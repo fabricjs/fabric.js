@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="ASL" owner="AE" desc="Test Focusable Elements - tspan Element" status="accepted"
+    approved="yes"
+    version="$Revision: 1.6 $" testname="$RCSfile: interact-focus-208-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>Test Focusable Elements - tspan Element</p>
+      <p>
+        Each tspan has an animation that sets the fill to green upon receiving
+        focus. The focus should be moved in turn to "Old", "pond", "frogs",
+        "jumped", "in", "sound", "of" and then "water".
+      </p>
+      <p>
+        For the test to pass:
+      </p>
+      <ul>
+        <li>
+          "Old", "pond", and "sound", "of" and "water" must each turn green
+          respectively when given focus.
+        </li>
+        <li>
+          "frogs" and "in" must both turn green at the same time when each is
+          given focus.
+        </li>
+        <li>
+          "jumped" must turn green when given focus and in addition "frogs" and
+          "in" must turn green at the same time due to focus bubbling.
+        </li>
+      </ul>
+      <p>
+        In the 2nd phrase there are two nested tspan elements: "jumped" is in
+        the inner tspan, so focus should be received by the outer two words
+        "frogs", "in" and then by the word "jumped".
+      </p>
+      <p>
+        Focus navigation is user agent dependant but typically is navigated
+        with the keyboard keys.
+      </p>
+      <p>
+        TAB or arrow keys move the focus while the ENTER key activates the
+        focused element.
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: interact-focus-208-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+    <text xml:id="display-title" x="240" y="40" text-anchor="middle" font-size="16" fill="#000">Test Focusable Elements - tspan Element</text>
+    <text xml:id="comment-1" x="240" y="60" text-anchor="middle" font-size="14" fill="#555">
+      Give focus to each word.
+    </text>
+    <text x="240" y="185" text-anchor="middle" font-size="20" fill="#000">
+      <tspan focusable="true" xml:id="old" >
+        Old
+        <set attributeName="fill" to="green" begin="old.focusin"/>
+        <set attributeName="fill" to="inherit" begin="old.focusout"/>
+      </tspan>
+      <tspan focusable="true" xml:id="pond">
+        pond
+        <set attributeName="fill" to="green" begin="pond.focusin"/>
+        <set attributeName="fill" to="inherit" begin="pond.focusout"/>
+      </tspan>
+      <tspan > - </tspan>
+      <tspan focusable="true" xml:id="phrase2" fill="blue">
+        frogs
+        <tspan focusable="true" fill="#555" xml:id="jumped">
+          jumped
+          <set attributeName="fill" to="green" begin="jumped.focusin"/>
+          <set attributeName="fill" to="#555" begin="jumped.focusout"/>
+        </tspan>
+        in
+        <set attributeName="fill" to="green" begin="phrase2.focusin"/>
+        <set attributeName="fill" to="blue" begin="phrase2.focusout"/>
+      </tspan>
+      <tspan>-</tspan>
+      <tspan focusable="true" xml:id="sound">
+        sound
+        <set attributeName="fill" to="green" begin="sound.focusin"/>
+        <set attributeName="fill" to="inherit" begin="sound.focusout"/>
+      </tspan>
+      <tspan focusable="true" xml:id="of">
+        of
+        <set attributeName="fill" to="green" begin="of.focusin"/>
+        <set attributeName="fill" to="inherit" begin="of.focusout"/>
+      </tspan>
+      <tspan focusable="true" xml:id="water">
+        water
+        <set attributeName="fill" to="green" begin="water.focusin"/>
+        <set attributeName="fill" to="inherit" begin="water.focusout"/>
+      </tspan>
+    </text>
+    <text fill="#555" text-anchor="end" x="450" y="270" font-size="8">Frog Haiku by Matsuo Basho (1686), translated by Lafcadio Hearn</text>
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none" fill="black">$Revision: 1.6 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240"
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

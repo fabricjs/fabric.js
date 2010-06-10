@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="DOH" owner="AE" desc="External Animated Use Elements" status="accepted"
+    approved="yes"
+    version="$Revision: 1.7 $" testname="$RCSfile: linking-refs-201-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>External Animated Use Elements</p>
+      <p>
+        A 'use' elements place various animated fragments.
+        A local animate element is then applied to further animate the fragment.-
+      </p>
+      <p> - </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: linking-refs-201-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+    <text xml:id="display-title" text-anchor="middle" x="240" y="45" font-size="16" fill="black">External Animated Use Elements</text>
+    <g transform="translate(90, 50)" font-size="14">
+      <g transform="translate(0, 60)">
+        <text x="80" y="0" fill="#555">Two rotating rectangles, blue and black</text>
+        <text x="80" y="15" fill="#555">with animated opacity</text>
+        <g fill-opacity="0.5">
+          <use x="20" xlink:href="../images/svglib.svg#rect5" fill="blue"/>
+          <use x="50" xlink:href="../images/svglib.svg#rect5"/>
+          <animate attributeName="fill-opacity" values="1;0.3;1" begin="0" dur="4s" repeatCount="indefinite"/>
+        </g>
+      </g>
+      <g transform="translate(0, 100)">
+        <text x="80" y="0" fill="#555">Two rotating rectangles, oscillating in phase  </text>
+        <text x="80" y="15" fill="#555">opposition between yellow and red</text>
+        <g>
+          <use x="20" xlink:href="../images/svglib.svg#rect5" fill="blue">
+            <animate xml:id="anim10" attributeName="fill" from="red" to="yellow" begin="0;anim20.end" dur="1s"/>
+            <animate xml:id="anim20" attributeName="fill" from="yellow" to="red" begin="anim10.end" dur="1s"/>
+          </use>
+          <use x="50" xlink:href="../images/svglib.svg#rect5"/>
+          <animate xml:id="anim1" attributeName="fill" from="yellow" to="red" begin="0;anim2.end" dur="1s"/>
+          <animate xml:id="anim2" attributeName="fill" from="red" to="yellow" begin="anim1.end" dur="1s"/>
+        </g>
+      </g>
+      <g transform="translate(0, 140)">
+        <text x="80" y="0" fill="#555">Animated rotation, translation and color at </text>
+        <text x="80" y="15" fill="#555">different 'use' levels, external and internal</text>
+        <use x="20" xlink:href="../images/svglib.svg#rect6">
+          <animate attributeName="fill" from="red" to="blue" begin="0" dur="1s" repeatCount="indefinite"/>
+        </use>
+      </g>
+    </g>
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none" fill="black">$Revision: 1.7 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240" 
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

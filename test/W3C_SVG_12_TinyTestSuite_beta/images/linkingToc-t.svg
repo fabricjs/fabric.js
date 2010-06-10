@@ -1,0 +1,63 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd"> 
+  
+
+<!-- ========================================================  -->
+<!-- linkingToc.svg                                            -->
+<!--                                                           -->
+<!-- Auxiliary file for linking BE tests ... a Table of        -->
+<!-- Contents and index of the BE test cases.                  -->
+<!--                                                           -->
+<!--                                                           -->
+<!-- History:                                                  -->
+<!--  02-apr-2000, LH: Created.                                -->
+<!--  03-Aug-2000, LH: update DOCTYPE for CR DTD, 20000802;    -->
+<!--  23-Aug-2000, LH: fix it for rename of xlinkAttr-BE-02;   -->
+<!--  06-Feb-2002, LK: Modify for SVG 1.1 linking tests;       -->
+<!--                                                           -->
+<!-- ========================================================  -->
+<svg version="1.1" baseProfile="tiny" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="480" height="360" >
+
+   <text x="75" y="20" font-size="20">TOC &amp; index of linking tests.</text>
+
+   
+   <a xlink:href="../svg/linking-a-04-t.svg" > 
+     <text x="20" y="70" fill="blue" font-size="12">
+       1.) linking-a-04-t:  Verify basic links out of SVG content ('a').
+     </text> 
+   </a>
+
+   <a xlink:href="../svg/linking-uri-03-t.svg" > 
+     <text x="20" y="100" fill="blue" font-size="12">
+       2.) linking-uri-03-t:  Verify handling of xlink attributes on 'a'.
+     </text> 
+   </a>
+   
+   <a xlink:href="../svglinking-a-02-b.svg" > 
+     <text x="20" y="130" fill="blue" font-size="12">
+       3.) linking-a-02-b:  Verify links into SVG content and fragment syntax.
+     </text> 
+   </a>
+   
+   <a xlink:href="../svg/linking-uri-01-b.svg" > 
+     <text x="20" y="160" fill="blue" font-size="12">
+      4.) linking-uri-01-b:  Verify 'view' element handling.
+     </text> 
+   </a>
+ 
+   <a xlink:href="../svg/linking-uri-02-b.svg" > 
+     <text x="20" y="190" fill="blue" font-size="12">
+      5.) linking-uri-02-b:  Verify 'view' element handling (companion to linking-uri-01-f).
+     </text> 
+   </a>
+ 
+   <text x="20" y="230" fill="black" font-size="12">
+     [Note.  This is not a linking test, but a supplemental file and link
+   </text>
+   <text x="20" y="242">  
+     target for other linking tests.]
+   </text>
+
+   <rect id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000000"/>
+
+</svg>

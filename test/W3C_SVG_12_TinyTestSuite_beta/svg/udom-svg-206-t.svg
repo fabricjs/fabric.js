@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="CL" owner="CM" desc="Test SVGSVGElement.currentScale" status="accepted"
+    approved="yes"
+    version="$Revision: 1.7 $" testname="$RCSfile: udom-svg-206-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        This tests setting and getting the <tt>currentScale</tt> attribute of
+        the <b>SVGSVGElement</b> interface.
+      </p>
+      <p>
+        There are three sub-tests, each represented by a rectangle (blue for
+        pass, red for fail). The test has been passed if all three rectangles are blue, and
+        the test slide is shown at 90% of its regular size (i.e., the
+        range (0, 0) -&gt; (533.333, 400) user units is shown).
+      </p>
+
+      <p>
+        The first sub-test checks that the initial value of
+        <tt>currentScale</tt> is 1.  The second checks setting
+        <tt>currentScale</tt> to a valid value (in this case, 0.9), and
+        looks at the resulting screenCTM.  The third exercises retrieving
+        the newly set value.
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: udom-svg-206-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+    <text x='10' y='42'>SVGSVGElement.currentScale test</text>
+    <text x='10' y='280' font-size='12'>All three rectangles must be blue.</text>
+    <g font-size='12'>
+      <rect xml:id='rect1' x='10' y='60' width='50' height='50' fill='red'/>
+      <text x='10' y='130'>Initial value</text>
+
+      <rect xml:id='rect2' x='160' y='60' width='50' height='50' fill='red'/>
+      <text x='160' y='130'>Set value</text>
+
+      <rect xml:id='rect3' x='310' y='60' width='50' height='50' fill='red'/>
+      <text x='310' y='130'>Get new value</text>
+
+    </g>
+    <script type='application/ecmascript'>
+      <![CDATA[
+      function eq(a, b) {
+        return Math.abs(a - b) < 1e-4;
+      }
+
+      svg = document.documentElement;
+
+      if (svg.currentScale == 1) {
+        document.getElementById('rect1').setAttributeNS(null, 'fill', 'blue');
+      }
+
+      var m1 = svg.getScreenCTM();
+      svg.currentScale = 0.9;
+      var m2 = svg.getScreenCTM();
+      if (eq(m1.getComponent(0) * 0.9, m2.getComponent(0)) && eq(m1.getComponent(3) * 0.9, m2.getComponent(3))) {
+        document.getElementById('rect2').setAttributeNS(null, 'fill', 'blue');
+      }
+
+      if (eq(svg.currentScale, 0.9)) {
+        document.getElementById('rect3').setAttributeNS(null, 'fill', 'blue');
+      }
+
+
+      svg.currentScale = 0.9;
+    ]]>
+    </script>
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.7 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240"
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

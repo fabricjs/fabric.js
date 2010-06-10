@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="AE" owner="CM" desc="Test the operation of Node.removeChild" status="accepted"
+    approved="yes"
+    version="$Revision: 1.6 $" testname="$RCSfile: udom-dom-206-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        This tests that the <tt>removeChild</tt> method of the
+        <b>Node</b> interface works correctly.
+      </p>
+      <p>
+        The test has three sub-tests, for different <tt>removeChild</tt>
+        behavior, which consist of a paired rectangle and circle:
+      </p>
+      <ul>
+        <li>
+          The first is a test of successfully removing a single element
+          from the document.  Initially, a red rectangle occludes a blue
+          rectangle.  This red rectangle should then be removed by the
+          <tt>removeChild</tt> call, which results in the blue rectangle
+          becoming visible.  The circle beneath it represents whether
+          <tt>removeChild</tt> returned the correct value (i.e., a reference
+          to the same red rectangle that was removed).  If this return
+          value is incorrect, the circle will remain red.  If it was
+          correct, the circle is changed to be blue.
+        </li>
+        <li>
+          The second is a test of successfully removing a subtree
+          from the document.  The subtree is simply a <tt>g</tt> element
+          with a red <tt>rect</tt> as a child, which initially occludes
+          a blue rectangle.  The group with the red rectangle should then be
+          removed by the <tt>removeChild</tt> call, which results in the blue
+          rectangle becoming visible.  The circle beneath it represents
+          whether <tt>removeChild</tt> returned the correct value (i.e., a
+          reference to the <tt>g</tt> element that was removed).  If this
+          return value is incorrect, the circle will remain red.  If it was
+          correct, the circle is changed to be blue.
+        </li>
+        <li>
+          The third is a test of <tt>removeChild</tt> throwing a NOT_FOUND_ERR
+          <b>DOMException</b> when passed an element that is not a child of
+          the element on which the method was called.  If the blue rectangle
+          remains, the implementation correctly did not remove it.  The circle
+          indicates whether the exception was thrown as expected.  If the
+          exception was not thrown, or the wrong is exception is thrown,
+          the circle will remain red.  Otherwise, the circle will be changed
+          to be blue.
+        </li>
+      </ul>
+      <p>
+        The test has been passed if the top row shows three blue rectangles
+        and the bottom row shows three blue circles.
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: udom-dom-206-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+    <text x='10' y='42'>Node.removeChild test</text>
+    <text x='10' y='280' font-size='12'>All three rects and three circles must be blue.</text>
+    <g xml:id='g1' transform='translate(120,60)'>
+      <g font-size='10'>
+        <g text-anchor='middle'>
+          <text x='55' y='20'>remove single element</text>
+          <text x='155' y='20'>remove subtree</text>
+          <text x='255' y='20'>remove incorrect element</text>
+        </g>
+        <g text-anchor='end'>
+          <text x='0' y='55'>removeChild operation</text>
+          <text x='0' y='125'>removeChild return value</text>
+        </g>
+      </g>
+      <rect xml:id='rect1' x='30' y='30' width='50' height='50' fill='blue'/>
+      <rect xml:id='rect2' x='30' y='30' width='50' height='50' fill='red'/>
+      <circle xml:id='circle1' cx='55' cy='125' r='25' fill='red'/>
+      <rect x='130' y='30' width='50' height='50' fill='blue'/>
+      <g xml:id='g2'>
+        <rect x='130' y='30' width='50' height='50' fill='red'/>
+      </g>
+      <circle xml:id='circle2' cx='155' cy='125' r='25' fill='red'/>
+      <rect xml:id='rect3' x='230' y='30' width='50' height='50' fill='blue'/>
+      <circle xml:id='circle3' cx='255' cy='125' r='25' fill='red'/>
+    </g>
+    <script type='application/ecmascript'>
+      <![CDATA[
+      // Get all of the elements.
+      var ids = 'g1 g2 rect1 rect2 rect3 circle1 circle2 circle3'.split(' ');
+      for (var i in ids) {
+        this[ids[i]] = document.getElementById(ids[i]);
+      }
+
+      // Test removing a single element.
+      if (g1.removeChild(rect2) == rect2) {
+        circle1.setAttributeNS(null, 'fill', 'blue');
+      }
+
+      // Test removing a subtree.
+      if (g1.removeChild(g2) == g2) {
+        circle2.setAttributeNS(null, 'fill', 'blue');
+      }
+
+      // Test removing a child from the wrong parent.
+      try {
+        g2.removeChild(rect3);
+      } catch (e) {
+        if (e.code == DOMException.NOT_FOUND_ERR) {
+          circle3.setAttributeNS(null, 'fill', 'blue');
+        }
+      }
+    ]]>
+    </script>
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.6 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240" 
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

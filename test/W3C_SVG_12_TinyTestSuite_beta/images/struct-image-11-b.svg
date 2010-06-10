@@ -1,0 +1,8 @@
+<?xml version="1.0" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="svg-root" viewBox="0 0 450 450" width="450" height="450">
+	<g id="rects">  
+		<rect x="225" y="0" width="225" height="225" style="fill:red" onclick="evt.currentTarget.style.fill = 'green';"/>
+		<rect x="0" y="225" width="225" height="225" style="fill:#f00" onclick="evt.currentTarget.setProperty('fill','green',null);"/>
+	</g>
+</svg>
+ 

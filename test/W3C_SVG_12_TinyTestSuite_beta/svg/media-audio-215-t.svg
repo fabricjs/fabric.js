@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="AZ" owner="AG" desc="Tests the audio-level property for nested audio elements and clamping of audio-level" status="accepted"
+    approved="yes"
+    version="$Revision: 1.6 $" testname="$RCSfile: media-audio-215-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        Tests the audio-level property for nested audio elements and clamping
+        of audio-level.
+      </p>
+      <p>
+        The test consists of 6 subtests. When each audio sub-test is executed a
+        corresponding rect will turn blue. When each audio sub-test is
+        finished the corresponding rect will turn gray again. For this test to pass, all subtests must
+        have a green rectangle next to them.
+
+        The audio must also be heard to pass this test. If the user agent does not support the WAV media format, the test is still a pass.
+      </p>
+      <p>
+        The 1st subtest has an audio-level = 1. To pass this subtest the audio
+        must be played at the system volume.
+      </p>
+      <p>
+        The 2nd subtest has an audio-level = 2. To pass this subtest the audio
+        must be played at the system volume.
+      </p>
+      <p>
+        The 3rd subtest has an audio element with an audio-level = 2. Within
+        the audio element there is a child audio element with an
+        audio-level = 0.5. The source audio is the child audio element. To pass
+        this subtest the audio must be played at 1/2 the system volume.
+      </p>
+      <p>
+        The 4th subtest has an audio element with an audio-level = 0.5. Within
+        the audio element there is a child audio element with an
+        audio-level = 2. The source audio is the child audio element. To pass
+        this subtest the audio must be played at 1/2 the system volume.
+      </p>
+      <p>
+        The 5th subtest has three audio elements. The first audio element has
+        an audio-level = 0.5 and is the parent audio element. The second audio
+        element has an audio-level = 2 and is a child to the first audio
+        element. The third audio element has an audio-level = 0.5 and is a
+        child to the second audio element. The source audio is third audio
+        element. To pass this subtest the audio must be played at 1/4 the
+        system volume.
+      </p>
+      <p>
+        The 6th subtest has four audio elements. The first audio element has
+        an audio-level = to the audio level of the 3rd audio element (0.5). The
+        second audio element references an audio element from another subtest
+        with an audio-level of 2. The second audio element is a child of the
+        first audio element. The third audio element has an audio-level = 0.5
+        and is a child of the second audio element. The fourth audio element
+        has an audio-level of 2 and is a child of the third audio element. The
+        source audio is the fourth audio element. To pass this subtest the
+        audio must be played at 1/4 the system volume.
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: media-audio-215-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+    <!-- 1st Subtest -->
+    <audio xml:id="audio_test_1" audio-level="1" xlink:href="../images/pacman.wav" begin="0s" dur="4.3s" repeatCount="1"/>
+
+    <!-- 2nd Subtest -->
+    <audio xml:id="audio_test_2" audio-level="2" xlink:href="../images/pacman.wav" begin="4.3s" dur="4.3s" repeatCount="1"/>
+
+    <!-- 3rd Subtest -->
+    <g xml:id="audio_test_3_begin" audio-level="2">
+      <audio xml:id="audio_test_3" audio-level="0.5" xlink:href="../images/pacman.wav" begin="8.6s" dur="4.3s" repeatCount="1"/>
+    </g>
+
+    <!-- 4th Subtest -->
+    <g xml:id="audio_test_4_begin" audio-level="0.5">
+      <audio xml:id="audio_test_4" audio-level="2" xlink:href="../images/pacman.wav" begin="12.9s" dur="4.3s" repeatCount="1"/>
+    </g>
+
+    <!-- 5th Subtest -->
+    <g xml:id="audio_test_5_begin" audio-level="0.5">
+      <g audio-level="2">
+        <audio xml:id="audio_test_5" audio-level="0.5" xlink:href="../images/pacman.wav" begin="17.2s" dur="4.3s" repeatCount="1"/>
+      </g>
+    </g>
+
+    <!-- 6th Subtest -->
+    <g xml:id="audio_test_6_begin" audio-level="0.5">
+      <g audio-level="2">
+        <g audio-level="0.5">
+          <audio xml:id="audio_test_6" audio-level="2" xlink:href="../images/pacman.wav" begin="21.5s" dur="4.3s" repeatCount="1"/>
+        </g>
+      </g>
+    </g>
+
+    <script type="application/ecmascript">
+      <![CDATA[
+      function checkAudioLevel(begin_id, expected_audio_lvl, result_id)
+      {
+        //
+        // Must start with an audio level of as the final audio output is a
+        // multiplication (i.e. can't start with audio level = 0)
+        //
+        var final_audio_lvl = 1;
+        var elm = document.getElementById(begin_id);
+
+        //
+        // Travers the elements in the group and calculate the final audio
+        // level. The loop terminates when it encounters an audio element.
+        //
+        for ( ; ; )
+        {
+          final_audio_lvl = final_audio_lvl * elm.getFloatTrait("audio-level");
+
+          if (elm.localName == "audio")
+          {
+            break;
+          }
+          
+          elm = elm.firstElementChild;
+        }
+
+        if (expected_audio_lvl == final_audio_lvl)
+        {
+          document.getElementById(result_id).setAttribute("fill", "green");
+        }
+        else
+        {
+          document.getElementById(result_id).setAttribute("fill", "red");
+        }
+      }
+      ]]>
+    </script>
+
+    <g transform="translate(20,20)">
+      <!-- 1st Subtest Volume = System Volume -->
+      <rect x="0" y="0" width="30" height="30" fill="none">
+        <set attributeName="fill" to="blue" begin="audio_test_1.beginEvent" end="audio_test_1.endEvent">
+          <handler type="text/ecmascript" xe:event="endEvent">
+            checkAudioLevel("audio_test_1", "1", "audio_test_1_result");
+          </handler>
+        </set>
+      </rect>
+      <rect xml:id="audio_test_1_result" x="40" y="0" width="30" height="30" fill="#DDD"/>
+      <text x="80" y="10">audio-level = 1</text>
+      <text x="80" y="30">Volume = System Volume</text>
+
+      <!-- 2nd Subtest Volume = System Volume Volume = System Volume-->
+      <g transform="translate(0,50)">
+        <rect x="0" y="0" width="30" height="30" fill="none">
+          <set attributeName="fill" to="blue" begin="audio_test_2.beginEvent" end="audio_test_2.endEvent">
+            <handler type="text/ecmascript" xe:event="endEvent">
+              checkAudioLevel("audio_test_2", "1", "audio_test_2_result");
+            </handler>
+          </set>
+        </rect>
+        <rect xml:id="audio_test_2_result" x="40" y="0" width="30" height="30" fill="#DDD"/>
+        <text x="80" y="10">audio-level = clamp(2)</text>
+        <text x="80" y="30">Volume = System Volume</text>
+      </g>
+
+      <!-- 3rd Subtest Volume = 0.5 System Volume-->
+      <g transform="translate(0,100)">
+        <rect x="0" y="0" width="30" height="30" fill="none">
+          <set attributeName="fill" to="blue" begin="audio_test_3.beginEvent" end="audio_test_3.endEvent">
+            <handler type="text/ecmascript" xe:event="endEvent">
+              checkAudioLevel("audio_test_3_begin", "0.5", "audio_test_3_result");
+            </handler>
+          </set>
+        </rect>
+        <rect xml:id="audio_test_3_result" x="40" y="0" width="30" height="30" fill="#DDD"/>
+        <text x="80" y="10">audio-level = clamp(2) * 0.5</text>
+        <text x="80" y="30">Volume = 0.5 System Volume</text>
+      </g>
+
+      <!-- 4th Subtest Volume = 0.5 System Volume-->
+      <g transform="translate(0,150)">
+        <rect x="0" y="0" width="30" height="30" fill="none">
+          <set attributeName="fill" to="blue" begin="audio_test_4.beginEvent" end="audio_test_4.endEvent">
+            <handler type="text/ecmascript" xe:event="endEvent">
+              checkAudioLevel("audio_test_4_begin", "0.5", "audio_test_4_result");
+            </handler>
+          </set>
+        </rect>
+        <rect xml:id="audio_test_4_result" x="40" y="0" width="30" height="30" fill="#DDD"/>
+        <text x="80" y="10">audio-level = 0.5 * clamp(2)</text>
+        <text x="80" y="30">Volume = 0.5 System Volume</text>
+      </g>
+
+      <!-- 5th Subtest Volume = 0.25 System Volume-->
+      <g transform="translate(0,200)">
+        <rect x="0" y="0" width="30" height="30" fill="none">
+          <set attributeName="fill" to="blue" begin="audio_test_5.beginEvent" end="audio_test_5.endEvent">
+            <handler type="text/ecmascript" xe:event="endEvent">
+              checkAudioLevel("audio_test_5_begin", "0.25", "audio_test_5_result");
+            </handler>
+          </set>
+        </rect>
+        <rect xml:id="audio_test_5_result" x="40" y="0" width="30" height="30" fill="#DDD"/>
+        <text x="80" y="10">audio-level = 0.5 * clamp(2) * 0.5</text>
+        <text x="80" y="30">Volume = 0.25 System Volume</text>
+      </g>
+
+      <!-- 6th Subtest Volume = 0.25 System Volume-->
+      <g transform="translate(0,250)">
+        <rect x="0" y="0" width="30" height="30" fill="none">
+          <set attributeName="fill" to="blue" begin="audio_test_6.beginEvent" end="audio_test_6.endEvent">
+            <handler type="text/ecmascript" xe:event="endEvent">
+              checkAudioLevel("audio_test_6_begin", "0.25", "audio_test_6_result");
+            </handler>
+          </set>
+        </rect>
+        <rect xml:id="audio_test_6_result" x="40" y="0" width="30" height="30" fill="#DDD"/>
+        <text x="80" y="10">audio-level = 0.5 * clamp(2) * 0.5 * clamp(2)</text>
+        <text x="80" y="30">Volume = 0.25 System Volume</text>
+      </g>
+    </g>
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.6 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240"
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

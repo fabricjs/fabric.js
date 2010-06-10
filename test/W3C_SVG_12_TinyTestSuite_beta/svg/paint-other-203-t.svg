@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="NR" owner="ASl" desc="Tests animation of solid-color and solid-opacity" status="accepted"
+    approved="yes"
+    version="$Revision: 1.6 $" testname="$RCSfile: paint-other-203-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        Test solidColor animation. Animates solid-color and solid-opacity on two rects.
+      </p>
+      <p>
+        The test is passed if the following objects are displayed:
+        Rect 1
+        - Fill: blue animated to red, opacity 0 animated to 1
+        - Stroke: none
+
+        Rect 2 (roated -30 degrees)
+        - Fill: none
+        - Stroke: red animated to yellow, opacity 1 animated to 0
+      </p>
+      <p>
+        One rect animates its fill from blue to red over 3 seconds and has its solid-opacity animated from 0 to 1 over 5 seconds.
+        The other rect (no fill and rotated -30) has its stroke animated from red to yellow over 3s and solid-opacity from 1 to 0 over 5 seconds.
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: paint-other-203-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+
+    <solidColor xml:id="solidFill" >
+      <animate attributeName="solid-opacity" from="0" to="1" begin="0s" dur="5s" fill="freeze" />
+      <animateColor attributeName="solid-color" from="rgb(0,0,255)" to="rgb(255,0,0)" begin="0s" dur="3s" fill="freeze" />
+    </solidColor>
+    <solidColor xml:id="solidStroke" >
+      <animate attributeName="solid-opacity" from="1" to="0" begin="0s" dur="5s" fill="freeze" />
+      <animateColor attributeName="solid-color" from="red" to="yellow" begin="0s" dur="3s" fill="freeze" />
+    </solidColor>
+  </g>
+
+  <rect x="150" y="100" width="200" height="100" rx="25" fill="url(#solidFill)"/>
+
+  <g transform="translate(150 155) rotate(-30)" >
+    <rect x="0" y="0" width="200" height="100" rx="25" fill="none" stroke="url(#solidStroke)" stroke-width="15" />
+  </g>
+
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.6 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240"
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

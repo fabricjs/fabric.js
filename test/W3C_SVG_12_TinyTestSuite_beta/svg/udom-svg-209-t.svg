@@ -1,0 +1,416 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="AE" owner="ASl" desc="Test raising of begin, end and repeat events togheter with pause/resume element" status="accepted"
+    approved="yes"
+    version="$Revision: 1.3 $" testname="$RCSfile: udom-svg-209-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        Test on SMIL with scripting. Animation should match the indicated begin- repeat- and end-values
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: udom-svg-209-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="10">
+
+    <defs>
+      <polygon xml:id="arrow" points="0,0, 3,-8, -3,-8"/>
+    </defs>
+
+    <text x="230" y="69" text-anchor="middle">begin</text>
+    <text x="230" y="82" text-anchor="middle">0-1s</text>
+    <text x="230" y="95" text-anchor="middle">5-6s</text>
+
+    <text x="280" y="69" text-anchor="middle">repeat(1)</text>
+    <text x="280" y="82" text-anchor="middle">1-2s</text>
+    <text x="280" y="95" text-anchor="middle">7.5-8.5s</text>
+
+    <text x="330" y="82" text-anchor="middle">repeat(2)</text>
+    <text x="330" y="95" text-anchor="middle">never</text>
+
+    <text x="380" y="82" text-anchor="middle">repeat(3)</text>
+    <text x="380" y="95" text-anchor="middle">never</text>
+
+    <text x="430" y="69" text-anchor="middle">end</text>
+    <text x="430" y="82" text-anchor="middle">3-4s</text>
+    <text x="430" y="95" text-anchor="middle">8-9s</text>
+
+    <text x="125" y="82" fill="#CCC">
+      Pause 5s
+      <set attributeName="fill" to="#F00" begin="pause_anim.begin" end="pause_anim.end"/>
+    </text>
+
+    <!--======================================================================-->
+    <!--=                                                                    =-->
+    <!--======================================================================-->
+
+    <rect x="100" y="100" width="25" height="10" fill="#FA3" stroke="#000">
+
+      <animate xml:id="anim_1"
+               attributeName="width" from="0" to="25" additive="sum"
+               begin="0;5" end="3;8" dur="1"
+               repeatCount="indefinite" accumulate="sum">
+
+      </animate>
+
+    </rect>
+
+    <use xlink:href="#arrow" x="125" y="100">
+      <animate attributeName="x"
+               values=  "125; 163;    163;   125;   125;    163"
+               keyTimes="0;   0.1875; 0.375; 0.375; 0.8125; 1"
+               begin="0" dur="8"/>
+    </use>
+
+
+    <rect x="210" y="100" width="40" height="10" fill="#CCC" stroke="#555">
+      <set attributeName="fill"   begin="anim_1.beginEvent" dur="1" to="#FA3"/>
+      <set attributeName="stroke" begin="anim_1.beginEvent" dur="1" to="#000"/>
+    </rect>
+
+    <rect x="260" y="100" width="40" height="10" fill="#CCC" stroke="#555">
+      <set attributeName="fill"   begin="anim_1.repeat(1)" dur="1" to="#FA3"/>
+      <set attributeName="stroke" begin="anim_1.repeat(1)" dur="1" to="#000"/>
+    </rect>
+
+    <rect x="310" y="100" width="40" height="10" fill="#CCC" stroke="#555">
+      <set attributeName="fill"   begin="anim_1.repeat(2)" dur="1" to="#FA3"/>
+      <set attributeName="stroke" begin="anim_1.repeat(2)" dur="1" to="#000"/>
+    </rect>
+
+    <rect x="360" y="100" width="40" height="10" fill="#CCC" stroke="#555">
+      <set attributeName="fill"   begin="anim_1.repeat(3)" dur="1" to="#F00"/>
+      <set attributeName="stroke" begin="anim_1.repeat(3)" dur="1" to="#000"/>
+    </rect>
+
+    <rect x="410" y="100" width="40" height="10" fill="#CCC" stroke="#555">
+      <set attributeName="fill"   begin="anim_1.endEvent" dur="1" to="#FA3"/>
+      <set attributeName="stroke" begin="anim_1.endEvent" dur="1" to="#000"/>
+    </rect>
+
+
+    <!--======================================================================-->
+
+    <rect x="100" y="120" width="25" height="10" fill="#FA3" stroke="#000">
+
+      <animate xml:id="anim_2"
+               attributeName="width" from="0" to="25" additive="sum"
+               begin="0;5" end="3;8" dur="1" fill="freeze"
+               repeatCount="indefinite" accumulate="sum">
+
+      </animate>
+
+    </rect>
+
+    <use xlink:href="#arrow" x="163" y="120">
+      <animate attributeName="x"
+               values=  "125; 163;    163;   125;   125;    163"
+               keyTimes="0;   0.1875; 0.625; 0.625; 0.8125; 1"
+               begin="0" dur="8"/>
+    </use>
+
+
+    <rect x="210" y="120" width="40" height="10" fill="#CCC" stroke="#555">
+      <set attributeName="fill"   begin="anim_2.beginEvent" dur="1" to="#FA3"/>
+      <set attributeName="stroke" begin="anim_2.beginEvent" dur="1" to="#000"/>
+    </rect>
+
+    <rect x="260" y="120" width="40" height="10" fill="#CCC" stroke="#555">
+      <set attributeName="fill"   begin="anim_2.repeat(1)" dur="1" to="#FA3"/>
+      <set attributeName="stroke" begin="anim_2.repeat(1)" dur="1" to="#000"/>
+    </rect>
+
+    <rect x="310" y="120" width="40" height="10" fill="#CCC" stroke="#555">
+      <set attributeName="fill"   begin="anim_2.repeat(2)" dur="1" to="#FA3"/>
+      <set attributeName="stroke" begin="anim_2.repeat(2)" dur="1" to="#000"/>
+    </rect>
+
+    <rect x="360" y="120" width="40" height="10" fill="#CCC" stroke="#555">
+      <set attributeName="fill"   begin="anim_2.repeat(3)" dur="1" to="#F00"/>
+      <set attributeName="stroke" begin="anim_2.repeat(3)" dur="1" to="#000"/>
+    </rect>
+
+    <rect x="410" y="120" width="40" height="10" fill="#CCC" stroke="#555">
+      <set attributeName="fill"   begin="anim_2.endEvent" dur="1" to="#FA3"/>
+      <set attributeName="stroke" begin="anim_2.endEvent" dur="1" to="#000"/>
+    </rect>
+
+    <!--======================================================================-->
+
+    <rect x="100" y="140" width="25" height="10" fill="#FA3" stroke="#000">
+
+      <animate xml:id="anim_3"
+               attributeName="width" from="0" to="25" additive="sum"
+               begin="0;5" end="3;8" dur="1" fill="freeze"
+               repeatDur="indefinite" accumulate="sum">
+
+      </animate>
+
+    </rect>
+
+    <use xlink:href="#arrow" x="163" y="140">
+      <animate attributeName="x"
+               values=  "125; 163;    163;   125;   125;    163"
+               keyTimes="0;   0.1875; 0.625; 0.625; 0.8125; 1"
+               begin="0" dur="8"/>
+    </use>
+
+
+    <rect x="210" y="140" width="40" height="10" fill="#CCC" stroke="#555">
+      <set attributeName="fill"   begin="anim_3.beginEvent" dur="1" to="#FA3"/>
+      <set attributeName="stroke" begin="anim_3.beginEvent" dur="1" to="#000"/>
+    </rect>
+
+    <rect x="260" y="140" width="40" height="10" fill="#CCC" stroke="#555">
+      <set attributeName="fill"   begin="anim_3.repeat(1)" dur="1" to="#FA3"/>
+      <set attributeName="stroke" begin="anim_3.repeat(1)" dur="1" to="#000"/>
+    </rect>
+
+    <rect x="310" y="140" width="40" height="10" fill="#CCC" stroke="#555">
+      <set attributeName="fill"   begin="anim_3.repeat(2)" dur="1" to="#FA3"/>
+      <set attributeName="stroke" begin="anim_3.repeat(2)" dur="1" to="#000"/>
+    </rect>
+
+    <rect x="360" y="140" width="40" height="10" fill="#CCC" stroke="#555">
+      <set attributeName="fill"   begin="anim_3.repeat(3)" dur="1" to="#F00"/>
+      <set attributeName="stroke" begin="anim_3.repeat(3)" dur="1" to="#000"/>
+    </rect>
+
+    <rect x="410" y="140" width="40" height="10" fill="#CCC" stroke="#555">
+      <set attributeName="fill"   begin="anim_3.endEvent" dur="1" to="#FA3"/>
+      <set attributeName="stroke" begin="anim_3.endEvent" dur="1" to="#000"/>
+    </rect>
+
+
+    <!--======================================================================-->
+    <!--=                                                                    =-->
+    <!--======================================================================-->
+
+    <rect x="10" y="170" fill="#EEE" width="460" height="90"/>
+    <text x="20" y="185">Scripted begin and end</text>
+
+
+
+    <rect x="100" y="200" width="25" height="10" fill="#FA3" stroke="#000">
+
+      <animate xml:id="anim_4"
+               attributeName="width" from="0" to="25" additive="sum"
+               begin="indefinite" dur="1"
+               repeatCount="indefinite" accumulate="sum">
+
+      </animate>
+
+    </rect>
+
+    <use xlink:href="#arrow" x="125" y="200">
+      <animate attributeName="x"
+               values=  "125; 163;    163;   125;   125;    163"
+               keyTimes="0;   0.1875; 0.375; 0.375; 0.8125; 1"
+               begin="0" dur="8"/>
+    </use>
+
+
+    <rect x="210" y="200" width="40" height="10" fill="#CCC" stroke="#555">
+      <set attributeName="fill"   begin="anim_4.beginEvent" dur="1" to="#FA3"/>
+      <set attributeName="stroke" begin="anim_4.beginEvent" dur="1" to="#000"/>
+    </rect>
+
+    <rect x="260" y="200" width="40" height="10" fill="#CCC" stroke="#555">
+      <set attributeName="fill"   begin="anim_4.repeat(1)" dur="1" to="#FA3"/>
+      <set attributeName="stroke" begin="anim_4.repeat(1)" dur="1" to="#000"/>
+    </rect>
+
+    <rect x="310" y="200" width="40" height="10" fill="#CCC" stroke="#555">
+      <set attributeName="fill"   begin="anim_4.repeat(2)" dur="1" to="#FA3"/>
+      <set attributeName="stroke" begin="anim_4.repeat(2)" dur="1" to="#000"/>
+    </rect>
+
+    <rect x="360" y="200" width="40" height="10" fill="#CCC" stroke="#555">
+      <set attributeName="fill"   begin="anim_4.repeat(3)" dur="1" to="#F00"/>
+      <set attributeName="stroke" begin="anim_4.repeat(3)" dur="1" to="#000"/>
+    </rect>
+
+    <rect x="410" y="200" width="40" height="10" fill="#CCC" stroke="#555">
+      <set attributeName="fill"   begin="anim_4.endEvent" dur="1" to="#FA3"/>
+      <set attributeName="stroke" begin="anim_4.endEvent" dur="1" to="#000"/>
+    </rect>
+
+
+    <!--======================================================================-->
+
+    <rect x="100" y="220" width="25" height="10" fill="#FA3" stroke="#000">
+
+      <animate xml:id="anim_5"
+               attributeName="width" from="0" to="25" additive="sum"
+               begin="indefinite" dur="1" fill="freeze"
+               repeatCount="indefinite" accumulate="sum">
+
+      </animate>
+
+    </rect>
+
+    <use xlink:href="#arrow" x="163" y="220">
+      <animate attributeName="x"
+               values=  "125; 163;    163;   125;   125;    163"
+               keyTimes="0;   0.1875; 0.625; 0.625; 0.8125; 1"
+               begin="0" dur="8"/>
+    </use>
+
+
+    <rect x="210" y="220" width="40" height="10" fill="#CCC" stroke="#555">
+      <set attributeName="fill"   begin="anim_5.beginEvent" dur="1" to="#FA3"/>
+      <set attributeName="stroke" begin="anim_5.beginEvent" dur="1" to="#000"/>
+    </rect>
+
+    <rect x="260" y="220" width="40" height="10" fill="#CCC" stroke="#555">
+      <set attributeName="fill"   begin="anim_5.repeat(1)" dur="1" to="#FA3"/>
+      <set attributeName="stroke" begin="anim_5.repeat(1)" dur="1" to="#000"/>
+    </rect>
+
+    <rect x="310" y="220" width="40" height="10" fill="#CCC" stroke="#555">
+      <set attributeName="fill"   begin="anim_5.repeat(2)" dur="1" to="#FA3"/>
+      <set attributeName="stroke" begin="anim_5.repeat(2)" dur="1" to="#000"/>
+    </rect>
+
+    <rect x="360" y="220" width="40" height="10" fill="#CCC" stroke="#555">
+      <set attributeName="fill"   begin="anim_5.repeat(3)" dur="1" to="#F00"/>
+      <set attributeName="stroke" begin="anim_5.repeat(3)" dur="1" to="#000"/>
+    </rect>
+
+    <rect x="410" y="220" width="40" height="10" fill="#CCC" stroke="#555">
+      <set attributeName="fill"   begin="anim_5.endEvent" dur="1" to="#FA3"/>
+      <set attributeName="stroke" begin="anim_5.endEvent" dur="1" to="#000"/>
+    </rect>
+
+    <!--======================================================================-->
+
+    <rect x="100" y="240" width="25" height="10" fill="#FA3" stroke="#000">
+
+      <animate xml:id="anim_6"
+               attributeName="width" from="0" to="25" additive="sum"
+               begin="indefinite" dur="1" fill="freeze"
+               repeatDur="indefinite" accumulate="sum">
+
+      </animate>
+
+    </rect>
+
+    <use xlink:href="#arrow" x="163" y="240">
+      <animate attributeName="x"
+               values=  "125; 163;    163;   125;   125;    163"
+               keyTimes="0;   0.1875; 0.625; 0.625; 0.8125; 1"
+               begin="0" dur="8"/>
+    </use>
+
+
+    <rect x="210" y="240" width="40" height="10" fill="#CCC" stroke="#555">
+      <set attributeName="fill"   begin="anim_6.beginEvent" dur="1" to="#FA3"/>
+      <set attributeName="stroke" begin="anim_6.beginEvent" dur="1" to="#000"/>
+    </rect>
+
+    <rect x="260" y="240" width="40" height="10" fill="#CCC" stroke="#555">
+      <set attributeName="fill"   begin="anim_6.repeat(1)" dur="1" to="#FA3"/>
+      <set attributeName="stroke" begin="anim_6.repeat(1)" dur="1" to="#000"/>
+    </rect>
+
+    <rect x="310" y="240" width="40" height="10" fill="#CCC" stroke="#555">
+      <set attributeName="fill"   begin="anim_6.repeat(2)" dur="1" to="#FA3"/>
+      <set attributeName="stroke" begin="anim_6.repeat(2)" dur="1" to="#000"/>
+    </rect>
+
+    <rect x="360" y="240" width="40" height="10" fill="#CCC" stroke="#555">
+      <set attributeName="fill"   begin="anim_6.repeat(3)" dur="1" to="#F00"/>
+      <set attributeName="stroke" begin="anim_6.repeat(3)" dur="1" to="#000"/>
+    </rect>
+
+    <rect x="410" y="240" width="40" height="10" fill="#CCC" stroke="#555">
+      <set attributeName="fill"   begin="anim_6.endEvent" dur="1" to="#FA3"/>
+      <set attributeName="stroke" begin="anim_6.endEvent" dur="1" to="#000"/>
+    </rect>
+
+
+    <!--======================================================================-->
+
+    <animate attributeName="visibility" from="visible" to="visible"
+             begin="0;5" end="3;8">
+
+      <handler type="text/ecmascript" xe:event="beginEvent">
+        document.getElementById("anim_4").beginElement();
+        document.getElementById("anim_5").beginElement();
+        document.getElementById("anim_6").beginElement();
+      </handler>
+
+      <handler type="text/ecmascript" xe:event="endEvent">
+        document.getElementById("anim_4").endElement();
+        document.getElementById("anim_5").endElement();
+        document.getElementById("anim_6").endElement();
+      </handler>
+
+    </animate>
+
+
+    <!--======================================================================-->
+
+    <animate xml:id="pause_anim" attributeName="visibility"
+             from="visible" to="visible" begin="1.5" dur="5">
+
+      <handler type="text/ecmascript" xe:event="beginEvent">
+        document.getElementById("anim_1").pauseElement();
+        document.getElementById("anim_2").pauseElement();
+        document.getElementById("anim_3").pauseElement();
+        document.getElementById("anim_4").pauseElement();
+        document.getElementById("anim_5").pauseElement();
+        document.getElementById("anim_6").pauseElement();
+      </handler>
+
+      <handler type="text/ecmascript" xe:event="endEvent">
+        document.getElementById("anim_1").resumeElement();
+        document.getElementById("anim_2").resumeElement();
+        document.getElementById("anim_3").resumeElement();
+        document.getElementById("anim_4").resumeElement();
+        document.getElementById("anim_5").resumeElement();
+        document.getElementById("anim_6").resumeElement();
+      </handler>
+
+    </animate>
+
+
+    <text y="300" x="210 230 250 270 290 310 330 350 370 390 400"
+          text-anchor="middle">0123456789(s)</text>
+    <rect x="210" y="305" width="180" height="3"/>
+    <rect x="210" y="305" width="180" height="3" fill="#F00">
+      <animate attributeName="width" values="0;180" dur="9" fill="freeze"/>
+    </rect>
+
+
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.3 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240" 
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

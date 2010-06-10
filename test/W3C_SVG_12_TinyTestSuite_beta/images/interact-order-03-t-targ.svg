@@ -1,0 +1,71 @@
+<?xml version="1.0" standalone="no"?>
+
+<!--======================================================================-->
+<!--=  Copyright 2000, 2002 World Wide Web Consortium, (Massachusetts    =-->
+<!--=  Institute of Technology, Institut National de Recherche en        =-->
+<!--=  Informatique et en Automatique, Keio University). All Rights      =-->
+<!--=  Reserved. See http://www.w3.org/Consortium/Legal/.                =-->
+<!--======================================================================-->
+<!--======================================================================-->
+<!--                                                                      -->
+<!-- interact-bubble-BE-04-target.svg                                     -->
+<!-- renamed for 1.1 suite to interact-order-01-f-targ.svg                -->
+<!-- renamed for 1.1 suite to interact-order-03-b-targ.svg                -->
+<!-- renamed/modified for 1.2 Tiny suite to interact-order-03-t-targ.svg  -->
+<!--                                                                      -->
+<!-- File that just serves as hyperlink target for test case              -->
+<!-- interact-interact-order-06-t.svg.                                    -->
+<!--                                                                      -->
+<!-- Author : Jon Ferraiolo 06-Aug-2000                                   -->
+<!--          1.1 revision by Thomas DeWeese 5-Feb-2002                   -->
+<!--          1.2 revision by Dr Olaf Hoffmann May-2007                   -->
+<!--                                                                      -->
+<!-- History:                                                             -->
+<!--  06-Aug-2000, JF: Serial#1 created.                                  -->
+<!--  11-May-2007, AG: Applied changes as per comments                    -->
+<!--                   by Dr. Olaf Hoffmann                               -->
+<!--                                                                      -->
+<!--======================================================================-->
+
+
+<svg version="1.2" id="svg-root" width="80" height="60" viewBox="0 0 480 360"
+     xmlns="http://www.w3.org/2000/svg" 
+     xmlns:xlink="http://www.w3.org/1999/xlink" >
+
+  <title id="test-title">$RCSfile: interact-order-03-t-targ.svg,v $</title>
+  <desc id="test-desc">
+    File that just serves as hyperlink target for test case
+    interact-order-06-t.svg.
+  </desc>
+  <defs>
+    <font-face font-family="SVGFreeSansASCII" unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="SVGFreeSans.svg#ascii" />
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif">
+    <g font-size="40" text-anchor="middle">
+      <text x="240" y="40">
+        Hyperlink target for
+      </text>
+      <text x="240" y="85">
+        interact-order-06-t.svg.
+      </text>
+    </g>
+
+    <a xlink:href="../svg/interact-order-06-t.svg.">
+      <circle cx="240" cy="180" r="75" />
+    </a>
+
+    <g font-size="40" text-anchor="middle">
+      <text x="240" y="300">
+        Click to hyperlink back to
+      </text>
+      <text x="240" y="345">
+        interact-order-06-t.svg.
+      </text>
+    </g>
+  </g>
+</svg>
+

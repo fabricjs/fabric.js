@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="ED" owner="CL" desc="test animation and inheritance on solid-color" status="accepted"
+    approved="yes"
+    version="$Revision: 1.5 $" testname="$RCSfile: styling-inherit-03-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        Tests inheritance, animation, currentColor on solid-color. Four
+        rectangles are displayed. After a five second animation has completed,
+        the test is passed if all four rectangles display a solid green fill.
+      </p>
+      <p>
+        <em>Note: </em>The solid-color property is not inherited by default, but the value 'inherit' forces it to
+        inherit the current animated value from its parent.
+      </p>
+
+      <p>
+        In the first subtest, the rectangle has a solid fill.
+        On the solidColor element, the value of the solid-color property  is
+        'inherit'. Its parent, a group,  also has solid-color set to
+        "inherit". The parent of this group is another group, the property
+        solid-color is green on it.
+      </p>
+      <p>
+        In the second subtest, the rectangle has a solid fill.
+        On the solidColor element, the value of the solid-color property  is
+        'inherit'. Its parent  has solid-color set to
+        "inherit". The parent of this group is another group whose solid-color
+        property is yellow.
+        The solid-color property on the solidColor element is
+        animated from yellow to green. Thus, after the animation finishes,
+        the inherited value is green.
+      </p>
+      <p>
+        In the third subtest, the rectangle has a solid fill.
+        On the solidColor element, the value of the solid-color property  is
+        'inherit'. Its parent  has solid-color set to
+        "inherit". The parent of this group is another group whose solid-color
+        property is yellow.
+        The solid-color property on the outermost group is
+        animated from yellow to green. Thus, after the animation finishes,
+        the inherited value is green.
+      </p>
+      <p>
+        In the fourth subtest, the rectangle has a solid fill.
+        On the solidColor element, the value of the solid-color property  is
+        'currentColor'. Its parent  has color set to
+        "inherit". The parent of this group is another group whose color
+        property is yellow.
+        The color property on theoutermost group is
+        animated from yellow to green. Thus, after the animation finishes,
+        the inherited value of color, and thus the value used by currentColor, is green.
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: styling-inherit-03-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+
+    <g xml:id="gramps" solid-color="green">
+      <g xml:id="daddy" solid-color="inherit">
+        <solidColor  xml:id="g" solid-color="inherit"/>
+      </g>
+    </g>
+
+    <g xml:id="granny" solid-color="yellow">
+      <g xml:id="mummy" solid-color="inherit">
+        <solidColor  xml:id="y2g" solid-color="inherit">
+          <animateColor attributeName="solid-color" begin="0s" dur="5s" to="green" fill="freeze"/>
+        </solidColor>
+      </g>
+    </g>
+
+    <g xml:id="floom" solid-color="yellow">
+      <animateColor attributeName="solid-color" begin="0s" dur="5s" to="green" fill="freeze"/>
+      <g xml:id="wooble" solid-color="inherit">
+        <solidColor  xml:id="y2g2" solid-color="inherit"/>
+      </g>
+    </g>
+
+    <g xml:id="brillig" color="yellow">
+      <animateColor attributeName="color" begin="0s" dur="5s" to="green" fill="freeze"/>
+      <g xml:id="slithy" color="inherit">
+        <solidColor  xml:id="toves" solid-color="currentColor"/>
+      </g>
+    </g>
+
+    <rect x="50" y="50" width="100" height="100" fill="url(#g)"/>
+    <rect x="200" y="50" width="100" height="100" fill="url(#y2g)"/>
+    <rect x="350" y="50" width="100" height="100" fill="url(#y2g2)"/>
+
+    <rect x="350" y="200" width="100" height="100" fill="url(#toves)"/>
+
+    <!-- put all of the actual test inside this group -->
+
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.5 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240" 
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

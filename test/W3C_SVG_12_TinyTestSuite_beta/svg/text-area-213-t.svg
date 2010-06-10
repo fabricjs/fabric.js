@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="ASL" owner="AE" desc="TextArea with Animated Width and Height" status="accepted"
+    approved="yes"
+    version="$Revision: 1.6 $" testname="$RCSfile: text-area-213-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>TextArea with Animated Width and Height</p>
+      <p>
+        A visible rectangle is drawn the same size as the textArea. The text contained in the textArea should
+        automatically wrap.
+      </p>
+      <p>
+        The textArea starts off as a 24x 24 square and is animated down to full size. The text should continually
+        rewrap as the textArea increases in size.
+      </p>
+      <p>The text is taken from "The Lost Princess of Oz" by Baum, L. Frank (Lyman Frank), 1856-1919</p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: text-area-213-t.svg,v $</title>
+  <defs>
+    <font-face font-family="SVGFreeSansASCII" unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii" />
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+    <text xml:id="display-title" x="240" y="30" font-size="14" text-anchor="middle" fill="#000">TextArea with display-align </text>
+    <text xml:id="comment-1" x="240" y="45" font-size="11" text-anchor="middle" fill="#555">
+      The text should be clipped properly for each display-align value, as height animates
+    </text>
+    <text x="365" y="290" font-size="8" text-anchor="end" fill="#555">
+      Excerpt from "The Lost Princess of Oz" by Baum, L. Frank (Lyman Frank), 1856-1919
+    </text>
+
+    <g transform="translate(0,130)">
+      <text x="420" y="0" text-anchor="middle" font-style="italic">
+        default
+        <set xml:id="aDefault" attributeName="fill" to="red" begin="0" dur="6"/>
+      </text>
+      <text x="420" y="15" text-anchor="middle" >
+        auto
+        <set xml:id="aAuto" attributeName="fill" to="red" begin="aDefault.end" dur="6"/>
+      </text>
+      <text x="420" y="30" text-anchor="middle" >
+        before
+        <set xml:id="aBefore" attributeName="fill" to="red" begin="aAuto.end" dur="6"/>
+      </text>
+      <text x="420" y="45" text-anchor="middle" >
+        center
+        <set xml:id="aCenter" attributeName="fill" to="red" begin="aBefore.end" dur="6"/>
+      </text>
+      <text x="420" y="60" text-anchor="middle" >
+        after
+        <set xml:id="aAfter" attributeName="fill" to="red" begin="aCenter.end" />
+      </text>
+    </g>
+
+    <rect x="15" y="60" height="215" width="350" fill="none" stroke="black" stroke-width="0.25">
+      <animate xml:id="a1" attributeName="height" from="215" to="0" calcMode="paced" begin="aDefault.begin+1;aAuto.begin+1;aBefore.begin+1;aCenter.begin+1;aAfter.begin+1" dur="2s" fill="freeze"/>
+      <animate xml:id="a2" attributeName="height" from="0" to="215" calcMode="paced" begin="a1.end" dur="2s" fill="freeze"/>
+    </rect>
+    <textArea x="15" y="60" height="215" width="350" font-size="16" fill="#258" >
+      <set attributeName="display-align" to="auto" begin="aAuto.begin" />
+      <set attributeName="display-align" to="before" begin="aBefore.begin" />
+      <set attributeName="display-align" to="center" begin="aCenter.begin" />
+      <set attributeName="display-align" to="after" begin="aAfter.begin" />
+      <animate attributeName="height" from="215" to="0" calcMode="paced" begin="a1.begin" dur="2s" fill="freeze"/>
+      <animate attributeName="height" from="0" to="215" calcMode="paced" begin="a1.end" dur="2s" fill="freeze"/>
+      Together they searched all through the great palace and even to the farthest limits of the palace grounds, which were quite extensive, but nowhere could they find a trace of Ozma.  When Dorothy returned to where Betsy and Trot awaited her, the little girl's face was rather solemn and troubled...
+    </textArea>
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.6 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240"
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

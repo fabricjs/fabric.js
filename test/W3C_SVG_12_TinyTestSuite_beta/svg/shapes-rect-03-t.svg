@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="AE" owner="AN" desc="Testing the correct stroking of the rect element." status="accepted"
+    approved="yes"
+    version="$Revision: 1.5 $" testname="$RCSfile: shapes-rect-03-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>Testing the correct stroking of the rect element. The blue lines indicate where a dash or gap should start and end. For the test to pass, it has to match the reference image.</p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: shapes-rect-03-t.svg,v $</title>
+  <defs>
+    <font-face font-family="SVGFreeSansASCII" unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii" />
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+    <text font-size="12" x="240" y="14" text-anchor="middle">Testing the correct stroking of the &lt;rect/&gt; element</text>
+    <g fill="red" stroke="#000000">
+      <!-- normal rectangle -->
+      <rect x="50" y="100" width="100" height="100" stroke-dasharray="100,5" stroke-width="5"/>
+      <!-- rectangle with rounded corner -->
+      <rect x="250" y="100" width="100" height="100" rx="10" ry="10" stroke-dasharray="100,5" stroke-width="5"/>
+    </g>
+    <g xml:id="lines_indicating_the_dashing" stroke="blue">
+      <!-- left rectangle -->
+      <line x1="50" y1="100" x2="50" y2="90" />
+      <line x1="150" y1="100" x2="150" y2="90" />
+      <line x1="150" y1="105" x2="160" y2="105" />
+      <line x1="145" y1="200" x2="145" y2="210" />
+      <line x1="140" y1="200" x2="140" y2="210" />
+      <line x1="50" y1="190" x2="40" y2="190" />
+      <line x1="50" y1="185" x2="40" y2="185" />
+      <!-- right rectangle -->
+      <line x1="260" y1="100" x2="260" y2="90" />
+      <line x1="350" y1="114" x2="360" y2="114" />
+      <line x1="350" y1="119" x2="360" y2="119" />
+      <line x1="326.4" y1="200" x2="326.4" y2="210" />
+      <line x1="321.4" y1="200" x2="321.4" y2="210" />
+      <line x1="250" y1="167" x2="240" y2="167" />
+      <line x1="250" y1="162" x2="240" y2="162" />
+    </g>
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none" fill="black">$Revision: 1.5 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000" />
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark" fill-opacity="0.5"> 
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1" /> 
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240" text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text> 
+  </g>-->
+</svg>

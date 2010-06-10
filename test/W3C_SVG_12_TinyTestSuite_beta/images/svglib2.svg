@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<text x="10" y="20">This SVG file only contains data referenced by others</text>
+<defs>
+  <rect id="rect1" x="0" y="0" width="30" height="30" fill="green" />
+  <circle id="circle1" cx="15" cy="15" r="10" fill="yellow" />
+
+  <g id="gCircRef2">
+  <rect width="30" height="30" fill="blue" fill-opacity=".3" />
+  <use xlink:href="svglib.svg#gCircRef"/>
+  </g>
+
+  <rect id="nameClashTest" x="0" y="0" width="30" height="30" fill="red" />
+
+</defs>
+</svg>

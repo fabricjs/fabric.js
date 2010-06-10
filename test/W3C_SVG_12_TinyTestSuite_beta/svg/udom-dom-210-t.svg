@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="AE" owner="CM" desc="Test the operation of Document.createElementNS" status="accepted"
+    approved="yes"
+    version="$Revision: 1.8 $" testname="$RCSfile: udom-dom-210-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        This tests that the <tt>createElementNS</tt> method on the
+        <b>Document</b> interface works correctly, for each SVG Tiny 1.2
+        element, and for some unknown elements.
+      </p>
+      <p>
+        There are four sub-tests (a rectangle for each). The test has been
+        passed if all four rectangles are blue.
+      </p>
+      <p>
+        Thes are:
+      </p>
+      <ul>
+        <li>Sub-test 1: test creating each SVG Tiny 1.2 element.</li>
+        <li>Sub-test 2: test creating an unknown element in no namespace.</li>
+        <li>Sub-test 3: test creating an unknown element in the SVG namespace.</li>
+        <li>Sub-test 4: test creating an unknown element in another namespace.</li>
+      </ul>
+      <p>
+
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: udom-dom-210-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+    <text x='10' y='42'>Document.createElement(NS) test</text>
+    <g font-size='10'>
+      <text x='10' y='150'>SVG elements</text>
+      <text x='120' y='150'>Unknown element,</text>
+      <text x='120' y='160'>no namespace</text>
+      <text x='230' y='150'>Unknown element,</text>
+      <text x='230' y='160'>SVG namespace</text>
+      <text x='340' y='150'>Unknown element,</text>
+      <text x='340' y='160'>non-SVG namespace</text>
+    </g>
+    <text x='10' y='250' font-size='12'>All four rectangles must be blue.</text>
+    <g xml:id='g1' transform='translate(0,50)'>
+      <rect xml:id='rect1' x='10' y='30' width='50' height='50' fill='red'/>
+      <rect xml:id='rect2' x='120' y='30' width='50' height='50' fill='red'/>
+      <rect xml:id='rect3' x='230' y='30' width='50' height='50' fill='red'/>
+      <rect xml:id='rect4' x='340' y='30' width='50' height='50' fill='red'/>
+    </g>
+    <script type='application/ecmascript'>
+      <![CDATA[
+        SVGNS = 'http://www.w3.org/2000/svg';
+        EVNS = 'http://www.w3.org/2001/xml-events';
+        VNS = 'http://example.org/vegetable';
+
+        // Get all of the elements.
+        var ids = 'g1 rect1 rect2 rect3 rect4'.split(' ');
+        for (var i in ids) {
+          this[ids[i]] = document.getElementById(ids[i]);
+        }
+
+        // List of all SVG element names.
+        var elementNames = 'a animate animateColor animateMotion animateTransform animation audio circle defs desc discard ellipse font font-face font-face-src font-face-uri foreignObject g glyph handler hkern image line linearGradient metadata missing-glyph mpath path polygon polyline prefetch radialGradient rect script set solidColor stop svg switch tbreak text textArea title tspan use video'.split(' ');
+
+        var elementName, elt;
+
+        // Test creating SVG Tiny 1.2 elements.
+        try {
+          for (var i in elementNames) {
+            elementName = elementNames[i];
+            elt = document.createElementNS(SVGNS, elementName);
+            if (elt.localName != elementName ||
+                elt.namespaceURI != SVGNS ||
+                elt.parentNode != null ||
+                elt.ownerDocument != document ||
+                elt.textContent != '') {
+              throw 'assertion failed for <' + elementName + '>';
+            }
+          }
+          elt = document.createElementNS(EVNS, 'listener');
+          if (elt.localName != 'listener' ||
+              elt.namespaceURI != EVNS ||
+              elt.parentNode != null ||
+              elt.ownerDocument != document ||
+              elt.textContent != '') {
+            throw 'assertion failed for <ev:listener>';
+          }
+          rect1.setAttributeNS(null, 'fill', 'blue');
+        } catch (e) {
+        }
+
+        // Test creating an unknown element in no namespace.
+        try {
+          elt = document.createElementNS(null, 'thing');
+          if (elt.localName == 'thing' &&
+              elt.namespaceURI == null &&
+              elt.parentNode == null &&
+              elt.ownerDocument == document &&
+              elt.textContent == '') {
+            rect2.setAttributeNS(null, 'fill', 'blue');
+          }
+        } catch (e) {
+        }
+
+        // Test creating an unknown element in the SVG namespace.
+        try {
+          elt = document.createElementNS(SVGNS, 'donkey');
+          if (elt.localName == 'donkey' &&
+              elt.namespaceURI == SVGNS &&
+              elt.parentNode == null &&
+              elt.ownerDocument == document &&
+              elt.textContent == '') {
+            rect3.setAttributeNS(null, 'fill', 'blue');
+          }
+        } catch (e) {
+        }
+
+        // Test creating an unknown element in a different namespace.
+        try {
+          elt = document.createElementNS(VNS, 'gourd');
+          if (elt.localName == 'gourd' &&
+              elt.namespaceURI == VNS &&
+              elt.parentNode == null &&
+              elt.ownerDocument == document &&
+              elt.textContent == '') {
+            rect4.setAttributeNS(null, 'fill', 'blue');
+          }
+        } catch (e) {
+        }
+      ]]>
+    </script>
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.8 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240" 
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

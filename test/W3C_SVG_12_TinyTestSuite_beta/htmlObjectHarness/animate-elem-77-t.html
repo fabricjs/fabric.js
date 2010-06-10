@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE html PUBLIC  "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+ <html xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+ <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+ <meta name="keywords" content="W3C SVG 1.1 Test Suite testsuite mobile"/>
+ <meta name="description" content="W3C SVG 1.2 Tiny Test Suite"/>
+ <title>
+SVG 1.2 Tiny test:animate-elem-77-t </title>
+ <style type="text/css">
+ <!--
+ .bodytext    { font-family:verdana, helvetica, sans-serif; font-size: 12pt; line-height: 125%; text-align: Left; margin-top: 0; margin-bottom: 0 }
+ .pageTitle         { line-height: 150%; font-size: 20pt; font-weight : 900; margin-bottom: 20pt }
+ .pageSubTitle  { color : blue; line-height: 100%; font-size: 24pt; font-weight : 900 }
+ .openChapter   { color : blue; line-height: 125%; font-weight : 900 }
+ .openSection   { color : blue; line-height: 125%; font-weight : 900 }
+ .info  { color : black; line-height: 110%; font-size: 10pt; font-weight : 100 }
+ p          { margin-top:0; margin-bottom:0; padding-top:0; padding-bottom:0 }
+ blockquote { margin-top:0; margin-bottom:0; padding-top:0; padding-bottom:0 }
+ .opscript {margin-left: 3%; margin-right: 3%; }
+ .opscript p { margin-top: 0.7em}
+ .navbar {background: black; color: white; font-weight: bold}
+ -->
+ </style>
+ </head>
+ <body class="bodytext">
+
+	<div class="linkbar"> 
+<p>
+<a href="animate-elem-77-t.html">Tiny version</a></p>
+<p>Specification link: <a target="spec" href="http://www.w3.org/TR/SVGMobile12/animate.html">16.2 Animation elements</a></p>
+ <p>
+    <a href="animate-elem-70-t.html">animate-elem-70-t ←</a> 
+    <a href="index.html">index</a>
+    <a href="animate-elem-78-t.html">→ animate-elem-78-t</a>
+</p></div>
+
+	<table align="center" border="0" cellspacing="0" cellpadding="10">
+		<tr>
+			<td align="center" colspan="3">
+				<table border="0" cellpadding="8">
+					<tr>
+						<td align="center" colspan="2" class="pageTitle">
+							<h1>animate-elem-77-t</h1>
+						</td>
+					</tr>
+					<tr  class="navbar">
+						<td align="center">
+							SVG Image
+						</td>
+						<td align="center">
+							PNG Image
+						</td>
+					</tr>
+					<tr>
+						<td align="right">
+   	    		  			<object data="../svggen/animate-elem-77-t.svg" width="480" height="360" type="image/svg+xml"><p style="font-size:300%;color:red">FAIL</p></object>
+						</td>
+						<td align="left">
+							<img alt="raster image of animate-elem-77-t" src="../png/animate-elem-77-t.png" width="480" height="360"/>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+
+               
+<div class="opscript">
+      <p>
+        This test demonstrates how &lt;set&gt; elements change text properties on a &lt;text&gt; element. For each of the
+        text properties being tested, 3 &lt;set&gt; elements are set. The first &lt;set&gt; element acts directly on the
+        &lt;text&gt; element. The second &lt;set&gt; element acts on a &lt;g&gt; containing children. The third
+        &lt;set&gt; element acts on an &lt;a&gt; containing children. In each case the test validates that the animated
+        value set on the &lt;g&gt; and &lt;a&gt; elements is inherited by the &lt;text&gt; element. All the &lt;set&gt;
+        elements have a begin attribute set to 0s with an offset of 1s after end. So, the animation will apply 1s after
+        the document is loaded and will repeat every 1s after the animation ends.
+      </p>
+      <p>
+        The first &lt;set&gt; validates the transform property. When applied to the &lt;text&gt; element, the letter A
+        will be translated to the right every 1s, in the &lt;text&gt; column. When applied to the &lt;g&gt; element, the
+        letter A inherits the transform value and is translated to the right every 1s, as seen in the &lt;g&gt; column.
+        When applied to the &lt;a&gt; element, the letter A inherits the transform value and is translated to the right
+        every 1s, as seen in &lt;a&gt; column.
+      </p>
+      <p>
+        The second &lt;set&gt; validates the text-anchor attribute. When applied to the &lt;text&gt; element, the anchor
+        position of letter A is moved from start to end. When applied to the &lt;g&gt; and &lt;a&gt; element, the property
+        is inherited and hence the anchor position of letter A is moved from start to end in the second row.
+      </p>
+      <p>
+        The third &lt;set&gt; validates the font-size attribute. The font size of letter A is changed from 20 to 30. When
+        applied to &lt;g&gt; and &lt;a&gt; elements, the letter A inherits the font-size and hence in row 3, letter A has
+        a font-size of 30 in all 3 right columns of row 3.
+      </p>
+      <p>
+        The fourth &lt;set&gt; validates the font-family attribute. The font-family is changed from default to serif. When
+        applied to &lt;g&gt; and &lt;a&gt; elements, the letter A inherits the font-family attribute and hence in row 4,
+        letter A has serif font-family in all 3 columns.
+      </p>
+      <p>
+        The fifth &lt;set&gt; validates the font-style attribute. The font-style is changed from normal to italic. When
+        applied to &lt;g&gt; and &lt;a&gt; elements, the letter A inherits the font-style attribute and hence in row 5,
+        letter A is animated to italic in all 3 columns.
+      </p>
+      <p>
+        The sixth &lt;set&gt; validates the font-weight attribute. The font-weight is changed from normal to bold. When
+        applied to &lt;g&gt; and &lt;a&gt; elements, the letter A inherits the font-weight attribute and hence in row 6,
+        letter A is changed to bold on the right.
+      </p>
+
+		</div>
+<div class="linkbar"> <p>
+				<a href="animate-elem-70-t.html">animate-elem-70-t ←</a>
+				<a href="index.html">index</a>
+				<a href="animate-elem-78-t.html">→ animate-elem-78-t</a>
+						</p></div>
+</body>
+</html>

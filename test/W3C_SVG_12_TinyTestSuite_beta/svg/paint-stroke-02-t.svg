@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="NR" owner="KMC" desc="Test that viewer has the basic capability to handle the 'stroke', 'stroke-width' and 'stroke-linejoin' properties." status="accepted"
+    approved="yes"
+    version="$Revision: 1.6 $" testname="$RCSfile: paint-stroke-02-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        Verify the basic capability to handle the stroke properties ("stroke", "stroke-width", "stroke-linejoin") in
+        combination with the "rect" element. The pair should be rendered as two red rectangles without an interior fill.
+        The upper rectangle should have a stroke width of 5 with sharp corners. The lower rectangle should have a stroke
+        width of 5 with round corners.
+      </p>
+      <p>
+        The test uses the "rect" element, as well as basic "fill" (solid primary colors), "stroke", stroke="red"
+        stroke-width="10" stroke-linejoin="round", "font-family" (Arial) and "font-size" properties.
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: paint-stroke-02-t.svg,v $</title>
+  <defs>
+    <font-face font-family="SVGFreeSansASCII" unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii" />
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+    <!-- ====================================================================== -->
+    <!-- Set of rectangles with stroke-width:10 and stroke-linejoin:round-->
+    <!-- ====================================================================== -->
+    <text font-size="36" x="10" y="40">Basic paint: stroke properties.</text>
+    <rect xml:id="stroke-01" fill="none" stroke="red" stroke-width="20" x="90" y="70" width="300" height="50" />
+    <rect xml:id="stroke-02" fill="none" stroke="red" stroke-width="20" stroke-linejoin="round" x="90" y="190" width="300" height="50" />
+    <text font-size="40" x="120" y="160">stroke-width="20"</text>
+    <text font-size="40" x="58" y="290">stroke-linejoin="round"</text>
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none" fill="black">$Revision: 1.6 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000" />
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240" 
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="DOH" owner="AE" desc="Testing pointer-events and rendering order" status="accepted"
+    approved="yes"
+    version="$Revision: 1.6 $" testname="$RCSfile: interact-pevents-07-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>Testing pointer-events and rendering order</p>
+      <p>
+        Rectangles should turn RED on mouseover Ovals should turn RED if Pointer-Events are set to "ALL"
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: interact-pevents-07-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+    <rect x="15" y="15" height="280" width="450" fill="none" stroke="black" stroke-width="0.25"/>
+    <g text-anchor="middle">
+      <text x="240" y="30" fill="black" font-size="15">Testing pointer-events and rendering order</text>
+      <text x="240" y="42" fill="#555" font-size="10">Rectangles should turn RED on mouseover </text>
+      <text x="240" y="54" fill="#555" font-size="10">Ovals should turn RED if Pointer-Events are set to "ALL"</text>
+    </g>
+    <g xml:id="buttons">
+      <g text-anchor="middle" font-size="8" fill="#555" transform="translate(0,10)">
+        <text x="400" y="85">Change "Pointer-Events" of </text>
+        <text x="400" y="95">ovals from "ALL" to "NONE"</text>
+        <circle xml:id="on" cx="385" cy="65" r="10" fill-opacity="1" fill="#3c5" stroke="black" stroke-width="3"/>
+        <circle xml:id="off" cx="415" cy="65" r="10" fill-opacity="1" fill="#f35" stroke="black"/>
+      </g>
+      <g text-anchor="middle" font-size="12" fill="#555">
+        <text xml:id="all" x="240" y="285" fill="#555" visibility="visible">Purple ovals have "Pointer-Events" set to "ALL".</text>
+        <text xml:id="none" x="240" y="285" fill="#555" visibility="hidden">Purple ovals have Pointer-Events set to "NONE".</text>
+      </g>
+      <set xlink:href="#all" attributeName="visibility" to="visible" begin="on.mouseover" fill="freeze"/>
+      <set xlink:href="#all" attributeName="visibility" to="hidden" begin="off.mouseover" fill="freeze"/>
+      <set xlink:href="#none" attributeName="visibility" to="hidden" begin="on.mouseover" fill="freeze"/>
+      <set xlink:href="#none" attributeName="visibility" to="visible" begin="off.mouseover" fill="freeze"/>
+      <set xlink:href="#on" attributeName="stroke-width" to="3" begin="on.mouseover" fill="freeze"/>
+      <set xlink:href="#on" attributeName="stroke-width" to="1" begin="off.mouseover" fill="freeze"/>
+      <set xlink:href="#off" attributeName="stroke-width" to="3" begin="off.mouseover" fill="freeze"/>
+      <set xlink:href="#off" attributeName="stroke-width" to="1" begin="on.mouseover" fill="freeze"/>
+      <set xlink:href="#c10" attributeName="pointer-events" to="all" begin="on.mouseover" fill="freeze"/>
+      <set xlink:href="#c10" attributeName="pointer-events" to="none" begin="off.mouseover" fill="freeze"/>
+      <set xlink:href="#c11" attributeName="pointer-events" to="all" begin="on.mouseover" fill="freeze"/>
+      <set xlink:href="#c11" attributeName="pointer-events" to="none" begin="off.mouseover" fill="freeze"/>
+      <set xlink:href="#c12" attributeName="pointer-events" to="all" begin="on.mouseover" fill="freeze"/>
+      <set xlink:href="#c12" attributeName="pointer-events" to="none" begin="off.mouseover" fill="freeze"/>
+    </g>
+    <g transform="scale(0.75, 0.5) translate(100, 85)">
+      <circle xml:id="c10" cx="160" cy="350" r="100" fill-opacity="1" fill="#53f" stroke="black" pointer-events="all">
+        <set attributeName="fill" to="#F55" begin="c10.mouseover"/>
+        <set attributeName="fill" to="#53f" begin="c10.mouseout"/>
+      </circle>
+      <rect xml:id="r10" x="10" y="50" width="300" height="300" fill-opacity="1" fill="#35f" stroke="black">
+        <set attributeName="fill" to="#F55" begin="r10.mouseover"/>
+        <set attributeName="fill" to="#35f" begin="r10.mouseout"/>
+      </rect>
+      <circle xml:id="c11" cx="310" cy="350" r="90" fill-opacity="1" fill="#75f" stroke="black" pointer-events="all">
+        <set attributeName="fill" to="#F55" begin="c11.mouseover"/>
+        <set attributeName="fill" to="#75f" begin="c11.mouseout"/>
+      </circle>
+      <rect xml:id="r11" x="60" y="100" width="200" height="200" fill-opacity="1" fill="#57f" stroke="black">
+        <set attributeName="fill" to="#F55" begin="r11.mouseover"/>
+        <set attributeName="fill" to="#57f" begin="r11.mouseout"/>
+      </rect>
+      <circle xml:id="c12" cx="310" cy="200" r="75" fill-opacity="1" fill="#97f" stroke="black" pointer-events="all">
+        <set attributeName="fill" to="#F55" begin="c12.mouseover"/>
+        <set attributeName="fill" to="#97f" begin="c12.mouseout"/>
+      </circle>
+      <rect xml:id="r12" x="110" y="150" width="100" height="100" fill-opacity="1" fill="#79f" stroke="black">
+        <set attributeName="fill" to="#F55" begin="r12.mouseover"/>
+        <set attributeName="fill" to="#79f" begin="r12.mouseout"/>
+      </rect>
+      <g xml:id="dasharray-rectangles" stroke-width="0.5" stroke-dasharray="4, 4">
+        <rect xml:id="r-dash10" x="10" y="50" width="300" height="300" fill-opacity="0" fill="none" stroke="black" pointer-events="none"/>
+        <rect xml:id="r-dash11" x="60" y="100" width="200" height="200" fill-opacity="0" fill="none" stroke="black" pointer-events="none"/>
+        <rect xml:id="r-dash12" x="110" y="150" width="100" height="100" fill-opacity="0" fill="none" stroke="black" pointer-events="none"/>
+      </g>
+    </g>
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none" fill="black">$Revision: 1.6 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!-- 
+ 	<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240" 
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g> 
+ -->
+</svg>

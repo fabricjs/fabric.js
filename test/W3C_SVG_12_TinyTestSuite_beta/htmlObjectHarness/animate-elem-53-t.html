@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE html PUBLIC  "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+ <html xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+ <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+ <meta name="keywords" content="W3C SVG 1.1 Test Suite testsuite mobile"/>
+ <meta name="description" content="W3C SVG 1.2 Tiny Test Suite"/>
+ <title>
+SVG 1.2 Tiny test:animate-elem-53-t </title>
+ <style type="text/css">
+ <!--
+ .bodytext    { font-family:verdana, helvetica, sans-serif; font-size: 12pt; line-height: 125%; text-align: Left; margin-top: 0; margin-bottom: 0 }
+ .pageTitle         { line-height: 150%; font-size: 20pt; font-weight : 900; margin-bottom: 20pt }
+ .pageSubTitle  { color : blue; line-height: 100%; font-size: 24pt; font-weight : 900 }
+ .openChapter   { color : blue; line-height: 125%; font-weight : 900 }
+ .openSection   { color : blue; line-height: 125%; font-weight : 900 }
+ .info  { color : black; line-height: 110%; font-size: 10pt; font-weight : 100 }
+ p          { margin-top:0; margin-bottom:0; padding-top:0; padding-bottom:0 }
+ blockquote { margin-top:0; margin-bottom:0; padding-top:0; padding-bottom:0 }
+ .opscript {margin-left: 3%; margin-right: 3%; }
+ .opscript p { margin-top: 0.7em}
+ .navbar {background: black; color: white; font-weight: bold}
+ -->
+ </style>
+ </head>
+ <body class="bodytext">
+
+	<div class="linkbar"> 
+<p>
+<a href="animate-elem-53-t.html">Tiny version</a></p>
+<p>Specification link: <a target="spec" href="http://www.w3.org/TR/SVGMobile12/animate.html">16.2 Animation elements</a></p>
+ <p>
+    <a href="animate-elem-52-t.html">animate-elem-52-t ←</a> 
+    <a href="index.html">index</a>
+    <a href="animate-elem-61-t.html">→ animate-elem-61-t</a>
+</p></div>
+
+	<table align="center" border="0" cellspacing="0" cellpadding="10">
+		<tr>
+			<td align="center" colspan="3">
+				<table border="0" cellpadding="8">
+					<tr>
+						<td align="center" colspan="2" class="pageTitle">
+							<h1>animate-elem-53-t</h1>
+						</td>
+					</tr>
+					<tr  class="navbar">
+						<td align="center">
+							SVG Image
+						</td>
+						<td align="center">
+							PNG Image
+						</td>
+					</tr>
+					<tr>
+						<td align="right">
+   	    		  			<object data="../svggen/animate-elem-53-t.svg" width="480" height="360" type="image/svg+xml"><p style="font-size:300%;color:red">FAIL</p></object>
+						</td>
+						<td align="left">
+							<img alt="raster image of animate-elem-53-t" src="../png/animate-elem-53-t.png" width="480" height="360"/>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+
+               
+<div class="opscript">
+      <p>
+        The purpose of this test is to test animation of points and calcMode.
+      </p>
+      <p>
+        1. The green squares should animate together side by side. This applies
+        to the red ones as well.
+        2. The time values indicate when the squares should reach the
+        corresponding reference square.
+        3. The total distance is 0+40+80+24.14=144.14
+        a. The "green animation" is 9 sec and linear so each interval
+        should get 3 sec.
+        b. The "red animation" is 8 sec and paced so the intervals
+        should get 2.22, 4.44 and 1.34 sec each.
+      </p>
+      <p>
+        Here comes a more detailed description of the animation.
+
+        The left green square (LG) is animated by animating the points with
+        a value array, consisting of 4 lists of points. This is an animation
+        with calcMode="linear" so an equal amount of time should be spent on
+        all 4 intervals. The right green square (RG) is animated by a simple
+        linear motion followed by a scale to follow LG.
+        The last scale by 1.9428 correspond to a movement of the lover right
+        corner of the square by sqrt((30*0.9428)^2 + (30*0.9428)^2) which is
+        approximately 40 distance units. This is the same distance as the first
+        interval in the values array (and half the second interval).
+        The length (in terms of distance) is not really important for the
+        green squares but for the red squares which are animated with
+        calcMode="paced" the length is used to calculate the time for each
+        interval.
+        Since the first and last interval are of the same length which
+        totals to the length of the middle interval, the interval should
+        be given time according to [27.75%(2.22sec);55.5%(4.44sec);16.75%(1.34sec)].
+
+        So the left red square (LR) is animated just as the LG square but
+        with calcMode="paced". The same applies to the right red square (RR)
+        that has default calcMode ("paced" for animateMotion) compared to the
+        RG square that has calcMode="linear".
+        The calcMode for the scale of RR (and RG) is not important since
+        it's not a value list type of animation.
+      </p>
+
+		</div>
+<div class="linkbar"> <p>
+				<a href="animate-elem-52-t.html">animate-elem-52-t ←</a>
+				<a href="index.html">index</a>
+				<a href="animate-elem-61-t.html">→ animate-elem-61-t</a>
+						</p></div>
+</body>
+</html>

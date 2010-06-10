@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="NR" owner="DOH" desc="Direction of stroke-dasharray and stroke-dashoffset for basic shapes." status="accepted"
+    approved="yes"
+    version="$Revision: 1.5 $" testname="$RCSfile: paint-stroke-202-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        Direction of stroke-dasharray and stroke-dashoffset for basic shapes.
+      </p>
+      <p>
+        The main indication for a failed test is the appearence of a blue path on
+        a white background area. It is passed, if all blue paths are on a gray background area.
+      </p>
+      <p>
+        stroke-dasharray and stroke-dashoffset are tested on basic shapes circle, ellipse, rectangle,
+        rectangle with rounded corners, line, polyline and polygon. The test is sensitive to the
+        direction of stroke-dasharray and stroke-dashoffset and on the starting point on the basic
+        shape.
+      </p>
+      <p>
+        The dashes are positioned correctly, if they are only on a gray background area.
+        If there are dashes on a white background, this is an indication for an error.
+        Additional information given in the elements title and desc for the related subtest
+        may help to identify the tested shape and property combination and the error,
+        if there is one.
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: paint-stroke-202-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+    <g>
+      <title>background of filled rectangles indicating stroking areas in gray</title>
+      <rect x="0" y="0" width="480" height="360" fill="#fff" />
+      <rect x="20" y="20" width="100" height="100" fill="#ccc" />
+      <rect x="120" y="120" width="100" height="100" fill="#ccc" />
+      <g transform="translate(0,30) rotate(45,320,120)">
+        <rect x="220" y="20" width="100" height="100" fill="#ccc" />
+        <rect x="320" y="120" width="100" height="100" fill="#ccc" />
+      </g>
+      <rect x="400" y="40" width="70" height="70" fill="#ccc" />
+      <rect x="400" y="180" width="70" height="70" fill="#ccc" />
+    </g>
+
+    <g>
+      <title>testing stroke-dasharray for circle, rectangle with rounded corners, ellipse</title>
+      <circle cx="120" cy="120" r="89.1268"
+       fill="none" stroke-width="20" stroke="#00f" stroke-dasharray="140">
+        <title>stroke-dasharray on circle without stroke-dashoffset</title>
+        <desc>Note that the pathLength of the circle is exactly 560</desc>
+      </circle>
+      <rect x="30.8732" y="30.8732" width="178.2535" height="178.2535" rx="200"
+      fill="none" stroke-width="12" stroke="#00a" stroke-dasharray="0,140,140,140,140">
+        <title>stroke-dasharray on rect with rounded corners without stroke-dashoffset</title>
+        <desc>Note that the pathLength of the rect is exactly 560</desc>
+      </rect>
+      <ellipse cx="120" cy="120" rx="89.1268" ry="89.1268"
+      fill="none" stroke-width="4" stroke="#44f" stroke-dasharray="140">
+        <title>stroke-dasharray on ellipse without stroke-dashoffset</title>
+        <desc>Note that the pathLength of the ellipse is exactly 560</desc>
+      </ellipse>
+
+
+      <circle cx="320" cy="150" r="89.1268"
+       fill="none" stroke-width="20" stroke="#00f" stroke-dasharray="140" stroke-dashoffset="-70">
+        <title>stroke-dasharray on circle without negative stroke-dashoffset</title>
+        <desc>Note that the pathLength of the circle is exactly 560</desc>
+      </circle>
+      <rect x="230.8732" y="60.8732" width="178.2535" height="178.2535" rx="200"
+       fill="none" stroke-width="12" stroke="#00a" stroke-dasharray="140" stroke-dashoffset="-210">
+        <title>stroke-dasharray on rect with rounded corners with negative stroke-dashoffset</title>
+        <desc>Note that the pathLength of the rect is exactly 560</desc>
+      </rect>
+      <ellipse cx="320" cy="150" rx="89.1268" ry="89.1268"
+       fill="none" stroke-width="4" stroke="#44f" stroke-dasharray="140" stroke-dashoffset="210">
+        <title>stroke-dasharray on ellipse with positive stroke-dashoffset</title>
+        <desc>Note that the pathLength of the ellipse is exactly 560</desc>
+      </ellipse>
+    </g>
+
+
+    <g fill="none" stroke-dasharray="none" stroke-dashoffset="none">
+      <title>testing stroke-dasharray for line, polyline, polygon</title>
+      <line x1="10" y1="250" x2="80" y2="250" stroke-width="30" stroke="#ccc" />
+      <line x1="150" y1="250" x2="220" y2="250" stroke-width="30" stroke="#ccc" />
+      <line x1="10" y1="250" x2="220" y2="250"
+         stroke-width="20" stroke="#00f" stroke-dasharray="70" stroke-dashoffset="0">
+        <title>stroke-dasharray on line with stroke-dashoffset set to 0</title>
+      </line>
+      <polyline points="10,250 100,250 220,250"
+         stroke-width="12" stroke="#00a" stroke-dasharray="70" stroke-dashoffset="0">
+        <title>stroke-dasharray on polyline with stroke-dashoffset set to 0</title>
+      </polyline>
+      <polygon points="10,250 100,250 255,250"
+        stroke-width="4" stroke="#44f" stroke-dasharray="70" stroke-dashoffset="0">
+        <title>stroke-dasharray on polygon with stroke-dashoffset set to 0</title>
+      </polygon>
+
+      <line x1="10" y1="290" x2="45" y2="290" stroke-width="30" stroke="#ccc" />
+      <line x1="115" y1="290" x2="185" y2="290" stroke-width="30" stroke="#ccc" />
+      <line x1="255" y1="290" x2="290" y2="290" stroke-width="30" stroke="#ccc" />
+      <line x1="10" y1="290" x2="290" y2="290" stroke-width="20" stroke="#00f" stroke-dasharray="70" stroke-dashoffset="35">
+        <title>stroke-dasharray on line with stroke-dashoffset</title>
+      </line>
+      <polyline points="10,290 100,290 290,290"
+        stroke-width="12" stroke="#00a" stroke-dasharray="70" stroke-dashoffset="-105">
+        <title>stroke-dasharray on polyline with negative stroke-dashoffset</title>
+      </polyline>
+      <polygon points="10,290 100,290 290,290"
+        stroke-width="4" stroke="#44f" stroke-dasharray="70" stroke-dashoffset="35">
+        <title>stroke-dasharray on polygon with stroke-dashoffset</title>
+      </polygon>
+    </g>
+
+
+    <g fill="none" >
+      <title>testing stroke-dasharray for rectangles</title>
+      <rect x="420" y="30" width="30" height="240"
+        stroke-width="20" stroke="#00f" stroke-dasharray="70" stroke-dashoffset="100">
+        <title>stroke-dasharray on rect with positive stroke-dashoffset</title>
+      </rect>
+
+      <rect x="420" y="20" width="30" height="258.5841" rx="10"
+        stroke-width="12" stroke="#00a"
+        stroke-dasharray="10,35.708,70,70,70,78.5841,70,70,70,70" stroke-dashoffset="10">
+        <title>stroke-dasharray on rect with rounded corners with positive stroke-dashoffset</title>
+        <desc>Note that the pathLength of the rectangle is exactly 560, the round parts are 2pi*rx</desc>
+      </rect>
+
+      <rect x="420" y="-10" width="30" height="350"
+        stroke-width="4" stroke="#44f" stroke-dasharray="0,70,70,70,70,210,70,70,70,70" stroke-dashoffset="-10">
+        <title>stroke-dasharray on rect with negative stroke-dashoffset</title>
+      </rect>
+    </g>
+
+
+    <g font-size="12" stroke="none" fill="#ccc">
+      <text x="340" y="310">position of the dashes:</text>
+      <text x="340" y="322">blue on gray: ok</text>
+      <text x="340" y="334">blue on white: fail </text>
+    </g>
+
+
+
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.5 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240" 
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

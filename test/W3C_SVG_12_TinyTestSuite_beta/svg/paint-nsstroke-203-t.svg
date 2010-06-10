@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="NR" owner="AE" desc="Non-scaling Stroke" status="accepted"
+    approved="yes"
+    version="$Revision: 1.5 $" testname="$RCSfile: paint-nsstroke-203-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>Non-scaling Stroke</p>
+      <p>Testing "non-scaling-stroke" on basic shapes with "animate" and "animateTranform".</p>
+      <p>The animation should run indefinitely.</p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: paint-nsstroke-203-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+    <g>
+      <g text-anchor="middle" font-size="10" fill="#555">
+        <text xml:id="display-title" x="240" y="30" font-size="14" fill="#000">Non-scaling Stroke</text>
+        <text xml:id="comment-1" x="240" y="45">
+          The 'vector-effect' is set to 'non-scaling' on the geometric shapes used in this kaleidoscope.
+        </text>
+        <text xml:id="comment-2" x="240" y="57">
+          The animation should run indefinitely.
+        </text>
+      </g>
+    </g>
+    <defs>
+      <g xml:id="group1">
+        <g>
+          <rect xml:id="bluesquare" x="-40" y="-40" width="20" height="20" fill="#00f" stroke="black" stroke-width="2" vector-effect="non-scaling-stroke" fill-opacity="0.5" stroke-opacity="0.5">
+            <animateTransform attributeName="transform" type="rotate" begin="0s" dur="5s" values="0;359" repeatCount="indefinite" accumulate="none" additive="replace" calcMode="linear" fill="remove" restart="always"/>
+            <animateColor attributeName="fill" begin="0s" dur="5s" values="#00f;#0f0;#f00;#ff0;#0f0;#00f" fill="remove" repeatCount="indefinite"/>
+            <animateColor attributeName="stroke" begin="0s" dur="5s" values="#000;#080;#0f0;#080;#040;#000" fill="remove" repeatCount="indefinite"/>
+          </rect>
+          <animateTransform attributeName="transform" type="translate" begin="0s" dur="3s" values="-10,0;50,-10" repeatCount="indefinite" accumulate="none" additive="replace" calcMode="linear" fill="remove" restart="always"/>
+        </g>
+        <g>
+          <rect xml:id="tall" x="0" y="0" width="10" height="40" fill="#f60" stroke="blue" stroke-width="10" vector-effect="non-scaling-stroke" fill-opacity="0.6" stroke-opacity="0.6">
+            <animateTransform attributeName="transform" type="rotate" begin="1s" dur="3s" values="0;359" repeatCount="indefinite" accumulate="none" additive="replace" calcMode="linear" fill="remove" restart="always"/>
+            <animateColor attributeName="fill" begin="0s" dur="5s" values="#f60;#f00;#00f;#0ff;#f60" fill="remove" repeatCount="indefinite"/>
+          </rect>
+          <animateTransform attributeName="transform" type="translate" begin="1s" dur="3s" values="75,20;-10,0" repeatCount="indefinite" accumulate="none" additive="replace" calcMode="linear" fill="remove" restart="always"/>
+        </g>
+        <g>
+          <polygon xml:id="polygon1" points="0 0 5 0 15 30 0 20" fill="#0fc" stroke="red" stroke-width="1" vector-effect="non-scaling-stroke" fill-opacity="0.4" stroke-opacity="0.4">
+            <animateTransform attributeName="transform" type="rotate" begin="3s" dur="5s" values="0;359" repeatCount="indefinite" accumulate="none" additive="replace" calcMode="linear" fill="remove" restart="always"/>
+            <animateColor attributeName="fill" begin="0s" dur="5s" values="#0fc;#ff0;#f00;#0f0;#0fc" fill="remove" repeatCount="indefinite"/>
+          </polygon>
+          <animateTransform attributeName="transform" type="translate" begin="2s" dur="2s" values="40,0;40,10" repeatCount="indefinite" accumulate="none" additive="replace" calcMode="linear" fill="remove" restart="always"/>
+        </g>
+      </g>
+    </defs>
+    <g transform="translate(240,170) scale(2)">
+      <g transform="rotate(0)">
+        <use xlink:href="#group1"/>
+        <use xlink:href="#group1" transform="scale(1,-1)"/>
+      </g>
+      <g transform="rotate(45)">
+        <use xlink:href="#group1"/>
+        <use xlink:href="#group1" transform="scale(1,-1)"/>
+      </g>
+      <g transform="rotate(90)">
+        <use xlink:href="#group1"/>
+        <use xlink:href="#group1" transform="scale(1,-1)"/>
+      </g>
+      <g transform="rotate(135)">
+        <use xlink:href="#group1"/>
+        <use xlink:href="#group1" transform="scale(1,-1)"/>
+      </g>
+      <g transform="rotate(180)">
+        <use xlink:href="#group1"/>
+        <use xlink:href="#group1" transform="scale(1,-1)"/>
+      </g>
+      <g transform="rotate(225)">
+        <use xlink:href="#group1"/>
+        <use xlink:href="#group1" transform="scale(1,-1)"/>
+      </g>
+      <g transform="rotate(270)">
+        <use xlink:href="#group1"/>
+        <use xlink:href="#group1" transform="scale(1,-1)"/>
+      </g>
+      <g transform="rotate(315)">
+        <use xlink:href="#group1"/>
+        <use xlink:href="#group1" transform="scale(1,-1)"/>
+      </g>
+    </g>
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.5 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240" 
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

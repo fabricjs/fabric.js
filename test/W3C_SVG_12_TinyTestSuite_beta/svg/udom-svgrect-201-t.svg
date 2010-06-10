@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="AZ,AN" owner="AE" desc="Test SVGRect object" status="accepted"
+    approved="yes"
+    version="$Revision: 1.8 $" testname="$RCSfile: udom-svgrect-201-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        This test creates SVGRect object and verifies that the initial data is all zero. It then modifies the x, y, width and height.
+        To pass, the result matrix should be correct, and when this happens the text
+        changes from 'failed' to 'passed'
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: udom-svgrect-201-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+
+    <handler type="text/ecmascript" xe:event="SVGLoad">
+      <![CDATA[
+      var svg_ns = "http://www.w3.org/2000/svg";
+      var xlink_ns = "http://www.w3.org/1999/xlink";
+
+      var count=0;
+      var topsvg = document.documentElement;
+      var startY = 80;
+      var rowHeight = 15;
+      var fontSize = 10;
+      var isPassed = true;
+      var epsilon = 1 / 65535;
+
+      function drawString( text, col )
+      {
+        node_to_insert=document.createElementNS(svg_ns,"text");
+        node_to_insert.setFloatTrait("font-size",fontSize);	
+        node_to_insert.setAttribute("x","25");	
+        var yVal = startY + count++ * rowHeight;
+        node_to_insert.setFloatTrait("y",yVal);
+        node_to_insert.textContent=text;
+        node_to_insert.setAttribute("fill", col);
+        document.getElementById( "test-body-content" ).appendChild(node_to_insert);                       
+      }
+
+      try
+      {
+        rect = topsvg.createSVGRect(  );
+        drawString( "created SVGRect[ " + rect.x+ " , " + rect.y +  " , " + rect.width + " , " + rect.height +  " ];" , "black" );        
+
+        if ( ( Math.abs(rect.x - 0 ) < epsilon ) && (Math.abs(rect.y - 0 ) < epsilon ) && (Math.abs(rect.width - 0 ) < epsilon ) && (Math.abs(rect.width - 0 ) < epsilon ) )
+        {
+          drawString( "Results match expected values." , "green" );
+        }
+        else
+        {
+          isPassed = false;
+          drawString( "Results do not match expected values! (0,0,0,0)" , "red" );
+        }
+
+        rect.x = 10;
+        rect.y = 20;
+        rect.width = 30;
+        rect.height = 40;
+        drawString( "set SVGRect to[ " + rect.x+ " , " + rect.y +  " , " + rect.width + " , " + rect.height +  " ];" ,  "black" );        
+
+        if ( ( Math.abs(rect.x - 10 ) < epsilon ) && (Math.abs(rect.y - 20 ) < epsilon ) && (Math.abs(rect.width - 30 ) < epsilon ) && (Math.abs(rect.height - 40 ) < epsilon ) )
+        {
+          drawString( "Results match expected values." , "green" );
+        }
+        else
+        {
+          isPassed = false;
+          drawString( "Results do not match expected values! (10,20,30,40)" , "red" );
+        }
+
+        if ( isPassed )
+        {
+          var status = document.getElementById("TestStatus");
+          status.setTrait("#text", "passed");
+          status.setAttribute("fill", "green");
+        }
+      }
+      catch(e)
+      {
+        isPassed = false;
+        drawString("Unexpected exception!" , "red");
+      }
+      ]]>
+    </handler>
+    <text  x="240" y="40" text-anchor="middle" >SVGRect - basic test</text>
+
+    <rect x="330" y="315" width="130" height="40" stroke="blue" fill="none"/>
+    <g fill="black">
+      <text xml:id="TestStatus" x="333" y="350" font-size="40">failed</text>
+    </g>
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.8 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240"
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

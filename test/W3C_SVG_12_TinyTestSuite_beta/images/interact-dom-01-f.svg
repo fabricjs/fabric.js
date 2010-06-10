@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+
+<!--======================================================================-->
+<!--=  Copyright 2000 World Wide Web Consortium, (Massachusetts          =-->
+<!--=  Institute of Technology, Institut National de Recherche en        =-->
+<!--=  Informatique et en Automatique, Keio University). All Rights      =-->
+<!--=  Reserved. See http://www.w3.org/Consortium/Legal/.                =-->
+<!--======================================================================-->
+<!-- ===================================================================== -->
+<!--                                                                       -->
+<!-- dom-eventListener-BE-04.svg                                           -->
+<!-- renamed for 1.1 suite to interact-dom-01-f.svg                        -->
+<!--                                                                       -->
+<!-- Tests DOM events support. The test uses ECMA Script                   -->
+<!--                                                                       -->
+<!-- Author : Vincent Hardy  06-08-2000                                    -->
+<!-- 1.1 revision by Vincent Hardy                                         -->
+<!--                                                                       -->
+<!-- History:                                                              -->
+<!--  06 08 2000, VH, created                                              -->
+<!--  30-oct-2000, LH, corrected "\" to "/" in "text/ecmascript"; ser#2    -->
+<!--  16-nov-2000, CJ, corrected infinite loop in mutationEventDetected    -->
+<!--  12-dec-2000, JF, replace mutation event logic with more explicit     -->
+<!--                   test to ensure event listener is removed.           -->
+<!--                                                                       -->
+<!-- ===================================================================== -->
+<!--======================================================================-->
+<!--= Note. After October 2000, revision history is kept as CVS 'commit' =-->
+<!--= log messages, and therefore is no longer in the preceding preamble.=-->
+<!--======================================================================-->
+
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="svg-root" width="480" height="360" onload="initTest(evt)">
+    <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testSuite/description/">
+        <OperatorScript>
+            <Paragraph>
+                Verify basic support for DOM event listener registration. The root svg element
+                has an onload handler where a click event listener is registered on group element 'Start Button'.
+            </Paragraph>
+            <Paragraph>
+                If UI events listener registration is supported (and UI events), 
+                when the user clicks on the button a text node is inserted reading "UI Event Listeners supported". 
+            </Paragraph>
+            <Paragraph>
+                At the end of the test, the start test button in changed to pink, 
+                and the click event listener is removed from the the start button.
+            </Paragraph>
+            <Paragraph>
+                Subsequent clicks on the start button should cause no effect if
+                the event listener has been removed successfully.
+                If additional lines of text appear in the document that say "UI Event Listeners supported",
+                then the implementation has not successfully removed the event listener.
+            </Paragraph>
+            <Paragraph>
+                After clicking at least once on the button,
+                the rendered image should be exactly as the reference image, except for 
+                differences in text display.
+            </Paragraph>
+        </OperatorScript>
+    </SVGTestCase>
+
+
+    <title id="test-title">interact-dom-01-f</title>
+    <desc id="test-desc">Checks if DOM/ECMA Script binding is supported. Checks that the DOM API
+supports event listener registration/unregistration.</desc>
+    <!--======================================================================-->
+    <!--Content of Test Case follows...                  =====================-->
+    <!--======================================================================-->
+    <g id="test-body-content">
+
+	<script type="text/ecmascript"><![CDATA[
+		
+    var svg_ns = "http://www.w3.org/2000/svg"
+		var doc;
+		var content;
+		var startButton;
+		var buttonRect;
+    var yLocation = 100;
+		//
+		// onload handler for top level svg element. Sets a UI event listener for
+		// the test start button.
+		//
+		function initTest(evt){
+			// Get Document
+    	var target = evt.target;
+			doc = target.ownerDocument;
+			content = doc.getElementById("test-body-content");
+
+			// Get start rect and add a UI listener
+			startButton = doc.getElementById("startButton");
+			buttonRect = doc.getElementById("buttonRect");
+			startButton.addEventListener("click", uiEventDetected, false);
+		}
+
+		//
+		// click handler for 'startButton' rect element.
+		//
+    function uiEventDetected(evt) {
+			//
+			// Add an element to show that UI event was detected
+			//
+			var newText = doc.createElementNS(svg_ns, 'text');
+			newText.setAttribute('x', '50');
+			newText.setAttribute('y', yLocation);
+			var message = "UI Event Listeners supported";
+			var textContent = doc.createTextNode(message);
+			newText.appendChild(textContent);
+			content.appendChild(newText);
+
+			startButton.removeEventListener("click", uiEventDetected, false);
+
+			// Make start button pink
+			buttonRect.setAttribute("fill", "#ff8888");
+			buttonRect.setAttribute("stroke", "black");		
+
+      // If test does not successfully remove the event listener, then
+      // a second click will cause a subsequent text string to appear 50 units
+      // below the first new text string.
+      yLocation = yLocation + 50;	
+    }
+
+	]]></script>
+
+	<!-- ===================================================================== -->
+	<!-- Start button                                                          -->
+	<!-- ===================================================================== -->
+	<g id="startButton">
+		<rect id="buttonRect" x="10" y="50" width="80" height="20" fill="#dddddd" stroke="black" />
+		<text x="15" y="65">Start Test</text>
+	</g>
+
+</g>
+    <!--======================================================================-->
+    <!--Legend and frame:      Title, suite and SVG document serialization====-->
+    <!--======================================================================-->
+    <g id="test-legend" fill="black" font-family="Helvetica" font-size="10" >
+        <rect x="10" y="300" width="275" height="50" fill="none" stroke="#000000" />
+        <path fill="none" stroke="#000000"  d="M10 315 h275 M205 315 v35 M10 336 h195 M205 332 h80"/>
+        <text x="25" y="311">Scalable Vector Graphics (SVG) v1.1 Conformance Suite</text>
+        <a xlink:href="copyright-documents-19990405.html">
+            <text x="12" y="347" fill="blue" >Copyright 2002 W3C. All Rights Reserved.</text>
+        </a>
+        <text font-size="12"  x="35" y="330">interact-dom-01-f</text>
+        <text font-size="10"  x="210" y="327">$Revision: 1.1 $</text>
+        <text font-size="10"  x="210" y="345">Release 1.0</text>
+        <rect id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000000" />
+    </g>
+</svg>

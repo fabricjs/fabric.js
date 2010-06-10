@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="AE" owner="ED" desc="Tests all the feature strings." status="accepted"
+    approved="yes"
+    version="$Revision: 1.4 $" testname="$RCSfile: struct-cond-205-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        Tests all the SVG Tiny 1.2 feature strings using requiredFeatures.
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: struct-cond-205-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII" font-size="18">
+    <g fill="#555" font-size="10" text-anchor="middle">
+      <text fill="#000" x="240" font-size="14" y="30" xml:id="display-title">Required Features Attribute</text>
+      <text x="240" y="45" xml:id="comment-1">
+        A series of switches are used to determine which 'requiredFeatures' are supported.
+      </text>
+    </g>
+    <g font-size="10" transform="translate(-30,80)">
+      <text text-anchor="end" x="340" y="-15" fill="#555" font-size="14">Feature</text>
+      <text x="350" y="-15" fill="#555" font-size="14">Supported?</text>
+
+      <text text-anchor="end" x="340" y="0" fill="black">http://www.w3.org/Graphics/SVG/feature/1.2/#SVG-static</text>
+      <switch>
+        <text x="350" y="0" fill="green" requiredFeatures="http://www.w3.org/Graphics/SVG/feature/1.2/#SVG-static">Yes</text>
+        <text x="350" y="0" fill="red">No</text>
+      </switch>
+      <text text-anchor="end" x="340" y="12" fill="black">http://www.w3.org/Graphics/SVG/feature/1.2/#SVG-static-DOM</text>
+      <switch>
+        <text x="350" y="12" fill="green" requiredFeatures="http://www.w3.org/Graphics/SVG/feature/1.2/#SVG-static-DOM">Yes</text>
+        <text x="350" y="12" fill="red">No</text>
+      </switch>
+      <text text-anchor="end" x="340" y="24" fill="black">http://www.w3.org/Graphics/SVG/feature/1.2/#SVG-animated</text>
+      <switch>
+        <text x="350" y="24" fill="green" requiredFeatures="http://www.w3.org/Graphics/SVG/feature/1.2/#SVG-animated">Yes</text>
+        <text x="350" y="24" fill="red">No</text>
+      </switch>
+      <text text-anchor="end" x="340" y="36" fill="black">http://www.w3.org/Graphics/SVG/feature/1.2/#SVG-all</text>
+      <switch>
+        <text x="350" y="36" fill="green" requiredFeatures="http://www.w3.org/Graphics/SVG/feature/1.2/#SVG-all">Yes</text>
+        <text x="350" y="36" fill="red">No</text>
+      </switch>
+      <text text-anchor="end" x="340" y="48" fill="black">http://www.w3.org/Graphics/SVG/feature/1.2/#CoreAttribute</text>
+      <switch>
+        <text x="350" y="48" fill="green" requiredFeatures="http://www.w3.org/Graphics/SVG/feature/1.2/#CoreAttribute">Yes</text>
+        <text x="350" y="48" fill="red">No</text>
+      </switch>
+      <text text-anchor="end" x="340" y="60" fill="black">http://www.w3.org/Graphics/SVG/feature/1.2/#NavigationAttribute</text>
+      <switch>
+        <text x="350" y="60" fill="green" requiredFeatures="http://www.w3.org/Graphics/SVG/feature/1.2/#NavigationAttribute">Yes</text>
+        <text x="350" y="60" fill="red">No</text>
+      </switch>
+      <text text-anchor="end" x="340" y="72" fill="black">garbage</text>
+      <switch>
+        <text x="350" y="72" fill="green" requiredFeatures="garbage">Yes</text>
+        <text x="350" y="72" fill="red">No (expected)</text>
+      </switch>
+      <text text-anchor="end" x="340" y="84" fill="black">http://www.w3.org/Graphics/SVG/feature/1.2/#NavigationAttribute</text>
+      <switch>
+        <text x="350" y="84" fill="green" requiredFeatures="http://www.w3.org/Graphics/SVG/feature/1.2/#NavigationAttribute">Yes</text>
+        <text x="350" y="84" fill="red">No</text>
+      </switch>
+      <text text-anchor="end" x="340" y="96" fill="black">http://www.w3.org/Graphics/SVG/feature/1.2/#Structure</text>
+      <switch>
+        <text x="350" y="96" fill="green" requiredFeatures="http://www.w3.org/Graphics/SVG/feature/1.2/#Structure">Yes</text>
+        <text x="350" y="96" fill="red">No</text>
+      </switch>
+      <text text-anchor="end" x="340" y="108" fill="black">http://www.w3.org/Graphics/SVG/feature/1.2/#structure</text>
+      <switch>
+        <text x="350" y="108" fill="green" requiredFeatures="http://www.w3.org/Graphics/SVG/feature/1.2/#structure">Yes</text>
+        <text x="350" y="108" fill="red">No (expected)</text>
+      </switch>
+      <text text-anchor="end" x="340" y="120" fill="black">http://www.w3.org/Graphics/SVG/feature/1.2/#ConditionalProcessing</text>
+      <switch>
+        <text x="350" y="120" fill="green" requiredFeatures="http://www.w3.org/Graphics/SVG/feature/1.2/#ConditionalProcessing">Yes</text>
+        <text x="350" y="120" fill="red">No</text>
+      </switch>
+      <text text-anchor="end" x="340" y="132" fill="black">http://www.w3.org/Graphics/SVG/feature/1.2/#ConditionalProcessingAttribute</text>
+      <switch>
+        <text x="350" y="132" fill="green" requiredFeatures="http://www.w3.org/Graphics/SVG/feature/1.2/#ConditionalProcessingAttribute">Yes</text>
+        <text x="350" y="132" fill="red">No</text>
+      </switch>
+      <text text-anchor="end" x="340" y="144" fill="black">http://www.w3.org/Graphics/SVG/feature/1.2/#Image</text>
+      <switch>
+        <text x="350" y="144" fill="green" requiredFeatures="http://www.w3.org/Graphics/SVG/feature/1.2/#Image">Yes</text>
+        <text x="350" y="144" fill="red">No</text>
+      </switch>
+      <text text-anchor="end" x="340" y="156" fill="black">http://www.w3.org/Graphics/SVG/feature/1.2/#Prefetch</text>
+      <switch>
+        <text x="350" y="156" fill="green" requiredFeatures="http://www.w3.org/Graphics/SVG/feature/1.2/#Prefetch">Yes</text>
+        <text x="350" y="156" fill="red">No</text>
+      </switch>
+      <text text-anchor="end" x="340" y="168" fill="black">http://www.w3.org/Graphics/SVG/feature/1.2/#Discard</text>
+      <switch>
+        <text x="350" y="168" fill="green" requiredFeatures="http://www.w3.org/Graphics/SVG/feature/1.2/#Discard">Yes</text>
+        <text x="350" y="168" fill="red">No</text>
+      </switch>
+      <text text-anchor="end" x="340" y="180" fill="black">http://www.w3.org/Graphics/SVG/feature/1.2/#Shape</text>
+      <switch>
+        <text x="350" y="180" fill="green" requiredFeatures="http://www.w3.org/Graphics/SVG/feature/1.2/#Shape">Yes</text>
+        <text x="350" y="180" fill="red">No</text>
+      </switch>
+      <text text-anchor="end" x="340" y="192" fill="black">http://www.w3.org/Graphics/SVG/feature/1.2/#Text</text>
+      <switch>
+        <text x="350" y="192" fill="green" requiredFeatures="http://www.w3.org/Graphics/SVG/feature/1.2/#Text">Yes</text>
+        <text x="350" y="192" fill="red">No</text>
+      </switch>
+      <text text-anchor="end" x="340" y="204" fill="black">http://www.w3.org/Graphics/SVG/feature/1.2/#PaintAttribute</text>
+      <switch>
+        <text x="350" y="204" fill="green" requiredFeatures="http://www.w3.org/Graphics/SVG/feature/1.2/#PaintAttribute">Yes</text>
+        <text x="350" y="204" fill="red">No</text>
+      </switch>
+      <text text-anchor="end" x="340" y="216" fill="black">http://www.w3.org/Graphics/SVG/feature/1.2/#OpacityAttribute</text>
+      <switch>
+        <text x="350" y="216" fill="green" requiredFeatures="http://www.w3.org/Graphics/SVG/feature/1.2/#OpacityAttribute">Yes</text>
+        <text x="350" y="216" fill="red">No</text>
+      </switch>
+      <text text-anchor="end" x="340" y="228" fill="black">http://www.w3.org/Graphics/SVG/feature/1.2/#GraphicsAttribute</text>
+      <switch>
+        <text x="350" y="228" fill="green" requiredFeatures="http://www.w3.org/Graphics/SVG/feature/1.2/#GraphicsAttribute">Yes</text>
+        <text x="350" y="228" fill="red">No</text>
+      </switch>
+      <!--
+			<text text-anchor="end" x="340" y="180" fill="black">http://www.w3.org/Graphics/SVG/feature/1.2/#Gradient</text>
+			<switch>
+				<text x="350" y="180" fill="green" requiredFeatures="http://www.w3.org/Graphics/SVG/feature/1.2/#Gradient">Yes</text>
+				<text x="350" y="180" fill="red">No</text>
+			</switch>
+			<text text-anchor="end" x="340" y="180" fill="black">http://www.w3.org/Graphics/SVG/feature/1.2/#SolidColor</text>
+			<switch>
+				<text x="350" y="180" fill="green" requiredFeatures="http://www.w3.org/Graphics/SVG/feature/1.2/#SolidColor">Yes</text>
+				<text x="350" y="180" fill="red">No</text>
+			</switch>
+			<text text-anchor="end" x="340" y="180" fill="black">http://www.w3.org/Graphics/SVG/feature/1.2/#Hyperlinking</text>
+			<switch>
+				<text x="350" y="180" fill="green" requiredFeatures="http://www.w3.org/Graphics/SVG/feature/1.2/#Hyperlinking">Yes</text>
+				<text x="350" y="180" fill="red">No</text>
+			</switch>
+			<text text-anchor="end" x="340" y="180" fill="black">http://www.w3.org/Graphics/SVG/feature/1.2/#XlinkAttribute</text>
+			<switch>
+				<text x="350" y="180" fill="green" requiredFeatures="http://www.w3.org/Graphics/SVG/feature/1.2/#XlinkAttribute">Yes</text>
+				<text x="350" y="180" fill="red">No</text>
+			</switch>
+			<text text-anchor="end" x="340" y="180" fill="black">http://www.w3.org/Graphics/SVG/feature/1.2/#ExternalResourcesRequired</text>
+			<switch>
+				<text x="350" y="180" fill="green" requiredFeatures="http://www.w3.org/Graphics/SVG/feature/1.2/#ExternalResourcesRequired">Yes</text>
+				<text x="350" y="180" fill="red">No</text>
+			</switch>
+			<text text-anchor="end" x="340" y="180" fill="black">http://www.w3.org/Graphics/SVG/feature/1.2/#Scripting</text>
+			<switch>
+				<text x="350" y="180" fill="green" requiredFeatures="http://www.w3.org/Graphics/SVG/feature/1.2/#Scripting">Yes</text>
+				<text x="350" y="180" fill="red">No</text>
+			</switch>
+			
+			<text text-anchor="end" x="340" y="180" fill="black">http://www.w3.org/Graphics/SVG/feature/1.2/#Handler</text>
+			<switch>
+				<text x="350" y="180" fill="green" requiredFeatures="http://www.w3.org/Graphics/SVG/feature/1.2/#Handler">Yes</text>
+				<text x="350" y="180" fill="red">No</text>
+			</switch>
+			<text text-anchor="end" x="340" y="180" fill="black">http://www.w3.org/Graphics/SVG/feature/1.2/#Listener</text>
+			<switch>
+				<text x="350" y="180" fill="green" requiredFeatures="http://www.w3.org/Graphics/SVG/feature/1.2/#Listener">Yes</text>
+				<text x="350" y="180" fill="red">No</text>
+			</switch>
+			<text text-anchor="end" x="340" y="180" fill="black">http://www.w3.org/Graphics/SVG/feature/1.2/#TimedAnimation</text>
+			<switch>
+				<text x="350" y="180" fill="green" requiredFeatures="http://www.w3.org/Graphics/SVG/feature/1.2/#TimedAnimation">Yes</text>
+				<text x="350" y="180" fill="red">No</text>
+			</switch>
+			<text text-anchor="end" x="340" y="180" fill="black">http://www.w3.org/Graphics/SVG/feature/1.2/#Animation</text>
+			<switch>
+				<text x="350" y="180" fill="green" requiredFeatures="http://www.w3.org/Graphics/SVG/feature/1.2/#Animation">Yes</text>
+				<text x="350" y="180" fill="red">No</text>
+			</switch>
+			<text text-anchor="end" x="340" y="180" fill="black">http://www.w3.org/Graphics/SVG/feature/1.2/#Audio</text>
+			<switch>
+				<text x="350" y="180" fill="green" requiredFeatures="http://www.w3.org/Graphics/SVG/feature/1.2/#Audio">Yes</text>
+				<text x="350" y="180" fill="red">No</text>
+			</switch>
+			<text text-anchor="end" x="340" y="180" fill="black">http://www.w3.org/Graphics/SVG/feature/1.2/#Video</text>
+			<switch>
+				<text x="350" y="180" fill="green" requiredFeatures="http://www.w3.org/Graphics/SVG/feature/1.2/#Video">Yes</text>
+				<text x="350" y="180" fill="red">No</text>
+			</switch>
+			<text text-anchor="end" x="340" y="180" fill="black">http://www.w3.org/Graphics/SVG/feature/1.2/#Font</text>
+			<switch>
+				<text x="350" y="180" fill="green" requiredFeatures="http://www.w3.org/Graphics/SVG/feature/1.2/#Font">Yes</text>
+				<text x="350" y="180" fill="red">No</text>
+			</switch>
+			<text text-anchor="end" x="340" y="180" fill="black">http://www.w3.org/Graphics/SVG/feature/1.2/#Extensibility</text>
+			<switch>
+				<text x="350" y="180" fill="green" requiredFeatures="http://www.w3.org/Graphics/SVG/feature/1.2/#Extensibility">Yes</text>
+				<text x="350" y="180" fill="red">No</text>
+			</switch>
+			<text text-anchor="end" x="340" y="180" fill="black">http://www.w3.org/Graphics/SVG/feature/1.2/#MediaAttribute</text>
+			<switch>
+				<text x="350" y="180" fill="green" requiredFeatures="http://www.w3.org/Graphics/SVG/feature/1.2/#MediaAttribute">Yes</text>
+				<text x="350" y="180" fill="red">No</text>
+			</switch>
+			<text text-anchor="end" x="340" y="180" fill="black">http://www.w3.org/Graphics/SVG/feature/1.2/#TextFlow</text>
+			<switch>
+				<text x="350" y="180" fill="green" requiredFeatures="http://www.w3.org/Graphics/SVG/feature/1.2/#TextFlow">Yes</text>
+				<text x="350" y="180" fill="red">No</text>
+			</switch>
+			<text text-anchor="end" x="340" y="180" fill="black">http://www.w3.org/Graphics/SVG/feature/1.2/#TransformedVideo</text>
+			<switch>
+				<text x="350" y="180" fill="green" requiredFeatures="http://www.w3.org/Graphics/SVG/feature/1.2/#TransformedVideo">Yes</text>
+				<text x="350" y="180" fill="red">No</text>
+			</switch>
+			<text text-anchor="end" x="340" y="180" fill="black">http://www.w3.org/Graphics/SVG/feature/1.2/#ComposedVideo</text>
+			<switch>
+				<text x="350" y="180" fill="green" requiredFeatures="http://www.w3.org/Graphics/SVG/feature/1.2/#ComposedVideo">Yes</text>
+				<text x="350" y="180" fill="red">No</text>
+			</switch>
+			-->
+    </g>
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.4 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240"
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

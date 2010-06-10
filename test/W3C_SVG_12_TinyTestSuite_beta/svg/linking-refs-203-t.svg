@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="DOH" owner="AE" desc="External Fragments with 'use' Element" status="accepted"
+    approved="yes"
+    version="$Revision: 1.8 $" testname="$RCSfile: linking-refs-203-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        Tests various external fragments with 'use' element:
+        fill, stroke, text, group, multiple levels, name clash and circular references
+      </p>
+      <p>
+        SVG fragments defined in an external file are invoked with the 'use' element.
+        The test is passed if the following objects are rendered:
+        - Right top; square with a horizontal gradient fill from orange to yellow, diagonal gradient stroke from blue to pink
+        - Right middle top; square with a diagonal gradient fill from blue to pink, horizontal gradient stroke from orange to yellow
+        - Right middle bottom; the letters ABC in an SVG font
+        - Right bottom; the English alphabet a to j in the shape of a square
+        - Left Top; square with horizontal gradient fill from orange to yellow, and 3 circles all with a blue to red gradient fill
+        running diagonally inside the square
+        - Left middle top; green square with a yellow circle in the middle
+        - Left middle bottom; red square
+        - Left bottom; two identical squares with light blue fill.
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: linking-refs-203-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+
+    <linearGradient xml:id="myLocalGrad">
+      <stop offset="0.05" stop-color="#F60"/>
+      <stop offset="0.95" stop-color="#FF6"/>
+    </linearGradient>
+    <rect xml:id="nameClashTest" x="0" y="0" width="30" height="30" fill="blue" />
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+    <g text-anchor="middle">
+      <text xml:id="display-title" fill="black" x="240" y="40" font-size="18">External Fragments with 'use' Element</text>
+    </g>
+    <g transform="translate(25, 25)" font-size="11">
+      <g transform="translate(0, 0)">
+        <text fill="#000" fill-opacity="0.6" x="50" y="72">Rect using external gradients</text>
+        <text fill="#000" fill-opacity="0.6" x="50" y="86">for fill and stroke</text>
+        <use xlink:href="../images/svglib.svg#rect3" x="10" y="60" fill="green" stroke="blue" stroke-width="5"/>
+      </g>
+      <g transform="translate(0, 40)">
+        <text fill="#000" fill-opacity="0.6" x="50" y="72">Rect using external fill gradient</text>
+        <text fill="#000" fill-opacity="0.6" x="50" y="86">gradient &amp; local stroke gradient</text>
+        <use xlink:href="../images/svglib.svg#rect4" x="10" y="60" stroke="url(#myLocalGrad)" stroke-width="5"/>
+      </g>
+      <g transform="translate(0, 80)">
+        <text fill="#000" fill-opacity="0.6" x="50" y="80">Text using SVG font</text>
+        <use xlink:href="../images/svglib.svg#text2" fill="blue" x="10" y="80"/>
+      </g>
+      <g transform="translate(0, 120)">
+        <text fill="#000" fill-opacity="0.6" x="50" y="80">Alphabet a to j</text>
+        <use xlink:href="../images/svglib.svg#textArea1" fill="blue" x="10" y="60" font-size="12"/>
+      </g>
+    </g>
+    <g transform="translate(245, 25)" font-size="11">
+      <g transform="translate(0, 0)">
+        <text fill="#000" fill-opacity="0.6" x="50" y="72">Group using a rect and</text>
+        <text fill="#000" fill-opacity="0.6" x="50" y="86">3 circles using gradients</text>
+        <use xlink:href="../images/svglib.svg#g2" x="10" y="60"/>
+      </g>
+      <g transform="translate(0, 40)">
+        <text fill="#000" fill-opacity="0.6" x="50" y="72">2 levels of external &lt;use&gt; A green</text>
+        <text fill="#000" fill-opacity="0.6" x="50" y="86">rect, yellow circle must appear</text>
+        <use xlink:href="../images/svglib.svg#g3" x="10" y="60"/>
+      </g>
+      <g transform="translate(0, 80)">
+        <text fill="#000" fill-opacity="0.6" x="50" y="72">Testing id name clash.</text>
+        <text fill="#000" fill-opacity="0.6" x="50" y="86">Rect must be red</text>
+        <use xlink:href="../images/svglib2.svg#nameClashTest" x="10" y="60"/>
+      </g>
+      <g transform="translate(0, 120)">
+        <g stroke-opacity="0.5" transform="translate(0, 67)">
+          <text fill="#000" fill-opacity="0.6" x="50" y="0">External circular reference</text>
+          <text fill="#000" fill-opacity="0.6" x="50" y="12" font-size="9">Two identical rectangles must appear,</text>
+          <text fill="#000" fill-opacity="0.6" x="50" y="22" font-size="9">proving the circular reference didn't loop</text>
+        </g>
+        <rect x="-30" y="60" width="30" height="30" fill="blue" fill-opacity=".3" />
+        <use xlink:href="../images/svglib.svg#gCircRef" x="10" y="60"/>
+      </g>
+    </g>
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none" fill="black">$Revision: 1.8 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240" 
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

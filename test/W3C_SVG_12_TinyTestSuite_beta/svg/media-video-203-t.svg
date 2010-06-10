@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="ASL" owner="AE" desc="Video with TransformBehavior Set to Pinned and Overlay" status="accepted"
+    approved="yes"
+    version="$Revision: 1.8 $" testname="$RCSfile: media-video-203-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>Video with TransformBehavior Set to Pinned</p>
+      <p>
+        This file tests the transformBehavior attribute set to 'pinned'.
+        The video should always overlap the two crossing lines, even during zoom/pan, proving it
+        is always rendered at its native resolution, and pinned at its the center (the blue dot).
+        If the video is rendered inside the small rotated rectangle, it means the transformBehavior
+        attribute is not applied / supported.
+      </p>
+      <p>
+        If the user agent does not support the 3GP media format, the test is still a pass.
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: media-video-203-t.svg,v $</title>
+  <defs>
+    <font-face font-family="SVGFreeSansASCII" unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii" />
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+    <rect x="15" y="50" height="235" width="450" fill="none" stroke="black" stroke-width="0.25"/>
+    <g text-anchor="middle" transform="translate(0,2)">
+      <text xml:id="display-title" x="240" y="20" font-size="14" fill="#000">Video with TransformBehavior Set to Pinned</text>
+      <text xml:id="comment-1" x="240" y="35" font-size="10" fill="#555">
+        The video should exactly overlap the two wide crossing lines, proving it is pinned on the blue dot
+      </text>
+    </g>
+
+    <line x1="240" y1="-3000" x2="240" y2="3360" stroke-width="176" vector-effect="non-scaling-stroke" stroke-opacity=".2" stroke="blue" />
+    <line x1="-3000" y1="167.5" x2="3480" y2="167.5" stroke-width="144" vector-effect="non-scaling-stroke" stroke-opacity=".2" stroke="blue" />
+    <g transform="translate(240,167.5),rotate(15)">
+      <video width="100" height="67" transformBehavior="pinned" xlink:href="../images/dogandball.3gp" type="video/3gp" fill="freeze"/>
+      <rect width="100" height="67" fill="none" stroke="blue" stroke-width="2"/>
+      <circle r="5" fill="blue" />
+    </g>
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.8 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240"
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

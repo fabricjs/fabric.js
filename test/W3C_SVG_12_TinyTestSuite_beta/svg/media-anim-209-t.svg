@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+    viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+    xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="DOH" owner="AE" desc="Animation Elements with External References" status="accepted"
+    approved="yes"
+    version="$Revision: 1.9 $" testname="$RCSfile: media-anim-209-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>Animation Elements with Discard</p>
+      <p>Four animation elements reference struct-discard-201.svg.</p>
+      <p>Each animation element is a target of a discard, at 6, 10, 14 and 18s.</p>
+      <p>To pass each animation element should discard at the specified time.</p>
+      <p>In addition, each referenced file should behave as indicated in the test struct-discard-201.</p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: media-anim-209-t.svg,v $</title>
+  <defs>
+    <font-face
+        font-family="SVGFreeSansASCII"
+        unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+
+    <text xml:id="revision" x="15" y="20" font-size="15" stroke="none" fill="black">Animation and discard elements</text>
+
+    <g transform="scale(0.9) translate(120, -10)">
+      <rect x="0" y="50" height="150" width="150" fill="none" stroke="black" stroke-width="0.25"/>
+      <animation xml:id="anim1" begin="0" dur="120"  x="0" y="50" width="150" height="130" xlink:href="struct-discard-201-t.svg" fill="remove"/>
+      <text x="15" y="190" font-size="12" stroke="none" fill="black">Discard @ 6s</text>
+
+      <rect x="150" y="50" height="150" width="150" fill="none" stroke="black" stroke-width="0.25"/>
+      <animation xml:id="anim2" begin="4" dur="120"  x="150" y="50" width="150" height="130" xlink:href="struct-discard-201-t.svg" fill="remove"/>
+      <text x="165" y="190" font-size="12" stroke="none" fill="black">Discard @ 10s</text>
+
+      <rect x="0" y="200" height="150" width="150" fill="none" stroke="black" stroke-width="0.25"/>
+      <animation xml:id="anim3" begin="8" dur="120" x="0" y="200" width="150" height="130" xlink:href="struct-discard-201-t.svg" fill="remove"/>
+      <text x="15" y="340" font-size="12" stroke="none" fill="black">Discard @ 14s</text>
+
+      <rect x="150" y="200" height="150" width="150" fill="none" stroke="black" stroke-width="0.25"/>
+      <animation xml:id="anim4" begin="12" dur="120" x="150" y="200" width="150" height="130" xlink:href="struct-discard-201-t.svg" fill="remove"/>
+      <text x="165" y="340" font-size="12" stroke="none" fill="black">Discard @ 18s</text>
+
+
+      <discard begin="6s" xlink:href="#anim1"/>
+      <discard begin="10s" xlink:href="#anim2"/>
+      <discard begin="14s" xlink:href="#anim3"/>
+      <discard begin="18s" xlink:href="#anim4"/>
+    </g>
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.9 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240"
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

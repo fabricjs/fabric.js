@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE html PUBLIC  "-//CL//DTD XHTML 1.0 Transitional plus Embed//EN"
+ "http://www.w3.org/Graphics/xhtml1-transitional-plus-embed.dtd">
+ <html xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+ <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+ <meta name="keywords" content="W3C SVG 1.1 Test Suite testsuite mobile"/>
+ <meta name="description" content="W3C SVG 1.2 Tiny Test Suite"/>
+ <title>
+SVG 1.2 Tiny test:animate-elem-83-t </title>
+ <style type="text/css">
+ <!--
+ .bodytext    { font-family:verdana, helvetica, sans-serif; font-size: 12pt; line-height: 125%; text-align: Left; margin-top: 0; margin-bottom: 0 }
+ .pageTitle         { line-height: 150%; font-size: 20pt; font-weight : 900; margin-bottom: 20pt }
+ .pageSubTitle  { color : blue; line-height: 100%; font-size: 24pt; font-weight : 900 }
+ .openChapter   { color : blue; line-height: 125%; font-weight : 900 }
+ .openSection   { color : blue; line-height: 125%; font-weight : 900 }
+ .info  { color : black; line-height: 110%; font-size: 10pt; font-weight : 100 }
+ p          { margin-top:0; margin-bottom:0; padding-top:0; padding-bottom:0 }
+ blockquote { margin-top:0; margin-bottom:0; padding-top:0; padding-bottom:0 }
+ .opscript {margin-left: 3%; margin-right: 3%; }
+ .opscript p { margin-top: 0.7em}
+ .navbar {background: black; color: white; font-weight: bold}
+ -->
+ </style>
+ </head>
+ <body class="bodytext">
+
+	<div class="linkbar"> 
+<p>
+<a href="animate-elem-83-t.html">Tiny version</a></p>
+<p>Specification link: <a target="spec" href="http://www.w3.org/TR/SVGMobile12/animate.html">16.2 Animation elements</a></p>
+ <p>
+    <a href="animate-elem-82-t.html">animate-elem-82-t ←</a> 
+    <a href="index.html">index</a>
+    <a href="animate-elem-84-t.html">→ animate-elem-84-t</a>
+</p></div>
+
+	<table align="center" border="0" cellspacing="0" cellpadding="10">
+		<tr>
+			<td align="center" colspan="3">
+				<table border="0" cellpadding="8">
+					<tr>
+						<td align="center" colspan="2" class="pageTitle">
+							<h1>animate-elem-83-t</h1>
+						</td>
+					</tr>
+					<tr  class="navbar">
+						<td align="center">
+							SVG Image
+						</td>
+						<td align="center">
+							PNG Image
+						</td>
+					</tr>
+					<tr>
+						<td align="right">
+   	    		  			<embed src="../svggen/animate-elem-83-t.svg" width="480" height="360"/>
+						</td>
+						<td align="left">
+							<img alt="raster image of animate-elem-83-t" src="../png/animate-elem-83-t.png" width="480" height="360"/>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+
+               
+<div class="opscript">
+      <p>This test validates the operation of the animate element on the &lt;path&gt; element's d attribute.</p>
+      <p>
+        The following descriptions references to the tests by number. The first test is the one showing on the top left.
+        The last, sixth test is the one showing at the bottom right. Test numbers are alocated from left to right and
+        from top to bottom. For each test, there are reference outline markers which show the expected animated shape at
+        different times in the animation. At the time of the expected shape, the outline of the expected shape is drawn
+        with a thick stroke for 0.2s so the test user can visually check that the shapes are matching at the expected
+        times.
+      </p>
+      <p>
+        The first test validates a simple from-to animation on a path's d attribute made of M, C and Z commands where
+        both the from and to attributes are specified. The attributes are compatible with the path element's d attribute.
+      </p>
+      <p>
+        The second test validates a simple to-animation on a path's d attribute made of M, C and Z commands where the to
+        attribute is specified. The attribute is compatible with the path element's d attribute.
+      </p>
+      <p>
+        The third test validates a simple values-animation on a path's d attribute made of M, C and Z commands where the
+        values attribute is specified and specifies three seperate values. The attribute is compatible with the path
+        element's d attribute.
+      </p>
+      <p>
+        The fourth, fifth and sixth tests validate that interpolation between compatible path values (i.e., path values
+        which normalize to the compatible values) is supported.
+      </p>
+      <p>
+        The fourth tests interpolation between a path value containing H, V and L commands (in the from value) and a path
+        value containing compatible h, v and l commands (in the to value).
+      </p>
+      <p>
+        The fifth tests interpolation between a path value containing C and S commands (in the from value) and a path value
+        containing compatible c and s commands (in the to value).
+      </p>
+      <p>
+        The sixth tests interpolation between a path value containing Q, T and A commands (in the from value) and a path
+        value containing compatible q, t and a commands (in the to value).
+      </p>
+
+		</div>
+<div class="linkbar"> <p>
+				<a href="animate-elem-82-t.html">animate-elem-82-t ←</a>
+				<a href="index.html">index</a>
+				<a href="animate-elem-84-t.html">→ animate-elem-84-t</a>
+						</p></div>
+</body>
+</html>

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE html PUBLIC  "-//CL//DTD XHTML 1.0 Transitional plus Embed//EN"
+ "http://www.w3.org/Graphics/xhtml1-transitional-plus-embed.dtd">
+ <html xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+ <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+ <meta name="keywords" content="W3C SVG 1.1 Test Suite testsuite mobile"/>
+ <meta name="description" content="W3C SVG 1.2 Tiny Test Suite"/>
+ <title>
+SVG 1.2 Tiny test:struct-use-205-t </title>
+ <style type="text/css">
+ <!--
+ .bodytext    { font-family:verdana, helvetica, sans-serif; font-size: 12pt; line-height: 125%; text-align: Left; margin-top: 0; margin-bottom: 0 }
+ .pageTitle         { line-height: 150%; font-size: 20pt; font-weight : 900; margin-bottom: 20pt }
+ .pageSubTitle  { color : blue; line-height: 100%; font-size: 24pt; font-weight : 900 }
+ .openChapter   { color : blue; line-height: 125%; font-weight : 900 }
+ .openSection   { color : blue; line-height: 125%; font-weight : 900 }
+ .info  { color : black; line-height: 110%; font-size: 10pt; font-weight : 100 }
+ p          { margin-top:0; margin-bottom:0; padding-top:0; padding-bottom:0 }
+ blockquote { margin-top:0; margin-bottom:0; padding-top:0; padding-bottom:0 }
+ .opscript {margin-left: 3%; margin-right: 3%; }
+ .opscript p { margin-top: 0.7em}
+ .navbar {background: black; color: white; font-weight: bold}
+ -->
+ </style>
+ </head>
+ <body class="bodytext">
+
+	<div class="linkbar"> 
+<p>
+<a href="struct-use-205-t.html">Tiny version</a></p>
+<p>Specification link: <a target="spec" href="http://www.w3.org/TR/SVGMobile12/struct.html">5.6 The 'use' element</a></p>
+ <p>
+    <a href="struct-use-204-t.html">struct-use-204-t ←</a> 
+    <a href="index.html">index</a>
+    <a href="struct-use-206-t.html">→ struct-use-206-t</a>
+</p></div>
+
+	<table align="center" border="0" cellspacing="0" cellpadding="10">
+		<tr>
+			<td align="center" colspan="3">
+				<table border="0" cellpadding="8">
+					<tr>
+						<td align="center" colspan="2" class="pageTitle">
+							<h1>struct-use-205-t</h1>
+						</td>
+					</tr>
+					<tr  class="navbar">
+						<td align="center">
+							SVG Image
+						</td>
+						<td align="center">
+							PNG Image
+						</td>
+					</tr>
+					<tr>
+						<td align="right">
+   	    		  			<embed src="../svggen/struct-use-205-t.svg" width="480" height="360"/>
+						</td>
+						<td align="left">
+							<img alt="raster image of struct-use-205-t" src="../png/struct-use-205-t.png" width="480" height="360"/>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+
+               
+<div class="opscript">
+      <p>
+        This test checks some aspects of the SVGElementInstance with regards to events.
+      </p>
+      <p>
+        Four blue rects should be visible at first. To run the test each rect must be clicked a minimum of two times. Once
+        to run the basic test, and once to verify that the event handler was removed properly. The test has passed if after
+        clicking all the rects two times or more there are four green rects with the word "Passed" on them. If anything red
+        is visible or the text on any of the rects say "Failed" then the test has failed.
+      </p>
+      <p>
+        The top-left rect checks that correspondingUseElement and correspondingElement are returning the correct values, and
+        also that the currentTarget isn't the same as target here.
+      </p>
+      <p>
+        The top-right rect checks that events bubble the correct way when SVGElementInstance is involved. It's almost the same
+        as the first subtest, but uses another 'use' element.
+      </p>
+      <p>
+        The bottom-left rect doesn't use 'use' elements at all, it's to illustrate event bubbling in normal trees as compared
+        to SVGElementInstance trees.
+      </p>
+      <p>
+        The bottom-right rect uses nested 'use' elements. The event handler 'nestedhandler' should be executed first, and will
+        check some aspects of nested use elements. It will modify what it references, and that is checked in the 'h4' event
+        handler.
+      </p>
+
+		</div>
+<div class="linkbar"> <p>
+				<a href="struct-use-204-t.html">struct-use-204-t ←</a>
+				<a href="index.html">index</a>
+				<a href="struct-use-206-t.html">→ struct-use-206-t</a>
+						</p></div>
+</body>
+</html>

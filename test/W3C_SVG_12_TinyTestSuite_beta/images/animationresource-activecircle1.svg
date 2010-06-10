@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+		<linearGradient id="myGrad">
+			<stop offset="0.05" stop-color="#F60"/>
+			<stop offset="0.95" stop-color="#FF6"/>
+		</linearGradient>
+		<circle id="myCircle" r="5" fill="url(#myGrad)"/>
+	</defs>
+	<circle cx="15" cy="15" r="15" fill="#888" focusable="true" id="activeCircle1">
+		<set attributeName="fill" to="red" begin="activeCircle1.focusin"/>
+		<set attributeName="fill" to="grey" begin="activeCircle1.focusout"/>
+	</circle>
+</svg>
+

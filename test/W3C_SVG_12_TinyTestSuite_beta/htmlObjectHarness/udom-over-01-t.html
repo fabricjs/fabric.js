@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE html PUBLIC  "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+ <html xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+ <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+ <meta name="keywords" content="W3C SVG 1.1 Test Suite testsuite mobile"/>
+ <meta name="description" content="W3C SVG 1.2 Tiny Test Suite"/>
+ <title>
+SVG 1.2 Tiny test:udom-over-01-t </title>
+ <style type="text/css">
+ <!--
+ .bodytext    { font-family:verdana, helvetica, sans-serif; font-size: 12pt; line-height: 125%; text-align: Left; margin-top: 0; margin-bottom: 0 }
+ .pageTitle         { line-height: 150%; font-size: 20pt; font-weight : 900; margin-bottom: 20pt }
+ .pageSubTitle  { color : blue; line-height: 100%; font-size: 24pt; font-weight : 900 }
+ .openChapter   { color : blue; line-height: 125%; font-weight : 900 }
+ .openSection   { color : blue; line-height: 125%; font-weight : 900 }
+ .info  { color : black; line-height: 110%; font-size: 10pt; font-weight : 100 }
+ p          { margin-top:0; margin-bottom:0; padding-top:0; padding-bottom:0 }
+ blockquote { margin-top:0; margin-bottom:0; padding-top:0; padding-bottom:0 }
+ .opscript {margin-left: 3%; margin-right: 3%; }
+ .opscript p { margin-top: 0.7em}
+ .navbar {background: black; color: white; font-weight: bold}
+ -->
+ </style>
+ </head>
+ <body class="bodytext">
+
+	<div class="linkbar"> 
+<p>
+<a href="udom-over-01-t.html">Tiny version</a></p>
+<p>Specification link: <a target="spec" href="http://www.w3.org/TR/SVGMobile12/svgudom.html">Appendix A The SVG Micro DOM (uDOM)</a></p>
+ <p>
+    <a href="udom-node-204-t.html">udom-node-204-t ←</a> 
+    <a href="index.html">index</a>
+    <a href="udom-smil-201-t.html">→ udom-smil-201-t</a>
+</p></div>
+
+	<table align="center" border="0" cellspacing="0" cellpadding="10">
+		<tr>
+			<td align="center" colspan="3">
+				<table border="0" cellpadding="8">
+					<tr>
+						<td align="center" colspan="2" class="pageTitle">
+							<h1>udom-over-01-t</h1>
+						</td>
+					</tr>
+					<tr  class="navbar">
+						<td align="center">
+							SVG Image
+						</td>
+						<td align="center">
+							PNG Image
+						</td>
+					</tr>
+					<tr>
+						<td align="right">
+   	    		  			<object data="../svggen/udom-over-01-t.svg" width="480" height="360" type="image/svg+xml"><p style="font-size:300%;color:red">FAIL</p></object>
+						</td>
+						<td align="left">
+							<img alt="raster image of udom-over-01-t" src="../png/udom-over-01-t.png" width="480" height="360"/>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+
+               
+<div class="opscript">
+      <p>
+        Verify the basic capability to handle the SVG DOM API.
+        The test is composed of a top level svg element with an 'onload' event handler and a rect element.
+        Both the svg and the rect elements have an identifier. The 'onload' handler invokes SVG-specific DOM API methods which use these identifiers.
+      </p>
+      <p>
+        First, the handler gets the SVG root element and checks it has the expected identifier.
+        Then, the handler accesses the coordinates of the rect element and uses them to build a 'shadow' rectangle under the existing one.
+        Finally, the 'shadow' rectangle is created using the createElementNS method.
+      </p>
+      <p>
+        If an implementation supports the ECMAScript DOM binding for SVG, then the image must show the following text:
+        "This document's root identifier is: svg-root" and a red rectangle with a black shadow rectangle. Otherwise, only a red rectangle will show.
+      </p>
+      <p>The rendered picture should match the reference image.</p>
+
+		</div>
+<div class="linkbar"> <p>
+				<a href="udom-node-204-t.html">udom-node-204-t ←</a>
+				<a href="index.html">index</a>
+				<a href="udom-smil-201-t.html">→ udom-smil-201-t</a>
+						</p></div>
+</body>
+</html>

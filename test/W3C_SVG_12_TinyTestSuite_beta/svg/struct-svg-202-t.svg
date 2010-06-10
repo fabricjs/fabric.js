@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="AE" owner="ASl" desc="Tests the default value for attribute snapshotTime" status="accepted"
+    approved="yes"
+    version="$Revision: 1.4 $" testname="$RCSfile: struct-svg-202-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        The svg shold look the same on both sides and the text
+        should read "OK".
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: struct-svg-202-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+
+    <rect xml:id="referenceframe" x="10" y="30" width="220" height="280" stroke="#000000" fill="none"/>
+    <rect xml:id="testframe" x="249" y="30" width="220" height="280" stroke="#000000" fill="none"/>
+    <rect xml:id="textframe" x="340" y="315" width="120" height="40" stroke="#000000" fill="none"/>
+
+    <text xml:id="title" x="10" y="25" font-size="15">GetFloatTrait(snapshotTime) on svg where snapshotTime is default</text>
+    <text xml:id="referencetext" x="75" y="50" font-size="20">reference</text>
+    <text xml:id="scripttext" x="325" y="50" font-size="20">scripted</text>
+    <g fill="black">
+      <text xml:id="status" x="350" y="350" font-size="40" fill="red">Error!</text>
+    </g>
+
+    <text xml:id="reftextelement" x="20" y="150" font-size="25" fill="#184bed">
+      l8 4 bed
+    </text>
+
+    <text xml:id="scripttextelement" x="259" y="150" fill="#184bed" font-size="25">
+      l8 4 bed
+    </text>
+
+    <defs>
+      <path xml:id="moon" fill="#eac900" d="M 0 0 C 50 20 50 80 0 100 C 30 80 30 20 0 0 z" transform="rotate(30)"/>
+    </defs>
+
+    <use xlink:href="#moon" x="90" y="200"/>
+    <use xlink:href="#moon" x="329" y="200"/>
+
+
+    <script type="application/ecmascript">
+      <![CDATA[
+        var text = document.getElementById("status");
+        var svg = document.getElementById("svg-root");
+        var fs = svg.getFloatTrait("snapshotTime");
+        if(fs == "0")
+        {
+          text.setTrait("#text", "OK!");
+          text.setTrait("fill", "inherit");
+        }
+      ]]>
+    </script>
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.4 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240" 
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

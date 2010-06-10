@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <title xml:id="test-title">$RCSfile: text-align-201-t.svg,v $</title>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+    <text x="5" y="40" font-size="40" fill="black">Test of 'text-anchor'</text>
+    <text x="20" y="80" font-size="30" fill="black">text-anchor, text and tspan</text>
+    <!-- Test cases -->
+    <line x1="220" y1="120" x2="220" y2="260" stroke="red" />
+    <g font-family="Arial" font-size="30" fill="blue">
+      <text x="220" y="140" text-anchor="start">
+        start text
+        <tspan xml:space="preserve" fill="red"> red tspan</tspan>
+      </text>
+      <text x="220" y="180" text-anchor="middle" font-size="23">
+        first text <tspan font-weight="bold">first tspan</tspan> <tspan font-weight="bold">last tspan</tspan> last text
+      </text>
+    </g>
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none" fill="black">&#x24;Revision: 1.4 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000" />
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark"> 
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1" /> 
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240" text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text> 
+  </g>-->
+</svg>

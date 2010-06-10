@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="480" height="360"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="AE" owner="ED" desc="Test getScreenCTM when the CTM is being animated" status="accepted"
+    approved="yes"
+    version="$Revision: 1.6 $" testname="$RCSfile: udom-svg-225-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        This test verifies that the CTM fetched by getScreenCTM is a snapshot value of the current animated state.
+
+        The CTM values are inspected on 'beginEvent', 'endEvent' and 'repeatEvent' times. The expected values are
+        calculated from the SMIL Animation equations and the current document time.
+
+        The test has passed if the testcase reports "Results match expected values." 8 times, and each such string
+        is prefixed with a green rectangle. When this happens the text in the rect with blue stroke changes from
+        'failed' to 'passed'.
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: udom-svg-225-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+
+    <handler type="text/ecmascript" xe:event="SVGLoad">
+      <![CDATA[
+  
+      var svg_ns = "http://www.w3.org/2000/svg";
+      var xlink_ns = "http://www.w3.org/1999/xlink";
+  
+      var count=0;
+      var topsvg = document.documentElement;
+      var startY = 80;
+      var rowHeight = 12;
+      var fontSize = "10";
+      var isPassed = new Array();
+      var eps = 1 / 65535; // 16.16 fixpoint epsilon
+
+      function drawString( text )
+      {
+        node_to_insert=document.createElementNS(svg_ns,"text");
+        node_to_insert.setAttributeNS(null,"font-size",fontSize);	
+        node_to_insert.setAttributeNS(null,"x","25");	
+        var yVal = startY + count++ * rowHeight;
+        node_to_insert.setAttributeNS(null, "y",  yVal.toString()  );
+        node_to_insert.textContent=text ;
+        document.getElementById( "test-body-content" ).appendChild(node_to_insert);                       
+      }
+  
+      function drawStatusBox( status )
+      {
+        node_to_insert=document.createElementNS(svg_ns,"rect");
+        node_to_insert.setAttributeNS(null,"x","10");	
+        var yVal = ( startY - (rowHeight/2) ) + ( count - 1 ) * ( rowHeight );
+        node_to_insert.setAttributeNS(null, "y",  yVal.toString()  );
+        node_to_insert.setAttributeNS(null, "width",  rowHeight / 2  );
+        node_to_insert.setAttributeNS(null, "height",  rowHeight / 2  );
+        if ( status )
+        {
+          node_to_insert.setAttributeNS(null, "fill",  "green"  );
+        }
+        else
+        {
+          node_to_insert.setAttributeNS(null, "fill",  "red"  );
+        }
+        document.getElementById( "test-body-content" ).appendChild(node_to_insert);                       
+      }
+  
+    function verifyMatrix( matrix, expected, epsilon )
+    {
+      if
+      (
+        ( Math.abs(matrix.getComponent(0) - expected[0]) < epsilon ) &&
+        ( Math.abs(matrix.getComponent(1) - expected[1]) < epsilon ) &&
+        ( Math.abs(matrix.getComponent(2) - expected[2]) < epsilon ) &&
+        ( Math.abs(matrix.getComponent(3) - expected[3]) < epsilon ) &&
+        ( Math.abs(matrix.getComponent(4) - expected[4]) < epsilon ) &&
+        ( Math.abs(matrix.getComponent(5) - expected[5]) < epsilon )
+      )
+      {
+        drawString( "Results match expected values." );
+        drawStatusBox( true );
+        isPassed.push(true);
+      }
+      else
+      {
+        isPassed.push(false);
+        drawString( "Results do not match expected values!" );
+        drawString( "expected: " + expected[0].toString() + " " 
+                                  + expected[1].toString() + " " 
+                                  + expected[2].toString() + " " 
+                                  + expected[3].toString() + " " 
+                                  + expected[4].toString() + " " 
+                                  + expected[5].toString() );
+        drawStatusBox( false );
+      }
+    }
+      
+      function verifyMatrix2( matrix, expected, epsilon )
+      {
+        if
+        (
+          ( Math.abs( matrix.getComponent(0) - expected.getComponent(0) ) < epsilon ) &&
+          ( Math.abs( matrix.getComponent(1) - expected.getComponent(1) ) < epsilon ) &&
+          ( Math.abs( matrix.getComponent(2) - expected.getComponent(2) ) < epsilon ) &&
+          ( Math.abs( matrix.getComponent(3) - expected.getComponent(3) ) < epsilon ) &&
+          ( Math.abs( matrix.getComponent(4) - expected.getComponent(4) ) < epsilon ) &&
+          ( Math.abs( matrix.getComponent(5) - expected.getComponent(5) ) < epsilon )
+        )
+        {
+          drawString( "Results match expected values." );
+          drawStatusBox( true );
+          isPassed.push(true);
+        }
+        else
+        {
+          isPassed.push(false);
+          drawString( "Results do not match expected values!" );
+          drawString( "expected: " + expected.getComponent(0).toFixed(1) + " " 
+                                   + expected.getComponent(1).toFixed(1) + " " 
+                                   + expected.getComponent(2).toFixed(1) + " " 
+                                   + expected.getComponent(3).toFixed(1) + " " 
+                                   + expected.getComponent(4).toFixed(1) + " " 
+                                   + expected.getComponent(5).toFixed(1) );
+          drawString( "got: " + matrix.getComponent(0).toFixed(1) + " " 
+                                   + matrix.getComponent(1).toFixed(1) + " " 
+                                   + matrix.getComponent(2).toFixed(1) + " " 
+                                   + matrix.getComponent(3).toFixed(1) + " " 
+                                   + matrix.getComponent(4).toFixed(1) + " " 
+                                   + matrix.getComponent(5).toFixed(1) );
+          drawStatusBox( false );
+        }
+      }
+      ]]>
+    </handler>
+
+    <rect xml:id="rect1" transform="translate(240 160)" x="-60" y="-40" width="120" height="80" fill="green">
+      <animateTransform attributeName="transform" type="translate" values="0 0;10 10;20 30" dur="2s" begin="0s">
+        <handler xe:event="beginEvent">
+          var ctm = document.getElementById( "rect1" ).getScreenCTM( );
+          var expected = [ 1, 0, 0, 1, 0, 0 ];
+          verifyMatrix(ctm, expected, eps);
+        </handler>
+        <handler xe:event="endEvent">
+          var ctm = document.getElementById( "rect1" ).getScreenCTM( );
+          var expected = [ 1, 0, 0, 1, 240, 160 ];
+          verifyMatrix(ctm, expected, eps);
+        </handler>
+      </animateTransform>
+    </rect>
+
+    <animate attributeName="dummy" dur="0.5s" begin="0s" repeatCount="4">
+      <handler xe:event="repeatEvent">
+        <![CDATA[
+        var ctm = document.getElementById( "rect2" ).getScreenCTM( );
+
+        // using equations from SMIL:
+        // http://www.w3.org/TR/2005/REC-SMIL2-20051213/animation.html#adef-values
+
+        var t = document.documentElement.getCurrentTime();
+        var angle = 35;
+        if(t < 2)
+	        angle = 360*(t/2);
+
+        var di = 2 / (5-1);
+        var i = Math.floor((t*5)/2);
+        var ti = di * i;
+        var vals = [0, 1, 2, 1, 0];
+        var scale = vals[i] + (vals[i+1]-vals[i]) * (t - ti) / di;
+
+        var expected = document.documentElement.createSVGMatrixComponents(1,0,0,1,0,0);
+        expected.mScale(0.1);
+        expected.mTranslate(3000,1000);
+        if(t > 0)
+        {
+          expected.mTranslate(240,160);
+        }
+        expected.mRotate(angle);
+        if(t > 0)
+        {
+          expected.mTranslate(-240,-160);
+        }
+        expected.mScale(scale);
+
+        verifyMatrix2(ctm, document.getElementById( "rect2" ).getScreenCTM( ), eps);
+        verifyMatrix2(ctm, expected, eps);
+        ]]>
+      </handler>
+      <handler xe:event="endEvent">
+        <![CDATA[
+      if( isPassed.length == 8 )
+      {
+        var fullpass = true;
+        for(var i = 0; i < isPassed.length; i++)
+          if(!isPassed[i])
+            fullpass = false;
+        
+        if(fullpass)
+        {
+          var status = document.getElementById("TestStatus");
+          status.setTrait( "#text", "passed" );
+        }
+      }
+      ]]>
+      </handler>
+    </animate>
+
+    <g xml:id="g1" transform="scale(0.1) translate(3000 1000)">
+      <g xml:id="g2" transform="rotate(35)">
+        <animateTransform attributeName="transform" type="rotate" values="0 240 160;360 240 160" dur="2s" begin="0s" repeatCount="2"/>
+        <rect xml:id="rect2" width="100" height="100" fill="green">
+          <animateTransform attributeName="transform" type="scale" values="0;1;2;1;0" dur="2s" begin="0s" repeatCount="2" additive="sum"/>
+        </rect>
+      </g>
+    </g>
+
+    <text  x="240" y="40" text-anchor="middle" >SVGLocatable.getScreenCTM - animated test</text>
+
+    <rect x="330" y="315" width="130" height="40" stroke="blue" fill="none"/>
+    <g fill="black">
+      <text xml:id="TestStatus" x="333" y="350" font-size="40">failed</text>
+    </g>
+
+
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.6 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240"
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>
+</svg>

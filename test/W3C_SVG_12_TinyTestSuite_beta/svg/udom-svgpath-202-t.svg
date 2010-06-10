@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="ED,AN" owner="AE" desc="Test SVGPath.close(), .moveTo(), .lineTo()" status="accepted"
+    approved="yes"
+    version="$Revision: 1.14 $" testname="$RCSfile: udom-svgpath-202-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        This test creates path data using the SVGPath interface, with emphasis on support for lineTo and curveTo
+        To pass, the path data must match expected results for the text at the bottom of the test to read 'pass'.
+        The path data is verified by calling getSegment and getSegmentParam.
+        In addition, no red should be seen through the path element.
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: udom-svgpath-202-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+
+    <handler type="text/ecmascript" xe:event="SVGLoad">
+      <![CDATA[
+  
+      var svg_ns = "http://www.w3.org/2000/svg";
+      var xlink_ns = "http://www.w3.org/1999/xlink";
+  
+      var count=0;
+      var topsvg = document.documentElement;
+      var startY = 80;
+      var rowHeight = 11;
+      var fontSize = 10;
+      var isPassed = true;
+      var epsilon = 1 / 65535; // 16.16 fixpoint epsilon
+ 
+      function drawColorString( text, color )
+    {
+      node_to_insert=document.createElementNS(svg_ns,"text");
+      node_to_insert.setAttributeNS(null,"font-size",fontSize);	
+      var xVal = 5;
+      node_to_insert.setAttributeNS(null,"x", xVal.toString() );	
+      var yVal = startY + count++ * rowHeight;
+      node_to_insert.setAttributeNS(null, "y",  yVal.toString()  );
+      node_to_insert.setAttributeNS(null, "fill",  color  );
+      node_to_insert.textContent=text ;
+      document.getElementById( "test-body-content" ).appendChild(node_to_insert);          
+     
+    }
+
+      function drawPathString( text )
+      { 
+        node_to_insert=document.createElementNS(svg_ns,"text");
+        node_to_insert.setFloatTrait("font-size",fontSize);	
+        node_to_insert.setFloatTrait("x",25);	
+        var yVal =startY + count++ * rowHeight;
+        node_to_insert.setFloatTrait("y",yVal);
+        node_to_insert.textContent=text ;
+        document.getElementById( "test-body-content" ).appendChild(node_to_insert);                       
+      }       
+  
+      function PathSegment( cmd, numParams )
+      {
+        this.cmd = cmd;
+        this.numParams = numParams;
+      }
+  
+      function parseSegment( segment )
+      {
+        var segObj = new PathSegment( "UNDEFINED", 2 );
+        switch( segment )
+        {
+          case SVGPath.MOVE_TO:
+            segObj.cmd = "MOVE_TO";
+            break;
+  
+          case SVGPath.LINE_TO:
+            segObj.cmd = "LINE_TO";
+            break;
+  
+          case SVGPath.CURVE_TO:
+            segObj.cmd = "CURVE_TO";
+            segObj.numParams = 6;
+            break;
+  
+          case SVGPath.QUAD_TO:
+            segObj.cmd = "QUAD_TO";
+            segObj.numParams = 4;
+            break;
+  
+          case SVGPath.CLOSE:
+            segObj.numParams = 0;
+            segObj.cmd = "CLOSE"
+            break;
+        }
+        return segObj;
+      }
+  
+      function drawSVGPath( path )
+      {
+        drawPathString( "numberOfSegments: " + path.numberOfSegments.toString() );
+        
+        for( i = 0; i < path.numberOfSegments; i++ )
+        {
+          var segment = path.getSegment( i );
+          var segObj = parseSegment( segment );
+          var paramStr = "";
+          for ( j = 0; j < segObj.numParams; j++ )
+          {
+            paramStr += " " + path.getSegmentParam( i, j );
+          }        
+          drawPathString(  "segment " + i.toString() + ": " + segObj.cmd + " "  + paramStr );
+        }
+      }
+    
+      function expectedValue( cmd, numParams, params )
+      {
+        this.cmd = cmd;
+        this.numParams = numParams;
+        this.params = params;
+      }
+  
+      /* expected = array of expectedValue */
+      function verifyPath( path, expected, numExpected )
+      {
+        if ( numExpected != path.numberOfSegments )
+        {
+            isPassed = false;
+            drawColorString( "Results do not match expected values!", "red" );
+            drawColorString( "expected number of segments = " + numExpected.toString(), "black" );
+            return;
+        }
+  
+        for ( var i = 0; i < path.numberOfSegments; ++i )
+        {
+          var segment = path.getSegment( i );
+          var segObj = parseSegment( segment );
+          if ( segObj.cmd != expected[i].cmd )
+          {
+            isPassed = false;
+            drawColorString( "Results do not match expected values!", "red" );
+            drawColorString( "expected[" + i.toString() + "].cmd = " + expected[i].cmd, "black" );
+            return;
+          }
+          else
+          if ( segObj.numParams != expected[i].numParams )
+          {
+            isPassed = false;
+            drawColorString( "Results do not match expected values!" ,  "red");
+            drawColorString( "expected[" + i.toString() + "].numParams = " + expected[i].numParams.toString(), "black" );
+            return;
+          }
+          else
+          {
+            for ( var j = 0; j < segObj.numParams; j++ )
+            {
+              if ( Math.abs(path.getSegmentParam( i, j ) - expected[i].params[j]) > epsilon )
+              {
+                isPassed = false;
+                drawColorString( "Results do not match expected values!" , "red");
+                drawColorString( "expected[" + i.toString() + "].params[" + j.toString() + "] = " + expected[i].params[j].toString(), "black" );
+                drawColorString( "actual[" + i.toString() + "].params[" + j.toString() + "] = " + path.getSegmentParam( i, j ) , "black");
+                return;
+              }
+            }        
+          }
+        }
+  
+        drawColorString( "Results match expected values.", "green" );
+      }
+  
+      var expectedNumSegments;
+      var expected;
+      try
+      {
+        path = topsvg.createSVGPath(  );
+        drawColorString( "created SVGPath" , "black");
+  
+        path.moveTo( 360, 325 );
+        drawColorString( "added moveTo[360, 325]" , "black");
+  
+        path.curveTo( 320, 265, 455, 225, 440, 325 );
+        drawColorString( "added curveTo[320, 265, 455, 225, 440, 325]", "black" );
+  
+        path.lineTo( 360, 325 );
+        drawColorString( "added lineTo[360, 325]", "black" );
+
+        path.close();
+        drawColorString( "added close", "black" );
+          
+        drawSVGPath( path  );  
+  
+        expectedNumSegments = 4;
+        expected = 
+        [
+          new expectedValue( "MOVE_TO",  2, [ 360, 325 ] ),
+          new expectedValue( "CURVE_TO",  6, [ 320, 265, 455, 225, 440,  325 ] ),
+          new expectedValue( "LINE_TO",  2, [ 360, 325 ] ),
+          new expectedValue( "CLOSE",  0, [] )
+        ];
+        verifyPath( path, expected, expectedNumSegments );
+  
+        document.getElementById( "path1" ).setPathTrait( "d", path );
+        drawColorString( "set path trait", "black" );
+  
+        if ( isPassed )
+        {
+          var status = document.getElementById("TestStatus");
+          status.setTrait("#text", "passed");
+      status.setAttribute("fill", "green");
+        }
+      }
+      catch(e)
+      {
+        isPassed = false;
+        drawColorString("Unexpected exception!", "red");
+      }
+    ]]>
+    </handler>
+
+
+    <text  x="240" y="40" text-anchor="middle" >SVGPath - lineTo, curveTo</text>
+    <text  x="240" y="60" text-anchor="middle" >getSegment, getSegmentParam</text>
+    <g transform="translate( 0, -100 )" stroke-width="10">
+      <path fill="none" stroke="red" d="M 360 325 c -40 -60 95 -100 80 0 L 360 325z"/>
+      <path xml:id="path1" fill="none" stroke="green"/>
+    </g>
+
+    <rect x="330" y="315" width="130" height="40" stroke="blue" fill="none"/>
+    <g fill="red">
+      <text xml:id="TestStatus" x="333" y="350" font-size="40">failed</text>
+    </g>
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.14 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!-- <g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240"
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

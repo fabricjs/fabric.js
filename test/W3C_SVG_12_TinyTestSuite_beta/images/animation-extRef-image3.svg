@@ -1,0 +1,14 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "SVG-1.1-monolithic-fixed.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="animation-extRef-image3" width="360" height="120" viewBox="0 0 360 120">
+	<g style="stroke: black; stroke-width:2">
+		<rect x="2" y="10" width="120" height="20" style="fill: lightgreen"/>
+		<rect x="2" y="50" width="240" height="20" style="fill: blue"/>
+		<rect x="2" y="90" width="240" height="20" style="fill: red">
+			<animate attributeName="width" attributeType="XML" from="240" to="356" begin="1s" dur="5s" fill="freeze"/>
+		</rect>
+	</g>
+	<g>
+		<text x="280" y="30" style="font-size:20">Image 3</text>
+	</g>
+</svg>

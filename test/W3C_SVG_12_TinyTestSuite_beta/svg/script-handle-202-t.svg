@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="AE" owner="ASl" desc="Tests event handling with SMIL and scripting" status="accepted"
+    approved="yes"
+    version="$Revision: 1.6 $" testname="$RCSfile: script-handle-202-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        Test of script handlers for SMIL events. A red square should flash on the screen six times.
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: script-handle-202-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+
+    <text x="20" y="30" font-size="10">
+      Test of script handlers for SMIL events. A red square should flash on the screen six times.
+    </text>
+    <rect xml:id="r1" x="130" y="50" width="200" height="200" fill="red" visibility="visible"/>
+
+    <g>
+      <!-- Animations to trigger the beginEvents -->
+      <animate xml:id="t1" attributeName="visibility"
+        begin="0.5;1.5;2.5;3.5;4.5;5.5" dur="0.5" from="visible" to="visible"/>
+
+      <animate xml:id="t2" attributeName="visibility"
+        begin="1;2;3;4;5;6" dur="0.5" from="visible" to="visible"/>
+    </g>
+
+    <xe:listener observer="t1" event="beginEvent" handler="#handler"/>
+    <xe:listener observer="t2" event="beginEvent" handler="#handler"/>
+
+    <handler xml:id="handler" type="application/ecmascript">
+      flipVisibility(evt);
+    </handler>
+
+    <script type="application/ecmascript">
+      <![CDATA[
+        var r1 = document.getElementById("r1");
+        var t1 = document.getElementById("t1");
+        var t2 = document.getElementById("t2");
+
+
+        function flipVisibility(evt)
+        {
+            if (evt.target == t1)
+            {
+                r1.setTrait("visibility", "hidden");
+            }
+            else if(evt.target == t2)
+            {
+                r1.setTrait("visibility", "visible");
+            }
+        }
+      ]]>
+    </script>
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.6 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240" 
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

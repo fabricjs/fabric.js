@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE html PUBLIC  "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+ <html xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+ <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+ <meta name="keywords" content="W3C SVG 1.1 Test Suite testsuite mobile"/>
+ <meta name="description" content="W3C SVG 1.2 Tiny Test Suite"/>
+ <title>
+SVG 1.2 Tiny test:paint-stroke-201-t </title>
+ <style type="text/css">
+ <!--
+ .bodytext    { font-family:verdana, helvetica, sans-serif; font-size: 12pt; line-height: 125%; text-align: Left; margin-top: 0; margin-bottom: 0 }
+ .pageTitle         { line-height: 150%; font-size: 20pt; font-weight : 900; margin-bottom: 20pt }
+ .pageSubTitle  { color : blue; line-height: 100%; font-size: 24pt; font-weight : 900 }
+ .openChapter   { color : blue; line-height: 125%; font-weight : 900 }
+ .openSection   { color : blue; line-height: 125%; font-weight : 900 }
+ .info  { color : black; line-height: 110%; font-size: 10pt; font-weight : 100 }
+ p          { margin-top:0; margin-bottom:0; padding-top:0; padding-bottom:0 }
+ blockquote { margin-top:0; margin-bottom:0; padding-top:0; padding-bottom:0 }
+ .opscript {margin-left: 3%; margin-right: 3%; }
+ .opscript p { margin-top: 0.7em}
+ .navbar {background: black; color: white; font-weight: bold}
+ -->
+ </style>
+ </head>
+ <body class="bodytext">
+
+	<div class="linkbar"> 
+<p>
+<a href="paint-stroke-201-t.html">Tiny version</a></p>
+<p>Specification link: <a target="spec" href="http://www.w3.org/TR/SVGMobile12/painting.html">11.4 Stroke Properties</a></p>
+ <p>
+    <a href="paint-stroke-08-t.html">paint-stroke-08-t ←</a> 
+    <a href="index.html">index</a>
+    <a href="paint-stroke-202-t.html">→ paint-stroke-202-t</a>
+</p></div>
+
+	<table align="center" border="0" cellspacing="0" cellpadding="10">
+		<tr>
+			<td align="center" colspan="3">
+				<table border="0" cellpadding="8">
+					<tr>
+						<td align="center" colspan="2" class="pageTitle">
+							<h1>paint-stroke-201-t</h1>
+						</td>
+					</tr>
+					<tr  class="navbar">
+						<td align="center">
+							SVG Image
+						</td>
+						<td align="center">
+							PNG Image
+						</td>
+					</tr>
+					<tr>
+						<td align="right">
+   	    		  			<object data="../svggen/paint-stroke-201-t.svg" width="480" height="360" type="image/svg+xml"><p style="font-size:300%;color:red">FAIL</p></object>
+						</td>
+						<td align="left">
+							<img alt="raster image of paint-stroke-201-t" src="../png/paint-stroke-201-t.png" width="480" height="360"/>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+
+               
+<div class="opscript">
+      <p>
+        Stroking for circle, large stroke-width, small r.
+      </p>
+      <p>
+        The main indication for a failed test is the appearence of something red.
+        A second indication is a thin white line inside a blue area.
+      </p>
+      <p>
+        For smaller circles the radius gets smaller than the half stroke-width, therefore the fill is not
+        visible anymore for them.  Only the animated circle at the beginning and the next circle
+        on its right have a visible fill.
+      </p>
+      <p>
+        To test the correct rendering, the blue circles cover always red filled circles without a stroke.
+        Additionally the size of the circles is given with a thin white stroke on top. If something
+        red gets visible or blue parts of the stroke of the circle are outside of the related white
+        stroked circle, an error is occured. If the circles are not displayed as circles with an accuracy of
+        one device pixel, an error is occured too.
+      </p>
+
+		</div>
+<div class="linkbar"> <p>
+				<a href="paint-stroke-08-t.html">paint-stroke-08-t ←</a>
+				<a href="index.html">index</a>
+				<a href="paint-stroke-202-t.html">→ paint-stroke-202-t</a>
+						</p></div>
+</body>
+</html>

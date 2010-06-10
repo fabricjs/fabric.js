@@ -1,0 +1,1622 @@
+<!-- =====================================================================
+  This is the DTD for SVG 1.1.
+
+  The specification for SVG that corresponds to this DTD is available at:
+
+    http://www.w3.org/TR/2002/WD-SVG11-20020215/
+
+  Copyright (c) 2002 W3C (MIT, INRIA, Keio), All Rights Reserved.
+
+  For SVG 1.1:
+
+    Namespace:
+      http://www.w3.org/2000/svg  
+
+    Public identifier:
+      PUBLIC "-//W3C//DTD SVG 1.1//EN"
+
+    URI for the DTD:
+      http://www.w3.org/TR/2002/WD-SVG11-20020215/DTD/svg11.dtd
+============================================================================= -->
+<!-- ==============================================================
+     ENTITY DECLARATIONS: Data types 
+     ============================================================== -->
+<!ENTITY % BaselineShiftValue "CDATA">
+<!-- 'baseline-shift' property/attribute value (e.g., 'baseline', 'sub', etc.) -->
+<!ENTITY % Boolean "(false | true)">
+<!-- feature specification -->
+<!ENTITY % ClassList "CDATA">
+<!-- list of classes -->
+<!ENTITY % ClipValue "CDATA">
+<!-- 'clip' property/attribute value (e.g., 'auto', rect(...)) -->
+<!ENTITY % ClipPathValue "CDATA">
+<!-- 'clip-path' property/attribute value (e.g., 'none', %URI;) -->
+<!ENTITY % ClipFillRule "(nonzero | evenodd | inherit)">
+<!-- 'clip-rule' or fill-rule property/attribute value -->
+<!ENTITY % ContentType "CDATA">
+<!-- media type, as per [RFC2045] -->
+<!ENTITY % Coordinate "CDATA">
+<!-- a <coordinate> -->
+<!ENTITY % Coordinates "CDATA">
+<!-- a list of <coordinate>s -->
+<!ENTITY % Color "CDATA">
+<!-- a <color> value -->
+<!ENTITY % CursorValue "CDATA">
+<!-- 'cursor' property/attribute value (e.g., 'crosshair', %URI;) -->
+<!ENTITY % EnableBackgroundValue "CDATA">
+<!-- 'enable-background' property/attribute value (e.g., 'new', 'accumulate') -->
+<!ENTITY % ExtensionList "CDATA">
+<!-- extension list specification -->
+<!ENTITY % FeatureList "CDATA">
+<!-- feature list specification -->
+<!ENTITY % FilterValue "CDATA">
+<!-- 'filter' property/attribute value (e.g., 'none', %URI;) -->
+<!ENTITY % FontFamilyValue "CDATA">
+<!-- 'font-family' property/attribute value (i.e., list of fonts) -->
+<!ENTITY % FontSizeValue "CDATA">
+<!-- 'font-size' property/attribute value -->
+<!ENTITY % FontSizeAdjustValue "CDATA">
+<!-- 'font-size-adjust' property/attribute value -->
+<!ENTITY % GlyphOrientationHorizontalValue "CDATA">
+<!-- 'glyph-orientation-horizontal' property/attribute value (e.g., <angle>) -->
+<!ENTITY % GlyphOrientationVerticalValue "CDATA">
+<!-- 'glyph-orientation-vertical' property/attribute value (e.g., 'auto', <angle>) -->
+<!ENTITY % Integer "CDATA">
+<!-- a <integer> -->
+<!ENTITY % KerningValue "CDATA">
+<!-- 'kerning' property/attribute value (e.g., auto | <length>) -->
+<!ENTITY % LanguageCode "NMTOKEN">
+<!-- a language code, as per [RFC3066] -->
+<!ENTITY % LanguageCodes "CDATA">
+<!-- comma-separated list of language codes, as per [RFC3066] -->
+<!ENTITY % Length "CDATA">
+<!-- a <length> -->
+<!ENTITY % Lengths "CDATA">
+<!-- a list of <length>s -->
+<!ENTITY % LinkTarget "NMTOKEN">
+<!-- link to this target -->
+<!ENTITY % MarkerValue "CDATA">
+<!-- 'marker' property/attribute value (e.g., 'none', %URI;) -->
+<!ENTITY % MaskValue "CDATA">
+<!-- 'mask' property/attribute value (e.g., 'none', %URI;) -->
+<!ENTITY % MediaDesc "CDATA">
+<!-- comma-separated list of media descriptors. -->
+<!ENTITY % Number "CDATA">
+<!-- a <number> -->
+<!ENTITY % NumberOptionalNumber "CDATA">
+<!-- list of <number>s, but at least one and at most two -->
+<!ENTITY % NumberOrPercentage "CDATA">
+<!-- a <number> or a  <percentage> -->
+<!ENTITY % Numbers "CDATA">
+<!-- a list of <number>s -->
+<!ENTITY % OpacityValue "CDATA">
+<!-- opacity value (e.g., <number>) -->
+<!ENTITY % Paint "CDATA">
+<!-- a 'fill' or 'stroke' property/attribute value: <paint> -->
+<!ENTITY % PathData "CDATA">
+<!-- a path data specification -->
+<!ENTITY % Points "CDATA">
+<!-- a list of points -->
+<!ENTITY % PreserveAspectRatioSpec "CDATA">
+<!-- 'preserveAspectRatio' attribute specification -->
+<!ENTITY % Script "CDATA">
+<!-- script expression -->
+<!ENTITY % SpacingValue "CDATA">
+<!-- 'letter-spacing' or 'word-spacing' property/attribute value (e.g., normal | <length>) -->
+<!ENTITY % StrokeDashArrayValue "CDATA">
+<!-- 'stroke-dasharray' property/attribute value (e.g., 'none', list of <number>s) -->
+<!ENTITY % StrokeDashOffsetValue "CDATA">
+<!-- 'stroke-dashoffset' property/attribute value (e.g., 'none', <legnth>) -->
+<!ENTITY % StrokeMiterLimitValue "CDATA">
+<!-- 'stroke-miterlimit' property/attribute value (e.g., <number>) -->
+<!ENTITY % StrokeWidthValue "CDATA">
+<!-- 'stroke-width' property/attribute value (e.g., <length>) -->
+<!ENTITY % StructuredText "content CDATA #FIXED 'structured text'">
+<!ENTITY % StyleSheet "CDATA">
+<!-- style sheet data -->
+<!ENTITY % SVGColor "CDATA">
+<!-- An SVG color value (RGB plus optional ICC) -->
+<!ENTITY % Text "CDATA">
+<!-- arbitrary text string -->
+<!ENTITY % TextDecorationValue "CDATA">
+<!-- 'text-decoration' property/attribute value (e.g., 'none', 'underline') -->
+<!ENTITY % TransformList "CDATA">
+<!-- list of transforms -->
+<!ENTITY % URI "CDATA">
+<!-- a Uniform Resource Identifier, see [URI] -->
+<!ENTITY % ViewBoxSpec "CDATA">
+<!-- 'viewBox' attribute specification -->
+<!-- ==============================================================
+     ENTITY DECLARATIONS: Collections of common attributes 
+     ============================================================== -->
+<!-- All elements have an ID. -->
+<!ENTITY % stdAttrs "id ID #IMPLIED
+  xml:base %URI; #IMPLIED">
+<!-- Common attributes for elements that might contain character data content. -->
+<!ENTITY % langSpaceAttrs "xml:lang %LanguageCode; #IMPLIED
+  xml:space (default|preserve) #IMPLIED">
+<!-- Common attributes to check for system capabilities. -->
+<!ENTITY % testAttrs "requiredFeatures %FeatureList; #IMPLIED
+  requiredExtensions %ExtensionList; #IMPLIED
+  systemLanguage %LanguageCodes; #IMPLIED">
+<!-- For most uses of URI referencing:
+        standard XLink attributes other than xlink:href. -->
+<!ENTITY % xlinkRefAttrs "xmlns:xlink CDATA #FIXED 'http://www.w3.org/1999/xlink'
+  xlink:type (simple) #FIXED 'simple' 
+  xlink:role %URI; #IMPLIED
+  xlink:arcrole %URI; #IMPLIED
+  xlink:title CDATA #IMPLIED
+  xlink:show (other) 'other'
+  xlink:actuate (onLoad) #FIXED 'onLoad'">
+<!-- Standard XLink attributes for uses of URI referencing where xlink:show is 'embed' -->
+<!ENTITY % xlinkRefAttrsEmbed "xmlns:xlink CDATA #FIXED 'http://www.w3.org/1999/xlink'
+  xlink:type (simple) #FIXED 'simple' 
+  xlink:role %URI; #IMPLIED
+  xlink:arcrole %URI; #IMPLIED
+  xlink:title CDATA #IMPLIED
+  xlink:show (embed) 'embed'
+  xlink:actuate (onLoad) #FIXED 'onLoad'">
+<!ENTITY % graphicsElementEvents "onfocusin %Script; #IMPLIED
+   onfocusout %Script; #IMPLIED
+   onactivate %Script; #IMPLIED
+   onclick %Script; #IMPLIED
+   onmousedown %Script; #IMPLIED
+   onmouseup %Script; #IMPLIED
+   onmouseover %Script; #IMPLIED
+   onmousemove %Script; #IMPLIED
+   onmouseout %Script; #IMPLIED
+   onload %Script; #IMPLIED">
+<!ENTITY % documentEvents "onunload %Script; #IMPLIED
+   onabort %Script; #IMPLIED
+   onerror %Script; #IMPLIED
+   onresize %Script; #IMPLIED
+   onscroll %Script; #IMPLIED
+   onzoom %Script; #IMPLIED">
+<!ENTITY % animationEvents "onbegin %Script; #IMPLIED
+   onend %Script; #IMPLIED
+   onrepeat %Script; #IMPLIED">
+<!-- This entity allows for at most one of desc, title and metadata,
+     supplied in any order -->
+<!ENTITY % descTitleMetadata "(((desc,((title,metadata?)|(metadata,title?))?)|
+          (title,((desc,metadata?)|(metadata,desc?))?)|
+          (metadata,((desc,title?)|(title,desc?))?))?)">
+<!-- ==============================================================
+     ENTITY DECLARATIONS: Collections of presentation attributes 
+     ============================================================== -->
+<!-- The following presentation attributes have to do with specifying color. -->
+<!ENTITY % PresentationAttributes-Color "color %Color; #IMPLIED
+   color-interpolation (auto | sRGB | linearRGB | inherit) #IMPLIED
+   color-rendering (auto | optimizeSpeed | optimizeQuality | inherit) #IMPLIED ">
+<!-- The following presentation attributes apply to container elements. -->
+<!ENTITY % PresentationAttributes-Containers "enable-background %EnableBackgroundValue; #IMPLIED ">
+<!-- The following presentation attributes apply to 'feFlood' elements. -->
+<!ENTITY % PresentationAttributes-feFlood "flood-color %SVGColor; #IMPLIED
+   flood-opacity %OpacityValue; #IMPLIED ">
+<!-- The following presentation attributes apply to filling and stroking operations. -->
+<!ENTITY % PresentationAttributes-FillStroke "fill %Paint; #IMPLIED
+   fill-opacity %OpacityValue; #IMPLIED
+   fill-rule %ClipFillRule; #IMPLIED
+   stroke %Paint; #IMPLIED
+   stroke-dasharray %StrokeDashArrayValue; #IMPLIED
+   stroke-dashoffset %StrokeDashOffsetValue; #IMPLIED
+   stroke-linecap (butt | round | square | inherit) #IMPLIED
+   stroke-linejoin (miter | round | bevel | inherit) #IMPLIED
+   stroke-miterlimit %StrokeMiterLimitValue; #IMPLIED
+   stroke-opacity %OpacityValue; #IMPLIED
+   stroke-width %StrokeWidthValue; #IMPLIED ">
+<!-- The following presentation attributes apply to filter primitives. -->
+<!ENTITY % PresentationAttributes-FilterPrimitives "color-interpolation-filters (auto | sRGB | linearRGB | inherit) #IMPLIED ">
+<!-- The following presentation attributes have to do with selecting a font to use. -->
+<!ENTITY % PresentationAttributes-FontSpecification "font-family %FontFamilyValue; #IMPLIED
+   font-size %FontSizeValue; #IMPLIED
+   font-size-adjust %FontSizeAdjustValue; #IMPLIED
+   font-stretch (normal | wider | narrower | ultra-condensed | extra-condensed |
+                 condensed | semi-condensed | semi-expanded | expanded |
+                 extra-expanded | ultra-expanded | inherit) #IMPLIED
+   font-style (normal | italic | oblique | inherit) #IMPLIED
+   font-variant (normal | small-caps | inherit) #IMPLIED
+   font-weight (normal | bold | bolder | lighter | 100 | 200 | 300 |
+               400 | 500 | 600 | 700 | 800 | 900 | inherit) #IMPLIED ">
+<!-- The following presentation attributes apply to gradient 'stop' elements. -->
+<!ENTITY % PresentationAttributes-Gradients "stop-color %SVGColor; #IMPLIED
+   stop-opacity %OpacityValue; #IMPLIED ">
+<!-- The following presentation attributes apply to 'solid-color' elements. -->
+<!ENTITY % PresentationAttributes-SolidColor "solid-color %SVGColor; #IMPLIED
+   solid-opacity %OpacityValue; #IMPLIED ">
+<!-- The following presentation attributes apply to graphics elements. -->
+<!ENTITY % PresentationAttributes-Graphics "clip-path %ClipPathValue; #IMPLIED
+   clip-rule %ClipFillRule; #IMPLIED
+   cursor %CursorValue; #IMPLIED
+   display (inline | block | list-item | run-in | compact | marker |
+            table | inline-table | table-row-group | table-header-group |
+            table-footer-group | table-row | table-column-group | table-column |
+            table-cell | table-caption | none | inherit) #IMPLIED
+   filter %FilterValue; #IMPLIED
+   image-rendering (auto | optimizeSpeed | optimizeQuality | inherit) #IMPLIED
+   mask %MaskValue; #IMPLIED
+   opacity %OpacityValue; #IMPLIED
+   pointer-events (visiblePainted | visibleFill | visibleStroke | visible |
+                   painted | fill | stroke | all | none | inherit) #IMPLIED
+   shape-rendering (auto | optimizeSpeed | crispEdges | geometricPrecision | inherit) #IMPLIED
+   text-rendering (auto | optimizeSpeed | optimizeLegibility | geometricPrecision | inherit) #IMPLIED
+   visibility (visible | hidden | inherit) #IMPLIED ">
+<!-- The following presentation attributes apply to 'image' elements. -->
+<!ENTITY % PresentationAttributes-Images "color-profile CDATA #IMPLIED ">
+<!--The following presentation attributes apply to 'feDiffuseLighting' and 'feSpecularLighting' elements. -->
+<!ENTITY % PresentationAttributes-LightingEffects "lighting-color %SVGColor; #IMPLIED ">
+<!-- The following presentation attributes apply to marker operations. -->
+<!ENTITY % PresentationAttributes-Markers "marker-start %MarkerValue; #IMPLIED
+   marker-mid %MarkerValue; #IMPLIED
+   marker-end %MarkerValue; #IMPLIED ">
+<!-- The following presentation attributes apply to text content elements. -->
+<!ENTITY % PresentationAttributes-TextContentElements "alignment-baseline (baseline | top | before-edge | text-top | text-before-edge |
+                        middle | bottom | after-edge | text-bottom | text-after-edge |
+                        ideographic | lower | hanging | mathematical | inherit) #IMPLIED
+   baseline-shift %BaselineShiftValue; #IMPLIED
+   direction (ltr | rtl | inherit) #IMPLIED
+   dominant-baseline (auto | autosense-script | no-change | reset|
+                      ideographic | lower | hanging | mathematical | inherit ) #IMPLIED
+   glyph-orientation-horizontal %GlyphOrientationHorizontalValue; #IMPLIED
+   glyph-orientation-vertical %GlyphOrientationVerticalValue; #IMPLIED
+   kerning %KerningValue; #IMPLIED
+   letter-spacing %SpacingValue; #IMPLIED
+   text-anchor (start | middle | end | inherit) #IMPLIED
+   text-decoration %TextDecorationValue; #IMPLIED
+   unicode-bidi (normal | embed | bidi-override | inherit) #IMPLIED
+   word-spacing %SpacingValue; #IMPLIED ">
+<!-- The following presentation attributes apply to 'text' elements. -->
+<!ENTITY % PresentationAttributes-TextElements "writing-mode (lr-tb | rl-tb | tb-rl | lr | rl | tb | inherit) #IMPLIED ">
+<!-- The following presentation attributes apply to elements that establish viewports. -->
+<!ENTITY % PresentationAttributes-Viewports "clip %ClipValue; #IMPLIED
+   overflow (visible | hidden | scroll | auto | inherit) #IMPLIED ">
+<!--The following represents the complete list of presentation attributes. -->
+<!ENTITY % PresentationAttributes-All "%PresentationAttributes-Color;
+   %PresentationAttributes-Containers;
+   %PresentationAttributes-feFlood;
+   %PresentationAttributes-FillStroke;
+   %PresentationAttributes-FilterPrimitives;
+   %PresentationAttributes-FontSpecification;
+   %PresentationAttributes-Gradients;
+   %PresentationAttributes-Graphics;
+   %PresentationAttributes-Images;
+   %PresentationAttributes-LightingEffects;
+   %PresentationAttributes-Markers;
+   %PresentationAttributes-TextContentElements;
+   %PresentationAttributes-TextElements;
+   %PresentationAttributes-Viewports;">
+<!-- ==============================================================
+     ENTITY DECLARATIONS: DTD extensions 
+     ============================================================== -->
+<!-- Allow for extending the DTD with internal subset for 
+     container and graphics elements -->
+<!ENTITY % ceExt "">
+<!ENTITY % geExt "">
+<!-- ==============================================================
+     DECLARATIONS CORRESPONDING TO: Document Structure 
+     ============================================================== -->
+<!ENTITY % svgExt "">
+<!ELEMENT svg (desc|title|metadata|defs|
+                   path|text|rect|circle|ellipse|line|polyline|polygon|
+                   use|image|svg|g|view|switch|a|altGlyphDef|
+                   script|style|symbol|marker|clipPath|mask|
+                   linearGradient|radialGradient|solidColor|pattern|filter|cursor|font|
+                   animate|set|animateMotion|animateColor|animateTransform|
+                   color-profile|font-face
+                   %ceExt;%svgExt;)* >
+<!ATTLIST svg
+	xmlns CDATA #FIXED "http://www.w3.org/2000/svg"
+	%stdAttrs; 
+	%testAttrs; 
+	%langSpaceAttrs; 
+	externalResourcesRequired %Boolean; #IMPLIED
+	class %ClassList; #IMPLIED
+	style %StyleSheet; #IMPLIED
+	%PresentationAttributes-All; 
+	viewBox %ViewBoxSpec; #IMPLIED
+	preserveAspectRatio %PreserveAspectRatioSpec; "xMidYMid meet"
+	zoomAndPan (disable | magnify) "magnify"
+	%graphicsElementEvents; 
+	%documentEvents; 
+	version %Number; #FIXED "1.0"
+	x %Coordinate; #IMPLIED
+	y %Coordinate; #IMPLIED
+	width %Length; #IMPLIED
+	height %Length; #IMPLIED
+	contentScriptType %ContentType; "text/ecmascript"
+	contentStyleType %ContentType; "text/css"
+>
+<!ENTITY % gExt "">
+<!ELEMENT g (desc|title|metadata|defs|
+                   path|text|rect|circle|ellipse|line|polyline|polygon|
+                   use|image|svg|g|view|switch|a|altGlyphDef|
+                   script|style|symbol|marker|clipPath|mask|
+                   linearGradient|radialGradient|solidColor|pattern|filter|cursor|font|
+                   animate|set|animateMotion|animateColor|animateTransform|
+                   color-profile|font-face
+                   %ceExt;%gExt;)* >
+<!ATTLIST g
+	%stdAttrs; 
+	%testAttrs; 
+	%langSpaceAttrs; 
+	externalResourcesRequired %Boolean; #IMPLIED
+	class %ClassList; #IMPLIED
+	style %StyleSheet; #IMPLIED
+	%PresentationAttributes-All; 
+	transform %TransformList; #IMPLIED
+	%graphicsElementEvents; 
+>
+<!ENTITY % defsExt "">
+<!ELEMENT defs (desc|title|metadata|defs|
+                   path|text|rect|circle|ellipse|line|polyline|polygon|
+                   use|image|svg|g|view|switch|a|altGlyphDef|
+                   script|style|symbol|marker|clipPath|mask|
+                   linearGradient|radialGradient|solidColor|pattern|filter|cursor|font|
+                   animate|set|animateMotion|animateColor|animateTransform|
+                   color-profile|font-face
+                   %ceExt;%defsExt;)* >
+<!ATTLIST defs
+	%stdAttrs; 
+	%testAttrs; 
+	%langSpaceAttrs; 
+	externalResourcesRequired %Boolean; #IMPLIED
+	class %ClassList; #IMPLIED
+	style %StyleSheet; #IMPLIED
+	%PresentationAttributes-All; 
+	transform %TransformList; #IMPLIED
+	%graphicsElementEvents; 
+>
+<!ENTITY % descExt "">
+<!ELEMENT desc (#PCDATA %descExt;)* >
+<!ATTLIST desc
+	%stdAttrs; 
+	%langSpaceAttrs; 
+	class %ClassList; #IMPLIED
+	style %StyleSheet; #IMPLIED
+	%StructuredText; 
+>
+<!ENTITY % titleExt "">
+<!ELEMENT title (#PCDATA %titleExt;)* >
+<!ATTLIST title
+	%stdAttrs; 
+	%langSpaceAttrs; 
+	class %ClassList; #IMPLIED
+	style %StyleSheet; #IMPLIED
+	%StructuredText; 
+>
+<!ENTITY % symbolExt "">
+<!ELEMENT symbol (desc|title|metadata|defs|
+                   path|text|rect|circle|ellipse|line|polyline|polygon|
+                   use|image|svg|g|view|switch|a|altGlyphDef|
+                   script|style|symbol|marker|clipPath|mask|
+                   linearGradient|radialGradient|solidColor|pattern|filter|cursor|font|
+                   animate|set|animateMotion|animateColor|animateTransform|
+                   color-profile|font-face
+                   %ceExt;%symbolExt;)* >
+<!ATTLIST symbol
+	%stdAttrs; 
+	%langSpaceAttrs; 
+	externalResourcesRequired %Boolean; #IMPLIED
+	class %ClassList; #IMPLIED
+	style %StyleSheet; #IMPLIED
+	%PresentationAttributes-All; 
+	viewBox %ViewBoxSpec; #IMPLIED
+	preserveAspectRatio %PreserveAspectRatioSpec; "xMidYMid meet"
+	%graphicsElementEvents; 
+>
+<!ENTITY % useExt "">
+<!ELEMENT use (%descTitleMetadata;,(animate|set|animateMotion|animateColor|animateTransform
+                   %geExt;%useExt;)*) >
+<!ATTLIST use
+	%stdAttrs; 
+	%xlinkRefAttrsEmbed; 
+	xlink:href %URI; #REQUIRED
+	%testAttrs; 
+	%langSpaceAttrs; 
+	externalResourcesRequired %Boolean; #IMPLIED
+	class %ClassList; #IMPLIED
+	style %StyleSheet; #IMPLIED
+	%PresentationAttributes-All; 
+	transform %TransformList; #IMPLIED
+	%graphicsElementEvents; 
+	x %Coordinate; #IMPLIED
+	y %Coordinate; #IMPLIED
+	width %Length; #IMPLIED
+	height %Length; #IMPLIED
+>
+<!ENTITY % imageExt "">
+<!ELEMENT image (%descTitleMetadata;,(animate|set|animateMotion|animateColor|animateTransform
+                   %geExt;%imageExt;)*) >
+<!ATTLIST image
+	%stdAttrs; 
+	%xlinkRefAttrsEmbed; 
+	xlink:href %URI; #REQUIRED
+	%testAttrs; 
+	%langSpaceAttrs; 
+	externalResourcesRequired %Boolean; #IMPLIED
+	class %ClassList; #IMPLIED
+	style %StyleSheet; #IMPLIED
+	%PresentationAttributes-Color; 
+	%PresentationAttributes-Graphics; 
+	%PresentationAttributes-Images; 
+	%PresentationAttributes-Viewports; 
+	transform %TransformList; #IMPLIED
+	preserveAspectRatio %PreserveAspectRatioSpec; "xMidYMid meet"
+	%graphicsElementEvents; 
+	x %Coordinate; #IMPLIED
+	y %Coordinate; #IMPLIED
+	width %Length; #REQUIRED
+	height %Length; #REQUIRED
+>
+<!ENTITY % switchExt "">
+<!ELEMENT switch (%descTitleMetadata;,
+                  (path|text|rect|circle|ellipse|line|polyline|polygon|
+                   use|image|svg|g|switch|a|foreignObject|
+                   animate|set|animateMotion|animateColor|animateTransform
+                   %ceExt;%switchExt;)*) >
+<!ATTLIST switch
+	%stdAttrs; 
+	%testAttrs; 
+	%langSpaceAttrs; 
+	externalResourcesRequired %Boolean; #IMPLIED
+	class %ClassList; #IMPLIED
+	style %StyleSheet; #IMPLIED
+	%PresentationAttributes-All; 
+	transform %TransformList; #IMPLIED
+	%graphicsElementEvents; 
+>
+<!-- ==============================================================
+     DECLARATIONS CORRESPONDING TO: Styling 
+     ============================================================== -->
+<!ELEMENT style (#PCDATA)>
+<!ATTLIST style
+	%stdAttrs; 
+	xml:space (preserve) #FIXED "preserve"
+	type %ContentType; #REQUIRED
+	media %MediaDesc; #IMPLIED
+	title %Text; #IMPLIED
+>
+<!-- ==============================================================
+     DECLARATIONS CORRESPONDING TO: Paths
+     ============================================================== -->
+<!ENTITY % pathExt "">
+<!ELEMENT path (%descTitleMetadata;,(animate|set|animateMotion|animateColor|animateTransform
+                %geExt;%pathExt;)*) >
+<!ATTLIST path
+	%stdAttrs; 
+	%testAttrs; 
+	%langSpaceAttrs; 
+	externalResourcesRequired %Boolean; #IMPLIED
+	class %ClassList; #IMPLIED
+	style %StyleSheet; #IMPLIED
+	%PresentationAttributes-Color; 
+	%PresentationAttributes-FillStroke; 
+	%PresentationAttributes-Graphics; 
+	%PresentationAttributes-Markers; 
+	transform %TransformList; #IMPLIED
+	%graphicsElementEvents; 
+	d %PathData; #REQUIRED
+	pathLength %Number; #IMPLIED
+>
+<!-- ==============================================================
+     DECLARATIONS CORRESPONDING TO: Basic Shapes
+     ============================================================== -->
+<!ENTITY % rectExt "">
+<!ELEMENT rect (%descTitleMetadata;,(animate|set|animateMotion|animateColor|animateTransform
+                %geExt;%rectExt;)*) >
+<!ATTLIST rect
+	%stdAttrs; 
+	%testAttrs; 
+	%langSpaceAttrs; 
+	externalResourcesRequired %Boolean; #IMPLIED
+	class %ClassList; #IMPLIED
+	style %StyleSheet; #IMPLIED
+	%PresentationAttributes-Color; 
+	%PresentationAttributes-FillStroke; 
+	%PresentationAttributes-Graphics; 
+	transform %TransformList; #IMPLIED
+	%graphicsElementEvents; 
+	x %Coordinate; #IMPLIED
+	y %Coordinate; #IMPLIED
+	width %Length; #REQUIRED
+	height %Length; #REQUIRED
+	rx %Length; #IMPLIED
+	ry %Length; #IMPLIED
+>
+<!ENTITY % circleExt "">
+<!ELEMENT circle (%descTitleMetadata;,(animate|set|animateMotion|animateColor|animateTransform
+                %geExt;%circleExt;)*) >
+<!ATTLIST circle
+	%stdAttrs; 
+	%testAttrs; 
+	%langSpaceAttrs; 
+	externalResourcesRequired %Boolean; #IMPLIED
+	class %ClassList; #IMPLIED
+	style %StyleSheet; #IMPLIED
+	%PresentationAttributes-Color; 
+	%PresentationAttributes-FillStroke; 
+	%PresentationAttributes-Graphics; 
+	transform %TransformList; #IMPLIED
+	%graphicsElementEvents; 
+	cx %Coordinate; #IMPLIED
+	cy %Coordinate; #IMPLIED
+	r %Length; #REQUIRED
+>
+<!ENTITY % ellipseExt "">
+<!ELEMENT ellipse (%descTitleMetadata;,(animate|set|animateMotion|animateColor|animateTransform
+                %geExt;%ellipseExt;)*) >
+<!ATTLIST ellipse
+	%stdAttrs; 
+	%testAttrs; 
+	%langSpaceAttrs; 
+	externalResourcesRequired %Boolean; #IMPLIED
+	class %ClassList; #IMPLIED
+	style %StyleSheet; #IMPLIED
+	%PresentationAttributes-Color; 
+	%PresentationAttributes-FillStroke; 
+	%PresentationAttributes-Graphics; 
+	transform %TransformList; #IMPLIED
+	%graphicsElementEvents; 
+	cx %Coordinate; #IMPLIED
+	cy %Coordinate; #IMPLIED
+	rx %Length; #REQUIRED
+	ry %Length; #REQUIRED
+>
+<!ENTITY % lineExt "">
+<!ELEMENT line (%descTitleMetadata;,(animate|set|animateMotion|animateColor|animateTransform
+                %geExt;%lineExt;)*) >
+<!ATTLIST line
+	%stdAttrs; 
+	%testAttrs; 
+	%langSpaceAttrs; 
+	externalResourcesRequired %Boolean; #IMPLIED
+	class %ClassList; #IMPLIED
+	style %StyleSheet; #IMPLIED
+	%PresentationAttributes-Color; 
+	%PresentationAttributes-FillStroke; 
+	%PresentationAttributes-Graphics; 
+	%PresentationAttributes-Markers; 
+	transform %TransformList; #IMPLIED
+	%graphicsElementEvents; 
+	x1 %Coordinate; #IMPLIED
+	y1 %Coordinate; #IMPLIED
+	x2 %Coordinate; #IMPLIED
+	y2 %Coordinate; #IMPLIED
+>
+<!ENTITY % polylineExt "">
+<!ELEMENT polyline (%descTitleMetadata;,(animate|set|animateMotion|animateColor|animateTransform
+                %geExt;%polylineExt;)*) >
+<!ATTLIST polyline
+	%stdAttrs; 
+	%testAttrs; 
+	%langSpaceAttrs; 
+	externalResourcesRequired %Boolean; #IMPLIED
+	class %ClassList; #IMPLIED
+	style %StyleSheet; #IMPLIED
+	%PresentationAttributes-Color; 
+	%PresentationAttributes-FillStroke; 
+	%PresentationAttributes-Graphics; 
+	%PresentationAttributes-Markers; 
+	transform %TransformList; #IMPLIED
+	%graphicsElementEvents; 
+	points %Points; #REQUIRED
+>
+<!ENTITY % polygonExt "">
+<!ELEMENT polygon (%descTitleMetadata;,(animate|set|animateMotion|animateColor|animateTransform
+                %geExt;%polygonExt;)*) >
+<!ATTLIST polygon
+	%stdAttrs; 
+	%testAttrs; 
+	%langSpaceAttrs; 
+	externalResourcesRequired %Boolean; #IMPLIED
+	class %ClassList; #IMPLIED
+	style %StyleSheet; #IMPLIED
+	%PresentationAttributes-Color; 
+	%PresentationAttributes-FillStroke; 
+	%PresentationAttributes-Graphics; 
+	%PresentationAttributes-Markers; 
+	transform %TransformList; #IMPLIED
+	%graphicsElementEvents; 
+	points %Points; #REQUIRED
+>
+<!-- ==============================================================
+     DECLARATIONS CORRESPONDING TO: Text
+     ============================================================== -->
+<!ENTITY % textExt "">
+<!ELEMENT text (#PCDATA|desc|title|metadata|
+                tspan|tref|textPath|altGlyph|a|animate|set|
+                animateMotion|animateColor|animateTransform
+                %geExt;%textExt;)* >
+<!ATTLIST text
+	%stdAttrs; 
+	%testAttrs; 
+	%langSpaceAttrs; 
+	externalResourcesRequired %Boolean; #IMPLIED
+	class %ClassList; #IMPLIED
+	style %StyleSheet; #IMPLIED
+	%PresentationAttributes-Color; 
+	%PresentationAttributes-FillStroke; 
+	%PresentationAttributes-FontSpecification; 
+	%PresentationAttributes-Graphics; 
+	%PresentationAttributes-TextContentElements; 
+	%PresentationAttributes-TextElements; 
+	transform %TransformList; #IMPLIED
+	%graphicsElementEvents; 
+	x %Coordinates; #IMPLIED
+	y %Coordinates; #IMPLIED
+	dx %Lengths; #IMPLIED
+	dy %Lengths; #IMPLIED
+	rotate %Numbers; #IMPLIED
+	textLength %Length; #IMPLIED
+	lengthAdjust (spacing | spacingAndGlyphs) #IMPLIED
+>
+<!ENTITY % tspanExt "">
+<!ELEMENT tspan (#PCDATA|desc|title|metadata|tspan|tref|altGlyph|a|animate|set|animateColor
+                %tspanExt;)* >
+<!ATTLIST tspan
+	%stdAttrs; 
+	%testAttrs; 
+	%langSpaceAttrs; 
+	externalResourcesRequired %Boolean; #IMPLIED
+	class %ClassList; #IMPLIED
+	style %StyleSheet; #IMPLIED
+	%PresentationAttributes-Color; 
+	%PresentationAttributes-FillStroke; 
+	%PresentationAttributes-FontSpecification; 
+	%PresentationAttributes-Graphics; 
+	%PresentationAttributes-TextContentElements; 
+	%graphicsElementEvents; 
+	x %Coordinates; #IMPLIED
+	y %Coordinates; #IMPLIED
+	dx %Lengths; #IMPLIED
+	dy %Lengths; #IMPLIED
+	rotate %Numbers; #IMPLIED
+	textLength %Length; #IMPLIED
+	lengthAdjust (spacing | spacingAndGlyphs) #IMPLIED
+>
+<!ENTITY % trefExt "">
+<!ELEMENT tref (desc|title|metadata|animate|set|animateColor
+                %trefExt;)* >
+<!ATTLIST tref
+	%stdAttrs; 
+	%xlinkRefAttrs; 
+	xlink:href %URI; #REQUIRED
+	%testAttrs; 
+	%langSpaceAttrs; 
+	externalResourcesRequired %Boolean; #IMPLIED
+	class %ClassList; #IMPLIED
+	style %StyleSheet; #IMPLIED
+	%PresentationAttributes-Color; 
+	%PresentationAttributes-FillStroke; 
+	%PresentationAttributes-FontSpecification; 
+	%PresentationAttributes-Graphics; 
+	%PresentationAttributes-TextContentElements; 
+	%graphicsElementEvents; 
+	x %Coordinates; #IMPLIED
+	y %Coordinates; #IMPLIED
+	dx %Lengths; #IMPLIED
+	dy %Lengths; #IMPLIED
+	rotate %Numbers; #IMPLIED
+	textLength %Length; #IMPLIED
+	lengthAdjust (spacing | spacingAndGlyphs) #IMPLIED
+>
+<!ENTITY % divExt "">
+<!--ELEMENT div (#PCDATA | region | div | p | span | animate | set | animateMotion | animateColor | animateTransform | %divExt;)*-->
+<!ELEMENT div (#PCDATA | region | div | p | span | animate | set | animateMotion | animateColor | animateTransform  %ceExt;%divExt;)*>
+
+<!ATTLIST div
+	%stdAttrs; 
+	%langSpaceAttrs; 
+	%testAttrs; 
+	class %ClassList; #IMPLIED
+	style %StyleSheet; #IMPLIED
+	%PresentationAttributes-Color; 
+	%PresentationAttributes-FillStroke; 
+	%PresentationAttributes-FontSpecification; 
+	%PresentationAttributes-Graphics; 
+	%PresentationAttributes-TextContentElements; 
+	%graphicsElementEvents; 
+	spacing (auto | exact) #IMPLIED
+>
+<!ENTITY % pExt "">
+<!--ELEMENT p (#PCDATA | p | div | span | animate | set | animateMotion | animateColor | animateTransform | %pExt;)*-->
+<!ELEMENT p (#PCDATA | p | div | span | animate | set | animateMotion | animateColor | animateTransform %ceExt;%pExt;)*>
+<!ATTLIST p
+	%stdAttrs; 
+	%langSpaceAttrs; 
+	%testAttrs; 
+	class %ClassList; #IMPLIED
+	style %StyleSheet; #IMPLIED
+	%PresentationAttributes-Color; 
+	%PresentationAttributes-FillStroke; 
+	%PresentationAttributes-FontSpecification; 
+	%PresentationAttributes-Graphics; 
+	%PresentationAttributes-TextContentElements; 
+	%graphicsElementEvents; 
+>
+<!ENTITY % spanExt "">
+<!ELEMENT span (#PCDATA | animate | set | animateMotion | animateColor | animateTransform %ceExt;%spanExt;)*>
+<!--ELEMENT span (#PCDATA | animate | set | animateMotion | animateColor | animateTransform | %spanExt;)*-->
+
+<!ATTLIST span
+	%stdAttrs; 
+	%langSpaceAttrs; 
+	%testAttrs; 
+	class %ClassList; #IMPLIED
+	style %StyleSheet; #IMPLIED
+	%PresentationAttributes-Color; 
+	%PresentationAttributes-FillStroke; 
+	%PresentationAttributes-FontSpecification; 
+	%PresentationAttributes-Graphics; 
+	%PresentationAttributes-TextContentElements; 
+	%graphicsElementEvents; 
+>
+<!ENTITY % regionExt "">
+<!--ELEMENT region (rect | use | %regionExt;)*-->
+<!ELEMENT region (rect | use %ceExt;%regionExt;)*>
+<!ATTLIST region
+	%stdAttrs; 
+	%langSpaceAttrs; 
+	%testAttrs; 
+	class %ClassList; #IMPLIED
+	style %StyleSheet; #IMPLIED
+	%PresentationAttributes-All; 
+	%graphicsElementEvents; 
+>
+<!ENTITY % brExt "">
+<!-- dont think this can be extended from EMPTY to having coontent 
+<!ELEMENT br (%ceExt;%brExt;)*-->
+<!ELEMENT br EMPTY >
+<!ATTLIST br
+	%stdAttrs; 
+	%testAttrs; 
+>
+<!ENTITY % textPathExt "">
+<!ELEMENT textPath (#PCDATA|desc|title|metadata|tspan|tref|altGlyph|a|animate|set|animateColor
+                %textPathExt;)* >
+<!ATTLIST textPath
+	%stdAttrs; 
+	%xlinkRefAttrs; 
+	xlink:href %URI; #REQUIRED
+	%langSpaceAttrs; 
+	%testAttrs; 
+	externalResourcesRequired %Boolean; #IMPLIED
+	class %ClassList; #IMPLIED
+	style %StyleSheet; #IMPLIED
+	%PresentationAttributes-Color; 
+	%PresentationAttributes-FillStroke; 
+	%PresentationAttributes-FontSpecification; 
+	%PresentationAttributes-Graphics; 
+	%PresentationAttributes-TextContentElements; 
+	%graphicsElementEvents; 
+	startOffset %Length; #IMPLIED
+	textLength %Length; #IMPLIED
+	lengthAdjust (spacing | spacingAndGlyphs) #IMPLIED
+	method (align | stretch) #IMPLIED
+	spacing (auto | exact) #IMPLIED
+>
+<!ENTITY % altGlyphExt "">
+<!ELEMENT altGlyph (#PCDATA %altGlyphExt;)* >
+<!ATTLIST altGlyph
+	%stdAttrs; 
+	%xlinkRefAttrs; 
+	xlink:href %URI; #IMPLIED
+	glyphRef CDATA #IMPLIED
+	format CDATA #IMPLIED
+	%testAttrs; 
+	%langSpaceAttrs; 
+	externalResourcesRequired %Boolean; #IMPLIED
+	class %ClassList; #IMPLIED
+	style %StyleSheet; #IMPLIED
+	%PresentationAttributes-Color; 
+	%PresentationAttributes-FillStroke; 
+	%PresentationAttributes-FontSpecification; 
+	%PresentationAttributes-Graphics; 
+	%PresentationAttributes-TextContentElements; 
+	%graphicsElementEvents; 
+	x %Coordinates; #IMPLIED
+	y %Coordinates; #IMPLIED
+	dx %Lengths; #IMPLIED
+	dy %Lengths; #IMPLIED
+	rotate %Numbers; #IMPLIED
+>
+<!ENTITY % altGlyphDefExt "">
+<!ELEMENT altGlyphDef ((glyphRef+|altGlyphItem+) %altGlyphDefExt;) >
+<!ATTLIST altGlyphDef
+	%stdAttrs; 
+>
+<!ENTITY % altGlyphItemExt "">
+<!ELEMENT altGlyphItem (glyphRef+ %altGlyphItemExt;) >
+<!ATTLIST altGlyphItem
+	%stdAttrs; 
+>
+<!ELEMENT glyphRef EMPTY>
+<!ATTLIST glyphRef
+	%stdAttrs; 
+	%xlinkRefAttrs; 
+	xlink:href %URI; #IMPLIED
+	class %ClassList; #IMPLIED
+	style %StyleSheet; #IMPLIED
+	%PresentationAttributes-FontSpecification; 
+	glyphRef CDATA #IMPLIED
+	format CDATA #IMPLIED
+	x %Number; #IMPLIED
+	y %Number; #IMPLIED
+	dx %Number; #IMPLIED
+	dy %Number; #IMPLIED
+>
+<!-- ==============================================================
+     DECLARATIONS CORRESPONDING TO: Painting: Filling, Stroking and Marker Symbols 
+     ============================================================== -->
+<!ENTITY % markerExt "">
+<!ELEMENT marker (desc|title|metadata|defs|
+                   path|text|rect|circle|ellipse|line|polyline|polygon|
+                   use|image|svg|g|view|switch|a|altGlyphDef|
+                   script|style|symbol|marker|clipPath|mask|
+                   linearGradient|radialGradient|solidColor|pattern|filter|cursor|font|
+                   animate|set|animateMotion|animateColor|animateTransform|
+                   color-profile|font-face
+                   %ceExt;%markerExt;)* >
+<!ATTLIST marker
+	%stdAttrs; 
+	%langSpaceAttrs; 
+	externalResourcesRequired %Boolean; #IMPLIED
+	class %ClassList; #IMPLIED
+	style %StyleSheet; #IMPLIED
+	%PresentationAttributes-All; 
+	viewBox %ViewBoxSpec; #IMPLIED
+	preserveAspectRatio %PreserveAspectRatioSpec; "xMidYMid meet"
+	refX %Coordinate; #IMPLIED
+	refY %Coordinate; #IMPLIED
+	markerUnits (strokeWidth | userSpaceOnUse) #IMPLIED
+	markerWidth %Length; #IMPLIED
+	markerHeight %Length; #IMPLIED
+	orient CDATA #IMPLIED
+>
+<!-- ==============================================================
+     DECLARATIONS CORRESPONDING TO: Color 
+     ============================================================== -->
+<!ELEMENT color-profile (%descTitleMetadata;)>
+<!ATTLIST color-profile
+	%stdAttrs; 
+	%xlinkRefAttrs; 
+	xlink:href %URI; #IMPLIED
+	local CDATA #IMPLIED
+	name CDATA #REQUIRED
+	rendering-intent (auto | perceptual | relative-colorimetric | saturation | absolute-colorimetric) "auto"
+>
+<!ENTITY % solidColorExt "">
+<!--ELEMENT solidColor (%descTitleMetadata;, (stop | animate | set | animateTransform | animateColor | animateMotion | %solidExt;)*)-->
+<!ELEMENT solidColor (%descTitleMetadata;, (stop | animate | set | animateTransform | animateColor | animateMotion %ceExt;%solidColorExt;)*)>
+
+<!ATTLIST solidColor
+	%stdAttrs; 
+	class %ClassList; #IMPLIED
+	style %StyleSheet; #IMPLIED
+	%PresentationAttributes-SolidColor; 
+>
+<!-- ==============================================================
+     DECLARATIONS CORRESPONDING TO: Gradients and Patterns 
+     ============================================================== -->
+<!ENTITY % linearGradientExt "">
+<!ELEMENT linearGradient (%descTitleMetadata;,(stop|animate|set|animateTransform
+                   %linearGradientExt;)*) >
+<!ATTLIST linearGradient
+	%stdAttrs; 
+	%xlinkRefAttrs; 
+	xlink:href %URI; #IMPLIED
+	externalResourcesRequired %Boolean; #IMPLIED
+	class %ClassList; #IMPLIED
+	style %StyleSheet; #IMPLIED
+	%PresentationAttributes-Color; 
+	%PresentationAttributes-Gradients; 
+	gradientUnits (userSpaceOnUse | objectBoundingBox) #IMPLIED
+	gradientTransform %TransformList; #IMPLIED
+	x1 %Coordinate; #IMPLIED
+	y1 %Coordinate; #IMPLIED
+	x2 %Coordinate; #IMPLIED
+	y2 %Coordinate; #IMPLIED
+	spreadMethod (pad | reflect | repeat) #IMPLIED
+>
+<!ENTITY % radialGradientExt "">
+<!ELEMENT radialGradient (%descTitleMetadata;,(stop|animate|set|animateTransform
+                   %radialGradientExt;)*) >
+<!ATTLIST radialGradient
+	%stdAttrs; 
+	%xlinkRefAttrs; 
+	xlink:href %URI; #IMPLIED
+	externalResourcesRequired %Boolean; #IMPLIED
+	class %ClassList; #IMPLIED
+	style %StyleSheet; #IMPLIED
+	%PresentationAttributes-Color; 
+	%PresentationAttributes-Gradients; 
+	gradientUnits (userSpaceOnUse | objectBoundingBox) #IMPLIED
+	gradientTransform %TransformList; #IMPLIED
+	cx %Coordinate; #IMPLIED
+	cy %Coordinate; #IMPLIED
+	r %Length; #IMPLIED
+	fx %Coordinate; #IMPLIED
+	fy %Coordinate; #IMPLIED
+	spreadMethod (pad | reflect | repeat) #IMPLIED
+>
+<!ENTITY % stopExt "">
+<!ELEMENT stop (animate|set|animateColor
+                   %stopExt;)* >
+<!ATTLIST stop
+	%stdAttrs; 
+	class %ClassList; #IMPLIED
+	style %StyleSheet; #IMPLIED
+	%PresentationAttributes-Color; 
+	%PresentationAttributes-Gradients; 
+	offset %NumberOrPercentage; #REQUIRED
+>
+<!ENTITY % patternExt "">
+<!ELEMENT pattern (desc|title|metadata|defs|
+                   path|text|rect|circle|ellipse|line|polyline|polygon|
+                   use|image|svg|g|view|switch|a|altGlyphDef|
+                   script|style|symbol|marker|clipPath|mask|
+                   linearGradient|radialGradient|solidColor|pattern|filter|cursor|font|
+                   animate|set|animateMotion|animateColor|animateTransform|
+                   color-profile|font-face
+                   %ceExt;%patternExt;)* >
+<!ATTLIST pattern
+	%stdAttrs; 
+	%xlinkRefAttrs; 
+	xlink:href %URI; #IMPLIED
+	%testAttrs; 
+	%langSpaceAttrs; 
+	externalResourcesRequired %Boolean; #IMPLIED
+	class %ClassList; #IMPLIED
+	style %StyleSheet; #IMPLIED
+	%PresentationAttributes-All; 
+	viewBox %ViewBoxSpec; #IMPLIED
+	preserveAspectRatio %PreserveAspectRatioSpec; "xMidYMid meet"
+	patternUnits (userSpaceOnUse | objectBoundingBox) #IMPLIED
+	patternContentUnits (userSpaceOnUse | objectBoundingBox) #IMPLIED
+	patternTransform %TransformList; #IMPLIED
+	x %Coordinate; #IMPLIED
+	y %Coordinate; #IMPLIED
+	width %Length; #IMPLIED
+	height %Length; #IMPLIED
+>
+<!-- ==============================================================
+     DECLARATIONS CORRESPONDING TO: Clipping, Masking and Compositing 
+     ============================================================== -->
+<!ENTITY % clipPathExt "">
+<!ELEMENT clipPath (%descTitleMetadata;,
+                    (path|text|rect|circle|ellipse|line|polyline|polygon|
+                     use|animate|set|animateMotion|animateColor|animateTransform
+                     %ceExt;%clipPathExt;)*) >
+<!ATTLIST clipPath
+	%stdAttrs; 
+	%testAttrs; 
+	%langSpaceAttrs; 
+	externalResourcesRequired %Boolean; #IMPLIED
+	class %ClassList; #IMPLIED
+	style %StyleSheet; #IMPLIED
+	%PresentationAttributes-Color; 
+	%PresentationAttributes-FillStroke; 
+	%PresentationAttributes-FontSpecification; 
+	%PresentationAttributes-Graphics; 
+	%PresentationAttributes-TextContentElements; 
+	%PresentationAttributes-TextElements; 
+	transform %TransformList; #IMPLIED
+	clipPathUnits (userSpaceOnUse | objectBoundingBox) #IMPLIED
+>
+<!ENTITY % maskExt "">
+<!ELEMENT mask (desc|title|metadata|defs|
+                   path|text|rect|circle|ellipse|line|polyline|polygon|
+                   use|image|svg|g|view|switch|a|altGlyphDef|
+                   script|style|symbol|marker|clipPath|mask|
+                   linearGradient|radialGradient|solidColor|pattern|filter|cursor|font|
+                   animate|set|animateMotion|animateColor|animateTransform|
+                   color-profile|font-face
+                   %ceExt;%maskExt;)*  >
+<!ATTLIST mask
+	%stdAttrs; 
+	%testAttrs; 
+	%langSpaceAttrs; 
+	externalResourcesRequired %Boolean; #IMPLIED
+	class %ClassList; #IMPLIED
+	style %StyleSheet; #IMPLIED
+	%PresentationAttributes-All; 
+	maskUnits (userSpaceOnUse | objectBoundingBox) #IMPLIED
+	maskContentUnits (userSpaceOnUse | objectBoundingBox) #IMPLIED
+	x %Coordinate; #IMPLIED
+	y %Coordinate; #IMPLIED
+	width %Length; #IMPLIED
+	height %Length; #IMPLIED
+>
+<!-- ==============================================================
+     DECLARATIONS CORRESPONDING TO: Filter Effects
+     ============================================================== -->
+<!ENTITY % filterExt "">
+<!ELEMENT filter (%descTitleMetadata;,(feBlend|feFlood|
+  feColorMatrix|feComponentTransfer|
+  feComposite|feConvolveMatrix|feDiffuseLighting|feDisplacementMap|
+  feGaussianBlur|feImage|feMerge|
+  feMorphology|feOffset|feSpecularLighting|
+  feTile|feTurbulence|
+  animate|set
+  %filterExt;)*) >
+<!ATTLIST filter
+	%stdAttrs; 
+	%xlinkRefAttrs; 
+	xlink:href %URI; #IMPLIED
+	%langSpaceAttrs; 
+	externalResourcesRequired %Boolean; #IMPLIED
+	class %ClassList; #IMPLIED
+	style %StyleSheet; #IMPLIED
+	%PresentationAttributes-All; 
+	filterUnits (userSpaceOnUse | objectBoundingBox) #IMPLIED
+	primitiveUnits (userSpaceOnUse | objectBoundingBox) #IMPLIED
+	x %Coordinate; #IMPLIED
+	y %Coordinate; #IMPLIED
+	width %Length; #IMPLIED
+	height %Length; #IMPLIED
+	filterRes %NumberOptionalNumber; #IMPLIED
+>
+<!ENTITY % filter_primitive_attributes "x %Coordinate; #IMPLIED
+   y %Coordinate; #IMPLIED
+   width %Length; #IMPLIED
+   height %Length; #IMPLIED
+   result CDATA #IMPLIED">
+<!ENTITY % filter_primitive_attributes_with_in "%filter_primitive_attributes;
+   in CDATA #IMPLIED">
+<!ELEMENT feDistantLight (animate | set)*>
+<!ATTLIST feDistantLight
+	%stdAttrs; 
+	azimuth %Number; #IMPLIED
+	elevation %Number; #IMPLIED
+>
+<!ELEMENT fePointLight (animate | set)*>
+<!ATTLIST fePointLight
+	%stdAttrs; 
+	x %Number; #IMPLIED
+	y %Number; #IMPLIED
+	z %Number; #IMPLIED
+>
+<!ELEMENT feSpotLight (animate | set)*>
+<!ATTLIST feSpotLight
+	%stdAttrs; 
+	x %Number; #IMPLIED
+	y %Number; #IMPLIED
+	z %Number; #IMPLIED
+	pointsAtX %Number; #IMPLIED
+	pointsAtY %Number; #IMPLIED
+	pointsAtZ %Number; #IMPLIED
+	specularExponent %Number; #IMPLIED
+	limitingConeAngle %Number; #IMPLIED
+>
+<!ELEMENT feBlend (animate | set)*>
+<!ATTLIST feBlend
+	%stdAttrs; 
+	%PresentationAttributes-FilterPrimitives; 
+	%filter_primitive_attributes_with_in; 
+	in2 CDATA #REQUIRED
+	mode (normal | multiply | screen | darken | lighten) "normal"
+>
+<!ELEMENT feColorMatrix (animate | set)*>
+<!ATTLIST feColorMatrix
+	%stdAttrs; 
+	%PresentationAttributes-FilterPrimitives; 
+	%filter_primitive_attributes_with_in; 
+	type (matrix | saturate | hueRotate | luminanceToAlpha) "matrix"
+	values CDATA #IMPLIED
+>
+<!ELEMENT feComponentTransfer (feFuncR?, feFuncG?, feFuncB?, feFuncA?)>
+<!ATTLIST feComponentTransfer
+	%stdAttrs; 
+	%PresentationAttributes-FilterPrimitives; 
+	%filter_primitive_attributes_with_in; 
+>
+<!ENTITY % component_transfer_function_attributes "type (identity | table | discrete | linear | gamma) #REQUIRED
+   tableValues CDATA #IMPLIED
+   slope %Number; #IMPLIED
+   intercept %Number; #IMPLIED
+   amplitude %Number; #IMPLIED
+   exponent %Number; #IMPLIED
+   offset %Number; #IMPLIED">
+<!ELEMENT feFuncR (animate | set)*>
+<!ATTLIST feFuncR
+	%stdAttrs; 
+	%component_transfer_function_attributes; 
+>
+<!ELEMENT feFuncG (animate | set)*>
+<!ATTLIST feFuncG
+	%stdAttrs; 
+	%component_transfer_function_attributes; 
+>
+<!ELEMENT feFuncB (animate | set)*>
+<!ATTLIST feFuncB
+	%stdAttrs; 
+	%component_transfer_function_attributes; 
+>
+<!ELEMENT feFuncA (animate | set)*>
+<!ATTLIST feFuncA
+	%stdAttrs; 
+	%component_transfer_function_attributes; 
+>
+<!ELEMENT feComposite (animate | set)*>
+<!ATTLIST feComposite
+	%stdAttrs; 
+	%PresentationAttributes-FilterPrimitives; 
+	%filter_primitive_attributes_with_in; 
+	in2 CDATA #REQUIRED
+	operator (over | in | out | atop | xor | arithmetic) "over"
+	k1 %Number; #IMPLIED
+	k2 %Number; #IMPLIED
+	k3 %Number; #IMPLIED
+	k4 %Number; #IMPLIED
+>
+<!ELEMENT feConvolveMatrix (animate | set)*>
+<!ATTLIST feConvolveMatrix
+	%stdAttrs; 
+	%PresentationAttributes-FilterPrimitives; 
+	%filter_primitive_attributes_with_in; 
+	order %NumberOptionalNumber; #REQUIRED
+	kernelMatrix CDATA #REQUIRED
+	divisor %Number; #IMPLIED
+	bias %Number; #IMPLIED
+	targetX %Integer; #IMPLIED
+	targetY %Integer; #IMPLIED
+	edgeMode (duplicate | wrap | none) "duplicate"
+	kernelUnitLength %NumberOptionalNumber; #IMPLIED
+	preserveAlpha %Boolean; #IMPLIED
+>
+<!ELEMENT feDiffuseLighting ((feDistantLight | fePointLight | feSpotLight), (animate | set | animateColor)*)>
+<!ATTLIST feDiffuseLighting
+	%stdAttrs; 
+	class %ClassList; #IMPLIED
+	style %StyleSheet; #IMPLIED
+	%PresentationAttributes-Color; 
+	%PresentationAttributes-FilterPrimitives; 
+	%PresentationAttributes-LightingEffects; 
+	%filter_primitive_attributes_with_in; 
+	surfaceScale %Number; #IMPLIED
+	diffuseConstant %Number; #IMPLIED
+	kernelUnitLength %NumberOptionalNumber; #IMPLIED
+>
+<!ELEMENT feDisplacementMap (animate | set)*>
+<!ATTLIST feDisplacementMap
+	%stdAttrs; 
+	%PresentationAttributes-FilterPrimitives; 
+	%filter_primitive_attributes_with_in; 
+	in2 CDATA #REQUIRED
+	scale %Number; #IMPLIED
+	xChannelSelector (R | G | B | A) "A"
+	yChannelSelector (R | G | B | A) "A"
+>
+<!ELEMENT feFlood (animate | set | animateColor)*>
+<!ATTLIST feFlood
+	%stdAttrs; 
+	class %ClassList; #IMPLIED
+	style %StyleSheet; #IMPLIED
+	%PresentationAttributes-Color; 
+	%PresentationAttributes-feFlood; 
+	%PresentationAttributes-FilterPrimitives; 
+	%filter_primitive_attributes_with_in; 
+>
+<!ELEMENT feGaussianBlur (animate | set)*>
+<!ATTLIST feGaussianBlur
+	%stdAttrs; 
+	%PresentationAttributes-FilterPrimitives; 
+	%filter_primitive_attributes_with_in; 
+	stdDeviation %NumberOptionalNumber; #IMPLIED
+>
+<!ELEMENT feImage (animate | set | animateTransform)*>
+<!ATTLIST feImage
+	%stdAttrs; 
+	%xlinkRefAttrsEmbed; 
+	xlink:href %URI; #REQUIRED
+	%langSpaceAttrs; 
+	externalResourcesRequired %Boolean; #IMPLIED
+	class %ClassList; #IMPLIED
+	style %StyleSheet; #IMPLIED
+	%filter_primitive_attributes; 
+	%PresentationAttributes-All; 
+>
+<!ELEMENT feMerge (feMergeNode)*>
+<!ATTLIST feMerge
+	%stdAttrs; 
+	%PresentationAttributes-FilterPrimitives; 
+	%filter_primitive_attributes; 
+>
+<!ELEMENT feMergeNode (animate | set)*>
+<!ATTLIST feMergeNode
+	%stdAttrs; 
+	in CDATA #IMPLIED
+>
+<!ELEMENT feMorphology (animate | set)*>
+<!ATTLIST feMorphology
+	%stdAttrs; 
+	%PresentationAttributes-FilterPrimitives; 
+	%filter_primitive_attributes_with_in; 
+	operator (erode | dilate) "erode"
+	radius %NumberOptionalNumber; #IMPLIED
+>
+<!ELEMENT feOffset (animate | set)*>
+<!ATTLIST feOffset
+	%stdAttrs; 
+	%PresentationAttributes-FilterPrimitives; 
+	%filter_primitive_attributes_with_in; 
+	dx %Number; #IMPLIED
+	dy %Number; #IMPLIED
+>
+<!ELEMENT feSpecularLighting ((feDistantLight | fePointLight | feSpotLight), (animate | set | animateColor)*)>
+<!ATTLIST feSpecularLighting
+	%stdAttrs; 
+	class %ClassList; #IMPLIED
+	style %StyleSheet; #IMPLIED
+	%PresentationAttributes-Color; 
+	%PresentationAttributes-FilterPrimitives; 
+	%PresentationAttributes-LightingEffects; 
+	%filter_primitive_attributes_with_in; 
+	surfaceScale %Number; #IMPLIED
+	specularConstant %Number; #IMPLIED
+	specularExponent %Number; #IMPLIED
+	kernelUnitLength %NumberOptionalNumber; #IMPLIED
+>
+<!ELEMENT feTile (animate | set)*>
+<!ATTLIST feTile
+	%stdAttrs; 
+	%PresentationAttributes-FilterPrimitives; 
+	%filter_primitive_attributes_with_in; 
+>
+<!ELEMENT feTurbulence (animate | set)*>
+<!ATTLIST feTurbulence
+	%stdAttrs; 
+	%PresentationAttributes-FilterPrimitives; 
+	%filter_primitive_attributes; 
+	baseFrequency %NumberOptionalNumber; #IMPLIED
+	numOctaves %Integer; #IMPLIED
+	seed %Number; #IMPLIED
+	stitchTiles (stitch | noStitch) "noStitch"
+	type (fractalNoise | turbulence) "turbulence"
+>
+<!-- ==============================================================
+     DECLARATIONS CORRESPONDING TO: Interactivity 
+     ============================================================== -->
+<!ELEMENT cursor (%descTitleMetadata;)>
+<!ATTLIST cursor
+	%stdAttrs; 
+	%xlinkRefAttrs; 
+	xlink:href %URI; #REQUIRED
+	%testAttrs; 
+	externalResourcesRequired %Boolean; #IMPLIED
+	x %Coordinate; #IMPLIED
+	y %Coordinate; #IMPLIED
+>
+<!-- ==============================================================
+     DECLARATIONS CORRESPONDING TO: Linking
+     ============================================================== -->
+<!ENTITY % aExt "">
+<!ELEMENT a (#PCDATA|desc|title|metadata|defs|
+                   path|text|rect|circle|ellipse|line|polyline|polygon|
+                   use|image|svg|g|view|switch|a|altGlyphDef|
+                   script|style|symbol|marker|clipPath|mask|
+                   linearGradient|radialGradient|solidColor|pattern|filter|cursor|font|
+                   animate|set|animateMotion|animateColor|animateTransform|
+                   color-profile|font-face
+                   %ceExt;%aExt;)* >
+<!ATTLIST a
+	%stdAttrs; 
+	xmlns:xlink CDATA #FIXED "http://www.w3.org/1999/xlink"
+	xlink:type (simple) #FIXED "simple"
+	xlink:role %URI; #IMPLIED
+	xlink:arcrole %URI; #IMPLIED
+	xlink:title CDATA #IMPLIED
+	xlink:show (new | replace) "replace"
+	xlink:actuate (onRequest) #FIXED "onRequest"
+	xlink:href %URI; #REQUIRED
+	%testAttrs; 
+	%langSpaceAttrs; 
+	externalResourcesRequired %Boolean; #IMPLIED
+	class %ClassList; #IMPLIED
+	style %StyleSheet; #IMPLIED
+	%PresentationAttributes-All; 
+	transform %TransformList; #IMPLIED
+	%graphicsElementEvents; 
+	target %LinkTarget; #IMPLIED
+>
+<!ENTITY % viewExt "">
+<!ELEMENT view (%descTitleMetadata;%viewExt;) >
+<!ATTLIST view
+	%stdAttrs; 
+	externalResourcesRequired %Boolean; #IMPLIED
+	viewBox %ViewBoxSpec; #IMPLIED
+	preserveAspectRatio %PreserveAspectRatioSpec; "xMidYMid meet"
+	zoomAndPan (disable | magnify) "magnify"
+	viewTarget CDATA #IMPLIED
+>
+<!-- ==============================================================
+     DECLARATIONS CORRESPONDING TO: Scripting 
+     ============================================================== -->
+<!ELEMENT script (#PCDATA)>
+<!ATTLIST script
+	%stdAttrs; 
+	%xlinkRefAttrs; 
+	xlink:href %URI; #IMPLIED
+	externalResourcesRequired %Boolean; #IMPLIED
+	type %ContentType; #REQUIRED
+>
+<!-- ==============================================================
+     DECLARATIONS CORRESPONDING TO: Animation 
+     ============================================================== -->
+<!ENTITY % animElementAttrs "%xlinkRefAttrs;
+  xlink:href %URI; #IMPLIED">
+<!ENTITY % animAttributeAttrs "attributeName  CDATA  #REQUIRED
+  attributeType  CDATA  #IMPLIED">
+<!ENTITY % animTimingAttrs "begin CDATA #IMPLIED 
+  dur CDATA #IMPLIED
+  end CDATA #IMPLIED
+  min CDATA #IMPLIED
+  max CDATA #IMPLIED
+  restart (always | never | whenNotActive) 'always'
+  repeatCount CDATA #IMPLIED 
+  repeatDur CDATA #IMPLIED
+  fill (remove | freeze) 'remove'">
+<!ENTITY % animValueAttrs "calcMode (discrete | linear | paced | spline) 'linear'
+  values CDATA #IMPLIED
+  keyTimes CDATA #IMPLIED
+  keySplines CDATA #IMPLIED
+  from CDATA #IMPLIED
+  to CDATA #IMPLIED
+  by CDATA #IMPLIED">
+<!ENTITY % animAdditionAttrs "additive       (replace | sum) 'replace'
+  accumulate     (none | sum) 'none'">
+<!ENTITY % animateExt "">
+<!ELEMENT animate (%descTitleMetadata;%animateExt;) >
+<!ATTLIST animate
+	%stdAttrs; 
+	%testAttrs; 
+	externalResourcesRequired %Boolean; #IMPLIED
+	%animationEvents; 
+	%animElementAttrs; 
+	%animAttributeAttrs; 
+	%animTimingAttrs; 
+	%animValueAttrs; 
+	%animAdditionAttrs; 
+>
+<!ENTITY % setExt "">
+<!ELEMENT set (%descTitleMetadata;%setExt;) >
+<!ATTLIST set
+	%stdAttrs; 
+	%testAttrs; 
+	externalResourcesRequired %Boolean; #IMPLIED
+	%animationEvents; 
+	%animElementAttrs; 
+	%animAttributeAttrs; 
+	%animTimingAttrs; 
+	to CDATA #IMPLIED
+>
+<!ENTITY % animateMotionExt "">
+<!ELEMENT animateMotion (%descTitleMetadata;,mpath? %animateMotionExt;) >
+<!ATTLIST animateMotion
+	%stdAttrs; 
+	%testAttrs; 
+	externalResourcesRequired %Boolean; #IMPLIED
+	%animationEvents; 
+	%animElementAttrs; 
+	%animTimingAttrs; 
+	calcMode (discrete | linear | paced | spline) "paced"
+	values CDATA #IMPLIED
+	keyTimes CDATA #IMPLIED
+	keySplines CDATA #IMPLIED
+	from CDATA #IMPLIED
+	to CDATA #IMPLIED
+	by CDATA #IMPLIED
+	%animAdditionAttrs; 
+	path CDATA #IMPLIED
+	keyPoints CDATA #IMPLIED
+	rotate CDATA #IMPLIED
+	origin CDATA #IMPLIED
+>
+<!ENTITY % mpathExt "">
+<!ELEMENT mpath (%descTitleMetadata;%mpathExt;) >
+<!ATTLIST mpath
+	%stdAttrs; 
+	%xlinkRefAttrs; 
+	xlink:href %URI; #REQUIRED
+	externalResourcesRequired %Boolean; #IMPLIED
+>
+<!ENTITY % animateColorExt "">
+<!ELEMENT animateColor (%descTitleMetadata;%animateColorExt;) >
+<!ATTLIST animateColor
+	%stdAttrs; 
+	%testAttrs; 
+	externalResourcesRequired %Boolean; #IMPLIED
+	%animationEvents; 
+	%animElementAttrs; 
+	%animAttributeAttrs; 
+	%animTimingAttrs; 
+	%animValueAttrs; 
+	%animAdditionAttrs; 
+>
+<!ENTITY % animateTransformExt "">
+<!ELEMENT animateTransform (%descTitleMetadata;%animateTransformExt;) >
+<!ATTLIST animateTransform
+	%stdAttrs; 
+	%testAttrs; 
+	externalResourcesRequired %Boolean; #IMPLIED
+	%animationEvents; 
+	%animElementAttrs; 
+	%animAttributeAttrs; 
+	%animTimingAttrs; 
+	%animValueAttrs; 
+	%animAdditionAttrs; 
+	type (translate | scale | rotate | skewX | skewY) "translate"
+>
+<!-- ==============================================================
+     DECLARATIONS CORRESPONDING TO: Fonts 
+     ============================================================== -->
+<!ENTITY % fontExt "">
+<!ELEMENT font (%descTitleMetadata;,font-face,
+                   missing-glyph,(glyph|hkern|vkern %fontExt;)*) >
+<!ATTLIST font
+	%stdAttrs; 
+	externalResourcesRequired %Boolean; #IMPLIED
+	class %ClassList; #IMPLIED
+	style %StyleSheet; #IMPLIED
+	%PresentationAttributes-All; 
+	horiz-origin-x %Number; #IMPLIED
+	horiz-origin-y %Number; #IMPLIED
+	horiz-adv-x %Number; #REQUIRED
+	vert-origin-x %Number; #IMPLIED
+	vert-origin-y %Number; #IMPLIED
+	vert-adv-y %Number; #IMPLIED
+>
+<!ENTITY % glyphExt "">
+<!ELEMENT glyph (desc|title|metadata|defs|
+                   path|text|rect|circle|ellipse|line|polyline|polygon|
+                   use|image|svg|g|view|switch|a|altGlyphDef|
+                   script|style|symbol|marker|clipPath|mask|
+                   linearGradient|radialGradient|solidColor|pattern|filter|cursor|font|
+                   animate|set|animateMotion|animateColor|animateTransform|
+                   color-profile|font-face
+                   %glyphExt;)* >
+<!ATTLIST glyph
+	%stdAttrs; 
+	class %ClassList; #IMPLIED
+	style %StyleSheet; #IMPLIED
+	%PresentationAttributes-All; 
+	unicode CDATA #IMPLIED
+	glyph-name CDATA #IMPLIED
+	d %PathData; #IMPLIED
+	orientation CDATA #IMPLIED
+	arabic-form CDATA #IMPLIED
+	lang %LanguageCodes; #IMPLIED
+	horiz-adv-x %Number; #IMPLIED
+	vert-origin-x %Number; #IMPLIED
+	vert-origin-y %Number; #IMPLIED
+	vert-adv-y %Number; #IMPLIED
+>
+<!ENTITY % missing-glyphExt "">
+<!ELEMENT missing-glyph (desc|title|metadata|defs|
+                   path|text|rect|circle|ellipse|line|polyline|polygon|
+                   use|image|svg|g|view|switch|a|altGlyphDef|
+                   script|style|symbol|marker|clipPath|mask|
+                   linearGradient|radialGradient|solidColor|pattern|filter|cursor|font|
+                   animate|set|animateMotion|animateColor|animateTransform|
+                   color-profile|font-face
+                   %missing-glyphExt;)* >
+<!ATTLIST missing-glyph
+	%stdAttrs; 
+	class %ClassList; #IMPLIED
+	style %StyleSheet; #IMPLIED
+	%PresentationAttributes-All; 
+	d %PathData; #IMPLIED
+	horiz-adv-x %Number; #IMPLIED
+	vert-origin-x %Number; #IMPLIED
+	vert-origin-y %Number; #IMPLIED
+	vert-adv-y %Number; #IMPLIED
+>
+<!ELEMENT hkern EMPTY>
+<!ATTLIST hkern
+	%stdAttrs; 
+	u1 CDATA #IMPLIED
+	g1 CDATA #IMPLIED
+	u2 CDATA #IMPLIED
+	g2 CDATA #IMPLIED
+	k %Number; #REQUIRED
+>
+<!ELEMENT vkern EMPTY>
+<!ATTLIST vkern
+	%stdAttrs; 
+	u1 CDATA #IMPLIED
+	g1 CDATA #IMPLIED
+	u2 CDATA #IMPLIED
+	g2 CDATA #IMPLIED
+	k %Number; #REQUIRED
+>
+<!ELEMENT font-face (%descTitleMetadata;, font-face-src?, definition-src?)>
+<!ATTLIST font-face
+	%stdAttrs; 
+	font-family CDATA #IMPLIED
+	font-style CDATA #IMPLIED
+	font-variant CDATA #IMPLIED
+	font-weight CDATA #IMPLIED
+	font-stretch CDATA #IMPLIED
+	font-size CDATA #IMPLIED
+	unicode-range CDATA #IMPLIED
+	units-per-em %Number; #IMPLIED
+	panose-1 CDATA #IMPLIED
+	stemv %Number; #IMPLIED
+	stemh %Number; #IMPLIED
+	slope %Number; #IMPLIED
+	cap-height %Number; #IMPLIED
+	x-height %Number; #IMPLIED
+	accent-height %Number; #IMPLIED
+	ascent %Number; #IMPLIED
+	descent %Number; #IMPLIED
+	widths CDATA #IMPLIED
+	bbox CDATA #IMPLIED
+	ideographic %Number; #IMPLIED
+	alphabetic %Number; #IMPLIED
+	mathematical %Number; #IMPLIED
+	hanging %Number; #IMPLIED
+	v-ideographic %Number; #IMPLIED
+	v-alphabetic %Number; #IMPLIED
+	v-mathematical %Number; #IMPLIED
+	v-hanging %Number; #IMPLIED
+	underline-position %Number; #IMPLIED
+	underline-thickness %Number; #IMPLIED
+	strikethrough-position %Number; #IMPLIED
+	strikethrough-thickness %Number; #IMPLIED
+	overline-position %Number; #IMPLIED
+	overline-thickness %Number; #IMPLIED
+>
+<!ELEMENT font-face-src (font-face-uri | font-face-name)+>
+<!ATTLIST font-face-src
+	%stdAttrs; 
+>
+<!ELEMENT font-face-uri (font-face-format*)>
+<!ATTLIST font-face-uri
+	%stdAttrs; 
+	%xlinkRefAttrs; 
+	xlink:href %URI; #REQUIRED
+>
+<!ELEMENT font-face-format EMPTY>
+<!ATTLIST font-face-format
+	%stdAttrs; 
+	string CDATA #IMPLIED
+>
+<!ELEMENT font-face-name EMPTY>
+<!ATTLIST font-face-name
+	%stdAttrs; 
+	name CDATA #IMPLIED
+>
+<!ELEMENT definition-src EMPTY>
+<!ATTLIST definition-src
+	%stdAttrs; 
+	%xlinkRefAttrs; 
+	xlink:href %URI; #REQUIRED
+>
+<!-- ==============================================================
+     DECLARATIONS CORRESPONDING TO: Metadata 
+     ============================================================== -->
+<!ENTITY % metadataExt "">
+<!ELEMENT metadata (#PCDATA %metadataExt;)* >
+<!ATTLIST metadata
+	%stdAttrs; 
+>
+<!-- ==============================================================
+     DECLARATIONS CORRESPONDING TO: Extensibility 
+     ============================================================== -->
+<!ENTITY % foreignObjectExt "">
+<!ELEMENT foreignObject (#PCDATA %ceExt;%foreignObjectExt;)* >
+<!ATTLIST foreignObject
+	%stdAttrs; 
+	%testAttrs; 
+	%langSpaceAttrs; 
+	externalResourcesRequired %Boolean; #IMPLIED
+	class %ClassList; #IMPLIED
+	style %StyleSheet; #IMPLIED
+	%PresentationAttributes-All; 
+	transform %TransformList; #IMPLIED
+	%graphicsElementEvents; 
+	x %Coordinate; #IMPLIED
+	y %Coordinate; #IMPLIED
+	width %Length; #REQUIRED
+	height %Length; #REQUIRED
+	%StructuredText; 
+>

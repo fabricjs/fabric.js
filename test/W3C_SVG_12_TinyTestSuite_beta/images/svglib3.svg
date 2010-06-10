@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <text x="10" y="20">This SVG file only contains data referenced by others</text>
+  <defs>
+    <image id="img2" width="200" height="126" xlink:href="bread.png"/>
+    <g xml:base="image2/">
+      <a id="img1" xlink:href="xlink1.svg">
+        <image width="200" height="126" xlink:href="bread2.png"/>
+      </a>
+    </g>
+  </defs>
+</svg>

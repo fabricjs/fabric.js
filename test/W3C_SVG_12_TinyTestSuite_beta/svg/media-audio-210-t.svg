@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="AE" owner="ASl" desc="Test audio elements and repeatCount" status="accepted"
+    approved="yes"
+    version="$Revision: 1.5 $" testname="$RCSfile: media-audio-210-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        An audio element 'mondays' begains at 0s and also at problem.end, with a repeatDur of 3s.
+      </p>
+      <p>
+        An audio element 'problem' begains at mondays.end, with a repeatDur of 3s.
+      </p>
+      <p>
+        The two sounds should take turns and play for 3 seconds each.
+      </p>
+      <p>
+        If the user agent does not support the WAV media format, the test is still a pass.
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: media-audio-210-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+
+    <audio xml:id="mondays" begin="0;problem.end" repeatDur="3"
+      repeatCount="5" xlink:href="../images/welcome.wav"/>
+
+    <audio xml:id="problem" begin="mondays.end" repeatDur="3"
+      repeatCount="5" xlink:href="../images/excuse_me.wav"/>
+
+    <rect x="10" y="10" width="10" height="10" fill="#FA5">
+      <animate xml:id="bar" attributeName="width"
+        begin="mondays.begin;problem.begin" dur="1" repeatCount="indefinite" end="mondays.end;problem.end"
+        values="10;30;50;30;200;20;120;150;50;10;50;138;190;40;60;10;180;140;100;10;190;145;180"/>
+    </rect>
+
+    <text x="10" y="30">Repeat the two sounds 3s of each</text>
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.5 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240" 
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

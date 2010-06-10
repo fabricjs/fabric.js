@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="AE,AN" owner="CL" desc="Verify property inheritance" status="accepted"
+    approved="yes"
+    version="$Revision: 1.10 $" testname="$RCSfile: styling-inherit-01-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>Verify property inheritance as required by 6.7 "Property inheritance". </p>
+      <p>For this test to pass:</p>
+      <p>At the center right, there is an ellipse. The fill color is not specified on that element but on its parent. The ellipse must be filled a solid yellow</p>
+      <p>At the top left, an oval shape is formed from a rectangle with a radial gradient. The color of the middle stop uses the keyword 'inherit' and thus takes its parent's value of green, giving a yellow, green, white gradient from the center to the edge.</p>
+      <p>At the bottom left, an oval shape is formed from a rectangle with a radial gradient. The color of the middle stop uses the value 'currentColor' and thus takes the value its parent's color property, a dark red, giving a yellow, dark red, white gradient from the center to the edge</p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: styling-inherit-01-t.svg,v $</title>
+  <defs>
+    <font-face font-family="SVGFreeSansASCII" unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii" />
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+    <g fill="yellow">
+      <g stroke="#555">
+        <ellipse rx="90" ry="60" cx="330" cy="140" />
+      </g>
+    </g>
+    <radialGradient xml:id="ygw" stop-color="green">
+      <stop offset="0%" stop-color="yellow" />
+      <stop offset="50%" stop-color="inherit" />
+      <stop offset="100%" stop-color="white" />
+    </radialGradient>
+    <rect width="180" height="120" x="40" y="20" stroke="none" fill="url(#ygw)" />
+    <radialGradient xml:id="yrw" color="#700">
+      <stop offset="0%" stop-color="yellow" />
+      <stop offset="50%" stop-color="currentColor" />
+      <stop offset="100%" stop-color="white" />
+    </radialGradient>
+    <rect width="180" height="120" x="40" y="160" stroke="none" fill="url(#yrw)" />
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none" fill="black">$Revision: 1.10 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000" />
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240"
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

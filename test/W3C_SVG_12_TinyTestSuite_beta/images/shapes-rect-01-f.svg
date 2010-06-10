@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">  
+
+<!--======================================================================-->
+<!--=  Copyright 2000 World Wide Web Consortium, (Massachusetts          =-->
+<!--=  Institute of Technology, Institut National de Recherche en        =-->
+<!--=  Informatique et en Automatique, Keio University). All Rights      =-->
+<!--=  Reserved. See http://www.w3.org/Consortium/Legal/.                =-->
+<!--======================================================================-->
+<!-- ===================================================================== -->
+<!--                                                                       -->
+<!-- shapes-rect-BE-01.svg                                                 -->
+<!-- renamed for 1.1 suite to shapes-rect-01-f.svg                         -->
+<!--                                                                       -->
+<!-- Test that viewer has the basic capability to handle the <rect>        -->
+<!-- element.                                                              -->
+<!--                                                                       -->
+<!-- Author : Kelvin R. Lawrence,   3-Feb-2000                             -->
+<!--                                                                       -->
+<!-- History:                                                              -->
+<!--   3-Feb-2000, KRL, Serial#1 created.  Matches 20000202 SVG spec.      -->
+<!--   27-Feb-2000, LH, Serial#2, fix TC name, formatting, create .XML     -->
+<!--   12-Mar-2000, LH, fix test-framing rect; ser#3                       -->
+<!--  03-Aug-2000, LH=" update DOCTYPE for CR DTD, 20000802" ser# .         -->
+<!--                                                                       -->
+<!-- ===================================================================== -->
+<!--======================================================================-->
+<!--= Note. After October 2000, revision history is kept as CVS 'commit' =-->
+<!--= log messages, and therefore is no longer in the preceding preamble.=-->
+<!--======================================================================-->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"  id="svg-root" width="480" height="360">
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/">
+    <OperatorScript>
+      <Paragraph>
+Verify that interpreter/viewer has basic capability to handle the 'rect'
+shape element.  Four pairs of rectangles should be displayed in the
+four quadrants, with the shapes in each pair being identical to each other.  
+Filling, stroking, and filling-plus-stroking are tested, as are the round-rect 
+attributes.  
+      </Paragraph>
+      <Paragraph>
+The rendered picture should match the reference image, except for possible
+variations in the labelling text (per CSS2 rules).  
+      </Paragraph>
+      <Paragraph>
+This test uses 'text' and 'path' elements, as well as
+fill (solid primary colors), stroke (primary colors and wide lines),
+font-family ("Helvetica"), and font-size properties within the 'style' attribute.
+      </Paragraph>
+    </OperatorScript>
+  </SVGTestCase>
+
+	<title id="test-title">shapes-rect-01-f</title>
+	<desc id="test-desc">Test that viewer has the basic capability to handle the &lt;rect&gt; element.</desc>
+	<!--======================================================================-->
+	<!--Content of Test Case follows...                  =====================-->
+	<!--======================================================================-->
+	<g id="test-body-content">
+		<!-- ====================================================================== -->
+		<!-- First of all draw two simple rectangles. One stroked , one filled.     -->
+		<!-- ====================================================================== -->
+		<text font-family="Helvetica" font-size="12"  x="160" y="14">Basic rectangles</text>
+		<text font-family="Helvetica" font-size="12"  x="82" y="20">width=50</text>
+		<text font-family="Helvetica" font-size="12"  x="78" y="36">height=80</text>
+		<rect id="Simple-rect-no-fill" fill="none" stroke="#000000"  x="30" y="46" width="50" height="80"/>
+		<rect id="Simple-rect-filled" fill="red"  x="130" y="46" width="50" height="80"/>
+		<text font-family="Helvetica" font-size="12"  x="36" y="142">stroked</text>
+		<text font-family="Helvetica" font-size="12"  x="142" y="142">filled</text>
+		<!-- ====================================================================== -->
+		<!-- Second set of rectangles this time with rounded corners.               -->
+		<!-- ====================================================================== -->
+		<text font-family="Helvetica" font-size="12"  x="302" y="20">width=50</text>
+		<text font-family="Helvetica" font-size="12"  x="298" y="36">height=80</text>
+		<text font-family="Helvetica" font-size="12"  x="310" y="52">rx=30</text>
+		<rect id="Simple-round-rect-no-fill" fill="none" stroke="#000000"  x="250" y="46" width="50" height="80" rx="30"/>
+		<rect id="Simple-round-rect-filled" fill="red"  x="350" y="46" width="50" height="80" rx="30"/>
+		<text font-family="Helvetica" font-size="12"  x="256" y="142">stroked</text>
+		<text font-family="Helvetica" font-size="12"  x="362" y="142">filled</text>
+		<!-- ====================================================================== -->
+		<!-- Third set of rectangles.                                               -->
+		<!-- ====================================================================== -->
+		<text font-family="Helvetica" font-size="12"  x="82" y="170">width=50</text>
+		<text font-family="Helvetica" font-size="12"  x="78" y="186">height=80</text>
+		<rect id="rect-03" fill="none" stroke="#0000FF" stroke-width="8"  x="30" y="196" width="50" height="80"/>
+		<rect id="rect-04" fill="#00FF00" stroke="#0000FF" stroke-width="8"  x="130" y="196" width="50" height="80"/>
+		<text font-family="Helvetica" font-size="12"  x="36" y="292">stroked</text>
+		<text font-family="Helvetica" font-size="12"  x="118" y="292">filled &amp; stroked</text>
+		<!-- ====================================================================== -->
+		<!-- Fourth set of rectangles.                                              -->
+		<!-- ====================================================================== -->
+		<text font-family="Helvetica" font-size="12"  x="272" y="170">width=50, height=80</text>
+		<text font-family="Helvetica" font-size="12"  x="296" y="186">rx=30 ry=50</text>
+		<rect id="rect-05" fill="none" stroke="#0000FF" stroke-width="8"  x="250" y="196" width="50" height="80" rx="30" ry="50"/>
+		<rect id="rect-06" fill="#00FF00"  x="350" y="196" width="50" height="80" rx="30" ry="50"/>
+		<text font-family="Helvetica" font-size="12"  x="256" y="292">stroked</text>
+		<text font-family="Helvetica" font-size="12"  x="362" y="292">filled</text>
+	</g>
+	<!--======================================================================-->
+	<!--Legend and frame:      Title, suite and SVG document serialization====-->
+	<!--======================================================================-->
+	<g id="test-legend" fill="black" font-family="Helvetica" font-size="10" >
+		<rect x="10" y="300" width="275" height="50" fill="none" stroke="#000000" />
+		<path fill="none" stroke="#000000"  d="M10 315 h275 M205 315 v35 M10 336 h195 M205 332 h80"/>
+		<text x="25" y="311">Scalable Vector Graphics (SVG) v1.1 Conformance Suite</text>
+		<a xlink:href="copyright-documents-19990405.html">
+			<text x="12" y="347" fill="blue" >Copyright 2002 W3C. All Rights Reserved.</text>
+		</a>
+		<text font-size="12"  x="35" y="330">shapes-rect-01-f</text>
+		<text font-size="10"  x="210" y="327">$Revision: 1.1 $</text>
+		<text font-size="10"  x="210" y="345">Release 1.0</text>
+		<rect id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000000" />
+	</g>
+</svg>

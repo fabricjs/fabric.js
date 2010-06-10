@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="AE" owner="MI" desc="Tests multiple x, y, rotate" status="accepted"
+    approved="yes"
+    version="$Revision: 1.6 $" testname="$RCSfile: text-text-07-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>Tests multiple x, y, rotate, with various combinations. Since an array of values is given, each glyph must use the value from the corresponding character in the list.</p>
+      <p>The rendered picture should match the reference image exactly, except for possible variations in the labelling text (per CSS2 rules).</p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: text-text-07-t.svg,v $</title>
+  <defs>
+    <font-face font-family="SVGFreeSansASCII" unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii" />
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+    <text x="240 260 280 300 320 340 360" y="60 80 100 120 140 160 180 200" font-size="35">Multi X Y</text>
+    <text x="10" y="60" rotate="0 10 20 30 40 50 60" font-size="35">ROTATE</text>
+    <text x="10 30 50 70 90 110 130 150 170 190 210 230 250" y="300 290 280 270 260 250 240 230 220 210 200 190 180" rotate="0 -10 -20 -30 -40 -50 -60 -70 -80 -90 -100 -110 -120" font-size="35">Both Together</text>
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none" fill="black">$Revision: 1.6 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000" />
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark"> 
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1" /> 
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240" text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text> 
+  </g>-->
+</svg>

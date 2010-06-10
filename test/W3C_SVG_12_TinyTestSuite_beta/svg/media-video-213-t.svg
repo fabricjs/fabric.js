@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="DOH" owner="AE" desc="Rotation with Video and Image" status="accepted"
+    approved="yes"
+    version="$Revision: 1.6 $" testname="$RCSfile: media-video-213-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>Rotation with Video and Image</p>
+      <p>
+        Tests the case when type is set to 'rotate' in animateTransform. The test
+        contains two objects; one video and one image. Both are rotated about a
+        point definied by the center of the black circle. The video will rotate
+        clockwise, and the image will rotate anti-clockwise.
+      </p>
+      <p>
+        If the user agent does not support the 3GP media format, the test is still a pass.
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: media-video-213-t.svg,v $</title>
+  <defs>
+    <font-face font-family="SVGFreeSansASCII" unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii" />
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+    <g text-anchor="middle">
+      <text xml:id="display-title" x="240" y="20" font-size="14" fill="#000">
+        Rotation with Video and Image
+      </text>
+    </g>
+    <rect x="15" y="55" fill="none" width="450" height="245" stroke="black" stroke-width="0.25"/>
+    <line x1="240" x2="240" y1="0" y2="300" stroke="blue" visibility="hidden"/>
+    <g >
+      <circle cx="240" cy="180" r="105" fill="none" stroke="black" stroke-width="10"/>
+
+      <g transform="translate(55,75)">
+        <g>
+          <rect width="185" height="105" fill="none" stroke="blue" stroke-width="6"/>
+          <video xml:id="v1" width="185" height="105" xlink:href="../images/dogandball.3gp" type="video/3gp" />
+          <animateTransform attributeName="transform" type="rotate" from="0,185,105" to="360,185,105" begin="0s" dur="20s" fill="freeze"/>
+        </g>
+      </g>
+
+      <g transform="translate(240,180)">
+        <g>
+          <rect width="185" height="105" fill="none" stroke="blue" stroke-width="6" stroke-opacity="0.4"/>
+          <image xml:id="i1" width="185" height="105" xlink:href="../images/dogandball.jpg"/>
+          <animateTransform attributeName="transform" type="rotate" from="0" to="-360" begin="0s" dur="20s" fill="freeze"/>
+        </g>
+      </g>
+
+    </g>
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.6 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240"
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

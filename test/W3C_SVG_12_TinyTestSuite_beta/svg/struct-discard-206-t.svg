@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="AE" owner="ED" desc="Tests that discard elements can be discarded before activation." status="accepted"
+    approved="yes"
+    version="$Revision: 1.5 $" testname="$RCSfile: struct-discard-206-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        Tests that discard elements can be discarded before activation.
+      </p>
+      <p>
+        The test has passed if after 3 seconds there is there are 4 green rects visible,
+        and nothing red.
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: struct-discard-206-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+    <g transform="translate(30,-30)">
+      <rect xml:id="r0" x="100" y="100" width="200" height="200" fill="red"/>
+      <rect xml:id="r1" x="100" y="100" width="100" height="100" fill="green"/>
+      <rect xml:id="r2" x="200" y="100" width="100" height="100" fill="green"/>
+      <rect xml:id="r3" x="100" y="200" width="100" height="100" fill="green"/>
+      <rect xml:id="r4" x="200" y="200" width="100" height="100" fill="green"/>
+      <rect xml:id="r5" x="100" y="100" width="200" height="200" fill="red"/>
+
+      <discard xml:id="discard1" xlink:href="#r1" begin="2s"/>
+      <discard xml:id="discard2" xlink:href="#r2" begin="2s"/>
+      <discard xml:id="discard3" xlink:href="#r3" begin="2s"/>
+      <discard xml:id="discard4" xlink:href="#r5"/>
+      <discard xml:id="discard5" xlink:href="#discard1" begin="1s"/>
+      <discard xml:id="discard6" xlink:href="#discard2" begin="0s"/>
+      <discard xml:id="discard7" xlink:href="#discard3"/>
+    </g>
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.5 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240" 
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

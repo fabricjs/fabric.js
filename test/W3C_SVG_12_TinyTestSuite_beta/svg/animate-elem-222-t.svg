@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="AE" owner="DOH" desc="Correct timing with begin, end, dur, fill, min." status="accepted"
+    approved="yes"
+    version="$Revision: 1.6 $" testname="$RCSfile: animate-elem-222-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        Correct timing with begin, end, dur, fill, min.
+      </p>
+      <p>
+        The main indication for a failed test is the appearance of red.
+      </p>
+      <p>
+        Simple from to animations for cx and cy of a blue stroked
+        circle are used with begin, dur, end, fill and min attributes and
+        correlated with syncbase values.
+        This is compared with simple animateMotion with the
+        same trajectory and timing.
+        The related red circle is always
+        covered by the blue stroke circle.
+        The gray path gives the correct trajectory.
+      </p>
+      <p>
+        The test is passed if the blue circle follows the defined path.
+        If part of the red circle becomes visible, the test is failed.
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: animate-elem-222-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+    <rect x="0" y="0" width="480" height="360" fill="#fff" />
+
+    <g transform="translate(120,0) scale(0.36)">
+      <circle cx="0" cy="0" r="90" fill="#f00">
+        <title>red comparison using animateMotion</title>
+        <animateMotion
+         from="100,100"
+         to="900,100"
+         dur="5s"
+         fill="freeze" />
+        <animateMotion
+        values="100,100"
+        begin="5s"
+        fill="freeze" />
+        <animateMotion
+        from="100,100"
+        to="100,900"
+        begin="10s"
+        dur="5s"
+        fill="freeze" />
+        <animateMotion
+         from="100,900"
+         to="900,900"
+         begin="20s"
+         dur="5s"
+         fill="freeze" />
+      </circle>
+
+
+
+
+
+
+      <circle cx="100" cy="100" r="60" stroke="#00f" stroke-width="60" fill="#f00">
+        <title>blue test using from-to animate with begin, end, dur, min, fill</title>
+        <animate id="a1" xml:id="a1"
+             attributeName="cx"
+             attributeType="XML"
+       from="100"
+       to="900"
+       dur="5s"
+       end="2.5s"
+       min="10s"
+       fill="remove" />
+
+        <animate id="a2" xml:id="a2"
+            attributeName="cy"
+            attributeType="XML"
+      from="100"
+      to="900"
+      begin="a1.end"
+      dur="5s"
+      end="a1.end+2.5s"
+      min="10s"
+      fill="freeze" />
+
+        <animate
+            attributeName="cx"
+            attributeType="XML"
+      from="100"
+      to="900"
+      begin="a2.end"
+      dur="5s"
+      fill="freeze" />
+      </circle>
+
+
+      <path  fill="none" stroke-width="60"
+      stroke="#888" stroke-linecap="round" stroke-linejoin="round"
+      d="M100,100 L900, 100 M100, 100 L100,900 900,900" />
+    </g>
+
+    <g id="myText" xml:id="myText" font-size="12" stroke="none">
+      <text x="10" y="50">begin, end, dur, min</text>
+      <text x="10" y="70">red=wrong </text>
+    </g>
+
+
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.6 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240"
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

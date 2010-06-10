@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="AE" owner="DOH" desc="accumulative animateMotion with rotate" status="accepted"
+    approved="yes"
+    version="$Revision: 1.4 $" testname="$RCSfile: animate-elem-202-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        Precision test for accumulative animateMotion.
+      </p>
+      <p>
+        The main indication for a failed test is the appearence of something
+        red and that circles are not centered below the paths given in gray.
+      </p>
+      <p>
+        Circles are moved along squares given with the path attribute,
+        repeatDur and accumulate with a repeatDur of 30s and repetition.
+        Different values for the rotate attribute are given too, this has no visible effect,
+        because centered circles are moved.
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: animate-elem-202-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+    <rect x="0" y="0" width="480" height="360" fill="#fff" />
+    <g transform="translate(80,-20) scale(0.45)">
+      <g>
+        <circle cx="0" cy="0" r="70" fill="#f00">
+          <animateMotion
+            dur="8s"
+            path="M100,100L100,500 500,500 500,100 100,100"
+            repeatDur="30s"
+            accumulate="sum"
+            fill="freeze" />
+        </circle>
+        <circle cx="0" cy="0" r="60"
+        stroke="#00f" stroke-width="20.5"
+        fill="#f00">
+          <animateMotion
+            dur="8s"
+            path="M100,100L100,500 500,500 500,100 100,100"
+            repeatDur="30s"
+            accumulate="sum"
+            fill="freeze"
+            rotate="auto" />
+        </circle>
+        <circle cx="0" cy="0" r="40"
+        stroke="#00f" stroke-width="20.5"
+        fill="#f00">
+          <animateMotion
+            dur="8s"
+            path="M100,100L100,500 500,500 500,100 100,100"
+            repeatDur="30s"
+            accumulate="sum"
+            fill="freeze"
+            rotate="auto-reverse" />
+        </circle>
+        <circle cx="0" cy="0" r="20"
+        stroke="#00f" stroke-width="20.5"
+        fill="#f00">
+          <animateMotion
+            dur="8s"
+            path="M100,100L100,500 500,500 500,100 100,100"
+            repeatDur="30s"
+            accumulate="sum"
+            fill="freeze"
+            rotate="60" />
+        </circle>
+
+      </g>
+
+      <g fill="none" stroke-width="20"
+        stroke="#888" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="100" y="100" width="400" height="400">
+          <set attributeName="display" to="none" begin="8s" />
+        </rect>
+        <rect x="200" y="200" width="400" height="400">
+          <set attributeName="display" to="none" begin="16s" />
+        </rect>
+        <rect x="300" y="300" width="400" height="400">
+          <set attributeName="display" to="none" begin="24s" />
+        </rect>
+        <path d="M400,400v400h400v-400" />
+      </g>
+    </g>
+
+    <g font-size="12" stroke="none" fill="#ccc">
+      <text x="10" y="160">animateMotion</text>
+      <text x="10" y="180">accumulate</text>
+      <text x="10" y="250">red = wrong</text>
+      <text x="10" y="265">circle not centered</text>
+      <text x="10" y="280">below path = wrong</text>
+    </g>
+
+
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.4 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240" 
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

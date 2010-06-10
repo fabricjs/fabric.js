@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">  
+
+<!--======================================================================-->
+<!--=  Copyright 2000 World Wide Web Consortium, (Massachusetts          =-->
+<!--=  Institute of Technology, Institut National de Recherche en        =-->
+<!--=  Informatique et en Automatique, Keio University). All Rights      =-->
+<!--=  Reserved. See http://www.w3.org/Consortium/Legal/.                =-->
+<!--======================================================================-->
+<!-- ===================================================================== -->
+<!--                                                                       -->
+<!-- path-lines-BE-01.svg                                                  -->
+<!-- renamed for 1.1 suite to paths-data-04-f.svg                          -->
+<!--                                                                       -->
+<!-- Test that viewer has the basic capability to handle the <path>        -->
+<!-- element and data (d) attribute in combination with the moveto,        -->
+<!-- lineto, and closepath commands - M, L, Z, m, l, and z.                -->
+<!--                                                                       -->
+<!-- Author : Lofton Henderson, 20-Jan-2000 (from Mark Sgarlato, Adobe).   -->
+<!--                                                                       -->
+<!-- History:                                                              -->
+<!--  20-Jan-2000, LH, Serial#1 created.  Matches 20000110 SVG spec.       -->
+<!--  12-Mar-2000, LH, fix test-framing rect; ser#2                        -->
+<!--  03-Aug-2000, LH=" update DOCTYPE for CR DTD, 20000802" ser# .         -->
+<!--  29-Oct-2000, JF: add fill-rule:evenodd to two paths to get same      -->
+<!--                   visual result as before. Necessary because default  -->
+<!--                   fill-rule is now nonzero. Update to ser#3.          -->
+<!--                                                                       -->
+<!-- ===================================================================== -->
+<!--======================================================================-->
+<!--= Note. After October 2000, revision history is kept as CVS 'commit' =-->
+<!--= log messages, and therefore is no longer in the preceding preamble.=-->
+<!--======================================================================-->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"  id="svg-root" width="480" height="360">
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/" >
+    <OperatorScript>
+      <Paragraph>
+Verify the basic capability to handle the 'path' element, and its data attribute (d)
+in combination with the straight-line path commands.
+Four pairs of figures should be displayed in the
+four quadrants. The shapes in each pair are identical, with one stroked and
+one filled.  Two pairs of concentric equilateral triangles are drawn using respectively
+M,L,Z and m,l,z.  The fill-mode default of "even-odd" means that 
+the inner triangle is hollow.  Two pairs of staircase figures are drawn using 
+respectively M,H,V,Z and m,h,v,z.
+      </Paragraph>
+      <Paragraph>
+The rendered picture should match the reference image exactly, except for possible
+variations in the labelling text (per CSS2 rules).  
+      </Paragraph>
+      <Paragraph>
+The test uses the 'rect' element, as well as basic fill (solid primary colors), 
+stroke (black 1-pixel lines), font-family (Helvetica) and font-size properties.
+      </Paragraph>
+    </OperatorScript>
+  </SVGTestCase>
+
+	<title id="test-title">paths-data-04-f</title>
+	<desc id="test-desc">Test that viewer has the basic capability to handle the &lt;path&gt; element and data (d) attribute in combination with the moveto, lineto, and closepath commands - M, L, Z, m, l, and z.</desc>
+	<!--======================================================================-->
+	<!--Content of Test Case follows...                  =====================-->
+	<!--======================================================================-->
+	<g id="test-body-content">
+		<!-- ====================================================================== -->
+		<!-- First Group of Triangles using M, L & Z commands ===================== -->
+		<!-- ====================================================================== -->
+		<text font-family="Helvetica" font-size="12"  x="160" y="14">Lines drawn with commands:</text>
+		<text font-family="Helvetica" font-size="12"  x="88" y="30">M, L, L, L, Z,</text>
+		<text font-family="Helvetica" font-size="12"  x="98" y="46">subpath</text>
+		<text font-family="Helvetica" font-size="12"  x="88" y="61">M, L, L, L, Z</text>
+		<path id="Triangle_stroke_MLZ" fill="none" stroke="#000000"  d="   M   62.00000   56.00000    L  113.96152  146.00000   L   10.03848  146.00000    L   62.00000   56.00000   Z    M   62.00000  71.00000   L  100.97114  138.50000   L   23.02886  138.50000   L   62.00000  71.00000   Z  "/>
+		<rect x="60.00000" y="54.00000" width="4" height="4" fill="#00C000" stroke="none" />
+		<rect x="111.96152" y="144.00000" width="4" height="4" fill="#00C000" stroke="none" />
+		<rect x="8.03848" y="144.00000" width="4" height="4" fill="#00C000" stroke="none" />
+		<rect x="60.00000" y="69.00000" width="4" height="4" fill="#00C000" stroke="none" />
+		<rect x="98.97114" y="136.50000" width="4" height="4" fill="#00C000" stroke="none" />
+		<rect x="21.02886" y="136.50000" width="4" height="4" fill="#00C000" stroke="none" />
+		<text font-family="Helvetica" font-size="12"  x="42" y="162">stroked</text>
+		<path id="Triangle_fill_MLZ" fill="#FF0000" stroke="none" fill-rule="evenodd"  d="   M  177.00000   56.00000    L  228.96152  146.00000   L  125.03848  146.00000    L  177.00000   56.00000   Z    M  177.00000  71.00000   L  215.97114  138.50000   L  138.02886  138.50000   L  177.00000  71.00000   Z  "/>
+		<rect x="175.00000" y="54.00000" width="4" height="4" fill="#00C000" stroke="none" />
+		<rect x="226.96152" y="144.00000" width="4" height="4" fill="#00C000" stroke="none" />
+		<rect x="123.03848" y="144.00000" width="4" height="4" fill="#00C000" stroke="none" />
+		<rect x="175.00000" y="69.00000" width="4" height="4" fill="#00C000" stroke="none" />
+		<rect x="213.97114" y="136.50000" width="4" height="4" fill="#00C000" stroke="none" />
+		<rect x="136.02886" y="136.50000" width="4" height="4" fill="#00C000" stroke="none" />
+		<text font-family="Helvetica" font-size="12"  x="162" y="162">filled</text>
+		<!-- ====================================================================== -->
+		<!-- Second Group of Triangles using m, l & z commands===================== -->
+		<!-- ====================================================================== -->
+		<text font-family="Helvetica" font-size="12"  x="96" y="180">m, l, l, l, z,</text>
+		<text font-family="Helvetica" font-size="12"  x="100" y="194">subpath</text>
+		<text font-family="Helvetica" font-size="12"  x="97" y="208">m, l, l, l, z</text>
+		<path id="Triangle_stroke_mlz" fill="none" stroke="#000000"  d="   m   62.00000  190.00000    l   51.96152   90.00000   l -103.92304    0.00000    l   51.96152  -90.00000   z    m    0.00000   15.00000   l   38.97114   67.50000   l  -77.91228    0.00000   l   38.97114  -67.50000   z  "/>
+		<rect x="60.00000" y="188.00000" width="4" height="4" fill="#FF0000" stroke="none" />
+		<rect x="111.96152" y="278.00000" width="4" height="4" fill="#FF0000" stroke="none" />
+		<rect x="8.03848" y="278.00000" width="4" height="4" fill="#FF0000" stroke="none" />
+		<rect x="60.00000" y="203.00000" width="4" height="4" fill="#FF0000" stroke="none" />
+		<rect x="98.97114" y="270.50000" width="4" height="4" fill="#FF0000" stroke="none" />
+		<rect x="21.02886" y="270.50000" width="4" height="4" fill="#FF0000" stroke="none" />
+		<path id="Triangle_fill_mlz" fill="#00C000" stroke="none" fill-rule="evenodd"  d="   m  177.00000  190.00000    l   51.96152   90.00000   l -103.92304    0.00000    l   51.96152  -90.00000   z    m    0.00000   15.00000   l   38.97114   67.50000   l  -77.91228    0.00000   l   38.97114  -67.50000   z  "/>
+		<rect x="175.00000" y="188.00000" width="4" height="4" fill="#FF0000" stroke="none" />
+		<rect x="226.96152" y="278.00000" width="4" height="4" fill="#FF0000" stroke="none" />
+		<rect x="123.03848" y="278.00000" width="4" height="4" fill="#FF0000" stroke="none" />
+		<rect x="175.00000" y="203.00000" width="4" height="4" fill="#FF0000" stroke="none" />
+		<rect x="213.97114" y="270.50000" width="4" height="4" fill="#FF0000" stroke="none" />
+		<rect x="136.02886" y="270.50000" width="4" height="4" fill="#FF0000" stroke="none" />
+		<!-- ====================================================================== -->
+		<!-- First Group of Stairs using M, H, V & Z commands====================== -->
+		<!-- ====================================================================== -->
+		<text font-family="Helvetica" font-size="12"  x="288" y="30">M, H, V, H,</text>
+		<text font-family="Helvetica" font-size="12"  x="288" y="46">V. H, V, H,</text>
+		<text font-family="Helvetica" font-size="12"  x="304" y="62">V, Z</text>
+		<path id="Stairs_stroke_MHVZ" fill="none" stroke="#000000"  d="   M  240.00000  56.00000    H  270.00000   V  86.00000    H  300.00000   V  116.00000    H  330.00000   V  146.00000    H  240.00000   V  56.00000    Z  "/>
+		<rect x="238.00000" y="54.00000" width="4" height="4" fill="#FFFF00" stroke="none" />
+		<rect x="268.00000" y="54.00000" width="4" height="4" fill="#FFFF00" stroke="none" />
+		<rect x="268.00000" y="84.00000" width="4" height="4" fill="#FFFF00" stroke="none" />
+		<rect x="298.00000" y="84.00000" width="4" height="4" fill="#FFFF00" stroke="none" />
+		<rect x="298.00000" y="114.00000" width="4" height="4" fill="#FFFF00" stroke="none" />
+		<rect x="328.00000" y="114.00000" width="4" height="4" fill="#FFFF00" stroke="none" />
+		<rect x="328.00000" y="144.00000" width="4" height="4" fill="#FFFF00" stroke="none" />
+		<rect x="238.00000" y="144.00000" width="4" height="4" fill="#FFFF00" stroke="none" />
+		<path id="Stairs_fill_MHVZ" fill="#0000FF" stroke="none"  d="   M  350.00000  56.00000   H  380.00000   V  86.00000    H  410.00000   V  116.00000    H  440.00000   V  146.00000    H  350.00000   V  56.00000    Z  "/>
+		<rect x="348.00000" y="54.00000" width="4" height="4" fill="#FFFF00" stroke="none" />
+		<rect x="378.00000" y="54.00000" width="4" height="4" fill="#FFFF00" stroke="none" />
+		<rect x="378.00000" y="84.00000" width="4" height="4" fill="#FFFF00" stroke="none" />
+		<rect x="408.00000" y="84.00000" width="4" height="4" fill="#FFFF00" stroke="none" />
+		<rect x="408.00000" y="114.00000" width="4" height="4" fill="#FFFF00" stroke="none" />
+		<rect x="438.00000" y="114.00000" width="4" height="4" fill="#FFFF00" stroke="none" />
+		<rect x="438.00000" y="144.00000" width="4" height="4" fill="#FFFF00" stroke="none" />
+		<rect x="348.00000" y="144.00000" width="4" height="4" fill="#FFFF00" stroke="none" />
+		<!-- ====================================================================== -->
+		<!-- Second Group of Stairs using m, h, v & z commands====================== -->
+		<!-- ====================================================================== -->
+		<text font-family="Helvetica" font-size="12"  x="288" y="180">m, h, v, h</text>
+		<text font-family="Helvetica" font-size="12"  x="288" y="194">v, h, v, h</text>
+		<text font-family="Helvetica" font-size="12"  x="304" y="208">v, z</text>
+		<path id="Stairs_stroke_mhvz" fill="none" stroke="#000000"  d="   m  240.00000  190.00000    h   30.00000   v   30.00000    h   30.00000   v   30.00000    h   30.00000   v   30.00000    h  -90.00000   v  -90.00000    z  "/>
+		<rect x="238.00000" y="188.00000" width="4" height="4" fill="#0000FF" stroke="none" />
+		<rect x="268.00000" y="188.00000" width="4" height="4" fill="#0000FF" stroke="none" />
+		<rect x="268.00000" y="218.00000" width="4" height="4" fill="#0000FF" stroke="none" />
+		<rect x="298.00000" y="218.00000" width="4" height="4" fill="#0000FF" stroke="none" />
+		<rect x="298.00000" y="248.00000" width="4" height="4" fill="#0000FF" stroke="none" />
+		<rect x="328.00000" y="248.00000" width="4" height="4" fill="#0000FF" stroke="none" />
+		<rect x="328.00000" y="278.00000" width="4" height="4" fill="#0000FF" stroke="none" />
+		<rect x="238.00000" y="278.00000" width="4" height="4" fill="#0000FF" stroke="none" />
+		<path id="Stairs_fill_mhvz" fill="#FFFF00" stroke="none"  d="   m  350.00000  190.00000    h   30.00000   v   30.00000    h   30.00000   v   30.00000    h   30.00000   v   30.00000    h  -90.00000   v  -90.00000    z  "/>
+		<rect x="348.00000" y="188.00000" width="4" height="4" fill="#0000FF" stroke="none" />
+		<rect x="378.00000" y="188.00000" width="4" height="4" fill="#0000FF" stroke="none" />
+		<rect x="378.00000" y="218.00000" width="4" height="4" fill="#0000FF" stroke="none" />
+		<rect x="408.00000" y="218.00000" width="4" height="4" fill="#0000FF" stroke="none" />
+		<rect x="408.00000" y="248.00000" width="4" height="4" fill="#0000FF" stroke="none" />
+		<rect x="438.00000" y="248.00000" width="4" height="4" fill="#0000FF" stroke="none" />
+		<rect x="438.00000" y="278.00000" width="4" height="4" fill="#0000FF" stroke="none" />
+		<rect x="348.00000" y="278.00000" width="4" height="4" fill="#0000FF" stroke="none" />
+	</g>
+	<!--======================================================================-->
+	<!--Legend and frame:      Title, suite and SVG document serialization====-->
+	<!--======================================================================-->
+	<g id="test-legend" fill="black" font-family="Helvetica" font-size="10" >
+		<rect x="10" y="300" width="275" height="50" fill="none" stroke="#000000" />
+		<path fill="none" stroke="#000000"  d="M10 315 h275 M205 315 v35 M10 336 h195 M205 332 h80"/>
+		<text x="25" y="311">Scalable Vector Graphics (SVG) v1.1 Conformance Suite</text>
+		<a xlink:href="copyright-documents-19990405.html">
+			<text x="12" y="347" fill="blue" >Copyright 2002 W3C. All Rights Reserved.</text>
+		</a>
+		<text font-size="12"  x="35" y="330">paths-data-04-f</text>
+		<text font-size="10"  x="210" y="327">$Revision: 1.1 $</text>
+		<text font-size="10"  x="210" y="345">Release 3.0</text>
+		<rect id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000000" />
+	</g>
+</svg>

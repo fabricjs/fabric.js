@@ -277,14 +277,11 @@
      * @method _initWrapperElement
      */
     _initWrapperElement: function (width, height) {
-      var wrapperProperties = { 
-        className: 'canvas_container',
-        style: {
-          width: width + 'px',
-          height: height + 'px'
-        }
-      };
-      var wrapper = Element.wrap(this.getElement(), 'div', wrapperProperties);
+      var wrapper = Element.wrap(this.getElement(), 'div', { className: 'canvas_container' });
+      wrapper.setStyle({
+        width: width + 'px',
+        height: height + 'px'
+      });
       this._makeElementUnselectable(wrapper);
       this.wrapper = wrapper;
     },

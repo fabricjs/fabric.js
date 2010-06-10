@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="AE" owner="ASl" desc="Test with two event handlers on the same object" status="accepted"
+    approved="yes"
+    version="$Revision: 1.7 $" testname="$RCSfile: script-handle-201-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        Test on event handling and scripting. While the mouse is over the rect, a new red rect should become visible underneath.
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: script-handle-201-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+
+    <text x="20" y="30" font-size="10">
+      Multiple eventhandlers on one object
+    </text>
+    <text x="20" y="45" font-size="10">
+      mouse-over/out events should change visibility of rectangle under the event target rectangle.
+    </text>
+    <text x="20" y="60" font-size="10">
+      move mouse over the rect.
+    </text>
+
+    <rect xml:id="r1" x="0" y="70" width="50" height="50" fill="white" stroke="black"
+      visibility="visible">
+
+      <animateTransform attributeName="transform" type="translate"
+        from="0 0" to="150 0" dur="3.5s" fill="freeze" additive="replace"/>
+
+      <animateTransform attributeName="transform" type="translate"
+        from="150 0" to="300 0" begin="3.5s" dur="3.5s" fill="freeze" additive="replace"/>
+    </rect>
+
+
+    <rect xml:id="r2" x="0" y="130" width="50" height="50" fill="red" stroke="black" visibility="hidden">
+      <animateTransform attributeName="transform" type="translate"
+    	from="0 0" to="150 0" dur="3.5s" fill="freeze" additive="replace"/>
+
+      <animateTransform attributeName="transform" type="translate"
+    	from="150 0" to="300 0" begin="3.5s" dur="3.5s" fill="freeze" additive="replace"/>
+
+    </rect>
+
+    <xe:listener observer="r1" event="mouseover" handler="#handler"/>
+    <xe:listener observer="r1" event="mouseout" handler="#handl"/>
+
+    <handler xml:id="handler" xe:event="resize" type="application/ecmascript">
+      flipVisibility();
+    </handler>
+
+    <handler xml:id="handl" xe:event="resize" type="application/ecmascript">
+      florpVisibility();
+    </handler>
+
+    <script type="text/ecmascript">
+      <![CDATA[
+        var r1 = document.getElementById("r1");
+        var r2 = document.getElementById("r2");
+        function flipVisibility()
+        {
+            if (r1.getTrait("visibility") == "visible") 
+            {
+                r2.setTrait("visibility", "visible");
+            }
+        }
+        function florpVisibility()
+        {
+            if (r1.getTrait("visibility") == "visible") 
+            {
+                r2.setTrait("visibility", "hidden");
+            }
+        }
+
+            ]]>
+    </script>
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.7 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240" 
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

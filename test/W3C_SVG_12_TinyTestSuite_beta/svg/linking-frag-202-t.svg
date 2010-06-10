@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="ED" owner="AE" desc="Testing Links to External 'svgView' with Transforms" status="accepted"
+    approved="yes"
+    version="$Revision: 1.6 $" testname="$RCSfile: linking-frag-202-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        Testing Links to external and internal 'svgView' with Transforms.
+      </p>
+      <p>
+        The first part of the test is passed if the rect links on the top line go to the linking-frag-202-t.svg file and
+        adjust the resulting view according to their respective text;
+        - The rect with 'Rotate' must link to the linking-frag-201-t.svg file and rotate resulting view
+        - The rect with 'Shift' must link to the linking-frag-201-t.svg file and shitf the resulting view
+        - The rect with 'Scale' must link to the linking-frag-201-t.svg file and scale the resulting view
+        - The rect with 'skewX' must link to the linking-frag-201-t.svg file and skew the resulting view along the X axis
+        - The rect with 'skewY' must link to the linking-frag-201-t.svg file and skew the resulting view along the Y axis
+        - The rect with 'identity' must link to the linking-frag-201-t.svg file and restore the view to an identity transformation.
+      </p>
+      <p>
+        The second part of the test is passed if the rect links on the bottom line link to this file and adjust the
+        resulting view according to their respective text;
+        - The rect with 'Rotate' must link to this file and rotate resulting view
+        - The rect with 'Shift' must link to this file and shitf the resulting view
+        - The rect with 'Scale' must link to this file and scale the resulting view
+        - The rect with 'skewX' must link to this file and skew the resulting view along the X axis
+        - The rect with 'skewY' must link to this file and skew the resulting view along the Y axis
+        - The rect with 'identity' must link to this file and restore the view to an identity transformation.
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: linking-frag-202-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+
+    <rect xml:id="outlineRect" width="50" height="25" stroke="#333" fill-opacity="0.5" />
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+    <g text-anchor="middle">
+      <text xml:id="display-title" fill="black" x="240" y="40" font-size="18">Testing Links to External 'svgView' with Transforms</text>
+      <text xml:id="comment-1" text-anchor="middle" fill="#555" x="240" y="65" font-size="12">
+        First line links to an svgView in an external file <tspan fill="black" font-style="italic">(linking-frag-201-t.svg)</tspan>
+      </text>
+      <text xml:id="comment-2" text-anchor="middle" fill="#555" x="240" y="80" font-size="12">
+        Second line links to an svgView in the local file
+      </text>
+    </g>
+
+    <rect x="30" y="100" width="420" height="140" fill="blue" fill-opacity=".1" />
+
+    <g transform="translate(10, 30)" font-size="12">
+      <a xml:id="a1" xlink:href="linking-frag-201-t.svg#svgView(transform(rotate(30, 150, 150)))" transform="translate(30,100)">
+        <use stroke-width="2" xlink:href="#outlineRect" fill="red">
+          <set attributeName="stroke-width" to="4" begin="a1.focusin" end="a1.focusout" />
+        </use>
+        <text x="25" y="17" stroke="none" stroke-width="0" fill="white" text-anchor="middle">Rotate</text>
+      </a>
+      <a xml:id="a2" xlink:href="linking-frag-201-t.svg#svgView(transform(translate(50, -50)))" transform="translate(100,100)">
+        <use stroke-width="2" xlink:href="#outlineRect" fill="blue" >
+          <set attributeName="stroke-width" to="4" begin="a2.focusin" end="a2.focusout" />
+        </use>
+        <text x="25" y="17" stroke="none" stroke-width="0" fill="white" text-anchor="middle">Shift</text>
+      </a>
+      <a xml:id="a3" xlink:href="linking-frag-201-t.svg#svgView(transform(scale(0.5)))" transform="translate(170,100)">
+        <use stroke-width="2" xlink:href="#outlineRect" fill="green" >
+          <set attributeName="stroke-width" to="4" begin="a3.focusin" end="a3.focusout" />
+        </use>
+        <text x="25" y="17" stroke="none" stroke-width="0" fill="white" text-anchor="middle">Scale</text>
+      </a>
+      <a xml:id="a4" xlink:href="linking-frag-201-t.svg#svgView(transform(skewX(15)))" transform="translate(240,100)">
+        <use stroke-width="2" xlink:href="#outlineRect" fill="purple" >
+          <set attributeName="stroke-width" to="4" begin="a4.focusin" end="a4.focusout" />
+        </use>
+        <text x="25" y="17" stroke="none" stroke-width="0" fill="white" text-anchor="middle">skewX</text>
+      </a>
+      <a xml:id="a5" xlink:href="linking-frag-201-t.svg#svgView(transform(skewY(15)))" transform="translate(310,100)">
+        <use stroke-width="2" xlink:href="#outlineRect" fill="maroon" >
+          <set attributeName="stroke-width" to="4" begin="a5.focusin" end="a5.focusout" />
+        </use>
+        <text x="25" y="17" stroke="none" stroke-width="0" fill="white" text-anchor="middle">skewY</text>
+      </a>
+      <a xml:id="a6" xlink:href="linking-frag-201-t.svg#svgView(transform(matrix(1 0 0 1 0 0)))" transform="translate(380,100)">
+        <use stroke-width="2" xlink:href="#outlineRect" fill="white" >
+          <set attributeName="stroke-width" to="4" begin="a6.focusin" end="a6.focusout" />
+        </use>
+        <text x="25" y="17" stroke="none" stroke-width="0" text-anchor="middle">identity</text>
+      </a>
+
+      <a xml:id="a7" xlink:href="#svgView(transform(rotate(30, 150, 150)))" transform="translate(30,150)">
+        <use stroke-width="2" xlink:href="#outlineRect" fill="red" >
+          <set attributeName="stroke-width" to="4" begin="a7.focusin" end="a7.focusout" />
+        </use>
+        <text x="25" y="17" stroke="none" stroke-width="0" fill="white" text-anchor="middle">Rotate</text>
+      </a>
+      <a xml:id="a8" xlink:href="#svgView(transform(translate(50, -50)))" transform="translate(100,150)">
+        <use stroke-width="2" xlink:href="#outlineRect" fill="blue" >
+          <set attributeName="stroke-width" to="4" begin="a8.focusin" end="a8.focusout" />
+        </use>
+        <text x="25" y="17" stroke="none" stroke-width="0" fill="white" text-anchor="middle">Shift</text>
+      </a>
+      <a xml:id="a9" xlink:href="#svgView(transform(scale(0.5)))" transform="translate(170,150)">
+        <use stroke-width="2" xlink:href="#outlineRect" fill="green" >
+          <set attributeName="stroke-width" to="4" begin="a9.focusin" end="a9.focusout" />
+        </use>
+        <text x="25" y="17" stroke="none" stroke-width="0" fill="white" text-anchor="middle">Scale</text>
+      </a>
+      <a xml:id="a10" xlink:href="#svgView(transform(skewX(15)))" transform="translate(240,150)">
+        <use stroke-width="2" xlink:href="#outlineRect" fill="purple" >
+          <set attributeName="stroke-width" to="4" begin="a10.focusin" end="a10.focusout" />
+        </use>
+        <text x="25" y="17" stroke="none" stroke-width="0" fill="white" text-anchor="middle">skewX</text>
+      </a>
+      <a xml:id="a11" xlink:href="#svgView(transform(skewY(15)))" transform="translate(310,150)">
+        <use stroke-width="2" xlink:href="#outlineRect" fill="maroon" >
+          <set attributeName="stroke-width" to="4" begin="a11.focusin" end="a11.focusout" />
+        </use>
+        <text x="25" y="17" stroke="none" stroke-width="0" fill="white" text-anchor="middle">skewY</text>
+      </a>
+      <a xml:id="a12" xlink:href="#svgView(transform(matrix(1 0 0 1 0 0)))" transform="translate(380,150)">
+        <use stroke-width="2" xlink:href="#outlineRect" fill="white" >
+          <set attributeName="stroke-width" to="4" begin="a12.focusin" end="a12.focusout" />
+        </use>
+        <text x="25" y="17" stroke="none" stroke-width="0" text-anchor="middle">identity</text>
+      </a>
+    </g>
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none" fill="black">$Revision: 1.6 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240" 
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

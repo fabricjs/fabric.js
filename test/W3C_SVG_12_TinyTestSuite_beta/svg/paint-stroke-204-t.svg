@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="NR" owner="DOH" desc="Precision tests for stroke-linejoin" status="accepted"
+    approved="yes"
+    version="$Revision: 1.5 $" testname="$RCSfile: paint-stroke-204-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        Precision tests for stroke-linejoin.
+      </p>
+      <p>
+        The main indication for a failed test is the appearence of something red.
+      </p>
+      <p>
+        stroke-linejoin is tested, using a comparsion with filled or stroked paths or shapes with the same appearance.
+        This is tested for different three miter angles for the values round, miter and bevel, for each of them one with
+        test path on top of the comparsion shapes and one with the path below.
+      </p>
+      The four paths top right test the inheritance either for the value explicitely set to 'inherit' or a missing stroke-linejoin property.
+      <p>
+      </p>
+      <p>
+        The top is always blue. If something
+        red gets visible, an error is occured.
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: paint-stroke-204-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+
+    <rect x="0" y="0" width="480" height="360" fill="#fff" />
+    <g stroke-linejoin="miter" stroke-miterlimit="10">
+      <g transform="translate(-25,-25) scale(0.75)">
+        <title>stroke-linejoin round (on top)</title>
+        <path d="M50,50L50,100 M50,100 100,100" stroke-width="20" stroke="red" fill="none"/>
+        <circle cx="50" cy="100" r="10" fill="red" />
+        <path d="M50,50L50,100 100,100" stroke-width="20" stroke-linejoin="round" stroke="blue" fill="none"/>
+
+        <path d="M200,50L150,100 M150,100 200,100" stroke-width="20" stroke="red" fill="none"/>
+        <circle cx="150" cy="100" r="10" fill="red" />
+        <path d="M200,50L150,100 200,100" stroke-width="20" stroke-linejoin="round" stroke="blue" fill="none"/>
+
+        <path d="M250,50L300,100 M300,100 350,100" stroke-width="20" stroke="red" fill="none"/>
+        <circle cx="300" cy="100" r="10" fill="red" />
+        <path d="M250,50L300,100 350,100" stroke-width="20" stroke-linejoin="round" stroke="blue" fill="none"/>
+      </g>
+
+      <g transform="translate(-25,35) scale(0.75)">
+        <title>stroke-linejoin round (below)</title>
+        <path d="M50,50L50,100 100,100" stroke-width="20" stroke-linejoin="round" stroke="red" fill="none"/>
+        <path d="M50,50L50,100 M50,100 100,100" stroke-width="20" stroke="blue" fill="none"/>
+        <circle cx="50" cy="100" r="10" fill="blue" />
+
+        <path d="M200,50L150,100 200,100" stroke-width="20" stroke-linejoin="round" stroke="red" fill="none"/>
+        <path d="M200,50L150,100 M150,100 200,100" stroke-width="20" stroke="blue" fill="none"/>
+        <circle cx="150" cy="100" r="10" fill="blue" />
+
+        <path d="M250,50L300,100 350,100" stroke-width="20" stroke-linejoin="round" stroke="red" fill="none"/>
+        <path d="M250,50L300,100 M300,100 350,100" stroke-width="20" stroke="blue" fill="none"/>
+        <circle cx="300" cy="100" r="10" fill="blue" />
+      </g>
+
+
+
+      <g transform="translate(-25,120) scale(0.75)">
+        <title>stroke-linejoin miter (on top)</title>
+
+        <path d="M50,50L50,110 M40,100 100,100" stroke-width="20" stroke="red" fill="none"/>
+        <path d="M50,50L50,100 100,100" stroke-width="20" stroke-linejoin="miter" stroke="blue" fill="none"/>
+
+        <path d="M192.928932188,42.928932188            
+                 L125.857864376,110 200,110 200,90 174.142135624,90 207.071067812,57.071067812z" fill="red"/>
+        <path d="M200,50L150,100 200,100" stroke-width="20" stroke-linejoin="miter" stroke="blue" fill="none"/>
+
+        <path d="M242.928932188,57.071067812           
+                 L295.857864376,110 350,110 350,90 304.142135624,90 257.071067812,42.928932188z" fill="red"/>
+        <path d="M250,50L300,100 350,100" stroke-width="20" stroke-linejoin="miter" stroke="blue" fill="none"/>
+      </g>
+
+      <g transform="translate(-25,180) scale(0.75)">
+        <title>stroke-linejoin miter (below)</title>
+        <path d="M50,50L50,100 100,100" stroke-width="20" stroke-linejoin="miter" stroke="red" fill="none"/>
+        <path d="M50,50L50,110 M40,100 100,100" stroke-width="20" stroke="blue" fill="none"/>
+
+        <path d="M200,50L150,100 200,100" stroke-width="20" stroke-linejoin="miter" stroke="red" fill="none"/>
+        <path d="M192.928932188,42.928932188            
+                 L125.857864376,110 200,110 200,90 174.142135624,90 207.071067812,57.071067812z" fill="blue"/>
+
+        <path d="M250,50L300,100 350,100" stroke-width="20" stroke-linejoin="miter" stroke="red" fill="none"/>
+        <path d="M242.928932188,57.071067812           
+                 L295.857864376,110 350,110 350,90 304.142135624,90 257.071067812,42.928932188z" fill="blue"/>
+      </g>
+
+
+      <g transform="translate(215,-25) scale(0.75)">
+        <title>stroke-linejoin bevel (on top)</title>
+
+        <path d="M40,50L40,100 50,110 100,110 100,90 60,90 60,50z" fill="red"/>
+        <path d="M50,50L50,100 100,100" stroke-width="20" stroke-linejoin="bevel" stroke="blue" fill="none"/>
+
+        <path d="M192.928932188,42.928932188            
+                 L142.928932188,92.928932188 150,110
+		 200,110 200,90 174.142135624,90 207.071067812,57.071067812z" fill="red"/>
+        <path d="M200,50L150,100 200,100" stroke-width="20" stroke-linejoin="bevel" stroke="blue" fill="none"/>
+
+        <path d="M242.928932188,57.071067812           
+                 L292.928932188,107.071067812 300,110
+		 350,110 350,90 304.142135624,90 257.071067812,42.928932188z" fill="red"/>
+        <path d="M250,50L300,100 350,100" stroke-width="20" stroke-linejoin="bevel" stroke="blue" fill="none"/>
+      </g>
+
+      <g transform="translate(215,35) scale(0.75)">
+        <title>stroke-linejoin bevel (below)</title>
+        <path d="M50,50L50,100 100,100" stroke-width="20" stroke-linejoin="bevel" stroke="red" fill="none"/>
+        <path d="M40,50L40,100 50,110 100,110 100,90 60,90 60,50z" fill="blue"/>
+
+        <path d="M200,50L150,100 200,100" stroke-width="20" stroke-linejoin="bevel" stroke="red" fill="none"/>
+        <path d="M192.928932188,42.928932188            
+                 L142.928932188,92.928932188 150,110 200,110 200,90 174.142135624,90 207.071067812,57.071067812z" fill="blue"/>
+
+        <path d="M250,50L300,100 350,100" stroke-width="20" stroke-linejoin="bevel" stroke="red" fill="none"/>
+        <path d="M242.928932188,57.071067812           
+                 L292.928932188,107.071067812 300,110 350,110 350,90 304.142135624,90 257.071067812,42.928932188z" fill="blue"/>
+      </g>
+
+      <g  transform="translate(250,140)" stroke-linejoin="round" stroke="blue" fill="none" stroke-width="10">
+        <title>inheritance test (on top, round)</title>
+        <path d="M0,150L25,120 50,150" stroke-linejoin="round" stroke="red" fill="none" stroke-width="10" />
+        <path d="M1000,0L1000,0" stroke-linejoin="miter" />
+        <path d="M0,150L25,120 50,150" stroke-linejoin="inherit" />
+
+        <path d="M0,0L100,200 50,0" stroke-linejoin="round" stroke="red" fill="none" stroke-width="10" />
+        <path d="M0,0L100,200 50,0" />
+      </g>
+
+      <g  transform="translate(370,140)" stroke-linejoin="round" stroke="red" fill="none" stroke-width="10">
+        <title>inheritance test (below, round)</title>
+        <path d="M1000,0L1000,0" stroke-linejoin="miter" />
+        <path d="M0,150L25,120 50,150" stroke-linejoin="inherit" />
+        <path d="M0,150L25,120 50,150" stroke-linejoin="round" stroke="blue" fill="none" stroke-width="10" />
+
+        <path d="M0,0L100,200 50,0" />
+        <path d="M0,0L100,200 50,0" stroke-linejoin="round" stroke="blue" fill="none" stroke-width="10" />
+      </g>
+    </g>
+    <g font-size="12" stroke="none" fill="#ccc">
+      <text x="20" y="283">stroke-linejoin:</text>
+      <text x="20" y="295">red = wrong</text>
+    </g>
+
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.5 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240" 
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>
