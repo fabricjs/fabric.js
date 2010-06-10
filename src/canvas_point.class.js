@@ -89,8 +89,8 @@
       return new Point(this.x + (that.x - this.x) * t, this.y + (that.y - this.y) * t);
     },
     distanceFrom: function (that) {
-      var dx = this.x - that.x;
-      var dy = this.y - that.y;
+      var dx = this.x - that.x,
+          dy = this.y - that.y;
       return Math.sqrt(dx * dx + dy * dy);
     },
     min: function (that) {
@@ -111,8 +111,8 @@
       this.y = that.y;
     },
     swap: function (that) {
-      var x = this.x;
-      var y = this.y;
+      var x = this.x,
+          y = this.y;
       this.x = that.x;
       this.y = that.y;
       that.x = x;

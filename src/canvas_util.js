@@ -2,7 +2,9 @@
   
   var Canvas = this.Canvas || (this.Canvas = { });
   
-  if (Canvas.util) return;
+  if (Canvas.util) {
+    return;
+  }
   
   /**
    * @static
