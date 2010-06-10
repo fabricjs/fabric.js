@@ -1,7 +1,11 @@
 (function(){
   
   var Canvas = this.Canvas || (this.Canvas = { });
-  if (Canvas.Ellipse) return;
+  
+  if (Canvas.Ellipse) {
+    console.warn('Canvas.Ellipse is already defined.');
+    return;
+  }
   
   Canvas.Ellipse = Class.create(Canvas.Object, {
     

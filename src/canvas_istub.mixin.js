@@ -1,5 +1,7 @@
 (function(){
+  
   var Canvas = this.Canvas || (this.Canvas = { });
+  
   Canvas.IStub = {
     /**
      * @method initStub

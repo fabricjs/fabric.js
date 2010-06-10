@@ -1,7 +1,9 @@
 (function(){
   
   var Canvas = this.Canvas || (this.Canvas = { });
-  if (Canvas.Line) return;
+  if (Canvas.Line) {
+    return;
+  }
   
   Canvas.Line = Class.create(Canvas.Object, {
     

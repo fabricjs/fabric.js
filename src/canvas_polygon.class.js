@@ -1,10 +1,12 @@
 (function(){
   
   var Canvas = this.Canvas || (this.Canvas = { });
-  if (Canvas.Polygon) return;
+  if (Canvas.Polygon) {
+    return;
+  }
   
-  function byX(p) { return p.x }
-  function byY(p) { return p.y }
+  function byX(p) { return p.x; }
+  function byY(p) { return p.y; }
   
   Canvas.Polygon = Class.create(Canvas.Object, {
     
@@ -51,7 +53,7 @@
         return {
           x: point.x - this.minX, 
           y: point.y - this.minY
-        }
+        };
       }, this);
     },
     
@@ -109,8 +111,8 @@
    */
   Canvas.Polygon.fromElement = function(element, options) {
     if (!element) return null;
-    var points = Canvas.parsePointsAttribute(element.getAttribute('points'));
-    var parsedAttributes = Canvas.parseAttributes(element, Canvas.Polygon.ATTRIBUTE_NAMES);
+    var points = Canvas.parsePointsAttribute(element.getAttribute('points')),
+        parsedAttributes = Canvas.parseAttributes(element, Canvas.Polygon.ATTRIBUTE_NAMES);
     return new Canvas.Polygon(points, Object.extend(parsedAttributes, options));
   };
   

@@ -282,7 +282,7 @@
         width: width + 'px',
         height: height + 'px'
       });
-      this._makeElementUnselectable(wrapper);
+      Element.makeUnselectable(wrapper);
       this.wrapper = wrapper;
     },
     
@@ -369,7 +369,7 @@
         // if that didn't work, throw error
         throw CANVAS_INIT_ERROR;
       }
-      this._makeElementUnselectable(oContainer);
+      Element.makeUnselectable(oContainer);
       return oContainer;
     },
 
@@ -393,16 +393,6 @@
       var canvas = this._createCanvasElement('canvas-container');
       this._oContextBackgroundEl = canvas;
       this._oContextBackground = canvas.getContext('2d');
-    },
-    
-    /**
-     * @private
-     * @method _makeElementUnselectable
-     */
-    _makeElementUnselectable: function (element) {
-      if ('onselectstart' in element) {
-        element.onselectstart = Prototype.falseFunction;
-      }
     },
     
     /**

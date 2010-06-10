@@ -1,4 +1,4 @@
-(function(){
+(function() {
   
   var global = this;
   
@@ -7,7 +7,7 @@
   }
   
   if (global.Canvas.Image) {
-    console.warn('Canvas.Image is already defined. Skipping');
+    console.warn('Canvas.Image is already defined.');
     return;
   };
   

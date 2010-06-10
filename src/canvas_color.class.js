@@ -1,4 +1,13 @@
-(function(){
+(function() {
+  
+  var Canvas = this.Canvas || (this.Canvas = { });
+  
+  if (Canvas.Color) {
+    console.warn('Canvas.Color is already defined.');
+    return;
+  }
+  
+  Canvas.Color = Color;
   
   /**
    * @constructor
@@ -70,8 +79,10 @@
     
     var r = source[0].toString(16);
     r = (r.length == 1) ? ('0' + r) : r;
+    
     var g = source[1].toString(16);
     g = (g.length == 1) ? ('0' + g) : g;
+    
     var b = source[2].toString(16);
     b = (b.length == 1) ? ('0' + b) : b;
     
@@ -224,7 +235,7 @@
         parseInt(g, 16),
         parseInt(b, 16),
         1
-      ]
+      ];
     }
   };
   
@@ -238,8 +249,4 @@
     oColor.setSource(source);
     return oColor;
   };
-  
-  if (this.Canvas && !this.Canvas.Color) {
-    this.Canvas.Color = Color;
-  }
 })();

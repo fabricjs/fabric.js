@@ -6,7 +6,9 @@
    * @namespace
    */
   var Canvas = global.Canvas || (global.Canvas = { });
-  if (Canvas.Object) return;
+  if (Canvas.Object) {
+    return;
+  }
   
   var _slice = Array.prototype.slice;
   

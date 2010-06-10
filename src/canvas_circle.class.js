@@ -1,10 +1,13 @@
-(function(){
+(function() {
   
   var global  = this,
       Canvas  = global.Canvas || (global.Canvas = { }),
       piBy2   = Math.PI * 2;
   
-  if (Canvas.Circle) return;
+  if (Canvas.Circle) {
+    console.warn('Canvas.Circle is already defined.');
+    return;
+  }
   
   Canvas.Circle = Class.create(Canvas.Object, /** @lends Canvas.Circle.prototype */ {
     

@@ -1,7 +1,9 @@
 (function(){
   
   var Canvas = this.Canvas || (this.Canvas = { });
-  if (Canvas.Rect) return;
+  if (Canvas.Rect) {
+    return;
+  }
   
   /** 
    * @class Rect

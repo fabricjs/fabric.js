@@ -1,7 +1,9 @@
 (function(){
   
   var Canvas = this.Canvas || (this.Canvas = { });
-  if (Canvas.Group) return;
+  if (Canvas.Group) {
+    return;
+  }
   
   Canvas.Group = Class.create(Canvas.Object, {
     
@@ -41,13 +43,13 @@
      * @method _updateObjectsCoords
      */
     _updateObjectsCoords: function() {
-      var groupDeltaX = this.left;
-      var groupDeltaY = this.top;
+      var groupDeltaX = this.left,
+          groupDeltaY = this.top;
       
       this.forEachObject(function(object) {
         
-        var objectLeft = object.get('left');
-        var objectTop = object.get('top');
+        var objectLeft = object.get('left'),
+            objectTop = object.get('top');
         
         object.set('originalLeft', objectLeft);
         object.set('originalTop', objectTop);

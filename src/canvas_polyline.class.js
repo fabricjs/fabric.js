@@ -1,7 +1,9 @@
 (function(){
   
   var Canvas = this.Canvas || (this.Canvas = { });
-  if (Canvas.Polyline) return;
+  if (Canvas.Polyline) {
+    return;
+  }
   
   Canvas.Polyline = Class.create(Canvas.Object, {
     
@@ -87,8 +89,8 @@
    */
   Canvas.Polyline.fromElement = function(element, options) {
     if (!element) return null;
-    var points = Canvas.parsePointsAttribute(element.getAttribute('points'));
-    var parsedAttributes = Canvas.parseAttributes(element, ATTRIBUTE_NAMES);
+    var points = Canvas.parsePointsAttribute(element.getAttribute('points')),
+        parsedAttributes = Canvas.parseAttributes(element, ATTRIBUTE_NAMES);
     return new Canvas.Polyline(points, Object.extend(parsedAttributes, options));
   };
   

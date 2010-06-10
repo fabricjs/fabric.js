@@ -1,7 +1,9 @@
 (function(){
   
   var Canvas = this.Canvas || (this.Canvas = { });
-  if (Canvas.PathGroup) return;
+  if (Canvas.PathGroup) {
+    return;
+  }
   
   Canvas.PathGroup = Class.create(Canvas.Path, Canvas.IStub, Enumerable, {
     

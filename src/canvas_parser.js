@@ -23,7 +23,9 @@
    */
   function parseAttributes(element, attributes) {
     
-    if (!element) return;
+    if (!element) {
+      return;
+    }
     
     var value, 
         parsed, 
