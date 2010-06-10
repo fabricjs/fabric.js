@@ -945,8 +945,8 @@
           y2 = y1 + this._groupSelector.top,
           currentObject;
       
-      var selectionX1Y1 = new Canvas.Point2D(Math.min(x1,x2), Math.min(y1,y2)),
-          selectionX2Y2 = new Canvas.Point2D(Math.max(x1,x2), Math.max(y1,y2));
+      var selectionX1Y1 = new Canvas.Point(Math.min(x1, x2), Math.min(y1, y2)),
+          selectionX2Y2 = new Canvas.Point(Math.max(x1, x2), Math.max(y1, y2));
       
       for (var i=0, l=this._aObjects.length; i<l; ++i) {
         currentObject = this._aObjects[i];

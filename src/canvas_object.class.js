@@ -724,10 +724,10 @@
      */
     intersectsWithRect: function(selectionTL, selectionBR) {
       var oCoords = this.oCoords,
-          tl = new Canvas.Point2D(oCoords.tl.x, oCoords.tl.y),
-          tr = new Canvas.Point2D(oCoords.tr.x, oCoords.tr.y),
-          bl = new Canvas.Point2D(oCoords.bl.x, oCoords.bl.y),
-          br = new Canvas.Point2D(oCoords.br.x, oCoords.br.y);
+          tl = new Canvas.Point(oCoords.tl.x, oCoords.tl.y),
+          tr = new Canvas.Point(oCoords.tr.x, oCoords.tr.y),
+          bl = new Canvas.Point(oCoords.bl.x, oCoords.bl.y),
+          br = new Canvas.Point(oCoords.br.x, oCoords.br.y);
       
       var intersection = Canvas.Intersection.intersectPolygonRectangle(
         [tl, tr, br, bl],
@@ -747,10 +747,10 @@
       // extracts coords
       function getCoords(oCoords) {
         return {
-          tl: new Canvas.Point2D(oCoords.tl.x, oCoords.tl.y),
-          tr: new Canvas.Point2D(oCoords.tr.x, oCoords.tr.y),
-          bl: new Canvas.Point2D(oCoords.bl.x, oCoords.bl.y),
-          br: new Canvas.Point2D(oCoords.br.x, oCoords.br.y)
+          tl: new Canvas.Point(oCoords.tl.x, oCoords.tl.y),
+          tr: new Canvas.Point(oCoords.tr.x, oCoords.tr.y),
+          bl: new Canvas.Point(oCoords.bl.x, oCoords.bl.y),
+          br: new Canvas.Point(oCoords.br.x, oCoords.br.y)
         }
       }
       var thisCoords = getCoords(this.oCoords),
@@ -772,10 +772,10 @@
      */
     isContainedWithinRect: function(selectionTL, selectionBR) {
       var oCoords = this.oCoords,
-          tl = new Canvas.Point2D(oCoords.tl.x, oCoords.tl.y),
-          tr = new Canvas.Point2D(oCoords.tr.x, oCoords.tr.y),
-          bl = new Canvas.Point2D(oCoords.bl.x, oCoords.bl.y),
-          br = new Canvas.Point2D(oCoords.br.x, oCoords.br.y);
+          tl = new Canvas.Point(oCoords.tl.x, oCoords.tl.y),
+          tr = new Canvas.Point(oCoords.tr.x, oCoords.tr.y),
+          bl = new Canvas.Point(oCoords.bl.x, oCoords.bl.y),
+          br = new Canvas.Point(oCoords.br.x, oCoords.br.y);
       return tl.x > selectionTL.x
         && tr.x < selectionBR.x
         && tl.y > selectionTL.y
