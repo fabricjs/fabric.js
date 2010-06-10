@@ -15,7 +15,7 @@
   
   function Point2D(x, y) {
     if (arguments.length > 0) {
-      this.init(x,y);
+      this.init(x, y);
     }
   }
   Point2D.prototype = {
@@ -140,11 +140,11 @@
     this.points = this.points.concat(points);
   };
   
-  Intersection.intersectLineLine = function (a1,a2,b1,b2) {
+  Intersection.intersectLineLine = function (a1, a2, b1, b2) {
     var result;
-    var ua_t = (b2.x-b1.x) * (a1.y-b1.y) - (b2.y-b1.y) * (a1.x-b1.x);
-    var ub_t = (a2.x-a1.x) * (a1.y-b1.y) - (a2.y-a1.y) * (a1.x-b1.x);
-    var u_b = (b2.y-b1.y) * (a2.x-a1.x) - (b2.x-b1.x) * (a2.y-a1.y);
+    var ua_t = (b2.x - b1.x) * (a1.y - b1.y) - (b2.y - b1.y) * (a1.x - b1.x);
+    var ub_t = (a2.x - a1.x) * (a1.y - b1.y) - (a2.y - a1.y) * (a1.x - b1.x);
+    var u_b = (b2.y - b1.y) * (a2.x - a1.x) - (b2.x - b1.x) * (a2.y - a1.y);
     if (u_b != 0) {
       var ua = ua_t/u_b;
       var ub = ub_t/u_b;
