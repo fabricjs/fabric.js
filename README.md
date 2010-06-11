@@ -43,6 +43,63 @@
     
     canvas.add(rect);
 
+### Object Model hierarchy
+    
+      Canvas.Object
+        |
+        -- Canvas.Line
+        |
+        -- Canvas.Circle
+        |
+        -- Canvas.Ellipse
+        |
+        -- Canvas.Rect
+        |
+        -- Canvas.Polyline
+        |
+        -- Canvas.Polygon
+        |
+        -- Canvas.Group
+        |
+        -- Canvas.Text
+        |
+        -- Canvas.Image
+        |
+        -- Canvas.Path
+             |
+             -- Canvas.PathGroup
+      
+      
+      Canvas.util
+        |
+        -- removeFromArray
+        |
+        -- degreesToRadians
+        |
+        -- toFixed
+        |
+        -- getRandomInt
+    
+      
+      Canvas
+        |
+        -- parseAttributes
+        |
+        -- parseElements
+        |
+        -- parseStyleAttribute
+        |
+        -- parsePointsAttribute
+      
+      
+      Canvas.Element
+
+      Canvas.Point
+
+      Canvas.Intersection
+
+      Canvas.Color
+
 ### Credits
 
 - Ernest Delgado for the original idea of [manipulating images on canvas](http://www.ernestdelgado.com/archive/canvas/).
