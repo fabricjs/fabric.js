@@ -1,15 +1,20 @@
-### What is it?
-
 **Fabric.js** is a framework that makes it easy to work with HTML5 canvas element. It is an **interactive object model** on top of canvas element. It is also an **SVG-to-canvas parser**.
 
-### What are the features?
+### Goals
 
 - Unit tested
 - Modular
 - Cross-browser
 - Fast
 
-### How do I use it?
+### Supported browsers
+
+- Firefox 2+
+- Safari 3+
+- Opera 9.64+
+- Chrome 1+
+
+### Examples of use
 
 #### Adding red rectangle to canvas
   
