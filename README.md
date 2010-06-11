@@ -14,6 +14,16 @@
 - Opera 9.64+
 - Chrome 1+
 
+### Building
+
+1. Install [Sprockets](http://github.com/sstephenson/sprockets)
+
+        $ gem install --remote sprockets
+
+2. Build distribution file
+
+        $ sprocketize fabric.js > dist/all.js
+
 ### Examples of use
 
 #### Adding red rectangle to canvas

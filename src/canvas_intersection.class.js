@@ -1,3 +1,5 @@
+//= require 'canvas_point.class'
+
 (function() {
   
   /* Adaptation of work of Kevin Lindsey (kevin@kevlindev.com) */

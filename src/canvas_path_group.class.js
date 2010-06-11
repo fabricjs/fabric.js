@@ -1,3 +1,5 @@
+//= require "canvas_path.class"
+
 (function(){
   
   var Canvas = this.Canvas || (this.Canvas = { });

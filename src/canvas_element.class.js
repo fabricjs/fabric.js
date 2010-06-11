@@ -1,6 +1,3 @@
-/*jslint onevar: true, undef: true, eqeqeq: true, bitwise: true, regexp: true, newcap: true, immed: true */
-/*global Image: false, APE: false, $: false */
-
 (function () {
   
   var global = this,

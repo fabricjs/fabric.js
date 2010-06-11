@@ -1,3 +1,5 @@
+//= require "canvas_object.class"
+
 (function() {
   
   var global  = this,
