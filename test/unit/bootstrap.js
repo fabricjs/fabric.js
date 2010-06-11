@@ -94,8 +94,6 @@
   canvasLoader.addModule({ name: 'canvas_assertions',     type: 'js',   path: 'test/lib/canvas_assertions.js',          varName: 'assertSameColor' });
                                                           
   canvasLoader.addModule({ name: 'ape_anim',              type: 'js',   path: 'core/anim.js',                           varName: 'APE.anim' });
-  canvasLoader.addModule({ name: 'toggle_button',         type: 'js',   path: 'ui/button/toggle_button.widget.js',      varName: 'APE.widget.ToggleButton' });
-  canvasLoader.addModule({ name: 'text_placeholder',      type: 'js',   path: 'ui/dashboard_textplaceholder.js',        varName: 'Dashboard.TextPlaceholder' });
   
   canvasLoader.insert();
 })(this);
