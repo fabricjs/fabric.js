@@ -1,7 +1,9 @@
 (function(){
   
   var Canvas = this.Canvas || (this.Canvas = { });
+  
   if (Canvas.Polygon) {
+    console.warn('Canvas.Polygon is already defined');
     return;
   }
   
@@ -100,7 +102,7 @@
   });
   
   // http://www.w3.org/TR/SVG/shapes.html#PolygonElement
-  Canvas.Polygon.ATTRIBUTE_NAMES = $w('fill fill-opacity stroke stroke-width transform');
+  Canvas.Polygon.ATTRIBUTE_NAMES = 'fill fill-opacity stroke stroke-width transform'.split(' ');
   
   /**
    * @static
@@ -110,9 +112,12 @@
    * @return {Object} instance of Canvas.Polygon
    */
   Canvas.Polygon.fromElement = function(element, options) {
-    if (!element) return null;
+    if (!element) {
+      return null;
+    }
     var points = Canvas.parsePointsAttribute(element.getAttribute('points')),
         parsedAttributes = Canvas.parseAttributes(element, Canvas.Polygon.ATTRIBUTE_NAMES);
+        
     return new Canvas.Polygon(points, Object.extend(parsedAttributes, options));
   };
   

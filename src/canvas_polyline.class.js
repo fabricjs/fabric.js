@@ -1,7 +1,9 @@
 (function(){
   
   var Canvas = this.Canvas || (this.Canvas = { });
+  
   if (Canvas.Polyline) {
+    console.warn('Canvas.Polyline is already defined');
     return;
   }
   
@@ -78,7 +80,7 @@
   });
   
   // http://www.w3.org/TR/SVG/shapes.html#PolylineElement
-  var ATTRIBUTE_NAMES = $w('fill fill-opacity stroke stroke-width transform');
+  var ATTRIBUTE_NAMES = 'fill fill-opacity stroke stroke-width transform'.split(' ');
   
   /**
    * @static
@@ -88,9 +90,12 @@
    * @return {Object} instance of Canvas.Polyline
    */
   Canvas.Polyline.fromElement = function(element, options) {
-    if (!element) return null;
+    if (!element) {
+      return null;
+    }
     var points = Canvas.parsePointsAttribute(element.getAttribute('points')),
         parsedAttributes = Canvas.parseAttributes(element, ATTRIBUTE_NAMES);
+        
     return new Canvas.Polyline(points, Object.extend(parsedAttributes, options));
   };
   

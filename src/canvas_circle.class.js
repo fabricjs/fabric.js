@@ -72,7 +72,7 @@
   /**
    * @see: http://www.w3.org/TR/SVG/shapes.html#CircleElement
    */
-  Canvas.Circle.ATTRIBUTE_NAMES = $w('cx cy r fill fill-opacity stroke stroke-width transform');
+  Canvas.Circle.ATTRIBUTE_NAMES = 'cx cy r fill fill-opacity stroke stroke-width transform'.split(' ');
   
   /**
    * @static

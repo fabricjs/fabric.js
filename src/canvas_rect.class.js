@@ -96,7 +96,7 @@
   });
   
   // TODO (kangax): implement rounded rectangles (both parsing and rendering)
-  Canvas.Rect.ATTRIBUTE_NAMES = $w('x y width height rx ry fill fill-opacity stroke stroke-width transform');
+  Canvas.Rect.ATTRIBUTE_NAMES = 'x y width height rx ry fill fill-opacity stroke stroke-width transform'.split(' ');
   
   /**
    * @private
@@ -115,7 +115,10 @@
    * @return {Object} instance of Canvas.Rect
    */
   Canvas.Rect.fromElement = function(element, options) {
-    if (!element) return null;
+    if (!element) {
+      return null;
+    }
+    
     var parsedAttributes = Canvas.parseAttributes(element, Canvas.Rect.ATTRIBUTE_NAMES);
     parsedAttributes = _setDefaultLeftTopValues(parsedAttributes);
     

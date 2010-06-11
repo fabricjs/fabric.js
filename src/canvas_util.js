@@ -3,6 +3,7 @@
   var Canvas = this.Canvas || (this.Canvas = { });
   
   if (Canvas.util) {
+    console.warn('Canvas.util is already defined');
     return;
   }
   

@@ -143,7 +143,7 @@ function init() {
       this.assertHashEqual(augmentedObjectRepr, cObj.toObject());
       
       var fractionalValue = 166.66666666666666,
-          testedProperties = $w('left top width height'),
+          testedProperties = 'left top width height'.split(' '),
           fractionDigitsDefault = 2;
           
       function testFractionDigits(fractionDigits, expectedValue) {

@@ -2,8 +2,7 @@
   
   /* Adaptation of work of Kevin Lindsey (kevin@kevlindev.com) */
   
-  var global = this;
-  var Canvas = global.Canvas || (global.Canvas = { });
+  var Canvas = this.Canvas || (this.Canvas = { });
 
   if (Canvas.Point) {    
     console.warn('Canvas.Point is already defined');

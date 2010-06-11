@@ -102,7 +102,7 @@
       return { 
         width: element.width, 
         height: element.height
-      }
+      };
     },
     
     /**
@@ -178,7 +178,9 @@
      */
     toGrayscale: function(callback) {
       
-      if (this.__isGrayscaled) return;
+      if (this.__isGrayscaled) {
+        return;
+      }
       
       var imgEl = this.getElement(),
           canvasEl = document.createElement('canvas'),
@@ -304,8 +306,9 @@
    * @static
    */
   Canvas.Image.fromObject = function(object, callback) {
-    var img = document.createElement('img');
-    var src = object.src;
+    var img = document.createElement('img'),
+        src = object.src;
+        
     if (object.width) {
       img.width = object.width;
     }
@@ -317,7 +320,7 @@
         callback(new Canvas.Image(img, object));
       }
       img = img.onload = null;
-    }
+    };
     img.src = src;
   };
   

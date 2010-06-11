@@ -10,6 +10,7 @@
       Canvas = global.Canvas || (global.Canvas = { });
       
   if (Canvas.Element) {
+    console.warn('Canvas.Element is already defined.');
     return;
   }
   
@@ -44,8 +45,8 @@
     if (!el.getContext) {
       return;
     }
-    var ctx = el.getContext('2d');
     
+    var ctx = el.getContext('2d');
     if (!ctx) {
       return;
     }

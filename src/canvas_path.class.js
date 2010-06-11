@@ -1,15 +1,12 @@
 (function(){
   
-  var global = this;
+  var Canvas = this.Canvas || (this.Canvas = { });
   
-  if (!global.Canvas) {
-    global.Canvas = { };
-  }
-  if (global.Canvas.Path) {
+  if (Canvas.Path) {
     console.warn('Canvas.Path is already defined');
     return;
   }
-  if (!global.Canvas.Object) {
+  if (!Canvas.Object) {
     console.warn('Canvas.Path requires Canvas.Object');
     return;
   }
@@ -453,7 +450,7 @@
     return new Canvas.Path(object.path, object);
   };
   
-  var ATTRIBUTE_NAMES = Canvas.Path.ATTRIBUTE_NAMES = $w('d fill fill-opacity fill-rule stroke stroke-width transform');
+  var ATTRIBUTE_NAMES = Canvas.Path.ATTRIBUTE_NAMES = 'd fill fill-opacity fill-rule stroke stroke-width transform'.split(' ');
   /**
    * Creates an instance of Canvas.Path from an SVG <PATH> element
    * @static

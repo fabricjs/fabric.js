@@ -70,7 +70,7 @@
   });
   
   // http://www.w3.org/TR/SVG/shapes.html#LineElement
-  Canvas.Element.ATTRIBUTE_NAMES = $w('x1 y1 x2 y2 stroke stroke-width transform');
+  Canvas.Element.ATTRIBUTE_NAMES = 'x1 y1 x2 y2 stroke stroke-width transform'.split(' ');
   
   /**
    * @static

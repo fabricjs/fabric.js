@@ -2,6 +2,7 @@
   
   var Canvas = this.Canvas || (this.Canvas = { });
   if (Canvas.PathGroup) {
+    console.warn('Canvas.PathGroup is already defined');
     return;
   }
   

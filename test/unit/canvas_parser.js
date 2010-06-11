@@ -65,7 +65,7 @@ function init() {
       this.assert(Canvas.parseAttributes);
       
       var element = makeElement();
-      var attributeNames = $w(' cx cy x y r fill-opacity fill-rule stroke-width transform fill fill-rule');
+      var attributeNames = 'cx cy x y r fill-opacity fill-rule stroke-width transform fill fill-rule'.split(' ');
       var parsedAttributes = Canvas.parseAttributes(element, attributeNames);
       
       this.assertObjectIdentical({
@@ -84,7 +84,7 @@ function init() {
       element.setAttribute('stroke', 'none');
       
       this.assertObjectIdentical({ fill: '', stroke: '' }, 
-        Canvas.parseAttributes(element, $w(' fill stroke ')));
+        Canvas.parseAttributes(element, 'fill stroke'.split(' ')));
     },
     
     testCanvasParseAttributesFillRule: function() {
@@ -92,7 +92,7 @@ function init() {
       element.setAttribute('fill-rule', 'evenodd');
       
       this.assertObjectIdentical({ fillRule: 'destination-over' }, 
-        Canvas.parseAttributes(element, $w(' fill-rule ')));
+        Canvas.parseAttributes(element, ['fill-rule']));
     },
     
     testCanvasParseAttributesFillRuleWithoutTransformation: function() {
@@ -100,14 +100,14 @@ function init() {
       element.setAttribute('fill-rule', 'inherit');
       
       this.assertObjectIdentical({ fillRule: 'inherit' }, 
-        Canvas.parseAttributes(element, $w(' fill-rule ')));
+        Canvas.parseAttributes(element, ['fill-rule']));
     },
     
     testCanvasParseAttributesTransform: function() {
       var element = document.createElement('path');
       element.setAttribute('transform', 'translate(5, 10)');
       this.assertObjectIdentical({ transformMatrix: [1, 0, 0, 1, 5, 10] }, 
-        Canvas.parseAttributes(element, $w(' transform ')));
+        Canvas.parseAttributes(element, ['transform']));
     },
     
     testCanvasParseAttributesWithParent: function() {
@@ -123,7 +123,7 @@ function init() {
       grandParent.setAttribute('fill', 'red');
       
       this.assertObjectIdentical({ fill: 'red', left: 100, top: 200 }, 
-        Canvas.parseAttributes(element, $w(' x y fill ')));
+        Canvas.parseAttributes(element, ['x y fill']));
     },
     
     testCanvasParseElements: function() {

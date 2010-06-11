@@ -45,9 +45,9 @@
     /**
      * @field
      */
-    stateProperties: $w('top left width height scaleX scaleY flipX flipY ' +
-                        'theta angle opacity cornersize fill overlayFill stroke ' +
-                        'strokeWidth fillRule borderScaleFactor transformMatrix'),
+    stateProperties:  ('top left width height scaleX scaleY flipX flipY ' +
+                      'theta angle opacity cornersize fill overlayFill stroke ' +
+                      'strokeWidth fillRule borderScaleFactor transformMatrix').split(' '),
     
     /**
      * @field

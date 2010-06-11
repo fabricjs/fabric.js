@@ -80,7 +80,7 @@
     }
   });
   
-  Canvas.Ellipse.ATTRIBUTE_NAMES = $w('cx cy rx ry fill fill-opacity stroke stroke-width transform');
+  Canvas.Ellipse.ATTRIBUTE_NAMES = 'cx cy rx ry fill fill-opacity stroke stroke-width transform'.split(' ');
   
   /**
    * @static

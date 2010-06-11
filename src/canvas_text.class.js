@@ -1,13 +1,12 @@
 (function(){
   
-  var global = this;
-  var Canvas = global.Canvas || (global.Canvas = { });
+  var Canvas = this.Canvas || (this.Canvas = { });
 
-  if (global.Canvas.Text) {    
+  if (Canvas.Text) {    
     console.warn('Canvas.Text is already defined');
     return;
   }
-  if (!global.Canvas.Object) {
+  if (!Canvas.Object) {
     console.warn('Canvas.Text requires Canvas.Object');
     return;
   }
