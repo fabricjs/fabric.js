@@ -20,7 +20,7 @@
   }
   
   var canvasLoader = new YAHOO.util.YUILoader({
-    base: 'http://assets.printio.dev/javascripts/',
+    base: '/',
     require: [
       'header', 'console', 'prototype', 'ape-ep-dom', 'ape-extensions', 'prototype-extensions',
       
@@ -42,7 +42,6 @@
     }
   });
   
-  canvasLoader.addModule({ name: "header",                type: "js",   path: "HEADER.js",                              varName: "window" });
   canvasLoader.addModule({ name: "console",               type: "js",   path: "core/console.js",                        varName: "console.log" });
   canvasLoader.addModule({ name: "prototype",             type: "js",   path: "core/prototype.js",                      varName: "Prototype" });
   canvasLoader.addModule({ name: "ape-ep-dom",            type: "js",   path: "core/ape-ep-dom.js",                     varName: "APE.dom" });
@@ -90,7 +89,7 @@
   // testing facility                                                                                                 
   canvasLoader.addModule({ name: 'unittest',              type: 'js',   path: 'test/lib/unittest.js',                   varName: 'Test.Unit' });
   canvasLoader.addModule({ name: 'event_simulate',        type: 'js',   path: 'test/lib/event.simulate.js',             varName: 'Event.simulate' });
-  canvasLoader.addModule({ name: 'unittest_css',          type: 'css',  path: 'test/lib/unittest.css' });               
+  //canvasLoader.addModule({ name: 'unittest_css',          type: 'css',  path: 'test/lib/unittest.css' });               
   canvasLoader.addModule({ name: 'canvas_assertions',     type: 'js',   path: 'test/lib/canvas_assertions.js',          varName: 'assertSameColor' });
                                                           
   canvasLoader.addModule({ name: 'ape_anim',              type: 'js',   path: 'core/anim.js',                           varName: 'APE.anim' });

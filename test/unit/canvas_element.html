@@ -10,17 +10,24 @@
     </style>
     
     <!--[if IE]>
-      <script type="text/javascript" src="../../core/excanvas.js"></script>
+      <script type="text/javascript" src="../../src/excanvas.js"></script>
     <![endif]-->
     
-    <script src="http://yui.yahooapis.com/2.7.0/build/yuiloader/yuiloader-min.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="../lib/unittest.css" type="text/css">
     
-    <script src="bootstrap.js" type="text/javascript"></script>
+    <script src="../../dist/all.js" type="text/javascript"></script>
+    <script src="../lib/unittest.js" type="text/javascript"></script>
+    <script src="../lib/event.simulate.js" type="text/javascript"></script>
+    
     <script src="canvas_element.js" type="text/javascript"></script>
   </head>
   <body>
     <h2>Canvas.Element unit tests</h2>
     <div id="testlog"></div>
     <canvas id="test" width="500" height="500"></canvas>
+    
+    <script type="text/javascript">
+      init();
+    </script>
   </body>
 </html>
