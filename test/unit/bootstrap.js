@@ -13,7 +13,7 @@
   global.loadScript = loadScript;
   
   function observeCompletionEvent() {
-    document.observe('tests:completed', function(e) {
+    Canvas.base.observeEvent('tests:completed', function(e) {
       global.__testsCompleted = true;
       global.__result = e.memo.result;
     });

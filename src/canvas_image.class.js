@@ -19,7 +19,7 @@
   }
   
   
-  Canvas.Image = Class.create(Canvas.Object, {
+  Canvas.Image = Canvas.base.createClass(Canvas.Object, {
     
     maxwidth: null,
     maxheight: null,
@@ -145,7 +145,7 @@
      * @return {Object} object representation of an instance
      */
     toObject: function() {
-      return Object.extend(this.callSuper('toObject'), {
+      return Canvas.base.object.extend(this.callSuper('toObject'), {
         src: this.getSrc()
       });
     },
@@ -256,7 +256,7 @@
      */
     _initElement: function(element) {
       this.setElement($(element));
-      this.getElement().addClassName(Canvas.Image.CSS_CANVAS);
+      Canvas.base.addClass(this.getElement(), Canvas.Image.CSS_CANVAS);
     },
     
     /**

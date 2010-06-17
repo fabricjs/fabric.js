@@ -7,7 +7,7 @@
     return;
   }
   
-  Canvas.Line = Class.create(Canvas.Object, {
+  Canvas.Line = Canvas.base.createClass(Canvas.Object, {
     
     type: 'line',
     
@@ -62,7 +62,7 @@
      * @return {Object}
      */
     toObject: function() {
-      return Object.extend(this.callSuper('toObject'), {
+      return Canvas.base.object.extend(this.callSuper('toObject'), {
         x1: this.get('x1'),
         y1: this.get('y1'),
         x2: this.get('x2'),
@@ -89,7 +89,7 @@
       parsedAttributes.x2 || 0,
       parsedAttributes.y2 || 0
     ];
-    return new Canvas.Line(points, Object.extend(parsedAttributes, options));
+    return new Canvas.Line(points, Canvas.base.object.extend(parsedAttributes, options));
   };
   
   /**

@@ -16,7 +16,7 @@
       STROKE_OFFSET = 0.5,
       FX_TRANSITION = 'decel',
       
-      getCoords = APE.dom.Event.getCoords,
+      getPointer = Canvas.base.getPointer,
       
       cursorMap = {
         'tr': 'ne-resize',
@@ -182,7 +182,7 @@
     this.calcOffset();
   };
   
-  Object.extend(Canvas.Element.prototype, {
+  Canvas.base.object.extend(Canvas.Element.prototype, {
     
     selectionColor:         'rgba(100,100,255,0.3)', // blue
     selectionBorderColor:   'rgba(255,255,255,0.3)', // white
@@ -210,7 +210,7 @@
      * @chainable
      */
     calcOffset: function () {
-      this._offset = Element.cumulativeOffset(this.getElement());
+      this._offset = Canvas.base.getElementOffset(this.getElement());
       return this;
     },
     
@@ -247,12 +247,9 @@
      *
      */
     _initElement: function (canvasEl) {
-      if ($(canvasEl)) {
-        this._oElement = $(canvasEl);
-      }
-      else {
-        this._oElement = new Element('canvas');
-      }
+      var el = Canvas.base.getById(canvasEl);
+      this._oElement = el || document.createElement('canvas');
+      
       if (typeof this._oElement.getContext === 'undefined') {
         G_vmlCanvasManager.initElement(this._oElement);
       }
@@ -275,12 +272,12 @@
      * @method _initWrapperElement
      */
     _initWrapperElement: function (width, height) {
-      var wrapper = Element.wrap(this.getElement(), 'div', { className: 'canvas_container' });
-      wrapper.setStyle({
+      var wrapper = Canvas.base.wrapElement(this.getElement(), 'div', { className: 'canvas_container' });
+      Canvas.base.setStyle(wrapper, {
         width: width + 'px',
         height: height + 'px'
       });
-      Element.makeUnselectable(wrapper);
+      Canvas.base.makeElementUnselectable(wrapper);
       this.wrapper = wrapper;
     },
     
@@ -289,7 +286,7 @@
      * @method _setElementStyle
      */
     _setElementStyle: function (width, height) {
-      this.getElement().setStyle({
+      Canvas.base.setStyle(this.getElement(), {
         position: 'absolute',
         width: width + 'px',
         height: height + 'px',
@@ -306,7 +303,7 @@
        * See configuration documentation for more details.
        */
     _initConfig: function (oConfig) {
-      Object.extend(this._oConfig, oConfig || { });
+      Canvas.base.object.extend(this._oConfig, oConfig || { });
       
       this._oConfig.width = parseInt(this._oElement.width, 10) || 0;
       this._oConfig.height = parseInt(this._oElement.height, 10) || 0;
@@ -330,10 +327,10 @@
       this._onMouseMove = function (e){ _this.__onMouseMove(e); };
       this._onResize = function (e) { _this.calcOffset() };
       
-      Event.observe(this._oElement, 'mousedown', this._onMouseDown);
-      Event.observe(document, 'mousemove', this._onMouseMove);
-      Event.observe(document, 'mouseup', this._onMouseUp);
-      Event.observe(window, 'resize', this._onResize);
+      Canvas.base.addListener(this._oElement, 'mousedown', this._onMouseDown);
+      Canvas.base.addListener(document, 'mousemove', this._onMouseMove);
+      Canvas.base.addListener(document, 'mouseup', this._onMouseUp);
+      Canvas.base.addListener(window, 'resize', this._onResize);
     },
     
     /**
@@ -367,7 +364,7 @@
         // if that didn't work, throw error
         throw CANVAS_INIT_ERROR;
       }
-      Element.makeUnselectable(oContainer);
+      Canvas.base.makeElementUnselectable(oContainer);
       return oContainer;
     },
 
@@ -475,7 +472,7 @@
             target = transform.target;
             
         if (target.__scaling) {
-          document.fire('object:scaled', { target: target });
+          Canvas.base.fireEvent('object:scaled', { target: target });
           target.__scaling = false;
         }
         
@@ -487,7 +484,7 @@
         // only fire :modified event if target coordinates were changed during mousedown-mouseup
         if (target.hasStateChanged()) {
           target.isMoving = false;
-          document.fire('object:modified', { target: target });
+          Canvas.base.fireEvent('object:modified', { target: target });
         }
       }
       
@@ -501,7 +498,7 @@
       if (activeGroup) {
         if (activeGroup.hasStateChanged() && 
             activeGroup.containsPoint(this.getPointer(e))) {
-          document.fire('group:modified', { target: activeGroup });
+          Canvas.base.fireEvent('group:modified', { target: activeGroup });
         }
         activeGroup.setObjectsCoords();
         activeGroup.set('isMoving', false);
@@ -608,15 +605,15 @@
     deactivateAllWithDispatch: function () {
       var activeGroup = this.getActiveGroup();
       if (activeGroup) {
-        document.fire('before:group:destroyed', {
+        Canvas.base.fireEvent('before:group:destroyed', {
           target: activeGroup
         });
       }
       this.deactivateAll();
       if (activeGroup) {
-        document.fire('after:group:destroyed');
+        Canvas.base.fireEvent('after:group:destroyed');
       }
-      document.fire('selection:cleared');
+      Canvas.base.fireEvent('selection:cleared');
       return this;
     },
     
@@ -627,7 +624,7 @@
     _setupCurrentTransform: function (e, target) {
       var action = 'drag', 
           corner,
-          pointer = getCoords(e);
+          pointer = getPointer(e);
       
       if (corner = target._findTargetCorner(e, this._offset)) {
         action = /ml|mr/.test(corner) 
@@ -680,7 +677,7 @@
         else {
           activeGroup.add(target);
         }
-        document.fire('group:selected', { target: activeGroup });
+        Canvas.base.fireEvent('group:selected', { target: activeGroup });
         activeGroup.setActive(true);
       }
       else {
@@ -717,7 +714,7 @@
       
       // We initially clicked in an empty area, so we draw a box for multiple selection.
       if (this._groupSelector !== null) {
-        var pointer = getCoords(e);
+        var pointer = getPointer(e);
         this._groupSelector.left = pointer.x - this._offset.left - this._groupSelector.ex;
         this._groupSelector.top = pointer.y - this._offset.top - this._groupSelector.ey;
         this.renderTop();
@@ -753,7 +750,7 @@
       }
       else {
         // object is being transformed (scaled/rotated/moved/etc.)
-        var pointer = getCoords(e), 
+        var pointer = getPointer(e), 
             x = pointer.x, 
             y = pointer.y;
             
@@ -803,11 +800,11 @@
      *                    When not provided, an object is scaled by both dimensions equally
      */ 
     _scaleObject: function (x, y, by) {
-      var lastLen = Math.sqrt(Math.pow(this._currentTransform.ey - this._currentTransform.top - this._offset[1], 2) +
-        Math.pow(this._currentTransform.ex - this._currentTransform.left - this._offset[0], 2));
+      var lastLen = Math.sqrt(Math.pow(this._currentTransform.ey - this._currentTransform.top - this._offset.top, 2) +
+        Math.pow(this._currentTransform.ex - this._currentTransform.left - this._offset.left, 2));
       
-      var curLen = Math.sqrt(Math.pow(y - this._currentTransform.top - this._offset[1], 2) +
-        Math.pow(x - this._currentTransform.left - this._offset[0], 2));
+      var curLen = Math.sqrt(Math.pow(y - this._currentTransform.top - this._offset.top, 2) +
+        Math.pow(x - this._currentTransform.left - this._offset.left, 2));
       
       var target = this._currentTransform.target;
       target.__scaling = true;
@@ -831,10 +828,10 @@
      * @param y {Number} pointer's y coordinate
      */ 
     _rotateObject: function (x, y) {
-      var lastAngle = Math.atan2(this._currentTransform.ey - this._currentTransform.top - this._offset[1],
-        this._currentTransform.ex - this._currentTransform.left - this._offset[0]); 
-      var curAngle = Math.atan2(y - this._currentTransform.top - this._offset[1],
-        x - this._currentTransform.left - this._offset[0]);
+      var lastAngle = Math.atan2(this._currentTransform.ey - this._currentTransform.top - this._offset.top,
+        this._currentTransform.ex - this._currentTransform.left - this._offset.left); 
+      var curAngle = Math.atan2(y - this._currentTransform.top - this._offset.top,
+        x - this._currentTransform.left - this._offset.left);
       this._currentTransform.target.set('theta', (curAngle - lastAngle) + this._currentTransform.theta);
     },
     
@@ -923,20 +920,18 @@
     
     _findSelectedObjects: function (e) {
       
-      var pointer = getCoords(e),
-          target, 
+      var target, 
           targetRegion,
-          group = [],
+          group = [ ],
           x1 = this._groupSelector.ex,
           y1 = this._groupSelector.ey,
           x2 = x1 + this._groupSelector.left,
           y2 = y1 + this._groupSelector.top,
-          currentObject;
-      
-      var selectionX1Y1 = new Canvas.Point(Math.min(x1, x2), Math.min(y1, y2)),
+          currentObject,
+          selectionX1Y1 = new Canvas.Point(Math.min(x1, x2), Math.min(y1, y2)),
           selectionX2Y2 = new Canvas.Point(Math.max(x1, x2), Math.max(y1, y2));
       
-      for (var i=0, l=this._aObjects.length; i<l; ++i) {
+      for (var i = 0, len = this._aObjects.length; i < len; ++i) {
         currentObject = this._aObjects[i];
         
         if (currentObject.intersectsWithRect(selectionX1Y1, selectionX2Y2) || 
@@ -949,7 +944,7 @@
       // do not create group for 1 element only
       if (group.length === 1) {
         this.setActiveObject(group[0]);
-        document.fire('object:selected', {
+        Canvas.base.fireEvent('object:selected', {
           target: group[0]
         });
       } 
@@ -957,7 +952,7 @@
         var group = new Canvas.Group(group);
         this.setActiveGroup(group);
         group.saveCoords();
-        document.fire('group:selected', { target: group });
+        Canvas.base.fireEvent('group:selected', { target: group });
       }
       this.renderAll();
     },
@@ -1263,10 +1258,10 @@
      * @return {Object} object with "x" and "y" number values
      */
     getPointer: function (e) {
-      var p = getCoords(e);
+      var pointer = getPointer(e);
       return {
-        x: p.x - this._offset.left,
-        y: p.y - this._offset.top
+        x: pointer.x - this._offset.left,
+        y: pointer.y - this._offset.top
       };
     },
     
@@ -1398,7 +1393,7 @@
      * @return {String} json string
      */
     toJSON: function () {
-      return Object.toJSON(this.toObject());
+      return JSON.stringify(this.toObject());
     },
     
     /**
@@ -1407,7 +1402,7 @@
      * @return {String} json string
      */
     toDatalessJSON: function () {
-      return Object.toJSON(this.toDatalessObject());
+      return JSON.stringify(this.toDatalessObject());
     },
     
     /**
@@ -1490,13 +1485,13 @@
     _enlivenObjects: function (objects, callback) {
       var numLoadedImages = 0,
           // get length of all images 
-          numTotalImages = objects.findAll(function (o){
+          numTotalImages = objects.filter(function (o){
             return o.type === 'image';
           }).length;
       
       var _this = this;
       
-      objects.each(function (o) {
+      objects.forEach(function (o) {
         if (!o.type) {
           return;
         }
@@ -1557,7 +1552,7 @@
           numTotalObjects = objects.length;
       
       try {
-        objects.each(function (obj, index) {
+        objects.forEach(function (obj, index) {
           
           var pathProp = obj.paths ? 'paths' : 'path';
           var path = obj[pathProp];
@@ -1585,7 +1580,7 @@
               _this.loadImageFromURL(path, function (image) {
                 image.setSourcePath(path);
 
-                Object.extend(image, obj);
+                Canvas.base.object.extend(image, obj);
                 image.setAngle(obj.angle);
 
                 onObjectLoaded(image, index);
@@ -1608,7 +1603,7 @@
                 }
               }
               
-              Prototype.getScript(path, onscriptload);
+              Canvas.base.getScript(path, onscriptload);
             }
             else {
               _this.loadSVGFromURL(path, function (elements, options) {
@@ -1623,7 +1618,7 @@
                 // copy parameters from serialied json to object (left, top, scaleX, scaleY, etc.)
                 // skip this step if an object is a PathGroup, since we already passed it options object before
                 if (!(object instanceof Canvas.PathGroup)) {
-                  Object.extend(object, obj);
+                  Canvas.base.object.extend(object, obj);
                   if (typeof obj.angle !== 'undefined') {
                     object.setAngle(obj.angle);
                   }
@@ -1696,7 +1691,7 @@
       
       var _this = this;
       
-      url = url.replace(/^\n\s*/, '').replace(/\?.*$/, '').strip();
+      url = url.replace(/^\n\s*/, '').replace(/\?.*$/, '').trim();
       
       this.cache.has(url, function (hasUrl) {
         if (hasUrl) {
@@ -1880,7 +1875,7 @@
       
       this.renderAll();
       
-      document.fire('object:selected', { target: object });
+      Canvas.base.fireEvent('object:selected', { target: object });
       return this;
     },
     
@@ -1973,10 +1968,10 @@
      * @return {Number} complexity
      */
     complexity: function () {
-      return this.getObjects().inject(0, function (memo, current) {
+      return this.getObjects().reduce(function (memo, current) {
         memo += current.complexity ? current.complexity() : 0;
         return memo;
-      });
+      }, 0);
     },
     
     /**
@@ -2054,13 +2049,13 @@
    * @method toString
    * @return {String} string representation of an instance
    */
-   // Assign explicitly since `Object.extend` doesn't take care of DontEnum bug yet
+   // Assign explicitly since `extend` doesn't take care of DontEnum bug yet
   Canvas.Element.prototype.toString = function () {
     return '#<Canvas.Element (' + this.complexity() + '): '+
            '{ objects: ' + this.getObjects().length + ' }>';
   };
   
-  Object.extend(Canvas.Element, {
+  Canvas.base.object.extend(Canvas.Element, {
     
     /**
      * @property EMPTY_JSON

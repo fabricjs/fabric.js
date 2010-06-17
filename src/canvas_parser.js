@@ -36,7 +36,7 @@
       parentAttributes = Canvas.parseAttributes(element.parentNode, attributes);
     }
     
-    var ownAttributes = attributes.inject({}, function(memo, attr) {
+    var ownAttributes = attributes.reduce(function(memo, attr) {
       value = element.getAttribute(attr);
       parsed = parseFloat(value);
       if (value) {        
@@ -57,12 +57,12 @@
         memo[attr] = isNaN(parsed) ? value : parsed;
       }
       return memo;
-    });
+    }, { });
     
     // add values parsed from style
     // TODO (kangax): check the presedence of values from the style attribute
-    ownAttributes = Object.extend(Canvas.parseStyleAttribute(element), ownAttributes);
-    return Object.extend(parentAttributes, ownAttributes);
+    ownAttributes = Canvas.base.object.extend(Canvas.parseStyleAttribute(element), ownAttributes);
+    return Canvas.base.object.extend(parentAttributes, ownAttributes);
   };
   
   /**
@@ -165,8 +165,8 @@
       
       attributeValue.replace(reTransform, function(match) {
           
-        var m = new RegExp(transform).exec(match).reject(function (match) {
-              return (match == '' || match == null); 
+        var m = new RegExp(transform).exec(match).filter(function (match) {
+              return (match !== '' && match != null);
             }),
             operation = m[1],
             args = m.slice(2).map(parseFloat);
@@ -205,12 +205,12 @@
   function parsePointsAttribute(points) {
     // points attribute is required and must not be empty
     if (!points) return null;
-    points = points.strip().split(/\s+/);
-    var parsedPoints = points.inject([], function(memo, pair) {
+    points = points.trim().split(/\s+/);
+    var parsedPoints = points.reduce(function(memo, pair) {
       pair = pair.split(',');
       memo.push({ x: parseFloat(pair[0]), y: parseFloat(pair[1]) });
       return memo;
-    });
+    }, [ ]);
     // odd number of points is an error
     if (parsedPoints.length % 2 !== 0) {
       // return null;
@@ -231,13 +231,13 @@
       if (typeof style == 'string') {
         style = style.split(';');
         style.pop();
-        oStyle = style.inject({ }, function(memo, current) {
+        oStyle = style.reduce(function(memo, current) {
           var attr = current.split(':'),
-              key = attr[0].strip(),
-              value = attr[1].strip();
+              key = attr[0].trim(),
+              value = attr[1].trim();
           memo[key] = value;
           return memo;
-        });
+        }, { });
       }
       else {
         for (var prop in style) {
@@ -270,7 +270,10 @@
         }
       }
     });
-    return _elements.compact();
+    _elements = _elements.filter(function(el) {
+      return el != null;
+    });
+    return _elements;
   };
   
   /**
@@ -310,9 +313,9 @@
 
     return function(doc, callback) {
       if (!doc) return;
-      var descendants = $A(doc.getElementsByTagName('*'));
+      var descendants = Canvas.base.toArray(doc.getElementsByTagName('*'));
       
-      var elements = descendants.findAll(function(el) {
+      var elements = descendants.filter(function(el) {
         return reAllowedSVGTagNames.test(el.tagName) && 
           !hasParentWithNodeName(el, 'pattern');
       });
@@ -352,7 +355,7 @@
     };
   })();
   
-  Object.extend(Canvas, {
+  Canvas.base.object.extend(Canvas, {
     parseAttributes:        parseAttributes,
     parseElements:          parseElements,
     parseStyleAttribute:    parseStyleAttribute,

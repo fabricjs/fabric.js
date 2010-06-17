@@ -135,10 +135,10 @@ function init() {
       }
       
       var elements = [
-        new Element('rect', getOptions()),
-        new Element('circle', getOptions({ r: 14 })),
-        new Element('path', getOptions({ d: 'M 100 100 L 300 100 L 200 300 z' })),
-        new Element('inexistent', getOptions())
+        Canvas.base.makeElement('rect', getOptions()),
+        Canvas.base.makeElement('circle', getOptions({ r: 14 })),
+        Canvas.base.makeElement('path', getOptions({ d: 'M 100 100 L 300 100 L 200 300 z' })),
+        Canvas.base.makeElement('inexistent', getOptions())
       ];
       
       var parsedElements;

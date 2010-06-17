@@ -11,7 +11,7 @@
    * @class Rect
    * @extends Canvas.Object
    */
-  Canvas.Rect = Class.create(Canvas.Object, /** @lends Canvas.Rect.prototype */ {
+  Canvas.Rect = Canvas.base.createClass(Canvas.Object, /** @lends Canvas.Rect.prototype */ {
     
     type: 'rect',
     
@@ -124,7 +124,7 @@
     var parsedAttributes = Canvas.parseAttributes(element, Canvas.Rect.ATTRIBUTE_NAMES);
     parsedAttributes = _setDefaultLeftTopValues(parsedAttributes);
     
-    var rect = new Canvas.Rect(Object.extend(options || { }, parsedAttributes));
+    var rect = new Canvas.Rect(Canvas.base.object.extend(options || { }, parsedAttributes));
     rect._normalizeLeftTopProperties(parsedAttributes);
     
     return rect;

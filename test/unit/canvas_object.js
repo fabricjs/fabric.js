@@ -150,7 +150,7 @@ function init() {
         
         Canvas.Object.prototype.NUM_FRACTION_DIGITS = fractionDigits;
         
-        testedProperties.each(function(property) {
+        testedProperties.forEach(function(property) {
           cObj.set(property, fractionalValue);
           this.assertIdentical(expectedValue, cObj.toObject()[property], 
             'value of ' + property + ' should have ' + fractionDigits + ' fractional digits');

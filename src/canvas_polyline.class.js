@@ -9,7 +9,7 @@
     return;
   }
   
-  Canvas.Polyline = Class.create(Canvas.Object, {
+  Canvas.Polyline = Canvas.base.createClass(Canvas.Object, {
     
     type: 'polyline',
     
@@ -98,7 +98,7 @@
     var points = Canvas.parsePointsAttribute(element.getAttribute('points')),
         parsedAttributes = Canvas.parseAttributes(element, ATTRIBUTE_NAMES);
         
-    return new Canvas.Polyline(points, Object.extend(parsedAttributes, options));
+    return new Canvas.Polyline(points, Canvas.base.object.extend(parsedAttributes, options));
   };
   
   /**

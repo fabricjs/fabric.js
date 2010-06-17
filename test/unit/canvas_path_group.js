@@ -78,10 +78,10 @@ function init(){
       
       this.assertRespondsTo('complexity', pathGroup);
       
-      var objectsTotalComplexity = pathGroup.getObjects().inject(0, function(total, current) {
+      var objectsTotalComplexity = pathGroup.getObjects().reduce(function(total, current) {
         total += current.complexity();
         return total;
-      });
+      }, 0);
       
       this.assertIdentical(objectsTotalComplexity, pathGroup.complexity());
     },
@@ -117,7 +117,7 @@ function init(){
       this.assertRespondsTo('set', pathGroup);
       this.assertIdentical(pathGroup, pathGroup.set('fill', fillValue), 'should be chainable');
       
-      pathGroup.getObjects().each(function(path){
+      pathGroup.getObjects().forEach(function(path) {
         this.assertIdentical(fillValue, path.get('fill'));
       }, this);
       this.assertIdentical(fillValue, pathGroup.get('fill'));

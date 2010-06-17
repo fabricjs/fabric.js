@@ -111,8 +111,10 @@
 window.onload = function() {
   
   var benchmarks = window.__benchmarks = [];
+  var imgEls = document.getElementsByTagName('img');
   
-  $$('.svg-test-wrapper img').each(function(imgElement, i) {
+  Canvas.base.toArray(imgEls).forEach(function(imgElement, i) {
+    if (typeof Ajax == 'undefined') return;
     new Ajax.Request('W3C_SVG_12_TinyTestSuite_beta/svg/' + imgElement.alt + '.svg', {
       method: 'get',
       onSuccess: function(r) {
@@ -128,7 +130,8 @@ window.onload = function() {
             width: imgElement.width,
             height: imgElement.height
           };
-          var canvasElement = new Element('canvas', dimensions).setStyle({
+          var canvasElement = Canvas.base.makeElement('canvas', dimensions);
+          Canvas.base.setStyle(canvasElement, {
             width: dimensions.width + 'px',
             height: dimensions.height + 'px'
           });
@@ -136,7 +139,7 @@ window.onload = function() {
             after: canvasElement
           });
           var oCanvas = window.__canvas = new Canvas.Element(canvasElement);
-          elements.each(function(o) {
+          elements.forEach(function(o) {
             oCanvas.add(o);
           })
         });

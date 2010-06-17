@@ -8,7 +8,7 @@
     return;
   }
   
-  Canvas.PathGroup = Class.create(Canvas.Path, Canvas.IStub, Enumerable, {
+  Canvas.PathGroup = Canvas.base.createClass(Canvas.Path, Canvas.IStub, {
     
     type: 'path-group',
     forceFillOverwrite: false,
@@ -31,7 +31,7 @@
     },
     
     initProperties: function() {
-      this.stateProperties.each(function(prop) {
+      this.stateProperties.forEach(function(prop) {
         if (prop === 'fill') {
           this.set(prop, this.options[prop]);
         }
@@ -104,7 +104,7 @@
      */
     toObject: function() {
       var _super = Canvas.Object.prototype.toObject;
-      return Object.extend(_super.call(this), {
+      return Canvas.base.object.extend(_super.call(this), {
         paths: this.getObjects().invoke('clone'),
         sourcePath: this.sourcePath
       });
@@ -138,7 +138,7 @@
      */
     isSameColor: function() {
       var firstPathFill = this.getObjects()[0].get('fill');
-      return this.all(function(path) {
+      return this.every(function(path) {
         return path.get('fill') === firstPathFill;
       });
     },
@@ -149,9 +149,9 @@
       * @return {Number} complexity
       */
     complexity: function() {
-      return this.paths.inject(0, function(total, path) {
+      return this.paths.reduce(function(total, path) {
         return total + ((path && path.complexity) ? path.complexity() : 0);
-      });
+      }, 0);
     },
     
     /**
@@ -173,11 +173,6 @@
      */
     getObjects: function() {
       return this.paths;
-    },
-    
-    // "base" for Enumerable mixin
-    _each: function(iterator) {
-      return this.getObjects()._each(iterator);
     }
   });
   

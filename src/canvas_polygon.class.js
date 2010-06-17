@@ -12,7 +12,7 @@
   function byX(p) { return p.x; }
   function byY(p) { return p.y; }
   
-  Canvas.Polygon = Class.create(Canvas.Object, {
+  Canvas.Polygon = Canvas.base.createClass(Canvas.Object, {
     
     type: 'polygon',
     
@@ -37,10 +37,10 @@
     _calcDimensions: function() {
       
       var points = this.points,
-          minX = points.min(byX),
-          minY = points.min(byY),
-          maxX = points.max(byX),
-          maxY = points.max(byY);
+          minX = Canvas.base.array.min(points, byX),
+          minY = Canvas.base.array.min(points, byY),
+          maxX = Canvas.base.array.max(points, byX),
+          maxY = Canvas.base.array.max(points, byY);
       
       this.width = maxX - minX;
       this.height = maxY - minY;
@@ -67,7 +67,7 @@
      * @return {Object} object representation of an instance
      */
     toObject: function() {
-      return Object.extend(this.callSuper('toObject'), {
+      return Canvas.base.object.extend(this.callSuper('toObject'), {
         points: this.points.clone()
       });
     },
@@ -120,7 +120,7 @@
     var points = Canvas.parsePointsAttribute(element.getAttribute('points')),
         parsedAttributes = Canvas.parseAttributes(element, Canvas.Polygon.ATTRIBUTE_NAMES);
         
-    return new Canvas.Polygon(points, Object.extend(parsedAttributes, options));
+    return new Canvas.Polygon(points, Canvas.base.object.extend(parsedAttributes, options));
   };
   
   /**

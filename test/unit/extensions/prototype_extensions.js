@@ -24,7 +24,7 @@ function init() {
     },
     
     testButtonEnableDisable: function(){
-      var buttonEl = new Element('button');
+      var buttonEl = document.createElement('button');
       
       this.assertRespondsTo('enable', buttonEl);
       this.assertRespondsTo('disable', buttonEl);
@@ -39,7 +39,7 @@ function init() {
     },
     
     testMakeUnselectable: function() {
-      var el = new Element('div');
+      var el = document.createElement('div');
       
       this.assertRespondsTo('makeUnselectable', el);
       

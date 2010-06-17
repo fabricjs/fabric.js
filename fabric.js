@@ -1,7 +1,6 @@
-//= require "lib/prototype"
-//= require "lib/prototype-extensions"
-//= require "lib/ape-ep-dom"
-//= require "lib/ape-extensions"
+//= require "lib/json2"
+
+//= require "src/canvas_base"
 
 //= require "src/canvas_util"
 //= require "src/canvas_parser"

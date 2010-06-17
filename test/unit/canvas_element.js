@@ -519,15 +519,16 @@ function init() {
       }
       var target;
       
-      document.observe('before:group:destroyed', (function(e){
+      Canvas.base.observeEvent('before:group:destroyed', (function (e) {
         eventsFired.beforeGroupDestroyed = true;
         this.assertIdentical(canvas.getActiveGroup(), e.memo.target, 'event should have active group as its `target` property');
       }).bind(this));
       
-      document.observe('after:group:destroyed', function(){
+      Canvas.base.observeEvent('after:group:destroyed', function(){
         eventsFired.afterGroupDestroyed = true;
       });
-      document.observe('selection:cleared', function(){
+      
+      Canvas.base.observeEvent('selection:cleared', function(){
         eventsFired.selectionCleared = true;
       });
       
@@ -636,7 +637,7 @@ function init() {
       canvas.add(rect);
       
       var canvasEl = canvas.getElement(),
-          canvasOffset = canvasEl.cumulativeOffset();
+          canvasOffset = Canvas.base.getElementOffset(canvasEl);
       
       var eventStub = { 
         pageX: canvasOffset.left + 100, 
@@ -688,7 +689,7 @@ function init() {
     testResizeImageToFit: function() {
       this.assertRespondsTo('_resizeImageToFit', canvas);
       
-      var imgEl = new Element('img', { src: '../fixtures/very_large_image.jpg' }),
+      var imgEl = Canvas.base.makeElement('img', { src: '../fixtures/very_large_image.jpg' }),
           ORIGINAL_WIDTH = 3888,
           ORIGINAL_HEIGHT = 2592;
       

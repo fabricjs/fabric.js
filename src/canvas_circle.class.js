@@ -11,7 +11,7 @@
     return;
   }
   
-  Canvas.Circle = Class.create(Canvas.Object, /** @lends Canvas.Circle.prototype */ {
+  Canvas.Circle = Canvas.base.createClass(Canvas.Object, /** @lends Canvas.Circle.prototype */ {
     
     /**
      * @field
@@ -40,7 +40,7 @@
      * @return {Object} object representation of an instance
      */
     toObject: function() {
-      return Object.extend(this.callSuper('toObject'), {
+      return Canvas.base.object.extend(this.callSuper('toObject'), {
         radius: this.get('radius')
       });
     },
@@ -89,7 +89,7 @@
     if (!isValidRadius(parsedAttributes)) {
       throw Error('value of `r` attribute is required and can not be negative');
     }
-    return new Canvas.Circle(Object.extend(parsedAttributes, options));
+    return new Canvas.Circle(Canvas.base.object.extend(parsedAttributes, options));
   };
   
   /**

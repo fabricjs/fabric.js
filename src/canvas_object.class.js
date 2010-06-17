@@ -16,7 +16,7 @@
    * @class Object
    * @memberOf Canvas
    */
-  Canvas.Object = Class.create( /** @lends Canvas.Object.prototype */ {
+  Canvas.Object = Canvas.base.createClass({
     
     type: 'object',
     
@@ -105,7 +105,7 @@
     
     setOptions: function(options) {
       // this.constructor.superclass.prototype.options -> this.options -> options
-      this.options = Object.extend(this._getOptions(), options);
+      this.options = Canvas.base.object.extend(this._getOptions(), options);
     },
     
     /**
@@ -113,7 +113,7 @@
      * @method _getOptions
      */
     _getOptions: function() {
-      return Object.extend(Object.clone(this._getSuperOptions()), this.options);
+      return Canvas.base.object.extend(Canvas.base.object.clone(this._getSuperOptions()), this.options);
     },
     
     /**
@@ -139,7 +139,7 @@
      * @method _importProperties
      */
     _importProperties: function() {
-      this.stateProperties.each(function(prop) {
+      this.stateProperties.forEach(function(prop) {
         (prop === 'angle') 
           ? this.setAngle(this.options[prop])
           : (this[prop] = this.options[prop]);
@@ -166,7 +166,7 @@
      * @return {String} json
      */
     toJSON: function() {
-      return Object.toJSON(this.toObject());
+      return JSON.stringify(this.toObject());
     },
     
     /**
@@ -214,7 +214,7 @@
      */
     _removeDefaultValues: function(object) {
       var defaultOptions = Canvas.Object.prototype.options;
-      this.stateProperties.each(function(prop) {
+      this.stateProperties.forEach(function(prop) {
         if (object[prop] === defaultOptions[prop]) {
           delete object[prop];
         }
@@ -675,7 +675,7 @@
       el.width = this.getWidth();
       el.height = this.getHeight();
       
-      Element.wrap(el, 'div');
+      Canvas.base.wrapElement(el, 'div');
 
       var canvas = new Canvas.Element(el);
       canvas.backgroundColor = 'transparent';
@@ -700,7 +700,7 @@
      * @return {Boolean} true if instance' state has changed
      */
     hasStateChanged: function() {
-      return this.stateProperties.any(function(prop) {
+      return this.stateProperties.some(function(prop) {
         return this[prop] !== this.originalState[prop];
       }, this);
     },
@@ -711,7 +711,7 @@
      * @chainable
      */
     saveState: function() {
-      this.stateProperties.each(function(prop) {
+      this.stateProperties.forEach(function(prop) {
         this.originalState[prop] = this.get(prop);
       }, this);
       return this;
@@ -802,7 +802,7 @@
      * @return {String|Boolean} corner code (tl, tr, bl, br, etc.), or false if nothing is found
      */
     _findTargetCorner: function(e, offset) {
-      var pointer = Event.pointer(e),
+      var pointer = Canvas.base.getPointer(e),
           ex = pointer.x - offset.left,
           ey = pointer.y - offset.top,
           xpoints,

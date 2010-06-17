@@ -65,7 +65,7 @@ function init(){
         this.assert(randomInt >= 100 && randomInt <= 200);
       }
       
-      var areAllTheSame = randomInts.all(function(value){ 
+      var areAllTheSame = randomInts.every(function(value){ 
         return value === randomInts[0];
       });
       

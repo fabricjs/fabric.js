@@ -39,7 +39,8 @@
         }
 
         function addResult(title, result) {
-          $('results').insert('<h3>' + title + '</h3><p>' + result + '</p>');
+          var el = Canvas.base.getById('results');
+          el.innerHTML += ('<h3>' + title + '</h3><p>' + result + '</p>');
         }
 
         this.c = new Canvas.Element('test');

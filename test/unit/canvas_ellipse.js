@@ -41,7 +41,7 @@ function init(){
       
       ellipse.set('left', 100).set('top', 200).set('rx', 15).set('ry', 25);
       
-      var augmentedProperties = Object.extend(Object.clone(defaultProperties), {
+      var augmentedProperties = Canvas.base.object.extend(Canvas.base.object.clone(defaultProperties), {
         left: 100,
         top: 200,
         rx: 15,

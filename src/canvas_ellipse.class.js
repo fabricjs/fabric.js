@@ -9,7 +9,7 @@
     return;
   }
   
-  Canvas.Ellipse = Class.create(Canvas.Object, {
+  Canvas.Ellipse = Canvas.base.createClass(Canvas.Object, {
     
     type: 'ellipse',
     
@@ -37,7 +37,7 @@
      * @return {Object} object representation of an instance
      */
     toObject: function() {
-      return Object.extend(this.callSuper('toObject'), {
+      return Canvas.base.object.extend(this.callSuper('toObject'), {
         rx: this.get('rx'),
         ry: this.get('ry')
       })
@@ -93,7 +93,7 @@
    */
   Canvas.Ellipse.fromElement = function(element, options) {
     var parsedAttributes = Canvas.parseAttributes(element, Canvas.Ellipse.ATTRIBUTE_NAMES);
-    return new Canvas.Ellipse(Object.extend(parsedAttributes, options));
+    return new Canvas.Ellipse(Canvas.base.object.extend(parsedAttributes, options));
   };
   
   /**

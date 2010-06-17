@@ -7,7 +7,7 @@
     return;
   }
   
-  Canvas.Group = Class.create(Canvas.Object, {
+  Canvas.Group = Canvas.base.createClass(Canvas.Object, {
     
     /**
      * @property type
@@ -29,7 +29,7 @@
       this._updateObjectsCoords();
       
       if (options) {
-        Object.extend(this, options);
+        Canvas.base.object.extend(this, options);
       }
       this._setOpacityIfSame();
       
@@ -156,7 +156,7 @@
      * @return {Boolean} true if group contains an object
      */
     contains: function(object) {
-      return this.objects.include(object);
+      return this.objects.indexOf(object) > -1;
     },
     
     /**
@@ -165,7 +165,7 @@
      * @return {Object} object representation of an instance
      */
     toObject: function() {
-      return Object.extend(this.callSuper('toObject'), {
+      return Canvas.base.object.extend(this.callSuper('toObject'), {
         objects: this.objects.invoke('clone')
       });
     },
@@ -207,10 +207,10 @@
      * @return {Number} complexity
      */
     complexity: function() {
-      return this.getObjects().inject(0, function(total, object) {
+      return this.getObjects().reduce(function(total, object) {
         total += (typeof object.complexity == 'function') ? object.complexity() : 0;
         return total;
-      });
+      }, 0);
     },
     
     /**
@@ -221,7 +221,7 @@
      * @chainable
      */
     _restoreObjectsState: function() {
-      this.objects.each(this._restoreObjectState, this);
+      this.objects.forEach(this._restoreObjectState, this);
       return this;
     },
     
@@ -348,7 +348,7 @@
       var objects = this.getObjects(),
           firstValue = objects[0] ? objects[0].get('opacity') : 1;
           
-      var isSameOpacity = objects.all(function(o) {
+      var isSameOpacity = objects.every(function(o) {
         return o.get('opacity') === firstValue;
       });
       
@@ -377,10 +377,10 @@
         }
       };
       
-      minX = aX.min();
-      maxX = aX.max();
-      minY = aY.min();
-      maxY = aY.max();
+      minX = Canvas.base.array.min(aX);
+      maxX = Canvas.base.array.max(aX);
+      minY = Canvas.base.array.min(aY);
+      maxY = Canvas.base.array.max(aY);
       
       width = maxX - minX;
       height = maxY - minY;

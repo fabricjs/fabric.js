@@ -39,7 +39,7 @@ Event.simulateMouse = function(element, eventName) {
     'top: #{pointerY}px; left: #{pointerX}px;'.interpolate(options) + 
     'border-top: 1px solid red; border-left: 1px solid red;'
     
-  this.mark = new Element('div', { style: style });
+  this.mark = Canvas.base.makeElement('div', { style: style });
   this.mark.appendChild(document.createTextNode(" "));
   document.body.appendChild(this.mark);
   
@@ -140,9 +140,9 @@ Test.Unit.Logger = Class.create({
   appendActionButtons: function(actions) {
     actions = $H(actions);
     if (!actions.any()) return;
-    var div = new Element("div", {className: 'action_buttons'});
+    var div = Canvas.base.makeElement("div", { className: 'action_buttons' });
     actions.inject(div, function(container, action) {
-      var button = new Element("input").setValue(action.key).observe("click", action.value);
+      var button = Canvas.base.makeElement("input").setValue(action.key).observe("click", action.value);
       button.type = "button";
       return container.insert(button);
     });

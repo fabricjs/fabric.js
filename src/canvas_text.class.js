@@ -13,7 +13,7 @@
     return;
   }
   
-  Canvas.Text = Class.create(Canvas.Object, {
+  Canvas.Text = Canvas.base.createClass(Canvas.Object, {
     
     options: {
       top:         10,
@@ -31,7 +31,7 @@
       this.initStateProperties();
       this.text = text;
       this.setOptions(options);
-      Object.extend(this, this.options);
+      Canvas.base.object.extend(this, this.options);
       this.theta = this.angle * (Math.PI/180);
       this.width = this.getWidth();
       this.setCoords();
@@ -51,7 +51,7 @@
     
     toString: function() {
       return '#<Canvas.Text ('+ this.complexity() +'): ' + 
-        Object.toJSON({ text: this.text, fontfamily: this.fontfamily }) +'>';
+        JSON.stringify({ text: this.text, fontfamily: this.fontfamily }) + '>';
     },
     
     _render: function(context) {
@@ -110,7 +110,7 @@
   	 * @return {Object} object representation of an instance
   	 */
   	toObject: function() {
-  	  return Object.extend(this.callSuper('toObject'), {
+  	  return Canvas.base.object.extend(this.callSuper('toObject'), {
   	    text:         this.text,
   	    fontsize:     this.fontsize,
   	    fontweight:   this.fontweight,

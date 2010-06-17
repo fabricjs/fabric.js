@@ -14,7 +14,7 @@
   }
   
   // Instance methods
-  Canvas.Path = Class.create(Canvas.Object, Canvas.IStub, {
+  Canvas.Path = Canvas.base.createClass(Canvas.Object, Canvas.IStub, {
     
     type: 'path',
     
@@ -62,7 +62,7 @@
       this.path = this._parsePath();
       
       if (!isWidthSet || !isHeightSet) {
-        Object.extend(this, this._parseDimensions());
+        Canvas.base.object.extend(this, this._parseDimensions());
         if (isWidthSet) {
           this.width = this.options.width;
         }
@@ -311,7 +311,7 @@
      */
     toString: function() {
       return '#<Canvas.Path ('+ this.complexity() +'): ' + 
-        Object.toJSON({ top: this.top, left: this.left }) +'>';
+        JSON.stringify({ top: this.top, left: this.left }) +'>';
     },
     
     /**
@@ -319,7 +319,7 @@
      * @return {Object}
      */
     toObject: function() {
-      var o = Object.extend(this.callSuper('toObject'), {
+      var o = Canvas.base.object.extend(this.callSuper('toObject'), {
         path: this.path,
         sourcePath: this.sourcePath
       });
@@ -362,7 +362,7 @@
       // use plain loop for perf.
       for (var i = 0, len = this.path.length; i < len; i++) {
         currentPath = this.path[i];
-        chunks = currentPath.slice(1).strip().replace(/(\d)-/g, '$1###-').split(/\s|,|###/);
+        chunks = currentPath.slice(1).trim().replace(/(\d)-/g, '$1###-').split(/\s|,|###/);
         result.push([currentPath.charAt(0)].concat(chunks.map(parseFloat)));
       }
       return result;
@@ -388,7 +388,7 @@
         }
         return item[item.length - 1];
       }
-      this.path.each(function(item, i) {
+      this.path.forEach(function(item, i) {
         if (item[0] !== 'H') {
           previousX = (i === 0) ? getX(item) : getX(this.path[i-1]);
         }
@@ -423,7 +423,6 @@
         aY.push(y);
         
       }, this);
-      
       var minX = aX.min(), 
           minY = aY.min(), 
           deltaX = deltaY = 0;
@@ -465,6 +464,6 @@
     var parsedAttributes = Canvas.parseAttributes(element, ATTRIBUTE_NAMES),
         path = parsedAttributes.d;
     delete parsedAttributes.d;
-    return new Canvas.Path(path, Object.extend(parsedAttributes, options));
+    return new Canvas.Path(path, Canvas.base.object.extend(parsedAttributes, options));
   }
 })();
