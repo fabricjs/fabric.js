@@ -24,6 +24,10 @@
 
         $ sprocketize fabric.js > dist/all.js
 
+3. Create a minified distribution file
+
+        $ java -jar lib/yuicompressor-2.4.2.jar dist/all.js -o dist/all.min.js
+
 ### Examples of use
 
 #### Adding red rectangle to canvas
