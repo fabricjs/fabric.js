@@ -108,7 +108,7 @@ if (!Array.prototype.reduce) {
 function invoke(array, method) {
   var args = slice.call(arguments, 2), result = [ ];
   for (var i = 0, len = array.length; i < len; i++) {
-    result[i] = method.apply(array[i], args);
+    result[i] = args.length ? method.apply(array[i], args) : method.call(array[i]);
   }
   return result;
 }

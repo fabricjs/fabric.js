@@ -185,18 +185,15 @@
   Canvas.base.object.extend(Canvas.Element.prototype, {
     
     selectionColor:         'rgba(100,100,255,0.3)', // blue
-    selectionBorderColor:   'rgba(255,255,255,0.3)', // white
+    selectionBorderColor:   'rgba(255,255,255,0.3)',
     selectionLineWidth:     1,
-    backgroundColor:        'rgba(255,255,255,1)', // white
+    backgroundColor:        'rgba(255,255,255,1)',
     includeDefaultValues:   true,
     
     shouldCacheImages:      false,
     
     CANVAS_WIDTH:           600,
     CANVAS_HEIGHT:          600,
-    
-    CANVAS_PRINT_WIDTH:     3000,
-    CANVAS_PRINT_HEIGHT:    3000,
     
     onBeforeScaleRotate: function () {
       /* NOOP */
@@ -2023,8 +2020,8 @@
     
     _resizeImageToFit: function (imgEl) {
       
-      var widthScaleFactor = 1, //this.CANVAS_WIDTH / this.CANVAS_PRINT_WIDTH,
-          heightScaleFactor = 1, //this.CANVAS_HEIGHT / this.CANVAS_PRINT_HEIGHT,
+      var widthScaleFactor = 1,
+          heightScaleFactor = 1,
           imageWidth = imgEl.width || imgEl.offsetWidth,
           imageHeight = imgEl.height || imgEl.offsetHeight;
       
