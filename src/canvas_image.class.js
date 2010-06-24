@@ -255,7 +255,7 @@
      * @param {HTMLImageElement|String} el The element representing the image
      */
     _initElement: function(element) {
-      this.setElement($(element));
+      this.setElement(Canvas.base.getById(element));
       Canvas.base.addClass(this.getElement(), Canvas.Image.CSS_CANVAS);
     },
     

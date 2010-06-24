@@ -260,7 +260,7 @@
    function parseElements(elements, options) {
     // transform svg elements to Canvas.Path elements
     var _elements = elements.map(function(el) {
-      var klass = Canvas[el.tagName.capitalize()];
+      var klass = Canvas[Canvas.base.string.capitalize(el.tagName)];
       if (klass && klass.fromElement) {
         try {
           return klass.fromElement(el, options);
@@ -346,7 +346,7 @@
         height: height
       };
 
-      var elements = Canvas.parseElements(elements, Object.clone(options));
+      var elements = Canvas.parseElements(elements, Canvas.base.object.clone(options));
       if (!elements || (elements && !elements.length)) return;
 
       if (callback) {

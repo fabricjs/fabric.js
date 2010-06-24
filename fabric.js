@@ -26,3 +26,5 @@
 //= require "src/canvas_group.class"
 
 //= require "src/canvas_text.class"
+
+//= require "src/canvas_image.class"

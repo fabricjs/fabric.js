@@ -36,7 +36,8 @@
         throw Error('`path` argument is required');
       }
       
-      var fromArray = Object.isArray(path);
+      var fromArray = Object.prototype.toString.call(path) === '[object Array]';
+      
       this.path = fromArray
         ? path
         : path.match && path.match(/[a-zA-Z][^a-zA-Z]*/g);

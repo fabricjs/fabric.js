@@ -15,4 +15,6 @@
   //= require "canvas_base/dom_style"
   //= require "canvas_base/dom_misc"
   
+  //= require "canvas_base/dom_request"
+  
 })(this);
