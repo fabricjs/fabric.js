@@ -1979,10 +1979,10 @@
      */
     dispose: function () {
       this.clear();
-      Event.stopObserving(this.getElement(), 'mousedown', this._onMouseDown);
-      Event.stopObserving(document, 'mouseup', this._onMouseUp);
-      Event.stopObserving(document, 'mousemove', this._onMouseMove);
-      Event.stopObserving(window, 'resize', this._onResize);
+      Canvas.base.removeListener(this.getElement(), 'mousedown', this._onMouseDown);
+      Canvas.base.removeListener(document, 'mouseup', this._onMouseUp);
+      Canvas.base.removeListener(document, 'mousemove', this._onMouseMove);
+      Canvas.base.removeListener(window, 'resize', this._onResize);
       return this;
     },
     
