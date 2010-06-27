@@ -130,7 +130,7 @@ function init() {
       this.assert(Canvas.parseElements);
       
       function getOptions(options) {
-        return Object.extend(Object.clone({ 
+        return Canvas.base.object.extend(Canvas.base.object.clone({ 
           left: 10, top: 20, width: 30, height: 40 }), options || { });
       }
       

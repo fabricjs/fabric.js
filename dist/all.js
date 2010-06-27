@@ -5916,7 +5916,7 @@ Canvas.base.getElementOffset = getElementOffset;
      */
     toObject: function() {
       return Canvas.base.object.extend(this.callSuper('toObject'), {
-        points: this.points.clone()
+        points: this.points.concat()
       });
     },
 
@@ -7236,7 +7236,7 @@ Canvas.base.getElementOffset = getElementOffset;
    * @return {Canvas.Text} an instance
    */
 	Canvas.Text.fromObject = function(object) {
-	  return new Canvas.Text(object.text, Object.clone(object));
+	  return new Canvas.Text(object.text, Canvas.base.object.clone(object));
 	};
 
 	/**

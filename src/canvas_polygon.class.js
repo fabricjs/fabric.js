@@ -68,7 +68,7 @@
      */
     toObject: function() {
       return Canvas.base.object.extend(this.callSuper('toObject'), {
-        points: this.points.clone()
+        points: this.points.concat()
       });
     },
     

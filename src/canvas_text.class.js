@@ -177,7 +177,7 @@
    * @return {Canvas.Text} an instance
    */
 	Canvas.Text.fromObject = function(object) {
-	  return new Canvas.Text(object.text, Object.clone(object));
+	  return new Canvas.Text(object.text, Canvas.base.object.clone(object));
 	};
 	
 	/**
