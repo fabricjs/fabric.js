@@ -6,6 +6,8 @@
 - Modular
 - Cross-browser
 - Fast
+- Encapsulated in one object
+- No browser sniffing for critical functionality
 
 ### Supported browsers
 
