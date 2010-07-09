@@ -425,6 +425,13 @@
       return this._setDimension('height', value);
     },
     
+    setDimensions: function(dimensions) {
+      for (var prop in dimensions) {
+        this._setDimension(prop, dimensions[prop]);
+      }
+      return this;
+    },
+    
     /**
      * private helper for setting width/height
      * @method _setDimensions
@@ -1465,16 +1472,17 @@
     loadFromJSON: function (json, callback) {
       if (!json) return;
       
-      var serialized = json.evalJSON();
+      var serialized = JSON.parse(json);
       if (!serialized || (serialized && !serialized.objects)) return;
       
       this.clear();
+      var _this = this;
       this._enlivenObjects(serialized.objects, function () {
-        this.backgroundColor = serialized.background;
+        _this.backgroundColor = serialized.background;
         if (callback) {
           callback();
         }
-      }.bind(this));
+      });
       
       return this;
     },
@@ -1495,7 +1503,7 @@
         switch (o.type) {
           case 'image':
           case 'font':
-            Canvas[o.type.capitalize()].fromObject(o, function (o) {
+            Canvas[Canvas.base.string.capitalize(o.type)].fromObject(o, function (o) {
               _this.add(o);
               if (++numLoadedImages === numTotalImages) {
                 if (callback) callback();
@@ -1503,7 +1511,7 @@
             });
             break;
           default:
-            var klass = Canvas[o.type.capitalize().camelize()];
+            var klass = Canvas[Canvas.base.string.camelize(Canvas.base.string.capitalize(o.type))];
             if (klass && klass.fromObject) {
               _this.add(klass.fromObject(o));
             }

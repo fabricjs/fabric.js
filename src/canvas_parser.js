@@ -155,7 +155,7 @@
     return function(attributeValue) {
       
       // start with identity matrix
-      var matrix = iMatrix.clone();
+      var matrix = iMatrix.concat();
       
       // return if no argument was given or 
       // an argument does not match transform attribute regexp

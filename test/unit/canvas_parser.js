@@ -1,4 +1,4 @@
-function init() {
+(function(){
   
   function makeElement() {
     var element = document.createElement('path');
@@ -60,203 +60,210 @@ function init() {
                             '2.186], ["c", -0.534, 0.42, -0.248, 1.744, 0.203, 2.164], ["c", 2.527, 0, 5.04, -0.988, 7.921, -0.666], ["C", 47.872, 19.969, '+
                             '54.917, 30.783, 62.022, 30.848], ["L", 62.022, 30.848], ["z", null]]}';
   
-  new Test.Unit.Runner({
-    testCanvasParseAttributes: function() {
-      this.assert(Canvas.parseAttributes);
-      
-      var element = makeElement();
-      var attributeNames = 'cx cy x y r fill-opacity fill-rule stroke-width transform fill fill-rule'.split(' ');
-      var parsedAttributes = Canvas.parseAttributes(element, attributeNames);
-      
-      this.assertObjectIdentical({
-        left:         102, 
-        top:          104,
-        radius:       105,
-        opacity:      0.45,
-        fillRule:     'foo',
-        strokeWidth:  4
-      }, parsedAttributes);
-    },
+  module('Canvas.Parser');
+  
+  test('parseAttributes', function() {
+    ok(Canvas.parseAttributes);
     
-    testCanvasParseAttributesNoneValues: function() {
-      var element = document.createElement('path');
-      element.setAttribute('fill', 'none');
-      element.setAttribute('stroke', 'none');
-      
-      this.assertObjectIdentical({ fill: '', stroke: '' }, 
-        Canvas.parseAttributes(element, 'fill stroke'.split(' ')));
-    },
+    var element = makeElement();
+    var attributeNames = 'cx cy x y r fill-opacity fill-rule stroke-width transform fill fill-rule'.split(' ');
+    var parsedAttributes = Canvas.parseAttributes(element, attributeNames);
     
-    testCanvasParseAttributesFillRule: function() {
-      var element = document.createElement('path');
-      element.setAttribute('fill-rule', 'evenodd');
-      
-      this.assertObjectIdentical({ fillRule: 'destination-over' }, 
-        Canvas.parseAttributes(element, ['fill-rule']));
-    },
-    
-    testCanvasParseAttributesFillRuleWithoutTransformation: function() {
-      var element = document.createElement('path');
-      element.setAttribute('fill-rule', 'inherit');
-      
-      this.assertObjectIdentical({ fillRule: 'inherit' }, 
-        Canvas.parseAttributes(element, ['fill-rule']));
-    },
-    
-    testCanvasParseAttributesTransform: function() {
-      var element = document.createElement('path');
-      element.setAttribute('transform', 'translate(5, 10)');
-      this.assertObjectIdentical({ transformMatrix: [1, 0, 0, 1, 5, 10] }, 
-        Canvas.parseAttributes(element, ['transform']));
-    },
-    
-    testCanvasParseAttributesWithParent: function() {
-      var element = document.createElement('path');
-      var parent = document.createElement('g');
-      var grandParent = document.createElement('g');
-      
-      parent.appendChild(element);
-      grandParent.appendChild(parent);
-      
-      element.setAttribute('x', '100');
-      parent.setAttribute('y', '200');
-      grandParent.setAttribute('fill', 'red');
-      
-      this.assertObjectIdentical({ fill: 'red', left: 100, top: 200 }, 
-        Canvas.parseAttributes(element, ['x y fill']));
-    },
-    
-    testCanvasParseElements: function() {
-      this.assert(Canvas.parseElements);
-      
-      function getOptions(options) {
-        return Canvas.base.object.extend(Canvas.base.object.clone({ 
-          left: 10, top: 20, width: 30, height: 40 }), options || { });
-      }
-      
-      var elements = [
-        Canvas.base.makeElement('rect', getOptions()),
-        Canvas.base.makeElement('circle', getOptions({ r: 14 })),
-        Canvas.base.makeElement('path', getOptions({ d: 'M 100 100 L 300 100 L 200 300 z' })),
-        Canvas.base.makeElement('inexistent', getOptions())
-      ];
-      
-      var parsedElements;
-      this.assertNothingRaised(function() {
-        parsedElements = Canvas.parseElements(elements);
-      }.bind(this));
-      
-      this.assertInstanceOf(Canvas.Rect, parsedElements[0]);
-      this.assertInstanceOf(Canvas.Circle, parsedElements[1]);
-      this.assertInstanceOf(Canvas.Path, parsedElements[2]);
-    },
-    testCanvasParseStyleAttribute: function() {
-      this.assert(Canvas.parseStyleAttribute);
-      
-      var element = document.createElement('path');
-      element.setAttribute('style', 'left:10px;top:22.3em;width:103.45pt;height:20%;');
-      
-      var expectedObject = { 
-        'left':   '10px', 
-        'top':    '22.3em', 
-        'width':  '103.45pt', 
-        'height': '20%' 
-      }
-      this.assertObjectIdentical(expectedObject, Canvas.parseStyleAttribute(element));
-    },
-    testCanvasParsePointsAttribute: function() {
-      this.assert(Canvas.parsePointsAttribute);
-      var element = document.createElement('polygon');
-      element.setAttribute('points', '10,12           20,22,  -0.52,0.001 2.3e2,2.3e-2, 10,-1     ');
-      var actualPoints = Canvas.parsePointsAttribute(element.getAttribute('points'));
-      
-      this.assertIdentical(10, actualPoints[0].x);
-      this.assertIdentical(12, actualPoints[0].y);
-      
-      this.assertIdentical(20, actualPoints[1].x);
-      this.assertIdentical(22, actualPoints[1].y);
-      
-      this.assertIdentical(-0.52, actualPoints[2].x);
-      this.assertIdentical(0.001, actualPoints[2].y);
-      
-      this.assertIdentical(2.3e2, actualPoints[3].x);
-      this.assertIdentical(2.3e-2, actualPoints[3].y);
-      
-      this.assertIdentical(10, actualPoints[4].x);
-      this.assertIdentical(-1, actualPoints[4].y);
-    },
-    testCanvasParseTransformAttribute: function() {
-      this.assert(Canvas.parseTransformAttribute);
-      var element = document.createElement('path');
-      
-      //'translate(-10,-20) scale(2) rotate(45) translate(5,10)'
-      
-      element.setAttribute('transform', 'translate(5,10)');
-      var parsedValue = Canvas.parseTransformAttribute(element.getAttribute('transform'));
-      this.assertEnumEqual([1,0,0,1,5,10], parsedValue);
-      
-      element.setAttribute('transform', 'translate(-10,-20)');
-      var parsedValue = Canvas.parseTransformAttribute(element.getAttribute('transform'));
-      this.assertEnumEqual([1,0,0,1,-10,-20], parsedValue);
-      
-      var ANGLE = 90;
-      element.setAttribute('transform', 'rotate(' + ANGLE + ')');
-      var parsedValue = Canvas.parseTransformAttribute(element.getAttribute('transform'));
-      this.assertEnumEqual([Math.cos(ANGLE), Math.sin(ANGLE), -Math.sin(ANGLE), Math.cos(ANGLE), 0, 0], parsedValue);
-      
-      element.setAttribute('transform', 'scale(3.5)');
-      var parsedValue = Canvas.parseTransformAttribute(element.getAttribute('transform'));
-      this.assertEnumEqual([3.5,0,0,3.5,0,0], parsedValue);
-      
-      element.setAttribute('transform', 'scale(2 13)');
-      var parsedValue = Canvas.parseTransformAttribute(element.getAttribute('transform'));
-      this.assertEnumEqual([2,0,0,13,0,0], parsedValue);
-      
-      element.setAttribute('transform', 'skewX(2)');
-      var parsedValue = Canvas.parseTransformAttribute(element.getAttribute('transform'));
-      this.assertEnumEqual([1,0,2,1,0,0], parsedValue);
-      
-      element.setAttribute('transform', 'skewY(234.111)');
-      var parsedValue = Canvas.parseTransformAttribute(element.getAttribute('transform'));
-      this.assertEnumEqual([1,234.111,0,1,0,0], parsedValue);
-      
-      element.setAttribute('transform', 'matrix(1,2,3,4,5,6)');
-      var parsedValue = Canvas.parseTransformAttribute(element.getAttribute('transform'));
-      this.assertEnumEqual([1,2,3,4,5,6], parsedValue);
-      
-      element.setAttribute('transform', 'scale(2 13) translate(5,15) skewX(11.22)');
-      var parsedValue = Canvas.parseTransformAttribute(element.getAttribute('transform'));
-      this.assertEnumEqual([2,0,11.22,13,5,15], parsedValue);
-      
-      /*
-      // TODO (kangax): matrices multiplication is not yet supported
-      element.setAttribute('transform', 'translate(21,31) translate(11,22)');
-      var parsedValue = Canvas.parseTransformAttribute(element.getAttribute('transform'));
-      this.assertEnumEqual([1,0,0,1,32,53], parsedValue);
-      */
-    },
-    testCanvasParseSVGDocument: function() {
-      
-      this.assert(Canvas.parseSVGDocument);
-      
-      var data;
-      new Ajax.Request('../fixtures/path.svg', {
-        method: 'get',
-        onSuccess: function(resp) {
-          var doc = resp.responseXML;
-          Canvas.parseSVGDocument(doc.documentElement, function() {
-            data = arguments[0];
-          });
-        }
-      });
-      
-      this.wait(1500, function() {
-        this.assertArray(data);
-        var path = data[0];
-        
-        this.assertInstanceOf(Canvas.Path, path);
-        this.assertIdentical(EXPECTED_PATH_JSON, path.toJSON());
-      });
-    }
+    same({
+      left:         102, 
+      top:          104,
+      radius:       105,
+      opacity:      0.45,
+      fillRule:     'foo',
+      strokeWidth:  4
+    }, parsedAttributes);
   });
-}
+  
+  test('parseAttributesNoneValues', function() {
+    var element = document.createElement('path');
+    element.setAttribute('fill', 'none');
+    element.setAttribute('stroke', 'none');
+    
+    same({ fill: '', stroke: '' }, Canvas.parseAttributes(element, 'fill stroke'.split(' ')));
+  });
+  
+  test('parseAttributesFillRule', function() {
+    var element = document.createElement('path');
+    element.setAttribute('fill-rule', 'evenodd');
+    
+    same({ fillRule: 'destination-over' }, Canvas.parseAttributes(element, ['fill-rule']));
+  });
+  
+  test('parseAttributesFillRuleWithoutTransformation', function() {
+    var element = document.createElement('path');
+    element.setAttribute('fill-rule', 'inherit');
+    
+    same({ fillRule: 'inherit' }, Canvas.parseAttributes(element, ['fill-rule']));
+  });
+  
+  test('parseAttributesTransform', function() {
+    var element = document.createElement('path');
+    element.setAttribute('transform', 'translate(5, 10)');
+    same({ transformMatrix: [1, 0, 0, 1, 5, 10] }, Canvas.parseAttributes(element, ['transform']));
+  });
+  
+  test('parseAttributesWithParent', function() {
+    var element = document.createElement('path');
+    var parent = document.createElement('g');
+    var grandParent = document.createElement('g');
+    
+    parent.appendChild(element);
+    grandParent.appendChild(parent);
+    
+    element.setAttribute('x', '100');
+    parent.setAttribute('y', '200');
+    grandParent.setAttribute('fill', 'red');
+    
+    same({ fill: 'red', left: 100, top: 200 }, 
+      Canvas.parseAttributes(element, ['x y fill']));
+  });
+  
+  test('parseElements', function() {
+    ok(Canvas.parseElements);
+    
+    function getOptions(options) {
+      return Canvas.base.object.extend(Canvas.base.object.clone({ 
+        left: 10, top: 20, width: 30, height: 40 }), options || { });
+    }
+    
+    var elements = [
+      Canvas.base.makeElement('rect', getOptions()),
+      Canvas.base.makeElement('circle', getOptions({ r: 14 })),
+      Canvas.base.makeElement('path', getOptions({ d: 'M 100 100 L 300 100 L 200 300 z' })),
+      Canvas.base.makeElement('inexistent', getOptions())
+    ];
+    
+    var parsedElements, error;
+    try {
+      parsedElements = Canvas.parseElements(elements);
+    }
+    catch(err) {
+      error = err;
+    }
+    ok(error === undefined, 'No error is raised');
+    
+    ok(parsedElements[0] instanceof Canvas.Rect);
+    ok(parsedElements[1] instanceof Canvas.Circle);
+    ok(parsedElements[2] instanceof Canvas.Path);
+  });
+  
+  test('parseStyleAttribute', function() {
+    ok(Canvas.parseStyleAttribute);
+    
+    var element = document.createElement('path');
+    element.setAttribute('style', 'left:10px;top:22.3em;width:103.45pt;height:20%;');
+    
+    var expectedObject = { 
+      'left':   '10px', 
+      'top':    '22.3em', 
+      'width':  '103.45pt', 
+      'height': '20%' 
+    }
+    same(expectedObject, Canvas.parseStyleAttribute(element));
+  });
+  
+  test('parsePointsAttribute', function() {
+    ok(Canvas.parsePointsAttribute);
+    
+    var element = document.createElement('polygon');
+    element.setAttribute('points', '10,12           20,22,  -0.52,0.001 2.3e2,2.3e-2, 10,-1     ');
+    
+    var actualPoints = Canvas.parsePointsAttribute(element.getAttribute('points'));
+    
+    equals(actualPoints[0].x, 10);
+    equals(actualPoints[0].y, 12);
+    
+    equals(actualPoints[1].x, 20);
+    equals(actualPoints[1].y, 22);
+    
+    equals(actualPoints[2].x, -0.52);
+    equals(actualPoints[2].y, 0.001);
+    
+    equals(actualPoints[3].x, 2.3e2);
+    equals(actualPoints[3].y, 2.3e-2);
+    
+    equals(actualPoints[4].x, 10);
+    equals(actualPoints[4].y, -1);
+  });
+  
+  test('parseTransformAttribute', function() {
+    ok(Canvas.parseTransformAttribute);
+    var element = document.createElement('path');
+    
+    //'translate(-10,-20) scale(2) rotate(45) translate(5,10)'
+    
+    element.setAttribute('transform', 'translate(5,10)');
+    var parsedValue = Canvas.parseTransformAttribute(element.getAttribute('transform'));
+    same([1,0,0,1,5,10], parsedValue);
+    
+    element.setAttribute('transform', 'translate(-10,-20)');
+    var parsedValue = Canvas.parseTransformAttribute(element.getAttribute('transform'));
+    same([1,0,0,1,-10,-20], parsedValue);
+    
+    var ANGLE = 90;
+    element.setAttribute('transform', 'rotate(' + ANGLE + ')');
+    var parsedValue = Canvas.parseTransformAttribute(element.getAttribute('transform'));
+    same([Math.cos(ANGLE), Math.sin(ANGLE), -Math.sin(ANGLE), Math.cos(ANGLE), 0, 0], parsedValue);
+    
+    element.setAttribute('transform', 'scale(3.5)');
+    var parsedValue = Canvas.parseTransformAttribute(element.getAttribute('transform'));
+    same([3.5,0,0,3.5,0,0], parsedValue);
+    
+    element.setAttribute('transform', 'scale(2 13)');
+    var parsedValue = Canvas.parseTransformAttribute(element.getAttribute('transform'));
+    same([2,0,0,13,0,0], parsedValue);
+    
+    element.setAttribute('transform', 'skewX(2)');
+    var parsedValue = Canvas.parseTransformAttribute(element.getAttribute('transform'));
+    same([1,0,2,1,0,0], parsedValue);
+    
+    element.setAttribute('transform', 'skewY(234.111)');
+    var parsedValue = Canvas.parseTransformAttribute(element.getAttribute('transform'));
+    same([1,234.111,0,1,0,0], parsedValue);
+    
+    element.setAttribute('transform', 'matrix(1,2,3,4,5,6)');
+    var parsedValue = Canvas.parseTransformAttribute(element.getAttribute('transform'));
+    same([1,2,3,4,5,6], parsedValue);
+    
+    element.setAttribute('transform', 'scale(2 13) translate(5,15) skewX(11.22)');
+    var parsedValue = Canvas.parseTransformAttribute(element.getAttribute('transform'));
+    same([2,0,11.22,13,5,15], parsedValue);
+    
+    
+    // TODO (kangax): matrices multiplication is not yet supported
+    // element.setAttribute('transform', 'translate(21,31) translate(11,22)');
+    // var parsedValue = Canvas.parseTransformAttribute(element.getAttribute('transform'));
+    // this.assertEnumEqual([1,0,0,1,32,53], parsedValue);
+  });
+  
+  asyncTest('parseSVGDocument', function() {
+    ok(Canvas.parseSVGDocument);
+    
+    var data;
+    Canvas.base.request('../fixtures/path.svg', {
+      method: 'get',
+      onComplete: function(resp) {
+        var doc = resp.responseXML;
+        Canvas.parseSVGDocument(doc.documentElement, function() {
+          data = arguments[0];
+        });
+      }
+    });
+    
+    setTimeout(function() {
+      ok(typeof data.length == 'number');
+      var path = data[0];
+      
+      ok(path instanceof Canvas.Path);
+      equals(EXPECTED_PATH_JSON, path.toJSON());
+      start();
+      
+    }, 1500);
+  });
+  
+})();

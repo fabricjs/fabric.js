@@ -8,8 +8,13 @@
  *    $('foo').simulate('click'); // => fires "click" event on an element with id=foo
  *
  **/
-(function(){
-  
+(function() {
+  function extendObject(destination, source) {
+    for (var prop in source) {
+      destination[prop] = source[prop];
+    }
+    return destination;
+  }
   var eventMatchers = {
     'HTMLEvents': /^(?:load|unload|abort|error|select|change|submit|reset|focus|blur|resize|scroll)$/,
     'MouseEvents': /^(?:click|mouse(?:down|up|over|move|out))$/,
@@ -29,14 +34,17 @@
   
   Event.simulate = function(element, eventName) {
     
-    var options = Object.extend(Object.clone(defaultOptions), arguments[2] || { }),
+    var options = extendObject(extendObject({ }, defaultOptions), arguments[2] || { }),
         oEvent, 
         eventType;
         
-    element = $(element);
+    element = typeof element == 'string' ? document.getElementById(element) : element;
     
     for (var name in eventMatchers) {
-      if (eventMatchers[name].test(eventName)) { eventType = name; break; }
+      if (eventMatchers[name].test(eventName)) {
+        eventType = name; 
+        break; 
+      }
     }
     
     if (!eventType) {
@@ -77,11 +85,9 @@
     else {
       options.clientX = options.pointerX;
       options.clientY = options.pointerY;
-      oEvent = Object.extend(document.createEventObject(), options);
+      oEvent = extendObject(document.createEventObject(), options);
       element.fireEvent('on' + eventName, oEvent);
     }
     return element;
   }
-  
-  Element.addMethods({ simulate: Event.simulate });
 })()

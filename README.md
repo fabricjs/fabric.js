@@ -2,7 +2,7 @@
 
 ### Goals
 
-- Unit tested
+- Unit tested (~925 tests at the moment)
 - Modular
 - Cross-browser
 - Fast

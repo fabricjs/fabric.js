@@ -246,7 +246,7 @@
      * @return {String}
      */
     toString: function() {
-      return "#<Canvas." + this.type.capitalize() + ">";
+      return "#<Canvas." + Canvas.base.string.capitalize(this.type) + ">";
     },
     
     /**

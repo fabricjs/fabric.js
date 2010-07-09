@@ -166,7 +166,7 @@
      */
     toObject: function() {
       return Canvas.base.object.extend(this.callSuper('toObject'), {
-        objects: this.objects.invoke('clone')
+        objects: Canvas.base.array.invoke(this.objects, 'clone')
       });
     },
     

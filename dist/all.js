@@ -522,26 +522,47 @@ if (!Array.prototype.reduce) {
 function invoke(array, method) {
   var args = slice.call(arguments, 2), result = [ ];
   for (var i = 0, len = array.length; i < len; i++) {
-    result[i] = args.length ? method.apply(array[i], args) : method.call(array[i]);
+    result[i] = args.length ? array[i][method].apply(array[i], args) : array[i][method].call(array[i]);
   }
   return result;
 }
 
-function max(array, context) {
-  var i = array.length - 1, result = array[i];
-  while (i--) {
-    if (array[i] >= result) {
-      result = array[i];
+function max(array, byProperty) {
+  var i = array.length - 1,
+      result = byProperty ? array[i][byProperty] : array[i];
+  if (byProperty) {
+    while (i--) {
+      if (array[i][byProperty] >= result) {
+        result = array[i][byProperty];
+      }
+    }
+  }
+  else {
+    while (i--) {
+      if (array[i] >= result) {
+        result = array[i];
+      }
     }
   }
   return result;
 }
 
-function min(array, context) {
-  var i = array.length - 1, result = array[i];
-  while (i--) {
-    if (array[i] < result) {
-      result = array[i];
+function min(array, byProperty) {
+  var i = array.length - 1,
+      result = byProperty ? array[i][byProperty] : array[i];
+
+  if (byProperty) {
+    while (i--) {
+      if (array[i][byProperty] < result) {
+        result = array[i][byProperty];
+      }
+    }
+  }
+  else {
+    while (i--) {
+      if (array[i] < result) {
+        result = array[i];
+      }
     }
   }
   return result;
@@ -587,6 +608,14 @@ Canvas.base.string = {
   camelize: camelize,
   capitalize: capitalize
 };
+if (!Function.prototype.bind) {
+  Function.prototype.bind = function(thisArg) {
+    var fn = this, args = Array.prototype.slice.call(arguments, 1);
+    return function() {
+      return fn.apply(thisArg, args.concat(Array.prototype.slice.call(arguments)));
+    };
+  };
+}
 
 (function() {
 
@@ -1308,7 +1337,7 @@ Canvas.base.getElementOffset = getElementOffset;
 
     return function(attributeValue) {
 
-      var matrix = iMatrix.clone();
+      var matrix = iMatrix.concat();
 
       if (!attributeValue || (attributeValue && !reTransformList.test(attributeValue))) {
         return matrix;
@@ -2417,6 +2446,13 @@ Canvas.base.getElementOffset = getElementOffset;
       return this._setDimension('height', value);
     },
 
+    setDimensions: function(dimensions) {
+      for (var prop in dimensions) {
+        this._setDimension(prop, dimensions[prop]);
+      }
+      return this;
+    },
+
     /**
      * private helper for setting width/height
      * @method _setDimensions
@@ -3409,16 +3445,17 @@ Canvas.base.getElementOffset = getElementOffset;
     loadFromJSON: function (json, callback) {
       if (!json) return;
 
-      var serialized = json.evalJSON();
+      var serialized = JSON.parse(json);
       if (!serialized || (serialized && !serialized.objects)) return;
 
       this.clear();
+      var _this = this;
       this._enlivenObjects(serialized.objects, function () {
-        this.backgroundColor = serialized.background;
+        _this.backgroundColor = serialized.background;
         if (callback) {
           callback();
         }
-      }.bind(this));
+      });
 
       return this;
     },
@@ -3438,7 +3475,7 @@ Canvas.base.getElementOffset = getElementOffset;
         switch (o.type) {
           case 'image':
           case 'font':
-            Canvas[o.type.capitalize()].fromObject(o, function (o) {
+            Canvas[Canvas.base.string.capitalize(o.type)].fromObject(o, function (o) {
               _this.add(o);
               if (++numLoadedImages === numTotalImages) {
                 if (callback) callback();
@@ -3446,7 +3483,7 @@ Canvas.base.getElementOffset = getElementOffset;
             });
             break;
           default:
-            var klass = Canvas[o.type.capitalize().camelize()];
+            var klass = Canvas[Canvas.base.string.camelize(Canvas.base.string.capitalize(o.type))];
             if (klass && klass.fromObject) {
               _this.add(klass.fromObject(o));
             }
@@ -4290,7 +4327,7 @@ Canvas.base.getElementOffset = getElementOffset;
      * @return {String}
      */
     toString: function() {
-      return "#<Canvas." + this.type.capitalize() + ">";
+      return "#<Canvas." + Canvas.base.string.capitalize(this.type) + ">";
     },
 
     /**
@@ -5885,10 +5922,10 @@ Canvas.base.getElementOffset = getElementOffset;
     _calcDimensions: function() {
 
       var points = this.points,
-          minX = Canvas.base.array.min(points, byX),
-          minY = Canvas.base.array.min(points, byY),
-          maxX = Canvas.base.array.max(points, byX),
-          maxY = Canvas.base.array.max(points, byY);
+          minX = Canvas.base.array.min(points, 'x'),
+          minY = Canvas.base.array.min(points, 'y'),
+          maxX = Canvas.base.array.max(points, 'x'),
+          maxY = Canvas.base.array.max(points, 'y');
 
       this.width = maxX - minX;
       this.height = maxY - minY;
@@ -6293,9 +6330,11 @@ Canvas.base.getElementOffset = getElementOffset;
      */
     toObject: function() {
       var o = Canvas.base.object.extend(this.callSuper('toObject'), {
-        path: this.path,
-        sourcePath: this.sourcePath
+        path: this.path
       });
+      if (this.sourcePath) {
+        o.sourcePath = this.sourcePath;
+      }
       if (this.transformMatrix) {
         o.transformMatrix = this.transformMatrix;
       }
@@ -6386,20 +6425,24 @@ Canvas.base.getElementOffset = getElementOffset;
             ? previousY
             : getY(item);
 
-        aX.push(x);
-        aY.push(y);
+        var val = parseInt(x, 10);
+        if (!isNaN(val)) aX.push(val);
+
+        val = parseInt(y, 10);
+        if (!isNaN(val)) aY.push(val);
 
       }, this);
-      var minX = aX.min(),
-          minY = aY.min(),
+
+      var minX = Canvas.base.array.min(aX),
+          minY = Canvas.base.array.min(aY),
           deltaX = deltaY = 0;
 
       var o = {
         top: minY - deltaY,
         left: minX - deltaX,
-        bottom: aY.max() - deltaY,
-        right: aX.max() - deltaX
-      }
+        bottom: Canvas.base.array.max(aY) - deltaY,
+        right: Canvas.base.array.max(aX) - deltaX
+      };
 
       o.width = o.right - o.left;
       o.height = o.bottom - o.top;
@@ -6538,7 +6581,7 @@ Canvas.base.getElementOffset = getElementOffset;
     toObject: function() {
       var _super = Canvas.Object.prototype.toObject;
       return Canvas.base.object.extend(_super.call(this), {
-        paths: this.getObjects().invoke('clone'),
+        paths: Canvas.base.array.invoke(this.getObjects(), 'clone'),
         sourcePath: this.sourcePath
       });
     },
@@ -6571,7 +6614,7 @@ Canvas.base.getElementOffset = getElementOffset;
      */
     isSameColor: function() {
       var firstPathFill = this.getObjects()[0].get('fill');
-      return this.every(function(path) {
+      return this.getObjects().every(function(path) {
         return path.get('fill') === firstPathFill;
       });
     },
@@ -6799,7 +6842,7 @@ Canvas.base.getElementOffset = getElementOffset;
      */
     toObject: function() {
       return Canvas.base.object.extend(this.callSuper('toObject'), {
-        objects: this.objects.invoke('clone')
+        objects: Canvas.base.array.invoke(this.objects, 'clone')
       });
     },
 

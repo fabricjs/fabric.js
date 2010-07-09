@@ -1,4 +1,4 @@
-function init() {
+(function() {
   
   var emptyImageCanvasData = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAfQAAAH0CAYAAADL1t+KAAAH7ElEQVR4nO3VMQ0AMAzAsPInvYHoMS2yEeTLHADge/M6AADYM3QACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIMHQACDB0AAgwdAAIuMjH4b7osLFBAAAAAElFTkSuQmCC";  
   
@@ -30,724 +30,763 @@ function init() {
   
   var canvas = this.canvas = new Canvas.Element('test');
   
-  var canvasEl = $('test');
+  var canvasEl = document.getElementById('test');
   var canvasContext = canvasEl.getContext('2d');
   
   function makeRect(options) {
     var defaultOptions = { width: 10, height: 10 };
-    return new Canvas.Rect(Object.extend(defaultOptions, options || { }));
+    return new Canvas.Rect(Canvas.base.object.extend(defaultOptions, options || { }));
   }
   
-  new Test.Unit.Runner({
+  module('Canvas.Element', {
     teardown: function() {
       canvas.clear();
       canvas.setActiveGroup(null);
       canvas.backgroundColor = Canvas.Element.prototype.backgroundColor;
       canvas.calcOffset();
-    },
-    
-    testInitialProperties: function() {
-      this.assert('backgroundColor' in canvas);
-      this.assertIdentical(true, canvas.includeDefaultValues);
-    },
-    
-    testGetObjects: function() {
-      
-      this.assertRespondsTo('getObjects', canvas, 'should respond to `getObjects` method');
-      this.assertEnumEqual([], canvas.getObjects(), 'should return empty array for `getObjects` when empty');
-      this.assertIdentical(0, canvas.getObjects().length, 'should have a 0 length when empty');
-    },
-    testGetElement: function() {
-      this.assertRespondsTo('getElement', canvas, 'should respond to `getElement` method');
-      this.assertIdentical(canvasEl, canvas.getElement(), 'should return a proper element');
-    },
-    testItem: function() {
-      var rect = makeRect();
-      
-      this.assertRespondsTo('item', canvas, 'should respond to item');
-      canvas.add(rect);
-      this.assertIdentical(rect, canvas.item(0), 'should return proper item');
-    },
-    testCalcOffset: function() {
-      this.assertRespondsTo('calcOffset', canvas, 'should respond to `calcOffset`');
-      this.assertIsChainable('calcOffset', canvas);
-    },
-    testAdd: function() {
-      var rect = makeRect();
-      
-      this.assertRespondsTo('add', canvas);
-      this.assert(canvas === canvas.add(rect), 'should be chainable');
-      this.assertIdentical(rect, canvas.item(0));
-      
-      canvas.add(makeRect(), makeRect(), makeRect());
-      this.assertIdentical(4, canvas.getObjects().length, 'should support multiple arguments');
-    },
-    testInsertAt: function() {
-      
-      var rect1 = makeRect(),
-          rect2 = makeRect();
-      
-      canvas.add(rect1, rect2);
-      
-      this.assertRespondsTo('insertAt', canvas, 'should respond to `insertAt` method');
-      
-      var rect = makeRect();
-      canvas.insertAt(rect, 1);
-      this.assertIdentical(rect, canvas.item(1));
-      canvas.insertAt(rect, 2);
-      this.assertIdentical(rect, canvas.item(2));
-      this.assert(canvas === canvas.insertAt(rect, 2), 'should be chainable');
-    },
-    testGetContext: function() {
-      this.assertRespondsTo('getContext', canvas);
-      this.assertIdentical(canvasContext, canvas.getContext());
-    },
-    testClearContext: function() {
-      this.assertRespondsTo('clearContext', canvas);
-      this.assertIdentical(canvas, canvas.clearContext(canvas.getContext()), 'chainable');
-    },
-    testClear: function() {
-      this.assertRespondsTo('clear', canvas);
-      this.assertIsChainable('clear', canvas);
-      this.assertIdentical(0, canvas.getObjects().length);
-      canvas.add(makeRect({ left: 100, top: 100, fill: '#ff5555' }));
-      
-      if (Canvas.Element.supports('getImageData')) {
-        this.assert(!assertSameColor(canvas._oContextContainer), 'a red rectangle should be rendered on canvas');
-        canvas.clear();
-        this.assert(assertSameColor(canvas._oContextContainer), 'color should be the same throughout canvas after clearing');
-      }
-    },
-    testRenderAll: function() {
-      this.assertRespondsTo('renderAll', canvas);
-      this.assertIsChainable('renderAll', canvas);
-    },
-    testRenderTop: function() {
-      this.assertRespondsTo('renderTop', canvas);
-      this.assertIsChainable('renderTop', canvas);
-    },
-    testFindTarget: function() {
-      this.assertRespondsTo('findTarget', canvas);
-    },
-    testToDataURL: function() {
-      this.assertRespondsTo('toDataURL', canvas);
-      if (!Canvas.Element.supports('toDataURL')) {
-        this.warn("toDataURL is not supported by environment");
-      }
-      else {
-        var dataURL = canvas.toDataURL('png');
-        // don't compare actual data url, as it is often browser-dependent
-        // this.assertIdentical(emptyImageCanvasData, canvas.toDataURL('png'));
-        this.assertIdentical('string', typeof dataURL);
-        this.assertIdentical('data:image/png;base64', dataURL.substring(0, 21));
-      }
-    },
-    testGetPointer: function() {
-      this.assertRespondsTo('getPointer', canvas);
-      canvasEl.observe('click', function(e) {
-        var pointer = canvas.getPointer(e);
-        //this.assertIdentical(101, pointer.x, 'pointer.x should be correct');
-        //this.assertIdentical(102, pointer.y, 'pointer.y should be correct');
-      }.bind(this));
-      Event.simulate(canvasEl, 'click', {
-        pointerX: 101, pointerY: 102
-      });
-    },
-    testGetCenter: function() {
-      this.assertRespondsTo('getCenter', canvas);
-      var center = canvas.getCenter();
-      this.assertIdentical(canvasEl.width / 2, center.left);
-      this.assertIdentical(canvasEl.height / 2, center.top);
-    },
-    testCenterObjectH: function() {
-      this.assertRespondsTo('centerObjectH', canvas);
-      var rect = makeRect({ left: 102, top: 202 });
-      canvas.add(rect);
-      this.assertIdentical(canvas, canvas.centerObjectH(rect), 'should be chainable');
-      this.assertIdentical(canvasEl.width / 2, rect.get('left'), 'object\'s "left" property should correspond to canvas element\'s center');
-    },
-    testCenterObjectV: function() {
-      this.assertRespondsTo('centerObjectV', canvas);
-      var rect = makeRect({ left: 102, top: 202 });
-      canvas.add(rect);
-      this.assertIdentical(canvas, canvas.centerObjectV(rect), 'should be chainable');
-      this.assertIdentical(canvasEl.height / 2, rect.get('top'), 'object\'s "top" property should correspond to canvas element\'s center');
-    },
-    testStraightenObject: function() {
-      this.assertRespondsTo('straightenObject', canvas);
-      var rect = makeRect({ angle: 10 })
-      canvas.add(rect);
-      this.assertIdentical(canvas, canvas.straightenObject(rect), 'should be chainable');
-      this.assertIdentical(0, rect.getAngle(), 'angle should be coerced to 0 (from 10)');
-      
-      rect.setAngle('60');
-      canvas.straightenObject(rect);
-      this.assertIdentical(90, rect.getAngle(), 'angle should be coerced to 90 (from 60)');
-      
-      rect.setAngle('100');
-      canvas.straightenObject(rect);
-      this.assertIdentical(90, rect.getAngle(), 'angle should be coerced to 90 (from 100)');
-    },
-    testToJson: function() {
-      this.assertRespondsTo('toJSON', canvas);
-      this.assertIdentical('{"objects": [], "background": "rgba(255,255,255,1)"}', canvas.toJSON());
-      canvas.backgroundColor = '#ff5555';
-      this.assertIdentical('{"objects": [], "background": "#ff5555"}', canvas.toJSON(), '`background` value should be reflected in json');
-      canvas.add(makeRect());
-      this.assertIdentical(RECT_JSON, canvas.toJSON());
-    },
-    testToDatalessJSON: function() {
-      this.assertRespondsTo('toDatalessJSON', canvas);
-      this.assertIdentical('{"objects": [], "background": "rgba(255,255,255,1)"}', canvas.toDatalessJSON());
-      canvas.backgroundColor = '#ff5555';
-      this.assertIdentical('{"objects": [], "background": "#ff5555"}', 
-        canvas.toDatalessJSON(), '`background` value should be reflected in json');
-      canvas.add(makeRect());
-      this.assertIdentical(RECT_JSON, canvas.toDatalessJSON());
-    },
-    testToDatalessJSON: function() {
-      var path = new Canvas.Path('M 100 100 L 300 100 L 200 300 z', {
-        sourcePath: 'http://example.com/'
-      });
-      canvas.add(path);
-      this.assertIdentical(PATH_DATALESS_JSON, canvas.toDatalessJSON());
-    },
-    testToObject: function() {
-      this.assertRespondsTo('toObject', canvas);
-      var expectedObject = { 
-        background: canvas.backgroundColor, 
-        objects: canvas.getObjects()
-      };
-      this.assertHashEqual(expectedObject, canvas.toObject());
-      
-      var rect = makeRect();
-      canvas.add(rect);
-      
-      this.assertIdentical(rect.type, canvas.toObject().objects[0].type);
-    },
-    testToDatalessObject: function() {
-      this.assertRespondsTo('toDatalessObject', canvas);
-      var expectedObject = { 
-        background: canvas.backgroundColor, 
-        objects: canvas.getObjects()
-      };
-      this.assertHashEqual(expectedObject, canvas.toDatalessObject());
-      
-      var rect = makeRect();
-      canvas.add(rect);
-      
-      this.assertIdentical(rect.type, canvas.toObject().objects[0].type);
-      // TODO (kangax): need to test this method with Canvas.Path to ensure that path is not populated
-    },
-    testIsEmpty: function() {
-      this.assertRespondsTo('isEmpty', canvas);
-      this.assert(canvas.isEmpty());
-      canvas.add(makeRect());
-      this.assert(!canvas.isEmpty());
-    },
-    testLoadFromJSON: function() {
-      this.assertRespondsTo('loadFromJSON', canvas);
-      canvas.loadFromJSON(PATH_JSON, function(){
-        var obj = canvas.item(0);
-        
-        this.assert(!canvas.isEmpty(), 'canvas is not empty');
-        this.assertIdentical('path', obj.type, 'first object is a path object');
-        this.assertIdentical('#ff5555', canvas.backgroundColor, 'backgroundColor is populated properly');
-        
-        this.assertIdentical(268, obj.get('left'));
-        this.assertIdentical(266, obj.get('top'));
-        this.assertIdentical(51, obj.get('width'));
-        this.assertIdentical(49, obj.get('height'));
-        this.assertIdentical('rgb(0,0,0)', obj.get('fill'));
-        this.assertIdentical(null, obj.get('stroke'));
-        this.assertIdentical(1, obj.get('strokeWidth'));
-        this.assertIdentical(1, obj.get('scaleX'));
-        this.assertIdentical(1, obj.get('scaleY'));
-        this.assertIdentical(0, obj.get('angle'));
-        this.assertIdentical(false, obj.get('flipX'));
-        this.assertIdentical(false, obj.get('flipY'));
-        this.assertIdentical(1, obj.get('opacity'));
-        this.assert(obj.get('path').length > 0);
-        
-      }.bind(this))
-    },
-    testRemove: function() {
-      this.assertRespondsTo('remove', canvas);
-      var rect1 = makeRect(),
-          rect2 = makeRect();
-      canvas.add(rect1, rect2);
-      this.assertIdentical(rect1, canvas.remove(rect1), 'should return removed object');
-      this.assertIdentical(rect2, canvas.item(0), 'only second object should be left');
-    },
-    testFxRemove: function() {
-      this.assertRespondsTo('fxRemove', canvas);
-      
-      var rect = new Canvas.Rect();
-      canvas.add(rect);
-      
-      var callbackFired = false;
-      function onRemove(){
-        callbackFired = true;
-      }
-      
-      this.assertIdentical(rect, canvas.item(0));
-      this.assertIdentical(canvas, canvas.fxRemove(rect, onRemove), 'should be chainable');
-      
-      this.wait(1000, function(){
-        this.assertUndefined(canvas.item(0));
-        this.assert(callbackFired);
-      });
-    },
-    testSendToBack: function() {
-      this.assertRespondsTo('sendToBack', canvas);
-      
-      var rect1 = makeRect(),
-          rect2 = makeRect(),
-          rect3 = makeRect();
-      
-      canvas.add(rect1, rect2, rect3);
-      
-      canvas.sendToBack(rect3);
-      this.assertIdentical(rect3, canvas.item(0), 'third should now be the first one');
-      
-      canvas.sendToBack(rect2);
-      this.assertIdentical(rect2, canvas.item(0), 'second should now be the first one');
-      
-      canvas.sendToBack(rect2);
-      this.assertIdentical(rect2, canvas.item(0), 'second should *still* be the first one');
-    },
-    testBringToFront: function() {
-      this.assertRespondsTo('bringToFront', canvas);
-      
-      var rect1 = makeRect(),
-          rect2 = makeRect(),
-          rect3 = makeRect();
-      
-      canvas.add(rect1, rect2, rect3);
-      
-      canvas.bringToFront(rect1);
-      this.assertIdentical(rect1, canvas.item(2), 'first should now be the last one');
-      
-      canvas.bringToFront(rect2);
-      this.assertIdentical(rect2, canvas.item(2), 'second should now be the last one');
-      
-      canvas.bringToFront(rect2);
-      this.assertIdentical(rect2, canvas.item(2), 'second should *still* be the last one');
-    },
-    testSendBackwards: function() {
-      this.assertRespondsTo('sendBackwards', canvas);
-      
-      var rect1 = makeRect(),
-          rect2 = makeRect(),
-          rect3 = makeRect();
-      
-      canvas.add(rect1, rect2, rect3);
-      
-      // [ 1, 2, 3 ]
-      this.assertIdentical(rect1, canvas.item(0));
-      this.assertIdentical(rect2, canvas.item(1));
-      this.assertIdentical(rect3, canvas.item(2));
-      
-      canvas.sendBackwards(rect3);
-      
-      // moved 3 one level back — [1, 3, 2]
-      this.assertIdentical(rect1, canvas.item(0));
-      this.assertIdentical(rect2, canvas.item(2));
-      this.assertIdentical(rect3, canvas.item(1));
-      
-      canvas.sendBackwards(rect3);
-      
-      // moved 3 one level back — [3, 1, 2]
-      this.assertIdentical(rect1, canvas.item(1));
-      this.assertIdentical(rect2, canvas.item(2));
-      this.assertIdentical(rect3, canvas.item(0));
-      
-      canvas.sendBackwards(rect3);
-      
-      // 3 stays at the same position — [2, 3, 1]
-      this.assertIdentical(rect1, canvas.item(1));
-      this.assertIdentical(rect2, canvas.item(2));
-      this.assertIdentical(rect3, canvas.item(0));
-      
-      canvas.sendBackwards(rect2);
-      
-      this.assertIdentical(rect1, canvas.item(2));
-      this.assertIdentical(rect2, canvas.item(1));
-      this.assertIdentical(rect3, canvas.item(0));
-      
-      canvas.sendBackwards(rect2);
-      
-      this.assertIdentical(rect1, canvas.item(2));
-      this.assertIdentical(rect2, canvas.item(0));
-      this.assertIdentical(rect3, canvas.item(1));
-    },
-    testBringForward: function() {
-      this.assertRespondsTo('bringForward', canvas);
-      
-      var rect1 = makeRect(),
-          rect2 = makeRect(),
-          rect3 = makeRect();
-      
-      canvas.add(rect1, rect2, rect3);
-      
-      // initial position — [ 1, 2, 3 ]
-      this.assertIdentical(rect1, canvas.item(0));
-      this.assertIdentical(rect2, canvas.item(1));
-      this.assertIdentical(rect3, canvas.item(2));
-      
-      canvas.bringForward(rect1);
-      
-      // 1 moves one way up — [ 2, 1, 3 ]
-      this.assertIdentical(rect1, canvas.item(1));
-      this.assertIdentical(rect2, canvas.item(0));
-      this.assertIdentical(rect3, canvas.item(2));
-      
-      canvas.bringForward(rect1);
-      
-      // 1 moves one way up again — [ 2, 3, 1 ]
-      this.assertIdentical(rect1, canvas.item(2));
-      this.assertIdentical(rect2, canvas.item(0));
-      this.assertIdentical(rect3, canvas.item(1));
-      
-      canvas.bringForward(rect1);
-      
-      // 1 is already all the way on top and so doesn't change position — [ 2, 3, 1 ]
-      this.assertIdentical(rect1, canvas.item(2));
-      this.assertIdentical(rect2, canvas.item(0));
-      this.assertIdentical(rect3, canvas.item(1));
-      
-      canvas.bringForward(rect3);
-      
-      // 1 is already all the way on top and so doesn't change position — [ 2, 1, 3 ]
-      this.assertIdentical(rect1, canvas.item(1));
-      this.assertIdentical(rect2, canvas.item(0));
-      this.assertIdentical(rect3, canvas.item(2));
-    },
-    testSetActiveObject: function() {
-      this.assertRespondsTo('setActiveObject', canvas);
-      
-      var rect1 = makeRect(),
-          rect2 = makeRect();
-      
-      canvas.add(rect1, rect2);
-      
-      canvas.setActiveObject(rect1);
-      this.assert(rect1.isActive());
-      
-      canvas.setActiveObject(rect2);
-      this.assert(rect2.isActive());
-    },
-    testGetActiveObject: function() {
-      this.assertRespondsTo('getActiveObject', canvas);
-      
-      var rect1 = makeRect(),
-          rect2 = makeRect();
-          
-      canvas.add(rect1, rect2);
-      
-      canvas.setActiveObject(rect1);
-      //this.assertIdentical(rect1, canvas.getActiveObject());
-      
-      canvas.setActiveObject(rect2);
-      //this.assertIdentical(rect2, canvas.getActiveObject());
-      
-    },
-    testGetSetActiveGroup: function() {
-      this.assertRespondsTo('getActiveGroup', canvas);
-      this.assertRespondsTo('setActiveGroup', canvas);
-      
-      this.assertNull(canvas.getActiveGroup(), 'should initially be null');
-      
-      var group = new Canvas.Group([
-        makeRect({ left: 10, top: 10 }), 
-        makeRect({ left: 20, top: 20 })
-      ]);
-      
-      this.assertIdentical(canvas, canvas.setActiveGroup(group), 'chainable');
-      this.assertIdentical(group, canvas.getActiveGroup());
-    },
-    testItem: function() {
-      this.assertRespondsTo('item', canvas);
-      
-      var rect1 = makeRect(),
-          rect2 = makeRect();
-      
-      canvas.add(rect1, rect2);
-      
-      this.assertIdentical(rect1, canvas.item(0));
-      this.assertIdentical(rect2, canvas.item(1));
-      
-      canvas.remove(canvas.item(0));
-      
-      this.assertIdentical(rect2, canvas.item(0));
-    },
-    testRemoveActiveGroup: function() {
-      this.assertRespondsTo('removeActiveGroup', canvas);
-      var group = new Canvas.Group([makeRect(), makeRect()]);
-      canvas.setActiveGroup(group);
-      this.assertIdentical(canvas, canvas.removeActiveGroup(), 'chainable');
-      this.assertNull(canvas.getActiveGroup(), 'removing active group sets it to null');
-    },
-    testDeactivateAll: function() {
-      this.assertRespondsTo('deactivateAll', canvas);
-      
-      canvas.add(makeRect());
-      canvas.setActiveObject(canvas.item(0));
-
-      canvas.deactivateAll();
-      this.assert(!canvas.item(0).isActive());
-      this.assertNull(canvas.getActiveObject());
-      this.assertNull(canvas.getActiveGroup());
-    },
-    testDeactivateAllWithDispatch: function() {
-      this.assertRespondsTo('deactivateAllWithDispatch', canvas);
-      
-      canvas.add(makeRect());
-      canvas.setActiveObject(canvas.item(0));
-      
-      var group = new Canvas.Group([
-        makeRect({ left: 10, top: 10 }), 
-        makeRect({ left: 20, top: 20 })
-      ]);
-      
-      canvas.setActiveGroup(group);
-      
-      var eventsFired = {
-        beforeGroupDestroyed: false,
-        afterGroupDestroyed: false,
-        selectionCleared: false
-      }
-      var target;
-      
-      Canvas.base.observeEvent('before:group:destroyed', (function (e) {
-        eventsFired.beforeGroupDestroyed = true;
-        this.assertIdentical(canvas.getActiveGroup(), e.memo.target, 'event should have active group as its `target` property');
-      }).bind(this));
-      
-      Canvas.base.observeEvent('after:group:destroyed', function(){
-        eventsFired.afterGroupDestroyed = true;
-      });
-      
-      Canvas.base.observeEvent('selection:cleared', function(){
-        eventsFired.selectionCleared = true;
-      });
-      
-      canvas.deactivateAllWithDispatch();
-      this.assert(!canvas.item(0).isActive());
-      this.assertNull(canvas.getActiveObject());
-      this.assertNull(canvas.getActiveGroup());
-      
-      for (var prop in eventsFired) {
-        this.assert(eventsFired[prop]);
-      }
-      
-      eventsFired.beforeGroupDestroyed = false;
-      eventsFired.afterGroupDestroyed = false;
-      eventsFired.selectionCleared = false;
-      
-      canvas.deactivateAllWithDispatch();
-      
-      this.assert(!eventsFired.beforeGroupDestroyed, 'before:group:destroyed should only fire when there\'s an active group');
-      this.assert(!eventsFired.afterGroupDestroyed, 'after:group:destroyed should only fire when there\'s an active group');
-      
-      this.assert(eventsFired.selectionCleared, 'selection:cleared is fired independent of active group existence');
-    },
-    testComplexity: function() {
-      this.assertRespondsTo('complexity', canvas);
-      this.assertIdentical(0, canvas.complexity());
-      
-      canvas.add(makeRect());
-      this.assertIdentical(1, canvas.complexity());
-      
-      canvas.add(makeRect(), makeRect());
-      this.assertIdentical(3, canvas.complexity());
-    },
-    testToString: function() {
-      this.assertRespondsTo('toString', canvas);
-      
-      this.assertIdentical('#<Canvas.Element (0): { objects: 0 }>', canvas.toString());
-      
-      canvas.add(makeRect());
-      this.assertIdentical('#<Canvas.Element (1): { objects: 1 }>', canvas.toString());
-    },
-    testDispose: function() {
-      
-      function invokeEventsOnCanvas() {
-        Event.simulate(canvas.getElement(), 'mousedown');
-        Event.simulate(canvas.getElement(), 'mouseup');
-        Event.simulate(canvas.getElement(), 'mousemove');
-      }
-      var assertInvocationsCount = (function() {
-        var message = 'event handler should not be invoked after `dispose`';
-        this.assertIdentical(1, handlerInvocationCounts.__onMouseDown);
-        this.assertIdentical(1, handlerInvocationCounts.__onMouseUp);
-        this.assertIdentical(1, handlerInvocationCounts.__onMouseMove);
-      }).bind(this);
-      
-      this.assertRespondsTo('dispose', canvas);
-      canvas.add(makeRect(), makeRect(), makeRect());
-      
-      var handlerInvocationCounts = {
-        __onMouseDown: 0, __onMouseUp: 0, __onMouseMove: 0
-      }
-      // hijack event handlers
-      canvas.__onMouseDown = function() {
-        handlerInvocationCounts.__onMouseDown++;
-      };
-      canvas.__onMouseUp = function() {
-        handlerInvocationCounts.__onMouseUp++;
-      };
-      canvas.__onMouseMove = function() {
-        handlerInvocationCounts.__onMouseMove++;
-      };
-      
-      invokeEventsOnCanvas();
-      assertInvocationsCount();
-      
-      canvas.dispose();
-      this.assertIdentical(0, canvas.getObjects().length, 'dispose should clear canvas');
-      
-      invokeEventsOnCanvas();
-      assertInvocationsCount();
-    },
-    testClone: function() {
-      this.assertRespondsTo('clone', canvas);
-      // TODO (kangax): test clone
-    },
-    testSetBgImage: function() {
-      this.assertRespondsTo('setBgImage', canvas);
-      this.assertIdentical(canvas, canvas.setBgImage(''), 'chainable');
-    },
-    testGetSetWidth: function() {
-      this.assertRespondsTo('getWidth', canvas);
-      this.assertIdentical(500, canvas.getWidth());
-      this.assertIdentical(canvas, canvas.setWidth(444), 'chainable');
-      this.assertIdentical(444, canvas.getWidth());
-    },
-    testGetHeight: function() {
-      this.assertRespondsTo('getHeight', canvas);
-      this.assertIdentical(500, canvas.getHeight());
-      this.assertIdentical(canvas, canvas.setHeight(765), 'chainable');
-      this.assertIdentical(765, canvas.getHeight());
-    },
-    testContainsPoint: function() {
-      this.assertRespondsTo('containsPoint', canvas);
-      
-      var rect = new Canvas.Rect({ left: 100, top: 100, width: 50, height: 50 });
-      canvas.add(rect);
-      
-      var canvasEl = canvas.getElement(),
-          canvasOffset = Canvas.base.getElementOffset(canvasEl);
-      
-      var eventStub = { 
-        pageX: canvasOffset.left + 100, 
-        pageY: canvasOffset.top + 100 
-      }
-      
-      this.assert(canvas.containsPoint(eventStub, rect), 'point at (100, 100) should be within area (75, 75, 125, 125)');
-      
-      eventStub = {
-        pageX: canvasOffset.left + 200, 
-        pageY: canvasOffset.top + 200
-      }
-      this.assert(!canvas.containsPoint(eventStub, rect), 'point at (200, 200) should NOT be within area (75, 75, 125, 125)');
-      
-      rect.set('left', 200).set('top', 200).setCoords();
-      this.assert(canvas.containsPoint(eventStub, rect), 'point at (200, 200) should be within area (175, 175, 225, 225)');
-      
-    },
-    testToGrayscale: function() {
-      this.assertRespondsTo('toGrayscale', Canvas.Element);
-      
-      if (!Canvas.Element.supports('getImageData')) {
-        this.warn('getImageData is not supported by environment. Some of the tests can not be run.');
-        return;
-      }
-      
-      var canvasEl = document.createElement('canvas'),
-          context = canvasEl.getContext('2d');
-          
-      canvasEl.width = canvasEl.height = 10;
-      
-      context.fillStyle = 'rgb(255,0,0)'; // red
-      context.fillRect(0, 0, 10, 10);
-      
-      var imageData = context.getImageData(0, 0, 10, 10),
-          data = imageData.data,
-          firstPixelData = [data[0], data[1], data[2], data[3]];
-          
-      this.assertObjectIdentical([255, 0, 0, 255], firstPixelData);
-      
-      Canvas.Element.toGrayscale(canvasEl);
-      
-      imageData = context.getImageData(0, 0, 10, 10);
-      data = imageData.data;
-      firstPixelData = [data[0], data[1], data[2], data[3]];
-      
-      this.assertObjectIdentical([85, 85, 85, 255], firstPixelData);
-    },
-    testResizeImageToFit: function() {
-      this.assertRespondsTo('_resizeImageToFit', canvas);
-      
-      var imgEl = Canvas.base.makeElement('img', { src: '../fixtures/very_large_image.jpg' }),
-          ORIGINAL_WIDTH = 3888,
-          ORIGINAL_HEIGHT = 2592;
-      
-      this.wait(2000, function(){
-        
-        this.assertIdentical(ORIGINAL_WIDTH, imgEl.width);
-        this.assertIdentical(ORIGINAL_HEIGHT, imgEl.height);
-        
-        canvas._resizeImageToFit(imgEl);
-        
-        this.assert(imgEl.width < ORIGINAL_WIDTH);
-        this.assert(imgEl.height < ORIGINAL_HEIGHT);
-      });
-    },
-    testCache: function() {
-      this.assert(canvas.cache);
-      
-      this.assertRespondsTo('has', canvas.cache);
-      this.assertRespondsTo('get', canvas.cache);
-      this.assertRespondsTo('set', canvas.cache);
-      
-      var message = 'initially, `has` should always return false';
-      
-      var hasFoo, hasBarBaz, hasEmpty;
-      
-      canvas.cache.has('foo', function(v){
-        hasFoo = v;
-      });
-      canvas.cache.has('bar baz moooo', function(v){
-        hasBarBaz = v;
-      });
-      canvas.cache.has('', function(v){
-        hasEmpty = v;
-      });
-      
-      this.wait(500, function(){
-        this.assertIdentical(false, hasFoo, message);
-        this.assertIdentical(false, hasBarBaz, message);
-        this.assertIdentical(false, hasEmpty, message);
-      });
-    },
-    testLoadImageFromURL: function() {
-      this.assertRespondsTo('loadImageFromURL', canvas);
-      
-      var callbackInvoked = false,
-          objectPassedToCallback;
-          
-      canvas.loadImageFromURL('../fixtures/very_large_image.jpg', function(obj) {
-        callbackInvoked = true;
-        objectPassedToCallback = obj;
-      });
-      
-      this.wait(2000, function(){
-        this.assert(callbackInvoked, 'callback should be invoked');
-        this.assertInstanceOf(Canvas.Image, objectPassedToCallback, 'object passed to callback should be an instance of `Canvas.Image`');
-        this.assert(objectPassedToCallback.getSrc().endsWith('fixtures/very_large_image.jpg'), 'image should have correct src');
-      });
-      
     }
   });
-}
+  
+  test('initialProperties', function() {
+    ok('backgroundColor' in canvas);
+    equals(canvas.includeDefaultValues, true);
+  });
+  
+  test('getObjects', function() {
+    ok(typeof canvas.getObjects == 'function', 'should respond to `getObjects` method');
+    same([], canvas.getObjects(), 'should return empty array for `getObjects` when empty');
+    equals(canvas.getObjects().length, 0, 'should have a 0 length when empty');
+  });
+  
+  test('getElement', function() {
+    ok(typeof canvas.getElement == 'function', 'should respond to `getElement` method');
+    equals(canvas.getElement(), canvasEl, 'should return a proper element');
+  });
+  
+  test('item', function() {
+    var rect = makeRect();
+    
+    ok(typeof canvas.item == 'function', 'should respond to item');
+    canvas.add(rect);
+    equals(canvas.item(0), rect, 'should return proper item');
+  });
+  
+  test('calcOffset', function() {
+    ok(typeof canvas.calcOffset == 'function', 'should respond to `calcOffset`');
+    equals(canvas, canvas.calcOffset());
+  });
+  
+  test('add', function() {
+    var rect = makeRect();
+    
+    ok(typeof canvas.add == 'function');
+    ok(canvas === canvas.add(rect), 'should be chainable');
+    equals(canvas.item(0), rect);
+    
+    canvas.add(makeRect(), makeRect(), makeRect());
+    equals(canvas.getObjects().length, 4, 'should support multiple arguments');
+  });
+  
+  test('insertAt', function() {
+    var rect1 = makeRect(),
+        rect2 = makeRect();
+    
+    canvas.add(rect1, rect2);
+    
+    ok(typeof canvas.insertAt == 'function', 'should respond to `insertAt` method');
+    
+    var rect = makeRect();
+    canvas.insertAt(rect, 1);
+    equals(canvas.item(1), rect);
+    canvas.insertAt(rect, 2);
+    equals(canvas.item(2), rect);
+    equals(canvas, canvas.insertAt(rect, 2), 'should be chainable');
+  });
+  
+  test('getContext', function() {
+    ok(typeof canvas.getContext == 'function');
+    equals(canvas.getContext(), canvasContext);
+  });
+  
+  test('clearContext', function() {
+    ok(typeof canvas.clearContext == 'function');
+    equals(canvas, canvas.clearContext(canvas.getContext()), 'chainable');
+  });
+  
+  test('clear', function() {
+    ok(typeof canvas.clear == 'function');
+    
+    equals(canvas, canvas.clear());
+    equals(canvas.getObjects().length, 0);
+    
+    canvas.add(makeRect({ left: 100, top: 100, fill: '#ff5555' }));
+    
+    if (Canvas.Element.supports('getImageData')) {
+      //ok(!assertSameColor(canvas._oContextContainer), 'a red rectangle should be rendered on canvas');
+      canvas.clear();
+      //ok(assertSameColor(canvas._oContextContainer), 'color should be the same throughout canvas after clearing');
+    }
+  });
+  
+  test('renderAll', function() {
+    ok(typeof canvas.renderAll == 'function');
+    equals(canvas, canvas.renderAll());
+  });
+  
+  test('renderTop', function() {
+    ok(typeof canvas.renderTop == 'function');
+    equals(canvas, canvas.renderTop());
+  });
+  
+  test('findTarget', function() {
+    ok(typeof canvas.findTarget == 'function');
+  });
+  
+  test('toDataURL', function() {
+    ok(typeof canvas.toDataURL == 'function');
+    if (!Canvas.Element.supports('toDataURL')) {
+      alert("toDataURL is not supported by environment");
+    }
+    else {
+      var dataURL = canvas.toDataURL('png');
+      // don't compare actual data url, as it is often browser-dependent
+      // this.assertIdentical(emptyImageCanvasData, canvas.toDataURL('png'));
+      equals(typeof dataURL, 'string');
+      equals(dataURL.substring(0, 21), 'data:image/png;base64');
+    }
+  });
+  
+  test('getPointer', function() {
+    ok(typeof canvas.getPointer == 'function');
+    
+    Canvas.base.addListener(canvasEl, 'click', function(e) {
+      var pointer = canvas.getPointer(e);
+      equals(pointer.x, 101, 'pointer.x should be correct');
+      equals(pointer.y, 102, 'pointer.y should be correct');
+    });
+    Event.simulate(canvasEl, 'click', {
+      pointerX: 101, pointerY: 102
+    });
+  });
+  
+  test('getCenter', function() {
+    ok(typeof canvas.getCenter == 'function');
+    var center = canvas.getCenter();
+    equals(center.left, canvasEl.width / 2);
+    equals(center.top, canvasEl.height / 2);
+  });
+  
+  test('centerObjectH', function() {
+    ok(typeof canvas.centerObjectH == 'function');
+    var rect = makeRect({ left: 102, top: 202 });
+    canvas.add(rect);
+    equals(canvas.centerObjectH(rect), canvas, 'should be chainable');
+    equals(rect.get('left'), canvasEl.width / 2, 'object\'s "left" property should correspond to canvas element\'s center');
+  });
+  
+  test('centerObjectV', function() {
+    ok(typeof canvas.centerObjectV == 'function');
+    var rect = makeRect({ left: 102, top: 202 });
+    canvas.add(rect);
+    equals(canvas.centerObjectV(rect), canvas, 'should be chainable');
+    equals(rect.get('top'), canvasEl.height / 2, 'object\'s "top" property should correspond to canvas element\'s center');
+  });
+  
+  test('straightenObject', function() {
+    ok(typeof canvas.straightenObject == 'function');
+    var rect = makeRect({ angle: 10 })
+    canvas.add(rect);
+    equals(canvas.straightenObject(rect), canvas, 'should be chainable');
+    equals(rect.getAngle(), 0, 'angle should be coerced to 0 (from 10)');
+    
+    rect.setAngle('60');
+    canvas.straightenObject(rect);
+    equals(rect.getAngle(), 90, 'angle should be coerced to 90 (from 60)');
+    
+    rect.setAngle('100');
+    canvas.straightenObject(rect);
+    equals(rect.getAngle(), 90, 'angle should be coerced to 90 (from 100)');
+  });
+  
+  test('toJSON', function() {
+    ok(typeof canvas.toJSON == 'function');
+    equals(canvas.toJSON(), '{"objects": [], "background": "rgba(255,255,255,1)"}');
+    canvas.backgroundColor = '#ff5555';
+    equals(canvas.toJSON(), '`background` value should be reflected in json');
+    canvas.add(makeRect());
+    same(canvas.toJSON(), RECT_JSON);
+  });
+  
+  test('toDatalessJSON', function() {
+    var path = new Canvas.Path('M 100 100 L 300 100 L 200 300 z', {
+      sourcePath: 'http://example.com/'
+    });
+    canvas.add(path);
+    equals(canvas.toDatalessJSON(), PATH_DATALESS_JSON);
+  });
+  
+  test('toObject', function() {
+    ok(typeof canvas.toObject == 'function');
+    var expectedObject = { 
+      background: canvas.backgroundColor, 
+      objects: canvas.getObjects()
+    };
+    same(expectedObject, canvas.toObject());
+    
+    var rect = makeRect();
+    canvas.add(rect);
+    
+    equals(canvas.toObject().objects[0].type, rect.type);
+  });
+  
+  test('toDatalessObject', function() {
+    ok(typeof canvas.toDatalessObject == 'function');
+    var expectedObject = { 
+      background: canvas.backgroundColor, 
+      objects: canvas.getObjects()
+    };
+    same(expectedObject, canvas.toDatalessObject());
+    
+    var rect = makeRect();
+    canvas.add(rect);
+    
+    equals(canvas.toObject().objects[0].type, rect.type);
+    // TODO (kangax): need to test this method with Canvas.Path to ensure that path is not populated
+  });
+  
+  test('isEmpty', function() {
+    ok(typeof canvas.isEmpty == 'function');
+    ok(canvas.isEmpty());
+    canvas.add(makeRect());
+    ok(!canvas.isEmpty());
+  });
+  
+  test('loadFromJSON', function() {
+    ok(typeof canvas.loadFromJSON == 'function');
+    
+    canvas.loadFromJSON(PATH_JSON, function(){
+      var obj = canvas.item(0);
+      
+      ok(!canvas.isEmpty(), 'canvas is not empty');
+      equals(obj.type, 'path', 'first object is a path object');
+      equals(canvas.backgroundColor, '#ff5555', 'backgroundColor is populated properly');
+      
+      equals(obj.get('left'), 268);
+      equals(obj.get('top'), 266);
+      equals(obj.get('width'), 51);
+      equals(obj.get('height'), 49);
+      equals(obj.get('fill'), 'rgb(0,0,0)');
+      equals(obj.get('stroke'), null);
+      equals(obj.get('strokeWidth'), 1);
+      equals(obj.get('scaleX'), 1);
+      equals(obj.get('scaleY'), 1);
+      equals(obj.get('angle'), 0);
+      equals(obj.get('flipX'), false);
+      equals(obj.get('flipY'), false);
+      equals(obj.get('opacity'), 1);
+      ok(obj.get('path').length > 0);
+    });
+  });
+  
+  test('remove', function() {
+    ok(typeof canvas.remove == 'function');
+    var rect1 = makeRect(),
+        rect2 = makeRect();
+    canvas.add(rect1, rect2);
+    equals(canvas.remove(rect1), rect1, 'should return removed object');
+    equals(canvas.item(0), rect2, 'only second object should be left');
+  });
+  
+  test('sendToBack', function() {
+    ok(typeof canvas.sendToBack == 'function');
+    
+    var rect1 = makeRect(),
+        rect2 = makeRect(),
+        rect3 = makeRect();
+    
+    canvas.add(rect1, rect2, rect3);
+    
+    canvas.sendToBack(rect3);
+    equals(canvas.item(0), rect3, 'third should now be the first one');
+    
+    canvas.sendToBack(rect2);
+    equals(canvas.item(0), rect2, 'second should now be the first one');
+    
+    canvas.sendToBack(rect2);
+    equals(canvas.item(0), rect2, 'second should *still* be the first one');
+  });
+  
+  test('bringToFront', function() {
+    ok(typeof canvas.bringToFront == 'function');
+    
+    var rect1 = makeRect(),
+        rect2 = makeRect(),
+        rect3 = makeRect();
+    
+    canvas.add(rect1, rect2, rect3);
+    
+    canvas.bringToFront(rect1);
+    equals(canvas.item(2), rect1, 'first should now be the last one');
+    
+    canvas.bringToFront(rect2);
+    equals(canvas.item(2), rect2, 'second should now be the last one');
+    
+    canvas.bringToFront(rect2);
+    equals(canvas.item(2), rect2, 'second should *still* be the last one');
+  });
+  
+  test('sendBackwards', function() {
+    ok(typeof canvas.sendBackwards == 'function');
+    
+    var rect1 = makeRect(),
+        rect2 = makeRect(),
+        rect3 = makeRect();
+    
+    canvas.add(rect1, rect2, rect3);
+    
+    // [ 1, 2, 3 ]
+    equals(canvas.item(0), rect1);
+    equals(canvas.item(1), rect2);
+    equals(canvas.item(2), rect3);
+    
+    canvas.sendBackwards(rect3);
+    
+    // moved 3 one level back — [1, 3, 2]
+    equals(canvas.item(0), rect1);
+    equals(canvas.item(2), rect2);
+    equals(canvas.item(1), rect3);
+    
+    canvas.sendBackwards(rect3);
+    
+    // moved 3 one level back — [3, 1, 2]
+    equals(canvas.item(1), rect1);
+    equals(canvas.item(2), rect2);
+    equals(canvas.item(0), rect3);
+    
+    canvas.sendBackwards(rect3);
+    
+    // 3 stays at the same position — [2, 3, 1]
+    equals(canvas.item(1), rect1);
+    equals(canvas.item(2), rect2);
+    equals(canvas.item(0), rect3);
+    
+    canvas.sendBackwards(rect2);
+    
+    equals(canvas.item(2), rect1);
+    equals(canvas.item(1), rect2);
+    equals(canvas.item(0), rect3);
+    
+    canvas.sendBackwards(rect2);
+    
+    equals(canvas.item(2), rect1);
+    equals(canvas.item(0), rect2);
+    equals(canvas.item(1), rect3);
+  });
+  
+  test('bringForward', function() {
+    ok(typeof canvas.bringForward == 'function');
+    
+    var rect1 = makeRect(),
+        rect2 = makeRect(),
+        rect3 = makeRect();
+    
+    canvas.add(rect1, rect2, rect3);
+    
+    // initial position — [ 1, 2, 3 ]
+    equals(canvas.item(0), rect1);
+    equals(canvas.item(1), rect2);
+    equals(canvas.item(2), rect3);
+    
+    canvas.bringForward(rect1);
+    
+    // 1 moves one way up — [ 2, 1, 3 ]
+    equals(canvas.item(1), rect1);
+    equals(canvas.item(0), rect2);
+    equals(canvas.item(2), rect3);
+    
+    canvas.bringForward(rect1);
+    
+    // 1 moves one way up again — [ 2, 3, 1 ]
+    equals(canvas.item(2), rect1);
+    equals(canvas.item(0), rect2);
+    equals(canvas.item(1), rect3);
+    
+    canvas.bringForward(rect1);
+    
+    // 1 is already all the way on top and so doesn't change position — [ 2, 3, 1 ]
+    equals(canvas.item(2), rect1);
+    equals(canvas.item(0), rect2);
+    equals(canvas.item(1), rect3);
+    
+    canvas.bringForward(rect3);
+    
+    // 1 is already all the way on top and so doesn't change position — [ 2, 1, 3 ]
+    equals(canvas.item(1), rect1);
+    equals(canvas.item(0), rect2);
+    equals(canvas.item(2), rect3);
+  });
+  
+  test('setActiveObject', function() {
+    ok(typeof canvas.setActiveObject == 'function');
+    
+    var rect1 = makeRect(),
+        rect2 = makeRect();
+    
+    canvas.add(rect1, rect2);
+    
+    canvas.setActiveObject(rect1);
+    ok(rect1.isActive());
+    
+    canvas.setActiveObject(rect2);
+    ok(rect2.isActive());
+  });
+  
+  test('getActiveObject', function() {
+    ok(typeof canvas.getActiveObject == 'function');
+    
+    var rect1 = makeRect(),
+        rect2 = makeRect();
+        
+    canvas.add(rect1, rect2);
+    
+    canvas.setActiveObject(rect1);
+    equals(canvas.getActiveObject(), rect1);
+    
+    canvas.setActiveObject(rect2);
+    equals(canvas.getActiveObject(), rect2);
+  });
+  
+  test('getSetActiveGroup', function() {
+    ok(typeof canvas.getActiveGroup == 'function');
+    ok(typeof canvas.setActiveGroup == 'function');
+    
+    equals(canvas.getActiveGroup(), null, 'should initially be null');
+    
+    var group = new Canvas.Group([
+      makeRect({ left: 10, top: 10 }), 
+      makeRect({ left: 20, top: 20 })
+    ]);
+    
+    equals(canvas.setActiveGroup(group), canvas, 'chainable');
+    equals(canvas.getActiveGroup(), group);
+  });
+  
+  test('item', function() {
+    ok(typeof canvas.item == 'function');
+    
+    var rect1 = makeRect(),
+        rect2 = makeRect();
+    
+    canvas.add(rect1, rect2);
+    
+    equals(canvas.item(0), rect1);
+    equals(canvas.item(1), rect2);
+    
+    canvas.remove(canvas.item(0));
+    
+    equals(canvas.item(0), rect2);
+  });
+  
+  test('removeActiveGroup', function() {
+    ok(typeof canvas.removeActiveGroup == 'function');
+    var group = new Canvas.Group([makeRect(), makeRect()]);
+    canvas.setActiveGroup(group);
+    equals(canvas.removeActiveGroup(), canvas, 'chainable');
+    equals(canvas.getActiveGroup(), null, 'removing active group sets it to null');
+  });
+  
+  test('deactivateAll', function() {
+    ok(typeof canvas.deactivateAll == 'function');
+    
+    canvas.add(makeRect());
+    canvas.setActiveObject(canvas.item(0));
+
+    canvas.deactivateAll();
+    ok(!canvas.item(0).isActive());
+    equals(canvas.getActiveObject(), null);
+    equals(canvas.getActiveGroup(), null);
+  });
+  
+  test('deactivateAllWithDispatch', function() {
+    ok(typeof canvas.deactivateAllWithDispatch == 'function');
+    
+    canvas.add(makeRect());
+    canvas.setActiveObject(canvas.item(0));
+    
+    var group = new Canvas.Group([
+      makeRect({ left: 10, top: 10 }), 
+      makeRect({ left: 20, top: 20 })
+    ]);
+    
+    canvas.setActiveGroup(group);
+    
+    var eventsFired = {
+      beforeGroupDestroyed: false,
+      afterGroupDestroyed: false,
+      selectionCleared: false
+    };
+    var target;
+    
+    Canvas.base.observeEvent('before:group:destroyed', function (e) {
+      eventsFired.beforeGroupDestroyed = true;
+      equals(canvas.getActiveGroup(), e.memo.target, 'event should have active group as its `target` property');
+    });
+    
+    Canvas.base.observeEvent('after:group:destroyed', function(){
+      eventsFired.afterGroupDestroyed = true;
+    });
+    
+    Canvas.base.observeEvent('selection:cleared', function(){
+      eventsFired.selectionCleared = true;
+    });
+    
+    canvas.deactivateAllWithDispatch();
+    ok(!canvas.item(0).isActive());
+    equals(canvas.getActiveObject(), null);
+    equals(canvas.getActiveGroup(), null);
+    
+    for (var prop in eventsFired) {
+      ok(eventsFired[prop]);
+    }
+    
+    eventsFired.beforeGroupDestroyed = false;
+    eventsFired.afterGroupDestroyed = false;
+    eventsFired.selectionCleared = false;
+    
+    canvas.deactivateAllWithDispatch();
+    
+    ok(!eventsFired.beforeGroupDestroyed, 'before:group:destroyed should only fire when there\'s an active group');
+    ok(!eventsFired.afterGroupDestroyed, 'after:group:destroyed should only fire when there\'s an active group');
+    
+    ok(eventsFired.selectionCleared, 'selection:cleared is fired independent of active group existence');
+  });
+  
+  test('complexity', function() {
+    ok(typeof canvas.complexity == 'function');
+    equals(canvas.complexity(), 0);
+    
+    canvas.add(makeRect());
+    equals(canvas.complexity(), 1);
+    
+    canvas.add(makeRect(), makeRect());
+    equals(canvas.complexity(), 3);
+  });
+  
+  test('toString', function() {
+    ok(typeof canvas.toString == 'function');
+    
+    equals(canvas.toString(), '#<Canvas.Element (0): { objects: 0 }>');
+    
+    canvas.add(makeRect());
+    equals(canvas.toString(), '#<Canvas.Element (1): { objects: 1 }>');
+  });
+  
+  test('dispose', function() {
+    function invokeEventsOnCanvas() {
+      Event.simulate(canvas.getElement(), 'mousedown');
+      Event.simulate(canvas.getElement(), 'mouseup');
+      Event.simulate(canvas.getElement(), 'mousemove');
+    }
+    var assertInvocationsCount = function() {
+      var message = 'event handler should not be invoked after `dispose`';
+      equals(handlerInvocationCounts.__onMouseDown, 1);
+      equals(handlerInvocationCounts.__onMouseUp, 1);
+      equals(handlerInvocationCounts.__onMouseMove, 1);
+    };
+    
+    ok(typeof canvas.dispose == 'function');
+    canvas.add(makeRect(), makeRect(), makeRect());
+    
+    var handlerInvocationCounts = {
+      __onMouseDown: 0, __onMouseUp: 0, __onMouseMove: 0
+    };
+    
+    // hijack event handlers
+    canvas.__onMouseDown = function() {
+      handlerInvocationCounts.__onMouseDown++;
+    };
+    canvas.__onMouseUp = function() {
+      handlerInvocationCounts.__onMouseUp++;
+    };
+    canvas.__onMouseMove = function() {
+      handlerInvocationCounts.__onMouseMove++;
+    };
+    
+    invokeEventsOnCanvas();
+    assertInvocationsCount();
+    
+    canvas.dispose();
+    equals(canvas.getObjects().length, 0, 'dispose should clear canvas');
+    
+    invokeEventsOnCanvas();
+    assertInvocationsCount();
+  });
+  
+  test('clone', function() {
+    ok(typeof canvas.clone == 'function');
+    // TODO (kangax): test clone
+  });
+  
+  test('getSetWidth', function() {
+    ok(typeof canvas.getWidth == 'function');
+    equals(canvas.getWidth(), 500);
+    equals(canvas.setWidth(444), canvas, 'chainable');
+    equals(canvas.getWidth(), 444);
+  });
+  
+  test('getSetHeight', function() {
+    ok(typeof canvas.getHeight == 'function');
+    equals(canvas.getHeight(), 500);
+    equals(canvas.setHeight(765), canvas, 'chainable');
+    equals(canvas.getHeight(), 765);
+  });
+  
+  test('containsPoint', function() {
+    ok(typeof canvas.containsPoint == 'function');
+    
+    var rect = new Canvas.Rect({ left: 100, top: 100, width: 50, height: 50 });
+    canvas.add(rect);
+    
+    var canvasEl = canvas.getElement(),
+        canvasOffset = Canvas.base.getElementOffset(canvasEl);
+    
+    var eventStub = { 
+      pageX: canvasOffset.left + 100, 
+      pageY: canvasOffset.top + 100 
+    };
+    
+    ok(canvas.containsPoint(eventStub, rect), 'point at (100, 100) should be within area (75, 75, 125, 125)');
+    
+    eventStub = {
+      pageX: canvasOffset.left + 200, 
+      pageY: canvasOffset.top + 200
+    };
+    ok(!canvas.containsPoint(eventStub, rect), 'point at (200, 200) should NOT be within area (75, 75, 125, 125)');
+    
+    rect.set('left', 200).set('top', 200).setCoords();
+    ok(canvas.containsPoint(eventStub, rect), 'point at (200, 200) should be within area (175, 175, 225, 225)');
+  });
+  
+  test('toGrayscale', function() {
+    ok(typeof Canvas.Element.toGrayscale == 'function');
+    
+    if (!Canvas.Element.supports('getImageData')) {
+      alert('getImageData is not supported by environment. Some of the tests can not be run.');
+      return;
+    }
+    
+    var canvasEl = document.createElement('canvas'),
+        context = canvasEl.getContext('2d');
+        
+    canvasEl.width = canvasEl.height = 10;
+    
+    context.fillStyle = 'rgb(255,0,0)'; // red
+    context.fillRect(0, 0, 10, 10);
+    
+    var imageData = context.getImageData(0, 0, 10, 10),
+        data = imageData.data,
+        firstPixelData = [data[0], data[1], data[2], data[3]];
+        
+    same([255, 0, 0, 255], firstPixelData);
+    
+    Canvas.Element.toGrayscale(canvasEl);
+    
+    imageData = context.getImageData(0, 0, 10, 10);
+    data = imageData.data;
+    firstPixelData = [data[0], data[1], data[2], data[3]];
+    
+    same([85, 85, 85, 255], firstPixelData);
+  });
+  
+  asyncTest('resizeImageToFit', function() {
+    ok(typeof canvas._resizeImageToFit == 'function');
+    
+    var imgEl = Canvas.base.makeElement('img', { src: '../fixtures/very_large_image.jpg' }),
+        ORIGINAL_WIDTH = 3888,
+        ORIGINAL_HEIGHT = 2592;
+    
+    setTimeout(function() {
+      equals(imgEl.width, ORIGINAL_WIDTH);
+      equals(imgEl.height, ORIGINAL_HEIGHT);
+      
+      canvas._resizeImageToFit(imgEl);
+      
+      ok(imgEl.width < ORIGINAL_WIDTH);
+      ok(imgEl.height < ORIGINAL_HEIGHT);
+      
+      start();
+    }, 2000);
+  });
+  
+  asyncTest('cache', function() {
+    ok(canvas.cache);
+    
+    ok(typeof canvas.cache.has == 'function');
+    ok(typeof canvas.cache.get == 'function');
+    ok(typeof canvas.cache.set == 'function');
+    
+    var message = 'initially, `has` should always return false';
+    
+    var hasFoo, hasBarBaz, hasEmpty;
+    
+    canvas.cache.has('foo', function(v){
+      hasFoo = v;
+    });
+    canvas.cache.has('bar baz moooo', function(v){
+      hasBarBaz = v;
+    });
+    canvas.cache.has('', function(v){
+      hasEmpty = v;
+    });
+    
+    setTimeout(function() {
+      equals(hasFoo, false, message);
+      equals(hasBarBaz, false, message);
+      equals(hasEmpty, false, message);
+      
+      start();
+    }, 500);
+  });
+  
+  asyncTest('loadImageFromURL', function() {
+    ok(typeof canvas.loadImageFromURL == 'function');
+    
+    var callbackInvoked = false,
+        objectPassedToCallback;
+        
+    canvas.loadImageFromURL('../fixtures/very_large_image.jpg', function(obj) {
+      callbackInvoked = true;
+      objectPassedToCallback = obj;
+    });
+    
+    setTimeout(function() {
+      ok(callbackInvoked, 'callback should be invoked');
+      ok(objectPassedToCallback instanceof Canvas.Image, 'object passed to callback should be an instance of `Canvas.Image`');
+      ok(/fixtures\/very_large_image\.jpg$/.test(objectPassedToCallback.getSrc()), 'image should have correct src');
+      
+      start();
+    }, 2000);
+  });
+  
+  asyncTest('fxRemove', function() {
+    ok(typeof canvas.fxRemove == 'function');
+    
+    var rect = new Canvas.Rect();
+    canvas.add(rect);
+    
+    var callbackFired = false;
+    function onRemove(){
+      callbackFired = true;
+    }
+    
+    equals(canvas.item(0), rect);
+    equals(canvas.fxRemove(rect, onRemove), canvas, 'should be chainable');
+    
+    setTimeout(function() {
+      equals(canvas.item(0), undefined);
+      ok(callbackFired);
+      
+      start();
+    }, 1000);
+  });
+})();

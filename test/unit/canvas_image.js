@@ -1,4 +1,4 @@
-function init() {
+(function(){
   
   function getAbsolutePath(path) {
     var isAbsolute = /^https?:/.test(path);
@@ -49,135 +49,139 @@ function init() {
     return _createImageObject(IMG_WIDTH / 2, IMG_HEIGHT / 2);
   }
   
-  new Test.Unit.Runner({
-    testConstructor: function() {
-      this.assert(Canvas.Image);
-      
-      var image = createImageObject();
-      
-      this.assertInstanceOf(Canvas.Image, image);
-      this.assertInstanceOf(Canvas.Object, image);
-      
-      this.assertIdentical('image', image.get('type'));
-    },
+  module('Canvas.Image');
+  
+  test('constructor', function() {
+    ok(Canvas.Image);
     
-    testToObject: function() {
-      var image = createImageObject();
-      this.assertRespondsTo('toObject', image);
-      this.assertObjectIdentical(REFERENCE_IMG_OBJECT, image.toObject());
-    },
+    var image = createImageObject();
     
-    testToString: function() {
-      var image = createImageObject();
-      this.assertRespondsTo('toString', image);
-      this.assertIdentical('#<Canvas.Image: { src: "' + IMG_SRC + '" }>', image.toString());
-    },
+    ok(image instanceof Canvas.Image);
+    ok(image instanceof Canvas.Object);
     
-    testGetSrc: function() {
-      var image = createImageObject();
-      this.assertRespondsTo('getSrc', image);
-      this.assertIdentical(IMG_SRC, image.getSrc());
-    },
+    equals(image.get('type'), 'image');
+  });
+  
+  test('toObject', function() {
+    var image = createImageObject();
+    ok(typeof image.toObject == 'function');
+    same(REFERENCE_IMG_OBJECT, image.toObject());
+  });
+  
+  test('toString', function() {
+    var image = createImageObject();
+    ok(typeof image.toString == 'function');
+    equals(image.toString(), '#<Canvas.Image: { src: "' + IMG_SRC + '" }>');
+  });
+  
+  test('getSrc', function() {
+    var image = createImageObject();
+    ok(typeof image.getSrc == 'function');
+    equals(image.getSrc(), IMG_SRC);
+  });
+  
+  test('getElement', function() {
+    var elImage = document.createElement('image');
+    var image = new Canvas.Image(elImage);
+    ok(typeof image.getElement == 'function');
+    equals(image.getElement(), elImage);
+  });
+  
+  test('setElement', function() {
+    var image = createImageObject();
+    ok(typeof image.setElement == 'function');
     
-    testGetElement: function() {
-      var elImage = document.createElement('image');
-      var image = new Canvas.Image(elImage);
-      this.assertRespondsTo('getElement', image);
-      this.assertIdentical(elImage, image.getElement());
-    },
+    var elImage = document.createElement('image');
+    equals(image.setElement(elImage), image, 'chainable');
+    equals(image.getElement(), elImage);
+  });
+  
+  asyncTest('clone', function() {
+    var image = createImageObject();
+    ok(typeof image.clone == 'function');
     
-    testSetElement: function() {
-      var image = createImageObject();
-      this.assertRespondsTo('setElement', image);
-      
-      var elImage = document.createElement('image');
-      this.assertIdentical(image, image.setElement(elImage), 'chainable');
-      this.assertIdentical(elImage, image.getElement());
-    },
+    var imageClone = null;
+    image.clone(function(clone) {
+      imageClone = clone;
+    });
     
-    testClone: function() {
-      var image = createImageObject();
-      this.assertRespondsTo('clone', image);
-      
-      var imageClone = null;
-      image.clone(function(clone) {
-        imageClone = clone;
-      });
-      
-      this.wait(1000, function(){
-        this.assertInstanceOf(Canvas.Image, imageClone);
-        this.assertObjectIdentical(imageClone.toObject(), image.toObject());
-      }.bind(this));
-    },
+    setTimeout(function() {
+      ok(imageClone instanceof Canvas.Image);
+      same(imageClone.toObject(), image.toObject());
+      start();
+    }, 1000);
+  });
+  
+  asyncTest('cloneWidthHeight', function() {
+    var image = createSmallImageObject();
     
-    testCloneWidthHeight: function() {
-      
-      var image = createSmallImageObject();
-      
-      var imageClone = null;
-      image.clone(function(clone) {
-        imageClone = clone;
-      });
-      
-      this.wait(1000, function(){
-        this.assertIdentical(IMG_WIDTH / 2, imageClone.getElement().width, 
-          'clone\'s element should have width identical to that of original image');
-        this.assertIdentical(IMG_HEIGHT / 2, imageClone.getElement().height,
-          'clone\'s element should have height identical to that of original image');
-      }.bind(this));
-    },
+    var imageClone = null;
+    image.clone(function(clone) {
+      imageClone = clone;
+    });
     
-    testCanvasImageFromObject: function() {
-      this.assertRespondsTo('fromObject', Canvas.Image);
-      
-      // should not throw error when no callback is given
-      Canvas.Image.fromObject(REFERENCE_IMG_OBJECT);
-      
-      var image;
-      Canvas.Image.fromObject(REFERENCE_IMG_OBJECT, function(instance){
-        image = instance;
-      });
-      
-      this.wait(1000, function(){
-        this.assertInstanceOf(Canvas.Image, image);
-      });
-    },
+    setTimeout(function() {
+      equals(imageClone.getElement().width, IMG_WIDTH / 2,
+        'clone\'s element should have width identical to that of original image');
+      equals(imageClone.getElement().height, IMG_HEIGHT / 2,
+        'clone\'s element should have height identical to that of original image');
+      start();
+    }, 1000);
+  });
+  
+  asyncTest('fromObject', function() {
+    ok(typeof Canvas.Image.fromObject == 'function');
     
-    testCanvasImageFromURL: function() {
-      this.assertRespondsTo('fromURL', Canvas.Image);
-      
-      // should not throw error when no callback is given
-      // can't use `assertNothingRaised` due to asynchronous callback
-      Canvas.Image.fromURL(IMG_SRC);
-      
-      var image;
-      Canvas.Image.fromURL(IMG_SRC, function(instance) {
-        image = instance;
-      });
-      
-      this.wait(1000, function(){
-        this.assertInstanceOf(Canvas.Image, image);
-        this.assertObjectIdentical(REFERENCE_IMG_OBJECT, image.toObject());
-      });
-    },
+    // should not throw error when no callback is given
+    Canvas.Image.fromObject(REFERENCE_IMG_OBJECT);
     
-    testToGrayscale: function() {
-      var image = createImageObject(),
-          imageEl = document.createElement('img');
-          
-      imageEl.src = IMG_SRC;
-      image.setElement(imageEl);
-      
-      this.assertRespondsTo('toGrayscale', image);
-      
-      if (!Canvas.Element.supports('toDataURL')) {
-        this.warn('toDataURL is not supported. Some tests can not be run.');
-      }
-      else {
-        this.assertIdentical(false, image.__isGrayscaled);
-        this.assertIdentical(image, image.toGrayscale(), 'chainable');
-        this.assertIdentical(true, image.__isGrayscaled);
-      }
+    var image;
+    Canvas.Image.fromObject(REFERENCE_IMG_OBJECT, function(instance){
+      image = instance;
+    });
+    
+    setTimeout(function() {
+      ok(image instanceof Canvas.Image);
+      start();
+    }, 1000);
+  });
+  
+  asyncTest('fromURL', function() {
+    ok(typeof Canvas.Image.fromURL == 'function');
+    
+    // should not throw error when no callback is given
+    // can't use `assertNothingRaised` due to asynchronous callback
+    Canvas.Image.fromURL(IMG_SRC);
+    
+    var image;
+    Canvas.Image.fromURL(IMG_SRC, function(instance) {
+      image = instance;
+    });
+    
+    setTimeout(function() {
+      ok(image instanceof Canvas.Image);
+      same(REFERENCE_IMG_OBJECT, image.toObject());
+      start();
+    }, 1000);
+  });
+  
+  test('toGrayscale', function() {
+    var image = createImageObject(),
+        imageEl = document.createElement('img');
+        
+    imageEl.src = IMG_SRC;
+    image.setElement(imageEl);
+    
+    ok(typeof image.toGrayscale == 'function');
+    
+    if (!Canvas.Element.supports('toDataURL')) {
+      alert('toDataURL is not supported. Some tests can not be run.');
+    }
+    else {
+      equals(image.__isGrayscaled, false);
+      equals(image.toGrayscale(), image, 'chainable');
+      equals(image.__isGrayscaled, true);
     }
   });
-}
+  
+})();

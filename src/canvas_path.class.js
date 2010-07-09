@@ -321,9 +321,11 @@
      */
     toObject: function() {
       var o = Canvas.base.object.extend(this.callSuper('toObject'), {
-        path: this.path,
-        sourcePath: this.sourcePath
+        path: this.path
       });
+      if (this.sourcePath) {
+        o.sourcePath = this.sourcePath;
+      }
       if (this.transformMatrix) {
         o.transformMatrix = this.transformMatrix;
       }
@@ -420,20 +422,24 @@
             ? previousY 
             : getY(item);
         
-        aX.push(x);
-        aY.push(y);
+        var val = parseInt(x, 10);
+        if (!isNaN(val)) aX.push(val);
+        
+        val = parseInt(y, 10);
+        if (!isNaN(val)) aY.push(val);
         
       }, this);
-      var minX = aX.min(), 
-          minY = aY.min(), 
+      
+      var minX = Canvas.base.array.min(aX), 
+          minY = Canvas.base.array.min(aY), 
           deltaX = deltaY = 0;
       
       var o = {
         top: minY - deltaY,
         left: minX - deltaX,
-        bottom: aY.max() - deltaY,
-        right: aX.max() - deltaX
-      }
+        bottom: Canvas.base.array.max(aY) - deltaY,
+        right: Canvas.base.array.max(aX) - deltaX
+      };
       
       o.width = o.right - o.left;
       o.height = o.bottom - o.top;

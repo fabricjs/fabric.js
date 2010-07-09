@@ -1,4 +1,4 @@
-function init(){
+(function(){
   
   var REFERENCE_PATH_GROUP_OBJECT = {
     'type':         'path-group', 
@@ -41,122 +41,131 @@ function init(){
     return new Canvas.PathGroup(getPathObjects());
   }
   
-  new Test.Unit.Runner({
-    testConstructor: function() {
-      this.assert(Canvas.PathGroup);
-      var pathGroup = getPathGroupObject();
-      
-      this.assertInstanceOf(Canvas.PathGroup, pathGroup);
-      this.assertInstanceOf(Canvas.Object, pathGroup);
-      this.assertHasMixin(Enumerable, pathGroup);
-      
-      this.assertIdentical('path-group', pathGroup.get('type'));
-    },
-    testGetObjects: function() {
-      var paths = getPathObjects();
-      var pathGroup = new Canvas.PathGroup(paths);
-      this.assertRespondsTo('getObjects', pathGroup);
-      this.assertEnumEqual(paths, pathGroup.getObjects());
-    },
-    testToObject: function() {
-      var pathGroup = getPathGroupObject();
-      this.assertRespondsTo('toObject', pathGroup);
-      var object = pathGroup.toObject();
-      this.assertObjectIdentical(Object.extend(Object.clone(REFERENCE_PATH_GROUP_OBJECT), {
-        paths: object.paths
-      }), object);
-    },
-    testComplexity: function() {
-      function sum(objects) {
-        var i = objects.length, total = 0;
-        while (i--) {
-          total += objects[i];
-        }
-        return total;
-      }
-      var pathGroup = getPathGroupObject();
-      
-      this.assertRespondsTo('complexity', pathGroup);
-      
-      var objectsTotalComplexity = pathGroup.getObjects().reduce(function(total, current) {
-        total += current.complexity();
-        return total;
-      }, 0);
-      
-      this.assertIdentical(objectsTotalComplexity, pathGroup.complexity());
-    },
-    testToDatalessObject: function() {
-      var pathGroup = getPathGroupObject();
-      this.assertRespondsTo('toDatalessObject', pathGroup);
-      
-      pathGroup.setSourcePath('http://example.com/');
-      var expectedObject = Object.extend(Object.clone(REFERENCE_PATH_GROUP_OBJECT), {
-        'paths': 'http://example.com/',
-        'sourcePath': 'http://example.com/'
-      });
-      this.assertObjectIdentical(expectedObject, pathGroup.toDatalessObject());
-    },
-    testToString: function() {
-      var pathGroup = getPathGroupObject();
-      this.assertRespondsTo('toString', pathGroup);
-      this.assertIdentical('#<Canvas.PathGroup (8): { top: 0, left: 0 }>', pathGroup.toString());
-    },
-    testIsSameColor: function() {
-      var pathGroup = getPathGroupObject();
-      
-      this.assertRespondsTo('isSameColor', pathGroup);
-      this.assertIdentical(true, pathGroup.isSameColor());
-      
-      pathGroup.getObjects()[0].set('fill', 'black');
-      this.assertIdentical(false, pathGroup.isSameColor());
-    },
-    testSet: function() {
-      var fillValue = 'rgb(100,200,100)';
-      var pathGroup = getPathGroupObject();
-      
-      this.assertRespondsTo('set', pathGroup);
-      this.assertIdentical(pathGroup, pathGroup.set('fill', fillValue), 'should be chainable');
-      
-      pathGroup.getObjects().forEach(function(path) {
-        this.assertIdentical(fillValue, path.get('fill'));
-      }, this);
-      this.assertIdentical(fillValue, pathGroup.get('fill'));
-      
-      // set different color to one of the paths
-      pathGroup.getObjects()[1].set('fill', 'black');
-      pathGroup.set('fill', 'rgb(255,255,255)');
-      this.assertIdentical('rgb(100,200,100)', pathGroup.getObjects()[0].get('fill'),
-        'when paths are of different fill, setting fill of a group should not change them');
-        
-      pathGroup.getObjects()[1].set('fill', 'red');
-      
-      pathGroup.set('left', 1234);
-      this.assertNotEqual(1234, pathGroup.getObjects()[0].get('left'));
-      this.assertIdentical(1234, pathGroup.get('left'));
-    },
+  module('Canvas.PathGroup');
+  
+  test('constructor', function() {
+    ok(Canvas.PathGroup);
+    var pathGroup = getPathGroupObject();
     
-    testGrayscale: function() {
-      var pathGroup = getPathGroupObject();
-      
-      this.assertRespondsTo('toGrayscale', pathGroup);
-      this.assertIdentical(pathGroup, pathGroup.toGrayscale(), 'should be chainable');
-      
-      var firstObject = pathGroup.getObjects()[0],
-          secondObject = pathGroup.getObjects()[1];
-      
-      firstObject.set('overlayFill', null);
-      secondObject.set('overlayFill', null);
-      
-      firstObject.set('fill', 'rgb(200,0,0)'/* red */);
-      secondObject.set('fill', '0000FF'/* blue */);
-      
-      pathGroup.toGrayscale();
-      
-      this.assertIdentical('rgb(60,60,60)', firstObject.get('overlayFill'));
-      this.assertIdentical('rgb(28,28,28)', secondObject.get('overlayFill'));
-      
-      this.assertIdentical('rgb(200,0,0)', firstObject.get('fill'), 'toGrayscale should not change original fill value');
-      this.assertIdentical('rgb(0,0,255)', new Canvas.Color(secondObject.get('fill')).toRgb(), 'toGrayscale should not change original fill value');
-    }
+    ok(pathGroup instanceof Canvas.PathGroup);
+    ok(pathGroup instanceof Canvas.Object);
+    //this.assertHasMixin(Enumerable, pathGroup);
+    
+    equals(pathGroup.get('type'), 'path-group');
   });
-}
+  
+  test('getObjects', function() {
+    var paths = getPathObjects();
+    var pathGroup = new Canvas.PathGroup(paths);
+    ok(typeof pathGroup.getObjects == 'function');
+    same(paths, pathGroup.getObjects());
+  });
+  
+  test('toObject', function() {
+    var pathGroup = getPathGroupObject();
+    ok(typeof pathGroup.toObject == 'function');
+    var object = pathGroup.toObject();
+    same(Canvas.base.object.extend(Canvas.base.object.clone(REFERENCE_PATH_GROUP_OBJECT), {
+      paths: object.paths
+    }), object);
+  });
+  
+  test('complexity', function() {
+    function sum(objects) {
+      var i = objects.length, total = 0;
+      while (i--) {
+        total += objects[i];
+      }
+      return total;
+    }
+    var pathGroup = getPathGroupObject();
+    
+    ok(typeof pathGroup.complexity == 'function');
+    
+    var objectsTotalComplexity = pathGroup.getObjects().reduce(function(total, current) {
+      total += current.complexity();
+      return total;
+    }, 0);
+    
+    equals(pathGroup.complexity(), objectsTotalComplexity);
+  });
+  
+  test('toDatalessObject', function() {
+    var pathGroup = getPathGroupObject();
+    ok(typeof pathGroup.toDatalessObject == 'function');
+    
+    pathGroup.setSourcePath('http://example.com/');
+    var expectedObject = Canvas.base.object.extend(Canvas.base.object.clone(REFERENCE_PATH_GROUP_OBJECT), {
+      'paths': 'http://example.com/',
+      'sourcePath': 'http://example.com/'
+    });
+    same(expectedObject, pathGroup.toDatalessObject());
+  });
+  
+  test('toString', function() {
+    var pathGroup = getPathGroupObject();
+    ok(typeof pathGroup.toString == 'function');
+    equals(pathGroup.toString(), '#<Canvas.PathGroup (8): { top: 0, left: 0 }>');
+  });
+  
+  test('isSameColor', function() {
+    var pathGroup = getPathGroupObject();
+    
+    ok(typeof pathGroup.isSameColor == 'function');
+    equals(pathGroup.isSameColor(), true);
+    
+    pathGroup.getObjects()[0].set('fill', 'black');
+    equals(pathGroup.isSameColor(), false);
+  });
+  
+  test('set', function() {
+    var fillValue = 'rgb(100,200,100)';
+    var pathGroup = getPathGroupObject();
+    
+    ok(typeof pathGroup.set == 'function');
+    equals(pathGroup.set('fill', fillValue), pathGroup, 'should be chainable');
+    
+    pathGroup.getObjects().forEach(function(path) {
+      equals(path.get('fill'), fillValue);
+    }, this);
+    
+    equals(pathGroup.get('fill'), fillValue);
+    
+    // set different color to one of the paths
+    pathGroup.getObjects()[1].set('fill', 'black');
+    pathGroup.set('fill', 'rgb(255,255,255)');
+    
+    equals(pathGroup.getObjects()[0].get('fill'), 'rgb(100,200,100)',
+      'when paths are of different fill, setting fill of a group should not change them');
+      
+    pathGroup.getObjects()[1].set('fill', 'red');
+    
+    pathGroup.set('left', 1234);
+    ok(pathGroup.getObjects()[0].get('left') !== 1234);
+    equals(pathGroup.get('left'), 1234);
+  });
+  
+  test('grayscale', function() {
+    var pathGroup = getPathGroupObject();
+    
+    ok(typeof pathGroup.toGrayscale == 'function');
+    equals(pathGroup.toGrayscale(), pathGroup, 'should be chainable');
+    
+    var firstObject = pathGroup.getObjects()[0],
+        secondObject = pathGroup.getObjects()[1];
+    
+    firstObject.set('overlayFill', null);
+    secondObject.set('overlayFill', null);
+    
+    firstObject.set('fill', 'rgb(200,0,0)');
+    secondObject.set('fill', '0000FF');
+    
+    pathGroup.toGrayscale();
+    
+    equals(firstObject.get('overlayFill'), 'rgb(60,60,60)');
+    equals(secondObject.get('overlayFill'), 'rgb(28,28,28)');
+
+    equals(firstObject.get('fill'), 'rgb(200,0,0)', 'toGrayscale should not change original fill value');
+    equals(new Canvas.Color(secondObject.get('fill')).toRgb(), 'rgb(0,0,255)', 'toGrayscale should not change original fill value');
+  });
+})();

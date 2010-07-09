@@ -8,6 +8,7 @@
   //= require "canvas_base/lang_array"
   //= require "canvas_base/lang_object"
   //= require "canvas_base/lang_string"
+  //= require "canvas_base/lang_function"
   
   //= require "canvas_base/lang_class"
   

@@ -26,7 +26,9 @@
     'points':       getPoints()
   };
   
-  test('constructor', function(){
+  module('Canvas.Polyline');
+  
+  test('constructor', function() {
     ok(Canvas.Polyline);
     
     var polyline = new Canvas.Polyline(getPoints());
@@ -38,34 +40,26 @@
     same(polyline.get('points'), getPoints());
   });
   
-  test('complexity', function(){
+  test('complexity', function() {
     var polyline = new Canvas.Polyline(getPoints());
     ok(typeof polyline.complexity == 'function');
   });
   
-  test('toObject', function(){
+  test('toObject', function() {
     var polyline = new Canvas.Polyline(getPoints());
     ok(typeof polyline.toObject == 'function');
-    
     same(polyline.toObject(), REFERENCE_OBJECT);
   });
   
-  test('Canvas.Polyline.fromObject', function(){
+  test('fromObject', function() {
     ok(typeof Canvas.Polyline.fromObject == 'function');
     var polyline = Canvas.Polyline.fromObject(REFERENCE_OBJECT);
     ok(polyline instanceof Canvas.Polyline);
     same(polyline.toObject(), REFERENCE_OBJECT);
   });
   
-  /*
-  testCanvasPolylineFromObject: function() {
-    this.assertRespondsTo('fromObject', Canvas.Polyline);
-    var polyline = Canvas.Polyline.fromObject(REFERENCE_OBJECT);
-    this.assertInstanceOf(Canvas.Polyline, polyline);
-    this.assertObjectIdentical(REFERENCE_OBJECT, polyline.toObject());
-  },
-  testCanvasPolylineFromElement: function() {
-    this.assertRespondsTo('fromElement', Canvas.Polyline);
+  test('fromElement', function() {
+    ok(typeof Canvas.Polyline.fromElement == 'function');
     
     var elPolyline = document.createElement('polyline');
     
@@ -73,8 +67,8 @@
     
     var polyline = Canvas.Polyline.fromElement(elPolyline);
     
-    this.assertInstanceOf(Canvas.Polyline, polyline);
-    this.assertObjectIdentical(REFERENCE_OBJECT, polyline.toObject());
+    ok(polyline instanceof Canvas.Polyline);
+    same(REFERENCE_OBJECT, polyline.toObject());
     
     var elPolylineWithAttrs = document.createElement('polyline');
     elPolylineWithAttrs.setAttribute('points', '10,10 20,20 30,30 10,10');
@@ -85,9 +79,9 @@
     elPolylineWithAttrs.setAttribute('transform', 'translate(-10,-20) scale(2)');
     
     var polylineWithAttrs = Canvas.Polyline.fromElement(elPolylineWithAttrs);
-    var expectedPoints = [{x: 10, y: 10}, {x: 20, y: 20}, {x: 30, y: 30}, {x: 10, y: 10}];
-    
-    this.assertObjectIdentical(Object.extend(REFERENCE_OBJECT, {
+    //var expectedPoints = [{x: 10, y: 10}, {x: 20, y: 20}, {x: 30, y: 30}, {x: 10, y: 10}];
+    /*
+    same(Canvas.base.object.extend(REFERENCE_OBJECT, {
       'width': 20, 
       'height': 20, 
       'fill': 'rgb(255,255,255)', 
@@ -97,15 +91,15 @@
       'points': expectedPoints
     }), polylineWithAttrs.toObject());
     
-    this.assertEnumEqual([ 2, 0, 0, 2, -10, -20 ], polylineWithAttrs.get('transformMatrix'));
+    same([ 2, 0, 0, 2, -10, -20 ], polylineWithAttrs.get('transformMatrix'));
     
     var elPolylineWithoutPoints = document.createElement('polyline');
-    
+    /*
     this.assertRaise('TypeError', function(){
       Canvas.Polyline.fromElement(elPolylineWithoutPoints);
     }, 'missing points attribute should result in error');
     
-    this.assertNull(Canvas.Polyline.fromElement());
-  }
-  */
+    equals(Canvas.Polyline.fromElement(), null);
+    */
+  });
 })();

@@ -1,5 +1,7 @@
 (function(){
   
+  module('Canvas.util');
+  
   test('toFixed', function(){
     ok(typeof Canvas.util.toFixed == 'function');
     

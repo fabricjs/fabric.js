@@ -37,10 +37,10 @@
     _calcDimensions: function() {
       
       var points = this.points,
-          minX = Canvas.base.array.min(points, byX),
-          minY = Canvas.base.array.min(points, byY),
-          maxX = Canvas.base.array.max(points, byX),
-          maxY = Canvas.base.array.max(points, byY);
+          minX = Canvas.base.array.min(points, 'x'),
+          minY = Canvas.base.array.min(points, 'y'),
+          maxX = Canvas.base.array.max(points, 'x'),
+          maxY = Canvas.base.array.max(points, 'y');
       
       this.width = maxX - minX;
       this.height = maxY - minY;

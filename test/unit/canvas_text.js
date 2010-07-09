@@ -23,6 +23,8 @@
     'path':         null
   };
   
+  module('Canvas.Text');
+  
   test('constructor', function() {
     ok(Canvas.Text);
     var text = new Canvas.Text('foo');
@@ -112,6 +114,9 @@
     console.warn = function() {
       warnWasCalled = true;
     }
+    var originalCanvasObject = Canvas.Object;
+    var originalCanvasText = Canvas.Text;
+    
     delete Canvas.Text;
     delete Canvas.Object;
     
@@ -121,6 +126,10 @@
     
     setTimeout(function(){
       ok(warnWasCalled);
+      
+      Canvas.Object = originalCanvasObject;
+      Canvas.Text = originalCanvasText;
+      
       start();
     }, 500);
   });

@@ -18,6 +18,8 @@
     'opacity': 1
   };
   
+  module('Canvas.Rect');
+  
   test('constructor', function(){
     ok(Canvas.Rect);
 

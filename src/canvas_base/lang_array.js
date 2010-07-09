@@ -108,26 +108,47 @@ if (!Array.prototype.reduce) {
 function invoke(array, method) {
   var args = slice.call(arguments, 2), result = [ ];
   for (var i = 0, len = array.length; i < len; i++) {
-    result[i] = args.length ? method.apply(array[i], args) : method.call(array[i]);
+    result[i] = args.length ? array[i][method].apply(array[i], args) : array[i][method].call(array[i]);
   }
   return result;
 }
 
-function max(array, context) {
-  var i = array.length - 1, result = array[i];
-  while (i--) {
-    if (array[i] >= result) {
-      result = array[i];
+function max(array, byProperty) {
+  var i = array.length - 1, 
+      result = byProperty ? array[i][byProperty] : array[i];
+  if (byProperty) {
+    while (i--) {
+      if (array[i][byProperty] >= result) {
+        result = array[i][byProperty];
+      }
+    }
+  }
+  else {
+    while (i--) {
+      if (array[i] >= result) {
+        result = array[i];
+      }
     }
   }
   return result;
 }
 
-function min(array, context) {
-  var i = array.length - 1, result = array[i];
-  while (i--) {
-    if (array[i] < result) {
-      result = array[i];
+function min(array, byProperty) {
+  var i = array.length - 1, 
+      result = byProperty ? array[i][byProperty] : array[i];
+      
+  if (byProperty) {
+    while (i--) {
+      if (array[i][byProperty] < result) {
+        result = array[i][byProperty];
+      }
+    }
+  }
+  else {
+    while (i--) {
+      if (array[i] < result) {
+        result = array[i];
+      }
     }
   }
   return result;

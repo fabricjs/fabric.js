@@ -105,7 +105,7 @@
     toObject: function() {
       var _super = Canvas.Object.prototype.toObject;
       return Canvas.base.object.extend(_super.call(this), {
-        paths: this.getObjects().invoke('clone'),
+        paths: Canvas.base.array.invoke(this.getObjects(), 'clone'),
         sourcePath: this.sourcePath
       });
     },
@@ -138,7 +138,7 @@
      */
     isSameColor: function() {
       var firstPathFill = this.getObjects()[0].get('fill');
-      return this.every(function(path) {
+      return this.getObjects().every(function(path) {
         return path.get('fill') === firstPathFill;
       });
     },
