@@ -111,3 +111,7 @@
 - Ernest Delgado for the original idea of [manipulating images on canvas](http://www.ernestdelgado.com/archive/canvas/).
 - [Maxim "hakunin" Chernyak](http://twitter.com/hakunin) for ideas, and help with various parts of the library.
 - [Sergey Nisnevich](http://nisnya.com) for help with geometry logic.
+
+### License
+
+MIT License
