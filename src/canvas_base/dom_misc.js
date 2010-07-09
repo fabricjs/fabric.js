@@ -123,9 +123,36 @@ function falseFunction() { return false; };
   }
 })();
 
+function animate(options) {
+  options || (options = { });
+  var start = +new Date(), 
+      duration = options.duration || 500,
+      finish = start + duration, time, pos,
+      onChange = options.onChange || function() { },
+      easing = options.easing || function(pos) { return (-Math.cos(pos * Math.PI) / 2) + 0.5; },
+      startValue = 'startValue' in options ? options.startValue : 0,
+      endValue = 'endValue' in options ? options.endValue : 100,
+      isReversed = startValue > endValue
+  
+  options.onStart && options.onStart();
+
+  var interval = setInterval(function() {
+    time = +new Date();
+    pos = time > finish ? 1 : (time - start) / duration;
+    onChange(isReversed 
+      ? (startValue - (startValue - endValue) * easing(pos)) 
+      : (startValue + (endValue - startValue) * easing(pos)));
+    if (time > finish) {
+      clearInterval(interval);
+      options.onComplete && options.onComplete();
+    }
+  }, 10);
+}
+
 Canvas.base.getById = getById;
 Canvas.base.toArray = toArray;
 Canvas.base.makeElement = makeElement;
 Canvas.base.addClass = addClass;
 Canvas.base.wrapElement = wrapElement;
 Canvas.base.getElementOffset = getElementOffset;
+Canvas.base.animate = animate;

@@ -1054,12 +1054,39 @@ function falseFunction() { return false; };
   }
 })();
 
+function animate(options) {
+  options || (options = { });
+  var start = +new Date(),
+      duration = options.duration || 500,
+      finish = start + duration, time, pos,
+      onChange = options.onChange || function() { },
+      easing = options.easing || function(pos) { return (-Math.cos(pos * Math.PI) / 2) + 0.5; },
+      startValue = 'startValue' in options ? options.startValue : 0,
+      endValue = 'endValue' in options ? options.endValue : 100,
+      isReversed = startValue > endValue
+
+  options.onStart && options.onStart();
+
+  var interval = setInterval(function() {
+    time = +new Date();
+    pos = time > finish ? 1 : (time - start) / duration;
+    onChange(isReversed
+      ? (startValue - (startValue - endValue) * easing(pos))
+      : (startValue + (endValue - startValue) * easing(pos)));
+    if (time > finish) {
+      clearInterval(interval);
+      options.onComplete && options.onComplete();
+    }
+  }, 10);
+}
+
 Canvas.base.getById = getById;
 Canvas.base.toArray = toArray;
 Canvas.base.makeElement = makeElement;
 Canvas.base.addClass = addClass;
 Canvas.base.wrapElement = wrapElement;
 Canvas.base.getElementOffset = getElementOffset;
+Canvas.base.animate = animate;
 
 (function(){
 
@@ -5260,31 +5287,24 @@ Canvas.base.getElementOffset = getElementOffset;
      * @chainable
      */
     fxRemove: function(callbacks) {
-      callbacks = callbacks || { };
+      var empty = function() { },
+          onComplete = callbacks.onComplete || empty,
+          onChange = callbacks.onChange || empty,
+          _this = this;
 
-      callbacks.onComplete = callbacks.onComplete || Prototype.emptyFunction;
-      callbacks.onChange = callbacks.onChange || Prototype.emptyFunction;
-
-      var _this = this,
-          fx = new APE.anim.Animation(),
-          startValue = this.get('opacity'),
-          endValue = 0,
-          step = endValue - startValue;
-
-      fx.run = function(percent) {
-        _this.set('opacity', startValue + step * percent);
-        callbacks.onChange();
-      };
-      fx.onend = function() {
-        callbacks.onComplete();
-      };
-      fx.onstart = function() {
-        _this.setActive(false);
-      };
-
-      fx.duration = this.FX_DURATION;
-      fx.transition = APE.anim.Transitions[this.FX_TRANSITION];
-      fx.start();
+      Canvas.base.animate({
+        startValue: this.get('opacity'),
+        endValue: 0,
+        duration: this.FX_DURATION,
+        onChange: function(value) {
+          _this.set('opacity', value);
+          onChange();
+        },
+        onComplete: onComplete,
+        onStart: function() {
+          _this.setActive(false);
+        }
+      });
 
       return this;
     },

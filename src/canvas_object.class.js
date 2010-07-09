@@ -1200,31 +1200,24 @@
      * @chainable
      */
     fxRemove: function(callbacks) {
-      callbacks = callbacks || { };
+      var empty = function() { },
+          onComplete = callbacks.onComplete || empty,
+          onChange = callbacks.onChange || empty,
+          _this = this;
       
-      callbacks.onComplete = callbacks.onComplete || Prototype.emptyFunction;
-      callbacks.onChange = callbacks.onChange || Prototype.emptyFunction;
-      
-      var _this = this,
-          fx = new APE.anim.Animation(),
-          startValue = this.get('opacity'),
-          endValue = 0,
-          step = endValue - startValue;
-      
-      fx.run = function(percent) {
-        _this.set('opacity', startValue + step * percent);
-        callbacks.onChange();
-      };
-      fx.onend = function() {
-        callbacks.onComplete();
-      };
-      fx.onstart = function() {
-        _this.setActive(false);
-      };
-
-      fx.duration = this.FX_DURATION;
-      fx.transition = APE.anim.Transitions[this.FX_TRANSITION];
-      fx.start();
+      Canvas.base.animate({
+        startValue: this.get('opacity'),
+        endValue: 0,
+        duration: this.FX_DURATION,
+        onChange: function(value) {
+          _this.set('opacity', value);
+          onChange();
+        },
+        onComplete: onComplete,
+        onStart: function() {
+          _this.setActive(false);
+        }
+      });
       
       return this;
     },
