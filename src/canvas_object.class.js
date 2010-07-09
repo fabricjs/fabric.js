@@ -1,13 +1,14 @@
 (function(){
   
-  var global = this;
+  var global = this,
   
   /**
    * @name Canvas
    * @namespace
    */
-  var Canvas = global.Canvas || (global.Canvas = { });
-  if (Canvas.Object) {
+      fabric = global.fabric || (global.fabric = { });
+      
+  if (fabric.Object) {
     return;
   }
   
@@ -17,7 +18,7 @@
    * @class Object
    * @memberOf Canvas
    */
-  Canvas.Object = Canvas.base.createClass({
+  fabric.Object = fabric.base.createClass({
     
     type: 'object',
     
@@ -106,7 +107,7 @@
     
     setOptions: function(options) {
       // this.constructor.superclass.prototype.options -> this.options -> options
-      this.options = Canvas.base.object.extend(this._getOptions(), options);
+      this.options = fabric.base.object.extend(this._getOptions(), options);
     },
     
     /**
@@ -114,7 +115,7 @@
      * @method _getOptions
      */
     _getOptions: function() {
-      return Canvas.base.object.extend(Canvas.base.object.clone(this._getSuperOptions()), this.options);
+      return fabric.base.object.extend(fabric.base.object.clone(this._getSuperOptions()), this.options);
     },
     
     /**
@@ -176,7 +177,7 @@
      * @return {Object}
      */
     toObject: function() {
-      var toFixed = Canvas.util.toFixed;
+      var toFixed = fabric.util.toFixed;
       var object = {
         type: this.type,
         left: toFixed(this.left, this.NUM_FRACTION_DIGITS),
@@ -214,7 +215,7 @@
      * @method _removeDefaultValues
      */
     _removeDefaultValues: function(object) {
-      var defaultOptions = Canvas.Object.prototype.options;
+      var defaultOptions = fabric.Object.prototype.options;
       this.stateProperties.forEach(function(prop) {
         if (object[prop] === defaultOptions[prop]) {
           delete object[prop];
@@ -234,7 +235,7 @@
     /**
      * Sets state of an object - `true` makes it active, `false` - inactive
      * @param {Boolean} active
-     * @return {Canvas.Object} thisArg
+     * @return {fabric.Object} thisArg
      * @chainable
      */
     setActive: function(active) {
@@ -247,14 +248,14 @@
      * @return {String}
      */
     toString: function() {
-      return "#<Canvas." + Canvas.base.string.capitalize(this.type) + ">";
+      return "#<fabric." + fabric.base.string.capitalize(this.type) + ">";
     },
     
     /**
      * Basic setter
      * @param {Any} property
      * @param {Any} value
-     * @return {Canvas.Object} thisArg
+     * @return {fabric.Object} thisArg
      * @chainable
      */
     set: function(property, value) {
@@ -275,7 +276,7 @@
      * Toggles specified property from `true` to `false` or from `false` to `true`
      * @method toggle
      * @param {String} property property to toggle
-     * @return {Canvas.Object} thisArg
+     * @return {fabric.Object} thisArg
      * @chainable
      */
     toggle: function(property) {
@@ -289,7 +290,7 @@
     /**
      * @method setSourcePath
      * @param {String} value
-     * @return {Canvas.Object} thisArg
+     * @return {fabric.Object} thisArg
      * @chainable
      */
     setSourcePath: function(value) {
@@ -373,7 +374,7 @@
      * Scales an object (equally by x and y)
      * @method scale
      * @param value {Number} scale factor
-     * @return {Canvas.Object} thisArg
+     * @return {fabric.Object} thisArg
      * @chainable
      */
     scale: function(value) {
@@ -386,7 +387,7 @@
      * Scales an object to a given width (scaling by x/y equally)
      * @method scaleToWidth
      * @param value {Number} new width value
-     * @return {Canvas.Object} thisArg
+     * @return {fabric.Object} thisArg
      * @chainable
      */
     scaleToWidth: function(value) {
@@ -397,7 +398,7 @@
      * Scales an object to a given height (scaling by x/y equally)
      * @method scaleToHeight
      * @param value {Number} new height value
-     * @return {Canvas.Object} thisArg
+     * @return {fabric.Object} thisArg
      * @chainable
      */
     scaleToHeight: function(value) {
@@ -408,7 +409,7 @@
      * Sets object opacity 
      * @method setOpacity
      * @param value {Number} value 0-1
-     * @return {Canvas.Object} thisArg
+     * @return {fabric.Object} thisArg
      * @chainable
      */
     setOpacity: function(value) {
@@ -440,7 +441,7 @@
     /**
      * Sets corner position coordinates based on current angle, width and height.
      * @method setCoords
-     * return {Canvas.Object} thisArg
+     * return {fabric.Object} thisArg
      * @chainable
      */
     setCoords: function() {
@@ -509,7 +510,7 @@
      * Requires public options: padding, borderColor
      * @method drawBorders
      * @param {CanvasRenderingContext2D} ctx Context to draw on
-     * @return {Canvas.Object} thisArg
+     * @return {fabric.Object} thisArg
      * @chainable
      */
     drawBorders: function(ctx) {
@@ -550,7 +551,7 @@
      * Requires public options: cornersize, padding
      * @method drawCorners
      * @param {CanvasRenderingContext2D} ctx Context to draw on
-     * @return {Canvas.Object} thisArg
+     * @return {fabric.Object} thisArg
      * @chainable
      */
     drawCorners: function(ctx) {
@@ -622,28 +623,28 @@
      * Clones an instance
      * @method clone
      * @param {Object} options object
-     * @return {Canvas.Object} clone of an instance
+     * @return {fabric.Object} clone of an instance
      */
     clone: function(options) {
       if (this.constructor.fromObject) {
         return this.constructor.fromObject(this.toObject(), options);
       }
-      return new Canvas.Object(this.toObject());
+      return new fabric.Object(this.toObject());
     },
     
     /**
-     * Creates an instance of Canvas.Image out of an object
+     * Creates an instance of fabric.Image out of an object
      * @method cloneAsImage
      * @param callback {Function} callback, invoked with an instance as a first argument
-     * @return {Canvas.Object} thisArg
+     * @return {fabric.Object} thisArg
      * @chainable
      */
     cloneAsImage: function(callback) {
-      if (Canvas.Image) {
+      if (fabric.Image) {
         var i = new Image();
         i.onload = function() {
           if (callback) {
-            callback(new Canvas.Image(i), orig);
+            callback(new fabric.Image(i), orig);
           }
           i = i.onload = null;
         }
@@ -671,9 +672,9 @@
       el.width = this.getWidth();
       el.height = this.getHeight();
       
-      Canvas.base.wrapElement(el, 'div');
+      fabric.base.wrapElement(el, 'div');
 
-      var canvas = new Canvas.Element(el);
+      var canvas = new fabric.Element(el);
       canvas.backgroundColor = 'transparent';
       canvas.renderAll();
       
@@ -703,7 +704,7 @@
     
     /**
      * @method saveState
-     * @return {Canvas.Object} thisArg
+     * @return {fabric.Object} thisArg
      * @chainable
      */
     saveState: function() {
@@ -722,12 +723,12 @@
      */
     intersectsWithRect: function(selectionTL, selectionBR) {
       var oCoords = this.oCoords,
-          tl = new Canvas.Point(oCoords.tl.x, oCoords.tl.y),
-          tr = new Canvas.Point(oCoords.tr.x, oCoords.tr.y),
-          bl = new Canvas.Point(oCoords.bl.x, oCoords.bl.y),
-          br = new Canvas.Point(oCoords.br.x, oCoords.br.y);
+          tl = new fabric.Point(oCoords.tl.x, oCoords.tl.y),
+          tr = new fabric.Point(oCoords.tr.x, oCoords.tr.y),
+          bl = new fabric.Point(oCoords.bl.x, oCoords.bl.y),
+          br = new fabric.Point(oCoords.br.x, oCoords.br.y);
       
-      var intersection = Canvas.Intersection.intersectPolygonRectangle(
+      var intersection = fabric.Intersection.intersectPolygonRectangle(
         [tl, tr, br, bl],
         selectionTL,
         selectionBR
@@ -745,15 +746,15 @@
       // extracts coords
       function getCoords(oCoords) {
         return {
-          tl: new Canvas.Point(oCoords.tl.x, oCoords.tl.y),
-          tr: new Canvas.Point(oCoords.tr.x, oCoords.tr.y),
-          bl: new Canvas.Point(oCoords.bl.x, oCoords.bl.y),
-          br: new Canvas.Point(oCoords.br.x, oCoords.br.y)
+          tl: new fabric.Point(oCoords.tl.x, oCoords.tl.y),
+          tr: new fabric.Point(oCoords.tr.x, oCoords.tr.y),
+          bl: new fabric.Point(oCoords.bl.x, oCoords.bl.y),
+          br: new fabric.Point(oCoords.br.x, oCoords.br.y)
         }
       }
       var thisCoords = getCoords(this.oCoords),
           otherCoords = getCoords(other.oCoords);
-      var intersection = Canvas.Intersection.intersectPolygonPolygon(
+      var intersection = fabric.Intersection.intersectPolygonPolygon(
         [thisCoords.tl, thisCoords.tr, thisCoords.br, thisCoords.bl],
         [otherCoords.tl, otherCoords.tr, otherCoords.br, otherCoords.bl]
       );
@@ -770,10 +771,10 @@
      */
     isContainedWithinRect: function(selectionTL, selectionBR) {
       var oCoords = this.oCoords,
-          tl = new Canvas.Point(oCoords.tl.x, oCoords.tl.y),
-          tr = new Canvas.Point(oCoords.tr.x, oCoords.tr.y),
-          bl = new Canvas.Point(oCoords.bl.x, oCoords.bl.y),
-          br = new Canvas.Point(oCoords.br.x, oCoords.br.y);
+          tl = new fabric.Point(oCoords.tl.x, oCoords.tl.y),
+          tr = new fabric.Point(oCoords.tr.x, oCoords.tr.y),
+          bl = new fabric.Point(oCoords.bl.x, oCoords.bl.y),
+          br = new fabric.Point(oCoords.br.x, oCoords.br.y);
       return tl.x > selectionTL.x
         && tr.x < selectionBR.x
         && tl.y > selectionTL.y
@@ -798,7 +799,7 @@
      * @return {String|Boolean} corner code (tl, tr, bl, br, etc.), or false if nothing is found
      */
     _findTargetCorner: function(e, offset) {
-      var pointer = Canvas.base.getPointer(e),
+      var pointer = fabric.base.getPointer(e),
           ex = pointer.x - offset.left,
           ey = pointer.y - offset.top,
           xpoints,
@@ -1112,12 +1113,12 @@
     /**
      * Makes object's color grayscale
      * @method toGrayscale
-     * @return {Canvas.Object} thisArg
+     * @return {fabric.Object} thisArg
      */
     toGrayscale: function() {
       var fillValue = this.get('fill');
       if (fillValue) {
-        this.set('overlayFill', new Canvas.Color(fillValue).toGrayscale().toRgb());
+        this.set('overlayFill', new fabric.Color(fillValue).toGrayscale().toRgb());
       }
       return this;
     },
@@ -1143,7 +1144,7 @@
     
     /**
      * @method straighten
-     * @return {Canvas.Object} thisArg
+     * @return {fabric.Object} thisArg
      * @chainable
      */
     straighten: function() {
@@ -1158,7 +1159,7 @@
      *                  - onComplete: invoked on completion
      *                  - onChange: invoked on every step of animation
      *
-     * @return {Canvas.Object} thisArg
+     * @return {fabric.Object} thisArg
      * @chainable
      */
     fxStraighten: function(callbacks) {
@@ -1169,7 +1170,7 @@
           onChange = callbacks.onChange || empty,
           _this = this;
       
-      Canvas.base.animate({
+      fabric.base.animate({
         startValue: this.get('angle'),
         endValue: this._getAngleValueForStraighten(),
         duration: this.FX_DURATION,
@@ -1192,7 +1193,7 @@
     /**
      * @method fxRemove
      * @param {Object} callbacks
-     * @return {Canvas.Object} thisArg
+     * @return {fabric.Object} thisArg
      * @chainable
      */
     fxRemove: function(callbacks) {
@@ -1203,7 +1204,7 @@
           onChange = callbacks.onChange || empty,
           _this = this;
       
-      Canvas.base.animate({
+      fabric.base.animate({
         startValue: this.get('opacity'),
         endValue: 0,
         duration: this.FX_DURATION,
@@ -1245,5 +1246,5 @@
   /**
    * @alias rotate -> setAngle
    */
-  Canvas.Object.prototype.rotate = Canvas.Object.prototype.setAngle;
+  fabric.Object.prototype.rotate = fabric.Object.prototype.setAngle;
 })();

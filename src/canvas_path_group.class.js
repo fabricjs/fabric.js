@@ -2,13 +2,14 @@
 
 (function(){
   
-  var Canvas = this.Canvas || (this.Canvas = { });
-  if (Canvas.PathGroup) {
-    console.warn('Canvas.PathGroup is already defined');
+  var fabric = this.fabric || (this.fabric = { });
+  
+  if (fabric.PathGroup) {
+    console.warn('fabric.PathGroup is already defined');
     return;
   }
   
-  Canvas.PathGroup = Canvas.base.createClass(Canvas.Path, Canvas.IStub, {
+  fabric.PathGroup = fabric.base.createClass(fabric.Path, {
     
     type: 'path-group',
     forceFillOverwrite: false,
@@ -81,7 +82,7 @@
      * @method set
      * @param {String} prop
      * @param {Any} value
-     * @return {Canvas.PathGroup} thisArg
+     * @return {fabric.PathGroup} thisArg
      */
     set: function(prop, value) {
       if ((prop === 'fill' || prop === 'overlayFill') && this.isSameColor()) {
@@ -92,8 +93,8 @@
         }
       }
       else {
-        // skipping parent "class" - Canvas.Path
-        Canvas.Object.prototype.set.call(this, prop, value);
+        // skipping parent "class" - fabric.Path
+        fabric.Object.prototype.set.call(this, prop, value);
       }
       return this;
     },
@@ -103,9 +104,9 @@
      * @return {Object} object representation of an instance
      */
     toObject: function() {
-      var _super = Canvas.Object.prototype.toObject;
-      return Canvas.base.object.extend(_super.call(this), {
-        paths: Canvas.base.array.invoke(this.getObjects(), 'clone'),
+      var _super = fabric.Object.prototype.toObject;
+      return fabric.base.object.extend(_super.call(this), {
+        paths: fabric.base.array.invoke(this.getObjects(), 'clone'),
         sourcePath: this.sourcePath
       });
     },
@@ -128,7 +129,7 @@
       * @return {String} string representation of an object
       */
     toString: function() {
-      return '#<Canvas.PathGroup (' + this.complexity() + 
+      return '#<fabric.PathGroup (' + this.complexity() + 
         '): { top: ' + this.top + ', left: ' + this.left + ' }>';
     },
     
@@ -157,7 +158,7 @@
     /**
       * Makes path group grayscale
       * @method toGrayscale
-      * @return {Canvas.PathGroup} thisArg
+      * @return {fabric.PathGroup} thisArg
       */
     toGrayscale: function() {
       var i = this.paths.length;
@@ -182,7 +183,7 @@
    */
   function instantiatePaths(paths) {
     for (var i = 0, len = paths.length; i < len; i++) {
-      if (!(paths[i] instanceof Canvas.Object)) {
+      if (!(paths[i] instanceof fabric.Object)) {
         var klassName = paths[i].type.camelize().capitalize();
         paths[i] = Canvas[klassName].fromObject(paths[i]);
       }
@@ -192,12 +193,12 @@
   
   /**
    * @static
-   * @method Canvas.PathGroup.fromObject
+   * @method fabric.PathGroup.fromObject
    * @param {Object}
-   * @return {Canvas.PathGroup}
+   * @return {fabric.PathGroup}
    */
-  Canvas.PathGroup.fromObject = function(object) {
+  fabric.PathGroup.fromObject = function(object) {
     var paths = instantiatePaths(object.paths);
-    return new Canvas.PathGroup(paths, object);
+    return new fabric.PathGroup(paths, object);
   }
 })();

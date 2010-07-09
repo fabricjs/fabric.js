@@ -1,26 +1,26 @@
 (function(){
   
-  module('Canvas.Ellipse');
+  module('fabric.Ellipse');
   
   test('constructor', function() {
-    ok(Canvas.Ellipse);
+    ok(fabric.Ellipse);
 
-    var ellipse = new Canvas.Ellipse();
+    var ellipse = new fabric.Ellipse();
 
-    ok(ellipse instanceof Canvas.Ellipse, 'should inherit from Canvas.Ellipse');
-    ok(ellipse instanceof Canvas.Object, 'should inherit from Canvas.Object');
+    ok(ellipse instanceof fabric.Ellipse, 'should inherit from fabric.Ellipse');
+    ok(ellipse instanceof fabric.Object, 'should inherit from fabric.Object');
 
     equals(ellipse.type, 'ellipse');
   });
   
   test('complexity', function() {
-    var ellipse = new Canvas.Ellipse();
+    var ellipse = new fabric.Ellipse();
     ok(typeof ellipse.complexity == 'function');
     equals(ellipse.complexity(), 1);
   });
   
   test('toObject', function() {
-    var ellipse = new Canvas.Ellipse();
+    var ellipse = new fabric.Ellipse();
     var defaultProperties = {
       'type': 'ellipse', 
       'left': 0, 
@@ -45,7 +45,7 @@
 
     ellipse.set('left', 100).set('top', 200).set('rx', 15).set('ry', 25);
 
-    var augmentedProperties = Canvas.base.object.extend(Canvas.base.object.clone(defaultProperties), {
+    var augmentedProperties = fabric.base.object.extend(fabric.base.object.clone(defaultProperties), {
       left: 100,
       top: 200,
       rx: 15,
@@ -56,7 +56,7 @@
   });
   
   test('render', function() {
-    var ellipse = new Canvas.Ellipse();
+    var ellipse = new fabric.Ellipse();
     ellipse.set('rx', 0).set('ry', 0);
 
     var wasRenderCalled = false;
@@ -70,7 +70,7 @@
   });
   
   test('fromElement', function() {
-    ok(typeof Canvas.Ellipse.fromElement == 'function');
+    ok(typeof fabric.Ellipse.fromElement == 'function');
 
     var elEllipse     = document.createElement('ellipse'),
         rx            = 5,
@@ -89,8 +89,8 @@
     elEllipse.setAttribute('fill-opacity', fillOpacity);
     elEllipse.setAttribute('stroke-width', strokeWidth);
 
-    var oEllipse = Canvas.Ellipse.fromElement(elEllipse);
-    ok(oEllipse instanceof Canvas.Ellipse);
+    var oEllipse = fabric.Ellipse.fromElement(elEllipse);
+    ok(oEllipse instanceof fabric.Ellipse);
 
     equals(oEllipse.get('rx'), rx);
     equals(oEllipse.get('ry'), ry);
@@ -102,7 +102,7 @@
   });
   
   test('fromObject', function() {
-    ok(typeof Canvas.Ellipse == 'function');
+    ok(typeof fabric.Ellipse == 'function');
 
     var left    = 112,
         top     = 234,
@@ -110,10 +110,10 @@
         ry      = 14.78,
         fill    = 'ff5555';
 
-    var ellipse = Canvas.Ellipse.fromObject({
+    var ellipse = fabric.Ellipse.fromObject({
       left: left, top: top, rx: rx, ry: ry, fill: fill
     });
-    ok(ellipse instanceof Canvas.Ellipse);
+    ok(ellipse instanceof fabric.Ellipse);
 
     equals(ellipse.get('left'), left);
     equals(ellipse.get('top'), top);
@@ -122,7 +122,7 @@
     equals(ellipse.get('fill'), fill);
 
     var expected = ellipse.toObject();
-    var actual = Canvas.Ellipse.fromObject(expected).toObject();
+    var actual = fabric.Ellipse.fromObject(expected).toObject();
 
     same(expected, actual);
   });

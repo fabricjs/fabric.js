@@ -14,7 +14,7 @@ function capitalize(string) {
   return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
 }
 
-Canvas.base.string = {
+fabric.base.string = {
   camelize: camelize,
   capitalize: capitalize
 };

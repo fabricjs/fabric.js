@@ -37,9 +37,9 @@
     <canvas id="canvas" width="300" height="300"></canvas>  
     ...
     
-    var canvas = new Canvas.Element('canvas');
+    var canvas = new fabric.Element('canvas');
     
-    var rect = new Canvas.Rect({
+    var rect = new fabric.Rect({
       top: 100,
       left: 100,
       width: 60,
@@ -51,32 +51,32 @@
 
 ### Object Model hierarchy
     
-      Canvas.Object
+      fabric.Object
         |
-        -- Canvas.Line
+        -- fabric.Line
         |
-        -- Canvas.Circle
+        -- fabric.Circle
         |
-        -- Canvas.Ellipse
+        -- fabric.Ellipse
         |
-        -- Canvas.Rect
+        -- fabric.Rect
         |
-        -- Canvas.Polyline
+        -- fabric.Polyline
         |
-        -- Canvas.Polygon
+        -- fabric.Polygon
         |
-        -- Canvas.Group
+        -- fabric.Group
         |
-        -- Canvas.Text
+        -- fabric.Text
         |
-        -- Canvas.Image
+        -- fabric.Image
         |
-        -- Canvas.Path
+        -- fabric.Path
              |
-             -- Canvas.PathGroup
+             -- fabric.PathGroup
       
       
-      Canvas.util
+      fabric.util
         |
         -- removeFromArray
         |
@@ -98,13 +98,13 @@
         -- parsePointsAttribute
       
       
-      Canvas.Element
+      fabric.Element
 
-      Canvas.Point
+      fabric.Point
 
-      Canvas.Intersection
+      fabric.Intersection
 
-      Canvas.Color
+      fabric.Color
 
 ### Credits
 
@@ -115,3 +115,7 @@
 ### License
 
 MIT License
+
+### TODO
+
+- Write unit tests for fabric.base.* and move them to fabric.util.*

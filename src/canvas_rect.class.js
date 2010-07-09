@@ -2,16 +2,17 @@
 
 (function(){
   
-  var Canvas = this.Canvas || (this.Canvas = { });
-  if (Canvas.Rect) {
+  var fabric = this.fabric || (this.fabric = { });
+  
+  if (fabric.Rect) {
     return;
   }
   
   /** 
    * @class Rect
-   * @extends Canvas.Object
+   * @extends fabric.Object
    */
-  Canvas.Rect = Canvas.base.createClass(Canvas.Object, /** @lends Canvas.Rect.prototype */ {
+  fabric.Rect = fabric.base.createClass(fabric.Object, /** @lends fabric.Rect.prototype */ {
     
     type: 'rect',
     
@@ -98,7 +99,7 @@
   });
   
   // TODO (kangax): implement rounded rectangles (both parsing and rendering)
-  Canvas.Rect.ATTRIBUTE_NAMES = 'x y width height rx ry fill fill-opacity stroke stroke-width transform'.split(' ');
+  fabric.Rect.ATTRIBUTE_NAMES = 'x y width height rx ry fill fill-opacity stroke stroke-width transform'.split(' ');
   
   /**
    * @private
@@ -111,20 +112,20 @@
   
   /**
    * @static
-   * @method Canvas.Rect.fromElement
+   * @method fabric.Rect.fromElement
    * @param element {SVGElement} element to parse
    * @param options {Object} options object
-   * @return {Object} instance of Canvas.Rect
+   * @return {Object} instance of fabric.Rect
    */
-  Canvas.Rect.fromElement = function(element, options) {
+  fabric.Rect.fromElement = function(element, options) {
     if (!element) {
       return null;
     }
     
-    var parsedAttributes = Canvas.parseAttributes(element, Canvas.Rect.ATTRIBUTE_NAMES);
+    var parsedAttributes = fabric.parseAttributes(element, fabric.Rect.ATTRIBUTE_NAMES);
     parsedAttributes = _setDefaultLeftTopValues(parsedAttributes);
     
-    var rect = new Canvas.Rect(Canvas.base.object.extend(options || { }, parsedAttributes));
+    var rect = new fabric.Rect(fabric.base.object.extend(options || { }, parsedAttributes));
     rect._normalizeLeftTopProperties(parsedAttributes);
     
     return rect;
@@ -132,11 +133,11 @@
   
   /**
    * @static
-   * @method Canvas.Rect.fromObject
+   * @method fabric.Rect.fromObject
    * @param object {Object} object to create an instance from
-   * @return {Object} instance of Canvas.Rect
+   * @return {Object} instance of fabric.Rect
    */
-  Canvas.Rect.fromObject = function(object) {
-    return new Canvas.Rect(object);
+  fabric.Rect.fromObject = function(object) {
+    return new fabric.Rect(object);
   };
 })();

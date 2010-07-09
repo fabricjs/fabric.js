@@ -2,12 +2,12 @@
 
 (function(){
   
-  var Canvas = this.Canvas || (this.Canvas = { });
-  if (Canvas.Group) {
+  var fabric = this.fabric || (this.fabric = { });
+  if (fabric.Group) {
     return;
   }
   
-  Canvas.Group = Canvas.base.createClass(Canvas.Object, {
+  fabric.Group = fabric.base.createClass(fabric.Object, {
     
     /**
      * @property type
@@ -29,7 +29,7 @@
       this._updateObjectsCoords();
       
       if (options) {
-        Canvas.base.object.extend(this, options);
+        fabric.base.object.extend(this, options);
       }
       this._setOpacityIfSame();
       
@@ -71,7 +71,7 @@
      * @return {String}
      */
     toString: function() {
-      return '#<Canvas.Group: (' + this.complexity() + ')>';
+      return '#<fabric.Group: (' + this.complexity() + ')>';
     },
     
     /**
@@ -106,7 +106,7 @@
      */
     remove: function(object) {
       this._restoreObjectsState();
-      Canvas.util.removeFromArray(this.objects, object);
+      fabric.util.removeFromArray(this.objects, object);
       object.setActive(false);
       this._calcBounds();
       this._updateObjectsCoords();
@@ -165,8 +165,8 @@
      * @return {Object} object representation of an instance
      */
     toObject: function() {
-      return Canvas.base.object.extend(this.callSuper('toObject'), {
-        objects: Canvas.base.array.invoke(this.objects, 'clone')
+      return fabric.base.object.extend(this.callSuper('toObject'), {
+        objects: fabric.base.array.invoke(this.objects, 'clone')
       });
     },
     
@@ -196,7 +196,7 @@
     /**
      * @method item
      * @param index {Number} index of item to get
-     * @return {Canvas.Object}
+     * @return {fabric.Object}
      */
     item: function(index) {
       return this.getObjects()[index];
@@ -217,7 +217,7 @@
      * Retores original state of each of group objects
      * @private
      * @method _restoreObjectsState
-     * @return {Canvas.Group} thisArg
+     * @return {fabric.Group} thisArg
      * @chainable
      */
     _restoreObjectsState: function() {
@@ -228,7 +228,7 @@
     /**
      * @private
      * @method _restoreObjectState
-     * @param {Canvas.Object} object
+     * @param {fabric.Object} object
      */
     _restoreObjectState: function(object) {
       
@@ -258,7 +258,7 @@
     
     /**
      * @method destroy
-     * @return {Canvas.Group} thisArg
+     * @return {fabric.Group} thisArg
      * @chainable
      */
     destroy: function() {
@@ -267,7 +267,7 @@
     
     /**
      * @saveCoords
-     * @return {Canvas.Group} thisArg
+     * @return {fabric.Group} thisArg
      * @chainable
      */
     saveCoords: function() {
@@ -284,7 +284,7 @@
     /**
      * Sets coordinates of all group objects
      * @method setObjectsCoords
-     * @return {Canvas.Group} thisArg
+     * @return {fabric.Group} thisArg
      * @chainable
      */
     setObjectsCoords: function() {
@@ -297,7 +297,7 @@
     /**
      * Activates (makes active) all group objects
      * @method activateAllObjects
-     * @return {Canvas.Group} thisArg
+     * @return {fabric.Group} thisArg
      * @chainable
      */
     activateAllObjects: function() {
@@ -307,7 +307,7 @@
     /**
      * @method setActive
      * @param {Boolean} value `true` to activate object, `false` otherwise
-     * @return {Canvas.Group} thisArg
+     * @return {fabric.Group} thisArg
      * @chainable
      */
     setActive: function(value) {
@@ -328,7 +328,7 @@
      *
      * @param {Object} context a.k.a. thisObject
      *
-     * @return {Canvas.Group}
+     * @return {fabric.Group}
      * @chainable
      */
     forEachObject: function(callback, context) {
@@ -377,10 +377,10 @@
         }
       };
       
-      minX = Canvas.base.array.min(aX);
-      maxX = Canvas.base.array.max(aX);
-      minY = Canvas.base.array.min(aY);
-      maxY = Canvas.base.array.max(aY);
+      minX = fabric.base.array.min(aX);
+      maxX = fabric.base.array.max(aX);
+      minY = fabric.base.array.min(aY);
+      maxY = fabric.base.array.max(aY);
       
       width = maxX - minX;
       height = maxY - minY;
@@ -420,12 +420,12 @@
   
   /**
    * @static
-   * @method Canvas.Group.fromObject
+   * @method fabric.Group.fromObject
    * @param object {Object} object to create a group from
    * @param options {Object} options object
-   * @return {Canvas.Group} an instance of Canvas.Group
+   * @return {fabric.Group} an instance of fabric.Group
    */
-  Canvas.Group.fromObject = function(object) {
-    return new Canvas.Group(object.objects, object);
+  fabric.Group.fromObject = function(object) {
+    return new fabric.Group(object.objects, object);
   }
 })();

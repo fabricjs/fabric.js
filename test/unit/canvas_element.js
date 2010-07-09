@@ -27,21 +27,21 @@
                   '"stroke":null,"strokeWidth":1,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1}],'+
                   '"background":"#ff5555"}';
   
-  var canvas = this.canvas = new Canvas.Element('test');
+  var canvas = this.canvas = new fabric.Element('test');
   
   var canvasEl = document.getElementById('test');
   var canvasContext = canvasEl.getContext('2d');
   
   function makeRect(options) {
     var defaultOptions = { width: 10, height: 10 };
-    return new Canvas.Rect(Canvas.base.object.extend(defaultOptions, options || { }));
+    return new fabric.Rect(fabric.base.object.extend(defaultOptions, options || { }));
   }
   
-  module('Canvas.Element', {
+  module('fabric.Element', {
     teardown: function() {
       canvas.clear();
       canvas.setActiveGroup(null);
-      canvas.backgroundColor = Canvas.Element.prototype.backgroundColor;
+      canvas.backgroundColor = fabric.Element.prototype.backgroundColor;
       canvas.calcOffset();
     }
   });
@@ -120,7 +120,7 @@
     
     canvas.add(makeRect({ left: 100, top: 100, fill: '#ff5555' }));
     
-    if (Canvas.Element.supports('getImageData')) {
+    if (fabric.Element.supports('getImageData')) {
       //ok(!assertSameColor(canvas._oContextContainer), 'a red rectangle should be rendered on canvas');
       canvas.clear();
       //ok(assertSameColor(canvas._oContextContainer), 'color should be the same throughout canvas after clearing');
@@ -143,7 +143,7 @@
   
   test('toDataURL', function() {
     ok(typeof canvas.toDataURL == 'function');
-    if (!Canvas.Element.supports('toDataURL')) {
+    if (!fabric.Element.supports('toDataURL')) {
       alert("toDataURL is not supported by environment");
     }
     else {
@@ -158,7 +158,7 @@
   test('getPointer', function() {
     ok(typeof canvas.getPointer == 'function');
     
-    Canvas.base.addListener(canvasEl, 'click', function(e) {
+    fabric.base.addListener(canvasEl, 'click', function(e) {
       var pointer = canvas.getPointer(e);
       equals(pointer.x, 101, 'pointer.x should be correct');
       equals(pointer.y, 102, 'pointer.y should be correct');
@@ -217,7 +217,7 @@
   });
   
   test('toDatalessJSON', function() {
-    var path = new Canvas.Path('M 100 100 L 300 100 L 200 300 z', {
+    var path = new fabric.Path('M 100 100 L 300 100 L 200 300 z', {
       sourcePath: 'http://example.com/'
     });
     canvas.add(path);
@@ -250,7 +250,7 @@
     canvas.add(rect);
     
     equals(canvas.toObject().objects[0].type, rect.type);
-    // TODO (kangax): need to test this method with Canvas.Path to ensure that path is not populated
+    // TODO (kangax): need to test this method with fabric.Path to ensure that path is not populated
   });
   
   test('isEmpty', function() {
@@ -461,7 +461,7 @@
     
     equals(canvas.getActiveGroup(), null, 'should initially be null');
     
-    var group = new Canvas.Group([
+    var group = new fabric.Group([
       makeRect({ left: 10, top: 10 }), 
       makeRect({ left: 20, top: 20 })
     ]);
@@ -488,7 +488,7 @@
   
   test('removeActiveGroup', function() {
     ok(typeof canvas.removeActiveGroup == 'function');
-    var group = new Canvas.Group([makeRect(), makeRect()]);
+    var group = new fabric.Group([makeRect(), makeRect()]);
     canvas.setActiveGroup(group);
     equals(canvas.removeActiveGroup(), canvas, 'chainable');
     equals(canvas.getActiveGroup(), null, 'removing active group sets it to null');
@@ -512,7 +512,7 @@
     canvas.add(makeRect());
     canvas.setActiveObject(canvas.item(0));
     
-    var group = new Canvas.Group([
+    var group = new fabric.Group([
       makeRect({ left: 10, top: 10 }), 
       makeRect({ left: 20, top: 20 })
     ]);
@@ -526,16 +526,16 @@
     };
     var target;
     
-    Canvas.base.observeEvent('before:group:destroyed', function (e) {
+    fabric.base.observeEvent('before:group:destroyed', function (e) {
       eventsFired.beforeGroupDestroyed = true;
       equals(canvas.getActiveGroup(), e.memo.target, 'event should have active group as its `target` property');
     });
     
-    Canvas.base.observeEvent('after:group:destroyed', function(){
+    fabric.base.observeEvent('after:group:destroyed', function(){
       eventsFired.afterGroupDestroyed = true;
     });
     
-    Canvas.base.observeEvent('selection:cleared', function(){
+    fabric.base.observeEvent('selection:cleared', function(){
       eventsFired.selectionCleared = true;
     });
     
@@ -574,10 +574,10 @@
   test('toString', function() {
     ok(typeof canvas.toString == 'function');
     
-    equals(canvas.toString(), '#<Canvas.Element (0): { objects: 0 }>');
+    equals(canvas.toString(), '#<fabric.Element (0): { objects: 0 }>');
     
     canvas.add(makeRect());
-    equals(canvas.toString(), '#<Canvas.Element (1): { objects: 1 }>');
+    equals(canvas.toString(), '#<fabric.Element (1): { objects: 1 }>');
   });
   
   test('dispose', function() {
@@ -643,11 +643,11 @@
   test('containsPoint', function() {
     ok(typeof canvas.containsPoint == 'function');
     
-    var rect = new Canvas.Rect({ left: 100, top: 100, width: 50, height: 50 });
+    var rect = new fabric.Rect({ left: 100, top: 100, width: 50, height: 50 });
     canvas.add(rect);
     
     var canvasEl = canvas.getElement(),
-        canvasOffset = Canvas.base.getElementOffset(canvasEl);
+        canvasOffset = fabric.base.getElementOffset(canvasEl);
     
     var eventStub = { 
       pageX: canvasOffset.left + 100, 
@@ -667,9 +667,9 @@
   });
   
   test('toGrayscale', function() {
-    ok(typeof Canvas.Element.toGrayscale == 'function');
+    ok(typeof fabric.Element.toGrayscale == 'function');
     
-    if (!Canvas.Element.supports('getImageData')) {
+    if (!fabric.Element.supports('getImageData')) {
       alert('getImageData is not supported by environment. Some of the tests can not be run.');
       return;
     }
@@ -688,7 +688,7 @@
         
     same([255, 0, 0, 255], firstPixelData);
     
-    Canvas.Element.toGrayscale(canvasEl);
+    fabric.Element.toGrayscale(canvasEl);
     
     imageData = context.getImageData(0, 0, 10, 10);
     data = imageData.data;
@@ -700,7 +700,7 @@
   asyncTest('resizeImageToFit', function() {
     ok(typeof canvas._resizeImageToFit == 'function');
     
-    var imgEl = Canvas.base.makeElement('img', { src: '../fixtures/very_large_image.jpg' }),
+    var imgEl = fabric.base.makeElement('img', { src: '../fixtures/very_large_image.jpg' }),
         ORIGINAL_WIDTH = 3888,
         ORIGINAL_HEIGHT = 2592;
     
@@ -760,7 +760,7 @@
     
     setTimeout(function() {
       ok(callbackInvoked, 'callback should be invoked');
-      ok(objectPassedToCallback instanceof Canvas.Image, 'object passed to callback should be an instance of `Canvas.Image`');
+      ok(objectPassedToCallback instanceof fabric.Image, 'object passed to callback should be an instance of `fabric.Image`');
       ok(/fixtures\/very_large_image\.jpg$/.test(objectPassedToCallback.getSrc()), 'image should have correct src');
       
       start();
@@ -770,7 +770,7 @@
   asyncTest('fxRemove', function() {
     ok(typeof canvas.fxRemove == 'function');
     
-    var rect = new Canvas.Rect();
+    var rect = new fabric.Rect();
     canvas.add(rect);
     
     var callbackFired = false;

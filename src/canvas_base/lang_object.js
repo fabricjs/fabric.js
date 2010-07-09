@@ -9,7 +9,7 @@ function clone(object) {
   return extend({ }, object);
 }
 
-Canvas.base.object = {
+fabric.base.object = {
   extend: extend,
   clone: clone
 };

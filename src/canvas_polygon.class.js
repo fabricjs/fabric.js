@@ -2,17 +2,17 @@
 
 (function(){
   
-  var Canvas = this.Canvas || (this.Canvas = { });
+  var fabric = this.fabric || (this.fabric = { });
   
-  if (Canvas.Polygon) {
-    console.warn('Canvas.Polygon is already defined');
+  if (fabric.Polygon) {
+    console.warn('fabric.Polygon is already defined');
     return;
   }
   
   function byX(p) { return p.x; }
   function byY(p) { return p.y; }
   
-  Canvas.Polygon = Canvas.base.createClass(Canvas.Object, {
+  fabric.Polygon = fabric.base.createClass(fabric.Object, {
     
     type: 'polygon',
     
@@ -37,10 +37,10 @@
     _calcDimensions: function() {
       
       var points = this.points,
-          minX = Canvas.base.array.min(points, 'x'),
-          minY = Canvas.base.array.min(points, 'y'),
-          maxX = Canvas.base.array.max(points, 'x'),
-          maxY = Canvas.base.array.max(points, 'y');
+          minX = fabric.base.array.min(points, 'x'),
+          minY = fabric.base.array.min(points, 'y'),
+          maxX = fabric.base.array.max(points, 'x'),
+          maxY = fabric.base.array.max(points, 'y');
       
       this.width = maxX - minX;
       this.height = maxY - minY;
@@ -67,7 +67,7 @@
      * @return {Object} object representation of an instance
      */
     toObject: function() {
-      return Canvas.base.object.extend(this.callSuper('toObject'), {
+      return fabric.base.object.extend(this.callSuper('toObject'), {
         points: this.points.concat()
       });
     },
@@ -104,32 +104,32 @@
   });
   
   // http://www.w3.org/TR/SVG/shapes.html#PolygonElement
-  Canvas.Polygon.ATTRIBUTE_NAMES = 'fill fill-opacity stroke stroke-width transform'.split(' ');
+  fabric.Polygon.ATTRIBUTE_NAMES = 'fill fill-opacity stroke stroke-width transform'.split(' ');
   
   /**
    * @static
-   * @method Canvas.Polygon.fromElement
+   * @method fabric.Polygon.fromElement
    * @param element {SVGElement} element to parse
    * @param options {Object} options object
-   * @return {Object} instance of Canvas.Polygon
+   * @return {Object} instance of fabric.Polygon
    */
-  Canvas.Polygon.fromElement = function(element, options) {
+  fabric.Polygon.fromElement = function(element, options) {
     if (!element) {
       return null;
     }
-    var points = Canvas.parsePointsAttribute(element.getAttribute('points')),
-        parsedAttributes = Canvas.parseAttributes(element, Canvas.Polygon.ATTRIBUTE_NAMES);
+    var points = fabric.parsePointsAttribute(element.getAttribute('points')),
+        parsedAttributes = fabric.parseAttributes(element, fabric.Polygon.ATTRIBUTE_NAMES);
         
-    return new Canvas.Polygon(points, Canvas.base.object.extend(parsedAttributes, options));
+    return new fabric.Polygon(points, fabric.base.object.extend(parsedAttributes, options));
   };
   
   /**
    * @static
-   * @method Canvas.Polygon.fromObject
+   * @method fabric.Polygon.fromObject
    * @param object {Object} object to create an instance from
-   * @return {Object} instance of Canvas.Polygon
+   * @return {Object} instance of fabric.Polygon
    */
-  Canvas.Polygon.fromObject = function(object) {
-    return new Canvas.Polygon(object.points, object);
+  fabric.Polygon.fromObject = function(object) {
+    return new fabric.Polygon(object.points, object);
   }
 })();

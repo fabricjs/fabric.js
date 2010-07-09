@@ -3,15 +3,15 @@
 (function() {
   
   var global  = this,
-      Canvas  = global.Canvas || (global.Canvas = { }),
+      fabric  = global.fabric || (global.fabric = { }),
       piBy2   = Math.PI * 2;
   
-  if (Canvas.Circle) {
-    console.warn('Canvas.Circle is already defined.');
+  if (fabric.Circle) {
+    console.warn('fabric.Circle is already defined.');
     return;
   }
   
-  Canvas.Circle = Canvas.base.createClass(Canvas.Object, /** @lends Canvas.Circle.prototype */ {
+  fabric.Circle = fabric.base.createClass(fabric.Object, /** @lends fabric.Circle.prototype */ {
     
     /**
      * @field
@@ -40,7 +40,7 @@
      * @return {Object} object representation of an instance
      */
     toObject: function() {
-      return Canvas.base.object.extend(this.callSuper('toObject'), {
+      return fabric.base.object.extend(this.callSuper('toObject'), {
         radius: this.get('radius')
       });
     },
@@ -74,22 +74,22 @@
   /**
    * @see: http://www.w3.org/TR/SVG/shapes.html#CircleElement
    */
-  Canvas.Circle.ATTRIBUTE_NAMES = 'cx cy r fill fill-opacity stroke stroke-width transform'.split(' ');
+  fabric.Circle.ATTRIBUTE_NAMES = 'cx cy r fill fill-opacity stroke stroke-width transform'.split(' ');
   
   /**
    * @static
-   * @method Canvas.Circle.fromElement
+   * @method fabric.Circle.fromElement
    * @param element {SVGElement} element to parse
    * @param options {Object} options object
    * @throws {Error} If value of `r` attribute is missing or invalid
-   * @return {Object} instance of Canvas.Circle
+   * @return {Object} instance of fabric.Circle
    */
-  Canvas.Circle.fromElement = function(element, options) {
-    var parsedAttributes = Canvas.parseAttributes(element, Canvas.Circle.ATTRIBUTE_NAMES);
+  fabric.Circle.fromElement = function(element, options) {
+    var parsedAttributes = fabric.parseAttributes(element, fabric.Circle.ATTRIBUTE_NAMES);
     if (!isValidRadius(parsedAttributes)) {
       throw Error('value of `r` attribute is required and can not be negative');
     }
-    return new Canvas.Circle(Canvas.base.object.extend(parsedAttributes, options));
+    return new fabric.Circle(fabric.base.object.extend(parsedAttributes, options));
   };
   
   /**
@@ -101,11 +101,11 @@
   
   /**
    * @static
-   * @method Canvas.Circle.fromObject
+   * @method fabric.Circle.fromObject
    * @param object {Object} object to create an instance from
-   * @return {Object} instance of Canvas.Circle
+   * @return {Object} instance of fabric.Circle
    */
-  Canvas.Circle.fromObject = function(object) {
-    return new Canvas.Circle(object);
+  fabric.Circle.fromObject = function(object) {
+    return new fabric.Circle(object);
   }
 })();

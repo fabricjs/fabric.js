@@ -1,13 +1,13 @@
 (function() {
   
-  var Canvas = this.Canvas || (this.Canvas = { });
+  var fabric = this.fabric || (this.fabric = { });
   
-  if (Canvas.Color) {
-    console.warn('Canvas.Color is already defined.');
+  if (fabric.Color) {
+    console.warn('fabric.Color is already defined.');
     return;
   }
   
-  Canvas.Color = Color;
+  fabric.Color = Color;
   
   /**
    * @constructor

@@ -1,6 +1,6 @@
 (function(){
   
-  var Canvas = this.Canvas || (this.Canvas = { });
+  var fabric = this.fabric || (this.fabric = { });
   
   var attributesMap = {
     'cx':             'left',
@@ -33,7 +33,7 @@
 
     // if there's a parent container (`g` node), parse its attributes recursively upwards
     if (element.parentNode && /^g$/i.test(element.parentNode.nodeName)) {
-      parentAttributes = Canvas.parseAttributes(element.parentNode, attributes);
+      parentAttributes = fabric.parseAttributes(element.parentNode, attributes);
     }
     
     var ownAttributes = attributes.reduce(function(memo, attr) {
@@ -48,7 +48,7 @@
           value = (value === 'evenodd') ? 'destination-over' : value;
         }
         if (attr === 'transform') {
-          value = Canvas.parseTransformAttribute(value);
+          value = fabric.parseTransformAttribute(value);
         }
         // transform attribute names
         if (attr in attributesMap) {
@@ -61,17 +61,17 @@
     
     // add values parsed from style
     // TODO (kangax): check the presedence of values from the style attribute
-    ownAttributes = Canvas.base.object.extend(Canvas.parseStyleAttribute(element), ownAttributes);
-    return Canvas.base.object.extend(parentAttributes, ownAttributes);
+    ownAttributes = fabric.base.object.extend(fabric.parseStyleAttribute(element), ownAttributes);
+    return fabric.base.object.extend(parentAttributes, ownAttributes);
   };
   
   /**
    * @static
-   * @method Canvas.parseTransformAttribute
+   * @method fabric.parseTransformAttribute
    * @param attributeValue {String} string containing attribute value
    * @return {Array} array of 6 elements representing transformation matrix
    */
-  Canvas.parseTransformAttribute = (function() {
+  fabric.parseTransformAttribute = (function() {
     function rotateMatrix(matrix, args) {
       var angle = args[0];
       
@@ -198,7 +198,7 @@
   
   /**
    * @static
-   * @method Canvas.parsePointsAttribute
+   * @method fabric.parsePointsAttribute
    * @param points {String} points attribute string
    * @return {Array} array of points
    */
@@ -220,7 +220,7 @@
 
   /**
    * @static
-   * @method Canvas.parseStyleAttribute
+   * @method fabric.parseStyleAttribute
    * @param element {SVGElement} element to parse
    * @return {Object} objects with values parsed from style attribute of an element
    */
@@ -252,15 +252,15 @@
 
   /**
    * @static
-   * @method Canvas.parseElements
+   * @method fabric.parseElements
    * @param elements {Array} array of elements to parse
    * @param options {Object} options object
    * @return {Array} array of corresponding instances (transformed from SVG elements)
    */
    function parseElements(elements, options) {
-    // transform svg elements to Canvas.Path elements
+    // transform svg elements to fabric.Path elements
     var _elements = elements.map(function(el) {
-      var klass = Canvas[Canvas.base.string.capitalize(el.tagName)];
+      var klass = fabric[fabric.base.string.capitalize(el.tagName)];
       if (klass && klass.fromElement) {
         try {
           return klass.fromElement(el, options);
@@ -278,12 +278,12 @@
   
   /**
    * @static
-   * @method Canvas.parseSVGDocument
+   * @method fabric.parseSVGDocument
    * @param doc {SVGDocument} SVG document to parse
    * @param callback {Function} callback to call when parsing is finished. 
    * Callback is being passed array of elements (parsed from a document)
    */
-  Canvas.parseSVGDocument = (function(){
+  fabric.parseSVGDocument = (function(){
 
     var reAllowedSVGTagNames = /^(path|circle|polygon|polyline|ellipse|rect|line)$/;
 
@@ -313,7 +313,7 @@
 
     return function(doc, callback) {
       if (!doc) return;
-      var descendants = Canvas.base.toArray(doc.getElementsByTagName('*'));
+      var descendants = fabric.base.toArray(doc.getElementsByTagName('*'));
       
       var elements = descendants.filter(function(el) {
         return reAllowedSVGTagNames.test(el.tagName) && 
@@ -346,7 +346,7 @@
         height: height
       };
 
-      var elements = Canvas.parseElements(elements, Canvas.base.object.clone(options));
+      var elements = fabric.parseElements(elements, fabric.base.object.clone(options));
       if (!elements || (elements && !elements.length)) return;
 
       if (callback) {
@@ -355,7 +355,7 @@
     };
   })();
   
-  Canvas.base.object.extend(Canvas, {
+  fabric.base.object.extend(fabric, {
     parseAttributes:        parseAttributes,
     parseElements:          parseElements,
     parseStyleAttribute:    parseStyleAttribute,

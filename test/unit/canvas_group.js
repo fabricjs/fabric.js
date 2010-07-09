@@ -1,20 +1,20 @@
 (function(){
   
-  var canvas = this.canvas = new Canvas.Element('test');
+  var canvas = this.canvas = new fabric.Element('test');
   var canvasEl = document.getElementById('test');
   
   function makeGroupWith2Objects() {
-    var rect1 = new Canvas.Rect({ top: 100, left: 100, width: 30, height: 10 }),
-        rect2 = new Canvas.Rect({ top: 120, left: 50, width: 10, height: 40 });
+    var rect1 = new fabric.Rect({ top: 100, left: 100, width: 30, height: 10 }),
+        rect2 = new fabric.Rect({ top: 120, left: 50, width: 10, height: 40 });
         
-    return new Canvas.Group([ rect1, rect2 ]);
+    return new fabric.Group([ rect1, rect2 ]);
   }
   
-  module('Canvas.Group', {
+  module('fabric.Group', {
     teardown: function() {
       canvas.clear();
       canvas.setActiveGroup(null);
-      canvas.backgroundColor = Canvas.Element.prototype.backgroundColor;
+      canvas.backgroundColor = fabric.Element.prototype.backgroundColor;
       canvas.calcOffset();
     }
   });
@@ -23,19 +23,19 @@
     var group = makeGroupWith2Objects();
     
     ok(group);
-    ok(group instanceof Canvas.Group, 'should be instance of Canvas.Group');
+    ok(group instanceof fabric.Group, 'should be instance of fabric.Group');
   });
   
   test('toString', function() {
     var group = makeGroupWith2Objects();
-    equals(group.toString(), '#<Canvas.Group: (2)>', 'should return proper representation');
+    equals(group.toString(), '#<fabric.Group: (2)>', 'should return proper representation');
   });
   
   test('getObjects', function() {
-    var rect1 = new Canvas.Rect(),
-        rect2 = new Canvas.Rect();
+    var rect1 = new fabric.Rect(),
+        rect2 = new fabric.Rect();
 
-    var group = new Canvas.Group([ rect1, rect2 ]);
+    var group = new fabric.Group([ rect1, rect2 ]);
     
     ok(typeof group.getObjects == 'function');
     ok(Object.prototype.toString.call(group.getObjects()) == '[object Array]', 'should be an array');
@@ -45,7 +45,7 @@
   
   test('add', function() {
     var group = makeGroupWith2Objects();
-    var rect = new Canvas.Rect();
+    var rect = new fabric.Rect();
     
     ok(typeof group.add == 'function');
     equals(group.add(rect), group, 'should be chainable');
@@ -54,10 +54,10 @@
   });
   
   test('remove', function() {
-    var rect1 = new Canvas.Rect(),
-        rect2 = new Canvas.Rect(),
-        rect3 = new Canvas.Rect(),
-        group = new Canvas.Group([ rect1, rect2, rect3 ]);
+    var rect1 = new fabric.Rect(),
+        rect2 = new fabric.Rect(),
+        rect3 = new fabric.Rect(),
+        group = new fabric.Group([ rect1, rect2, rect3 ]);
         
     ok(typeof group.remove == 'function');
     equals(group.remove(rect2), group, 'should be chainable');
@@ -69,7 +69,7 @@
     
     ok(typeof group.size == 'function');
     equals(group.size(), 2);
-    group.add(new Canvas.Rect());
+    group.add(new fabric.Rect());
     equals(group.size(), 3);
     group.remove(group.getObjects()[0]).remove(group.getObjects()[0]);
     equals(group.size(), 1);
@@ -95,10 +95,10 @@
   });
   
   test('contains', function() {
-    var rect1           = new Canvas.Rect(),
-        rect2           = new Canvas.Rect(),
-        notIncludedRect = new Canvas.Rect(),
-        group           = new Canvas.Group([ rect1, rect2 ]);
+    var rect1           = new fabric.Rect(),
+        rect2           = new fabric.Rect(),
+        notIncludedRect = new fabric.Rect(),
+        group           = new fabric.Group([ rect1, rect2 ]);
     
     ok(typeof group.contains == 'function');
     
@@ -271,23 +271,23 @@
     ok(typeof group.setActive == 'function');
     
     group.setActive(false);
-    same([false, false], Canvas.base.array.invoke(group.getObjects(), 'isActive'));
+    same([false, false], fabric.base.array.invoke(group.getObjects(), 'isActive'));
     
     group.setActive(true);
-    same([true, true], Canvas.base.array.invoke(group.getObjects(), 'isActive'));
+    same([true, true], fabric.base.array.invoke(group.getObjects(), 'isActive'));
   });
   
   test('fromObject', function() {
     var group = makeGroupWith2Objects();
     
-    ok(typeof Canvas.Group.fromObject == 'function');
+    ok(typeof fabric.Group.fromObject == 'function');
     var groupObject = group.toObject();
     
-    var newGroupFromObject = Canvas.Group.fromObject(groupObject);
+    var newGroupFromObject = fabric.Group.fromObject(groupObject);
     var objectFromOldGroup = group.toObject();
     var objectFromNewGroup = newGroupFromObject.toObject();
     
-    ok(newGroupFromObject instanceof Canvas.Group);
+    ok(newGroupFromObject instanceof fabric.Group);
     
     // delete `objects` arrays, since `assertHashEqual` fails to compare them for equality
     delete objectFromOldGroup.objects;

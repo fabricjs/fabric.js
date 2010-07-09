@@ -23,73 +23,73 @@
     'path':         null
   };
   
-  module('Canvas.Text');
+  module('fabric.Text');
   
   test('constructor', function() {
-    ok(Canvas.Text);
-    var text = new Canvas.Text('foo');
+    ok(fabric.Text);
+    var text = new fabric.Text('foo');
     
-    ok(text instanceof Canvas.Text);
-    ok(text instanceof Canvas.Object);
+    ok(text instanceof fabric.Text);
+    ok(text instanceof fabric.Object);
     
     equals(text.get('type'), 'text');
     equals(text.get('text'), 'foo');
   });
   
   test('toString', function() {
-    var text = new Canvas.Text('foo');
+    var text = new fabric.Text('foo');
     ok(typeof text.toString == 'function');
-    equals(text.toString(), '#<Canvas.Text (0): {"text":"foo","fontfamily":"Modernist_One_400"}>');
+    equals(text.toString(), '#<fabric.Text (0): {"text":"foo","fontfamily":"Modernist_One_400"}>');
   });
   
   test('toObject', function() {
-    var text = new Canvas.Text('foo');
+    var text = new fabric.Text('foo');
     ok(typeof text.toObject == 'function');
     same(text.toObject(), REFERENCE_TEXT_OBJECT);
   });
   
   test('complexity', function(){
-    var text = new Canvas.Text('foo');
+    var text = new fabric.Text('foo');
     ok(typeof text.complexity == 'function');
   });
   
   test('set', function() {
-    var text = new Canvas.Text('foo');
+    var text = new fabric.Text('foo');
     ok(typeof text.set == 'function');
     equals(text.set('text', 'bar'), text, 'should be chainable');
   });
   
   test('setColor', function(){
-    var text = new Canvas.Text('foo');
+    var text = new fabric.Text('foo');
     ok(typeof text.setColor == 'function');
     equals(text.setColor('123456'), text, 'should be chainable');
     equals(text.get('fill'), '123456');
   });
   
   test('setFontsize', function(){
-    var text = new Canvas.Text('foo');
+    var text = new fabric.Text('foo');
     ok(typeof text.setFontsize == 'function');
     equals(text.setFontsize(12), text);
     equals(text.get('fontsize'), 12);
   });
   
   test('getText', function(){
-    var text = new Canvas.Text('foo');
+    var text = new fabric.Text('foo');
     ok(typeof text.getText == 'function');
     equals(text.getText(), 'foo');
     equals(text.getText(), text.get('text'));
   });
   
   test('setText', function(){
-    var text = new Canvas.Text('foo');
+    var text = new fabric.Text('foo');
     ok(typeof text.setText == 'function');
     equals(text.setText('bar'), text, 'should be chainable');
     equals(text.getText(), 'bar');
   });
   
-  test('Canvas.Text.fromObject', function(){
-    ok(typeof Canvas.Text.fromObject == 'function');
-    var text = Canvas.Text.fromObject(REFERENCE_TEXT_OBJECT);
+  test('fabric.Text.fromObject', function(){
+    ok(typeof fabric.Text.fromObject == 'function');
+    var text = fabric.Text.fromObject(REFERENCE_TEXT_OBJECT);
     same(text.toObject(), REFERENCE_TEXT_OBJECT);
   });
   
@@ -114,11 +114,11 @@
     console.warn = function() {
       warnWasCalled = true;
     }
-    var originalCanvasObject = Canvas.Object;
-    var originalCanvasText = Canvas.Text;
+    var originalCanvasObject = fabric.Object;
+    var originalCanvasText = fabric.Text;
     
-    delete Canvas.Text;
-    delete Canvas.Object;
+    delete fabric.Text;
+    delete fabric.Object;
     
     var el = document.createElement('script');
     el.src = '../../src/canvas_text.class.js';
@@ -127,8 +127,8 @@
     setTimeout(function(){
       ok(warnWasCalled);
       
-      Canvas.Object = originalCanvasObject;
-      Canvas.Text = originalCanvasText;
+      fabric.Object = originalCanvasObject;
+      fabric.Text = originalCanvasText;
       
       start();
     }, 500);

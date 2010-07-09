@@ -4,11 +4,11 @@
   
   /* Adaptation of work of Kevin Lindsey (kevin@kevlindev.com) */
   
-  var global = this;
-  var Canvas = global.Canvas || (global.Canvas = { });
+  var global = this,
+      fabric = global.fabric || (global.fabric = { });
   
-  if (Canvas.Intersection) {    
-    console.warn('Canvas.Intersection is already defined');
+  if (fabric.Intersection) {    
+    console.warn('fabric.Intersection is already defined');
     return;
   }
 
@@ -39,7 +39,7 @@
           ub = ub_t / u_b;
       if (0 <= ua && ua <= 1 && 0 <= ub && ub <= 1) {
         result = new Intersection("Intersection");
-        result.points.push(new Canvas.Point(a1.x + ua * (a2.x - a1.x), a1.y + ua * (a2.y - a1.y)));
+        result.points.push(new fabric.Point(a1.x + ua * (a2.x - a1.x), a1.y + ua * (a2.y - a1.y)));
       }
       else {
         result = new Intersection("No Intersection");
@@ -93,8 +93,8 @@
   Intersection.intersectPolygonRectangle = function (points, r1, r2) {
     var min = r1.min(r2),
         max = r1.max(r2),
-        topRight = new Canvas.Point(max.x, min.y),
-        bottomLeft = new Canvas.Point(min.x, max.y),
+        topRight = new fabric.Point(max.x, min.y),
+        bottomLeft = new fabric.Point(min.x, max.y),
         inter1 = Intersection.intersectLinePolygon(min, topRight, points),
         inter2 = Intersection.intersectLinePolygon(topRight, max, points),
         inter3 = Intersection.intersectLinePolygon(max, bottomLeft, points),
@@ -111,6 +111,6 @@
     return result;
   };
   
-  Canvas.Intersection = Intersection;
+  fabric.Intersection = Intersection;
   
 })();

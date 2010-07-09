@@ -22,14 +22,14 @@
     'y2': 14
   };
   
-  module('Canvas.Line');
+  module('fabric.Line');
   
   test('constructor', function() {
-    ok(Canvas.Line);
-    var line = new Canvas.Line([10, 11, 20, 21]);
+    ok(fabric.Line);
+    var line = new fabric.Line([10, 11, 20, 21]);
     
-    ok(line instanceof Canvas.Line);
-    ok(line instanceof Canvas.Object);
+    ok(line instanceof fabric.Line);
+    ok(line instanceof fabric.Object);
     
     equals(line.type, 'line');
     
@@ -38,7 +38,7 @@
     equals(line.get('x2'), 20);
     equals(line.get('y2'), 21);
     
-    var lineWithoutPoints = new Canvas.Line();
+    var lineWithoutPoints = new fabric.Line();
     
     equals(lineWithoutPoints.get('x1'), 0);
     equals(lineWithoutPoints.get('y1'), 0);
@@ -47,25 +47,25 @@
   });
   
   test('complexity', function() {
-    var line = new Canvas.Line();
+    var line = new fabric.Line();
     ok(typeof line.complexity == 'function');
   });
   
   test('toObject', function() {
-    var line = new Canvas.Line([11, 12, 13, 14]);
+    var line = new fabric.Line([11, 12, 13, 14]);
     ok(typeof line.toObject == 'function');
     same(LINE_OBJECT, line.toObject());
   });
   
   test('fromObject', function() {
-    ok(typeof Canvas.Line.fromObject == 'function');
-    var line = Canvas.Line.fromObject(LINE_OBJECT);
-    ok(line instanceof Canvas.Line);
+    ok(typeof fabric.Line.fromObject == 'function');
+    var line = fabric.Line.fromObject(LINE_OBJECT);
+    ok(line instanceof fabric.Line);
     same(LINE_OBJECT, line.toObject());
   });
   
   test('fromElement', function() {
-    ok(typeof Canvas.Line.fromElement == 'function');
+    ok(typeof fabric.Line.fromElement == 'function');
     
     var lineEl        = document.createElement('line'),
         x1            = 11,
@@ -82,8 +82,8 @@
     lineEl.setAttribute('stroke', stroke);
     lineEl.setAttribute('stroke-width', strokeWidth);
     
-    var oLine = Canvas.Line.fromElement(lineEl);
-    ok(oLine instanceof Canvas.Line);
+    var oLine = fabric.Line.fromElement(lineEl);
+    ok(oLine instanceof fabric.Line);
     
     equals(oLine.get('x1'), x1);
     equals(oLine.get('y1'), y1);
@@ -96,7 +96,7 @@
     lineElWithMissingAttributes.setAttribute('x1', 10);
     lineElWithMissingAttributes.setAttribute('y1', 20);
     
-    oLine = Canvas.Line.fromElement(lineElWithMissingAttributes);
+    oLine = fabric.Line.fromElement(lineElWithMissingAttributes);
     
     equals(oLine.get('x2'), 0, 'missing attributes count as 0 values');
     equals(oLine.get('y2'), 0, 'missing attributes count as 0 values');

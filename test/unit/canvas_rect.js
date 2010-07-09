@@ -18,48 +18,48 @@
     'opacity': 1
   };
   
-  module('Canvas.Rect');
+  module('fabric.Rect');
   
   test('constructor', function(){
-    ok(Canvas.Rect);
+    ok(fabric.Rect);
 
-    var rect = new Canvas.Rect();
+    var rect = new fabric.Rect();
 
-    ok(rect instanceof Canvas.Rect);
-    ok(rect instanceof Canvas.Object);
+    ok(rect instanceof fabric.Rect);
+    ok(rect instanceof fabric.Object);
 
     same(rect.get('type'), 'rect');
   });
   
   test('complexity', function() {
-    var rect = new Canvas.Rect();
+    var rect = new fabric.Rect();
     
     ok(typeof rect.complexity == 'function');
   });
   
   test('toObject', function() {
-    var rect = new Canvas.Rect();
+    var rect = new fabric.Rect();
     ok(typeof rect.toObject == 'function');
 
     var object = rect.toObject();
     same(object, REFERENCE_RECT);
   });
   
-  test('Canvas.Rect.fromObject', function() {
-    ok(typeof Canvas.Rect.fromObject == 'function');
+  test('fabric.Rect.fromObject', function() {
+    ok(typeof fabric.Rect.fromObject == 'function');
     
-    var rect = Canvas.Rect.fromObject(REFERENCE_RECT);
-    ok(rect instanceof Canvas.Rect);
+    var rect = fabric.Rect.fromObject(REFERENCE_RECT);
+    ok(rect instanceof fabric.Rect);
     same(rect.toObject(), REFERENCE_RECT);
   });
   
-  test('Canvas.Rect.fromElement', function() {
-    ok(typeof Canvas.Rect.fromElement == 'function');
+  test('fabric.Rect.fromElement', function() {
+    ok(typeof fabric.Rect.fromElement == 'function');
 
     var elRect = document.createElement('rect');
-    var rect = Canvas.Rect.fromElement(elRect);
+    var rect = fabric.Rect.fromElement(elRect);
 
-    ok(rect instanceof Canvas.Rect);
+    ok(rect instanceof fabric.Rect);
     same(rect.toObject(), REFERENCE_RECT);
 
     var elRectWithAttrs = document.createElement('rect');
@@ -75,10 +75,10 @@
     elRectWithAttrs.setAttribute('stroke-width', 3);
     //elRectWithAttrs.setAttribute('transform', 'translate(-10,-20) scale(2) rotate(45) translate(5,10)');
 
-    var rectWithAttrs = Canvas.Rect.fromElement(elRectWithAttrs);
-    ok(rectWithAttrs instanceof Canvas.Rect);
+    var rectWithAttrs = fabric.Rect.fromElement(elRectWithAttrs);
+    ok(rectWithAttrs instanceof fabric.Rect);
 
-    var expectedObject = Canvas.base.object.extend(REFERENCE_RECT, {
+    var expectedObject = fabric.base.object.extend(REFERENCE_RECT, {
       left: 121,
       top: 186.5,
       width: 222,
@@ -90,6 +90,6 @@
     });
     same(rectWithAttrs.toObject(), expectedObject);
 
-    ok(Canvas.Rect.fromElement() === null);
+    ok(fabric.Rect.fromElement() === null);
   });
 })();

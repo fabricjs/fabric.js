@@ -82,7 +82,7 @@ function falseFunction() { return false; };
     return element;
   }
   
-  Canvas.base.makeElementUnselectable = makeElementUnselectable
+  fabric.base.makeElementUnselectable = makeElementUnselectable
 })();
 
 (function(){
@@ -115,11 +115,11 @@ function falseFunction() { return false; };
     callback();
   }
   
-  Canvas.base.getScript = getScript;
+  fabric.base.getScript = getScript;
   
   var Jaxer = this.Jaxer;
   if (Jaxer && Jaxer.load) {
-    Canvas.base.getScript = getScriptJaxer;
+    fabric.base.getScript = getScriptJaxer;
   }
 })();
 
@@ -149,10 +149,10 @@ function animate(options) {
   }, 10);
 }
 
-Canvas.base.getById = getById;
-Canvas.base.toArray = toArray;
-Canvas.base.makeElement = makeElement;
-Canvas.base.addClass = addClass;
-Canvas.base.wrapElement = wrapElement;
-Canvas.base.getElementOffset = getElementOffset;
-Canvas.base.animate = animate;
+fabric.base.getById = getById;
+fabric.base.toArray = toArray;
+fabric.base.makeElement = makeElement;
+fabric.base.addClass = addClass;
+fabric.base.wrapElement = wrapElement;
+fabric.base.getElementOffset = getElementOffset;
+fabric.base.animate = animate;

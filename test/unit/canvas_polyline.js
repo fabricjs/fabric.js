@@ -26,48 +26,48 @@
     'points':       getPoints()
   };
   
-  module('Canvas.Polyline');
+  module('fabric.Polyline');
   
   test('constructor', function() {
-    ok(Canvas.Polyline);
+    ok(fabric.Polyline);
     
-    var polyline = new Canvas.Polyline(getPoints());
+    var polyline = new fabric.Polyline(getPoints());
     
-    ok(polyline instanceof Canvas.Polyline);
-    ok(polyline instanceof Canvas.Object);
+    ok(polyline instanceof fabric.Polyline);
+    ok(polyline instanceof fabric.Object);
     
     equals(polyline.type, 'polyline');
     same(polyline.get('points'), getPoints());
   });
   
   test('complexity', function() {
-    var polyline = new Canvas.Polyline(getPoints());
+    var polyline = new fabric.Polyline(getPoints());
     ok(typeof polyline.complexity == 'function');
   });
   
   test('toObject', function() {
-    var polyline = new Canvas.Polyline(getPoints());
+    var polyline = new fabric.Polyline(getPoints());
     ok(typeof polyline.toObject == 'function');
     same(polyline.toObject(), REFERENCE_OBJECT);
   });
   
   test('fromObject', function() {
-    ok(typeof Canvas.Polyline.fromObject == 'function');
-    var polyline = Canvas.Polyline.fromObject(REFERENCE_OBJECT);
-    ok(polyline instanceof Canvas.Polyline);
+    ok(typeof fabric.Polyline.fromObject == 'function');
+    var polyline = fabric.Polyline.fromObject(REFERENCE_OBJECT);
+    ok(polyline instanceof fabric.Polyline);
     same(polyline.toObject(), REFERENCE_OBJECT);
   });
   
   test('fromElement', function() {
-    ok(typeof Canvas.Polyline.fromElement == 'function');
+    ok(typeof fabric.Polyline.fromElement == 'function');
     
     var elPolyline = document.createElement('polyline');
     
     elPolyline.setAttribute('points', '10,12 20,22');
     
-    var polyline = Canvas.Polyline.fromElement(elPolyline);
+    var polyline = fabric.Polyline.fromElement(elPolyline);
     
-    ok(polyline instanceof Canvas.Polyline);
+    ok(polyline instanceof fabric.Polyline);
     same(REFERENCE_OBJECT, polyline.toObject());
     
     var elPolylineWithAttrs = document.createElement('polyline');
@@ -78,10 +78,10 @@
     elPolylineWithAttrs.setAttribute('stroke', 'blue');
     elPolylineWithAttrs.setAttribute('transform', 'translate(-10,-20) scale(2)');
     
-    var polylineWithAttrs = Canvas.Polyline.fromElement(elPolylineWithAttrs);
+    var polylineWithAttrs = fabric.Polyline.fromElement(elPolylineWithAttrs);
     //var expectedPoints = [{x: 10, y: 10}, {x: 20, y: 20}, {x: 30, y: 30}, {x: 10, y: 10}];
     /*
-    same(Canvas.base.object.extend(REFERENCE_OBJECT, {
+    same(fabric.base.object.extend(REFERENCE_OBJECT, {
       'width': 20, 
       'height': 20, 
       'fill': 'rgb(255,255,255)', 
@@ -96,10 +96,10 @@
     var elPolylineWithoutPoints = document.createElement('polyline');
     /*
     this.assertRaise('TypeError', function(){
-      Canvas.Polyline.fromElement(elPolylineWithoutPoints);
+      fabric.Polyline.fromElement(elPolylineWithoutPoints);
     }, 'missing points attribute should result in error');
     
-    equals(Canvas.Polyline.fromElement(), null);
+    equals(fabric.Polyline.fromElement(), null);
     */
   });
 })();

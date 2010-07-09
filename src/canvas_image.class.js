@@ -4,22 +4,22 @@
   
   var global = this;
   
-  if (!global.Canvas) {
-    global.Canvas = { };
+  if (!global.fabric) {
+    global.fabric = { };
   }
   
-  if (global.Canvas.Image) {
-    console.warn('Canvas.Image is already defined.');
+  if (global.fabric.Image) {
+    console.warn('fabric.Image is already defined.');
     return;
   };
   
-  if (!Canvas.Object) {
-    console.warn('Canvas.Object is required for Canvas.Image initialization');
+  if (!fabric.Object) {
+    console.warn('fabric.Object is required for fabric.Image initialization');
     return;
   }
   
   
-  Canvas.Image = Canvas.base.createClass(Canvas.Object, {
+  fabric.Image = fabric.base.createClass(fabric.Object, {
     
     maxwidth: null,
     maxheight: null,
@@ -53,7 +53,7 @@
     
     /**
      * @method setElement
-     * @return {Canvas.Image} thisArg
+     * @return {fabric.Image} thisArg
      */
     setElement: function(element) {
       this._element = element;
@@ -145,7 +145,7 @@
      * @return {Object} object representation of an instance
      */
     toObject: function() {
-      return Canvas.base.object.extend(this.callSuper('toObject'), {
+      return fabric.base.object.extend(this.callSuper('toObject'), {
         src: this.getSrc()
       });
     },
@@ -163,7 +163,7 @@
      * @return {String} string representation of an instance
      */
     toString: function() {        
-      return '#<Canvas.Image: { src: "' + this.getSrc() + '" }>';
+      return '#<fabric.Image: { src: "' + this.getSrc() + '" }>';
     },
     
     /**
@@ -193,7 +193,7 @@
       canvasEl.height = imgEl.height;
 
       canvasEl.getContext('2d').drawImage(imgEl, 0, 0);
-      Canvas.Element.toGrayscale(canvasEl);
+      fabric.Element.toGrayscale(canvasEl);
           
       replacement.onload = function() {
         _this.setElement(replacement);
@@ -255,8 +255,8 @@
      * @param {HTMLImageElement|String} el The element representing the image
      */
     _initElement: function(element) {
-      this.setElement(Canvas.base.getById(element));
-      Canvas.base.addClass(this.getElement(), Canvas.Image.CSS_CANVAS);
+      this.setElement(fabric.base.getById(element));
+      fabric.base.addClass(this.getElement(), fabric.Image.CSS_CANVAS);
     },
     
     /**
@@ -293,21 +293,21 @@
   
   /**
    * Constant for the default CSS class name that represents a Canvas
-   * @property Canvas.Image.CSS_CANVAS
+   * @property fabric.Image.CSS_CANVAS
    * @static
    * @final
    * @type String
    */
-  Canvas.Image.CSS_CANVAS = "canvas-img";
+  fabric.Image.CSS_CANVAS = "canvas-img";
   
   /**
-   * Creates an instance of Canvas.Image from its object representation
+   * Creates an instance of fabric.Image from its object representation
    * @method fromObject
    * @param object {Object}
    * @param callback {Function} optional
    * @static
    */
-  Canvas.Image.fromObject = function(object, callback) {
+  fabric.Image.fromObject = function(object, callback) {
     var img = document.createElement('img'),
         src = object.src;
         
@@ -319,7 +319,7 @@
     }
     img.onload = function() {
       if (callback) {
-        callback(new Canvas.Image(img, object));
+        callback(new fabric.Image(img, object));
       }
       img = img.onload = null;
     };
@@ -327,18 +327,18 @@
   };
   
   /**
-   * Creates an instance of Canvas.Image from an URL string
+   * Creates an instance of fabric.Image from an URL string
    * @method fromURL
    * @param url {String}
    * @param callback {Function} optional
    * @param imgOptions {Object} optional
    * @static
    */
-  Canvas.Image.fromURL = function(url, callback, imgOptions) {
+  fabric.Image.fromURL = function(url, callback, imgOptions) {
     var img = document.createElement('img');
     img.onload = function() {
       if (callback) {
-        callback(new Canvas.Image(img, imgOptions));
+        callback(new fabric.Image(img, imgOptions));
       }
       img = img.onload = null;
     };

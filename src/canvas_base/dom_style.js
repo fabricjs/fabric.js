@@ -53,6 +53,6 @@
     };
   }
 
-  Canvas.base.setStyle = setStyle;
+  fabric.base.setStyle = setStyle;
   
 })();

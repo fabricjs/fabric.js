@@ -1,9 +1,9 @@
 (function(){
   
-  var Canvas = this.Canvas || (this.Canvas = { });
+  var fabric = this.fabric || (this.fabric = { });
   
-  if (Canvas.util) {
-    console.warn('Canvas.util is already defined');
+  if (fabric.util) {
+    console.warn('fabric.util is already defined');
     return;
   }
   
@@ -56,7 +56,7 @@
      return parseFloat(Number(number).toFixed(fractionDigits));
    }
   
-  Canvas.util = { 
+  fabric.util = { 
     removeFromArray:        removeFromArray, 
     degreesToRadians:       degreesToRadians,
     toFixed:                toFixed,

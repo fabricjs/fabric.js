@@ -140,8 +140,8 @@
     };
   }
   
-  Canvas.base.addListener = addListener;
-  Canvas.base.removeListener = removeListener;
+  fabric.base.addListener = addListener;
+  fabric.base.removeListener = removeListener;
   
   
   var customEventListeners = { };
@@ -167,8 +167,8 @@
     }
   }
   
-  Canvas.base.observeEvent = observeEvent;
-  Canvas.base.fireEvent = fireEvent;
+  fabric.base.observeEvent = observeEvent;
+  fabric.base.fireEvent = fireEvent;
   
   // TODO (kangax): this method needs fixing
   function getPointer(event) {
@@ -193,5 +193,5 @@
        (docElement.clientTop || 0));
   }
   
-  Canvas.base.getPointer = getPointer;
+  fabric.base.getPointer = getPointer;
 })(this);

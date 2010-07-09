@@ -29,7 +29,7 @@
   }
   
   function getPathObject(path) {
-    return Canvas.Path.fromElement(getPathElement(path));
+    return fabric.Path.fromElement(getPathElement(path));
   }
   
   function getPathObjects() {
@@ -38,17 +38,17 @@
   }
   
   function getPathGroupObject() {
-    return new Canvas.PathGroup(getPathObjects());
+    return new fabric.PathGroup(getPathObjects());
   }
   
-  module('Canvas.PathGroup');
+  module('fabric.PathGroup');
   
   test('constructor', function() {
-    ok(Canvas.PathGroup);
+    ok(fabric.PathGroup);
     var pathGroup = getPathGroupObject();
     
-    ok(pathGroup instanceof Canvas.PathGroup);
-    ok(pathGroup instanceof Canvas.Object);
+    ok(pathGroup instanceof fabric.PathGroup);
+    ok(pathGroup instanceof fabric.Object);
     //this.assertHasMixin(Enumerable, pathGroup);
     
     equals(pathGroup.get('type'), 'path-group');
@@ -56,7 +56,7 @@
   
   test('getObjects', function() {
     var paths = getPathObjects();
-    var pathGroup = new Canvas.PathGroup(paths);
+    var pathGroup = new fabric.PathGroup(paths);
     ok(typeof pathGroup.getObjects == 'function');
     same(paths, pathGroup.getObjects());
   });
@@ -66,10 +66,10 @@
     ok(typeof pathGroup.toObject == 'function');
     var object = pathGroup.toObject();
     
-    /*same(Canvas.base.object.extend(Canvas.base.object.clone(REFERENCE_PATH_GROUP_OBJECT), {
+    /*same(fabric.base.object.extend(fabric.base.object.clone(REFERENCE_PATH_GROUP_OBJECT), {
       paths: object.paths
     }), object);
-    console.log(Canvas.base.object.extend(Canvas.base.object.clone(REFERENCE_PATH_GROUP_OBJECT), {
+    console.log(fabric.base.object.extend(fabric.base.object.clone(REFERENCE_PATH_GROUP_OBJECT), {
       paths: object.paths
     }), object);*/
   });
@@ -99,7 +99,7 @@
     ok(typeof pathGroup.toDatalessObject == 'function');
     
     pathGroup.setSourcePath('http://example.com/');
-    var expectedObject = Canvas.base.object.extend(Canvas.base.object.clone(REFERENCE_PATH_GROUP_OBJECT), {
+    var expectedObject = fabric.base.object.extend(fabric.base.object.clone(REFERENCE_PATH_GROUP_OBJECT), {
       'paths': 'http://example.com/',
       'sourcePath': 'http://example.com/'
     });
@@ -109,7 +109,7 @@
   test('toString', function() {
     var pathGroup = getPathGroupObject();
     ok(typeof pathGroup.toString == 'function');
-    equals(pathGroup.toString(), '#<Canvas.PathGroup (8): { top: 0, left: 0 }>');
+    equals(pathGroup.toString(), '#<fabric.PathGroup (8): { top: 0, left: 0 }>');
   });
   
   test('isSameColor', function() {
@@ -170,6 +170,6 @@
     equals(secondObject.get('overlayFill'), 'rgb(28,28,28)');
 
     equals(firstObject.get('fill'), 'rgb(200,0,0)', 'toGrayscale should not change original fill value');
-    equals(new Canvas.Color(secondObject.get('fill')).toRgb(), 'rgb(0,0,255)', 'toGrayscale should not change original fill value');
+    equals(new fabric.Color(secondObject.get('fill')).toRgb(), 'rgb(0,0,255)', 'toGrayscale should not change original fill value');
   });
 })();

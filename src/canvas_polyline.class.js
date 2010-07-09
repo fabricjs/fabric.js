@@ -2,14 +2,14 @@
 
 (function(){
   
-  var Canvas = this.Canvas || (this.Canvas = { });
+  var fabric = this.fabric || (this.fabric = { });
   
-  if (Canvas.Polyline) {
-    console.warn('Canvas.Polyline is already defined');
+  if (fabric.Polyline) {
+    console.warn('fabric.Polyline is already defined');
     return;
   }
   
-  Canvas.Polyline = Canvas.base.createClass(Canvas.Object, {
+  fabric.Polyline = fabric.base.createClass(fabric.Object, {
     
     type: 'polyline',
     
@@ -32,7 +32,7 @@
      * @method _calcDimensions
      */
     _calcDimensions: function() {
-      return Canvas.Polygon.prototype._calcDimensions.call(this);
+      return fabric.Polygon.prototype._calcDimensions.call(this);
     },
     
     /**
@@ -40,7 +40,7 @@
      * @method _toOrigin
      */
     _toOrigin: function() {
-      return Canvas.Polygon.prototype._toOrigin.call(this);
+      return fabric.Polygon.prototype._toOrigin.call(this);
     },
     
     /**
@@ -49,7 +49,7 @@
      * @return {Object} object representation of an instance
      */
     toObject: function() {
-      return Canvas.Polygon.prototype.toObject.call(this);
+      return fabric.Polygon.prototype.toObject.call(this);
     },
     
     /**
@@ -86,29 +86,29 @@
   
   /**
    * @static
-   * @method Canvas.Polyline.fromElement
+   * @method fabric.Polyline.fromElement
    * @param element {SVGElement} element to parse
    * @param options {Object} options object
-   * @return {Object} instance of Canvas.Polyline
+   * @return {Object} instance of fabric.Polyline
    */
-  Canvas.Polyline.fromElement = function(element, options) {
+  fabric.Polyline.fromElement = function(element, options) {
     if (!element) {
       return null;
     }
-    var points = Canvas.parsePointsAttribute(element.getAttribute('points')),
-        parsedAttributes = Canvas.parseAttributes(element, ATTRIBUTE_NAMES);
+    var points = fabric.parsePointsAttribute(element.getAttribute('points')),
+        parsedAttributes = fabric.parseAttributes(element, ATTRIBUTE_NAMES);
         
-    return new Canvas.Polyline(points, Canvas.base.object.extend(parsedAttributes, options));
+    return new fabric.Polyline(points, fabric.base.object.extend(parsedAttributes, options));
   };
   
   /**
    * @static
-   * @method Canvas.Polyline.fromObject
+   * @method fabric.Polyline.fromObject
    * @param object {Object} object to create an instance from
-   * @return {Object} instance of Canvas.Polyline
+   * @return {Object} instance of fabric.Polyline
    */
-  Canvas.Polyline.fromObject = function(object) {
+  fabric.Polyline.fromObject = function(object) {
     var points = object.points;
-    return new Canvas.Polyline(points, object);
+    return new fabric.Polyline(points, object);
   }
 })();

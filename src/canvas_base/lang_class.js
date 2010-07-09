@@ -59,5 +59,5 @@
     return klass;
   }
 
-  Canvas.base.createClass = createClass;
+  fabric.base.createClass = createClass;
 })();

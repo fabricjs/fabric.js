@@ -2,7 +2,7 @@
   "http://www.w3.org/TR/html4/strict.dtd">
 <html lang="en">
   <head>
-    <title>Unit test file :: Canvas.Text</title>
+    <title>Unit test file :: fabric.Text</title>
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
   
     <link rel="stylesheet" href="lib/unittest.css" type="text/css">
@@ -39,17 +39,17 @@
         }
 
         function addResult(title, result) {
-          var el = Canvas.base.getById('results');
+          var el = fabric.base.getById('results');
           el.innerHTML += ('<h3>' + title + '</h3><p>' + result + '</p>');
         }
 
-        this.c = new Canvas.Element('test');
+        this.c = new fabric.Element('test');
 
         var t1, t2;
 
         var t = new Date();
         for (var i=50; i--; ) {
-          c.add(new Canvas.Rect({
+          c.add(new fabric.Rect({
             width: getRandomInt(10, 50),
             height: getRandomInt(10, 50),
             fill: '#' + getRandomColor(),

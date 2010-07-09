@@ -2,12 +2,12 @@
 
 (function(){
   
-  var Canvas = this.Canvas || (this.Canvas = { });
-  if (Canvas.Line) {
+  var fabric = this.fabric || (this.fabric = { });
+  if (fabric.Line) {
     return;
   }
   
-  Canvas.Line = Canvas.base.createClass(Canvas.Object, {
+  fabric.Line = fabric.base.createClass(fabric.Object, {
     
     type: 'line',
     
@@ -62,7 +62,7 @@
      * @return {Object}
      */
     toObject: function() {
-      return Canvas.base.object.extend(this.callSuper('toObject'), {
+      return fabric.base.object.extend(this.callSuper('toObject'), {
         x1: this.get('x1'),
         y1: this.get('y1'),
         x2: this.get('x2'),
@@ -72,34 +72,34 @@
   });
   
   // http://www.w3.org/TR/SVG/shapes.html#LineElement
-  Canvas.Element.ATTRIBUTE_NAMES = 'x1 y1 x2 y2 stroke stroke-width transform'.split(' ');
+  fabric.Element.ATTRIBUTE_NAMES = 'x1 y1 x2 y2 stroke stroke-width transform'.split(' ');
   
   /**
    * @static
-   * @method Canvas.Line.fromElement
+   * @method fabric.Line.fromElement
    * @param element {SVGElement} element to parse
    * @param options {Object} options object
-   * @return {Object} instance of Canvas.Line
+   * @return {Object} instance of fabric.Line
    */
-  Canvas.Line.fromElement = function(element, options) {
-    var parsedAttributes = Canvas.parseAttributes(element, Canvas.Element.ATTRIBUTE_NAMES);
+  fabric.Line.fromElement = function(element, options) {
+    var parsedAttributes = fabric.parseAttributes(element, fabric.Element.ATTRIBUTE_NAMES);
     var points = [
       parsedAttributes.x1 || 0,
       parsedAttributes.y1 || 0,
       parsedAttributes.x2 || 0,
       parsedAttributes.y2 || 0
     ];
-    return new Canvas.Line(points, Canvas.base.object.extend(parsedAttributes, options));
+    return new fabric.Line(points, fabric.base.object.extend(parsedAttributes, options));
   };
   
   /**
    * @static
-   * @method Canvas.Line.fromObject
+   * @method fabric.Line.fromObject
    * @param object {Object} object to create an instance from
-   * @return {Object} instance of Canvas.Line
+   * @return {Object} instance of fabric.Line
    */
-  Canvas.Line.fromObject = function(object) {
+  fabric.Line.fromObject = function(object) {
     var points = [object.x1, object.y1, object.x2, object.y2];
-    return new Canvas.Line(points, object);
+    return new fabric.Line(points, object);
   };
 })();

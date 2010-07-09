@@ -2,14 +2,14 @@
 
 (function(){
   
-  var Canvas = this.Canvas || (this.Canvas = { });
+  var fabric = this.fabric || (this.fabric = { });
   
-  if (Canvas.Ellipse) {
-    console.warn('Canvas.Ellipse is already defined.');
+  if (fabric.Ellipse) {
+    console.warn('fabric.Ellipse is already defined.');
     return;
   }
   
-  Canvas.Ellipse = Canvas.base.createClass(Canvas.Object, {
+  fabric.Ellipse = fabric.base.createClass(fabric.Object, {
     
     type: 'ellipse',
     
@@ -37,7 +37,7 @@
      * @return {Object} object representation of an instance
      */
     toObject: function() {
-      return Canvas.base.object.extend(this.callSuper('toObject'), {
+      return fabric.base.object.extend(this.callSuper('toObject'), {
         rx: this.get('rx'),
         ry: this.get('ry')
       })
@@ -82,27 +82,27 @@
     }
   });
   
-  Canvas.Ellipse.ATTRIBUTE_NAMES = 'cx cy rx ry fill fill-opacity stroke stroke-width transform'.split(' ');
+  fabric.Ellipse.ATTRIBUTE_NAMES = 'cx cy rx ry fill fill-opacity stroke stroke-width transform'.split(' ');
   
   /**
    * @static
-   * @method Canvas.Ellipse.fromElement
+   * @method fabric.Ellipse.fromElement
    * @param element {SVGElement} element to parse
    * @param options {Object} options object
-   * @return {Object} instance of Canvas.Ellipse
+   * @return {Object} instance of fabric.Ellipse
    */
-  Canvas.Ellipse.fromElement = function(element, options) {
-    var parsedAttributes = Canvas.parseAttributes(element, Canvas.Ellipse.ATTRIBUTE_NAMES);
-    return new Canvas.Ellipse(Canvas.base.object.extend(parsedAttributes, options));
+  fabric.Ellipse.fromElement = function(element, options) {
+    var parsedAttributes = fabric.parseAttributes(element, fabric.Ellipse.ATTRIBUTE_NAMES);
+    return new fabric.Ellipse(fabric.base.object.extend(parsedAttributes, options));
   };
   
   /**
    * @static
-   * @method Canvas.Ellipse.fromObject
+   * @method fabric.Ellipse.fromObject
    * @param object {Object} object to create an instance from
-   * @return {Object} instance of Canvas.Ellipse
+   * @return {Object} instance of fabric.Ellipse
    */
-  Canvas.Ellipse.fromObject = function(object) {
-    return new Canvas.Ellipse(object);
+  fabric.Ellipse.fromObject = function(object) {
+    return new fabric.Ellipse(object);
   }
 })();

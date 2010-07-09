@@ -2,18 +2,18 @@
 
 (function(){
   
-  var Canvas = this.Canvas || (this.Canvas = { });
+  var fabric = this.fabric || (this.fabric = { });
 
-  if (Canvas.Text) {    
-    console.warn('Canvas.Text is already defined');
+  if (fabric.Text) {    
+    console.warn('fabric.Text is already defined');
     return;
   }
-  if (!Canvas.Object) {
-    console.warn('Canvas.Text requires Canvas.Object');
+  if (!fabric.Object) {
+    console.warn('fabric.Text requires fabric.Object');
     return;
   }
   
-  Canvas.Text = Canvas.base.createClass(Canvas.Object, {
+  fabric.Text = fabric.base.createClass(fabric.Object, {
     
     options: {
       top:         10,
@@ -31,7 +31,7 @@
       this.initStateProperties();
       this.text = text;
       this.setOptions(options);
-      Canvas.base.object.extend(this, this.options);
+      fabric.base.object.extend(this, this.options);
       this.theta = this.angle * (Math.PI/180);
       this.width = this.getWidth();
       this.setCoords();
@@ -50,7 +50,7 @@
     },
     
     toString: function() {
-      return '#<Canvas.Text ('+ this.complexity() +'): ' + 
+      return '#<fabric.Text ('+ this.complexity() +'): ' + 
         JSON.stringify({ text: this.text, fontfamily: this.fontfamily }) + '>';
     },
     
@@ -110,7 +110,7 @@
   	 * @return {Object} object representation of an instance
   	 */
   	toObject: function() {
-  	  return Canvas.base.object.extend(this.callSuper('toObject'), {
+  	  return fabric.base.object.extend(this.callSuper('toObject'), {
   	    text:         this.text,
   	    fontsize:     this.fontsize,
   	    fontweight:   this.fontweight,
@@ -122,7 +122,7 @@
   	/**
   	 * @method setColor
   	 * @param {String} value
-  	 * @return {Canvas.Text} thisArg
+  	 * @return {fabric.Text} thisArg
   	 * @chainable
   	 */
   	setColor: function(value) {
@@ -133,7 +133,7 @@
   	/**
   	 * @method setFontsize
   	 * @param {Number} value
-  	 * @return {Canvas.Text} thisArg
+  	 * @return {fabric.Text} thisArg
   	 * @chainable
   	 */
   	setFontsize: function(value) {
@@ -153,7 +153,7 @@
   	/**
   	 * @method setText
   	 * @param {String} value
-  	 * @return {Canvas.Text} thisArg
+  	 * @return {fabric.Text} thisArg
   	 */
   	setText: function(value) {
   	  this.set('text', value);
@@ -174,18 +174,18 @@
    * @static
    * @method fromObject
    * @param {Object} object to create an instance from
-   * @return {Canvas.Text} an instance
+   * @return {fabric.Text} an instance
    */
-	Canvas.Text.fromObject = function(object) {
-	  return new Canvas.Text(object.text, Canvas.base.object.clone(object));
+	fabric.Text.fromObject = function(object) {
+	  return new fabric.Text(object.text, fabric.base.object.clone(object));
 	};
 	
 	/**
    * @static
-   * @method Canvas.Text.fromElement
-   * @return {Canvas.Text} an instance
+   * @method fabric.Text.fromElement
+   * @return {fabric.Text} an instance
    */
-	Canvas.Text.fromElement = function(element) {
+	fabric.Text.fromElement = function(element) {
 	  // TODO (kangax): implement this
 	};
 })();

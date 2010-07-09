@@ -1,11 +1,11 @@
 (function() {
   
-  /* Adaptation of work of Kevin Lindsey (kevin@kevlindev.com) */
+  /*! Adaptation of work of Kevin Lindsey (kevin@kevlindev.com) */
   
-  var Canvas = this.Canvas || (this.Canvas = { });
+  var fabric = this.fabric || (this.fabric = { });
 
-  if (Canvas.Point) {    
-    console.warn('Canvas.Point is already defined');
+  if (fabric.Point) {    
+    console.warn('fabric.Point is already defined');
     return;
   }
   
@@ -119,6 +119,6 @@
     }
   };
   
-  Canvas.Point = Point;
+  fabric.Point = Point;
   
 })();

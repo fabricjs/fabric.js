@@ -57,5 +57,5 @@
     return request;
   };
   
-  Canvas.base.request = request;
+  fabric.base.request = request;
 })();

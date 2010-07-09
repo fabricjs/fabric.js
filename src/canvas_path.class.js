@@ -2,19 +2,19 @@
 
 (function(){
   
-  var Canvas = this.Canvas || (this.Canvas = { });
+  var fabric = this.fabric || (this.fabric = { });
   
-  if (Canvas.Path) {
-    console.warn('Canvas.Path is already defined');
+  if (fabric.Path) {
+    console.warn('fabric.Path is already defined');
     return;
   }
-  if (!Canvas.Object) {
-    console.warn('Canvas.Path requires Canvas.Object');
+  if (!fabric.Object) {
+    console.warn('fabric.Path requires fabric.Object');
     return;
   }
   
   // Instance methods
-  Canvas.Path = Canvas.base.createClass(Canvas.Object, Canvas.IStub, {
+  fabric.Path = fabric.base.createClass(fabric.Object, {
     
     type: 'path',
     
@@ -63,7 +63,7 @@
       this.path = this._parsePath();
       
       if (!isWidthSet || !isHeightSet) {
-        Canvas.base.object.extend(this, this._parseDimensions());
+        fabric.base.object.extend(this, this._parseDimensions());
         if (isWidthSet) {
           this.width = this.options.width;
         }
@@ -311,7 +311,7 @@
      * @return {String} string representation of an instance
      */
     toString: function() {
-      return '#<Canvas.Path ('+ this.complexity() +'): ' + 
+      return '#<fabric.Path ('+ this.complexity() +'): ' + 
         JSON.stringify({ top: this.top, left: this.left }) +'>';
     },
     
@@ -320,7 +320,7 @@
      * @return {Object}
      */
     toObject: function() {
-      var o = Canvas.base.object.extend(this.callSuper('toObject'), {
+      var o = fabric.base.object.extend(this.callSuper('toObject'), {
         path: this.path
       });
       if (this.sourcePath) {
@@ -430,15 +430,15 @@
         
       }, this);
       
-      var minX = Canvas.base.array.min(aX), 
-          minY = Canvas.base.array.min(aY), 
+      var minX = fabric.base.array.min(aX), 
+          minY = fabric.base.array.min(aY), 
           deltaX = deltaY = 0;
       
       var o = {
         top: minY - deltaY,
         left: minX - deltaX,
-        bottom: Canvas.base.array.max(aY) - deltaY,
-        right: Canvas.base.array.max(aX) - deltaX
+        bottom: fabric.base.array.max(aY) - deltaY,
+        right: fabric.base.array.max(aX) - deltaX
       };
       
       o.width = o.right - o.left;
@@ -449,28 +449,28 @@
   });
   
   /**
-   * Creates an instance of Canvas.Path from an object
+   * Creates an instance of fabric.Path from an object
    * @static
-   * @method Canvas.Path.fromObject
-   * @return {Canvas.Path} Instance of Canvas.Path
+   * @method fabric.Path.fromObject
+   * @return {fabric.Path} Instance of fabric.Path
    */
-  Canvas.Path.fromObject = function(object) {
-    return new Canvas.Path(object.path, object);
+  fabric.Path.fromObject = function(object) {
+    return new fabric.Path(object.path, object);
   };
   
-  var ATTRIBUTE_NAMES = Canvas.Path.ATTRIBUTE_NAMES = 'd fill fill-opacity fill-rule stroke stroke-width transform'.split(' ');
+  var ATTRIBUTE_NAMES = fabric.Path.ATTRIBUTE_NAMES = 'd fill fill-opacity fill-rule stroke stroke-width transform'.split(' ');
   /**
-   * Creates an instance of Canvas.Path from an SVG <PATH> element
+   * Creates an instance of fabric.Path from an SVG <PATH> element
    * @static
-   * @method Canvas.Path.fromElement
+   * @method fabric.Path.fromElement
    * @param {SVGElement} element to parse
    * @param {Object} options object
-   * @return {Canvas.Path} Instance of Canvas.Path
+   * @return {fabric.Path} Instance of fabric.Path
    */
-  Canvas.Path.fromElement = function(element, options) {
-    var parsedAttributes = Canvas.parseAttributes(element, ATTRIBUTE_NAMES),
+  fabric.Path.fromElement = function(element, options) {
+    var parsedAttributes = fabric.parseAttributes(element, ATTRIBUTE_NAMES),
         path = parsedAttributes.d;
     delete parsedAttributes.d;
-    return new Canvas.Path(path, Canvas.base.object.extend(parsedAttributes, options));
+    return new fabric.Path(path, fabric.base.object.extend(parsedAttributes, options));
   }
 })();

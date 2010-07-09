@@ -38,7 +38,7 @@
     elImage.src = IMG_SRC;
     elImage.width = width;
     elImage.height = height;
-    return new Canvas.Image(elImage);
+    return new fabric.Image(elImage);
   }
   
   function createImageObject() {
@@ -49,15 +49,15 @@
     return _createImageObject(IMG_WIDTH / 2, IMG_HEIGHT / 2);
   }
   
-  module('Canvas.Image');
+  module('fabric.Image');
   
   test('constructor', function() {
-    ok(Canvas.Image);
+    ok(fabric.Image);
     
     var image = createImageObject();
     
-    ok(image instanceof Canvas.Image);
-    ok(image instanceof Canvas.Object);
+    ok(image instanceof fabric.Image);
+    ok(image instanceof fabric.Object);
     
     equals(image.get('type'), 'image');
   });
@@ -71,7 +71,7 @@
   test('toString', function() {
     var image = createImageObject();
     ok(typeof image.toString == 'function');
-    equals(image.toString(), '#<Canvas.Image: { src: "' + IMG_SRC + '" }>');
+    equals(image.toString(), '#<fabric.Image: { src: "' + IMG_SRC + '" }>');
   });
   
   test('getSrc', function() {
@@ -82,7 +82,7 @@
   
   test('getElement', function() {
     var elImage = document.createElement('image');
-    var image = new Canvas.Image(elImage);
+    var image = new fabric.Image(elImage);
     ok(typeof image.getElement == 'function');
     equals(image.getElement(), elImage);
   });
@@ -106,7 +106,7 @@
     });
     
     setTimeout(function() {
-      ok(imageClone instanceof Canvas.Image);
+      ok(imageClone instanceof fabric.Image);
       same(imageClone.toObject(), image.toObject());
       start();
     }, 1000);
@@ -130,36 +130,36 @@
   });
   
   asyncTest('fromObject', function() {
-    ok(typeof Canvas.Image.fromObject == 'function');
+    ok(typeof fabric.Image.fromObject == 'function');
     
     // should not throw error when no callback is given
-    Canvas.Image.fromObject(REFERENCE_IMG_OBJECT);
+    fabric.Image.fromObject(REFERENCE_IMG_OBJECT);
     
     var image;
-    Canvas.Image.fromObject(REFERENCE_IMG_OBJECT, function(instance){
+    fabric.Image.fromObject(REFERENCE_IMG_OBJECT, function(instance){
       image = instance;
     });
     
     setTimeout(function() {
-      ok(image instanceof Canvas.Image);
+      ok(image instanceof fabric.Image);
       start();
     }, 1000);
   });
   
   asyncTest('fromURL', function() {
-    ok(typeof Canvas.Image.fromURL == 'function');
+    ok(typeof fabric.Image.fromURL == 'function');
     
     // should not throw error when no callback is given
     // can't use `assertNothingRaised` due to asynchronous callback
-    Canvas.Image.fromURL(IMG_SRC);
+    fabric.Image.fromURL(IMG_SRC);
     
     var image;
-    Canvas.Image.fromURL(IMG_SRC, function(instance) {
+    fabric.Image.fromURL(IMG_SRC, function(instance) {
       image = instance;
     });
     
     setTimeout(function() {
-      ok(image instanceof Canvas.Image);
+      ok(image instanceof fabric.Image);
       same(REFERENCE_IMG_OBJECT, image.toObject());
       start();
     }, 1000);
@@ -174,7 +174,7 @@
     
     ok(typeof image.toGrayscale == 'function');
     
-    if (!Canvas.Element.supports('toDataURL')) {
+    if (!fabric.Element.supports('toDataURL')) {
       alert('toDataURL is not supported. Some tests can not be run.');
     }
     else {

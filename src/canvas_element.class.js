@@ -6,8 +6,8 @@
       
       Canvas = global.Canvas || (global.Canvas = { });
       
-  if (Canvas.Element) {
-    console.warn('Canvas.Element is already defined.');
+  if (fabric.Element) {
+    console.warn('fabric.Element is already defined.');
     return;
   }
   
@@ -16,7 +16,7 @@
       STROKE_OFFSET = 0.5,
       FX_TRANSITION = 'decel',
       
-      getPointer = Canvas.base.getPointer,
+      getPointer = fabric.base.getPointer,
       
       cursorMap = {
         'tr': 'ne-resize',
@@ -105,11 +105,11 @@
   })();
   
   /**
-   * @class Canvas.Element
+   * @class fabric.Element
    * @constructor
    * @param {HTMLElement | String} el Container element for the canvas.
    */
-  Canvas.Element = function (el, oConfig) {
+  fabric.Element = function (el, oConfig) {
     
     /**
      * The object literal containing mouse position if clicked in an empty area (no image)
@@ -147,7 +147,7 @@
     this._currentTransform = null;
     
     /**
-     * References instance of Canvas.Group - when multiple objects are selected
+     * References instance of fabric.Group - when multiple objects are selected
      * @property _activeGroup
      * @type object
      */
@@ -182,7 +182,7 @@
     this.calcOffset();
   };
   
-  Canvas.base.object.extend(Canvas.Element.prototype, {
+  fabric.base.object.extend(fabric.Element.prototype, {
     
     selectionColor:         'rgba(100,100,255,0.3)', // blue
     selectionBorderColor:   'rgba(255,255,255,0.3)',
@@ -203,11 +203,11 @@
      * Calculates canvas element offset relative to the document
      * This method is also attached as "resize" event handler of window
      * @method calcOffset
-     * @return {Canvas.Element} instance
+     * @return {fabric.Element} instance
      * @chainable
      */
     calcOffset: function () {
-      this._offset = Canvas.base.getElementOffset(this.getElement());
+      this._offset = fabric.base.getElementOffset(this.getElement());
       return this;
     },
     
@@ -215,7 +215,7 @@
      * @method setOverlayImage
      * @param {String} url url of an image to set background to
      * @param {Function} callback callback to invoke when image is loaded and set as an overlay one
-     * @return {Canvas.Element} thisArg
+     * @return {fabric.Element} thisArg
      * @chainable
      */
     // TODO (kangax): test callback
@@ -244,7 +244,7 @@
      *
      */
     _initElement: function (canvasEl) {
-      var el = Canvas.base.getById(canvasEl);
+      var el = fabric.base.getById(canvasEl);
       this._oElement = el || document.createElement('canvas');
       
       if (typeof this._oElement.getContext === 'undefined') {
@@ -269,12 +269,12 @@
      * @method _initWrapperElement
      */
     _initWrapperElement: function (width, height) {
-      var wrapper = Canvas.base.wrapElement(this.getElement(), 'div', { className: 'canvas_container' });
-      Canvas.base.setStyle(wrapper, {
+      var wrapper = fabric.base.wrapElement(this.getElement(), 'div', { className: 'canvas_container' });
+      fabric.base.setStyle(wrapper, {
         width: width + 'px',
         height: height + 'px'
       });
-      Canvas.base.makeElementUnselectable(wrapper);
+      fabric.base.makeElementUnselectable(wrapper);
       this.wrapper = wrapper;
     },
     
@@ -283,7 +283,7 @@
      * @method _setElementStyle
      */
     _setElementStyle: function (width, height) {
-      Canvas.base.setStyle(this.getElement(), {
+      fabric.base.setStyle(this.getElement(), {
         position: 'absolute',
         width: width + 'px',
         height: height + 'px',
@@ -300,7 +300,7 @@
        * See configuration documentation for more details.
        */
     _initConfig: function (oConfig) {
-      Canvas.base.object.extend(this._oConfig, oConfig || { });
+      fabric.base.object.extend(this._oConfig, oConfig || { });
       
       this._oConfig.width = parseInt(this._oElement.width, 10) || 0;
       this._oConfig.height = parseInt(this._oElement.height, 10) || 0;
@@ -324,10 +324,10 @@
       this._onMouseMove = function (e){ _this.__onMouseMove(e); };
       this._onResize = function (e) { _this.calcOffset() };
       
-      Canvas.base.addListener(this._oElement, 'mousedown', this._onMouseDown);
-      Canvas.base.addListener(document, 'mousemove', this._onMouseMove);
-      Canvas.base.addListener(document, 'mouseup', this._onMouseUp);
-      Canvas.base.addListener(window, 'resize', this._onResize);
+      fabric.base.addListener(this._oElement, 'mousedown', this._onMouseDown);
+      fabric.base.addListener(document, 'mousemove', this._onMouseMove);
+      fabric.base.addListener(document, 'mouseup', this._onMouseUp);
+      fabric.base.addListener(window, 'resize', this._onResize);
     },
     
     /**
@@ -361,7 +361,7 @@
         // if that didn't work, throw error
         throw CANVAS_INIT_ERROR;
       }
-      Canvas.base.makeElementUnselectable(oContainer);
+      fabric.base.makeElementUnselectable(oContainer);
       return oContainer;
     },
 
@@ -408,7 +408,7 @@
     /**
      * @method setWidth
      * @param {Number} width value to set width to
-     * @return {Canvas.Element} instance
+     * @return {fabric.Element} instance
      * @chainable true
      */
     setWidth: function (value) {
@@ -418,7 +418,7 @@
     /**
      * @method setHeight
      * @param {Number} height value to set height to
-     * @return {Canvas.Element} instance
+     * @return {fabric.Element} instance
      * @chainable true
      */
     setHeight: function (value) {
@@ -438,7 +438,7 @@
      * @private
      * @param {String} prop property (width|height)
      * @param {Number} value value to set property to
-     * @return {Canvas.Element} instance
+     * @return {fabric.Element} instance
      * @chainable true
      */
     _setDimension: function (prop, value) {
@@ -476,7 +476,7 @@
             target = transform.target;
             
         if (target.__scaling) {
-          Canvas.base.fireEvent('object:scaled', { target: target });
+          fabric.base.fireEvent('object:scaled', { target: target });
           target.__scaling = false;
         }
         
@@ -488,7 +488,7 @@
         // only fire :modified event if target coordinates were changed during mousedown-mouseup
         if (target.hasStateChanged()) {
           target.isMoving = false;
-          Canvas.base.fireEvent('object:modified', { target: target });
+          fabric.base.fireEvent('object:modified', { target: target });
         }
       }
       
@@ -502,7 +502,7 @@
       if (activeGroup) {
         if (activeGroup.hasStateChanged() && 
             activeGroup.containsPoint(this.getPointer(e))) {
-          Canvas.base.fireEvent('group:modified', { target: activeGroup });
+          fabric.base.fireEvent('group:modified', { target: activeGroup });
         }
         activeGroup.setObjectsCoords();
         activeGroup.set('isMoving', false);
@@ -604,20 +604,20 @@
     /**
      * Deactivates all objects and dispatches appropriate events
      * @method deactivateAllWithDispatch
-     * @return {Canvas.Element} thisArg
+     * @return {fabric.Element} thisArg
      */
     deactivateAllWithDispatch: function () {
       var activeGroup = this.getActiveGroup();
       if (activeGroup) {
-        Canvas.base.fireEvent('before:group:destroyed', {
+        fabric.base.fireEvent('before:group:destroyed', {
           target: activeGroup
         });
       }
       this.deactivateAll();
       if (activeGroup) {
-        Canvas.base.fireEvent('after:group:destroyed');
+        fabric.base.fireEvent('after:group:destroyed');
       }
-      Canvas.base.fireEvent('selection:cleared');
+      fabric.base.fireEvent('selection:cleared');
       return this;
     },
     
@@ -681,7 +681,7 @@
         else {
           activeGroup.add(target);
         }
-        Canvas.base.fireEvent('group:selected', { target: activeGroup });
+        fabric.base.fireEvent('group:selected', { target: activeGroup });
         activeGroup.setActive(true);
       }
       else {
@@ -690,7 +690,7 @@
           // only if there's an active object
           if (target !== this._activeObject) {
             // and that object is not the actual target
-            var group = new Canvas.Group([ this._activeObject,target ]);
+            var group = new fabric.Group([ this._activeObject,target ]);
             this.setActiveGroup(group);
             activeGroup = this.getActiveGroup();
           }
@@ -932,8 +932,8 @@
           x2 = x1 + this._groupSelector.left,
           y2 = y1 + this._groupSelector.top,
           currentObject,
-          selectionX1Y1 = new Canvas.Point(Math.min(x1, x2), Math.min(y1, y2)),
-          selectionX2Y2 = new Canvas.Point(Math.max(x1, x2), Math.max(y1, y2));
+          selectionX1Y1 = new fabric.Point(Math.min(x1, x2), Math.min(y1, y2)),
+          selectionX2Y2 = new fabric.Point(Math.max(x1, x2), Math.max(y1, y2));
       
       for (var i = 0, len = this._aObjects.length; i < len; ++i) {
         currentObject = this._aObjects[i];
@@ -948,24 +948,24 @@
       // do not create group for 1 element only
       if (group.length === 1) {
         this.setActiveObject(group[0]);
-        Canvas.base.fireEvent('object:selected', {
+        fabric.base.fireEvent('object:selected', {
           target: group[0]
         });
       } 
       else if (group.length > 1) {
-        var group = new Canvas.Group(group);
+        var group = new fabric.Group(group);
         this.setActiveGroup(group);
         group.saveCoords();
-        Canvas.base.fireEvent('group:selected', { target: group });
+        fabric.base.fireEvent('group:selected', { target: group });
       }
       this.renderAll();
     },
     
     /**
      * Adds an object to canvas and renders canvas
-     * An object should be an instance of (or inherit from) Canvas.Object
+     * An object should be an instance of (or inherit from) fabric.Object
      * @method add
-     * @return {Canvas.Element} thisArg
+     * @return {fabric.Element} thisArg
      * @chainable
      */
     add: function () {
@@ -976,11 +976,11 @@
     
     /**
      * Inserts an object to canvas at specified index and renders canvas. 
-     * An object should be an instance of (or inherit from) Canvas.Object
+     * An object should be an instance of (or inherit from) fabric.Object
      * @method insertAt
      * @param object {Object} Object to insert
      * @param index {Number} index to insert object at
-     * @return {Canvas.Element} instance
+     * @return {fabric.Element} instance
      */
     insertAt: function (object, index) {
       this._aObjects.splice(index, 0, object);
@@ -1010,7 +1010,7 @@
      * Clears specified context of canvas element
      * @method clearContext
      * @param context {Object} ctx context to clear
-     * @return {Canvas.Element} thisArg
+     * @return {fabric.Element} thisArg
      * @chainable
      */
     clearContext: clearContext,
@@ -1018,7 +1018,7 @@
     /**
      * Clears all contexts of canvas element
      * @method clear
-     * @return {Canvas.Element} thisArg
+     * @return {fabric.Element} thisArg
      * @chainable
      */
     clear: function () {
@@ -1033,7 +1033,7 @@
      * Renders both the top canvas and the secondary container canvas.
      * @method renderAll
      * @param allOnTop {Boolean} optional Whether we want to force all images to be rendered on the top canvas
-     * @return {Canvas.Element} instance
+     * @return {fabric.Element} instance
      * @chainable
      */ 
     renderAll: function (allOnTop) {
@@ -1097,7 +1097,7 @@
      * Method to render only the top canvas.
      * Also used to render the group selection box.
      * @method renderTop
-     * @return {Canvas.Element} thisArg
+     * @return {fabric.Element} thisArg
      * @chainable
      */
     renderTop: function () {
@@ -1130,7 +1130,7 @@
      * Applies one implementation of 'point inside polygon' algorithm
      * @method containsPoint
      * @param e { Event } event object
-     * @param target { Canvas.Object } object to test against
+     * @param target { fabric.Object } object to test against
      * @return {Boolean} true if point contains within area of given object
      */
     containsPoint: function (e, target) {
@@ -1285,8 +1285,8 @@
     /**
      * Centers object horizontally
      * @method centerObjectH
-     * @param {Canvas.Object} object Object to center
-     * @return {Canvas.Element} thisArg
+     * @param {fabric.Object} object Object to center
+     * @return {fabric.Element} thisArg
      */
     centerObjectH: function (object) {
       object.set('left', this.getCenter().left);
@@ -1297,8 +1297,8 @@
     /**
      * Centers object horizontally with animation
      * @method fxCenterObjectH
-     * @param {Canvas.Object} object
-     * @return {Canvas.Element} thisArg
+     * @param {fabric.Object} object
+     * @return {fabric.Element} thisArg
      * @chainable
      */
     fxCenterObjectH: function (object) {
@@ -1327,8 +1327,8 @@
     /**
      * Centers object vertically
      * @method centerObjectH
-     * @param object {Canvas.Object} Object to center
-     * @return {Canvas.Element} thisArg
+     * @param object {fabric.Object} Object to center
+     * @return {fabric.Element} thisArg
      * @chainable
      */
     centerObjectV: function (object) {
@@ -1340,8 +1340,8 @@
     /**
      * Centers object vertically with animation
      * @method fxCenterObjectV
-     * @param {Canvas.Object} object
-     * @return {Canvas.Element} thisArg
+     * @param {fabric.Object} object
+     * @return {fabric.Element} thisArg
      * @chainable
      */
     fxCenterObjectV: function (object) {
@@ -1368,8 +1368,8 @@
     
     /**
      * @method straightenObject
-     * @param {Canvas.Object} object Object to straighten
-     * @return {Canvas.Element} thisArg
+     * @param {fabric.Object} object Object to straighten
+     * @return {fabric.Element} thisArg
      * @chainable
      */
     straightenObject: function (object) {
@@ -1380,8 +1380,8 @@
     
     /**
      * @method fxStraightenObject
-     * @param {Canvas.Object} object Object to straighten
-     * @return {Canvas.Element} thisArg
+     * @param {fabric.Object} object Object to straighten
+     * @return {fabric.Element} thisArg
      * @chainable
      */
     fxStraightenObject: function (object) {
@@ -1460,13 +1460,13 @@
     
     /**
      * Populates canvas with data from the specified JSON
-     * JSON format must conform to the one of Canvas.Element#toJSON
+     * JSON format must conform to the one of fabric.Element#toJSON
      * @method loadFromJSON
      * @param json {String} json string
      * @param callback {Function} callback, invoked when json is parsed 
-     *                            and corresponding objects (e.g. Canvas.Image) 
+     *                            and corresponding objects (e.g. fabric.Image) 
      *                            are initialized
-     * @return {Canvas.Element} instance
+     * @return {fabric.Element} instance
      * @chainable
      */
     loadFromJSON: function (json, callback) {
@@ -1503,7 +1503,7 @@
         switch (o.type) {
           case 'image':
           case 'font':
-            Canvas[Canvas.base.string.capitalize(o.type)].fromObject(o, function (o) {
+            fabric[fabric.base.string.capitalize(o.type)].fromObject(o, function (o) {
               _this.add(o);
               if (++numLoadedImages === numTotalImages) {
                 if (callback) callback();
@@ -1511,7 +1511,7 @@
             });
             break;
           default:
-            var klass = Canvas[Canvas.base.string.camelize(Canvas.base.string.capitalize(o.type))];
+            var klass = fabric[fabric.base.string.camelize(fabric.base.string.capitalize(o.type))];
             if (klass && klass.fromObject) {
               _this.add(klass.fromObject(o));
             }
@@ -1585,7 +1585,7 @@
               _this.loadImageFromURL(path, function (image) {
                 image.setSourcePath(path);
 
-                Canvas.base.object.extend(image, obj);
+                fabric.base.object.extend(image, obj);
                 image.setAngle(obj.angle);
 
                 onObjectLoaded(image, index);
@@ -1594,7 +1594,7 @@
             else if (obj.type === 'text') {
               
               obj.path = path;
-              var object = Canvas.Text.fromObject(obj);
+              var object = fabric.Text.fromObject(obj);
               window.__context = _this;
               var onscriptload = function () {
                 // TODO (kangax): find out why Opera refuses to work without this timeout
@@ -1608,12 +1608,12 @@
                 }
               }
               
-              Canvas.base.getScript(path, onscriptload);
+              fabric.base.getScript(path, onscriptload);
             }
             else {
               _this.loadSVGFromURL(path, function (elements, options) {
                 if (elements.length > 1) {
-                  var object = new Canvas.PathGroup(elements, obj);
+                  var object = new fabric.PathGroup(elements, obj);
                 }
                 else {
                   var object = elements[0];
@@ -1622,8 +1622,8 @@
 
                 // copy parameters from serialied json to object (left, top, scaleX, scaleY, etc.)
                 // skip this step if an object is a PathGroup, since we already passed it options object before
-                if (!(object instanceof Canvas.PathGroup)) {
-                  Canvas.base.object.extend(object, obj);
+                if (!(object instanceof fabric.PathGroup)) {
+                  fabric.base.object.extend(object, obj);
                   if (typeof obj.angle !== 'undefined') {
                     object.setAngle(obj.angle);
                   }
@@ -1657,7 +1657,7 @@
         function checkIfLoaded() {
           var imgEl = document.getElementById(imgCache[url]);
           if (imgEl.width && imgEl.height) {
-            callback(new Canvas.Image(imgEl));
+            callback(new fabric.Image(imgEl));
           }
           else {
             setTimeout(checkIfLoaded, 50);
@@ -1677,7 +1677,7 @@
             
             _this._resizeImageToFit(imgEl);
             
-            var oImg = new Canvas.Image(imgEl);
+            var oImg = new fabric.Image(imgEl);
             callback(oImg);
           };
           
@@ -1722,7 +1722,7 @@
         var doc = xml.documentElement;
         if (!doc) return;
         
-        Canvas.parseSVGDocument(doc, function (results, options) {
+        fabric.parseSVGDocument(doc, function (results, options) {
           _this.cache.set(url, {
             objects: results.invoke('toObject'),
             options: options
@@ -1755,7 +1755,7 @@
      * @return {Object} removed object
      */
     remove: function (object) {
-      Canvas.util.removeFromArray(this._aObjects, object);
+      fabric.util.removeFromArray(this._aObjects, object);
       this.renderAll();
       return object;
     },
@@ -1763,9 +1763,9 @@
     /**
      * Same as `remove` but animated
      * @method fxRemove
-     * @param {Canvas.Object} object Object to remove
+     * @param {fabric.Object} object Object to remove
      * @param {Function} callback callback, invoked on effect completion
-     * @return {Canvas.Element} thisArg
+     * @return {fabric.Element} thisArg
      * @chainable
      */
     fxRemove: function (object, callback) {
@@ -1785,12 +1785,12 @@
     /**
      * Moves an object to the bottom of the stack
      * @method sendToBack
-     * @param object {Canvas.Object} Object to send to back
-     * @return {Canvas.Element} thisArg
+     * @param object {fabric.Object} Object to send to back
+     * @return {fabric.Element} thisArg
      * @chainable
      */
     sendToBack: function (object) {
-      Canvas.util.removeFromArray(this._aObjects, object);
+      fabric.util.removeFromArray(this._aObjects, object);
       this._aObjects.unshift(object);
       return this.renderAll();
     },
@@ -1798,12 +1798,12 @@
     /**
      * Moves an object to the top of the stack
      * @method bringToFront
-     * @param object {Canvas.Object} Object to send
-     * @return {Canvas.Element} thisArg
+     * @param object {fabric.Object} Object to send
+     * @return {fabric.Element} thisArg
      * @chainable
      */
     bringToFront: function (object) {
-      Canvas.util.removeFromArray(this._aObjects, object);
+      fabric.util.removeFromArray(this._aObjects, object);
       this._aObjects.push(object);
       return this.renderAll();
     },
@@ -1811,8 +1811,8 @@
     /**
      * Moves an object one level down in stack
      * @method sendBackwards
-     * @param object {Canvas.Object} Object to send
-     * @return {Canvas.Element} thisArg
+     * @param object {fabric.Object} Object to send
+     * @return {fabric.Element} thisArg
      * @chainable
      */
     sendBackwards: function (object) {
@@ -1829,7 +1829,7 @@
             break;
           }
         }
-        Canvas.util.removeFromArray(this._aObjects, object);
+        fabric.util.removeFromArray(this._aObjects, object);
         this._aObjects.splice(nextIntersectingIdx, 0, object);
       }
       return this.renderAll();
@@ -1838,8 +1838,8 @@
     /**
      * Moves an object one level up in stack
      * @method sendForward
-     * @param object {Canvas.Object} Object to send
-     * @return {Canvas.Element} thisArg
+     * @param object {fabric.Object} Object to send
+     * @return {fabric.Element} thisArg
      * @chainable
      */
     bringForward: function (object) {
@@ -1858,7 +1858,7 @@
             break;
           }
         }
-        Canvas.util.removeFromArray(objects, object);
+        fabric.util.removeFromArray(objects, object);
         objects.splice(nextIntersectingIdx, 0, object);
       }
       this.renderAll();
@@ -1867,8 +1867,8 @@
     /**
      * Sets given object as active
      * @method setActiveObject
-     * @param object {Canvas.Object} Object to set as an active one
-     * @return {Canvas.Element} thisArg
+     * @param object {fabric.Object} Object to set as an active one
+     * @return {fabric.Element} thisArg
      * @chainable
      */
     setActiveObject: function (object) {
@@ -1880,14 +1880,14 @@
       
       this.renderAll();
       
-      Canvas.base.fireEvent('object:selected', { target: object });
+      fabric.base.fireEvent('object:selected', { target: object });
       return this;
     },
     
     /**
      * Returns currently active object
      * @method getActiveObject
-     * @return {Canvas.Object} active object
+     * @return {fabric.Object} active object
      */
     getActiveObject: function () {
       return this._activeObject;
@@ -1896,7 +1896,7 @@
     /**
      * Removes an active object
      * @method removeActiveObject
-     * @return {Canvas.Element} thisArg
+     * @return {fabric.Element} thisArg
      * @chainable
      */
     removeActiveObject: function () {
@@ -1910,8 +1910,8 @@
     /**
      * Sets current group to a speicified one
      * @method setActiveGroup
-     * @param group {Canvas.Group} group to set as a current one 
-     * @return {Canvas.Element} thisArg
+     * @param group {fabric.Group} group to set as a current one 
+     * @return {fabric.Element} thisArg
      * @chainable
      */
     setActiveGroup: function (group) {
@@ -1922,7 +1922,7 @@
     /**
      * Returns current group
      * @method getActiveGroup
-     * @return {Canvas.Group} Current group
+     * @return {fabric.Group} Current group
      */
     getActiveGroup: function () {
       return this._activeGroup;
@@ -1931,7 +1931,7 @@
     /**
      * Removes current group
      * @method removeActiveGroup
-     * @return {Canvas.Element} thisArg
+     * @return {fabric.Element} thisArg
      */
     removeActiveGroup: function () {
       var g = this.getActiveGroup();
@@ -1944,7 +1944,7 @@
     /**
      * @method item
      * @param {Number} index
-     * @return {Canvas.Object}
+     * @return {fabric.Object}
      */
     item: function (index) {
       return this.getObjects()[index];
@@ -1953,7 +1953,7 @@
     /**
      * Deactivates all objects by calling their setActive(false)
      * @method deactivateAll
-     * @return {Canvas.Element} thisArg
+     * @return {fabric.Element} thisArg
      */
     deactivateAll: function () {
       var allObjects = this.getObjects(),
@@ -1982,22 +1982,22 @@
     /**
      * Clears a canvas element and removes all event handlers.
      * @method dispose
-     * @return {Canvas.Element} thisArg
+     * @return {fabric.Element} thisArg
      * @chainable
      */
     dispose: function () {
       this.clear();
-      Canvas.base.removeListener(this.getElement(), 'mousedown', this._onMouseDown);
-      Canvas.base.removeListener(document, 'mouseup', this._onMouseUp);
-      Canvas.base.removeListener(document, 'mousemove', this._onMouseMove);
-      Canvas.base.removeListener(window, 'resize', this._onResize);
+      fabric.base.removeListener(this.getElement(), 'mousedown', this._onMouseDown);
+      fabric.base.removeListener(document, 'mouseup', this._onMouseUp);
+      fabric.base.removeListener(document, 'mousemove', this._onMouseMove);
+      fabric.base.removeListener(window, 'resize', this._onResize);
       return this;
     },
     
     /**
      * @method clone
      * @param {Object} callback OPTIONAL expects `onBeforeClone` and `onAfterClone` functions
-     * @return {Canvas.Element} instance clone
+     * @return {fabric.Element} instance clone
      */
     clone: function (callback) {
       var el = document.createElement('canvas');
@@ -2005,7 +2005,7 @@
       el.height = this.getHeight();
           
       // cache
-      var clone = this.__clone || (this.__clone = new Canvas.Element(el));
+      var clone = this.__clone || (this.__clone = new fabric.Element(el));
       
       return clone.loadFromJSON(this.toJSON(), function () {
         if (callback) {
@@ -2054,12 +2054,12 @@
    * @return {String} string representation of an instance
    */
    // Assign explicitly since `extend` doesn't take care of DontEnum bug yet
-  Canvas.Element.prototype.toString = function () {
-    return '#<Canvas.Element (' + this.complexity() + '): '+
+  fabric.Element.prototype.toString = function () {
+    return '#<fabric.Element (' + this.complexity() + '): '+
            '{ objects: ' + this.getObjects().length + ' }>';
   };
   
-  Canvas.base.object.extend(Canvas.Element, {
+  fabric.base.object.extend(fabric.Element, {
     
     /**
      * @property EMPTY_JSON

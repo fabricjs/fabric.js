@@ -26,49 +26,49 @@
     'points':       getPoints()
   };
   
-  module('Canvas.Polygon');
+  module('fabric.Polygon');
   
   test('constructor', function() {
-    ok(Canvas.Polygon);
+    ok(fabric.Polygon);
     
-    var polygon = new Canvas.Polygon(getPoints());
+    var polygon = new fabric.Polygon(getPoints());
     
-    ok(polygon instanceof Canvas.Polygon);
-    ok(polygon instanceof Canvas.Object);
+    ok(polygon instanceof fabric.Polygon);
+    ok(polygon instanceof fabric.Object);
     
     equals(polygon.type, 'polygon');
     same(getPoints(), polygon.get('points'));
   });
   
   test('complexity', function() {
-    var polygon = new Canvas.Polygon(getPoints());
+    var polygon = new fabric.Polygon(getPoints());
     ok(typeof polygon.complexity == 'function');
   });
   
   test('toObject', function() {
-    var polygon = new Canvas.Polygon(getPoints());
+    var polygon = new fabric.Polygon(getPoints());
     ok(typeof polygon.toObject == 'function');
     
     same(REFERENCE_OBJECT, polygon.toObject());
   });
   
   test('fromObject', function() {
-    ok(typeof Canvas.Polygon.fromObject == 'function');
-    var polygon = Canvas.Polygon.fromObject(REFERENCE_OBJECT);
-    ok(polygon instanceof Canvas.Polygon);
+    ok(typeof fabric.Polygon.fromObject == 'function');
+    var polygon = fabric.Polygon.fromObject(REFERENCE_OBJECT);
+    ok(polygon instanceof fabric.Polygon);
     same(REFERENCE_OBJECT, polygon.toObject());
   });
   
   test('fromElement', function() {
-    ok(typeof Canvas.Polygon.fromElement == 'function');
+    ok(typeof fabric.Polygon.fromElement == 'function');
     
     var elPolygon = document.createElement('polygon');
     
     elPolygon.setAttribute('points', '10,12 20,22');
     
-    var polygon = Canvas.Polygon.fromElement(elPolygon);
+    var polygon = fabric.Polygon.fromElement(elPolygon);
     
-    ok(polygon instanceof Canvas.Polygon);
+    ok(polygon instanceof fabric.Polygon);
     same(REFERENCE_OBJECT, polygon.toObject());
     
     var elPolygonWithAttrs = document.createElement('polygon');
@@ -79,10 +79,10 @@
     elPolygonWithAttrs.setAttribute('stroke', 'blue');
     elPolygonWithAttrs.setAttribute('transform', 'translate(-10,-20) scale(2)');
     
-    var polygonWithAttrs = Canvas.Polygon.fromElement(elPolygonWithAttrs);
+    var polygonWithAttrs = fabric.Polygon.fromElement(elPolygonWithAttrs);
     var expectedPoints = [{x: 10, y: 10}, {x: 20, y: 20}, {x: 30, y: 30}, {x: 10, y: 10}];
 
-    same(Canvas.base.object.extend(REFERENCE_OBJECT, {
+    same(fabric.base.object.extend(REFERENCE_OBJECT, {
       'width': 20, 
       'height': 20, 
       'fill': 'rgb(255,255,255)', 
@@ -98,13 +98,13 @@
     
     var error;
     try {
-      Canvas.Polygon.fromElement(elPolygonWithoutPoints);
+      fabric.Polygon.fromElement(elPolygonWithoutPoints);
     }
     catch(err) {
       error = err;
     }
     ok(error, 'missing points attribute should result in error');
     
-    equals(Canvas.Polygon.fromElement(), null);
+    equals(fabric.Polygon.fromElement(), null);
   });
 })();

@@ -29,27 +29,27 @@
   }
   
   function getPathObject(path) {
-    return Canvas.Path.fromElement(getPathElement(path));
+    return fabric.Path.fromElement(getPathElement(path));
   }
   
   function makePathObject() {
     return getPathObject("M 100 100 L 300 100 L 200 300 z");
   }
   
-  module('Canvas.Path');
+  module('fabric.Path');
   
   test('constructor', function() {
-    ok(Canvas.Path);
+    ok(fabric.Path);
     var path = makePathObject();
     
-    ok(path instanceof Canvas.Path);
-    ok(path instanceof Canvas.Object);
+    ok(path instanceof fabric.Path);
+    ok(path instanceof fabric.Object);
     
     equals(path.get('type'), 'path');
     
     var error;
     try {
-      new Canvas.Path();
+      new fabric.Path();
     }
     catch(err) {
       error = err;
@@ -61,7 +61,7 @@
   test('toString', function() {
     var path = makePathObject();
     ok(typeof path.toString == 'function');
-    equals('#<Canvas.Path (4): {"top":100,"left":100}>', path.toString());
+    equals('#<fabric.Path (4): {"top":100,"left":100}>', path.toString());
   });
   
   test('toObject', function() {
@@ -77,7 +77,7 @@
     
     var src = 'http://example.com/';
     path.setSourcePath(src);
-    same(Canvas.base.object.extend(Canvas.base.object.clone(REFERENCE_PATH_OBJECT), {
+    same(fabric.base.object.extend(fabric.base.object.clone(REFERENCE_PATH_OBJECT), {
       path: src
     }), path.toDatalessObject());
   });
@@ -88,14 +88,14 @@
   });
   
   test('fromObject', function() {
-    ok(typeof Canvas.Path.fromObject == 'function');
-    var path = Canvas.Path.fromObject(REFERENCE_PATH_OBJECT);
-    ok(path instanceof Canvas.Path);
+    ok(typeof fabric.Path.fromObject == 'function');
+    var path = fabric.Path.fromObject(REFERENCE_PATH_OBJECT);
+    ok(path instanceof fabric.Path);
     same(REFERENCE_PATH_OBJECT, path.toObject());
   });
   
   test('fromElement', function() {
-    ok(typeof Canvas.Path.fromElement == 'function');
+    ok(typeof fabric.Path.fromElement == 'function');
     var elPath = document.createElement('path');
     
     elPath.setAttribute('d', 'M 100 100 L 300 100 L 200 300 z');
@@ -108,17 +108,17 @@
     // elPath.setAttribute('transform', 'scale(2) translate(10, -20)');
     elPath.setAttribute('transform', 'scale(2)');
     
-    var path = Canvas.Path.fromElement(elPath);
-    ok(path instanceof Canvas.Path);
+    var path = fabric.Path.fromElement(elPath);
+    ok(path instanceof fabric.Path);
     
-    same(Canvas.base.object.extend(REFERENCE_PATH_OBJECT, {
+    same(fabric.base.object.extend(REFERENCE_PATH_OBJECT, {
       transformMatrix: [2, 0, 0, 2, 0, 0]
     }), path.toObject());
     
     var ANGLE = 90;
     
     elPath.setAttribute('transform', 'rotate(' + ANGLE + ')');
-    path = Canvas.Path.fromElement(elPath);
+    path = fabric.Path.fromElement(elPath);
     
     same(
       [ Math.cos(ANGLE), Math.sin(ANGLE), -Math.sin(ANGLE), Math.cos(ANGLE), 0, 0 ], 

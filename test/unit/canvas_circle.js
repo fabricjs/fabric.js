@@ -1,26 +1,26 @@
 (function() {
   
-  module('Canvas.Circle');
+  module('fabric.Circle');
   
   test('constructor', function(){
-    ok(Canvas.Circle);
+    ok(fabric.Circle);
 
-    var circle = new Canvas.Circle();
+    var circle = new fabric.Circle();
     
-    ok(circle instanceof Canvas.Circle, 'should inherit from Canvas.Circle');
-    ok(circle instanceof Canvas.Object, 'should inherit from Canvas.Object');
+    ok(circle instanceof fabric.Circle, 'should inherit from fabric.Circle');
+    ok(circle instanceof fabric.Object, 'should inherit from fabric.Object');
     
     same(circle.type, 'circle');
   });
   
   test('complexity', function() {
-    var circle = new Canvas.Circle();
+    var circle = new fabric.Circle();
     ok(typeof circle.complexity == 'function');
     equals(circle.complexity(), 1);
   });
   
   test('toObject', function() {
-    var circle = new Canvas.Circle();
+    var circle = new fabric.Circle();
     var defaultProperties = {
       'type': 'circle', 
       'left': 0, 
@@ -44,7 +44,7 @@
     
     circle.set('left', 100).set('top', 200).set('radius', 15);
     
-    var augmentedProperties = Canvas.base.object.extend(Canvas.base.object.clone(defaultProperties), {
+    var augmentedProperties = fabric.base.object.extend(fabric.base.object.clone(defaultProperties), {
       left: 100,
       top: 200,
       radius: 15
@@ -54,7 +54,7 @@
   });
   
   test('fromElement', function() {
-    ok(typeof Canvas.Circle.fromElement == 'function');
+    ok(typeof fabric.Circle.fromElement == 'function');
     
     var elCircle      = document.createElement('circle'),
         radius        = 10,
@@ -72,8 +72,8 @@
     elCircle.setAttribute('fill-opacity', fillOpacity);
     elCircle.setAttribute('stroke-width', strokeWidth);
     
-    var oCircle = Canvas.Circle.fromElement(elCircle);
-    ok(oCircle instanceof Canvas.Circle);
+    var oCircle = fabric.Circle.fromElement(elCircle);
+    ok(oCircle instanceof fabric.Circle);
     
     equals(oCircle.get('radius'), radius);
     equals(oCircle.get('left'), left);
@@ -87,7 +87,7 @@
     
     var error;
     try {
-      Canvas.Circle.fromElement(elFaultyCircle);
+      fabric.Circle.fromElement(elFaultyCircle);
     }
     catch(err) {
       error = err;
@@ -98,7 +98,7 @@
     
     error = void 0;
     try {
-      Canvas.Circle.fromElement(elFaultyCircle);
+      fabric.Circle.fromElement(elFaultyCircle);
     }
     catch(err) {
       error = err;
@@ -108,18 +108,18 @@
   });
   
   test('fromObject', function() {
-    ok(typeof Canvas.Circle.fromObject == 'function');
+    ok(typeof fabric.Circle.fromObject == 'function');
     
     var left    = 112,
         top     = 234,
         radius  = 13.45,
         fill    = 'ff5555';
     
-    var circle = Canvas.Circle.fromObject({
+    var circle = fabric.Circle.fromObject({
       left: left, top: top, radius: radius, fill: fill
     });
     
-    ok(circle instanceof Canvas.Circle);
+    ok(circle instanceof fabric.Circle);
     
     equals(circle.get('left'), left);
     equals(circle.get('top'), top);
@@ -127,7 +127,7 @@
     equals(circle.get('fill'), fill);
     
     var expected = circle.toObject();
-    var actual = Canvas.Circle.fromObject(expected).toObject();
+    var actual = fabric.Circle.fromObject(expected).toObject();
     
     same(expected, actual);
   });

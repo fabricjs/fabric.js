@@ -1,7 +1,7 @@
 (function (global) {
   
-  var Canvas = this.Canvas || (this.Canvas = { });
-  Canvas.base = { };
+  var fabric = this.fabric || (this.fabric = { });
+  fabric.base = { };
   
   var slice = Array.prototype.slice;
   

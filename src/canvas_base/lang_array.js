@@ -154,7 +154,7 @@ function min(array, byProperty) {
   return result;
 }
 
-Canvas.base.array = {
+fabric.base.array = {
   invoke: invoke,
   min: min,
   max: max
