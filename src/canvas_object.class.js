@@ -1168,28 +1168,28 @@
     fxStraighten: function(callbacks) {
       callbacks = callbacks || { };
       
-      callbacks.onComplete = callbacks.onComplete || Prototype.emptyFunction;
-      callbacks.onChange = callbacks.onChange || Prototype.emptyFunction;
+      var empty = function() { },
+          onComplete = callbacks.onComplete || empty,
+          onChange = callbacks.onChange || empty,
+          _this = this;
       
-      var _this           = this,
-          fx              = new APE.anim.Animation(),
-          startAngleValue = this.get('angle'),
-          endAngleValue   = this._getAngleValueForStraighten(),
-          step            = endAngleValue - startAngleValue;
+      Canvas.base.animate({
+        startValue: this.get('angle'),
+        endValue: this._getAngleValueForStraighten(),
+        duration: this.FX_DURATION,
+        onChange: function(value) {
+          _this.setAngle(value);
+          onChange();
+        },
+        onComplete: function() {
+          _this.setCoords();
+          onComplete();
+        },
+        onStart: function() {
+          _this.setActive(false);
+        }
+      });
       
-      fx.run = function(percent) {
-        _this.setAngle(startAngleValue + step * percent);
-        callbacks.onChange();
-      };
-      fx.onend = function() {
-        _this.setCoords();
-        callbacks.onComplete();
-      };
-      
-      fx.duration = this.FX_DURATION;
-      fx.transition = APE.anim.Transitions[this.FX_TRANSITION];
-      
-      fx.start();
       return this;
     },
     
@@ -1200,6 +1200,8 @@
      * @chainable
      */
     fxRemove: function(callbacks) {
+      callbacks || (callbacks = { });
+      
       var empty = function() { },
           onComplete = callbacks.onComplete || empty,
           onChange = callbacks.onChange || empty,
