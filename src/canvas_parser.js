@@ -71,7 +71,7 @@
    * @param attributeValue {String} string containing attribute value
    * @return {Array} array of 6 elements representing transformation matrix
    */
-  Canvas.parseTransformAttribute = (function(){
+  Canvas.parseTransformAttribute = (function() {
     function rotateMatrix(matrix, args) {
       var angle = args[0];
       

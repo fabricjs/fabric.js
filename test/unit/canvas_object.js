@@ -84,13 +84,13 @@
   });
   
   test('toJSON', function() {
-    var emptyObjectJSON = '{"type": "object", "left": 0, "top": 0, "width": 100, "height": 100, "fill": "rgb(0,0,0)",'+
-      ' "overlayFill": null, "stroke": null, "strokeWidth": 1, "scaleX": 1, "scaleY": 1, "angle": 0,'+
-      ' "flipX": false, "flipY": false, "opacity": 1}';
+    var emptyObjectJSON = '{"type":"object","left":0,"top":0,"width":100,"height":100,"fill":"rgb(0,0,0)",'+
+                          '"overlayFill":null,"stroke":null,"strokeWidth":1,"scaleX":1,"scaleY":1,"angle":0,'+
+                          '"flipX":false,"flipY":false,"opacity":1}';
       
-    var augmentedJSON =   '{"type": "object", "left": 0, "top": 0, "width": 122, "height": 100, "fill": "rgb(0,0,0)",'+
-        ' "overlayFill": null, "stroke": null, "strokeWidth": 1, "scaleX": 1.3, "scaleY": 1, "angle": 0,'+
-        ' "flipX": false, "flipY": true, "opacity": 0.88}';
+    var augmentedJSON = '{"type":"object","left":0,"top":0,"width":122,"height":100,"fill":"rgb(0,0,0)",'+
+                        '"overlayFill":null,"stroke":null,"strokeWidth":1,"scaleX":1.3,"scaleY":1,"angle":0,'+
+                        '"flipX":false,"flipY":true,"opacity":0.88}';
       
     var cObj = new Canvas.Object();
     ok(typeof cObj.toJSON == 'function');
@@ -510,6 +510,7 @@
     equals(object.toGrayscale(), object, 'should be chainable');
     
     object.set('fill', 'rgb(200,0,0)'); // set color to red
+    
     object.toGrayscale();
     
     equals(object.get('overlayFill'), 'rgb(60,60,60)');

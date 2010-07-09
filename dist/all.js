@@ -1,3 +1,7 @@
+if (typeof console == 'undefined') {
+  var console = { log: function() { }, warn: function() { } };
+}
+
 /*
     http://www.JSON.org/json2.js
     2010-03-20
@@ -838,7 +842,7 @@ if (!Function.prototype.bind) {
     if (!customEventListeners[eventName]) return;
     for (var i = 0, len = customEventListeners[eventName].length; i < len; i++) {
       try {
-        customEventListeners[eventName]({ memo: memo });
+        customEventListeners[eventName][i]({ memo: memo });
       }
       catch(err) {
         setTimeout(function () {
@@ -954,7 +958,7 @@ function makeElement(tagName, attributes) {
     else if (prop === 'for') {
       prop = 'htmlFor';
     }
-    el[prop] = attributes[prop];
+    el.setAttribute(prop, attributes[prop]);
   }
   return el;
 }
@@ -1285,7 +1289,7 @@ Canvas.base.animate = animate;
    * @param attributeValue {String} string containing attribute value
    * @return {Array} array of 6 elements representing transformation matrix
    */
-  Canvas.parseTransformAttribute = (function(){
+  Canvas.parseTransformAttribute = (function() {
     function rotateMatrix(matrix, args) {
       var angle = args[0];
 
@@ -4014,11 +4018,10 @@ Canvas.base.animate = animate;
 
     _resizeImageToFit: function (imgEl) {
 
-      var widthScaleFactor = 1,
-          heightScaleFactor = 1,
-          imageWidth = imgEl.width || imgEl.offsetWidth,
-          imageHeight = imgEl.height || imgEl.offsetHeight;
-
+      var imageWidth = imgEl.width || imgEl.offsetWidth,
+          imageHeight = imgEl.height || imgEl.offsetHeight,
+          widthScaleFactor = this.getWidth() / imageWidth,
+          heightScaleFactor = this.getHeight() / imageHeight;
 
       if (imageWidth && imageHeight) {
         imgEl.width = imageWidth * widthScaleFactor;
@@ -4117,6 +4120,7 @@ Canvas.base.animate = animate;
 (function(){
 
   var global = this;
+
   /**
    * @name Canvas
    * @namespace
@@ -4373,12 +4377,7 @@ Canvas.base.animate = animate;
         this.setAngle(value);
       }
       else {
-        if (property === 'fill' && this.overlayFill) {
-          this.overlayFill = value;
-        }
-        else {
-          this[property] = value;
-        }
+        this[property] = value;
       }
       return this;
     },

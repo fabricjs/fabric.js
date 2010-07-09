@@ -19,7 +19,7 @@ function makeElement(tagName, attributes) {
     else if (prop === 'for') {
       prop = 'htmlFor';
     }
-    el[prop] = attributes[prop];
+    el.setAttribute(prop, attributes[prop]);
   }
   return el;
 }

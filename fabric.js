@@ -1,3 +1,7 @@
+if (typeof console == 'undefined') {
+  var console = { log: function() { }, warn: function() { } };
+}
+
 //= require "lib/json2"
 
 //= require "src/canvas_base"

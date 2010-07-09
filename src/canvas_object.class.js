@@ -1,6 +1,7 @@
 (function(){
   
   var global = this;
+  
   /**
    * @name Canvas
    * @namespace
@@ -265,12 +266,7 @@
         this.setAngle(value);
       }
       else {
-        if (property === 'fill' && this.overlayFill) {
-          this.overlayFill = value;
-        }
-        else {
-          this[property] = value;
-        }
+        this[property] = value;
       }
       return this;
     },

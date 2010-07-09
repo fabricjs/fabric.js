@@ -157,7 +157,7 @@
     if (!customEventListeners[eventName]) return;
     for (var i = 0, len = customEventListeners[eventName].length; i < len; i++) {
       try {
-        customEventListeners[eventName]({ memo: memo });
+        customEventListeners[eventName][i]({ memo: memo });
       }
       catch(err) {
         setTimeout(function () {

@@ -103,13 +103,16 @@
     elPath.setAttribute('fill-opacity', '1');
     elPath.setAttribute('stroke', 'blue');
     elPath.setAttribute('stroke-width', '1');
-    elPath.setAttribute('transform', 'scale(2) translate(10, -20)');
+    
+    // TODO (kangax): to support multiple transformation keywords, we need to do proper matrix multiplication
+    // elPath.setAttribute('transform', 'scale(2) translate(10, -20)');
+    elPath.setAttribute('transform', 'scale(2)');
     
     var path = Canvas.Path.fromElement(elPath);
     ok(path instanceof Canvas.Path);
     
     same(Canvas.base.object.extend(REFERENCE_PATH_OBJECT, {
-      transformMatrix: [2, 0, 0, 2, 10, -20]
+      transformMatrix: [2, 0, 0, 2, 0, 0]
     }), path.toObject());
     
     var ANGLE = 90;

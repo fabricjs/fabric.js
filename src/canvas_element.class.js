@@ -2028,11 +2028,10 @@
     
     _resizeImageToFit: function (imgEl) {
       
-      var widthScaleFactor = 1,
-          heightScaleFactor = 1,
-          imageWidth = imgEl.width || imgEl.offsetWidth,
-          imageHeight = imgEl.height || imgEl.offsetHeight;
-      
+      var imageWidth = imgEl.width || imgEl.offsetWidth,
+          imageHeight = imgEl.height || imgEl.offsetHeight,
+          widthScaleFactor = this.getWidth() / imageWidth,
+          heightScaleFactor = this.getHeight() / imageHeight;
       
       // scale image down so that it has original dimensions when printed in large resolution
       if (imageWidth && imageHeight) {
