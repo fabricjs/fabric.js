@@ -1,4 +1,4 @@
-//= require "canvas_object.class"
+//= require "object.class"
 
 (function() {
   
@@ -11,7 +11,7 @@
     return;
   }
   
-  fabric.Circle = fabric.base.createClass(fabric.Object, /** @lends fabric.Circle.prototype */ {
+  fabric.Circle = fabric.util.createClass(fabric.Object, /** @lends fabric.Circle.prototype */ {
     
     /**
      * @field
@@ -40,7 +40,7 @@
      * @return {Object} object representation of an instance
      */
     toObject: function() {
-      return fabric.base.object.extend(this.callSuper('toObject'), {
+      return fabric.util.object.extend(this.callSuper('toObject'), {
         radius: this.get('radius')
       });
     },
@@ -89,7 +89,7 @@
     if (!isValidRadius(parsedAttributes)) {
       throw Error('value of `r` attribute is required and can not be negative');
     }
-    return new fabric.Circle(fabric.base.object.extend(parsedAttributes, options));
+    return new fabric.Circle(fabric.util.object.extend(parsedAttributes, options));
   };
   
   /**

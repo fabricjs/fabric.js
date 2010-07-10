@@ -78,7 +78,7 @@
     var rectWithAttrs = fabric.Rect.fromElement(elRectWithAttrs);
     ok(rectWithAttrs instanceof fabric.Rect);
 
-    var expectedObject = fabric.base.object.extend(REFERENCE_RECT, {
+    var expectedObject = fabric.util.object.extend(REFERENCE_RECT, {
       left: 121,
       top: 186.5,
       width: 222,

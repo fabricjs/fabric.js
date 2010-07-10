@@ -1,4 +1,4 @@
-//= require "canvas_object.class"
+//= require "object.class"
 
 (function(){
   
@@ -7,7 +7,7 @@
     return;
   }
   
-  fabric.Line = fabric.base.createClass(fabric.Object, {
+  fabric.Line = fabric.util.createClass(fabric.Object, {
     
     type: 'line',
     
@@ -62,7 +62,7 @@
      * @return {Object}
      */
     toObject: function() {
-      return fabric.base.object.extend(this.callSuper('toObject'), {
+      return fabric.util.object.extend(this.callSuper('toObject'), {
         x1: this.get('x1'),
         y1: this.get('y1'),
         x2: this.get('x2'),
@@ -89,7 +89,7 @@
       parsedAttributes.x2 || 0,
       parsedAttributes.y2 || 0
     ];
-    return new fabric.Line(points, fabric.base.object.extend(parsedAttributes, options));
+    return new fabric.Line(points, fabric.util.object.extend(parsedAttributes, options));
   };
   
   /**

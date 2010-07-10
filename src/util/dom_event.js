@@ -140,8 +140,8 @@
     };
   }
   
-  fabric.base.addListener = addListener;
-  fabric.base.removeListener = removeListener;
+  fabric.util.addListener = addListener;
+  fabric.util.removeListener = removeListener;
   
   
   var customEventListeners = { };
@@ -167,8 +167,8 @@
     }
   }
   
-  fabric.base.observeEvent = observeEvent;
-  fabric.base.fireEvent = fireEvent;
+  fabric.util.observeEvent = observeEvent;
+  fabric.util.fireEvent = fireEvent;
   
   // TODO (kangax): this method needs fixing
   function getPointer(event) {
@@ -193,5 +193,5 @@
        (docElement.clientTop || 0));
   }
   
-  fabric.base.getPointer = getPointer;
+  fabric.util.getPointer = getPointer;
 })(this);

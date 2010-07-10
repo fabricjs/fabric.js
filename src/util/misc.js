@@ -1,12 +1,5 @@
 (function(){
   
-  var fabric = this.fabric || (this.fabric = { });
-  
-  if (fabric.util) {
-    console.warn('fabric.util is already defined');
-    return;
-  }
-  
   /**
    * @static
    * Removes value from an array. 
@@ -56,10 +49,8 @@
      return parseFloat(Number(number).toFixed(fractionDigits));
    }
   
-  fabric.util = { 
-    removeFromArray:        removeFromArray, 
-    degreesToRadians:       degreesToRadians,
-    toFixed:                toFixed,
-    getRandomInt:           getRandomInt
-  };
+   fabric.util.removeFromArray = removeFromArray;
+   fabric.util.degreesToRadians = degreesToRadians;
+   fabric.util.toFixed = toFixed;
+   fabric.util.getRandomInt = getRandomInt;
 })();

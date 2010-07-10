@@ -87,16 +87,16 @@
     ok(fabric.parseElements);
     
     function getOptions(options) {
-      return fabric.base.object.extend(fabric.base.object.clone({ 
+      return fabric.util.object.extend(fabric.util.object.clone({ 
         left: 10, top: 20, width: 30, height: 40 
       }), options || { });
     }
     
     var elements = [
-      fabric.base.makeElement('rect', getOptions()),
-      fabric.base.makeElement('circle', getOptions({ r: 14 })),
-      fabric.base.makeElement('path', getOptions({ d: 'M 100 100 L 300 100 L 200 300 z' })),
-      fabric.base.makeElement('inexistent', getOptions())
+      fabric.util.makeElement('rect', getOptions()),
+      fabric.util.makeElement('circle', getOptions({ r: 14 })),
+      fabric.util.makeElement('path', getOptions({ d: 'M 100 100 L 300 100 L 200 300 z' })),
+      fabric.util.makeElement('inexistent', getOptions())
     ];
     
     var parsedElements, error;
@@ -206,7 +206,7 @@
     ok(fabric.parseSVGDocument);
     
     var data;
-    fabric.base.request('../fixtures/path.svg', {
+    fabric.util.request('../fixtures/path.svg', {
       method: 'get',
       onComplete: function(resp) {
         var doc = resp.responseXML;

@@ -57,5 +57,5 @@
     return request;
   };
   
-  fabric.base.request = request;
+  fabric.util.request = request;
 })();

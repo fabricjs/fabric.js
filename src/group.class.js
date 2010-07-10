@@ -1,4 +1,4 @@
-//= require "canvas_object.class"
+//= require "object.class"
 
 (function(){
   
@@ -7,7 +7,7 @@
     return;
   }
   
-  fabric.Group = fabric.base.createClass(fabric.Object, {
+  fabric.Group = fabric.util.createClass(fabric.Object, {
     
     /**
      * @property type
@@ -29,7 +29,7 @@
       this._updateObjectsCoords();
       
       if (options) {
-        fabric.base.object.extend(this, options);
+        fabric.util.object.extend(this, options);
       }
       this._setOpacityIfSame();
       
@@ -165,8 +165,8 @@
      * @return {Object} object representation of an instance
      */
     toObject: function() {
-      return fabric.base.object.extend(this.callSuper('toObject'), {
-        objects: fabric.base.array.invoke(this.objects, 'clone')
+      return fabric.util.object.extend(this.callSuper('toObject'), {
+        objects: fabric.util.array.invoke(this.objects, 'clone')
       });
     },
     
@@ -377,10 +377,10 @@
         }
       };
       
-      minX = fabric.base.array.min(aX);
-      maxX = fabric.base.array.max(aX);
-      minY = fabric.base.array.min(aY);
-      maxY = fabric.base.array.max(aY);
+      minX = fabric.util.array.min(aX);
+      maxX = fabric.util.array.max(aX);
+      minY = fabric.util.array.min(aY);
+      maxY = fabric.util.array.max(aY);
       
       width = maxX - minX;
       height = maxY - minY;

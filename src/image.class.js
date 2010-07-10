@@ -1,4 +1,4 @@
-//= require "canvas_object.class"
+//= require "object.class"
 
 (function() {
   
@@ -19,7 +19,7 @@
   }
   
   
-  fabric.Image = fabric.base.createClass(fabric.Object, {
+  fabric.Image = fabric.util.createClass(fabric.Object, {
     
     maxwidth: null,
     maxheight: null,
@@ -145,7 +145,7 @@
      * @return {Object} object representation of an instance
      */
     toObject: function() {
-      return fabric.base.object.extend(this.callSuper('toObject'), {
+      return fabric.util.object.extend(this.callSuper('toObject'), {
         src: this.getSrc()
       });
     },
@@ -255,8 +255,8 @@
      * @param {HTMLImageElement|String} el The element representing the image
      */
     _initElement: function(element) {
-      this.setElement(fabric.base.getById(element));
-      fabric.base.addClass(this.getElement(), fabric.Image.CSS_CANVAS);
+      this.setElement(fabric.util.getById(element));
+      fabric.util.addClass(this.getElement(), fabric.Image.CSS_CANVAS);
     },
     
     /**

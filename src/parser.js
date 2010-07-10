@@ -61,8 +61,8 @@
     
     // add values parsed from style
     // TODO (kangax): check the presedence of values from the style attribute
-    ownAttributes = fabric.base.object.extend(fabric.parseStyleAttribute(element), ownAttributes);
-    return fabric.base.object.extend(parentAttributes, ownAttributes);
+    ownAttributes = fabric.util.object.extend(fabric.parseStyleAttribute(element), ownAttributes);
+    return fabric.util.object.extend(parentAttributes, ownAttributes);
   };
   
   /**
@@ -260,7 +260,7 @@
    function parseElements(elements, options) {
     // transform svg elements to fabric.Path elements
     var _elements = elements.map(function(el) {
-      var klass = fabric[fabric.base.string.capitalize(el.tagName)];
+      var klass = fabric[fabric.util.string.capitalize(el.tagName)];
       if (klass && klass.fromElement) {
         try {
           return klass.fromElement(el, options);
@@ -313,7 +313,7 @@
 
     return function(doc, callback) {
       if (!doc) return;
-      var descendants = fabric.base.toArray(doc.getElementsByTagName('*'));
+      var descendants = fabric.util.toArray(doc.getElementsByTagName('*'));
       
       var elements = descendants.filter(function(el) {
         return reAllowedSVGTagNames.test(el.tagName) && 
@@ -346,7 +346,7 @@
         height: height
       };
 
-      var elements = fabric.parseElements(elements, fabric.base.object.clone(options));
+      var elements = fabric.parseElements(elements, fabric.util.object.clone(options));
       if (!elements || (elements && !elements.length)) return;
 
       if (callback) {
@@ -355,7 +355,7 @@
     };
   })();
   
-  fabric.base.object.extend(fabric, {
+  fabric.util.object.extend(fabric, {
     parseAttributes:        parseAttributes,
     parseElements:          parseElements,
     parseStyleAttribute:    parseStyleAttribute,

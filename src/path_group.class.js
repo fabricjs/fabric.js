@@ -1,4 +1,4 @@
-//= require "canvas_path.class"
+//= require "path.class"
 
 (function(){
   
@@ -9,7 +9,7 @@
     return;
   }
   
-  fabric.PathGroup = fabric.base.createClass(fabric.Path, {
+  fabric.PathGroup = fabric.util.createClass(fabric.Path, {
     
     type: 'path-group',
     forceFillOverwrite: false,
@@ -105,8 +105,8 @@
      */
     toObject: function() {
       var _super = fabric.Object.prototype.toObject;
-      return fabric.base.object.extend(_super.call(this), {
-        paths: fabric.base.array.invoke(this.getObjects(), 'clone'),
+      return fabric.util.object.extend(_super.call(this), {
+        paths: fabric.util.array.invoke(this.getObjects(), 'clone'),
         sourcePath: this.sourcePath
       });
     },

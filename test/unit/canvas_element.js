@@ -34,7 +34,7 @@
   
   function makeRect(options) {
     var defaultOptions = { width: 10, height: 10 };
-    return new fabric.Rect(fabric.base.object.extend(defaultOptions, options || { }));
+    return new fabric.Rect(fabric.util.object.extend(defaultOptions, options || { }));
   }
   
   module('fabric.Element', {
@@ -158,7 +158,7 @@
   test('getPointer', function() {
     ok(typeof canvas.getPointer == 'function');
     
-    fabric.base.addListener(canvasEl, 'click', function(e) {
+    fabric.util.addListener(canvasEl, 'click', function(e) {
       var pointer = canvas.getPointer(e);
       equals(pointer.x, 101, 'pointer.x should be correct');
       equals(pointer.y, 102, 'pointer.y should be correct');
@@ -526,16 +526,16 @@
     };
     var target;
     
-    fabric.base.observeEvent('before:group:destroyed', function (e) {
+    fabric.util.observeEvent('before:group:destroyed', function (e) {
       eventsFired.beforeGroupDestroyed = true;
       equals(canvas.getActiveGroup(), e.memo.target, 'event should have active group as its `target` property');
     });
     
-    fabric.base.observeEvent('after:group:destroyed', function(){
+    fabric.util.observeEvent('after:group:destroyed', function(){
       eventsFired.afterGroupDestroyed = true;
     });
     
-    fabric.base.observeEvent('selection:cleared', function(){
+    fabric.util.observeEvent('selection:cleared', function(){
       eventsFired.selectionCleared = true;
     });
     
@@ -647,7 +647,7 @@
     canvas.add(rect);
     
     var canvasEl = canvas.getElement(),
-        canvasOffset = fabric.base.getElementOffset(canvasEl);
+        canvasOffset = fabric.util.getElementOffset(canvasEl);
     
     var eventStub = { 
       pageX: canvasOffset.left + 100, 
@@ -700,7 +700,7 @@
   asyncTest('resizeImageToFit', function() {
     ok(typeof canvas._resizeImageToFit == 'function');
     
-    var imgEl = fabric.base.makeElement('img', { src: '../fixtures/very_large_image.jpg' }),
+    var imgEl = fabric.util.makeElement('img', { src: '../fixtures/very_large_image.jpg' }),
         ORIGINAL_WIDTH = 3888,
         ORIGINAL_HEIGHT = 2592;
     

@@ -1,4 +1,4 @@
-//= require "canvas_object.class"
+//= require "object.class"
 
 (function(){
   
@@ -9,7 +9,7 @@
     return;
   }
   
-  fabric.Polyline = fabric.base.createClass(fabric.Object, {
+  fabric.Polyline = fabric.util.createClass(fabric.Object, {
     
     type: 'polyline',
     
@@ -98,7 +98,7 @@
     var points = fabric.parsePointsAttribute(element.getAttribute('points')),
         parsedAttributes = fabric.parseAttributes(element, ATTRIBUTE_NAMES);
         
-    return new fabric.Polyline(points, fabric.base.object.extend(parsedAttributes, options));
+    return new fabric.Polyline(points, fabric.util.object.extend(parsedAttributes, options));
   };
   
   /**

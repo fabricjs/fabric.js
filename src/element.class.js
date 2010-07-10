@@ -16,7 +16,7 @@
       STROKE_OFFSET = 0.5,
       FX_TRANSITION = 'decel',
       
-      getPointer = fabric.base.getPointer,
+      getPointer = fabric.util.getPointer,
       
       cursorMap = {
         'tr': 'ne-resize',
@@ -182,7 +182,7 @@
     this.calcOffset();
   };
   
-  fabric.base.object.extend(fabric.Element.prototype, {
+  fabric.util.object.extend(fabric.Element.prototype, {
     
     selectionColor:         'rgba(100,100,255,0.3)', // blue
     selectionBorderColor:   'rgba(255,255,255,0.3)',
@@ -207,7 +207,7 @@
      * @chainable
      */
     calcOffset: function () {
-      this._offset = fabric.base.getElementOffset(this.getElement());
+      this._offset = fabric.util.getElementOffset(this.getElement());
       return this;
     },
     
@@ -244,7 +244,7 @@
      *
      */
     _initElement: function (canvasEl) {
-      var el = fabric.base.getById(canvasEl);
+      var el = fabric.util.getById(canvasEl);
       this._oElement = el || document.createElement('canvas');
       
       if (typeof this._oElement.getContext === 'undefined') {
@@ -269,12 +269,12 @@
      * @method _initWrapperElement
      */
     _initWrapperElement: function (width, height) {
-      var wrapper = fabric.base.wrapElement(this.getElement(), 'div', { className: 'canvas_container' });
-      fabric.base.setStyle(wrapper, {
+      var wrapper = fabric.util.wrapElement(this.getElement(), 'div', { className: 'canvas_container' });
+      fabric.util.setStyle(wrapper, {
         width: width + 'px',
         height: height + 'px'
       });
-      fabric.base.makeElementUnselectable(wrapper);
+      fabric.util.makeElementUnselectable(wrapper);
       this.wrapper = wrapper;
     },
     
@@ -283,7 +283,7 @@
      * @method _setElementStyle
      */
     _setElementStyle: function (width, height) {
-      fabric.base.setStyle(this.getElement(), {
+      fabric.util.setStyle(this.getElement(), {
         position: 'absolute',
         width: width + 'px',
         height: height + 'px',
@@ -300,7 +300,7 @@
        * See configuration documentation for more details.
        */
     _initConfig: function (oConfig) {
-      fabric.base.object.extend(this._oConfig, oConfig || { });
+      fabric.util.object.extend(this._oConfig, oConfig || { });
       
       this._oConfig.width = parseInt(this._oElement.width, 10) || 0;
       this._oConfig.height = parseInt(this._oElement.height, 10) || 0;
@@ -324,10 +324,10 @@
       this._onMouseMove = function (e){ _this.__onMouseMove(e); };
       this._onResize = function (e) { _this.calcOffset() };
       
-      fabric.base.addListener(this._oElement, 'mousedown', this._onMouseDown);
-      fabric.base.addListener(document, 'mousemove', this._onMouseMove);
-      fabric.base.addListener(document, 'mouseup', this._onMouseUp);
-      fabric.base.addListener(window, 'resize', this._onResize);
+      fabric.util.addListener(this._oElement, 'mousedown', this._onMouseDown);
+      fabric.util.addListener(document, 'mousemove', this._onMouseMove);
+      fabric.util.addListener(document, 'mouseup', this._onMouseUp);
+      fabric.util.addListener(window, 'resize', this._onResize);
     },
     
     /**
@@ -361,7 +361,7 @@
         // if that didn't work, throw error
         throw CANVAS_INIT_ERROR;
       }
-      fabric.base.makeElementUnselectable(oContainer);
+      fabric.util.makeElementUnselectable(oContainer);
       return oContainer;
     },
 
@@ -476,7 +476,7 @@
             target = transform.target;
             
         if (target.__scaling) {
-          fabric.base.fireEvent('object:scaled', { target: target });
+          fabric.util.fireEvent('object:scaled', { target: target });
           target.__scaling = false;
         }
         
@@ -488,7 +488,7 @@
         // only fire :modified event if target coordinates were changed during mousedown-mouseup
         if (target.hasStateChanged()) {
           target.isMoving = false;
-          fabric.base.fireEvent('object:modified', { target: target });
+          fabric.util.fireEvent('object:modified', { target: target });
         }
       }
       
@@ -502,7 +502,7 @@
       if (activeGroup) {
         if (activeGroup.hasStateChanged() && 
             activeGroup.containsPoint(this.getPointer(e))) {
-          fabric.base.fireEvent('group:modified', { target: activeGroup });
+          fabric.util.fireEvent('group:modified', { target: activeGroup });
         }
         activeGroup.setObjectsCoords();
         activeGroup.set('isMoving', false);
@@ -609,15 +609,15 @@
     deactivateAllWithDispatch: function () {
       var activeGroup = this.getActiveGroup();
       if (activeGroup) {
-        fabric.base.fireEvent('before:group:destroyed', {
+        fabric.util.fireEvent('before:group:destroyed', {
           target: activeGroup
         });
       }
       this.deactivateAll();
       if (activeGroup) {
-        fabric.base.fireEvent('after:group:destroyed');
+        fabric.util.fireEvent('after:group:destroyed');
       }
-      fabric.base.fireEvent('selection:cleared');
+      fabric.util.fireEvent('selection:cleared');
       return this;
     },
     
@@ -681,7 +681,7 @@
         else {
           activeGroup.add(target);
         }
-        fabric.base.fireEvent('group:selected', { target: activeGroup });
+        fabric.util.fireEvent('group:selected', { target: activeGroup });
         activeGroup.setActive(true);
       }
       else {
@@ -948,7 +948,7 @@
       // do not create group for 1 element only
       if (group.length === 1) {
         this.setActiveObject(group[0]);
-        fabric.base.fireEvent('object:selected', {
+        fabric.util.fireEvent('object:selected', {
           target: group[0]
         });
       } 
@@ -956,7 +956,7 @@
         var group = new fabric.Group(group);
         this.setActiveGroup(group);
         group.saveCoords();
-        fabric.base.fireEvent('group:selected', { target: group });
+        fabric.util.fireEvent('group:selected', { target: group });
       }
       this.renderAll();
     },
@@ -1503,7 +1503,7 @@
         switch (o.type) {
           case 'image':
           case 'font':
-            fabric[fabric.base.string.capitalize(o.type)].fromObject(o, function (o) {
+            fabric[fabric.util.string.capitalize(o.type)].fromObject(o, function (o) {
               _this.add(o);
               if (++numLoadedImages === numTotalImages) {
                 if (callback) callback();
@@ -1511,7 +1511,7 @@
             });
             break;
           default:
-            var klass = fabric[fabric.base.string.camelize(fabric.base.string.capitalize(o.type))];
+            var klass = fabric[fabric.util.string.camelize(fabric.util.string.capitalize(o.type))];
             if (klass && klass.fromObject) {
               _this.add(klass.fromObject(o));
             }
@@ -1585,7 +1585,7 @@
               _this.loadImageFromURL(path, function (image) {
                 image.setSourcePath(path);
 
-                fabric.base.object.extend(image, obj);
+                fabric.util.object.extend(image, obj);
                 image.setAngle(obj.angle);
 
                 onObjectLoaded(image, index);
@@ -1608,7 +1608,7 @@
                 }
               }
               
-              fabric.base.getScript(path, onscriptload);
+              fabric.util.getScript(path, onscriptload);
             }
             else {
               _this.loadSVGFromURL(path, function (elements, options) {
@@ -1623,7 +1623,7 @@
                 // copy parameters from serialied json to object (left, top, scaleX, scaleY, etc.)
                 // skip this step if an object is a PathGroup, since we already passed it options object before
                 if (!(object instanceof fabric.PathGroup)) {
-                  fabric.base.object.extend(object, obj);
+                  fabric.util.object.extend(object, obj);
                   if (typeof obj.angle !== 'undefined') {
                     object.setAngle(obj.angle);
                   }
@@ -1880,7 +1880,7 @@
       
       this.renderAll();
       
-      fabric.base.fireEvent('object:selected', { target: object });
+      fabric.util.fireEvent('object:selected', { target: object });
       return this;
     },
     
@@ -1987,10 +1987,10 @@
      */
     dispose: function () {
       this.clear();
-      fabric.base.removeListener(this.getElement(), 'mousedown', this._onMouseDown);
-      fabric.base.removeListener(document, 'mouseup', this._onMouseUp);
-      fabric.base.removeListener(document, 'mousemove', this._onMouseMove);
-      fabric.base.removeListener(window, 'resize', this._onResize);
+      fabric.util.removeListener(this.getElement(), 'mousedown', this._onMouseDown);
+      fabric.util.removeListener(document, 'mouseup', this._onMouseUp);
+      fabric.util.removeListener(document, 'mousemove', this._onMouseMove);
+      fabric.util.removeListener(window, 'resize', this._onResize);
       return this;
     },
     
@@ -2059,7 +2059,7 @@
            '{ objects: ' + this.getObjects().length + ' }>';
   };
   
-  fabric.base.object.extend(fabric.Element, {
+  fabric.util.object.extend(fabric.Element, {
     
     /**
      * @property EMPTY_JSON

@@ -1,4 +1,4 @@
-//= require "canvas_object.class"
+//= require "object.class"
 
 (function(){
   
@@ -14,7 +14,7 @@
   }
   
   // Instance methods
-  fabric.Path = fabric.base.createClass(fabric.Object, {
+  fabric.Path = fabric.util.createClass(fabric.Object, {
     
     type: 'path',
     
@@ -63,7 +63,7 @@
       this.path = this._parsePath();
       
       if (!isWidthSet || !isHeightSet) {
-        fabric.base.object.extend(this, this._parseDimensions());
+        fabric.util.object.extend(this, this._parseDimensions());
         if (isWidthSet) {
           this.width = this.options.width;
         }
@@ -320,7 +320,7 @@
      * @return {Object}
      */
     toObject: function() {
-      var o = fabric.base.object.extend(this.callSuper('toObject'), {
+      var o = fabric.util.object.extend(this.callSuper('toObject'), {
         path: this.path
       });
       if (this.sourcePath) {
@@ -430,15 +430,15 @@
         
       }, this);
       
-      var minX = fabric.base.array.min(aX), 
-          minY = fabric.base.array.min(aY), 
+      var minX = fabric.util.array.min(aX), 
+          minY = fabric.util.array.min(aY), 
           deltaX = deltaY = 0;
       
       var o = {
         top: minY - deltaY,
         left: minX - deltaX,
-        bottom: fabric.base.array.max(aY) - deltaY,
-        right: fabric.base.array.max(aX) - deltaX
+        bottom: fabric.util.array.max(aY) - deltaY,
+        right: fabric.util.array.max(aX) - deltaX
       };
       
       o.width = o.right - o.left;
@@ -471,6 +471,6 @@
     var parsedAttributes = fabric.parseAttributes(element, ATTRIBUTE_NAMES),
         path = parsedAttributes.d;
     delete parsedAttributes.d;
-    return new fabric.Path(path, fabric.base.object.extend(parsedAttributes, options));
+    return new fabric.Path(path, fabric.util.object.extend(parsedAttributes, options));
   }
 })();

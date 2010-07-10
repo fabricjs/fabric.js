@@ -1,4 +1,4 @@
-//= require "canvas_object.class"
+//= require "object.class"
 
 (function(){
   
@@ -13,7 +13,7 @@
     return;
   }
   
-  fabric.Text = fabric.base.createClass(fabric.Object, {
+  fabric.Text = fabric.util.createClass(fabric.Object, {
     
     options: {
       top:         10,
@@ -31,7 +31,7 @@
       this.initStateProperties();
       this.text = text;
       this.setOptions(options);
-      fabric.base.object.extend(this, this.options);
+      fabric.util.object.extend(this, this.options);
       this.theta = this.angle * (Math.PI/180);
       this.width = this.getWidth();
       this.setCoords();
@@ -110,7 +110,7 @@
   	 * @return {Object} object representation of an instance
   	 */
   	toObject: function() {
-  	  return fabric.base.object.extend(this.callSuper('toObject'), {
+  	  return fabric.util.object.extend(this.callSuper('toObject'), {
   	    text:         this.text,
   	    fontsize:     this.fontsize,
   	    fontweight:   this.fontweight,
@@ -177,7 +177,7 @@
    * @return {fabric.Text} an instance
    */
 	fabric.Text.fromObject = function(object) {
-	  return new fabric.Text(object.text, fabric.base.object.clone(object));
+	  return new fabric.Text(object.text, fabric.util.object.clone(object));
 	};
 	
 	/**

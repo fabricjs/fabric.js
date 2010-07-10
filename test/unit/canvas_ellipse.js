@@ -45,7 +45,7 @@
 
     ellipse.set('left', 100).set('top', 200).set('rx', 15).set('ry', 25);
 
-    var augmentedProperties = fabric.base.object.extend(fabric.base.object.clone(defaultProperties), {
+    var augmentedProperties = fabric.util.object.extend(fabric.util.object.clone(defaultProperties), {
       left: 100,
       top: 200,
       rx: 15,

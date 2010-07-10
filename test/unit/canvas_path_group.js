@@ -66,10 +66,10 @@
     ok(typeof pathGroup.toObject == 'function');
     var object = pathGroup.toObject();
     
-    /*same(fabric.base.object.extend(fabric.base.object.clone(REFERENCE_PATH_GROUP_OBJECT), {
+    /*same(fabric.util.object.extend(fabric.util.object.clone(REFERENCE_PATH_GROUP_OBJECT), {
       paths: object.paths
     }), object);
-    console.log(fabric.base.object.extend(fabric.base.object.clone(REFERENCE_PATH_GROUP_OBJECT), {
+    console.log(fabric.util.object.extend(fabric.util.object.clone(REFERENCE_PATH_GROUP_OBJECT), {
       paths: object.paths
     }), object);*/
   });
@@ -99,7 +99,7 @@
     ok(typeof pathGroup.toDatalessObject == 'function');
     
     pathGroup.setSourcePath('http://example.com/');
-    var expectedObject = fabric.base.object.extend(fabric.base.object.clone(REFERENCE_PATH_GROUP_OBJECT), {
+    var expectedObject = fabric.util.object.extend(fabric.util.object.clone(REFERENCE_PATH_GROUP_OBJECT), {
       'paths': 'http://example.com/',
       'sourcePath': 'http://example.com/'
     });

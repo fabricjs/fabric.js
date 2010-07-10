@@ -53,6 +53,6 @@
     };
   }
 
-  fabric.base.setStyle = setStyle;
+  fabric.util.setStyle = setStyle;
   
 })();

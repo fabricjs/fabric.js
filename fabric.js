@@ -1,36 +1,37 @@
 /*! Fabric.js Copyright 2010, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
 if (typeof console == 'undefined') {
-  var console = { log: function() { }, warn: function() { } };
+  var console = { 
+    log: function() { }, 
+    warn: function() { } 
+  };
 }
 
 //= require "lib/json2"
 
-//= require "src/canvas_base"
+//= require "src/util"
+//= require "src/parser"
+                 
+//= require "src/point.class"
+//= require "src/intersection.class"
 
-//= require "src/canvas_util"
-//= require "src/canvas_parser"
+//= require "src/color.class"
 
-//= require "src/canvas_point.class"
-//= require "src/canvas_intersection.class"
+//= require "src/element.class"
 
-//= require "src/canvas_color.class"
+//= require "src/object.class"
+//= require "src/line.class"
+//= require "src/circle.class"
+//= require "src/ellipse.class"
+//= require "src/rect.class"
+//= require "src/polyline.class"
+//= require "src/polygon.class"
 
-//= require "src/canvas_element.class"
+//= require "src/path.class"
+//= require "src/path_group.class"
 
-//= require "src/canvas_object.class"
-//= require "src/canvas_line.class"
-//= require "src/canvas_circle.class"
-//= require "src/canvas_ellipse.class"
-//= require "src/canvas_rect.class"
-//= require "src/canvas_polyline.class"
-//= require "src/canvas_polygon.class"
+//= require "src/group.class"
 
-//= require "src/canvas_path.class"
-//= require "src/canvas_path_group.class"
+//= require "src/text.class"
 
-//= require "src/canvas_group.class"
-
-//= require "src/canvas_text.class"
-
-//= require "src/canvas_image.class"
+//= require "src/image.class"

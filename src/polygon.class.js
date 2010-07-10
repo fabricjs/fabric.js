@@ -1,4 +1,4 @@
-//= require "canvas_object.class"
+//= require "object.class"
 
 (function(){
   
@@ -12,7 +12,7 @@
   function byX(p) { return p.x; }
   function byY(p) { return p.y; }
   
-  fabric.Polygon = fabric.base.createClass(fabric.Object, {
+  fabric.Polygon = fabric.util.createClass(fabric.Object, {
     
     type: 'polygon',
     
@@ -37,10 +37,10 @@
     _calcDimensions: function() {
       
       var points = this.points,
-          minX = fabric.base.array.min(points, 'x'),
-          minY = fabric.base.array.min(points, 'y'),
-          maxX = fabric.base.array.max(points, 'x'),
-          maxY = fabric.base.array.max(points, 'y');
+          minX = fabric.util.array.min(points, 'x'),
+          minY = fabric.util.array.min(points, 'y'),
+          maxX = fabric.util.array.max(points, 'x'),
+          maxY = fabric.util.array.max(points, 'y');
       
       this.width = maxX - minX;
       this.height = maxY - minY;
@@ -67,7 +67,7 @@
      * @return {Object} object representation of an instance
      */
     toObject: function() {
-      return fabric.base.object.extend(this.callSuper('toObject'), {
+      return fabric.util.object.extend(this.callSuper('toObject'), {
         points: this.points.concat()
       });
     },
@@ -120,7 +120,7 @@
     var points = fabric.parsePointsAttribute(element.getAttribute('points')),
         parsedAttributes = fabric.parseAttributes(element, fabric.Polygon.ATTRIBUTE_NAMES);
         
-    return new fabric.Polygon(points, fabric.base.object.extend(parsedAttributes, options));
+    return new fabric.Polygon(points, fabric.util.object.extend(parsedAttributes, options));
   };
   
   /**

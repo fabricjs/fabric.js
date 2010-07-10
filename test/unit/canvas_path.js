@@ -77,7 +77,7 @@
     
     var src = 'http://example.com/';
     path.setSourcePath(src);
-    same(fabric.base.object.extend(fabric.base.object.clone(REFERENCE_PATH_OBJECT), {
+    same(fabric.util.object.extend(fabric.util.object.clone(REFERENCE_PATH_OBJECT), {
       path: src
     }), path.toDatalessObject());
   });
@@ -111,7 +111,7 @@
     var path = fabric.Path.fromElement(elPath);
     ok(path instanceof fabric.Path);
     
-    same(fabric.base.object.extend(REFERENCE_PATH_OBJECT, {
+    same(fabric.util.object.extend(REFERENCE_PATH_OBJECT, {
       transformMatrix: [2, 0, 0, 2, 0, 0]
     }), path.toObject());
     

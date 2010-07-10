@@ -82,7 +82,7 @@ function falseFunction() { return false; };
     return element;
   }
   
-  fabric.base.makeElementUnselectable = makeElementUnselectable
+  fabric.util.makeElementUnselectable = makeElementUnselectable
 })();
 
 (function(){
@@ -115,11 +115,11 @@ function falseFunction() { return false; };
     callback();
   }
   
-  fabric.base.getScript = getScript;
+  fabric.util.getScript = getScript;
   
   var Jaxer = this.Jaxer;
   if (Jaxer && Jaxer.load) {
-    fabric.base.getScript = getScriptJaxer;
+    fabric.util.getScript = getScriptJaxer;
   }
 })();
 
@@ -149,10 +149,10 @@ function animate(options) {
   }, 10);
 }
 
-fabric.base.getById = getById;
-fabric.base.toArray = toArray;
-fabric.base.makeElement = makeElement;
-fabric.base.addClass = addClass;
-fabric.base.wrapElement = wrapElement;
-fabric.base.getElementOffset = getElementOffset;
-fabric.base.animate = animate;
+fabric.util.getById = getById;
+fabric.util.toArray = toArray;
+fabric.util.makeElement = makeElement;
+fabric.util.addClass = addClass;
+fabric.util.wrapElement = wrapElement;
+fabric.util.getElementOffset = getElementOffset;
+fabric.util.animate = animate;

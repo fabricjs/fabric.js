@@ -9,7 +9,7 @@ function clone(object) {
   return extend({ }, object);
 }
 
-fabric.base.object = {
+fabric.util.object = {
   extend: extend,
   clone: clone
 };

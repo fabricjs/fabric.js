@@ -1,4 +1,4 @@
-//= require 'canvas_point.class'
+//= require 'point.class'
 
 (function() {
   

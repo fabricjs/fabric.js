@@ -1,4 +1,4 @@
-//= require "canvas_object.class"
+//= require "object.class"
 
 (function(){
   
@@ -12,7 +12,7 @@
    * @class Rect
    * @extends fabric.Object
    */
-  fabric.Rect = fabric.base.createClass(fabric.Object, /** @lends fabric.Rect.prototype */ {
+  fabric.Rect = fabric.util.createClass(fabric.Object, /** @lends fabric.Rect.prototype */ {
     
     type: 'rect',
     
@@ -125,7 +125,7 @@
     var parsedAttributes = fabric.parseAttributes(element, fabric.Rect.ATTRIBUTE_NAMES);
     parsedAttributes = _setDefaultLeftTopValues(parsedAttributes);
     
-    var rect = new fabric.Rect(fabric.base.object.extend(options || { }, parsedAttributes));
+    var rect = new fabric.Rect(fabric.util.object.extend(options || { }, parsedAttributes));
     rect._normalizeLeftTopProperties(parsedAttributes);
     
     return rect;

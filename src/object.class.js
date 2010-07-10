@@ -18,7 +18,7 @@
    * @class Object
    * @memberOf Canvas
    */
-  fabric.Object = fabric.base.createClass({
+  fabric.Object = fabric.util.createClass({
     
     type: 'object',
     
@@ -107,7 +107,7 @@
     
     setOptions: function(options) {
       // this.constructor.superclass.prototype.options -> this.options -> options
-      this.options = fabric.base.object.extend(this._getOptions(), options);
+      this.options = fabric.util.object.extend(this._getOptions(), options);
     },
     
     /**
@@ -115,7 +115,7 @@
      * @method _getOptions
      */
     _getOptions: function() {
-      return fabric.base.object.extend(fabric.base.object.clone(this._getSuperOptions()), this.options);
+      return fabric.util.object.extend(fabric.util.object.clone(this._getSuperOptions()), this.options);
     },
     
     /**
@@ -248,7 +248,7 @@
      * @return {String}
      */
     toString: function() {
-      return "#<fabric." + fabric.base.string.capitalize(this.type) + ">";
+      return "#<fabric." + fabric.util.string.capitalize(this.type) + ">";
     },
     
     /**
@@ -672,7 +672,7 @@
       el.width = this.getWidth();
       el.height = this.getHeight();
       
-      fabric.base.wrapElement(el, 'div');
+      fabric.util.wrapElement(el, 'div');
 
       var canvas = new fabric.Element(el);
       canvas.backgroundColor = 'transparent';
@@ -799,7 +799,7 @@
      * @return {String|Boolean} corner code (tl, tr, bl, br, etc.), or false if nothing is found
      */
     _findTargetCorner: function(e, offset) {
-      var pointer = fabric.base.getPointer(e),
+      var pointer = fabric.util.getPointer(e),
           ex = pointer.x - offset.left,
           ey = pointer.y - offset.top,
           xpoints,
@@ -1170,7 +1170,7 @@
           onChange = callbacks.onChange || empty,
           _this = this;
       
-      fabric.base.animate({
+      fabric.util.animate({
         startValue: this.get('angle'),
         endValue: this._getAngleValueForStraighten(),
         duration: this.FX_DURATION,
@@ -1204,7 +1204,7 @@
           onChange = callbacks.onChange || empty,
           _this = this;
       
-      fabric.base.animate({
+      fabric.util.animate({
         startValue: this.get('opacity'),
         endValue: 0,
         duration: this.FX_DURATION,

@@ -59,5 +59,5 @@
     return klass;
   }
 
-  fabric.base.createClass = createClass;
+  fabric.util.createClass = createClass;
 })();

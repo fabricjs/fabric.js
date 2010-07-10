@@ -1,4 +1,4 @@
-//= require "canvas_object.class"
+//= require "object.class"
 
 (function(){
   
@@ -9,7 +9,7 @@
     return;
   }
   
-  fabric.Ellipse = fabric.base.createClass(fabric.Object, {
+  fabric.Ellipse = fabric.util.createClass(fabric.Object, {
     
     type: 'ellipse',
     
@@ -37,7 +37,7 @@
      * @return {Object} object representation of an instance
      */
     toObject: function() {
-      return fabric.base.object.extend(this.callSuper('toObject'), {
+      return fabric.util.object.extend(this.callSuper('toObject'), {
         rx: this.get('rx'),
         ry: this.get('ry')
       })
@@ -93,7 +93,7 @@
    */
   fabric.Ellipse.fromElement = function(element, options) {
     var parsedAttributes = fabric.parseAttributes(element, fabric.Ellipse.ATTRIBUTE_NAMES);
-    return new fabric.Ellipse(fabric.base.object.extend(parsedAttributes, options));
+    return new fabric.Ellipse(fabric.util.object.extend(parsedAttributes, options));
   };
   
   /**

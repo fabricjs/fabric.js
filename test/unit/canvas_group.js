@@ -271,10 +271,10 @@
     ok(typeof group.setActive == 'function');
     
     group.setActive(false);
-    same([false, false], fabric.base.array.invoke(group.getObjects(), 'isActive'));
+    same([false, false], fabric.util.array.invoke(group.getObjects(), 'isActive'));
     
     group.setActive(true);
-    same([true, true], fabric.base.array.invoke(group.getObjects(), 'isActive'));
+    same([true, true], fabric.util.array.invoke(group.getObjects(), 'isActive'));
   });
   
   test('fromObject', function() {

@@ -44,7 +44,7 @@
     
     circle.set('left', 100).set('top', 200).set('radius', 15);
     
-    var augmentedProperties = fabric.base.object.extend(fabric.base.object.clone(defaultProperties), {
+    var augmentedProperties = fabric.util.object.extend(fabric.util.object.clone(defaultProperties), {
       left: 100,
       top: 200,
       radius: 15

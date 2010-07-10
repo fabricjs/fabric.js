@@ -82,7 +82,7 @@
     var polygonWithAttrs = fabric.Polygon.fromElement(elPolygonWithAttrs);
     var expectedPoints = [{x: 10, y: 10}, {x: 20, y: 20}, {x: 30, y: 30}, {x: 10, y: 10}];
 
-    same(fabric.base.object.extend(REFERENCE_OBJECT, {
+    same(fabric.util.object.extend(REFERENCE_OBJECT, {
       'width': 20, 
       'height': 20, 
       'fill': 'rgb(255,255,255)', 
