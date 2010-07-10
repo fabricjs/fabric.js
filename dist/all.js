@@ -1,3 +1,5 @@
+/*! Fabric.js Copyright 2010, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
+
 if (typeof console == 'undefined') {
   var console = { log: function() { }, warn: function() { } };
 }
@@ -1569,7 +1571,7 @@ fabric.base.animate = animate;
 
 (function() {
 
-  /*! Adaptation of work of Kevin Lindsey (kevin@kevlindev.com) */
+  /* Adaptation of work of Kevin Lindsey (kevin@kevlindev.com) */
 
   var fabric = this.fabric || (this.fabric = { });
 

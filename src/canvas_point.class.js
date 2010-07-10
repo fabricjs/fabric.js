@@ -1,6 +1,6 @@
 (function() {
   
-  /*! Adaptation of work of Kevin Lindsey (kevin@kevlindev.com) */
+  /* Adaptation of work of Kevin Lindsey (kevin@kevlindev.com) */
   
   var fabric = this.fabric || (this.fabric = { });
 
