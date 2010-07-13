@@ -1,11 +1,11 @@
-**Fabric.js** is a framework that makes it easy to work with HTML5 canvas element.<br>
-It is an **interactive object model** on top of canvas element.<br>
-It is also an **SVG-to-canvas parser**.
+**Fabric.js** is a framework that makes it easy to work with HTML5 canvas element. It is an **interactive object model** on top of canvas element. It is also an **SVG-to-canvas parser**. 
+
+Using Fabric.js, you can create and populate objects on canvas; objects like simple geometrical shapes — rectangles, circles, ellipses, polygons, or more complex shapes consisting of hundreds or thousands of simple paths. You can then scale, move, and rotate these objects with the mouse; modify their properties — color, transparency, z-index, etc. You can also manipulate these objects altogether — grouping them with a simple mouse selection.
 
 ### Goals
 
-- Unit tested (~925 tests at the moment)
-- Modular
+- Unit tested (939 tests at the moment)
+- Modular (~20 small "classes")
 - Cross-browser
 - Fast
 - Encapsulated in one object
@@ -17,6 +17,7 @@ It is also an **SVG-to-canvas parser**.
 - Safari 3+
 - Opera 9.64+
 - Chrome 1+
+- IE9pre3
 
 ### Building
 
@@ -120,4 +121,4 @@ MIT License
 
 ### TODO
 
-- Write unit tests for fabric.base.* and move them to fabric.util.*
+- All methods under fabric.util.* (except misc.js) need unit tests
