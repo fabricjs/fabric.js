@@ -1569,13 +1569,13 @@
               case 'image':
               case 'text':
                 Canvas[obj.type.capitalize()].fromObject(obj, function (o) {
-                  onObjectLoaded(o);
+                  onObjectLoaded(o, index);
                 });
                 break;
               default:
                 var klass = Canvas[obj.type.capitalize().camelize()];
                 if (klass && klass.fromObject) {
-                  onObjectLoaded(klass.fromObject(obj));
+                  onObjectLoaded(klass.fromObject(obj), index);
                 }
                 break;
             }

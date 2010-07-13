@@ -100,7 +100,7 @@
     };
     
     var el = document.createElement('script');
-    el.src = '../../src/canvas_text.class.js';
+    el.src = '../../src/text.class.js';
     document.body.appendChild(el);
     
     setTimeout(function() {
@@ -113,22 +113,22 @@
     var warnWasCalled = false;
     console.warn = function() {
       warnWasCalled = true;
-    }
-    var originalCanvasObject = fabric.Object;
-    var originalCanvasText = fabric.Text;
+    };
+    var originalObject = fabric.Object;
+    var originalText = fabric.Text;
     
     delete fabric.Text;
     delete fabric.Object;
     
     var el = document.createElement('script');
-    el.src = '../../src/canvas_text.class.js';
+    el.src = '../../src/text.class.js';
     document.body.appendChild(el);
     
-    setTimeout(function(){
+    setTimeout(function() {
       ok(warnWasCalled);
       
-      fabric.Object = originalCanvasObject;
-      fabric.Text = originalCanvasText;
+      fabric.Object = originalObject;
+      fabric.Text = originalText;
       
       start();
     }, 500);

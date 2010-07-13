@@ -349,20 +349,27 @@
   
   asyncTest('cloneAsImage', function() {
     var cObj = new fabric.Rect();
+    
     ok(typeof cObj.cloneAsImage == 'function');
     
-    var image;
-    var _this = this;
-    
-    setTimeout(function(){
-      ok(image);
-      ok(image instanceof fabric.Image);
+    if (!fabric.Element.supports('toDataURL')) {
+      alert('`toDataURL` is not supported by this environment; skipping `cloneAsImage` test (as it relies on `toDataURL`)');
       start();
-    }, 1000);
-    
-    cObj.cloneAsImage(function(i) {
-      image = i;
-    });
+    }
+    else {
+      var image;
+      var _this = this;
+
+      setTimeout(function(){
+        ok(image);
+        ok(image instanceof fabric.Image);
+        start();
+      }, 1000);
+
+      cObj.cloneAsImage(function(i) {
+        image = i;
+      });
+    }
   });
   
   test('toDataURL', function() {
@@ -379,11 +386,14 @@
     var cObj = new fabric.Rect();
     ok(typeof cObj.toDataURL == 'function');
     
-    // equals(cObj.toDataURL(), data);
-    var dataURL = cObj.toDataURL();
-    
-    equals(typeof dataURL, 'string');
-    equals(dataURL.substring(0, 21), 'data:image/png;base64');
+    if (!fabric.Element.supports('toDataURL')) {
+      alert('toDataURL is not supported by this environment. Some of the tests can not be run.');
+    }
+    else {
+      var dataURL = cObj.toDataURL();
+      equals(typeof dataURL, 'string');
+      equals(dataURL.substring(0, 21), 'data:image/png;base64');
+    }
   });
   
   test('hasStateChanged', function() {

@@ -144,7 +144,7 @@
   test('toDataURL', function() {
     ok(typeof canvas.toDataURL == 'function');
     if (!fabric.Element.supports('toDataURL')) {
-      alert("toDataURL is not supported by environment");
+      alert("toDataURL is not supported by this environment. Some of the tests can not be run.");
     }
     else {
       var dataURL = canvas.toDataURL('png');
@@ -670,7 +670,7 @@
     ok(typeof fabric.Element.toGrayscale == 'function');
     
     if (!fabric.Element.supports('getImageData')) {
-      alert('getImageData is not supported by environment. Some of the tests can not be run.');
+      alert('getImageData is not supported by this environment. Some of the tests can not be run.');
       return;
     }
     
