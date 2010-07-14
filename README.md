@@ -18,6 +18,9 @@ Using Fabric.js, you can create and populate objects on canvas; objects like sim
 - Opera 9.64+
 - Chrome 1+
 - IE9pre3
+- IE8 (incomplete — about 30 failings tests at the moment, and only with help of [Explorer Canvas](http://code.google.com/p/explorercanvas/))
+
+### History
 
 ### Building
 
@@ -115,10 +118,26 @@ Using Fabric.js, you can create and populate objects on canvas; objects like sim
 - [Maxim "hakunin" Chernyak](http://twitter.com/hakunin) for ideas, and help with various parts of the library.
 - [Sergey Nisnevich](http://nisnya.com) for help with geometry logic.
 
-### License
+### MIT License
 
-MIT License
+Copyright (c) 2008-2010 Bitsonnet
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
 ### TODO
 
 - All methods under fabric.util.* (except misc.js) need unit tests
+- SVG-to-canvas parser needs to support more SVG declarations (e.g. gradients are not yet supported)
