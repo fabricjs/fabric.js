@@ -2,12 +2,11 @@
   "http://www.w3.org/TR/html4/strict.dtd">
 <html lang="en">
   <head>
-    <title>Unit test file :: fabric.Text</title>
+    <title>Fabric.js benchmark</title>
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
-  
     <link rel="stylesheet" href="lib/unittest.css" type="text/css">
   
-    <!--[if IE]>
+    <!--[if lt IE 9]>
       <script type="text/javascript" src="../lib/excanvas.js"></script>
     <![endif]-->
     
@@ -20,14 +19,14 @@
   </head>
   <body>
     
-    <h2>Canvas benchmark</h2>
+    <h2>Fabric.js benchmark</h2>
     
     <div id="results"></div>
     <canvas id="test" width="600" height="600"></canvas>
     
     <script type="text/javascript">
     
-      (function(){
+      (function() {
         
         function getRandomInt(min, max) {
           return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -48,7 +47,7 @@
         var t1, t2;
 
         var t = new Date();
-        for (var i=50; i--; ) {
+        for (var i = 50; i--; ) {
           c.add(new fabric.Rect({
             width: getRandomInt(10, 50),
             height: getRandomInt(10, 50),
