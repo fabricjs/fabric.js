@@ -46,7 +46,7 @@
   canvas.add(rect).add(circle).add(ellipse.scale(2));
 
   function loadSVGFromURL(url, callback) {
-    var req = new fabric.base.request(url, {
+    var req = new fabric.util.request(url, {
       method: 'get',
       onComplete: function(r) {
         var xml = r.responseXML;

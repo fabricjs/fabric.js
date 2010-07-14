@@ -79,6 +79,7 @@
     elPolylineWithAttrs.setAttribute('transform', 'translate(-10,-20) scale(2)');
     
     var polylineWithAttrs = fabric.Polyline.fromElement(elPolylineWithAttrs);
+    
     //var expectedPoints = [{x: 10, y: 10}, {x: 20, y: 20}, {x: 30, y: 30}, {x: 10, y: 10}];
     /*
     same(fabric.util.object.extend(REFERENCE_OBJECT, {
