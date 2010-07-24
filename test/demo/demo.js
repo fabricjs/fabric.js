@@ -56,8 +56,9 @@
     ev.preventDefault();
     
     var className = ev.target.className,
-        left = fabric.util.getRandomInt(100, 500),
-        top = fabric.util.getRandomInt(100, 500);
+        left = fabric.util.getRandomInt(100, 700),
+        top = fabric.util.getRandomInt(100, 500),
+        angle = fabric.util.getRandomInt(-20, 20);
     
     switch (className) {
       case 'rect':
@@ -70,6 +71,18 @@
       
       case 'triangle':
         canvas.add(new fabric.Triangle({ left: left, top: top, fill: 'rgb(0,255,0)', width: 50, height: 50, opacity: 0.8 }));
+      
+      case 'image':
+        fabric.Image.fromURL('http://www.dooziedog.com/dog_breeds/pug/images/full/Pug-Puppy.jpg', function(image) {
+          image.set('left', left).set('top', top).set('angle', angle).scale(0.1).setCoords();
+          canvas.add(image);
+        });
+        break;
+      
+      case 'clear':
+        if (confirm('Are you sure?')) {
+          canvas.clear();
+        }
     }
   };
 
