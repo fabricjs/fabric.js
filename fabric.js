@@ -22,6 +22,7 @@ if (typeof console == 'undefined') {
 //= require "src/object.class"
 //= require "src/line.class"
 //= require "src/circle.class"
+//= require "src/triangle.class"
 //= require "src/ellipse.class"
 //= require "src/rect.class"
 //= require "src/polyline.class"

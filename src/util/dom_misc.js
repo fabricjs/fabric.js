@@ -14,12 +14,14 @@ function makeElement(tagName, attributes) {
   var el = document.createElement(tagName);
   for (var prop in attributes) {
     if (prop === 'class') {
-      prop = 'className';
+      el.className = attributes[prop];
     }
     else if (prop === 'for') {
-      prop = 'htmlFor';
+      el.htmlFor = attributes[prop];
     }
-    el.setAttribute(prop, attributes[prop]);
+    else {
+      el.setAttribute(prop, attributes[prop]);
+    }
   }
   return el;
 }

@@ -269,7 +269,7 @@
      * @method _initWrapperElement
      */
     _initWrapperElement: function (width, height) {
-      var wrapper = fabric.util.wrapElement(this.getElement(), 'div', { className: 'canvas_container' });
+      var wrapper = fabric.util.wrapElement(this.getElement(), 'div', { 'class': 'canvas_container' });
       fabric.util.setStyle(wrapper, {
         width: width + 'px',
         height: height + 'px'

@@ -1,10 +1,4 @@
-(function(){
-  
-  var el = document.createElement('canvas');
-  el.id = 'canvas';
-  el.width = 800;
-  el.height = 600;
-  document.body.appendChild(el);
+(function() {
 
   var canvas = this.canvas = new fabric.Element('canvas');
 
@@ -57,6 +51,27 @@
       }
     })
   }
+  
+  document.getElementById('commands').onclick = function(ev) {
+    ev.preventDefault();
+    
+    var className = ev.target.className,
+        left = fabric.util.getRandomInt(100, 500),
+        top = fabric.util.getRandomInt(100, 500);
+    
+    switch (className) {
+      case 'rect':
+        canvas.add(new fabric.Rect({ left: left, top: top, fill: 'rgb(255,0,0)', width: 50, height: 50, opacity: 0.8 }));
+        break;
+        
+      case 'circle':
+        canvas.add(new fabric.Circle({ left: left, top: top, fill: 'rgb(0,0,255)', radius: 50, opacity: 0.8 }));
+        break;
+      
+      case 'triangle':
+        canvas.add(new fabric.Triangle({ left: left, top: top, fill: 'rgb(0,255,0)', width: 50, height: 50, opacity: 0.8 }));
+    }
+  };
 
   loadSVGFromURL('assets/1.svg', function(objects) {
     var o = objects[0];

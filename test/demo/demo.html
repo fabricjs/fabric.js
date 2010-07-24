@@ -13,12 +13,21 @@
     <script src="../../dist/all.js" type="text/javascript"></script>
     
     <style type="text/css">
-      canvas { border: 1px solid #aaa; }
-      .canvas_container { margin: 0 auto; position: relative; }
+      .canvas_container { margin: 0 auto; position: relative; float: left; border: 1px solid #aaa; }
+      #commands { float: left; margin-left: 20px; list-style: none; }
     </style>
     
   </head>
   <body>
+    <canvas id="canvas" width="800" height="600"></canvas>
+    
+    <ul id="commands">
+      <li style="font-weight:bold;margin-bottom:1em">Add objects to canvas:</li>
+      <li><button class="rect">Rectangle</button></li>
+      <li><button class="circle">Circle</button></li>
+      <li><button class="triangle">Triangle</button></li>
+    </ul>
+    
     <script src="demo.js" type="text/javascript"></script>
   </body>
 </html>

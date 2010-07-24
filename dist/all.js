@@ -958,12 +958,14 @@ function makeElement(tagName, attributes) {
   var el = document.createElement(tagName);
   for (var prop in attributes) {
     if (prop === 'class') {
-      prop = 'className';
+      el.className = attributes[prop];
     }
     else if (prop === 'for') {
-      prop = 'htmlFor';
+      el.htmlFor = attributes[prop];
     }
-    el.setAttribute(prop, attributes[prop]);
+    else {
+      el.setAttribute(prop, attributes[prop]);
+    }
   }
   return el;
 }
@@ -2321,7 +2323,7 @@ fabric.util.animate = animate;
      * @method _initWrapperElement
      */
     _initWrapperElement: function (width, height) {
-      var wrapper = fabric.util.wrapElement(this.getElement(), 'div', { className: 'canvas_container' });
+      var wrapper = fabric.util.wrapElement(this.getElement(), 'div', { 'class': 'canvas_container' });
       fabric.util.setStyle(wrapper, {
         width: width + 'px',
         height: height + 'px'
@@ -5377,9 +5379,14 @@ fabric.util.animate = animate;
      */
     _render: function(ctx) {
       ctx.beginPath();
+
       ctx.moveTo(-this.width / 2, -this.height / 2);
       ctx.lineTo(this.width / 2, this.height / 2);
+
+      var origStrokeStyle = ctx.strokeStyle;
+      ctx.strokeStyle = ctx.fillStyle;
       ctx.stroke();
+      ctx.strokeStyle = origStrokeStyle;
     },
 
     /**
@@ -5544,6 +5551,74 @@ fabric.util.animate = animate;
   fabric.Circle.fromObject = function(object) {
     return new fabric.Circle(object);
   }
+})();
+(function(){
+
+  var fabric = this.fabric || (this.fabric = { });
+
+  if (fabric.Triangle) return;
+
+  fabric.Triangle = fabric.util.createClass(fabric.Object, {
+
+    /**
+     * @field
+     */
+    type: 'triangle',
+
+    /**
+     * @constructs
+     * @method initialize
+     * @param options {Object} options object
+     * @return {Object} thisArg
+     */
+    initialize: function(options) {
+      options = options || { };
+
+      this.callSuper('initialize', options);
+
+      this.set('width', options.width || 100)
+          .set('height', options.height || 100);
+    },
+
+    /**
+     * @private
+     * @method _render
+     * @param ctx {CanvasRenderingContext2D} context to render on
+     */
+    _render: function(ctx) {
+      ctx.beginPath();
+
+      ctx.moveTo(-this.width / 2, this.height / 2);
+      ctx.lineTo(0, -this.height / 2);
+      ctx.lineTo(this.width / 2, this.height / 2);
+
+      if (this.fill) {
+        ctx.fill();
+      }
+      if (this.stroke) {
+        ctx.stroke();
+      }
+    },
+
+    /**
+     * Returns complexity of an instance
+     * @method complexity
+     * @return {Number} complexity of this instance
+     */
+    complexity: function() {
+      return 1;
+    }
+  });
+
+  /**
+   * @static
+   * @method Canvas.Trangle.fromObject
+   * @param object {Object} object to create an instance from
+   * @return {Object} instance of Canvas.Triangle
+   */
+  fabric.Triangle.fromObject = function(object) {
+    return new fabric.Triangle(object);
+  };
 })();
 
 (function(){
