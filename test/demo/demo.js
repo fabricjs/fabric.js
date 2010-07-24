@@ -71,6 +71,7 @@
       
       case 'triangle':
         canvas.add(new fabric.Triangle({ left: left, top: top, fill: 'rgb(0,255,0)', width: 50, height: 50, opacity: 0.8 }));
+        break;
       
       case 'image':
         fabric.Image.fromURL('http://www.dooziedog.com/dog_breeds/pug/images/full/Pug-Puppy.jpg', function(image) {
