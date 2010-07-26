@@ -35,7 +35,6 @@
       radius: getRandomInt(10, 50),
       fill: '#' + getRandomColor(),
       opacity: getRandomNum(0.5, 1),
-      angle: getRandomInt(0, 180),
       top: getRandomInt(0 + offset, c._oConfig.height - offset),
       left: getRandomInt(0 + offset, c._oConfig.width - offset)
     }));
