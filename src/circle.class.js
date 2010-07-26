@@ -2,8 +2,7 @@
 
 (function() {
   
-  var global  = this,
-      fabric  = global.fabric || (global.fabric = { }),
+  var fabric  = this.fabric || (this.fabric = { }),
       piBy2   = Math.PI * 2,
       extend = fabric.util.object.extend;
   

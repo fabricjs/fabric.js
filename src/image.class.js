@@ -2,7 +2,8 @@
 
 (function() {
   
-  var global = this;
+  var global = this,
+      extend = fabric.util.object.extend;
   
   if (!global.fabric) {
     global.fabric = { };
@@ -145,7 +146,7 @@
      * @return {Object} object representation of an instance
      */
     toObject: function() {
-      return fabric.util.object.extend(this.callSuper('toObject'), {
+      return extend(this.callSuper('toObject'), {
         src: this.getSrc()
       });
     },

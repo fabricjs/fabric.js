@@ -5,7 +5,9 @@
   var fabric = this.fabric || (this.fabric = { }),
       extend = fabric.util.object.extend,
       min = fabric.util.array.min,
-      max = fabric.util.array.max;
+      max = fabric.util.array.max,
+      invoke = fabric.util.array.invoke,
+      removeFromArray = fabric.util.removeFromArray;
       
   if (fabric.Group) {
     return;
@@ -110,7 +112,7 @@
      */
     remove: function(object) {
       this._restoreObjectsState();
-      fabric.util.removeFromArray(this.objects, object);
+      removeFromArray(this.objects, object);
       object.setActive(false);
       this._calcBounds();
       this._updateObjectsCoords();
@@ -170,7 +172,7 @@
      */
     toObject: function() {
       return extend(this.callSuper('toObject'), {
-        objects: fabric.util.array.invoke(this.objects, 'clone')
+        objects: invoke(this.objects, 'clone')
       });
     },
     

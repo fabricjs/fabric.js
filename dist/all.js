@@ -5462,8 +5462,7 @@ fabric.util.animate = animate;
 
 (function() {
 
-  var global  = this,
-      fabric  = global.fabric || (global.fabric = { }),
+  var fabric  = this.fabric || (this.fabric = { }),
       piBy2   = Math.PI * 2,
       extend = fabric.util.object.extend;
 
@@ -6798,7 +6797,9 @@ fabric.util.animate = animate;
   var fabric = this.fabric || (this.fabric = { }),
       extend = fabric.util.object.extend,
       min = fabric.util.array.min,
-      max = fabric.util.array.max;
+      max = fabric.util.array.max,
+      invoke = fabric.util.array.invoke,
+      removeFromArray = fabric.util.removeFromArray;
 
   if (fabric.Group) {
     return;
@@ -6901,7 +6902,7 @@ fabric.util.animate = animate;
      */
     remove: function(object) {
       this._restoreObjectsState();
-      fabric.util.removeFromArray(this.objects, object);
+      removeFromArray(this.objects, object);
       object.setActive(false);
       this._calcBounds();
       this._updateObjectsCoords();
@@ -6960,7 +6961,7 @@ fabric.util.animate = animate;
      */
     toObject: function() {
       return extend(this.callSuper('toObject'), {
-        objects: fabric.util.array.invoke(this.objects, 'clone')
+        objects: invoke(this.objects, 'clone')
       });
     },
 
@@ -7414,7 +7415,8 @@ fabric.util.animate = animate;
 
 (function() {
 
-  var global = this;
+  var global = this,
+      extend = fabric.util.object.extend;
 
   if (!global.fabric) {
     global.fabric = { };
@@ -7554,7 +7556,7 @@ fabric.util.animate = animate;
      * @return {Object} object representation of an instance
      */
     toObject: function() {
-      return fabric.util.object.extend(this.callSuper('toObject'), {
+      return extend(this.callSuper('toObject'), {
         src: this.getSrc()
       });
     },
