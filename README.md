@@ -69,6 +69,8 @@ Fabric.js started as a foundation for design editor on [printio.ru](http://print
         |
         -- fabric.Circle
         |
+        -- fabric.Triangle
+        |
         -- fabric.Ellipse
         |
         -- fabric.Rect
