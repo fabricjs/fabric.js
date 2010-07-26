@@ -211,9 +211,10 @@
       memo.push({ x: parseFloat(pair[0]), y: parseFloat(pair[1]) });
       return memo;
     }, [ ]);
+    
     // odd number of points is an error
     if (parsedPoints.length % 2 !== 0) {
-      // return null;
+      return null;
     }
     return parsedPoints;
   };

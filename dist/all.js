@@ -1419,7 +1419,9 @@ fabric.util.animate = animate;
       memo.push({ x: parseFloat(pair[0]), y: parseFloat(pair[1]) });
       return memo;
     }, [ ]);
+
     if (parsedPoints.length % 2 !== 0) {
+      return null;
     }
     return parsedPoints;
   };
@@ -6764,7 +6766,7 @@ fabric.util.animate = animate;
   /**
    * @static
    * @method fabric.PathGroup.fromObject
-   * @param {Object}
+   * @param {Object} object
    * @return {fabric.PathGroup}
    */
   fabric.PathGroup.fromObject = function(object) {
@@ -7452,8 +7454,8 @@ fabric.util.animate = animate;
      * Width and height have to mantain the same proportion in the final image as it was in the initial one.
      * @method getNormalizedSize
      * @param {Object} oImg
-     * @param {Number} maximum width of the image in px
-     * @param {Number} maximum height of the image in px
+     * @param {Number} maxwidth maximum width of the image in px
+     * @param {Number} maxheight maximum height of the image in px
      */
     getNormalizedSize: function(oImg, maxwidth, maxheight) {
       if (maxheight && maxwidth && (oImg.width > oImg.height && (oImg.width / oImg.height) < (maxwidth / maxheight))) {

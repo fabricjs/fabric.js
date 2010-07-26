@@ -194,7 +194,7 @@
   /**
    * @static
    * @method fabric.PathGroup.fromObject
-   * @param {Object}
+   * @param {Object} object
    * @return {fabric.PathGroup}
    */
   fabric.PathGroup.fromObject = function(object) {

@@ -36,7 +36,11 @@ Fabric.js started as a foundation for design editor on [printio.ru](http://print
 
 3. Create a minified distribution file
 
+        # Using YUICompressor
         $ java -jar lib/yuicompressor-2.4.2.jar dist/all.js -o dist/all.min.js
+        
+        # or Google Closure Compiler
+        $ java -jar lib/google_closure_compiler.jar --js dist/all.js --js_output_file dist/all.min.js
 
 ### Examples of use
 
