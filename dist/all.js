@@ -1,4 +1,4 @@
-/*! Fabric.js Copyright 2010, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
+/*! Fabric.js Copyright 2008-2010, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
 if (typeof console == 'undefined') {
   var console = {
