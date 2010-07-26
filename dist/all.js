@@ -2065,6 +2065,8 @@ fabric.util.animate = animate;
   var global = this,
       window = global.window,
       document = window.document,
+      capitalize = fabric.util.string.capitalize,
+      camelize = fabric.util.string.camelize,
 
       Canvas = global.Canvas || (global.Canvas = { });
 
@@ -3083,7 +3085,7 @@ fabric.util.animate = animate;
           activeGroup = this.getActiveGroup();
 
       if (length) {
-        for (var i=0; i<length; ++i) {
+        for (var i = 0; i < length; ++i) {
 
           if (!activeGroup ||
               (activeGroup &&
@@ -3506,7 +3508,7 @@ fabric.util.animate = animate;
         switch (o.type) {
           case 'image':
           case 'font':
-            fabric[fabric.util.string.capitalize(o.type)].fromObject(o, function (o) {
+            fabric[capitalize(o.type)].fromObject(o, function (o) {
               _this.add(o);
               if (++numLoadedImages === numTotalImages) {
                 if (callback) callback();
@@ -3514,7 +3516,7 @@ fabric.util.animate = animate;
             });
             break;
           default:
-            var klass = fabric[fabric.util.string.camelize(fabric.util.string.capitalize(o.type))];
+            var klass = fabric[camelize(capitalize(o.type))];
             if (klass && klass.fromObject) {
               _this.add(klass.fromObject(o));
             }
