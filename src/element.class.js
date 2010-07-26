@@ -4,9 +4,7 @@
       window = global.window,
       document = window.document,
       capitalize = fabric.util.string.capitalize,
-      camelize = fabric.util.string.camelize,
-      
-      Canvas = global.Canvas || (global.Canvas = { });
+      camelize = fabric.util.string.camelize;
       
   if (fabric.Element) {
     console.warn('fabric.Element is already defined.');
@@ -1570,12 +1568,12 @@
             switch (obj.type) {
               case 'image':
               case 'text':
-                Canvas[obj.type.capitalize()].fromObject(obj, function (o) {
+                Canvas[capitalize(obj.type)].fromObject(obj, function (o) {
                   onObjectLoaded(o, index);
                 });
                 break;
               default:
-                var klass = Canvas[obj.type.capitalize().camelize()];
+                var klass = Canvas[camelize(capitalize(obj.type))];
                 if (klass && klass.fromObject) {
                   onObjectLoaded(klass.fromObject(obj), index);
                 }
@@ -1744,7 +1742,7 @@
       var options = cachedObject.options;
       
       objects = objects.map(function (o) {
-        return Canvas[o.type.capitalize()].fromObject(o);
+        return fabric[capitalize(o.type)].fromObject(o);
       });
       
       return ({ objects: objects, options: options });
