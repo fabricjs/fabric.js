@@ -1,6 +1,9 @@
 (function(){
   
-  var fabric = this.fabric || (this.fabric = { });
+  var fabric = this.fabric || (this.fabric = { }),
+      extend = fabric.util.object.extend,
+      capitalize = fabric.util.string.capitalize,
+      clone = fabric.util.object.clone;
   
   var attributesMap = {
     'cx':             'left',
@@ -61,8 +64,8 @@
     
     // add values parsed from style
     // TODO (kangax): check the presedence of values from the style attribute
-    ownAttributes = fabric.util.object.extend(fabric.parseStyleAttribute(element), ownAttributes);
-    return fabric.util.object.extend(parentAttributes, ownAttributes);
+    ownAttributes = extend(fabric.parseStyleAttribute(element), ownAttributes);
+    return extend(parentAttributes, ownAttributes);
   };
   
   /**
@@ -261,7 +264,7 @@
    function parseElements(elements, options) {
     // transform svg elements to fabric.Path elements
     var _elements = elements.map(function(el) {
-      var klass = fabric[fabric.util.string.capitalize(el.tagName)];
+      var klass = fabric[capitalize(el.tagName)];
       if (klass && klass.fromElement) {
         try {
           return klass.fromElement(el, options);
@@ -347,7 +350,7 @@
         height: height
       };
 
-      var elements = fabric.parseElements(elements, fabric.util.object.clone(options));
+      var elements = fabric.parseElements(elements, clone(options));
       if (!elements || (elements && !elements.length)) return;
 
       if (callback) {
@@ -356,7 +359,7 @@
     };
   })();
   
-  fabric.util.object.extend(fabric, {
+  extend(fabric, {
     parseAttributes:        parseAttributes,
     parseElements:          parseElements,
     parseStyleAttribute:    parseStyleAttribute,

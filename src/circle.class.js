@@ -4,7 +4,8 @@
   
   var global  = this,
       fabric  = global.fabric || (global.fabric = { }),
-      piBy2   = Math.PI * 2;
+      piBy2   = Math.PI * 2,
+      extend = fabric.util.object.extend;
   
   if (fabric.Circle) {
     console.warn('fabric.Circle is already defined.');
@@ -40,7 +41,7 @@
      * @return {Object} object representation of an instance
      */
     toObject: function() {
-      return fabric.util.object.extend(this.callSuper('toObject'), {
+      return extend(this.callSuper('toObject'), {
         radius: this.get('radius')
       });
     },
@@ -89,7 +90,7 @@
     if (!isValidRadius(parsedAttributes)) {
       throw Error('value of `r` attribute is required and can not be negative');
     }
-    return new fabric.Circle(fabric.util.object.extend(parsedAttributes, options));
+    return new fabric.Circle(extend(parsedAttributes, options));
   };
   
   /**

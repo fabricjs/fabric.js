@@ -1,22 +1,29 @@
 (function () {
   
-  var global = this,
-      window = global.window,
-      document = window.document,
-      capitalize = fabric.util.string.capitalize,
-      camelize = fabric.util.string.camelize;
-      
   if (fabric.Element) {
     console.warn('fabric.Element is already defined.');
     return;
   }
   
-  var CANVAS_INIT_ERROR = new Error('Could not initialize `canvas` element'),
+  var global = this,
+      window = global.window,
+      document = window.document,
+      
+      // aliases for faster resolution
+      extend = fabric.util.object.extend,
+      capitalize = fabric.util.string.capitalize,
+      camelize = fabric.util.string.camelize,
+      fireEvent = fabric.util.fireEvent,
+      getPointer = fabric.util.getPointer,
+      getElementOffset = fabric.util.getElementOffset,
+      removeFromArray = fabric.util.removeFromArray,
+      addListener = fabric.util.addlistener,
+      removeListener = fabric.util.removelistener,
+      
+      CANVAS_INIT_ERROR = new Error('Could not initialize `canvas` element'),
       FX_DURATION = 500,
       STROKE_OFFSET = 0.5,
       FX_TRANSITION = 'decel',
-      
-      getPointer = fabric.util.getPointer,
       
       cursorMap = {
         'tr': 'ne-resize',
@@ -182,7 +189,7 @@
     this.calcOffset();
   };
   
-  fabric.util.object.extend(fabric.Element.prototype, {
+  extend(fabric.Element.prototype, {
     
     selectionColor:         'rgba(100,100,255,0.3)', // blue
     selectionBorderColor:   'rgba(255,255,255,0.3)',
@@ -207,7 +214,7 @@
      * @chainable
      */
     calcOffset: function () {
-      this._offset = fabric.util.getElementOffset(this.getElement());
+      this._offset = getElementOffset(this.getElement());
       return this;
     },
     
@@ -300,7 +307,7 @@
        * See configuration documentation for more details.
        */
     _initConfig: function (oConfig) {
-      fabric.util.object.extend(this._oConfig, oConfig || { });
+      extend(this._oConfig, oConfig || { });
       
       this._oConfig.width = parseInt(this._oElement.width, 10) || 0;
       this._oConfig.height = parseInt(this._oElement.height, 10) || 0;
@@ -319,15 +326,15 @@
       
       var _this = this;
       
-      this._onMouseDown = function (e){ _this.__onMouseDown(e); };
-      this._onMouseUp = function (e){ _this.__onMouseUp(e); };
-      this._onMouseMove = function (e){ _this.__onMouseMove(e); };
+      this._onMouseDown = function (e) { _this.__onMouseDown(e); };
+      this._onMouseUp = function (e) { _this.__onMouseUp(e); };
+      this._onMouseMove = function (e) { _this.__onMouseMove(e); };
       this._onResize = function (e) { _this.calcOffset() };
       
-      fabric.util.addListener(this._oElement, 'mousedown', this._onMouseDown);
-      fabric.util.addListener(document, 'mousemove', this._onMouseMove);
-      fabric.util.addListener(document, 'mouseup', this._onMouseUp);
-      fabric.util.addListener(window, 'resize', this._onResize);
+      addListener(this._oElement, 'mousedown', this._onMouseDown);
+      addListener(document, 'mousemove', this._onMouseMove);
+      addListener(document, 'mouseup', this._onMouseUp);
+      addListener(window, 'resize', this._onResize);
     },
     
     /**
@@ -476,7 +483,7 @@
             target = transform.target;
             
         if (target.__scaling) {
-          fabric.util.fireEvent('object:scaled', { target: target });
+          fireEvent('object:scaled', { target: target });
           target.__scaling = false;
         }
         
@@ -488,7 +495,7 @@
         // only fire :modified event if target coordinates were changed during mousedown-mouseup
         if (target.hasStateChanged()) {
           target.isMoving = false;
-          fabric.util.fireEvent('object:modified', { target: target });
+          fireEvent('object:modified', { target: target });
         }
       }
       
@@ -502,7 +509,7 @@
       if (activeGroup) {
         if (activeGroup.hasStateChanged() && 
             activeGroup.containsPoint(this.getPointer(e))) {
-          fabric.util.fireEvent('group:modified', { target: activeGroup });
+          fireEvent('group:modified', { target: activeGroup });
         }
         activeGroup.setObjectsCoords();
         activeGroup.set('isMoving', false);
@@ -609,15 +616,15 @@
     deactivateAllWithDispatch: function () {
       var activeGroup = this.getActiveGroup();
       if (activeGroup) {
-        fabric.util.fireEvent('before:group:destroyed', {
+        fireEvent('before:group:destroyed', {
           target: activeGroup
         });
       }
       this.deactivateAll();
       if (activeGroup) {
-        fabric.util.fireEvent('after:group:destroyed');
+        fireEvent('after:group:destroyed');
       }
-      fabric.util.fireEvent('selection:cleared');
+      fireEvent('selection:cleared');
       return this;
     },
     
@@ -681,7 +688,7 @@
         else {
           activeGroup.add(target);
         }
-        fabric.util.fireEvent('group:selected', { target: activeGroup });
+        fireEvent('group:selected', { target: activeGroup });
         activeGroup.setActive(true);
       }
       else {
@@ -948,7 +955,7 @@
       // do not create group for 1 element only
       if (group.length === 1) {
         this.setActiveObject(group[0]);
-        fabric.util.fireEvent('object:selected', {
+        fireEvent('object:selected', {
           target: group[0]
         });
       } 
@@ -956,7 +963,7 @@
         var group = new fabric.Group(group);
         this.setActiveGroup(group);
         group.saveCoords();
-        fabric.util.fireEvent('group:selected', { target: group });
+        fireEvent('group:selected', { target: group });
       }
       this.renderAll();
     },
@@ -1585,7 +1592,7 @@
               _this.loadImageFromURL(path, function (image) {
                 image.setSourcePath(path);
 
-                fabric.util.object.extend(image, obj);
+                extend(image, obj);
                 image.setAngle(obj.angle);
 
                 onObjectLoaded(image, index);
@@ -1623,7 +1630,7 @@
                 // copy parameters from serialied json to object (left, top, scaleX, scaleY, etc.)
                 // skip this step if an object is a PathGroup, since we already passed it options object before
                 if (!(object instanceof fabric.PathGroup)) {
-                  fabric.util.object.extend(object, obj);
+                  extend(object, obj);
                   if (typeof obj.angle !== 'undefined') {
                     object.setAngle(obj.angle);
                   }
@@ -1755,7 +1762,7 @@
      * @return {Object} removed object
      */
     remove: function (object) {
-      fabric.util.removeFromArray(this._aObjects, object);
+      removeFromArray(this._aObjects, object);
       this.renderAll();
       return object;
     },
@@ -1790,7 +1797,7 @@
      * @chainable
      */
     sendToBack: function (object) {
-      fabric.util.removeFromArray(this._aObjects, object);
+      removeFromArray(this._aObjects, object);
       this._aObjects.unshift(object);
       return this.renderAll();
     },
@@ -1803,7 +1810,7 @@
      * @chainable
      */
     bringToFront: function (object) {
-      fabric.util.removeFromArray(this._aObjects, object);
+      removeFromArray(this._aObjects, object);
       this._aObjects.push(object);
       return this.renderAll();
     },
@@ -1829,7 +1836,7 @@
             break;
           }
         }
-        fabric.util.removeFromArray(this._aObjects, object);
+        removeFromArray(this._aObjects, object);
         this._aObjects.splice(nextIntersectingIdx, 0, object);
       }
       return this.renderAll();
@@ -1858,7 +1865,7 @@
             break;
           }
         }
-        fabric.util.removeFromArray(objects, object);
+        removeFromArray(objects, object);
         objects.splice(nextIntersectingIdx, 0, object);
       }
       this.renderAll();
@@ -1880,7 +1887,7 @@
       
       this.renderAll();
       
-      fabric.util.fireEvent('object:selected', { target: object });
+      fireEvent('object:selected', { target: object });
       return this;
     },
     
@@ -1987,10 +1994,10 @@
      */
     dispose: function () {
       this.clear();
-      fabric.util.removeListener(this.getElement(), 'mousedown', this._onMouseDown);
-      fabric.util.removeListener(document, 'mouseup', this._onMouseUp);
-      fabric.util.removeListener(document, 'mousemove', this._onMouseMove);
-      fabric.util.removeListener(window, 'resize', this._onResize);
+      removeListener(this.getElement(), 'mousedown', this._onMouseDown);
+      removeListener(document, 'mouseup', this._onMouseUp);
+      removeListener(document, 'mousemove', this._onMouseMove);
+      removeListener(window, 'resize', this._onResize);
       return this;
     },
     
@@ -2059,7 +2066,7 @@
            '{ objects: ' + this.getObjects().length + ' }>';
   };
   
-  fabric.util.object.extend(fabric.Element, {
+  extend(fabric.Element, {
     
     /**
      * @property EMPTY_JSON

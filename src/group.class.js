@@ -2,7 +2,11 @@
 
 (function(){
   
-  var fabric = this.fabric || (this.fabric = { });
+  var fabric = this.fabric || (this.fabric = { }),
+      extend = fabric.util.object.extend,
+      min = fabric.util.array.min,
+      max = fabric.util.array.max;
+      
   if (fabric.Group) {
     return;
   }
@@ -29,7 +33,7 @@
       this._updateObjectsCoords();
       
       if (options) {
-        fabric.util.object.extend(this, options);
+        extend(this, options);
       }
       this._setOpacityIfSame();
       
@@ -165,7 +169,7 @@
      * @return {Object} object representation of an instance
      */
     toObject: function() {
-      return fabric.util.object.extend(this.callSuper('toObject'), {
+      return extend(this.callSuper('toObject'), {
         objects: fabric.util.array.invoke(this.objects, 'clone')
       });
     },
@@ -377,10 +381,10 @@
         }
       };
       
-      minX = fabric.util.array.min(aX);
-      maxX = fabric.util.array.max(aX);
-      minY = fabric.util.array.min(aY);
-      maxY = fabric.util.array.max(aY);
+      minX = min(aX);
+      maxX = max(aX);
+      minY = min(aY);
+      maxY = max(aY);
       
       width = maxX - minX;
       height = maxY - minY;

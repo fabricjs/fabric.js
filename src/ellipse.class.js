@@ -2,7 +2,8 @@
 
 (function(){
   
-  var fabric = this.fabric || (this.fabric = { });
+  var fabric = this.fabric || (this.fabric = { }),
+      extend = fabric.util.object.extend;
   
   if (fabric.Ellipse) {
     console.warn('fabric.Ellipse is already defined.');
@@ -37,7 +38,7 @@
      * @return {Object} object representation of an instance
      */
     toObject: function() {
-      return fabric.util.object.extend(this.callSuper('toObject'), {
+      return extend(this.callSuper('toObject'), {
         rx: this.get('rx'),
         ry: this.get('ry')
       })
@@ -93,7 +94,7 @@
    */
   fabric.Ellipse.fromElement = function(element, options) {
     var parsedAttributes = fabric.parseAttributes(element, fabric.Ellipse.ATTRIBUTE_NAMES);
-    return new fabric.Ellipse(fabric.util.object.extend(parsedAttributes, options));
+    return new fabric.Ellipse(extend(parsedAttributes, options));
   };
   
   /**

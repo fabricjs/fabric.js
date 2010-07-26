@@ -2,7 +2,10 @@
 
 (function(){
   
-  var fabric = this.fabric || (this.fabric = { });
+  var fabric = this.fabric || (this.fabric = { }),
+      extend = fabric.util.object.extend,
+      min = fabric.util.array.min,
+      max = fabric.util.array.max;
   
   if (fabric.Polygon) {
     console.warn('fabric.Polygon is already defined');
@@ -37,10 +40,10 @@
     _calcDimensions: function() {
       
       var points = this.points,
-          minX = fabric.util.array.min(points, 'x'),
-          minY = fabric.util.array.min(points, 'y'),
-          maxX = fabric.util.array.max(points, 'x'),
-          maxY = fabric.util.array.max(points, 'y');
+          minX = min(points, 'x'),
+          minY = min(points, 'y'),
+          maxX = max(points, 'x'),
+          maxY = max(points, 'y');
       
       this.width = maxX - minX;
       this.height = maxY - minY;
@@ -67,7 +70,7 @@
      * @return {Object} object representation of an instance
      */
     toObject: function() {
-      return fabric.util.object.extend(this.callSuper('toObject'), {
+      return extend(this.callSuper('toObject'), {
         points: this.points.concat()
       });
     },
@@ -120,7 +123,7 @@
     var points = fabric.parsePointsAttribute(element.getAttribute('points')),
         parsedAttributes = fabric.parseAttributes(element, fabric.Polygon.ATTRIBUTE_NAMES);
         
-    return new fabric.Polygon(points, fabric.util.object.extend(parsedAttributes, options));
+    return new fabric.Polygon(points, extend(parsedAttributes, options));
   };
   
   /**

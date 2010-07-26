@@ -2,7 +2,9 @@
 
 (function(){
   
-  var fabric = this.fabric || (this.fabric = { });
+  var fabric = this.fabric || (this.fabric = { }),
+      extend = fabric.util.object.extend;
+      
   if (fabric.Line) {
     return;
   }
@@ -70,7 +72,7 @@
      * @return {Object}
      */
     toObject: function() {
-      return fabric.util.object.extend(this.callSuper('toObject'), {
+      return extend(this.callSuper('toObject'), {
         x1: this.get('x1'),
         y1: this.get('y1'),
         x2: this.get('x2'),
@@ -97,7 +99,7 @@
       parsedAttributes.x2 || 0,
       parsedAttributes.y2 || 0
     ];
-    return new fabric.Line(points, fabric.util.object.extend(parsedAttributes, options));
+    return new fabric.Line(points, extend(parsedAttributes, options));
   };
   
   /**

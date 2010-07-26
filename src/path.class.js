@@ -2,7 +2,10 @@
 
 (function(){
   
-  var fabric = this.fabric || (this.fabric = { });
+  var fabric = this.fabric || (this.fabric = { }),
+      min = fabric.util.array.min,
+      max = fabric.util.array.max,
+      extend = fabric.util.object.extend;
   
   if (fabric.Path) {
     console.warn('fabric.Path is already defined');
@@ -63,7 +66,7 @@
       this.path = this._parsePath();
       
       if (!isWidthSet || !isHeightSet) {
-        fabric.util.object.extend(this, this._parseDimensions());
+        extend(this, this._parseDimensions());
         if (isWidthSet) {
           this.width = this.options.width;
         }
@@ -314,7 +317,7 @@
      * @return {Object}
      */
     toObject: function() {
-      var o = fabric.util.object.extend(this.callSuper('toObject'), {
+      var o = extend(this.callSuper('toObject'), {
         path: this.path
       });
       if (this.sourcePath) {
@@ -421,15 +424,15 @@
         
       }, this);
       
-      var minX = fabric.util.array.min(aX), 
-          minY = fabric.util.array.min(aY), 
+      var minX = min(aX), 
+          minY = min(aY), 
           deltaX = deltaY = 0;
       
       var o = {
         top: minY - deltaY,
         left: minX - deltaX,
-        bottom: fabric.util.array.max(aY) - deltaY,
-        right: fabric.util.array.max(aX) - deltaX
+        bottom: max(aY) - deltaY,
+        right: max(aX) - deltaX
       };
       
       o.width = o.right - o.left;
@@ -462,6 +465,6 @@
     var parsedAttributes = fabric.parseAttributes(element, ATTRIBUTE_NAMES),
         path = parsedAttributes.d;
     delete parsedAttributes.d;
-    return new fabric.Path(path, fabric.util.object.extend(parsedAttributes, options));
+    return new fabric.Path(path, extend(parsedAttributes, options));
   }
 })();

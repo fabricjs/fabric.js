@@ -6,7 +6,12 @@
    * @name Canvas
    * @namespace
    */
-      fabric = global.fabric || (global.fabric = { });
+      fabric = global.fabric || (global.fabric = { }),
+      extend = fabric.util.object.extend,
+      clone = fabric.util.object.clone,
+      toFixed = fabric.util.toFixed,
+      capitalize = fabric.util.string.capitalize,
+      getPointer = fabric.util.getPointer;
       
   if (fabric.Object) {
     return;
@@ -107,7 +112,7 @@
     
     setOptions: function(options) {
       // this.constructor.superclass.prototype.options -> this.options -> options
-      this.options = fabric.util.object.extend(this._getOptions(), options);
+      this.options = extend(this._getOptions(), options);
     },
     
     /**
@@ -115,7 +120,7 @@
      * @method _getOptions
      */
     _getOptions: function() {
-      return fabric.util.object.extend(fabric.util.object.clone(this._getSuperOptions()), this.options);
+      return extend(clone(this._getSuperOptions()), this.options);
     },
     
     /**
@@ -177,7 +182,6 @@
      * @return {Object}
      */
     toObject: function() {
-      var toFixed = fabric.util.toFixed;
       var object = {
         type: this.type,
         left: toFixed(this.left, this.NUM_FRACTION_DIGITS),
@@ -248,7 +252,7 @@
      * @return {String}
      */
     toString: function() {
-      return "#<fabric." + fabric.util.string.capitalize(this.type) + ">";
+      return "#<fabric." + capitalize(this.type) + ">";
     },
     
     /**
@@ -799,7 +803,7 @@
      * @return {String|Boolean} corner code (tl, tr, bl, br, etc.), or false if nothing is found
      */
     _findTargetCorner: function(e, offset) {
-      var pointer = fabric.util.getPointer(e),
+      var pointer = getPointer(e),
           ex = pointer.x - offset.left,
           ey = pointer.y - offset.top,
           xpoints,

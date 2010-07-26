@@ -2,7 +2,9 @@
 
 (function(){
   
-  var fabric = this.fabric || (this.fabric = { });
+  var fabric = this.fabric || (this.fabric = { }),
+      extend = fabric.util.object.extend,
+      clone = fabric.util.object.clone;
 
   if (fabric.Text) {    
     console.warn('fabric.Text is already defined');
@@ -31,7 +33,7 @@
       this.initStateProperties();
       this.text = text;
       this.setOptions(options);
-      fabric.util.object.extend(this, this.options);
+      extend(this, this.options);
       this.theta = this.angle * (Math.PI/180);
       this.width = this.getWidth();
       this.setCoords();
@@ -110,7 +112,7 @@
   	 * @return {Object} object representation of an instance
   	 */
   	toObject: function() {
-  	  return fabric.util.object.extend(this.callSuper('toObject'), {
+  	  return extend(this.callSuper('toObject'), {
   	    text:         this.text,
   	    fontsize:     this.fontsize,
   	    fontweight:   this.fontweight,
@@ -177,7 +179,7 @@
    * @return {fabric.Text} an instance
    */
 	fabric.Text.fromObject = function(object) {
-	  return new fabric.Text(object.text, fabric.util.object.clone(object));
+	  return new fabric.Text(object.text, clone(object));
 	};
 	
 	/**

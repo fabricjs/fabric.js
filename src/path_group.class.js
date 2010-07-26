@@ -2,7 +2,9 @@
 
 (function(){
   
-  var fabric = this.fabric || (this.fabric = { });
+  var fabric = this.fabric || (this.fabric = { }),
+      extend = fabric.util.object.extend,
+      invoke = fabric.util.array.invoke;
   
   if (fabric.PathGroup) {
     console.warn('fabric.PathGroup is already defined');
@@ -105,8 +107,8 @@
      */
     toObject: function() {
       var _super = fabric.Object.prototype.toObject;
-      return fabric.util.object.extend(_super.call(this), {
-        paths: fabric.util.array.invoke(this.getObjects(), 'clone'),
+      return extend(_super.call(this), {
+        paths: invoke(this.getObjects(), 'clone'),
         sourcePath: this.sourcePath
       });
     },
