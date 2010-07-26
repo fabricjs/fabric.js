@@ -1,14 +1,12 @@
 /**
- * Event.simulate(@element, eventName[, options]) -> Element
+ * simulateEvent(@element, eventName[, options]) -> Element
  * 
  * - @element: element to fire event on
  * - eventName: name of event to fire (only MouseEvents and HTMLEvents interfaces are supported)
  * - options: optional object to fine-tune event properties - pointerX, pointerY, ctrlKey, etc.
  *
- *    $('foo').simulate('click'); // => fires "click" event on an element with id=foo
- *
  **/
-(function() {
+(function(global) {
   function extendObject(destination, source) {
     for (var prop in source) {
       destination[prop] = source[prop];
@@ -19,7 +17,7 @@
     'HTMLEvents': /^(?:load|unload|abort|error|select|change|submit|reset|focus|blur|resize|scroll)$/,
     'MouseEvents': /^(?:click|mouse(?:down|up|over|move|out))$/,
     'KeyboardEvent': /^(?:key(?:up|down|press))$/
-  }
+  };
   var defaultOptions = {
     pointerX: 0,
     pointerY: 0,
@@ -30,9 +28,9 @@
     metaKey: false,
     bubbles: true,
     cancelable: true
-  }
+  };
   
-  Event.simulate = function(element, eventName) {
+  global.simulateEvent = function(element, eventName) {
     
     var options = extendObject(extendObject({ }, defaultOptions), arguments[2] || { }),
         oEvent, 
@@ -90,4 +88,4 @@
     }
     return element;
   }
-})()
+})(this);

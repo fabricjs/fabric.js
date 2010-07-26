@@ -163,7 +163,7 @@
       equals(pointer.x, 101, 'pointer.x should be correct');
       equals(pointer.y, 102, 'pointer.y should be correct');
     });
-    Event.simulate(canvasEl, 'click', {
+    simulateEvent(canvasEl, 'click', {
       pointerX: 101, pointerY: 102
     });
   });
@@ -582,9 +582,9 @@
   
   test('dispose', function() {
     function invokeEventsOnCanvas() {
-      Event.simulate(canvas.getElement(), 'mousedown');
-      Event.simulate(canvas.getElement(), 'mouseup');
-      Event.simulate(canvas.getElement(), 'mousemove');
+      simulateEvent(canvas.getElement(), 'mousedown');
+      simulateEvent(canvas.getElement(), 'mouseup');
+      simulateEvent(canvas.getElement(), 'mousemove');
     }
     var assertInvocationsCount = function() {
       var message = 'event handler should not be invoked after `dispose`';

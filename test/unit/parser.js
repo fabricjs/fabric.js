@@ -200,6 +200,7 @@
     // element.setAttribute('transform', 'scale(2 13) translate(5,15) skewX(11.22)');
     // var parsedValue = fabric.parseTransformAttribute(element.getAttribute('transform'));
     // same([2,0,11.22,13,5,15], parsedValue);
+    
   });
   
   asyncTest('parseSVGDocument', function() {
@@ -217,13 +218,14 @@
     });
     
     setTimeout(function() {
-      ok(typeof data.length == 'number');
-      var path = data[0];
-      
-      ok(path instanceof fabric.Path);
-      equals(EXPECTED_PATH_JSON, path.toJSON());
+      ok(typeof data != 'undefined' && typeof data.length == 'number');
+      if (data) {
+        var path = data[0];
+
+        ok(path instanceof fabric.Path);
+        equals(EXPECTED_PATH_JSON, path.toJSON());
+      }
       start();
-      
     }, 1500);
   });
   
