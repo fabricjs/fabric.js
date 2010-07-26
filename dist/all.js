@@ -6388,12 +6388,7 @@ fabric.util.animate = animate;
       }
       ctx.beginPath();
 
-      if (this.stub) {
-        this.stub._render(ctx);
-      }
-      else {
-        this._render(ctx);
-      }
+      this._render(ctx);
 
       if (this.fill) {
         ctx.fill();
@@ -6455,9 +6450,6 @@ fabric.util.animate = animate;
     },
 
     set: function(prop, value) {
-      if (this.stub) {
-        this.stub.set(prop, value)
-      }
       return this.callSuper('set', prop, value);
     },
 

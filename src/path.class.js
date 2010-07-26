@@ -282,13 +282,7 @@
       }
       ctx.beginPath();
       
-      // stubbb !!!
-      if (this.stub) {
-        this.stub._render(ctx);
-      }
-      else {
-        this._render(ctx);
-      }
+      this._render(ctx);
       
       if (this.fill) {
         ctx.fill();
@@ -350,9 +344,6 @@
     },
     
     set: function(prop, value) {
-      if (this.stub) {
-        this.stub.set(prop, value)
-      }
       return this.callSuper('set', prop, value);
     },
     
