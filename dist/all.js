@@ -3309,24 +3309,27 @@ fabric.util.animate = animate;
      * @chainable
      */
     fxCenterObjectH: function (object) {
-      var _this = this,
-          fx = new APE.anim.Animation(),
-          startValue = object.get('left'),
-          endValue = _this.getCenter().left,
-          step = endValue - startValue;
+      callbacks = callbacks || { };
 
-      fx.run = function (percent) {
-        object.set('left', startValue + step * percent);
-        _this.renderAll();
-      };
+      var empty = function() { },
+          onComplete = callbacks.onComplete || empty,
+          onChange = callbacks.onChange || empty,
+          _this = this;
 
-      fx.onend = function () {
-        object.setCoords();
-      };
-
-      fx.duration = FX_DURATION;
-      fx.transition = APE.anim.Transitions[FX_TRANSITION];
-      fx.start();
+      fabric.util.animate({
+        startValue: object.get('left'),
+        endValue: this.getCenter().left,
+        duration: this.FX_DURATION,
+        onChange: function(value) {
+          object.set('left', value);
+          _this.renderAll();
+          onChange();
+        },
+        onComplete: function() {
+          object.setCoords();
+          onComplete();
+        }
+      });
 
       return this;
     },
@@ -3352,25 +3355,29 @@ fabric.util.animate = animate;
      * @chainable
      */
     fxCenterObjectV: function (object) {
-      var _this = this,
-          fx = new APE.anim.Animation(),
-          startValue = object.get('top'),
-          endValue = _this.getCenter().top,
-          step = endValue - startValue;
+      callbacks = callbacks || { };
 
-      fx.run = function (percent) {
-        object.set('top', startValue + step * percent).setCoords();
-        _this.renderAll();
-      };
+      var empty = function() { },
+          onComplete = callbacks.onComplete || empty,
+          onChange = callbacks.onChange || empty,
+          _this = this;
 
-      fx.onend = function () {
-        object.setCoords();
-      };
+      fabric.util.animate({
+        startValue: object.get('top'),
+        endValue: this.getCenter().top,
+        duration: this.FX_DURATION,
+        onChange: function(value) {
+          object.set('top', value);
+          _this.renderAll();
+          onChange();
+        },
+        onComplete: function() {
+          object.setCoords();
+          onComplete();
+        }
+      });
 
-      fx.duration = FX_DURATION;
-      fx.transition = APE.anim.Transitions[FX_TRANSITION];
-
-      fx.start();
+      return this;
     },
 
     /**
@@ -6584,7 +6591,11 @@ fabric.util.animate = animate;
 
   var fabric = this.fabric || (this.fabric = { }),
       extend = fabric.util.object.extend,
-      invoke = fabric.util.array.invoke;
+      invoke = fabric.util.array.invoke,
+      parentSet = fabric.Object.prototype.set,
+      parentToObject = fabric.Object.prototype.toObject,
+      camelize = fabric.util.string.camelize,
+      capitalize = fabric.util.string.capitalize;
 
   if (fabric.PathGroup) {
     console.warn('fabric.PathGroup is already defined');
@@ -6674,7 +6685,7 @@ fabric.util.animate = animate;
         }
       }
       else {
-        fabric.Object.prototype.set.call(this, prop, value);
+        parentSet.call(this, prop, value);
       }
       return this;
     },
@@ -6684,8 +6695,7 @@ fabric.util.animate = animate;
      * @return {Object} object representation of an instance
      */
     toObject: function() {
-      var _super = fabric.Object.prototype.toObject;
-      return extend(_super.call(this), {
+      return extend(toObject.call(this), {
         paths: invoke(this.getObjects(), 'clone'),
         sourcePath: this.sourcePath
       });
@@ -6764,8 +6774,8 @@ fabric.util.animate = animate;
   function instantiatePaths(paths) {
     for (var i = 0, len = paths.length; i < len; i++) {
       if (!(paths[i] instanceof fabric.Object)) {
-        var klassName = paths[i].type.camelize().capitalize();
-        paths[i] = Canvas[klassName].fromObject(paths[i]);
+        var klassName = capitalize(camelize(paths[i].type));
+        paths[i] = fabric[klassName].fromObject(paths[i]);
       }
     }
     return paths;
