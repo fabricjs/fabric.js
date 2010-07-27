@@ -110,7 +110,7 @@
      * @return {Object} object representation of an instance
      */
     toObject: function() {
-      return extend(toObject.call(this), {
+      return extend(parentToObject.call(this), {
         paths: invoke(this.getObjects(), 'clone'),
         sourcePath: this.sourcePath
       });

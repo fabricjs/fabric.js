@@ -422,6 +422,77 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
 
   fabric.util = { };
 
+(function() {
+
+  /**
+   * Removes value from an array.
+   * Presence of value (and its position in an array) is determined via `Array.prototype.indexOf`
+   * @static
+   * @method removeFromArray
+   * @param {Array} array
+   * @param {Any} value
+   * @return {Array} original array
+   */
+  function removeFromArray(array, value) {
+    var idx = array.indexOf(value);
+    if (idx !== -1) {
+      array.splice(idx, 1);
+    }
+    return array;
+  };
+
+  /**
+   * @static
+   * @method getRandomInt
+   * @param {Number} min lower limit
+   * @param {Number} max upper limit
+   * @return {Number} random value (between min and max)
+   */
+  function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  /**
+   * Transforms degrees to radians
+   * @static
+   * @method degreesToRadians
+   * @param {Number} degrees value in degrees
+   * @return {Number} value in radians
+   */
+  var PiBy180 = Math.PI / 180;
+  function degreesToRadians(degrees) {
+    return degrees * PiBy180;
+  }
+
+  /**
+   * A wrapper around Number#toFixed, which contrary to native method returns number, not string
+   * @static
+   * @method toFixed
+   * @param {Number | String} number number to operate on
+   * @param {Number} fractionDigits number of fraction digits to "leave"
+   * @return {Number}
+   */
+   function toFixed(number, fractionDigits) {
+     return parseFloat(Number(number).toFixed(fractionDigits));
+   }
+
+   /**
+    * Function which always returns `false`
+    * @static
+    * @method falseFunction
+    * @return {Boolean}
+    */
+   function falseFunction() {
+     return false;
+   }
+
+   fabric.util.removeFromArray = removeFromArray;
+   fabric.util.degreesToRadians = degreesToRadians;
+   fabric.util.toFixed = toFixed;
+   fabric.util.getRandomInt = getRandomInt;
+   fabric.util.falseFunction = falseFunction;
+})();
+
 if (!Array.prototype.indexOf) {
   Array.prototype.indexOf = function(value, from) {
     var len = this.length >>> 0;
@@ -991,8 +1062,6 @@ function getElementOffset(element) {
   return ({ left: valueL, top: valueT });
 }
 
-function falseFunction() { return false; };
-
 (function () {
   var style = document.documentElement.style;
 
@@ -1008,7 +1077,7 @@ function falseFunction() { return false; };
 
   function makeElementUnselectable(element) {
     if (typeof element.onselectstart !== 'undefined') {
-      element.onselectstart = falseFunction;
+      element.onselectstart = fabric.util.falseFunction;
     }
     if (selectProp) {
       element.style[selectProp] = 'none';
@@ -1019,7 +1088,7 @@ function falseFunction() { return false; };
     return element;
   }
 
-  fabric.util.makeElementUnselectable = makeElementUnselectable
+  fabric.util.makeElementUnselectable = makeElementUnselectable;
 })();
 
 (function(){
@@ -1152,63 +1221,6 @@ fabric.util.animate = animate;
   };
 
   fabric.util.request = request;
-})();
-
-(function(){
-
-  /**
-   * @static
-   * Removes value from an array.
-   * Presence of value (and its position in an array) is determined via `Array.prototype.indexOf`
-   * @param {Array} array
-   * @param {Any} value
-   * @return {Array} original array
-   */
-  function removeFromArray(array, value) {
-    var idx = array.indexOf(value);
-    if (idx !== -1) {
-      array.splice(idx, 1);
-    }
-    return array;
-  };
-
-  /**
-   * @static
-   * @method getRandomInt
-   * @param {Number} min lower limit
-   * @param {Number} max upper limit
-   * @return {Number} random value (between min and max)
-   */
-  function getRandomInt(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
-
-  /**
-   * @static
-   * Transforms degrees to radians
-   * @param {Number} degrees value in degrees
-   * @return {Number} value in radians
-   */
-  var PiBy180 = Math.PI / 180;
-  function degreesToRadians(degrees) {
-    return degrees * PiBy180;
-  }
-
-  /**
-   * A wrapper around Number#toFixed,
-   * which contrary to native method returns number, not string
-   * @param {Number | String} number number to operate on
-   * @param {Number} fractionDigits number of fraction digits to "leave"
-   * @return {Number}
-   */
-   function toFixed(number, fractionDigits) {
-     return parseFloat(Number(number).toFixed(fractionDigits));
-   }
-
-   fabric.util.removeFromArray = removeFromArray;
-   fabric.util.degreesToRadians = degreesToRadians;
-   fabric.util.toFixed = toFixed;
-   fabric.util.getRandomInt = getRandomInt;
 })();
 
 })(this);
@@ -3543,7 +3555,7 @@ fabric.util.animate = animate;
       }
 
       var serialized = (typeof json === 'string')
-        ? json.evalJSON()
+        ? JSON.parse(json)
         : json;
 
       if (!serialized || (serialized && !serialized.objects)) return;
@@ -3579,12 +3591,12 @@ fabric.util.animate = animate;
             switch (obj.type) {
               case 'image':
               case 'text':
-                Canvas[capitalize(obj.type)].fromObject(obj, function (o) {
+                fabric[capitalize(obj.type)].fromObject(obj, function (o) {
                   onObjectLoaded(o, index);
                 });
                 break;
               default:
-                var klass = Canvas[camelize(capitalize(obj.type))];
+                var klass = fabric[camelize(capitalize(obj.type))];
                 if (klass && klass.fromObject) {
                   onObjectLoaded(klass.fromObject(obj), index);
                 }
@@ -3606,9 +3618,8 @@ fabric.util.animate = animate;
 
               obj.path = path;
               var object = fabric.Text.fromObject(obj);
-              window.__context = _this;
               var onscriptload = function () {
-                if (Prototype.Browser.Opera) {
+                if (Object.prototype.toString.call(window.opera) === '[object Opera]') {
                   setTimeout(function () {
                     onObjectLoaded(object, index);
                   }, 500);
@@ -4028,13 +4039,10 @@ fabric.util.animate = animate;
     _resizeImageToFit: function (imgEl) {
 
       var imageWidth = imgEl.width || imgEl.offsetWidth,
-          imageHeight = imgEl.height || imgEl.offsetHeight,
-          widthScaleFactor = this.getWidth() / imageWidth,
-          heightScaleFactor = this.getHeight() / imageHeight;
+          widthScaleFactor = this.getWidth() / imageWidth;
 
-      if (imageWidth && imageHeight) {
+      if (imageWidth) {
         imgEl.width = imageWidth * widthScaleFactor;
-        imgEl.height = imageHeight * heightScaleFactor;
       }
     },
 
@@ -6695,7 +6703,7 @@ fabric.util.animate = animate;
      * @return {Object} object representation of an instance
      */
     toObject: function() {
-      return extend(toObject.call(this), {
+      return extend(parentToObject.call(this), {
         paths: invoke(this.getObjects(), 'clone'),
         sourcePath: this.sourcePath
       });
@@ -7505,7 +7513,7 @@ fabric.util.animate = animate;
       return {
         width: normalizedWidth,
         height: normalizedHeight
-      }
+      };
     },
 
     /**

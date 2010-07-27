@@ -1546,7 +1546,7 @@
 
       // serialize if it wasn't already
       var serialized = (typeof json === 'string')
-        ? json.evalJSON()
+        ? JSON.parse(json)
         : json;
       
       if (!serialized || (serialized && !serialized.objects)) return;
@@ -1582,12 +1582,12 @@
             switch (obj.type) {
               case 'image':
               case 'text':
-                Canvas[capitalize(obj.type)].fromObject(obj, function (o) {
+                fabric[capitalize(obj.type)].fromObject(obj, function (o) {
                   onObjectLoaded(o, index);
                 });
                 break;
               default:
-                var klass = Canvas[camelize(capitalize(obj.type))];
+                var klass = fabric[camelize(capitalize(obj.type))];
                 if (klass && klass.fromObject) {
                   onObjectLoaded(klass.fromObject(obj), index);
                 }
@@ -1609,10 +1609,9 @@
               
               obj.path = path;
               var object = fabric.Text.fromObject(obj);
-              window.__context = _this;
               var onscriptload = function () {
                 // TODO (kangax): find out why Opera refuses to work without this timeout
-                if (Prototype.Browser.Opera) {
+                if (Object.prototype.toString.call(window.opera) === '[object Opera]') {
                   setTimeout(function () {
                     onObjectLoaded(object, index);
                   }, 500);
@@ -2043,14 +2042,11 @@
     _resizeImageToFit: function (imgEl) {
       
       var imageWidth = imgEl.width || imgEl.offsetWidth,
-          imageHeight = imgEl.height || imgEl.offsetHeight,
-          widthScaleFactor = this.getWidth() / imageWidth,
-          heightScaleFactor = this.getHeight() / imageHeight;
+          widthScaleFactor = this.getWidth() / imageWidth;
       
       // scale image down so that it has original dimensions when printed in large resolution
-      if (imageWidth && imageHeight) {
+      if (imageWidth) {
         imgEl.width = imageWidth * widthScaleFactor;
-        imgEl.height = imageHeight * heightScaleFactor;
       }
     },
     

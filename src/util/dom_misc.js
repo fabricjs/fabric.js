@@ -55,8 +55,6 @@ function getElementOffset(element) {
   return ({ left: valueL, top: valueT });
 }
 
-function falseFunction() { return false; };
-
 (function () {
   var style = document.documentElement.style;
 
@@ -72,7 +70,7 @@ function falseFunction() { return false; };
 
   function makeElementUnselectable(element) {
     if (typeof element.onselectstart !== 'undefined') {
-      element.onselectstart = falseFunction;
+      element.onselectstart = fabric.util.falseFunction;
     }
     if (selectProp) {
       element.style[selectProp] = 'none';
@@ -84,7 +82,7 @@ function falseFunction() { return false; };
     return element;
   }
   
-  fabric.util.makeElementUnselectable = makeElementUnselectable
+  fabric.util.makeElementUnselectable = makeElementUnselectable;
 })();
 
 (function(){

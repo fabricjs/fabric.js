@@ -1,9 +1,10 @@
-(function(){
+(function() {
   
   /**
-   * @static
    * Removes value from an array. 
    * Presence of value (and its position in an array) is determined via `Array.prototype.indexOf`
+   * @static
+   * @method removeFromArray
    * @param {Array} array
    * @param {Any} value
    * @return {Array} original array
@@ -28,8 +29,9 @@
   }
   
   /**
-   * @static
    * Transforms degrees to radians
+   * @static
+   * @method degreesToRadians
    * @param {Number} degrees value in degrees
    * @return {Number} value in radians
    */
@@ -39,8 +41,9 @@
   }
   
   /**
-   * A wrapper around Number#toFixed, 
-   * which contrary to native method returns number, not string
+   * A wrapper around Number#toFixed, which contrary to native method returns number, not string
+   * @static
+   * @method toFixed
    * @param {Number | String} number number to operate on
    * @param {Number} fractionDigits number of fraction digits to "leave"
    * @return {Number}
@@ -48,9 +51,20 @@
    function toFixed(number, fractionDigits) {
      return parseFloat(Number(number).toFixed(fractionDigits));
    }
+   
+   /**
+    * Function which always returns `false`
+    * @static
+    * @method falseFunction
+    * @return {Boolean}
+    */
+   function falseFunction() {
+     return false;
+   }
   
    fabric.util.removeFromArray = removeFromArray;
    fabric.util.degreesToRadians = degreesToRadians;
    fabric.util.toFixed = toFixed;
    fabric.util.getRandomInt = getRandomInt;
+   fabric.util.falseFunction = falseFunction;
 })();

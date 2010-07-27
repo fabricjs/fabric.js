@@ -93,7 +93,7 @@
       return { 
         width: normalizedWidth, 
         height: normalizedHeight 
-      }
+      };
     },
     
     /**

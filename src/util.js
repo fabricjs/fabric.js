@@ -5,6 +5,8 @@
       
   fabric.util = { };
   
+  //= require "util/misc"
+  
   //= require "util/lang_array"
   //= require "util/lang_object"
   //= require "util/lang_string"
@@ -17,7 +19,5 @@
   //= require "util/dom_misc"
   
   //= require "util/dom_request"
-  
-  //= require "util/misc"
   
 })(this);

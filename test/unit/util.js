@@ -56,7 +56,7 @@
     same(fabric.util.degreesToRadians(), NaN);
   });
   
-  test('getRandomInt', function(){
+  test('getRandomInt', function() {
     ok(typeof fabric.util.getRandomInt == 'function');
     
     var randomInts = [];
@@ -71,6 +71,11 @@
     });
     
     ok(!areAllTheSame);
+  });
+  
+  test('falseFunction', function() {
+    ok(typeof fabric.util.falseFunction == 'function');
+    equals(fabric.util.falseFunction(), false);
   });
   
 })();
