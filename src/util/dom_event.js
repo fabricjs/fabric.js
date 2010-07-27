@@ -143,7 +143,6 @@
   fabric.util.addListener = addListener;
   fabric.util.removeListener = removeListener;
   
-  
   var customEventListeners = { };
   
   function observeEvent(eventName, handler) {
@@ -154,16 +153,11 @@
   }
   
   function fireEvent(eventName, memo) {
-    if (!customEventListeners[eventName]) return;
-    for (var i = 0, len = customEventListeners[eventName].length; i < len; i++) {
-      try {
-        customEventListeners[eventName][i]({ memo: memo });
-      }
-      catch(err) {
-        setTimeout(function () {
-          throw err;
-        }, 0);
-      }
+    var listenersForEvent = customEventListeners[eventName];
+    if (!listenersForEvent) return;
+    for (var i = 0, len = listenersForEvent.length; i < len; i++) {
+      // avoiding try/catch for perf. reasons
+      listenersForEvent[i]({ memo: memo });
     }
   }
   

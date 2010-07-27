@@ -11,13 +11,12 @@
       clone = fabric.util.object.clone,
       toFixed = fabric.util.toFixed,
       capitalize = fabric.util.string.capitalize,
-      getPointer = fabric.util.getPointer;
+      getPointer = fabric.util.getPointer,
+      slice = Array.prototype.slice
       
   if (fabric.Object) {
     return;
   }
-  
-  var _slice = Array.prototype.slice;
   
   /** 
    * @class Object
@@ -89,7 +88,7 @@
     callSuper: function(methodName) {
       var fn = this.constructor.superclass.prototype[methodName];
       return (arguments.length > 1) 
-        ? fn.apply(this, _slice.call(arguments, 1))
+        ? fn.apply(this, slice.call(arguments, 1))
         : fn.call(this);
     },
     

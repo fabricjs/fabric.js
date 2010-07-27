@@ -17,8 +17,8 @@
       getPointer = fabric.util.getPointer,
       getElementOffset = fabric.util.getElementOffset,
       removeFromArray = fabric.util.removeFromArray,
-      addListener = fabric.util.addlistener,
-      removeListener = fabric.util.removelistener,
+      addListener = fabric.util.addListener,
+      removeListener = fabric.util.removeListener,
       
       CANVAS_INIT_ERROR = new Error('Could not initialize `canvas` element'),
       FX_DURATION = 500,
@@ -1309,25 +1309,28 @@
      * @chainable
      */
     fxCenterObjectH: function (object) {
-      var _this = this,
-          fx = new APE.anim.Animation(),
-          startValue = object.get('left'),
-          endValue = _this.getCenter().left,
-          step = endValue - startValue;
+      callbacks = callbacks || { };
 
-      fx.run = function (percent) {
-        object.set('left', startValue + step * percent);
-        _this.renderAll();
-      };
-      
-      fx.onend = function () {
-        object.setCoords();
-      };
+      var empty = function() { },
+          onComplete = callbacks.onComplete || empty,
+          onChange = callbacks.onChange || empty,
+          _this = this;
 
-      fx.duration = FX_DURATION;
-      fx.transition = APE.anim.Transitions[FX_TRANSITION];
-      fx.start();
-      
+      fabric.util.animate({
+        startValue: object.get('left'),
+        endValue: this.getCenter().left,
+        duration: this.FX_DURATION,
+        onChange: function(value) {
+          object.set('left', value);
+          _this.renderAll();
+          onChange();
+        },
+        onComplete: function() {
+          object.setCoords();
+          onComplete();
+        }
+      });
+
       return this;
     },
     
@@ -1352,25 +1355,29 @@
      * @chainable
      */
     fxCenterObjectV: function (object) {
-      var _this = this,
-          fx = new APE.anim.Animation(),
-          startValue = object.get('top'),
-          endValue = _this.getCenter().top,
-          step = endValue - startValue;
+      callbacks = callbacks || { };
 
-      fx.run = function (percent) {
-        object.set('top', startValue + step * percent).setCoords();
-        _this.renderAll();
-      };
-      
-      fx.onend = function () {
-        object.setCoords();
-      };
+      var empty = function() { },
+          onComplete = callbacks.onComplete || empty,
+          onChange = callbacks.onChange || empty,
+          _this = this;
 
-      fx.duration = FX_DURATION;
-      fx.transition = APE.anim.Transitions[FX_TRANSITION];
+      fabric.util.animate({
+        startValue: object.get('top'),
+        endValue: this.getCenter().top,
+        duration: this.FX_DURATION,
+        onChange: function(value) {
+          object.set('top', value);
+          _this.renderAll();
+          onChange();
+        },
+        onComplete: function() {
+          object.setCoords();
+          onComplete();
+        }
+      });
 
-      fx.start();
+      return this;
     },
     
     /**

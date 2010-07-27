@@ -4,7 +4,11 @@
   
   var fabric = this.fabric || (this.fabric = { }),
       extend = fabric.util.object.extend,
-      invoke = fabric.util.array.invoke;
+      invoke = fabric.util.array.invoke,
+      parentSet = fabric.Object.prototype.set,
+      parentToObject = fabric.Object.prototype.toObject,
+      camelize = fabric.util.string.camelize,
+      capitalize = fabric.util.string.capitalize;
   
   if (fabric.PathGroup) {
     console.warn('fabric.PathGroup is already defined');
@@ -96,7 +100,7 @@
       }
       else {
         // skipping parent "class" - fabric.Path
-        fabric.Object.prototype.set.call(this, prop, value);
+        parentSet.call(this, prop, value);
       }
       return this;
     },
@@ -106,8 +110,7 @@
      * @return {Object} object representation of an instance
      */
     toObject: function() {
-      var _super = fabric.Object.prototype.toObject;
-      return extend(_super.call(this), {
+      return extend(toObject.call(this), {
         paths: invoke(this.getObjects(), 'clone'),
         sourcePath: this.sourcePath
       });
@@ -186,8 +189,8 @@
   function instantiatePaths(paths) {
     for (var i = 0, len = paths.length; i < len; i++) {
       if (!(paths[i] instanceof fabric.Object)) {
-        var klassName = paths[i].type.camelize().capitalize();
-        paths[i] = Canvas[klassName].fromObject(paths[i]);
+        var klassName = capitalize(camelize(paths[i].type));
+        paths[i] = fabric[klassName].fromObject(paths[i]);
       }
     }
     return paths;

@@ -833,7 +833,6 @@ if (!Function.prototype.bind) {
   fabric.util.addListener = addListener;
   fabric.util.removeListener = removeListener;
 
-
   var customEventListeners = { };
 
   function observeEvent(eventName, handler) {
@@ -844,16 +843,10 @@ if (!Function.prototype.bind) {
   }
 
   function fireEvent(eventName, memo) {
-    if (!customEventListeners[eventName]) return;
-    for (var i = 0, len = customEventListeners[eventName].length; i < len; i++) {
-      try {
-        customEventListeners[eventName][i]({ memo: memo });
-      }
-      catch(err) {
-        setTimeout(function () {
-          throw err;
-        }, 0);
-      }
+    var listenersForEvent = customEventListeners[eventName];
+    if (!listenersForEvent) return;
+    for (var i = 0, len = listenersForEvent.length; i < len; i++) {
+      listenersForEvent[i]({ memo: memo });
     }
   }
 
@@ -2081,8 +2074,8 @@ fabric.util.animate = animate;
       getPointer = fabric.util.getPointer,
       getElementOffset = fabric.util.getElementOffset,
       removeFromArray = fabric.util.removeFromArray,
-      addListener = fabric.util.addlistener,
-      removeListener = fabric.util.removelistener,
+      addListener = fabric.util.addListener,
+      removeListener = fabric.util.removeListener,
 
       CANVAS_INIT_ERROR = new Error('Could not initialize `canvas` element'),
       FX_DURATION = 500,
@@ -4139,13 +4132,12 @@ fabric.util.animate = animate;
       clone = fabric.util.object.clone,
       toFixed = fabric.util.toFixed,
       capitalize = fabric.util.string.capitalize,
-      getPointer = fabric.util.getPointer;
+      getPointer = fabric.util.getPointer,
+      slice = Array.prototype.slice
 
   if (fabric.Object) {
     return;
   }
-
-  var _slice = Array.prototype.slice;
 
   /**
    * @class Object
@@ -4216,7 +4208,7 @@ fabric.util.animate = animate;
     callSuper: function(methodName) {
       var fn = this.constructor.superclass.prototype[methodName];
       return (arguments.length > 1)
-        ? fn.apply(this, _slice.call(arguments, 1))
+        ? fn.apply(this, slice.call(arguments, 1))
         : fn.call(this);
     },
 
