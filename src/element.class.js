@@ -1308,7 +1308,7 @@
      * @return {fabric.Element} thisArg
      * @chainable
      */
-    fxCenterObjectH: function (object) {
+    fxCenterObjectH: function (object, callbacks) {
       callbacks = callbacks || { };
 
       var empty = function() { },
@@ -1354,7 +1354,7 @@
      * @return {fabric.Element} thisArg
      * @chainable
      */
-    fxCenterObjectV: function (object) {
+    fxCenterObjectV: function (object, callbacks) {
       callbacks = callbacks || { };
 
       var empty = function() { },
