@@ -189,7 +189,7 @@
   function instantiatePaths(paths) {
     for (var i = 0, len = paths.length; i < len; i++) {
       if (!(paths[i] instanceof fabric.Object)) {
-        var klassName = capitalize(camelize(paths[i].type));
+        var klassName = camelize(capitalize(paths[i].type));
         paths[i] = fabric[klassName].fromObject(paths[i]);
       }
     }
@@ -205,5 +205,5 @@
   fabric.PathGroup.fromObject = function(object) {
     var paths = instantiatePaths(object.paths);
     return new fabric.PathGroup(paths, object);
-  }
+  };
 })();

@@ -466,5 +466,5 @@
         path = parsedAttributes.d;
     delete parsedAttributes.d;
     return new fabric.Path(path, extend(parsedAttributes, options));
-  }
+  };
 })();

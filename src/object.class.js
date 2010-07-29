@@ -167,15 +167,6 @@
     },
     
     /**
-     * Returns a JSON representation of an instance
-     * @method toJSON
-     * @return {String} json
-     */
-    toJSON: function() {
-      return JSON.stringify(this.toObject());
-    },
-    
-    /**
      * Returns an object representation of an instance
      * @method toObject
      * @return {Object}
@@ -1243,6 +1234,16 @@
       else if (angle > 315)                   { return  360;  }
       
       return 0;
+    },
+    
+    /**
+     * Returns a JSON representation of an instance
+     * @method toJSON
+     * @return {String} json
+     */
+    toJSON: function() {
+      // delegate, not alias
+      return this.toObject();
     }
   });
   

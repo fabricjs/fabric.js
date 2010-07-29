@@ -1406,21 +1406,12 @@
     },
     
     /**
-     * Returs JSON representation of canvas
-     * @method toJSON
-     * @return {String} json string
-     */
-    toJSON: function () {
-      return JSON.stringify(this.toObject());
-    },
-    
-    /**
      * Returs dataless JSON representation of canvas
      * @method toDatalessJSON
      * @return {String} json string
      */
     toDatalessJSON: function () {
-      return JSON.stringify(this.toDatalessObject());
+      return this.toDatalessObject();
     },
     
     /**
@@ -2137,4 +2128,11 @@
     }
     
   });
+  
+  /**
+   * Returs JSON representation of canvas
+   * @method toJSON
+   * @return {String} json string
+   */
+  fabric.Element.prototype.toJSON = fabric.Element.prototype.toObject;
 })();

@@ -3418,21 +3418,12 @@ fabric.util.animate = animate;
     },
 
     /**
-     * Returs JSON representation of canvas
-     * @method toJSON
-     * @return {String} json string
-     */
-    toJSON: function () {
-      return JSON.stringify(this.toObject());
-    },
-
-    /**
      * Returs dataless JSON representation of canvas
      * @method toDatalessJSON
      * @return {String} json string
      */
     toDatalessJSON: function () {
-      return JSON.stringify(this.toDatalessObject());
+      return this.toDatalessObject();
     },
 
     /**
@@ -4017,7 +4008,7 @@ fabric.util.animate = animate;
 
       var clone = this.__clone || (this.__clone = new fabric.Element(el));
 
-      return clone.loadFromJSON(this.toJSON(), function () {
+      return clone.loadFromJSON(JSON.stringify(this.toJSON()), function () {
         if (callback) {
           callback(clone);
         }
@@ -4132,6 +4123,13 @@ fabric.util.animate = animate;
     }
 
   });
+
+  /**
+   * Returs JSON representation of canvas
+   * @method toJSON
+   * @return {String} json string
+   */
+  fabric.Element.prototype.toJSON = fabric.Element.prototype.toObject;
 })();
 
 (function(){
@@ -4293,15 +4291,6 @@ fabric.util.animate = animate;
         this.scaleX * (this.flipX ? -1 : 1),
         this.scaleY * (this.flipY ? -1 : 1)
       );
-    },
-
-    /**
-     * Returns a JSON representation of an instance
-     * @method toJSON
-     * @return {String} json
-     */
-    toJSON: function() {
-      return JSON.stringify(this.toObject());
     },
 
     /**
@@ -5349,6 +5338,15 @@ fabric.util.animate = animate;
       else if (angle > 315)                   { return  360;  }
 
       return 0;
+    },
+
+    /**
+     * Returns a JSON representation of an instance
+     * @method toJSON
+     * @return {String} json
+     */
+    toJSON: function() {
+      return this.toObject();
     }
   });
 
@@ -6592,7 +6590,7 @@ fabric.util.animate = animate;
         path = parsedAttributes.d;
     delete parsedAttributes.d;
     return new fabric.Path(path, extend(parsedAttributes, options));
-  }
+  };
 })();
 
 (function(){
@@ -6782,7 +6780,7 @@ fabric.util.animate = animate;
   function instantiatePaths(paths) {
     for (var i = 0, len = paths.length; i < len; i++) {
       if (!(paths[i] instanceof fabric.Object)) {
-        var klassName = capitalize(camelize(paths[i].type));
+        var klassName = camelize(capitalize(paths[i].type));
         paths[i] = fabric[klassName].fromObject(paths[i]);
       }
     }
@@ -6798,7 +6796,7 @@ fabric.util.animate = animate;
   fabric.PathGroup.fromObject = function(object) {
     var paths = instantiatePaths(object.paths);
     return new fabric.PathGroup(paths, object);
-  }
+  };
 })();
 
 
