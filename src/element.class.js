@@ -206,6 +206,10 @@
       /* NOOP */
     },
     
+    onFpsUpdate: function() {
+      /* NOOP */
+    },
+    
     /**
      * Calculates canvas element offset relative to the document
      * This method is also attached as "resize" event handler of window
@@ -1072,12 +1076,12 @@
       var length = this._aObjects.length,
           activeGroup = this.getActiveGroup();
       
-      if (length) {  
+      var startTime = new Date();
+      
+      if (length) {
         for (var i = 0; i < length; ++i) {
-          
-          // only render objects which are not in the group (if one exists)
-          if (!activeGroup || 
-              (activeGroup && 
+          if (!activeGroup ||
+              (activeGroup &&
               !activeGroup.contains(this._aObjects[i]))) {
             this._draw(containerCanvas, this._aObjects[i]);
           }
@@ -1092,6 +1096,9 @@
       if (this.overlayImage) {
         this._oContextTop.drawImage(this.overlayImage, 0, 0);
       }
+      
+      var elapsedTime = new Date() - startTime;
+      this.onFpsUpdate(~~(1000 / elapsedTime));
       
       if (this.afterRender) {
         this.afterRender();

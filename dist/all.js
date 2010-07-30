@@ -2270,6 +2270,10 @@ fabric.util.animate = animate;
       /* NOOP */
     },
 
+    onFpsUpdate: function() {
+      /* NOOP */
+    },
+
     /**
      * Calculates canvas element offset relative to the document
      * This method is also attached as "resize" event handler of window
@@ -3096,9 +3100,10 @@ fabric.util.animate = animate;
       var length = this._aObjects.length,
           activeGroup = this.getActiveGroup();
 
+      var startTime = new Date();
+
       if (length) {
         for (var i = 0; i < length; ++i) {
-
           if (!activeGroup ||
               (activeGroup &&
               !activeGroup.contains(this._aObjects[i]))) {
@@ -3114,6 +3119,9 @@ fabric.util.animate = animate;
       if (this.overlayImage) {
         this._oContextTop.drawImage(this.overlayImage, 0, 0);
       }
+
+      var elapsedTime = new Date() - startTime;
+      this.onFpsUpdate(~~(1000 / elapsedTime));
 
       if (this.afterRender) {
         this.afterRender();
@@ -3553,6 +3561,7 @@ fabric.util.animate = animate;
 
       this.clear();
 
+      this.backgroundColor = serialized.background;
       this._enlivenDatalessObjects(serialized.objects, callback);
     },
 
@@ -3569,6 +3578,10 @@ fabric.util.animate = animate;
       var _this = this,
           numLoadedObjects = 0,
           numTotalObjects = objects.length;
+
+      if (numTotalObjects === 0 && callback) {
+        callback();
+      }
 
       try {
         objects.forEach(function (obj, index) {
@@ -4008,7 +4021,7 @@ fabric.util.animate = animate;
 
       var clone = this.__clone || (this.__clone = new fabric.Element(el));
 
-      return clone.loadFromJSON(JSON.stringify(this.toJSON()), function () {
+      return clone.loadFromJSON(this.toJSON(), function () {
         if (callback) {
           callback(clone);
         }
@@ -6224,7 +6237,7 @@ fabric.util.animate = animate;
           l = -(this.width / 2),
           t = -(this.height / 2);
 
-      for (var i=0, len=this.path.length; i<len; ++i) {
+      for (var i = 0, len = this.path.length; i < len; ++i) {
 
         current = this.path[i];
 
@@ -6577,6 +6590,7 @@ fabric.util.animate = animate;
   };
 
   var ATTRIBUTE_NAMES = fabric.Path.ATTRIBUTE_NAMES = 'd fill fill-opacity fill-rule stroke stroke-width transform'.split(' ');
+
   /**
    * Creates an instance of fabric.Path from an SVG <PATH> element
    * @static

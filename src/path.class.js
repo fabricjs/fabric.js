@@ -87,7 +87,7 @@
           l = -(this.width / 2),
           t = -(this.height / 2);
           
-      for (var i=0, len=this.path.length; i<len; ++i) {
+      for (var i = 0, len = this.path.length; i < len; ++i) {
         
         current = this.path[i];
         
@@ -453,6 +453,7 @@
   };
   
   var ATTRIBUTE_NAMES = fabric.Path.ATTRIBUTE_NAMES = 'd fill fill-opacity fill-rule stroke stroke-width transform'.split(' ');
+  
   /**
    * Creates an instance of fabric.Path from an SVG <PATH> element
    * @static

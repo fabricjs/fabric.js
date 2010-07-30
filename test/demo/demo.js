@@ -24,6 +24,12 @@
   
   var canvas = this.canvas = new fabric.Element('canvas');
   
+  var fpsEl = document.getElementById('fps').firstChild;
+  
+  canvas.onFpsUpdate = function(fps) {
+    fpsEl.nodeValue = 'FPS: ' + fps;
+  };
+  
   document.getElementById('commands').onclick = function(ev) {
     ev.preventDefault();
     

@@ -13,6 +13,8 @@
     <script src="../../dist/all.min.js" type="text/javascript"></script>
     
     <style type="text/css">
+      #body-wrapper { width: 1200px; margin: 0 auto; overflow: hidden; position: relative; }
+      #fps { position: absolute; left: 0; top: 0; background: rgb(200,200,200); width: 70px; }
       .canvas_container { margin: 0 auto; position: relative; float: left; border: 1px solid #aaa; }
       #commands { float: left; margin-left: 20px; list-style: none; }
       .clear { color: red; font-weight: bold; margin-top: 1em; }
@@ -22,31 +24,35 @@
     
   </head>
   <body>
-    <canvas id="canvas" width="800" height="600"></canvas>
-    
-    <ul id="commands">
-      <li style="font-weight:bold;margin-bottom:1em">Add objects to canvas:</li>
-      
-      <li><button class="rect">Rectangle</button></li>
-      <li><button class="circle">Circle</button></li>
-      <li><button class="triangle">Triangle</button></li>
-      <li><button class="image1">Image 1</button></li>
-      <li><button class="image2">Image 2</button></li>
-      <li><button class="shape" id="shape1">SVG shape 1</button></li>
-      <li><button class="shape" id="shape2">SVG shape 2</button></li>
-      <li><button class="shape" id="shape3">SVG shape 3</button></li>
-      <li><button class="shape" id="shape4">SVG shape 4</button></li>
-      
-      <li><button id="rasterize">Rasterize canvas to image</button></li>
-      
-      <li><button class="clear">Clear canvas</button></li>
-      <li style="margin-top:20px;">
-        <label for="canvas-console">Execute code:</label>
-        <textarea rows="8" cols="40" id="canvas-console">canvas.clear(); // clears canvas</textarea>
-        <button type="button" id="execute">Execute</button>
-      </li>
-    </ul>
-    
+    <div id="body-wrapper">
+      <div id="fps">
+        
+      </div>
+      <canvas id="canvas" width="800" height="600"></canvas>
+
+      <ul id="commands">
+        <li style="font-weight:bold;margin-bottom:1em">Add objects to canvas:</li>
+
+        <li><button class="rect">Rectangle</button></li>
+        <li><button class="circle">Circle</button></li>
+        <li><button class="triangle">Triangle</button></li>
+        <li><button class="image1">Image 1</button></li>
+        <li><button class="image2">Image 2</button></li>
+        <li><button class="shape" id="shape1">SVG shape 1</button></li>
+        <li><button class="shape" id="shape2">SVG shape 2</button></li>
+        <li><button class="shape" id="shape3">SVG shape 3</button></li>
+        <li><button class="shape" id="shape4">SVG shape 4</button></li>
+
+        <li><button id="rasterize">Rasterize canvas to image</button></li>
+
+        <li><button class="clear">Clear canvas</button></li>
+        <li style="margin-top:20px;">
+          <label for="canvas-console">Execute code:</label>
+          <textarea rows="8" cols="40" id="canvas-console">canvas.clear(); // clears canvas</textarea>
+          <button type="button" id="execute">Execute</button>
+        </li>
+      </ul>
+    </div>
     <script src="demo.js" type="text/javascript"></script>
   </body>
 </html>
