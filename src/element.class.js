@@ -1544,6 +1544,8 @@
       
       this.clear();
 
+      // TODO: test this
+      this.backgroundColor = serialized.background;
       this._enlivenDatalessObjects(serialized.objects, callback);
     },
     
@@ -1560,6 +1562,10 @@
       var _this = this,
           numLoadedObjects = 0,
           numTotalObjects = objects.length;
+      
+      if (numTotalObjects === 0 && callback) {
+        callback();
+      }
       
       try {
         objects.forEach(function (obj, index) {
