@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <title>Free drawing test</title>
+    <style type="text/css">
+      #c, #d { border: 1px solid #aaa; }
+      body { margin: 0; }
+    </style>
+    <script src="../dist/all.js" type="text/javascript"></script>
+  </head>
+  <body>
+    <!-- <canvas id="c" width="300" height="300"></canvas> -->
+    <canvas id="d" width="300" height="300"></canvas>
+    <div id="out"></div>
+    <script type="text/javascript">
+      (function() {
+        var canvas = document.getElementById('d'),
+            ctx = canvas.getContext('2d'),
+            path = [ ],
+            xPoints = [ ],
+            yPoints = [ ],
+            width = canvas.width,
+            height = canvas.height;
+        
+        ctx.fillStyle = '#000000';
+        
+        function onMove(e) {
+          var x = e.pageX,
+              y = e.pageY;
+              
+          ctx.lineTo(x, y);
+          ctx.stroke();
+          
+          xPoints.push(x);
+          yPoints.push(y);
+        }
+        
+        function reset() {
+          xPoints.length = yPoints.length = path.length = 0;
+          ctx.clearRect(0, 0, width, height);
+        }
+        
+        canvas.onmousedown = function(e) {
+          var x = e.pageX,
+              y = e.pageY;
+              
+          reset();
+          
+          ctx.moveTo(x, y);
+          
+          xPoints.push(x);
+          yPoints.push(y);
+          
+          canvas.onmousemove = onMove;
+        };
+        
+        canvas.onmouseup = function(e) {
+          canvas.onmousemove = null;
+          
+          var minX = fabric.util.array.min(xPoints),
+              minY = fabric.util.array.min(yPoints);
+          
+          ctx.fillStyle = 'rgb(255,0,0)';
+          ctx.fillRect(minX, minY, 3, 3);
+          ctx.fillStyle = 'rgb(0,0,0)'
+          
+          path.push('M ', xPoints[0] - minX, ' ', yPoints[0] - minY, ' ');
+          
+          for (var i = 1; xPoint = xPoints[i], yPoint = yPoints[i]; i++) {
+            path.push('L ', xPoint - minX, ' ', yPoint - minY, ' ');
+          }
+          
+          document.getElementById('out').innerHTML = ('var p = new fabric.Path("' + path.join('') + '"); p.fill = null; p.options.stroke = "rgb(0,0,0)"; __canvas.add(p); p.set("left", __canvas.getCenter().left).set("top", __canvas.getCenter().top).setCoords(); __canvas.renderAll();');
+        };
+        
+        // var canvas = this.canvas = new fabric.Element('c');
+      })();
+    </script>
+  </body>
+</html>
