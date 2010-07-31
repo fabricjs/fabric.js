@@ -788,4 +788,22 @@
       start();
     }, 1000);
   });
+  
+  test('onFpsUpdate', function() {
+
+    ok(typeof canvas.onFpsUpdate == 'function');
+    
+    var invoked = false, fps;
+    
+    canvas.onFpsUpdate = function(value) { 
+      invoked = true; 
+      fps = value;
+    };
+    
+    canvas.renderAll();
+    
+    ok(invoked, 'onFpsUpdate should be invoked');
+    ok(typeof fps == 'number', 'onFpsUpdate must receive numeric value');
+    
+  });
 })();

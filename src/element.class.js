@@ -20,6 +20,13 @@
       addListener = fabric.util.addListener,
       removeListener = fabric.util.removeListener,
       
+      sqrt = Math.sqrt,
+      pow = Math.pow,
+      atan2 = Math.atan2,
+      abs = Math.abs,
+      min = Math.min,
+      max = Math.max,
+      
       CANVAS_INIT_ERROR = new Error('Could not initialize `canvas` element'),
       FX_DURATION = 500,
       STROKE_OFFSET = 0.5,
@@ -35,58 +42,6 @@
         'mr': 'e-resize',
         'mb': 's-resize'
       };
-  
-  // WebKit is about 10x faster at clearing canvas with `canvasEl.width = canvasEl.width` rather than `context.clearRect`
-  // We feature-test performance of both methods to determine a winner
-  var fastestClearingMethod = (function () {
-    var el = document.createElement('canvas'), 
-        t, t1, t2, i,
-        numIterations = 200,
-        canvasLength = 300;
-        
-    el.width = el.height = canvasLength;
-    
-    if (!el.getContext) {
-      return;
-    }
-    
-    var ctx = el.getContext('2d');
-    if (!ctx) {
-      return;
-    }
-    
-    t = new Date();
-    for (i = numIterations; i--; ) {
-      ctx.clearRect(0, 0, canvasLength, canvasLength);
-    }
-    t1 = new Date() - t;
-    
-    t = new Date();
-    for (i = numIterations; i--; ) {
-      el.width = el.height;
-    }
-    t2 = new Date() - t;
-
-    if (t2 < t1) {
-      return 'width';
-    }
-  })();
-
-  function clearContext(ctx) {
-    // this sucks, but we can't use `getWidth`/`getHeight` here for perf. reasons
-    ctx.clearRect(0, 0, this._oConfig.width, this._oConfig.height);
-    return this;
-  }
-  
-  // nightly webkit has some rendering artifacts when using this clearing method, so disable it for now
-  /*
-  if (fastestClearingMethod === 'width') {
-    clearContext = function (ctx) {
-      ctx.canvas.width = ctx.canvas.width;
-      return this;
-    }
-  }
-  */
   
   var CAN_SET_TRANSPARENT_FILL = (function () {
     
@@ -116,7 +71,7 @@
    * @constructor
    * @param {HTMLElement | String} el Container element for the canvas.
    */
-  fabric.Element = function (el, oConfig) {
+  fabric.Element = function (el, config) {
     
     /**
      * The object literal containing mouse position if clicked in an empty area (no image)
@@ -127,24 +82,24 @@
 
     /**
      * The array literal containing all objects on canvas
-     * @property _aObjects
+     * @property _objects
      * @type array
      */
-    this._aObjects = [];
+    this._objects = [];
 
     /**
      * The element that references the canvas interface implementation
-     * @property _oContext
+     * @property _context
      * @type object
      */
-    this._oContext = null;
+    this._context = null;
 
     /**
      * The main element that contains the canvas
-     * @property _oElement
+     * @property _element
      * @type object
      */
-    this._oElement = null;
+    this._element = null;
 
     /**
      * The object literal containing the current x,y params of the transformation
@@ -162,25 +117,25 @@
     
      /**
       * An object containing config parameters
-      * @property _oConfig
+      * @property _config
       * @type object
       */
-    this._oConfig = { 
+    this._config = { 
       width: 300, 
       height: 150 
     };
     
-    oConfig = oConfig || { };
+    config = config || { };
     
     this._initElement(el);
-    this._initConfig(oConfig);
+    this._initConfig(config);
     
-    if (oConfig.overlayImage) {
-      this.setOverlayImage(oConfig.overlayImage);
+    if (config.overlayImage) {
+      this.setOverlayImage(config.overlayImage);
     }
     
-    if (oConfig.afterRender) {
-      this.afterRender = oConfig.afterRender;
+    if (config.afterRender) {
+      this.afterRender = config.afterRender;
     }
     
     this._createCanvasBackground();
@@ -256,20 +211,20 @@
      */
     _initElement: function (canvasEl) {
       var el = fabric.util.getById(canvasEl);
-      this._oElement = el || document.createElement('canvas');
+      this._element = el || document.createElement('canvas');
       
-      if (typeof this._oElement.getContext === 'undefined') {
-        G_vmlCanvasManager.initElement(this._oElement);
+      if (typeof this._element.getContext === 'undefined') {
+        G_vmlCanvasManager.initElement(this._element);
       }
-      if (typeof this._oElement.getContext === 'undefined') {
+      if (typeof this._element.getContext === 'undefined') {
         throw CANVAS_INIT_ERROR;
       }
-      if (!(this._oContextTop = this._oElement.getContext('2d'))) {
+      if (!(this.contextTop = this._element.getContext('2d'))) {
         throw CANVAS_INIT_ERROR;
       }
       
-      var width = this._oElement.width || 0,
-          height = this._oElement.height || 0;
+      var width = this._element.width || 0,
+          height = this._element.height || 0;
       
       this._initWrapperElement(width, height);
       this._setElementStyle(width, height);
@@ -306,18 +261,18 @@
     /**
        * For now we use an object literal without methods to store the config params
        * @method _initConfig
-       * @param oConfig {Object} userConfig The configuration Object literal 
+       * @param config {Object} userConfig The configuration Object literal 
        * containing the configuration that should be set for this module. 
        * See configuration documentation for more details.
        */
-    _initConfig: function (oConfig) {
-      extend(this._oConfig, oConfig || { });
+    _initConfig: function (config) {
+      extend(this._config, config || { });
       
-      this._oConfig.width = parseInt(this._oElement.width, 10) || 0;
-      this._oConfig.height = parseInt(this._oElement.height, 10) || 0;
+      this._config.width = parseInt(this._element.width, 10) || 0;
+      this._config.height = parseInt(this._element.height, 10) || 0;
 
-      this._oElement.style.width = this._oConfig.width + 'px';
-      this._oElement.style.height = this._oConfig.height + 'px';
+      this._element.style.width = this._config.width + 'px';
+      this._element.style.height = this._config.height + 'px';
     },
 
     /**
@@ -335,7 +290,7 @@
       this._onMouseMove = function (e) { _this.__onMouseMove(e); };
       this._onResize = function (e) { _this.calcOffset() };
       
-      addListener(this._oElement, 'mousedown', this._onMouseDown);
+      addListener(this._element, 'mousedown', this._onMouseDown);
       addListener(document, 'mousemove', this._onMouseMove);
       addListener(document, 'mouseup', this._onMouseUp);
       addListener(window, 'resize', this._onResize);
@@ -354,7 +309,7 @@
       }
       
       element.className = className;
-      var oContainer = this._oElement.parentNode.insertBefore(element, this._oElement);
+      var oContainer = this._element.parentNode.insertBefore(element, this._element);
       
       oContainer.width = this.getWidth();
       oContainer.height = this.getHeight();
@@ -381,10 +336,9 @@
      * @method _createCanvasContainer
      */
     _createCanvasContainer: function () {
-      // this context will contain all images that are not on the top
       var canvas = this._createCanvasElement('canvas-container');
-      this._oContextContainerEl = canvas;
-      this._oContextContainer = canvas.getContext('2d');
+      this.contextContainerEl = canvas;
+      this.contextContainer = canvas.getContext('2d');
     },
 
     /**
@@ -392,10 +346,9 @@
      * @method _createCanvasBackground
      */
     _createCanvasBackground: function () {
-      // this context will contain the background
       var canvas = this._createCanvasElement('canvas-container');
-      this._oContextBackgroundEl = canvas;
-      this._oContextBackground = canvas.getContext('2d');
+      this._contextBackgroundEl = canvas;
+      this._contextBackground = canvas.getContext('2d');
     },
     
     /**
@@ -404,7 +357,7 @@
      * @return {Number}
      */
     getWidth: function () {
-      return this._oConfig.width;
+      return this._config.width;
     },
     
     /**
@@ -413,7 +366,7 @@
      * @return {Number}
      */
     getHeight: function () {
-      return this._oConfig.height;
+      return this._config.height;
     },
     
     /**
@@ -453,19 +406,19 @@
      * @chainable true
      */
     _setDimension: function (prop, value) {
-      this._oContextContainerEl[prop] = value;
-      this._oContextContainerEl.style[prop] = value + 'px';
+      this.contextContainerEl[prop] = value;
+      this.contextContainerEl.style[prop] = value + 'px';
       
-      this._oContextBackgroundEl[prop] = value;
-      this._oContextBackgroundEl.style[prop] = value + 'px';
+      this._contextBackgroundEl[prop] = value;
+      this._contextBackgroundEl.style[prop] = value + 'px';
       
-      this._oElement[prop] = value;
-      this._oElement.style[prop] = value + 'px';
+      this._element[prop] = value;
+      this._element.style[prop] = value + 'px';
       
       // <DIV> container (parent of all <CANVAS> elements)
-      this._oElement.parentNode.style[prop] = value + 'px';
+      this._element.parentNode.style[prop] = value + 'px';
       
-      this._oConfig[prop] = value;
+      this._config[prop] = value;
       this.calcOffset();
       this.renderAll();
       
@@ -486,14 +439,15 @@
         var transform = this._currentTransform,
             target = transform.target;
             
-        if (target.__scaling) {
+        if (target._scaling) {
           fireEvent('object:scaled', { target: target });
-          target.__scaling = false;
+          target._scaling = false;
         }
         
         // determine the new coords everytime the image changes its position
-        for (var i=0, l=this._aObjects.length; i<l; ++i) {
-          this._aObjects[i].setCoords();
+        var i = this._objects.length;
+        while (i--) {
+          this._objects[i].setCoords();
         }
         
         // only fire :modified event if target coordinates were changed during mousedown-mouseup
@@ -609,7 +563,7 @@
      * @return {HTMLCanvasElement}
      */
     getElement: function () {
-      return this._oElement;
+      return this._element;
     },
     
     /**
@@ -642,9 +596,9 @@
           pointer = getPointer(e);
       
       if (corner = target._findTargetCorner(e, this._offset)) {
-        action = /ml|mr/.test(corner) 
+        action = (corner === 'ml' || corner === 'mr') 
           ? 'scaleX' 
-          : /mt|mb/.test(corner) 
+          : (corner === 'mt' || corner === 'mb') 
             ? 'scaleY' 
             : 'rotate';
       }
@@ -737,7 +691,7 @@
       else if (!this._currentTransform) {
         
         // alias style to elimintate unnecessary lookup
-        var style = this._oElement.style;
+        var style = this._element.style;
         
         // Here we are hovering the canvas then we will determine
         // what part of the pictures we are hovering to change the caret symbol.
@@ -747,9 +701,9 @@
         
         if (!target) {  
           // image/text was hovered-out from, we remove its borders
-          for (var i = this._aObjects.length; i--; ) {
-            if (!this._aObjects[i].active) {
-              this._aObjects[i].setActive(false);
+          for (var i = this._objects.length; i--; ) {
+            if (!this._objects[i].active) {
+              this._objects[i].setActive(false);
             }
           }
           style.cursor = 'default';
@@ -815,14 +769,14 @@
      *                    When not provided, an object is scaled by both dimensions equally
      */ 
     _scaleObject: function (x, y, by) {
-      var lastLen = Math.sqrt(Math.pow(this._currentTransform.ey - this._currentTransform.top - this._offset.top, 2) +
-        Math.pow(this._currentTransform.ex - this._currentTransform.left - this._offset.left, 2));
+      var lastLen = sqrt(pow(this._currentTransform.ey - this._currentTransform.top - this._offset.top, 2) +
+        pow(this._currentTransform.ex - this._currentTransform.left - this._offset.left, 2));
       
-      var curLen = Math.sqrt(Math.pow(y - this._currentTransform.top - this._offset.top, 2) +
-        Math.pow(x - this._currentTransform.left - this._offset.left, 2));
+      var curLen = sqrt(pow(y - this._currentTransform.top - this._offset.top, 2) +
+        pow(x - this._currentTransform.left - this._offset.left, 2));
       
       var target = this._currentTransform.target;
-      target.__scaling = true;
+      target._scaling = true;
       
       if (!by) {
         target.set('scaleX', this._currentTransform.scaleX * curLen/lastLen);
@@ -843,9 +797,9 @@
      * @param y {Number} pointer's y coordinate
      */ 
     _rotateObject: function (x, y) {
-      var lastAngle = Math.atan2(this._currentTransform.ey - this._currentTransform.top - this._offset.top,
+      var lastAngle = atan2(this._currentTransform.ey - this._currentTransform.top - this._offset.top,
         this._currentTransform.ex - this._currentTransform.left - this._offset.left); 
-      var curAngle = Math.atan2(y - this._currentTransform.top - this._offset.top,
+      var curAngle = atan2(y - this._currentTransform.top - this._offset.top,
         x - this._currentTransform.left - this._offset.left);
       this._currentTransform.target.set('theta', (curAngle - lastAngle) + this._currentTransform.theta);
     },
@@ -854,7 +808,7 @@
      * @method _setCursor
      */
     _setCursor: function (value) {
-      this._oElement.style.cursor = value;
+      this._element.style.cursor = value;
     },
     
     /**
@@ -865,7 +819,7 @@
      * @param target {Object} Object that the mouse is hovering, if so.
      */
     _setCursorFromEvent: function (e, target) {
-      var s = this._oElement.style;
+      var s = this._element.style;
       if (!target) {
         s.cursor = 'default';
         return false;
@@ -910,22 +864,22 @@
     _drawSelection: function () {
       var left = this._groupSelector.left,
           top = this._groupSelector.top,
-          aleft = Math.abs(left),
-          atop = Math.abs(top);
+          aleft = abs(left),
+          atop = abs(top);
 
-      this._oContextTop.fillStyle = this.selectionColor;
+      this.contextTop.fillStyle = this.selectionColor;
 
-      this._oContextTop.fillRect(
+      this.contextTop.fillRect(
         this._groupSelector.ex - ((left > 0) ? 0 : -left),
         this._groupSelector.ey - ((top > 0) ? 0 : -top),
         aleft, 
         atop
       );
 
-      this._oContextTop.lineWidth = this.selectionLineWidth;
-      this._oContextTop.strokeStyle = this.selectionBorderColor;
+      this.contextTop.lineWidth = this.selectionLineWidth;
+      this.contextTop.strokeStyle = this.selectionBorderColor;
       
-      this._oContextTop.strokeRect(
+      this.contextTop.strokeRect(
         this._groupSelector.ex + STROKE_OFFSET - ((left > 0) ? 0 : aleft), 
         this._groupSelector.ey + STROKE_OFFSET - ((top > 0) ? 0 : atop),
         aleft,
@@ -943,11 +897,11 @@
           x2 = x1 + this._groupSelector.left,
           y2 = y1 + this._groupSelector.top,
           currentObject,
-          selectionX1Y1 = new fabric.Point(Math.min(x1, x2), Math.min(y1, y2)),
-          selectionX2Y2 = new fabric.Point(Math.max(x1, x2), Math.max(y1, y2));
+          selectionX1Y1 = new fabric.Point(min(x1, x2), min(y1, y2)),
+          selectionX2Y2 = new fabric.Point(max(x1, x2), max(y1, y2));
       
-      for (var i = 0, len = this._aObjects.length; i < len; ++i) {
-        currentObject = this._aObjects[i];
+      for (var i = 0, len = this._objects.length; i < len; ++i) {
+        currentObject = this._objects[i];
         
         if (currentObject.intersectsWithRect(selectionX1Y1, selectionX2Y2) || 
             currentObject.isContainedWithinRect(selectionX1Y1, selectionX2Y2)) {
@@ -980,7 +934,7 @@
      * @chainable
      */
     add: function () {
-      this._aObjects.push.apply(this._aObjects, arguments);
+      this._objects.push.apply(this._objects, arguments);
       this.renderAll();
       return this;
     },
@@ -994,7 +948,7 @@
      * @return {fabric.Element} instance
      */
     insertAt: function (object, index) {
-      this._aObjects.splice(index, 0, object);
+      this._objects.splice(index, 0, object);
       this.renderAll();
       return this;
     },
@@ -1005,7 +959,7 @@
      * @return {Array}
      */
     getObjects: function () {
-      return this._aObjects;
+      return this._objects;
     },
     
     /**
@@ -1014,7 +968,7 @@
      * @return {CanvasRenderingContext2D}
      */
     getContext: function () {
-      return this._oContextTop;
+      return this.contextTop;
     },
     
     /**
@@ -1024,7 +978,11 @@
      * @return {fabric.Element} thisArg
      * @chainable
      */
-    clearContext: clearContext,
+    clearContext: function(ctx) {
+      // this sucks, but we can't use `getWidth`/`getHeight` here for perf. reasons
+      ctx.clearRect(0, 0, this._config.width, this._config.height);
+      return this;
+    },
     
     /**
      * Clears all contexts of canvas element
@@ -1033,9 +991,9 @@
      * @chainable
      */
     clear: function () {
-      this._aObjects.length = 0;
-      this.clearContext(this._oContextTop);
-      this.clearContext(this._oContextContainer);
+      this._objects.length = 0;
+      this.clearContext(this.contextTop);
+      this.clearContext(this.contextContainer);
       this.renderAll();
       return this;
     },
@@ -1050,16 +1008,16 @@
     renderAll: function (allOnTop) {
       
       // this sucks, but we can't use `getWidth`/`getHeight` here for perf. reasons
-      var w = this._oConfig.width,
-          h = this._oConfig.height;
+      var w = this._config.width,
+          h = this._config.height;
           
       // when allOnTop is true all images are rendered in the top canvas.
       // This is used for actions like toDataUrl that needs to take some actions on a unique canvas.
-      var containerCanvas = allOnTop ? this._oContextTop : this._oContextContainer;
+      var containerCanvas = allOnTop ? this.contextTop : this.contextContainer;
 
-      this.clearContext(this._oContextTop);
+      this.clearContext(this.contextTop);
 
-      if (containerCanvas !== this._oContextTop) {
+      if (containerCanvas !== this.contextTop) {
         this.clearContext(containerCanvas);
       }
       
@@ -1073,7 +1031,7 @@
         containerCanvas.fillRect(0, 0, w, h);
       }
       
-      var length = this._aObjects.length,
+      var length = this._objects.length,
           activeGroup = this.getActiveGroup();
       
       var startTime = new Date();
@@ -1082,19 +1040,19 @@
         for (var i = 0; i < length; ++i) {
           if (!activeGroup ||
               (activeGroup &&
-              !activeGroup.contains(this._aObjects[i]))) {
-            this._draw(containerCanvas, this._aObjects[i]);
+              !activeGroup.contains(this._objects[i]))) {
+            this._draw(containerCanvas, this._objects[i]);
           }
         }
       }
       
       // delegate rendering to group selection (if one exists)
       if (activeGroup) {
-        this._draw(this._oContextTop, activeGroup);
+        this._draw(this.contextTop, activeGroup);
       }
       
       if (this.overlayImage) {
-        this._oContextTop.drawImage(this.overlayImage, 0, 0);
+        this.contextTop.drawImage(this.overlayImage, 0, 0);
       }
       
       var elapsedTime = new Date() - startTime;
@@ -1116,9 +1074,9 @@
      */
     renderTop: function () {
       
-      this.clearContext(this._oContextTop);
+      this.clearContext(this.contextTop);
       if (this.overlayImage) {
-        this._oContextTop.drawImage(this.overlayImage, 0, 0);
+        this.contextTop.drawImage(this.overlayImage, 0, 0);
       }
       
       // we render the top context - last object
@@ -1130,7 +1088,7 @@
       // used for drawing selection borders/corners
       var activeGroup = this.getActiveGroup();
       if (activeGroup) {
-        activeGroup.render(this._oContextTop);
+        activeGroup.render(this.contextTop);
       }
       
       if (this.afterRender) {
@@ -1210,9 +1168,9 @@
       }
       
       // then check all of the objects on canvas
-      for (var i = this._aObjects.length; i--; ) {
-        if (this.containsPoint(e, this._aObjects[i])) {
-          target = this._aObjects[i];
+      for (var i = this._objects.length; i--; ) {
+        if (this.containsPoint(e, this._objects[i])) {
+          target = this._objects[i];
           this.relatedTarget = target;
           break;
         }
@@ -1253,14 +1211,14 @@
           activeObject = this.getActiveObject();
       
       this.setWidth(scaledWidth).setHeight(scaledHeight);
-      this._oContextTop.scale(multiplier, multiplier);
+      this.contextTop.scale(multiplier, multiplier);
       
       if (activeObject) {
         this.deactivateAll().renderAll();
       }
       var dataURL = this.toDataURL(format);
 
-      this._oContextTop.scale( 1 / multiplier,  1 / multiplier);
+      this.contextTop.scale( 1 / multiplier,  1 / multiplier);
       this.setWidth(origWidth).setHeight(origHeight);
       
       if (activeObject) {
@@ -1445,7 +1403,7 @@
      */
     _toObjectMethod: function (methodName) {
       return { 
-        objects: this._aObjects.map(function (instance){
+        objects: this._objects.map(function (instance){
           // TODO (kangax): figure out how to clean this up
           if (!this.includeDefaultValues) {
             var originalValue = instance.includeDefaultValues;
@@ -1467,7 +1425,7 @@
      * @return {Boolean} true if canvas is empty
      */
     isEmpty: function () {
-      return this._aObjects.length === 0;
+      return this._objects.length === 0;
     },
     
     /**
@@ -1772,7 +1730,7 @@
      * @return {Object} removed object
      */
     remove: function (object) {
-      removeFromArray(this._aObjects, object);
+      removeFromArray(this._objects, object);
       this.renderAll();
       return object;
     },
@@ -1807,8 +1765,8 @@
      * @chainable
      */
     sendToBack: function (object) {
-      removeFromArray(this._aObjects, object);
-      this._aObjects.unshift(object);
+      removeFromArray(this._objects, object);
+      this._objects.unshift(object);
       return this.renderAll();
     },
     
@@ -1820,8 +1778,8 @@
      * @chainable
      */
     bringToFront: function (object) {
-      removeFromArray(this._aObjects, object);
-      this._aObjects.push(object);
+      removeFromArray(this._objects, object);
+      this._objects.push(object);
       return this.renderAll();
     },
     
@@ -1833,7 +1791,7 @@
      * @chainable
      */
     sendBackwards: function (object) {
-      var idx = this._aObjects.indexOf(object),
+      var idx = this._objects.indexOf(object),
           nextIntersectingIdx = idx;
       
       // if object is not on the bottom of stack
@@ -1841,13 +1799,13 @@
         
         // traverse down the stack looking for the nearest intersecting object
         for (var i=idx-1; i>=0; --i) {
-          if (object.intersectsWithObject(this._aObjects[i])) {
+          if (object.intersectsWithObject(this._objects[i])) {
             nextIntersectingIdx = i;
             break;
           }
         }
-        removeFromArray(this._aObjects, object);
-        this._aObjects.splice(nextIntersectingIdx, 0, object);
+        removeFromArray(this._objects, object);
+        this._objects.splice(nextIntersectingIdx, 0, object);
       }
       return this.renderAll();
     },
@@ -1869,7 +1827,7 @@
       if (idx !== objects.length-1) {
         
         // traverse up the stack looking for the nearest intersecting object
-        for (var i=idx+1, l=this._aObjects.length; i<l; ++i) {
+        for (var i = idx + 1, l = this._objects.length; i < l; ++i) {
           if (object.intersectsWithObject(objects[i])) {
             nextIntersectingIdx = i;
             break;

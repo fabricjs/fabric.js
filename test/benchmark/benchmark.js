@@ -17,7 +17,11 @@
 
   this.c = new fabric.Element('test');
 
-  var t1, t2, lim = 50, offset = 50;
+  var t1, t2, 
+      lim = 50, 
+      offset = 50, 
+      width = c.getWidth(), 
+      height = c.getHeight();
 
   var t = new Date();
   for (var i = lim; i--; ) {
@@ -27,16 +31,16 @@
       fill: '#' + getRandomColor(),
       opacity: getRandomNum(0.5, 1),
       angle: getRandomInt(0, 180),
-      top: getRandomInt(0 + offset, c._oConfig.height - offset),
-      left: getRandomInt(0 + offset, c._oConfig.width - offset)
+      top: getRandomInt(0 + offset, height - offset),
+      left: getRandomInt(0 + offset, width - offset)
     }));
     
     c.add(new fabric.Circle({
       radius: getRandomInt(10, 50),
       fill: '#' + getRandomColor(),
       opacity: getRandomNum(0.5, 1),
-      top: getRandomInt(0 + offset, c._oConfig.height - offset),
-      left: getRandomInt(0 + offset, c._oConfig.width - offset)
+      top: getRandomInt(0 + offset, height - offset),
+      left: getRandomInt(0 + offset, width - offset)
     }));
     
     c.add(new fabric.Triangle({
@@ -45,8 +49,8 @@
       fill: '#' + getRandomColor(),
       opacity: getRandomNum(0.5, 1),
       angle: getRandomInt(0, 180),
-      top: getRandomInt(0 + offset, c._oConfig.height - offset),
-      left: getRandomInt(0 + offset, c._oConfig.width - offset)
+      top: getRandomInt(0 + offset, height - offset),
+      left: getRandomInt(0 + offset, width - offset)
     }));
   }
   
