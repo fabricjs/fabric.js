@@ -529,10 +529,10 @@
           h = this.getHeight();
       
       ctx.strokeRect(
-        Math.floor(-(w / 2) - padding) + 0.5, // offset needed to make lines look sharper
-        Math.floor(-(h / 2) - padding) + 0.5,
-        Math.floor(w + padding2),
-        Math.floor(h + padding2)
+        ~~(-(w / 2) - padding) + 0.5, // offset needed to make lines look sharper
+        ~~(-(h / 2) - padding) + 0.5,
+        ~~(w + padding2),
+        ~~(h + padding2)
       );
       
       ctx.restore();

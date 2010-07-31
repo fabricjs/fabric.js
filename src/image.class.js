@@ -72,17 +72,17 @@
     getNormalizedSize: function(oImg, maxwidth, maxheight) {
       if (maxheight && maxwidth && (oImg.width > oImg.height && (oImg.width / oImg.height) < (maxwidth / maxheight))) {
         // height is the constraining dimension.
-        normalizedWidth = Math.floor((oImg.width * maxheight) / oImg.height);
+        normalizedWidth = ~~((oImg.width * maxheight) / oImg.height);
         normalizedHeight = maxheight;
       }
       else if (maxheight && ((oImg.height == oImg.width) || (oImg.height > oImg.width) || (oImg.height > maxheight))) {
         // height is the constraining dimension.
-        normalizedWidth = Math.floor((oImg.width * maxheight) / oImg.height);
+        normalizedWidth = ~~((oImg.width * maxheight) / oImg.height);
         normalizedHeight = maxheight;
       }
       else if (maxwidth && (maxwidth < oImg.width)){ 
         // width is the constraining dimension.
-        normalizedHeight = Math.floor((oImg.height * maxwidth) / oImg.width);
+        normalizedHeight = ~~((oImg.height * maxwidth) / oImg.width);
         normalizedWidth = maxwidth;
       }
       else {

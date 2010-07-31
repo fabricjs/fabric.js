@@ -4626,10 +4626,10 @@ fabric.util.animate = animate;
           h = this.getHeight();
 
       ctx.strokeRect(
-        Math.floor(-(w / 2) - padding) + 0.5, // offset needed to make lines look sharper
-        Math.floor(-(h / 2) - padding) + 0.5,
-        Math.floor(w + padding2),
-        Math.floor(h + padding2)
+        ~~(-(w / 2) - padding) + 0.5, // offset needed to make lines look sharper
+        ~~(-(h / 2) - padding) + 0.5,
+        ~~(w + padding2),
+        ~~(h + padding2)
       );
 
       ctx.restore();
@@ -7469,15 +7469,15 @@ fabric.util.animate = animate;
      */
     getNormalizedSize: function(oImg, maxwidth, maxheight) {
       if (maxheight && maxwidth && (oImg.width > oImg.height && (oImg.width / oImg.height) < (maxwidth / maxheight))) {
-        normalizedWidth = Math.floor((oImg.width * maxheight) / oImg.height);
+        normalizedWidth = ~~((oImg.width * maxheight) / oImg.height);
         normalizedHeight = maxheight;
       }
       else if (maxheight && ((oImg.height == oImg.width) || (oImg.height > oImg.width) || (oImg.height > maxheight))) {
-        normalizedWidth = Math.floor((oImg.width * maxheight) / oImg.height);
+        normalizedWidth = ~~((oImg.width * maxheight) / oImg.height);
         normalizedHeight = maxheight;
       }
       else if (maxwidth && (maxwidth < oImg.width)){
-        normalizedHeight = Math.floor((oImg.height * maxwidth) / oImg.width);
+        normalizedHeight = ~~((oImg.height * maxwidth) / oImg.width);
         normalizedWidth = maxwidth;
       }
       else {
