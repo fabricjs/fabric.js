@@ -19,6 +19,7 @@
       <div id="fps">
         
       </div>
+      <div id="complexity">Canvas complexity (number of paths):<strong></strong></div>
       <canvas id="canvas" width="800" height="600"></canvas>
 
       <ul id="commands">
@@ -29,14 +30,17 @@
         <li><button class="triangle">Triangle</button></li>
         <li><button class="image1">Image 1</button></li>
         <li><button class="image2">Image 2</button></li>
-        <li><button class="shape" id="shape1">SVG shape 1</button></li>
-        <li><button class="shape" id="shape2">SVG shape 2</button></li>
-        <li><button class="shape" id="shape3">SVG shape 3</button></li>
-        <li><button class="shape" id="shape4">SVG shape 4</button></li>
+        <li><button class="shape" id="shape2">SVG shape (<strong>90</strong> paths)</button></li>
+        <li><button class="shape" id="shape1">SVG shape (<strong>448</strong> paths)</button></li>
+        <li><button class="shape" id="shape3">SVG shape (<strong>1197</strong> paths)</button></li>
+        <li><button class="shape" id="shape5">SVG shape (<strong>2208</strong> paths)</button></li>
+        <li><button class="shape" id="shape4">SVG shape (<strong>2742</strong> paths)</button></li>
 
         <li><button id="rasterize">Rasterize canvas to image</button></li>
 
         <li><button class="clear">Clear canvas</button></li>
+        <li><button id="remove-selected">Remove selected object/group</button></li>
+        
         <li style="margin-top:20px;">
           <label for="canvas-console">Execute code:</label>
 <textarea rows="17" cols="45" id="canvas-console">

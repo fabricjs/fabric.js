@@ -1,10 +1,19 @@
 (function() {
   
+  function pad(str, length) {
+    while (str.length < length) {
+      str = '0' + str;
+    }
+    return str;
+   };
+  
   var getRandomInt = fabric.util.getRandomInt;
   function getRandomColor() {
-    return getRandomInt(0, 255).toString(16) 
-      + getRandomInt(0, 255).toString(16) 
-      + getRandomInt(0, 255).toString(16);
+    return (
+      pad(getRandomInt(0, 255).toString(16), 2) + 
+      pad(getRandomInt(0, 255).toString(16), 2) + 
+      pad(getRandomInt(0, 255).toString(16), 2)
+    );
   }
   function getRandomNum(min, max) {
     return Math.random() * (max - min) + min;
@@ -112,6 +121,9 @@
           canvas.clear();
         }
     }
+    setTimeout(function(){
+      document.getElementById('complexity').childNodes[1].innerHTML = ' ' + canvas.complexity();
+    }, 100);
   };
   
   document.getElementById('execute').onclick = function() {
@@ -123,6 +135,21 @@
   
   document.getElementById('rasterize').onclick = function() {
     window.open(canvas.toDataURL('png'));
+  };
+  
+  document.getElementById('remove-selected').onclick = function() {
+    var activeObject = canvas.getActiveObject(),
+        activeGroup = canvas.getActiveGroup();
+    if (activeObject) {
+      canvas.remove(activeObject);
+    }
+    else if (activeGroup) {
+      var objectsInGroup = activeGroup.getObjects();
+      canvas.removeActiveGroup();
+      objectsInGroup.forEach(function(object) {
+        canvas.remove(object);
+      });
+    }
   };
   
 })();
