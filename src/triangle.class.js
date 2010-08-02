@@ -31,12 +31,15 @@
      * @method _render
      * @param ctx {CanvasRenderingContext2D} context to render on
      */
-    _render: function(ctx) {
-      ctx.beginPath();
+    _render: function(ctx) {      
+      var widthBy2 = this.width / 2,
+          heightBy2 = this.height / 2;
       
-      ctx.moveTo(-this.width / 2, this.height / 2);
-      ctx.lineTo(0, -this.height / 2);
-      ctx.lineTo(this.width / 2, this.height / 2);
+      ctx.beginPath();
+      ctx.moveTo(-widthBy2, heightBy2);
+      ctx.lineTo(0, -heightBy2);
+      ctx.lineTo(widthBy2, heightBy2);
+      ctx.closePath();
       
       if (this.fill) {
         ctx.fill();

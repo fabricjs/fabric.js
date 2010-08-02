@@ -3046,18 +3046,18 @@ fabric.util.animate = animate;
 
       this.clearContext(this.contextTop);
 
-      if (containerCanvas !== this.contextTop) {
+      if (!allOnTop) {
         this.clearContext(containerCanvas);
       }
 
       if (allOnTop) {
-        if (!CAN_SET_TRANSPARENT_FILL && this.backgroundColor === 'transparent') {
+        /*if (!CAN_SET_TRANSPARENT_FILL && this.backgroundColor === 'transparent') {
           var skip = true;
         }
         if (!skip) {
           containerCanvas.fillStyle = this.backgroundColor;
         }
-        containerCanvas.fillRect(0, 0, w, h);
+        containerCanvas.fillRect(0, 0, w, h);*/
       }
 
       var length = this._objects.length,
@@ -3210,6 +3210,7 @@ fabric.util.animate = animate;
       if (format === 'jpeg' || format === 'png') {
         this.renderAll(true);
         data = this.getElement().toDataURL('image/' + format);
+        this.renderAll();
       }
       return data;
     },
@@ -5494,6 +5495,7 @@ fabric.util.animate = animate;
     _render: function(ctx) {
       ctx.beginPath();
       ctx.arc(0, 0, this.radius, 0, piBy2, false);
+      ctx.closePath();
       if (this.fill) {
         ctx.fill();
       }
@@ -5584,11 +5586,14 @@ fabric.util.animate = animate;
      * @param ctx {CanvasRenderingContext2D} context to render on
      */
     _render: function(ctx) {
-      ctx.beginPath();
+      var widthBy2 = this.width / 2,
+          heightBy2 = this.height / 2;
 
-      ctx.moveTo(-this.width / 2, this.height / 2);
-      ctx.lineTo(0, -this.height / 2);
-      ctx.lineTo(this.width / 2, this.height / 2);
+      ctx.beginPath();
+      ctx.moveTo(-widthBy2, heightBy2);
+      ctx.lineTo(0, -heightBy2);
+      ctx.lineTo(widthBy2, heightBy2);
+      ctx.closePath();
 
       if (this.fill) {
         ctx.fill();

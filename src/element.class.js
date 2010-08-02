@@ -1017,18 +1017,18 @@
 
       this.clearContext(this.contextTop);
 
-      if (containerCanvas !== this.contextTop) {
+      if (!allOnTop) {
         this.clearContext(containerCanvas);
       }
       
       if (allOnTop) {
-        if (!CAN_SET_TRANSPARENT_FILL && this.backgroundColor === 'transparent') {
+        /*if (!CAN_SET_TRANSPARENT_FILL && this.backgroundColor === 'transparent') {
           var skip = true;
         }
         if (!skip) {
           containerCanvas.fillStyle = this.backgroundColor;
         }
-        containerCanvas.fillRect(0, 0, w, h);
+        containerCanvas.fillRect(0, 0, w, h);*/
       }
       
       var length = this._objects.length,
@@ -1192,6 +1192,7 @@
       if (format === 'jpeg' || format === 'png') {
         this.renderAll(true);
         data = this.getElement().toDataURL('image/' + format);
+        this.renderAll();
       }
       return data;
     },

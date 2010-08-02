@@ -53,6 +53,7 @@
     _render: function(ctx) {
       ctx.beginPath();
       ctx.arc(0, 0, this.radius, 0, piBy2, false);
+      ctx.closePath();
       if (this.fill) {
         ctx.fill();
       }
