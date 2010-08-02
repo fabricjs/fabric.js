@@ -289,6 +289,10 @@
       var sidesBorderWidth = 2 * this.currentBorder;
       this.width = (this.getElement().width || 0) + sidesBorderWidth;
       this.height = (this.getElement().height || 0) + sidesBorderWidth;
+    },
+    
+    complexity: function() {
+      return 1;
     }
   });
   

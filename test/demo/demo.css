@@ -1,6 +1,6 @@
 #body-wrapper { width: 1200px; margin: 0 auto; overflow: hidden; position: relative; }
 #fps { position: absolute; left: 0; top: 0; background: rgb(200,200,200); width: 70px; }
-#commands { float: left; margin-left: 20px; list-style: none; }
+#commands { float: left; list-style: none; }
 #canvas-console { display: block; }
 #rasterize { margin-top: 10px; color: green; }
 

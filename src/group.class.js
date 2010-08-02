@@ -187,11 +187,11 @@
       
       var groupScaleFactor = Math.max(this.scaleX, this.scaleY);
       
-      for (var i = 0, len = this.objects.length; i < len; i++) {
-        var originalScaleFactor = this.objects[i].borderScaleFactor;
-        this.objects[i].borderScaleFactor = groupScaleFactor;
-        this.objects[i].render(ctx);
-        this.objects[i].borderScaleFactor = originalScaleFactor;
+      for (var i = 0, len = this.objects.length, object; object = this.objects[i]; i++) {
+        var originalScaleFactor = object.borderScaleFactor;
+        object.borderScaleFactor = groupScaleFactor;
+        object.render(ctx);
+        object.borderScaleFactor = originalScaleFactor;
       }
       this.hideBorders || this.drawBorders(ctx);
       this.hideCorners || this.drawCorners(ctx);

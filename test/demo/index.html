@@ -39,7 +39,22 @@
         <li><button class="clear">Clear canvas</button></li>
         <li style="margin-top:20px;">
           <label for="canvas-console">Execute code:</label>
-          <textarea rows="8" cols="40" id="canvas-console">canvas.clear(); // clears canvas</textarea>
+<textarea rows="17" cols="45" id="canvas-console">
+/*
+
+// clear canvas
+canvas.clear();
+
+// remove currently selected object
+canvas.remove(canvas.getActiveObject());
+
+// add red rectangle
+canvas.add(new fabric.Rect({ 
+  width: 50, height: 50, left: 50, top: 50, fill: 'rgb(255,0,0)' 
+}));
+
+*/
+</textarea>
           <button type="button" id="execute">Execute</button>
         </li>
       </ul>

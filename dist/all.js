@@ -4442,7 +4442,7 @@ fabric.util.animate = animate;
 
       if (this.active && !noTransform) {
         this.drawBorders(ctx);
-        this.drawCorners(ctx);
+        this.hideCorners || this.drawCorners(ctx);
       }
       ctx.restore();
     },
@@ -4615,8 +4615,8 @@ fabric.util.animate = animate;
       ctx.globalAlpha = this.isMoving ? o.borderOpacityWhenMoving : 1;
       ctx.strokeStyle = o.borderColor;
 
-      var scaleX = 1 / (this.scaleX < this.MIN_SCALE_LIMIT ? this.MIN_SCALE_LIMIT : this.scaleX);
-      var scaleY = 1 / (this.scaleY < this.MIN_SCALE_LIMIT ? this.MIN_SCALE_LIMIT : this.scaleY);
+      var scaleX = 1 / (this.scaleX < this.MIN_SCALE_LIMIT ? this.MIN_SCALE_LIMIT : this.scaleX),
+          scaleY = 1 / (this.scaleY < this.MIN_SCALE_LIMIT ? this.MIN_SCALE_LIMIT : this.scaleY);
 
       ctx.lineWidth = 1 / this.borderScaleFactor;
 
@@ -6961,11 +6961,11 @@ fabric.util.animate = animate;
 
       var groupScaleFactor = Math.max(this.scaleX, this.scaleY);
 
-      for (var i = 0, len = this.objects.length; i < len; i++) {
-        var originalScaleFactor = this.objects[i].borderScaleFactor;
-        this.objects[i].borderScaleFactor = groupScaleFactor;
-        this.objects[i].render(ctx);
-        this.objects[i].borderScaleFactor = originalScaleFactor;
+      for (var i = 0, len = this.objects.length, object; object = this.objects[i]; i++) {
+        var originalScaleFactor = object.borderScaleFactor;
+        object.borderScaleFactor = groupScaleFactor;
+        object.render(ctx);
+        object.borderScaleFactor = originalScaleFactor;
       }
       this.hideBorders || this.drawBorders(ctx);
       this.hideCorners || this.drawCorners(ctx);
@@ -7476,7 +7476,7 @@ fabric.util.animate = animate;
         normalizedWidth = ~~((oImg.width * maxheight) / oImg.height);
         normalizedHeight = maxheight;
       }
-      else if (maxwidth && (maxwidth < oImg.width)){
+      else if (maxwidth && (maxwidth < oImg.width)) {
         normalizedHeight = ~~((oImg.height * maxwidth) / oImg.width);
         normalizedWidth = maxwidth;
       }
@@ -7684,6 +7684,10 @@ fabric.util.animate = animate;
       var sidesBorderWidth = 2 * this.currentBorder;
       this.width = (this.getElement().width || 0) + sidesBorderWidth;
       this.height = (this.getElement().height || 0) + sidesBorderWidth;
+    },
+
+    complexity: function() {
+      return 1;
     }
   });
 
