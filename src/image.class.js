@@ -80,7 +80,7 @@
         normalizedWidth = ~~((oImg.width * maxheight) / oImg.height);
         normalizedHeight = maxheight;
       }
-      else if (maxwidth && (maxwidth < oImg.width)){ 
+      else if (maxwidth && (maxwidth < oImg.width)) {
         // width is the constraining dimension.
         normalizedHeight = ~~((oImg.height * maxwidth) / oImg.width);
         normalizedWidth = maxwidth;

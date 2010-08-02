@@ -76,14 +76,14 @@
         break;
       
       case 'image1':
-        fabric.Image.fromURL('http://www.dooziedog.com/dog_breeds/pug/images/full/Pug-Puppy.jpg', function(image) {
-          image.set('left', left).set('top', top).set('angle', angle).scale(getRandomNum(0.05, 0.25)).setCoords();
+        fabric.Image.fromURL('assets/pug.jpg', function(image) {
+          image.set('left', left).set('top', top).set('angle', angle).scale(getRandomNum(0.1, 0.25)).setCoords();
           canvas.add(image);
         });
         break;
       
       case 'image2':
-        fabric.Image.fromURL('http://www.google.com/intl/en_ALL/images/srpr/logo1w.png', function(image) {
+        fabric.Image.fromURL('assets/logo.png', function(image) {
           image.set('left', left).set('top', top).set('angle', angle).scale(getRandomNum(0.1, 1)).setCoords();
           canvas.add(image);
         });
