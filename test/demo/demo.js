@@ -152,4 +152,38 @@
     }
   };
   
+  var supportsSlider = (function(){
+    var el = document.createElement('input');
+    el.type = 'range';
+    return el.type === 'range';
+  })();
+  
+  if (supportsSlider) {
+    var controls = document.getElementById('controls');
+    
+    var sliderLabel = document.createElement('label');
+    sliderLabel.htmlFor = 'opacity';
+    sliderLabel.innerHTML = 'Opacity: ';
+    
+    var slider = document.createElement('input');
+    slider.type = 'range';
+    slider.id = 'opacity';
+    slider.value = 100;
+    
+    controls.appendChild(sliderLabel);
+    controls.appendChild(slider);
+    
+    canvas.calcOffset();
+    
+    slider.onchange = function() {
+      var activeObject = canvas.getActiveObject(),
+          activeGroup = canvas.getActiveGroup();
+          
+      if (activeObject || activeGroup) {
+        (activeObject || activeGroup).set('opacity', parseInt(this.value, 10) / 100);
+        canvas.renderAll();
+      }
+    };
+  }
+  
 })();

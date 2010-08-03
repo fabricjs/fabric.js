@@ -16,11 +16,16 @@
   </head>
   <body>
     <div id="body-wrapper">
-      <div id="fps">
-        
+      <div id="controls">
+
       </div>
-      <div id="complexity">Canvas complexity (number of paths):<strong></strong></div>
-      <canvas id="canvas" width="800" height="600"></canvas>
+      <div style="position:relative;width:804px;height:604px;float:left;">
+        <canvas id="canvas" width="800" height="600"></canvas>
+        <div id="fps">
+
+        </div>
+        <div id="complexity">Canvas complexity (number of paths):<strong></strong></div>
+      </div>
 
       <ul id="commands">
         <li style="font-weight:bold;margin-bottom:1em">Add objects to canvas:</li>
@@ -28,10 +33,13 @@
         <li><button class="rect">Rectangle</button></li>
         <li><button class="circle">Circle</button></li>
         <li><button class="triangle">Triangle</button></li>
-        <li><button class="image1">Image 1</button></li>
+        
+        <li style="margin-top:10px"><button class="image1">Image 1</button></li>
         <li><button class="image2">Image 2</button></li>
-        <li><button class="shape" id="shape2">SVG shape (<strong>90</strong> paths)</button></li>
+        
+        <li style="margin-top:10px;"><button class="shape" id="shape2">SVG shape (<strong>90</strong> paths)</button></li>
         <li><button class="shape" id="shape1">SVG shape (<strong>448</strong> paths)</button></li>
+        <li><button class="shape" id="shape7">SVG shape (<strong>1018</strong> paths)</button></li>
         <li><button class="shape" id="shape3">SVG shape (<strong>1197</strong> paths)</button></li>
         <li><button class="shape" id="shape5">SVG shape (<strong>2208</strong> paths)</button></li>
         <li><button class="shape" id="shape4">SVG shape (<strong>2742</strong> paths)</button></li>
@@ -42,11 +50,10 @@
         <li><button class="clear">Clear canvas</button></li>
         <li><button id="remove-selected">Remove selected object/group</button></li>
         
-        <li style="margin-top:20px;">
+        <li style="margin-top:10px;">
           <label for="canvas-console">Execute code:</label>
 <textarea rows="17" cols="45" id="canvas-console">
 /*
-
 // clear canvas
 canvas.clear();
 
@@ -55,9 +62,21 @@ canvas.remove(canvas.getActiveObject());
 
 // add red rectangle
 canvas.add(new fabric.Rect({ 
-  width: 50, height: 50, left: 50, top: 50, fill: 'rgb(255,0,0)' 
+  width: 50, 
+  height: 50, 
+  left: 50, 
+  top: 50, 
+  fill: 'rgb(255,0,0)' 
 }));
 
+// add green, half-transparent circle
+canvas.add(new fabric.Circle({ 
+  radius: 40, 
+  left: 50, 
+  top: 50, 
+  fill: 'rgb(0,255,0)', 
+  opacity: 0.5
+}));
 */
 </textarea>
           <button type="button" id="execute">Execute</button>
