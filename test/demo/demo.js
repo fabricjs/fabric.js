@@ -186,4 +186,70 @@
     };
   }
   
+  var lockHorizontallyEl = document.getElementById('lock-horizontally');
+  lockHorizontallyEl.onclick = function() {
+    var activeObject = canvas.getActiveObject();
+    if (activeObject) {
+      activeObject.lockHorizontally = !activeObject.lockHorizontally;
+      lockHorizontallyEl.innerHTML = activeObject.lockHorizontally 
+        ? 'Unlock horizontal movement' 
+        : 'Lock horizontal movement';
+    }
+  };
+  
+  var lockVerticallyEl = document.getElementById('lock-vertically');
+  lockVerticallyEl.onclick = function() {
+    var activeObject = canvas.getActiveObject();
+    if (activeObject) {
+      activeObject.lockVertically = !activeObject.lockVertically;
+      lockVerticallyEl.innerHTML = activeObject.lockVertically 
+        ? 'Unlock vertical movement' 
+        : 'Lock vertical movement';
+    }
+  };
+  
+  var lockScalingEl = document.getElementById('lock-scaling');
+  lockScalingEl.onclick = function() {
+    var activeObject = canvas.getActiveObject();
+    if (activeObject) {
+      activeObject.lockScaling = !activeObject.lockScaling;
+      lockScalingEl.innerHTML = activeObject.lockScaling 
+        ? 'Unlock scaling' 
+        : 'Lock scaling';
+    }
+  };
+  
+  var lockRotationEl = document.getElementById('lock-rotation');
+  lockRotationEl.onclick = function() {
+    var activeObject = canvas.getActiveObject();
+    if (activeObject) {
+      activeObject.lockRotation = !activeObject.lockRotation;
+      lockRotationEl.innerHTML = activeObject.lockRotation
+        ? 'Unlock rotation' 
+        : 'Lock rotation';
+    }
+  };
+  
+  var activeObjectButtons = [ lockHorizontallyEl, lockVerticallyEl, lockScalingEl, lockRotationEl ];
+  
+  fabric.util.observeEvent('object:selected', function(e) {
+    var selectedObject = e.memo.target;
+    
+    for (var i = activeObjectButtons.length; i--; ) {
+      activeObjectButtons[i].disabled = false;
+    }
+    
+    lockHorizontallyEl.innerHTML = (selectedObject.lockHorizontally ? 'Unlock horizontal movement' : 'Lock horizontal movement');
+    lockVerticallyEl.innerHTML = (selectedObject.lockVertically ? 'Unlock vertical movement' : 'Lock vertical movement');
+    lockScalingEl.innerHTML = (selectedObject.lockScaling ? 'Unlock scaling' : 'Lock scaling');
+    lockRotationEl.innerHTML = (selectedObject.lockRotation ? 'Unlock rotation' : 'Lock rotation');
+    
+  });
+  
+  fabric.util.observeEvent('selection:cleared', function(e) {
+    for (var i = activeObjectButtons.length; i--; ) {
+      activeObjectButtons[i].disabled = true;
+    }
+  });
+  
 })();

@@ -681,11 +681,13 @@
     */
     __onMouseMove: function (e) {
       
+      var groupSelector = this._groupSelector;
+      
       // We initially clicked in an empty area, so we draw a box for multiple selection.
-      if (this._groupSelector !== null) {
+      if (groupSelector !== null) {
         var pointer = getPointer(e);
-        this._groupSelector.left = pointer.x - this._offset.left - this._groupSelector.ex;
-        this._groupSelector.top = pointer.y - this._offset.top - this._groupSelector.ey;
+        groupSelector.left = pointer.x - this._offset.left - groupSelector.ex;
+        groupSelector.top = pointer.y - this._offset.top - groupSelector.ey;
         this.renderTop();
       }
       else if (!this._currentTransform) {
@@ -756,8 +758,8 @@
      */
     _translateObject: function (x, y) {
       var target = this._currentTransform.target;
-      target.set('left', x - this._currentTransform.offsetX);
-      target.set('top', y - this._currentTransform.offsetY);
+      target.lockHorizontally || target.set('left', x - this._currentTransform.offsetX);
+      target.lockVertically || target.set('top', y - this._currentTransform.offsetY);
     },
 
     /**
@@ -769,24 +771,26 @@
      *                    When not provided, an object is scaled by both dimensions equally
      */ 
     _scaleObject: function (x, y, by) {
-      var lastLen = sqrt(pow(this._currentTransform.ey - this._currentTransform.top - this._offset.top, 2) +
-        pow(this._currentTransform.ex - this._currentTransform.left - this._offset.left, 2));
+      var t = this._currentTransform,
+          offset = this._offset,
+          target = t.target;
       
-      var curLen = sqrt(pow(y - this._currentTransform.top - this._offset.top, 2) +
-        pow(x - this._currentTransform.left - this._offset.left, 2));
+      if (target.lockScaling) return;
       
-      var target = this._currentTransform.target;
+      var lastLen = sqrt(pow(t.ey - t.top - offset.top, 2) + pow(t.ex - t.left - offset.left, 2)),
+          curLen = sqrt(pow(y - t.top - offset.top, 2) + pow(x - t.left - offset.left, 2));
+      
       target._scaling = true;
       
       if (!by) {
-        target.set('scaleX', this._currentTransform.scaleX * curLen/lastLen);
-        target.set('scaleY', this._currentTransform.scaleY * curLen/lastLen);
+        target.set('scaleX', t.scaleX * curLen/lastLen);
+        target.set('scaleY', t.scaleY * curLen/lastLen);
       }
       else if (by === 'x') {
-        target.set('scaleX', this._currentTransform.scaleX * curLen/lastLen);
+        target.set('scaleX', t.scaleX * curLen/lastLen);
       }
       else if (by === 'y') {
-        target.set('scaleY', this._currentTransform.scaleY * curLen/lastLen);
+        target.set('scaleY', t.scaleY * curLen/lastLen);
       }
     },
 
@@ -797,11 +801,16 @@
      * @param y {Number} pointer's y coordinate
      */ 
     _rotateObject: function (x, y) {
-      var lastAngle = atan2(this._currentTransform.ey - this._currentTransform.top - this._offset.top,
-        this._currentTransform.ex - this._currentTransform.left - this._offset.left); 
-      var curAngle = atan2(y - this._currentTransform.top - this._offset.top,
-        x - this._currentTransform.left - this._offset.left);
-      this._currentTransform.target.set('theta', (curAngle - lastAngle) + this._currentTransform.theta);
+      
+      var t = this._currentTransform, 
+          o = this._offset;
+      
+      if (t.target.lockRotation) return;
+      
+      var lastAngle = atan2(t.ey - t.top - o.top, t.ex - t.left - o.left),
+          curAngle = atan2(y - t.top - o.top, x - t.left - o.left);
+          
+      t.target.set('theta', (curAngle - lastAngle) + t.theta);
     },
     
     /**
@@ -862,16 +871,17 @@
      * @private
      */
     _drawSelection: function () {
-      var left = this._groupSelector.left,
-          top = this._groupSelector.top,
+      var groupSelector = this._groupSelector,
+          left = groupSelector.left,
+          top = groupSelector.top,
           aleft = abs(left),
           atop = abs(top);
 
       this.contextTop.fillStyle = this.selectionColor;
 
       this.contextTop.fillRect(
-        this._groupSelector.ex - ((left > 0) ? 0 : -left),
-        this._groupSelector.ey - ((top > 0) ? 0 : -top),
+        groupSelector.ex - ((left > 0) ? 0 : -left),
+        groupSelector.ey - ((top > 0) ? 0 : -top),
         aleft, 
         atop
       );
@@ -880,15 +890,14 @@
       this.contextTop.strokeStyle = this.selectionBorderColor;
       
       this.contextTop.strokeRect(
-        this._groupSelector.ex + STROKE_OFFSET - ((left > 0) ? 0 : aleft), 
-        this._groupSelector.ey + STROKE_OFFSET - ((top > 0) ? 0 : atop),
+        groupSelector.ex + STROKE_OFFSET - ((left > 0) ? 0 : aleft), 
+        groupSelector.ey + STROKE_OFFSET - ((top > 0) ? 0 : atop),
         aleft,
         atop
       );
     },
     
     _findSelectedObjects: function (e) {
-      
       var target, 
           targetRegion,
           group = [ ],
@@ -1714,8 +1723,8 @@
     
     _enlivenCachedObject: function (cachedObject) {
       
-      var objects = cachedObject.objects;
-      var options = cachedObject.options;
+      var objects = cachedObject.objects,
+          options = cachedObject.options;
       
       objects = objects.map(function (o) {
         return fabric[capitalize(o.type)].fromObject(o);

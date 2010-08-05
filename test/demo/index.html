@@ -30,12 +30,16 @@
       <ul id="commands">
         <li style="font-weight:bold;margin-bottom:1em">Add objects to canvas:</li>
 
-        <li><button class="rect">Rectangle</button></li>
-        <li><button class="circle">Circle</button></li>
-        <li><button class="triangle">Triangle</button></li>
+        <li>
+          <button class="rect">Rectangle</button>
+          <button class="circle">Circle</button>
+          <button class="triangle">Triangle</button>
+        </li>
         
-        <li style="margin-top:10px"><button class="image1">Image 1</button></li>
-        <li><button class="image2">Image 2</button></li>
+        <li style="margin-top:10px">
+          <button class="image1">Image 1</button>
+          <button class="image2">Image 2</button>
+        </li>
         
         <li style="margin-top:10px;"><button class="shape" id="shape2">SVG shape (<strong>90</strong> paths)</button></li>
         <li><button class="shape" id="shape1">SVG shape (<strong>448</strong> paths)</button></li>
@@ -49,6 +53,19 @@
 
         <li><button class="clear">Clear canvas</button></li>
         <li><button id="remove-selected">Remove selected object/group</button></li>
+        
+        <li style="margin-top:10px;">
+          <button id="lock-horizontally" disabled>Lock horizontal movement</button>
+        </li>
+        <li>
+          <button id="lock-vertically" disabled>Lock vertical movement</button>
+        </li>
+        <li>
+          <button id="lock-scaling" disabled>Lock scaling</button>
+        </li>
+        <li>
+          <button id="lock-rotation" disabled>Lock rotation</button>
+        </li>
         
         <li style="margin-top:10px;">
           <label for="canvas-console">Execute code:</label>
