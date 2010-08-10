@@ -121,10 +121,14 @@
           canvas.clear();
         }
     }
+    updateComplexity();
+  };
+  
+  function updateComplexity() {
     setTimeout(function(){
       document.getElementById('complexity').childNodes[1].innerHTML = ' ' + canvas.complexity();
     }, 100);
-  };
+  }
   
   document.getElementById('execute').onclick = function() {
     var code = document.getElementById('canvas-console').value;
@@ -250,6 +254,23 @@
     for (var i = activeObjectButtons.length; i--; ) {
       activeObjectButtons[i].disabled = true;
     }
+  });
+  
+  var drawingModeEl = document.getElementById('drawing-mode');
+  drawingModeEl.onclick = function() {
+    canvas.isDrawingMode = !canvas.isDrawingMode;
+    if (canvas.isDrawingMode) {
+      drawingModeEl.innerHTML = 'Cancel drawing mode';
+      drawingModeEl.className = 'is-drawing'
+    }
+    else {
+      drawingModeEl.innerHTML = 'Enter drawing mode';
+      drawingModeEl.className = '';
+    }
+  };
+  
+  fabric.util.observeEvent('path:created', function() {
+    updateComplexity();
   });
   
 })();

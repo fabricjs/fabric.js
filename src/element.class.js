@@ -20,6 +20,9 @@
       addListener = fabric.util.addListener,
       removeListener = fabric.util.removeListener,
       
+      utilMin = fabric.util.array.min,
+      utilMax = fabric.util.array.max,
+      
       sqrt = Math.sqrt,
       pow = Math.pow,
       atan2 = Math.atan2,
@@ -115,6 +118,16 @@
      */
     this._activeGroup = null;
     
+    /**
+     * X coordinates of a path, captured during free drawing
+     */
+    this._freeDrawingXPoints = [ ];
+    
+    /**
+     * Y coordinates of a path, captured during free drawing
+     */
+    this._freeDrawingYPoints = [ ];
+    
      /**
       * An object containing config parameters
       * @property _config
@@ -149,7 +162,7 @@
     selectionColor:         'rgba(100,100,255,0.3)', // blue
     selectionBorderColor:   'rgba(255,255,255,0.3)',
     selectionLineWidth:     1,
-    backgroundColor:        'rgba(255,255,255,1)',
+    backgroundColor:        'transparent',
     includeDefaultValues:   true,
     
     shouldCacheImages:      false,
@@ -434,6 +447,12 @@
      *
      */
     __onMouseUp: function (e) {
+      
+      if (this.isDrawingMode && this._isCurrentlyDrawing) {
+        this._finalizeDrawingPath();
+        return;
+      }
+      
       if (this._currentTransform) {
         
         var transform = this._currentTransform,
@@ -488,7 +507,7 @@
       }, 50);
     },
     
-    shouldClearSelection: function (e) {
+    _shouldClearSelection: function (e) {
       var target = this.findTarget(e),
           activeGroup = this.getActiveGroup();
       return (
@@ -513,6 +532,11 @@
      */
     __onMouseDown: function (e) {
       
+      if (this.isDrawingMode) {
+        this._prepareForDrawing(e);
+        return;
+      }
+      
       // ignore if some object is being transformed at this moment
       if (this._currentTransform) return;
       
@@ -521,7 +545,7 @@
           activeGroup = this.getActiveGroup(), 
           corner;
       
-      if (this.shouldClearSelection(e)) {
+      if (this._shouldClearSelection(e)) {
         
         this._groupSelector = {
           ex: pointer.x,
@@ -668,6 +692,66 @@
         activeGroup.saveCoords();
       }
     },
+    
+    _prepareForDrawing: function(e) {
+      
+      this._isCurrentlyDrawing = true;
+      
+      this.removeActiveObject().renderAll();
+      
+      var pointer = this.getPointer(e);
+      
+      this._freeDrawingXPoints.length = this._freeDrawingYPoints.length = 0;
+      
+      this._freeDrawingXPoints.push(pointer.x);
+      this._freeDrawingYPoints.push(pointer.y);
+      
+      this.contextTop.beginPath();
+      this.contextTop.moveTo(pointer.x, pointer.y);
+      this.contextTop.strokeStyle = 'rgb(0,0,0)';
+    },
+    
+    _captureDrawingPath: function(e) {
+      var pointer = this.getPointer(e);
+      
+      this._freeDrawingXPoints.push(pointer.x);
+      this._freeDrawingYPoints.push(pointer.y);
+      
+      this.contextTop.lineTo(pointer.x, pointer.y);
+      this.contextTop.stroke();
+    },
+    
+    _finalizeDrawingPath: function() {
+      
+      this.contextTop.closePath();
+      
+      this._isCurrentlyDrawing = false;
+      
+      var minX = utilMin(this._freeDrawingXPoints),
+          minY = utilMin(this._freeDrawingYPoints),
+          maxX = utilMax(this._freeDrawingXPoints),
+          maxY = utilMax(this._freeDrawingYPoints),
+          ctx = this.contextTop,
+          path = [ ],
+          xPoints = this._freeDrawingXPoints,
+          yPoints = this._freeDrawingYPoints;
+      
+      ctx.fillStyle = 'rgb(0, 0, 0)';
+      
+      path.push('M ', xPoints[0] - minX, ' ', yPoints[0] - minY, ' ');
+      
+      for (var i = 1; xPoint = xPoints[i], yPoint = yPoints[i]; i++) {
+        path.push('L ', xPoint - minX, ' ', yPoint - minY, ' ');
+      }
+      
+      var p = new fabric.Path(path.join('')); 
+      p.fill = null;
+      p.options.stroke = "rgb(0,0,0)";
+      this.add(p);
+      p.set("left", minX + (maxX - minX) / 2).set("top", minY + (maxY - minY) / 2).setCoords();
+      this.renderAll();
+      fireEvent('path:created', { path: p });
+    },
 
    /**
     * Method that defines the actions when mouse is hovering the canvas.
@@ -680,6 +764,13 @@
     *
     */
     __onMouseMove: function (e) {
+      
+      if (this.isDrawingMode) {
+        if (this._isCurrentlyDrawing) {
+          this._captureDrawingPath(e);
+        }
+        return;
+      }
       
       var groupSelector = this._groupSelector;
       
@@ -1992,7 +2083,7 @@
       // cache
       var clone = this.__clone || (this.__clone = new fabric.Element(el));
       
-      return clone.loadFromJSON(this.toJSON(), function () {
+      return clone.loadFromJSON(JSON.stringify(this.toJSON()), function () {
         if (callback) {
           callback(clone);
         }
