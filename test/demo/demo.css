@@ -1,10 +1,11 @@
 #body-wrapper { width: 1200px; margin: 0 auto; overflow: hidden; position: relative; }
 #fps { position: absolute; left: 1px; top: 0; background: rgb(200,200,200); width: 70px; z-index: 1000; }
-#commands { float: left; list-style: none; }
+#commands { float: left; list-style: none; font-size: 14px; }
 #canvas-console { display: block; font-size: 11px; }
 #rasterize { margin-top: 10px; color: green; }
 #complexity { position: absolute; bottom: -20px; left: 0; }
 #controls { margin-bottom: 5px; }
+#drawing-mode-options { margin-top: 5px; background: #ffc; padding: 5px; border: 1px solid #aaa; }
 
 .canvas_container { margin: 0 auto; position: relative; float: left; border: 1px solid #aaa; }
 .clear { color: red; font-weight: bold; margin-top: 1em; }

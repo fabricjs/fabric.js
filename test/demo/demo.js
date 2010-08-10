@@ -256,21 +256,34 @@
     }
   });
   
-  var drawingModeEl = document.getElementById('drawing-mode');
+  var drawingModeEl = document.getElementById('drawing-mode'),
+      drawingOptionsEl = document.getElementById('drawing-mode-options'),
+      drawingColorEl = document.getElementById('drawing-color'),
+      drawingLineWidthEl = document.getElementById('drawing-line-width');
+      
   drawingModeEl.onclick = function() {
     canvas.isDrawingMode = !canvas.isDrawingMode;
     if (canvas.isDrawingMode) {
       drawingModeEl.innerHTML = 'Cancel drawing mode';
-      drawingModeEl.className = 'is-drawing'
+      drawingModeEl.className = 'is-drawing';
+      drawingOptionsEl.style.display = '';
     }
     else {
       drawingModeEl.innerHTML = 'Enter drawing mode';
       drawingModeEl.className = '';
+      drawingOptionsEl.style.display = 'none';
     }
   };
   
   fabric.util.observeEvent('path:created', function() {
     updateComplexity();
   });
+  
+  drawingColorEl.onchange = function() {
+    canvas.freeDrawingColor = drawingColorEl.value;
+  };
+  drawingLineWidthEl.onchange = function() {
+    canvas.freeDrawingLineWidth = parseInt(drawingLineWidthEl.value, 10) || 1; // disallow 0, NaN, etc.
+  };
   
 })();

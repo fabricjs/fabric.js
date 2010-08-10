@@ -2227,10 +2227,13 @@ fabric.util.animate = animate;
 
   extend(fabric.Element.prototype, {
 
-    selectionColor:         'rgba(100,100,255,0.3)', // blue
-    selectionBorderColor:   'rgba(255,255,255,0.3)',
-    selectionLineWidth:     1,
+    selectionColor:         'rgba(100, 100, 255, 0.3)', // blue
+    selectionBorderColor:   'rgba(255, 255, 255, 0.3)',
+    freeDrawingColor:       'rgb(0, 0, 0)',
     backgroundColor:        'transparent',
+
+    freeDrawingLineWidth:   1,
+    selectionLineWidth:     1,
     includeDefaultValues:   true,
 
     shouldCacheImages:      false,
@@ -2756,7 +2759,8 @@ fabric.util.animate = animate;
 
       this.contextTop.beginPath();
       this.contextTop.moveTo(pointer.x, pointer.y);
-      this.contextTop.strokeStyle = 'rgb(0,0,0)';
+      this.contextTop.strokeStyle = this.freeDrawingColor;
+      this.contextTop.lineWidth = this.freeDrawingLineWidth;
     },
 
     _captureDrawingPath: function(e) {
@@ -2784,17 +2788,17 @@ fabric.util.animate = animate;
           xPoints = this._freeDrawingXPoints,
           yPoints = this._freeDrawingYPoints;
 
-      ctx.fillStyle = 'rgb(0, 0, 0)';
-
       path.push('M ', xPoints[0] - minX, ' ', yPoints[0] - minY, ' ');
 
       for (var i = 1; xPoint = xPoints[i], yPoint = yPoints[i]; i++) {
         path.push('L ', xPoint - minX, ' ', yPoint - minY, ' ');
       }
 
+
       var p = new fabric.Path(path.join(''));
       p.fill = null;
-      p.options.stroke = "rgb(0,0,0)";
+      p.stroke = this.freeDrawingColor;
+      p.strokeWidth = this.freeDrawingLineWidth;
       this.add(p);
       p.set("left", minX + (maxX - minX) / 2).set("top", minY + (maxY - minY) / 2).setCoords();
       this.renderAll();
@@ -3150,15 +3154,13 @@ fabric.util.animate = animate;
         this.clearContext(containerCanvas);
       }
 
-      if (allOnTop) {
-        /*if (!CAN_SET_TRANSPARENT_FILL && this.backgroundColor === 'transparent') {
-          var skip = true;
-        }
-        if (!skip) {
-          containerCanvas.fillStyle = this.backgroundColor;
-        }
-        containerCanvas.fillRect(0, 0, w, h);*/
+      if (!CAN_SET_TRANSPARENT_FILL && this.backgroundColor === 'transparent') {
+        var skip = true;
       }
+      if (!skip) {
+        containerCanvas.fillStyle = this.backgroundColor;
+      }
+      containerCanvas.fillRect(0, 0, w, h);
 
       var length = this._objects.length,
           activeGroup = this.getActiveGroup();
@@ -6501,9 +6503,9 @@ fabric.util.animate = animate;
       if (this.fill) {
         ctx.fill();
       }
-      if (this.options.stroke) {
-        ctx.strokeStyle = this.options.stroke;
-        ctx.lineWidth = this.options.strokeWidth;
+      if (this.stroke) {
+        ctx.strokeStyle = this.stroke;
+        ctx.lineWidth = this.strokeWidth;
         ctx.stroke();
       }
       if (!noTransform && this.active) {

@@ -290,9 +290,9 @@
       if (this.fill) {
         ctx.fill();
       }
-      if (this.options.stroke) {
-        ctx.strokeStyle = this.options.stroke;
-        ctx.lineWidth = this.options.strokeWidth;
+      if (this.stroke) {
+        ctx.strokeStyle = this.stroke;
+        ctx.lineWidth = this.strokeWidth;
         ctx.stroke();
       }
       if (!noTransform && this.active) {
