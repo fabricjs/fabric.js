@@ -2596,6 +2596,9 @@ fabric.util.animate = animate;
 
       if (this.isDrawingMode) {
         this._prepareForDrawing(e);
+
+        this._captureDrawingPath(e);
+
         return;
       }
 
@@ -2761,6 +2764,7 @@ fabric.util.animate = animate;
       this.contextTop.moveTo(pointer.x, pointer.y);
       this.contextTop.strokeStyle = this.freeDrawingColor;
       this.contextTop.lineWidth = this.freeDrawingLineWidth;
+      this.contextTop.lineCap = this.contextTop.lineJoin = 'round';
     },
 
     _captureDrawingPath: function(e) {
@@ -6506,6 +6510,7 @@ fabric.util.animate = animate;
       if (this.stroke) {
         ctx.strokeStyle = this.stroke;
         ctx.lineWidth = this.strokeWidth;
+        ctx.lineCap = ctx.lineJoin = 'round';
         ctx.stroke();
       }
       if (!noTransform && this.active) {

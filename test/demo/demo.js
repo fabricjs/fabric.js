@@ -286,4 +286,7 @@
     canvas.freeDrawingLineWidth = parseInt(drawingLineWidthEl.value, 10) || 1; // disallow 0, NaN, etc.
   };
   
+  canvas.freeDrawingColor = drawingColorEl.value;
+  canvas.freeDrawingLineWidth = parseInt(drawingLineWidthEl.value, 10) || 1;
+  
 })();

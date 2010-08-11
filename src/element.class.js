@@ -537,6 +537,10 @@
       
       if (this.isDrawingMode) {
         this._prepareForDrawing(e);
+        
+        // capture coordinates immediately; this allows to draw dots (when movement never occurs)
+        this._captureDrawingPath(e);
+        
         return;
       }
       
@@ -713,6 +717,7 @@
       this.contextTop.moveTo(pointer.x, pointer.y);
       this.contextTop.strokeStyle = this.freeDrawingColor;
       this.contextTop.lineWidth = this.freeDrawingLineWidth;
+      this.contextTop.lineCap = this.contextTop.lineJoin = 'round';
     },
     
     _captureDrawingPath: function(e) {

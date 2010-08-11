@@ -293,6 +293,7 @@
       if (this.stroke) {
         ctx.strokeStyle = this.stroke;
         ctx.lineWidth = this.strokeWidth;
+        ctx.lineCap = ctx.lineJoin = 'round';
         ctx.stroke();
       }
       if (!noTransform && this.active) {
