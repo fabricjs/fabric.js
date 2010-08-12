@@ -19,7 +19,7 @@
     return Math.random() * (max - min) + min;
   }
   function loadSVGFromURL(url, callback) {
-    var req = new fabric.util.request(url, {
+    new fabric.util.request(url, {
       method: 'get',
       onComplete: function(r) {
         var xml = r.responseXML;
