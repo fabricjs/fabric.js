@@ -1,11 +1,9 @@
 /*! Fabric.js Copyright 2010, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-if (typeof console == 'undefined') {
-  var console = {
-    log: function() { },
-    warn: function() { }
-  };
-}
+var console = console || {
+  log: function() { },
+  warn: function() { }
+};
 
 /*
     http://www.JSON.org/json2.js
@@ -565,7 +563,7 @@ if (!Array.prototype.filter) {
         }
       }
     }
-    return res;
+    return result;
   };
 }
 
@@ -932,7 +930,7 @@ if (!Function.prototype.bind) {
     var docElement = document.documentElement,
         body = document.body || { scrollLeft: 0 };
 
-    return event.pageX || (event.clientX +
+    return event.pageX || ((typeof event.clientX != 'unknown' ? event.clientX : 0) +
       (docElement.scrollLeft || body.scrollLeft) -
       (docElement.clientLeft || 0));
   }
@@ -941,7 +939,7 @@ if (!Function.prototype.bind) {
     var docElement = document.documentElement,
         body = document.body || { scrollTop: 0 };
 
-    return  event.pageY || (event.clientY +
+    return  event.pageY || ((typeof event.clientY != 'unknown' ? event.clientY : 0) +
        (docElement.scrollTop || body.scrollTop) -
        (docElement.clientTop || 0));
   }
@@ -2115,28 +2113,6 @@ fabric.util.animate = animate;
         'mb': 's-resize'
       };
 
-  var CAN_SET_TRANSPARENT_FILL = (function () {
-
-
-    var canvasEl = document.createElement('canvas');
-    if (!canvasEl || !canvasEl.getContext) {
-      return;
-    }
-
-    var context = canvasEl.getContext('2d');
-    if (!context) {
-      return;
-    }
-
-    try {
-      context.fillStyle = 'transparent';
-      return true;
-    }
-    catch(err) { }
-
-    return false;
-  })();
-
   /**
    * @class fabric.Element
    * @constructor
@@ -2230,7 +2206,7 @@ fabric.util.animate = animate;
     selectionColor:         'rgba(100, 100, 255, 0.3)', // blue
     selectionBorderColor:   'rgba(255, 255, 255, 0.3)',
     freeDrawingColor:       'rgb(0, 0, 0)',
-    backgroundColor:        'transparent',
+    backgroundColor:        'rgba(0, 0, 0, 0)',
 
     freeDrawingLineWidth:   1,
     selectionLineWidth:     1,
@@ -2296,7 +2272,7 @@ fabric.util.animate = animate;
       var el = fabric.util.getById(canvasEl);
       this._element = el || document.createElement('canvas');
 
-      if (typeof this._element.getContext === 'undefined') {
+      if (typeof this._element.getContext === 'undefined' && typeof G_vmlCanvasManager !== 'undefined') {
         G_vmlCanvasManager.initElement(this._element);
       }
       if (typeof this._element.getContext === 'undefined') {
@@ -2402,7 +2378,7 @@ fabric.util.animate = animate;
       oContainer.style.left = 0;
       oContainer.style.top = 0;
 
-      if (typeof element.getContext === 'undefined') {
+      if (typeof element.getContext === 'undefined' && typeof G_vmlCanvasManager !== 'undefined') {
         G_vmlCanvasManager.initElement(element);
       }
       if (typeof element.getContext === 'undefined') {
@@ -3157,13 +3133,7 @@ fabric.util.animate = animate;
       if (!allOnTop) {
         this.clearContext(containerCanvas);
       }
-
-      if (!CAN_SET_TRANSPARENT_FILL && this.backgroundColor === 'transparent') {
-        var skip = true;
-      }
-      if (!skip) {
-        containerCanvas.fillStyle = this.backgroundColor;
-      }
+      containerCanvas.fillStyle = this.backgroundColor;
       containerCanvas.fillRect(0, 0, w, h);
 
       var length = this._objects.length,
