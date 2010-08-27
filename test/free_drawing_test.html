@@ -8,6 +8,9 @@
       #c, #d { border: 1px solid #aaa; }
       body { margin: 0; }
     </style>
+    <!--[if lt IE 9]>
+      <script type="text/javascript" src="../lib/excanvas.js"></script>
+    <![endif]-->
     <script src="../dist/all.js" type="text/javascript"></script>
   </head>
   <body>
@@ -25,7 +28,13 @@
     <script type="text/javascript">
       (function() {
         var canvas = document.getElementById('d'),
-            ctx = canvas.getContext('2d'),
+            ctx = (function(){
+              return canvas.getContext 
+                ? canvas.getContext('2d') 
+                : typeof G_vmlCanvasManager != 'undefined' 
+                  ? G_vmlCanvasManager.initElement(canvas).getContext('2d')
+                  : null;
+            })(),
             path = [ ],
             xPoints = [ ],
             yPoints = [ ],
@@ -38,9 +47,12 @@
             hardness = 50,
             color = 'rgba(255,0,0,0)';
         
+        if (!ctx) return;
+        
         ctx.fillStyle = '#000000';
         
         function onMove(e) {
+          e = e || window.event;
           var x = e.pageX,
               y = e.pageY,
               spread = type == 'pencil' ? (diameter - 1) : (hardness / 100 * diameter - 1);
@@ -72,6 +84,7 @@
         }
         
         canvas.onmousedown = function(e) {
+          e = e || window.event;
           var x = e.pageX,
               y = e.pageY;
               
@@ -87,6 +100,7 @@
         };
         
         canvas.onmouseup = function(e) {
+          e = e || window.event;
           canvas.onmousemove = null;
           
           var minX = fabric.util.array.min(xPoints),

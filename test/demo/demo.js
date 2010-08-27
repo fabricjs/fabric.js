@@ -40,7 +40,14 @@
   };
   
   document.getElementById('commands').onclick = function(ev) {
-    ev.preventDefault();
+    ev = ev || window.event;
+    
+    if (ev.preventDefault) {
+      ev.preventDefault()
+    }
+    else if (ev.returnValue) {
+      ev.returnValue = false;
+    }
     
     var element = ev.target || ev.srcElement,
         className = element.className,
@@ -158,7 +165,10 @@
   
   var supportsSlider = (function(){
     var el = document.createElement('input');
-    el.type = 'range';
+    try {
+      el.type = 'range';
+    }
+    catch(err) { }
     return el.type === 'range';
   })();
   

@@ -70,7 +70,7 @@ if (!Array.prototype.filter) {
         }
       }
     }
-    return res;
+    return result;
   };
 }
 
