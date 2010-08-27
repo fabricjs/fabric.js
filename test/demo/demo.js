@@ -145,7 +145,12 @@
   };
   
   document.getElementById('rasterize').onclick = function() {
-    window.open(canvas.toDataURL('png'));
+    if (!fabric.Element.supports('toDataURL')) {
+      alert('This browser doesn\'t provide means to serialize canvas to an image');
+    }
+    else {
+      window.open(canvas.toDataURL('png'));
+    }
   };
   
   document.getElementById('remove-selected').onclick = function() {

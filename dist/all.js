@@ -4153,6 +4153,9 @@ fabric.util.animate = animate;
      */
     supports: function (methodName) {
       var el = document.createElement('canvas');
+      if (typeof G_vmlCanvasManager !== 'undefined') {
+        G_vmlCanvasManager.initElement(el);
+      }
       if (!el || !el.getContext) {
         return null;
       }
