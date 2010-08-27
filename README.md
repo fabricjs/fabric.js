@@ -17,7 +17,7 @@ Using Fabric.js, you can create and populate objects on canvas; objects like sim
 - Safari 3+
 - Opera 9.64+
 - Chrome 1+
-- IE9pre3
+- IE9 PP4
 
 #### With help of [Explorer Canvas](http://code.google.com/p/explorercanvas/)
 
@@ -45,6 +45,12 @@ Fabric.js started as a foundation for design editor on [printio.ru](http://print
         
         # or Google Closure Compiler
         $ java -jar lib/google_closure_compiler.jar --js dist/all.js --js_output_file dist/all.min.js
+
+### Demos
+
+- [Main demo](http://yura.thinkweb2.com/canvas_demo/test/demo/)
+- [Benchmark (quantity)](http://yura.thinkweb2.com/canvas_demo/test/benchmarks/quantity.html)
+- [Benchmark (animation)](http://yura.thinkweb2.com/canvas_demo/test/benchmarks/animation.html)
 
 ### Examples of use
 
