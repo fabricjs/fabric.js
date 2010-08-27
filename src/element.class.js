@@ -46,29 +46,6 @@
         'mb': 's-resize'
       };
   
-  var CAN_SET_TRANSPARENT_FILL = (function () {
-    
-    // FF2.0 (and maybe other equivalents) throw error
-    
-    var canvasEl = document.createElement('canvas');
-    if (!canvasEl || !canvasEl.getContext) {
-      return;
-    }
-    
-    var context = canvasEl.getContext('2d');
-    if (!context) {
-      return;
-    }
-    
-    try { 
-      context.fillStyle = 'transparent';
-      return true;
-    }
-    catch(err) { }
-    
-    return false;
-  })();
-  
   /**
    * @class fabric.Element
    * @constructor
@@ -162,7 +139,7 @@
     selectionColor:         'rgba(100, 100, 255, 0.3)', // blue
     selectionBorderColor:   'rgba(255, 255, 255, 0.3)',
     freeDrawingColor:       'rgb(0, 0, 0)',
-    backgroundColor:        'transparent',
+    backgroundColor:        'rgba(0, 0, 0, 0)',
     
     freeDrawingLineWidth:   1,
     selectionLineWidth:     1,
@@ -229,7 +206,7 @@
       var el = fabric.util.getById(canvasEl);
       this._element = el || document.createElement('canvas');
       
-      if (typeof this._element.getContext === 'undefined') {
+      if (typeof this._element.getContext === 'undefined' && typeof G_vmlCanvasManager !== 'undefined') {
         G_vmlCanvasManager.initElement(this._element);
       }
       if (typeof this._element.getContext === 'undefined') {
@@ -335,7 +312,7 @@
       oContainer.style.left = 0;
       oContainer.style.top = 0;
       
-      if (typeof element.getContext === 'undefined') {
+      if (typeof element.getContext === 'undefined' && typeof G_vmlCanvasManager !== 'undefined') {
         // try augmenting element with excanvas' G_vmlCanvasManager
         G_vmlCanvasManager.initElement(element);
       }
@@ -1131,13 +1108,7 @@
       if (!allOnTop) {
         this.clearContext(containerCanvas);
       }
-      
-      if (!CAN_SET_TRANSPARENT_FILL && this.backgroundColor === 'transparent') {
-        var skip = true;
-      }
-      if (!skip) {
-        containerCanvas.fillStyle = this.backgroundColor;
-      }
+      containerCanvas.fillStyle = this.backgroundColor;
       containerCanvas.fillRect(0, 0, w, h);
       
       var length = this._objects.length,
