@@ -1,11 +1,9 @@
 /*! Fabric.js Copyright 2010, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-if (typeof console == 'undefined') {
-  var console = { 
-    log: function() { }, 
-    warn: function() { } 
-  };
-}
+var console = console || {
+  log: function() { }, 
+  warn: function() { }
+};
 
 //= require "lib/json2"
 
