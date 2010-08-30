@@ -1541,13 +1541,13 @@
     _enlivenObjects: function (objects, callback) {
       var numLoadedImages = 0,
           // get length of all images 
-          numTotalImages = objects.filter(function (o){
+          numTotalImages = objects.filter(function (o) {
             return o.type === 'image';
           }).length;
       
       var _this = this;
       
-      objects.forEach(function (o) {
+      objects.forEach(function (o, index) {
         if (!o.type) {
           return;
         }
@@ -1555,16 +1555,18 @@
           case 'image':
           case 'font':
             fabric[capitalize(o.type)].fromObject(o, function (o) {
-              _this.add(o);
+              _this.insertAt(o, index);
               if (++numLoadedImages === numTotalImages) {
-                if (callback) callback();
+                if (callback) {
+                  callback();
+                }
               }
             });
             break;
           default:
             var klass = fabric[camelize(capitalize(o.type))];
             if (klass && klass.fromObject) {
-              _this.add(klass.fromObject(o));
+              _this.insertAt(klass.fromObject(o), index);
             }
             break;
         }
