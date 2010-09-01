@@ -78,4 +78,38 @@
     equals(fabric.util.falseFunction(), false);
   });
   
+  test('String.prototype.trim', function() {
+    ok(typeof String.prototype.trim == 'function');
+    equals('\t\n   foo bar \n    \xA0  '.trim(), 'foo bar');
+  });
+  
+  test('camelize', function() {
+    var camelize = fabric.util.string.camelize;
+    
+    ok(typeof camelize == 'function');
+    
+    equals(camelize('foo'), 'foo');
+    equals(camelize('foo-bar'), 'fooBar');
+    equals(camelize('Foo-bar-Baz'), 'FooBarBaz');
+    equals(camelize('FooBarBaz'), 'FooBarBaz');
+    equals(camelize('-bar'), 'Bar');
+    equals(camelize(''), '');
+    equals(camelize('and_something_with_underscores'), 'and_something_with_underscores');
+    equals(camelize('underscores_and-dashes'), 'underscores_andDashes');
+    equals(camelize('--double'), 'Double');
+  });
+  
+  test('capitalize', function() {
+    var capitalize = fabric.util.string.capitalize;
+    
+    ok(typeof capitalize == 'function');
+    
+    equals(capitalize('foo'), 'Foo');
+    equals(capitalize(''), '');
+    equals(capitalize('Foo'), 'Foo');
+    equals(capitalize('foo-bar-baz'), 'Foo-bar-baz');
+    equals(capitalize('FOO'), 'Foo');
+    equals(capitalize('FoobaR'), 'Foobar');
+    equals(capitalize('2foo'), '2foo');
+  });
 })();
