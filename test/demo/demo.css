@@ -1,6 +1,7 @@
 #body-wrapper { width: 1200px; margin: 0 auto; overflow: hidden; position: relative; }
 #fps { position: absolute; left: 1px; top: 0; background: rgb(200,200,200); width: 70px; z-index: 1000; }
-#commands { float: left; list-style: none; font-size: 14px; }
+#commands { float: left; font-size: 14px; margin-left: 10px; }
+#commands ul { list-style: none; padding-left: 0; }
 #canvas-console { display: block; font-size: 11px; }
 #rasterize { margin-top: 10px; color: green; }
 #complexity { position: absolute; bottom: -20px; left: 0; }
@@ -12,3 +13,6 @@
 
 #drawing-mode { color: blue; }
 #drawing-mode.is-drawing { color: red; }
+
+.svg-shapes { overflow: hidden; width: 320px; }
+.svg-shapes li { display: inline; }

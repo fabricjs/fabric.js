@@ -25,88 +25,105 @@
         <div id="complexity">Canvas complexity (number of paths):<strong></strong></div>
       </div>
 
-      <ul id="commands">
-        <li style="font-weight:bold;margin-bottom:1em">Add objects to canvas:</li>
-
-        <li>
-          <button class="rect">Rectangle</button>
-          <button class="circle">Circle</button>
-          <button class="triangle">Triangle</button>
-        </li>
+      <div id="commands">
+        <p>Add <strong>simple shapes</strong> to canvas:</p>
+        <ul>
+          <li>
+            <button class="rect">Rectangle</button>
+            <button class="circle">Circle</button>
+            <button class="triangle">Triangle</button>
+          </li>
+        </ul>
         
-        <li style="margin-top:10px">
-          <button class="image1">Image 1</button>
-          <button class="image2">Image 2</button>
-        </li>
+        <p>Add <strong>images</strong> to canvas:</p>
+        <ul>
+          <li style="margin-top:10px">
+            <button class="image1">Image 1</button>
+            <button class="image2">Image 2</button>
+          </li>
+        </ul>
         
-        <li style="margin-top:10px;"><button class="shape" id="shape2">SVG shape (<strong>90</strong> paths)</button></li>
-        <li><button class="shape" id="shape1">SVG shape (<strong>448</strong> paths)</button></li>
-        <li><button class="shape" id="shape7">SVG shape (<strong>1018</strong> paths)</button></li>
-        <li><button class="shape" id="shape3">SVG shape (<strong>1197</strong> paths)</button></li>
-        <li><button class="shape" id="shape5">SVG shape (<strong>2208</strong> paths)</button></li>
-        <li><button class="shape" id="shape4">SVG shape (<strong>2742</strong> paths)</button></li>
-        <li><button class="shape" id="shape6">SVG shape (<strong>3921</strong> paths)</button></li>
-
-        <li><button id="rasterize">Rasterize canvas to image</button></li>
-
-        <li><button class="clear">Clear canvas</button></li>
-        <li><button id="remove-selected">Remove selected object/group</button></li>
+        <p>Add <strong>SVG shapes</strong> to canvas:</p>
+        <ul class="svg-shapes">
+          <li><button class="shape" id="shape8"><strong>65</strong> paths</button></li>
+          <li><button class="shape" id="shape17"><strong>87</strong> paths</button></li>
+          <li><button class="shape" id="shape2"><strong>90</strong> paths</button></li>
+          <li><button class="shape" id="shape14"><strong>226</strong> paths</button></li>
+          <li><button class="shape" id="shape9"><strong>404</strong> paths</button></li>
+          <li><button class="shape" id="shape1"><strong>448</strong> paths</button></li>
+          <li><button class="shape" id="shape10"><strong>778</strong> paths</button></li>
+          <li><button class="shape" id="shape7"><strong>1018</strong> paths</button></li>
+          <li><button class="shape" id="shape3"><strong>1197</strong> paths</button></li>
+          <li><button class="shape" id="shape13"><strong>1652</strong> paths</button></li>
+          <li><button class="shape" id="shape5"><strong>2208</strong> paths</button></li>
+          <li><button class="shape" id="shape4"><strong>2742</strong> paths</button></li>
+          <li><button class="shape" id="shape6"><strong>3921</strong> paths</button></li>
+          <li><button class="shape" id="shape15"><strong>8325</strong> paths</button></li>
+          <li><button class="shape" id="shape18"><strong>x</strong> paths</button></li>
+        </ul>
         
-        <li style="margin-top:10px;">
-          <button id="lock-horizontally" disabled>Lock horizontal movement</button>
-        </li>
-        <li>
-          <button id="lock-vertically" disabled>Lock vertical movement</button>
-        </li>
-        <li>
-          <button id="lock-scaling" disabled>Lock scaling</button>
-        </li>
-        <li>
-          <button id="lock-rotation" disabled>Lock rotation</button>
-        </li>
+        <ul>
+          <li><button id="rasterize">Rasterize canvas to image</button></li>
+
+          <li><button class="clear">Clear canvas</button></li>
+          <li><button id="remove-selected">Remove selected object/group</button></li>
         
-        <li style="margin-top:10px;">
-          <button id="drawing-mode">Enter drawing mode</button>
-          <div style="display:none;" id="drawing-mode-options">
-            Width:
-            <input value="10" id="drawing-line-width" size="2">
-            Color:
-            <input value="rgb(0,0,0)" id="drawing-color" size="15">
-          </div>
-        </li>
+          <li style="margin-top:10px;">
+            <button id="lock-horizontally">Lock horizontal movement</button>
+          </li>
+          <li>
+            <button id="lock-vertically">Lock vertical movement</button>
+          </li>
+          <li>
+            <button id="lock-scaling">Lock scaling</button>
+          </li>
+          <li>
+            <button id="lock-rotation">Lock rotation</button>
+          </li>
         
-        <li style="margin-top:10px;">
-          <label for="canvas-console">Execute code:</label>
-<textarea rows="17" cols="45" id="canvas-console">
-/*
-// clear canvas
-canvas.clear();
+          <li style="margin-top:10px;">
+            <button id="drawing-mode">Enter drawing mode</button>
+            <div style="display:none;" id="drawing-mode-options">
+              Width:
+              <input value="10" id="drawing-line-width" size="2">
+              Color:
+              <input value="rgb(0,0,0)" id="drawing-color" size="15">
+            </div>
+          </li>
+        
+          <li style="margin-top:10px;">
+            <label for="canvas-console">Execute code:</label>
+  <textarea rows="17" cols="45" id="canvas-console">
+  /*
+  // clear canvas
+  canvas.clear();
 
-// remove currently selected object
-canvas.remove(canvas.getActiveObject());
+  // remove currently selected object
+  canvas.remove(canvas.getActiveObject());
 
-// add red rectangle
-canvas.add(new fabric.Rect({ 
-  width: 50, 
-  height: 50, 
-  left: 50, 
-  top: 50, 
-  fill: 'rgb(255,0,0)' 
-}));
+  // add red rectangle
+  canvas.add(new fabric.Rect({ 
+    width: 50, 
+    height: 50, 
+    left: 50, 
+    top: 50, 
+    fill: 'rgb(255,0,0)' 
+  }));
 
-// add green, half-transparent circle
-canvas.add(new fabric.Circle({ 
-  radius: 40, 
-  left: 50, 
-  top: 50, 
-  fill: 'rgb(0,255,0)', 
-  opacity: 0.5
-}));
-*/
-</textarea>
-          <button type="button" id="execute">Execute</button>
-        </li>
-      </ul>
+  // add green, half-transparent circle
+  canvas.add(new fabric.Circle({ 
+    radius: 40, 
+    left: 50, 
+    top: 50, 
+    fill: 'rgb(0,255,0)', 
+    opacity: 0.5
+  }));
+  */
+  </textarea>
+            <button type="button" id="execute">Execute</button>
+          </li>
+        </ul>
+      </div>
     </div>
     <script src="demo.js" type="text/javascript"></script>
   </body>

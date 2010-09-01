@@ -153,7 +153,8 @@
     }
   };
   
-  document.getElementById('remove-selected').onclick = function() {
+  var removeSelectedEl = document.getElementById('remove-selected');
+  removeSelectedEl.onclick = function() {
     var activeObject = canvas.getActiveObject(),
         activeGroup = canvas.getActiveGroup();
     if (activeObject) {
@@ -249,9 +250,16 @@
     }
   };
   
-  var activeObjectButtons = [ lockHorizontallyEl, lockVerticallyEl, lockScalingEl, lockRotationEl ];
+  var activeObjectButtons = [ lockHorizontallyEl, lockVerticallyEl, lockScalingEl, lockRotationEl, removeSelectedEl ];
   
-  fabric.util.observeEvent('object:selected', function(e) {
+  for (var i = activeObjectButtons.length; i--; ) {
+    activeObjectButtons[i].disabled = true;
+  }
+  
+  fabric.util.observeEvent('object:selected', onObjectSelected);
+  fabric.util.observeEvent('group:selected', onObjectSelected);
+  
+  function onObjectSelected(e) {
     var selectedObject = e.memo.target;
     
     for (var i = activeObjectButtons.length; i--; ) {
@@ -262,8 +270,7 @@
     lockVerticallyEl.innerHTML = (selectedObject.lockVertically ? 'Unlock vertical movement' : 'Lock vertical movement');
     lockScalingEl.innerHTML = (selectedObject.lockScaling ? 'Unlock scaling' : 'Lock scaling');
     lockRotationEl.innerHTML = (selectedObject.lockRotation ? 'Unlock rotation' : 'Lock rotation');
-    
-  });
+  }
   
   fabric.util.observeEvent('selection:cleared', function(e) {
     for (var i = activeObjectButtons.length; i--; ) {
