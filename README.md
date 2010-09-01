@@ -2,6 +2,8 @@
 
 Using Fabric.js, you can create and populate objects on canvas; objects like simple geometrical shapes — rectangles, circles, ellipses, polygons, or more complex shapes consisting of hundreds or thousands of simple paths. You can then scale, move, and rotate these objects with the mouse; modify their properties — color, transparency, z-index, etc. You can also manipulate these objects altogether — grouping them with a simple mouse selection.
 
+Contributions are very much welcome!
+
 ### Goals
 
 - Unit tested (939 tests at the moment)
@@ -23,6 +25,8 @@ Using Fabric.js, you can create and populate objects on canvas; objects like sim
 
 - IE8 (incomplete — about 17 failing tests at the moment)
 - IE7,6 (incomplete - about 27 failing tests at the moment)
+
+You can [run automated unit tests](http://kangax.github.com/fabric.js/test/unit/suite_runner.html) right in the browser.
 
 ### History
 
@@ -48,9 +52,9 @@ Fabric.js started as a foundation for design editor on [printio.ru](http://print
 
 ### Demos
 
-- [Main demo](http://yura.thinkweb2.com/canvas_demo/test/demo/)
-- [Benchmark (quantity)](http://yura.thinkweb2.com/canvas_demo/test/benchmarks/quantity.html)
-- [Benchmark (animation)](http://yura.thinkweb2.com/canvas_demo/test/benchmarks/animation.html)
+- [Main demo](http://kangax.github.com/fabric.js/test/demo/)
+- [Benchmark (quantity)](http://kangax.github.com/fabric.js/test/benchmarks/quantity.html)
+- [Benchmark (animation)](http://kangax.github.com/fabric.js/test/benchmarks/animation.html)
 
 ### Examples of use
 
