@@ -112,4 +112,41 @@
     equals(capitalize('FoobaR'), 'Foobar');
     equals(capitalize('2foo'), '2foo');
   });
+  
+  test('extend', function() {
+    var extend = fabric.util.object.extend;
+    
+    ok(typeof extend == 'function');
+    
+    var destination = { x: 1 },
+        source = { y: 2 };
+        
+    extend(destination, source);
+    
+    equals(destination.x, 1);
+    equals(destination.y, 2);
+    equals(source.x, undefined);
+    equals(source.y, 2);
+    
+    destination = { x: 1 };
+    source = { x: 2 };
+    
+    extend(destination, source);
+    
+    equals(destination.x, 2);
+    equals(source.x, 2);
+  });
+  
+  test('clone', function() {
+    var clone = fabric.util.object.clone;
+    
+    ok(typeof clone == 'function');
+    
+    var obj = { x: 1, y: [1, 2, 3] },
+        clone = clone(obj);
+    
+    equals(clone.x, 1);
+    notEqual(obj, clone);
+    equals(clone.y, obj.y);
+  });
 })();
