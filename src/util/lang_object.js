@@ -1,6 +1,6 @@
 function extend(destination, source) {
   
-  // JScript DontEnum bug is not take care of
+  // JScript DontEnum bug is not taken care of
   for (var property in source) {
     destination[property] = source[property];
   }
