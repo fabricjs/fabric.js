@@ -149,4 +149,49 @@
     notEqual(obj, clone);
     equals(clone.y, obj.y);
   });
+  
+  test('bind', function() {
+    ok(typeof Function.prototype.bind == 'function');
+    
+    var obj = { };
+    function fn() {
+      return [this, arguments[0], arguments[1]];
+    }
+    
+    var bound = fn.bind(obj);
+    same([obj, undefined, undefined], bound());
+    same([obj, 1, undefined], bound(1))
+    same([obj, 1, null], bound(1, null));
+    
+    bound = fn.bind(obj, 1);
+    same([obj, 1, undefined], bound());
+    same([obj, 1, 2], bound(2));
+  });
+  
+  test('getById', function() {
+    ok(typeof fabric.util.getById == 'function');
+    
+    var el = document.createElement('div');
+    el.id = 'foobarbaz';
+    document.body.appendChild(el);
+    
+    equals(el, fabric.util.getById(el));
+    equals(el, fabric.util.getById('foobarbaz'));
+    equals(null, fabric.util.getById('likely-non-existent-id'));
+  });
+  
+  test('toArray', function() {
+    ok(typeof fabric.util.toArray == 'function');
+    
+    same(['x', 'y'], fabric.util.toArray({ 0: 'x', 1: 'y', length: 2 }));
+    same([1, 3], fabric.util.toArray(function(){ return arguments }(1, 3)));
+    
+    var nodelist = document.getElementsByTagName('div'),
+        converted = fabric.util.toArray(nodelist);
+        
+    ok(converted instanceof Array);
+    equals(nodelist.length, converted.length);
+    equals(nodelist[0], converted[0]);
+    equals(nodelist[1], converted[1]);
+  });
 })();
