@@ -107,8 +107,16 @@
     if (!element) {
       return null;
     }
+    options || (options = { });
+    
     var points = fabric.parsePointsAttribute(element.getAttribute('points')),
         parsedAttributes = fabric.parseAttributes(element, fabric.Polygon.ATTRIBUTE_NAMES);
+    
+    for (var i = 0, len = points.length; i < len; i++) {
+      // normalize coordinates, according to containing box (dimensions of which are passed via `options`)
+      points[i].x -= (options.width / 2) || 0;
+      points[i].y -= (options.height / 2) || 0;
+    }
         
     return new fabric.Polygon(points, extend(parsedAttributes, options));
   };
