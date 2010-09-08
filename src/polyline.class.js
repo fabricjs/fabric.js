@@ -36,14 +36,6 @@
     },
     
     /**
-     * @private
-     * @method _toOrigin
-     */
-    _toOrigin: function() {
-      return fabric.Polygon.prototype._toOrigin.call(this);
-    },
-    
-    /**
      * Returns object representation of an instance
      * @method toObject
      * @return {Object} object representation of an instance

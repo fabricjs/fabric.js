@@ -52,19 +52,6 @@
     },
     
     /**
-     * @private
-     * @method _toOrigin
-     */
-    _toOrigin: function() {
-      this.points = this.points.map(function(point) {
-        return {
-          x: point.x - this.minX, 
-          y: point.y - this.minY
-        };
-      }, this);
-    },
-    
-    /**
      * Returns object representation of an instance
      * @method toObject
      * @return {Object} object representation of an instance

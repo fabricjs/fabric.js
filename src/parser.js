@@ -206,19 +206,34 @@
    * @return {Array} array of points
    */
   function parsePointsAttribute(points) {
+        
     // points attribute is required and must not be empty
     if (!points) return null;
-    points = points.trim().split(/\s+/);
-    var parsedPoints = points.reduce(function(memo, pair) {
-      pair = pair.split(',');
-      memo.push({ x: parseFloat(pair[0]), y: parseFloat(pair[1]) });
-      return memo;
-    }, [ ]);
+    
+    points = points.trim();
+    var asPairs = points.indexOf(',') > -1;
+    
+    points = points.split(/\s+/);
+    var parsedPoints = [ ];
+    
+    // points could look like "10,20 30,40" or "10 20 30 40"
+    if (asPairs) {  
+     for (var i = 0, len = points.length; i < len; i++) {
+       var pair = pair.split(',');
+       parsedPoints.push({ x: parseFloat(pair[0]), y: parseFloat(pair[1]) });
+     } 
+    }
+    else {
+      for (var i = 0, len = points.length; i < len; i+=2) {
+        parsedPoints.push({ x: parseFloat(points[i]), y: parseFloat(points[i+1]) });
+      }
+    }
     
     // odd number of points is an error
     if (parsedPoints.length % 2 !== 0) {
-      return null;
+      // return null;
     }
+    
     return parsedPoints;
   };
 
