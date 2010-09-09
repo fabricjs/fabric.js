@@ -6,7 +6,7 @@ Contributions are very much welcome!
 
 ### Goals
 
-- Unit tested (939 tests at the moment)
+- Unit tested (1007 tests at the moment)
 - Modular (~20 small "classes")
 - Cross-browser
 - Fast
