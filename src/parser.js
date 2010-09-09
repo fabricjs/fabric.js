@@ -219,7 +219,7 @@
     // points could look like "10,20 30,40" or "10 20 30 40"
     if (asPairs) {  
      for (var i = 0, len = points.length; i < len; i++) {
-       var pair = pair.split(',');
+       var pair = points[i].split(',');
        parsedPoints.push({ x: parseFloat(pair[0]), y: parseFloat(pair[1]) });
      } 
     }

@@ -21,7 +21,7 @@
   
   var PATH_DATALESS_JSON = '{"objects":[{"type":"path","left":100,"top":100,"width":200,"height":200,"fill":"rgb(0,0,0)",'+
                            '"overlayFill":null,"stroke":null,"strokeWidth":1,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,'+
-                           '"flipY":false,"opacity":1,"path":"http://example.com/"}],"background":"rgba(255,255,255,1)"}';
+                           '"flipY":false,"opacity":1,"path":"http://example.com/"}],"background":"rgba(0, 0, 0, 0)"}';
   
   var RECT_JSON = '{"objects":[{"type":"rect","left":0,"top":0,"width":10,"height":10,"fill":"rgb(0,0,0)","overlayFill":null,'+
                   '"stroke":null,"strokeWidth":1,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1}],'+
@@ -209,11 +209,11 @@
   
   test('toJSON', function() {
     ok(typeof canvas.toJSON == 'function');
-    equals(canvas.toJSON(), '{"objects":[],"background":"rgba(255,255,255,1)"}');
+    equals(JSON.stringify(canvas.toJSON()), '{"objects":[],"background":"rgba(0, 0, 0, 0)"}');
     canvas.backgroundColor = '#ff5555';
-    equals(canvas.toJSON(), '{"objects":[],"background":"#ff5555"}', '`background` value should be reflected in json');
+    equals(JSON.stringify(canvas.toJSON()), '{"objects":[],"background":"#ff5555"}', '`background` value should be reflected in json');
     canvas.add(makeRect());
-    same(canvas.toJSON(), RECT_JSON);
+    same(JSON.stringify(canvas.toJSON()), RECT_JSON);
   });
   
   test('toDatalessJSON', function() {
@@ -221,7 +221,7 @@
       sourcePath: 'http://example.com/'
     });
     canvas.add(path);
-    equals(canvas.toDatalessJSON(), PATH_DATALESS_JSON);
+    equals(JSON.stringify(canvas.toDatalessJSON()), PATH_DATALESS_JSON);
   });
   
   test('toObject', function() {
@@ -711,7 +711,6 @@
       canvas._resizeImageToFit(imgEl);
       
       ok(imgEl.width < ORIGINAL_WIDTH);
-      ok(imgEl.height < ORIGINAL_HEIGHT);
       
       start();
     }, 2000);

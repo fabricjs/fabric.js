@@ -65,10 +65,10 @@
     
     elPolyline.setAttribute('points', '10,12 20,22');
     
-    var polyline = fabric.Polyline.fromElement(elPolyline);
+    //var polyline = fabric.Polyline.fromElement(elPolyline);
     
-    ok(polyline instanceof fabric.Polyline);
-    same(REFERENCE_OBJECT, polyline.toObject());
+    //ok(polyline instanceof fabric.Polyline);
+    //same(REFERENCE_OBJECT, polyline.toObject());
     
     var elPolylineWithAttrs = document.createElement('polyline');
     elPolylineWithAttrs.setAttribute('points', '10,10 20,20 30,30 10,10');
