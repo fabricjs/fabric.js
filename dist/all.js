@@ -5,6 +5,8 @@ var console = console || {
   warn: function() { }
 };
 
+var fabric = fabric || { version: 0.1 };
+
 /*
     http://www.JSON.org/json2.js
     2010-03-20
