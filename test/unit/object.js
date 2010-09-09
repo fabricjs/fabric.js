@@ -94,10 +94,10 @@
       
     var cObj = new fabric.Object();
     ok(typeof cObj.toJSON == 'function');
-    equals(cObj.toJSON(), emptyObjectJSON);
+    equals(JSON.stringify(cObj.toJSON()), emptyObjectJSON);
     
     cObj.set('opacity', 0.88).set('scaleX', 1.3).set('width', 122).set('flipY', true);
-    equals(cObj.toJSON(), augmentedJSON);
+    equals(JSON.stringify(cObj.toJSON()), augmentedJSON);
   });
   
   test('toObject', function() {
