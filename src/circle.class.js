@@ -52,7 +52,7 @@
      */
     _render: function(ctx) {
       ctx.beginPath();
-      ctx.arc(0, 0, this.radius, 0, piBy2, false);
+      ctx.arc(this.left, this.top, this.radius, 0, piBy2, false);
       ctx.closePath();
       if (this.fill) {
         ctx.fill();
@@ -86,9 +86,16 @@
    * @return {Object} instance of fabric.Circle
    */
   fabric.Circle.fromElement = function(element, options) {
+    options || (options = { });
     var parsedAttributes = fabric.parseAttributes(element, fabric.Circle.ATTRIBUTE_NAMES);
     if (!isValidRadius(parsedAttributes)) {
       throw Error('value of `r` attribute is required and can not be negative');
+    }
+    if ('left' in parsedAttributes) {
+      parsedAttributes.left -= (options.width / 2) || 0;
+    }
+    if ('top' in parsedAttributes) {
+      parsedAttributes.top -= (options.height / 2) || 0;
     }
     return new fabric.Circle(extend(parsedAttributes, options));
   };

@@ -41,7 +41,7 @@
       return extend(this.callSuper('toObject'), {
         rx: this.get('rx'),
         ry: this.get('ry')
-      })
+      });
     },
     
     /**
@@ -64,7 +64,7 @@
       ctx.beginPath();
       ctx.save();
       ctx.transform(1, 0, 0, this.ry/this.rx, 0, 0);
-      ctx.arc(0, 0, this.rx, 0, Math.PI * 2, false);
+      ctx.arc(this.left, this.top, this.rx, 0, Math.PI * 2, false);
       ctx.restore();
       if (this.stroke) {
         ctx.stroke();
@@ -93,7 +93,14 @@
    * @return {Object} instance of fabric.Ellipse
    */
   fabric.Ellipse.fromElement = function(element, options) {
+    options || (options = { });
     var parsedAttributes = fabric.parseAttributes(element, fabric.Ellipse.ATTRIBUTE_NAMES);
+    if ('left' in parsedAttributes) {
+      parsedAttributes.left -= (options.width / 2) || 0;
+    }
+    if ('top' in parsedAttributes) {
+      parsedAttributes.top -= (options.height / 2) || 0;
+    }
     return new fabric.Ellipse(extend(parsedAttributes, options));
   };
   

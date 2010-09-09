@@ -652,6 +652,7 @@ fabric.util.array = {
   max: max
 };
 function extend(destination, source) {
+
   for (var property in source) {
     destination[property] = source[property];
   }
@@ -688,10 +689,10 @@ fabric.util.string = {
 };
 if (!Function.prototype.bind) {
   Function.prototype.bind = function(thisArg) {
-    var fn = this, args = Array.prototype.slice.call(arguments, 1);
-    return function() {
-      return fn.apply(thisArg, args.concat(Array.prototype.slice.call(arguments)));
-    };
+    var fn = this, args = slice.call(arguments, 1);
+    return args.length
+      ? function() { return fn.apply(thisArg, args.concat(slice.call(arguments))) }
+      : function() { return fn.apply(thisArg, arguments) };
   };
 }
 
@@ -1418,17 +1419,30 @@ fabric.util.animate = animate;
    * @return {Array} array of points
    */
   function parsePointsAttribute(points) {
+
     if (!points) return null;
-    points = points.trim().split(/\s+/);
-    var parsedPoints = points.reduce(function(memo, pair) {
-      pair = pair.split(',');
-      memo.push({ x: parseFloat(pair[0]), y: parseFloat(pair[1]) });
-      return memo;
-    }, [ ]);
+
+    points = points.trim();
+    var asPairs = points.indexOf(',') > -1;
+
+    points = points.split(/\s+/);
+    var parsedPoints = [ ];
+
+    if (asPairs) {
+     for (var i = 0, len = points.length; i < len; i++) {
+       var pair = pair.split(',');
+       parsedPoints.push({ x: parseFloat(pair[0]), y: parseFloat(pair[1]) });
+     }
+    }
+    else {
+      for (var i = 0, len = points.length; i < len; i+=2) {
+        parsedPoints.push({ x: parseFloat(points[i]), y: parseFloat(points[i+1]) });
+      }
+    }
 
     if (parsedPoints.length % 2 !== 0) {
-      return null;
     }
+
     return parsedPoints;
   };
 
@@ -3553,13 +3567,13 @@ fabric.util.animate = animate;
 
     _enlivenObjects: function (objects, callback) {
       var numLoadedImages = 0,
-          numTotalImages = objects.filter(function (o){
+          numTotalImages = objects.filter(function (o) {
             return o.type === 'image';
           }).length;
 
       var _this = this;
 
-      objects.forEach(function (o) {
+      objects.forEach(function (o, index) {
         if (!o.type) {
           return;
         }
@@ -3567,16 +3581,18 @@ fabric.util.animate = animate;
           case 'image':
           case 'font':
             fabric[capitalize(o.type)].fromObject(o, function (o) {
-              _this.add(o);
+              _this.insertAt(o, index);
               if (++numLoadedImages === numTotalImages) {
-                if (callback) callback();
+                if (callback) {
+                  callback();
+                }
               }
             });
             break;
           default:
             var klass = fabric[camelize(capitalize(o.type))];
             if (klass && klass.fromObject) {
-              _this.add(klass.fromObject(o));
+              _this.insertAt(klass.fromObject(o), index);
             }
             break;
         }
@@ -5573,7 +5589,7 @@ fabric.util.animate = animate;
      */
     _render: function(ctx) {
       ctx.beginPath();
-      ctx.arc(0, 0, this.radius, 0, piBy2, false);
+      ctx.arc(this.left, this.top, this.radius, 0, piBy2, false);
       ctx.closePath();
       if (this.fill) {
         ctx.fill();
@@ -5607,9 +5623,16 @@ fabric.util.animate = animate;
    * @return {Object} instance of fabric.Circle
    */
   fabric.Circle.fromElement = function(element, options) {
+    options || (options = { });
     var parsedAttributes = fabric.parseAttributes(element, fabric.Circle.ATTRIBUTE_NAMES);
     if (!isValidRadius(parsedAttributes)) {
       throw Error('value of `r` attribute is required and can not be negative');
+    }
+    if ('left' in parsedAttributes) {
+      parsedAttributes.left -= (options.width / 2) || 0;
+    }
+    if ('top' in parsedAttributes) {
+      parsedAttributes.top -= (options.height / 2) || 0;
     }
     return new fabric.Circle(extend(parsedAttributes, options));
   };
@@ -5744,7 +5767,7 @@ fabric.util.animate = animate;
       return extend(this.callSuper('toObject'), {
         rx: this.get('rx'),
         ry: this.get('ry')
-      })
+      });
     },
 
     /**
@@ -5766,7 +5789,7 @@ fabric.util.animate = animate;
       ctx.beginPath();
       ctx.save();
       ctx.transform(1, 0, 0, this.ry/this.rx, 0, 0);
-      ctx.arc(0, 0, this.rx, 0, Math.PI * 2, false);
+      ctx.arc(this.left, this.top, this.rx, 0, Math.PI * 2, false);
       ctx.restore();
       if (this.stroke) {
         ctx.stroke();
@@ -5795,7 +5818,14 @@ fabric.util.animate = animate;
    * @return {Object} instance of fabric.Ellipse
    */
   fabric.Ellipse.fromElement = function(element, options) {
+    options || (options = { });
     var parsedAttributes = fabric.parseAttributes(element, fabric.Ellipse.ATTRIBUTE_NAMES);
+    if ('left' in parsedAttributes) {
+      parsedAttributes.left -= (options.width / 2) || 0;
+    }
+    if ('top' in parsedAttributes) {
+      parsedAttributes.top -= (options.height / 2) || 0;
+    }
     return new fabric.Ellipse(extend(parsedAttributes, options));
   };
 
@@ -5986,14 +6016,6 @@ fabric.util.animate = animate;
     },
 
     /**
-     * @private
-     * @method _toOrigin
-     */
-    _toOrigin: function() {
-      return fabric.Polygon.prototype._toOrigin.call(this);
-    },
-
-    /**
      * Returns object representation of an instance
      * @method toObject
      * @return {Object} object representation of an instance
@@ -6044,8 +6066,15 @@ fabric.util.animate = animate;
     if (!element) {
       return null;
     }
+    options || (options = { });
+
     var points = fabric.parsePointsAttribute(element.getAttribute('points')),
         parsedAttributes = fabric.parseAttributes(element, ATTRIBUTE_NAMES);
+
+    for (var i = 0, len = points.length; i < len; i++) {
+      points[i].x -= (options.width / 2) || 0;
+      points[i].y -= (options.height / 2) || 0;
+    }
 
     return new fabric.Polyline(points, fabric.util.object.extend(parsedAttributes, options));
   };
@@ -6114,19 +6143,6 @@ fabric.util.animate = animate;
     },
 
     /**
-     * @private
-     * @method _toOrigin
-     */
-    _toOrigin: function() {
-      this.points = this.points.map(function(point) {
-        return {
-          x: point.x - this.minX,
-          y: point.y - this.minY
-        };
-      }, this);
-    },
-
-    /**
      * Returns object representation of an instance
      * @method toObject
      * @return {Object} object representation of an instance
@@ -6181,8 +6197,15 @@ fabric.util.animate = animate;
     if (!element) {
       return null;
     }
+    options || (options = { });
+
     var points = fabric.parsePointsAttribute(element.getAttribute('points')),
         parsedAttributes = fabric.parseAttributes(element, fabric.Polygon.ATTRIBUTE_NAMES);
+
+    for (var i = 0, len = points.length; i < len; i++) {
+      points[i].x -= (options.width / 2) || 0;
+      points[i].y -= (options.height / 2) || 0;
+    }
 
     return new fabric.Polygon(points, extend(parsedAttributes, options));
   };
