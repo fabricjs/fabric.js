@@ -50,9 +50,9 @@
      * @method _render
      * @param ctx {CanvasRenderingContext2D} context to render on
      */
-    _render: function(ctx) {
+    _render: function(ctx, noTransform) {
       ctx.beginPath();
-      ctx.arc(this.left, this.top, this.radius, 0, piBy2, false);
+      ctx.arc(noTransform ? this.left : 0, noTransform ? this.top : 0, this.radius, 0, piBy2, false);
       ctx.closePath();
       if (this.fill) {
         ctx.fill();
@@ -61,6 +61,7 @@
         ctx.stroke();
       }
     },
+    
     
     /**
      * Returns complexity of an instance

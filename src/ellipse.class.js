@@ -3,6 +3,7 @@
 (function(){
   
   var fabric = this.fabric || (this.fabric = { }),
+      piBy2   = Math.PI * 2,
       extend = fabric.util.object.extend;
   
   if (fabric.Ellipse) {
@@ -60,11 +61,11 @@
      * @method _render
      * @param ctx {CanvasRenderingContext2D} context to render on
      */
-    _render: function(ctx) {
+    _render: function(ctx, noTransform) {
       ctx.beginPath();
       ctx.save();
       ctx.transform(1, 0, 0, this.ry/this.rx, 0, 0);
-      ctx.arc(this.left, this.top, this.rx, 0, Math.PI * 2, false);
+      ctx.arc(noTransform ? this.left : 0, noTransform ? this.top : 0, this.rx, 0, piBy2, false);
       ctx.restore();
       if (this.stroke) {
         ctx.stroke();

@@ -337,7 +337,7 @@
         ctx.fillStyle = this.fill;
       }
       
-      this._render(ctx);
+      this._render(ctx, noTransform);
       
       if (this.active && !noTransform) {
         this.drawBorders(ctx);

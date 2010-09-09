@@ -4536,7 +4536,7 @@ fabric.util.animate = animate;
         ctx.fillStyle = this.fill;
       }
 
-      this._render(ctx);
+      this._render(ctx, noTransform);
 
       if (this.active && !noTransform) {
         this.drawBorders(ctx);
@@ -5589,9 +5589,9 @@ fabric.util.animate = animate;
      * @method _render
      * @param ctx {CanvasRenderingContext2D} context to render on
      */
-    _render: function(ctx) {
+    _render: function(ctx, noTransform) {
       ctx.beginPath();
-      ctx.arc(this.left, this.top, this.radius, 0, piBy2, false);
+      ctx.arc(noTransform ? this.left : 0, noTransform ? this.top : 0, this.radius, 0, piBy2, false);
       ctx.closePath();
       if (this.fill) {
         ctx.fill();
@@ -5600,6 +5600,7 @@ fabric.util.animate = animate;
         ctx.stroke();
       }
     },
+
 
     /**
      * Returns complexity of an instance
@@ -5791,7 +5792,7 @@ fabric.util.animate = animate;
       ctx.beginPath();
       ctx.save();
       ctx.transform(1, 0, 0, this.ry/this.rx, 0, 0);
-      ctx.arc(this.left, this.top, this.rx, 0, Math.PI * 2, false);
+      ctx.arc(0, 0, this.rx, 0, Math.PI * 2, false);
       ctx.restore();
       if (this.stroke) {
         ctx.stroke();
