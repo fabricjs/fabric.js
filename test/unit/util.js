@@ -194,4 +194,69 @@
     equals(nodelist[0], converted[0]);
     equals(nodelist[1], converted[1]);
   });
+  
+  test('makeElement', function() {
+    var makeElement = fabric.util.makeElement;
+    ok(typeof makeElement == 'function');
+    
+    var el = makeElement('div');
+    
+    equals(el.tagName.toLowerCase(), 'div');
+    equals(el.nodeType, 1);
+    
+    el = makeElement('p', { 'class': 'blah', 'for': 'boo_hoo', 'some_random-attribute': 'woot' });
+    
+    equals(el.tagName.toLowerCase(), 'p');
+    equals(el.nodeType, 1);
+    equals(el.className, 'blah');
+    equals(el.htmlFor, 'boo_hoo');
+    equals(el.getAttribute('some_random-attribute'), 'woot');
+  });
+  
+  test('addClass', function() {
+    var addClass = fabric.util.addClass;
+    ok(typeof addClass == 'function');
+    
+    var el = document.createElement('div');
+    addClass(el, 'foo');
+    equals(el.className, 'foo');
+    
+    addClass(el, 'bar');
+    equals(el.className, 'foo bar');
+    
+    addClass(el, 'baz qux');
+    equals(el.className, 'foo bar baz qux');
+    
+    addClass(el, 'foo');
+    equals(el.className, 'foo bar baz qux');
+  });
+  
+  test('wrapElement', function() {
+    var wrapElement = fabric.util.wrapElement;
+    ok(typeof wrapElement == 'function');
+    
+    var el = document.createElement('p');
+    var wrapper = wrapElement(el, 'div');
+    
+    equals(wrapper.tagName.toLowerCase(), 'div');
+    equals(wrapper.firstChild, el);
+    
+    el = document.createElement('p');
+    wrapper = wrapElement(el, 'div', { 'class': 'foo' });
+    
+    equals(wrapper.tagName.toLowerCase(), 'div');
+    equals(wrapper.firstChild, el);
+    equals(wrapper.className, 'foo');
+    
+    var childEl = document.createElement('span');
+    var parentEl = document.createElement('p');
+    
+    parentEl.appendChild(childEl);
+    
+    wrapper = wrapElement(childEl, 'strong');
+    
+    // wrapper is now in between parent and child
+    equals(wrapper.parentNode, parentEl);
+    equals(wrapper.firstChild, childEl);
+  });
 })();
