@@ -672,7 +672,7 @@ fabric.util.object = {
 };
 if (!String.prototype.trim) {
   String.prototype.trim = function () {
-    return this.replace(/^\s+/, '').replace(/\s+$/, '');
+    return this.replace(/^[\s\xA0]+/, '').replace(/[\s\xA0]+$/, '');
   };
 }
 

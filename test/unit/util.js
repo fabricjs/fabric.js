@@ -269,7 +269,9 @@
     el.appendChild(document.createTextNode('foo'));
     
     equals(el, makeElementUnselectable(el), 'should be "chainable"');
-    equals(el.onselectstart, fabric.util.falseFunction);
+    if (typeof el.onselectstart != 'undefined') {
+      equals(el.onselectstart, fabric.util.falseFunction);
+    }
     
     // not sure if it's a good idea to test implementation details here
     // functional test would probably make more sense

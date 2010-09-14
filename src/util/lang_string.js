@@ -1,6 +1,7 @@
 if (!String.prototype.trim) {
   String.prototype.trim = function () {
-    return this.replace(/^\s+/, '').replace(/\s+$/, '');
+    // this trim is not fully ES3 or ES5 compliant, but it should cover most cases for now
+    return this.replace(/^[\s\xA0]+/, '').replace(/[\s\xA0]+$/, '');
   };
 }
 

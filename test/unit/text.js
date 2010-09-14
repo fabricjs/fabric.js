@@ -95,43 +95,59 @@
   
   asyncTest('Text already defined', function() {
     var warnWasCalled = false;
-    console.warn = function() {
+    
+    function warn() {
       warnWasCalled = true;
-    };
+    }
+    console.warn = warn;
     
-    var el = document.createElement('script');
-    el.src = '../../src/text.class.js';
-    document.body.appendChild(el);
-    
-    setTimeout(function() {
-      ok(warnWasCalled);
+    if (console.warn === warn) {
+      // some browsers (e.g. Safari 3.0.4) don't allow to override `console.warn`
+      var el = document.createElement('script');
+      el.src = '../../src/text.class.js';
+      document.body.appendChild(el);
+
+      setTimeout(function() {
+        ok(warnWasCalled);
+        start();
+      }, 500);
+    }
+    else {
       start();
-    }, 500);
+    }
+    
   });
   
   asyncTest('Object doesn\'t exist', function() {
     var warnWasCalled = false;
-    console.warn = function() {
+    function warn() {
       warnWasCalled = true;
-    };
-    var originalObject = fabric.Object;
-    var originalText = fabric.Text;
+    }
+    console.warn = warn;
     
-    delete fabric.Text;
-    delete fabric.Object;
-    
-    var el = document.createElement('script');
-    el.src = '../../src/text.class.js';
-    document.body.appendChild(el);
-    
-    setTimeout(function() {
-      ok(warnWasCalled);
-      
-      fabric.Object = originalObject;
-      fabric.Text = originalText;
-      
+    if (console.warn === warn) {
+      var originalObject = fabric.Object;
+      var originalText = fabric.Text;
+
+      delete fabric.Text;
+      delete fabric.Object;
+
+      var el = document.createElement('script');
+      el.src = '../../src/text.class.js';
+      document.body.appendChild(el);
+
+      setTimeout(function() {
+        ok(warnWasCalled);
+
+        fabric.Object = originalObject;
+        fabric.Text = originalText;
+
+        start();
+      }, 500);
+    }
+    else {
       start();
-    }, 500);
+    }
   });
   
 })();
