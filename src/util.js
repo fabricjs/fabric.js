@@ -1,7 +1,8 @@
 (function (global) {
   
   var fabric = this.fabric || (this.fabric = { }),
-      slice = Array.prototype.slice;
+      slice = Array.prototype.slice,
+      apply = Function.prototype.apply;
       
   fabric.util = { };
   

@@ -2,7 +2,7 @@
   
   module('fabric.util');
   
-  test('toFixed', function(){
+  test('fabric.util.toFixed', function(){
     ok(typeof fabric.util.toFixed == 'function');
     
     function test(what) {
@@ -21,7 +21,7 @@
     test.call(this, 166.66666666666666666666); // number
   });
   
-  test('removeFromArray', function() {
+  test('fabric.util.removeFromArray', function() {
     var testArray = [1,2,3,4,5];
     
     ok(typeof fabric.util.removeFromArray == 'function');
@@ -47,7 +47,7 @@
     same(['0'], testArray, 'should use (strict) identity comparison, rather than equality one');
   });
   
-  test('degreesToRadians', function(){
+  test('fabric.util.degreesToRadians', function(){
     ok(typeof fabric.util.degreesToRadians == 'function');
     equals(fabric.util.degreesToRadians(0), 0);
     equals(fabric.util.degreesToRadians(90), Math.PI / 2);
@@ -56,7 +56,7 @@
     same(fabric.util.degreesToRadians(), NaN);
   });
   
-  test('getRandomInt', function() {
+  test('fabric.util.getRandomInt', function() {
     ok(typeof fabric.util.getRandomInt == 'function');
     
     var randomInts = [];
@@ -73,7 +73,7 @@
     ok(!areAllTheSame);
   });
   
-  test('falseFunction', function() {
+  test('fabric.util.falseFunction', function() {
     ok(typeof fabric.util.falseFunction == 'function');
     equals(fabric.util.falseFunction(), false);
   });
@@ -83,7 +83,7 @@
     equals('\t\n   foo bar \n    \xA0  '.trim(), 'foo bar');
   });
   
-  test('camelize', function() {
+  test('fabric.util.string.camelize', function() {
     var camelize = fabric.util.string.camelize;
     
     ok(typeof camelize == 'function');
@@ -99,7 +99,7 @@
     equals(camelize('--double'), 'Double');
   });
   
-  test('capitalize', function() {
+  test('fabric.util.string.capitalize', function() {
     var capitalize = fabric.util.string.capitalize;
     
     ok(typeof capitalize == 'function');
@@ -113,7 +113,7 @@
     equals(capitalize('2foo'), '2foo');
   });
   
-  test('extend', function() {
+  test('fabric.util.object.extend', function() {
     var extend = fabric.util.object.extend;
     
     ok(typeof extend == 'function');
@@ -137,7 +137,7 @@
     equals(source.x, 2);
   });
   
-  test('clone', function() {
+  test('fabric.util.object.clone', function() {
     var clone = fabric.util.object.clone;
     
     ok(typeof clone == 'function');
@@ -150,7 +150,7 @@
     equals(clone.y, obj.y);
   });
   
-  test('bind', function() {
+  test('Function.prototype.bind', function() {
     ok(typeof Function.prototype.bind == 'function');
     
     var obj = { };
@@ -168,7 +168,7 @@
     same([obj, 1, 2], bound(2));
   });
   
-  test('getById', function() {
+  test('fabric.util.getById', function() {
     ok(typeof fabric.util.getById == 'function');
     
     var el = document.createElement('div');
@@ -180,7 +180,7 @@
     equals(null, fabric.util.getById('likely-non-existent-id'));
   });
   
-  test('toArray', function() {
+  test('fabric.util.toArray', function() {
     ok(typeof fabric.util.toArray == 'function');
     
     same(['x', 'y'], fabric.util.toArray({ 0: 'x', 1: 'y', length: 2 }));
@@ -195,7 +195,7 @@
     equals(nodelist[1], converted[1]);
   });
   
-  test('makeElement', function() {
+  test('fabric.util.makeElement', function() {
     var makeElement = fabric.util.makeElement;
     ok(typeof makeElement == 'function');
     
@@ -213,7 +213,7 @@
     equals(el.getAttribute('some_random-attribute'), 'woot');
   });
   
-  test('addClass', function() {
+  test('fabric.util.addClass', function() {
     var addClass = fabric.util.addClass;
     ok(typeof addClass == 'function');
     
@@ -231,7 +231,7 @@
     equals(el.className, 'foo bar baz qux');
   });
   
-  test('wrapElement', function() {
+  test('fabric.util.wrapElement', function() {
     var wrapElement = fabric.util.wrapElement;
     ok(typeof wrapElement == 'function');
     
@@ -258,5 +258,26 @@
     // wrapper is now in between parent and child
     equals(wrapper.parentNode, parentEl);
     equals(wrapper.firstChild, childEl);
+  });
+  
+  test('fabric.util.makeElementUnselectable', function() {
+    var makeElementUnselectable = fabric.util.makeElementUnselectable;
+    
+    ok(typeof makeElementUnselectable == 'function');
+    
+    var el = document.createElement('p');
+    el.appendChild(document.createTextNode('foo'));
+    
+    equals(el, makeElementUnselectable(el), 'should be "chainable"');
+    equals(el.onselectstart, fabric.util.falseFunction);
+    
+    // not sure if it's a good idea to test implementation details here
+    // functional test would probably make more sense
+    if (typeof el.unselectable == 'string') {
+      equals('on', el.unselectable);
+    }
+    else if (typeof el.userSelect != 'undefined') {
+      equals('none', el.userSelect);
+    }
   });
 })();

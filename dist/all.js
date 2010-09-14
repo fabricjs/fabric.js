@@ -418,7 +418,8 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
 (function (global) {
 
   var fabric = this.fabric || (this.fabric = { }),
-      slice = Array.prototype.slice;
+      slice = Array.prototype.slice,
+      apply = Function.prototype.apply;
 
   fabric.util = { };
 
@@ -693,10 +694,11 @@ if (!Function.prototype.bind) {
   Function.prototype.bind = function(thisArg) {
     var fn = this, args = slice.call(arguments, 1);
     return args.length
-      ? function() { return fn.apply(thisArg, args.concat(slice.call(arguments))) }
-      : function() { return fn.apply(thisArg, arguments) };
+      ? function() { return apply.call(fn, thisArg, args.concat(slice.call(arguments))); }
+      : function() { return apply.call(fn, thisArg, arguments) };
   };
 }
+
 
 (function() {
 

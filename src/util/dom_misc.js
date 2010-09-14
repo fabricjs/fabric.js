@@ -78,7 +78,6 @@ function getElementOffset(element) {
     else if (typeof element.unselectable == 'string') {
       element.unselectable = 'on';
     }
-    // TODO (kangax): test return value
     return element;
   }
   
