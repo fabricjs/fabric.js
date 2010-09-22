@@ -123,6 +123,7 @@
               .setCoords();
               
             canvas.add(pathGroup);
+            canvas.calcOffset();
           });
         }
         break;
