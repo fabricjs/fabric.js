@@ -49,8 +49,12 @@
       ev.returnValue = false;
     }
     
-    var element = ev.target || ev.srcElement,
-        className = element.className,
+    var element = ev.target || ev.srcElement;
+    if (element.nodeName.toLowerCase() === 'strong') {
+      element = element.parentNode;
+    }
+    
+    var className = element.className,
         offset = 50,
         left = fabric.util.getRandomInt(0 + offset, 700 - offset),
         top = fabric.util.getRandomInt(0 + offset, 500 - offset),
