@@ -1,9 +1,11 @@
 /*! Fabric.js Copyright 2010, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var console = console || {
-  log: function() { }, 
-  warn: function() { }
-};
+if (typeof console == 'undefined') {
+  var console = {
+    log: function() { },
+    warn: function() { }
+  };
+}
 
 var fabric = fabric || { version: 0.1 };
 
