@@ -7,11 +7,11 @@
       clone = fabric.util.object.clone;
 
   if (fabric.Text) {    
-    console.warn('fabric.Text is already defined');
+    fabric.warn('fabric.Text is already defined');
     return;
   }
   if (!fabric.Object) {
-    console.warn('fabric.Text requires fabric.Object');
+    fabric.warn('fabric.Text requires fabric.Object');
     return;
   }
   

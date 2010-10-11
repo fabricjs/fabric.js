@@ -8,7 +8,7 @@
       max = fabric.util.array.max;
   
   if (fabric.Polygon) {
-    console.warn('fabric.Polygon is already defined');
+    fabric.warn('fabric.Polygon is already defined');
     return;
   }
   

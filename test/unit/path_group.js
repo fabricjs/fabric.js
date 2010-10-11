@@ -65,13 +65,6 @@
     var pathGroup = getPathGroupObject();
     ok(typeof pathGroup.toObject == 'function');
     var object = pathGroup.toObject();
-    
-    /*same(fabric.util.object.extend(fabric.util.object.clone(REFERENCE_PATH_GROUP_OBJECT), {
-      paths: object.paths
-    }), object);
-    console.log(fabric.util.object.extend(fabric.util.object.clone(REFERENCE_PATH_GROUP_OBJECT), {
-      paths: object.paths
-    }), object);*/
   });
   
   test('complexity', function() {

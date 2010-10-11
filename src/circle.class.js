@@ -7,7 +7,7 @@
       extend = fabric.util.object.extend;
   
   if (fabric.Circle) {
-    console.warn('fabric.Circle is already defined.');
+    fabric.warn('fabric.Circle is already defined.');
     return;
   }
   

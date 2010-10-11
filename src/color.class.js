@@ -3,7 +3,7 @@
   var fabric = this.fabric || (this.fabric = { });
   
   if (fabric.Color) {
-    console.warn('fabric.Color is already defined.');
+    fabric.warn('fabric.Color is already defined.');
     return;
   }
   

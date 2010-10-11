@@ -8,7 +8,7 @@
       fabric = global.fabric || (global.fabric = { });
   
   if (fabric.Intersection) {    
-    console.warn('fabric.Intersection is already defined');
+    fabric.warn('fabric.Intersection is already defined');
     return;
   }
 

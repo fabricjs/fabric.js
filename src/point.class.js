@@ -5,7 +5,7 @@
   var fabric = this.fabric || (this.fabric = { });
 
   if (fabric.Point) {    
-    console.warn('fabric.Point is already defined');
+    fabric.warn('fabric.Point is already defined');
     return;
   }
   

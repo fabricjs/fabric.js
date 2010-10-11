@@ -94,60 +94,54 @@
   });
   
   asyncTest('Text already defined', function() {
-    var warnWasCalled = false;
+    var warnWasCalled = false, originalWarn = fabric.warn;
     
     function warn() {
       warnWasCalled = true;
     }
-    console.warn = warn;
+    fabric.warn = warn;
     
-    if (console.warn === warn) {
-      // some browsers (e.g. Safari 3.0.4) don't allow to override `console.warn`
-      var el = document.createElement('script');
-      el.src = '../../src/text.class.js';
-      document.body.appendChild(el);
+    var el = document.createElement('script');
+    el.src = '../../src/text.class.js';
+    document.body.appendChild(el);
 
-      setTimeout(function() {
-        ok(warnWasCalled);
-        start();
-      }, 500);
-    }
-    else {
+    setTimeout(function() {
+      ok(warnWasCalled);
+      
+      fabric.warn = originalWarn;
+      
       start();
-    }
+    }, 500);
     
   });
   
   asyncTest('Object doesn\'t exist', function() {
-    var warnWasCalled = false;
+    var warnWasCalled = false, originalWarn = fabric.warn;
     function warn() {
       warnWasCalled = true;
     }
-    console.warn = warn;
+    fabric.warn = warn;
     
-    if (console.warn === warn) {
-      var originalObject = fabric.Object;
-      var originalText = fabric.Text;
+    var originalObject = fabric.Object;
+    var originalText = fabric.Text;
 
-      delete fabric.Text;
-      delete fabric.Object;
+    delete fabric.Text;
+    delete fabric.Object;
 
-      var el = document.createElement('script');
-      el.src = '../../src/text.class.js';
-      document.body.appendChild(el);
+    var el = document.createElement('script');
+    el.src = '../../src/text.class.js';
+    document.body.appendChild(el);
 
-      setTimeout(function() {
-        ok(warnWasCalled);
+    setTimeout(function() {
+      ok(warnWasCalled);
 
-        fabric.Object = originalObject;
-        fabric.Text = originalText;
+      fabric.Object = originalObject;
+      fabric.Text = originalText;
+      
+      fabric.warn = originalWarn;
 
-        start();
-      }, 500);
-    }
-    else {
       start();
-    }
+    }, 500);
   });
   
 })();

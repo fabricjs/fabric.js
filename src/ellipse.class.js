@@ -7,7 +7,7 @@
       extend = fabric.util.object.extend;
   
   if (fabric.Ellipse) {
-    console.warn('fabric.Ellipse is already defined.');
+    fabric.warn('fabric.Ellipse is already defined.');
     return;
   }
   

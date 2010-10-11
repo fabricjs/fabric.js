@@ -11,7 +11,7 @@
       capitalize = fabric.util.string.capitalize;
   
   if (fabric.PathGroup) {
-    console.warn('fabric.PathGroup is already defined');
+    fabric.warn('fabric.PathGroup is already defined');
     return;
   }
   

@@ -1,11 +1,22 @@
 /*! Fabric.js Copyright 2010, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var console = console || {
-  log: function() { }, 
-  warn: function() { }
-};
-
 var fabric = fabric || { version: 0.1 };
+
+fabric.log = function() { };
+fabric.warn = function() { };
+
+if (typeof console !== 'undefined') {
+  if (typeof console.log !== 'undefined' && console.log.apply) {
+    fabric.log = function() { 
+      return console.log.apply(console, arguments);
+    };
+  }
+  if (typeof console.warn !== 'undefined' && console.warn.apply) {
+    fabric.warn = function() { 
+      return console.warn.apply(console, arguments);
+    };
+  }
+}
 
 //= require "lib/json2"
 

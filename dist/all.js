@@ -1,11 +1,22 @@
 /*! Fabric.js Copyright 2010, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var console = console || {
-  log: function() { },
-  warn: function() { }
-};
-
 var fabric = fabric || { version: 0.1 };
+
+fabric.log = function() { };
+fabric.warn = function() { };
+
+if (typeof console !== 'undefined') {
+  if (typeof console.log !== 'undefined' && console.log.apply) {
+    fabric.log = function() {
+      return console.log.apply(console, arguments);
+    };
+  }
+  if (typeof console.warn !== 'undefined' && console.warn.apply) {
+    fabric.warn = function() {
+      return console.warn.apply(console, arguments);
+    };
+  }
+}
 
 /*
     http://www.JSON.org/json2.js
@@ -1497,7 +1508,7 @@ fabric.util.animate = animate;
           return klass.fromElement(el, options);
         }
         catch(e) {
-          console.log(e.message || e);
+          fabric.log(e.message || e);
         }
       }
     });
@@ -1598,7 +1609,7 @@ fabric.util.animate = animate;
   var fabric = this.fabric || (this.fabric = { });
 
   if (fabric.Point) {
-    console.warn('fabric.Point is already defined');
+    fabric.warn('fabric.Point is already defined');
     return;
   }
 
@@ -1724,7 +1735,7 @@ fabric.util.animate = animate;
       fabric = global.fabric || (global.fabric = { });
 
   if (fabric.Intersection) {
-    console.warn('fabric.Intersection is already defined');
+    fabric.warn('fabric.Intersection is already defined');
     return;
   }
 
@@ -1836,7 +1847,7 @@ fabric.util.animate = animate;
   var fabric = this.fabric || (this.fabric = { });
 
   if (fabric.Color) {
-    console.warn('fabric.Color is already defined.');
+    fabric.warn('fabric.Color is already defined.');
     return;
   }
 
@@ -2087,7 +2098,7 @@ fabric.util.animate = animate;
 (function () {
 
   if (fabric.Element) {
-    console.warn('fabric.Element is already defined.');
+    fabric.warn('fabric.Element is already defined.');
     return;
   }
 
@@ -3719,7 +3730,7 @@ fabric.util.animate = animate;
         }, this);
       }
       catch(e) {
-        console.log(e.message);
+        fabric.log(e.message);
       }
     },
 
@@ -3811,7 +3822,7 @@ fabric.util.animate = animate;
       }
 
       function onFailure() {
-        console.log('ERROR!');
+        fabric.log('ERROR!');
       }
     },
 
@@ -5548,7 +5559,7 @@ fabric.util.animate = animate;
       extend = fabric.util.object.extend;
 
   if (fabric.Circle) {
-    console.warn('fabric.Circle is already defined.');
+    fabric.warn('fabric.Circle is already defined.');
     return;
   }
 
@@ -5738,7 +5749,7 @@ fabric.util.animate = animate;
       extend = fabric.util.object.extend;
 
   if (fabric.Ellipse) {
-    console.warn('fabric.Ellipse is already defined.');
+    fabric.warn('fabric.Ellipse is already defined.');
     return;
   }
 
@@ -5991,7 +6002,7 @@ fabric.util.animate = animate;
   var fabric = this.fabric || (this.fabric = { });
 
   if (fabric.Polyline) {
-    console.warn('fabric.Polyline is already defined');
+    fabric.warn('fabric.Polyline is already defined');
     return;
   }
 
@@ -6105,7 +6116,7 @@ fabric.util.animate = animate;
       max = fabric.util.array.max;
 
   if (fabric.Polygon) {
-    console.warn('fabric.Polygon is already defined');
+    fabric.warn('fabric.Polygon is already defined');
     return;
   }
 
@@ -6236,11 +6247,11 @@ fabric.util.animate = animate;
       extend = fabric.util.object.extend;
 
   if (fabric.Path) {
-    console.warn('fabric.Path is already defined');
+    fabric.warn('fabric.Path is already defined');
     return;
   }
   if (!fabric.Object) {
-    console.warn('fabric.Path requires fabric.Object');
+    fabric.warn('fabric.Path requires fabric.Object');
     return;
   }
 
@@ -6695,7 +6706,7 @@ fabric.util.animate = animate;
       capitalize = fabric.util.string.capitalize;
 
   if (fabric.PathGroup) {
-    console.warn('fabric.PathGroup is already defined');
+    fabric.warn('fabric.PathGroup is already defined');
     return;
   }
 
@@ -7332,11 +7343,11 @@ fabric.util.animate = animate;
       clone = fabric.util.object.clone;
 
   if (fabric.Text) {
-    console.warn('fabric.Text is already defined');
+    fabric.warn('fabric.Text is already defined');
     return;
   }
   if (!fabric.Object) {
-    console.warn('fabric.Text requires fabric.Object');
+    fabric.warn('fabric.Text requires fabric.Object');
     return;
   }
 
@@ -7522,12 +7533,12 @@ fabric.util.animate = animate;
   }
 
   if (global.fabric.Image) {
-    console.warn('fabric.Image is already defined.');
+    fabric.warn('fabric.Image is already defined.');
     return;
   };
 
   if (!fabric.Object) {
-    console.warn('fabric.Object is required for fabric.Image initialization');
+    fabric.warn('fabric.Object is required for fabric.Image initialization');
     return;
   }
 

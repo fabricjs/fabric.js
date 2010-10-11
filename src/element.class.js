@@ -1,7 +1,7 @@
 (function () {
   
   if (fabric.Element) {
-    console.warn('fabric.Element is already defined.');
+    fabric.warn('fabric.Element is already defined.');
     return;
   }
   
@@ -1694,7 +1694,7 @@
         }, this);
       } 
       catch(e) {
-        console.log(e.message);
+        fabric.log(e.message);
       }
     },
     
@@ -1790,7 +1790,7 @@
       }
       
       function onFailure() {
-        console.log('ERROR!');
+        fabric.log('ERROR!');
       }
     },
     

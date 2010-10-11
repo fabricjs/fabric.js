@@ -285,7 +285,7 @@
           return klass.fromElement(el, options);
         }
         catch(e) {
-          console.log(e.message || e);
+          fabric.log(e.message || e);
         }
       }
     });

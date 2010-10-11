@@ -5,7 +5,7 @@
   var fabric = this.fabric || (this.fabric = { });
   
   if (fabric.Polyline) {
-    console.warn('fabric.Polyline is already defined');
+    fabric.warn('fabric.Polyline is already defined');
     return;
   }
   

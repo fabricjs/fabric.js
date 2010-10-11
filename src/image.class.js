@@ -10,12 +10,12 @@
   }
   
   if (global.fabric.Image) {
-    console.warn('fabric.Image is already defined.');
+    fabric.warn('fabric.Image is already defined.');
     return;
   };
   
   if (!fabric.Object) {
-    console.warn('fabric.Object is required for fabric.Image initialization');
+    fabric.warn('fabric.Object is required for fabric.Image initialization');
     return;
   }
   

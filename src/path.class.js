@@ -8,11 +8,11 @@
       extend = fabric.util.object.extend;
   
   if (fabric.Path) {
-    console.warn('fabric.Path is already defined');
+    fabric.warn('fabric.Path is already defined');
     return;
   }
   if (!fabric.Object) {
-    console.warn('fabric.Path requires fabric.Object');
+    fabric.warn('fabric.Path requires fabric.Object');
     return;
   }
   
