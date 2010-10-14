@@ -2,7 +2,18 @@
 
 var fabric = fabric || { version: 0.1 };
 
+/**
+ * Wrapper around `console.log` (when available)
+ * @method log
+ * @param {Any} Values to log
+ */
 fabric.log = function() { };
+
+/**
+ * Wrapper around `console.warn` (when available)
+ * @method warn
+ * @param {Any} Values to log as a warning
+ */
 fabric.warn = function() { };
 
 if (typeof console !== 'undefined') {

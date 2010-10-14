@@ -1,24 +1,30 @@
 //= require "object.class"
 
-(function(){
+(function() {
   
   var fabric = this.fabric || (this.fabric = { }),
       extend = fabric.util.object.extend;
       
   if (fabric.Line) {
+    fabric.warn('fabric.Line is already defined');
     return;
   }
   
-  fabric.Line = fabric.util.createClass(fabric.Object, {
+  /** 
+   * @class Line
+   * @extends fabric.Object
+   */
+  fabric.Line = fabric.util.createClass(fabric.Object, /** @scope fabric.Line.prototype */ {
     
+    /** @property */
     type: 'line',
     
     /**
-     * @constructor
+     * Constructor
      * @method initialize
-     * @param points {Array} array of points
-     * @param options {Object} options object
-     * @return {Object} thisArg
+     * @param {Array} points Array of points
+     * @param {Object} [options] Options object
+     * @return {fabric.Line} thisArg
      */
     initialize: function(points, options) {
       if (!points) {
@@ -41,7 +47,7 @@
     /**
      * @private
      * @method _render
-     * @param ctx {CanvasRenderingContext2D} context to render on
+     * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
       ctx.beginPath();
@@ -68,6 +74,7 @@
     },
     
     /**
+     * Returns object representation of an instance
      * @methd toObject
      * @return {Object}
      */
@@ -81,15 +88,17 @@
     }
   });
   
-  // http://www.w3.org/TR/SVG/shapes.html#LineElement
+  /**
+   * @see http://www.w3.org/TR/SVG/shapes.html#LineElement
+   */
   fabric.Element.ATTRIBUTE_NAMES = 'x1 y1 x2 y2 stroke stroke-width transform'.split(' ');
   
   /**
    * @static
    * @method fabric.Line.fromElement
-   * @param element {SVGElement} element to parse
-   * @param options {Object} options object
-   * @return {Object} instance of fabric.Line
+   * @param {SVGElement} element Element to parse
+   * @param {Object} [options] Options object
+   * @return {fabric.Line} instance of fabric.Line
    */
   fabric.Line.fromElement = function(element, options) {
     var parsedAttributes = fabric.parseAttributes(element, fabric.Element.ATTRIBUTE_NAMES);
@@ -105,8 +114,8 @@
   /**
    * @static
    * @method fabric.Line.fromObject
-   * @param object {Object} object to create an instance from
-   * @return {Object} instance of fabric.Line
+   * @param {Object} object Object to create an instance from
+   * @return {fabric.Line} instance of fabric.Line
    */
   fabric.Line.fromObject = function(object) {
     var points = [object.x1, object.y1, object.x2, object.y2];

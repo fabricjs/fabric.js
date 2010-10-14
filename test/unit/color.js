@@ -167,5 +167,9 @@
     oColor = new fabric.Color('rgb(255,255,255)');
     oColor.overlayWith('rgb(0,0,0)');
     equals(oColor.toRgb(), 'rgb(128,128,128)');
+    
+    oColor = new fabric.Color('rgb(255,255,255)');
+    oColor.overlayWith(new fabric.Color('rgb(0,0,0)'));
+    equals(oColor.toRgb(), 'rgb(128,128,128)');
   });
 })();

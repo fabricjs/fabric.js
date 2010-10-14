@@ -1,10 +1,11 @@
 //= require "object.class"
 
-(function(){
+(function() {
   
   var fabric = this.fabric || (this.fabric = { });
   
   if (fabric.Rect) {
+    console.warn('fabric.Rect is already defined');
     return;
   }
   
@@ -12,17 +13,19 @@
    * @class Rect
    * @extends fabric.Object
    */
-  fabric.Rect = fabric.util.createClass(fabric.Object, /** @lends fabric.Rect.prototype */ {
+  fabric.Rect = fabric.util.createClass(fabric.Object, /** @scope fabric.Rect.prototype */ {
     
+    /** @property */
     type: 'rect',
     
+    /** @property */
     options: {
       rx: 0,
       ry: 0
     },
     
     /**
-     * @constructs
+     * Constructor
      * @method initialize
      * @param options {Object} options object
      * @return {Object} thisArg
@@ -115,7 +118,7 @@
    * @method fabric.Rect.fromElement
    * @param element {SVGElement} element to parse
    * @param options {Object} options object
-   * @return {Object} instance of fabric.Rect
+   * @return {fabric.Rect} instance of fabric.Rect
    */
   fabric.Rect.fromElement = function(element, options) {
     if (!element) {

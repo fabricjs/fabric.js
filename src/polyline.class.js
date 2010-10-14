@@ -1,6 +1,6 @@
 //= require "object.class"
 
-(function(){
+(function() {
   
   var fabric = this.fabric || (this.fabric = { });
   
@@ -9,15 +9,20 @@
     return;
   }
   
-  fabric.Polyline = fabric.util.createClass(fabric.Object, {
+  /** 
+   * @class Polyline
+   * @extends fabric.Object
+   */
+  fabric.Polyline = fabric.util.createClass(fabric.Object, /** @scope fabric.Polyline.prototype */ {
     
+    /** @property */
     type: 'polyline',
     
     /**
-     * @constructor
+     * Constructor
      * @method initialize
-     * @param points {Array} array of points
-     * @param options {Object} options object
+     * @param {Array} points array of points
+     * @param {Object} [options] Options object
      * @return {Object} thisArg
      */
     initialize: function(points, options) {
@@ -38,7 +43,7 @@
     /**
      * Returns object representation of an instance
      * @method toObject
-     * @return {Object} object representation of an instance
+     * @return {Object} Object representation of an instance
      */
     toObject: function() {
       return fabric.Polygon.prototype.toObject.call(this);
@@ -47,7 +52,7 @@
     /**
      * @private
      * @method _render
-     * @param ctx {CanvasRenderingContext2D} context to render on
+     * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
       var point;
@@ -65,6 +70,7 @@
     },
     
     /**
+     * Returns complexity of an instance
      * @method complexity
      * @return {Number} complexity
      */
@@ -73,14 +79,19 @@
     }
   });
   
-  // http://www.w3.org/TR/SVG/shapes.html#PolylineElement
+  /**
+   * List of attribute names to account for when parsing SVG element (used by `fabric.Polyline.fromElement`)
+   * @static
+   * @see: http://www.w3.org/TR/SVG/shapes.html#PolylineElement
+   */
   var ATTRIBUTE_NAMES = 'fill fill-opacity stroke stroke-width transform'.split(' ');
   
   /**
+   * Returns fabric.Polyline instance from an SVG element
    * @static
    * @method fabric.Polyline.fromElement
-   * @param element {SVGElement} element to parse
-   * @param options {Object} options object
+   * @param {SVGElement} element Element to parse
+   * @param {Object} [options] Options object
    * @return {Object} instance of fabric.Polyline
    */
   fabric.Polyline.fromElement = function(element, options) {
@@ -102,13 +113,15 @@
   };
   
   /**
+   * Returns fabric.Polyline instance from an object representation
    * @static
    * @method fabric.Polyline.fromObject
-   * @param object {Object} object to create an instance from
-   * @return {Object} instance of fabric.Polyline
+   * @param {Object} [object] Object to create an instance from
+   * @return {fabric.Polyline}
    */
   fabric.Polyline.fromObject = function(object) {
     var points = object.points;
     return new fabric.Polyline(points, object);
-  }
+  };
+  
 })();

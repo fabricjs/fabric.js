@@ -11,25 +11,52 @@
     fabric.warn('fabric.Intersection is already defined');
     return;
   }
-
+  
+  /**
+   * @class Intersection
+   * @memberOf fabric
+   */
   function Intersection(status) {
     if (arguments.length > 0) {
       this.init(status);
     }
   }
   
-  Intersection.prototype.init = function (status) {
-    this.status = status;
-    this.points = [];
-  };
-  Intersection.prototype.appendPoint = function (point) {
-    this.points.push(point);
-  };
-  Intersection.prototype.appendPoints = function (points) {
-    this.points = this.points.concat(points);
+  fabric.Intersection = Intersection;
+  
+  fabric.Intersection.prototype = /** @scope fabric.Intersection.prototype */ {
+    
+    /**
+     * @method init
+     * @param {String} status
+     */
+    init: function (status) {
+      this.status = status;
+      this.points = [];
+    },
+    
+    /**
+     * @method appendPoint
+     * @param {String} status
+     */
+    appendPoint: function (point) {
+      this.points.push(point);
+    },
+    
+    /**
+     * @method appendPoints
+     * @param {String} status
+     */
+    appendPoints: function (points) {
+      this.points = this.points.concat(points);
+    }
   };
   
-  Intersection.intersectLineLine = function (a1, a2, b1, b2) {
+  /**
+   * @static
+   * @method intersectLineLine
+   */
+  fabric.Intersection.intersectLineLine = function (a1, a2, b1, b2) {
     var result,
         ua_t = (b2.x - b1.x) * (a1.y - b1.y) - (b2.y - b1.y) * (a1.x - b1.x),
         ub_t = (a2.x - a1.x) * (a1.y - b1.y) - (a2.y - a1.y) * (a1.x - b1.x),
@@ -56,7 +83,10 @@
     return result;
   };
   
-  Intersection.intersectLinePolygon = function(a1,a2,points){
+  /**
+   * @method intersectLinePolygon
+   */
+  fabric.Intersection.intersectLinePolygon = function(a1,a2,points){
     var result = new Intersection("No Intersection"),
         length = points.length;
         
@@ -73,7 +103,10 @@
     return result;
   };
   
-  Intersection.intersectPolygonPolygon = function (points1, points2) {
+  /**
+   * @method intersectPolygonPolygon
+   */
+  fabric.Intersection.intersectPolygonPolygon = function (points1, points2) {
     var result = new Intersection("No Intersection"),
         length = points1.length;
         
@@ -90,7 +123,10 @@
     return result;
   };
   
-  Intersection.intersectPolygonRectangle = function (points, r1, r2) {
+  /**
+   * @method intersectPolygonRectangle
+   */
+  fabric.Intersection.intersectPolygonRectangle = function (points, r1, r2) {
     var min = r1.min(r2),
         max = r1.max(r2),
         topRight = new fabric.Point(max.x, min.y),
@@ -110,7 +146,5 @@
     }
     return result;
   };
-  
-  fabric.Intersection = Intersection;
   
 })();

@@ -1,11 +1,6 @@
 (function(){
   
   var global = this,
-  
-  /**
-   * @name Canvas
-   * @namespace
-   */
       fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       clone = fabric.util.object.clone,
@@ -20,12 +15,14 @@
   
   /** 
    * @class Object
-   * @memberOf Canvas
+   * @memberOf fabric
    */
-  fabric.Object = fabric.util.createClass({
+  fabric.Object = fabric.util.createClass(/** @scope fabric.Object.prototype */ {
     
+    /** @property */
     type: 'object',
     
+    /** @property */
     includeDefaultValues: true,
     
     /**
@@ -48,17 +45,14 @@
      */
     MIN_SCALE_LIMIT:            0.1,
     
-    /**
-     * @field
-     */
+    /** @property */
     stateProperties:  ('top left width height scaleX scaleY flipX flipY ' +
                       'theta angle opacity cornersize fill overlayFill stroke ' +
                       'strokeWidth fillRule borderScaleFactor transformMatrix').split(' '),
     
-    /**
-     * @field
-     */
     // TODO (kangax): rename to `defaultOptions`
+    
+    /** @property */
     options: {
       top:                      0,
       left:                     0,
@@ -85,6 +79,10 @@
       transformMatrix:          null
     },
     
+    /**
+     * @method callSuper
+     * @param {String} methodName
+     */
     callSuper: function(methodName) {
       var fn = this.constructor.superclass.prototype[methodName];
       return (arguments.length > 1) 
@@ -93,8 +91,9 @@
     },
     
     /**
-     * @constructs
-     * @param options {Object} options
+     * Constructor
+     * @method initialize
+     * @param {Object} [options] Options object
      */
     initialize: function(options) {
       // overwrite default options with specified ones
@@ -109,6 +108,10 @@
       this.saveState();
     },
     
+    /**
+     * @method setOptions
+     * @param {Object} [options]
+     */
     setOptions: function(options) {
       // this.constructor.superclass.prototype.options -> this.options -> options
       this.options = extend(this._getOptions(), options);
@@ -636,17 +639,20 @@
     cloneAsImage: function(callback) {
       if (fabric.Image) {
         var i = new Image();
+        
+        /** @ignore */
         i.onload = function() {
           if (callback) {
             callback(new fabric.Image(i), orig);
           }
           i = i.onload = null;
-        }
+        };
+        
         var orig = {
           angle: this.get('angle'),
           flipX: this.get('flipX'),
           flipY: this.get('flipY')
-        }
+        };
 
         // normalize angle
         this.set('angle', 0).set('flipX', false).set('flipY', false);

@@ -1,6 +1,6 @@
 //= require "object.class"
 
-(function(){
+(function() {
   
   var fabric = this.fabric || (this.fabric = { }),
       extend = fabric.util.object.extend,
@@ -15,8 +15,13 @@
     return;
   }
   
-  fabric.Text = fabric.util.createClass(fabric.Object, {
+  /** 
+   * @class Text
+   * @extends fabric.Object
+   */
+  fabric.Text = fabric.util.createClass(fabric.Object, /** @scope fabric.Text.prototype */ {
     
+    /** @property */
     options: {
       top:         10,
       left:        10,
@@ -26,8 +31,16 @@
       path:        null
     },
     
+    /** @property */
     type: 'text',
     
+    /**
+     * Constructor
+     * @method initialize
+     * @param {String} text
+     * @param {Object} [options]
+     * @return {fabric.Text} thisArg
+     */
     initialize: function(text, options) {
       this.originalState = { };
       this.initStateProperties();
@@ -39,6 +52,9 @@
       this.setCoords();
     },
     
+    /**
+     * @method initStateProperties
+     */
     initStateProperties: function() {
       var o;
       if ((o = this.constructor) && 
@@ -51,11 +67,21 @@
       }
     },
     
+    /**
+     * Returns string representation of an instance
+     * @method toString
+     * @return {String} String representation of text object
+     */
     toString: function() {
       return '#<fabric.Text ('+ this.complexity() +'): ' + 
         JSON.stringify({ text: this.text, fontfamily: this.fontfamily }) + '>';
     },
     
+    /**
+     * @private
+     * @method _render
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
     _render: function(context) {
       var o = Cufon.textOptions || (Cufon.textOptions = { });
       
@@ -81,6 +107,10 @@
       this.height = o.height;
     },
     
+    /**
+     * @private
+     * @method _initDummyElement
+     */
     _initDummyElement: function() {
       var el = document.createElement('div');
       el.innerHTML = this.text;
@@ -97,6 +127,10 @@
       return el;
     },
     
+    /**
+     * @method render
+     * @param ctx {CanvasRenderingContext2D} context to render on
+     */
     render: function(context) {
       context.save();
       this._render(context);
@@ -109,7 +143,7 @@
   	
   	/**
   	 * @method toObject
-  	 * @return {Object} object representation of an instance
+  	 * @return {Object} Object representation of text object
   	 */
   	toObject: function() {
   	  return extend(this.callSuper('toObject'), {
@@ -153,9 +187,11 @@
   	},
   	
   	/**
+  	 * Sets text of an instance, and updates its coordinates
   	 * @method setText
   	 * @param {String} value
   	 * @return {fabric.Text} thisArg
+  	 * @chainable
   	 */
   	setText: function(value) {
   	  this.set('text', value);
@@ -163,6 +199,14 @@
   	  return this;
   	},
   	
+  	/**
+  	 * Sets specified property to a specified value
+  	 * @method set
+  	 * @param {String} name
+  	 * @param {Any} value
+  	 * @return {fabric.Text} thisArg
+  	 * @chainable
+  	 */
   	set: function(name, value) {
   	  this[name] = value;
   	  if (name === 'fontfamily') {
@@ -173,6 +217,7 @@
   });
 	
 	/**
+	 * Returns fabric.Text instance from an object representation
    * @static
    * @method fromObject
    * @param {Object} object to create an instance from

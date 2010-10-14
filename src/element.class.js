@@ -177,10 +177,11 @@
      * @return {fabric.Element} thisArg
      * @chainable
      */
-    // TODO (kangax): test callback
-    setOverlayImage: function (url, callback) {
+    setOverlayImage: function (url, callback) { // TODO (kangax): test callback
       if (url) {
         var _this = this, img = new Image();
+        
+        /** @ignore */
         img.onload = function () { 
           _this.overlayImage = img;
           if (callback) {
@@ -194,13 +195,13 @@
     },
     
     /**
-     * canvas class's initialization method. This method is automatically 
-     * called by constructor, and sets up all DOM references for 
-     * pre-existing markup, and creates required markup if it is not 
+     * Canvas class' initialization method; This method is automatically 
+     * called by constructor, sets up all DOM references for 
+     * pre-existing markup, and creates required markup if it is not.
      * already present.
      * @method _initElement
-     * @param canvasEl {HTMLElement|String} canvasEl canvas element
-     *
+     * @param {HTMLElement|String} canvasEl Canvas element
+     * @throws {CANVAS_INIT_ERROR} If canvas can not be initialized
      */
     _initElement: function (canvasEl) {
       var el = fabric.util.getById(canvasEl);
@@ -1730,6 +1731,8 @@
         // else append a new image element
         else {
           var imgEl = new Image();
+          
+          /** @ignore */
           imgEl.onload = function () {
             imgEl.onload = null;
             
@@ -1750,6 +1753,11 @@
       }
     })(),
     
+    /**
+     * @method loadSVGFromURL
+     * @param {String} url
+     * @param {Function} callback
+     */
     loadSVGFromURL: function (url, callback) {
       
       var _this = this;
@@ -1952,7 +1960,7 @@
     },
     
     /**
-     * Removes an active object
+     * Removes currently active object
      * @method removeActiveObject
      * @return {fabric.Element} thisArg
      * @chainable
@@ -1966,9 +1974,9 @@
     },
     
     /**
-     * Sets current group to a speicified one
+     * Sets active group to a speicified one
      * @method setActiveGroup
-     * @param group {fabric.Group} group to set as a current one 
+     * @param {fabric.Group} group Group to set as a current one 
      * @return {fabric.Element} thisArg
      * @chainable
      */
@@ -1978,7 +1986,7 @@
     },
     
     /**
-     * Returns current group
+     * Returns currently active group
      * @method getActiveGroup
      * @return {fabric.Group} Current group
      */
@@ -1987,7 +1995,7 @@
     },
     
     /**
-     * Removes current group
+     * Removes currently active group
      * @method removeActiveGroup
      * @return {fabric.Element} thisArg
      */
@@ -2000,6 +2008,7 @@
     },
     
     /**
+     * Returns object at specified index
      * @method item
      * @param {Number} index
      * @return {fabric.Object}

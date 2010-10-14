@@ -15,11 +15,25 @@
     return;
   }
   
-  fabric.PathGroup = fabric.util.createClass(fabric.Path, {
+  /** 
+   * @class PathGroup
+   * @extends fabric.Path
+   */
+  fabric.PathGroup = fabric.util.createClass(fabric.Path, /** @scope fabric.PathGroup.prototype */ {
     
+    /** @property */
     type: 'path-group',
+    
+    /** @property */
     forceFillOverwrite: false,
     
+    /**
+     * Constructor
+     * @method initialize
+     * @param {Array} paths
+     * @param {Object} [options] Options object
+     * @return {fabric.PathGroup} thisArg
+     */
     initialize: function(paths, options) {
       
       options = options || { };

@@ -3,7 +3,8 @@
   var fabric = this.fabric || (this.fabric = { }),
       slice = Array.prototype.slice,
       apply = Function.prototype.apply;
-      
+  
+  /** @namespace */
   fabric.util = { };
   
   //= require "util/misc"

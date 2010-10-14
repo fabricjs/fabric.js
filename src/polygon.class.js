@@ -1,6 +1,6 @@
 //= require "object.class"
 
-(function(){
+(function() {
   
   var fabric = this.fabric || (this.fabric = { }),
       extend = fabric.util.object.extend,
@@ -15,16 +15,21 @@
   function byX(p) { return p.x; }
   function byY(p) { return p.y; }
   
-  fabric.Polygon = fabric.util.createClass(fabric.Object, {
+  /** 
+   * @class Polygon
+   * @extends fabric.Object
+   */
+  fabric.Polygon = fabric.util.createClass(fabric.Object, /** @scope fabric.Polygon.prototype */ {
     
+    /** @property */
     type: 'polygon',
     
     /**
-     * @constructor
+     * Constructor
      * @method initialize
-     * @param points {Array} array of points
-     * @param options {Object} options object
-     * @return thisArg
+     * @param {Array} points Array of points
+     * @param {Object} options Options object
+     * @return {fabric.Polygon} thisArg
      */
     initialize: function(points, options) {
       options = options || { };
@@ -93,15 +98,20 @@
     }
   });
   
-  // http://www.w3.org/TR/SVG/shapes.html#PolygonElement
+  /**
+   * List of attribute names to account for when parsing SVG element (used by `fabric.Polygon.fromElement`)
+   * @static
+   * @see: http://www.w3.org/TR/SVG/shapes.html#PolygonElement
+   */
   fabric.Polygon.ATTRIBUTE_NAMES = 'fill fill-opacity stroke stroke-width transform'.split(' ');
   
   /**
+   * Returns fabric.Polygon instance from an SVG element
    * @static
    * @method fabric.Polygon.fromElement
-   * @param element {SVGElement} element to parse
-   * @param options {Object} options object
-   * @return {Object} instance of fabric.Polygon
+   * @param {SVGElement} element Element to parse
+   * @param {Object} options Options object
+   * @return {fabric.Polygon}
    */
   fabric.Polygon.fromElement = function(element, options) {
     if (!element) {
@@ -122,10 +132,11 @@
   };
   
   /**
+   * Returns fabric.Polygon instance from an object representation
    * @static
    * @method fabric.Polygon.fromObject
-   * @param object {Object} object to create an instance from
-   * @return {Object} instance of fabric.Polygon
+   * @param {Object} object Object to create an instance from
+   * @return {fabric.Polygon}
    */
   fabric.Polygon.fromObject = function(object) {
     return new fabric.Polygon(object.points, object);

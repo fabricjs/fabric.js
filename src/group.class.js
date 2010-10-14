@@ -13,16 +13,20 @@
     return;
   }
   
-  fabric.Group = fabric.util.createClass(fabric.Object, {
+  /** 
+   * @class Group
+   * @extends fabric.Object
+   */
+  fabric.Group = fabric.util.createClass(fabric.Object, /** @scope fabric.Group.prototype */ {
     
-    /**
-     * @property type
-     */
+    /** @property */
     type: 'group',
     
     /**
-     * @constructor
+     * Constructor
+     * @method initialized
      * @param {Object} objects Group objects
+     * @param {Object} [options] Options object
      * @return {Object} thisArg
      */
     initialize: function(objects, options) {
@@ -73,6 +77,7 @@
     },
     
     /**
+     * Returns string represenation of a group
      * @method toString
      * @return {String}
      */
@@ -81,6 +86,7 @@
     },
     
     /**
+     * Returns an array of all objects in this group
      * @method getObjects
      * @return {Array} group objects
      */
@@ -89,10 +95,10 @@
     },
     
     /**
-     * Adds an object to a group. Recalculates group's dimension, position.
+     * Adds an object to a group; Then recalculates group's dimension, position.
      * @method add
      * @param {Object} object
-     * @return {Object} thisArg
+     * @return {fabric.Group} thisArg
      * @chainable
      */
     add: function(object) {
@@ -105,9 +111,9 @@
     },
     
     /**
-     * Removes an object from a group. Recalculates group's dimension, position.
+     * Removes an object from a group; Then recalculates group's dimension, position.
      * @param {Object} object
-     * @return {Object} thisArg
+     * @return {fabric.Group} thisArg
      * @chainable
      */
     remove: function(object) {
@@ -120,7 +126,7 @@
     },
     
     /**
-     * Returns a size of a group (i.e. length of an array containing its objects)
+     * Returns a size of a group (i.e: length of an array containing its objects)
      * @return {Number} Group size
      */
     size: function() {
@@ -131,8 +137,8 @@
      * Sets property to a given value
      * @method set
      * @param {String} name
-     * @param {Object | Function} value
-     * @return {Object} thisArg
+     * @param {Object|Function} value
+     * @return {fabric.Group} thisArg
      * @chainable
      */
     set: function(name, value) {
@@ -159,7 +165,7 @@
      * Returns true if a group contains an object
      * @method contains
      * @param {Object} object Object to check against
-     * @return {Boolean} true if group contains an object
+     * @return {Boolean} `true` if group contains an object
      */
     contains: function(object) {
       return this.objects.indexOf(object) > -1;
@@ -179,7 +185,7 @@
     /**
      * Renders instance on a given context
      * @method render
-     * @param ctx {CanvasRenderingContext2D} context to render instance on
+     * @param {CanvasRenderingContext2D} ctx context to render instance on
      */
     render: function(ctx) {
       ctx.save();
@@ -200,6 +206,7 @@
     },
     
     /**
+     * Returns object from the group at the specified index
      * @method item
      * @param index {Number} index of item to get
      * @return {fabric.Object}
@@ -209,6 +216,7 @@
     },
     
     /**
+     * Returns complexity of an instance
      * @method complexity
      * @return {Number} complexity
      */
@@ -220,7 +228,7 @@
     },
     
     /**
-     * Retores original state of each of group objects
+     * Retores original state of each of group objects (original state is that which was before group was created).
      * @private
      * @method _restoreObjectsState
      * @return {fabric.Group} thisArg
@@ -232,9 +240,11 @@
     },
     
     /**
+     * Restores original state of a specified object in group
      * @private
      * @method _restoreObjectState
      * @param {fabric.Object} object
+     * @return {fabric.Group} thisArg
      */
     _restoreObjectState: function(object) {
       
@@ -263,6 +273,7 @@
     },
     
     /**
+     * Destroys a group (restoring state of its objects)
      * @method destroy
      * @return {fabric.Group} thisArg
      * @chainable
@@ -282,6 +293,10 @@
       return this;
     },
     
+    /**
+     * @method hasMoved
+     * @return {Boolean} true if an object was moved (since fabric.Group#saveCoords was called)
+     */
     hasMoved: function() {
       return this._originalLeft !== this.get('left') ||
              this._originalTop !== this.get('top');
@@ -311,6 +326,7 @@
     },
     
     /**
+     * Activates (makes active) all group objects
      * @method setActive
      * @param {Boolean} value `true` to activate object, `false` otherwise
      * @return {fabric.Group} thisArg
@@ -332,9 +348,9 @@
      *                   Callback is invoked in a context of Global Object (e.g. `window`) 
      *                   when no `context` argument is given
      *
-     * @param {Object} context a.k.a. thisObject
+     * @param {Object} context Context (aka thisObject)
      *
-     * @return {fabric.Group}
+     * @return {fabric.Group} thisArg
      * @chainable
      */
     forEachObject: function(callback, context) {

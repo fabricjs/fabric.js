@@ -1,5 +1,7 @@
 (function(){
   
+  /** @name fabric */
+  
   var fabric = this.fabric || (this.fabric = { }),
       extend = fabric.util.object.extend,
       capitalize = fabric.util.string.capitalize,
@@ -18,8 +20,12 @@
   };
   
   /**
-   * Returns an object of attributes' name/value, given element and an array of attribute names
-   * Parses parent "g" nodes recursively upwards
+   * Returns an object of attributes' name/value, given element and an array of attribute names;
+   * Parses parent "g" nodes recursively upwards.
+   *
+   * @static
+   * @memberOf fabric
+   * @method parseAttributes
    * @param {DOMElement} element Element to parse
    * @param {Array} attributes Array of attributes to parse
    * @return {Object} object containing parsed attributes' names/values
@@ -70,7 +76,9 @@
   
   /**
    * @static
-   * @method fabric.parseTransformAttribute
+   * @function
+   * @memberOf fabric
+   * @method parseTransformAttribute
    * @param attributeValue {String} string containing attribute value
    * @return {Array} array of 6 elements representing transformation matrix
    */
@@ -201,7 +209,8 @@
   
   /**
    * @static
-   * @method fabric.parsePointsAttribute
+   * @memberOf fabric
+   * @method parsePointsAttribute
    * @param points {String} points attribute string
    * @return {Array} array of points
    */
@@ -239,9 +248,10 @@
 
   /**
    * @static
-   * @method fabric.parseStyleAttribute
-   * @param element {SVGElement} element to parse
-   * @return {Object} objects with values parsed from style attribute of an element
+   * @memberOf fabric
+   * @method parseStyleAttribute
+   * @param {SVGElement} element Element to parse
+   * @return {Object} Objects with values parsed from style attribute of an element
    */
   function parseStyleAttribute(element) {
     var oStyle = { },
@@ -271,10 +281,11 @@
 
   /**
    * @static
-   * @method fabric.parseElements
-   * @param elements {Array} array of elements to parse
-   * @param options {Object} options object
-   * @return {Array} array of corresponding instances (transformed from SVG elements)
+   * @memberOf fabric
+   * @method parseElements
+   * @param {Array} elements Array of elements to parse
+   * @param {Object} options Options object
+   * @return {Array} Array of corresponding instances (transformed from SVG elements)
    */
    function parseElements(elements, options) {
     // transform svg elements to fabric.Path elements
@@ -297,12 +308,13 @@
   
   /**
    * @static
-   * @method fabric.parseSVGDocument
-   * @param doc {SVGDocument} SVG document to parse
-   * @param callback {Function} callback to call when parsing is finished. 
-   * Callback is being passed array of elements (parsed from a document)
+   * @function
+   * @memberOf fabric
+   * @method parseSVGDocument
+   * @param {SVGDocument} doc SVG document to parse
+   * @param {Function} callback Callback to call when parsing is finished; It's being passed an array of elements (parsed from a document).
    */
-  fabric.parseSVGDocument = (function(){
+  fabric.parseSVGDocument = (function() {
 
     var reAllowedSVGTagNames = /^(path|circle|polygon|polyline|ellipse|rect|line)$/;
 

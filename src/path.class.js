@@ -16,16 +16,40 @@
     return;
   }
   
-  // Instance methods
-  fabric.Path = fabric.util.createClass(fabric.Object, {
+  /**
+   * @private
+   */
+  function getX(item) {
+    if (item[0] === 'H') {
+      return item[1];
+    }
+    return item[item.length - 2];
+  }
+  
+  /**
+   * @private
+   */
+  function getY(item) {
+    if (item[0] === 'V') {
+      return item[1];
+    }
+    return item[item.length - 1];
+  }
+  
+  /** 
+   * @class Path
+   * @extends fabric.Object
+   */
+  fabric.Path = fabric.util.createClass(fabric.Object, /** @scope fabric.Path.prototype */ {
     
+    /** @property */
     type: 'path',
     
     /**
-     * @constructor
-     * @param path {Array | String} path data
-     * (i.e. sequence of coordinates and corresponding "command" tokens)
-     * @param options {Object} options object
+     * Constructor
+     * @method initialize
+     * @param {Array|String} path Path data (sequence of coordinates and corresponding "command" tokens)
+     * @param {Object} [options] Options object
      */
     initialize: function(path, options) {
       options = options || { };
@@ -342,7 +366,12 @@
       delete o.sourcePath;
       return o;
     },
-
+    
+    /**
+     * Returns number representation of an instance complexity
+     * @method complexity
+     * @return {Number} complexity
+     */
     complexity: function() {
       return this.path.length;
     },
@@ -366,6 +395,9 @@
       return result;
     },
     
+    /**
+     * @method _parseDimensions
+     */
     _parseDimensions: function() {
       var aX = [], 
           aY = [], 
@@ -374,18 +406,7 @@
           isLowerCase = false, 
           x, 
           y;
-      function getX(item) {
-        if (item[0] === 'H') {
-          return item[1];
-        }
-        return item[item.length - 2];
-      }
-      function getY(item) {
-        if (item[0] === 'V') {
-          return item[1];
-        }
-        return item[item.length - 1];
-      }
+      
       this.path.forEach(function(item, i) {
         if (item[0] !== 'H') {
           previousX = (i === 0) ? getX(item) : getX(this.path[i-1]);

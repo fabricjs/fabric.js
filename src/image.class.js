@@ -19,22 +19,34 @@
     return;
   }
   
-  
-  fabric.Image = fabric.util.createClass(fabric.Object, {
+  /** 
+   * @class Image
+   * @extends fabric.Object
+   */
+  fabric.Image = fabric.util.createClass(fabric.Object, /** @scope fabric.Image.prototype */ {
     
+    /** @property */
     maxwidth: null,
+    
+    /** @property */
     maxheight: null,
+    
+    /** @property */
     active: false,
     
+    /** @property */
     bordervisibility: false,
+    
+    /** @property */
     cornervisibility: false,
     
+    /** @property */
     type: 'image',
     
     __isGrayscaled: false,
     
     /**
-     * @constructor
+     * Constructor
      * @param {HTMLImageElement | String} element Image element
      * @param {Object} options optional
      */
@@ -45,6 +57,7 @@
     },
     
     /**
+     * Returns image element which this instance if based on
      * @method getElement
      * @return {HTMLImageElement} image element
      */
@@ -53,8 +66,11 @@
     },
     
     /**
+     * Sets image element for this instance to a specified one
      * @method setElement
+     * @param {HTMLImageElement} element
      * @return {fabric.Image} thisArg
+     * @chainable
      */
     setElement: function(element) {
       this._element = element;
@@ -62,12 +78,12 @@
     },
     
     /**
-     * Method that resizes an image depending on whether maxwidth and maxheight are set up.
+     * Resizes an image depending on whether maxwidth and maxheight are set up;
      * Width and height have to mantain the same proportion in the final image as it was in the initial one.
      * @method getNormalizedSize
      * @param {Object} oImg
-     * @param {Number} maxwidth maximum width of the image in px 
-     * @param {Number} maxheight maximum height of the image in px 
+     * @param {Number} maxwidth maximum width of the image (in px)
+     * @param {Number} maxheight maximum height of the image (in px)
      */ 
     getNormalizedSize: function(oImg, maxwidth, maxheight) {
       if (maxheight && maxwidth && (oImg.width > oImg.height && (oImg.width / oImg.height) < (maxwidth / maxheight))) {
@@ -97,6 +113,7 @@
     },
     
     /**
+     * Returns original size of an image
      * @method getOriginalSize
      * @return {Object} object with "width" and "height" properties
      */
@@ -109,24 +126,29 @@
     },
     
     /**
+     * Sets border visibility
      * @method setBorderVisibility
-     * @param showBorder {Boolean} when true, border is being set visible
+     * @param {Boolean} visible When true, border is set to be visible
      */
-    setBorderVisibility: function(showBorder) {
+    setBorderVisibility: function(visible) {
       this._resetWidthHeight();
       this._adjustWidthHeightToBorders(showBorder);
       this.setCoords();
     },
     
     /**
+     * Sets corner visibility
      * @method setCornersVisibility
+     * @param {Boolean} visible When true, corners are set to be visible
      */
     setCornersVisibility: function(visible) {
       this.cornervisibility = !!visible;
     },
     
     /**
+     * Renders image on a specified context
      * @method render
+     * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     render: function(ctx, noTransform) {
       ctx.save();
@@ -142,8 +164,9 @@
     },
     
     /**
+     * Returns object representation of an instance
      * @method toObject
-     * @return {Object} object representation of an instance
+     * @return {Object} Object representation of an instance
      */
     toObject: function() {
       return extend(this.callSuper('toObject'), {
@@ -152,30 +175,34 @@
     },
     
     /**
+     * Returns source of an image
      * @method getSrc
-     * @return {String} source of an image
+     * @return {String} Source of an image
      */
     getSrc: function() {
       return this.getElement().src;
     },
     
     /**
+     * Returns string representation of an instance
      * @method toString
-     * @return {String} string representation of an instance
+     * @return {String} String representation of an instance
      */
     toString: function() {        
       return '#<fabric.Image: { src: "' + this.getSrc() + '" }>';
     },
     
     /**
+     * Returns a clone of an instance
      * @mthod clone
-     * @param {Function} callback
+     * @param {Function} callback Callback is invoked with a clone as a first argument
      */
     clone: function(callback) {
       this.constructor.fromObject(this.toObject(), callback);
     },
     
     /**
+     * Makes image grayscale
      * @mthod toGrayscale
      * @param {Function} callback
      */
@@ -195,7 +222,8 @@
 
       canvasEl.getContext('2d').drawImage(imgEl, 0, 0);
       fabric.Element.toGrayscale(canvasEl);
-          
+      
+      /** @ignore */
       replacement.onload = function() {
         _this.setElement(replacement);
         callback && callback();
@@ -291,26 +319,29 @@
       this.height = (this.getElement().height || 0) + sidesBorderWidth;
     },
     
+    /**
+     * Returns complexity of an instance
+     * @method complexity
+     * @return {Number} complexity
+     */
     complexity: function() {
       return 1;
     }
   });
   
   /**
-   * Constant for the default CSS class name that represents a Canvas
-   * @property fabric.Image.CSS_CANVAS
+   * Default CSS class name for canvas
    * @static
-   * @final
    * @type String
    */
   fabric.Image.CSS_CANVAS = "canvas-img";
   
   /**
    * Creates an instance of fabric.Image from its object representation
+   * @static
    * @method fromObject
    * @param object {Object}
    * @param callback {Function} optional
-   * @static
    */
   fabric.Image.fromObject = function(object, callback) {
     var img = document.createElement('img'),
@@ -322,6 +353,8 @@
     if (object.height) {
       img.height = object.height;
     }
+    
+    /** @ignore */
     img.onload = function() {
       if (callback) {
         callback(new fabric.Image(img, object));
@@ -333,14 +366,16 @@
   
   /**
    * Creates an instance of fabric.Image from an URL string
-   * @method fromURL
-   * @param url {String}
-   * @param callback {Function} optional
-   * @param imgOptions {Object} optional
    * @static
+   * @method fromURL
+   * @param {String} url URL to create an image from
+   * @param {Function} [callback] Callback to invoke when image is created (newly created image is passed as a first argument)
+   * @param {Object} [imgOptions] Options object
    */
   fabric.Image.fromURL = function(url, callback, imgOptions) {
     var img = document.createElement('img');
+    
+    /** @ignore */
     img.onload = function() {
       if (callback) {
         callback(new fabric.Image(img, imgOptions));

@@ -1,18 +1,23 @@
-(function(){
+(function() {
   
   var fabric = this.fabric || (this.fabric = { });
   
-  if (fabric.Triangle) return;
+  if (fabric.Triangle) {
+    fabric.warn('fabric.Triangle is already defined');
+    return;
+  }
   
-  fabric.Triangle = fabric.util.createClass(fabric.Object, {
+  /** 
+   * @class Triangle
+   * @extends fabric.Object
+   */
+  fabric.Triangle = fabric.util.createClass(fabric.Object, /** @scope fabric.Triangle.prototype */ {
     
-    /**
-     * @field
-     */
+    /** @property */
     type: 'triangle',
     
     /**
-     * @constructs
+     * Constructor
      * @method initialize
      * @param options {Object} options object
      * @return {Object} thisArg
@@ -29,7 +34,7 @@
     /**
      * @private
      * @method _render
-     * @param ctx {CanvasRenderingContext2D} context to render on
+     * @param ctx {CanvasRenderingContext2D} Context to render on
      */
     _render: function(ctx) {      
       var widthBy2 = this.width / 2,
@@ -60,6 +65,7 @@
   });
   
   /**
+   * Returns fabric.Triangle instance from an object representation
    * @static
    * @method Canvas.Trangle.fromObject
    * @param object {Object} object to create an instance from

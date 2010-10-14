@@ -10,16 +10,17 @@
     fabric.warn('fabric.Circle is already defined.');
     return;
   }
-  
-  fabric.Circle = fabric.util.createClass(fabric.Object, /** @lends fabric.Circle.prototype */ {
+
+  /** 
+   * @class Circle
+   * @extends fabric.Object
+   */
+  fabric.Circle = fabric.util.createClass(fabric.Object, /** @scope fabric.Circle.prototype */ {
     
-    /**
-     * @field
-     */
+    /** @property */
     type: 'circle',
     
     /**
-     * @constructs
      * @method initialize
      * @param options {Object} options object
      * @return {Object} thisArg
@@ -74,11 +75,14 @@
   });
   
   /**
+   * List of attribute names to account for when parsing SVG element (used by `fabric.Circle.fromElement`)
+   * @static
    * @see: http://www.w3.org/TR/SVG/shapes.html#CircleElement
    */
   fabric.Circle.ATTRIBUTE_NAMES = 'cx cy r fill fill-opacity stroke stroke-width transform'.split(' ');
   
   /**
+   * Returns fabric.Circle instance from an SVG element
    * @static
    * @method fabric.Circle.fromElement
    * @param element {SVGElement} element to parse
@@ -109,10 +113,11 @@
   }
   
   /**
+   * Returns fabric.Circle instance from an object representation
    * @static
    * @method fabric.Circle.fromObject
-   * @param object {Object} object to create an instance from
-   * @return {Object} instance of fabric.Circle
+   * @param {Object} object Object to create an instance from
+   * @return {Object} Instance of fabric.Circle
    */
   fabric.Circle.fromObject = function(object) {
     return new fabric.Circle(object);

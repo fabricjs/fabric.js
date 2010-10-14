@@ -11,14 +11,19 @@
     return;
   }
   
-  fabric.Ellipse = fabric.util.createClass(fabric.Object, {
+  /** 
+   * @class Ellipse
+   * @extends fabric.Object
+   */
+  fabric.Ellipse = fabric.util.createClass(fabric.Object, /** @scope fabric.Ellipse.prototype */ {
     
+    /** @property */
     type: 'ellipse',
     
     /**
-     * @constructor
+     * Constructor
      * @method initialize
-     * @param options {Object} options object
+     * @param {Object} [options] Options object
      * @return {Object} thisArg
      */
     initialize: function(options) {
@@ -87,11 +92,12 @@
   fabric.Ellipse.ATTRIBUTE_NAMES = 'cx cy rx ry fill fill-opacity stroke stroke-width transform'.split(' ');
   
   /**
+   * Returns fabric.Ellipse instance from an SVG element
    * @static
    * @method fabric.Ellipse.fromElement
-   * @param element {SVGElement} element to parse
-   * @param options {Object} options object
-   * @return {Object} instance of fabric.Ellipse
+   * @param {SVGElement} element Element to parse
+   * @param {Object} [options] Options object
+   * @return {fabric.Ellipse}
    */
   fabric.Ellipse.fromElement = function(element, options) {
     options || (options = { });
@@ -106,10 +112,11 @@
   };
   
   /**
+   * Returns fabric.Ellipse instance from an object representation
    * @static
    * @method fabric.Ellipse.fromObject
-   * @param object {Object} object to create an instance from
-   * @return {Object} instance of fabric.Ellipse
+   * @param {Object} object Object to create an instance from
+   * @return {fabric.Ellipse}
    */
   fabric.Ellipse.fromObject = function(object) {
     return new fabric.Ellipse(object);
