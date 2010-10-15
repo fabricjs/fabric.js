@@ -6,7 +6,7 @@ Contributions are very much welcome!
 
 ### Goals
 
-- Unit tested (1007 tests at the moment)
+- Unit tested (1011 tests at the moment)
 - Modular (~20 small "classes")
 - Cross-browser
 - Fast
@@ -19,7 +19,7 @@ Contributions are very much welcome!
 - Safari 3+
 - Opera 9.64+
 - Chrome 1+
-- IE9 PP4
+- IE9 beta
 
 #### With help of [Explorer Canvas](http://code.google.com/p/explorercanvas/)
 
@@ -52,13 +52,17 @@ Fabric.js started as a foundation for design editor on [printio.ru](http://print
 
 4. Optionally, you can build documentation
 
-        $ java -jar lib/jsdoc-toolkit/jsrun.jar lib/jsdoc-toolkit/app/run.js -a -t=lib/jsdoc-toolkit/templates/jsdoc -d=docs fabric.js src/ src/util/
+        $ java -jar lib/jsdoc-toolkit/jsrun.jar lib/jsdoc-toolkit/app/run.js -a -t=lib/jsdoc-toolkit/templates/codeview -d=docs fabric.js src/ src/util/
 
 ### Demos
 
 - [Main demo](http://kangax.github.com/fabric.js/test/demo/)
 - [Benchmark (quantity)](http://kangax.github.com/fabric.js/test/benchmarks/quantity.html)
 - [Benchmark (animation)](http://kangax.github.com/fabric.js/test/benchmarks/animation.html)
+
+### Documentation
+
+Documentation is always available at [http://kangax.github.com/fabric.js/docs/](http://kangax.github.com/fabric.js/docs/). You can also build it locally, following step 4 from the "Building" section of this README.
 
 ### Examples of use
 
@@ -78,65 +82,6 @@ Fabric.js started as a foundation for design editor on [printio.ru](http://print
     });
     
     canvas.add(rect);
-
-### Object Model hierarchy
-    
-      fabric.Object
-        |
-        -- fabric.Line
-        |
-        -- fabric.Circle
-        |
-        -- fabric.Triangle
-        |
-        -- fabric.Ellipse
-        |
-        -- fabric.Rect
-        |
-        -- fabric.Polyline
-        |
-        -- fabric.Polygon
-        |
-        -- fabric.Group
-        |
-        -- fabric.Text
-        |
-        -- fabric.Image
-        |
-        -- fabric.Path
-             |
-             -- fabric.PathGroup
-      
-      
-      fabric.util
-        |
-        -- removeFromArray
-        |
-        -- degreesToRadians
-        |
-        -- toFixed
-        |
-        -- getRandomInt
-    
-      
-      Canvas
-        |
-        -- parseAttributes
-        |
-        -- parseElements
-        |
-        -- parseStyleAttribute
-        |
-        -- parsePointsAttribute
-      
-      
-      fabric.Element
-
-      fabric.Point
-
-      fabric.Intersection
-
-      fabric.Color
 
 ### Credits
 
