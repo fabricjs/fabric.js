@@ -30,6 +30,7 @@ if (typeof console !== 'undefined') {
 }
 
 //= require "lib/json2"
+//= require "lib/cufon"
 
 //= require "src/util"
 //= require "src/parser"

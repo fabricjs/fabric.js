@@ -316,4 +316,12 @@
   canvas.freeDrawingColor = drawingColorEl.value;
   canvas.freeDrawingLineWidth = parseInt(drawingLineWidthEl.value, 10) || 1;
   
+  var helloWorld = new fabric.Text('Hello world!', { 
+    left: getRandomInt(50, 650), 
+    top: getRandomInt(50, 650),
+    fontfamily: 'delicious_500'
+  });
+  
+  canvas.add(helloWorld);
+  
 })();

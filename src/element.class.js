@@ -116,17 +116,17 @@
       height: 150 
     };
     
-    config = config || { };
+    options = options || { };
     
     this._initElement(el);
-    this._initConfig(config);
+    this._initConfig(options);
     
-    if (config.overlayImage) {
-      this.setOverlayImage(config.overlayImage);
+    if (options.overlayImage) {
+      this.setOverlayImage(options.overlayImage);
     }
     
-    if (config.afterRender) {
-      this.afterRender = config.afterRender;
+    if (options.afterRender) {
+      this.afterRender = options.afterRender;
     }
     
     this._createCanvasBackground();
