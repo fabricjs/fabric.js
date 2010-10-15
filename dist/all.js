@@ -452,6 +452,7 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
    * Removes value from an array.
    * Presence of value (and its position in an array) is determined via `Array.prototype.indexOf`
    * @static
+   * @memberOf fabric.util
    * @method removeFromArray
    * @param {Array} array
    * @param {Any} value
@@ -466,8 +467,10 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
   };
 
   /**
+   * Returns random number between 2 specified ones.
    * @static
    * @method getRandomInt
+   * @memberOf fabric.util
    * @param {Number} min lower limit
    * @param {Number} max upper limit
    * @return {Number} random value (between min and max)
@@ -476,22 +479,25 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
+  var PiBy180 = Math.PI / 180;
+
   /**
-   * Transforms degrees to radians
+   * Transforms degrees to radians.
    * @static
    * @method degreesToRadians
+   * @memberOf fabric.util
    * @param {Number} degrees value in degrees
    * @return {Number} value in radians
    */
-  var PiBy180 = Math.PI / 180;
   function degreesToRadians(degrees) {
     return degrees * PiBy180;
   }
 
   /**
-   * A wrapper around Number#toFixed, which contrary to native method returns number, not string
+   * A wrapper around Number#toFixed, which contrary to native method returns number, not string.
    * @static
    * @method toFixed
+   * @memberOf fabric.util
    * @param {Number | String} number number to operate on
    * @param {Number} fractionDigits number of fraction digits to "leave"
    * @return {Number}
@@ -501,9 +507,10 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
    }
 
    /**
-    * Function which always returns `false`
+    * Function which always returns `false`.
     * @static
     * @method falseFunction
+    * @memberOf fabric.util
     * @return {Boolean}
     */
    function falseFunction() {
@@ -623,6 +630,13 @@ if (!Array.prototype.reduce) {
   };
 }
 
+/**
+ * Invokes method on all items in a given array
+ * @method invoke
+ * @memberOf fabric.util.array
+ * @param {Array} array Array to iterate over
+ * @param {String} method Name of a method to invoke
+ */
 function invoke(array, method) {
   var args = slice.call(arguments, 2), result = [ ];
   for (var i = 0, len = array.length; i < len; i++) {
@@ -631,6 +645,13 @@ function invoke(array, method) {
   return result;
 }
 
+/**
+ * Finds maximum value in array (not necessarily "first" one)
+ * @method max
+ * @memberOf fabric.util.array
+ * @param {Array} array Array to iterate over
+ * @param {String} byProperty
+ */
 function max(array, byProperty) {
   var i = array.length - 1,
       result = byProperty ? array[i][byProperty] : array[i];
@@ -651,6 +672,13 @@ function max(array, byProperty) {
   return result;
 }
 
+/**
+ * Finds minimum value in array (not necessarily "first" one)
+ * @method min
+ * @memberOf fabric.util.array
+ * @param {Array} array Array to iterate over
+ * @param {String} byProperty
+ */
 function min(array, byProperty) {
   var i = array.length - 1,
       result = byProperty ? array[i][byProperty] : array[i];
@@ -672,43 +700,76 @@ function min(array, byProperty) {
   return result;
 }
 
+/** @namespace */
 fabric.util.array = {
   invoke: invoke,
   min: min,
   max: max
 };
+/**
+ * Copies all enumerable properties of one object to another
+ * @memberOf fabric.util.object
+ * @method extend
+ * @param {Object} destination Where to copy to
+ * @param {Object} source Where to copy from
+ */
 function extend(destination, source) {
-
   for (var property in source) {
     destination[property] = source[property];
   }
   return destination;
 }
 
+/**
+ * Creates an empty object and copies all enumerable properties of another object to it
+ * @method clone
+ * @memberOf fabric.util.object
+ * @param {Object} object Object to clone
+ */
 function clone(object) {
   return extend({ }, object);
 }
 
+/** @namespace fabric.util.object */
 fabric.util.object = {
   extend: extend,
   clone: clone
 };
 if (!String.prototype.trim) {
+  /**
+   * Trims a string (removing whitespace from the beginning and the end)
+   * @method trim
+   */
   String.prototype.trim = function () {
     return this.replace(/^[\s\xA0]+/, '').replace(/[\s\xA0]+$/, '');
   };
 }
 
+/**
+ * Camelizes a string
+ * @memberOf fabric.util.string
+ * @method camelize
+ * @param {String} string String to camelize
+ * @return {String} Camelized version of a string
+ */
 function camelize(string) {
   return string.replace(/-+(.)?/g, function(match, character) {
     return character ? character.toUpperCase() : '';
   });
 }
 
+/**
+ * Capitalizes a string
+ * @memberOf fabric.util.string
+ * @method capitalize
+ * @param {String} string String to capitalize
+ * @return {String} Capitalized version of a string
+ */
 function capitalize(string) {
   return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
 }
 
+/** @namespace */
 fabric.util.string = {
   camelize: camelize,
   capitalize: capitalize
@@ -734,6 +795,7 @@ if (!Function.prototype.bind) {
 
   var addMethods;
   if (IS_DONTENUM_BUGGY) {
+    /** @ignore */
     addMethods = function(klass, source) {
       if (source.toString !== Object.prototype.toString) {
         klass.prototype.toString = source.toString;
@@ -747,6 +809,7 @@ if (!Function.prototype.bind) {
     };
   }
   else {
+    /** @ignore */
     addMethods = function(klass, source) {
       for (var property in source) {
         klass.prototype[property] = source[property];
@@ -755,6 +818,12 @@ if (!Function.prototype.bind) {
   }
 
   function subclass() { };
+
+  /**
+   * Helper for creation of "classes"
+   * @method createClass
+   * @memberOf fabric.util
+   */
   function createClass() {
     var parent = null,
         properties = slice.call(arguments, 0);
@@ -858,18 +927,23 @@ if (!Function.prototype.bind) {
 
       listeners = { },
 
-      handlers = { };
+      handlers = { },
+
+      addListener, removeListener;
 
   if (shouldUseAddListenerRemoveListener) {
+    /** @ignore */
     addListener = function (element, eventName, handler) {
       element.addEventListener(eventName, handler, false);
     };
+    /** @ignore */
     removeListener = function (element, eventName, handler) {
       element.removeEventListener(eventName, handler, false);
     };
   }
 
   else if (shouldUseAttachEventDetachEvent) {
+    /** @ignore */
     addListener = function (element, eventName, handler) {
       var uid = getUniqueId(element);
       setElement(uid, element);
@@ -884,7 +958,7 @@ if (!Function.prototype.bind) {
       listeners[uid][eventName].push(listener);
       element.attachEvent('on' + eventName, listener.wrappedHandler);
     };
-
+    /** @ignore */
     removeListener = function (element, eventName, handler) {
       var uid = getUniqueId(element), listener;
       if (listeners[uid] && listeners[uid][eventName]) {
@@ -899,6 +973,7 @@ if (!Function.prototype.bind) {
     };
   }
   else {
+    /** @ignore */
     addListener = function (element, eventName, handler) {
       var uid = getUniqueId(element);
       if (!handlers[uid]) {
@@ -914,6 +989,7 @@ if (!Function.prototype.bind) {
       }
       handlers[uid][eventName].push(handler);
     };
+    /** @ignore */
     removeListener = function (element, eventName, handler) {
       var uid = getUniqueId(element);
       if (handlers[uid] && handlers[uid][eventName]) {
@@ -927,11 +1003,36 @@ if (!Function.prototype.bind) {
     };
   }
 
+  /**
+   * Adds an event listener to an element
+   * @mthod addListener
+   * @memberOf fabric.util
+   * @function
+   * @param {HTMLElement} element
+   * @param {String} eventName
+   * @param {Function} handler
+   */
   fabric.util.addListener = addListener;
+
+  /**
+   * Removes an event listener from an element
+   * @mthod removeListener
+   * @memberOf fabric.util
+   * @function
+   * @param {HTMLElement} element
+   * @param {String} eventName
+   * @param {Function} handler
+   */
   fabric.util.removeListener = removeListener;
 
   var customEventListeners = { };
 
+  /**
+   * @mthod observeEvent
+   * @memberOf fabric.util
+   * @param {String} eventName
+   * @param {Function} handler
+   */
   function observeEvent(eventName, handler) {
     if (!customEventListeners[eventName]) {
       customEventListeners[eventName] = [ ];
@@ -939,6 +1040,13 @@ if (!Function.prototype.bind) {
     customEventListeners[eventName].push(handler);
   }
 
+  /**
+   * Fires event with an optional memo object
+   * @mthod fireEvent
+   * @memberOf fabric.util
+   * @param {String} eventName
+   * @param {Object} [memo]
+   */
   function fireEvent(eventName, memo) {
     var listenersForEvent = customEventListeners[eventName];
     if (!listenersForEvent) return;
@@ -947,9 +1055,12 @@ if (!Function.prototype.bind) {
     }
   }
 
-  fabric.util.observeEvent = observeEvent;
-  fabric.util.fireEvent = fireEvent;
-
+  /**
+   * Cross-browser wrapper for getting event's coordinates
+   * @method getPointer
+   * @memberOf fabric.util
+   * @param {Event} event
+   */
   function getPointer(event) {
     return { x: pointerX(event), y: pointerY(event) };
   }
@@ -973,6 +1084,8 @@ if (!Function.prototype.bind) {
   }
 
   fabric.util.getPointer = getPointer;
+  fabric.util.observeEvent = observeEvent;
+  fabric.util.fireEvent = fireEvent;
 })(this);
 (function () {
 
@@ -1007,12 +1120,14 @@ if (!Function.prototype.bind) {
       setOpacity = function (element) { return element; };
 
   if (supportsOpacity) {
+    /** @ignore */
     setOpacity = function(element, value) {
       element.style.opacity = value;
       return element;
     };
   }
   else if (supportsFilters) {
+    /** @ignore */
     setOpacity = function(element, value) {
       var es = element.style;
       if (element.currentStyle && !element.currentStyle.hasLayout) {
@@ -1126,7 +1241,9 @@ function getElementOffset(element) {
 
   	scriptEl.type = 'text/javascript';
   	scriptEl.setAttribute('runat', 'server');
-  	scriptEl.onload = scriptEl.onreadystatechange = function(e) {
+
+  	/** @ignore */
+  	scriptEl.onload = /** @ignore */ scriptEl.onreadystatechange = function(e) {
   	  if (loading) {
   	    if (typeof this.readyState == 'string' &&
   	        this.readyState !== 'loaded' &&
@@ -1222,6 +1339,7 @@ fabric.util.animate = animate;
         request = makeXHR(),
         body;
 
+    /** @ignore */
     request.onreadystatechange = function() {
       if (request.readyState === 4) {
         onComplete(request);
@@ -2299,9 +2417,10 @@ fabric.util.animate = animate;
   /**
    * @class fabric.Element
    * @constructor
-   * @param {HTMLElement | String} el Container element for the canvas.
+   * @param {HTMLElement | String} el &lt;canvas> element to initialize instance on
+   * @param {Object} [options] Options object
    */
-  fabric.Element = function (el, config) {
+  fabric.Element = function (el, options) {
 
     /**
      * The object literal containing mouse position if clicked in an empty area (no image)
@@ -2384,27 +2503,83 @@ fabric.util.animate = animate;
     this.calcOffset();
   };
 
-  extend(fabric.Element.prototype, {
+  extend(fabric.Element.prototype, /** @scope fabric.Element.prototype */ {
 
+    /**
+     * @property
+     * @type String
+     */
     selectionColor:         'rgba(100, 100, 255, 0.3)', // blue
+
+    /**
+     * @property
+     * @type String
+     */
     selectionBorderColor:   'rgba(255, 255, 255, 0.3)',
+
+    /**
+     * @property
+     * @type String
+     */
     freeDrawingColor:       'rgb(0, 0, 0)',
+
+    /**
+     * @property
+     * @type String
+     */
     backgroundColor:        'rgba(0, 0, 0, 0)',
 
+    /**
+     * @property
+     * @type Number
+     */
     freeDrawingLineWidth:   1,
+
+    /**
+     * @property
+     * @type Number
+     */
     selectionLineWidth:     1,
+
+    /**
+     * @property
+     * @type Boolean
+     */
     includeDefaultValues:   true,
 
+    /**
+     * @property
+     * @type Boolean
+     */
     shouldCacheImages:      false,
 
+    /**
+     * @constant
+     * @type Number
+     */
     CANVAS_WIDTH:           600,
+
+    /**
+     * @constant
+     * @type Number
+     */
     CANVAS_HEIGHT:          600,
 
-    onBeforeScaleRotate: function () {
+    /**
+     * Callback; invoked right before object is about to be scaled/rotated
+     * @method onBeforeScaleRotate
+     * @param {fabric.Object} target Object that's about to be scaled/rotated
+     */
+    onBeforeScaleRotate: function (target) {
       /* NOOP */
     },
 
-    onFpsUpdate: function() {
+    /**
+     * Callback; invoked on every redraw of canvas and is being passed a number indicating current fps
+     * @method onFpsUpdate
+     * @param {Number} fps
+     */
+    onFpsUpdate: function(fps) {
       /* NOOP */
     },
 
@@ -2421,6 +2596,7 @@ fabric.util.animate = animate;
     },
 
     /**
+     * Sets overlay image for this canvas
      * @method setOverlayImage
      * @param {String} url url of an image to set background to
      * @param {Function} callback callback to invoke when image is loaded and set as an overlay one
@@ -2445,9 +2621,8 @@ fabric.util.animate = animate;
     },
 
     /**
-     * Canvas class' initialization method; This method is automatically
-     * called by constructor, sets up all DOM references for
-     * pre-existing markup, and creates required markup if it is not.
+     * Canvas class' initialization method; Automatically called by constructor;
+     * Sets up all DOM references for pre-existing markup and creates required markup if it's not yet created.
      * already present.
      * @method _initElement
      * @param {HTMLElement|String} canvasEl Canvas element
@@ -2477,6 +2652,8 @@ fabric.util.animate = animate;
     /**
      * @private
      * @method _initWrapperElement
+     * @param {Number} width
+     * @param {Number} height
      */
     _initWrapperElement: function (width, height) {
       var wrapper = fabric.util.wrapElement(this.getElement(), 'div', { 'class': 'canvas_container' });
@@ -2491,6 +2668,8 @@ fabric.util.animate = animate;
     /**
      * @private
      * @method _setElementStyle
+     * @param {Number} width
+     * @param {Number} height
      */
     _setElementStyle: function (width, height) {
       fabric.util.setStyle(this.getElement(), {
@@ -2503,12 +2682,12 @@ fabric.util.animate = animate;
     },
 
     /**
-       * For now we use an object literal without methods to store the config params
-       * @method _initConfig
-       * @param config {Object} userConfig The configuration Object literal
-       * containing the configuration that should be set for this module.
-       * See configuration documentation for more details.
-       */
+     * For now, use an object literal without methods to store the config params
+     * @method _initConfig
+     * @param config {Object} userConfig The configuration Object literal
+     * containing the configuration that should be set for this module;
+     * See configuration documentation for more details.
+     */
     _initConfig: function (config) {
       extend(this._config, config || { });
 
@@ -2520,7 +2699,7 @@ fabric.util.animate = animate;
     },
 
     /**
-     * Adds main mouse listeners to the whole canvas
+     * Adds mouse listeners to  canvas
      * @method _initEvents
      * @private
      * See configuration documentation for more details.
@@ -2612,6 +2791,7 @@ fabric.util.animate = animate;
     },
 
     /**
+     * Sets width of this canvas instance
      * @method setWidth
      * @param {Number} width value to set width to
      * @return {fabric.Element} instance
@@ -2622,6 +2802,7 @@ fabric.util.animate = animate;
     },
 
     /**
+     * Sets height of this canvas instance
      * @method setHeight
      * @param {Number} height value to set height to
      * @return {fabric.Element} instance
@@ -2631,6 +2812,13 @@ fabric.util.animate = animate;
       return this._setDimension('height', value);
     },
 
+    /**
+     * Sets dimensions (width, height) of this canvas instance
+     * @method setDimensions
+     * @param {Object} dimensions
+     * @return {fabric.Element} thisArg
+     * @chainable
+     */
     setDimensions: function(dimensions) {
       for (var prop in dimensions) {
         this._setDimension(prop, dimensions[prop]);
@@ -2639,9 +2827,9 @@ fabric.util.animate = animate;
     },
 
     /**
-     * private helper for setting width/height
-     * @method _setDimensions
+     * Helper for setting width/height
      * @private
+     * @method _setDimensions
      * @param {String} prop property (width|height)
      * @param {Number} value value to set property to
      * @return {fabric.Element} instance
@@ -2805,6 +2993,7 @@ fabric.util.animate = animate;
     },
 
     /**
+     * Returns &lt;canvas> element corresponding to this instance
      * @method getElement
      * @return {HTMLCanvasElement}
      */
@@ -2908,6 +3097,10 @@ fabric.util.animate = animate;
       }
     },
 
+    /**
+     * @private
+     * @method _prepareForDrawing
+     */
     _prepareForDrawing: function(e) {
 
       this._isCurrentlyDrawing = true;
@@ -2928,6 +3121,10 @@ fabric.util.animate = animate;
       this.contextTop.lineCap = this.contextTop.lineJoin = 'round';
     },
 
+    /**
+     * @private
+     * @method _captureDrawingPath
+     */
     _captureDrawingPath: function(e) {
       var pointer = this.getPointer(e);
 
@@ -2938,6 +3135,10 @@ fabric.util.animate = animate;
       this.contextTop.stroke();
     },
 
+    /**
+     * @private
+     * @method _finalizeDrawingPath
+     */
     _finalizeDrawingPath: function() {
 
       this.contextTop.closePath();
@@ -3229,8 +3430,8 @@ fabric.util.animate = animate;
     },
 
     /**
-     * Adds an object to canvas and renders canvas
-     * An object should be an instance of (or inherit from) fabric.Object
+     * Adds objects to canvas, then renders canvas;
+     * Objects should be instances of (or inherit from) fabric.Object
      * @method add
      * @return {fabric.Element} thisArg
      * @chainable
@@ -3286,7 +3487,7 @@ fabric.util.animate = animate;
     },
 
     /**
-     * Clears all contexts of canvas element
+     * Clears all contexts (background, main, top) of an instance
      * @method clear
      * @return {fabric.Element} thisArg
      * @chainable
@@ -3477,6 +3678,7 @@ fabric.util.animate = animate;
     },
 
     /**
+     * Exports canvas element to a dataurl image (allowing to change image size via multiplier).
      * @method toDataURLWithMultiplier
      * @param {String} format (png|jpeg)
      * @param {Number} multiplier
@@ -3510,6 +3712,7 @@ fabric.util.animate = animate;
     },
 
     /**
+     * Returns pointer coordinates relative to canvas.
      * @method getPointer
      * @return {Object} object with "x" and "y" number values
      */
@@ -3535,7 +3738,7 @@ fabric.util.animate = animate;
     },
 
     /**
-     * Centers object horizontally
+     * Centers object horizontally.
      * @method centerObjectH
      * @param {fabric.Object} object Object to center
      * @return {fabric.Element} thisArg
@@ -3547,9 +3750,10 @@ fabric.util.animate = animate;
     },
 
     /**
-     * Centers object horizontally with animation
+     * Centers object horizontally with animation.
      * @method fxCenterObjectH
-     * @param {fabric.Object} object
+     * @param {fabric.Object} object Object to center
+     * @param {Object} [callbacks] Callbacks object with optional "onComplete" and/or "onChange" properties
      * @return {fabric.Element} thisArg
      * @chainable
      */
@@ -3580,9 +3784,9 @@ fabric.util.animate = animate;
     },
 
     /**
-     * Centers object vertically
+     * Centers object vertically.
      * @method centerObjectH
-     * @param object {fabric.Object} Object to center
+     * @param {fabric.Object} object Object to center
      * @return {fabric.Element} thisArg
      * @chainable
      */
@@ -3593,9 +3797,10 @@ fabric.util.animate = animate;
     },
 
     /**
-     * Centers object vertically with animation
+     * Centers object vertically with animation.
      * @method fxCenterObjectV
-     * @param {fabric.Object} object
+     * @param {fabric.Object} object Object to center
+     * @param {Object} [callbacks] Callbacks object with optional "onComplete" and/or "onChange" properties
      * @return {fabric.Element} thisArg
      * @chainable
      */
@@ -3626,6 +3831,7 @@ fabric.util.animate = animate;
     },
 
     /**
+     * Straightens object, then rerenders canvas
      * @method straightenObject
      * @param {fabric.Object} object Object to straighten
      * @return {fabric.Element} thisArg
@@ -3638,6 +3844,7 @@ fabric.util.animate = animate;
     },
 
     /**
+     * Same as `fabric.Element#straightenObject`, but animated
      * @method fxStraightenObject
      * @param {fabric.Object} object Object to straighten
      * @return {fabric.Element} thisArg
@@ -3709,11 +3916,11 @@ fabric.util.animate = animate;
 
     /**
      * Populates canvas with data from the specified JSON
-     * JSON format must conform to the one of fabric.Element#toJSON
+     * JSON format must conform to the one of `fabric.Element#toJSON`
      * @method loadFromJSON
-     * @param json {String} json string
-     * @param callback {Function} callback, invoked when json is parsed
-     *                            and corresponding objects (e.g. fabric.Image)
+     * @param {String} json JSON string
+     * @param {Function} callback Callback, invoked when json is parsed
+     *                            and corresponding objects (e.g: fabric.Image)
      *                            are initialized
      * @return {fabric.Element} instance
      * @chainable
@@ -3736,6 +3943,11 @@ fabric.util.animate = animate;
       return this;
     },
 
+    /**
+     * @method _enlivenObjects
+     * @param {Array} objects
+     * @param {Function} callback
+     */
     _enlivenObjects: function (objects, callback) {
       var numLoadedImages = 0,
           numTotalImages = objects.filter(function (o) {
@@ -3774,6 +3986,17 @@ fabric.util.animate = animate;
       }
     },
 
+    /**
+     * Populates canvas with data from the specified dataless JSON
+     * JSON format must conform to the one of `fabric.Element#toDatalessJSON`
+     * @method loadFromDatalessJSON
+     * @param {String} json JSON string
+     * @param {Function} callback Callback, invoked when json is parsed
+     *                            and corresponding objects (e.g: fabric.Image)
+     *                            are initialized
+     * @return {fabric.Element} instance
+     * @chainable
+     */
     loadFromDatalessJSON: function (json, callback) {
 
       if (!json) {
@@ -3792,8 +4015,14 @@ fabric.util.animate = animate;
       this._enlivenDatalessObjects(serialized.objects, callback);
     },
 
+    /**
+     * @method _enlivenDatalessObjects
+     * @param {Array} objects
+     * @param {Function} callback
+     */
     _enlivenDatalessObjects: function (objects, callback) {
 
+      /** @ignore */
       function onObjectLoaded(object, index) {
         _this.insertAt(object, index);
 				object.setCoords();
@@ -3892,6 +4121,7 @@ fabric.util.animate = animate;
 
     /**
      * Loads an image from URL
+     * @function
      * @method loadImageFromURL
      * @param url {String} url of image to load
      * @param callback {Function} calback, invoked when image is loaded
@@ -3941,6 +4171,7 @@ fabric.util.animate = animate;
     })(),
 
     /**
+     * Takes url corresponding to an SVG document, and parses it to a set of objects
      * @method loadSVGFromURL
      * @param {String} url
      * @param {Function} callback
@@ -3989,6 +4220,9 @@ fabric.util.animate = animate;
       }
     },
 
+    /**
+     * @method _enlivenCachedObject
+     */
     _enlivenCachedObject: function (cachedObject) {
 
       var objects = cachedObject.objects,
@@ -4014,10 +4248,10 @@ fabric.util.animate = animate;
     },
 
     /**
-     * Same as `remove` but animated
+     * Same as `fabric.Element#remove` but animated
      * @method fxRemove
      * @param {fabric.Object} object Object to remove
-     * @param {Function} callback callback, invoked on effect completion
+     * @param {Function} callback Callback, invoked on effect completion
      * @return {fabric.Element} thisArg
      * @chainable
      */
@@ -4036,7 +4270,7 @@ fabric.util.animate = animate;
     },
 
     /**
-     * Moves an object to the bottom of the stack
+     * Moves an object to the bottom of the stack of drawn objects
      * @method sendToBack
      * @param object {fabric.Object} Object to send to back
      * @return {fabric.Element} thisArg
@@ -4049,7 +4283,7 @@ fabric.util.animate = animate;
     },
 
     /**
-     * Moves an object to the top of the stack
+     * Moves an object to the top of the stack of drawn objects
      * @method bringToFront
      * @param object {fabric.Object} Object to send
      * @return {fabric.Element} thisArg
@@ -4062,7 +4296,7 @@ fabric.util.animate = animate;
     },
 
     /**
-     * Moves an object one level down in stack
+     * Moves an object one level down in stack of drawn objects
      * @method sendBackwards
      * @param object {fabric.Object} Object to send
      * @return {fabric.Element} thisArg
@@ -4087,7 +4321,7 @@ fabric.util.animate = animate;
     },
 
     /**
-     * Moves an object one level up in stack
+     * Moves an object one level up in stack of drawn objects
      * @method sendForward
      * @param object {fabric.Object} Object to send
      * @return {fabric.Element} thisArg
@@ -4245,12 +4479,14 @@ fabric.util.animate = animate;
     },
 
     /**
+     * Clones canvas instance
      * @method clone
-     * @param {Object} callback OPTIONAL expects `onBeforeClone` and `onAfterClone` functions
-     * @return {fabric.Element} instance clone
+     * @param {Object} [callback] Expects `onBeforeClone` and `onAfterClone` functions
+     * @return {fabric.Element} Clone of this instance
      */
     clone: function (callback) {
       var el = document.createElement('canvas');
+
       el.width = this.getWidth();
       el.height = this.getHeight();
 
@@ -4263,18 +4499,36 @@ fabric.util.animate = animate;
       });
     },
 
+    /**
+     * @private
+     * @method _toDataURL
+     * @param {String} format
+     * @param {Function} callback
+     */
     _toDataURL: function (format, callback) {
       this.clone(function (clone) {
         callback(clone.toDataURL(format));
       });
     },
 
+    /**
+     * @private
+     * @method _toDataURLWithMultiplier
+     * @param {String} format
+     * @param {Number} multiplier
+     * @param {Function} callback
+     */
     _toDataURLWithMultiplier: function (format, multiplier, callback) {
       this.clone(function (clone) {
         callback(clone.toDataURLWithMultiplier(format, multiplier));
       });
     },
 
+    /**
+     * @private
+     * @method _resizeImageToFit
+     * @param {HTMLImageElement} imgEl
+     */
     _resizeImageToFit: function (imgEl) {
 
       var imageWidth = imgEl.width || imgEl.offsetWidth,
@@ -4285,11 +4539,38 @@ fabric.util.animate = animate;
       }
     },
 
-    /* stubs */
+    /**
+     * @property
+     * @namespace
+     */
     cache: {
-      has: function (name, callback){ callback(false) },
-      get: function () { },
-      set: function () { }
+
+      /**
+       * @method has
+       * @param {String} name
+       * @param {Function} callback
+       */
+      has: function (name, callback) {
+        callback(false);
+      },
+
+      /**
+       * @method get
+       * @param {String} url
+       * @param {Function} callback
+       */
+      get: function (url, callback) {
+        /* NOOP */
+      },
+
+      /**
+       * @method set
+       * @param {String} url
+       * @param {Object} object
+       */
+      set: function (url, object) {
+        /* NOOP */
+      }
     }
   });
 
@@ -4298,19 +4579,22 @@ fabric.util.animate = animate;
    * @method toString
    * @return {String} string representation of an instance
    */
-  fabric.Element.prototype.toString = function () {
+  fabric.Element.prototype.toString = function () { // Assign explicitly since `extend` doesn't take care of DontEnum bug yet
     return '#<fabric.Element (' + this.complexity() + '): '+
            '{ objects: ' + this.getObjects().length + ' }>';
   };
 
-  extend(fabric.Element, {
+  extend(fabric.Element, /** @scope fabric.Element */ {
 
     /**
+     * @static
      * @property EMPTY_JSON
+     * @type String
      */
     EMPTY_JSON: '{"objects": [], "background": "white"}',
 
     /**
+     * Takes &lt;canvas> element and transforms its data in such way that it becomes grayscale
      * @static
      * @method toGrayscale
      * @param {HTMLCanvasElement} canvasEl
@@ -4341,13 +4625,16 @@ fabric.util.animate = animate;
     /**
      * Provides a way to check support of some of the canvas methods
      * (either those of HTMLCanvasElement itself, or rendering context)
+     *
      * @method supports
-     * @param methodName {String} method to check support for
+     * @param methodName {String} Method to check support for;
+     *                            Could be one of "getImageData" or "toDataURL"
      * @return {Boolean | null} `true` if method is supported (or at least exists),
-     * `null` if canvas element or context can not be initialized
+     *                          `null` if canvas element or context can not be initialized
      */
     supports: function (methodName) {
       var el = document.createElement('canvas');
+
       if (typeof G_vmlCanvasManager !== 'undefined') {
         G_vmlCanvasManager.initElement(el);
       }
@@ -4377,6 +4664,7 @@ fabric.util.animate = animate;
 
   /**
    * Returs JSON representation of canvas
+   * @function
    * @method toJSON
    * @return {String} json string
    */
@@ -4404,39 +4692,55 @@ fabric.util.animate = animate;
    */
   fabric.Object = fabric.util.createClass(/** @scope fabric.Object.prototype */ {
 
-    /** @property */
+    /**
+     * @property
+     * @type String
+     */
     type: 'object',
 
-    /** @property */
+    /**
+     * @property
+     * @type Boolean
+     */
     includeDefaultValues: true,
 
     /**
      * @constant
+     * @type Number
      */
     NUM_FRACTION_DIGITS:        2,
 
     /**
      * @constant
+     * @type Number
      */
     FX_DURATION:                500,
 
     /**
      * @constant
+     * @type String
      */
     FX_TRANSITION:              'decel',
 
     /**
      * @constant
+     * @type Number
      */
     MIN_SCALE_LIMIT:            0.1,
 
-    /** @property */
+    /**
+     * @property
+     * @type Array
+     */
     stateProperties:  ('top left width height scaleX scaleY flipX flipY ' +
                       'theta angle opacity cornersize fill overlayFill stroke ' +
                       'strokeWidth fillRule borderScaleFactor transformMatrix').split(' '),
 
 
-    /** @property */
+    /**
+     * @property
+     * @type Object
+     */
     options: {
       top:                      0,
       left:                     0,
@@ -5629,7 +5933,10 @@ fabric.util.animate = animate;
    */
   fabric.Line = fabric.util.createClass(fabric.Object, /** @scope fabric.Line.prototype */ {
 
-    /** @property */
+    /**
+     * @property
+     * @type String
+     */
     type: 'line',
 
     /**
@@ -5753,9 +6060,10 @@ fabric.util.animate = animate;
     type: 'circle',
 
     /**
+     * Constructor
      * @method initialize
-     * @param options {Object} options object
-     * @return {Object} thisArg
+     * @param {Object} [options] Options object
+     * @return {fabric.Circle} thisArg
      */
     initialize: function(options) {
       options = options || { };
@@ -5870,7 +6178,10 @@ fabric.util.animate = animate;
    */
   fabric.Triangle = fabric.util.createClass(fabric.Object, /** @scope fabric.Triangle.prototype */ {
 
-    /** @property */
+    /**
+     * @property
+     * @type String
+     */
     type: 'triangle',
 
     /**
@@ -6070,10 +6381,16 @@ fabric.util.animate = animate;
    */
   fabric.Rect = fabric.util.createClass(fabric.Object, /** @scope fabric.Rect.prototype */ {
 
-    /** @property */
+    /**
+     * @property
+     * @type String
+     */
     type: 'rect',
 
-    /** @property */
+    /**
+     * @property
+     * @type Object
+     */
     options: {
       rx: 0,
       ry: 0
@@ -6213,7 +6530,10 @@ fabric.util.animate = animate;
    */
   fabric.Polyline = fabric.util.createClass(fabric.Object, /** @scope fabric.Polyline.prototype */ {
 
-    /** @property */
+    /**
+     * @property
+     * @type String
+     */
     type: 'polyline',
 
     /**
@@ -6344,7 +6664,10 @@ fabric.util.animate = animate;
    */
   fabric.Polygon = fabric.util.createClass(fabric.Object, /** @scope fabric.Polygon.prototype */ {
 
-    /** @property */
+    /**
+     * @property
+     * @type String
+     */
     type: 'polygon',
 
     /**
@@ -6508,7 +6831,10 @@ fabric.util.animate = animate;
    */
   fabric.Path = fabric.util.createClass(fabric.Object, /** @scope fabric.Path.prototype */ {
 
-    /** @property */
+    /**
+     * @property
+     * @type String
+     */
     type: 'path',
 
     /**
@@ -6965,10 +7291,16 @@ fabric.util.animate = animate;
    */
   fabric.PathGroup = fabric.util.createClass(fabric.Path, /** @scope fabric.PathGroup.prototype */ {
 
-    /** @property */
+    /**
+     * @property
+     * @type String
+     */
     type: 'path-group',
 
-    /** @property */
+    /**
+     * @property
+     * @type Boolean
+     */
     forceFillOverwrite: false,
 
     /**
@@ -7184,7 +7516,10 @@ fabric.util.animate = animate;
    */
   fabric.Group = fabric.util.createClass(fabric.Object, /** @scope fabric.Group.prototype */ {
 
-    /** @property */
+    /**
+     * @property
+     * @type String
+     */
     type: 'group',
 
     /**
@@ -7636,7 +7971,10 @@ fabric.util.animate = animate;
    */
   fabric.Text = fabric.util.createClass(fabric.Object, /** @scope fabric.Text.prototype */ {
 
-    /** @property */
+    /**
+     * @property
+     * @type Object
+     */
     options: {
       top:         10,
       left:        10,
@@ -7646,7 +7984,10 @@ fabric.util.animate = animate;
       path:        null
     },
 
-    /** @property */
+    /**
+     * @property
+     * @type String
+     */
     type: 'text',
 
     /**
@@ -7872,22 +8213,40 @@ fabric.util.animate = animate;
    */
   fabric.Image = fabric.util.createClass(fabric.Object, /** @scope fabric.Image.prototype */ {
 
-    /** @property */
+    /**
+     * @property
+     * @type Number
+     */
     maxwidth: null,
 
-    /** @property */
+    /**
+     * @property
+     * @type Number
+     */
     maxheight: null,
 
-    /** @property */
+    /**
+     * @property
+     * @type Boolean
+     */
     active: false,
 
-    /** @property */
+    /**
+     * @property
+     * @type Boolean
+     */
     bordervisibility: false,
 
-    /** @property */
+    /**
+     * @property
+     * @type Boolean
+     */
     cornervisibility: false,
 
-    /** @property */
+    /**
+     * @property
+     * @type String
+     */
     type: 'image',
 
     __isGrayscaled: false,

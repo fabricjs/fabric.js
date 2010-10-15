@@ -25,22 +25,40 @@
    */
   fabric.Image = fabric.util.createClass(fabric.Object, /** @scope fabric.Image.prototype */ {
     
-    /** @property */
+    /**
+     * @property
+     * @type Number
+     */
     maxwidth: null,
     
-    /** @property */
+    /**
+     * @property
+     * @type Number
+     */
     maxheight: null,
     
-    /** @property */
+    /**
+     * @property
+     * @type Boolean
+     */
     active: false,
     
-    /** @property */
+    /**
+     * @property
+     * @type Boolean
+     */
     bordervisibility: false,
     
-    /** @property */
+    /**
+     * @property
+     * @type Boolean
+     */
     cornervisibility: false,
     
-    /** @property */
+    /**
+     * @property
+     * @type String
+     */
     type: 'image',
     
     __isGrayscaled: false,

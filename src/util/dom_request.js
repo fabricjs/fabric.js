@@ -32,7 +32,8 @@
         onComplete = options.onComplete || function() { },
         request = makeXHR(),
         body;
-
+        
+    /** @ignore */
     request.onreadystatechange = function() {
       if (request.readyState === 4) {
         onComplete(request);

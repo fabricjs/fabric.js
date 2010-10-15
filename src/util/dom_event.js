@@ -71,18 +71,23 @@
       listeners = { },
 
       // DOM L0 branch
-      handlers = { };
+      handlers = { },
+      
+      addListener, removeListener;
 
   if (shouldUseAddListenerRemoveListener) {
+    /** @ignore */
     addListener = function (element, eventName, handler) {
       element.addEventListener(eventName, handler, false);
     };
+    /** @ignore */
     removeListener = function (element, eventName, handler) {
       element.removeEventListener(eventName, handler, false);
     };
   }
 
   else if (shouldUseAttachEventDetachEvent) {
+    /** @ignore */
     addListener = function (element, eventName, handler) { 
       var uid = getUniqueId(element);
       setElement(uid, element);
@@ -97,7 +102,7 @@
       listeners[uid][eventName].push(listener);
       element.attachEvent('on' + eventName, listener.wrappedHandler);
     };
-
+    /** @ignore */
     removeListener = function (element, eventName, handler) {
       var uid = getUniqueId(element), listener;
       if (listeners[uid] && listeners[uid][eventName]) {
@@ -112,6 +117,7 @@
     };
   }
   else {
+    /** @ignore */
     addListener = function (element, eventName, handler) {
       var uid = getUniqueId(element);
       if (!handlers[uid]) {
@@ -127,6 +133,7 @@
       }
       handlers[uid][eventName].push(handler);
     };
+    /** @ignore */
     removeListener = function (element, eventName, handler) {
       var uid = getUniqueId(element);
       if (handlers[uid] && handlers[uid][eventName]) {
@@ -140,11 +147,36 @@
     };
   }
   
+  /**
+   * Adds an event listener to an element
+   * @mthod addListener
+   * @memberOf fabric.util
+   * @function
+   * @param {HTMLElement} element
+   * @param {String} eventName
+   * @param {Function} handler
+   */
   fabric.util.addListener = addListener;
+  
+  /**
+   * Removes an event listener from an element
+   * @mthod removeListener
+   * @memberOf fabric.util
+   * @function
+   * @param {HTMLElement} element
+   * @param {String} eventName
+   * @param {Function} handler
+   */
   fabric.util.removeListener = removeListener;
   
   var customEventListeners = { };
   
+  /**
+   * @mthod observeEvent
+   * @memberOf fabric.util
+   * @param {String} eventName
+   * @param {Function} handler
+   */
   function observeEvent(eventName, handler) {
     if (!customEventListeners[eventName]) {
       customEventListeners[eventName] = [ ];
@@ -152,6 +184,13 @@
     customEventListeners[eventName].push(handler);
   }
   
+  /**
+   * Fires event with an optional memo object
+   * @mthod fireEvent
+   * @memberOf fabric.util
+   * @param {String} eventName
+   * @param {Object} [memo]
+   */
   function fireEvent(eventName, memo) {
     var listenersForEvent = customEventListeners[eventName];
     if (!listenersForEvent) return;
@@ -161,11 +200,14 @@
     }
   }
   
-  fabric.util.observeEvent = observeEvent;
-  fabric.util.fireEvent = fireEvent;
-  
-  // TODO (kangax): this method needs fixing
+  /**
+   * Cross-browser wrapper for getting event's coordinates
+   * @method getPointer
+   * @memberOf fabric.util
+   * @param {Event} event
+   */
   function getPointer(event) {
+    // TODO (kangax): this method needs fixing
     return { x: pointerX(event), y: pointerY(event) };
   }
 
@@ -191,4 +233,6 @@
   }
   
   fabric.util.getPointer = getPointer;
+  fabric.util.observeEvent = observeEvent;
+  fabric.util.fireEvent = fireEvent;
 })(this);

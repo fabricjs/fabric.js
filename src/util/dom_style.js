@@ -31,12 +31,14 @@
       setOpacity = function (element) { return element; };
 
   if (supportsOpacity) {
+    /** @ignore */
     setOpacity = function(element, value) {
       element.style.opacity = value;
       return element;
     };
   }
   else if (supportsFilters) {
+    /** @ignore */
     setOpacity = function(element, value) {
       var es = element.style;
       if (element.currentStyle && !element.currentStyle.hasLayout) {

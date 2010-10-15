@@ -21,10 +21,16 @@
    */
   fabric.PathGroup = fabric.util.createClass(fabric.Path, /** @scope fabric.PathGroup.prototype */ {
     
-    /** @property */
+    /**
+     * @property
+     * @type String
+     */
     type: 'path-group',
     
-    /** @property */
+    /**
+     * @property
+     * @type Boolean
+     */
     forceFillOverwrite: false,
     
     /**

@@ -42,7 +42,10 @@
    */
   fabric.Path = fabric.util.createClass(fabric.Object, /** @scope fabric.Path.prototype */ {
     
-    /** @property */
+    /**
+     * @property
+     * @type String
+     */
     type: 'path',
     
     /**

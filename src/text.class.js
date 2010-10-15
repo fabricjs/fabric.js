@@ -21,7 +21,10 @@
    */
   fabric.Text = fabric.util.createClass(fabric.Object, /** @scope fabric.Text.prototype */ {
     
-    /** @property */
+    /**
+     * @property
+     * @type Object
+     */
     options: {
       top:         10,
       left:        10,
@@ -31,7 +34,10 @@
       path:        null
     },
     
-    /** @property */
+    /**
+     * @property
+     * @type String
+     */
     type: 'text',
     
     /**

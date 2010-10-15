@@ -93,7 +93,9 @@ function getElementOffset(element) {
 
   	scriptEl.type = 'text/javascript';
   	scriptEl.setAttribute('runat', 'server');
-  	scriptEl.onload = scriptEl.onreadystatechange = function(e) {
+  	
+  	/** @ignore */
+  	scriptEl.onload = /** @ignore */ scriptEl.onreadystatechange = function(e) {
   	  if (loading) {
   	    if (typeof this.readyState == 'string' && 
   	        this.readyState !== 'loaded' && 

@@ -9,6 +9,7 @@
   
   var addMethods;
   if (IS_DONTENUM_BUGGY) {
+    /** @ignore */
     addMethods = function(klass, source) {
       if (source.toString !== Object.prototype.toString) {
         klass.prototype.toString = source.toString;
@@ -22,6 +23,7 @@
     };
   }
   else {
+    /** @ignore */
     addMethods = function(klass, source) {
       for (var property in source) {
         klass.prototype[property] = source[property];
@@ -30,6 +32,12 @@
   }
 
   function subclass() { };
+  
+  /**
+   * Helper for creation of "classes"
+   * @method createClass
+   * @memberOf fabric.util
+   */
   function createClass() {
     var parent = null, 
         properties = slice.call(arguments, 0);
@@ -58,6 +66,6 @@
     klass.prototype.constructor = klass;
     return klass;
   }
-
+  
   fabric.util.createClass = createClass;
 })();

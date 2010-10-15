@@ -1,9 +1,10 @@
 (function() {
   
   /**
-   * Removes value from an array. 
+   * Removes value from an array.
    * Presence of value (and its position in an array) is determined via `Array.prototype.indexOf`
    * @static
+   * @memberOf fabric.util
    * @method removeFromArray
    * @param {Array} array
    * @param {Any} value
@@ -18,8 +19,10 @@
   };
   
   /**
+   * Returns random number between 2 specified ones.
    * @static
    * @method getRandomInt
+   * @memberOf fabric.util
    * @param {Number} min lower limit
    * @param {Number} max upper limit
    * @return {Number} random value (between min and max)
@@ -28,22 +31,25 @@
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
   
+  var PiBy180 = Math.PI / 180;
+  
   /**
-   * Transforms degrees to radians
+   * Transforms degrees to radians.
    * @static
    * @method degreesToRadians
+   * @memberOf fabric.util
    * @param {Number} degrees value in degrees
    * @return {Number} value in radians
    */
-  var PiBy180 = Math.PI / 180;
   function degreesToRadians(degrees) {
     return degrees * PiBy180;
   }
   
   /**
-   * A wrapper around Number#toFixed, which contrary to native method returns number, not string
+   * A wrapper around Number#toFixed, which contrary to native method returns number, not string.
    * @static
    * @method toFixed
+   * @memberOf fabric.util
    * @param {Number | String} number number to operate on
    * @param {Number} fractionDigits number of fraction digits to "leave"
    * @return {Number}
@@ -53,9 +59,10 @@
    }
    
    /**
-    * Function which always returns `false`
+    * Function which always returns `false`.
     * @static
     * @method falseFunction
+    * @memberOf fabric.util
     * @return {Boolean}
     */
    function falseFunction() {

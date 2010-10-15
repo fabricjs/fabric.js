@@ -19,40 +19,56 @@
    */
   fabric.Object = fabric.util.createClass(/** @scope fabric.Object.prototype */ {
     
-    /** @property */
+    /**
+     * @property
+     * @type String
+     */
     type: 'object',
     
-    /** @property */
+    /**
+     * @property
+     * @type Boolean
+     */
     includeDefaultValues: true,
     
     /**
      * @constant
+     * @type Number
      */
     NUM_FRACTION_DIGITS:        2,
     
     /**
      * @constant
+     * @type Number
      */
     FX_DURATION:                500,
     
     /**
      * @constant
+     * @type String
      */
     FX_TRANSITION:              'decel',
     
     /**
      * @constant
+     * @type Number
      */
     MIN_SCALE_LIMIT:            0.1,
     
-    /** @property */
+    /**
+     * @property
+     * @type Array
+     */
     stateProperties:  ('top left width height scaleX scaleY flipX flipY ' +
                       'theta angle opacity cornersize fill overlayFill stroke ' +
                       'strokeWidth fillRule borderScaleFactor transformMatrix').split(' '),
     
     // TODO (kangax): rename to `defaultOptions`
     
-    /** @property */
+    /**
+     * @property
+     * @type Object
+     */
     options: {
       top:                      0,
       left:                     0,

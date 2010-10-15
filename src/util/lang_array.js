@@ -105,6 +105,13 @@ if (!Array.prototype.reduce) {
   };
 }
 
+/**
+ * Invokes method on all items in a given array
+ * @method invoke
+ * @memberOf fabric.util.array
+ * @param {Array} array Array to iterate over
+ * @param {String} method Name of a method to invoke
+ */
 function invoke(array, method) {
   var args = slice.call(arguments, 2), result = [ ];
   for (var i = 0, len = array.length; i < len; i++) {
@@ -113,6 +120,13 @@ function invoke(array, method) {
   return result;
 }
 
+/**
+ * Finds maximum value in array (not necessarily "first" one)
+ * @method max
+ * @memberOf fabric.util.array
+ * @param {Array} array Array to iterate over
+ * @param {String} byProperty
+ */
 function max(array, byProperty) {
   var i = array.length - 1, 
       result = byProperty ? array[i][byProperty] : array[i];
@@ -133,6 +147,13 @@ function max(array, byProperty) {
   return result;
 }
 
+/**
+ * Finds minimum value in array (not necessarily "first" one)
+ * @method min
+ * @memberOf fabric.util.array
+ * @param {Array} array Array to iterate over
+ * @param {String} byProperty
+ */
 function min(array, byProperty) {
   var i = array.length - 1, 
       result = byProperty ? array[i][byProperty] : array[i];
@@ -154,6 +175,7 @@ function min(array, byProperty) {
   return result;
 }
 
+/** @namespace */
 fabric.util.array = {
   invoke: invoke,
   min: min,

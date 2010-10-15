@@ -21,9 +21,10 @@
     type: 'circle',
     
     /**
+     * Constructor
      * @method initialize
-     * @param options {Object} options object
-     * @return {Object} thisArg
+     * @param {Object} [options] Options object
+     * @return {fabric.Circle} thisArg
      */
     initialize: function(options) {
       options = options || { };

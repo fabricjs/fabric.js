@@ -49,9 +49,10 @@
   /**
    * @class fabric.Element
    * @constructor
-   * @param {HTMLElement | String} el Container element for the canvas.
+   * @param {HTMLElement | String} el &lt;canvas> element to initialize instance on
+   * @param {Object} [options] Options object
    */
-  fabric.Element = function (el, config) {
+  fabric.Element = function (el, options) {
     
     /**
      * The object literal containing mouse position if clicked in an empty area (no image)
@@ -134,27 +135,83 @@
     this.calcOffset();
   };
   
-  extend(fabric.Element.prototype, {
+  extend(fabric.Element.prototype, /** @scope fabric.Element.prototype */ {
     
+    /**
+     * @property
+     * @type String
+     */
     selectionColor:         'rgba(100, 100, 255, 0.3)', // blue
+    
+    /**
+     * @property
+     * @type String
+     */
     selectionBorderColor:   'rgba(255, 255, 255, 0.3)',
+    
+    /**
+     * @property
+     * @type String
+     */
     freeDrawingColor:       'rgb(0, 0, 0)',
+    
+    /**
+     * @property
+     * @type String
+     */
     backgroundColor:        'rgba(0, 0, 0, 0)',
     
+    /**
+     * @property
+     * @type Number
+     */
     freeDrawingLineWidth:   1,
+    
+    /**
+     * @property
+     * @type Number
+     */
     selectionLineWidth:     1,
+    
+    /**
+     * @property
+     * @type Boolean
+     */
     includeDefaultValues:   true,
     
+    /**
+     * @property
+     * @type Boolean
+     */
     shouldCacheImages:      false,
     
+    /**
+     * @constant
+     * @type Number
+     */
     CANVAS_WIDTH:           600,
+    
+    /**
+     * @constant
+     * @type Number
+     */
     CANVAS_HEIGHT:          600,
     
-    onBeforeScaleRotate: function () {
+    /**
+     * Callback; invoked right before object is about to be scaled/rotated
+     * @method onBeforeScaleRotate
+     * @param {fabric.Object} target Object that's about to be scaled/rotated
+     */
+    onBeforeScaleRotate: function (target) {
       /* NOOP */
     },
     
-    onFpsUpdate: function() {
+    /**
+     * Callback; invoked on every redraw of canvas and is being passed a number indicating current fps
+     * @method onFpsUpdate
+     * @param {Number} fps
+     */
+    onFpsUpdate: function(fps) {
       /* NOOP */
     },
     
@@ -171,6 +228,7 @@
     },
     
     /**
+     * Sets overlay image for this canvas
      * @method setOverlayImage
      * @param {String} url url of an image to set background to
      * @param {Function} callback callback to invoke when image is loaded and set as an overlay one
@@ -195,9 +253,8 @@
     },
     
     /**
-     * Canvas class' initialization method; This method is automatically 
-     * called by constructor, sets up all DOM references for 
-     * pre-existing markup, and creates required markup if it is not.
+     * Canvas class' initialization method; Automatically called by constructor;
+     * Sets up all DOM references for pre-existing markup and creates required markup if it's not yet created.
      * already present.
      * @method _initElement
      * @param {HTMLElement|String} canvasEl Canvas element
@@ -227,6 +284,8 @@
     /**
      * @private
      * @method _initWrapperElement
+     * @param {Number} width
+     * @param {Number} height
      */
     _initWrapperElement: function (width, height) {
       var wrapper = fabric.util.wrapElement(this.getElement(), 'div', { 'class': 'canvas_container' });
@@ -241,6 +300,8 @@
     /**
      * @private
      * @method _setElementStyle
+     * @param {Number} width
+     * @param {Number} height
      */
     _setElementStyle: function (width, height) {
       fabric.util.setStyle(this.getElement(), {
@@ -253,12 +314,12 @@
     },
 
     /**
-       * For now we use an object literal without methods to store the config params
-       * @method _initConfig
-       * @param config {Object} userConfig The configuration Object literal 
-       * containing the configuration that should be set for this module. 
-       * See configuration documentation for more details.
-       */
+     * For now, use an object literal without methods to store the config params
+     * @method _initConfig
+     * @param config {Object} userConfig The configuration Object literal 
+     * containing the configuration that should be set for this module;
+     * See configuration documentation for more details.
+     */
     _initConfig: function (config) {
       extend(this._config, config || { });
       
@@ -270,7 +331,7 @@
     },
 
     /**
-     * Adds main mouse listeners to the whole canvas
+     * Adds mouse listeners to  canvas
      * @method _initEvents
      * @private
      * See configuration documentation for more details.
@@ -364,6 +425,7 @@
     },
     
     /**
+     * Sets width of this canvas instance
      * @method setWidth
      * @param {Number} width value to set width to
      * @return {fabric.Element} instance
@@ -374,6 +436,7 @@
     },
     
     /**
+     * Sets height of this canvas instance
      * @method setHeight
      * @param {Number} height value to set height to
      * @return {fabric.Element} instance
@@ -383,6 +446,13 @@
       return this._setDimension('height', value);
     },
     
+    /**
+     * Sets dimensions (width, height) of this canvas instance
+     * @method setDimensions
+     * @param {Object} dimensions
+     * @return {fabric.Element} thisArg
+     * @chainable
+     */
     setDimensions: function(dimensions) {
       for (var prop in dimensions) {
         this._setDimension(prop, dimensions[prop]);
@@ -391,9 +461,9 @@
     },
     
     /**
-     * private helper for setting width/height
-     * @method _setDimensions
+     * Helper for setting width/height
      * @private
+     * @method _setDimensions
      * @param {String} prop property (width|height)
      * @param {Number} value value to set property to
      * @return {fabric.Element} instance
@@ -568,6 +638,7 @@
     },
     
     /**
+     * Returns &lt;canvas> element corresponding to this instance
      * @method getElement
      * @return {HTMLCanvasElement}
      */
@@ -678,6 +749,10 @@
       }
     },
     
+    /**
+     * @private
+     * @method _prepareForDrawing
+     */
     _prepareForDrawing: function(e) {
       
       this._isCurrentlyDrawing = true;
@@ -698,6 +773,10 @@
       this.contextTop.lineCap = this.contextTop.lineJoin = 'round';
     },
     
+    /**
+     * @private
+     * @method _captureDrawingPath
+     */
     _captureDrawingPath: function(e) {
       var pointer = this.getPointer(e);
       
@@ -708,6 +787,10 @@
       this.contextTop.stroke();
     },
     
+    /**
+     * @private
+     * @method _finalizeDrawingPath
+     */
     _finalizeDrawingPath: function() {
       
       this.contextTop.closePath();
@@ -1016,8 +1099,8 @@
     },
     
     /**
-     * Adds an object to canvas and renders canvas
-     * An object should be an instance of (or inherit from) fabric.Object
+     * Adds objects to canvas, then renders canvas;
+     * Objects should be instances of (or inherit from) fabric.Object
      * @method add
      * @return {fabric.Element} thisArg
      * @chainable
@@ -1074,7 +1157,7 @@
     },
     
     /**
-     * Clears all contexts of canvas element
+     * Clears all contexts (background, main, top) of an instance
      * @method clear
      * @return {fabric.Element} thisArg
      * @chainable
@@ -1264,7 +1347,7 @@
      * @method toDataURL
      * @param {String} format the format of the output image. Either "jpeg" or "png".
      * @return {String}
-     */ 
+     */
     toDataURL: function (format) {
       var data;
       if (!format) {
@@ -1279,6 +1362,7 @@
     },
     
     /**
+     * Exports canvas element to a dataurl image (allowing to change image size via multiplier).
      * @method toDataURLWithMultiplier
      * @param {String} format (png|jpeg)
      * @param {Number} multiplier
@@ -1312,6 +1396,7 @@
     },
     
     /**
+     * Returns pointer coordinates relative to canvas.
      * @method getPointer
      * @return {Object} object with "x" and "y" number values
      */
@@ -1337,7 +1422,7 @@
     },
     
     /**
-     * Centers object horizontally
+     * Centers object horizontally.
      * @method centerObjectH
      * @param {fabric.Object} object Object to center
      * @return {fabric.Element} thisArg
@@ -1349,9 +1434,10 @@
     },
     
     /**
-     * Centers object horizontally with animation
+     * Centers object horizontally with animation.
      * @method fxCenterObjectH
-     * @param {fabric.Object} object
+     * @param {fabric.Object} object Object to center
+     * @param {Object} [callbacks] Callbacks object with optional "onComplete" and/or "onChange" properties
      * @return {fabric.Element} thisArg
      * @chainable
      */
@@ -1382,9 +1468,9 @@
     },
     
     /**
-     * Centers object vertically
+     * Centers object vertically.
      * @method centerObjectH
-     * @param object {fabric.Object} Object to center
+     * @param {fabric.Object} object Object to center
      * @return {fabric.Element} thisArg
      * @chainable
      */
@@ -1395,9 +1481,10 @@
     },
     
     /**
-     * Centers object vertically with animation
+     * Centers object vertically with animation.
      * @method fxCenterObjectV
-     * @param {fabric.Object} object
+     * @param {fabric.Object} object Object to center
+     * @param {Object} [callbacks] Callbacks object with optional "onComplete" and/or "onChange" properties
      * @return {fabric.Element} thisArg
      * @chainable
      */
@@ -1428,6 +1515,7 @@
     },
     
     /**
+     * Straightens object, then rerenders canvas
      * @method straightenObject
      * @param {fabric.Object} object Object to straighten
      * @return {fabric.Element} thisArg
@@ -1440,6 +1528,7 @@
     },
     
     /**
+     * Same as `fabric.Element#straightenObject`, but animated
      * @method fxStraightenObject
      * @param {fabric.Object} object Object to straighten
      * @return {fabric.Element} thisArg
@@ -1512,11 +1601,11 @@
     
     /**
      * Populates canvas with data from the specified JSON
-     * JSON format must conform to the one of fabric.Element#toJSON
+     * JSON format must conform to the one of `fabric.Element#toJSON`
      * @method loadFromJSON
-     * @param json {String} json string
-     * @param callback {Function} callback, invoked when json is parsed 
-     *                            and corresponding objects (e.g. fabric.Image) 
+     * @param {String} json JSON string
+     * @param {Function} callback Callback, invoked when json is parsed 
+     *                            and corresponding objects (e.g: fabric.Image) 
      *                            are initialized
      * @return {fabric.Element} instance
      * @chainable
@@ -1539,6 +1628,11 @@
       return this;
     },
     
+    /**
+     * @method _enlivenObjects
+     * @param {Array} objects
+     * @param {Function} callback
+     */
     _enlivenObjects: function (objects, callback) {
       var numLoadedImages = 0,
           // get length of all images 
@@ -1578,6 +1672,17 @@
       }
     },
     
+    /**
+     * Populates canvas with data from the specified dataless JSON
+     * JSON format must conform to the one of `fabric.Element#toDatalessJSON`
+     * @method loadFromDatalessJSON
+     * @param {String} json JSON string
+     * @param {Function} callback Callback, invoked when json is parsed 
+     *                            and corresponding objects (e.g: fabric.Image) 
+     *                            are initialized
+     * @return {fabric.Element} instance
+     * @chainable
+     */
     loadFromDatalessJSON: function (json, callback) {
       
       if (!json) {
@@ -1598,8 +1703,14 @@
       this._enlivenDatalessObjects(serialized.objects, callback);
     },
     
+    /**
+     * @method _enlivenDatalessObjects
+     * @param {Array} objects
+     * @param {Function} callback
+     */
     _enlivenDatalessObjects: function (objects, callback) {
       
+      /** @ignore */
       function onObjectLoaded(object, index) {
         _this.insertAt(object, index);
 				object.setCoords();
@@ -1701,6 +1812,7 @@
     
     /**
      * Loads an image from URL
+     * @function
      * @method loadImageFromURL
      * @param url {String} url of image to load
      * @param callback {Function} calback, invoked when image is loaded
@@ -1754,6 +1866,7 @@
     })(),
     
     /**
+     * Takes url corresponding to an SVG document, and parses it to a set of objects
      * @method loadSVGFromURL
      * @param {String} url
      * @param {Function} callback
@@ -1772,6 +1885,7 @@
           });
         }
         else {
+          // TODO (kangax): replace Prototype's API with fabric's util one
           new Ajax.Request(url, {
             method: 'get',
             onComplete: onComplete,
@@ -1802,6 +1916,9 @@
       }
     },
     
+    /**
+     * @method _enlivenCachedObject
+     */
     _enlivenCachedObject: function (cachedObject) {
       
       var objects = cachedObject.objects,
@@ -1827,10 +1944,10 @@
     },
     
     /**
-     * Same as `remove` but animated
+     * Same as `fabric.Element#remove` but animated
      * @method fxRemove
      * @param {fabric.Object} object Object to remove
-     * @param {Function} callback callback, invoked on effect completion
+     * @param {Function} callback Callback, invoked on effect completion
      * @return {fabric.Element} thisArg
      * @chainable
      */
@@ -1849,7 +1966,7 @@
     },
     
     /**
-     * Moves an object to the bottom of the stack
+     * Moves an object to the bottom of the stack of drawn objects
      * @method sendToBack
      * @param object {fabric.Object} Object to send to back
      * @return {fabric.Element} thisArg
@@ -1862,7 +1979,7 @@
     },
     
     /**
-     * Moves an object to the top of the stack
+     * Moves an object to the top of the stack of drawn objects
      * @method bringToFront
      * @param object {fabric.Object} Object to send
      * @return {fabric.Element} thisArg
@@ -1875,7 +1992,7 @@
     },
     
     /**
-     * Moves an object one level down in stack
+     * Moves an object one level down in stack of drawn objects
      * @method sendBackwards
      * @param object {fabric.Object} Object to send
      * @return {fabric.Element} thisArg
@@ -1902,7 +2019,7 @@
     },
     
     /**
-     * Moves an object one level up in stack
+     * Moves an object one level up in stack of drawn objects
      * @method sendForward
      * @param object {fabric.Object} Object to send
      * @return {fabric.Element} thisArg
@@ -2062,12 +2179,14 @@
     },
     
     /**
+     * Clones canvas instance
      * @method clone
-     * @param {Object} callback OPTIONAL expects `onBeforeClone` and `onAfterClone` functions
-     * @return {fabric.Element} instance clone
+     * @param {Object} [callback] Expects `onBeforeClone` and `onAfterClone` functions
+     * @return {fabric.Element} Clone of this instance
      */
     clone: function (callback) {
       var el = document.createElement('canvas');
+      
       el.width = this.getWidth();
       el.height = this.getHeight();
           
@@ -2081,18 +2200,36 @@
       });
     },
     
+    /**
+     * @private
+     * @method _toDataURL
+     * @param {String} format
+     * @param {Function} callback
+     */
     _toDataURL: function (format, callback) {
       this.clone(function (clone) {
         callback(clone.toDataURL(format));
       });
     },
     
+    /**
+     * @private
+     * @method _toDataURLWithMultiplier
+     * @param {String} format
+     * @param {Number} multiplier
+     * @param {Function} callback
+     */
     _toDataURLWithMultiplier: function (format, multiplier, callback) {
       this.clone(function (clone) {
         callback(clone.toDataURLWithMultiplier(format, multiplier));
       });
     },
     
+    /**
+     * @private
+     * @method _resizeImageToFit
+     * @param {HTMLImageElement} imgEl
+     */
     _resizeImageToFit: function (imgEl) {
       
       var imageWidth = imgEl.width || imgEl.offsetWidth,
@@ -2104,11 +2241,38 @@
       }
     },
     
-    /* stubs */
+    /**
+     * @property
+     * @namespace
+     */
     cache: {
-      has: function (name, callback){ callback(false) },
-      get: function () { },
-      set: function () { }
+      
+      /**
+       * @method has
+       * @param {String} name
+       * @param {Function} callback
+       */
+      has: function (name, callback) { 
+        callback(false);
+      },
+      
+      /**
+       * @method get
+       * @param {String} url
+       * @param {Function} callback
+       */
+      get: function (url, callback) {
+        /* NOOP */
+      },
+      
+      /**
+       * @method set
+       * @param {String} url
+       * @param {Object} object
+       */
+      set: function (url, object) {
+        /* NOOP */
+      }
     }
   });
   
@@ -2117,20 +2281,22 @@
    * @method toString
    * @return {String} string representation of an instance
    */
-   // Assign explicitly since `extend` doesn't take care of DontEnum bug yet
-  fabric.Element.prototype.toString = function () {
+  fabric.Element.prototype.toString = function () { // Assign explicitly since `extend` doesn't take care of DontEnum bug yet
     return '#<fabric.Element (' + this.complexity() + '): '+
            '{ objects: ' + this.getObjects().length + ' }>';
   };
   
-  extend(fabric.Element, {
+  extend(fabric.Element, /** @scope fabric.Element */ {
     
     /**
+     * @static
      * @property EMPTY_JSON
+     * @type String
      */
     EMPTY_JSON: '{"objects": [], "background": "white"}',
     
     /**
+     * Takes &lt;canvas> element and transforms its data in such way that it becomes grayscale
      * @static
      * @method toGrayscale
      * @param {HTMLCanvasElement} canvasEl
@@ -2161,13 +2327,16 @@
     /**
      * Provides a way to check support of some of the canvas methods 
      * (either those of HTMLCanvasElement itself, or rendering context)
+     *
      * @method supports
-     * @param methodName {String} method to check support for
+     * @param methodName {String} Method to check support for; 
+     *                            Could be one of "getImageData" or "toDataURL"
      * @return {Boolean | null} `true` if method is supported (or at least exists), 
-     * `null` if canvas element or context can not be initialized
+     *                          `null` if canvas element or context can not be initialized
      */
     supports: function (methodName) {
       var el = document.createElement('canvas');
+      
       if (typeof G_vmlCanvasManager !== 'undefined') {
         G_vmlCanvasManager.initElement(el);
       }
@@ -2197,6 +2366,7 @@
   
   /**
    * Returs JSON representation of canvas
+   * @function
    * @method toJSON
    * @return {String} json string
    */

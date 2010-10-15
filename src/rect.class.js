@@ -15,10 +15,16 @@
    */
   fabric.Rect = fabric.util.createClass(fabric.Object, /** @scope fabric.Rect.prototype */ {
     
-    /** @property */
+    /**
+     * @property
+     * @type String
+     */
     type: 'rect',
     
-    /** @property */
+    /**
+     * @property
+     * @type Object
+     */
     options: {
       rx: 0,
       ry: 0

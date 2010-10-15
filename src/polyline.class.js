@@ -15,7 +15,10 @@
    */
   fabric.Polyline = fabric.util.createClass(fabric.Object, /** @scope fabric.Polyline.prototype */ {
     
-    /** @property */
+    /**
+     * @property
+     * @type String
+     */
     type: 'polyline',
     
     /**
