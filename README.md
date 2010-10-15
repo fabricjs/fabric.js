@@ -50,6 +50,10 @@ Fabric.js started as a foundation for design editor on [printio.ru](http://print
         # or Google Closure Compiler
         $ java -jar lib/google_closure_compiler.jar --js dist/all.js --js_output_file dist/all.min.js
 
+4. Optionally, you can build documentation
+
+        $ java -jar lib/jsdoc-toolkit/jsrun.jar lib/jsdoc-toolkit/app/run.js -a -t=lib/jsdoc-toolkit/templates/jsdoc -d=docs fabric.js src/ src/util/
+
 ### Demos
 
 - [Main demo](http://kangax.github.com/fabric.js/test/demo/)
