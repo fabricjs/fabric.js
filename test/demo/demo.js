@@ -317,9 +317,10 @@
   canvas.freeDrawingLineWidth = parseInt(drawingLineWidthEl.value, 10) || 1;
   
   var helloWorld = new fabric.Text('Hello world!', { 
-    left: getRandomInt(50, 650), 
-    top: getRandomInt(50, 650),
-    fontfamily: 'delicious_500'
+    left: getRandomInt(100, 650), 
+    top: getRandomInt(100, 650),
+    fontfamily: 'delicious_500',
+    angle: getRandomInt(-20, 20)
   });
   
   canvas.add(helloWorld);
