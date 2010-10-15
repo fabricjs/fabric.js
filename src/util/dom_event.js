@@ -22,14 +22,17 @@
       return element.__uniqueID || (element.__uniqueID = 'uniqueID__' + uid++);
     };
   })();
-
+  
+  /** @ignore */
   var getElement, setElement;
 
   (function () {
     var elements = { };
+    /** @ignore */
     getElement = function (uid) {
       return elements[uid];
     };
+    /** @ignore */
     setElement = function (uid, element) {
       elements[uid] = element;
     };

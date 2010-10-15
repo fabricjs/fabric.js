@@ -23,7 +23,17 @@
   })();
 
   function emptyFn() { };
-
+  
+  /**
+   * Cross-browser abstraction for sending XMLHttpRequest
+   * @method request
+   * @memberOf fabric.util
+   * @param {String} url URL to send XMLHttpRequest to
+   * @param {Object} [options] Options object
+   * @param {String} [options.method="GET"]
+   * @param {Function} options.onComplete Callback to invoke when request is completed
+   * @return {XMLHttpRequest} request
+   */
   function request(url, options) {
 
     options || (options = { });

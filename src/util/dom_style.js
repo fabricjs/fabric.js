@@ -1,5 +1,13 @@
 (function () {
   
+  /**
+   * Cross-browser wrapper for setting element's style
+   * @method setStyle
+   * @memberOf fabric.util
+   * @param {HTMLElement} element
+   * @param {Object} styles
+   * @return {HTMLElement} Element that was passed as a first argument
+   */
   function setStyle(element, styles) {
     var elementStyle = element.style, match;
     if (typeof styles === 'string') {
@@ -28,6 +36,8 @@
       view = document.defaultView,
       supportsGCS = view && typeof view.getComputedStyle !== 'undefined',
       reOpacity = /alpha\s*\(\s*opacity\s*=\s*([^\)]+)\)/,
+      
+      /** @ignore */
       setOpacity = function (element) { return element; };
 
   if (supportsOpacity) {

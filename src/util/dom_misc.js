@@ -1,7 +1,21 @@
+/**
+ * Takes id and returns an element with that id (if one exists in a document)
+ * @method getById
+ * @memberOf fabric.util
+ * @param {String|HTMLElement} id
+ * @return {HTMLElement|null}
+ */
 function getById(id) {
   return typeof id === 'string' ? document.getElementById(id) : id;
 }
 
+/**
+ * Converts an array-like object (e.g. arguments or NodeList) to an array
+ * @method toArray
+ * @memberOf fabric.util
+ * @param {Object} arrayLike
+ * @return {Array}
+ */
 function toArray(arrayLike) {
   var arr = [ ], i = arrayLike.length;
   while (i--) {
@@ -10,6 +24,14 @@ function toArray(arrayLike) {
   return arr;
 }
 
+/**
+ * Creates specified element with specified attributes
+ * @method makeElement
+ * @memberOf fabric.util
+ * @param {String} tagName Type of an element to create
+ * @param {Object} [attributes] Attributes to set on an element
+ * @return {HTMLElement} Newly created element
+ */
 function makeElement(tagName, attributes) {
   var el = document.createElement(tagName);
   for (var prop in attributes) {
@@ -26,12 +48,28 @@ function makeElement(tagName, attributes) {
   return el;
 }
 
+/**
+ * Adds class to an element
+ * @method addClass
+ * @memberOf fabric.util
+ * @param {HTMLElement} element Element to add class to
+ * @param {String} className Class to add to an element
+ */
 function addClass(element, className) {
   if ((' ' + element.className + ' ').indexOf(' ' + className + ' ') === -1) {
     element.className += (element.className ? ' ' : '') + className;
   }  
 }
 
+/**
+ * Wraps element with another element
+ * @method wrapElement
+ * @memberOf fabric.util
+ * @param {HTMLElement} element Element to wrap
+ * @param {HTMLElement|String} wrapper Element to wrap with
+ * @param {Object} [attributes] Attributes to set on a wrapper
+ * @return {HTMLElement} wrapper
+ */
 function wrapElement(element, wrapper, attributes) {
   if (typeof wrapper === 'string') {
     wrapper = makeElement(wrapper, attributes);
@@ -43,8 +81,16 @@ function wrapElement(element, wrapper, attributes) {
   return wrapper;
 }
 
-// TODO (kangax): need to fix this method
+/**
+ * Returns offset for a given element
+ * @method getElementOffset
+ * @function
+ * @memberOf fabric.util
+ * @param {HTMLElement} element Element to get offset for
+ * @return {Object} Object with "left" and "top" properties
+ */
 function getElementOffset(element) {
+  // TODO (kangax): need to fix this method
   var valueT = 0, valueL = 0;
   do {
     valueT += element.offsetTop  || 0;
@@ -67,7 +113,14 @@ function getElementOffset(element) {
         : 'KhtmlUserSelect' in style 
           ? 'KhtmlUserSelect' 
           : '';
-
+  
+  /**
+   * Makes element unselectable
+   * @method makeElementUnselectable
+   * @memberOf fabric.util
+   * @param {HTMLElement} element Element to make unselectable
+   * @return {HTMLElement} Element that was passed in
+   */
   function makeElementUnselectable(element) {
     if (typeof element.onselectstart !== 'undefined') {
       element.onselectstart = fabric.util.falseFunction;
@@ -84,8 +137,15 @@ function getElementOffset(element) {
   fabric.util.makeElementUnselectable = makeElementUnselectable;
 })();
 
-(function(){
+(function() {
   
+  /**
+   * Inserts a script element with a given url into a document; invokes callback, when that script is finished loading
+   * @method getScript
+   * @memberOf fabric.util
+   * @param {String} url URL of a script to load
+   * @param {Function} callback Callback to execute when script is finished loading
+   */
   function getScript(url, callback) {
   	var headEl = document.getElementsByTagName("head")[0],
   	    scriptEl = document.createElement('script'), 
@@ -124,6 +184,18 @@ function getElementOffset(element) {
   }
 })();
 
+/**
+ * Changes value from one to another within certain period of time, invoking callbacks as value is being changed.
+ * @method animate
+ * @memberOf fabric.util
+ * @param {Object} [options] Animation options
+ * @param {Function} [options.onChange] Callback; invoked on every value change
+ * @param {Function} [options.onComplete] Callback; invoked when value change is completed
+ * @param {Number} [options.startValue=0] Starting value
+ * @param {Number} [options.endValue=100] Ending value
+ * @param {Function} [options.easing] Easing function
+ * @param {Number} [options.duration=500] Duration of change
+ */
 function animate(options) {
   options || (options = { });
   var start = +new Date(), 
