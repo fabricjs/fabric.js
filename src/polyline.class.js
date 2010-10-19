@@ -104,7 +104,7 @@
     options || (options = { });
     
     var points = fabric.parsePointsAttribute(element.getAttribute('points')),
-        parsedAttributes = fabric.parseAttributes(element, ATTRIBUTE_NAMES);
+        parsedAttributes = fabric.parseAttributes(element, fabric.Polyline.ATTRIBUTE_NAMES);
     
     for (var i = 0, len = points.length; i < len; i++) {
       // normalize coordinates, according to containing box (dimensions of which are passed via `options`)

@@ -312,6 +312,7 @@
   };
   
   /**
+   * Parses an SVG document, converts it to an array of corresponding fabric.* instances and passes them to a callback
    * @static
    * @function
    * @memberOf fabric

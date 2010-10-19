@@ -1700,6 +1700,7 @@ if (!String.prototype.trim) {
   /**
    * Trims a string (removing whitespace from the beginning and the end)
    * @method trim
+   * @see <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String/Trim">String#trim on MDN</a>
    */
   String.prototype.trim = function () {
     return this.replace(/^[\s\xA0]+/, '').replace(/[\s\xA0]+$/, '');
@@ -2433,7 +2434,10 @@ fabric.util.animate = animate;
 })(this);
 (function(){
 
-  /** @name fabric */
+  /**
+   * @name fabric
+   * @namespace
+   */
 
   var fabric = this.fabric || (this.fabric = { }),
       extend = fabric.util.object.extend,
@@ -2455,7 +2459,6 @@ fabric.util.animate = animate;
   /**
    * Returns an object of attributes' name/value, given element and an array of attribute names;
    * Parses parent "g" nodes recursively upwards.
-   *
    * @static
    * @memberOf fabric
    * @method parseAttributes
@@ -2503,6 +2506,7 @@ fabric.util.animate = animate;
   };
 
   /**
+   * Parses "transform" attribute, returning an array of values
    * @static
    * @function
    * @memberOf fabric
@@ -2629,6 +2633,7 @@ fabric.util.animate = animate;
   })();
 
   /**
+   * Parses "points" attribute, returning an array of values
    * @static
    * @memberOf fabric
    * @method parsePointsAttribute
@@ -2664,6 +2669,7 @@ fabric.util.animate = animate;
   };
 
   /**
+   * Parses "style" attribute, retuning an object with values
    * @static
    * @memberOf fabric
    * @method parseStyleAttribute
@@ -2697,6 +2703,7 @@ fabric.util.animate = animate;
   };
 
   /**
+   * Transforms an array of svg elements to corresponding fabric.* instances
    * @static
    * @memberOf fabric
    * @method parseElements
@@ -2723,6 +2730,7 @@ fabric.util.animate = animate;
   };
 
   /**
+   * Parses an SVG document, converts it to an array of corresponding fabric.* instances and passes them to a callback
    * @static
    * @function
    * @memberOf fabric
@@ -3569,40 +3577,46 @@ fabric.util.animate = animate;
   extend(fabric.Element.prototype, /** @scope fabric.Element.prototype */ {
 
     /**
-     * @property
-     * @type String
-     */
-    selectionColor:         'rgba(100, 100, 255, 0.3)', // blue
-
-    /**
-     * @property
-     * @type String
-     */
-    selectionBorderColor:   'rgba(255, 255, 255, 0.3)',
-
-    /**
-     * @property
-     * @type String
-     */
-    freeDrawingColor:       'rgb(0, 0, 0)',
-
-    /**
+     * Background color of this canvas instance
      * @property
      * @type String
      */
     backgroundColor:        'rgba(0, 0, 0, 0)',
 
     /**
+     * Color of selection
      * @property
-     * @type Number
+     * @type String
      */
-    freeDrawingLineWidth:   1,
+    selectionColor:         'rgba(100, 100, 255, 0.3)', // blue
 
     /**
+     * Color of the border of selection (usually slightly darker than color of selection itself)
+     * @property
+     * @type String
+     */
+    selectionBorderColor:   'rgba(255, 255, 255, 0.3)',
+
+    /**
+     * Width of a line used in selection
      * @property
      * @type Number
      */
     selectionLineWidth:     1,
+
+    /**
+     * Color of the line used in free drawing mode
+     * @property
+     * @type String
+     */
+    freeDrawingColor:       'rgb(0, 0, 0)',
+
+    /**
+     * Width of a line used in free drawing mode
+     * @property
+     * @type Number
+     */
+    freeDrawingLineWidth:   1,
 
     /**
      * @property
@@ -3611,6 +3625,7 @@ fabric.util.animate = animate;
     includeDefaultValues:   true,
 
     /**
+     * Indicates whether images loaded via `fabric.Element#loadImageFromUrl` should be cached
      * @property
      * @type Boolean
      */
@@ -5183,7 +5198,7 @@ fabric.util.animate = animate;
     },
 
     /**
-     * Loads an image from URL
+     * Loads an image from URL, creates an instance of fabric.Image and passes it to a callback
      * @function
      * @method loadImageFromURL
      * @param url {String} url of image to load
@@ -5603,6 +5618,7 @@ fabric.util.animate = animate;
     },
 
     /**
+     * Used for caching SVG documents (loaded via `fabric.Element#loadSVGFromURL`)
      * @property
      * @namespace
      */
@@ -5792,6 +5808,8 @@ fabric.util.animate = animate;
     MIN_SCALE_LIMIT:            0.1,
 
     /**
+     * List of properties to consider when checking if state of an object is changed (fabric.Object#hasStateChanged);
+     * as well as for history (undo/redo) purposes
      * @property
      * @type Array
      */
@@ -7070,9 +7088,11 @@ fabric.util.animate = animate;
   });
 
   /**
+   * List of attribute names to account for when parsing SVG element (used by `fabric.Line.fromElement`)
+   * @static
    * @see http://www.w3.org/TR/SVG/shapes.html#LineElement
    */
-  fabric.Element.ATTRIBUTE_NAMES = 'x1 y1 x2 y2 stroke stroke-width transform'.split(' ');
+  fabric.Line.ATTRIBUTE_NAMES = 'x1 y1 x2 y2 stroke stroke-width transform'.split(' ');
 
   /**
    * Returns fabric.Line instance from an SVG element
@@ -7083,7 +7103,7 @@ fabric.util.animate = animate;
    * @return {fabric.Line} instance of fabric.Line
    */
   fabric.Line.fromElement = function(element, options) {
-    var parsedAttributes = fabric.parseAttributes(element, fabric.Element.ATTRIBUTE_NAMES);
+    var parsedAttributes = fabric.parseAttributes(element, fabric.Line.ATTRIBUTE_NAMES);
     var points = [
       parsedAttributes.x1 || 0,
       parsedAttributes.y1 || 0,
@@ -7331,7 +7351,10 @@ fabric.util.animate = animate;
    */
   fabric.Ellipse = fabric.util.createClass(fabric.Object, /** @scope fabric.Ellipse.prototype */ {
 
-    /** @property */
+    /**
+     * @property
+     * @type String
+     */
     type: 'ellipse',
 
     /**
@@ -7365,6 +7388,7 @@ fabric.util.animate = animate;
     },
 
     /**
+     * Renders this instance on a given context
      * @method render
      * @param ctx {CanvasRenderingContext2D} context to render on
      * @param noTransform {Boolean} context is not transformed when set to true
@@ -7394,6 +7418,7 @@ fabric.util.animate = animate;
     },
 
     /**
+     * Returns complexity of an instance
      * @method complexity
      * @return {Number} complexity
      */
@@ -7402,6 +7427,11 @@ fabric.util.animate = animate;
     }
   });
 
+  /**
+   * List of attribute names to account for when parsing SVG element (used by `fabric.Ellipse.fromElement`)
+   * @static
+   * @see http://www.w3.org/TR/SVG/shapes.html#EllipseElement
+   */
   fabric.Ellipse.ATTRIBUTE_NAMES = 'cx cy rx ry fill fill-opacity stroke stroke-width transform'.split(' ');
 
   /**
@@ -7542,6 +7572,11 @@ fabric.util.animate = animate;
     }
   });
 
+
+  /**
+   * List of attribute names to account for when parsing SVG element (used by `fabric.Rect.fromElement`)
+   * @static
+   */
   fabric.Rect.ATTRIBUTE_NAMES = 'x y width height rx ry fill fill-opacity stroke stroke-width transform'.split(' ');
 
   /**
@@ -7554,6 +7589,7 @@ fabric.util.animate = animate;
   }
 
   /**
+   * Returns fabric.Rect instance from an SVG element
    * @static
    * @method fabric.Rect.fromElement
    * @param element {SVGElement} element to parse
@@ -7575,6 +7611,7 @@ fabric.util.animate = animate;
   };
 
   /**
+   * Returns fabric.Rect instance from an object representation
    * @static
    * @method fabric.Rect.fromObject
    * @param object {Object} object to create an instance from
@@ -7672,7 +7709,7 @@ fabric.util.animate = animate;
    * @static
    * @see: http://www.w3.org/TR/SVG/shapes.html#PolylineElement
    */
-  var ATTRIBUTE_NAMES = 'fill fill-opacity stroke stroke-width transform'.split(' ');
+  fabric.Polyline.ATTRIBUTE_NAMES = 'fill fill-opacity stroke stroke-width transform'.split(' ');
 
   /**
    * Returns fabric.Polyline instance from an SVG element
@@ -7689,7 +7726,7 @@ fabric.util.animate = animate;
     options || (options = { });
 
     var points = fabric.parsePointsAttribute(element.getAttribute('points')),
-        parsedAttributes = fabric.parseAttributes(element, ATTRIBUTE_NAMES);
+        parsedAttributes = fabric.parseAttributes(element, fabric.Polyline.ATTRIBUTE_NAMES);
 
     for (var i = 0, len = points.length; i < len; i++) {
       points[i].x -= (options.width / 2) || 0;
@@ -7944,6 +7981,10 @@ fabric.util.animate = animate;
       }
     },
 
+    /**
+     * @private
+     * @method _initializeFromArray
+     */
     _initializeFromArray: function(options) {
       var isWidthSet = 'width' in options,
           isHeightSet = 'height' in options;
@@ -7961,6 +8002,10 @@ fabric.util.animate = animate;
       }
     },
 
+    /**
+     * @private
+     * @method _render
+     */
     _render: function(ctx) {
       var current, // current instruction
           x = 0, // current x
@@ -8141,6 +8186,12 @@ fabric.util.animate = animate;
       }
     },
 
+    /**
+     * Renders path on a specified context
+     * @method render
+     * @param {CanvasRenderingContext2D} ctx context to render path on
+     * @param {Boolean} noTransform When true, context is not transformed
+     */
     render: function(ctx, noTransform) {
       ctx.save();
       var m = this.transformMatrix;
@@ -8192,6 +8243,7 @@ fabric.util.animate = animate;
     },
 
     /**
+     * Returns object representation of an instance
      * @method toObject
      * @return {Object}
      */
@@ -8209,6 +8261,7 @@ fabric.util.animate = animate;
     },
 
     /**
+     * Returns dataless object representation of an instance
      * @method toDatalessObject
      * @return {Object}
      */
@@ -8322,10 +8375,15 @@ fabric.util.animate = animate;
     return new fabric.Path(object.path, object);
   };
 
-  var ATTRIBUTE_NAMES = fabric.Path.ATTRIBUTE_NAMES = 'd fill fill-opacity fill-rule stroke stroke-width transform'.split(' ');
+  /**
+   * List of attribute names to account for when parsing SVG element (used by `fabric.Path.fromElement`)
+   * @static
+   * @see http://www.w3.org/TR/SVG/paths.html#PathElement
+   */
+  fabric.Path.ATTRIBUTE_NAMES = 'd fill fill-opacity fill-rule stroke stroke-width transform'.split(' ');
 
   /**
-   * Creates an instance of fabric.Path from an SVG <PATH> element
+   * Creates an instance of fabric.Path from an SVG <path> element
    * @static
    * @method fabric.Path.fromElement
    * @param {SVGElement} element to parse
@@ -8333,7 +8391,7 @@ fabric.util.animate = animate;
    * @return {fabric.Path} Instance of fabric.Path
    */
   fabric.Path.fromElement = function(element, options) {
-    var parsedAttributes = fabric.parseAttributes(element, ATTRIBUTE_NAMES),
+    var parsedAttributes = fabric.parseAttributes(element, fabric.Path.ATTRIBUTE_NAMES),
         path = parsedAttributes.d;
     delete parsedAttributes.d;
     return new fabric.Path(path, extend(parsedAttributes, options));
@@ -8388,7 +8446,7 @@ fabric.util.animate = animate;
       this.paths = paths;
 
       this.setOptions(options);
-      this.initProperties();
+      this._initProperties();
 
       this.setCoords();
 
@@ -8397,7 +8455,11 @@ fabric.util.animate = animate;
       }
     },
 
-    initProperties: function() {
+    /**
+     * @private
+     * @method _initProperties
+     */
+    _initProperties: function() {
       this.stateProperties.forEach(function(prop) {
         if (prop === 'fill') {
           this.set(prop, this.options[prop]);
@@ -8411,6 +8473,11 @@ fabric.util.animate = animate;
       }, this);
     },
 
+    /**
+     * Renders this group on a specified context
+     * @method render
+     * @param {CanvasRenderingContext2D} ctx Context to render this instance on
+     */
     render: function(ctx) {
       if (this.stub) {
         ctx.save();
@@ -8444,6 +8511,7 @@ fabric.util.animate = animate;
     },
 
     /**
+     * Sets certain property to a certain value
      * @method set
      * @param {String} prop
      * @param {Any} value
@@ -8464,6 +8532,7 @@ fabric.util.animate = animate;
     },
 
     /**
+     * Returns object representation of this path group
      * @method toObject
      * @return {Object} object representation of an instance
      */
@@ -8475,6 +8544,7 @@ fabric.util.animate = animate;
     },
 
     /**
+     * Returns dataless object representation of this path group
      * @method toDatalessObject
      * @return {Object} dataless object representation of an instance
      */
@@ -8487,7 +8557,7 @@ fabric.util.animate = animate;
     },
 
      /**
-      * Returns a string representation of an object
+      * Returns a string representation of this path group
       * @method toString
       * @return {String} string representation of an object
       */
@@ -8497,6 +8567,7 @@ fabric.util.animate = animate;
     },
 
     /**
+     * Returns true if all paths in this group are of same color
      * @method isSameColor
      * @return {Boolean} true if all paths are of the same color (`fill`)
      */
@@ -8532,6 +8603,7 @@ fabric.util.animate = animate;
     },
 
     /**
+     * Returns all paths in this path group
      * @method getObjects
      * @return {Array} array of path objects included in this path group
      */
@@ -8555,6 +8627,7 @@ fabric.util.animate = animate;
   }
 
   /**
+   * Creates fabric.Triangle instance from an object representation
    * @static
    * @method fabric.PathGroup.fromObject
    * @param {Object} object
@@ -8850,6 +8923,7 @@ fabric.util.animate = animate;
     },
 
     /**
+     * Saves coordinates of this instance (to be used together with `hasMoved`)
      * @saveCoords
      * @return {fabric.Group} thisArg
      * @chainable
@@ -8861,6 +8935,7 @@ fabric.util.animate = animate;
     },
 
     /**
+     * Checks whether this group was moved (since `saveCoords` was called last)
      * @method hasMoved
      * @return {Boolean} true if an object was moved (since fabric.Group#saveCoords was called)
      */
@@ -8907,6 +8982,7 @@ fabric.util.animate = animate;
     },
 
     /**
+     * Executes given function for each object in this group
      * @method forEachObject
      * @param {Function} callback
      *                   Callback invoked with current object as first argument,
@@ -8982,8 +9058,9 @@ fabric.util.animate = animate;
     },
 
     /**
+     * Checks if point is contained within the group
      * @method containsPoint
-     * @param {Object} point point with `x` and `y` properties
+     * @param {fabric.Point} point point with `x` and `y` properties
      * @return {Boolean} true if point is contained within group
      */
     containsPoint: function(point) {
@@ -8999,6 +9076,10 @@ fabric.util.animate = animate;
               centerY + halfHeight > point.y;
     },
 
+    /**
+     * Makes all of this group's objects grayscale (i.e. calling `toGrayscale` on them)
+     * @method toGrayscale
+     */
     toGrayscale: function() {
       var i = this.objects.length;
       while (i--) {
@@ -9008,6 +9089,7 @@ fabric.util.animate = animate;
   });
 
   /**
+   * Returns fabric.Group instance from an object representation
    * @static
    * @method fabric.Group.fromObject
    * @param object {Object} object to create a group from
@@ -9069,7 +9151,7 @@ fabric.util.animate = animate;
      */
     initialize: function(text, options) {
       this.originalState = { };
-      this.initStateProperties();
+      this._initStateProperties();
       this.text = text;
       this.setOptions(options);
       extend(this, this.options);
@@ -9079,9 +9161,11 @@ fabric.util.animate = animate;
     },
 
     /**
+     * Creates `stateProperties` list on an instance, and adds `fabric.Text` -specific ones to it (such as "fontfamily", "fontweight", etc.)
+     * @private
      * @method initStateProperties
      */
-    initStateProperties: function() {
+    _initStateProperties: function() {
       var o;
       if ((o = this.constructor) &&
           (o = o.superclass) &&
@@ -9149,6 +9233,7 @@ fabric.util.animate = animate;
     },
 
     /**
+     * Renders text instance on a specified context
      * @method render
      * @param ctx {CanvasRenderingContext2D} context to render on
      */
@@ -9163,6 +9248,7 @@ fabric.util.animate = animate;
     },
 
   	/**
+  	 * Returns object representation of an instance
   	 * @method toObject
   	 * @return {Object} Object representation of text object
   	 */
@@ -9177,6 +9263,7 @@ fabric.util.animate = animate;
   	},
 
   	/**
+  	 * Sets "color" of an instance (alias of `set('fill', &hellip;)`)
   	 * @method setColor
   	 * @param {String} value
   	 * @return {fabric.Text} thisArg
@@ -9188,6 +9275,7 @@ fabric.util.animate = animate;
   	},
 
   	/**
+  	 * Sets fontsize of an instance and updates its coordinates
   	 * @method setFontsize
   	 * @param {Number} value
   	 * @return {fabric.Text} thisArg
@@ -9200,6 +9288,7 @@ fabric.util.animate = animate;
   	},
 
   	/**
+  	 * Returns actual text value of an instance
   	 * @method getText
   	 * @return {String}
   	 */
@@ -9249,6 +9338,7 @@ fabric.util.animate = animate;
 	};
 
 	/**
+	 * Returns fabric.Text instance from an SVG element (<b>not yet implemented</b>)
    * @static
    * @method fabric.Text.fromElement
    * @return {fabric.Text} an instance
