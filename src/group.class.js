@@ -286,6 +286,7 @@
     },
     
     /**
+     * Saves coordinates of this instance (to be used together with `hasMoved`)
      * @saveCoords
      * @return {fabric.Group} thisArg
      * @chainable
@@ -297,6 +298,7 @@
     },
     
     /**
+     * Checks whether this group was moved (since `saveCoords` was called last)
      * @method hasMoved
      * @return {Boolean} true if an object was moved (since fabric.Group#saveCoords was called)
      */
@@ -343,6 +345,7 @@
     },
     
     /**
+     * Executes given function for each object in this group
      * @method forEachObject
      * @param {Function} callback 
      *                   Callback invoked with current object as first argument, 
@@ -418,8 +421,9 @@
     },
     
     /**
+     * Checks if point is contained within the group
      * @method containsPoint
-     * @param {Object} point point with `x` and `y` properties
+     * @param {fabric.Point} point point with `x` and `y` properties
      * @return {Boolean} true if point is contained within group
      */
     containsPoint: function(point) {
@@ -435,6 +439,10 @@
               centerY + halfHeight > point.y;
     },
     
+    /**
+     * Makes all of this group's objects grayscale (i.e. calling `toGrayscale` on them)
+     * @method toGrayscale
+     */
     toGrayscale: function() {
       var i = this.objects.length;
       while (i--) {
@@ -444,6 +452,7 @@
   });
   
   /**
+   * Returns fabric.Group instance from an object representation
    * @static
    * @method fabric.Group.fromObject
    * @param object {Object} object to create a group from

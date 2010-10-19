@@ -17,7 +17,10 @@
    */
   fabric.Ellipse = fabric.util.createClass(fabric.Object, /** @scope fabric.Ellipse.prototype */ {
     
-    /** @property */
+    /**
+     * @property
+     * @type String
+     */
     type: 'ellipse',
     
     /**
@@ -51,6 +54,7 @@
     },
     
     /**
+     * Renders this instance on a given context
      * @method render
      * @param ctx {CanvasRenderingContext2D} context to render on
      * @param noTransform {Boolean} context is not transformed when set to true
@@ -81,6 +85,7 @@
     },
     
     /**
+     * Returns complexity of an instance
      * @method complexity
      * @return {Number} complexity
      */
@@ -89,6 +94,11 @@
     }
   });
   
+  /**
+   * List of attribute names to account for when parsing SVG element (used by `fabric.Ellipse.fromElement`)
+   * @static
+   * @see http://www.w3.org/TR/SVG/shapes.html#EllipseElement
+   */
   fabric.Ellipse.ATTRIBUTE_NAMES = 'cx cy rx ry fill fill-opacity stroke stroke-width transform'.split(' ');
   
   /**

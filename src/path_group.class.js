@@ -48,7 +48,7 @@
       this.paths = paths;
       
       this.setOptions(options);
-      this.initProperties();
+      this._initProperties();
       
       this.setCoords();
       
@@ -57,7 +57,11 @@
       }
     },
     
-    initProperties: function() {
+    /**
+     * @private
+     * @method _initProperties
+     */
+    _initProperties: function() {
       this.stateProperties.forEach(function(prop) {
         if (prop === 'fill') {
           this.set(prop, this.options[prop]);
@@ -71,6 +75,11 @@
       }, this);
     },
     
+    /**
+     * Renders this group on a specified context
+     * @method render
+     * @param {CanvasRenderingContext2D} ctx Context to render this instance on
+     */
     render: function(ctx) {
       if (this.stub) {
         // fast-path, rendering image stub
@@ -105,6 +114,7 @@
     },
     
     /**
+     * Sets certain property to a certain value
      * @method set
      * @param {String} prop
      * @param {Any} value
@@ -126,6 +136,7 @@
     },
     
     /**
+     * Returns object representation of this path group
      * @method toObject
      * @return {Object} object representation of an instance
      */
@@ -137,6 +148,7 @@
     },
     
     /**
+     * Returns dataless object representation of this path group
      * @method toDatalessObject
      * @return {Object} dataless object representation of an instance
      */
@@ -149,7 +161,7 @@
     },
     
      /**
-      * Returns a string representation of an object
+      * Returns a string representation of this path group
       * @method toString
       * @return {String} string representation of an object
       */
@@ -159,6 +171,7 @@
     },
     
     /**
+     * Returns true if all paths in this group are of same color
      * @method isSameColor
      * @return {Boolean} true if all paths are of the same color (`fill`)
      */
@@ -194,6 +207,7 @@
     },
     
     /**
+     * Returns all paths in this path group
      * @method getObjects
      * @return {Array} array of path objects included in this path group
      */
@@ -217,6 +231,7 @@
   }
   
   /**
+   * Creates fabric.Triangle instance from an object representation
    * @static
    * @method fabric.PathGroup.fromObject
    * @param {Object} object

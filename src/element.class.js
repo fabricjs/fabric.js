@@ -138,40 +138,46 @@
   extend(fabric.Element.prototype, /** @scope fabric.Element.prototype */ {
     
     /**
-     * @property
-     * @type String
-     */
-    selectionColor:         'rgba(100, 100, 255, 0.3)', // blue
-    
-    /**
-     * @property
-     * @type String
-     */
-    selectionBorderColor:   'rgba(255, 255, 255, 0.3)',
-    
-    /**
-     * @property
-     * @type String
-     */
-    freeDrawingColor:       'rgb(0, 0, 0)',
-    
-    /**
+     * Background color of this canvas instance
      * @property
      * @type String
      */
     backgroundColor:        'rgba(0, 0, 0, 0)',
     
     /**
+     * Color of selection
      * @property
-     * @type Number
+     * @type String
      */
-    freeDrawingLineWidth:   1,
+    selectionColor:         'rgba(100, 100, 255, 0.3)', // blue
     
     /**
+     * Color of the border of selection (usually slightly darker than color of selection itself)
+     * @property
+     * @type String
+     */
+    selectionBorderColor:   'rgba(255, 255, 255, 0.3)',
+    
+    /**
+     * Width of a line used in selection
      * @property
      * @type Number
      */
     selectionLineWidth:     1,
+    
+    /**
+     * Color of the line used in free drawing mode
+     * @property
+     * @type String
+     */
+    freeDrawingColor:       'rgb(0, 0, 0)',
+    
+    /**
+     * Width of a line used in free drawing mode
+     * @property
+     * @type Number
+     */
+    freeDrawingLineWidth:   1,
     
     /**
      * @property
@@ -180,6 +186,7 @@
     includeDefaultValues:   true,
     
     /**
+     * Indicates whether images loaded via `fabric.Element#loadImageFromUrl` should be cached
      * @property
      * @type Boolean
      */
@@ -1811,7 +1818,7 @@
     },
     
     /**
-     * Loads an image from URL
+     * Loads an image from URL, creates an instance of fabric.Image and passes it to a callback
      * @function
      * @method loadImageFromURL
      * @param url {String} url of image to load
@@ -1858,6 +1865,7 @@
           imgEl.src = url;
           
           if (this.shouldCacheImages) {
+            // TODO (kangax): replace Element.identify w. fabric -based alternative
             imgCache[url] = Element.identify(imgEl);
           }
           document.body.appendChild(imgEl);
@@ -2242,6 +2250,7 @@
     },
     
     /**
+     * Used for caching SVG documents (loaded via `fabric.Element#loadSVGFromURL`)
      * @property
      * @namespace
      */

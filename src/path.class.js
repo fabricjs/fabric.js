@@ -86,6 +86,10 @@
       }
     },
     
+    /**
+     * @private
+     * @method _initializeFromArray
+     */
     _initializeFromArray: function(options) {
       var isWidthSet = 'width' in options,
           isHeightSet = 'height' in options;
@@ -103,6 +107,10 @@
       }
     },
     
+    /**
+     * @private
+     * @method _render
+     */
     _render: function(ctx) {
       var current, // current instruction 
           x = 0, // current x 
@@ -289,6 +297,12 @@
       }
     },
     
+    /**
+     * Renders path on a specified context 
+     * @method render
+     * @param {CanvasRenderingContext2D} ctx context to render path on
+     * @param {Boolean} noTransform When true, context is not transformed
+     */
     render: function(ctx, noTransform) {
       ctx.save();
       var m = this.transformMatrix;
@@ -341,6 +355,7 @@
     },
     
     /**
+     * Returns object representation of an instance
      * @method toObject
      * @return {Object}
      */
@@ -358,6 +373,7 @@
     },
     
     /**
+     * Returns dataless object representation of an instance
      * @method toDatalessObject
      * @return {Object}
      */
@@ -379,10 +395,10 @@
       return this.path.length;
     },
     
-    set: function(prop, value) {
-      return this.callSuper('set', prop, value);
-    },
-    
+    /**
+     * @private
+     * @method _parsePath
+     */
     _parsePath: function() {
       
       var result = [],
@@ -477,10 +493,15 @@
     return new fabric.Path(object.path, object);
   };
   
-  var ATTRIBUTE_NAMES = fabric.Path.ATTRIBUTE_NAMES = 'd fill fill-opacity fill-rule stroke stroke-width transform'.split(' ');
+  /**
+   * List of attribute names to account for when parsing SVG element (used by `fabric.Path.fromElement`)
+   * @static
+   * @see http://www.w3.org/TR/SVG/paths.html#PathElement
+   */
+  fabric.Path.ATTRIBUTE_NAMES = 'd fill fill-opacity fill-rule stroke stroke-width transform'.split(' ');
   
   /**
-   * Creates an instance of fabric.Path from an SVG <PATH> element
+   * Creates an instance of fabric.Path from an SVG <path> element
    * @static
    * @method fabric.Path.fromElement
    * @param {SVGElement} element to parse
@@ -488,7 +509,7 @@
    * @return {fabric.Path} Instance of fabric.Path
    */
   fabric.Path.fromElement = function(element, options) {
-    var parsedAttributes = fabric.parseAttributes(element, ATTRIBUTE_NAMES),
+    var parsedAttributes = fabric.parseAttributes(element, fabric.Path.ATTRIBUTE_NAMES),
         path = parsedAttributes.d;
     delete parsedAttributes.d;
     return new fabric.Path(path, extend(parsedAttributes, options));

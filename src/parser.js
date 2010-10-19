@@ -1,6 +1,9 @@
 (function(){
   
-  /** @name fabric */
+  /**
+   * @name fabric
+   * @namespace
+   */
   
   var fabric = this.fabric || (this.fabric = { }),
       extend = fabric.util.object.extend,
@@ -22,7 +25,6 @@
   /**
    * Returns an object of attributes' name/value, given element and an array of attribute names;
    * Parses parent "g" nodes recursively upwards.
-   *
    * @static
    * @memberOf fabric
    * @method parseAttributes
@@ -75,6 +77,7 @@
   };
   
   /**
+   * Parses "transform" attribute, returning an array of values
    * @static
    * @function
    * @memberOf fabric
@@ -208,6 +211,7 @@
   })();
   
   /**
+   * Parses "points" attribute, returning an array of values
    * @static
    * @memberOf fabric
    * @method parsePointsAttribute
@@ -247,6 +251,7 @@
   };
 
   /**
+   * Parses "style" attribute, retuning an object with values
    * @static
    * @memberOf fabric
    * @method parseStyleAttribute
@@ -280,6 +285,7 @@
   };
 
   /**
+   * Transforms an array of svg elements to corresponding fabric.* instances
    * @static
    * @memberOf fabric
    * @method parseElements
@@ -288,7 +294,6 @@
    * @return {Array} Array of corresponding instances (transformed from SVG elements)
    */
    function parseElements(elements, options) {
-    // transform svg elements to fabric.Path elements
     var _elements = elements.map(function(el) {
       var klass = fabric[capitalize(el.tagName)];
       if (klass && klass.fromElement) {

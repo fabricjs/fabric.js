@@ -5,7 +5,7 @@
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<meta name="generator" content="JsDoc Toolkit" />
 		
-		<title>JsDoc Reference - fabric.Line</title>
+		<title>JsDoc Reference - fabric</title>
 
 		<style type="text/css">
 			/* default.css */
@@ -252,27 +252,25 @@ ul.inheritsList
 <!-- ============================== class title ============================ -->
 			<h1 class="classTitle">
 				
-				Class fabric.Line
+				Namespace fabric
 			</h1>
 
 <!-- ============================== class summary ========================== -->			
 			<p class="description">
 				
-				<br />Extends
-					<a href="../symbols/fabric.Object.html">fabric.Object</a>.<br />
 				
 			
-				Line
 				
 				
-					<br /><i>Defined in: </i> <a href="../symbols/src/src_line.class.js.html">line.class.js</a>.
+				
+					<br /><i>Defined in: </i> <a href="../symbols/src/src_parser.js.html">parser.js</a>.
 				
 			</p>
 
 <!-- ============================== constructor summary ==================== -->			
 			
-			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class fabric.Line.">
-				<caption>Class Summary</caption>
+			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class fabric.">
+				<caption>Namespace Summary</caption>
 				<thead>
 					<tr>
 						<th scope="col">Constructor Attributes</th>
@@ -284,7 +282,7 @@ ul.inheritsList
 						<td class="attributes">&nbsp;</td>
 						<td class="nameDescription" >
 							<div class="fixedFont">
-								<b><a href="../symbols/fabric.Line.html#constructor">fabric.Line</a></b>()
+								<b><a href="../symbols/fabric.html#constructor">fabric</a></b>
 							</div>
 							<div class="description"></div>
 						</td>
@@ -297,44 +295,7 @@ ul.inheritsList
 			
 				
 				
-				<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class fabric.Line.">
-					<caption>Field Summary</caption>
-					<thead>
-						<tr>
-							<th scope="col">Field Attributes</th>
-							<th scope="col">Field Name and Description</th>
-						</tr>
-					</thead>
-					<tbody>
-					
-						<tr>
-							<td class="attributes">&lt;static&gt; &nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								fabric.Line.<b><a href="../symbols/fabric.Line.html#.ATTRIBUTE_NAMES">ATTRIBUTE_NAMES</a></b>
-								</div>
-								<div class="description">List of attribute names to account for when parsing SVG element (used by `fabric.Line.fromElement`)</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/fabric.Line.html#type">type</a></b>
-								</div>
-								<div class="description"></div>
-							</td>
-						</tr>
-					
-					</tbody>
-				</table>
 				
-				
-				
-				<dl class="inheritsList">
-				<dt>Fields borrowed from class <a href="../symbols/fabric.Object.html">fabric.Object</a>: </dt><dd><a href="../symbols/fabric.Object.html#FX_DURATION">FX_DURATION</a>, <a href="../symbols/fabric.Object.html#FX_TRANSITION">FX_TRANSITION</a>, <a href="../symbols/fabric.Object.html#includeDefaultValues">includeDefaultValues</a>, <a href="../symbols/fabric.Object.html#MIN_SCALE_LIMIT">MIN_SCALE_LIMIT</a>, <a href="../symbols/fabric.Object.html#NUM_FRACTION_DIGITS">NUM_FRACTION_DIGITS</a>, <a href="../symbols/fabric.Object.html#options">options</a>, <a href="../symbols/fabric.Object.html#rotate">rotate</a>, <a href="../symbols/fabric.Object.html#stateProperties">stateProperties</a></dd>
-				</dl>
 				
 			
 
@@ -342,7 +303,7 @@ ul.inheritsList
 			
 				
 				
-				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class fabric.Line.">
+				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class fabric.">
 					<caption>Method Summary</caption>
 					<thead>
 						<tr>
@@ -353,47 +314,75 @@ ul.inheritsList
 					<tbody>
 					
 						<tr>
-							<td class="attributes">&nbsp;</td>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/fabric.Line.html#complexity">complexity</a></b>()
+								<div class="fixedFont">fabric.<b><a href="../symbols/fabric.html#.log">log</a></b>(Values)
 								</div>
-								<div class="description">Returns complexity of an instance</div>
+								<div class="description">Wrapper around `console.log` (when available)</div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">fabric.Line.<b><a href="../symbols/fabric.Line.html#.fromElement">fromElement</a></b>(element, options)
+								<div class="fixedFont">fabric.<b><a href="../symbols/fabric.html#.parseAttributes">parseAttributes</a></b>(element, attributes)
 								</div>
-								<div class="description">Returns fabric.Line instance from an SVG element</div>
+								<div class="description">Returns an object of attributes' name/value, given element and an array of attribute names;
+Parses parent "g" nodes recursively upwards.</div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">fabric.Line.<b><a href="../symbols/fabric.Line.html#.fromObject">fromObject</a></b>(object)
+								<div class="fixedFont">fabric.<b><a href="../symbols/fabric.html#.parseElements">parseElements</a></b>(elements, options)
 								</div>
-								<div class="description">Returns fabric.Line instance from an object representation</div>
+								<div class="description"></div>
 							</td>
 						</tr>
 					
 						<tr>
-							<td class="attributes">&nbsp;</td>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/fabric.Line.html#initialize">initialize</a></b>(points, options)
+								<div class="fixedFont">fabric.<b><a href="../symbols/fabric.html#.parsePointsAttribute">parsePointsAttribute</a></b>(points)
 								</div>
-								<div class="description">Constructor</div>
+								<div class="description"></div>
 							</td>
 						</tr>
 					
 						<tr>
-							<td class="attributes">&nbsp;</td>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/fabric.Line.html#toObject">toObject</a></b>()
+								<div class="fixedFont">fabric.<b><a href="../symbols/fabric.html#.parseStyleAttribute">parseStyleAttribute</a></b>(element)
 								</div>
-								<div class="description">Returns object representation of an instance</div>
+								<div class="description"></div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">fabric.<b><a href="../symbols/fabric.html#.parseSVGDocument">parseSVGDocument</a></b>(doc, callback)
+								</div>
+								<div class="description"></div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">fabric.<b><a href="../symbols/fabric.html#.parseTransformAttribute">parseTransformAttribute</a></b>(attributeValue)
+								</div>
+								<div class="description"></div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">fabric.<b><a href="../symbols/fabric.html#.warn">warn</a></b>(Values)
+								</div>
+								<div class="description">Wrapper around `console.warn` (when available)</div>
 							</td>
 						</tr>
 					
@@ -401,10 +390,6 @@ ul.inheritsList
 				</table>
 				
 				
-				
-				<dl class="inheritsList">
-				<dt>Methods borrowed from class <a href="../symbols/fabric.Object.html">fabric.Object</a>: </dt><dd><a href="../symbols/fabric.Object.html#callSuper">callSuper</a>, <a href="../symbols/fabric.Object.html#clone">clone</a>, <a href="../symbols/fabric.Object.html#cloneAsImage">cloneAsImage</a>, <a href="../symbols/fabric.Object.html#drawBorders">drawBorders</a>, <a href="../symbols/fabric.Object.html#drawCorners">drawCorners</a>, <a href="../symbols/fabric.Object.html#fxRemove">fxRemove</a>, <a href="../symbols/fabric.Object.html#fxStraighten">fxStraighten</a>, <a href="../symbols/fabric.Object.html#get">get</a>, <a href="../symbols/fabric.Object.html#getAngle">getAngle</a>, <a href="../symbols/fabric.Object.html#getCenter">getCenter</a>, <a href="../symbols/fabric.Object.html#getHeight">getHeight</a>, <a href="../symbols/fabric.Object.html#getWidth">getWidth</a>, <a href="../symbols/fabric.Object.html#hasStateChanged">hasStateChanged</a>, <a href="../symbols/fabric.Object.html#intersectsWithObject">intersectsWithObject</a>, <a href="../symbols/fabric.Object.html#intersectsWithRect">intersectsWithRect</a>, <a href="../symbols/fabric.Object.html#isActive">isActive</a>, <a href="../symbols/fabric.Object.html#isContainedWithinRect">isContainedWithinRect</a>, <a href="../symbols/fabric.Object.html#isType">isType</a>, <a href="../symbols/fabric.Object.html#render">render</a>, <a href="../symbols/fabric.Object.html#saveState">saveState</a>, <a href="../symbols/fabric.Object.html#scale">scale</a>, <a href="../symbols/fabric.Object.html#scaleToHeight">scaleToHeight</a>, <a href="../symbols/fabric.Object.html#scaleToWidth">scaleToWidth</a>, <a href="../symbols/fabric.Object.html#set">set</a>, <a href="../symbols/fabric.Object.html#setActive">setActive</a>, <a href="../symbols/fabric.Object.html#setAngle">setAngle</a>, <a href="../symbols/fabric.Object.html#setCoords">setCoords</a>, <a href="../symbols/fabric.Object.html#setOpacity">setOpacity</a>, <a href="../symbols/fabric.Object.html#setOptions">setOptions</a>, <a href="../symbols/fabric.Object.html#setSourcePath">setSourcePath</a>, <a href="../symbols/fabric.Object.html#straighten">straighten</a>, <a href="../symbols/fabric.Object.html#toDatalessObject">toDatalessObject</a>, <a href="../symbols/fabric.Object.html#toDataURL">toDataURL</a>, <a href="../symbols/fabric.Object.html#toggle">toggle</a>, <a href="../symbols/fabric.Object.html#toGrayscale">toGrayscale</a>, <a href="../symbols/fabric.Object.html#toJSON">toJSON</a>, <a href="../symbols/fabric.Object.html#toString">toString</a>, <a href="../symbols/fabric.Object.html#transform">transform</a></dd>
-				</dl>
 				
 			
 <!-- ============================== events summary ======================== -->
@@ -414,11 +399,11 @@ ul.inheritsList
 			
 			<div class="details"><a name="constructor"> </a>
 				<div class="sectionTitle">
-					Class Detail
+					Namespace Detail
 				</div>
 				
 				<div class="fixedFont">
-						<b>fabric.Line</b>()
+						<b>fabric</b>
 				</div>
 				
 				<div class="description">
@@ -442,62 +427,6 @@ ul.inheritsList
 
 <!-- ============================== field details ========================== -->		
 			
-				<div class="sectionTitle">
-					Field Detail
-				</div>
-				
-					<a name=".ATTRIBUTE_NAMES"> </a>
-					<div class="fixedFont">&lt;static&gt; 
-					
-					
-					<span class="light">fabric.Line.</span><b>ATTRIBUTE_NAMES</b>
-					
-					</div>
-					<div class="description">
-						List of attribute names to account for when parsing SVG element (used by `fabric.Line.fromElement`)
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-							<dl class="detailList">
-							<dt class="heading">See:</dt>
-							
-							<dd>http://www.w3.org/TR/SVG/shapes.html#LineElement</dd>
-							
-							</dl>
-						
-						
-
-					<hr />
-				
-					<a name="type"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{<a href="../symbols/String.html">String</a>}</span>
-					<b>type</b>
-					
-					</div>
-					<div class="description">
-						
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					
-				
-			
 
 <!-- ============================== method details ========================= -->		
 			
@@ -505,21 +434,78 @@ ul.inheritsList
 					Method Detail
 				</div>
 				
-					<a name="complexity"> </a>
-					<div class="fixedFont">
+					<a name=".log"> </a>
+					<div class="fixedFont">&lt;static&gt; 
 					
-					<span class="light">{Number}</span>
-					<b>complexity</b>()
+					
+					<span class="light">fabric.</span><b>log</b>(Values)
 					
 					</div>
 					<div class="description">
-						Returns complexity of an instance
+						Wrapper around `console.log` (when available)
+						
+							<br />
+							<i>Defined in: </i> <a href="../symbols/src/fabric.js.html">fabric.js</a>.
 						
 						
 					</div>
 					
 					
 					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Any}</span> <b>Values</b>
+									
+								</dt>
+								<dd>to log</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name=".parseAttributes"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Object}</span>
+					<span class="light">fabric.</span><b>parseAttributes</b>(element, attributes)
+					
+					</div>
+					<div class="description">
+						Returns an object of attributes' name/value, given element and an array of attribute names;
+Parses parent "g" nodes recursively upwards.
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{DOMElement}</span> <b>element</b>
+									
+								</dt>
+								<dd>Element to parse</dd>
+							
+								<dt>
+									<span class="light fixedFont">{<a href="../symbols/Array.html">Array</a>}</span> <b>attributes</b>
+									
+								</dt>
+								<dd>Array of attributes to parse</dd>
+							
+							</dl>
 						
 						
 						
@@ -528,7 +514,7 @@ ul.inheritsList
 							<dl class="detailList">
 							<dt class="heading">Returns:</dt>
 							
-								<dd><span class="light fixedFont">{Number}</span> complexity</dd>
+								<dd><span class="light fixedFont">{Object}</span> object containing parsed attributes' names/values</dd>
 							
 							</dl>
 						
@@ -537,15 +523,107 @@ ul.inheritsList
 
 					<hr />
 				
-					<a name=".fromElement"> </a>
+					<a name=".parseElements"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 					
-					<span class="light">{<a href="../symbols/fabric.Line.html">fabric.Line</a>}</span>
-					<span class="light">fabric.Line.</span><b>fromElement</b>(element, options)
+					<span class="light">{<a href="../symbols/Array.html">Array</a>}</span>
+					<span class="light">fabric.</span><b>parseElements</b>(elements, options)
 					
 					</div>
 					<div class="description">
-						Returns fabric.Line instance from an SVG element
+						
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{<a href="../symbols/Array.html">Array</a>}</span> <b>elements</b>
+									
+								</dt>
+								<dd>Array of elements to parse</dd>
+							
+								<dt>
+									<span class="light fixedFont">{Object}</span> <b>options</b>
+									
+								</dt>
+								<dd>Options object</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/Array.html">Array</a>}</span> Array of corresponding instances (transformed from SVG elements)</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name=".parsePointsAttribute"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{<a href="../symbols/Array.html">Array</a>}</span>
+					<span class="light">fabric.</span><b>parsePointsAttribute</b>(points)
+					
+					</div>
+					<div class="description">
+						
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<b>points</b>
+									
+								</dt>
+								<dd>{String} points attribute string</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/Array.html">Array</a>}</span> array of points</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name=".parseStyleAttribute"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Object}</span>
+					<span class="light">fabric.</span><b>parseStyleAttribute</b>(element)
+					
+					</div>
+					<div class="description">
+						
 						
 						
 					</div>
@@ -562,12 +640,6 @@ ul.inheritsList
 								</dt>
 								<dd>Element to parse</dd>
 							
-								<dt>
-									<span class="light fixedFont">{Object}</span> <b>options</b>
-									<i>Optional</i>
-								</dt>
-								<dd>Options object</dd>
-							
 							</dl>
 						
 						
@@ -577,7 +649,7 @@ ul.inheritsList
 							<dl class="detailList">
 							<dt class="heading">Returns:</dt>
 							
-								<dd><span class="light fixedFont">{<a href="../symbols/fabric.Line.html">fabric.Line</a>}</span> instance of fabric.Line</dd>
+								<dd><span class="light fixedFont">{Object}</span> Objects with values parsed from style attribute of an element</dd>
 							
 							</dl>
 						
@@ -586,15 +658,15 @@ ul.inheritsList
 
 					<hr />
 				
-					<a name=".fromObject"> </a>
+					<a name=".parseSVGDocument"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 					
-					<span class="light">{<a href="../symbols/fabric.Line.html">fabric.Line</a>}</span>
-					<span class="light">fabric.Line.</span><b>fromObject</b>(object)
+					
+					<span class="light">fabric.</span><b>parseSVGDocument</b>(doc, callback)
 					
 					</div>
 					<div class="description">
-						Returns fabric.Line instance from an object representation
+						
 						
 						
 					</div>
@@ -606,38 +678,37 @@ ul.inheritsList
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{Object}</span> <b>object</b>
+									<span class="light fixedFont">{SVGDocument}</span> <b>doc</b>
 									
 								</dt>
-								<dd>Object to create an instance from</dd>
+								<dd>SVG document to parse</dd>
+							
+								<dt>
+									<span class="light fixedFont">{<a href="../symbols/Function.html">Function</a>}</span> <b>callback</b>
+									
+								</dt>
+								<dd>Callback to call when parsing is finished; It's being passed an array of elements (parsed from a document).</dd>
 							
 							</dl>
 						
 						
 						
 						
-						
-							<dl class="detailList">
-							<dt class="heading">Returns:</dt>
-							
-								<dd><span class="light fixedFont">{<a href="../symbols/fabric.Line.html">fabric.Line</a>}</span> instance of fabric.Line</dd>
-							
-							</dl>
 						
 						
 						
 
 					<hr />
 				
-					<a name="initialize"> </a>
-					<div class="fixedFont">
+					<a name=".parseTransformAttribute"> </a>
+					<div class="fixedFont">&lt;static&gt; 
 					
-					<span class="light">{<a href="../symbols/fabric.Line.html">fabric.Line</a>}</span>
-					<b>initialize</b>(points, options)
+					<span class="light">{<a href="../symbols/Array.html">Array</a>}</span>
+					<span class="light">fabric.</span><b>parseTransformAttribute</b>(attributeValue)
 					
 					</div>
 					<div class="description">
-						Constructor
+						
 						
 						
 					</div>
@@ -649,16 +720,10 @@ ul.inheritsList
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{<a href="../symbols/Array.html">Array</a>}</span> <b>points</b>
+									<b>attributeValue</b>
 									
 								</dt>
-								<dd>Array of points</dd>
-							
-								<dt>
-									<span class="light fixedFont">{Object}</span> <b>options</b>
-									<i>Optional</i>
-								</dt>
-								<dd>Options object</dd>
+								<dd>{String} string containing attribute value</dd>
 							
 							</dl>
 						
@@ -669,7 +734,7 @@ ul.inheritsList
 							<dl class="detailList">
 							<dt class="heading">Returns:</dt>
 							
-								<dd><span class="light fixedFont">{<a href="../symbols/fabric.Line.html">fabric.Line</a>}</span> thisArg</dd>
+								<dd><span class="light fixedFont">{<a href="../symbols/Array.html">Array</a>}</span> array of 6 elements representing transformation matrix</dd>
 							
 							</dl>
 						
@@ -678,15 +743,18 @@ ul.inheritsList
 
 					<hr />
 				
-					<a name="toObject"> </a>
-					<div class="fixedFont">
+					<a name=".warn"> </a>
+					<div class="fixedFont">&lt;static&gt; 
 					
-					<span class="light">{Object}</span>
-					<b>toObject</b>()
+					
+					<span class="light">fabric.</span><b>warn</b>(Values)
 					
 					</div>
 					<div class="description">
-						Returns object representation of an instance
+						Wrapper around `console.warn` (when available)
+						
+							<br />
+							<i>Defined in: </i> <a href="../symbols/src/fabric.js.html">fabric.js</a>.
 						
 						
 					</div>
@@ -694,16 +762,20 @@ ul.inheritsList
 					
 					
 						
-						
-						
-						
-						
 							<dl class="detailList">
-							<dt class="heading">Returns:</dt>
+							<dt class="heading">Parameters:</dt>
 							
-								<dd><span class="light fixedFont">{Object}</span> </dd>
+								<dt>
+									<span class="light fixedFont">{Any}</span> <b>Values</b>
+									
+								</dt>
+								<dd>to log as a warning</dd>
 							
 							</dl>
+						
+						
+						
+						
 						
 						
 						
@@ -722,7 +794,7 @@ ul.inheritsList
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Tue Oct 19 2010 16:02:47 GMT-0400 (EDT)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Tue Oct 19 2010 16:02:46 GMT-0400 (EDT)
 		</div>
 	</body>
 </html>

@@ -69,6 +69,7 @@
     },
     
     /**
+     * Returns complexity of an instance
      * @method complexity
      * @return {Number} complexity
      */
@@ -92,11 +93,14 @@
   });
   
   /**
+   * List of attribute names to account for when parsing SVG element (used by `fabric.Line.fromElement`)
+   * @static
    * @see http://www.w3.org/TR/SVG/shapes.html#LineElement
    */
-  fabric.Element.ATTRIBUTE_NAMES = 'x1 y1 x2 y2 stroke stroke-width transform'.split(' ');
+  fabric.Line.ATTRIBUTE_NAMES = 'x1 y1 x2 y2 stroke stroke-width transform'.split(' ');
   
   /**
+   * Returns fabric.Line instance from an SVG element
    * @static
    * @method fabric.Line.fromElement
    * @param {SVGElement} element Element to parse
@@ -104,7 +108,7 @@
    * @return {fabric.Line} instance of fabric.Line
    */
   fabric.Line.fromElement = function(element, options) {
-    var parsedAttributes = fabric.parseAttributes(element, fabric.Element.ATTRIBUTE_NAMES);
+    var parsedAttributes = fabric.parseAttributes(element, fabric.Line.ATTRIBUTE_NAMES);
     var points = [
       parsedAttributes.x1 || 0,
       parsedAttributes.y1 || 0,
@@ -115,6 +119,7 @@
   };
   
   /**
+   * Returns fabric.Line instance from an object representation
    * @static
    * @method fabric.Line.fromObject
    * @param {Object} object Object to create an instance from

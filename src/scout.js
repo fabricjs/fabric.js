@@ -1,3 +1,4 @@
+/** @ignore */
 var scout = (function () {
   var tests = { };
   return {

@@ -49,7 +49,7 @@
      */
     initialize: function(text, options) {
       this.originalState = { };
-      this.initStateProperties();
+      this._initStateProperties();
       this.text = text;
       this.setOptions(options);
       extend(this, this.options);
@@ -59,9 +59,11 @@
     },
     
     /**
+     * Creates `stateProperties` list on an instance, and adds `fabric.Text` -specific ones to it (such as "fontfamily", "fontweight", etc.)
+     * @private
      * @method initStateProperties
      */
-    initStateProperties: function() {
+    _initStateProperties: function() {
       var o;
       if ((o = this.constructor) && 
           (o = o.superclass) &&
@@ -134,6 +136,7 @@
     },
     
     /**
+     * Renders text instance on a specified context
      * @method render
      * @param ctx {CanvasRenderingContext2D} context to render on
      */
@@ -148,6 +151,7 @@
     },
   	
   	/**
+  	 * Returns object representation of an instance
   	 * @method toObject
   	 * @return {Object} Object representation of text object
   	 */
@@ -162,6 +166,7 @@
   	},
   	
   	/**
+  	 * Sets "color" of an instance (alias of `set('fill', &hellip;)`)
   	 * @method setColor
   	 * @param {String} value
   	 * @return {fabric.Text} thisArg
@@ -173,6 +178,7 @@
   	},
   	
   	/**
+  	 * Sets fontsize of an instance and updates its coordinates
   	 * @method setFontsize
   	 * @param {Number} value
   	 * @return {fabric.Text} thisArg
@@ -185,6 +191,7 @@
   	},
   	
   	/**
+  	 * Returns actual text value of an instance
   	 * @method getText
   	 * @return {String}
   	 */
@@ -234,6 +241,7 @@
 	};
 	
 	/**
+	 * Returns fabric.Text instance from an SVG element (<b>not yet implemented</b>)
    * @static
    * @method fabric.Text.fromElement
    * @return {fabric.Text} an instance

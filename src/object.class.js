@@ -56,6 +56,8 @@
     MIN_SCALE_LIMIT:            0.1,
     
     /**
+     * List of properties to consider when checking if state of an object is changed (fabric.Object#hasStateChanged); 
+     * as well as for history (undo/redo) purposes
      * @property
      * @type Array
      */
@@ -216,6 +218,7 @@
     },
     
     /**
+     * Returns (dataless) object representation of an instance
      * @method toDatalessObject
      */
     toDatalessObject: function() {

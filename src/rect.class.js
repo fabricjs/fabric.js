@@ -108,6 +108,11 @@
   });
   
   // TODO (kangax): implement rounded rectangles (both parsing and rendering)
+  
+  /**
+   * List of attribute names to account for when parsing SVG element (used by `fabric.Rect.fromElement`)
+   * @static
+   */
   fabric.Rect.ATTRIBUTE_NAMES = 'x y width height rx ry fill fill-opacity stroke stroke-width transform'.split(' ');
   
   /**
@@ -120,6 +125,7 @@
   }
   
   /**
+   * Returns fabric.Rect instance from an SVG element
    * @static
    * @method fabric.Rect.fromElement
    * @param element {SVGElement} element to parse
@@ -141,6 +147,7 @@
   };
   
   /**
+   * Returns fabric.Rect instance from an object representation
    * @static
    * @method fabric.Rect.fromObject
    * @param object {Object} object to create an instance from

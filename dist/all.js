@@ -1736,6 +1736,13 @@ fabric.util.string = {
   capitalize: capitalize
 };
 if (!Function.prototype.bind) {
+  /**
+   * Cross-browser approximation of ES5 Function.prototype.bind (not fully spec conforming)
+   * @see <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function/bind">Function#bind on MDN</a>
+   * @param {Object} thisArg Object to bind function to
+   * @param {Any[]} [...] Values to pass to a bound function
+   * @return {Function}
+   */
   Function.prototype.bind = function(thisArg) {
     var fn = this, args = slice.call(arguments, 1);
     return args.length
@@ -1842,13 +1849,16 @@ if (!Function.prototype.bind) {
     };
   })();
 
+  /** @ignore */
   var getElement, setElement;
 
   (function () {
     var elements = { };
+    /** @ignore */
     getElement = function (uid) {
       return elements[uid];
     };
+    /** @ignore */
     setElement = function (uid, element) {
       elements[uid] = element;
     };
@@ -2050,6 +2060,14 @@ if (!Function.prototype.bind) {
 })(this);
 (function () {
 
+  /**
+   * Cross-browser wrapper for setting element's style
+   * @method setStyle
+   * @memberOf fabric.util
+   * @param {HTMLElement} element
+   * @param {Object} styles
+   * @return {HTMLElement} Element that was passed as a first argument
+   */
   function setStyle(element, styles) {
     var elementStyle = element.style, match;
     if (typeof styles === 'string') {
@@ -2078,6 +2096,8 @@ if (!Function.prototype.bind) {
       view = document.defaultView,
       supportsGCS = view && typeof view.getComputedStyle !== 'undefined',
       reOpacity = /alpha\s*\(\s*opacity\s*=\s*([^\)]+)\)/,
+
+      /** @ignore */
       setOpacity = function (element) { return element; };
 
   if (supportsOpacity) {
@@ -2108,10 +2128,24 @@ if (!Function.prototype.bind) {
   fabric.util.setStyle = setStyle;
 
 })();
+/**
+ * Takes id and returns an element with that id (if one exists in a document)
+ * @method getById
+ * @memberOf fabric.util
+ * @param {String|HTMLElement} id
+ * @return {HTMLElement|null}
+ */
 function getById(id) {
   return typeof id === 'string' ? document.getElementById(id) : id;
 }
 
+/**
+ * Converts an array-like object (e.g. arguments or NodeList) to an array
+ * @method toArray
+ * @memberOf fabric.util
+ * @param {Object} arrayLike
+ * @return {Array}
+ */
 function toArray(arrayLike) {
   var arr = [ ], i = arrayLike.length;
   while (i--) {
@@ -2120,6 +2154,14 @@ function toArray(arrayLike) {
   return arr;
 }
 
+/**
+ * Creates specified element with specified attributes
+ * @method makeElement
+ * @memberOf fabric.util
+ * @param {String} tagName Type of an element to create
+ * @param {Object} [attributes] Attributes to set on an element
+ * @return {HTMLElement} Newly created element
+ */
 function makeElement(tagName, attributes) {
   var el = document.createElement(tagName);
   for (var prop in attributes) {
@@ -2136,12 +2178,28 @@ function makeElement(tagName, attributes) {
   return el;
 }
 
+/**
+ * Adds class to an element
+ * @method addClass
+ * @memberOf fabric.util
+ * @param {HTMLElement} element Element to add class to
+ * @param {String} className Class to add to an element
+ */
 function addClass(element, className) {
   if ((' ' + element.className + ' ').indexOf(' ' + className + ' ') === -1) {
     element.className += (element.className ? ' ' : '') + className;
   }
 }
 
+/**
+ * Wraps element with another element
+ * @method wrapElement
+ * @memberOf fabric.util
+ * @param {HTMLElement} element Element to wrap
+ * @param {HTMLElement|String} wrapper Element to wrap with
+ * @param {Object} [attributes] Attributes to set on a wrapper
+ * @return {HTMLElement} wrapper
+ */
 function wrapElement(element, wrapper, attributes) {
   if (typeof wrapper === 'string') {
     wrapper = makeElement(wrapper, attributes);
@@ -2153,6 +2211,14 @@ function wrapElement(element, wrapper, attributes) {
   return wrapper;
 }
 
+/**
+ * Returns offset for a given element
+ * @method getElementOffset
+ * @function
+ * @memberOf fabric.util
+ * @param {HTMLElement} element Element to get offset for
+ * @return {Object} Object with "left" and "top" properties
+ */
 function getElementOffset(element) {
   var valueT = 0, valueL = 0;
   do {
@@ -2177,6 +2243,13 @@ function getElementOffset(element) {
           ? 'KhtmlUserSelect'
           : '';
 
+  /**
+   * Makes element unselectable
+   * @method makeElementUnselectable
+   * @memberOf fabric.util
+   * @param {HTMLElement} element Element to make unselectable
+   * @return {HTMLElement} Element that was passed in
+   */
   function makeElementUnselectable(element) {
     if (typeof element.onselectstart !== 'undefined') {
       element.onselectstart = fabric.util.falseFunction;
@@ -2193,8 +2266,15 @@ function getElementOffset(element) {
   fabric.util.makeElementUnselectable = makeElementUnselectable;
 })();
 
-(function(){
+(function() {
 
+  /**
+   * Inserts a script element with a given url into a document; invokes callback, when that script is finished loading
+   * @method getScript
+   * @memberOf fabric.util
+   * @param {String} url URL of a script to load
+   * @param {Function} callback Callback to execute when script is finished loading
+   */
   function getScript(url, callback) {
   	var headEl = document.getElementsByTagName("head")[0],
   	    scriptEl = document.createElement('script'),
@@ -2231,6 +2311,18 @@ function getElementOffset(element) {
   }
 })();
 
+/**
+ * Changes value from one to another within certain period of time, invoking callbacks as value is being changed.
+ * @method animate
+ * @memberOf fabric.util
+ * @param {Object} [options] Animation options
+ * @param {Function} [options.onChange] Callback; invoked on every value change
+ * @param {Function} [options.onComplete] Callback; invoked when value change is completed
+ * @param {Number} [options.startValue=0] Starting value
+ * @param {Number} [options.endValue=100] Ending value
+ * @param {Function} [options.easing] Easing function
+ * @param {Number} [options.duration=500] Duration of change
+ */
 function animate(options) {
   options || (options = { });
   var start = +new Date(),
@@ -2291,6 +2383,16 @@ fabric.util.animate = animate;
 
   function emptyFn() { };
 
+  /**
+   * Cross-browser abstraction for sending XMLHttpRequest
+   * @method request
+   * @memberOf fabric.util
+   * @param {String} url URL to send XMLHttpRequest to
+   * @param {Object} [options] Options object
+   * @param {String} [options.method="GET"]
+   * @param {Function} options.onComplete Callback to invoke when request is completed
+   * @return {XMLHttpRequest} request
+   */
   function request(url, options) {
 
     options || (options = { });
@@ -5843,6 +5945,7 @@ fabric.util.animate = animate;
     },
 
     /**
+     * Returns (dataless) object representation of an instance
      * @method toDatalessObject
      */
     toDatalessObject: function() {
@@ -6943,6 +7046,7 @@ fabric.util.animate = animate;
     },
 
     /**
+     * Returns complexity of an instance
      * @method complexity
      * @return {Number} complexity
      */
@@ -6971,6 +7075,7 @@ fabric.util.animate = animate;
   fabric.Element.ATTRIBUTE_NAMES = 'x1 y1 x2 y2 stroke stroke-width transform'.split(' ');
 
   /**
+   * Returns fabric.Line instance from an SVG element
    * @static
    * @method fabric.Line.fromElement
    * @param {SVGElement} element Element to parse
@@ -6989,6 +7094,7 @@ fabric.util.animate = animate;
   };
 
   /**
+   * Returns fabric.Line instance from an object representation
    * @static
    * @method fabric.Line.fromObject
    * @param {Object} object Object to create an instance from
@@ -7017,7 +7123,10 @@ fabric.util.animate = animate;
    */
   fabric.Circle = fabric.util.createClass(fabric.Object, /** @scope fabric.Circle.prototype */ {
 
-    /** @property */
+    /**
+     * @property
+     * @type String
+     */
     type: 'circle',
 
     /**
@@ -8121,10 +8230,10 @@ fabric.util.animate = animate;
       return this.path.length;
     },
 
-    set: function(prop, value) {
-      return this.callSuper('set', prop, value);
-    },
-
+    /**
+     * @private
+     * @method _parsePath
+     */
     _parsePath: function() {
 
       var result = [],
