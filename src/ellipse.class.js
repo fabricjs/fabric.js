@@ -1,8 +1,10 @@
 //= require "object.class"
 
-(function(){
+(function(global){
   
-  var fabric = this.fabric || (this.fabric = { }),
+  "use strict";
+  
+  var fabric = global.fabric || (global.fabric = { }),
       piBy2   = Math.PI * 2,
       extend = fabric.util.object.extend;
   
@@ -95,14 +97,14 @@
   });
   
   /**
-   * List of attribute names to account for when parsing SVG element (used by `fabric.Ellipse.fromElement`)
+   * List of attribute names to account for when parsing SVG element (used by {@link fabric.Ellipse.fromElement})
    * @static
    * @see http://www.w3.org/TR/SVG/shapes.html#EllipseElement
    */
   fabric.Ellipse.ATTRIBUTE_NAMES = 'cx cy rx ry fill fill-opacity stroke stroke-width transform'.split(' ');
   
   /**
-   * Returns fabric.Ellipse instance from an SVG element
+   * Returns {@link fabric.Ellipse} instance from an SVG element
    * @static
    * @method fabric.Ellipse.fromElement
    * @param {SVGElement} element Element to parse
@@ -131,4 +133,4 @@
   fabric.Ellipse.fromObject = function(object) {
     return new fabric.Ellipse(object);
   }
-})();
+})(this);

@@ -1,6 +1,8 @@
-(function() {
+(function(global) {
   
-  var fabric = this.fabric || (this.fabric = { });
+  "use strict";
+  
+  var fabric = global.fabric || (global.fabric = { });
   
   if (fabric.Color) {
     fabric.warn('fabric.Color is already defined.');
@@ -8,8 +10,8 @@
   }
   
   /**
-   * The purpose of fabric.Color is to abstract and encapsulate common color operations;
-   * fabric.Color is a constructor and creates instances of fabric.Color objects.
+   * The purpose of {@link fabric.Color} is to abstract and encapsulate common color operations;
+   * {@link fabric.Color} is a constructor and creates instances of {@link fabric.Color} objects.
    *
    * @class Color
    * @memberOf fabric
@@ -275,4 +277,4 @@
     oColor.setSource(source);
     return oColor;
   };
-})();
+})(this);

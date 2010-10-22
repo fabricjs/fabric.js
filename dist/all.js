@@ -1400,7 +1400,9 @@ Cufon.registerEngine('vml', (function() {
 
 (function (global) {
 
-  var fabric = this.fabric || (this.fabric = { }),
+  "use strict";
+
+  var fabric = global.fabric || (global.fabric = { }),
       slice = Array.prototype.slice,
       apply = Function.prototype.apply;
 
@@ -2306,7 +2308,7 @@ function getElementOffset(element) {
 
   fabric.util.getScript = getScript;
 
-  var Jaxer = this.Jaxer;
+  var Jaxer = global.Jaxer;
   if (Jaxer && Jaxer.load) {
     fabric.util.getScript = getScriptJaxer;
   }
@@ -2432,14 +2434,16 @@ fabric.util.animate = animate;
 })();
 
 })(this);
-(function(){
+(function(global) {
+
+  "use strict";
 
   /**
    * @name fabric
    * @namespace
    */
 
-  var fabric = this.fabric || (this.fabric = { }),
+  var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       capitalize = fabric.util.string.capitalize,
       clone = fabric.util.object.clone;
@@ -2813,13 +2817,15 @@ fabric.util.animate = animate;
     parsePointsAttribute:   parsePointsAttribute
   });
 
-})();
+})(this);
 
-(function() {
+(function(global) {
+
+  "use strict";
 
   /* Adaptation of work of Kevin Lindsey (kevin@kevlindev.com) */
 
-  var fabric = this.fabric || (this.fabric = { });
+  var fabric = global.fabric || (global.fabric = { });
 
   if (fabric.Point) {
     fabric.warn('fabric.Point is already defined');
@@ -3008,14 +3014,15 @@ fabric.util.animate = animate;
     }
   };
 
-})();
+})(this);
 
-(function() {
+(function(global) {
+
+  "use strict";
 
   /* Adaptation of work of Kevin Lindsey (kevin@kevlindev.com) */
 
-  var global = this,
-      fabric = global.fabric || (global.fabric = { });
+  var fabric = global.fabric || (global.fabric = { });
 
   if (fabric.Intersection) {
     fabric.warn('fabric.Intersection is already defined');
@@ -3157,11 +3164,13 @@ fabric.util.animate = animate;
     return result;
   };
 
-})();
+})(this);
 
-(function() {
+(function(global) {
 
-  var fabric = this.fabric || (this.fabric = { });
+  "use strict";
+
+  var fabric = global.fabric || (global.fabric = { });
 
   if (fabric.Color) {
     fabric.warn('fabric.Color is already defined.');
@@ -3169,8 +3178,8 @@ fabric.util.animate = animate;
   }
 
   /**
-   * The purpose of fabric.Color is to abstract and encapsulate common color operations;
-   * fabric.Color is a constructor and creates instances of fabric.Color objects.
+   * The purpose of {@link fabric.Color} is to abstract and encapsulate common color operations;
+   * {@link fabric.Color} is a constructor and creates instances of {@link fabric.Color} objects.
    *
    * @class Color
    * @memberOf fabric
@@ -3436,17 +3445,18 @@ fabric.util.animate = animate;
     oColor.setSource(source);
     return oColor;
   };
-})();
+})(this);
 
-(function () {
+(function (global) {
+
+  "use strict";
 
   if (fabric.Element) {
     fabric.warn('fabric.Element is already defined.');
     return;
   }
 
-  var global = this,
-      window = global.window,
+  var window = global.window,
       document = window.document,
 
       extend = fabric.util.object.extend,
@@ -4229,6 +4239,8 @@ fabric.util.animate = animate;
           maxY = utilMax(this._freeDrawingYPoints),
           ctx = this.contextTop,
           path = [ ],
+          xPoint,
+          yPoint,
           xPoints = this._freeDrawingXPoints,
           yPoints = this._freeDrawingYPoints;
 
@@ -5748,12 +5760,13 @@ fabric.util.animate = animate;
    * @return {String} json string
    */
   fabric.Element.prototype.toJSON = fabric.Element.prototype.toObject;
-})();
+})(this);
 
-(function(){
+(function(global) {
 
-  var global = this,
-      fabric = global.fabric || (global.fabric = { }),
+  "use strict";
+
+  var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       clone = fabric.util.object.clone,
       toFixed = fabric.util.toFixed,
@@ -6997,11 +7010,13 @@ fabric.util.animate = animate;
    * @alias rotate -> setAngle
    */
   fabric.Object.prototype.rotate = fabric.Object.prototype.setAngle;
-})();
+})(this);
 
-(function() {
+(function(global) {
 
-  var fabric = this.fabric || (this.fabric = { }),
+  "use strict";
+
+  var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend;
 
   if (fabric.Line) {
@@ -7124,11 +7139,13 @@ fabric.util.animate = animate;
     var points = [object.x1, object.y1, object.x2, object.y2];
     return new fabric.Line(points, object);
   };
-})();
+})(this);
 
-(function() {
+(function(global) {
 
-  var fabric  = this.fabric || (this.fabric = { }),
+  "use strict";
+
+  var fabric  = global.fabric || (global.fabric = { }),
       piBy2   = Math.PI * 2,
       extend = fabric.util.object.extend;
 
@@ -7205,14 +7222,14 @@ fabric.util.animate = animate;
   });
 
   /**
-   * List of attribute names to account for when parsing SVG element (used by `fabric.Circle.fromElement`)
+   * List of attribute names to account for when parsing SVG element (used by {@link fabric.Circle.fromElement})
    * @static
    * @see: http://www.w3.org/TR/SVG/shapes.html#CircleElement
    */
   fabric.Circle.ATTRIBUTE_NAMES = 'cx cy r fill fill-opacity stroke stroke-width transform'.split(' ');
 
   /**
-   * Returns fabric.Circle instance from an SVG element
+   * Returns {@link fabric.Circle} instance from an SVG element
    * @static
    * @method fabric.Circle.fromElement
    * @param element {SVGElement} element to parse
@@ -7243,7 +7260,7 @@ fabric.util.animate = animate;
   }
 
   /**
-   * Returns fabric.Circle instance from an object representation
+   * Returns {@link fabric.Circle} instance from an object representation
    * @static
    * @method fabric.Circle.fromObject
    * @param {Object} object Object to create an instance from
@@ -7252,10 +7269,12 @@ fabric.util.animate = animate;
   fabric.Circle.fromObject = function(object) {
     return new fabric.Circle(object);
   }
-})();
-(function() {
+})(this);
+(function(global) {
 
-  var fabric = this.fabric || (this.fabric = { });
+  "use strict";
+
+  var fabric = global.fabric || (global.fabric = { });
 
   if (fabric.Triangle) {
     fabric.warn('fabric.Triangle is already defined');
@@ -7332,11 +7351,13 @@ fabric.util.animate = animate;
   fabric.Triangle.fromObject = function(object) {
     return new fabric.Triangle(object);
   };
-})();
+})(this);
 
-(function(){
+(function(global){
 
-  var fabric = this.fabric || (this.fabric = { }),
+  "use strict";
+
+  var fabric = global.fabric || (global.fabric = { }),
       piBy2   = Math.PI * 2,
       extend = fabric.util.object.extend;
 
@@ -7428,14 +7449,14 @@ fabric.util.animate = animate;
   });
 
   /**
-   * List of attribute names to account for when parsing SVG element (used by `fabric.Ellipse.fromElement`)
+   * List of attribute names to account for when parsing SVG element (used by {@link fabric.Ellipse.fromElement})
    * @static
    * @see http://www.w3.org/TR/SVG/shapes.html#EllipseElement
    */
   fabric.Ellipse.ATTRIBUTE_NAMES = 'cx cy rx ry fill fill-opacity stroke stroke-width transform'.split(' ');
 
   /**
-   * Returns fabric.Ellipse instance from an SVG element
+   * Returns {@link fabric.Ellipse} instance from an SVG element
    * @static
    * @method fabric.Ellipse.fromElement
    * @param {SVGElement} element Element to parse
@@ -7464,11 +7485,13 @@ fabric.util.animate = animate;
   fabric.Ellipse.fromObject = function(object) {
     return new fabric.Ellipse(object);
   }
-})();
+})(this);
 
-(function() {
+(function(global) {
 
-  var fabric = this.fabric || (this.fabric = { });
+  "use strict";
+
+  var fabric = global.fabric || (global.fabric = { });
 
   if (fabric.Rect) {
     console.warn('fabric.Rect is already defined');
@@ -7620,11 +7643,13 @@ fabric.util.animate = animate;
   fabric.Rect.fromObject = function(object) {
     return new fabric.Rect(object);
   };
-})();
+})(this);
 
-(function() {
+(function(global) {
 
-  var fabric = this.fabric || (this.fabric = { });
+  "use strict";
+
+  var fabric = global.fabric || (global.fabric = { });
 
   if (fabric.Polyline) {
     fabric.warn('fabric.Polyline is already defined');
@@ -7748,11 +7773,13 @@ fabric.util.animate = animate;
     return new fabric.Polyline(points, object);
   };
 
-})();
+})(this);
 
-(function() {
+(function(global) {
 
-  var fabric = this.fabric || (this.fabric = { }),
+  "use strict";
+
+  var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       min = fabric.util.array.min,
       max = fabric.util.array.max;
@@ -7893,12 +7920,14 @@ fabric.util.animate = animate;
   fabric.Polygon.fromObject = function(object) {
     return new fabric.Polygon(object.points, object);
   }
-})();
+})(this);
 
 
-(function(){
+(function(global) {
 
-  var fabric = this.fabric || (this.fabric = { }),
+  "use strict";
+
+  var fabric = global.fabric || (global.fabric = { }),
       min = fabric.util.array.min,
       max = fabric.util.array.max,
       extend = fabric.util.object.extend;
@@ -8396,11 +8425,13 @@ fabric.util.animate = animate;
     delete parsedAttributes.d;
     return new fabric.Path(path, extend(parsedAttributes, options));
   };
-})();
+})(this);
 
-(function(){
+(function(global) {
 
-  var fabric = this.fabric || (this.fabric = { }),
+  "use strict";
+
+  var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       invoke = fabric.util.array.invoke,
       parentSet = fabric.Object.prototype.set,
@@ -8637,12 +8668,14 @@ fabric.util.animate = animate;
     var paths = instantiatePaths(object.paths);
     return new fabric.PathGroup(paths, object);
   };
-})();
+})(this);
 
 
-(function(){
+(function(global){
 
-  var fabric = this.fabric || (this.fabric = { }),
+  "use strict";
+
+  var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       min = fabric.util.array.min,
       max = fabric.util.array.max,
@@ -9099,12 +9132,14 @@ fabric.util.animate = animate;
   fabric.Group.fromObject = function(object) {
     return new fabric.Group(object.objects, object);
   }
-})();
+})(this);
 
 
-(function() {
+(function(global) {
 
-  var fabric = this.fabric || (this.fabric = { }),
+  "use strict";
+
+  var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       clone = fabric.util.object.clone;
 
@@ -9345,13 +9380,14 @@ fabric.util.animate = animate;
    */
 	fabric.Text.fromElement = function(element) {
 	};
-})();
+})(this);
 
 
-(function() {
+(function(global) {
 
-  var global = this,
-      extend = fabric.util.object.extend;
+  "use strict";
+
+  var extend = fabric.util.object.extend;
 
   if (!global.fabric) {
     global.fabric = { };
@@ -9747,4 +9783,4 @@ fabric.util.animate = animate;
     };
     img.src = url;
   };
-})();
+})(this);

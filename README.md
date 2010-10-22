@@ -12,6 +12,7 @@ Contributions are very much welcome!
 - Fast
 - Encapsulated in one object
 - No browser sniffing for critical functionality
+- Runs under ES5 strict mode
 
 ### Supported browsers
 

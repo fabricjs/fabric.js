@@ -1,4 +1,6 @@
-(function() {
+(function(global) {
+  
+  "use strict";
   
   function pad(str, length) {
     while (str.length < length) {
@@ -31,7 +33,7 @@
     })
   }
   
-  var canvas = this.canvas = new fabric.Element('canvas');
+  var canvas = global.canvas = new fabric.Element('canvas');
   
   var fpsEl = document.getElementById('fps').firstChild;
   
@@ -325,4 +327,8 @@
   
   canvas.add(helloWorld);
   
-})();
+  setTimeout(function() {
+    canvas.calcOffset();
+  }, 100);
+  
+})(this);

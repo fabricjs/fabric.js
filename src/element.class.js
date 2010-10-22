@@ -1,12 +1,13 @@
-(function () {
+(function (global) {
+  
+  "use strict";
   
   if (fabric.Element) {
     fabric.warn('fabric.Element is already defined.');
     return;
   }
   
-  var global = this,
-      window = global.window,
+  var window = global.window,
       document = window.document,
       
       // aliases for faster resolution
@@ -810,6 +811,8 @@
           maxY = utilMax(this._freeDrawingYPoints),
           ctx = this.contextTop,
           path = [ ],
+          xPoint,
+          yPoint,
           xPoints = this._freeDrawingXPoints,
           yPoints = this._freeDrawingYPoints;
       
@@ -2380,4 +2383,4 @@
    * @return {String} json string
    */
   fabric.Element.prototype.toJSON = fabric.Element.prototype.toObject;
-})();
+})(this);

@@ -1,7 +1,8 @@
-(function(){
+(function(global) {
   
-  var global = this,
-      fabric = global.fabric || (global.fabric = { }),
+  "use strict";
+  
+  var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       clone = fabric.util.object.clone,
       toFixed = fabric.util.toFixed,
@@ -1276,4 +1277,4 @@
    * @alias rotate -> setAngle
    */
   fabric.Object.prototype.rotate = fabric.Object.prototype.setAngle;
-})();
+})(this);

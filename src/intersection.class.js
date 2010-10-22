@@ -1,11 +1,12 @@
 //= require 'point.class'
 
-(function() {
+(function(global) {
+  
+  "use strict";
   
   /* Adaptation of work of Kevin Lindsey (kevin@kevlindev.com) */
   
-  var global = this,
-      fabric = global.fabric || (global.fabric = { });
+  var fabric = global.fabric || (global.fabric = { });
   
   if (fabric.Intersection) {    
     fabric.warn('fabric.Intersection is already defined');
@@ -147,4 +148,4 @@
     return result;
   };
   
-})();
+})(this);

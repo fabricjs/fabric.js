@@ -1,8 +1,10 @@
 //= require "object.class"
 
-(function() {
+(function(global) {
   
-  var fabric = this.fabric || (this.fabric = { }),
+  "use strict";
+  
+  var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       min = fabric.util.array.min,
       max = fabric.util.array.max;
@@ -144,4 +146,4 @@
   fabric.Polygon.fromObject = function(object) {
     return new fabric.Polygon(object.points, object);
   }
-})();
+})(this);

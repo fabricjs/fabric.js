@@ -1,6 +1,8 @@
 (function (global) {
   
-  var fabric = this.fabric || (this.fabric = { }),
+  "use strict";
+  
+  var fabric = global.fabric || (global.fabric = { }),
       slice = Array.prototype.slice,
       apply = Function.prototype.apply;
   

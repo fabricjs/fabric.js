@@ -1,8 +1,10 @@
 //= require "object.class"
 
-(function(){
+(function(global) {
   
-  var fabric = this.fabric || (this.fabric = { }),
+  "use strict";
+  
+  var fabric = global.fabric || (global.fabric = { }),
       min = fabric.util.array.min,
       max = fabric.util.array.max,
       extend = fabric.util.object.extend;
@@ -514,4 +516,4 @@
     delete parsedAttributes.d;
     return new fabric.Path(path, extend(parsedAttributes, options));
   };
-})();
+})(this);

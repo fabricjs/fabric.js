@@ -1,8 +1,10 @@
 //= require "object.class"
 
-(function() {
+(function(global) {
   
-  var fabric = this.fabric || (this.fabric = { }),
+  "use strict";
+  
+  var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       clone = fabric.util.object.clone;
 
@@ -249,4 +251,4 @@
 	fabric.Text.fromElement = function(element) {
 	  // TODO (kangax): implement this
 	};
-})();
+})(this);

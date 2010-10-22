@@ -1,6 +1,8 @@
-(function() {
+(function(global) {
   
-  var fabric = this.fabric || (this.fabric = { });
+  "use strict";
+  
+  var fabric = global.fabric || (global.fabric = { });
   
   if (fabric.Triangle) {
     fabric.warn('fabric.Triangle is already defined');
@@ -77,4 +79,4 @@
   fabric.Triangle.fromObject = function(object) {
     return new fabric.Triangle(object);
   };
-})();
+})(this);

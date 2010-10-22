@@ -1,8 +1,10 @@
 //= require "object.class"
 
-(function() {
+(function(global) {
   
-  var fabric  = this.fabric || (this.fabric = { }),
+  "use strict";
+  
+  var fabric  = global.fabric || (global.fabric = { }),
       piBy2   = Math.PI * 2,
       extend = fabric.util.object.extend;
   
@@ -79,14 +81,14 @@
   });
   
   /**
-   * List of attribute names to account for when parsing SVG element (used by `fabric.Circle.fromElement`)
+   * List of attribute names to account for when parsing SVG element (used by {@link fabric.Circle.fromElement})
    * @static
    * @see: http://www.w3.org/TR/SVG/shapes.html#CircleElement
    */
   fabric.Circle.ATTRIBUTE_NAMES = 'cx cy r fill fill-opacity stroke stroke-width transform'.split(' ');
   
   /**
-   * Returns fabric.Circle instance from an SVG element
+   * Returns {@link fabric.Circle} instance from an SVG element
    * @static
    * @method fabric.Circle.fromElement
    * @param element {SVGElement} element to parse
@@ -117,7 +119,7 @@
   }
   
   /**
-   * Returns fabric.Circle instance from an object representation
+   * Returns {@link fabric.Circle} instance from an object representation
    * @static
    * @method fabric.Circle.fromObject
    * @param {Object} object Object to create an instance from
@@ -126,4 +128,4 @@
   fabric.Circle.fromObject = function(object) {
     return new fabric.Circle(object);
   }
-})();
+})(this);

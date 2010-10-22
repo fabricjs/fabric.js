@@ -1,8 +1,10 @@
 //= require "object.class"
 
-(function(){
+(function(global){
   
-  var fabric = this.fabric || (this.fabric = { }),
+  "use strict";
+  
+  var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       min = fabric.util.array.min,
       max = fabric.util.array.max,
@@ -462,4 +464,4 @@
   fabric.Group.fromObject = function(object) {
     return new fabric.Group(object.objects, object);
   }
-})();
+})(this);

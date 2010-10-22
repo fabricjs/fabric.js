@@ -1,11 +1,13 @@
-(function(){
+(function(global) {
+  
+  "use strict";
   
   /**
    * @name fabric
    * @namespace
    */
   
-  var fabric = this.fabric || (this.fabric = { }),
+  var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       capitalize = fabric.util.string.capitalize,
       clone = fabric.util.object.clone;
@@ -399,4 +401,4 @@
     parsePointsAttribute:   parsePointsAttribute
   });
   
-})();
+})(this);

@@ -178,7 +178,7 @@ function getElementOffset(element) {
   
   fabric.util.getScript = getScript;
   
-  var Jaxer = this.Jaxer;
+  var Jaxer = global.Jaxer;
   if (Jaxer && Jaxer.load) {
     fabric.util.getScript = getScriptJaxer;
   }

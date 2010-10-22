@@ -1,8 +1,10 @@
 //= require "path.class"
 
-(function(){
+(function(global) {
   
-  var fabric = this.fabric || (this.fabric = { }),
+  "use strict";
+  
+  var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       invoke = fabric.util.array.invoke,
       parentSet = fabric.Object.prototype.set,
@@ -241,4 +243,4 @@
     var paths = instantiatePaths(object.paths);
     return new fabric.PathGroup(paths, object);
   };
-})();
+})(this);

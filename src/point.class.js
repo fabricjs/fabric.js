@@ -1,8 +1,10 @@
-(function() {
+(function(global) {
+  
+  "use strict";
   
   /* Adaptation of work of Kevin Lindsey (kevin@kevlindev.com) */
   
-  var fabric = this.fabric || (this.fabric = { });
+  var fabric = global.fabric || (global.fabric = { });
 
   if (fabric.Point) {    
     fabric.warn('fabric.Point is already defined');
@@ -191,4 +193,4 @@
     }
   };
   
-})();
+})(this);

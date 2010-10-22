@@ -1,9 +1,10 @@
 //= require "object.class"
 
-(function() {
+(function(global) {
   
-  var global = this,
-      extend = fabric.util.object.extend;
+  "use strict";
+  
+  var extend = fabric.util.object.extend;
   
   if (!global.fabric) {
     global.fabric = { };
@@ -402,4 +403,4 @@
     };
     img.src = url;
   };
-})();
+})(this);

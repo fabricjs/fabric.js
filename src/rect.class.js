@@ -1,8 +1,10 @@
 //= require "object.class"
 
-(function() {
+(function(global) {
   
-  var fabric = this.fabric || (this.fabric = { });
+  "use strict";
+  
+  var fabric = global.fabric || (global.fabric = { });
   
   if (fabric.Rect) {
     console.warn('fabric.Rect is already defined');
@@ -156,4 +158,4 @@
   fabric.Rect.fromObject = function(object) {
     return new fabric.Rect(object);
   };
-})();
+})(this);

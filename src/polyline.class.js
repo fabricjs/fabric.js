@@ -1,8 +1,10 @@
 //= require "object.class"
 
-(function() {
+(function(global) {
   
-  var fabric = this.fabric || (this.fabric = { });
+  "use strict";
+  
+  var fabric = global.fabric || (global.fabric = { });
   
   if (fabric.Polyline) {
     fabric.warn('fabric.Polyline is already defined');
@@ -127,4 +129,4 @@
     return new fabric.Polyline(points, object);
   };
   
-})();
+})(this);
