@@ -331,4 +331,6 @@
     canvas.calcOffset();
   }, 100);
   
+  initCenteringGuidelines(canvas);
+  
 })(this);

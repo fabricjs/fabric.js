@@ -3672,6 +3672,19 @@ fabric.util.animate = animate;
     },
 
     /**
+     * Callback; invoked every time active object is moved
+     * @method onObjectMove
+     * @param {fabric.Object} object that's being moved
+     */
+    onObjectMove: null,
+
+    /**
+     * Callback; invoked when a mouseup event occurs, and at the end of all other transformations
+     * @method onMouseUp
+     */
+    onMouseUp: null,
+
+    /**
      * Calculates canvas element offset relative to the document
      * This method is also attached as "resize" event handler of window
      * @method calcOffset
@@ -3998,12 +4011,17 @@ fabric.util.animate = animate;
       this.renderAll();
 
       this._setCursorFromEvent(e, target);
+
       this._setCursor('');
 
       var _this = this;
       setTimeout(function () {
         _this._setCursorFromEvent(e, target);
       }, 50);
+
+      if (this.onMouseUp) {
+        this.onMouseUp();
+      }
     },
 
     _shouldClearSelection: function (e) {
@@ -4331,6 +4349,9 @@ fabric.util.animate = animate;
         }
         else {
           this._translateObject(x, y);
+          if (this.onObjectMove) {
+            this.onObjectMove(this._currentTransform.target);
+          }
         }
         this.renderAll();
       }
