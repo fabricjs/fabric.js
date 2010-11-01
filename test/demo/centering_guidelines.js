@@ -43,32 +43,37 @@ function initCenteringGuidelines(canvas) {
     ctx.restore();
   }
   
-  canvas.onObjectMove = function(object) {
-    var isInVerticalCenter = object.get('left') in canvasWidthCenterMap,
-        isInHorizontalCenter = object.get('top') in canvasHeightCenterMap;
+  var observeEvent = fabric.util.observeEvent,
+      afterRenderActions = [ ],
+      isInVerticalCenter,
+      isInHorizontalCenter;
+  
+  observeEvent('object:moved', function(e) {
+    object = e.memo.target;
     
-    if (isInVerticalCenter || isInHorizontalCenter) {
-      canvas.afterRender = function() {
-        if (isInHorizontalCenter) {
-          showHorizontalCenterLine();
-        }
-        if (isInVerticalCenter) {
-          showVerticalCenterLine();
-        }
-      };
-      if (isInHorizontalCenter) {
-        object.set('top', canvasHeightCenter);
-      }
-      if (isInVerticalCenter) {
-        object.set('left', canvasWidthCenter);
-      }
+    isInVerticalCenter = object.get('left') in canvasWidthCenterMap,
+    isInHorizontalCenter = object.get('top') in canvasHeightCenterMap;
+    
+    if (isInHorizontalCenter) {
+      object.set('top', canvasHeightCenter);
     }
-    else {
-      canvas.afterRender = null;
+    if (isInVerticalCenter) {
+      object.set('left', canvasWidthCenter);
     }
-  };
-  canvas.onMouseUp = function() {
-    canvas.afterRender = null;
+  });
+  
+  observeEvent('after:render', function() {
+    if (isInVerticalCenter) {
+      showVerticalCenterLine();
+    }
+    if (isInHorizontalCenter) {
+      showHorizontalCenterLine();
+    }
+  });
+  
+  observeEvent('mouse:up', function() {
+    // clear these values, to stop drawing guidelines once mouse is up
+    isInVerticalCenter = isInHorizontalCenter = null;
     canvas.renderAll();
-  };
+  });
 }

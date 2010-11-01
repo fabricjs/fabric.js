@@ -3574,10 +3574,6 @@ fabric.util.animate = animate;
       this.setOverlayImage(options.overlayImage);
     }
 
-    if (options.afterRender) {
-      this.afterRender = options.afterRender;
-    }
-
     this._createCanvasBackground();
     this._createCanvasContainer();
     this._initEvents();
@@ -3670,19 +3666,6 @@ fabric.util.animate = animate;
     onFpsUpdate: function(fps) {
       /* NOOP */
     },
-
-    /**
-     * Callback; invoked every time active object is moved
-     * @method onObjectMove
-     * @param {fabric.Object} object that's being moved
-     */
-    onObjectMove: null,
-
-    /**
-     * Callback; invoked when a mouseup event occurs, and at the end of all other transformations
-     * @method onMouseUp
-     */
-    onMouseUp: null,
 
     /**
      * Calculates canvas element offset relative to the document
@@ -4019,9 +4002,7 @@ fabric.util.animate = animate;
         _this._setCursorFromEvent(e, target);
       }, 50);
 
-      if (this.onMouseUp) {
-        this.onMouseUp();
-      }
+      fireEvent('mouse:up');
     },
 
     _shouldClearSelection: function (e) {
@@ -4349,9 +4330,10 @@ fabric.util.animate = animate;
         }
         else {
           this._translateObject(x, y);
-          if (this.onObjectMove) {
-            this.onObjectMove(this._currentTransform.target);
-          }
+
+          fireEvent('object:moved', {
+            target: this._currentTransform.target
+          });
         }
         this.renderAll();
       }
@@ -4659,9 +4641,7 @@ fabric.util.animate = animate;
       var elapsedTime = new Date() - startTime;
       this.onFpsUpdate(~~(1000 / elapsedTime));
 
-      if (this.afterRender) {
-        this.afterRender();
-      }
+      fireEvent('after:render');
 
       return this;
     },
@@ -4689,9 +4669,7 @@ fabric.util.animate = animate;
         activeGroup.render(this.contextTop);
       }
 
-      if (this.afterRender) {
-        this.afterRender();
-      }
+      fireEvent('after:render');
 
       return this;
     },
