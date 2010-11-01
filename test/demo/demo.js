@@ -331,7 +331,9 @@
     canvas.calcOffset();
   }, 100);
   
-  initCenteringGuidelines(canvas);
-  initAligningGuidelines(canvas);
+  if (document.location.search.indexOf('guidelines') > -1) {
+    initCenteringGuidelines(canvas);
+    initAligningGuidelines(canvas);
+  }
   
 })(this);
