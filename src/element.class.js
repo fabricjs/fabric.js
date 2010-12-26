@@ -1857,10 +1857,9 @@
           imgEl.onload = function () {
             imgEl.onload = null;
             
-            _this._resizeImageToFit(imgEl);
-            
-            var oImg = new fabric.Image(imgEl);
-            callback(oImg);
+            if (imgEl.width && imgEl.height) {
+              callback(new fabric.Image(imgEl));
+            }
           };
           
           imgEl.className = 'canvas-img-clone';
@@ -1949,6 +1948,9 @@
      */
     remove: function (object) {
       removeFromArray(this._objects, object);
+      if (this.getActiveObject() === object) {
+        this.removeActiveObject();
+      }
       this.renderAll();
       return object;
     },
