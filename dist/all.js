@@ -5242,10 +5242,9 @@ fabric.util.animate = animate;
           imgEl.onload = function () {
             imgEl.onload = null;
 
-            _this._resizeImageToFit(imgEl);
-
-            var oImg = new fabric.Image(imgEl);
-            callback(oImg);
+            if (imgEl.width && imgEl.height) {
+              callback(new fabric.Image(imgEl));
+            }
           };
 
           imgEl.className = 'canvas-img-clone';
@@ -5332,6 +5331,9 @@ fabric.util.animate = animate;
      */
     remove: function (object) {
       removeFromArray(this._objects, object);
+      if (this.getActiveObject() === object) {
+        this.removeActiveObject();
+      }
       this.renderAll();
       return object;
     },
@@ -7054,8 +7056,8 @@ fabric.util.animate = animate;
       this.set('x2', points[2]);
       this.set('y2', points[3]);
 
-      this.set('width', this.x2 - this.x1);
-      this.set('height', this.y2 - this.y1);
+      this.set('width', (this.x2 - this.x1) || 1);
+      this.set('height', (this.y2 - this.y1) || 1);
       this.set('left', this.x1 + this.width / 2);
       this.set('top', this.y1 + this.height / 2);
     },
@@ -9207,7 +9209,8 @@ fabric.util.animate = animate;
           (o = o.stateProperties) &&
           o.clone) {
         this.stateProperties = o.clone();
-        this.stateProperties.push('fontfamily', 'fontweight', 'path');
+        this.stateProperties.push('fontfamily', 'fontweight', 'path', 'text');
+        fabric.util.removeFromArray(this.stateProperties, 'width');
       }
     },
 

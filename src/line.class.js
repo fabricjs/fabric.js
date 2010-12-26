@@ -43,8 +43,8 @@
       this.set('x2', points[2]);
       this.set('y2', points[3]);
       
-      this.set('width', this.x2 - this.x1);
-      this.set('height', this.y2 - this.y1);
+      this.set('width', (this.x2 - this.x1) || 1);
+      this.set('height', (this.y2 - this.y1) || 1);
       this.set('left', this.x1 + this.width / 2);
       this.set('top', this.y1 + this.height / 2);
     },

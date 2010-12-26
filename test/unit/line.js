@@ -101,4 +101,12 @@
     equals(oLine.get('x2'), 0, 'missing attributes count as 0 values');
     equals(oLine.get('y2'), 0, 'missing attributes count as 0 values');
   });
+  
+  test('straight lines should be displayed', function() {
+    var line1 = new fabric.Line([10,10,100,10]),
+        line2 = new fabric.Line([10,10,10,100]);
+        
+    equals(line1.get('height'), 1);
+    equals(line2.get('width'), 1);
+  });
 })();
