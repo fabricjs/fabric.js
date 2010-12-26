@@ -73,7 +73,8 @@
           (o = o.stateProperties) &&
           o.clone) {
         this.stateProperties = o.clone();
-        this.stateProperties.push('fontfamily', 'fontweight', 'path');
+        this.stateProperties.push('fontfamily', 'fontweight', 'path', 'text');
+        fabric.util.removeFromArray(this.stateProperties, 'width');
       }
     },
     
