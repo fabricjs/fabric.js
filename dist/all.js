@@ -1,4 +1,4 @@
-/*! Fabric.js Copyright 2010, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
+/*! Fabric.js Copyright 2008-2011, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
 var fabric = fabric || { version: 0.1 };
 
@@ -2758,9 +2758,9 @@ fabric.util.animate = animate;
       '$'
     );
 
-    function hasParentWithNodeName(element, parentNodeName) {
+    function hasAncestorWithNodeName(element, nodeName) {
       while (element && (element = element.parentNode)) {
-        if (element.nodeName === parentNodeName) {
+        if (nodeName.test(element.nodeName)) {
           return true;
         }
       }
@@ -2773,7 +2773,7 @@ fabric.util.animate = animate;
 
       var elements = descendants.filter(function(el) {
         return reAllowedSVGTagNames.test(el.tagName) &&
-          !hasParentWithNodeName(el, 'pattern');
+              !hasAncestorWithNodeName(el, /^(?:pattern|defs)$/);
       });
 
       if (!elements || (elements && !elements.length)) return;
@@ -5773,7 +5773,7 @@ fabric.util.animate = animate;
       toFixed = fabric.util.toFixed,
       capitalize = fabric.util.string.capitalize,
       getPointer = fabric.util.getPointer,
-      slice = Array.prototype.slice
+      slice = Array.prototype.slice;
 
   if (fabric.Object) {
     return;

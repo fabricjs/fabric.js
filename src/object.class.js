@@ -8,7 +8,7 @@
       toFixed = fabric.util.toFixed,
       capitalize = fabric.util.string.capitalize,
       getPointer = fabric.util.getPointer,
-      slice = Array.prototype.slice
+      slice = Array.prototype.slice;
       
   if (fabric.Object) {
     return;

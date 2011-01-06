@@ -341,9 +341,9 @@
       '$'
     );
     
-    function hasParentWithNodeName(element, parentNodeName) {
+    function hasAncestorWithNodeName(element, nodeName) {
       while (element && (element = element.parentNode)) {
-        if (element.nodeName === parentNodeName) {
+        if (nodeName.test(element.nodeName)) {
           return true;
         }
       }
@@ -356,7 +356,7 @@
       
       var elements = descendants.filter(function(el) {
         return reAllowedSVGTagNames.test(el.tagName) && 
-          !hasParentWithNodeName(el, 'pattern');
+              !hasAncestorWithNodeName(el, /^(?:pattern|defs)$/); // http://www.w3.org/TR/SVG/struct.html#DefsElement
       });
 
       if (!elements || (elements && !elements.length)) return;
