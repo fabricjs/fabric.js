@@ -124,8 +124,29 @@
       'top':    '22.3em', 
       'width':  '103.45pt', 
       'height': '20%' 
-    }
+    };
     same(expectedObject, fabric.parseStyleAttribute(element));
+  });
+  
+  test('parseStyleAttribute with one pair', function() {
+    var element = document.createElement('path');
+    element.setAttribute('style', 'left:10px');
+    
+    var expectedObject = { 
+      'left': '10px'
+    };
+    same(expectedObject, fabric.parseStyleAttribute(element));
+  });
+  
+  test('parseAttributes (style to have higher priority than attribute)', function() {
+    var element = document.createElement('path');
+    element.setAttribute('style', 'fill:red');
+    element.setAttribute('fill', 'green');
+    
+    var expectedObject = { 
+      'fill': 'red'
+    };
+    same(expectedObject, fabric.parseAttributes(element, ['path']));
   });
   
   test('parsePointsAttribute', function() {

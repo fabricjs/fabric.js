@@ -2505,7 +2505,8 @@ fabric.util.animate = animate;
       return memo;
     }, { });
 
-    ownAttributes = extend(fabric.parseStyleAttribute(element), ownAttributes);
+
+    ownAttributes = extend(ownAttributes, fabric.parseStyleAttribute(element));
     return extend(parentAttributes, ownAttributes);
   };
 
@@ -2685,8 +2686,7 @@ fabric.util.animate = animate;
         style = element.getAttribute('style');
     if (style) {
       if (typeof style == 'string') {
-        style = style.split(';');
-        style.pop();
+        style = style.replace(/;$/, '').split(';');
         oStyle = style.reduce(function(memo, current) {
           var attr = current.split(':'),
               key = attr[0].trim(),

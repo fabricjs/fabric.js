@@ -72,9 +72,10 @@
       return memo;
     }, { });
     
-    // add values parsed from style
-    // TODO (kangax): check the presedence of values from the style attribute
-    ownAttributes = extend(fabric.parseStyleAttribute(element), ownAttributes);
+    // add values parsed from style, which take precedence over attributes
+    // (see: http://www.w3.org/TR/SVG/styling.html#UsingPresentationAttributes)
+    
+    ownAttributes = extend(ownAttributes, fabric.parseStyleAttribute(element));
     return extend(parentAttributes, ownAttributes);
   };
   
@@ -265,8 +266,7 @@
         style = element.getAttribute('style');
     if (style) {
       if (typeof style == 'string') {
-        style = style.split(';');
-        style.pop();
+        style = style.replace(/;$/, '').split(';');
         oStyle = style.reduce(function(memo, current) {
           var attr = current.split(':'),
               key = attr[0].trim(),
