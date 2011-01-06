@@ -218,7 +218,9 @@
     });
     
     setTimeout(function() {
-      ok(typeof data != 'undefined' && typeof data.length == 'number');
+      equals(typeof data, 'object');
+      equals(data.length, 1);
+      
       if (data) {
         var path = data[0];
 
