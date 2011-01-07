@@ -327,6 +327,25 @@
   
   canvas.add(helloWorld);
   
+  document.onkeydown = function(e) {
+    var obj = canvas.getActiveObject() || canvas.getActiveGroup();
+    if (obj && e.keyCode === 8) {
+      // this is horrible. need to fix, so that unified interface can be used
+      if (obj.type === 'group') {
+        var groupObjects = obj.getObjects();
+        canvas.removeActiveGroup();
+        groupObjects.forEach(function(obj) {
+          canvas.remove(obj);
+        });
+      }
+      else {
+        canvas.remove(obj);
+      }
+      canvas.renderAll();
+      return false;
+    }
+  };
+  
   setTimeout(function() {
     canvas.calcOffset();
   }, 100);
