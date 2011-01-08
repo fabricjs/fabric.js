@@ -184,4 +184,38 @@
     }
   });
   
+  asyncTest('fromElement', function() {
+    
+    function makeElement(tagName, attributes) {
+      var element = document.createElement(tagName);
+      for (var prop in attributes) {
+        element.setAttribute(prop, attributes[prop]);
+      }
+      return element;
+    }
+    
+    var IMAGE_DATA_URL = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAARCAYAAADtyJ2fAAAACXBIWXMAAAsSAAALEgHS3X78AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAVBJREFUeNqMU7tOBDEMtENuy614/QE/gZBOuvJK+Et6CiQ6JP6ExxWI7bhL1vgVExYKLPmsTTIzjieHd+MZZSBIAJwEyJU0EWaum+lNljRux3O6nl70Gx/GUwUeyYcDJWZNhMK1aEXYe95Mz4iP44kDTRUZSWSq1YEHri0/HZxXfGSFBN+qDEJTrNI+QXRBviZ7eWCQgjsg+IHiHYB30MhqUxwcmH1Arc2kFDwkBldeFGJLPqs/AbbF2dWgUym6Z2Tb6RVzYxG1wUnmaNcOonZiU0++l6C7FzoQY42g3+8jz+GZ+dWMr1rRH0OjAFhPO+VJFx/vWDqPmk8H97CGBUYUiqAGW0PVe1+aX8j2Ll0tgHtvLx6AK9Tu1ZTFTQ0ojChqGD4qkOzeAuzVfgzsaTym1ClS+IdwtQCFooQMBTumNun1H6Bfcc9/MUn4R3wJMAAZH6MmA4ht4gAAAABJRU5ErkJggg==";
+    
+    ok(typeof fabric.Image.fromElement == 'function', 'fromElement should exist');
+    
+    var imageEl = makeElement('image', {
+      width: "14",
+      height: "17",
+      "xlink:href": IMAGE_DATA_URL
+    });
+    
+    var imgObject;
+    fabric.Image.fromElement(imageEl, function(obj) {
+      imgObject = obj;
+    });
+    
+    setTimeout(function() {
+      ok(imgObject instanceof fabric.Image);
+      same(imgObject.get('width'), 14, 'width of an object');
+      same(imgObject.get('height'), 17, 'height of an object');
+      same(imgObject.getSrc(), IMAGE_DATA_URL, 'src of an object');
+      start();
+    }, 1000);
+  });
+  
 })();

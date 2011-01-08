@@ -83,7 +83,7 @@
       fabric.parseAttributes(element, 'x y fill'.split(' ')));
   });
   
-  test('parseElements', function() {
+  asyncTest('parseElements', function() {
     ok(fabric.parseElements);
     
     function getOptions(options) {
@@ -101,16 +101,21 @@
     
     var parsedElements, error;
     try {
-      parsedElements = fabric.parseElements(elements);
+      fabric.parseElements(elements, function(instances) {
+        parsedElements = instances;
+      });
     }
     catch(err) {
       error = err;
     }
     ok(error === undefined, 'No error is raised');
     
-    ok(parsedElements[0] instanceof fabric.Rect);
-    ok(parsedElements[1] instanceof fabric.Circle);
-    ok(parsedElements[2] instanceof fabric.Path);
+    setTimeout(function(){
+      ok(parsedElements[0] instanceof fabric.Rect);
+      ok(parsedElements[1] instanceof fabric.Circle);
+      ok(parsedElements[2] instanceof fabric.Path);
+      start();
+    }, 1000);
   });
   
   test('parseStyleAttribute', function() {

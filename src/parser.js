@@ -292,25 +292,46 @@
    * @memberOf fabric
    * @method parseElements
    * @param {Array} elements Array of elements to parse
+   * @param {Function} callback Being passed an array of fabric instances (transformed from SVG elements)
    * @param {Object} options Options object
-   * @return {Array} Array of corresponding instances (transformed from SVG elements)
    */
-   function parseElements(elements, options) {
-    var _elements = elements.map(function(el) {
+  function parseElements(elements, callback, options) {
+    var instances = Array(elements.length), i = elements.length;
+
+    function checkIfDone() {
+      if (--i === 0) {
+        instances = instances.filter(function(el) {
+          return el != null;
+        });
+        callback(instances);
+      }
+    }
+
+    elements.map(function(el, index) {
       var klass = fabric[capitalize(el.tagName)];
       if (klass && klass.fromElement) {
         try {
-          return klass.fromElement(el, options);
+          if (klass.fromElement.async) {
+            klass.fromElement(el, (function(index) { 
+              return function(obj) {
+                instances.splice(index, 0, obj);
+                checkIfDone();
+              };
+            })(index), options);
+          }
+          else {
+            instances.splice(index, 0, klass.fromElement(el, options));
+            checkIfDone();
+          }
         }
         catch(e) {
           fabric.log(e.message || e);
         }
       }
+      else {
+        checkIfDone();
+      }
     });
-    _elements = _elements.filter(function(el) {
-      return el != null;
-    });
-    return _elements;
   };
   
   /**
@@ -324,7 +345,7 @@
    */
   fabric.parseSVGDocument = (function() {
 
-    var reAllowedSVGTagNames = /^(path|circle|polygon|polyline|ellipse|rect|line)$/;
+    var reAllowedSVGTagNames = /^(path|circle|polygon|polyline|ellipse|rect|line|image)$/;
 
     // http://www.w3.org/TR/SVG/coords.html#ViewBoxAttribute
     // \d doesn't quite cut it (as we need to match an actual float number)
@@ -385,12 +406,11 @@
         height: height
       };
 
-      var elements = fabric.parseElements(elements, clone(options));
-      if (!elements || (elements && !elements.length)) return;
-
-      if (callback) {
-        callback(elements, options);
-      }
+      fabric.parseElements(elements, function(instances) {
+        if (callback) {
+          callback(instances, options);
+        }
+      }, clone(options));
     };
   })();
   

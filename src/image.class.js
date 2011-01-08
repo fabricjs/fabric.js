@@ -403,4 +403,31 @@
     };
     img.src = url;
   };
+  
+  /**
+   * List of attribute names to account for when parsing SVG element (used by {@link fabric.Image.fromElement})
+   * @static
+   * @see http://www.w3.org/TR/SVG/struct.html#ImageElement
+   */
+  fabric.Image.ATTRIBUTE_NAMES = 'x y width height fill fill-opacity stroke stroke-width transform xlink:href'.split(' ');
+  
+  /**
+   * Returns {@link fabric.Image} instance from an SVG element
+   * @static
+   * @method fabric.Image.fromElement
+   * @param {SVGElement} element Element to parse
+   * @param {Function} callback Callback to execute when fabric.Image object is created
+   * @param {Object} [options] Options object
+   * @return {fabric.Image}
+   */
+  fabric.Image.fromElement = function(element, callback, options) {
+    options || (options = { });
+    
+    var parsedAttributes = fabric.parseAttributes(element, fabric.Image.ATTRIBUTE_NAMES);
+    
+    fabric.Image.fromURL(parsedAttributes['xlink:href'], callback, extend(parsedAttributes, options));
+  };
+  
+  fabric.Image.fromElement.async = true;
+  
 })(this);
