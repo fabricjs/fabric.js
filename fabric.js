@@ -34,6 +34,7 @@ if (typeof console !== 'undefined') {
 
 //= require "src/util"
 //= require "src/parser"
+//= require "src/gradient"
                  
 //= require "src/point.class"
 //= require "src/intersection.class"

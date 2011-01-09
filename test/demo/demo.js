@@ -355,4 +355,20 @@
     initAligningGuidelines(canvas);
   }
   
+  document.getElementById('gradientify').onclick = function() {
+    var obj = canvas.getActiveObject();
+    if (obj) {
+      obj.setGradientFill(canvas.getContext(), {
+        x2: (getRandomInt(0, 1) ? 0 : obj.width),
+        y2: (getRandomInt(0, 1) ? 0 : obj.height),
+        colorStops: { 
+          0: '#' + getRandomColor(), 
+          1: '#' + getRandomColor()
+        }
+      });
+      canvas.renderAll();
+      console.log(getRandomNum(0, 1));
+    }
+  };
+  
 })(this);

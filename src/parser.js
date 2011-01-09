@@ -285,6 +285,22 @@
     }
     return oStyle;
   };
+  
+  function resolveGradients(instances) {
+    for (var i = instances.length; i--; ) {
+      var instanceFillValue = instances[i].get('fill');
+      
+      if (/^url\(/.test(instanceFillValue)) {
+        
+        // url(#grad1) --> grad1
+        var gradientId = instanceFillValue.slice(5, instanceFillValue.length - 1);
+        
+        if (fabric.gradientDefs[gradientId]) {
+          instances[i].set('fill', fabric.gradientDefs[gradientId]);
+        }
+      }
+    }
+  }
 
   /**
    * Transforms an array of svg elements to corresponding fabric.* instances
@@ -303,6 +319,7 @@
         instances = instances.filter(function(el) {
           return el != null;
         });
+        resolveGradients(instances);
         callback(instances);
       }
     }
@@ -373,6 +390,7 @@
 
     return function(doc, callback) {
       if (!doc) return;
+      
       var descendants = fabric.util.toArray(doc.getElementsByTagName('*'));
       
       var elements = descendants.filter(function(el) {
@@ -405,6 +423,8 @@
         width: width, 
         height: height
       };
+      
+      fabric.gradientDefs = fabric.getGradientDefs(doc);
 
       fabric.parseElements(elements, function(instances) {
         if (callback) {

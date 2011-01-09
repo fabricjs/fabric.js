@@ -1270,6 +1270,10 @@
     toJSON: function() {
       // delegate, not alias
       return this.toObject();
+    },
+    
+    setGradientFill: function(ctx, options) {
+      this.set('fill', fabric.Gradient.forObject(this, ctx, options));
     }
   });
   
