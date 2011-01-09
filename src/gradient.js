@@ -16,8 +16,9 @@
           x2 = options.x2 || ctx.canvas.width,
           y2 = options.y2 || 0,
           colorStops = options.colorStops;
-
+          
       var gradient = ctx.createLinearGradient(x1, y1, x2, y2);
+      
       for (var position in colorStops) {
         var colorValue = colorStops[position];
         gradient.addColorStop(position, colorValue);
@@ -30,7 +31,7 @@
      * @static
      * @see http://www.w3.org/TR/SVG/pservers.html#LinearGradientElement
      */
-    fromElement: function(el, ctx) {
+    fromElement: function(el, ctx, instance) {
       
       /** 
        *  @example:
@@ -53,11 +54,20 @@
         colorStops[offset] = el.getAttribute('stop-color');
       }
       
-      return fabric.Gradient.create(ctx, {
+      var coords = {
         x1: el.getAttribute('x1') || 0,
         y1: el.getAttribute('y1') || 0,
         x2: el.getAttribute('x2') || '100%',
-        y2: el.getAttribute('y2') || 0,
+        y2: el.getAttribute('y2') || 0
+      };
+      
+      _convertPercentUnitsToValues(instance, coords);
+      
+      return fabric.Gradient.create(ctx, {
+        x1: coords.x1,
+        y1: coords.y1,
+        x2: coords.x2,
+        y2: coords.y2,
         colorStops: colorStops
       });
     },
@@ -104,7 +114,7 @@
    * @memberOf fabric
    * @method getGradientDefs
    * @param {SVGDocument} doc SVG document to parse
-   * @return {Object} Gradient definitions; key corresponds to element id, value -- to gradient definition
+   * @return {Object} Gradient definitions; key corresponds to element id, value -- to gradient definition element
    */
   function getGradientDefs(doc) {
     var linearGradientEls = doc.getElementsByTagName('linearGradient'),
@@ -114,11 +124,12 @@
     
     for (var i = linearGradientEls.length; i--; ) {
       el = linearGradientEls[i];
-      gradientDefs[el.id] = fabric.Gradient.fromElement(el);
+      gradientDefs[el.id] = el;
     }
+    
     for (var i = radialGradientEls.length; i--; ) {
       el = radialGradientEls[i];
-      gradientDefs[el.id] = fabric.Gradient.fromElement(el);
+      gradientDefs[el.id] = el;
     }
     
     return gradientDefs;

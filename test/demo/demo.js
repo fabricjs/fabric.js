@@ -367,7 +367,6 @@
         }
       });
       canvas.renderAll();
-      console.log(getRandomNum(0, 1));
     }
   };
   

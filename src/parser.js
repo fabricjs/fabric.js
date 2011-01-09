@@ -287,6 +287,8 @@
   };
   
   function resolveGradients(instances) {
+    var ctx = fabric.Element.activeInstance.getContext();
+    
     for (var i = instances.length; i--; ) {
       var instanceFillValue = instances[i].get('fill');
       
@@ -296,7 +298,13 @@
         var gradientId = instanceFillValue.slice(5, instanceFillValue.length - 1);
         
         if (fabric.gradientDefs[gradientId]) {
-          instances[i].set('fill', fabric.gradientDefs[gradientId]);
+          instances[i].set('fill', 
+            fabric.Gradient.fromElement(
+              fabric.gradientDefs[gradientId],
+              ctx,
+              instances[i]
+            )
+          );
         }
       }
     }

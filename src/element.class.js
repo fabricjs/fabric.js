@@ -129,7 +129,10 @@
     this._createCanvasBackground();
     this._createCanvasContainer();
     this._initEvents();
+    
     this.calcOffset();
+    
+    fabric.Element.activeInstance = this;
   };
   
   extend(fabric.Element.prototype, /** @scope fabric.Element.prototype */ {
