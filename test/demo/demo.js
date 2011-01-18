@@ -257,7 +257,16 @@
     }
   };
   
-  var activeObjectButtons = [ lockHorizontallyEl, lockVerticallyEl, lockScalingEl, lockRotationEl, removeSelectedEl ];
+  var gradientifyBtn = document.getElementById('gradientify');
+  
+  var activeObjectButtons = [ 
+    lockHorizontallyEl, 
+    lockVerticallyEl, 
+    lockScalingEl, 
+    lockRotationEl, 
+    removeSelectedEl,
+    gradientifyBtn
+  ];
   
   for (var i = activeObjectButtons.length; i--; ) {
     activeObjectButtons[i].disabled = true;
@@ -355,7 +364,7 @@
     initAligningGuidelines(canvas);
   }
   
-  document.getElementById('gradientify').onclick = function() {
+  gradientifyBtn.onclick = function() {
     var obj = canvas.getActiveObject();
     if (obj) {
       obj.setGradientFill(canvas.getContext(), {
