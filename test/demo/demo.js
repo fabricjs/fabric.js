@@ -28,7 +28,12 @@
         if (!xml) return;
         var doc = xml.documentElement;
         if (!doc) return;
-        fabric.parseSVGDocument(doc, callback);
+        
+        var startTime = new Date();
+        fabric.parseSVGDocument(doc, function() {
+          console.log((new Date() - startTime) + 'ms');
+          callback.apply(this, arguments);
+        });
       }
     })
   }
@@ -121,7 +126,7 @@
               .set('top', top)
               .set('angle', angle)
               .set('fill', '#' + getRandomColor())
-              .scale(getRandomNum(0.75, 1.25))
+              .scaleToWidth(300)
               .setCoords();
               
             canvas.add(pathGroup);

@@ -75,7 +75,7 @@
     // add values parsed from style, which take precedence over attributes
     // (see: http://www.w3.org/TR/SVG/styling.html#UsingPresentationAttributes)
     
-    ownAttributes = extend(ownAttributes, fabric.parseStyleAttribute(element));
+    ownAttributes = extend(ownAttributes, extend(getGlobalStylesForElement(element), fabric.parseStyleAttribute(element)));
     return extend(parentAttributes, ownAttributes);
   };
   
@@ -360,6 +360,74 @@
   };
   
   /**
+   * Returns CSS rules for a given SVG document
+   * @static
+   * @function
+   * @memberOf fabric
+   * @method getCSSRules
+   * @param {SVGDocument} doc SVG document to parse
+   * @return {Object} CSS rules of this document
+   */
+  function getCSSRules(doc) {
+    var styles = doc.getElementsByTagName('style'),
+        allRules = { },
+        rules;
+    
+    // very crude parsing of style contents  
+    for (var i = 0, len = styles.length; i < len; i++) {
+      var styleContents = styles[0].textContent;
+      
+      // remove comments
+      styleContents = styleContents.replace(/\/\*[\s\S]*?\*\//g, '');
+                         
+      rules = styleContents.match(/[^{]*\{[\s\S]*?\}/g);
+      rules = rules.map(function(rule) { return rule.trim() });
+      
+      rules.forEach(function(rule) {
+        var match = rule.match(/([\s\S]*?)\s*\{([^}]*)\}/),
+            rule = match[1],
+            declaration = match[2].trim(),
+            propertyValuePairs = declaration.replace(/;$/, '').split(/\s*;\s*/);
+        
+        if (!allRules[rule]) {
+          allRules[rule] = { };
+        }
+        
+        for (var i = 0, len = propertyValuePairs.length; i < len; i++) {
+          var pair = propertyValuePairs[i].split(/\s*:\s*/),
+              property = pair[0],
+              value = pair[1];
+              
+          allRules[rule][property] = value;
+        }
+      });
+    }
+    
+    return allRules;
+  }
+  
+  function getGlobalStylesForElement(element) {
+    var nodeName = element.nodeName,
+        className = element.getAttribute('class'),
+        id = element.getAttribute('id'),
+        styles = { };
+    
+    for (var rule in fabric.cssRules) {
+      var ruleMatchesElement = (className && new RegExp('^\\.' + className).test(rule)) ||
+                               (id && new RegExp('^#' + id).test(rule)) ||
+                               (new RegExp('^' + nodeName).test(rule));
+                               
+      if (ruleMatchesElement) {
+        for (var property in fabric.cssRules[rule]) {
+          styles[property] = fabric.cssRules[rule][property];
+        }
+      }
+    }
+    
+    return styles;
+  }
+  
+  /**
    * Parses an SVG document, converts it to an array of corresponding fabric.* instances and passes them to a callback
    * @static
    * @function
@@ -433,7 +501,10 @@
       };
       
       fabric.gradientDefs = fabric.getGradientDefs(doc);
-
+      fabric.cssRules = getCSSRules(doc);
+      
+      // Precedence of rules:   style > class > attribute
+      
       fabric.parseElements(elements, function(instances) {
         if (callback) {
           callback(instances, options);
@@ -446,7 +517,8 @@
     parseAttributes:        parseAttributes,
     parseElements:          parseElements,
     parseStyleAttribute:    parseStyleAttribute,
-    parsePointsAttribute:   parsePointsAttribute
+    parsePointsAttribute:   parsePointsAttribute,
+    getCSSRules:            getCSSRules
   });
   
 })(this);
