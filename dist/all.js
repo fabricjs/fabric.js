@@ -2936,6 +2936,25 @@ fabric.util.animate = animate;
 })(this);
 (function() {
 
+  function getColorStopFromStyle(el) {
+    var style = el.getAttribute('style');
+
+    if (style) {
+      var keyValuePairs = style.split(/\s*;\s*/);
+
+      for (var i = keyValuePairs.length; i--; ) {
+
+        var split = keyValuePairs[i].split(/\s*:\s*/),
+            key = split[0].trim(),
+            value = split[1].trim();
+
+        if (key === 'stop-color') {
+          return value;
+        }
+      }
+    }
+  }
+
   /** @namespace */
 
   fabric.Gradient = {
@@ -2957,7 +2976,7 @@ fabric.util.animate = animate;
 
       for (var position in colorStops) {
         var colorValue = colorStops[position];
-        gradient.addColorStop(position, colorValue);
+        gradient.addColorStop(parseFloat(position), colorValue);
       }
       return gradient;
     },
@@ -2977,17 +2996,26 @@ fabric.util.animate = animate;
        *    <stop offset="100%" stop-color="black"/>
        *  </linearGradient>
        *
+       *  OR
+       *
+       *  <linearGradient id="grad1">
+       *    <stop offset="0%" style="stop-color:rgb(255,255,255)"/>
+       *    <stop offset="100%" style="stop-color:rgb(0,0,0)"/>
+       *  </linearGradient>
+       *
        */
 
       var colorStopEls = el.getElementsByTagName('stop'),
           el,
           offset,
-          colorStops = { };
+          colorStops = { },
+          colorStopFromStyle;
 
       for (var i = colorStopEls.length; i--; ) {
         el = colorStopEls[i];
         offset = parseInt(el.getAttribute('offset'), 10) / 100;
-        colorStops[offset] = el.getAttribute('stop-color');
+        debugger;
+        colorStops[offset] = getColorStopFromStyle(el) || el.getAttribute('stop-color');
       }
 
       var coords = {
@@ -3039,6 +3067,12 @@ fabric.util.animate = animate;
         else if (prop === 'y1' || prop === 'y2') {
           options[prop] = object.height * percents / 100;
         }
+      }
+      if (prop === 'x1' || prop === 'x2') {
+        options[prop] -= object.width / 2;
+      }
+      else if (prop === 'y1' || prop === 'y2') {
+        options[prop] -= object.height / 2;
       }
     }
   }

@@ -120,16 +120,24 @@
         var id = element.id, match;
         if (match = /\d+$/.exec(id)) {
           loadSVGFromURL('assets/' + match[0] + '.svg', function(objects, options) {
-            var pathGroup = new fabric.PathGroup(objects, options);
-            pathGroup
+            
+            var loadedObject;
+            if (objects.length > 1) {
+              loadedObject = new fabric.PathGroup(objects, options);
+            }
+            else {
+              loadedObject = objects[0];
+            }
+            
+            loadedObject
               .set('left', left)
               .set('top', top)
               .set('angle', angle)
-              .set('fill', '#' + getRandomColor())
+              //.set('fill', '#' + getRandomColor())
               .scaleToWidth(300)
               .setCoords();
               
-            canvas.add(pathGroup);
+            canvas.add(loadedObject);
             canvas.calcOffset();
           });
         }
