@@ -6864,11 +6864,6 @@ fabric.util.animate = animate;
 
       for (var i in this.oCoords) {
         lines = this._getImageLines(this.oCoords[i].corner, i);
-
-        canvas.contextTop.fillStyle = 'red';
-
-
-
         xpoints = this._findCrossPoints(ex, ey, lines);
         if (xpoints % 2 == 1 && xpoints != 0) {
           this.__corner = i;

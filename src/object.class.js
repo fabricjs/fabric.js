@@ -841,11 +841,7 @@
       
       for (var i in this.oCoords) {
         lines = this._getImageLines(this.oCoords[i].corner, i);
-        
-        canvas.contextTop.fillStyle = 'red';
-        
         // debugging
-        
         // canvas.contextTop.fillRect(lines.bottomline.d.x, lines.bottomline.d.y, 2, 2);
         //         canvas.contextTop.fillRect(lines.bottomline.o.x, lines.bottomline.o.y, 2, 2);
         //         
