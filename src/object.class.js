@@ -84,7 +84,7 @@
       theta:                    0,
       opacity:                  1,
       angle:                    0,
-      cornersize:               10,
+      cornersize:               12,
       padding:                  0,
       borderColor:              'rgba(102,153,255,0.75)',
       cornerColor:              'rgba(102,153,255,0.5)',
@@ -512,6 +512,20 @@
         y: bl.y + (this.currentWidth/2 * sinTh)
       }
       
+      // debugging
+      
+      // setTimeout(function() {
+      //         canvas.contextTop.fillStyle = 'green';
+      //         canvas.contextTop.fillRect(mb.x, mb.y, 3, 3);
+      //         canvas.contextTop.fillRect(bl.x, bl.y, 3, 3);
+      //         canvas.contextTop.fillRect(br.x, br.y, 3, 3);
+      //         canvas.contextTop.fillRect(tl.x, tl.y, 3, 3);
+      //         canvas.contextTop.fillRect(tr.x, tr.y, 3, 3);
+      //         canvas.contextTop.fillRect(ml.x, ml.y, 3, 3);
+      //         canvas.contextTop.fillRect(mr.x, mr.y, 3, 3);
+      //         canvas.contextTop.fillRect(mt.x, mt.y, 3, 3);
+      //       }, 50);
+      
       // clockwise
       this.oCoords = { tl: tl, tr: tr, br: br, bl: bl, ml: ml, mt: mt, mr: mr, mb: mb };
       
@@ -827,6 +841,23 @@
       
       for (var i in this.oCoords) {
         lines = this._getImageLines(this.oCoords[i].corner, i);
+        
+        canvas.contextTop.fillStyle = 'red';
+        
+        // debugging
+        
+        // canvas.contextTop.fillRect(lines.bottomline.d.x, lines.bottomline.d.y, 2, 2);
+        //         canvas.contextTop.fillRect(lines.bottomline.o.x, lines.bottomline.o.y, 2, 2);
+        //         
+        //         canvas.contextTop.fillRect(lines.leftline.d.x, lines.leftline.d.y, 2, 2);
+        //         canvas.contextTop.fillRect(lines.leftline.o.x, lines.leftline.o.y, 2, 2);
+        //         
+        //         canvas.contextTop.fillRect(lines.topline.d.x, lines.topline.d.y, 2, 2);
+        //         canvas.contextTop.fillRect(lines.topline.o.x, lines.topline.o.y, 2, 2);
+        //         
+        //         canvas.contextTop.fillRect(lines.rightline.d.x, lines.rightline.d.y, 2, 2);
+        //         canvas.contextTop.fillRect(lines.rightline.o.x, lines.rightline.o.y, 2, 2);
+        
         xpoints = this._findCrossPoints(ex, ey, lines);
         if (xpoints % 2 == 1 && xpoints != 0) {
           this.__corner = i;
@@ -922,212 +953,165 @@
      */ 
     _setCornerCoords: function() {
       var coords = this.oCoords,
-          theta = this.theta,
-          cosOffset = this.cornersize * /*this.scaleX * */ Math.cos(theta),
-          sinOffset = this.cornersize * /*this.scaleY * */ Math.sin(theta),
-          size2 = this.cornersize / 2,
-          size2x = size2 - sinOffset,
-          size2y = size2,
+          theta = fabric.util.degreesToRadians(45 - this.getAngle()),
+          cornerHypotenuse = Math.sqrt(2 * Math.pow(this.cornersize, 2)) / 2,
+          cosHalfOffset = cornerHypotenuse * Math.cos(theta),
+          sinHalfOffset = cornerHypotenuse * Math.sin(theta),
           corner;
-      
-      coords.tl.x -= size2x;
-      coords.tl.y -= size2y;
-      
+
       coords.tl.corner = {
         tl: {
-          x: coords.tl.x,
-          y: coords.tl.y
+          x: coords.tl.x - sinHalfOffset,
+          y: coords.tl.y - cosHalfOffset
         },
         tr: {
-          x: coords.tl.x + cosOffset,
-          y: coords.tl.y + sinOffset
+          x: coords.tl.x + cosHalfOffset,
+          y: coords.tl.y - sinHalfOffset
         },
         bl: {
-          x: coords.tl.x - sinOffset,
-          y: coords.tl.y + cosOffset
+          x: coords.tl.x - cosHalfOffset,
+          y: coords.tl.y + sinHalfOffset
+        },
+        br: {
+          x: coords.tl.x + sinHalfOffset,
+          y: coords.tl.y + cosHalfOffset
         }
       };
-      coords.tl.corner.br = {
-        x: coords.tl.corner.tr.x - sinOffset,
-        y: coords.tl.corner.tr.y + cosOffset
-      };
       
-      coords.tl.x += size2x;
-      coords.tl.y += size2y;
-      
-      coords.tr.x += size2;
-      coords.tr.y -= size2;
       coords.tr.corner = {
         tl: {
-          x: coords.tr.x - cosOffset,
-          y: coords.tr.y - sinOffset
+          x: coords.tr.x - sinHalfOffset,
+          y: coords.tr.y - cosHalfOffset
         },
         tr: {
-          x: coords.tr.x,
-          y: coords.tr.y
+          x: coords.tr.x + cosHalfOffset,
+          y: coords.tr.y - sinHalfOffset
         },
         br: {
-          x: coords.tr.x - sinOffset,
-          y: coords.tr.y + cosOffset
+          x: coords.tr.x + sinHalfOffset,
+          y: coords.tr.y + cosHalfOffset
+        },
+        bl: {
+          x: coords.tr.x - cosHalfOffset,
+          y: coords.tr.y + sinHalfOffset
         }
       };
-      coords.tr.corner.bl = {
-        x: coords.tr.corner.tl.x - sinOffset,
-        y: coords.tr.corner.tl.y + cosOffset
-      };
-      coords.tr.x -= size2;
-      coords.tr.y += size2;
       
-      coords.bl.x -= size2;
-      coords.bl.y += size2;
       coords.bl.corner = {
         tl: {
-          x: coords.bl.x + sinOffset,
-          y: coords.bl.y - cosOffset
+          x: coords.bl.x - sinHalfOffset,
+          y: coords.bl.y - cosHalfOffset
         },
         bl: {
-          x: coords.bl.x,
-          y: coords.bl.y
+          x: coords.bl.x - cosHalfOffset,
+          y: coords.bl.y + sinHalfOffset
         },
         br: {
-          x: coords.bl.x + cosOffset,
-          y: coords.bl.y + sinOffset
+          x: coords.bl.x + sinHalfOffset,
+          y: coords.bl.y + cosHalfOffset
+        },
+        tr: {
+          x: coords.bl.x + cosHalfOffset,
+          y: coords.bl.y - sinHalfOffset
         }
       };
-      coords.bl.corner.tr = {
-        x: coords.bl.corner.br.x + sinOffset,
-        y: coords.bl.corner.br.y - cosOffset
-      };
-      coords.bl.x += size2;
-      coords.bl.y -= size2;
       
-      coords.br.x += size2;
-      coords.br.y += size2;
       coords.br.corner = {
         tr: {
-          x: coords.br.x + sinOffset,
-          y: coords.br.y - cosOffset
+          x: coords.br.x + cosHalfOffset,
+          y: coords.br.y - sinHalfOffset
         },
         bl: {
-          x: coords.br.x - cosOffset,
-          y: coords.br.y - sinOffset
+          x: coords.br.x - cosHalfOffset,
+          y: coords.br.y + sinHalfOffset
         },
         br: {
-          x: coords.br.x,
-          y: coords.br.y
+          x: coords.br.x + sinHalfOffset,
+          y: coords.br.y + cosHalfOffset
+        },
+        tl: {
+          x: coords.br.x - sinHalfOffset,
+          y: coords.br.y - cosHalfOffset
         }
       };
-      coords.br.corner.tl = {
-        x: coords.br.corner.bl.x + sinOffset,
-        y: coords.br.corner.bl.y - cosOffset
-      };
-      coords.br.x -= size2;
-      coords.br.y -= size2;
-      
-      
-      coords.ml.x -= size2;
-      coords.ml.y -= size2;
+
       coords.ml.corner = {
         tl: {
-          x: coords.ml.x,
-          y: coords.ml.y
+          x: coords.ml.x - sinHalfOffset,
+          y: coords.ml.y - cosHalfOffset
         },
         tr: {
-          x: coords.ml.x + cosOffset,
-          y: coords.ml.y + sinOffset
+          x: coords.ml.x + cosHalfOffset,
+          y: coords.ml.y - sinHalfOffset
         },
         bl: {
-          x: coords.ml.x - sinOffset,
-          y: coords.ml.y + cosOffset
+          x: coords.ml.x - cosHalfOffset,
+          y: coords.ml.y + sinHalfOffset
+        },
+        br: {
+          x: coords.ml.x + sinHalfOffset,
+          y: coords.ml.y + cosHalfOffset
         }
       };
-      coords.ml.corner.br = {
-        x: coords.ml.corner.tr.x - sinOffset,
-        y: coords.ml.corner.tr.y + cosOffset
-      };
-      coords.ml.x += size2;
-      coords.ml.y += size2;
       
-      coords.mt.x -= size2;
-      coords.mt.y -= size2;
       coords.mt.corner = {
         tl: {
-          x: coords.mt.x,
-          y: coords.mt.y
+          x: coords.mt.x - sinHalfOffset,
+          y: coords.mt.y - cosHalfOffset
         },
         tr: {
-          x: coords.mt.x + cosOffset,
-          y: coords.mt.y + sinOffset
+          x: coords.mt.x + cosHalfOffset,
+          y: coords.mt.y - sinHalfOffset
         },
         bl: {
-          x: coords.mt.x - sinOffset,
-          y: coords.mt.y + cosOffset
+          x: coords.mt.x - cosHalfOffset,
+          y: coords.mt.y + sinHalfOffset
+        },
+        br: {
+          x: coords.mt.x + sinHalfOffset,
+          y: coords.mt.y + cosHalfOffset
         }
       };
-      coords.mt.corner.br = {
-        x: coords.mt.corner.tr.x - sinOffset,
-        y: coords.mt.corner.tr.y + cosOffset
-      };
-      coords.mt.x += size2;
-      coords.mt.y += size2;
-      
-      coords.mr.x -= size2;
-      coords.mr.y -= size2;
+
       coords.mr.corner = {
         tl: {
-          x: coords.mr.x,
-          y: coords.mr.y
+          x: coords.mr.x - sinHalfOffset,
+          y: coords.mr.y - cosHalfOffset
         },
         tr: {
-          x: coords.mr.x + cosOffset,
-          y: coords.mr.y + sinOffset
+          x: coords.mr.x + cosHalfOffset,
+          y: coords.mr.y - sinHalfOffset
         },
         bl: {
-          x: coords.mr.x - sinOffset,
-          y: coords.mr.y + cosOffset
+          x: coords.mr.x - cosHalfOffset,
+          y: coords.mr.y + sinHalfOffset
+        },
+        br: {
+          x: coords.mr.x + sinHalfOffset,
+          y: coords.mr.y + cosHalfOffset
         }
       };
-      coords.mr.corner.br = {
-        x: coords.mr.corner.tr.x - sinOffset,
-        y: coords.mr.corner.tr.y + cosOffset
-      };
-      coords.mr.x += size2;
-      coords.mr.y += size2;
       
-      coords.mb.x -= size2;
-      coords.mb.y -= size2;
       coords.mb.corner = {
         tl: {
-          x: coords.mb.x,
-          y: coords.mb.y
+          x: coords.mb.x - sinHalfOffset,
+          y: coords.mb.y - cosHalfOffset
         },
         tr: {
-          x: coords.mb.x + cosOffset,
-          y: coords.mb.y + sinOffset
+          x: coords.mb.x + cosHalfOffset,
+          y: coords.mb.y - sinHalfOffset
         },
         bl: {
-          x: coords.mb.x - sinOffset,
-          y: coords.mb.y + cosOffset
+          x: coords.mb.x - cosHalfOffset,
+          y: coords.mb.y + sinHalfOffset
+        },
+        br: {
+          x: coords.mb.x + sinHalfOffset,
+          y: coords.mb.y + cosHalfOffset
         }
       };
-      coords.mb.corner.br = {
-        x: coords.mb.corner.tr.x - sinOffset,
-        y: coords.mb.corner.tr.y + cosOffset
-      };
-      
-      coords.mb.x += size2;
-      coords.mb.y += size2;
-      
+
       corner = coords.mb.corner;
-      
-      corner.tl.x -= size2;
-      corner.tl.y -= size2;
-      corner.tr.x -= size2;
-      corner.tr.y -= size2;
-      corner.br.x -= size2;
-      corner.br.y -= size2;
-      corner.bl.x -= size2;
-      corner.bl.y -= size2;
     },
     
     /**
