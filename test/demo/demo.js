@@ -316,7 +316,9 @@
     lockScalingEl, 
     lockRotationEl, 
     removeSelectedEl,
-    gradientifyBtn
+    gradientifyBtn,
+    document.getElementById('opacity'),
+    document.getElementById('color')
   ];
   
   for (var i = activeObjectButtons.length; i--; ) {
