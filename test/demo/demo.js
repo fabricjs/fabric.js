@@ -189,41 +189,79 @@
     }
   };
   
-  var supportsSlider = (function(){
-    var el = document.createElement('input');
-    try {
-      el.type = 'range';
-    }
-    catch(err) { }
-    return el.type === 'range';
-  })();
+  var supportsInputOfType = function(type) {
+    return function() {
+      var el = document.createElement('input');
+      try {
+        el.type = type;
+      }
+      catch(err) { }
+      return el.type === type;
+    };
+  };
+  
+  var supportsSlider = supportsInputOfType('range'),
+      supportsColorpicker = supportsInputOfType('color');
   
   if (supportsSlider) {
-    var controls = document.getElementById('controls');
-    
-    var sliderLabel = document.createElement('label');
-    sliderLabel.htmlFor = 'opacity';
-    sliderLabel.innerHTML = 'Opacity: ';
-    
-    var slider = document.createElement('input');
-    slider.type = 'range';
-    slider.id = 'opacity';
-    slider.value = 100;
-    
-    controls.appendChild(sliderLabel);
-    controls.appendChild(slider);
-    
-    canvas.calcOffset();
-    
-    slider.onchange = function() {
-      var activeObject = canvas.getActiveObject(),
-          activeGroup = canvas.getActiveGroup();
-          
-      if (activeObject || activeGroup) {
-        (activeObject || activeGroup).set('opacity', parseInt(this.value, 10) / 100);
-        canvas.renderAll();
-      }
-    };
+    (function(){
+      var controls = document.getElementById('controls');
+
+      var sliderLabel = document.createElement('label');
+      sliderLabel.htmlFor = 'opacity';
+      sliderLabel.innerHTML = 'Opacity: ';
+
+      var slider = document.createElement('input');
+      slider.type = 'range';
+      slider.id = 'opacity';
+      slider.value = 100;
+
+      controls.appendChild(sliderLabel);
+      controls.appendChild(slider);
+
+      canvas.calcOffset();
+
+      slider.onchange = function() {
+        var activeObject = canvas.getActiveObject(),
+            activeGroup = canvas.getActiveGroup();
+
+        if (activeObject || activeGroup) {
+          (activeObject || activeGroup).set('opacity', parseInt(this.value, 10) / 100);
+          canvas.renderAll();
+        }
+      };
+    })();
+  }
+  
+  if (supportsColorpicker) {
+    (function(){
+      var controls = document.getElementById('controls');
+
+      var label = document.createElement('label');
+      label.htmlFor = 'color';
+      label.innerHTML = 'Color: ';
+      label.style.marginLeft = '10px';
+
+      var colorpicker = document.createElement('input');
+      colorpicker.type = 'color';
+      colorpicker.id = 'color';
+      colorpicker.style.width = '40px';
+
+      controls.appendChild(label);
+      controls.appendChild(colorpicker);
+
+      canvas.calcOffset();
+
+      colorpicker.onchange = function() {
+        var activeObject = canvas.getActiveObject(),
+            activeGroup = canvas.getActiveGroup();
+
+        if (activeObject || activeGroup) {
+          (activeObject || activeGroup).set('fill', this.value);
+          canvas.renderAll();
+        }
+      };
+    })();
   }
   
   var lockHorizontallyEl = document.getElementById('lock-horizontally');
