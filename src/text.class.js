@@ -28,12 +28,15 @@
      * @type Object
      */
     options: {
-      top:         10,
-      left:        10,
-      fontsize:    20,
-      fontweight:  100,
-      fontfamily:  'Modernist_One_400',
-      path:        null
+      top:            10,
+      left:           10,
+      fontsize:       20,
+      fontweight:     100,
+      fontfamily:     'Modernist_One_400',
+      textDecoration: '',
+      textShadow:     '',
+      fontStyle:      '',
+      path:           null
     },
     
     /**
@@ -73,7 +76,15 @@
           (o = o.stateProperties) &&
           o.clone) {
         this.stateProperties = o.clone();
-        this.stateProperties.push('fontfamily', 'fontweight', 'path', 'text');
+        this.stateProperties.push(
+          'fontfamily', 
+          'fontweight', 
+          'path', 
+          'text', 
+          'textDecoration', 
+          'textShadow', 
+          'fontStyle'
+        );
         fabric.util.removeFromArray(this.stateProperties, 'width');
       }
     },
@@ -110,7 +121,10 @@
       // draw text
       Cufon.replaceElement(el, {
         separate: 'none', 
-        fontFamily: this.fontfamily
+        fontFamily: this.fontfamily,
+        enableTextDecoration: true,
+        textDecoration: this.textDecoration,
+        textShadow: this.textShadow
       });
       
       // update width, height
@@ -123,7 +137,11 @@
      * @method _initDummyElement
      */
     _initDummyElement: function() {
-      var el = document.createElement('div');
+      var el = document.createElement('div'),
+          container = document.createElement('div');
+      
+      // Cufon doesn't play nice with textDecoration=underline if element doesn't have a parent
+      container.appendChild(el);
       el.innerHTML = this.text;
       
       // need to specify these manually, since Jaxer doesn't support retrieving computed style
@@ -160,11 +178,14 @@
   	 */
   	toObject: function() {
   	  return extend(this.callSuper('toObject'), {
-  	    text:         this.text,
-  	    fontsize:     this.fontsize,
-  	    fontweight:   this.fontweight,
-  	    fontfamily:   this.fontfamily,
-  	    path:         this.path
+  	    text:           this.text,
+  	    fontsize:       this.fontsize,
+  	    fontweight:     this.fontweight,
+  	    fontfamily:     this.fontfamily,
+  	    fontStyle:      this.fontStyle,
+  	    textDecoration: this.textDecoration,
+  	    textShadow:     this.textShadow,
+  	    path:           this.path
   	  });
   	},
   	
