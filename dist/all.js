@@ -952,7 +952,7 @@ var Cufon = (function() {
 	api.replace = function(elements, options, ignoreHistory) {
 		options = merge(defaultOptions, options);
 		if (!options.engine) return api; // there's no browser support so we'll just stop here
-		if (typeof options.textShadow == 'string')
+		if (typeof options.textShadow == 'string' && options.textShadow)
 			options.textShadow = CSS.textShadow(options.textShadow);
 		if (!ignoreHistory) replaceHistory.push(arguments);
 		if (elements.nodeType || typeof elements == 'string') elements = [ elements ];
@@ -968,7 +968,7 @@ var Cufon = (function() {
 
 	api.replaceElement = function(el, options) {
 	  options = merge(defaultOptions, options);
-	  if (typeof options.textShadow == 'string')
+	  if (typeof options.textShadow == 'string' && options.textShadow)
       options.textShadow = CSS.textShadow(options.textShadow);
 	  return replaceElement(el, options);
 	};
@@ -1084,11 +1084,20 @@ Cufon.registerEngine('canvas', (function() {
 
 		var width = 0, lastWidth = null;
 
+    var maxWidth = 0;
 		for (var i = 0, l = chars.length; i < l; ++i) {
+		  if (chars[i] === '\n') {
+			  if (width > maxWidth) {
+			    maxWidth = width;
+			  }
+			  width = 0;
+			  continue;
+			}
 			var glyph = font.glyphs[chars[i]] || font.missingGlyph;
 			if (!glyph) continue;
 			width += lastWidth = Number(glyph.w || font.w) + letterSpacing;
 		}
+		width = Math.max(maxWidth, width)
 
 		if (lastWidth === null) return null; // there's nothing to render
 
@@ -1176,15 +1185,27 @@ Cufon.registerEngine('canvas', (function() {
 			g.stroke();
 		}
 
-		var textDecoration = options.enableTextDecoration ? Cufon.CSS.textDecoration(el, style) : {};
+		var textDecoration = options.enableTextDecoration ? Cufon.CSS.textDecoration(el, style) : {},
+		    isItalic = options.fontStyle === 'italic';
 
-		if (textDecoration.underline) line(-font.face['underline-position'], textDecoration.underline);
-		if (textDecoration.overline) line(font.ascent, textDecoration.overline);
+    g.fillStyle = Cufon.textOptions.color || style.get('color');
 
-		g.fillStyle = Cufon.textOptions.color || style.get('color');
+		if (textDecoration.underline) line(-font.face['underline-position'], g.fillStyle);
+		if (textDecoration.overline) line(font.ascent, g.fillStyle);
+		if (textDecoration['line-through']) line(-font.descent, g.fillStyle);
 
 		function renderText() {
+		  if (isItalic) {
+		    g.save();
+		    g.transform(1, 0, -0.25, 1, 0, 0);
+		  }
+		  var left = 0;
 			for (var i = 0, l = chars.length; i < l; ++i) {
+			  if (chars[i] === '\n') {
+          g.translate(-left, -font.ascent);
+          left = 0;
+          continue;
+        }
 				var glyph = font.glyphs[chars[i]] || font.missingGlyph;
 				if (!glyph) continue;
 				g.beginPath();
@@ -1193,7 +1214,12 @@ Cufon.registerEngine('canvas', (function() {
 					else glyph.code = generateFromVML('m' + glyph.d, g);
 				}
 				g.fill();
-				g.translate(Number(glyph.w || font.w) + letterSpacing, 0);
+				var charWidth = Number(glyph.w || font.w) + letterSpacing;
+				g.translate(charWidth, 0);
+				left += charWidth;
+			}
+			if (isItalic) {
+			  g.restore();
 			}
 		}
 
@@ -1212,8 +1238,6 @@ Cufon.registerEngine('canvas', (function() {
 
 		g.restore();
 		g.restore();
-
-		if (textDecoration['line-through']) line(-font.descent, textDecoration['line-through']);
 
 		return wrapper;
 
@@ -3931,6 +3955,20 @@ fabric.util.animate = animate;
     shouldCacheImages:      false,
 
     /**
+     * Indicates whether objects' state should be saved
+     * @property
+     * @type Boolean
+     */
+    stateful:               true,
+
+    /**
+     * Indicates whether fabric.Element#add should also re-render canvas.
+     * Disabling this option could give a great performance boost when adding a lot of objects to canvas at once
+     * (followed by a manual rendering after addition)
+     */
+    renderOnAddition:       true,
+
+    /**
      * @constant
      * @type Number
      */
@@ -3956,9 +3994,7 @@ fabric.util.animate = animate;
      * @method onFpsUpdate
      * @param {Number} fps
      */
-    onFpsUpdate: function(fps) {
-      /* NOOP */
-    },
+    onFpsUpdate: null,
 
     /**
      * Calculates canvas element offset relative to the document
@@ -4067,6 +4103,10 @@ fabric.util.animate = animate;
      */
     _initConfig: function (config) {
       extend(this._config, config || { });
+
+      for (var prop in this._config) {
+        this[prop] = this._config[prop];
+      }
 
       this._config.width = parseInt(this._element.width, 10) || 0;
       this._config.height = parseInt(this._element.height, 10) || 0;
@@ -4261,7 +4301,7 @@ fabric.util.animate = animate;
           this._objects[i].setCoords();
         }
 
-        if (target.hasStateChanged()) {
+        if (this.stateful && target.hasStateChanged()) {
           target.isMoving = false;
           fireEvent('object:modified', { target: target });
         }
@@ -4274,7 +4314,7 @@ fabric.util.animate = animate;
       }
       var activeGroup = this.getActiveGroup();
       if (activeGroup) {
-        if (activeGroup.hasStateChanged() &&
+        if (this.stateful && activeGroup.hasStateChanged() &&
             activeGroup.containsPoint(this.getPointer(e))) {
           fireEvent('group:modified', { target: activeGroup });
         }
@@ -4350,7 +4390,7 @@ fabric.util.animate = animate;
         this.deactivateAllWithDispatch();
       }
       else {
-        target.saveState();
+        this.stateful && target.saveState();
 
         if (corner = target._findTargetCorner(e, this._offset)) {
           this.onBeforeScaleRotate(target);
@@ -4824,7 +4864,12 @@ fabric.util.animate = animate;
      */
     add: function () {
       this._objects.push.apply(this._objects, arguments);
-      this.renderAll();
+      if (this.stateful) {
+        for (var i = arguments.length; i--; ) {
+          arguments[i].setupState();
+        }
+      }
+      this.renderOnAddition && this.renderAll();
       return this;
     },
 
@@ -4909,9 +4954,8 @@ fabric.util.animate = animate;
       containerCanvas.fillRect(0, 0, w, h);
 
       var length = this._objects.length,
-          activeGroup = this.getActiveGroup();
-
-      var startTime = new Date();
+          activeGroup = this.getActiveGroup(),
+          startTime = new Date();
 
       if (length) {
         for (var i = 0; i < length; ++i) {
@@ -4931,8 +4975,10 @@ fabric.util.animate = animate;
         this.contextTop.drawImage(this.overlayImage, 0, 0);
       }
 
-      var elapsedTime = new Date() - startTime;
-      this.onFpsUpdate(~~(1000 / elapsedTime));
+      if (this.onFpsUpdate) {
+        var elapsedTime = new Date() - startTime;
+        this.onFpsUpdate(~~(1000 / elapsedTime));
+      }
 
       fireEvent('after:render');
 
@@ -5571,10 +5617,9 @@ fabric.util.animate = animate;
           });
         }
         else {
-          new Ajax.Request(url, {
+          new fabric.util.request(url, {
             method: 'get',
-            onComplete: onComplete,
-            onFailure: onFailure
+            onComplete: onComplete
           });
         }
       });
@@ -5589,15 +5634,11 @@ fabric.util.animate = animate;
 
         fabric.parseSVGDocument(doc, function (results, options) {
           _this.cache.set(url, {
-            objects: results.invoke('toObject'),
+            objects: fabric.util.array.invoke(results, 'toObject'),
             options: options
           });
           callback(results, options);
         });
-      }
-
-      function onFailure() {
-        fabric.log('ERROR!');
       }
     },
 
@@ -6174,9 +6215,7 @@ fabric.util.animate = animate;
     initialize: function(options) {
       this.setOptions(options);
       this._importProperties();
-      this.originalState = { };
       this.setCoords();
-      this.saveState();
     },
 
     /**
@@ -6218,11 +6257,13 @@ fabric.util.animate = animate;
      * @method _importProperties
      */
     _importProperties: function() {
-      this.stateProperties.forEach(function(prop) {
+      var i = this.stateProperties.length, prop;
+      while (i--) {
+        prop = this.stateProperties[i];
         (prop === 'angle')
           ? this.setAngle(this.options[prop])
           : (this[prop] = this.options[prop]);
-      }, this);
+      }
     },
 
     /**
@@ -6773,6 +6814,14 @@ fabric.util.animate = animate;
     },
 
     /**
+     * @method setupState
+     */
+    setupState: function() {
+      this.originalState = { };
+      this.saveState();
+    },
+
+    /**
      * Returns true if object intersects with an area formed by 2 points
      * @method intersectsWithRect
      * @param {Object} selectionTL
@@ -6864,6 +6913,7 @@ fabric.util.animate = animate;
 
       for (var i in this.oCoords) {
         lines = this._getImageLines(this.oCoords[i].corner, i);
+
         xpoints = this._findCrossPoints(ex, ey, lines);
         if (xpoints % 2 == 1 && xpoints != 0) {
           this.__corner = i;
@@ -7521,7 +7571,8 @@ fabric.util.animate = animate;
    */
   fabric.Circle.fromObject = function(object) {
     return new fabric.Circle(object);
-  }
+  };
+
 })(this);
 (function(global) {
 
@@ -9416,12 +9467,15 @@ fabric.util.animate = animate;
      * @type Object
      */
     options: {
-      top:         10,
-      left:        10,
-      fontsize:    20,
-      fontweight:  100,
-      fontfamily:  'Modernist_One_400',
-      path:        null
+      top:            10,
+      left:           10,
+      fontsize:       20,
+      fontweight:     100,
+      fontfamily:     'Modernist_One_400',
+      textDecoration: '',
+      textShadow:     null,
+      fontStyle:      '',
+      path:           null
     },
 
     /**
@@ -9461,7 +9515,15 @@ fabric.util.animate = animate;
           (o = o.stateProperties) &&
           o.clone) {
         this.stateProperties = o.clone();
-        this.stateProperties.push('fontfamily', 'fontweight', 'path', 'text');
+        this.stateProperties.push(
+          'fontfamily',
+          'fontweight',
+          'path',
+          'text',
+          'textDecoration',
+          'textShadow',
+          'fontStyle'
+        );
         fabric.util.removeFromArray(this.stateProperties, 'width');
       }
     },
@@ -9495,7 +9557,10 @@ fabric.util.animate = animate;
 
       Cufon.replaceElement(el, {
         separate: 'none',
-        fontFamily: this.fontfamily
+        fontFamily: this.fontfamily,
+        enableTextDecoration: true,
+        textDecoration: this.textDecoration,
+        textShadow: this.textShadow
       });
 
       this.width = o.width;
@@ -9507,7 +9572,10 @@ fabric.util.animate = animate;
      * @method _initDummyElement
      */
     _initDummyElement: function() {
-      var el = document.createElement('div');
+      var el = document.createElement('div'),
+          container = document.createElement('div');
+
+      container.appendChild(el);
       el.innerHTML = this.text;
 
       el.style.fontSize = '40px';
@@ -9543,11 +9611,14 @@ fabric.util.animate = animate;
   	 */
   	toObject: function() {
   	  return extend(this.callSuper('toObject'), {
-  	    text:         this.text,
-  	    fontsize:     this.fontsize,
-  	    fontweight:   this.fontweight,
-  	    fontfamily:   this.fontfamily,
-  	    path:         this.path
+  	    text:           this.text,
+  	    fontsize:       this.fontsize,
+  	    fontweight:     this.fontweight,
+  	    fontfamily:     this.fontfamily,
+  	    fontStyle:      this.fontStyle,
+  	    textDecoration: this.textDecoration,
+  	    textShadow:     this.textShadow,
+  	    path:           this.path
   	  });
   	},
 

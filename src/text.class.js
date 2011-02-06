@@ -34,7 +34,7 @@
       fontweight:     100,
       fontfamily:     'Modernist_One_400',
       textDecoration: '',
-      textShadow:     '',
+      textShadow:     null,
       fontStyle:      '',
       path:           null
     },

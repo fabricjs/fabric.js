@@ -17,30 +17,13 @@
       pad(getRandomInt(0, 255).toString(16), 2)
     );
   }
+  
   function getRandomNum(min, max) {
     return Math.random() * (max - min) + min;
   }
-  function loadSVGFromURL(url, callback) {
-    new fabric.util.request(url, {
-      method: 'get',
-      onComplete: function(r) {
-        var xml = r.responseXML;
-        if (!xml) return;
-        var doc = xml.documentElement;
-        if (!doc) return;
-        
-        var startTime = new Date();
-        fabric.parseSVGDocument(doc, function() {
-          console.log((new Date() - startTime) + 'ms');
-          callback.apply(this, arguments);
-        });
-      }
-    })
-  }
   
-  var canvas = global.canvas = new fabric.Element('canvas');
-  
-  var fpsEl = document.getElementById('fps').firstChild;
+  var canvas = global.canvas = new fabric.Element('canvas'),
+      fpsEl = document.getElementById('fps').firstChild;
   
   canvas.onFpsUpdate = function(fps) {
     fpsEl.nodeValue = 'FPS: ' + fps;
@@ -119,7 +102,7 @@
       case 'shape':
         var id = element.id, match;
         if (match = /\d+$/.exec(id)) {
-          loadSVGFromURL('assets/' + match[0] + '.svg', function(objects, options) {
+          canvas.loadSVGFromURL('assets/' + match[0] + '.svg', function(objects, options) {
             
             var loadedObject;
             if (objects.length > 1) {
@@ -394,17 +377,17 @@
     if (obj && e.keyCode === 8) {
       // this is horrible. need to fix, so that unified interface can be used
       if (obj.type === 'group') {
-        var groupObjects = obj.getObjects();
-        canvas.removeActiveGroup();
-        groupObjects.forEach(function(obj) {
-          canvas.remove(obj);
-        });
+        // var groupObjects = obj.getObjects();
+        //         canvas.removeActiveGroup();
+        //         groupObjects.forEach(function(obj) {
+        //           canvas.remove(obj);
+        //         });
       }
       else {
-        canvas.remove(obj);
+        //canvas.remove(obj);
       }
       canvas.renderAll();
-      return false;
+      // return false;
     }
   };
   
@@ -431,5 +414,28 @@
       canvas.renderAll();
     }
   };
+  
+  var textEl = document.getElementById('text');
+  if (textEl) {
+    textEl.onfocus = function() {
+      var activeObject = canvas.getActiveObject();
+    
+      if (activeObject && activeObject.type === 'text') {
+        this.value = activeObject.text;
+      }
+    };
+    textEl.onkeyup = function(e) {
+      var activeObject = canvas.getActiveObject();
+      if (activeObject) {
+        if (!this.value) {
+          canvas.removeActiveObject();
+        }
+        else {
+          activeObject.text = this.value;
+        }
+        canvas.renderAll();
+      }
+    };
+  }
   
 })(this);
