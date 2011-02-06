@@ -119,12 +119,8 @@
       this.setOptions(options);
       // "import" state properties into an instance
       this._importProperties();
-      // create "local" members
-      this.originalState = { };
       // set initial coords
       this.setCoords();
-      // setup state properties
-      this.saveState();
     },
     
     /**
@@ -167,11 +163,13 @@
      * @method _importProperties
      */
     _importProperties: function() {
-      this.stateProperties.forEach(function(prop) {
-        (prop === 'angle') 
+      var i = this.stateProperties.length, prop;
+      while (i--) {
+        prop = this.stateProperties[i];
+        (prop === 'angle')
           ? this.setAngle(this.options[prop])
           : (this[prop] = this.options[prop]);
-      }, this);
+      }
     },
     
     /**
@@ -746,6 +744,14 @@
         this.originalState[prop] = this.get(prop);
       }, this);
       return this;
+    },
+    
+    /**
+     * @method setupState
+     */
+    setupState: function() {
+      this.originalState = { };
+      this.saveState();
     },
     
     /**

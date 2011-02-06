@@ -112,7 +112,7 @@
       * @property _config
       * @type object
       */
-    this._config = { 
+    this._config = {
       width: 300, 
       height: 150 
     };
@@ -193,6 +193,20 @@
     shouldCacheImages:      false,
     
     /**
+     * Indicates whether objects' state should be saved
+     * @property
+     * @type Boolean
+     */
+    stateful:               true,
+    
+    /**
+     * Indicates whether fabric.Element#add should also re-render canvas. 
+     * Disabling this option could give a great performance boost when adding a lot of objects to canvas at once 
+     * (followed by a manual rendering after addition)
+     */
+    renderOnAddition:       true,
+    
+    /**
      * @constant
      * @type Number
      */
@@ -218,9 +232,7 @@
      * @method onFpsUpdate
      * @param {Number} fps
      */
-    onFpsUpdate: function(fps) {
-      /* NOOP */
-    },
+    onFpsUpdate: null,
     
     /**
      * Calculates canvas element offset relative to the document
@@ -329,6 +341,10 @@
      */
     _initConfig: function (config) {
       extend(this._config, config || { });
+      
+      for (var prop in this._config) {
+        this[prop] = this._config[prop];
+      }
       
       this._config.width = parseInt(this._element.width, 10) || 0;
       this._config.height = parseInt(this._element.height, 10) || 0;
@@ -528,7 +544,7 @@
         }
         
         // only fire :modified event if target coordinates were changed during mousedown-mouseup
-        if (target.hasStateChanged()) {
+        if (this.stateful && target.hasStateChanged()) {
           target.isMoving = false;
           fireEvent('object:modified', { target: target });
         }
@@ -542,7 +558,7 @@
       }
       var activeGroup = this.getActiveGroup();
       if (activeGroup) {
-        if (activeGroup.hasStateChanged() && 
+        if (this.stateful && activeGroup.hasStateChanged() && 
             activeGroup.containsPoint(this.getPointer(e))) {
           fireEvent('group:modified', { target: activeGroup });
         }
@@ -624,7 +640,7 @@
       else {
         // determine if it's a drag or rotate case
         // rotate and scale will happen at the same time
-        target.saveState();
+        this.stateful && target.saveState();
         
         if (corner = target._findTargetCorner(e, this._offset)) {
           this.onBeforeScaleRotate(target);
@@ -1123,7 +1139,12 @@
      */
     add: function () {
       this._objects.push.apply(this._objects, arguments);
-      this.renderAll();
+      if (this.stateful) {
+        for (var i = arguments.length; i--; ) {
+          arguments[i].setupState();
+        }
+      }
+      this.renderOnAddition && this.renderAll();
       return this;
     },
     
@@ -1212,9 +1233,8 @@
       containerCanvas.fillRect(0, 0, w, h);
       
       var length = this._objects.length,
-          activeGroup = this.getActiveGroup();
-      
-      var startTime = new Date();
+          activeGroup = this.getActiveGroup(),
+          startTime = new Date();
       
       if (length) {
         for (var i = 0; i < length; ++i) {
@@ -1235,8 +1255,10 @@
         this.contextTop.drawImage(this.overlayImage, 0, 0);
       }
       
-      var elapsedTime = new Date() - startTime;
-      this.onFpsUpdate(~~(1000 / elapsedTime));
+      if (this.onFpsUpdate) {
+        var elapsedTime = new Date() - startTime;
+        this.onFpsUpdate(~~(1000 / elapsedTime));
+      }
       
       fireEvent('after:render');
       

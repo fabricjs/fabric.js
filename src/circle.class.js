@@ -127,5 +127,6 @@
    */
   fabric.Circle.fromObject = function(object) {
     return new fabric.Circle(object);
-  }
+  };
+  
 })(this);
