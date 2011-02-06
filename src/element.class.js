@@ -1919,11 +1919,9 @@
           });
         }
         else {
-          // TODO (kangax): replace Prototype's API with fabric's util one
-          new Ajax.Request(url, {
+          new fabric.util.request(url, {
             method: 'get',
-            onComplete: onComplete,
-            onFailure: onFailure
+            onComplete: onComplete
           });
         }
       });
@@ -1938,15 +1936,11 @@
         
         fabric.parseSVGDocument(doc, function (results, options) {
           _this.cache.set(url, {
-            objects: results.invoke('toObject'),
+            objects: fabric.util.array.invoke(results, 'toObject'),
             options: options
           });
           callback(results, options);
         });
-      }
-      
-      function onFailure() {
-        fabric.log('ERROR!');
       }
     },
     
