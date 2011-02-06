@@ -5631,8 +5631,10 @@ fabric.util.animate = animate;
 
         var doc = xml.documentElement;
         if (!doc) return;
-
+        
+        var t = new Date();
         fabric.parseSVGDocument(doc, function (results, options) {
+          fabric.documentParsingTime = new Date() - t;
           _this.cache.set(url, {
             objects: fabric.util.array.invoke(results, 'toObject'),
             options: options

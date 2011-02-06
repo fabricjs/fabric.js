@@ -46,7 +46,7 @@
           var shape = Raphael(tiger).translate(200, 200);
           shape.drag(start, move, up);
           
-          logEl.innerHTML = 'Raphael: ' + (new Date() - startTime) + 'ms<br>';
+          logEl.innerHTML = 'Raphael: <b>' + (new Date() - startTime) + '</b>ms<br>';
           
         })();
         
@@ -71,7 +71,8 @@
             canvas.add(group);
             canvas.renderAll();
             
-            logEl.innerHTML += 'fabric: ' + (new Date() - startTime) + 'ms';
+            logEl.innerHTML += 'fabric: <b>' + fabric.documentParsingTime + '</b>ms (to parse SVG doc), <b>' + 
+              (new Date() - startTime) + '</b>ms (to render its interactive representation on canvas)';
           });
           
           canvas.calcOffset();

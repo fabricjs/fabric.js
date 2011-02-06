@@ -52,24 +52,31 @@
                 stateful: false 
               }),
               Image = fabric.Image,
-              startTime = new Date(),
+              totalTime = 0,
               circle;
 
           for (var i = numObjects; i--; ) {
-            fabric.Image.fromURL('pug.jpg', function(o) {
-              o.set('left', getRandomNum(-25, width))
-                .set('top', getRandomNum(-25, height))
-                .scale(0.2)
-                .setCoords();
-              o.rotate(getRandomNum(0, 90));
-              o.set('opacity', opacity);
-              canvas.add(o);
-              canvas.renderAll();
-            });
+            fabric.Image.fromURL('pug.jpg', (function(i){
+              return function(o) {
+                var startTime = new Date();
+
+                o.set('left', getRandomNum(-25, width))
+                  .set('top', getRandomNum(-25, height))
+                  .scale(0.2)
+                  .setCoords();
+                o.rotate(getRandomNum(0, 90));
+                o.set('opacity', opacity);
+                canvas.add(o);
+
+                if (i === 0) {
+                  canvas.renderAll();
+                  logEl.innerHTML += 'fabric: ' + totalTime + 'ms';
+                }
+
+                totalTime += (new Date() - startTime);
+              };
+            })(i));
           }
-          canvas.renderAll();
-          
-          logEl.innerHTML += 'fabric: ' + (new Date() - startTime) + 'ms';
           
         })();
       };
