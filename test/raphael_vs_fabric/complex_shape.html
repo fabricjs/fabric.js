@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Complex shape</title>
+    <style>
+      svg {
+        border: 1px solid #000;
+      }
+      .canvas_container {
+        border: 1px solid #000;
+        position: relative;
+      }
+    </style>
+    <script src="raphael-min.js"></script>
+    <script src="../../dist/all.js"></script>
+    <script src="tiger.js"></script>
+    <script>
+      
+      var numObjects = 5,
+          width = 500,
+          height = 500;
+          
+      window.onload = function() {
+        
+        var logEl = document.getElementById('log');
+        
+        (function testRaphael() {
+          
+          var start = function () {
+            // storing original coordinates
+            this.ox = this.attr("cx");
+            this.oy = this.attr("cy");
+            this.attr({opacity: .5});
+          },
+          move = function (dx, dy) {
+            // move will be called with dx and dy
+            this.attr({cx: this.ox + dx, cy: this.oy + dy});
+          },
+          up = function () {
+            // restoring state
+            this.attr({opacity: 1});
+          };
+          
+          var startTime = new Date();
+          var shape = Raphael(tiger).translate(200, 200);
+          shape.drag(start, move, up);
+          
+          logEl.innerHTML = 'Raphael: ' + (new Date() - startTime) + 'ms<br>';
+          
+        })();
+        
+        (function testFabric() {
+          
+          var canvas = window.__canvas = new fabric.Element('canvas', { 
+                renderOnAddition: false, 
+                stateful: false 
+              });
+
+          
+          canvas.loadSVGFromURL('tiger2.svg', function(objects) {
+            
+            var startTime = new Date();
+            
+            var group = new fabric.PathGroup(objects, {
+              left: 265,
+              top: 300,
+              width: 495,
+              height: 511
+            });
+            canvas.add(group);
+            canvas.renderAll();
+            
+            logEl.innerHTML += 'fabric: ' + (new Date() - startTime) + 'ms';
+          });
+          
+          canvas.calcOffset();
+          
+          
+        })();
+      };
+    </script>
+  </head>
+  <body>
+    <p>Rendering a complex shape</p>
+    <canvas id="canvas" width="600" height="600"></canvas>
+    <p id="log"></p>
+  </body>
+</html>
