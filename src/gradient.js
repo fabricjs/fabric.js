@@ -78,7 +78,6 @@
       for (var i = colorStopEls.length; i--; ) {
         el = colorStopEls[i];
         offset = parseInt(el.getAttribute('offset'), 10) / 100;
-        debugger;
         colorStops[offset] = getColorStopFromStyle(el) || el.getAttribute('stop-color');
       }
       
