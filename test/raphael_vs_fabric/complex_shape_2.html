@@ -29,6 +29,41 @@
             
         var logEl = document.getElementById('log');
         
+        (function testFabric() {
+          
+          var canvas = window.__canvas = new fabric.Element('canvas', { 
+                renderOnAddition: false, 
+                stateful: false 
+              });
+
+          //console.profile('parsing');
+          
+          canvas.loadSVGFromURL('dragon.svg', function(objects) {
+            
+            //console.profileEnd('parsing');
+            
+            var startTime = new Date();
+            
+            var group = new fabric.PathGroup(objects, {
+              left: 185,
+              top: 380,
+              width: 371,
+              height: 760
+            });
+            canvas.add(group);
+            canvas.renderAll();
+            
+            var renderingTime = new Date() - startTime;
+            
+            logEl.innerHTML += 'fabric: <b>' + (fabric.documentParsingTime + renderingTime) + 
+              '</b>ms (parsing: ' + fabric.documentParsingTime + ', rendering: ' + renderingTime + ')';
+              
+            document.getElementById('description').appendChild(document.createTextNode(' (' + group.complexity() + ' paths)'))
+          });
+          
+          canvas.calcOffset();
+        })();
+        
         (function testRaphael() {
           
           var start = function () {
@@ -56,42 +91,12 @@
           logEl.innerHTML = 'Raphael: <b>' + (new Date() - startTime) + '</b>ms<br>';
           
         })();
-        
-        (function testFabric() {
-          
-          var canvas = window.__canvas = new fabric.Element('canvas', { 
-                renderOnAddition: false, 
-                stateful: false 
-              });
-
-          
-          canvas.loadSVGFromURL('dragon.svg', function(objects) {
-            
-            var startTime = new Date();
-            
-            var group = new fabric.PathGroup(objects, {
-              left: 185,
-              top: 380,
-              width: 371,
-              height: 760
-            });
-            canvas.add(group);
-            canvas.renderAll();
-            
-            var renderingTime = new Date() - startTime;
-            
-            logEl.innerHTML += 'fabric: <b>' + (fabric.documentParsingTime + renderingTime) + 
-              '</b>ms (parsing: ' + fabric.documentParsingTime + ', rendering: ' + renderingTime + ')';
-              
-            document.getElementById('description').appendChild(document.createTextNode(' (' + group.complexity() + ' paths)'))
-          });
-          
-          canvas.calcOffset();
-        })();
       };
     </script>
   </head>
   <body>
+    <!-- preload svg -->
+    <iframe src="dragon.svg" style="position:absolute;top:-999px;left:-999px"></iframe>
     <p id="description">Rendering a complex shape</p>
     <div id="holder"></div>
     <canvas id="canvas" width="380" height="760"></canvas>

@@ -6122,6 +6122,7 @@ fabric.util.animate = animate;
       toFixed = fabric.util.toFixed,
       capitalize = fabric.util.string.capitalize,
       getPointer = fabric.util.getPointer,
+      degreesToRadians = fabric.util.degreesToRadians,
       slice = Array.prototype.slice;
 
   if (fabric.Object) {
@@ -7018,11 +7019,10 @@ fabric.util.animate = animate;
      */
     _setCornerCoords: function() {
       var coords = this.oCoords,
-          theta = fabric.util.degreesToRadians(45 - this.getAngle()),
+          theta = degreesToRadians(45 - this.getAngle()),
           cornerHypotenuse = Math.sqrt(2 * Math.pow(this.cornersize, 2)) / 2,
           cosHalfOffset = cornerHypotenuse * Math.cos(theta),
-          sinHalfOffset = cornerHypotenuse * Math.sin(theta),
-          corner;
+          sinHalfOffset = cornerHypotenuse * Math.sin(theta);
 
       coords.tl.corner = {
         tl: {
@@ -7175,8 +7175,6 @@ fabric.util.animate = animate;
           y: coords.mb.y + cosHalfOffset
         }
       };
-
-      corner = coords.mb.corner;
     },
 
     /**
@@ -8636,15 +8634,18 @@ fabric.util.animate = animate;
      * @method _parsePath
      */
     _parsePath: function() {
-
-      var result = [],
+      var result = [ ],
           currentPath,
           chunks;
 
-      for (var i = 0, len = this.path.length; i < len; i++) {
+      for (var i = 0, j, chunksParsed, len = this.path.length; i < len; i++) {
         currentPath = this.path[i];
         chunks = currentPath.slice(1).trim().replace(/(\d)-/g, '$1###-').split(/\s|,|###/);
-        result.push([currentPath.charAt(0)].concat(chunks.map(parseFloat)));
+        j = chunks.length, chunksParsed = [ currentPath.charAt(0) ];
+        while (j--) {
+          chunksParsed[j+1] = parseFloat(chunks[j]);
+        }
+        result.push(chunksParsed);
       }
       return result;
     },
@@ -8740,7 +8741,7 @@ fabric.util.animate = animate;
    */
   fabric.Path.fromElement = function(element, options) {
     var parsedAttributes = fabric.parseAttributes(element, fabric.Path.ATTRIBUTE_NAMES);
-    return new fabric.Path(parsedAttributes.d, parsedAttributes ? extend(parsedAttributes, options) : undefined);
+    return new fabric.Path(parsedAttributes.d, extend(parsedAttributes, options));
   };
 })(this);
 

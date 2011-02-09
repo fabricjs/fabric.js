@@ -402,16 +402,20 @@
      * @method _parsePath
      */
     _parsePath: function() {
-      
-      var result = [],
+      var result = [ ],
           currentPath, 
           chunks;
       
-      // use plain loop for perf.
-      for (var i = 0, len = this.path.length; i < len; i++) {
+      // use plain loop for performance reasons. 
+      // this chunk of code can be called thousands of times per second (when parsing large shapes)
+      for (var i = 0, j, chunksParsed, len = this.path.length; i < len; i++) {
         currentPath = this.path[i];
         chunks = currentPath.slice(1).trim().replace(/(\d)-/g, '$1###-').split(/\s|,|###/);
-        result.push([currentPath.charAt(0)].concat(chunks.map(parseFloat)));
+        j = chunks.length, chunksParsed = [ currentPath.charAt(0) ];
+        while (j--) {
+          chunksParsed[j+1] = parseFloat(chunks[j]);
+        }
+        result.push(chunksParsed);
       }
       return result;
     },

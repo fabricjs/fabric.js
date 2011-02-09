@@ -21,31 +21,6 @@
         
         var logEl = document.getElementById('log');
         
-        (function testRaphael() {
-          
-          var start = function () {
-            // storing original coordinates
-            this.ox = this.attr("cx");
-            this.oy = this.attr("cy");
-            this.attr({opacity: .5});
-          },
-          move = function (dx, dy) {
-            // move will be called with dx and dy
-            this.attr({cx: this.ox + dx, cy: this.oy + dy});
-          },
-          up = function () {
-            // restoring state
-            this.attr({opacity: 1});
-          };
-          
-          var startTime = new Date();
-          var shape = Raphael(tiger).translate(200, 200);
-          shape.drag(start, move, up);
-          
-          logEl.innerHTML = 'Raphael: <b>' + (new Date() - startTime) + '</b>ms<br>';
-          
-        })();
-        
         (function testFabric() {
           
           var canvas = window.__canvas = new fabric.Element('canvas', { 
@@ -78,10 +53,37 @@
           canvas.calcOffset();
           
         })();
+        
+        (function testRaphael() {
+          
+          var start = function () {
+            // storing original coordinates
+            this.ox = this.attr("cx");
+            this.oy = this.attr("cy");
+            this.attr({opacity: .5});
+          },
+          move = function (dx, dy) {
+            // move will be called with dx and dy
+            this.attr({cx: this.ox + dx, cy: this.oy + dy});
+          },
+          up = function () {
+            // restoring state
+            this.attr({opacity: 1});
+          };
+          
+          var startTime = new Date();
+          var shape = Raphael(tiger).translate(200, 200);
+          shape.drag(start, move, up);
+          
+          logEl.innerHTML = 'Raphael: <b>' + (new Date() - startTime) + '</b>ms<br>';
+          
+        })();
       };
     </script>
   </head>
   <body>
+    <!-- preload svg -->
+    <iframe src="tiger2.svg" style="position:absolute;top:-999px;left:-999px"></iframe>
     <p id="description">Rendering a complex shape</p>
     <canvas id="canvas" width="600" height="600"></canvas>
     <p id="log"></p>

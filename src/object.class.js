@@ -8,6 +8,7 @@
       toFixed = fabric.util.toFixed,
       capitalize = fabric.util.string.capitalize,
       getPointer = fabric.util.getPointer,
+      degreesToRadians = fabric.util.degreesToRadians,
       slice = Array.prototype.slice;
       
   if (fabric.Object) {
@@ -955,11 +956,10 @@
      */ 
     _setCornerCoords: function() {
       var coords = this.oCoords,
-          theta = fabric.util.degreesToRadians(45 - this.getAngle()),
+          theta = degreesToRadians(45 - this.getAngle()),
           cornerHypotenuse = Math.sqrt(2 * Math.pow(this.cornersize, 2)) / 2,
           cosHalfOffset = cornerHypotenuse * Math.cos(theta),
-          sinHalfOffset = cornerHypotenuse * Math.sin(theta),
-          corner;
+          sinHalfOffset = cornerHypotenuse * Math.sin(theta);
 
       coords.tl.corner = {
         tl: {
@@ -1112,8 +1112,6 @@
           y: coords.mb.y + cosHalfOffset
         }
       };
-
-      corner = coords.mb.corner;
     },
     
     /**
