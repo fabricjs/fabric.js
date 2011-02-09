@@ -91,7 +91,8 @@
       };
       
       function reload(num) {
-        document.location.href = document.location.href.replace(/\?\d+$/, '?' + num);
+        document.location.search = '?' + num;
+        return false;
       }
     </script>
   </head>
@@ -99,12 +100,12 @@
     <div>
       Rendering a large number (<span id="numshapes"></span>) of simple shapes
       <ul>
-        <li><a href="#" onclick="reload(10)">10 shapes</a></li>
-        <li><a href="#" onclick="reload(100)">100 shapes</a></li>
-        <li><a href="#" onclick="reload(500)">500 shapes</a></li>
-        <li><a href="#" onclick="reload(1000)">1000 shapes</a></li>
-        <li><a href="#" onclick="reload(2000)">2000 shapes</a></li>
-        <li><a href="#" onclick="reload(5000)">5000 shapes</a></li>
+        <li><a href="#" onclick="return reload(10)">10 shapes</a></li>
+        <li><a href="#" onclick="return reload(100)">100 shapes</a></li>
+        <li><a href="#" onclick="return reload(500)">500 shapes</a></li>
+        <li><a href="#" onclick="return reload(1000)">1000 shapes</a></li>
+        <li><a href="#" onclick="return reload(2000)">2000 shapes</a></li>
+        <li><a href="#" onclick="return reload(5000)">5000 shapes</a></li>
       </ul>
     </div>
     

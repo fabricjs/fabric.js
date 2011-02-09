@@ -1139,11 +1139,9 @@
      */
     add: function () {
       this._objects.push.apply(this._objects, arguments);
-      if (this.stateful) {
-        for (var i = arguments.length; i--; ) {
-          arguments[i].setupState();
-          arguments[i].setCoords();
-        }
+      for (var i = arguments.length; i--; ) {
+        this.stateful && arguments[i].setupState();
+        arguments[i].setCoords();
       }
       this.renderOnAddition && this.renderAll();
       return this;
