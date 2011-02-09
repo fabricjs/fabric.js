@@ -49,7 +49,7 @@
       this.paths = paths;
       
       this.setOptions(options);
-      this._initProperties();
+      //this._initProperties();
       
       this.setCoords();
       
@@ -62,19 +62,19 @@
      * @private
      * @method _initProperties
      */
-    _initProperties: function() {
-      this.stateProperties.forEach(function(prop) {
-        if (prop === 'fill') {
-          this.set(prop, this.options[prop]);
-        }
-        else if (prop === 'angle') {
-          this.setAngle(this.options[prop]);
-        }
-        else {
-          this[prop] = this.options[prop];
-        }
-      }, this);
-    },
+    // _initProperties: function() {
+    //       this.stateProperties.forEach(function(prop) {
+    //         if (prop === 'fill') {
+    //           this.set(prop, this.options[prop]);
+    //         }
+    //         else if (prop === 'angle') {
+    //           this.setAngle(this.options[prop]);
+    //         }
+    //         else {
+    //           this[prop] = this.options[prop];
+    //         }
+    //       }, this);
+    //     },
     
     /**
      * Renders this group on a specified context

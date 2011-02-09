@@ -6182,36 +6182,29 @@ fabric.util.animate = animate;
                       'theta angle opacity cornersize fill overlayFill stroke ' +
                       'strokeWidth fillRule borderScaleFactor transformMatrix').split(' '),
 
-
-    /**
-     * @property
-     * @type Object
-     */
-    options: {
-      top:                      0,
-      left:                     0,
-      width:                    100,
-      height:                   100,
-      scaleX:                   1,
-      scaleY:                   1,
-      flipX:                    false,
-      flipY:                    false,
-      theta:                    0,
-      opacity:                  1,
-      angle:                    0,
-      cornersize:               12,
-      padding:                  0,
-      borderColor:              'rgba(102,153,255,0.75)',
-      cornerColor:              'rgba(102,153,255,0.5)',
-      fill:                     'rgb(0,0,0)',
-      overlayFill:              null,
-      stroke:                   null,
-      strokeWidth:              1,
-      fillRule:                 'source-over',
-      borderOpacityWhenMoving:  0.4,
-      borderScaleFactor:        1,
-      transformMatrix:          null
-    },
+    top:                      0,
+    left:                     0,
+    width:                    0,
+    height:                   0,
+    scaleX:                   1,
+    scaleY:                   1,
+    flipX:                    false,
+    flipY:                    false,
+    theta:                    0,
+    opacity:                  1,
+    angle:                    0,
+    cornersize:               12,
+    padding:                  0,
+    borderColor:              'rgba(102,153,255,0.75)',
+    cornerColor:              'rgba(102,153,255,0.5)',
+    fill:                     'rgb(0,0,0)',
+    fillRule:                 'source-over',
+    overlayFill:              null,
+    stroke:                   null,
+    strokeWidth:              1,
+    borderOpacityWhenMoving:  0.4,
+    borderScaleFactor:        1,
+    transformMatrix:          null,
 
     /**
      * @method callSuper
@@ -6230,9 +6223,7 @@ fabric.util.animate = animate;
      * @param {Object} [options] Options object
      */
     initialize: function(options) {
-      this.setOptions(options);
-      this._importProperties();
-      this.setCoords();
+      options && this.setOptions(options);
     },
 
     /**
@@ -6240,47 +6231,14 @@ fabric.util.animate = animate;
      * @param {Object} [options]
      */
     setOptions: function(options) {
-      console.log('setting options', this);
-      this.options = extend(this._getOptions(), options);
-    },
-
-    /**
-     * @private
-     * @method _getOptions
-     */
-    _getOptions: function() {
-      return extend(clone(this._getSuperOptions()), this.options);
-    },
-
-    /**
-     * @private
-     * @method _getSuperOptions
-     */
-    _getSuperOptions: function() {
-      var c = this.constructor;
-      if (c) {
-        var s = c.superclass;
-        if (s) {
-          var p = s.prototype;
-          if (p && typeof p._getOptions == 'function') {
-            return p._getOptions();
-          }
-        }
-      }
-      return { };
-    },
-
-    /**
-     * @private
-     * @method _importProperties
-     */
-    _importProperties: function() {
       var i = this.stateProperties.length, prop;
       while (i--) {
         prop = this.stateProperties[i];
-        (prop === 'angle')
-          ? this.setAngle(this.options[prop])
-          : (this[prop] = this.options[prop]);
+        if (options[prop]) {
+          (prop === 'angle')
+            ? this.setAngle(options[prop])
+            : (this[prop] = options[prop]);
+        }
       }
     },
 
@@ -6304,27 +6262,29 @@ fabric.util.animate = animate;
      * @return {Object}
      */
     toObject: function() {
+
       var object = {
-        type: this.type,
-        left: toFixed(this.left, this.NUM_FRACTION_DIGITS),
-        top: toFixed(this.top, this.NUM_FRACTION_DIGITS),
-        width: toFixed(this.width, this.NUM_FRACTION_DIGITS),
-        height: toFixed(this.height, this.NUM_FRACTION_DIGITS),
-        fill: this.fill,
-        overlayFill: this.overlayFill,
-        stroke: this.stroke,
-        strokeWidth: this.strokeWidth,
-        scaleX: toFixed(this.scaleX, this.NUM_FRACTION_DIGITS),
-        scaleY: toFixed(this.scaleY, this.NUM_FRACTION_DIGITS),
-        angle: toFixed(this.getAngle(), this.NUM_FRACTION_DIGITS),
-        flipX: this.flipX,
-        flipY: this.flipY,
-        opacity: toFixed(this.opacity, this.NUM_FRACTION_DIGITS)
+        type:         this.type,
+        left:         toFixed(this.left, this.NUM_FRACTION_DIGITS),
+        top:          toFixed(this.top, this.NUM_FRACTION_DIGITS),
+        width:        toFixed(this.width, this.NUM_FRACTION_DIGITS),
+        height:       toFixed(this.height, this.NUM_FRACTION_DIGITS),
+        fill:         this.fill,
+        overlayFill:  this.overlayFill,
+        stroke:       this.stroke,
+        strokeWidth:  this.strokeWidth,
+        scaleX:       toFixed(this.scaleX, this.NUM_FRACTION_DIGITS),
+        scaleY:       toFixed(this.scaleY, this.NUM_FRACTION_DIGITS),
+        angle:        toFixed(this.getAngle(), this.NUM_FRACTION_DIGITS),
+        flipX:        this.flipX,
+        flipY:        this.flipY,
+        opacity:      toFixed(this.opacity, this.NUM_FRACTION_DIGITS)
       };
 
       if (!this.includeDefaultValues) {
         object = this._removeDefaultValues(object);
       }
+
       return object;
     },
 
@@ -6638,14 +6598,13 @@ fabric.util.animate = animate;
      * @chainable
      */
     drawBorders: function(ctx) {
-      var o = this.options,
-          padding = o.padding,
+      var padding = this.padding,
           padding2 = padding * 2;
 
       ctx.save();
 
-      ctx.globalAlpha = this.isMoving ? o.borderOpacityWhenMoving : 1;
-      ctx.strokeStyle = o.borderColor;
+      ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
+      ctx.strokeStyle = this.borderColor;
 
       var scaleX = 1 / (this.scaleX < this.MIN_SCALE_LIMIT ? this.MIN_SCALE_LIMIT : this.scaleX),
           scaleY = 1 / (this.scaleY < this.MIN_SCALE_LIMIT ? this.MIN_SCALE_LIMIT : this.scaleY);
@@ -6678,9 +6637,9 @@ fabric.util.animate = animate;
      * @chainable
      */
     drawCorners: function(ctx) {
-      var size = this.options.cornersize,
+      var size = this.cornersize,
           size2 = size / 2,
-          padding = this.options.padding,
+          padding = this.padding,
           left = -(this.width / 2),
           top = -(this.height / 2),
           _left,
@@ -6694,8 +6653,8 @@ fabric.util.animate = animate;
 
       ctx.save();
 
-      ctx.globalAlpha = this.isMoving ? this.options.borderOpacityWhenMoving : 1;
-      ctx.fillStyle = this.options.cornerColor;
+      ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
+      ctx.fillStyle = this.cornerColor;
 
       _left = left - scaleOffsetX;
       _top = top - scaleOffsetY;
@@ -7854,11 +7813,11 @@ fabric.util.animate = animate;
      * @method _initRxRy
      */
     _initRxRy: function() {
-      if (this.options.rx && !this.options.ry) {
-        this.options.ry = this.options.rx;
+      if (this.rx && !this.ry) {
+        this.ry = this.rx;
       }
-      else if (this.options.ry && !this.options.rx) {
-        this.options.rx = this.options.ry;
+      else if (this.ry && !this.rx) {
+        this.rx = this.ry;
       }
     },
 
@@ -7868,8 +7827,8 @@ fabric.util.animate = animate;
      * @param ctx {CanvasRenderingContext2D} context to render on
      */
     _render: function(ctx) {
-      var rx = this.options.rx || 0,
-          ry = this.options.ry || 0,
+      var rx = this.rx || 0,
+          ry = this.ry || 0,
           x = -this.width / 2,
           y = -this.height / 2,
           w = this.width,
@@ -8303,7 +8262,6 @@ fabric.util.animate = animate;
       options = options || { };
 
       this.setOptions(options);
-      this._importProperties();
 
       if (!path) {
         throw Error('`path` argument is required');
@@ -8339,10 +8297,10 @@ fabric.util.animate = animate;
       if (!isWidthSet || !isHeightSet) {
         extend(this, this._parseDimensions());
         if (isWidthSet) {
-          this.width = this.options.width;
+          this.width = options.width;
         }
         if (isHeightSet) {
-          this.height = this.options.height;
+          this.height = options.height;
         }
       }
     },
@@ -8793,7 +8751,6 @@ fabric.util.animate = animate;
       this.paths = paths;
 
       this.setOptions(options);
-      this._initProperties();
 
       this.setCoords();
 
@@ -8806,19 +8763,6 @@ fabric.util.animate = animate;
      * @private
      * @method _initProperties
      */
-    _initProperties: function() {
-      this.stateProperties.forEach(function(prop) {
-        if (prop === 'fill') {
-          this.set(prop, this.options[prop]);
-        }
-        else if (prop === 'angle') {
-          this.setAngle(this.options[prop]);
-        }
-        else {
-          this[prop] = this.options[prop];
-        }
-      }, this);
-    },
 
     /**
      * Renders this group on a specified context
@@ -9474,21 +9418,13 @@ fabric.util.animate = animate;
    */
   fabric.Text = fabric.util.createClass(fabric.Object, /** @scope fabric.Text.prototype */ {
 
-    /**
-     * @property
-     * @type Object
-     */
-    options: {
-      top:            10,
-      left:           10,
-      fontsize:       20,
-      fontweight:     100,
-      fontfamily:     'Modernist_One_400',
-      textDecoration: '',
-      textShadow:     null,
-      fontStyle:      '',
-      path:           null
-    },
+    fontsize:       20,
+    fontweight:     100,
+    fontfamily:     'Modernist_One_400',
+    textDecoration: '',
+    textShadow:     null,
+    fontStyle:      '',
+    path:           null,
 
     /**
      * @property
@@ -9507,14 +9443,14 @@ fabric.util.animate = animate;
       this._initStateProperties();
       this.text = text;
       this.setOptions(options);
-      extend(this, this.options);
-      this.theta = this.angle * (Math.PI/180);
+      this.theta = this.angle * Math.PI / 180;
       this.width = this.getWidth();
       this.setCoords();
     },
 
     /**
-     * Creates `stateProperties` list on an instance, and adds `fabric.Text` -specific ones to it (such as "fontfamily", "fontweight", etc.)
+     * Creates `stateProperties` list on an instance, and adds `fabric.Text` -specific ones to it
+     * (such as "fontfamily", "fontweight", etc.)
      * @private
      * @method initStateProperties
      */
@@ -9524,8 +9460,8 @@ fabric.util.animate = animate;
           (o = o.superclass) &&
           (o = o.prototype) &&
           (o = o.stateProperties) &&
-          o.clone) {
-        this.stateProperties = o.clone();
+          o.concat) {
+        this.stateProperties = o.concat();
         this.stateProperties.push(
           'fontfamily',
           'fontweight',
@@ -9576,6 +9512,8 @@ fabric.util.animate = animate;
 
       this.width = o.width;
       this.height = o.height;
+
+      this.setCoords();
     },
 
     /**

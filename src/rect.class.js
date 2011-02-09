@@ -48,11 +48,11 @@
      * @method _initRxRy
      */
     _initRxRy: function() {
-      if (this.options.rx && !this.options.ry) {
-        this.options.ry = this.options.rx;
+      if (this.rx && !this.ry) {
+        this.ry = this.rx;
       }
-      else if (this.options.ry && !this.options.rx) {
-        this.options.rx = this.options.ry;
+      else if (this.ry && !this.rx) {
+        this.rx = this.ry;
       }
     },
     
@@ -62,8 +62,8 @@
      * @param ctx {CanvasRenderingContext2D} context to render on
      */
     _render: function(ctx) {   
-      var rx = this.options.rx || 0,
-          ry = this.options.ry || 0,
+      var rx = this.rx || 0,
+          ry = this.ry || 0,
           x = -this.width / 2,
           y = -this.height / 2,
           w = this.width,

@@ -23,21 +23,13 @@
    */
   fabric.Text = fabric.util.createClass(fabric.Object, /** @scope fabric.Text.prototype */ {
     
-    /**
-     * @property
-     * @type Object
-     */
-    options: {
-      top:            10,
-      left:           10,
-      fontsize:       20,
-      fontweight:     100,
-      fontfamily:     'Modernist_One_400',
-      textDecoration: '',
-      textShadow:     null,
-      fontStyle:      '',
-      path:           null
-    },
+    fontsize:       20,
+    fontweight:     100,
+    fontfamily:     'Modernist_One_400',
+    textDecoration: '',
+    textShadow:     null,
+    fontStyle:      '',
+    path:           null,
     
     /**
      * @property
@@ -56,14 +48,14 @@
       this._initStateProperties();
       this.text = text;
       this.setOptions(options);
-      extend(this, this.options);
-      this.theta = this.angle * (Math.PI/180);
+      this.theta = this.angle * Math.PI / 180;
       this.width = this.getWidth();
       this.setCoords();
     },
     
     /**
-     * Creates `stateProperties` list on an instance, and adds `fabric.Text` -specific ones to it (such as "fontfamily", "fontweight", etc.)
+     * Creates `stateProperties` list on an instance, and adds `fabric.Text` -specific ones to it 
+     * (such as "fontfamily", "fontweight", etc.)
      * @private
      * @method initStateProperties
      */
@@ -73,8 +65,8 @@
           (o = o.superclass) &&
           (o = o.prototype) &&
           (o = o.stateProperties) &&
-          o.clone) {
-        this.stateProperties = o.clone();
+          o.concat) {
+        this.stateProperties = o.concat();
         this.stateProperties.push(
           'fontfamily', 
           'fontweight', 
@@ -129,6 +121,9 @@
       // update width, height
       this.width = o.width;
       this.height = o.height;
+      
+      // need to set coords _after_ the width/height was retreived from Cufon
+      this.setCoords();
     },
     
     /**

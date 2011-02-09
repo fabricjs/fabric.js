@@ -67,37 +67,29 @@
                       'theta angle opacity cornersize fill overlayFill stroke ' +
                       'strokeWidth fillRule borderScaleFactor transformMatrix').split(' '),
     
-    // TODO (kangax): rename to `defaultOptions`
-    
-    /**
-     * @property
-     * @type Object
-     */
-    options: {
-      top:                      0,
-      left:                     0,
-      width:                    100,
-      height:                   100,
-      scaleX:                   1,
-      scaleY:                   1,
-      flipX:                    false,
-      flipY:                    false,
-      theta:                    0,
-      opacity:                  1,
-      angle:                    0,
-      cornersize:               12,
-      padding:                  0,
-      borderColor:              'rgba(102,153,255,0.75)',
-      cornerColor:              'rgba(102,153,255,0.5)',
-      fill:                     'rgb(0,0,0)',
-      overlayFill:              null,
-      stroke:                   null,
-      strokeWidth:              1,
-      fillRule:                 'source-over',
-      borderOpacityWhenMoving:  0.4,
-      borderScaleFactor:        1,
-      transformMatrix:          null
-    },
+    top:                      0,
+    left:                     0,
+    width:                    0,
+    height:                   0,
+    scaleX:                   1,
+    scaleY:                   1,
+    flipX:                    false,
+    flipY:                    false,
+    theta:                    0,
+    opacity:                  1,
+    angle:                    0,
+    cornersize:               12,
+    padding:                  0,
+    borderColor:              'rgba(102,153,255,0.75)',
+    cornerColor:              'rgba(102,153,255,0.5)',
+    fill:                     'rgb(0,0,0)',
+    fillRule:                 'source-over',
+    overlayFill:              null,
+    stroke:                   null,
+    strokeWidth:              1,
+    borderOpacityWhenMoving:  0.4,
+    borderScaleFactor:        1,
+    transformMatrix:          null,
     
     /**
      * @method callSuper
@@ -116,12 +108,7 @@
      * @param {Object} [options] Options object
      */
     initialize: function(options) {
-      // overwrite default options with specified ones
-      this.setOptions(options);
-      // "import" state properties into an instance
-      this._importProperties();
-      // set initial coords
-      this.setCoords();
+      options && this.setOptions(options);
     },
     
     /**
@@ -129,48 +116,14 @@
      * @param {Object} [options]
      */
     setOptions: function(options) {
-      // this.constructor.superclass.prototype.options -> this.options -> options
-      this.options = extend(this._getOptions(), options);
-    },
-    
-    /**
-     * @private
-     * @method _getOptions
-     */
-    _getOptions: function() {
-      return extend(clone(this._getSuperOptions()), this.options);
-    },
-    
-    /**
-     * @private
-     * @method _getSuperOptions
-     */
-    _getSuperOptions: function() {
-      var c = this.constructor;
-      if (c) {
-        var s = c.superclass;
-        if (s) {
-          var p = s.prototype;
-          if (p && typeof p._getOptions == 'function') {
-            return p._getOptions();
-          }
-        }
-      }
-      return { };
-    },
-    
-    /**
-     * @private
-     * @method _importProperties
-     */
-    _importProperties: function() {
-      // console.log(this.options);
       var i = this.stateProperties.length, prop;
       while (i--) {
         prop = this.stateProperties[i];
-        (prop === 'angle')
-          ? this.setAngle(this.options[prop])
-          : (this[prop] = this.options[prop]);
+        if (options[prop]) {
+          (prop === 'angle')
+            ? this.setAngle(options[prop])
+            : (this[prop] = options[prop]);
+        }
       }
     },
     
@@ -194,27 +147,29 @@
      * @return {Object}
      */
     toObject: function() {
+      
       var object = {
-        type: this.type,
-        left: toFixed(this.left, this.NUM_FRACTION_DIGITS),
-        top: toFixed(this.top, this.NUM_FRACTION_DIGITS),
-        width: toFixed(this.width, this.NUM_FRACTION_DIGITS),
-        height: toFixed(this.height, this.NUM_FRACTION_DIGITS),
-        fill: this.fill,
-        overlayFill: this.overlayFill,
-        stroke: this.stroke,
-        strokeWidth: this.strokeWidth,
-        scaleX: toFixed(this.scaleX, this.NUM_FRACTION_DIGITS),
-        scaleY: toFixed(this.scaleY, this.NUM_FRACTION_DIGITS),
-        angle: toFixed(this.getAngle(), this.NUM_FRACTION_DIGITS),
-        flipX: this.flipX,
-        flipY: this.flipY,
-        opacity: toFixed(this.opacity, this.NUM_FRACTION_DIGITS)
+        type:         this.type,
+        left:         toFixed(this.left, this.NUM_FRACTION_DIGITS),
+        top:          toFixed(this.top, this.NUM_FRACTION_DIGITS),
+        width:        toFixed(this.width, this.NUM_FRACTION_DIGITS),
+        height:       toFixed(this.height, this.NUM_FRACTION_DIGITS),
+        fill:         this.fill,
+        overlayFill:  this.overlayFill,
+        stroke:       this.stroke,
+        strokeWidth:  this.strokeWidth,
+        scaleX:       toFixed(this.scaleX, this.NUM_FRACTION_DIGITS),
+        scaleY:       toFixed(this.scaleY, this.NUM_FRACTION_DIGITS),
+        angle:        toFixed(this.getAngle(), this.NUM_FRACTION_DIGITS),
+        flipX:        this.flipX,
+        flipY:        this.flipY,
+        opacity:      toFixed(this.opacity, this.NUM_FRACTION_DIGITS)
       };
       
       if (!this.includeDefaultValues) {
         object = this._removeDefaultValues(object);
       }
+      
       return object;
     },
     
@@ -545,14 +500,13 @@
      * @chainable
      */
     drawBorders: function(ctx) {
-      var o = this.options,
-          padding = o.padding,
+      var padding = this.padding,
           padding2 = padding * 2;
       
       ctx.save();
       
-      ctx.globalAlpha = this.isMoving ? o.borderOpacityWhenMoving : 1;
-      ctx.strokeStyle = o.borderColor;
+      ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
+      ctx.strokeStyle = this.borderColor;
       
       var scaleX = 1 / (this.scaleX < this.MIN_SCALE_LIMIT ? this.MIN_SCALE_LIMIT : this.scaleX),
           scaleY = 1 / (this.scaleY < this.MIN_SCALE_LIMIT ? this.MIN_SCALE_LIMIT : this.scaleY);
@@ -586,9 +540,9 @@
      * @chainable
      */
     drawCorners: function(ctx) {
-      var size = this.options.cornersize,
+      var size = this.cornersize,
           size2 = size / 2,
-          padding = this.options.padding,
+          padding = this.padding,
           left = -(this.width / 2),
           top = -(this.height / 2),
           _left, 
@@ -602,8 +556,8 @@
           
       ctx.save();
       
-      ctx.globalAlpha = this.isMoving ? this.options.borderOpacityWhenMoving : 1;
-      ctx.fillStyle = this.options.cornerColor;
+      ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
+      ctx.fillStyle = this.cornerColor;
       
       // top-left
       _left = left - scaleOffsetX;

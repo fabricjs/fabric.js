@@ -61,7 +61,6 @@
       options = options || { };
       
       this.setOptions(options);
-      this._importProperties();
       
       if (!path) {
         throw Error('`path` argument is required');
@@ -98,10 +97,10 @@
       if (!isWidthSet || !isHeightSet) {
         extend(this, this._parseDimensions());
         if (isWidthSet) {
-          this.width = this.options.width;
+          this.width = options.width;
         }
         if (isHeightSet) {
-          this.height = this.options.height;
+          this.height = options.height;
         }
       }
     },
