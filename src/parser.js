@@ -467,7 +467,8 @@
     return function(doc, callback) {
       if (!doc) return;
       
-      var descendants = fabric.util.toArray(doc.getElementsByTagName('*'));
+      var startTime = new Date(),
+          descendants = fabric.util.toArray(doc.getElementsByTagName('*'));
       
       var elements = descendants.filter(function(el) {
         return reAllowedSVGTagNames.test(el.tagName) && 
@@ -506,6 +507,7 @@
       // Precedence of rules:   style > class > attribute
       
       fabric.parseElements(elements, function(instances) {
+        fabric.documentParsingTime = new Date() - startTime;
         if (callback) {
           callback(instances, options);
         }

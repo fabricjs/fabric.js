@@ -2155,6 +2155,8 @@ if (!Function.prototype.bind) {
   fabric.util.setStyle = setStyle;
 
 })();
+var _slice = Array.prototype.slice;
+
 /**
  * Takes id and returns an element with that id (if one exists in a document)
  * @method getById
@@ -2174,11 +2176,22 @@ function getById(id) {
  * @return {Array}
  */
 function toArray(arrayLike) {
-  var arr = [ ], i = arrayLike.length;
-  while (i--) {
-    arr[i] = arrayLike[i];
-  }
-  return arr;
+  return _slice.call(arrayLike, 0);
+}
+
+try {
+  var sliceCanConvertNodelists = toArray(document.childNodes) instanceof Array;
+}
+catch(err) { }
+
+if (!sliceCanConvertNodelists) {
+  toArray = function(arrayLike) {
+    var arr = new Array(arrayLike.length), i = arrayLike.length;
+    while (i--) {
+      arr[i] = arrayLike[i];
+    }
+    return arr;
+  };
 }
 
 /**
@@ -2879,19 +2892,18 @@ fabric.util.animate = animate;
    */
   fabric.parseSVGDocument = (function() {
 
-    var reAllowedSVGTagNames = /^(path|circle|polygon|polyline|ellipse|rect|line|image)$/;
-
-
-    var reNum = '(?:[-+]?\\d+(?:\\.\\d+)?(?:e[-+]?\\d+)?)';
-
-    var reViewBoxAttrValue = new RegExp(
-      '^' +
-      '\\s*(' + reNum + '+)\\s*,?' +
-      '\\s*(' + reNum + '+)\\s*,?' +
-      '\\s*(' + reNum + '+)\\s*,?' +
-      '\\s*(' + reNum + '+)\\s*' +
-      '$'
-    );
+    var reAllowedSVGTagNames = /^(path|circle|polygon|polyline|ellipse|rect|line|image)$/,
+        
+        reNum = '(?:[-+]?\\d+(?:\\.\\d+)?(?:e[-+]?\\d+)?)',
+        
+        reViewBoxAttrValue = new RegExp(
+          '^' +
+          '\\s*(' + reNum + '+)\\s*,?' +
+          '\\s*(' + reNum + '+)\\s*,?' +
+          '\\s*(' + reNum + '+)\\s*,?' +
+          '\\s*(' + reNum + '+)\\s*' +
+          '$'
+        );
 
     function hasAncestorWithNodeName(element, nodeName) {
       while (element && (element = element.parentNode)) {
@@ -2905,7 +2917,8 @@ fabric.util.animate = animate;
     return function(doc, callback) {
       if (!doc) return;
 
-      var descendants = fabric.util.toArray(doc.getElementsByTagName('*'));
+      var startTime = new Date(),
+          descendants = fabric.util.toArray(doc.getElementsByTagName('*'));
 
       var elements = descendants.filter(function(el) {
         return reAllowedSVGTagNames.test(el.tagName) &&
@@ -2942,6 +2955,7 @@ fabric.util.animate = animate;
 
 
       fabric.parseElements(elements, function(instances) {
+        fabric.documentParsingTime = new Date() - startTime;
         if (callback) {
           callback(instances, options);
         }
@@ -5630,10 +5644,8 @@ fabric.util.animate = animate;
 
         var doc = xml.documentElement;
         if (!doc) return;
-        
-        var t = new Date();
+
         fabric.parseSVGDocument(doc, function (results, options) {
-          fabric.documentParsingTime = new Date() - t;
           _this.cache.set(url, {
             objects: fabric.util.array.invoke(results, 'toObject'),
             options: options

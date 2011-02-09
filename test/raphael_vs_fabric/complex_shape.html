@@ -71,19 +71,21 @@
             canvas.add(group);
             canvas.renderAll();
             
-            logEl.innerHTML += 'fabric: <b>' + fabric.documentParsingTime + '</b>ms (to parse SVG doc), <b>' + 
-              (new Date() - startTime) + '</b>ms (to render its interactive representation on canvas)';
+            var renderingTime = new Date() - startTime;
+            
+            logEl.innerHTML += 'fabric: <b>' + (fabric.documentParsingTime + renderingTime) + '</b>ms';
+              
+            document.getElementById('description').appendChild(document.createTextNode(' (' + group.complexity() + ' paths)'))
           });
           
           canvas.calcOffset();
-          
           
         })();
       };
     </script>
   </head>
   <body>
-    <p>Rendering a complex shape</p>
+    <p id="description">Rendering a complex shape</p>
     <canvas id="canvas" width="600" height="600"></canvas>
     <p id="log"></p>
   </body>

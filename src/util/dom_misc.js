@@ -1,3 +1,5 @@
+var _slice = Array.prototype.slice;
+
 /**
  * Takes id and returns an element with that id (if one exists in a document)
  * @method getById
@@ -17,11 +19,22 @@ function getById(id) {
  * @return {Array}
  */
 function toArray(arrayLike) {
-  var arr = [ ], i = arrayLike.length;
-  while (i--) {
-    arr[i] = arrayLike[i];
-  }
-  return arr;
+  return _slice.call(arrayLike, 0);
+}
+
+try {
+  var sliceCanConvertNodelists = toArray(document.childNodes) instanceof Array;
+}
+catch(err) { }
+
+if (!sliceCanConvertNodelists) {
+  toArray = function(arrayLike) {
+    var arr = new Array(arrayLike.length), i = arrayLike.length;
+    while (i--) {
+      arr[i] = arrayLike[i];
+    }
+    return arr;
+  };
 }
 
 /**
