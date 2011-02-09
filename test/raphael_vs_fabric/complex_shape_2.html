@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Complex shape</title>
+    <title>Complex shape 2</title>
     <style>
       svg {
         border: 1px solid #000;
@@ -11,14 +11,22 @@
         border: 1px solid #000;
         position: relative;
       }
+      #holder {
+        height: 760px;
+        width: 380px;
+        left: 500px;
+        position: absolute;
+      }
     </style>
     <script src="raphael-min.js"></script>
     <script src="../../dist/all.js"></script>
-    <script src="tiger.js"></script>
+    <script src="dragon.js"></script>
     <script>
           
       window.onload = function() {
-        
+        var width = 380,
+            height = 760;
+            
         var logEl = document.getElementById('log');
         
         (function testRaphael() {
@@ -39,8 +47,11 @@
           };
           
           var startTime = new Date();
-          var shape = Raphael(tiger).translate(200, 200);
-          shape.drag(start, move, up);
+          
+          var r = Raphael("holder", width, height);
+          r.dragon();
+          
+          // r.drag(start, move, up);
           
           logEl.innerHTML = 'Raphael: <b>' + (new Date() - startTime) + '</b>ms<br>';
           
@@ -54,35 +65,35 @@
               });
 
           
-          canvas.loadSVGFromURL('tiger2.svg', function(objects) {
+          canvas.loadSVGFromURL('dragon.svg', function(objects) {
             
             var startTime = new Date();
             
             var group = new fabric.PathGroup(objects, {
-              left: 265,
-              top: 300,
-              width: 495,
-              height: 511
+              left: 185,
+              top: 380,
+              width: 371,
+              height: 760
             });
             canvas.add(group);
             canvas.renderAll();
             
             var renderingTime = new Date() - startTime;
             
-            logEl.innerHTML += 'fabric: <b>' + (fabric.documentParsingTime + renderingTime) + '</b>ms';
+            logEl.innerHTML += 'fabric: <b>' + (fabric.documentParsingTime + renderingTime) + '</b>ms (parsing: '+fabric.documentParsingTime+', rendering: '+ renderingTime +')';
               
             document.getElementById('description').appendChild(document.createTextNode(' (' + group.complexity() + ' paths)'))
           });
           
           canvas.calcOffset();
-          
         })();
       };
     </script>
   </head>
   <body>
     <p id="description">Rendering a complex shape</p>
-    <canvas id="canvas" width="600" height="600"></canvas>
+    <div id="holder"></div>
+    <canvas id="canvas" width="380" height="760"></canvas>
     <p id="log"></p>
   </body>
 </html>

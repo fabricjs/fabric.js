@@ -790,7 +790,7 @@
   
   test('onFpsUpdate', function() {
 
-    ok(typeof canvas.onFpsUpdate == 'function');
+    ok(typeof canvas.onFpsUpdate != 'undefined');
     
     var invoked = false, fps;
     
