@@ -80,7 +80,8 @@
             
             var renderingTime = new Date() - startTime;
             
-            logEl.innerHTML += 'fabric: <b>' + (fabric.documentParsingTime + renderingTime) + '</b>ms (parsing: '+fabric.documentParsingTime+', rendering: '+ renderingTime +')';
+            logEl.innerHTML += 'fabric: <b>' + (fabric.documentParsingTime + renderingTime) + 
+              '</b>ms (parsing: ' + fabric.documentParsingTime + ', rendering: ' + renderingTime + ')';
               
             document.getElementById('description').appendChild(document.createTextNode(' (' + group.complexity() + ' paths)'))
           });
