@@ -60,6 +60,9 @@ Fabric.js started as a foundation for design editor on [printio.ru](http://print
 - [Main demo](http://kangax.github.com/fabric.js/test/demo/)
 - [Benchmark (quantity)](http://kangax.github.com/fabric.js/test/benchmarks/quantity.html)
 - [Benchmark (animation)](http://kangax.github.com/fabric.js/test/benchmarks/animation.html)
+- [Benchmark (Raphael vs. Fabric; simple shapes)](http://kangax.github.com/fabric.js/test/raphael_vs_fabric/simple_shapes.html)
+- [Benchmark (Raphael vs. Fabric; complex shape 1)](http://kangax.github.com/fabric.js/test/raphael_vs_fabric/complex_shape.html)
+- [Benchmark (Raphael vs. Fabric; complex shape 2)](http://kangax.github.com/fabric.js/test/raphael_vs_fabric/complex_shape_2.html)
 
 ### Documentation
 

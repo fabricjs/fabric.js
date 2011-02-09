@@ -11,6 +11,7 @@
         border: 1px solid #000;
         position: relative;
       }
+      ul, ul li { display: inline-block; }
     </style>
     <script src="raphael-min.js"></script>
     <script src="../../dist/all.js"></script>
@@ -19,7 +20,7 @@
         return Math.random() * (max - min) + min;
       }
       
-      var numObjects = 200,
+      var numObjects = parseInt(document.location.search.slice(1), 10) || 200,
           radius = 20,
           width = 500,
           height = 500;
@@ -28,9 +29,11 @@
         
         var logEl = document.getElementById('log');
         
+        document.getElementById('numshapes').innerHTML = numObjects;
+        
         (function testRaphael() {
           
-          var paper = Raphael(550, 50, width, height),
+          var paper = Raphael(550, 57, width, height),
               startTime = new Date(),
               circle;
           
@@ -86,10 +89,25 @@
           
         })();
       };
+      
+      function reload(num) {
+        document.location.href = document.location.href.replace(/\?\d+$/, '?' + num);
+      }
     </script>
   </head>
   <body>
-    <p>Rendering a large number of simple shapes</p>
+    <div>
+      Rendering a large number (<span id="numshapes"></span>) of simple shapes
+      <ul>
+        <li><a href="#" onclick="reload(10)">10 shapes</a></li>
+        <li><a href="#" onclick="reload(100)">100 shapes</a></li>
+        <li><a href="#" onclick="reload(500)">500 shapes</a></li>
+        <li><a href="#" onclick="reload(1000)">1000 shapes</a></li>
+        <li><a href="#" onclick="reload(2000)">2000 shapes</a></li>
+        <li><a href="#" onclick="reload(5000)">5000 shapes</a></li>
+      </ul>
+    </div>
+    
     <canvas id="canvas" width="500" height="500"></canvas>
     <p id="log"></p>
   </body>
