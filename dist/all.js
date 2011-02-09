@@ -4882,6 +4882,7 @@ fabric.util.animate = animate;
       if (this.stateful) {
         for (var i = arguments.length; i--; ) {
           arguments[i].setupState();
+          arguments[i].setCoords();
         }
       }
       this.renderOnAddition && this.renderAll();
@@ -6239,6 +6240,7 @@ fabric.util.animate = animate;
      * @param {Object} [options]
      */
     setOptions: function(options) {
+      console.log('setting options', this);
       this.options = extend(this._getOptions(), options);
     },
 
@@ -8247,7 +8249,8 @@ fabric.util.animate = animate;
   var fabric = global.fabric || (global.fabric = { }),
       min = fabric.util.array.min,
       max = fabric.util.array.max,
-      extend = fabric.util.object.extend;
+      extend = fabric.util.object.extend,
+      _toString = Object.prototype.toString;
 
   if (fabric.Path) {
     fabric.warn('fabric.Path is already defined');
@@ -8302,13 +8305,11 @@ fabric.util.animate = animate;
       this.setOptions(options);
       this._importProperties();
 
-      this.originalState = { };
-
       if (!path) {
         throw Error('`path` argument is required');
       }
 
-      var fromArray = Object.prototype.toString.call(path) === '[object Array]';
+      var fromArray = _toString.call(path) === '[object Array]';
 
       this.path = fromArray
         ? path
@@ -8318,9 +8319,7 @@ fabric.util.animate = animate;
 
       if (!fromArray) {
         this._initializeFromArray(options);
-      };
-
-      this.setCoords();
+      }
 
       if (options.sourcePath) {
         this.setSourcePath(options.sourcePath);
@@ -8791,7 +8790,6 @@ fabric.util.animate = animate;
 
       options = options || { };
 
-      this.originalState = { };
       this.paths = paths;
 
       this.setOptions(options);
@@ -9506,7 +9504,6 @@ fabric.util.animate = animate;
      * @return {fabric.Text} thisArg
      */
     initialize: function(text, options) {
-      this.originalState = { };
       this._initStateProperties();
       this.text = text;
       this.setOptions(options);

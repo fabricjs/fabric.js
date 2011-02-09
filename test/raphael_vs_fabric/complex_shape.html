@@ -28,8 +28,11 @@
                 stateful: false 
               });
 
+          console.profile('parsing');
           
           canvas.loadSVGFromURL('tiger2.svg', function(objects) {
+            
+            console.profileEnd('parsing');
             
             var startTime = new Date();
             
@@ -54,7 +57,7 @@
           
         })();
         
-        (function testRaphael() {
+        /*(function testRaphael() {
           
           var start = function () {
             // storing original coordinates
@@ -77,7 +80,7 @@
           
           logEl.innerHTML = 'Raphael: <b>' + (new Date() - startTime) + '</b>ms<br>';
           
-        })();
+        })();*/
       };
     </script>
   </head>

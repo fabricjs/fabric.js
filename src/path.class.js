@@ -7,7 +7,8 @@
   var fabric = global.fabric || (global.fabric = { }),
       min = fabric.util.array.min,
       max = fabric.util.array.max,
-      extend = fabric.util.object.extend;
+      extend = fabric.util.object.extend,
+      _toString = Object.prototype.toString;
   
   if (fabric.Path) {
     fabric.warn('fabric.Path is already defined');
@@ -62,13 +63,11 @@
       this.setOptions(options);
       this._importProperties();
       
-      this.originalState = { };
-      
       if (!path) {
         throw Error('`path` argument is required');
       }
       
-      var fromArray = Object.prototype.toString.call(path) === '[object Array]';
+      var fromArray = _toString.call(path) === '[object Array]';
       
       this.path = fromArray
         ? path
@@ -79,9 +78,7 @@
       // TODO (kangax): rewrite this idiocracy
       if (!fromArray) {
         this._initializeFromArray(options);
-      };
-      
-      this.setCoords();
+      }
       
       if (options.sourcePath) {
         this.setSourcePath(options.sourcePath);

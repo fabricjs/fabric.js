@@ -53,7 +53,6 @@
      * @return {fabric.Text} thisArg
      */
     initialize: function(text, options) {
-      this.originalState = { };
       this._initStateProperties();
       this.text = text;
       this.setOptions(options);

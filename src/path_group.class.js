@@ -46,7 +46,6 @@
       
       options = options || { };
       
-      this.originalState = { };
       this.paths = paths;
       
       this.setOptions(options);

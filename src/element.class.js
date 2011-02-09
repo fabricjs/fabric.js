@@ -1142,6 +1142,7 @@
       if (this.stateful) {
         for (var i = arguments.length; i--; ) {
           arguments[i].setupState();
+          arguments[i].setCoords();
         }
       }
       this.renderOnAddition && this.renderAll();

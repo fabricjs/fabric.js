@@ -164,6 +164,7 @@
      * @method _importProperties
      */
     _importProperties: function() {
+      // console.log(this.options);
       var i = this.stateProperties.length, prop;
       while (i--) {
         prop = this.stateProperties[i];
