@@ -2788,7 +2788,8 @@ fabric.util.animate = animate;
       }
     }
 
-    elements.map(function(el, index) {
+    for (var index = 0, el, len = elements.length; index < len; index++) {
+      el = elements[index];
       var klass = fabric[capitalize(el.tagName)];
       if (klass && klass.fromElement) {
         try {
@@ -2812,7 +2813,7 @@ fabric.util.animate = animate;
       else {
         checkIfDone();
       }
-    });
+    }
   };
 
   /**
@@ -2892,18 +2893,19 @@ fabric.util.animate = animate;
    */
   fabric.parseSVGDocument = (function() {
 
-    var reAllowedSVGTagNames = /^(path|circle|polygon|polyline|ellipse|rect|line|image)$/,
-        
-        reNum = '(?:[-+]?\\d+(?:\\.\\d+)?(?:e[-+]?\\d+)?)',
-        
-        reViewBoxAttrValue = new RegExp(
-          '^' +
-          '\\s*(' + reNum + '+)\\s*,?' +
-          '\\s*(' + reNum + '+)\\s*,?' +
-          '\\s*(' + reNum + '+)\\s*,?' +
-          '\\s*(' + reNum + '+)\\s*' +
-          '$'
-        );
+    var reAllowedSVGTagNames = /^(path|circle|polygon|polyline|ellipse|rect|line|image)$/;
+
+
+    var reNum = '(?:[-+]?\\d+(?:\\.\\d+)?(?:e[-+]?\\d+)?)';
+
+    var reViewBoxAttrValue = new RegExp(
+      '^' +
+      '\\s*(' + reNum + '+)\\s*,?' +
+      '\\s*(' + reNum + '+)\\s*,?' +
+      '\\s*(' + reNum + '+)\\s*,?' +
+      '\\s*(' + reNum + '+)\\s*' +
+      '$'
+    );
 
     function hasAncestorWithNodeName(element, nodeName) {
       while (element && (element = element.parentNode)) {
@@ -8737,10 +8739,8 @@ fabric.util.animate = animate;
    * @return {fabric.Path} Instance of fabric.Path
    */
   fabric.Path.fromElement = function(element, options) {
-    var parsedAttributes = fabric.parseAttributes(element, fabric.Path.ATTRIBUTE_NAMES),
-        path = parsedAttributes.d;
-    delete parsedAttributes.d;
-    return new fabric.Path(path, extend(parsedAttributes, options));
+    var parsedAttributes = fabric.parseAttributes(element, fabric.Path.ATTRIBUTE_NAMES);
+    return new fabric.Path(parsedAttributes.d, parsedAttributes ? extend(parsedAttributes, options) : undefined);
   };
 })(this);
 

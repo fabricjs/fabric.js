@@ -5,7 +5,7 @@
  * @param {Object} destination Where to copy to
  * @param {Object} source Where to copy from
  */
-function extend(destination, source) {  
+function extend(destination, source) {
   // JScript DontEnum bug is not taken care of
   for (var property in source) {
     destination[property] = source[property];

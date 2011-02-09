@@ -511,9 +511,7 @@
    * @return {fabric.Path} Instance of fabric.Path
    */
   fabric.Path.fromElement = function(element, options) {
-    var parsedAttributes = fabric.parseAttributes(element, fabric.Path.ATTRIBUTE_NAMES),
-        path = parsedAttributes.d;
-    delete parsedAttributes.d;
-    return new fabric.Path(path, extend(parsedAttributes, options));
+    var parsedAttributes = fabric.parseAttributes(element, fabric.Path.ATTRIBUTE_NAMES);
+    return new fabric.Path(parsedAttributes.d, extend(parsedAttributes, options));
   };
 })(this);

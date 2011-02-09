@@ -331,8 +331,9 @@
         callback(instances);
       }
     }
-
-    elements.map(function(el, index) {
+    
+    for (var index = 0, el, len = elements.length; index < len; index++) {
+      el = elements[index];
       var klass = fabric[capitalize(el.tagName)];
       if (klass && klass.fromElement) {
         try {
@@ -356,7 +357,7 @@
       else {
         checkIfDone();
       }
-    });
+    }
   };
   
   /**
