@@ -2744,7 +2744,10 @@ fabric.util.animate = animate;
   };
 
   function resolveGradients(instances) {
-    var ctx = fabric.Element.activeInstance.getContext();
+    var activeInstance = fabric.Element.activeInstance,
+        ctx = activeInstance ? activeInstance.getContext() : null;
+        
+    if (!ctx) return;
 
     for (var i = instances.length; i--; ) {
       var instanceFillValue = instances[i].get('fill');
@@ -2755,12 +2758,7 @@ fabric.util.animate = animate;
 
         if (fabric.gradientDefs[gradientId]) {
           instances[i].set('fill',
-            fabric.Gradient.fromElement(
-              fabric.gradientDefs[gradientId],
-              ctx,
-              instances[i]
-            )
-          );
+            fabric.Gradient.fromElement(fabric.gradientDefs[gradientId], ctx, instances[i]));
         }
       }
     }
