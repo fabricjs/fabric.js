@@ -1192,7 +1192,6 @@ Cufon.registerEngine('canvas', (function() {
 
 		if (textDecoration.underline) line(-font.face['underline-position'], g.fillStyle);
 		if (textDecoration.overline) line(font.ascent, g.fillStyle);
-		if (textDecoration['line-through']) line(-font.descent, g.fillStyle);
 
 		function renderText() {
 		  if (isItalic) {
@@ -1234,7 +1233,13 @@ Cufon.registerEngine('canvas', (function() {
 			}
 		}
 
+		g.save();
 		renderText();
+		g.restore();
+
+		if (textDecoration['line-through']) {
+		  line(-font.descent, g.fillStyle);
+		}
 
 		g.restore();
 		g.restore();
@@ -2746,7 +2751,7 @@ fabric.util.animate = animate;
   function resolveGradients(instances) {
     var activeInstance = fabric.Element.activeInstance,
         ctx = activeInstance ? activeInstance.getContext() : null;
-        
+
     if (!ctx) return;
 
     for (var i = instances.length; i--; ) {
