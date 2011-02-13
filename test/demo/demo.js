@@ -96,6 +96,7 @@
         fabric.Image.fromURL('assets/logo.png', function(image) {
           image.set('left', left).set('top', top).set('angle', angle).scale(getRandomNum(0.1, 1)).setCoords();
           canvas.add(image);
+          updateComplexity();
         });
         break;
       
@@ -121,6 +122,7 @@
               .setCoords();
               
             canvas.add(loadedObject);
+            updateComplexity();
             canvas.calcOffset();
           });
         }
@@ -363,6 +365,7 @@
   canvas.freeDrawingColor = drawingColorEl.value;
   canvas.freeDrawingLineWidth = parseInt(drawingLineWidthEl.value, 10) || 1;
   
+  /*
   var helloWorld = new fabric.Text('Hello world!', { 
     left: getRandomInt(100, 650), 
     top: getRandomInt(100, 650),
@@ -371,6 +374,8 @@
   });
   
   canvas.add(helloWorld);
+  */
+  updateComplexity();
   
   document.onkeydown = function(e) {
     var obj = canvas.getActiveObject() || canvas.getActiveGroup();
