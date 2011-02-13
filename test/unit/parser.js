@@ -110,10 +110,12 @@
     }
     ok(error === undefined, 'No error is raised');
     
-    setTimeout(function(){
-      ok(parsedElements[0] instanceof fabric.Rect);
-      ok(parsedElements[1] instanceof fabric.Circle);
-      ok(parsedElements[2] instanceof fabric.Path);
+    setTimeout(function() {
+      if (parsedElements) {
+        ok(parsedElements[0] instanceof fabric.Rect);
+        ok(parsedElements[1] instanceof fabric.Circle);
+        ok(parsedElements[2] instanceof fabric.Path);
+      }
       start();
     }, 1000);
   });
