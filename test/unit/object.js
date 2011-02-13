@@ -73,22 +73,17 @@
     ok(cObj.stateProperties.length > 0);
   });
   
-  test('options', function() {
-    var cObj = new fabric.Object();
-    ok(typeof cObj.options == 'object');
-  });
-  
   test('transform', function() {
     var cObj = new fabric.Object();
     ok(typeof cObj.transform == 'function');
   });
   
   test('toJSON', function() {
-    var emptyObjectJSON = '{"type":"object","left":0,"top":0,"width":100,"height":100,"fill":"rgb(0,0,0)",'+
+    var emptyObjectJSON = '{"type":"object","left":0,"top":0,"width":0,"height":0,"fill":"rgb(0,0,0)",'+
                           '"overlayFill":null,"stroke":null,"strokeWidth":1,"scaleX":1,"scaleY":1,"angle":0,'+
                           '"flipX":false,"flipY":false,"opacity":1}';
       
-    var augmentedJSON = '{"type":"object","left":0,"top":0,"width":122,"height":100,"fill":"rgb(0,0,0)",'+
+    var augmentedJSON = '{"type":"object","left":0,"top":0,"width":122,"height":0,"fill":"rgb(0,0,0)",'+
                         '"overlayFill":null,"stroke":null,"strokeWidth":1,"scaleX":1.3,"scaleY":1,"angle":0,'+
                         '"flipX":false,"flipY":true,"opacity":0.88}';
       
@@ -105,8 +100,8 @@
       'type': "object",
       'left': 0, 
       'top': 0, 
-      'width': 100, 
-      'height': 100, 
+      'width': 0, 
+      'height': 0, 
       'fill': 'rgb(0,0,0)',
       'overlayFill': null,
       'stroke': null, 
@@ -170,12 +165,6 @@
     same(cObj.toObject(), cObj.toDatalessObject());
   });
   
-  test('toObjectWithoutDefaultValues', function() {
-    var cObj = new fabric.Object();
-    cObj.includeDefaultValues = false;
-    same({ type: 'object' }, cObj.toObject());
-  });
-  
   test('isActive', function() {
     var cObj = new fabric.Object();
     ok(typeof cObj.isActive == 'function');
@@ -208,7 +197,7 @@
   test('getWidth', function() {
     var cObj = new fabric.Object();
     ok(typeof cObj.getWidth == 'function');
-    equals(cObj.getWidth(), 100);
+    equals(cObj.getWidth(), 0);
     cObj.set('width', 123);
     equals(cObj.getWidth(), 123);
     cObj.set('scaleX', 2);
@@ -218,7 +207,7 @@
   test('getHeight', function() {
     var cObj = new fabric.Object();
     ok(typeof cObj.getHeight == 'function');
-    equals(cObj.getHeight(), 100);
+    equals(cObj.getHeight(), 0);
     cObj.set('height', 123);
     equals(cObj.getHeight(), 123);
     cObj.set('scaleY', 2);
@@ -286,7 +275,7 @@
   });
   
   test('setCoords', function() {
-    var cObj = new fabric.Object({ left: 200, top: 200 });
+    var cObj = new fabric.Object({ left: 200, top: 200, width: 100, height: 100 });
     ok(typeof cObj.setCoords == 'function');
     equals(cObj.setCoords(), cObj, 'chainable');
     
@@ -399,6 +388,7 @@
   test('hasStateChanged', function() {
     var cObj = new fabric.Object();
     ok(typeof cObj.hasStateChanged == 'function');
+    cObj.setupState();
     ok(!cObj.hasStateChanged());
     cObj.saveState();
     cObj.set('left', 123).set('top', 456);
@@ -408,6 +398,7 @@
   test('saveState', function() {
     var cObj = new fabric.Object();
     ok(typeof cObj.saveState == 'function');
+    cObj.setupState();
     equals(cObj.saveState(), cObj, 'chainable');
     cObj.set('left', 123).set('top', 456);
     cObj.saveState();
@@ -418,6 +409,7 @@
   
   test('intersectsWithRectangle', function() {
     var cObj = new fabric.Object({ left: 100, top: 100, width: 100, height: 100 });
+    cObj.setCoords();
     ok(typeof cObj.intersectsWithRect == 'function');
          
     var point1 = new fabric.Point(110, 100),
@@ -431,19 +423,23 @@
   
   test('intersectsWithObject', function() {
     var cObj = new fabric.Object({ left: 100, top: 100, width: 100, height: 100 });
+    cObj.setCoords();
     ok(typeof cObj.intersectsWithObject == 'function');
     
     var cObj2 = new fabric.Object({ left: 50, top: 50, width: 200, height: 200 });
+    cObj2.setCoords();
     ok(cObj.intersectsWithObject(cObj2));
     ok(cObj2.intersectsWithObject(cObj));
     
     var cObj3 = new fabric.Object({ left: 400, top: 356, width: 13, height: 33 });
+    cObj3.setCoords();
     ok(!cObj.intersectsWithObject(cObj3));
     ok(!cObj3.intersectsWithObject(cObj));  
   });
   
   test('isContainedWithinRect', function() {
     var cObj = new fabric.Object({ left: 20, top: 20, width: 10, height: 10 });
+    cObj.setCoords();
     ok(typeof cObj.isContainedWithinRect == 'function');
     
     // fully contained
