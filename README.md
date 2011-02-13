@@ -115,5 +115,6 @@ SOFTWARE.
 ### TODO
 
 - All methods under fabric.util.* (except misc.js) need unit tests
-- SVG-to-canvas parser needs to support more SVG declarations (e.g. gradients are not yet supported)
+- SVG-to-canvas parser needs to support more SVG declarations (e.g. radial gradients are not yet supported)
 - IE<9 buggy with drawing images (images are rendered, but can't be moved/scaled/rotated)
+- Need more performance tests vs. Raphael.js (to be able to determine which one is better at which times; e.g. static vs. dynamic, animation, etc.)
