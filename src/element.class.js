@@ -1157,6 +1157,8 @@
      */
     insertAt: function (object, index) {
       this._objects.splice(index, 0, object);
+      this.stateful && object.setupState();
+      object.setCoords();
       this.renderAll();
       return this;
     },

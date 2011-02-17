@@ -1254,6 +1254,9 @@ Cufon.registerEngine('vml', (function() {
 
 	if (!document.namespaces) return;
 
+	var canvasEl = document.createElement('canvas');
+	if (canvasEl && canvasEl.getContext && canvasEl.getContext.apply) return;
+
 	if (document.namespaces.cvml == null) {
 		document.namespaces.add('cvml', 'urn:schemas-microsoft-com:vml');
 	}
@@ -4900,6 +4903,8 @@ fabric.util.animate = animate;
      */
     insertAt: function (object, index) {
       this._objects.splice(index, 0, object);
+      this.stateful && object.setupState();
+      object.setCoords();
       this.renderAll();
       return this;
     },
