@@ -469,7 +469,8 @@
       
       var minX = min(aX), 
           minY = min(aY), 
-          deltaX = deltaY = 0;
+          deltaX = 0,
+          deltaY = 0;
       
       var o = {
         top: minY - deltaY,
