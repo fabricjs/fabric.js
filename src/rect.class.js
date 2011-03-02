@@ -39,8 +39,19 @@
      * @return {Object} thisArg
      */
     initialize: function(options) {
+      this._initStateProperties();
       this.callSuper('initialize', options);
       this._initRxRy();
+    },
+    
+    /**
+     * Creates `stateProperties` list on an instance, and adds `fabric.Rect` -specific ones to it 
+     * (such as "rx", "ry", etc.)
+     * @private
+     * @method _initStateProperties
+     */
+    _initStateProperties: function() {
+      this.stateProperties = this.stateProperties.concat(['rx', 'ry']);
     },
     
     /**
