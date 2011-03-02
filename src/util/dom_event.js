@@ -188,6 +188,18 @@
   }
   
   /**
+   * @mthod stopObservingEvent
+   * @memberOf fabric.util
+   * @param {String} eventName
+   * @param {Function} handler
+   */
+  function stopObservingEvent(eventName, handler) {
+    if (customEventListeners[eventName]) {
+      fabric.util.removeFromArray(customEventListeners[eventName], handler);
+    }
+  }
+  
+  /**
    * Fires event with an optional memo object
    * @mthod fireEvent
    * @memberOf fabric.util
@@ -237,5 +249,6 @@
   
   fabric.util.getPointer = getPointer;
   fabric.util.observeEvent = observeEvent;
+  fabric.util.stopObservingEvent = stopObservingEvent;
   fabric.util.fireEvent = fireEvent;
 })(this);
