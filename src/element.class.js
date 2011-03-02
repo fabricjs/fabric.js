@@ -843,7 +843,16 @@
       // TODO (kangax): maybe remove Path creation from here, to decouple fabric.Element from fabric.Path, 
       // and instead fire something like "drawing:completed" event with path string
       
-      var p = new fabric.Path(path.join('')); 
+      path = path.join('');
+      
+      if (path === "M 0 0 L 0 0 ") {
+        // do not create 0 width/height paths, as they are rendered inconsistently across browsers
+        // Firefox 4, for example, renders a dot, whereas Chrome 10 renders nothing
+        return;
+      }
+
+      var p = new fabric.Path(path);
+       
       p.fill = null;
       p.stroke = this.freeDrawingColor;
       p.strokeWidth = this.freeDrawingLineWidth;
@@ -1781,6 +1790,10 @@
               default:
                 var klass = fabric[camelize(capitalize(obj.type))];
                 if (klass && klass.fromObject) {
+                  // restore path
+                  if (path) {
+                    obj[pathProp] = path;
+                  }
                   onObjectLoaded(klass.fromObject(obj), index);
                 }
                 break;
