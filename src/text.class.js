@@ -57,27 +57,20 @@
      * Creates `stateProperties` list on an instance, and adds `fabric.Text` -specific ones to it 
      * (such as "fontfamily", "fontweight", etc.)
      * @private
-     * @method initStateProperties
+     * @method _initStateProperties
      */
     _initStateProperties: function() {
-      var o;
-      if ((o = this.constructor) && 
-          (o = o.superclass) &&
-          (o = o.prototype) &&
-          (o = o.stateProperties) &&
-          o.concat) {
-        this.stateProperties = o.concat();
-        this.stateProperties.push(
-          'fontfamily', 
-          'fontweight', 
-          'path', 
-          'text', 
-          'textDecoration', 
-          'textShadow', 
-          'fontStyle'
-        );
-        fabric.util.removeFromArray(this.stateProperties, 'width');
-      }
+      this.stateProperties = this.stateProperties.concat();
+      this.stateProperties.push(
+        'fontfamily', 
+        'fontweight', 
+        'path', 
+        'text', 
+        'textDecoration', 
+        'textShadow', 
+        'fontStyle'
+      );
+      fabric.util.removeFromArray(this.stateProperties, 'width');
     },
     
     /**
