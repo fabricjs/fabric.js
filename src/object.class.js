@@ -119,7 +119,7 @@
       var i = this.stateProperties.length, prop;
       while (i--) {
         prop = this.stateProperties[i];
-        if (options[prop]) {
+        if (prop in options) {
           (prop === 'angle')
             ? this.setAngle(options[prop])
             : (this[prop] = options[prop]);
