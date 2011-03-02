@@ -2047,6 +2047,18 @@ if (!Function.prototype.bind) {
   }
 
   /**
+   * @mthod stopObservingEvent
+   * @memberOf fabric.util
+   * @param {String} eventName
+   * @param {Function} handler
+   */
+  function stopObservingEvent(eventName, handler) {
+    if (customEventListeners[eventName]) {
+      fabric.util.removeFromArray(customEventListeners[eventName], handler);
+    }
+  }
+
+  /**
    * Fires event with an optional memo object
    * @mthod fireEvent
    * @memberOf fabric.util
@@ -2091,6 +2103,7 @@ if (!Function.prototype.bind) {
 
   fabric.util.getPointer = getPointer;
   fabric.util.observeEvent = observeEvent;
+  fabric.util.stopObservingEvent = stopObservingEvent;
   fabric.util.fireEvent = fireEvent;
 })(this);
 (function () {
@@ -4604,7 +4617,14 @@ fabric.util.animate = animate;
       }
 
 
-      var p = new fabric.Path(path.join(''));
+      path = path.join('');
+
+      if (path === "M 0 0 L 0 0 ") {
+        return;
+      }
+
+      var p = new fabric.Path(path);
+
       p.fill = null;
       p.stroke = this.freeDrawingColor;
       p.strokeWidth = this.freeDrawingLineWidth;
@@ -5508,6 +5528,9 @@ fabric.util.animate = animate;
               default:
                 var klass = fabric[camelize(capitalize(obj.type))];
                 if (klass && klass.fromObject) {
+                  if (path) {
+                    obj[pathProp] = path;
+                  }
                   onObjectLoaded(klass.fromObject(obj), index);
                 }
                 break;
@@ -6240,7 +6263,7 @@ fabric.util.animate = animate;
       var i = this.stateProperties.length, prop;
       while (i--) {
         prop = this.stateProperties[i];
-        if (options[prop]) {
+        if (prop in options) {
           (prop === 'angle')
             ? this.setAngle(options[prop])
             : (this[prop] = options[prop]);
@@ -7810,8 +7833,19 @@ fabric.util.animate = animate;
      * @return {Object} thisArg
      */
     initialize: function(options) {
+      this._initStateProperties();
       this.callSuper('initialize', options);
       this._initRxRy();
+    },
+
+    /**
+     * Creates `stateProperties` list on an instance, and adds `fabric.Rect` -specific ones to it
+     * (such as "rx", "ry", etc.)
+     * @private
+     * @method _initStateProperties
+     */
+    _initStateProperties: function() {
+      this.stateProperties = this.stateProperties.concat(['rx', 'ry']);
     },
 
     /**
@@ -8661,7 +8695,8 @@ fabric.util.animate = animate;
 
       var minX = min(aX),
           minY = min(aY),
-          deltaX = deltaY = 0;
+          deltaX = 0,
+          deltaY = 0;
 
       var o = {
         top: minY - deltaY,
@@ -9458,27 +9493,20 @@ fabric.util.animate = animate;
      * Creates `stateProperties` list on an instance, and adds `fabric.Text` -specific ones to it
      * (such as "fontfamily", "fontweight", etc.)
      * @private
-     * @method initStateProperties
+     * @method _initStateProperties
      */
     _initStateProperties: function() {
-      var o;
-      if ((o = this.constructor) &&
-          (o = o.superclass) &&
-          (o = o.prototype) &&
-          (o = o.stateProperties) &&
-          o.concat) {
-        this.stateProperties = o.concat();
-        this.stateProperties.push(
-          'fontfamily',
-          'fontweight',
-          'path',
-          'text',
-          'textDecoration',
-          'textShadow',
-          'fontStyle'
-        );
-        fabric.util.removeFromArray(this.stateProperties, 'width');
-      }
+      this.stateProperties = this.stateProperties.concat();
+      this.stateProperties.push(
+        'fontfamily',
+        'fontweight',
+        'path',
+        'text',
+        'textDecoration',
+        'textShadow',
+        'fontStyle'
+      );
+      fabric.util.removeFromArray(this.stateProperties, 'width');
     },
 
     /**
