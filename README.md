@@ -19,8 +19,8 @@ Contributions are very much welcome!
 - Firefox 2+
 - Safari 3+
 - Opera 9.64+
-- Chrome 1+
-- IE9 beta
+- Chrome (all versions should work)
+- IE9
 
 #### With help of [Explorer Canvas](http://code.google.com/p/explorercanvas/)
 
@@ -95,7 +95,7 @@ Documentation is always available at [http://kangax.github.com/fabric.js/docs/](
 
 ### MIT License
 
-Copyright (c) 2008-2010 Bitsonnet
+Copyright (c) 2008-2011 Bitsonnet
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
