@@ -55,6 +55,8 @@
    */
   fabric.Element = function (el, options) {
     
+    options || (options = { });
+    
     /**
      * The object literal containing mouse position if clicked in an empty area (no image)
      * @property _groupSelector
@@ -75,13 +77,6 @@
      * @type object
      */
     this._context = null;
-
-    /**
-     * The main element that contains the canvas
-     * @property _element
-     * @type object
-     */
-    this._element = null;
 
     /**
      * The object literal containing the current x,y params of the transformation
@@ -107,28 +102,16 @@
      */
     this._freeDrawingYPoints = [ ];
     
-     /**
-      * An object containing config parameters
-      * @property _config
-      * @type object
-      */
-    this._config = {
-      width: 300, 
-      height: 150 
-    };
-    
-    options = options || { };
-    
-    this._initElement(el);
-    this._initConfig(options);
+    this._createUpperCanvas(el);
+    this._initOptions(options);
+    this._initWrapperElement();
+    this._createLowerCanvas();
+
+    this._initEvents();
     
     if (options.overlayImage) {
       this.setOverlayImage(options.overlayImage);
     }
-    
-    this._createCanvasBackground();
-    this._createCanvasContainer();
-    this._initEvents();
     
     this.calcOffset();
     
@@ -219,6 +202,12 @@
     CANVAS_HEIGHT:          600,
     
     /**
+     * @constant
+     * @type String
+     */
+    CONTAINER_CLASS:        'canvas-container',
+    
+    /**
      * Callback; invoked right before object is about to be scaled/rotated
      * @method onBeforeScaleRotate
      * @param {fabric.Object} target Object that's about to be scaled/rotated
@@ -242,7 +231,7 @@
      * @chainable
      */
     calcOffset: function () {
-      this._offset = getElementOffset(this.getElement());
+      this._offset = getElementOffset(this.upperCanvasEl);
       return this;
     },
     
@@ -272,85 +261,74 @@
     },
     
     /**
-     * Canvas class' initialization method; Automatically called by constructor;
-     * Sets up all DOM references for pre-existing markup and creates required markup if it's not yet created.
-     * already present.
-     * @method _initElement
-     * @param {HTMLElement|String} canvasEl Canvas element
-     * @throws {CANVAS_INIT_ERROR} If canvas can not be initialized
-     */
-    _initElement: function (canvasEl) {
-      var el = fabric.util.getById(canvasEl);
-      this._element = el || document.createElement('canvas');
-      
-      if (typeof this._element.getContext === 'undefined' && typeof G_vmlCanvasManager !== 'undefined') {
-        G_vmlCanvasManager.initElement(this._element);
-      }
-      if (typeof this._element.getContext === 'undefined') {
-        throw CANVAS_INIT_ERROR;
-      }
-      if (!(this.contextTop = this._element.getContext('2d'))) {
-        throw CANVAS_INIT_ERROR;
-      }
-      
-      var width = this._element.width || 0,
-          height = this._element.height || 0;
-      
-      this._initWrapperElement(width, height);
-      this._setElementStyle(width, height);
-    },
-    
-    /**
      * @private
      * @method _initWrapperElement
      * @param {Number} width
      * @param {Number} height
      */
-    _initWrapperElement: function (width, height) {
-      var wrapper = fabric.util.wrapElement(this.getElement(), 'div', { 'class': 'canvas_container' });
-      fabric.util.setStyle(wrapper, {
-        width: width + 'px',
-        height: height + 'px'
+    _initWrapperElement: function () {
+      this.wrapperEl = fabric.util.wrapElement(this.upperCanvasEl, 'div', { 
+        'class': this.CONTAINER_CLASS
       });
-      fabric.util.makeElementUnselectable(wrapper);
-      this.wrapper = wrapper;
+      fabric.util.setStyle(this.wrapperEl, {
+        width: this.getWidth() + 'px',
+        height: this.getHeight() + 'px',
+        position: 'relative'
+      });
+      fabric.util.makeElementUnselectable(this.wrapperEl);
     },
     
     /**
      * @private
-     * @method _setElementStyle
-     * @param {Number} width
-     * @param {Number} height
+     * @method _applyCanvasStyle
+     * @param {Element} element
      */
-    _setElementStyle: function (width, height) {
-      fabric.util.setStyle(this.getElement(), {
+    _applyCanvasStyle: function (element) {
+      fabric.util.setStyle(element, {
         position: 'absolute',
-        width: width + 'px',
-        height: height + 'px',
+        width: this.getWidth() + 'px',
+        height: this.getHeight() + 'px',
         left: 0,
         top: 0
       });
+      element.width = this.getWidth() || element.width;
+      element.height = this.getHeight() || element.height;
+      fabric.util.makeElementUnselectable(element);
+    },
+    
+    /**
+     * @private
+     * @method initCanvas
+     * @param {Element} element
+     */
+    _createCanvasElement: function() {
+      var element = document.createElement('canvas');
+      if (!element) {
+        throw CANVAS_INIT_ERROR;
+      }
+      if (typeof element.getContext === 'undefined' && typeof G_vmlCanvasManager !== 'undefined') {
+        G_vmlCanvasManager.initElement(element);
+      }
+      if (typeof element.getContext === 'undefined') {
+        throw CANVAS_INIT_ERROR;
+      }
+      return element;
     },
 
     /**
-     * For now, use an object literal without methods to store the config params
-     * @method _initConfig
-     * @param config {Object} userConfig The configuration Object literal 
-     * containing the configuration that should be set for this module;
-     * See configuration documentation for more details.
+     * @method _initOptions
+     * @param {Object} options
      */
-    _initConfig: function (config) {
-      extend(this._config, config || { });
-      
-      for (var prop in this._config) {
-        this[prop] = this._config[prop];
+    _initOptions: function (options) {
+      for (var prop in options) {
+        this[prop] = options[prop];
       }
       
-      this._config.width = parseInt(this._element.width, 10) || 0;
-      this._config.height = parseInt(this._element.height, 10) || 0;
+      this.width = parseInt(this.upperCanvasEl.width, 10) || 0;
+      this.height = parseInt(this.upperCanvasEl.height, 10) || 0;
 
-      this._element.style.width = this._config.width + 'px';
-      this._element.style.height = this._config.height + 'px';
+      this.upperCanvasEl.style.width = this.width + 'px';
+      this.upperCanvasEl.style.height = this.height + 'px';
     },
 
     /**
@@ -368,65 +346,38 @@
       this._onMouseMove = function (e) { _this.__onMouseMove(e); };
       this._onResize = function (e) { _this.calcOffset() };
       
-      addListener(this._element, 'mousedown', this._onMouseDown);
+      addListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
       addListener(document, 'mousemove', this._onMouseMove);
       addListener(document, 'mouseup', this._onMouseUp);
       addListener(window, 'resize', this._onResize);
     },
     
     /**
-     * Creates canvas elements
-     * @method _createCanvasElement
-     * @private
+     * @method _createUpperCanvas
+     * @param {HTMLElement|String} canvasEl Canvas element
+     * @throws {CANVAS_INIT_ERROR} If canvas can not be initialized
      */
-    _createCanvasElement: function (className) {
-        
-      var element = document.createElement('canvas');
-      if (!element) {
-        return;
-      }
+    _createUpperCanvas: function (canvasEl) {
+      this.upperCanvasEl = fabric.util.getById(canvasEl) || this._createCanvasElement();
       
-      element.className = className;
-      var oContainer = this._element.parentNode.insertBefore(element, this._element);
+      fabric.util.addClass(this.upperCanvasEl, 'upper-canvas');
+      this._applyCanvasStyle(this.upperCanvasEl);
       
-      oContainer.width = this.getWidth();
-      oContainer.height = this.getHeight();
-      oContainer.style.width = this.getWidth() + 'px';
-      oContainer.style.height = this.getHeight() + 'px';
-      oContainer.style.position = 'absolute';
-      oContainer.style.left = 0;
-      oContainer.style.top = 0;
-      
-      if (typeof element.getContext === 'undefined' && typeof G_vmlCanvasManager !== 'undefined') {
-        // try augmenting element with excanvas' G_vmlCanvasManager
-        G_vmlCanvasManager.initElement(element);
-      }
-      if (typeof element.getContext === 'undefined') {
-        // if that didn't work, throw error
-        throw CANVAS_INIT_ERROR;
-      }
-      fabric.util.makeElementUnselectable(oContainer);
-      return oContainer;
+      this.contextTop = this.upperCanvasEl.getContext('2d');
     },
-
+    
     /**
-     * Creates a secondary canvas to contain all the images are not being translated/rotated/scaled
-     * @method _createCanvasContainer
+     * Creates a secondary canvas
+     * @method _createLowerCanvas
      */
-    _createCanvasContainer: function () {
-      var canvas = this._createCanvasElement('canvas-container');
-      this.contextContainerEl = canvas;
-      this.contextContainer = canvas.getContext('2d');
-    },
-
-    /**
-     * Creates a "background" canvas
-     * @method _createCanvasBackground
-     */
-    _createCanvasBackground: function () {
-      var canvas = this._createCanvasElement('canvas-container');
-      this._contextBackgroundEl = canvas;
-      this._contextBackground = canvas.getContext('2d');
+    _createLowerCanvas: function () {
+      this.lowerCanvasEl = this._createCanvasElement();
+      this.lowerCanvasEl.className = 'lower-canvas';
+      
+      this.wrapperEl.insertBefore(this.lowerCanvasEl, this.upperCanvasEl);
+      
+      this._applyCanvasStyle(this.lowerCanvasEl);
+      this.contextContainer = this.lowerCanvasEl.getContext('2d');
     },
     
     /**
@@ -435,7 +386,7 @@
      * @return {Number}
      */
     getWidth: function () {
-      return this._config.width;
+      return this.width;
     },
     
     /**
@@ -444,7 +395,7 @@
      * @return {Number}
      */
     getHeight: function () {
-      return this._config.height;
+      return this.height;
     },
     
     /**
@@ -493,19 +444,16 @@
      * @chainable true
      */
     _setDimension: function (prop, value) {
-      this.contextContainerEl[prop] = value;
-      this.contextContainerEl.style[prop] = value + 'px';
+      this.lowerCanvasEl[prop] = value;
+      this.lowerCanvasEl.style[prop] = value + 'px';
       
-      this._contextBackgroundEl[prop] = value;
-      this._contextBackgroundEl.style[prop] = value + 'px';
+      this.upperCanvasEl[prop] = value;
+      this.upperCanvasEl.style[prop] = value + 'px';
       
-      this._element[prop] = value;
-      this._element.style[prop] = value + 'px';
+      this.wrapperEl.style[prop] = value + 'px';
       
-      // <DIV> container (parent of all <CANVAS> elements)
-      this._element.parentNode.style[prop] = value + 'px';
+      this[prop] = value;
       
-      this._config[prop] = value;
       this.calcOffset();
       this.renderAll();
       
@@ -669,7 +617,7 @@
      * @return {HTMLCanvasElement}
      */
     getElement: function () {
-      return this._element;
+      return this.upperCanvasEl;
     },
     
     /**
@@ -893,7 +841,7 @@
       else if (!this._currentTransform) {
         
         // alias style to elimintate unnecessary lookup
-        var style = this._element.style;
+        var style = this.upperCanvasEl.style;
         
         // Here we are hovering the canvas then we will determine
         // what part of the pictures we are hovering to change the caret symbol.
@@ -1021,7 +969,7 @@
      * @method _setCursor
      */
     _setCursor: function (value) {
-      this._element.style.cursor = value;
+      this.upperCanvasEl.style.cursor = value;
     },
     
     /**
@@ -1032,7 +980,7 @@
      * @param target {Object} Object that the mouse is hovering, if so.
      */
     _setCursorFromEvent: function (e, target) {
-      var s = this._element.style;
+      var s = this.upperCanvasEl.style;
       if (!target) {
         s.cursor = 'default';
         return false;
@@ -1198,8 +1146,7 @@
      * @chainable
      */
     clearContext: function(ctx) {
-      // this sucks, but we can't use `getWidth`/`getHeight` here for perf. reasons
-      ctx.clearRect(0, 0, this._config.width, this._config.height);
+      ctx.clearRect(0, 0, this.width, this.height);
       return this;
     },
     
@@ -1226,13 +1173,7 @@
      */ 
     renderAll: function (allOnTop) {
       
-      // this sucks, but we can't use `getWidth`/`getHeight` here for perf. reasons
-      var w = this._config.width,
-          h = this._config.height;
-          
-      // when allOnTop is true all images are rendered in the top canvas.
-      // This is used for actions like toDataUrl that needs to take some actions on a unique canvas.
-      var containerCanvas = allOnTop ? this.contextTop : this.contextContainer;
+      var containerCanvas = this[allOnTop ? 'contextTop' : 'contextContainer'];
 
       this.clearContext(this.contextTop);
 
@@ -1240,7 +1181,7 @@
         this.clearContext(containerCanvas);
       }
       containerCanvas.fillStyle = this.backgroundColor;
-      containerCanvas.fillRect(0, 0, w, h);
+      containerCanvas.fillRect(0, 0, this.width, this.height);
       
       var length = this._objects.length,
           activeGroup = this.getActiveGroup(),
@@ -1399,7 +1340,7 @@
       }
       if (format === 'jpeg' || format === 'png') {
         this.renderAll(true);
-        data = this.getElement().toDataURL('image/' + format);
+        data = this.upperCanvasEl.toDataURL('image/' + format);
         this.renderAll();
       }
       return data;
@@ -2216,7 +2157,7 @@
      */
     dispose: function () {
       this.clear();
-      removeListener(this.getElement(), 'mousedown', this._onMouseDown);
+      removeListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
       removeListener(document, 'mouseup', this._onMouseUp);
       removeListener(document, 'mousemove', this._onMouseMove);
       removeListener(window, 'resize', this._onResize);

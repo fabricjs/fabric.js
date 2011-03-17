@@ -12,7 +12,7 @@ h2 { background: #ffc; margin-top: 0; padding: 5px; color: #333; font-size: 1em;
 #drawing-mode-options { margin-top: 5px; background: #ffc; padding: 5px; border: 1px solid #aaa; }
 #text { position: relative; top: 30px; width: 250px; height: 100px; }
 
-.canvas_container { margin: 0 auto; position: relative; float: left; border: 1px solid #aaa; }
+.canvas-container { margin: 0 auto; float: left; border: 1px solid #aaa; }
 .clear { color: red; font-weight: bold; margin-top: 1em; }
 
 #drawing-mode { color: blue; }
