@@ -1084,9 +1084,10 @@ Cufon.registerEngine('canvas', (function() {
 
 		var width = 0, lastWidth = null;
 
-    var maxWidth = 0;
+    var maxWidth = 0, lines = 1;
 		for (var i = 0, l = chars.length; i < l; ++i) {
 		  if (chars[i] === '\n') {
+		    lines++
 			  if (width > maxWidth) {
 			    maxWidth = width;
 			  }
@@ -1148,7 +1149,8 @@ Cufon.registerEngine('canvas', (function() {
 		var _height = size.convert(font.height);
 
 		Cufon.textOptions.width = _width;
-		Cufon.textOptions.height = _height;
+		Cufon.textOptions.height = _height * lines;
+		Cufon.textOptions.lines = lines;
 
 		if (HAS_INLINE_BLOCK) {
 			wStyle.width = wrapperWidth;
@@ -1167,7 +1169,7 @@ Cufon.registerEngine('canvas', (function() {
 
 		g.translate(
 		  -expandLeft - ((1/scale * canvas.width) / 2) + (Cufon.fonts[font.family].offsetLeft || 0),
-		  -expandTop - (1/scale * canvas.height) / 2
+		  -expandTop - (canvas.height / scale * Cufon.textOptions.lines) / 2
 		);
 
 		g.lineWidth = font.face['underline-thickness'];
@@ -1201,7 +1203,7 @@ Cufon.registerEngine('canvas', (function() {
 		  var left = 0;
 			for (var i = 0, l = chars.length; i < l; ++i) {
 			  if (chars[i] === '\n') {
-          g.translate(-left, -font.ascent);
+          g.translate(-left, -font.ascent - font.ascent / 5 /* space between lines */);
           left = 0;
           continue;
         }
@@ -6626,7 +6628,8 @@ fabric.util.animate = animate;
           scaleOffsetY = (padding + size2) / this.scaleY,
           scaleOffsetX = (padding + size2) / this.scaleX,
           scaleOffsetSizeX = (padding + size2 - size) / this.scaleX,
-          scaleOffsetSizeY = (padding + size2 - size) / this.scaleY;
+          scaleOffsetSizeY = (padding + size2 - size) / this.scaleY,
+          height = this.height;
 
       ctx.save();
 
@@ -6642,11 +6645,11 @@ fabric.util.animate = animate;
       ctx.fillRect(_left, _top, sizeX, sizeY);
 
       _left = left - scaleOffsetX;
-      _top = top + this.height + scaleOffsetSizeY;
+      _top = top + height + scaleOffsetSizeY;
       ctx.fillRect(_left, _top, sizeX, sizeY);
 
       _left = left + this.width + scaleOffsetSizeX;
-      _top = top + this.height + scaleOffsetSizeY;
+      _top = top + height + scaleOffsetSizeY;
       ctx.fillRect(_left, _top, sizeX, sizeY);
 
       _left = left + this.width/2 - scaleOffsetX;
@@ -6654,15 +6657,15 @@ fabric.util.animate = animate;
       ctx.fillRect(_left, _top, sizeX, sizeY);
 
       _left = left + this.width/2 - scaleOffsetX;
-      _top = top + this.height + scaleOffsetSizeY;
+      _top = top + height + scaleOffsetSizeY;
       ctx.fillRect(_left, _top, sizeX, sizeY);
 
       _left = left + this.width + scaleOffsetSizeX;
-      _top = top + this.height/2 - scaleOffsetY;
+      _top = top + height/2 - scaleOffsetY;
       ctx.fillRect(_left, _top, sizeX, sizeY);
 
       _left = left - scaleOffsetX;
-      _top = top + this.height/2 - scaleOffsetY;
+      _top = top + height/2 - scaleOffsetY;
       ctx.fillRect(_left, _top, sizeX, sizeY);
 
       ctx.restore();

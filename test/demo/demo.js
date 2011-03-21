@@ -365,7 +365,7 @@
   canvas.freeDrawingColor = drawingColorEl.value;
   canvas.freeDrawingLineWidth = parseInt(drawingLineWidthEl.value, 10) || 1;
   
-  /*
+  
   var helloWorld = new fabric.Text('Hello world!', { 
     left: getRandomInt(100, 650), 
     top: getRandomInt(100, 650),
@@ -374,7 +374,7 @@
   });
   
   canvas.add(helloWorld);
-  */
+  
   updateComplexity();
   
   document.onkeydown = function(e) {

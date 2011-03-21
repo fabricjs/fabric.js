@@ -502,30 +502,29 @@
     drawBorders: function(ctx) {
       var padding = this.padding,
           padding2 = padding * 2;
-      
+
       ctx.save();
-      
+
       ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
       ctx.strokeStyle = this.borderColor;
-      
+
       var scaleX = 1 / (this.scaleX < this.MIN_SCALE_LIMIT ? this.MIN_SCALE_LIMIT : this.scaleX),
           scaleY = 1 / (this.scaleY < this.MIN_SCALE_LIMIT ? this.MIN_SCALE_LIMIT : this.scaleY);
-      
-      // could be set by a group, that this object is contained within
+
       ctx.lineWidth = 1 / this.borderScaleFactor;
-      
+
       ctx.scale(scaleX, scaleY);
-      
+
       var w = this.getWidth(),
           h = this.getHeight();
-      
+
       ctx.strokeRect(
         ~~(-(w / 2) - padding) + 0.5, // offset needed to make lines look sharper
         ~~(-(h / 2) - padding) + 0.5,
         ~~(w + padding2),
         ~~(h + padding2)
       );
-      
+
       ctx.restore();
       return this;
     },
@@ -552,7 +551,8 @@
           scaleOffsetY = (padding + size2) / this.scaleY,
           scaleOffsetX = (padding + size2) / this.scaleX,
           scaleOffsetSizeX = (padding + size2 - size) / this.scaleX,
-          scaleOffsetSizeY = (padding + size2 - size) / this.scaleY;
+          scaleOffsetSizeY = (padding + size2 - size) / this.scaleY,
+          height = this.height;
           
       ctx.save();
       
@@ -571,12 +571,12 @@
       
       // bottom-left
       _left = left - scaleOffsetX;
-      _top = top + this.height + scaleOffsetSizeY;
+      _top = top + height + scaleOffsetSizeY;
       ctx.fillRect(_left, _top, sizeX, sizeY);
       
       // bottom-right
       _left = left + this.width + scaleOffsetSizeX;
-      _top = top + this.height + scaleOffsetSizeY;
+      _top = top + height + scaleOffsetSizeY;
       ctx.fillRect(_left, _top, sizeX, sizeY);
       
       // middle-top
@@ -586,17 +586,17 @@
       
       // middle-bottom
       _left = left + this.width/2 - scaleOffsetX;
-      _top = top + this.height + scaleOffsetSizeY;
+      _top = top + height + scaleOffsetSizeY;
       ctx.fillRect(_left, _top, sizeX, sizeY);
       
       // middle-right
       _left = left + this.width + scaleOffsetSizeX;
-      _top = top + this.height/2 - scaleOffsetY;
+      _top = top + height/2 - scaleOffsetY;
       ctx.fillRect(_left, _top, sizeX, sizeY);
       
       // middle-left
       _left = left - scaleOffsetX;
-      _top = top + this.height/2 - scaleOffsetY;
+      _top = top + height/2 - scaleOffsetY;
       ctx.fillRect(_left, _top, sizeX, sizeY);
       
       ctx.restore();
