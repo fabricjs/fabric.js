@@ -108,7 +108,8 @@
         fontFamily: this.fontfamily,
         enableTextDecoration: true,
         textDecoration: this.textDecoration,
-        textShadow: this.textShadow
+        textShadow: this.textShadow,
+        fontStyle: this.fontStyle
       });
       
       // update width, height
@@ -134,7 +135,6 @@
       // need to specify these manually, since Jaxer doesn't support retrieving computed style
       el.style.fontSize = '40px';
       el.style.fontWeight = '400';
-      el.style.fontStyle = 'normal';
       el.style.letterSpacing = 'normal';
       el.style.color = '#000000';
       el.style.fontWeight = '600';

@@ -24,10 +24,17 @@
 
       </div>
       <div style="position:relative;width:804px;height:704px;float:left;">
-        <canvas id="canvas" width="800" height="700"></canvas>
         <div id="fps">&nbsp;</div>
+        <canvas id="canvas" width="800" height="700"></canvas>
         <div id="complexity">Canvas complexity (number of paths):<strong></strong></div>
-        <textarea id="text"></textarea>
+        <div id="text-controls">
+          <textarea id="text"></textarea>
+          <button type="button" id="text-cmd-italic">Italic</button>
+          <button type="button" id="text-cmd-underline">Underline</button>
+          <button type="button" id="text-cmd-linethrough">Linethrough</button>
+          <button type="button" id="text-cmd-overline">Overline</button>
+          <button type="button" id="text-cmd-shadow">Shadow</button>
+        </div>
       </div>
 
       <div id="commands">

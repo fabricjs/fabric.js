@@ -1192,14 +1192,7 @@ Cufon.registerEngine('canvas', (function() {
 
     g.fillStyle = Cufon.textOptions.color || style.get('color');
 
-		if (textDecoration.underline) line(-font.face['underline-position'], g.fillStyle);
-		if (textDecoration.overline) line(font.ascent, g.fillStyle);
-
 		function renderText() {
-		  if (isItalic) {
-		    g.save();
-		    g.transform(1, 0, -0.25, 1, 0, 0);
-		  }
 		  var left = 0;
 			for (var i = 0, l = chars.length; i < l; ++i) {
 			  if (chars[i] === '\n') {
@@ -1208,19 +1201,49 @@ Cufon.registerEngine('canvas', (function() {
           continue;
         }
 				var glyph = font.glyphs[chars[i]] || font.missingGlyph;
+
 				if (!glyph) continue;
+
+				var charWidth = Number(glyph.w || font.w) + letterSpacing;
+
+				if (textDecoration) {
+    		  g.save();
+    		  g.strokeStyle = g.fillStyle;
+    		  g.beginPath();
+    		  if (textDecoration.underline) {
+    		    g.moveTo(0, -font.face['underline-position']);
+      			g.lineTo(charWidth, -font.face['underline-position']);
+    		  }
+    			if (textDecoration.overline) {
+    			  g.moveTo(0, font.ascent);
+      			g.lineTo(charWidth, font.ascent);
+    			}
+    			if (textDecoration['line-through']) {
+      		  g.moveTo(0, -font.descent);
+      		  g.lineTo(charWidth, -font.descent);
+      		}
+    			g.stroke();
+    			g.restore();
+    		}
+
+				if (isItalic) {
+  		    g.save();
+  		    g.transform(1, 0, -0.25, 1, 0, 0);
+  		  }
+
 				g.beginPath();
 				if (glyph.d) {
 					if (glyph.code) interpret(glyph.code, g);
 					else glyph.code = generateFromVML('m' + glyph.d, g);
 				}
 				g.fill();
-				var charWidth = Number(glyph.w || font.w) + letterSpacing;
+
+				if (isItalic) {
+  		    g.restore();
+  		  }
+
 				g.translate(charWidth, 0);
 				left += charWidth;
-			}
-			if (isItalic) {
-			  g.restore();
 			}
 		}
 
@@ -1238,11 +1261,6 @@ Cufon.registerEngine('canvas', (function() {
 		g.save();
 		renderText();
 		g.restore();
-
-		if (textDecoration['line-through']) {
-		  line(-font.descent, g.fillStyle);
-		}
-
 		g.restore();
 		g.restore();
 
@@ -9492,7 +9510,8 @@ fabric.util.animate = animate;
         fontFamily: this.fontfamily,
         enableTextDecoration: true,
         textDecoration: this.textDecoration,
-        textShadow: this.textShadow
+        textShadow: this.textShadow,
+        fontStyle: this.fontStyle
       });
 
       this.width = o.width;
@@ -9514,7 +9533,6 @@ fabric.util.animate = animate;
 
       el.style.fontSize = '40px';
       el.style.fontWeight = '400';
-      el.style.fontStyle = 'normal';
       el.style.letterSpacing = 'normal';
       el.style.color = '#000000';
       el.style.fontWeight = '600';

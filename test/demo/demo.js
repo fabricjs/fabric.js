@@ -443,4 +443,64 @@
     };
   }
   
+  var cmdUnderlineBtn = document.getElementById('text-cmd-underline');
+  if (cmdUnderlineBtn) {
+    cmdUnderlineBtn.onclick = function() {
+      var activeObject = canvas.getActiveObject();
+      if (activeObject && activeObject.type === 'text') {
+        activeObject.textDecoration = (activeObject.textDecoration == 'underline' ? '' : 'underline');
+        this.className = activeObject.textDecoration ? 'selected' : '';
+        canvas.renderAll();
+      }
+    };
+  }
+  
+  var cmdLinethroughBtn = document.getElementById('text-cmd-linethrough');
+  if (cmdLinethroughBtn) {
+    cmdLinethroughBtn.onclick = function() {
+      var activeObject = canvas.getActiveObject();
+      if (activeObject && activeObject.type === 'text') {
+        activeObject.textDecoration = (activeObject.textDecoration == 'line-through' ? '' : 'line-through');
+        this.className = activeObject.textDecoration ? 'selected' : '';
+        canvas.renderAll();
+      }
+    };
+  }
+  
+  var cmdOverlineBtn = document.getElementById('text-cmd-overline');
+  if (cmdOverlineBtn) {
+    cmdOverlineBtn.onclick = function() {
+      var activeObject = canvas.getActiveObject();
+      if (activeObject && activeObject.type === 'text') {
+        activeObject.textDecoration = (activeObject.textDecoration == 'overline' ? '' : 'overline');
+        this.className = activeObject.textDecoration ? 'selected' : '';
+        canvas.renderAll();
+      }
+    };
+  }
+  
+  var cmdItalicBtn = document.getElementById('text-cmd-italic');
+  if (cmdItalicBtn) {
+    cmdItalicBtn.onclick = function() {
+      var activeObject = canvas.getActiveObject();
+      if (activeObject && activeObject.type === 'text') {
+        activeObject.fontStyle = (activeObject.fontStyle == 'italic' ? '' : 'italic');
+        this.className = activeObject.fontStyle ? 'selected' : '';
+        canvas.renderAll();
+      }
+    };
+  }
+  
+  var cmdShadowBtn = document.getElementById('text-cmd-shadow');
+  if (cmdShadowBtn) {
+    cmdShadowBtn.onclick = function() {
+      var activeObject = canvas.getActiveObject();
+      if (activeObject && activeObject.type === 'text') {
+        activeObject.textShadow = !activeObject.textShadow ? 'rgba(0,0,0,0.2) 2px 2px 10px' : '';
+        this.className = activeObject.fontStyle ? 'selected' : '';
+        canvas.renderAll();
+      }
+    };
+  }
+  
 })(this);
