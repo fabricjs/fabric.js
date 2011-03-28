@@ -188,7 +188,7 @@
   var supportsSlider = supportsInputOfType('range'),
       supportsColorpicker = supportsInputOfType('color');
   
-  if (supportsSlider) {
+  if (supportsSlider()) {
     (function(){
       var controls = document.getElementById('controls');
 
@@ -218,7 +218,7 @@
     })();
   }
   
-  if (supportsColorpicker) {
+  if (supportsColorpicker()) {
     (function(){
       var controls = document.getElementById('controls');
 
@@ -301,10 +301,17 @@
     lockScalingEl, 
     lockRotationEl, 
     removeSelectedEl,
-    gradientifyBtn,
-    document.getElementById('opacity'),
-    document.getElementById('color')
+    gradientifyBtn
   ];
+  
+  var opacityEl = document.getElementById('opacity');
+  if (opacityEl) {
+    activeObjectButtons.push(opacityEl);
+  }
+  var colorEl = document.getElementById('color');
+  if (colorEl) {
+    activeObjectButtons.push(colorEl);
+  }
   
   for (var i = activeObjectButtons.length; i--; ) {
     activeObjectButtons[i].disabled = true;

@@ -1236,7 +1236,17 @@ Cufon.registerEngine('canvas', (function() {
 					if (glyph.code) interpret(glyph.code, g);
 					else glyph.code = generateFromVML('m' + glyph.d, g);
 				}
+
 				g.fill();
+
+				if (options.strokeStyle) {
+				  g.closePath();
+				  g.save();
+				  g.lineWidth = options.strokeWidth;
+  				g.strokeStyle = options.strokeStyle;
+  				g.stroke();
+  				g.restore();
+				}
 
 				if (isItalic) {
   		    g.restore();
@@ -9434,6 +9444,8 @@ fabric.util.animate = animate;
     textDecoration: '',
     textShadow:     null,
     fontStyle:      '',
+    strokeStyle:    '',
+    strokeWidth:    1,
     path:           null,
 
     /**
@@ -9473,7 +9485,9 @@ fabric.util.animate = animate;
         'text',
         'textDecoration',
         'textShadow',
-        'fontStyle'
+        'fontStyle',
+        'strokeStyle',
+        'strokeWidth'
       );
       fabric.util.removeFromArray(this.stateProperties, 'width');
     },
@@ -9511,7 +9525,9 @@ fabric.util.animate = animate;
         enableTextDecoration: true,
         textDecoration: this.textDecoration,
         textShadow: this.textShadow,
-        fontStyle: this.fontStyle
+        fontStyle: this.fontStyle,
+        strokeStyle: this.strokeStyle,
+        strokeWidth: this.strokeWidth
       });
 
       this.width = o.width;
@@ -9570,7 +9586,9 @@ fabric.util.animate = animate;
   	    fontStyle:      this.fontStyle,
   	    textDecoration: this.textDecoration,
   	    textShadow:     this.textShadow,
-  	    path:           this.path
+  	    path:           this.path,
+  	    strokeStyle:    this.strokeStyle,
+  	    strokeWidth:    this.strokeWidth
   	  });
   	},
 
