@@ -4110,21 +4110,24 @@ fabric.util.animate = animate;
      * @param {Element} element
      */
     _applyCanvasStyle: function (element) {
+      var width = this.getWidth() || element.width,
+          height = this.getHeight() || element.height;
+
       fabric.util.setStyle(element, {
         position: 'absolute',
-        width: this.getWidth() + 'px',
-        height: this.getHeight() + 'px',
+        width: width + 'px',
+        height: height + 'px',
         left: 0,
         top: 0
       });
-      element.width = this.getWidth() || element.width;
-      element.height = this.getHeight() || element.height;
+      element.width = width;
+      element.height = height;
       fabric.util.makeElementUnselectable(element);
     },
 
     /**
      * @private
-     * @method initCanvas
+     * @method _createCanvasElement
      * @param {Element} element
      */
     _createCanvasElement: function() {
@@ -4132,13 +4135,20 @@ fabric.util.animate = animate;
       if (!element) {
         throw CANVAS_INIT_ERROR;
       }
-      if (typeof element.getContext === 'undefined' && typeof G_vmlCanvasManager !== 'undefined') {
+      this._initCanvasElement(element);
+      return element;
+    },
+
+    _initCanvasElement: function(element) {
+      if (typeof element.getContext === 'undefined' &&
+          typeof G_vmlCanvasManager !== 'undefined' &&
+          G_vmlCanvasManager.initElement) {
+
         G_vmlCanvasManager.initElement(element);
       }
       if (typeof element.getContext === 'undefined') {
         throw CANVAS_INIT_ERROR;
       }
-      return element;
     },
 
     /**
@@ -4185,6 +4195,7 @@ fabric.util.animate = animate;
      */
     _createUpperCanvas: function (canvasEl) {
       this.upperCanvasEl = fabric.util.getById(canvasEl) || this._createCanvasElement();
+      this._initCanvasElement(this.upperCanvasEl);
 
       fabric.util.addClass(this.upperCanvasEl, 'upper-canvas');
       this._applyCanvasStyle(this.upperCanvasEl);
