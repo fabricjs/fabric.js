@@ -7506,6 +7506,23 @@ fabric.util.animate = animate;
       }
     },
 
+    /**
+     * Returns horizontal radius of an object (according to how an object is scaled)
+     * @method getRadiusX
+     * @return {Number}
+     */
+    getRadiusX: function() {
+      return this.get('radius') * this.get('scaleX');
+    },
+
+    /**
+     * Returns vertical radius of an object (according to how an object is scaled)
+     * @method getRadiusY
+     * @return {Number}
+     */
+    getRadiusY: function() {
+      return this.get('radius') * this.get('scaleY');
+    },
 
     /**
      * Returns complexity of an instance

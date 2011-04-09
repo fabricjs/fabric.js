@@ -13,6 +13,31 @@
     same(circle.type, 'circle');
   });
   
+  test('getRadiusX, getRadiusY', function() {
+    var circle = new fabric.Circle({ radius: 10 });
+    
+    ok(typeof circle.getRadiusX == 'function', 'getRadiusX should exist');
+    ok(typeof circle.getRadiusY == 'function', 'getRadiusY should exist');
+    
+    equals(circle.getRadiusX(), 10);
+    equals(circle.getRadiusY(), 10);
+    
+    circle.scale(2);
+    
+    equals(circle.getRadiusX(), 20);
+    equals(circle.getRadiusY(), 20);
+    
+    circle.set('scaleX', 3);
+    
+    equals(circle.getRadiusX(), 30);
+    equals(circle.getRadiusY(), 20);
+    
+    circle.set('scaleY', 4);
+    
+    equals(circle.getRadiusX(), 30);
+    equals(circle.getRadiusY(), 40);
+  });
+  
   test('complexity', function() {
     var circle = new fabric.Circle();
     ok(typeof circle.complexity == 'function');
