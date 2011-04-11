@@ -22,8 +22,13 @@
     return Math.random() * (max - min) + min;
   }
   
-  var canvas = global.canvas = new fabric.Element('canvas'),
-      fpsEl = document.getElementById('fps').firstChild;
+  var canvas = global.canvas = new fabric.Element('canvas', {
+    clipTo: function(canvas) {
+      canvas.arc(this.width / 2, this.height / 2, 200, 0, Math.PI * 2, true);
+    }
+  });
+  
+  var fpsEl = document.getElementById('fps').firstChild;
   
   canvas.onFpsUpdate = function(fps) {
     fpsEl.nodeValue = 'FPS: ' + fps;

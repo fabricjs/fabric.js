@@ -4988,6 +4988,12 @@ fabric.util.animate = animate;
           activeGroup = this.getActiveGroup(),
           startTime = new Date();
 
+      if (this.clipTo) {
+        containerCanvas.beginPath();
+        this.clipTo(containerCanvas);
+        containerCanvas.clip();
+      }
+
       if (length) {
         for (var i = 0; i < length; ++i) {
           if (!activeGroup ||
