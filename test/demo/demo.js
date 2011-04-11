@@ -23,9 +23,11 @@
   }
   
   var canvas = global.canvas = new fabric.Element('canvas', {
+    /*
     clipTo: function(canvas) {
       canvas.arc(this.width / 2, this.height / 2, 200, 0, Math.PI * 2, true);
     }
+    */
   });
   
   var fpsEl = document.getElementById('fps').firstChild;
