@@ -12,7 +12,7 @@ h2 { background: #ffc; margin-top: 0; padding: 5px; color: #333; font-size: 1em;
 #text-controls { clear: both; margin-top: 20px }
 #text-controls button { vertical-align: top; }
 #drawing-mode-options { margin-top: 5px; background: #ffc; padding: 5px; border: 1px solid #aaa; }
-#text { position: relative; width: 250px; height: 100px; }
+#text { position: relative; width: 350px; height: 200px; }
 #text-cmd-linethrough { text-decoration: line-through; }
 #text-cmd-underline { text-decoration: underline; }
 #text-cmd-overline { text-decoration: overline; }

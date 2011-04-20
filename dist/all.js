@@ -1137,7 +1137,6 @@ Cufon.registerEngine('canvas', (function() {
 		canvas.width = Math.ceil(size.convert(width + expandRight - expandLeft) * roundingFactor);
 		canvas.height = roundedHeight;
 
-
 		expandTop += viewBox.minY;
 
 		cStyle.top = Math.round(size.convert(expandTop - font.ascent)) + 'px';
@@ -1145,11 +1144,11 @@ Cufon.registerEngine('canvas', (function() {
 
 		var _width = Math.ceil(size.convert(width * roundingFactor));
 		var wrapperWidth = _width + 'px';
-
 		var _height = size.convert(font.height);
+		var totalLineHeight = (options.lineHeight - 1) * size.convert(-font.ascent / 5) * (lines - 1);
 
 		Cufon.textOptions.width = _width;
-		Cufon.textOptions.height = _height * lines;
+		Cufon.textOptions.height = (_height * lines) + totalLineHeight;
 		Cufon.textOptions.lines = lines;
 
 		if (HAS_INLINE_BLOCK) {
@@ -1169,7 +1168,7 @@ Cufon.registerEngine('canvas', (function() {
 
 		g.translate(
 		  -expandLeft - ((1/scale * canvas.width) / 2) + (Cufon.fonts[font.family].offsetLeft || 0),
-		  -expandTop - (canvas.height / scale * Cufon.textOptions.lines) / 2
+		  -expandTop - (Cufon.textOptions.height / scale) / 2
 		);
 
 		g.lineWidth = font.face['underline-thickness'];
@@ -1196,7 +1195,7 @@ Cufon.registerEngine('canvas', (function() {
 		  var left = 0;
 			for (var i = 0, l = chars.length; i < l; ++i) {
 			  if (chars[i] === '\n') {
-          g.translate(-left, -font.ascent - font.ascent / 5 /* space between lines */);
+          g.translate(-left, -font.ascent - ((font.ascent / 5) * options.lineHeight) /* space between lines */);
           left = 0;
           continue;
         }
@@ -9478,6 +9477,7 @@ fabric.util.animate = animate;
     textDecoration: '',
     textShadow:     null,
     fontStyle:      '',
+    lineHeight:     1,
     strokeStyle:    '',
     strokeWidth:    1,
     path:           null,
@@ -9520,6 +9520,7 @@ fabric.util.animate = animate;
         'textDecoration',
         'textShadow',
         'fontStyle',
+        'lineHeight',
         'strokeStyle',
         'strokeWidth'
       );
@@ -9560,6 +9561,7 @@ fabric.util.animate = animate;
         textDecoration: this.textDecoration,
         textShadow: this.textShadow,
         fontStyle: this.fontStyle,
+        lineHeight: this.lineHeight,
         strokeStyle: this.strokeStyle,
         strokeWidth: this.strokeWidth
       });
@@ -9618,6 +9620,7 @@ fabric.util.animate = animate;
   	    fontweight:     this.fontweight,
   	    fontfamily:     this.fontfamily,
   	    fontStyle:      this.fontStyle,
+  	    lineHeight:     this.lineHeight,
   	    textDecoration: this.textDecoration,
   	    textShadow:     this.textShadow,
   	    path:           this.path,

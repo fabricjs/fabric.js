@@ -29,6 +29,7 @@
     textDecoration: '',
     textShadow:     null,
     fontStyle:      '',
+    lineHeight:     1,
     strokeStyle:    '',
     strokeWidth:    1,
     path:           null,
@@ -71,6 +72,7 @@
         'textDecoration', 
         'textShadow', 
         'fontStyle',
+        'lineHeight',
         'strokeStyle',
         'strokeWidth'
       );
@@ -114,6 +116,7 @@
         textDecoration: this.textDecoration,
         textShadow: this.textShadow,
         fontStyle: this.fontStyle,
+        lineHeight: this.lineHeight,
         strokeStyle: this.strokeStyle,
         strokeWidth: this.strokeWidth
       });
@@ -176,6 +179,7 @@
   	    fontweight:     this.fontweight,
   	    fontfamily:     this.fontfamily,
   	    fontStyle:      this.fontStyle,
+  	    lineHeight:     this.lineHeight,
   	    textDecoration: this.textDecoration,
   	    textShadow:     this.textShadow,
   	    path:           this.path,
