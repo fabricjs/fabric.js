@@ -166,110 +166,110 @@
       }
       context.restore();
     },
-  	
-  	/**
-  	 * Returns object representation of an instance
-  	 * @method toObject
-  	 * @return {Object} Object representation of text object
-  	 */
-  	toObject: function() {
-  	  return extend(this.callSuper('toObject'), {
-  	    text:           this.text,
-  	    fontsize:       this.fontsize,
-  	    fontweight:     this.fontweight,
-  	    fontfamily:     this.fontfamily,
-  	    fontStyle:      this.fontStyle,
-  	    lineHeight:     this.lineHeight,
-  	    textDecoration: this.textDecoration,
-  	    textShadow:     this.textShadow,
-  	    path:           this.path,
-  	    strokeStyle:    this.strokeStyle,
-  	    strokeWidth:    this.strokeWidth
-  	  });
-  	},
-  	
-  	/**
-  	 * Sets "color" of an instance (alias of `set('fill', &hellip;)`)
-  	 * @method setColor
-  	 * @param {String} value
-  	 * @return {fabric.Text} thisArg
-  	 * @chainable
-  	 */
-  	setColor: function(value) {
-  	  this.set('fill', value);
-  	  return this;
-  	},
-  	
-  	/**
-  	 * Sets fontsize of an instance and updates its coordinates
-  	 * @method setFontsize
-  	 * @param {Number} value
-  	 * @return {fabric.Text} thisArg
-  	 * @chainable
-  	 */
-  	setFontsize: function(value) {
-  	  this.set('fontsize', value);
-  	  this.setCoords();
-  	  return this;
-  	},
-  	
-  	/**
-  	 * Returns actual text value of an instance
-  	 * @method getText
-  	 * @return {String}
-  	 */
-  	getText: function() {
-  	  return this.text;
-  	},
-  	
-  	/**
-  	 * Sets text of an instance, and updates its coordinates
-  	 * @method setText
-  	 * @param {String} value
-  	 * @return {fabric.Text} thisArg
-  	 * @chainable
-  	 */
-  	setText: function(value) {
-  	  this.set('text', value);
-  	  this.setCoords();
-  	  return this;
-  	},
-  	
-  	/**
-  	 * Sets specified property to a specified value
-  	 * @method set
-  	 * @param {String} name
-  	 * @param {Any} value
-  	 * @return {fabric.Text} thisArg
-  	 * @chainable
-  	 */
-  	set: function(name, value) {
-  	  this[name] = value;
-  	  if (name === 'fontfamily') {
-  	    this.path = this.path.replace(/(.*?)([^\/]*)(\.font\.js)/, '$1' + value + '$3');
-  	  }
-  	  return this;
-  	}
+    
+    /**
+     * Returns object representation of an instance
+     * @method toObject
+     * @return {Object} Object representation of text object
+     */
+    toObject: function() {
+      return extend(this.callSuper('toObject'), {
+        text:           this.text,
+        fontsize:       this.fontsize,
+        fontweight:     this.fontweight,
+        fontfamily:     this.fontfamily,
+        fontStyle:      this.fontStyle,
+        lineHeight:     this.lineHeight,
+        textDecoration: this.textDecoration,
+        textShadow:     this.textShadow,
+        path:           this.path,
+        strokeStyle:    this.strokeStyle,
+        strokeWidth:    this.strokeWidth
+      });
+    },
+    
+    /**
+     * Sets "color" of an instance (alias of `set('fill', &hellip;)`)
+     * @method setColor
+     * @param {String} value
+     * @return {fabric.Text} thisArg
+     * @chainable
+     */
+    setColor: function(value) {
+      this.set('fill', value);
+      return this;
+    },
+    
+    /**
+     * Sets fontsize of an instance and updates its coordinates
+     * @method setFontsize
+     * @param {Number} value
+     * @return {fabric.Text} thisArg
+     * @chainable
+     */
+    setFontsize: function(value) {
+      this.set('fontsize', value);
+      this.setCoords();
+      return this;
+    },
+    
+    /**
+     * Returns actual text value of an instance
+     * @method getText
+     * @return {String}
+     */
+    getText: function() {
+      return this.text;
+    },
+    
+    /**
+     * Sets text of an instance, and updates its coordinates
+     * @method setText
+     * @param {String} value
+     * @return {fabric.Text} thisArg
+     * @chainable
+     */
+    setText: function(value) {
+      this.set('text', value);
+      this.setCoords();
+      return this;
+    },
+    
+    /**
+     * Sets specified property to a specified value
+     * @method set
+     * @param {String} name
+     * @param {Any} value
+     * @return {fabric.Text} thisArg
+     * @chainable
+     */
+    set: function(name, value) {
+      this[name] = value;
+      if (name === 'fontfamily') {
+        this.path = this.path.replace(/(.*?)([^\/]*)(\.font\.js)/, '$1' + value + '$3');
+      }
+      return this;
+    }
   });
-	
-	/**
-	 * Returns fabric.Text instance from an object representation
+  
+  /**
+   * Returns fabric.Text instance from an object representation
    * @static
    * @method fromObject
    * @param {Object} object to create an instance from
    * @return {fabric.Text} an instance
    */
-	fabric.Text.fromObject = function(object) {
-	  return new fabric.Text(object.text, clone(object));
-	};
-	
-	/**
-	 * Returns fabric.Text instance from an SVG element (<b>not yet implemented</b>)
+  fabric.Text.fromObject = function(object) {
+    return new fabric.Text(object.text, clone(object));
+  };
+  
+  /**
+   * Returns fabric.Text instance from an SVG element (<b>not yet implemented</b>)
    * @static
    * @method fabric.Text.fromElement
    * @return {fabric.Text} an instance
    */
-	fabric.Text.fromElement = function(element) {
-	  // TODO (kangax): implement this
-	};
+  fabric.Text.fromElement = function(element) {
+    // TODO (kangax): implement this
+  };
 })(this);

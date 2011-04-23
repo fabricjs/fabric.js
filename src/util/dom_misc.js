@@ -210,15 +210,18 @@ function getElementOffset(element) {
  * @param {Number} [options.duration=500] Duration of change
  */
 function animate(options) {
+  
   options || (options = { });
+  
   var start = +new Date(), 
       duration = options.duration || 500,
       finish = start + duration, time, pos,
       onChange = options.onChange || function() { },
+      abort = options.abort || function() { return false; },
       easing = options.easing || function(pos) { return (-Math.cos(pos * Math.PI) / 2) + 0.5; },
       startValue = 'startValue' in options ? options.startValue : 0,
       endValue = 'endValue' in options ? options.endValue : 100,
-      isReversed = startValue > endValue
+      isReversed = startValue > endValue;
   
   options.onStart && options.onStart();
 
@@ -228,11 +231,13 @@ function animate(options) {
     onChange(isReversed 
       ? (startValue - (startValue - endValue) * easing(pos)) 
       : (startValue + (endValue - startValue) * easing(pos)));
-    if (time > finish) {
+    if (time > finish || abort()) {
       clearInterval(interval);
       options.onComplete && options.onComplete();
     }
   }, 10);
+  
+  return interval;
 }
 
 fabric.util.getById = getById;
