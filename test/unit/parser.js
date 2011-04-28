@@ -259,4 +259,30 @@
     }, 1500);
   });
   
+  // https://github.com/kangax/fabric.js/issues/25
+  asyncTest('parseSVGDocument w. rect', function() {
+    
+    var data;
+    fabric.util.request('../fixtures/svg_with_rect.svg', {
+      method: 'get',
+      onComplete: function(resp) {
+        var doc = resp.responseXML;
+        fabric.parseSVGDocument(doc.documentElement, function() {
+          data = arguments[0];
+        });
+      }
+    });
+    
+    setTimeout(function() {
+      equals(typeof data, 'object');
+      equals(data.length, 1);
+      
+      if (data) {
+        var rect = data[0];
+        ok(rect instanceof fabric.Rect);
+      }
+      start();
+    }, 1500);
+  });
+  
 })();
