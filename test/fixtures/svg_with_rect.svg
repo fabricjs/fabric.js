@@ -3,5 +3,6 @@
   <!ENTITY ns_flows "http://ns.adobe.com/Flows/1.0/">
 ]>
 <svg version="1.1" xmlns="http://www.w3.org/2000/svg">
-  <rect x="8.5" y="208" width="8.76" height="17.28" />
+  <rect height="100" width="100" y="50" x="50" fill="red" />
+  <circle r="25" cy="100" cx="100" fill="green" />
 </svg>

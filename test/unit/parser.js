@@ -253,34 +253,29 @@
         var path = data[0];
 
         ok(path instanceof fabric.Path);
-        equals(EXPECTED_PATH_JSON, JSON.stringify(path.toJSON()));
+        equals(JSON.stringify(path.toJSON()), EXPECTED_PATH_JSON);
       }
       start();
     }, 1500);
   });
   
   // https://github.com/kangax/fabric.js/issues/25
-  asyncTest('parseSVGDocument w. rect', function() {
+  asyncTest('parsing one element should not "leak" its "fill" value onto parsing of following element', function() {
     
-    var data;
+    var objects;
     fabric.util.request('../fixtures/svg_with_rect.svg', {
       method: 'get',
       onComplete: function(resp) {
         var doc = resp.responseXML;
         fabric.parseSVGDocument(doc.documentElement, function() {
-          data = arguments[0];
+          objects = arguments[0];
         });
       }
     });
     
     setTimeout(function() {
-      equals(typeof data, 'object');
-      equals(data.length, 1);
+      equals(objects[1].fill, 'green');
       
-      if (data) {
-        var rect = data[0];
-        ok(rect instanceof fabric.Rect);
-      }
       start();
     }, 1500);
   });
