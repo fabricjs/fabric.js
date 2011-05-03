@@ -1,5 +1,18 @@
 (function() {
   
+  // polyfill by @paulirish
+  if (!window.requestAnimationFrame ) {
+    window.requestAnimationFrame = (function() {
+      return window.webkitRequestAnimationFrame ||
+      window.mozRequestAnimationFrame ||
+      window.oRequestAnimationFrame ||
+      window.msRequestAnimationFrame ||
+      function( /* function FrameRequestCallback */ callback, /* DOMElement Element */ element ) {
+        window.setTimeout( callback, 1000 / 60 );
+      };
+    })();
+  }
+  
   var canvas = new fabric.Element('test'),
       fpsEl = document.getElementById('fps'),
       complexityEl = document.getElementById('complexity'),
@@ -65,32 +78,22 @@
     });
   }
   
+  var angle = 0; 
   function animate() {
-    fabric.util.animate({
-      startValue: 0,
-      endValue: 360,
-      duration: 3000,
-      easing: function(value) { 
-        return value;
-      },
-      onChange: function(value) {
-        if (canvas._objects.length) {
-          canvas._objects[0].setAngle(value);
-          canvas._objects[1].setAngle(value);
-          canvas._objects[2].setAngle(value);
-          canvas._objects[3].setAngle(value);
-        }
-        canvas.renderAll();
-      },
-      onComplete: function() {
-        if (!shouldAbort) {
-          animate();
-        }
-      },
-      abort: function() {
-        return shouldAbort;
-      }
-    });
+    angle += 2;
+    if (angle === 360) {
+      angle = 0;
+    }
+    canvas.item(0).setAngle(angle);
+    canvas.item(1).setAngle(angle);
+    canvas.item(2).setAngle(angle);
+    canvas.item(3).setAngle(angle);
+    
+    canvas.renderAll();
+    
+    if (!shouldAbort) {
+      window.requestAnimationFrame(animate, canvas.upperCanvasEl);
+    }
   }
   
   function loadShape() {
