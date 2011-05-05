@@ -4717,8 +4717,8 @@ fabric.util.animate = animate;
      */
     _translateObject: function (x, y) {
       var target = this._currentTransform.target;
-      target.lockHorizontally || target.set('left', x - this._currentTransform.offsetX);
-      target.lockVertically || target.set('top', y - this._currentTransform.offsetY);
+      target.lockMovementX || target.set('left', x - this._currentTransform.offsetX);
+      target.lockMovementY || target.set('top', y - this._currentTransform.offsetY);
     },
 
     /**
@@ -4734,7 +4734,7 @@ fabric.util.animate = animate;
           offset = this._offset,
           target = t.target;
 
-      if (target.lockScaling) return;
+      if (target.lockScalingX && target.lockScalingY) return;
 
       var lastLen = sqrt(pow(t.ey - t.top - offset.top, 2) + pow(t.ex - t.left - offset.left, 2)),
           curLen = sqrt(pow(y - t.top - offset.top, 2) + pow(x - t.left - offset.left, 2));
@@ -4742,14 +4742,14 @@ fabric.util.animate = animate;
       target._scaling = true;
 
       if (!by) {
-        target.set('scaleX', t.scaleX * curLen/lastLen);
-        target.set('scaleY', t.scaleY * curLen/lastLen);
+        target.lockScalingX || target.set('scaleX', t.scaleX * curLen/lastLen);
+        target.lockScalingY || target.set('scaleY', t.scaleY * curLen/lastLen);
       }
-      else if (by === 'x') {
-        target.set('scaleX', t.scaleX * curLen/lastLen);
+      else if (by === 'x' && !target.lockUniScaling) {
+        target.lockScalingX || target.set('scaleX', t.scaleX * curLen/lastLen);
       }
-      else if (by === 'y') {
-        target.set('scaleY', t.scaleY * curLen/lastLen);
+      else if (by === 'y' && !target.lockUniScaling) {
+        target.lockScalingY || target.set('scaleY', t.scaleY * curLen/lastLen);
       }
     },
 

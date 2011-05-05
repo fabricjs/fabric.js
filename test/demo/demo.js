@@ -260,8 +260,8 @@
   lockHorizontallyEl.onclick = function() {
     var activeObject = canvas.getActiveObject();
     if (activeObject) {
-      activeObject.lockHorizontally = !activeObject.lockHorizontally;
-      lockHorizontallyEl.innerHTML = activeObject.lockHorizontally 
+      activeObject.lockMovementX = !activeObject.lockMovementX;
+      lockHorizontallyEl.innerHTML = activeObject.lockMovementX 
         ? 'Unlock horizontal movement' 
         : 'Lock horizontal movement';
     }
@@ -271,21 +271,32 @@
   lockVerticallyEl.onclick = function() {
     var activeObject = canvas.getActiveObject();
     if (activeObject) {
-      activeObject.lockVertically = !activeObject.lockVertically;
-      lockVerticallyEl.innerHTML = activeObject.lockVertically 
+      activeObject.lockMovementY = !activeObject.lockMovementY;
+      lockVerticallyEl.innerHTML = activeObject.lockMovementY 
         ? 'Unlock vertical movement' 
         : 'Lock vertical movement';
     }
   };
   
-  var lockScalingEl = document.getElementById('lock-scaling');
-  lockScalingEl.onclick = function() {
+  var lockScalingXEl = document.getElementById('lock-scaling-x');
+  lockScalingXEl.onclick = function() {
     var activeObject = canvas.getActiveObject();
     if (activeObject) {
-      activeObject.lockScaling = !activeObject.lockScaling;
-      lockScalingEl.innerHTML = activeObject.lockScaling 
-        ? 'Unlock scaling' 
-        : 'Lock scaling';
+      activeObject.lockScalingX = !activeObject.lockScalingX;
+      lockScalingXEl.innerHTML = activeObject.lockScalingX
+        ? 'Unlock horizontal scaling' 
+        : 'Lock horizontal scaling';
+    }
+  };
+  
+  var lockScalingYEl = document.getElementById('lock-scaling-y');
+  lockScalingYEl.onclick = function() {
+    var activeObject = canvas.getActiveObject();
+    if (activeObject) {
+      activeObject.lockScalingY = !activeObject.lockScalingY;
+      lockScalingYEl.innerHTML = activeObject.lockScalingY
+        ? 'Unlock vertical scaling' 
+        : 'Lock vertical scaling';
     }
   };
   
@@ -305,7 +316,8 @@
   var activeObjectButtons = [ 
     lockHorizontallyEl, 
     lockVerticallyEl, 
-    lockScalingEl, 
+    lockScalingXEl, 
+    lockScalingYEl,
     lockRotationEl, 
     removeSelectedEl,
     gradientifyBtn
@@ -334,9 +346,10 @@
       activeObjectButtons[i].disabled = false;
     }
     
-    lockHorizontallyEl.innerHTML = (selectedObject.lockHorizontally ? 'Unlock horizontal movement' : 'Lock horizontal movement');
-    lockVerticallyEl.innerHTML = (selectedObject.lockVertically ? 'Unlock vertical movement' : 'Lock vertical movement');
-    lockScalingEl.innerHTML = (selectedObject.lockScaling ? 'Unlock scaling' : 'Lock scaling');
+    lockHorizontallyEl.innerHTML = (selectedObject.lockMovementX ? 'Unlock horizontal movement' : 'Lock horizontal movement');
+    lockVerticallyEl.innerHTML = (selectedObject.lockMovementY ? 'Unlock vertical movement' : 'Lock vertical movement');
+    lockScalingXEl.innerHTML = (selectedObject.lockScalingX ? 'Unlock horizontal scaling' : 'Lock horizontal scaling');
+    lockScalingYEl.innerHTML = (selectedObject.lockScalingY ? 'Unlock vertical scaling' : 'Lock vertical scaling');
     lockRotationEl.innerHTML = (selectedObject.lockRotation ? 'Unlock rotation' : 'Lock rotation');
   }
   
