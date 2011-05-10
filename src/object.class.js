@@ -188,11 +188,13 @@
      */
     _removeDefaultValues: function(object) {
       var defaultOptions = fabric.Object.prototype.options;
-      this.stateProperties.forEach(function(prop) {
-        if (object[prop] === defaultOptions[prop]) {
-          delete object[prop];
-        }
-      });
+      if (defaultOptions) {
+        this.stateProperties.forEach(function(prop) {
+          if (object[prop] === defaultOptions[prop]) {
+            delete object[prop];
+          }
+        });
+      }
       return object;
     },
     

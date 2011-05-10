@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2011, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.2.1" };
+var fabric = fabric || { version: "0.2.2" };
 
 /**
  * Wrapper around `console.log` (when available)
@@ -6330,11 +6330,13 @@ fabric.util.animate = animate;
      */
     _removeDefaultValues: function(object) {
       var defaultOptions = fabric.Object.prototype.options;
-      this.stateProperties.forEach(function(prop) {
-        if (object[prop] === defaultOptions[prop]) {
-          delete object[prop];
-        }
-      });
+      if (defaultOptions) {
+        this.stateProperties.forEach(function(prop) {
+          if (object[prop] === defaultOptions[prop]) {
+            delete object[prop];
+          }
+        });
+      }
       return object;
     },
 
