@@ -713,7 +713,7 @@
       ok(imgEl.width < ORIGINAL_WIDTH);
       
       start();
-    }, 1000);
+    }, 2000);
   });
   
   asyncTest('cache', function() {
@@ -763,7 +763,7 @@
       ok(/fixtures\/very_large_image\.jpg$/.test(objectPassedToCallback.getSrc()), 'image should have correct src');
       
       start();
-    }, 1000);
+    }, 2000);
   });
   
   asyncTest('fxRemove', function() {
