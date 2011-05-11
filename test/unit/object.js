@@ -12,7 +12,7 @@
     }
   });
   
-  test('constructor', function() {
+  test('constructor & properties', function() {
     ok(typeof fabric.Object == 'function');
     
     var cObj = new fabric.Object();
@@ -20,8 +20,10 @@
     ok(cObj);
     ok(cObj instanceof fabric.Object);
     ok(cObj.constructor === fabric.Object);
+    
     equals(cObj.type, 'object');
     equals(cObj.includeDefaultValues, true);
+    equals(cObj.selectable, true);
   });
   
   test('get', function() {
@@ -81,11 +83,11 @@
   test('toJSON', function() {
     var emptyObjectJSON = '{"type":"object","left":0,"top":0,"width":0,"height":0,"fill":"rgb(0,0,0)",'+
                           '"overlayFill":null,"stroke":null,"strokeWidth":1,"scaleX":1,"scaleY":1,"angle":0,'+
-                          '"flipX":false,"flipY":false,"opacity":1}';
+                          '"flipX":false,"flipY":false,"opacity":1,"selectable":true}';
       
     var augmentedJSON = '{"type":"object","left":0,"top":0,"width":122,"height":0,"fill":"rgb(0,0,0)",'+
                         '"overlayFill":null,"stroke":null,"strokeWidth":1,"scaleX":1.3,"scaleY":1,"angle":0,'+
-                        '"flipX":false,"flipY":true,"opacity":0.88}';
+                        '"flipX":false,"flipY":true,"opacity":0.88,"selectable":true}';
       
     var cObj = new fabric.Object();
     ok(typeof cObj.toJSON == 'function');
@@ -111,7 +113,8 @@
       'angle': 0, 
       'flipX': false, 
       'flipY': false, 
-      'opacity': 1
+      'opacity': 1,
+      'selectable': true
     }
     var augmentedObjectRepr = {
       'type': "object",
@@ -128,13 +131,21 @@
       'angle': 0, 
       'flipX': true, 
       'flipY': false, 
-      'opacity': 0.13
+      'opacity': 0.13,
+      'selectable': false
     }
     
     var cObj = new fabric.Object();
     same(emptyObjectRepr, cObj.toObject());
     
-    cObj.set('left', 10).set('top', 20).set('width', 30).set('height', 40).set('flipX', true).set('opacity', 0.13);
+    cObj.set('left', 10)
+        .set('top', 20)
+        .set('width', 30)
+        .set('height', 40)
+        .set('flipX', true)
+        .set('opacity', 0.13)
+        .set('selectable', false);
+        
     same(augmentedObjectRepr, cObj.toObject());
     
     var fractionalValue = 166.66666666666666,
@@ -337,7 +348,7 @@
   });
   
   asyncTest('cloneAsImage', function() {
-    var cObj = new fabric.Rect();
+    var cObj = new fabric.Rect({ width: 100, height: 100, fill: 'red' });
     
     ok(typeof cObj.cloneAsImage == 'function');
     
@@ -349,7 +360,7 @@
       var image;
       var _this = this;
 
-      setTimeout(function(){
+      setTimeout(function() {
         ok(image);
         ok(image instanceof fabric.Image);
         start();
@@ -372,7 +383,10 @@
       'uYBGJI2D8CQtHkAhqTNAzAkbR6AIWnzAAxJmwdgSNo8AEPS5gEYkjYPw'+
       'JC0eQCGpM0DMCRtHsDjB5K06yueJFXJAAAAAElFTkSuQmCC';
       
-    var cObj = new fabric.Rect();
+    var cObj = new fabric.Rect({
+      width: 100, height: 100, fill: 'red'
+    });
+    
     ok(typeof cObj.toDataURL == 'function');
     
     if (!fabric.Element.supports('toDataURL')) {

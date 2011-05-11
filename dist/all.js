@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2011, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.2.2" };
+var fabric = fabric || { version: "0.2.3" };
 
 /**
  * Wrapper around `console.log` (when available)
@@ -6215,7 +6215,8 @@ fabric.util.animate = animate;
      */
     stateProperties:  ('top left width height scaleX scaleY flipX flipY ' +
                       'theta angle opacity cornersize fill overlayFill stroke ' +
-                      'strokeWidth fillRule borderScaleFactor transformMatrix').split(' '),
+                      'strokeWidth fillRule borderScaleFactor transformMatrix ' +
+                      'selectable').split(' '),
 
     top:                      0,
     left:                     0,
@@ -6240,6 +6241,12 @@ fabric.util.animate = animate;
     borderOpacityWhenMoving:  0.4,
     borderScaleFactor:        1,
     transformMatrix:          null,
+
+    /**
+     * When set to `false`, an object can not be selected for modification (using either point-click-based or group-based selection)
+     * @property
+     * @type Boolean
+     */
     selectable:               true,
 
     /**
@@ -6314,7 +6321,8 @@ fabric.util.animate = animate;
         angle:        toFixed(this.getAngle(), this.NUM_FRACTION_DIGITS),
         flipX:        this.flipX,
         flipY:        this.flipY,
-        opacity:      toFixed(this.opacity, this.NUM_FRACTION_DIGITS)
+        opacity:      toFixed(this.opacity, this.NUM_FRACTION_DIGITS),
+        selectable:   this.selectable
       };
 
       if (!this.includeDefaultValues) {

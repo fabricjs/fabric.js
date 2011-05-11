@@ -65,7 +65,8 @@
      */
     stateProperties:  ('top left width height scaleX scaleY flipX flipY ' +
                       'theta angle opacity cornersize fill overlayFill stroke ' +
-                      'strokeWidth fillRule borderScaleFactor transformMatrix').split(' '),
+                      'strokeWidth fillRule borderScaleFactor transformMatrix ' +
+                      'selectable').split(' '),
     
     top:                      0,
     left:                     0,
@@ -170,7 +171,8 @@
         angle:        toFixed(this.getAngle(), this.NUM_FRACTION_DIGITS),
         flipX:        this.flipX,
         flipY:        this.flipY,
-        opacity:      toFixed(this.opacity, this.NUM_FRACTION_DIGITS)
+        opacity:      toFixed(this.opacity, this.NUM_FRACTION_DIGITS),
+        selectable:   this.selectable
       };
       
       if (!this.includeDefaultValues) {
