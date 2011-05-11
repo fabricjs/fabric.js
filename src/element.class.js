@@ -1077,11 +1077,14 @@
         
         if (currentObject.intersectsWithRect(selectionX1Y1, selectionX2Y2) || 
             currentObject.isContainedWithinRect(selectionX1Y1, selectionX2Y2)) {
-              
-          currentObject.setActive(true);
-          group.push(currentObject);
+          
+          if (currentObject.selectable) {
+            currentObject.setActive(true);
+            group.push(currentObject);
+          }
         }
       }
+      
       // do not create group for 1 element only
       if (group.length === 1) {
         this.setActiveObject(group[0]);
@@ -1095,6 +1098,7 @@
         group.saveCoords();
         fireEvent('group:selected', { target: group });
       }
+      
       this.renderAll();
     },
     
@@ -1322,6 +1326,7 @@
      * @param {Boolean} skipGroup when true, group is skipped and only objects are traversed through
      */ 
     findTarget: function (e, skipGroup) {
+      
       var target,
           pointer = this.getPointer(e);
       
@@ -1341,7 +1346,9 @@
           break;
         }
       }
-      return target;
+      if (target && target.selectable) {
+        return target;
+      }
     },
 
     /**

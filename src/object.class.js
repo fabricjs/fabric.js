@@ -92,6 +92,13 @@
     transformMatrix:          null,
     
     /**
+     * When set to `false`, an object can not be selected for modification (using either point-click-based or group-based selection)
+     * @property
+     * @type Boolean
+     */
+    selectable:               true,
+    
+    /**
      * @method callSuper
      * @param {String} methodName
      */

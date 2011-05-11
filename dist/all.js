@@ -4873,10 +4873,13 @@ fabric.util.animate = animate;
         if (currentObject.intersectsWithRect(selectionX1Y1, selectionX2Y2) ||
             currentObject.isContainedWithinRect(selectionX1Y1, selectionX2Y2)) {
 
-          currentObject.setActive(true);
-          group.push(currentObject);
+          if (currentObject.selectable) {
+            currentObject.setActive(true);
+            group.push(currentObject);
+          }
         }
       }
+
       if (group.length === 1) {
         this.setActiveObject(group[0]);
         fireEvent('object:selected', {
@@ -4889,6 +4892,7 @@ fabric.util.animate = animate;
         group.saveCoords();
         fireEvent('group:selected', { target: group });
       }
+
       this.renderAll();
     },
 
@@ -5107,6 +5111,7 @@ fabric.util.animate = animate;
      * @param {Boolean} skipGroup when true, group is skipped and only objects are traversed through
      */
     findTarget: function (e, skipGroup) {
+
       var target,
           pointer = this.getPointer(e);
 
@@ -5124,7 +5129,9 @@ fabric.util.animate = animate;
           break;
         }
       }
-      return target;
+      if (target && target.selectable) {
+        return target;
+      }
     },
 
     /**
@@ -6233,6 +6240,7 @@ fabric.util.animate = animate;
     borderOpacityWhenMoving:  0.4,
     borderScaleFactor:        1,
     transformMatrix:          null,
+    selectable:               true,
 
     /**
      * @method callSuper
