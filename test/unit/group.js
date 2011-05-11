@@ -114,6 +114,7 @@
     ok(typeof group.toObject == 'function');
     
     var clone = group.toObject();
+    
     var expectedObject = {
       'type': 'group', 
       'left': 80, 
@@ -126,6 +127,7 @@
       'strokeWidth': 1, 
       'scaleX': 1, 
       'scaleY': 1, 
+      'selectable': true,
       'angle': 0, 
       'flipX': false, 
       'flipY': false, 
@@ -133,7 +135,8 @@
       'objects': clone.objects
     };
     
-    same(expectedObject, clone);
+    console.log(clone, expectedObject);
+    same(clone, expectedObject);
     
     ok(group !== clone, 'should produce different object');
     ok(group.getObjects() !== clone.objects, 'should produce different object array');

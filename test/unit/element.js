@@ -21,10 +21,10 @@
   
   var PATH_DATALESS_JSON = '{"objects":[{"type":"path","left":100,"top":100,"width":200,"height":200,"fill":"rgb(0,0,0)",'+
                            '"overlayFill":null,"stroke":null,"strokeWidth":1,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,'+
-                           '"flipY":false,"opacity":1,"path":"http://example.com/"}],"background":"rgba(0, 0, 0, 0)"}';
+                           '"flipY":false,"opacity":1,"selectable":true,"path":"http://example.com/"}],"background":"rgba(0, 0, 0, 0)"}';
   
   var RECT_JSON = '{"objects":[{"type":"rect","left":0,"top":0,"width":10,"height":10,"fill":"rgb(0,0,0)","overlayFill":null,'+
-                  '"stroke":null,"strokeWidth":1,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1}],'+
+                  '"stroke":null,"strokeWidth":1,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,"selectable":true}],'+
                   '"background":"#ff5555"}';
   
   var canvas = this.canvas = new fabric.Element('test');
@@ -713,7 +713,7 @@
       ok(imgEl.width < ORIGINAL_WIDTH);
       
       start();
-    }, 2000);
+    }, 1000);
   });
   
   asyncTest('cache', function() {
@@ -763,7 +763,7 @@
       ok(/fixtures\/very_large_image\.jpg$/.test(objectPassedToCallback.getSrc()), 'image should have correct src');
       
       start();
-    }, 2000);
+    }, 1000);
   });
   
   asyncTest('fxRemove', function() {
@@ -783,7 +783,6 @@
     setTimeout(function() {
       equals(canvas.item(0), undefined);
       ok(callbackFired);
-      
       start();
     }, 1000);
   });

@@ -19,7 +19,8 @@
     'x1': 11, 
     'y1': 12, 
     'x2': 13, 
-    'y2': 14
+    'y2': 14,
+    'selectable': true
   };
   
   module('fabric.Line');

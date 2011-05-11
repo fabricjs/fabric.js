@@ -2318,7 +2318,7 @@
            data = imageData.data, 
            iLen = imageData.width,
            jLen = imageData.height,
-           index, average;
+           index, average, i, j;
 
        for (i = 0; i < iLen; i++) {
          for (j = 0; j < jLen; j++) {

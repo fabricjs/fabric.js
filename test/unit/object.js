@@ -364,7 +364,7 @@
         ok(image);
         ok(image instanceof fabric.Image);
         start();
-      }, 1000);
+      }, 500);
 
       cObj.cloneAsImage(function(i) {
         image = i;

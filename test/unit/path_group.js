@@ -16,6 +16,7 @@
     'flipX':        false, 
     'flipY':        false, 
     'opacity':      1, 
+    'selectable':   true,
     'paths':        getPathObjects()
   };
   

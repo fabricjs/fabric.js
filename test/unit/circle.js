@@ -62,7 +62,8 @@
       'flipX': false, 
       'flipY': false, 
       'opacity': 1, 
-      'radius': 0
+      'radius': 0,
+      'selectable': true
     };
     ok(typeof circle.toObject == 'function');
     same(circle.toObject(), defaultProperties);

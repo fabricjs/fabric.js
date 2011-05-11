@@ -30,7 +30,8 @@
     'flipX':        false, 
     'flipY':        false, 
     'opacity':      1, 
-    'src':          IMG_SRC
+    'src':          IMG_SRC,
+    'selectable':   true
   }
   
   function _createImageObject(width, height) {

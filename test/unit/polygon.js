@@ -23,7 +23,8 @@
     'flipX':        false, 
     'flipY':        false, 
     'opacity':      1, 
-    'points':       getPoints()
+    'points':       getPoints(),
+    'selectable':   true
   };
   
   module('fabric.Polygon');

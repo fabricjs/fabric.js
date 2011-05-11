@@ -38,7 +38,8 @@
       'flipY': false, 
       'opacity': 1, 
       'rx': 0,
-      'ry': 0
+      'ry': 0,
+      'selectable': true
     };
     ok(typeof ellipse.toObject == 'function');
     same(defaultProperties, ellipse.toObject());

@@ -4,8 +4,8 @@
     'type': 'rect', 
     'left': 0, 
     'top': 0, 
-    'width': 100, 
-    'height': 100, 
+    'width': 0, 
+    'height': 0, 
     'fill': 'rgb(0,0,0)',
     'overlayFill': null,
     'stroke': null, 
@@ -15,7 +15,8 @@
     'angle': 0, 
     'flipX': false, 
     'flipY': false, 
-    'opacity': 1
+    'opacity': 1,
+    'selectable': true
   };
   
   module('fabric.Rect');
