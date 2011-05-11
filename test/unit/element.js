@@ -32,6 +32,8 @@
   var canvasEl = document.getElementById('test');
   var canvasContext = canvasEl.getContext('2d');
   
+  canvas.wrapperEl.style.cssText = 'position:absolute;left:-1000px;top:0;border:1px solid red';
+  
   function makeRect(options) {
     var defaultOptions = { width: 10, height: 10 };
     return new fabric.Rect(fabric.util.object.extend(defaultOptions, options || { }));
@@ -159,8 +161,9 @@
     ok(typeof canvas.getPointer == 'function');
     
     fabric.util.addListener(canvasEl, 'click', function(e) {
+      canvas.calcOffset();
       var pointer = canvas.getPointer(e);
-      equals(pointer.x, 101, 'pointer.x should be correct');
+      equals(pointer.x, 101 + 1000 /* since canvas is shifted 1000px off-screen */, 'pointer.x should be correct');
       equals(pointer.y, 102, 'pointer.y should be correct');
     });
     simulateEvent(canvasEl, 'click', {

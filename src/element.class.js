@@ -1867,6 +1867,7 @@
           };
           
           imgEl.className = 'canvas-img-clone';
+          imgEl.style.cssText = 'position:absolute;left:-9999px;top:-9999px;';
           imgEl.src = url;
           
           if (this.shouldCacheImages) {
