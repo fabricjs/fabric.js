@@ -6,7 +6,7 @@ Contributions are very much welcome!
 
 ### Goals
 
-- Unit tested (1011 tests at the moment)
+- Unit tested (1033 tests at the moment)
 - Modular (~20 small "classes")
 - Cross-browser
 - Fast
@@ -20,7 +20,7 @@ Contributions are very much welcome!
 - Safari 3+
 - Opera 9.64+
 - Chrome (all versions should work)
-- IE9
+- IE9+
 
 #### With help of [Explorer Canvas](http://code.google.com/p/explorercanvas/)
 
