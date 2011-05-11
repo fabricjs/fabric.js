@@ -23,7 +23,7 @@
   function getPathElement(path) {
     var el = document.createElement('path');
     el.setAttribute('d', path);
-    el.setAttribute('fill', 'red');
+    el.setAttribute('fill', 'rgb(255,0,0)');
     el.setAttribute('stroke', 'blue');
     el.setAttribute('troke-width', 3);
     return el;
@@ -144,11 +144,11 @@
   });
   
   test('grayscale', function() {
+    
     var pathGroup = getPathGroupObject();
     
     ok(typeof pathGroup.toGrayscale == 'function');
     equals(pathGroup.toGrayscale(), pathGroup, 'should be chainable');
-    
     var firstObject = pathGroup.getObjects()[0],
         secondObject = pathGroup.getObjects()[1];
     
