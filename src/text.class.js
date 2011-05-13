@@ -29,9 +29,10 @@
     textDecoration: '',
     textShadow:     null,
     fontStyle:      '',
-    lineHeight:     1,
+    lineHeight:     1.6,
     strokeStyle:    '',
     strokeWidth:    1,
+    backgroundColor: '',
     path:           null,
     
     /**
@@ -74,7 +75,8 @@
         'fontStyle',
         'lineHeight',
         'strokeStyle',
-        'strokeWidth'
+        'strokeWidth',
+        'backgroundColor'
       );
       fabric.util.removeFromArray(this.stateProperties, 'width');
     },
@@ -118,7 +120,8 @@
         fontStyle: this.fontStyle,
         lineHeight: this.lineHeight,
         strokeStyle: this.strokeStyle,
-        strokeWidth: this.strokeWidth
+        strokeWidth: this.strokeWidth,
+        backgroundColor: this.backgroundColor
       });
       
       // update width, height
@@ -184,7 +187,8 @@
         textShadow:     this.textShadow,
         path:           this.path,
         strokeStyle:    this.strokeStyle,
-        strokeWidth:    this.strokeWidth
+        strokeWidth:    this.strokeWidth,
+        backgroundColor: this.backgroundColor
       });
     },
     

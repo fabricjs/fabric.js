@@ -27,12 +27,13 @@
     'fontsize':       20, 
     'fontweight':     100, 
     'fontfamily':     'Modernist_One_400',
-    "lineHeight":     1, 
-    "textDecoration": '', 
-    "textShadow":     null, 
-    "strokeStyle":    '',
-    "fontStyle":      '',
-    "path":           null
+    'lineHeight':     1.6, 
+    'textDecoration': '', 
+    'textShadow':     null, 
+    'strokeStyle':    '',
+    'fontStyle':      '',
+    'path':           null,
+    'backgroundColor': ''
   };
   
   module('fabric.Text');

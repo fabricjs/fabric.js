@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2011, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.2.4" };
+var fabric = fabric || { version: "0.2.5" };
 
 /**
  * Wrapper around `console.log` (when available)
@@ -1189,18 +1189,44 @@ Cufon.registerEngine('canvas', (function() {
     var textDecoration = options.enableTextDecoration ? Cufon.CSS.textDecoration(el, style) : {},
         isItalic = options.fontStyle === 'italic';
 
-    g.fillStyle = Cufon.textOptions.color || style.get('color');
+    function renderBackground() {
+      g.save();
+      g.fillStyle = options.backgroundColor;
 
-    function renderText() {
       var left = 0;
       for (var i = 0, l = chars.length; i < l; ++i) {
         if (chars[i] === '\n') {
-          g.translate(-left, -font.ascent - ((font.ascent / 5) * options.lineHeight) /* space between lines */);
+          g.translate(-left, -font.ascent - ((font.ascent / 5) * options.lineHeight));
           left = 0;
           continue;
         }
         var glyph = font.glyphs[chars[i]] || font.missingGlyph;
+        if (!glyph) continue;
 
+        var charWidth = Number(glyph.w || font.w) + letterSpacing;
+
+        g.save();
+        g.translate(0, font.ascent);
+        g.fillRect(0, 0, charWidth + 10, -font.ascent + font.descent);
+        g.restore();
+
+        g.translate(charWidth, 0);
+        left += charWidth;
+      }
+      g.restore();
+    }
+
+    function renderText() {
+      g.fillStyle = Cufon.textOptions.color || style.get('color');
+
+      var left = 0;
+      for (var i = 0, l = chars.length; i < l; ++i) {
+        if (chars[i] === '\n') {
+          g.translate(-left, -font.ascent - ((font.ascent / 5) * options.lineHeight));
+          left = 0;
+          continue;
+        }
+        var glyph = font.glyphs[chars[i]] || font.missingGlyph;
         if (!glyph) continue;
 
         var charWidth = Number(glyph.w || font.w) + letterSpacing;
@@ -1268,6 +1294,7 @@ Cufon.registerEngine('canvas', (function() {
     }
 
     g.save();
+    renderBackground();
     renderText();
     g.restore();
     g.restore();
@@ -1333,13 +1360,15 @@ Cufon.registerEngine('vml', (function() {
 
     var viewBox = font.viewBox;
 
-    var size = style.computedFontSize || (style.computedFontSize = new Cufon.CSS.Size(getFontSizeInPixels(el, style.get('fontSize')) + 'px', font.baseSize));
+    var size = style.computedFontSize ||
+      (style.computedFontSize = new Cufon.CSS.Size(getFontSizeInPixels(el, style.get('fontSize')) + 'px', font.baseSize));
 
     var letterSpacing = style.computedLSpacing;
 
     if (letterSpacing == undefined) {
       letterSpacing = style.get('letterSpacing');
-      style.computedLSpacing = letterSpacing = (letterSpacing == 'normal') ? 0 : ~~size.convertFrom(getSizeInPixels(el, letterSpacing));
+      style.computedLSpacing = letterSpacing =
+        (letterSpacing == 'normal') ? 0 : ~~size.convertFrom(getSizeInPixels(el, letterSpacing));
     }
 
     var wrapper, canvas;
@@ -9501,9 +9530,10 @@ fabric.util.animate = animate;
     textDecoration: '',
     textShadow:     null,
     fontStyle:      '',
-    lineHeight:     1,
+    lineHeight:     1.6,
     strokeStyle:    '',
     strokeWidth:    1,
+    backgroundColor: '',
     path:           null,
 
     /**
@@ -9546,7 +9576,8 @@ fabric.util.animate = animate;
         'fontStyle',
         'lineHeight',
         'strokeStyle',
-        'strokeWidth'
+        'strokeWidth',
+        'backgroundColor'
       );
       fabric.util.removeFromArray(this.stateProperties, 'width');
     },
@@ -9587,7 +9618,8 @@ fabric.util.animate = animate;
         fontStyle: this.fontStyle,
         lineHeight: this.lineHeight,
         strokeStyle: this.strokeStyle,
-        strokeWidth: this.strokeWidth
+        strokeWidth: this.strokeWidth,
+        backgroundColor: this.backgroundColor
       });
 
       this.width = o.width;
@@ -9649,7 +9681,8 @@ fabric.util.animate = animate;
         textShadow:     this.textShadow,
         path:           this.path,
         strokeStyle:    this.strokeStyle,
-        strokeWidth:    this.strokeWidth
+        strokeWidth:    this.strokeWidth,
+        backgroundColor: this.backgroundColor
       });
     },
 

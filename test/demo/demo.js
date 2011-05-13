@@ -393,14 +393,20 @@
   canvas.freeDrawingLineWidth = parseInt(drawingLineWidthEl.value, 10) || 1;
   
   
-  var helloWorld = new fabric.Text('Hello world!', { 
-    left: getRandomInt(100, 650), 
-    top: getRandomInt(100, 650),
+  var text = 'Lorem ipsum dolor sit amet,\nconsectetur adipisicing elit,\nsed do eiusmod tempor incididunt\nut labore et dolore magna aliqua.\n' +
+    'Ut enim ad minim veniam,\nquis nostrud exercitation ullamco\nlaboris nisi ut aliquip ex ea commodo consequat.';
+    
+  var textSample = new fabric.Text(text, { 
+    left: getRandomInt(300, 550), 
+    top: getRandomInt(500, 550),
     fontfamily: 'delicious_500',
-    angle: getRandomInt(-20, 20)
+    angle: getRandomInt(-10, 10),
+    fill: '#' + getRandomColor(),
+    scaleX: 0.5,
+    scaleY: 0.5
   });
   
-  canvas.add(helloWorld);
+  canvas.add(textSample);
   
   updateComplexity();
   
@@ -530,19 +536,30 @@
     };
   }
   
+  var bgColorField = document.getElementById('text-bg-color');
+  if (bgColorField) {
+    bgColorField.onchange = function() {
+      var activeObject = canvas.getActiveObject();
+      if (activeObject && activeObject.type === 'text') {
+        activeObject.backgroundColor = this.value;
+        canvas.renderAll();
+      }
+    };
+  }
+  
   if (supportsSlider) {
     (function(){
-      var container = document.getElementById('text-controls');
+      var container = document.getElementById('text-control-buttons');
       var slider = document.createElement('input');
-      // var label = document.createElement('label');
-      // label.innerHTML = 'Line height';
+      var label = document.createElement('label');
+      label.innerHTML = 'Line height: ';
       slider.type = 'range';
       slider.min = -2;
       slider.max = 10;
       slider.step = 0.1;
-      slider.value = 1;
-      // container.appendChild(label);
-      container.appendChild(slider);
+      slider.value = 1.5;
+      container.appendChild(label);
+      label.appendChild(slider);
       slider.title = "Line height";
       slider.onchange = function(){
         var activeObject = canvas.getActiveObject();
