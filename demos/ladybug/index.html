@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Sliding ladybugs</title>
+    <script src="../../dist/all.js"></script>
+    <script>
+      // polyfill by @paulirish
+      if (!window.requestAnimationFrame ) {
+        window.requestAnimationFrame = (function() {
+          return window.webkitRequestAnimationFrame ||
+          window.mozRequestAnimationFrame ||
+          window.oRequestAnimationFrame ||
+          window.msRequestAnimationFrame ||
+          function( /* function FrameRequestCallback */ callback, /* DOMElement Element */ element ) {
+            window.setTimeout( callback, 1000 / 60 );
+          };
+        })();
+      }
+    </script>
+    <style>
+      .canvas-container { border: 1px solid #ccc; display: inline-block; }
+      h2 span { font-weight: normal; }
+      pre { background: #eef; display: inline-block; padding-right: 15px; margin-left: 15px }
+    </style>
+    <link rel="stylesheet" href="../../lib/master.css" type="text/css">
+  </head>
+  <body>
+    <ul id="header">
+      <li><a href="../index.html">Demos</a></li>
+      <li><a href="../../docs/index.html">Docs</a></li>
+      <li><a href="../../test/unit/suite_runner.html">Tests</a></li>
+    </ul>
+    <div id="bd-wrapper">
+
+      <h2><span>Fabric.js demos</span> &middot; Sliding ladybugs</h2>
+
+      <canvas id="c" width="800" height="400"></canvas>
+
+<script id="main">
+  var canvas = new fabric.Element('c');
+
+  setInterval(function() {
+    fabric.Image.fromURL('ladybug.png', function(img) {
+      img.selectable = false;
+      img.set('left', fabric.util.getRandomInt(200, 600)).set('top', -50);
+      img.movingLeft = !!Math.round(Math.random());
+      canvas.add(img);
+    });
+  }, 1000);
+
+  (function animate() {
+    canvas.forEachObject(function(obj) {
+      obj.left += (obj.movingLeft ? -1 : 1);
+      obj.top += 1;
+      if (obj.left > 900 || obj.top > 500) {
+        canvas.remove(obj);
+      }
+      else {
+        obj.setAngle(obj.getAngle() + 2);
+      }
+    });
+    canvas.renderAll();
+    window.requestAnimationFrame(animate);
+  })();
+
+</script>
+
+      <script>
+        (function(){
+          var preEl = document.createElement('pre');
+          preEl.innerHTML = document.getElementById('main').innerHTML;
+          document.getElementById('bd-wrapper').appendChild(preEl);
+        })();
+      </script>
+    </div>
+  </body>
+</html>

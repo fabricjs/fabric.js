@@ -1,0 +1,10 @@
+body { font-family: Garamond, "Hoefler Text", "Times New Roman", Times, serif; margin: 0; }
+
+#header { background: #333; margin: 0; padding: 0; color: #555; }
+#header li { display: inline-block; }
+#header li:after { content: "|"; }
+#header li:last-child:after { content: ""; }
+#header li a { display: inline-block; padding: 10px; color: pink; font-variant: small-caps; text-decoration: none; }
+#header li a:hover, #header li a:focus { text-decoration: underline; }
+
+#bd-wrapper { padding: 10px; }
