@@ -361,14 +361,7 @@
      * @return {fabric.Group} thisArg
      * @chainable
      */
-    forEachObject: function(callback, context) {
-      var objects = this.getObjects(),
-          i = objects.length;
-      while (i--) {
-        callback.call(context, objects[i], i, objects);
-      }
-      return this;
-    },
+    forEachObject: fabric.Element.prototype.forEachObject,
     
     /**
      * @private

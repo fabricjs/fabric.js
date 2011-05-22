@@ -5970,6 +5970,20 @@ fabric.util.animate = animate;
     },
 
     /**
+     * Iterates over all objects, invoking callback for each one of them
+     * @method forEachObject
+     * @return {fabric.Element} thisArg
+     */
+    forEachObject: function(callback, context) {
+      var objects = this.getObjects(),
+          i = objects.length;
+      while (i--) {
+        callback.call(context, objects[i], i, objects);
+      }
+      return this;
+    },
+
+    /**
      * Clears a canvas element and removes all event handlers.
      * @method dispose
      * @return {fabric.Element} thisArg
@@ -6166,7 +6180,6 @@ fabric.util.animate = animate;
           return null;
       }
     }
-
   });
 
   /**
@@ -9395,14 +9408,7 @@ fabric.util.animate = animate;
      * @return {fabric.Group} thisArg
      * @chainable
      */
-    forEachObject: function(callback, context) {
-      var objects = this.getObjects(),
-          i = objects.length;
-      while (i--) {
-        callback.call(context, objects[i], i, objects);
-      }
-      return this;
-    },
+    forEachObject: fabric.Element.prototype.forEachObject,
 
     /**
      * @private
