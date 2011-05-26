@@ -68,7 +68,7 @@ Fabric.js started as a foundation for design editor on [printio.ru](http://print
 
 Documentation is always available at [http://kangax.github.com/fabric.js/docs/](http://kangax.github.com/fabric.js/docs/). You can also build it locally, following step 4 from the "Building" section of this README.
 
-Also see [presentation from BK.js](http://www.slideshare.net/kangax/fabricjs-building-acanvaslibrarybk) for an overview of fabric.js and how it works.
+Also see [presentation from BK.js](http://www.slideshare.net/kangax/fabricjs-building-acanvaslibrarybk) and [presentation from Falsy Values](http://www.slideshare.net/kangax/fabric-falsy-values-8067834) for an overview of fabric.js, how it works, and its features.
 
 ### Examples of use
 
