@@ -2217,6 +2217,7 @@
           
       // cache
       var clone = this.__clone || (this.__clone = new fabric.Element(el));
+      clone.clipTo = this.clipTo;
       
       return clone.loadFromJSON(JSON.stringify(this.toJSON()), function () {
         if (callback) {

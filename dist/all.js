@@ -6011,7 +6011,8 @@ fabric.util.animate = animate;
       el.height = this.getHeight();
 
       var clone = this.__clone || (this.__clone = new fabric.Element(el));
-
+      clone.clipTo = this.clipTo;
+      
       return clone.loadFromJSON(JSON.stringify(this.toJSON()), function () {
         if (callback) {
           callback(clone);
