@@ -1203,6 +1203,7 @@
           startTime = new Date();
       
       if (this.clipTo) {
+        containerCanvas.save();
         containerCanvas.beginPath();
         this.clipTo(containerCanvas);
         containerCanvas.clip();
@@ -1216,6 +1217,10 @@
             this._draw(containerCanvas, this._objects[i]);
           }
         }
+      }
+      
+      if (this.clipTo) {
+        containerCanvas.restore();
       }
       
       // delegate rendering to group selection (if one exists)
