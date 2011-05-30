@@ -25,13 +25,13 @@
      * @property
      * @type String
      */
-    type: 'object',
+    type:                       'object',
     
     /**
      * @property
      * @type Boolean
      */
-    includeDefaultValues: true,
+    includeDefaultValues:       true,
     
     /**
      * @constant
@@ -246,12 +246,20 @@
       if (shouldConstrainValue) {
         value = this.MIN_SCALE_LIMIT;
       }
-      if (property === 'angle') {
-        this.setAngle(value);
+      if (typeof property == 'object') {
+        for (var prop in property) {
+          this.set(prop, property[prop]);
+        }
       }
       else {
-        this[property] = value;
+        if (property === 'angle') {
+          this.setAngle(value);
+        }
+        else {
+          this[property] = value;
+        }
       }
+      
       return this;
     },
     

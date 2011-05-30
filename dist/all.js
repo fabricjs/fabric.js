@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2011, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.2.5" };
+var fabric = fabric || { version: "0.2.7" };
 
 /**
  * Wrapper around `console.log` (when available)
@@ -6012,7 +6012,7 @@ fabric.util.animate = animate;
 
       var clone = this.__clone || (this.__clone = new fabric.Element(el));
       clone.clipTo = this.clipTo;
-      
+
       return clone.loadFromJSON(JSON.stringify(this.toJSON()), function () {
         if (callback) {
           callback(clone);
@@ -6219,13 +6219,13 @@ fabric.util.animate = animate;
      * @property
      * @type String
      */
-    type: 'object',
+    type:                       'object',
 
     /**
      * @property
      * @type Boolean
      */
-    includeDefaultValues: true,
+    includeDefaultValues:       true,
 
     /**
      * @constant
@@ -6439,12 +6439,20 @@ fabric.util.animate = animate;
       if (shouldConstrainValue) {
         value = this.MIN_SCALE_LIMIT;
       }
-      if (property === 'angle') {
-        this.setAngle(value);
+      if (typeof property == 'object') {
+        for (var prop in property) {
+          this.set(prop, property[prop]);
+        }
       }
       else {
-        this[property] = value;
+        if (property === 'angle') {
+          this.setAngle(value);
+        }
+        else {
+          this[property] = value;
+        }
       }
+
       return this;
     },
 

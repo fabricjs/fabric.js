@@ -56,7 +56,18 @@
     equals(cObj.get('width'), 51);
     equals(cObj.get('height'), 61);
     equals(cObj.get('opacity'), 0.5);
+    
     equals(cObj.set('opacity', 0.5), cObj, 'chainable');
+  });
+  
+  test('set with object of prop/values', function() {
+    var cObj = new fabric.Object({  });
+    
+    equals(cObj, cObj.set({ width: 99, height: 88, fill: 'red' }), 'chainable');
+    
+    equals('red', cObj.get('fill'));
+    equals(99, cObj.get('width'));
+    equals(88, cObj.get('height'));
   });
   
   test('setSourcePath', function() {
