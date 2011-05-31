@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2011, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.2.7" };
+var fabric = fabric || { version: "0.2.8" };
 
 /**
  * Wrapper around `console.log` (when available)

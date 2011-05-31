@@ -94,14 +94,24 @@
       
       case 'image1':
         fabric.Image.fromURL('assets/pug.jpg', function(image) {
-          image.set('left', left).set('top', top).set('angle', angle).scale(getRandomNum(0.1, 0.25)).setCoords();
+          image.set({
+            left: left,
+            top: top,
+            angle: angle
+          });
+          image.scale(getRandomNum(0.1, 0.25)).setCoords();
           canvas.add(image);
         });
         break;
       
       case 'image2':
         fabric.Image.fromURL('assets/logo.png', function(image) {
-          image.set('left', left).set('top', top).set('angle', angle).scale(getRandomNum(0.1, 1)).setCoords();
+          image.set({
+            left: left,
+            top: top,
+            angle: angle
+          });
+          image.scale(getRandomNum(0.1, 1)).setCoords();
           canvas.add(image);
           updateComplexity();
         });
@@ -120,13 +130,12 @@
               loadedObject = objects[0];
             }
             
-            loadedObject
-              .set('left', left)
-              .set('top', top)
-              .set('angle', angle)
-              //.set('fill', '#' + getRandomColor())
-              .scaleToWidth(300)
-              .setCoords();
+            loadedObject.set({
+              left: left,
+              top: top,
+              angle: angle
+            });
+            loadedObject.scaleToWidth(300).setCoords();
               
             canvas.add(loadedObject);
             updateComplexity();

@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2011, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.2.7" };
+var fabric = fabric || { version: "0.2.8" };
 
 /**
  * Wrapper around `console.log` (when available)
@@ -5026,6 +5026,7 @@ fabric.util.animate = animate;
           startTime = new Date();
 
       if (this.clipTo) {
+        containerCanvas.save();
         containerCanvas.beginPath();
         this.clipTo(containerCanvas);
         containerCanvas.clip();
@@ -5039,6 +5040,10 @@ fabric.util.animate = animate;
             this._draw(containerCanvas, this._objects[i]);
           }
         }
+      }
+
+      if (this.clipTo) {
+        containerCanvas.restore();
       }
 
       if (activeGroup) {
@@ -7386,6 +7391,26 @@ fabric.util.animate = animate;
    * @alias rotate -> setAngle
    */
   fabric.Object.prototype.rotate = fabric.Object.prototype.setAngle;
+
+  var proto = fabric.Object.prototype;
+  for (var i = proto.stateProperties.length; i--; ) {
+
+    var propName = proto.stateProperties[i],
+        capitalizedPropName = propName.charAt(0).toUpperCase() + propName.slice(1),
+        setterName = 'set' + capitalizedPropName,
+        getterName = 'get' + capitalizedPropName;
+
+    if (!proto[getterName]) {
+      proto[getterName] = (function(property) {
+        return new Function('return this.get("' + property + '")');
+      })(propName);
+    }
+    if (!proto[setterName]) {
+      proto[setterName] = (function(property) {
+        return new Function('value', 'return this.set("' + property + '", value)');
+      })(propName);
+    }
+  }
 })(this);
 
 (function(global) {

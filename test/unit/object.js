@@ -70,6 +70,25 @@
     equals(88, cObj.get('height'));
   });
   
+  test('Dinamically generated accessors', function() {
+    var cObj = new fabric.Object({ });
+    
+    equals('function', typeof cObj.getWidth);
+    equals('function', typeof cObj.setWidth);
+    
+    equals('function', typeof cObj.getFill);
+    equals('function', typeof cObj.setFill);
+    
+    equals(cObj, cObj.setFill('red'), 'chainable');
+    equals('red', cObj.getFill());
+    
+    cObj.setScaleX(2.3);
+    equals(2.3, cObj.getScaleX());
+    
+    cObj.setOpacity(0.123)
+    equals(0.123, cObj.getOpacity());
+  });
+  
   test('setSourcePath', function() {
     var cObj = new fabric.Object();
     var SRC_PATH = 'http://example.com/';

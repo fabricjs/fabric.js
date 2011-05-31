@@ -1239,4 +1239,25 @@
    * @alias rotate -> setAngle
    */
   fabric.Object.prototype.rotate = fabric.Object.prototype.setAngle;
+  
+  var proto = fabric.Object.prototype;
+  for (var i = proto.stateProperties.length; i--; ) {
+    
+    var propName = proto.stateProperties[i],
+        capitalizedPropName = propName.charAt(0).toUpperCase() + propName.slice(1),
+        setterName = 'set' + capitalizedPropName,
+        getterName = 'get' + capitalizedPropName;
+    
+    // using `new Function` for better introspection
+    if (!proto[getterName]) {
+      proto[getterName] = (function(property) {
+        return new Function('return this.get("' + property + '")');
+      })(propName);
+    }
+    if (!proto[setterName]) {
+      proto[setterName] = (function(property) {
+        return new Function('value', 'return this.set("' + property + '", value)');
+      })(propName);
+    }
+  }
 })(this);
