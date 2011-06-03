@@ -575,6 +575,9 @@
      */
     __onMouseDown: function (e) {
       
+      // accept only left clicks
+      if (e.which !== 1) return;
+      
       if (this.isDrawingMode) {
         this._prepareForDrawing(e);
         
