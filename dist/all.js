@@ -5018,8 +5018,6 @@ fabric.util.animate = animate;
       if (!allOnTop) {
         this.clearContext(containerCanvas);
       }
-      containerCanvas.fillStyle = this.backgroundColor;
-      containerCanvas.fillRect(0, 0, this.width, this.height);
 
       var length = this._objects.length,
           activeGroup = this.getActiveGroup(),
@@ -5031,6 +5029,9 @@ fabric.util.animate = animate;
         this.clipTo(containerCanvas);
         containerCanvas.clip();
       }
+
+      containerCanvas.fillStyle = this.backgroundColor;
+      containerCanvas.fillRect(0, 0, this.width, this.height);
 
       if (length) {
         for (var i = 0; i < length; ++i) {

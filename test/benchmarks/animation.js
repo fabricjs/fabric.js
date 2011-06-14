@@ -102,13 +102,13 @@
         loadSVGFromURL('../demo/assets/' + shapePath, function(objects, options) {
           var pathGroup = new fabric.PathGroup(objects, options);
 
-          pathGroup
-            .set('left', coords[i].x)
-            .set('top', coords[i].y)
-            .set('angle', 30)
-            .set('fill', '#ff5555')
-            .scale(scaleObjectEl.value)
-            .setCoords();
+          pathGroup.set({
+            left: coords[i].x,
+            top: coords[i].y,
+            angle: 30,
+            fill: '#ff5555'
+          });
+          pathGroup.scale(scaleObjectEl.value).setCoords();
 
           canvas.add(pathGroup);
 
