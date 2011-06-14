@@ -59,6 +59,8 @@
      */
     _render: function(ctx, noTransform) {
       ctx.beginPath();
+      // multiply by currently set alpha (the one that was set by path group where this object is contained, for example)
+      ctx.globalAlpha *= this.opacity;
       ctx.arc(noTransform ? this.left : 0, noTransform ? this.top : 0, this.radius, 0, piBy2, false);
       ctx.closePath();
       if (this.fill) {
@@ -102,7 +104,7 @@
    * @static
    * @see: http://www.w3.org/TR/SVG/shapes.html#CircleElement
    */
-  fabric.Circle.ATTRIBUTE_NAMES = 'cx cy r fill fill-opacity stroke stroke-width transform'.split(' ');
+  fabric.Circle.ATTRIBUTE_NAMES = 'cx cy r fill fill-opacity opacity stroke stroke-width transform'.split(' ');
   
   /**
    * Returns {@link fabric.Circle} instance from an SVG element

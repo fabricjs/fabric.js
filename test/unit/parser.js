@@ -280,4 +280,17 @@
     }, 1500);
   });
   
+  test('opacity attribute', function() {
+    var tagNames = ['rect', 'path', 'circle', 'ellipse', 'polygon'];
+    
+    for (var i = tagNames.length; i--; ) {
+      var el = document.createElement(tagNames[i]);
+      var opacityValue = Math.random().toFixed(2);
+      el.setAttribute('opacity', opacityValue);
+      var obj = fabric.Rect.fromElement(el);
+      equals(parseFloat(opacityValue), obj.opacity, 
+        'opacity should be parsed correctly from "opacity" attribute of ' + tagNames[i] + ' element');
+    }
+  });
+  
 })();

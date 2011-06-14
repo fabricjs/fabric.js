@@ -409,7 +409,7 @@
    * @static
    * @see http://www.w3.org/TR/SVG/struct.html#ImageElement
    */
-  fabric.Image.ATTRIBUTE_NAMES = 'x y width height fill fill-opacity stroke stroke-width transform xlink:href'.split(' ');
+  fabric.Image.ATTRIBUTE_NAMES = 'x y width height fill fill-opacity opacity stroke stroke-width transform xlink:href'.split(' ');
   
   /**
    * Returns {@link fabric.Image} instance from an SVG element

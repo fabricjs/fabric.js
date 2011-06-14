@@ -81,6 +81,8 @@
           h = this.height;
       
       ctx.beginPath();
+      ctx.globalAlpha *= this.opacity;
+      
       ctx.moveTo(x+rx, y);
       ctx.lineTo(x+w-rx, y);
       ctx.bezierCurveTo(x+w, y, x+w, y+ry, x+w, y+ry);
@@ -126,7 +128,7 @@
    * List of attribute names to account for when parsing SVG element (used by `fabric.Rect.fromElement`)
    * @static
    */
-  fabric.Rect.ATTRIBUTE_NAMES = 'x y width height rx ry fill fill-opacity stroke stroke-width transform'.split(' ');
+  fabric.Rect.ATTRIBUTE_NAMES = 'x y width height rx ry fill fill-opacity opacity stroke stroke-width transform'.split(' ');
   
   /**
    * @private

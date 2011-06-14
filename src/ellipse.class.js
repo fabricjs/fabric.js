@@ -75,15 +75,16 @@
     _render: function(ctx, noTransform) {
       ctx.beginPath();
       ctx.save();
+      ctx.globalAlpha *= this.opacity;
       ctx.transform(1, 0, 0, this.ry/this.rx, 0, 0);
       ctx.arc(noTransform ? this.left : 0, noTransform ? this.top : 0, this.rx, 0, piBy2, false);
-      ctx.restore();
       if (this.stroke) {
         ctx.stroke();
       }
       if (this.fill) {
         ctx.fill();
       }
+      ctx.restore();
     },
     
     /**
@@ -101,7 +102,7 @@
    * @static
    * @see http://www.w3.org/TR/SVG/shapes.html#EllipseElement
    */
-  fabric.Ellipse.ATTRIBUTE_NAMES = 'cx cy rx ry fill fill-opacity stroke stroke-width transform'.split(' ');
+  fabric.Ellipse.ATTRIBUTE_NAMES = 'cx cy rx ry fill fill-opacity opacity stroke stroke-width transform'.split(' ');
   
   /**
    * Returns {@link fabric.Ellipse} instance from an SVG element

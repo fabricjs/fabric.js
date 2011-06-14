@@ -89,7 +89,7 @@
    * @static
    * @see: http://www.w3.org/TR/SVG/shapes.html#PolylineElement
    */
-  fabric.Polyline.ATTRIBUTE_NAMES = 'fill fill-opacity stroke stroke-width transform'.split(' ');
+  fabric.Polyline.ATTRIBUTE_NAMES = 'fill fill-opacity opacity stroke stroke-width transform'.split(' ');
   
   /**
    * Returns fabric.Polyline instance from an SVG element

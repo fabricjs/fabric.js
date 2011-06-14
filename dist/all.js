@@ -7602,6 +7602,7 @@ fabric.util.animate = animate;
      */
     _render: function(ctx, noTransform) {
       ctx.beginPath();
+      ctx.globalAlpha *= this.opacity;
       ctx.arc(noTransform ? this.left : 0, noTransform ? this.top : 0, this.radius, 0, piBy2, false);
       ctx.closePath();
       if (this.fill) {
@@ -7645,7 +7646,7 @@ fabric.util.animate = animate;
    * @static
    * @see: http://www.w3.org/TR/SVG/shapes.html#CircleElement
    */
-  fabric.Circle.ATTRIBUTE_NAMES = 'cx cy r fill fill-opacity stroke stroke-width transform'.split(' ');
+  fabric.Circle.ATTRIBUTE_NAMES = 'cx cy r fill fill-opacity opacity stroke stroke-width transform'.split(' ');
 
   /**
    * Returns {@link fabric.Circle} instance from an SVG element
@@ -7847,15 +7848,16 @@ fabric.util.animate = animate;
     _render: function(ctx, noTransform) {
       ctx.beginPath();
       ctx.save();
+      ctx.globalAlpha *= this.opacity;
       ctx.transform(1, 0, 0, this.ry/this.rx, 0, 0);
       ctx.arc(noTransform ? this.left : 0, noTransform ? this.top : 0, this.rx, 0, piBy2, false);
-      ctx.restore();
       if (this.stroke) {
         ctx.stroke();
       }
       if (this.fill) {
         ctx.fill();
       }
+      ctx.restore();
     },
 
     /**
@@ -7873,7 +7875,7 @@ fabric.util.animate = animate;
    * @static
    * @see http://www.w3.org/TR/SVG/shapes.html#EllipseElement
    */
-  fabric.Ellipse.ATTRIBUTE_NAMES = 'cx cy rx ry fill fill-opacity stroke stroke-width transform'.split(' ');
+  fabric.Ellipse.ATTRIBUTE_NAMES = 'cx cy rx ry fill fill-opacity opacity stroke stroke-width transform'.split(' ');
 
   /**
    * Returns {@link fabric.Ellipse} instance from an SVG element
@@ -7988,6 +7990,8 @@ fabric.util.animate = animate;
           h = this.height;
 
       ctx.beginPath();
+      ctx.globalAlpha *= this.opacity;
+
       ctx.moveTo(x+rx, y);
       ctx.lineTo(x+w-rx, y);
       ctx.bezierCurveTo(x+w, y, x+w, y+ry, x+w, y+ry);
@@ -8031,7 +8035,7 @@ fabric.util.animate = animate;
    * List of attribute names to account for when parsing SVG element (used by `fabric.Rect.fromElement`)
    * @static
    */
-  fabric.Rect.ATTRIBUTE_NAMES = 'x y width height rx ry fill fill-opacity stroke stroke-width transform'.split(' ');
+  fabric.Rect.ATTRIBUTE_NAMES = 'x y width height rx ry fill fill-opacity opacity stroke stroke-width transform'.split(' ');
 
   /**
    * @private
@@ -8165,7 +8169,7 @@ fabric.util.animate = animate;
    * @static
    * @see: http://www.w3.org/TR/SVG/shapes.html#PolylineElement
    */
-  fabric.Polyline.ATTRIBUTE_NAMES = 'fill fill-opacity stroke stroke-width transform'.split(' ');
+  fabric.Polyline.ATTRIBUTE_NAMES = 'fill fill-opacity opacity stroke stroke-width transform'.split(' ');
 
   /**
    * Returns fabric.Polyline instance from an SVG element
@@ -8314,7 +8318,7 @@ fabric.util.animate = animate;
    * @static
    * @see: http://www.w3.org/TR/SVG/shapes.html#PolygonElement
    */
-  fabric.Polygon.ATTRIBUTE_NAMES = 'fill fill-opacity stroke stroke-width transform'.split(' ');
+  fabric.Polygon.ATTRIBUTE_NAMES = 'fill fill-opacity opacity stroke stroke-width transform'.split(' ');
 
   /**
    * Returns fabric.Polygon instance from an SVG element
@@ -8840,7 +8844,7 @@ fabric.util.animate = animate;
    * @static
    * @see http://www.w3.org/TR/SVG/paths.html#PathElement
    */
-  fabric.Path.ATTRIBUTE_NAMES = 'd fill fill-opacity fill-rule stroke stroke-width transform'.split(' ');
+  fabric.Path.ATTRIBUTE_NAMES = 'd fill fill-opacity opacity fill-rule stroke stroke-width transform'.split(' ');
 
   /**
    * Creates an instance of fabric.Path from an SVG <path> element
@@ -10219,7 +10223,7 @@ fabric.util.animate = animate;
    * @static
    * @see http://www.w3.org/TR/SVG/struct.html#ImageElement
    */
-  fabric.Image.ATTRIBUTE_NAMES = 'x y width height fill fill-opacity stroke stroke-width transform xlink:href'.split(' ');
+  fabric.Image.ATTRIBUTE_NAMES = 'x y width height fill fill-opacity opacity stroke stroke-width transform xlink:href'.split(' ');
 
   /**
    * Returns {@link fabric.Image} instance from an SVG element
