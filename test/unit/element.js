@@ -529,16 +529,16 @@
     };
     var target;
     
-    fabric.util.observeEvent('before:group:destroyed', function (e) {
+    canvas.observe('before:group:destroyed', function (e) {
       eventsFired.beforeGroupDestroyed = true;
       equals(canvas.getActiveGroup(), e.memo.target, 'event should have active group as its `target` property');
     });
     
-    fabric.util.observeEvent('after:group:destroyed', function(){
+    canvas.observe('after:group:destroyed', function(){
       eventsFired.afterGroupDestroyed = true;
     });
     
-    fabric.util.observeEvent('selection:cleared', function(){
+    canvas.observe('selection:cleared', function(){
       eventsFired.selectionCleared = true;
     });
     

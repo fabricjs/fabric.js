@@ -2,7 +2,7 @@
  * Augments canvas by assigning to `onObjectMove` and `onAfterRender`. 
  * This kind of sucks because other code using those methods will stop functioning. 
  * Need to fix it by replacing callbacks with pub/sub kind of subscription model.
- * (or maybe use existing fabric.util.fireEvent/observeEvent (if it won't be too slow))
+ * (or maybe use existing fabric.util.fire/observe (if it won't be too slow))
  */
 function initCenteringGuidelines(canvas) {
   
@@ -43,12 +43,11 @@ function initCenteringGuidelines(canvas) {
     ctx.restore();
   }
   
-  var observeEvent = fabric.util.observeEvent,
-      afterRenderActions = [ ],
+  var afterRenderActions = [ ],
       isInVerticalCenter,
       isInHorizontalCenter;
   
-  observeEvent('object:moved', function(e) {
+  canvas.observe('object:moved', function(e) {
     object = e.memo.target;
     
     isInVerticalCenter = object.get('left') in canvasWidthCenterMap,
@@ -62,7 +61,7 @@ function initCenteringGuidelines(canvas) {
     }
   });
   
-  observeEvent('after:render', function() {
+  canvas.observe('after:render', function() {
     if (isInVerticalCenter) {
       showVerticalCenterLine();
     }
@@ -71,7 +70,7 @@ function initCenteringGuidelines(canvas) {
     }
   });
   
-  observeEvent('mouse:up', function() {
+  canvas.observe('mouse:up', function() {
     // clear these values, to stop drawing guidelines once mouse is up
     isInVerticalCenter = isInHorizontalCenter = null;
     canvas.renderAll();

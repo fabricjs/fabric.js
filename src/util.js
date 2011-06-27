@@ -9,6 +9,7 @@
   /** @namespace */
   fabric.util = { };
   
+  //= require "observable"
   //= require "util/misc"
   
   //= require "util/lang_array"

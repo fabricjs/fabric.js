@@ -172,49 +172,6 @@
    */
   fabric.util.removeListener = removeListener;
   
-  var customEventListeners = { };
-  
-  /**
-   * @mthod observeEvent
-   * @memberOf fabric.util
-   * @param {String} eventName
-   * @param {Function} handler
-   */
-  function observeEvent(eventName, handler) {
-    if (!customEventListeners[eventName]) {
-      customEventListeners[eventName] = [ ];
-    }
-    customEventListeners[eventName].push(handler);
-  }
-  
-  /**
-   * @mthod stopObservingEvent
-   * @memberOf fabric.util
-   * @param {String} eventName
-   * @param {Function} handler
-   */
-  function stopObservingEvent(eventName, handler) {
-    if (customEventListeners[eventName]) {
-      fabric.util.removeFromArray(customEventListeners[eventName], handler);
-    }
-  }
-  
-  /**
-   * Fires event with an optional memo object
-   * @mthod fireEvent
-   * @memberOf fabric.util
-   * @param {String} eventName
-   * @param {Object} [memo]
-   */
-  function fireEvent(eventName, memo) {
-    var listenersForEvent = customEventListeners[eventName];
-    if (!listenersForEvent) return;
-    for (var i = 0, len = listenersForEvent.length; i < len; i++) {
-      // avoiding try/catch for perf. reasons
-      listenersForEvent[i]({ memo: memo });
-    }
-  }
-  
   /**
    * Cross-browser wrapper for getting event's coordinates
    * @method getPointer
@@ -248,7 +205,7 @@
   }
   
   fabric.util.getPointer = getPointer;
-  fabric.util.observeEvent = observeEvent;
-  fabric.util.stopObservingEvent = stopObservingEvent;
-  fabric.util.fireEvent = fireEvent;
+  
+  fabric.util.object.extend(fabric.util, fabric.Observable);
+  
 })(this);

@@ -1499,6 +1499,56 @@ Cufon.registerEngine('vml', (function() {
   /** @namespace */
   fabric.util = { };
 
+fabric.Observable = {
+
+  /**
+   * @mthod observe
+   * @param {String} eventName
+   * @param {Function} handler
+   */
+  observe: function(eventName, handler) {
+    if (!this.__eventListeners) {
+      this.__eventListeners = { };
+    }
+    if (!this.__eventListeners[eventName]) {
+      this.__eventListeners[eventName] = [ ];
+    }
+    this.__eventListeners[eventName].push(handler);
+  },
+
+  /**
+   * @mthod stopObserving
+   * @memberOf fabric.util
+   * @param {String} eventName
+   * @param {Function} handler
+   */
+  stopObserving: function(eventName, handler) {
+    if (!this.__eventListeners) {
+      this.__eventListeners = { };
+    }
+    if (this.__eventListeners[eventName]) {
+      fabric.util.removeFromArray(this.__eventListeners[eventName], handler);
+    }
+  },
+
+  /**
+   * Fires event with an optional memo object
+   * @mthod fire
+   * @memberOf fabric.util
+   * @param {String} eventName
+   * @param {Object} [memo]
+   */
+  fire: function(eventName, memo) {
+    if (!this.__eventListeners) {
+      this.__eventListeners = { }
+    }
+    var listenersForEvent = this.__eventListeners[eventName];
+    if (!listenersForEvent) return;
+    for (var i = 0, len = listenersForEvent.length; i < len; i++) {
+      listenersForEvent[i]({ memo: memo });
+    }
+  }
+};
 (function() {
 
   /**
@@ -2089,48 +2139,6 @@ if (!Function.prototype.bind) {
    */
   fabric.util.removeListener = removeListener;
 
-  var customEventListeners = { };
-
-  /**
-   * @mthod observeEvent
-   * @memberOf fabric.util
-   * @param {String} eventName
-   * @param {Function} handler
-   */
-  function observeEvent(eventName, handler) {
-    if (!customEventListeners[eventName]) {
-      customEventListeners[eventName] = [ ];
-    }
-    customEventListeners[eventName].push(handler);
-  }
-
-  /**
-   * @mthod stopObservingEvent
-   * @memberOf fabric.util
-   * @param {String} eventName
-   * @param {Function} handler
-   */
-  function stopObservingEvent(eventName, handler) {
-    if (customEventListeners[eventName]) {
-      fabric.util.removeFromArray(customEventListeners[eventName], handler);
-    }
-  }
-
-  /**
-   * Fires event with an optional memo object
-   * @mthod fireEvent
-   * @memberOf fabric.util
-   * @param {String} eventName
-   * @param {Object} [memo]
-   */
-  function fireEvent(eventName, memo) {
-    var listenersForEvent = customEventListeners[eventName];
-    if (!listenersForEvent) return;
-    for (var i = 0, len = listenersForEvent.length; i < len; i++) {
-      listenersForEvent[i]({ memo: memo });
-    }
-  }
-
   /**
    * Cross-browser wrapper for getting event's coordinates
    * @method getPointer
@@ -2160,9 +2168,9 @@ if (!Function.prototype.bind) {
   }
 
   fabric.util.getPointer = getPointer;
-  fabric.util.observeEvent = observeEvent;
-  fabric.util.stopObservingEvent = stopObservingEvent;
-  fabric.util.fireEvent = fireEvent;
+
+  fabric.util.object.extend(fabric.util, fabric.Observable);
+
 })(this);
 (function () {
 
@@ -3873,7 +3881,6 @@ fabric.util.animate = animate;
       extend = fabric.util.object.extend,
       capitalize = fabric.util.string.capitalize,
       camelize = fabric.util.string.camelize,
-      fireEvent = fabric.util.fireEvent,
       getPointer = fabric.util.getPointer,
       getElementOffset = fabric.util.getElementOffset,
       removeFromArray = fabric.util.removeFromArray,
@@ -3976,6 +3983,8 @@ fabric.util.animate = animate;
 
     fabric.Element.activeInstance = this;
   };
+
+  extend(fabric.Element.prototype, fabric.Observable);
 
   extend(fabric.Element.prototype, /** @scope fabric.Element.prototype */ {
 
@@ -4210,14 +4219,19 @@ fabric.util.animate = animate;
 
       var _this = this;
 
-      this._onMouseDown = function (e) { _this.__onMouseDown(e); };
-      this._onMouseUp = function (e) { _this.__onMouseUp(e); };
+      this._onMouseDown = function (e) {
+        _this.__onMouseDown(e);
+        addListener(document, 'mouseup', _this._onMouseUp);
+      };
+      this._onMouseUp = function (e) {
+        _this.__onMouseUp(e);
+        removeListener(document, 'mouseup', _this._onMouseUp);
+      };
       this._onMouseMove = function (e) { _this.__onMouseMove(e); };
       this._onResize = function (e) { _this.calcOffset() };
 
       addListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
       addListener(document, 'mousemove', this._onMouseMove);
-      addListener(document, 'mouseup', this._onMouseUp);
       addListener(window, 'resize', this._onResize);
     },
 
@@ -4351,7 +4365,7 @@ fabric.util.animate = animate;
             target = transform.target;
 
         if (target._scaling) {
-          fireEvent('object:scaled', { target: target });
+          this.fire('object:scaled', { target: target });
           target._scaling = false;
         }
 
@@ -4362,7 +4376,7 @@ fabric.util.animate = animate;
 
         if (this.stateful && target.hasStateChanged()) {
           target.isMoving = false;
-          fireEvent('object:modified', { target: target });
+          this.fire('object:modified', { target: target });
         }
       }
 
@@ -4375,7 +4389,7 @@ fabric.util.animate = animate;
       if (activeGroup) {
         if (this.stateful && activeGroup.hasStateChanged() &&
             activeGroup.containsPoint(this.getPointer(e))) {
-          fireEvent('group:modified', { target: activeGroup });
+          this.fire('group:modified', { target: activeGroup });
         }
         activeGroup.setObjectsCoords();
         activeGroup.set('isMoving', false);
@@ -4394,7 +4408,7 @@ fabric.util.animate = animate;
         _this._setCursorFromEvent(e, target);
       }, 50);
 
-      fireEvent('mouse:up');
+      this.fire('mouse:up');
     },
 
     _shouldClearSelection: function (e) {
@@ -4469,6 +4483,8 @@ fabric.util.animate = animate;
         }
       }
       this.renderAll();
+
+      this.fire('mouse:down');
     },
 
     /**
@@ -4488,15 +4504,15 @@ fabric.util.animate = animate;
     deactivateAllWithDispatch: function () {
       var activeGroup = this.getActiveGroup();
       if (activeGroup) {
-        fireEvent('before:group:destroyed', {
+        this.fire('before:group:destroyed', {
           target: activeGroup
         });
       }
       this.deactivateAll();
       if (activeGroup) {
-        fireEvent('after:group:destroyed');
+        this.fire('after:group:destroyed');
       }
-      fireEvent('selection:cleared');
+      this.fire('selection:cleared');
       return this;
     },
 
@@ -4557,7 +4573,7 @@ fabric.util.animate = animate;
         else {
           activeGroup.add(target);
         }
-        fireEvent('group:selected', { target: activeGroup });
+        this.fire('group:selected', { target: activeGroup });
         activeGroup.setActive(true);
       }
       else {
@@ -4656,7 +4672,7 @@ fabric.util.animate = animate;
       this.add(p);
       p.set("left", minX + (maxX - minX) / 2).set("top", minY + (maxY - minY) / 2).setCoords();
       this.renderAll();
-      fireEvent('path:created', { path: p });
+      this.fire('path:created', { path: p });
     },
 
    /**
@@ -4730,7 +4746,7 @@ fabric.util.animate = animate;
         else {
           this._translateObject(x, y);
 
-          fireEvent('object:moved', {
+          this.fire('object:moved', {
             target: this._currentTransform.target
           });
         }
@@ -4911,7 +4927,7 @@ fabric.util.animate = animate;
 
       if (group.length === 1) {
         this.setActiveObject(group[0]);
-        fireEvent('object:selected', {
+        this.fire('object:selected', {
           target: group[0]
         });
       }
@@ -4919,7 +4935,7 @@ fabric.util.animate = animate;
         var group = new fabric.Group(group);
         this.setActiveGroup(group);
         group.saveCoords();
-        fireEvent('group:selected', { target: group });
+        this.fire('group:selected', { target: group });
       }
 
       this.renderAll();
@@ -5060,7 +5076,7 @@ fabric.util.animate = animate;
         this.onFpsUpdate(~~(1000 / elapsedTime));
       }
 
-      fireEvent('after:render');
+      this.fire('after:render');
 
       return this;
     },
@@ -5088,7 +5104,7 @@ fabric.util.animate = animate;
         activeGroup.render(this.contextTop);
       }
 
-      fireEvent('after:render');
+      this.fire('after:render');
 
       return this;
     },
@@ -5875,7 +5891,7 @@ fabric.util.animate = animate;
 
       this.renderAll();
 
-      fireEvent('object:selected', { target: object });
+      this.fire('object:selected', { target: object });
       return this;
     },
 
@@ -5998,7 +6014,6 @@ fabric.util.animate = animate;
     dispose: function () {
       this.clear();
       removeListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
-      removeListener(document, 'mouseup', this._onMouseUp);
       removeListener(document, 'mousemove', this._onMouseMove);
       removeListener(window, 'resize', this._onResize);
       return this;

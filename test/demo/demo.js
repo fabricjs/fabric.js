@@ -345,8 +345,8 @@
     activeObjectButtons[i].disabled = true;
   }
   
-  fabric.util.observeEvent('object:selected', onObjectSelected);
-  fabric.util.observeEvent('group:selected', onObjectSelected);
+  canvas.observe('object:selected', onObjectSelected);
+  canvas.observe('group:selected', onObjectSelected);
   
   function onObjectSelected(e) {
     var selectedObject = e.memo.target;
@@ -362,7 +362,7 @@
     lockRotationEl.innerHTML = (selectedObject.lockRotation ? 'Unlock rotation' : 'Lock rotation');
   }
   
-  fabric.util.observeEvent('selection:cleared', function(e) {
+  canvas.observe('selection:cleared', function(e) {
     for (var i = activeObjectButtons.length; i--; ) {
       activeObjectButtons[i].disabled = true;
     }
@@ -387,7 +387,7 @@
     }
   };
   
-  fabric.util.observeEvent('path:created', function() {
+  canvas.observe('path:created', function() {
     updateComplexity();
   });
   
@@ -578,7 +578,7 @@
         }
       };
       
-      fabric.util.observeEvent('object:selected', function(e) {
+      canvas.observe('object:selected', function(e) {
         slider.value = e.memo.target.lineHeight;
       });
     })();

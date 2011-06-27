@@ -14,7 +14,6 @@
       extend = fabric.util.object.extend,
       capitalize = fabric.util.string.capitalize,
       camelize = fabric.util.string.camelize,
-      fireEvent = fabric.util.fireEvent,
       getPointer = fabric.util.getPointer,
       getElementOffset = fabric.util.getElementOffset,
       removeFromArray = fabric.util.removeFromArray,
@@ -117,6 +116,8 @@
     
     fabric.Element.activeInstance = this;
   };
+  
+  extend(fabric.Element.prototype, fabric.Observable);
   
   extend(fabric.Element.prototype, /** @scope fabric.Element.prototype */ {
     
@@ -351,14 +352,19 @@
       
       var _this = this;
       
-      this._onMouseDown = function (e) { _this.__onMouseDown(e); };
-      this._onMouseUp = function (e) { _this.__onMouseUp(e); };
+      this._onMouseDown = function (e) { 
+        _this.__onMouseDown(e);
+        addListener(document, 'mouseup', _this._onMouseUp);
+      };
+      this._onMouseUp = function (e) { 
+        _this.__onMouseUp(e);
+        removeListener(document, 'mouseup', _this._onMouseUp);
+      };
       this._onMouseMove = function (e) { _this.__onMouseMove(e); };
       this._onResize = function (e) { _this.calcOffset() };
       
       addListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
       addListener(document, 'mousemove', this._onMouseMove);
-      addListener(document, 'mouseup', this._onMouseUp);
       addListener(window, 'resize', this._onResize);
     },
     
@@ -492,7 +498,7 @@
             target = transform.target;
             
         if (target._scaling) {
-          fireEvent('object:scaled', { target: target });
+          this.fire('object:scaled', { target: target });
           target._scaling = false;
         }
         
@@ -505,7 +511,7 @@
         // only fire :modified event if target coordinates were changed during mousedown-mouseup
         if (this.stateful && target.hasStateChanged()) {
           target.isMoving = false;
-          fireEvent('object:modified', { target: target });
+          this.fire('object:modified', { target: target });
         }
       }
       
@@ -519,7 +525,7 @@
       if (activeGroup) {
         if (this.stateful && activeGroup.hasStateChanged() && 
             activeGroup.containsPoint(this.getPointer(e))) {
-          fireEvent('group:modified', { target: activeGroup });
+          this.fire('group:modified', { target: activeGroup });
         }
         activeGroup.setObjectsCoords();
         activeGroup.set('isMoving', false);
@@ -540,7 +546,7 @@
         _this._setCursorFromEvent(e, target);
       }, 50);
       
-      fireEvent('mouse:up');
+      this.fire('mouse:up');
     },
     
     _shouldClearSelection: function (e) {
@@ -620,6 +626,8 @@
       }
       // we must renderAll so that active image is placed on the top canvas
       this.renderAll();
+      
+      this.fire('mouse:down');
     },
     
     /**
@@ -639,15 +647,15 @@
     deactivateAllWithDispatch: function () {
       var activeGroup = this.getActiveGroup();
       if (activeGroup) {
-        fireEvent('before:group:destroyed', {
+        this.fire('before:group:destroyed', {
           target: activeGroup
         });
       }
       this.deactivateAll();
       if (activeGroup) {
-        fireEvent('after:group:destroyed');
+        this.fire('after:group:destroyed');
       }
-      fireEvent('selection:cleared');
+      this.fire('selection:cleared');
       return this;
     },
     
@@ -711,7 +719,7 @@
         else {
           activeGroup.add(target);
         }
-        fireEvent('group:selected', { target: activeGroup });
+        this.fire('group:selected', { target: activeGroup });
         activeGroup.setActive(true);
       }
       else {
@@ -818,7 +826,7 @@
       this.add(p);
       p.set("left", minX + (maxX - minX) / 2).set("top", minY + (maxY - minY) / 2).setCoords();
       this.renderAll();
-      fireEvent('path:created', { path: p });
+      this.fire('path:created', { path: p });
     },
 
    /**
@@ -904,7 +912,7 @@
         else {
           this._translateObject(x, y);
           
-          fireEvent('object:moved', {
+          this.fire('object:moved', {
             target: this._currentTransform.target
           });
         }
@@ -1088,7 +1096,7 @@
       // do not create group for 1 element only
       if (group.length === 1) {
         this.setActiveObject(group[0]);
-        fireEvent('object:selected', {
+        this.fire('object:selected', {
           target: group[0]
         });
       } 
@@ -1096,7 +1104,7 @@
         var group = new fabric.Group(group);
         this.setActiveGroup(group);
         group.saveCoords();
-        fireEvent('group:selected', { target: group });
+        this.fire('group:selected', { target: group });
       }
       
       this.renderAll();
@@ -1238,7 +1246,7 @@
         this.onFpsUpdate(~~(1000 / elapsedTime));
       }
       
-      fireEvent('after:render');
+      this.fire('after:render');
       
       return this;
     },
@@ -1269,7 +1277,7 @@
         activeGroup.render(this.contextTop);
       }
       
-      fireEvent('after:render');
+      this.fire('after:render');
       
       return this;
     },
@@ -2080,7 +2088,7 @@
       
       this.renderAll();
       
-      fireEvent('object:selected', { target: object });
+      this.fire('object:selected', { target: object });
       return this;
     },
     
@@ -2203,7 +2211,6 @@
     dispose: function () {
       this.clear();
       removeListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
-      removeListener(document, 'mouseup', this._onMouseUp);
       removeListener(document, 'mousemove', this._onMouseMove);
       removeListener(window, 'resize', this._onResize);
       return this;

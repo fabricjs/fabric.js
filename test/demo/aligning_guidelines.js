@@ -53,7 +53,7 @@ function initAligningGuidelines(canvas) {
   var verticalLines = [ ],
       horizontalLines = [ ];
   
-  fabric.util.observeEvent('object:moved', function(e) {
+  canvas.observe('object:moved', function(e) {
     
     var activeObject = e.memo.target,
         canvasObjects = canvas.getObjects(),
@@ -171,7 +171,7 @@ function initAligningGuidelines(canvas) {
     }
   });
   
-  fabric.util.observeEvent('after:render', function() {
+  canvas.observe('after:render', function() {
     for (var i = verticalLines.length; i--; ) {
       drawVerticalLine(verticalLines[i]);
     }
@@ -180,7 +180,7 @@ function initAligningGuidelines(canvas) {
     }
   });
   
-  fabric.util.observeEvent('mouse:up', function() {
+  canvas.observe('mouse:up', function() {
     verticalLines.length = horizontalLines.length = 0;
     canvas.renderAll();
   });
