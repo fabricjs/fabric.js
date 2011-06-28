@@ -61,6 +61,8 @@
       ctx.moveTo(-this.width / 2, -this.height / 2);
       ctx.lineTo(this.width / 2, this.height / 2);
       
+      ctx.lineWidth = this.strokeWidth;
+      
       // TODO: test this
       // make sure setting "fill" changes color of a line
       // (by copying fillStyle to strokeStyle, since line is stroked, not filled)

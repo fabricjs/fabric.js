@@ -129,6 +129,13 @@
     backgroundColor:        'rgba(0, 0, 0, 0)',
     
     /**
+     * Indicates whether object selection should be enabled
+     * @property
+     * @type Boolean
+     */
+    selection:              true,
+    
+    /**
      * Color of selection
      * @property
      * @type String
@@ -573,6 +580,9 @@
      *
      */
     __onMouseDown: function (e) {
+      
+      // accept only left clicks
+      if (e.which !== 1) return;
       
       if (this.isDrawingMode) {
         this._prepareForDrawing(e);
@@ -1086,7 +1096,7 @@
         if (currentObject.intersectsWithRect(selectionX1Y1, selectionX2Y2) || 
             currentObject.isContainedWithinRect(selectionX1Y1, selectionX2Y2)) {
           
-          if (currentObject.selectable) {
+          if (this.selection && currentObject.selectable) {
             currentObject.setActive(true);
             group.push(currentObject);
           }
@@ -1266,7 +1276,7 @@
       }
       
       // we render the top context - last object
-      if (this._groupSelector) {
+      if (this.selection && this._groupSelector) {
         this._drawSelection();
       }
       
@@ -1360,7 +1370,7 @@
           break;
         }
       }
-      if (target && target.selectable) {
+      if (this.selection && target && target.selectable) {
         return target;
       }
     },
