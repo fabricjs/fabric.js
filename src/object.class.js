@@ -681,7 +681,7 @@
       
       fabric.util.wrapElement(el, 'div');
 
-      var canvas = new fabric.Element(el);
+      var canvas = new fabric.Canvas(el);
       canvas.backgroundColor = 'transparent';
       canvas.renderAll();
       

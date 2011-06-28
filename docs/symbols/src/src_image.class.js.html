@@ -247,7 +247,7 @@
 <span class='line'>240</span> </span><span class="WHIT">      </span><span class="NAME">canvasEl.height</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">imgEl.height</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>241</span> 
 <span class='line'>242</span> </span><span class="WHIT">      </span><span class="NAME">canvasEl.getContext</span><span class="PUNC">(</span><span class="STRN">'2d'</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">drawImage</span><span class="PUNC">(</span><span class="NAME">imgEl</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>243</span> </span><span class="WHIT">      </span><span class="NAME">fabric.Element.toGrayscale</span><span class="PUNC">(</span><span class="NAME">canvasEl</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>243</span> </span><span class="WHIT">      </span><span class="NAME">fabric.Canvas.toGrayscale</span><span class="PUNC">(</span><span class="NAME">canvasEl</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>244</span> </span><span class="WHIT">      
 <span class='line'>245</span>       </span><span class="COMM">/** @ignore */</span><span class="WHIT">
 <span class='line'>246</span> </span><span class="WHIT">      </span><span class="NAME">replacement.onload</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
@@ -410,4 +410,31 @@
 <span class='line'>403</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>404</span> </span><span class="WHIT">    </span><span class="NAME">img.src</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">url</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>405</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>406</span> </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">)</span><span class="PUNC">;</span></pre></body></html>
+<span class='line'>406</span> </span><span class="WHIT">  
+<span class='line'>407</span>   </span><span class="COMM">/**
+<span class='line'>408</span>    * List of attribute names to account for when parsing SVG element (used by {@link fabric.Image.fromElement})
+<span class='line'>409</span>    * @static
+<span class='line'>410</span>    * @see http://www.w3.org/TR/SVG/struct.html#ImageElement
+<span class='line'>411</span>    */</span><span class="WHIT">
+<span class='line'>412</span> </span><span class="WHIT">  </span><span class="NAME">fabric.Image.ATTRIBUTE_NAMES</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">'x y width height fill fill-opacity opacity stroke stroke-width transform xlink:href'</span><span class="PUNC">.</span><span class="NAME">split</span><span class="PUNC">(</span><span class="STRN">' '</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>413</span> </span><span class="WHIT">  
+<span class='line'>414</span>   </span><span class="COMM">/**
+<span class='line'>415</span>    * Returns {@link fabric.Image} instance from an SVG element
+<span class='line'>416</span>    * @static
+<span class='line'>417</span>    * @method fabric.Image.fromElement
+<span class='line'>418</span>    * @param {SVGElement} element Element to parse
+<span class='line'>419</span>    * @param {Function} callback Callback to execute when fabric.Image object is created
+<span class='line'>420</span>    * @param {Object} [options] Options object
+<span class='line'>421</span>    * @return {fabric.Image}
+<span class='line'>422</span>    */</span><span class="WHIT">
+<span class='line'>423</span> </span><span class="WHIT">  </span><span class="NAME">fabric.Image.fromElement</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">element</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">callback</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">options</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>424</span> </span><span class="WHIT">    </span><span class="NAME">options</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">options</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>425</span> </span><span class="WHIT">    
+<span class='line'>426</span>     </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">parsedAttributes</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">fabric.parseAttributes</span><span class="PUNC">(</span><span class="NAME">element</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">fabric.Image.ATTRIBUTE_NAMES</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>427</span> </span><span class="WHIT">    
+<span class='line'>428</span>     </span><span class="NAME">fabric.Image.fromURL</span><span class="PUNC">(</span><span class="NAME">parsedAttributes</span><span class="PUNC">[</span><span class="STRN">'xlink:href'</span><span class="PUNC">]</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">callback</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">extend</span><span class="PUNC">(</span><span class="NAME">parsedAttributes</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">options</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>429</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>430</span> </span><span class="WHIT">  
+<span class='line'>431</span>   </span><span class="NAME">fabric.Image.fromElement.async</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>432</span> </span><span class="WHIT">  
+<span class='line'>433</span> </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">)</span><span class="PUNC">;</span></pre></body></html>

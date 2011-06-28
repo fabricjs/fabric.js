@@ -78,7 +78,7 @@ Also see [presentation from BK.js](http://www.slideshare.net/kangax/fabricjs-bui
     <canvas id="canvas" width="300" height="300"></canvas>  
     ...
     
-    var canvas = new fabric.Element('canvas');
+    var canvas = new fabric.Canvas('canvas');
     
     var rect = new fabric.Rect({
       top: 100,

@@ -13,7 +13,7 @@
     })();
   }
   
-  var canvas = new fabric.Element('test'),
+  var canvas = new fabric.Canvas('test'),
       fpsEl = document.getElementById('fps'),
       complexityEl = document.getElementById('complexity'),
       changeShapeEl = document.forms[0],

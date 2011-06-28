@@ -175,7 +175,7 @@
     
     ok(typeof image.toGrayscale == 'function');
     
-    if (!fabric.Element.supports('toDataURL')) {
+    if (!fabric.Canvas.supports('toDataURL')) {
       alert('toDataURL is not supported. Some tests can not be run.');
     }
     else {

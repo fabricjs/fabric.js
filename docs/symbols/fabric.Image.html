@@ -195,15 +195,19 @@ ul.inheritsList
 	
 	<li><a href="../symbols/fabric.html">fabric</a></li>
 	
+	<li><a href="../symbols/fabric.Canvas.html">fabric.Canvas</a></li>
+	
+	<li><a href="../symbols/fabric.Canvas%23cache.html">fabric.Canvas#cache</a></li>
+	
 	<li><a href="../symbols/fabric.Circle.html">fabric.Circle</a></li>
 	
 	<li><a href="../symbols/fabric.Color.html">fabric.Color</a></li>
 	
 	<li><a href="../symbols/fabric.Element.html">fabric.Element</a></li>
 	
-	<li><a href="../symbols/fabric.Element%23cache.html">fabric.Element#cache</a></li>
-	
 	<li><a href="../symbols/fabric.Ellipse.html">fabric.Ellipse</a></li>
+	
+	<li><a href="../symbols/fabric.Gradient.html">fabric.Gradient</a></li>
 	
 	<li><a href="../symbols/fabric.Group.html">fabric.Group</a></li>
 	
@@ -318,6 +322,16 @@ ul.inheritsList
 						</tr>
 					
 						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								fabric.Image.<b><a href="../symbols/fabric.Image.html#.ATTRIBUTE_NAMES">ATTRIBUTE_NAMES</a></b>
+								</div>
+								<div class="description">List of attribute names to account for when parsing SVG element (used by <a href="../symbols/fabric.Image.html#.fromElement">fabric.Image.fromElement</a>)</div>
+							</td>
+						</tr>
+					
+						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
 								<div class="fixedFont">
@@ -383,7 +397,7 @@ ul.inheritsList
 				
 				
 				<dl class="inheritsList">
-				<dt>Fields borrowed from class <a href="../symbols/fabric.Object.html">fabric.Object</a>: </dt><dd><a href="../symbols/fabric.Object.html#FX_DURATION">FX_DURATION</a>, <a href="../symbols/fabric.Object.html#FX_TRANSITION">FX_TRANSITION</a>, <a href="../symbols/fabric.Object.html#includeDefaultValues">includeDefaultValues</a>, <a href="../symbols/fabric.Object.html#MIN_SCALE_LIMIT">MIN_SCALE_LIMIT</a>, <a href="../symbols/fabric.Object.html#NUM_FRACTION_DIGITS">NUM_FRACTION_DIGITS</a>, <a href="../symbols/fabric.Object.html#options">options</a>, <a href="../symbols/fabric.Object.html#rotate">rotate</a>, <a href="../symbols/fabric.Object.html#stateProperties">stateProperties</a></dd>
+				<dt>Fields borrowed from class <a href="../symbols/fabric.Object.html">fabric.Object</a>: </dt><dd><a href="../symbols/fabric.Object.html#FX_DURATION">FX_DURATION</a>, <a href="../symbols/fabric.Object.html#FX_TRANSITION">FX_TRANSITION</a>, <a href="../symbols/fabric.Object.html#includeDefaultValues">includeDefaultValues</a>, <a href="../symbols/fabric.Object.html#MIN_SCALE_LIMIT">MIN_SCALE_LIMIT</a>, <a href="../symbols/fabric.Object.html#NUM_FRACTION_DIGITS">NUM_FRACTION_DIGITS</a>, <a href="../symbols/fabric.Object.html#rotate">rotate</a>, <a href="../symbols/fabric.Object.html#selectable">selectable</a>, <a href="../symbols/fabric.Object.html#stateProperties">stateProperties</a></dd>
 				</dl>
 				
 			
@@ -417,6 +431,15 @@ ul.inheritsList
 								<div class="fixedFont"><b><a href="../symbols/fabric.Image.html#complexity">complexity</a></b>()
 								</div>
 								<div class="description">Returns complexity of an instance</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">fabric.Image.<b><a href="../symbols/fabric.Image.html#.fromElement">fromElement</a></b>(element, callback, options)
+								</div>
+								<div class="description">Returns <a href="../symbols/fabric.Image.html">fabric.Image</a> instance from an SVG element</div>
 							</td>
 						</tr>
 					
@@ -553,7 +576,7 @@ Width and height have to mantain the same proportion in the final image as it wa
 				
 				
 				<dl class="inheritsList">
-				<dt>Methods borrowed from class <a href="../symbols/fabric.Object.html">fabric.Object</a>: </dt><dd><a href="../symbols/fabric.Object.html#callSuper">callSuper</a>, <a href="../symbols/fabric.Object.html#cloneAsImage">cloneAsImage</a>, <a href="../symbols/fabric.Object.html#drawBorders">drawBorders</a>, <a href="../symbols/fabric.Object.html#drawCorners">drawCorners</a>, <a href="../symbols/fabric.Object.html#fxRemove">fxRemove</a>, <a href="../symbols/fabric.Object.html#fxStraighten">fxStraighten</a>, <a href="../symbols/fabric.Object.html#get">get</a>, <a href="../symbols/fabric.Object.html#getAngle">getAngle</a>, <a href="../symbols/fabric.Object.html#getCenter">getCenter</a>, <a href="../symbols/fabric.Object.html#getHeight">getHeight</a>, <a href="../symbols/fabric.Object.html#getWidth">getWidth</a>, <a href="../symbols/fabric.Object.html#hasStateChanged">hasStateChanged</a>, <a href="../symbols/fabric.Object.html#intersectsWithObject">intersectsWithObject</a>, <a href="../symbols/fabric.Object.html#intersectsWithRect">intersectsWithRect</a>, <a href="../symbols/fabric.Object.html#isActive">isActive</a>, <a href="../symbols/fabric.Object.html#isContainedWithinRect">isContainedWithinRect</a>, <a href="../symbols/fabric.Object.html#isType">isType</a>, <a href="../symbols/fabric.Object.html#saveState">saveState</a>, <a href="../symbols/fabric.Object.html#scale">scale</a>, <a href="../symbols/fabric.Object.html#scaleToHeight">scaleToHeight</a>, <a href="../symbols/fabric.Object.html#scaleToWidth">scaleToWidth</a>, <a href="../symbols/fabric.Object.html#set">set</a>, <a href="../symbols/fabric.Object.html#setActive">setActive</a>, <a href="../symbols/fabric.Object.html#setAngle">setAngle</a>, <a href="../symbols/fabric.Object.html#setCoords">setCoords</a>, <a href="../symbols/fabric.Object.html#setOpacity">setOpacity</a>, <a href="../symbols/fabric.Object.html#setOptions">setOptions</a>, <a href="../symbols/fabric.Object.html#setSourcePath">setSourcePath</a>, <a href="../symbols/fabric.Object.html#straighten">straighten</a>, <a href="../symbols/fabric.Object.html#toDatalessObject">toDatalessObject</a>, <a href="../symbols/fabric.Object.html#toDataURL">toDataURL</a>, <a href="../symbols/fabric.Object.html#toggle">toggle</a>, <a href="../symbols/fabric.Object.html#toJSON">toJSON</a>, <a href="../symbols/fabric.Object.html#transform">transform</a></dd>
+				<dt>Methods borrowed from class <a href="../symbols/fabric.Object.html">fabric.Object</a>: </dt><dd><a href="../symbols/fabric.Object.html#callSuper">callSuper</a>, <a href="../symbols/fabric.Object.html#cloneAsImage">cloneAsImage</a>, <a href="../symbols/fabric.Object.html#drawBorders">drawBorders</a>, <a href="../symbols/fabric.Object.html#drawCorners">drawCorners</a>, <a href="../symbols/fabric.Object.html#fxRemove">fxRemove</a>, <a href="../symbols/fabric.Object.html#fxStraighten">fxStraighten</a>, <a href="../symbols/fabric.Object.html#get">get</a>, <a href="../symbols/fabric.Object.html#getAngle">getAngle</a>, <a href="../symbols/fabric.Object.html#getCenter">getCenter</a>, <a href="../symbols/fabric.Object.html#getHeight">getHeight</a>, <a href="../symbols/fabric.Object.html#getWidth">getWidth</a>, <a href="../symbols/fabric.Object.html#hasStateChanged">hasStateChanged</a>, <a href="../symbols/fabric.Object.html#intersectsWithObject">intersectsWithObject</a>, <a href="../symbols/fabric.Object.html#intersectsWithRect">intersectsWithRect</a>, <a href="../symbols/fabric.Object.html#isActive">isActive</a>, <a href="../symbols/fabric.Object.html#isContainedWithinRect">isContainedWithinRect</a>, <a href="../symbols/fabric.Object.html#isType">isType</a>, <a href="../symbols/fabric.Object.html#saveState">saveState</a>, <a href="../symbols/fabric.Object.html#scale">scale</a>, <a href="../symbols/fabric.Object.html#scaleToHeight">scaleToHeight</a>, <a href="../symbols/fabric.Object.html#scaleToWidth">scaleToWidth</a>, <a href="../symbols/fabric.Object.html#set">set</a>, <a href="../symbols/fabric.Object.html#setActive">setActive</a>, <a href="../symbols/fabric.Object.html#setAngle">setAngle</a>, <a href="../symbols/fabric.Object.html#setCoords">setCoords</a>, <a href="../symbols/fabric.Object.html#setGradientFill">setGradientFill</a>, <a href="../symbols/fabric.Object.html#setOpacity">setOpacity</a>, <a href="../symbols/fabric.Object.html#setOptions">setOptions</a>, <a href="../symbols/fabric.Object.html#setSourcePath">setSourcePath</a>, <a href="../symbols/fabric.Object.html#setupState">setupState</a>, <a href="../symbols/fabric.Object.html#straighten">straighten</a>, <a href="../symbols/fabric.Object.html#toDatalessObject">toDatalessObject</a>, <a href="../symbols/fabric.Object.html#toDataURL">toDataURL</a>, <a href="../symbols/fabric.Object.html#toggle">toggle</a>, <a href="../symbols/fabric.Object.html#toJSON">toJSON</a>, <a href="../symbols/fabric.Object.html#transform">transform</a></dd>
 				</dl>
 				
 			
@@ -613,6 +636,35 @@ Width and height have to mantain the same proportion in the final image as it wa
 
 						
 						
+						
+						
+
+					<hr />
+				
+					<a name=".ATTRIBUTE_NAMES"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					
+					<span class="light">fabric.Image.</span><b>ATTRIBUTE_NAMES</b>
+					
+					</div>
+					<div class="description">
+						List of attribute names to account for when parsing SVG element (used by <a href="../symbols/fabric.Image.html#.fromElement">fabric.Image.fromElement</a>)
+						
+						
+					</div>
+					
+					
+
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">See:</dt>
+							
+							<dd>http://www.w3.org/TR/SVG/struct.html#ImageElement</dd>
+							
+							</dl>
 						
 						
 
@@ -818,6 +870,61 @@ Width and height have to mantain the same proportion in the final image as it wa
 							<dt class="heading">Returns:</dt>
 							
 								<dd><span class="light fixedFont">{Number}</span> complexity</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name=".fromElement"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{<a href="../symbols/fabric.Image.html">fabric.Image</a>}</span>
+					<span class="light">fabric.Image.</span><b>fromElement</b>(element, callback, options)
+					
+					</div>
+					<div class="description">
+						Returns <a href="../symbols/fabric.Image.html">fabric.Image</a> instance from an SVG element
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{SVGElement}</span> <b>element</b>
+									
+								</dt>
+								<dd>Element to parse</dd>
+							
+								<dt>
+									<span class="light fixedFont">{<a href="../symbols/Function.html">Function</a>}</span> <b>callback</b>
+									
+								</dt>
+								<dd>Callback to execute when fabric.Image object is created</dd>
+							
+								<dt>
+									<span class="light fixedFont">{Object}</span> <b>options</b>
+									<i>Optional</i>
+								</dt>
+								<dd>Options object</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/fabric.Image.html">fabric.Image</a>}</span> </dd>
 							
 							</dl>
 						
@@ -1372,7 +1479,7 @@ Width and height have to mantain the same proportion in the final image as it wa
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Thu Oct 21 2010 22:39:50 GMT-0400 (EDT)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Tue Jun 28 2011 18:47:43 GMT-0400 (EDT)
 		</div>
 	</body>
 </html>

@@ -27,7 +27,7 @@
                   '"stroke":null,"strokeWidth":1,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,"selectable":true}],'+
                   '"background":"#ff5555"}';
   
-  var canvas = this.canvas = new fabric.Element('test');
+  var canvas = this.canvas = new fabric.Canvas('test');
   
   var canvasEl = document.getElementById('test');
   var canvasContext = canvasEl.getContext('2d');
@@ -39,11 +39,11 @@
     return new fabric.Rect(fabric.util.object.extend(defaultOptions, options || { }));
   }
   
-  module('fabric.Element', {
+  module('fabric.Canvas', {
     teardown: function() {
       canvas.clear();
       canvas.setActiveGroup(null);
-      canvas.backgroundColor = fabric.Element.prototype.backgroundColor;
+      canvas.backgroundColor = fabric.Canvas.prototype.backgroundColor;
       canvas.calcOffset();
     }
   });
@@ -122,7 +122,7 @@
     
     canvas.add(makeRect({ left: 100, top: 100, fill: '#ff5555' }));
     
-    if (fabric.Element.supports('getImageData')) {
+    if (fabric.Canvas.supports('getImageData')) {
       //ok(!assertSameColor(canvas._oContextContainer), 'a red rectangle should be rendered on canvas');
       canvas.clear();
       //ok(assertSameColor(canvas._oContextContainer), 'color should be the same throughout canvas after clearing');
@@ -145,7 +145,7 @@
   
   test('toDataURL', function() {
     ok(typeof canvas.toDataURL == 'function');
-    if (!fabric.Element.supports('toDataURL')) {
+    if (!fabric.Canvas.supports('toDataURL')) {
       alert("toDataURL is not supported by this environment. Some of the tests can not be run.");
     }
     else {
@@ -577,10 +577,10 @@
   test('toString', function() {
     ok(typeof canvas.toString == 'function');
     
-    equals(canvas.toString(), '#<fabric.Element (0): { objects: 0 }>');
+    equals(canvas.toString(), '#<fabric.Canvas (0): { objects: 0 }>');
     
     canvas.add(makeRect());
-    equals(canvas.toString(), '#<fabric.Element (1): { objects: 1 }>');
+    equals(canvas.toString(), '#<fabric.Canvas (1): { objects: 1 }>');
   });
   
   test('dispose', function() {
@@ -670,9 +670,9 @@
   });
   
   test('toGrayscale', function() {
-    ok(typeof fabric.Element.toGrayscale == 'function');
+    ok(typeof fabric.Canvas.toGrayscale == 'function');
     
-    if (!fabric.Element.supports('getImageData')) {
+    if (!fabric.Canvas.supports('getImageData')) {
       alert('getImageData is not supported by this environment. Some of the tests can not be run.');
       return;
     }
@@ -691,7 +691,7 @@
         
     same([255, 0, 0, 255], firstPixelData);
     
-    fabric.Element.toGrayscale(canvasEl);
+    fabric.Canvas.toGrayscale(canvasEl);
     
     imageData = context.getImageData(0, 0, 10, 10);
     data = imageData.data;

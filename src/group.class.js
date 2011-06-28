@@ -361,7 +361,7 @@
      * @return {fabric.Group} thisArg
      * @chainable
      */
-    forEachObject: fabric.Element.prototype.forEachObject,
+    forEachObject: fabric.Canvas.prototype.forEachObject,
     
     /**
      * @private

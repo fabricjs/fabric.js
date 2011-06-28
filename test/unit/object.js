@@ -1,13 +1,13 @@
 (function(){
   
-  var canvas = this.canvas = new fabric.Element('test'),
+  var canvas = this.canvas = new fabric.Canvas('test'),
       canvasEl = document.getElementById('test');
   
   module('fabric.Object', {
     teardown: function() {
       canvas.clear();
       canvas.setActiveGroup(null);
-      canvas.backgroundColor = fabric.Element.prototype.backgroundColor;
+      canvas.backgroundColor = fabric.Canvas.prototype.backgroundColor;
       canvas.calcOffset();
     }
   });
@@ -382,7 +382,7 @@
     
     ok(typeof cObj.cloneAsImage == 'function');
     
-    if (!fabric.Element.supports('toDataURL')) {
+    if (!fabric.Canvas.supports('toDataURL')) {
       alert('`toDataURL` is not supported by this environment; skipping `cloneAsImage` test (as it relies on `toDataURL`)');
       start();
     }
@@ -419,7 +419,7 @@
     
     ok(typeof cObj.toDataURL == 'function');
     
-    if (!fabric.Element.supports('toDataURL')) {
+    if (!fabric.Canvas.supports('toDataURL')) {
       alert('toDataURL is not supported by this environment. Some of the tests can not be run.');
     }
     else {

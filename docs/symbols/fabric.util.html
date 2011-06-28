@@ -195,15 +195,19 @@ ul.inheritsList
 	
 	<li><a href="../symbols/fabric.html">fabric</a></li>
 	
+	<li><a href="../symbols/fabric.Canvas.html">fabric.Canvas</a></li>
+	
+	<li><a href="../symbols/fabric.Canvas%23cache.html">fabric.Canvas#cache</a></li>
+	
 	<li><a href="../symbols/fabric.Circle.html">fabric.Circle</a></li>
 	
 	<li><a href="../symbols/fabric.Color.html">fabric.Color</a></li>
 	
 	<li><a href="../symbols/fabric.Element.html">fabric.Element</a></li>
 	
-	<li><a href="../symbols/fabric.Element%23cache.html">fabric.Element#cache</a></li>
-	
 	<li><a href="../symbols/fabric.Ellipse.html">fabric.Ellipse</a></li>
+	
+	<li><a href="../symbols/fabric.Gradient.html">fabric.Gradient</a></li>
 	
 	<li><a href="../symbols/fabric.Group.html">fabric.Group</a></li>
 	
@@ -361,18 +365,27 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">fabric.util.<b><a href="../symbols/fabric.util.html#.falseFunction">falseFunction</a></b>()
+								<div class="fixedFont">fabric.util.<b><a href="../symbols/fabric.util.html#.fabric.Observable.fire">fabric.Observable.fire</a></b>(eventName, memo)
 								</div>
-								<div class="description">Function which always returns `false`.</div>
+								<div class="description">Fires event with an optional memo object</div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">fabric.util.<b><a href="../symbols/fabric.util.html#.fireEvent">fireEvent</a></b>(eventName, memo)
+								<div class="fixedFont">fabric.util.<b><a href="../symbols/fabric.util.html#.fabric.Observable.stopObserving">fabric.Observable.stopObserving</a></b>(eventName, handler)
 								</div>
-								<div class="description">Fires event with an optional memo object</div>
+								<div class="description"></div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">fabric.util.<b><a href="../symbols/fabric.util.html#.falseFunction">falseFunction</a></b>()
+								</div>
+								<div class="description">Function which always returns `false`.</div>
 							</td>
 						</tr>
 					
@@ -436,15 +449,6 @@ ul.inheritsList
 								<div class="fixedFont">fabric.util.<b><a href="../symbols/fabric.util.html#.makeElementUnselectable">makeElementUnselectable</a></b>(element)
 								</div>
 								<div class="description">Makes element unselectable</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&lt;static&gt; &nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">fabric.util.<b><a href="../symbols/fabric.util.html#.observeEvent">observeEvent</a></b>(eventName, handler)
-								</div>
-								<div class="description"></div>
 							</td>
 						</tr>
 					
@@ -804,6 +808,96 @@ ul.inheritsList
 
 					<hr />
 				
+					<a name=".fabric.Observable.fire"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					
+					<span class="light">fabric.util.</span><b>fabric.Observable.fire</b>(eventName, memo)
+					
+					</div>
+					<div class="description">
+						Fires event with an optional memo object
+						
+							<br />
+							<i>Defined in: </i> <a href="../symbols/src/src_observable.js.html">observable.js</a>.
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{<a href="../symbols/String.html">String</a>}</span> <b>eventName</b>
+									
+								</dt>
+								<dd></dd>
+							
+								<dt>
+									<span class="light fixedFont">{Object}</span> <b>memo</b>
+									<i>Optional</i>
+								</dt>
+								<dd></dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name=".fabric.Observable.stopObserving"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					
+					<span class="light">fabric.util.</span><b>fabric.Observable.stopObserving</b>(eventName, handler)
+					
+					</div>
+					<div class="description">
+						
+						
+							<br />
+							<i>Defined in: </i> <a href="../symbols/src/src_observable.js.html">observable.js</a>.
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{<a href="../symbols/String.html">String</a>}</span> <b>eventName</b>
+									
+								</dt>
+								<dd></dd>
+							
+								<dt>
+									<span class="light fixedFont">{<a href="../symbols/Function.html">Function</a>}</span> <b>handler</b>
+									
+								</dt>
+								<dd></dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
 					<a name=".falseFunction"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 					
@@ -833,51 +927,6 @@ ul.inheritsList
 								<dd><span class="light fixedFont">{Boolean}</span> </dd>
 							
 							</dl>
-						
-						
-						
-
-					<hr />
-				
-					<a name=".fireEvent"> </a>
-					<div class="fixedFont">&lt;static&gt; 
-					
-					
-					<span class="light">fabric.util.</span><b>fireEvent</b>(eventName, memo)
-					
-					</div>
-					<div class="description">
-						Fires event with an optional memo object
-						
-							<br />
-							<i>Defined in: </i> <a href="../symbols/src/src_util_dom_event.js.html">dom_event.js</a>.
-						
-						
-					</div>
-					
-					
-					
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{<a href="../symbols/String.html">String</a>}</span> <b>eventName</b>
-									
-								</dt>
-								<dd></dd>
-							
-								<dt>
-									<span class="light fixedFont">{Object}</span> <b>memo</b>
-									<i>Optional</i>
-								</dt>
-								<dd></dd>
-							
-							</dl>
-						
-						
-						
-						
 						
 						
 						
@@ -1204,51 +1253,6 @@ ul.inheritsList
 								<dd><span class="light fixedFont">{HTMLElement}</span> Element that was passed in</dd>
 							
 							</dl>
-						
-						
-						
-
-					<hr />
-				
-					<a name=".observeEvent"> </a>
-					<div class="fixedFont">&lt;static&gt; 
-					
-					
-					<span class="light">fabric.util.</span><b>observeEvent</b>(eventName, handler)
-					
-					</div>
-					<div class="description">
-						
-						
-							<br />
-							<i>Defined in: </i> <a href="../symbols/src/src_util_dom_event.js.html">dom_event.js</a>.
-						
-						
-					</div>
-					
-					
-					
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{<a href="../symbols/String.html">String</a>}</span> <b>eventName</b>
-									
-								</dt>
-								<dd></dd>
-							
-								<dt>
-									<span class="light fixedFont">{<a href="../symbols/Function.html">Function</a>}</span> <b>handler</b>
-									
-								</dt>
-								<dd></dd>
-							
-							</dl>
-						
-						
-						
-						
 						
 						
 						
@@ -1643,7 +1647,7 @@ Presence of value (and its position in an array) is determined via `Array.protot
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Thu Oct 21 2010 22:39:51 GMT-0400 (EDT)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Tue Jun 28 2011 18:47:44 GMT-0400 (EDT)
 		</div>
 	</body>
 </html>

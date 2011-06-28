@@ -50,8 +50,8 @@
 <span class='line'> 43</span> </span><span class="WHIT">      </span><span class="NAME">this.set</span><span class="PUNC">(</span><span class="STRN">'x2'</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">points</span><span class="PUNC">[</span><span class="NUMB">2</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'> 44</span> </span><span class="WHIT">      </span><span class="NAME">this.set</span><span class="PUNC">(</span><span class="STRN">'y2'</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">points</span><span class="PUNC">[</span><span class="NUMB">3</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'> 45</span> </span><span class="WHIT">      
-<span class='line'> 46</span>       </span><span class="NAME">this.set</span><span class="PUNC">(</span><span class="STRN">'width'</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this.x2</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">this.x1</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 47</span> </span><span class="WHIT">      </span><span class="NAME">this.set</span><span class="PUNC">(</span><span class="STRN">'height'</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this.y2</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">this.y1</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 46</span>       </span><span class="NAME">this.set</span><span class="PUNC">(</span><span class="STRN">'width'</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.x2</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">this.x1</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 47</span> </span><span class="WHIT">      </span><span class="NAME">this.set</span><span class="PUNC">(</span><span class="STRN">'height'</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.y2</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">this.y1</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'> 48</span> </span><span class="WHIT">      </span><span class="NAME">this.set</span><span class="PUNC">(</span><span class="STRN">'left'</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this.x1</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">this.width</span><span class="WHIT"> </span><span class="PUNC">/</span><span class="WHIT"> </span><span class="NUMB">2</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'> 49</span> </span><span class="WHIT">      </span><span class="NAME">this.set</span><span class="PUNC">(</span><span class="STRN">'top'</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this.y1</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">this.height</span><span class="WHIT"> </span><span class="PUNC">/</span><span class="WHIT"> </span><span class="NUMB">2</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'> 50</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
@@ -68,74 +68,76 @@
 <span class='line'> 61</span> </span><span class="WHIT">      </span><span class="NAME">ctx.moveTo</span><span class="PUNC">(</span><span class="PUNC">-</span><span class="NAME">this.width</span><span class="WHIT"> </span><span class="PUNC">/</span><span class="WHIT"> </span><span class="NUMB">2</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="NAME">this.height</span><span class="WHIT"> </span><span class="PUNC">/</span><span class="WHIT"> </span><span class="NUMB">2</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'> 62</span> </span><span class="WHIT">      </span><span class="NAME">ctx.lineTo</span><span class="PUNC">(</span><span class="NAME">this.width</span><span class="WHIT"> </span><span class="PUNC">/</span><span class="WHIT"> </span><span class="NUMB">2</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this.height</span><span class="WHIT"> </span><span class="PUNC">/</span><span class="WHIT"> </span><span class="NUMB">2</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'> 63</span> </span><span class="WHIT">      
-<span class='line'> 64</span>       </span><span class="COMM">// TODO: test this</span><span class="WHIT">
-<span class='line'> 65</span> </span><span class="WHIT">      </span><span class="COMM">// make sure setting "fill" changes color of a line</span><span class="WHIT">
-<span class='line'> 66</span> </span><span class="WHIT">      </span><span class="COMM">// (by copying fillStyle to strokeStyle, since line is stroked, not filled)</span><span class="WHIT">
-<span class='line'> 67</span> </span><span class="WHIT">      </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">origStrokeStyle</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">ctx.strokeStyle</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 68</span> </span><span class="WHIT">      </span><span class="NAME">ctx.strokeStyle</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">ctx.fillStyle</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 69</span> </span><span class="WHIT">      </span><span class="NAME">ctx.stroke</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 70</span> </span><span class="WHIT">      </span><span class="NAME">ctx.strokeStyle</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">origStrokeStyle</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 71</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 72</span> </span><span class="WHIT">    
-<span class='line'> 73</span>     </span><span class="COMM">/**
-<span class='line'> 74</span>      * Returns complexity of an instance
-<span class='line'> 75</span>      * @method complexity
-<span class='line'> 76</span>      * @return {Number} complexity
-<span class='line'> 77</span>      */</span><span class="WHIT">
-<span class='line'> 78</span> </span><span class="WHIT">    </span><span class="NAME">complexity</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 79</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 80</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 81</span> </span><span class="WHIT">    
-<span class='line'> 82</span>     </span><span class="COMM">/**
-<span class='line'> 83</span>      * Returns object representation of an instance
-<span class='line'> 84</span>      * @methd toObject
-<span class='line'> 85</span>      * @return {Object}
-<span class='line'> 86</span>      */</span><span class="WHIT">
-<span class='line'> 87</span> </span><span class="WHIT">    </span><span class="NAME">toObject</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 88</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">extend</span><span class="PUNC">(</span><span class="NAME">this.callSuper</span><span class="PUNC">(</span><span class="STRN">'toObject'</span><span class="PUNC">)</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 89</span> </span><span class="WHIT">        </span><span class="NAME">x1</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">this.get</span><span class="PUNC">(</span><span class="STRN">'x1'</span><span class="PUNC">)</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 90</span> </span><span class="WHIT">        </span><span class="NAME">y1</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">this.get</span><span class="PUNC">(</span><span class="STRN">'y1'</span><span class="PUNC">)</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 91</span> </span><span class="WHIT">        </span><span class="NAME">x2</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">this.get</span><span class="PUNC">(</span><span class="STRN">'x2'</span><span class="PUNC">)</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 92</span> </span><span class="WHIT">        </span><span class="NAME">y2</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">this.get</span><span class="PUNC">(</span><span class="STRN">'y2'</span><span class="PUNC">)</span><span class="WHIT">
-<span class='line'> 93</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 94</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'> 95</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 96</span> </span><span class="WHIT">  
-<span class='line'> 97</span>   </span><span class="COMM">/**
-<span class='line'> 98</span>    * List of attribute names to account for when parsing SVG element (used by `fabric.Line.fromElement`)
-<span class='line'> 99</span>    * @static
-<span class='line'>100</span>    * @see http://www.w3.org/TR/SVG/shapes.html#LineElement
-<span class='line'>101</span>    */</span><span class="WHIT">
-<span class='line'>102</span> </span><span class="WHIT">  </span><span class="NAME">fabric.Line.ATTRIBUTE_NAMES</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">'x1 y1 x2 y2 stroke stroke-width transform'</span><span class="PUNC">.</span><span class="NAME">split</span><span class="PUNC">(</span><span class="STRN">' '</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>103</span> </span><span class="WHIT">  
-<span class='line'>104</span>   </span><span class="COMM">/**
-<span class='line'>105</span>    * Returns fabric.Line instance from an SVG element
-<span class='line'>106</span>    * @static
-<span class='line'>107</span>    * @method fabric.Line.fromElement
-<span class='line'>108</span>    * @param {SVGElement} element Element to parse
-<span class='line'>109</span>    * @param {Object} [options] Options object
-<span class='line'>110</span>    * @return {fabric.Line} instance of fabric.Line
-<span class='line'>111</span>    */</span><span class="WHIT">
-<span class='line'>112</span> </span><span class="WHIT">  </span><span class="NAME">fabric.Line.fromElement</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">element</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">options</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>113</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">parsedAttributes</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">fabric.parseAttributes</span><span class="PUNC">(</span><span class="NAME">element</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">fabric.Line.ATTRIBUTE_NAMES</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>114</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">points</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="WHIT">
-<span class='line'>115</span> </span><span class="WHIT">      </span><span class="NAME">parsedAttributes.x1</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>116</span> </span><span class="WHIT">      </span><span class="NAME">parsedAttributes.y1</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>117</span> </span><span class="WHIT">      </span><span class="NAME">parsedAttributes.x2</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>118</span> </span><span class="WHIT">      </span><span class="NAME">parsedAttributes.y2</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="WHIT">
-<span class='line'>119</span> </span><span class="WHIT">    </span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>120</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">fabric.Line</span><span class="PUNC">(</span><span class="NAME">points</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">extend</span><span class="PUNC">(</span><span class="NAME">parsedAttributes</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">options</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>121</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>122</span> </span><span class="WHIT">  
-<span class='line'>123</span>   </span><span class="COMM">/**
-<span class='line'>124</span>    * Returns fabric.Line instance from an object representation
-<span class='line'>125</span>    * @static
-<span class='line'>126</span>    * @method fabric.Line.fromObject
-<span class='line'>127</span>    * @param {Object} object Object to create an instance from
-<span class='line'>128</span>    * @return {fabric.Line} instance of fabric.Line
-<span class='line'>129</span>    */</span><span class="WHIT">
-<span class='line'>130</span> </span><span class="WHIT">  </span><span class="NAME">fabric.Line.fromObject</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">object</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>131</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">points</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="NAME">object.x1</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">object.y1</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">object.x2</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">object.y2</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>132</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">fabric.Line</span><span class="PUNC">(</span><span class="NAME">points</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">object</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>133</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>134</span> </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">)</span><span class="PUNC">;</span></pre></body></html>
+<span class='line'> 64</span>       </span><span class="NAME">ctx.lineWidth</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.strokeWidth</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 65</span> </span><span class="WHIT">      
+<span class='line'> 66</span>       </span><span class="COMM">// TODO: test this</span><span class="WHIT">
+<span class='line'> 67</span> </span><span class="WHIT">      </span><span class="COMM">// make sure setting "fill" changes color of a line</span><span class="WHIT">
+<span class='line'> 68</span> </span><span class="WHIT">      </span><span class="COMM">// (by copying fillStyle to strokeStyle, since line is stroked, not filled)</span><span class="WHIT">
+<span class='line'> 69</span> </span><span class="WHIT">      </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">origStrokeStyle</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">ctx.strokeStyle</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 70</span> </span><span class="WHIT">      </span><span class="NAME">ctx.strokeStyle</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">ctx.fillStyle</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 71</span> </span><span class="WHIT">      </span><span class="NAME">ctx.stroke</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 72</span> </span><span class="WHIT">      </span><span class="NAME">ctx.strokeStyle</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">origStrokeStyle</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 73</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 74</span> </span><span class="WHIT">    
+<span class='line'> 75</span>     </span><span class="COMM">/**
+<span class='line'> 76</span>      * Returns complexity of an instance
+<span class='line'> 77</span>      * @method complexity
+<span class='line'> 78</span>      * @return {Number} complexity
+<span class='line'> 79</span>      */</span><span class="WHIT">
+<span class='line'> 80</span> </span><span class="WHIT">    </span><span class="NAME">complexity</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 81</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 82</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 83</span> </span><span class="WHIT">    
+<span class='line'> 84</span>     </span><span class="COMM">/**
+<span class='line'> 85</span>      * Returns object representation of an instance
+<span class='line'> 86</span>      * @methd toObject
+<span class='line'> 87</span>      * @return {Object}
+<span class='line'> 88</span>      */</span><span class="WHIT">
+<span class='line'> 89</span> </span><span class="WHIT">    </span><span class="NAME">toObject</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 90</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">extend</span><span class="PUNC">(</span><span class="NAME">this.callSuper</span><span class="PUNC">(</span><span class="STRN">'toObject'</span><span class="PUNC">)</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 91</span> </span><span class="WHIT">        </span><span class="NAME">x1</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">this.get</span><span class="PUNC">(</span><span class="STRN">'x1'</span><span class="PUNC">)</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 92</span> </span><span class="WHIT">        </span><span class="NAME">y1</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">this.get</span><span class="PUNC">(</span><span class="STRN">'y1'</span><span class="PUNC">)</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 93</span> </span><span class="WHIT">        </span><span class="NAME">x2</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">this.get</span><span class="PUNC">(</span><span class="STRN">'x2'</span><span class="PUNC">)</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 94</span> </span><span class="WHIT">        </span><span class="NAME">y2</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">this.get</span><span class="PUNC">(</span><span class="STRN">'y2'</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'> 95</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 96</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 97</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 98</span> </span><span class="WHIT">  
+<span class='line'> 99</span>   </span><span class="COMM">/**
+<span class='line'>100</span>    * List of attribute names to account for when parsing SVG element (used by `fabric.Line.fromElement`)
+<span class='line'>101</span>    * @static
+<span class='line'>102</span>    * @see http://www.w3.org/TR/SVG/shapes.html#LineElement
+<span class='line'>103</span>    */</span><span class="WHIT">
+<span class='line'>104</span> </span><span class="WHIT">  </span><span class="NAME">fabric.Line.ATTRIBUTE_NAMES</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">'x1 y1 x2 y2 stroke stroke-width transform'</span><span class="PUNC">.</span><span class="NAME">split</span><span class="PUNC">(</span><span class="STRN">' '</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>105</span> </span><span class="WHIT">  
+<span class='line'>106</span>   </span><span class="COMM">/**
+<span class='line'>107</span>    * Returns fabric.Line instance from an SVG element
+<span class='line'>108</span>    * @static
+<span class='line'>109</span>    * @method fabric.Line.fromElement
+<span class='line'>110</span>    * @param {SVGElement} element Element to parse
+<span class='line'>111</span>    * @param {Object} [options] Options object
+<span class='line'>112</span>    * @return {fabric.Line} instance of fabric.Line
+<span class='line'>113</span>    */</span><span class="WHIT">
+<span class='line'>114</span> </span><span class="WHIT">  </span><span class="NAME">fabric.Line.fromElement</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">element</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">options</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>115</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">parsedAttributes</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">fabric.parseAttributes</span><span class="PUNC">(</span><span class="NAME">element</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">fabric.Line.ATTRIBUTE_NAMES</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>116</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">points</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="WHIT">
+<span class='line'>117</span> </span><span class="WHIT">      </span><span class="NAME">parsedAttributes.x1</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>118</span> </span><span class="WHIT">      </span><span class="NAME">parsedAttributes.y1</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>119</span> </span><span class="WHIT">      </span><span class="NAME">parsedAttributes.x2</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>120</span> </span><span class="WHIT">      </span><span class="NAME">parsedAttributes.y2</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="WHIT">
+<span class='line'>121</span> </span><span class="WHIT">    </span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>122</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">fabric.Line</span><span class="PUNC">(</span><span class="NAME">points</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">extend</span><span class="PUNC">(</span><span class="NAME">parsedAttributes</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">options</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>123</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>124</span> </span><span class="WHIT">  
+<span class='line'>125</span>   </span><span class="COMM">/**
+<span class='line'>126</span>    * Returns fabric.Line instance from an object representation
+<span class='line'>127</span>    * @static
+<span class='line'>128</span>    * @method fabric.Line.fromObject
+<span class='line'>129</span>    * @param {Object} object Object to create an instance from
+<span class='line'>130</span>    * @return {fabric.Line} instance of fabric.Line
+<span class='line'>131</span>    */</span><span class="WHIT">
+<span class='line'>132</span> </span><span class="WHIT">  </span><span class="NAME">fabric.Line.fromObject</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">object</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>133</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">points</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="NAME">object.x1</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">object.y1</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">object.x2</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">object.y2</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>134</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">fabric.Line</span><span class="PUNC">(</span><span class="NAME">points</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">object</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>135</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>136</span> </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">)</span><span class="PUNC">;</span></pre></body></html>

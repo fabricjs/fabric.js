@@ -1,5 +1,5 @@
 (function(){
-  this.canvas = new fabric.Element('testee0');
+  this.canvas = new fabric.Canvas('testee0');
   
   canvas.add(new fabric.Line([10,10,40,50], { stroke: 'red' }));
   canvas.add(new fabric.Line([70,80,110,110], { stroke: 'green', strokeWidth: 7 }));
@@ -8,7 +8,7 @@
 
 
 (function(){
-  this.canvas = new fabric.Element('testee1');
+  this.canvas = new fabric.Canvas('testee1');
   
   var width = height = 40;
   
@@ -25,7 +25,7 @@
 
 
 (function(){
-  this.canvas2 = new fabric.Element('testee2');
+  this.canvas2 = new fabric.Canvas('testee2');
   
   var radius = 25;
   
@@ -42,7 +42,7 @@
 
 
 (function(){
-  this.canvas3 = new fabric.Element('testee3');
+  this.canvas3 = new fabric.Canvas('testee3');
   
   var rx = 20,
       ry = 40;
@@ -60,7 +60,7 @@
 
 
 (function(){
-  this.canvas4 = new fabric.Element('testee4');
+  this.canvas4 = new fabric.Canvas('testee4');
   
   var points = [
     {x:10,y:10},
@@ -84,7 +84,7 @@
 
 
 (function(){
-  this.canvas5 = new fabric.Element('testee5');
+  this.canvas5 = new fabric.Canvas('testee5');
   
   var points = [
     {x:10,y:10},
@@ -138,7 +138,7 @@ window.onload = function() {
           imgElement.insert({
             after: canvasElement
           });
-          var oCanvas = window.__canvas = new fabric.Element(canvasElement);
+          var oCanvas = window.__canvas = new fabric.Canvas(canvasElement);
           elements.forEach(function(o) {
             ofabric.add(o);
           })

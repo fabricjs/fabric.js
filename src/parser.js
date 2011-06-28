@@ -287,7 +287,7 @@
   };
   
   function resolveGradients(instances) {
-    var activeInstance = fabric.Element.activeInstance,
+    var activeInstance = fabric.Canvas.activeInstance,
         ctx = activeInstance ? activeInstance.getContext() : null;
         
     if (!ctx) return;

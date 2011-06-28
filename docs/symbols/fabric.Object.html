@@ -195,15 +195,19 @@ ul.inheritsList
 	
 	<li><a href="../symbols/fabric.html">fabric</a></li>
 	
+	<li><a href="../symbols/fabric.Canvas.html">fabric.Canvas</a></li>
+	
+	<li><a href="../symbols/fabric.Canvas%23cache.html">fabric.Canvas#cache</a></li>
+	
 	<li><a href="../symbols/fabric.Circle.html">fabric.Circle</a></li>
 	
 	<li><a href="../symbols/fabric.Color.html">fabric.Color</a></li>
 	
 	<li><a href="../symbols/fabric.Element.html">fabric.Element</a></li>
 	
-	<li><a href="../symbols/fabric.Element%23cache.html">fabric.Element#cache</a></li>
-	
 	<li><a href="../symbols/fabric.Ellipse.html">fabric.Ellipse</a></li>
+	
+	<li><a href="../symbols/fabric.Gradient.html">fabric.Gradient</a></li>
 	
 	<li><a href="../symbols/fabric.Group.html">fabric.Group</a></li>
 	
@@ -359,7 +363,7 @@ ul.inheritsList
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
 								<div class="fixedFont">
-								<b><a href="../symbols/fabric.Object.html#options">options</a></b>
+								<b><a href="../symbols/fabric.Object.html#rotate">rotate</a></b>
 								</div>
 								<div class="description"></div>
 							</td>
@@ -369,9 +373,9 @@ ul.inheritsList
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
 								<div class="fixedFont">
-								<b><a href="../symbols/fabric.Object.html#rotate">rotate</a></b>
+								<b><a href="../symbols/fabric.Object.html#selectable">selectable</a></b>
 								</div>
-								<div class="description"></div>
+								<div class="description">When set to `false`, an object can not be selected for modification (using either point-click-based or group-based selection)</div>
 							</td>
 						</tr>
 					
@@ -681,6 +685,15 @@ as well as for history (undo/redo) purposes</div>
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/fabric.Object.html#setGradientFill">setGradientFill</a></b>(ctx, options)
+								</div>
+								<div class="description"></div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
 								<div class="fixedFont"><b><a href="../symbols/fabric.Object.html#setOpacity">setOpacity</a></b>(value)
 								</div>
 								<div class="description">Sets object opacity</div>
@@ -700,6 +713,15 @@ as well as for history (undo/redo) purposes</div>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
 								<div class="fixedFont"><b><a href="../symbols/fabric.Object.html#setSourcePath">setSourcePath</a></b>(value)
+								</div>
+								<div class="description"></div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/fabric.Object.html#setupState">setupState</a></b>()
 								</div>
 								<div class="description"></div>
 							</td>
@@ -941,11 +963,11 @@ as well as for history (undo/redo) purposes</div>
 
 					<hr />
 				
-					<a name="options"> </a>
+					<a name="rotate"> </a>
 					<div class="fixedFont">
 					
-					<span class="light">{Object}</span>
-					<b>options</b>
+					
+					<b>rotate</b>
 					
 					</div>
 					<div class="description">
@@ -963,15 +985,15 @@ as well as for history (undo/redo) purposes</div>
 
 					<hr />
 				
-					<a name="rotate"> </a>
+					<a name="selectable"> </a>
 					<div class="fixedFont">
 					
-					
-					<b>rotate</b>
+					<span class="light">{Boolean}</span>
+					<b>selectable</b>
 					
 					</div>
 					<div class="description">
-						
+						When set to `false`, an object can not be selected for modification (using either point-click-based or group-based selection)
 						
 						
 					</div>
@@ -2187,6 +2209,48 @@ Requires public options: cornersize, padding
 
 					<hr />
 				
+					<a name="setGradientFill"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>setGradientFill</b>(ctx, options)
+					
+					</div>
+					<div class="description">
+						
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<b>ctx</b>
+									
+								</dt>
+								<dd></dd>
+							
+								<dt>
+									<b>options</b>
+									
+								</dt>
+								<dd></dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
 					<a name="setOpacity"> </a>
 					<div class="fixedFont">
 					
@@ -2303,6 +2367,31 @@ Requires public options: cornersize, padding
 								<dd><span class="light fixedFont">{<a href="../symbols/fabric.Object.html">fabric.Object</a>}</span> thisArg</dd>
 							
 							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="setupState"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>setupState</b>()
+					
+					</div>
+					<div class="description">
+						
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
 						
 						
 						
@@ -2617,7 +2706,7 @@ Requires public options: cornersize, padding
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Thu Oct 21 2010 22:39:51 GMT-0400 (EDT)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Tue Jun 28 2011 18:47:43 GMT-0400 (EDT)
 		</div>
 	</body>
 </html>

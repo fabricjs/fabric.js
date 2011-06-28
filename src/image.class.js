@@ -240,7 +240,7 @@
       canvasEl.height = imgEl.height;
 
       canvasEl.getContext('2d').drawImage(imgEl, 0, 0);
-      fabric.Element.toGrayscale(canvasEl);
+      fabric.Canvas.toGrayscale(canvasEl);
       
       /** @ignore */
       replacement.onload = function() {

@@ -5,7 +5,7 @@
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<meta name="generator" content="JsDoc Toolkit" />
 		
-		<title>JsDoc Reference - fabric.util.object</title>
+		<title>JsDoc Reference - fabric.Gradient</title>
 
 		<style type="text/css">
 			/* default.css */
@@ -256,7 +256,7 @@ ul.inheritsList
 <!-- ============================== class title ============================ -->
 			<h1 class="classTitle">
 				
-				Namespace fabric.util.object
+				Namespace fabric.Gradient
 			</h1>
 
 <!-- ============================== class summary ========================== -->			
@@ -264,16 +264,16 @@ ul.inheritsList
 				
 				
 			
-				fabric.util.object
 				
 				
-					<br /><i>Defined in: </i> <a href="../symbols/src/src_util_lang_object.js.html">lang_object.js</a>.
+				
+					<br /><i>Defined in: </i> <a href="../symbols/src/src_gradient.js.html">gradient.js</a>.
 				
 			</p>
 
 <!-- ============================== constructor summary ==================== -->			
 			
-			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class fabric.util.object.">
+			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class fabric.Gradient.">
 				<caption>Namespace Summary</caption>
 				<thead>
 					<tr>
@@ -286,7 +286,7 @@ ul.inheritsList
 						<td class="attributes">&nbsp;</td>
 						<td class="nameDescription" >
 							<div class="fixedFont">
-								<b><a href="../symbols/fabric.util.object.html#constructor">fabric.util.object</a></b>
+								<b><a href="../symbols/fabric.Gradient.html#constructor">fabric.Gradient</a></b>
 							</div>
 							<div class="description"></div>
 						</td>
@@ -302,7 +302,7 @@ ul.inheritsList
 			
 				
 				
-				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class fabric.util.object.">
+				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class fabric.Gradient.">
 					<caption>Method Summary</caption>
 					<thead>
 						<tr>
@@ -315,18 +315,27 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">fabric.util.object.<b><a href="../symbols/fabric.util.object.html#.clone">clone</a></b>(object)
+								<div class="fixedFont">fabric.Gradient.<b><a href="../symbols/fabric.Gradient.html#.create">create</a></b>(ctx, options)
 								</div>
-								<div class="description">Creates an empty object and copies all enumerable properties of another object to it</div>
+								<div class="description"></div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">fabric.util.object.<b><a href="../symbols/fabric.util.object.html#.extend">extend</a></b>(destination, source)
+								<div class="fixedFont">fabric.Gradient.<b><a href="../symbols/fabric.Gradient.html#.forObject">forObject</a></b>(obj, ctx, options)
 								</div>
-								<div class="description">Copies all enumerable properties of one object to another</div>
+								<div class="description"></div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">fabric.Gradient.<b><a href="../symbols/fabric.Gradient.html#.fromElement">fromElement</a></b>(el, ctx, instance)
+								</div>
+								<div class="description"></div>
 							</td>
 						</tr>
 					
@@ -347,7 +356,7 @@ ul.inheritsList
 				</div>
 				
 				<div class="fixedFont">
-						<b>fabric.util.object</b>
+						<b>fabric.Gradient</b>
 				</div>
 				
 				<div class="description">
@@ -378,15 +387,15 @@ ul.inheritsList
 					Method Detail
 				</div>
 				
-					<a name=".clone"> </a>
+					<a name=".create"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 					
 					
-					<span class="light">fabric.util.object.</span><b>clone</b>(object)
+					<span class="light">fabric.Gradient.</span><b>create</b>(ctx, options)
 					
 					</div>
 					<div class="description">
-						Creates an empty object and copies all enumerable properties of another object to it
+						
 						
 						
 					</div>
@@ -398,10 +407,16 @@ ul.inheritsList
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{Object}</span> <b>object</b>
+									<b>ctx</b>
 									
 								</dt>
-								<dd>Object to clone</dd>
+								<dd></dd>
+							
+								<dt>
+									<b>options</b>
+									
+								</dt>
+								<dd></dd>
 							
 							</dl>
 						
@@ -414,15 +429,15 @@ ul.inheritsList
 
 					<hr />
 				
-					<a name=".extend"> </a>
+					<a name=".forObject"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 					
 					
-					<span class="light">fabric.util.object.</span><b>extend</b>(destination, source)
+					<span class="light">fabric.Gradient.</span><b>forObject</b>(obj, ctx, options)
 					
 					</div>
 					<div class="description">
-						Copies all enumerable properties of one object to another
+						
 						
 						
 					</div>
@@ -434,16 +449,22 @@ ul.inheritsList
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{Object}</span> <b>destination</b>
+									<b>obj</b>
 									
 								</dt>
-								<dd>Where to copy to</dd>
+								<dd></dd>
 							
 								<dt>
-									<span class="light fixedFont">{Object}</span> <b>source</b>
+									<b>ctx</b>
 									
 								</dt>
-								<dd>Where to copy from</dd>
+								<dd></dd>
+							
+								<dt>
+									<b>options</b>
+									
+								</dt>
+								<dd></dd>
 							
 							</dl>
 						
@@ -452,6 +473,61 @@ ul.inheritsList
 						
 						
 						
+						
+
+					<hr />
+				
+					<a name=".fromElement"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					
+					<span class="light">fabric.Gradient.</span><b>fromElement</b>(el, ctx, instance)
+					
+					</div>
+					<div class="description">
+						
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<b>el</b>
+									
+								</dt>
+								<dd></dd>
+							
+								<dt>
+									<b>ctx</b>
+									
+								</dt>
+								<dd></dd>
+							
+								<dt>
+									<b>instance</b>
+									
+								</dt>
+								<dd></dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">See:</dt>
+							
+								<dd>http://www.w3.org/TR/SVG/pservers.html#LinearGradientElement</dd>
+							
+							</dl>
 						
 
 					
@@ -468,7 +544,7 @@ ul.inheritsList
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Tue Jun 28 2011 18:47:44 GMT-0400 (EDT)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Tue Jun 28 2011 18:47:43 GMT-0400 (EDT)
 		</div>
 	</body>
 </html>

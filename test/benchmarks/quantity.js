@@ -15,7 +15,7 @@
     el.innerHTML += ('<h3 style="display:inline-block;">' + title + '</h3><p style="margin-left:1em;margin-right:1em;display:inline-block">' + result + '</p>');
   }
 
-  this.c = new fabric.Element('test');
+  this.c = new fabric.Canvas('test');
 
   var t1, t2, 
       lim = 50, 

@@ -2,8 +2,8 @@
   
   "use strict";
   
-  if (fabric.Element) {
-    fabric.warn('fabric.Element is already defined.');
+  if (fabric.Canvas) {
+    fabric.warn('fabric.Canvas is already defined.');
     return;
   }
   
@@ -47,12 +47,12 @@
       };
   
   /**
-   * @class fabric.Element
+   * @class fabric.Canvas
    * @constructor
    * @param {HTMLElement | String} el &lt;canvas> element to initialize instance on
    * @param {Object} [options] Options object
    */
-  fabric.Element = function (el, options) {
+  fabric.Canvas = function (el, options) {
     
     options || (options = { });
     
@@ -114,12 +114,12 @@
     
     this.calcOffset();
     
-    fabric.Element.activeInstance = this;
+    fabric.Canvas.activeInstance = this;
   };
   
-  extend(fabric.Element.prototype, fabric.Observable);
+  extend(fabric.Canvas.prototype, fabric.Observable);
   
-  extend(fabric.Element.prototype, /** @scope fabric.Element.prototype */ {
+  extend(fabric.Canvas.prototype, /** @scope fabric.Canvas.prototype */ {
     
     /**
      * Background color of this canvas instance
@@ -177,7 +177,7 @@
     includeDefaultValues:   true,
     
     /**
-     * Indicates whether images loaded via `fabric.Element#loadImageFromUrl` should be cached
+     * Indicates whether images loaded via `fabric.Canvas#loadImageFromUrl` should be cached
      * @property
      * @type Boolean
      */
@@ -191,7 +191,7 @@
     stateful:               true,
     
     /**
-     * Indicates whether fabric.Element#add should also re-render canvas. 
+     * Indicates whether fabric.Canvas#add should also re-render canvas. 
      * Disabling this option could give a great performance boost when adding a lot of objects to canvas at once 
      * (followed by a manual rendering after addition)
      */
@@ -235,7 +235,7 @@
      * Calculates canvas element offset relative to the document
      * This method is also attached as "resize" event handler of window
      * @method calcOffset
-     * @return {fabric.Element} instance
+     * @return {fabric.Canvas} instance
      * @chainable
      */
     calcOffset: function () {
@@ -248,7 +248,7 @@
      * @method setOverlayImage
      * @param {String} url url of an image to set background to
      * @param {Function} callback callback to invoke when image is loaded and set as an overlay one
-     * @return {fabric.Element} thisArg
+     * @return {fabric.Canvas} thisArg
      * @chainable
      */
     setOverlayImage: function (url, callback) { // TODO (kangax): test callback
@@ -426,7 +426,7 @@
      * Sets width of this canvas instance
      * @method setWidth
      * @param {Number} width value to set width to
-     * @return {fabric.Element} instance
+     * @return {fabric.Canvas} instance
      * @chainable true
      */
     setWidth: function (value) {
@@ -437,7 +437,7 @@
      * Sets height of this canvas instance
      * @method setHeight
      * @param {Number} height value to set height to
-     * @return {fabric.Element} instance
+     * @return {fabric.Canvas} instance
      * @chainable true
      */
     setHeight: function (value) {
@@ -448,7 +448,7 @@
      * Sets dimensions (width, height) of this canvas instance
      * @method setDimensions
      * @param {Object} dimensions
-     * @return {fabric.Element} thisArg
+     * @return {fabric.Canvas} thisArg
      * @chainable
      */
     setDimensions: function(dimensions) {
@@ -464,7 +464,7 @@
      * @method _setDimensions
      * @param {String} prop property (width|height)
      * @param {Number} value value to set property to
-     * @return {fabric.Element} instance
+     * @return {fabric.Canvas} instance
      * @chainable true
      */
     _setDimension: function (prop, value) {
@@ -652,7 +652,7 @@
     /**
      * Deactivates all objects and dispatches appropriate events
      * @method deactivateAllWithDispatch
-     * @return {fabric.Element} thisArg
+     * @return {fabric.Canvas} thisArg
      */
     deactivateAllWithDispatch: function () {
       var activeGroup = this.getActiveGroup();
@@ -817,7 +817,7 @@
         path.push('L ', xPoint - minX, ' ', yPoint - minY, ' ');
       }
       
-      // TODO (kangax): maybe remove Path creation from here, to decouple fabric.Element from fabric.Path, 
+      // TODO (kangax): maybe remove Path creation from here, to decouple fabric.Canvas from fabric.Path, 
       // and instead fire something like "drawing:completed" event with path string
       
       path = path.join('');
@@ -1124,7 +1124,7 @@
      * Adds objects to canvas, then renders canvas;
      * Objects should be instances of (or inherit from) fabric.Object
      * @method add
-     * @return {fabric.Element} thisArg
+     * @return {fabric.Canvas} thisArg
      * @chainable
      */
     add: function () {
@@ -1143,7 +1143,7 @@
      * @method insertAt
      * @param object {Object} Object to insert
      * @param index {Number} index to insert object at
-     * @return {fabric.Element} instance
+     * @return {fabric.Canvas} instance
      */
     insertAt: function (object, index) {
       this._objects.splice(index, 0, object);
@@ -1175,7 +1175,7 @@
      * Clears specified context of canvas element
      * @method clearContext
      * @param context {Object} ctx context to clear
-     * @return {fabric.Element} thisArg
+     * @return {fabric.Canvas} thisArg
      * @chainable
      */
     clearContext: function(ctx) {
@@ -1186,7 +1186,7 @@
     /**
      * Clears all contexts (background, main, top) of an instance
      * @method clear
-     * @return {fabric.Element} thisArg
+     * @return {fabric.Canvas} thisArg
      * @chainable
      */
     clear: function () {
@@ -1201,7 +1201,7 @@
      * Renders both the top canvas and the secondary container canvas.
      * @method renderAll
      * @param allOnTop {Boolean} optional Whether we want to force all images to be rendered on the top canvas
-     * @return {fabric.Element} instance
+     * @return {fabric.Canvas} instance
      * @chainable
      */ 
     renderAll: function (allOnTop) {
@@ -1265,7 +1265,7 @@
      * Method to render only the top canvas.
      * Also used to render the group selection box.
      * @method renderTop
-     * @return {fabric.Element} thisArg
+     * @return {fabric.Canvas} thisArg
      * @chainable
      */
     renderTop: function () {
@@ -1458,7 +1458,7 @@
      * Centers object horizontally.
      * @method centerObjectH
      * @param {fabric.Object} object Object to center
-     * @return {fabric.Element} thisArg
+     * @return {fabric.Canvas} thisArg
      */
     centerObjectH: function (object) {
       object.set('left', this.getCenter().left);
@@ -1471,7 +1471,7 @@
      * @method fxCenterObjectH
      * @param {fabric.Object} object Object to center
      * @param {Object} [callbacks] Callbacks object with optional "onComplete" and/or "onChange" properties
-     * @return {fabric.Element} thisArg
+     * @return {fabric.Canvas} thisArg
      * @chainable
      */
     fxCenterObjectH: function (object, callbacks) {
@@ -1504,7 +1504,7 @@
      * Centers object vertically.
      * @method centerObjectH
      * @param {fabric.Object} object Object to center
-     * @return {fabric.Element} thisArg
+     * @return {fabric.Canvas} thisArg
      * @chainable
      */
     centerObjectV: function (object) {
@@ -1518,7 +1518,7 @@
      * @method fxCenterObjectV
      * @param {fabric.Object} object Object to center
      * @param {Object} [callbacks] Callbacks object with optional "onComplete" and/or "onChange" properties
-     * @return {fabric.Element} thisArg
+     * @return {fabric.Canvas} thisArg
      * @chainable
      */
     fxCenterObjectV: function (object, callbacks) {
@@ -1551,7 +1551,7 @@
      * Straightens object, then rerenders canvas
      * @method straightenObject
      * @param {fabric.Object} object Object to straighten
-     * @return {fabric.Element} thisArg
+     * @return {fabric.Canvas} thisArg
      * @chainable
      */
     straightenObject: function (object) {
@@ -1561,10 +1561,10 @@
     },
     
     /**
-     * Same as `fabric.Element#straightenObject`, but animated
+     * Same as `fabric.Canvas#straightenObject`, but animated
      * @method fxStraightenObject
      * @param {fabric.Object} object Object to straighten
-     * @return {fabric.Element} thisArg
+     * @return {fabric.Canvas} thisArg
      * @chainable
      */
     fxStraightenObject: function (object) {
@@ -1634,13 +1634,13 @@
     
     /**
      * Populates canvas with data from the specified JSON
-     * JSON format must conform to the one of `fabric.Element#toJSON`
+     * JSON format must conform to the one of `fabric.Canvas#toJSON`
      * @method loadFromJSON
      * @param {String} json JSON string
      * @param {Function} callback Callback, invoked when json is parsed 
      *                            and corresponding objects (e.g: fabric.Image) 
      *                            are initialized
-     * @return {fabric.Element} instance
+     * @return {fabric.Canvas} instance
      * @chainable
      */
     loadFromJSON: function (json, callback) {
@@ -1707,13 +1707,13 @@
     
     /**
      * Populates canvas with data from the specified dataless JSON
-     * JSON format must conform to the one of `fabric.Element#toDatalessJSON`
+     * JSON format must conform to the one of `fabric.Canvas#toDatalessJSON`
      * @method loadFromDatalessJSON
      * @param {String} json JSON string
      * @param {Function} callback Callback, invoked when json is parsed 
      *                            and corresponding objects (e.g: fabric.Image) 
      *                            are initialized
-     * @return {fabric.Element} instance
+     * @return {fabric.Canvas} instance
      * @chainable
      */
     loadFromDatalessJSON: function (json, callback) {
@@ -1979,11 +1979,11 @@
     },
     
     /**
-     * Same as `fabric.Element#remove` but animated
+     * Same as `fabric.Canvas#remove` but animated
      * @method fxRemove
      * @param {fabric.Object} object Object to remove
      * @param {Function} callback Callback, invoked on effect completion
-     * @return {fabric.Element} thisArg
+     * @return {fabric.Canvas} thisArg
      * @chainable
      */
     fxRemove: function (object, callback) {
@@ -2004,7 +2004,7 @@
      * Moves an object to the bottom of the stack of drawn objects
      * @method sendToBack
      * @param object {fabric.Object} Object to send to back
-     * @return {fabric.Element} thisArg
+     * @return {fabric.Canvas} thisArg
      * @chainable
      */
     sendToBack: function (object) {
@@ -2017,7 +2017,7 @@
      * Moves an object to the top of the stack of drawn objects
      * @method bringToFront
      * @param object {fabric.Object} Object to send
-     * @return {fabric.Element} thisArg
+     * @return {fabric.Canvas} thisArg
      * @chainable
      */
     bringToFront: function (object) {
@@ -2030,7 +2030,7 @@
      * Moves an object one level down in stack of drawn objects
      * @method sendBackwards
      * @param object {fabric.Object} Object to send
-     * @return {fabric.Element} thisArg
+     * @return {fabric.Canvas} thisArg
      * @chainable
      */
     sendBackwards: function (object) {
@@ -2057,7 +2057,7 @@
      * Moves an object one level up in stack of drawn objects
      * @method sendForward
      * @param object {fabric.Object} Object to send
-     * @return {fabric.Element} thisArg
+     * @return {fabric.Canvas} thisArg
      * @chainable
      */
     bringForward: function (object) {
@@ -2086,7 +2086,7 @@
      * Sets given object as active
      * @method setActiveObject
      * @param object {fabric.Object} Object to set as an active one
-     * @return {fabric.Element} thisArg
+     * @return {fabric.Canvas} thisArg
      * @chainable
      */
     setActiveObject: function (object) {
@@ -2114,7 +2114,7 @@
     /**
      * Removes currently active object
      * @method removeActiveObject
-     * @return {fabric.Element} thisArg
+     * @return {fabric.Canvas} thisArg
      * @chainable
      */
     removeActiveObject: function () {
@@ -2129,7 +2129,7 @@
      * Sets active group to a speicified one
      * @method setActiveGroup
      * @param {fabric.Group} group Group to set as a current one 
-     * @return {fabric.Element} thisArg
+     * @return {fabric.Canvas} thisArg
      * @chainable
      */
     setActiveGroup: function (group) {
@@ -2149,7 +2149,7 @@
     /**
      * Removes currently active group
      * @method removeActiveGroup
-     * @return {fabric.Element} thisArg
+     * @return {fabric.Canvas} thisArg
      */
     removeActiveGroup: function () {
       var g = this.getActiveGroup();
@@ -2172,7 +2172,7 @@
     /**
      * Deactivates all objects by calling their setActive(false)
      * @method deactivateAll
-     * @return {fabric.Element} thisArg
+     * @return {fabric.Canvas} thisArg
      */
     deactivateAll: function () {
       var allObjects = this.getObjects(),
@@ -2201,7 +2201,7 @@
     /**
      * Iterates over all objects, invoking callback for each one of them
      * @method forEachObject
-     * @return {fabric.Element} thisArg
+     * @return {fabric.Canvas} thisArg
      */
     forEachObject: function(callback, context) {
       var objects = this.getObjects(),
@@ -2215,7 +2215,7 @@
     /**
      * Clears a canvas element and removes all event handlers.
      * @method dispose
-     * @return {fabric.Element} thisArg
+     * @return {fabric.Canvas} thisArg
      * @chainable
      */
     dispose: function () {
@@ -2230,7 +2230,7 @@
      * Clones canvas instance
      * @method clone
      * @param {Object} [callback] Expects `onBeforeClone` and `onAfterClone` functions
-     * @return {fabric.Element} Clone of this instance
+     * @return {fabric.Canvas} Clone of this instance
      */
     clone: function (callback) {
       var el = document.createElement('canvas');
@@ -2239,7 +2239,7 @@
       el.height = this.getHeight();
           
       // cache
-      var clone = this.__clone || (this.__clone = new fabric.Element(el));
+      var clone = this.__clone || (this.__clone = new fabric.Canvas(el));
       clone.clipTo = this.clipTo;
       
       return clone.loadFromJSON(JSON.stringify(this.toJSON()), function () {
@@ -2291,7 +2291,7 @@
     },
     
     /**
-     * Used for caching SVG documents (loaded via `fabric.Element#loadSVGFromURL`)
+     * Used for caching SVG documents (loaded via `fabric.Canvas#loadSVGFromURL`)
      * @property
      * @namespace
      */
@@ -2331,12 +2331,12 @@
    * @method toString
    * @return {String} string representation of an instance
    */
-  fabric.Element.prototype.toString = function () { // Assign explicitly since `extend` doesn't take care of DontEnum bug yet
-    return '#<fabric.Element (' + this.complexity() + '): '+
+  fabric.Canvas.prototype.toString = function () { // Assign explicitly since `extend` doesn't take care of DontEnum bug yet
+    return '#<fabric.Canvas (' + this.complexity() + '): '+
            '{ objects: ' + this.getObjects().length + ' }>';
   };
   
-  extend(fabric.Element, /** @scope fabric.Element */ {
+  extend(fabric.Canvas, /** @scope fabric.Canvas */ {
     
     /**
      * @static
@@ -2419,5 +2419,14 @@
    * @method toJSON
    * @return {String} json string
    */
-  fabric.Element.prototype.toJSON = fabric.Element.prototype.toObject;
+  fabric.Canvas.prototype.toJSON = fabric.Canvas.prototype.toObject;
+  
+  /**
+   * @class fabric.Element
+   * @alias fabric.Canvas
+   * @deprecated
+   * @constructor
+   */
+  fabric.Element = fabric.Canvas;
+  
 })(this);

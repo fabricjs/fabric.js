@@ -5,7 +5,7 @@
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<meta name="generator" content="JsDoc Toolkit" />
 		
-		<title>JsDoc Reference - fabric.util.object</title>
+		<title>JsDoc Reference - fabric.Canvas#cache</title>
 
 		<style type="text/css">
 			/* default.css */
@@ -256,7 +256,7 @@ ul.inheritsList
 <!-- ============================== class title ============================ -->
 			<h1 class="classTitle">
 				
-				Namespace fabric.util.object
+				Namespace fabric.Canvas#cache
 			</h1>
 
 <!-- ============================== class summary ========================== -->			
@@ -264,16 +264,16 @@ ul.inheritsList
 				
 				
 			
-				fabric.util.object
 				
 				
-					<br /><i>Defined in: </i> <a href="../symbols/src/src_util_lang_object.js.html">lang_object.js</a>.
+				
+					<br /><i>Defined in: </i> <a href="../symbols/src/src_element.class.js.html">element.class.js</a>.
 				
 			</p>
 
 <!-- ============================== constructor summary ==================== -->			
 			
-			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class fabric.util.object.">
+			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class fabric.Canvas#cache.">
 				<caption>Namespace Summary</caption>
 				<thead>
 					<tr>
@@ -286,9 +286,9 @@ ul.inheritsList
 						<td class="attributes">&nbsp;</td>
 						<td class="nameDescription" >
 							<div class="fixedFont">
-								<b><a href="../symbols/fabric.util.object.html#constructor">fabric.util.object</a></b>
+								<b><a href="../symbols/fabric.Canvas%23cache.html#constructor">fabric.Canvas#cache</a></b>
 							</div>
-							<div class="description"></div>
+							<div class="description">Used for caching SVG documents (loaded via `fabric.Canvas#loadSVGFromURL`)</div>
 						</td>
 					</tr>
 				</tbody>
@@ -297,12 +297,17 @@ ul.inheritsList
 
 <!-- ============================== properties summary ===================== -->
 			
+				
+				
+				
+				
+			
 
 <!-- ============================== methods summary ======================== -->
 			
 				
 				
-				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class fabric.util.object.">
+				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class fabric.Canvas#cache.">
 					<caption>Method Summary</caption>
 					<thead>
 						<tr>
@@ -315,18 +320,27 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">fabric.util.object.<b><a href="../symbols/fabric.util.object.html#.clone">clone</a></b>(object)
+								<div class="fixedFont">fabric.Canvas#cache.<b><a href="../symbols/fabric.Canvas%23cache.html#.get">get</a></b>(url, callback)
 								</div>
-								<div class="description">Creates an empty object and copies all enumerable properties of another object to it</div>
+								<div class="description"></div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">fabric.util.object.<b><a href="../symbols/fabric.util.object.html#.extend">extend</a></b>(destination, source)
+								<div class="fixedFont">fabric.Canvas#cache.<b><a href="../symbols/fabric.Canvas%23cache.html#.has">has</a></b>(name, callback)
 								</div>
-								<div class="description">Copies all enumerable properties of one object to another</div>
+								<div class="description"></div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">fabric.Canvas#cache.<b><a href="../symbols/fabric.Canvas%23cache.html#.set">set</a></b>(url, object)
+								</div>
+								<div class="description"></div>
 							</td>
 						</tr>
 					
@@ -347,11 +361,11 @@ ul.inheritsList
 				</div>
 				
 				<div class="fixedFont">
-						<b>fabric.util.object</b>
+						<b>fabric.Canvas#cache</b>
 				</div>
 				
 				<div class="description">
-					
+					Used for caching SVG documents (loaded via `fabric.Canvas#loadSVGFromURL`)
 					
 				</div>
 				
@@ -378,15 +392,15 @@ ul.inheritsList
 					Method Detail
 				</div>
 				
-					<a name=".clone"> </a>
+					<a name=".get"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 					
 					
-					<span class="light">fabric.util.object.</span><b>clone</b>(object)
+					<span class="light">fabric.Canvas#cache.</span><b>get</b>(url, callback)
 					
 					</div>
 					<div class="description">
-						Creates an empty object and copies all enumerable properties of another object to it
+						
 						
 						
 					</div>
@@ -398,10 +412,16 @@ ul.inheritsList
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{Object}</span> <b>object</b>
+									<span class="light fixedFont">{<a href="../symbols/String.html">String</a>}</span> <b>url</b>
 									
 								</dt>
-								<dd>Object to clone</dd>
+								<dd></dd>
+							
+								<dt>
+									<span class="light fixedFont">{<a href="../symbols/Function.html">Function</a>}</span> <b>callback</b>
+									
+								</dt>
+								<dd></dd>
 							
 							</dl>
 						
@@ -414,15 +434,15 @@ ul.inheritsList
 
 					<hr />
 				
-					<a name=".extend"> </a>
+					<a name=".has"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 					
 					
-					<span class="light">fabric.util.object.</span><b>extend</b>(destination, source)
+					<span class="light">fabric.Canvas#cache.</span><b>has</b>(name, callback)
 					
 					</div>
 					<div class="description">
-						Copies all enumerable properties of one object to another
+						
 						
 						
 					</div>
@@ -434,16 +454,58 @@ ul.inheritsList
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{Object}</span> <b>destination</b>
+									<span class="light fixedFont">{<a href="../symbols/String.html">String</a>}</span> <b>name</b>
 									
 								</dt>
-								<dd>Where to copy to</dd>
+								<dd></dd>
 							
 								<dt>
-									<span class="light fixedFont">{Object}</span> <b>source</b>
+									<span class="light fixedFont">{<a href="../symbols/Function.html">Function</a>}</span> <b>callback</b>
 									
 								</dt>
-								<dd>Where to copy from</dd>
+								<dd></dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name=".set"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					
+					<span class="light">fabric.Canvas#cache.</span><b>set</b>(url, object)
+					
+					</div>
+					<div class="description">
+						
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{<a href="../symbols/String.html">String</a>}</span> <b>url</b>
+									
+								</dt>
+								<dd></dd>
+							
+								<dt>
+									<span class="light fixedFont">{Object}</span> <b>object</b>
+									
+								</dt>
+								<dd></dd>
 							
 							</dl>
 						
@@ -468,7 +530,7 @@ ul.inheritsList
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Tue Jun 28 2011 18:47:44 GMT-0400 (EDT)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Tue Jun 28 2011 18:47:43 GMT-0400 (EDT)
 		</div>
 	</body>
 </html>

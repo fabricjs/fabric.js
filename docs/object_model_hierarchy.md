@@ -49,7 +49,7 @@
           -- getRandomInt
       
       
-      fabric.Element
+      fabric.Canvas
 
       fabric.Point
 

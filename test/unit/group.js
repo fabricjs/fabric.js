@@ -1,6 +1,6 @@
 (function(){
   
-  var canvas = this.canvas = new fabric.Element('test');
+  var canvas = this.canvas = new fabric.Canvas('test');
   var canvasEl = document.getElementById('test');
   
   function makeGroupWith2Objects() {
@@ -14,7 +14,7 @@
     teardown: function() {
       canvas.clear();
       canvas.setActiveGroup(null);
-      canvas.backgroundColor = fabric.Element.prototype.backgroundColor;
+      canvas.backgroundColor = fabric.Canvas.prototype.backgroundColor;
       canvas.calcOffset();
     }
   });

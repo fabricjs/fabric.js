@@ -22,7 +22,7 @@
     return Math.random() * (max - min) + min;
   }
   
-  var canvas = global.canvas = new fabric.Element('canvas', {
+  var canvas = global.canvas = new fabric.Canvas('canvas', {
     /*
     clipTo: function(canvas) {
       canvas.arc(this.width / 2, this.height / 2, 200, 0, Math.PI * 2, true);
@@ -166,7 +166,7 @@
   };
   
   document.getElementById('rasterize').onclick = function() {
-    if (!fabric.Element.supports('toDataURL')) {
+    if (!fabric.Canvas.supports('toDataURL')) {
       alert('This browser doesn\'t provide means to serialize canvas to an image');
     }
     else {
