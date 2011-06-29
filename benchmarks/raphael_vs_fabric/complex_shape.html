@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Complex shape</title>
+    <style>
+      svg {
+        border: 1px solid #000;
+      }
+      .canvas_container {
+        border: 1px solid #000;
+        position: relative;
+      }
+    </style>
+    <script src="raphael-min.js"></script>
+    <script src="../../dist/all.js"></script>
+    <script src="tiger.js"></script>
+    <script>
+          
+      window.onload = function() {
+        
+        var logEl = document.getElementById('log');
+        
+        (function testFabric() {
+          
+          var canvas = window.__canvas = new fabric.Element('canvas', { 
+                renderOnAddition: false, 
+                stateful: false 
+              });
+
+          //console.profile('parsing');
+          
+          canvas.loadSVGFromURL('tiger2.svg', function(objects) {
+            
+            //console.profileEnd('parsing');
+            
+            var startTime = new Date();
+            
+            var group = new fabric.PathGroup(objects, {
+              left: 265,
+              top: 300,
+              width: 495,
+              height: 511
+            });
+            canvas.add(group);
+            canvas.renderAll();
+            
+            var renderingTime = new Date() - startTime;
+            
+            logEl.innerHTML += 'fabric: <b>' + (fabric.documentParsingTime + renderingTime) + 
+              '</b>ms (parsing: ' + fabric.documentParsingTime + ', rendering: ' + renderingTime + ')';
+              
+            document.getElementById('description').appendChild(document.createTextNode(' (' + group.complexity() + ' paths)'))
+          });
+          
+          canvas.calcOffset();
+          
+        })();
+        
+        (function testRaphael() {
+          
+          var start = function () {
+            // storing original coordinates
+            this.ox = this.attr("cx");
+            this.oy = this.attr("cy");
+            this.attr({opacity: .5});
+          },
+          move = function (dx, dy) {
+            // move will be called with dx and dy
+            this.attr({cx: this.ox + dx, cy: this.oy + dy});
+          },
+          up = function () {
+            // restoring state
+            this.attr({opacity: 1});
+          };
+          
+          var startTime = new Date();
+          var shape = Raphael(tiger).translate(200, 200);
+          shape.drag(start, move, up);
+          
+          logEl.innerHTML = 'Raphael: <b>' + (new Date() - startTime) + '</b>ms<br>';
+          
+        })();
+      };
+    </script>
+    <link rel="stylesheet" href="../../lib/master.css" type="text/css">
+  </head>
+  <body>
+    <ul id="header">
+      <li><a href="../index.html">Demos</a></li>
+      <li><a href="../index.html">Benchmarks</a></li>
+      <li><a href="../../docs/index.html">Docs</a></li>
+      <li><a href="../../test/unit/suite_runner.html">Tests</a></li>
+    </ul>
+    <div id="bd-wrapper">
+      <!-- preload svg -->
+      <iframe src="tiger2.svg" style="position:absolute;top:-999px;left:-999px"></iframe>
+      <p id="description">Rendering a complex shape</p>
+      <canvas id="canvas" width="600" height="600"></canvas>
+      <p id="log"></p>
+    </div>
+  </body>
+</html>

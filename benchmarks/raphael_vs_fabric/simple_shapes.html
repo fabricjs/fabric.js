@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Simple shapes</title>
+    <style>
+      svg {
+        border: 1px solid #000;
+      }
+      .canvas_container {
+        border: 1px solid #000;
+        position: relative;
+      }
+      #bd-wrapper ul, #bd-wrapper ul li { display: inline-block; }
+    </style>
+    <script src="raphael-min.js"></script>
+    <script src="../../dist/all.js"></script>
+    <script>
+      function getRandomNum(min, max) {
+        return Math.random() * (max - min) + min;
+      }
+      
+      var numObjects = parseInt(document.location.search.slice(1), 10) || 200,
+          radius = 20,
+          width = 500,
+          height = 500;
+          
+      window.onload = function() {
+        
+        var logEl = document.getElementById('log');
+        
+        document.getElementById('numshapes').innerHTML = numObjects;
+        
+        (function testRaphael() {
+          
+          var paper = Raphael(550, 94, width, height),
+              startTime = new Date(),
+              circle;
+          
+          var start = function () {
+            // storing original coordinates
+            this.ox = this.attr("cx");
+            this.oy = this.attr("cy");
+            this.attr({opacity: .5});
+          },
+          move = function (dx, dy) {
+            // move will be called with dx and dy
+            this.attr({cx: this.ox + dx, cy: this.oy + dy});
+          },
+          up = function () {
+            // restoring state
+            this.attr({opacity: 1});
+          };
+
+          for (var i = numObjects; i--; ) {
+            circle = paper.circle(getRandomNum(0, width), getRandomNum(0, height), radius);
+            circle.attr('fill', 'red');
+            circle.attr('stroke', 'blue');            
+            circle.drag(move, start, up);
+          }
+          
+          logEl.innerHTML = 'Raphael: ' + (new Date() - startTime) + 'ms<br>';
+          
+        })();
+        
+        (function testFabric() {
+          
+          var canvas = window.__canvas = new fabric.Element('canvas', { 
+                renderOnAddition: false, 
+                stateful: false 
+              }),
+              Circle = fabric.Circle,
+              startTime = new Date(),
+              circle;
+
+          for (var i = numObjects; i--; ) {
+            canvas.add(new Circle({ 
+              radius: radius,
+              left: getRandomNum(0, width), 
+              top: getRandomNum(0, height),
+              fill: 'red',
+              stroke: 'blue'
+            }));
+          }
+          canvas.renderAll();
+          canvas.calcOffset();
+          
+          logEl.innerHTML += 'fabric: ' + (new Date() - startTime) + 'ms';
+          
+        })();
+      };
+      
+      function reload(num) {
+        document.location.search = '?' + num;
+        return false;
+      }
+    </script>
+    <link rel="stylesheet" href="../../lib/master.css" type="text/css">
+  </head>
+  <body>
+    <ul id="header">
+      <li><a href="../index.html">Demos</a></li>
+      <li><a href="../index.html">Benchmarks</a></li>
+      <li><a href="../../docs/index.html">Docs</a></li>
+      <li><a href="../../test/unit/suite_runner.html">Tests</a></li>
+    </ul>
+    <div id="bd-wrapper">
+      Rendering a large number (<span id="numshapes"></span>) of simple shapes
+      <ul>
+        <li><a href="#" onclick="return reload(10)">10 shapes</a></li>
+        <li><a href="#" onclick="return reload(100)">100 shapes</a></li>
+        <li><a href="#" onclick="return reload(500)">500 shapes</a></li>
+        <li><a href="#" onclick="return reload(1000)">1000 shapes</a></li>
+        <li><a href="#" onclick="return reload(2000)">2000 shapes</a></li>
+        <li><a href="#" onclick="return reload(5000)">5000 shapes</a></li>
+      </ul>
+      <canvas id="canvas" width="500" height="500"></canvas>
+      <p id="log"></p>
+    </div>
+  </body>
+</html>
