@@ -553,7 +553,7 @@
         _this._setCursorFromEvent(e, target);
       }, 50);
       
-      this.fire('mouse:up');
+      this.fire('mouse:up', { target: target });
     },
     
     _shouldClearSelection: function (e) {
@@ -637,7 +637,7 @@
       // we must renderAll so that active image is placed on the top canvas
       this.renderAll();
       
-      this.fire('mouse:down');
+      this.fire('mouse:down', { target: target });
     },
     
     /**

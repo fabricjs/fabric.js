@@ -32,6 +32,11 @@
         <h3>Custom object boundaries</h3>
         <canvas id="c3" width="200" height="200"></canvas>
       </div>
+      
+      <div class="block">
+        <h3>No object boundaries + opacity on move</h3>
+        <canvas id="c10" width="200" height="200"></canvas>
+      </div>
 
       <div class="block">
         <h3>Unselectable canvas</h3>
@@ -86,6 +91,30 @@
         canvas3.item(0).borderColor = 'red';
         canvas3.item(0).cornerColor = 'green';
         canvas3.item(0).cornersize = 6;
+        
+        var canvas10 = new fabric.Canvas('c10');
+        canvas10.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
+        canvas10.item(0).borderColor = 'rgba(0,0,0,0)';
+        canvas10.item(0).cornerColor = 'rgba(0,0,0,0)';
+        
+        canvas10.observe('mouse:down', function(e) {
+          if (e.memo.target) {
+            e.memo.target.opacity = 0.5;
+            canvas10.renderAll();
+          }
+        });
+        canvas10.observe('mouse:up', function(e) {
+          if (e.memo.target) {
+            e.memo.target.opacity = 1;
+            canvas10.renderAll();
+          }
+        });
+        canvas10.observe('object:moved', function(e) {
+          e.memo.target.opacity = 0.5;
+        });
+        canvas10.observe('object:modified', function(e) {
+          e.memo.target.opacity = 1;
+        });
         
         var canvas4 = new fabric.Canvas('c4');
         canvas4.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));

@@ -4415,7 +4415,7 @@ fabric.util.animate = animate;
         _this._setCursorFromEvent(e, target);
       }, 50);
 
-      this.fire('mouse:up');
+      this.fire('mouse:up', { target: target });
     },
 
     _shouldClearSelection: function (e) {
@@ -4493,7 +4493,7 @@ fabric.util.animate = animate;
       }
       this.renderAll();
 
-      this.fire('mouse:down');
+      this.fire('mouse:down', { target: target });
     },
 
     /**
