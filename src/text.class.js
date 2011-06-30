@@ -132,6 +132,16 @@
       this.setCoords();
     },
     
+    // _render: function(context) {
+    //       context.fillStyle = this.fill;
+    //       context.font = this.fontsize + 'px ' + this.fontFamily;
+    //       this.transform(context);
+    //       this.width = context.measureText(this.text).width;
+    //       this.height = this.fontsize;
+    //       context.fillText(this.text, -this.width / 2, 0);
+    //       this.setCoords();
+    //     },
+    
     /**
      * @private
      * @method _initDummyElement
