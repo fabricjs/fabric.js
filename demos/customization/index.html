@@ -64,6 +64,11 @@
       </div>
       
       <div class="block">
+        <h3>Overlay image</h3>
+        <canvas id="c13" width="200" height="200"></canvas>
+      </div>
+      
+      <div class="block">
         <h3>Locked object rotation</h3>
         <canvas id="c6" width="200" height="200"></canvas>
       </div>
@@ -170,6 +175,12 @@
         }
         canvas12.observe('mouse:down', function(e) { animate(e, 1); });
         canvas12.observe('mouse:up', function(e) { animate(e, 0); });
+        
+        var canvas13 = new fabric.Canvas('c13');
+        canvas13.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
+        canvas13.setOverlayImage('jail_cell_bars.png', function(){
+          canvas13.renderAll();
+        });
         
         var canvas4 = new fabric.Canvas('c4');
         canvas4.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
