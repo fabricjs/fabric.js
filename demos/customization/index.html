@@ -42,6 +42,11 @@
         <h3>Custom cursor on object hover</h3>
         <canvas id="c11" width="200" height="200"></canvas>
       </div>
+      
+      <div class="block">
+        <h3>Modification on move</h3>
+        <canvas id="c12" width="200" height="200"></canvas>
+      </div>
 
       <div class="block">
         <h3>Unselectable canvas</h3>
@@ -126,6 +131,45 @@
         var canvas11 = new fabric.Canvas('c11');
         canvas11.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
         canvas11.HOVER_CURSOR = 'pointer';
+        
+        var canvas12 = new fabric.Canvas('c12');
+        canvas12.add(new fabric.Rect({ left: 110, top: 110, fill: 'green', width: 50, height: 50 }));
+        canvas12.add(new fabric.Rect({ left: 50, top: 50, fill: 'blue', width: 40, height: 40 }));
+        
+        canvas12.forEachObject(function(o){ o.borderColor = o.cornerColor = 'rgba(0,0,0,0)'; });
+        
+        canvas12.HOVER_CURSOR = 'pointer';
+        
+        function animate(e, dir) {
+          if (e.memo.target) {
+            fabric.util.animate({
+              startValue: e.memo.target.get('angle'),
+              endValue: e.memo.target.get('angle') + (dir ? 10 : -10),
+              duration: 100,
+              onChange: function(value) {
+                e.memo.target.setAngle(value);
+                canvas12.renderAll();
+              },
+              onComplete: function() {
+                e.memo.target.setCoords();
+              }
+            });
+            fabric.util.animate({
+              startValue: e.memo.target.get('scaleX'),
+              endValue: e.memo.target.get('scaleX') + (dir ? 0.2 : -0.2),
+              duration: 100,
+              onChange: function(value) {
+                e.memo.target.scale(value);
+                canvas12.renderAll();
+              },
+              onComplete: function() {
+                e.memo.target.setCoords();
+              }
+            });
+          }
+        }
+        canvas12.observe('mouse:down', function(e) { animate(e, 1); });
+        canvas12.observe('mouse:up', function(e) { animate(e, 0); });
         
         var canvas4 = new fabric.Canvas('c4');
         canvas4.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
