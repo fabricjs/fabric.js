@@ -99,7 +99,7 @@
   function loadShape() {
     for (var i = coords.length; i--; ) {
       (function(i){
-        loadSVGFromURL('../demo/assets/' + shapePath, function(objects, options) {
+        loadSVGFromURL('../../demos/kitchensink/assets/' + shapePath, function(objects, options) {
           var pathGroup = new fabric.PathGroup(objects, options);
 
           pathGroup.set({
@@ -112,15 +112,13 @@
 
           canvas.add(pathGroup);
 
-          if (i === 0) {
-            canvasObjects = canvas.getObjects();
-            if (canvasObjects.length > 0) {
-              animate();
-            }
-            setTimeout(function() {
-              complexityEl.innerHTML = canvas.complexity();
-            }, 50);
+          canvasObjects = canvas.getObjects();
+          if (canvasObjects.length === 4) {
+            animate();
           }
+          setTimeout(function() {
+            complexityEl.innerHTML = canvas.complexity();
+          }, 50);
         });
       })(i);
     }
