@@ -216,6 +216,12 @@
     CONTAINER_CLASS:        'canvas-container',
     
     /**
+     * @constant
+     * @type String
+     */
+    HOVER_CURSOR:           'move',
+    
+    /**
      * Callback; invoked right before object is about to be scaled/rotated
      * @method onBeforeScaleRotate
      * @param {fabric.Object} target Object that's about to be scaled/rotated
@@ -1022,7 +1028,7 @@
                       && target._findTargetCorner(e, this._offset);
         
         if (!corner) {
-          s.cursor = 'move';
+          s.cursor = this.HOVER_CURSOR;
         }
         else {
           if (corner in cursorMap) {
