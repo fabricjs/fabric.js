@@ -90,6 +90,10 @@ Also see [presentation from BK.js](http://www.slideshare.net/kangax/fabricjs-bui
     
     canvas.add(rect);
 
+### Staying in touch
+
+Follow [@fabric.js](http://twitter.com/fabricjs) or [@kangax](http://twitter.com/kangax) on twitter. Questions, suggestions — [fabric.js on Google Groups](http://groups.google.com/group/fabricjs).
+
 ### Credits
 
 - Ernest Delgado for the original idea of [manipulating images on canvas](http://www.ernestdelgado.com/archive/canvas/).
@@ -114,15 +118,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
-### Staying in touch
-
-Follow [@fabric.js](http://twitter.com/fabricjs) or [@kangax](http://twitter.com/kangax) on twitter. Questions, suggestions — [fabric.js on Google Groups](http://groups.google.com/group/fabricjs).
-
-### TODO
-
-- All methods under fabric.util.* (except misc.js) need unit tests
-- SVG-to-canvas parser needs to support more SVG declarations (e.g. radial gradients are not yet supported)
-- IE<9 buggy with drawing images (images are rendered, but can't be moved/scaled/rotated)
-- Need more performance tests vs. Raphael.js (to be able to determine which one is better at which times; e.g. static vs. dynamic, animation, etc.)
-- Get rid of Cufon, only borrowing its text rendering logic (a lot of code from Cufon is irrelevant to fabric).

@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2011, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.3" };
+var fabric = fabric || { version: "0.3.1" };
 
 /**
  * Wrapper around `console.log` (when available)
@@ -1510,10 +1510,17 @@ fabric.Observable = {
     if (!this.__eventListeners) {
       this.__eventListeners = { };
     }
-    if (!this.__eventListeners[eventName]) {
-      this.__eventListeners[eventName] = [ ];
+    if (arguments.length === 1) {
+      for (var prop in eventName) {
+        this.observe(prop, eventName[prop]);
+      }
     }
-    this.__eventListeners[eventName].push(handler);
+    else {
+      if (!this.__eventListeners[eventName]) {
+        this.__eventListeners[eventName] = [ ];
+      }
+      this.__eventListeners[eventName].push(handler);
+    }
   },
 
   /**

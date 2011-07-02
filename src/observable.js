@@ -9,10 +9,18 @@ fabric.Observable = {
     if (!this.__eventListeners) {
       this.__eventListeners = { };
     }
-    if (!this.__eventListeners[eventName]) {
-      this.__eventListeners[eventName] = [ ];
+    // one object with key/value pairs was passed
+    if (arguments.length === 1) {
+      for (var prop in eventName) {
+        this.observe(prop, eventName[prop]);
+      }
     }
-    this.__eventListeners[eventName].push(handler);
+    else {
+      if (!this.__eventListeners[eventName]) {
+        this.__eventListeners[eventName] = [ ];
+      }
+      this.__eventListeners[eventName].push(handler);
+    }
   },
   
   /**

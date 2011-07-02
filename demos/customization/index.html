@@ -97,23 +97,25 @@
         canvas10.item(0).borderColor = 'rgba(0,0,0,0)';
         canvas10.item(0).cornerColor = 'rgba(0,0,0,0)';
         
-        canvas10.observe('mouse:down', function(e) {
-          if (e.memo.target) {
+        canvas10.observe({
+          'mouse:down': function(e) {
+            if (e.memo.target) {
+              e.memo.target.opacity = 0.5;
+              canvas10.renderAll();
+            }
+          },
+          'mouse:up': function(e) {
+            if (e.memo.target) {
+              e.memo.target.opacity = 1;
+              canvas10.renderAll();
+            }
+          },
+          'object:moved': function(e) {
             e.memo.target.opacity = 0.5;
-            canvas10.renderAll();
-          }
-        });
-        canvas10.observe('mouse:up', function(e) {
-          if (e.memo.target) {
+          },
+          'object:modified': function(e) {
             e.memo.target.opacity = 1;
-            canvas10.renderAll();
           }
-        });
-        canvas10.observe('object:moved', function(e) {
-          e.memo.target.opacity = 0.5;
-        });
-        canvas10.observe('object:modified', function(e) {
-          e.memo.target.opacity = 1;
         });
         
         var canvas4 = new fabric.Canvas('c4');
