@@ -7431,6 +7431,32 @@ fabric.util.animate = animate;
 
     setGradientFill: function(ctx, options) {
       this.set('fill', fabric.Gradient.forObject(this, ctx, options));
+    },
+
+    animate: function(property, to, options) {
+      var obj = this;
+
+      if (!('from' in options)) {
+        options.from = this.get(property);
+      }
+
+      if (/[+-]/.test(to.charAt(0))) {
+        to = this.get(property) + parseFloat(to);
+      }
+
+      fabric.util.animate({
+        startValue: options.from,
+        endValue: to,
+        duration: options.duration,
+        onChange: function(value) {
+          obj.set(property, value);
+          options.onChange && options.onChange();
+        },
+        onComplete: function() {
+          obj.setCoords();
+          options.onComplete && options.onComplete();
+        }
+      });
     }
   });
 
