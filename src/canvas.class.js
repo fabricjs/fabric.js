@@ -511,7 +511,6 @@
             target = transform.target;
             
         if (target._scaling) {
-          this.fire('object:scaled', { target: target });
           target._scaling = false;
         }
         
@@ -536,10 +535,6 @@
       }
       var activeGroup = this.getActiveGroup();
       if (activeGroup) {
-        if (this.stateful && activeGroup.hasStateChanged() && 
-            activeGroup.containsPoint(this.getPointer(e))) {
-          this.fire('group:modified', { target: activeGroup });
-        }
         activeGroup.setObjectsCoords();
         activeGroup.set('isMoving', false);
         this._setCursor('default');
@@ -661,17 +656,14 @@
      * @return {fabric.Canvas} thisArg
      */
     deactivateAllWithDispatch: function () {
-      var activeGroup = this.getActiveGroup();
-      if (activeGroup) {
-        this.fire('before:group:destroyed', {
-          target: activeGroup
-        });
+      var activeObject = this.getActiveGroup() || this.getActiveObject();
+      if (activeObject) {
+        this.fire('before:selection:cleared', { target: activeObject });
       }
       this.deactivateAll();
-      if (activeGroup) {
-        this.fire('after:group:destroyed');
+      if (activeObject) {
+        this.fire('selection:cleared');
       }
-      this.fire('selection:cleared');
       return this;
     },
     
@@ -735,7 +727,7 @@
         else {
           activeGroup.add(target);
         }
-        this.fire('group:selected', { target: activeGroup });
+        this.fire('selection:created', { target: activeGroup });
         activeGroup.setActive(true);
       }
       else {
@@ -928,7 +920,7 @@
         else {
           this._translateObject(x, y);
           
-          this.fire('object:moved', {
+          this.fire('object:moving', {
             target: this._currentTransform.target
           });
         }
@@ -1120,7 +1112,7 @@
         var group = new fabric.Group(group);
         this.setActiveGroup(group);
         group.saveCoords();
-        this.fire('group:selected', { target: group });
+        this.fire('selection:created', { target: group });
       }
       
       this.renderAll();
