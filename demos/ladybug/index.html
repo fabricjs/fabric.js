@@ -39,11 +39,10 @@
       <canvas id="c" width="800" height="400"></canvas>
 
 <script id="main">
-  var canvas = new fabric.Canvas('c');
+  var canvas = new fabric.Canvas('c', { selection: false });
 
   setInterval(function() {
     fabric.Image.fromURL('ladybug.png', function(img) {
-      img.selectable = false;
       img.set('left', fabric.util.getRandomInt(200, 600)).set('top', -50);
       img.movingLeft = !!Math.round(Math.random());
       canvas.add(img);

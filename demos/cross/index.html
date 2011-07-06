@@ -67,17 +67,20 @@
     }
   });
 
-  canvas.add(new Cross({ top: 100, left: 100 }));
-  canvas.add(new Cross({ top: 140, left: 230 }));
-  canvas.add(new Cross({ top: 300, left: 210 }));
-  canvas.add(new Cross({ top: 40, left: 400 }));
-  canvas.add(new Cross({ top: 450, left: 400 }));
+  canvas.add(
+    new Cross({ top: 100, left: 100 }),
+    new Cross({ top: 140, left: 230 }),
+    new Cross({ top: 300, left: 210 }),
+    new Cross({ top: 40, left: 400 }),
+    new Cross({ top: 450, left: 400 })
+  );
 
   setTimeout(function animate() {
     canvas.forEachObject(function(obj){ obj.animateWidthHeight() });
     canvas.renderAll();
     setTimeout(animate, 10);
   }, 10);
+  
 </script>
 
       <script>

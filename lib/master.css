@@ -8,3 +8,5 @@ body { font-family: Garamond, "Hoefler Text", "Times New Roman", Times, serif; m
 #header li a:hover, #header li a:focus { text-decoration: underline; }
 
 #bd-wrapper { padding: 10px; }
+
+pre { margin-top: 0; font-size: 12px; vertical-align: top; }
