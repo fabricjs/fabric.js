@@ -1,6 +1,6 @@
 #bd-wrapper { overflow: hidden; position: relative; }
 #fps { position: absolute; left: 1px; top: 0; background: rgb(200,200,200); width: 70px; z-index: 1000; }
-#commands { float: left; font-size: 14px; margin-left: 10px; }
+#commands { float: left; font-size: 14px; margin-left: 15px; margin-top: -80px }
 #commands ul { list-style: none; padding-left: 0; }
 #canvas-console { display: block; font-size: 11px; }
 #rasterize { margin-top: 10px; color: green; }
@@ -25,7 +25,8 @@
 #drawing-mode { color: blue; }
 #drawing-mode.is-drawing { color: red; }
 
-.svg-shapes { overflow: hidden; width: 320px; }
+.svg-shapes { overflow: hidden; width: 450px; }
 .svg-shapes li { display: inline; }
+.object-controls { width: 450px }
 
 button.selected { font-weight: bold; vertical-align: top }

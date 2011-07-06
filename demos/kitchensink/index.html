@@ -89,14 +89,19 @@
           <li><button class="shape" id="shape17"><strong>87</strong> paths</button></li>
           <li><button class="shape" id="shape2"><strong>90</strong> paths</button></li>
           <li><button class="shape" id="shape69">HTML5 logo (<strong>96</strong> paths)</button></li>
+          <li><button class="shape" id="shape115"><strong>124</strong> paths</button></li>
           <li><button class="shape" id="shape47"><strong>133</strong> paths</button></li>
           <li><button class="shape" id="shape51"><strong>141</strong> paths</button></li>
+          <li><button class="shape" id="shape109"><strong>153</strong> paths</button></li>
           <li><button class="shape" id="shape50"><strong>167</strong> paths</button></li>
           <li><button class="shape" id="shape99"><strong>174</strong> paths</button></li>
+          <li><button class="shape" id="shape112"><strong>183</strong> paths</button></li>
           <li><button class="shape" id="shape63"><strong>202</strong> paths</button></li>
           <li><button class="shape" id="shape64"><strong>224</strong> paths</button></li>
           <li><button class="shape" id="shape14"><strong>226</strong> paths</button></li>
+          <li><button class="shape" id="shape108"><strong>236</strong> paths</button></li>
           <li><button class="shape" id="shape62"><strong>237</strong> paths</button></li>
+          <li><button class="shape" id="shape113"><strong>278</strong> paths</button></li>
           <li><button class="shape" id="shape98"><strong>280</strong> paths</button></li>
           <li><button class="shape" id="shape57"><strong>321</strong> paths</button></li>
           <li><button class="shape" id="shape90"><strong>363</strong> paths</button></li>
@@ -114,11 +119,14 @@
           <li><button class="shape" id="shape101"><strong>832</strong> paths</button></li>
           <li><button class="shape" id="shape102"><strong>850</strong> paths</button></li>
           <li><button class="shape" id="shape43"><strong>936</strong> paths</button></li>
+          <li><button class="shape" id="shape110"><strong>1004</strong> paths</button></li>
           <li><button class="shape" id="shape7"><strong>1018</strong> paths</button></li>
           <li><button class="shape" id="shape95"><strong>1066</strong> paths</button></li>
           <li><button class="shape" id="shape97"><strong>1126</strong> paths</button></li>
+          <li><button class="shape" id="shape116"><strong>1196</strong> paths</button></li>
           <li><button class="shape" id="shape3"><strong>1197</strong> paths</button></li>
           <li><button class="shape" id="shape26"><strong>1215</strong> paths</button></li>
+          <li><button class="shape" id="shape114"><strong>1269</strong> paths</button></li>
           <li><button class="shape" id="shape77"><strong>1424</strong> paths</button></li>
           <li><button class="shape" id="shape32"><strong>1515</strong> paths</button></li>
           <li><button class="shape" id="shape13"><strong>1652</strong> paths</button></li>
@@ -151,17 +159,6 @@
           <li><button class="shape" id="shape72"><strong>29303</strong> paths</button></li>
           <li><button class="shape" id="shape48"><strong>41787</strong> paths</button></li>
           
-          <br><br>
-          
-          <li><button class="shape" id="shape108"><strong>236</strong> paths</button></li>
-          <li><button class="shape" id="shape109"><strong>153</strong> paths</button></li>
-          <li><button class="shape" id="shape110"><strong>1004</strong> paths</button></li>
-          <li><button class="shape" id="shape112"><strong>183</strong> paths</button></li>
-          <li><button class="shape" id="shape113"><strong>278</strong> paths</button></li>
-          <li><button class="shape" id="shape114"><strong>1269</strong> paths</button></li>
-          <li><button class="shape" id="shape115"><strong>124</strong> paths</button></li>
-          <li><button class="shape" id="shape116"><strong>1196</strong> paths</button></li>
-          
           <!-- <li><button class="shape" id="shape111"><strong>18229</strong> paths</button></li> -->
           
           <br><br>
@@ -178,25 +175,19 @@
           <!-- <li><button class="shape" id="shape103"><strong>xxx</strong> paths</button></li> -->
         </ul>
         
-        <ul>
-          <li><button id="rasterize">Rasterize canvas to image</button></li>
-
-          <li><button class="clear">Clear canvas</button></li>
-          <li><button id="remove-selected">Remove selected object/group</button></li>
+        <ul class="object-controls">
+          <li>
+            <button id="rasterize">Rasterize canvas to image</button>
+            <button class="clear">Clear canvas</button>
+          </li>
+          
+          <li style="margin-top:10px;"><button id="remove-selected">Remove selected object/group</button></li>
         
           <li style="margin-top:10px;">
             <button id="lock-horizontally">Lock horizontal movement</button>
-          </li>
-          <li>
             <button id="lock-vertically">Lock vertical movement</button>
-          </li>
-          <li>
             <button id="lock-scaling-x">Lock horizontal scaling</button>
-          </li>
-          <li>
             <button id="lock-scaling-y">Lock vertical scaling</button>
-          </li>
-          <li>
             <button id="lock-rotation">Lock rotation</button>
           </li>
           
@@ -216,7 +207,7 @@
         
           <li style="margin-top:10px;">
             <label for="canvas-console">Execute code:</label>
-  <textarea rows="17" cols="45" id="canvas-console">
+  <textarea rows="15" cols="55" id="canvas-console">
   /*
   // clear canvas
   canvas.clear();

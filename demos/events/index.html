@@ -23,9 +23,13 @@
     <div id="bd-wrapper">
 
       <h2><span>Fabric.js demos</span> &middot; Event inspector</h2>
-
+      
       <canvas id="c1" width="200" height="200"></canvas>
       <canvas id="c2" width="200" height="200"></canvas>
+      
+      <div id="observing-events-log" style="position:absolute;top:110px;left:450px;">
+        <strong style="margin-bottom:10px;display:block">Observing these events:</strong>
+      </div>
       
       <div>
         <div id="log1">&nbsp;</div>
@@ -50,8 +54,15 @@
           var containerEl = (where === 1 ? log1 : log2);
           containerEl.insertBefore(el, containerEl.firstChild);
         }
+        function logObservingEvent(eventName) {
+          var el = document.getElementById('observing-events-log');
+          var para = document.createElement('p');
+          para.appendChild(document.createTextNode(eventName));
+          el.appendChild(para);
+        }
   
         function observe(eventName) {
+          logObservingEvent(eventName);
           canvas1.observe(eventName, function(){ log(eventName, 1) });
           canvas2.observe(eventName, function(){ log(eventName, 2) });
         }
