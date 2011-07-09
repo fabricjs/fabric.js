@@ -47,12 +47,6 @@
     
     /**
      * @constant
-     * @type String
-     */
-    FX_TRANSITION:              'decel',
-    
-    /**
-     * @constant
      * @type Number
      */
     MIN_SCALE_LIMIT:            0.1,

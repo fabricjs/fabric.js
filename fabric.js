@@ -42,6 +42,7 @@ if (typeof console !== 'undefined') {
 //= require "src/color.class"
 
 //= require "src/canvas.class"
+//= require "src/canvas.fx"
 
 //= require "src/object.class"
 //= require "src/line.class"
