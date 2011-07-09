@@ -2,6 +2,18 @@
 
 (function(global) {
   
+  var commandLengths = {
+    m: 2,
+    l: 2,
+    h: 1,
+    v: 1,
+    c: 6,
+    s: 4,
+    q: 4,
+    t: 2,
+    a: 7
+  };
+  
   function drawArc(ctx, x, y, coords) {
     var rx = coords[0];
     var ry = coords[1];
@@ -530,20 +542,30 @@
           currentPath, 
           chunks,
           parsed;
-      
-      // use plain loop for performance reasons. 
-      // this chunk of code can be called thousands of times per second (when parsing large shapes)
+
       for (var i = 0, j, chunksParsed, len = this.path.length; i < len; i++) {
         currentPath = this.path[i];
         chunks = currentPath.slice(1).trim().replace(/(\d)-/g, '$1###-').split(/\s|,|###/);
         chunksParsed = [ currentPath.charAt(0) ];
+
         for (var j = 0, jlen = chunks.length; j < jlen; j++) {
           parsed = parseFloat(chunks[j]);
           if (!isNaN(parsed)) {
             chunksParsed.push(parsed);
           }
         }
-        result.push(chunksParsed);
+
+        var command = chunksParsed[0].toLowerCase(),
+            commandLength = commandLengths[command];
+            
+        if (chunksParsed.length - 1 > commandLength) {
+          for (var k = 1, klen = chunksParsed.length; k < klen; k += commandLength) {
+            result.push([command].concat(chunksParsed.slice(k, k + commandLength)));
+          }
+        }
+        else {
+          result.push(chunksParsed);
+        }
       }
       
       return result;

@@ -126,4 +126,20 @@
       path.get('transformMatrix')
     );
   });
+  
+  test('multiple sequences in path commands', function() {
+    var el = getPathElement('M100 100 l 200 200 300 300 400 -50 z');
+    var obj = fabric.Path.fromElement(el);
+    
+    same(['M', 100, 100], obj.path[0]);
+    same(['l', 200, 200], obj.path[1]);
+    same(['l', 300, 300], obj.path[2]);
+    same(['l', 400, -50], obj.path[3]);
+    
+    el = getPathElement('c 0,-53.25604 43.17254,-96.42858 96.42857,-96.42857 53.25603,0 96.42857,43.17254 96.42857,96.42857');
+    obj = fabric.Path.fromElement(el);
+    
+    same(['c', 0, -53.25604, 43.17254, -96.42858, 96.42857, -96.42857], obj.path[0]);
+    same(['c', 53.25603, 0, 96.42857, 43.17254, 96.42857, 96.42857], obj.path[1]);
+  });
 })();
