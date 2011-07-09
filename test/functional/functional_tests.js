@@ -113,11 +113,10 @@ window.onload = function() {
   var benchmarks = window.__benchmarks = [];
   var imgEls = document.getElementsByTagName('img');
   
-  fabric.base.toArray(imgEls).forEach(function(imgElement, i) {
-    if (typeof Ajax == 'undefined') return;
-    new Ajax.Request('W3C_SVG_12_TinyTestSuite_beta/svg/' + imgElement.alt + '.svg', {
-      method: 'get',
-      onSuccess: function(r) {
+  fabric.util.toArray(imgEls).forEach(function(imgElement, i) {
+    fabric.util.request('../W3C_SVG_12_TinyTestSuite_beta/svg/' + imgElement.alt + '.svg', {
+      method: 'GET',
+      onComplete: function(r) {
         if (!r) return;
         if (!r.responseXML) return;
         var doc = r.responseXML.documentElement;
@@ -130,22 +129,21 @@ window.onload = function() {
             width: imgElement.width,
             height: imgElement.height
           };
-          var canvasElement = fabric.base.makeElement('canvas', dimensions);
-          fabric.base.setStyle(canvasElement, {
+          var canvasElement = fabric.util.makeElement('canvas', dimensions);
+          fabric.util.setStyle(canvasElement, {
             width: dimensions.width + 'px',
             height: dimensions.height + 'px'
           });
-          imgElement.insert({
-            after: canvasElement
-          });
+          imgElement.parentNode.insertBefore(canvasElement, imgElement.nextSibling);
+          
           var oCanvas = window.__canvas = new fabric.Canvas(canvasElement);
-          elements.forEach(function(o) {
-            ofabric.add(o);
-          })
+          var group = new fabric.PathGroup(elements);
+          
+          oCanvas.add(group);
         });
         
         benchmarks.push(new Date() - startTime);
       }
-    })
+    });
   });
 };
