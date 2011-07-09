@@ -128,9 +128,7 @@
       while (i--) {
         prop = this.stateProperties[i];
         if (prop in options) {
-          (prop === 'angle')
-            ? this.setAngle(options[prop])
-            : (this[prop] = options[prop]);
+          this.set(prop, options[prop]);
         }
       }
     },
@@ -334,6 +332,12 @@
         ctx.fillStyle = this.fill;
       }
       
+      if (this.group) {
+        ctx.translate(
+          -this.group.width / 2 + this.width / 2, 
+          -this.group.height / 2 + this.height / 2
+        );
+      }
       this._render(ctx, noTransform);
       
       if (this.active && !noTransform) {

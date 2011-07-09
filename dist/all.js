@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2011, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.4" };
+var fabric = fabric || { version: "0.4.1" };
 
 /**
  * Wrapper around `console.log` (when available)
@@ -6366,9 +6366,7 @@ fabric.util.getElementOffset = getElementOffset;
       while (i--) {
         prop = this.stateProperties[i];
         if (prop in options) {
-          (prop === 'angle')
-            ? this.setAngle(options[prop])
-            : (this[prop] = options[prop]);
+          this.set(prop, options[prop]);
         }
       }
     },
@@ -6570,6 +6568,12 @@ fabric.util.getElementOffset = getElementOffset;
         ctx.fillStyle = this.fill;
       }
 
+      if (this.group) {
+        ctx.translate(
+          -this.group.width / 2 + this.width / 2,
+          -this.group.height / 2 + this.height / 2
+        );
+      }
       this._render(ctx, noTransform);
 
       if (this.active && !noTransform) {
@@ -8058,6 +8062,10 @@ fabric.util.getElementOffset = getElementOffset;
       ctx.beginPath();
       ctx.globalAlpha *= this.opacity;
 
+      if (this.group) {
+        ctx.translate(this.x, this.y);
+      }
+
       ctx.moveTo(x+rx, y);
       ctx.lineTo(x+w-rx, y);
       ctx.bezierCurveTo(x+w, y, x+w, y+ry, x+w, y+ry);
@@ -8081,9 +8089,11 @@ fabric.util.getElementOffset = getElementOffset;
       if (parsedAttributes.left) {
         this.set('left', parsedAttributes.left + this.getWidth() / 2);
       }
+      this.set('x', parsedAttributes.left || 0);
       if (parsedAttributes.top) {
         this.set('top', parsedAttributes.top + this.getHeight() / 2);
       }
+      this.set('y', parsedAttributes.top || 0);
       return this;
     },
 
@@ -9103,11 +9113,13 @@ fabric.util.getElementOffset = getElementOffset;
     initialize: function(paths, options) {
 
       options = options || { };
-
       this.paths = paths;
 
-      this.setOptions(options);
+      for (var i = this.paths.length; i--; ) {
+        this.paths[i].group = this;
+      }
 
+      this.setOptions(options);
       this.setCoords();
 
       if (options.sourcePath) {
@@ -9987,7 +9999,7 @@ fabric.util.getElementOffset = getElementOffset;
      */
     set: function(name, value) {
       this[name] = value;
-      if (name === 'fontfamily') {
+      if (name === 'fontfamily' && this.path) {
         this.path = this.path.replace(/(.*?)([^\/]*)(\.font\.js)/, '$1' + value + '$3');
       }
       return this;

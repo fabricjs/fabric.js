@@ -259,7 +259,7 @@
      */
     set: function(name, value) {
       this[name] = value;
-      if (name === 'fontfamily') {
+      if (name === 'fontfamily' && this.path) {
         this.path = this.path.replace(/(.*?)([^\/]*)(\.font\.js)/, '$1' + value + '$3');
       }
       return this;

@@ -83,6 +83,10 @@
       ctx.beginPath();
       ctx.globalAlpha *= this.opacity;
       
+      if (this.group) {
+        ctx.translate(this.x, this.y);
+      }
+      
       ctx.moveTo(x+rx, y);
       ctx.lineTo(x+w-rx, y);
       ctx.bezierCurveTo(x+w, y, x+w, y+ry, x+w, y+ry);
@@ -107,9 +111,11 @@
       if (parsedAttributes.left) {
         this.set('left', parsedAttributes.left + this.getWidth() / 2);
       }
+      this.set('x', parsedAttributes.left || 0);
       if (parsedAttributes.top) {
         this.set('top', parsedAttributes.top + this.getHeight() / 2);
       }
+      this.set('y', parsedAttributes.top || 0);
       return this;
     },
     

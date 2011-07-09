@@ -45,12 +45,13 @@
     initialize: function(paths, options) {
       
       options = options || { };
-      
       this.paths = paths;
       
-      this.setOptions(options);
-      //this._initProperties();
+      for (var i = this.paths.length; i--; ) {
+        this.paths[i].group = this;
+      }
       
+      this.setOptions(options);
       this.setCoords();
       
       if (options.sourcePath) {
