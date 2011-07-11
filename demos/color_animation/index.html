@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Polaroid photos</title>
+    <script src="../../dist/all.js"></script>
+    <style>
+      .canvas-container { border: 1px solid #ccc; display: inline-block; vertical-align: top; }
+      h2 span { font-weight: normal; }
+      pre { background: #eef; display: inline-block; padding-right: 15px; margin-left: 15px }
+    </style>
+    <link rel="stylesheet" href="../../lib/master.css" type="text/css">
+  </head>
+  <body>
+    <ul id="header">
+      <li><a href="../index.html">Demos</a></li>
+      <li><a href="../../benchmarks/index.html">Benchmarks</a></li>
+      <li><a href="../../docs/index.html">Docs</a></li>
+      <li><a href="../../test/unit/suite_runner.html">Tests</a></li>
+    </ul>
+    <div id="bd-wrapper">
+
+      <h2><span>Fabric.js demos</span> &middot; Color animation</h2>
+
+      <canvas id="c" width="600" height="500"></canvas>
+
+<script>
+  var getRandomInt = fabric.util.getRandomInt;
+  function pad(s) {
+    return s.length === 1 ? ('0' + s) : s;
+  }
+  function getRandomColor() {
+    return pad(getRandomInt(0, 255).toString(16)) + 
+           pad(getRandomInt(0, 255).toString(16)) + 
+           pad(getRandomInt(0, 255).toString(16));
+  }
+</script>
+<script id="main">
+  var canvas = new fabric.Canvas('c');
+  
+  canvas.loadSVGFromURL('../kitchensink/assets/135.svg', function(objects) {
+    
+    var obj = objects[0].scale(0.75).setAngle(-15);
+    canvas.centerObjectH(obj).centerObjectV(obj);
+    canvas.add(obj);
+    
+    setInterval(function() {
+      obj.set('fill', getRandomColor());
+      canvas.renderAll();
+    }, 500);
+  });
+    
+</script>
+
+      <script>
+        (function(){
+          var preEl = document.createElement('pre');
+          preEl.innerHTML = document.getElementById('main').innerHTML;
+          document.getElementById('bd-wrapper').appendChild(preEl);
+        })();
+      </script>
+    </div>
+  </body>
+</html>
