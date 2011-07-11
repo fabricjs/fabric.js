@@ -404,20 +404,21 @@
   
   var text = 'Lorem ipsum dolor sit amet,\nconsectetur adipisicing elit,\nsed do eiusmod tempor incididunt\nut labore et dolore magna aliqua.\n' +
     'Ut enim ad minim veniam,\nquis nostrud exercitation ullamco\nlaboris nisi ut aliquip ex ea commodo consequat.';
-    
-  var textSample = new fabric.Text(text, { 
-    left: getRandomInt(300, 550), 
-    top: getRandomInt(500, 550),
-    fontfamily: 'delicious_500',
-    angle: getRandomInt(-10, 10),
-    fill: '#' + getRandomColor(),
-    scaleX: 0.5,
-    scaleY: 0.5
-  });
   
-  canvas.add(textSample);
+  document.getElementById('add-text').onclick = function() {
+    var textSample = new fabric.Text(text.slice(0, getRandomInt(0, text.length)), { 
+      left: getRandomInt(300, 550), 
+      top: getRandomInt(500, 550),
+      fontfamily: 'delicious_500',
+      angle: getRandomInt(-10, 10),
+      fill: '#' + getRandomColor(),
+      scaleX: 0.5,
+      scaleY: 0.5
+    });
+    canvas.add(textSample);
+    updateComplexity();
+  };
   
-  updateComplexity();
   
   document.onkeydown = function(e) {
     var obj = canvas.getActiveObject() || canvas.getActiveGroup();
@@ -486,6 +487,9 @@
   }
   
   var cmdUnderlineBtn = document.getElementById('text-cmd-underline');
+  activeObjectButtons.push(cmdUnderlineBtn);
+  cmdUnderlineBtn.disabled = true;
+  
   if (cmdUnderlineBtn) {
     cmdUnderlineBtn.onclick = function() {
       var activeObject = canvas.getActiveObject();
@@ -498,6 +502,9 @@
   }
   
   var cmdLinethroughBtn = document.getElementById('text-cmd-linethrough');
+  activeObjectButtons.push(cmdLinethroughBtn);
+  cmdLinethroughBtn.disabled = true;
+  
   if (cmdLinethroughBtn) {
     cmdLinethroughBtn.onclick = function() {
       var activeObject = canvas.getActiveObject();
@@ -510,6 +517,9 @@
   }
   
   var cmdOverlineBtn = document.getElementById('text-cmd-overline');
+  activeObjectButtons.push(cmdOverlineBtn);
+  cmdOverlineBtn.disabled = true;
+  
   if (cmdOverlineBtn) {
     cmdOverlineBtn.onclick = function() {
       var activeObject = canvas.getActiveObject();
@@ -522,6 +532,9 @@
   }
   
   var cmdItalicBtn = document.getElementById('text-cmd-italic');
+  activeObjectButtons.push(cmdItalicBtn);
+  cmdItalicBtn.disabled = true;
+  
   if (cmdItalicBtn) {
     cmdItalicBtn.onclick = function() {
       var activeObject = canvas.getActiveObject();
@@ -534,6 +547,9 @@
   }
   
   var cmdShadowBtn = document.getElementById('text-cmd-shadow');
+  activeObjectButtons.push(cmdShadowBtn);
+  cmdShadowBtn.disabled = true;
+  
   if (cmdShadowBtn) {
     cmdShadowBtn.onclick = function() {
       var activeObject = canvas.getActiveObject();
