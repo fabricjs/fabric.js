@@ -719,7 +719,7 @@
           target.setActive(false);
           if (activeGroup.size() === 1) {
             // remove group alltogether if after removal it only contains 1 object
-            this.removeActiveGroup();
+            this.discardActiveGroup();
           }
         }
         else {
@@ -756,7 +756,7 @@
       
       this._isCurrentlyDrawing = true;
       
-      this.removeActiveObject().renderAll();
+      this.discardActiveObject().renderAll();
       
       var pointer = this.getPointer(e);
       
@@ -1880,7 +1880,7 @@
     remove: function (object) {
       removeFromArray(this._objects, object);
       if (this.getActiveObject() === object) {
-        this.removeActiveObject();
+        this.discardActiveObject();
       }
       this.renderAll();
       return object;
@@ -1998,12 +1998,12 @@
     },
     
     /**
-     * Removes currently active object
-     * @method removeActiveObject
+     * Discards currently active object
+     * @method discardActiveObject
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
-    removeActiveObject: function () {
+    discardActiveObject: function () {
       if (this._activeObject) {
         this._activeObject.setActive(false);
       }
@@ -2034,10 +2034,10 @@
     
     /**
      * Removes currently active group
-     * @method removeActiveGroup
+     * @method discardActiveGroup
      * @return {fabric.Canvas} thisArg
      */
-    removeActiveGroup: function () {
+    discardActiveGroup: function () {
       var g = this.getActiveGroup();
       if (g) {
         g.destroy();
@@ -2067,8 +2067,8 @@
       for ( ; i < len; i++) {
         allObjects[i].setActive(false);
       }
-      this.removeActiveGroup();
-      this.removeActiveObject();
+      this.discardActiveGroup();
+      this.discardActiveObject();
       return this;
     },
     

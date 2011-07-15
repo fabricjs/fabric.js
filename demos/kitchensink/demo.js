@@ -183,7 +183,7 @@
     }
     else if (activeGroup) {
       var objectsInGroup = activeGroup.getObjects();
-      canvas.removeActiveGroup();
+      canvas.discardActiveGroup();
       objectsInGroup.forEach(function(object) {
         canvas.remove(object);
       });
@@ -426,7 +426,7 @@
       // this is horrible. need to fix, so that unified interface can be used
       if (obj.type === 'group') {
         // var groupObjects = obj.getObjects();
-        //         canvas.removeActiveGroup();
+        //         canvas.discardActiveGroup();
         //         groupObjects.forEach(function(obj) {
         //           canvas.remove(obj);
         //         });
@@ -476,7 +476,7 @@
       var activeObject = canvas.getActiveObject();
       if (activeObject) {
         if (!this.value) {
-          canvas.removeActiveObject();
+          canvas.discardActiveObject();
         }
         else {
           activeObject.text = this.value;

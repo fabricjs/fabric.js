@@ -489,11 +489,11 @@
     equals(canvas.item(0), rect2);
   });
   
-  test('removeActiveGroup', function() {
-    ok(typeof canvas.removeActiveGroup == 'function');
+  test('discardActiveGroup', function() {
+    ok(typeof canvas.discardActiveGroup == 'function');
     var group = new fabric.Group([makeRect(), makeRect()]);
     canvas.setActiveGroup(group);
-    equals(canvas.removeActiveGroup(), canvas, 'chainable');
+    equals(canvas.discardActiveGroup(), canvas, 'chainable');
     equals(canvas.getActiveGroup(), null, 'removing active group sets it to null');
   });
   
