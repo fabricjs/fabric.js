@@ -41,19 +41,19 @@ Fabric.js started as a foundation for design editor on [printio.ru](http://print
 
         $ gem install --remote sprockets
 
-2. Build distribution file
+2. Build distribution file  **[~80K minified, ~24K gzipped]**
 
         $ sprocketize fabric.js > dist/all.js
 
-    - Build distribution with support for text (`fabric.Text`)
+    - Build distribution with support for text (`fabric.Text`) **[~99K minified, 30K gzipped]**
         
             $ sprocketize fabric+text.js > dist/all.js
         
-    - Build distribution with support for serialization (`loadFromJSON`, `clone`, etc.)
+    - Build distribution with support for serialization (`loadFromJSON`, `clone`, etc.) **[~86K minified, 26K gzipped]**
         
             $ sprocketize fabric+serialization.js > dist/all.js
     
-    - Build distribution with support for text AND serialization
+    - Build distribution with support for text AND serialization **[~105K minified, 32K gzipped]**
 
             $ sprocketize fabric+text+serialization.js > dist/all.js
 
