@@ -1,5 +1,7 @@
 //= require "HEADER"
 
+//= require "lib/cufon"
+
 //= require "src/log"
 //= require "src/util"
 //= require "src/parser"
@@ -22,4 +24,5 @@
 //= require "src/path.class"
 //= require "src/path_group.class"
 //= require "src/group.class"
+//= require "src/text.class"
 //= require "src/image.class"

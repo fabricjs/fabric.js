@@ -1,5 +1,8 @@
 //= require "HEADER"
 
+//= require "lib/cufon"
+//= require "lib/json2"
+
 //= require "src/log"
 //= require "src/util"
 //= require "src/parser"
@@ -10,6 +13,7 @@
 
 //= require "src/canvas.class"
 //= require "src/canvas.fx"
+//= require "src/canvas.serialization"
 
 //= require "src/object.class"
 //= require "src/line.class"
@@ -22,4 +26,5 @@
 //= require "src/path.class"
 //= require "src/path_group.class"
 //= require "src/group.class"
+//= require "src/text.class"
 //= require "src/image.class"

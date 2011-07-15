@@ -2,440 +2,6 @@
 
 var fabric = fabric || { version: "0.4.2" };
 
-/**
- * Wrapper around `console.log` (when available)
- * @method log
- * @param {Any} Values to log
- */
-fabric.log = function() { };
-
-/**
- * Wrapper around `console.warn` (when available)
- * @method warn
- * @param {Any} Values to log as a warning
- */
-fabric.warn = function() { };
-
-if (typeof console !== 'undefined') {
-  if (typeof console.log !== 'undefined' && console.log.apply) {
-    fabric.log = function() {
-      return console.log.apply(console, arguments);
-    };
-  }
-  if (typeof console.warn !== 'undefined' && console.warn.apply) {
-    fabric.warn = function() {
-      return console.warn.apply(console, arguments);
-    };
-  }
-}
-
-/*
-    http://www.JSON.org/json2.js
-    2010-03-20
-
-    Public Domain.
-
-    NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK.
-
-    See http://www.JSON.org/js.html
-
-
-    This code should be minified before deployment.
-    See http://javascript.crockford.com/jsmin.html
-
-    USE YOUR OWN COPY. IT IS EXTREMELY UNWISE TO LOAD CODE FROM SERVERS YOU DO
-    NOT CONTROL.
-
-
-    This file creates a global JSON object containing two methods: stringify
-    and parse.
-
-        JSON.stringify(value, replacer, space)
-            value       any JavaScript value, usually an object or array.
-
-            replacer    an optional parameter that determines how object
-                        values are stringified for objects. It can be a
-                        function or an array of strings.
-
-            space       an optional parameter that specifies the indentation
-                        of nested structures. If it is omitted, the text will
-                        be packed without extra whitespace. If it is a number,
-                        it will specify the number of spaces to indent at each
-                        level. If it is a string (such as '\t' or '&nbsp;'),
-                        it contains the characters used to indent at each level.
-
-            This method produces a JSON text from a JavaScript value.
-
-            When an object value is found, if the object contains a toJSON
-            method, its toJSON method will be called and the result will be
-            stringified. A toJSON method does not serialize: it returns the
-            value represented by the name/value pair that should be serialized,
-            or undefined if nothing should be serialized. The toJSON method
-            will be passed the key associated with the value, and this will be
-            bound to the value
-
-            For example, this would serialize Dates as ISO strings.
-
-                Date.prototype.toJSON = function (key) {
-                    function f(n) {
-                        return n < 10 ? '0' + n : n;
-                    }
-
-                    return this.getUTCFullYear()   + '-' +
-                         f(this.getUTCMonth() + 1) + '-' +
-                         f(this.getUTCDate())      + 'T' +
-                         f(this.getUTCHours())     + ':' +
-                         f(this.getUTCMinutes())   + ':' +
-                         f(this.getUTCSeconds())   + 'Z';
-                };
-
-            You can provide an optional replacer method. It will be passed the
-            key and value of each member, with this bound to the containing
-            object. The value that is returned from your method will be
-            serialized. If your method returns undefined, then the member will
-            be excluded from the serialization.
-
-            If the replacer parameter is an array of strings, then it will be
-            used to select the members to be serialized. It filters the results
-            such that only members with keys listed in the replacer array are
-            stringified.
-
-            Values that do not have JSON representations, such as undefined or
-            functions, will not be serialized. Such values in objects will be
-            dropped; in arrays they will be replaced with null. You can use
-            a replacer function to replace those with JSON values.
-            JSON.stringify(undefined) returns undefined.
-
-            The optional space parameter produces a stringification of the
-            value that is filled with line breaks and indentation to make it
-            easier to read.
-
-            If the space parameter is a non-empty string, then that string will
-            be used for indentation. If the space parameter is a number, then
-            the indentation will be that many spaces.
-
-            Example:
-
-            text = JSON.stringify(['e', {pluribus: 'unum'}]);
-
-
-            text = JSON.stringify(['e', {pluribus: 'unum'}], null, '\t');
-
-            text = JSON.stringify([new Date()], function (key, value) {
-                return this[key] instanceof Date ?
-                    'Date(' + this[key] + ')' : value;
-            });
-
-
-        JSON.parse(text, reviver)
-            This method parses a JSON text to produce an object or array.
-            It can throw a SyntaxError exception.
-
-            The optional reviver parameter is a function that can filter and
-            transform the results. It receives each of the keys and values,
-            and its return value is used instead of the original value.
-            If it returns what it received, then the structure is not modified.
-            If it returns undefined then the member is deleted.
-
-            Example:
-
-
-            myData = JSON.parse(text, function (key, value) {
-                var a;
-                if (typeof value === 'string') {
-                    a =
-/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*)?)Z$/.exec(value);
-                    if (a) {
-                        return new Date(Date.UTC(+a[1], +a[2] - 1, +a[3], +a[4],
-                            +a[5], +a[6]));
-                    }
-                }
-                return value;
-            });
-
-            myData = JSON.parse('["Date(09/09/2001)"]', function (key, value) {
-                var d;
-                if (typeof value === 'string' &&
-                        value.slice(0, 5) === 'Date(' &&
-                        value.slice(-1) === ')') {
-                    d = new Date(value.slice(5, -1));
-                    if (d) {
-                        return d;
-                    }
-                }
-                return value;
-            });
-
-
-    This is a reference implementation. You are free to copy, modify, or
-    redistribute.
-*/
-
-/*jslint evil: true, strict: false */
-
-/*members "", "\b", "\t", "\n", "\f", "\r", "\"", JSON, "\\", apply,
-    call, charCodeAt, getUTCDate, getUTCFullYear, getUTCHours,
-    getUTCMinutes, getUTCMonth, getUTCSeconds, hasOwnProperty, join,
-    lastIndex, length, parse, prototype, push, replace, slice, stringify,
-    test, toJSON, toString, valueOf
-*/
-
-
-
-if (!this.JSON) {
-    this.JSON = {};
-}
-
-(function () {
-
-    function f(n) {
-        return n < 10 ? '0' + n : n;
-    }
-
-    if (typeof Date.prototype.toJSON !== 'function') {
-
-        Date.prototype.toJSON = function (key) {
-
-            return isFinite(this.valueOf()) ?
-                   this.getUTCFullYear()   + '-' +
-                 f(this.getUTCMonth() + 1) + '-' +
-                 f(this.getUTCDate())      + 'T' +
-                 f(this.getUTCHours())     + ':' +
-                 f(this.getUTCMinutes())   + ':' +
-                 f(this.getUTCSeconds())   + 'Z' : null;
-        };
-
-        String.prototype.toJSON =
-        Number.prototype.toJSON =
-        Boolean.prototype.toJSON = function (key) {
-            return this.valueOf();
-        };
-    }
-
-    var cx = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
-        escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
-        gap,
-        indent,
-        meta = {    // table of character substitutions
-            '\b': '\\b',
-            '\t': '\\t',
-            '\n': '\\n',
-            '\f': '\\f',
-            '\r': '\\r',
-            '"' : '\\"',
-            '\\': '\\\\'
-        },
-        rep;
-
-
-    function quote(string) {
-
-
-        escapable.lastIndex = 0;
-        return escapable.test(string) ?
-            '"' + string.replace(escapable, function (a) {
-                var c = meta[a];
-                return typeof c === 'string' ? c :
-                    '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
-            }) + '"' :
-            '"' + string + '"';
-    }
-
-
-    function str(key, holder) {
-
-
-        var i,          // The loop counter.
-            k,          // The member key.
-            v,          // The member value.
-            length,
-            mind = gap,
-            partial,
-            value = holder[key];
-
-
-        if (value && typeof value === 'object' &&
-                typeof value.toJSON === 'function') {
-            value = value.toJSON(key);
-        }
-
-
-        if (typeof rep === 'function') {
-            value = rep.call(holder, key, value);
-        }
-
-
-        switch (typeof value) {
-        case 'string':
-            return quote(value);
-
-        case 'number':
-
-
-            return isFinite(value) ? String(value) : 'null';
-
-        case 'boolean':
-        case 'null':
-
-
-            return String(value);
-
-
-        case 'object':
-
-
-            if (!value) {
-                return 'null';
-            }
-
-
-            gap += indent;
-            partial = [];
-
-
-            if (Object.prototype.toString.apply(value) === '[object Array]') {
-
-
-                length = value.length;
-                for (i = 0; i < length; i += 1) {
-                    partial[i] = str(i, value) || 'null';
-                }
-
-
-                v = partial.length === 0 ? '[]' :
-                    gap ? '[\n' + gap +
-                            partial.join(',\n' + gap) + '\n' +
-                                mind + ']' :
-                          '[' + partial.join(',') + ']';
-                gap = mind;
-                return v;
-            }
-
-
-            if (rep && typeof rep === 'object') {
-                length = rep.length;
-                for (i = 0; i < length; i += 1) {
-                    k = rep[i];
-                    if (typeof k === 'string') {
-                        v = str(k, value);
-                        if (v) {
-                            partial.push(quote(k) + (gap ? ': ' : ':') + v);
-                        }
-                    }
-                }
-            } else {
-
-
-                for (k in value) {
-                    if (Object.hasOwnProperty.call(value, k)) {
-                        v = str(k, value);
-                        if (v) {
-                            partial.push(quote(k) + (gap ? ': ' : ':') + v);
-                        }
-                    }
-                }
-            }
-
-
-            v = partial.length === 0 ? '{}' :
-                gap ? '{\n' + gap + partial.join(',\n' + gap) + '\n' +
-                        mind + '}' : '{' + partial.join(',') + '}';
-            gap = mind;
-            return v;
-        }
-    }
-
-
-    if (typeof JSON.stringify !== 'function') {
-        JSON.stringify = function (value, replacer, space) {
-
-
-            var i;
-            gap = '';
-            indent = '';
-
-
-            if (typeof space === 'number') {
-                for (i = 0; i < space; i += 1) {
-                    indent += ' ';
-                }
-
-
-            } else if (typeof space === 'string') {
-                indent = space;
-            }
-
-
-            rep = replacer;
-            if (replacer && typeof replacer !== 'function' &&
-                    (typeof replacer !== 'object' ||
-                     typeof replacer.length !== 'number')) {
-                throw new Error('JSON.stringify');
-            }
-
-
-            return str('', {'': value});
-        };
-    }
-
-
-
-    if (typeof JSON.parse !== 'function') {
-        JSON.parse = function (text, reviver) {
-
-
-            var j;
-
-            function walk(holder, key) {
-
-
-                var k, v, value = holder[key];
-                if (value && typeof value === 'object') {
-                    for (k in value) {
-                        if (Object.hasOwnProperty.call(value, k)) {
-                            v = walk(value, k);
-                            if (v !== undefined) {
-                                value[k] = v;
-                            } else {
-                                delete value[k];
-                            }
-                        }
-                    }
-                }
-                return reviver.call(holder, key, value);
-            }
-
-
-
-            text = String(text);
-            cx.lastIndex = 0;
-            if (cx.test(text)) {
-                text = text.replace(cx, function (a) {
-                    return '\\u' +
-                        ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
-                });
-            }
-
-
-
-            if (/^[\],:{}\s]*$/.
-test(text.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, '@').
-replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']').
-replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
-
-
-                j = eval('(' + text + ')');
-
-
-                return typeof reviver === 'function' ?
-                    walk({'': j}, '') : j;
-            }
-
-
-            throw new SyntaxError('JSON.parse');
-        };
-    }
-}());
 (function(){
   var view = document.defaultView;
   if (view && view.getComputedStyle) {
@@ -1487,7 +1053,440 @@ Cufon.registerEngine('vml', (function() {
   };
 
 })());
+/*
+    http://www.JSON.org/json2.js
+    2010-03-20
 
+    Public Domain.
+
+    NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK.
+
+    See http://www.JSON.org/js.html
+
+
+    This code should be minified before deployment.
+    See http://javascript.crockford.com/jsmin.html
+
+    USE YOUR OWN COPY. IT IS EXTREMELY UNWISE TO LOAD CODE FROM SERVERS YOU DO
+    NOT CONTROL.
+
+
+    This file creates a global JSON object containing two methods: stringify
+    and parse.
+
+        JSON.stringify(value, replacer, space)
+            value       any JavaScript value, usually an object or array.
+
+            replacer    an optional parameter that determines how object
+                        values are stringified for objects. It can be a
+                        function or an array of strings.
+
+            space       an optional parameter that specifies the indentation
+                        of nested structures. If it is omitted, the text will
+                        be packed without extra whitespace. If it is a number,
+                        it will specify the number of spaces to indent at each
+                        level. If it is a string (such as '\t' or '&nbsp;'),
+                        it contains the characters used to indent at each level.
+
+            This method produces a JSON text from a JavaScript value.
+
+            When an object value is found, if the object contains a toJSON
+            method, its toJSON method will be called and the result will be
+            stringified. A toJSON method does not serialize: it returns the
+            value represented by the name/value pair that should be serialized,
+            or undefined if nothing should be serialized. The toJSON method
+            will be passed the key associated with the value, and this will be
+            bound to the value
+
+            For example, this would serialize Dates as ISO strings.
+
+                Date.prototype.toJSON = function (key) {
+                    function f(n) {
+                        return n < 10 ? '0' + n : n;
+                    }
+
+                    return this.getUTCFullYear()   + '-' +
+                         f(this.getUTCMonth() + 1) + '-' +
+                         f(this.getUTCDate())      + 'T' +
+                         f(this.getUTCHours())     + ':' +
+                         f(this.getUTCMinutes())   + ':' +
+                         f(this.getUTCSeconds())   + 'Z';
+                };
+
+            You can provide an optional replacer method. It will be passed the
+            key and value of each member, with this bound to the containing
+            object. The value that is returned from your method will be
+            serialized. If your method returns undefined, then the member will
+            be excluded from the serialization.
+
+            If the replacer parameter is an array of strings, then it will be
+            used to select the members to be serialized. It filters the results
+            such that only members with keys listed in the replacer array are
+            stringified.
+
+            Values that do not have JSON representations, such as undefined or
+            functions, will not be serialized. Such values in objects will be
+            dropped; in arrays they will be replaced with null. You can use
+            a replacer function to replace those with JSON values.
+            JSON.stringify(undefined) returns undefined.
+
+            The optional space parameter produces a stringification of the
+            value that is filled with line breaks and indentation to make it
+            easier to read.
+
+            If the space parameter is a non-empty string, then that string will
+            be used for indentation. If the space parameter is a number, then
+            the indentation will be that many spaces.
+
+            Example:
+
+            text = JSON.stringify(['e', {pluribus: 'unum'}]);
+
+
+            text = JSON.stringify(['e', {pluribus: 'unum'}], null, '\t');
+
+            text = JSON.stringify([new Date()], function (key, value) {
+                return this[key] instanceof Date ?
+                    'Date(' + this[key] + ')' : value;
+            });
+
+
+        JSON.parse(text, reviver)
+            This method parses a JSON text to produce an object or array.
+            It can throw a SyntaxError exception.
+
+            The optional reviver parameter is a function that can filter and
+            transform the results. It receives each of the keys and values,
+            and its return value is used instead of the original value.
+            If it returns what it received, then the structure is not modified.
+            If it returns undefined then the member is deleted.
+
+            Example:
+
+
+            myData = JSON.parse(text, function (key, value) {
+                var a;
+                if (typeof value === 'string') {
+                    a =
+/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*)?)Z$/.exec(value);
+                    if (a) {
+                        return new Date(Date.UTC(+a[1], +a[2] - 1, +a[3], +a[4],
+                            +a[5], +a[6]));
+                    }
+                }
+                return value;
+            });
+
+            myData = JSON.parse('["Date(09/09/2001)"]', function (key, value) {
+                var d;
+                if (typeof value === 'string' &&
+                        value.slice(0, 5) === 'Date(' &&
+                        value.slice(-1) === ')') {
+                    d = new Date(value.slice(5, -1));
+                    if (d) {
+                        return d;
+                    }
+                }
+                return value;
+            });
+
+
+    This is a reference implementation. You are free to copy, modify, or
+    redistribute.
+*/
+
+/*jslint evil: true, strict: false */
+
+/*members "", "\b", "\t", "\n", "\f", "\r", "\"", JSON, "\\", apply,
+    call, charCodeAt, getUTCDate, getUTCFullYear, getUTCHours,
+    getUTCMinutes, getUTCMonth, getUTCSeconds, hasOwnProperty, join,
+    lastIndex, length, parse, prototype, push, replace, slice, stringify,
+    test, toJSON, toString, valueOf
+*/
+
+
+
+if (!this.JSON) {
+    this.JSON = {};
+}
+
+(function () {
+
+    function f(n) {
+        return n < 10 ? '0' + n : n;
+    }
+
+    if (typeof Date.prototype.toJSON !== 'function') {
+
+        Date.prototype.toJSON = function (key) {
+
+            return isFinite(this.valueOf()) ?
+                   this.getUTCFullYear()   + '-' +
+                 f(this.getUTCMonth() + 1) + '-' +
+                 f(this.getUTCDate())      + 'T' +
+                 f(this.getUTCHours())     + ':' +
+                 f(this.getUTCMinutes())   + ':' +
+                 f(this.getUTCSeconds())   + 'Z' : null;
+        };
+
+        String.prototype.toJSON =
+        Number.prototype.toJSON =
+        Boolean.prototype.toJSON = function (key) {
+            return this.valueOf();
+        };
+    }
+
+    var cx = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
+        escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
+        gap,
+        indent,
+        meta = {    // table of character substitutions
+            '\b': '\\b',
+            '\t': '\\t',
+            '\n': '\\n',
+            '\f': '\\f',
+            '\r': '\\r',
+            '"' : '\\"',
+            '\\': '\\\\'
+        },
+        rep;
+
+
+    function quote(string) {
+
+
+        escapable.lastIndex = 0;
+        return escapable.test(string) ?
+            '"' + string.replace(escapable, function (a) {
+                var c = meta[a];
+                return typeof c === 'string' ? c :
+                    '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
+            }) + '"' :
+            '"' + string + '"';
+    }
+
+
+    function str(key, holder) {
+
+
+        var i,          // The loop counter.
+            k,          // The member key.
+            v,          // The member value.
+            length,
+            mind = gap,
+            partial,
+            value = holder[key];
+
+
+        if (value && typeof value === 'object' &&
+                typeof value.toJSON === 'function') {
+            value = value.toJSON(key);
+        }
+
+
+        if (typeof rep === 'function') {
+            value = rep.call(holder, key, value);
+        }
+
+
+        switch (typeof value) {
+        case 'string':
+            return quote(value);
+
+        case 'number':
+
+
+            return isFinite(value) ? String(value) : 'null';
+
+        case 'boolean':
+        case 'null':
+
+
+            return String(value);
+
+
+        case 'object':
+
+
+            if (!value) {
+                return 'null';
+            }
+
+
+            gap += indent;
+            partial = [];
+
+
+            if (Object.prototype.toString.apply(value) === '[object Array]') {
+
+
+                length = value.length;
+                for (i = 0; i < length; i += 1) {
+                    partial[i] = str(i, value) || 'null';
+                }
+
+
+                v = partial.length === 0 ? '[]' :
+                    gap ? '[\n' + gap +
+                            partial.join(',\n' + gap) + '\n' +
+                                mind + ']' :
+                          '[' + partial.join(',') + ']';
+                gap = mind;
+                return v;
+            }
+
+
+            if (rep && typeof rep === 'object') {
+                length = rep.length;
+                for (i = 0; i < length; i += 1) {
+                    k = rep[i];
+                    if (typeof k === 'string') {
+                        v = str(k, value);
+                        if (v) {
+                            partial.push(quote(k) + (gap ? ': ' : ':') + v);
+                        }
+                    }
+                }
+            } else {
+
+
+                for (k in value) {
+                    if (Object.hasOwnProperty.call(value, k)) {
+                        v = str(k, value);
+                        if (v) {
+                            partial.push(quote(k) + (gap ? ': ' : ':') + v);
+                        }
+                    }
+                }
+            }
+
+
+            v = partial.length === 0 ? '{}' :
+                gap ? '{\n' + gap + partial.join(',\n' + gap) + '\n' +
+                        mind + '}' : '{' + partial.join(',') + '}';
+            gap = mind;
+            return v;
+        }
+    }
+
+
+    if (typeof JSON.stringify !== 'function') {
+        JSON.stringify = function (value, replacer, space) {
+
+
+            var i;
+            gap = '';
+            indent = '';
+
+
+            if (typeof space === 'number') {
+                for (i = 0; i < space; i += 1) {
+                    indent += ' ';
+                }
+
+
+            } else if (typeof space === 'string') {
+                indent = space;
+            }
+
+
+            rep = replacer;
+            if (replacer && typeof replacer !== 'function' &&
+                    (typeof replacer !== 'object' ||
+                     typeof replacer.length !== 'number')) {
+                throw new Error('JSON.stringify');
+            }
+
+
+            return str('', {'': value});
+        };
+    }
+
+
+
+    if (typeof JSON.parse !== 'function') {
+        JSON.parse = function (text, reviver) {
+
+
+            var j;
+
+            function walk(holder, key) {
+
+
+                var k, v, value = holder[key];
+                if (value && typeof value === 'object') {
+                    for (k in value) {
+                        if (Object.hasOwnProperty.call(value, k)) {
+                            v = walk(value, k);
+                            if (v !== undefined) {
+                                value[k] = v;
+                            } else {
+                                delete value[k];
+                            }
+                        }
+                    }
+                }
+                return reviver.call(holder, key, value);
+            }
+
+
+
+            text = String(text);
+            cx.lastIndex = 0;
+            if (cx.test(text)) {
+                text = text.replace(cx, function (a) {
+                    return '\\u' +
+                        ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
+                });
+            }
+
+
+
+            if (/^[\],:{}\s]*$/.
+test(text.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, '@').
+replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']').
+replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
+
+
+                j = eval('(' + text + ')');
+
+
+                return typeof reviver === 'function' ?
+                    walk({'': j}, '') : j;
+            }
+
+
+            throw new SyntaxError('JSON.parse');
+        };
+    }
+}());
+
+/**
+ * Wrapper around `console.log` (when available)
+ * @method log
+ * @param {Any} Values to log
+ */
+fabric.log = function() { };
+
+/**
+ * Wrapper around `console.warn` (when available)
+ * @method warn
+ * @param {Any} Values to log as a warning
+ */
+fabric.warn = function() { };
+
+if (typeof console !== 'undefined') {
+  if (typeof console.log !== 'undefined' && console.log.apply) {
+    fabric.log = function() {
+      return console.log.apply(console, arguments);
+    };
+  }
+  if (typeof console.warn !== 'undefined' && console.warn.apply) {
+    fabric.warn = function() {
+      return console.warn.apply(console, arguments);
+    };
+  }
+}
 (function (global) {
 
   "use strict";
@@ -3244,7 +3243,6 @@ fabric.util.getElementOffset = getElementOffset;
   fabric.getGradientDefs = getGradientDefs;
 
 })();
-
 (function(global) {
 
   "use strict";
@@ -3591,7 +3589,6 @@ fabric.util.getElementOffset = getElementOffset;
   };
 
 })(this);
-
 (function(global) {
 
   "use strict";
@@ -5366,214 +5363,6 @@ fabric.util.getElementOffset = getElementOffset;
     },
 
     /**
-     * Populates canvas with data from the specified JSON
-     * JSON format must conform to the one of `fabric.Canvas#toJSON`
-     * @method loadFromJSON
-     * @param {String} json JSON string
-     * @param {Function} callback Callback, invoked when json is parsed
-     *                            and corresponding objects (e.g: fabric.Image)
-     *                            are initialized
-     * @return {fabric.Canvas} instance
-     * @chainable
-     */
-    loadFromJSON: function (json, callback) {
-      if (!json) return;
-
-      var serialized = JSON.parse(json);
-      if (!serialized || (serialized && !serialized.objects)) return;
-
-      this.clear();
-      var _this = this;
-      this._enlivenObjects(serialized.objects, function () {
-        _this.backgroundColor = serialized.background;
-        if (callback) {
-          callback();
-        }
-      });
-
-      return this;
-    },
-
-    /**
-     * @method _enlivenObjects
-     * @param {Array} objects
-     * @param {Function} callback
-     */
-    _enlivenObjects: function (objects, callback) {
-      var numLoadedImages = 0,
-          numTotalImages = objects.filter(function (o) {
-            return o.type === 'image';
-          }).length;
-
-      var _this = this;
-
-      objects.forEach(function (o, index) {
-        if (!o.type) {
-          return;
-        }
-        switch (o.type) {
-          case 'image':
-          case 'font':
-            fabric[capitalize(o.type)].fromObject(o, function (o) {
-              _this.insertAt(o, index);
-              if (++numLoadedImages === numTotalImages) {
-                if (callback) {
-                  callback();
-                }
-              }
-            });
-            break;
-          default:
-            var klass = fabric[camelize(capitalize(o.type))];
-            if (klass && klass.fromObject) {
-              _this.insertAt(klass.fromObject(o), index);
-            }
-            break;
-        }
-      });
-
-      if (numTotalImages === 0 && callback) {
-        callback();
-      }
-    },
-
-    /**
-     * Populates canvas with data from the specified dataless JSON
-     * JSON format must conform to the one of `fabric.Canvas#toDatalessJSON`
-     * @method loadFromDatalessJSON
-     * @param {String} json JSON string
-     * @param {Function} callback Callback, invoked when json is parsed
-     *                            and corresponding objects (e.g: fabric.Image)
-     *                            are initialized
-     * @return {fabric.Canvas} instance
-     * @chainable
-     */
-    loadFromDatalessJSON: function (json, callback) {
-
-      if (!json) {
-        return;
-      }
-
-      var serialized = (typeof json === 'string')
-        ? JSON.parse(json)
-        : json;
-
-      if (!serialized || (serialized && !serialized.objects)) return;
-
-      this.clear();
-
-      this.backgroundColor = serialized.background;
-      this._enlivenDatalessObjects(serialized.objects, callback);
-    },
-
-    /**
-     * @method _enlivenDatalessObjects
-     * @param {Array} objects
-     * @param {Function} callback
-     */
-    _enlivenDatalessObjects: function (objects, callback) {
-
-      /** @ignore */
-      function onObjectLoaded(object, index) {
-        _this.insertAt(object, index);
-        object.setCoords();
-        if (++numLoadedObjects === numTotalObjects) {
-          callback && callback();
-        }
-      }
-
-      var _this = this,
-          numLoadedObjects = 0,
-          numTotalObjects = objects.length;
-
-      if (numTotalObjects === 0 && callback) {
-        callback();
-      }
-
-      try {
-        objects.forEach(function (obj, index) {
-
-          var pathProp = obj.paths ? 'paths' : 'path';
-          var path = obj[pathProp];
-
-          delete obj[pathProp];
-
-          if (typeof path !== 'string') {
-            switch (obj.type) {
-              case 'image':
-              case 'text':
-                fabric[capitalize(obj.type)].fromObject(obj, function (o) {
-                  onObjectLoaded(o, index);
-                });
-                break;
-              default:
-                var klass = fabric[camelize(capitalize(obj.type))];
-                if (klass && klass.fromObject) {
-                  if (path) {
-                    obj[pathProp] = path;
-                  }
-                  onObjectLoaded(klass.fromObject(obj), index);
-                }
-                break;
-            }
-          }
-          else {
-            if (obj.type === 'image') {
-              _this.loadImageFromURL(path, function (image) {
-                image.setSourcePath(path);
-
-                extend(image, obj);
-                image.setAngle(obj.angle);
-
-                onObjectLoaded(image, index);
-              });
-            }
-            else if (obj.type === 'text') {
-
-              obj.path = path;
-              var object = fabric.Text.fromObject(obj);
-              var onscriptload = function () {
-                if (Object.prototype.toString.call(window.opera) === '[object Opera]') {
-                  setTimeout(function () {
-                    onObjectLoaded(object, index);
-                  }, 500);
-                }
-                else {
-                  onObjectLoaded(object, index);
-                }
-              }
-
-              fabric.util.getScript(path, onscriptload);
-            }
-            else {
-              _this.loadSVGFromURL(path, function (elements, options) {
-                if (elements.length > 1) {
-                  var object = new fabric.PathGroup(elements, obj);
-                }
-                else {
-                  var object = elements[0];
-                }
-                object.setSourcePath(path);
-
-                if (!(object instanceof fabric.PathGroup)) {
-                  extend(object, obj);
-                  if (typeof obj.angle !== 'undefined') {
-                    object.setAngle(obj.angle);
-                  }
-                }
-
-                onObjectLoaded(object, index);
-              });
-            }
-          }
-        }, this);
-      }
-      catch(e) {
-        fabric.log(e.message);
-      }
-    },
-
-    /**
      * Loads an image from URL, creates an instance of fabric.Image and passes it to a callback
      * @function
      * @method loadImageFromURL
@@ -5619,6 +5408,7 @@ fabric.util.getElementOffset = getElementOffset;
           if (this.shouldCacheImages) {
             imgCache[url] = Element.identify(imgEl);
           }
+
           document.body.appendChild(imgEl);
         }
       }
@@ -5922,53 +5712,6 @@ fabric.util.getElementOffset = getElementOffset;
     },
 
     /**
-     * Clones canvas instance
-     * @method clone
-     * @param {Object} [callback] Expects `onBeforeClone` and `onAfterClone` functions
-     * @return {fabric.Canvas} Clone of this instance
-     */
-    clone: function (callback) {
-      var el = document.createElement('canvas');
-
-      el.width = this.getWidth();
-      el.height = this.getHeight();
-
-      var clone = this.__clone || (this.__clone = new fabric.Canvas(el));
-      clone.clipTo = this.clipTo;
-
-      return clone.loadFromJSON(JSON.stringify(this.toJSON()), function () {
-        if (callback) {
-          callback(clone);
-        }
-      });
-    },
-
-    /**
-     * @private
-     * @method _toDataURL
-     * @param {String} format
-     * @param {Function} callback
-     */
-    _toDataURL: function (format, callback) {
-      this.clone(function (clone) {
-        callback(clone.toDataURL(format));
-      });
-    },
-
-    /**
-     * @private
-     * @method _toDataURLWithMultiplier
-     * @param {String} format
-     * @param {Number} multiplier
-     * @param {Function} callback
-     */
-    _toDataURLWithMultiplier: function (format, multiplier, callback) {
-      this.clone(function (clone) {
-        callback(clone.toDataURLWithMultiplier(format, multiplier));
-      });
-    },
-
-    /**
      * @private
      * @method _resizeImageToFit
      * @param {HTMLImageElement} imgEl
@@ -6227,6 +5970,263 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
       }
     });
     return this;
+  }
+});
+fabric.util.object.extend(fabric.Canvas.prototype, {
+
+  /**
+   * Populates canvas with data from the specified dataless JSON
+   * JSON format must conform to the one of `fabric.Canvas#toDatalessJSON`
+   * @method loadFromDatalessJSON
+   * @param {String} json JSON string
+   * @param {Function} callback Callback, invoked when json is parsed
+   *                            and corresponding objects (e.g: fabric.Image)
+   *                            are initialized
+   * @return {fabric.Canvas} instance
+   * @chainable
+   */
+  loadFromDatalessJSON: function (json, callback) {
+
+    if (!json) {
+      return;
+    }
+
+    var serialized = (typeof json === 'string')
+      ? JSON.parse(json)
+      : json;
+
+    if (!serialized || (serialized && !serialized.objects)) return;
+
+    this.clear();
+
+    this.backgroundColor = serialized.background;
+    this._enlivenDatalessObjects(serialized.objects, callback);
+  },
+
+  /**
+   * @method _enlivenDatalessObjects
+   * @param {Array} objects
+   * @param {Function} callback
+   */
+  _enlivenDatalessObjects: function (objects, callback) {
+
+    /** @ignore */
+    function onObjectLoaded(object, index) {
+      _this.insertAt(object, index);
+      object.setCoords();
+      if (++numLoadedObjects === numTotalObjects) {
+        callback && callback();
+      }
+    }
+
+    var _this = this,
+        numLoadedObjects = 0,
+        numTotalObjects = objects.length;
+
+    if (numTotalObjects === 0 && callback) {
+      callback();
+    }
+
+    try {
+      objects.forEach(function (obj, index) {
+
+        var pathProp = obj.paths ? 'paths' : 'path';
+        var path = obj[pathProp];
+
+        delete obj[pathProp];
+
+        if (typeof path !== 'string') {
+          switch (obj.type) {
+            case 'image':
+            case 'text':
+              fabric[capitalize(obj.type)].fromObject(obj, function (o) {
+                onObjectLoaded(o, index);
+              });
+              break;
+            default:
+              var klass = fabric[camelize(capitalize(obj.type))];
+              if (klass && klass.fromObject) {
+                if (path) {
+                  obj[pathProp] = path;
+                }
+                onObjectLoaded(klass.fromObject(obj), index);
+              }
+              break;
+          }
+        }
+        else {
+          if (obj.type === 'image') {
+            _this.loadImageFromURL(path, function (image) {
+              image.setSourcePath(path);
+
+              extend(image, obj);
+              image.setAngle(obj.angle);
+
+              onObjectLoaded(image, index);
+            });
+          }
+          else if (obj.type === 'text') {
+
+            obj.path = path;
+            var object = fabric.Text.fromObject(obj);
+            var onscriptload = function () {
+              if (Object.prototype.toString.call(window.opera) === '[object Opera]') {
+                setTimeout(function () {
+                  onObjectLoaded(object, index);
+                }, 500);
+              }
+              else {
+                onObjectLoaded(object, index);
+              }
+            }
+
+            fabric.util.getScript(path, onscriptload);
+          }
+          else {
+            _this.loadSVGFromURL(path, function (elements, options) {
+              if (elements.length > 1) {
+                var object = new fabric.PathGroup(elements, obj);
+              }
+              else {
+                var object = elements[0];
+              }
+              object.setSourcePath(path);
+
+              if (!(object instanceof fabric.PathGroup)) {
+                extend(object, obj);
+                if (typeof obj.angle !== 'undefined') {
+                  object.setAngle(obj.angle);
+                }
+              }
+
+              onObjectLoaded(object, index);
+            });
+          }
+        }
+      }, this);
+    }
+    catch(e) {
+      fabric.log(e.message);
+    }
+  },
+
+  /**
+   * Populates canvas with data from the specified JSON
+   * JSON format must conform to the one of `fabric.Canvas#toJSON`
+   * @method loadFromJSON
+   * @param {String} json JSON string
+   * @param {Function} callback Callback, invoked when json is parsed
+   *                            and corresponding objects (e.g: fabric.Image)
+   *                            are initialized
+   * @return {fabric.Canvas} instance
+   * @chainable
+   */
+  loadFromJSON: function (json, callback) {
+    if (!json) return;
+
+    var serialized = JSON.parse(json);
+    if (!serialized || (serialized && !serialized.objects)) return;
+
+    this.clear();
+    var _this = this;
+    this._enlivenObjects(serialized.objects, function () {
+      _this.backgroundColor = serialized.background;
+      if (callback) {
+        callback();
+      }
+    });
+
+    return this;
+  },
+
+  /**
+   * @method _enlivenObjects
+   * @param {Array} objects
+   * @param {Function} callback
+   */
+  _enlivenObjects: function (objects, callback) {
+    var numLoadedImages = 0,
+        numTotalImages = objects.filter(function (o) {
+          return o.type === 'image';
+        }).length;
+
+    var _this = this;
+
+    objects.forEach(function (o, index) {
+      if (!o.type) {
+        return;
+      }
+      switch (o.type) {
+        case 'image':
+        case 'font':
+          fabric[capitalize(o.type)].fromObject(o, function (o) {
+            _this.insertAt(o, index);
+            if (++numLoadedImages === numTotalImages) {
+              if (callback) {
+                callback();
+              }
+            }
+          });
+          break;
+        default:
+          var klass = fabric[camelize(capitalize(o.type))];
+          if (klass && klass.fromObject) {
+            _this.insertAt(klass.fromObject(o), index);
+          }
+          break;
+      }
+    });
+
+    if (numTotalImages === 0 && callback) {
+      callback();
+    }
+  },
+
+  /**
+   * @private
+   * @method _toDataURL
+   * @param {String} format
+   * @param {Function} callback
+   */
+  _toDataURL: function (format, callback) {
+    this.clone(function (clone) {
+      callback(clone.toDataURL(format));
+    });
+  },
+
+  /**
+   * @private
+   * @method _toDataURLWithMultiplier
+   * @param {String} format
+   * @param {Number} multiplier
+   * @param {Function} callback
+   */
+  _toDataURLWithMultiplier: function (format, multiplier, callback) {
+    this.clone(function (clone) {
+      callback(clone.toDataURLWithMultiplier(format, multiplier));
+    });
+  },
+
+  /**
+   * Clones canvas instance
+   * @method clone
+   * @param {Object} [callback] Expects `onBeforeClone` and `onAfterClone` functions
+   * @return {fabric.Canvas} Clone of this instance
+   */
+  clone: function (callback) {
+    var el = document.createElement('canvas');
+
+    el.width = this.getWidth();
+    el.height = this.getHeight();
+
+    var clone = this.__clone || (this.__clone = new fabric.Canvas(el));
+    clone.clipTo = this.clipTo;
+
+    return clone.loadFromJSON(JSON.stringify(this.toJSON()), function () {
+      if (callback) {
+        callback(clone);
+      }
+    });
   }
 });
 
@@ -8421,7 +8421,6 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
   }
 })(this);
 
-
 (function(global) {
 
   var commandLengths = {
@@ -8901,8 +8900,8 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
      * @return {String} string representation of an instance
      */
     toString: function() {
-      return '#<fabric.Path ('+ this.complexity() +'): ' +
-        JSON.stringify({ top: this.top, left: this.left }) +'>';
+      return '#<fabric.Path (' + this.complexity() +
+        '): { "top": ' + this.top + ', "left": ' + this.left + '}>';
     },
 
     /**
@@ -9309,7 +9308,6 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
     return new fabric.PathGroup(paths, object);
   };
 })(this);
-
 
 (function(global){
 
@@ -9767,7 +9765,6 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
   }
 })(this);
 
-
 (function(global) {
 
   "use strict";
@@ -9855,8 +9852,8 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
      * @return {String} String representation of text object
      */
     toString: function() {
-      return '#<fabric.Text ('+ this.complexity() +'): ' +
-        JSON.stringify({ text: this.text, fontfamily: this.fontfamily }) + '>';
+      return '#<fabric.Text (' + this.complexity() +
+        '): { "text": ' + this.text + ', "fontfamily": ' + this.fontfamily + '}>';
     },
 
     /**
@@ -10038,7 +10035,6 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
   fabric.Text.fromElement = function(element) {
   };
 })(this);
-
 
 (function(global) {
 

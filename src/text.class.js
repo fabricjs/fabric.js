@@ -87,8 +87,8 @@
      * @return {String} String representation of text object
      */
     toString: function() {
-      return '#<fabric.Text ('+ this.complexity() +'): ' + 
-        JSON.stringify({ text: this.text, fontfamily: this.fontfamily }) + '>';
+      return '#<fabric.Text (' + this.complexity() +
+        '): { "text": ' + this.text + ', "fontfamily": ' + this.fontfamily + '}>';
     },
     
     /**

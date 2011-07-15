@@ -45,6 +45,18 @@ Fabric.js started as a foundation for design editor on [printio.ru](http://print
 
         $ sprocketize fabric.js > dist/all.js
 
+    - Build distribution with support for text (`fabric.Text`)
+        
+            $ sprocketize fabric+text.js > dist/all.js
+        
+    - Build distribution with support for serialization (`loadFromJSON`, `clone`, etc.)
+        
+            $ sprocketize fabric+serialization.js > dist/all.js
+    
+    - Build distribution with support for text AND serialization
+
+            $ sprocketize fabric+text+serialization.js > dist/all.js
+
 3. Create a minified distribution file
 
         # Using YUICompressor

@@ -1,5 +1,7 @@
 //= require "HEADER"
 
+//= require "lib/json2"
+
 //= require "src/log"
 //= require "src/util"
 //= require "src/parser"
@@ -10,6 +12,7 @@
 
 //= require "src/canvas.class"
 //= require "src/canvas.fx"
+//= require "src/canvas.serialization"
 
 //= require "src/object.class"
 //= require "src/line.class"

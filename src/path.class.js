@@ -488,8 +488,8 @@
      * @return {String} string representation of an instance
      */
     toString: function() {
-      return '#<fabric.Path ('+ this.complexity() +'): ' + 
-        JSON.stringify({ top: this.top, left: this.left }) +'>';
+      return '#<fabric.Path (' + this.complexity() + 
+        '): { "top": ' + this.top + ', "left": ' + this.left + '}>';
     },
     
     /**
