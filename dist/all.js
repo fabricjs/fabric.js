@@ -4761,6 +4761,7 @@ fabric.util.getElementOffset = getElementOffset;
         }
         this.renderAll();
       }
+      this.fire('mouse:move', { e: e });
     },
 
     /**

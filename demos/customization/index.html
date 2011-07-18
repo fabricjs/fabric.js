@@ -5,7 +5,7 @@
     <title>Animating crosses (custom class)</title>
     <script src="../../dist/all.js"></script>
     <style>
-      .canvas-container { border: 1px solid #ccc; display: inline-block; vertical-align: top; }
+      .canvas-container { border: 1px dotted #ccc; display: inline-block; vertical-align: top; }
       h2 span { font-weight: normal; }
       pre { background: #eef; display: inline-block; padding-right: 15px; margin-left: 15px }
       .block { float: left; margin-right: 20px; width: 260px; height: 270px; }
@@ -88,6 +88,11 @@
         <canvas id="c9" width="200" height="200"></canvas>
       </div>
       
+      <div class="block">
+        <h3>Making objects grayscale</h3>
+        <canvas id="c14" width="200" height="200"></canvas>
+      </div>
+      
       <script id="main">
         var canvas1 = new fabric.Canvas('c1');
         canvas1.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
@@ -135,11 +140,11 @@
         
         var canvas11 = new fabric.Canvas('c11');
         canvas11.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
-        canvas11.HOVER_CURSOR = 'pointer';
+        canvas11.HOVER_CURSOR = 'crosshair';
         
         var canvas12 = new fabric.Canvas('c12');
-        canvas12.add(new fabric.Rect({ left: 110, top: 110, fill: 'green', width: 50, height: 50 }));
-        canvas12.add(new fabric.Rect({ left: 50, top: 50, fill: 'blue', width: 40, height: 40 }));
+        canvas12.add(new fabric.Rect({ left: 110, top: 110, fill: '#f0f', width: 50, height: 50 }));
+        canvas12.add(new fabric.Rect({ left: 50, top: 50, fill: '#77f', width: 40, height: 40 }));
         
         canvas12.forEachObject(function(o){ o.borderColor = o.cornerColor = 'rgba(0,0,0,0)'; });
         
@@ -197,20 +202,33 @@
         canvas5.renderAll();
         
         var canvas6 = new fabric.Canvas('c6');
-        canvas6.add(new fabric.Rect({ width: 50, height: 50, fill: '#55f', top: 100, left: 100 }));
+        canvas6.add(new fabric.Rect({ width: 50, height: 50, fill: '#77f', top: 100, left: 100 }));
         canvas6.item(0).lockRotation = true;
         
         var canvas7 = new fabric.Canvas('c7');
-        canvas7.add(new fabric.Rect({ width: 50, height: 50, fill: '#55f', top: 100, left: 100 }));
+        canvas7.add(new fabric.Rect({ width: 50, height: 50, fill: '#77f', top: 100, left: 100 }));
         canvas7.item(0).lockScalingX = canvas7.item(0).lockScalingY = true;
         
         var canvas8 = new fabric.Canvas('c8');
-        canvas8.add(new fabric.Rect({ width: 50, height: 50, fill: '#55f', top: 100, left: 100 }));
+        canvas8.add(new fabric.Rect({ width: 50, height: 50, fill: '#77f', top: 100, left: 100 }));
         canvas8.item(0).lockMovementX = true;
         
         var canvas9 = new fabric.Canvas('c9');
-        canvas9.add(new fabric.Rect({ width: 50, height: 50, fill: '#55f', top: 100, left: 100 }));
+        canvas9.add(new fabric.Rect({ width: 50, height: 50, fill: '#77f', top: 100, left: 100 }));
         canvas9.item(0).lockMovementY = true;
+        
+        var canvas14 = new fabric.Canvas('c14');
+        fabric.Image.fromURL('../kitchensink/assets/pug.jpg', function(obj) {
+          canvas14.add(obj.scale(0.1).rotate(-15).set({ left: 80, top: 95 }));
+          canvas14.add(new fabric.Rect({ width: 50, height: 40, fill: '#77f', top: 75, left: 160 }))
+          canvas14.add(new fabric.Circle({ radius: 20, fill: '#f55', top: 170, left: 150 }));
+          
+          function callback(){ canvas14.renderAll() }
+          
+          canvas14.item(0).toGrayscale(callback);
+          canvas14.item(1).toGrayscale(callback);
+          canvas14.item(2).toGrayscale(callback);
+        });
         
       </script>
 

@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Polaroid photos</title>
+    <title>Opacity &amp; mouse move</title>
     <script src="../../dist/all.js"></script>
     <style>
       .canvas-container { border: 1px solid #ccc; display: inline-block; vertical-align: top; }
@@ -20,7 +20,7 @@
     </ul>
     <div id="bd-wrapper">
 
-      <h2><span>Fabric.js demos</span> &middot; Color animation</h2>
+      <h2><span>Fabric.js demos</span> &middot; Opacity &amp; mouse move</h2>
 
       <canvas id="c" width="600" height="500"></canvas>
 
@@ -30,7 +30,7 @@
     return s.length === 1 ? ('0' + s) : s;
   }
   function getRandomColor() {
-    return pad(getRandomInt(0, 255).toString(16)) + 
+    return '#' + pad(getRandomInt(0, 255).toString(16)) + 
            pad(getRandomInt(0, 255).toString(16)) + 
            pad(getRandomInt(0, 255).toString(16));
   }
@@ -40,14 +40,29 @@
   
   canvas.loadSVGFromURL('../kitchensink/assets/135.svg', function(objects) {
     
-    var obj = objects[0].scale(0.75).setAngle(-15);
+    var obj = objects[0].scale(0.25);
     canvas.centerObjectH(obj).centerObjectV(obj);
     canvas.add(obj);
     
-    setInterval(function() {
-      obj.set('fill', getRandomColor());
+    canvas.add(obj.clone().set({ left: 100, top: 100, angle: -15 }));
+    canvas.add(obj.clone().set({ left: 480, top: 100, angle: 15 }));
+    canvas.add(obj.clone().set({ left: 100, top: 400, angle: -15 }));
+    canvas.add(obj.clone().set({ left: 480, top: 400, angle: 15 }));
+    
+    canvas.observe('mouse:move', function(e) {
+      
+      var p = canvas.getPointer(e.memo.e);
+      
+      canvas.forEachObject(function(obj) {
+        var distX = Math.abs(p.x - obj.left),
+            distY = Math.abs(p.y - obj.top),
+            dist = Math.round(Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2)));
+
+        obj.setOpacity(1 / (dist / 20));
+      });
+      
       canvas.renderAll();
-    }, 500);
+    });
   });
     
 </script>

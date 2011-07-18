@@ -925,6 +925,7 @@
         // only commit here. when we are actually moving the pictures
         this.renderAll();
       }
+      this.fire('mouse:move', { e: e });
     },
 
     /**
