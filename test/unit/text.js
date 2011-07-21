@@ -29,7 +29,8 @@
     'fontfamily':     'Modernist_One_400',
     'lineHeight':     1.6, 
     'textDecoration': '', 
-    'textShadow':     null, 
+    'textShadow':     null,
+    'textAlign':      'left', 
     'strokeStyle':    '',
     'fontStyle':      '',
     'path':           null,
@@ -53,7 +54,7 @@
   test('toString', function() {
     var text = createTextObject();
     ok(typeof text.toString == 'function');
-    equals(text.toString(), '#<fabric.Text (0): {"text":"foo","fontfamily":"Modernist_One_400"}>');
+    equals(text.toString(), '#<fabric.Text (0): { "text": "foo", "fontfamily": "Modernist_One_400" }>');
   });
   
   test('toObject', function() {

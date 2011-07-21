@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2011, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.4.2" };
+var fabric = fabric || { version: "0.4.3" };
 
 (function(){
   var view = document.defaultView;
@@ -650,13 +650,14 @@ Cufon.registerEngine('canvas', (function() {
 
     var width = 0, lastWidth = null;
 
-    var maxWidth = 0, lines = 1;
+    var maxWidth = 0, lines = 1, lineWidths = [ ];
     for (var i = 0, l = chars.length; i < l; ++i) {
       if (chars[i] === '\n') {
-        lines++
+        lines++;
         if (width > maxWidth) {
           maxWidth = width;
         }
+        lineWidths.push(width);
         width = 0;
         continue;
       }
@@ -664,7 +665,14 @@ Cufon.registerEngine('canvas', (function() {
       if (!glyph) continue;
       width += lastWidth = Number(glyph.w || font.w) + letterSpacing;
     }
-    width = Math.max(maxWidth, width)
+    lineWidths.push(width);
+
+    width = Math.max(maxWidth, width);
+
+    var lineOffsets = [ ];
+    for (var i = lineWidths.length; i--; ) {
+      lineOffsets[i] = width - lineWidths[i];
+    }
 
     if (lastWidth === null) return null; // there's nothing to render
 
@@ -785,11 +793,36 @@ Cufon.registerEngine('canvas', (function() {
     function renderText() {
       g.fillStyle = Cufon.textOptions.color || style.get('color');
 
-      var left = 0;
+      var left = 0, lineNum = 0;
+
+      if (options.textAlign === 'right') {
+        g.translate(lineOffsets[lineNum], 0);
+      }
+      else if (options.textAlign === 'center') {
+        g.translate(lineOffsets[lineNum] / 2, 0);
+      }
+
       for (var i = 0, l = chars.length; i < l; ++i) {
         if (chars[i] === '\n') {
-          g.translate(-left, -font.ascent - ((font.ascent / 5) * options.lineHeight));
+
+          lineNum++;
+
+          var topOffset = -font.ascent - ((font.ascent / 5) * options.lineHeight);
+
+          if (options.textAlign === 'right') {
+            g.translate(-width, topOffset);
+            g.translate(lineOffsets[lineNum], 0);
+          }
+          else if (options.textAlign === 'center') {
+            g.translate(-left - (lineOffsets[lineNum - 1] / 2), topOffset);
+            g.translate(lineOffsets[lineNum] / 2, 0);
+          }
+          else {
+            g.translate(-left, topOffset);
+          }
+
           left = 0;
+
           continue;
         }
         var glyph = font.glyphs[chars[i]] || font.missingGlyph;
@@ -9789,23 +9822,85 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
    */
   fabric.Text = fabric.util.createClass(fabric.Object, /** @scope fabric.Text.prototype */ {
 
-    fontsize:       20,
-    fontweight:     100,
-    fontfamily:     'Modernist_One_400',
-    textDecoration: '',
-    textShadow:     null,
-    fontStyle:      '',
-    lineHeight:     1.6,
-    strokeStyle:    '',
-    strokeWidth:    1,
-    backgroundColor: '',
-    path:           null,
+    /**
+     * @property
+     * @type Number
+     */
+    fontsize:         20,
+
+    /**
+     * @property
+     * @type Number
+     */
+    fontweight:       100,
 
     /**
      * @property
      * @type String
      */
-    type: 'text',
+    fontfamily:       'Modernist_One_400',
+
+    /**
+     * @property
+     * @type String
+     */
+    textDecoration:   '',
+
+    /**
+     * @property
+     * @type String | null
+     */
+    textShadow:       null,
+
+    /**
+     * Determines text alignment. Possible values: "left", "center", or "right".
+     * @property
+     * @type String
+     */
+    textAlign:        'left',
+
+    /**
+     * @property
+     * @type String
+     */
+    fontStyle:        '',
+
+    /**
+     * @property
+     * @type Number
+     */
+    lineHeight:       1.6,
+
+    /**
+     * @property
+     * @type String
+     */
+    strokeStyle:      '',
+
+    /**
+     * @property
+     * @type Number
+     */
+    strokeWidth:      1,
+
+    /**
+     * @property
+     * @type String
+     */
+    backgroundColor:  '',
+
+
+    /**
+     * @property
+     * @type String | null
+     */
+    path:             null,
+
+    /**
+     * @property
+     * @type String
+     */
+    type:             'text',
 
     /**
      * Constructor
@@ -9838,6 +9933,7 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
         'text',
         'textDecoration',
         'textShadow',
+        'textAlign',
         'fontStyle',
         'lineHeight',
         'strokeStyle',
@@ -9854,7 +9950,7 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
      */
     toString: function() {
       return '#<fabric.Text (' + this.complexity() +
-        '): { "text": ' + this.text + ', "fontfamily": ' + this.fontfamily + '}>';
+        '): { "text": "' + this.text + '", "fontfamily": "' + this.fontfamily + '" }>';
     },
 
     /**
@@ -9880,6 +9976,7 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
         enableTextDecoration: true,
         textDecoration: this.textDecoration,
         textShadow: this.textShadow,
+        textAlign: this.textAlign,
         fontStyle: this.fontStyle,
         lineHeight: this.lineHeight,
         strokeStyle: this.strokeStyle,
@@ -9945,6 +10042,7 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
         lineHeight:     this.lineHeight,
         textDecoration: this.textDecoration,
         textShadow:     this.textShadow,
+        textAlign:      this.textAlign,
         path:           this.path,
         strokeStyle:    this.strokeStyle,
         strokeWidth:    this.strokeWidth,

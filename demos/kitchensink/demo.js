@@ -487,10 +487,9 @@
   }
   
   var cmdUnderlineBtn = document.getElementById('text-cmd-underline');
-  activeObjectButtons.push(cmdUnderlineBtn);
-  cmdUnderlineBtn.disabled = true;
-  
   if (cmdUnderlineBtn) {
+    activeObjectButtons.push(cmdUnderlineBtn);
+    cmdUnderlineBtn.disabled = true;
     cmdUnderlineBtn.onclick = function() {
       var activeObject = canvas.getActiveObject();
       if (activeObject && activeObject.type === 'text') {
@@ -502,10 +501,9 @@
   }
   
   var cmdLinethroughBtn = document.getElementById('text-cmd-linethrough');
-  activeObjectButtons.push(cmdLinethroughBtn);
-  cmdLinethroughBtn.disabled = true;
-  
   if (cmdLinethroughBtn) {
+    activeObjectButtons.push(cmdLinethroughBtn);
+    cmdLinethroughBtn.disabled = true;
     cmdLinethroughBtn.onclick = function() {
       var activeObject = canvas.getActiveObject();
       if (activeObject && activeObject.type === 'text') {
@@ -517,10 +515,9 @@
   }
   
   var cmdOverlineBtn = document.getElementById('text-cmd-overline');
-  activeObjectButtons.push(cmdOverlineBtn);
-  cmdOverlineBtn.disabled = true;
-  
   if (cmdOverlineBtn) {
+    activeObjectButtons.push(cmdOverlineBtn);
+    cmdOverlineBtn.disabled = true;
     cmdOverlineBtn.onclick = function() {
       var activeObject = canvas.getActiveObject();
       if (activeObject && activeObject.type === 'text') {
@@ -532,10 +529,9 @@
   }
   
   var cmdItalicBtn = document.getElementById('text-cmd-italic');
-  activeObjectButtons.push(cmdItalicBtn);
-  cmdItalicBtn.disabled = true;
-  
   if (cmdItalicBtn) {
+    activeObjectButtons.push(cmdItalicBtn);
+    cmdItalicBtn.disabled = true;
     cmdItalicBtn.onclick = function() {
       var activeObject = canvas.getActiveObject();
       if (activeObject && activeObject.type === 'text') {
@@ -547,15 +543,27 @@
   }
   
   var cmdShadowBtn = document.getElementById('text-cmd-shadow');
-  activeObjectButtons.push(cmdShadowBtn);
-  cmdShadowBtn.disabled = true;
-  
   if (cmdShadowBtn) {
+    activeObjectButtons.push(cmdShadowBtn);
+    cmdShadowBtn.disabled = true;
     cmdShadowBtn.onclick = function() {
       var activeObject = canvas.getActiveObject();
       if (activeObject && activeObject.type === 'text') {
         activeObject.textShadow = !activeObject.textShadow ? 'rgba(0,0,0,0.2) 2px 2px 10px' : '';
         this.className = activeObject.fontStyle ? 'selected' : '';
+        canvas.renderAll();
+      }
+    };
+  }
+  
+  var textAlignSwitch = document.getElementById('text-align');
+  if (textAlignSwitch) {
+    activeObjectButtons.push(textAlignSwitch);
+    textAlignSwitch.disabled = true;
+    textAlignSwitch.onchange = function() {
+      var activeObject = canvas.getActiveObject();
+      if (activeObject && activeObject.type === 'text') {
+        activeObject.textAlign = this.value.toLowerCase();
         canvas.renderAll();
       }
     };

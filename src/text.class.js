@@ -23,23 +23,85 @@
    */
   fabric.Text = fabric.util.createClass(fabric.Object, /** @scope fabric.Text.prototype */ {
     
-    fontsize:       20,
-    fontweight:     100,
-    fontfamily:     'Modernist_One_400',
-    textDecoration: '',
-    textShadow:     null,
-    fontStyle:      '',
-    lineHeight:     1.6,
-    strokeStyle:    '',
-    strokeWidth:    1,
-    backgroundColor: '',
-    path:           null,
+    /**
+     * @property
+     * @type Number
+     */
+    fontsize:         20,
+    
+    /**
+     * @property
+     * @type Number
+     */
+    fontweight:       100,
     
     /**
      * @property
      * @type String
      */
-    type: 'text',
+    fontfamily:       'Modernist_One_400',
+    
+    /**
+     * @property
+     * @type String
+     */
+    textDecoration:   '',
+    
+    /**
+     * @property
+     * @type String | null
+     */
+    textShadow:       null,
+    
+    /**
+     * Determines text alignment. Possible values: "left", "center", or "right".
+     * @property
+     * @type String
+     */
+    textAlign:        'left',
+    
+    /**
+     * @property
+     * @type String
+     */
+    fontStyle:        '',
+    
+    /**
+     * @property
+     * @type Number
+     */
+    lineHeight:       1.6,
+    
+    /**
+     * @property
+     * @type String
+     */
+    strokeStyle:      '',
+    
+    /**
+     * @property
+     * @type Number
+     */
+    strokeWidth:      1,
+    
+    /**
+     * @property
+     * @type String
+     */
+    backgroundColor:  '',
+    
+    
+    /**
+     * @property
+     * @type String | null
+     */
+    path:             null,
+    
+    /**
+     * @property
+     * @type String
+     */
+    type:             'text',
     
     /**
      * Constructor
@@ -72,6 +134,7 @@
         'text', 
         'textDecoration', 
         'textShadow', 
+        'textAlign',
         'fontStyle',
         'lineHeight',
         'strokeStyle',
@@ -88,7 +151,7 @@
      */
     toString: function() {
       return '#<fabric.Text (' + this.complexity() +
-        '): { "text": ' + this.text + ', "fontfamily": ' + this.fontfamily + '}>';
+        '): { "text": "' + this.text + '", "fontfamily": "' + this.fontfamily + '" }>';
     },
     
     /**
@@ -117,6 +180,7 @@
         enableTextDecoration: true,
         textDecoration: this.textDecoration,
         textShadow: this.textShadow,
+        textAlign: this.textAlign,
         fontStyle: this.fontStyle,
         lineHeight: this.lineHeight,
         strokeStyle: this.strokeStyle,
@@ -195,6 +259,7 @@
         lineHeight:     this.lineHeight,
         textDecoration: this.textDecoration,
         textShadow:     this.textShadow,
+        textAlign:      this.textAlign,
         path:           this.path,
         strokeStyle:    this.strokeStyle,
         strokeWidth:    this.strokeWidth,
