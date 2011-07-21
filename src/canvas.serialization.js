@@ -125,7 +125,7 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
               // copy parameters from serialied json to object (left, top, scaleX, scaleY, etc.)
               // skip this step if an object is a PathGroup, since we already passed it options object before
               if (!(object instanceof fabric.PathGroup)) {
-                extend(object, obj);
+                fabric.util.object.extend(object, obj);
                 if (typeof obj.angle !== 'undefined') {
                   object.setAngle(obj.angle);
                 }

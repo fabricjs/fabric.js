@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2011, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.4.3" };
+var fabric = fabric || { version: "0.4.4" };
 
 (function(){
   var view = document.defaultView;
@@ -6127,7 +6127,7 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
               object.setSourcePath(path);
 
               if (!(object instanceof fabric.PathGroup)) {
-                extend(object, obj);
+                fabric.util.object.extend(object, obj);
                 if (typeof obj.angle !== 'undefined') {
                   object.setAngle(obj.angle);
                 }
