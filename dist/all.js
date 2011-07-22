@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2011, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.4.4" };
+var fabric = fabric || { version: "0.4.5" };
 
 (function(){
   var view = document.defaultView;
@@ -9950,7 +9950,7 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
      */
     toString: function() {
       return '#<fabric.Text (' + this.complexity() +
-        '): { "text": "' + this.text + '", "fontfamily": "' + this.fontFamily + '" }>';
+        '): { "text": "' + this.text + '", "fontFamily": "' + this.fontFamily + '" }>';
     },
 
     /**
