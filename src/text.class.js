@@ -27,19 +27,19 @@
      * @property
      * @type Number
      */
-    fontsize:         20,
+    fontSize:         20,
     
     /**
      * @property
      * @type Number
      */
-    fontweight:       100,
+    fontWeight:       100,
     
     /**
      * @property
      * @type String
      */
-    fontfamily:       'Modernist_One_400',
+    fontFamily:       'Modernist_One_400',
     
     /**
      * @property
@@ -121,15 +121,15 @@
     
     /**
      * Creates `stateProperties` list on an instance, and adds `fabric.Text` -specific ones to it 
-     * (such as "fontfamily", "fontweight", etc.)
+     * (such as "fontFamily", "fontWeight", etc.)
      * @private
      * @method _initStateProperties
      */
     _initStateProperties: function() {
       this.stateProperties = this.stateProperties.concat();
       this.stateProperties.push(
-        'fontfamily', 
-        'fontweight', 
+        'fontFamily', 
+        'fontWeight', 
         'path', 
         'text', 
         'textDecoration', 
@@ -151,7 +151,7 @@
      */
     toString: function() {
       return '#<fabric.Text (' + this.complexity() +
-        '): { "text": "' + this.text + '", "fontfamily": "' + this.fontfamily + '" }>';
+        '): { "text": "' + this.text + '", "fontFamily": "' + this.fontFamily + '" }>';
     },
     
     /**
@@ -176,7 +176,7 @@
       // draw text
       Cufon.replaceElement(el, {
         separate: 'none', 
-        fontFamily: this.fontfamily,
+        fontFamily: this.fontFamily,
         enableTextDecoration: true,
         textDecoration: this.textDecoration,
         textShadow: this.textShadow,
@@ -198,10 +198,10 @@
     
     // _render: function(context) {
     //       context.fillStyle = this.fill;
-    //       context.font = this.fontsize + 'px ' + this.fontFamily;
+    //       context.font = this.fontSize + 'px ' + this.fontFamily;
     //       this.transform(context);
     //       this.width = context.measureText(this.text).width;
-    //       this.height = this.fontsize;
+    //       this.height = this.fontSize;
     //       context.fillText(this.text, -this.width / 2, 0);
     //       this.setCoords();
     //     },
@@ -252,9 +252,9 @@
     toObject: function() {
       return extend(this.callSuper('toObject'), {
         text:           this.text,
-        fontsize:       this.fontsize,
-        fontweight:     this.fontweight,
-        fontfamily:     this.fontfamily,
+        fontSize:       this.fontSize,
+        fontWeight:     this.fontWeight,
+        fontFamily:     this.fontFamily,
         fontStyle:      this.fontStyle,
         lineHeight:     this.lineHeight,
         textDecoration: this.textDecoration,
@@ -280,14 +280,14 @@
     },
     
     /**
-     * Sets fontsize of an instance and updates its coordinates
+     * Sets fontSize of an instance and updates its coordinates
      * @method setFontsize
      * @param {Number} value
      * @return {fabric.Text} thisArg
      * @chainable
      */
     setFontsize: function(value) {
-      this.set('fontsize', value);
+      this.set('fontSize', value);
       this.setCoords();
       return this;
     },
@@ -324,7 +324,7 @@
      */
     set: function(name, value) {
       this[name] = value;
-      if (name === 'fontfamily' && this.path) {
+      if (name === 'fontFamily' && this.path) {
         this.path = this.path.replace(/(.*?)([^\/]*)(\.font\.js)/, '$1' + value + '$3');
       }
       return this;

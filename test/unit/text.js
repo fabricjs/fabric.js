@@ -2,7 +2,7 @@
   
   function createTextObject() {
     return new fabric.Text('foo', {
-      fontfamily: 'Modernist_One_400'
+      fontFamily: 'Modernist_One_400'
     });
   }
   
@@ -24,9 +24,9 @@
     'opacity':        1, 
     'selectable':     true,
     'text':           'foo', 
-    'fontsize':       20, 
-    'fontweight':     100, 
-    'fontfamily':     'Modernist_One_400',
+    'fontSize':       20, 
+    'fontWeight':     100, 
+    'fontFamily':     'Modernist_One_400',
     'lineHeight':     1.6, 
     'textDecoration': '', 
     'textShadow':     null,
@@ -54,7 +54,7 @@
   test('toString', function() {
     var text = createTextObject();
     ok(typeof text.toString == 'function');
-    equals(text.toString(), '#<fabric.Text (0): { "text": "foo", "fontfamily": "Modernist_One_400" }>');
+    equals(text.toString(), '#<fabric.Text (0): { "text": "foo", "fontFamily": "Modernist_One_400" }>');
   });
   
   test('toObject', function() {
@@ -85,7 +85,7 @@
     var text = createTextObject();
     ok(typeof text.setFontsize == 'function');
     equals(text.setFontsize(12), text);
-    equals(text.get('fontsize'), 12);
+    equals(text.get('fontSize'), 12);
   });
   
   test('getText', function(){
