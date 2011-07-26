@@ -39,7 +39,7 @@
      * @property
      * @type String
      */
-    fontFamily:       'Modernist_One_400',
+    fontFamily:       'Times_New_Roman',
     
     /**
      * @property
