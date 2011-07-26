@@ -552,7 +552,7 @@
         _this._setCursorFromEvent(e, target);
       }, 50);
       
-      this.fire('mouse:up', { target: target });
+      this.fire('mouse:up', { target: target, e: e });
     },
     
     _shouldClearSelection: function (e) {
@@ -636,7 +636,7 @@
       // we must renderAll so that active image is placed on the top canvas
       this.renderAll();
       
-      this.fire('mouse:down', { target: target });
+      this.fire('mouse:down', { target: target, e: e });
     },
     
     /**
@@ -925,7 +925,7 @@
         // only commit here. when we are actually moving the pictures
         this.renderAll();
       }
-      this.fire('mouse:move', { e: e });
+      this.fire('mouse:move', { target: target, e: e });
     },
 
     /**

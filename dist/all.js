@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2011, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.4.5" };
+var fabric = fabric || { version: "0.4.6" };
 
 (function(){
   var view = document.defaultView;
@@ -4451,7 +4451,7 @@ fabric.util.getElementOffset = getElementOffset;
         _this._setCursorFromEvent(e, target);
       }, 50);
 
-      this.fire('mouse:up', { target: target });
+      this.fire('mouse:up', { target: target, e: e });
     },
 
     _shouldClearSelection: function (e) {
@@ -4529,7 +4529,7 @@ fabric.util.getElementOffset = getElementOffset;
       }
       this.renderAll();
 
-      this.fire('mouse:down', { target: target });
+      this.fire('mouse:down', { target: target, e: e });
     },
 
     /**
@@ -4794,7 +4794,7 @@ fabric.util.getElementOffset = getElementOffset;
         }
         this.renderAll();
       }
-      this.fire('mouse:move', { e: e });
+      this.fire('mouse:move', { target: target, e: e });
     },
 
     /**
