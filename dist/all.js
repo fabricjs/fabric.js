@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2011, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.4.7" };
+var fabric = fabric || { version: "0.4.8" };
 
 (function(){
   var view = document.defaultView;
@@ -5455,9 +5455,12 @@ fabric.util.getElementOffset = getElementOffset;
           imgEl.onload = function () {
             imgEl.onload = null;
 
-            if (imgEl.width && imgEl.height) {
-              callback(new fabric.Image(imgEl));
-            }
+
+            setTimeout(function() {
+              if (imgEl.width && imgEl.height) {
+                callback(new fabric.Image(imgEl));
+              }
+            }, 0);
           };
 
           imgEl.className = 'canvas-img-clone';

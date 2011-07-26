@@ -1579,9 +1579,14 @@
           imgEl.onload = function () {
             imgEl.onload = null;
             
-            if (imgEl.width && imgEl.height) {
-              callback(new fabric.Image(imgEl));
-            }
+            // setTimeout is to work around Chrome's issue,
+            // when "load" event fires for (cached) image, yet its dimensions are 0
+            
+            setTimeout(function() {
+              if (imgEl.width && imgEl.height) {
+                callback(new fabric.Image(imgEl));
+              }
+            }, 0);
           };
           
           imgEl.className = 'canvas-img-clone';
