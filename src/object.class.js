@@ -767,12 +767,23 @@
       }
       var thisCoords = getCoords(this.oCoords),
           otherCoords = getCoords(other.oCoords);
+          
       var intersection = fabric.Intersection.intersectPolygonPolygon(
         [thisCoords.tl, thisCoords.tr, thisCoords.br, thisCoords.bl],
         [otherCoords.tl, otherCoords.tr, otherCoords.br, otherCoords.bl]
       );
       
       return (intersection.status === 'Intersection');
+    },
+    
+    /**
+     * Returns true if object is fully contained within area of another object
+     * @method isContainedWithinObject
+     * @param {Object} other Object to test
+     * @return {Boolean}
+     */
+    isContainedWithinObject: function(other) {
+      return this.isContainedWithinRect(other.oCoords.tl, other.oCoords.br);
     },
     
     /**
@@ -788,6 +799,7 @@
           tr = new fabric.Point(oCoords.tr.x, oCoords.tr.y),
           bl = new fabric.Point(oCoords.bl.x, oCoords.bl.y),
           br = new fabric.Point(oCoords.br.x, oCoords.br.y);
+          
       return tl.x > selectionTL.x
         && tr.x < selectionBR.x
         && tl.y > selectionTL.y

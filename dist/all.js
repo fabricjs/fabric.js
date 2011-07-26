@@ -5563,7 +5563,7 @@ fabric.util.getElementOffset = getElementOffset;
       if (idx !== 0) {
 
         for (var i=idx-1; i>=0; --i) {
-          if (object.intersectsWithObject(this._objects[i])) {
+          if (object.intersectsWithObject(this._objects[i]) || object.isContainedWithinObject(this._objects[i])) {
             nextIntersectingIdx = i;
             break;
           }
@@ -5590,7 +5590,7 @@ fabric.util.getElementOffset = getElementOffset;
       if (idx !== objects.length-1) {
 
         for (var i = idx + 1, l = this._objects.length; i < l; ++i) {
-          if (object.intersectsWithObject(objects[i])) {
+          if (object.intersectsWithObject(objects[i]) || object.isContainedWithinObject(this._objects[i])) {
             nextIntersectingIdx = i;
             break;
           }
@@ -7006,12 +7006,23 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
       }
       var thisCoords = getCoords(this.oCoords),
           otherCoords = getCoords(other.oCoords);
+
       var intersection = fabric.Intersection.intersectPolygonPolygon(
         [thisCoords.tl, thisCoords.tr, thisCoords.br, thisCoords.bl],
         [otherCoords.tl, otherCoords.tr, otherCoords.br, otherCoords.bl]
       );
 
       return (intersection.status === 'Intersection');
+    },
+
+    /**
+     * Returns true if object is fully contained within area of another object
+     * @method isContainedWithinObject
+     * @param {Object} other Object to test
+     * @return {Boolean}
+     */
+    isContainedWithinObject: function(other) {
+      return this.isContainedWithinRect(other.oCoords.tl, other.oCoords.br);
     },
 
     /**
@@ -7027,6 +7038,7 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
           tr = new fabric.Point(oCoords.tr.x, oCoords.tr.y),
           bl = new fabric.Point(oCoords.bl.x, oCoords.bl.y),
           br = new fabric.Point(oCoords.br.x, oCoords.br.y);
+
       return tl.x > selectionTL.x
         && tr.x < selectionBR.x
         && tl.y > selectionTL.y
@@ -9838,7 +9850,7 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
      * @property
      * @type String
      */
-    fontFamily:       'Modernist_One_400',
+    fontFamily:       'Times_New_Roman',
 
     /**
      * @property
