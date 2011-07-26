@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2011, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.4.6" };
+var fabric = fabric || { version: "0.4.7" };
 
 (function(){
   var view = document.defaultView;
@@ -767,11 +767,36 @@ Cufon.registerEngine('canvas', (function() {
       g.save();
       g.fillStyle = options.backgroundColor;
 
-      var left = 0;
+      var left = 0, lineNum = 0;
+
+      if (options.textAlign === 'right') {
+        g.translate(lineOffsets[lineNum], 0);
+      }
+      else if (options.textAlign === 'center') {
+        g.translate(lineOffsets[lineNum] / 2, 0);
+      }
+
       for (var i = 0, l = chars.length; i < l; ++i) {
         if (chars[i] === '\n') {
-          g.translate(-left, -font.ascent - ((font.ascent / 5) * options.lineHeight));
+
+          lineNum++;
+
+          var topOffset = -font.ascent - ((font.ascent / 5) * options.lineHeight);
+
+          if (options.textAlign === 'right') {
+            g.translate(-width, topOffset);
+            g.translate(lineOffsets[lineNum], 0);
+          }
+          else if (options.textAlign === 'center') {
+            g.translate(-left - (lineOffsets[lineNum - 1] / 2), topOffset);
+            g.translate(lineOffsets[lineNum] / 2, 0);
+          }
+          else {
+            g.translate(-left, topOffset);
+          }
+
           left = 0;
+
           continue;
         }
         var glyph = font.glyphs[chars[i]] || font.missingGlyph;
