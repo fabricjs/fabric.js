@@ -67,12 +67,12 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
           switch (obj.type) {
             case 'image':
             case 'text':
-              fabric[capitalize(obj.type)].fromObject(obj, function (o) {
+              fabric[fabric.util.string.capitalize(obj.type)].fromObject(obj, function (o) {
                 onObjectLoaded(o, index);
               });
               break;
             default:
-              var klass = fabric[camelize(capitalize(obj.type))];
+              var klass = fabric[fabric.util.string.camelize(fabric.util.string.capitalize(obj.type))];
               if (klass && klass.fromObject) {
                 // restore path
                 if (path) {
@@ -88,7 +88,7 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
             _this.loadImageFromURL(path, function (image) {
               image.setSourcePath(path);
 
-              extend(image, obj);
+              fabric.util.object.extend(image, obj);
               image.setAngle(obj.angle);
 
               onObjectLoaded(image, index);
@@ -192,7 +192,7 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
       switch (o.type) {
         case 'image':
         case 'font':
-          fabric[capitalize(o.type)].fromObject(o, function (o) {
+          fabric[fabric.util.string.capitalize(o.type)].fromObject(o, function (o) {
             _this.insertAt(o, index);
             if (++numLoadedImages === numTotalImages) {
               if (callback) {
@@ -202,7 +202,7 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
           });
           break;
         default:
-          var klass = fabric[camelize(capitalize(o.type))];
+          var klass = fabric[fabric.util.string.camelize(fabric.util.string.capitalize(o.type))];
           if (klass && klass.fromObject) {
             _this.insertAt(klass.fromObject(o), index);
           }
