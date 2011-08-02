@@ -159,19 +159,19 @@
      * @method _render
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    _render: function(context) {
+    _render: function(ctx) {
       var o = Cufon.textOptions || (Cufon.textOptions = { });
       
       // export options to be used by cufon.js
       o.left = this.left;
       o.top = this.top;
-      o.context = context;
+      o.context = ctx;
       o.color = this.fill;
       
       var el = this._initDummyElement();
       
       // set "cursor" to top/left corner
-      this.transform(context);
+      this.transform(ctx);
       
       // draw text
       Cufon.replaceElement(el, {
@@ -234,14 +234,14 @@
      * @method render
      * @param ctx {CanvasRenderingContext2D} context to render on
      */
-    render: function(context) {
-      context.save();
-      this._render(context);
-      if (this.active) {
-        this.drawBorders(context);
-        this.drawCorners(context);
+    render: function(ctx, noTransform) {
+      ctx.save();
+      this._render(ctx);
+      if (!noTransform && this.active) {
+        this.drawBorders(ctx);
+        this.hideCorners || this.drawCorners(ctx);
       }
-      context.restore();
+      ctx.restore();
     },
     
     /**
