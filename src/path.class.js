@@ -489,7 +489,7 @@
      */
     toString: function() {
       return '#<fabric.Path (' + this.complexity() + 
-        '): { "top": ' + this.top + ', "left": ' + this.left + '}>';
+        '): { "top": ' + this.top + ', "left": ' + this.left + ' }>';
     },
     
     /**

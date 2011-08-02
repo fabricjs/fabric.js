@@ -523,20 +523,10 @@
     canvas.setActiveGroup(group);
     
     var eventsFired = {
-      beforeGroupDestroyed: false,
-      afterGroupDestroyed: false,
       selectionCleared: false
     };
     var target;
     
-    canvas.observe('before:group:destroyed', function (e) {
-      eventsFired.beforeGroupDestroyed = true;
-      equals(canvas.getActiveGroup(), e.memo.target, 'event should have active group as its `target` property');
-    });
-    
-    canvas.observe('after:group:destroyed', function(){
-      eventsFired.afterGroupDestroyed = true;
-    });
     
     canvas.observe('selection:cleared', function(){
       eventsFired.selectionCleared = true;
@@ -550,17 +540,6 @@
     for (var prop in eventsFired) {
       ok(eventsFired[prop]);
     }
-    
-    eventsFired.beforeGroupDestroyed = false;
-    eventsFired.afterGroupDestroyed = false;
-    eventsFired.selectionCleared = false;
-    
-    canvas.deactivateAllWithDispatch();
-    
-    ok(!eventsFired.beforeGroupDestroyed, 'before:group:destroyed should only fire when there\'s an active group');
-    ok(!eventsFired.afterGroupDestroyed, 'after:group:destroyed should only fire when there\'s an active group');
-    
-    ok(eventsFired.selectionCleared, 'selection:cleared is fired independent of active group existence');
   });
   
   test('complexity', function() {

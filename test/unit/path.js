@@ -16,7 +16,7 @@
     'flipX': false, 
     'flipY': false, 
     'opacity': 1,
-    'path': [['M', 100, 100], ['L', 300, 100], ['L', 200, 300], ['z', NaN]],
+    'path': [['M', 100, 100], ['L', 300, 100], ['L', 200, 300], ['z']],
     'selectable': true
   };
   
@@ -62,7 +62,8 @@
   test('toString', function() {
     var path = makePathObject();
     ok(typeof path.toString == 'function');
-    equals('#<fabric.Path (4): {"top":100,"left":100}>', path.toString());
+    console.log(path.toString());
+    equals('#<fabric.Path (4): { "top": 100, "left": 100 }>', path.toString());
   });
   
   test('toObject', function() {

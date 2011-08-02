@@ -4,8 +4,8 @@
     'type':         'path-group', 
     'left':         0, 
     'top':          0, 
-    'width':        100, 
-    'height':       100, 
+    'width':        0, 
+    'height':       0, 
     'fill':         'rgb(0,0,0)',
     'overlayFill':  null,
     'stroke':       null, 
@@ -59,6 +59,11 @@
     var paths = getPathObjects();
     var pathGroup = new fabric.PathGroup(paths);
     ok(typeof pathGroup.getObjects == 'function');
+    
+    // nulling group to avoid circular reference (qUnit goes into inifinite loop)
+    paths[0].group = null;
+    paths[1].group = null;
+    
     same(paths, pathGroup.getObjects());
   });
   
@@ -120,6 +125,9 @@
     var fillValue = 'rgb(100,200,100)';
     var pathGroup = getPathGroupObject();
     
+    pathGroup.getObjects()[0].group = null;
+    pathGroup.getObjects()[1].group = null;
+    
     ok(typeof pathGroup.set == 'function');
     equals(pathGroup.set('fill', fillValue), pathGroup, 'should be chainable');
     
@@ -147,6 +155,9 @@
     
     var pathGroup = getPathGroupObject();
     
+    pathGroup.getObjects()[0].group = null;
+    pathGroup.getObjects()[1].group = null;
+    
     ok(typeof pathGroup.toGrayscale == 'function');
     equals(pathGroup.toGrayscale(), pathGroup, 'should be chainable');
     var firstObject = pathGroup.getObjects()[0],
@@ -162,7 +173,7 @@
     
     equals(firstObject.get('overlayFill'), 'rgb(60,60,60)');
     equals(secondObject.get('overlayFill'), 'rgb(28,28,28)');
-
+        
     equals(firstObject.get('fill'), 'rgb(200,0,0)', 'toGrayscale should not change original fill value');
     equals(new fabric.Color(secondObject.get('fill')).toRgb(), 'rgb(0,0,255)', 'toGrayscale should not change original fill value');
   });

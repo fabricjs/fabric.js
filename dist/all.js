@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2011, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.4.11" };
+var fabric = fabric || { version: "0.4.12" };
 
 (function(){
   var view = document.defaultView;
@@ -6391,6 +6391,20 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
     selectable:               true,
 
     /**
+     * When set to `false`, object's controls are not displayed and can not be used to manipulate object
+     * @property
+     * @type Boolean
+     */
+    hasControls:              true,
+
+    /**
+     * When set to `false`, object's borders are not rendered
+     * @property
+     * @type Boolean
+     */
+    hasBorders:               true,
+
+    /**
      * @method callSuper
      * @param {String} methodName
      */
@@ -6797,6 +6811,8 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
      * @chainable
      */
     drawBorders: function(ctx) {
+      if (!this.hasBorders) return;
+
       var padding = this.padding,
           padding2 = padding * 2;
 
@@ -6836,6 +6852,8 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
      * @chainable
      */
     drawCorners: function(ctx) {
+      if (!this.hasControls) return;
+
       var size = this.cornersize,
           size2 = size / 2,
           padding = this.padding,
@@ -7094,6 +7112,8 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
      * @return {String|Boolean} corner code (tl, tr, bl, br, etc.), or false if nothing is found
      */
     _findTargetCorner: function(e, offset) {
+      if (!this.hasControls) return false;
+
       var pointer = getPointer(e),
           ex = pointer.x - offset.left,
           ey = pointer.y - offset.top,
@@ -8978,7 +8998,7 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
      */
     toString: function() {
       return '#<fabric.Path (' + this.complexity() +
-        '): { "top": ' + this.top + ', "left": ' + this.left + '}>';
+        '): { "top": ' + this.top + ', "left": ' + this.left + ' }>';
     },
 
     /**
