@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2011, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.4.10" };
+var fabric = fabric || { version: "0.4.11" };
 
 (function(){
   var view = document.defaultView;
@@ -765,6 +765,7 @@ Cufon.registerEngine('canvas', (function() {
 
     function renderBackground() {
       g.save();
+
       g.fillStyle = options.backgroundColor;
 
       var left = 0, lineNum = 0;
@@ -918,7 +919,9 @@ Cufon.registerEngine('canvas', (function() {
     }
 
     g.save();
-    renderBackground();
+    if (options.backgroundColor) {
+      renderBackground();
+    }
     renderText();
     g.restore();
     g.restore();
@@ -9836,7 +9839,8 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
    */
   fabric.Group.fromObject = function(object) {
     return new fabric.Group(object.objects, object);
-  }
+  };
+
 })(this);
 
 (function(global) {

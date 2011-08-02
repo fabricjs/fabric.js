@@ -456,5 +456,6 @@
    */
   fabric.Group.fromObject = function(object) {
     return new fabric.Group(object.objects, object);
-  }
+  };
+  
 })(this);
