@@ -29,12 +29,22 @@
       </div>
 
       <div class="block">
-        <h3>Custom object boundaries</h3>
+        <h3>Custom borders, controls</h3>
         <canvas id="c3" width="200" height="200"></canvas>
       </div>
       
       <div class="block">
-        <h3>No object boundaries + opacity on move</h3>
+        <h3>No borders</h3>
+        <canvas id="c15" width="200" height="200"></canvas>
+      </div>
+      
+      <div class="block">
+        <h3>No controls</h3>
+        <canvas id="c16" width="200" height="200"></canvas>
+      </div>
+      
+      <div class="block">
+        <h3>No borders, no controls</h3>
         <canvas id="c10" width="200" height="200"></canvas>
       </div>
       
@@ -111,11 +121,11 @@
         canvas3.item(0).borderColor = 'red';
         canvas3.item(0).cornerColor = 'green';
         canvas3.item(0).cornersize = 6;
+        canvas3.setActiveObject(canvas3.item(0));
         
         var canvas10 = new fabric.Canvas('c10');
         canvas10.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
-        canvas10.item(0).borderColor = 'rgba(0,0,0,0)';
-        canvas10.item(0).cornerColor = 'rgba(0,0,0,0)';
+        canvas10.item(0).hasControls = canvas10.item(0).hasBorders = false;
         
         canvas10.observe({
           'mouse:down': function(e) {
@@ -140,7 +150,7 @@
         
         var canvas11 = new fabric.Canvas('c11');
         canvas11.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
-        canvas11.HOVER_CURSOR = 'crosshair';
+        canvas11.HOVER_CURSOR = 'pointer';
         
         var canvas12 = new fabric.Canvas('c12');
         canvas12.add(new fabric.Rect({ left: 110, top: 110, fill: '#f0f', width: 50, height: 50 }));
@@ -229,6 +239,16 @@
           canvas14.item(1).toGrayscale(callback);
           canvas14.item(2).toGrayscale(callback);
         });
+        
+        var canvas15 = new fabric.Canvas('c15');
+        canvas15.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
+        canvas15.item(0).hasBorders = false;
+        canvas15.setActiveObject(canvas15.item(0));
+        
+        var canvas16 = new fabric.Canvas('c16');
+        canvas16.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
+        canvas16.item(0).hasControls = false;
+        canvas16.setActiveObject(canvas16.item(0));
         
       </script>
 
