@@ -67,20 +67,35 @@
           
           var canvas = window.__canvas = new fabric.Element('canvas', { 
                 renderOnAddition: false, 
-                stateful: false 
+                stateful: false,
+                HOVER_CURSOR: 'default'
               }),
               Circle = fabric.Circle,
               startTime = new Date(),
               circle;
-
+          
+          canvas.observe({
+            'object:selected': function(e) {
+              e.memo.target.setOpacity(0.75);
+            },
+            'mouse:up': function(e) {
+              if (e.memo.target) {
+                e.memo.target.setOpacity(1);
+                canvas.renderAll();
+              } 
+            }
+          });
+          
           for (var i = numObjects; i--; ) {
-            canvas.add(new Circle({ 
+            var c = new Circle({ 
               radius: radius,
               left: getRandomNum(0, width), 
               top: getRandomNum(0, height),
               fill: 'red',
               stroke: 'blue'
-            }));
+            });
+            c.hasControls = c.hasBorders = false;
+            canvas.add(c);
           }
           canvas.renderAll();
           canvas.calcOffset();
