@@ -38,7 +38,7 @@
 <script id="main">
   var canvas = new fabric.Canvas('c');
   
-  canvas.loadSVGFromURL('../kitchensink/assets/135.svg', function(objects) {
+  fabric.loadSVGFromURL('../kitchensink/assets/135.svg', function(objects) {
     
     var obj = objects[0].scale(0.25);
     canvas.centerObjectH(obj).centerObjectV(obj);
