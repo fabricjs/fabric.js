@@ -1604,66 +1604,6 @@
     })(),
     
     /**
-     * Takes url corresponding to an SVG document, and parses it to a set of objects
-     * @method loadSVGFromURL
-     * @param {String} url
-     * @param {Function} callback
-     */
-    loadSVGFromURL: function (url, callback) {
-      
-      var _this = this;
-      
-      url = url.replace(/^\n\s*/, '').replace(/\?.*$/, '').trim();
-      
-      this.cache.has(url, function (hasUrl) {
-        if (hasUrl) {
-          _this.cache.get(url, function (value) {
-            var enlivedRecord = _this._enlivenCachedObject(value);
-            callback(enlivedRecord.objects, enlivedRecord.options);
-          });
-        }
-        else {
-          new fabric.util.request(url, {
-            method: 'get',
-            onComplete: onComplete
-          });
-        }
-      });
-      
-      function onComplete(r) {
-        
-        var xml = r.responseXML;
-        if (!xml) return;
-        
-        var doc = xml.documentElement;
-        if (!doc) return;
-        
-        fabric.parseSVGDocument(doc, function (results, options) {
-          _this.cache.set(url, {
-            objects: fabric.util.array.invoke(results, 'toObject'),
-            options: options
-          });
-          callback(results, options);
-        });
-      }
-    },
-    
-    /**
-     * @method _enlivenCachedObject
-     */
-    _enlivenCachedObject: function (cachedObject) {
-      
-      var objects = cachedObject.objects,
-          options = cachedObject.options;
-      
-      objects = objects.map(function (o) {
-        return fabric[capitalize(o.type)].fromObject(o);
-      });
-      
-      return ({ objects: objects, options: options });
-    },
-    
-    /**
      * Removes an object from canvas and returns it
      * @method remove
      * @param object {Object} Object to remove
@@ -1917,41 +1857,6 @@
       // scale image down so that it has original dimensions when printed in large resolution
       if (imageWidth) {
         imgEl.width = imageWidth * widthScaleFactor;
-      }
-    },
-    
-    /**
-     * Used for caching SVG documents (loaded via `fabric.Canvas#loadSVGFromURL`)
-     * @property
-     * @namespace
-     */
-    cache: {
-      
-      /**
-       * @method has
-       * @param {String} name
-       * @param {Function} callback
-       */
-      has: function (name, callback) { 
-        callback(false);
-      },
-      
-      /**
-       * @method get
-       * @param {String} url
-       * @param {Function} callback
-       */
-      get: function (url, callback) {
-        /* NOOP */
-      },
-      
-      /**
-       * @method set
-       * @param {String} url
-       * @param {Object} object
-       */
-      set: function (url, object) {
-        /* NOOP */
       }
     }
   });

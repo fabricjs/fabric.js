@@ -113,7 +113,7 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
             fabric.util.getScript(path, onscriptload);
           }
           else {
-            _this.loadSVGFromURL(path, function (elements, options) {
+            fabric.loadSVGFromURL(path, function (elements, options) {
               if (elements.length > 1) {
                 var object = new fabric.PathGroup(elements, obj);
               }

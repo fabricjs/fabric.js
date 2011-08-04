@@ -120,7 +120,7 @@
       case 'shape':
         var id = element.id, match;
         if (match = /\d+$/.exec(id)) {
-          canvas.loadSVGFromURL('assets/' + match[0] + '.svg', function(objects, options) {
+          fabric.loadSVGFromURL('assets/' + match[0] + '.svg', function(objects, options) {
             
             var loadedObject;
             if (objects.length > 1) {
@@ -607,5 +607,14 @@
       });
     })();
   }
+  
+  document.getElementById('load-svg').onclick = function() {
+    var svg = document.getElementById('svg-console').value;
+    fabric.loadSVGFromString(svg, function(objects) {
+      if (objects.length === 1) {
+        canvas.add(objects[0]);
+      }
+    });
+  };
   
 })(this);

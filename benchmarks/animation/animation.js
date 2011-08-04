@@ -65,19 +65,6 @@
     canvas.renderAll();
   };
   
-  function loadSVGFromURL(url, callback) {
-    new fabric.util.request(url, {
-      method: 'get',
-      onComplete: function(r) {
-        var xml = r.responseXML;
-        if (!xml) return;
-        var doc = xml.documentElement;
-        if (!doc) return;
-        fabric.parseSVGDocument(doc, callback);
-      }
-    });
-  }
-  
   var angle = 0; 
   function animate() {
     angle += 2;
@@ -98,8 +85,8 @@
   
   function loadShape() {
     for (var i = coords.length; i--; ) {
-      (function(i){
-        loadSVGFromURL('../../demos/kitchensink/assets/' + shapePath, function(objects, options) {
+      (function(i) {
+        fabric.loadSVGFromURL('../../demos/kitchensink/assets/' + shapePath, function(objects, options) {
           var pathGroup = new fabric.PathGroup(objects, options);
 
           pathGroup.set({
