@@ -257,7 +257,26 @@
               <input type="color" value="rgb(0,0,0)" id="drawing-color" size="15">
             </div>
           </li>
-        
+          
+          <li style="margin-top:10px">
+            
+<label for="svg-console">Load SVG:</label>
+
+<textarea rows="15" cols="55" id="svg-console">
+&lt;?xml version="1.0" standalone="no"?>
+&lt;!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+
+&lt;svg width="100%" height="100%" version="1.1"
+xmlns="http://www.w3.org/2000/svg">
+
+&lt;rect width="300" height="100"
+style="fill:rgb(0,0,255);stroke-width:1;stroke:rgb(0,0,0)"/>
+&lt;/svg>
+</textarea>
+            <button type="button" id="load-svg">Load</button>
+          </li>
+          
           <li style="margin-top:10px;">
             <label for="canvas-console">Execute code:</label>
   <textarea rows="15" cols="55" id="canvas-console">
@@ -288,24 +307,6 @@ canvas.add(new fabric.Circle({
   
   </textarea>
             <button type="button" id="execute">Execute</button>
-          </li>
-          <li style="margin-top:10px">
-            
-<label for="svg-console">Load SVG:</label>
-
-<textarea rows="15" cols="55" id="svg-console">
-&lt;?xml version="1.0" standalone="no"?>
-&lt;!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
-  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-
-&lt;svg width="100%" height="100%" version="1.1"
-xmlns="http://www.w3.org/2000/svg">
-
-&lt;rect width="300" height="100"
-style="fill:rgb(0,0,255);stroke-width:1;stroke:rgb(0,0,0)"/>
-&lt;/svg>
-</textarea>
-            <button type="button" id="load-svg">Load</button>
           </li>
         </ul>
       </div>

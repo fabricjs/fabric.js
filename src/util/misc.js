@@ -213,6 +213,7 @@
     * @param {Function} callback
     */
   function loadSVGFromString(string, callback) {
+    string = string.trim();
     var doc;
     if (typeof DOMParser !== 'undefined') {
       var parser = new DOMParser();

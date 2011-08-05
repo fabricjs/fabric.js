@@ -1767,7 +1767,7 @@ fabric.Observable = {
    };
 
    /**
-    * Takes url corresponding to an SVG document, and parses it to a set of objects
+    * Takes url corresponding to an SVG document, and parses it into a set of fabric objects
     * @method loadSVGFromURL
     * @param {String} url
     * @param {Function} callback
@@ -1799,8 +1799,6 @@ fabric.Observable = {
        var doc = xml.documentElement;
        if (!doc) return;
 
-       console.log(doc);
-
        fabric.parseSVGDocument(doc, function (results, options) {
          svgCache.set(url, {
            objects: fabric.util.array.invoke(results, 'toObject'),
@@ -1826,7 +1824,14 @@ fabric.Observable = {
    return ({ objects: objects, options: options });
   }
 
+  /**
+    * Takes string corresponding to an SVG document, and parses it into a set of fabric objects
+    * @method loadSVGFromString
+    * @param {String} string
+    * @param {Function} callback
+    */
   function loadSVGFromString(string, callback) {
+    string = string.trim();
     var doc;
     if (typeof DOMParser !== 'undefined') {
       var parser = new DOMParser();

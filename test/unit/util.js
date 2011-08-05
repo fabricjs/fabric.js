@@ -282,4 +282,45 @@
       equals('none', el.userSelect);
     }
   });
+  
+  test('fabric.loadSVGFromURL', function() {
+    equal("function", typeof fabric.loadSVGFromURL);
+  });
+  
+  var SVG_DOC_AS_STRING = '<?xml version="1.0"?>\
+    <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\
+    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">\
+      <polygon fill="red" stroke="blue" stroke-width="10" points="350, 75 379,161 469,161\
+        397,215 423,301 350,250 277,301 303,215 231,161 321,161" />\
+    </svg>';
+  
+  asyncTest('fabric.loadSVGFromString', function() {
+    equal("function", typeof fabric.loadSVGFromString);
+    
+    var loadedObjects = [ ];
+    fabric.loadSVGFromString(SVG_DOC_AS_STRING, function(objects) {
+      loadedObjects = objects;
+    });
+    
+    setTimeout(function() {
+      ok(loadedObjects[0] instanceof fabric.Polygon);
+      equals('red', loadedObjects[0].fill);
+      start();
+    }, 1000);
+  });
+  
+  asyncTest('fabric.loadSVGFromString with surrounding whitespace', function() {
+    var loadedObjects = [ ];
+    fabric.loadSVGFromString('   \n\n  ' + SVG_DOC_AS_STRING + '  ', function(objects) {
+      loadedObjects = objects;
+    });
+    
+    setTimeout(function() {
+      ok(loadedObjects[0] instanceof fabric.Polygon);
+      equals('red', loadedObjects[0] && loadedObjects[0].fill);
+      start();
+    }, 1000);
+  });
+  
+  
 })();

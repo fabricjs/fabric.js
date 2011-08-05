@@ -614,6 +614,10 @@
       if (objects.length === 1) {
         canvas.add(objects[0]);
       }
+      else {
+        canvas.add(new fabric.PathGroup(objects));
+      }
+      canvas.renderAll();
     });
   };
   
