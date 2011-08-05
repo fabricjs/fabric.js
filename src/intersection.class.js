@@ -148,4 +148,4 @@
     return result;
   };
   
-})(this);
+})(typeof exports != 'undefined' ? exports : this);

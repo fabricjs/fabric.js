@@ -129,4 +129,4 @@
     return new fabric.Polyline(points, object);
   };
   
-})(this);
+})(typeof exports != 'undefined' ? exports : this);

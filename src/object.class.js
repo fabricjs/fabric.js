@@ -1316,4 +1316,5 @@
       })(propName);
     }
   }
-})(this);
+  
+})(typeof exports != 'undefined' ? exports : this);

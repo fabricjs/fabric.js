@@ -145,5 +145,6 @@
    */
   fabric.Polygon.fromObject = function(object) {
     return new fabric.Polygon(object.points, object);
-  }
-})(this);
+  };
+
+})(typeof exports != 'undefined' ? exports : this);

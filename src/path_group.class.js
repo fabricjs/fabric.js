@@ -243,4 +243,5 @@
     var paths = instantiatePaths(object.paths);
     return new fabric.PathGroup(paths, object);
   };
-})(this);
+
+})(typeof exports != 'undefined' ? exports : this);

@@ -148,4 +148,4 @@
     return new fabric.Circle(object);
   };
   
-})(this);
+})(typeof exports != 'undefined' ? exports : this);

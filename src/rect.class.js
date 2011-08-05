@@ -177,4 +177,5 @@
   fabric.Rect.fromObject = function(object) {
     return new fabric.Rect(object);
   };
-})(this);
+  
+})(typeof exports != 'undefined' ? exports : this);

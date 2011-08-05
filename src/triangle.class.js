@@ -79,4 +79,5 @@
   fabric.Triangle.fromObject = function(object) {
     return new fabric.Triangle(object);
   };
-})(this);
+
+})(typeof exports != 'undefined' ? exports : this);

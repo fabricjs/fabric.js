@@ -133,5 +133,6 @@
    */
   fabric.Ellipse.fromObject = function(object) {
     return new fabric.Ellipse(object);
-  }
-})(this);
+  };
+
+})(typeof exports != 'undefined' ? exports : this);

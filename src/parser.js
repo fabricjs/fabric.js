@@ -521,4 +521,4 @@
     getCSSRules:            getCSSRules
   });
   
-})(this);
+})(typeof exports != 'undefined' ? exports : this);

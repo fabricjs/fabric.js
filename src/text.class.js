@@ -351,4 +351,5 @@
   fabric.Text.fromElement = function(element) {
     // TODO (kangax): implement this
   };
-})(this);
+  
+})(typeof exports != 'undefined' ? exports : this);

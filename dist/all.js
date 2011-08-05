@@ -2,18 +2,9 @@
 
 var fabric = fabric || { version: "0.4.13" };
 
-(function(){
-  var view = document.defaultView;
-  if (view && view.getComputedStyle) {
-    var style = view.getComputedStyle(document.documentElement, '');
-
-    if (style === null) {
-      view.getComputedStyle = function getComputedStyle(element, pseudoElement) {
-        return element.style;
-      }
-    }
-  }
-})();
+if (typeof exports != 'undefined') {
+  exports.fabric = fabric;
+}
 
 /*!
  * Copyright (c) 2009 Simo Kinnunen.
@@ -702,7 +693,7 @@ Cufon.registerEngine('canvas', (function() {
     }
 
     var wStyle = wrapper.style;
-    var cStyle = canvas.style;
+    var cStyle = canvas.style || { };
 
     var height = size.convert(viewBox.height - expandTop + expandBottom);
     var roundedHeight = Math.ceil(height);
@@ -1114,6 +1105,10 @@ Cufon.registerEngine('vml', (function() {
   };
 
 })());
+
+if (typeof exports != 'undefined') {
+  exports.Cufon = Cufon;
+}
 /*
     http://www.JSON.org/json2.js
     2010-03-20
@@ -3255,7 +3250,7 @@ fabric.util.getElementOffset = getElementOffset;
     getCSSRules:            getCSSRules
   });
 
-})(this);
+})(typeof exports != 'undefined' ? exports : this);
 (function() {
 
   function getColorStopFromStyle(el) {
@@ -3624,7 +3619,7 @@ fabric.util.getElementOffset = getElementOffset;
     }
   };
 
-})(this);
+})(typeof exports != 'undefined' ? exports : this);
 
 (function(global) {
 
@@ -3774,7 +3769,7 @@ fabric.util.getElementOffset = getElementOffset;
     return result;
   };
 
-})(this);
+})(typeof exports != 'undefined' ? exports : this);
 (function(global) {
 
   "use strict";
@@ -4054,7 +4049,8 @@ fabric.util.getElementOffset = getElementOffset;
     oColor.setSource(source);
     return oColor;
   };
-})(this);
+
+})(typeof exports != 'undefined' ? exports : this);
 
 (function (global) {
 
@@ -4065,10 +4061,7 @@ fabric.util.getElementOffset = getElementOffset;
     return;
   }
 
-  var window = global.window,
-      document = window.document,
-
-      extend = fabric.util.object.extend,
+  var extend = fabric.util.object.extend,
       capitalize = fabric.util.string.capitalize,
       camelize = fabric.util.string.camelize,
       getPointer = fabric.util.getPointer,
@@ -4375,6 +4368,9 @@ fabric.util.getElementOffset = getElementOffset;
      */
     _createCanvasElement: function() {
       var element = document.createElement('canvas');
+      if (!element.style) {
+        element.style = { };
+      }
       if (!element) {
         throw CANVAS_INIT_ERROR;
       }
@@ -5960,7 +5956,7 @@ fabric.util.getElementOffset = getElementOffset;
    */
   fabric.Element = fabric.Canvas;
 
-})(this);
+})(typeof exports != 'undefined' ? exports : this);
 fabric.util.object.extend(fabric.Canvas.prototype, {
 
   /**
@@ -7595,7 +7591,8 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
       })(propName);
     }
   }
-})(this);
+
+})(typeof exports != 'undefined' ? exports : this);
 
 (function(global) {
 
@@ -7726,7 +7723,8 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
     var points = [object.x1, object.y1, object.x2, object.y2];
     return new fabric.Line(points, object);
   };
-})(this);
+
+})(typeof exports != 'undefined' ? exports : this);
 
 (function(global) {
 
@@ -7875,7 +7873,7 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
     return new fabric.Circle(object);
   };
 
-})(this);
+})(typeof exports != 'undefined' ? exports : this);
 (function(global) {
 
   "use strict";
@@ -7957,7 +7955,8 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
   fabric.Triangle.fromObject = function(object) {
     return new fabric.Triangle(object);
   };
-})(this);
+
+})(typeof exports != 'undefined' ? exports : this);
 
 (function(global){
 
@@ -8091,8 +8090,9 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
    */
   fabric.Ellipse.fromObject = function(object) {
     return new fabric.Ellipse(object);
-  }
-})(this);
+  };
+
+})(typeof exports != 'undefined' ? exports : this);
 
 (function(global) {
 
@@ -8269,7 +8269,8 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
   fabric.Rect.fromObject = function(object) {
     return new fabric.Rect(object);
   };
-})(this);
+
+})(typeof exports != 'undefined' ? exports : this);
 
 (function(global) {
 
@@ -8399,7 +8400,7 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
     return new fabric.Polyline(points, object);
   };
 
-})(this);
+})(typeof exports != 'undefined' ? exports : this);
 
 (function(global) {
 
@@ -8545,8 +8546,9 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
    */
   fabric.Polygon.fromObject = function(object) {
     return new fabric.Polygon(object.points, object);
-  }
-})(this);
+  };
+
+})(typeof exports != 'undefined' ? exports : this);
 
 (function(global) {
 
@@ -9204,7 +9206,8 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
     var parsedAttributes = fabric.parseAttributes(element, fabric.Path.ATTRIBUTE_NAMES);
     return new fabric.Path(parsedAttributes.d, extend(parsedAttributes, options));
   };
-})(this);
+
+})(typeof exports != 'undefined' ? exports : this);
 
 (function(global) {
 
@@ -9434,7 +9437,8 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
     var paths = instantiatePaths(object.paths);
     return new fabric.PathGroup(paths, object);
   };
-})(this);
+
+})(typeof exports != 'undefined' ? exports : this);
 
 (function(global){
 
@@ -9891,7 +9895,7 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
     return new fabric.Group(object.objects, object);
   };
 
-})(this);
+})(typeof exports != 'undefined' ? exports : this);
 
 (function(global) {
 
@@ -10227,7 +10231,8 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
    */
   fabric.Text.fromElement = function(element) {
   };
-})(this);
+
+})(typeof exports != 'undefined' ? exports : this);
 
 (function(global) {
 
@@ -10656,4 +10661,4 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
 
   fabric.Image.fromElement.async = true;
 
-})(this);
+})(typeof exports != 'undefined' ? exports : this);

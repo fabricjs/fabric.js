@@ -277,4 +277,5 @@
     oColor.setSource(source);
     return oColor;
   };
-})(this);
+
+})(typeof exports != 'undefined' ? exports : this);

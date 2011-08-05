@@ -670,4 +670,5 @@
     var parsedAttributes = fabric.parseAttributes(element, fabric.Path.ATTRIBUTE_NAMES);
     return new fabric.Path(parsedAttributes.d, extend(parsedAttributes, options));
   };
-})(this);
+
+})(typeof exports != 'undefined' ? exports : this);

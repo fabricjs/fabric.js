@@ -7,11 +7,8 @@
     return;
   }
   
-  var window = global.window,
-      document = window.document,
-      
-      // aliases for faster resolution
-      extend = fabric.util.object.extend,
+  // aliases for faster resolution
+  var extend = fabric.util.object.extend,
       capitalize = fabric.util.string.capitalize,
       camelize = fabric.util.string.camelize,
       getPointer = fabric.util.getPointer,
@@ -318,6 +315,9 @@
      */
     _createCanvasElement: function() {
       var element = document.createElement('canvas');
+      if (!element.style) {
+        element.style = { };
+      }
       if (!element) {
         throw CANVAS_INIT_ERROR;
       }
@@ -1964,4 +1964,4 @@
    */
   fabric.Element = fabric.Canvas;
   
-})(this);
+})(typeof exports != 'undefined' ? exports : this);

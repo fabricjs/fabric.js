@@ -133,4 +133,5 @@
     var points = [object.x1, object.y1, object.x2, object.y2];
     return new fabric.Line(points, object);
   };
-})(this);
+
+})(typeof exports != 'undefined' ? exports : this);

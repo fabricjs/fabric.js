@@ -458,4 +458,4 @@
     return new fabric.Group(object.objects, object);
   };
   
-})(this);
+})(typeof exports != 'undefined' ? exports : this);

@@ -430,4 +430,4 @@
   
   fabric.Image.fromElement.async = true;
   
-})(this);
+})(typeof exports != 'undefined' ? exports : this);
