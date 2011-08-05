@@ -12,7 +12,7 @@
 //= require "src/color.class"
 
 //= require "src/canvas.class"
-//= require "src/canvas.fx"
+//= require "src/canvas.animation"
 //= require "src/canvas.serialization"
 
 //= require "src/object.class"
