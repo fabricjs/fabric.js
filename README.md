@@ -15,6 +15,7 @@ Contributions are very much welcome!
 - Encapsulated in one object
 - No browser sniffing for critical functionality
 - Runs under ES5 strict mode
+- Runs on a server under [Node.js](http://nodejs.org/)
 
 ### Supported browsers
 
