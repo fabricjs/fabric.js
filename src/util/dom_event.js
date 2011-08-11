@@ -12,7 +12,7 @@
     return true;
   }
   var getUniqueId = (function () {
-    if (typeof document.documentElement.uniqueID !== 'undefined') {
+    if (typeof fabric.document.documentElement.uniqueID !== 'undefined') {
       return function (element) {
         return element.uniqueID;
       };
@@ -47,7 +47,7 @@
 
   function createWrappedHandler(uid, handler) {
     return function (e) {
-      handler.call(getElement(uid), e || window.event);
+      handler.call(getElement(uid), e || fabric.window.event);
     };
   }
 
@@ -56,19 +56,19 @@
       if (handlers[uid] && handlers[uid][eventName]) {
         var handlersForEvent = handlers[uid][eventName];
         for (var i = 0, len = handlersForEvent.length; i < len; i++) {
-          handlersForEvent[i].call(this, e || window.event);
+          handlersForEvent[i].call(this, e || fabric.window.event);
         }
       }
     };
   }
 
   var shouldUseAddListenerRemoveListener = (
-        areHostMethods(document.documentElement, 'addEventListener', 'removeEventListener') &&
-        areHostMethods(window, 'addEventListener', 'removeEventListener')),
+        areHostMethods(fabric.document.documentElement, 'addEventListener', 'removeEventListener') &&
+        areHostMethods(fabric.window, 'addEventListener', 'removeEventListener')),
 
       shouldUseAttachEventDetachEvent = (
-        areHostMethods(document.documentElement, 'attachEvent', 'detachEvent') &&
-        areHostMethods(window, 'attachEvent', 'detachEvent')),
+        areHostMethods(fabric.document.documentElement, 'attachEvent', 'detachEvent') &&
+        areHostMethods(fabric.window, 'attachEvent', 'detachEvent')),
 
       // IE branch
       listeners = { },
@@ -184,8 +184,8 @@
   }
 
   function pointerX(event) {
-    var docElement = document.documentElement,
-        body = document.body || { scrollLeft: 0 };
+    var docElement = fabric.document.documentElement,
+        body = fabric.document.body || { scrollLeft: 0 };
     
     // looks like in IE (<9) clientX at certain point (apparently when mouseup fires on VML element) 
     // is represented as COM object, with all the consequences, like "unknown" type and error on [[Get]]
@@ -196,8 +196,8 @@
   }
 
   function pointerY(event) {
-    var docElement = document.documentElement,
-        body = document.body || { scrollTop: 0 };
+    var docElement = fabric.document.documentElement,
+        body = fabric.document.body || { scrollTop: 0 };
 
     return  event.pageY || ((typeof event.clientY != 'unknown' ? event.clientY : 0) +
        (docElement.scrollTop || body.scrollTop) -

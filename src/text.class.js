@@ -211,8 +211,8 @@
      * @method _initDummyElement
      */
     _initDummyElement: function() {
-      var el = document.createElement('div'),
-          container = document.createElement('div');
+      var el = fabric.document.createElement('div'),
+          container = fabric.document.createElement('div');
       
       // Cufon doesn't play nice with textDecoration=underline if element doesn't have a parent
       container.appendChild(el);

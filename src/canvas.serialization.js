@@ -100,7 +100,7 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
             var object = fabric.Text.fromObject(obj);
             var onscriptload = function () {
               // TODO (kangax): find out why Opera refuses to work without this timeout
-              if (Object.prototype.toString.call(window.opera) === '[object Opera]') {
+              if (Object.prototype.toString.call(fabric.window.opera) === '[object Opera]') {
                 setTimeout(function () {
                   onObjectLoaded(object, index);
                 }, 500);
@@ -247,7 +247,7 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
    * @return {fabric.Canvas} Clone of this instance
    */
   clone: function (callback) {
-    var el = document.createElement('canvas');
+    var el = fabric.document.createElement('canvas');
     
     el.width = this.getWidth();
     el.height = this.getHeight();

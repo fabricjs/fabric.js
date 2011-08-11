@@ -30,10 +30,10 @@
     return element;
   }
 
-  var parseEl = document.createElement('div'),
+  var parseEl = fabric.document.createElement('div'),
       supportsOpacity = typeof parseEl.style.opacity === 'string', 
       supportsFilters = typeof parseEl.style.filter === 'string',
-      view = document.defaultView,
+      view = fabric.document.defaultView,
       supportsGCS = view && typeof view.getComputedStyle !== 'undefined',
       reOpacity = /alpha\s*\(\s*opacity\s*=\s*([^\)]+)\)/,
       

@@ -698,36 +698,6 @@
     }, 2000);
   });
   
-  asyncTest('cache', function() {
-    ok(canvas.cache);
-    
-    ok(typeof canvas.cache.has == 'function');
-    ok(typeof canvas.cache.get == 'function');
-    ok(typeof canvas.cache.set == 'function');
-    
-    var message = 'initially, `has` should always return false';
-    
-    var hasFoo, hasBarBaz, hasEmpty;
-    
-    canvas.cache.has('foo', function(v){
-      hasFoo = v;
-    });
-    canvas.cache.has('bar baz moooo', function(v){
-      hasBarBaz = v;
-    });
-    canvas.cache.has('', function(v){
-      hasEmpty = v;
-    });
-    
-    setTimeout(function() {
-      equals(hasFoo, false, message);
-      equals(hasBarBaz, false, message);
-      equals(hasEmpty, false, message);
-      
-      start();
-    }, 500);
-  });
-  
   asyncTest('loadImageFromURL', function() {
     ok(typeof canvas.loadImageFromURL == 'function');
     

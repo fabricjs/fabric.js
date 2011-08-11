@@ -232,8 +232,8 @@
       }
       
       var imgEl = this.getElement(),
-          canvasEl = document.createElement('canvas'),
-          replacement = document.createElement('img'),
+          canvasEl = fabric.document.createElement('canvas'),
+          replacement = fabric.document.createElement('img'),
           _this = this;
 
       canvasEl.width = imgEl.width;
@@ -363,7 +363,7 @@
    * @param callback {Function} optional
    */
   fabric.Image.fromObject = function(object, callback) {
-    var img = document.createElement('img'),
+    var img = fabric.document.createElement('img'),
         src = object.src;
         
     if (object.width) {
@@ -392,7 +392,7 @@
    * @param {Object} [imgOptions] Options object
    */
   fabric.Image.fromURL = function(url, callback, imgOptions) {
-    var img = document.createElement('img');
+    var img = fabric.document.createElement('img');
     
     /** @ignore */
     img.onload = function() {

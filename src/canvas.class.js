@@ -314,7 +314,7 @@
      * @param {Element} element
      */
     _createCanvasElement: function() {
-      var element = document.createElement('canvas');
+      var element = fabric.document.createElement('canvas');
       if (!element.style) {
         element.style = { };
       }
@@ -365,18 +365,18 @@
       
       this._onMouseDown = function (e) { 
         _this.__onMouseDown(e);
-        addListener(document, 'mouseup', _this._onMouseUp);
+        addListener(fabric.document, 'mouseup', _this._onMouseUp);
       };
       this._onMouseUp = function (e) { 
         _this.__onMouseUp(e);
-        removeListener(document, 'mouseup', _this._onMouseUp);
+        removeListener(fabric.document, 'mouseup', _this._onMouseUp);
       };
       this._onMouseMove = function (e) { _this.__onMouseMove(e); };
       this._onResize = function (e) { _this.calcOffset() };
       
       addListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
-      addListener(document, 'mousemove', this._onMouseMove);
-      addListener(window, 'resize', this._onResize);
+      addListener(fabric.document, 'mousemove', this._onMouseMove);
+      addListener(fabric.window, 'resize', this._onResize);
     },
     
     /**
@@ -1557,7 +1557,7 @@
         var _this = this;
         
         function checkIfLoaded() {
-          var imgEl = document.getElementById(imgCache[url]);
+          var imgEl = fabric.document.getElementById(imgCache[url]);
           if (imgEl.width && imgEl.height) {
             callback(new fabric.Image(imgEl));
           }
@@ -1598,7 +1598,7 @@
             imgCache[url] = Element.identify(imgEl);
           }
           
-          document.body.appendChild(imgEl);
+          fabric.document.body.appendChild(imgEl);
         }
       }
     })(),
@@ -1839,8 +1839,8 @@
     dispose: function () {
       this.clear();
       removeListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
-      removeListener(document, 'mousemove', this._onMouseMove);
-      removeListener(window, 'resize', this._onResize);
+      removeListener(fabric.document, 'mousemove', this._onMouseMove);
+      removeListener(fabric.window, 'resize', this._onResize);
       return this;
     },
     
@@ -1920,7 +1920,7 @@
      *                          `null` if canvas element or context can not be initialized
      */
     supports: function (methodName) {
-      var el = document.createElement('canvas');
+      var el = fabric.document.createElement('canvas');
       
       if (typeof G_vmlCanvasManager !== 'undefined') {
         G_vmlCanvasManager.initElement(el);

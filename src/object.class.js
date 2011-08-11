@@ -690,7 +690,7 @@
      * @return {String} string of data
      */
     toDataURL: function() {
-      var el = document.createElement('canvas');
+      var el = fabric.document.createElement('canvas');
       
       el.width = this.getWidth();
       el.height = this.getHeight();

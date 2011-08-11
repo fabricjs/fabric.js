@@ -221,7 +221,7 @@
         doc = parser.parseFromString(string, 'text/xml');
       }
     }
-    else if (window.ActiveXObject) {
+    else if (fabric.window.ActiveXObject) {
       var doc = new ActiveXObject('Microsoft.XMLDOM');
       if (doc && doc.loadXML) {
         doc.async = 'false';
@@ -243,4 +243,5 @@
   
   fabric.loadSVGFromURL = loadSVGFromURL;
   fabric.loadSVGFromString = loadSVGFromString;
+  
 })();

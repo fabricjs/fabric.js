@@ -1,9 +1,18 @@
 /*! Fabric.js Copyright 2008-2011, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.4.13" };
+var fabric = fabric || { version: "0.5" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
+}
+
+if (typeof document != 'undefined' && typeof window != 'undefined') {
+  fabric.document = document;
+  fabric.window = window;
+}
+else {
+  fabric.document = require("jsdom").jsdom("<!DOCTYPE html><html><head></head><body></body></html>");
+  fabric.window = fabric.document.createWindow();
 }
 
 /*!
@@ -30,20 +39,20 @@ var Cufon = (function() {
       };
 
 
-      if (document.addEventListener) {
-        document.addEventListener('DOMContentLoaded', perform, false);
-        window.addEventListener('pageshow', perform, false); // For cached Gecko pages
+      if (fabric.document.addEventListener) {
+        fabric.document.addEventListener('DOMContentLoaded', perform, false);
+        fabric.window.addEventListener('pageshow', perform, false); // For cached Gecko pages
       }
 
 
-      if (!window.opera && document.readyState) (function() {
-        readyStatus[document.readyState] ? perform() : setTimeout(arguments.callee, 10);
+      if (!fabric.window.opera && fabric.document.readyState) (function() {
+        readyStatus[fabric.document.readyState] ? perform() : setTimeout(arguments.callee, 10);
       })();
 
 
-      if (document.readyState && document.createStyleSheet) (function() {
+      if (fabric.document.readyState && fabric.document.createStyleSheet) (function() {
         try {
-          document.body.doScroll('left');
+          fabric.document.body.doScroll('left');
           perform();
         }
         catch (e) {
@@ -51,7 +60,7 @@ var Cufon = (function() {
         }
       })();
 
-      addEvent(window, 'load', perform); // Fallback
+      addEvent(fabric.window, 'load', perform); // Fallback
 
       return function(listener) {
         if (!arguments.length) perform();
@@ -117,7 +126,7 @@ var Cufon = (function() {
         for (var i = 0, l = linkElements.length; link = linkElements[i], i < l; ++i) {
           if (!link.disabled && link.rel.toLowerCase() == 'stylesheet') ++linkStyles;
         }
-        if (document.styleSheets.length >= styleElements.length + linkStyles) perform();
+        if (fabric.document.styleSheets.length >= styleElements.length + linkStyles) perform();
         else setTimeout(arguments.callee, 10);
       });
 
@@ -129,7 +138,7 @@ var Cufon = (function() {
     })(),
 
     supports: function(property, value) {
-      var checker = document.createElement('span').style;
+      var checker = fabric.document.createElement('span').style;
       if (checker[property] === undefined) return false;
       checker[property] = value;
       return checker[property] === value;
@@ -355,7 +364,7 @@ var Cufon = (function() {
     }
     else if (el.attachEvent) {
       el.attachEvent('on' + type, function() {
-        return listener.call(el, window.event);
+        return listener.call(el, fabric.window.event);
       });
     }
   }
@@ -389,7 +398,7 @@ var Cufon = (function() {
   }
 
   function elementsByTagName(query) {
-    return document.getElementsByTagName(query);
+    return fabric.document.getElementsByTagName(query);
   }
 
   function merge() {
@@ -404,7 +413,7 @@ var Cufon = (function() {
 
     var separate = options.separate;
     if (separate == 'none') return engines[options.engine].apply(null, arguments);
-    var fragment = document.createDocumentFragment(), processed;
+    var fragment = fabric.document.createDocumentFragment(), processed;
     var parts = text.split(separators[separate]), needsAligning = (separate == 'words');
     if (needsAligning && HAS_BROKEN_REGEXP) {
       if (/^\s/.test(text)) parts.unshift('');
@@ -463,12 +472,12 @@ var Cufon = (function() {
     },
     printable: true,
     selector: (
-        window.Sizzle
-      ||  (window.jQuery && function(query) { return jQuery(query); }) // avoid noConflict issues
-      ||  (window.dojo && dojo.query)
-      ||  (window.$$ && function(query) { return $$(query); })
-      ||  (window.$ && function(query) { return $(query); })
-      ||  (document.querySelectorAll && function(query) { return document.querySelectorAll(query); })
+        fabric.window.Sizzle
+      ||  (fabric.window.jQuery && function(query) { return jQuery(query); }) // avoid noConflict issues
+      ||  (fabric.window.dojo && dojo.query)
+      ||  (fabric.window.$$ && function(query) { return $$(query); })
+      ||  (fabric.window.$ && function(query) { return $(query); })
+      ||  (fabric.document.querySelectorAll && function(query) { return fabric.document.querySelectorAll(query); })
       ||  elementsByTagName
     ),
     separate: 'words', // 'none' and 'characters' are also accepted
@@ -548,17 +557,17 @@ var Cufon = (function() {
 Cufon.registerEngine('canvas', (function() {
 
 
-  var check = document.createElement('canvas');
+  var check = fabric.document.createElement('canvas');
   if (!check || !check.getContext || !check.getContext.apply) return;
   check = null;
 
   var HAS_INLINE_BLOCK = Cufon.CSS.supports('display', 'inline-block');
 
-  var HAS_BROKEN_LINEHEIGHT = !HAS_INLINE_BLOCK && (document.compatMode == 'BackCompat' || /frameset|transitional/i.test(document.doctype.publicId));
+  var HAS_BROKEN_LINEHEIGHT = !HAS_INLINE_BLOCK && (fabric.document.compatMode == 'BackCompat' || /frameset|transitional/i.test(fabric.document.doctype.publicId));
 
-  var styleSheet = document.createElement('style');
+  var styleSheet = fabric.document.createElement('style');
   styleSheet.type = 'text/css';
-  styleSheet.appendChild(document.createTextNode(
+  styleSheet.appendChild(fabric.document.createTextNode(
     '.cufon-canvas{text-indent:0}' +
     '@media screen,projection{' +
       '.cufon-canvas{display:inline;display:inline-block;position:relative;vertical-align:middle' +
@@ -576,7 +585,7 @@ Cufon.registerEngine('canvas', (function() {
       '.cufon-canvas .cufon-alt{display:inline}' +
     '}'
   ));
-  document.getElementsByTagName('head')[0].appendChild(styleSheet);
+  fabric.document.getElementsByTagName('head')[0].appendChild(styleSheet);
 
   function generateFromVML(path, context) {
     var atX = 0, atY = 0;
@@ -677,17 +686,17 @@ Cufon.registerEngine('canvas', (function() {
       canvas = node.firstChild;
     }
     else {
-      wrapper = document.createElement('span');
+      wrapper = fabric.document.createElement('span');
       wrapper.className = 'cufon cufon-canvas';
       wrapper.alt = text;
 
-      canvas = document.createElement('canvas');
+      canvas = fabric.document.createElement('canvas');
       wrapper.appendChild(canvas);
 
       if (options.printable) {
-        var print = document.createElement('span');
+        var print = fabric.document.createElement('span');
         print.className = 'cufon-alt';
-        print.appendChild(document.createTextNode(text));
+        print.appendChild(fabric.document.createTextNode(text));
         wrapper.appendChild(print);
       }
     }
@@ -926,21 +935,21 @@ Cufon.registerEngine('canvas', (function() {
 
 Cufon.registerEngine('vml', (function() {
 
-  if (!document.namespaces) return;
+  if (!fabric.document.namespaces) return;
 
-  var canvasEl = document.createElement('canvas');
+  var canvasEl = fabric.document.createElement('canvas');
   if (canvasEl && canvasEl.getContext && canvasEl.getContext.apply) return;
 
-  if (document.namespaces.cvml == null) {
-    document.namespaces.add('cvml', 'urn:schemas-microsoft-com:vml');
+  if (fabric.document.namespaces.cvml == null) {
+    fabric.document.namespaces.add('cvml', 'urn:schemas-microsoft-com:vml');
   }
 
-  var check = document.createElement('cvml:shape');
+  var check = fabric.document.createElement('cvml:shape');
   check.style.behavior = 'url(#default#VML)';
   if (!check.coordsize) return; // VML isn't supported
   check = null;
 
-  document.write('<style type="text/css">' +
+  fabric.document.write('<style type="text/css">' +
     '.cufon-vml-canvas{text-indent:0}' +
     '@media screen{' +
       'cvml\\:shape,cvml\\:shadow{behavior:url(#default#VML);display:block;antialias:true;position:absolute}' +
@@ -996,22 +1005,22 @@ Cufon.registerEngine('vml', (function() {
       canvas = node.firstChild;
     }
     else {
-      wrapper = document.createElement('span');
+      wrapper = fabric.document.createElement('span');
       wrapper.className = 'cufon cufon-vml';
       wrapper.alt = text;
 
-      canvas = document.createElement('span');
+      canvas = fabric.document.createElement('span');
       canvas.className = 'cufon-vml-canvas';
       wrapper.appendChild(canvas);
 
       if (options.printable) {
-        var print = document.createElement('span');
+        var print = fabric.document.createElement('span');
         print.className = 'cufon-alt';
-        print.appendChild(document.createTextNode(text));
+        print.appendChild(fabric.document.createTextNode(text));
         wrapper.appendChild(print);
       }
 
-      if (!hasNext) wrapper.appendChild(document.createElement('cvml:shape'));
+      if (!hasNext) wrapper.appendChild(fabric.document.createElement('cvml:shape'));
     }
 
     var wStyle = wrapper.style;
@@ -1061,7 +1070,7 @@ Cufon.registerEngine('vml', (function() {
         if (shape.firstChild) shape.removeChild(shape.firstChild); // shadow
       }
       else {
-        shape = document.createElement('cvml:shape');
+        shape = fabric.document.createElement('cvml:shape');
         canvas.appendChild(shape);
       }
 
@@ -1078,7 +1087,7 @@ Cufon.registerEngine('vml', (function() {
       if (shadows) {
         var shadow1 = shadows[0], shadow2 = shadows[1];
         var color1 = Cufon.CSS.color(shadow1.color), color2;
-        var shadow = document.createElement('cvml:shadow');
+        var shadow = fabric.document.createElement('cvml:shadow');
         shadow.on = 't';
         shadow.color = color1.color;
         shadow.offset = shadow1.offX + ',' + shadow1.offY;
@@ -1834,7 +1843,7 @@ fabric.Observable = {
         doc = parser.parseFromString(string, 'text/xml');
       }
     }
-    else if (window.ActiveXObject) {
+    else if (fabric.window.ActiveXObject) {
       var doc = new ActiveXObject('Microsoft.XMLDOM');
       if (doc && doc.loadXML) {
         doc.async = 'false';
@@ -2212,7 +2221,7 @@ if (!Function.prototype.bind) {
     return true;
   }
   var getUniqueId = (function () {
-    if (typeof document.documentElement.uniqueID !== 'undefined') {
+    if (typeof fabric.document.documentElement.uniqueID !== 'undefined') {
       return function (element) {
         return element.uniqueID;
       };
@@ -2247,7 +2256,7 @@ if (!Function.prototype.bind) {
 
   function createWrappedHandler(uid, handler) {
     return function (e) {
-      handler.call(getElement(uid), e || window.event);
+      handler.call(getElement(uid), e || fabric.window.event);
     };
   }
 
@@ -2256,19 +2265,19 @@ if (!Function.prototype.bind) {
       if (handlers[uid] && handlers[uid][eventName]) {
         var handlersForEvent = handlers[uid][eventName];
         for (var i = 0, len = handlersForEvent.length; i < len; i++) {
-          handlersForEvent[i].call(this, e || window.event);
+          handlersForEvent[i].call(this, e || fabric.window.event);
         }
       }
     };
   }
 
   var shouldUseAddListenerRemoveListener = (
-        areHostMethods(document.documentElement, 'addEventListener', 'removeEventListener') &&
-        areHostMethods(window, 'addEventListener', 'removeEventListener')),
+        areHostMethods(fabric.document.documentElement, 'addEventListener', 'removeEventListener') &&
+        areHostMethods(fabric.window, 'addEventListener', 'removeEventListener')),
 
       shouldUseAttachEventDetachEvent = (
-        areHostMethods(document.documentElement, 'attachEvent', 'detachEvent') &&
-        areHostMethods(window, 'attachEvent', 'detachEvent')),
+        areHostMethods(fabric.document.documentElement, 'attachEvent', 'detachEvent') &&
+        areHostMethods(fabric.window, 'attachEvent', 'detachEvent')),
 
       listeners = { },
 
@@ -2381,8 +2390,8 @@ if (!Function.prototype.bind) {
   }
 
   function pointerX(event) {
-    var docElement = document.documentElement,
-        body = document.body || { scrollLeft: 0 };
+    var docElement = fabric.document.documentElement,
+        body = fabric.document.body || { scrollLeft: 0 };
 
     return event.pageX || ((typeof event.clientX != 'unknown' ? event.clientX : 0) +
       (docElement.scrollLeft || body.scrollLeft) -
@@ -2390,8 +2399,8 @@ if (!Function.prototype.bind) {
   }
 
   function pointerY(event) {
-    var docElement = document.documentElement,
-        body = document.body || { scrollTop: 0 };
+    var docElement = fabric.document.documentElement,
+        body = fabric.document.body || { scrollTop: 0 };
 
     return  event.pageY || ((typeof event.clientY != 'unknown' ? event.clientY : 0) +
        (docElement.scrollTop || body.scrollTop) -
@@ -2435,10 +2444,10 @@ if (!Function.prototype.bind) {
     return element;
   }
 
-  var parseEl = document.createElement('div'),
+  var parseEl = fabric.document.createElement('div'),
       supportsOpacity = typeof parseEl.style.opacity === 'string',
       supportsFilters = typeof parseEl.style.filter === 'string',
-      view = document.defaultView,
+      view = fabric.document.defaultView,
       supportsGCS = view && typeof view.getComputedStyle !== 'undefined',
       reOpacity = /alpha\s*\(\s*opacity\s*=\s*([^\)]+)\)/,
 
@@ -2483,7 +2492,7 @@ var _slice = Array.prototype.slice;
  * @return {HTMLElement|null}
  */
 function getById(id) {
-  return typeof id === 'string' ? document.getElementById(id) : id;
+  return typeof id === 'string' ? fabric.document.getElementById(id) : id;
 }
 
 /**
@@ -2498,7 +2507,7 @@ function toArray(arrayLike) {
 }
 
 try {
-  var sliceCanConvertNodelists = toArray(document.childNodes) instanceof Array;
+  var sliceCanConvertNodelists = toArray(fabric.document.childNodes) instanceof Array;
 }
 catch(err) { }
 
@@ -2521,7 +2530,7 @@ if (!sliceCanConvertNodelists) {
  * @return {HTMLElement} Newly created element
  */
 function makeElement(tagName, attributes) {
-  var el = document.createElement(tagName);
+  var el = fabric.document.createElement(tagName);
   for (var prop in attributes) {
     if (prop === 'class') {
       el.className = attributes[prop];
@@ -2589,7 +2598,7 @@ function getElementOffset(element) {
 }
 
 (function () {
-  var style = document.documentElement.style;
+  var style = fabric.document.documentElement.style;
 
   var selectProp = 'userSelect' in style
     ? 'userSelect'
@@ -2634,8 +2643,8 @@ function getElementOffset(element) {
    * @param {Function} callback Callback to execute when script is finished loading
    */
   function getScript(url, callback) {
-  	var headEl = document.getElementsByTagName("head")[0],
-  	    scriptEl = document.createElement('script'),
+  	var headEl = fabric.document.getElementsByTagName("head")[0],
+  	    scriptEl = fabric.document.createElement('script'),
   	    loading = true;
 
   	scriptEl.type = 'text/javascript';
@@ -2648,7 +2657,7 @@ function getElementOffset(element) {
   	        this.readyState !== 'loaded' &&
   	        this.readyState !== 'complete') return;
     	  loading = false;
-    		callback(e || window.event);
+    		callback(e || fabric.window.event);
     		scriptEl = scriptEl.onload = scriptEl.onreadystatechange = null;
     	}
   	};
@@ -2749,7 +2758,7 @@ fabric.util.getElementOffset = getElementOffset;
   fabric.util.request = request;
 })();
 
-})(this);
+})(typeof exports != 'undefined' ? exports : this);
 (function(global) {
 
   "use strict";
@@ -4367,7 +4376,7 @@ fabric.util.getElementOffset = getElementOffset;
      * @param {Element} element
      */
     _createCanvasElement: function() {
-      var element = document.createElement('canvas');
+      var element = fabric.document.createElement('canvas');
       if (!element.style) {
         element.style = { };
       }
@@ -4418,18 +4427,18 @@ fabric.util.getElementOffset = getElementOffset;
 
       this._onMouseDown = function (e) {
         _this.__onMouseDown(e);
-        addListener(document, 'mouseup', _this._onMouseUp);
+        addListener(fabric.document, 'mouseup', _this._onMouseUp);
       };
       this._onMouseUp = function (e) {
         _this.__onMouseUp(e);
-        removeListener(document, 'mouseup', _this._onMouseUp);
+        removeListener(fabric.document, 'mouseup', _this._onMouseUp);
       };
       this._onMouseMove = function (e) { _this.__onMouseMove(e); };
       this._onResize = function (e) { _this.calcOffset() };
 
       addListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
-      addListener(document, 'mousemove', this._onMouseMove);
-      addListener(window, 'resize', this._onResize);
+      addListener(fabric.document, 'mousemove', this._onMouseMove);
+      addListener(fabric.window, 'resize', this._onResize);
     },
 
     /**
@@ -5560,7 +5569,7 @@ fabric.util.getElementOffset = getElementOffset;
         var _this = this;
 
         function checkIfLoaded() {
-          var imgEl = document.getElementById(imgCache[url]);
+          var imgEl = fabric.document.getElementById(imgCache[url]);
           if (imgEl.width && imgEl.height) {
             callback(new fabric.Image(imgEl));
           }
@@ -5595,7 +5604,7 @@ fabric.util.getElementOffset = getElementOffset;
             imgCache[url] = Element.identify(imgEl);
           }
 
-          document.body.appendChild(imgEl);
+          fabric.document.body.appendChild(imgEl);
         }
       }
     })(),
@@ -5832,8 +5841,8 @@ fabric.util.getElementOffset = getElementOffset;
     dispose: function () {
       this.clear();
       removeListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
-      removeListener(document, 'mousemove', this._onMouseMove);
-      removeListener(window, 'resize', this._onResize);
+      removeListener(fabric.document, 'mousemove', this._onMouseMove);
+      removeListener(fabric.window, 'resize', this._onResize);
       return this;
     },
 
@@ -5912,7 +5921,7 @@ fabric.util.getElementOffset = getElementOffset;
      *                          `null` if canvas element or context can not be initialized
      */
     supports: function (methodName) {
-      var el = document.createElement('canvas');
+      var el = fabric.document.createElement('canvas');
 
       if (typeof G_vmlCanvasManager !== 'undefined') {
         G_vmlCanvasManager.initElement(el);
@@ -6161,7 +6170,7 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
             obj.path = path;
             var object = fabric.Text.fromObject(obj);
             var onscriptload = function () {
-              if (Object.prototype.toString.call(window.opera) === '[object Opera]') {
+              if (Object.prototype.toString.call(fabric.window.opera) === '[object Opera]') {
                 setTimeout(function () {
                   onObjectLoaded(object, index);
                 }, 500);
@@ -6305,7 +6314,7 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
    * @return {fabric.Canvas} Clone of this instance
    */
   clone: function (callback) {
-    var el = document.createElement('canvas');
+    var el = fabric.document.createElement('canvas');
 
     el.width = this.getWidth();
     el.height = this.getHeight();
@@ -6987,7 +6996,7 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
      * @return {String} string of data
      */
     toDataURL: function() {
-      var el = document.createElement('canvas');
+      var el = fabric.document.createElement('canvas');
 
       el.width = this.getWidth();
       el.height = this.getHeight();
@@ -10094,8 +10103,8 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
      * @method _initDummyElement
      */
     _initDummyElement: function() {
-      var el = document.createElement('div'),
-          container = document.createElement('div');
+      var el = fabric.document.createElement('div'),
+          container = fabric.document.createElement('div');
 
       container.appendChild(el);
       el.innerHTML = this.text;
@@ -10463,8 +10472,8 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
       }
 
       var imgEl = this.getElement(),
-          canvasEl = document.createElement('canvas'),
-          replacement = document.createElement('img'),
+          canvasEl = fabric.document.createElement('canvas'),
+          replacement = fabric.document.createElement('img'),
           _this = this;
 
       canvasEl.width = imgEl.width;
@@ -10594,7 +10603,7 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
    * @param callback {Function} optional
    */
   fabric.Image.fromObject = function(object, callback) {
-    var img = document.createElement('img'),
+    var img = fabric.document.createElement('img'),
         src = object.src;
 
     if (object.width) {
@@ -10623,7 +10632,7 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
    * @param {Object} [imgOptions] Options object
    */
   fabric.Image.fromURL = function(url, callback, imgOptions) {
-    var img = document.createElement('img');
+    var img = fabric.document.createElement('img');
 
     /** @ignore */
     img.onload = function() {

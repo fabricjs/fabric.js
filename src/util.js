@@ -25,4 +25,4 @@
   
   //= require "util/dom_request"
   
-})(this);
+})(typeof exports != 'undefined' ? exports : this);

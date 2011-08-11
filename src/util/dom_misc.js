@@ -8,7 +8,7 @@ var _slice = Array.prototype.slice;
  * @return {HTMLElement|null}
  */
 function getById(id) {
-  return typeof id === 'string' ? document.getElementById(id) : id;
+  return typeof id === 'string' ? fabric.document.getElementById(id) : id;
 }
 
 /**
@@ -23,7 +23,7 @@ function toArray(arrayLike) {
 }
 
 try {
-  var sliceCanConvertNodelists = toArray(document.childNodes) instanceof Array;
+  var sliceCanConvertNodelists = toArray(fabric.document.childNodes) instanceof Array;
 }
 catch(err) { }
 
@@ -46,7 +46,7 @@ if (!sliceCanConvertNodelists) {
  * @return {HTMLElement} Newly created element
  */
 function makeElement(tagName, attributes) {
-  var el = document.createElement(tagName);
+  var el = fabric.document.createElement(tagName);
   for (var prop in attributes) {
     if (prop === 'class') {
       el.className = attributes[prop];
@@ -115,7 +115,7 @@ function getElementOffset(element) {
 }
 
 (function () {
-  var style = document.documentElement.style;
+  var style = fabric.document.documentElement.style;
 
   var selectProp = 'userSelect' in style
     ? 'userSelect'
@@ -160,8 +160,8 @@ function getElementOffset(element) {
    * @param {Function} callback Callback to execute when script is finished loading
    */
   function getScript(url, callback) {
-  	var headEl = document.getElementsByTagName("head")[0],
-  	    scriptEl = document.createElement('script'), 
+  	var headEl = fabric.document.getElementsByTagName("head")[0],
+  	    scriptEl = fabric.document.createElement('script'), 
   	    loading = true;
 
   	scriptEl.type = 'text/javascript';
@@ -174,7 +174,7 @@ function getElementOffset(element) {
   	        this.readyState !== 'loaded' && 
   	        this.readyState !== 'complete') return;
     	  loading = false;
-    		callback(e || window.event);
+    		callback(e || fabric.window.event);
     		scriptEl = scriptEl.onload = scriptEl.onreadystatechange = null;
     	}
   	};
