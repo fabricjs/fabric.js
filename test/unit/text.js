@@ -74,6 +74,16 @@
     equals(text.set('text', 'bar'), text, 'should be chainable');
   });
   
+  test('set with "hash"', function() {
+    var text = createTextObject();
+    
+    text.set({ opacity: 0.123, fill: 'red', fontFamily: 'blah' });
+    
+    equals(0.123, text.getOpacity());
+    equals('red', text.getFill());
+    equals('blah', text.get('fontFamily'));
+  });
+  
   test('setColor', function(){
     var text = createTextObject();
     ok(typeof text.setColor == 'function');

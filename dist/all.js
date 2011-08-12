@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2011, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.5" };
+var fabric = fabric || { version: "0.5.1" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -1865,6 +1865,7 @@ fabric.Observable = {
 
   fabric.loadSVGFromURL = loadSVGFromURL;
   fabric.loadSVGFromString = loadSVGFromString;
+
 })();
 
 if (!Array.prototype.indexOf) {
@@ -10213,9 +10214,16 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
      * @chainable
      */
     set: function(name, value) {
-      this[name] = value;
-      if (name === 'fontFamily' && this.path) {
-        this.path = this.path.replace(/(.*?)([^\/]*)(\.font\.js)/, '$1' + value + '$3');
+      if (typeof name == 'object') {
+        for (var prop in name) {
+          this.set(prop, name[prop]);
+        }
+      }
+      else {
+        this[name] = value;
+        if (name === 'fontFamily' && this.path) {
+          this.path = this.path.replace(/(.*?)([^\/]*)(\.font\.js)/, '$1' + value + '$3');
+        }
       }
       return this;
     }

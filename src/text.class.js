@@ -323,9 +323,16 @@
      * @chainable
      */
     set: function(name, value) {
-      this[name] = value;
-      if (name === 'fontFamily' && this.path) {
-        this.path = this.path.replace(/(.*?)([^\/]*)(\.font\.js)/, '$1' + value + '$3');
+      if (typeof name == 'object') {
+        for (var prop in name) {
+          this.set(prop, name[prop]);
+        }
+      }
+      else {
+        this[name] = value;
+        if (name === 'fontFamily' && this.path) {
+          this.path = this.path.replace(/(.*?)([^\/]*)(\.font\.js)/, '$1' + value + '$3');
+        }
       }
       return this;
     }
