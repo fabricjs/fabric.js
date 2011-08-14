@@ -1,5 +1,7 @@
 (function() {
   
+  fabric.util = { };
+  
   /**
    * Removes value from an array.
    * Presence of value (and its position in an array) is determined via `Array.prototype.indexOf`
@@ -111,128 +113,6 @@
 
      return interval;
    }
-   
-   
-   /**
-    * Used for caching SVG documents (loaded via `fabric.Canvas#loadSVGFromURL`)
-    * @property
-    * @namespace
-    */
-   var svgCache = {
-     
-     /**
-      * @method has
-      * @param {String} name
-      * @param {Function} callback
-      */
-     has: function (name, callback) { 
-       callback(false);
-     },
-     
-     /**
-      * @method get
-      * @param {String} url
-      * @param {Function} callback
-      */
-     get: function (url, callback) {
-       /* NOOP */
-     },
-     
-     /**
-      * @method set
-      * @param {String} url
-      * @param {Object} object
-      */
-     set: function (url, object) {
-       /* NOOP */
-     }
-   };
-   
-   /**
-    * Takes url corresponding to an SVG document, and parses it into a set of fabric objects
-    * @method loadSVGFromURL
-    * @param {String} url
-    * @param {Function} callback
-    */
-   function loadSVGFromURL(url, callback) {
-     
-     url = url.replace(/^\n\s*/, '').replace(/\?.*$/, '').trim();
-     
-     svgCache.has(url, function (hasUrl) {
-       if (hasUrl) {
-         svgCache.get(url, function (value) {
-           var enlivedRecord = _enlivenCachedObject(value);
-           callback(enlivedRecord.objects, enlivedRecord.options);
-         });
-       }
-       else {
-         new fabric.util.request(url, {
-           method: 'get',
-           onComplete: onComplete
-         });
-       }
-     });
-     
-     function onComplete(r) {
-       
-       var xml = r.responseXML;
-       if (!xml) return;
-       
-       var doc = xml.documentElement;
-       if (!doc) return;
-       
-       fabric.parseSVGDocument(doc, function (results, options) {
-         svgCache.set(url, {
-           objects: fabric.util.array.invoke(results, 'toObject'),
-           options: options
-         });
-         callback(results, options);
-       });
-     }
-   }
-   
-  /**
-  * @method _enlivenCachedObject
-  */
-  function _enlivenCachedObject(cachedObject) {
- 
-   var objects = cachedObject.objects,
-       options = cachedObject.options;
- 
-   objects = objects.map(function (o) {
-     return fabric[capitalize(o.type)].fromObject(o);
-   });
- 
-   return ({ objects: objects, options: options });
-  }
-  
-  /**
-    * Takes string corresponding to an SVG document, and parses it into a set of fabric objects
-    * @method loadSVGFromString
-    * @param {String} string
-    * @param {Function} callback
-    */
-  function loadSVGFromString(string, callback) {
-    string = string.trim();
-    var doc;
-    if (typeof DOMParser !== 'undefined') {
-      var parser = new DOMParser();
-      if (parser && parser.parseFromString) {
-        doc = parser.parseFromString(string, 'text/xml');
-      }
-    }
-    else if (fabric.window.ActiveXObject) {
-      var doc = new ActiveXObject('Microsoft.XMLDOM');
-      if (doc && doc.loadXML) {
-        doc.async = 'false';
-        doc.loadXML(string);
-      }
-    }
-    
-    fabric.parseSVGDocument(doc.documentElement, function (results, options) {
-      callback(results, options);
-    });
-  }
   
   fabric.util.removeFromArray = removeFromArray;
   fabric.util.degreesToRadians = degreesToRadians;
@@ -240,8 +120,5 @@
   fabric.util.getRandomInt = getRandomInt;
   fabric.util.falseFunction = falseFunction;
   fabric.util.animate = animate;
-  
-  fabric.loadSVGFromURL = loadSVGFromURL;
-  fabric.loadSVGFromString = loadSVGFromString;
   
 })();

@@ -38,25 +38,27 @@ Fabric.js started as a foundation for design editor on [printio.ru](http://print
 
 <h3 id="fabric-building">Building</h3>
 
-1. Install [Sprockets](http://github.com/sstephenson/sprockets)
+1. [Install Node.js](https://github.com/joyent/node/wiki/Installation)
 
-        $ gem install --remote sprockets
+2. Build distribution file  **[~76K minified, ~22K gzipped]**
 
-2. Build distribution file  **[~80K minified, ~24K gzipped]**
+        $ node build.js
 
-        $ sprocketize fabric.js > dist/all.js
-
-    - Build distribution with support for text (`fabric.Text`) **[~99K minified, 30K gzipped]**
-        
-            $ sprocketize fabric+text.js > dist/all.js
-        
-    - Build distribution with support for serialization (`loadFromJSON`, `clone`, etc.) **[~86K minified, 26K gzipped]**
-        
-            $ sprocketize fabric+serialization.js > dist/all.js
+    - Or build a custom distribution file, by passing (comma separated) module names to be included.<br>
     
-    - Build distribution with support for text AND serialization **[~105K minified, 32K gzipped]**
-
-            $ sprocketize fabric+text+serialization.js > dist/all.js
+            $ node build.js modules=text,serialization,parser
+            // or
+            $ node build.js modules=text
+            // or
+            $ node build.js modules=parser,text
+            // etc.
+      
+      By default (when none of the modules are specified) only basic functionality is included. 
+      See the list of modules below for more information on each one of them.
+    
+    - You can also include all modules like so:
+    
+            $ node build.js modules=ALL
 
 3. Create a minified distribution file
 
@@ -81,6 +83,15 @@ Fabric.js started as a foundation for design editor on [printio.ru](http://print
 Documentation is always available at [http://kangax.github.com/fabric.js/docs/](http://kangax.github.com/fabric.js/docs/). You can also build it locally, following step 4 from the "Building" section of this README.
 
 Also see [presentation from BK.js](http://www.slideshare.net/kangax/fabricjs-building-acanvaslibrarybk) and [presentation from Falsy Values](http://www.slideshare.net/kangax/fabric-falsy-values-8067834) for an overview of fabric.js, how it works, and its features.
+
+### Optional modules
+
+These are the optional modules that could be specified for inclusion, when building custom version of fabric:
+
+- **text** — Adds support for `fabric.Text`
+- **serialization** — Adds support for `loadFromJSON`, `loadFromDatalessJSON`, and `clone` methods on `fabric.Canvas`
+- **parser** — Adds support for `fabric.parseSVGDocument`, `fabric.loadSVGFromURL`, and `fabric.loadSVGFromString`
+- **node** — Adds support for running fabric under node.js, with help of [jsdom](https://github.com/tmpvar/jsdom) and [node-canvas](https://github.com/learnboost/node-canvas) libraries.
 
 ### Examples of use
 
