@@ -1,4 +1,4 @@
-test
-benchmarks
-demos
-docs
+test/
+benchmarks/
+demos/
+docs/

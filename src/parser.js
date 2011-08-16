@@ -468,6 +468,17 @@
       var startTime = new Date(),
           descendants = fabric.util.toArray(doc.getElementsByTagName('*'));
       
+      if (descendants.length === 0) {
+        // we're likely in node, where "o3-xml" library fails to gEBTN("*")
+        // https://github.com/ajaxorg/node-o3-xml/issues/21
+        descendants = doc.selectNodes("//*[name(.)!='svg']");
+        var arr = [ ];
+        for (var i = 0, len = descendants.length; i < len; i++) {
+          arr[i] = descendants[i];
+        }
+        descendants = arr;
+      }
+      
       var elements = descendants.filter(function(el) {
         return reAllowedSVGTagNames.test(el.tagName) && 
               !hasAncestorWithNodeName(el, /^(?:pattern|defs)$/); // http://www.w3.org/TR/SVG/struct.html#DefsElement
