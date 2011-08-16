@@ -11031,9 +11031,9 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
   var XML = require('o3-xml'),
       URL = require('url'),
       HTTP = require('http'),
-
-      Image = require('canvas').Image,
-      fabric = require('../dist/all.js').fabric;
+      
+      Canvas = require('canvas'),
+      Image = require('canvas').Image;
 
   function request(url, encoding, callback) {
     var oURL = URL.parse(url),
@@ -11082,8 +11082,10 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
     });
   };
 
-  fabric.createCanvasForNode = function(nodeCanvas) {
-    var canvasEl = fabric.document.createElement('canvas');
+  fabric.createCanvasForNode = function(width, height) {
+    
+    var canvasEl = fabric.document.createElement('canvas'),
+        nodeCanvas = new Canvas(width || 600, height || 600);
 
     // jsdom doesn't create style on canvas element, so here be temp. workaround 
     canvasEl.style = { };
@@ -11093,8 +11095,27 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
 
     var fabricCanvas = new fabric.Canvas(canvasEl);
     fabricCanvas.contextContainer = nodeCanvas.getContext('2d');
+    fabricCanvas.nodeCanvas = nodeCanvas;
 
     return fabricCanvas;
+  };
+  
+  fabric.Canvas.prototype.createPNGStream = function() {
+    return this.nodeCanvas.createPNGStream();
+  };
+  
+  var origSetWidth = fabric.Canvas.prototype.setWidth;
+  fabric.Canvas.prototype.setWidth = function(width) {
+    origSetWidth.call(this);
+    this.nodeCanvas.width = width;
+    return this;
+  };
+  
+  var origSetHeight = fabric.Canvas.prototype.setHeight;
+  fabric.Canvas.prototype.setHeight = function(height) {
+    origSetHeight.call(this);
+    this.nodeCanvas.height = height;
+    return this;
   };
   
 })();
