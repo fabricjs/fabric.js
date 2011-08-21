@@ -361,26 +361,32 @@
    * @method fromObject
    * @param object {Object}
    * @param callback {Function} optional
+   * @return fabric.Image
+   * Returns the instance of the fabric.Image.
    */
   fabric.Image.fromObject = function(object, callback) {
     var img = fabric.document.createElement('img'),
         src = object.src;
-        
+    var fabricImage = undefined;
+
     if (object.width) {
       img.width = object.width;
     }
     if (object.height) {
       img.height = object.height;
     }
-    
+
     /** @ignore */
     img.onload = function() {
       if (callback) {
-        callback(new fabric.Image(img, object));
+        fabricImage = fabric.Image(img, object);
+        callback(fabricImage);
       }
       img = img.onload = null;
     };
     img.src = src;
+
+    return fabricImage;
   };
   
   /**
@@ -390,18 +396,24 @@
    * @param {String} url URL to create an image from
    * @param {Function} [callback] Callback to invoke when image is created (newly created image is passed as a first argument)
    * @param {Object} [imgOptions] Options object
+   * @return fabric.Image
+   * Returns the instance of the fabric.Image.
    */
   fabric.Image.fromURL = function(url, callback, imgOptions) {
     var img = fabric.document.createElement('img');
-    
+    var fabricImage = undefined;
+
     /** @ignore */
     img.onload = function() {
       if (callback) {
-        callback(new fabric.Image(img, imgOptions));
+        fabricImage = new fabric.Image(img, imgOptions);
+        callback(fabricImage);
       }
       img = img.onload = null;
     };
     img.src = url;
+
+    return fabricImage;
   };
   
   /**
