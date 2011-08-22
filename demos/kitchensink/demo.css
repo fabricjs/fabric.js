@@ -1,6 +1,6 @@
 #bd-wrapper { overflow: hidden; position: relative; }
 #fps { position: absolute; left: 1px; top: 0; background: rgb(200,200,200); width: 70px; z-index: 1000; }
-#commands { float: left; font-size: 14px; margin-left: 15px; margin-top: -80px }
+#commands { float: left; font-size: 14px; margin-left: 15px; }
 #commands ul { list-style: none; padding-left: 0; }
 #canvas-console { display: block; font-size: 11px; }
 #rasterize { margin-top: 10px; color: green; }
