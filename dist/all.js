@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2011, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.5.3" };
+var fabric = fabric || { version: "0.5.4" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -4588,22 +4588,25 @@ fabric.util.string = {
      * See configuration documentation for more details.
      */
     _initEvents: function () {
-      
       var _this = this;
       
       this._onMouseDown = function (e) { 
         _this.__onMouseDown(e);
         addListener(fabric.document, 'mouseup', _this._onMouseUp);
+        addListener(fabric.document, 'mousemove', _this._onMouseMove);
+        removeListener(_this.upperCanvasEl, 'mousemove', _this._onMouseMove);
       };
       this._onMouseUp = function (e) { 
         _this.__onMouseUp(e);
         removeListener(fabric.document, 'mouseup', _this._onMouseUp);
+        removeListener(fabric.document, 'mousemove', _this._onMouseMove);
+        addListener(_this.upperCanvasEl, 'mousemove', _this._onMouseMove);
       };
       this._onMouseMove = function (e) { _this.__onMouseMove(e); };
       this._onResize = function (e) { _this.calcOffset() };
       
       addListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
-      addListener(fabric.document, 'mousemove', this._onMouseMove);
+      addListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
       addListener(fabric.window, 'resize', this._onResize);
     },
     
