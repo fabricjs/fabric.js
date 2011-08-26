@@ -33,7 +33,7 @@
           canvasEl.width = shape.width || 600;
           canvasEl.height = shape.height || 600;
           
-          canvas = new fabric.Canvas('c' + id);
+          canvas = window['__canvas' + id] = new fabric.Canvas('c' + id, { selection: false });
           
           canvas.add(shape).centerObjectH(shape).centerObjectV(shape).renderAll();
           shape.setCoords();
