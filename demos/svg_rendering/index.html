@@ -30,8 +30,15 @@
           var shape = toShape(objects, options);
           
           var canvasEl = document.getElementById('c' + id);
+          
           canvasEl.width = shape.width || 600;
           canvasEl.height = shape.height || 600;
+          
+          var iframeEl = canvasEl.parentNode.nextSibling.childNodes[1];
+          if (iframeEl) {
+            iframeEl.style.width = canvasEl.width + 'px';
+            iframeEl.style.height = canvasEl.height + 'px';
+          }
           
           canvas = window['__canvas' + id] = new fabric.Canvas('c' + id, { selection: false });
           
