@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2011, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.5.4" };
+var fabric = fabric || { version: "0.5.5" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -4334,6 +4334,9 @@ fabric.util.string = {
     if (options.overlayImage) {
       this.setOverlayImage(options.overlayImage);
     }
+    if (options.backgroundImage) {
+      this.setBackgroundImage(options.backgroundImage);
+    }
     
     this.calcOffset();
     
@@ -4350,6 +4353,14 @@ fabric.util.string = {
      * @type String
      */
     backgroundColor:        'rgba(0, 0, 0, 0)',
+    
+    /**
+     * Background image of this canvas instance
+     * Should be set via `setBackgroundImage`
+     * @property
+     * @type String
+     */
+    backgroundImage:        '',
     
     /**
      * Indicates whether object selection should be enabled
@@ -4473,28 +4484,50 @@ fabric.util.string = {
     },
     
     /**
-     * Sets overlay image for this canvas
-     * @method setOverlayImage
-     * @param {String} url url of an image to set background to
-     * @param {Function} callback callback to invoke when image is loaded and set as an overlay one
-     * @return {fabric.Canvas} thisArg
-     * @chainable
+     * @private
      */
-    setOverlayImage: function (url, callback) { // TODO (kangax): test callback
+    _loadImage: function(url, callback) {
       if (url) {
         var _this = this, img = new Image();
         
         /** @ignore */
         img.onload = function () { 
-          _this.overlayImage = img;
-          if (callback) {
-            callback();
-          }
+          callback.call(_this, img);
           img = img.onload = null;
         };
         img.src = url;
       }
       return this;
+    },
+    
+    /**
+     * Sets overlay image for this canvas
+     * @method setOverlayImage
+     * @param {String} url url of an image to set overlay to
+     * @param {Function} callback callback to invoke when image is loaded and set as an overlay
+     * @return {fabric.Canvas} thisArg
+     * @chainable
+     */
+    setOverlayImage: function (url, callback) { // TODO (kangax): test callback
+      return this._loadImage(url, function(img) {
+        this.overlayImage = img;
+        callback && callback();
+      });
+    },
+    
+    /**
+     * Sets background image for this canvas
+     * @method setBackgroundImage
+     * @param {String} url url of an image to set background to
+     * @param {Function} callback callback to invoke when image is loaded and set as background
+     * @return {fabric.Canvas} thisArg
+     * @chainable
+     */
+    setBackgroundImage: function (url, callback) {
+      return this._loadImage(url, function(img) {
+        this.backgroundImage = img;
+        callback && callback();
+      });
     },
     
     /**
@@ -5434,12 +5467,12 @@ fabric.util.string = {
      */ 
     renderAll: function (allOnTop) {
       
-      var containerCanvas = this[allOnTop ? 'contextTop' : 'contextContainer'];
+      var canvasToDrawOn = this[allOnTop ? 'contextTop' : 'contextContainer'];
 
       this.clearContext(this.contextTop);
 
       if (!allOnTop) {
-        this.clearContext(containerCanvas);
+        this.clearContext(canvasToDrawOn);
       }
       
       var length = this._objects.length,
@@ -5447,27 +5480,31 @@ fabric.util.string = {
           startTime = new Date();
       
       if (this.clipTo) {
-        containerCanvas.save();
-        containerCanvas.beginPath();
-        this.clipTo(containerCanvas);
-        containerCanvas.clip();
+        canvasToDrawOn.save();
+        canvasToDrawOn.beginPath();
+        this.clipTo(canvasToDrawOn);
+        canvasToDrawOn.clip();
       }
       
-      containerCanvas.fillStyle = this.backgroundColor;
-      containerCanvas.fillRect(0, 0, this.width, this.height);
+      canvasToDrawOn.fillStyle = this.backgroundColor;
+      canvasToDrawOn.fillRect(0, 0, this.width, this.height);
+      
+      if (this.backgroundImage) {
+        canvasToDrawOn.drawImage(this.backgroundImage, 0, 0, this.width, this.height);
+      }
       
       if (length) {
         for (var i = 0; i < length; ++i) {
           if (!activeGroup ||
               (activeGroup &&
               !activeGroup.contains(this._objects[i]))) {
-            this._draw(containerCanvas, this._objects[i]);
+            this._draw(canvasToDrawOn, this._objects[i]);
           }
         }
       }
       
       if (this.clipTo) {
-        containerCanvas.restore();
+        canvasToDrawOn.restore();
       }
       
       // delegate rendering to group selection (if one exists)
@@ -6070,7 +6107,7 @@ fabric.util.string = {
     dispose: function () {
       this.clear();
       removeListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
-      removeListener(fabric.document, 'mousemove', this._onMouseMove);
+      removeListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
       removeListener(fabric.window, 'resize', this._onResize);
       return this;
     },

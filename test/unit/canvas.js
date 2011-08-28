@@ -759,4 +759,17 @@
     ok(typeof fps == 'number', 'onFpsUpdate must receive numeric value');
     
   });
+  
+  asyncTest('backgroundImage', function() {
+    same('', canvas.backgroundImage);
+    canvas.setBackgroundImage('../../demos/kitchensink/assets/pug.jpg');
+    
+    setTimeout(function() {
+      
+      ok(typeof canvas.backgroundImage == 'object');
+      ok(/pug\.jpg$/.test(canvas.backgroundImage.src));
+      
+      start();
+    }, 1000);
+  });
 })();

@@ -69,8 +69,13 @@
       </div>
 
       <div class="block">
-        <h3>Custom canvas background</h3>
+        <h3>Custom background</h3>
         <canvas id="c5" width="200" height="200"></canvas>
+      </div>
+      
+      <div class="block">
+        <h3>Custom background image</h3>
+        <canvas id="c17" width="200" height="200"></canvas>
       </div>
       
       <div class="block">
@@ -193,9 +198,7 @@
         
         var canvas13 = new fabric.Canvas('c13');
         canvas13.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
-        canvas13.setOverlayImage('jail_cell_bars.png', function(){
-          canvas13.renderAll();
-        });
+        canvas13.setOverlayImage('jail_cell_bars.png', canvas13.renderAll.bind(canvas13));
         
         var canvas4 = new fabric.Canvas('c4');
         canvas4.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
@@ -250,6 +253,9 @@
         canvas16.item(0).hasControls = false;
         canvas16.setActiveObject(canvas16.item(0));
         
+        var canvas17 = new fabric.Canvas('c17');
+        canvas17.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
+        canvas17.setBackgroundImage('../kitchensink/assets/pug.jpg', canvas17.renderAll.bind(canvas17));
       </script>
 
     </div>
