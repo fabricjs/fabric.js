@@ -1,4 +1,4 @@
-(function(){
+(function() {
   
   module('fabric.util');
   
@@ -166,6 +166,21 @@
     bound = fn.bind(obj, 1);
     same([obj, 1, undefined], bound());
     same([obj, 1, 2], bound(2));
+    
+    function Point(x, y) { 
+      this.x = x; 
+      this.y = y;
+    }
+    
+    var obj = { }
+    var YAxisPoint = Point.bind(obj, 0);
+    var axisPoint = new YAxisPoint(5);
+    
+    same(0, axisPoint.x);
+    same(5, axisPoint.y);
+    
+    ok(axisPoint instanceof Point);
+    // ok(axisPoint instanceof YAxisPoint); <-- fails
   });
   
   test('fabric.util.getById', function() {

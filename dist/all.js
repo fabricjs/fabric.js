@@ -2136,7 +2136,8 @@ fabric.util.string = {
 (function() {
   
   var slice = Array.prototype.slice,
-      apply = Function.prototype.apply;
+      apply = Function.prototype.apply,
+      dummy = function() { };
   
   if (!Function.prototype.bind) {
     /**
@@ -2146,12 +2147,23 @@ fabric.util.string = {
      * @param {Any[]} [...] Values to pass to a bound function
      * @return {Function}
      */
-    Function.prototype.bind = function(thisArg) {
-      var fn = this, args = slice.call(arguments, 1);
-      return args.length
-        ? function() { return apply.call(fn, thisArg, args.concat(slice.call(arguments))); }
-        : function() { return apply.call(fn, thisArg, arguments) };
-    };
+     Function.prototype.bind = function(thisArg) {
+       var fn = this, args = slice.call(arguments, 1), bound;
+       if (args.length) {
+         bound = function() { 
+           return apply.call(fn, this instanceof dummy ? this : thisArg, args.concat(slice.call(arguments))); 
+         };
+       }
+       else {
+         bound = function() { 
+           return apply.call(fn, this instanceof dummy ? this : thisArg, arguments);
+         };
+       }
+       dummy.prototype = this.prototype;
+       bound.prototype = new dummy;
+       
+       return bound;
+     };
   }
   
 })();
