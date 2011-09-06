@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2011, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.5.5" };
+var fabric = fabric || { version: "0.5.6" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -11151,6 +11151,13 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
       fabric.parseSVGDocument(doc.documentElement, function(results, options) {
         callback(results, options);
       });
+    });
+  };
+  
+  fabric.util.getScript = function(url, callback) {
+    request(url, '', function(body) {
+      eval(body);
+      callback && callback();
     });
   };
 
