@@ -1440,16 +1440,27 @@
           scaledHeight = origHeight * multiplier,
           activeObject = this.getActiveObject();
       
-      this.setWidth(scaledWidth).setHeight(scaledHeight);
+      if (multiplier > 1) {
+        // we're only changing canvas dimensions when retrieving _enlarged_ version of data url, 
+        // since canvas element needs to accomodate increased dimensions
+        // when multiplier is <=1 canvas dimensions stay the same (and only context scaling changes)
+        this.setWidth(scaledWidth).setHeight(scaledHeight);
+      }
+
       this.contextTop.scale(multiplier, multiplier);
+      this.renderAll(true);
       
       if (activeObject) {
         this.deactivateAll().renderAll();
       }
+      
       var dataURL = this.toDataURL(format);
 
       this.contextTop.scale( 1 / multiplier,  1 / multiplier);
-      this.setWidth(origWidth).setHeight(origHeight);
+      
+      if (multiplier > 1) {
+        this.setWidth(origWidth).setHeight(origHeight);
+      }
       
       if (activeObject) {
         this.setActiveObject(activeObject);
