@@ -147,6 +147,9 @@
    * @param {String} byProperty
    */
   function max(array, byProperty) {
+		if(array.length === 0) {
+		  return 0;
+		}
     var i = array.length - 1, 
         result = byProperty ? array[i][byProperty] : array[i];
     if (byProperty) {
@@ -174,6 +177,9 @@
    * @param {String} byProperty
    */
   function min(array, byProperty) {
+		if(array.length === 0) {
+      return 0;
+		}
     var i = array.length - 1, 
         result = byProperty ? array[i][byProperty] : array[i];
 
