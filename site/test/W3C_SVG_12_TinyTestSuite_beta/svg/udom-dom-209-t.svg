@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="ED" owner="CM" desc="Test the operation of Element.setAttribute(NS)" status="accepted"
+    approved="yes"
+    version="$Revision: 1.6 $" testname="$RCSfile: udom-dom-209-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        This tests that the <tt>setAttribute</tt> and <tt>setAttributeNS</tt>
+        methods on the <b>Element</b> interface work correctly, for some
+        simple cases.
+      </p>
+      <p>
+        There are five sub-tests (a rectangle for each).  These are:
+      </p>
+      <ul>
+        <li>Sub-test 1: test setting known attributes in no namespace.</li>
+        <li>Sub-test 2: test setting unknown attributes in no namespace.</li>
+        <li>
+          Sub-test 3: test setting known attributes in a namespace, correctly using <tt>setAttributeNS</tt> with a namespace URI.
+        </li>
+        <li>
+          Sub-test 4: test setting known attributes in a namespace, incorrectly using <tt>setAttribute</tt> with a QName.
+        </li>
+        <li>Sub-test 5: test setting unknown attributes in a namespace.</li>
+      </ul>
+      <p>
+        The test has been passed if all five rectangles are blue.
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: udom-dom-209-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+    <text x='10' y='42'>Element.setAttribute(NS) test</text>
+    <text x='10' y='250' font-size='12'>All five rectangles must be blue.</text>
+    <defs>
+      <rect xml:id='good' width='50' height='50' fill='blue'/>
+      <rect xml:id='bad' width='50' height='50' fill='red'/>
+    </defs>
+    <g xml:id='g1' xmlns:v='http://example.org/vegetable' transform='translate(0,50)'>
+      <rect xml:id='rect1' x='10' y='30' width='0' height='0' fill='blue'/>
+      <rect xml:id='rect2' x='80' y='30' width='50' height='50' fill='red'/>
+      <rect x='150' y='30' width='50' height='50' fill='red'/>
+      <use xml:id='use1' xlink:href='#invalid' x='150' y='30'/>
+      <rect x='220' y='30' width='50' height='50' fill='blue'/>
+      <use xml:id='use2' xlink:href='#invalid' x='150' y='30'/>
+      <rect xml:id='rect3' x='290' y='30' width='50' height='50' fill='red'/>
+    </g>
+    <script type='application/ecmascript'>
+      <![CDATA[
+        XMLNS = 'http://www.w3.org/XML/1998/namespace';
+        XLINKNS = 'http://www.w3.org/1999/xlink';
+        VNS = 'http://example.org/vegetable';
+
+        // Get all of the elements.
+        var ids = 'g1 rect1 rect2 rect3 use1 use2'.split(' ');
+        for (var i in ids) {
+          this[ids[i]] = document.getElementById(ids[i]);
+        }
+
+        // Test setting known attributes in no namespace.
+        rect1.setAttribute('width', '50');
+        rect1.setAttributeNS(null, 'height', '50');
+
+        // Test setting unknown attributes in no namespace.
+        rect2.setAttribute('probability', 'high');
+        rect2.setAttributeNS(null, 'altitude', '12000ft');
+        if (rect2.getAttribute('probability') == 'high' &&
+            rect2.getAttributeNS(null, 'probability') == 'high' &&
+            rect2.getAttribute('altitude') == '12000ft' &&
+            rect2.getAttributeNS(null, 'altitude') == '12000ft') {
+          rect2.setAttributeNS(null, 'fill', 'blue');
+        }
+
+        // Test setting known attributes in a namespace.
+        use1.setAttributeNS(XLINKNS, 'href', '#good');
+        use2.setAttribute('xlink:href', '#bad');
+
+        // Test setting unknown attributes in a namespace.
+        rect3.setAttribute('v:crispness', 'quiteCrisp');
+        rect3.setAttributeNS(VNS, 'hasSeeds', 'true');
+        if (rect3.getAttribute('v:crispness') == 'quiteCrisp' &&
+            rect3.getAttributeNS(VNS, 'crispness') != 'quiteCrisp' &&
+            rect3.getAttribute('v:hasSeeds') != 'true' &&
+            rect3.getAttributeNS(VNS, 'hasSeeds') == 'true') {
+          rect3.setAttributeNS(null, 'fill', 'blue');
+        }
+      ]]>
+    </script>
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.6 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240"
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

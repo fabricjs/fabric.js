@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="ED,AE" owner="CM" desc="Test the stopPropagation method of the Event interface" status="accepted"
+    approved="yes"
+    version="$Revision: 1.8 $" testname="$RCSfile: udom-event-203-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        This tests the <tt>stopPropagation</tt> method of the
+        <b>Event</b> interface.
+      </p>
+      <p>
+        The test consists of a single rectangle, which has event listeners
+        registered on it and some of its ancestor nodes.  Clicking on the
+        rectangle will dispatch the <tt>click</tt> event.  The listener on
+        the parent node of the <tt>rect</tt> calls <tt>stopPropagation()</tt>.
+        The test checks that the listener for the grandparent node is not
+        dispatched.
+      </p>
+      <p>
+        The test has been passed if the rectangle becomes blue when clicking
+        it.
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: udom-event-203-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+    <text x='10' y='42'>Event.stopPropagation test</text>
+    <text x='10' y='240' font-size='12'>Click the rectangle above.</text>
+    <text x='10' y='258' font-size='12'>If it turns blue, the test has been passed.</text>
+    <g xml:id='g1'>
+      <g xml:id='g2'>
+        <rect xml:id='rect1' x='10' y='103' width='50' height='50' fill='black'/>
+      </g>
+    </g>
+    <script type='application/ecmascript'>
+      <![CDATA[
+        // Get all of the elements.
+        var ids = 'g1 g2 rect1'.split(' ');
+        for (var i in ids)
+        {
+          this[ids[i]] = document.getElementById(ids[i]);
+        }
+
+        g2.addEventListener
+        (
+          'click',
+          function(e)
+          {
+             e.stopPropagation();
+             rect1.setAttributeNS(null, 'fill', 'blue');
+          },
+          false
+        );
+
+        g1.addEventListener
+        (
+          'click',
+          function(e)
+          {
+             rect1.setAttributeNS(null, 'fill', 'red');
+          },
+          false
+        );
+      ]]>
+    </script>
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.8 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240" 
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

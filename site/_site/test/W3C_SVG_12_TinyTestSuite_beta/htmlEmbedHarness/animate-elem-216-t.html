@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE html PUBLIC  "-//CL//DTD XHTML 1.0 Transitional plus Embed//EN"
+ "http://www.w3.org/Graphics/xhtml1-transitional-plus-embed.dtd">
+ <html xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+ <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+ <meta name="keywords" content="W3C SVG 1.1 Test Suite testsuite mobile"/>
+ <meta name="description" content="W3C SVG 1.2 Tiny Test Suite"/>
+ <title>
+SVG 1.2 Tiny test:animate-elem-216-t </title>
+ <style type="text/css">
+ <!--
+ .bodytext    { font-family:verdana, helvetica, sans-serif; font-size: 12pt; line-height: 125%; text-align: Left; margin-top: 0; margin-bottom: 0 }
+ .pageTitle         { line-height: 150%; font-size: 20pt; font-weight : 900; margin-bottom: 20pt }
+ .pageSubTitle  { color : blue; line-height: 100%; font-size: 24pt; font-weight : 900 }
+ .openChapter   { color : blue; line-height: 125%; font-weight : 900 }
+ .openSection   { color : blue; line-height: 125%; font-weight : 900 }
+ .info  { color : black; line-height: 110%; font-size: 10pt; font-weight : 100 }
+ p          { margin-top:0; margin-bottom:0; padding-top:0; padding-bottom:0 }
+ blockquote { margin-top:0; margin-bottom:0; padding-top:0; padding-bottom:0 }
+ .opscript {margin-left: 3%; margin-right: 3%; }
+ .opscript p { margin-top: 0.7em}
+ .navbar {background: black; color: white; font-weight: bold}
+ -->
+ </style>
+ </head>
+ <body class="bodytext">
+
+	<div class="linkbar"> 
+<p>
+<a href="animate-elem-216-t.html">Tiny version</a></p>
+<p>Specification link: <a target="spec" href="http://www.w3.org/TR/SVGMobile12/animate.html">16.2 Animation elements</a></p>
+ <p>
+    <a href="animate-elem-215-t.html">animate-elem-215-t ←</a> 
+    <a href="index.html">index</a>
+    <a href="animate-elem-217-t.html">→ animate-elem-217-t</a>
+</p></div>
+
+	<table align="center" border="0" cellspacing="0" cellpadding="10">
+		<tr>
+			<td align="center" colspan="3">
+				<table border="0" cellpadding="8">
+					<tr>
+						<td align="center" colspan="2" class="pageTitle">
+							<h1>animate-elem-216-t</h1>
+						</td>
+					</tr>
+					<tr  class="navbar">
+						<td align="center">
+							SVG Image
+						</td>
+						<td align="center">
+							PNG Image
+						</td>
+					</tr>
+					<tr>
+						<td align="right">
+   	    		  			<embed src="../svggen/animate-elem-216-t.svg" width="480" height="360"/>
+						</td>
+						<td align="left">
+							<img alt="raster image of animate-elem-216-t" src="../png/animate-elem-216-t.png" width="480" height="360"/>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+
+               
+<div class="opscript">
+      <p>Compare from-to, from-by and by animateTransform skewX with values animateTransform.</p>
+      <p>
+        The main indication for a failed test is the appearance of red.
+      </p>
+      <p>
+        SMIL 2 specifies, how from-to, from-by and by animations have to be converted into
+        values animation. Therefore they have to be the same as the related values animation.
+        The conversion is as follows:
+      </p>
+      <table>
+        <tr>
+          <th>used</th>
+          <th>converted</th>
+        </tr>
+        <tr>
+          <td>from="a" to="b"</td>
+          <td>values="a;b"</td>
+        </tr>
+        <tr>
+          <td>from="a" by="b"</td>
+          <td>values="a;a+b"</td>
+        </tr>
+        <tr>
+          <td>by="a"</td>
+          <td>
+            values="0;a" additive="sum"
+          </td>
+        </tr>
+      </table>
+      <p>
+        (by and from-by animations have only a meaning, if values can be added somehow.
+        '0' is used as a general symbol for the neutral element of addition for the related attribute,
+        this means 0 + a = a + 0 = a. And '0' is not equal to the symbol '1' as the basic unit of the
+        related attribute, '0' is a predecessor of '1' in the related attribute space. For animateTransform
+        the '0' is the same as the zero matrix, not the unity or identity matrix.
+        For the skewX type this is a skew with an angle of 0.
+        Deviating from SMIL 2 in SVG it is specified, that for animateTranform the animation
+        effect has to be postmultiplied to the underlying value, if the animation is additive. Note
+        that for two additive skewX angles a, b the resulting angle is not a+b but atan(tan(a)+tan(b)).
+      </p>
+      <p>
+        The from-to, from-by and by are applied to animateTransform of the skewX type
+        of different blue stroked
+        paths and are compared with the related values animations including additive and
+        cumulative hehaviour for underlying red paths. Additionally underlying dark red
+        paths simulate the same behaviour using always the defaults additive replace and
+        accumulate  replace with animateMotion. The blue paths cover all red paths.
+        Therefore if something red gets visible, an error is occured.
+        Because fill is always not set and therefore remove,
+        the final value is the value at 2s given with a simple values animateTransform, not very
+        interesting for the test.
+      </p>
+
+		</div>
+<div class="linkbar"> <p>
+				<a href="animate-elem-215-t.html">animate-elem-215-t ←</a>
+				<a href="index.html">index</a>
+				<a href="animate-elem-217-t.html">→ animate-elem-217-t</a>
+						</p></div>
+</body>
+</html>

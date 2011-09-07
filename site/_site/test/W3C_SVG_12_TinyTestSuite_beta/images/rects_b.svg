@@ -1,0 +1,6 @@
+<svg width="80" height="80" viewBox="0 0 80 80">
+	<rect fill="#f63" stroke="none" x="0" y="0" width="40" height="40"/>
+	<rect fill="#cc9" stroke="none" x="40" y="0" width="40" height="40"/>
+	<rect fill="#cc9" stroke="none" x="0" y="40" width="40" height="40"/>
+	<rect fill="#f63" stroke="none" x="40" y="40" width="40" height="40"/>
+</svg>

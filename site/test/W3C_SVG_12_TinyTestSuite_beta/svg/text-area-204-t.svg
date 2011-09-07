@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="ASL" owner="AE" desc="TextArea with Animated Font-size" status="accepted"
+    approved="yes"
+    version="$Revision: 1.8 $" testname="$RCSfile: text-area-204-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>TextArea with Animated Font-size</p>
+      <p>The font-size is animated from 32 to 8.5 - text should continually rewrap as the font-size decreases in size.</p>
+      <p>The text is taken from "The Lost Princess of Oz" by Baum, L. Frank (Lyman Frank), 1856-1919</p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: text-area-204-t.svg,v $</title>
+  <defs>
+    <font-face font-family="SVGFreeSansASCII" unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii" />
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+    <text xml:id="display-title" x="240" y="30" font-size="14" text-anchor="middle" fill="#000">TextArea  with Animated Font-size</text>
+    <text xml:id="comment-1" x="240" y="45" font-size="11" text-anchor="middle" fill="#555">The text should continually rewrap as the 'font-size' decreases and increases in size.</text>
+    <text x="465" y="290" font-size="8" text-anchor="end" fill="#555">Excerpt from "The Lost Princess of Oz" by Baum, L. Frank (Lyman Frank), 1856-1919</text>
+    <rect x="15" y="60" height="215" width="450" fill="none" stroke="black" stroke-width="0.25"/>
+    <textArea x="15" y="60" width="450" height="215" font-size="16" fill="#259">
+      <animate xml:id="a1" attributeName="font-size" from="32" to="8.5" calcMode="paced" dur="3s" fill="freeze"/>
+      <animate xml:id="a2" attributeName="font-size" from="8.5" to="250" calcMode="paced" dur="3s" begin="a1.end" fill="freeze"/>
+      <animate attributeName="font-size" from="250" to="32" calcMode="paced" dur="3s" begin="a2.end" fill="freeze"/>
+      No sooner were the Wizard of Oz and his followers well within the castle entrance when the big gates swung to with a clang and heavy bars dropped across them.  They looked at one another uneasily, but no one cared to speak of the incident.   If they were indeed prisoners in the wicker castle, it was evident they must find a way to escape, but their first duty was to attend to the errand on which they had come and seek the Royal Ozma, whom they believed to be a prisoner of the magician, and rescue her.
+      <tbreak/>
+      They found they had entered a square courtyard, from which an entrance led into the main building of the castle.  No person had appeared to greet them so far, although a gaudy peacock perched upon the wall cackled with laughter and said in its sharp, shrill voice, "Poor fools!  Poor fools!"
+      <tbreak/>
+      "I hope the peacock is mistaken," remarked the Frogman, but no one else paid any attention to the bird.  They were a little awed by the stillness and loneliness of the place.  As they entered the doors of the castle, which stood invitingly open, these also closed behind them and huge bolts shot into place.  The animals had all accompanied the party into the castle because they felt it would be dangerous for them to separate.  They were forced to follow a zigzag passage, turning this way and that, until finally they entered a great central hall, circular in form and with a high dome from which was suspended an enormous chandelier.
+      <tbreak/>
+      The Wizard went first, and Dorothy, Betsy and Trot followed him, Toto keeping at the heels of his little mistress.  Then came the Lion, the Woozy and the Sawhorse, then Cayke the Cookie Cook and Button-Bright, then the Lavender Bear carrying the Pink Bear, and finally the Frogman and the Patchwork Girl, with Hank the Mule tagging behind.  So it was the Wizard who caught the first glimpse of the big, domed hall, but the others quickly followed and gathered in a wondering group just within the entrance.
+      <tbreak/>
+      Upon a raised platform at one side was a heavy table on which lay Glinda's Great Book of Records, but the platform was firmly fastened to the floor and the table was fastened to the platform and the Book was chained fast to the table, just as it had been when it was kept in Glinda's palace.  On the wall over the table hung Ozma's Magic Picture.  On a row of shelves at the opposite side of the hall stood all the chemicals and essences of magic and all the magical instruments that had been stolen from Glinda and Ozma and the Wizard, with glass doors covering the shelves so that no one could get at them.
+    </textArea>
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.8 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240"
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

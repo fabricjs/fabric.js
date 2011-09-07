@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="NR" owner="DOH" desc="Stroking for circle, large stroke-width, small r." status="accepted"
+    approved="yes"
+    version="$Revision: 1.5 $" testname="$RCSfile: paint-stroke-201-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        Stroking for circle, large stroke-width, small r.
+      </p>
+      <p>
+        The main indication for a failed test is the appearence of something red.
+        A second indication is a thin white line inside a blue area.
+      </p>
+      <p>
+        For smaller circles the radius gets smaller than the half stroke-width, therefore the fill is not
+        visible anymore for them.  Only the animated circle at the beginning and the next circle
+        on its right have a visible fill.
+      </p>
+      <p>
+        To test the correct rendering, the blue circles cover always red filled circles without a stroke.
+        Additionally the size of the circles is given with a thin white stroke on top. If something
+        red gets visible or blue parts of the stroke of the circle are outside of the related white
+        stroked circle, an error is occured. If the circles are not displayed as circles with an accuracy of
+        one device pixel, an error is occured too.
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: paint-stroke-201-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+
+    <rect x="0" y="0" width="480" height="360" fill="#fff" />
+    <g fill="#f00">
+      <circle cx="100" cy="160" r="90">
+        <animate
+	      attributeName="r"
+	      attributeType="XML"
+	      values="88;88;56;40;32;28;26;25;24.5;24.25;24.125;24.0675"
+	      dur="60s"
+	      fill="freeze" />
+      </circle>
+      <circle cx="250" cy="70" r="56" />
+      <circle cx="370" cy="120" r="40" />
+      <circle cx="430" cy="190" r="32" />
+      <circle cx="400" cy="260" r="28"/>
+      <circle cx="340" cy="290" r="26" />
+      <circle cx="280" cy="270" r="25"/>
+      <circle cx="250" cy="220" r="24.5" />
+      <circle cx="285" cy="170" r="24.25" />
+      <circle cx="340" cy="200" r="24.125" />
+    </g>
+
+    <g fill="#88f" stroke="#008" stroke-width="48">
+      <circle cx="100" cy="160" r="40">
+        <animate
+     attributeName="r"
+     attributeType="XML"
+     values="64;64;32;16;8;4;2;1;0.5;0.25;0.125;0.0675"
+     dur="60s"
+     fill="freeze" />
+      </circle>
+      <circle cx="250" cy="70" r="32" />
+      <circle cx="370" cy="120" r="16" />
+      <circle cx="430" cy="190" r="8" />
+      <circle cx="400" cy="260" r="4"/>
+      <circle cx="340" cy="290" r="2" />
+      <circle cx="280" cy="270" r="1"/>
+      <circle cx="250" cy="220" r="0.5" />
+      <circle cx="285" cy="170" r="0.25" />
+      <circle cx="340" cy="200" r="0.125" />
+    </g>
+
+
+    <g fill="none" stroke-width="0.5" stroke="#fff" >
+      <circle cx="100" cy="160" r="80">
+        <animate
+         attributeName="r"
+         attributeType="XML"
+         values="88;88;56;40;32;28;26;25;24.5;24.25;24.125;24.0675"
+         dur="60s"
+         fill="freeze" />
+      </circle>
+      <circle cx="250" cy="70" r="56" />
+      <circle cx="370" cy="120" r="40" />
+      <circle cx="430" cy="190" r="32" />
+      <circle cx="400" cy="260" r="28"/>
+      <circle cx="340" cy="290" r="26" />
+      <circle cx="280" cy="270" r="25"/>
+      <circle cx="250" cy="220" r="24.5" />
+      <circle cx="285" cy="170" r="24.25" />
+      <circle cx="340" cy="200" r="24.125" />
+    </g>
+    <g font-size="12" stroke="none" fill="#ccc">
+      <text x="30" y="270">stroked circles</text>
+      <text x="30" y="287">red = wrong</text>
+      <text x="30" y="300">white inside blue = wrong</text>
+    </g>
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.5 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240" 
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="ED" owner="ASl" desc="Trait access on solidColor solid-opacity" status="accepted"
+    approved="yes"
+    version="$Revision: 1.7 $" testname="$RCSfile: udom-traitaccess-203-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        Test on solidColor solid-opacity trait access.
+        Test result are displayed within the test.
+        The first sub-test should display a number approximately equal to 0.2.
+        The second sub-test should display a number approximately equal to 0.5.
+        The third sub-test should display a number equal to 1.
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: udom-traitaccess-203-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+
+    <g xml:id="solidgroup">
+      <solidColor xml:id="solidfill" solid-opacity="0.2" solid-color="rgb(0,0,255)">
+      </solidColor>
+      <solidColor xml:id="soliddefault">
+      </solidColor>
+      <solidColor xml:id="solidstroke" solid-opacity="0.8" solid-color="red">
+      </solidColor>
+    </g>
+
+    <rect x="250" y="100" width="200" height="100" rx="25"
+        fill="url(#solidfill)"/>
+    <g transform="translate(250 170) rotate(-30)" >
+      <rect x="0" y="0" width="200" height="100" rx="25"
+          fill="none" stroke="url(#solidstroke)" stroke-width="30" />
+    </g>
+
+    <text x="5" y="20" font-size="20">Testing solidColor trait access</text>
+
+    <!-- Text for test 1, getFloatTrait -->
+    <text x="5" y="75" font-size="20">1. getFloatTrait(solid-opacity):</text>
+    <text x="5" y="100" xml:id="printout1" font-size="20">DOES NOT WORK!</text>
+
+    <!-- Text for test 2, setFloatTrait -->
+    <text x="5" y="150" font-size="20">2. setFloatTrait(solid-opacity):</text>
+    <text x="5" y="175" xml:id="printout2" font-size="20">DOES NOT WORK!</text>
+
+    <!-- Text for test 3, getting default -->
+    <text x="5" y="225" font-size="20">3. getting default:</text>
+    <text x="5" y="250" xml:id="printout3" font-size="20">DOES NOT WORK!</text>
+
+    <script type="text/ecmascript">
+      <![CDATA[
+        //variables
+        var sc_fill_element = document.getElementById("solidfill");
+        var sc_default_element = document.getElementById("soliddefault");
+        var printout1 = document.getElementById("printout1");
+        var printout2 = document.getElementById("printout2");
+        var printout3 = document.getElementById("printout3");
+
+        sc_fill_element.getFloatTrait("solid-opacity");
+
+        // Impl. test 1, getFloatTrait
+        printout1.setTrait("#text", " " + sc_fill_element.getFloatTrait("solid-opacity") + " (should be ~0.2)");
+
+        // Impl. test 2, setFloatTrait
+        sc_fill_element.setFloatTrait("solid-opacity", 0.5);
+        printout2.setTrait("#text", " " + sc_fill_element.getFloatTrait("solid-opacity") + " (should be ~0.5)");
+
+        // Impl. test 3, getting default
+        printout3.setTrait("#text", " " + sc_default_element.getFloatTrait("solid-opacity") + " (should be 1)");
+      ]]>
+    </script>
+
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.7 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240" 
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

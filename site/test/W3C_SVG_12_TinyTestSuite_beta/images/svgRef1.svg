@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg id="svg-root" width="100%" height="100%" viewBox="0 0 480 360" 
+  xmlns="http://www.w3.org/2000/svg" 
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events">
+
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/" >
+    <OperatorScript version="$Revision: 1.2 $" testname="" >
+      <Paragraph>
+      </Paragraph>
+    </OperatorScript>
+  </SVGTestCase>
+
+  <title id="test-title" > </title>
+  <desc id="test-desc" > </desc>
+
+  <!--======================================================================-->
+  <!--Content of Test Case follows...                  =====================-->
+  <!--======================================================================-->
+  <g id="testContent" color="ghostwhite" >
+    <defs>
+      <linearGradient id="linearGrad1" gradientUnits="objectBoundingBox" y1="0" x1="0" y2="1" x2="1" >
+      	<stop offset="000%" stop-color="orange" />
+      	<stop offset="033%" stop-color="red"    />
+      	<stop offset="050%" stop-color="gold"   />
+      	<stop offset="066%" stop-color="red"    />
+      	<stop offset="100%" stop-color="orange" />
+      </linearGradient>
+
+      <radialGradient id="radialGrad1" gradientUnits="objectBoundingBox" cx="0.5" cy="0.5" r="0.5" fx="0.15" fy="0.15" >
+      	<stop offset="000%" stop-color="orange" />
+      	<stop offset="033%" stop-color="red"    />
+      	<stop offset="050%" stop-color="gold"   />
+      	<stop offset="066%" stop-color="red"    />
+      	<stop offset="100%" stop-color="orange" />
+      </radialGradient>
+    </defs>
+
+    <g id="objects1" >
+      <rect id="rect1" x="001" y="050" width="239" height="125" stroke="none" />
+      <rect id="rect2" x="240" y="050" width="239" height="125" stroke="none" />
+      <rect id="rect3" x="001" y="175" width="239" height="125" stroke="none" fill="currentColor"      />
+      <rect id="rect4" x="240" y="175" width="239" height="125" stroke="none" fill="url(#radialGrad1)" />
+    </g>
+  </g>
+
+  <text font-size="35" x="240" y="35" text-anchor="middle" fill="white" >svgRef1.svg</text>
+  <text id="revision" x="10" y="340" font-size="40" stroke="none" fill="black">$Revision: 1.2 $</text>
+  <rect id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000000"/>
+</svg>

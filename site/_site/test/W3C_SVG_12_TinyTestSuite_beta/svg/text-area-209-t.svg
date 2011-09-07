@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="ASL" owner="AE" desc="TextArea Testing Word Breaks and Tbreak" status="accepted"
+    approved="yes"
+    version="$Revision: 1.7 $" testname="$RCSfile: text-area-209-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>TextArea Testing Word Breaks and Tbreak</p>
+      <p>
+        Each word should break onto a new line. The left-hand 'textArea' has no 'tbreak' elements
+        while the right-hand one uses 'tbreak' after each word. Both should appear the same.
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: text-area-209-t.svg,v $</title>
+  <defs>
+    <font-face font-family="SVGFreeSansASCII" unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii" />
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+    <text xml:id="display-title" x="240" y="25" font-size="14" text-anchor="middle" fill="#000">TextArea Testing Word Breaks and Tbreak</text>
+    <text xml:id="comment-1" x="240" y="40" font-size="11" text-anchor="middle" fill="#555">
+      Each word should break onto a new line. The left-hand 'textArea' has no 'tbreak' elements
+    </text>
+    <text xml:id="comment-2" x="240" y="52" font-size="11" text-anchor="middle" fill="#555">
+      while the right-hand one uses 'tbreak' after each word. Both should appear the same.
+    </text>
+    <rect x="15" y="65" height="220" width="220" fill="none" stroke="black" stroke-width="0.25"/>
+    <textArea x="15" y="65" height="220" width="220" font-size="12" xml:space="default" fill="#359">
+      Pseudopseudohypoparathyroidism Dichlorodiphenyltrichloroethane Floccinaucinihilipilification Honorificabilitudinitatibus Trinitrophenylmethylnitramine Paradimethylaminobenzaldehyde Cystoureteropyelonephritis Ethylenediaminetetraacetate Octamethylpyrophosphoramide Electroencephalographically Antitransubstantiationalist Hydroxydesoxycorticosterone Methylchloroisothiazolinone Ethylenediaminetetraacetic Anhydrohydroxyprogesterone Antidisestablishmentarianism Requeterequeteacostumbrado Superpsicoanalisticamente Anticonstitutionnellement Sobreabundantisimamente Apesadumbradisimamente Otorrinolaringologistico Endocrinologicamente
+    </textArea>
+    <rect x="245" y="65" height="220" width="220" fill="none" stroke="black" stroke-width="0.25"/>
+    <textArea x="245" y="65" height="220" width="220" font-size="12" xml:space="default" fill="#359">
+      Pseudopseudohypoparathyroidism <tbreak/>Dichlorodiphenyltrichloroethane <tbreak/>Floccinaucinihilipilification <tbreak/>Honorificabilitudinitatibus <tbreak/>Trinitrophenylmethylnitramine <tbreak/>Paradimethylaminobenzaldehyde <tbreak/>Cystoureteropyelonephritis <tbreak/>Ethylenediaminetetraacetate <tbreak/>Octamethylpyrophosphoramide <tbreak/>Electroencephalographically <tbreak/>Antitransubstantiationalist <tbreak/>Hydroxydesoxycorticosterone <tbreak/>Methylchloroisothiazolinone <tbreak/>Ethylenediaminetetraacetic <tbreak/>Anhydrohydroxyprogesterone <tbreak/>Antidisestablishmentarianism <tbreak/>Requeterequeteacostumbrado <tbreak/>Superpsicoanalisticamente <tbreak/>Anticonstitutionnellement <tbreak/>Sobreabundantisimamente <tbreak/>Apesadumbradisimamente <tbreak/>Otorrinolaringologistico <tbreak/>Endocrinologicamente <tbreak/>
+    </textArea>
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.7 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240"
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

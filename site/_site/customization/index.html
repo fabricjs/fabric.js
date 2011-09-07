@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    
+    <title>Customization | Fabric.js Demos</title>
+    
+    <link rel="stylesheet" href="/css/master.css">
+  
+    <script src="/lib/fabric.js"></script>
+    
+    <!--[if lt IE 9]>
+      <script src="https://raw.github.com/kangax/fabric.js/gh-pages/lib/excanvas.js"></script>
+    <![endif]-->
+  
+    <script>
+      // polyfill by @paulirish
+      if (!window.requestAnimationFrame ) {
+        window.requestAnimationFrame = (function() {
+          return window.webkitRequestAnimationFrame ||
+          window.mozRequestAnimationFrame ||
+          window.oRequestAnimationFrame ||
+          window.msRequestAnimationFrame ||
+          function( /* function FrameRequestCallback */ callback, /* DOMElement Element */ element ) {
+            window.setTimeout( callback, 1000 / 60 );
+          };
+        })();
+      }
+    </script>
+  </head>
+  <body>
+    <ul id="header">
+  <li><a href="/demos">Demos</a></li>
+  <li><a href="/benchmarks">Benchmarks</a></li>
+  <li><a href="/docs">Docs</a></li>
+  <li><a href="/test">Tests</a></li>
+  <li class="flattr">
+    <a class="FlattrButton" style="display:none;" rev="flattr;button:compact;" href="http://kangax.github.com/fabric.js"></a>
+    <noscript><a href="http://flattr.com/thing/391332/Fabric-js" target="_blank">
+    <img src="http://api.flattr.com/button/flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0" /></a></noscript>
+  </li>
+  <li class="twitter"><a href="http://twitter.com/fabricjs"><span>Twitter</span></a></li>
+  <li class="github"><a href="http://github.com/kangax/fabric.js"><span>Github</span></a></li>
+</ul>
+<script>
+(function() {
+  var s = document.createElement('script'), t = document.getElementsByTagName('script')[0];
+  s.async = true;
+  s.src = 'http://api.flattr.com/js/0.6/load.js?mode=auto';
+  t.parentNode.insertBefore(s, t);
+})();
+</script>
+  
+    <div id="bd-wrapper">
+      <h2><span>Fabric.js demos</span> &middot; Customization</h2>
+    
+      <style>
+  .block { float: left; margin-right: 20px; width: 260px; height: 270px; }
+</style>
+
+<div class="block">
+  <h3>Custom selection style</h3>
+  <canvas id="c1" width="200" height="200"></canvas>
+</div>
+
+<div class="block">
+  <h3>Custom borders, controls</h3>
+  <canvas id="c3" width="200" height="200"></canvas>
+</div>
+
+<div class="block">
+  <h3>No borders</h3>
+  <canvas id="c15" width="200" height="200"></canvas>
+</div>
+
+<div class="block">
+  <h3>No controls</h3>
+  <canvas id="c16" width="200" height="200"></canvas>
+</div>
+
+<div class="block">
+  <h3>No borders, no controls</h3>
+  <canvas id="c10" width="200" height="200"></canvas>
+</div>
+
+<div class="block">
+  <h3>Custom cursor on object hover</h3>
+  <canvas id="c11" width="200" height="200"></canvas>
+</div>
+
+<div class="block">
+  <h3>Modification on move</h3>
+  <canvas id="c12" width="200" height="200"></canvas>
+</div>
+
+<div class="block">
+  <h3>Unselectable canvas</h3>
+  <canvas id="c2" width="200" height="200"></canvas>
+</div>
+
+<div class="block">
+  <h3>Unselectable object</h3>
+  <canvas id="c4" width="200" height="200"></canvas>
+</div>
+
+<div class="block">
+  <h3>Custom background</h3>
+  <canvas id="c5" width="200" height="200"></canvas>
+</div>
+
+<div class="block">
+  <h3>Custom background image</h3>
+  <canvas id="c17" width="200" height="200"></canvas>
+</div>
+
+<div class="block">
+  <h3>Overlay image</h3>
+  <canvas id="c13" width="200" height="200"></canvas>
+</div>
+
+<div class="block">
+  <h3>Locked object rotation</h3>
+  <canvas id="c6" width="200" height="200"></canvas>
+</div>
+
+<div class="block">
+  <h3>Locked object scaling</h3>
+  <canvas id="c7" width="200" height="200"></canvas>
+</div>
+
+<div class="block">
+  <h3>Locked X movement</h3>
+  <canvas id="c8" width="200" height="200"></canvas>
+</div>
+
+<div class="block">
+  <h3>Locked Y movement</h3>
+  <canvas id="c9" width="200" height="200"></canvas>
+</div>
+
+<div class="block">
+  <h3>Making objects grayscale</h3>
+  <canvas id="c14" width="200" height="200"></canvas>
+</div>
+
+<script>
+  var canvas1 = new fabric.Canvas('c1');
+  canvas1.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
+  
+  canvas1.selectionColor = 'rgba(0,255,0,0.3)';
+  canvas1.selectionBorderColor = 'red';
+  canvas1.selectionLineWidth = 5;
+
+  var canvas2 = new fabric.Canvas('c2');
+  canvas2.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
+  canvas2.selection = false;
+  
+  var canvas3 = new fabric.Canvas('c3');
+  canvas3.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
+  
+  canvas3.item(0).borderColor = 'red';
+  canvas3.item(0).cornerColor = 'green';
+  canvas3.item(0).cornersize = 6;
+  canvas3.setActiveObject(canvas3.item(0));
+  
+  var canvas10 = new fabric.Canvas('c10');
+  canvas10.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
+  canvas10.item(0).hasControls = canvas10.item(0).hasBorders = false;
+  
+  canvas10.observe({
+    'mouse:down': function(e) {
+      if (e.memo.target) {
+        e.memo.target.opacity = 0.5;
+        canvas10.renderAll();
+      }
+    },
+    'mouse:up': function(e) {
+      if (e.memo.target) {
+        e.memo.target.opacity = 1;
+        canvas10.renderAll();
+      }
+    },
+    'object:moved': function(e) {
+      e.memo.target.opacity = 0.5;
+    },
+    'object:modified': function(e) {
+      e.memo.target.opacity = 1;
+    }
+  });
+  
+  var canvas11 = new fabric.Canvas('c11');
+  canvas11.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
+  canvas11.HOVER_CURSOR = 'pointer';
+  
+  var canvas12 = new fabric.Canvas('c12');
+  canvas12.add(new fabric.Rect({ left: 110, top: 110, fill: '#f0f', width: 50, height: 50 }));
+  canvas12.add(new fabric.Rect({ left: 50, top: 50, fill: '#77f', width: 40, height: 40 }));
+  
+  canvas12.forEachObject(function(o){ o.borderColor = o.cornerColor = 'rgba(0,0,0,0)'; });
+  
+  canvas12.HOVER_CURSOR = 'pointer';
+  
+  function animate(e, dir) {
+    if (e.memo.target) {
+      fabric.util.animate({
+        startValue: e.memo.target.get('angle'),
+        endValue: e.memo.target.get('angle') + (dir ? 10 : -10),
+        duration: 100,
+        onChange: function(value) {
+          e.memo.target.setAngle(value);
+          canvas12.renderAll();
+        },
+        onComplete: function() {
+          e.memo.target.setCoords();
+        }
+      });
+      fabric.util.animate({
+        startValue: e.memo.target.get('scaleX'),
+        endValue: e.memo.target.get('scaleX') + (dir ? 0.2 : -0.2),
+        duration: 100,
+        onChange: function(value) {
+          e.memo.target.scale(value);
+          canvas12.renderAll();
+        },
+        onComplete: function() {
+          e.memo.target.setCoords();
+        }
+      });
+    }
+  }
+  canvas12.observe('mouse:down', function(e) { animate(e, 1); });
+  canvas12.observe('mouse:up', function(e) { animate(e, 0); });
+  
+  var canvas13 = new fabric.Canvas('c13');
+  canvas13.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
+  canvas13.setOverlayImage('/assets/jail_cell_bars.png', canvas13.renderAll.bind(canvas13));
+  
+  var canvas4 = new fabric.Canvas('c4');
+  canvas4.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
+  canvas4.add(new fabric.Rect({ left: 50, top: 50, fill: 'green', width: 30, height: 30 }));
+  canvas4.add(new fabric.Rect({ left: 150, top: 50, fill: 'green', width: 30, height: 30 }));
+  canvas4.add(new fabric.Rect({ left: 150, top: 150, fill: 'green', width: 30, height: 30 }));
+  canvas4.add(new fabric.Rect({ left: 50, top: 150, fill: 'green', width: 30, height: 30 }));
+  
+  canvas4.item(0).selectable = false;
+  
+  var canvas5 = new fabric.Canvas('c5');
+  canvas5.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
+  canvas5.backgroundColor = 'rgba(0,0,255,0.3)';
+  canvas5.renderAll();
+  
+  var canvas6 = new fabric.Canvas('c6');
+  canvas6.add(new fabric.Rect({ width: 50, height: 50, fill: '#77f', top: 100, left: 100 }));
+  canvas6.item(0).lockRotation = true;
+  
+  var canvas7 = new fabric.Canvas('c7');
+  canvas7.add(new fabric.Rect({ width: 50, height: 50, fill: '#77f', top: 100, left: 100 }));
+  canvas7.item(0).lockScalingX = canvas7.item(0).lockScalingY = true;
+  
+  var canvas8 = new fabric.Canvas('c8');
+  canvas8.add(new fabric.Rect({ width: 50, height: 50, fill: '#77f', top: 100, left: 100 }));
+  canvas8.item(0).lockMovementX = true;
+  
+  var canvas9 = new fabric.Canvas('c9');
+  canvas9.add(new fabric.Rect({ width: 50, height: 50, fill: '#77f', top: 100, left: 100 }));
+  canvas9.item(0).lockMovementY = true;
+  
+  var canvas14 = new fabric.Canvas('c14');
+  fabric.Image.fromURL('/assets/pug.jpg', function(obj) {
+    canvas14.add(obj.scale(0.1).rotate(-15).set({ left: 80, top: 95 }));
+    canvas14.add(new fabric.Rect({ width: 50, height: 40, fill: '#77f', top: 75, left: 160 }))
+    canvas14.add(new fabric.Circle({ radius: 20, fill: '#f55', top: 170, left: 150 }));
+    
+    function callback(){ canvas14.renderAll() }
+    
+    canvas14.item(0).toGrayscale(callback);
+    canvas14.item(1).toGrayscale(callback);
+    canvas14.item(2).toGrayscale(callback);
+  });
+  
+  var canvas15 = new fabric.Canvas('c15');
+  canvas15.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
+  canvas15.item(0).hasBorders = false;
+  canvas15.setActiveObject(canvas15.item(0));
+  
+  var canvas16 = new fabric.Canvas('c16');
+  canvas16.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
+  canvas16.item(0).hasControls = false;
+  canvas16.setActiveObject(canvas16.item(0));
+  
+  var canvas17 = new fabric.Canvas('c17');
+  canvas17.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
+  canvas17.setBackgroundImage('../kitchensink/assets/pug.jpg', canvas17.renderAll.bind(canvas17));
+</script>
+    </div>
+  
+    <script>
+      (function(){
+        var mainScriptEl = document.getElementById('main');
+        if (!mainScriptEl) return;
+        var preEl = document.createElement('pre');
+        preEl.innerHTML = mainScriptEl.innerHTML;
+        document.getElementById('bd-wrapper').appendChild(preEl);
+      })();
+    </script>
+  </body>
+</html>

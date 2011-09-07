@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="ASL" owner="AE" desc="Test Focusable Property - Anchor Element" status="accepted"
+    approved="yes"
+    version="$Revision: 1.7 $" testname="$RCSfile: interact-focus-202-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>Test Focusable Property</p>
+      <p>Testing the focusable property : its default value and animatability on text and anchor elements.</p>
+      <p>The 1st text is the target of animateColor which starts on focusin, and also has the focusable attribute set to false.</p>
+      <p>The 2nd text does not have a focusable attribute and is not the target of animations which start by focus events.</p>
+      <p>The 3rd text is the target of animateColor which starts on focusin.</p>
+      <p>The 4th text is the target of animateColor which starts on activate.</p>
+      <p>The 5th text is the child of an a element.</p>
+      <p>The 6th text is the child of an a element and also has the focusable attribute set to false.</p>
+      <p>The 7th text has the editable attribute set to simple.</p>
+      <p>The 8th text is the observer DOMFocusIn and DOMFocusOut handlers.</p>
+      <p>The 9th and 10th text elements are used to modify the focusable attribute of the 11th element.</p>
+      <p>
+        The 11th text is the target of animateColor which starts on focusin, and also has the focusable attribute set to false.
+        The focusable attribute is modified by activate events on the 9th and 10th elements.
+      </p>
+      <p>The 12th and 13th text elements are used to modify the focusable attribute of the 14th element.</p>
+      <p>
+        The 14th text is the child of an a element - the a element also has the focusable attribute set to false.
+        The focusable attribute is modified by activate events on the 12th and 13th elements.
+      </p>
+
+      <p>The focus ring will look like the following: 3, 4, 5, 7, 8, 9, 10, 12 and 13.</p>
+      <p>Activating the 9th text element will make the 11th element focusable.</p>
+      <p>Activating the 12th text element will make the 14th element focusable.</p>
+
+      <p>Focus navigation is user agent dependant but typically is navigated with the keyboard keys.</p>
+      <p>TAB or arrow keys move the focus while the ENTER key activates the focused element.</p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: interact-focus-202-t.svg,v $</title>
+  <defs>
+    <font-face font-family="SVGFreeSansASCII" unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+    <script type="text/ecmascript">
+      <![CDATA[
+        function setRed() {
+        var myText6 = document.getElementById("text6");
+        myText6.setTrait("fill", "red");
+        }
+        function setBlack() {
+        var myText6 = document.getElementById("text6");
+        myText6.setTrait("fill", "black");
+        }
+      ]]>
+    </script>
+
+    <rect xml:id="myRect" width="200" height="20" fill="#DDD" stroke="none"/>
+  </defs>
+
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+
+    <use xlink:href="#myRect" x="40" y="80" />
+    <text xml:id="text0" x="50" y="95" focusable="false" font-size="12" >
+      Unfocusable (explicit)
+      <set attributeName="fill" to="red" begin="text0.focusin"/>
+      <set attributeName="fill" to="black" begin="text0.focusout"/>
+    </text>
+
+    <use xlink:href="#myRect" x="40" y="110" />
+    <text xml:id="text00" x="50" y="125" font-size="12" >
+      Unfocusable (implicit)
+    </text>
+
+    <use xlink:href="#myRect" x="40" y="140" />
+    <text xml:id="text1" x="50" y="155" font-size="12" >
+      Focusable (red on focus)
+      <set attributeName="fill" to="red" begin="text1.focusin" end="text1.focusout; indefinite"/>
+    </text>
+
+    <use xlink:href="#myRect" x="40" y="170" />
+    <text xml:id="text3" x="50" y="185" font-size="12" >
+      Focusable (red on activate)
+      <set attributeName="fill" to="red" begin="text3.activate"/>
+    </text>
+
+    <use xlink:href="#myRect" x="40" y="200" />
+    <a xml:id="text4" xlink:href="#text1">
+      <text x="50" y="215"  font-size="12" >
+        Focusable : &lt;a&gt; (silent)
+      </text>
+    </a>
+
+    <use xlink:href="#myRect" x="40" y="230" />
+    <a xml:id="text5" xlink:href="#text1" focusable="false">
+      <text x="50" y="245" font-size="12" >
+        Unfocusable &lt;a&gt;
+      </text>
+      <set attributeName="fill" to="blue" begin="text5.focusin" end="text5.focusout; indefinite"/>
+    </a>
+
+    <use xlink:href="#myRect" x="40" y="260" />
+    <text x="50" y="275"  editable="simple" font-size="12" >
+      Focusable : editable text (silent)
+    </text>
+
+    <use xlink:href="#myRect" x="260" y="80" />
+    <text  xml:id="text6" x="270" y="95" font-size="12" >
+      Focusable : listeners (red on focus)
+    </text>
+    <xe:listener event="DOMFocusIn" observer="text6" handler="#myFocusinHandler" />
+    <xe:listener event="DOMFocusOut" observer="text6" handler="#myFocusoutHandler" />
+    <handler xml:id="myFocusinHandler">setRed()</handler>
+    <handler xml:id="myFocusoutHandler">setBlack()</handler>
+
+    <use xlink:href="#myRect" x="260" y="110" />
+    <text xml:id="text7" x="270" y="125" font-size="12" >
+      activate to make (0) focusable
+      <set attributeName="fill" to="red" begin="text7.focusin" end="text7.focusout; indefinite"/>
+    </text>
+
+    <use xlink:href="#myRect" x="260" y="140" />
+    <text xml:id="text8" x="270" y="155" font-size="12" >
+      activate to make (0) unfocusable
+      <set attributeName="fill" to="red" begin="text8.focusin" end="text8.focusout; indefinite"/>
+    </text>
+
+    <use xlink:href="#myRect" x="260" y="170" />
+    <text xml:id="text9" x="270" y="185" focusable="false" font-size="12" >
+      (0) : red on focus
+      <set attributeName="fill" to="red" begin="text9.focusin" end="text9.focusout; indefinite"/>
+      <set attributeName="focusable" to="true" begin="text7.activate" end="text8.activate; indefinite"/>
+    </text>
+
+    <use xlink:href="#myRect" x="260" y="200" />
+    <text xml:id="text10" x="270" y="215" font-size="12" >
+      activate to make (1) focusable
+      <set attributeName="fill" to="red" begin="text10.focusin" end="text10.focusout; indefinite"/>
+    </text>
+
+    <use xlink:href="#myRect" x="260" y="230" />
+    <text xml:id="text11" x="270" y="245" font-size="12" >
+      activate to make (1) unfocusable
+      <set attributeName="fill" to="red" begin="text11.focusin" end="text11.focusout; indefinite"/>
+    </text>
+
+    <use xlink:href="#myRect" x="260" y="260" focusable="false"/>
+    <a xlink:href="#text1" focusable="false">
+      <text xml:id="text12" x="270" y="275"  focusable="false" font-size="12" >
+        (1) : &lt;a&gt; (silent)
+      </text>
+      <set attributeName="focusable" to="auto" begin="text10.activate" end="text11.activate; indefinite"/>
+    </a>
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none" fill="black">$Revision: 1.7 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240" 
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

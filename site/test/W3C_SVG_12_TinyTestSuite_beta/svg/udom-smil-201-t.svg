@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="ED" owner="CM" desc="Test ElementTimeControl's beginElement and beginElementAt methods" status="accepted"
+    approved="yes"
+    version="$Revision: 1.5 $" testname="$RCSfile: udom-smil-201-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        This tests the <tt>beginElement</tt> and <tt>beginElementAt</tt>
+        methods of the <b>ElementTimeControl</b> interface.
+      </p>
+      <p>
+        The test consists of four animated rectangles, one pink, three blue.
+        To perform the test, the user must click the pink rectangle.
+        The pink rectangle is set to animate with <tt>begin='mousedown'</tt>,
+        while the three blue rectangles have <tt>begin='indefinite'</tt>,
+        and are begun with calls to methods on the <b>ElementTimeControl</b>
+        interface:
+      </p>
+      <ul>
+        <li>
+          The first blue rectangle is begun with <tt>.beginElement()</tt>.
+        </li>
+        <li>
+          The second blue rectangle is begun with <tt>.beginElementAt(0)</tt>.
+        </li>
+        <li>
+          The third blue rectangle is begun with <tt>.beginElementAt(2.5)</tt>.
+        </li>
+      </ul>
+      <p>
+        The test has been passed if the three blue rectangles reach their
+        destination at the same time as the pink rectangle.
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: udom-smil-201-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+    <text x='10' y='42'>ElementTimeControl.beginElement(At) test 1</text>
+    <text x='10' y='68' font-size='12'>Click the pink rectangle.</text>
+    <g stroke-width='4'>
+      <g stroke='#aaa'>
+        <line x1='150' y1='115' x2='320' y2='115'/>
+        <line x1='150' y1='165' x2='320' y2='165'/>
+        <line x1='150' y1='215' x2='320' y2='215'/>
+        <line x1='250' y1='265' x2='320' y2='265'/>
+      </g>
+      <g fill='#ccc' stroke='#666'>
+        <rect x='120' y='100' width='30' height='30'/>
+        <rect x='320' y='100' width='30' height='30'/>
+        <rect x='120' y='150' width='30' height='30'/>
+        <rect x='320' y='150' width='30' height='30'/>
+        <rect x='120' y='200' width='30' height='30'/>
+        <rect x='320' y='200' width='30' height='30'/>
+        <rect x='220' y='250' width='30' height='30'/>
+        <rect x='320' y='250' width='30' height='30'/>
+      </g>
+      <g stroke='black'>
+        <rect xml:id='rect1' x='120' y='100' width='30' height='30' fill='rgb(204,0,102)'>
+          <animate xml:id='animate1' attributeName='x' from='120' to='320' begin='mousedown' dur='5s' restart='never' fill='freeze'/>
+        </rect>
+        <g fill='rgb(0,102,204)'>
+          <rect x='120' y='150' width='30' height='30'>
+            <animate xml:id='animate2' attributeName='x' from='120' to='320' begin='indefinite' dur='5s' restart='never' fill='freeze'/>
+          </rect>
+          <rect x='120' y='200' width='30' height='30'>
+            <animate xml:id='animate3' attributeName='x' from='120' to='320' begin='indefinite' dur='5s' restart='never' fill='freeze'/>
+          </rect>
+          <rect x='220' y='250' width='30' height='30'>
+            <animate xml:id='animate4' attributeName='x' from='220' to='320' begin='indefinite' dur='2.5s' restart='never' fill='freeze'/>
+          </rect>
+        </g>
+      </g>
+    </g>
+    <script type='application/ecmascript'>
+      <![CDATA[
+      function listener(e) {
+        document.getElementById('animate2').beginElement();
+        document.getElementById('animate3').beginElementAt(0);
+        document.getElementById('animate4').beginElementAt(2.5);
+        e.target.removeEventListener('mousedown', listener, false);
+      }
+      document.getElementById('rect1').addEventListener
+        ('mousedown', listener, false);
+    ]]>
+    </script>
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.5 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240" 
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

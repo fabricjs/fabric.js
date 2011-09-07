@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE html PUBLIC  "-//CL//DTD XHTML 1.0 Transitional plus Embed//EN"
+ "http://www.w3.org/Graphics/xhtml1-transitional-plus-embed.dtd">
+ <html xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+ <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+ <meta name="keywords" content="W3C SVG 1.1 Test Suite testsuite mobile"/>
+ <meta name="description" content="W3C SVG 1.2 Tiny Test Suite"/>
+ <title>
+SVG 1.2 Tiny test:udom-dom-206-t </title>
+ <style type="text/css">
+ <!--
+ .bodytext    { font-family:verdana, helvetica, sans-serif; font-size: 12pt; line-height: 125%; text-align: Left; margin-top: 0; margin-bottom: 0 }
+ .pageTitle         { line-height: 150%; font-size: 20pt; font-weight : 900; margin-bottom: 20pt }
+ .pageSubTitle  { color : blue; line-height: 100%; font-size: 24pt; font-weight : 900 }
+ .openChapter   { color : blue; line-height: 125%; font-weight : 900 }
+ .openSection   { color : blue; line-height: 125%; font-weight : 900 }
+ .info  { color : black; line-height: 110%; font-size: 10pt; font-weight : 100 }
+ p          { margin-top:0; margin-bottom:0; padding-top:0; padding-bottom:0 }
+ blockquote { margin-top:0; margin-bottom:0; padding-top:0; padding-bottom:0 }
+ .opscript {margin-left: 3%; margin-right: 3%; }
+ .opscript p { margin-top: 0.7em}
+ .navbar {background: black; color: white; font-weight: bold}
+ -->
+ </style>
+ </head>
+ <body class="bodytext">
+
+	<div class="linkbar"> 
+<p>
+<a href="udom-dom-206-t.html">Tiny version</a></p>
+<p>Specification link: <a target="spec" href="http://www.w3.org/TR/SVGMobile12/svgudom.html">Appendix A The SVG Micro DOM (uDOM)</a></p>
+ <p>
+    <a href="udom-dom-204-t.html">udom-dom-204-t ←</a> 
+    <a href="index.html">index</a>
+    <a href="udom-dom-207-t.html">→ udom-dom-207-t</a>
+</p></div>
+
+	<table align="center" border="0" cellspacing="0" cellpadding="10">
+		<tr>
+			<td align="center" colspan="3">
+				<table border="0" cellpadding="8">
+					<tr>
+						<td align="center" colspan="2" class="pageTitle">
+							<h1>udom-dom-206-t</h1>
+						</td>
+					</tr>
+					<tr  class="navbar">
+						<td align="center">
+							SVG Image
+						</td>
+						<td align="center">
+							PNG Image
+						</td>
+					</tr>
+					<tr>
+						<td align="right">
+   	    		  			<embed src="../svggen/udom-dom-206-t.svg" width="480" height="360"/>
+						</td>
+						<td align="left">
+							<img alt="raster image of udom-dom-206-t" src="../png/udom-dom-206-t.png" width="480" height="360"/>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+
+               
+<div class="opscript">
+      <p>
+        This tests that the <tt>removeChild</tt> method of the
+        <b>Node</b> interface works correctly.
+      </p>
+      <p>
+        The test has three sub-tests, for different <tt>removeChild</tt>
+        behavior, which consist of a paired rectangle and circle:
+      </p>
+      <ul>
+        <li>
+          The first is a test of successfully removing a single element
+          from the document.  Initially, a red rectangle occludes a blue
+          rectangle.  This red rectangle should then be removed by the
+          <tt>removeChild</tt> call, which results in the blue rectangle
+          becoming visible.  The circle beneath it represents whether
+          <tt>removeChild</tt> returned the correct value (i.e., a reference
+          to the same red rectangle that was removed).  If this return
+          value is incorrect, the circle will remain red.  If it was
+          correct, the circle is changed to be blue.
+        </li>
+        <li>
+          The second is a test of successfully removing a subtree
+          from the document.  The subtree is simply a <tt>g</tt> element
+          with a red <tt>rect</tt> as a child, which initially occludes
+          a blue rectangle.  The group with the red rectangle should then be
+          removed by the <tt>removeChild</tt> call, which results in the blue
+          rectangle becoming visible.  The circle beneath it represents
+          whether <tt>removeChild</tt> returned the correct value (i.e., a
+          reference to the <tt>g</tt> element that was removed).  If this
+          return value is incorrect, the circle will remain red.  If it was
+          correct, the circle is changed to be blue.
+        </li>
+        <li>
+          The third is a test of <tt>removeChild</tt> throwing a NOT_FOUND_ERR
+          <b>DOMException</b> when passed an element that is not a child of
+          the element on which the method was called.  If the blue rectangle
+          remains, the implementation correctly did not remove it.  The circle
+          indicates whether the exception was thrown as expected.  If the
+          exception was not thrown, or the wrong is exception is thrown,
+          the circle will remain red.  Otherwise, the circle will be changed
+          to be blue.
+        </li>
+      </ul>
+      <p>
+        The test has been passed if the top row shows three blue rectangles
+        and the bottom row shows three blue circles.
+      </p>
+
+		</div>
+<div class="linkbar"> <p>
+				<a href="udom-dom-204-t.html">udom-dom-204-t ←</a>
+				<a href="index.html">index</a>
+				<a href="udom-dom-207-t.html">→ udom-dom-207-t</a>
+						</p></div>
+</body>
+</html>

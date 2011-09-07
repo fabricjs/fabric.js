@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="AE" owner="CM" desc="Test the TextEvent interface" status="accepted"
+    approved="yes"
+    version="$Revision: 1.9 $" testname="$RCSfile: udom-event-207-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        This tests the <tt>data</tt> attribute of the <b>TextEvent</b>
+        interface.
+      </p>
+      <p>
+        To perform the test, the user must input some text.  This can be
+        from a variety of sources, such characters directly from a keyboard,
+        text pasted from the clipboard, input from an IME or input from a
+        speech recognizer.
+        Once the text has been input, the black rectangle should turn blue to
+        indicate that the test has been passed.  In addition, the
+        <tt>text</tt> element below the rectangle will show the text that was
+        input.
+      </p>
+      <p>
+        If the rectangle becomes red, the test failed because the
+        <tt>data</tt> attribute had an invalid value.  If the rectangle
+        remains black, the test failed because the <tt>textInput</tt>
+        event is not supported.  If the text string does not appear, 
+        or does not match the input text, the test failed because the 
+        <tt>textInput</tt> event is not supported correctly (e.g. it
+        only tests for any keyboard activity).
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: udom-event-207-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+    <text x='10' y='42'>TextEvent interface test</text>
+    <text x='10' y='68' font-size='12'>Input some text.  The rectangle below should become blue</text>
+    <text x='10' y='81' font-size='12'>to indicate that the test has been passed.</text>
+    <rect xml:id='rect1' x='10' y='95' width='50' height='50'/>
+    <text x='10' y='172' font-size='12'>
+      Text input: [<tspan xml:id='tspan1' fill='blue'/>]
+    </text>
+    <script type='application/ecmascript'>
+      <![CDATA[
+        document.documentElement.addEventListener
+        (
+          'textInput',
+           function(e)
+           {
+              if (e.data != null && e.data != '')
+              {
+                document.getElementById('rect1').setAttributeNS(null, 'fill', 'blue');
+                document.getElementById('tspan1').textContent = e.data;
+              }
+              else
+              {
+                document.getElementById('rect1').setAttributeNS(null, 'fill', 'red');
+              }
+            },
+            false
+        );
+      ]]>
+    </script>
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.9 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240" 
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

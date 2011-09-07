@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="CM" owner="ASl" desc="Test to set textContent, which removes other element children" status="accepted"
+    approved="yes"
+    version="$Revision: 1.4 $" testname="$RCSfile: udom-textcontent-202-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        Tests access to textContent.
+        The only text that should be visible is the string "Rect Text and Rect Animate Text!" in green.
+        The set element that makes the element "setTextContent" hidden should be removed when setting the new textContent and therefore the text must be visible.
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: udom-textcontent-202-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+    <text xml:id="setTextContent" x="10" y="75" font-weight="bold" font-size="25" fill="red">
+
+      Not changed yet!
+
+      <set attributeName="visibility" to="hidden"/>
+
+
+    </text>
+
+    <rect xml:id="rect" x="10" y="10" width="40" height="40" fill="red" stroke="blue" stroke-width="8">
+      <text xml:id="getTextContent" x="10" y="150" font-weight="bold" font-size="25" fill="green">
+        Rect Text
+      </text>
+
+      <animate xml:id="rectAnim" attributeName="x"
+               begin="0s" dur="2s"
+               from="10" to="30">
+        <desc>
+          and Rect Animate Text!
+        </desc>
+      </animate>
+
+    </rect>
+
+    <script type="application/ecmascript">
+      <![CDATA[
+        var text = document.getElementById("setTextContent");
+        var rect = document.getElementById("rect");
+        text.textContent = rect.textContent;
+        text.setTrait("fill", "green");
+      ]]>
+    </script>
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.4 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240" 
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    
+    <title>vs. Raphael (Complex Shape) | Fabric.js Benchmarks</title>
+    
+    <link rel="stylesheet" href="/css/master.css">
+  
+    <script src="https://raw.github.com/kangax/fabric.js/gh-pages/dist/all.js"></script>
+    <!--[if lt IE 9]>
+      <script src="https://raw.github.com/kangax/fabric.js/gh-pages/lib/excanvas.js"></script>
+    <![endif]-->
+  
+  </head>
+  <body>
+    <ul id="header">
+  <li><a href="/demos">Demos</a></li>
+  <li><a href="/benchmarks">Benchmarks</a></li>
+  <li><a href="/docs">Docs</a></li>
+  <li><a href="/test">Tests</a></li>
+  <li class="flattr">
+    <a class="FlattrButton" style="display:none;" rev="flattr;button:compact;" href="http://kangax.github.com/fabric.js"></a>
+    <noscript><a href="http://flattr.com/thing/391332/Fabric-js" target="_blank">
+    <img src="http://api.flattr.com/button/flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0" /></a></noscript>
+  </li>
+  <li class="twitter"><a href="http://twitter.com/fabricjs"><span>Twitter</span></a></li>
+  <li class="github"><a href="http://github.com/kangax/fabric.js"><span>Github</span></a></li>
+</ul>
+<script>
+(function() {
+  var s = document.createElement('script'), t = document.getElementsByTagName('script')[0];
+  s.async = true;
+  s.src = 'http://api.flattr.com/js/0.6/load.js?mode=auto';
+  t.parentNode.insertBefore(s, t);
+})();
+</script>
+  
+    <div id="bd-wrapper">
+      <h2><span>Fabric.js benchmarks</span> &middot; vs. Raphael (Complex Shape)</h2>
+    
+      <style>
+  svg {
+    border: 1px solid #000;
+  }
+  .canvas_container {
+    display: block;
+  }
+</style>
+<script src="/lib/raphael-min.js"></script>
+<script src="/lib/tiger.js"></script>
+<script>
+      
+  window.onload = function() {
+    
+    var logEl = document.getElementById('log');
+    
+    (function testFabric() {
+      
+      var canvas = window.__canvas = new fabric.Element('canvas', { 
+            renderOnAddition: false, 
+            stateful: false 
+          });
+
+      //console.profile('parsing');
+      
+      fabric.loadSVGFromURL('/lib/tiger2.svg', function(objects) {
+        
+        //console.profileEnd('parsing');
+        
+        var startTime = new Date();
+        
+        var group = new fabric.PathGroup(objects, {
+          left: 265,
+          top: 300,
+          width: 495,
+          height: 511
+        });
+        canvas.add(group);
+        canvas.renderAll();
+        
+        var renderingTime = new Date() - startTime;
+        
+        logEl.innerHTML += 'fabric: <b class="bench">' + (fabric.documentParsingTime + renderingTime) + 
+          '</b> ms (parsing: ' + fabric.documentParsingTime + ', rendering: ' + renderingTime + ')';
+          
+        document.getElementById('description').appendChild(document.createTextNode(' (' + group.complexity() + ' paths)'))
+      });
+      
+      canvas.calcOffset();
+      
+    })();
+    
+    (function testRaphael() {
+      
+      var start = function () {
+        // storing original coordinates
+        this.ox = this.attr("cx");
+        this.oy = this.attr("cy");
+        this.attr({opacity: .5});
+      },
+      move = function (dx, dy) {
+        // move will be called with dx and dy
+        this.attr({cx: this.ox + dx, cy: this.oy + dy});
+      },
+      up = function () {
+        // restoring state
+        this.attr({opacity: 1});
+      };
+      
+      var startTime = new Date();
+      var shape = Raphael(tiger).translate(200, 200);
+      shape.drag(start, move, up);
+      
+      logEl.innerHTML = 'Raphael: <b class="bench">' + (new Date() - startTime) + '</b> ms<br>';
+      
+    })();
+  };
+</script>
+
+<!-- preload svg -->
+<iframe src="/lib/tiger2.svg" style="position:absolute;top:-999px;left:-999px"></iframe>
+<p id="description">Rendering a complex shape</p>
+<canvas id="canvas" width="600" height="600"></canvas>
+<p id="log"></p>
+    </div>
+  </body>
+</html>

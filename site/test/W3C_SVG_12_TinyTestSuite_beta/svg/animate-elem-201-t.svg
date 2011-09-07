@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="AE" owner="ASl" desc="Test the animate-elements active intervals" status="accepted"
+    approved="yes"
+    version="$Revision: 1.5 $" testname="$RCSfile: animate-elem-201-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        Five orange rectangles have one animation each. When an
+        animation is active it moves its orange rectangle from its
+        left marker to its right marker. The active intervals
+        are [1-2], [4-6] and [8-10].
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: animate-elem-201-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+
+    <text text-anchor="middle" x="240" y="35" font-size="25">animate-elements active intervals</text>
+
+    <text text-anchor="middle" x="340" y="75"  font-size="18">0-1s</text>
+    <text text-anchor="middle" x="340" y="94"  font-size="18">2-4s</text>
+    <text text-anchor="middle" x="340" y="111" font-size="18">6-8s</text>
+    <text text-anchor="middle" x="340" y="129" font-size="18">&gt;10s</text>
+
+    <text text-anchor="middle" x="420" y="75"  font-size="18">1-2s</text>
+    <text text-anchor="middle" x="420" y="94"  font-size="18">4-6s</text>
+    <text text-anchor="middle" x="420" y="111" font-size="18">8-10s</text>
+
+    <rect x="320" y="140" width="40" height="20" fill="#CCC" stroke="#555"/>
+    <rect x="400" y="140" width="40" height="20" fill="#CCC" stroke="#555"/>
+    <rect x="320" y="170" width="40" height="20" fill="#CCC" stroke="#555"/>
+    <rect x="400" y="170" width="40" height="20" fill="#CCC" stroke="#555"/>
+    <rect x="320" y="200" width="40" height="20" fill="#CCC" stroke="#555"/>
+    <rect x="400" y="200" width="40" height="20" fill="#CCC" stroke="#555"/>
+    <rect x="320" y="230" width="40" height="20" fill="#CCC" stroke="#555"/>
+    <rect x="400" y="230" width="40" height="20" fill="#CCC" stroke="#555"/>
+    <rect x="320" y="260" width="40" height="20" fill="#CCC" stroke="#555"/>
+    <rect x="400" y="260" width="40" height="20" fill="#CCC" stroke="#555"/>
+
+
+    <!-- No interval will be created at 11 s since the end attribute does
+           not contain a rule to end an interval starting later than 10 s. -->
+    <text x="315" y="155" text-anchor="end" font-size="14">Begin-value without matching end-value</text>
+
+    <rect x="320" y="140" width="40" height="20" fill="#FA5" stroke="#555">
+      <animate attributeName="x" from="400" to="400"
+               begin="1;4;8;11" end="2;6;10"/>
+    </rect>
+
+
+    <!-- The two intervals starting at 4 s and 8 s will both use the end
+           attributes 10 as interval end. -->
+    <text x="315" y="185" text-anchor="end" font-size="14">Two begin-values share one end-value</text>
+
+    <rect x="320" y="170" width="40" height="20" fill="#FA5" stroke="#555">
+      <animate attributeName="x" from="400" to="400" dur="2"
+               begin="1;4;8" end="2;10"/>
+    </rect>
+
+
+    <!-- The second interval will start late at 4s (instead of at 3 s) since
+           that is the earliest time it can get an end time to the interval. -->
+    <text x="315" y="215" text-anchor="end" font-size="14">Second interval will start late</text>
+
+    <rect x="320" y="200" width="40" height="20" fill="#FA5" stroke="#555">
+      <animate attributeName="x" from="400" to="400"
+               begin="1;3;8" end="syncbase01.begin+2"/>
+    </rect>
+
+    <set xml:id="syncbase01" attributeName="visibility" to="visible"
+         begin="0;4;5;8"/>
+
+
+    <!-- The animation will create several begin- and end instance times when
+           the sync base creates one interval. The instance times will result in
+           three  intervals. -->
+    <text x="315" y="245" text-anchor="end" font-size="14">Several sync-dependencies to one sync-base</text>
+
+    <rect x="320" y="230" width="40" height="20" fill="#FA5" stroke="#555">
+      <animate attributeName="x" from="400" to="400"
+               begin="syncbase02.begin;syncbase02.end-5;syncbase02.end+2;syncbase02.begin+7"
+               end="syncbase02.end;syncbase02.begin-2;syncbase02.begin+6"/>
+    </rect>
+
+    <set xml:id="syncbase02" attributeName="visibility" to="visible"
+         begin="4" end="6"/>
+
+
+    <!-- Intervals can be ended by an event. Create intervals for all begin times. 
+           First interval will be ended by the eventbase01s begin event. -->
+    <text x="315" y="275" text-anchor="end" font-size="14">Intervals are ended by an event-value</text>
+
+    <rect x="320" y="260" width="40" height="20" fill="#FA5" stroke="#555">
+      <animate attributeName="x" from="400" to="400" dur="2"
+               begin="1;4;8"
+               end="eventbase01.beginEvent"/>
+    </rect>
+
+    <set xml:id="eventbase01" attributeName="visibility" to="visible"
+         begin="2" end="6"/>
+
+
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.5 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240" 
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

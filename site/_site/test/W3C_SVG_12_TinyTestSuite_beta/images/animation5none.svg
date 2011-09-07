@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 100 100" preserveAspectRatio="xMinYMin"
+     viewport-fill="url(#myGrad)" viewport-fill-opacity="0.3"
+     version="1.2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <defs>
+    <font-face font-family="SVGFreeSansASCII" unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+    <linearGradient id="myGrad">
+      <stop offset="0.05" stop-color="black"/>
+      <stop offset="0.95" stop-color="yellow"/>
+    </linearGradient>
+  </defs>
+  <g>
+    <g stroke="red" stroke-opacity=".2">
+      <line x1="50" y1="0" x2="50" y2="100"/>
+      <line x1="0" y1="20" x2="100" y2="20"/>
+    </g>
+    <g text-anchor="middle" font-size="6" font-family="SVGFreeSansASCII">
+      <text x="50" y="25">This is an embedded </text>
+      <text x="50" y="35">&lt;animation&gt;</text>
+      <text x="50" y="45">A yellow rectangle </text>
+      <text x="50" y="55">animates to cover</text>
+      <text x="50" y="65">the entire viewBox</text>
+    </g>
+    <rect x="1" y="1" width="98" height="98" fill="yellow" fill-opacity=".5" stroke="black" stroke-width="2" stroke-opacity=".2">
+      <animate attributeName="width" values="98;0;98" dur="10s" repeatCount="indefinite"/>
+      <animate attributeName="height" values="98;0;98" dur="10s" repeatCount="indefinite"/>
+    </rect>
+  </g>
+</svg>

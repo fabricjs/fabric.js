@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="CM" owner="AE" desc="Test SVG Traits" status="accepted"
+    approved="yes"
+    version="$Revision: 1.8 $" testname="$RCSfile: udom-svg-237-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        The TraitAccess tests uses a set of common ECMAScript code to test
+        various trait combinations with expected values. If a result is not as
+        expected, an error is displayed in red text, indicating the returned
+        result and what was expected.  When all subtests have returned success,
+        the result is set to 'passed'.  The pass condition for the test is that
+        all subtests are green, and the word 'passed' is at the bottom right.
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: udom-svg-237-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+
+    <rect xml:id="UnitTest" x="330" y="315" width="130" height="40" stroke="blue" fill="none"/>
+    <g fill="black">
+      <text xml:id="UnitTestStatus" x="333" y="350" font-size="40">failed</text>
+    </g>
+
+    <rect x="1" y="1" width="478" height="358" stroke="black" stroke-width="1" fill="none"/>
+
+    <g>
+      <script xlink:href="../images/TraitAccess.common.es" type="text/ecmascript" />
+    </g>
+
+    <text  x="240" y="40" text-anchor="middle" >TraitAccess - methods supported by "accumulate"</text>
+
+    <rect xml:id="targetRect" fill="none" x="300" y="20" width="10" height="1">
+      <animateMotion xml:id="animm1" accumulate="sum" additive="replace" calcMode="paced" values="0,0; 100,0" dur="10s" />
+      <animateMotion xml:id="animm2" additive="replace" calcMode="paced" values="0,0; 100,0" dur="10s" />
+    </rect>
+
+    <g xml:id="test-start">
+      <handler type="text/ecmascript" xe:event="SVGLoad">
+        <![CDATA[
+          try
+          {
+            rowHeight = 10;
+            fontSize = 8;
+
+            var animm1 = document.getElementById( "animm1" );
+            var animm2 = document.getElementById( "animm2" );
+
+            document.getElementById( "targetRect" ).removeChild( animm1 );
+
+            runGetTraitIters
+            ( 
+              [
+                  new getTraitIter ( "a01" , "getTrait"               , 0 , animm1 , "accumulate" , "sum"  , 0 , 0 , 0 )
+                , new getTraitIter ( "a02" , "getTraitNS"             , null , animm1 , "accumulate" , "sum"  , 0 , 0 , 0 )
+                , new getTraitIter ( "a03" , "getPresentationTrait"   , 0 , animm1 , "accumulate" , "sum"  , 0 , 0 , 0 )
+                , new getTraitIter ( "a04" , "getPresentationTraitNS" , null , animm1 , "accumulate" , "sum"  , 0 , 0 , 0 )
+                , new getTraitIter ( "a05" , "getTrait"               , 0 , animm2 , "accumulate" , "none" , 0 , 0 , 0 )
+                , new getTraitIter ( "a06" , "getTraitNS"             , null , animm2 , "accumulate" , "none" , 0 , 0 , 0 )
+                , new getTraitIter ( "a07" , "getPresentationTrait"   , 0 , animm2 , "accumulate" , "none" , 0 , 0 , 0 )
+                , new getTraitIter ( "a08" , "getPresentationTraitNS" , null , animm2 , "accumulate" , "none" , 0 , 0 , 0 )
+              ]
+            );
+
+            runSetTraitIters
+            (
+              [
+                  new setTraitIter ( "b01" , "setTrait"   , "getTrait"               , 0 , animm1 , "accumulate" , "none" , "none" , 0 , 0 , 0 )
+                , new setTraitIter ( "b02" , "setTrait"   , "getTraitNS"             , null , animm1 , "accumulate" , "none" , "none" , 0 , 0 , 0 )
+                , new setTraitIter ( "b03" , "setTrait"   , "getPresentationTrait"   , 0 , animm1 , "accumulate" , "none" , "none" , 0 , 0 , 0 )
+                , new setTraitIter ( "b04" , "setTrait"   , "getPresentationTraitNS" , null , animm1 , "accumulate" , "none" , "none" , 0 , 0 , 0 )
+                , new setTraitIter ( "b05" , "setTraitNS" , "getTrait"               , null , animm1 , "accumulate" , "none" , "none" , 0 , 0 , 0 )
+                , new setTraitIter ( "b06" , "setTraitNS" , "getTraitNS"             , null , animm1 , "accumulate" , "none" , "none" , 0 , 0 , 0 )
+                , new setTraitIter ( "b07" , "setTraitNS" , "getPresentationTrait"   , null , animm1 , "accumulate" , "none" , "none" , 0 , 0 , 0 )
+                , new setTraitIter ( "b08" , "setTraitNS" , "getPresentationTraitNS" , null , animm1 , "accumulate" , "none" , "none" , 0 , 0 , 0 )
+                , new setTraitIter ( "b09" , "setTrait" , 0                      , 0 , animm2 , "accumulate" , "none"  , 0      , 0 , DOMException.NOT_SUPPORTED_ERR , "NOT_SUPPORTED_ERR" )
+                , new setTraitIter ( "b10" , "setTraitNS" , 0                      , null , animm2 , "accumulate" , "none"  , 0      , 0 , DOMException.NOT_SUPPORTED_ERR , "NOT_SUPPORTED_ERR" )
+              ]
+            );
+          }
+          catch(e)
+          {
+            isPassed = false;
+            drawString("Main: Unexpected exception thrown!" );
+            drawStatusBox( false );
+          }
+
+          if( isPassed )
+          {
+            var status = document.getElementById("UnitTestStatus");
+            status.setTrait("#text", "passed");
+            status.setAttribute("fill", "#0C0");
+          }
+        ]]>
+      </handler>
+    </g>
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.8 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240"
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root"
+  width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="ED" owner="AE" desc="Test SVGPoint" status="accepted"
+    approved="yes"
+    version="$Revision: 1.8 $" testname="$RCSfile: udom-svgpoint-201-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        This test creates a SVGPoint and sets some basic values for x and y. To pass, the text at the
+        bottom of the screen should read 'passed'.
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: udom-svgpoint-201-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+
+    <handler type="text/ecmascript" xe:event="SVGLoad">
+      <![CDATA[
+      var svg_ns = "http://www.w3.org/2000/svg";
+      var xlink_ns = "http://www.w3.org/1999/xlink";
+        
+      var count=0;
+      var topsvg = document.documentElement;
+      var startY = 60;
+      var rowHeight = 11;
+      var fontSize = "10";
+      var isPassed = true;
+  
+      function drawString( text, color )
+      {
+        node_to_insert=document.createElementNS(svg_ns,"text");
+        node_to_insert.setAttributeNS(null,"font-size",fontSize);
+        var xVal = 5;
+        node_to_insert.setAttributeNS(null,"x", xVal.toString() );
+        var yVal = startY + count++ * rowHeight;
+        node_to_insert.setAttributeNS(null, "y",  yVal.toString()  );
+        node_to_insert.setAttributeNS(null, "fill",  color  );
+        node_to_insert.textContent=text ;
+        document.getElementById( "test-body-content" ).appendChild(node_to_insert);
+      }
+
+
+      function verifyPoint(description, point, x, y )
+      {
+        var epsilon = 1 / 65535;
+
+        drawString(description, "black");
+
+        point.x = x;
+        point.y = y;
+
+        if(( Math.abs(point.x - x ) < epsilon ) && ( Math.abs(point.y - y ) < epsilon ))
+        {
+          drawString( "Results match expected values[ " + x + " , " + y + " ];", "green" );
+          drawString( "Values in the point SVGPoint[ " + point.x + " , " + point.y + " ];", "black");
+        }
+        else
+        {
+          isPassed = false;
+          drawString( "Results do not match expected values[ " + x + " , " + y + " ];", "red" );
+          drawString( "Values in the point SVGPoint[ " + point.x + " , " + point.y + " ];", "black"  );
+        }
+
+        drawString("", "black");
+
+      }
+
+      try
+      {
+        var point = topsvg.createSVGPoint( );
+
+        verifyPoint("created SVGPoint[ " + point.x+ " , " + point.y + " ];", point, 0, 0);
+
+        verifyPoint("Test for +epsilon,+epsilon positive integers", point, 32767, 32767);
+
+        verifyPoint("Test for -epsilon,-epsilon negative integers", point, -32767, -32767);
+
+        // to be updated after ACTION-2027
+        //verifyPoint("Test for +epsilon,+epsilon real positive numbers", point, 32767.65535, 32767.65535);
+
+        // to be updated after ACTION-2027
+        //verifyPoint("Test for -epsilon,-epsilon real negative numbers", point, -32767.65535, -32767.65535);
+
+        if( isPassed )
+        {
+          var status = document.getElementById("TestStatus");
+          status.setTrait("#text", "passed");
+          status.setAttribute( "fill", "green" );
+        }
+      }
+      catch(e)
+      {
+        isPassed = false;
+        drawString("Unexpected exception!", "red");
+      }
+      ]]>
+    </handler>
+
+    <text  x="240" y="40" text-anchor="middle" >SVGPoint </text>
+    <rect xml:id="rect1" x="30" y="50" width="50" height="50" fill="none"/>
+
+    <rect  x="330" y="315" width="130" height="40" stroke="blue" fill="none"/>
+    <g fill="red">
+      <text xml:id="TestStatus" x="333" y="350" font-size="40">failed</text>
+    </g>
+
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.8 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240"
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

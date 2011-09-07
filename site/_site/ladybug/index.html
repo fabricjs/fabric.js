@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    
+    <title>Sliding Ladybugs | Fabric.js Demos</title>
+    
+    <link rel="stylesheet" href="/css/master.css">
+  
+    <script src="/lib/fabric.js"></script>
+    
+    <!--[if lt IE 9]>
+      <script src="https://raw.github.com/kangax/fabric.js/gh-pages/lib/excanvas.js"></script>
+    <![endif]-->
+  
+    <script>
+      // polyfill by @paulirish
+      if (!window.requestAnimationFrame ) {
+        window.requestAnimationFrame = (function() {
+          return window.webkitRequestAnimationFrame ||
+          window.mozRequestAnimationFrame ||
+          window.oRequestAnimationFrame ||
+          window.msRequestAnimationFrame ||
+          function( /* function FrameRequestCallback */ callback, /* DOMElement Element */ element ) {
+            window.setTimeout( callback, 1000 / 60 );
+          };
+        })();
+      }
+    </script>
+  </head>
+  <body>
+    <ul id="header">
+  <li><a href="/demos">Demos</a></li>
+  <li><a href="/benchmarks">Benchmarks</a></li>
+  <li><a href="/docs">Docs</a></li>
+  <li><a href="/test">Tests</a></li>
+  <li class="flattr">
+    <a class="FlattrButton" style="display:none;" rev="flattr;button:compact;" href="http://kangax.github.com/fabric.js"></a>
+    <noscript><a href="http://flattr.com/thing/391332/Fabric-js" target="_blank">
+    <img src="http://api.flattr.com/button/flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0" /></a></noscript>
+  </li>
+  <li class="twitter"><a href="http://twitter.com/fabricjs"><span>Twitter</span></a></li>
+  <li class="github"><a href="http://github.com/kangax/fabric.js"><span>Github</span></a></li>
+</ul>
+<script>
+(function() {
+  var s = document.createElement('script'), t = document.getElementsByTagName('script')[0];
+  s.async = true;
+  s.src = 'http://api.flattr.com/js/0.6/load.js?mode=auto';
+  t.parentNode.insertBefore(s, t);
+})();
+</script>
+  
+    <div id="bd-wrapper">
+      <h2><span>Fabric.js demos</span> &middot; Sliding Ladybugs</h2>
+    
+      <canvas id="c" width="800" height="400"></canvas>
+
+<script id="main">var canvas = new fabric.Canvas('c', { selection: false });
+
+setInterval(function() {
+  fabric.Image.fromURL('/assets/ladybug.png', function(img) {
+    img.set('left', fabric.util.getRandomInt(200, 600)).set('top', -50);
+    img.movingLeft = !!Math.round(Math.random());
+    canvas.add(img);
+  });
+}, 1000);
+
+(function animate() {
+  canvas.forEachObject(function(obj) {
+    obj.left += (obj.movingLeft ? -1 : 1);
+    obj.top += 1;
+    if (obj.left > 900 || obj.top > 500) {
+      canvas.remove(obj);
+    }
+    else {
+      obj.setAngle(obj.getAngle() + 2);
+    }
+  });
+  canvas.renderAll();
+  window.requestAnimationFrame(animate);
+})();
+</script>
+    </div>
+  
+    <script>
+      (function(){
+        var mainScriptEl = document.getElementById('main');
+        if (!mainScriptEl) return;
+        var preEl = document.createElement('pre');
+        preEl.innerHTML = mainScriptEl.innerHTML;
+        document.getElementById('bd-wrapper').appendChild(preEl);
+      })();
+    </script>
+  </body>
+</html>

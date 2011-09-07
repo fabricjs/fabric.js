@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    
+    <title>Animation | Fabric.js Benchmarks</title>
+    
+    <link rel="stylesheet" href="/css/master.css">
+  
+    <script src="https://raw.github.com/kangax/fabric.js/gh-pages/dist/all.js"></script>
+    <!--[if lt IE 9]>
+      <script src="https://raw.github.com/kangax/fabric.js/gh-pages/lib/excanvas.js"></script>
+    <![endif]-->
+  
+  </head>
+  <body>
+    <ul id="header">
+  <li><a href="/demos">Demos</a></li>
+  <li><a href="/benchmarks">Benchmarks</a></li>
+  <li><a href="/docs">Docs</a></li>
+  <li><a href="/test">Tests</a></li>
+  <li class="flattr">
+    <a class="FlattrButton" style="display:none;" rev="flattr;button:compact;" href="http://kangax.github.com/fabric.js"></a>
+    <noscript><a href="http://flattr.com/thing/391332/Fabric-js" target="_blank">
+    <img src="http://api.flattr.com/button/flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0" /></a></noscript>
+  </li>
+  <li class="twitter"><a href="http://twitter.com/fabricjs"><span>Twitter</span></a></li>
+  <li class="github"><a href="http://github.com/kangax/fabric.js"><span>Github</span></a></li>
+</ul>
+<script>
+(function() {
+  var s = document.createElement('script'), t = document.getElementsByTagName('script')[0];
+  s.async = true;
+  s.src = 'http://api.flattr.com/js/0.6/load.js?mode=auto';
+  t.parentNode.insertBefore(s, t);
+})();
+</script>
+  
+    <div id="bd-wrapper">
+      <h2><span>Fabric.js benchmarks</span> &middot; Animation</h2>
+    
+      <form>
+  <p>
+    Canvas complexity: 
+    <span id="complexity"></span> paths
+    <span style="margin-left: 75px">
+      <span id="fps" style="font-weight: bold;"></span> FPS
+    </span>
+  </p>
+  <p>
+    Shape:
+    <input value="2.svg" id="shape-path">
+    <button>Change</button>
+    <span style="margin-left: 30px">
+      Shape size: 
+      <input type="range" value="1" min="0.1" max="5" step="0.1" id="scale-object">
+      (<b id="scale-object-output">1</b>)
+    </span>
+  </p>
+  <p>
+    Canvas size:
+    <input type="range" value="600" min="100" max="1200" step="10" id="scale-canvas">
+    (<b id="scale-canvas-output">600</b>)
+  </p>
+</form>
+<canvas id="test" width="600" height="600"></canvas>
+<script>
+  (function() {
+
+    // polyfill by @paulirish
+    if (!window.requestAnimationFrame ) {
+      window.requestAnimationFrame = (function() {
+        return window.webkitRequestAnimationFrame ||
+        window.mozRequestAnimationFrame ||
+        window.oRequestAnimationFrame ||
+        window.msRequestAnimationFrame ||
+        function( /* function FrameRequestCallback */ callback, /* DOMElement Element */ element ) {
+          window.setTimeout( callback, 1000 / 60 );
+        };
+      })();
+    }
+
+    var canvas = new fabric.Canvas('test'),
+        fpsEl = document.getElementById('fps'),
+        complexityEl = document.getElementById('complexity'),
+        changeShapeEl = document.forms[0],
+        shapePathEl = document.getElementById('shape-path'),
+        scaleObjectEl = document.getElementById('scale-object'),
+        scaleObjectOutputEl = document.getElementById('scale-object-output'),
+        scaleCanvasEl = document.getElementById('scale-canvas'),
+        scaleCanvasOutputEl = document.getElementById('scale-canvas-output'),
+        canvasObjects,
+        shapePath = '1.svg',
+        coords = [{ x: 150, y: 150 }, { x: 450, y: 150 }, { x: 150, y: 450 }, { x: 450, y: 450 }],
+        interval,
+        shouldAbort = false;
+
+    canvas.onFpsUpdate = function(value) {
+      fpsEl.innerHTML = value;
+    };
+
+    changeShapeEl.onsubmit = function() {
+      if (shapePathEl.value) {
+        shapePath = shapePathEl.value;
+      }
+      shouldAbort = true;
+      canvas.clear();
+
+      setTimeout(function() {
+        loadShape();
+        shouldAbort = false;
+      }, 100);
+
+      return false;
+    };
+
+    function scaleObjects() {
+      scaleObjectOutputEl.firstChild.nodeValue = fabric.util.toFixed(scaleObjectEl.value, 2);
+      for (var canvasObjects = canvas.getObjects(), i = canvasObjects.length; i--; ) {
+        canvasObjects[i].scaleX = scaleObjectEl.value;
+        canvasObjects[i].scaleY = scaleObjectEl.value;
+      }
+    }
+
+    scaleObjectEl.onchange = scaleObjects;
+
+    scaleCanvasEl.onchange = function() {
+      var scaleValue = fabric.util.toFixed(scaleCanvasEl.value, 2);
+      scaleCanvasOutputEl.firstChild.nodeValue = scaleValue;
+
+      canvas.setWidth(scaleValue).setHeight(scaleValue);
+      canvas.renderAll();
+    };
+
+    var angle = 0; 
+    function animate() {
+      angle += 2;
+      if (angle === 360) {
+        angle = 0;
+      }
+      canvas.item(0).setAngle(angle);
+      canvas.item(1).setAngle(angle);
+      canvas.item(2).setAngle(angle);
+      canvas.item(3).setAngle(angle);
+
+      canvas.renderAll();
+
+      if (!shouldAbort) {
+        window.requestAnimationFrame(animate, canvas.upperCanvasEl);
+      }
+    }
+
+    function loadShape() {
+      for (var i = coords.length; i--; ) {
+        (function(i) {
+          fabric.loadSVGFromURL('/assets/' + shapePath, function(objects, options) {
+            var pathGroup = new fabric.PathGroup(objects, options);
+
+            pathGroup.set({
+              left: coords[i].x,
+              top: coords[i].y,
+              angle: 30,
+              fill: '#ff5555'
+            });
+            pathGroup.scale(scaleObjectEl.value).setCoords();
+
+            canvas.add(pathGroup);
+
+            canvasObjects = canvas.getObjects();
+            if (canvasObjects.length === 4) {
+              animate();
+            }
+            setTimeout(function() {
+              complexityEl.innerHTML = canvas.complexity();
+            }, 50);
+          });
+        })(i);
+      }
+    }
+
+    loadShape();
+
+  })();
+</script>
+    </div>
+  </body>
+</html>

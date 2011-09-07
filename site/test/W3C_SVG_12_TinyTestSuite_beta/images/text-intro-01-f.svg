@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">  
+
+<!--======================================================================-->
+<!--=  Copyright 2000 World Wide Web Consortium, (Massachusetts          =-->
+<!--=  Institute of Technology, Institut National de Recherche en        =-->
+<!--=  Informatique et en Automatique, Keio University). All Rights      =-->
+<!--=  Reserved. See http://www.w3.org/Consortium/Legal/.                =-->
+<!--======================================================================-->
+<!-- ===================================================================== -->
+<!--                                                                       -->
+<!-- text-i18n-BE-09.svg                                                   -->
+<!-- renamed for 1.1 suite to text-intro-01-f.svg                          -->
+<!--                                                                       -->
+<!-- Test various aspects of internationalized text, including             -->
+<!-- left-to-right, right-to-left, top-to-bottom, and the                  -->
+<!-- following properties: 'writing-mode',                                 -->
+<!-- 'glyph-orientation-vertical', 'glyph-orientation-horizontal',         -->
+<!-- 'direction' and 'unicode-bidi'.                                       -->
+<!--                                                                       -->
+<!-- Author : Jon Ferraiolo 06-Aug-2000                                    -->
+<!-- 1.1 revision by Vincent Hardy                                         -->
+<!--                                                                       -->
+<!-- History:                                                              -->
+<!--  06-Aug-2000, JF: Serial#1 created.                                   -->
+<!--  19-Aug-2000, LH: fix missing </g>.                                   -->
+<!--                                                                       -->
+<!-- ===================================================================== -->
+<!--======================================================================-->
+<!--= Note. After October 2000, revision history is kept as CVS 'commit' =-->
+<!--= log messages, and therefore is no longer in the preceding preamble.=-->
+<!--======================================================================-->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"  id="svg-root" width="480" height="360">
+    <SVGTestCase  chapter="text" focus="i18n" testType="BE" BENumber="09" >
+        <OperatorScript>
+            <Paragraph>
+                Test various aspects of internationalized text, including
+                left-to-right, right-to-left, top-to-bottom, and the
+                following properties: 'writing-mode',
+                'glyph-orientation-vertical', 'glyph-orientation-horizontal',
+                'direction' and 'unicode-bidi'.
+            </Paragraph>
+            <Paragraph>
+                Various text strings in various languages appear. The main
+                purpose of the test is to verify that the correct characters
+                appear and that they appear in the correct order and orientation.
+                In particular, ensure that the three lines with Hebrew are ordered
+                correctly (test of bidi algorithms and support of 'unicode-bidi' and
+                'direction' properties). Also, ensure that the two lines of
+                vertical Japanese text have the proper orientation
+                (test of 'glyph-orientation-vertical' property).
+            </Paragraph>
+            <Paragraph>
+                This test requires installation of a system font that supports
+                the various international characters used in this test case.
+                Due to differences across systems regarding system fonts and
+                font handling, for some implementations editing of the test case
+                may be necessary to specify the correct system font. To
+                minimize system dependencies, a future version of this test
+                might include all necessary glyphs as an SVG font.
+            </Paragraph>
+        </OperatorScript>
+    </SVGTestCase>
+
+	<title id="test-title">text-intro-01-f</title>
+	<desc id="test-desc">Test various aspects of internationalized text, including left-to-right, right-to-left, top-to-bottom, and the following properties: 'writing-mode', 'glyph-orientation-vertical', 'glyph-orientation-horizontal', 'direction' and 'unicode-bidi'.</desc>
+	<!--======================================================================-->
+	<!--Content of Test Case follows...                  =====================-->
+	<!--======================================================================-->
+	<g id="test-body-content">
+		<text font-family="Helvetica" font-size="12" fill="red"  x="10" y="20">Test combinations of left-to-right, right-to-left, top-to-bottom text.</text>
+		<g font-size="12" font-family="'LucidaSansUnicode','MS-Gothic'" >
+			<text x="10" y="60">Polish: Mogę jeść szkło, i mi nie szkodzi.</text>
+			<text x="10" y="80">Russian: Я могу есть стекло, это мне не вредит.</text>
+			<text x="10" y="100" font-size="11" >Greek: Μπορώ να φάω σπασμένα γυαλιά χωρίς να πάθω τίποτα.</text>
+			<text x="10" y="120">Text "אני יכול לאכול זכוכית וזה לא מזיק לי" is in Hebrew</text>
+			<text x="10" y="140">Yiddish: איך קען עסן גלאָז און עס טוט מיר נישט װײ.</text>
+		</g>
+		<g font-size="12" font-family="'MS-Gothic','LucidaSansUnicode'" >
+			<text x="10" y="160">Chinese:我能吞下玻璃而不伤身体。</text>
+			<text x="10" y="180" font-size="12" >Japanese: 私はガラスを食べられます。それは私を傷つけません。</text>
+		</g>
+		<text font-family="Helvetica" font-size="12" fill="red"  x="10" y="200">unicode-bidi:bidi-override. First, direction:ltr, then direction:rtl.</text>
+		<g font-size="12" font-family="'LucidaSansUnicode','MS-Gothic'" >
+			<text x="10" y="220" unicode-bidi="bidi-override" direction="ltr" >Text "אני יכול לאכול זכוכית וזה לא מזיק לי" is in Hebrew</text>
+			<text x="10" y="240" unicode-bidi="bidi-override" direction="rtl" >Text "אני יכול לאכול זכוכית וזה לא מזיק לי" is in Hebrew</text>
+		</g>
+		<g font-size="12" font-family="'MS-Gothic','LucidaSansUnicode'" writing-mode="tb" ><text x="390" y="10">This text "我能吞下玻璃而不伤身体。" is in Chinese</text><text x="410" y="10" font-size="10">Japanese: 私はガラスを食べられます。それは私を傷つけません。</text><text x="430" y="10" glyph-orientation-vertical="0" font-size="10" >Japanese: 私はガラスを食べられます。それは私を傷つけません。</text></g>
+	</g>
+
+    <!--======================================================================-->
+    <!--Legend and frame:      Title, suite and SVG document serialization====-->
+    <!--======================================================================-->
+    <g id="test-legend" fill="black" font-family="Helvetica" font-size="10" >
+        <rect x="10" y="300" width="275" height="50" fill="none" stroke="#000000" />
+        <path fill="none" stroke="#000000"  d="M10 315 h275 M205 315 v35 M10 336 h195 M205 332 h80"/>
+        <text x="25" y="311">Scalable Vector Graphics (SVG) v1.1 Conformance Suite</text>
+        <a xlink:href="copyright-documents-19990405.html">
+            <text x="12" y="347" fill="blue" >Copyright 2002 W3C. All Rights Reserved.</text>
+        </a>
+        <text font-size="12"  x="35" y="330">text-intro-01-f</text>
+        <text font-size="10"  x="210" y="327">$Revision: 1.1 $</text>
+        <text font-size="10"  x="210" y="345">Release 1.0</text>
+        <rect id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000000" />
+    </g>
+</svg>

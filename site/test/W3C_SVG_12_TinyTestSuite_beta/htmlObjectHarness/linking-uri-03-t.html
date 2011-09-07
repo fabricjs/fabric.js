@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE html PUBLIC  "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+ <html xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+ <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+ <meta name="keywords" content="W3C SVG 1.1 Test Suite testsuite mobile"/>
+ <meta name="description" content="W3C SVG 1.2 Tiny Test Suite"/>
+ <title>
+SVG 1.2 Tiny test:linking-uri-03-t </title>
+ <style type="text/css">
+ <!--
+ .bodytext    { font-family:verdana, helvetica, sans-serif; font-size: 12pt; line-height: 125%; text-align: Left; margin-top: 0; margin-bottom: 0 }
+ .pageTitle         { line-height: 150%; font-size: 20pt; font-weight : 900; margin-bottom: 20pt }
+ .pageSubTitle  { color : blue; line-height: 100%; font-size: 24pt; font-weight : 900 }
+ .openChapter   { color : blue; line-height: 125%; font-weight : 900 }
+ .openSection   { color : blue; line-height: 125%; font-weight : 900 }
+ .info  { color : black; line-height: 110%; font-size: 10pt; font-weight : 100 }
+ p          { margin-top:0; margin-bottom:0; padding-top:0; padding-bottom:0 }
+ blockquote { margin-top:0; margin-bottom:0; padding-top:0; padding-bottom:0 }
+ .opscript {margin-left: 3%; margin-right: 3%; }
+ .opscript p { margin-top: 0.7em}
+ .navbar {background: black; color: white; font-weight: bold}
+ -->
+ </style>
+ </head>
+ <body class="bodytext">
+
+	<div class="linkbar"> 
+<p>
+<a href="linking-uri-03-t.html">Tiny version</a></p>
+<p>Specification link: <a target="spec" href="http://www.w3.org/TR/SVGMobile12/linking.html">14 Linking</a></p>
+ <p>
+    <a href="linking-refs-206-t.html">linking-refs-206-t ←</a> 
+    <a href="index.html">index</a>
+    <a href="media-alevel-201-t.html">→ media-alevel-201-t</a>
+</p></div>
+
+	<table align="center" border="0" cellspacing="0" cellpadding="10">
+		<tr>
+			<td align="center" colspan="3">
+				<table border="0" cellpadding="8">
+					<tr>
+						<td align="center" colspan="2" class="pageTitle">
+							<h1>linking-uri-03-t</h1>
+						</td>
+					</tr>
+					<tr  class="navbar">
+						<td align="center">
+							SVG Image
+						</td>
+						<td align="center">
+							PNG Image
+						</td>
+					</tr>
+					<tr>
+						<td align="right">
+   	    		  			<object data="../svggen/linking-uri-03-t.svg" width="480" height="360" type="image/svg+xml"><p style="font-size:300%;color:red">FAIL</p></object>
+						</td>
+						<td align="left">
+							<img alt="raster image of linking-uri-03-t" src="../png/linking-uri-03-t.png" width="480" height="360"/>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+
+               
+<div class="opscript">
+      <p>
+        Verify the handling of the allowable xlink attributes on the 'a' element. The initial view of this test contains a
+        single green triangle, labelling text, and the usual template legend and frame.
+      </p>
+      <p>
+        There is a link on the triangle, pointing to an external SVG file, which is in the images directory (../images/).
+        The target file contains SVG 'text' elements which comprise a TOC and brief description of all of the SVG Tiny 1.2
+        test files for Linking. Upon clicking the triangle, the image of the linkingToc-t.svg file should replace the
+        initial view of this test case in the viewer frame.
+      </p>
+      <p>
+        The purpose of the test is to verify that viewers tolerate the presence of xlink attributes on the 'a' element. The
+        presence of the attributes should not change the behavior of the test in any way. The results of executing the link
+        should be identical to executing the first (topmost) link of linking-uri-01-t.
+      </p>
+      <p>
+        There are two reference images associated with this test case. The first illustrates the correct "start" or initial
+        state of the rendered SVG file. The second illustrates the correct image after the link is activated (to the
+        linkingToc-t.svg file). (Note. This harness does not yet provide access to multiple PNGs; the first, initial-state
+        PNG is shown.)
+      </p>
+      <p>
+        The test uses the 'rect' element, as well as basic fill (solid simple colors), stroke (black and colored wide and
+        1-pixel lines), font-family (Arial) and font-size properties.
+      </p>
+
+		</div>
+<div class="linkbar"> <p>
+				<a href="linking-refs-206-t.html">linking-refs-206-t ←</a>
+				<a href="index.html">index</a>
+				<a href="media-alevel-201-t.html">→ media-alevel-201-t</a>
+						</p></div>
+</body>
+</html>

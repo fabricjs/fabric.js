@@ -1,0 +1,21 @@
+body { font-family: Garamond, "Hoefler Text", "Times New Roman", Times, serif; margin: 0; }
+
+#header { background: #333; margin: 0; padding: 0; color: #555; }
+#header li { display: inline-block; }
+#header li a { display: inline-block; padding: 10px; color: pink; font-variant: small-caps; text-decoration: none; }
+#header li a:hover, #header li a:focus { text-decoration: underline; }
+#header li.github, #header li.twitter, #header li.flattr { float: right; }
+#header li.flattr { margin-top: 9px; margin-right: 10px; margin-left: 5px }
+.github a, .twitter a { font-variant: normal !important; color: #cf909b !important; }
+.github span, .twitter span { color: pink }
+
+#bd-wrapper { padding: 10px; }
+#bd-wrapper > ul > li { margin-bottom: 5px }
+
+pre { margin-top: 0; font-size: 12px; vertical-align: top; background: #eef; display: inline-block; padding: 15px; margin-left: 15px; display: inline-block }
+
+.canvas-container { border: 1px dotted #ccc; display: inline-block; vertical-align: top; }
+
+h2 span { font-weight: normal; }
+
+b.bench { font-family: monospace; font-size: 18px; background: #ffc; padding: 0 3px; border: 1px solid #eee; line-height: 1.5 }

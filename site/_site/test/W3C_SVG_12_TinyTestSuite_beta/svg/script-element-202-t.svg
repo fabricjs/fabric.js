@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="AE" owner="ED" desc="Test that scripts are not processed until added to the DOM tree." status="accepted"
+    approved="yes"
+    version="$Revision: 1.5 $" testname="$RCSfile: script-element-202-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        Test that scripts are not processed until added to the DOM tree. Also test that a function defined in a script
+        element can be called from a handler element in the same scripting context.
+      </p>
+      <p>
+        When the blue rect is clicked a script element is created. The script to be run must not be processed until
+        the script element is added to the tree. If it is processed before added to the tree, the rect that is
+        inserted into the document will be red. If not, then it will be green.
+      </p>
+      <p>
+        The test has passed if after clicking the blue rect a green rect is displayed in its place.
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: script-element-202-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+
+    <script>
+      var svgroot = document.documentElement;
+      var fill = "red";
+      var scriptText = "var r = document.createElementNS('http://www.w3.org/2000/svg', 'rect'); r.setAttributeNS( null, 'x', 120); r.setAttributeNS( null, 'y', 50); r.setAttributeNS( null, 'width', 240); r.setAttributeNS( null, 'height', 240); r.setAttributeNS( null, 'fill', fill); svgroot.appendChild(r);"
+
+      function makeScriptElement()
+      {
+      var elm = document.createElementNS("http://www.w3.org/2000/svg", "script");
+      elm.textContent = scriptText;
+
+      fill = "green";
+
+      svgroot.appendChild(elm);
+      }
+    </script>
+
+    <rect xml:id="status" x="120" y="50" width="240" height="240" fill="blue">
+      <handler xe:event="click">
+        makeScriptElement();
+      </handler>
+    </rect>
+    <text x="240" y="180" text-anchor="middle" pointer-events="none">Click here!</text>
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.5 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240" 
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

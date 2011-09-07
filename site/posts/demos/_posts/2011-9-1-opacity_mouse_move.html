@@ -1,0 +1,47 @@
+---
+layout: demo
+title: Opacity Mouse Move
+---
+
+<canvas id="c" width="600" height="500"></canvas>
+
+<script>
+var getRandomInt = fabric.util.getRandomInt;
+function pad(s) {
+  return s.length === 1 ? ('0' + s) : s;
+}
+function getRandomColor() {
+  return '#' + pad(getRandomInt(0, 255).toString(16)) + 
+    pad(getRandomInt(0, 255).toString(16)) + 
+    pad(getRandomInt(0, 255).toString(16));
+}
+</script>
+<script id="main">var canvas = new fabric.Canvas('c');
+
+fabric.loadSVGFromURL('/assets/135.svg', function(objects) {
+
+  var obj = objects[0].scale(0.25);
+  canvas.centerObjectH(obj).centerObjectV(obj);
+  canvas.add(obj);
+
+  canvas.add(obj.clone().set({ left: 100, top: 100, angle: -15 }));
+  canvas.add(obj.clone().set({ left: 480, top: 100, angle: 15 }));
+  canvas.add(obj.clone().set({ left: 100, top: 400, angle: -15 }));
+  canvas.add(obj.clone().set({ left: 480, top: 400, angle: 15 }));
+
+  canvas.observe('mouse:move', function(e) {
+
+    var p = canvas.getPointer(e.memo.e);
+
+    canvas.forEachObject(function(obj) {
+      var distX = Math.abs(p.x - obj.left),
+          distY = Math.abs(p.y - obj.top),
+          dist = Math.round(Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2)));
+
+      obj.setOpacity(1 / (dist / 20));
+    });
+
+    canvas.renderAll();
+  });
+});
+</script>

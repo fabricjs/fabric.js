@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">  
+
+<!--======================================================================-->
+<!--=  Copyright 2000 World Wide Web Consortium, (Massachusetts          =-->
+<!--=  Institute of Technology, Institut National de Recherche en        =-->
+<!--=  Informatique et en Automatique, Keio University). All Rights      =-->
+<!--=  Reserved. See http://www.w3.org/Consortium/Legal/.                =-->
+<!--======================================================================-->
+<!--======================================================================-->
+<!--                                                                      -->
+<!-- filters-composite-BE-05.svg                                          -->
+<!-- renamed for 1.1 suite to filters-composite-01-f.svg                  -->
+<!--                                                                      -->
+<!-- Test which verifies the basic facilities of feComposite.             -->
+<!--                                                                      -->
+<!-- Author : Jon Ferraiolo 03-Apr-2000                                   -->
+<!-- Revised for 1.1 : Mike Bultrowicz, 4 February 2002                   -->
+<!--                                                                      -->
+<!-- History:                                                             -->
+<!--  04-Apr-2000, JF: Serial#1 created.                                  -->
+<!--  03-Aug-2000, LH=" update DOCTYPE for CR DTD, 20000802" ser# .       -->
+<!--  16-Aug-2000, LH="rename" ser#2.                                     -->
+<!--                                                                      -->
+<!--======================================================================-->
+<!--======================================================================-->
+<!--= Note. After October 2000, revision history is kept as CVS 'commit' =-->
+<!--= log messages, and therefore is no longer in the preceding preamble.=-->
+<!--======================================================================-->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="svg-root" width="480" height="360">
+    <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/">
+        <OperatorScript>
+			<Paragraph>
+				Test which verifies the basic facilities of feComposite.
+			</Paragraph> 
+			<Paragraph>
+				This test uses the following elements: &lt;path&gt;, &lt;use&gt;, 
+				&lt;linearGradient&gt;, &lt;filter&gt; with, an enable-background 
+				attribute, &lt;feFlood&gt;, &lt;feComposite&gt;, &lt;feMerge&gt;
+			</Paragraph> 
+			<Paragraph>
+				The test case shows six pairs of overlapping triangles 
+				depicting the six different feComposite operators. The 
+				first row shows compositing when both triangles have 
+				opacity=1. The second row shows compositing when both 
+				triangles have opacity=.5. The six columns illustrate the 
+				six types of compositing operations.
+			</Paragraph> 
+        </OperatorScript>
+    </SVGTestCase>
+	<title id="test-title">filters-composite-01-f</title>
+	<desc id="test-desc">Test which verifies the basic facilities of feComposite.</desc>
+	<!--======================================================================-->
+	<!--Content of Test Case follows...                  =====================-->
+	<!--======================================================================-->
+	<g id="test-body-content" transform="translate(15 -60)">
+		<title>Example feComposite - Examples of feComposite operations</title>
+		<desc>Six pairs of overlapping triangles depicting the six different feComposite operators.</desc>
+		<defs>
+			<path id="Blue100" d="M 0 0 L 100 0 L 100 100 z" fill="#00ffff" />
+			<path id="Red100" d="M 0 0 L 0 100 L 100 0 z" fill="#ff00ff" />
+			<path id="Blue50" d="M 0 125 L 100 125 L 100 225 z" fill="#00ffff" fill-opacity=".5" />
+			<path id="Red50" d="M 0 125 L 0 225 L 100 125 z" fill="#ff00ff" fill-opacity=".5" />
+			<filter id="over" filterUnits="objectBoundingBox" x="-5%" y="-5%" width="110%" height="110%">
+				<feFlood flood-color="#ffffff" flood-opacity="1"  result="flood"/>
+				<feComposite in="SourceGraphic" in2="BackgroundImage" operator="over" result="comp"/>
+				<feMerge>
+					<feMergeNode in="flood"/>
+					<feMergeNode in="comp"/>
+				</feMerge>
+			</filter>
+			<filter id="in" filterUnits="objectBoundingBox" x="-5%" y="-5%" width="110%" height="110%">
+				<feFlood flood-color="#ffffff" flood-opacity="1"  result="flood"/>
+				<feComposite in="SourceGraphic" in2="BackgroundImage" operator="in" result="comp"/>
+				<feMerge>
+					<feMergeNode in="flood"/>
+					<feMergeNode in="comp"/>
+				</feMerge>
+			</filter>
+			<filter id="out" filterUnits="objectBoundingBox" x="-5%" y="-5%" width="110%" height="110%">
+				<feFlood flood-color="#ffffff" flood-opacity="1"  result="flood"/>
+				<feComposite in="SourceGraphic" in2="BackgroundImage" operator="out" result="comp"/>
+				<feMerge>
+					<feMergeNode in="flood"/>
+					<feMergeNode in="comp"/>
+				</feMerge>
+			</filter>
+			<filter id="atop" filterUnits="objectBoundingBox" x="-5%" y="-5%" width="110%" height="110%">
+				<feFlood flood-color="#ffffff" flood-opacity="1"  result="flood"/>
+				<feComposite in="SourceGraphic" in2="BackgroundImage" operator="atop" result="comp"/>
+				<feMerge>
+					<feMergeNode in="flood"/>
+					<feMergeNode in="comp"/>
+				</feMerge>
+			</filter>
+			<filter id="xor" filterUnits="objectBoundingBox" x="-5%" y="-5%" width="110%" height="110%">
+				<feFlood flood-color="#ffffff" flood-opacity="1"  result="flood"/>
+				<feComposite in="SourceGraphic" in2="BackgroundImage" operator="xor" result="comp"/>
+				<feMerge>
+					<feMergeNode in="flood"/>
+					<feMergeNode in="comp"/>
+				</feMerge>
+			</filter>
+			<filter id="arithmetic" filterUnits="objectBoundingBox" x="-5%" y="-5%" width="110%" height="110%">
+				<feFlood flood-color="#ffffff" flood-opacity="1"  result="flood"/>
+				<feComposite in="SourceGraphic" in2="BackgroundImage" result="comp" operator="arithmetic" k1=".5" k2=".5" k3=".5" k4=".5"/>
+				<feMerge>
+					<feMergeNode in="flood"/>
+					<feMergeNode in="comp"/>
+				</feMerge>
+			</filter>
+		</defs>
+		<g font-family="Verdana" font-size="40" shape-rendering="crispEdges"  transform="translate(5,150) scale(.4)">
+			<rect fill="none" stroke="blue"  x="1" y="1" width="1098" height="323"/>
+			<text x="15" y="75">opacity 1.0</text>
+			<text x="15" y="200">opacity 0.5</text>
+			<g transform="translate(275,25)" enable-background="new" >
+				<use xlink:href="#Blue100"/>
+				<use xlink:href="#Red100" filter="url(#over)" />
+			</g>
+			<g transform="translate(275,25)" enable-background="new" >
+				<use xlink:href="#Blue50"/>
+				<use xlink:href="#Red50" filter="url(#over)" />
+				<text x="5" y="275">over</text>
+			</g>
+			<g transform="translate(400,25)" enable-background="new" >
+				<use xlink:href="#Blue100"/>
+				<use xlink:href="#Red100" filter="url(#in)" />
+			</g>
+			<g transform="translate(400,25)" enable-background="new" >
+				<use xlink:href="#Blue50"/>
+				<use xlink:href="#Red50" filter="url(#in)" />
+				<text x="35" y="275">in</text>
+			</g>
+			<g transform="translate(525,25)" enable-background="new" >
+				<use xlink:href="#Blue100"/>
+				<use xlink:href="#Red100" filter="url(#out)" />
+			</g>
+			<g transform="translate(525,25)" enable-background="new" >
+				<use xlink:href="#Blue50"/>
+				<use xlink:href="#Red50" filter="url(#out)" />
+				<text x="15" y="275">out</text>
+			</g>
+			<g transform="translate(650,25)" enable-background="new" >
+				<use xlink:href="#Blue100"/>
+				<use xlink:href="#Red100" filter="url(#atop)" />
+			</g>
+			<g transform="translate(650,25)" enable-background="new" >
+				<use xlink:href="#Blue50"/>
+				<use xlink:href="#Red50" filter="url(#atop)" />
+				<text x="10" y="275">atop</text>
+			</g>
+			<g transform="translate(775,25)" enable-background="new" >
+				<use xlink:href="#Blue100"/>
+				<use xlink:href="#Red100" filter="url(#xor)" />
+			</g>
+			<g transform="translate(775,25)" enable-background="new" >
+				<use xlink:href="#Blue50"/>
+				<use xlink:href="#Red50" filter="url(#xor)" />
+				<text x="15" y="275">xor</text>
+			</g>
+			<g transform="translate(900,25)" enable-background="new" >
+				<use xlink:href="#Blue100"/>
+				<use xlink:href="#Red100" filter="url(#arithmetic)" />
+			</g>
+			<g transform="translate(900,25)" enable-background="new" >
+				<use xlink:href="#Blue50"/>
+				<use xlink:href="#Red50" filter="url(#arithmetic)" />
+				<text x="-25" y="275">arithmetic</text>
+			</g>
+		</g>
+	</g>
+	<!--======================================================================-->
+	<!--Legend and frame:      Title, suite and SVG document serialization====-->
+	<!--======================================================================-->
+    <g id="test-legend" fill="black" font-family="Helvetica" font-size="10">
+        <rect x="10" y="300" width="275" height="50" fill="none" stroke="#000000"/>
+        <path fill="none" stroke="#000000" d="M10 315 h275 M205 315 v35 M10 336 h195 M205 332 h80"/>
+        <text x="25" y="311">Scalable Vector Graphics (SVG) v1.1 Conformance Suite</text>
+        <a xlink:href="copyright-documents-19990405.html">
+            <text x="12" y="347" fill="blue" >Copyright 2002 W3C. All Rights Reserved.</text>
+        </a>
+        <text font-size="12" x="35" y="330">filters-composite-01</text>
+        <text font-size="10" x="210" y="327">$Revision: 1.1 $</text>
+        <text font-size="10" x="210" y="345">Release 1.0</text>
+        <rect id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000000"/>
+    </g>
+</svg>

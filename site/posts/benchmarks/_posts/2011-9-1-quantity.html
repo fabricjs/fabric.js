@@ -1,0 +1,87 @@
+---
+layout: benchmark
+title: Quantity
+---
+
+<style>
+  h3 { margin: 0; padding: 0; }
+  p { margin: 0; }
+  #results { background: #ffc; display: inline-block; padding: 5px; margin: 20px 0; }
+</style>
+
+<p>Drawing 150 randomly positioned, randomly colored and randomly rotated circles, rectangles and triangles.</p>
+<div id="results"></div>
+<br>
+<canvas id="test" width="600" height="600"></canvas>
+<script>
+  (function() {
+
+    var getRandomInt = fabric.util.getRandomInt;
+    function getRandomColor() {
+      return getRandomInt(0, 255).toString(16) 
+        + getRandomInt(0, 255).toString(16) 
+        + getRandomInt(0, 255).toString(16);
+    }
+    function getRandomNum(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+
+    function addResult(title, result) {
+      var el = fabric.util.getById('results');
+      el.innerHTML += ('<h3 style="display:inline-block;">' + title + '</h3><p style="margin-left:1em;margin-right:1em;display:inline-block">' + result + '</p>');
+    }
+
+    this.c = new fabric.Canvas('test');
+
+    var t1, t2, 
+        lim = 50, 
+        offset = 50, 
+        width = c.getWidth(), 
+        height = c.getHeight();
+
+    var t = new Date();
+    for (var i = lim; i--; ) {
+      c.add(new fabric.Rect({
+        width: getRandomInt(10, 50),
+        height: getRandomInt(10, 50),
+        fill: '#' + getRandomColor(),
+        opacity: getRandomNum(0.5, 1),
+        angle: getRandomInt(0, 180),
+        top: getRandomInt(0 + offset, height - offset),
+        left: getRandomInt(0 + offset, width - offset)
+      }));
+
+      c.add(new fabric.Circle({
+        radius: getRandomInt(10, 50),
+        fill: '#' + getRandomColor(),
+        opacity: getRandomNum(0.5, 1),
+        top: getRandomInt(0 + offset, height - offset),
+        left: getRandomInt(0 + offset, width - offset)
+      }));
+
+      c.add(new fabric.Triangle({
+        width: getRandomInt(10, 50),
+        height: getRandomInt(10, 50),
+        fill: '#' + getRandomColor(),
+        opacity: getRandomNum(0.5, 1),
+        angle: getRandomInt(0, 180),
+        top: getRandomInt(0 + offset, height - offset),
+        left: getRandomInt(0 + offset, width - offset)
+      }));
+    }
+
+    addResult('Initialization: ', (t1 = new Date() - t) + 'ms');
+
+    t = new Date();
+    for (var i = 50; i--; ) {
+      c.renderAll();
+    }
+
+    addResult('Rendering: ', (t2 = new Date() - t) + 'ms');
+
+    addResult('Total time: ', (t1 + t2) + 'ms');
+
+    c.calcOffset();
+
+  })();
+</script>

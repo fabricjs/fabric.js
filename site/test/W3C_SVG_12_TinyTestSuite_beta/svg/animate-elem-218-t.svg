@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="AS" owner="DOH" desc="xml:id or id? Identification of the element, that is target of an animation." status="accepted"
+    approved="yes"
+    version="$Revision: 1.5 $" testname="$RCSfile: animate-elem-218-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        xml:id or id? Identification of the element, that is target of an animation.
+        For authors it is recommended not to use different for id and xml:id for the same
+        element and not the same value for id in one element and the same value for
+        xml:id in another element. This is done in this document only as a (stupid) test,
+        not as an application.
+      </p>
+      <p>
+        The main indication for a failed test is the appearance of red or no animation after 2s.
+      </p>
+      <p>
+        Because for historical reasons, SVG tiny 1.2 has two fragment identifiers.
+        It is recommended, that xml:id is used and  not only id. As a consequence
+        it is possible to have two different identifier values for one element.
+        In such a case, id is skipped and only xml:id has to be choosen.
+
+        In this test the height of the blue rectangle is set to another value. This is compared
+        with a set animation of another red rectangle, having the same value for xml:id and
+        id. The blue rectangle has to cover always the red one. If something red is visible,
+        an error is occured.
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: animate-elem-218-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+
+    <defs>
+      <set xlink:href="#rect" attributeName="height" to="150" begin="2s" />
+
+      <set xlink:href="#dummy" attributeName="height" to="50" begin="2s" />
+      <set xlink:href="#dummy" attributeName="width" to="50" begin="4s" />
+
+      <set xlink:href="#cp" attributeName="height" to="150" begin="2s" />
+      <set xlink:href="#cid" attributeName="height" to="150" begin="2s" />
+      <set xlink:href="#cxmlid" attributeName="height" to="150" begin="2s" />
+
+      <set xlink:href="#a" attributeName="height" to="150" begin="2s" />
+      <set xlink:href="#cpba" attributeName="height" to="150" begin="2s" />
+
+      <set xlink:href="#b" attributeName="width" to="150" begin="2s" />
+      <set xlink:href="#cpab" attributeName="width" to="150" begin="2s" />
+    </defs>
+    <rect x="0" y="0" width="480" height="360" fill="#fff" />
+
+    <rect id="cp" xml:id="cp" x="180" y="140"  rx="50" ry="50" width="100" height="100"
+      fill="none" stroke="#600" stroke-width="20" />
+    <rect xml:id="cid" x="180" y="140"  rx="50" ry="50" width="100" height="100"
+      fill="none" stroke="#a00" stroke-width="20" />
+    <rect xml:id="cxmlid" x="180" y="140"  rx="50" ry="50" width="100" height="100"
+      fill="none" stroke="#f44" stroke-width="20" />
+
+    <rect id="dummy" xml:id="rect" x="180" y="140"  rx="50" ry="50" width="100" height="100"
+      fill="none" stroke="blue" stroke-width="20" />
+
+
+    <rect id="cpab" xml:id="cpab" x="310" y="30"  rx="50" ry="50" width="100" height="100"
+      fill="none" stroke="red" stroke-width="20" />
+
+    <rect id="a" xml:id="b" x="310" y="30"  rx="50" ry="50" width="100" height="100"
+      fill="none" stroke="blue" stroke-width="20" />
+
+
+    <rect id="cpba" xml:id="cpba" x="20" y="30"  rx="50" ry="50" width="100" height="100"
+      fill="none" stroke="red" stroke-width="20" />
+
+    <rect id="b" xml:id="a" x="20" y="30"  rx="50" ry="50" width="100" height="100"
+      fill="none" stroke="blue" stroke-width="20" />
+
+    <g id="myText" xml:id="myText" font-size="12" stroke="none">
+      <text x="300" y="285">xml:id or id?</text>
+      <text x="300" y="300">identifiy the animated element</text>
+      <text x="300" y="320">red=wrong </text>
+      <text x="300" y="340">timing: set at 2s</text>
+    </g>
+
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.5 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240" 
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

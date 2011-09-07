@@ -1,0 +1,32 @@
+---
+layout: demo
+title: Sliding Ladybugs
+---
+
+<canvas id="c" width="800" height="400"></canvas>
+
+<script id="main">var canvas = new fabric.Canvas('c', { selection: false });
+
+setInterval(function() {
+  fabric.Image.fromURL('/assets/ladybug.png', function(img) {
+    img.set('left', fabric.util.getRandomInt(200, 600)).set('top', -50);
+    img.movingLeft = !!Math.round(Math.random());
+    canvas.add(img);
+  });
+}, 1000);
+
+(function animate() {
+  canvas.forEachObject(function(obj) {
+    obj.left += (obj.movingLeft ? -1 : 1);
+    obj.top += 1;
+    if (obj.left > 900 || obj.top > 500) {
+      canvas.remove(obj);
+    }
+    else {
+      obj.setAngle(obj.getAngle() + 2);
+    }
+  });
+  canvas.renderAll();
+  window.requestAnimationFrame(animate);
+})();
+</script>

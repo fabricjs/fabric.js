@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<defs>
+		<rect id="myRect" width="240" height="40"/>
+		<use id="focusRect1" xlink:href="#myRect" focusable="true" fill-opacity="0.4" fill="blue">
+			<set attributeName="fill" to="red" begin="focusRect1.focusin"/>
+			<set attributeName="fill" to="blue" begin="focusRect1.focusout"/>
+		</use>
+		<g id="poem" transform="translate(7,15)">
+			<text y="0">There once was a curious frog</text>
+			<text y="12">Who sat by a pond on a log</text>
+			<text y="24">And, to see what resulted,</text>
+			<text y="36">In the pond catapulted</text>
+			<text y="48">With a water-noise heard round the bog.</text>
+		</g>
+		<g id="poem-w-rect">
+			<rect width="240" height="70"/>
+			<use xlink:href="#poem" fill-opacity="1" fill="white"/>
+		</g>
+	</defs>
+               <text x="10" y="20">This file only contains fragments used from other files</text>
+</svg>

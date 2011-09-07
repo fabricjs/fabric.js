@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    
+    <title>{{ page.title }} | Fabric.js Demos</title>
+    
+    <link rel="stylesheet" href="/css/master.css">
+  
+    <script src="/lib/fabric.js"></script>
+    
+    <!--[if lt IE 9]>
+      <script src="https://raw.github.com/kangax/fabric.js/gh-pages/lib/excanvas.js"></script>
+    <![endif]-->
+  
+    <script>
+      // polyfill by @paulirish
+      if (!window.requestAnimationFrame ) {
+        window.requestAnimationFrame = (function() {
+          return window.webkitRequestAnimationFrame ||
+          window.mozRequestAnimationFrame ||
+          window.oRequestAnimationFrame ||
+          window.msRequestAnimationFrame ||
+          function( /* function FrameRequestCallback */ callback, /* DOMElement Element */ element ) {
+            window.setTimeout( callback, 1000 / 60 );
+          };
+        })();
+      }
+    </script>
+  </head>
+  <body>
+    {% include header.html %}
+  
+    <div id="bd-wrapper">
+      <h2><span>Fabric.js demos</span> &middot; {{ page.title }}</h2>
+    
+      {{ content }}
+    </div>
+  
+    <script>
+      (function(){
+        var mainScriptEl = document.getElementById('main');
+        if (!mainScriptEl) return;
+        var preEl = document.createElement('pre');
+        preEl.innerHTML = mainScriptEl.innerHTML;
+        document.getElementById('bd-wrapper').appendChild(preEl);
+      })();
+    </script>
+  </body>
+</html>

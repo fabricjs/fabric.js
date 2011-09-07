@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE html PUBLIC  "-//CL//DTD XHTML 1.0 Transitional plus Embed//EN"
+ "http://www.w3.org/Graphics/xhtml1-transitional-plus-embed.dtd">
+ <html xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+ <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+ <meta name="keywords" content="W3C SVG 1.1 Test Suite testsuite mobile"/>
+ <meta name="description" content="W3C SVG 1.2 Tiny Test Suite"/>
+ <title>
+SVG 1.2 Tiny test:paint-grad-05-t </title>
+ <style type="text/css">
+ <!--
+ .bodytext    { font-family:verdana, helvetica, sans-serif; font-size: 12pt; line-height: 125%; text-align: Left; margin-top: 0; margin-bottom: 0 }
+ .pageTitle         { line-height: 150%; font-size: 20pt; font-weight : 900; margin-bottom: 20pt }
+ .pageSubTitle  { color : blue; line-height: 100%; font-size: 24pt; font-weight : 900 }
+ .openChapter   { color : blue; line-height: 125%; font-weight : 900 }
+ .openSection   { color : blue; line-height: 125%; font-weight : 900 }
+ .info  { color : black; line-height: 110%; font-size: 10pt; font-weight : 100 }
+ p          { margin-top:0; margin-bottom:0; padding-top:0; padding-bottom:0 }
+ blockquote { margin-top:0; margin-bottom:0; padding-top:0; padding-bottom:0 }
+ .opscript {margin-left: 3%; margin-right: 3%; }
+ .opscript p { margin-top: 0.7em}
+ .navbar {background: black; color: white; font-weight: bold}
+ -->
+ </style>
+ </head>
+ <body class="bodytext">
+
+	<div class="linkbar"> 
+<p>
+<a href="paint-grad-05-t.html">Tiny version</a></p>
+<p>Specification link: <a target="spec" href="http://www.w3.org/TR/SVGMobile12/painting.html">11.16 Gradients</a></p>
+ <p>
+    <a href="paint-grad-04-t.html">paint-grad-04-t ←</a> 
+    <a href="index.html">index</a>
+    <a href="paint-grad-07-t.html">→ paint-grad-07-t</a>
+</p></div>
+
+	<table align="center" border="0" cellspacing="0" cellpadding="10">
+		<tr>
+			<td align="center" colspan="3">
+				<table border="0" cellpadding="8">
+					<tr>
+						<td align="center" colspan="2" class="pageTitle">
+							<h1>paint-grad-05-t</h1>
+						</td>
+					</tr>
+					<tr  class="navbar">
+						<td align="center">
+							SVG Image
+						</td>
+						<td align="center">
+							PNG Image
+						</td>
+					</tr>
+					<tr>
+						<td align="right">
+   	    		  			<embed src="../svggen/paint-grad-05-t.svg" width="480" height="360"/>
+						</td>
+						<td align="left">
+							<img alt="raster image of paint-grad-05-t" src="../png/paint-grad-05-t.png" width="480" height="360"/>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+
+               
+<div class="opscript">
+      <p>Test that checks the capability of the stop opacity in linear and radial gradients.</p>
+      <p>
+        There are two tests which contain rectangles with gradients using stop-opacity properties. A cyan color text string
+        "Background" is put behind both of the rectangles to help demonstrate the opacity concept. From top-down the appearance
+        of objects is as follows.
+      </p>
+      <p>
+        The first rectangle has a linear gradient fill with a vector starting at top left and going to bottom right. The stop
+        colors are at 20% spacing apart and are in the following order : violet, blue, lime, yellow, orange, red. Also a stop
+        opacity is given to the colors in the following order: 1, 0.2, 0.5, 0, 0.8, 1 Because the gradient vector vector goes
+        from (0,0) to (1,1) in object bounding box space and because the object bounding box has a larger width than height,
+        the gradient vector is skewed off of a pure 45 degree angle. The gradient stripes are also skewed so that they are no
+        longer perpendicular to the gradient vector.
+      </p>
+      <p>
+        The next rectangle has a radial gradient fill with a multi-color stops from innermost to outermost in the following
+        order : black, yellow, red, blue, white, green. Also a stop opacity is given to the colors in the following order: 1,
+        0.2, 0.5, 0, 0.8, 1
+      </p>
+      <p>
+        The rendered picture should match the reference image exactly, except for possible variations in the labelling text
+        (per CSS2 rules).
+      </p>
+
+		</div>
+<div class="linkbar"> <p>
+				<a href="paint-grad-04-t.html">paint-grad-04-t ←</a>
+				<a href="index.html">index</a>
+				<a href="paint-grad-07-t.html">→ paint-grad-07-t</a>
+						</p></div>
+</body>
+</html>

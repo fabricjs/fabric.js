@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">  
+
+<!--======================================================================-->
+<!--=  Copyright 2000 World Wide Web Consortium, (Massachusetts          =-->
+<!--=  Institute of Technology, Institut National de Recherche en        =-->
+<!--=  Informatique et en Automatique, Keio University). All Rights      =-->
+<!--=  Reserved. See http://www.w3.org/Consortium/Legal/.                =-->
+<!--======================================================================-->
+<!-- ===================================================================== -->
+<!--                                                                       -->
+<!-- animation-add-BE-09.svg                                               -->
+<!--                                                                       -->
+<!-- Test 'additive' and 'accumulate' attributes.                          -->
+<!--                                                                       -->
+<!-- Author : Jon Ferraiolo 11-Aug-2000                                    -->
+<!--                                                                       -->
+<!-- History:                                                              -->
+<!--  11-Aug-2000, JF: Serial#1 created.                                   -->
+<!--                                                                       -->
+<!-- ===================================================================== -->
+<!--======================================================================-->
+<!--= Note. After October 2000, revision history is kept as CVS 'commit' =-->
+<!--= log messages, and therefore is no longer in the preceding preamble.=-->
+<!--======================================================================-->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"  id="svg-root" width="450" height="450">
+
+<SVGTestCase xmlns="http://www.w3.org/2000/svg/test" chapter="animation" focus="add" testType="BE" BENumber="09" >
+
+<!-- For the BE-01 case, 'Previous' elt. should target previous chapter-focus. -->
+ 
+  <Previous chapter="animation" focus="values" BENumber="08" />
+  <Next chapter="animation" focus="inherit" BENumber="10" />
+  <Parent chapter="toc" />
+  <Child testType="DT" DTNumber="01" />
+
+  <OperatorScript>
+    <Paragraph>
+Test 'additive' and 'accumulate' attributes.
+</Paragraph>
+<Paragraph>
+Eight animations have been defined.
+For each animation, ruler lines and text are provided to help show
+what the correct behavior is. 
+The red text shows the values for attributes 'additive' and 'accumulate'.
+The black text and ruler lines help show the change in height of
+the rectangles over time.
+</Paragraph>
+<Paragraph>
+In the first row, a single animation which changes the height of the rectangle
+is defined for each picture.
+The height changes from 10 to 25, and the animation repeats (total of two loops).
+The four pictures show the effect with the four possible combinations of
+'additive' (either 'replace' or 'sum') and 'accumulate' (either 'none' or 'sum').
+</Paragraph>
+<Paragraph>
+In the second row, two identical animations change the height of the rectangle,
+with each animation exactly the same as the corresponding animation in the first row.
+Again, the four pictures show the effect with the four possible combinations of
+'additive' (either 'replace' or 'sum') and 'accumulate' (either 'none' or 'sum').
+Because two animations are animating the height, the effects of 'additive' and
+'accumulate' are sometimes different than when there is only a single animation.
+</Paragraph>
+  </OperatorScript>
+
+</SVGTestCase>
+
+	<title id="test-title">animation-add-BE-09</title>
+	<desc id="test-desc">Test 'additive' and 'accumulate' attributes.</desc>
+	<!--======================================================================-->
+	<!--Content of Test Case follows...                  =====================-->
+	<!--======================================================================-->
+	<g id="test-body-content">
+		<text font-family="Helvetica" font-size="14" text-anchor="middle"  x="225" y="25">Test 'additive' and 'accumulate' attributes.</text>
+		<g xml:space="preserve" font-family="Helvetica" font-size="13.5" text-anchor="end"             stroke-width="3" >
+			<g transform="translate(75,60)">
+				<text x="-10" y="14">0,4 sec. </text>
+				<line x1="-10" y1="10" x2="20" y2="10" fill="none" stroke="#880000" />
+				<text x="-10" y="29">4,8+ sec. </text>
+				<line x1="-10" y1="25" x2="20" y2="25" fill="none" stroke="#880000" />
+				<rect x="0" y="0" width="20" height="25" fill="#44FFAA" stroke="#008888" stroke-width="4" >
+					<animate attributeName="height" calcMode="discrete" additive="replace" accumulate="none" repeatCount="2" from="10" to="25" begin="0s" dur="4s" fill="freeze"/>
+				</rect>
+				<text x="-15" y="100" xml:space="default" text-anchor="middle" fill="red" font-size="12" >additive='replace'</text>
+				<text x="-15" y="115" xml:space="default" text-anchor="middle" fill="red" font-size="12" >accumulate='none'</text>
+			</g>
+			<g transform="translate(185,60)">
+				<text x="-10" y="39">0,4 sec. </text>
+				<line x1="-10" y1="35" x2="20" y2="35" fill="none" stroke="#880000" />
+				<text x="-10" y="54">4,8+ sec. </text>
+				<line x1="-10" y1="50" x2="20" y2="50" fill="none" stroke="#880000" />
+				<rect x="0" y="0" width="20" height="25" fill="#44FFAA" stroke="#008888" stroke-width="4" >
+					<animate attributeName="height" calcMode="discrete" additive="sum" accumulate="none" repeatCount="2" from="10" to="25" begin="0s" dur="4s" fill="freeze"/>
+				</rect>
+				<text x="-15" y="100" xml:space="default" text-anchor="middle" fill="red" font-size="12" >additive='sum'</text>
+				<text x="-15" y="115" xml:space="default" text-anchor="middle" fill="red" font-size="12" >accumulate='none'</text>
+			</g>
+			<g transform="translate(295,60)">
+				<text x="-10" y="14">0 sec. </text>
+				<line x1="-10" y1="10" x2="20" y2="10" fill="none" stroke="#880000" />
+				<text x="-10" y="29">4 sec. </text>
+				<line x1="-10" y1="25" x2="20" y2="25" fill="none" stroke="#880000" />
+				<text x="-10" y="39">4 sec. </text>
+				<line x1="-10" y1="35" x2="20" y2="35" fill="none" stroke="#880000" />
+				<text x="-10" y="54">8+ sec. </text>
+				<line x1="-10" y1="50" x2="20" y2="50" fill="none" stroke="#880000" />
+				<rect x="0" y="0" width="20" height="25" fill="#44FFAA" stroke="#008888" stroke-width="4" >
+					<animate attributeName="height" calcMode="discrete" additive="replace" accumulate="sum" repeatCount="2" from="10" to="25" begin="0s" dur="4s" fill="freeze"/>
+				</rect>
+				<text x="-15" y="100" xml:space="default" text-anchor="middle" fill="red" font-size="12" >additive='replace'</text>
+				<text x="-15" y="115" xml:space="default" text-anchor="middle" fill="red" font-size="12" >accumulate='sum'</text>
+			</g>
+			<g transform="translate(405,60)">
+				<text x="-10" y="39">0 sec. </text>
+				<line x1="-10" y1="35" x2="20" y2="35" fill="none" stroke="#880000" />
+				<text x="-10" y="54">4 sec. </text>
+				<line x1="-10" y1="50" x2="20" y2="50" fill="none" stroke="#880000" />
+				<text x="-10" y="64">4 sec. </text>
+				<line x1="-10" y1="60" x2="20" y2="60" fill="none" stroke="#880000" />
+				<text x="-10" y="79">8+ sec. </text>
+				<line x1="-10" y1="75" x2="20" y2="75" fill="none" stroke="#880000" />
+				<rect x="0" y="0" width="20" height="25" fill="#44FFAA" stroke="#008888" stroke-width="4" >
+					<animate attributeName="height" calcMode="discrete" additive="sum" accumulate="sum" repeatCount="2" from="10" to="25" begin="0s" dur="4s" fill="freeze"/>
+				</rect>
+				<text x="-15" y="100" xml:space="default" text-anchor="middle" fill="red" font-size="12" >additive='sum'</text>
+				<text x="-15" y="115" xml:space="default" text-anchor="middle" fill="red" font-size="12" >accumulate='sum'</text>
+			</g>
+			<g transform="translate(75,220)">
+				<text x="-10" y="14">0,4 sec. </text>
+				<line x1="-10" y1="10" x2="20" y2="10" fill="none" stroke="#880000" />
+				<text x="-10" y="29">4,8+ sec. </text>
+				<line x1="-10" y1="25" x2="20" y2="25" fill="none" stroke="#880000" />
+				<rect x="0" y="0" width="20" height="25" fill="#44FFAA" stroke="#008888" stroke-width="4" >
+					<animate attributeName="height" calcMode="discrete" additive="replace" accumulate="none" repeatCount="2" from="10" to="25" begin="0s" dur="4s" fill="freeze"/>
+					<animate attributeName="height" calcMode="discrete" additive="replace" accumulate="none" repeatCount="2" from="10" to="25" begin="0s" dur="4s" fill="freeze"/>
+				</rect>
+				<text x="-15" y="140" xml:space="default" text-anchor="middle" fill="red" font-size="12" >additive='replace'</text>
+				<text x="-15" y="155" xml:space="default" text-anchor="middle" fill="red" font-size="12" >accumulate='none'</text>
+			</g>
+			<g transform="translate(185,220)">
+				<text x="-10" y="49">0,4 sec. </text>
+				<line x1="-10" y1="45" x2="20" y2="45" fill="none" stroke="#880000" />
+				<text x="-10" y="79">4,8+ sec. </text>
+				<line x1="-10" y1="75" x2="20" y2="75" fill="none" stroke="#880000" />
+				<rect x="0" y="0" width="20" height="25" fill="#44FFAA" stroke="#008888" stroke-width="4" >
+					<animate attributeName="height" calcMode="discrete" additive="sum" accumulate="none" repeatCount="2" from="10" to="25" begin="0s" dur="4s" fill="freeze"/>
+					<animate attributeName="height" calcMode="discrete" additive="sum" accumulate="none" repeatCount="2" from="10" to="25" begin="0s" dur="4s" fill="freeze"/>
+				</rect>
+				<text x="-15" y="140" xml:space="default" text-anchor="middle" fill="red" font-size="12" >additive='sum'</text>
+				<text x="-15" y="155" xml:space="default" text-anchor="middle" fill="red" font-size="12" >accumulate='none'</text>
+			</g>
+			<g transform="translate(295,220)">
+				<text x="-10" y="14">0 sec. </text>
+				<line x1="-10" y1="10" x2="20" y2="10" fill="none" stroke="#880000" />
+				<text x="-10" y="29">4 sec. </text>
+				<line x1="-10" y1="25" x2="20" y2="25" fill="none" stroke="#880000" />
+				<text x="-10" y="39">4 sec. </text>
+				<line x1="-10" y1="35" x2="20" y2="35" fill="none" stroke="#880000" />
+				<text x="-10" y="54">8+ sec. </text>
+				<line x1="-10" y1="50" x2="20" y2="50" fill="none" stroke="#880000" />
+				<rect x="0" y="0" width="20" height="25" fill="#44FFAA" stroke="#008888" stroke-width="4" >
+					<animate attributeName="height" calcMode="discrete" additive="replace" accumulate="sum" repeatCount="2" from="10" to="25" begin="0s" dur="4s" fill="freeze"/>
+					<animate attributeName="height" calcMode="discrete" additive="replace" accumulate="sum" repeatCount="2" from="10" to="25" begin="0s" dur="4s" fill="freeze"/>
+				</rect>
+				<text x="-15" y="140" xml:space="default" text-anchor="middle" fill="red" font-size="12" >additive='replace'</text>
+				<text x="-15" y="155" xml:space="default" text-anchor="middle" fill="red" font-size="12" >accumulate='sum'</text>
+			</g>
+			<g transform="translate(405,220)">
+				<text x="-10" y="49">0 sec. </text>
+				<line x1="-10" y1="45" x2="20" y2="45" fill="none" stroke="#880000" />
+				<text x="-10" y="79">4 sec. </text>
+				<line x1="-10" y1="75" x2="20" y2="75" fill="none" stroke="#880000" />
+				<text x="-10" y="99">4 sec. </text>
+				<line x1="-10" y1="95" x2="20" y2="95" fill="none" stroke="#880000" />
+				<text x="-10" y="129">8+ sec. </text>
+				<line x1="-10" y1="125" x2="20" y2="125" fill="none" stroke="#880000" />
+				<rect x="0" y="0" width="20" height="25" fill="#44FFAA" stroke="#008888" stroke-width="4" >
+					<animate attributeName="height" calcMode="discrete" additive="sum" accumulate="sum" repeatCount="2" from="10" to="25" begin="0s" dur="4s" fill="freeze"/>
+					<animate attributeName="height" calcMode="discrete" additive="sum" accumulate="sum" repeatCount="2" from="10" to="25" begin="0s" dur="4s" fill="freeze"/>
+				</rect>
+				<text x="-15" y="140" xml:space="default" text-anchor="middle" fill="red" font-size="12" >additive='sum'</text>
+				<text x="-15" y="155" xml:space="default" text-anchor="middle" fill="red" font-size="12" >accumulate='sum'</text>
+			</g>
+		</g>
+	</g>
+	<!--======================================================================-->
+	<!--Legend and frame:      Title, suite and SVG document serialization====-->
+	<!--======================================================================-->
+	<g id="test-legend" fill="black" font-family="Helvetica" font-size="10" >
+		<rect x="10" y="390" width="275" height="50" fill="none" stroke="#000000" />
+		<path fill="none" stroke="#000000"  d="M10 405 h275 M205 405 v35 M10 426 h195 M205 422 h80"/>
+		<text x="25" y="401">Scalable Vector Graphics (SVG) Conformance Suite</text>
+		<a xlink:href="copyright-documents-19990405.html">
+			<text x="12" y="437" fill="blue" >Copyright 2000 W3C. All Rights Reserved.</text>
+		</a>
+		<text font-size="12"  x="35" y="420">animation-add-BE-09</text>
+		<text font-size="10"  x="210" y="417">$Revision: 1.1 $</text>
+		<text font-size="10"  x="210" y="435">Release 3.0</text>
+		<rect id="test-frame" x="1" y="1" width="448" height="448" fill="none" stroke="#000000" />
+	</g>
+</svg>

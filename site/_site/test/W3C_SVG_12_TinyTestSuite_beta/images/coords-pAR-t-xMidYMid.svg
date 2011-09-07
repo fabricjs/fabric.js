@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+	width="30" height="40" viewBox="0 0 30 40" preserveAspectRatio="xMidYMid">
+
+	<!-- Title and Description. -->
+  <title xml:id="test-title">$RCSfile: coords-pAR-t-xMidYMid.svg,v $</title>
+	<desc>
+		Basic svg file used for external svg reference tests.
+	</desc>
+
+  <g xml:id="test-body-content">
+    <rect x='.5' y='.5' width='29' height='39' fill='black' stroke='red' />
+    <g transform='translate(0, 5)'>
+      <circle cx='15' cy='15' r='10' fill='yellow' />
+      <circle cx='12' cy='12' r='1.5' fill='black' />
+      <circle cx='17' cy='12' r='1.5' fill='black' />
+      <path d='M 10 19 L 15 23 20 19' stroke='black' stroke-width='2' />
+    </g>">
+  </g>
+</svg>

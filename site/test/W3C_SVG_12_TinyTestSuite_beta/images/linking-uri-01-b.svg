@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1 Basic//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11-basic.dtd">
+
+<!--======================================================================-->
+<!--=  Copyright 2000 World Wide Web Consortium, (Massachusetts          =-->
+<!--=  Institute of Technology, Institut National de Recherche en        =-->
+<!--=  Informatique et en Automatique, Keio University). All Rights      =-->
+<!--=  Reserved. See http://www.w3.org/Consortium/Legal/.                =-->
+<!--======================================================================-->
+<!-- =====================================================================-->
+<!--                                                                      -->
+<!-- linking-uri-01-b.svg                                                 -->
+<!--                                                                      -->
+<!-- Link test of the 'view' element and its attributes, 1 of 2, internal.-->
+<!--                                                                      -->
+<!-- Note.  This is one of a pair, with linking-uri-02-b.svg, which is    -->
+<!-- identical except that all of it's links refer to the objects in      -->
+<!-- this file.                                                           -->
+<!--                                                                      -->
+<!-- Author : Lee Klosterman  01-February-2002                            -->
+<!-- Revised for Mobile Profiles: Jun Fujisawa 16-Jul-2002                -->
+<!--                                                                      -->
+<!-- History:                                                             -->
+<!--                                                                      -->
+<!-- =====================================================================-->
+<!--======================================================================-->
+<!--= Note. After October 2000, revision history is kept as CVS 'commit' =-->
+<!--= log messages, and therefore is no longer in the preceding preamble.=-->
+<!--======================================================================-->
+<svg version="1.1" baseProfile="basic" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"  id="svg-root" width="100%" height="100%" viewBox="0 0 480 360">
+
+
+    <title id="test-title">linking-uri-01-b</title>
+    <desc id="test-desc">Link test of the 'view' element and its attributes, 1 of 2, internal.</desc>
+    <!--======================================================================-->
+    <!--Content of Test Case follows...                  =====================-->
+    <!--======================================================================-->
+    <g id="test-body-content">
+    	<text x="65" y="16" font-size="12" >Link test of the 'view' element and its attributes, 1 of 2, internal.</text>
+    	<g transform="translate(-150,75)">
+    		<rect x="300" y="55" width="125" height="85" fill="#aaa" />
+    		<a xlink:href="#rect-view">
+    			<text x="320" y="70" fill="red" >Go to Rectangle</text>
+    		</a>
+    		<a xlink:href="#ellipse-view">
+    			<text x="320" y="90" fill="blue" >Go to Ellipse</text>
+    		</a>
+    		<a xlink:href="#circle-view">
+    			<text x="320" y="110" fill="yellow" >Go to Circle</text>
+    		</a>
+    		<a xlink:href="#polygon-view">
+    			<text x="320" y="130" fill="green" >Go to Polygon</text>
+    		</a>
+    		<text x="315" y="150" font-size="12" >Click element's line</text>
+    		<text x="315" y="162" font-size="12" >to link to its view</text>
+    	</g>
+        
+    	<!-- View with no attributes.  Picture should not change. -->
+    	<view id="rect-view"/>
+    	<rect id="rect-object" fill="red"  x="295" y="36" width="135" height="68"/>
+    	<text id="rect-label" x="340" y="116">Rectangle</text>
+    	<rect x="292" y="29" width="141" height="91" fill="none" stroke="black" />
+    	<text x="302" y="130" font-size="10" >No view attributes except id.</text>
+    	<!-- Test viewBox.  Should blow-up the ellipse in the frame. -->
+    	<view id="ellipse-view" viewBox="294 221 152 83"/>
+    	<ellipse id="ellipse-object" fill="blue"  cx="370" cy="251" rx="72" ry="32"/>
+    	<text id="ellipse-label" x="355" y="295">Ellipse</text>
+    	<rect x="295" y="216" width="150" height="82" fill="none" stroke="black" />
+    	<text x="315" y="214" font-size="10" >viewBox, should fill frame.</text>
+    	<!-- Test preserveAspectRatio. -->
+    	<view id="circle-view" viewBox="20 29 128 91.5" preserveAspectRatio="none"/>
+    	<circle id="circle-object" fill="yellow"  cx="85" cy="68" r="36"/>
+    	<text id="circle-label" x="70" y="116">Circle</text>
+    	<rect x="36" y="29" width="98" height="91" fill="none" stroke="black" />
+    	<text x="36" y="128" font-size="10" >viewBox &amp; non-uniform</text>
+    	<text x="36" y="137" font-size="10" >preserveAspectRatio</text>
+    	<!-- Test viewTarget attribute, should highlight the polygon. -->
+    	<view id="polygon-view" viewTarget="polygon-object"/>
+    	<polygon id="polygon-object" fill="green"  points="87,211 134,238 116,283 57,283 39,238 87,211"/>
+    	<text id="polygon-label" x="65" y="295">Polygon</text>
+    	<rect x="36" y="208" width="100" height="89" fill="none" stroke="black" />
+    	<text x="46" y="197" font-size="10" >viewTarget, should</text>
+    	<text x="46" y="206" font-size="10" >highlight polygon</text>
+    </g>
+    
+	<text id="revision" x="10" y="340" font-size="40" stroke="none" fill="black">$Revision: 1.1 $</text>
+	<rect id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000000"/>
+</svg>

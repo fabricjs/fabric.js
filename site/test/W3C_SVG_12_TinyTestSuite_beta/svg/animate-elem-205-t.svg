@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="AS" owner="DOH" desc="Advanced test for linear animateMotion" status="accepted"
+    approved="yes"
+    version="$Revision: 1.4 $" testname="$RCSfile: animate-elem-205-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        Precision test for linear animateMotion with separated path fragments,
+        mpath element, rotate auto.
+      </p>
+      <p>
+        The main indication for a failed test is the appearence of the red fill
+        of the test circle. The circle has to follow exactly the paths given
+        in gray.
+      </p>
+      <p>
+        A linear animateMotion of a blue stroked square with a centered
+        circle is compared with four animateMotion of a red square
+        with a centered circle.
+        The motion of the red square is following the
+        combination of four animateMotion following on
+        each other and is the same as the motion of the blue
+        square, because the timing is choosen in such a way.
+        Therefore the blue square covers always the red one
+        completely.
+      </p>
+      <p>
+        The path is given in gray. The red fill of the circle
+        is always covered with the gray path.
+        Eight gray stroked markers are lightened, when the circle
+        is exactly above the marker. The red fill of the marker
+        is exactly covered by the blue stroked circle.
+        If something red gets visible, an error is occured
+        and the animateMotion is not linear.
+      </p>
+      <p>
+        The exact timing is calculated using an analytical
+        integration of the path length of the sub paths
+        (this is available for quadratic or linear curves).
+        With this method the path position  and the
+        time can be determined as functions of the usual
+        parametrisation of the used B&#233;zier curves.
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: animate-elem-205-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+    <defs>
+      <path xml:id="path01"
+        d="M100 100c1,1 495,495 500,500M90,900c540,0 810,-270  810,-810M200,800q0,-600 600,-600M600,600q-1,-1 -500,-500" />
+      <path xml:id="path02" d="M100 100L600,600" />
+      <!-- pathLength 500*sqrt(2) = 707.106781187 ; 
+       velocity 20*sqrt(2) px/s = 28.284271247px/s
+       marker size is 30px...
+       marker time = 1.060660172s  round down -> 1s
+       marker offset = -0.530330086s -> 0.5s
+-->
+      <path xml:id="path03" d="M90,900Q900,900 900,90" />
+      <!--
+                                            i               p          f
+c(u)=(1 - u)^2 i + 2u(1-u) p + u^2 f
+
+dc/du= 2(u-1) i + 2(1 -2u) p + 2u f
+         = (2(p-i) + 2u(i+f -2p))^2
+
+(1): (dc/cu)^2 =  4 (i+f -2p)^2 u^2 + 8(p-i)(i+f-2p)u + 4 (p - i)^2
+          
+                     add  components ... 
+         m        =      e   (  a u^2                 +       b u              +     c )
+      for symmetry reasons with numbers:
+        m  = 1620^2 (2 u^2 -2 u + 1)
+        h = m/e = 2 u^2 -2 u + 1
+             d = 4ac - b^2
+             numbers:  8 - 4 = 4 = d
+             k = 4a/d
+             numbers: k = 8/4 = 2
+
+integral... 0 to u <=1
+       (2au+b)sqrt(h)/4a + 1/(2k) g
+       
+       g = 1/sqrt(a) ln(2sqrt(ah) + 2au +b)    
+                               
+(2) 0: b/(4a) sqrt(c) +d/(8a sqrt(a))  ln(2sqrt(ac) +b)
+(3) 1: (2a+b)sqrt(a+b+c)/4a +d/(8a sqrt(a)) ln (2sqrt(a(a+b+c))+2a +b)
+numbers:
+-1/4 + 1/(4sqrt(2)) ln(2sqrt(2) -2)
+1/4 + 1/(4sqrt(2))  ln(2sqrt(2) +2)
+result = 1/2 + 1/(4sqrt(2)) (ln(2sqrt(2) +2) - ln(2sqrt(2) -2)) =
+             1/2 + 1/(4sqrt(2)) ln((sqrt(2) +1)/(sqrt(2) -1))) =
+             1/2 + 1/(4sqrt(2)) ln(3+2sqrt(2)) =
+             0.81161262
+therefore  pathLength = 1620*0.81161262 = 1314.812444514
+
+velocity = 52.592497781 px/s
+marker time = 0.570423564s  round down -> 0.5s
+marker offset = 0.285211782s -> 0.25s
+
+
+integral 0 to u <=1
+(2u-1)/4 sqrt(2 u^2 -2 u + 1) + 1/(4sqrt(2)) ln (2sqrt(4u^2 -4u +2) +4u -2)
++ 1/4 - 1/(4sqrt(2)) ln(2sqrt(2) -2) =
+(2u-1)/4 sqrt(2 u^2 -2 u + 1) + 1/4 + 1/(4sqrt(2)) ln ((sqrt(4u^2 -4u +2) +2u -1)/(sqrt(2) -1))
+
+-->
+
+      <path xml:id="path04" d="M200,800Q200,200 800,200" />
+
+      <!--
+                                                i            p             f
+c(u)=(1 - u)^2 i + 2u(1-u) p + u^2 f
+
+dc/du= 2(u-1) i + 2(1 -2u) p + 2u f
+         = (2(p-i) + 2u(i+f -2p))^2
+
+(1): (dc/cu)^2 =  4 (i+f -2p)^2 u^2 + 8(p-i)(i+f-2p)u + 4 (p - i)^2
+
+x:  1200^2 u^2
+y:  1200^2 u^2 + 2 * 1200^2 u + 1200^2
+
+     for symmetry reasons with numbers:
+        m  = 1200^2 (2 u^2 -2 u + 1)
+        h = m/1200^2 = 2 u^2 -2 u + 1
+therefore  pathLength = 1200*0.81161262 = 973.935144084;
+velocity= 38.957405763 px/s
+marker time: 0.770071811s  round down -> 0.7s
+marker offset: -0.385035905s -> 0.35s
+
+-->
+      <path xml:id="path05" d="M600 600L100,100" />
+
+
+      <!--
+pathLength path01 = 3702.961151072
+fraction path02/path01 = 0.190957116 (the same for the last path fragment)
+fraction path03/path01 = 0.355070548
+fraction path04/path01 = 0.263015221
+
+fraction (path02+path03)/path01 = 0.546027664
+fraction (path02+path03+path04)/path01 = 0.809042885
+
+
+marker 
+u= 0.1 path02
+u = 0.5 path02
+u = 0.9 path02
+
+these are the positions and times:
+
+(150,150) - 2.5s
+(350,350) - 12.5s
+(550,500) - 22.5s
+
+
+0 u path03 - 25s
+0.1u path03
+0.5u path03
+0.9u path03
+
+c(0.1)=(1 - u)^2 i + 2u(1-u) p + u^2 f
+      =  0.81 (a,b) + 0.18 (b,b) + 0.01 (b,a)
+      = (0.81a +0.19b, 0.99b + 0.01a)
+      = (243.9, 891.9)
+
+      
+integral... 0 to u <=0.1
+       h= 2 u^2 -2 u + 1 = 0.02-0.2 +1 = 0.82
+       (2u-1)sqrt(h)/4 + 1/4 g
+         -0.181107703   -0.006986405
+       g = 1/sqrt(2) ln(2sqrt(2h) + 4u -2)    
+              -0.02794562
+0:      -1/4 + 1/(4sqrt(2)) ln(2sqrt(2) -2) = -0.283274042
+0.1:   -0.188094108
+0.095179934/0.81161262
+
+path fraction:
+0.421173612/0.81161262 = 0.117272615
+27.931815375s
+        
+c(0.5) = 0.25 (a,b) + 0.5 (b,b) + 0.25 (b,a)
+              (0.25 a + 0.75 b, 0.25 a + 0.75 b)
+               (697.5, 697.5)      
+ 
+path fraction: 0.5
+37.5s
+         
+c(0.9)=(1 - u)^2 i + 2u(1-u) p + u^2 f      
+      = 0.01 (a,b) + 0.18 (b,b) + 0.81 (b,a)
+      = (0.01a + 0.99b, 0.19b + 0.81a)
+      = (891.9, 243.9)
+
+path fraction by symmetry to time
+47.068184625s     
+
+
+0 u path04 -  50s   
+0.1u path04
+...  0.81 (b,a) + 0.18 (b,b) + 0.01 (a,b)
+     (0.99b + 0.01a,0.81a + 0.19b)
+     (206, 686)
+     
+time ...
+52.931815375s
+     
+     
+0.5u path04
+     (350,350)
+     
+62.5s    
+     
+0.9u path04
+     (686,206)
+
+72.068184625s 
+
+ path05
+0: 75s
+0.1: 77.5s
+0.5: 87.5s
+0.9: 97.5s
+
+
+-->
+    </defs>
+
+    <rect x="0" y="0" width="480" height="360" fill="#fff" />
+    <g transform="translate(90,-22) scale(0.4) rotate(90 500 500)">
+      <g fill="none" stroke-width="40" stroke="#666">
+        <title>marker</title>
+        <circle cx="150" cy="150" r="35"/>
+        <circle cx="350" cy="350" r="35"/>
+        <circle cx="550" cy="550" r="35"/>
+        <circle cx="243.9" cy="891.9" r="35"/>
+        <circle cy="243.9" cx="891.9" r="35"/>
+        <circle cx="697.5" cy="697.5" r="35"/>
+        <circle cx="206" cy="686" r="35"/>
+        <circle cy="206" cx="686" r="35"/>
+
+        <g fill="red" stroke="#aaf">
+          <circle cx="150" cy="150" r="35" display="none">
+            <set attributeName="display" to="inline" begin="2s" dur="1s" />
+            <set attributeName="display" to="inline" begin="97s" dur="1s" />
+          </circle>
+          <circle cx="350" cy="350" r="35" display="none">
+            <set attributeName="display" to="inline" begin="12s" dur="1s" />
+            <set attributeName="display" to="inline" begin="87s" dur="1s" />
+            <set attributeName="display" to="inline" begin="62.15s" dur="0.7s" />
+          </circle>
+          <circle cx="550" cy="550" r="35" display="none">
+            <set attributeName="display" to="inline" begin="22s" dur="1s" />
+            <set attributeName="display" to="inline" begin="77s" dur="1s" />
+          </circle>
+
+          <circle cx="243.9" cy="891.9" r="35" display="none">
+            <set attributeName="display" to="inline" begin="27681.8154ms" dur="0.5s" />
+          </circle>
+
+          <circle cx="697.5" cy="697.5" r="35" display="none">
+            <set attributeName="display" to="inline" begin="37.25s" dur="0.5s" />
+          </circle>
+
+          <circle cy="243.9" cx="891.9" r="35" display="none">
+            <set attributeName="display" to="inline" begin="46.8182s" dur="0.5s" />
+          </circle>
+
+          <circle cx="206" cy="686" r="35" display="none">
+            <set attributeName="display" to="inline" begin="52.5818s" dur="0.7s" />
+          </circle>
+
+          <circle cy="206" cx="686" r="35" display="none">
+            <set attributeName="display" to="inline" begin="71.8182s" dur="0.7s" />
+          </circle>
+
+        </g>
+      </g>
+      <g>
+        <rect x="-50" y="-50" width="100" height="100" fill="none" stroke="#f00" stroke-width="10" />
+        <circle cx="0" cy="0" r="30" fill="#f00" />
+        <title>red: four times animateMotion using mpath</title>
+        <animateMotion dur="25s" fill="freeze" rotate="auto">
+          <mpath xlink:href="#path02" />
+        </animateMotion>
+        <animateMotion begin="25s" dur="25s" fill="freeze" rotate="auto">
+          <mpath xlink:href="#path03" />
+        </animateMotion>
+        <animateMotion begin="50s" dur="25s" fill="freeze" rotate="auto">
+          <mpath xlink:href="#path04" />
+        </animateMotion>
+        <animateMotion begin="75s" dur="25s" fill="freeze" rotate="auto">
+          <mpath xlink:href="#path05" />
+        </animateMotion>
+      </g>
+
+      <g>
+        <rect x="-50" y="-50" width="100" height="100" fill="none" stroke="#00f" stroke-width="10" />
+        <circle cx="0" cy="0" r="16" fill="#f00" stroke-width="28" stroke="blue" />
+        <title>blue: animateMotion calcMode linear using mpath</title>
+        <animateMotion dur="100s" calcMode="linear" fill="freeze" rotate="auto">
+          <mpath xlink:href="#path01" />
+        </animateMotion>
+      </g>
+
+      <use xlink:href="#path01" fill="none"  stroke-width="4" stroke="#ccc" stroke-linecap="round" />
+
+    </g>
+
+
+    <g font-size="12" stroke="none" fill="#ccc">
+      <text x="10" y="180">animateMotion</text>
+      <text x="10" y="195">calcMode linear</text>
+      <text x="10" y="225">red = wrong</text>
+      <text x="10" y="245">no animation = wrong</text>
+      <text x="10" y="265">circle not centered</text>
+      <text x="10" y="280">below paths = wrong</text>
+      <text x="10" y="300">timing = lightened markers</text>
+    </g>
+
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.4 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240" 
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

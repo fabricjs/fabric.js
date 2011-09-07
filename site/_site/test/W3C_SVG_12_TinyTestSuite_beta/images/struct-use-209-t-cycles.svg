@@ -1,0 +1,9 @@
+<?xml version="1.0" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  xml:id="svg-root" viewBox="0 0 450 450" width="450" height="450">
+  <rect x="225" y="0" width="225" height="225" fill="yellow"/>
+  <image xml:id="image" x="0" y="225" xlink:href="../svg/struct-use-209-t.svg"/>
+  <use xml:id="use" x="0" y="0" xlink:href="../svg/struct-use-209-t.svg#svg-root"/>
+  <rect x="0" y="225" width="225" height="225" fill="none" stroke="black"/>
+</svg>
+

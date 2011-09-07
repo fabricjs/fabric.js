@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    
+    <title>Hovering | Fabric.js Demos</title>
+    
+    <link rel="stylesheet" href="/css/master.css">
+  
+    <script src="/lib/fabric.js"></script>
+    
+    <!--[if lt IE 9]>
+      <script src="https://raw.github.com/kangax/fabric.js/gh-pages/lib/excanvas.js"></script>
+    <![endif]-->
+  
+    <script>
+      // polyfill by @paulirish
+      if (!window.requestAnimationFrame ) {
+        window.requestAnimationFrame = (function() {
+          return window.webkitRequestAnimationFrame ||
+          window.mozRequestAnimationFrame ||
+          window.oRequestAnimationFrame ||
+          window.msRequestAnimationFrame ||
+          function( /* function FrameRequestCallback */ callback, /* DOMElement Element */ element ) {
+            window.setTimeout( callback, 1000 / 60 );
+          };
+        })();
+      }
+    </script>
+  </head>
+  <body>
+    <ul id="header">
+  <li><a href="/demos">Demos</a></li>
+  <li><a href="/benchmarks">Benchmarks</a></li>
+  <li><a href="/docs">Docs</a></li>
+  <li><a href="/test">Tests</a></li>
+  <li class="flattr">
+    <a class="FlattrButton" style="display:none;" rev="flattr;button:compact;" href="http://kangax.github.com/fabric.js"></a>
+    <noscript><a href="http://flattr.com/thing/391332/Fabric-js" target="_blank">
+    <img src="http://api.flattr.com/button/flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0" /></a></noscript>
+  </li>
+  <li class="twitter"><a href="http://twitter.com/fabricjs"><span>Twitter</span></a></li>
+  <li class="github"><a href="http://github.com/kangax/fabric.js"><span>Github</span></a></li>
+</ul>
+<script>
+(function() {
+  var s = document.createElement('script'), t = document.getElementsByTagName('script')[0];
+  s.async = true;
+  s.src = 'http://api.flattr.com/js/0.6/load.js?mode=auto';
+  t.parentNode.insertBefore(s, t);
+})();
+</script>
+  
+    <div id="bd-wrapper">
+      <h2><span>Fabric.js demos</span> &middot; Hovering</h2>
+    
+      <canvas id="c" width="600" height="500"></canvas>
+
+<script id="main">var canvas = new fabric.Canvas('c');
+
+// piggyback on `canvas.findTarget`, to fire "object:over" and "object:out" events
+
+canvas.findTarget = (function(originalFn) {
+  return function() {
+    var target = originalFn.apply(this, arguments);
+    if (target) {
+      if (this._hoveredTarget !== target) {
+        canvas.fire('object:over', { target: target });
+        if (this._hoveredTarget) {
+          canvas.fire('object:out', { target: this._hoveredTarget });
+        }
+        this._hoveredTarget = target;
+      }
+    }
+    else if (this._hoveredTarget) {
+      canvas.fire('object:out', { target: this._hoveredTarget });
+      this._hoveredTarget = null;
+    }
+    return target;
+  };
+})(canvas.findTarget);
+
+// now we can observe "object:over" and "object:out" events
+// in this example, object is set to red color on hover over and green color on hover out
+
+canvas.observe('object:over', function(e) {
+  e.memo.target.setFill('red');
+  canvas.renderAll();
+});
+
+canvas.observe('object:out', function(e) {
+  e.memo.target.setFill('green');
+  canvas.renderAll();
+});
+
+// add random objects
+for (var i = 15; i--; ) {
+  var dim = fabric.util.getRandomInt(30, 60);
+  var klass = ['Rect', 'Triangle', 'Circle'][fabric.util.getRandomInt(0,2)];
+  var options = { 
+    top: fabric.util.getRandomInt(0, 600),
+    left: fabric.util.getRandomInt(0, 600),
+    fill: 'green'
+  };
+  if (klass === 'Circle') {
+    options.radius = dim;
+  }
+  else {
+    options.width = dim;
+    options.height = dim;
+  }
+  canvas.add(new fabric[klass](options));
+}
+</script>
+    </div>
+  
+    <script>
+      (function(){
+        var mainScriptEl = document.getElementById('main');
+        if (!mainScriptEl) return;
+        var preEl = document.createElement('pre');
+        preEl.innerHTML = mainScriptEl.innerHTML;
+        document.getElementById('bd-wrapper').appendChild(preEl);
+      })();
+    </script>
+  </body>
+</html>

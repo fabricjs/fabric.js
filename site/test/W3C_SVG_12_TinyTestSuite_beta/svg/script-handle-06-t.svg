@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="AE" owner="ED, VH" desc="This test validates basic support for the mouse events defined in SVG." status="accepted"
+    approved="yes"
+    version="$Revision: 1.9 $" testname="$RCSfile: script-handle-06-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>Tests basic mouse event handlers.</p>
+      <p>The test shows a target that can be used to generate the various kinds of mouse and keyboard events supported in SVG. Below the target, the list of events is shown with red markers next to each.</p>
+      <p>If the test passes, all the markers should have turned to green after the events have been triggered on the target. If any event has not triggered, its marker will remain red.</p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: script-handle-06-t.svg,v $</title>
+  <defs>
+    <font-face font-family="SVGFreeSansASCII" unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii" />
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+    <!-- Displayed Title -->
+    <text x="100" y="40" fill="black" font-size="24"> Mouse event handlers test. </text>
+    <!-- The test defines a target and defines all the handlers for the target -->
+    <!-- There are legends for each handler that are modified after the handler-->
+    <!-- has been invoked -->
+    <g xml:id="targetGroup" transform="translate(60, 140)">
+      <text x="60" y="7" font-size="24">Use the target to trigger events</text>
+      <!-- The target has all the event handlers defined -->
+      <!-- Use this <g> instead -->
+      <g xml:id="target">
+        <handler xe:event="DOMFocusIn">
+          onEvent(evt, 'onfocusin');
+        </handler>
+        <handler xe:event="DOMFocusOut">
+          onEvent(evt, 'onfocusout');
+        </handler>
+        <handler xe:event="DOMActivate">
+          onEvent(evt, 'onactivate');
+        </handler>
+        <circle cx="0" cy="0" r="30" fill="#cccccc" stroke="black" />
+        <line x1="-30" y1="0" x2="30" y2="0" />
+        <line x1="0" y1="-30" x2="0" y2="30" />
+      </g>
+      <text focusable="true" x="-40" y="-50" font-size="32">Target</text>
+    </g>
+    <!-- targetGroup -->
+    <g xml:id="labels">
+      <g xml:id="mouseEvents" transform="translate(65, 190)">
+        <g xml:id="mouseEventsLabels">
+          <text x="10" y="20" font-size="32">onfocusin</text>
+          <text x="10" y="50" font-size="32">onfocusout</text>
+          <text x="10" y="80" font-size="32">onactivate</text>
+        </g>
+        <g xml:id="mouseEventsTestIndicators">
+          <!-- onfocusin -->
+          <rect x="-15" y="2" width="20" height="20" fill="green" />
+          <rect xml:id="onfocusin" x="-15" y="2" width="20" height="20" fill="red" />
+          <!-- onfocusout -->
+          <rect x="-15" y="32" width="20" height="20" fill="green" />
+          <rect xml:id="onfocusout" x="-15" y="32" width="20" height="20" fill="red" />
+          <!-- onactivate -->
+          <rect x="-15" y="62" width="20" height="20" fill="green" />
+          <rect xml:id="onactivate" x="-15" y="62" width="20" height="20" fill="red" />
+        </g>
+      </g>
+      <!-- Mouse Events -->
+    </g>
+    <script type="text/ecmascript">
+      <![CDATA[
+      function onEvent(evt, indicatorId){
+        // Get Document
+        var target = evt.target;
+        var doc = target.ownerDocument;
+        // Mark test as passed
+        var testPassed = doc.getElementById(indicatorId);
+        testPassed.setTrait('visibility', 'hidden');
+      }
+    ]]>
+    </script>
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none" fill="black">$Revision: 1.9 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000" />
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark"> 
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1" /> 
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240" text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text> 
+  </g>-->
+</svg>

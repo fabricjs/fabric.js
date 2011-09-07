@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    
+    <title>Event inspector | Fabric.js Demos</title>
+    
+    <link rel="stylesheet" href="/css/master.css">
+  
+    <script src="/lib/fabric.js"></script>
+    
+    <!--[if lt IE 9]>
+      <script src="https://raw.github.com/kangax/fabric.js/gh-pages/lib/excanvas.js"></script>
+    <![endif]-->
+  
+    <script>
+      // polyfill by @paulirish
+      if (!window.requestAnimationFrame ) {
+        window.requestAnimationFrame = (function() {
+          return window.webkitRequestAnimationFrame ||
+          window.mozRequestAnimationFrame ||
+          window.oRequestAnimationFrame ||
+          window.msRequestAnimationFrame ||
+          function( /* function FrameRequestCallback */ callback, /* DOMElement Element */ element ) {
+            window.setTimeout( callback, 1000 / 60 );
+          };
+        })();
+      }
+    </script>
+  </head>
+  <body>
+    <ul id="header">
+  <li><a href="/demos">Demos</a></li>
+  <li><a href="/benchmarks">Benchmarks</a></li>
+  <li><a href="/docs">Docs</a></li>
+  <li><a href="/test">Tests</a></li>
+  <li class="flattr">
+    <a class="FlattrButton" style="display:none;" rev="flattr;button:compact;" href="http://kangax.github.com/fabric.js"></a>
+    <noscript><a href="http://flattr.com/thing/391332/Fabric-js" target="_blank">
+    <img src="http://api.flattr.com/button/flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0" /></a></noscript>
+  </li>
+  <li class="twitter"><a href="http://twitter.com/fabricjs"><span>Twitter</span></a></li>
+  <li class="github"><a href="http://github.com/kangax/fabric.js"><span>Github</span></a></li>
+</ul>
+<script>
+(function() {
+  var s = document.createElement('script'), t = document.getElementsByTagName('script')[0];
+  s.async = true;
+  s.src = 'http://api.flattr.com/js/0.6/load.js?mode=auto';
+  t.parentNode.insertBefore(s, t);
+})();
+</script>
+  
+    <div id="bd-wrapper">
+      <h2><span>Fabric.js demos</span> &middot; Event inspector</h2>
+    
+      <style>
+  p { margin-top: 3px; margin-bottom: 3px; }
+  #log1, #log2 { display: inline-block; width: 200px; height: 500px; overflow-y: auto; font-family: monospace; font-size: 11px; }
+</style>
+
+<canvas id="c1" width="200" height="200"></canvas>
+<canvas id="c2" width="200" height="200"></canvas>
+
+<div id="observing-events-log" style="position:absolute;top:110px;left:450px;">
+  <strong style="margin-bottom:10px;display:block">Observing these events:</strong>
+</div>
+
+<div>
+  <div id="log1">&nbsp;</div>
+  <div id="log2">&nbsp;</div>
+</div>
+
+<script>
+  var canvas1 = new fabric.Canvas('c1');
+  canvas1.add(new fabric.Rect({ width: 50, height: 50, fill: 'red', top: 100, left: 100 }));
+  canvas1.add(new fabric.Rect({ width: 30, height: 30, fill: 'green', top: 50, left: 50 }));
+
+  var canvas2 = new fabric.Canvas('c2');
+  canvas2.add(new fabric.Rect({ width: 50, height: 50, fill: 'red', top: 100, left: 100 }));
+  canvas2.add(new fabric.Rect({ width: 30, height: 30, fill: 'green', top: 50, left: 50 }));
+
+  var log1 = document.getElementById('log1');
+  var log2 = document.getElementById('log2');
+
+  function log(message, where) { 
+    var el = document.createElement('p'); 
+    el.appendChild(document.createTextNode(message));
+    var containerEl = (where === 1 ? log1 : log2);
+    containerEl.insertBefore(el, containerEl.firstChild);
+  }
+  function logObservingEvent(eventName) {
+    var el = document.getElementById('observing-events-log');
+    var para = document.createElement('p');
+    para.appendChild(document.createTextNode(eventName));
+    el.appendChild(para);
+  }
+
+  function observe(eventName) {
+    logObservingEvent(eventName);
+    canvas1.observe(eventName, function(){ log(eventName, 1) });
+    canvas2.observe(eventName, function(){ log(eventName, 2) });
+  }
+
+  observe('object:modified');
+  observe('object:moving');
+  observe('object:selected');
+  
+  observe('before:selection:cleared');
+  observe('selection:cleared');
+  observe('selection:created');
+  
+  // observe('after:render');
+  observe('mouse:up');
+  observe('mouse:down');
+
+</script>
+    </div>
+  
+    <script>
+      (function(){
+        var mainScriptEl = document.getElementById('main');
+        if (!mainScriptEl) return;
+        var preEl = document.createElement('pre');
+        preEl.innerHTML = mainScriptEl.innerHTML;
+        document.getElementById('bd-wrapper').appendChild(preEl);
+      })();
+    </script>
+  </body>
+</html>

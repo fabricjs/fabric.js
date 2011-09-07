@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="DOH" owner="JF" desc="Test event bubbling of event attributes." status="accepted"
+    approved="yes"
+    version="$Revision: 1.9 $" testname="$RCSfile: interact-order-06-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>Test event bubbling of event attributes, part c.</p>
+      <p>
+        The three strings tests event handling behavior on text. Text selection
+        only is available after event listeners and event attributes have been
+        processed, and after hyperlink processing has occurred. The supplemental
+        text below the text strings describes what should occur.
+      </p>
+      <p>This test requires that the user agent support scripting.</p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: interact-order-06-t.svg,v $</title>
+  <defs>
+    <font-face font-family="SVGFreeSansASCII" unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii" />
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+    <defs>
+      <script type="text/ecmascript">
+        <![CDATA[
+           function bubbleYes(evt, color)
+           {
+             // Get Document
+             var target = evt.target;
+             target.setAttribute('fill', '' +color);
+           }
+
+           function bubbleNo(evt, color)
+           {
+             // Get Document
+             var target = evt.target;
+             target.setAttribute('fill', '' +color); 
+             evt.stopPropagation();
+             evt.preventDefault();
+           }
+         ]]>
+      </script>
+    </defs>
+    <text font-size="40" x="60" y="40">Event bubbling - c</text>
+    <g xml:id="background">
+      <rect fill="#EEE" stroke="#000" x="10" y="55" width="460" height="230" />
+    </g>
+    <g fill="#000" font-size="40">
+      <!-- Ensure that events get the event before the hyperlink which happens before text selection -->
+      <a xlink:href="../images/interact-order-03-t-targ.svg" font-size="40">
+        <text x="20" y="90">
+          <handler type="text/ecmascript" xe:event="click">
+            bubbleNo(evt, 'red');
+          </handler>
+          <handler type="text/ecmascript" xe:event="mouseout">
+            bubbleNo(evt, 'inherit');
+          </handler>
+
+          String turns red on click
+        </text>
+        <g>
+          <handler type="text/ecmascript" xe:event="click">
+            bubbleYes(evt, 'blue');
+          </handler>
+          <handler type="text/ecmascript" xe:event="mouseout">
+            bubbleYes(evt, 'inherit');
+          </handler>
+          <text x="60" y="160"> String hyperlinks to </text>
+          <text x="20" y="200" font-size="33"> interact-order-03-t-targ.svg </text>
+        </g>
+        <text x="30" y="270">
+          <handler type="text/ecmascript" xe:event="click">
+            bubbleNo(evt, 'inherit');
+          </handler>
+          
+          All strings are selectable.
+        </text>
+      </a>
+    </g>
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none" fill="black">$Revision: 1.9 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000" />
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1" />
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240" text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

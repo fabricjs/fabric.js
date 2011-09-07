@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="AG" owner="HS" desc="Test that the viewer has basic capability to handle radial gradients on fills and stroke of objects and text. This means it needs to understand the following elements : &lt;radialGradient&gt;, &lt;stop&gt; and the following properties : stop-color, fill:url(# ), stroke(url# )" status="accepted"
+    approved="yes"
+    version="$Revision: 1.7 $" testname="$RCSfile: paint-grad-11-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>Test that the viewer has basic capability to handle radial gradients on fills and stroke of objects and text.</p>
+      <p>
+        This test uses the following elements : &lt;radialGradient&gt;, &lt;stop&gt; and the following properties : stop-color,
+        fill:url(# ), stroke(url# )
+      </p>
+      <p>From top-down (left to right) the appearance of objects is as follows.</p>
+      <p>
+        The top left rectangle should be a radial gradient from black(in) to red(outside). The gradiant is applied to the
+        fill of the rectangle.
+      </p>
+      <p>
+        The next rectangle has no fill, but has a thick stroke on which the gradient is applied. The gradient goes from
+        red(in) to yellow (out).
+      </p>
+      <p>The next item is a text with a radial gradient on the fill. The gradient goes from black (in) to yellow (out).</p>
+      <p>The last item is a text with a 2 user unit stroke on which a black (in) to red (out) linear gradient is applied.</p>
+      <p>
+        The rendered picture should match the reference image exactly, except for possible variations in the labelling text
+        (per CSS2 rules).
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: paint-grad-11-t.svg,v $</title>
+  <defs>
+    <font-face font-family="SVGFreeSansASCII" unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii" />
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+    <!-- ====================================================================== -->
+    <!-- Very simple black to red radial gradient ======== -->
+    <!-- ====================================================================== -->
+    <radialGradient gradientUnits="userSpaceOnUse" xml:id="Grad1" cx="75" cy="100" r="130">
+      <stop stop-color="black" offset="0" />
+      <stop stop-color="red" offset="1" />
+    </radialGradient>
+    <rect x="10" y="10" width="210" height="140" fill="url(#Grad1)" />
+    <text font-size="12" x="10" y="165">Radial gradient on fill of rectangle</text>
+    <!-- ====================================================================== -->
+    <!-- Radial gradient on the stroke of a rectangle ======== -->
+    <!-- ====================================================================== -->
+    <radialGradient xml:id="Grad2" gradientUnits="userSpaceOnUse" cx="295" cy="100" r="150">
+      <stop stop-color="red" offset="0" />
+      <stop stop-color="yellow" offset="1" />
+    </radialGradient>
+    <rect x="250" y="30" width="170" height="100" fill="none" stroke="url(#Grad2)" stroke-width="40" />
+    <text font-size="12" x="230" y="165">Radial gradient on stroke of rectangle</text>
+    <!-- ====================================================================== -->
+    <!-- Gradient on fill of text ======== -->
+    <!-- ====================================================================== -->
+    <radialGradient xml:id="Grad3" gradientUnits="userSpaceOnUse" cx="225" cy="180" r="90">
+      <stop stop-color="black" offset="0" />
+      <stop stop-color="yellow" offset="1" />
+    </radialGradient>
+    <text font-size="50" fill="url(#Grad3)" x="10" y="210">Gradient on text fill</text>
+    <text font-size="12" x="10" y="225">Radial gradient on text, black to yellow</text>
+    <!-- ====================================================================== -->
+    <!-- Gradient on stroke of text ======== -->
+    <!-- ====================================================================== -->
+    <radialGradient xml:id="Grad4" gradientUnits="userSpaceOnUse" cx="225" cy="245" r="90">
+      <stop stop-color="black" offset="0" />
+      <stop stop-color="red" offset="1" />
+    </radialGradient>
+    <text font-size="45" fill="none" stroke="url(#Grad4)" stroke-width="2" x="10" y="270">Gradient on text stroke</text>
+    <text font-size="12" x="10" y="285">Radial gradient on stroke of text, black to red</text>
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none" fill="black">$Revision: 1.7 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000" />
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240"
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

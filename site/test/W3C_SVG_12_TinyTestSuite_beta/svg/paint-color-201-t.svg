@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="AN" owner="CL" desc="test the sixteen color names for Tiny" status="accepted"
+    approved="yes"
+    version="$Revision: 1.4 $" testname="$RCSfile: paint-color-201-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        Tests the sixteen color names that must be supported in SVG Tiny.
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: paint-color-201-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+
+    <!--  color names -->
+    <rect  x="10" y="30" width="25" height="25" fill="black"/>
+    <rect  x="10" y="60" width="25" height="25" fill="silver"/>
+    <rect  x="10" y="90" width="25" height="25" fill="gray"/>
+    <rect  x="10" y="120" width="25" height="25" fill="white"/>
+    <rect  x="10" y="150" width="25" height="25" fill="maroon"/>
+    <rect  x="10" y="180" width="25" height="25" fill="red"/>
+    <rect  x="10" y="210" width="25" height="25" fill="purple"/>
+    <rect  x="10" y="240" width="25" height="25" fill="fuchsia"/>
+
+    <!-- rrgb values -->
+    <rect  x="35" y="30" width="25" height="25" fill="rgb( 0, 0, 0)"/>
+    <rect  x="35" y="60" width="25" height="25" fill="rgb(192, 192, 192)"/>
+    <rect  x="35" y="90" width="25" height="25" fill="rgb(128, 128, 128)"/>
+    <rect  x="35" y="120" width="25" height="25" fill="rgb(255, 255, 255)"/>
+    <rect  x="35" y="150" width="25" height="25" fill="rgb(128, 0, 0)"/>
+    <rect  x="35" y="180" width="25" height="25" fill="rgb(255, 0, 0)"/>
+    <rect  x="35" y="210" width="25" height="25" fill="rgb(128, 0, 128)"/>
+    <rect  x="35" y="240" width="25" height="25" fill="rgb(255, 0, 255)"/>
+
+    <!-- make white visible -->
+    <rect  x="10" y="120" width="50" height="25" fill="none" stroke="black"/>
+
+    <!--  labels -->
+    <text x="70" y="50">black</text>
+    <text x="70" y="80">silver</text>
+    <text x="70" y="110">gray</text>
+    <text x="70" y="140">white</text>
+    <text x="70" y="170">maroon</text>
+    <text x="70" y="200">red</text>
+    <text x="70" y="230">purple</text>
+    <text x="70" y="260">fuchsia</text>
+
+    <!--  rgb values -->
+    <rect  x="275" y="30" width="25" height="25" fill="green"/>
+    <rect  x="275" y="60" width="25" height="25" fill="lime"/>
+    <rect  x="275" y="90" width="25" height="25" fill="olive"/>
+    <rect  x="275" y="120" width="25" height="25" fill="yellow"/>
+    <rect  x="275" y="150" width="25" height="25" fill="navy"/>
+    <rect  x="275" y="180" width="25" height="25" fill="blue"/>
+    <rect  x="275" y="210" width="25" height="25" fill="teal"/>
+    <rect  x="275" y="240" width="25" height="25" fill="aqua"/>
+
+    <!--  color names -->
+    <rect  x="250" y="30" width="25" height="25" fill="rgb( 0, 128, 0)"/>
+    <rect  x="250" y="60" width="25" height="25" fill="rgb( 0, 255, 0)"/>
+    <rect  x="250" y="90" width="25" height="25" fill="rgb(128, 128, 0)"/>
+    <rect  x="250" y="120" width="25" height="25" fill="rgb(255, 255, 0)"/>
+    <rect  x="250" y="150" width="25" height="25" fill="rgb( 0, 0, 128)"/>
+    <rect  x="250" y="180" width="25" height="25" fill="rgb( 0, 0, 255)"/>
+    <rect  x="250" y="210" width="25" height="25" fill="rgb( 0, 128, 128)"/>
+    <rect  x="250" y="240" width="25" height="25" fill="rgb( 0, 255, 255)"/>
+
+    <!--  labels -->
+    <text x="310" y="50">green</text>
+    <text x="310" y="80">lime</text>
+    <text x="310" y="110">olive</text>
+    <text x="310" y="140">yellow</text>
+    <text x="310" y="170">navy</text>
+    <text x="310" y="200">blue</text>
+    <text x="310" y="230">teal</text>
+    <text x="310" y="260">aqua</text>
+
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.4 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240"
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="AE" owner="ED" desc="Test svg element in svg." status="accepted"
+    approved="yes"
+    version="$Revision: 1.5 $" testname="$RCSfile: struct-svg-203-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        This test tests that any &lt;svg&gt; elements that are encountered inside
+        an &lt;svg&gt; element are ignored, if the user agent supports SVG Tiny 1.2 only.
+      </p>
+      <p>
+        If the user agent can handle SVG 1.1 Basic or Full, then the test has passed
+        if only the string "This text should be visible if the viewer supports at least SVG 1.1 Basic."
+        is visible.
+      </p>
+      <p>
+        If the user agent supports only SVG 1.2 Tiny then the test has passed if
+        the svg element and it's contents have been ignored. Only the string
+        "This text should be visible if the viewer supports only SVG 1.2 Tiny." should
+        be visible.
+      </p>
+      <p>
+        If <em>both</em> strings are visible then the test has failed.
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: struct-svg-203-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+
+    <text x="240" y="250" text-anchor="middle" font-size="10">This text should be visible if the viewer supports only SVG 1.2 Tiny.</text>
+
+    <svg x="10" y="200" width="460" height="100" viewBox="0 0 400 100" overflow="visible">
+      <rect width="400" height="100" fill="white"/>
+      <text x="200" y="30" text-anchor="middle" font-size="10">This text should be visible if the viewer supports at least SVG 1.1 Basic.</text>
+    </svg>
+
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.5 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240" 
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

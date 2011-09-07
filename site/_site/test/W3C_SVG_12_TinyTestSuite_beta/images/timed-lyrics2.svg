@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+     <svg viewBox="0 0 617 617" height="100%" width="100%"
+         xmlns="http://www.w3.org/2000/svg"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         version="1.2" baseProfile="tiny">
+         
+         <desc>This document contains the textual lyrics to synchronize with some SVG content in the referencing document</desc>
+         <defs>
+			<font-face
+				font-family="SVGFreeSansASCII"
+				unicode-range="U+0-7F">
+				<font-face-src>
+					<font-face-uri xlink:href="SVGFreeSans.svg#ascii"/>
+				</font-face-src>
+			</font-face>
+		</defs>
+         <g fill="blue" font-family="SVGFreeSansASCII,sans-serif" font-size="10" transform="translate(20, 20)">
+             <text xml:id="Text0" display="none">This is some text</text>
+             <set xlink:href="#Text0" attributeName="display" to="inline" begin="0" end="2"/>
+             <text xml:id="Text10" display="none">simulating some lyrics</text>
+             <set xlink:href="#Text10" attributeName="display" to="inline" begin="2.1" end="4"/>
+             <text xml:id="Text20" display="none">displayed synchronously</text>
+             <set xlink:href="#Text20" attributeName="display" to="inline" begin="4.1" end="6"/>
+             <text xml:id="Text30" display="none">with some SVG</text>
+             <set xlink:href="#Text30" attributeName="display" to="inline" begin="6.1" end="8"/>
+             <text xml:id="Text40" display="none">in a different document</text>
+             <set xlink:href="#Text40" attributeName="display" to="inline" begin="8.1" end="10"/>
+             <text xml:id="Text50" display="none">with a skiier</text>
+             <set xlink:href="#Text50" attributeName="display" to="inline" begin="10.1" end="12"/>
+             <text xml:id="Text60" display="none">and noise</text>
+             <set xlink:href="#Text60" attributeName="display" to="inline" begin="12.1" end="14"/>
+         </g>
+     </svg>

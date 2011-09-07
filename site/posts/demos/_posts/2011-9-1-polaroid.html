@@ -1,0 +1,64 @@
+---
+layout: demo
+title: Polaroid
+---
+
+<canvas id="c" width="600" height="500"></canvas>
+
+<script id="main">var canvas = new fabric.Canvas('c', { 
+  backgroundColor: '#333', 
+  HOVER_CURSOR: 'pointer'
+});
+
+var PolaroidPhoto = fabric.util.createClass(fabric.Object, fabric.Observable, {
+  H_PADDING: 20,
+  V_PADDING: 50,
+  initialize: function(src, options) {
+    this.callSuper('initialize', options);
+    this.image = new Image();
+    this.image.src = src;
+    this.image.onload = (function() {
+      this.width = this.image.width;
+      this.height = this.image.height;
+      this.loaded = true;
+      this.setCoords();
+      this.fire('image:loaded');
+    }).bind(this);
+  },
+  _render: function(ctx) {
+    if (this.loaded) {
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(
+        -(this.width / 2) - this.H_PADDING, 
+        -(this.height / 2) - this.H_PADDING, 
+        this.width + this.H_PADDING * 2, 
+        this.height + this.V_PADDING * 2);
+      ctx.drawImage(this.image, -this.width / 2, -this.height / 2);
+    }
+  }
+});
+var photo = new PolaroidPhoto('/assets/pug.jpg', { 
+  top: 200, 
+  left: 200, 
+  scaleX: 0.2, 
+  scaleY: 0.2 
+});
+photo.observe('image:loaded', canvas.renderAll.bind(canvas));
+photo.drawBorders = photo.drawCorners = function() { return this };
+
+function makeHandler(arg) {
+  return function(e) {
+    if (e.memo.target) {
+      e.memo.target.animate('angle', arg, {
+        duration: 100,
+        onChange: canvas.renderAll.bind(canvas)
+      });
+    }
+  };
+}
+canvas.observe({
+  'mouse:down': makeHandler('+10'),
+  'mouse:up': makeHandler('-10')
+});
+canvas.add(photo);
+</script>

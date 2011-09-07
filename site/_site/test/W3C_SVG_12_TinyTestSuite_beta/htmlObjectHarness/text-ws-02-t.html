@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE html PUBLIC  "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+ <html xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+ <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+ <meta name="keywords" content="W3C SVG 1.1 Test Suite testsuite mobile"/>
+ <meta name="description" content="W3C SVG 1.2 Tiny Test Suite"/>
+ <title>
+SVG 1.2 Tiny test:text-ws-02-t </title>
+ <style type="text/css">
+ <!--
+ .bodytext    { font-family:verdana, helvetica, sans-serif; font-size: 12pt; line-height: 125%; text-align: Left; margin-top: 0; margin-bottom: 0 }
+ .pageTitle         { line-height: 150%; font-size: 20pt; font-weight : 900; margin-bottom: 20pt }
+ .pageSubTitle  { color : blue; line-height: 100%; font-size: 24pt; font-weight : 900 }
+ .openChapter   { color : blue; line-height: 125%; font-weight : 900 }
+ .openSection   { color : blue; line-height: 125%; font-weight : 900 }
+ .info  { color : black; line-height: 110%; font-size: 10pt; font-weight : 100 }
+ p          { margin-top:0; margin-bottom:0; padding-top:0; padding-bottom:0 }
+ blockquote { margin-top:0; margin-bottom:0; padding-top:0; padding-bottom:0 }
+ .opscript {margin-left: 3%; margin-right: 3%; }
+ .opscript p { margin-top: 0.7em}
+ .navbar {background: black; color: white; font-weight: bold}
+ -->
+ </style>
+ </head>
+ <body class="bodytext">
+
+	<div class="linkbar"> 
+<p>
+<a href="text-ws-02-t.html">Tiny version</a></p>
+<p>Specification link: <a target="spec" href="http://www.w3.org/TR/SVGMobile12/text.html">10.10 White space handling</a></p>
+ <p>
+    <a href="text-ws-01-t.html">text-ws-01-t ←</a> 
+    <a href="index.html">index</a>
+    <a href="udom-conform-201-t.html">→ udom-conform-201-t</a>
+</p></div>
+
+	<table align="center" border="0" cellspacing="0" cellpadding="10">
+		<tr>
+			<td align="center" colspan="3">
+				<table border="0" cellpadding="8">
+					<tr>
+						<td align="center" colspan="2" class="pageTitle">
+							<h1>text-ws-02-t</h1>
+						</td>
+					</tr>
+					<tr  class="navbar">
+						<td align="center">
+							SVG Image
+						</td>
+						<td align="center">
+							PNG Image
+						</td>
+					</tr>
+					<tr>
+						<td align="right">
+   	    		  			<object data="../svggen/text-ws-02-t.svg" width="480" height="360" type="image/svg+xml"><p style="font-size:300%;color:red">FAIL</p></object>
+						</td>
+						<td align="left">
+							<img alt="raster image of text-ws-02-t" src="../png/text-ws-02-t.png" width="480" height="360"/>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+
+               
+<div class="opscript">
+      <p>Test for viewer correct handling of whitespace and the 'xml:space' attribute. There are two sub-tests, for value "preserve". In each test, the content of the 'text' element is written on multiple lines. The first test of each pair has indented text with leading space characters, tabs, etc. The second has no indentation, but a line break before the content and after it. There are no space (or other whitespace) characters at the ends of the lines.</p>
+      <p>The two test cases are self-descriptive. From the top; first, "preserve" applied to essentially the same content as first; second, "preserve" applied to essentially the same content as second.</p>
+      <p>In each test, the test string is in blue and the reference image is in black. The rendered picture should approximately match the reference image, however there is some question in the reference image concerning the exact amount of space in the long-space areas. The third test uses the nbsp unicode character to force the reference white spaces display, which provides an accurate match if the font in use has the same metrics for that character and the default white space. Also, variations are possible in the text fonts and layout (per CSS2 rules).</p>
+      <p>The test also uses the 'rect' element, as well as basic fill (solid primary colors), stroke (black 1-pixel lines), font-family (Arial) and font-size properties.</p>
+
+		</div>
+<div class="linkbar"> <p>
+				<a href="text-ws-01-t.html">text-ws-01-t ←</a>
+				<a href="index.html">index</a>
+				<a href="udom-conform-201-t.html">→ udom-conform-201-t</a>
+						</p></div>
+</body>
+</html>

@@ -1,0 +1,8 @@
+<?xml version="1.0" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="svg-root" width="480" height="360">
+	<g id="rects">
+		<rect x="120" y="0" width="120" height="120" fill="lime" />
+		<rect x="0" y="120" width="120" height="120" fill="#0f0"/>
+	</g>
+</svg>
+ 
