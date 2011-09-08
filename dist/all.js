@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2011, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.5.9" };
+var fabric = fabric || { version: "0.5.10" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -10562,7 +10562,7 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
       replacement.onload = function() {
         _this.setElement(replacement);
         callback && callback();
-        replacement.onload = canvasEl = imgEl = null;
+        replacement.onload = canvasEl = imgEl = imageData = null;
       };
       replacement.width = imgEl.width;
       replacement.height = imgEl.height;
@@ -11126,6 +11126,15 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
     var oURL = URL.parse(url),
         client = HTTP.createClient(80, oURL.hostname),
         request = client.request('GET', oURL.pathname, { 'host': oURL.hostname });
+
+    client.addListener('error', function(err) {
+      if (err.errno === process.ECONNREFUSED) {
+        fabric.log('ECONNREFUSED: connection refused to ' + client.host + ':' + client.port);
+      }
+      else {
+        fabric.log(err.message);
+      }
+    });
 
     request.end();
     request.on('response', function (response) {
