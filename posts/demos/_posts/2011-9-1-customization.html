@@ -182,7 +182,7 @@ title: Customization
   
   var canvas13 = new fabric.Canvas('c13');
   canvas13.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
-  canvas13.setOverlayImage('/assets/jail_cell_bars.png', canvas13.renderAll.bind(canvas13));
+  canvas13.setOverlayImage('../assets/jail_cell_bars.png', canvas13.renderAll.bind(canvas13));
   
   var canvas4 = new fabric.Canvas('c4');
   canvas4.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
@@ -215,7 +215,7 @@ title: Customization
   canvas9.item(0).lockMovementY = true;
   
   var canvas14 = new fabric.Canvas('c14');
-  fabric.Image.fromURL('/assets/pug.jpg', function(obj) {
+  fabric.Image.fromURL('../assets/pug.jpg', function(obj) {
     canvas14.add(obj.scale(0.1).rotate(-15).set({ left: 80, top: 95 }));
     canvas14.add(new fabric.Rect({ width: 50, height: 40, fill: '#77f', top: 75, left: 160 }))
     canvas14.add(new fabric.Circle({ radius: 20, fill: '#f55', top: 170, left: 150 }));
@@ -239,5 +239,5 @@ title: Customization
   
   var canvas17 = new fabric.Canvas('c17');
   canvas17.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
-  canvas17.setBackgroundImage('../kitchensink/assets/pug.jpg', canvas17.renderAll.bind(canvas17));
+  canvas17.setBackgroundImage('../assets/pug.jpg', canvas17.renderAll.bind(canvas17));
 </script>

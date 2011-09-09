@@ -117,7 +117,7 @@ title: Animation
     function loadShape() {
       for (var i = coords.length; i--; ) {
         (function(i) {
-          fabric.loadSVGFromURL('/assets/' + shapePath, function(objects, options) {
+          fabric.loadSVGFromURL('../assets/' + shapePath, function(objects, options) {
             var pathGroup = new fabric.PathGroup(objects, options);
 
             pathGroup.set({

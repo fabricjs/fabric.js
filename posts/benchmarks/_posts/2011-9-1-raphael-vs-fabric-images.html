@@ -12,8 +12,8 @@ title: vs. Raphael (Images)
     display: block;
   }
 </style>
-<img src="/lib/pug.jpg" style="position:absolute;left:-999px;top:-999px">
-<script src="/lib/raphael-min.js"></script>
+<img src="../lib/pug.jpg" style="position:absolute;left:-999px;top:-999px">
+<script src="../lib/raphael-min.js"></script>
 <script>
   function getRandomNum(min, max) {
     return Math.random() * (max - min) + min;
@@ -35,7 +35,7 @@ title: vs. Raphael (Images)
           circle;
 
       for (var i = numObjects; i--; ) {
-        img = paper.image("/lib/pug.jpg", getRandomNum(-25, width), getRandomNum(-25, height), 100, 100);
+        img = paper.image("../lib/pug.jpg", getRandomNum(-25, width), getRandomNum(-25, height), 100, 100);
         img.rotate(getRandomNum(0, 90));
         img.attr('opacity', opacity);
       }
@@ -55,7 +55,7 @@ title: vs. Raphael (Images)
           circle;
 
       for (var i = numObjects; i--; ) {
-        fabric.Image.fromURL('/lib/pug.jpg', (function(i){
+        fabric.Image.fromURL('../lib/pug.jpg', (function(i){
           return function(o) {
             var startTime = new Date();
 

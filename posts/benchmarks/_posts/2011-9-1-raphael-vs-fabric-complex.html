@@ -11,8 +11,8 @@ title: vs. Raphael (Complex Shape)
     display: block;
   }
 </style>
-<script src="/lib/raphael-min.js"></script>
-<script src="/lib/tiger.js"></script>
+<script src="../lib/raphael-min.js"></script>
+<script src="../lib/tiger.js"></script>
 <script>
       
   window.onload = function() {
@@ -28,7 +28,7 @@ title: vs. Raphael (Complex Shape)
 
       //console.profile('parsing');
       
-      fabric.loadSVGFromURL('/lib/tiger2.svg', function(objects) {
+      fabric.loadSVGFromURL('../lib/tiger2.svg', function(objects) {
         
         //console.profileEnd('parsing');
         
@@ -83,7 +83,7 @@ title: vs. Raphael (Complex Shape)
 </script>
 
 <!-- preload svg -->
-<iframe src="/lib/tiger2.svg" style="position:absolute;top:-999px;left:-999px"></iframe>
+<iframe src="../lib/tiger2.svg" style="position:absolute;top:-999px;left:-999px"></iframe>
 <p id="description">Rendering a complex shape</p>
 <canvas id="canvas" width="600" height="600"></canvas>
 <p id="log"></p>

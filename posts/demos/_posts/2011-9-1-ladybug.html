@@ -8,7 +8,7 @@ title: Sliding Ladybugs
 <script id="main">var canvas = new fabric.Canvas('c', { selection: false });
 
 setInterval(function() {
-  fabric.Image.fromURL('/assets/ladybug.png', function(img) {
+  fabric.Image.fromURL('../assets/ladybug.png', function(img) {
     img.set('left', fabric.util.getRandomInt(200, 600)).set('top', -50);
     img.movingLeft = !!Math.round(Math.random());
     canvas.add(img);

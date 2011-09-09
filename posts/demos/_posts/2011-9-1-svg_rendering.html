@@ -25,7 +25,7 @@ title: SVG Rendering
 <script>
   function initCanvas(id) {
     var canvas;
-    fabric.loadSVGFromURL('/assets/' + id + '.svg', function(objects, options) {
+    fabric.loadSVGFromURL('../assets/' + id + '.svg', function(objects, options) {
       var shape = toShape(objects, options);
       
       var canvasEl = document.getElementById('c' + id);
@@ -65,8 +65,8 @@ title: SVG Rendering
     if (blacklist.indexOf(i) == -1) {
       document.write('<div class="test"><div class="block left"><p>Canvas #' + i + '</p>');
       document.write('<canvas id="c' + i + '" width="600" height="600"></canvas></div>');
-      document.write('<div class="block"><p><a href="/assets/' + i + '.svg">SVG</a></p>');
-      document.write('<iframe src="/assets/' + i + '.svg"></iframe></div></div><br>');
+      document.write('<div class="block"><p><a href="../assets/' + i + '.svg">SVG</a></p>');
+      document.write('<iframe src="../assets/' + i + '.svg"></iframe></div></div><br>');
       initCanvas(i);
     }
   }
