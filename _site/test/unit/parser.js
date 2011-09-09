@@ -235,7 +235,7 @@
     ok(fabric.parseSVGDocument);
     
     var data;
-    fabric.util.request('/test/fixtures/path.svg', {
+    fabric.util.request('../fixtures/path.svg', {
       method: 'get',
       onComplete: function(resp) {
         var doc = resp.responseXML;
