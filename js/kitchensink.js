@@ -93,7 +93,7 @@
         break;
       
       case 'image1':
-        fabric.Image.fromURL('/assets/pug.jpg', function(image) {
+        fabric.Image.fromURL('../assets/pug.jpg', function(image) {
           image.set({
             left: left,
             top: top,
@@ -105,7 +105,7 @@
         break;
       
       case 'image2':
-        fabric.Image.fromURL('/assets/logo.png', function(image) {
+        fabric.Image.fromURL('../assets/logo.png', function(image) {
           image.set({
             left: left,
             top: top,
@@ -120,7 +120,7 @@
       case 'shape':
         var id = element.id, match;
         if (match = /\d+$/.exec(id)) {
-          fabric.loadSVGFromURL('/assets/' + match[0] + '.svg', function(objects, options) {
+          fabric.loadSVGFromURL('../assets/' + match[0] + '.svg', function(objects, options) {
             
             var loadedObject;
             if (objects.length > 1) {
