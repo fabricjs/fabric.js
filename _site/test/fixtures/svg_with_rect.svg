@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1 Tiny//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11-tiny.dtd" [
-  <!ENTITY ns_flows "http://ns.adobe.com/Flows/1.0/">
-]>
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg">
-  <rect height="100" width="100" y="50" x="50" fill="red" />
-  <circle r="25" cy="100" cx="100" fill="green" />
-</svg>
