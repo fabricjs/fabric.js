@@ -610,12 +610,12 @@
   
   document.getElementById('load-svg').onclick = function() {
     var svg = document.getElementById('svg-console').value;
-    fabric.loadSVGFromString(svg, function(objects) {
+    fabric.loadSVGFromString(svg, function(objects, options) {
       if (objects.length === 1) {
         canvas.add(objects[0]);
       }
       else {
-        canvas.add(new fabric.PathGroup(objects));
+        canvas.add(new fabric.PathGroup(objects, options));
       }
       canvas.renderAll();
     });
