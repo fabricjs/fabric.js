@@ -5,7 +5,9 @@
   "use strict";
   
   var fabric = global.fabric || (global.fabric = { }),
-      extend = fabric.util.object.extend;
+      extend = fabric.util.object.extend,
+      parentSet = fabric.Object.prototype.set,
+      coordProps = { 'x1': 1, 'x2': 1, 'y1': 1, 'y2': 1 };
       
   if (fabric.Line) {
     fabric.warn('fabric.Line is already defined');
@@ -43,10 +45,22 @@
       this.set('x2', points[2]);
       this.set('y2', points[3]);
       
+      this._setWidthHeight();
+    },
+    
+    _setWidthHeight: function() {
       this.set('width', (this.x2 - this.x1) || 1);
       this.set('height', (this.y2 - this.y1) || 1);
       this.set('left', this.x1 + this.width / 2);
       this.set('top', this.y1 + this.height / 2);
+    },
+    
+    set: function(name, value) {
+      parentSet.call(this, name, value);
+      if (name in coordProps) {
+        this._setWidthHeight();
+      }
+      return this;
     },
     
     /**

@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2011, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.5.10" };
+var fabric = fabric || { version: "0.5.11" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
