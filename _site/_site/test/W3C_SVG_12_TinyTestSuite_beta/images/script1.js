@@ -1,1 +1,0 @@
-document.getElementById('c1').setAttributeNS(null, 'fill','green');

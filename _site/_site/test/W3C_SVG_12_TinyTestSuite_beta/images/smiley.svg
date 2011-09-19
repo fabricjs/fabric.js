@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 30 40">
-	<rect x='.5' y='.5' width='29' height='39' fill='black' stroke='red' />
-	<g transform='translate(0, 5)'>
-	  <circle cx='15' cy='15' r='10' fill='yellow' />
-	  <circle cx='12' cy='12' r='1.5' fill='black' />
-	  <circle cx='17' cy='12' r='1.5' fill='black' />
-	  <path d='M 10 19 L 15 23 20 19' stroke='black' stroke-width='2' />
-	</g>
-</svg>
