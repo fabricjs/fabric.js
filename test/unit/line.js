@@ -110,4 +110,16 @@
     equals(line1.get('height'), 1);
     equals(line2.get('width'), 1);
   });
+  
+  test('changing x/y coords should update width/height', function() {
+    var line = new fabric.Line([ 50, 50, 100, 100]);
+    
+    equals(50, line.width);
+    
+    line.set({ x1: 75, y1: 75, x2: 175, y2: 175 });
+    
+    equals(100, line.width);
+    equals(100, line.height);
+  });
+  
 })();
