@@ -913,7 +913,7 @@
         if (!target) {  
           // image/text was hovered-out from, we remove its borders
           for (var i = this._objects.length; i--; ) {
-            if (!this._objects[i].active) {
+            if (this._objects[i] && !this._objects[i].active) {
               this._objects[i].setActive(false);
             }
           }
@@ -1126,6 +1126,8 @@
       for (var i = 0, len = this._objects.length; i < len; ++i) {
         currentObject = this._objects[i];
         
+        if (!currentObject) continue;
+        
         if (currentObject.intersectsWithRect(selectionX1Y1, selectionX2Y2) || 
             currentObject.isContainedWithinRect(selectionX1Y1, selectionX2Y2)) {
           
@@ -1176,10 +1178,16 @@
      * @method insertAt
      * @param object {Object} Object to insert
      * @param index {Number} index to insert object at
+     * @param nonSplicing {Boolean} when `true`, no splicing (shifting) of objects occurs
      * @return {fabric.Canvas} instance
      */
-    insertAt: function (object, index) {
-      this._objects.splice(index, 0, object);
+    insertAt: function (object, index, nonSplicing) {
+      if (nonSplicing) {
+        this._objects[index] = object;
+      }
+      else {
+        this._objects.splice(index, 0, object);
+      }
       this.stateful && object.setupState();
       object.setCoords();
       this.renderAll();
@@ -1268,8 +1276,7 @@
       if (length) {
         for (var i = 0; i < length; ++i) {
           if (!activeGroup ||
-              (activeGroup &&
-              !activeGroup.contains(this._objects[i]))) {
+              (activeGroup && this._objects[i] && !activeGroup.contains(this._objects[i]))) {
             this._draw(canvasToDrawOn, this._objects[i]);
           }
         }
@@ -1401,7 +1408,7 @@
       
       // then check all of the objects on canvas
       for (var i = this._objects.length; i--; ) {
-        if (this.containsPoint(e, this._objects[i])) {
+        if (this._objects[i] && this.containsPoint(e, this._objects[i])) {
           target = this._objects[i];
           this.relatedTarget = target;
           break;

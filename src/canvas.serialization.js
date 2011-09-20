@@ -40,7 +40,7 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
 
     /** @ignore */
     function onObjectLoaded(object, index) {
-      _this.insertAt(object, index);
+      _this.insertAt(object, index, true);
       object.setCoords();
       if (++numLoadedObjects === numTotalObjects) {
         callback && callback();
@@ -193,7 +193,7 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
         case 'image':
         case 'font':
           fabric[fabric.util.string.capitalize(o.type)].fromObject(o, function (o) {
-            _this.insertAt(o, index);
+            _this.insertAt(o, index, true);
             if (++numLoadedImages === numTotalImages) {
               if (callback) {
                 callback();
@@ -204,7 +204,7 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
         default:
           var klass = fabric[fabric.util.string.camelize(fabric.util.string.capitalize(o.type))];
           if (klass && klass.fromObject) {
-            _this.insertAt(klass.fromObject(o), index);
+            _this.insertAt(klass.fromObject(o), index, true);
           }
           break;
       }

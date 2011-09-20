@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2011, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.5.11" };
+var fabric = fabric || { version: "0.5.12" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -5168,7 +5168,7 @@ fabric.util.string = {
         if (!target) {  
           // image/text was hovered-out from, we remove its borders
           for (var i = this._objects.length; i--; ) {
-            if (!this._objects[i].active) {
+            if (this._objects[i] && !this._objects[i].active) {
               this._objects[i].setActive(false);
             }
           }
@@ -5381,6 +5381,8 @@ fabric.util.string = {
       for (var i = 0, len = this._objects.length; i < len; ++i) {
         currentObject = this._objects[i];
         
+        if (!currentObject) continue;
+        
         if (currentObject.intersectsWithRect(selectionX1Y1, selectionX2Y2) || 
             currentObject.isContainedWithinRect(selectionX1Y1, selectionX2Y2)) {
           
@@ -5431,10 +5433,16 @@ fabric.util.string = {
      * @method insertAt
      * @param object {Object} Object to insert
      * @param index {Number} index to insert object at
+     * @param nonSplicing {Boolean} when `true`, no splicing (shifting) of objects occurs
      * @return {fabric.Canvas} instance
      */
-    insertAt: function (object, index) {
-      this._objects.splice(index, 0, object);
+    insertAt: function (object, index, nonSplicing) {
+      if (nonSplicing) {
+        this._objects[index] = object;
+      }
+      else {
+        this._objects.splice(index, 0, object);
+      }
       this.stateful && object.setupState();
       object.setCoords();
       this.renderAll();
@@ -5523,8 +5531,7 @@ fabric.util.string = {
       if (length) {
         for (var i = 0; i < length; ++i) {
           if (!activeGroup ||
-              (activeGroup &&
-              !activeGroup.contains(this._objects[i]))) {
+              (activeGroup && this._objects[i] && !activeGroup.contains(this._objects[i]))) {
             this._draw(canvasToDrawOn, this._objects[i]);
           }
         }
@@ -5656,7 +5663,7 @@ fabric.util.string = {
       
       // then check all of the objects on canvas
       for (var i = this._objects.length; i--; ) {
-        if (this.containsPoint(e, this._objects[i])) {
+        if (this._objects[i] && this.containsPoint(e, this._objects[i])) {
           target = this._objects[i];
           this.relatedTarget = target;
           break;
@@ -6416,7 +6423,7 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
 
     /** @ignore */
     function onObjectLoaded(object, index) {
-      _this.insertAt(object, index);
+      _this.insertAt(object, index, true);
       object.setCoords();
       if (++numLoadedObjects === numTotalObjects) {
         callback && callback();
@@ -6569,7 +6576,7 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
         case 'image':
         case 'font':
           fabric[fabric.util.string.capitalize(o.type)].fromObject(o, function (o) {
-            _this.insertAt(o, index);
+            _this.insertAt(o, index, true);
             if (++numLoadedImages === numTotalImages) {
               if (callback) {
                 callback();
@@ -6580,7 +6587,7 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
         default:
           var klass = fabric[fabric.util.string.camelize(fabric.util.string.capitalize(o.type))];
           if (klass && klass.fromObject) {
-            _this.insertAt(klass.fromObject(o), index);
+            _this.insertAt(klass.fromObject(o), index, true);
           }
           break;
       }
