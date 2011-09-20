@@ -405,14 +405,14 @@
       minY = min(aY);
       maxY = max(aY);
       
-      width = maxX - minX;
-      height = maxY - minY;
+      width = (maxX - minX) || 0;
+      height = (maxY - minY) || 0;
       
       this.width = width;
       this.height = height;
       
-      this.left = minX + width / 2;
-      this.top = minY + height / 2;
+      this.left = (minX + width / 2) || 0;
+      this.top = (minY + height / 2) || 0;
     },
     
     /**

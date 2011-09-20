@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2011, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.5.12" };
+var fabric = fabric || { version: "0.5.13" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -2003,6 +2003,8 @@ fabric.Observable = {
    * @param {String} byProperty
    */
   function max(array, byProperty) {
+    if (!array || array.length === 0) return undefined;
+    
     var i = array.length - 1, 
         result = byProperty ? array[i][byProperty] : array[i];
     if (byProperty) {
@@ -2030,6 +2032,8 @@ fabric.Observable = {
    * @param {String} byProperty
    */
   function min(array, byProperty) {
+    if (!array || array.length === 0) return undefined;
+    
     var i = array.length - 1, 
         result = byProperty ? array[i][byProperty] : array[i];
 
@@ -9674,7 +9678,7 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
     initialize: function(paths, options) {
       
       options = options || { };
-      this.paths = paths;
+      this.paths = paths || [ ];
       
       for (var i = this.paths.length; i--; ) {
         this.paths[i].group = this;
@@ -10281,14 +10285,14 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
       minY = min(aY);
       maxY = max(aY);
       
-      width = maxX - minX;
-      height = maxY - minY;
+      width = (maxX - minX) || 0;
+      height = (maxY - minY) || 0;
       
       this.width = width;
       this.height = height;
       
-      this.left = minX + width / 2;
-      this.top = minY + height / 2;
+      this.left = (minX + width / 2) || 0;
+      this.top = (minY + height / 2) || 0;
     },
     
     /**

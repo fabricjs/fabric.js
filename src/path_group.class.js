@@ -45,7 +45,7 @@
     initialize: function(paths, options) {
       
       options = options || { };
-      this.paths = paths;
+      this.paths = paths || [ ];
       
       for (var i = this.paths.length; i--; ) {
         this.paths[i].group = this;
