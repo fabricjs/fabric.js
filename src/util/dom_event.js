@@ -204,6 +204,15 @@
        (docElement.clientTop || 0));
   }
   
+  if (fabric.isTouchSupported) {
+    pointerX = function(event) {
+      return event.touches && event.touches[0].pageX;
+    };
+    pointerY = function(event) {
+      return event.touches && event.touches[0].pageY;
+    };
+  }
+  
   fabric.util.getPointer = getPointer;
   
   fabric.util.object.extend(fabric.util, fabric.Observable);

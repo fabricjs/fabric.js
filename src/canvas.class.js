@@ -395,24 +395,52 @@
     _initEvents: function () {
       var _this = this;
       
-      this._onMouseDown = function (e) { 
+      this._onMouseDown = function (e) {
         _this.__onMouseDown(e);
+        
         addListener(fabric.document, 'mouseup', _this._onMouseUp);
+        addListener(fabric.document, 'touchend', _this._onMouseUp);
+        
         addListener(fabric.document, 'mousemove', _this._onMouseMove);
+        addListener(fabric.document, 'touchmove', _this._onMouseMove);
+        
         removeListener(_this.upperCanvasEl, 'mousemove', _this._onMouseMove);
+        removeListener(_this.upperCanvasEl, 'touchmove', _this._onMouseMove);
       };
-      this._onMouseUp = function (e) { 
-        _this.__onMouseUp(e);
-        removeListener(fabric.document, 'mouseup', _this._onMouseUp);
-        removeListener(fabric.document, 'mousemove', _this._onMouseMove);
-        addListener(_this.upperCanvasEl, 'mousemove', _this._onMouseMove);
-      };
-      this._onMouseMove = function (e) { _this.__onMouseMove(e); };
-      this._onResize = function (e) { _this.calcOffset() };
       
-      addListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
-      addListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
+      this._onMouseUp = function (e) {
+        _this.__onMouseUp(e);
+        
+        removeListener(fabric.document, 'mouseup', _this._onMouseUp);
+        removeListener(fabric.document, 'touchend', _this._onMouseUp);
+        
+        removeListener(fabric.document, 'mousemove', _this._onMouseMove);
+        removeListener(fabric.document, 'touchmove', _this._onMouseMove);
+        
+        addListener(_this.upperCanvasEl, 'mousemove', _this._onMouseMove);
+        addListener(_this.upperCanvasEl, 'touchmove', _this._onMouseMove);
+      };
+      
+      this._onMouseMove = function (e) { 
+        e.preventDefault && e.preventDefault();
+        _this.__onMouseMove(e);
+      };
+      
+      this._onResize = function (e) { 
+        _this.calcOffset();
+      };
+      
+
       addListener(fabric.window, 'resize', this._onResize);
+      
+      if (fabric.isTouchSupported) {
+        addListener(this.upperCanvasEl, 'touchstart', this._onMouseDown);
+        addListener(this.upperCanvasEl, 'touchmove', this._onMouseMove);
+      }
+      else {
+        addListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
+        addListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
+      }
     },
     
     /**
@@ -617,7 +645,7 @@
     __onMouseDown: function (e) {
       
       // accept only left clicks
-      if (e.which !== 1) return;
+      if (e.which !== 1 && !fabric.isTouchSupported) return;
       
       if (this.isDrawingMode) {
         this._prepareForDrawing(e);
@@ -2018,5 +2046,9 @@
    * @constructor
    */
   fabric.Element = fabric.Canvas;
+  
+  if (fabric.isTouchSupported) {
+    fabric.Canvas.prototype._setCursorFromEvent = function() { };
+  }
   
 })(typeof exports != 'undefined' ? exports : this);

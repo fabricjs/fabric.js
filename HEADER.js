@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2011, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.5.14" };
+var fabric = fabric || { version: "0.6" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -15,3 +15,5 @@ else {
   fabric.document = require("jsdom").jsdom("<!DOCTYPE html><html><head></head><body></body></html>");
   fabric.window = fabric.document.createWindow();
 }
+
+fabric.isTouchSupported = "ontouchstart" in fabric.document.documentElement;
