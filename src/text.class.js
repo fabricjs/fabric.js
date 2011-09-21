@@ -27,7 +27,7 @@
      * @property
      * @type Number
      */
-    fontSize:         20,
+    fontSize:         40,
     
     /**
      * @property
@@ -218,13 +218,8 @@
       container.appendChild(el);
       el.innerHTML = this.text;
       
-      // need to specify these manually, since Jaxer doesn't support retrieving computed style
-      el.style.fontSize = '40px';
-      el.style.fontWeight = '400';
+      el.style.fontSize = this.fontSize + 'px';
       el.style.letterSpacing = 'normal';
-      el.style.color = '#000000';
-      el.style.fontWeight = '600';
-      el.style.fontFamily = 'Verdana';
       
       return el;
     },

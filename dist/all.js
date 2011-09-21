@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2011, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.5.13" };
+var fabric = fabric || { version: "0.5.14" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -10801,7 +10801,7 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
      * @property
      * @type Number
      */
-    fontSize:         20,
+    fontSize:         40,
     
     /**
      * @property
@@ -10992,13 +10992,8 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
       container.appendChild(el);
       el.innerHTML = this.text;
       
-      // need to specify these manually, since Jaxer doesn't support retrieving computed style
-      el.style.fontSize = '40px';
-      el.style.fontWeight = '400';
+      el.style.fontSize = this.fontSize + 'px';
       el.style.letterSpacing = 'normal';
-      el.style.color = '#000000';
-      el.style.fontWeight = '600';
-      el.style.fontFamily = 'Verdana';
       
       return el;
     },
