@@ -14,7 +14,7 @@ body { font-family: Garamond, "Hoefler Text", "Times New Roman", Times, serif; m
 
 pre { margin-top: 0; font-size: 12px; vertical-align: top; background: #eef; display: inline-block; padding: 15px; margin-left: 15px; display: inline-block }
 
-.canvas-container { border: 1px dotted #ccc; display: inline-block; vertical-align: top; }
+.canvas-container { border: 1px dotted #ccc; display: inline-block; vertical-align: top; -webkit-tap-highlight-color: rgba(0,0,0,0); }
 
 h2 span { font-weight: normal; }
 
