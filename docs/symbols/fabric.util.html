@@ -1,18 +1,13 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-	<head>
-		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-		<meta name="generator" content="JsDoc Toolkit" />
-		
-		<title>JsDoc Reference - fabric.util</title>
+---
+layout: doc
+title: Fabric.js API Reference - fabric.util
+---
 
-		<style type="text/css">
-			/* default.css */
-body
+<style>
+	/* default.css */
+#bd-wrapper
 {
 	font: 12px "Lucida Grande", Tahoma, Arial, Helvetica, sans-serif;
-	width: 800px;
 }
 
 .header
@@ -44,8 +39,7 @@ pre.code
 	border: 1px dashed #ccc;
 }
 
-#index
-{
+#index {
 	margin-top: 24px;
 	float: left;
 	width: 160px;
@@ -55,14 +49,12 @@ pre.code
 	padding: 8px;
 }
 
-#content
-{
+#content {
 	margin-left: 190px;
 	width: 600px;
 }
 
-.classList
-{
+.classList {
 	list-style-type: none;
 	padding: 0;
 	margin: 0 0 0 8px;
@@ -71,23 +63,20 @@ pre.code
 	overflow: auto;
 }
 
-.classList li
-{
+.classList li {
 	padding: 0;
 	margin: 0 0 8px 0;
 }
 
 .summaryTable { width: 100%; }
 
-h1.classTitle
-{
+h1.classTitle {
 	font-size:170%;
 	line-height:130%;
 }
 
 h2 { font-size: 110%; }
-caption, div.sectionTitle
-{
+caption, div.sectionTitle {
 	background-color: #7F8FB1;
 	color: #fff;
 	font-size:130%;
@@ -99,8 +88,7 @@ caption, div.sectionTitle
 div.sectionTitle { margin-bottom: 8px; }
 .summaryTable thead { display: none; }
 
-.summaryTable td
-{
+.summaryTable td {
 	vertical-align: top;
 	padding: 4px;
 	border-bottom: 1px #7F8FB1 solid;
@@ -108,30 +96,26 @@ div.sectionTitle { margin-bottom: 8px; }
 }
 
 /*col#summaryAttributes {}*/
-.summaryTable td.attributes
-{
+.summaryTable td.attributes {
 	border-left: 1px #7F8FB1 solid;
 	width: 140px;
 	text-align: right;
 }
 
-td.attributes, .fixedFont
-{
+td.attributes, .fixedFont {
 	line-height: 15px;
 	color: #002EBE;
 	font-family: "Courier New",Courier,monospace;
 	font-size: 13px;
 }
 
-.summaryTable td.nameDescription
-{
+.summaryTable td.nameDescription {
 	text-align: left;
 	font-size: 13px;
 	line-height: 15px;
 }
 
-.summaryTable td.nameDescription, .description
-{
+.summaryTable td.nameDescription, .description {
 	line-height: 15px;
 	padding: 4px;
 	padding-left: 4px;
@@ -139,8 +123,7 @@ td.attributes, .fixedFont
 
 .summaryTable { margin-bottom: 8px; }
 
-ul.inheritsList
-{
+ul.inheritsList {
 	list-style: square;
 	margin-left: 20px;
 	padding-left: 0;
@@ -152,38 +135,33 @@ ul.inheritsList
 }
 .detailList dt { margin-left: 20px; }
 
-.detailList .heading
-{
+.detailList .heading {
 	font-weight: bold;
 	padding-bottom: 6px;
 	margin-left: 0;
 }
 
-.light, td.attributes, .light a:link, .light a:visited
-{
+.light, td.attributes, .light a:link, .light a:visited {
 	color: #777;
 	font-style: italic;
 }
 
-.fineprint
-{
+.fineprint {
 	text-align: right;
 	font-size: 10px;
 }
-		</style>
-	</head>
+</style>
 
-	<body>
 <!-- ============================== header ================================= -->	
-		<!-- begin static/header.html -->
-		<div id="header">
+<!-- begin static/header.html -->
+<div id="header">
 </div>
-		<!-- end static/header.html -->
+<!-- end static/header.html -->
 
 <!-- ============================== classes index ============================ -->
-		<div id="index">
-			<!-- begin publish.classesIndex -->
-			<div align="center"><a href="../index.html">Class Index</a>
+<div id="index">
+	<!-- begin publish.classesIndex -->
+	<div align="center"><a href="../index.html">Class Index</a>
 | <a href="../files.html">File Index</a></div>
 <hr />
 <h2>Classes</h2>
@@ -196,8 +174,6 @@ ul.inheritsList
 	<li><a href="../symbols/fabric.html">fabric</a></li>
 	
 	<li><a href="../symbols/fabric.Canvas.html">fabric.Canvas</a></li>
-	
-	<li><a href="../symbols/fabric.Canvas%23cache.html">fabric.Canvas#cache</a></li>
 	
 	<li><a href="../symbols/fabric.Circle.html">fabric.Circle</a></li>
 	
@@ -218,6 +194,8 @@ ul.inheritsList
 	<li><a href="../symbols/fabric.Line.html">fabric.Line</a></li>
 	
 	<li><a href="../symbols/fabric.Object.html">fabric.Object</a></li>
+	
+	<li><a href="../symbols/fabric.Observable.html">fabric.Observable</a></li>
 	
 	<li><a href="../symbols/fabric.Path.html">fabric.Path</a></li>
 	
@@ -249,1405 +227,1277 @@ ul.inheritsList
 	
 </ul>
 <hr />
-			<!-- end publish.classesIndex -->
-		</div>
-		
-		<div id="content">
+	<!-- end publish.classesIndex -->
+</div>
+
+<div id="content">
 <!-- ============================== class title ============================ -->
-			<h1 class="classTitle">
-				
-				Namespace fabric.util
-			</h1>
+	<h1 class="classTitle">
+		
+		Namespace fabric.util
+	</h1>
 
 <!-- ============================== class summary ========================== -->			
-			<p class="description">
-				
-				
-			
-				
-				
-				
-					<br /><i>Defined in: </i> <a href="../symbols/src/src_util.js.html">util.js</a>.
-				
-			</p>
+	<p class="description">
+		
+		
+	
+		
+		
+		
+			<br /><i>Defined in: </i> <a href="../symbols/src/src_util_misc.js.html">misc.js</a>.
+		
+	</p>
 
 <!-- ============================== constructor summary ==================== -->			
-			
-			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class fabric.util.">
-				<caption>Namespace Summary</caption>
-				<thead>
-					<tr>
-						<th scope="col">Constructor Attributes</th>
-						<th scope="col">Constructor Name and Description</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<td class="attributes">&nbsp;</td>
-						<td class="nameDescription" >
-							<div class="fixedFont">
-								<b><a href="../symbols/fabric.util.html#constructor">fabric.util</a></b>
-							</div>
-							<div class="description"></div>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-			
+	
+	<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class fabric.util.">
+		<caption>Namespace Summary</caption>
+		<thead>
+			<tr>
+				<th scope="col">Constructor Attributes</th>
+				<th scope="col">Constructor Name and Description</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td class="attributes">&nbsp;</td>
+				<td class="nameDescription" >
+					<div class="fixedFont">
+						<b><a href="../symbols/fabric.util.html#constructor">fabric.util</a></b>
+					</div>
+					<div class="description"></div>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	
 
 <!-- ============================== properties summary ===================== -->
-			
-				
-				
-				
-				
-			
+	
+		
+		
+		
+		
+	
 
 <!-- ============================== methods summary ======================== -->
+	
+		
+		
+		<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class fabric.util.">
+			<caption>Method Summary</caption>
+			<thead>
+				<tr>
+					<th scope="col">Method Attributes</th>
+					<th scope="col">Method Name and Description</th>
+				</tr>
+			</thead>
+			<tbody>
 			
-				
-				
-				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class fabric.util.">
-					<caption>Method Summary</caption>
-					<thead>
-						<tr>
-							<th scope="col">Method Attributes</th>
-							<th scope="col">Method Name and Description</th>
-						</tr>
-					</thead>
-					<tbody>
-					
-						<tr>
-							<td class="attributes">&lt;static&gt; &nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">fabric.util.<b><a href="../symbols/fabric.util.html#.addClass">addClass</a></b>(element, className)
-								</div>
-								<div class="description">Adds class to an element</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&lt;static&gt; &nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">fabric.util.<b><a href="../symbols/fabric.util.html#.addListener">addListener</a></b>(element, eventName, handler)
-								</div>
-								<div class="description">Adds an event listener to an element</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&lt;static&gt; &nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">fabric.util.<b><a href="../symbols/fabric.util.html#.animate">animate</a></b>(options)
-								</div>
-								<div class="description">Changes value from one to another within certain period of time, invoking callbacks as value is being changed.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&lt;static&gt; &nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">fabric.util.<b><a href="../symbols/fabric.util.html#.createClass">createClass</a></b>()
-								</div>
-								<div class="description">Helper for creation of "classes"</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&lt;static&gt; &nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">fabric.util.<b><a href="../symbols/fabric.util.html#.degreesToRadians">degreesToRadians</a></b>(degrees)
-								</div>
-								<div class="description">Transforms degrees to radians.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&lt;static&gt; &nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">fabric.util.<b><a href="../symbols/fabric.util.html#.fabric.Observable.fire">fabric.Observable.fire</a></b>(eventName, memo)
-								</div>
-								<div class="description">Fires event with an optional memo object</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&lt;static&gt; &nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">fabric.util.<b><a href="../symbols/fabric.util.html#.fabric.Observable.stopObserving">fabric.Observable.stopObserving</a></b>(eventName, handler)
-								</div>
-								<div class="description"></div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&lt;static&gt; &nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">fabric.util.<b><a href="../symbols/fabric.util.html#.falseFunction">falseFunction</a></b>()
-								</div>
-								<div class="description">Function which always returns `false`.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&lt;static&gt; &nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">fabric.util.<b><a href="../symbols/fabric.util.html#.getById">getById</a></b>(id)
-								</div>
-								<div class="description">Takes id and returns an element with that id (if one exists in a document)</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&lt;static&gt; &nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">fabric.util.<b><a href="../symbols/fabric.util.html#.getElementOffset">getElementOffset</a></b>(element)
-								</div>
-								<div class="description">Returns offset for a given element</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&lt;static&gt; &nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">fabric.util.<b><a href="../symbols/fabric.util.html#.getPointer">getPointer</a></b>(event)
-								</div>
-								<div class="description">Cross-browser wrapper for getting event's coordinates</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&lt;static&gt; &nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">fabric.util.<b><a href="../symbols/fabric.util.html#.getRandomInt">getRandomInt</a></b>(min, max)
-								</div>
-								<div class="description">Returns random number between 2 specified ones.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&lt;static&gt; &nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">fabric.util.<b><a href="../symbols/fabric.util.html#.getScript">getScript</a></b>(url, callback)
-								</div>
-								<div class="description">Inserts a script element with a given url into a document; invokes callback, when that script is finished loading</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&lt;static&gt; &nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">fabric.util.<b><a href="../symbols/fabric.util.html#.makeElement">makeElement</a></b>(tagName, attributes)
-								</div>
-								<div class="description">Creates specified element with specified attributes</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&lt;static&gt; &nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">fabric.util.<b><a href="../symbols/fabric.util.html#.makeElementUnselectable">makeElementUnselectable</a></b>(element)
-								</div>
-								<div class="description">Makes element unselectable</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&lt;static&gt; &nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">fabric.util.<b><a href="../symbols/fabric.util.html#.removeFromArray">removeFromArray</a></b>(array, value)
-								</div>
-								<div class="description">Removes value from an array.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&lt;static&gt; &nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">fabric.util.<b><a href="../symbols/fabric.util.html#.removeListener">removeListener</a></b>(element, eventName, handler)
-								</div>
-								<div class="description">Removes an event listener from an element</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&lt;static&gt; &nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">fabric.util.<b><a href="../symbols/fabric.util.html#.request">request</a></b>(url, options)
-								</div>
-								<div class="description">Cross-browser abstraction for sending XMLHttpRequest</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&lt;static&gt; &nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">fabric.util.<b><a href="../symbols/fabric.util.html#.setStyle">setStyle</a></b>(element, styles)
-								</div>
-								<div class="description">Cross-browser wrapper for setting element's style</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&lt;static&gt; &nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">fabric.util.<b><a href="../symbols/fabric.util.html#.toArray">toArray</a></b>(arrayLike)
-								</div>
-								<div class="description">Converts an array-like object (e.g.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&lt;static&gt; &nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">fabric.util.<b><a href="../symbols/fabric.util.html#.toFixed">toFixed</a></b>(number, fractionDigits)
-								</div>
-								<div class="description">A wrapper around Number#toFixed, which contrary to native method returns number, not string.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&lt;static&gt; &nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">fabric.util.<b><a href="../symbols/fabric.util.html#.wrapElement">wrapElement</a></b>(element, wrapper, attributes)
-								</div>
-								<div class="description">Wraps element with another element</div>
-							</td>
-						</tr>
-					
-					</tbody>
-				</table>
-				
-				
-				
+				<tr>
+					<td class="attributes">&lt;static&gt; &nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont">fabric.util.<b><a href="../symbols/fabric.util.html#.addClass">addClass</a></b>(element, className)
+						</div>
+						<div class="description">Adds class to an element</div>
+					</td>
+				</tr>
 			
+				<tr>
+					<td class="attributes">&lt;static&gt; &nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont">fabric.util.<b><a href="../symbols/fabric.util.html#.addListener">addListener</a></b>(element, eventName, handler)
+						</div>
+						<div class="description">Adds an event listener to an element</div>
+					</td>
+				</tr>
+			
+				<tr>
+					<td class="attributes">&lt;static&gt; &nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont">fabric.util.<b><a href="../symbols/fabric.util.html#.animate">animate</a></b>(options)
+						</div>
+						<div class="description">Changes value from one to another within certain period of time, invoking callbacks as value is being changed.</div>
+					</td>
+				</tr>
+			
+				<tr>
+					<td class="attributes">&lt;static&gt; &nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont">fabric.util.<b><a href="../symbols/fabric.util.html#.createClass">createClass</a></b>()
+						</div>
+						<div class="description">Helper for creation of "classes"</div>
+					</td>
+				</tr>
+			
+				<tr>
+					<td class="attributes">&lt;static&gt; &nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont">fabric.util.<b><a href="../symbols/fabric.util.html#.degreesToRadians">degreesToRadians</a></b>(degrees)
+						</div>
+						<div class="description">Transforms degrees to radians.</div>
+					</td>
+				</tr>
+			
+				<tr>
+					<td class="attributes">&lt;static&gt; &nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont">fabric.util.<b><a href="../symbols/fabric.util.html#.falseFunction">falseFunction</a></b>()
+						</div>
+						<div class="description">Function which always returns `false`.</div>
+					</td>
+				</tr>
+			
+				<tr>
+					<td class="attributes">&lt;static&gt; &nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont">fabric.util.<b><a href="../symbols/fabric.util.html#.getById">getById</a></b>(id)
+						</div>
+						<div class="description">Takes id and returns an element with that id (if one exists in a document)</div>
+					</td>
+				</tr>
+			
+				<tr>
+					<td class="attributes">&lt;static&gt; &nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont">fabric.util.<b><a href="../symbols/fabric.util.html#.getElementOffset">getElementOffset</a></b>(element)
+						</div>
+						<div class="description">Returns offset for a given element</div>
+					</td>
+				</tr>
+			
+				<tr>
+					<td class="attributes">&lt;static&gt; &nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont">fabric.util.<b><a href="../symbols/fabric.util.html#.getPointer">getPointer</a></b>(event)
+						</div>
+						<div class="description">Cross-browser wrapper for getting event's coordinates</div>
+					</td>
+				</tr>
+			
+				<tr>
+					<td class="attributes">&lt;static&gt; &nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont">fabric.util.<b><a href="../symbols/fabric.util.html#.getRandomInt">getRandomInt</a></b>(min, max)
+						</div>
+						<div class="description">Returns random number between 2 specified ones.</div>
+					</td>
+				</tr>
+			
+				<tr>
+					<td class="attributes">&lt;static&gt; &nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont">fabric.util.<b><a href="../symbols/fabric.util.html#.getScript">getScript</a></b>(url, callback)
+						</div>
+						<div class="description">Inserts a script element with a given url into a document; invokes callback, when that script is finished loading</div>
+					</td>
+				</tr>
+			
+				<tr>
+					<td class="attributes">&lt;static&gt; &nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont">fabric.util.<b><a href="../symbols/fabric.util.html#.makeElement">makeElement</a></b>(tagName, attributes)
+						</div>
+						<div class="description">Creates specified element with specified attributes</div>
+					</td>
+				</tr>
+			
+				<tr>
+					<td class="attributes">&lt;static&gt; &nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont">fabric.util.<b><a href="../symbols/fabric.util.html#.makeElementUnselectable">makeElementUnselectable</a></b>(element)
+						</div>
+						<div class="description">Makes element unselectable</div>
+					</td>
+				</tr>
+			
+				<tr>
+					<td class="attributes">&lt;static&gt; &nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont">fabric.util.<b><a href="../symbols/fabric.util.html#.removeFromArray">removeFromArray</a></b>(array, value)
+						</div>
+						<div class="description">Removes value from an array.</div>
+					</td>
+				</tr>
+			
+				<tr>
+					<td class="attributes">&lt;static&gt; &nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont">fabric.util.<b><a href="../symbols/fabric.util.html#.removeListener">removeListener</a></b>(element, eventName, handler)
+						</div>
+						<div class="description">Removes an event listener from an element</div>
+					</td>
+				</tr>
+			
+				<tr>
+					<td class="attributes">&lt;static&gt; &nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont">fabric.util.<b><a href="../symbols/fabric.util.html#.request">request</a></b>(url, options)
+						</div>
+						<div class="description">Cross-browser abstraction for sending XMLHttpRequest</div>
+					</td>
+				</tr>
+			
+				<tr>
+					<td class="attributes">&lt;static&gt; &nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont">fabric.util.<b><a href="../symbols/fabric.util.html#.setStyle">setStyle</a></b>(element, styles)
+						</div>
+						<div class="description">Cross-browser wrapper for setting element's style</div>
+					</td>
+				</tr>
+			
+				<tr>
+					<td class="attributes">&lt;static&gt; &nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont">fabric.util.<b><a href="../symbols/fabric.util.html#.toArray">toArray</a></b>(arrayLike)
+						</div>
+						<div class="description">Converts an array-like object (e.g.</div>
+					</td>
+				</tr>
+			
+				<tr>
+					<td class="attributes">&lt;static&gt; &nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont">fabric.util.<b><a href="../symbols/fabric.util.html#.toFixed">toFixed</a></b>(number, fractionDigits)
+						</div>
+						<div class="description">A wrapper around Number#toFixed, which contrary to native method returns number, not string.</div>
+					</td>
+				</tr>
+			
+				<tr>
+					<td class="attributes">&lt;static&gt; &nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont">fabric.util.<b><a href="../symbols/fabric.util.html#.wrapElement">wrapElement</a></b>(element, wrapper, attributes)
+						</div>
+						<div class="description">Wraps element with another element</div>
+					</td>
+				</tr>
+			
+			</tbody>
+		</table>
+		
+		
+		
+	
 <!-- ============================== events summary ======================== -->
-			
+	
 
 <!-- ============================== constructor details ==================== -->		
+	
+	<div class="details"><a name="constructor"> </a>
+		<div class="sectionTitle">
+			Namespace Detail
+		</div>
+		
+		<div class="fixedFont">
+				<b>fabric.util</b>
+		</div>
+		
+		<div class="description">
 			
-			<div class="details"><a name="constructor"> </a>
-				<div class="sectionTitle">
-					Namespace Detail
-				</div>
-				
-				<div class="fixedFont">
-						<b>fabric.util</b>
-				</div>
-				
-				<div class="description">
-					
-					
-				</div>
-				
-				
-				
-				
-					
-					
-					
-					
-					
-					
-					
+			
+		</div>
+		
+		
+		
+		
+			
+			
+			
+			
+			
+			
+			
 
-			</div>
-			
+	</div>
+	
 
 <!-- ============================== field details ========================== -->		
-			
+	
 
 <!-- ============================== method details ========================= -->		
-			
-				<div class="sectionTitle">
-					Method Detail
-				</div>
-				
-					<a name=".addClass"> </a>
-					<div class="fixedFont">&lt;static&gt; 
-					
-					
-					<span class="light">fabric.util.</span><b>addClass</b>(element, className)
-					
-					</div>
-					<div class="description">
-						Adds class to an element
-						
-							<br />
-							<i>Defined in: </i> <a href="../symbols/src/src_util_dom_misc.js.html">dom_misc.js</a>.
-						
-						
-					</div>
-					
-					
-					
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{HTMLElement}</span> <b>element</b>
-									
-								</dt>
-								<dd>Element to add class to</dd>
-							
-								<dt>
-									<span class="light fixedFont">{<a href="../symbols/String.html">String</a>}</span> <b>className</b>
-									
-								</dt>
-								<dd>Class to add to an element</dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name=".addListener"> </a>
-					<div class="fixedFont">&lt;static&gt; 
-					
-					
-					<span class="light">fabric.util.</span><b>addListener</b>(element, eventName, handler)
-					
-					</div>
-					<div class="description">
-						Adds an event listener to an element
-						
-							<br />
-							<i>Defined in: </i> <a href="../symbols/src/src_util_dom_event.js.html">dom_event.js</a>.
-						
-						
-					</div>
-					
-					
-					
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{HTMLElement}</span> <b>element</b>
-									
-								</dt>
-								<dd></dd>
-							
-								<dt>
-									<span class="light fixedFont">{<a href="../symbols/String.html">String</a>}</span> <b>eventName</b>
-									
-								</dt>
-								<dd></dd>
-							
-								<dt>
-									<span class="light fixedFont">{<a href="../symbols/Function.html">Function</a>}</span> <b>handler</b>
-									
-								</dt>
-								<dd></dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name=".animate"> </a>
-					<div class="fixedFont">&lt;static&gt; 
-					
-					
-					<span class="light">fabric.util.</span><b>animate</b>(options)
-					
-					</div>
-					<div class="description">
-						Changes value from one to another within certain period of time, invoking callbacks as value is being changed.
-						
-							<br />
-							<i>Defined in: </i> <a href="../symbols/src/src_util_dom_misc.js.html">dom_misc.js</a>.
-						
-						
-					</div>
-					
-					
-					
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{Object}</span> <b>options</b>
-									<i>Optional</i>
-								</dt>
-								<dd>Animation options</dd>
-							
-								<dt>
-									<span class="light fixedFont">{<a href="../symbols/Function.html">Function</a>}</span> <b>options.onChange</b>
-									<i>Optional</i>
-								</dt>
-								<dd>Callback; invoked on every value change</dd>
-							
-								<dt>
-									<span class="light fixedFont">{<a href="../symbols/Function.html">Function</a>}</span> <b>options.onComplete</b>
-									<i>Optional</i>
-								</dt>
-								<dd>Callback; invoked when value change is completed</dd>
-							
-								<dt>
-									<span class="light fixedFont">{Number}</span> <b>options.startValue</b>
-									<i>Optional, Default: 0</i>
-								</dt>
-								<dd>Starting value</dd>
-							
-								<dt>
-									<span class="light fixedFont">{Number}</span> <b>options.endValue</b>
-									<i>Optional, Default: 100</i>
-								</dt>
-								<dd>Ending value</dd>
-							
-								<dt>
-									<span class="light fixedFont">{<a href="../symbols/Function.html">Function</a>}</span> <b>options.easing</b>
-									<i>Optional</i>
-								</dt>
-								<dd>Easing function</dd>
-							
-								<dt>
-									<span class="light fixedFont">{Number}</span> <b>options.duration</b>
-									<i>Optional, Default: 500</i>
-								</dt>
-								<dd>Duration of change</dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name=".createClass"> </a>
-					<div class="fixedFont">&lt;static&gt; 
-					
-					
-					<span class="light">fabric.util.</span><b>createClass</b>()
-					
-					</div>
-					<div class="description">
-						Helper for creation of "classes"
-						
-							<br />
-							<i>Defined in: </i> <a href="../symbols/src/src_util_lang_class.js.html">lang_class.js</a>.
-						
-						
-					</div>
-					
-					
-					
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name=".degreesToRadians"> </a>
-					<div class="fixedFont">&lt;static&gt; 
-					
-					<span class="light">{Number}</span>
-					<span class="light">fabric.util.</span><b>degreesToRadians</b>(degrees)
-					
-					</div>
-					<div class="description">
-						Transforms degrees to radians.
-						
-							<br />
-							<i>Defined in: </i> <a href="../symbols/src/src_util_misc.js.html">misc.js</a>.
-						
-						
-					</div>
-					
-					
-					
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{Number}</span> <b>degrees</b>
-									
-								</dt>
-								<dd>value in degrees</dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-							<dl class="detailList">
-							<dt class="heading">Returns:</dt>
-							
-								<dd><span class="light fixedFont">{Number}</span> value in radians</dd>
-							
-							</dl>
-						
-						
-						
-
-					<hr />
-				
-					<a name=".fabric.Observable.fire"> </a>
-					<div class="fixedFont">&lt;static&gt; 
-					
-					
-					<span class="light">fabric.util.</span><b>fabric.Observable.fire</b>(eventName, memo)
-					
-					</div>
-					<div class="description">
-						Fires event with an optional memo object
-						
-							<br />
-							<i>Defined in: </i> <a href="../symbols/src/src_observable.js.html">observable.js</a>.
-						
-						
-					</div>
-					
-					
-					
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{<a href="../symbols/String.html">String</a>}</span> <b>eventName</b>
-									
-								</dt>
-								<dd></dd>
-							
-								<dt>
-									<span class="light fixedFont">{Object}</span> <b>memo</b>
-									<i>Optional</i>
-								</dt>
-								<dd></dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name=".fabric.Observable.stopObserving"> </a>
-					<div class="fixedFont">&lt;static&gt; 
-					
-					
-					<span class="light">fabric.util.</span><b>fabric.Observable.stopObserving</b>(eventName, handler)
-					
-					</div>
-					<div class="description">
-						
-						
-							<br />
-							<i>Defined in: </i> <a href="../symbols/src/src_observable.js.html">observable.js</a>.
-						
-						
-					</div>
-					
-					
-					
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{<a href="../symbols/String.html">String</a>}</span> <b>eventName</b>
-									
-								</dt>
-								<dd></dd>
-							
-								<dt>
-									<span class="light fixedFont">{<a href="../symbols/Function.html">Function</a>}</span> <b>handler</b>
-									
-								</dt>
-								<dd></dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name=".falseFunction"> </a>
-					<div class="fixedFont">&lt;static&gt; 
-					
-					<span class="light">{Boolean}</span>
-					<span class="light">fabric.util.</span><b>falseFunction</b>()
-					
-					</div>
-					<div class="description">
-						Function which always returns `false`.
-						
-							<br />
-							<i>Defined in: </i> <a href="../symbols/src/src_util_misc.js.html">misc.js</a>.
-						
-						
-					</div>
-					
-					
-					
-						
-						
-						
-						
-						
-							<dl class="detailList">
-							<dt class="heading">Returns:</dt>
-							
-								<dd><span class="light fixedFont">{Boolean}</span> </dd>
-							
-							</dl>
-						
-						
-						
-
-					<hr />
-				
-					<a name=".getById"> </a>
-					<div class="fixedFont">&lt;static&gt; 
-					
-					<span class="light">{HTMLElement|null}</span>
-					<span class="light">fabric.util.</span><b>getById</b>(id)
-					
-					</div>
-					<div class="description">
-						Takes id and returns an element with that id (if one exists in a document)
-						
-							<br />
-							<i>Defined in: </i> <a href="../symbols/src/src_util_dom_misc.js.html">dom_misc.js</a>.
-						
-						
-					</div>
-					
-					
-					
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{<a href="../symbols/String.html">String</a>|HTMLElement}</span> <b>id</b>
-									
-								</dt>
-								<dd></dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-							<dl class="detailList">
-							<dt class="heading">Returns:</dt>
-							
-								<dd><span class="light fixedFont">{HTMLElement|null}</span> </dd>
-							
-							</dl>
-						
-						
-						
-
-					<hr />
-				
-					<a name=".getElementOffset"> </a>
-					<div class="fixedFont">&lt;static&gt; 
-					
-					<span class="light">{Object}</span>
-					<span class="light">fabric.util.</span><b>getElementOffset</b>(element)
-					
-					</div>
-					<div class="description">
-						Returns offset for a given element
-						
-							<br />
-							<i>Defined in: </i> <a href="../symbols/src/src_util_dom_misc.js.html">dom_misc.js</a>.
-						
-						
-					</div>
-					
-					
-					
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{HTMLElement}</span> <b>element</b>
-									
-								</dt>
-								<dd>Element to get offset for</dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-							<dl class="detailList">
-							<dt class="heading">Returns:</dt>
-							
-								<dd><span class="light fixedFont">{Object}</span> Object with "left" and "top" properties</dd>
-							
-							</dl>
-						
-						
-						
-
-					<hr />
-				
-					<a name=".getPointer"> </a>
-					<div class="fixedFont">&lt;static&gt; 
-					
-					
-					<span class="light">fabric.util.</span><b>getPointer</b>(event)
-					
-					</div>
-					<div class="description">
-						Cross-browser wrapper for getting event's coordinates
-						
-							<br />
-							<i>Defined in: </i> <a href="../symbols/src/src_util_dom_event.js.html">dom_event.js</a>.
-						
-						
-					</div>
-					
-					
-					
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{Event}</span> <b>event</b>
-									
-								</dt>
-								<dd></dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name=".getRandomInt"> </a>
-					<div class="fixedFont">&lt;static&gt; 
-					
-					<span class="light">{Number}</span>
-					<span class="light">fabric.util.</span><b>getRandomInt</b>(min, max)
-					
-					</div>
-					<div class="description">
-						Returns random number between 2 specified ones.
-						
-							<br />
-							<i>Defined in: </i> <a href="../symbols/src/src_util_misc.js.html">misc.js</a>.
-						
-						
-					</div>
-					
-					
-					
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{Number}</span> <b>min</b>
-									
-								</dt>
-								<dd>lower limit</dd>
-							
-								<dt>
-									<span class="light fixedFont">{Number}</span> <b>max</b>
-									
-								</dt>
-								<dd>upper limit</dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-							<dl class="detailList">
-							<dt class="heading">Returns:</dt>
-							
-								<dd><span class="light fixedFont">{Number}</span> random value (between min and max)</dd>
-							
-							</dl>
-						
-						
-						
-
-					<hr />
-				
-					<a name=".getScript"> </a>
-					<div class="fixedFont">&lt;static&gt; 
-					
-					
-					<span class="light">fabric.util.</span><b>getScript</b>(url, callback)
-					
-					</div>
-					<div class="description">
-						Inserts a script element with a given url into a document; invokes callback, when that script is finished loading
-						
-							<br />
-							<i>Defined in: </i> <a href="../symbols/src/src_util_dom_misc.js.html">dom_misc.js</a>.
-						
-						
-					</div>
-					
-					
-					
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{<a href="../symbols/String.html">String</a>}</span> <b>url</b>
-									
-								</dt>
-								<dd>URL of a script to load</dd>
-							
-								<dt>
-									<span class="light fixedFont">{<a href="../symbols/Function.html">Function</a>}</span> <b>callback</b>
-									
-								</dt>
-								<dd>Callback to execute when script is finished loading</dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name=".makeElement"> </a>
-					<div class="fixedFont">&lt;static&gt; 
-					
-					<span class="light">{HTMLElement}</span>
-					<span class="light">fabric.util.</span><b>makeElement</b>(tagName, attributes)
-					
-					</div>
-					<div class="description">
-						Creates specified element with specified attributes
-						
-							<br />
-							<i>Defined in: </i> <a href="../symbols/src/src_util_dom_misc.js.html">dom_misc.js</a>.
-						
-						
-					</div>
-					
-					
-					
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{<a href="../symbols/String.html">String</a>}</span> <b>tagName</b>
-									
-								</dt>
-								<dd>Type of an element to create</dd>
-							
-								<dt>
-									<span class="light fixedFont">{Object}</span> <b>attributes</b>
-									<i>Optional</i>
-								</dt>
-								<dd>Attributes to set on an element</dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-							<dl class="detailList">
-							<dt class="heading">Returns:</dt>
-							
-								<dd><span class="light fixedFont">{HTMLElement}</span> Newly created element</dd>
-							
-							</dl>
-						
-						
-						
-
-					<hr />
-				
-					<a name=".makeElementUnselectable"> </a>
-					<div class="fixedFont">&lt;static&gt; 
-					
-					<span class="light">{HTMLElement}</span>
-					<span class="light">fabric.util.</span><b>makeElementUnselectable</b>(element)
-					
-					</div>
-					<div class="description">
-						Makes element unselectable
-						
-							<br />
-							<i>Defined in: </i> <a href="../symbols/src/src_util_dom_misc.js.html">dom_misc.js</a>.
-						
-						
-					</div>
-					
-					
-					
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{HTMLElement}</span> <b>element</b>
-									
-								</dt>
-								<dd>Element to make unselectable</dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-							<dl class="detailList">
-							<dt class="heading">Returns:</dt>
-							
-								<dd><span class="light fixedFont">{HTMLElement}</span> Element that was passed in</dd>
-							
-							</dl>
-						
-						
-						
-
-					<hr />
-				
-					<a name=".removeFromArray"> </a>
-					<div class="fixedFont">&lt;static&gt; 
-					
-					<span class="light">{<a href="../symbols/Array.html">Array</a>}</span>
-					<span class="light">fabric.util.</span><b>removeFromArray</b>(array, value)
-					
-					</div>
-					<div class="description">
-						Removes value from an array.
-Presence of value (and its position in an array) is determined via `Array.prototype.indexOf`
-						
-							<br />
-							<i>Defined in: </i> <a href="../symbols/src/src_util_misc.js.html">misc.js</a>.
-						
-						
-					</div>
-					
-					
-					
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{<a href="../symbols/Array.html">Array</a>}</span> <b>array</b>
-									
-								</dt>
-								<dd></dd>
-							
-								<dt>
-									<span class="light fixedFont">{Any}</span> <b>value</b>
-									
-								</dt>
-								<dd></dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-							<dl class="detailList">
-							<dt class="heading">Returns:</dt>
-							
-								<dd><span class="light fixedFont">{<a href="../symbols/Array.html">Array</a>}</span> original array</dd>
-							
-							</dl>
-						
-						
-						
-
-					<hr />
-				
-					<a name=".removeListener"> </a>
-					<div class="fixedFont">&lt;static&gt; 
-					
-					
-					<span class="light">fabric.util.</span><b>removeListener</b>(element, eventName, handler)
-					
-					</div>
-					<div class="description">
-						Removes an event listener from an element
-						
-							<br />
-							<i>Defined in: </i> <a href="../symbols/src/src_util_dom_event.js.html">dom_event.js</a>.
-						
-						
-					</div>
-					
-					
-					
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{HTMLElement}</span> <b>element</b>
-									
-								</dt>
-								<dd></dd>
-							
-								<dt>
-									<span class="light fixedFont">{<a href="../symbols/String.html">String</a>}</span> <b>eventName</b>
-									
-								</dt>
-								<dd></dd>
-							
-								<dt>
-									<span class="light fixedFont">{<a href="../symbols/Function.html">Function</a>}</span> <b>handler</b>
-									
-								</dt>
-								<dd></dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name=".request"> </a>
-					<div class="fixedFont">&lt;static&gt; 
-					
-					<span class="light">{XMLHttpRequest}</span>
-					<span class="light">fabric.util.</span><b>request</b>(url, options)
-					
-					</div>
-					<div class="description">
-						Cross-browser abstraction for sending XMLHttpRequest
-						
-							<br />
-							<i>Defined in: </i> <a href="../symbols/src/src_util_dom_request.js.html">dom_request.js</a>.
-						
-						
-					</div>
-					
-					
-					
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{<a href="../symbols/String.html">String</a>}</span> <b>url</b>
-									
-								</dt>
-								<dd>URL to send XMLHttpRequest to</dd>
-							
-								<dt>
-									<span class="light fixedFont">{Object}</span> <b>options</b>
-									<i>Optional</i>
-								</dt>
-								<dd>Options object</dd>
-							
-								<dt>
-									<span class="light fixedFont">{<a href="../symbols/String.html">String</a>}</span> <b>options.method</b>
-									<i>Optional, Default: "GET"</i>
-								</dt>
-								<dd></dd>
-							
-								<dt>
-									<span class="light fixedFont">{<a href="../symbols/Function.html">Function</a>}</span> <b>options.onComplete</b>
-									
-								</dt>
-								<dd>Callback to invoke when request is completed</dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-							<dl class="detailList">
-							<dt class="heading">Returns:</dt>
-							
-								<dd><span class="light fixedFont">{XMLHttpRequest}</span> request</dd>
-							
-							</dl>
-						
-						
-						
-
-					<hr />
-				
-					<a name=".setStyle"> </a>
-					<div class="fixedFont">&lt;static&gt; 
-					
-					<span class="light">{HTMLElement}</span>
-					<span class="light">fabric.util.</span><b>setStyle</b>(element, styles)
-					
-					</div>
-					<div class="description">
-						Cross-browser wrapper for setting element's style
-						
-							<br />
-							<i>Defined in: </i> <a href="../symbols/src/src_util_dom_style.js.html">dom_style.js</a>.
-						
-						
-					</div>
-					
-					
-					
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{HTMLElement}</span> <b>element</b>
-									
-								</dt>
-								<dd></dd>
-							
-								<dt>
-									<span class="light fixedFont">{Object}</span> <b>styles</b>
-									
-								</dt>
-								<dd></dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-							<dl class="detailList">
-							<dt class="heading">Returns:</dt>
-							
-								<dd><span class="light fixedFont">{HTMLElement}</span> Element that was passed as a first argument</dd>
-							
-							</dl>
-						
-						
-						
-
-					<hr />
-				
-					<a name=".toArray"> </a>
-					<div class="fixedFont">&lt;static&gt; 
-					
-					<span class="light">{<a href="../symbols/Array.html">Array</a>}</span>
-					<span class="light">fabric.util.</span><b>toArray</b>(arrayLike)
-					
-					</div>
-					<div class="description">
-						Converts an array-like object (e.g. arguments or NodeList) to an array
-						
-							<br />
-							<i>Defined in: </i> <a href="../symbols/src/src_util_dom_misc.js.html">dom_misc.js</a>.
-						
-						
-					</div>
-					
-					
-					
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{Object}</span> <b>arrayLike</b>
-									
-								</dt>
-								<dd></dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-							<dl class="detailList">
-							<dt class="heading">Returns:</dt>
-							
-								<dd><span class="light fixedFont">{<a href="../symbols/Array.html">Array</a>}</span> </dd>
-							
-							</dl>
-						
-						
-						
-
-					<hr />
-				
-					<a name=".toFixed"> </a>
-					<div class="fixedFont">&lt;static&gt; 
-					
-					<span class="light">{Number}</span>
-					<span class="light">fabric.util.</span><b>toFixed</b>(number, fractionDigits)
-					
-					</div>
-					<div class="description">
-						A wrapper around Number#toFixed, which contrary to native method returns number, not string.
-						
-							<br />
-							<i>Defined in: </i> <a href="../symbols/src/src_util_misc.js.html">misc.js</a>.
-						
-						
-					</div>
-					
-					
-					
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{Number | String}</span> <b>number</b>
-									
-								</dt>
-								<dd>number to operate on</dd>
-							
-								<dt>
-									<span class="light fixedFont">{Number}</span> <b>fractionDigits</b>
-									
-								</dt>
-								<dd>number of fraction digits to "leave"</dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-							<dl class="detailList">
-							<dt class="heading">Returns:</dt>
-							
-								<dd><span class="light fixedFont">{Number}</span> </dd>
-							
-							</dl>
-						
-						
-						
-
-					<hr />
-				
-					<a name=".wrapElement"> </a>
-					<div class="fixedFont">&lt;static&gt; 
-					
-					<span class="light">{HTMLElement}</span>
-					<span class="light">fabric.util.</span><b>wrapElement</b>(element, wrapper, attributes)
-					
-					</div>
-					<div class="description">
-						Wraps element with another element
-						
-							<br />
-							<i>Defined in: </i> <a href="../symbols/src/src_util_dom_misc.js.html">dom_misc.js</a>.
-						
-						
-					</div>
-					
-					
-					
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{HTMLElement}</span> <b>element</b>
-									
-								</dt>
-								<dd>Element to wrap</dd>
-							
-								<dt>
-									<span class="light fixedFont">{HTMLElement|<a href="../symbols/String.html">String</a>}</span> <b>wrapper</b>
-									
-								</dt>
-								<dd>Element to wrap with</dd>
-							
-								<dt>
-									<span class="light fixedFont">{Object}</span> <b>attributes</b>
-									<i>Optional</i>
-								</dt>
-								<dd>Attributes to set on a wrapper</dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-							<dl class="detailList">
-							<dt class="heading">Returns:</dt>
-							
-								<dd><span class="light fixedFont">{HTMLElement}</span> wrapper</dd>
-							
-							</dl>
-						
-						
-						
-
-					
-				
-			
-			
-<!-- ============================== event details ========================= -->		
-			
-			
-			<hr />
+	
+		<div class="sectionTitle">
+			Method Detail
 		</div>
+		
+			<a name=".addClass"> </a>
+			<div class="fixedFont">&lt;static&gt; 
+			
+			
+			<span class="light">fabric.util.</span><b>addClass</b>(element, className)
+			
+			</div>
+			<div class="description">
+				Adds class to an element
+				
+					<br />
+					<i>Defined in: </i> <a href="../symbols/src/src_util_dom_misc.js.html">dom_misc.js</a>.
+				
+				
+			</div>
+			
+			
+			
+				
+					<dl class="detailList">
+					<dt class="heading">Parameters:</dt>
+					
+						<dt>
+							<span class="light fixedFont">{HTMLElement}</span> <b>element</b>
+							
+						</dt>
+						<dd>Element to add class to</dd>
+					
+						<dt>
+							<span class="light fixedFont">{<a href="../symbols/String.html">String</a>}</span> <b>className</b>
+							
+						</dt>
+						<dd>Class to add to an element</dd>
+					
+					</dl>
+				
+				
+				
+				
+				
+				
+				
+
+			<hr />
+		
+			<a name=".addListener"> </a>
+			<div class="fixedFont">&lt;static&gt; 
+			
+			
+			<span class="light">fabric.util.</span><b>addListener</b>(element, eventName, handler)
+			
+			</div>
+			<div class="description">
+				Adds an event listener to an element
+				
+					<br />
+					<i>Defined in: </i> <a href="../symbols/src/src_util_dom_event.js.html">dom_event.js</a>.
+				
+				
+			</div>
+			
+			
+			
+				
+					<dl class="detailList">
+					<dt class="heading">Parameters:</dt>
+					
+						<dt>
+							<span class="light fixedFont">{HTMLElement}</span> <b>element</b>
+							
+						</dt>
+						<dd></dd>
+					
+						<dt>
+							<span class="light fixedFont">{<a href="../symbols/String.html">String</a>}</span> <b>eventName</b>
+							
+						</dt>
+						<dd></dd>
+					
+						<dt>
+							<span class="light fixedFont">{<a href="../symbols/Function.html">Function</a>}</span> <b>handler</b>
+							
+						</dt>
+						<dd></dd>
+					
+					</dl>
+				
+				
+				
+				
+				
+				
+				
+
+			<hr />
+		
+			<a name=".animate"> </a>
+			<div class="fixedFont">&lt;static&gt; 
+			
+			
+			<span class="light">fabric.util.</span><b>animate</b>(options)
+			
+			</div>
+			<div class="description">
+				Changes value from one to another within certain period of time, invoking callbacks as value is being changed.
+				
+				
+			</div>
+			
+			
+			
+				
+					<dl class="detailList">
+					<dt class="heading">Parameters:</dt>
+					
+						<dt>
+							<span class="light fixedFont">{Object}</span> <b>options</b>
+							<i>Optional</i>
+						</dt>
+						<dd>Animation options</dd>
+					
+						<dt>
+							<span class="light fixedFont">{<a href="../symbols/Function.html">Function</a>}</span> <b>options.onChange</b>
+							<i>Optional</i>
+						</dt>
+						<dd>Callback; invoked on every value change</dd>
+					
+						<dt>
+							<span class="light fixedFont">{<a href="../symbols/Function.html">Function</a>}</span> <b>options.onComplete</b>
+							<i>Optional</i>
+						</dt>
+						<dd>Callback; invoked when value change is completed</dd>
+					
+						<dt>
+							<span class="light fixedFont">{Number}</span> <b>options.startValue</b>
+							<i>Optional, Default: 0</i>
+						</dt>
+						<dd>Starting value</dd>
+					
+						<dt>
+							<span class="light fixedFont">{Number}</span> <b>options.endValue</b>
+							<i>Optional, Default: 100</i>
+						</dt>
+						<dd>Ending value</dd>
+					
+						<dt>
+							<span class="light fixedFont">{<a href="../symbols/Function.html">Function</a>}</span> <b>options.easing</b>
+							<i>Optional</i>
+						</dt>
+						<dd>Easing function</dd>
+					
+						<dt>
+							<span class="light fixedFont">{Number}</span> <b>options.duration</b>
+							<i>Optional, Default: 500</i>
+						</dt>
+						<dd>Duration of change</dd>
+					
+					</dl>
+				
+				
+				
+				
+				
+				
+				
+
+			<hr />
+		
+			<a name=".createClass"> </a>
+			<div class="fixedFont">&lt;static&gt; 
+			
+			
+			<span class="light">fabric.util.</span><b>createClass</b>()
+			
+			</div>
+			<div class="description">
+				Helper for creation of "classes"
+				
+					<br />
+					<i>Defined in: </i> <a href="../symbols/src/src_util_lang_class.js.html">lang_class.js</a>.
+				
+				
+			</div>
+			
+			
+			
+				
+				
+				
+				
+				
+				
+				
+
+			<hr />
+		
+			<a name=".degreesToRadians"> </a>
+			<div class="fixedFont">&lt;static&gt; 
+			
+			<span class="light">{Number}</span>
+			<span class="light">fabric.util.</span><b>degreesToRadians</b>(degrees)
+			
+			</div>
+			<div class="description">
+				Transforms degrees to radians.
+				
+				
+			</div>
+			
+			
+			
+				
+					<dl class="detailList">
+					<dt class="heading">Parameters:</dt>
+					
+						<dt>
+							<span class="light fixedFont">{Number}</span> <b>degrees</b>
+							
+						</dt>
+						<dd>value in degrees</dd>
+					
+					</dl>
+				
+				
+				
+				
+				
+					<dl class="detailList">
+					<dt class="heading">Returns:</dt>
+					
+						<dd><span class="light fixedFont">{Number}</span> value in radians</dd>
+					
+					</dl>
+				
+				
+				
+
+			<hr />
+		
+			<a name=".falseFunction"> </a>
+			<div class="fixedFont">&lt;static&gt; 
+			
+			<span class="light">{Boolean}</span>
+			<span class="light">fabric.util.</span><b>falseFunction</b>()
+			
+			</div>
+			<div class="description">
+				Function which always returns `false`.
+				
+				
+			</div>
+			
+			
+			
+				
+				
+				
+				
+				
+					<dl class="detailList">
+					<dt class="heading">Returns:</dt>
+					
+						<dd><span class="light fixedFont">{Boolean}</span> </dd>
+					
+					</dl>
+				
+				
+				
+
+			<hr />
+		
+			<a name=".getById"> </a>
+			<div class="fixedFont">&lt;static&gt; 
+			
+			<span class="light">{HTMLElement|null}</span>
+			<span class="light">fabric.util.</span><b>getById</b>(id)
+			
+			</div>
+			<div class="description">
+				Takes id and returns an element with that id (if one exists in a document)
+				
+					<br />
+					<i>Defined in: </i> <a href="../symbols/src/src_util_dom_misc.js.html">dom_misc.js</a>.
+				
+				
+			</div>
+			
+			
+			
+				
+					<dl class="detailList">
+					<dt class="heading">Parameters:</dt>
+					
+						<dt>
+							<span class="light fixedFont">{<a href="../symbols/String.html">String</a>|HTMLElement}</span> <b>id</b>
+							
+						</dt>
+						<dd></dd>
+					
+					</dl>
+				
+				
+				
+				
+				
+					<dl class="detailList">
+					<dt class="heading">Returns:</dt>
+					
+						<dd><span class="light fixedFont">{HTMLElement|null}</span> </dd>
+					
+					</dl>
+				
+				
+				
+
+			<hr />
+		
+			<a name=".getElementOffset"> </a>
+			<div class="fixedFont">&lt;static&gt; 
+			
+			<span class="light">{Object}</span>
+			<span class="light">fabric.util.</span><b>getElementOffset</b>(element)
+			
+			</div>
+			<div class="description">
+				Returns offset for a given element
+				
+					<br />
+					<i>Defined in: </i> <a href="../symbols/src/src_util_dom_misc.js.html">dom_misc.js</a>.
+				
+				
+			</div>
+			
+			
+			
+				
+					<dl class="detailList">
+					<dt class="heading">Parameters:</dt>
+					
+						<dt>
+							<span class="light fixedFont">{HTMLElement}</span> <b>element</b>
+							
+						</dt>
+						<dd>Element to get offset for</dd>
+					
+					</dl>
+				
+				
+				
+				
+				
+					<dl class="detailList">
+					<dt class="heading">Returns:</dt>
+					
+						<dd><span class="light fixedFont">{Object}</span> Object with "left" and "top" properties</dd>
+					
+					</dl>
+				
+				
+				
+
+			<hr />
+		
+			<a name=".getPointer"> </a>
+			<div class="fixedFont">&lt;static&gt; 
+			
+			
+			<span class="light">fabric.util.</span><b>getPointer</b>(event)
+			
+			</div>
+			<div class="description">
+				Cross-browser wrapper for getting event's coordinates
+				
+					<br />
+					<i>Defined in: </i> <a href="../symbols/src/src_util_dom_event.js.html">dom_event.js</a>.
+				
+				
+			</div>
+			
+			
+			
+				
+					<dl class="detailList">
+					<dt class="heading">Parameters:</dt>
+					
+						<dt>
+							<span class="light fixedFont">{Event}</span> <b>event</b>
+							
+						</dt>
+						<dd></dd>
+					
+					</dl>
+				
+				
+				
+				
+				
+				
+				
+
+			<hr />
+		
+			<a name=".getRandomInt"> </a>
+			<div class="fixedFont">&lt;static&gt; 
+			
+			<span class="light">{Number}</span>
+			<span class="light">fabric.util.</span><b>getRandomInt</b>(min, max)
+			
+			</div>
+			<div class="description">
+				Returns random number between 2 specified ones.
+				
+				
+			</div>
+			
+			
+			
+				
+					<dl class="detailList">
+					<dt class="heading">Parameters:</dt>
+					
+						<dt>
+							<span class="light fixedFont">{Number}</span> <b>min</b>
+							
+						</dt>
+						<dd>lower limit</dd>
+					
+						<dt>
+							<span class="light fixedFont">{Number}</span> <b>max</b>
+							
+						</dt>
+						<dd>upper limit</dd>
+					
+					</dl>
+				
+				
+				
+				
+				
+					<dl class="detailList">
+					<dt class="heading">Returns:</dt>
+					
+						<dd><span class="light fixedFont">{Number}</span> random value (between min and max)</dd>
+					
+					</dl>
+				
+				
+				
+
+			<hr />
+		
+			<a name=".getScript"> </a>
+			<div class="fixedFont">&lt;static&gt; 
+			
+			
+			<span class="light">fabric.util.</span><b>getScript</b>(url, callback)
+			
+			</div>
+			<div class="description">
+				Inserts a script element with a given url into a document; invokes callback, when that script is finished loading
+				
+					<br />
+					<i>Defined in: </i> <a href="../symbols/src/src_util_dom_misc.js.html">dom_misc.js</a>.
+				
+				
+			</div>
+			
+			
+			
+				
+					<dl class="detailList">
+					<dt class="heading">Parameters:</dt>
+					
+						<dt>
+							<span class="light fixedFont">{<a href="../symbols/String.html">String</a>}</span> <b>url</b>
+							
+						</dt>
+						<dd>URL of a script to load</dd>
+					
+						<dt>
+							<span class="light fixedFont">{<a href="../symbols/Function.html">Function</a>}</span> <b>callback</b>
+							
+						</dt>
+						<dd>Callback to execute when script is finished loading</dd>
+					
+					</dl>
+				
+				
+				
+				
+				
+				
+				
+
+			<hr />
+		
+			<a name=".makeElement"> </a>
+			<div class="fixedFont">&lt;static&gt; 
+			
+			<span class="light">{HTMLElement}</span>
+			<span class="light">fabric.util.</span><b>makeElement</b>(tagName, attributes)
+			
+			</div>
+			<div class="description">
+				Creates specified element with specified attributes
+				
+					<br />
+					<i>Defined in: </i> <a href="../symbols/src/src_util_dom_misc.js.html">dom_misc.js</a>.
+				
+				
+			</div>
+			
+			
+			
+				
+					<dl class="detailList">
+					<dt class="heading">Parameters:</dt>
+					
+						<dt>
+							<span class="light fixedFont">{<a href="../symbols/String.html">String</a>}</span> <b>tagName</b>
+							
+						</dt>
+						<dd>Type of an element to create</dd>
+					
+						<dt>
+							<span class="light fixedFont">{Object}</span> <b>attributes</b>
+							<i>Optional</i>
+						</dt>
+						<dd>Attributes to set on an element</dd>
+					
+					</dl>
+				
+				
+				
+				
+				
+					<dl class="detailList">
+					<dt class="heading">Returns:</dt>
+					
+						<dd><span class="light fixedFont">{HTMLElement}</span> Newly created element</dd>
+					
+					</dl>
+				
+				
+				
+
+			<hr />
+		
+			<a name=".makeElementUnselectable"> </a>
+			<div class="fixedFont">&lt;static&gt; 
+			
+			<span class="light">{HTMLElement}</span>
+			<span class="light">fabric.util.</span><b>makeElementUnselectable</b>(element)
+			
+			</div>
+			<div class="description">
+				Makes element unselectable
+				
+					<br />
+					<i>Defined in: </i> <a href="../symbols/src/src_util_dom_misc.js.html">dom_misc.js</a>.
+				
+				
+			</div>
+			
+			
+			
+				
+					<dl class="detailList">
+					<dt class="heading">Parameters:</dt>
+					
+						<dt>
+							<span class="light fixedFont">{HTMLElement}</span> <b>element</b>
+							
+						</dt>
+						<dd>Element to make unselectable</dd>
+					
+					</dl>
+				
+				
+				
+				
+				
+					<dl class="detailList">
+					<dt class="heading">Returns:</dt>
+					
+						<dd><span class="light fixedFont">{HTMLElement}</span> Element that was passed in</dd>
+					
+					</dl>
+				
+				
+				
+
+			<hr />
+		
+			<a name=".removeFromArray"> </a>
+			<div class="fixedFont">&lt;static&gt; 
+			
+			<span class="light">{<a href="../symbols/Array.html">Array</a>}</span>
+			<span class="light">fabric.util.</span><b>removeFromArray</b>(array, value)
+			
+			</div>
+			<div class="description">
+				Removes value from an array.
+Presence of value (and its position in an array) is determined via `Array.prototype.indexOf`
+				
+				
+			</div>
+			
+			
+			
+				
+					<dl class="detailList">
+					<dt class="heading">Parameters:</dt>
+					
+						<dt>
+							<span class="light fixedFont">{<a href="../symbols/Array.html">Array</a>}</span> <b>array</b>
+							
+						</dt>
+						<dd></dd>
+					
+						<dt>
+							<span class="light fixedFont">{Any}</span> <b>value</b>
+							
+						</dt>
+						<dd></dd>
+					
+					</dl>
+				
+				
+				
+				
+				
+					<dl class="detailList">
+					<dt class="heading">Returns:</dt>
+					
+						<dd><span class="light fixedFont">{<a href="../symbols/Array.html">Array</a>}</span> original array</dd>
+					
+					</dl>
+				
+				
+				
+
+			<hr />
+		
+			<a name=".removeListener"> </a>
+			<div class="fixedFont">&lt;static&gt; 
+			
+			
+			<span class="light">fabric.util.</span><b>removeListener</b>(element, eventName, handler)
+			
+			</div>
+			<div class="description">
+				Removes an event listener from an element
+				
+					<br />
+					<i>Defined in: </i> <a href="../symbols/src/src_util_dom_event.js.html">dom_event.js</a>.
+				
+				
+			</div>
+			
+			
+			
+				
+					<dl class="detailList">
+					<dt class="heading">Parameters:</dt>
+					
+						<dt>
+							<span class="light fixedFont">{HTMLElement}</span> <b>element</b>
+							
+						</dt>
+						<dd></dd>
+					
+						<dt>
+							<span class="light fixedFont">{<a href="../symbols/String.html">String</a>}</span> <b>eventName</b>
+							
+						</dt>
+						<dd></dd>
+					
+						<dt>
+							<span class="light fixedFont">{<a href="../symbols/Function.html">Function</a>}</span> <b>handler</b>
+							
+						</dt>
+						<dd></dd>
+					
+					</dl>
+				
+				
+				
+				
+				
+				
+				
+
+			<hr />
+		
+			<a name=".request"> </a>
+			<div class="fixedFont">&lt;static&gt; 
+			
+			<span class="light">{XMLHttpRequest}</span>
+			<span class="light">fabric.util.</span><b>request</b>(url, options)
+			
+			</div>
+			<div class="description">
+				Cross-browser abstraction for sending XMLHttpRequest
+				
+					<br />
+					<i>Defined in: </i> <a href="../symbols/src/src_util_dom_request.js.html">dom_request.js</a>.
+				
+				
+			</div>
+			
+			
+			
+				
+					<dl class="detailList">
+					<dt class="heading">Parameters:</dt>
+					
+						<dt>
+							<span class="light fixedFont">{<a href="../symbols/String.html">String</a>}</span> <b>url</b>
+							
+						</dt>
+						<dd>URL to send XMLHttpRequest to</dd>
+					
+						<dt>
+							<span class="light fixedFont">{Object}</span> <b>options</b>
+							<i>Optional</i>
+						</dt>
+						<dd>Options object</dd>
+					
+						<dt>
+							<span class="light fixedFont">{<a href="../symbols/String.html">String</a>}</span> <b>options.method</b>
+							<i>Optional, Default: "GET"</i>
+						</dt>
+						<dd></dd>
+					
+						<dt>
+							<span class="light fixedFont">{<a href="../symbols/Function.html">Function</a>}</span> <b>options.onComplete</b>
+							
+						</dt>
+						<dd>Callback to invoke when request is completed</dd>
+					
+					</dl>
+				
+				
+				
+				
+				
+					<dl class="detailList">
+					<dt class="heading">Returns:</dt>
+					
+						<dd><span class="light fixedFont">{XMLHttpRequest}</span> request</dd>
+					
+					</dl>
+				
+				
+				
+
+			<hr />
+		
+			<a name=".setStyle"> </a>
+			<div class="fixedFont">&lt;static&gt; 
+			
+			<span class="light">{HTMLElement}</span>
+			<span class="light">fabric.util.</span><b>setStyle</b>(element, styles)
+			
+			</div>
+			<div class="description">
+				Cross-browser wrapper for setting element's style
+				
+					<br />
+					<i>Defined in: </i> <a href="../symbols/src/src_util_dom_style.js.html">dom_style.js</a>.
+				
+				
+			</div>
+			
+			
+			
+				
+					<dl class="detailList">
+					<dt class="heading">Parameters:</dt>
+					
+						<dt>
+							<span class="light fixedFont">{HTMLElement}</span> <b>element</b>
+							
+						</dt>
+						<dd></dd>
+					
+						<dt>
+							<span class="light fixedFont">{Object}</span> <b>styles</b>
+							
+						</dt>
+						<dd></dd>
+					
+					</dl>
+				
+				
+				
+				
+				
+					<dl class="detailList">
+					<dt class="heading">Returns:</dt>
+					
+						<dd><span class="light fixedFont">{HTMLElement}</span> Element that was passed as a first argument</dd>
+					
+					</dl>
+				
+				
+				
+
+			<hr />
+		
+			<a name=".toArray"> </a>
+			<div class="fixedFont">&lt;static&gt; 
+			
+			<span class="light">{<a href="../symbols/Array.html">Array</a>}</span>
+			<span class="light">fabric.util.</span><b>toArray</b>(arrayLike)
+			
+			</div>
+			<div class="description">
+				Converts an array-like object (e.g. arguments or NodeList) to an array
+				
+					<br />
+					<i>Defined in: </i> <a href="../symbols/src/src_util_dom_misc.js.html">dom_misc.js</a>.
+				
+				
+			</div>
+			
+			
+			
+				
+					<dl class="detailList">
+					<dt class="heading">Parameters:</dt>
+					
+						<dt>
+							<span class="light fixedFont">{Object}</span> <b>arrayLike</b>
+							
+						</dt>
+						<dd></dd>
+					
+					</dl>
+				
+				
+				
+				
+				
+					<dl class="detailList">
+					<dt class="heading">Returns:</dt>
+					
+						<dd><span class="light fixedFont">{<a href="../symbols/Array.html">Array</a>}</span> </dd>
+					
+					</dl>
+				
+				
+				
+
+			<hr />
+		
+			<a name=".toFixed"> </a>
+			<div class="fixedFont">&lt;static&gt; 
+			
+			<span class="light">{Number}</span>
+			<span class="light">fabric.util.</span><b>toFixed</b>(number, fractionDigits)
+			
+			</div>
+			<div class="description">
+				A wrapper around Number#toFixed, which contrary to native method returns number, not string.
+				
+				
+			</div>
+			
+			
+			
+				
+					<dl class="detailList">
+					<dt class="heading">Parameters:</dt>
+					
+						<dt>
+							<span class="light fixedFont">{Number | String}</span> <b>number</b>
+							
+						</dt>
+						<dd>number to operate on</dd>
+					
+						<dt>
+							<span class="light fixedFont">{Number}</span> <b>fractionDigits</b>
+							
+						</dt>
+						<dd>number of fraction digits to "leave"</dd>
+					
+					</dl>
+				
+				
+				
+				
+				
+					<dl class="detailList">
+					<dt class="heading">Returns:</dt>
+					
+						<dd><span class="light fixedFont">{Number}</span> </dd>
+					
+					</dl>
+				
+				
+				
+
+			<hr />
+		
+			<a name=".wrapElement"> </a>
+			<div class="fixedFont">&lt;static&gt; 
+			
+			<span class="light">{HTMLElement}</span>
+			<span class="light">fabric.util.</span><b>wrapElement</b>(element, wrapper, attributes)
+			
+			</div>
+			<div class="description">
+				Wraps element with another element
+				
+					<br />
+					<i>Defined in: </i> <a href="../symbols/src/src_util_dom_misc.js.html">dom_misc.js</a>.
+				
+				
+			</div>
+			
+			
+			
+				
+					<dl class="detailList">
+					<dt class="heading">Parameters:</dt>
+					
+						<dt>
+							<span class="light fixedFont">{HTMLElement}</span> <b>element</b>
+							
+						</dt>
+						<dd>Element to wrap</dd>
+					
+						<dt>
+							<span class="light fixedFont">{HTMLElement|<a href="../symbols/String.html">String</a>}</span> <b>wrapper</b>
+							
+						</dt>
+						<dd>Element to wrap with</dd>
+					
+						<dt>
+							<span class="light fixedFont">{Object}</span> <b>attributes</b>
+							<i>Optional</i>
+						</dt>
+						<dd>Attributes to set on a wrapper</dd>
+					
+					</dl>
+				
+				
+				
+				
+				
+					<dl class="detailList">
+					<dt class="heading">Returns:</dt>
+					
+						<dd><span class="light fixedFont">{HTMLElement}</span> wrapper</dd>
+					
+					</dl>
+				
+				
+				
+
+			
+		
+	
+	
+<!-- ============================== event details ========================= -->		
+	
+	
+	<hr>
+</div>
 
 		
 <!-- ============================== footer ================================= -->
-		<div class="fineprint" style="clear:both">
-			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Tue Jun 28 2011 18:47:44 GMT-0400 (EDT)
-		</div>
-	</body>
-</html>
+<div class="fineprint" style="clear:both">
+	
+	Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Thu Sep 22 2011 12:31:24 GMT-0400 (EDT)
+</div>

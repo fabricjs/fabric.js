@@ -1,6 +1,6 @@
 ---
 layout: doc
-title: Fabric.js API Reference - fabric.util.array
+title: Fabric.js API Reference - fabric.Observable
 ---
 
 <style>
@@ -234,7 +234,7 @@ ul.inheritsList {
 <!-- ============================== class title ============================ -->
 	<h1 class="classTitle">
 		
-		Namespace fabric.util.array
+		Namespace fabric.Observable
 	</h1>
 
 <!-- ============================== class summary ========================== -->			
@@ -245,13 +245,13 @@ ul.inheritsList {
 		
 		
 		
-			<br /><i>Defined in: </i> <a href="../symbols/src/src_util_lang_array.js.html">lang_array.js</a>.
+			<br /><i>Defined in: </i> <a href="../symbols/src/src_observable.js.html">observable.js</a>.
 		
 	</p>
 
 <!-- ============================== constructor summary ==================== -->			
 	
-	<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class fabric.util.array.">
+	<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class fabric.Observable.">
 		<caption>Namespace Summary</caption>
 		<thead>
 			<tr>
@@ -264,7 +264,7 @@ ul.inheritsList {
 				<td class="attributes">&nbsp;</td>
 				<td class="nameDescription" >
 					<div class="fixedFont">
-						<b><a href="../symbols/fabric.util.array.html#constructor">fabric.util.array</a></b>
+						<b><a href="../symbols/fabric.Observable.html#constructor">fabric.Observable</a></b>
 					</div>
 					<div class="description"></div>
 				</td>
@@ -280,7 +280,7 @@ ul.inheritsList {
 	
 		
 		
-		<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class fabric.util.array.">
+		<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class fabric.Observable.">
 			<caption>Method Summary</caption>
 			<thead>
 				<tr>
@@ -293,27 +293,27 @@ ul.inheritsList {
 				<tr>
 					<td class="attributes">&lt;static&gt; &nbsp;</td>
 					<td class="nameDescription">
-						<div class="fixedFont">fabric.util.array.<b><a href="../symbols/fabric.util.array.html#.invoke">invoke</a></b>(array, method)
+						<div class="fixedFont">fabric.Observable.<b><a href="../symbols/fabric.Observable.html#.fire">fire</a></b>(eventName, memo)
 						</div>
-						<div class="description">Invokes method on all items in a given array</div>
+						<div class="description">Fires event with an optional memo object</div>
 					</td>
 				</tr>
 			
 				<tr>
 					<td class="attributes">&lt;static&gt; &nbsp;</td>
 					<td class="nameDescription">
-						<div class="fixedFont">fabric.util.array.<b><a href="../symbols/fabric.util.array.html#.max">max</a></b>(array, byProperty)
+						<div class="fixedFont">fabric.Observable.<b><a href="../symbols/fabric.Observable.html#.observe">observe</a></b>(eventName, handler)
 						</div>
-						<div class="description">Finds maximum value in array (not necessarily "first" one)</div>
+						<div class="description">Observes specified event</div>
 					</td>
 				</tr>
 			
 				<tr>
 					<td class="attributes">&lt;static&gt; &nbsp;</td>
 					<td class="nameDescription">
-						<div class="fixedFont">fabric.util.array.<b><a href="../symbols/fabric.util.array.html#.min">min</a></b>(array, byProperty)
+						<div class="fixedFont">fabric.Observable.<b><a href="../symbols/fabric.Observable.html#.stopObserving">stopObserving</a></b>(eventName, handler)
 						</div>
-						<div class="description">Finds minimum value in array (not necessarily "first" one)</div>
+						<div class="description">Stops event observing for a particular event handler</div>
 					</td>
 				</tr>
 			
@@ -334,7 +334,7 @@ ul.inheritsList {
 		</div>
 		
 		<div class="fixedFont">
-				<b>fabric.util.array</b>
+				<b>fabric.Observable</b>
 		</div>
 		
 		<div class="description">
@@ -365,15 +365,15 @@ ul.inheritsList {
 			Method Detail
 		</div>
 		
-			<a name=".invoke"> </a>
+			<a name=".fire"> </a>
 			<div class="fixedFont">&lt;static&gt; 
 			
 			
-			<span class="light">fabric.util.array.</span><b>invoke</b>(array, method)
+			<span class="light">fabric.Observable.</span><b>fire</b>(eventName, memo)
 			
 			</div>
 			<div class="description">
-				Invokes method on all items in a given array
+				Fires event with an optional memo object
 				
 				
 			</div>
@@ -385,16 +385,16 @@ ul.inheritsList {
 					<dt class="heading">Parameters:</dt>
 					
 						<dt>
-							<span class="light fixedFont">{<a href="../symbols/Array.html">Array</a>}</span> <b>array</b>
+							<span class="light fixedFont">{<a href="../symbols/String.html">String</a>}</span> <b>eventName</b>
 							
 						</dt>
-						<dd>Array to iterate over</dd>
+						<dd></dd>
 					
 						<dt>
-							<span class="light fixedFont">{<a href="../symbols/String.html">String</a>}</span> <b>method</b>
-							
+							<span class="light fixedFont">{Object}</span> <b>memo</b>
+							<i>Optional</i>
 						</dt>
-						<dd>Name of a method to invoke</dd>
+						<dd></dd>
 					
 					</dl>
 				
@@ -407,15 +407,15 @@ ul.inheritsList {
 
 			<hr />
 		
-			<a name=".max"> </a>
+			<a name=".observe"> </a>
 			<div class="fixedFont">&lt;static&gt; 
 			
 			
-			<span class="light">fabric.util.array.</span><b>max</b>(array, byProperty)
+			<span class="light">fabric.Observable.</span><b>observe</b>(eventName, handler)
 			
 			</div>
 			<div class="description">
-				Finds maximum value in array (not necessarily "first" one)
+				Observes specified event
 				
 				
 			</div>
@@ -427,13 +427,13 @@ ul.inheritsList {
 					<dt class="heading">Parameters:</dt>
 					
 						<dt>
-							<span class="light fixedFont">{<a href="../symbols/Array.html">Array</a>}</span> <b>array</b>
+							<span class="light fixedFont">{<a href="../symbols/String.html">String</a>}</span> <b>eventName</b>
 							
 						</dt>
-						<dd>Array to iterate over</dd>
+						<dd></dd>
 					
 						<dt>
-							<span class="light fixedFont">{<a href="../symbols/String.html">String</a>}</span> <b>byProperty</b>
+							<span class="light fixedFont">{<a href="../symbols/Function.html">Function</a>}</span> <b>handler</b>
 							
 						</dt>
 						<dd></dd>
@@ -449,15 +449,15 @@ ul.inheritsList {
 
 			<hr />
 		
-			<a name=".min"> </a>
+			<a name=".stopObserving"> </a>
 			<div class="fixedFont">&lt;static&gt; 
 			
 			
-			<span class="light">fabric.util.array.</span><b>min</b>(array, byProperty)
+			<span class="light">fabric.Observable.</span><b>stopObserving</b>(eventName, handler)
 			
 			</div>
 			<div class="description">
-				Finds minimum value in array (not necessarily "first" one)
+				Stops event observing for a particular event handler
 				
 				
 			</div>
@@ -469,13 +469,13 @@ ul.inheritsList {
 					<dt class="heading">Parameters:</dt>
 					
 						<dt>
-							<span class="light fixedFont">{<a href="../symbols/Array.html">Array</a>}</span> <b>array</b>
+							<span class="light fixedFont">{<a href="../symbols/String.html">String</a>}</span> <b>eventName</b>
 							
 						</dt>
-						<dd>Array to iterate over</dd>
+						<dd></dd>
 					
 						<dt>
-							<span class="light fixedFont">{<a href="../symbols/String.html">String</a>}</span> <b>byProperty</b>
+							<span class="light fixedFont">{<a href="../symbols/Function.html">Function</a>}</span> <b>handler</b>
 							
 						</dt>
 						<dd></dd>
@@ -503,5 +503,5 @@ ul.inheritsList {
 <!-- ============================== footer ================================= -->
 <div class="fineprint" style="clear:both">
 	
-	Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Thu Sep 22 2011 12:31:24 GMT-0400 (EDT)
+	Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Thu Sep 22 2011 12:31:23 GMT-0400 (EDT)
 </div>
