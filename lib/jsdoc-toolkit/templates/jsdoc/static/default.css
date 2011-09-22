@@ -1,8 +1,7 @@
 /* default.css */
-body
+#bd-wrapper
 {
 	font: 12px "Lucida Grande", Tahoma, Arial, Helvetica, sans-serif;
-	width: 800px;
 }
 
 .header
@@ -34,8 +33,7 @@ pre.code
 	border: 1px dashed #ccc;
 }
 
-#index
-{
+#index {
 	margin-top: 24px;
 	float: left;
 	width: 160px;
@@ -45,14 +43,12 @@ pre.code
 	padding: 8px;
 }
 
-#content
-{
+#content {
 	margin-left: 190px;
 	width: 600px;
 }
 
-.classList
-{
+.classList {
 	list-style-type: none;
 	padding: 0;
 	margin: 0 0 0 8px;
@@ -61,23 +57,20 @@ pre.code
 	overflow: auto;
 }
 
-.classList li
-{
+.classList li {
 	padding: 0;
 	margin: 0 0 8px 0;
 }
 
 .summaryTable { width: 100%; }
 
-h1.classTitle
-{
+h1.classTitle {
 	font-size:170%;
 	line-height:130%;
 }
 
 h2 { font-size: 110%; }
-caption, div.sectionTitle
-{
+caption, div.sectionTitle {
 	background-color: #7F8FB1;
 	color: #fff;
 	font-size:130%;
@@ -89,8 +82,7 @@ caption, div.sectionTitle
 div.sectionTitle { margin-bottom: 8px; }
 .summaryTable thead { display: none; }
 
-.summaryTable td
-{
+.summaryTable td {
 	vertical-align: top;
 	padding: 4px;
 	border-bottom: 1px #7F8FB1 solid;
@@ -98,30 +90,26 @@ div.sectionTitle { margin-bottom: 8px; }
 }
 
 /*col#summaryAttributes {}*/
-.summaryTable td.attributes
-{
+.summaryTable td.attributes {
 	border-left: 1px #7F8FB1 solid;
 	width: 140px;
 	text-align: right;
 }
 
-td.attributes, .fixedFont
-{
+td.attributes, .fixedFont {
 	line-height: 15px;
 	color: #002EBE;
 	font-family: "Courier New",Courier,monospace;
 	font-size: 13px;
 }
 
-.summaryTable td.nameDescription
-{
+.summaryTable td.nameDescription {
 	text-align: left;
 	font-size: 13px;
 	line-height: 15px;
 }
 
-.summaryTable td.nameDescription, .description
-{
+.summaryTable td.nameDescription, .description {
 	line-height: 15px;
 	padding: 4px;
 	padding-left: 4px;
@@ -129,8 +117,7 @@ td.attributes, .fixedFont
 
 .summaryTable { margin-bottom: 8px; }
 
-ul.inheritsList
-{
+ul.inheritsList {
 	list-style: square;
 	margin-left: 20px;
 	padding-left: 0;
@@ -142,21 +129,18 @@ ul.inheritsList
 }
 .detailList dt { margin-left: 20px; }
 
-.detailList .heading
-{
+.detailList .heading {
 	font-weight: bold;
 	padding-bottom: 6px;
 	margin-left: 0;
 }
 
-.light, td.attributes, .light a:link, .light a:visited
-{
+.light, td.attributes, .light a:link, .light a:visited {
 	color: #777;
 	font-style: italic;
 }
 
-.fineprint
-{
+.fineprint {
 	text-align: right;
 	font-size: 10px;
 }

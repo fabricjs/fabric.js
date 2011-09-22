@@ -16,4 +16,9 @@ else {
   fabric.window = fabric.document.createWindow();
 }
 
+/**
+ * True when in environment that supports touch events
+ * @property isTouchSupported
+ * @type boolean
+ */
 fabric.isTouchSupported = "ontouchstart" in fabric.document.documentElement;

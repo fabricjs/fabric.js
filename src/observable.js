@@ -1,7 +1,11 @@
+/**
+ * @namespace
+ */
 fabric.Observable = {
   
   /**
-   * @mthod observe
+   * Observes specified event
+   * @method observe
    * @param {String} eventName
    * @param {Function} handler
    */
@@ -24,8 +28,8 @@ fabric.Observable = {
   },
   
   /**
-   * @mthod stopObserving
-   * @memberOf fabric.util
+   * Stops event observing for a particular event handler
+   * @method stopObserving
    * @param {String} eventName
    * @param {Function} handler
    */
@@ -40,8 +44,7 @@ fabric.Observable = {
   
   /**
    * Fires event with an optional memo object
-   * @mthod fire
-   * @memberOf fabric.util
+   * @method fire
    * @param {String} eventName
    * @param {Object} [memo]
    */

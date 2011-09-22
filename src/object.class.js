@@ -22,6 +22,7 @@
   fabric.Object = fabric.util.createClass(/** @scope fabric.Object.prototype */ {
     
     /**
+     * Type of an object (rect, circle, path, etc)
      * @property
      * @type String
      */

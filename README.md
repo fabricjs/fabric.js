@@ -70,7 +70,7 @@ Fabric.js started as a foundation for design editor on [printio.ru](http://print
 
 4. Optionally, you can build documentation
 
-        $ java -jar lib/jsdoc-toolkit/jsrun.jar lib/jsdoc-toolkit/app/run.js -a -t=lib/jsdoc-toolkit/templates/jsdoc -d=docs fabric.js src/ src/util/
+        $ java -jar lib/jsdoc-toolkit/jsrun.jar lib/jsdoc-toolkit/app/run.js -a -t=lib/jsdoc-toolkit/templates/jsdoc -d=site/docs HEADER.js src/ src/util/
 
 ### Demos
 

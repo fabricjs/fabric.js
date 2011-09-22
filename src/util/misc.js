@@ -1,5 +1,8 @@
 (function() {
   
+  /**
+   * @namespace
+   */
   fabric.util = { };
   
   /**
