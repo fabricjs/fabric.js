@@ -31,7 +31,7 @@ function makeLine(coords) {
   });
 }
 
-var canvas = new fabric.Canvas('c');
+var canvas = new fabric.Canvas('c', { selection: false });
 
 var line = makeLine([ 250, 125, 250, 175 ]),
     line2 = makeLine([ 250, 175, 250, 250 ]),
