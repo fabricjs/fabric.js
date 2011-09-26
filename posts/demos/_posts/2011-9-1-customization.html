@@ -4,129 +4,94 @@ title: Customization
 ---
 
 <style>
-  .block { float: left; margin-right: 20px; width: 260px; height: 270px; }
+  .block { background: #eee; padding: 10px; margin-bottom: 10px }
+  pre { display: inline-block; background: #444; color: #eee; padding-left: 0; margin-left: 0; }
+  .canvas-container { background: #fff; margin-bottom: 10px; margin-right: 10px; border: 0; }
 </style>
+
+<script>
+  fabric.instances = [ ];
+</script>
 
 <div class="block">
   <h3>Custom selection style</h3>
   <canvas id="c1" width="200" height="200"></canvas>
+<script>
+(function(){
+  var canvas = new fabric.Canvas('c1');
+  canvas.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
+
+  canvas.selectionColor = 'rgba(0,255,0,0.3)';
+  canvas.selectionBorderColor = 'red';
+  canvas.selectionLineWidth = 5;
+fabric.instances.push(canvas)})();
+</script>
 </div>
 
 <div class="block">
   <h3>Custom borders, controls</h3>
   <canvas id="c3" width="200" height="200"></canvas>
+<script>
+(function(){
+  var canvas = new fabric.Canvas('c3');
+  canvas.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
+
+  canvas.item(0).set({
+    borderColor: 'red',
+    cornerColor: 'green',
+    cornersize: 6
+  });
+  canvas.setActiveObject(canvas.item(0));
+fabric.instances.push(canvas)})();
+</script>
 </div>
 
 <div class="block">
   <h3>No borders</h3>
   <canvas id="c15" width="200" height="200"></canvas>
+<script>
+(function(){
+  var canvas = new fabric.Canvas('c15');
+  canvas.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
+  canvas.item(0).hasBorders = false;
+  canvas.setActiveObject(canvas.item(0));
+fabric.instances.push(canvas)})();
+</script>
 </div>
 
 <div class="block">
   <h3>No controls</h3>
   <canvas id="c16" width="200" height="200"></canvas>
+<script>
+(function(){
+  var canvas = new fabric.Canvas('c16');
+  canvas.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
+  canvas.item(0).hasControls = false;
+  canvas.setActiveObject(canvas.item(0));
+fabric.instances.push(canvas)})();
+</script>
 </div>
 
 <div class="block">
   <h3>No borders, no controls</h3>
   <canvas id="c10" width="200" height="200"></canvas>
-</div>
-
-<div class="block">
-  <h3>Custom cursor on object hover</h3>
-  <canvas id="c11" width="200" height="200"></canvas>
-</div>
-
-<div class="block">
-  <h3>Modification on move</h3>
-  <canvas id="c12" width="200" height="200"></canvas>
-</div>
-
-<div class="block">
-  <h3>Unselectable canvas</h3>
-  <canvas id="c2" width="200" height="200"></canvas>
-</div>
-
-<div class="block">
-  <h3>Unselectable object</h3>
-  <canvas id="c4" width="200" height="200"></canvas>
-</div>
-
-<div class="block">
-  <h3>Custom background</h3>
-  <canvas id="c5" width="200" height="200"></canvas>
-</div>
-
-<div class="block">
-  <h3>Custom background image</h3>
-  <canvas id="c17" width="200" height="200"></canvas>
-</div>
-
-<div class="block">
-  <h3>Overlay image</h3>
-  <canvas id="c13" width="200" height="200"></canvas>
-</div>
-
-<div class="block">
-  <h3>Locked object rotation</h3>
-  <canvas id="c6" width="200" height="200"></canvas>
-</div>
-
-<div class="block">
-  <h3>Locked object scaling</h3>
-  <canvas id="c7" width="200" height="200"></canvas>
-</div>
-
-<div class="block">
-  <h3>Locked X movement</h3>
-  <canvas id="c8" width="200" height="200"></canvas>
-</div>
-
-<div class="block">
-  <h3>Locked Y movement</h3>
-  <canvas id="c9" width="200" height="200"></canvas>
-</div>
-
-<div class="block">
-  <h3>Making objects grayscale</h3>
-  <canvas id="c14" width="200" height="200"></canvas>
-</div>
-
 <script>
-  var canvas1 = new fabric.Canvas('c1');
-  canvas1.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
-  
-  canvas1.selectionColor = 'rgba(0,255,0,0.3)';
-  canvas1.selectionBorderColor = 'red';
-  canvas1.selectionLineWidth = 5;
+(function(){
+  var canvas = new fabric.Canvas('c10');
+  canvas.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
+  canvas.item(0).hasControls = canvas.item(0).hasBorders = false;
 
-  var canvas2 = new fabric.Canvas('c2');
-  canvas2.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
-  canvas2.selection = false;
-  
-  var canvas3 = new fabric.Canvas('c3');
-  canvas3.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
-  
-  canvas3.item(0).borderColor = 'red';
-  canvas3.item(0).cornerColor = 'green';
-  canvas3.item(0).cornersize = 6;
-  canvas3.setActiveObject(canvas3.item(0));
-  
-  var canvas10 = new fabric.Canvas('c10');
-  canvas10.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
-  canvas10.item(0).hasControls = canvas10.item(0).hasBorders = false;
-  
-  canvas10.observe({
+  canvas.observe({
     'mouse:down': function(e) {
       if (e.memo.target) {
         e.memo.target.opacity = 0.5;
-        canvas10.renderAll();
+        canvas.renderAll();
       }
     },
     'mouse:up': function(e) {
       if (e.memo.target) {
         e.memo.target.opacity = 1;
-        canvas10.renderAll();
+        canvas.renderAll();
       }
     },
     'object:moved': function(e) {
@@ -136,18 +101,34 @@ title: Customization
       e.memo.target.opacity = 1;
     }
   });
-  
-  var canvas11 = new fabric.Canvas('c11');
-  canvas11.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
-  canvas11.HOVER_CURSOR = 'pointer';
-  
-  var canvas12 = new fabric.Canvas('c12');
-  canvas12.add(new fabric.Rect({ left: 110, top: 110, fill: '#f0f', width: 50, height: 50 }));
-  canvas12.add(new fabric.Rect({ left: 50, top: 50, fill: '#77f', width: 40, height: 40 }));
-  
-  canvas12.forEachObject(function(o){ o.borderColor = o.cornerColor = 'rgba(0,0,0,0)'; });
-  
-  canvas12.HOVER_CURSOR = 'pointer';
+fabric.instances.push(canvas)})();
+</script>
+</div>
+
+<div class="block">
+  <h3>Custom cursor on object hover</h3>
+  <canvas id="c11" width="200" height="200"></canvas>
+<script>
+(function(){
+  var canvas = new fabric.Canvas('c11');
+  canvas.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
+  canvas.HOVER_CURSOR = 'pointer';
+fabric.instances.push(canvas)})();
+</script>
+</div>
+
+<div class="block">
+  <h3>Modification on move</h3>
+  <canvas id="c12" width="200" height="200"></canvas>
+<script>
+(function(){
+  var canvas = new fabric.Canvas('c12');
+  canvas.add(new fabric.Rect({ left: 110, top: 110, fill: '#f0f', width: 50, height: 50 }));
+  canvas.add(new fabric.Rect({ left: 50, top: 50, fill: '#77f', width: 40, height: 40 }));
+
+  canvas.forEachObject(function(o){ o.hasBorder = o.hasControls = false; });
+
+  canvas.HOVER_CURSOR = 'pointer';
   
   function animate(e, dir) {
     if (e.memo.target) {
@@ -157,7 +138,7 @@ title: Customization
         duration: 100,
         onChange: function(value) {
           e.memo.target.setAngle(value);
-          canvas12.renderAll();
+          canvas.renderAll();
         },
         onComplete: function() {
           e.memo.target.setCoords();
@@ -169,7 +150,7 @@ title: Customization
         duration: 100,
         onChange: function(value) {
           e.memo.target.scale(value);
-          canvas12.renderAll();
+          canvas.renderAll();
         },
         onComplete: function() {
           e.memo.target.setCoords();
@@ -177,67 +158,164 @@ title: Customization
       });
     }
   }
-  canvas12.observe('mouse:down', function(e) { animate(e, 1); });
-  canvas12.observe('mouse:up', function(e) { animate(e, 0); });
-  
-  var canvas13 = new fabric.Canvas('c13');
-  canvas13.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
-  canvas13.setOverlayImage('../assets/jail_cell_bars.png', canvas13.renderAll.bind(canvas13));
-  
-  var canvas4 = new fabric.Canvas('c4');
-  canvas4.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
-  canvas4.add(new fabric.Rect({ left: 50, top: 50, fill: 'green', width: 30, height: 30 }));
-  canvas4.add(new fabric.Rect({ left: 150, top: 50, fill: 'green', width: 30, height: 30 }));
-  canvas4.add(new fabric.Rect({ left: 150, top: 150, fill: 'green', width: 30, height: 30 }));
-  canvas4.add(new fabric.Rect({ left: 50, top: 150, fill: 'green', width: 30, height: 30 }));
-  
-  canvas4.item(0).selectable = false;
-  
-  var canvas5 = new fabric.Canvas('c5');
-  canvas5.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
-  canvas5.backgroundColor = 'rgba(0,0,255,0.3)';
-  canvas5.renderAll();
-  
-  var canvas6 = new fabric.Canvas('c6');
-  canvas6.add(new fabric.Rect({ width: 50, height: 50, fill: '#77f', top: 100, left: 100 }));
-  canvas6.item(0).lockRotation = true;
-  
-  var canvas7 = new fabric.Canvas('c7');
-  canvas7.add(new fabric.Rect({ width: 50, height: 50, fill: '#77f', top: 100, left: 100 }));
-  canvas7.item(0).lockScalingX = canvas7.item(0).lockScalingY = true;
-  
-  var canvas8 = new fabric.Canvas('c8');
-  canvas8.add(new fabric.Rect({ width: 50, height: 50, fill: '#77f', top: 100, left: 100 }));
-  canvas8.item(0).lockMovementX = true;
-  
-  var canvas9 = new fabric.Canvas('c9');
-  canvas9.add(new fabric.Rect({ width: 50, height: 50, fill: '#77f', top: 100, left: 100 }));
-  canvas9.item(0).lockMovementY = true;
-  
-  var canvas14 = new fabric.Canvas('c14');
+  canvas.observe('mouse:down', function(e) { animate(e, 1); });
+  canvas.observe('mouse:up', function(e) { animate(e, 0); });
+fabric.instances.push(canvas)})();
+</script>
+</div>
+
+<div class="block">
+  <h3>No group selection</h3>
+  <canvas id="c2" width="200" height="200"></canvas>
+<script>
+(function(){
+  var canvas = new fabric.Canvas('c2');
+  canvas.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
+  canvas.selection = false;
+fabric.instances.push(canvas)})();
+</script>
+</div>
+
+<div class="block">
+  <h3>Unselectable object</h3>
+  <canvas id="c4" width="200" height="200"></canvas>
+<script>
+(function(){
+  var canvas = new fabric.Canvas('c4');
+  canvas.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
+  canvas.add(new fabric.Rect({ left: 50, top: 50, fill: 'green', width: 30, height: 30 }));
+  canvas.add(new fabric.Rect({ left: 150, top: 50, fill: 'green', width: 30, height: 30 }));
+  canvas.add(new fabric.Rect({ left: 150, top: 150, fill: 'green', width: 30, height: 30 }));
+  canvas.add(new fabric.Rect({ left: 50, top: 150, fill: 'green', width: 30, height: 30 }));
+
+  canvas.item(0).selectable = false;
+fabric.instances.push(canvas)})();
+</script>
+</div>
+
+<div class="block">
+  <h3>Custom background color</h3>
+  <canvas id="c5" width="200" height="200"></canvas>
+<script>
+(function(){
+  var canvas = new fabric.Canvas('c5');
+  canvas.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
+  canvas.backgroundColor = 'rgba(0,0,255,0.3)';
+  canvas.renderAll();
+fabric.instances.push(canvas)})();
+</script>
+</div>
+
+<div class="block">
+  <h3>Custom background image</h3>
+  <canvas id="c17" width="200" height="200"></canvas>
+<script>
+(function(){
+  var canvas = new fabric.Canvas('c17');
+  canvas.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
+  canvas.setBackgroundImage('../assets/pug.jpg', canvas.renderAll.bind(canvas));
+fabric.instances.push(canvas)})();
+</script>
+</div>
+
+<div class="block">
+  <h3>Overlay image</h3>
+  <canvas id="c13" width="200" height="200"></canvas>
+<script>
+(function(){
+  var canvas = new fabric.Canvas('c13');
+  canvas.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
+  canvas.setOverlayImage('../assets/jail_cell_bars.png', canvas.renderAll.bind(canvas));
+fabric.instances.push(canvas)})();
+</script>
+</div>
+
+<div class="block">
+  <h3>Locked object rotation</h3>
+  <canvas id="c6" width="200" height="200"></canvas>
+<script>
+(function(){
+  var canvas = new fabric.Canvas('c6');
+  canvas.add(new fabric.Rect({ width: 50, height: 50, fill: '#77f', top: 100, left: 100 }));
+  canvas.item(0).lockRotation = true;
+fabric.instances.push(canvas)})();
+</script>
+</div>
+
+<div class="block">
+  <h3>Locked object scaling</h3>
+  <canvas id="c7" width="200" height="200"></canvas>
+<script>
+(function(){
+  var canvas = new fabric.Canvas('c7');
+  canvas.add(new fabric.Rect({ width: 50, height: 50, fill: '#77f', top: 100, left: 100 }));
+  canvas.item(0).lockScalingX = canvas.item(0).lockScalingY = true;
+fabric.instances.push(canvas)})();
+</script>
+</div>
+
+<div class="block">
+  <h3>Locked X movement</h3>
+  <canvas id="c8" width="200" height="200"></canvas>
+<script>
+(function(){
+  var canvas = new fabric.Canvas('c8');
+  canvas.add(new fabric.Rect({ width: 50, height: 50, fill: '#77f', top: 100, left: 100 }));
+  canvas.item(0).lockMovementX = true;
+fabric.instances.push(canvas)})();
+</script>
+</div>
+
+<div class="block">
+  <h3>Locked Y movement</h3>
+  <canvas id="c9" width="200" height="200"></canvas>
+<script>
+(function(){
+  var canvas = new fabric.Canvas('c9');
+  canvas.add(new fabric.Rect({ width: 50, height: 50, fill: '#77f', top: 100, left: 100 }));
+  canvas.item(0).lockMovementY = true;
+fabric.instances.push(canvas)})();
+</script>
+</div>
+
+<div class="block">
+  <h3>Making objects grayscale</h3>
+  <canvas id="c14" width="200" height="200"></canvas>
+<script>
+(function(){
+  var canvas = new fabric.Canvas('c14');
   fabric.Image.fromURL('../assets/pug.jpg', function(obj) {
-    canvas14.add(obj.scale(0.1).rotate(-15).set({ left: 80, top: 95 }));
-    canvas14.add(new fabric.Rect({ width: 50, height: 40, fill: '#77f', top: 75, left: 160 }))
-    canvas14.add(new fabric.Circle({ radius: 20, fill: '#f55', top: 170, left: 150 }));
-    
-    function callback(){ canvas14.renderAll() }
-    
-    canvas14.item(0).toGrayscale(callback);
-    canvas14.item(1).toGrayscale(callback);
-    canvas14.item(2).toGrayscale(callback);
+
+    canvas.add(obj.scale(0.1).rotate(-15).set({ left: 80, top: 95 }));
+    canvas.add(new fabric.Rect({ width: 50, height: 40, fill: '#77f', top: 75, left: 160 }))
+    canvas.add(new fabric.Circle({ radius: 20, fill: '#f55', top: 170, left: 150 }));
+
+    function callback(){ canvas.renderAll() }
+
+    canvas.item(0).toGrayscale(callback);
+    canvas.item(1).toGrayscale(callback);
+    canvas.item(2).toGrayscale(callback);
   });
-  
-  var canvas15 = new fabric.Canvas('c15');
-  canvas15.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
-  canvas15.item(0).hasBorders = false;
-  canvas15.setActiveObject(canvas15.item(0));
-  
-  var canvas16 = new fabric.Canvas('c16');
-  canvas16.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
-  canvas16.item(0).hasControls = false;
-  canvas16.setActiveObject(canvas16.item(0));
-  
-  var canvas17 = new fabric.Canvas('c17');
-  canvas17.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
-  canvas17.setBackgroundImage('../assets/pug.jpg', canvas17.renderAll.bind(canvas17));
+fabric.instances.push(canvas)})();
+</script>
+</div>
+
+<script>
+  (function() {
+    var scriptEls = document.getElementsByTagName('script');
+    for (var i = 0, len = scriptEls.length; i < len; i++) {
+      if (scriptEls[i].parentNode.className === 'block') {
+        var preEl = document.createElement('pre');
+        preEl.innerHTML = scriptEls[i].innerHTML
+          .replace(/^\n*\(function\(\){\n/g, '')
+          .replace(/(fabric\.instances\.push\(canvas\))?\}\)\(\);\n*$/g, '');
+          
+        scriptEls[i].parentNode.appendChild(preEl);
+        
+        for (var i = fabric.instances.length; i--; ) {
+          fabric.instances[i].calcOffset();
+        }
+      }
+    }
+  })();
 </script>
