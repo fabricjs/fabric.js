@@ -246,7 +246,7 @@
       replacement.onload = function() {
         _this.setElement(replacement);
         callback && callback();
-        replacement.onload = canvasEl = imgEl = imageData = null;
+        replacement.onload = canvasEl = imgEl = null;
       };
       replacement.width = imgEl.width;
       replacement.height = imgEl.height;
