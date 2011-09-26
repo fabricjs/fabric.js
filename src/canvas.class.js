@@ -135,7 +135,7 @@
     backgroundImage:        '',
     
     /**
-     * Indicates whether object selection should be enabled
+     * Indicates whether group selection should be enabled
      * @property
      * @type Boolean
      */
@@ -1442,7 +1442,7 @@
           break;
         }
       }
-      if (this.selection && target && target.selectable) {
+      if (target && target.selectable) {
         return target;
       }
     },

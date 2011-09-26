@@ -16,6 +16,11 @@ else {
   fabric.window = fabric.document.createWindow();
 }
 
+/**
+ * True when in environment that supports touch events
+ * @property isTouchSupported
+ * @type boolean
+ */
 fabric.isTouchSupported = "ontouchstart" in fabric.document.documentElement;
 /*
     http://www.JSON.org/json2.js
@@ -1673,10 +1678,14 @@ if (typeof console !== 'undefined') {
   }
 }
 
+/**
+ * @namespace
+ */
 fabric.Observable = {
   
   /**
-   * @mthod observe
+   * Observes specified event
+   * @method observe
    * @param {String} eventName
    * @param {Function} handler
    */
@@ -1699,8 +1708,8 @@ fabric.Observable = {
   },
   
   /**
-   * @mthod stopObserving
-   * @memberOf fabric.util
+   * Stops event observing for a particular event handler
+   * @method stopObserving
    * @param {String} eventName
    * @param {Function} handler
    */
@@ -1715,8 +1724,7 @@ fabric.Observable = {
   
   /**
    * Fires event with an optional memo object
-   * @mthod fire
-   * @memberOf fabric.util
+   * @method fire
    * @param {String} eventName
    * @param {Object} [memo]
    */
@@ -1734,6 +1742,9 @@ fabric.Observable = {
 };
 (function() {
   
+  /**
+   * @namespace
+   */
   fabric.util = { };
   
   /**
@@ -4405,7 +4416,7 @@ fabric.util.string = {
     backgroundImage:        '',
     
     /**
-     * Indicates whether object selection should be enabled
+     * Indicates whether group selection should be enabled
      * @property
      * @type Boolean
      */
@@ -5712,7 +5723,7 @@ fabric.util.string = {
           break;
         }
       }
-      if (this.selection && target && target.selectable) {
+      if (target && target.selectable) {
         return target;
       }
     },
@@ -6717,6 +6728,7 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
   fabric.Object = fabric.util.createClass(/** @scope fabric.Object.prototype */ {
     
     /**
+     * Type of an object (rect, circle, path, etc)
      * @property
      * @type String
      */
@@ -10630,7 +10642,7 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
       replacement.onload = function() {
         _this.setElement(replacement);
         callback && callback();
-        replacement.onload = canvasEl = imgEl = imageData = null;
+        replacement.onload = canvasEl = imgEl = null;
       };
       replacement.width = imgEl.width;
       replacement.height = imgEl.height;
