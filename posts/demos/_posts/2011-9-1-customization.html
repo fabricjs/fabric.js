@@ -311,11 +311,11 @@ fabric.instances.push(canvas)})();
           .replace(/(fabric\.instances\.push\(canvas\))?\}\)\(\);\n*$/g, '');
           
         scriptEls[i].parentNode.appendChild(preEl);
-        
-        // for (var i = fabric.instances.length; i--; ) {
-        //           fabric.instances[i].calcOffset();
-        //         }
       }
+    }
+    
+    for (var i = fabric.instances.length; i--; ) {
+      fabric.instances[i].calcOffset();
     }
   })();
 </script>
