@@ -1,0 +1,80 @@
+---
+layout: demo
+title: Standalone Controls
+---
+
+<style>
+  .controls { display: inline-block; background: #fafafa; margin-left: 10px; padding: 15px; border-left: 1px dotted #aaa; height: 270px }
+  .canvas-container { display: inline-block; vertical-align: top; }
+  canvas { border: 1px solid #eee !important }
+  label span { width: 50px; display: inline-block }
+  *[type=range] { position: relative; top: 4px }
+  p:first-child { margin-top: 0 }
+  p:last-child { margin-bottom: 0 }
+</style>
+
+<canvas id="c" width="300" height="300" style="border:1px solid #ccc"></canvas>
+<div class="controls">
+  <p>
+    <label><span>Angle:</span> <input type="range" id="angle-control" value="0" min="0" max="180"></label>
+  </p>
+  <p>
+    <label><span>Left:</span> <input type="range" id="left-control" value="150" min="0" max="300"></label>
+  </p>
+  <p>
+    <label><span>Top:</span> <input type="range" id="top-control" value="150" min="0" max="300"></label>
+  </p>
+  <p>
+    <label><span>Scale:</span> <input type="range" id="scale-control" value="1" min="0.1" max="3" step="0.1"></label>
+  </p>
+</div>
+
+<script id="main">var canvas = new fabric.Canvas('c');
+
+var $ = function(id){return document.getElementById(id)};
+
+var rect = new fabric.Rect({ 
+  width: 100, 
+  height: 100, 
+  top: 150, 
+  left: 150, 
+  fill: 'rgba(255,0,0,0.5)' 
+});
+
+canvas.add(rect);
+
+var angleControl = $('angle-control');
+angleControl.onchange = function() {
+  rect.setAngle(this.value).setCoords();
+  canvas.renderAll();
+};
+
+var scaleControl = $('scale-control');
+scaleControl.onchange = function() {
+  rect.scale(this.value).setCoords();
+  canvas.renderAll();
+};
+
+var topControl = $('top-control');
+topControl.onchange = function() {
+  rect.setTop(this.value).setCoords();
+  canvas.renderAll();
+};
+
+var leftControl = $('left-control');
+leftControl.onchange = function() {
+  rect.setLeft(this.value).setCoords();
+  canvas.renderAll();
+};
+
+function updateControls() {
+  scaleControl.value = rect.getScaleX();
+  angleControl.value = rect.getAngle();
+  leftControl.value = rect.getLeft();
+  topControl.value = rect.getTop();
+}
+canvas.observe({ 
+  'object:modified': updateControls, 
+  'object:moving': updateControls
+});
+</script>
