@@ -970,14 +970,30 @@
           
           if (!e.shiftKey) {
             this._rotateObject(x, y);
+            
+            this.fire('object:rotating', {
+              target: this._currentTransform.target
+            });
           }
+          
           this._scaleObject(x, y);
+          this.fire('object:scaling', {
+            target: this._currentTransform.target
+          });
         }
         else if (this._currentTransform.action === 'scaleX') {
           this._scaleObject(x, y, 'x');
+          
+          this.fire('object:scaling', {
+            target: this._currentTransform.target
+          });
         }
         else if (this._currentTransform.action === 'scaleY') {
           this._scaleObject(x, y, 'y');
+          
+          this.fire('object:scaling', {
+            target: this._currentTransform.target
+          });
         }
         else {
           this._translateObject(x, y);
