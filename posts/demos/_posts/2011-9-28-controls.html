@@ -16,7 +16,7 @@ title: Standalone Controls
 <canvas id="c" width="300" height="300" style="border:1px solid #ccc"></canvas>
 <div class="controls">
   <p>
-    <label><span>Angle:</span> <input type="range" id="angle-control" value="0" min="0" max="180"></label>
+    <label><span>Angle:</span> <input type="range" id="angle-control" value="0" min="-90" max="90"></label>
   </p>
   <p>
     <label><span>Left:</span> <input type="range" id="left-control" value="150" min="0" max="300"></label>
@@ -74,7 +74,8 @@ function updateControls() {
   topControl.value = rect.getTop();
 }
 canvas.observe({ 
-  'object:modified': updateControls, 
-  'object:moving': updateControls
+  'object:moving': updateControls,
+  'object:scaling': updateControls,
+  'object:resizing': updateControls
 });
 </script>
