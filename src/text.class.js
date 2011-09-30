@@ -130,6 +130,7 @@
       this.stateProperties.push(
         'fontFamily', 
         'fontWeight', 
+        'fontSize', 
         'path', 
         'text', 
         'textDecoration', 
