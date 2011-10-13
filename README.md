@@ -75,8 +75,8 @@ Fabric.js started as a foundation for design editor on [printio.ru](http://print
 ### Demos
 
 - [Demos](http://kangax.github.com/fabric.js/demos/)
-- [Kitchensink demo](http://kangax.github.com/fabric.js/demos/kitchensink)
-- [Benchmarks](http://kangax.github.com/fabric.js/benchmarks)
+- [Kitchensink demo](http://kangax.github.com/fabric.js/kitchensink/)
+- [Benchmarks](http://kangax.github.com/fabric.js/benchmarks/)
 
 ### Documentation
 
