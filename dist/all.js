@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2011, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.6.1" };
+var fabric = fabric || { version: "0.6.2" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -971,7 +971,6 @@ var Cufon = (function() {
   var replaceHistory = [];
   
   var engines = {}, fonts = {}, defaultOptions = {
-    enableTextDecoration: false,
     engine: null,
     //fontScale: 1,
     //fontScaling: false,
@@ -1277,7 +1276,7 @@ Cufon.registerEngine('canvas', (function() {
       g.stroke();
     }
 
-    var textDecoration = options.enableTextDecoration ? Cufon.CSS.textDecoration(el, style) : {},
+    var textDecoration = Cufon.getTextDecoration(options),
         isItalic = options.fontStyle === 'italic';
     
     function renderBackground() {
@@ -1563,7 +1562,7 @@ Cufon.registerEngine('vml', (function() {
     
     wStyle.height = size.convert(font.height) + 'px';
     
-    var textDecoration = options.enableTextDecoration ? Cufon.CSS.textDecoration(el, style) : {};
+    var textDecoration = Cufon.getTextDecoration(options);
     
     var color = style.get('color');
     
@@ -1647,6 +1646,14 @@ Cufon.registerEngine('vml', (function() {
   };
   
 })());
+
+Cufon.getTextDecoration = function(options) {
+  return {
+    underline: options.textDecoration === 'underline',
+    overline: options.textDecoration === 'overline',
+    'line-through': options.textDecoration === 'line-through'
+  };
+};
 
 if (typeof exports != 'undefined') {
   exports.Cufon = Cufon;
@@ -10975,6 +10982,7 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
       this.stateProperties.push(
         'fontFamily', 
         'fontWeight', 
+        'fontSize', 
         'path', 
         'text', 
         'textDecoration', 
@@ -11022,7 +11030,6 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
       Cufon.replaceElement(el, {
         separate: 'none', 
         fontFamily: this.fontFamily,
-        enableTextDecoration: true,
         textDecoration: this.textDecoration,
         textShadow: this.textShadow,
         textAlign: this.textAlign,
