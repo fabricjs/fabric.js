@@ -91,6 +91,7 @@ These are the optional modules that could be specified for inclusion, when build
 - **text** — Adds support for `fabric.Text`
 - **serialization** — Adds support for `loadFromJSON`, `loadFromDatalessJSON`, and `clone` methods on `fabric.Canvas`
 - **parser** — Adds support for `fabric.parseSVGDocument`, `fabric.loadSVGFromURL`, and `fabric.loadSVGFromString`
+- **image_filters** — Adds support for image filters, such as grayscale of white removal.
 - **node** — Adds support for running fabric under node.js, with help of [jsdom](https://github.com/tmpvar/jsdom) and [node-canvas](https://github.com/learnboost/node-canvas) libraries.
 
 ### Examples of use

@@ -62,7 +62,12 @@
      */
     type: 'image',
     
-    __isGrayscaled: false,
+    /**
+     * Filters to be applied to an image (when calling `applyFilters`)
+     * @property
+     * @type Array
+     */
+    filters: [ ],
     
     /**
      * Constructor
@@ -72,6 +77,7 @@
     initialize: function(element, options) {
       this.callSuper('initialize', options);
       this._initElement(element);
+      this._originalImage = this.getElement();
       this._initConfig(options || { });
     },
     
@@ -221,17 +227,13 @@
     },
     
     /**
-     * Makes image grayscale
-     * @mthod toGrayscale
-     * @param {Function} callback
+     * Applies filters assigned to this image (from "filters" array)
+     * @mthod applyFilters
+     * @param {Function} callback Callback is invoked when all filters have been applied and new image is generated
      */
-    toGrayscale: function(callback) {
+    applyFilters: function(callback) {
       
-      if (this.__isGrayscaled) {
-        return;
-      }
-      
-      var imgEl = this.getElement(),
+      var imgEl = this._originalImage,
           canvasEl = fabric.document.createElement('canvas'),
           replacement = fabric.document.createElement('img'),
           _this = this;
@@ -240,7 +242,10 @@
       canvasEl.height = imgEl.height;
 
       canvasEl.getContext('2d').drawImage(imgEl, 0, 0);
-      fabric.Canvas.toGrayscale(canvasEl);
+      
+      this.filters.forEach(function(filter) { 
+        filter.applyTo(canvasEl);
+      });
       
       /** @ignore */
       replacement.onload = function() {
@@ -252,8 +257,6 @@
       replacement.height = imgEl.height;
       
       replacement.src = canvasEl.toDataURL('image/png');
-      
-      this.__isGrayscaled = true;
       
       return this;
     },

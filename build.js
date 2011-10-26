@@ -81,6 +81,8 @@ var filesToInclude = [
   'src/group.class.js',
   'src/image.class.js',
   
+  ifSpecifiedInclude('image_filters', 'src/image_filters.js'),
+  
   ifSpecifiedInclude('text', 'src/text.class.js'),
   
   ifSpecifiedInclude('node', 'lib/fabric_node.js')

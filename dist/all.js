@@ -10481,7 +10481,7 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
      */
     type: 'image',
     
-    __isGrayscaled: false,
+    filters: [ ],
     
     /**
      * Constructor
@@ -10491,6 +10491,7 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
     initialize: function(element, options) {
       this.callSuper('initialize', options);
       this._initElement(element);
+      this._originalImage = this.getElement();
       this._initConfig(options || { });
     },
     
@@ -10639,18 +10640,9 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
       this.constructor.fromObject(this.toObject(), callback);
     },
     
-    /**
-     * Makes image grayscale
-     * @mthod toGrayscale
-     * @param {Function} callback
-     */
-    toGrayscale: function(callback) {
+    applyFilters: function(callback) {
       
-      if (this.__isGrayscaled) {
-        return;
-      }
-      
-      var imgEl = this.getElement(),
+      var imgEl = this._originalImage,
           canvasEl = fabric.document.createElement('canvas'),
           replacement = fabric.document.createElement('img'),
           _this = this;
@@ -10659,7 +10651,10 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
       canvasEl.height = imgEl.height;
 
       canvasEl.getContext('2d').drawImage(imgEl, 0, 0);
-      fabric.Canvas.toGrayscale(canvasEl);
+      
+      this.filters.forEach(function(filter) { 
+        filter.applyTo(canvasEl);
+      });
       
       /** @ignore */
       replacement.onload = function() {
@@ -10671,8 +10666,6 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
       replacement.height = imgEl.height;
       
       replacement.src = canvasEl.toDataURL('image/png');
-      
-      this.__isGrayscaled = true;
       
       return this;
     },
@@ -10850,6 +10843,74 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
   fabric.Image.fromElement.async = true;
   
 })(typeof exports != 'undefined' ? exports : this);
+fabric.Image.GrayscaleFilter = fabric.util.createClass({
+  
+  initialize: function() {
+    
+  },
+  
+  applyTo: function(canvasEl) {
+    var context = canvasEl.getContext('2d'),
+        imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
+        data = imageData.data, 
+        iLen = imageData.width,
+        jLen = imageData.height,
+        index, average, i, j;
+
+     for (i = 0; i < iLen; i++) {
+       for (j = 0; j < jLen; j++) {
+
+         index = (i * 4) * jLen + (j * 4);
+         average = (data[index] + data[index + 1] + data[index + 2]) / 3;
+
+         data[index]     = average;
+         data[index + 1] = average;
+         data[index + 2] = average;
+       }
+     }
+
+     context.putImageData(imageData, 0, 0);
+  }
+});
+
+fabric.Image.RemoveWhiteFilter = fabric.util.createClass({
+  
+  initialize: function(options) {
+    options || (options = { });
+    this.threshold = options.threshold || 30;
+    this.distance = options.distance || 20;
+  },
+  
+  applyTo: function(canvasEl) {
+    var context = canvasEl.getContext('2d'),
+        imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
+        data = imageData.data,
+        threshold = this.threshold,
+        distance = this.distance,
+        limit = 255 - threshold,
+        abs = Math.abs,
+        r, g, b;
+     
+    for (var i = 0, len = data.length; i < len; i += 4) {
+      
+      r = data[i];
+      g = data[i+1];
+      b = data[i+2];
+          
+      if (r > limit && 
+          g > limit && 
+          b > limit && 
+          abs(r-g) < distance && 
+          abs(r-b) < distance &&
+          abs(g-b) < distance) {
+
+        data[i+3] = 1;
+      }
+    }
+    
+    context.putImageData(imageData, 0, 0);
+  }
+});
 //= require "object.class"
 
 (function(global) {
