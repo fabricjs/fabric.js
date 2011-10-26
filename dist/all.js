@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2011, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.6.2" };
+var fabric = fabric || { version: "0.6.3" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -10481,6 +10481,11 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
      */
     type: 'image',
     
+    /**
+     * Filters to be applied to an image (when calling `applyFilters`)
+     * @property
+     * @type Array
+     */
     filters: [ ],
     
     /**
@@ -10640,6 +10645,11 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
       this.constructor.fromObject(this.toObject(), callback);
     },
     
+    /**
+     * Applies filters assigned to this image (from "filters" array)
+     * @mthod applyFilters
+     * @param {Function} callback Callback is invoked when all filters have been applied and new image is generated
+     */
     applyFilters: function(callback) {
       
       var imgEl = this._originalImage,
