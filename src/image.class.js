@@ -244,7 +244,7 @@
       canvasEl.getContext('2d').drawImage(imgEl, 0, 0);
       
       this.filters.forEach(function(filter) { 
-        filter.applyTo(canvasEl);
+        filter && filter.applyTo(canvasEl);
       });
       
       /** @ignore */
