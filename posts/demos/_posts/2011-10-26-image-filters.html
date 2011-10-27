@@ -1,0 +1,39 @@
+---
+layout: demo
+title: Image Filters
+---
+
+<style>
+  .controls { display: inline-block; background: #fafafa; margin-left: 10px; padding: 15px; border-left: 1px dotted #aaa; height: 270px }
+  .canvas-container { display: inline-block; vertical-align: top; }
+</style>
+
+<canvas id="c" width="500" height="500"></canvas>
+<div class="controls">
+  <h3>Filters:</h3>
+  <p>
+    <label><span>Grayscale:</span> <input type="checkbox" id="grayscale"></label>
+  </p>
+  <p>
+    <label><span>Remove white:</span> <input type="checkbox" id="remove-white"></label>
+  </p>
+</div>
+
+<script id="main">var canvas = new fabric.Canvas('c', { backgroundImage: '../assets/jail_cell_bars.png' });
+
+var oImg;
+fabric.Image.fromURL('../assets/logo.png', function(img) {
+  oImg = img.set({ left: 250, top: 250, angle: -10 })
+  canvas.add(oImg);
+});
+
+document.getElementById('grayscale').onclick = function() {
+  oImg.filters[0] = this.checked ? new fabric.Image.GrayscaleFilter() : null;
+  oImg.applyFilters(canvas.renderAll.bind(canvas));
+};
+
+document.getElementById('remove-white').onclick = function() {
+  oImg.filters[1] = this.checked ? new fabric.Image.RemoveWhiteFilter({ threshold: 30, distance: 20 }) : null
+  oImg.applyFilters(canvas.renderAll.bind(canvas));
+};
+</script>
