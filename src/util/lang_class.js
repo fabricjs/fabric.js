@@ -1,6 +1,6 @@
 (function() {
   
-  var slice = Array.prototype.slice;
+  var slice = Array.prototype.slice, emptyFunction = function() { };
   
   var IS_DONTENUM_BUGGY = (function(){
     for (var p in { toString: 1 }) {

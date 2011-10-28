@@ -75,10 +75,17 @@
      * @param {Object} options optional
      */
     initialize: function(element, options) {
+      options || (options = { });
+      
       this.callSuper('initialize', options);
       this._initElement(element);
       this._originalImage = this.getElement();
-      this._initConfig(options || { });
+      this._initConfig(options);
+      
+      if (options.filters) {
+        this.filters = options.filters;
+        this.applyFilters();
+      }
     },
     
     /**
@@ -195,7 +202,8 @@
      */
     toObject: function() {
       return extend(this.callSuper('toObject'), {
-        src: this.getSrc()
+        src: this._originalImage.src,
+        filters: this.filters.concat()
       });
     },
     
@@ -378,9 +386,16 @@
     
     /** @ignore */
     img.onload = function() {
-      if (callback) {
-        callback(new fabric.Image(img, object));
+      
+      // transform filters from objects (representation) to actual instance
+      if (object.filters && object.filters.length) {
+        object.filters = object.filters.map(function(filterObj) {
+          return fabric.Image.filters[filterObj.type].fromObject(filterObj);
+        });
       }
+      
+      var instance = new fabric.Image(img, object);
+      callback && callback(instance);
       img = img.onload = null;
     };
     img.src = src;

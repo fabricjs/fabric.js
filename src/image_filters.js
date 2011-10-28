@@ -1,9 +1,24 @@
-fabric.Image.GrayscaleFilter = fabric.util.createClass({
+/**
+ * @namespace
+ */
+fabric.Image.filters = { };
+
+/**
+ * @class fabric.Image.filters.Grayscale
+ * @memberOf fabric.Image.filters
+ */
+fabric.Image.filters.Grayscale = fabric.util.createClass( /** @scope fabric.Image.filters.Grayscale.prototype */ {
   
-  initialize: function() {
-    
-  },
+  /**
+   * @param {String} type
+   */
+  type: "Grayscale",
   
+  /** 
+   * @method applyTo
+   * @memberOf fabric.Image.filters.Grayscale.prototype
+   * @param {Object} canvasEl Canvas element to apply filter to
+   */
   applyTo: function(canvasEl) {
     var context = canvasEl.getContext('2d'),
         imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
@@ -25,17 +40,46 @@ fabric.Image.GrayscaleFilter = fabric.util.createClass({
      }
 
      context.putImageData(imageData, 0, 0);
+  },
+  
+  /** 
+   * @method toJSON
+   * @return {String} json representation of filter
+   */
+  toJSON: function() {
+    return { type: this.type };
   }
 });
 
-fabric.Image.RemoveWhiteFilter = fabric.util.createClass({
+fabric.Image.filters.Grayscale.fromObject = function() {
+  return new fabric.Image.filters.Grayscale();
+};
   
+/**
+ * @class fabric.Image.filters.RemoveWhite
+ * @memberOf fabric.Image.filters
+ */
+fabric.Image.filters.RemoveWhite = fabric.util.createClass( /** @scope fabric.Image.filters.RemoveWhite.prototype */ {
+  
+  /**
+   * @param {String} type
+   */
+  type: "RemoveWhite",
+  
+  /** 
+   * @memberOf fabric.Image.filters.RemoveWhite.prototype
+   * @param {Object} [options] Options object
+   */
   initialize: function(options) {
     options || (options = { });
     this.threshold = options.threshold || 30;
     this.distance = options.distance || 20;
   },
   
+  /** 
+   * @method applyTo
+   * @param {Object} canvasEl Canvas element to apply filter to
+   */
   applyTo: function(canvasEl) {
     var context = canvasEl.getContext('2d'),
         imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
@@ -45,13 +89,13 @@ fabric.Image.RemoveWhiteFilter = fabric.util.createClass({
         limit = 255 - threshold,
         abs = Math.abs,
         r, g, b;
-     
+
     for (var i = 0, len = data.length; i < len; i += 4) {
-      
+
       r = data[i];
       g = data[i+1];
       b = data[i+2];
-          
+
       if (r > limit && 
           g > limit && 
           b > limit && 
@@ -62,7 +106,23 @@ fabric.Image.RemoveWhiteFilter = fabric.util.createClass({
         data[i+3] = 1;
       }
     }
-    
+
     context.putImageData(imageData, 0, 0);
+  },
+  
+  /** 
+   * @method toJSON
+   * @return {String} json representation of filter
+   */
+  toJSON: function() {
+    return { 
+      type: this.type, 
+      threshold: this.threshold, 
+      distance: this.distance
+    };
   }
 });
+
+fabric.Image.filters.RemoveWhite.fromObject = function(object) {
+  return new fabric.Image.filters.RemoveWhite(object);
+};
