@@ -16,10 +16,16 @@ title: Image Filters
   </p>
   <p>
     <label><span>Remove white:</span> <input type="checkbox" id="remove-white"></label>
+    <br>
+    <label>Threshold: <input type="range" id="remove-white-threshold" value="60" min="0" max="255"></label>
+    <br>
+    <label>Distance: <input type="range" id="remove-white-distance" value="10" min="0" max="255"></label>
   </p>
 </div>
 
-<script id="main">var canvas = new fabric.Canvas('c', { backgroundImage: '../assets/jail_cell_bars.png' });
+<script id="main">var $ = function(id){return document.getElementById(id)};
+
+var canvas = new fabric.Canvas('c', { backgroundImage: '../lib/bg.png' });
 
 var oImg;
 fabric.Image.fromURL('../assets/logo.png', function(img) {
@@ -27,13 +33,31 @@ fabric.Image.fromURL('../assets/logo.png', function(img) {
   canvas.add(oImg);
 });
 
-document.getElementById('grayscale').onclick = function() {
-  oImg.filters[0] = this.checked ? new fabric.Image.GrayscaleFilter() : null;
+$('grayscale').onclick = function() {
+  oImg.filters[0] = this.checked ? new fabric.Image.filters.Grayscale() : null;
   oImg.applyFilters(canvas.renderAll.bind(canvas));
 };
 
-document.getElementById('remove-white').onclick = function() {
-  oImg.filters[1] = this.checked ? new fabric.Image.RemoveWhiteFilter({ threshold: 30, distance: 20 }) : null
+function removeWhiteHandler() {
+  oImg.filters[1] = this.checked ? new fabric.Image.filters.RemoveWhite({ 
+    threshold: $('remove-white-threshold').value, 
+    distance: $('remove-white-distance').value 
+  }) : null;
+  oImg.applyFilters(canvas.renderAll.bind(canvas));
+}
+
+$('remove-white').onclick = removeWhiteHandler;
+
+$('remove-white-threshold').onchange = function() {
+  $('remove-white').checked = true;
+  removeWhiteHandler.call($('remove-white'));
+  
+  oImg.filters[1] && (oImg.filters[1].threshold = this.value);
+  oImg.applyFilters(canvas.renderAll.bind(canvas));
+};
+
+$('remove-white-distance').onchange = function() {
+  oImg.filters[1] && (oImg.filters[1].distance = this.value);
   oImg.applyFilters(canvas.renderAll.bind(canvas));
 };
 </script>
