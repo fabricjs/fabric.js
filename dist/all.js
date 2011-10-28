@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2011, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.6.4" };
+var fabric = fabric || { version: "0.6.5" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -4395,7 +4395,7 @@ fabric.util.string = {
       this.setOverlayImage(options.overlayImage);
     }
     if (options.backgroundImage) {
-      this.setBackgroundImage(options.backgroundImage);
+      this.setBackgroundImage(options.backgroundImage, this.renderAll.bind(this));
     }
     
     this.calcOffset();
@@ -5601,7 +5601,7 @@ fabric.util.string = {
       canvasToDrawOn.fillStyle = this.backgroundColor;
       canvasToDrawOn.fillRect(0, 0, this.width, this.height);
       
-      if (this.backgroundImage) {
+      if (typeof this.backgroundImage == 'object') {
         canvasToDrawOn.drawImage(this.backgroundImage, 0, 0, this.width, this.height);
       }
       

@@ -107,7 +107,7 @@
       this.setOverlayImage(options.overlayImage);
     }
     if (options.backgroundImage) {
-      this.setBackgroundImage(options.backgroundImage);
+      this.setBackgroundImage(options.backgroundImage, this.renderAll.bind(this));
     }
     
     this.calcOffset();
@@ -1313,7 +1313,7 @@
       canvasToDrawOn.fillStyle = this.backgroundColor;
       canvasToDrawOn.fillRect(0, 0, this.width, this.height);
       
-      if (this.backgroundImage) {
+      if (typeof this.backgroundImage == 'object') {
         canvasToDrawOn.drawImage(this.backgroundImage, 0, 0, this.width, this.height);
       }
       
