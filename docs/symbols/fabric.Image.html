@@ -189,6 +189,12 @@ ul.inheritsList {
 	
 	<li><a href="../symbols/fabric.Image.html">fabric.Image</a></li>
 	
+	<li><a href="../symbols/fabric.Image.filters.html">fabric.Image.filters</a></li>
+	
+	<li><a href="../symbols/fabric.Image.filters.Grayscale.html">fabric.Image.filters.Grayscale</a></li>
+	
+	<li><a href="../symbols/fabric.Image.filters.RemoveWhite.html">fabric.Image.filters.RemoveWhite</a></li>
+	
 	<li><a href="../symbols/fabric.Intersection.html">fabric.Intersection</a></li>
 	
 	<li><a href="../symbols/fabric.Line.html">fabric.Line</a></li>
@@ -343,6 +349,16 @@ ul.inheritsList {
 					<td class="attributes">&nbsp;</td>
 					<td class="nameDescription">
 						<div class="fixedFont">
+						<b><a href="../symbols/fabric.Image.html#filters">filters</a></b>
+						</div>
+						<div class="description">Filters to be applied to an image (when calling `applyFilters`)</div>
+					</td>
+				</tr>
+			
+				<tr>
+					<td class="attributes">&nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont">
 						<b><a href="../symbols/fabric.Image.html#maxheight">maxheight</a></b>
 						</div>
 						<div class="description"></div>
@@ -393,6 +409,15 @@ ul.inheritsList {
 				</tr>
 			</thead>
 			<tbody>
+			
+				<tr>
+					<td class="attributes">&nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont"><b><a href="../symbols/fabric.Image.html#applyFilters">applyFilters</a></b>(callback)
+						</div>
+						<div class="description">Applies filters assigned to this image (from "filters" array)</div>
+					</td>
+				</tr>
 			
 				<tr>
 					<td class="attributes">&nbsp;</td>
@@ -524,15 +549,6 @@ Width and height have to mantain the same proportion in the final image as it wa
 				<tr>
 					<td class="attributes">&nbsp;</td>
 					<td class="nameDescription">
-						<div class="fixedFont"><b><a href="../symbols/fabric.Image.html#toGrayscale">toGrayscale</a></b>(callback)
-						</div>
-						<div class="description">Makes image grayscale</div>
-					</td>
-				</tr>
-			
-				<tr>
-					<td class="attributes">&nbsp;</td>
-					<td class="nameDescription">
 						<div class="fixedFont"><b><a href="../symbols/fabric.Image.html#toObject">toObject</a></b>()
 						</div>
 						<div class="description">Returns object representation of an instance</div>
@@ -554,7 +570,7 @@ Width and height have to mantain the same proportion in the final image as it wa
 		
 		
 		<dl class="inheritsList">
-		<dt>Methods borrowed from class <a href="../symbols/fabric.Object.html">fabric.Object</a>: </dt><dd><a href="../symbols/fabric.Object.html#animate">animate</a>, <a href="../symbols/fabric.Object.html#callSuper">callSuper</a>, <a href="../symbols/fabric.Object.html#cloneAsImage">cloneAsImage</a>, <a href="../symbols/fabric.Object.html#drawBorders">drawBorders</a>, <a href="../symbols/fabric.Object.html#drawCorners">drawCorners</a>, <a href="../symbols/fabric.Object.html#fxRemove">fxRemove</a>, <a href="../symbols/fabric.Object.html#fxStraighten">fxStraighten</a>, <a href="../symbols/fabric.Object.html#get">get</a>, <a href="../symbols/fabric.Object.html#getAngle">getAngle</a>, <a href="../symbols/fabric.Object.html#getCenter">getCenter</a>, <a href="../symbols/fabric.Object.html#getHeight">getHeight</a>, <a href="../symbols/fabric.Object.html#getWidth">getWidth</a>, <a href="../symbols/fabric.Object.html#hasStateChanged">hasStateChanged</a>, <a href="../symbols/fabric.Object.html#intersectsWithObject">intersectsWithObject</a>, <a href="../symbols/fabric.Object.html#intersectsWithRect">intersectsWithRect</a>, <a href="../symbols/fabric.Object.html#isActive">isActive</a>, <a href="../symbols/fabric.Object.html#isContainedWithinObject">isContainedWithinObject</a>, <a href="../symbols/fabric.Object.html#isContainedWithinRect">isContainedWithinRect</a>, <a href="../symbols/fabric.Object.html#isType">isType</a>, <a href="../symbols/fabric.Object.html#saveState">saveState</a>, <a href="../symbols/fabric.Object.html#scale">scale</a>, <a href="../symbols/fabric.Object.html#scaleToHeight">scaleToHeight</a>, <a href="../symbols/fabric.Object.html#scaleToWidth">scaleToWidth</a>, <a href="../symbols/fabric.Object.html#set">set</a>, <a href="../symbols/fabric.Object.html#setActive">setActive</a>, <a href="../symbols/fabric.Object.html#setAngle">setAngle</a>, <a href="../symbols/fabric.Object.html#setCoords">setCoords</a>, <a href="../symbols/fabric.Object.html#setGradientFill">setGradientFill</a>, <a href="../symbols/fabric.Object.html#setOpacity">setOpacity</a>, <a href="../symbols/fabric.Object.html#setOptions">setOptions</a>, <a href="../symbols/fabric.Object.html#setSourcePath">setSourcePath</a>, <a href="../symbols/fabric.Object.html#setupState">setupState</a>, <a href="../symbols/fabric.Object.html#straighten">straighten</a>, <a href="../symbols/fabric.Object.html#toDatalessObject">toDatalessObject</a>, <a href="../symbols/fabric.Object.html#toDataURL">toDataURL</a>, <a href="../symbols/fabric.Object.html#toggle">toggle</a>, <a href="../symbols/fabric.Object.html#toJSON">toJSON</a>, <a href="../symbols/fabric.Object.html#transform">transform</a></dd>
+		<dt>Methods borrowed from class <a href="../symbols/fabric.Object.html">fabric.Object</a>: </dt><dd><a href="../symbols/fabric.Object.html#animate">animate</a>, <a href="../symbols/fabric.Object.html#callSuper">callSuper</a>, <a href="../symbols/fabric.Object.html#cloneAsImage">cloneAsImage</a>, <a href="../symbols/fabric.Object.html#drawBorders">drawBorders</a>, <a href="../symbols/fabric.Object.html#drawCorners">drawCorners</a>, <a href="../symbols/fabric.Object.html#fxRemove">fxRemove</a>, <a href="../symbols/fabric.Object.html#fxStraighten">fxStraighten</a>, <a href="../symbols/fabric.Object.html#get">get</a>, <a href="../symbols/fabric.Object.html#getAngle">getAngle</a>, <a href="../symbols/fabric.Object.html#getCenter">getCenter</a>, <a href="../symbols/fabric.Object.html#getHeight">getHeight</a>, <a href="../symbols/fabric.Object.html#getWidth">getWidth</a>, <a href="../symbols/fabric.Object.html#hasStateChanged">hasStateChanged</a>, <a href="../symbols/fabric.Object.html#intersectsWithObject">intersectsWithObject</a>, <a href="../symbols/fabric.Object.html#intersectsWithRect">intersectsWithRect</a>, <a href="../symbols/fabric.Object.html#isActive">isActive</a>, <a href="../symbols/fabric.Object.html#isContainedWithinObject">isContainedWithinObject</a>, <a href="../symbols/fabric.Object.html#isContainedWithinRect">isContainedWithinRect</a>, <a href="../symbols/fabric.Object.html#isType">isType</a>, <a href="../symbols/fabric.Object.html#saveState">saveState</a>, <a href="../symbols/fabric.Object.html#scale">scale</a>, <a href="../symbols/fabric.Object.html#scaleToHeight">scaleToHeight</a>, <a href="../symbols/fabric.Object.html#scaleToWidth">scaleToWidth</a>, <a href="../symbols/fabric.Object.html#set">set</a>, <a href="../symbols/fabric.Object.html#setActive">setActive</a>, <a href="../symbols/fabric.Object.html#setAngle">setAngle</a>, <a href="../symbols/fabric.Object.html#setCoords">setCoords</a>, <a href="../symbols/fabric.Object.html#setGradientFill">setGradientFill</a>, <a href="../symbols/fabric.Object.html#setOpacity">setOpacity</a>, <a href="../symbols/fabric.Object.html#setOptions">setOptions</a>, <a href="../symbols/fabric.Object.html#setSourcePath">setSourcePath</a>, <a href="../symbols/fabric.Object.html#setupState">setupState</a>, <a href="../symbols/fabric.Object.html#straighten">straighten</a>, <a href="../symbols/fabric.Object.html#toDatalessObject">toDatalessObject</a>, <a href="../symbols/fabric.Object.html#toDataURL">toDataURL</a>, <a href="../symbols/fabric.Object.html#toggle">toggle</a>, <a href="../symbols/fabric.Object.html#toGrayscale">toGrayscale</a>, <a href="../symbols/fabric.Object.html#toJSON">toJSON</a>, <a href="../symbols/fabric.Object.html#transform">transform</a></dd>
 		</dl>
 		
 	
@@ -714,6 +730,28 @@ Width and height have to mantain the same proportion in the final image as it wa
 
 			<hr />
 		
+			<a name="filters"> </a>
+			<div class="fixedFont">
+			
+			<span class="light">{<a href="../symbols/Array.html">Array</a>}</span>
+			<b>filters</b>
+			
+			</div>
+			<div class="description">
+				Filters to be applied to an image (when calling `applyFilters`)
+				
+				
+			</div>
+			
+			
+
+				
+				
+				
+				
+
+			<hr />
+		
 			<a name="maxheight"> </a>
 			<div class="fixedFont">
 			
@@ -787,6 +825,42 @@ Width and height have to mantain the same proportion in the final image as it wa
 		<div class="sectionTitle">
 			Method Detail
 		</div>
+		
+			<a name="applyFilters"> </a>
+			<div class="fixedFont">
+			
+			
+			<b>applyFilters</b>(callback)
+			
+			</div>
+			<div class="description">
+				Applies filters assigned to this image (from "filters" array)
+				
+				
+			</div>
+			
+			
+			
+				
+					<dl class="detailList">
+					<dt class="heading">Parameters:</dt>
+					
+						<dt>
+							<span class="light fixedFont">{<a href="../symbols/Function.html">Function</a>}</span> <b>callback</b>
+							
+						</dt>
+						<dd>Callback is invoked when all filters have been applied and new image is generated</dd>
+					
+					</dl>
+				
+				
+				
+				
+				
+				
+				
+
+			<hr />
 		
 			<a name="clone"> </a>
 			<div class="fixedFont">
@@ -1345,42 +1419,6 @@ Width and height have to mantain the same proportion in the final image as it wa
 
 			<hr />
 		
-			<a name="toGrayscale"> </a>
-			<div class="fixedFont">
-			
-			
-			<b>toGrayscale</b>(callback)
-			
-			</div>
-			<div class="description">
-				Makes image grayscale
-				
-				
-			</div>
-			
-			
-			
-				
-					<dl class="detailList">
-					<dt class="heading">Parameters:</dt>
-					
-						<dt>
-							<span class="light fixedFont">{<a href="../symbols/Function.html">Function</a>}</span> <b>callback</b>
-							
-						</dt>
-						<dd></dd>
-					
-					</dl>
-				
-				
-				
-				
-				
-				
-				
-
-			<hr />
-		
 			<a name="toObject"> </a>
 			<div class="fixedFont">
 			
@@ -1457,5 +1495,5 @@ Width and height have to mantain the same proportion in the final image as it wa
 <!-- ============================== footer ================================= -->
 <div class="fineprint" style="clear:both">
 	
-	Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Thu Sep 22 2011 12:31:23 GMT-0400 (EDT)
+	Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Thu Oct 27 2011 19:59:08 GMT-0400 (EDT)
 </div>

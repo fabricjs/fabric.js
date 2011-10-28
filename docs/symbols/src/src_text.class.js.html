@@ -137,54 +137,54 @@
 <span class='line'>130</span> </span><span class="WHIT">      </span><span class="NAME">this.stateProperties.push</span><span class="PUNC">(</span><span class="WHIT">
 <span class='line'>131</span> </span><span class="WHIT">        </span><span class="STRN">'fontFamily'</span><span class="PUNC">,</span><span class="WHIT"> 
 <span class='line'>132</span>         </span><span class="STRN">'fontWeight'</span><span class="PUNC">,</span><span class="WHIT"> 
-<span class='line'>133</span>         </span><span class="STRN">'path'</span><span class="PUNC">,</span><span class="WHIT"> 
-<span class='line'>134</span>         </span><span class="STRN">'text'</span><span class="PUNC">,</span><span class="WHIT"> 
-<span class='line'>135</span>         </span><span class="STRN">'textDecoration'</span><span class="PUNC">,</span><span class="WHIT"> 
-<span class='line'>136</span>         </span><span class="STRN">'textShadow'</span><span class="PUNC">,</span><span class="WHIT"> 
-<span class='line'>137</span>         </span><span class="STRN">'textAlign'</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>138</span> </span><span class="WHIT">        </span><span class="STRN">'fontStyle'</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>139</span> </span><span class="WHIT">        </span><span class="STRN">'lineHeight'</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>140</span> </span><span class="WHIT">        </span><span class="STRN">'strokeStyle'</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>141</span> </span><span class="WHIT">        </span><span class="STRN">'strokeWidth'</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>142</span> </span><span class="WHIT">        </span><span class="STRN">'backgroundColor'</span><span class="WHIT">
-<span class='line'>143</span> </span><span class="WHIT">      </span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>144</span> </span><span class="WHIT">      </span><span class="NAME">fabric.util.removeFromArray</span><span class="PUNC">(</span><span class="NAME">this.stateProperties</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="STRN">'width'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>145</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>146</span> </span><span class="WHIT">    
-<span class='line'>147</span>     </span><span class="COMM">/**
-<span class='line'>148</span>      * Returns string representation of an instance
-<span class='line'>149</span>      * @method toString
-<span class='line'>150</span>      * @return {String} String representation of text object
-<span class='line'>151</span>      */</span><span class="WHIT">
-<span class='line'>152</span> </span><span class="WHIT">    </span><span class="NAME">toString</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>153</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="STRN">'#&lt;fabric.Text ('</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">this.complexity</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT">
-<span class='line'>154</span> </span><span class="WHIT">        </span><span class="STRN">'): { "text": "'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">this.text</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'", "fontFamily": "'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">this.fontFamily</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'" }>'</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>155</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>156</span> </span><span class="WHIT">    
-<span class='line'>157</span>     </span><span class="COMM">/**
-<span class='line'>158</span>      * @private
-<span class='line'>159</span>      * @method _render
-<span class='line'>160</span>      * @param {CanvasRenderingContext2D} ctx Context to render on
-<span class='line'>161</span>      */</span><span class="WHIT">
-<span class='line'>162</span> </span><span class="WHIT">    </span><span class="NAME">_render</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">ctx</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>163</span> </span><span class="WHIT">      </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">o</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">Cufon.textOptions</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">Cufon.textOptions</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>164</span> </span><span class="WHIT">      
-<span class='line'>165</span>       </span><span class="COMM">// export options to be used by cufon.js</span><span class="WHIT">
-<span class='line'>166</span> </span><span class="WHIT">      </span><span class="NAME">o.left</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.left</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>167</span> </span><span class="WHIT">      </span><span class="NAME">o.top</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.top</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>168</span> </span><span class="WHIT">      </span><span class="NAME">o.context</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">ctx</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>169</span> </span><span class="WHIT">      </span><span class="NAME">o.color</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.fill</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>170</span> </span><span class="WHIT">      
-<span class='line'>171</span>       </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">el</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this._initDummyElement</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>172</span> </span><span class="WHIT">      
-<span class='line'>173</span>       </span><span class="COMM">// set "cursor" to top/left corner</span><span class="WHIT">
-<span class='line'>174</span> </span><span class="WHIT">      </span><span class="NAME">this.transform</span><span class="PUNC">(</span><span class="NAME">ctx</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>175</span> </span><span class="WHIT">      
-<span class='line'>176</span>       </span><span class="COMM">// draw text</span><span class="WHIT">
-<span class='line'>177</span> </span><span class="WHIT">      </span><span class="NAME">Cufon.replaceElement</span><span class="PUNC">(</span><span class="NAME">el</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>178</span> </span><span class="WHIT">        </span><span class="NAME">separate</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">'none'</span><span class="PUNC">,</span><span class="WHIT"> 
-<span class='line'>179</span>         </span><span class="NAME">fontFamily</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">this.fontFamily</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>180</span> </span><span class="WHIT">        </span><span class="NAME">enableTextDecoration</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>133</span>         </span><span class="STRN">'fontSize'</span><span class="PUNC">,</span><span class="WHIT"> 
+<span class='line'>134</span>         </span><span class="STRN">'path'</span><span class="PUNC">,</span><span class="WHIT"> 
+<span class='line'>135</span>         </span><span class="STRN">'text'</span><span class="PUNC">,</span><span class="WHIT"> 
+<span class='line'>136</span>         </span><span class="STRN">'textDecoration'</span><span class="PUNC">,</span><span class="WHIT"> 
+<span class='line'>137</span>         </span><span class="STRN">'textShadow'</span><span class="PUNC">,</span><span class="WHIT"> 
+<span class='line'>138</span>         </span><span class="STRN">'textAlign'</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>139</span> </span><span class="WHIT">        </span><span class="STRN">'fontStyle'</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>140</span> </span><span class="WHIT">        </span><span class="STRN">'lineHeight'</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>141</span> </span><span class="WHIT">        </span><span class="STRN">'strokeStyle'</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>142</span> </span><span class="WHIT">        </span><span class="STRN">'strokeWidth'</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>143</span> </span><span class="WHIT">        </span><span class="STRN">'backgroundColor'</span><span class="WHIT">
+<span class='line'>144</span> </span><span class="WHIT">      </span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>145</span> </span><span class="WHIT">      </span><span class="NAME">fabric.util.removeFromArray</span><span class="PUNC">(</span><span class="NAME">this.stateProperties</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="STRN">'width'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>146</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>147</span> </span><span class="WHIT">    
+<span class='line'>148</span>     </span><span class="COMM">/**
+<span class='line'>149</span>      * Returns string representation of an instance
+<span class='line'>150</span>      * @method toString
+<span class='line'>151</span>      * @return {String} String representation of text object
+<span class='line'>152</span>      */</span><span class="WHIT">
+<span class='line'>153</span> </span><span class="WHIT">    </span><span class="NAME">toString</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>154</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="STRN">'#&lt;fabric.Text ('</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">this.complexity</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT">
+<span class='line'>155</span> </span><span class="WHIT">        </span><span class="STRN">'): { "text": "'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">this.text</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'", "fontFamily": "'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">this.fontFamily</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'" }>'</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>156</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>157</span> </span><span class="WHIT">    
+<span class='line'>158</span>     </span><span class="COMM">/**
+<span class='line'>159</span>      * @private
+<span class='line'>160</span>      * @method _render
+<span class='line'>161</span>      * @param {CanvasRenderingContext2D} ctx Context to render on
+<span class='line'>162</span>      */</span><span class="WHIT">
+<span class='line'>163</span> </span><span class="WHIT">    </span><span class="NAME">_render</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">ctx</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>164</span> </span><span class="WHIT">      </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">o</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">Cufon.textOptions</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">Cufon.textOptions</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>165</span> </span><span class="WHIT">      
+<span class='line'>166</span>       </span><span class="COMM">// export options to be used by cufon.js</span><span class="WHIT">
+<span class='line'>167</span> </span><span class="WHIT">      </span><span class="NAME">o.left</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.left</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>168</span> </span><span class="WHIT">      </span><span class="NAME">o.top</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.top</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>169</span> </span><span class="WHIT">      </span><span class="NAME">o.context</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">ctx</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>170</span> </span><span class="WHIT">      </span><span class="NAME">o.color</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.fill</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>171</span> </span><span class="WHIT">      
+<span class='line'>172</span>       </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">el</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this._initDummyElement</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>173</span> </span><span class="WHIT">      
+<span class='line'>174</span>       </span><span class="COMM">// set "cursor" to top/left corner</span><span class="WHIT">
+<span class='line'>175</span> </span><span class="WHIT">      </span><span class="NAME">this.transform</span><span class="PUNC">(</span><span class="NAME">ctx</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>176</span> </span><span class="WHIT">      
+<span class='line'>177</span>       </span><span class="COMM">// draw text</span><span class="WHIT">
+<span class='line'>178</span> </span><span class="WHIT">      </span><span class="NAME">Cufon.replaceElement</span><span class="PUNC">(</span><span class="NAME">el</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>179</span> </span><span class="WHIT">        </span><span class="NAME">separate</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">'none'</span><span class="PUNC">,</span><span class="WHIT"> 
+<span class='line'>180</span>         </span><span class="NAME">fontFamily</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">this.fontFamily</span><span class="PUNC">,</span><span class="WHIT">
 <span class='line'>181</span> </span><span class="WHIT">        </span><span class="NAME">textDecoration</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">this.textDecoration</span><span class="PUNC">,</span><span class="WHIT">
 <span class='line'>182</span> </span><span class="WHIT">        </span><span class="NAME">textShadow</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">this.textShadow</span><span class="PUNC">,</span><span class="WHIT">
 <span class='line'>183</span> </span><span class="WHIT">        </span><span class="NAME">textAlign</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">this.textAlign</span><span class="PUNC">,</span><span class="WHIT">
