@@ -340,6 +340,18 @@
     },
     
     /**
+     * @method _initFilters
+     * @param {Object} object Object with filters property
+     */
+    _initFilters: function(object) {
+      if (object.filters && object.filters.length) {
+        this.filters = object.filters.map(function(filterObj) {
+          return fabric.Image.filters[filterObj.type].fromObject(filterObj);
+        });
+      }
+    },
+    
+    /**
      * @private
      */
     _setBorder: function() {
@@ -397,13 +409,7 @@
     
     /** @ignore */
     img.onload = function() {
-      
-      // transform filters from objects (representation) to actual instance
-      if (object.filters && object.filters.length) {
-        object.filters = object.filters.map(function(filterObj) {
-          return fabric.Image.filters[filterObj.type].fromObject(filterObj);
-        });
-      }
+      fabric.Image.prototype._initFilters.call(object, object);
       
       var instance = new fabric.Image(img, object);
       callback && callback(instance);

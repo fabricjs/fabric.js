@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2011, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.6.6" };
+var fabric = fabric || { version: "0.6.7" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -10759,6 +10759,18 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
     },
     
     /**
+     * @method _initFilters
+     * @param {Object} object Object with filters property
+     */
+    _initFilters: function(object) {
+      if (object.filters && object.filters.length) {
+        this.filters = object.filters.map(function(filterObj) {
+          return fabric.Image.filters[filterObj.type].fromObject(filterObj);
+        });
+      }
+    },
+    
+    /**
      * @private
      */
     _setBorder: function() {
@@ -10816,13 +10828,7 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
     
     /** @ignore */
     img.onload = function() {
-      
-      // transform filters from objects (representation) to actual instance
-      if (object.filters && object.filters.length) {
-        object.filters = object.filters.map(function(filterObj) {
-          return fabric.Image.filters[filterObj.type].fromObject(filterObj);
-        });
-      }
+      fabric.Image.prototype._initFilters.call(object, object);
       
       var instance = new fabric.Image(img, object);
       callback && callback(instance);
@@ -11436,6 +11442,7 @@ fabric.Image.filters.RemoveWhite.fromObject = function(object) {
   fabric.Image.fromObject = function(object, callback) {
     fabric.Canvas.prototype.loadImageFromURL(object.src, function(oImg) {
       oImg._initConfig(object);
+      oImg._initFilters(object);
       callback(oImg);
     });
   };
