@@ -97,17 +97,14 @@
          abort = options.abort || function() { return false; },
          easing = options.easing || function(pos) { return (-Math.cos(pos * Math.PI) / 2) + 0.5; },
          startValue = 'startValue' in options ? options.startValue : 0,
-         endValue = 'endValue' in options ? options.endValue : 100,
-         isReversed = startValue > endValue;
+         endValue = 'endValue' in options ? options.endValue : 100;
 
      options.onStart && options.onStart();
 
      var interval = setInterval(function() {
        time = +new Date();
        pos = time > finish ? 1 : (time - start) / duration;
-       onChange(isReversed 
-         ? (startValue - (startValue - endValue) * easing(pos)) 
-         : (startValue + (endValue - startValue) * easing(pos)));
+       onChange(startValue + (endValue - startValue) * easing(pos));
        if (time > finish || abort()) {
          clearInterval(interval);
          options.onComplete && options.onComplete();
