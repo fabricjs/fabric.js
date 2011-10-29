@@ -240,22 +240,23 @@
      * @param {Function} callback Callback is invoked when all filters have been applied and new image is generated
      */
     applyFilters: function(callback) {
-      
-      var imgEl = this._originalImage,
+
+      var isLikelyNode = typeof Buffer !== 'undefined' && typeof window === 'undefined',
+          imgEl = this._originalImage,
           canvasEl = fabric.document.createElement('canvas'),
-          replacement = fabric.document.createElement('img'),
+          replacement = isLikelyNode ? new (require('canvas').Image) : fabric.document.createElement('img'),
           _this = this;
 
       canvasEl.width = imgEl.width;
       canvasEl.height = imgEl.height;
 
       canvasEl.getContext('2d').drawImage(imgEl, 0, 0);
-      
+
       this.filters.forEach(function(filter) { 
         filter && filter.applyTo(canvasEl);
       });
-      
-      /** @ignore */
+
+       /** @ignore */
       replacement.onload = function() {
         _this.setElement(replacement);
         callback && callback();
@@ -263,9 +264,19 @@
       };
       replacement.width = imgEl.width;
       replacement.height = imgEl.height;
-      
-      replacement.src = canvasEl.toDataURL('image/png');
-      
+
+      if (isLikelyNode) {
+        var base64str = canvasEl.toDataURL('image/png').replace(/data:image\/png;base64,/, '');
+        replacement.src = new Buffer(base64str, 'base64');
+        _this.setElement(replacement);
+
+        // onload doesn't fire in node, so we invoke callback manually
+        callback && callback();
+      }
+      else {
+        replacement.src = canvasEl.toDataURL('image/png');
+      }
+
       return this;
     },
     
