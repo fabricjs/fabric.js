@@ -31,6 +31,7 @@ var oImg;
 fabric.Image.fromURL('../assets/logo.png', function(img) {
   oImg = img.set({ left: 250, top: 250, angle: -10 })
   canvas.add(oImg);
+  canvas.renderAll();
 });
 
 $('grayscale').onclick = function() {
@@ -38,20 +39,15 @@ $('grayscale').onclick = function() {
   oImg.applyFilters(canvas.renderAll.bind(canvas));
 };
 
-function removeWhiteHandler() {
+$('remove-white').onclick = function () {
   oImg.filters[1] = this.checked ? new fabric.Image.filters.RemoveWhite({ 
     threshold: $('remove-white-threshold').value, 
     distance: $('remove-white-distance').value 
   }) : null;
   oImg.applyFilters(canvas.renderAll.bind(canvas));
-}
-
-$('remove-white').onclick = removeWhiteHandler;
+};
 
 $('remove-white-threshold').onchange = function() {
-  $('remove-white').checked = true;
-  removeWhiteHandler.call($('remove-white'));
-  
   oImg.filters[1] && (oImg.filters[1].threshold = this.value);
   oImg.applyFilters(canvas.renderAll.bind(canvas));
 };
