@@ -240,6 +240,12 @@
      * @param {Function} callback Callback is invoked when all filters have been applied and new image is generated
      */
     applyFilters: function(callback) {
+      
+      if (this.filters.length === 0) {
+        this.setElement(this._originalImage);
+        callback && callback();
+        return;
+      }
 
       var isLikelyNode = typeof Buffer !== 'undefined' && typeof window === 'undefined',
           imgEl = this._originalImage,

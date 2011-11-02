@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2011, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.6.7" };
+var fabric = fabric || { version: "0.6.8" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -1846,17 +1846,14 @@ fabric.Observable = {
          abort = options.abort || function() { return false; },
          easing = options.easing || function(pos) { return (-Math.cos(pos * Math.PI) / 2) + 0.5; },
          startValue = 'startValue' in options ? options.startValue : 0,
-         endValue = 'endValue' in options ? options.endValue : 100,
-         isReversed = startValue > endValue;
+         endValue = 'endValue' in options ? options.endValue : 100;
 
      options.onStart && options.onStart();
 
      var interval = setInterval(function() {
        time = +new Date();
        pos = time > finish ? 1 : (time - start) / duration;
-       onChange(isReversed 
-         ? (startValue - (startValue - endValue) * easing(pos)) 
-         : (startValue + (endValue - startValue) * easing(pos)));
+       onChange(startValue + (endValue - startValue) * easing(pos));
        if (time > finish || abort()) {
          clearInterval(interval);
          options.onComplete && options.onComplete();
@@ -1874,6 +1871,7 @@ fabric.Observable = {
   fabric.util.animate = animate;
   
 })();
+
 (function() {
   
   var slice = Array.prototype.slice;
@@ -10659,6 +10657,12 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
      * @param {Function} callback Callback is invoked when all filters have been applied and new image is generated
      */
     applyFilters: function(callback) {
+      
+      if (this.filters.length === 0) {
+        this.setElement(this._originalImage);
+        callback && callback();
+        return;
+      }
 
       var isLikelyNode = typeof Buffer !== 'undefined' && typeof window === 'undefined',
           imgEl = this._originalImage,
