@@ -9,7 +9,7 @@
     "build": "node build.js modules=ALL"
   }, 
   "dependencies": {
-    "canvas": "0.7.0",
+    "canvas": "0.8.1",
     "jsdom": ">=0.2.3", 
     "o3-xml": "0.1.0"
  }, 
