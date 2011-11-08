@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2011, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.6.8" };
+var fabric = fabric || { version: "0.6.9" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -2703,7 +2703,28 @@ fabric.util.string = {
       return element;
     }
 
+    /**
+     * Makes element selectable
+     * @method makeElementSelectable
+     * @memberOf fabric.util
+     * @param {HTMLElement} element Element to make selectable
+     * @return {HTMLElement} Element that was passed in
+     */
+    function makeElementSelectable(element) {
+      if (typeof element.onselectstart !== 'undefined') {
+        element.onselectstart = null;
+      }
+      if (selectProp) {
+        element.style[selectProp] = '';
+      }
+      else if (typeof element.unselectable == 'string') {
+        element.unselectable = '';
+      }
+      return element;
+    }
+
     fabric.util.makeElementUnselectable = makeElementUnselectable;
+    fabric.util.makeElementSelectable = makeElementSelectable;
   })();
 
   (function() {
