@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2011, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.6.9" };
+var fabric = fabric || { version: "0.6.10" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -4535,6 +4535,12 @@ fabric.util.string = {
     HOVER_CURSOR:           'move',
     
     /**
+     * @constant
+     * @type String
+     */
+    CURSOR:                 'default',
+    
+    /**
      * Callback; invoked right before object is about to be scaled/rotated
      * @method onBeforeScaleRotate
      * @param {fabric.Object} target Object that's about to be scaled/rotated
@@ -4906,7 +4912,7 @@ fabric.util.string = {
       if (activeGroup) {
         activeGroup.setObjectsCoords();
         activeGroup.set('isMoving', false);
-        this._setCursor('default');
+        this._setCursor(this.CURSOR);
       }
       
       // clear selection
@@ -5252,7 +5258,7 @@ fabric.util.string = {
               this._objects[i].setActive(false);
             }
           }
-          style.cursor = 'default';
+          style.cursor = this.CURSOR;
         }
         else {
           // set proper cursor 
@@ -5395,7 +5401,7 @@ fabric.util.string = {
     _setCursorFromEvent: function (e, target) {
       var s = this.upperCanvasEl.style;
       if (!target) {
-        s.cursor = 'default';
+        s.cursor = this.CURSOR;
         return false;
       }
       else {
@@ -5413,7 +5419,7 @@ fabric.util.string = {
             s.cursor = cursorMap[corner];
           }
           else {
-            s.cursor = 'default';
+            s.cursor = this.CURSOR;
             return false;
           }
         }

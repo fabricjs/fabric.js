@@ -228,6 +228,12 @@
     HOVER_CURSOR:           'move',
     
     /**
+     * @constant
+     * @type String
+     */
+    CURSOR:                 'default',
+    
+    /**
      * Callback; invoked right before object is about to be scaled/rotated
      * @method onBeforeScaleRotate
      * @param {fabric.Object} target Object that's about to be scaled/rotated
@@ -599,7 +605,7 @@
       if (activeGroup) {
         activeGroup.setObjectsCoords();
         activeGroup.set('isMoving', false);
-        this._setCursor('default');
+        this._setCursor(this.CURSOR);
       }
       
       // clear selection
@@ -945,7 +951,7 @@
               this._objects[i].setActive(false);
             }
           }
-          style.cursor = 'default';
+          style.cursor = this.CURSOR;
         }
         else {
           // set proper cursor 
@@ -1088,7 +1094,7 @@
     _setCursorFromEvent: function (e, target) {
       var s = this.upperCanvasEl.style;
       if (!target) {
-        s.cursor = 'default';
+        s.cursor = this.CURSOR;
         return false;
       }
       else {
@@ -1106,7 +1112,7 @@
             s.cursor = cursorMap[corner];
           }
           else {
-            s.cursor = 'default';
+            s.cursor = this.CURSOR;
             return false;
           }
         }
