@@ -298,6 +298,28 @@
     }
   });
   
+  test('fabric.util.makeElementSelectable', function() {
+    var makeElementSelectable = fabric.util.makeElementSelectable;
+    
+    ok(typeof makeElementSelectable == 'function');
+    
+    var el = document.createElement('p');
+    el.appendChild(document.createTextNode('foo'));
+    
+    makeElementUnselectable(el);
+    makeElementSelectable(el);
+    
+    if (typeof el.onselectstart != 'undefined') {
+      equals(el.onselectstart, null);
+    }
+    if (typeof el.unselectable == 'string') {
+      equals('', el.unselectable);
+    }
+    else if (typeof el.userSelect != 'undefined') {
+      equals('', el.userSelect);
+    }
+  });
+  
   test('fabric.loadSVGFromURL', function() {
     equal("function", typeof fabric.loadSVGFromURL);
   });
