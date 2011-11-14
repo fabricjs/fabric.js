@@ -174,7 +174,7 @@
         result.push(Math.round((source[i] * (1 - otherAlpha)) + (otherSource[i] * otherAlpha)));
       }
 
-      result[4] = alpha;
+      result[3] = alpha;
       this.setSource(result);
       return this;
     }

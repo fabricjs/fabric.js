@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2011, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.6.10" };
+var fabric = fabric || { version: "0.6.11" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -4200,7 +4200,7 @@ fabric.util.string = {
         result.push(Math.round((source[i] * (1 - otherAlpha)) + (otherSource[i] * otherAlpha)));
       }
 
-      result[4] = alpha;
+      result[3] = alpha;
       this.setSource(result);
       return this;
     }
