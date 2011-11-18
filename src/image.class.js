@@ -470,6 +470,6 @@
     fabric.Image.fromURL(parsedAttributes['xlink:href'], callback, extend(parsedAttributes, options));
   };
   
-  fabric.Image.fromElement.async = true;
+  fabric.Image.async = true;
   
 })(typeof exports != 'undefined' ? exports : this);

@@ -334,7 +334,7 @@
       var klass = fabric[capitalize(el.tagName)];
       if (klass && klass.fromElement) {
         try {
-          if (klass.fromElement.async) {
+          if (klass.async) {
             klass.fromElement(el, (function(index) { 
               return function(obj) {
                 instances.splice(index, 0, obj);

@@ -681,7 +681,9 @@
 
         // normalize angle
         this.set('angle', 0).set('flipX', false).set('flipY', false);
-        i.src = this.toDataURL();
+        this.toDataURL(function(dataURL) {
+          i.src = dataURL;
+        });
       }
       return this;
     },
@@ -691,8 +693,10 @@
      * @method toDataURL
      * @return {String} string of data
      */
-    toDataURL: function() {
+    toDataURL: function(callback) {
       var el = fabric.document.createElement('canvas');
+      
+      // TODO: should probably use bounding rectangle dimensions instead
       
       el.width = this.getWidth();
       el.height = this.getHeight();
@@ -703,18 +707,27 @@
       canvas.backgroundColor = 'transparent';
       canvas.renderAll();
       
-      var clone = this.clone();
-      clone.left = el.width / 2;
-      clone.top = el.height / 2;
+      if (this.constructor.async) {
+        this.clone(proceed);
+      }
+      else {
+        proceed(this.clone());
+      }
       
-      clone.setActive(false);
-      
-      canvas.add(clone);
-      var data = canvas.toDataURL('png');
-      
-      canvas.dispose();
-      canvas = clone = null;
-      return data;
+      function proceed(clone) {
+        clone.left = el.width / 2;
+        clone.top = el.height / 2;
+
+        clone.setActive(false);
+
+        canvas.add(clone);
+        var data = canvas.toDataURL('png');
+
+        canvas.dispose();
+        canvas = clone = null;
+        
+        callback && callback(data);
+      }
     },
     
     /**
