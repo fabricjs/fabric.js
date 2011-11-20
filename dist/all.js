@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2011, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.6.12" };
+var fabric = fabric || { version: "0.6.13" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -3614,10 +3614,10 @@ fabric.util.string = {
       _convertPercentUnitsToValues(obj, options);
 
       var gradient = fabric.Gradient.create(ctx, { 
-        x1: options.x1 - (obj.width / 2),
-        y1: options.y1 - (obj.height / 2),
-        x2: options.x2 - (obj.width / 2),
-        y2: options.y2 - (obj.height / 2),
+        x1: options.x1,
+        y1: options.y1,
+        x2: options.x2,
+        y2: options.y2,
         colorStops: options.colorStops
       });
 
