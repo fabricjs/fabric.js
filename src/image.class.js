@@ -119,6 +119,8 @@
      * @param {Number} maxheight maximum height of the image (in px)
      */
     getNormalizedSize: function(oImg, maxwidth, maxheight) {
+      var normalizedWidth, normalizedHeight;
+
       if (maxheight && maxwidth && (oImg.width > oImg.height && (oImg.width / oImg.height) < (maxwidth / maxheight))) {
         // height is the constraining dimension.
         normalizedWidth = ~~((oImg.width * maxheight) / oImg.height);
@@ -165,7 +167,7 @@
      */
     setBorderVisibility: function(visible) {
       this._resetWidthHeight();
-      this._adjustWidthHeightToBorders(showBorder);
+      this._adjustWidthHeightToBorders(visible);
       this.setCoords();
     },
 
