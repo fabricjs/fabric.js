@@ -299,7 +299,8 @@
   });
   
   test('fabric.util.makeElementSelectable', function() {
-    var makeElementSelectable = fabric.util.makeElementSelectable;
+    var makeElementSelectable = fabric.util.makeElementSelectable,
+        makeElementUnselectable = fabric.util.makeElementUnselectable;
     
     ok(typeof makeElementSelectable == 'function');
     

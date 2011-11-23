@@ -402,7 +402,7 @@
     }
   });
   
-  test('toDataURL', function() {
+  asyncTest('toDataURL', function() {
     var data = 
       'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQA'+
       'AABkCAYAAABw4pVUAAAA+UlEQVR4nO3RoRHAQBDEsOu/6YR+B2s'+
@@ -421,11 +421,15 @@
     
     if (!fabric.Canvas.supports('toDataURL')) {
       alert('toDataURL is not supported by this environment. Some of the tests can not be run.');
+      start();
     }
     else {
-      var dataURL = cObj.toDataURL();
-      equals(typeof dataURL, 'string');
-      equals(dataURL.substring(0, 21), 'data:image/png;base64');
+      cObj.toDataURL(function(dataURL) {
+        equals(typeof dataURL, 'string');
+        equals(dataURL.substring(0, 21), 'data:image/png;base64');
+        
+        start();
+      });
     }
   });
   

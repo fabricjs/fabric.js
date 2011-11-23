@@ -239,6 +239,7 @@
       method: 'get',
       onComplete: function(resp) {
         var doc = resp.responseXML;
+        if (!doc || !doc.documentElement) return;
         fabric.parseSVGDocument(doc.documentElement, function() {
           data = arguments[0];
         });
@@ -247,9 +248,10 @@
     
     setTimeout(function() {
       equals(typeof data, 'object');
-      equals(data.length, 1);
       
       if (data) {
+        equals(data.length, 1);
+        
         var path = data[0];
 
         ok(path instanceof fabric.Path);
@@ -267,6 +269,7 @@
       method: 'get',
       onComplete: function(resp) {
         var doc = resp.responseXML;
+        if (!doc || !doc.documentElement) return;
         fabric.parseSVGDocument(doc.documentElement, function() {
           objects = arguments[0];
         });
@@ -274,7 +277,9 @@
     });
     
     setTimeout(function() {
-      equals(objects[1].fill, 'green');
+      if (objects) {
+        equals(objects[1].fill, 'green');
+      }
       
       start();
     }, 1500);
