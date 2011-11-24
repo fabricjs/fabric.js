@@ -178,6 +178,7 @@
       Cufon.replaceElement(el, {
         separate: 'none', 
         fontFamily: this.fontFamily,
+        fontWeight: this.fontWeight,
         textDecoration: this.textDecoration,
         textShadow: this.textShadow,
         textAlign: this.textAlign,
