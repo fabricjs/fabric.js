@@ -360,5 +360,29 @@
     }, 1000);
   });
   
+  asyncTest('fabric.util.loadImage', function() {
+    ok(typeof fabric.util.loadImage == 'function');
+    
+    var callbackInvoked = false,
+        objectPassedToCallback;
+        
+    fabric.util.loadImage('../fixtures/very_large_image.jpg', function(obj) {
+      callbackInvoked = true;
+      objectPassedToCallback = obj;
+    });
+    
+    setTimeout(function() {
+      ok(callbackInvoked, 'callback should be invoked');
+      
+      if (objectPassedToCallback) {
+        ok(objectPassedToCallback instanceof Image, 'object passed to callback should be an instance of `fabric.Image`');
+        var oImg = new fabric.Image(objectPassedToCallback);
+        ok(/fixtures\/very_large_image\.jpg$/.test(oImg.getSrc()), 'image should have correct src');
+      }
+      
+      start();
+    }, 2000);
+  });
+  
   
 })();

@@ -703,29 +703,6 @@
     }, 2000);
   });
   
-  asyncTest('loadImageFromURL', function() {
-    ok(typeof canvas.loadImageFromURL == 'function');
-    
-    var callbackInvoked = false,
-        objectPassedToCallback;
-        
-    canvas.loadImageFromURL('../fixtures/very_large_image.jpg', function(obj) {
-      callbackInvoked = true;
-      objectPassedToCallback = obj;
-    });
-    
-    setTimeout(function() {
-      ok(callbackInvoked, 'callback should be invoked');
-      
-      if (objectPassedToCallback) {
-        ok(objectPassedToCallback instanceof fabric.Image, 'object passed to callback should be an instance of `fabric.Image`');
-        ok(/fixtures\/very_large_image\.jpg$/.test(objectPassedToCallback.getSrc()), 'image should have correct src');
-      }
-      
-      start();
-    }, 2000);
-  });
-  
   asyncTest('fxRemove', function() {
     ok(typeof canvas.fxRemove == 'function');
     
