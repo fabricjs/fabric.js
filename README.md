@@ -55,6 +55,11 @@ Fabric.js started as a foundation for design editor on [printio.ru](http://print
       
       By default (when none of the modules are specified) only basic functionality is included. 
       See the list of modules below for more information on each one of them.
+      Note that default distribution has support for **static canvases** only.
+      
+      To get minimal distribution with interactivity, make sure to include corresponding module:
+      
+            $ node build.js modules=interaction
     
     - You can also include all modules like so:
     
@@ -62,15 +67,15 @@ Fabric.js started as a foundation for design editor on [printio.ru](http://print
 
 3. Create a minified distribution file
 
-        # Using YUICompressor
-        $ java -jar lib/yuicompressor-2.4.2.jar dist/all.js -o dist/all.min.js
+        # Using YUICompressor (default option)
+        $ node build.js modules=... minifier=yui
         
         # or Google Closure Compiler
-        $ java -jar lib/google_closure_compiler.jar --js dist/all.js --js_output_file dist/all.min.js
+        $ node build.js modules=... minifier=closure
 
 4. Optionally, you can build documentation
 
-        $ java -jar lib/jsdoc-toolkit/jsrun.jar lib/jsdoc-toolkit/app/run.js -a -t=lib/jsdoc-toolkit/templates/jsdoc -d=site/docs HEADER.js src/ src/util/
+        $ node build_docs.js
 
 ### Demos
 
@@ -90,6 +95,7 @@ These are the optional modules that could be specified for inclusion, when build
 
 - **text** — Adds support for `fabric.Text`
 - **serialization** — Adds support for `loadFromJSON`, `loadFromDatalessJSON`, and `clone` methods on `fabric.Canvas`
+- **interaction** — Adds support for interactive features of fabric — selecting/transforming objects/groups via mouse/touch devices.
 - **parser** — Adds support for `fabric.parseSVGDocument`, `fabric.loadSVGFromURL`, and `fabric.loadSVGFromString`
 - **image_filters** — Adds support for image filters, such as grayscale of white removal.
 - **node** — Adds support for running fabric under node.js, with help of [jsdom](https://github.com/tmpvar/jsdom) and [node-canvas](https://github.com/learnboost/node-canvas) libraries.

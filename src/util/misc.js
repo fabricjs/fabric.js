@@ -86,39 +86,59 @@
     * @param {Function} [options.easing] Easing function
     * @param {Number} [options.duration=500] Duration of change
     */
-   function animate(options) {
+  function animate(options) {
 
-     options || (options = { });
+    options || (options = { });
 
-     var start = +new Date(), 
-         duration = options.duration || 500,
-         finish = start + duration, time, pos,
-         onChange = options.onChange || function() { },
-         abort = options.abort || function() { return false; },
-         easing = options.easing || function(pos) { return (-Math.cos(pos * Math.PI) / 2) + 0.5; },
-         startValue = 'startValue' in options ? options.startValue : 0,
-         endValue = 'endValue' in options ? options.endValue : 100;
+    var start = +new Date(), 
+      duration = options.duration || 500,
+      finish = start + duration, time, pos,
+      onChange = options.onChange || function() { },
+      abort = options.abort || function() { return false; },
+      easing = options.easing || function(pos) { return (-Math.cos(pos * Math.PI) / 2) + 0.5; },
+      startValue = 'startValue' in options ? options.startValue : 0,
+      endValue = 'endValue' in options ? options.endValue : 100;
 
-     options.onStart && options.onStart();
+    options.onStart && options.onStart();
 
-     var interval = setInterval(function() {
-       time = +new Date();
-       pos = time > finish ? 1 : (time - start) / duration;
-       onChange(startValue + (endValue - startValue) * easing(pos));
-       if (time > finish || abort()) {
-         clearInterval(interval);
-         options.onComplete && options.onComplete();
-       }
-     }, 10);
+    var interval = setInterval(function() {
+      time = +new Date();
+      pos = time > finish ? 1 : (time - start) / duration;
+      onChange(startValue + (endValue - startValue) * easing(pos));
+      if (time > finish || abort()) {
+        clearInterval(interval);
+        options.onComplete && options.onComplete();
+     }
+    }, 10);
 
-     return interval;
-   }
-  
+    return interval;
+  }
+
+  /**
+    * Loads image element from given url and passes it to a callback
+    * @method loadImage
+    * @memberOf fabric.util
+    * @param {String} url URL representing an image
+    * @param {Function} callback Callback; invoked with loaded image
+    * @param {Any} context optional Context to invoke callback in
+    */
+  function loadImage(url, callback, context) {
+    if (url) {
+      var img = new Image();
+      /** @ignore */
+      img.onload = function () { 
+        callback && callback.call(context, img);
+        img = img.onload = null;
+      };
+      img.src = url;
+    }
+  }
+
   fabric.util.removeFromArray = removeFromArray;
   fabric.util.degreesToRadians = degreesToRadians;
   fabric.util.toFixed = toFixed;
   fabric.util.getRandomInt = getRandomInt;
   fabric.util.falseFunction = falseFunction;
   fabric.util.animate = animate;
-  
+  fabric.util.loadImage = loadImage;
 })();
