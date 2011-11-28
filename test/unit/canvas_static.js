@@ -556,7 +556,7 @@
   
   asyncTest('backgroundImage', function() {
     same('', canvas.backgroundImage);
-    canvas.setBackgroundImage('/assets/pug.jpg');
+    canvas.setBackgroundImage('../../assets/pug.jpg');
     
     setTimeout(function() {
       
