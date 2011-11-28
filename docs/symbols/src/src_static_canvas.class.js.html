@@ -1,0 +1,955 @@
+<html><head><meta http-equiv="content-type" content="text/html; charset=utf-8"> <style>
+	.KEYW {color: #933;}
+	.COMM {color: #bbb; font-style: italic;}
+	.NUMB {color: #393;}
+	.STRN {color: #393;}
+	.REGX {color: #339;}
+	.line {border-right: 1px dotted #666; color: #666; font-style: normal;}
+	</style></head><body><pre><span class='line'>  1</span> <span class="PUNC">(</span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">global</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>  2</span> </span><span class="WHIT">  
+<span class='line'>  3</span>   </span><span class="STRN">"use strict"</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>  4</span> </span><span class="WHIT">  
+<span class='line'>  5</span>   </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">fabric.StaticCanvas</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>  6</span> </span><span class="WHIT">    </span><span class="NAME">fabric.warn</span><span class="PUNC">(</span><span class="STRN">'fabric.StaticCanvas is already defined.'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>  7</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>  8</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>  9</span> </span><span class="WHIT">  
+<span class='line'> 10</span>   </span><span class="COMM">// aliases for faster resolution</span><span class="WHIT">
+<span class='line'> 11</span> </span><span class="WHIT">  </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">extend</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">fabric.util.object.extend</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 12</span> </span><span class="WHIT">      </span><span class="NAME">getElementOffset</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">fabric.util.getElementOffset</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 13</span> </span><span class="WHIT">      </span><span class="NAME">removeFromArray</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">fabric.util.removeFromArray</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 14</span> </span><span class="WHIT">      </span><span class="NAME">removeListener</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">fabric.util.removeListener</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 15</span> </span><span class="WHIT">      
+<span class='line'> 16</span>       </span><span class="NAME">CANVAS_INIT_ERROR</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Error</span><span class="PUNC">(</span><span class="STRN">'Could not initialize `canvas` element'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 17</span> </span><span class="WHIT">  
+<span class='line'> 18</span>   </span><span class="COMM">/**
+<span class='line'> 19</span>    * @class fabric.StaticCanvas
+<span class='line'> 20</span>    * @constructor
+<span class='line'> 21</span>    * @param {HTMLElement | String} el &lt;canvas> element to initialize instance on
+<span class='line'> 22</span>    * @param {Object} [options] Options object
+<span class='line'> 23</span>    */</span><span class="WHIT">
+<span class='line'> 24</span> </span><span class="WHIT">  </span><span class="NAME">fabric.StaticCanvas</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">el</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">options</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 25</span> </span><span class="WHIT">    </span><span class="NAME">options</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">options</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 26</span> </span><span class="WHIT">    
+<span class='line'> 27</span>     </span><span class="NAME">this._initStatic</span><span class="PUNC">(</span><span class="NAME">el</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">options</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 28</span> </span><span class="WHIT">    </span><span class="NAME">fabric.StaticCanvas.activeInstance</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 29</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 30</span> </span><span class="WHIT">  
+<span class='line'> 31</span>   </span><span class="NAME">extend</span><span class="PUNC">(</span><span class="NAME">fabric.StaticCanvas.prototype</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">fabric.Observable</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 32</span> </span><span class="WHIT">  
+<span class='line'> 33</span>   </span><span class="NAME">extend</span><span class="PUNC">(</span><span class="NAME">fabric.StaticCanvas.prototype</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="COMM">/** @scope fabric.StaticCanvas.prototype */</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 34</span> </span><span class="WHIT">    
+<span class='line'> 35</span>     </span><span class="COMM">/**
+<span class='line'> 36</span>      * Background color of this canvas instance
+<span class='line'> 37</span>      * @property
+<span class='line'> 38</span>      * @type String
+<span class='line'> 39</span>      */</span><span class="WHIT">
+<span class='line'> 40</span> </span><span class="WHIT">    </span><span class="NAME">backgroundColor</span><span class="PUNC">:</span><span class="WHIT">        </span><span class="STRN">'rgba(0, 0, 0, 0)'</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 41</span> </span><span class="WHIT">    
+<span class='line'> 42</span>     </span><span class="COMM">/**
+<span class='line'> 43</span>      * Background image of this canvas instance
+<span class='line'> 44</span>      * Should be set via `setBackgroundImage`
+<span class='line'> 45</span>      * @property
+<span class='line'> 46</span>      * @type String
+<span class='line'> 47</span>      */</span><span class="WHIT">
+<span class='line'> 48</span> </span><span class="WHIT">    </span><span class="NAME">backgroundImage</span><span class="PUNC">:</span><span class="WHIT">        </span><span class="STRN">''</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 49</span> </span><span class="WHIT">    
+<span class='line'> 50</span>     </span><span class="COMM">/**
+<span class='line'> 51</span>      * @property
+<span class='line'> 52</span>      * @type Boolean
+<span class='line'> 53</span>      */</span><span class="WHIT">
+<span class='line'> 54</span> </span><span class="WHIT">    </span><span class="NAME">includeDefaultValues</span><span class="PUNC">:</span><span class="WHIT">   </span><span class="KEYW">true</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 55</span> </span><span class="WHIT">    
+<span class='line'> 56</span>     </span><span class="COMM">/**
+<span class='line'> 57</span>      * Indicates whether objects' state should be saved
+<span class='line'> 58</span>      * @property
+<span class='line'> 59</span>      * @type Boolean
+<span class='line'> 60</span>      */</span><span class="WHIT">
+<span class='line'> 61</span> </span><span class="WHIT">    </span><span class="NAME">stateful</span><span class="PUNC">:</span><span class="WHIT">               </span><span class="KEYW">true</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 62</span> </span><span class="WHIT">    
+<span class='line'> 63</span>     </span><span class="COMM">/**
+<span class='line'> 64</span>      * Indicates whether fabric.Canvas#add should also re-render canvas. 
+<span class='line'> 65</span>      * Disabling this option could give a great performance boost when adding a lot of objects to canvas at once 
+<span class='line'> 66</span>      * (followed by a manual rendering after addition)
+<span class='line'> 67</span>      */</span><span class="WHIT">
+<span class='line'> 68</span> </span><span class="WHIT">    </span><span class="NAME">renderOnAddition</span><span class="PUNC">:</span><span class="WHIT">       </span><span class="KEYW">true</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 69</span> </span><span class="WHIT">    
+<span class='line'> 70</span>     </span><span class="COMM">/**
+<span class='line'> 71</span>      * @constant
+<span class='line'> 72</span>      * @type Number
+<span class='line'> 73</span>      */</span><span class="WHIT">
+<span class='line'> 74</span> </span><span class="WHIT">    </span><span class="NAME">CANVAS_WIDTH</span><span class="PUNC">:</span><span class="WHIT">           </span><span class="NUMB">600</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 75</span> </span><span class="WHIT">    
+<span class='line'> 76</span>     </span><span class="COMM">/**
+<span class='line'> 77</span>      * @constant
+<span class='line'> 78</span>      * @type Number
+<span class='line'> 79</span>      */</span><span class="WHIT">
+<span class='line'> 80</span> </span><span class="WHIT">    </span><span class="NAME">CANVAS_HEIGHT</span><span class="PUNC">:</span><span class="WHIT">          </span><span class="NUMB">600</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 81</span> </span><span class="WHIT">    
+<span class='line'> 82</span>     </span><span class="COMM">/**
+<span class='line'> 83</span>      * @constant
+<span class='line'> 84</span>      * @type String
+<span class='line'> 85</span>      */</span><span class="WHIT">
+<span class='line'> 86</span> </span><span class="WHIT">    </span><span class="NAME">CONTAINER_CLASS</span><span class="PUNC">:</span><span class="WHIT">        </span><span class="STRN">'canvas-container'</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 87</span> </span><span class="WHIT">    
+<span class='line'> 88</span>     </span><span class="COMM">/**
+<span class='line'> 89</span>      * Callback; invoked right before object is about to be scaled/rotated
+<span class='line'> 90</span>      * @method onBeforeScaleRotate
+<span class='line'> 91</span>      * @param {fabric.Object} target Object that's about to be scaled/rotated
+<span class='line'> 92</span>      */</span><span class="WHIT">
+<span class='line'> 93</span> </span><span class="WHIT">    </span><span class="NAME">onBeforeScaleRotate</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">target</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 94</span> </span><span class="WHIT">      </span><span class="COMM">/* NOOP */</span><span class="WHIT">
+<span class='line'> 95</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 96</span> </span><span class="WHIT">    
+<span class='line'> 97</span>     </span><span class="COMM">/**
+<span class='line'> 98</span>      * Callback; invoked on every redraw of canvas and is being passed a number indicating current fps
+<span class='line'> 99</span>      * @method onFpsUpdate
+<span class='line'>100</span>      * @param {Number} fps
+<span class='line'>101</span>      */</span><span class="WHIT">
+<span class='line'>102</span> </span><span class="WHIT">    </span><span class="NAME">onFpsUpdate</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>103</span> </span><span class="WHIT">    
+<span class='line'>104</span>     </span><span class="NAME">_initStatic</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">el</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">options</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>105</span> </span><span class="WHIT">      </span><span class="NAME">this._objects</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>106</span> 
+<span class='line'>107</span> </span><span class="WHIT">      </span><span class="NAME">this._createLowerCanvas</span><span class="PUNC">(</span><span class="NAME">el</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>108</span> </span><span class="WHIT">      </span><span class="NAME">this._initOptions</span><span class="PUNC">(</span><span class="NAME">options</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>109</span> 
+<span class='line'>110</span> </span><span class="WHIT">      </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">options.overlayImage</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>111</span> </span><span class="WHIT">        </span><span class="NAME">this.setOverlayImage</span><span class="PUNC">(</span><span class="NAME">options.overlayImage</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this.renderAll.bind</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>112</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>113</span> </span><span class="WHIT">      </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">options.backgroundImage</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>114</span> </span><span class="WHIT">        </span><span class="NAME">this.setBackgroundImage</span><span class="PUNC">(</span><span class="NAME">options.backgroundImage</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this.renderAll.bind</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>115</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>116</span> </span><span class="WHIT">      </span><span class="NAME">this.calcOffset</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>117</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>118</span> </span><span class="WHIT">    
+<span class='line'>119</span>     </span><span class="COMM">/**
+<span class='line'>120</span>      * Calculates canvas element offset relative to the document
+<span class='line'>121</span>      * This method is also attached as "resize" event handler of window
+<span class='line'>122</span>      * @method calcOffset
+<span class='line'>123</span>      * @return {fabric.Canvas} instance
+<span class='line'>124</span>      * @chainable
+<span class='line'>125</span>      */</span><span class="WHIT">
+<span class='line'>126</span> </span><span class="WHIT">    </span><span class="NAME">calcOffset</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>127</span> </span><span class="WHIT">      </span><span class="NAME">this._offset</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">getElementOffset</span><span class="PUNC">(</span><span class="NAME">this.lowerCanvasEl</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>128</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>129</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>130</span> </span><span class="WHIT">    
+<span class='line'>131</span>     </span><span class="COMM">/**
+<span class='line'>132</span>      * Sets overlay image for this canvas
+<span class='line'>133</span>      * @method setOverlayImage
+<span class='line'>134</span>      * @param {String} url url of an image to set overlay to
+<span class='line'>135</span>      * @param {Function} callback callback to invoke when image is loaded and set as an overlay
+<span class='line'>136</span>      * @return {fabric.Canvas} thisArg
+<span class='line'>137</span>      * @chainable
+<span class='line'>138</span>      */</span><span class="WHIT">
+<span class='line'>139</span> </span><span class="WHIT">    </span><span class="NAME">setOverlayImage</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">url</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">callback</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="COMM">// TODO (kangax): test callback</span><span class="WHIT">
+<span class='line'>140</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">fabric.util.loadImage</span><span class="PUNC">(</span><span class="NAME">url</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">img</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>141</span> </span><span class="WHIT">        </span><span class="NAME">this.overlayImage</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">img</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>142</span> </span><span class="WHIT">        </span><span class="NAME">callback</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">callback</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>143</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>144</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>145</span> </span><span class="WHIT">    
+<span class='line'>146</span>     </span><span class="COMM">/**
+<span class='line'>147</span>      * Sets background image for this canvas
+<span class='line'>148</span>      * @method setBackgroundImage
+<span class='line'>149</span>      * @param {String} url url of an image to set background to
+<span class='line'>150</span>      * @param {Function} callback callback to invoke when image is loaded and set as background
+<span class='line'>151</span>      * @return {fabric.Canvas} thisArg
+<span class='line'>152</span>      * @chainable
+<span class='line'>153</span>      */</span><span class="WHIT">
+<span class='line'>154</span> </span><span class="WHIT">    </span><span class="NAME">setBackgroundImage</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">url</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">callback</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>155</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">fabric.util.loadImage</span><span class="PUNC">(</span><span class="NAME">url</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">img</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>156</span> </span><span class="WHIT">        </span><span class="NAME">this.backgroundImage</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">img</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>157</span> </span><span class="WHIT">        </span><span class="NAME">callback</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">callback</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>158</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>159</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>160</span> </span><span class="WHIT">    
+<span class='line'>161</span>     </span><span class="COMM">/**
+<span class='line'>162</span>      * @private
+<span class='line'>163</span>      * @method _createCanvasElement
+<span class='line'>164</span>      * @param {Element} element
+<span class='line'>165</span>      */</span><span class="WHIT">
+<span class='line'>166</span> </span><span class="WHIT">    </span><span class="NAME">_createCanvasElement</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>167</span> </span><span class="WHIT">      </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">element</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">fabric.document.createElement</span><span class="PUNC">(</span><span class="STRN">'canvas'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>168</span> </span><span class="WHIT">      </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">element.style</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>169</span> </span><span class="WHIT">        </span><span class="NAME">element.style</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>170</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>171</span> </span><span class="WHIT">      </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">element</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>172</span> </span><span class="WHIT">        </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="NAME">CANVAS_INIT_ERROR</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>173</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>174</span> </span><span class="WHIT">      </span><span class="NAME">this._initCanvasElement</span><span class="PUNC">(</span><span class="NAME">element</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>175</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">element</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>176</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>177</span> </span><span class="WHIT">    
+<span class='line'>178</span>     </span><span class="NAME">_initCanvasElement</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">element</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>179</span> </span><span class="WHIT">      </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">typeof</span><span class="WHIT"> </span><span class="NAME">element.getContext</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="STRN">'undefined'</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> 
+<span class='line'>180</span>           </span><span class="KEYW">typeof</span><span class="WHIT"> </span><span class="NAME">G_vmlCanvasManager</span><span class="WHIT"> </span><span class="PUNC">!==</span><span class="WHIT"> </span><span class="STRN">'undefined'</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> 
+<span class='line'>181</span>           </span><span class="NAME">G_vmlCanvasManager.initElement</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>182</span> </span><span class="WHIT">            
+<span class='line'>183</span>         </span><span class="NAME">G_vmlCanvasManager.initElement</span><span class="PUNC">(</span><span class="NAME">element</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>184</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>185</span> </span><span class="WHIT">      </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">typeof</span><span class="WHIT"> </span><span class="NAME">element.getContext</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="STRN">'undefined'</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>186</span> </span><span class="WHIT">        </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="NAME">CANVAS_INIT_ERROR</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>187</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>188</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>189</span> 
+<span class='line'>190</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>191</span>      * @method _initOptions
+<span class='line'>192</span>      * @param {Object} options
+<span class='line'>193</span>      */</span><span class="WHIT">
+<span class='line'>194</span> </span><span class="WHIT">    </span><span class="NAME">_initOptions</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">options</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>195</span> </span><span class="WHIT">      </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">prop</span><span class="WHIT"> </span><span class="KEYW">in</span><span class="WHIT"> </span><span class="NAME">options</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>196</span> </span><span class="WHIT">        </span><span class="KEYW">this</span><span class="PUNC">[</span><span class="NAME">prop</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">options</span><span class="PUNC">[</span><span class="NAME">prop</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>197</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>198</span> </span><span class="WHIT">      
+<span class='line'>199</span>       </span><span class="NAME">this.width</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">parseInt</span><span class="PUNC">(</span><span class="NAME">this.lowerCanvasEl.width</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NUMB">10</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>200</span> </span><span class="WHIT">      </span><span class="NAME">this.height</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">parseInt</span><span class="PUNC">(</span><span class="NAME">this.lowerCanvasEl.height</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NUMB">10</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>201</span> 
+<span class='line'>202</span> </span><span class="WHIT">      </span><span class="NAME">this.lowerCanvasEl.style.width</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.width</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'px'</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>203</span> </span><span class="WHIT">      </span><span class="NAME">this.lowerCanvasEl.style.height</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.height</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'px'</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>204</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>205</span> </span><span class="WHIT">    
+<span class='line'>206</span>     </span><span class="COMM">/**
+<span class='line'>207</span>      * Creates a secondary canvas
+<span class='line'>208</span>      * @method _createLowerCanvas
+<span class='line'>209</span>      */</span><span class="WHIT">
+<span class='line'>210</span> </span><span class="WHIT">    </span><span class="NAME">_createLowerCanvas</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">canvasEl</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>211</span> </span><span class="WHIT">      </span><span class="NAME">this.lowerCanvasEl</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">fabric.util.getById</span><span class="PUNC">(</span><span class="NAME">canvasEl</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NAME">this._createCanvasElement</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>212</span> </span><span class="WHIT">      </span><span class="NAME">this._initCanvasElement</span><span class="PUNC">(</span><span class="NAME">this.lowerCanvasEl</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>213</span> </span><span class="WHIT">      
+<span class='line'>214</span>       </span><span class="NAME">fabric.util.addClass</span><span class="PUNC">(</span><span class="NAME">this.lowerCanvasEl</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="STRN">'lower-canvas'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>215</span> </span><span class="WHIT">      
+<span class='line'>216</span>       </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.interactive</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>217</span> </span><span class="WHIT">        </span><span class="NAME">this._applyCanvasStyle</span><span class="PUNC">(</span><span class="NAME">this.lowerCanvasEl</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>218</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>219</span> </span><span class="WHIT">      
+<span class='line'>220</span>       </span><span class="NAME">this.contextContainer</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.lowerCanvasEl.getContext</span><span class="PUNC">(</span><span class="STRN">'2d'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>221</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>222</span> </span><span class="WHIT">    
+<span class='line'>223</span>     </span><span class="COMM">/**
+<span class='line'>224</span>      * Returns canvas width
+<span class='line'>225</span>      * @method getWidth
+<span class='line'>226</span>      * @return {Number}
+<span class='line'>227</span>      */</span><span class="WHIT">
+<span class='line'>228</span> </span><span class="WHIT">    </span><span class="NAME">getWidth</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>229</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.width</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>230</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>231</span> </span><span class="WHIT">    
+<span class='line'>232</span>     </span><span class="COMM">/**
+<span class='line'>233</span>      * Returns canvas height
+<span class='line'>234</span>      * @method getHeight
+<span class='line'>235</span>      * @return {Number}
+<span class='line'>236</span>      */</span><span class="WHIT">
+<span class='line'>237</span> </span><span class="WHIT">    </span><span class="NAME">getHeight</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>238</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.height</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>239</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>240</span> </span><span class="WHIT">    
+<span class='line'>241</span>     </span><span class="COMM">/**
+<span class='line'>242</span>      * Sets width of this canvas instance
+<span class='line'>243</span>      * @method setWidth
+<span class='line'>244</span>      * @param {Number} width value to set width to
+<span class='line'>245</span>      * @return {fabric.Canvas} instance
+<span class='line'>246</span>      * @chainable true
+<span class='line'>247</span>      */</span><span class="WHIT">
+<span class='line'>248</span> </span><span class="WHIT">    </span><span class="NAME">setWidth</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">value</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>249</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._setDimension</span><span class="PUNC">(</span><span class="STRN">'width'</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">value</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>250</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>251</span> </span><span class="WHIT">    
+<span class='line'>252</span>     </span><span class="COMM">/**
+<span class='line'>253</span>      * Sets height of this canvas instance
+<span class='line'>254</span>      * @method setHeight
+<span class='line'>255</span>      * @param {Number} height value to set height to
+<span class='line'>256</span>      * @return {fabric.Canvas} instance
+<span class='line'>257</span>      * @chainable true
+<span class='line'>258</span>      */</span><span class="WHIT">
+<span class='line'>259</span> </span><span class="WHIT">    </span><span class="NAME">setHeight</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">value</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>260</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._setDimension</span><span class="PUNC">(</span><span class="STRN">'height'</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">value</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>261</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>262</span> </span><span class="WHIT">    
+<span class='line'>263</span>     </span><span class="COMM">/**
+<span class='line'>264</span>      * Sets dimensions (width, height) of this canvas instance
+<span class='line'>265</span>      * @method setDimensions
+<span class='line'>266</span>      * @param {Object} dimensions
+<span class='line'>267</span>      * @return {fabric.Canvas} thisArg
+<span class='line'>268</span>      * @chainable
+<span class='line'>269</span>      */</span><span class="WHIT">
+<span class='line'>270</span> </span><span class="WHIT">    </span><span class="NAME">setDimensions</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">dimensions</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>271</span> </span><span class="WHIT">      </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">prop</span><span class="WHIT"> </span><span class="KEYW">in</span><span class="WHIT"> </span><span class="NAME">dimensions</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>272</span> </span><span class="WHIT">        </span><span class="NAME">this._setDimension</span><span class="PUNC">(</span><span class="NAME">prop</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">dimensions</span><span class="PUNC">[</span><span class="NAME">prop</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>273</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>274</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>275</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>276</span> </span><span class="WHIT">    
+<span class='line'>277</span>     </span><span class="COMM">/**
+<span class='line'>278</span>      * Helper for setting width/height
+<span class='line'>279</span>      * @private
+<span class='line'>280</span>      * @method _setDimensions
+<span class='line'>281</span>      * @param {String} prop property (width|height)
+<span class='line'>282</span>      * @param {Number} value value to set property to
+<span class='line'>283</span>      * @return {fabric.Canvas} instance
+<span class='line'>284</span>      * @chainable true
+<span class='line'>285</span>      */</span><span class="WHIT">
+<span class='line'>286</span> </span><span class="WHIT">    </span><span class="NAME">_setDimension</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">prop</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">value</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>287</span> </span><span class="WHIT">      </span><span class="NAME">this.lowerCanvasEl</span><span class="PUNC">[</span><span class="NAME">prop</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">value</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>288</span> </span><span class="WHIT">      </span><span class="NAME">this.lowerCanvasEl.style</span><span class="PUNC">[</span><span class="NAME">prop</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">value</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'px'</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>289</span> </span><span class="WHIT">      
+<span class='line'>290</span>       </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.upperCanvasEl</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>291</span> </span><span class="WHIT">        </span><span class="NAME">this.upperCanvasEl</span><span class="PUNC">[</span><span class="NAME">prop</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">value</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>292</span> </span><span class="WHIT">        </span><span class="NAME">this.upperCanvasEl.style</span><span class="PUNC">[</span><span class="NAME">prop</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">value</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'px'</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>293</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>294</span> </span><span class="WHIT">      
+<span class='line'>295</span>       </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.wrapperEl</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>296</span> </span><span class="WHIT">        </span><span class="NAME">this.wrapperEl.style</span><span class="PUNC">[</span><span class="NAME">prop</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">value</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'px'</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>297</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>298</span> </span><span class="WHIT">      
+<span class='line'>299</span>       </span><span class="KEYW">this</span><span class="PUNC">[</span><span class="NAME">prop</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">value</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>300</span> </span><span class="WHIT">      
+<span class='line'>301</span>       </span><span class="NAME">this.calcOffset</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>302</span> </span><span class="WHIT">      </span><span class="NAME">this.renderAll</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>303</span> </span><span class="WHIT">      
+<span class='line'>304</span>       </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>305</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>306</span> </span><span class="WHIT">    
+<span class='line'>307</span>     </span><span class="COMM">/**
+<span class='line'>308</span>      * Returns &lt;canvas> element corresponding to this instance
+<span class='line'>309</span>      * @method getElement
+<span class='line'>310</span>      * @return {HTMLCanvasElement}
+<span class='line'>311</span>      */</span><span class="WHIT">
+<span class='line'>312</span> </span><span class="WHIT">    </span><span class="NAME">getElement</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>313</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.lowerCanvasEl</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>314</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>315</span> </span><span class="WHIT">    
+<span class='line'>316</span>     </span><span class="COMM">// placeholder</span><span class="WHIT">
+<span class='line'>317</span> </span><span class="WHIT">    </span><span class="NAME">getActiveObject</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>318</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>319</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>320</span> </span><span class="WHIT">    
+<span class='line'>321</span>     </span><span class="COMM">// placeholder</span><span class="WHIT">
+<span class='line'>322</span> </span><span class="WHIT">    </span><span class="NAME">getActiveGroup</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>323</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>324</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>325</span> </span><span class="WHIT">    
+<span class='line'>326</span>     </span><span class="COMM">/**
+<span class='line'>327</span>      * Given a context, renders an object on that context 
+<span class='line'>328</span>      * @param ctx {Object} context to render object on
+<span class='line'>329</span>      * @param object {Object} object to render
+<span class='line'>330</span>      * @private
+<span class='line'>331</span>      */</span><span class="WHIT">
+<span class='line'>332</span> </span><span class="WHIT">    </span><span class="NAME">_draw</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">ctx</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">object</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>333</span> </span><span class="WHIT">      </span><span class="NAME">object</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">object.render</span><span class="PUNC">(</span><span class="NAME">ctx</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>334</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>335</span> </span><span class="WHIT">    
+<span class='line'>336</span>     </span><span class="COMM">/**
+<span class='line'>337</span>      * Adds objects to canvas, then renders canvas;
+<span class='line'>338</span>      * Objects should be instances of (or inherit from) fabric.Object
+<span class='line'>339</span>      * @method add
+<span class='line'>340</span>      * @return {fabric.Canvas} thisArg
+<span class='line'>341</span>      * @chainable
+<span class='line'>342</span>      */</span><span class="WHIT">
+<span class='line'>343</span> </span><span class="WHIT">    </span><span class="NAME">add</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>344</span> </span><span class="WHIT">      </span><span class="NAME">this._objects.push.apply</span><span class="PUNC">(</span><span class="NAME">this._objects</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>345</span> </span><span class="WHIT">      </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">arguments.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">--</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>346</span> </span><span class="WHIT">        </span><span class="NAME">this.stateful</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">setupState</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>347</span> </span><span class="WHIT">        </span><span class="NAME">arguments</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">setCoords</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>348</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>349</span> </span><span class="WHIT">      </span><span class="NAME">this.renderOnAddition</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">this.renderAll</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>350</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>351</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>352</span> </span><span class="WHIT">    
+<span class='line'>353</span>     </span><span class="COMM">/**
+<span class='line'>354</span>      * Inserts an object to canvas at specified index and renders canvas. 
+<span class='line'>355</span>      * An object should be an instance of (or inherit from) fabric.Object
+<span class='line'>356</span>      * @method insertAt
+<span class='line'>357</span>      * @param object {Object} Object to insert
+<span class='line'>358</span>      * @param index {Number} index to insert object at
+<span class='line'>359</span>      * @param nonSplicing {Boolean} when `true`, no splicing (shifting) of objects occurs
+<span class='line'>360</span>      * @return {fabric.Canvas} instance
+<span class='line'>361</span>      */</span><span class="WHIT">
+<span class='line'>362</span> </span><span class="WHIT">    </span><span class="NAME">insertAt</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">object</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">index</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">nonSplicing</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>363</span> </span><span class="WHIT">      </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">nonSplicing</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>364</span> </span><span class="WHIT">        </span><span class="NAME">this._objects</span><span class="PUNC">[</span><span class="NAME">index</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">object</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>365</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>366</span> </span><span class="WHIT">      </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>367</span> </span><span class="WHIT">        </span><span class="NAME">this._objects.splice</span><span class="PUNC">(</span><span class="NAME">index</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">object</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>368</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>369</span> </span><span class="WHIT">      </span><span class="NAME">this.stateful</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">object.setupState</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>370</span> </span><span class="WHIT">      </span><span class="NAME">object.setCoords</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>371</span> </span><span class="WHIT">      </span><span class="NAME">this.renderAll</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>372</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>373</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>374</span> </span><span class="WHIT">    
+<span class='line'>375</span>     </span><span class="COMM">/**
+<span class='line'>376</span>      * Returns an array of objects this instance has
+<span class='line'>377</span>      * @method getObjects
+<span class='line'>378</span>      * @return {Array}
+<span class='line'>379</span>      */</span><span class="WHIT">
+<span class='line'>380</span> </span><span class="WHIT">    </span><span class="NAME">getObjects</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>381</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._objects</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>382</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>383</span> </span><span class="WHIT">    
+<span class='line'>384</span>     </span><span class="COMM">/**
+<span class='line'>385</span>      * Clears specified context of canvas element
+<span class='line'>386</span>      * @method clearContext
+<span class='line'>387</span>      * @param context {Object} ctx context to clear
+<span class='line'>388</span>      * @return {fabric.Canvas} thisArg
+<span class='line'>389</span>      * @chainable
+<span class='line'>390</span>      */</span><span class="WHIT">
+<span class='line'>391</span> </span><span class="WHIT">    </span><span class="NAME">clearContext</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">ctx</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>392</span> </span><span class="WHIT">      </span><span class="NAME">ctx.clearRect</span><span class="PUNC">(</span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this.width</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this.height</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>393</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>394</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>395</span> </span><span class="WHIT">    
+<span class='line'>396</span>     </span><span class="COMM">/**
+<span class='line'>397</span>      * Clears all contexts (background, main, top) of an instance
+<span class='line'>398</span>      * @method clear
+<span class='line'>399</span>      * @return {fabric.Canvas} thisArg
+<span class='line'>400</span>      * @chainable
+<span class='line'>401</span>      */</span><span class="WHIT">
+<span class='line'>402</span> </span><span class="WHIT">    </span><span class="NAME">clear</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>403</span> </span><span class="WHIT">      </span><span class="NAME">this._objects.length</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>404</span> </span><span class="WHIT">      </span><span class="NAME">this.clearContext</span><span class="PUNC">(</span><span class="NAME">this.contextContainer</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>405</span> </span><span class="WHIT">      </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.contextTop</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>406</span> </span><span class="WHIT">        </span><span class="NAME">this.clearContext</span><span class="PUNC">(</span><span class="NAME">this.contextTop</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>407</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>408</span> </span><span class="WHIT">      </span><span class="NAME">this.renderAll</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>409</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>410</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>411</span> 
+<span class='line'>412</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>413</span>      * Renders both the top canvas and the secondary container canvas.
+<span class='line'>414</span>      * @method renderAll
+<span class='line'>415</span>      * @param allOnTop {Boolean} optional Whether we want to force all images to be rendered on the top canvas
+<span class='line'>416</span>      * @return {fabric.Canvas} instance
+<span class='line'>417</span>      * @chainable
+<span class='line'>418</span>      */</span><span class="WHIT"> 
+<span class='line'>419</span>     </span><span class="NAME">renderAll</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">allOnTop</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>420</span> </span><span class="WHIT">      
+<span class='line'>421</span>       </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">canvasToDrawOn</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">[</span><span class="PUNC">(</span><span class="NAME">allOnTop</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">this.interactive</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">?</span><span class="WHIT"> </span><span class="STRN">'contextTop'</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">'contextContainer'</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>422</span> 
+<span class='line'>423</span> </span><span class="WHIT">      </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.contextTop</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>424</span> </span><span class="WHIT">        </span><span class="NAME">this.clearContext</span><span class="PUNC">(</span><span class="NAME">this.contextTop</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>425</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>426</span> 
+<span class='line'>427</span> </span><span class="WHIT">      </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">allOnTop</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>428</span> </span><span class="WHIT">        </span><span class="NAME">this.clearContext</span><span class="PUNC">(</span><span class="NAME">canvasToDrawOn</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>429</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>430</span> </span><span class="WHIT">      
+<span class='line'>431</span>       </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">length</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this._objects.length</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>432</span> </span><span class="WHIT">          </span><span class="NAME">activeGroup</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.getActiveGroup</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>433</span> </span><span class="WHIT">          </span><span class="NAME">startTime</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Date</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>434</span> </span><span class="WHIT">      
+<span class='line'>435</span>       </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.clipTo</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>436</span> </span><span class="WHIT">        </span><span class="NAME">canvasToDrawOn.save</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>437</span> </span><span class="WHIT">        </span><span class="NAME">canvasToDrawOn.beginPath</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>438</span> </span><span class="WHIT">        </span><span class="NAME">this.clipTo</span><span class="PUNC">(</span><span class="NAME">canvasToDrawOn</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>439</span> </span><span class="WHIT">        </span><span class="NAME">canvasToDrawOn.clip</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>440</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>441</span> </span><span class="WHIT">      
+<span class='line'>442</span>       </span><span class="NAME">canvasToDrawOn.fillStyle</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.backgroundColor</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>443</span> </span><span class="WHIT">      </span><span class="NAME">canvasToDrawOn.fillRect</span><span class="PUNC">(</span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this.width</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this.height</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>444</span> </span><span class="WHIT">      
+<span class='line'>445</span>       </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">typeof</span><span class="WHIT"> </span><span class="NAME">this.backgroundImage</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="STRN">'object'</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>446</span> </span><span class="WHIT">        </span><span class="NAME">canvasToDrawOn.drawImage</span><span class="PUNC">(</span><span class="NAME">this.backgroundImage</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this.width</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this.height</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>447</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>448</span> </span><span class="WHIT">      
+<span class='line'>449</span>       </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">length</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>450</span> </span><span class="WHIT">        </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="PUNC">++</span><span class="NAME">i</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>451</span> </span><span class="WHIT">          </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">activeGroup</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT">
+<span class='line'>452</span> </span><span class="WHIT">              </span><span class="PUNC">(</span><span class="NAME">activeGroup</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">this._objects</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="PUNC">!</span><span class="NAME">activeGroup.contains</span><span class="PUNC">(</span><span class="NAME">this._objects</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>453</span> </span><span class="WHIT">            </span><span class="NAME">this._draw</span><span class="PUNC">(</span><span class="NAME">canvasToDrawOn</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this._objects</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>454</span> </span><span class="WHIT">          </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>455</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>456</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>457</span> </span><span class="WHIT">      
+<span class='line'>458</span>       </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.clipTo</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>459</span> </span><span class="WHIT">        </span><span class="NAME">canvasToDrawOn.restore</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>460</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>461</span> </span><span class="WHIT">      
+<span class='line'>462</span>       </span><span class="COMM">// delegate rendering to group selection (if one exists)</span><span class="WHIT">
+<span class='line'>463</span> </span><span class="WHIT">      </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">activeGroup</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>464</span> </span><span class="WHIT">        </span><span class="NAME">this._draw</span><span class="PUNC">(</span><span class="NAME">this.contextTop</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">activeGroup</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>465</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>466</span> </span><span class="WHIT">      
+<span class='line'>467</span>       </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.overlayImage</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>468</span> </span><span class="WHIT">        </span><span class="NAME">this.contextTop.drawImage</span><span class="PUNC">(</span><span class="NAME">this.overlayImage</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>469</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>470</span> </span><span class="WHIT">      
+<span class='line'>471</span>       </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.onFpsUpdate</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>472</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">elapsedTime</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Date</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">startTime</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>473</span> </span><span class="WHIT">        </span><span class="NAME">this.onFpsUpdate</span><span class="PUNC">(</span><span class="PUNC">~</span><span class="PUNC">~</span><span class="PUNC">(</span><span class="NUMB">1000</span><span class="WHIT"> </span><span class="PUNC">/</span><span class="WHIT"> </span><span class="NAME">elapsedTime</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>474</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>475</span> </span><span class="WHIT">      
+<span class='line'>476</span>       </span><span class="NAME">this.fire</span><span class="PUNC">(</span><span class="STRN">'after:render'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>477</span> </span><span class="WHIT">      
+<span class='line'>478</span>       </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>479</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>480</span> 
+<span class='line'>481</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>482</span>      * Method to render only the top canvas.
+<span class='line'>483</span>      * Also used to render the group selection box.
+<span class='line'>484</span>      * @method renderTop
+<span class='line'>485</span>      * @return {fabric.Canvas} thisArg
+<span class='line'>486</span>      * @chainable
+<span class='line'>487</span>      */</span><span class="WHIT">
+<span class='line'>488</span> </span><span class="WHIT">    </span><span class="NAME">renderTop</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>489</span> </span><span class="WHIT">      </span><span class="NAME">this.clearContext</span><span class="PUNC">(</span><span class="NAME">this.contextTop</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NAME">this.contextContainer</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>490</span> </span><span class="WHIT">      
+<span class='line'>491</span>       </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.overlayImage</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>492</span> </span><span class="WHIT">        </span><span class="PUNC">(</span><span class="NAME">this.contextTop</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NAME">this.contextContainer</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">drawImage</span><span class="PUNC">(</span><span class="NAME">this.overlayImage</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>493</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>494</span> </span><span class="WHIT">      
+<span class='line'>495</span>       </span><span class="COMM">// we render the top context - last object</span><span class="WHIT">
+<span class='line'>496</span> </span><span class="WHIT">      </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.selection</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">this._groupSelector</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>497</span> </span><span class="WHIT">        </span><span class="NAME">this._drawSelection</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>498</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>499</span> </span><span class="WHIT">      
+<span class='line'>500</span>       </span><span class="COMM">// delegate rendering to group selection if one exists</span><span class="WHIT">
+<span class='line'>501</span> </span><span class="WHIT">      </span><span class="COMM">// used for drawing selection borders/corners</span><span class="WHIT">
+<span class='line'>502</span> </span><span class="WHIT">      </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">activeGroup</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.getActiveGroup</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>503</span> </span><span class="WHIT">      </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">activeGroup</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>504</span> </span><span class="WHIT">        </span><span class="NAME">activeGroup.render</span><span class="PUNC">(</span><span class="NAME">this.contextTop</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>505</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>506</span> </span><span class="WHIT">      
+<span class='line'>507</span>       </span><span class="NAME">this.fire</span><span class="PUNC">(</span><span class="STRN">'after:render'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>508</span> </span><span class="WHIT">      
+<span class='line'>509</span>       </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>510</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>511</span> 
+<span class='line'>512</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>513</span>      * Exports canvas element to a dataurl image.
+<span class='line'>514</span>      * @method toDataURL
+<span class='line'>515</span>      * @param {String} format the format of the output image. Either "jpeg" or "png".
+<span class='line'>516</span>      * @return {String}
+<span class='line'>517</span>      */</span><span class="WHIT">
+<span class='line'>518</span> </span><span class="WHIT">    </span><span class="NAME">toDataURL</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">format</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>519</span> </span><span class="WHIT">      </span><span class="NAME">this.renderAll</span><span class="PUNC">(</span><span class="KEYW">true</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>520</span> </span><span class="WHIT">      </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">data</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.upperCanvasEl</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NAME">this.lowerCanvasEl</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">toDataURL</span><span class="PUNC">(</span><span class="STRN">'image/'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">format</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>521</span> </span><span class="WHIT">      </span><span class="NAME">this.renderAll</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>522</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>523</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>524</span> </span><span class="WHIT">    
+<span class='line'>525</span>     </span><span class="COMM">/**
+<span class='line'>526</span>      * Exports canvas element to a dataurl image (allowing to change image size via multiplier).
+<span class='line'>527</span>      * @method toDataURLWithMultiplier
+<span class='line'>528</span>      * @param {String} format (png|jpeg)
+<span class='line'>529</span>      * @param {Number} multiplier
+<span class='line'>530</span>      * @return {String}
+<span class='line'>531</span>      */</span><span class="WHIT">
+<span class='line'>532</span> </span><span class="WHIT">    </span><span class="NAME">toDataURLWithMultiplier</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">format</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">multiplier</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>533</span> </span><span class="WHIT">      
+<span class='line'>534</span>       </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">origWidth</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.getWidth</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>535</span> </span><span class="WHIT">          </span><span class="NAME">origHeight</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.getHeight</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>536</span> </span><span class="WHIT">          </span><span class="NAME">scaledWidth</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">origWidth</span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NAME">multiplier</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>537</span> </span><span class="WHIT">          </span><span class="NAME">scaledHeight</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">origHeight</span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NAME">multiplier</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>538</span> </span><span class="WHIT">          </span><span class="NAME">activeObject</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.getActiveObject</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>539</span> </span><span class="WHIT">      
+<span class='line'>540</span>       </span><span class="NAME">this.setWidth</span><span class="PUNC">(</span><span class="NAME">scaledWidth</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">setHeight</span><span class="PUNC">(</span><span class="NAME">scaledHeight</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>541</span> </span><span class="WHIT">      </span><span class="NAME">this.contextTop.scale</span><span class="PUNC">(</span><span class="NAME">multiplier</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">multiplier</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>542</span> </span><span class="WHIT">      
+<span class='line'>543</span>       </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">activeObject</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>544</span> </span><span class="WHIT">        </span><span class="NAME">this.deactivateAll</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>545</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>546</span> </span><span class="WHIT">      
+<span class='line'>547</span>       </span><span class="COMM">// restoring width, height for `renderAll` to draw </span><span class="WHIT">
+<span class='line'>548</span> </span><span class="WHIT">      </span><span class="COMM">// background properly (while context is scaled)</span><span class="WHIT">
+<span class='line'>549</span> </span><span class="WHIT">      </span><span class="NAME">this.width</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">origWidth</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>550</span> </span><span class="WHIT">      </span><span class="NAME">this.height</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">origHeight</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>551</span> </span><span class="WHIT">      
+<span class='line'>552</span>       </span><span class="NAME">this.renderAll</span><span class="PUNC">(</span><span class="KEYW">true</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>553</span> </span><span class="WHIT">      
+<span class='line'>554</span>       </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">dataURL</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.toDataURL</span><span class="PUNC">(</span><span class="NAME">format</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>555</span> 
+<span class='line'>556</span> </span><span class="WHIT">      </span><span class="NAME">this.contextTop.scale</span><span class="PUNC">(</span><span class="NUMB">1</span><span class="WHIT"> </span><span class="PUNC">/</span><span class="WHIT"> </span><span class="NAME">multiplier</span><span class="PUNC">,</span><span class="WHIT">  </span><span class="NUMB">1</span><span class="WHIT"> </span><span class="PUNC">/</span><span class="WHIT"> </span><span class="NAME">multiplier</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>557</span> </span><span class="WHIT">      </span><span class="NAME">this.setWidth</span><span class="PUNC">(</span><span class="NAME">origWidth</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">setHeight</span><span class="PUNC">(</span><span class="NAME">origHeight</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>558</span> </span><span class="WHIT">      
+<span class='line'>559</span>       </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">activeObject</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>560</span> </span><span class="WHIT">        </span><span class="NAME">this.setActiveObject</span><span class="PUNC">(</span><span class="NAME">activeObject</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>561</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>562</span> </span><span class="WHIT">      </span><span class="NAME">this.renderAll</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>563</span> </span><span class="WHIT">      
+<span class='line'>564</span>       </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">dataURL</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>565</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>566</span> </span><span class="WHIT">    
+<span class='line'>567</span>     </span><span class="COMM">/**
+<span class='line'>568</span>      * Returns coordinates of a center of canvas.
+<span class='line'>569</span>      * Returned value is an object with top and left properties
+<span class='line'>570</span>      * @method getCenter
+<span class='line'>571</span>      * @return {Object} object with "top" and "left" number values
+<span class='line'>572</span>      */</span><span class="WHIT">
+<span class='line'>573</span> </span><span class="WHIT">    </span><span class="NAME">getCenter</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>574</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>575</span> </span><span class="WHIT">        </span><span class="NAME">top</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">this.getHeight</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">/</span><span class="WHIT"> </span><span class="NUMB">2</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>576</span> </span><span class="WHIT">        </span><span class="NAME">left</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">this.getWidth</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">/</span><span class="WHIT"> </span><span class="NUMB">2</span><span class="WHIT">
+<span class='line'>577</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>578</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>579</span> </span><span class="WHIT">    
+<span class='line'>580</span>     </span><span class="COMM">/**
+<span class='line'>581</span>      * Centers object horizontally.
+<span class='line'>582</span>      * @method centerObjectH
+<span class='line'>583</span>      * @param {fabric.Object} object Object to center
+<span class='line'>584</span>      * @return {fabric.Canvas} thisArg
+<span class='line'>585</span>      */</span><span class="WHIT">
+<span class='line'>586</span> </span><span class="WHIT">    </span><span class="NAME">centerObjectH</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">object</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>587</span> </span><span class="WHIT">      </span><span class="NAME">object.set</span><span class="PUNC">(</span><span class="STRN">'left'</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this.getCenter</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">left</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>588</span> </span><span class="WHIT">      </span><span class="NAME">this.renderAll</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>589</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>590</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>591</span> </span><span class="WHIT">    
+<span class='line'>592</span>     </span><span class="COMM">/**
+<span class='line'>593</span>      * Centers object vertically.
+<span class='line'>594</span>      * @method centerObjectH
+<span class='line'>595</span>      * @param {fabric.Object} object Object to center
+<span class='line'>596</span>      * @return {fabric.Canvas} thisArg
+<span class='line'>597</span>      * @chainable
+<span class='line'>598</span>      */</span><span class="WHIT">
+<span class='line'>599</span> </span><span class="WHIT">    </span><span class="NAME">centerObjectV</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">object</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>600</span> </span><span class="WHIT">      </span><span class="NAME">object.set</span><span class="PUNC">(</span><span class="STRN">'top'</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this.getCenter</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">top</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>601</span> </span><span class="WHIT">      </span><span class="NAME">this.renderAll</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>602</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>603</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>604</span> </span><span class="WHIT">    
+<span class='line'>605</span>     </span><span class="COMM">/**
+<span class='line'>606</span>      * Centers object vertically and horizontally.
+<span class='line'>607</span>      * @method centerObject
+<span class='line'>608</span>      * @param {fabric.Object} object Object to center
+<span class='line'>609</span>      * @return {fabric.Canvas} thisArg
+<span class='line'>610</span>      * @chainable
+<span class='line'>611</span>      */</span><span class="WHIT">
+<span class='line'>612</span> </span><span class="WHIT">    </span><span class="NAME">centerObject</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">object</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>613</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.centerObjectH</span><span class="PUNC">(</span><span class="NAME">object</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">centerObjectV</span><span class="PUNC">(</span><span class="NAME">object</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>614</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>615</span> </span><span class="WHIT">    
+<span class='line'>616</span>     </span><span class="COMM">/**
+<span class='line'>617</span>      * Straightens object, then rerenders canvas
+<span class='line'>618</span>      * @method straightenObject
+<span class='line'>619</span>      * @param {fabric.Object} object Object to straighten
+<span class='line'>620</span>      * @return {fabric.Canvas} thisArg
+<span class='line'>621</span>      * @chainable
+<span class='line'>622</span>      */</span><span class="WHIT">
+<span class='line'>623</span> </span><span class="WHIT">    </span><span class="NAME">straightenObject</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">object</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>624</span> </span><span class="WHIT">      </span><span class="NAME">object.straighten</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>625</span> </span><span class="WHIT">      </span><span class="NAME">this.renderAll</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>626</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>627</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>628</span> </span><span class="WHIT">    
+<span class='line'>629</span>     </span><span class="COMM">/**
+<span class='line'>630</span>      * Returs dataless JSON representation of canvas
+<span class='line'>631</span>      * @method toDatalessJSON
+<span class='line'>632</span>      * @return {String} json string
+<span class='line'>633</span>      */</span><span class="WHIT">
+<span class='line'>634</span> </span><span class="WHIT">    </span><span class="NAME">toDatalessJSON</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>635</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.toDatalessObject</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>636</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>637</span> </span><span class="WHIT">    
+<span class='line'>638</span>     </span><span class="COMM">/**
+<span class='line'>639</span>      * Returns object representation of canvas
+<span class='line'>640</span>      * @method toObject
+<span class='line'>641</span>      * @return {Object}
+<span class='line'>642</span>      */</span><span class="WHIT">
+<span class='line'>643</span> </span><span class="WHIT">    </span><span class="NAME">toObject</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>644</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._toObjectMethod</span><span class="PUNC">(</span><span class="STRN">'toObject'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>645</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>646</span> </span><span class="WHIT">    
+<span class='line'>647</span>     </span><span class="COMM">/**
+<span class='line'>648</span>      * Returns dataless object representation of canvas
+<span class='line'>649</span>      * @method toDatalessObject
+<span class='line'>650</span>      * @return {Object}
+<span class='line'>651</span>      */</span><span class="WHIT">
+<span class='line'>652</span> </span><span class="WHIT">    </span><span class="NAME">toDatalessObject</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>653</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._toObjectMethod</span><span class="PUNC">(</span><span class="STRN">'toDatalessObject'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>654</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>655</span> </span><span class="WHIT">    
+<span class='line'>656</span>     </span><span class="COMM">/**
+<span class='line'>657</span>      * @private
+<span class='line'>658</span>      * @method _toObjectMethod
+<span class='line'>659</span>      */</span><span class="WHIT">
+<span class='line'>660</span> </span><span class="WHIT">    </span><span class="NAME">_toObjectMethod</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">methodName</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>661</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> 
+<span class='line'>662</span>         </span><span class="NAME">objects</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">this._objects.map</span><span class="PUNC">(</span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">instance</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>663</span> </span><span class="WHIT">          </span><span class="COMM">// TODO (kangax): figure out how to clean this up</span><span class="WHIT">
+<span class='line'>664</span> </span><span class="WHIT">          </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">this.includeDefaultValues</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>665</span> </span><span class="WHIT">            </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">originalValue</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">instance.includeDefaultValues</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>666</span> </span><span class="WHIT">            </span><span class="NAME">instance.includeDefaultValues</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>667</span> </span><span class="WHIT">          </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>668</span> </span><span class="WHIT">          </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">object</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">instance</span><span class="PUNC">[</span><span class="NAME">methodName</span><span class="PUNC">]</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>669</span> </span><span class="WHIT">          </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">this.includeDefaultValues</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>670</span> </span><span class="WHIT">            </span><span class="NAME">instance.includeDefaultValues</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">originalValue</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>671</span> </span><span class="WHIT">          </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>672</span> </span><span class="WHIT">          </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">object</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>673</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">)</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>674</span> </span><span class="WHIT">        </span><span class="NAME">background</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">this.backgroundColor</span><span class="WHIT">
+<span class='line'>675</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>676</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>677</span> 
+<span class='line'>678</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>679</span>      * Returns true if canvas contains no objects
+<span class='line'>680</span>      * @method isEmpty
+<span class='line'>681</span>      * @return {Boolean} true if canvas is empty
+<span class='line'>682</span>      */</span><span class="WHIT">
+<span class='line'>683</span> </span><span class="WHIT">    </span><span class="NAME">isEmpty</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>684</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._objects.length</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>685</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>686</span> </span><span class="WHIT">    
+<span class='line'>687</span>     </span><span class="COMM">/**
+<span class='line'>688</span>      * Removes an object from canvas and returns it
+<span class='line'>689</span>      * @method remove
+<span class='line'>690</span>      * @param object {Object} Object to remove
+<span class='line'>691</span>      * @return {Object} removed object
+<span class='line'>692</span>      */</span><span class="WHIT">
+<span class='line'>693</span> </span><span class="WHIT">    </span><span class="NAME">remove</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">object</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>694</span> </span><span class="WHIT">      </span><span class="NAME">removeFromArray</span><span class="PUNC">(</span><span class="NAME">this._objects</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">object</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>695</span> </span><span class="WHIT">      </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.getActiveObject</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="NAME">object</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>696</span> </span><span class="WHIT">        </span><span class="NAME">this.discardActiveObject</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>697</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>698</span> </span><span class="WHIT">      </span><span class="NAME">this.renderAll</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>699</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">object</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>700</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>701</span> </span><span class="WHIT">    
+<span class='line'>702</span>     </span><span class="COMM">/**
+<span class='line'>703</span>      * Moves an object to the bottom of the stack of drawn objects
+<span class='line'>704</span>      * @method sendToBack
+<span class='line'>705</span>      * @param object {fabric.Object} Object to send to back
+<span class='line'>706</span>      * @return {fabric.Canvas} thisArg
+<span class='line'>707</span>      * @chainable
+<span class='line'>708</span>      */</span><span class="WHIT">
+<span class='line'>709</span> </span><span class="WHIT">    </span><span class="NAME">sendToBack</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">object</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>710</span> </span><span class="WHIT">      </span><span class="NAME">removeFromArray</span><span class="PUNC">(</span><span class="NAME">this._objects</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">object</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>711</span> </span><span class="WHIT">      </span><span class="NAME">this._objects.unshift</span><span class="PUNC">(</span><span class="NAME">object</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>712</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.renderAll</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>713</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>714</span> </span><span class="WHIT">    
+<span class='line'>715</span>     </span><span class="COMM">/**
+<span class='line'>716</span>      * Moves an object to the top of the stack of drawn objects
+<span class='line'>717</span>      * @method bringToFront
+<span class='line'>718</span>      * @param object {fabric.Object} Object to send
+<span class='line'>719</span>      * @return {fabric.Canvas} thisArg
+<span class='line'>720</span>      * @chainable
+<span class='line'>721</span>      */</span><span class="WHIT">
+<span class='line'>722</span> </span><span class="WHIT">    </span><span class="NAME">bringToFront</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">object</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>723</span> </span><span class="WHIT">      </span><span class="NAME">removeFromArray</span><span class="PUNC">(</span><span class="NAME">this._objects</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">object</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>724</span> </span><span class="WHIT">      </span><span class="NAME">this._objects.push</span><span class="PUNC">(</span><span class="NAME">object</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>725</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.renderAll</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>726</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>727</span> </span><span class="WHIT">    
+<span class='line'>728</span>     </span><span class="COMM">/**
+<span class='line'>729</span>      * Moves an object one level down in stack of drawn objects
+<span class='line'>730</span>      * @method sendBackwards
+<span class='line'>731</span>      * @param object {fabric.Object} Object to send
+<span class='line'>732</span>      * @return {fabric.Canvas} thisArg
+<span class='line'>733</span>      * @chainable
+<span class='line'>734</span>      */</span><span class="WHIT">
+<span class='line'>735</span> </span><span class="WHIT">    </span><span class="NAME">sendBackwards</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">object</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>736</span> </span><span class="WHIT">      </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">idx</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this._objects.indexOf</span><span class="PUNC">(</span><span class="NAME">object</span><span class="PUNC">)</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>737</span> </span><span class="WHIT">          </span><span class="NAME">nextIntersectingIdx</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">idx</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>738</span> </span><span class="WHIT">      
+<span class='line'>739</span>       </span><span class="COMM">// if object is not on the bottom of stack</span><span class="WHIT">
+<span class='line'>740</span> </span><span class="WHIT">      </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">idx</span><span class="WHIT"> </span><span class="PUNC">!==</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>741</span> </span><span class="WHIT">        
+<span class='line'>742</span>         </span><span class="COMM">// traverse down the stack looking for the nearest intersecting object</span><span class="WHIT">
+<span class='line'>743</span> </span><span class="WHIT">        </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">=</span><span class="NAME">idx</span><span class="PUNC">-</span><span class="NUMB">1</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">>=</span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="PUNC">--</span><span class="NAME">i</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>744</span> </span><span class="WHIT">          </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">object.intersectsWithObject</span><span class="PUNC">(</span><span class="NAME">this._objects</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NAME">object.isContainedWithinObject</span><span class="PUNC">(</span><span class="NAME">this._objects</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>745</span> </span><span class="WHIT">            </span><span class="NAME">nextIntersectingIdx</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>746</span> </span><span class="WHIT">            </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>747</span> </span><span class="WHIT">          </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>748</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>749</span> </span><span class="WHIT">        </span><span class="NAME">removeFromArray</span><span class="PUNC">(</span><span class="NAME">this._objects</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">object</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>750</span> </span><span class="WHIT">        </span><span class="NAME">this._objects.splice</span><span class="PUNC">(</span><span class="NAME">nextIntersectingIdx</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">object</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>751</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>752</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.renderAll</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>753</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>754</span> </span><span class="WHIT">    
+<span class='line'>755</span>     </span><span class="COMM">/**
+<span class='line'>756</span>      * Moves an object one level up in stack of drawn objects
+<span class='line'>757</span>      * @method sendForward
+<span class='line'>758</span>      * @param object {fabric.Object} Object to send
+<span class='line'>759</span>      * @return {fabric.Canvas} thisArg
+<span class='line'>760</span>      * @chainable
+<span class='line'>761</span>      */</span><span class="WHIT">
+<span class='line'>762</span> </span><span class="WHIT">    </span><span class="NAME">bringForward</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">object</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>763</span> </span><span class="WHIT">      </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">objects</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.getObjects</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>764</span> </span><span class="WHIT">          </span><span class="NAME">idx</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">objects.indexOf</span><span class="PUNC">(</span><span class="NAME">object</span><span class="PUNC">)</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>765</span> </span><span class="WHIT">          </span><span class="NAME">nextIntersectingIdx</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">idx</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>766</span> 
+<span class='line'>767</span> </span><span class="WHIT">      
+<span class='line'>768</span>       </span><span class="COMM">// if object is not on top of stack (last item in an array)</span><span class="WHIT">
+<span class='line'>769</span> </span><span class="WHIT">      </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">idx</span><span class="WHIT"> </span><span class="PUNC">!==</span><span class="WHIT"> </span><span class="NAME">objects.length</span><span class="PUNC">-</span><span class="NUMB">1</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>770</span> </span><span class="WHIT">        
+<span class='line'>771</span>         </span><span class="COMM">// traverse up the stack looking for the nearest intersecting object</span><span class="WHIT">
+<span class='line'>772</span> </span><span class="WHIT">        </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">idx</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">l</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this._objects.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">l</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="PUNC">++</span><span class="NAME">i</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>773</span> </span><span class="WHIT">          </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">object.intersectsWithObject</span><span class="PUNC">(</span><span class="NAME">objects</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NAME">object.isContainedWithinObject</span><span class="PUNC">(</span><span class="NAME">this._objects</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>774</span> </span><span class="WHIT">            </span><span class="NAME">nextIntersectingIdx</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>775</span> </span><span class="WHIT">            </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>776</span> </span><span class="WHIT">          </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>777</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>778</span> </span><span class="WHIT">        </span><span class="NAME">removeFromArray</span><span class="PUNC">(</span><span class="NAME">objects</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">object</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>779</span> </span><span class="WHIT">        </span><span class="NAME">objects.splice</span><span class="PUNC">(</span><span class="NAME">nextIntersectingIdx</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">object</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>780</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>781</span> </span><span class="WHIT">      </span><span class="NAME">this.renderAll</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>782</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>783</span> </span><span class="WHIT">    
+<span class='line'>784</span>     </span><span class="COMM">/**
+<span class='line'>785</span>      * Returns object at specified index
+<span class='line'>786</span>      * @method item
+<span class='line'>787</span>      * @param {Number} index
+<span class='line'>788</span>      * @return {fabric.Object}
+<span class='line'>789</span>      */</span><span class="WHIT">
+<span class='line'>790</span> </span><span class="WHIT">    </span><span class="NAME">item</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">index</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>791</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.getObjects</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">[</span><span class="NAME">index</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>792</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>793</span> </span><span class="WHIT">    
+<span class='line'>794</span>     </span><span class="COMM">/**
+<span class='line'>795</span>      * Returns number representation of an instance complexity
+<span class='line'>796</span>      * @method complexity
+<span class='line'>797</span>      * @return {Number} complexity
+<span class='line'>798</span>      */</span><span class="WHIT">
+<span class='line'>799</span> </span><span class="WHIT">    </span><span class="NAME">complexity</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>800</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.getObjects</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">reduce</span><span class="PUNC">(</span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">memo</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">current</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>801</span> </span><span class="WHIT">        </span><span class="NAME">memo</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">current.complexity</span><span class="WHIT"> </span><span class="PUNC">?</span><span class="WHIT"> </span><span class="NAME">current.complexity</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>802</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">memo</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>803</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>804</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>805</span> </span><span class="WHIT">    
+<span class='line'>806</span>     </span><span class="COMM">/**
+<span class='line'>807</span>      * Iterates over all objects, invoking callback for each one of them
+<span class='line'>808</span>      * @method forEachObject
+<span class='line'>809</span>      * @return {fabric.Canvas} thisArg
+<span class='line'>810</span>      */</span><span class="WHIT">
+<span class='line'>811</span> </span><span class="WHIT">    </span><span class="NAME">forEachObject</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">callback</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">context</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>812</span> </span><span class="WHIT">      </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">objects</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.getObjects</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>813</span> </span><span class="WHIT">          </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">objects.length</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>814</span> </span><span class="WHIT">      </span><span class="KEYW">while</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">i</span><span class="PUNC">--</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>815</span> </span><span class="WHIT">        </span><span class="NAME">callback.call</span><span class="PUNC">(</span><span class="NAME">context</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">objects</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">objects</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>816</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>817</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>818</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>819</span> </span><span class="WHIT">    
+<span class='line'>820</span>     </span><span class="COMM">/**
+<span class='line'>821</span>      * Clears a canvas element and removes all event handlers.
+<span class='line'>822</span>      * @method dispose
+<span class='line'>823</span>      * @return {fabric.Canvas} thisArg
+<span class='line'>824</span>      * @chainable
+<span class='line'>825</span>      */</span><span class="WHIT">
+<span class='line'>826</span> </span><span class="WHIT">    </span><span class="NAME">dispose</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>827</span> </span><span class="WHIT">      </span><span class="NAME">this.clear</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>828</span> </span><span class="WHIT">      </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.interactive</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>829</span> </span><span class="WHIT">        </span><span class="NAME">removeListener</span><span class="PUNC">(</span><span class="NAME">this.upperCanvasEl</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="STRN">'mousedown'</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this._onMouseDown</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>830</span> </span><span class="WHIT">        </span><span class="NAME">removeListener</span><span class="PUNC">(</span><span class="NAME">this.upperCanvasEl</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="STRN">'mousemove'</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this._onMouseMove</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>831</span> </span><span class="WHIT">        </span><span class="NAME">removeListener</span><span class="PUNC">(</span><span class="NAME">fabric.window</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="STRN">'resize'</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this._onResize</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>832</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>833</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>834</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>835</span> </span><span class="WHIT">    
+<span class='line'>836</span>     </span><span class="COMM">/**
+<span class='line'>837</span>      * @private
+<span class='line'>838</span>      * @method _resizeImageToFit
+<span class='line'>839</span>      * @param {HTMLImageElement} imgEl
+<span class='line'>840</span>      */</span><span class="WHIT">
+<span class='line'>841</span> </span><span class="WHIT">    </span><span class="NAME">_resizeImageToFit</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">imgEl</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>842</span> </span><span class="WHIT">      
+<span class='line'>843</span>       </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">imageWidth</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">imgEl.width</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NAME">imgEl.offsetWidth</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>844</span> </span><span class="WHIT">          </span><span class="NAME">widthScaleFactor</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.getWidth</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">/</span><span class="WHIT"> </span><span class="NAME">imageWidth</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>845</span> </span><span class="WHIT">      
+<span class='line'>846</span>       </span><span class="COMM">// scale image down so that it has original dimensions when printed in large resolution</span><span class="WHIT">
+<span class='line'>847</span> </span><span class="WHIT">      </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">imageWidth</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>848</span> </span><span class="WHIT">        </span><span class="NAME">imgEl.width</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">imageWidth</span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NAME">widthScaleFactor</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>849</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>850</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>851</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>852</span> </span><span class="WHIT">  
+<span class='line'>853</span>   </span><span class="COMM">/**
+<span class='line'>854</span>    * Returns a string representation of an instance
+<span class='line'>855</span>    * @method toString
+<span class='line'>856</span>    * @return {String} string representation of an instance
+<span class='line'>857</span>    */</span><span class="WHIT">
+<span class='line'>858</span> </span><span class="WHIT">  </span><span class="NAME">fabric.StaticCanvas.prototype.toString</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="COMM">// Assign explicitly since `extend` doesn't take care of DontEnum bug yet</span><span class="WHIT">
+<span class='line'>859</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="STRN">'#&lt;fabric.Canvas ('</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">this.complexity</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'): '</span><span class="PUNC">+</span><span class="WHIT">
+<span class='line'>860</span> </span><span class="WHIT">           </span><span class="STRN">'{ objects: '</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">this.getObjects</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">length</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">' }>'</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>861</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>862</span> </span><span class="WHIT">  
+<span class='line'>863</span>   </span><span class="NAME">extend</span><span class="PUNC">(</span><span class="NAME">fabric.StaticCanvas</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="COMM">/** @scope fabric.StaticCanvas */</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>864</span> </span><span class="WHIT">    
+<span class='line'>865</span>     </span><span class="COMM">/**
+<span class='line'>866</span>      * @static
+<span class='line'>867</span>      * @property EMPTY_JSON
+<span class='line'>868</span>      * @type String
+<span class='line'>869</span>      */</span><span class="WHIT">
+<span class='line'>870</span> </span><span class="WHIT">    </span><span class="NAME">EMPTY_JSON</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">'{"objects": [], "background": "white"}'</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>871</span> </span><span class="WHIT">    
+<span class='line'>872</span>     </span><span class="COMM">/**
+<span class='line'>873</span>      * Takes &lt;canvas> element and transforms its data in such way that it becomes grayscale
+<span class='line'>874</span>      * @static
+<span class='line'>875</span>      * @method toGrayscale
+<span class='line'>876</span>      * @param {HTMLCanvasElement} canvasEl
+<span class='line'>877</span>      */</span><span class="WHIT">
+<span class='line'>878</span> </span><span class="WHIT">    </span><span class="NAME">toGrayscale</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">canvasEl</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>879</span> </span><span class="WHIT">       </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">context</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">canvasEl.getContext</span><span class="PUNC">(</span><span class="STRN">'2d'</span><span class="PUNC">)</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>880</span> </span><span class="WHIT">           </span><span class="NAME">imageData</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">context.getImageData</span><span class="PUNC">(</span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">canvasEl.width</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">canvasEl.height</span><span class="PUNC">)</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>881</span> </span><span class="WHIT">           </span><span class="NAME">data</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">imageData.data</span><span class="PUNC">,</span><span class="WHIT"> 
+<span class='line'>882</span>            </span><span class="NAME">iLen</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">imageData.width</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>883</span> </span><span class="WHIT">           </span><span class="NAME">jLen</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">imageData.height</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>884</span> </span><span class="WHIT">           </span><span class="NAME">index</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">average</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">j</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>885</span> 
+<span class='line'>886</span> </span><span class="WHIT">       </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">iLen</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>887</span> </span><span class="WHIT">         </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">j</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">j</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">jLen</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">j</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>888</span> 
+<span class='line'>889</span> </span><span class="WHIT">           </span><span class="NAME">index</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NUMB">4</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NAME">jLen</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">j</span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NUMB">4</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>890</span> </span><span class="WHIT">           </span><span class="NAME">average</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">data</span><span class="PUNC">[</span><span class="NAME">index</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">[</span><span class="NAME">index</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">[</span><span class="NAME">index</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NUMB">2</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">/</span><span class="WHIT"> </span><span class="NUMB">3</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>891</span> 
+<span class='line'>892</span> </span><span class="WHIT">           </span><span class="NAME">data</span><span class="PUNC">[</span><span class="NAME">index</span><span class="PUNC">]</span><span class="WHIT">     </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">average</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>893</span> </span><span class="WHIT">           </span><span class="NAME">data</span><span class="PUNC">[</span><span class="NAME">index</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">average</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>894</span> </span><span class="WHIT">           </span><span class="NAME">data</span><span class="PUNC">[</span><span class="NAME">index</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NUMB">2</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">average</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>895</span> </span><span class="WHIT">         </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>896</span> </span><span class="WHIT">       </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>897</span> 
+<span class='line'>898</span> </span><span class="WHIT">       </span><span class="NAME">context.putImageData</span><span class="PUNC">(</span><span class="NAME">imageData</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>899</span> </span><span class="WHIT">     </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>900</span> </span><span class="WHIT">    
+<span class='line'>901</span>     </span><span class="COMM">/**
+<span class='line'>902</span>      * Provides a way to check support of some of the canvas methods 
+<span class='line'>903</span>      * (either those of HTMLCanvasElement itself, or rendering context)
+<span class='line'>904</span>      *
+<span class='line'>905</span>      * @method supports
+<span class='line'>906</span>      * @param methodName {String} Method to check support for; 
+<span class='line'>907</span>      *                            Could be one of "getImageData" or "toDataURL"
+<span class='line'>908</span>      * @return {Boolean | null} `true` if method is supported (or at least exists), 
+<span class='line'>909</span>      *                          `null` if canvas element or context can not be initialized
+<span class='line'>910</span>      */</span><span class="WHIT">
+<span class='line'>911</span> </span><span class="WHIT">    </span><span class="NAME">supports</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">methodName</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>912</span> </span><span class="WHIT">      </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">el</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">fabric.document.createElement</span><span class="PUNC">(</span><span class="STRN">'canvas'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>913</span> </span><span class="WHIT">      
+<span class='line'>914</span>       </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">typeof</span><span class="WHIT"> </span><span class="NAME">G_vmlCanvasManager</span><span class="WHIT"> </span><span class="PUNC">!==</span><span class="WHIT"> </span><span class="STRN">'undefined'</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>915</span> </span><span class="WHIT">        </span><span class="NAME">G_vmlCanvasManager.initElement</span><span class="PUNC">(</span><span class="NAME">el</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>916</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>917</span> </span><span class="WHIT">      </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">el</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">!</span><span class="NAME">el.getContext</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>918</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>919</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>920</span> </span><span class="WHIT">      
+<span class='line'>921</span>       </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">ctx</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">el.getContext</span><span class="PUNC">(</span><span class="STRN">'2d'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>922</span> </span><span class="WHIT">      </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">ctx</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>923</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>924</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>925</span> </span><span class="WHIT">      
+<span class='line'>926</span>       </span><span class="KEYW">switch</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">methodName</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>927</span> </span><span class="WHIT">        
+<span class='line'>928</span>         </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="STRN">'getImageData'</span><span class="PUNC">:</span><span class="WHIT">
+<span class='line'>929</span> </span><span class="WHIT">          </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">typeof</span><span class="WHIT"> </span><span class="NAME">ctx.getImageData</span><span class="WHIT"> </span><span class="PUNC">!==</span><span class="WHIT"> </span><span class="STRN">'undefined'</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>930</span> </span><span class="WHIT">          
+<span class='line'>931</span>         </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="STRN">'toDataURL'</span><span class="PUNC">:</span><span class="WHIT">
+<span class='line'>932</span> </span><span class="WHIT">          </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">typeof</span><span class="WHIT"> </span><span class="NAME">el.toDataURL</span><span class="WHIT"> </span><span class="PUNC">!==</span><span class="WHIT"> </span><span class="STRN">'undefined'</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>933</span> </span><span class="WHIT">          
+<span class='line'>934</span>         </span><span class="KEYW">default</span><span class="PUNC">:</span><span class="WHIT">
+<span class='line'>935</span> </span><span class="WHIT">          </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>936</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>937</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>938</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>939</span> </span><span class="WHIT">  
+<span class='line'>940</span>   </span><span class="COMM">/**
+<span class='line'>941</span>    * Returs JSON representation of canvas
+<span class='line'>942</span>    * @function
+<span class='line'>943</span>    * @method toJSON
+<span class='line'>944</span>    * @return {String} json string
+<span class='line'>945</span>    */</span><span class="WHIT">
+<span class='line'>946</span> </span><span class="WHIT">  </span><span class="NAME">fabric.StaticCanvas.prototype.toJSON</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">fabric.StaticCanvas.prototype.toObject</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>947</span> </span><span class="WHIT">  
+<span class='line'>948</span> </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">(</span><span class="KEYW">typeof</span><span class="WHIT"> </span><span class="NAME">exports</span><span class="WHIT"> </span><span class="PUNC">!=</span><span class="WHIT"> </span><span class="STRN">'undefined'</span><span class="WHIT"> </span><span class="PUNC">?</span><span class="WHIT"> </span><span class="NAME">exports</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">)</span><span class="PUNC">;</span></pre></body></html>

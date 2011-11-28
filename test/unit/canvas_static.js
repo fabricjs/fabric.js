@@ -27,9 +27,9 @@
                   '"stroke":null,"strokeWidth":1,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,"selectable":true}],'+
                   '"background":"#ff5555"}';
   
-  var canvas = this.canvas = new fabric.Canvas('canvas');
+  var canvas = this.canvas = new fabric.StaticCanvas('static-canvas');
   
-  var canvasEl = document.getElementById('canvas');
+  var canvasEl = document.getElementById('static-canvas');
   var canvasContext = canvasEl.getContext('2d');
   
   function makeRect(options) {
@@ -37,11 +37,10 @@
     return new fabric.Rect(fabric.util.object.extend(defaultOptions, options || { }));
   }
   
-  module('fabric.Canvas', {
+  module('fabric.StaticCanvas', {
     teardown: function() {
       canvas.clear();
-      canvas.setActiveGroup(null);
-      canvas.backgroundColor = fabric.Canvas.prototype.backgroundColor;
+      canvas.backgroundColor = fabric.StaticCanvas.prototype.backgroundColor;
       canvas.calcOffset();
     }
   });
@@ -102,13 +101,9 @@
     equals(canvas, canvas.insertAt(rect, 2), 'should be chainable');
   });
   
-  test('getContext', function() {
-    ok(typeof canvas.getContext == 'function');
-  });
-  
   test('clearContext', function() {
     ok(typeof canvas.clearContext == 'function');
-    equals(canvas, canvas.clearContext(canvas.getContext()), 'chainable');
+    equals(canvas, canvas.clearContext(canvas.contextContainer), 'chainable');
   });
   
   test('clear', function() {
@@ -136,10 +131,6 @@
     equals(canvas, canvas.renderTop());
   });
   
-  test('findTarget', function() {
-    ok(typeof canvas.findTarget == 'function');
-  });
-  
   test('toDataURL', function() {
     ok(typeof canvas.toDataURL == 'function');
     if (!fabric.Canvas.supports('toDataURL')) {
@@ -154,30 +145,10 @@
     }
   });
   
-  asyncTest('getPointer', function() {
-    ok(typeof canvas.getPointer == 'function');
-    
-    window.scroll(0,0);
-    
-    fabric.util.addListener(canvasEl, 'click', function(e) {
-      canvas.calcOffset();
-      var pointer = canvas.getPointer(e);
-      equals(pointer.x, 101, 'pointer.x should be correct');
-      equals(pointer.y, 102, 'pointer.y should be correct');
-      
-      start();
-    });
-    
-    setTimeout(function() {
-      simulateEvent(canvasEl, 'click', {
-        pointerX: 101, pointerY: 102
-      });
-    }, 100);
-  });
-  
   test('getCenter', function() {
     ok(typeof canvas.getCenter == 'function');
     var center = canvas.getCenter();
+    console.log(canvasEl.outerHTML);
     equals(center.left, canvasEl.width / 2);
     equals(center.top, canvasEl.height / 2);
   });
@@ -432,51 +403,6 @@
     equals(canvas.item(2), rect3);
   });
   
-  test('setActiveObject', function() {
-    ok(typeof canvas.setActiveObject == 'function');
-    
-    var rect1 = makeRect(),
-        rect2 = makeRect();
-    
-    canvas.add(rect1, rect2);
-    
-    canvas.setActiveObject(rect1);
-    ok(rect1.isActive());
-    
-    canvas.setActiveObject(rect2);
-    ok(rect2.isActive());
-  });
-  
-  test('getActiveObject', function() {
-    ok(typeof canvas.getActiveObject == 'function');
-    
-    var rect1 = makeRect(),
-        rect2 = makeRect();
-        
-    canvas.add(rect1, rect2);
-    
-    canvas.setActiveObject(rect1);
-    equals(canvas.getActiveObject(), rect1);
-    
-    canvas.setActiveObject(rect2);
-    equals(canvas.getActiveObject(), rect2);
-  });
-  
-  test('getSetActiveGroup', function() {
-    ok(typeof canvas.getActiveGroup == 'function');
-    ok(typeof canvas.setActiveGroup == 'function');
-    
-    equals(canvas.getActiveGroup(), null, 'should initially be null');
-    
-    var group = new fabric.Group([
-      makeRect({ left: 10, top: 10 }), 
-      makeRect({ left: 20, top: 20 })
-    ]);
-    
-    equals(canvas.setActiveGroup(group), canvas, 'chainable');
-    equals(canvas.getActiveGroup(), group);
-  });
-  
   test('item', function() {
     ok(typeof canvas.item == 'function');
     
@@ -491,59 +417,6 @@
     canvas.remove(canvas.item(0));
     
     equals(canvas.item(0), rect2);
-  });
-  
-  test('discardActiveGroup', function() {
-    ok(typeof canvas.discardActiveGroup == 'function');
-    var group = new fabric.Group([makeRect(), makeRect()]);
-    canvas.setActiveGroup(group);
-    equals(canvas.discardActiveGroup(), canvas, 'chainable');
-    equals(canvas.getActiveGroup(), null, 'removing active group sets it to null');
-  });
-  
-  test('deactivateAll', function() {
-    ok(typeof canvas.deactivateAll == 'function');
-    
-    canvas.add(makeRect());
-    canvas.setActiveObject(canvas.item(0));
-
-    canvas.deactivateAll();
-    ok(!canvas.item(0).isActive());
-    equals(canvas.getActiveObject(), null);
-    equals(canvas.getActiveGroup(), null);
-  });
-  
-  test('deactivateAllWithDispatch', function() {
-    ok(typeof canvas.deactivateAllWithDispatch == 'function');
-    
-    canvas.add(makeRect());
-    canvas.setActiveObject(canvas.item(0));
-    
-    var group = new fabric.Group([
-      makeRect({ left: 10, top: 10 }), 
-      makeRect({ left: 20, top: 20 })
-    ]);
-    
-    canvas.setActiveGroup(group);
-    
-    var eventsFired = {
-      selectionCleared: false
-    };
-    var target;
-    
-    
-    canvas.observe('selection:cleared', function(){
-      eventsFired.selectionCleared = true;
-    });
-    
-    canvas.deactivateAllWithDispatch();
-    ok(!canvas.item(0).isActive());
-    equals(canvas.getActiveObject(), null);
-    equals(canvas.getActiveGroup(), null);
-    
-    for (var prop in eventsFired) {
-      ok(eventsFired[prop]);
-    }
   });
   
   test('complexity', function() {
@@ -566,46 +439,11 @@
     equals(canvas.toString(), '#<fabric.Canvas (1): { objects: 1 }>');
   });
   
-  test('dispose', function() {
-    function invokeEventsOnCanvas() {
-      // nextSibling because we need to invoke events on upper canvas
-      simulateEvent(canvas.getElement().nextSibling, 'mousedown');
-      simulateEvent(canvas.getElement().nextSibling, 'mouseup');
-      simulateEvent(canvas.getElement().nextSibling, 'mousemove');
-    }
-    var assertInvocationsCount = function() {
-      var message = 'event handler should not be invoked after `dispose`';
-      equals(handlerInvocationCounts.__onMouseDown, 1);
-      equals(handlerInvocationCounts.__onMouseUp, 1);
-      equals(handlerInvocationCounts.__onMouseMove, 1);
-    };
-    
+  test('dispose', function() {    
     ok(typeof canvas.dispose == 'function');
     canvas.add(makeRect(), makeRect(), makeRect());
-    
-    var handlerInvocationCounts = {
-      __onMouseDown: 0, __onMouseUp: 0, __onMouseMove: 0
-    };
-    
-    // hijack event handlers
-    canvas.__onMouseDown = function() {
-      handlerInvocationCounts.__onMouseDown++;
-    };
-    canvas.__onMouseUp = function() {
-      handlerInvocationCounts.__onMouseUp++;
-    };
-    canvas.__onMouseMove = function() {
-      handlerInvocationCounts.__onMouseMove++;
-    };
-    
-    invokeEventsOnCanvas();
-    assertInvocationsCount();
-    
     canvas.dispose();
     equals(canvas.getObjects().length, 0, 'dispose should clear canvas');
-    
-    invokeEventsOnCanvas();
-    assertInvocationsCount();
   });
   
   test('clone', function() {
@@ -625,32 +463,6 @@
     equals(canvas.getHeight(), 500);
     equals(canvas.setHeight(765), canvas, 'chainable');
     equals(canvas.getHeight(), 765);
-  });
-  
-  test('containsPoint', function() {
-    ok(typeof canvas.containsPoint == 'function');
-    
-    var rect = new fabric.Rect({ left: 100, top: 100, width: 50, height: 50 });
-    canvas.add(rect);
-    
-    var canvasEl = canvas.getElement(),
-        canvasOffset = fabric.util.getElementOffset(canvasEl);
-    
-    var eventStub = { 
-      pageX: canvasOffset.left + 100, 
-      pageY: canvasOffset.top + 100 
-    };
-    
-    ok(canvas.containsPoint(eventStub, rect), 'point at (100, 100) should be within area (75, 75, 125, 125)');
-    
-    eventStub = {
-      pageX: canvasOffset.left + 200, 
-      pageY: canvasOffset.top + 200
-    };
-    ok(!canvas.containsPoint(eventStub, rect), 'point at (200, 200) should NOT be within area (75, 75, 125, 125)');
-    
-    rect.set('left', 200).set('top', 200).setCoords();
-    ok(canvas.containsPoint(eventStub, rect), 'point at (200, 200) should be within area (175, 175, 225, 225)');
   });
   
   test('toGrayscale', function() {

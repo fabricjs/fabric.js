@@ -6,7 +6,7 @@ title: All Unit Tests
 <link rel="stylesheet" href="../lib/qunit.css">
 
 <style>
-  .canvas-container { display: none }
+  .canvas-container, #static-canvas { position: absolute; left: 0; top: 0; display: none; }
 </style>
 
 <script src="../lib/qunit.js"></script>
@@ -15,7 +15,8 @@ title: All Unit Tests
 <h2 id="qunit-userAgent"></h2>
 <ol id="qunit-tests"></ol>
 
-<canvas id="test" width="500" height="500"></canvas>
+<canvas id="canvas" width="500" height="500"></canvas>
+<canvas id="static-canvas" width="500" height="500"></canvas>
 
 <script src="util.js"></script>
 <!-- <script src="text.js"></script>-->
@@ -31,6 +32,7 @@ title: All Unit Tests
 <script src="group.js"></script>
 <script src="ellipse.js"></script>
 <script src="canvas.js"></script>
+<script src="canvas_static.js"></script>
 <script src="color.js"></script>
 <script src="circle.js"></script>
 <script src="observable.js"></script> 

@@ -31,8 +31,9 @@
     'flipY':        false, 
     'opacity':      1, 
     'src':          IMG_SRC,
-    'selectable':   true
-  }
+    'selectable':   true, 
+    'filters':      []
+  };
   
   function _createImageObject(width, height) {
     var elImage = document.createElement('image');
@@ -110,7 +111,7 @@
       ok(imageClone instanceof fabric.Image);
       same(imageClone.toObject(), image.toObject());
       start();
-    }, 1000);
+    }, 500);
   });
   
   asyncTest('cloneWidthHeight', function() {
@@ -127,7 +128,7 @@
       equals(imageClone.getElement().height, IMG_HEIGHT / 2,
         'clone\'s element should have height identical to that of original image');
       start();
-    }, 1000);
+    }, 500);
   });
   
   asyncTest('fromObject', function() {
@@ -144,7 +145,7 @@
     setTimeout(function() {
       ok(image instanceof fabric.Image);
       start();
-    }, 1000);
+    }, 500);
   });
   
   asyncTest('fromURL', function() {
@@ -163,7 +164,7 @@
       ok(image instanceof fabric.Image);
       same(REFERENCE_IMG_OBJECT, image.toObject());
       start();
-    }, 1000);
+    }, 500);
   });
   
   test('toGrayscale', function() {
@@ -179,9 +180,7 @@
       alert('toDataURL is not supported. Some tests can not be run.');
     }
     else {
-      equals(image.__isGrayscaled, false);
       equals(image.toGrayscale(), image, 'chainable');
-      equals(image.__isGrayscaled, true);
     }
   });
   
@@ -216,7 +215,7 @@
       same(imgObject.get('height'), 17, 'height of an object');
       same(imgObject.getSrc(), IMAGE_DATA_URL, 'src of an object');
       start();
-    }, 1000);
+    }, 500);
   });
   
 })();
