@@ -375,7 +375,7 @@
       ok(callbackInvoked, 'callback should be invoked');
       
       if (objectPassedToCallback) {
-        ok(objectPassedToCallback instanceof Image, 'object passed to callback should be an instance of `fabric.Image`');
+        ok(objectPassedToCallback.tagName.toUpperCase() === 'IMG', 'object passed to callback should be an image element');
         var oImg = new fabric.Image(objectPassedToCallback);
         ok(/fixtures\/very_large_image\.jpg$/.test(oImg.getSrc()), 'image should have correct src');
       }
