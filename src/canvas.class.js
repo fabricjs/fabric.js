@@ -96,6 +96,11 @@
      * @type Number
      */
     freeDrawingLineWidth:   1,
+    
+    /**
+     * Flag indicating whether or not to respond to mouse events
+     */
+    respondToEvents: true,
 
     /**
      * @constant
@@ -186,6 +191,9 @@
      *
      */
     __onMouseUp: function (e) {
+      if (!this.respondToEvents) {
+        return;
+      }
 
       if (this.isDrawingMode && this._isCurrentlyDrawing) {
         this._finalizeDrawingPath();
@@ -254,6 +262,9 @@
      *
      */
     __onMouseDown: function (e) {
+      if (!this.respondToEvents) {
+        return;
+      }
 
       // accept only left clicks
       if (e.which !== 1 && !fabric.isTouchSupported) return;
@@ -325,6 +336,9 @@
       *
       */
     __onMouseMove: function (e) {
+      if (!this.respondToEvents) {
+        return;
+      }
 
       if (this.isDrawingMode) {
         if (this._isCurrentlyDrawing) {
@@ -1042,6 +1056,17 @@
       }
       this.discardActiveGroup();
       this.discardActiveObject();
+      return this;
+    },
+
+    /**
+     * Sets internal flag indicating whether or not to respond to mouse events
+     * @method listenToEvents
+     * @param {Boolean} Flag indicating whether or not to listen to events
+     * @return {fabric.Canvas} thisArg
+     */
+    listenToEvents: function (state) {
+      this.respondToEvents = state;
       return this;
     },
     
