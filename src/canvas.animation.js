@@ -1,4 +1,4 @@
-fabric.util.object.extend(fabric.Canvas.prototype, {
+fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   
   /**
    * Centers object horizontally with animation.

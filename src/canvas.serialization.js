@@ -1,4 +1,4 @@
-fabric.util.object.extend(fabric.Canvas.prototype, {
+fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   
   /**
    * Populates canvas with data from the specified dataless JSON
@@ -85,13 +85,15 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
         }
         else {
           if (obj.type === 'image') {
-            _this.loadImageFromURL(path, function (image) {
-              image.setSourcePath(path);
+            fabric.util.loadImage(path, function (image) {
+              var oImg = new fabric.Image(image);
+              
+              oImg.setSourcePath(path);
 
-              fabric.util.object.extend(image, obj);
-              image.setAngle(obj.angle);
+              fabric.util.object.extend(oImg, obj);
+              oImg.setAngle(obj.angle);
 
-              onObjectLoaded(image, index);
+              onObjectLoaded(oImg, index);
             });
           }
           else if (obj.type === 'text') {

@@ -1,8 +1,19 @@
 var fs = require('fs'),
-    childProcess = require('child_process');
+    exec = require('child_process').exec;
 
 var modules = process.argv.slice(2)[0];
 modules = modules ? modules.split('=')[1].split(',') : [ ];
+
+var minifier = process.argv.slice(3)[0];
+var mininfierCmd;
+
+minifier = minifier ? minifier.split('=')[1] : 'yui';
+if (minifier === 'yui') {
+  mininfierCmd = 'java -jar lib/yuicompressor-2.4.2.jar dist/all.js -o dist/all.min.js';
+}
+else if (minifier === 'closure') {
+  mininfierCmd = 'java -jar lib/google_closure_compiler.jar --js dist/all.js --js_output_file dist/all.min.js';
+}
 
 var includeAllModules = modules.length === 1 && modules[0] === 'ALL';
 
@@ -63,7 +74,9 @@ var filesToInclude = [
   'src/intersection.class.js',
   'src/color.class.js',
   
-  'src/canvas.class.js',
+  'src/static_canvas.class.js',
+  ifSpecifiedInclude('interaction', 'src/canvas.class.js'),
+  
   'src/canvas.animation.js',
   
   ifSpecifiedInclude('serialization', 'src/canvas.serialization.js'),
@@ -93,7 +106,21 @@ appendFileContents(filesToInclude, function() {
     if (err) {
       console.log(err);
       throw err;
-    };
-    console.log('All done');
+    }
+    
+    console.log('Built distribution to dist/all.js');
+
+    exec(mininfierCmd, function (error, output) {
+      if (!error) {
+        console.log('Minified using', minifier, 'to dist/all.min.js');
+      }
+      exec('gzip -c dist/all.min.js > dist/all.min.js.gz', function (error, output) {
+        console.log('Gzipped to dist/all.min.js.gz');
+        
+        exec('ls -l dist', function (error, output) {
+          console.log(output.replace(/^.*/, ''));
+        });
+      });
+    });
   });
 });
