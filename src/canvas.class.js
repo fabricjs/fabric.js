@@ -305,7 +305,7 @@
           if (target !== this.getActiveGroup()) {
             this.deactivateAll();
           }
-          this.setActiveObject(target);
+          this.setActiveObject(target, e);
         }
       }
       // we must renderAll so that active image is placed on the top canvas
@@ -552,7 +552,7 @@
         else {
           activeGroup.add(target);
         }
-        this.fire('selection:created', { target: activeGroup });
+        this.fire('selection:created', { target: activeGroup, e: e });
         activeGroup.setActive(true);
       }
       else {
@@ -828,10 +828,7 @@
 
       // do not create group for 1 element only
       if (group.length === 1) {
-        this.setActiveObject(group[0]);
-        this.fire('object:selected', {
-          target: group[0]
-        });
+        this.setActiveObject(group[0], e);
       } 
       else if (group.length > 1) {
         var group = new fabric.Group(group);
@@ -958,7 +955,7 @@
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
-    setActiveObject: function (object) {
+    setActiveObject: function (object, e) {
       if (this._activeObject) {
         this._activeObject.setActive(false);
       }
@@ -967,7 +964,7 @@
       
       this.renderAll();
       
-      this.fire('object:selected', { target: object });
+      this.fire('object:selected', { target: object, e: e });
       return this;
     },
     
