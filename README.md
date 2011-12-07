@@ -8,10 +8,10 @@ Contributions are very much welcome!
 
 ### Goals
 
-- Unit tested (1050 tests at the moment)
+- Unit tested (~1200 tests at the moment)
 - Modular (~20 small "classes")
 - Cross-browser
-- Fast
+- [Fast](https://github.com/kangax/fabric.js/wiki/Focus-on-speed)
 - Encapsulated in one object
 - No browser sniffing for critical functionality
 - Runs under ES5 strict mode
