@@ -100,19 +100,36 @@
       endValue = 'endValue' in options ? options.endValue : 100;
 
     options.onStart && options.onStart();
-
-    var interval = setInterval(function() {
+    
+    (function tick() {
       time = +new Date();
       pos = time > finish ? 1 : (time - start) / duration;
       onChange(startValue + (endValue - startValue) * easing(pos));
       if (time > finish || abort()) {
-        clearInterval(interval);
         options.onComplete && options.onComplete();
-     }
-    }, 10);
-
-    return interval;
+        return;
+      }
+      requestAnimFrame(tick);
+    })();
   }
+  
+  /**
+    * requestAnimationFrame polyfill from http://paulirish.com/2011/requestanimationframe-for-smart-animating/
+    * @method requestAnimFrame
+    * @memberOf fabric.util
+    * @param {Function} callback Callback to invoke
+    * @param {DOMElement} element optional Element to associate with animation
+    */
+  var requestAnimFrame = (function() {
+    return  window.requestAnimationFrame       || 
+            window.webkitRequestAnimationFrame || 
+            window.mozRequestAnimationFrame    || 
+            window.oRequestAnimationFrame      || 
+            window.msRequestAnimationFrame     || 
+            function(callback, element) {
+              window.setTimeout(callback, 1000 / 60);
+            };
+  })();
 
   /**
     * Loads image element from given url and passes it to a callback
@@ -140,5 +157,6 @@
   fabric.util.getRandomInt = getRandomInt;
   fabric.util.falseFunction = falseFunction;
   fabric.util.animate = animate;
+  fabric.util.requestAnimFrame = requestAnimFrame;
   fabric.util.loadImage = loadImage;
 })();
