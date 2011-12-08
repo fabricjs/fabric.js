@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2011, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.7.2" };
+var fabric = fabric || { version: "0.7.3" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -4377,14 +4377,14 @@ fabric.util.string = {
   extend(fabric.StaticCanvas.prototype, /** @scope fabric.StaticCanvas.prototype */ {
     
     /**
-     * Background color of this canvas instance
+     * Background color of canvas instance
      * @property
      * @type String
      */
     backgroundColor:        'rgba(0, 0, 0, 0)',
     
     /**
-     * Background image of this canvas instance
+     * Background image of canvas instance
      * Should be set via `setBackgroundImage`
      * @property
      * @type String
@@ -4392,6 +4392,7 @@ fabric.util.string = {
     backgroundImage:        '',
     
     /**
+     * Indicates whether toObject/toDatalessObject should include default values
      * @property
      * @type Boolean
      */
@@ -4420,22 +4421,18 @@ fabric.util.string = {
     clipTo:                 null,
     
     /**
+     * Default canvas width
      * @constant
      * @type Number
      */
     CANVAS_WIDTH:           600,
     
     /**
+     * Default canvas height
      * @constant
      * @type Number
      */
     CANVAS_HEIGHT:          600,
-    
-    /**
-     * @constant
-     * @type String
-     */
-    CONTAINER_CLASS:        'canvas-container',
     
     /**
      * Callback; invoked right before object is about to be scaled/rotated
@@ -5330,6 +5327,7 @@ fabric.util.string = {
   /**
    * @class fabric.Canvas
    * @constructor
+   * @extends fabric.StaticCanvas
    * @param {HTMLElement | String} el &lt;canvas> element to initialize instance on
    * @param {Object} [options] Options object
    */  
@@ -5346,7 +5344,7 @@ fabric.util.string = {
   ProtoProxy.prototype = fabric.StaticCanvas.prototype;
   fabric.Canvas.prototype = new ProtoProxy;
   
-  var InteractiveMethods = {
+  var InteractiveMethods = /** @scope fabric.Canvas.prototype */ {
     
     /**
      * Indicates that canvas is interactive. This property should not be changed.
@@ -5377,7 +5375,7 @@ fabric.util.string = {
     selectionBorderColor:   'rgba(255, 255, 255, 0.3)',
 
     /**
-     * Width of a line used in selection
+     * Width of a line used in object/group selection
      * @property
      * @type Number
      */
@@ -5398,16 +5396,25 @@ fabric.util.string = {
     freeDrawingLineWidth:   1,
 
     /**
+     * Default cursor value used when hovering over an object on canvas
      * @constant
      * @type String
      */
     HOVER_CURSOR:           'move',
 
     /**
+     * Default cursor value used for the entire canvas
      * @constant
      * @type String
      */
     CURSOR:                 'default',
+    
+    /**
+     * Default element class that's given to wrapper (div) element of canvas
+     * @constant
+     * @type String
+     */
+    CONTAINER_CLASS:        'canvas-container',
     
     _initInteractive: function() {
       this._currentTransform = null;
@@ -8700,7 +8707,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       ctx.globalAlpha *= this.opacity;
       
       if (this.group) {
-        ctx.translate(this.x, this.y);
+        ctx.translate(this.x || 0, this.y || 0);
       }
       
       ctx.moveTo(x+rx, y);

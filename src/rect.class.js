@@ -84,7 +84,7 @@
       ctx.globalAlpha *= this.opacity;
       
       if (this.group) {
-        ctx.translate(this.x, this.y);
+        ctx.translate(this.x || 0, this.y || 0);
       }
       
       ctx.moveTo(x+rx, y);
