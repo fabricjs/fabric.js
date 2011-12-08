@@ -42,7 +42,7 @@ pre.code
 #index {
 	margin-top: 24px;
 	float: left;
-	width: 160px;
+	width: 190px;
 	position: absolute;
 	left: 8px;
 	background-color: #F3F3F3;
@@ -50,8 +50,8 @@ pre.code
 }
 
 #content {
-	margin-left: 190px;
-	width: 600px;
+	margin-left: 220px;
+	width: 770px;
 }
 
 .classList {
@@ -64,7 +64,7 @@ pre.code
 }
 
 .classList li {
-	padding: 0;
+	paddinging: 0;
 	margin: 0 0 8px 0;
 }
 
@@ -91,13 +91,13 @@ div.sectionTitle { margin-bottom: 8px; }
 .summaryTable td {
 	vertical-align: top;
 	padding: 4px;
-	border-bottom: 1px #7F8FB1 solid;
-	border-right: 1px #7F8FB1 solid;
+	border-bottom: 1px #C0C8D8 solid;
+	border-right: 1px #C0C8D8 solid;
 }
 
 /*col#summaryAttributes {}*/
 .summaryTable td.attributes {
-	border-left: 1px #7F8FB1 solid;
+	border-left: 1px #C0C8D8 solid;
 	width: 140px;
 	text-align: right;
 }
@@ -150,6 +150,12 @@ ul.inheritsList {
 	text-align: right;
 	font-size: 10px;
 }
+
+.inheritsList dd {
+  margin-left: 0;
+  margin-top: 3px;
+  margin-bottom: 8px;
+}
 </style>
 
 <!-- ============================== header ================================= -->	
@@ -163,7 +169,7 @@ ul.inheritsList {
 	<!-- begin publish.classesIndex -->
 	<div align="center"><a href="../index.html">Class Index</a>
 | <a href="../files.html">File Index</a></div>
-<hr />
+<hr>
 <h2>Classes</h2>
 <ul class="classList">
 	
@@ -234,7 +240,6 @@ ul.inheritsList {
 	<li><a href="../symbols/String.html">String</a></li>
 	
 </ul>
-<hr />
 	<!-- end publish.classesIndex -->
 </div>
 
@@ -248,6 +253,8 @@ ul.inheritsList {
 <!-- ============================== class summary ========================== -->			
 	<p class="description">
 		
+		<br />Extends
+			<a href="../symbols/fabric.StaticCanvas.html">fabric.StaticCanvas</a>.<br />
 		
 	
 		fabric.Canvas
@@ -283,8 +290,260 @@ ul.inheritsList {
 
 <!-- ============================== properties summary ===================== -->
 	
+		
+		
+		<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class fabric.Canvas.">
+			<caption>Field Summary</caption>
+			<thead>
+				<tr>
+					<th scope="col">Field Attributes</th>
+					<th scope="col">Field Name and Description</th>
+				</tr>
+			</thead>
+			<tbody>
+			
+				<tr>
+					<td class="attributes">&lt;constant&gt; &nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont">
+						<b><a href="../symbols/fabric.Canvas.html#CONTAINER_CLASS">CONTAINER_CLASS</a></b>
+						</div>
+						<div class="description">Default element class that's given to wrapper (div) element of canvas</div>
+					</td>
+				</tr>
+			
+				<tr>
+					<td class="attributes">&lt;constant&gt; &nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont">
+						<b><a href="../symbols/fabric.Canvas.html#CURSOR">CURSOR</a></b>
+						</div>
+						<div class="description">Default cursor value used for the entire canvas</div>
+					</td>
+				</tr>
+			
+				<tr>
+					<td class="attributes">&nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont">
+						<b><a href="../symbols/fabric.Canvas.html#freeDrawingColor">freeDrawingColor</a></b>
+						</div>
+						<div class="description">Color of the line used in free drawing mode</div>
+					</td>
+				</tr>
+			
+				<tr>
+					<td class="attributes">&nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont">
+						<b><a href="../symbols/fabric.Canvas.html#freeDrawingLineWidth">freeDrawingLineWidth</a></b>
+						</div>
+						<div class="description">Width of a line used in free drawing mode</div>
+					</td>
+				</tr>
+			
+				<tr>
+					<td class="attributes">&lt;constant&gt; &nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont">
+						<b><a href="../symbols/fabric.Canvas.html#HOVER_CURSOR">HOVER_CURSOR</a></b>
+						</div>
+						<div class="description">Default cursor value used when hovering over an object on canvas</div>
+					</td>
+				</tr>
+			
+				<tr>
+					<td class="attributes">&nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont">
+						<b><a href="../symbols/fabric.Canvas.html#interactive">interactive</a></b>
+						</div>
+						<div class="description">Indicates that canvas is interactive.</div>
+					</td>
+				</tr>
+			
+				<tr>
+					<td class="attributes">&nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont">
+						<b><a href="../symbols/fabric.Canvas.html#selection">selection</a></b>
+						</div>
+						<div class="description">Indicates whether group selection should be enabled</div>
+					</td>
+				</tr>
+			
+				<tr>
+					<td class="attributes">&nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont">
+						<b><a href="../symbols/fabric.Canvas.html#selectionBorderColor">selectionBorderColor</a></b>
+						</div>
+						<div class="description">Color of the border of selection (usually slightly darker than color of selection itself)</div>
+					</td>
+				</tr>
+			
+				<tr>
+					<td class="attributes">&nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont">
+						<b><a href="../symbols/fabric.Canvas.html#selectionColor">selectionColor</a></b>
+						</div>
+						<div class="description">Color of selection</div>
+					</td>
+				</tr>
+			
+				<tr>
+					<td class="attributes">&nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont">
+						<b><a href="../symbols/fabric.Canvas.html#selectionLineWidth">selectionLineWidth</a></b>
+						</div>
+						<div class="description">Width of a line used in object/group selection</div>
+					</td>
+				</tr>
+			
+			</tbody>
+		</table>
+		
+		
+		
+		<dl class="inheritsList">
+		<dt>Fields borrowed from class <a href="../symbols/fabric.StaticCanvas.html">fabric.StaticCanvas</a>: </dt><dd><a href="../symbols/fabric.StaticCanvas.html#backgroundColor">backgroundColor</a>, <a href="../symbols/fabric.StaticCanvas.html#backgroundImage">backgroundImage</a>, <a href="../symbols/fabric.StaticCanvas.html#CANVAS_HEIGHT">CANVAS_HEIGHT</a>, <a href="../symbols/fabric.StaticCanvas.html#CANVAS_WIDTH">CANVAS_WIDTH</a>, <a href="../symbols/fabric.StaticCanvas.html#clipTo">clipTo</a>, <a href="../symbols/fabric.StaticCanvas.html#includeDefaultValues">includeDefaultValues</a>, <a href="../symbols/fabric.StaticCanvas.html#onFpsUpdate">onFpsUpdate</a>, <a href="../symbols/fabric.StaticCanvas.html#renderOnAddition">renderOnAddition</a>, <a href="../symbols/fabric.StaticCanvas.html#stateful">stateful</a></dd>
+		</dl>
+		
+	
 
 <!-- ============================== methods summary ======================== -->
+	
+		
+		
+		<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class fabric.Canvas.">
+			<caption>Method Summary</caption>
+			<thead>
+				<tr>
+					<th scope="col">Method Attributes</th>
+					<th scope="col">Method Name and Description</th>
+				</tr>
+			</thead>
+			<tbody>
+			
+				<tr>
+					<td class="attributes">&nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont"><b><a href="../symbols/fabric.Canvas.html#containsPoint">containsPoint</a></b>(e, target)
+						</div>
+						<div class="description">Applies one implementation of 'point inside polygon' algorithm</div>
+					</td>
+				</tr>
+			
+				<tr>
+					<td class="attributes">&nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont"><b><a href="../symbols/fabric.Canvas.html#deactivateAll">deactivateAll</a></b>()
+						</div>
+						<div class="description">Deactivates all objects by calling their setActive(false)</div>
+					</td>
+				</tr>
+			
+				<tr>
+					<td class="attributes">&nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont"><b><a href="../symbols/fabric.Canvas.html#deactivateAllWithDispatch">deactivateAllWithDispatch</a></b>()
+						</div>
+						<div class="description">Deactivates all objects and dispatches appropriate events</div>
+					</td>
+				</tr>
+			
+				<tr>
+					<td class="attributes">&nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont"><b><a href="../symbols/fabric.Canvas.html#discardActiveGroup">discardActiveGroup</a></b>()
+						</div>
+						<div class="description">Removes currently active group</div>
+					</td>
+				</tr>
+			
+				<tr>
+					<td class="attributes">&nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont"><b><a href="../symbols/fabric.Canvas.html#discardActiveObject">discardActiveObject</a></b>()
+						</div>
+						<div class="description">Discards currently active object</div>
+					</td>
+				</tr>
+			
+				<tr>
+					<td class="attributes">&nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont"><b><a href="../symbols/fabric.Canvas.html#findTarget">findTarget</a></b>(e, skipGroup)
+						</div>
+						<div class="description">Method that determines what object we are clicking on</div>
+					</td>
+				</tr>
+			
+				<tr>
+					<td class="attributes">&nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont"><b><a href="../symbols/fabric.Canvas.html#getActiveGroup">getActiveGroup</a></b>()
+						</div>
+						<div class="description">Returns currently active group</div>
+					</td>
+				</tr>
+			
+				<tr>
+					<td class="attributes">&nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont"><b><a href="../symbols/fabric.Canvas.html#getActiveObject">getActiveObject</a></b>()
+						</div>
+						<div class="description">Returns currently active object</div>
+					</td>
+				</tr>
+			
+				<tr>
+					<td class="attributes">&nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont"><b><a href="../symbols/fabric.Canvas.html#getContext">getContext</a></b>()
+						</div>
+						<div class="description">Returns topmost canvas context</div>
+					</td>
+				</tr>
+			
+				<tr>
+					<td class="attributes">&nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont"><b><a href="../symbols/fabric.Canvas.html#getPointer">getPointer</a></b>(e)
+						</div>
+						<div class="description">Returns pointer coordinates relative to canvas.</div>
+					</td>
+				</tr>
+			
+				<tr>
+					<td class="attributes">&nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont"><b><a href="../symbols/fabric.Canvas.html#setActiveGroup">setActiveGroup</a></b>(group)
+						</div>
+						<div class="description">Sets active group to a speicified one</div>
+					</td>
+				</tr>
+			
+				<tr>
+					<td class="attributes">&nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont"><b><a href="../symbols/fabric.Canvas.html#setActiveObject">setActiveObject</a></b>(object, e)
+						</div>
+						<div class="description">Sets given object as active</div>
+					</td>
+				</tr>
+			
+			</tbody>
+		</table>
+		
+		
+		
+		<dl class="inheritsList">
+		<dt>Methods borrowed from class <a href="../symbols/fabric.StaticCanvas.html">fabric.StaticCanvas</a>: </dt><dd><a href="../symbols/fabric.StaticCanvas.html#add">add</a>, <a href="../symbols/fabric.StaticCanvas.html#bringForward">bringForward</a>, <a href="../symbols/fabric.StaticCanvas.html#bringToFront">bringToFront</a>, <a href="../symbols/fabric.StaticCanvas.html#calcOffset">calcOffset</a>, <a href="../symbols/fabric.StaticCanvas.html#centerObject">centerObject</a>, <a href="../symbols/fabric.StaticCanvas.html#centerObjectH">centerObjectH</a>, <a href="../symbols/fabric.StaticCanvas.html#centerObjectV">centerObjectV</a>, <a href="../symbols/fabric.StaticCanvas.html#clear">clear</a>, <a href="../symbols/fabric.StaticCanvas.html#clearContext">clearContext</a>, <a href="../symbols/fabric.StaticCanvas.html#complexity">complexity</a>, <a href="../symbols/fabric.StaticCanvas.html#dispose">dispose</a>, <a href="../symbols/fabric.StaticCanvas.html#forEachObject">forEachObject</a>, <a href="../symbols/fabric.StaticCanvas.html#getCenter">getCenter</a>, <a href="../symbols/fabric.StaticCanvas.html#getElement">getElement</a>, <a href="../symbols/fabric.StaticCanvas.html#getHeight">getHeight</a>, <a href="../symbols/fabric.StaticCanvas.html#getObjects">getObjects</a>, <a href="../symbols/fabric.StaticCanvas.html#getWidth">getWidth</a>, <a href="../symbols/fabric.StaticCanvas.html#insertAt">insertAt</a>, <a href="../symbols/fabric.StaticCanvas.html#isEmpty">isEmpty</a>, <a href="../symbols/fabric.StaticCanvas.html#item">item</a>, <a href="../symbols/fabric.StaticCanvas.html#onBeforeScaleRotate">onBeforeScaleRotate</a>, <a href="../symbols/fabric.StaticCanvas.html#remove">remove</a>, <a href="../symbols/fabric.StaticCanvas.html#renderAll">renderAll</a>, <a href="../symbols/fabric.StaticCanvas.html#renderTop">renderTop</a>, <a href="../symbols/fabric.StaticCanvas.html#sendBackwards">sendBackwards</a>, <a href="../symbols/fabric.StaticCanvas.html#sendToBack">sendToBack</a>, <a href="../symbols/fabric.StaticCanvas.html#setBackgroundImage">setBackgroundImage</a>, <a href="../symbols/fabric.StaticCanvas.html#setDimensions">setDimensions</a>, <a href="../symbols/fabric.StaticCanvas.html#setHeight">setHeight</a>, <a href="../symbols/fabric.StaticCanvas.html#setOverlayImage">setOverlayImage</a>, <a href="../symbols/fabric.StaticCanvas.html#setWidth">setWidth</a>, <a href="../symbols/fabric.StaticCanvas.html#straightenObject">straightenObject</a>, <a href="../symbols/fabric.StaticCanvas.html#toDatalessJSON">toDatalessJSON</a>, <a href="../symbols/fabric.StaticCanvas.html#toDatalessObject">toDatalessObject</a>, <a href="../symbols/fabric.StaticCanvas.html#toDataURL">toDataURL</a>, <a href="../symbols/fabric.StaticCanvas.html#toDataURLWithMultiplier">toDataURLWithMultiplier</a>, <a href="../symbols/fabric.StaticCanvas.html#toJSON">toJSON</a>, <a href="../symbols/fabric.StaticCanvas.html#toObject">toObject</a>, <a href="../symbols/fabric.StaticCanvas.html#toString">toString</a></dd>
+		</dl>
+		
 	
 <!-- ============================== events summary ======================== -->
 	
@@ -338,8 +597,688 @@ ul.inheritsList {
 
 <!-- ============================== field details ========================== -->		
 	
+		<div class="sectionTitle">
+			Field Detail
+		</div>
+		
+			<a name="CONTAINER_CLASS"> </a>
+			<div class="fixedFont">&lt;constant&gt; 
+			
+			<span class="light">{<a href="../symbols/String.html">String</a>}</span>
+			<b>CONTAINER_CLASS</b>
+			
+			</div>
+			<div class="description">
+				Default element class that's given to wrapper (div) element of canvas
+				
+				
+			</div>
+			
+			
+
+				
+				
+				
+				
+
+			<hr />
+		
+			<a name="CURSOR"> </a>
+			<div class="fixedFont">&lt;constant&gt; 
+			
+			<span class="light">{<a href="../symbols/String.html">String</a>}</span>
+			<b>CURSOR</b>
+			
+			</div>
+			<div class="description">
+				Default cursor value used for the entire canvas
+				
+				
+			</div>
+			
+			
+
+				
+				
+				
+				
+
+			<hr />
+		
+			<a name="freeDrawingColor"> </a>
+			<div class="fixedFont">
+			
+			<span class="light">{<a href="../symbols/String.html">String</a>}</span>
+			<b>freeDrawingColor</b>
+			
+			</div>
+			<div class="description">
+				Color of the line used in free drawing mode
+				
+				
+			</div>
+			
+			
+
+				
+				
+				
+				
+
+			<hr />
+		
+			<a name="freeDrawingLineWidth"> </a>
+			<div class="fixedFont">
+			
+			<span class="light">{Number}</span>
+			<b>freeDrawingLineWidth</b>
+			
+			</div>
+			<div class="description">
+				Width of a line used in free drawing mode
+				
+				
+			</div>
+			
+			
+
+				
+				
+				
+				
+
+			<hr />
+		
+			<a name="HOVER_CURSOR"> </a>
+			<div class="fixedFont">&lt;constant&gt; 
+			
+			<span class="light">{<a href="../symbols/String.html">String</a>}</span>
+			<b>HOVER_CURSOR</b>
+			
+			</div>
+			<div class="description">
+				Default cursor value used when hovering over an object on canvas
+				
+				
+			</div>
+			
+			
+
+				
+				
+				
+				
+
+			<hr />
+		
+			<a name="interactive"> </a>
+			<div class="fixedFont">
+			
+			<span class="light">{Boolean}</span>
+			<b>interactive</b>
+			
+			</div>
+			<div class="description">
+				Indicates that canvas is interactive. This property should not be changed.
+				
+				
+			</div>
+			
+			
+
+				
+				
+				
+				
+
+			<hr />
+		
+			<a name="selection"> </a>
+			<div class="fixedFont">
+			
+			<span class="light">{Boolean}</span>
+			<b>selection</b>
+			
+			</div>
+			<div class="description">
+				Indicates whether group selection should be enabled
+				
+				
+			</div>
+			
+			
+
+				
+				
+				
+				
+
+			<hr />
+		
+			<a name="selectionBorderColor"> </a>
+			<div class="fixedFont">
+			
+			<span class="light">{<a href="../symbols/String.html">String</a>}</span>
+			<b>selectionBorderColor</b>
+			
+			</div>
+			<div class="description">
+				Color of the border of selection (usually slightly darker than color of selection itself)
+				
+				
+			</div>
+			
+			
+
+				
+				
+				
+				
+
+			<hr />
+		
+			<a name="selectionColor"> </a>
+			<div class="fixedFont">
+			
+			<span class="light">{<a href="../symbols/String.html">String</a>}</span>
+			<b>selectionColor</b>
+			
+			</div>
+			<div class="description">
+				Color of selection
+				
+				
+			</div>
+			
+			
+
+				
+				
+				
+				
+
+			<hr />
+		
+			<a name="selectionLineWidth"> </a>
+			<div class="fixedFont">
+			
+			<span class="light">{Number}</span>
+			<b>selectionLineWidth</b>
+			
+			</div>
+			<div class="description">
+				Width of a line used in object/group selection
+				
+				
+			</div>
+			
+			
+
+				
+				
+				
+				
+
+			
+		
+	
 
 <!-- ============================== method details ========================= -->		
+	
+		<div class="sectionTitle">
+			Method Detail
+		</div>
+		
+			<a name="containsPoint"> </a>
+			<div class="fixedFont">
+			
+			<span class="light">{Boolean}</span>
+			<b>containsPoint</b>(e, target)
+			
+			</div>
+			<div class="description">
+				Applies one implementation of 'point inside polygon' algorithm
+				
+				
+			</div>
+			
+			
+			
+				
+					<dl class="detailList">
+					<dt class="heading">Parameters:</dt>
+					
+						<dt>
+							<b>e</b>
+							
+						</dt>
+						<dd>{ Event } event object</dd>
+					
+						<dt>
+							<b>target</b>
+							
+						</dt>
+						<dd>{ fabric.Object } object to test against</dd>
+					
+					</dl>
+				
+				
+				
+				
+				
+					<dl class="detailList">
+					<dt class="heading">Returns:</dt>
+					
+						<dd><span class="light fixedFont">{Boolean}</span> true if point contains within area of given object</dd>
+					
+					</dl>
+				
+				
+				
+
+			<hr />
+		
+			<a name="deactivateAll"> </a>
+			<div class="fixedFont">
+			
+			<span class="light">{<a href="../symbols/fabric.Canvas.html">fabric.Canvas</a>}</span>
+			<b>deactivateAll</b>()
+			
+			</div>
+			<div class="description">
+				Deactivates all objects by calling their setActive(false)
+				
+				
+			</div>
+			
+			
+			
+				
+				
+				
+				
+				
+					<dl class="detailList">
+					<dt class="heading">Returns:</dt>
+					
+						<dd><span class="light fixedFont">{<a href="../symbols/fabric.Canvas.html">fabric.Canvas</a>}</span> thisArg</dd>
+					
+					</dl>
+				
+				
+				
+
+			<hr />
+		
+			<a name="deactivateAllWithDispatch"> </a>
+			<div class="fixedFont">
+			
+			<span class="light">{<a href="../symbols/fabric.Canvas.html">fabric.Canvas</a>}</span>
+			<b>deactivateAllWithDispatch</b>()
+			
+			</div>
+			<div class="description">
+				Deactivates all objects and dispatches appropriate events
+				
+				
+			</div>
+			
+			
+			
+				
+				
+				
+				
+				
+					<dl class="detailList">
+					<dt class="heading">Returns:</dt>
+					
+						<dd><span class="light fixedFont">{<a href="../symbols/fabric.Canvas.html">fabric.Canvas</a>}</span> thisArg</dd>
+					
+					</dl>
+				
+				
+				
+
+			<hr />
+		
+			<a name="discardActiveGroup"> </a>
+			<div class="fixedFont">
+			
+			<span class="light">{<a href="../symbols/fabric.Canvas.html">fabric.Canvas</a>}</span>
+			<b>discardActiveGroup</b>()
+			
+			</div>
+			<div class="description">
+				Removes currently active group
+				
+				
+			</div>
+			
+			
+			
+				
+				
+				
+				
+				
+					<dl class="detailList">
+					<dt class="heading">Returns:</dt>
+					
+						<dd><span class="light fixedFont">{<a href="../symbols/fabric.Canvas.html">fabric.Canvas</a>}</span> thisArg</dd>
+					
+					</dl>
+				
+				
+				
+
+			<hr />
+		
+			<a name="discardActiveObject"> </a>
+			<div class="fixedFont">
+			
+			<span class="light">{<a href="../symbols/fabric.Canvas.html">fabric.Canvas</a>}</span>
+			<b>discardActiveObject</b>()
+			
+			</div>
+			<div class="description">
+				Discards currently active object
+				
+				
+			</div>
+			
+			
+			
+				
+				
+				
+				
+				
+					<dl class="detailList">
+					<dt class="heading">Returns:</dt>
+					
+						<dd><span class="light fixedFont">{<a href="../symbols/fabric.Canvas.html">fabric.Canvas</a>}</span> thisArg</dd>
+					
+					</dl>
+				
+				
+				
+
+			<hr />
+		
+			<a name="findTarget"> </a>
+			<div class="fixedFont">
+			
+			
+			<b>findTarget</b>(e, skipGroup)
+			
+			</div>
+			<div class="description">
+				Method that determines what object we are clicking on
+				
+				
+			</div>
+			
+			
+			
+				
+					<dl class="detailList">
+					<dt class="heading">Parameters:</dt>
+					
+						<dt>
+							<span class="light fixedFont">{Event}</span> <b>e</b>
+							
+						</dt>
+						<dd>mouse event</dd>
+					
+						<dt>
+							<span class="light fixedFont">{Boolean}</span> <b>skipGroup</b>
+							
+						</dt>
+						<dd>when true, group is skipped and only objects are traversed through</dd>
+					
+					</dl>
+				
+				
+				
+				
+				
+				
+				
+
+			<hr />
+		
+			<a name="getActiveGroup"> </a>
+			<div class="fixedFont">
+			
+			<span class="light">{<a href="../symbols/fabric.Group.html">fabric.Group</a>}</span>
+			<b>getActiveGroup</b>()
+			
+			</div>
+			<div class="description">
+				Returns currently active group
+				
+				
+			</div>
+			
+			
+			
+				
+				
+				
+				
+				
+					<dl class="detailList">
+					<dt class="heading">Returns:</dt>
+					
+						<dd><span class="light fixedFont">{<a href="../symbols/fabric.Group.html">fabric.Group</a>}</span> Current group</dd>
+					
+					</dl>
+				
+				
+				
+
+			<hr />
+		
+			<a name="getActiveObject"> </a>
+			<div class="fixedFont">
+			
+			<span class="light">{<a href="../symbols/fabric.Object.html">fabric.Object</a>}</span>
+			<b>getActiveObject</b>()
+			
+			</div>
+			<div class="description">
+				Returns currently active object
+				
+				
+			</div>
+			
+			
+			
+				
+				
+				
+				
+				
+					<dl class="detailList">
+					<dt class="heading">Returns:</dt>
+					
+						<dd><span class="light fixedFont">{<a href="../symbols/fabric.Object.html">fabric.Object</a>}</span> active object</dd>
+					
+					</dl>
+				
+				
+				
+
+			<hr />
+		
+			<a name="getContext"> </a>
+			<div class="fixedFont">
+			
+			<span class="light">{CanvasRenderingContext2D}</span>
+			<b>getContext</b>()
+			
+			</div>
+			<div class="description">
+				Returns topmost canvas context
+				
+				
+			</div>
+			
+			
+			
+				
+				
+				
+				
+				
+					<dl class="detailList">
+					<dt class="heading">Returns:</dt>
+					
+						<dd><span class="light fixedFont">{CanvasRenderingContext2D}</span> </dd>
+					
+					</dl>
+				
+				
+				
+
+			<hr />
+		
+			<a name="getPointer"> </a>
+			<div class="fixedFont">
+			
+			<span class="light">{Object}</span>
+			<b>getPointer</b>(e)
+			
+			</div>
+			<div class="description">
+				Returns pointer coordinates relative to canvas.
+				
+				
+			</div>
+			
+			
+			
+				
+					<dl class="detailList">
+					<dt class="heading">Parameters:</dt>
+					
+						<dt>
+							<b>e</b>
+							
+						</dt>
+						<dd></dd>
+					
+					</dl>
+				
+				
+				
+				
+				
+					<dl class="detailList">
+					<dt class="heading">Returns:</dt>
+					
+						<dd><span class="light fixedFont">{Object}</span> object with "x" and "y" number values</dd>
+					
+					</dl>
+				
+				
+				
+
+			<hr />
+		
+			<a name="setActiveGroup"> </a>
+			<div class="fixedFont">
+			
+			<span class="light">{<a href="../symbols/fabric.Canvas.html">fabric.Canvas</a>}</span>
+			<b>setActiveGroup</b>(group)
+			
+			</div>
+			<div class="description">
+				Sets active group to a speicified one
+				
+				
+			</div>
+			
+			
+			
+				
+					<dl class="detailList">
+					<dt class="heading">Parameters:</dt>
+					
+						<dt>
+							<span class="light fixedFont">{<a href="../symbols/fabric.Group.html">fabric.Group</a>}</span> <b>group</b>
+							
+						</dt>
+						<dd>Group to set as a current one</dd>
+					
+					</dl>
+				
+				
+				
+				
+				
+					<dl class="detailList">
+					<dt class="heading">Returns:</dt>
+					
+						<dd><span class="light fixedFont">{<a href="../symbols/fabric.Canvas.html">fabric.Canvas</a>}</span> thisArg</dd>
+					
+					</dl>
+				
+				
+				
+
+			<hr />
+		
+			<a name="setActiveObject"> </a>
+			<div class="fixedFont">
+			
+			<span class="light">{<a href="../symbols/fabric.Canvas.html">fabric.Canvas</a>}</span>
+			<b>setActiveObject</b>(object, e)
+			
+			</div>
+			<div class="description">
+				Sets given object as active
+				
+				
+			</div>
+			
+			
+			
+				
+					<dl class="detailList">
+					<dt class="heading">Parameters:</dt>
+					
+						<dt>
+							<b>object</b>
+							
+						</dt>
+						<dd>{fabric.Object} Object to set as an active one</dd>
+					
+						<dt>
+							<b>e</b>
+							
+						</dt>
+						<dd></dd>
+					
+					</dl>
+				
+				
+				
+				
+				
+					<dl class="detailList">
+					<dt class="heading">Returns:</dt>
+					
+						<dd><span class="light fixedFont">{<a href="../symbols/fabric.Canvas.html">fabric.Canvas</a>}</span> thisArg</dd>
+					
+					</dl>
+				
+				
+				
+
+			
+		
 	
 	
 <!-- ============================== event details ========================= -->		
@@ -352,5 +1291,5 @@ ul.inheritsList {
 <!-- ============================== footer ================================= -->
 <div class="fineprint" style="clear:both">
 	
-	Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Sat Nov 26 2011 18:38:06 GMT-0500 (EST)
+	Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Thu Dec 08 2011 09:32:36 GMT-0500 (EST)
 </div>
