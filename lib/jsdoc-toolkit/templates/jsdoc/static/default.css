@@ -36,7 +36,7 @@ pre.code
 #index {
 	margin-top: 24px;
 	float: left;
-	width: 180px;
+	width: 190px;
 	position: absolute;
 	left: 8px;
 	background-color: #F3F3F3;
@@ -44,8 +44,8 @@ pre.code
 }
 
 #content {
-	margin-left: 210px;
-	width: 700px;
+	margin-left: 220px;
+	width: 770px;
 }
 
 .classList {
@@ -58,7 +58,7 @@ pre.code
 }
 
 .classList li {
-	padding: 0;
+	paddinging: 0;
 	margin: 0 0 8px 0;
 }
 
@@ -85,13 +85,13 @@ div.sectionTitle { margin-bottom: 8px; }
 .summaryTable td {
 	vertical-align: top;
 	padding: 4px;
-	border-bottom: 1px #7F8FB1 solid;
-	border-right: 1px #7F8FB1 solid;
+	border-bottom: 1px #C0C8D8 solid;
+	border-right: 1px #C0C8D8 solid;
 }
 
 /*col#summaryAttributes {}*/
 .summaryTable td.attributes {
-	border-left: 1px #7F8FB1 solid;
+	border-left: 1px #C0C8D8 solid;
 	width: 140px;
 	text-align: right;
 }
@@ -143,4 +143,10 @@ ul.inheritsList {
 .fineprint {
 	text-align: right;
 	font-size: 10px;
+}
+
+.inheritsList dd {
+  margin-left: 0;
+  margin-top: 3px;
+  margin-bottom: 8px;
 }
