@@ -33,14 +33,14 @@
   extend(fabric.StaticCanvas.prototype, /** @scope fabric.StaticCanvas.prototype */ {
     
     /**
-     * Background color of this canvas instance
+     * Background color of canvas instance
      * @property
      * @type String
      */
     backgroundColor:        'rgba(0, 0, 0, 0)',
     
     /**
-     * Background image of this canvas instance
+     * Background image of canvas instance
      * Should be set via `setBackgroundImage`
      * @property
      * @type String
@@ -48,6 +48,7 @@
     backgroundImage:        '',
     
     /**
+     * Indicates whether toObject/toDatalessObject should include default values
      * @property
      * @type Boolean
      */
@@ -68,22 +69,26 @@
     renderOnAddition:       true,
     
     /**
+     * Function that determines clipping of entire canvas area
+     * Being passed context as first argument. See clipping canvas area in https://github.com/kangax/fabric.js/wiki/FAQ
+     * @property
+     * @type Function
+     */
+    clipTo:                 null,
+    
+    /**
+     * Default canvas width
      * @constant
      * @type Number
      */
     CANVAS_WIDTH:           600,
     
     /**
+     * Default canvas height
      * @constant
      * @type Number
      */
     CANVAS_HEIGHT:          600,
-    
-    /**
-     * @constant
-     * @type String
-     */
-    CONTAINER_CLASS:        'canvas-container',
     
     /**
      * Callback; invoked right before object is about to be scaled/rotated

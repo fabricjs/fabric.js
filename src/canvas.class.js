@@ -30,6 +30,7 @@
   /**
    * @class fabric.Canvas
    * @constructor
+   * @extends fabric.StaticCanvas
    * @param {HTMLElement | String} el &lt;canvas> element to initialize instance on
    * @param {Object} [options] Options object
    */  
@@ -46,7 +47,7 @@
   ProtoProxy.prototype = fabric.StaticCanvas.prototype;
   fabric.Canvas.prototype = new ProtoProxy;
   
-  var InteractiveMethods = {
+  var InteractiveMethods = /** @scope fabric.Canvas.prototype */ {
     
     /**
      * Indicates that canvas is interactive. This property should not be changed.
@@ -77,7 +78,7 @@
     selectionBorderColor:   'rgba(255, 255, 255, 0.3)',
 
     /**
-     * Width of a line used in selection
+     * Width of a line used in object/group selection
      * @property
      * @type Number
      */
@@ -98,16 +99,25 @@
     freeDrawingLineWidth:   1,
 
     /**
+     * Default cursor value used when hovering over an object on canvas
      * @constant
      * @type String
      */
     HOVER_CURSOR:           'move',
 
     /**
+     * Default cursor value used for the entire canvas
      * @constant
      * @type String
      */
     CURSOR:                 'default',
+    
+    /**
+     * Default element class that's given to wrapper (div) element of canvas
+     * @constant
+     * @type String
+     */
+    CONTAINER_CLASS:        'canvas-container',
     
     _initInteractive: function() {
       this._currentTransform = null;
