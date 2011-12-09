@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2011, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.7.3" };
+var fabric = fabric || { version: "0.7.4" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -1870,13 +1870,13 @@ fabric.Observable = {
     * @param {DOMElement} element optional Element to associate with animation
     */
   var requestAnimFrame = (function() {
-    return  window.requestAnimationFrame       || 
-            window.webkitRequestAnimationFrame || 
-            window.mozRequestAnimationFrame    || 
-            window.oRequestAnimationFrame      || 
-            window.msRequestAnimationFrame     || 
+    return  fabric.window.requestAnimationFrame       || 
+            fabric.window.webkitRequestAnimationFrame || 
+            fabric.window.mozRequestAnimationFrame    || 
+            fabric.window.oRequestAnimationFrame      || 
+            fabric.window.msRequestAnimationFrame     || 
             function(callback, element) {
-              window.setTimeout(callback, 1000 / 60);
+              fabric.window.setTimeout(callback, 1000 / 60);
             };
   })();
 
@@ -11475,7 +11475,7 @@ fabric.Image.filters.RemoveWhite.fromObject = function(object) {
     request(url, 'binary', function(body) {
       var img = new Image();
       img.src = new Buffer(body, 'binary');
-      callback(new fabric.Image(img));
+      callback(img);
     });
   };
 

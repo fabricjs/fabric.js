@@ -121,13 +121,13 @@
     * @param {DOMElement} element optional Element to associate with animation
     */
   var requestAnimFrame = (function() {
-    return  window.requestAnimationFrame       || 
-            window.webkitRequestAnimationFrame || 
-            window.mozRequestAnimationFrame    || 
-            window.oRequestAnimationFrame      || 
-            window.msRequestAnimationFrame     || 
+    return  fabric.window.requestAnimationFrame       || 
+            fabric.window.webkitRequestAnimationFrame || 
+            fabric.window.mozRequestAnimationFrame    || 
+            fabric.window.oRequestAnimationFrame      || 
+            fabric.window.msRequestAnimationFrame     || 
             function(callback, element) {
-              window.setTimeout(callback, 1000 / 60);
+              fabric.window.setTimeout(callback, 1000 / 60);
             };
   })();
 
