@@ -88,8 +88,8 @@
     canvasEl.width = nodeCanvas.width;
     canvasEl.height = nodeCanvas.height;
 
-    var Canvas = fabric.Canvas || fabric.StaticCanvas;
-    var fabricCanvas = new Canvas(canvasEl);
+    var canvas = fabric.Canvas || fabric.StaticCanvas;
+    var fabricCanvas = new canvas(canvasEl);
     fabricCanvas.contextContainer = nodeCanvas.getContext('2d');
     fabricCanvas.nodeCanvas = nodeCanvas;
 
