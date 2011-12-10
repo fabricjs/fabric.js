@@ -1,0 +1,139 @@
+---
+layout: test
+title: Node.js
+---
+
+<style>
+  pre { min-width: 300px; max-width: 500px; padding: 10px; margin: 0 30px 0 0; background: #444; color: #eee; font-size: 11px; 
+      word-wrap: break-word; white-space: -moz-pre-wrap; white-space: pre-wrap; }
+  .column { float: left; min-width: 300px; margin-right: 10px; }
+  .column p { margin: 0 0 5px 0; padding: 0; }
+  .canvas-container, .node { margin-bottom: 10px; border: 1px solid #eee; background: #fff; }
+  .test { overflow: hidden; background: #eee; margin-bottom: 20px; display: inline-block; float: left; 
+    padding: 10px; box-shadow: 1px 1px 1px rgba(0,0,0,0.4) }
+  .test-source { display: none }
+</style>
+
+<script type="text/script" id="test-template">
+  <div class="test">
+    <div class="column">
+      <p>Source</p>
+<pre class="source"><code>#{code}</code></pre>
+    </div>
+    <div class="column">
+      <p>Canvas</p>
+      <canvas class="canvas" width="200" height="200"></canvas>
+    </div>
+    <div class="column">
+      <p>Node</p>
+      <img class="node" src="">
+    </div>
+  </div>
+</script>
+
+<pre class="test-source">
+var rect = new fabric.Rect({ 
+  left: 100, 
+  top: 100, 
+  width: 100, 
+  height: 50, 
+  fill: 'red'
+});
+canvas.add(rect);
+</pre>
+
+<pre class="test-source">
+var circle = new fabric.Circle({ 
+  left: 100, 
+  top: 100, 
+  radius: 50, 
+  fill: 'green'
+});
+canvas.add(circle);
+</pre>
+
+<pre class="test-source">
+var triangle = new fabric.Triangle({ 
+  left: 100, 
+  top: 100, 
+  width: 70,
+  height: 70,
+  fill: 'blue'
+});
+canvas.add(triangle);
+</pre>
+
+<pre class="test-source">
+var rect = new fabric.Rect({ 
+  left: 100, 
+  top: 100, 
+  width: 70,
+  height: 70,
+  fill: 'red',
+  angle: 30
+});
+canvas.add(rect);
+</pre>
+
+<pre class="test-source async">
+var src = 'http://kangax.github.com/fabric.js/assets/pug.jpg';
+fabric.util.loadImage(src, function(img) {
+  var oImg = new fabric.Image(img);
+  oImg.set({ 
+    left: 100, 
+    top: 100,
+  });
+  canvas.add(oImg);
+  proceed();
+});
+</pre>
+
+<pre class="test-source async">
+var src = 'http://kangax.github.com/fabric.js/assets/pug.jpg';
+fabric.util.loadImage(src, function(img) {
+  var oImg = new fabric.Image(img);
+  oImg.scale(0.2).set({ 
+    left: 100, 
+    top: 100,
+  });
+  canvas.add(oImg);
+  proceed();
+});
+</pre>
+
+<pre class="test-source async">
+var json = '{"objects":[{"type":"path","left":104,"top":96,"width":99,"height":115,"fill":"#00274D","overlayFill":null,"stroke":null,"strokeWidth":1,"scaleX":1.04,"scaleY":1.04,"angle":-25.8,"flipX":false,"flipY":false,"opacity":1,"selectable":true,"path":[["M",67.39,22.39],["c",2.59,-0.43,5.11,1.44,5.54,4.18],["c",0.43,2.66,-1.3,5.26,-3.89,5.69],["c",-1.8,0.29,-3.6,-0.58,-4.61,-2.02],["L",44.5,34.56],["l",10.87,59.62],["c",17.42,-4.46,26.06,-14.18,27.5,-29.02],["l",-10.01,-0.72],["L",88.7,51.91],["l",9.43,21.24],["c",-3.38,-1.95,-5.9,-5.11,-9.29,-7.06],["c",-0.29,25.06,-27.14,32.76,-33.77,47.95],["C",44.42,100.08,26.5,114.77,6.91,82.8],["L",0,92.45],["l",1.51,-21.6],["l",19.66,4.68],["l",-9.43,3.67],["c",7.49,11.59,17.57,19.87,36.43,16.42],["L",36.22,36.57],["l",-18.65,2.38],["c",-0.14,2.16,-1.73,4.03,-3.89,4.39],["c",-2.59,0.43,-5.04,-1.44,-5.54,-4.1],["c",-0.43,-2.74,1.3,-5.26,3.89,-5.69],["c",1.94,-0.36,3.89,0.65,4.9,2.3],["l",17.93,-4.82],["l",-1.37,-6.84],["c",-4.82,-0.79,-8.93,-4.75,-9.79,-10.08],["c",-1.15,-6.62,3.1,-12.89,9.43,-13.97],["c",6.41,-1.01,12.46,3.46,13.54,10.08],["c",0.86,5.18,-1.58,10.15,-5.69,12.6],["l",1.87,6.12],["l",20.74,-2.88],["C",64.01,24.26,65.52,22.75,67.39,22.39],["L",67.39,22.39],["z"],["M",33.91,5.18],["c",-3.46,0.58,-5.76,3.96,-5.11,7.56],["c",0.58,3.6,3.89,6.05,7.27,5.47],["c",3.46,-0.58,5.76,-3.96,5.18,-7.56],["C",40.61,7.05,37.37,4.61,33.91,5.18],["z"]]}],"background":"rgba(0, 0, 0, 0)"}';
+
+canvas.loadFromDatalessJSON(json, proceed);
+</pre>
+
+
+<script>
+  (function(){
+    function proceed(){ }
+    
+    for (var __all = document.getElementsByClassName('test-source'), __len = __all.length, __i = 0; __i < __len; __i++) {
+      (function(__testSourceEl) {
+
+        var __isAsync = __testSourceEl.className.indexOf('async') > -1;
+        var __testMarkup = document.getElementById('test-template')
+          .innerHTML.replace('#{code}', __testSourceEl.innerHTML);
+        var __dummyEl = document.createElement('div');
+        __dummyEl.innerHTML = __testMarkup;
+        var __testEl = __dummyEl.getElementsByClassName('test')[0]
+        document.getElementById('bd-wrapper').appendChild(__testEl);
+
+        var __sourceEl = __testEl.getElementsByClassName('source')[0];
+        var __canvasEl = __testEl.getElementsByClassName('canvas')[0];
+        var __nodeEl = __testEl.getElementsByClassName('node')[0];
+        var __code = __sourceEl.firstChild.innerHTML;
+        var canvas = new fabric.Canvas(__canvasEl);
+
+        eval(__code);
+
+        __nodeEl.src = 'http://localhost:8124?code=' + encodeURIComponent(__code) + '&async=' + __isAsync;
+
+      })(__all[__i]);
+    }
+  })();
+</script>
