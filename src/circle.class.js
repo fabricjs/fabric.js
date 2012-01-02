@@ -53,6 +53,20 @@
     },
     
     /**
+     * Returns svg representation of an instance
+     * @method toSVG
+     * @return {string} svg representation of an instance
+     */
+    toSVG: function() {
+      return ('<circle ' +
+        'cx="0" cy="0" ' +
+        'r="' + this.radius + '" ' +
+        'style="' + this.getSvgStyles() + '" ' +
+        'transform="' + this.getSvgTransform() + '" ' +
+        '/>');
+    },
+    
+    /**
      * @private
      * @method _render
      * @param ctx {CanvasRenderingContext2D} context to render on

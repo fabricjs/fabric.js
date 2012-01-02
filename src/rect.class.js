@@ -125,6 +125,20 @@
      */
     complexity: function() {
       return 1;
+    },
+    
+    /**
+     * Returns svg representation of an instance
+     * @method toSVG
+     * @return {string} svg representation of an instance
+     */
+    toSVG: function() {
+      return '<rect ' +
+              'x="' + (-1 * this.width / 2) + '" y="' + (-1 * this.height / 2) + '" ' +
+              'width="' + this.width + '" height="' + this.height + '" ' +
+              'style="' + this.getSvgStyles() + '" ' +
+              'transform="' + this.getSvgTransform() + '" ' +
+              '/>';
     }
   });
   

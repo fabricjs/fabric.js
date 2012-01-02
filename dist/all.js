@@ -1238,6 +1238,7 @@ Cufon.registerEngine('canvas', (function() {
     Cufon.textOptions.width = _width;
     Cufon.textOptions.height = (_height * lines) + totalLineHeight;
     Cufon.textOptions.lines = lines;
+    Cufon.textOptions.totalLineHeight = totalLineHeight;
 
     if (HAS_INLINE_BLOCK) {
       wStyle.width = wrapperWidth;
@@ -1250,7 +1251,9 @@ Cufon.registerEngine('canvas', (function() {
 
     var g = Cufon.textOptions.context || canvas.getContext('2d'),
         scale = roundedHeight / viewBox.height;
-
+    
+    Cufon.textOptions.fontAscent = font.ascent * scale;
+    
     g.save();
     g.scale(scale, scale);
     
@@ -1379,18 +1382,22 @@ Cufon.registerEngine('canvas', (function() {
         if (textDecoration) {
           g.save();
           g.strokeStyle = g.fillStyle;
+          
+          // add 2x more thickness — closer to SVG rendering
+          g.lineWidth += g.lineWidth;
+          
           g.beginPath();
           if (textDecoration.underline) {
-            g.moveTo(0, -font.face['underline-position']);
-            g.lineTo(charWidth, -font.face['underline-position']);
+            g.moveTo(0, -font.face['underline-position'] + 0.5);
+            g.lineTo(charWidth, -font.face['underline-position'] + 0.5);
           }
           if (textDecoration.overline) {
-            g.moveTo(0, font.ascent);
-            g.lineTo(charWidth, font.ascent);
+            g.moveTo(0, font.ascent + 0.5);
+            g.lineTo(charWidth, font.ascent + 0.5);
           }
           if (textDecoration['line-through']) {
-            g.moveTo(0, -font.descent);
-            g.lineTo(charWidth, -font.descent);
+            g.moveTo(0, -font.descent + 0.5);
+            g.lineTo(charWidth, -font.descent + 0.5);
           }
           g.stroke();
           g.restore();
@@ -3527,18 +3534,50 @@ fabric.util.string = {
       callback(results, options);
     });
   }
-  
-  extend(fabric, {
-    parseAttributes:        parseAttributes,
-    parseElements:          parseElements,
-    parseStyleAttribute:    parseStyleAttribute,
-    parsePointsAttribute:   parsePointsAttribute,
-    getCSSRules:            getCSSRules,
+
+  function createSVGFontFacesMarkup(objects) {
+    var markup = '';
     
-    loadSVGFromURL:         loadSVGFromURL,
-    loadSVGFromString:      loadSVGFromString
+    for (var i = 0, len = objects.length; i < len; i++) {
+      if (objects[i].type !== 'text' || !objects[i].path) continue;
+      
+      markup += [
+        '@font-face {',
+          'font-family: ', objects[i].fontFamily, '; ',
+          'src: url(\'', objects[i].path, '\')',
+        '}'
+      ].join('');
+    }
+    
+    if (markup) {
+      markup = [
+        '<defs>',
+          '<style type="text/css">',
+            '<![CDATA[',
+              markup,
+            ']]>',
+          '</style>',
+        '</defs>'
+      ].join('');
+    }
+    
+    return markup;
+  }
+
+  extend(fabric, {
+
+    parseAttributes:          parseAttributes,
+    parseElements:            parseElements,
+    parseStyleAttribute:      parseStyleAttribute,
+    parsePointsAttribute:     parsePointsAttribute,
+    getCSSRules:              getCSSRules,
+
+    loadSVGFromURL:           loadSVGFromURL,
+    loadSVGFromString:        loadSVGFromString,
+
+    createSVGFontFacesMarkup: createSVGFontFacesMarkup
   });
-  
+
 })(typeof exports != 'undefined' ? exports : this);
 (function() {
   
@@ -5022,6 +5061,36 @@ fabric.util.string = {
         }, this),
         background: this.backgroundColor
       }
+    },
+    
+    /**
+     * Returns SVG representation of canvas
+     * @function
+     * @method toSVG
+     * @return {String} 
+     */
+    toSVG: function() {
+      var markup = [
+        '<?xml version="1.0" standalone="no" ?>',
+          '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN" ',
+            '"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">',
+          '<svg ',
+            'xmlns="http://www.w3.org/2000/svg" ',
+            'xmlns:xlink="http://www.w3.org/1999/xlink" ',
+            'version="1.1" ',
+            'width="', this.width, '" ',
+            'height="', this.height, '" ',
+            'xml:space="preserve">',
+          '<desc>Created with Fabric.js ', fabric.version, '</desc>',
+          fabric.createSVGFontFacesMarkup(this.getObjects()),
+      ];
+
+      for (var i = 0, objects = this.getObjects(), len = objects.length; i < len; i++) {
+        markup.push(objects[i].toSVG());
+      }
+      markup.push('</svg>');
+
+      return markup.join('');
     },
 
     /**
@@ -6964,6 +7033,34 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     },
     
     /**
+     * Returns styles-string for svg-export
+     * @method getSvgStyles
+     * @return {string}
+     */
+    getSvgStyles: function() {
+      return [
+        "stroke: ", (this.stroke ? this.stroke : 'none'), "; ",
+        "stroke-width: ", (this.strokeWidth ? this.strokeWidth : '0'), "; ",
+        "fill: ", (this.fill ? this.fill : 'none'), "; ",
+        "opacity: ", (this.opacity ? this.opacity : '1'), ";",
+      ].join("");
+    },
+    
+    /**
+     * Returns transform-string for svg-export
+     * @method getSvgTransform
+     * @return {string}
+     */
+    getSvgTransform: function() {
+      var angle = this.getAngle();
+      return [
+        "translate(", this.left, " ", this.top, ")",
+        angle !== 0 ? (" rotate(" + angle + ")") : '',
+        (this.scaleX === 1 && this.scaleY === 1) ? '' : (" scale(" + toFixed(this.scaleX, '2') + " " + toFixed(this.scaleY, '2') + ")")
+      ].join('');
+    },
+    
+    /**
      * @private
      * @method _removeDefaultValues
      */
@@ -8207,6 +8304,24 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         x2: this.get('x2'),
         y2: this.get('y2')
       });
+    },
+    
+    /**
+     * Returns svg representation of an instance
+     * @method toSVG
+     * @return {string} svg representation of an instance
+     */
+    toSVG: function() {
+      console.log()
+      return [
+        '<line ',
+          'x1="', this.get('x1'), '" ',
+          'y1="', this.get('y1'), '" ',
+          'x2="', this.get('x2'), '" ',
+          'y2="', this.get('y2'), '" ',
+          'style="', this.getSvgStyles(), '" ',
+        '/>'
+      ].join('');
     }
   });
   
@@ -8301,6 +8416,20 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       return extend(this.callSuper('toObject'), {
         radius: this.get('radius')
       });
+    },
+    
+    /**
+     * Returns svg representation of an instance
+     * @method toSVG
+     * @return {string} svg representation of an instance
+     */
+    toSVG: function() {
+      return ('<circle ' +
+        'cx="0" cy="0" ' +
+        'r="' + this.radius + '" ' +
+        'style="' + this.getSvgStyles() + '" ' +
+        'transform="' + this.getSvgTransform() + '" ' +
+        '/>');
     },
     
     /**
@@ -8468,6 +8597,29 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      */
     complexity: function() {
       return 1;
+    },
+    
+    /**
+     * Returns svg representation of an instance
+     * @method toSVG
+     * @return {string} svg representation of an instance
+     */
+    toSVG: function() {
+
+      var widthBy2 = this.width / 2,
+          heightBy2 = this.height / 2;
+
+      var points = [
+        -widthBy2 + " " + heightBy2,
+        "0 " + -heightBy2,
+        widthBy2 + " " + heightBy2
+      ].join(",");
+
+      return '<polygon ' +
+              'points="' + points + '" ' +
+              'style="' + this.getSvgStyles() + '" ' +
+              'transform="' + this.getSvgTransform() + '" ' +
+              '/>';
     }
   });
   
@@ -8538,6 +8690,22 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         rx: this.get('rx'),
         ry: this.get('ry')
       });
+    },
+    
+    /**
+     * Returns svg representation of an instance
+     * @method toSVG
+     * @return {string} svg representation of an instance
+     */
+    toSVG: function() {
+      return [
+        '<ellipse ',
+          'rx="', this.get('rx'), '" ',
+          'ry="', this.get('ry'), '" ',
+          'style="', this.getSvgStyles(), '" ',
+          'transform="', this.getSvgTransform(), '" ',
+        '/>'
+      ].join('');
     },
     
     /**
@@ -8748,6 +8916,20 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      */
     complexity: function() {
       return 1;
+    },
+    
+    /**
+     * Returns svg representation of an instance
+     * @method toSVG
+     * @return {string} svg representation of an instance
+     */
+    toSVG: function() {
+      return '<rect ' +
+              'x="' + (-1 * this.width / 2) + '" y="' + (-1 * this.height / 2) + '" ' +
+              'width="' + this.width + '" height="' + this.height + '" ' +
+              'style="' + this.getSvgStyles() + '" ' +
+              'transform="' + this.getSvgTransform() + '" ' +
+              '/>';
     }
   });
   
@@ -8808,7 +8990,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   
   "use strict";
   
-  var fabric = global.fabric || (global.fabric = { });
+  var fabric = global.fabric || (global.fabric = { }),
+      toFixed = fabric.util.toFixed;
   
   if (fabric.Polyline) {
     fabric.warn('fabric.Polyline is already defined');
@@ -8856,6 +9039,26 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      */
     toObject: function() {
       return fabric.Polygon.prototype.toObject.call(this);
+    },
+    
+    /**
+     * Returns svg representation of an instance
+     * @method toSVG
+     * @return {string} svg representation of an instance
+     */
+    toSVG: function() {
+      var points = [];
+      for (var i = 0, len = this.points.length; i < len; i++) {
+        points.push(toFixed(this.points[i].x, 2), ',', toFixed(this.points[i].y, 2), ' ');
+      }
+      
+      return [
+        '<polyline ',
+          'points="', points.join(''), '" ',
+          'style="', this.getSvgStyles(), '" ',
+          'transform="', this.getSvgTransform(), '" ',
+        '/>'
+      ].join('');
     },
     
     /**
@@ -8943,7 +9146,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       min = fabric.util.array.min,
-      max = fabric.util.array.max;
+      max = fabric.util.array.max,
+      toFixed = fabric.util.toFixed;
   
   if (fabric.Polygon) {
     fabric.warn('fabric.Polygon is already defined');
@@ -9006,6 +9210,26 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       return extend(this.callSuper('toObject'), {
         points: this.points.concat()
       });
+    },
+    
+    /**
+     * Returns svg representation of an instance
+     * @method toSVG
+     * @return {string} svg representation of an instance
+     */
+    toSVG: function() {
+      var points = [];
+      for (var i = 0, len = this.points.length; i < len; i++) {
+        points.push(toFixed(this.points[i].x, 2), ',', toFixed(this.points[i].y, 2), ' ');
+      }
+      
+      return [
+        '<polygon ',
+          'points="', points.join(''), '" ',
+          'style="', this.getSvgStyles(), '" ',
+          'transform="', this.getSvgTransform(), '" ',
+        '/>'
+      ].join('');
     },
     
     /**
@@ -9611,6 +9835,29 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     },
     
     /**
+     * Returns svg representation of an instance
+     * @method toSVG
+     * @return {string} svg representation of an instance
+     */
+    toSVG: function() {
+      var chunks = [];
+      for (var i = 0, len = this.path.length; i < len; i++) {
+        chunks.push(this.path[i].join(' '));
+      }
+      var path = chunks.join(' ');
+
+      return [
+        '<g transform="', this.getSvgTransform(), '">',
+          '<path ',
+            'width="', this.width, '" height="', this.height, '" ',
+            'd="', path, '" ',
+            'style="', this.getSvgStyles(), '" ',
+            'transform="translate(', (-this.width / 2), ' ', (-this.height/2), ')" />',
+        '</g>'
+      ].join('');
+    },
+    
+    /**
      * Returns number representation of an instance complexity
      * @method complexity
      * @return {Number} complexity
@@ -9920,6 +10167,30 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         o.paths = this.sourcePath;
       }
       return o;
+    },
+    
+    /**
+     * Returns svg representation of an instance
+     * @method toSVG
+     * @return {string} svg representation of an instance
+     */
+    toSVG: function() {
+      var objects = this.getObjects();
+      var markup = [
+        '<g ',
+          'width="', this.width, '" ',
+          'height="', this.height, '" ',
+          'style="', this.getSvgStyles(), '" ',
+          'transform="', this.getSvgTransform(), '" ',
+        '>'
+      ];
+
+      for (var i = 0, len = objects.length; i < len; i++) {
+        markup.push(objects[i].toSVG());
+      }
+      markup.push('</g>');
+
+      return markup.join('');
     },
     
      /**
@@ -10677,6 +10948,24 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     },
     
     /**
+     * Returns svg representation of an instance
+     * @method toSVG
+     * @return {string} svg representation of an instance
+     */
+    toSVG: function() {
+      return '<g transform="' + this.getSvgTransform() + '">'+
+                '<image xlink:href="' + this.getSrc() + '" '+
+                  'style="' + this.getSvgStyles() + '" ' +
+                  // we're essentially moving origin of transformation from top/left corner to the center of the shape 
+                  // by wrapping it in container <g> element with actual transformation, then offsetting object to the top/left 
+                  // so that object's center aligns with container's left/top
+                  'transform="translate('+ (-this.width/2) + ' ' + (-this.height/2) + ')" ' +
+                  'width="' + this.width + '" ' +
+                  'height="' + this.height + '"' + '/>'+
+              '</g>';
+    },
+    
+    /**
      * Returns source of an image
      * @method getSrc
      * @return {String} Source of an image
@@ -11263,6 +11552,8 @@ fabric.Image.filters.RemoveWhite.fromObject = function(object) {
       // update width, height
       this.width = o.width;
       this.height = o.height;
+      this._totalLineHeight = o.totalLineHeight;
+      this._fontAscent = o.fontAscent;
       
       // need to set coords _after_ the width/height was retreived from Cufon
       this.setCoords();
@@ -11332,6 +11623,40 @@ fabric.Image.filters.RemoveWhite.fromObject = function(object) {
         strokeWidth:    this.strokeWidth,
         backgroundColor: this.backgroundColor
       });
+    },
+    
+    /**
+     * Returns svg representation of an instance
+     * @method toSVG
+     * @return {string} svg representation of an instance
+     */
+    toSVG: function() {
+      var textSpans = [ ],
+          textLines = this.text.split('\n'),
+          lineTopOffset = -this._fontAscent - ((this._fontAscent / 5) * this.lineHeight);
+      
+      for (var i = 0, len = textLines.length; i < len; i++) {
+        textSpans.push('<tspan x="0" dy="', lineTopOffset, '">', textLines[i], '</tspan>');
+      }
+      
+      var textLeftOffset = -(this.width/2),
+          textTopOffset = (this.height/2) - (textLines.length * this.fontSize) - this._totalLineHeight;
+          
+      return [
+        '<g transform="', this.getSvgTransform(), '">',
+          '<text ',
+            (this.fontFamily ? 'font-family="\'' + this.fontFamily + '\'" ': ''),
+            (this.fontSize ? 'font-size="' + this.fontSize + '" ': ''),
+            (this.fontStyle ? 'font-style="' + this.fontStyle + '" ': ''),
+            (this.fontWeight ? 'font-weight="' + this.fontWeight + '" ': ''),
+            (this.textDecoration ? 'text-decoration="' + this.textDecoration + '" ': ''),
+            'style="', this.getSvgStyles(), '" ',
+            /* svg starts from left/bottom corner so we normalize height */
+            'transform="translate(', textLeftOffset, ' ', textTopOffset, ')">',
+            textSpans.join(''),
+          '</text>',
+        '</g>'
+      ].join('');
     },
     
     /**

@@ -56,6 +56,22 @@
     },
     
     /**
+     * Returns svg representation of an instance
+     * @method toSVG
+     * @return {string} svg representation of an instance
+     */
+    toSVG: function() {
+      return [
+        '<ellipse ',
+          'rx="', this.get('rx'), '" ',
+          'ry="', this.get('ry'), '" ',
+          'style="', this.getSvgStyles(), '" ',
+          'transform="', this.getSvgTransform(), '" ',
+        '/>'
+      ].join('');
+    },
+    
+    /**
      * Renders this instance on a given context
      * @method render
      * @param ctx {CanvasRenderingContext2D} context to render on

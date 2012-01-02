@@ -7,7 +7,8 @@
   var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       min = fabric.util.array.min,
-      max = fabric.util.array.max;
+      max = fabric.util.array.max,
+      toFixed = fabric.util.toFixed;
   
   if (fabric.Polygon) {
     fabric.warn('fabric.Polygon is already defined');
@@ -70,6 +71,26 @@
       return extend(this.callSuper('toObject'), {
         points: this.points.concat()
       });
+    },
+    
+    /**
+     * Returns svg representation of an instance
+     * @method toSVG
+     * @return {string} svg representation of an instance
+     */
+    toSVG: function() {
+      var points = [];
+      for (var i = 0, len = this.points.length; i < len; i++) {
+        points.push(toFixed(this.points[i].x, 2), ',', toFixed(this.points[i].y, 2), ' ');
+      }
+      
+      return [
+        '<polygon ',
+          'points="', points.join(''), '" ',
+          'style="', this.getSvgStyles(), '" ',
+          'transform="', this.getSvgTransform(), '" ',
+        '/>'
+      ].join('');
     },
     
     /**

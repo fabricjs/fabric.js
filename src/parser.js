@@ -644,16 +644,48 @@
       callback(results, options);
     });
   }
-  
-  extend(fabric, {
-    parseAttributes:        parseAttributes,
-    parseElements:          parseElements,
-    parseStyleAttribute:    parseStyleAttribute,
-    parsePointsAttribute:   parsePointsAttribute,
-    getCSSRules:            getCSSRules,
+
+  function createSVGFontFacesMarkup(objects) {
+    var markup = '';
     
-    loadSVGFromURL:         loadSVGFromURL,
-    loadSVGFromString:      loadSVGFromString
+    for (var i = 0, len = objects.length; i < len; i++) {
+      if (objects[i].type !== 'text' || !objects[i].path) continue;
+      
+      markup += [
+        '@font-face {',
+          'font-family: ', objects[i].fontFamily, '; ',
+          'src: url(\'', objects[i].path, '\')',
+        '}'
+      ].join('');
+    }
+    
+    if (markup) {
+      markup = [
+        '<defs>',
+          '<style type="text/css">',
+            '<![CDATA[',
+              markup,
+            ']]>',
+          '</style>',
+        '</defs>'
+      ].join('');
+    }
+    
+    return markup;
+  }
+
+  extend(fabric, {
+
+    parseAttributes:          parseAttributes,
+    parseElements:            parseElements,
+    parseStyleAttribute:      parseStyleAttribute,
+    parsePointsAttribute:     parsePointsAttribute,
+    getCSSRules:              getCSSRules,
+
+    loadSVGFromURL:           loadSVGFromURL,
+    loadSVGFromString:        loadSVGFromString,
+
+    createSVGFontFacesMarkup: createSVGFontFacesMarkup
   });
-  
+
 })(typeof exports != 'undefined' ? exports : this);

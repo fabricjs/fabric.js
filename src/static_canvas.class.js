@@ -679,6 +679,36 @@
         background: this.backgroundColor
       }
     },
+    
+    /**
+     * Returns SVG representation of canvas
+     * @function
+     * @method toSVG
+     * @return {String} 
+     */
+    toSVG: function() {
+      var markup = [
+        '<?xml version="1.0" standalone="no" ?>',
+          '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN" ',
+            '"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">',
+          '<svg ',
+            'xmlns="http://www.w3.org/2000/svg" ',
+            'xmlns:xlink="http://www.w3.org/1999/xlink" ',
+            'version="1.1" ',
+            'width="', this.width, '" ',
+            'height="', this.height, '" ',
+            'xml:space="preserve">',
+          '<desc>Created with Fabric.js ', fabric.version, '</desc>',
+          fabric.createSVGFontFacesMarkup(this.getObjects()),
+      ];
+
+      for (var i = 0, objects = this.getObjects(), len = objects.length; i < len; i++) {
+        markup.push(objects[i].toSVG());
+      }
+      markup.push('</svg>');
+
+      return markup.join('');
+    },
 
     /**
      * Returns true if canvas contains no objects

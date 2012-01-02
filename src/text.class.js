@@ -192,6 +192,8 @@
       // update width, height
       this.width = o.width;
       this.height = o.height;
+      this._totalLineHeight = o.totalLineHeight;
+      this._fontAscent = o.fontAscent;
       
       // need to set coords _after_ the width/height was retreived from Cufon
       this.setCoords();
@@ -261,6 +263,40 @@
         strokeWidth:    this.strokeWidth,
         backgroundColor: this.backgroundColor
       });
+    },
+    
+    /**
+     * Returns svg representation of an instance
+     * @method toSVG
+     * @return {string} svg representation of an instance
+     */
+    toSVG: function() {
+      var textSpans = [ ],
+          textLines = this.text.split('\n'),
+          lineTopOffset = -this._fontAscent - ((this._fontAscent / 5) * this.lineHeight);
+      
+      for (var i = 0, len = textLines.length; i < len; i++) {
+        textSpans.push('<tspan x="0" dy="', lineTopOffset, '">', textLines[i], '</tspan>');
+      }
+      
+      var textLeftOffset = -(this.width/2),
+          textTopOffset = (this.height/2) - (textLines.length * this.fontSize) - this._totalLineHeight;
+          
+      return [
+        '<g transform="', this.getSvgTransform(), '">',
+          '<text ',
+            (this.fontFamily ? 'font-family="\'' + this.fontFamily + '\'" ': ''),
+            (this.fontSize ? 'font-size="' + this.fontSize + '" ': ''),
+            (this.fontStyle ? 'font-style="' + this.fontStyle + '" ': ''),
+            (this.fontWeight ? 'font-weight="' + this.fontWeight + '" ': ''),
+            (this.textDecoration ? 'text-decoration="' + this.textDecoration + '" ': ''),
+            'style="', this.getSvgStyles(), '" ',
+            /* svg starts from left/bottom corner so we normalize height */
+            'transform="translate(', textLeftOffset, ' ', textTopOffset, ')">',
+            textSpans.join(''),
+          '</text>',
+        '</g>'
+      ].join('');
     },
     
     /**

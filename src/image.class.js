@@ -209,6 +209,24 @@
     },
     
     /**
+     * Returns svg representation of an instance
+     * @method toSVG
+     * @return {string} svg representation of an instance
+     */
+    toSVG: function() {
+      return '<g transform="' + this.getSvgTransform() + '">'+
+                '<image xlink:href="' + this.getSrc() + '" '+
+                  'style="' + this.getSvgStyles() + '" ' +
+                  // we're essentially moving origin of transformation from top/left corner to the center of the shape 
+                  // by wrapping it in container <g> element with actual transformation, then offsetting object to the top/left 
+                  // so that object's center aligns with container's left/top
+                  'transform="translate('+ (-this.width/2) + ' ' + (-this.height/2) + ')" ' +
+                  'width="' + this.width + '" ' +
+                  'height="' + this.height + '"' + '/>'+
+              '</g>';
+    },
+    
+    /**
      * Returns source of an image
      * @method getSrc
      * @return {String} Source of an image

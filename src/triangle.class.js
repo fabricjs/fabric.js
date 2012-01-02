@@ -66,6 +66,29 @@
      */
     complexity: function() {
       return 1;
+    },
+    
+    /**
+     * Returns svg representation of an instance
+     * @method toSVG
+     * @return {string} svg representation of an instance
+     */
+    toSVG: function() {
+
+      var widthBy2 = this.width / 2,
+          heightBy2 = this.height / 2;
+
+      var points = [
+        -widthBy2 + " " + heightBy2,
+        "0 " + -heightBy2,
+        widthBy2 + " " + heightBy2
+      ].join(",");
+
+      return '<polygon ' +
+              'points="' + points + '" ' +
+              'style="' + this.getSvgStyles() + '" ' +
+              'transform="' + this.getSvgTransform() + '" ' +
+              '/>';
     }
   });
   

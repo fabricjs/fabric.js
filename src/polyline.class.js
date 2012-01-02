@@ -4,7 +4,8 @@
   
   "use strict";
   
-  var fabric = global.fabric || (global.fabric = { });
+  var fabric = global.fabric || (global.fabric = { }),
+      toFixed = fabric.util.toFixed;
   
   if (fabric.Polyline) {
     fabric.warn('fabric.Polyline is already defined');
@@ -52,6 +53,26 @@
      */
     toObject: function() {
       return fabric.Polygon.prototype.toObject.call(this);
+    },
+    
+    /**
+     * Returns svg representation of an instance
+     * @method toSVG
+     * @return {string} svg representation of an instance
+     */
+    toSVG: function() {
+      var points = [];
+      for (var i = 0, len = this.points.length; i < len; i++) {
+        points.push(toFixed(this.points[i].x, 2), ',', toFixed(this.points[i].y, 2), ' ');
+      }
+      
+      return [
+        '<polyline ',
+          'points="', points.join(''), '" ',
+          'style="', this.getSvgStyles(), '" ',
+          'transform="', this.getSvgTransform(), '" ',
+        '/>'
+      ].join('');
     },
     
     /**

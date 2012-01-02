@@ -162,6 +162,30 @@
       return o;
     },
     
+    /**
+     * Returns svg representation of an instance
+     * @method toSVG
+     * @return {string} svg representation of an instance
+     */
+    toSVG: function() {
+      var objects = this.getObjects();
+      var markup = [
+        '<g ',
+          'width="', this.width, '" ',
+          'height="', this.height, '" ',
+          'style="', this.getSvgStyles(), '" ',
+          'transform="', this.getSvgTransform(), '" ',
+        '>'
+      ];
+
+      for (var i = 0, len = objects.length; i < len; i++) {
+        markup.push(objects[i].toSVG());
+      }
+      markup.push('</g>');
+
+      return markup.join('');
+    },
+    
      /**
       * Returns a string representation of this path group
       * @method toString

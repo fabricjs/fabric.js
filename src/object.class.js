@@ -199,6 +199,34 @@
     },
     
     /**
+     * Returns styles-string for svg-export
+     * @method getSvgStyles
+     * @return {string}
+     */
+    getSvgStyles: function() {
+      return [
+        "stroke: ", (this.stroke ? this.stroke : 'none'), "; ",
+        "stroke-width: ", (this.strokeWidth ? this.strokeWidth : '0'), "; ",
+        "fill: ", (this.fill ? this.fill : 'none'), "; ",
+        "opacity: ", (this.opacity ? this.opacity : '1'), ";",
+      ].join("");
+    },
+    
+    /**
+     * Returns transform-string for svg-export
+     * @method getSvgTransform
+     * @return {string}
+     */
+    getSvgTransform: function() {
+      var angle = this.getAngle();
+      return [
+        "translate(", this.left, " ", this.top, ")",
+        angle !== 0 ? (" rotate(" + angle + ")") : '',
+        (this.scaleX === 1 && this.scaleY === 1) ? '' : (" scale(" + toFixed(this.scaleX, '2') + " " + toFixed(this.scaleY, '2') + ")")
+      ].join('');
+    },
+    
+    /**
      * @private
      * @method _removeDefaultValues
      */

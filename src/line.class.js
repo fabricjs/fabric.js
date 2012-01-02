@@ -107,6 +107,24 @@
         x2: this.get('x2'),
         y2: this.get('y2')
       });
+    },
+    
+    /**
+     * Returns svg representation of an instance
+     * @method toSVG
+     * @return {string} svg representation of an instance
+     */
+    toSVG: function() {
+      console.log()
+      return [
+        '<line ',
+          'x1="', this.get('x1'), '" ',
+          'y1="', this.get('y1'), '" ',
+          'x2="', this.get('x2'), '" ',
+          'y2="', this.get('y2'), '" ',
+          'style="', this.getSvgStyles(), '" ',
+        '/>'
+      ].join('');
     }
   });
   

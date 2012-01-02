@@ -525,6 +525,29 @@
     },
     
     /**
+     * Returns svg representation of an instance
+     * @method toSVG
+     * @return {string} svg representation of an instance
+     */
+    toSVG: function() {
+      var chunks = [];
+      for (var i = 0, len = this.path.length; i < len; i++) {
+        chunks.push(this.path[i].join(' '));
+      }
+      var path = chunks.join(' ');
+
+      return [
+        '<g transform="', this.getSvgTransform(), '">',
+          '<path ',
+            'width="', this.width, '" height="', this.height, '" ',
+            'd="', path, '" ',
+            'style="', this.getSvgStyles(), '" ',
+            'transform="translate(', (-this.width / 2), ' ', (-this.height/2), ')" />',
+        '</g>'
+      ].join('');
+    },
+    
+    /**
      * Returns number representation of an instance complexity
      * @method complexity
      * @return {Number} complexity
