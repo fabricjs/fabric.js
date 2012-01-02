@@ -1,0 +1,41 @@
+GIT
+  remote: https://github.com/kangax/jekyll.git
+  revision: dc3fb264cce05d1773cd94acfd6dc3d0a44f5234
+  specs:
+    jekyll (0.11.2)
+      albino (~> 1.3)
+      classifier (~> 1.3)
+      directory_watcher (~> 1.1)
+      kramdown (~> 0.13)
+      liquid (~> 2.3)
+      maruku (~> 0.5)
+
+GEM
+  remote: http://rubygems.org/
+  specs:
+    albino (1.3.3)
+      posix-spawn (>= 0.3.6)
+    classifier (1.3.3)
+      fast-stemmer (>= 1.0.0)
+    directory_watcher (1.4.1)
+    fast-stemmer (1.0.0)
+    hike (1.2.1)
+    kramdown (0.13.4)
+    liquid (2.3.0)
+    maruku (0.6.0)
+      syntax (>= 1.0.0)
+    posix-spawn (0.3.6)
+    rack (1.4.0)
+    sprockets (2.1.2)
+      hike (~> 1.2)
+      rack (~> 1.0)
+      tilt (~> 1.1, != 1.3.0)
+    syntax (1.0.0)
+    tilt (1.3.3)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  jekyll!
+  sprockets

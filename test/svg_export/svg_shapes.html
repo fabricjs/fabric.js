@@ -1,0 +1,31 @@
+---
+layout: test
+title: SVG Export
+---
+
+<link rel="stylesheet" href="master.css">
+
+<script type="text/script" id="test-template">
+  <div class="test" style="clear:both">
+    <div class="column" style="display:none">
+      <p>Source</p>
+      <pre class="source"><code>#{code}</code></pre>
+    </div>
+    <div class="column">
+      <p>Canvas</p>
+      <canvas class="canvas" width="300" height="300"></canvas>
+    </div>
+    <div class="column">
+      <p>SVG</p>
+      <div class="svg"></div>
+    </div>
+  </div>
+</script>
+
+<script>
+  for (var i = 1; i < 100; i++) {
+    document.write("<pre class=\"test-source async\">fabric.loadSVGFromURL('../../assets/" + i + ".svg', onShapeLoaded);</pre>");
+  }
+</script>
+
+<script src="master.js"></script>
