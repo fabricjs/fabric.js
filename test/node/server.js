@@ -44,8 +44,6 @@ function serveImage(__response, __code, __async) {
   }
   
   function proceed() {
-    console.log('proceed');
-    
     canvas.renderAll();
     var __stream = canvas.createPNGStream();
     __stream.on('data', function(chunk) {

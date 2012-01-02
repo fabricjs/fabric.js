@@ -12,13 +12,14 @@ title: Node.js
   .test { overflow: hidden; background: #eee; margin-bottom: 20px; display: inline-block; float: left; 
     padding: 10px; box-shadow: 1px 1px 1px rgba(0,0,0,0.4) }
   .test-source { display: none }
+  .note { background: #ffc; padding: 3px; box-shadow: 0 0 1px rgba(0,0,0,0.3); display: inline-block; }
 </style>
 
 <script type="text/script" id="test-template">
   <div class="test">
     <div class="column">
       <p>Source</p>
-<pre class="source"><code>#{code}</code></pre>
+      <pre class="source"><code>#{code}</code></pre>
     </div>
     <div class="column">
       <p>Canvas</p>
@@ -30,6 +31,10 @@ title: Node.js
     </div>
   </div>
 </script>
+
+<div>
+  <p class="note">Node.js has to be started with `<code>node start_server.js</code>` from root fabric dir.</p>
+</div>
 
 <pre class="test-source">
 var rect = new fabric.Rect({ 
