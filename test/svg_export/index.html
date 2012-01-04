@@ -7,6 +7,7 @@ title: SVG Export
 
 <script src="../../lib/fonts/Delicious.font.js"></script>
 <script src="../../lib/fonts/DejaVuSerif.font.js"></script>
+<script src="../../lib/fonts/CourierNew.font.js"></script>
 
 <script src="../../lib/font_definitions.js"></script>
 
@@ -369,7 +370,7 @@ canvas.add(poly);
 </pre>
 
 <pre class="test-source">
-  var text = new fabric.Text('this text is multiline,\ncentered,\n&amp;with background color!', { 
+  var text = new fabric.Text('this text is multiline,\ncentered,\n&amp; with background color!', { 
     fontFamily: 'DejaVu_Serif_400',
     fill: '#f55',
     left: 150,
@@ -382,6 +383,20 @@ canvas.add(poly);
   canvas.add(text);
 </pre>
 
+<pre class="test-source">
+  var text = new fabric.Text('this text is multiline,\ncentered,\nwith background color\n&amp; custom lineheight!', { 
+    fontFamily: 'DejaVu_Serif_400',
+    fill: '#eee',
+    left: 150,
+    top: 100,
+    fontSize: 18,
+    textAlign: 'center',
+    lineHeight: 5,
+    backgroundColor: '#555'
+  });
+  text.path = '../../lib/fonts/DejaVuSerif.ttf';
+  canvas.add(text);
+</pre>
 
 <pre class="test-source">
   var text = new fabric.Text('this is\na multiline\ntext\nwith\nshadow!', { 
@@ -394,6 +409,31 @@ canvas.add(poly);
   });
   text.path = '../../lib/fonts/DejaVuSerif.ttf';
   canvas.add(text);
+</pre>
+
+<pre class="test-source">
+  var path = '../../lib/fonts/CourierNew.ttf';
+  var text1 = new fabric.Text('Brisket turducken', { 
+    fontFamily: 'Courier New', fill: '#333', left: 150, top: 70, fontSize: 16,
+  });
+  text1.path = path;
+  var text2 = new fabric.Text('filet mignon chuck', { 
+    fontFamily: 'Courier New', fill: '#555', left: 150, top: 100, fontSize: 16,
+  });
+  text2.path = path;
+  var text3 = new fabric.Text('Salami pork chop', { 
+    fontFamily: 'Courier New', fill: '#777', left: 150, top: 130, fontSize: 16,
+  });
+  text3.path = path;
+  var text4 = new fabric.Text('bacon filet mignon', { 
+    fontFamily: 'Courier New', fill: '#999', left: 150, top: 160, fontSize: 16,
+  });
+  text4.path = path;
+  var text5 = new fabric.Text('kielbasa ribeye shoulder ', { 
+    fontFamily: 'Courier New', fill: '#bbb', left: 150, top: 190, fontSize: 16,
+  });
+  text5.path = path;
+  canvas.add(text1, text2, text3, text4, text5);
 </pre>
 
 <pre class="test-source async">
@@ -483,5 +523,18 @@ fabric.util.loadImage(src, function(img) {
   proceed();
 });
 </pre>
+
+<pre class="test-source async">
+var src = 'http://kangax.github.com/fabric.js/assets/logo.png';
+fabric.util.loadImage(src, function(img) {
+  canvas.add(new fabric.Image(img, { left: 50, top: 30, scaleX: 0.3, scaleY: 0.3 }));
+  canvas.add(new fabric.Image(img, { left: 250, top: 30, scaleX: 0.3, scaleY: 0.3 }));
+  canvas.add(new fabric.Image(img, { left: 50, top: 275, scaleX: 0.3, scaleY: 0.3 }));
+  canvas.add(new fabric.Image(img, { left: 250, top: 275, scaleX: 0.3, scaleY: 0.3 }));
+  canvas.add(new fabric.Image(img, { left: 150, top: 150, angle: 30, scaleX: 0.9, scaleY: 0.9 }));
+  proceed();
+});
+</pre>
+
 
 <script src="master.js"></script>
