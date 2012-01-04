@@ -194,7 +194,7 @@
       this.height = o.height;
       this._totalLineHeight = o.totalLineHeight;
       this._fontAscent = o.fontAscent;
-      this._bgBoundaries = o.bgBoundaries;
+      this._boundaries = o.boundaries;
       
       // need to set coords _after_ the width/height was retreived from Cufon
       this.setCoords();
@@ -281,22 +281,25 @@
           textTopOffset = (this.height/2) - (textLines.length * this.fontSize) - this._totalLineHeight;
       
       for (var i = 0, len = textLines.length; i < len; i++) {
-        textSpans.push('<tspan x="0" dy="', lineTopOffset, '">', textLines[i], '</tspan>');
+        
+        var lineLeftOffset = (this._boundaries && this._boundaries[i]) ? this._boundaries[i].left : 0;
+        textSpans.push('<tspan x="', lineLeftOffset, '" dy="', lineTopOffset, '">', textLines[i], '</tspan>');
+        
         if (!this.backgroundColor) continue;
         textBgRects.push(
           '<rect fill="', 
             this.backgroundColor, 
             '" x="', 
-            textLeftOffset, 
+            textLeftOffset + this._boundaries[i].left, 
             '" y="', 
             (lineTopOffset * i) - this.height / 2 + (this.lineHeight * 2.6) /* an offset that seems to straighten things out */,
             '" width="', 
-            this._bgBoundaries[i].width,
+            this._boundaries[i].width,
             '" height="', 
-            this._bgBoundaries[i].height,
+            this._boundaries[i].height,
           '"></rect>');
       }
-          
+
       return [
         '<g transform="', this.getSvgTransform(), '">',
           textBgRects.join(''),

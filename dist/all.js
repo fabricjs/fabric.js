@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2011, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.7.5" };
+var fabric = fabric || { version: "0.7.6" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -1253,6 +1253,7 @@ Cufon.registerEngine('canvas', (function() {
         scale = roundedHeight / viewBox.height;
     
     Cufon.textOptions.fontAscent = font.ascent * scale;
+    Cufon.textOptions.boundaries = null;
     
     g.save();
     g.scale(scale, scale);
@@ -1287,15 +1288,16 @@ Cufon.registerEngine('canvas', (function() {
       
       g.fillStyle = options.backgroundColor;
       
-      var left = 0, lineNum = 0;
+      var left = 0, lineNum = 0, boundaries = [{ left: 0 }];
       
       if (options.textAlign === 'right') {
         g.translate(lineOffsets[lineNum], 0);
+        boundaries[0].left = lineOffsets[lineNum] * scale;
       }
       else if (options.textAlign === 'center') {
         g.translate(lineOffsets[lineNum] / 2, 0);
+        boundaries[0].left = lineOffsets[lineNum] / 2 * scale;
       }
-      var bgBoundaries = [];
       
       for (var i = 0, l = chars.length; i < l; ++i) {
         if (chars[i] === '\n') {
@@ -1303,25 +1305,30 @@ Cufon.registerEngine('canvas', (function() {
           lineNum++;
           
           var topOffset = -font.ascent - ((font.ascent / 5) * options.lineHeight);
+          var boundary = boundaries[boundaries.length - 1];
+          var nextBoundary = { left: 0 };
+          
+          boundary.width = left * scale;
+          boundary.height = (-font.ascent + font.descent) * scale;
           
           if (options.textAlign === 'right') {
             g.translate(-width, topOffset);
             g.translate(lineOffsets[lineNum], 0);
+            nextBoundary.left = lineOffsets[lineNum] * scale;
           }
           else if (options.textAlign === 'center') {
             // offset to the start of text in previous line AND half of its offset 
             // (essentially moving caret to the left edge of bounding box)
             g.translate(-left - (lineOffsets[lineNum - 1] / 2), topOffset);
             g.translate(lineOffsets[lineNum] / 2, 0);
+            nextBoundary.left = lineOffsets[lineNum] / 2 * scale;
           }
           else {
             g.translate(-left, topOffset);
           }
           
-          bgBoundaries.push({
-            width: left * scale, 
-            height: (-font.ascent + font.descent) * scale
-          });
+          /* push next boundary (for the next line) */
+          boundaries.push(nextBoundary);
           
           left = 0;
           
@@ -1332,24 +1339,25 @@ Cufon.registerEngine('canvas', (function() {
         
         var charWidth = Number(glyph.w || font.w) + letterSpacing;
         
-        g.save();
-        g.translate(0, font.ascent);
-        g.fillRect(0, 0, charWidth + 10, -font.ascent + font.descent);
-        g.restore();
+        // only draw background when there's some kind of value
+        if (options.backgroundColor) {
+          g.save();
+          g.translate(0, font.ascent);
+          g.fillRect(0, 0, charWidth + 10, -font.ascent + font.descent);
+          g.restore();
+        }
         
         g.translate(charWidth, 0);
         left += charWidth;
         
         if (i == l-1) {
-          bgBoundaries.push({ 
-            width: left * scale, 
-            height: (-font.ascent + font.descent) * scale
-          });
+          boundaries[boundaries.length - 1].width = left * scale; 
+          boundaries[boundaries.length - 1].height = (-font.ascent + font.descent) * scale;
         }
       }
       g.restore();
       
-      Cufon.textOptions.bgBoundaries = bgBoundaries;
+      Cufon.textOptions.boundaries = boundaries;
     }
     
     function renderText() {
@@ -1461,9 +1469,7 @@ Cufon.registerEngine('canvas', (function() {
     }
 
     g.save();
-    if (options.backgroundColor) {
-      renderBackground();
-    }
+    renderBackground();
     renderText();
     g.restore();
     g.restore();
@@ -11569,7 +11575,7 @@ fabric.Image.filters.RemoveWhite.fromObject = function(object) {
       this.height = o.height;
       this._totalLineHeight = o.totalLineHeight;
       this._fontAscent = o.fontAscent;
-      this._bgBoundaries = o.bgBoundaries;
+      this._boundaries = o.boundaries;
       
       // need to set coords _after_ the width/height was retreived from Cufon
       this.setCoords();
@@ -11656,22 +11662,25 @@ fabric.Image.filters.RemoveWhite.fromObject = function(object) {
           textTopOffset = (this.height/2) - (textLines.length * this.fontSize) - this._totalLineHeight;
       
       for (var i = 0, len = textLines.length; i < len; i++) {
-        textSpans.push('<tspan x="0" dy="', lineTopOffset, '">', textLines[i], '</tspan>');
+        
+        var lineLeftOffset = (this._boundaries && this._boundaries[i]) ? this._boundaries[i].left : 0;
+        textSpans.push('<tspan x="', lineLeftOffset, '" dy="', lineTopOffset, '">', textLines[i], '</tspan>');
+        
         if (!this.backgroundColor) continue;
         textBgRects.push(
           '<rect fill="', 
             this.backgroundColor, 
             '" x="', 
-            textLeftOffset, 
+            textLeftOffset + this._boundaries[i].left, 
             '" y="', 
             (lineTopOffset * i) - this.height / 2 + (this.lineHeight * 2.6) /* an offset that seems to straighten things out */,
             '" width="', 
-            this._bgBoundaries[i].width,
+            this._boundaries[i].width,
             '" height="', 
-            this._bgBoundaries[i].height,
+            this._boundaries[i].height,
           '"></rect>');
       }
-          
+
       return [
         '<g transform="', this.getSvgTransform(), '">',
           textBgRects.join(''),
