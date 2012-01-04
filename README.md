@@ -30,7 +30,7 @@ Contributions are very much welcome!
 - IE8 (incomplete — about 17 failing tests at the moment)
 - IE7,6 (incomplete - about 27 failing tests at the moment)
 
-You can [run automated unit tests](http://kangax.github.com/fabric.js/test/unit/suite_runner.html) right in the browser.
+You can [run automated unit tests](http://kangax.github.com/fabric.js/test/unit/) right in the browser.
 
 ### History
 
