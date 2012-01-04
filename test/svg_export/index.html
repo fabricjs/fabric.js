@@ -354,6 +354,36 @@ canvas.add(poly);
 </pre>
 
 <pre class="test-source">
+  var text = new fabric.Text('this is\na multiline\ntext\nwith\ncustom lineheight\n&amp; background!', { 
+    fontFamily: 'DejaVu_Serif_400',
+    fill: '#333',
+    left: 120,
+    top: 100,
+    fontSize: 17,
+    lineHeight: 5,
+    backgroundColor: 'rgba(0,200,0,0.5)',
+    angle: 15
+  });
+  text.path = '../../lib/fonts/DejaVuSerif.ttf';
+  canvas.add(text);
+</pre>
+
+<pre class="test-source">
+  var text = new fabric.Text('this text is multiline,\ncentered,\n&amp;with background color!', { 
+    fontFamily: 'DejaVu_Serif_400',
+    fill: '#f55',
+    left: 150,
+    top: 100,
+    fontSize: 20,
+    textAlign: 'center',
+    backgroundColor: '#ffc'
+  });
+  text.path = '../../lib/fonts/DejaVuSerif.ttf';
+  canvas.add(text);
+</pre>
+
+
+<pre class="test-source">
   var text = new fabric.Text('this is\na multiline\ntext\nwith\nshadow!', { 
     fontFamily: 'DejaVu_Serif_400',
     fill: '#333',
