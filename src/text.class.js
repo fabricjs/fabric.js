@@ -194,6 +194,7 @@
       this.height = o.height;
       this._totalLineHeight = o.totalLineHeight;
       this._fontAscent = o.fontAscent;
+      this._bgBoundaries = o.bgBoundaries;
       
       // need to set coords _after_ the width/height was retreived from Cufon
       this.setCoords();
@@ -273,17 +274,32 @@
     toSVG: function() {
       var textSpans = [ ],
           textLines = this.text.split('\n'),
-          lineTopOffset = -this._fontAscent - ((this._fontAscent / 5) * this.lineHeight);
-      
-      for (var i = 0, len = textLines.length; i < len; i++) {
-        textSpans.push('<tspan x="0" dy="', lineTopOffset, '">', textLines[i], '</tspan>');
-      }
+          lineTopOffset = -this._fontAscent - ((this._fontAscent / 5) * this.lineHeight),
+          textBgRects = [ ];
       
       var textLeftOffset = -(this.width/2),
           textTopOffset = (this.height/2) - (textLines.length * this.fontSize) - this._totalLineHeight;
+      
+      for (var i = 0, len = textLines.length; i < len; i++) {
+        textSpans.push('<tspan x="0" dy="', lineTopOffset, '">', textLines[i], '</tspan>');
+        if (!this.backgroundColor) continue;
+        textBgRects.push(
+          '<rect fill="', 
+            this.backgroundColor, 
+            '" x="', 
+            textLeftOffset, 
+            '" y="', 
+            (lineTopOffset * i) - this.height / 2 + (this.lineHeight * 2.6) /* an offset that seems to straighten things out */,
+            '" width="', 
+            this._bgBoundaries[i].width,
+            '" height="', 
+            this._bgBoundaries[i].height,
+          '"></rect>');
+      }
           
       return [
         '<g transform="', this.getSvgTransform(), '">',
+          textBgRects.join(''),
           '<text ',
             (this.fontFamily ? 'font-family="\'' + this.fontFamily + '\'" ': ''),
             (this.fontSize ? 'font-size="' + this.fontSize + '" ': ''),
