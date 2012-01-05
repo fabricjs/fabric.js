@@ -15,6 +15,9 @@ title: Image Filters
     <label><span>Grayscale:</span> <input type="checkbox" id="grayscale"></label>
   </p>
   <p>
+    <label><span>Invert:</span> <input type="checkbox" id="invert"></label>
+  </p>
+  <p>
     <label><span>Remove white:</span> <input type="checkbox" id="remove-white"></label>
     <br>
     <label>Threshold: <input type="range" id="remove-white-threshold" value="60" min="0" max="255"></label>
@@ -39,8 +42,13 @@ $('grayscale').onclick = function() {
   oImg.applyFilters(canvas.renderAll.bind(canvas));
 };
 
+$('invert').onclick = function() {
+  oImg.filters[1] = this.checked ? new fabric.Image.filters.Invert() : null;
+  oImg.applyFilters(canvas.renderAll.bind(canvas));
+};
+
 $('remove-white').onclick = function () {
-  oImg.filters[1] = this.checked ? new fabric.Image.filters.RemoveWhite({ 
+  oImg.filters[2] = this.checked ? new fabric.Image.filters.RemoveWhite({ 
     threshold: $('remove-white-threshold').value, 
     distance: $('remove-white-distance').value 
   }) : null;
@@ -48,12 +56,12 @@ $('remove-white').onclick = function () {
 };
 
 $('remove-white-threshold').onchange = function() {
-  oImg.filters[1] && (oImg.filters[1].threshold = this.value);
+  oImg.filters[2] && (oImg.filters[2].threshold = this.value);
   oImg.applyFilters(canvas.renderAll.bind(canvas));
 };
 
 $('remove-white-distance').onchange = function() {
-  oImg.filters[1] && (oImg.filters[1].distance = this.value);
+  oImg.filters[2] && (oImg.filters[2].distance = this.value);
   oImg.applyFilters(canvas.renderAll.bind(canvas));
 };
 </script>
