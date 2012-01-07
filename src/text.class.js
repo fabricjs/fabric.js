@@ -195,6 +195,8 @@
       this._totalLineHeight = o.totalLineHeight;
       this._fontAscent = o.fontAscent;
       this._boundaries = o.boundaries;
+      this._shadowOffsets = o.shadowOffsets;
+      this._shadows = o.shadows || [ ];
       
       // need to set coords _after_ the width/height was retreived from Cufon
       this.setCoords();
@@ -272,37 +274,19 @@
      * @return {string} svg representation of an instance
      */
     toSVG: function() {
-      var textSpans = [ ],
-          textLines = this.text.split('\n'),
+      
+      var textLines = this.text.split('\n'),
           lineTopOffset = -this._fontAscent - ((this._fontAscent / 5) * this.lineHeight),
-          textBgRects = [ ];
-      
-      var textLeftOffset = -(this.width/2),
-          textTopOffset = (this.height/2) - (textLines.length * this.fontSize) - this._totalLineHeight;
-      
-      for (var i = 0, len = textLines.length; i < len; i++) {
-        
-        var lineLeftOffset = (this._boundaries && this._boundaries[i]) ? this._boundaries[i].left : 0;
-        textSpans.push('<tspan x="', lineLeftOffset, '" dy="', lineTopOffset, '">', textLines[i], '</tspan>');
-        
-        if (!this.backgroundColor) continue;
-        textBgRects.push(
-          '<rect fill="', 
-            this.backgroundColor, 
-            '" x="', 
-            textLeftOffset + this._boundaries[i].left, 
-            '" y="', 
-            (lineTopOffset * i) - this.height / 2 + (this.lineHeight * 2.6) /* an offset that seems to straighten things out */,
-            '" width="', 
-            this._boundaries[i].width,
-            '" height="', 
-            this._boundaries[i].height,
-          '"></rect>');
-      }
+          
+          textLeftOffset = -(this.width/2),
+          textTopOffset = (this.height/2) - (textLines.length * this.fontSize) - this._totalLineHeight,
+          
+          textAndBg = this._getSVGTextAndBg(lineTopOffset, textLeftOffset, textLines),
+          shadowSpans = this._getSVGShadows(lineTopOffset, textLines);
 
       return [
         '<g transform="', this.getSvgTransform(), '">',
-          textBgRects.join(''),
+          textAndBg.textBgRects.join(''),
           '<text ',
             (this.fontFamily ? 'font-family="\'' + this.fontFamily + '\'" ': ''),
             (this.fontSize ? 'font-size="' + this.fontSize + '" ': ''),
@@ -312,12 +296,70 @@
             'style="', this.getSvgStyles(), '" ',
             /* svg starts from left/bottom corner so we normalize height */
             'transform="translate(', textLeftOffset, ' ', textTopOffset, ')">',
-            textSpans.join(''),
+            shadowSpans.join(''),
+            textAndBg.textSpans.join(''),
           '</text>',
         '</g>'
       ].join('');
     },
     
+    _getSVGShadows: function(lineTopOffset, textLines) {
+      var shadowSpans = [ ]
+      for (var j = 0, jlen = this._shadows.length; j < jlen; j++) {
+        for (var i = 0, ilen = textLines.length; i < ilen; i++) {
+          var lineLeftOffset = (this._boundaries && this._boundaries[i]) ? this._boundaries[i].left : 0;
+          shadowSpans.push(
+            '<tspan x="',
+            lineLeftOffset + this._shadowOffsets[j][0],
+            (i === 0 ? '" y' : '" dy'), '="', 
+            lineTopOffset + (i === 0 ? this._shadowOffsets[j][1] : 0),
+            '" fill="',
+            this._shadows[j].color,
+            '">',
+            textLines[i],
+          '</tspan>');
+        }
+      }
+      return shadowSpans;
+    },
+    
+    _getSVGTextAndBg: function(lineTopOffset, textLeftOffset, textLines) {
+      var textSpans = [ ], textBgRects = [ ];
+      
+      // text and background
+      for (var i = 0, len = textLines.length; i < len; i++) {
+          
+        var lineLeftOffset = (this._boundaries && this._boundaries[i]) ? this._boundaries[i].left : 0;
+        textSpans.push(
+          '<tspan x="', 
+          lineLeftOffset, '" ', 
+          (i === 0 ? 'y' : 'dy'), '="', 
+          lineTopOffset, '">', 
+          textLines[i], 
+          '</tspan>'
+        );
+        
+        if (!this.backgroundColor) continue;
+        textBgRects.push(
+          '<rect fill="', 
+            this.backgroundColor, 
+            '" x="', 
+            textLeftOffset + this._boundaries[i].left, 
+            '" y="', 
+            /* an offset that seems to straighten things out */
+            (lineTopOffset * i) - this.height / 2 + (this.lineHeight * 2.6),
+            '" width="', 
+            this._boundaries[i].width,
+            '" height="', 
+            this._boundaries[i].height,
+          '"></rect>');
+      }
+      return {
+        textSpans: textSpans,
+        textBgRects: textBgRects
+      };
+    },
+
     /**
      * Sets "color" of an instance (alias of `set('fill', &hellip;)`)
      * @method setColor
