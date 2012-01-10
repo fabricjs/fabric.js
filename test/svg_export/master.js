@@ -39,6 +39,10 @@
       eval(__code);
       
       __svgEl.innerHTML = canvas.toSVG();
+      
+      __svgEl.onclick = function() {
+        console.log(canvas.toSVG());
+      };
 
     })(__all[__i]);
   }
