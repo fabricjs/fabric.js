@@ -1183,17 +1183,6 @@
     },
     
     /**
-     * @method getCenter
-     * @return {Object} object with `x`, `y` properties corresponding to path center coordinates
-     */
-    getCenter: function() {
-      return {
-        x: this.get('left') + this.width / 2,
-        y: this.get('top') + this.height / 2
-      };
-    },
-    
-    /**
      * @method straighten
      * @return {fabric.Object} thisArg
      * @chainable

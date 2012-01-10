@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2011, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.7.9" };
+var fabric = fabric || { version: "0.7.10" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -8043,17 +8043,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      */
     complexity: function() {
       return 0;
-    },
-    
-    /**
-     * @method getCenter
-     * @return {Object} object with `x`, `y` properties corresponding to path center coordinates
-     */
-    getCenter: function() {
-      return {
-        x: this.get('left') + this.width / 2,
-        y: this.get('top') + this.height / 2
-      };
     },
     
     /**
