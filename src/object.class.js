@@ -1303,7 +1303,7 @@
         options.from = this.get(property);
       }
       
-      if (/[+-]/.test(to.charAt(0))) {
+      if (typeof to === 'string' && /[+-]/.test(to.charAt(0))) {
         to = this.get(property) + parseFloat(to);
       }
       
