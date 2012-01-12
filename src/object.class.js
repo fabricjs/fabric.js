@@ -1313,7 +1313,7 @@
         duration: options.duration,
         onChange: function(value) {
           obj.set(property, value);
-          options.onChange && options.onChange();
+          options.onChange && options.onChange(value);
         },
         onComplete: function() {
           obj.setCoords();
