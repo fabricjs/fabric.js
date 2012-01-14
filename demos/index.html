@@ -3,7 +3,17 @@ layout: default
 title: Demos
 ---
 
+<h3>Featured</h3>
 <ul id="demos">
+{% for post in site.categories.featured %}
+  <li>
+    <a href="../{{ post.url }}">{{ post.title }}</a>
+  </li>
+{% endfor %}
+</ul>
+
+<h3>Various</h3>
+<ul id="featured-demos">
 {% for post in site.categories.demos %}
   <li>
     <a href="../{{ post.url }}">{{ post.title }}</a>
