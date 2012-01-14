@@ -42,8 +42,11 @@
         var mainScriptEl = document.getElementById('main');
         if (!mainScriptEl) return;
         var preEl = document.createElement('pre');
+        preEl.lang = 'javascript';
+        preEl.className = 'prettyprint';
         preEl.innerHTML = mainScriptEl.innerHTML;
         document.getElementById('bd-wrapper').appendChild(preEl);
+        prettyPrint();
       })();
     </script>
   </body>

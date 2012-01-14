@@ -41,9 +41,12 @@
       (function(){
         var mainScriptEl = document.getElementById('main');
         if (!mainScriptEl) return;
-        var preEl = document.createElement('pre');
-        preEl.innerHTML = mainScriptEl.innerHTML;
-        document.getElementById('bd-wrapper').appendChild(preEl);
+        var el = document.createElement('pre');
+        el.innerHTML = mainScriptEl.innerHTML;
+        el.lang = 'javascript';
+        el.className = 'prettyprint';
+        document.getElementById('bd-wrapper').appendChild(el);
+        prettyPrint();
       })();
     </script>
   </body>
