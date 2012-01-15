@@ -72,8 +72,8 @@
       ctx.beginPath();
       
       // move from center (of virtual box) to its left/top corner
-      ctx.moveTo(-this.width / 2, -this.height / 2);
-      ctx.lineTo(this.width / 2, this.height / 2);
+      ctx.moveTo(this.width === 1 ? 0 : (-this.width / 2), this.height === 1 ? 0 : (-this.height / 2));
+      ctx.lineTo(this.width === 1 ? 0 : (this.width / 2), this.height === 1 ? 0 : (this.height / 2));
       
       ctx.lineWidth = this.strokeWidth;
       
@@ -115,7 +115,6 @@
      * @return {string} svg representation of an instance
      */
     toSVG: function() {
-      console.log()
       return [
         '<line ',
           'x1="', this.get('x1'), '" ',
