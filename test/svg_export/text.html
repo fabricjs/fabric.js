@@ -300,4 +300,23 @@ title: SVG Export (text)
   canvas.add(text1, text2, text3, text4, text5);
 </pre>
 
+<pre class="test-source">
+  for (var i = 10; i < 300; i += 10) {
+    canvas.add(new fabric.Line([i, 0, i, 300], { stroke: '#aaa', fill: '#aaa' }));
+  }
+  for (var i = 10; i < 300; i += 10) {
+    canvas.add(new fabric.Line([0, i, 300, i], { stroke: '#aaa', fill: '#aaa' }));
+  }
+  
+  var text = new fabric.Text('abcdefg\nhijklmn\nopqrstu\nvwxyz', { 
+    fontFamily: 'Delicious',
+    fill: '#555',
+    left: 120,
+    top: 145,
+    fontSize: 60
+  });
+  text.path = '../../lib/fonts/Delicious.otf';
+  canvas.add(text);
+</pre>
+
 <script src="master.js"></script>

@@ -16,7 +16,7 @@
       var __sourceEl = __testEl.getElementsByClassName('source')[0];
       var __canvasEl = __testEl.getElementsByClassName('canvas')[0];
       var __svgEl = __testEl.getElementsByClassName('svg')[0];
-      var __code = __sourceEl.firstChild.innerHTML;
+      var __code = __sourceEl.firstChild.innerHTML.replace(/&lt;/g, '<').replace(/&gt;/, '>');
       var canvas = new fabric.StaticCanvas(__canvasEl);
       
       function proceed() {
