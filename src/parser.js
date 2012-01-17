@@ -629,11 +629,9 @@
     }
     else if (fabric.window.ActiveXObject) {
       var doc = new ActiveXObject('Microsoft.XMLDOM');
-      if (doc && doc.loadXML) {
-        doc.async = 'false';
-        //IE chokes on DOCTYPE
-        doc.loadXML(string.replace(/<!DOCTYPE[\s\S]*?(\[[\s\S]*\])*?>/i,''));
-      }
+      doc.async = 'false';
+      //IE chokes on DOCTYPE
+      doc.loadXML(string.replace(/<!DOCTYPE[\s\S]*?(\[[\s\S]*\])*?>/i,''));
     }
 
     fabric.parseSVGDocument(doc.documentElement, function (results, options) {
