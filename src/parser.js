@@ -632,7 +632,7 @@
       if (doc && doc.loadXML) {
         doc.async = 'false';
         //IE chokes on DOCTYPE
-        doc.loadXML(string.replace(/<!DOCTYPE.*?>/i,''));
+        doc.loadXML(string.replace(/<!DOCTYPE[\s\S]*?(\[[\s\S]*\])*?>/i,''));
       }
     }
 
