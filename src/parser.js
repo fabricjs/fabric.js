@@ -1,17 +1,17 @@
 (function(global) {
-  
+
   "use strict";
-  
+
   /**
    * @name fabric
    * @namespace
    */
-  
+
   var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       capitalize = fabric.util.string.capitalize,
       clone = fabric.util.object.clone;
-  
+
   var attributesMap = {
     'cx':             'left',
     'x':              'left',
@@ -23,7 +23,7 @@
     'stroke-width':   'strokeWidth',
     'transform':      'transformMatrix'
   };
-  
+
   /**
    * Returns an object of attributes' name/value, given element and an array of attribute names;
    * Parses parent "g" nodes recursively upwards.
@@ -35,24 +35,24 @@
    * @return {Object} object containing parsed attributes' names/values
    */
   function parseAttributes(element, attributes) {
-    
+
     if (!element) {
       return;
     }
-    
-    var value, 
-        parsed, 
+
+    var value,
+        parsed,
         parentAttributes = { };
 
     // if there's a parent container (`g` node), parse its attributes recursively upwards
     if (element.parentNode && /^g$/i.test(element.parentNode.nodeName)) {
       parentAttributes = fabric.parseAttributes(element.parentNode, attributes);
     }
-    
+
     var ownAttributes = attributes.reduce(function(memo, attr) {
       value = element.getAttribute(attr);
       parsed = parseFloat(value);
-      if (value) {        
+      if (value) {
         // "normalize" attribute values
         if ((attr === 'fill' || attr === 'stroke') && value === 'none') {
           value = '';
@@ -71,14 +71,14 @@
       }
       return memo;
     }, { });
-    
+
     // add values parsed from style, which take precedence over attributes
     // (see: http://www.w3.org/TR/SVG/styling.html#UsingPresentationAttributes)
-    
+
     ownAttributes = extend(ownAttributes, extend(getGlobalStylesForElement(element), fabric.parseStyleAttribute(element)));
     return extend(parentAttributes, ownAttributes);
   };
-  
+
   /**
    * Parses "transform" attribute, returning an array of values
    * @static
@@ -91,13 +91,13 @@
   fabric.parseTransformAttribute = (function() {
     function rotateMatrix(matrix, args) {
       var angle = args[0];
-      
+
       matrix[0] = Math.cos(angle);
       matrix[1] = Math.sin(angle);
       matrix[2] = -Math.sin(angle);
       matrix[3] = Math.cos(angle);
     }
-    
+
     function scaleMatrix(matrix, args) {
       var multiplierX = args[0],
           multiplierY = (args.length === 2) ? args[1] : args[0];
@@ -105,22 +105,22 @@
       matrix[0] = multiplierX;
       matrix[3] = multiplierY;
     }
-    
+
     function skewXMatrix(matrix, args) {
       matrix[2] = args[0];
     }
-    
+
     function skewYMatrix(matrix, args) {
       matrix[1] = args[0];
     }
-    
+
     function translateMatrix(matrix, args) {
       matrix[4] = args[0];
       if (args.length === 2) {
         matrix[5] = args[1];
       }
     }
-    
+
     // identity matrix
     var iMatrix = [
           1, // a
@@ -130,64 +130,64 @@
           0, // e
           0  // f
         ],
-    
+
         // == begin transform regexp
         number = '(?:[-+]?\\d+(?:\\.\\d+)?(?:e[-+]?\\d+)?)',
         comma_wsp = '(?:\\s+,?\\s*|,\\s*)',
-        
+
         skewX = '(?:(skewX)\\s*\\(\\s*(' + number + ')\\s*\\))',
         skewY = '(?:(skewY)\\s*\\(\\s*(' + number + ')\\s*\\))',
         rotate = '(?:(rotate)\\s*\\(\\s*(' + number + ')(?:' + comma_wsp + '(' + number + ')' + comma_wsp + '(' + number + '))?\\s*\\))',
         scale = '(?:(scale)\\s*\\(\\s*(' + number + ')(?:' + comma_wsp + '(' + number + '))?\\s*\\))',
         translate = '(?:(translate)\\s*\\(\\s*(' + number + ')(?:' + comma_wsp + '(' + number + '))?\\s*\\))',
-        
-        matrix = '(?:(matrix)\\s*\\(\\s*' + 
-                  '(' + number + ')' + comma_wsp + 
-                  '(' + number + ')' + comma_wsp + 
+
+        matrix = '(?:(matrix)\\s*\\(\\s*' +
                   '(' + number + ')' + comma_wsp +
                   '(' + number + ')' + comma_wsp +
                   '(' + number + ')' + comma_wsp +
-                  '(' + number + ')' + 
+                  '(' + number + ')' + comma_wsp +
+                  '(' + number + ')' + comma_wsp +
+                  '(' + number + ')' +
                   '\\s*\\))',
-        
+
         transform = '(?:' +
                     matrix + '|' +
                     translate + '|' +
                     scale + '|' +
                     rotate + '|' +
                     skewX + '|' +
-                    skewY + 
+                    skewY +
                     ')',
-        
+
         transforms = '(?:' + transform + '(?:' + comma_wsp + transform + ')*' + ')',
-        
+
         transform_list = '^\\s*(?:' + transforms + '?)\\s*$',
-    
+
         // http://www.w3.org/TR/SVG/coords.html#TransformAttribute
         reTransformList = new RegExp(transform_list),
         // == end transform regexp
-        
+
         reTransform = new RegExp(transform);
-    
+
     return function(attributeValue) {
-      
+
       // start with identity matrix
       var matrix = iMatrix.concat();
-      
-      // return if no argument was given or 
+
+      // return if no argument was given or
       // an argument does not match transform attribute regexp
       if (!attributeValue || (attributeValue && !reTransformList.test(attributeValue))) {
         return matrix;
       }
-      
+
       attributeValue.replace(reTransform, function(match) {
-          
+
         var m = new RegExp(transform).exec(match).filter(function (match) {
               return (match !== '' && match != null);
             }),
             operation = m[1],
             args = m.slice(2).map(parseFloat);
-        
+
         switch(operation) {
           case 'translate':
             translateMatrix(matrix, args);
@@ -212,7 +212,7 @@
       return matrix;
     }
   })();
-  
+
   /**
    * Parses "points" attribute, returning an array of values
    * @static
@@ -222,34 +222,34 @@
    * @return {Array} array of points
    */
   function parsePointsAttribute(points) {
-        
+
     // points attribute is required and must not be empty
     if (!points) return null;
-    
+
     points = points.trim();
     var asPairs = points.indexOf(',') > -1;
-    
+
     points = points.split(/\s+/);
     var parsedPoints = [ ];
-    
+
     // points could look like "10,20 30,40" or "10 20 30 40"
-    if (asPairs) {  
+    if (asPairs) {
      for (var i = 0, len = points.length; i < len; i++) {
        var pair = points[i].split(',');
        parsedPoints.push({ x: parseFloat(pair[0]), y: parseFloat(pair[1]) });
-     } 
+     }
     }
     else {
       for (var i = 0, len = points.length; i < len; i+=2) {
         parsedPoints.push({ x: parseFloat(points[i]), y: parseFloat(points[i+1]) });
       }
     }
-    
+
     // odd number of points is an error
     if (parsedPoints.length % 2 !== 0) {
       // return null;
     }
-    
+
     return parsedPoints;
   };
 
@@ -285,11 +285,11 @@
     }
     return oStyle;
   };
-  
+
   function resolveGradients(instances) {
     var activeInstance = fabric.Canvas.activeInstance,
         ctx = activeInstance ? activeInstance.getContext() : null;
-        
+
     if (!ctx) return;
 
     for (var i = instances.length; i--; ) {
@@ -328,14 +328,14 @@
         callback(instances);
       }
     }
-    
+
     for (var index = 0, el, len = elements.length; index < len; index++) {
       el = elements[index];
       var klass = fabric[capitalize(el.tagName)];
       if (klass && klass.fromElement) {
         try {
           if (klass.async) {
-            klass.fromElement(el, (function(index) { 
+            klass.fromElement(el, (function(index) {
               return function(obj) {
                 instances.splice(index, 0, obj);
                 checkIfDone();
@@ -356,7 +356,7 @@
       }
     }
   };
-  
+
   /**
    * Returns CSS rules for a given SVG document
    * @static
@@ -370,61 +370,61 @@
     var styles = doc.getElementsByTagName('style'),
         allRules = { },
         rules;
-    
-    // very crude parsing of style contents  
+
+    // very crude parsing of style contents
     for (var i = 0, len = styles.length; i < len; i++) {
       var styleContents = styles[0].textContent;
-      
+
       // remove comments
       styleContents = styleContents.replace(/\/\*[\s\S]*?\*\//g, '');
-                         
+
       rules = styleContents.match(/[^{]*\{[\s\S]*?\}/g);
       rules = rules.map(function(rule) { return rule.trim() });
-      
+
       rules.forEach(function(rule) {
         var match = rule.match(/([\s\S]*?)\s*\{([^}]*)\}/),
             rule = match[1],
             declaration = match[2].trim(),
             propertyValuePairs = declaration.replace(/;$/, '').split(/\s*;\s*/);
-        
+
         if (!allRules[rule]) {
           allRules[rule] = { };
         }
-        
+
         for (var i = 0, len = propertyValuePairs.length; i < len; i++) {
           var pair = propertyValuePairs[i].split(/\s*:\s*/),
               property = pair[0],
               value = pair[1];
-              
+
           allRules[rule][property] = value;
         }
       });
     }
-    
+
     return allRules;
   }
-  
+
   function getGlobalStylesForElement(element) {
     var nodeName = element.nodeName,
         className = element.getAttribute('class'),
         id = element.getAttribute('id'),
         styles = { };
-    
+
     for (var rule in fabric.cssRules) {
       var ruleMatchesElement = (className && new RegExp('^\\.' + className).test(rule)) ||
                                (id && new RegExp('^#' + id).test(rule)) ||
                                (new RegExp('^' + nodeName).test(rule));
-                               
+
       if (ruleMatchesElement) {
         for (var property in fabric.cssRules[rule]) {
           styles[property] = fabric.cssRules[rule][property];
         }
       }
     }
-    
+
     return styles;
   }
-  
+
   /**
    * Parses an SVG document, converts it to an array of corresponding fabric.* instances and passes them to a callback
    * @static
@@ -452,7 +452,7 @@
       '\\s*(' + reNum + '+)\\s*' +
       '$'
     );
-    
+
     function hasAncestorWithNodeName(element, nodeName) {
       while (element && (element = element.parentNode)) {
         if (nodeName.test(element.nodeName)) {
@@ -464,10 +464,10 @@
 
     return function(doc, callback) {
       if (!doc) return;
-      
+
       var startTime = new Date(),
           descendants = fabric.util.toArray(doc.getElementsByTagName('*'));
-      
+
       if (descendants.length === 0) {
         // we're likely in node, where "o3-xml" library fails to gEBTN("*")
         // https://github.com/ajaxorg/node-o3-xml/issues/21
@@ -478,9 +478,9 @@
         }
         descendants = arr;
       }
-      
+
       var elements = descendants.filter(function(el) {
-        return reAllowedSVGTagNames.test(el.tagName) && 
+        return reAllowedSVGTagNames.test(el.tagName) &&
               !hasAncestorWithNodeName(el, /^(?:pattern|defs)$/); // http://www.w3.org/TR/SVG/struct.html#DefsElement
       });
 
@@ -493,7 +493,7 @@
           height = null,
           minX,
           minY;
-      
+
       if (viewBoxAttr && (viewBoxAttr = viewBoxAttr.match(reViewBoxAttrValue))) {
         minX = parseInt(viewBoxAttr[1], 10);
         minY = parseInt(viewBoxAttr[2], 10);
@@ -505,16 +505,16 @@
       width = widthAttr ? parseFloat(widthAttr) : width;
       height = heightAttr ? parseFloat(heightAttr) : height;
 
-      var options = { 
-        width: width, 
+      var options = {
+        width: width,
         height: height
       };
-      
+
       fabric.gradientDefs = fabric.getGradientDefs(doc);
       fabric.cssRules = getCSSRules(doc);
-      
+
       // Precedence of rules:   style > class > attribute
-      
+
       fabric.parseElements(elements, function(instances) {
         fabric.documentParsingTime = new Date() - startTime;
         if (callback) {
@@ -523,23 +523,23 @@
       }, clone(options));
     };
   })();
-  
+
   /**
     * Used for caching SVG documents (loaded via `fabric.Canvas#loadSVGFromURL`)
     * @property
     * @namespace
     */
    var svgCache = {
-     
+
      /**
       * @method has
       * @param {String} name
       * @param {Function} callback
       */
-     has: function (name, callback) { 
+     has: function (name, callback) {
        callback(false);
      },
-     
+
      /**
       * @method get
       * @param {String} url
@@ -548,7 +548,7 @@
      get: function (url, callback) {
        /* NOOP */
      },
-     
+
      /**
       * @method set
       * @param {String} url
@@ -558,7 +558,7 @@
        /* NOOP */
      }
    };
-   
+
    /**
     * Takes url corresponding to an SVG document, and parses it into a set of fabric objects
     * @method loadSVGFromURL
@@ -566,9 +566,9 @@
     * @param {Function} callback
     */
    function loadSVGFromURL(url, callback) {
-     
+
      url = url.replace(/^\n\s*/, '').replace(/\?.*$/, '').trim();
-     
+
      svgCache.has(url, function (hasUrl) {
        if (hasUrl) {
          svgCache.get(url, function (value) {
@@ -583,15 +583,15 @@
          });
        }
      });
-     
+
      function onComplete(r) {
-       
+
        var xml = r.responseXML;
        if (!xml) return;
-       
+
        var doc = xml.documentElement;
        if (!doc) return;
-       
+
        fabric.parseSVGDocument(doc, function (results, options) {
          svgCache.set(url, {
            objects: fabric.util.array.invoke(results, 'toObject'),
@@ -601,22 +601,22 @@
        });
      }
    }
-   
+
   /**
   * @method _enlivenCachedObject
   */
   function _enlivenCachedObject(cachedObject) {
- 
+
    var objects = cachedObject.objects,
        options = cachedObject.options;
- 
+
    objects = objects.map(function (o) {
      return fabric[capitalize(o.type)].fromObject(o);
    });
- 
+
    return ({ objects: objects, options: options });
   }
-  
+
   /**
     * Takes string corresponding to an SVG document, and parses it into a set of fabric objects
     * @method loadSVGFromString
@@ -636,10 +636,11 @@
       var doc = new ActiveXObject('Microsoft.XMLDOM');
       if (doc && doc.loadXML) {
         doc.async = 'false';
-        doc.loadXML(string);
+        //IE chokes on DOCTYPE
+        doc.loadXML(string.replace(/<!DOCTYPE.*?>/i,''));
       }
     }
-    
+
     fabric.parseSVGDocument(doc.documentElement, function (results, options) {
       callback(results, options);
     });
@@ -647,10 +648,10 @@
 
   function createSVGFontFacesMarkup(objects) {
     var markup = '';
-    
+
     for (var i = 0, len = objects.length; i < len; i++) {
       if (objects[i].type !== 'text' || !objects[i].path) continue;
-      
+
       markup += [
         '@font-face {',
           'font-family: ', objects[i].fontFamily, '; ',
@@ -658,7 +659,7 @@
         '}'
       ].join('');
     }
-    
+
     if (markup) {
       markup = [
         '<defs>',
@@ -670,7 +671,7 @@
         '</defs>'
       ].join('');
     }
-    
+
     return markup;
   }
 
