@@ -266,19 +266,14 @@
         style = element.getAttribute('style');
     if (style) {
       if (typeof style == 'string') {
-        style = style.replace(/;$/, '').split(';');
-        oStyle = style.reduce(function(memo, current) {
-          var attr = current.split(':'),
-              key = attr[0].trim(),
-              value = attr[1].trim();
-          memo[key] = value;
-          return memo;
-        }, { });
-      }
-      else {
+        style = style.replace(/;$/, '').split(';').forEach(function (current) {
+            var attr = current.split(':');
+            oStyle[attr[0].trim().toLowerCase()] = attr[1].trim();
+        });
+      } else {
         for (var prop in style) {
           if (typeof style[prop] !== 'undefined') {
-            oStyle[prop] = style[prop];
+            oStyle[prop.toLowerCase()] = style[prop];
           }
         }
       }
