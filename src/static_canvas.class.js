@@ -1,20 +1,20 @@
 (function (global) {
-  
+
   "use strict";
-  
+
   if (fabric.StaticCanvas) {
     fabric.warn('fabric.StaticCanvas is already defined.');
     return;
   }
-  
+
   // aliases for faster resolution
   var extend = fabric.util.object.extend,
       getElementOffset = fabric.util.getElementOffset,
       removeFromArray = fabric.util.removeFromArray,
       removeListener = fabric.util.removeListener,
-      
+
       CANVAS_INIT_ERROR = new Error('Could not initialize `canvas` element');
-  
+
   /**
    * @class fabric.StaticCanvas
    * @constructor
@@ -23,22 +23,22 @@
    */
   fabric.StaticCanvas = function (el, options) {
     options || (options = { });
-    
+
     this._initStatic(el, options);
     fabric.StaticCanvas.activeInstance = this;
   };
-  
+
   extend(fabric.StaticCanvas.prototype, fabric.Observable);
-  
+
   extend(fabric.StaticCanvas.prototype, /** @scope fabric.StaticCanvas.prototype */ {
-    
+
     /**
      * Background color of canvas instance
      * @property
      * @type String
      */
     backgroundColor:        'rgba(0, 0, 0, 0)',
-    
+
     /**
      * Background image of canvas instance
      * Should be set via `setBackgroundImage`
@@ -46,28 +46,28 @@
      * @type String
      */
     backgroundImage:        '',
-    
+
     /**
      * Indicates whether toObject/toDatalessObject should include default values
      * @property
      * @type Boolean
      */
     includeDefaultValues:   true,
-    
+
     /**
      * Indicates whether objects' state should be saved
      * @property
      * @type Boolean
      */
     stateful:               true,
-    
+
     /**
-     * Indicates whether fabric.Canvas#add should also re-render canvas. 
-     * Disabling this option could give a great performance boost when adding a lot of objects to canvas at once 
+     * Indicates whether fabric.Canvas#add should also re-render canvas.
+     * Disabling this option could give a great performance boost when adding a lot of objects to canvas at once
      * (followed by a manual rendering after addition)
      */
     renderOnAddition:       true,
-    
+
     /**
      * Function that determines clipping of entire canvas area
      * Being passed context as first argument. See clipping canvas area in https://github.com/kangax/fabric.js/wiki/FAQ
@@ -75,21 +75,21 @@
      * @type Function
      */
     clipTo:                 null,
-    
+
     /**
      * Default canvas width
      * @constant
      * @type Number
      */
     CANVAS_WIDTH:           600,
-    
+
     /**
      * Default canvas height
      * @constant
      * @type Number
      */
     CANVAS_HEIGHT:          600,
-    
+
     /**
      * Callback; invoked right before object is about to be scaled/rotated
      * @method onBeforeScaleRotate
@@ -98,14 +98,14 @@
     onBeforeScaleRotate: function (target) {
       /* NOOP */
     },
-    
+
     /**
      * Callback; invoked on every redraw of canvas and is being passed a number indicating current fps
      * @method onFpsUpdate
      * @param {Number} fps
      */
     onFpsUpdate: null,
-    
+
     _initStatic: function(el, options) {
       this._objects = [];
 
@@ -120,7 +120,7 @@
       }
       this.calcOffset();
     },
-    
+
     /**
      * Calculates canvas element offset relative to the document
      * This method is also attached as "resize" event handler of window
@@ -132,7 +132,7 @@
       this._offset = getElementOffset(this.lowerCanvasEl);
       return this;
     },
-    
+
     /**
      * Sets overlay image for this canvas
      * @method setOverlayImage
@@ -147,7 +147,7 @@
         callback && callback();
       }, this);
     },
-    
+
     /**
      * Sets background image for this canvas
      * @method setBackgroundImage
@@ -162,7 +162,7 @@
         callback && callback();
       }, this);
     },
-    
+
     /**
      * @private
      * @method _createCanvasElement
@@ -179,12 +179,12 @@
       this._initCanvasElement(element);
       return element;
     },
-    
+
     _initCanvasElement: function(element) {
-      if (typeof element.getContext === 'undefined' && 
-          typeof G_vmlCanvasManager !== 'undefined' && 
+      if (typeof element.getContext === 'undefined' &&
+          typeof G_vmlCanvasManager !== 'undefined' &&
           G_vmlCanvasManager.initElement) {
-            
+
         G_vmlCanvasManager.initElement(element);
       }
       if (typeof element.getContext === 'undefined') {
@@ -200,14 +200,14 @@
       for (var prop in options) {
         this[prop] = options[prop];
       }
-      
+
       this.width = parseInt(this.lowerCanvasEl.width, 10) || 0;
       this.height = parseInt(this.lowerCanvasEl.height, 10) || 0;
 
       this.lowerCanvasEl.style.width = this.width + 'px';
       this.lowerCanvasEl.style.height = this.height + 'px';
     },
-    
+
     /**
      * Creates a secondary canvas
      * @method _createLowerCanvas
@@ -215,16 +215,16 @@
     _createLowerCanvas: function (canvasEl) {
       this.lowerCanvasEl = fabric.util.getById(canvasEl) || this._createCanvasElement();
       this._initCanvasElement(this.lowerCanvasEl);
-      
+
       fabric.util.addClass(this.lowerCanvasEl, 'lower-canvas');
-      
+
       if (this.interactive) {
         this._applyCanvasStyle(this.lowerCanvasEl);
       }
-      
+
       this.contextContainer = this.lowerCanvasEl.getContext('2d');
     },
-    
+
     /**
      * Returns canvas width
      * @method getWidth
@@ -233,7 +233,7 @@
     getWidth: function () {
       return this.width;
     },
-    
+
     /**
      * Returns canvas height
      * @method getHeight
@@ -242,7 +242,7 @@
     getHeight: function () {
       return this.height;
     },
-    
+
     /**
      * Sets width of this canvas instance
      * @method setWidth
@@ -253,7 +253,7 @@
     setWidth: function (value) {
       return this._setDimension('width', value);
     },
-    
+
     /**
      * Sets height of this canvas instance
      * @method setHeight
@@ -264,7 +264,7 @@
     setHeight: function (value) {
       return this._setDimension('height', value);
     },
-    
+
     /**
      * Sets dimensions (width, height) of this canvas instance
      * @method setDimensions
@@ -278,7 +278,7 @@
       }
       return this;
     },
-    
+
     /**
      * Helper for setting width/height
      * @private
@@ -291,24 +291,24 @@
     _setDimension: function (prop, value) {
       this.lowerCanvasEl[prop] = value;
       this.lowerCanvasEl.style[prop] = value + 'px';
-      
+
       if (this.upperCanvasEl) {
         this.upperCanvasEl[prop] = value;
         this.upperCanvasEl.style[prop] = value + 'px';
       }
-      
+
       if (this.wrapperEl) {
         this.wrapperEl.style[prop] = value + 'px';
       }
-      
+
       this[prop] = value;
-      
+
       this.calcOffset();
       this.renderAll();
-      
+
       return this;
     },
-    
+
     /**
      * Returns &lt;canvas> element corresponding to this instance
      * @method getElement
@@ -317,19 +317,19 @@
     getElement: function () {
       return this.lowerCanvasEl;
     },
-    
+
     // placeholder
     getActiveObject: function() {
       return null;
     },
-    
+
     // placeholder
     getActiveGroup: function() {
       return null;
     },
-    
+
     /**
-     * Given a context, renders an object on that context 
+     * Given a context, renders an object on that context
      * @param ctx {Object} context to render object on
      * @param object {Object} object to render
      * @private
@@ -337,7 +337,7 @@
     _draw: function (ctx, object) {
       object && object.render(ctx);
     },
-    
+
     /**
      * Adds objects to canvas, then renders canvas;
      * Objects should be instances of (or inherit from) fabric.Object
@@ -354,9 +354,9 @@
       this.renderOnAddition && this.renderAll();
       return this;
     },
-    
+
     /**
-     * Inserts an object to canvas at specified index and renders canvas. 
+     * Inserts an object to canvas at specified index and renders canvas.
      * An object should be an instance of (or inherit from) fabric.Object
      * @method insertAt
      * @param object {Object} Object to insert
@@ -376,7 +376,7 @@
       this.renderAll();
       return this;
     },
-    
+
     /**
      * Returns an array of objects this instance has
      * @method getObjects
@@ -385,7 +385,7 @@
     getObjects: function () {
       return this._objects;
     },
-    
+
     /**
      * Clears specified context of canvas element
      * @method clearContext
@@ -397,7 +397,7 @@
       ctx.clearRect(0, 0, this.width, this.height);
       return this;
     },
-    
+
     /**
      * Clears all contexts (background, main, top) of an instance
      * @method clear
@@ -420,9 +420,9 @@
      * @param allOnTop {Boolean} optional Whether we want to force all images to be rendered on the top canvas
      * @return {fabric.Canvas} instance
      * @chainable
-     */ 
+     */
     renderAll: function (allOnTop) {
-      
+
       var canvasToDrawOn = this[(allOnTop && this.interactive) ? 'contextTop' : 'contextContainer'];
 
       if (this.contextTop) {
@@ -432,25 +432,25 @@
       if (!allOnTop) {
         this.clearContext(canvasToDrawOn);
       }
-      
+
       var length = this._objects.length,
           activeGroup = this.getActiveGroup(),
           startTime = new Date();
-      
+
       if (this.clipTo) {
         canvasToDrawOn.save();
         canvasToDrawOn.beginPath();
         this.clipTo(canvasToDrawOn);
         canvasToDrawOn.clip();
       }
-      
+
       canvasToDrawOn.fillStyle = this.backgroundColor;
       canvasToDrawOn.fillRect(0, 0, this.width, this.height);
-      
+
       if (typeof this.backgroundImage == 'object') {
         canvasToDrawOn.drawImage(this.backgroundImage, 0, 0, this.width, this.height);
       }
-      
+
       if (length) {
         for (var i = 0; i < length; ++i) {
           if (!activeGroup ||
@@ -459,27 +459,27 @@
           }
         }
       }
-      
+
       if (this.clipTo) {
         canvasToDrawOn.restore();
       }
-      
+
       // delegate rendering to group selection (if one exists)
       if (activeGroup) {
         this._draw(this.contextTop, activeGroup);
       }
-      
+
       if (this.overlayImage) {
         this.contextTop.drawImage(this.overlayImage, 0, 0);
       }
-      
+
       if (this.onFpsUpdate) {
         var elapsedTime = new Date() - startTime;
         this.onFpsUpdate(~~(1000 / elapsedTime));
       }
-      
+
       this.fire('after:render');
-      
+
       return this;
     },
 
@@ -492,25 +492,25 @@
      */
     renderTop: function () {
       this.clearContext(this.contextTop || this.contextContainer);
-      
+
       if (this.overlayImage) {
         (this.contextTop || this.contextContainer).drawImage(this.overlayImage, 0, 0);
       }
-      
+
       // we render the top context - last object
       if (this.selection && this._groupSelector) {
         this._drawSelection();
       }
-      
+
       // delegate rendering to group selection if one exists
       // used for drawing selection borders/corners
       var activeGroup = this.getActiveGroup();
       if (activeGroup) {
         activeGroup.render(this.contextTop);
       }
-      
+
       this.fire('after:render');
-      
+
       return this;
     },
 
@@ -526,7 +526,7 @@
       this.renderAll();
       return data;
     },
-    
+
     /**
      * Exports canvas element to a dataurl image (allowing to change image size via multiplier).
      * @method toDataURLWithMultiplier
@@ -535,40 +535,40 @@
      * @return {String}
      */
     toDataURLWithMultiplier: function (format, multiplier) {
-      
+
       var origWidth = this.getWidth(),
           origHeight = this.getHeight(),
           scaledWidth = origWidth * multiplier,
           scaledHeight = origHeight * multiplier,
           activeObject = this.getActiveObject();
-      
+
       this.setWidth(scaledWidth).setHeight(scaledHeight);
       this.contextTop.scale(multiplier, multiplier);
-      
+
       if (activeObject) {
         this.deactivateAll();
       }
-      
-      // restoring width, height for `renderAll` to draw 
+
+      // restoring width, height for `renderAll` to draw
       // background properly (while context is scaled)
       this.width = origWidth;
       this.height = origHeight;
-      
+
       this.renderAll(true);
-      
+
       var dataURL = this.toDataURL(format);
 
       this.contextTop.scale(1 / multiplier,  1 / multiplier);
       this.setWidth(origWidth).setHeight(origHeight);
-      
+
       if (activeObject) {
         this.setActiveObject(activeObject);
       }
       this.renderAll();
-      
+
       return dataURL;
     },
-    
+
     /**
      * Returns coordinates of a center of canvas.
      * Returned value is an object with top and left properties
@@ -581,7 +581,7 @@
         left: this.getWidth() / 2
       };
     },
-    
+
     /**
      * Centers object horizontally.
      * @method centerObjectH
@@ -593,7 +593,7 @@
       this.renderAll();
       return this;
     },
-    
+
     /**
      * Centers object vertically.
      * @method centerObjectH
@@ -606,7 +606,7 @@
       this.renderAll();
       return this;
     },
-    
+
     /**
      * Centers object vertically and horizontally.
      * @method centerObject
@@ -617,7 +617,7 @@
     centerObject: function (object) {
       return this.centerObjectH(object).centerObjectV(object);
     },
-    
+
     /**
      * Straightens object, then rerenders canvas
      * @method straightenObject
@@ -630,7 +630,7 @@
       this.renderAll();
       return this;
     },
-    
+
     /**
      * Returs dataless JSON representation of canvas
      * @method toDatalessJSON
@@ -639,7 +639,7 @@
     toDatalessJSON: function () {
       return this.toDatalessObject();
     },
-    
+
     /**
      * Returns object representation of canvas
      * @method toObject
@@ -648,7 +648,7 @@
     toObject: function () {
       return this._toObjectMethod('toObject');
     },
-    
+
     /**
      * Returns dataless object representation of canvas
      * @method toDatalessObject
@@ -657,13 +657,13 @@
     toDatalessObject: function () {
       return this._toObjectMethod('toDatalessObject');
     },
-    
+
     /**
      * @private
      * @method _toObjectMethod
      */
     _toObjectMethod: function (methodName) {
-      return { 
+      return {
         objects: this._objects.map(function (instance){
           // TODO (kangax): figure out how to clean this up
           if (!this.includeDefaultValues) {
@@ -679,12 +679,12 @@
         background: this.backgroundColor
       }
     },
-    
+
     /**
      * Returns SVG representation of canvas
      * @function
      * @method toSVG
-     * @return {String} 
+     * @return {String}
      */
     toSVG: function() {
       var markup = [
@@ -718,7 +718,7 @@
     isEmpty: function () {
       return this._objects.length === 0;
     },
-    
+
     /**
      * Removes an object from canvas and returns it
      * @method remove
@@ -733,7 +733,7 @@
       this.renderAll();
       return object;
     },
-    
+
     /**
      * Moves an object to the bottom of the stack of drawn objects
      * @method sendToBack
@@ -746,7 +746,7 @@
       this._objects.unshift(object);
       return this.renderAll();
     },
-    
+
     /**
      * Moves an object to the top of the stack of drawn objects
      * @method bringToFront
@@ -759,7 +759,7 @@
       this._objects.push(object);
       return this.renderAll();
     },
-    
+
     /**
      * Moves an object one level down in stack of drawn objects
      * @method sendBackwards
@@ -770,10 +770,10 @@
     sendBackwards: function (object) {
       var idx = this._objects.indexOf(object),
           nextIntersectingIdx = idx;
-      
+
       // if object is not on the bottom of stack
       if (idx !== 0) {
-        
+
         // traverse down the stack looking for the nearest intersecting object
         for (var i=idx-1; i>=0; --i) {
           if (object.intersectsWithObject(this._objects[i]) || object.isContainedWithinObject(this._objects[i])) {
@@ -786,7 +786,7 @@
       }
       return this.renderAll();
     },
-    
+
     /**
      * Moves an object one level up in stack of drawn objects
      * @method sendForward
@@ -799,10 +799,10 @@
           idx = objects.indexOf(object),
           nextIntersectingIdx = idx;
 
-      
+
       // if object is not on top of stack (last item in an array)
       if (idx !== objects.length-1) {
-        
+
         // traverse up the stack looking for the nearest intersecting object
         for (var i = idx + 1, l = this._objects.length; i < l; ++i) {
           if (object.intersectsWithObject(objects[i]) || object.isContainedWithinObject(this._objects[i])) {
@@ -815,7 +815,7 @@
       }
       this.renderAll();
     },
-    
+
     /**
      * Returns object at specified index
      * @method item
@@ -825,7 +825,7 @@
     item: function (index) {
       return this.getObjects()[index];
     },
-    
+
     /**
      * Returns number representation of an instance complexity
      * @method complexity
@@ -837,7 +837,7 @@
         return memo;
       }, 0);
     },
-    
+
     /**
      * Iterates over all objects, invoking callback for each one of them
      * @method forEachObject
@@ -851,7 +851,7 @@
       }
       return this;
     },
-    
+
     /**
      * Clears a canvas element and removes all event handlers.
      * @method dispose
@@ -867,24 +867,24 @@
       }
       return this;
     },
-    
+
     /**
      * @private
      * @method _resizeImageToFit
      * @param {HTMLImageElement} imgEl
      */
     _resizeImageToFit: function (imgEl) {
-      
+
       var imageWidth = imgEl.width || imgEl.offsetWidth,
           widthScaleFactor = this.getWidth() / imageWidth;
-      
+
       // scale image down so that it has original dimensions when printed in large resolution
       if (imageWidth) {
         imgEl.width = imageWidth * widthScaleFactor;
       }
     }
   });
-  
+
   /**
    * Returns a string representation of an instance
    * @method toString
@@ -894,16 +894,16 @@
     return '#<fabric.Canvas (' + this.complexity() + '): '+
            '{ objects: ' + this.getObjects().length + ' }>';
   };
-  
+
   extend(fabric.StaticCanvas, /** @scope fabric.StaticCanvas */ {
-    
+
     /**
      * @static
      * @property EMPTY_JSON
      * @type String
      */
     EMPTY_JSON: '{"objects": [], "background": "white"}',
-    
+
     /**
      * Takes &lt;canvas> element and transforms its data in such way that it becomes grayscale
      * @static
@@ -913,7 +913,7 @@
     toGrayscale: function (canvasEl) {
        var context = canvasEl.getContext('2d'),
            imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
-           data = imageData.data, 
+           data = imageData.data,
            iLen = imageData.width,
            jLen = imageData.height,
            index, average, i, j;
@@ -932,46 +932,46 @@
 
        context.putImageData(imageData, 0, 0);
      },
-    
+
     /**
-     * Provides a way to check support of some of the canvas methods 
+     * Provides a way to check support of some of the canvas methods
      * (either those of HTMLCanvasElement itself, or rendering context)
      *
      * @method supports
-     * @param methodName {String} Method to check support for; 
+     * @param methodName {String} Method to check support for;
      *                            Could be one of "getImageData" or "toDataURL"
-     * @return {Boolean | null} `true` if method is supported (or at least exists), 
+     * @return {Boolean | null} `true` if method is supported (or at least exists),
      *                          `null` if canvas element or context can not be initialized
      */
     supports: function (methodName) {
       var el = fabric.document.createElement('canvas');
-      
+
       if (typeof G_vmlCanvasManager !== 'undefined') {
         G_vmlCanvasManager.initElement(el);
       }
       if (!el || !el.getContext) {
         return null;
       }
-      
+
       var ctx = el.getContext('2d');
       if (!ctx) {
         return null;
       }
-      
+
       switch (methodName) {
-        
+
         case 'getImageData':
           return typeof ctx.getImageData !== 'undefined';
-          
+
         case 'toDataURL':
           return typeof el.toDataURL !== 'undefined';
-          
+
         default:
           return null;
       }
     }
   });
-  
+
   /**
    * Returs JSON representation of canvas
    * @function
@@ -979,5 +979,5 @@
    * @return {String} json string
    */
   fabric.StaticCanvas.prototype.toJSON = fabric.StaticCanvas.prototype.toObject;
-  
+
 })(typeof exports != 'undefined' ? exports : this);
