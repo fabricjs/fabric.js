@@ -1,14 +1,14 @@
 //= require "object.class"
 
 (function(global) {
-  
+
   "use strict";
-  
+
   var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       clone = fabric.util.object.clone;
 
-  if (fabric.Text) {    
+  if (fabric.Text) {
     fabric.warn('fabric.Text is already defined');
     return;
   }
@@ -16,93 +16,93 @@
     fabric.warn('fabric.Text requires fabric.Object');
     return;
   }
-  
-  /** 
+
+  /**
    * @class Text
    * @extends fabric.Object
    */
   fabric.Text = fabric.util.createClass(fabric.Object, /** @scope fabric.Text.prototype */ {
-    
+
     /**
      * @property
      * @type Number
      */
     fontSize:         40,
-    
+
     /**
      * @property
      * @type Number
      */
     fontWeight:       100,
-    
+
     /**
      * @property
      * @type String
      */
     fontFamily:       'Times_New_Roman',
-    
+
     /**
      * @property
      * @type String
      */
     textDecoration:   '',
-    
+
     /**
      * @property
      * @type String | null
      */
     textShadow:       null,
-    
+
     /**
      * Determines text alignment. Possible values: "left", "center", or "right".
      * @property
      * @type String
      */
     textAlign:        'left',
-    
+
     /**
      * @property
      * @type String
      */
     fontStyle:        '',
-    
+
     /**
      * @property
      * @type Number
      */
     lineHeight:       1.6,
-    
+
     /**
      * @property
      * @type String
      */
     strokeStyle:      '',
-    
+
     /**
      * @property
      * @type Number
      */
     strokeWidth:      1,
-    
+
     /**
      * @property
      * @type String
      */
     backgroundColor:  '',
-    
-    
+
+
     /**
      * @property
      * @type String | null
      */
     path:             null,
-    
+
     /**
      * @property
      * @type String
      */
     type:             'text',
-    
+
     /**
      * Constructor
      * @method initialize
@@ -118,9 +118,9 @@
       this.width = this.getWidth();
       this.setCoords();
     },
-    
+
     /**
-     * Creates `stateProperties` list on an instance, and adds `fabric.Text` -specific ones to it 
+     * Creates `stateProperties` list on an instance, and adds `fabric.Text` -specific ones to it
      * (such as "fontFamily", "fontWeight", etc.)
      * @private
      * @method _initStateProperties
@@ -128,13 +128,13 @@
     _initStateProperties: function() {
       this.stateProperties = this.stateProperties.concat();
       this.stateProperties.push(
-        'fontFamily', 
-        'fontWeight', 
-        'fontSize', 
-        'path', 
-        'text', 
-        'textDecoration', 
-        'textShadow', 
+        'fontFamily',
+        'fontWeight',
+        'fontSize',
+        'path',
+        'text',
+        'textDecoration',
+        'textShadow',
         'textAlign',
         'fontStyle',
         'lineHeight',
@@ -144,7 +144,7 @@
       );
       fabric.util.removeFromArray(this.stateProperties, 'width');
     },
-    
+
     /**
      * Returns string representation of an instance
      * @method toString
@@ -154,7 +154,7 @@
       return '#<fabric.Text (' + this.complexity() +
         '): { "text": "' + this.text + '", "fontFamily": "' + this.fontFamily + '" }>';
     },
-    
+
     /**
      * @private
      * @method _render
@@ -162,21 +162,22 @@
      */
     _render: function(ctx) {
       var o = Cufon.textOptions || (Cufon.textOptions = { });
-      
+
       // export options to be used by cufon.js
       o.left = this.left;
       o.top = this.top;
       o.context = ctx;
       o.color = this.fill;
-      
+
       var el = this._initDummyElement();
-      
+
       // set "cursor" to top/left corner
       this.transform(ctx);
-      
+
       // draw text
       Cufon.replaceElement(el, {
-        separate: 'none', 
+        engine: 'canvas',
+        separate: 'none',
         fontFamily: this.fontFamily,
         fontWeight: this.fontWeight,
         textDecoration: this.textDecoration,
@@ -188,7 +189,7 @@
         strokeWidth: this.strokeWidth,
         backgroundColor: this.backgroundColor
       });
-      
+
       // update width, height
       this.width = o.width;
       this.height = o.height;
@@ -197,11 +198,11 @@
       this._boundaries = o.boundaries;
       this._shadowOffsets = o.shadowOffsets;
       this._shadows = o.shadows || [ ];
-      
+
       // need to set coords _after_ the width/height was retreived from Cufon
       this.setCoords();
     },
-    
+
     // _render: function(context) {
     //       context.fillStyle = this.fill;
     //       context.font = this.fontSize + 'px ' + this.fontFamily;
@@ -211,7 +212,7 @@
     //       context.fillText(this.text, -this.width / 2, 0);
     //       this.setCoords();
     //     },
-    
+
     /**
      * @private
      * @method _initDummyElement
@@ -219,17 +220,17 @@
     _initDummyElement: function() {
       var el = fabric.document.createElement('div'),
           container = fabric.document.createElement('div');
-      
+
       // Cufon doesn't play nice with textDecoration=underline if element doesn't have a parent
       container.appendChild(el);
       el.innerHTML = this.text;
-      
+
       el.style.fontSize = this.fontSize + 'px';
       el.style.letterSpacing = 'normal';
-      
+
       return el;
     },
-    
+
     /**
      * Renders text instance on a specified context
      * @method render
@@ -244,7 +245,7 @@
       }
       ctx.restore();
     },
-    
+
     /**
      * Returns object representation of an instance
      * @method toObject
@@ -267,20 +268,20 @@
         backgroundColor: this.backgroundColor
       });
     },
-    
+
     /**
      * Returns svg representation of an instance
      * @method toSVG
      * @return {string} svg representation of an instance
      */
     toSVG: function() {
-      
+
       var textLines = this.text.split('\n'),
           lineTopOffset = -this._fontAscent - ((this._fontAscent / 5) * this.lineHeight),
-          
+
           textLeftOffset = -(this.width/2),
           textTopOffset = (this.height/2) - (textLines.length * this.fontSize) - this._totalLineHeight,
-          
+
           textAndBg = this._getSVGTextAndBg(lineTopOffset, textLeftOffset, textLines),
           shadowSpans = this._getSVGShadows(lineTopOffset, textLines);
 
@@ -302,7 +303,7 @@
         '</g>'
       ].join('');
     },
-    
+
     _getSVGShadows: function(lineTopOffset, textLines) {
       var shadowSpans = [ ]
       for (var j = 0, jlen = this._shadows.length; j < jlen; j++) {
@@ -311,7 +312,7 @@
           shadowSpans.push(
             '<tspan x="',
             lineLeftOffset + this._shadowOffsets[j][0],
-            (i === 0 ? '" y' : '" dy'), '="', 
+            (i === 0 ? '" y' : '" dy'), '="',
             lineTopOffset + (i === 0 ? this._shadowOffsets[j][1] : 0),
             '" fill="',
             this._shadows[j].color,
@@ -322,35 +323,35 @@
       }
       return shadowSpans;
     },
-    
+
     _getSVGTextAndBg: function(lineTopOffset, textLeftOffset, textLines) {
       var textSpans = [ ], textBgRects = [ ];
-      
+
       // text and background
       for (var i = 0, len = textLines.length; i < len; i++) {
-          
+
         var lineLeftOffset = (this._boundaries && this._boundaries[i]) ? this._boundaries[i].left : 0;
         textSpans.push(
-          '<tspan x="', 
-          lineLeftOffset, '" ', 
-          (i === 0 ? 'y' : 'dy'), '="', 
-          lineTopOffset, '">', 
-          textLines[i], 
+          '<tspan x="',
+          lineLeftOffset, '" ',
+          (i === 0 ? 'y' : 'dy'), '="',
+          lineTopOffset, '">',
+          textLines[i],
           '</tspan>'
         );
-        
+
         if (!this.backgroundColor) continue;
         textBgRects.push(
-          '<rect fill="', 
-            this.backgroundColor, 
-            '" x="', 
-            textLeftOffset + this._boundaries[i].left, 
-            '" y="', 
+          '<rect fill="',
+            this.backgroundColor,
+            '" x="',
+            textLeftOffset + this._boundaries[i].left,
+            '" y="',
             /* an offset that seems to straighten things out */
             (lineTopOffset * i) - this.height / 2 + (this.lineHeight * 2.6),
-            '" width="', 
+            '" width="',
             this._boundaries[i].width,
-            '" height="', 
+            '" height="',
             this._boundaries[i].height,
           '"></rect>');
       }
@@ -371,7 +372,7 @@
       this.set('fill', value);
       return this;
     },
-    
+
     /**
      * Sets fontSize of an instance and updates its coordinates
      * @method setFontsize
@@ -384,7 +385,7 @@
       this.setCoords();
       return this;
     },
-    
+
     /**
      * Returns actual text value of an instance
      * @method getText
@@ -393,7 +394,7 @@
     getText: function() {
       return this.text;
     },
-    
+
     /**
      * Sets text of an instance, and updates its coordinates
      * @method setText
@@ -406,7 +407,7 @@
       this.setCoords();
       return this;
     },
-    
+
     /**
      * Sets specified property to a specified value
      * @method set
@@ -430,7 +431,7 @@
       return this;
     }
   });
-  
+
   /**
    * Returns fabric.Text instance from an object representation
    * @static
@@ -441,7 +442,7 @@
   fabric.Text.fromObject = function(object) {
     return new fabric.Text(object.text, clone(object));
   };
-  
+
   /**
    * Returns fabric.Text instance from an SVG element (<b>not yet implemented</b>)
    * @static
@@ -451,5 +452,5 @@
   fabric.Text.fromElement = function(element) {
     // TODO (kangax): implement this
   };
-  
+
 })(typeof exports != 'undefined' ? exports : this);
