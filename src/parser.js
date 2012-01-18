@@ -582,12 +582,15 @@
      function onComplete(r) {
 
        var xml = r.responseXML;
-       if (!xml) return;
+       if (!xml.documentElement && fabric.window.ActiveXObject && r.responseText) {
+         xml = new ActiveXObject('Microsoft.XMLDOM');
+         xml.async = 'false';
+         //IE chokes on DOCTYPE
+         xml.loadXML(r.responseText.replace(/<!DOCTYPE[\s\S]*?(\[[\s\S]*\])*?>/i,''));
+       }
+       if (!xml.documentElement) return;
 
-       var doc = xml.documentElement;
-       if (!doc) return;
-
-       fabric.parseSVGDocument(doc, function (results, options) {
+       fabric.parseSVGDocument(xml.documentElement, function (results, options) {
          svgCache.set(url, {
            objects: fabric.util.array.invoke(results, 'toObject'),
            options: options
