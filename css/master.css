@@ -3,7 +3,9 @@ body { font-family: Garamond, "Hoefler Text", "Times New Roman", Times, serif; m
 #features { width: 750px; margin: 0 auto; text-align: center }
 #features p { line-height: 1.2; text-align: left; text-indent: 15px }
 #features p.primary { text-align: center; text-indent: 0 }
+#features p.download { text-align: center; margin-top: 20px }
 #features img { box-shadow: rgba(0,0,0,0.3) 0 0 5px; margin-top: 20px; margin-bottom: 20px; width: 400px }
+#features img:hover { box-shadow: rgba(0,0,155,0.3) 0 0 5px; }
 
 #header { background: #333; margin: 0; padding: 0; color: #555; }
 #header li { display: inline-block; }
