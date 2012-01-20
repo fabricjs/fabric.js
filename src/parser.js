@@ -562,7 +562,7 @@
     */
    function loadSVGFromURL(url, callback) {
 
-     url = url.replace(/^\n\s*/, '').replace(/\?.*$/, '').trim();
+     url = url.replace(/^\n\s*/, '').trim();
 
      svgCache.has(url, function (hasUrl) {
        if (hasUrl) {
