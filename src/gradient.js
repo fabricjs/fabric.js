@@ -83,7 +83,10 @@
       
       for (var i = colorStopEls.length; i--; ) {
         el = colorStopEls[i];
-        offset = parseInt(el.getAttribute('offset'), 10) / 100;
+        offset = el.getAttribute('offset');
+        
+        // convert percents to absolute values
+        offset = parseFloat(offset) / (/%$/.test(offset) ? 100 : 1);
         colorStops[offset] = getColorStopFromStyle(el) || el.getAttribute('stop-color');
       }
       
