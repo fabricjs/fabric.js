@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2012, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.7.11" };
+var fabric = fabric || { version: "0.7.12" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -3683,20 +3683,19 @@ fabric.util.string = {
           el,
           offset,
           colorStops = { },
-          colorStopFromStyle;
-
+          colorStopFromStyle,
+          coords = {
+            x1: el.getAttribute('x1') || 0,
+            y1: el.getAttribute('y1') || 0,
+            x2: el.getAttribute('x2') || '100%',
+            y2: el.getAttribute('y2') || 0
+          };
+      
       for (var i = colorStopEls.length; i--; ) {
         el = colorStopEls[i];
         offset = parseInt(el.getAttribute('offset'), 10) / 100;
         colorStops[offset] = getColorStopFromStyle(el) || el.getAttribute('stop-color');
       }
-      
-      var coords = {
-        x1: el.getAttribute('x1') || 0,
-        y1: el.getAttribute('y1') || 0,
-        x2: el.getAttribute('x2') || '100%',
-        y2: el.getAttribute('y2') || 0
-      };
       
       _convertPercentUnitsToValues(instance, coords);
       
