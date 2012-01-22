@@ -1,74 +1,74 @@
 //= require "object.class"
 
 (function(global) {
-  
+
   "use strict";
-  
+
   var extend = fabric.util.object.extend;
-  
+
   if (!global.fabric) {
     global.fabric = { };
   }
-  
+
   if (global.fabric.Image) {
     fabric.warn('fabric.Image is already defined.');
     return;
   };
-  
+
   if (!fabric.Object) {
     fabric.warn('fabric.Object is required for fabric.Image initialization');
     return;
   }
-  
-  /** 
+
+  /**
    * @class Image
    * @extends fabric.Object
    */
   fabric.Image = fabric.util.createClass(fabric.Object, /** @scope fabric.Image.prototype */ {
-    
+
     /**
      * @property
      * @type Number
      */
     maxwidth: null,
-    
+
     /**
      * @property
      * @type Number
      */
     maxheight: null,
-    
+
     /**
      * @property
      * @type Boolean
      */
     active: false,
-    
+
     /**
      * @property
      * @type Boolean
      */
     bordervisibility: false,
-    
+
     /**
      * @property
      * @type Boolean
      */
     cornervisibility: false,
-    
+
     /**
      * @property
      * @type String
      */
     type: 'image',
-    
+
     /**
      * Filters to be applied to an image (when calling `applyFilters`)
      * @property
      * @type Array
      */
     filters: [ ],
-    
+
     /**
      * Constructor
      * @param {HTMLImageElement | String} element Image element
@@ -76,18 +76,18 @@
      */
     initialize: function(element, options) {
       options || (options = { });
-      
+
       this.callSuper('initialize', options);
       this._initElement(element);
       this._originalImage = this.getElement();
       this._initConfig(options);
-      
+
       if (options.filters) {
         this.filters = options.filters;
         this.applyFilters();
       }
     },
-    
+
     /**
      * Returns image element which this instance if based on
      * @method getElement
@@ -96,7 +96,7 @@
     getElement: function() {
       return this._element;
     },
-    
+
     /**
      * Sets image element for this instance to a specified one
      * @method setElement
@@ -109,7 +109,7 @@
       this._initConfig();
       return this;
     },
-    
+
     /**
      * Resizes an image depending on whether maxwidth and maxheight are set up;
      * Width and height have to mantain the same proportion in the final image as it was in the initial one.
@@ -117,8 +117,10 @@
      * @param {Object} oImg
      * @param {Number} maxwidth maximum width of the image (in px)
      * @param {Number} maxheight maximum height of the image (in px)
-     */ 
+     */
     getNormalizedSize: function(oImg, maxwidth, maxheight) {
+      var normalizedWidth, normalizedHeight;
+
       if (maxheight && maxwidth && (oImg.width > oImg.height && (oImg.width / oImg.height) < (maxwidth / maxheight))) {
         // height is the constraining dimension.
         normalizedWidth = ~~((oImg.width * maxheight) / oImg.height);
@@ -138,13 +140,13 @@
         normalizedWidth = oImg.width;
         normalizedHeight = oImg.height;
       }
-      
-      return { 
-        width: normalizedWidth, 
-        height: normalizedHeight 
+
+      return {
+        width: normalizedWidth,
+        height: normalizedHeight
       };
     },
-    
+
     /**
      * Returns original size of an image
      * @method getOriginalSize
@@ -152,12 +154,12 @@
      */
     getOriginalSize: function() {
       var element = this.getElement();
-      return { 
-        width: element.width, 
+      return {
+        width: element.width,
         height: element.height
       };
     },
-    
+
     /**
      * Sets border visibility
      * @method setBorderVisibility
@@ -165,10 +167,10 @@
      */
     setBorderVisibility: function(visible) {
       this._resetWidthHeight();
-      this._adjustWidthHeightToBorders(showBorder);
+      this._adjustWidthHeightToBorders(visible);
       this.setCoords();
     },
-    
+
     /**
      * Sets corner visibility
      * @method setCornersVisibility
@@ -177,7 +179,7 @@
     setCornersVisibility: function(visible) {
       this.cornervisibility = !!visible;
     },
-    
+
     /**
      * Renders image on a specified context
      * @method render
@@ -195,7 +197,7 @@
       }
       ctx.restore();
     },
-    
+
     /**
      * Returns object representation of an instance
      * @method toObject
@@ -207,7 +209,7 @@
         filters: this.filters.concat()
       });
     },
-    
+
     /**
      * Returns svg representation of an instance
      * @method toSVG
@@ -234,16 +236,16 @@
     getSrc: function() {
       return this.getElement().src;
     },
-    
+
     /**
      * Returns string representation of an instance
      * @method toString
      * @return {String} String representation of an instance
      */
-    toString: function() {        
+    toString: function() {
       return '#<fabric.Image: { src: "' + this.getSrc() + '" }>';
     },
-    
+
     /**
      * Returns a clone of an instance
      * @mthod clone
@@ -252,14 +254,14 @@
     clone: function(callback) {
       this.constructor.fromObject(this.toObject(), callback);
     },
-    
+
     /**
      * Applies filters assigned to this image (from "filters" array)
      * @mthod applyFilters
      * @param {Function} callback Callback is invoked when all filters have been applied and new image is generated
      */
     applyFilters: function(callback) {
-      
+
       if (this.filters.length === 0) {
         this.setElement(this._originalImage);
         callback && callback();
@@ -277,7 +279,7 @@
 
       canvasEl.getContext('2d').drawImage(imgEl, 0, 0);
 
-      this.filters.forEach(function(filter) { 
+      this.filters.forEach(function(filter) {
         filter && filter.applyTo(canvasEl);
       });
 
@@ -304,7 +306,7 @@
 
       return this;
     },
-    
+
     /**
      * @private
      */
@@ -318,7 +320,7 @@
         originalImgSize.height
       );
     },
-    
+
     /**
      * @private
      */
@@ -332,19 +334,19 @@
         this.currentBorder = 0;
       }
     },
-    
+
     /**
      * @private
      */
     _resetWidthHeight: function() {
       var element = this.getElement();
-      
+
       this.set('width', element.width);
       this.set('height', element.height);
     },
-    
+
     /**
-     * The Image class's initialization method. This method is automatically 
+     * The Image class's initialization method. This method is automatically
      * called by the constructor.
      * @method _initElement
      * @param {HTMLImageElement|String} el The element representing the image
@@ -353,7 +355,7 @@
       this.setElement(fabric.util.getById(element));
       fabric.util.addClass(this.getElement(), fabric.Image.CSS_CANVAS);
     },
-    
+
     /**
      * @method _initConfig
      * @param {Object} options Options object
@@ -363,7 +365,7 @@
       this._setBorder();
       this._setWidthHeight();
     },
-    
+
     /**
      * @method _initFilters
      * @param {Object} object Object with filters property
@@ -375,7 +377,7 @@
         });
       }
     },
-    
+
     /**
      * @private
      */
@@ -387,7 +389,7 @@
         this.currentBorder = 0;
       }
     },
-    
+
     /**
      * @private
      */
@@ -396,7 +398,7 @@
       this.width = (this.getElement().width || 0) + sidesBorderWidth;
       this.height = (this.getElement().height || 0) + sidesBorderWidth;
     },
-    
+
     /**
      * Returns complexity of an instance
      * @method complexity
@@ -406,14 +408,14 @@
       return 1;
     }
   });
-  
+
   /**
    * Default CSS class name for canvas
    * @static
    * @type String
    */
   fabric.Image.CSS_CANVAS = "canvas-img";
-  
+
   /**
    * Creates an instance of fabric.Image from its object representation
    * @static
@@ -424,25 +426,25 @@
   fabric.Image.fromObject = function(object, callback) {
     var img = fabric.document.createElement('img'),
         src = object.src;
-        
+
     if (object.width) {
       img.width = object.width;
     }
     if (object.height) {
       img.height = object.height;
     }
-    
+
     /** @ignore */
     img.onload = function() {
       fabric.Image.prototype._initFilters.call(object, object);
-      
+
       var instance = new fabric.Image(img, object);
       callback && callback(instance);
       img = img.onload = null;
     };
     img.src = src;
   };
-  
+
   /**
    * Creates an instance of fabric.Image from an URL string
    * @static
@@ -453,7 +455,7 @@
    */
   fabric.Image.fromURL = function(url, callback, imgOptions) {
     var img = fabric.document.createElement('img');
-    
+
     /** @ignore */
     img.onload = function() {
       if (callback) {
@@ -463,14 +465,29 @@
     };
     img.src = url;
   };
-  
+
+  /**
+   * Creates an instance of fabric.Image from a Data URL string
+   * @static
+   * @method fromDataURL
+   * @param {String} dataUrl URL to create an image from
+   * @param {Object} [imgOptions] Options object
+   */
+  fabric.Image.fromDataURL = function(dataUrl, imgOptions) {
+    var img = fabric.document.createElement('img');
+
+    img.src = dataUrl;
+
+    return new fabric.Image(img, imgOptions);
+  };
+
   /**
    * List of attribute names to account for when parsing SVG element (used by {@link fabric.Image.fromElement})
    * @static
    * @see http://www.w3.org/TR/SVG/struct.html#ImageElement
    */
   fabric.Image.ATTRIBUTE_NAMES = 'x y width height fill fill-opacity opacity stroke stroke-width transform xlink:href'.split(' ');
-  
+
   /**
    * Returns {@link fabric.Image} instance from an SVG element
    * @static
@@ -482,12 +499,12 @@
    */
   fabric.Image.fromElement = function(element, callback, options) {
     options || (options = { });
-    
+
     var parsedAttributes = fabric.parseAttributes(element, fabric.Image.ATTRIBUTE_NAMES);
-    
+
     fabric.Image.fromURL(parsedAttributes['xlink:href'], callback, extend(parsedAttributes, options));
   };
-  
+
   fabric.Image.async = true;
-  
+
 })(typeof exports != 'undefined' ? exports : this);
