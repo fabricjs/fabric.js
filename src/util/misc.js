@@ -149,6 +149,9 @@
       };
       img.src = url;
     }
+    else {
+      callback && callback.call(context, url);
+    }
   }
 
   fabric.util.removeFromArray = removeFromArray;
