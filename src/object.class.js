@@ -1,7 +1,7 @@
 (function(global) {
-  
+
   "use strict";
-  
+
   var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       clone = fabric.util.object.clone,
@@ -10,50 +10,50 @@
       getPointer = fabric.util.getPointer,
       degreesToRadians = fabric.util.degreesToRadians,
       slice = Array.prototype.slice;
-      
+
   if (fabric.Object) {
     return;
   }
-  
-  /** 
+
+  /**
    * @class Object
    * @memberOf fabric
    */
   fabric.Object = fabric.util.createClass(/** @scope fabric.Object.prototype */ {
-    
+
     /**
      * Type of an object (rect, circle, path, etc)
      * @property
      * @type String
      */
     type:                       'object',
-    
+
     /**
      * @property
      * @type Boolean
      */
     includeDefaultValues:       true,
-    
+
     /**
      * @constant
      * @type Number
      */
     NUM_FRACTION_DIGITS:        2,
-    
+
     /**
      * @constant
      * @type Number
      */
     FX_DURATION:                500,
-    
+
     /**
      * @constant
      * @type Number
      */
     MIN_SCALE_LIMIT:            0.1,
-    
+
     /**
-     * List of properties to consider when checking if state of an object is changed (fabric.Object#hasStateChanged); 
+     * List of properties to consider when checking if state of an object is changed (fabric.Object#hasStateChanged);
      * as well as for history (undo/redo) purposes
      * @property
      * @type Array
@@ -62,7 +62,7 @@
                       'theta angle opacity cornersize fill overlayFill stroke ' +
                       'strokeWidth fillRule borderScaleFactor transformMatrix ' +
                       'selectable').split(' '),
-    
+
     top:                      0,
     left:                     0,
     width:                    0,
@@ -86,39 +86,39 @@
     borderOpacityWhenMoving:  0.4,
     borderScaleFactor:        1,
     transformMatrix:          null,
-    
+
     /**
      * When set to `false`, an object can not be selected for modification (using either point-click-based or group-based selection)
      * @property
      * @type Boolean
      */
     selectable:               true,
-    
+
     /**
      * When set to `false`, object's controls are not displayed and can not be used to manipulate object
      * @property
      * @type Boolean
      */
     hasControls:              true,
-    
+
     /**
      * When set to `false`, object's borders are not rendered
      * @property
      * @type Boolean
      */
     hasBorders:               true,
-    
+
     /**
      * @method callSuper
      * @param {String} methodName
      */
     callSuper: function(methodName) {
       var fn = this.constructor.superclass.prototype[methodName];
-      return (arguments.length > 1) 
+      return (arguments.length > 1)
         ? fn.apply(this, slice.call(arguments, 1))
         : fn.call(this);
     },
-    
+
     /**
      * Constructor
      * @method initialize
@@ -127,7 +127,7 @@
     initialize: function(options) {
       options && this.setOptions(options);
     },
-    
+
     /**
      * @method setOptions
      * @param {Object} [options]
@@ -141,7 +141,7 @@
         }
       }
     },
-    
+
     /**
      * @method transform
      * @param {CanvasRenderingContext2D} ctx Context
@@ -151,18 +151,18 @@
       ctx.translate(this.left, this.top);
       ctx.rotate(this.theta);
       ctx.scale(
-        this.scaleX * (this.flipX ? -1 : 1), 
+        this.scaleX * (this.flipX ? -1 : 1),
         this.scaleY * (this.flipY ? -1 : 1)
       );
     },
-    
+
     /**
      * Returns an object representation of an instance
      * @method toObject
      * @return {Object}
      */
     toObject: function() {
-      
+
       var object = {
         type:         this.type,
         left:         toFixed(this.left, this.NUM_FRACTION_DIGITS),
@@ -181,14 +181,14 @@
         opacity:      toFixed(this.opacity, this.NUM_FRACTION_DIGITS),
         selectable:   this.selectable
       };
-      
+
       if (!this.includeDefaultValues) {
         object = this._removeDefaultValues(object);
       }
-      
+
       return object;
     },
-    
+
     /**
      * Returns (dataless) object representation of an instance
      * @method toDatalessObject
@@ -197,7 +197,7 @@
       // will be overwritten by subclasses
       return this.toObject();
     },
-    
+
     /**
      * Returns styles-string for svg-export
      * @method getSvgStyles
@@ -211,7 +211,7 @@
         "opacity: ", (this.opacity ? this.opacity : '1'), ";",
       ].join("");
     },
-    
+
     /**
      * Returns transform-string for svg-export
      * @method getSvgTransform
@@ -225,7 +225,7 @@
         (this.scaleX === 1 && this.scaleY === 1) ? '' : (" scale(" + toFixed(this.scaleX, '2') + " " + toFixed(this.scaleY, '2') + ")")
       ].join('');
     },
-    
+
     /**
      * @private
      * @method _removeDefaultValues
@@ -241,7 +241,7 @@
       }
       return object;
     },
-    
+
     /**
      * Returns true if an object is in its active state
      * @return {Boolean} true if an object is in its active state
@@ -249,7 +249,7 @@
     isActive: function() {
       return !!this.active;
     },
-    
+
     /**
      * Sets state of an object - `true` makes it active, `false` - inactive
      * @param {Boolean} active
@@ -260,7 +260,7 @@
       this.active = !!active;
       return this;
     },
-    
+
     /**
      * Returns a string representation of an instance
      * @return {String}
@@ -268,7 +268,7 @@
     toString: function() {
       return "#<fabric." + capitalize(this.type) + ">";
     },
-    
+
     /**
      * Basic setter
      * @param {Any} property
@@ -294,10 +294,10 @@
           this[property] = value;
         }
       }
-      
+
       return this;
     },
-    
+
     /**
      * Toggles specified property from `true` to `false` or from `false` to `true`
      * @method toggle
@@ -312,7 +312,7 @@
       }
       return this;
     },
-    
+
     /**
      * @method setSourcePath
      * @param {String} value
@@ -323,7 +323,7 @@
       this.sourcePath = value;
       return this;
     },
-    
+
     /**
      * Basic getter
      * @method get
@@ -331,60 +331,60 @@
      * @return {Any} value of a property
      */
     get: function(property) {
-      return (property === 'angle') 
-        ? this.getAngle() 
+      return (property === 'angle')
+        ? this.getAngle()
         : this[property];
     },
-    
+
     /**
      * @method render
      * @param {CanvasRenderingContext2D} ctx context to render on
      * @param {Boolean} noTransform
      */
     render: function(ctx, noTransform) {
-      
+
       // do not render if width or height are zeros
       if (this.width === 0 || this.height === 0) return;
-      
+
       ctx.save();
-      
+
       var m = this.transformMatrix;
       if (m) {
         ctx.setTransform(m[0], m[1], m[2], m[3], m[4], m[5]);
       }
-      
+
       if (!noTransform) {
         this.transform(ctx);
       }
-      
+
       if (this.stroke) {
         ctx.lineWidth = this.strokeWidth;
         ctx.strokeStyle = this.stroke;
       }
-      
+
       if (this.overlayFill) {
         ctx.fillStyle = this.overlayFill;
       }
       else if (this.fill) {
         ctx.fillStyle = this.fill;
       }
-      
+
       if (this.group) {
         // TODO: this breaks some shapes, need to look into it
         // ctx.translate(
-        //    -this.group.width / 2 + this.width / 2, 
+        //    -this.group.width / 2 + this.width / 2,
         //    -this.group.height / 2 + this.height / 2
         // );
       }
       this._render(ctx, noTransform);
-      
+
       if (this.active && !noTransform) {
         this.drawBorders(ctx);
         this.hideCorners || this.drawCorners(ctx);
       }
       ctx.restore();
     },
-    
+
     /**
      * Returns width of an object
      * @method getWidth
@@ -393,7 +393,7 @@
     getWidth: function() {
       return this.width * this.scaleX;
     },
-    
+
     /**
      * Returns height of an object
      * @method getHeight
@@ -402,7 +402,7 @@
     getHeight: function() {
       return this.height * this.scaleY;
     },
-    
+
     /**
      * Scales an object (equally by x and y)
      * @method scale
@@ -415,7 +415,7 @@
       this.scaleY = value;
       return this;
     },
-    
+
     /**
      * Scales an object to a given width (scaling by x/y equally)
      * @method scaleToWidth
@@ -426,7 +426,7 @@
     scaleToWidth: function(value) {
       return this.scale(value / this.width);
     },
-    
+
     /**
      * Scales an object to a given height (scaling by x/y equally)
      * @method scaleToHeight
@@ -437,9 +437,9 @@
     scaleToHeight: function(value) {
       return this.scale(value / this.height);
     },
-    
+
     /**
-     * Sets object opacity 
+     * Sets object opacity
      * @method setOpacity
      * @param value {Number} value 0-1
      * @return {fabric.Object} thisArg
@@ -449,7 +449,7 @@
       this.set('opacity', value);
       return this;
     },
-    
+
     /**
      * Returns object's angle value
      * @method getAngle
@@ -458,7 +458,7 @@
     getAngle: function() {
       return this.theta * 180 / Math.PI;
     },
-    
+
     /**
      * Sets object's angle
      * @method setAngle
@@ -470,7 +470,7 @@
       this.angle = value;
       return this;
     },
-    
+
     /**
      * Sets corner position coordinates based on current angle, width and height.
      * @method setCoords
@@ -478,14 +478,14 @@
      * @chainable
      */
     setCoords: function() {
-      
+
       this.currentWidth = this.width * this.scaleX;
       this.currentHeight = this.height * this.scaleY;
-      
+
       this._hypotenuse = Math.sqrt(
-        Math.pow(this.currentWidth / 2, 2) + 
+        Math.pow(this.currentWidth / 2, 2) +
         Math.pow(this.currentHeight / 2, 2));
-        
+
       this._angle = Math.atan(this.currentHeight / this.currentWidth);
 
       // offset added for rotate and scale actions
@@ -527,9 +527,9 @@
         x: bl.x + (this.currentWidth/2 * cosTh),
         y: bl.y + (this.currentWidth/2 * sinTh)
       }
-      
+
       // debugging
-      
+
       // setTimeout(function() {
       //         canvas.contextTop.fillStyle = 'green';
       //         canvas.contextTop.fillRect(mb.x, mb.y, 3, 3);
@@ -541,18 +541,18 @@
       //         canvas.contextTop.fillRect(mr.x, mr.y, 3, 3);
       //         canvas.contextTop.fillRect(mt.x, mt.y, 3, 3);
       //       }, 50);
-      
+
       // clockwise
       this.oCoords = { tl: tl, tr: tr, br: br, bl: bl, ml: ml, mt: mt, mr: mr, mb: mb };
-      
+
       // set coordinates of the draggable boxes in the corners used to scale/rotate the image
       this._setCornerCoords();
-      
+
       return this;
     },
-    
+
     /**
-     * Draws borders of an object's bounding box. 
+     * Draws borders of an object's bounding box.
      * Requires public properties: width, height
      * Requires public options: padding, borderColor
      * @method drawBorders
@@ -562,7 +562,7 @@
      */
     drawBorders: function(ctx) {
       if (!this.hasBorders) return;
-      
+
       var padding = this.padding,
           padding2 = padding * 2;
 
@@ -591,10 +591,10 @@
       ctx.restore();
       return this;
     },
-    
+
     /**
      * Draws corners of an object's bounding box.
-     * Requires public properties: width, height, scaleX, scaleY 
+     * Requires public properties: width, height, scaleX, scaleY
      * Requires public options: cornersize, padding
      * @method drawCorners
      * @param {CanvasRenderingContext2D} ctx Context to draw on
@@ -603,13 +603,13 @@
      */
     drawCorners: function(ctx) {
       if (!this.hasControls) return;
-      
+
       var size = this.cornersize,
           size2 = size / 2,
           padding = this.padding,
           left = -(this.width / 2),
           top = -(this.height / 2),
-          _left, 
+          _left,
           _top,
           sizeX = size / this.scaleX,
           sizeY = size / this.scaleY,
@@ -618,57 +618,57 @@
           scaleOffsetSizeX = (padding + size2 - size) / this.scaleX,
           scaleOffsetSizeY = (padding + size2 - size) / this.scaleY,
           height = this.height;
-          
+
       ctx.save();
-      
+
       ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
       ctx.fillStyle = this.cornerColor;
-      
+
       // top-left
       _left = left - scaleOffsetX;
       _top = top - scaleOffsetY;
       ctx.fillRect(_left, _top, sizeX, sizeY);
-      
+
       // top-right
       _left = left + this.width - scaleOffsetX;
       _top = top - scaleOffsetY;
       ctx.fillRect(_left, _top, sizeX, sizeY);
-      
+
       // bottom-left
       _left = left - scaleOffsetX;
       _top = top + height + scaleOffsetSizeY;
       ctx.fillRect(_left, _top, sizeX, sizeY);
-      
+
       // bottom-right
       _left = left + this.width + scaleOffsetSizeX;
       _top = top + height + scaleOffsetSizeY;
       ctx.fillRect(_left, _top, sizeX, sizeY);
-      
+
       // middle-top
       _left = left + this.width/2 - scaleOffsetX;
       _top = top - scaleOffsetY;
       ctx.fillRect(_left, _top, sizeX, sizeY);
-      
+
       // middle-bottom
       _left = left + this.width/2 - scaleOffsetX;
       _top = top + height + scaleOffsetSizeY;
       ctx.fillRect(_left, _top, sizeX, sizeY);
-      
+
       // middle-right
       _left = left + this.width + scaleOffsetSizeX;
       _top = top + height/2 - scaleOffsetY;
       ctx.fillRect(_left, _top, sizeX, sizeY);
-      
+
       // middle-left
       _left = left - scaleOffsetX;
       _top = top + height/2 - scaleOffsetY;
       ctx.fillRect(_left, _top, sizeX, sizeY);
-      
+
       ctx.restore();
-      
+
       return this;
     },
-    
+
     /**
      * Clones an instance
      * @method clone
@@ -681,7 +681,7 @@
       }
       return new fabric.Object(this.toObject());
     },
-    
+
     /**
      * Creates an instance of fabric.Image out of an object
      * @method cloneAsImage
@@ -692,7 +692,7 @@
     cloneAsImage: function(callback) {
       if (fabric.Image) {
         var i = new Image();
-        
+
         /** @ignore */
         i.onload = function() {
           if (callback) {
@@ -700,7 +700,7 @@
           }
           i = i.onload = null;
         };
-        
+
         var orig = {
           angle: this.get('angle'),
           flipX: this.get('flipX'),
@@ -715,7 +715,7 @@
       }
       return this;
     },
-    
+
     /**
      * Converts an object into a data-url-like string
      * @method toDataURL
@@ -723,25 +723,28 @@
      */
     toDataURL: function(callback) {
       var el = fabric.document.createElement('canvas');
-      
+      if (!el.getContext && typeof G_vmlCanvasManager != 'undefined') {
+        G_vmlCanvasManager.initElement(el);
+      }
+
       // TODO: should probably use bounding rectangle dimensions instead
-      
+
       el.width = this.getWidth();
       el.height = this.getHeight();
-      
+
       fabric.util.wrapElement(el, 'div');
 
       var canvas = new fabric.Canvas(el);
       canvas.backgroundColor = 'transparent';
       canvas.renderAll();
-      
+
       if (this.constructor.async) {
         this.clone(proceed);
       }
       else {
         proceed(this.clone());
       }
-      
+
       function proceed(clone) {
         clone.left = el.width / 2;
         clone.top = el.height / 2;
@@ -753,11 +756,11 @@
 
         canvas.dispose();
         canvas = clone = null;
-        
+
         callback && callback(data);
       }
     },
-    
+
     /**
      * @method hasStateChanged
      * @return {Boolean} true if instance' state has changed
@@ -767,7 +770,7 @@
         return this[prop] !== this.originalState[prop];
       }, this);
     },
-    
+
     /**
      * @method saveState
      * @return {fabric.Object} thisArg
@@ -779,7 +782,7 @@
       }, this);
       return this;
     },
-    
+
     /**
      * @method setupState
      */
@@ -787,7 +790,7 @@
       this.originalState = { };
       this.saveState();
     },
-    
+
     /**
      * Returns true if object intersects with an area formed by 2 points
      * @method intersectsWithRect
@@ -801,7 +804,7 @@
           tr = new fabric.Point(oCoords.tr.x, oCoords.tr.y),
           bl = new fabric.Point(oCoords.bl.x, oCoords.bl.y),
           br = new fabric.Point(oCoords.br.x, oCoords.br.y);
-      
+
       var intersection = fabric.Intersection.intersectPolygonRectangle(
         [tl, tr, br, bl],
         selectionTL,
@@ -809,7 +812,7 @@
       );
       return (intersection.status === 'Intersection');
     },
-    
+
     /**
      * Returns true if object intersects with another object
      * @method intersectsWithObject
@@ -828,15 +831,15 @@
       }
       var thisCoords = getCoords(this.oCoords),
           otherCoords = getCoords(other.oCoords);
-          
+
       var intersection = fabric.Intersection.intersectPolygonPolygon(
         [thisCoords.tl, thisCoords.tr, thisCoords.br, thisCoords.bl],
         [otherCoords.tl, otherCoords.tr, otherCoords.br, otherCoords.bl]
       );
-      
+
       return (intersection.status === 'Intersection');
     },
-    
+
     /**
      * Returns true if object is fully contained within area of another object
      * @method isContainedWithinObject
@@ -846,7 +849,7 @@
     isContainedWithinObject: function(other) {
       return this.isContainedWithinRect(other.oCoords.tl, other.oCoords.br);
     },
-    
+
     /**
      * Returns true if object is fully contained within area formed by 2 points
      * @method isContainedWithinRect
@@ -860,13 +863,13 @@
           tr = new fabric.Point(oCoords.tr.x, oCoords.tr.y),
           bl = new fabric.Point(oCoords.bl.x, oCoords.bl.y),
           br = new fabric.Point(oCoords.br.x, oCoords.br.y);
-          
+
       return tl.x > selectionTL.x
         && tr.x < selectionBR.x
         && tl.y > selectionTL.y
         && bl.y < selectionBR.y;
     },
-    
+
     /**
      * @method isType
      * @param type {String} type to check against
@@ -875,7 +878,7 @@
     isType: function(type) {
       return this.type === type;
     },
-    
+
     /**
      * Determines which one of the four corners has been clicked
      * @method _findTargetCorner
@@ -886,37 +889,37 @@
      */
     _findTargetCorner: function(e, offset) {
       if (!this.hasControls) return false;
-      
+
       var pointer = getPointer(e),
           ex = pointer.x - offset.left,
           ey = pointer.y - offset.top,
           xpoints,
           lines;
-      
+
       for (var i in this.oCoords) {
         lines = this._getImageLines(this.oCoords[i].corner, i);
         // debugging
         // canvas.contextTop.fillRect(lines.bottomline.d.x, lines.bottomline.d.y, 2, 2);
         //         canvas.contextTop.fillRect(lines.bottomline.o.x, lines.bottomline.o.y, 2, 2);
-        //         
+        //
         //         canvas.contextTop.fillRect(lines.leftline.d.x, lines.leftline.d.y, 2, 2);
         //         canvas.contextTop.fillRect(lines.leftline.o.x, lines.leftline.o.y, 2, 2);
-        //         
+        //
         //         canvas.contextTop.fillRect(lines.topline.d.x, lines.topline.d.y, 2, 2);
         //         canvas.contextTop.fillRect(lines.topline.o.x, lines.topline.o.y, 2, 2);
-        //         
+        //
         //         canvas.contextTop.fillRect(lines.rightline.d.x, lines.rightline.d.y, 2, 2);
         //         canvas.contextTop.fillRect(lines.rightline.o.x, lines.rightline.o.y, 2, 2);
-        
+
         xpoints = this._findCrossPoints(ex, ey, lines);
         if (xpoints % 2 == 1 && xpoints != 0) {
           this.__corner = i;
           return i;
-        }   
+        }
       }
       return false;
     },
-    
+
     /**
      * Helper method to determine how many cross points are between the 4 image edges
      * and the horizontal line determined by the position of our mouse when clicked on canvas
@@ -925,12 +928,12 @@
      * @param ex {Number} x coordinate of the mouse
      * @param ey {Number} y coordinate of the mouse
      * @param oCoords {Object} Coordinates of the image being evaluated
-     */   
+     */
     _findCrossPoints: function(ex, ey, oCoords) {
       var b1, b2, a1, a2, xi, yi,
           xcount = 0,
           iLine;
-          
+
       for (var lineKey in oCoords) {
         iLine = oCoords[lineKey];
         // optimisation 1: line below dot. no cross
@@ -942,22 +945,22 @@
           continue;
         }
         // optimisation 3: vertical line case
-        if ((iLine.o.x == iLine.d.x) && (iLine.o.x >= ex)) { 
+        if ((iLine.o.x == iLine.d.x) && (iLine.o.x >= ex)) {
           xi = iLine.o.x;
           yi = ey;
         }
         // calculate the intersection point
         else {
           b1 = 0;
-          b2 = (iLine.d.y-iLine.o.y)/(iLine.d.x-iLine.o.x); 
+          b2 = (iLine.d.y-iLine.o.y)/(iLine.d.x-iLine.o.x);
           a1 = ey-b1*ex;
           a2 = iLine.o.y-b2*iLine.o.x;
 
-          xi = - (a1-a2)/(b1-b2); 
-          yi = a1+b1*xi; 
+          xi = - (a1-a2)/(b1-b2);
+          yi = a1+b1*xi;
         }
         // dont count xi < ex cases
-        if (xi >= ex) { 
+        if (xi >= ex) {
           xcount += 1;
         }
         // optimisation 4: specific for square images
@@ -967,7 +970,7 @@
       }
       return xcount;
     },
-    
+
     /**
      * Method that returns an object with the image lines in it given the coordinates of the corners
      * @method _getImageLines
@@ -976,31 +979,31 @@
      */
     _getImageLines: function(oCoords, i) {
       return {
-        topline: { 
+        topline: {
           o: oCoords.tl,
           d: oCoords.tr
         },
-        rightline: { 
+        rightline: {
           o: oCoords.tr,
-          d: oCoords.br 
+          d: oCoords.br
         },
-        bottomline: { 
+        bottomline: {
           o: oCoords.br,
-          d: oCoords.bl 
+          d: oCoords.bl
         },
-        leftline: { 
+        leftline: {
           o: oCoords.bl,
-          d: oCoords.tl 
+          d: oCoords.tl
         }
       }
     },
-    
+
     /**
      * Sets the coordinates of the draggable boxes in the corners of
      * the image used to scale/rotate it.
      * @method _setCornerCoords
      * @private
-     */ 
+     */
     _setCornerCoords: function() {
       var coords = this.oCoords,
           theta = degreesToRadians(45 - this.getAngle()),
@@ -1026,7 +1029,7 @@
           y: coords.tl.y + cosHalfOffset
         }
       };
-      
+
       coords.tr.corner = {
         tl: {
           x: coords.tr.x - sinHalfOffset,
@@ -1045,7 +1048,7 @@
           y: coords.tr.y + sinHalfOffset
         }
       };
-      
+
       coords.bl.corner = {
         tl: {
           x: coords.bl.x - sinHalfOffset,
@@ -1064,7 +1067,7 @@
           y: coords.bl.y - sinHalfOffset
         }
       };
-      
+
       coords.br.corner = {
         tr: {
           x: coords.br.x + cosHalfOffset,
@@ -1102,7 +1105,7 @@
           y: coords.ml.y + cosHalfOffset
         }
       };
-      
+
       coords.mt.corner = {
         tl: {
           x: coords.mt.x - sinHalfOffset,
@@ -1140,7 +1143,7 @@
           y: coords.mr.y + cosHalfOffset
         }
       };
-      
+
       coords.mb.corner = {
         tl: {
           x: coords.mb.x - sinHalfOffset,
@@ -1160,7 +1163,7 @@
         }
       };
     },
-    
+
     /**
      * Makes object's color grayscale
      * @method toGrayscale
@@ -1173,7 +1176,7 @@
       }
       return this;
     },
-    
+
     /**
      * @method complexity
      * @return {Number}
@@ -1181,7 +1184,7 @@
     complexity: function() {
       return 0;
     },
-    
+
     /**
      * @method straighten
      * @return {fabric.Object} thisArg
@@ -1192,7 +1195,7 @@
       this.setAngle(angle);
       return this;
     },
-    
+
     /**
      * @method fxStraighten
      * @param {Object} callbacks
@@ -1204,12 +1207,12 @@
      */
     fxStraighten: function(callbacks) {
       callbacks = callbacks || { };
-      
+
       var empty = function() { },
           onComplete = callbacks.onComplete || empty,
           onChange = callbacks.onChange || empty,
           _this = this;
-      
+
       fabric.util.animate({
         startValue: this.get('angle'),
         endValue: this._getAngleValueForStraighten(),
@@ -1226,10 +1229,10 @@
           _this.setActive(false);
         }
       });
-      
+
       return this;
     },
-    
+
     /**
      * @method fxRemove
      * @param {Object} callbacks
@@ -1238,12 +1241,12 @@
      */
     fxRemove: function(callbacks) {
       callbacks || (callbacks = { });
-      
+
       var empty = function() { },
           onComplete = callbacks.onComplete || empty,
           onChange = callbacks.onChange || empty,
           _this = this;
-      
+
       fabric.util.animate({
         startValue: this.get('opacity'),
         endValue: 0,
@@ -1257,10 +1260,10 @@
           _this.setActive(false);
         }
       });
-      
+
       return this;
     },
-    
+
     /**
      * @method _getAngleValueForStraighten
      * @return {Number} angle value
@@ -1268,9 +1271,9 @@
      */
     _getAngleValueForStraighten: function() {
       var angle = this.get('angle');
-      
+
       // TODO (kangax): can this be simplified?
-      
+
       if      (angle > -225 && angle <= -135) { return -180;  }
       else if (angle > -135 && angle <= -45)  { return  -90;  }
       else if (angle > -45  && angle <= 45)   { return    0;  }
@@ -1278,10 +1281,10 @@
       else if (angle > 135  && angle <= 225 ) { return  180;  }
       else if (angle > 225  && angle <= 315)  { return  270;  }
       else if (angle > 315)                   { return  360;  }
-      
+
       return 0;
     },
-    
+
     /**
      * Returns a JSON representation of an instance
      * @method toJSON
@@ -1291,22 +1294,22 @@
       // delegate, not alias
       return this.toObject();
     },
-    
+
     setGradientFill: function(ctx, options) {
       this.set('fill', fabric.Gradient.forObject(this, ctx, options));
     },
-    
+
     animate: function(property, to, options) {
       var obj = this;
-      
+
       if (!('from' in options)) {
         options.from = this.get(property);
       }
-      
+
       if (/[+-]/.test(to.charAt(0))) {
         to = this.get(property) + parseFloat(to);
       }
-      
+
       fabric.util.animate({
         startValue: options.from,
         endValue: to,
@@ -1322,20 +1325,20 @@
       });
     }
   });
-  
+
   /**
    * @alias rotate -> setAngle
    */
   fabric.Object.prototype.rotate = fabric.Object.prototype.setAngle;
-  
+
   var proto = fabric.Object.prototype;
   for (var i = proto.stateProperties.length; i--; ) {
-    
+
     var propName = proto.stateProperties[i],
         capitalizedPropName = propName.charAt(0).toUpperCase() + propName.slice(1),
         setterName = 'set' + capitalizedPropName,
         getterName = 'get' + capitalizedPropName;
-    
+
     // using `new Function` for better introspection
     if (!proto[getterName]) {
       proto[getterName] = (function(property) {
@@ -1348,5 +1351,5 @@
       })(propName);
     }
   }
-  
+
 })(typeof exports != 'undefined' ? exports : this);
