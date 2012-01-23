@@ -48,6 +48,21 @@
     backgroundImage:        '',
 
     /**
+     * Opacity of the background image of the canvas instance
+     * @property
+     * @type Float
+     */
+    backgroundOpacity:      1.0,
+    
+    /**
+     * Indicatus whether the background image should be stretched to fit the 
+     * dimensions of the canvas instance.
+     * @property
+     * @type Boolean
+     */
+    backgroundStretch:      true,
+
+    /**
      * Indicates whether toObject/toDatalessObject should include default values
      * @property
      * @type Boolean
@@ -448,7 +463,16 @@
       canvasToDrawOn.fillRect(0, 0, this.width, this.height);
 
       if (typeof this.backgroundImage == 'object') {
-        canvasToDrawOn.drawImage(this.backgroundImage, 0, 0, this.width, this.height);
+        canvasToDrawOn.save();
+        canvasToDrawOn.globalAlpha = this.backgroundOpacity;
+
+        if (this.backgroundStretch) {
+            canvasToDrawOn.drawImage(this.backgroundImage, 0, 0, this.width, this.height);
+        }
+        else {
+            canvasToDrawOn.drawImage(this.backgroundImage, 0, 0);
+        }
+        canvasToDrawOn.restore();
       }
 
       if (length) {
