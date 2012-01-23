@@ -239,7 +239,13 @@
       method: 'get',
       onComplete: function(resp) {
         var doc = resp.responseXML;
-        if (!doc || !doc.documentElement) return;
+        if (!doc || !doc.documentElement) {
+            //IE can't parse XML with a DOCTYPE...
+            doc = new ActiveXObject('Microsoft.XMLDOM');
+            doc.async = 'false';
+           //IE chokes on DOCTYPE
+           doc.loadXML(resp.responseText.replace(/<!DOCTYPE[\s\S]*?(\[[\s\S]*\])*?>/i,''));
+        }
         fabric.parseSVGDocument(doc.documentElement, function() {
           data = arguments[0];
         });
