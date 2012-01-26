@@ -145,14 +145,6 @@
     }
   });
   
-  test('getCenter', function() {
-    ok(typeof canvas.getCenter == 'function');
-    var center = canvas.getCenter();
-    console.log(canvasEl.outerHTML);
-    equals(center.left, canvasEl.width / 2);
-    equals(center.top, canvasEl.height / 2);
-  });
-  
   test('centerObjectH', function() {
     ok(typeof canvas.centerObjectH == 'function');
     var rect = makeRect({ left: 102, top: 202 });
@@ -526,8 +518,8 @@
       callbackFired = true;
     }
     
-    equals(canvas.item(0), rect);
-    equals(canvas.fxRemove(rect, onRemove), canvas, 'should be chainable');
+    ok(canvas.item(0) === rect);
+    ok(canvas.fxRemove(rect, onRemove) === canvas, 'should be chainable');
     
     setTimeout(function() {
       equals(canvas.item(0), undefined);
@@ -562,6 +554,19 @@
       
       ok(typeof canvas.backgroundImage == 'object');
       ok(/pug\.jpg$/.test(canvas.backgroundImage.src));
+      
+      start();
+    }, 1000);
+  });
+  
+  asyncTest('setOverlayImage', function() {
+    same(canvas.overlayImage, undefined);
+    canvas.setOverlayImage('../../assets/pug.jpg');
+    
+    setTimeout(function() {
+      
+      ok(typeof canvas.overlayImage == 'object');
+      ok(/pug\.jpg$/.test(canvas.overlayImage.src));
       
       start();
     }, 1000);

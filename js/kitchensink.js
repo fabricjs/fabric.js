@@ -213,7 +213,9 @@
       sliderLabel.innerHTML = 'Opacity: ';
 
       var slider = document.createElement('input');
-      slider.type = 'range';
+      
+      try { slider.type = 'range'; } catch(err) { }
+      
       slider.id = 'opacity';
       slider.value = 100;
 
@@ -586,7 +588,7 @@
       var slider = document.createElement('input');
       var label = document.createElement('label');
       label.innerHTML = 'Line height: ';
-      slider.type = 'range';
+      try { slider.type = 'range'; } catch(err) { }
       slider.min = -2;
       slider.max = 10;
       slider.step = 0.1;
@@ -611,13 +613,15 @@
   document.getElementById('load-svg').onclick = function() {
     var svg = document.getElementById('svg-console').value;
     fabric.loadSVGFromString(svg, function(objects, options) {
+      var obj;
       if (objects.length === 1) {
-        canvas.add(objects[0]);
+        obj = objects[0]
       }
       else {
-        canvas.add(new fabric.PathGroup(objects, options));
+        obj = new fabric.PathGroup(objects, options);
       }
-      canvas.renderAll();
+      canvas.add(obj).centerObject(obj).renderAll();
+      obj.setCoords();
     });
   };
   
