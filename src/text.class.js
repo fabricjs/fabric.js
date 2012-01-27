@@ -224,14 +224,13 @@
       // Cufon doesn't play nice with textDecoration=underline if element doesn't have a parent
       container.appendChild(el);
 
-      //IE 7 & 8 drop newLines and white space on text nodes, due to a bug as disccused here
-      //and here http://web.student.tuwien.ac.at/~e0226430/innerHtmlQuirk.html
-      //http://www.w3schools.com/dom/dom_mozilla_vs_ie.asp
-
       if (typeof G_vmlCanvasManager == 'undefined') {
         el.innerHTML = this.text;
-      } else {
-        //for some reason, the carriage return is not stripped by IE but "\n" is, so let's keep \r as a new line marker...
+      }
+      else {
+        // IE 7 & 8 drop newlines and white space on text nodes
+        // see: http://web.student.tuwien.ac.at/~e0226430/innerHtmlQuirk.html
+        // see: http://www.w3schools.com/dom/dom_mozilla_vs_ie.asp
         el.innerText =  this.text.replace(/\r?\n/gi, '\r');
       }
 

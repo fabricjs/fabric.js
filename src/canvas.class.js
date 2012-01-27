@@ -266,7 +266,8 @@
     __onMouseDown: function (e) {
 
       // accept only left clicks
-      if (e.which !== 1 && !fabric.isTouchSupported) return;
+      var isLeftClick  = 'which' in e ? e.which == 1 : e.button == 1;
+      if (!isLeftClick && !fabric.isTouchSupported) return;
 
       if (this.isDrawingMode) {
         this._prepareForDrawing(e);
