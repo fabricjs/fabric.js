@@ -52,7 +52,7 @@
      * @property
      * @type Float
      */
-    backgroundOpacity:      1.0,
+    backgroundImageOpacity:      1.0,
     
     /**
      * Indicatus whether the background image should be stretched to fit the 
@@ -60,7 +60,7 @@
      * @property
      * @type Boolean
      */
-    backgroundStretch:      true,
+    backgroundImageStretch:      true,
 
     /**
      * Indicates whether toObject/toDatalessObject should include default values
@@ -471,9 +471,9 @@
 
       if (typeof this.backgroundImage == 'object') {
         canvasToDrawOn.save();
-        canvasToDrawOn.globalAlpha = this.backgroundOpacity;
+        canvasToDrawOn.globalAlpha = this.backgroundImageOpacity;
 
-        if (this.backgroundStretch) {
+        if (this.backgroundImageStretch) {
             canvasToDrawOn.drawImage(this.backgroundImage, 0, 0, this.width, this.height);
         }
         else {
