@@ -4,7 +4,7 @@
     return;
   }
   
-  var XML = require('o3-xml'),
+  var XML = require('o3-xml-fork'),
       URL = require('url'),
       HTTP = require('http'),
       
