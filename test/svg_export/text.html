@@ -319,4 +319,18 @@ title: SVG Export (text)
   canvas.add(text);
 </pre>
 
+<pre class="test-source">
+  var text = new fabric.Text('text\nwith\nrgba() values!', { 
+    fontFamily: 'Delicious',
+    fill: 'rgba(255,0,0,0.8)',
+    backgroundColor: 'rgba(0,0,0,0.85)',
+    left: 140,
+    top: 120,
+    fontSize: 40,
+    textShadow: 'rgba(255,255,255,0.9) 2px 2px'
+  });
+  text.path = '../../lib/fonts/Delicious.otf';
+  canvas.add(text);
+</pre>
+
 <script src="master.js"></script>
