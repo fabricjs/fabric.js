@@ -6,7 +6,8 @@
 
   var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
-      clone = fabric.util.object.clone;
+      clone = fabric.util.object.clone,
+      toFixed = fabric.util.toFixed;
 
   if (fabric.Text) {
     fabric.warn('fabric.Text is already defined');
@@ -305,7 +306,7 @@
             (this.textDecoration ? 'text-decoration="' + this.textDecoration + '" ': ''),
             'style="', this.getSvgStyles(), '" ',
             /* svg starts from left/bottom corner so we normalize height */
-            'transform="translate(', textLeftOffset, ' ', textTopOffset, ')">',
+            'transform="translate(', toFixed(textLeftOffset, 2), ' ', toFixed(textTopOffset, 2), ')">',
             shadowSpans.join(''),
             textAndBg.textSpans.join(''),
           '</text>',
@@ -320,12 +321,11 @@
           var lineLeftOffset = (this._boundaries && this._boundaries[i]) ? this._boundaries[i].left : 0;
           shadowSpans.push(
             '<tspan x="',
-            lineLeftOffset + this._shadowOffsets[j][0],
+            toFixed(lineLeftOffset + this._shadowOffsets[j][0], 2),
             (i === 0 ? '" y' : '" dy'), '="',
-            lineTopOffset + (i === 0 ? this._shadowOffsets[j][1] : 0),
-            '" fill="',
-            this._shadows[j].color,
-            '">',
+            toFixed(lineTopOffset + (i === 0 ? this._shadowOffsets[j][1] : 0), 2),
+            '" ',
+            this._getFillAttributes(this._shadows[j].color), '>',
             textLines[i],
           '</tspan>');
         }
@@ -334,40 +334,55 @@
     },
 
     _getSVGTextAndBg: function(lineTopOffset, textLeftOffset, textLines) {
-      var textSpans = [ ], textBgRects = [ ];
+      
+      var textSpans = [ ], 
+          textBgRects = [ ];
 
       // text and background
       for (var i = 0, len = textLines.length; i < len; i++) {
 
-        var lineLeftOffset = (this._boundaries && this._boundaries[i]) ? this._boundaries[i].left : 0;
+        var lineLeftOffset = (this._boundaries && this._boundaries[i]) ? toFixed(this._boundaries[i].left, 2) : 0;
         textSpans.push(
           '<tspan x="',
           lineLeftOffset, '" ',
           (i === 0 ? 'y' : 'dy'), '="',
-          lineTopOffset, '">',
+          toFixed(lineTopOffset, 2), '" ',
+          // doing this on <tspan> elements since setting opacity on containing <text> one doesn't work in Illustrator
+          this._getFillAttributes(this.fill), '>',
           textLines[i],
           '</tspan>'
         );
 
         if (!this.backgroundColor) continue;
+        
         textBgRects.push(
-          '<rect fill="',
-            this.backgroundColor,
-            '" x="',
-            textLeftOffset + this._boundaries[i].left,
+          '<rect ',
+            this._getFillAttributes(this.backgroundColor),
+            ' x="',
+            toFixed(textLeftOffset + this._boundaries[i].left, 2),
             '" y="',
             /* an offset that seems to straighten things out */
-            (lineTopOffset * i) - this.height / 2 + (this.lineHeight * 2.6),
+            toFixed((lineTopOffset * i) - this.height / 2 + (this.lineHeight * 2.6), 2),
             '" width="',
-            this._boundaries[i].width,
+            toFixed(this._boundaries[i].width, 2),
             '" height="',
-            this._boundaries[i].height,
+            toFixed(this._boundaries[i].height, 2),
           '"></rect>');
       }
       return {
         textSpans: textSpans,
         textBgRects: textBgRects
       };
+    },
+    
+    // Adobe Illustrator (at least CS5) is unable to render rgba()-based fill values
+    // we work around it by "moving" alpha channel into opacity attribute and setting fill's alpha to 1
+    _getFillAttributes: function(value) {
+      var fillColor = value ? new fabric.Color(value) : '';
+      if (!fillColor || !fillColor.getSource() || fillColor.getAlpha() === 1) {
+        return 'fill="' + value + '"';
+      }
+      return 'opacity="' + fillColor.getAlpha() + '" fill="' + fillColor.setAlpha(1).toRgb() + '"';
     },
 
     /**
