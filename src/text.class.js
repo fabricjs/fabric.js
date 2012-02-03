@@ -286,7 +286,7 @@
      */
     toSVG: function() {
 
-      var textLines = this.text.split('\n'),
+      var textLines = this.text.split(/\r?\n/),
           lineTopOffset = -this._fontAscent - ((this._fontAscent / 5) * this.lineHeight),
 
           textLeftOffset = -(this.width/2),
@@ -315,46 +315,58 @@
     },
 
     _getSVGShadows: function(lineTopOffset, textLines) {
-      var shadowSpans = [ ]
-      for (var j = 0, jlen = this._shadows.length; j < jlen; j++) {
-        for (var i = 0, ilen = textLines.length; i < ilen; i++) {
-          var lineLeftOffset = (this._boundaries && this._boundaries[i]) ? this._boundaries[i].left : 0;
-          shadowSpans.push(
-            '<tspan x="',
-            toFixed(lineLeftOffset + this._shadowOffsets[j][0], 2),
-            (i === 0 ? '" y' : '" dy'), '="',
-            toFixed(lineTopOffset + (i === 0 ? this._shadowOffsets[j][1] : 0), 2),
-            '" ',
-            this._getFillAttributes(this._shadows[j].color), '>',
-            textLines[i],
-          '</tspan>');
+      var shadowSpans = [], j, i, jlen, ilen, lineTopOffsetMultiplier = 1;
+
+      for (j = 0, jlen = this._shadows.length; j < jlen; j++) {
+        for (i = 0, ilen = textLines.length; i < ilen; i++) {
+          if (textLines[i] !== '') {
+            var lineLeftOffset = (this._boundaries && this._boundaries[i]) ? this._boundaries[i].left : 0;
+            shadowSpans.push(
+              '<tspan x="',
+              toFixed((lineLeftOffset + lineTopOffsetMultiplier) + this._shadowOffsets[j][0], 2),
+              (i === 0 ? '" y' : '" dy'), '="',
+              toFixed(lineTopOffset + (i === 0 ? this._shadowOffsets[j][1] : 0), 2),
+              '" ',
+              this._getFillAttributes(this._shadows[j].color), '>',
+              textLines[i],
+            '</tspan>');
+            lineTopOffsetMultiplier = 1;
+          } else {
+            // in some environments (e.g. IE 7 & 8) empty tspans are completely ignored, using a lineTopOffsetMultiplier
+            // prevents empty tspans
+            lineTopOffsetMultiplier++;
+          }
         }
       }
       return shadowSpans;
     },
 
     _getSVGTextAndBg: function(lineTopOffset, textLeftOffset, textLines) {
-      
-      var textSpans = [ ], 
-          textBgRects = [ ];
+      var textSpans = [ ], textBgRects = [ ], i, lineLeftOffset, len, lineTopOffsetMultiplier = 1;
 
       // text and background
-      for (var i = 0, len = textLines.length; i < len; i++) {
-
-        var lineLeftOffset = (this._boundaries && this._boundaries[i]) ? toFixed(this._boundaries[i].left, 2) : 0;
-        textSpans.push(
-          '<tspan x="',
-          lineLeftOffset, '" ',
-          (i === 0 ? 'y' : 'dy'), '="',
-          toFixed(lineTopOffset, 2), '" ',
-          // doing this on <tspan> elements since setting opacity on containing <text> one doesn't work in Illustrator
-          this._getFillAttributes(this.fill), '>',
-          textLines[i],
-          '</tspan>'
-        );
+      for (i = 0, len = textLines.length; i < len; i++) {
+        if (textLines[i] !== '') {
+          lineLeftOffset = (this._boundaries && this._boundaries[i]) ? toFixed(this._boundaries[i].left, 2) : 0;
+          textSpans.push(
+            '<tspan x="',
+            lineLeftOffset, '" ',
+            (i === 0 ? 'y' : 'dy'), '="',
+            toFixed(lineTopOffset * lineTopOffsetMultiplier, 2) , '" ',
+            // doing this on <tspan> elements since setting opacity on containing <text> one doesn't work in Illustrator
+            this._getFillAttributes(this.fill), '>',
+            textLines[i],
+            '</tspan>'
+          );
+          lineTopOffsetMultiplier = 1;
+        } else {
+          // in some environments (e.g. IE 7 & 8) empty tspans are completely ignored, using a lineTopOffsetMultiplier
+          // prevents empty tspans
+          lineTopOffsetMultiplier++;
+        }
 
         if (!this.backgroundColor) continue;
-        
+
         textBgRects.push(
           '<rect ',
             this._getFillAttributes(this.backgroundColor),
@@ -374,7 +386,7 @@
         textBgRects: textBgRects
       };
     },
-    
+
     // Adobe Illustrator (at least CS5) is unable to render rgba()-based fill values
     // we work around it by "moving" alpha channel into opacity attribute and setting fill's alpha to 1
     _getFillAttributes: function(value) {
