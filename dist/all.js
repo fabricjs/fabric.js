@@ -5123,7 +5123,7 @@ fabric.util.string = {
             'height="', this.height, '" ',
             'xml:space="preserve">',
           '<desc>Created with Fabric.js ', fabric.version, '</desc>',
-          fabric.createSVGFontFacesMarkup(this.getObjects()),
+          fabric.createSVGFontFacesMarkup(this.getObjects())
       ];
 
       for (var i = 0, objects = this.getObjects(), len = objects.length; i < len; i++) {
@@ -7085,7 +7085,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         "stroke: ", (this.stroke ? this.stroke : 'none'), "; ",
         "stroke-width: ", (this.strokeWidth ? this.strokeWidth : '0'), "; ",
         "fill: ", (this.fill ? this.fill : 'none'), "; ",
-        "opacity: ", (this.opacity ? this.opacity : '1'), ";",
+        "opacity: ", (this.opacity ? this.opacity : '1'), ";"
       ].join("");
     },
 

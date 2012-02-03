@@ -699,7 +699,7 @@
             'height="', this.height, '" ',
             'xml:space="preserve">',
           '<desc>Created with Fabric.js ', fabric.version, '</desc>',
-          fabric.createSVGFontFacesMarkup(this.getObjects()),
+          fabric.createSVGFontFacesMarkup(this.getObjects())
       ];
 
       for (var i = 0, objects = this.getObjects(), len = objects.length; i < len; i++) {

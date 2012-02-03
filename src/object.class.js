@@ -208,7 +208,7 @@
         "stroke: ", (this.stroke ? this.stroke : 'none'), "; ",
         "stroke-width: ", (this.strokeWidth ? this.strokeWidth : '0'), "; ",
         "fill: ", (this.fill ? this.fill : 'none'), "; ",
-        "opacity: ", (this.opacity ? this.opacity : '1'), ";",
+        "opacity: ", (this.opacity ? this.opacity : '1'), ";"
       ].join("");
     },
 
