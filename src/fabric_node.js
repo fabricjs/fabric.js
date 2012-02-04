@@ -46,6 +46,8 @@
     request(url, 'binary', function(body) {
       var img = new Image();
       img.src = new Buffer(body, 'binary');
+      // preserving original url, which seems to be lost in node-canvas
+      img._src = url;
       callback(img);
     });
   };

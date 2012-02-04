@@ -203,7 +203,7 @@
      */
     toObject: function() {
       return extend(this.callSuper('toObject'), {
-        src: this._originalImage.src,
+        src: this._originalImage.src || this._originalImage._src,
         filters: this.filters.concat()
       });
     },
@@ -215,7 +215,7 @@
      */
     toSVG: function() {
       return '<g transform="' + this.getSvgTransform() + '">'+
-                '<image xlink:href="' + this.getSrc() + '" '+
+                '<image xlink:href="' + this.getSvgSrc() + '" '+
                   'style="' + this.getSvgStyles() + '" ' +
                   // we're essentially moving origin of transformation from top/left corner to the center of the shape
                   // by wrapping it in container <g> element with actual transformation, then offsetting object to the top/left
@@ -232,7 +232,7 @@
      * @return {String} Source of an image
      */
     getSrc: function() {
-      return this.getElement().src;
+      return this.getElement().src || this.getElement()._src;
     },
 
     /**
@@ -417,6 +417,8 @@
    * @type String
    */
   fabric.Image.CSS_CANVAS = "canvas-img";
+  
+  fabric.Image.prototype.getSvgSrc = fabric.Image.prototype.getSrc;
 
   /**
    * Creates an instance of fabric.Image from its object representation
