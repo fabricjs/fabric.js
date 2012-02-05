@@ -521,12 +521,6 @@
     ok(!cObj.isType('object'));
   });
 
-  test('getCenter', function() {
-    var object = new fabric.Object({ left: 100, top: 124, width: 210, height: 66 });
-    ok(typeof object.getCenter == 'function');
-    same({ x: 205, y: 157 }, object.getCenter());
-  });
-
   test('toggle', function() {
     var object = new fabric.Object({ left: 100, top: 124, width: 210, height: 66 });
     ok(typeof object.toggle == 'function');

@@ -333,4 +333,16 @@ title: SVG Export (text)
   canvas.add(text);
 </pre>
 
+<pre class="test-source">
+  var text = new fabric.Text('text\n\nwith\n\ndouble\n\nnewlines!', { 
+    fontFamily: 'Delicious',
+    fill: 'green',
+    left: 100,
+    top: 140,
+    fontSize: 30
+  });
+  text.path = '../../lib/fonts/Delicious.otf';
+  canvas.add(text);
+</pre>
+
 <script src="master.js"></script>
