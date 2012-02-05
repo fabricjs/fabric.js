@@ -445,13 +445,13 @@
      */
     renderAll: function (allOnTop) {
 
-      var canvasToDrawOn = this[(allOnTop && this.interactive) ? 'contextTop' : 'contextContainer'];
+      var canvasToDrawOn = this[(allOnTop === true && this.interactive) ? 'contextTop' : 'contextContainer'];
 
       if (this.contextTop) {
         this.clearContext(this.contextTop);
       }
 
-      if (!allOnTop) {
+      if (allOnTop === false) {
         this.clearContext(canvasToDrawOn);
       }
 
