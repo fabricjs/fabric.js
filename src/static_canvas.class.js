@@ -48,6 +48,21 @@
     backgroundImage:        '',
 
     /**
+     * Opacity of the background image of the canvas instance
+     * @property
+     * @type Float
+     */
+    backgroundImageOpacity:      1.0,
+    
+    /**
+     * Indicatus whether the background image should be stretched to fit the 
+     * dimensions of the canvas instance.
+     * @property
+     * @type Boolean
+     */
+    backgroundImageStretch:      true,
+
+    /**
      * Indicates whether toObject/toDatalessObject should include default values
      * @property
      * @type Boolean
@@ -153,12 +168,19 @@
      * @method setBackgroundImage
      * @param {String} url url of an image to set background to
      * @param {Function} callback callback to invoke when image is loaded and set as background
+     * @param {Object} options optional options to set for the background image
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
-    setBackgroundImage: function (url, callback) {
+    setBackgroundImage: function (url, callback, options) {
       return fabric.util.loadImage(url, function(img) {
         this.backgroundImage = img;
+        if (options && options.backgroundOpacity) {
+            this.backgroundOpacity = options.backgroundOpacity;
+        }
+        if (options && options.backgroundStretch) {
+            this.backgroundStretch = options.backgroundStretch;
+        }
         callback && callback();
       }, this);
     },
@@ -448,7 +470,16 @@
       canvasToDrawOn.fillRect(0, 0, this.width, this.height);
 
       if (typeof this.backgroundImage == 'object') {
-        canvasToDrawOn.drawImage(this.backgroundImage, 0, 0, this.width, this.height);
+        canvasToDrawOn.save();
+        canvasToDrawOn.globalAlpha = this.backgroundImageOpacity;
+
+        if (this.backgroundImageStretch) {
+            canvasToDrawOn.drawImage(this.backgroundImage, 0, 0, this.width, this.height);
+        }
+        else {
+            canvasToDrawOn.drawImage(this.backgroundImage, 0, 0);
+        }
+        canvasToDrawOn.restore();
       }
 
       if (length) {
