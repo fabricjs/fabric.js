@@ -179,8 +179,30 @@
    * @param {Event} event
    */
   function getPointer(event) {
-    // TODO (kangax): this method needs fixing
-    return { x: pointerX(event), y: pointerY(event) };
+    
+    var element = event.target,
+        scrollLeft = 0,
+        scrollTop = 0,
+        firstFixedAncestor;
+    
+    do {
+      
+      element = element.parentNode;
+      
+      if (!firstFixedAncestor) {
+        if (element !== document && document.defaultView.getComputedStyle(element).position == 'fixed') firstFixedAncestor = element;
+      };
+      
+      scrollLeft += element.scrollLeft || 0;
+      scrollTop += element.scrollTop || 0;
+      
+    } while (element.parentNode && !firstFixedAncestor);
+    
+    return {
+      x: event.clientX + scrollLeft,
+      y: event.clientY + scrollTop
+    };
+    
   }
 
   function pointerX(event) {
