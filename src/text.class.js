@@ -328,7 +328,7 @@
               toFixed(lineTopOffset + (i === 0 ? this._shadowOffsets[j][1] : 0), 2),
               '" ',
               this._getFillAttributes(this._shadows[j].color), '>',
-              textLines[i],
+              fabric.util.string.escapeXml(textLines[i]),
             '</tspan>');
             lineTopOffsetMultiplier = 1;
           } else {
@@ -355,7 +355,7 @@
             toFixed(lineTopOffset * lineTopOffsetMultiplier, 2) , '" ',
             // doing this on <tspan> elements since setting opacity on containing <text> one doesn't work in Illustrator
             this._getFillAttributes(this.fill), '>',
-            textLines[i],
+            fabric.util.string.escapeXml(textLines[i]),
             '</tspan>'
           );
           lineTopOffsetMultiplier = 1;
