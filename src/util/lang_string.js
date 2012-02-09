@@ -1,3 +1,5 @@
+(function() {
+
 if (!String.prototype.trim) {
   /**
    * Trims a string (removing whitespace from the beginning and the end)
@@ -34,8 +36,18 @@ function capitalize(string) {
   return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
 }
 
+function escapeXml(string) {
+  return string.replace('&', '&amp;')
+     .replace('"', '&quot;')
+     .replace("'", '&apos;')
+     .replace("<", '&lt;')
+     .replace(">", '&gt;');
+}
+
 /** @namespace */
 fabric.util.string = {
   camelize: camelize,
-  capitalize: capitalize
+  capitalize: capitalize,
+  escapeXml: escapeXml
 };
+}());
