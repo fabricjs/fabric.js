@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2012, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.7.20" };
+var fabric = fabric || { version: "0.7.21" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -2199,6 +2199,8 @@ fabric.Observable = {
   };
   
 })();
+(function() {
+
 if (!String.prototype.trim) {
   /**
    * Trims a string (removing whitespace from the beginning and the end)
@@ -2235,11 +2237,22 @@ function capitalize(string) {
   return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
 }
 
+function escapeXml(string) {
+  return string.replace('&', '&amp;')
+     .replace('"', '&quot;')
+     .replace("'", '&apos;')
+     .replace("<", '&lt;')
+     .replace(">", '&gt;');
+}
+
 /** @namespace */
 fabric.util.string = {
   camelize: camelize,
-  capitalize: capitalize
+  capitalize: capitalize,
+  escapeXml: escapeXml
 };
+}());
+
 (function() {
   
   var slice = Array.prototype.slice,
@@ -4472,6 +4485,21 @@ fabric.util.string = {
     backgroundImage:        '',
 
     /**
+     * Opacity of the background image of the canvas instance
+     * @property
+     * @type Float
+     */
+    backgroundImageOpacity:      1.0,
+
+    /**
+     * Indicatus whether the background image should be stretched to fit the
+     * dimensions of the canvas instance.
+     * @property
+     * @type Boolean
+     */
+    backgroundImageStretch:      true,
+
+    /**
      * Indicates whether toObject/toDatalessObject should include default values
      * @property
      * @type Boolean
@@ -4577,12 +4605,19 @@ fabric.util.string = {
      * @method setBackgroundImage
      * @param {String} url url of an image to set background to
      * @param {Function} callback callback to invoke when image is loaded and set as background
+     * @param {Object} options optional options to set for the background image
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
-    setBackgroundImage: function (url, callback) {
+    setBackgroundImage: function (url, callback, options) {
       return fabric.util.loadImage(url, function(img) {
         this.backgroundImage = img;
+        if (options && options.backgroundOpacity) {
+            this.backgroundOpacity = options.backgroundOpacity;
+        }
+        if (options && options.backgroundStretch) {
+            this.backgroundStretch = options.backgroundStretch;
+        }
         callback && callback();
       }, this);
     },
@@ -4853,7 +4888,7 @@ fabric.util.string = {
         this.clearContext(this.contextTop);
       }
 
-      if (allOnTop === false) {
+      if (allOnTop === false || (typeof allOnTop === 'undefined')) {
         this.clearContext(canvasToDrawOn);
       }
 
@@ -4872,7 +4907,16 @@ fabric.util.string = {
       canvasToDrawOn.fillRect(0, 0, this.width, this.height);
 
       if (typeof this.backgroundImage == 'object') {
-        canvasToDrawOn.drawImage(this.backgroundImage, 0, 0, this.width, this.height);
+        canvasToDrawOn.save();
+        canvasToDrawOn.globalAlpha = this.backgroundImageOpacity;
+
+        if (this.backgroundImageStretch) {
+            canvasToDrawOn.drawImage(this.backgroundImage, 0, 0, this.width, this.height);
+        }
+        else {
+            canvasToDrawOn.drawImage(this.backgroundImage, 0, 0);
+        }
+        canvasToDrawOn.restore();
       }
 
       if (length) {
@@ -10802,18 +10846,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
     /**
      * @property
-     * @type Number
-     */
-    maxwidth: null,
-
-    /**
-     * @property
-     * @type Number
-     */
-    maxheight: null,
-
-    /**
-     * @property
      * @type Boolean
      */
     active: false,
@@ -10882,41 +10914,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       this._element = element;
       this._initConfig();
       return this;
-    },
-
-    /**
-     * Resizes an image depending on whether maxwidth and maxheight are set up;
-     * Width and height have to mantain the same proportion in the final image as it was in the initial one.
-     * @method getNormalizedSize
-     * @param {Object} oImg
-     * @param {Number} maxwidth maximum width of the image (in px)
-     * @param {Number} maxheight maximum height of the image (in px)
-     */
-    getNormalizedSize: function(oImg, maxwidth, maxheight) {
-      if (maxheight && maxwidth && (oImg.width > oImg.height && (oImg.width / oImg.height) < (maxwidth / maxheight))) {
-        // height is the constraining dimension.
-        normalizedWidth = ~~((oImg.width * maxheight) / oImg.height);
-        normalizedHeight = maxheight;
-      }
-      else if (maxheight && ((oImg.height == oImg.width) || (oImg.height > oImg.width) || (oImg.height > maxheight))) {
-        // height is the constraining dimension.
-        normalizedWidth = ~~((oImg.width * maxheight) / oImg.height);
-        normalizedHeight = maxheight;
-      }
-      else if (maxwidth && (maxwidth < oImg.width)) {
-        // width is the constraining dimension.
-        normalizedHeight = ~~((oImg.height * maxwidth) / oImg.width);
-        normalizedWidth = maxwidth;
-      }
-      else {
-        normalizedWidth = oImg.width;
-        normalizedHeight = oImg.height;
-      }
-
-      return {
-        width: normalizedWidth,
-        height: normalizedHeight
-      };
     },
 
     /**
@@ -11774,7 +11771,7 @@ fabric.Image.filters.Invert.fromObject = function() {
               toFixed(lineTopOffset + (i === 0 ? this._shadowOffsets[j][1] : 0), 2),
               '" ',
               this._getFillAttributes(this._shadows[j].color), '>',
-              textLines[i],
+              fabric.util.string.escapeXml(textLines[i]),
             '</tspan>');
             lineTopOffsetMultiplier = 1;
           } else {
@@ -11801,7 +11798,7 @@ fabric.Image.filters.Invert.fromObject = function() {
             toFixed(lineTopOffset * lineTopOffsetMultiplier, 2) , '" ',
             // doing this on <tspan> elements since setting opacity on containing <text> one doesn't work in Illustrator
             this._getFillAttributes(this.fill), '>',
-            textLines[i],
+            fabric.util.string.escapeXml(textLines[i]),
             '</tspan>'
           );
           lineTopOffsetMultiplier = 1;
