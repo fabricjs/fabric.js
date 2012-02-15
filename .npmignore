@@ -2,6 +2,7 @@ site/
 src/
 lib/
 .DS_Store
+HEADER.js
 start_server.js
 build_docs.js
 build.js
