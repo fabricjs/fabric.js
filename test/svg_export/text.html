@@ -345,4 +345,18 @@ title: SVG Export (text)
   canvas.add(text);
 </pre>
 
+<pre class="test-source">
+  var text = new fabric.Text('scaled text', { 
+    fontFamily: 'Delicious',
+    fill: 'purple',
+    left: 150,
+    top: 100,
+    fontSize: 20,
+    scaleX: 2,
+    scaleY: 2
+  });
+  text.path = '../../lib/fonts/Delicious.otf';
+  canvas.add(text);
+</pre>
+
 <script src="master.js"></script>

@@ -324,6 +324,27 @@ Should be set via `setBackgroundImage`</div>
 				</tr>
 			
 				<tr>
+					<td class="attributes">&nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont">
+						<b><a href="../symbols/fabric.StaticCanvas.html#backgroundImageOpacity">backgroundImageOpacity</a></b>
+						</div>
+						<div class="description">Opacity of the background image of the canvas instance</div>
+					</td>
+				</tr>
+			
+				<tr>
+					<td class="attributes">&nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont">
+						<b><a href="../symbols/fabric.StaticCanvas.html#backgroundImageStretch">backgroundImageStretch</a></b>
+						</div>
+						<div class="description">Indicatus whether the background image should be stretched to fit the 
+dimensions of the canvas instance.</div>
+					</td>
+				</tr>
+			
+				<tr>
 					<td class="attributes">&lt;constant&gt; &nbsp;</td>
 					<td class="nameDescription">
 						<div class="fixedFont">
@@ -691,7 +712,7 @@ This method is also attached as "resize" event handler of window</div>
 				<tr>
 					<td class="attributes">&nbsp;</td>
 					<td class="nameDescription">
-						<div class="fixedFont"><b><a href="../symbols/fabric.StaticCanvas.html#setBackgroundImage">setBackgroundImage</a></b>(url, callback)
+						<div class="fixedFont"><b><a href="../symbols/fabric.StaticCanvas.html#setBackgroundImage">setBackgroundImage</a></b>(url, callback, options)
 						</div>
 						<div class="description">Sets background image for this canvas</div>
 					</td>
@@ -747,7 +768,7 @@ This method is also attached as "resize" event handler of window</div>
 					<td class="nameDescription">
 						<div class="fixedFont">fabric.StaticCanvas.<b><a href="../symbols/fabric.StaticCanvas.html#.supports">supports</a></b>(methodName)
 						</div>
-						<div class="description">Provides a way to check support of some of the canvas methods 
+						<div class="description">Provides a way to check support of some of the canvas methods
 (either those of HTMLCanvasElement itself, or rendering context)</div>
 					</td>
 				</tr>
@@ -940,6 +961,51 @@ Should be set via `setBackgroundImage`
 
 			<hr />
 		
+			<a name="backgroundImageOpacity"> </a>
+			<div class="fixedFont">
+			
+			<span class="light">{Float}</span>
+			<b>backgroundImageOpacity</b>
+			
+			</div>
+			<div class="description">
+				Opacity of the background image of the canvas instance
+				
+				
+			</div>
+			
+			
+
+				
+				
+				
+				
+
+			<hr />
+		
+			<a name="backgroundImageStretch"> </a>
+			<div class="fixedFont">
+			
+			<span class="light">{Boolean}</span>
+			<b>backgroundImageStretch</b>
+			
+			</div>
+			<div class="description">
+				Indicatus whether the background image should be stretched to fit the 
+dimensions of the canvas instance.
+				
+				
+			</div>
+			
+			
+
+				
+				
+				
+				
+
+			<hr />
+		
 			<a name="CANVAS_HEIGHT"> </a>
 			<div class="fixedFont">&lt;constant&gt; 
 			
@@ -1081,8 +1147,8 @@ Being passed context as first argument. See clipping canvas area in https://gith
 			
 			</div>
 			<div class="description">
-				Indicates whether fabric.Canvas#add should also re-render canvas. 
-Disabling this option could give a great performance boost when adding a lot of objects to canvas at once 
+				Indicates whether fabric.Canvas#add should also re-render canvas.
+Disabling this option could give a great performance boost when adding a lot of objects to canvas at once
 (followed by a manual rendering after addition)
 				
 				
@@ -1843,7 +1909,7 @@ Returned value is an object with top and left properties
 			
 			</div>
 			<div class="description">
-				Inserts an object to canvas at specified index and renders canvas. 
+				Inserts an object to canvas at specified index and renders canvas.
 An object should be an instance of (or inherit from) fabric.Object
 				
 				
@@ -2211,7 +2277,7 @@ Also used to render the group selection box.
 			<div class="fixedFont">
 			
 			<span class="light">{<a href="../symbols/fabric.Canvas.html">fabric.Canvas</a>}</span>
-			<b>setBackgroundImage</b>(url, callback)
+			<b>setBackgroundImage</b>(url, callback, options)
 			
 			</div>
 			<div class="description">
@@ -2237,6 +2303,12 @@ Also used to render the group selection box.
 							
 						</dt>
 						<dd>callback to invoke when image is loaded and set as background</dd>
+					
+						<dt>
+							<span class="light fixedFont">{Object}</span> <b>options</b>
+							
+						</dt>
+						<dd>optional options to set for the background image</dd>
 					
 					</dl>
 				
@@ -2485,7 +2557,7 @@ Also used to render the group selection box.
 			
 			</div>
 			<div class="description">
-				Provides a way to check support of some of the canvas methods 
+				Provides a way to check support of some of the canvas methods
 (either those of HTMLCanvasElement itself, or rendering context)
 				
 				
@@ -2501,7 +2573,7 @@ Also used to render the group selection box.
 							<b>methodName</b>
 							
 						</dt>
-						<dd>{String} Method to check support for; 
+						<dd>{String} Method to check support for;
                            Could be one of "getImageData" or "toDataURL"</dd>
 					
 					</dl>
@@ -2513,7 +2585,7 @@ Also used to render the group selection box.
 					<dl class="detailList">
 					<dt class="heading">Returns:</dt>
 					
-						<dd><span class="light fixedFont">{Boolean | null}</span> `true` if method is supported (or at least exists), 
+						<dd><span class="light fixedFont">{Boolean | null}</span> `true` if method is supported (or at least exists),
                          `null` if canvas element or context can not be initialized</dd>
 					
 					</dl>
@@ -2855,5 +2927,5 @@ Also used to render the group selection box.
 <!-- ============================== footer ================================= -->
 <div class="fineprint" style="clear:both">
 	
-	Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Tue Jan 10 2012 14:11:59 GMT-0500 (EST)
+	Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Thu Feb 09 2012 18:27:40 GMT-0500 (EST)
 </div>
