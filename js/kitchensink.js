@@ -411,7 +411,7 @@
     var textSample = new fabric.Text(text.slice(0, getRandomInt(0, text.length)), { 
       left: getRandomInt(300, 550), 
       top: getRandomInt(500, 550),
-      fontFamily: 'delicious_500',
+      fontFamily: 'delicious',
       angle: getRandomInt(-10, 10),
       fill: '#' + getRandomColor(),
       scaleX: 0.5,

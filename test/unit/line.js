@@ -122,4 +122,11 @@
     equals(100, line.height);
   });
   
+  test('x1,y1 less than x2,y2 should work', function() {
+    var line = new fabric.Line([ 400, 200, 300, 400]);
+    
+    equals(100, line.width);
+    equals(200, line.height);
+  });
+  
 })();
