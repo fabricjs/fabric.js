@@ -294,7 +294,10 @@
 
           textAndBg = this._getSVGTextAndBg(lineTopOffset, textLeftOffset, textLines),
           shadowSpans = this._getSVGShadows(lineTopOffset, textLines);
-
+      
+      // move top offset by an ascent
+      textTopOffset += ((this._fontAscent / 5) * this.lineHeight);
+      
       return [
         '<g transform="', this.getSvgTransform(), '">',
           textAndBg.textBgRects.join(''),
@@ -328,7 +331,7 @@
               toFixed(lineTopOffset + (i === 0 ? this._shadowOffsets[j][1] : 0), 2),
               '" ',
               this._getFillAttributes(this._shadows[j].color), '>',
-              textLines[i],
+              fabric.util.string.escapeXml(textLines[i]),
             '</tspan>');
             lineTopOffsetMultiplier = 1;
           } else {
@@ -355,7 +358,7 @@
             toFixed(lineTopOffset * lineTopOffsetMultiplier, 2) , '" ',
             // doing this on <tspan> elements since setting opacity on containing <text> one doesn't work in Illustrator
             this._getFillAttributes(this.fill), '>',
-            textLines[i],
+            fabric.util.string.escapeXml(textLines[i]),
             '</tspan>'
           );
           lineTopOffsetMultiplier = 1;
@@ -374,7 +377,7 @@
             toFixed(textLeftOffset + this._boundaries[i].left, 2),
             '" y="',
             /* an offset that seems to straighten things out */
-            toFixed((lineTopOffset * i) - this.height / 2 + (this.lineHeight * 2.6), 2),
+            toFixed((lineTopOffset * i) - this.height / 2, 2),
             '" width="',
             toFixed(this._boundaries[i].width, 2),
             '" height="',

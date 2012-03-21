@@ -53,9 +53,9 @@
      * @type Float
      */
     backgroundImageOpacity:      1.0,
-    
+
     /**
-     * Indicatus whether the background image should be stretched to fit the 
+     * Indicatus whether the background image should be stretched to fit the
      * dimensions of the canvas instance.
      * @property
      * @type Boolean
@@ -451,7 +451,7 @@
         this.clearContext(this.contextTop);
       }
 
-      if (allOnTop === false) {
+      if (allOnTop === false || (typeof allOnTop === 'undefined')) {
         this.clearContext(canvasToDrawOn);
       }
 

@@ -49,8 +49,8 @@
     },
     
     _setWidthHeight: function() {
-      this.set('width', (this.x2 - this.x1) || 1);
-      this.set('height', (this.y2 - this.y1) || 1);
+      this.set('width', Math.abs(this.x2 - this.x1) || 1 /* prevent 0 width */);
+      this.set('height', Math.abs(this.y2 - this.y1) || 1 /* prevent 0 height */);
       this.set('left', this.x1 + this.width / 2);
       this.set('top', this.y1 + this.height / 2);
     },
@@ -71,9 +71,13 @@
     _render: function(ctx) {
       ctx.beginPath();
       
+      var xMultiplier = this.x1 > this.x2 ? -1 : 1,
+          yMultiplier = this.y1 > this.y2 ? -1 : 1;
+      
+      
       // move from center (of virtual box) to its left/top corner
-      ctx.moveTo(this.width === 1 ? 0 : (-this.width / 2), this.height === 1 ? 0 : (-this.height / 2));
-      ctx.lineTo(this.width === 1 ? 0 : (this.width / 2), this.height === 1 ? 0 : (this.height / 2));
+      ctx.moveTo(this.width === 1 ? 0 : (this.width / 2) * xMultiplier, this.height === 1 ? 0 : (this.height / 2) * yMultiplier);
+      ctx.lineTo(this.width === 1 ? 0 : (this.width / 2) * -xMultiplier, this.height === 1 ? 0 : (this.height / 2) * -yMultiplier);
       
       ctx.lineWidth = this.strokeWidth;
       

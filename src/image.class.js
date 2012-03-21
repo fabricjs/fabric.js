@@ -28,18 +28,6 @@
 
     /**
      * @property
-     * @type Number
-     */
-    maxwidth: null,
-
-    /**
-     * @property
-     * @type Number
-     */
-    maxheight: null,
-
-    /**
-     * @property
      * @type Boolean
      */
     active: false,
@@ -108,41 +96,6 @@
       this._element = element;
       this._initConfig();
       return this;
-    },
-
-    /**
-     * Resizes an image depending on whether maxwidth and maxheight are set up;
-     * Width and height have to mantain the same proportion in the final image as it was in the initial one.
-     * @method getNormalizedSize
-     * @param {Object} oImg
-     * @param {Number} maxwidth maximum width of the image (in px)
-     * @param {Number} maxheight maximum height of the image (in px)
-     */
-    getNormalizedSize: function(oImg, maxwidth, maxheight) {
-      if (maxheight && maxwidth && (oImg.width > oImg.height && (oImg.width / oImg.height) < (maxwidth / maxheight))) {
-        // height is the constraining dimension.
-        normalizedWidth = ~~((oImg.width * maxheight) / oImg.height);
-        normalizedHeight = maxheight;
-      }
-      else if (maxheight && ((oImg.height == oImg.width) || (oImg.height > oImg.width) || (oImg.height > maxheight))) {
-        // height is the constraining dimension.
-        normalizedWidth = ~~((oImg.width * maxheight) / oImg.height);
-        normalizedHeight = maxheight;
-      }
-      else if (maxwidth && (maxwidth < oImg.width)) {
-        // width is the constraining dimension.
-        normalizedHeight = ~~((oImg.height * maxwidth) / oImg.width);
-        normalizedWidth = maxwidth;
-      }
-      else {
-        normalizedWidth = oImg.width;
-        normalizedHeight = oImg.height;
-      }
-
-      return {
-        width: normalizedWidth,
-        height: normalizedHeight
-      };
     },
 
     /**
