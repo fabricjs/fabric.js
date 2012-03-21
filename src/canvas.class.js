@@ -247,8 +247,10 @@
       this._setCursor('');
 
       var _this = this;
+      // cloned event for IE to prevent Member Not Found error
+      var clonedEvent = fabric.util.object.clone(e);
       setTimeout(function () {
-        _this._setCursorFromEvent(e, target);
+        _this._setCursorFromEvent(clonedEvent, target);
       }, 50);
 
       this.fire('mouse:up', { target: target, e: e });

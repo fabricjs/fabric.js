@@ -180,23 +180,23 @@
    */
   function getPointer(event) {
     
-    var element = event.target,
+    var element = event.target || event.srcElement,
         scrollLeft = 0,
         scrollTop = 0,
         firstFixedAncestor;
     
-    do {
+    while (element.parentNode && !firstFixedAncestor) {
       
       element = element.parentNode;
       
       if (!firstFixedAncestor) {
-        if (element !== document && document.defaultView.getComputedStyle(element).position == 'fixed') firstFixedAncestor = element;
+        if (element !== document && fabric.util.getElementPosition(element) == 'fixed') firstFixedAncestor = element;
       };
       
       scrollLeft += element.scrollLeft || 0;
       scrollTop += element.scrollTop || 0;
       
-    } while (element.parentNode && !firstFixedAncestor);
+    }
     
     return {
       x: event.clientX + scrollLeft,

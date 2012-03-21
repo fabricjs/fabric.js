@@ -22,3 +22,5 @@ else {
  * @type boolean
  */
 fabric.isTouchSupported = "ontouchstart" in fabric.document.documentElement;
+
+fabric.canGetComputedStyle = !!(fabric.document.defaultView && fabric.document.defaultView.getComputedStyle);
