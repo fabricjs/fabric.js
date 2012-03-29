@@ -5257,7 +5257,7 @@ fabric.util.string = {
 
     /**
      * Moves an object one level up in stack of drawn objects
-     * @method sendForward
+     * @method bringForward
      * @param object {fabric.Object} Object to send
      * @return {fabric.Canvas} thisArg
      * @chainable
@@ -6720,7 +6720,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         if (typeof path !== 'string') {
           switch (obj.type) {
             case 'image':
-            case 'text':
               fabric[fabric.util.string.capitalize(obj.type)].fromObject(obj, function (o) {
                 onObjectLoaded(o, index);
               });

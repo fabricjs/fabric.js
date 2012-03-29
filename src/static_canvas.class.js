@@ -820,7 +820,7 @@
 
     /**
      * Moves an object one level up in stack of drawn objects
-     * @method sendForward
+     * @method bringForward
      * @param object {fabric.Object} Object to send
      * @return {fabric.Canvas} thisArg
      * @chainable
