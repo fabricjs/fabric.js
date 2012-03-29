@@ -60,9 +60,9 @@
 <span class='line'> 53</span>      * @type Float
 <span class='line'> 54</span>      */</span><span class="WHIT">
 <span class='line'> 55</span> </span><span class="WHIT">    </span><span class="NAME">backgroundImageOpacity</span><span class="PUNC">:</span><span class="WHIT">      </span><span class="NUMB">1.0</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 56</span> </span><span class="WHIT">    
-<span class='line'> 57</span>     </span><span class="COMM">/**
-<span class='line'> 58</span>      * Indicatus whether the background image should be stretched to fit the 
+<span class='line'> 56</span> 
+<span class='line'> 57</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'> 58</span>      * Indicatus whether the background image should be stretched to fit the
 <span class='line'> 59</span>      * dimensions of the canvas instance.
 <span class='line'> 60</span>      * @property
 <span class='line'> 61</span>      * @type Boolean
@@ -458,7 +458,7 @@
 <span class='line'>451</span> </span><span class="WHIT">        </span><span class="NAME">this.clearContext</span><span class="PUNC">(</span><span class="NAME">this.contextTop</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>452</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
 <span class='line'>453</span> 
-<span class='line'>454</span> </span><span class="WHIT">      </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">allOnTop</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>454</span> </span><span class="WHIT">      </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">allOnTop</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">typeof</span><span class="WHIT"> </span><span class="NAME">allOnTop</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="STRN">'undefined'</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
 <span class='line'>455</span> </span><span class="WHIT">        </span><span class="NAME">this.clearContext</span><span class="PUNC">(</span><span class="NAME">canvasToDrawOn</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>456</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
 <span class='line'>457</span> 
@@ -827,7 +827,7 @@
 <span class='line'>820</span> 
 <span class='line'>821</span> </span><span class="WHIT">    </span><span class="COMM">/**
 <span class='line'>822</span>      * Moves an object one level up in stack of drawn objects
-<span class='line'>823</span>      * @method sendForward
+<span class='line'>823</span>      * @method bringForward
 <span class='line'>824</span>      * @param object {fabric.Object} Object to send
 <span class='line'>825</span>      * @return {fabric.Canvas} thisArg
 <span class='line'>826</span>      * @chainable
