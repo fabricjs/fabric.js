@@ -11,7 +11,7 @@ body { font-family: Garamond, "Hoefler Text", "Times New Roman", Times, serif; m
 #header li { display: inline-block; }
 #header li a { display: inline-block; padding: 10px; color: pink; font-variant: small-caps; text-decoration: none; }
 #header li a:hover, #header li a:focus { text-decoration: underline; }
-#header li.github, #header li.twitter, #header li.flattr { float: right; }
+#header li.secondary { float: right; }
 #header li.flattr { margin-top: 9px; margin-right: 10px; margin-left: 5px }
 .github a, .twitter a { font-variant: normal !important; color: #cf909b !important; }
 .github span, .twitter span { color: pink }
