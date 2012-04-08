@@ -52,7 +52,7 @@
       this.setCoords(true);
       this.saveCoords();
       
-      this.activateAllObjects();
+      //this.activateAllObjects();
     },
     
     /**
@@ -101,15 +101,14 @@
     
     /**
      * Adds an object to a group; Then recalculates group's dimension, position.
-     * @method add
+     * @method addWithUpdate
      * @param {Object} object
      * @return {fabric.Group} thisArg
      * @chainable
      */
-    add: function(object) {
+    addWithUpdate: function(object) {
       this._restoreObjectsState();
       this.objects.push(object);
-      object.setActive(true);
       this._calcBounds();
       this._updateObjectsCoords();
       return this;
@@ -117,17 +116,41 @@
     
     /**
      * Removes an object from a group; Then recalculates group's dimension, position.
+     * @method removeWithUpdate
      * @param {Object} object
      * @return {fabric.Group} thisArg
      * @chainable
      */
-    remove: function(object) {
+    removeWithUpdate: function(object) {
       this._restoreObjectsState();
       removeFromArray(this.objects, object);
       object.setActive(false);
       this._calcBounds();
       this._updateObjectsCoords();
       return this;
+    },
+    
+    /**
+     * Adds an object to a group
+     * @method add
+     * @param {Object} object
+     * @return {fabric.Group} thisArg
+     * @chainable
+     */
+    add: function(object) {
+      this.objects.push(object);
+      return this;
+    },
+    
+    /**
+     * Removes an object from a group
+     * @method remove
+     * @param {Object} object
+     * @return {fabric.Group} thisArg
+     * @chainable
+     */
+    remove: function(object) {
+      removeFromArray(this.objects, object);
     },
     
     /**
@@ -192,7 +215,7 @@
      * @method render
      * @param {CanvasRenderingContext2D} ctx context to render instance on
      */
-    render: function(ctx) {
+    render: function(ctx, noTransform) {
       ctx.save();
       this.transform(ctx);
       
@@ -204,8 +227,10 @@
         object.render(ctx);
         object.borderScaleFactor = originalScaleFactor;
       }
-      this.hideBorders || this.drawBorders(ctx);
-      this.hideCorners || this.drawCorners(ctx);
+      if (!noTransform && this.active) {
+        this.drawBorders(ctx);
+        this.hideCorners || this.drawCorners(ctx);
+      }
       ctx.restore();
       this.setCoords();
     },
@@ -329,19 +354,8 @@
      * @chainable
      */
     activateAllObjects: function() {
-      return this.setActive(true);
-    },
-    
-    /**
-     * Activates (makes active) all group objects
-     * @method setActive
-     * @param {Boolean} value `true` to activate object, `false` otherwise
-     * @return {fabric.Group} thisArg
-     * @chainable
-     */
-    setActive: function(value) {
       this.forEachObject(function(object) {
-        object.setActive(value);
+        object.setActive();
       });
       return this;
     },
@@ -454,8 +468,13 @@
    * @param options {Object} options object
    * @return {fabric.Group} an instance of fabric.Group
    */
-  fabric.Group.fromObject = function(object) {
-    return new fabric.Group(object.objects, object);
+  fabric.Group.fromObject = function(object, callback) {
+    fabric.util.enlivenObjects(object.objects, function(enlivenedObjects) {
+      delete object.objects;
+      callback(new fabric.Group(enlivenedObjects, object));
+    });
   };
+  
+  fabric.Group.async = true;
   
 })(typeof exports != 'undefined' ? exports : this);

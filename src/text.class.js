@@ -491,5 +491,7 @@
   fabric.Text.fromElement = function(element) {
     // TODO (kangax): implement this
   };
+  
+  fabric.Text.async = true;
 
 })(typeof exports != 'undefined' ? exports : this);

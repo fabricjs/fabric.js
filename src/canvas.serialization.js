@@ -179,42 +179,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
    * @param {Function} callback
    */
   _enlivenObjects: function (objects, callback) {
-    var numLoadedImages = 0,
-        // get length of all images 
-        numTotalImages = objects.filter(function (o) {
-          return o.type === 'image';
-        }).length;
-    
     var _this = this;
-    
-    objects.forEach(function (o, index) {
-      if (!o.type) {
-        return;
-      }
-      switch (o.type) {
-        case 'image':
-        case 'font':
-          fabric[fabric.util.string.capitalize(o.type)].fromObject(o, function (o) {
-            _this.insertAt(o, index, true);
-            if (++numLoadedImages === numTotalImages) {
-              if (callback) {
-                callback();
-              }
-            }
-          });
-          break;
-        default:
-          var klass = fabric[fabric.util.string.camelize(fabric.util.string.capitalize(o.type))];
-          if (klass && klass.fromObject) {
-            _this.insertAt(klass.fromObject(o), index, true);
-          }
-          break;
-      }
+    fabric.util.enlivenObjects(objects, function(enlivenedObjects) {
+      enlivenedObjects.forEach(function(obj, index) {
+        _this.insertAt(obj, index, true);
+      });
     });
-    
-    if (numTotalImages === 0 && callback) {
-      callback();
-    }
   },
   
   /**

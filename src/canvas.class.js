@@ -225,7 +225,7 @@
       }
 
       this._currentTransform = null;
-
+      
       if (this._groupSelector) {
         // group selection was completed, determine its bounds
         this._findSelectedObjects(e);
@@ -285,7 +285,7 @@
           pointer = this.getPointer(e),
           activeGroup = this.getActiveGroup(), 
           corner;
-
+      
       if (this._shouldClearSelection(e)) {
 
         this._groupSelector = {
@@ -542,7 +542,7 @@
     },
 
     _handleGroupLogic: function (e, target) {
-      if (target.isType('group')) {
+      if (target === this.getActiveGroup()) {
         // if it's a group, find target again, this time skipping group
         target = this.findTarget(e, true);
         // if even object is not found, bail out
@@ -553,7 +553,7 @@
       var activeGroup = this.getActiveGroup();
       if (activeGroup) {
         if (activeGroup.contains(target)) {
-          activeGroup.remove(target);
+          activeGroup.removeWithUpdate(target);
           target.setActive(false);
           if (activeGroup.size() === 1) {
             // remove group alltogether if after removal it only contains 1 object
@@ -561,7 +561,7 @@
           }
         }
         else {
-          activeGroup.add(target);
+          activeGroup.addWithUpdate(target);
         }
         this.fire('selection:created', { target: activeGroup, e: e });
         activeGroup.setActive(true);
@@ -572,7 +572,7 @@
           // only if there's an active object
           if (target !== this._activeObject) {
             // and that object is not the actual target
-            var group = new fabric.Group([ this._activeObject,target ]);
+            var group = new fabric.Group([ this._activeObject, target ]);
             this.setActiveGroup(group);
             activeGroup = this.getActiveGroup();
           }
@@ -1011,6 +1011,7 @@
      */
     setActiveGroup: function (group) {
       this._activeGroup = group;
+      group && group.setActive(true);
       return this;
     },
     

@@ -1947,6 +1947,46 @@ fabric.Observable = {
       callback && callback.call(context, url);
     }
   }
+  
+  function enlivenObjects(objects, callback) {
+    
+    function getKlass(type) {
+      return fabric[fabric.util.string.camelize(fabric.util.string.capitalize(type))];
+    }
+    
+    var enlivenedObjects = [ ],
+        numLoadedAsyncObjects = 0,
+        // get length of all images 
+        numTotalAsyncObjects = objects.filter(function (o) {
+          return getKlass(o.type).async;
+        }).length;
+    
+    var _this = this;
+    
+    objects.forEach(function (o, index) {
+      if (!o.type) {
+        return;
+      }
+      var klass = getKlass(o.type);
+      if (klass.async) {
+        klass.fromObject(o, function (o) {
+          enlivenedObjects[index] = o;
+          if (++numLoadedAsyncObjects === numTotalAsyncObjects) {
+            if (callback) {
+              callback(enlivenedObjects);
+            }
+          }
+        });
+      }
+      else {
+        enlivenedObjects[index] = klass.fromObject(o);
+      }
+    });
+    
+    if (numTotalAsyncObjects === 0 && callback) {
+      callback(enlivenedObjects);
+    }
+  }
 
   fabric.util.removeFromArray = removeFromArray;
   fabric.util.degreesToRadians = degreesToRadians;
@@ -1956,6 +1996,7 @@ fabric.Observable = {
   fabric.util.animate = animate;
   fabric.util.requestAnimFrame = requestAnimFrame;
   fabric.util.loadImage = loadImage;
+  fabric.util.enlivenObjects = enlivenObjects;
 })();
 (function() {
   
@@ -5677,7 +5718,7 @@ fabric.util.string = {
       }
 
       this._currentTransform = null;
-
+      
       if (this._groupSelector) {
         // group selection was completed, determine its bounds
         this._findSelectedObjects(e);
@@ -5737,7 +5778,7 @@ fabric.util.string = {
           pointer = this.getPointer(e),
           activeGroup = this.getActiveGroup(), 
           corner;
-
+      
       if (this._shouldClearSelection(e)) {
 
         this._groupSelector = {
@@ -5994,7 +6035,7 @@ fabric.util.string = {
     },
 
     _handleGroupLogic: function (e, target) {
-      if (target.isType('group')) {
+      if (target === this.getActiveGroup()) {
         // if it's a group, find target again, this time skipping group
         target = this.findTarget(e, true);
         // if even object is not found, bail out
@@ -6005,7 +6046,7 @@ fabric.util.string = {
       var activeGroup = this.getActiveGroup();
       if (activeGroup) {
         if (activeGroup.contains(target)) {
-          activeGroup.remove(target);
+          activeGroup.removeWithUpdate(target);
           target.setActive(false);
           if (activeGroup.size() === 1) {
             // remove group alltogether if after removal it only contains 1 object
@@ -6013,7 +6054,7 @@ fabric.util.string = {
           }
         }
         else {
-          activeGroup.add(target);
+          activeGroup.addWithUpdate(target);
         }
         this.fire('selection:created', { target: activeGroup, e: e });
         activeGroup.setActive(true);
@@ -6024,7 +6065,7 @@ fabric.util.string = {
           // only if there's an active object
           if (target !== this._activeObject) {
             // and that object is not the actual target
-            var group = new fabric.Group([ this._activeObject,target ]);
+            var group = new fabric.Group([ this._activeObject, target ]);
             this.setActiveGroup(group);
             activeGroup = this.getActiveGroup();
           }
@@ -6463,6 +6504,7 @@ fabric.util.string = {
      */
     setActiveGroup: function (group) {
       this._activeGroup = group;
+      group && group.setActive(true);
       return this;
     },
     
@@ -6833,42 +6875,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
    * @param {Function} callback
    */
   _enlivenObjects: function (objects, callback) {
-    var numLoadedImages = 0,
-        // get length of all images 
-        numTotalImages = objects.filter(function (o) {
-          return o.type === 'image';
-        }).length;
-    
     var _this = this;
-    
-    objects.forEach(function (o, index) {
-      if (!o.type) {
-        return;
-      }
-      switch (o.type) {
-        case 'image':
-        case 'font':
-          fabric[fabric.util.string.capitalize(o.type)].fromObject(o, function (o) {
-            _this.insertAt(o, index, true);
-            if (++numLoadedImages === numTotalImages) {
-              if (callback) {
-                callback();
-              }
-            }
-          });
-          break;
-        default:
-          var klass = fabric[fabric.util.string.camelize(fabric.util.string.capitalize(o.type))];
-          if (klass && klass.fromObject) {
-            _this.insertAt(klass.fromObject(o), index, true);
-          }
-          break;
-      }
+    fabric.util.enlivenObjects(objects, function(enlivenedObjects) {
+      enlivenedObjects.forEach(function(obj, index) {
+        _this.insertAt(obj, index, true);
+      });
     });
-    
-    if (numTotalImages === 0 && callback) {
-      callback();
-    }
   },
   
   /**
@@ -10409,7 +10421,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       this.setCoords(true);
       this.saveCoords();
       
-      this.activateAllObjects();
+      //this.activateAllObjects();
     },
     
     /**
@@ -10458,15 +10470,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     
     /**
      * Adds an object to a group; Then recalculates group's dimension, position.
-     * @method add
+     * @method addWithUpdate
      * @param {Object} object
      * @return {fabric.Group} thisArg
      * @chainable
      */
-    add: function(object) {
+    addWithUpdate: function(object) {
       this._restoreObjectsState();
       this.objects.push(object);
-      object.setActive(true);
       this._calcBounds();
       this._updateObjectsCoords();
       return this;
@@ -10474,17 +10485,41 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     
     /**
      * Removes an object from a group; Then recalculates group's dimension, position.
+     * @method removeWithUpdate
      * @param {Object} object
      * @return {fabric.Group} thisArg
      * @chainable
      */
-    remove: function(object) {
+    removeWithUpdate: function(object) {
       this._restoreObjectsState();
       removeFromArray(this.objects, object);
       object.setActive(false);
       this._calcBounds();
       this._updateObjectsCoords();
       return this;
+    },
+    
+    /**
+     * Adds an object to a group
+     * @method add
+     * @param {Object} object
+     * @return {fabric.Group} thisArg
+     * @chainable
+     */
+    add: function(object) {
+      this.objects.push(object);
+      return this;
+    },
+    
+    /**
+     * Removes an object from a group
+     * @method remove
+     * @param {Object} object
+     * @return {fabric.Group} thisArg
+     * @chainable
+     */
+    remove: function(object) {
+      removeFromArray(this.objects, object);
     },
     
     /**
@@ -10549,7 +10584,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      * @method render
      * @param {CanvasRenderingContext2D} ctx context to render instance on
      */
-    render: function(ctx) {
+    render: function(ctx, noTransform) {
       ctx.save();
       this.transform(ctx);
       
@@ -10561,8 +10596,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         object.render(ctx);
         object.borderScaleFactor = originalScaleFactor;
       }
-      this.hideBorders || this.drawBorders(ctx);
-      this.hideCorners || this.drawCorners(ctx);
+      if (!noTransform && this.active) {
+        this.drawBorders(ctx);
+        this.hideCorners || this.drawCorners(ctx);
+      }
       ctx.restore();
       this.setCoords();
     },
@@ -10686,19 +10723,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      * @chainable
      */
     activateAllObjects: function() {
-      return this.setActive(true);
-    },
-    
-    /**
-     * Activates (makes active) all group objects
-     * @method setActive
-     * @param {Boolean} value `true` to activate object, `false` otherwise
-     * @return {fabric.Group} thisArg
-     * @chainable
-     */
-    setActive: function(value) {
       this.forEachObject(function(object) {
-        object.setActive(value);
+        object.setActive();
       });
       return this;
     },
@@ -10811,9 +10837,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
    * @param options {Object} options object
    * @return {fabric.Group} an instance of fabric.Group
    */
-  fabric.Group.fromObject = function(object) {
-    return new fabric.Group(object.objects, object);
+  fabric.Group.fromObject = function(object, callback) {
+    fabric.util.enlivenObjects(object.objects, function(enlivenedObjects) {
+      delete object.objects;
+      callback(new fabric.Group(enlivenedObjects, object));
+    });
   };
+  
+  fabric.Group.async = true;
   
 })(typeof exports != 'undefined' ? exports : this);
 //= require "object.class"
@@ -11268,7 +11299,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   fabric.Image.async = true;
 
 })(typeof exports != 'undefined' ? exports : this);
-
 /**
  * @namespace
  */
@@ -11934,9 +11964,10 @@ fabric.Image.filters.Invert.fromObject = function() {
   fabric.Text.fromElement = function(element) {
     // TODO (kangax): implement this
   };
+  
+  fabric.Text.async = true;
 
 })(typeof exports != 'undefined' ? exports : this);
-
 (function() {
   
   if (typeof document != 'undefined' && typeof window != 'undefined') {
