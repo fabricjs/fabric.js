@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2012, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.7.24" };
+var fabric = fabric || { version: "0.7.25" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -2568,10 +2568,10 @@ fabric.util.string = {
   
   if (fabric.isTouchSupported) {
     pointerX = function(event) {
-      return event.touches && event.touches[0].pageX;
+      return event.touches && event.touches[0] && event.touches[0].pageX;
     };
     pointerY = function(event) {
-      return event.touches && event.touches[0].pageY;
+      return event.touches && event.touches[0] && event.touches[0].pageY;
     };
   }
   

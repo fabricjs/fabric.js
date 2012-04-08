@@ -206,10 +206,10 @@
   
   if (fabric.isTouchSupported) {
     pointerX = function(event) {
-      return event.touches && event.touches[0].pageX;
+      return event.touches && event.touches[0] && event.touches[0].pageX;
     };
     pointerY = function(event) {
-      return event.touches && event.touches[0].pageY;
+      return event.touches && event.touches[0] && event.touches[0].pageY;
     };
   }
   
