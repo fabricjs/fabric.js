@@ -125,8 +125,9 @@ Follow [@fabric.js](http://twitter.com/fabricjs) or [@kangax](http://twitter.com
 ### Credits
 
 - Ernest Delgado for the original idea of [manipulating images on canvas](http://www.ernestdelgado.com/archive/canvas/).
-- [Maxim "hakunin" Chernyak](http://twitter.com/hakunin) for ideas, and help with various parts of the library.
+- [Maxim "hakunin" Chernyak](http://twitter.com/hakunin) for ideas, and help with various parts of the library throughout its life.
 - [Sergey Nisnevich](http://nisnya.com) for help with geometry logic.
+- Github contributors: @Kingsquare, @cleercode, @jarek-itmore, @sunrei, @khronnuz
 
 ### MIT License
 
