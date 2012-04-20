@@ -244,23 +244,38 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   /**
    * Clones canvas instance
    * @method clone
-   * @param {Object} [callback] Expects `onBeforeClone` and `onAfterClone` functions
-   * @return {fabric.Canvas} Clone of this instance
+   * @param {Object} [callback] Receives cloned instance as a first argument
    */
   clone: function (callback) {
+    var data = JSON.stringify(this);
+    this.cloneWithoutData(function(clone) {
+      clone.loadFromJSON(data, function() {
+        if (callback) {
+          callback(clone);
+        }
+      });
+    });
+  },
+  
+  /**
+   * Clones canvas instance without cloning existing data. 
+   * This essentially copies canvas dimensions, clipping properties, etc. 
+   * but leaves data empty (so that you can populate it with your own)
+   * @method cloneWithoutData
+   * @param {Object} [callback] Receives cloned instance as a first argument
+   */
+  cloneWithoutData: function(callback) {
     var el = fabric.document.createElement('canvas');
-    
+
     el.width = this.getWidth();
     el.height = this.getHeight();
-        
+
     // cache
     var clone = this.__clone || (this.__clone = new fabric.Canvas(el));
     clone.clipTo = this.clipTo;
-    
-    return clone.loadFromJSON(JSON.stringify(this.toJSON()), function () {
-      if (callback) {
-        callback(clone);
-      }
-    });
+
+    if (callback) {
+      callback(clone);
+    }
   }
 });
