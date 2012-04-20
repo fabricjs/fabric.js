@@ -4938,7 +4938,7 @@ fabric.util.string = {
       }
 
       if (this.overlayImage) {
-        this.contextTop.drawImage(this.overlayImage, 0, 0);
+        (this.contextTop || this.contextContainer).drawImage(this.overlayImage, 0, 0);
       }
 
       if (this.onFpsUpdate) {
