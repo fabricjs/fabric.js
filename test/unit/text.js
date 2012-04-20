@@ -24,7 +24,7 @@
     'opacity':        1, 
     'selectable':     true,
     'text':           'foo', 
-    'fontSize':       20, 
+    'fontSize':       40, 
     'fontWeight':     100, 
     'fontFamily':     'Modernist_One_400',
     'lineHeight':     1.6, 
