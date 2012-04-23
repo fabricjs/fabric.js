@@ -131,7 +131,7 @@ Follow [@fabric.js](http://twitter.com/fabricjs) or [@kangax](http://twitter.com
 
 ### MIT License
 
-Copyright (c) 2008-2012 Bitsonnet
+Copyright (c) 2008-2012 Printio (Juriy Zaytsev, Maxim Chernyak)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
