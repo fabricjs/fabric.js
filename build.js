@@ -57,6 +57,7 @@ var filesToInclude = [
   'src/observable.js',
   
   'src/util/misc.js',
+  'src/util/anim_ease.js',
   'src/util/lang_array.js',
   'src/util/lang_object.js',
   'src/util/lang_string.js',
@@ -66,7 +67,7 @@ var filesToInclude = [
   'src/util/dom_style.js',
   'src/util/dom_misc.js',
   'src/util/dom_request.js',
-  'src/util/anim_ease.js',
+  
   
   ifSpecifiedInclude('parser', 'src/parser.js'),
   
