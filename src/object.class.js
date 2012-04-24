@@ -1313,6 +1313,7 @@
       fabric.util.animate({
         startValue: options.from,
         endValue: to,
+        easing: options.easing,
         duration: options.duration,
         onChange: function(value) {
           obj.set(property, value);
