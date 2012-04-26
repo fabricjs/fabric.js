@@ -66,8 +66,9 @@ var filesToInclude = [
   'src/util/dom_style.js',
   'src/util/dom_misc.js',
   'src/util/dom_request.js',
-  'src/util/anim_ease.js',
   
+  ifSpecifiedInclude('easing', 'src/util/anim_ease.js'),
+
   ifSpecifiedInclude('parser', 'src/parser.js'),
   
   'src/gradient.js',
