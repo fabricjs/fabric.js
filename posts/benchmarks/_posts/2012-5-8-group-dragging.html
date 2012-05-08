@@ -1,0 +1,35 @@
+---
+layout: benchmark
+title: Group dragging
+---
+
+<style>
+  h3 { margin: 0; padding: 0; }
+</style>
+
+<p>Below is a group of ~2000 rectangles. Try dragging it, to see how responsive it is.</p>
+<canvas id="c" width="1200" height="600" style="border:1px solid #ccc"></canvas>
+
+<script>
+  (function() {
+
+    var canvas = new fabric.Canvas('c');
+    
+    var rects = [ ];
+    for (var i = 1; i <= 47; i++) {
+      for (var j = 1; j <= 42; j++) {
+        var rect = new fabric.Rect({
+          left: i*28,
+          top: j*18,
+          width: 20,
+          height: 10,
+          fill: 'green'
+        });
+        rects.push(rect);
+      }
+    }
+    
+    canvas.add(new fabric.Group(rects));
+
+  })();
+</script>
