@@ -583,7 +583,7 @@
             
         if (chunksParsed.length - 1 > commandLength) {
           for (var k = 1, klen = chunksParsed.length; k < klen; k += commandLength) {
-            result.push([command].concat(chunksParsed.slice(k, k + commandLength)));
+            result.push([ chunksParsed[0] ].concat(chunksParsed.slice(k, k + commandLength)));
           }
         }
         else {
