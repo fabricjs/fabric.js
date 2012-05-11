@@ -94,6 +94,8 @@ var filesToInclude = [
   'src/group.class.js',
   'src/image.class.js',
   
+  ifSpecifiedInclude('object_straightening', 'src/object_straightening.js'),
+  
   ifSpecifiedInclude('image_filters', 'src/image_filters.js'),
   
   ifSpecifiedInclude('text', 'src/text.class.js'),

@@ -1,5 +1,7 @@
 fabric.util.object.extend(fabric.StaticCanvas.prototype, {
-  
+
+  FX_DURATION: 500,
+
   /**
    * Centers object horizontally with animation.
    * @method fxCenterObjectH
@@ -69,20 +71,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   },
 
   /**
-   * Same as `fabric.Canvas#straightenObject`, but animated
-   * @method fxStraightenObject
-   * @param {fabric.Object} object Object to straighten
-   * @return {fabric.Canvas} thisArg
-   * @chainable
-   */
-  fxStraightenObject: function (object) {
-    object.fxStraighten({
-      onChange: this.renderAll.bind(this)
-    });
-    return this;
-  },
-
-  /**
    * Same as `fabric.Canvas#remove` but animated
    * @method fxRemove
    * @param {fabric.Object} object Object to remove
@@ -90,17 +78,32 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
    * @return {fabric.Canvas} thisArg
    * @chainable
    */
-  fxRemove: function (object, callback) {
-    var _this = this;
-    object.fxRemove({
-      onChange: this.renderAll.bind(this),
+  fxRemove: function (object, callbacks) {
+    callbacks = callbacks || { };
+
+    var empty = function() { },
+        onComplete = callbacks.onComplete || empty,
+        onChange = callbacks.onChange || empty,
+        _this = this;
+
+    fabric.util.animate({
+      startValue: object.get('opacity'),
+      endValue: 0,
+      duration: this.FX_DURATION,
+      onStart: function() {
+        object.setActive(false);
+      },
+      onChange: function(value) {
+        object.set('opacity', value);
+        _this.renderAll();
+        onChange();
+      },
       onComplete: function () {
         _this.remove(object);
-        if (typeof callback === 'function') {
-          callback();
-        }
+        onComplete();
       }
     });
+
     return this;
   }
 });

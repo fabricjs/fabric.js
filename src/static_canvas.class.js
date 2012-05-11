@@ -650,19 +650,6 @@
     },
 
     /**
-     * Straightens object, then rerenders canvas
-     * @method straightenObject
-     * @param {fabric.Object} object Object to straighten
-     * @return {fabric.Canvas} thisArg
-     * @chainable
-     */
-    straightenObject: function (object) {
-      object.straighten();
-      this.renderAll();
-      return this;
-    },
-
-    /**
      * Returs dataless JSON representation of canvas
      * @method toDatalessJSON
      * @return {String} json string

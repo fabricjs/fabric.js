@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2012, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.8.1" };
+var fabric = fabric || { version: "0.8.2" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -5087,19 +5087,6 @@ fabric.util.string = {
     },
 
     /**
-     * Straightens object, then rerenders canvas
-     * @method straightenObject
-     * @param {fabric.Object} object Object to straighten
-     * @return {fabric.Canvas} thisArg
-     * @chainable
-     */
-    straightenObject: function (object) {
-      object.straighten();
-      this.renderAll();
-      return this;
-    },
-
-    /**
      * Returs dataless JSON representation of canvas
      * @method toDatalessJSON
      * @return {String} json string
@@ -6547,7 +6534,9 @@ fabric.util.string = {
   fabric.Element = fabric.Canvas;
 })();
 fabric.util.object.extend(fabric.StaticCanvas.prototype, {
-  
+
+  FX_DURATION: 500,
+
   /**
    * Centers object horizontally with animation.
    * @method fxCenterObjectH
@@ -6617,20 +6606,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   },
 
   /**
-   * Same as `fabric.Canvas#straightenObject`, but animated
-   * @method fxStraightenObject
-   * @param {fabric.Object} object Object to straighten
-   * @return {fabric.Canvas} thisArg
-   * @chainable
-   */
-  fxStraightenObject: function (object) {
-    object.fxStraighten({
-      onChange: this.renderAll.bind(this)
-    });
-    return this;
-  },
-
-  /**
    * Same as `fabric.Canvas#remove` but animated
    * @method fxRemove
    * @param {fabric.Object} object Object to remove
@@ -6638,17 +6613,32 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
    * @return {fabric.Canvas} thisArg
    * @chainable
    */
-  fxRemove: function (object, callback) {
-    var _this = this;
-    object.fxRemove({
-      onChange: this.renderAll.bind(this),
+  fxRemove: function (object, callbacks) {
+    callbacks = callbacks || { };
+
+    var empty = function() { },
+        onComplete = callbacks.onComplete || empty,
+        onChange = callbacks.onChange || empty,
+        _this = this;
+
+    fabric.util.animate({
+      startValue: object.get('opacity'),
+      endValue: 0,
+      duration: this.FX_DURATION,
+      onStart: function() {
+        object.setActive(false);
+      },
+      onChange: function(value) {
+        object.set('opacity', value);
+        _this.renderAll();
+        onChange();
+      },
       onComplete: function () {
         _this.remove(object);
-        if (typeof callback === 'function') {
-          callback();
-        }
+        onComplete();
       }
     });
+
     return this;
   }
 });
@@ -6974,12 +6964,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      * @type Number
      */
     NUM_FRACTION_DIGITS:        2,
-
-    /**
-     * @constant
-     * @type Number
-     */
-    FX_DURATION:                500,
 
     /**
      * @constant
@@ -8117,106 +8101,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      * @return {Number}
      */
     complexity: function() {
-      return 0;
-    },
-
-    /**
-     * @method straighten
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-    straighten: function() {
-      var angle = this._getAngleValueForStraighten();
-      this.setAngle(angle);
-      return this;
-    },
-
-    /**
-     * @method fxStraighten
-     * @param {Object} callbacks
-     *                  - onComplete: invoked on completion
-     *                  - onChange: invoked on every step of animation
-     *
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-    fxStraighten: function(callbacks) {
-      callbacks = callbacks || { };
-
-      var empty = function() { },
-          onComplete = callbacks.onComplete || empty,
-          onChange = callbacks.onChange || empty,
-          _this = this;
-
-      fabric.util.animate({
-        startValue: this.get('angle'),
-        endValue: this._getAngleValueForStraighten(),
-        duration: this.FX_DURATION,
-        onChange: function(value) {
-          _this.setAngle(value);
-          onChange();
-        },
-        onComplete: function() {
-          _this.setCoords();
-          onComplete();
-        },
-        onStart: function() {
-          _this.setActive(false);
-        }
-      });
-
-      return this;
-    },
-
-    /**
-     * @method fxRemove
-     * @param {Object} callbacks
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-    fxRemove: function(callbacks) {
-      callbacks || (callbacks = { });
-
-      var empty = function() { },
-          onComplete = callbacks.onComplete || empty,
-          onChange = callbacks.onChange || empty,
-          _this = this;
-
-      fabric.util.animate({
-        startValue: this.get('opacity'),
-        endValue: 0,
-        duration: this.FX_DURATION,
-        onChange: function(value) {
-          _this.set('opacity', value);
-          onChange();
-        },
-        onComplete: onComplete,
-        onStart: function() {
-          _this.setActive(false);
-        }
-      });
-
-      return this;
-    },
-
-    /**
-     * @method _getAngleValueForStraighten
-     * @return {Number} angle value
-     * @private
-     */
-    _getAngleValueForStraighten: function() {
-      var angle = this.get('angle');
-
-      // TODO (kangax): can this be simplified?
-
-      if      (angle > -225 && angle <= -135) { return -180;  }
-      else if (angle > -135 && angle <= -45)  { return  -90;  }
-      else if (angle > -45  && angle <= 45)   { return    0;  }
-      else if (angle > 45   && angle <= 135)  { return   90;  }
-      else if (angle > 135  && angle <= 225 ) { return  180;  }
-      else if (angle > 225  && angle <= 315)  { return  270;  }
-      else if (angle > 315)                   { return  360;  }
-
       return 0;
     },
 
@@ -11283,6 +11167,107 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
 })(typeof exports != 'undefined' ? exports : this);
 
+fabric.util.object.extend(fabric.Object.prototype, {
+
+  /**
+   * @method _getAngleValueForStraighten
+   * @return {Number} angle value
+   * @private
+   */
+  _getAngleValueForStraighten: function() {
+    var angle = this.get('angle');
+
+    // TODO (kangax): can this be simplified?
+
+    if      (angle > -225 && angle <= -135) { return -180;  }
+    else if (angle > -135 && angle <= -45)  { return  -90;  }
+    else if (angle > -45  && angle <= 45)   { return    0;  }
+    else if (angle > 45   && angle <= 135)  { return   90;  }
+    else if (angle > 135  && angle <= 225 ) { return  180;  }
+    else if (angle > 225  && angle <= 315)  { return  270;  }
+    else if (angle > 315)                   { return  360;  }
+
+    return 0;
+  },
+
+  /**
+   * @method straighten
+   * @return {fabric.Object} thisArg
+   * @chainable
+   */
+  straighten: function() {
+    var angle = this._getAngleValueForStraighten();
+    this.setAngle(angle);
+    return this;
+  },
+
+  /**
+   * @method fxStraighten
+   * @param {Object} callbacks
+   *                  - onComplete: invoked on completion
+   *                  - onChange: invoked on every step of animation
+   *
+   * @return {fabric.Object} thisArg
+   * @chainable
+   */
+  fxStraighten: function(callbacks) {
+    callbacks = callbacks || { };
+
+    var empty = function() { },
+        onComplete = callbacks.onComplete || empty,
+        onChange = callbacks.onChange || empty,
+        _this = this;
+
+    fabric.util.animate({
+      startValue: this.get('angle'),
+      endValue: this._getAngleValueForStraighten(),
+      duration: this.FX_DURATION,
+      onChange: function(value) {
+        _this.setAngle(value);
+        onChange();
+      },
+      onComplete: function() {
+        _this.setCoords();
+        onComplete();
+      },
+      onStart: function() {
+        _this.setActive(false);
+      }
+    });
+
+    return this;
+  }
+});
+
+fabric.util.object.extend(fabric.StaticCanvas.prototype, {
+
+  /**
+   * Straightens object, then rerenders canvas
+   * @method straightenObject
+   * @param {fabric.Object} object Object to straighten
+   * @return {fabric.Canvas} thisArg
+   * @chainable
+   */
+  straightenObject: function (object) {
+    object.straighten();
+    this.renderAll();
+    return this;
+  },
+
+  /**
+   * Same as `fabric.Canvas#straightenObject`, but animated
+   * @method fxStraightenObject
+   * @param {fabric.Object} object Object to straighten
+   * @return {fabric.Canvas} thisArg
+   * @chainable
+   */
+  fxStraightenObject: function (object) {
+    object.fxStraighten({
+      onChange: this.renderAll.bind(this)
+    });
+    return this;
+  }
+});
 /**
  * @namespace
  */

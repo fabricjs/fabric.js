@@ -44,12 +44,6 @@
      * @constant
      * @type Number
      */
-    FX_DURATION:                500,
-
-    /**
-     * @constant
-     * @type Number
-     */
     MIN_SCALE_LIMIT:            0.1,
 
     /**
@@ -1182,106 +1176,6 @@
      * @return {Number}
      */
     complexity: function() {
-      return 0;
-    },
-
-    /**
-     * @method straighten
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-    straighten: function() {
-      var angle = this._getAngleValueForStraighten();
-      this.setAngle(angle);
-      return this;
-    },
-
-    /**
-     * @method fxStraighten
-     * @param {Object} callbacks
-     *                  - onComplete: invoked on completion
-     *                  - onChange: invoked on every step of animation
-     *
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-    fxStraighten: function(callbacks) {
-      callbacks = callbacks || { };
-
-      var empty = function() { },
-          onComplete = callbacks.onComplete || empty,
-          onChange = callbacks.onChange || empty,
-          _this = this;
-
-      fabric.util.animate({
-        startValue: this.get('angle'),
-        endValue: this._getAngleValueForStraighten(),
-        duration: this.FX_DURATION,
-        onChange: function(value) {
-          _this.setAngle(value);
-          onChange();
-        },
-        onComplete: function() {
-          _this.setCoords();
-          onComplete();
-        },
-        onStart: function() {
-          _this.setActive(false);
-        }
-      });
-
-      return this;
-    },
-
-    /**
-     * @method fxRemove
-     * @param {Object} callbacks
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-    fxRemove: function(callbacks) {
-      callbacks || (callbacks = { });
-
-      var empty = function() { },
-          onComplete = callbacks.onComplete || empty,
-          onChange = callbacks.onChange || empty,
-          _this = this;
-
-      fabric.util.animate({
-        startValue: this.get('opacity'),
-        endValue: 0,
-        duration: this.FX_DURATION,
-        onChange: function(value) {
-          _this.set('opacity', value);
-          onChange();
-        },
-        onComplete: onComplete,
-        onStart: function() {
-          _this.setActive(false);
-        }
-      });
-
-      return this;
-    },
-
-    /**
-     * @method _getAngleValueForStraighten
-     * @return {Number} angle value
-     * @private
-     */
-    _getAngleValueForStraighten: function() {
-      var angle = this.get('angle');
-
-      // TODO (kangax): can this be simplified?
-
-      if      (angle > -225 && angle <= -135) { return -180;  }
-      else if (angle > -135 && angle <= -45)  { return  -90;  }
-      else if (angle > -45  && angle <= 45)   { return    0;  }
-      else if (angle > 45   && angle <= 135)  { return   90;  }
-      else if (angle > 135  && angle <= 225 ) { return  180;  }
-      else if (angle > 225  && angle <= 315)  { return  270;  }
-      else if (angle > 315)                   { return  360;  }
-
       return 0;
     },
 
