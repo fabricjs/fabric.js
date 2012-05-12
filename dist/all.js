@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2012, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.8.2" };
+var fabric = fabric || { version: "0.8.3" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -1734,7 +1734,7 @@ if (typeof console !== 'undefined') {
  * @namespace
  */
 fabric.Observable = {
-  
+
   /**
    * Observes specified event
    * @method observe
@@ -1758,7 +1758,7 @@ fabric.Observable = {
       this.__eventListeners[eventName].push(handler);
     }
   },
-  
+
   /**
    * Stops event observing for a particular event handler
    * @method stopObserving
@@ -1773,14 +1773,14 @@ fabric.Observable = {
       fabric.util.removeFromArray(this.__eventListeners[eventName], handler);
     }
   },
-  
+
   /**
-   * Fires event with an optional memo object
+   * Fires event with an optional options object
    * @method fire
    * @param {String} eventName
-   * @param {Object} [memo]
+   * @param {Object} [options]
    */
-  fire: function(eventName, memo) {
+  fire: function(eventName, options) {
     if (!this.__eventListeners) {
       this.__eventListeners = { }
     }
@@ -1788,7 +1788,7 @@ fabric.Observable = {
     if (!listenersForEvent) return;
     for (var i = 0, len = listenersForEvent.length; i < len; i++) {
       // avoiding try/catch for perf. reasons
-      listenersForEvent[i]({ memo: memo });
+      listenersForEvent[i](options || { });
     }
   }
 };
