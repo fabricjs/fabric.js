@@ -348,27 +348,9 @@ ul.inheritsList {
 				<tr>
 					<td class="attributes">&nbsp;</td>
 					<td class="nameDescription">
-						<div class="fixedFont"><b><a href="../symbols/_global_.html#fxCenterObjectH">fxCenterObjectH</a></b>(object, callbacks)
+						<div class="fixedFont"><b><a href="../symbols/_global_.html#fxStraighten">fxStraighten</a></b>(callbacks)
 						</div>
-						<div class="description">Centers object horizontally with animation.</div>
-					</td>
-				</tr>
-			
-				<tr>
-					<td class="attributes">&nbsp;</td>
-					<td class="nameDescription">
-						<div class="fixedFont"><b><a href="../symbols/_global_.html#fxCenterObjectV">fxCenterObjectV</a></b>(object, callbacks)
-						</div>
-						<div class="description">Centers object vertically with animation.</div>
-					</td>
-				</tr>
-			
-				<tr>
-					<td class="attributes">&nbsp;</td>
-					<td class="nameDescription">
-						<div class="fixedFont"><b><a href="../symbols/_global_.html#fxRemove">fxRemove</a></b>(object, callback)
-						</div>
-						<div class="description">Same as `fabric.Canvas#remove` but animated</div>
+						<div class="description"></div>
 					</td>
 				</tr>
 			
@@ -416,6 +398,24 @@ JSON format must conform to the one of `fabric.Canvas#toJSON`</div>
 						<div class="fixedFont"><b><a href="../symbols/_global_.html#pointerY">pointerY</a></b>(event)
 						</div>
 						<div class="description"></div>
+					</td>
+				</tr>
+			
+				<tr>
+					<td class="attributes">&nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont"><b><a href="../symbols/_global_.html#straighten">straighten</a></b>()
+						</div>
+						<div class="description"></div>
+					</td>
+				</tr>
+			
+				<tr>
+					<td class="attributes">&nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont"><b><a href="../symbols/_global_.html#straightenObject">straightenObject</a></b>(object)
+						</div>
+						<div class="description">Straightens object, then rerenders canvas</div>
 					</td>
 				</tr>
 			
@@ -703,18 +703,18 @@ but leaves data empty (so that you can populate it with your own)
 
 			<hr />
 		
-			<a name="fxCenterObjectH"> </a>
+			<a name="fxStraighten"> </a>
 			<div class="fixedFont">
 			
-			<span class="light">{<a href="../symbols/fabric.Canvas.html">fabric.Canvas</a>}</span>
-			<b>fxCenterObjectH</b>(object, callbacks)
+			<span class="light">{<a href="../symbols/fabric.Object.html">fabric.Object</a>}</span>
+			<b>fxStraighten</b>(callbacks)
 			
 			</div>
 			<div class="description">
-				Centers object horizontally with animation.
+				
 				
 					<br />
-					<i>Defined in: </i> <a href="../symbols/src/src_canvas.animation.js.html">canvas.animation.js</a>.
+					<i>Defined in: </i> <a href="../symbols/src/src_object_straightening.js.html">object_straightening.js</a>.
 				
 				
 			</div>
@@ -724,18 +724,13 @@ but leaves data empty (so that you can populate it with your own)
 				
 					<dl class="detailList">
 					<dt class="heading">Parameters:</dt>
-					
-						<dt>
-							<span class="light fixedFont">{<a href="../symbols/fabric.Object.html">fabric.Object</a>}</span> <b>object</b>
-							
-						</dt>
-						<dd>Object to center</dd>
 					
 						<dt>
 							<span class="light fixedFont">{Object}</span> <b>callbacks</b>
-							<i>Optional</i>
+							
 						</dt>
-						<dd>Callbacks object with optional "onComplete" and/or "onChange" properties</dd>
+						<dd>- onComplete: invoked on completion
+                 - onChange: invoked on every step of animation</dd>
 					
 					</dl>
 				
@@ -746,111 +741,7 @@ but leaves data empty (so that you can populate it with your own)
 					<dl class="detailList">
 					<dt class="heading">Returns:</dt>
 					
-						<dd><span class="light fixedFont">{<a href="../symbols/fabric.Canvas.html">fabric.Canvas</a>}</span> thisArg</dd>
-					
-					</dl>
-				
-				
-				
-
-			<hr />
-		
-			<a name="fxCenterObjectV"> </a>
-			<div class="fixedFont">
-			
-			<span class="light">{<a href="../symbols/fabric.Canvas.html">fabric.Canvas</a>}</span>
-			<b>fxCenterObjectV</b>(object, callbacks)
-			
-			</div>
-			<div class="description">
-				Centers object vertically with animation.
-				
-					<br />
-					<i>Defined in: </i> <a href="../symbols/src/src_canvas.animation.js.html">canvas.animation.js</a>.
-				
-				
-			</div>
-			
-			
-			
-				
-					<dl class="detailList">
-					<dt class="heading">Parameters:</dt>
-					
-						<dt>
-							<span class="light fixedFont">{<a href="../symbols/fabric.Object.html">fabric.Object</a>}</span> <b>object</b>
-							
-						</dt>
-						<dd>Object to center</dd>
-					
-						<dt>
-							<span class="light fixedFont">{Object}</span> <b>callbacks</b>
-							<i>Optional</i>
-						</dt>
-						<dd>Callbacks object with optional "onComplete" and/or "onChange" properties</dd>
-					
-					</dl>
-				
-				
-				
-				
-				
-					<dl class="detailList">
-					<dt class="heading">Returns:</dt>
-					
-						<dd><span class="light fixedFont">{<a href="../symbols/fabric.Canvas.html">fabric.Canvas</a>}</span> thisArg</dd>
-					
-					</dl>
-				
-				
-				
-
-			<hr />
-		
-			<a name="fxRemove"> </a>
-			<div class="fixedFont">
-			
-			<span class="light">{<a href="../symbols/fabric.Canvas.html">fabric.Canvas</a>}</span>
-			<b>fxRemove</b>(object, callback)
-			
-			</div>
-			<div class="description">
-				Same as `fabric.Canvas#remove` but animated
-				
-					<br />
-					<i>Defined in: </i> <a href="../symbols/src/src_canvas.animation.js.html">canvas.animation.js</a>.
-				
-				
-			</div>
-			
-			
-			
-				
-					<dl class="detailList">
-					<dt class="heading">Parameters:</dt>
-					
-						<dt>
-							<span class="light fixedFont">{<a href="../symbols/fabric.Object.html">fabric.Object</a>}</span> <b>object</b>
-							
-						</dt>
-						<dd>Object to remove</dd>
-					
-						<dt>
-							<span class="light fixedFont">{<a href="../symbols/Function.html">Function</a>}</span> <b>callback</b>
-							
-						</dt>
-						<dd>Callback, invoked on effect completion</dd>
-					
-					</dl>
-				
-				
-				
-				
-				
-					<dl class="detailList">
-					<dt class="heading">Returns:</dt>
-					
-						<dd><span class="light fixedFont">{<a href="../symbols/fabric.Canvas.html">fabric.Canvas</a>}</span> thisArg</dd>
+						<dd><span class="light fixedFont">{<a href="../symbols/fabric.Object.html">fabric.Object</a>}</span> thisArg</dd>
 					
 					</dl>
 				
@@ -870,7 +761,7 @@ but leaves data empty (so that you can populate it with your own)
 				Same as `fabric.Canvas#straightenObject`, but animated
 				
 					<br />
-					<i>Defined in: </i> <a href="../symbols/src/src_canvas.animation.js.html">canvas.animation.js</a>.
+					<i>Defined in: </i> <a href="../symbols/src/src_object_straightening.js.html">object_straightening.js</a>.
 				
 				
 			</div>
@@ -1093,6 +984,87 @@ JSON format must conform to the one of `fabric.Canvas#toJSON`
 
 			<hr />
 		
+			<a name="straighten"> </a>
+			<div class="fixedFont">
+			
+			<span class="light">{<a href="../symbols/fabric.Object.html">fabric.Object</a>}</span>
+			<b>straighten</b>()
+			
+			</div>
+			<div class="description">
+				
+				
+					<br />
+					<i>Defined in: </i> <a href="../symbols/src/src_object_straightening.js.html">object_straightening.js</a>.
+				
+				
+			</div>
+			
+			
+			
+				
+				
+				
+				
+				
+					<dl class="detailList">
+					<dt class="heading">Returns:</dt>
+					
+						<dd><span class="light fixedFont">{<a href="../symbols/fabric.Object.html">fabric.Object</a>}</span> thisArg</dd>
+					
+					</dl>
+				
+				
+				
+
+			<hr />
+		
+			<a name="straightenObject"> </a>
+			<div class="fixedFont">
+			
+			<span class="light">{<a href="../symbols/fabric.Canvas.html">fabric.Canvas</a>}</span>
+			<b>straightenObject</b>(object)
+			
+			</div>
+			<div class="description">
+				Straightens object, then rerenders canvas
+				
+					<br />
+					<i>Defined in: </i> <a href="../symbols/src/src_object_straightening.js.html">object_straightening.js</a>.
+				
+				
+			</div>
+			
+			
+			
+				
+					<dl class="detailList">
+					<dt class="heading">Parameters:</dt>
+					
+						<dt>
+							<span class="light fixedFont">{<a href="../symbols/fabric.Object.html">fabric.Object</a>}</span> <b>object</b>
+							
+						</dt>
+						<dd>Object to straighten</dd>
+					
+					</dl>
+				
+				
+				
+				
+				
+					<dl class="detailList">
+					<dt class="heading">Returns:</dt>
+					
+						<dd><span class="light fixedFont">{<a href="../symbols/fabric.Canvas.html">fabric.Canvas</a>}</span> thisArg</dd>
+					
+					</dl>
+				
+				
+				
+
+			<hr />
+		
 			<a name="toArray"> </a>
 			<div class="fixedFont">
 			
@@ -1144,5 +1116,5 @@ JSON format must conform to the one of `fabric.Canvas#toJSON`
 <!-- ============================== footer ================================= -->
 <div class="fineprint" style="clear:both">
 	
-	Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Fri Apr 20 2012 13:09:02 GMT+0200 (CEST)
+	Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Fri May 11 2012 15:42:35 GMT+0400 (MSK)
 </div>

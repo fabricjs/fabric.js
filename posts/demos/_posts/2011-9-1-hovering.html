@@ -33,12 +33,12 @@ canvas.findTarget = (function(originalFn) {
 // in this example, object is set to red color on hover over and green color on hover out
 
 canvas.observe('object:over', function(e) {
-  e.memo.target.setFill('red');
+  e.target.setFill('red');
   canvas.renderAll();
 });
 
 canvas.observe('object:out', function(e) {
-  e.memo.target.setFill('green');
+  e.target.setFill('green');
   canvas.renderAll();
 });
 
@@ -46,7 +46,7 @@ canvas.observe('object:out', function(e) {
 for (var i = 15; i--; ) {
   var dim = fabric.util.getRandomInt(30, 60);
   var klass = ['Rect', 'Triangle', 'Circle'][fabric.util.getRandomInt(0,2)];
-  var options = { 
+  var options = {
     top: fabric.util.getRandomInt(0, 600),
     left: fabric.util.getRandomInt(0, 600),
     fill: 'green'

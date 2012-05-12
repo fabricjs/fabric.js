@@ -83,22 +83,22 @@ fabric.instances.push(canvas)})();
 
   canvas.observe({
     'mouse:down': function(e) {
-      if (e.memo.target) {
-        e.memo.target.opacity = 0.5;
+      if (e.target) {
+        e.target.opacity = 0.5;
         canvas.renderAll();
       }
     },
     'mouse:up': function(e) {
-      if (e.memo.target) {
-        e.memo.target.opacity = 1;
+      if (e.target) {
+        e.target.opacity = 1;
         canvas.renderAll();
       }
     },
     'object:moved': function(e) {
-      e.memo.target.opacity = 0.5;
+      e.target.opacity = 0.5;
     },
     'object:modified': function(e) {
-      e.memo.target.opacity = 1;
+      e.target.opacity = 1;
     }
   });
 fabric.instances.push(canvas)})();
@@ -129,31 +129,31 @@ fabric.instances.push(canvas)})();
   canvas.forEachObject(function(o){ o.hasBorder = o.hasControls = false; });
 
   canvas.HOVER_CURSOR = 'pointer';
-  
+
   function animate(e, dir) {
-    if (e.memo.target) {
+    if (e.target) {
       fabric.util.animate({
-        startValue: e.memo.target.get('angle'),
-        endValue: e.memo.target.get('angle') + (dir ? 10 : -10),
+        startValue: e.target.get('angle'),
+        endValue: e.target.get('angle') + (dir ? 10 : -10),
         duration: 100,
         onChange: function(value) {
-          e.memo.target.setAngle(value);
+          e.target.setAngle(value);
           canvas.renderAll();
         },
         onComplete: function() {
-          e.memo.target.setCoords();
+          e.target.setCoords();
         }
       });
       fabric.util.animate({
-        startValue: e.memo.target.get('scaleX'),
-        endValue: e.memo.target.get('scaleX') + (dir ? 0.2 : -0.2),
+        startValue: e.target.get('scaleX'),
+        endValue: e.target.get('scaleX') + (dir ? 0.2 : -0.2),
         duration: 100,
         onChange: function(value) {
-          e.memo.target.scale(value);
+          e.target.scale(value);
           canvas.renderAll();
         },
         onComplete: function() {
-          e.memo.target.setCoords();
+          e.target.setCoords();
         }
       });
     }
@@ -309,11 +309,11 @@ fabric.instances.push(canvas)})();
         preEl.innerHTML = scriptEls[i].innerHTML
           .replace(/^\n*\(function\(\){\n/g, '')
           .replace(/(fabric\.instances\.push\(canvas\))?\}\)\(\);\n*$/g, '');
-          
+
         scriptEls[i].parentNode.appendChild(preEl);
       }
     }
-    
+
     for (var i = fabric.instances.length; i--; ) {
       fabric.instances[i].calcOffset();
     }

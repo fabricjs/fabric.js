@@ -9,8 +9,8 @@
 <span class='line'>  2</span>  * @namespace
 <span class='line'>  3</span>  */</span><span class="WHIT">
 <span class='line'>  4</span> </span><span class="NAME">fabric.Observable</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>  5</span> </span><span class="WHIT">  
-<span class='line'>  6</span>   </span><span class="COMM">/**
+<span class='line'>  5</span> 
+<span class='line'>  6</span> </span><span class="WHIT">  </span><span class="COMM">/**
 <span class='line'>  7</span>    * Observes specified event
 <span class='line'>  8</span>    * @method observe
 <span class='line'>  9</span>    * @param {String} eventName
@@ -33,8 +33,8 @@
 <span class='line'> 26</span> </span><span class="WHIT">      </span><span class="NAME">this.__eventListeners</span><span class="PUNC">[</span><span class="NAME">eventName</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">push</span><span class="PUNC">(</span><span class="NAME">handler</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'> 27</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
 <span class='line'> 28</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 29</span> </span><span class="WHIT">  
-<span class='line'> 30</span>   </span><span class="COMM">/**
+<span class='line'> 29</span> 
+<span class='line'> 30</span> </span><span class="WHIT">  </span><span class="COMM">/**
 <span class='line'> 31</span>    * Stops event observing for a particular event handler
 <span class='line'> 32</span>    * @method stopObserving
 <span class='line'> 33</span>    * @param {String} eventName
@@ -48,14 +48,14 @@
 <span class='line'> 41</span> </span><span class="WHIT">      </span><span class="NAME">fabric.util.removeFromArray</span><span class="PUNC">(</span><span class="NAME">this.__eventListeners</span><span class="PUNC">[</span><span class="NAME">eventName</span><span class="PUNC">]</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">handler</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'> 42</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
 <span class='line'> 43</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 44</span> </span><span class="WHIT">  
-<span class='line'> 45</span>   </span><span class="COMM">/**
-<span class='line'> 46</span>    * Fires event with an optional memo object
+<span class='line'> 44</span> 
+<span class='line'> 45</span> </span><span class="WHIT">  </span><span class="COMM">/**
+<span class='line'> 46</span>    * Fires event with an optional options object
 <span class='line'> 47</span>    * @method fire
 <span class='line'> 48</span>    * @param {String} eventName
-<span class='line'> 49</span>    * @param {Object} [memo]
+<span class='line'> 49</span>    * @param {Object} [options]
 <span class='line'> 50</span>    */</span><span class="WHIT">
-<span class='line'> 51</span> </span><span class="WHIT">  </span><span class="NAME">fire</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">eventName</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">memo</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 51</span> </span><span class="WHIT">  </span><span class="NAME">fire</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">eventName</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">options</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
 <span class='line'> 52</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">this.__eventListeners</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
 <span class='line'> 53</span> </span><span class="WHIT">      </span><span class="NAME">this.__eventListeners</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="PUNC">}</span><span class="WHIT">
 <span class='line'> 54</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
@@ -63,7 +63,7 @@
 <span class='line'> 56</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">listenersForEvent</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">return</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'> 57</span> </span><span class="WHIT">    </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">len</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">listenersForEvent.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">len</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
 <span class='line'> 58</span> </span><span class="WHIT">      </span><span class="COMM">// avoiding try/catch for perf. reasons</span><span class="WHIT">
-<span class='line'> 59</span> </span><span class="WHIT">      </span><span class="NAME">listenersForEvent</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">(</span><span class="PUNC">{</span><span class="WHIT"> </span><span class="NAME">memo</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">memo</span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 59</span> </span><span class="WHIT">      </span><span class="NAME">listenersForEvent</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">(</span><span class="NAME">options</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'> 60</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
 <span class='line'> 61</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="WHIT">
 <span class='line'> 62</span> </span><span class="PUNC">}</span><span class="PUNC">;</span></pre></body></html>

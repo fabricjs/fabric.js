@@ -1,27 +1,27 @@
 (function(global) {
-  
+
   "use strict";
-  
+
   function pad(str, length) {
     while (str.length < length) {
       str = '0' + str;
     }
     return str;
    };
-  
+
   var getRandomInt = fabric.util.getRandomInt;
   function getRandomColor() {
     return (
-      pad(getRandomInt(0, 255).toString(16), 2) + 
-      pad(getRandomInt(0, 255).toString(16), 2) + 
+      pad(getRandomInt(0, 255).toString(16), 2) +
+      pad(getRandomInt(0, 255).toString(16), 2) +
       pad(getRandomInt(0, 255).toString(16), 2)
     );
   }
-  
+
   function getRandomNum(min, max) {
     return Math.random() * (max - min) + min;
   }
-  
+
   var canvas = global.canvas = new fabric.Canvas('canvas', {
     /*
     clipTo: function(canvas) {
@@ -29,28 +29,22 @@
     }
     */
   });
-  
-  var fpsEl = document.getElementById('fps').firstChild;
-  
-  canvas.onFpsUpdate = function(fps) {
-    fpsEl.nodeValue = 'FPS: ' + fps;
-  };
-  
+
   document.getElementById('commands').onclick = function(ev) {
     ev = ev || window.event;
-    
+
     if (ev.preventDefault) {
       ev.preventDefault()
     }
     else if (ev.returnValue) {
       ev.returnValue = false;
     }
-    
+
     var element = ev.target || ev.srcElement;
     if (element.nodeName.toLowerCase() === 'strong') {
       element = element.parentNode;
     }
-    
+
     var className = element.className,
         offset = 50,
         left = fabric.util.getRandomInt(0 + offset, 700 - offset),
@@ -58,40 +52,40 @@
         angle = fabric.util.getRandomInt(-20, 40),
         width = fabric.util.getRandomInt(30, 50),
         opacity = (function(min, max){ return Math.random() * (max - min) + min; })(0.5, 1);
-    
+
     switch (className) {
       case 'rect':
-        canvas.add(new fabric.Rect({ 
-          left: left, 
-          top: top, 
-          fill: '#' + getRandomColor(), 
-          width: 50, 
-          height: 50, 
-          opacity: 0.8 
+        canvas.add(new fabric.Rect({
+          left: left,
+          top: top,
+          fill: '#' + getRandomColor(),
+          width: 50,
+          height: 50,
+          opacity: 0.8
         }));
         break;
-        
+
       case 'circle':
-        canvas.add(new fabric.Circle({ 
-          left: left, 
-          top: top, 
-          fill: '#' + getRandomColor(), 
-          radius: 50, 
-          opacity: 0.8 
+        canvas.add(new fabric.Circle({
+          left: left,
+          top: top,
+          fill: '#' + getRandomColor(),
+          radius: 50,
+          opacity: 0.8
         }));
         break;
-      
+
       case 'triangle':
-        canvas.add(new fabric.Triangle({ 
-          left: left, 
-          top: top, 
-          fill: '#' + getRandomColor(), 
-          width: 50, 
-          height: 50, 
-          opacity: 0.8 
+        canvas.add(new fabric.Triangle({
+          left: left,
+          top: top,
+          fill: '#' + getRandomColor(),
+          width: 50,
+          height: 50,
+          opacity: 0.8
         }));
         break;
-      
+
       case 'image1':
         fabric.Image.fromURL('../assets/pug.jpg', function(image) {
           image.set({
@@ -103,7 +97,7 @@
           canvas.add(image);
         });
         break;
-      
+
       case 'image2':
         fabric.Image.fromURL('../assets/logo.png', function(image) {
           image.set({
@@ -116,12 +110,12 @@
           updateComplexity();
         });
         break;
-      
+
       case 'shape':
         var id = element.id, match;
         if (match = /\d+$/.exec(id)) {
           fabric.loadSVGFromURL('../assets/' + match[0] + '.svg', function(objects, options) {
-            
+
             var loadedObject;
             if (objects.length > 1) {
               loadedObject = new fabric.PathGroup(objects, options);
@@ -129,21 +123,21 @@
             else {
               loadedObject = objects[0];
             }
-            
+
             loadedObject.set({
               left: left,
               top: top,
               angle: angle
             });
             loadedObject.scaleToWidth(300).setCoords();
-              
+
             canvas.add(loadedObject);
             updateComplexity();
             canvas.calcOffset();
           });
         }
         break;
-      
+
       case 'clear':
         if (confirm('Are you sure?')) {
           canvas.clear();
@@ -151,20 +145,20 @@
     }
     updateComplexity();
   };
-  
+
   function updateComplexity() {
     setTimeout(function(){
       document.getElementById('complexity').childNodes[1].innerHTML = ' ' + canvas.complexity();
     }, 100);
   }
-  
+
   document.getElementById('execute').onclick = function() {
     var code = document.getElementById('canvas-console').value;
     if (!(/^\s+$/).test(code)) {
       eval(code);
     }
   };
-  
+
   document.getElementById('rasterize').onclick = function() {
     if (!fabric.Canvas.supports('toDataURL')) {
       alert('This browser doesn\'t provide means to serialize canvas to an image');
@@ -173,7 +167,7 @@
       window.open(canvas.toDataURL('png'));
     }
   };
-  
+
   var removeSelectedEl = document.getElementById('remove-selected');
   removeSelectedEl.onclick = function() {
     var activeObject = canvas.getActiveObject(),
@@ -189,7 +183,7 @@
       });
     }
   };
-  
+
   var supportsInputOfType = function(type) {
     return function() {
       var el = document.createElement('input');
@@ -200,10 +194,10 @@
       return el.type === type;
     };
   };
-  
+
   var supportsSlider = supportsInputOfType('range'),
       supportsColorpicker = supportsInputOfType('color');
-  
+
   if (supportsSlider()) {
     (function(){
       var controls = document.getElementById('controls');
@@ -213,9 +207,9 @@
       sliderLabel.innerHTML = 'Opacity: ';
 
       var slider = document.createElement('input');
-      
+
       try { slider.type = 'range'; } catch(err) { }
-      
+
       slider.id = 'opacity';
       slider.value = 100;
 
@@ -235,7 +229,7 @@
       };
     })();
   }
-  
+
   if (supportsColorpicker()) {
     (function(){
       var controls = document.getElementById('controls');
@@ -266,74 +260,74 @@
       };
     })();
   }
-  
+
   var lockHorizontallyEl = document.getElementById('lock-horizontally');
   lockHorizontallyEl.onclick = function() {
     var activeObject = canvas.getActiveObject();
     if (activeObject) {
       activeObject.lockMovementX = !activeObject.lockMovementX;
-      lockHorizontallyEl.innerHTML = activeObject.lockMovementX 
-        ? 'Unlock horizontal movement' 
+      lockHorizontallyEl.innerHTML = activeObject.lockMovementX
+        ? 'Unlock horizontal movement'
         : 'Lock horizontal movement';
     }
   };
-  
+
   var lockVerticallyEl = document.getElementById('lock-vertically');
   lockVerticallyEl.onclick = function() {
     var activeObject = canvas.getActiveObject();
     if (activeObject) {
       activeObject.lockMovementY = !activeObject.lockMovementY;
-      lockVerticallyEl.innerHTML = activeObject.lockMovementY 
-        ? 'Unlock vertical movement' 
+      lockVerticallyEl.innerHTML = activeObject.lockMovementY
+        ? 'Unlock vertical movement'
         : 'Lock vertical movement';
     }
   };
-  
+
   var lockScalingXEl = document.getElementById('lock-scaling-x');
   lockScalingXEl.onclick = function() {
     var activeObject = canvas.getActiveObject();
     if (activeObject) {
       activeObject.lockScalingX = !activeObject.lockScalingX;
       lockScalingXEl.innerHTML = activeObject.lockScalingX
-        ? 'Unlock horizontal scaling' 
+        ? 'Unlock horizontal scaling'
         : 'Lock horizontal scaling';
     }
   };
-  
+
   var lockScalingYEl = document.getElementById('lock-scaling-y');
   lockScalingYEl.onclick = function() {
     var activeObject = canvas.getActiveObject();
     if (activeObject) {
       activeObject.lockScalingY = !activeObject.lockScalingY;
       lockScalingYEl.innerHTML = activeObject.lockScalingY
-        ? 'Unlock vertical scaling' 
+        ? 'Unlock vertical scaling'
         : 'Lock vertical scaling';
     }
   };
-  
+
   var lockRotationEl = document.getElementById('lock-rotation');
   lockRotationEl.onclick = function() {
     var activeObject = canvas.getActiveObject();
     if (activeObject) {
       activeObject.lockRotation = !activeObject.lockRotation;
       lockRotationEl.innerHTML = activeObject.lockRotation
-        ? 'Unlock rotation' 
+        ? 'Unlock rotation'
         : 'Lock rotation';
     }
   };
-  
+
   var gradientifyBtn = document.getElementById('gradientify');
-  
-  var activeObjectButtons = [ 
-    lockHorizontallyEl, 
-    lockVerticallyEl, 
-    lockScalingXEl, 
+
+  var activeObjectButtons = [
+    lockHorizontallyEl,
+    lockVerticallyEl,
+    lockScalingXEl,
     lockScalingYEl,
-    lockRotationEl, 
+    lockRotationEl,
     removeSelectedEl,
     gradientifyBtn
   ];
-  
+
   var opacityEl = document.getElementById('opacity');
   if (opacityEl) {
     activeObjectButtons.push(opacityEl);
@@ -342,39 +336,39 @@
   if (colorEl) {
     activeObjectButtons.push(colorEl);
   }
-  
+
   for (var i = activeObjectButtons.length; i--; ) {
     activeObjectButtons[i].disabled = true;
   }
-  
+
   canvas.observe('object:selected', onObjectSelected);
   canvas.observe('group:selected', onObjectSelected);
-  
+
   function onObjectSelected(e) {
-    var selectedObject = e.memo.target;
-    
+    var selectedObject = e.target;
+
     for (var i = activeObjectButtons.length; i--; ) {
       activeObjectButtons[i].disabled = false;
     }
-    
+
     lockHorizontallyEl.innerHTML = (selectedObject.lockMovementX ? 'Unlock horizontal movement' : 'Lock horizontal movement');
     lockVerticallyEl.innerHTML = (selectedObject.lockMovementY ? 'Unlock vertical movement' : 'Lock vertical movement');
     lockScalingXEl.innerHTML = (selectedObject.lockScalingX ? 'Unlock horizontal scaling' : 'Lock horizontal scaling');
     lockScalingYEl.innerHTML = (selectedObject.lockScalingY ? 'Unlock vertical scaling' : 'Lock vertical scaling');
     lockRotationEl.innerHTML = (selectedObject.lockRotation ? 'Unlock rotation' : 'Lock rotation');
   }
-  
+
   canvas.observe('selection:cleared', function(e) {
     for (var i = activeObjectButtons.length; i--; ) {
       activeObjectButtons[i].disabled = true;
     }
   });
-  
+
   var drawingModeEl = document.getElementById('drawing-mode'),
       drawingOptionsEl = document.getElementById('drawing-mode-options'),
       drawingColorEl = document.getElementById('drawing-color'),
       drawingLineWidthEl = document.getElementById('drawing-line-width');
-      
+
   drawingModeEl.onclick = function() {
     canvas.isDrawingMode = !canvas.isDrawingMode;
     if (canvas.isDrawingMode) {
@@ -388,28 +382,28 @@
       drawingOptionsEl.style.display = 'none';
     }
   };
-  
+
   canvas.observe('path:created', function() {
     updateComplexity();
   });
-  
+
   drawingColorEl.onchange = function() {
     canvas.freeDrawingColor = drawingColorEl.value;
   };
   drawingLineWidthEl.onchange = function() {
     canvas.freeDrawingLineWidth = parseInt(drawingLineWidthEl.value, 10) || 1; // disallow 0, NaN, etc.
   };
-  
+
   canvas.freeDrawingColor = drawingColorEl.value;
   canvas.freeDrawingLineWidth = parseInt(drawingLineWidthEl.value, 10) || 1;
-  
-  
+
+
   var text = 'Lorem ipsum dolor sit amet,\nconsectetur adipisicing elit,\nsed do eiusmod tempor incididunt\nut labore et dolore magna aliqua.\n' +
     'Ut enim ad minim veniam,\nquis nostrud exercitation ullamco\nlaboris nisi ut aliquip ex ea commodo consequat.';
-  
+
   document.getElementById('add-text').onclick = function() {
-    var textSample = new fabric.Text(text.slice(0, getRandomInt(0, text.length)), { 
-      left: getRandomInt(300, 550), 
+    var textSample = new fabric.Text(text.slice(0, getRandomInt(0, text.length)), {
+      left: getRandomInt(300, 550),
       top: getRandomInt(500, 550),
       fontFamily: 'delicious',
       angle: getRandomInt(-10, 10),
@@ -420,8 +414,8 @@
     canvas.add(textSample);
     updateComplexity();
   };
-  
-  
+
+
   document.onkeydown = function(e) {
     var obj = canvas.getActiveObject() || canvas.getActiveGroup();
     if (obj && e.keyCode === 8) {
@@ -440,36 +434,36 @@
       // return false;
     }
   };
-  
+
   setTimeout(function() {
     canvas.calcOffset();
   }, 100);
-  
+
   if (document.location.search.indexOf('guidelines') > -1) {
     initCenteringGuidelines(canvas);
     initAligningGuidelines(canvas);
   }
-  
+
   gradientifyBtn.onclick = function() {
     var obj = canvas.getActiveObject();
     if (obj) {
       obj.setGradientFill(canvas.getContext(), {
         x2: (getRandomInt(0, 1) ? 0 : obj.width),
         y2: (getRandomInt(0, 1) ? 0 : obj.height),
-        colorStops: { 
-          0: '#' + getRandomColor(), 
+        colorStops: {
+          0: '#' + getRandomColor(),
           1: '#' + getRandomColor()
         }
       });
       canvas.renderAll();
     }
   };
-  
+
   var textEl = document.getElementById('text');
   if (textEl) {
     textEl.onfocus = function() {
       var activeObject = canvas.getActiveObject();
-    
+
       if (activeObject && activeObject.type === 'text') {
         this.value = activeObject.text;
       }
@@ -487,7 +481,7 @@
       }
     };
   }
-  
+
   var cmdUnderlineBtn = document.getElementById('text-cmd-underline');
   if (cmdUnderlineBtn) {
     activeObjectButtons.push(cmdUnderlineBtn);
@@ -501,7 +495,7 @@
       }
     };
   }
-  
+
   var cmdLinethroughBtn = document.getElementById('text-cmd-linethrough');
   if (cmdLinethroughBtn) {
     activeObjectButtons.push(cmdLinethroughBtn);
@@ -515,7 +509,7 @@
       }
     };
   }
-  
+
   var cmdOverlineBtn = document.getElementById('text-cmd-overline');
   if (cmdOverlineBtn) {
     activeObjectButtons.push(cmdOverlineBtn);
@@ -529,7 +523,7 @@
       }
     };
   }
-  
+
   var cmdItalicBtn = document.getElementById('text-cmd-italic');
   if (cmdItalicBtn) {
     activeObjectButtons.push(cmdItalicBtn);
@@ -543,7 +537,7 @@
       }
     };
   }
-  
+
   var cmdShadowBtn = document.getElementById('text-cmd-shadow');
   if (cmdShadowBtn) {
     activeObjectButtons.push(cmdShadowBtn);
@@ -557,7 +551,7 @@
       }
     };
   }
-  
+
   var textAlignSwitch = document.getElementById('text-align');
   if (textAlignSwitch) {
     activeObjectButtons.push(textAlignSwitch);
@@ -570,7 +564,7 @@
       }
     };
   }
-  
+
   var bgColorField = document.getElementById('text-bg-color');
   if (bgColorField) {
     bgColorField.onchange = function() {
@@ -581,7 +575,7 @@
       }
     };
   }
-  
+
   if (supportsSlider) {
     (function(){
       var container = document.getElementById('text-control-buttons');
@@ -603,13 +597,13 @@
           canvas.renderAll();
         }
       };
-      
+
       canvas.observe('object:selected', function(e) {
-        slider.value = e.memo.target.lineHeight;
+        slider.value = e.target.lineHeight;
       });
     })();
   }
-  
+
   document.getElementById('load-svg').onclick = function() {
     var svg = document.getElementById('svg-console').value;
     fabric.loadSVGFromString(svg, function(objects, options) {
@@ -624,5 +618,5 @@
       obj.setCoords();
     });
   };
-  
+
 })(this);

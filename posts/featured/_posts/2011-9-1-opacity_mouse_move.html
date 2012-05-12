@@ -11,8 +11,8 @@ function pad(s) {
   return s.length === 1 ? ('0' + s) : s;
 }
 function getRandomColor() {
-  return '#' + pad(getRandomInt(0, 255).toString(16)) + 
-    pad(getRandomInt(0, 255).toString(16)) + 
+  return '#' + pad(getRandomInt(0, 255).toString(16)) +
+    pad(getRandomInt(0, 255).toString(16)) +
     pad(getRandomInt(0, 255).toString(16));
 }
 </script>
@@ -31,7 +31,7 @@ fabric.loadSVGFromURL('../assets/135.svg', function(objects) {
 
   canvas.observe('mouse:move', function(e) {
 
-    var p = canvas.getPointer(e.memo.e);
+    var p = canvas.getPointer(e.e);
 
     canvas.forEachObject(function(obj) {
       var distX = Math.abs(p.x - obj.left),

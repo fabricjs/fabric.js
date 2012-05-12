@@ -4,11 +4,12 @@ title: Kitchensink
 ---
 
 <script src="../lib/fonts/Delicious.font.js"></script>
+<script src="../lib/stats.js"></script>
+
 <link rel="stylesheet" href="../css/kitchensink.css">
 
 <div id="controls"></div>
-<div style="position:relative;width:804px;float:left;">
-  <div id="fps">&nbsp;</div>
+<div style="position:relative;width:804px;float:left;" id="canvas-wrapper">
   <canvas id="canvas" width="800" height="700"></canvas>
   <div id="complexity">Canvas complexity (number of paths):<strong></strong></div>
   <div id="text-controls">

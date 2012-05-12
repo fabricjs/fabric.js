@@ -583,34 +583,6 @@
     equals(object.get('overlayFill'), '', 'Empty fill values should be left intact');
   });
 
-  asyncTest('fxRemove', function() {
-    var object = new fabric.Object({ left: 20, top: 30, width: 40, height: 50, opacity: 1 });
-
-    var onCompleteFired = false;
-    var onComplete = function(){ onCompleteFired = true; };
-
-    var onChangeFired = false;
-    var onChange = function(){ onChangeFired = true; };
-
-    var callbacks = { onComplete: onComplete, onChange: onChange };
-
-    ok(typeof object.fxRemove == 'function');
-    equals(object.fxRemove(callbacks), object, 'should be chainable');
-
-    equals(object.get('opacity'), 1);
-
-    setTimeout(function(){
-
-      ok(onCompleteFired);
-      ok(onChangeFired);
-
-      equals(object.get('opacity'), 0, 'opacity should be set to 0 by the end of animation');
-      equals(object.fxRemove(), object, 'should work without callbacks');
-
-      start();
-    }, 1000);
-  });
-
   asyncTest('fxStraighten', function() {
     var object = new fabric.Object({ left: 20, top: 30, width: 40, height: 50, angle: 43 });
 
