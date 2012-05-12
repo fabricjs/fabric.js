@@ -1,26 +1,28 @@
 (function() {
-  
+
   var REFERENCE_RECT = {
-    'type': 'rect', 
-    'left': 0, 
-    'top': 0, 
-    'width': 0, 
-    'height': 0, 
+    'type': 'rect',
+    'left': 0,
+    'top': 0,
+    'width': 0,
+    'height': 0,
     'fill': 'rgb(0,0,0)',
     'overlayFill': null,
-    'stroke': null, 
-    'strokeWidth': 1, 
-    'scaleX': 1, 
-    'scaleY': 1, 
-    'angle': 0, 
-    'flipX': false, 
-    'flipY': false, 
+    'stroke': null,
+    'strokeWidth': 1,
+    'scaleX': 1,
+    'scaleY': 1,
+    'angle': 0,
+    'flipX': false,
+    'flipY': false,
     'opacity': 1,
-    'selectable': true
+    'selectable': true,
+    'rx': 0,
+    'ry': 0
   };
-  
+
   module('fabric.Rect');
-  
+
   test('constructor', function(){
     ok(fabric.Rect);
 
@@ -31,13 +33,13 @@
 
     same(rect.get('type'), 'rect');
   });
-  
+
   test('complexity', function() {
     var rect = new fabric.Rect();
-    
+
     ok(typeof rect.complexity == 'function');
   });
-  
+
   test('toObject', function() {
     var rect = new fabric.Rect();
     ok(typeof rect.toObject == 'function');
@@ -45,15 +47,15 @@
     var object = rect.toObject();
     same(object, REFERENCE_RECT);
   });
-  
+
   test('fabric.Rect.fromObject', function() {
     ok(typeof fabric.Rect.fromObject == 'function');
-    
+
     var rect = fabric.Rect.fromObject(REFERENCE_RECT);
     ok(rect instanceof fabric.Rect);
     same(rect.toObject(), REFERENCE_RECT);
   });
-  
+
   test('fabric.Rect.fromElement', function() {
     ok(typeof fabric.Rect.fromElement == 'function');
 
@@ -87,10 +89,27 @@
       fill: 'rgb(255,255,255)',
       opacity: 0.45,
       stroke: 'blue',
-      strokeWidth: 3
+      strokeWidth: 3,
+      rx: 11,
+      ry: 12
     });
     same(rectWithAttrs.toObject(), expectedObject);
 
     ok(fabric.Rect.fromElement() === null);
+  });
+
+  test('clone with rounded corners', function() {
+    var rect = new fabric.Rect({ width: 100, height: 100, rx: 20, ry: 30 });
+    var clone = rect.clone();
+
+    equal(clone.get('rx'), rect.get('rx'));
+    equal(clone.get('ry'), rect.get('ry'));
+  });
+
+  test('toSVG with rounded corners', function() {
+    var rect = new fabric.Rect({ width: 100, height: 100, rx: 20, ry: 30 });
+    var svg = rect.toSVG();
+
+    equal('<rect x="-50" y="-50" rx="20" ry="30" width="100" height="100" style="stroke: none; stroke-width: 1; fill: rgb(0,0,0); opacity: 1;" transform="translate(0 0)" />', svg);
   });
 })();
