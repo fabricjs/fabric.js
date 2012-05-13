@@ -26,7 +26,7 @@
                            '"flipY":false,"opacity":1,"selectable":true,"path":"http://example.com/"}],"background":"rgba(0, 0, 0, 0)"}';
 
   var RECT_JSON = '{"objects":[{"type":"rect","left":0,"top":0,"width":10,"height":10,"fill":"rgb(0,0,0)","overlayFill":null,'+
-                  '"stroke":null,"strokeWidth":1,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,"selectable":true}],'+
+                  '"stroke":null,"strokeWidth":1,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,"selectable":true,"rx":0,"ry":0}],'+
                   '"background":"#ff5555"}';
 
   var canvas = this.canvas = new fabric.Canvas('canvas');
