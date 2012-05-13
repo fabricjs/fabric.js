@@ -83,6 +83,7 @@
     * @param {Function} [options.onComplete] Callback; invoked when value change is completed
     * @param {Number} [options.startValue=0] Starting value
     * @param {Number} [options.endValue=100] Ending value
+    * @param {Number} [options.byValue=100] Value to modify the property by
     * @param {Function} [options.easing] Easing function
     * @param {Number} [options.duration=500] Duration of change
     */
@@ -95,16 +96,17 @@
       finish = start + duration, time, pos,
       onChange = options.onChange || function() { },
       abort = options.abort || function() { return false; },
-      easing = options.easing || function(pos) { return (-Math.cos(pos * Math.PI) / 2) + 0.5; },
+      easing = options.easing || function(t, b, c, d) {return -c * Math.cos(t/d * (Math.PI/2)) + c + b;},
       startValue = 'startValue' in options ? options.startValue : 0,
       endValue = 'endValue' in options ? options.endValue : 100;
+      byValue = options.byValue || endValue - startValue;
 
     options.onStart && options.onStart();
     
     (function tick() {
       time = +new Date();
-      pos = time > finish ? 1 : (time - start) / duration;
-      onChange(startValue + (endValue - startValue) * easing(pos));
+      currentTime = time > finish ? duration : (time - start);
+      onChange(easing(currentTime, startValue, byValue, duration));
       if (time > finish || abort()) {
         options.onComplete && options.onComplete();
         return;

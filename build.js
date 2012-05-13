@@ -57,6 +57,7 @@ var filesToInclude = [
   'src/observable.js',
   
   'src/util/misc.js',
+  'src/util/anim_ease.js',
   'src/util/lang_array.js',
   'src/util/lang_object.js',
   'src/util/lang_string.js',
@@ -66,7 +67,13 @@ var filesToInclude = [
   'src/util/dom_style.js',
   'src/util/dom_misc.js',
   'src/util/dom_request.js',
+<<<<<<< HEAD
+=======
   
+>>>>>>> 383665d2363f00dd1a577207837b7dc326e04ed8
+  
+  ifSpecifiedInclude('easing', 'src/util/anim_ease.js'),
+
   ifSpecifiedInclude('parser', 'src/parser.js'),
   
   'src/gradient.js',
