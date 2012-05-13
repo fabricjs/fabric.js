@@ -421,6 +421,15 @@
     },
 
     /**
+     * Returns context of canvas where objects are drawn
+     * @method getContext
+     * @return {CanvasRenderingContext2D}
+     */
+    getContext: function () {
+      return this.contextContainer;
+    },
+
+    /**
      * Clears all contexts (background, main, top) of an instance
      * @method clear
      * @return {fabric.Canvas} thisArg
