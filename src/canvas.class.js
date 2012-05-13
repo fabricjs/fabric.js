@@ -960,6 +960,15 @@
     },
 
     /**
+     * Returns &lt;canvas> element on which object selection is drawn
+     * @method getElement
+     * @return {HTMLCanvasElement}
+     */
+    getSelectionElement: function () {
+      return this.upperCanvasEl;
+    },
+
+    /**
      * Sets given object as active
      * @method setActiveObject
      * @param object {fabric.Object} Object to set as an active one
