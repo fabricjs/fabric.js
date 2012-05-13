@@ -20,25 +20,25 @@ var includeAllModules = modules.length === 1 && modules[0] === 'ALL';
 var distFileContents = '';
 
 function appendFileContents(fileNames, callback) {
-  
+
   (function readNextFile() {
-    
+
     if (fileNames.length <= 0) {
       return callback();
     }
-    
+
     var fileName = fileNames.shift();
-    
+
     if (!fileName) {
       return readNextFile();
     }
-    
+
     fs.readFile(__dirname + '/' + fileName, function (err, data) {
       if (err) throw err;
       distFileContents += (data + '\n');
       readNextFile();
     });
-    
+
   })();
 }
 
@@ -49,13 +49,13 @@ function ifSpecifiedInclude(moduleName, fileName) {
 var filesToInclude = [
 
   'HEADER.js',
-  
+
   ifSpecifiedInclude('serialization', 'lib/json2.js'),
   ifSpecifiedInclude('text', 'lib/cufon.js'),
-  
+
   'src/log.js',
   'src/observable.js',
-  
+
   'src/util/misc.js',
   'src/util/anim_ease.js',
   'src/util/lang_array.js',
@@ -67,27 +67,23 @@ var filesToInclude = [
   'src/util/dom_style.js',
   'src/util/dom_misc.js',
   'src/util/dom_request.js',
-<<<<<<< HEAD
-=======
-  
->>>>>>> 383665d2363f00dd1a577207837b7dc326e04ed8
-  
+
   ifSpecifiedInclude('easing', 'src/util/anim_ease.js'),
 
   ifSpecifiedInclude('parser', 'src/parser.js'),
-  
+
   'src/gradient.js',
   'src/point.class.js',
   'src/intersection.class.js',
   'src/color.class.js',
-  
+
   'src/static_canvas.class.js',
   ifSpecifiedInclude('interaction', 'src/canvas.class.js'),
-  
+
   'src/canvas.animation.js',
-  
+
   ifSpecifiedInclude('serialization', 'src/canvas.serialization.js'),
-  
+
   'src/object.class.js',
   'src/line.class.js',
   'src/circle.class.js',
@@ -100,13 +96,13 @@ var filesToInclude = [
   'src/path_group.class.js',
   'src/group.class.js',
   'src/image.class.js',
-  
+
   ifSpecifiedInclude('object_straightening', 'src/object_straightening.js'),
-  
+
   ifSpecifiedInclude('image_filters', 'src/image_filters.js'),
-  
+
   ifSpecifiedInclude('text', 'src/text.class.js'),
-  
+
   ifSpecifiedInclude('node', 'src/fabric_node.js')
 ];
 
@@ -116,7 +112,7 @@ appendFileContents(filesToInclude, function() {
       console.log(err);
       throw err;
     }
-    
+
     console.log('Built distribution to dist/all.js');
 
     exec(mininfierCmd, function (error, output) {
@@ -125,7 +121,7 @@ appendFileContents(filesToInclude, function() {
       }
       exec('gzip -c dist/all.min.js > dist/all.min.js.gz', function (error, output) {
         console.log('Gzipped to dist/all.min.js.gz');
-        
+
         exec('ls -l dist', function (error, output) {
           console.log(output.replace(/^.*/, ''));
         });
