@@ -12,8 +12,7 @@
         'ml': 'w-resize',
         'mt': 'n-resize',
         'mr': 'e-resize',
-        'mb': 's-resize',
-       'mtr': 'e-resize'
+        'mb': 's-resize'
       },
 
       utilMin = fabric.util.array.min,
@@ -518,11 +517,7 @@
           ? 'scaleX'
           : (corner === 'mt' || corner === 'mb')
             ? 'scaleY'
-            : (corner === 'mtr')
-              ? 'rotate'
-              : (target.hasRotatingPoint)
-                ? 'scale'
-                : 'rotate';
+            : 'rotate';
       }
 
       this._currentTransform = {
