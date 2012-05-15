@@ -7719,13 +7719,13 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         ctx.fillStyle = this.fill;
       }
 
-      if (this.group) {
-        // TODO: this breaks some shapes, need to look into it
+      // TODO: this breaks some shapes, need to look into it
+      // if (this.group) {
         // ctx.translate(
         //    -this.group.width / 2 + this.width / 2,
         //    -this.group.height / 2 + this.height / 2
         // );
-      }
+      // }
       this._render(ctx, noTransform);
 
       if (this.active && !noTransform) {
@@ -8031,13 +8031,17 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
       // middle-top-rotate
       if (this.hasRotatingPoint) {
-        _left = left + this.width/2;
-        _top = top - (45 / this.scaleY) + scaleOffsetY;
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(_left, _top, sizeX / 2, 0, Math.PI * 2, false);
-        ctx.fill();
-        ctx.restore();
+        // _left = left + this.width/2;
+        // _top = top - (45 / this.scaleY) + scaleOffsetY;
+
+        // ctx.save();
+        // ctx.beginPath();
+        // ctx.arc(_left, _top, sizeX / 2, 0, Math.PI * 2, false);
+        // ctx.fill();
+        // ctx.restore();
+        _left = left + this.width/2 - scaleOffsetX;
+        _top = top - (45 / this.scaleY);
+        ctx.fillRect(_left, _top, sizeX, sizeY);
       }
 
       ctx.restore();
