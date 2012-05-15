@@ -402,7 +402,8 @@
               target: this._currentTransform.target
             });
           }
-
+        }
+        else if (this._currentTransform.action === 'scale') {
           this._scaleObject(x, y);
           this.fire('object:scaling', {
             target: this._currentTransform.target
