@@ -679,12 +679,16 @@
       _left = left - scaleOffsetX;
       _top = top + height/2 - scaleOffsetY;
       ctx.fillRect(_left, _top, sizeX, sizeY);
-      
+
       // middle-top-rotate
       if (this.hasRotatingPoint) {
-        _left = left + this.width/2 - scaleOffsetX;
-        _top = top - (45 / this.scaleY);
-        ctx.fillRect(_left, _top, sizeX, sizeY);
+        _left = left + this.width/2;
+        _top = top - (45 / this.scaleY) + scaleOffsetY;
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(_left, _top, sizeX / 2, 0, Math.PI * 2, false);
+        ctx.fill();
+        ctx.restore();
       }
 
       ctx.restore();
