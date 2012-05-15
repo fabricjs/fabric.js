@@ -103,6 +103,13 @@
     hasBorders:               true,
 
     /**
+     * When set to `false`, object's rotating point will not be visible or selectable
+     * @property
+     * @type Boolean
+     */
+    hasRotatingPoint:         false,
+
+    /**
      * @method callSuper
      * @param {String} methodName
      */
@@ -516,11 +523,15 @@
       var mr = {
         x: tr.x - (this.currentHeight/2 * sinTh),
         y: tr.y + (this.currentHeight/2 * cosTh)
-      }
+      };
       var mb = {
         x: bl.x + (this.currentWidth/2 * cosTh),
         y: bl.y + (this.currentWidth/2 * sinTh)
-      }
+      };
+      var mtr = {
+        x: tl.x + (this.currentWidth/2 * cosTh),
+        y: tl.y + (this.currentWidth/2 * sinTh)
+      };
 
       // debugging
 
@@ -537,7 +548,7 @@
       //       }, 50);
 
       // clockwise
-      this.oCoords = { tl: tl, tr: tr, br: br, bl: bl, ml: ml, mt: mt, mr: mr, mb: mb };
+      this.oCoords = { tl: tl, tr: tr, br: br, bl: bl, ml: ml, mt: mt, mr: mr, mb: mb, mtr: mtr };
 
       // set coordinates of the draggable boxes in the corners used to scale/rotate the image
       this._setCornerCoords();
@@ -581,6 +592,17 @@
         ~~(w + padding2),
         ~~(h + padding2)
       );
+
+      if (this.hasRotatingPoint && !this.hideCorners && !this.lockRotation) {
+        var rotateHeight = (-h/2);
+        var rotateWidth = (-w/2);
+
+        ctx.beginPath();
+        ctx.moveTo(0, rotateHeight);
+        ctx.lineTo(0, rotateHeight - 40);
+        ctx.closePath();
+        ctx.stroke();
+      }
 
       ctx.restore();
       return this;
@@ -657,6 +679,13 @@
       _left = left - scaleOffsetX;
       _top = top + height/2 - scaleOffsetY;
       ctx.fillRect(_left, _top, sizeX, sizeY);
+      
+      // middle-top-rotate
+      if (this.hasRotatingPoint) {
+        _left = left + this.width/2 - scaleOffsetX;
+        _top = top - (45 / this.scaleY);
+        ctx.fillRect(_left, _top, sizeX, sizeY);
+      }
 
       ctx.restore();
 
@@ -1154,6 +1183,25 @@
         br: {
           x: coords.mb.x + sinHalfOffset,
           y: coords.mb.y + cosHalfOffset
+        }
+      };
+
+      coords.mtr.corner = {
+        tl: {
+          x: coords.mtr.x - sinHalfOffset + (sinTh * 40),
+          y: coords.mtr.y - cosHalfOffset - (cosTh * 40)
+        },
+        tr: {
+          x: coords.mtr.x + cosHalfOffset + (sinTh * 40),
+          y: coords.mtr.y - sinHalfOffset - (cosTh * 40)
+        },
+        bl: {
+          x: coords.mtr.x - cosHalfOffset + (sinTh * 40),
+          y: coords.mtr.y + sinHalfOffset - (cosTh * 40)
+        },
+        br: {
+          x: coords.mtr.x + sinHalfOffset + (sinTh * 40),
+          y: coords.mtr.y + cosHalfOffset - (cosTh * 40)
         }
       };
     },
