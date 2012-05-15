@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2012, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.8.5" };
+var fabric = fabric || { version: "0.8.6" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -5854,7 +5854,8 @@ fabric.util.string = {
         'ml': 'w-resize',
         'mt': 'n-resize',
         'mr': 'e-resize',
-        'mb': 's-resize'
+        'mb': 's-resize',
+       'mtr': 'crosshair'
       },
 
       utilMin = fabric.util.array.min,
@@ -6243,7 +6244,14 @@ fabric.util.string = {
               target: this._currentTransform.target
             });
           }
-
+          if (!this._currentTransform.target.hasRotatingPoint) {
+            this._scaleObject(x, y);
+            this.fire('object:scaling', {
+              target: this._currentTransform.target
+            });
+          }
+        }
+        else if (this._currentTransform.action === 'scale') {
           this._scaleObject(x, y);
           this.fire('object:scaling', {
             target: this._currentTransform.target
@@ -6359,7 +6367,11 @@ fabric.util.string = {
           ? 'scaleX'
           : (corner === 'mt' || corner === 'mb')
             ? 'scaleY'
-            : 'rotate';
+            : (corner === 'mtr')
+              ? 'rotate'
+              : (target.hasRotatingPoint)
+                ? 'scale'
+                : 'rotate';
       }
 
       this._currentTransform = {
@@ -7440,6 +7452,13 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     hasBorders:               true,
 
     /**
+     * When set to `false`, object's rotating point will not be visible or selectable
+     * @property
+     * @type Boolean
+     */
+    hasRotatingPoint:         false,
+
+    /**
      * @method callSuper
      * @param {String} methodName
      */
@@ -7853,11 +7872,15 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       var mr = {
         x: tr.x - (this.currentHeight/2 * sinTh),
         y: tr.y + (this.currentHeight/2 * cosTh)
-      }
+      };
       var mb = {
         x: bl.x + (this.currentWidth/2 * cosTh),
         y: bl.y + (this.currentWidth/2 * sinTh)
-      }
+      };
+      var mtr = {
+        x: tl.x + (this.currentWidth/2 * cosTh),
+        y: tl.y + (this.currentWidth/2 * sinTh)
+      };
 
       // debugging
 
@@ -7874,7 +7897,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       //       }, 50);
 
       // clockwise
-      this.oCoords = { tl: tl, tr: tr, br: br, bl: bl, ml: ml, mt: mt, mr: mr, mb: mb };
+      this.oCoords = { tl: tl, tr: tr, br: br, bl: bl, ml: ml, mt: mt, mr: mr, mb: mb, mtr: mtr };
 
       // set coordinates of the draggable boxes in the corners used to scale/rotate the image
       this._setCornerCoords();
@@ -7918,6 +7941,17 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         ~~(w + padding2),
         ~~(h + padding2)
       );
+
+      if (this.hasRotatingPoint && !this.hideCorners && !this.lockRotation) {
+        var rotateHeight = (-h/2);
+        var rotateWidth = (-w/2);
+
+        ctx.beginPath();
+        ctx.moveTo(0, rotateHeight);
+        ctx.lineTo(0, rotateHeight - 40);
+        ctx.closePath();
+        ctx.stroke();
+      }
 
       ctx.restore();
       return this;
@@ -7994,6 +8028,17 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       _left = left - scaleOffsetX;
       _top = top + height/2 - scaleOffsetY;
       ctx.fillRect(_left, _top, sizeX, sizeY);
+
+      // middle-top-rotate
+      if (this.hasRotatingPoint) {
+        _left = left + this.width/2;
+        _top = top - (45 / this.scaleY) + scaleOffsetY;
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(_left, _top, sizeX / 2, 0, Math.PI * 2, false);
+        ctx.fill();
+        ctx.restore();
+      }
 
       ctx.restore();
 
@@ -8340,7 +8385,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
           theta = degreesToRadians(45 - this.getAngle()),
           cornerHypotenuse = Math.sqrt(2 * Math.pow(this.cornersize, 2)) / 2,
           cosHalfOffset = cornerHypotenuse * Math.cos(theta),
-          sinHalfOffset = cornerHypotenuse * Math.sin(theta);
+          sinHalfOffset = cornerHypotenuse * Math.sin(theta),
+          sinTh = Math.sin(this.theta),
+          cosTh = Math.cos(this.theta);
 
       coords.tl.corner = {
         tl: {
@@ -8491,6 +8538,25 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         br: {
           x: coords.mb.x + sinHalfOffset,
           y: coords.mb.y + cosHalfOffset
+        }
+      };
+
+      coords.mtr.corner = {
+        tl: {
+          x: coords.mtr.x - sinHalfOffset + (sinTh * 40),
+          y: coords.mtr.y - cosHalfOffset - (cosTh * 40)
+        },
+        tr: {
+          x: coords.mtr.x + cosHalfOffset + (sinTh * 40),
+          y: coords.mtr.y - sinHalfOffset - (cosTh * 40)
+        },
+        bl: {
+          x: coords.mtr.x - cosHalfOffset + (sinTh * 40),
+          y: coords.mtr.y + sinHalfOffset - (cosTh * 40)
+        },
+        br: {
+          x: coords.mtr.x + sinHalfOffset + (sinTh * 40),
+          y: coords.mtr.y + cosHalfOffset - (cosTh * 40)
         }
       };
     },
