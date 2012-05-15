@@ -6150,7 +6150,7 @@ fabric.util.string = {
 
         this._setupCurrentTransform(e, target);
 
-        var shouldHandleGroupLogic = e.shiftKey && (activeGroup || this.getActiveObject());
+        var shouldHandleGroupLogic = e.shiftKey && (activeGroup || this.getActiveObject()) && this.selection;
         if (shouldHandleGroupLogic) {
           this._handleGroupLogic(e, target);
         }
