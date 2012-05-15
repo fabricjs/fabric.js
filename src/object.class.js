@@ -1032,7 +1032,9 @@
           theta = degreesToRadians(45 - this.getAngle()),
           cornerHypotenuse = Math.sqrt(2 * Math.pow(this.cornersize, 2)) / 2,
           cosHalfOffset = cornerHypotenuse * Math.cos(theta),
-          sinHalfOffset = cornerHypotenuse * Math.sin(theta);
+          sinHalfOffset = cornerHypotenuse * Math.sin(theta),
+          sinTh = Math.sin(this.theta),
+          cosTh = Math.cos(this.theta);
 
       coords.tl.corner = {
         tl: {
