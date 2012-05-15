@@ -12,7 +12,8 @@
         'ml': 'w-resize',
         'mt': 'n-resize',
         'mr': 'e-resize',
-        'mb': 's-resize'
+        'mb': 's-resize',
+       'mtr': 'e-resize'
       },
 
       utilMin = fabric.util.array.min,
@@ -401,7 +402,14 @@
               target: this._currentTransform.target
             });
           }
-
+          if (!this._currentTransform.target.hasRotatingPoint) {
+            this._scaleObject(x, y);
+            this.fire('object:scaling', {
+              target: this._currentTransform.target
+            });
+          }
+        }
+        else if (this._currentTransform.action === 'scale') {
           this._scaleObject(x, y);
           this.fire('object:scaling', {
             target: this._currentTransform.target
@@ -517,7 +525,11 @@
           ? 'scaleX'
           : (corner === 'mt' || corner === 'mb')
             ? 'scaleY'
-            : 'rotate';
+            : (corner === 'mtr')
+              ? 'rotate'
+              : (target.hasRotatingPoint)
+                ? 'scale'
+                : 'rotate';
       }
 
       this._currentTransform = {
