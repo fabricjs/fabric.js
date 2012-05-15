@@ -13,7 +13,7 @@
         'mt': 'n-resize',
         'mr': 'e-resize',
         'mb': 's-resize',
-       'mtr': 'e-resize'
+       'mtr': 'crosshair'
       },
 
       utilMin = fabric.util.array.min,
