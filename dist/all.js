@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2012, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.8.7" };
+var fabric = fabric || { version: "0.8.8" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -5565,6 +5565,18 @@ fabric.util.string = {
           '<desc>Created with Fabric.js ', fabric.version, '</desc>',
           fabric.createSVGFontFacesMarkup(this.getObjects())
       ];
+
+      if (this.backgroundImage) {
+        markup.push(
+          '<image x="0" y="0" ',
+            'width="', this.width,
+            '" height="', this.height,
+            '" preserveAspectRatio="', (this.backgroundImageStretch ? 'none' : 'defer'),
+            '" xlink:href="', this.backgroundImage.src,
+            '" style="opacity:', this.backgroundImageOpacity,
+          '"></image>'
+        );
+      }
 
       for (var i = 0, objects = this.getObjects(), len = objects.length; i < len; i++) {
         markup.push(objects[i].toSVG());

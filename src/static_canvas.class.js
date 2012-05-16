@@ -735,6 +735,18 @@
           fabric.createSVGFontFacesMarkup(this.getObjects())
       ];
 
+      if (this.backgroundImage) {
+        markup.push(
+          '<image x="0" y="0" ',
+            'width="', this.width,
+            '" height="', this.height,
+            '" preserveAspectRatio="', (this.backgroundImageStretch ? 'none' : 'defer'),
+            '" xlink:href="', this.backgroundImage.src,
+            '" style="opacity:', this.backgroundImageOpacity,
+          '"></image>'
+        );
+      }
+
       for (var i = 0, objects = this.getObjects(), len = objects.length; i < len; i++) {
         markup.push(objects[i].toSVG());
       }
