@@ -37,7 +37,7 @@
      * @property
      * @type String
      */
-    backgroundColor:        'rgba(0, 0, 0, 0)',
+    backgroundColor: 'rgba(0, 0, 0, 0)',
 
     /**
      * Background image of canvas instance
@@ -45,14 +45,14 @@
      * @property
      * @type String
      */
-    backgroundImage:        '',
+    backgroundImage: '',
 
     /**
      * Opacity of the background image of the canvas instance
      * @property
      * @type Float
      */
-    backgroundImageOpacity:      1.0,
+    backgroundImageOpacity: 1.0,
 
     /**
      * Indicatus whether the background image should be stretched to fit the
@@ -60,28 +60,28 @@
      * @property
      * @type Boolean
      */
-    backgroundImageStretch:      true,
+    backgroundImageStretch: true,
 
     /**
      * Indicates whether toObject/toDatalessObject should include default values
      * @property
      * @type Boolean
      */
-    includeDefaultValues:   true,
+    includeDefaultValues: true,
 
     /**
      * Indicates whether objects' state should be saved
      * @property
      * @type Boolean
      */
-    stateful:               true,
+    stateful: true,
 
     /**
      * Indicates whether fabric.Canvas#add should also re-render canvas.
      * Disabling this option could give a great performance boost when adding a lot of objects to canvas at once
      * (followed by a manual rendering after addition)
      */
-    renderOnAddition:       true,
+    renderOnAddition: true,
 
     /**
      * Function that determines clipping of entire canvas area
@@ -89,21 +89,21 @@
      * @property
      * @type Function
      */
-    clipTo:                 null,
+    clipTo: null,
 
     /**
      * Default canvas width
      * @constant
      * @type Number
      */
-    CANVAS_WIDTH:           600,
+    CANVAS_WIDTH: 600,
 
     /**
      * Default canvas height
      * @constant
      * @type Number
      */
-    CANVAS_HEIGHT:          600,
+    CANVAS_HEIGHT: 600,
 
     /**
      * Callback; invoked right before object is about to be scaled/rotated
@@ -690,8 +690,8 @@
      * @method _toObjectMethod
      */
     _toObjectMethod: function (methodName) {
-      return {
-        objects: this._objects.map(function (instance){
+      var data = {
+        objects: this._objects.map(function (instance) {
           // TODO (kangax): figure out how to clean this up
           if (!this.includeDefaultValues) {
             var originalValue = instance.includeDefaultValues;
@@ -704,7 +704,13 @@
           return object;
         }, this),
         background: this.backgroundColor
+      };
+      if (this.backgroundImage) {
+        data.backgroundImage = this.backgroundImage.src;
+        data.backgroundImageOpacity = this.backgroundImageOpacity;
+        data.backgroundImageStretch = this.backgroundImageStretch;
       }
+      return data;
     },
 
     /**

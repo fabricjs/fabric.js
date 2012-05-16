@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2012, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.8.6" };
+var fabric = fabric || { version: "0.8.7" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -4868,7 +4868,7 @@ fabric.util.string = {
      * @property
      * @type String
      */
-    backgroundColor:        'rgba(0, 0, 0, 0)',
+    backgroundColor: 'rgba(0, 0, 0, 0)',
 
     /**
      * Background image of canvas instance
@@ -4876,14 +4876,14 @@ fabric.util.string = {
      * @property
      * @type String
      */
-    backgroundImage:        '',
+    backgroundImage: '',
 
     /**
      * Opacity of the background image of the canvas instance
      * @property
      * @type Float
      */
-    backgroundImageOpacity:      1.0,
+    backgroundImageOpacity: 1.0,
 
     /**
      * Indicatus whether the background image should be stretched to fit the
@@ -4891,28 +4891,28 @@ fabric.util.string = {
      * @property
      * @type Boolean
      */
-    backgroundImageStretch:      true,
+    backgroundImageStretch: true,
 
     /**
      * Indicates whether toObject/toDatalessObject should include default values
      * @property
      * @type Boolean
      */
-    includeDefaultValues:   true,
+    includeDefaultValues: true,
 
     /**
      * Indicates whether objects' state should be saved
      * @property
      * @type Boolean
      */
-    stateful:               true,
+    stateful: true,
 
     /**
      * Indicates whether fabric.Canvas#add should also re-render canvas.
      * Disabling this option could give a great performance boost when adding a lot of objects to canvas at once
      * (followed by a manual rendering after addition)
      */
-    renderOnAddition:       true,
+    renderOnAddition: true,
 
     /**
      * Function that determines clipping of entire canvas area
@@ -4920,21 +4920,21 @@ fabric.util.string = {
      * @property
      * @type Function
      */
-    clipTo:                 null,
+    clipTo: null,
 
     /**
      * Default canvas width
      * @constant
      * @type Number
      */
-    CANVAS_WIDTH:           600,
+    CANVAS_WIDTH: 600,
 
     /**
      * Default canvas height
      * @constant
      * @type Number
      */
-    CANVAS_HEIGHT:          600,
+    CANVAS_HEIGHT: 600,
 
     /**
      * Callback; invoked right before object is about to be scaled/rotated
@@ -5521,8 +5521,8 @@ fabric.util.string = {
      * @method _toObjectMethod
      */
     _toObjectMethod: function (methodName) {
-      return {
-        objects: this._objects.map(function (instance){
+      var data = {
+        objects: this._objects.map(function (instance) {
           // TODO (kangax): figure out how to clean this up
           if (!this.includeDefaultValues) {
             var originalValue = instance.includeDefaultValues;
@@ -5535,7 +5535,13 @@ fabric.util.string = {
           return object;
         }, this),
         background: this.backgroundColor
+      };
+      if (this.backgroundImage) {
+        data.backgroundImage = this.backgroundImage.src;
+        data.backgroundImageOpacity = this.backgroundImageOpacity;
+        data.backgroundImageStretch = this.backgroundImageStretch;
       }
+      return data;
     },
 
     /**
@@ -7067,14 +7073,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   }
 });
 fabric.util.object.extend(fabric.StaticCanvas.prototype, {
-  
+
   /**
    * Populates canvas with data from the specified dataless JSON
    * JSON format must conform to the one of `fabric.Canvas#toDatalessJSON`
    * @method loadFromDatalessJSON
    * @param {String} json JSON string
-   * @param {Function} callback Callback, invoked when json is parsed 
-   *                            and corresponding objects (e.g: fabric.Image) 
+   * @param {Function} callback Callback, invoked when json is parsed
+   *                            and corresponding objects (e.g: fabric.Image)
    *                            are initialized
    * @return {fabric.Canvas} instance
    * @chainable
@@ -7154,7 +7160,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
           if (obj.type === 'image') {
             fabric.util.loadImage(path, function (image) {
               var oImg = new fabric.Image(image);
-              
+
               oImg.setSourcePath(path);
 
               fabric.util.object.extend(oImg, obj);
@@ -7205,41 +7211,47 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
           }
         }
       }, this);
-    } 
+    }
     catch(e) {
       fabric.log(e.message);
     }
   },
-  
+
   /**
    * Populates canvas with data from the specified JSON
    * JSON format must conform to the one of `fabric.Canvas#toJSON`
    * @method loadFromJSON
    * @param {String} json JSON string
-   * @param {Function} callback Callback, invoked when json is parsed 
-   *                            and corresponding objects (e.g: fabric.Image) 
+   * @param {Function} callback Callback, invoked when json is parsed
+   *                            and corresponding objects (e.g: fabric.Image)
    *                            are initialized
    * @return {fabric.Canvas} instance
    * @chainable
    */
   loadFromJSON: function (json, callback) {
     if (!json) return;
-    
+
     var serialized = JSON.parse(json);
     if (!serialized || (serialized && !serialized.objects)) return;
-    
+
     this.clear();
     var _this = this;
     this._enlivenObjects(serialized.objects, function () {
       _this.backgroundColor = serialized.background;
+
+      if (serialized.backgroundImage) {
+        _this.setBackgroundImage(serialized.backgroundImage);
+        _this.backgroundImageOpacity = serialized.backgroundImageOpacity;
+        _this.backgroundImageStretch = serialized.backgroundImageStretch;
+      }
       if (callback) {
         callback();
       }
     });
-    
+
     return this;
   },
-  
+
   /**
    * @method _enlivenObjects
    * @param {Array} objects
@@ -7247,13 +7259,13 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
    */
   _enlivenObjects: function (objects, callback) {
     var numLoadedImages = 0,
-        // get length of all images 
+        // get length of all images
         numTotalImages = objects.filter(function (o) {
           return o.type === 'image';
         }).length;
-    
+
     var _this = this;
-    
+
     objects.forEach(function (o, index) {
       if (!o.type) {
         return;
@@ -7278,12 +7290,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
           break;
       }
     });
-    
+
     if (numTotalImages === 0 && callback) {
       callback();
     }
   },
-  
+
   /**
    * @private
    * @method _toDataURL
@@ -7295,7 +7307,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       callback(clone.toDataURL(format));
     });
   },
-  
+
   /**
    * @private
    * @method _toDataURLWithMultiplier
@@ -7308,7 +7320,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       callback(clone.toDataURLWithMultiplier(format, multiplier));
     });
   },
-  
+
   /**
    * Clones canvas instance
    * @method clone
@@ -7324,10 +7336,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       });
     });
   },
-  
+
   /**
-   * Clones canvas instance without cloning existing data. 
-   * This essentially copies canvas dimensions, clipping properties, etc. 
+   * Clones canvas instance without cloning existing data.
+   * This essentially copies canvas dimensions, clipping properties, etc.
    * but leaves data empty (so that you can populate it with your own)
    * @method cloneWithoutData
    * @param {Object} [callback] Receives cloned instance as a first argument
