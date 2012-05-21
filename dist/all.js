@@ -7538,22 +7538,25 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     toObject: function() {
 
       var object = {
-        type:         this.type,
-        left:         toFixed(this.left, this.NUM_FRACTION_DIGITS),
-        top:          toFixed(this.top, this.NUM_FRACTION_DIGITS),
-        width:        toFixed(this.width, this.NUM_FRACTION_DIGITS),
-        height:       toFixed(this.height, this.NUM_FRACTION_DIGITS),
-        fill:         this.fill,
-        overlayFill:  this.overlayFill,
-        stroke:       this.stroke,
-        strokeWidth:  this.strokeWidth,
-        scaleX:       toFixed(this.scaleX, this.NUM_FRACTION_DIGITS),
-        scaleY:       toFixed(this.scaleY, this.NUM_FRACTION_DIGITS),
-        angle:        toFixed(this.getAngle(), this.NUM_FRACTION_DIGITS),
-        flipX:        this.flipX,
-        flipY:        this.flipY,
-        opacity:      toFixed(this.opacity, this.NUM_FRACTION_DIGITS),
-        selectable:   this.selectable
+        type:             this.type,
+        left:             toFixed(this.left, this.NUM_FRACTION_DIGITS),
+        top:              toFixed(this.top, this.NUM_FRACTION_DIGITS),
+        width:            toFixed(this.width, this.NUM_FRACTION_DIGITS),
+        height:           toFixed(this.height, this.NUM_FRACTION_DIGITS),
+        fill:             this.fill,
+        overlayFill:      this.overlayFill,
+        stroke:           this.stroke,
+        strokeWidth:      this.strokeWidth,
+        scaleX:           toFixed(this.scaleX, this.NUM_FRACTION_DIGITS),
+        scaleY:           toFixed(this.scaleY, this.NUM_FRACTION_DIGITS),
+        angle:            toFixed(this.getAngle(), this.NUM_FRACTION_DIGITS),
+        flipX:            this.flipX,
+        flipY:            this.flipY,
+        opacity:          toFixed(this.opacity, this.NUM_FRACTION_DIGITS),
+        selectable:       this.selectable,
+        hasControls:      this.hasControls,
+        hasBorders:       this.hasBorders,
+        hasRotatingPoint: this.hasRotatingPoint
       };
 
       if (!this.includeDefaultValues) {
