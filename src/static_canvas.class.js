@@ -351,6 +351,44 @@
     },
 
     /**
+     * Returns next object in stack
+     * @method getNextObject
+     * @return {fabric.Object}
+     */
+    getNextObject: function() {
+      var idx = this._objects.indexOf(this.getActiveObject()),
+       topIdx = this._objects.length - 1;
+
+       if (this.isEmpty()) return null;
+
+      // if object is on the top of stack
+      if (idx === topIdx) {
+        return this._objects[0];
+      } else {
+        return this._objects[idx + 1];
+      }
+    },
+
+    /**
+     * Returns previous object in stack
+     * @method getPrevObject
+     * @return {fabric.Object}
+     */
+    getPrevObject: function() {
+      var idx = this._objects.indexOf(this.getActiveObject()),
+       topIdx = this._objects.length - 1
+
+       if (this.isEmpty()) return null;
+
+      // if object is on the bottom of stack
+      if (idx === 0) {
+        return this._objects[topIdx];
+      } else {
+        return this._objects[idx - 1];
+      }
+    },    
+
+    /**
      * Given a context, renders an object on that context
      * @param ctx {Object} context to render object on
      * @param object {Object} object to render
