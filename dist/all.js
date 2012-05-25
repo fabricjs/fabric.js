@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2012, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.8.8" };
+var fabric = fabric || { version: "0.8.9" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -8855,30 +8855,30 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 //= require "object.class"
 
 (function(global) {
-  
+
   "use strict";
-  
+
   var fabric  = global.fabric || (global.fabric = { }),
       piBy2   = Math.PI * 2,
       extend = fabric.util.object.extend;
-  
+
   if (fabric.Circle) {
     fabric.warn('fabric.Circle is already defined.');
     return;
   }
 
-  /** 
+  /**
    * @class Circle
    * @extends fabric.Object
    */
   fabric.Circle = fabric.util.createClass(fabric.Object, /** @scope fabric.Circle.prototype */ {
-    
+
     /**
      * @property
      * @type String
      */
     type: 'circle',
-    
+
     /**
      * Constructor
      * @method initialize
@@ -8887,14 +8887,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      */
     initialize: function(options) {
       options = options || { };
-      
+
       this.set('radius', options.radius || 0);
       this.callSuper('initialize', options);
-      
-      var radiusBy2ByScale = this.get('radius') * 2 * this.get('scaleX');
-      this.set('width', radiusBy2ByScale).set('height', radiusBy2ByScale);
+
+      var diameter = this.get('radius') * 2;
+      this.set('width', diameter).set('height', diameter);
     },
-    
+
     /**
      * Returns object representation of an instance
      * @method toObject
@@ -8905,7 +8905,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         radius: this.get('radius')
       });
     },
-    
+
     /**
      * Returns svg representation of an instance
      * @method toSVG
@@ -8919,7 +8919,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         'transform="' + this.getSvgTransform() + '" ' +
         '/>');
     },
-    
+
     /**
      * @private
      * @method _render
@@ -8938,7 +8938,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         ctx.stroke();
       }
     },
-    
+
     /**
      * Returns horizontal radius of an object (according to how an object is scaled)
      * @method getRadiusX
@@ -8947,7 +8947,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     getRadiusX: function() {
       return this.get('radius') * this.get('scaleX');
     },
-    
+
     /**
      * Returns vertical radius of an object (according to how an object is scaled)
      * @method getRadiusY
@@ -8956,7 +8956,17 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     getRadiusY: function() {
       return this.get('radius') * this.get('scaleY');
     },
-    
+
+    /**
+     * Sets radius of an object (and updates width accordingly)
+     * @method setRadius
+     * @return {Number}
+     */
+    setRadius: function(value) {
+      this.radius = value;
+      this.set('width', value * 2).set('height', value * 2);
+    },
+
     /**
      * Returns complexity of an instance
      * @method complexity
@@ -8966,14 +8976,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       return 1;
     }
   });
-  
+
   /**
    * List of attribute names to account for when parsing SVG element (used by {@link fabric.Circle.fromElement})
    * @static
    * @see: http://www.w3.org/TR/SVG/shapes.html#CircleElement
    */
   fabric.Circle.ATTRIBUTE_NAMES = 'cx cy r fill fill-opacity opacity stroke stroke-width transform'.split(' ');
-  
+
   /**
    * Returns {@link fabric.Circle} instance from an SVG element
    * @static
@@ -8997,14 +9007,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     }
     return new fabric.Circle(extend(parsedAttributes, options));
   };
-  
+
   /**
    * @private
    */
   function isValidRadius(attributes) {
     return (('radius' in attributes) && (attributes.radius > 0));
   }
-  
+
   /**
    * Returns {@link fabric.Circle} instance from an object representation
    * @static
@@ -9015,7 +9025,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   fabric.Circle.fromObject = function(object) {
     return new fabric.Circle(object);
   };
-  
+
 })(typeof exports != 'undefined' ? exports : this);
 (function(global) {
   
