@@ -7952,9 +7952,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       console.log('this.oCoords' + this.oCoords);
       var xCoords = [this.oCoords.tl.x, this.oCoords.tr.x, this.oCoords.br.x, this.oCoords.bl.x];
       console.log('xCoords' + xCoords);
-      var minX = Array.min(xCoords);
+      var minX = xCoords.min();
       console.log('minX' + minX);
-      var maxX = Array.max(xCoords);           
+      var maxX = xCoords.max();           
       console.log('maxX ' + maxX);
       console.log('minX - maxX ' + Math.abs(minX - maxX));
       return Math.abs(minX - maxX);
