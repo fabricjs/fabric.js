@@ -2200,6 +2200,17 @@ fabric.Observable = {
       }
     };
   }
+  
+  if (!Array.prototype.min) {
+    Array.prototype.max = function() {
+      return Math.max.apply(null, this);
+    }
+  }
+  if (!Array.prototype.min) {
+    Array.prototype.min = function() {
+      return Math.min.apply(null, this);
+    }
+  }
 
   if (!Array.prototype.map) {
     Array.prototype.map = function(fn, context) {
