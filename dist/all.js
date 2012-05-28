@@ -7968,8 +7968,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     getBoundingRectangleHeight: function() {
       console.log(this.oCoords);
       var yCoords = [this.oCoords.tl.y, this.oCoords.tr.y, this.oCoords.br.y, this.oCoords.bl.y];
-      var minY = yCoords.min;
-      var maxY = yCoords.max;        
+      var minY = yCoords.min();
+      var maxY = yCoords.max();        
       return Math.abs(minY - maxY);
     },    
 
