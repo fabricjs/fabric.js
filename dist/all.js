@@ -7931,6 +7931,29 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
       return this;
     },
+    
+    /**
+     * Returns width of an object's bounding rectangle
+     * @method getBoundingRectangleWidth
+     * @return {Number} width value
+     */
+    getBoundingRectangleWidth: function() {
+      minX = min(this.oCoords, 'x'),
+      maxX = max(this.oCoords, 'x'),
+           
+      return Math.abs(minX - maxX);
+    },
+
+    /**
+     * Returns height of an object's bounding rectangle
+     * @method getBoundingRectangleHeight
+     * @return {Number} height value
+     */
+    getBoundingRectangleHeight: function() {
+      minY = min(this.oCoords, 'y'),
+      maxY = max(this.oCoords, 'y');        
+      return Math.abs(minY = maxY);
+    },    
 
     /**
      * Draws borders of an object's bounding box.
@@ -8136,8 +8159,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
       // TODO: should probably use bounding rectangle dimensions instead
 
-      el.width = this.getWidth();
-      el.height = this.getHeight();
+      el.width  = this.getBoundingRectangleWidth(); //getWidth();
+      el.height = this.getBoundingRectangleHeight();//getHeight();
 
       fabric.util.wrapElement(el, 'div');
 
