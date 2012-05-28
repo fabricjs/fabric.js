@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2012, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.8.9" };
+var fabric = fabric || { version: "0.8.10" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -12470,15 +12470,15 @@ fabric.Image.filters.Invert.fromObject = function() {
 })(typeof exports != 'undefined' ? exports : this);
 
 (function() {
-  
+
   if (typeof document != 'undefined' && typeof window != 'undefined') {
     return;
   }
-  
-  var XML = require('o3-xml'),
+
+  var XML = new require('xmldom').DOMParser,
       URL = require('url'),
       HTTP = require('http'),
-      
+
       Canvas = require('canvas'),
       Image = require('canvas').Image;
 
@@ -12512,7 +12512,7 @@ fabric.Image.filters.Invert.fromObject = function() {
       });
     });
   }
-  
+
   fabric.util.loadImage = function(url, callback) {
     request(url, 'binary', function(body) {
       var img = new Image();
@@ -12532,7 +12532,7 @@ fabric.Image.filters.Invert.fromObject = function() {
       });
     });
   };
-  
+
   fabric.util.getScript = function(url, callback) {
     request(url, '', function(body) {
       eval(body);
@@ -12543,7 +12543,7 @@ fabric.Image.filters.Invert.fromObject = function() {
   fabric.Image.fromObject = function(object, callback) {
     fabric.util.loadImage(object.src, function(img) {
       var oImg = new fabric.Image(img);
-      
+
       oImg._initConfig(object);
       oImg._initFilters(object);
       callback(oImg);
@@ -12551,11 +12551,11 @@ fabric.Image.filters.Invert.fromObject = function() {
   };
 
   fabric.createCanvasForNode = function(width, height) {
-    
+
     var canvasEl = fabric.document.createElement('canvas'),
         nodeCanvas = new Canvas(width || 600, height || 600);
 
-    // jsdom doesn't create style on canvas element, so here be temp. workaround 
+    // jsdom doesn't create style on canvas element, so here be temp. workaround
     canvasEl.style = { };
 
     canvasEl.width = nodeCanvas.width;
@@ -12568,14 +12568,14 @@ fabric.Image.filters.Invert.fromObject = function() {
 
     return fabricCanvas;
   };
-  
+
   fabric.StaticCanvas.prototype.createPNGStream = function() {
     return this.nodeCanvas.createPNGStream();
   };
   if (fabric.Canvas) {
     fabric.Canvas.prototype.createPNGStream
   }
-  
+
   var origSetWidth = fabric.StaticCanvas.prototype.setWidth;
   fabric.StaticCanvas.prototype.setWidth = function(width) {
     origSetWidth.call(this);
@@ -12585,7 +12585,7 @@ fabric.Image.filters.Invert.fromObject = function() {
   if (fabric.Canvas) {
     fabric.Canvas.prototype.setWidth = fabric.StaticCanvas.prototype.setWidth;
   }
-  
+
   var origSetHeight = fabric.StaticCanvas.prototype.setHeight;
   fabric.StaticCanvas.prototype.setHeight = function(height) {
     origSetHeight.call(this);
@@ -12595,5 +12595,5 @@ fabric.Image.filters.Invert.fromObject = function() {
   if (fabric.Canvas) {
     fabric.Canvas.prototype.setHeight = fabric.StaticCanvas.prototype.setHeight;
   }
-  
+
 })();
