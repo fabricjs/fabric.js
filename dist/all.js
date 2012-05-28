@@ -7956,7 +7956,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       console.log('minX' + minX);
       var maxX = xCoords.max;           
       console.log('maxX' + maxX);
-      console.log('minX - maxX'+ Math.abs(minX - maxX));'
+      console.log('minX - maxX' + Math.abs(minX - maxX));
       return Math.abs(minX - maxX);
     },
 
