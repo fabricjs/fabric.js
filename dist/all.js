@@ -7938,6 +7938,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      * @return {Number} width value
      */
     getBoundingRectangleWidth: function() {
+      console.log(this.oCoords);
       minX = fabric.util.array.min(this.oCoords, 'x');
       maxX = fabric.util.array.max(this.oCoords, 'x');
            
@@ -7950,6 +7951,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      * @return {Number} height value
      */
     getBoundingRectangleHeight: function() {
+      console.log(this.oCoords);
       minY = fabric.util.array.min(this.oCoords, 'y');
       maxY = fabril.util.array.max(this.oCoords, 'y');        
       return Math.abs(minY = maxY);
