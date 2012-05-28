@@ -7949,14 +7949,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      * @return {Number} width value
      */
     getBoundingRectangleWidth: function() {
-      console.log('this.oCoords' + this.oCoords);
       var xCoords = [this.oCoords.tl.x, this.oCoords.tr.x, this.oCoords.br.x, this.oCoords.bl.x];
-      console.log('xCoords' + xCoords);
       var minX = xCoords.min();
-      console.log('minX' + minX);
       var maxX = xCoords.max();           
-      console.log('maxX ' + maxX);
-      console.log('minX - maxX ' + Math.abs(minX - maxX));
       return Math.abs(minX - maxX);
     },
 
@@ -7966,7 +7961,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      * @return {Number} height value
      */
     getBoundingRectangleHeight: function() {
-      console.log(this.oCoords);
       var yCoords = [this.oCoords.tl.y, this.oCoords.tr.y, this.oCoords.br.y, this.oCoords.bl.y];
       var minY = yCoords.min();
       var maxY = yCoords.max();        
