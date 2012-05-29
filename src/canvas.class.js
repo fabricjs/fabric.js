@@ -12,8 +12,7 @@
         'ml': 'w-resize',
         'mt': 'n-resize',
         'mr': 'e-resize',
-        'mb': 's-resize',
-       'mtr': 'crosshair'
+        'mb': 's-resize'
       },
 
       utilMin = fabric.util.array.min,
@@ -112,6 +111,13 @@
      * @type String
      */
     CURSOR:                 'default',
+
+    /**
+     * Cursor value used for rotation point
+     * @constant
+     * @type String
+     */
+    ROTATION_CURSOR:        'crosshair',
 
     /**
      * Default element class that's given to wrapper (div) element of canvas
@@ -781,8 +787,9 @@
         else {
           if (corner in cursorMap) {
             s.cursor = cursorMap[corner];
-          }
-          else {
+          } else if (corner === 'mtr') {
+            s.cursor = this.ROTATION_CURSOR
+          } else {
             s.cursor = this.CURSOR;
             return false;
           }
