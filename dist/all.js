@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2012, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.8.10" };
+var fabric = fabric || { version: "0.8.12" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -12475,7 +12475,7 @@ fabric.Image.filters.Invert.fromObject = function() {
     return;
   }
 
-  var XML = new require('xmldom').DOMParser,
+  var DOMParser = new require('xmldom').DOMParser,
       URL = require('url'),
       HTTP = require('http'),
 
@@ -12526,7 +12526,7 @@ fabric.Image.filters.Invert.fromObject = function() {
   fabric.loadSVGFromURL = function(url, callback) {
     url = url.replace(/^\n\s*/, '').replace(/\?.*$/, '').trim();
     request(url, '', function(body) {
-      var doc = XML.parseFromString(body);
+      var doc = new DOMParser().parseFromString(body);
       fabric.parseSVGDocument(doc.documentElement, function(results, options) {
         callback(results, options);
       });

@@ -4,7 +4,7 @@
     return;
   }
 
-  var XML = new require('xmldom').DOMParser,
+  var DOMParser = new require('xmldom').DOMParser,
       URL = require('url'),
       HTTP = require('http'),
 
@@ -55,7 +55,7 @@
   fabric.loadSVGFromURL = function(url, callback) {
     url = url.replace(/^\n\s*/, '').replace(/\?.*$/, '').trim();
     request(url, '', function(body) {
-      var doc = XML.parseFromString(body);
+      var doc = new DOMParser().parseFromString(body);
       fabric.parseSVGDocument(doc.documentElement, function(results, options) {
         callback(results, options);
       });
