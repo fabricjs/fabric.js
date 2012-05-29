@@ -535,6 +535,10 @@
         x: tl.x + (this.currentWidth/2 * cosTh),
         y: tl.y + (this.currentWidth/2 * sinTh)
       };
+      var mbr = {
+        x: tl.x + (this.currentWidth/2 * cosTh),
+        y: tl.y + (this.currentWidth/2 * sinTh)
+      };
 
       // debugging
 
@@ -551,7 +555,7 @@
       //       }, 50);
 
       // clockwise
-      this.oCoords = { tl: tl, tr: tr, br: br, bl: bl, ml: ml, mt: mt, mr: mr, mb: mb, mtr: mtr };
+      this.oCoords = { tl: tl, tr: tr, br: br, bl: bl, ml: ml, mt: mt, mr: mr, mb: mb, mtr: mtr, mbr: mbr };
 
       // set coordinates of the draggable boxes in the corners used to scale/rotate the image
       this._setCornerCoords();
@@ -1199,22 +1203,44 @@
         }
       };
 
+      var rotationPointDistance = 40;
       coords.mtr.corner = {
         tl: {
-          x: coords.mtr.x - sinHalfOffset + (sinTh * 40),
-          y: coords.mtr.y - cosHalfOffset - (cosTh * 40)
+          x: coords.mtr.x - sinHalfOffset + (sinTh * rotationPointDistance),
+          y: coords.mtr.y - cosHalfOffset - (cosTh * rotationPointDistance)
         },
         tr: {
-          x: coords.mtr.x + cosHalfOffset + (sinTh * 40),
-          y: coords.mtr.y - sinHalfOffset - (cosTh * 40)
+          x: coords.mtr.x + cosHalfOffset + (sinTh * rotationPointDistance),
+          y: coords.mtr.y - sinHalfOffset - (cosTh * rotationPointDistance)
         },
         bl: {
-          x: coords.mtr.x - cosHalfOffset + (sinTh * 40),
-          y: coords.mtr.y + sinHalfOffset - (cosTh * 40)
+          x: coords.mtr.x - cosHalfOffset + (sinTh * rotationPointDistance),
+          y: coords.mtr.y + sinHalfOffset - (cosTh * rotationPointDistance)
         },
         br: {
-          x: coords.mtr.x + sinHalfOffset + (sinTh * 40),
-          y: coords.mtr.y + cosHalfOffset - (cosTh * 40)
+          x: coords.mtr.x + sinHalfOffset + (sinTh * rotationPointDistance),
+          y: coords.mtr.y + cosHalfOffset - (cosTh * rotationPointDistance)
+        }
+      };
+
+      var bottomRotationPointDistance = (-rotationPointDistance - this.currentHeight);
+
+      coords.mbr.corner = {
+        tl: {
+          x: coords.mbr.x - sinHalfOffset + (sinTh * bottomRotationPointDistance),
+          y: coords.mbr.y - cosHalfOffset - (cosTh * bottomRotationPointDistance)
+        },
+        tr: {
+          x: coords.mbr.x + cosHalfOffset + (sinTh * bottomRotationPointDistance),
+          y: coords.mbr.y - sinHalfOffset - (cosTh * bottomRotationPointDistance)
+        },
+        bl: {
+          x: coords.mbr.x - cosHalfOffset + (sinTh * bottomRotationPointDistance),
+          y: coords.mbr.y + sinHalfOffset - (cosTh * bottomRotationPointDistance)
+        },
+        br: {
+          x: coords.mbr.x + sinHalfOffset + (sinTh * bottomRotationPointDistance),
+          y: coords.mbr.y + cosHalfOffset - (cosTh * bottomRotationPointDistance)
         }
       };
     },
