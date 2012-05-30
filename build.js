@@ -57,7 +57,6 @@ var filesToInclude = [
   'src/observable.js',
 
   'src/util/misc.js',
-  'src/util/anim_ease.js',
   'src/util/lang_array.js',
   'src/util/lang_object.js',
   'src/util/lang_string.js',
