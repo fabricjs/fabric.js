@@ -1816,30 +1816,6 @@ fabric.Observable = {
     }
     return array;
   };
-
-  /**
-   * Returns smallest number from an array.
-   * @static
-   * @memberOf fabric.util
-   * @method returnMinFromArray
-   * @param {Array} array
-   * @return {Number} smalled value
-   */
-  function returnMinFromArray(array) {
-    return Math.min.apply(null, array);
-  }
-
-  /**
-   * Returns largest number from an array.
-   * @static
-   * @memberOf fabric.util
-   * @method returnMaxFromArray
-   * @param {Array} array
-   * @return {Number} smalled value
-   */
-  function returnMaxFromArray(array) {
-    return Math.max.apply(null, array);
-  }
   
   /**
    * Returns random number between 2 specified ones.
@@ -1975,8 +1951,6 @@ fabric.Observable = {
   }
 
   fabric.util.removeFromArray = removeFromArray;
-  fabric.util.returnMaxFromArray = returnMaxFromArray;
-  fabric.util.returnMinFromArray = returnMinFromArray;
   fabric.util.degreesToRadians = degreesToRadians;
   fabric.util.toFixed = toFixed;
   fabric.util.getRandomInt = getRandomInt;
@@ -7965,8 +7939,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      */
     getBoundingRectWidth: function() {
       var xCoords = [this.oCoords.tl.x, this.oCoords.tr.x, this.oCoords.br.x, this.oCoords.bl.x];
-      var minX = fabric.util.returnMinFromArray(xCoords);
-      var maxX = fabric.util.returnMaxFromArray(xCoords);
+      var minX = fabric.util.array.min(xCoords);
+      var maxX = fabric.util.array.max(xCoords);
       return Math.abs(minX - maxX);
     },
 
@@ -7977,8 +7951,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      */
     getBoundingRectHeight: function() {
       var yCoords = [this.oCoords.tl.y, this.oCoords.tr.y, this.oCoords.br.y, this.oCoords.bl.y];
-      var minY = fabric.util.returnMinFromArray(yCoords);
-      var maxY = fabric.util.returnMaxFromArray(yCoords);      
+      var minY = fabric.util.array.min(yCoords);
+      var maxY = fabric.util.array.max(yCoords);      
       return Math.abs(minY - maxY);
     },    
 
