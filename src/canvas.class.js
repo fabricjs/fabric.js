@@ -531,7 +531,7 @@
           ? 'scaleX'
           : (corner === 'mt' || corner === 'mb')
             ? 'scaleY'
-            : (corner === 'mtr')
+            : (corner === 'mtr' || corner === 'mbr')
               ? 'rotate'
               : (target.hasRotatingPoint)
                 ? 'scale'
@@ -787,7 +787,7 @@
         else {
           if (corner in cursorMap) {
             s.cursor = cursorMap[corner];
-          } else if (corner === 'mtr') {
+          } else if (corner === 'mtr' || corner === 'mbr') {
             s.cursor = this.ROTATION_CURSOR
           } else {
             s.cursor = this.CURSOR;
