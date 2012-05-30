@@ -1816,6 +1816,30 @@ fabric.Observable = {
     }
     return array;
   };
+
+  /**
+   * Returns smallest number from an array.
+   * @static
+   * @memberOf fabric.util
+   * @method returnMinFromArray
+   * @param {Array} array
+   * @return {Number} smalled value
+   */
+  function returnMinFromArray(array) {
+    return Math.min.apply(null, array);
+  }
+
+  /**
+   * Returns largest number from an array.
+   * @static
+   * @memberOf fabric.util
+   * @method returnMaxFromArray
+   * @param {Array} array
+   * @return {Number} smalled value
+   */
+  function returnMaxFromArray(array) {
+    return Math.max.apply(null, array);
+  }
   
   /**
    * Returns random number between 2 specified ones.
@@ -1951,6 +1975,8 @@ fabric.Observable = {
   }
 
   fabric.util.removeFromArray = removeFromArray;
+  fabric.util.returnMaxFromArray = returnMaxFromArray;
+  fabric.util.returnMinFromArray = returnMinFromArray;
   fabric.util.degreesToRadians = degreesToRadians;
   fabric.util.toFixed = toFixed;
   fabric.util.getRandomInt = getRandomInt;
@@ -2201,17 +2227,6 @@ fabric.Observable = {
     };
   }
   
-  if (!Array.prototype.max) {
-    Array.prototype.max = function() {
-      return Math.max.apply(null, this);
-    }
-  }
-  if (!Array.prototype.min) {
-    Array.prototype.min = function() {
-      return Math.min.apply(null, this);
-    }
-  }
-
   if (!Array.prototype.map) {
     Array.prototype.map = function(fn, context) {
       var result = [ ];
@@ -7945,25 +7960,25 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     
     /**
      * Returns width of an object's bounding rectangle
-     * @method getBoundingRectangleWidth
+     * @method getBoundingRectWidth
      * @return {Number} width value
      */
-    getBoundingRectangleWidth: function() {
+    getBoundingRectWidth: function() {
       var xCoords = [this.oCoords.tl.x, this.oCoords.tr.x, this.oCoords.br.x, this.oCoords.bl.x];
-      var minX = xCoords.min();
-      var maxX = xCoords.max();           
+      var minX = fabric.util.returnMinFromArray(xCoords);
+      var maxX = fabric.util.returnMaxFromArray(xCoords);
       return Math.abs(minX - maxX);
     },
 
     /**
      * Returns height of an object's bounding rectangle
-     * @method getBoundingRectangleHeight
+     * @method getBoundingRectHeight
      * @return {Number} height value
      */
-    getBoundingRectangleHeight: function() {
+    getBoundingRectHeight: function() {
       var yCoords = [this.oCoords.tl.y, this.oCoords.tr.y, this.oCoords.br.y, this.oCoords.bl.y];
-      var minY = yCoords.min();
-      var maxY = yCoords.max();        
+      var minY = fabric.util.returnMinFromArray(yCoords);
+      var maxY = fabric.util.returnMaxFromArray(yCoords);      
       return Math.abs(minY - maxY);
     },    
 
@@ -8168,11 +8183,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       if (!el.getContext && typeof G_vmlCanvasManager != 'undefined') {
         G_vmlCanvasManager.initElement(el);
       }
-
-      // TODO: should probably use bounding rectangle dimensions instead
-
-      el.width  = this.getBoundingRectangleWidth(); //getWidth();
-      el.height = this.getBoundingRectangleHeight();//getHeight();
+      
+      el.width  = this.getBoundingRectWidth(); 
+      el.height = this.getBoundingRectHeight();
 
       fabric.util.wrapElement(el, 'div');
 
