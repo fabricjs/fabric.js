@@ -558,7 +558,31 @@
 
       return this;
     },
+    
+     /**
+     * Returns width of an object's bounding rectangle
+     * @method getBoundingRectWidth
+     * @return {Number} width value
+     */
+    getBoundingRectWidth: function() {
+      var xCoords = [this.oCoords.tl.x, this.oCoords.tr.x, this.oCoords.br.x, this.oCoords.bl.x];
+      var minX = fabric.util.array.min(xCoords);
+      var maxX = fabric.util.array.max(xCoords);
+      return Math.abs(minX - maxX);
+    },
 
+    /**
+     * Returns height of an object's bounding rectangle
+     * @method getBoundingRectHeight
+     * @return {Number} height value
+     */
+    getBoundingRectHeight: function() {
+      var yCoords = [this.oCoords.tl.y, this.oCoords.tr.y, this.oCoords.br.y, this.oCoords.bl.y];
+      var minY = fabric.util.array.min(yCoords);
+      var maxY = fabric.util.array.max(yCoords);      
+      return Math.abs(minY - maxY);
+    },    
+  
     /**
      * Draws borders of an object's bounding box.
      * Requires public properties: width, height
@@ -761,10 +785,8 @@
         G_vmlCanvasManager.initElement(el);
       }
 
-      // TODO: should probably use bounding rectangle dimensions instead
-
-      el.width = this.getWidth();
-      el.height = this.getHeight();
+      el.width  = this.getBoundingRectWidth(); 
+      el.height = this.getBoundingRectHeight();
 
       fabric.util.wrapElement(el, 'div');
 
