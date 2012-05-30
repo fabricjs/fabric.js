@@ -290,12 +290,31 @@ fabric.instances.push(canvas)})();
     canvas.add(new fabric.Rect({ width: 50, height: 40, fill: '#77f', top: 75, left: 160 }))
     canvas.add(new fabric.Circle({ radius: 20, fill: '#f55', top: 170, left: 150 }));
 
-    function callback(){ canvas.renderAll() }
+    canvas.item(0).toGrayscale();
+    canvas.item(1).toGrayscale();
+    canvas.item(2).toGrayscale();
 
-    canvas.item(0).toGrayscale(callback);
-    canvas.item(1).toGrayscale(callback);
-    canvas.item(2).toGrayscale(callback);
+    canvas.renderAll();
+
+    console.log(canvas.item(2).toGrayscale);
   });
+fabric.instances.push(canvas)})();
+</script>
+</div>
+
+<div class="block">
+  <h3>Rotating point</h3>
+  <canvas id="c18" width="200" height="200"></canvas>
+<script>
+(function(){
+  var canvas = new fabric.Canvas('c18');
+
+  canvas.add(new fabric.Rect({ width: 50, height: 50, fill: '#77f', top: 75, left: 75 }));
+  canvas.item(0).hasRotatingPoint = true;
+
+  canvas.add(new fabric.Circle({ radius: 40, fill: '#f55', top: 125, left: 125, scaleY: 0.5, flipY: true }));
+  canvas.item(1).hasRotatingPoint = true;
+
 fabric.instances.push(canvas)})();
 </script>
 </div>
