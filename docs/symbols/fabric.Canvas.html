@@ -233,6 +233,8 @@ ul.inheritsList {
 	
 	<li><a href="../symbols/fabric.util.array.html">fabric.util.array</a></li>
 	
+	<li><a href="../symbols/fabric.util.ease.html">fabric.util.ease</a></li>
+	
 	<li><a href="../symbols/fabric.util.object.html">fabric.util.object</a></li>
 	
 	<li><a href="../symbols/fabric.util.string.html">fabric.util.string</a></li>
@@ -361,6 +363,16 @@ ul.inheritsList {
 						<b><a href="../symbols/fabric.Canvas.html#interactive">interactive</a></b>
 						</div>
 						<div class="description">Indicates that canvas is interactive.</div>
+					</td>
+				</tr>
+			
+				<tr>
+					<td class="attributes">&lt;constant&gt; &nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont">
+						<b><a href="../symbols/fabric.Canvas.html#ROTATION_CURSOR">ROTATION_CURSOR</a></b>
+						</div>
+						<div class="description">Cursor value used for rotation point</div>
 					</td>
 				</tr>
 			
@@ -504,18 +516,27 @@ ul.inheritsList {
 				<tr>
 					<td class="attributes">&nbsp;</td>
 					<td class="nameDescription">
-						<div class="fixedFont"><b><a href="../symbols/fabric.Canvas.html#getContext">getContext</a></b>()
+						<div class="fixedFont"><b><a href="../symbols/fabric.Canvas.html#getPointer">getPointer</a></b>(e)
 						</div>
-						<div class="description">Returns topmost canvas context</div>
+						<div class="description">Returns pointer coordinates relative to canvas.</div>
 					</td>
 				</tr>
 			
 				<tr>
 					<td class="attributes">&nbsp;</td>
 					<td class="nameDescription">
-						<div class="fixedFont"><b><a href="../symbols/fabric.Canvas.html#getPointer">getPointer</a></b>(e)
+						<div class="fixedFont"><b><a href="../symbols/fabric.Canvas.html#getSelectionContext">getSelectionContext</a></b>()
 						</div>
-						<div class="description">Returns pointer coordinates relative to canvas.</div>
+						<div class="description">Returns context of canvas where object selection is drawn</div>
+					</td>
+				</tr>
+			
+				<tr>
+					<td class="attributes">&nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont"><b><a href="../symbols/fabric.Canvas.html#getSelectionElement">getSelectionElement</a></b>()
+						</div>
+						<div class="description">Returns &lt;canvas> element on which object selection is drawn</div>
 					</td>
 				</tr>
 			
@@ -543,7 +564,7 @@ ul.inheritsList {
 		
 		
 		<dl class="inheritsList">
-		<dt>Methods borrowed from class <a href="../symbols/fabric.StaticCanvas.html">fabric.StaticCanvas</a>: </dt><dd><a href="../symbols/fabric.StaticCanvas.html#add">add</a>, <a href="../symbols/fabric.StaticCanvas.html#bringForward">bringForward</a>, <a href="../symbols/fabric.StaticCanvas.html#bringToFront">bringToFront</a>, <a href="../symbols/fabric.StaticCanvas.html#calcOffset">calcOffset</a>, <a href="../symbols/fabric.StaticCanvas.html#centerObject">centerObject</a>, <a href="../symbols/fabric.StaticCanvas.html#centerObjectH">centerObjectH</a>, <a href="../symbols/fabric.StaticCanvas.html#centerObjectV">centerObjectV</a>, <a href="../symbols/fabric.StaticCanvas.html#clear">clear</a>, <a href="../symbols/fabric.StaticCanvas.html#clearContext">clearContext</a>, <a href="../symbols/fabric.StaticCanvas.html#complexity">complexity</a>, <a href="../symbols/fabric.StaticCanvas.html#createPNGStream">createPNGStream</a>, <a href="../symbols/fabric.StaticCanvas.html#dispose">dispose</a>, <a href="../symbols/fabric.StaticCanvas.html#forEachObject">forEachObject</a>, <a href="../symbols/fabric.StaticCanvas.html#getCenter">getCenter</a>, <a href="../symbols/fabric.StaticCanvas.html#getElement">getElement</a>, <a href="../symbols/fabric.StaticCanvas.html#getHeight">getHeight</a>, <a href="../symbols/fabric.StaticCanvas.html#getObjects">getObjects</a>, <a href="../symbols/fabric.StaticCanvas.html#getWidth">getWidth</a>, <a href="../symbols/fabric.StaticCanvas.html#insertAt">insertAt</a>, <a href="../symbols/fabric.StaticCanvas.html#isEmpty">isEmpty</a>, <a href="../symbols/fabric.StaticCanvas.html#item">item</a>, <a href="../symbols/fabric.StaticCanvas.html#onBeforeScaleRotate">onBeforeScaleRotate</a>, <a href="../symbols/fabric.StaticCanvas.html#remove">remove</a>, <a href="../symbols/fabric.StaticCanvas.html#renderAll">renderAll</a>, <a href="../symbols/fabric.StaticCanvas.html#renderTop">renderTop</a>, <a href="../symbols/fabric.StaticCanvas.html#sendBackwards">sendBackwards</a>, <a href="../symbols/fabric.StaticCanvas.html#sendToBack">sendToBack</a>, <a href="../symbols/fabric.StaticCanvas.html#setBackgroundImage">setBackgroundImage</a>, <a href="../symbols/fabric.StaticCanvas.html#setDimensions">setDimensions</a>, <a href="../symbols/fabric.StaticCanvas.html#setHeight">setHeight</a>, <a href="../symbols/fabric.StaticCanvas.html#setOverlayImage">setOverlayImage</a>, <a href="../symbols/fabric.StaticCanvas.html#setWidth">setWidth</a>, <a href="../symbols/fabric.StaticCanvas.html#toDatalessJSON">toDatalessJSON</a>, <a href="../symbols/fabric.StaticCanvas.html#toDatalessObject">toDatalessObject</a>, <a href="../symbols/fabric.StaticCanvas.html#toDataURL">toDataURL</a>, <a href="../symbols/fabric.StaticCanvas.html#toDataURLWithMultiplier">toDataURLWithMultiplier</a>, <a href="../symbols/fabric.StaticCanvas.html#toJSON">toJSON</a>, <a href="../symbols/fabric.StaticCanvas.html#toObject">toObject</a>, <a href="../symbols/fabric.StaticCanvas.html#toString">toString</a>, <a href="../symbols/fabric.StaticCanvas.html#toSVG">toSVG</a></dd>
+		<dt>Methods borrowed from class <a href="../symbols/fabric.StaticCanvas.html">fabric.StaticCanvas</a>: </dt><dd><a href="../symbols/fabric.StaticCanvas.html#add">add</a>, <a href="../symbols/fabric.StaticCanvas.html#bringForward">bringForward</a>, <a href="../symbols/fabric.StaticCanvas.html#bringToFront">bringToFront</a>, <a href="../symbols/fabric.StaticCanvas.html#calcOffset">calcOffset</a>, <a href="../symbols/fabric.StaticCanvas.html#centerObject">centerObject</a>, <a href="../symbols/fabric.StaticCanvas.html#centerObjectH">centerObjectH</a>, <a href="../symbols/fabric.StaticCanvas.html#centerObjectV">centerObjectV</a>, <a href="../symbols/fabric.StaticCanvas.html#clear">clear</a>, <a href="../symbols/fabric.StaticCanvas.html#clearContext">clearContext</a>, <a href="../symbols/fabric.StaticCanvas.html#complexity">complexity</a>, <a href="../symbols/fabric.StaticCanvas.html#createPNGStream">createPNGStream</a>, <a href="../symbols/fabric.StaticCanvas.html#dispose">dispose</a>, <a href="../symbols/fabric.StaticCanvas.html#forEachObject">forEachObject</a>, <a href="../symbols/fabric.StaticCanvas.html#getCenter">getCenter</a>, <a href="../symbols/fabric.StaticCanvas.html#getContext">getContext</a>, <a href="../symbols/fabric.StaticCanvas.html#getElement">getElement</a>, <a href="../symbols/fabric.StaticCanvas.html#getHeight">getHeight</a>, <a href="../symbols/fabric.StaticCanvas.html#getObjects">getObjects</a>, <a href="../symbols/fabric.StaticCanvas.html#getWidth">getWidth</a>, <a href="../symbols/fabric.StaticCanvas.html#insertAt">insertAt</a>, <a href="../symbols/fabric.StaticCanvas.html#isEmpty">isEmpty</a>, <a href="../symbols/fabric.StaticCanvas.html#item">item</a>, <a href="../symbols/fabric.StaticCanvas.html#onBeforeScaleRotate">onBeforeScaleRotate</a>, <a href="../symbols/fabric.StaticCanvas.html#remove">remove</a>, <a href="../symbols/fabric.StaticCanvas.html#renderAll">renderAll</a>, <a href="../symbols/fabric.StaticCanvas.html#renderTop">renderTop</a>, <a href="../symbols/fabric.StaticCanvas.html#sendBackwards">sendBackwards</a>, <a href="../symbols/fabric.StaticCanvas.html#sendToBack">sendToBack</a>, <a href="../symbols/fabric.StaticCanvas.html#setBackgroundImage">setBackgroundImage</a>, <a href="../symbols/fabric.StaticCanvas.html#setDimensions">setDimensions</a>, <a href="../symbols/fabric.StaticCanvas.html#setHeight">setHeight</a>, <a href="../symbols/fabric.StaticCanvas.html#setOverlayImage">setOverlayImage</a>, <a href="../symbols/fabric.StaticCanvas.html#setWidth">setWidth</a>, <a href="../symbols/fabric.StaticCanvas.html#toDatalessJSON">toDatalessJSON</a>, <a href="../symbols/fabric.StaticCanvas.html#toDatalessObject">toDatalessObject</a>, <a href="../symbols/fabric.StaticCanvas.html#toDataURL">toDataURL</a>, <a href="../symbols/fabric.StaticCanvas.html#toDataURLWithMultiplier">toDataURLWithMultiplier</a>, <a href="../symbols/fabric.StaticCanvas.html#toJSON">toJSON</a>, <a href="../symbols/fabric.StaticCanvas.html#toObject">toObject</a>, <a href="../symbols/fabric.StaticCanvas.html#toString">toString</a>, <a href="../symbols/fabric.StaticCanvas.html#toSVG">toSVG</a></dd>
 		</dl>
 		
 	
@@ -722,6 +743,28 @@ ul.inheritsList {
 			</div>
 			<div class="description">
 				Indicates that canvas is interactive. This property should not be changed.
+				
+				
+			</div>
+			
+			
+
+				
+				
+				
+				
+
+			<hr />
+		
+			<a name="ROTATION_CURSOR"> </a>
+			<div class="fixedFont">&lt;constant&gt; 
+			
+			<span class="light">{<a href="../symbols/String.html">String</a>}</span>
+			<b>ROTATION_CURSOR</b>
+			
+			</div>
+			<div class="description">
+				Cursor value used for rotation point
 				
 				
 			</div>
@@ -1114,38 +1157,6 @@ ul.inheritsList {
 
 			<hr />
 		
-			<a name="getContext"> </a>
-			<div class="fixedFont">
-			
-			<span class="light">{CanvasRenderingContext2D}</span>
-			<b>getContext</b>()
-			
-			</div>
-			<div class="description">
-				Returns topmost canvas context
-				
-				
-			</div>
-			
-			
-			
-				
-				
-				
-				
-				
-					<dl class="detailList">
-					<dt class="heading">Returns:</dt>
-					
-						<dd><span class="light fixedFont">{CanvasRenderingContext2D}</span> </dd>
-					
-					</dl>
-				
-				
-				
-
-			<hr />
-		
 			<a name="getPointer"> </a>
 			<div class="fixedFont">
 			
@@ -1181,6 +1192,70 @@ ul.inheritsList {
 					<dt class="heading">Returns:</dt>
 					
 						<dd><span class="light fixedFont">{Object}</span> object with "x" and "y" number values</dd>
+					
+					</dl>
+				
+				
+				
+
+			<hr />
+		
+			<a name="getSelectionContext"> </a>
+			<div class="fixedFont">
+			
+			<span class="light">{CanvasRenderingContext2D}</span>
+			<b>getSelectionContext</b>()
+			
+			</div>
+			<div class="description">
+				Returns context of canvas where object selection is drawn
+				
+				
+			</div>
+			
+			
+			
+				
+				
+				
+				
+				
+					<dl class="detailList">
+					<dt class="heading">Returns:</dt>
+					
+						<dd><span class="light fixedFont">{CanvasRenderingContext2D}</span> </dd>
+					
+					</dl>
+				
+				
+				
+
+			<hr />
+		
+			<a name="getSelectionElement"> </a>
+			<div class="fixedFont">
+			
+			<span class="light">{HTMLCanvasElement}</span>
+			<b>getSelectionElement</b>()
+			
+			</div>
+			<div class="description">
+				Returns &lt;canvas> element on which object selection is drawn
+				
+				
+			</div>
+			
+			
+			
+				
+				
+				
+				
+				
+					<dl class="detailList">
+					<dt class="heading">Returns:</dt>
+					
+						<dd><span class="light fixedFont">{HTMLCanvasElement}</span> </dd>
 					
 					</dl>
 				
@@ -1293,5 +1368,5 @@ ul.inheritsList {
 <!-- ============================== footer ================================= -->
 <div class="fineprint" style="clear:both">
 	
-	Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Fri May 11 2012 15:42:35 GMT+0400 (MSK)
+	Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Wed May 30 2012 15:56:27 GMT+0400 (MSK)
 </div>

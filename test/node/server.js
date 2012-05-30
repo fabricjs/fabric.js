@@ -34,15 +34,15 @@ console.log('Server listening on http://localhost:' + PORT);
 
 function serveImage(__response, __code, __async) {
   var canvas = __fabric.createCanvasForNode(200, 200);
-  
+
   eval(__code);
-  
+
   __response.writeHead(200, { 'Content-Type': 'image/png' });
-  
+
   if (__async !== 'true') {
     proceed();
   }
-  
+
   function proceed() {
     canvas.renderAll();
     var __stream = canvas.createPNGStream();

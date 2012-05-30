@@ -300,6 +300,25 @@
     });
   });
 
+  asyncTest('loadFromJSON with backgroundImage', function() {
+    canvas.setBackgroundImage('../../assets/pug.jpg');
+    var anotherCanvas = new fabric.Canvas();
+
+    setTimeout(function() {
+
+      var json = JSON.stringify(canvas);
+      anotherCanvas.loadFromJSON(json);
+
+      setTimeout(function() {
+
+        equal(JSON.stringify(anotherCanvas), json, 'backgrondImage and properties are initialized correctly');
+
+        start();
+
+      }, 1000);
+    }, 1000);
+  });
+
   test('remove', function() {
     ok(typeof canvas.remove == 'function');
     var rect1 = makeRect(),
@@ -640,7 +659,7 @@
     canvas.cloneWithoutData(function(clone) {
       ok(clone instanceof fabric.Canvas);
 
-      equals(EMPTY_JSON, JSON.stringify(clone), 'data on cloned canvas should be empty');
+      equals(JSON.stringify(clone), EMPTY_JSON, 'data on cloned canvas should be empty');
 
       equals(canvas.getWidth(), clone.getWidth());
       equals(canvas.getHeight(), clone.getHeight());
@@ -786,6 +805,14 @@
 
       ok(typeof canvas.backgroundImage == 'object');
       ok(/pug\.jpg$/.test(canvas.backgroundImage.src));
+
+      same(canvas.toJSON(), {
+        "objects": [ ],
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "http://localhost:4000/assets/pug.jpg",
+        "backgroundImageOpacity": 1,
+        "backgroundImageStretch": true
+      });
 
       start();
     }, 1000);
