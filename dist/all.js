@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2012, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.8.12" };
+var fabric = fabric || { version: "0.8.13" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -5676,8 +5676,7 @@ fabric.util.string = {
         'ml': 'w-resize',
         'mt': 'n-resize',
         'mr': 'e-resize',
-        'mb': 's-resize',
-       'mtr': 'crosshair'
+        'mb': 's-resize'
       },
 
       utilMin = fabric.util.array.min,
@@ -5776,6 +5775,13 @@ fabric.util.string = {
      * @type String
      */
     CURSOR:                 'default',
+
+    /**
+     * Cursor value used for rotation point
+     * @constant
+     * @type String
+     */
+    ROTATION_CURSOR:        'crosshair',
 
     /**
      * Default element class that's given to wrapper (div) element of canvas
@@ -6189,7 +6195,7 @@ fabric.util.string = {
           ? 'scaleX'
           : (corner === 'mt' || corner === 'mb')
             ? 'scaleY'
-            : (corner === 'mtr')
+            : (corner === 'mtr' || corner === 'mbr')
               ? 'rotate'
               : (target.hasRotatingPoint)
                 ? 'scale'
@@ -6445,8 +6451,9 @@ fabric.util.string = {
         else {
           if (corner in cursorMap) {
             s.cursor = cursorMap[corner];
-          }
-          else {
+          } else if (corner === 'mtr' || corner === 'mbr') {
+            s.cursor = this.ROTATION_CURSOR
+          } else {
             s.cursor = this.CURSOR;
             return false;
           }
@@ -7712,6 +7719,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         x: tl.x + (this.currentWidth/2 * cosTh),
         y: tl.y + (this.currentWidth/2 * sinTh)
       };
+      var mbr = {
+        x: tl.x + (this.currentWidth/2 * cosTh),
+        y: tl.y + (this.currentWidth/2 * sinTh)
+      };
 
       // debugging
 
@@ -7728,7 +7739,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       //       }, 50);
 
       // clockwise
-      this.oCoords = { tl: tl, tr: tr, br: br, bl: bl, ml: ml, mt: mt, mr: mr, mb: mb, mtr: mtr };
+      this.oCoords = { tl: tl, tr: tr, br: br, bl: bl, ml: ml, mt: mt, mr: mr, mb: mb, mtr: mtr, mbr: mbr };
 
       // set coordinates of the draggable boxes in the corners used to scale/rotate the image
       this._setCornerCoords();
@@ -8376,22 +8387,44 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         }
       };
 
+      var rotationPointDistance = 40;
       coords.mtr.corner = {
         tl: {
-          x: coords.mtr.x - sinHalfOffset + (sinTh * 40),
-          y: coords.mtr.y - cosHalfOffset - (cosTh * 40)
+          x: coords.mtr.x - sinHalfOffset + (sinTh * rotationPointDistance),
+          y: coords.mtr.y - cosHalfOffset - (cosTh * rotationPointDistance)
         },
         tr: {
-          x: coords.mtr.x + cosHalfOffset + (sinTh * 40),
-          y: coords.mtr.y - sinHalfOffset - (cosTh * 40)
+          x: coords.mtr.x + cosHalfOffset + (sinTh * rotationPointDistance),
+          y: coords.mtr.y - sinHalfOffset - (cosTh * rotationPointDistance)
         },
         bl: {
-          x: coords.mtr.x - cosHalfOffset + (sinTh * 40),
-          y: coords.mtr.y + sinHalfOffset - (cosTh * 40)
+          x: coords.mtr.x - cosHalfOffset + (sinTh * rotationPointDistance),
+          y: coords.mtr.y + sinHalfOffset - (cosTh * rotationPointDistance)
         },
         br: {
-          x: coords.mtr.x + sinHalfOffset + (sinTh * 40),
-          y: coords.mtr.y + cosHalfOffset - (cosTh * 40)
+          x: coords.mtr.x + sinHalfOffset + (sinTh * rotationPointDistance),
+          y: coords.mtr.y + cosHalfOffset - (cosTh * rotationPointDistance)
+        }
+      };
+
+      var bottomRotationPointDistance = (-rotationPointDistance - this.currentHeight);
+
+      coords.mbr.corner = {
+        tl: {
+          x: coords.mbr.x - sinHalfOffset + (sinTh * bottomRotationPointDistance),
+          y: coords.mbr.y - cosHalfOffset - (cosTh * bottomRotationPointDistance)
+        },
+        tr: {
+          x: coords.mbr.x + cosHalfOffset + (sinTh * bottomRotationPointDistance),
+          y: coords.mbr.y - sinHalfOffset - (cosTh * bottomRotationPointDistance)
+        },
+        bl: {
+          x: coords.mbr.x - cosHalfOffset + (sinTh * bottomRotationPointDistance),
+          y: coords.mbr.y + sinHalfOffset - (cosTh * bottomRotationPointDistance)
+        },
+        br: {
+          x: coords.mbr.x + sinHalfOffset + (sinTh * bottomRotationPointDistance),
+          y: coords.mbr.y + cosHalfOffset - (cosTh * bottomRotationPointDistance)
         }
       };
     },
