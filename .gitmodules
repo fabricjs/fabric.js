@@ -1,3 +1,4 @@
 [submodule "site"]
 	path = site
 	url = git@github.com:kangax/fabric.js.git
+	ignore = dirty
