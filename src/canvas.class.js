@@ -1,5 +1,5 @@
 (function() {
-  
+
   var extend = fabric.util.object.extend,
       getPointer = fabric.util.getPointer,
       addListener = fabric.util.addListener,
@@ -14,41 +14,41 @@
         'mr': 'e-resize',
         'mb': 's-resize'
       },
-      
+
       utilMin = fabric.util.array.min,
       utilMax = fabric.util.array.max,
-      
+
       sqrt = Math.sqrt,
       pow = Math.pow,
       atan2 = Math.atan2,
       abs = Math.abs,
       min = Math.min,
       max = Math.max,
-      
+
       STROKE_OFFSET = 0.5;
-  
+
   /**
    * @class fabric.Canvas
    * @constructor
    * @extends fabric.StaticCanvas
    * @param {HTMLElement | String} el &lt;canvas> element to initialize instance on
    * @param {Object} [options] Options object
-   */  
+   */
   fabric.Canvas = function(el, options) {
     options || (options = { });
 
     this._initStatic(el, options);
     this._initInteractive();
-    
+
     fabric.Canvas.activeInstance = this;
   };
-  
+
   function ProtoProxy(){ }
   ProtoProxy.prototype = fabric.StaticCanvas.prototype;
   fabric.Canvas.prototype = new ProtoProxy;
-  
+
   var InteractiveMethods = /** @scope fabric.Canvas.prototype */ {
-    
+
     /**
      * Indicates that canvas is interactive. This property should not be changed.
      * @property
@@ -111,14 +111,21 @@
      * @type String
      */
     CURSOR:                 'default',
-    
+
+    /**
+     * Cursor value used for rotation point
+     * @constant
+     * @type String
+     */
+    ROTATION_CURSOR:        'crosshair',
+
     /**
      * Default element class that's given to wrapper (div) element of canvas
      * @constant
      * @type String
      */
     CONTAINER_CLASS:        'canvas-container',
-    
+
     _initInteractive: function() {
       this._currentTransform = null;
       this._groupSelector = null;
@@ -129,7 +136,7 @@
       this._initEvents();
       this.calcOffset();
     },
-    
+
     /**
      * Adds mouse listeners to  canvas
      * @method _initEvents
@@ -165,12 +172,12 @@
         fabric.isTouchSupported && addListener(_this.upperCanvasEl, 'touchmove', _this._onMouseMove);
       };
 
-      this._onMouseMove = function (e) { 
+      this._onMouseMove = function (e) {
         e.preventDefault && e.preventDefault();
         _this.__onMouseMove(e);
       };
 
-      this._onResize = function (e) { 
+      this._onResize = function (e) {
         _this.calcOffset();
       };
 
@@ -285,7 +292,7 @@
 
       var target = this.findTarget(e),
           pointer = this.getPointer(e),
-          activeGroup = this.getActiveGroup(), 
+          activeGroup = this.getActiveGroup(),
           corner;
 
       if (this._shouldClearSelection(e)) {
@@ -310,7 +317,7 @@
 
         this._setupCurrentTransform(e, target);
 
-        var shouldHandleGroupLogic = e.shiftKey && (activeGroup || this.getActiveObject());
+        var shouldHandleGroupLogic = e.shiftKey && (activeGroup || this.getActiveObject()) && this.selection;
         if (shouldHandleGroupLogic) {
           this._handleGroupLogic(e, target);
         }
@@ -366,7 +373,7 @@
         // performance.
         var target = this.findTarget(e);
 
-        if (!target) {  
+        if (!target) {
           // image/text was hovered-out from, we remove its borders
           for (var i = this._objects.length; i--; ) {
             if (this._objects[i] && !this._objects[i].active) {
@@ -376,7 +383,7 @@
           style.cursor = this.CURSOR;
         }
         else {
-          // set proper cursor 
+          // set proper cursor
           this._setCursorFromEvent(e, target);
           if (target.isActive()) {
             // display corners when hovering over an image
@@ -386,14 +393,14 @@
       }
       else {
         // object is being transformed (scaled/rotated/moved/etc.)
-        var pointer = getPointer(e), 
-            x = pointer.x, 
+        var pointer = getPointer(e),
+            x = pointer.x,
             y = pointer.y;
 
         this._currentTransform.target.isMoving = true;
 
-        if (this._currentTransform.action === 'rotate') {  
-          // rotate object only if shift key is not pressed 
+        if (this._currentTransform.action === 'rotate') {
+          // rotate object only if shift key is not pressed
           // and if it is not a group we are transforming
 
           if (!e.shiftKey) {
@@ -403,7 +410,14 @@
               target: this._currentTransform.target
             });
           }
-
+          if (!this._currentTransform.target.hasRotatingPoint) {
+            this._scaleObject(x, y);
+            this.fire('object:scaling', {
+              target: this._currentTransform.target
+            });
+          }
+        }
+        else if (this._currentTransform.action === 'scale') {
           this._scaleObject(x, y);
           this.fire('object:scaling', {
             target: this._currentTransform.target
@@ -447,7 +461,7 @@
       
       var pointer = pointer || this.getPointer(e),
           xy = this._normalizePointer(target, pointer),
-          x = xy.x, 
+          x = xy.x,
           y = xy.y;
 
       // http://www.geog.ubc.ca/courses/klink/gis.notes/ncgia/u32.html
@@ -471,13 +485,13 @@
      */
     _normalizePointer: function (object, pointer) {
 
-      var activeGroup = this.getActiveGroup(), 
-          x = pointer.x, 
+      var activeGroup = this.getActiveGroup(),
+          x = pointer.x,
           y = pointer.y;
 
       var isObjectInGroup = (
-        activeGroup && 
-        object.type !== 'group' && 
+        activeGroup &&
+        object.type !== 'group' &&
         activeGroup.contains(object)
       );
 
@@ -497,10 +511,10 @@
           activeGroup = this.getActiveGroup();
       return (
         !target || (
-          target && 
-          activeGroup && 
-          !activeGroup.contains(target) && 
-          activeGroup !== target && 
+          target &&
+          activeGroup &&
+          !activeGroup.contains(target) &&
+          activeGroup !== target &&
           !e.shiftKey
         )
       );
@@ -511,16 +525,20 @@
      * @method _setupCurrentTransform
      */
     _setupCurrentTransform: function (e, target) {
-      var action = 'drag', 
+      var action = 'drag',
           corner,
           pointer = getPointer(e);
 
       if (corner = target._findTargetCorner(e, this._offset)) {
-        action = (corner === 'ml' || corner === 'mr') 
-          ? 'scaleX' 
-          : (corner === 'mt' || corner === 'mb') 
-            ? 'scaleY' 
-            : 'rotate';
+        action = (corner === 'ml' || corner === 'mr')
+          ? 'scaleX'
+          : (corner === 'mt' || corner === 'mb')
+            ? 'scaleY'
+            : (corner === 'mtr' || corner === 'mbr')
+              ? 'rotate'
+              : (target.hasRotatingPoint)
+                ? 'scale'
+                : 'rotate';
       }
 
       this._currentTransform = {
@@ -532,7 +550,7 @@
         offsetY: pointer.y - target.top,
         ex: pointer.x,
         ey: pointer.y,
-        left: target.left, 
+        left: target.left,
         top: target.top,
         theta: target.theta,
         width: target.width * target.scaleX
@@ -654,7 +672,7 @@
         path.push('L ', xPoint - minX, ' ', yPoint - minY, ' ');
       }
 
-      // TODO (kangax): maybe remove Path creation from here, to decouple fabric.Canvas from fabric.Path, 
+      // TODO (kangax): maybe remove Path creation from here, to decouple fabric.Canvas from fabric.Path,
       // and instead fire something like "drawing:completed" event with path string
 
       path = path.join('');
@@ -693,9 +711,9 @@
      * @method _scaleObject
      * @param x {Number} pointer's x coordinate
      * @param y {Number} pointer's y coordinate
-     * @param by {String} Either 'x' or 'y' - specifies dimension constraint by which to scale an object. 
+     * @param by {String} Either 'x' or 'y' - specifies dimension constraint by which to scale an object.
      *                    When not provided, an object is scaled by both dimensions equally
-     */ 
+     */
     _scaleObject: function (x, y, by) {
       var t = this._currentTransform,
           offset = this._offset,
@@ -725,10 +743,10 @@
      * @method _rotateObject
      * @param x {Number} pointer's x coordinate
      * @param y {Number} pointer's y coordinate
-     */ 
+     */
     _rotateObject: function (x, y) {
 
-      var t = this._currentTransform, 
+      var t = this._currentTransform,
           o = this._offset;
 
       if (t.target.lockRotation) return;
@@ -762,8 +780,8 @@
       else {
         var activeGroup = this.getActiveGroup();
         // only show proper corner when group selection is not active
-        var corner = !!target._findTargetCorner 
-                      && (!activeGroup || !activeGroup.contains(target)) 
+        var corner = !!target._findTargetCorner
+                      && (!activeGroup || !activeGroup.contains(target))
                       && target._findTargetCorner(e, this._offset);
 
         if (!corner) {
@@ -772,8 +790,9 @@
         else {
           if (corner in cursorMap) {
             s.cursor = cursorMap[corner];
-          }
-          else {
+          } else if (corner === 'mtr' || corner === 'mbr') {
+            s.cursor = this.ROTATION_CURSOR
+          } else {
             s.cursor = this.CURSOR;
             return false;
           }
@@ -798,7 +817,7 @@
       this.contextTop.fillRect(
         groupSelector.ex - ((left > 0) ? 0 : -left),
         groupSelector.ey - ((top > 0) ? 0 : -top),
-        aleft, 
+        aleft,
         atop
       );
 
@@ -806,7 +825,7 @@
       this.contextTop.strokeStyle = this.selectionBorderColor;
 
       this.contextTop.strokeRect(
-        groupSelector.ex + STROKE_OFFSET - ((left > 0) ? 0 : aleft), 
+        groupSelector.ex + STROKE_OFFSET - ((left > 0) ? 0 : aleft),
         groupSelector.ey + STROKE_OFFSET - ((top > 0) ? 0 : atop),
         aleft,
         atop
@@ -814,7 +833,7 @@
     },
 
     _findSelectedObjects: function (e) {
-      var target, 
+      var target,
           targetRegion,
           group = [ ],
           x1 = this._groupSelector.ex,
@@ -830,7 +849,7 @@
 
         if (!currentObject) continue;
 
-        if (currentObject.intersectsWithRect(selectionX1Y1, selectionX2Y2) || 
+        if (currentObject.intersectsWithRect(selectionX1Y1, selectionX2Y2) ||
             currentObject.isContainedWithinRect(selectionX1Y1, selectionX2Y2)) {
 
           if (this.selection && currentObject.selectable) {
@@ -843,7 +862,7 @@
       // do not create group for 1 element only
       if (group.length === 1) {
         this.setActiveObject(group[0], e);
-      } 
+      }
       else if (group.length > 1) {
         var group = new fabric.Group(group);
         this.setActiveGroup(group);
@@ -859,7 +878,7 @@
      * @method findTarget
      * @param {Event} e mouse event
      * @param {Boolean} skipGroup when true, group is skipped and only objects are traversed through
-     */ 
+     */
     findTarget: function (e, skipGroup) {
 
       var target,
@@ -898,7 +917,7 @@
         y: pointer.y - this._offset.top
       };
     },
-    
+
     /**
      * @method _createUpperCanvas
      * @param {HTMLElement|String} canvasEl Canvas element
@@ -907,13 +926,13 @@
     _createUpperCanvas: function () {
       this.upperCanvasEl = this._createCanvasElement();
       this.upperCanvasEl.className = 'upper-canvas';
-      
+
       this.wrapperEl.appendChild(this.upperCanvasEl);
-      
+
       this._applyCanvasStyle(this.upperCanvasEl);
       this.contextTop = this.upperCanvasEl.getContext('2d');
     },
-    
+
     /**
      * @private
      * @method _initWrapperElement
@@ -921,7 +940,7 @@
      * @param {Number} height
      */
     _initWrapperElement: function () {
-      this.wrapperEl = fabric.util.wrapElement(this.lowerCanvasEl, 'div', { 
+      this.wrapperEl = fabric.util.wrapElement(this.lowerCanvasEl, 'div', {
         'class': this.CONTAINER_CLASS
       });
       fabric.util.setStyle(this.wrapperEl, {
@@ -931,7 +950,7 @@
       });
       fabric.util.makeElementUnselectable(this.wrapperEl);
     },
-    
+
     /**
      * @private
      * @method _applyCanvasStyle
@@ -940,7 +959,7 @@
     _applyCanvasStyle: function (element) {
       var width = this.getWidth() || element.width,
           height = this.getHeight() || element.height;
-          
+
       fabric.util.setStyle(element, {
         position: 'absolute',
         width: width + 'px',
@@ -952,16 +971,25 @@
       element.height = height;
       fabric.util.makeElementUnselectable(element);
     },
-    
+
     /**
-     * Returns topmost canvas context
+     * Returns context of canvas where object selection is drawn
      * @method getContext
      * @return {CanvasRenderingContext2D}
      */
-    getContext: function () {
+    getSelectionContext: function() {
       return this.contextTop;
     },
-    
+
+    /**
+     * Returns &lt;canvas> element on which object selection is drawn
+     * @method getElement
+     * @return {HTMLCanvasElement}
+     */
+    getSelectionElement: function () {
+      return this.upperCanvasEl;
+    },
+
     /**
      * Sets given object as active
      * @method setActiveObject
@@ -975,13 +1003,13 @@
       }
       this._activeObject = object;
       object.setActive(true);
-      
+
       this.renderAll();
-      
+
       this.fire('object:selected', { target: object, e: e });
       return this;
     },
-    
+
     /**
      * Returns currently active object
      * @method getActiveObject
@@ -990,7 +1018,7 @@
     getActiveObject: function () {
       return this._activeObject;
     },
-    
+
     /**
      * Discards currently active object
      * @method discardActiveObject
@@ -1004,11 +1032,11 @@
       this._activeObject = null;
       return this;
     },
-    
+
     /**
      * Sets active group to a speicified one
      * @method setActiveGroup
-     * @param {fabric.Group} group Group to set as a current one 
+     * @param {fabric.Group} group Group to set as a current one
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
@@ -1016,7 +1044,7 @@
       this._activeGroup = group;
       return this;
     },
-    
+
     /**
      * Returns currently active group
      * @method getActiveGroup
@@ -1025,7 +1053,7 @@
     getActiveGroup: function () {
       return this._activeGroup;
     },
-    
+
     /**
      * Removes currently active group
      * @method discardActiveGroup
@@ -1038,7 +1066,7 @@
       }
       return this.setActiveGroup(null);
     },
-    
+
     /**
      * Deactivates all objects by calling their setActive(false)
      * @method deactivateAll
@@ -1055,7 +1083,7 @@
       this.discardActiveObject();
       return this;
     },
-    
+
     /**
      * Deactivates all objects and dispatches appropriate events
      * @method deactivateAllWithDispatch
@@ -1073,22 +1101,22 @@
       return this;
     }
   };
-  
+
   fabric.Canvas.prototype.toString = fabric.StaticCanvas.prototype.toString;
   extend(fabric.Canvas.prototype, InteractiveMethods);
-  
-  // iterating manually to workaround Opera's bug 
+
+  // iterating manually to workaround Opera's bug
   // where "prototype" property is enumerable and overrides existing prototype
   for (var prop in fabric.StaticCanvas) {
     if (prop !== 'prototype') {
       fabric.Canvas[prop] = fabric.StaticCanvas[prop];
     }
   }
-  
+
   if (fabric.isTouchSupported) {
     fabric.Canvas.prototype._setCursorFromEvent = function() { };
   }
-  
+
   /**
    * @class fabric.Element
    * @alias fabric.Canvas
