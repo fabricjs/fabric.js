@@ -22,6 +22,10 @@
     return Math.random() * (max - min) + min;
   }
 
+  if (/(iPhone|iPod|iPad)/i.test(navigator.userAgent)) {
+    fabric.Object.prototype.cornerSize = 30;
+  }
+
   var canvas = global.canvas = new fabric.Canvas('canvas', {
     /*
     clipTo: function(canvas) {

@@ -140,6 +140,34 @@ fabric.loadSVGFromURL('http://fabricjs.com/assets/45.svg', function(ob,op){
 });
 </pre>
 
+<pre class="test-source async">
+fabric.loadSVGFromURL('http://fabricjs.com/assets/55.svg', function(ob,op){
+  canvas.add(new fabric.PathGroup(ob, op).set({ left: 100, top: 100 }).scale(0.3));
+  proceed();
+});
+</pre>
+
+<pre class="test-source async">
+fabric.loadSVGFromURL('http://fabricjs.com/assets/65.svg', function(ob,op){
+  canvas.add(new fabric.PathGroup(ob, op).set({ left: 100, top: 100 }).scale(0.35));
+  proceed();
+});
+</pre>
+
+<pre class="test-source async">
+fabric.loadSVGFromURL('http://fabricjs.com/assets/85.svg', function(ob,op){
+  canvas.add(new fabric.PathGroup(ob, op).set({ left: 100, top: 100 }));
+  proceed();
+});
+</pre>
+
+<pre class="test-source async">
+fabric.loadSVGFromURL('http://fabricjs.com/assets/95.svg', function(ob,op){
+  canvas.add(new fabric.PathGroup(ob, op).set({ left: 100, top: 100 }).scale(0.5));
+  proceed();
+});
+</pre>
+
 <script>
   (function(){
     function proceed(){ }
