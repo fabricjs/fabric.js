@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2012, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.8.13" };
+var fabric = fabric || { version: "0.8.14" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -2363,11 +2363,11 @@ fabric.util.string = {
   fabric.util.createClass = createClass;
 })();
 (function (global) {
-  
+
   /* EVENT HANDLING */
-  
+
   function areHostMethods(object) {
-    var methodNames = Array.prototype.slice.call(arguments, 1), 
+    var methodNames = Array.prototype.slice.call(arguments, 1),
         t, i, len = methodNames.length;
     for (i = 0; i < len; i++) {
       t = typeof object[methodNames[i]];
@@ -2386,7 +2386,7 @@ fabric.util.string = {
       return element.__uniqueID || (element.__uniqueID = 'uniqueID__' + uid++);
     };
   })();
-  
+
   /** @ignore */
   var getElement, setElement;
 
@@ -2439,7 +2439,7 @@ fabric.util.string = {
 
       // DOM L0 branch
       handlers = { },
-      
+
       addListener, removeListener;
 
   if (shouldUseAddListenerRemoveListener) {
@@ -2455,7 +2455,7 @@ fabric.util.string = {
 
   else if (shouldUseAttachEventDetachEvent) {
     /** @ignore */
-    addListener = function (element, eventName, handler) { 
+    addListener = function (element, eventName, handler) {
       var uid = getUniqueId(element);
       setElement(uid, element);
       if (!listeners[uid]) {
@@ -2480,7 +2480,7 @@ fabric.util.string = {
             listeners[uid][eventName][i] = null;
           }
         }
-      }        
+      }
     };
   }
   else {
@@ -2513,7 +2513,7 @@ fabric.util.string = {
       }
     };
   }
-  
+
   /**
    * Adds an event listener to an element
    * @mthod addListener
@@ -2524,7 +2524,7 @@ fabric.util.string = {
    * @param {Function} handler
    */
   fabric.util.addListener = addListener;
-  
+
   /**
    * Removes an event listener from an element
    * @mthod removeListener
@@ -2535,7 +2535,7 @@ fabric.util.string = {
    * @param {Function} handler
    */
   fabric.util.removeListener = removeListener;
-  
+
   /**
    * Cross-browser wrapper for getting event's coordinates
    * @method getPointer
@@ -2550,8 +2550,8 @@ fabric.util.string = {
   function pointerX(event) {
     var docElement = fabric.document.documentElement,
         body = fabric.document.body || { scrollLeft: 0 };
-    
-    // looks like in IE (<9) clientX at certain point (apparently when mouseup fires on VML element) 
+
+    // looks like in IE (<9) clientX at certain point (apparently when mouseup fires on VML element)
     // is represented as COM object, with all the consequences, like "unknown" type and error on [[Get]]
     // need to investigate later
     return event.pageX || ((typeof event.clientX != 'unknown' ? event.clientX : 0) +
@@ -2567,20 +2567,20 @@ fabric.util.string = {
        (docElement.scrollTop || body.scrollTop) -
        (docElement.clientTop || 0));
   }
-  
+
   if (fabric.isTouchSupported) {
     pointerX = function(event) {
-      return event.touches && event.touches[0] && event.touches[0].pageX;
+      return event.touches && event.touches[0] && event.touches[0].pageX || event.clientX;
     };
     pointerY = function(event) {
-      return event.touches && event.touches[0] && event.touches[0].pageY;
+      return event.touches && event.touches[0] && event.touches[0].pageY || event.clientY;
     };
   }
-  
+
   fabric.util.getPointer = getPointer;
-  
+
   fabric.util.object.extend(fabric.util, fabric.Observable);
-  
+
 })(this);
 (function () {
   
