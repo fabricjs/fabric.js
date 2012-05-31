@@ -254,8 +254,10 @@
       this._setCursor('');
 
       var _this = this;
+      // cloned event for IE to prevent Member Not Found error
+      var clonedEvent = fabric.util.object.clone(e);
       setTimeout(function () {
-        _this._setCursorFromEvent(e, target);
+        _this._setCursorFromEvent(clonedEvent, target);
       }, 50);
 
       this.fire('mouse:up', { target: target, e: e });
@@ -455,8 +457,9 @@
      * @param target { fabric.Object } object to test against
      * @return {Boolean} true if point contains within area of given object
      */
-    containsPoint: function (e, target) {
-      var pointer = this.getPointer(e),
+    containsPoint: function (e, target, pointer) {
+      
+      var pointer = pointer || this.getPointer(e),
           xy = this._normalizePointer(target, pointer),
           x = xy.x,
           y = xy.y;
@@ -884,14 +887,14 @@
       // first check current group (if one exists)
       var activeGroup = this.getActiveGroup();
 
-      if (activeGroup && !skipGroup && this.containsPoint(e, activeGroup)) {
+      if (activeGroup && !skipGroup && this.containsPoint(e, activeGroup, pointer)) {
         target = activeGroup;
         return target;
       }
 
       // then check all of the objects on canvas
       for (var i = this._objects.length; i--; ) {
-        if (this._objects[i] && this.containsPoint(e, this._objects[i])) {
+        if (this._objects[i] && this.containsPoint(e, this._objects[i], pointer)) {
           target = this._objects[i];
           this.relatedTarget = target;
           break;

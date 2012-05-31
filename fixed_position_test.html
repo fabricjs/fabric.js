@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<title>Test</title>
+	
+	<style type="text/css" media="screen">
+		
+		#scroll1 {
+			margin-top: 500px;
+			width: 400px;
+			height: 400px;
+			background-color: #999999;
+			overflow: auto;
+		}
+		#scroll2 {
+			width: 500px;
+			height: 500px;
+			background-color: #888888;
+		}
+		#fixed {
+			position: fixed;
+			top: 100px;
+			left: 400px;
+			overflow: auto;
+			width: 300px;
+			height: 300px;
+			background-color: yellow;
+		}
+		
+	</style>
+	
+	<script type="text/javascript" charset="utf-8" src="excanvas.compiled.js"></script>
+	<script type="text/javascript" charset="utf-8" src="dist/all.js"></script>
+	
+	<script type="text/javascript" charset="utf-8">
+		
+		function onload() {
+			
+			var canvas = new fabric.Canvas('canvas');
+			
+			var rect = new fabric.Rect({
+			  top: 100,
+			  left: 100,
+			  width: 60,
+			  height: 70,
+			  fill: 'red'
+			});
+			
+			canvas.add(rect);
+			
+			
+			var canvas2 = new fabric.Canvas('canvas2');
+			
+			var rect2 = new fabric.Rect({
+			  top: 100,
+			  left: 100,
+			  width: 60,
+			  height: 70,
+			  fill: 'red'
+			});
+			
+			canvas2.add(rect2);
+			
+		}
+		
+	</script>
+	
+</head>
+<body onload="onload()">
+	
+	<div style="width: 5000px;">
+		
+		<div id="scroll1">
+
+			<div id="scroll2">
+				<canvas id="canvas" width="300" height="300"></canvas>
+
+				<div id="fixed">
+					<canvas id="canvas2" width="400" height="400"></canvas>
+				</div>
+			</div>
+
+		</div>
+		
+	</div>
+	
+	
+</body>

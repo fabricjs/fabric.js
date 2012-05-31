@@ -22,6 +22,9 @@ else {
  * @type boolean
  */
 fabric.isTouchSupported = "ontouchstart" in fabric.document.documentElement;
+
+fabric.canGetComputedStyle = !!(fabric.document.defaultView && fabric.document.defaultView.getComputedStyle);
+
 /*
     http://www.JSON.org/json2.js
     2010-03-20
@@ -2543,8 +2546,30 @@ fabric.util.string = {
    * @param {Event} event
    */
   function getPointer(event) {
-    // TODO (kangax): this method needs fixing
-    return { x: pointerX(event), y: pointerY(event) };
+    
+    var element = event.target || event.srcElement,
+        scrollLeft = 0,
+        scrollTop = 0,
+        firstFixedAncestor;
+    
+    while (element.parentNode && !firstFixedAncestor) {
+      
+      element = element.parentNode;
+      
+      if (!firstFixedAncestor) {
+        if (element !== document && fabric.util.getElementPosition(element) == 'fixed') firstFixedAncestor = element;
+      };
+      
+      scrollLeft += element.scrollLeft || 0;
+      scrollTop += element.scrollTop || 0;
+      
+    }
+    
+    return {
+      x: event.clientX + scrollLeft,
+      y: event.clientY + scrollTop
+    };
+    
   }
 
   function pointerX(event) {
@@ -2770,6 +2795,17 @@ fabric.util.string = {
     return ({ left: valueL, top: valueT });
   }
 
+  
+  function getElementPosition(element) {
+    if (fabric.canGetComputedStyle) {
+      return document.defaultView.getComputedStyle(element).position;
+    } else {
+      var value = element.style['position'];
+      if (!value && element.currentStyle) value = element.currentStyle['position'];
+      return value;
+    }
+  }
+  
   (function () {
     var style = fabric.document.documentElement.style;
 
@@ -2870,6 +2906,7 @@ fabric.util.string = {
   fabric.util.addClass = addClass;
   fabric.util.wrapElement = wrapElement;
   fabric.util.getElementOffset = getElementOffset;
+  fabric.util.getElementPosition = getElementPosition;
   
 })();
 (function(){
@@ -5918,8 +5955,10 @@ fabric.util.string = {
       this._setCursor('');
 
       var _this = this;
+      // cloned event for IE to prevent Member Not Found error
+      var clonedEvent = fabric.util.object.clone(e);
       setTimeout(function () {
-        _this._setCursorFromEvent(e, target);
+        _this._setCursorFromEvent(clonedEvent, target);
       }, 50);
 
       this.fire('mouse:up', { target: target, e: e });
@@ -6119,8 +6158,9 @@ fabric.util.string = {
      * @param target { fabric.Object } object to test against
      * @return {Boolean} true if point contains within area of given object
      */
-    containsPoint: function (e, target) {
-      var pointer = this.getPointer(e),
+    containsPoint: function (e, target, pointer) {
+      
+      var pointer = pointer || this.getPointer(e),
           xy = this._normalizePointer(target, pointer),
           x = xy.x,
           y = xy.y;
@@ -6548,14 +6588,14 @@ fabric.util.string = {
       // first check current group (if one exists)
       var activeGroup = this.getActiveGroup();
 
-      if (activeGroup && !skipGroup && this.containsPoint(e, activeGroup)) {
+      if (activeGroup && !skipGroup && this.containsPoint(e, activeGroup, pointer)) {
         target = activeGroup;
         return target;
       }
 
       // then check all of the objects on canvas
       for (var i = this._objects.length; i--; ) {
-        if (this._objects[i] && this.containsPoint(e, this._objects[i])) {
+        if (this._objects[i] && this.containsPoint(e, this._objects[i], pointer)) {
           target = this._objects[i];
           this.relatedTarget = target;
           break;
