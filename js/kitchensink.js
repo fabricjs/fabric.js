@@ -23,7 +23,7 @@
   }
 
   if (/(iPhone|iPod|iPad)/i.test(navigator.userAgent)) {
-    fabric.Object.prototype.cornerSize = 30;
+    fabric.Object.prototype.cornersize = 30;
   }
 
   var canvas = global.canvas = new fabric.Canvas('canvas', {
