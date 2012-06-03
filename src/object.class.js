@@ -144,6 +144,21 @@
     },
 
     /**
+     * @method getOptions
+     * @return {Object} [options]
+     */
+    getOptions: function() {
+      var i = this.stateProperties.length, prop, options = {};
+      while (i--) {
+        prop = this.stateProperties[i];
+        if (prop in this) {
+          options[prop] = this.get(prop);
+        }
+      }
+      return options;
+    },
+
+    /**
      * @method transform
      * @param {CanvasRenderingContext2D} ctx Context
      */
