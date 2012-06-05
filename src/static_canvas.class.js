@@ -908,6 +908,11 @@
       if (this.interactive) {
         removeListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
         removeListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
+        var parentNodeElement = this.upperCanvasEl.parentNode;
+        while (parentNodeElement) {
+          removeListener(parentNodeElement, 'scroll', this._onScroll);
+          parentNodeElement = parentNodeElement.parentNode;
+        }
         removeListener(fabric.window, 'resize', this._onResize);
       }
       return this;
