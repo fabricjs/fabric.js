@@ -5,14 +5,16 @@ title: Event inspector
 
 <style>
   p { margin-top: 3px; margin-bottom: 3px; }
-  #log1, #log2 { display: inline-block; width: 200px; height: 500px; overflow-y: auto; font-family: monospace; font-size: 11px; }
+  #log1, #log2 { display: inline-block; width: 200px; height: 500px; overflow-y: scroll; font-family: monospace; font-size: 11px; }
+  #observing-events-log { position: absolute; top: 70px; left: 450px }
+  #non-observing-events-log { position: absolute; top: 110px; left: 653px; }
 </style>
 
 <canvas id="c1" width="200" height="200"></canvas>
 <canvas id="c2" width="200" height="200"></canvas>
 
-<div id="observing-events-log" style="position:absolute;top:110px;left:450px;">
-  <strong style="margin-bottom:10px;display:block">Observing these events:</strong>
+<div id="observing-events-log">
+  <strong style="margin-bottom:10px;display:block">Observing these events</strong>
 </div>
 
 <div>
@@ -32,8 +34,8 @@ title: Event inspector
   var log1 = document.getElementById('log1');
   var log2 = document.getElementById('log2');
 
-  function log(message, where) { 
-    var el = document.createElement('p'); 
+  function log(message, where) {
+    var el = document.createElement('p');
     el.appendChild(document.createTextNode(message));
     var containerEl = (where === 1 ? log1 : log2);
     containerEl.insertBefore(el, containerEl.firstChild);
@@ -44,6 +46,9 @@ title: Event inspector
     para.appendChild(document.createTextNode(eventName));
     el.appendChild(para);
   }
+  function addSeparator() {
+    document.getElementById('observing-events-log').appendChild(document.createElement('br'));
+  }
 
   function observe(eventName) {
     logObservingEvent(eventName);
@@ -52,15 +57,25 @@ title: Event inspector
   }
 
   observe('object:modified');
-  observe('object:moving');
   observe('object:selected');
-  
+  addSeparator();
+
+  observe('object:moving');
+  observe('object:scaling');
+  observe('object:rotating');
+  addSeparator();
+
   observe('before:selection:cleared');
   observe('selection:cleared');
   observe('selection:created');
-  
-  // observe('after:render');
+  addSeparator();
+
   observe('mouse:up');
   observe('mouse:down');
+  observe('mouse:move');
+  addSeparator();
+
+  observe('after:render');
+  addSeparator();
 
 </script>
