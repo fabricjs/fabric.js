@@ -21,10 +21,12 @@
 
   var PATH_DATALESS_JSON = '{"objects":[{"type":"path","left":100,"top":100,"width":200,"height":200,"fill":"rgb(0,0,0)",'+
                            '"overlayFill":null,"stroke":null,"strokeWidth":1,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,'+
-                           '"flipY":false,"opacity":1,"selectable":true,"path":"http://example.com/"}],"background":"rgba(0, 0, 0, 0)"}';
+                           '"flipY":false,"opacity":1,"selectable":true,"hasControls":true,"hasBorders":true,"hasRotatingPoint":false,'+
+                           '"path":"http://example.com/"}],"background":"rgba(0, 0, 0, 0)"}';
 
   var RECT_JSON = '{"objects":[{"type":"rect","left":0,"top":0,"width":10,"height":10,"fill":"rgb(0,0,0)","overlayFill":null,'+
-                  '"stroke":null,"strokeWidth":1,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,"selectable":true,"rx":0,"ry":0}],'+
+                  '"stroke":null,"strokeWidth":1,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,"selectable":true,'+
+                  '"hasControls":true,"hasBorders":true,"hasRotatingPoint":false,"rx":0,"ry":0}],'+
                   '"background":"#ff5555"}';
 
   var canvas = this.canvas = new fabric.StaticCanvas('static-canvas');
@@ -570,5 +572,31 @@
 
       start();
     }, 1000);
+  });
+
+  test('object:added', function() {
+
+    var objectsAdded = [];
+    canvas.observe('object:added', function(e) {
+      objectsAdded.push(e.target);
+    });
+
+    var rect = new fabric.Rect({ width: 10, height: 20 });
+    canvas.add(rect);
+
+    same(objectsAdded[0], rect);
+
+    var circle1 = new fabric.Circle(),
+        circle2 = new fabric.Circle();
+
+    canvas.add(circle1, circle2);
+
+    same(objectsAdded[1], circle1);
+    same(objectsAdded[2], circle2);
+
+    var circle3 = new fabric.Circle();
+    canvas.insertAt(circle3, 2);
+
+    same(objectsAdded[3], circle3);
   });
 })();
