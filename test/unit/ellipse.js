@@ -1,7 +1,7 @@
 (function(){
-  
+
   module('fabric.Ellipse');
-  
+
   test('constructor', function() {
     ok(fabric.Ellipse);
 
@@ -12,34 +12,37 @@
 
     equals(ellipse.type, 'ellipse');
   });
-  
+
   test('complexity', function() {
     var ellipse = new fabric.Ellipse();
     ok(typeof ellipse.complexity == 'function');
     equals(ellipse.complexity(), 1);
   });
-  
+
   test('toObject', function() {
     var ellipse = new fabric.Ellipse();
     var defaultProperties = {
-      'type': 'ellipse', 
-      'left': 0, 
-      'top': 0, 
-      'width': 0, 
-      'height': 0, 
+      'type': 'ellipse',
+      'left': 0,
+      'top': 0,
+      'width': 0,
+      'height': 0,
       'fill': 'rgb(0,0,0)',
       'overlayFill': null,
-      'stroke': null, 
-      'strokeWidth': 1, 
-      'scaleX': 1, 
-      'scaleY': 1, 
-      'angle': 0, 
-      'flipX': false, 
-      'flipY': false, 
-      'opacity': 1, 
+      'stroke': null,
+      'strokeWidth': 1,
+      'scaleX': 1,
+      'scaleY': 1,
+      'angle': 0,
+      'flipX': false,
+      'flipY': false,
+      'opacity': 1,
       'rx': 0,
       'ry': 0,
-      'selectable': true
+      'selectable': true,
+      'hasControls': true,
+      'hasBorders': true,
+      'hasRotatingPoint': false
     };
     ok(typeof ellipse.toObject == 'function');
     same(defaultProperties, ellipse.toObject());
@@ -55,7 +58,7 @@
 
     same(augmentedProperties, ellipse.toObject());
   });
-  
+
   test('render', function() {
     var ellipse = new fabric.Ellipse();
     ellipse.set('rx', 0).set('ry', 0);
@@ -69,7 +72,7 @@
 
     equals(wasRenderCalled, false, 'should not render when rx/ry are 0');
   });
-  
+
   test('fromElement', function() {
     ok(typeof fabric.Ellipse.fromElement == 'function');
 
@@ -101,7 +104,7 @@
     equals(oEllipse.get('opacity'), fillOpacity);
     equals(oEllipse.get('strokeWidth'), strokeWidth);
   });
-  
+
   test('fromObject', function() {
     ok(typeof fabric.Ellipse == 'function');
 

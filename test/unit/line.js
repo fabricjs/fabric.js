@@ -20,7 +20,10 @@
     'y1': 12,
     'x2': 13,
     'y2': 14,
-    'selectable': true
+    'selectable': true,
+    'hasControls': true,
+    'hasBorders': true,
+    'hasRotatingPoint': false
   };
 
   module('fabric.Line');

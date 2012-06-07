@@ -23,10 +23,12 @@
 
   var PATH_DATALESS_JSON = '{"objects":[{"type":"path","left":100,"top":100,"width":200,"height":200,"fill":"rgb(0,0,0)",'+
                            '"overlayFill":null,"stroke":null,"strokeWidth":1,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,'+
-                           '"flipY":false,"opacity":1,"selectable":true,"path":"http://example.com/"}],"background":"rgba(0, 0, 0, 0)"}';
+                           '"flipY":false,"opacity":1,"selectable":true,"hasControls":true,"hasBorders":true,"hasRotatingPoint":false,'+
+                           '"path":"http://example.com/"}],"background":"rgba(0, 0, 0, 0)"}';
 
   var RECT_JSON = '{"objects":[{"type":"rect","left":0,"top":0,"width":10,"height":10,"fill":"rgb(0,0,0)","overlayFill":null,'+
-                  '"stroke":null,"strokeWidth":1,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,"selectable":true,"rx":0,"ry":0}],'+
+                  '"stroke":null,"strokeWidth":1,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,'+
+                  '"selectable":true,"hasControls":true,"hasBorders":true,"hasRotatingPoint":false,"rx":0,"ry":0}],'+
                   '"background":"#ff5555"}';
 
   var canvas = this.canvas = new fabric.Canvas('canvas');
@@ -47,6 +49,7 @@
       canvas.clear();
       canvas.setActiveGroup(null);
       canvas.backgroundColor = fabric.Canvas.prototype.backgroundColor;
+      canvas.backgroundImage = '';
       canvas.calcOffset();
       canvasEl.style.display = 'none';
     }
@@ -642,6 +645,7 @@
     canvas.clone(function(clone) {
       ok(clone instanceof fabric.Canvas);
 
+      // alert(JSON.stringify(clone));
       equals(canvasData, JSON.stringify(clone), 'data on cloned canvas should be identical');
 
       equals(canvas.getWidth(), clone.getWidth());
@@ -657,6 +661,7 @@
     canvas.add(new fabric.Rect({ width: 100, height: 110, top: 120, left: 130, fill: 'rgba(0,1,2,0.3)' }));
 
     canvas.cloneWithoutData(function(clone) {
+
       ok(clone instanceof fabric.Canvas);
 
       equals(JSON.stringify(clone), EMPTY_JSON, 'data on cloned canvas should be empty');
@@ -816,5 +821,21 @@
 
       start();
     }, 1000);
+  });
+
+  test('selection:cleared', function() {
+    var isFired = false;
+    canvas.observe('selection:cleared', function() { isFired = true });
+
+    canvas.add(new fabric.Rect());
+    canvas.remove(canvas.item(0));
+
+    equal(isFired, false, 'removing inactive object shouldnt fire "selection:cleared"');
+
+    canvas.add(new fabric.Rect());
+    canvas.setActiveObject(canvas.item(0));
+    canvas.remove(canvas.item(0));
+
+    equal(isFired, true, 'removing active object should fire "selection:cleared"');
   });
 })();

@@ -17,6 +17,9 @@
     'flipY': false,
     'opacity': 1,
     'selectable': true,
+    'hasControls': true,
+    'hasBorders': true,
+    'hasRotatingPoint': false,
     'rx': 0,
     'ry': 0
   };
