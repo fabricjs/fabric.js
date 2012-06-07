@@ -372,6 +372,7 @@
       for (var i = arguments.length; i--; ) {
         this.stateful && arguments[i].setupState();
         arguments[i].setCoords();
+        this.fire('object:added', { target: arguments[i] });
       }
       this.renderOnAddition && this.renderAll();
       return this;
@@ -396,6 +397,7 @@
       this.stateful && object.setupState();
       object.setCoords();
       this.renderAll();
+      this.fire('object:added', { target: object });
       return this;
     },
 
