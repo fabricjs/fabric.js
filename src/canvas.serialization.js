@@ -276,12 +276,22 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     el.width = this.getWidth();
     el.height = this.getHeight();
 
-    // cache
-    var clone = this.__clone || (this.__clone = new fabric.Canvas(el));
+    var clone = new fabric.Canvas(el);
     clone.clipTo = this.clipTo;
-
-    if (callback) {
-      callback(clone);
+    if (this.backgroundImage) {
+      clone.setBackgroundImage(this.backgroundImage.src, function() {
+        clone.renderAll();
+        if (callback) {
+          callback(clone);
+        }
+      });
+      clone.backgroundImageOpacity = this.backgroundImageOpacity;
+      clone.backgroundImageStretch = this.backgroundImageStretch;
+    }
+    else {
+      if (callback) {
+        callback(clone);
+      }
     }
   }
 });
