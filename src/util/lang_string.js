@@ -37,11 +37,11 @@ function capitalize(string) {
 }
 
 function escapeXml(string) {
-  return string.replace('&', '&amp;')
-     .replace('"', '&quot;')
-     .replace("'", '&apos;')
-     .replace("<", '&lt;')
-     .replace(">", '&gt;');
+  return string.replace(/&/g, '&amp;')
+     .replace(/"/g, '&quot;')
+     .replace(/'/g, '&apos;')
+     .replace(/</g, '&lt;')
+     .replace(/>/g, '&gt;');
 }
 
 /** @namespace */
