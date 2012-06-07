@@ -7,14 +7,21 @@ title: Event inspector
   p { margin-top: 3px; margin-bottom: 3px; }
   #log1, #log2 { display: inline-block; width: 200px; height: 500px; overflow-y: scroll; font-family: monospace; font-size: 11px; }
   #observing-events-log { position: absolute; top: 70px; left: 450px }
-  #non-observing-events-log { position: absolute; top: 110px; left: 653px; }
+  #non-observing-events-log { position: absolute; top: 70px; left: 653px; }
+  .log strong { margin-bottom: 10px; display: block; }
 </style>
 
 <canvas id="c1" width="200" height="200"></canvas>
 <canvas id="c2" width="200" height="200"></canvas>
 
-<div id="observing-events-log">
-  <strong style="margin-bottom:10px;display:block">Observing these events</strong>
+<div id="observing-events-log" class="log">
+  <strong>Observing these events</strong>
+</div>
+
+<div id="non-observing-events-log" class="log">
+  <strong>Other available events</strong>
+  <p>"path:created"</p>
+  <p>"object:added"</p>
 </div>
 
 <div>
