@@ -2290,58 +2290,69 @@ fabric.util.string = {
   
 })();
 (function() {
-  
+
   var slice = Array.prototype.slice, emptyFunction = function() { };
-  
+
   var IS_DONTENUM_BUGGY = (function(){
     for (var p in { toString: 1 }) {
       if (p === 'toString') return false;
     }
     return true;
   })();
-  
-  var addMethods;
-  if (IS_DONTENUM_BUGGY) {
-    /** @ignore */
-    addMethods = function(klass, source) {
-      if (source.toString !== Object.prototype.toString) {
-        klass.prototype.toString = source.toString;
+
+  /** @ignore */
+  var addMethods = function(klass, source, parent) {
+    for (var property in source) {
+
+      if (property in klass.prototype && typeof klass.prototype[property] == 'function') {
+
+        klass.prototype[property] = (function(property) {
+          return function() {
+
+            var superclass = this.constructor.superclass;
+            this.constructor.superclass = parent;
+            var returnValue = source[property].apply(this, arguments);
+            this.constructor.superclass = superclass;
+
+            if (property !== 'initialize') {
+              return returnValue;
+            }
+          }
+        })(property);
       }
-      if (source.valueOf !== Object.prototype.valueOf) {
-        klass.prototype.valueOf = source.valueOf;
-      }
-      for (var property in source) {
+      else {
         klass.prototype[property] = source[property];
       }
-    };
-  }
-  else {
-    /** @ignore */
-    addMethods = function(klass, source) {
-      for (var property in source) {
-        klass.prototype[property] = source[property];
+
+      if (IS_DONTENUM_BUGGY) {
+        if (source.toString !== Object.prototype.toString) {
+          klass.prototype.toString = source.toString;
+        }
+        if (source.valueOf !== Object.prototype.valueOf) {
+          klass.prototype.valueOf = source.valueOf;
+        }
       }
-    };
-  }
+    }
+  };
 
   function subclass() { };
-  
+
   /**
    * Helper for creation of "classes"
    * @method createClass
    * @memberOf fabric.util
    */
   function createClass() {
-    var parent = null, 
+    var parent = null,
         properties = slice.call(arguments, 0);
-    
+
     if (typeof properties[0] === 'function') {
       parent = properties.shift();
     }
     function klass() {
       this.initialize.apply(this, arguments);
     }
-    
+
     klass.superclass = parent;
     klass.subclasses = [ ];
 
@@ -2351,7 +2362,7 @@ fabric.util.string = {
       parent.subclasses.push(klass);
     }
     for (var i = 0, length = properties.length; i < length; i++) {
-      addMethods(klass, properties[i]);
+      addMethods(klass, properties[i], parent);
     }
     if (!klass.prototype.initialize) {
       klass.prototype.initialize = emptyFunction;
@@ -2359,7 +2370,7 @@ fabric.util.string = {
     klass.prototype.constructor = klass;
     return klass;
   }
-  
+
   fabric.util.createClass = createClass;
 })();
 (function (global) {
@@ -7183,12 +7194,22 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     el.width = this.getWidth();
     el.height = this.getHeight();
 
-    // cache
-    var clone = this.__clone || (this.__clone = new fabric.Canvas(el));
+    var clone = new fabric.Canvas(el);
     clone.clipTo = this.clipTo;
-
-    if (callback) {
-      callback(clone);
+    if (this.backgroundImage) {
+      clone.setBackgroundImage(this.backgroundImage.src, function() {
+        clone.renderAll();
+        if (callback) {
+          callback(clone);
+        }
+      });
+      clone.backgroundImageOpacity = this.backgroundImageOpacity;
+      clone.backgroundImageStretch = this.backgroundImageStretch;
+    }
+    else {
+      if (callback) {
+        callback(clone);
+      }
     }
   }
 });
@@ -7756,7 +7777,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
       return this;
     },
-    
+
      /**
      * Returns width of an object's bounding rectangle
      * @method getBoundingRectWidth
@@ -7777,10 +7798,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     getBoundingRectHeight: function() {
       var yCoords = [this.oCoords.tl.y, this.oCoords.tr.y, this.oCoords.br.y, this.oCoords.bl.y];
       var minY = fabric.util.array.min(yCoords);
-      var maxY = fabric.util.array.max(yCoords);      
+      var maxY = fabric.util.array.max(yCoords);
       return Math.abs(minY - maxY);
-    },    
-  
+    },
+
     /**
      * Draws borders of an object's bounding box.
      * Requires public properties: width, height
@@ -7983,7 +8004,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         G_vmlCanvasManager.initElement(el);
       }
 
-      el.width  = this.getBoundingRectWidth(); 
+      this.setCoords();
+      el.width  = this.getBoundingRectWidth();
       el.height = this.getBoundingRectHeight();
 
       fabric.util.wrapElement(el, 'div');
