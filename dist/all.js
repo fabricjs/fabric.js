@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2012, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.8.14" };
+var fabric = fabric || { version: "0.8.15" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -3830,30 +3830,34 @@ fabric.util.string = {
 })(typeof exports != 'undefined' ? exports : this);
 
 (function() {
-  
+
   function getColorStopFromStyle(el) {
     var style = el.getAttribute('style');
-    
+
     if (style) {
       var keyValuePairs = style.split(/\s*;\s*/);
-      
+
+      if (keyValuePairs[keyValuePairs.length-1] === '') {
+        keyValuePairs.pop();
+      }
+
       for (var i = keyValuePairs.length; i--; ) {
-        
+
         var split = keyValuePairs[i].split(/\s*:\s*/),
             key = split[0].trim(),
             value = split[1].trim();
-            
+
         if (key === 'stop-color') {
           return value;
         }
       }
     }
   }
-  
+
   /** @namespace */
-  
+
   fabric.Gradient = {
-    
+
     /**
      * @method create
      * @static
@@ -3866,23 +3870,23 @@ fabric.util.string = {
           x2 = options.x2 || ctx.canvas.width,
           y2 = options.y2 || 0,
           colorStops = options.colorStops;
-          
+
       var gradient = ctx.createLinearGradient(x1, y1, x2, y2);
-      
+
       for (var position in colorStops) {
         var colorValue = colorStops[position];
         gradient.addColorStop(parseFloat(position), colorValue);
       }
       return gradient;
     },
-    
+
     /**
      * @method fromElement
      * @static
      * @see http://www.w3.org/TR/SVG/pservers.html#LinearGradientElement
      */
     fromElement: function(el, ctx, instance) {
-      
+
       /**
        *  @example:
        *
@@ -3911,18 +3915,18 @@ fabric.util.string = {
             x2: el.getAttribute('x2') || '100%',
             y2: el.getAttribute('y2') || 0
           };
-      
+
       for (var i = colorStopEls.length; i--; ) {
         el = colorStopEls[i];
         offset = el.getAttribute('offset');
-        
+
         // convert percents to absolute values
         offset = parseFloat(offset) / (/%$/.test(offset) ? 100 : 1);
         colorStops[offset] = getColorStopFromStyle(el) || el.getAttribute('stop-color');
       }
-      
+
       _convertPercentUnitsToValues(instance, coords);
-      
+
       return fabric.Gradient.create(ctx, {
         x1: coords.x1,
         y1: coords.y1,
@@ -3931,17 +3935,17 @@ fabric.util.string = {
         colorStops: colorStops
       });
     },
-    
+
     /**
      * @method forObject
      * @static
      */
     forObject: function(obj, ctx, options) {
       options || (options = { });
-      
+
       _convertPercentUnitsToValues(obj, options);
 
-      var gradient = fabric.Gradient.create(ctx, { 
+      var gradient = fabric.Gradient.create(ctx, {
         x1: options.x1,
         y1: options.y1,
         x2: options.x2,
@@ -3952,7 +3956,7 @@ fabric.util.string = {
       return gradient;
     }
   };
-  
+
   function _convertPercentUnitsToValues(object, options) {
     for (var prop in options) {
       if (typeof options[prop] === 'string' && /^\d+%$/.test(options[prop])) {
@@ -3973,7 +3977,7 @@ fabric.util.string = {
       }
     }
   }
-  
+
   /**
    * Parses an SVG document, returning all of the gradient declarations found in it
    * @static
@@ -3988,22 +3992,22 @@ fabric.util.string = {
         radialGradientEls = doc.getElementsByTagName('radialGradient'),
         el,
         gradientDefs = { };
-    
+
     for (var i = linearGradientEls.length; i--; ) {
       el = linearGradientEls[i];
       gradientDefs[el.id] = el;
     }
-    
+
     for (var i = radialGradientEls.length; i--; ) {
       el = radialGradientEls[i];
       gradientDefs[el.id] = el;
     }
-    
+
     return gradientDefs;
   }
-  
+
   fabric.getGradientDefs = getGradientDefs;
-  
+
 })();
 (function(global) {
   
@@ -5007,6 +5011,7 @@ fabric.util.string = {
       for (var i = arguments.length; i--; ) {
         this.stateful && arguments[i].setupState();
         arguments[i].setCoords();
+        this.fire('object:added', { target: arguments[i] });
       }
       this.renderOnAddition && this.renderAll();
       return this;
@@ -5031,6 +5036,7 @@ fabric.util.string = {
       this.stateful && object.setupState();
       object.setCoords();
       this.renderAll();
+      this.fire('object:added', { target: object });
       return this;
     },
 
