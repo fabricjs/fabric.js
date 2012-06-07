@@ -562,7 +562,7 @@
 
       return this;
     },
-    
+
      /**
      * Returns width of an object's bounding rectangle
      * @method getBoundingRectWidth
@@ -583,10 +583,10 @@
     getBoundingRectHeight: function() {
       var yCoords = [this.oCoords.tl.y, this.oCoords.tr.y, this.oCoords.br.y, this.oCoords.bl.y];
       var minY = fabric.util.array.min(yCoords);
-      var maxY = fabric.util.array.max(yCoords);      
+      var maxY = fabric.util.array.max(yCoords);
       return Math.abs(minY - maxY);
-    },    
-  
+    },
+
     /**
      * Draws borders of an object's bounding box.
      * Requires public properties: width, height
@@ -789,7 +789,8 @@
         G_vmlCanvasManager.initElement(el);
       }
 
-      el.width  = this.getBoundingRectWidth(); 
+      this.setCoords();
+      el.width  = this.getBoundingRectWidth();
       el.height = this.getBoundingRectHeight();
 
       fabric.util.wrapElement(el, 'div');
