@@ -775,7 +775,11 @@
     remove: function (object) {
       removeFromArray(this._objects, object);
       if (this.getActiveObject() === object) {
+
+        // removing active object should fire "selection:cleared" events
+        this.fire('before:selection:cleared', { target: object });
         this.discardActiveObject();
+        this.fire('selection:cleared');
       }
       this.renderAll();
       return object;

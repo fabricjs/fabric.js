@@ -2004,7 +2004,7 @@ fabric.Observable = {
       }
     };
   }
-  
+
   if (!Array.prototype.map) {
     Array.prototype.map = function(fn, context) {
       var result = [ ];
@@ -5414,7 +5414,11 @@ fabric.util.string = {
     remove: function (object) {
       removeFromArray(this._objects, object);
       if (this.getActiveObject() === object) {
+
+        // removing active object should fire "selection:cleared" events
+        this.fire('before:selection:cleared', { target: object });
         this.discardActiveObject();
+        this.fire('selection:cleared');
       }
       this.renderAll();
       return object;
@@ -7753,7 +7757,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       return this;
     },
     
-    /**
+     /**
      * Returns width of an object's bounding rectangle
      * @method getBoundingRectWidth
      * @return {Number} width value
@@ -7776,7 +7780,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       var maxY = fabric.util.array.max(yCoords);      
       return Math.abs(minY - maxY);
     },    
-
+  
     /**
      * Draws borders of an object's bounding box.
      * Requires public properties: width, height
@@ -7978,7 +7982,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       if (!el.getContext && typeof G_vmlCanvasManager != 'undefined') {
         G_vmlCanvasManager.initElement(el);
       }
-      
+
       el.width  = this.getBoundingRectWidth(); 
       el.height = this.getBoundingRectHeight();
 
