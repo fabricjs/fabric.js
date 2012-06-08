@@ -97,6 +97,24 @@
   }
 
   /**
+   * Returns scroll for a given element, not including scroll of body element
+   * @method getElementScroll
+   * @function
+   * @memberOf fabric.util
+   * @param {HTMLElement} element Element to get scroll for
+   * @return {Object} Object with "left" and "top" properties
+   */
+  function getElementScroll(element) {
+    var scrollLeft = 0, scrollTop = 0;
+    do {
+      scrollLeft += element.scrollLeft || 0;
+      scrollTop +=  element.scrollTop || 0;
+      element = element.parentNode;
+    } while (element.tagName.toUpperCase() !== "BODY");
+    return ({ left: scrollLeft, top: scrollTop});
+  }
+
+  /**
    * Returns offset for a given element
    * @method getElementOffset
    * @function
@@ -106,14 +124,15 @@
    */
   function getElementOffset(element) {
     // TODO (kangax): need to fix this method
+    var scroll = getElementScroll(element);
     var valueT = 0, valueL = 0;
     do {
       valueT += element.offsetTop  || 0;
       valueL += element.offsetLeft || 0;
       element = element.offsetParent;
-    } 
-    while (element);
-    return ({ left: valueL, top: valueT });
+    } while (element);
+
+    return ({ left: valueL - scroll.left, top: valueT - scroll.top});
   }
 
   (function () {

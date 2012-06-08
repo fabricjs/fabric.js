@@ -181,8 +181,17 @@
         _this.calcOffset();
       };
 
+      this._onScroll = function (e) {
+        _this.calcOffset();
+      };
 
       addListener(fabric.window, 'resize', this._onResize);
+
+      var parentNodeElement = this.upperCanvasEl.parentNode;
+      while (parentNodeElement) {
+        addListener(parentNodeElement, 'scroll', this._onScroll);
+        parentNodeElement = parentNodeElement.parentNode;
+      }
 
       if (fabric.isTouchSupported) {
         addListener(this.upperCanvasEl, 'touchstart', this._onMouseDown);
