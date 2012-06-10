@@ -24,6 +24,14 @@
     'transform':      'transformMatrix'
   };
 
+  function normalizeAttr(attr) {
+    // transform attribute names
+    if (attr in attributesMap) {
+      return attributesMap[attr];
+    }
+    return attr;
+  }
+
   /**
    * Returns an object of attributes' name/value, given element and an array of attribute names;
    * Parses parent "g" nodes recursively upwards.
@@ -63,10 +71,7 @@
         if (attr === 'transform') {
           value = fabric.parseTransformAttribute(value);
         }
-        // transform attribute names
-        if (attr in attributesMap) {
-          attr = attributesMap[attr];
-        }
+        attr = normalizeAttr(attr);
         memo[attr] = isNaN(parsed) ? value : parsed;
       }
       return memo;
@@ -268,12 +273,12 @@
       if (typeof style == 'string') {
         style = style.replace(/;$/, '').split(';').forEach(function (current) {
             var attr = current.split(':');
-            oStyle[attr[0].trim().toLowerCase()] = attr[1].trim();
+            oStyle[normalizeAttr(attr[0].trim().toLowerCase())] = attr[1].trim();
         });
       } else {
         for (var prop in style) {
           if (typeof style[prop] !== 'undefined') {
-            oStyle[prop.toLowerCase()] = style[prop];
+            oStyle[normalizeAttr(prop.toLowerCase())] = style[prop];
           }
         }
       }

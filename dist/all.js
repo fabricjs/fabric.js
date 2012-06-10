@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2012, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.8.16" };
+var fabric = fabric || { version: "0.8.17" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -3177,6 +3177,14 @@ fabric.util.string = {
     'transform':      'transformMatrix'
   };
 
+  function normalizeAttr(attr) {
+    // transform attribute names
+    if (attr in attributesMap) {
+      return attributesMap[attr];
+    }
+    return attr;
+  }
+
   /**
    * Returns an object of attributes' name/value, given element and an array of attribute names;
    * Parses parent "g" nodes recursively upwards.
@@ -3216,10 +3224,7 @@ fabric.util.string = {
         if (attr === 'transform') {
           value = fabric.parseTransformAttribute(value);
         }
-        // transform attribute names
-        if (attr in attributesMap) {
-          attr = attributesMap[attr];
-        }
+        attr = normalizeAttr(attr);
         memo[attr] = isNaN(parsed) ? value : parsed;
       }
       return memo;
@@ -3421,12 +3426,12 @@ fabric.util.string = {
       if (typeof style == 'string') {
         style = style.replace(/;$/, '').split(';').forEach(function (current) {
             var attr = current.split(':');
-            oStyle[attr[0].trim().toLowerCase()] = attr[1].trim();
+            oStyle[normalizeAttr(attr[0].trim().toLowerCase())] = attr[1].trim();
         });
       } else {
         for (var prop in style) {
           if (typeof style[prop] !== 'undefined') {
-            oStyle[prop.toLowerCase()] = style[prop];
+            oStyle[normalizeAttr(prop.toLowerCase())] = style[prop];
           }
         }
       }
