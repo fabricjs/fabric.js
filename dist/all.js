@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2012, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.8.15" };
+var fabric = fabric || { version: "0.8.16" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -2240,11 +2240,11 @@ function capitalize(string) {
 }
 
 function escapeXml(string) {
-  return string.replace('&', '&amp;')
-     .replace('"', '&quot;')
-     .replace("'", '&apos;')
-     .replace("<", '&lt;')
-     .replace(">", '&gt;');
+  return string.replace(/&/g, '&amp;')
+     .replace(/"/g, '&quot;')
+     .replace(/'/g, '&apos;')
+     .replace(/</g, '&lt;')
+     .replace(/>/g, '&gt;');
 }
 
 /** @namespace */
