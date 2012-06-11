@@ -51,13 +51,6 @@
     type: 'image',
 
     /**
-     * Filters to be applied to an image (when calling `applyFilters`)
-     * @property
-     * @type Array
-     */
-    filters: [ ],
-
-    /**
      * Constructor
      * @param {HTMLImageElement | String} element Image element
      * @param {Object} options optional
@@ -69,6 +62,8 @@
       this._initElement(element);
       this._originalImage = this.getElement();
       this._initConfig(options);
+
+      this.filters = [ ];
 
       if (options.filters) {
         this.filters = options.filters;
