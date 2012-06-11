@@ -4,64 +4,144 @@ title: Image Filters
 ---
 
 <style>
-  .controls { display: inline-block; background: #fafafa; margin-left: 10px; padding: 15px; border-left: 1px dotted #aaa; height: 270px }
+  .controls { display: inline-block; background: #fafafa; margin-left: 10px; padding: 15px; border-left: 1px dotted #aaa; }
   .canvas-container { display: inline-block; vertical-align: top; }
+  input[disabled] { opacity: 0.5; }
 </style>
 
-<canvas id="c" width="500" height="500"></canvas>
+<canvas id="c" width="500" height="600"></canvas>
 <div class="controls">
   <h3>Filters:</h3>
   <p>
-    <label><span>Grayscale:</span> <input type="checkbox" id="grayscale"></label>
+    <label><span>Grayscale:</span> <input type="checkbox" id="grayscale" disabled></label>
   </p>
   <p>
-    <label><span>Invert:</span> <input type="checkbox" id="invert"></label>
+    <label><span>Invert:</span> <input type="checkbox" id="invert" disabled></label>
   </p>
   <p>
-    <label><span>Remove white:</span> <input type="checkbox" id="remove-white"></label>
+    <label><span>Sepia:</span> <input type="checkbox" id="sepia" disabled></label>
+  </p>
+  <p>
+    <label><span>Sepia2:</span> <input type="checkbox" id="sepia2" disabled></label>
+  </p>
+  <p>
+    <label><span>Remove white:</span> <input type="checkbox" id="remove-white" disabled></label>
     <br>
-    <label>Threshold: <input type="range" id="remove-white-threshold" value="60" min="0" max="255"></label>
+    <label>Threshold: <input type="range" id="remove-white-threshold" value="60" min="0" max="255" disabled></label>
     <br>
-    <label>Distance: <input type="range" id="remove-white-distance" value="10" min="0" max="255"></label>
+    <label>Distance: <input type="range" id="remove-white-distance" value="10" min="0" max="255" disabled></label>
+  </p>
+  <p>
+    <label><span>Brightness:</span> <input type="checkbox" id="brightness" disabled></label>
+    <br>
+    <label>Value: <input type="range" id="brightness-value" value="100" min="0" max="255" disabled></label>
+  </p>
+  <p>
+    <label><span>Noise:</span> <input type="checkbox" id="noise" disabled></label>
+    <br>
+    <label>Value: <input type="range" id="noise-value" value="100" min="0" max="1000" disabled></label>
+  </p>
+  <p>
+    <label><span>GradientTransparency:</span> <input type="checkbox" id="gradient-transparency" disabled></label>
+    <br>
+    <label>Value: <input type="range" id="gradient-transparency-value" value="100" min="0" max="255" disabled></label>
   </p>
 </div>
 
 <script id="main">var $ = function(id){return document.getElementById(id)};
 
-var canvas = new fabric.Canvas('c', { backgroundImage: '../lib/bg.png' });
+function applyFilter(index, filter) {
+  var obj = canvas.getActiveObject();
+  obj.filters[index] = filter;
+  obj.applyFilters(canvas.renderAll.bind(canvas));
+}
 
-var oImg;
+function applyFilterValue(index, prop, value) {
+  var obj = canvas.getActiveObject();
+  if (obj.filters[index]) {
+    obj.filters[index][prop] = value;
+    obj.applyFilters(canvas.renderAll.bind(canvas));
+  }
+}
+
+var canvas = new fabric.Canvas('c', { backgroundImage: '../lib/bg.png' }),
+    f = fabric.Image.filters;
+
+canvas.observe({
+  'object:selected': function() {
+    fabric.util.toArray(document.getElementsByTagName('input')).forEach(function(el){ el.disabled = false; })
+
+    var obj = canvas.getActiveObject();
+
+    $('grayscale').checked = !!obj.filters[0];
+    $('invert').checked = !!obj.filters[1];
+    $('remove-white').checked = !!obj.filters[2];
+    $('sepia').checked = !!obj.filters[3];
+    $('sepia2').checked = !!obj.filters[4];
+    $('brightness').checked = !!obj.filters[5];
+    $('noise').checked = !!obj.filters[6];
+    $('gradient-transparency').checked = !!obj.filters[7];
+  },
+  'selection:cleared': function() {
+    fabric.util.toArray(document.getElementsByTagName('input')).forEach(function(el){ el.disabled = true; })
+  }
+});
+
+fabric.Image.fromURL('../assets/pug.jpg', function(img) {
+  var oImg = img.set({ left: 250, top: 350, angle: -10 }).scale(0.4);
+  canvas.add(oImg).renderAll();
+});
 fabric.Image.fromURL('../assets/logo.png', function(img) {
-  oImg = img.set({ left: 250, top: 250, angle: -10 })
-  canvas.add(oImg);
-  canvas.renderAll();
+  var oImg = img.set({ left: 110, top: 75, angle: 10 }).scale(0.7);
+  canvas.add(oImg).renderAll();
 });
 
 $('grayscale').onclick = function() {
-  oImg.filters[0] = this.checked ? new fabric.Image.filters.Grayscale() : null;
-  oImg.applyFilters(canvas.renderAll.bind(canvas));
+  applyFilter(0, this.checked && new f.Grayscale());
 };
-
 $('invert').onclick = function() {
-  oImg.filters[1] = this.checked ? new fabric.Image.filters.Invert() : null;
-  oImg.applyFilters(canvas.renderAll.bind(canvas));
+  applyFilter(1, this.checked && new f.Invert());
 };
-
 $('remove-white').onclick = function () {
-  oImg.filters[2] = this.checked ? new fabric.Image.filters.RemoveWhite({ 
-    threshold: $('remove-white-threshold').value, 
-    distance: $('remove-white-distance').value 
-  }) : null;
-  oImg.applyFilters(canvas.renderAll.bind(canvas));
+  applyFilter(2, this.checked && new f.RemoveWhite({
+    threshold: $('remove-white-threshold').value,
+    distance: $('remove-white-distance').value
+  }));
 };
-
 $('remove-white-threshold').onchange = function() {
-  oImg.filters[2] && (oImg.filters[2].threshold = this.value);
-  oImg.applyFilters(canvas.renderAll.bind(canvas));
+  applyFilterValue(2, 'threshold', this.value);
 };
-
 $('remove-white-distance').onchange = function() {
-  oImg.filters[2] && (oImg.filters[2].distance = this.value);
-  oImg.applyFilters(canvas.renderAll.bind(canvas));
+  applyFilterValue(2, 'distance', this.value);
+};
+$('sepia').onclick = function() {
+  applyFilter(3, this.checked && new f.Sepia());
+};
+$('sepia2').onclick = function() {
+  applyFilter(4, this.checked && new f.Sepia2());
+};
+$('brightness').onclick = function () {
+  applyFilter(5, this.checked && new f.Brightness({
+    brightness: parseInt($('brightness-value').value, 10)
+  }));
+};
+$('brightness-value').onchange = function() {
+  applyFilterValue(5, 'brightness', parseInt(this.value, 10));
+};
+$('noise').onclick = function () {
+  applyFilter(6, this.checked && new f.Noise({
+    noise: parseInt($('noise-value').value, 10)
+  }));
+};
+$('noise-value').onchange = function() {
+  applyFilterValue(6, 'noise', parseInt(this.value, 10));
+};
+$('gradient-transparency').onclick = function () {
+  applyFilter(7, this.checked && new f.GradientTransparency({
+    threshold: parseInt($('gradient-transparency-value').value, 10)
+  }));
+};
+$('gradient-transparency-value').onchange = function() {
+  applyFilterValue(7, 'threshold', parseInt(this.value, 10));
 };
 </script>
