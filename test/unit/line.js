@@ -125,6 +125,19 @@
     equals(100, line.height);
   });
 
+  test('stroke-width in a style', function() {
+    var lineEl = document.createElement('line'),
+        x1 = 0,
+        y1 = 0,
+        x2 = 10,
+        y2 = 10;
+
+    lineEl.setAttribute('style', 'stroke-width:4');
+
+    var oLine = fabric.Line.fromElement(lineEl);
+    ok(4, oLine.strokeWidth);
+  });
+
   // this isn't implemented yet, so disabling for now
 
   // test('x1,y1 less than x2,y2 should work', function() {
