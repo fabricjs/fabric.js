@@ -615,4 +615,20 @@
       start();
     }, 1000);
   });
+
+  asyncTest('animate', function() {
+    var object = new fabric.Object({ left: 20, top: 30, width: 40, height: 50, angle: 43 });
+
+    ok(typeof object.animate == 'function');
+
+    object.animate('left', 40);
+    ok(true, 'animate without options does not crash');
+
+    setTimeout(function() {
+
+      equal(40, Math.round(object.get('left')));
+      start();
+
+    }, 500);
+  });
 })();
