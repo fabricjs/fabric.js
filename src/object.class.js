@@ -1306,11 +1306,13 @@
     animate: function(property, to, options) {
       var obj = this;
 
+      options || (options = { });
+
       if (!('from' in options)) {
         options.from = this.get(property);
       }
 
-      if (/[+-]/.test(to.charAt(0))) {
+      if (/[+-]/.test((to + '').charAt(0))) {
         to = this.get(property) + parseFloat(to);
       }
 

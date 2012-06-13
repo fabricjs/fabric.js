@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2012, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.8.18" };
+var fabric = fabric || { version: "0.8.19" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -8526,11 +8526,13 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     animate: function(property, to, options) {
       var obj = this;
 
+      options || (options = { });
+
       if (!('from' in options)) {
         options.from = this.get(property);
       }
 
-      if (/[+-]/.test(to.charAt(0))) {
+      if (/[+-]/.test((to + '').charAt(0))) {
         to = this.get(property) + parseFloat(to);
       }
 
