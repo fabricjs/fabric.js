@@ -13,7 +13,7 @@
 
   function request(url, encoding, callback) {
     var oURL = URL.parse(url),
-        client = HTTP.createClient(80, oURL.hostname),
+        client = HTTP.createClient(oURL.port, oURL.hostname),
         request = client.request('GET', oURL.pathname, { 'host': oURL.hostname });
 
     client.addListener('error', function(err) {
