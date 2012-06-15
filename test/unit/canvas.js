@@ -814,7 +814,7 @@
       same(canvas.toJSON(), {
         "objects": [ ],
         "background": "rgba(0, 0, 0, 0)",
-        "backgroundImage": document.location.origin + "/assets/pug.jpg",
+        "backgroundImage": (document.location.protocol + '//' + document.location.hostname + '/assets/pug.jpg'),
         "backgroundImageOpacity": 1,
         "backgroundImageStretch": true
       });
