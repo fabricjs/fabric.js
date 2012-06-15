@@ -629,6 +629,6 @@
       equal(40, Math.round(object.get('left')));
       start();
 
-    }, 500);
+    }, 1000);
   });
 })();
