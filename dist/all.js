@@ -1793,12 +1793,12 @@ fabric.Observable = {
   }
 };
 (function() {
-  
+
   /**
    * @namespace
    */
   fabric.util = { };
-  
+
   /**
    * Removes value from an array.
    * Presence of value (and its position in an array) is determined via `Array.prototype.indexOf`
@@ -1816,7 +1816,7 @@ fabric.Observable = {
     }
     return array;
   };
-  
+
   /**
    * Returns random number between 2 specified ones.
    * @static
@@ -1829,9 +1829,9 @@ fabric.Observable = {
   function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
-  
+
   var PiBy180 = Math.PI / 180;
-  
+
   /**
    * Transforms degrees to radians.
    * @static
@@ -1843,7 +1843,7 @@ fabric.Observable = {
   function degreesToRadians(degrees) {
     return degrees * PiBy180;
   }
-  
+
   /**
    * A wrapper around Number#toFixed, which contrary to native method returns number, not string.
    * @static
@@ -1856,7 +1856,7 @@ fabric.Observable = {
    function toFixed(number, fractionDigits) {
      return parseFloat(Number(number).toFixed(fractionDigits));
    }
-   
+
    /**
     * Function which always returns `false`.
     * @static
@@ -1867,7 +1867,7 @@ fabric.Observable = {
    function falseFunction() {
      return false;
    }
-   
+
    /**
     * Changes value from one to another within certain period of time, invoking callbacks as value is being changed.
     * @method animate
@@ -1885,7 +1885,7 @@ fabric.Observable = {
 
     options || (options = { });
 
-    var start = +new Date(), 
+    var start = +new Date(),
       duration = options.duration || 500,
       finish = start + duration, time, pos,
       onChange = options.onChange || function() { },
@@ -1896,7 +1896,7 @@ fabric.Observable = {
       byValue = options.byValue || endValue - startValue;
 
     options.onStart && options.onStart();
-    
+
     (function tick() {
       time = +new Date();
       currentTime = time > finish ? duration : (time - start);
@@ -1908,24 +1908,25 @@ fabric.Observable = {
       requestAnimFrame(tick);
     })();
   }
-  
+
+  var _requestAnimFrame = fabric.window.requestAnimationFrame       ||
+                          fabric.window.webkitRequestAnimationFrame ||
+                          fabric.window.mozRequestAnimationFrame    ||
+                          fabric.window.oRequestAnimationFrame      ||
+                          fabric.window.msRequestAnimationFrame     ||
+                          function(callback, element) {
+                            fabric.window.setTimeout(callback, 1000 / 60);
+                          };
   /**
-    * requestAnimationFrame polyfill from http://paulirish.com/2011/requestanimationframe-for-smart-animating/
+    * requestAnimationFrame polyfill based on http://paulirish.com/2011/requestanimationframe-for-smart-animating/
     * @method requestAnimFrame
     * @memberOf fabric.util
     * @param {Function} callback Callback to invoke
     * @param {DOMElement} element optional Element to associate with animation
     */
-  var requestAnimFrame = (function() {
-    return  fabric.window.requestAnimationFrame       || 
-            fabric.window.webkitRequestAnimationFrame || 
-            fabric.window.mozRequestAnimationFrame    || 
-            fabric.window.oRequestAnimationFrame      || 
-            fabric.window.msRequestAnimationFrame     || 
-            function(callback, element) {
-              fabric.window.setTimeout(callback, 1000 / 60);
-            };
-  })();
+  var requestAnimFrame = function() {
+    return _requestAnimFrame.apply(fabric.window, arguments);
+  };
 
   /**
     * Loads image element from given url and passes it to a callback
@@ -1939,7 +1940,7 @@ fabric.Observable = {
     if (url) {
       var img = new Image();
       /** @ignore */
-      img.onload = function () { 
+      img.onload = function () {
         callback && callback.call(context, img);
         img = img.onload = null;
       };
