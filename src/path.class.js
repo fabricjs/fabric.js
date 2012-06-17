@@ -1,7 +1,7 @@
 //= require "object.class"
 
 (function(global) {
-  
+
   var commandLengths = {
     m: 2,
     l: 2,
@@ -13,7 +13,7 @@
     t: 2,
     a: 7
   };
-  
+
   function drawArc(ctx, x, y, coords) {
     var rx = coords[0];
     var ry = coords[1];
@@ -28,19 +28,19 @@
      ctx.bezierCurveTo.apply(ctx, bez);
     }
   }
-  
-  var arcToSegmentsCache = { }, 
-      segmentToBezierCache = { }, 
-      _join = Array.prototype.join, 
+
+  var arcToSegmentsCache = { },
+      segmentToBezierCache = { },
+      _join = Array.prototype.join,
       argsString;
-  
+
   // Copied from Inkscape svgtopdf, thanks!
   function arcToSegments(x, y, rx, ry, large, sweep, rotateX, ox, oy) {
     argsString = _join.call(arguments);
     if (arcToSegmentsCache[argsString]) {
       return arcToSegmentsCache[argsString];
     }
-    
+
     var th = rotateX * (Math.PI/180);
     var sin_th = Math.sin(th);
     var cos_th = Math.cos(th);
@@ -98,7 +98,7 @@
     if (segmentToBezierCache[argsString]) {
       return segmentToBezierCache[argsString];
     }
-    
+
     var a00 = cos_th * rx;
     var a01 = -sin_th * ry;
     var a10 = sin_th * rx;
@@ -112,22 +112,22 @@
     var y3 = cy + Math.sin(th1);
     var x2 = x3 + t * Math.sin(th1);
     var y2 = y3 - t * Math.cos(th1);
-    
+
     return (segmentToBezierCache[argsString] = [
       a00 * x1 + a01 * y1,      a10 * x1 + a11 * y1,
       a00 * x2 + a01 * y2,      a10 * x2 + a11 * y2,
       a00 * x3 + a01 * y3,      a10 * x3 + a11 * y3
     ]);
   }
-  
+
   "use strict";
-  
+
   var fabric = global.fabric || (global.fabric = { }),
       min = fabric.util.array.min,
       max = fabric.util.array.max,
       extend = fabric.util.object.extend,
       _toString = Object.prototype.toString;
-  
+
   if (fabric.Path) {
     fabric.warn('fabric.Path is already defined');
     return;
@@ -136,7 +136,7 @@
     fabric.warn('fabric.Path requires fabric.Object');
     return;
   }
-  
+
   /**
    * @private
    */
@@ -146,7 +146,7 @@
     }
     return item[item.length - 2];
   }
-  
+
   /**
    * @private
    */
@@ -156,19 +156,19 @@
     }
     return item[item.length - 1];
   }
-  
-  /** 
+
+  /**
    * @class Path
    * @extends fabric.Object
    */
   fabric.Path = fabric.util.createClass(fabric.Object, /** @scope fabric.Path.prototype */ {
-    
+
     /**
      * @property
      * @type String
      */
     type: 'path',
-    
+
     /**
      * Constructor
      * @method initialize
@@ -177,31 +177,31 @@
      */
     initialize: function(path, options) {
       options = options || { };
-      
+
       this.setOptions(options);
-      
+
       if (!path) {
         throw Error('`path` argument is required');
       }
-      
+
       var fromArray = _toString.call(path) === '[object Array]';
-      
+
       this.path = fromArray
         ? path
         : path.match && path.match(/[a-zA-Z][^a-zA-Z]*/g);
-        
+
       if (!this.path) return;
-      
+
       // TODO (kangax): rewrite this idiocracy
       if (!fromArray) {
         this._initializeFromArray(options);
       }
-      
+
       if (options.sourcePath) {
         this.setSourcePath(options.sourcePath);
       }
     },
-    
+
     /**
      * @private
      * @method _initializeFromArray
@@ -209,9 +209,9 @@
     _initializeFromArray: function(options) {
       var isWidthSet = 'width' in options,
           isHeightSet = 'height' in options;
-          
+
       this.path = this._parsePath();
-      
+
       if (!isWidthSet || !isHeightSet) {
         extend(this, this._parseDimensions());
         if (isWidthSet) {
@@ -222,72 +222,72 @@
         }
       }
     },
-    
+
     /**
      * @private
      * @method _render
      */
     _render: function(ctx) {
-      var current, // current instruction 
-          x = 0, // current x 
+      var current, // current instruction
+          x = 0, // current x
           y = 0, // current y
           controlX = 0, // current control point x
           controlY = 0, // current control point y
-          tempX, 
+          tempX,
           tempY,
           l = -(this.width / 2),
           t = -(this.height / 2);
-          
+
       for (var i = 0, len = this.path.length; i < len; ++i) {
-        
+
         current = this.path[i];
-        
+
         switch (current[0]) { // first letter
-          
+
           case 'l': // lineto, relative
             x += current[1];
             y += current[2];
             ctx.lineTo(x + l, y + t);
             break;
-            
+
           case 'L': // lineto, absolute
             x = current[1];
             y = current[2];
             ctx.lineTo(x + l, y + t);
             break;
-            
+
           case 'h': // horizontal lineto, relative
             x += current[1];
             ctx.lineTo(x + l, y + t);
             break;
-            
+
           case 'H': // horizontal lineto, absolute
             x = current[1];
             ctx.lineTo(x + l, y + t);
             break;
-            
+
           case 'v': // vertical lineto, relative
             y += current[1];
             ctx.lineTo(x + l, y + t);
             break;
-            
+
           case 'V': // verical lineto, absolute
             y = current[1];
             ctx.lineTo(x + l, y + t);
             break;
-            
+
           case 'm': // moveTo, relative
             x += current[1];
             y += current[2];
             ctx.moveTo(x + l, y + t);
             break;
-          
+
           case 'M': // moveTo, absolute
             x = current[1];
             y = current[2];
             ctx.moveTo(x + l, y + t);
             break;
-            
+
           case 'c': // bezierCurveTo, relative
             tempX = x + current[5];
             tempY = y + current[6];
@@ -304,27 +304,27 @@
             x = tempX;
             y = tempY;
             break;
-            
+
           case 'C': // bezierCurveTo, absolute
             x = current[5];
             y = current[6];
             controlX = current[3];
             controlY = current[4];
             ctx.bezierCurveTo(
-              current[1] + l, 
-              current[2] + t, 
-              controlX + l, 
-              controlY + t, 
-              x + l, 
+              current[1] + l,
+              current[2] + t,
+              controlX + l,
+              controlY + t,
+              x + l,
               y + t
             );
             break;
-          
+
           case 's': // shorthand cubic bezierCurveTo, relative
             // transform to absolute x,y
             tempX = x + current[3];
             tempY = y + current[4];
-            // calculate reflection of previous control points            
+            // calculate reflection of previous control points
             controlX = 2 * x - controlX;
             controlY = 2 * y - controlY;
             ctx.bezierCurveTo(
@@ -335,14 +335,19 @@
               tempX + l,
               tempY + t
             );
+            // set control point to 2nd one of this command
+            // "... the first control point is assumed to be the reflection of the second control point on the previous command relative to the current point."
+            controlX = x + current[1];
+            controlY = y + current[2];
+
             x = tempX;
             y = tempY;
             break;
-            
+
           case 'S': // shorthand cubic bezierCurveTo, absolute
             tempX = current[3];
             tempY = current[4];
-            // calculate reflection of previous control points            
+            // calculate reflection of previous control points
             controlX = 2*x - controlX;
             controlY = 2*y - controlY;
             ctx.bezierCurveTo(
@@ -355,19 +360,25 @@
             );
             x = tempX;
             y = tempY;
+
+            // set control point to 2nd one of this command
+            // "... the first control point is assumed to be the reflection of the second control point on the previous command relative to the current point."
+            controlX = current[1];
+            controlY = current[2];
+
             break;
-            
+
           case 'q': // quadraticCurveTo, relative
             x += current[3];
             y += current[4];
             ctx.quadraticCurveTo(
-              current[1] + l, 
-              current[2] + t, 
-              x + l, 
+              current[1] + l,
+              current[2] + t,
+              x + l,
               y + t
             );
             break;
-            
+
           case 'Q': // quadraticCurveTo, absolute
             x = current[3];
             y = current[4];
@@ -380,7 +391,7 @@
               y + t
             );
             break;
-          
+
           case 'T':
             tempX = x;
             tempY = y;
@@ -392,41 +403,41 @@
             ctx.quadraticCurveTo(
               controlX + l,
               controlY + t,
-              x + l, 
+              x + l,
               y + t
             );
             break;
-            
+
           case 'a':
             // TODO: optimize this
-            drawArc(ctx, x + l, y + t, [ 
-              current[1], 
-              current[2], 
-              current[3], 
-              current[4], 
-              current[5], 
+            drawArc(ctx, x + l, y + t, [
+              current[1],
+              current[2],
+              current[3],
+              current[4],
+              current[5],
               current[6] + x + l,
               current[7] + y + t
             ]);
             x += current[6];
             y += current[7];
             break;
-          
+
           case 'A':
             // TODO: optimize this
-            drawArc(ctx, x + l, y + t, [ 
-              current[1], 
-              current[2], 
-              current[3], 
-              current[4], 
-              current[5], 
+            drawArc(ctx, x + l, y + t, [
+              current[1],
+              current[2],
+              current[3],
+              current[4],
+              current[5],
               current[6] + l,
               current[7] + t
             ]);
             x = current[6];
             y = current[7];
             break;
-          
+
           case 'z':
           case 'Z':
             ctx.closePath();
@@ -434,9 +445,9 @@
         }
       }
     },
-    
+
     /**
-     * Renders path on a specified context 
+     * Renders path on a specified context
      * @method render
      * @param {CanvasRenderingContext2D} ctx context to render path on
      * @param {Boolean} noTransform When true, context is not transformed
@@ -458,14 +469,14 @@
       else if (this.fill) {
         ctx.fillStyle = this.fill;
       }
-      
+
       if (this.stroke) {
         ctx.strokeStyle = this.stroke;
       }
       ctx.beginPath();
-      
+
       this._render(ctx);
-      
+
       if (this.fill) {
         ctx.fill();
       }
@@ -481,17 +492,17 @@
       }
       ctx.restore();
     },
-    
+
     /**
      * Returns string representation of an instance
      * @method toString
      * @return {String} string representation of an instance
      */
     toString: function() {
-      return '#<fabric.Path (' + this.complexity() + 
+      return '#<fabric.Path (' + this.complexity() +
         '): { "top": ' + this.top + ', "left": ' + this.left + ' }>';
     },
-    
+
     /**
      * Returns object representation of an instance
      * @method toObject
@@ -509,7 +520,7 @@
       }
       return o;
     },
-    
+
     /**
      * Returns dataless object representation of an instance
      * @method toDatalessObject
@@ -523,7 +534,7 @@
       delete o.sourcePath;
       return o;
     },
-    
+
     /**
      * Returns svg representation of an instance
      * @method toSVG
@@ -546,7 +557,7 @@
         '</g>'
       ].join('');
     },
-    
+
     /**
      * Returns number representation of an instance complexity
      * @method complexity
@@ -555,14 +566,14 @@
     complexity: function() {
       return this.path.length;
     },
-    
+
     /**
      * @private
      * @method _parsePath
      */
     _parsePath: function() {
       var result = [ ],
-          currentPath, 
+          currentPath,
           chunks,
           parsed;
 
@@ -580,7 +591,7 @@
 
         var command = chunksParsed[0].toLowerCase(),
             commandLength = commandLengths[command];
-            
+
         if (chunksParsed.length - 1 > commandLength) {
           for (var k = 1, klen = chunksParsed.length; k < klen; k += commandLength) {
             result.push([ chunksParsed[0] ].concat(chunksParsed.slice(k, k + commandLength)));
@@ -590,22 +601,22 @@
           result.push(chunksParsed);
         }
       }
-      
+
       return result;
     },
-    
+
     /**
      * @method _parseDimensions
      */
     _parseDimensions: function() {
-      var aX = [], 
-          aY = [], 
-          previousX, 
-          previousY, 
-          isLowerCase = false, 
-          x, 
+      var aX = [],
+          aY = [],
+          previousX,
+          previousY,
+          isLowerCase = false,
+          x,
           y;
-      
+
       this.path.forEach(function(item, i) {
         if (item[0] !== 'H') {
           previousX = (i === 0) ? getX(item) : getX(this.path[i-1]);
@@ -613,57 +624,57 @@
         if (item[0] !== 'V') {
           previousY = (i === 0) ? getY(item) : getY(this.path[i-1]);
         }
-        
-        // lowercased letter denotes relative position; 
+
+        // lowercased letter denotes relative position;
         // transform to absolute
         if (item[0] === item[0].toLowerCase()) {
           isLowerCase = true;
         }
-        
+
         // last 2 items in an array of coordinates are the actualy x/y (except H/V);
         // collect them
-        
+
         // TODO (kangax): support relative h/v commands
-            
+
         x = isLowerCase
           ? previousX + getX(item)
-          : item[0] === 'V' 
-            ? previousX 
+          : item[0] === 'V'
+            ? previousX
             : getX(item);
-            
+
         y = isLowerCase
           ? previousY + getY(item)
-          : item[0] === 'H' 
-            ? previousY 
+          : item[0] === 'H'
+            ? previousY
             : getY(item);
-        
+
         var val = parseInt(x, 10);
         if (!isNaN(val)) aX.push(val);
-        
+
         val = parseInt(y, 10);
         if (!isNaN(val)) aY.push(val);
-        
+
       }, this);
-      
-      var minX = min(aX), 
-          minY = min(aY), 
+
+      var minX = min(aX),
+          minY = min(aY),
           deltaX = 0,
           deltaY = 0;
-      
+
       var o = {
         top: minY - deltaY,
         left: minX - deltaX,
         bottom: max(aY) - deltaY,
         right: max(aX) - deltaX
       };
-      
+
       o.width = o.right - o.left;
       o.height = o.bottom - o.top;
-      
+
       return o;
     }
   });
-  
+
   /**
    * Creates an instance of fabric.Path from an object
    * @static
@@ -673,14 +684,14 @@
   fabric.Path.fromObject = function(object) {
     return new fabric.Path(object.path, object);
   };
-  
+
   /**
    * List of attribute names to account for when parsing SVG element (used by `fabric.Path.fromElement`)
    * @static
    * @see http://www.w3.org/TR/SVG/paths.html#PathElement
    */
   fabric.Path.ATTRIBUTE_NAMES = 'd fill fill-opacity opacity fill-rule stroke stroke-width transform'.split(' ');
-  
+
   /**
    * Creates an instance of fabric.Path from an SVG <path> element
    * @static
