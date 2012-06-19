@@ -157,10 +157,11 @@
      * @chainable
      */
     setOverlayImage: function (url, callback) { // TODO (kangax): test callback
-      return fabric.util.loadImage(url, function(img) {
+      fabric.util.loadImage(url, function(img) {
         this.overlayImage = img;
         callback && callback();
       }, this);
+      return this;
     },
 
     /**
