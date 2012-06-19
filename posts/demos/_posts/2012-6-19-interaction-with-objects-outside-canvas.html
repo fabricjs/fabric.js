@@ -1,0 +1,40 @@
+---
+layout: demo
+title: Interaction with objects outside canvas
+---
+
+<canvas id="c" width="500" height="500"></canvas>
+<input type="button" value="Some button" id="inline-btn" style="position:absolute">
+
+<script id="main">var canvas = new fabric.Canvas('c');
+
+fabric.Canvas.prototype.getAbsoluteCoords = function(object) {
+  return {
+    left: object.left + this._offset.left,
+    top: object.top + this._offset.top
+  };
+}
+
+var btn = document.getElementById('inline-btn'),
+    btnWidth = 85,
+    btnHeight = 18;
+
+function positionBtn(obj) {
+  var absCoords = canvas.getAbsoluteCoords(obj);
+
+  btn.style.left = (absCoords.left - btnWidth / 2) + 'px';
+  btn.style.top = (absCoords.top - btnHeight / 2) + 'px';
+}
+
+fabric.Image.fromURL('../lib/pug.jpg', function(img) {
+
+  canvas.add(img.set({ left: 250, top: 250, angle: 30 }).scale(0.25));
+
+  canvas.observe('object:moving', function(e) {
+    positionBtn(e.target);
+  });
+
+  positionBtn(img);
+});
+
+</script>
