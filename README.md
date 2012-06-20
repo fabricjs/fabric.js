@@ -8,7 +8,7 @@ Contributions are very much welcome!
 
 ### Goals
 
-- Unit tested (~1200 tests at the moment)
+- Unit tested (1200+ tests at the moment)
 - Modular (~20 small "classes")
 - Cross-browser
 - [Fast](https://github.com/kangax/fabric.js/wiki/Focus-on-speed)
@@ -125,12 +125,13 @@ Follow [@fabric.js](http://twitter.com/fabricjs) or [@kangax](http://twitter.com
 ### Credits
 
 - Ernest Delgado for the original idea of [manipulating images on canvas](http://www.ernestdelgado.com/archive/canvas/).
-- [Maxim "hakunin" Chernyak](http://twitter.com/hakunin) for ideas, and help with various parts of the library.
+- [Maxim "hakunin" Chernyak](http://twitter.com/hakunin) for ideas, and help with various parts of the library throughout its life.
 - [Sergey Nisnevich](http://nisnya.com) for help with geometry logic.
+- Github contributors: @Kingsquare, @cleercode, @jarek-itmore, @sunrei, @khronnuz
 
 ### MIT License
 
-Copyright (c) 2008-2012 Bitsonnet
+Copyright (c) 2008-2012 Printio (Juriy Zaytsev, Maxim Chernyak)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

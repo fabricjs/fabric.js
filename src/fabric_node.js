@@ -1,19 +1,19 @@
 (function() {
-  
+
   if (typeof document != 'undefined' && typeof window != 'undefined') {
     return;
   }
-  
-  var XML = require('o3-xml'),
+
+  var DOMParser = new require('xmldom').DOMParser,
       URL = require('url'),
       HTTP = require('http'),
-      
+
       Canvas = require('canvas'),
       Image = require('canvas').Image;
 
   function request(url, encoding, callback) {
     var oURL = URL.parse(url),
-        client = HTTP.createClient(80, oURL.hostname),
+        client = HTTP.createClient(oURL.port, oURL.hostname),
         request = client.request('GET', oURL.pathname, { 'host': oURL.hostname });
 
     client.addListener('error', function(err) {
@@ -41,7 +41,7 @@
       });
     });
   }
-  
+
   fabric.util.loadImage = function(url, callback) {
     request(url, 'binary', function(body) {
       var img = new Image();
@@ -55,13 +55,13 @@
   fabric.loadSVGFromURL = function(url, callback) {
     url = url.replace(/^\n\s*/, '').replace(/\?.*$/, '').trim();
     request(url, '', function(body) {
-      var doc = XML.parseFromString(body);
+      var doc = new DOMParser().parseFromString(body);
       fabric.parseSVGDocument(doc.documentElement, function(results, options) {
         callback(results, options);
       });
     });
   };
-  
+
   fabric.util.getScript = function(url, callback) {
     request(url, '', function(body) {
       eval(body);
@@ -72,7 +72,7 @@
   fabric.Image.fromObject = function(object, callback) {
     fabric.util.loadImage(object.src, function(img) {
       var oImg = new fabric.Image(img);
-      
+
       oImg._initConfig(object);
       oImg._initFilters(object);
       callback(oImg);
@@ -80,11 +80,11 @@
   };
 
   fabric.createCanvasForNode = function(width, height) {
-    
+
     var canvasEl = fabric.document.createElement('canvas'),
         nodeCanvas = new Canvas(width || 600, height || 600);
 
-    // jsdom doesn't create style on canvas element, so here be temp. workaround 
+    // jsdom doesn't create style on canvas element, so here be temp. workaround
     canvasEl.style = { };
 
     canvasEl.width = nodeCanvas.width;
@@ -97,14 +97,14 @@
 
     return fabricCanvas;
   };
-  
+
   fabric.StaticCanvas.prototype.createPNGStream = function() {
     return this.nodeCanvas.createPNGStream();
   };
   if (fabric.Canvas) {
     fabric.Canvas.prototype.createPNGStream
   }
-  
+
   var origSetWidth = fabric.StaticCanvas.prototype.setWidth;
   fabric.StaticCanvas.prototype.setWidth = function(width) {
     origSetWidth.call(this);
@@ -114,7 +114,7 @@
   if (fabric.Canvas) {
     fabric.Canvas.prototype.setWidth = fabric.StaticCanvas.prototype.setWidth;
   }
-  
+
   var origSetHeight = fabric.StaticCanvas.prototype.setHeight;
   fabric.StaticCanvas.prototype.setHeight = function(height) {
     origSetHeight.call(this);
@@ -124,5 +124,5 @@
   if (fabric.Canvas) {
     fabric.Canvas.prototype.setHeight = fabric.StaticCanvas.prototype.setHeight;
   }
-  
+
 })();

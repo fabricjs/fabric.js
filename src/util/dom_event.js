@@ -1,9 +1,9 @@
 (function (global) {
-  
+
   /* EVENT HANDLING */
-  
+
   function areHostMethods(object) {
-    var methodNames = Array.prototype.slice.call(arguments, 1), 
+    var methodNames = Array.prototype.slice.call(arguments, 1),
         t, i, len = methodNames.length;
     for (i = 0; i < len; i++) {
       t = typeof object[methodNames[i]];
@@ -22,7 +22,7 @@
       return element.__uniqueID || (element.__uniqueID = 'uniqueID__' + uid++);
     };
   })();
-  
+
   /** @ignore */
   var getElement, setElement;
 
@@ -75,7 +75,7 @@
 
       // DOM L0 branch
       handlers = { },
-      
+
       addListener, removeListener;
 
   if (shouldUseAddListenerRemoveListener) {
@@ -91,7 +91,7 @@
 
   else if (shouldUseAttachEventDetachEvent) {
     /** @ignore */
-    addListener = function (element, eventName, handler) { 
+    addListener = function (element, eventName, handler) {
       var uid = getUniqueId(element);
       setElement(uid, element);
       if (!listeners[uid]) {
@@ -116,7 +116,7 @@
             listeners[uid][eventName][i] = null;
           }
         }
-      }        
+      }
     };
   }
   else {
@@ -149,7 +149,7 @@
       }
     };
   }
-  
+
   /**
    * Adds an event listener to an element
    * @mthod addListener
@@ -160,7 +160,7 @@
    * @param {Function} handler
    */
   fabric.util.addListener = addListener;
-  
+
   /**
    * Removes an event listener from an element
    * @mthod removeListener
@@ -171,7 +171,7 @@
    * @param {Function} handler
    */
   fabric.util.removeListener = removeListener;
-  
+
   /**
    * Cross-browser wrapper for getting event's coordinates
    * @method getPointer
@@ -186,8 +186,8 @@
   function pointerX(event) {
     var docElement = fabric.document.documentElement,
         body = fabric.document.body || { scrollLeft: 0 };
-    
-    // looks like in IE (<9) clientX at certain point (apparently when mouseup fires on VML element) 
+
+    // looks like in IE (<9) clientX at certain point (apparently when mouseup fires on VML element)
     // is represented as COM object, with all the consequences, like "unknown" type and error on [[Get]]
     // need to investigate later
     return event.pageX || ((typeof event.clientX != 'unknown' ? event.clientX : 0) +
@@ -203,18 +203,18 @@
        (docElement.scrollTop || body.scrollTop) -
        (docElement.clientTop || 0));
   }
-  
+
   if (fabric.isTouchSupported) {
     pointerX = function(event) {
-      return event.touches && event.touches[0].pageX;
+      return event.touches && event.touches[0] && event.touches[0].pageX || event.clientX;
     };
     pointerY = function(event) {
-      return event.touches && event.touches[0].pageY;
+      return event.touches && event.touches[0] && event.touches[0].pageY || event.clientY;
     };
   }
-  
+
   fabric.util.getPointer = getPointer;
-  
+
   fabric.util.object.extend(fabric.util, fabric.Observable);
-  
+
 })(this);

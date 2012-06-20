@@ -51,13 +51,6 @@
     type: 'image',
 
     /**
-     * Filters to be applied to an image (when calling `applyFilters`)
-     * @property
-     * @type Array
-     */
-    filters: [ ],
-
-    /**
      * Constructor
      * @param {HTMLImageElement | String} element Image element
      * @param {Object} options optional
@@ -69,6 +62,8 @@
       this._initElement(element);
       this._originalImage = this.getElement();
       this._initConfig(options);
+
+      this.filters = [ ];
 
       if (options.filters) {
         this.filters = options.filters;
@@ -266,13 +261,12 @@
      * @private
      */
     _render: function(ctx) {
-      var originalImgSize = this.getOriginalSize();
       ctx.drawImage(
         this.getElement(),
-        - originalImgSize.width / 2,
-        - originalImgSize.height / 2,
-        originalImgSize.width,
-        originalImgSize.height
+        - this.width / 2,
+        -this.height / 2,
+        this.width,
+        this.height
       );
     },
 
@@ -370,7 +364,7 @@
    * @type String
    */
   fabric.Image.CSS_CANVAS = "canvas-img";
-  
+
   fabric.Image.prototype.getSvgSrc = fabric.Image.prototype.getSrc;
 
   /**

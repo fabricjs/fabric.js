@@ -37,7 +37,7 @@
      * @property
      * @type String
      */
-    backgroundColor:        'rgba(0, 0, 0, 0)',
+    backgroundColor: 'rgba(0, 0, 0, 0)',
 
     /**
      * Background image of canvas instance
@@ -45,14 +45,14 @@
      * @property
      * @type String
      */
-    backgroundImage:        '',
+    backgroundImage: '',
 
     /**
      * Opacity of the background image of the canvas instance
      * @property
      * @type Float
      */
-    backgroundImageOpacity:      1.0,
+    backgroundImageOpacity: 1.0,
 
     /**
      * Indicatus whether the background image should be stretched to fit the
@@ -60,28 +60,28 @@
      * @property
      * @type Boolean
      */
-    backgroundImageStretch:      true,
+    backgroundImageStretch: true,
 
     /**
      * Indicates whether toObject/toDatalessObject should include default values
      * @property
      * @type Boolean
      */
-    includeDefaultValues:   true,
+    includeDefaultValues: true,
 
     /**
      * Indicates whether objects' state should be saved
      * @property
      * @type Boolean
      */
-    stateful:               true,
+    stateful: true,
 
     /**
      * Indicates whether fabric.Canvas#add should also re-render canvas.
      * Disabling this option could give a great performance boost when adding a lot of objects to canvas at once
      * (followed by a manual rendering after addition)
      */
-    renderOnAddition:       true,
+    renderOnAddition: true,
 
     /**
      * Function that determines clipping of entire canvas area
@@ -89,21 +89,21 @@
      * @property
      * @type Function
      */
-    clipTo:                 null,
+    clipTo: null,
 
     /**
      * Default canvas width
      * @constant
      * @type Number
      */
-    CANVAS_WIDTH:           600,
+    CANVAS_WIDTH: 600,
 
     /**
      * Default canvas height
      * @constant
      * @type Number
      */
-    CANVAS_HEIGHT:          600,
+    CANVAS_HEIGHT: 600,
 
     /**
      * Callback; invoked right before object is about to be scaled/rotated
@@ -157,10 +157,11 @@
      * @chainable
      */
     setOverlayImage: function (url, callback) { // TODO (kangax): test callback
-      return fabric.util.loadImage(url, function(img) {
+      fabric.util.loadImage(url, function(img) {
         this.overlayImage = img;
         callback && callback();
       }, this);
+      return this;
     },
 
     /**
@@ -372,6 +373,7 @@
       for (var i = arguments.length; i--; ) {
         this.stateful && arguments[i].setupState();
         arguments[i].setCoords();
+        this.fire('object:added', { target: arguments[i] });
       }
       this.renderOnAddition && this.renderAll();
       return this;
@@ -396,6 +398,7 @@
       this.stateful && object.setupState();
       object.setCoords();
       this.renderAll();
+      this.fire('object:added', { target: object });
       return this;
     },
 
@@ -418,6 +421,15 @@
     clearContext: function(ctx) {
       ctx.clearRect(0, 0, this.width, this.height);
       return this;
+    },
+
+    /**
+     * Returns context of canvas where objects are drawn
+     * @method getContext
+     * @return {CanvasRenderingContext2D}
+     */
+    getContext: function () {
+      return this.contextContainer;
     },
 
     /**
@@ -501,7 +513,7 @@
       }
 
       if (this.overlayImage) {
-        this.contextTop.drawImage(this.overlayImage, 0, 0);
+        (this.contextTop || this.contextContainer).drawImage(this.overlayImage, 0, 0);
       }
 
       if (this.onFpsUpdate) {
@@ -650,19 +662,6 @@
     },
 
     /**
-     * Straightens object, then rerenders canvas
-     * @method straightenObject
-     * @param {fabric.Object} object Object to straighten
-     * @return {fabric.Canvas} thisArg
-     * @chainable
-     */
-    straightenObject: function (object) {
-      object.straighten();
-      this.renderAll();
-      return this;
-    },
-
-    /**
      * Returs dataless JSON representation of canvas
      * @method toDatalessJSON
      * @return {String} json string
@@ -694,8 +693,8 @@
      * @method _toObjectMethod
      */
     _toObjectMethod: function (methodName) {
-      return {
-        objects: this._objects.map(function (instance){
+      var data = {
+        objects: this._objects.map(function (instance) {
           // TODO (kangax): figure out how to clean this up
           if (!this.includeDefaultValues) {
             var originalValue = instance.includeDefaultValues;
@@ -708,7 +707,13 @@
           return object;
         }, this),
         background: this.backgroundColor
+      };
+      if (this.backgroundImage) {
+        data.backgroundImage = this.backgroundImage.src;
+        data.backgroundImageOpacity = this.backgroundImageOpacity;
+        data.backgroundImageStretch = this.backgroundImageStretch;
       }
+      return data;
     },
 
     /**
@@ -732,6 +737,18 @@
           '<desc>Created with Fabric.js ', fabric.version, '</desc>',
           fabric.createSVGFontFacesMarkup(this.getObjects())
       ];
+
+      if (this.backgroundImage) {
+        markup.push(
+          '<image x="0" y="0" ',
+            'width="', this.width,
+            '" height="', this.height,
+            '" preserveAspectRatio="', (this.backgroundImageStretch ? 'none' : 'defer'),
+            '" xlink:href="', this.backgroundImage.src,
+            '" style="opacity:', this.backgroundImageOpacity,
+          '"></image>'
+        );
+      }
 
       for (var i = 0, objects = this.getObjects(), len = objects.length; i < len; i++) {
         markup.push(objects[i].toSVG());
@@ -759,7 +776,11 @@
     remove: function (object) {
       removeFromArray(this._objects, object);
       if (this.getActiveObject() === object) {
+
+        // removing active object should fire "selection:cleared" events
+        this.fire('before:selection:cleared', { target: object });
         this.discardActiveObject();
+        this.fire('selection:cleared');
       }
       this.renderAll();
       return object;
@@ -820,7 +841,7 @@
 
     /**
      * Moves an object one level up in stack of drawn objects
-     * @method sendForward
+     * @method bringForward
      * @param object {fabric.Object} Object to send
      * @return {fabric.Canvas} thisArg
      * @chainable
