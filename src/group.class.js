@@ -1,32 +1,32 @@
 //= require "object.class"
 
 (function(global){
-  
+
   "use strict";
-  
+
   var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       min = fabric.util.array.min,
       max = fabric.util.array.max,
       invoke = fabric.util.array.invoke,
       removeFromArray = fabric.util.removeFromArray;
-      
+
   if (fabric.Group) {
     return;
   }
-  
-  /** 
+
+  /**
    * @class Group
    * @extends fabric.Object
    */
   fabric.Group = fabric.util.createClass(fabric.Object, /** @scope fabric.Group.prototype */ {
-    
+
     /**
      * @property
      * @type String
      */
     type: 'group',
-    
+
     /**
      * Constructor
      * @method initialized
@@ -37,24 +37,24 @@
     initialize: function(objects, options) {
       this.objects = objects || [];
       this.originalState = { };
-      
+
       this.callSuper('initialize');
-      
+
       this._calcBounds();
       this._updateObjectsCoords();
-      
+
       if (options) {
         extend(this, options);
       }
       this._setOpacityIfSame();
-      
+
       // group is active by default
       this.setCoords(true);
       this.saveCoords();
-      
+
       //this.activateAllObjects();
     },
-    
+
     /**
      * @private
      * @method _updateObjectsCoords
@@ -62,25 +62,25 @@
     _updateObjectsCoords: function() {
       var groupDeltaX = this.left,
           groupDeltaY = this.top;
-      
+
       this.forEachObject(function(object) {
-        
+
         var objectLeft = object.get('left'),
             objectTop = object.get('top');
-        
+
         object.set('originalLeft', objectLeft);
         object.set('originalTop', objectTop);
-        
+
         object.set('left', objectLeft - groupDeltaX);
         object.set('top', objectTop - groupDeltaY);
-        
+
         object.setCoords();
-        
+
         // do not display corners of objects enclosed in a group
         object.hideCorners = true;
       }, this);
     },
-    
+
     /**
      * Returns string represenation of a group
      * @method toString
@@ -89,7 +89,7 @@
     toString: function() {
       return '#<fabric.Group: (' + this.complexity() + ')>';
     },
-    
+
     /**
      * Returns an array of all objects in this group
      * @method getObjects
@@ -98,7 +98,7 @@
     getObjects: function() {
       return this.objects;
     },
-    
+
     /**
      * Adds an object to a group; Then recalculates group's dimension, position.
      * @method addWithUpdate
@@ -113,7 +113,7 @@
       this._updateObjectsCoords();
       return this;
     },
-    
+
     /**
      * Removes an object from a group; Then recalculates group's dimension, position.
      * @method removeWithUpdate
@@ -129,7 +129,7 @@
       this._updateObjectsCoords();
       return this;
     },
-    
+
     /**
      * Adds an object to a group
      * @method add
@@ -141,7 +141,7 @@
       this.objects.push(object);
       return this;
     },
-    
+
     /**
      * Removes an object from a group
      * @method remove
@@ -151,8 +151,9 @@
      */
     remove: function(object) {
       removeFromArray(this.objects, object);
+      return this;
     },
-    
+
     /**
      * Returns a size of a group (i.e: length of an array containing its objects)
      * @return {Number} Group size
@@ -160,7 +161,7 @@
     size: function() {
       return this.getObjects().length;
     },
-  
+
     /**
      * Sets property to a given value
      * @method set
@@ -188,7 +189,7 @@
       }
       return this;
     },
-  
+
     /**
      * Returns true if a group contains an object
      * @method contains
@@ -198,7 +199,7 @@
     contains: function(object) {
       return this.objects.indexOf(object) > -1;
     },
-    
+
     /**
      * Returns object representation of an instance
      * @method toObject
@@ -209,7 +210,7 @@
         objects: invoke(this.objects, 'clone')
       });
     },
-    
+
     /**
      * Renders instance on a given context
      * @method render
@@ -218,9 +219,9 @@
     render: function(ctx, noTransform) {
       ctx.save();
       this.transform(ctx);
-      
+
       var groupScaleFactor = Math.max(this.scaleX, this.scaleY);
-      
+
       for (var i = 0, len = this.objects.length, object; object = this.objects[i]; i++) {
         var originalScaleFactor = object.borderScaleFactor;
         object.borderScaleFactor = groupScaleFactor;
@@ -234,7 +235,7 @@
       ctx.restore();
       this.setCoords();
     },
-    
+
     /**
      * Returns object from the group at the specified index
      * @method item
@@ -244,7 +245,7 @@
     item: function(index) {
       return this.getObjects()[index];
     },
-    
+
     /**
      * Returns complexity of an instance
      * @method complexity
@@ -256,7 +257,7 @@
         return total;
       }, 0);
     },
-    
+
     /**
      * Retores original state of each of group objects (original state is that which was before group was created).
      * @private
@@ -268,7 +269,7 @@
       this.objects.forEach(this._restoreObjectState, this);
       return this;
     },
-    
+
     /**
      * Restores original state of a specified object in group
      * @private
@@ -277,7 +278,7 @@
      * @return {fabric.Group} thisArg
      */
     _restoreObjectState: function(object) {
-      
+
       var groupLeft = this.get('left'),
           groupTop = this.get('top'),
           groupAngle = this.getAngle() * (Math.PI / 180),
@@ -285,23 +286,23 @@
           objectTop = object.get('originalTop'),
           rotatedTop = Math.cos(groupAngle) * object.get('top') + Math.sin(groupAngle) * object.get('left'),
           rotatedLeft = -Math.sin(groupAngle) * object.get('top') + Math.cos(groupAngle) * object.get('left');
-      
+
       object.setAngle(object.getAngle() + this.getAngle());
-      
+
       object.set('left', groupLeft + rotatedLeft * this.get('scaleX'));
       object.set('top', groupTop + rotatedTop * this.get('scaleY'));
-      
+
       object.set('scaleX', object.get('scaleX') * this.get('scaleX'));
       object.set('scaleY', object.get('scaleY') * this.get('scaleY'));
-      
+
       object.setCoords();
       object.hideCorners = false;
       object.setActive(false);
       object.setCoords();
-      
+
       return this;
     },
-    
+
     /**
      * Destroys a group (restoring state of its objects)
      * @method destroy
@@ -311,7 +312,7 @@
     destroy: function() {
       return this._restoreObjectsState();
     },
-    
+
     /**
      * Saves coordinates of this instance (to be used together with `hasMoved`)
      * @saveCoords
@@ -323,7 +324,7 @@
       this._originalTop = this.get('top');
       return this;
     },
-    
+
     /**
      * Checks whether this group was moved (since `saveCoords` was called last)
      * @method hasMoved
@@ -333,7 +334,7 @@
       return this._originalLeft !== this.get('left') ||
              this._originalTop !== this.get('top');
     },
-    
+
     /**
      * Sets coordinates of all group objects
      * @method setObjectsCoords
@@ -346,7 +347,7 @@
       });
       return this;
     },
-    
+
     /**
      * Activates (makes active) all group objects
      * @method activateAllObjects
@@ -359,15 +360,15 @@
       });
       return this;
     },
-    
+
     /**
      * Executes given function for each object in this group
      * @method forEachObject
-     * @param {Function} callback 
-     *                   Callback invoked with current object as first argument, 
+     * @param {Function} callback
+     *                   Callback invoked with current object as first argument,
      *                   index - as second and an array of all objects - as third.
      *                   Iteration happens in reverse order (for performance reasons).
-     *                   Callback is invoked in a context of Global Object (e.g. `window`) 
+     *                   Callback is invoked in a context of Global Object (e.g. `window`)
      *                   when no `context` argument is given
      *
      * @param {Object} context Context (aka thisObject)
@@ -376,7 +377,7 @@
      * @chainable
      */
     forEachObject: fabric.StaticCanvas.prototype.forEachObject,
-    
+
     /**
      * @private
      * @method _setOpacityIfSame
@@ -384,24 +385,24 @@
     _setOpacityIfSame: function() {
       var objects = this.getObjects(),
           firstValue = objects[0] ? objects[0].get('opacity') : 1;
-          
+
       var isSameOpacity = objects.every(function(o) {
         return o.get('opacity') === firstValue;
       });
-      
+
       if (isSameOpacity) {
         this.opacity = firstValue;
       }
     },
-    
+
     /**
      * @private
      * @method _calcBounds
      */
     _calcBounds: function() {
-      var aX = [], 
-          aY = [], 
-          minX, minY, maxX, maxY, o, width, height, 
+      var aX = [],
+          aY = [],
+          minX, minY, maxX, maxY, o, width, height,
           i = 0,
           len = this.objects.length;
 
@@ -413,22 +414,22 @@
           aY.push(o.oCoords[prop].y);
         }
       };
-      
+
       minX = min(aX);
       maxX = max(aX);
       minY = min(aY);
       maxY = max(aY);
-      
+
       width = (maxX - minX) || 0;
       height = (maxY - minY) || 0;
-      
+
       this.width = width;
       this.height = height;
-      
+
       this.left = (minX + width / 2) || 0;
       this.top = (minY + height / 2) || 0;
     },
-    
+
     /**
      * Checks if point is contained within the group
      * @method containsPoint
@@ -436,18 +437,18 @@
      * @return {Boolean} true if point is contained within group
      */
     containsPoint: function(point) {
-      
+
       var halfWidth = this.get('width') / 2,
           halfHeight = this.get('height') / 2,
           centerX = this.get('left'),
           centerY = this.get('top');
-          
-      return  centerX - halfWidth < point.x && 
+
+      return  centerX - halfWidth < point.x &&
               centerX + halfWidth > point.x &&
               centerY - halfHeight < point.y &&
               centerY + halfHeight > point.y;
     },
-    
+
     /**
      * Makes all of this group's objects grayscale (i.e. calling `toGrayscale` on them)
      * @method toGrayscale
@@ -459,7 +460,7 @@
       }
     }
   });
-  
+
   /**
    * Returns fabric.Group instance from an object representation
    * @static
@@ -471,10 +472,10 @@
   fabric.Group.fromObject = function(object, callback) {
     fabric.util.enlivenObjects(object.objects, function(enlivenedObjects) {
       delete object.objects;
-      callback(new fabric.Group(enlivenedObjects, object));
+      callback && callback(new fabric.Group(enlivenedObjects, object));
     });
   };
-  
+
   fabric.Group.async = true;
-  
+
 })(typeof exports != 'undefined' ? exports : this);
