@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2012, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.8.22" };
+var fabric = fabric || { version: "0.8.23" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -4748,20 +4748,6 @@ fabric.util.string = {
     clipTo: null,
 
     /**
-     * Default canvas width
-     * @constant
-     * @type Number
-     */
-    CANVAS_WIDTH: 600,
-
-    /**
-     * Default canvas height
-     * @constant
-     * @type Number
-     */
-    CANVAS_HEIGHT: 600,
-
-    /**
      * Callback; invoked right before object is about to be scaled/rotated
      * @method onBeforeScaleRotate
      * @param {fabric.Object} target Object that's about to be scaled/rotated
@@ -5792,31 +5778,31 @@ fabric.util.string = {
 
     /**
      * Default cursor value used when hovering over an object on canvas
-     * @constant
+     * @property
      * @type String
      */
-    HOVER_CURSOR:           'move',
+    hoverCursor:            'move',
 
     /**
      * Default cursor value used for the entire canvas
-     * @constant
+     * @property
      * @type String
      */
-    CURSOR:                 'default',
+    defaultCursor:          'default',
 
     /**
      * Cursor value used for rotation point
-     * @constant
+     * @property
      * @type String
      */
-    ROTATION_CURSOR:        'crosshair',
+    rotationCursor:         'crosshair',
 
     /**
      * Default element class that's given to wrapper (div) element of canvas
-     * @constant
+     * @property
      * @type String
      */
-    CONTAINER_CLASS:        'canvas-container',
+    containerClass:        'canvas-container',
 
     _initInteractive: function() {
       this._currentTransform = null;
@@ -5934,7 +5920,7 @@ fabric.util.string = {
       if (activeGroup) {
         activeGroup.setObjectsCoords();
         activeGroup.set('isMoving', false);
-        this._setCursor(this.CURSOR);
+        this._setCursor(this.defaultCursor);
       }
 
       // clear selection
@@ -6073,7 +6059,7 @@ fabric.util.string = {
               this._objects[i].setActive(false);
             }
           }
-          style.cursor = this.CURSOR;
+          style.cursor = this.defaultCursor;
         }
         else {
           // set proper cursor
@@ -6466,7 +6452,7 @@ fabric.util.string = {
     _setCursorFromEvent: function (e, target) {
       var s = this.upperCanvasEl.style;
       if (!target) {
-        s.cursor = this.CURSOR;
+        s.cursor = this.defaultCursor;
         return false;
       }
       else {
@@ -6477,15 +6463,15 @@ fabric.util.string = {
                       && target._findTargetCorner(e, this._offset);
 
         if (!corner) {
-          s.cursor = this.HOVER_CURSOR;
+          s.cursor = this.hoverCursor;
         }
         else {
           if (corner in cursorMap) {
             s.cursor = cursorMap[corner];
           } else if (corner === 'mtr' || corner === 'mbr') {
-            s.cursor = this.ROTATION_CURSOR
+            s.cursor = this.rotationCursor;
           } else {
-            s.cursor = this.CURSOR;
+            s.cursor = this.defaulCursor;
             return false;
           }
         }
@@ -6633,7 +6619,7 @@ fabric.util.string = {
      */
     _initWrapperElement: function () {
       this.wrapperEl = fabric.util.wrapElement(this.lowerCanvasEl, 'div', {
-        'class': this.CONTAINER_CLASS
+        'class': this.containerClass
       });
       fabric.util.setStyle(this.wrapperEl, {
         width: this.getWidth() + 'px',
