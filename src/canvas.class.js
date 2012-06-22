@@ -206,6 +206,7 @@
 
       if (this.isDrawingMode && this._isCurrentlyDrawing) {
         this._finalizeDrawingPath();
+        this.fire('mouse:up', { e: e });
         return;
       }
 
@@ -232,7 +233,7 @@
       }
 
       this._currentTransform = null;
-      
+
       if (this._groupSelector) {
         // group selection was completed, determine its bounds
         this._findSelectedObjects(e);
@@ -282,6 +283,7 @@
         // capture coordinates immediately; this allows to draw dots (when movement never occurs)
         this._captureDrawingPath(e);
 
+        this.fire('mouse:down', { e: e });
         return;
       }
 
@@ -292,7 +294,7 @@
           pointer = this.getPointer(e),
           activeGroup = this.getActiveGroup(),
           corner;
-      
+
       if (this._shouldClearSelection(e)) {
 
         this._groupSelector = {
@@ -348,6 +350,7 @@
         if (this._isCurrentlyDrawing) {
           this._captureDrawingPath(e);
         }
+        this.fire('mouse:move', { e: e });
         return;
       }
 
