@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2012, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.8.21" };
+var fabric = fabric || { version: "0.8.22" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -5898,6 +5898,7 @@ fabric.util.string = {
 
       if (this.isDrawingMode && this._isCurrentlyDrawing) {
         this._finalizeDrawingPath();
+        this.fire('mouse:up', { e: e });
         return;
       }
 
@@ -5973,6 +5974,7 @@ fabric.util.string = {
 
         // capture coordinates immediately; this allows to draw dots (when movement never occurs)
         this._captureDrawingPath(e);
+        this.fire('mouse:down', { e: e });
 
         return;
       }
@@ -6040,6 +6042,7 @@ fabric.util.string = {
         if (this._isCurrentlyDrawing) {
           this._captureDrawingPath(e);
         }
+        this.fire('mouse:move', { e: e });
         return;
       }
 
