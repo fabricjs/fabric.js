@@ -222,27 +222,6 @@
     // this.assertEnumEqualUnordered(invokedObjects, group.getObjects(), 'setObjectsCoords should call setCoords on all objects');
   });
 
-  test('activateAllObjects', function() {
-    var group = makeGroupWith2Objects();
-
-    var assertAllObjectsActive = function() {
-      group.forEachObject(function(groupObject) {
-        ok(groupObject.isActive());
-      }, this);
-    };
-
-    ok(typeof group.activateAllObjects == 'function');
-    equals(group.activateAllObjects(), group, 'should be chainable');
-
-    assertAllObjectsActive();
-
-    group.forEachObject(function(groupObject) {
-      groupObject.setActive(false);
-    });
-    group.activateAllObjects();
-    assertAllObjectsActive();
-  });
-
   test('containsPoint', function() {
 
     var group = makeGroupWith2Objects();
@@ -267,38 +246,31 @@
       iteratedObjects.push(groupObject);
     });
 
-    //this.assertEnumEqualUnordered(iteratedObjects, group.getObjects(), 'should iterate through all objects');
+    equal(iteratedObjects[1], group.getObjects()[0]);
+    equal(iteratedObjects[0], group.getObjects()[1]);
   });
 
-  test('setActive', function() {
-    var group = makeGroupWith2Objects();
-
-    ok(typeof group.setActive == 'function');
-
-    group.setActive(false);
-    same([false, false], fabric.util.array.invoke(group.getObjects(), 'isActive'));
-
-    group.setActive(true);
-    same([true, true], fabric.util.array.invoke(group.getObjects(), 'isActive'));
-  });
-
-  test('fromObject', function() {
+  asyncTest('fromObject', function() {
     var group = makeGroupWith2Objects();
 
     ok(typeof fabric.Group.fromObject == 'function');
     var groupObject = group.toObject();
 
-    var newGroupFromObject = fabric.Group.fromObject(groupObject);
-    var objectFromOldGroup = group.toObject();
-    var objectFromNewGroup = newGroupFromObject.toObject();
+    fabric.Group.fromObject(groupObject, function(newGroupFromObject) {
 
-    ok(newGroupFromObject instanceof fabric.Group);
+      var objectFromOldGroup = group.toObject();
+      var objectFromNewGroup = newGroupFromObject.toObject();
 
-    // delete `objects` arrays, since `assertHashEqual` fails to compare them for equality
-    delete objectFromOldGroup.objects;
-    delete objectFromNewGroup.objects;
+      ok(newGroupFromObject instanceof fabric.Group);
 
-    same(objectFromOldGroup, objectFromNewGroup);
+      // delete `objects` arrays, since `assertHashEqual` fails to compare them for equality
+      delete objectFromOldGroup.objects;
+      delete objectFromNewGroup.objects;
+
+      same(objectFromOldGroup, objectFromNewGroup);
+
+      start();
+    });
   });
 
 })();
