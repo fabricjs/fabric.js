@@ -156,22 +156,22 @@
       callback && callback.call(context, url);
     }
   }
-  
+
   function enlivenObjects(objects, callback) {
-    
+
     function getKlass(type) {
       return fabric[fabric.util.string.camelize(fabric.util.string.capitalize(type))];
     }
-    
+
     var enlivenedObjects = [ ],
         numLoadedAsyncObjects = 0,
-        // get length of all images 
+        // get length of all images
         numTotalAsyncObjects = objects.filter(function (o) {
           return getKlass(o.type).async;
         }).length;
-    
+
     var _this = this;
-    
+
     objects.forEach(function (o, index) {
       if (!o.type) {
         return;
@@ -191,10 +191,21 @@
         enlivenedObjects[index] = klass.fromObject(o);
       }
     });
-    
+
     if (numTotalAsyncObjects === 0 && callback) {
       callback(enlivenedObjects);
     }
+  }
+
+  function groupSVGElements(elements, options, path) {
+    var object = elements.length > 1
+      ? new fabric.PathGroup(elements, options)
+      : elements[0];
+
+    if (typeof path !== 'undefined') {
+      object.setSourcePath(path);
+    }
+    return object;
   }
 
   fabric.util.removeFromArray = removeFromArray;
@@ -206,4 +217,5 @@
   fabric.util.requestAnimFrame = requestAnimFrame;
   fabric.util.loadImage = loadImage;
   fabric.util.enlivenObjects = enlivenObjects;
+  fabric.util.groupSVGElements = groupSVGElements;
 })();

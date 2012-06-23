@@ -115,13 +115,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
           }
           else {
             fabric.loadSVGFromURL(path, function (elements, options) {
-              if (elements.length > 1) {
-                var object = new fabric.PathGroup(elements, obj);
-              }
-              else {
-                var object = elements[0];
-              }
-              object.setSourcePath(path);
+              var object = fabric.util.groupSVGElements(elements, obj, path);
 
               // copy parameters from serialied json to object (left, top, scaleX, scaleY, etc.)
               // skip this step if an object is a PathGroup, since we already passed it options object before

@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2012, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.8.24" };
+var fabric = fabric || { version: "0.8.25" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -1950,22 +1950,22 @@ fabric.Observable = {
       callback && callback.call(context, url);
     }
   }
-  
+
   function enlivenObjects(objects, callback) {
-    
+
     function getKlass(type) {
       return fabric[fabric.util.string.camelize(fabric.util.string.capitalize(type))];
     }
-    
+
     var enlivenedObjects = [ ],
         numLoadedAsyncObjects = 0,
-        // get length of all images 
+        // get length of all images
         numTotalAsyncObjects = objects.filter(function (o) {
           return getKlass(o.type).async;
         }).length;
-    
+
     var _this = this;
-    
+
     objects.forEach(function (o, index) {
       if (!o.type) {
         return;
@@ -1985,10 +1985,21 @@ fabric.Observable = {
         enlivenedObjects[index] = klass.fromObject(o);
       }
     });
-    
+
     if (numTotalAsyncObjects === 0 && callback) {
       callback(enlivenedObjects);
     }
+  }
+
+  function groupSVGElements(elements, options, path) {
+    var object = elements.length > 1
+      ? new fabric.PathGroup(elements, options)
+      : elements[0];
+
+    if (typeof path !== 'undefined') {
+      object.setSourcePath(path);
+    }
+    return object;
   }
 
   fabric.util.removeFromArray = removeFromArray;
@@ -2000,6 +2011,7 @@ fabric.Observable = {
   fabric.util.requestAnimFrame = requestAnimFrame;
   fabric.util.loadImage = loadImage;
   fabric.util.enlivenObjects = enlivenObjects;
+  fabric.util.groupSVGElements = groupSVGElements;
 })();
 (function() {
   
@@ -7072,13 +7084,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
           }
           else {
             fabric.loadSVGFromURL(path, function (elements, options) {
-              if (elements.length > 1) {
-                var object = new fabric.PathGroup(elements, obj);
-              }
-              else {
-                var object = elements[0];
-              }
-              object.setSourcePath(path);
+              var object = fabric.util.groupSVGElements(elements, obj, path);
 
               // copy parameters from serialied json to object (left, top, scaleX, scaleY, etc.)
               // skip this step if an object is a PathGroup, since we already passed it options object before
