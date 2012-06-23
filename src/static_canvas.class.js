@@ -92,20 +92,6 @@
     clipTo: null,
 
     /**
-     * Default canvas width
-     * @constant
-     * @type Number
-     */
-    CANVAS_WIDTH: 600,
-
-    /**
-     * Default canvas height
-     * @constant
-     * @type Number
-     */
-    CANVAS_HEIGHT: 600,
-
-    /**
      * Callback; invoked right before object is about to be scaled/rotated
      * @method onBeforeScaleRotate
      * @param {fabric.Object} target Object that's about to be scaled/rotated
