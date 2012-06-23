@@ -119,14 +119,7 @@
         var id = element.id, match;
         if (match = /\d+$/.exec(id)) {
           fabric.loadSVGFromURL('../assets/' + match[0] + '.svg', function(objects, options) {
-
-            var loadedObject;
-            if (objects.length > 1) {
-              loadedObject = new fabric.PathGroup(objects, options);
-            }
-            else {
-              loadedObject = objects[0];
-            }
+            var loadedObject = fabric.util.groupSVGElements(objects, options);
 
             loadedObject.set({
               left: left,
@@ -611,13 +604,7 @@
   document.getElementById('load-svg').onclick = function() {
     var svg = document.getElementById('svg-console').value;
     fabric.loadSVGFromString(svg, function(objects, options) {
-      var obj;
-      if (objects.length === 1) {
-        obj = objects[0]
-      }
-      else {
-        obj = new fabric.PathGroup(objects, options);
-      }
+      var obj = fabric.util.groupSVGElements(objects, options);
       canvas.add(obj).centerObject(obj).renderAll();
       obj.setCoords();
     });

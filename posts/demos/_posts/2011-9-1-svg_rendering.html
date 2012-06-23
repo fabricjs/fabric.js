@@ -8,39 +8,30 @@ title: SVG Rendering
   .canvas-container { border: 1px solid #ccc; display: inline-block; vertical-align: top; margin-bottom: 10px; background: #fff; }
   .block { float: left; margin-right: 10px; margin-bottom: 10px }
   .block.left { clear: left; }
-  .test { background: #ccc; margin-right: 10px; margin-bottom: 10px; padding-left: 10px; 
+  .test { background: #ccc; margin-right: 10px; margin-bottom: 10px; padding-left: 10px;
     box-shadow: rgba(0,0,0,0.5) 1px 1px 3px; overflow: hidden; display: inline-block; }
   #bd-wrapper iframe { background: #fff; border: 0; max-width: 600px }
 </style>
 
 <script>
-  function toShape(objects, options) {
-    if (objects.length > 1) {
-      return new fabric.PathGroup(objects, options);
-    }
-    return objects[0];
-  }
-</script>
-
-<script>
   function initCanvas(id) {
     var canvas;
     fabric.loadSVGFromURL('../assets/' + id + '.svg', function(objects, options) {
-      var shape = toShape(objects, options);
-      
+      var shape = fabric.util.groupSVGElements(objects, options);
+
       var canvasEl = document.getElementById('c' + id);
-      
+
       canvasEl.width = shape.width || 600;
       canvasEl.height = shape.height || 600;
-      
+
       var iframeEl = canvasEl.parentNode.nextSibling.childNodes[1];
       if (iframeEl) {
         iframeEl.style.width = canvasEl.width + 'px';
         iframeEl.style.height = canvasEl.height + 'px';
       }
-      
+
       canvas = window['__canvas' + id] = new fabric.Canvas('c' + id, { selection: false });
-      
+
       canvas.add(shape).centerObjectH(shape).centerObjectV(shape).renderAll();
       shape.setCoords();
       canvas.calcOffset();
@@ -49,9 +40,9 @@ title: SVG Rendering
 </script>
 
 <script>
-  var blacklist = [ 
-    16 /* image doesn't render properly */, 
-    20 /* very intense shape */, 
+  var blacklist = [
+    16 /* image doesn't render properly */,
+    20 /* very intense shape */,
     33, 34, 35 /* very intense shapes */,
     52 /* image doesn't render properly */,
     56 /* image doesn't render properly */,

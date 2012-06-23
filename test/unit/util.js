@@ -384,5 +384,38 @@
     }, 2000);
   });
 
+  var SVG_WITH_1_ELEMENT = '<?xml version="1.0"?>\
+    <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\
+    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">\
+      <polygon fill="red" stroke="blue" stroke-width="10" points="350, 75 379,161 469,161\
+        397,215 423,301 350,250 277,301 303,215 231,161 321,161" />\
+    </svg>';
+
+  var SVG_WITH_2_ELEMENTS = '<?xml version="1.0"?>\
+    <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\
+    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">\
+      <polygon fill="red" stroke="blue" stroke-width="10" points="350, 75 379,161 469,161\
+        397,215 423,301 350,250 277,301 303,215 231,161 321,161" />\
+      <polygon fill="red" stroke="blue" stroke-width="10" points="350, 75 379,161 469,161\
+        397,215 423,301 350,250 277,301 303,215 231,161 321,161" />\
+    </svg>';
+
+  asyncTest('fabric.util.groupSVGElements', function() {
+    ok(typeof fabric.util.groupSVGElements == 'function');
+
+    var group1, group2;
+    fabric.loadSVGFromString(SVG_WITH_1_ELEMENT, function(objects, options) {
+      group1 = fabric.util.groupSVGElements(objects, options);
+    });
+    fabric.loadSVGFromString(SVG_WITH_2_ELEMENTS, function(objects, options) {
+      group2 = fabric.util.groupSVGElements(objects, options);
+    });
+
+    setTimeout(function() {
+      ok(group1 instanceof fabric.Polygon);
+      ok(group2 instanceof fabric.PathGroup);
+      start();
+    }, 1000);
+  });
 
 })();
