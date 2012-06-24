@@ -17,7 +17,7 @@ else if (minifier === 'closure') {
 
 var includeAllModules = modules.length === 1 && modules[0] === 'ALL';
 
-var distFileContents = '';
+var distFileContents = '/* build: `node build.js modules=' + modules.join(',') + '` */\n';
 
 function appendFileContents(fileNames, callback) {
 
