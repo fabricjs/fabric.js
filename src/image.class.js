@@ -322,7 +322,7 @@
     _initFilters: function(object) {
       if (object.filters && object.filters.length) {
         this.filters = object.filters.map(function(filterObj) {
-          return fabric.Image.filters[filterObj.type].fromObject(filterObj);
+          return filterObj && fabric.Image.filters[filterObj.type].fromObject(filterObj);
         });
       }
     },

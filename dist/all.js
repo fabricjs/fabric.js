@@ -1,3 +1,4 @@
+/* build: `node build.js modules=ALL` */
 /*! Fabric.js Copyright 2008-2012, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
 var fabric = fabric || { version: "0.8.25" };
@@ -11511,7 +11512,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     _initFilters: function(object) {
       if (object.filters && object.filters.length) {
         this.filters = object.filters.map(function(filterObj) {
-          return fabric.Image.filters[filterObj.type].fromObject(filterObj);
+          return filterObj && fabric.Image.filters[filterObj.type].fromObject(filterObj);
         });
       }
     },
