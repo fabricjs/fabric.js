@@ -4,7 +4,7 @@
         {
             "path": ".",
             "folder_exclude_patterns": ["tmp", "log", "jsdoc-toolkit", "_site", "docs"],
-            "file_exclude_patterns": ["*.min.js", "*.gz"]
+            "file_exclude_patterns": ["*.min.js", "*.gz", ".sublime-workspace"]
         }
     ],
     "settings": {
