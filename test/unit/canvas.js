@@ -315,7 +315,6 @@
       setTimeout(function() {
 
         equal(JSON.stringify(anotherCanvas), json, 'backgrondImage and properties are initialized correctly');
-
         start();
 
       }, 1000);
