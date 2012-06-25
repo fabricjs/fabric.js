@@ -164,9 +164,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         _this.backgroundImageOpacity = serialized.backgroundImageOpacity;
         _this.backgroundImageStretch = serialized.backgroundImageStretch;
       }
-      if (callback) {
-        callback();
-      }
+      callback && callback();
     });
 
     return this;
@@ -183,6 +181,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       enlivenedObjects.forEach(function(obj, index) {
         _this.insertAt(obj, index, true);
       });
+      callback && callback();
     });
   },
 
@@ -220,9 +219,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     var data = JSON.stringify(this);
     this.cloneWithoutData(function(clone) {
       clone.loadFromJSON(data, function() {
-        if (callback) {
-          callback(clone);
-        }
+        callback && callback(clone);
       });
     });
   },
@@ -245,17 +242,13 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     if (this.backgroundImage) {
       clone.setBackgroundImage(this.backgroundImage.src, function() {
         clone.renderAll();
-        if (callback) {
-          callback(clone);
-        }
+        callback && callback(clone);
       });
       clone.backgroundImageOpacity = this.backgroundImageOpacity;
       clone.backgroundImageStretch = this.backgroundImageStretch;
     }
     else {
-      if (callback) {
-        callback(clone);
-      }
+      callback && callback(clone);
     }
   }
 });
