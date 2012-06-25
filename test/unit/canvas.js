@@ -816,7 +816,9 @@
         "backgroundImage": (document.location.protocol +
                             '//' +
                             document.location.hostname +
-                            (parseInt(document.location.port, 10) !== 80 ? (':' + document.location.port) : '') +
+                            ((document.location.port === '' || parseInt(document.location.port, 10) === 80)
+                                ? ''
+                                : (':' + document.location.port)) +
                             '/assets/pug.jpg'),
         "backgroundImageOpacity": 1,
         "backgroundImageStretch": true
