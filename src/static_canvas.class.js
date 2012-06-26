@@ -569,12 +569,17 @@
           origHeight = this.getHeight(),
           scaledWidth = origWidth * multiplier,
           scaledHeight = origHeight * multiplier,
-          activeObject = this.getActiveObject();
+          activeObject = this.getActiveObject(),
+          activeGroup = this.getActiveGroup();
 
       this.setWidth(scaledWidth).setHeight(scaledHeight);
       this.contextTop.scale(multiplier, multiplier);
 
-      if (activeObject) {
+      if (activeGroup) {
+        // not removing group due to complications with restoring it with correct state afterwords
+        this._tempRemoveBordersCornersFromGroup(activeGroup);
+      }
+      else if (activeObject) {
         this.deactivateAll();
       }
 
@@ -590,12 +595,38 @@
       this.contextTop.scale(1 / multiplier,  1 / multiplier);
       this.setWidth(origWidth).setHeight(origHeight);
 
-      if (activeObject) {
+      if (activeGroup) {
+        this._restoreBordersCornersOnGroup(activeGroup);
+      }
+      else if (activeObject) {
         this.setActiveObject(activeObject);
       }
+
       this.renderAll();
 
       return dataURL;
+    },
+
+    _tempRemoveBordersCornersFromGroup: function(group) {
+      group.origHideCorners = group.hideCorners;
+      group.origBorderColor = group.borderColor;
+
+      group.hideCorners = true;
+      group.borderColor = 'rgba(0,0,0,0)';
+
+      group.forEachObject(function(o) {
+        o.origBorderColor = o.borderColor;
+        o.borderColor = 'rgba(0,0,0,0)';
+      });
+    },
+    _restoreBordersCornersOnGroup: function(group) {
+      group.hideCorners = group.origHideCorners;
+      group.borderColor = group.origBorderColor;
+
+      group.forEachObject(function(o) {
+        o.borderColor = o.origBorderColor;
+        delete o.origBorderColor;
+      });
     },
 
     /**
