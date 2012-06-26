@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL` */
 /*! Fabric.js Copyright 2008-2012, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.8.26" };
+var fabric = fabric || { version: "0.8.27" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -4276,21 +4276,19 @@ fabric.util.string = {
   };
   
 })(typeof exports != 'undefined' ? exports : this);
-//= require 'point.class'
-
 (function(global) {
-  
+
   "use strict";
-  
+
   /* Adaptation of work of Kevin Lindsey (kevin@kevlindev.com) */
-  
+
   var fabric = global.fabric || (global.fabric = { });
-  
-  if (fabric.Intersection) {    
+
+  if (fabric.Intersection) {
     fabric.warn('fabric.Intersection is already defined');
     return;
   }
-  
+
   /**
    * @class Intersection
    * @memberOf fabric
@@ -4300,11 +4298,11 @@ fabric.util.string = {
       this.init(status);
     }
   }
-  
+
   fabric.Intersection = Intersection;
-  
+
   fabric.Intersection.prototype = /** @scope fabric.Intersection.prototype */ {
-    
+
     /**
      * @method init
      * @param {String} status
@@ -4313,7 +4311,7 @@ fabric.util.string = {
       this.status = status;
       this.points = [];
     },
-    
+
     /**
      * @method appendPoint
      * @param {String} status
@@ -4321,7 +4319,7 @@ fabric.util.string = {
     appendPoint: function (point) {
       this.points.push(point);
     },
-    
+
     /**
      * @method appendPoints
      * @param {String} status
@@ -4330,7 +4328,7 @@ fabric.util.string = {
       this.points = this.points.concat(points);
     }
   };
-  
+
   /**
    * @static
    * @method intersectLineLine
@@ -4361,19 +4359,19 @@ fabric.util.string = {
     }
     return result;
   };
-  
+
   /**
    * @method intersectLinePolygon
    */
   fabric.Intersection.intersectLinePolygon = function(a1,a2,points){
     var result = new Intersection("No Intersection"),
         length = points.length;
-        
+
     for (var i = 0; i < length; i++) {
       var b1 = points[i],
           b2 = points[(i+1) % length],
           inter = Intersection.intersectLineLine(a1, a2, b1, b2);
-          
+
       result.appendPoints(inter.points);
     }
     if (result.points.length > 0) {
@@ -4381,19 +4379,19 @@ fabric.util.string = {
     }
     return result;
   };
-  
+
   /**
    * @method intersectPolygonPolygon
    */
   fabric.Intersection.intersectPolygonPolygon = function (points1, points2) {
     var result = new Intersection("No Intersection"),
         length = points1.length;
-        
+
     for (var i = 0; i < length; i++) {
       var a1 = points1[i],
           a2 = points1[(i+1) % length],
           inter = Intersection.intersectLinePolygon(a1, a2, points2);
-          
+
       result.appendPoints(inter.points);
     }
     if (result.points.length > 0) {
@@ -4401,7 +4399,7 @@ fabric.util.string = {
     }
     return result;
   };
-  
+
   /**
    * @method intersectPolygonRectangle
    */
@@ -4415,7 +4413,7 @@ fabric.util.string = {
         inter3 = Intersection.intersectLinePolygon(max, bottomLeft, points),
         inter4 = Intersection.intersectLinePolygon(bottomLeft, min, points),
         result = new Intersection("No Intersection");
-        
+
     result.appendPoints(inter1.points);
     result.appendPoints(inter2.points);
     result.appendPoints(inter3.points);
@@ -4425,7 +4423,7 @@ fabric.util.string = {
     }
     return result;
   };
-  
+
 })(typeof exports != 'undefined' ? exports : this);
 (function(global) {
   
@@ -5279,12 +5277,17 @@ fabric.util.string = {
           origHeight = this.getHeight(),
           scaledWidth = origWidth * multiplier,
           scaledHeight = origHeight * multiplier,
-          activeObject = this.getActiveObject();
+          activeObject = this.getActiveObject(),
+          activeGroup = this.getActiveGroup();
 
       this.setWidth(scaledWidth).setHeight(scaledHeight);
       this.contextTop.scale(multiplier, multiplier);
 
-      if (activeObject) {
+      if (activeGroup) {
+        // not removing group due to complications with restoring it with correct state afterwords
+        this._tempRemoveBordersCornersFromGroup(activeGroup);
+      }
+      else if (activeObject) {
         this.deactivateAll();
       }
 
@@ -5300,12 +5303,38 @@ fabric.util.string = {
       this.contextTop.scale(1 / multiplier,  1 / multiplier);
       this.setWidth(origWidth).setHeight(origHeight);
 
-      if (activeObject) {
+      if (activeGroup) {
+        this._restoreBordersCornersOnGroup(activeGroup);
+      }
+      else if (activeObject) {
         this.setActiveObject(activeObject);
       }
+
       this.renderAll();
 
       return dataURL;
+    },
+
+    _tempRemoveBordersCornersFromGroup: function(group) {
+      group.origHideCorners = group.hideCorners;
+      group.origBorderColor = group.borderColor;
+
+      group.hideCorners = true;
+      group.borderColor = 'rgba(0,0,0,0)';
+
+      group.forEachObject(function(o) {
+        o.origBorderColor = o.borderColor;
+        o.borderColor = 'rgba(0,0,0,0)';
+      });
+    },
+    _restoreBordersCornersOnGroup: function(group) {
+      group.hideCorners = group.origHideCorners;
+      group.borderColor = group.origBorderColor;
+
+      group.forEachObject(function(o) {
+        o.borderColor = o.origBorderColor;
+        delete o.origBorderColor;
+      });
     },
 
     /**
@@ -7130,11 +7159,19 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       _this.backgroundColor = serialized.background;
 
       if (serialized.backgroundImage) {
-        _this.setBackgroundImage(serialized.backgroundImage, _this.renderAll.bind(_this));
-        _this.backgroundImageOpacity = serialized.backgroundImageOpacity;
-        _this.backgroundImageStretch = serialized.backgroundImageStretch;
+        _this.setBackgroundImage(serialized.backgroundImage, function() {
+
+          _this.backgroundImageOpacity = serialized.backgroundImageOpacity;
+          _this.backgroundImageStretch = serialized.backgroundImageStretch;
+
+          _this.renderAll();
+
+          callback && callback();
+        });
       }
-      callback && callback();
+      else {
+        callback && callback();
+      }
     });
 
     return this;
@@ -8586,34 +8623,32 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
 })(typeof exports != 'undefined' ? exports : this);
 
-//= require "object.class"
-
 (function(global) {
-  
+
   "use strict";
-  
+
   var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       parentSet = fabric.Object.prototype.set,
       coordProps = { 'x1': 1, 'x2': 1, 'y1': 1, 'y2': 1 };
-      
+
   if (fabric.Line) {
     fabric.warn('fabric.Line is already defined');
     return;
   }
-  
-  /** 
+
+  /**
    * @class Line
    * @extends fabric.Object
    */
   fabric.Line = fabric.util.createClass(fabric.Object, /** @scope fabric.Line.prototype */ {
-    
+
     /**
      * @property
      * @type String
      */
     type: 'line',
-    
+
     /**
      * Constructor
      * @method initialize
@@ -8625,24 +8660,24 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       if (!points) {
         points = [0, 0, 0, 0];
       }
-      
+
       this.callSuper('initialize', options);
-      
+
       this.set('x1', points[0]);
       this.set('y1', points[1]);
       this.set('x2', points[2]);
       this.set('y2', points[3]);
-      
+
       this._setWidthHeight();
     },
-    
+
     _setWidthHeight: function() {
       this.set('width', (this.x2 - this.x1) || 1);
       this.set('height', (this.y2 - this.y1) || 1);
       this.set('left', this.x1 + this.width / 2);
       this.set('top', this.y1 + this.height / 2);
     },
-    
+
     set: function(name, value) {
       parentSet.call(this, name, value);
       if (name in coordProps) {
@@ -8650,7 +8685,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       }
       return this;
     },
-    
+
     /**
      * @private
      * @method _render
@@ -8658,13 +8693,13 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      */
     _render: function(ctx) {
       ctx.beginPath();
-      
+
       // move from center (of virtual box) to its left/top corner
       ctx.moveTo(this.width === 1 ? 0 : (-this.width / 2), this.height === 1 ? 0 : (-this.height / 2));
       ctx.lineTo(this.width === 1 ? 0 : (this.width / 2), this.height === 1 ? 0 : (this.height / 2));
-      
+
       ctx.lineWidth = this.strokeWidth;
-      
+
       // TODO: test this
       // make sure setting "fill" changes color of a line
       // (by copying fillStyle to strokeStyle, since line is stroked, not filled)
@@ -8673,7 +8708,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       ctx.stroke();
       ctx.strokeStyle = origStrokeStyle;
     },
-    
+
     /**
      * Returns complexity of an instance
      * @method complexity
@@ -8682,7 +8717,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     complexity: function() {
       return 1;
     },
-    
+
     /**
      * Returns object representation of an instance
      * @methd toObject
@@ -8696,7 +8731,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         y2: this.get('y2')
       });
     },
-    
+
     /**
      * Returns svg representation of an instance
      * @method toSVG
@@ -8714,14 +8749,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       ].join('');
     }
   });
-  
+
   /**
    * List of attribute names to account for when parsing SVG element (used by `fabric.Line.fromElement`)
    * @static
    * @see http://www.w3.org/TR/SVG/shapes.html#LineElement
    */
   fabric.Line.ATTRIBUTE_NAMES = 'x1 y1 x2 y2 stroke stroke-width transform'.split(' ');
-  
+
   /**
    * Returns fabric.Line instance from an SVG element
    * @static
@@ -8740,7 +8775,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     ];
     return new fabric.Line(points, extend(parsedAttributes, options));
   };
-  
+
   /**
    * Returns fabric.Line instance from an object representation
    * @static
@@ -8754,8 +8789,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   };
 
 })(typeof exports != 'undefined' ? exports : this);
-//= require "object.class"
-
 (function(global) {
 
   "use strict";
@@ -9035,33 +9068,31 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   };
 
 })(typeof exports != 'undefined' ? exports : this);
-//= require "object.class"
-
 (function(global){
-  
+
   "use strict";
-  
+
   var fabric = global.fabric || (global.fabric = { }),
       piBy2   = Math.PI * 2,
       extend = fabric.util.object.extend;
-  
+
   if (fabric.Ellipse) {
     fabric.warn('fabric.Ellipse is already defined.');
     return;
   }
-  
-  /** 
+
+  /**
    * @class Ellipse
    * @extends fabric.Object
    */
   fabric.Ellipse = fabric.util.createClass(fabric.Object, /** @scope fabric.Ellipse.prototype */ {
-    
+
     /**
      * @property
      * @type String
      */
     type: 'ellipse',
-    
+
     /**
      * Constructor
      * @method initialize
@@ -9070,16 +9101,16 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      */
     initialize: function(options) {
       options = options || { };
-      
+
       this.callSuper('initialize', options);
-      
+
       this.set('rx', options.rx || 0);
       this.set('ry', options.ry || 0);
-      
+
       this.set('width', this.get('rx') * 2);
       this.set('height', this.get('ry') * 2);
     },
-    
+
     /**
      * Returns object representation of an instance
      * @method toObject
@@ -9091,7 +9122,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         ry: this.get('ry')
       });
     },
-    
+
     /**
      * Returns svg representation of an instance
      * @method toSVG
@@ -9107,7 +9138,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         '/>'
       ].join('');
     },
-    
+
     /**
      * Renders this instance on a given context
      * @method render
@@ -9119,7 +9150,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       if (this.rx === 0 || this.ry === 0) return;
       return this.callSuper('render', ctx, noTransform);
     },
-    
+
     /**
      * @private
      * @method _render
@@ -9139,7 +9170,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       }
       ctx.restore();
     },
-    
+
     /**
      * Returns complexity of an instance
      * @method complexity
@@ -9149,14 +9180,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       return 1;
     }
   });
-  
+
   /**
    * List of attribute names to account for when parsing SVG element (used by {@link fabric.Ellipse.fromElement})
    * @static
    * @see http://www.w3.org/TR/SVG/shapes.html#EllipseElement
    */
   fabric.Ellipse.ATTRIBUTE_NAMES = 'cx cy rx ry fill fill-opacity opacity stroke stroke-width transform'.split(' ');
-  
+
   /**
    * Returns {@link fabric.Ellipse} instance from an SVG element
    * @static
@@ -9176,7 +9207,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     }
     return new fabric.Ellipse(extend(parsedAttributes, options));
   };
-  
+
   /**
    * Returns fabric.Ellipse instance from an object representation
    * @static
@@ -9189,8 +9220,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   };
 
 })(typeof exports != 'undefined' ? exports : this);
-//= require "object.class"
-
 (function(global) {
 
   "use strict";
@@ -9397,32 +9426,30 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   };
 
 })(typeof exports != 'undefined' ? exports : this);
-//= require "object.class"
-
 (function(global) {
-  
+
   "use strict";
-  
+
   var fabric = global.fabric || (global.fabric = { }),
       toFixed = fabric.util.toFixed;
-  
+
   if (fabric.Polyline) {
     fabric.warn('fabric.Polyline is already defined');
     return;
   }
-  
-  /** 
+
+  /**
    * @class Polyline
    * @extends fabric.Object
    */
   fabric.Polyline = fabric.util.createClass(fabric.Object, /** @scope fabric.Polyline.prototype */ {
-    
+
     /**
      * @property
      * @type String
      */
     type: 'polyline',
-    
+
     /**
      * Constructor
      * @method initialize
@@ -9436,7 +9463,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       this.callSuper('initialize', options);
       this._calcDimensions();
     },
-    
+
     /**
      * @private
      * @method _calcDimensions
@@ -9444,7 +9471,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     _calcDimensions: function() {
       return fabric.Polygon.prototype._calcDimensions.call(this);
     },
-    
+
     /**
      * Returns object representation of an instance
      * @method toObject
@@ -9453,7 +9480,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     toObject: function() {
       return fabric.Polygon.prototype.toObject.call(this);
     },
-    
+
     /**
      * Returns svg representation of an instance
      * @method toSVG
@@ -9464,7 +9491,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       for (var i = 0, len = this.points.length; i < len; i++) {
         points.push(toFixed(this.points[i].x, 2), ',', toFixed(this.points[i].y, 2), ' ');
       }
-      
+
       return [
         '<polyline ',
           'points="', points.join(''), '" ',
@@ -9473,7 +9500,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         '/>'
       ].join('');
     },
-    
+
     /**
      * @private
      * @method _render
@@ -9493,7 +9520,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         ctx.stroke();
       }
     },
-    
+
     /**
      * Returns complexity of an instance
      * @method complexity
@@ -9503,14 +9530,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       return this.get('points').length;
     }
   });
-  
+
   /**
    * List of attribute names to account for when parsing SVG element (used by `fabric.Polyline.fromElement`)
    * @static
    * @see: http://www.w3.org/TR/SVG/shapes.html#PolylineElement
    */
   fabric.Polyline.ATTRIBUTE_NAMES = 'fill fill-opacity opacity stroke stroke-width transform'.split(' ');
-  
+
   /**
    * Returns fabric.Polyline instance from an SVG element
    * @static
@@ -9524,19 +9551,19 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       return null;
     }
     options || (options = { });
-    
+
     var points = fabric.parsePointsAttribute(element.getAttribute('points')),
         parsedAttributes = fabric.parseAttributes(element, fabric.Polyline.ATTRIBUTE_NAMES);
-    
+
     for (var i = 0, len = points.length; i < len; i++) {
       // normalize coordinates, according to containing box (dimensions of which are passed via `options`)
       points[i].x -= (options.width / 2) || 0;
       points[i].y -= (options.height / 2) || 0;
     }
-            
+
     return new fabric.Polyline(points, fabric.util.object.extend(parsedAttributes, options));
   };
-  
+
   /**
    * Returns fabric.Polyline instance from an object representation
    * @static
@@ -9548,40 +9575,38 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     var points = object.points;
     return new fabric.Polyline(points, object);
   };
-  
-})(typeof exports != 'undefined' ? exports : this);
-//= require "object.class"
 
+})(typeof exports != 'undefined' ? exports : this);
 (function(global) {
-  
+
   "use strict";
-  
+
   var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       min = fabric.util.array.min,
       max = fabric.util.array.max,
       toFixed = fabric.util.toFixed;
-  
+
   if (fabric.Polygon) {
     fabric.warn('fabric.Polygon is already defined');
     return;
   }
-  
+
   function byX(p) { return p.x; }
   function byY(p) { return p.y; }
-  
-  /** 
+
+  /**
    * @class Polygon
    * @extends fabric.Object
    */
   fabric.Polygon = fabric.util.createClass(fabric.Object, /** @scope fabric.Polygon.prototype */ {
-    
+
     /**
      * @property
      * @type String
      */
     type: 'polygon',
-    
+
     /**
      * Constructor
      * @method initialize
@@ -9595,25 +9620,25 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       this.callSuper('initialize', options);
       this._calcDimensions();
     },
-    
+
     /**
      * @private
      * @method _calcDimensions
      */
     _calcDimensions: function() {
-      
+
       var points = this.points,
           minX = min(points, 'x'),
           minY = min(points, 'y'),
           maxX = max(points, 'x'),
           maxY = max(points, 'y');
-      
+
       this.width = maxX - minX;
       this.height = maxY - minY;
       this.minX = minX;
       this.minY = minY;
     },
-    
+
     /**
      * Returns object representation of an instance
      * @method toObject
@@ -9624,7 +9649,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         points: this.points.concat()
       });
     },
-    
+
     /**
      * Returns svg representation of an instance
      * @method toSVG
@@ -9635,7 +9660,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       for (var i = 0, len = this.points.length; i < len; i++) {
         points.push(toFixed(this.points[i].x, 2), ',', toFixed(this.points[i].y, 2), ' ');
       }
-      
+
       return [
         '<polygon ',
           'points="', points.join(''), '" ',
@@ -9644,7 +9669,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         '/>'
       ].join('');
     },
-    
+
     /**
      * @private
      * @method _render
@@ -9665,7 +9690,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         ctx.stroke();
       }
     },
-    
+
     /**
      * Returns complexity of an instance
      * @method complexity
@@ -9675,14 +9700,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       return this.points.length;
     }
   });
-  
+
   /**
    * List of attribute names to account for when parsing SVG element (used by `fabric.Polygon.fromElement`)
    * @static
    * @see: http://www.w3.org/TR/SVG/shapes.html#PolygonElement
    */
   fabric.Polygon.ATTRIBUTE_NAMES = 'fill fill-opacity opacity stroke stroke-width transform'.split(' ');
-  
+
   /**
    * Returns fabric.Polygon instance from an SVG element
    * @static
@@ -9696,19 +9721,19 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       return null;
     }
     options || (options = { });
-    
+
     var points = fabric.parsePointsAttribute(element.getAttribute('points')),
         parsedAttributes = fabric.parseAttributes(element, fabric.Polygon.ATTRIBUTE_NAMES);
-    
+
     for (var i = 0, len = points.length; i < len; i++) {
       // normalize coordinates, according to containing box (dimensions of which are passed via `options`)
       points[i].x -= (options.width / 2) || 0;
       points[i].y -= (options.height / 2) || 0;
     }
-        
+
     return new fabric.Polygon(points, extend(parsedAttributes, options));
   };
-  
+
   /**
    * Returns fabric.Polygon instance from an object representation
    * @static
@@ -9721,8 +9746,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   };
 
 })(typeof exports != 'undefined' ? exports : this);
-//= require "object.class"
-
 (function(global) {
 
   var commandLengths = {
@@ -10429,12 +10452,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   };
 
 })(typeof exports != 'undefined' ? exports : this);
-//= require "path.class"
-
 (function(global) {
-  
+
   "use strict";
-  
+
   var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       invoke = fabric.util.array.invoke,
@@ -10442,30 +10463,30 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       parentToObject = fabric.Object.prototype.toObject,
       camelize = fabric.util.string.camelize,
       capitalize = fabric.util.string.capitalize;
-  
+
   if (fabric.PathGroup) {
     fabric.warn('fabric.PathGroup is already defined');
     return;
   }
-  
-  /** 
+
+  /**
    * @class PathGroup
    * @extends fabric.Path
    */
   fabric.PathGroup = fabric.util.createClass(fabric.Path, /** @scope fabric.PathGroup.prototype */ {
-    
+
     /**
      * @property
      * @type String
      */
     type: 'path-group',
-    
+
     /**
      * @property
      * @type Boolean
      */
     forceFillOverwrite: false,
-    
+
     /**
      * Constructor
      * @method initialize
@@ -10474,22 +10495,22 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      * @return {fabric.PathGroup} thisArg
      */
     initialize: function(paths, options) {
-      
+
       options = options || { };
       this.paths = paths || [ ];
-      
+
       for (var i = this.paths.length; i--; ) {
         this.paths[i].group = this;
       }
-      
+
       this.setOptions(options);
       this.setCoords();
-      
+
       if (options.sourcePath) {
         this.setSourcePath(options.sourcePath);
       }
     },
-    
+
     /**
      * @private
      * @method _initProperties
@@ -10507,7 +10528,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     //         }
     //       }, this);
     //     },
-    
+
     /**
      * Renders this group on a specified context
      * @method render
@@ -10517,7 +10538,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       if (this.stub) {
         // fast-path, rendering image stub
         ctx.save();
-        
+
         this.transform(ctx);
         this.stub.render(ctx, false /* no transform */);
         if (this.active) {
@@ -10528,12 +10549,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       }
       else {
         ctx.save();
-        
+
         var m = this.transformMatrix;
         if (m) {
           ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
         }
-        
+
         this.transform(ctx);
         for (var i = 0, l = this.paths.length; i < l; ++i) {
           this.paths[i].render(ctx, true);
@@ -10545,7 +10566,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         ctx.restore();
       }
     },
-    
+
     /**
      * Sets certain property to a certain value
      * @method set
@@ -10567,7 +10588,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       }
       return this;
     },
-    
+
     /**
      * Returns object representation of this path group
      * @method toObject
@@ -10579,7 +10600,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         sourcePath: this.sourcePath
       });
     },
-    
+
     /**
      * Returns dataless object representation of this path group
      * @method toDatalessObject
@@ -10592,7 +10613,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       }
       return o;
     },
-    
+
     /**
      * Returns svg representation of an instance
      * @method toSVG
@@ -10616,17 +10637,17 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
       return markup.join('');
     },
-    
+
      /**
       * Returns a string representation of this path group
       * @method toString
       * @return {String} string representation of an object
       */
     toString: function() {
-      return '#<fabric.PathGroup (' + this.complexity() + 
+      return '#<fabric.PathGroup (' + this.complexity() +
         '): { top: ' + this.top + ', left: ' + this.left + ' }>';
     },
-    
+
     /**
      * Returns true if all paths in this group are of same color
      * @method isSameColor
@@ -10638,7 +10659,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         return path.get('fill') === firstPathFill;
       });
     },
-    
+
     /**
       * Returns number representation of object's complexity
       * @method complexity
@@ -10649,7 +10670,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         return total + ((path && path.complexity) ? path.complexity() : 0);
       }, 0);
     },
-    
+
     /**
       * Makes path group grayscale
       * @method toGrayscale
@@ -10662,7 +10683,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       }
       return this;
     },
-    
+
     /**
      * Returns all paths in this path group
      * @method getObjects
@@ -10672,7 +10693,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       return this.paths;
     }
   });
-  
+
   /**
    * @private
    * @method instantiatePaths
@@ -10686,7 +10707,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     }
     return paths;
   }
-  
+
   /**
    * Creates fabric.Triangle instance from an object representation
    * @static
@@ -10700,8 +10721,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   };
 
 })(typeof exports != 'undefined' ? exports : this);
-//= require "object.class"
-
 (function(global){
 
   "use strict";
@@ -11181,8 +11200,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   fabric.Group.async = true;
 
 })(typeof exports != 'undefined' ? exports : this);
-//= require "object.class"
-
 (function(global) {
 
   "use strict";
@@ -12162,8 +12179,6 @@ fabric.Image.filters.GradientTransparency = fabric.util.createClass( /** @scope 
 fabric.Image.filters.GradientTransparency.fromObject = function(object) {
   return new fabric.Image.filters.GradientTransparency(object);
 };
-//= require "object.class"
-
 (function(global) {
 
   "use strict";
@@ -12458,10 +12473,10 @@ fabric.Image.filters.GradientTransparency.fromObject = function(object) {
 
           textAndBg = this._getSVGTextAndBg(lineTopOffset, textLeftOffset, textLines),
           shadowSpans = this._getSVGShadows(lineTopOffset, textLines);
-      
+
       // move top offset by an ascent
       textTopOffset += ((this._fontAscent / 5) * this.lineHeight);
-      
+
       return [
         '<g transform="', this.getSvgTransform(), '">',
           textAndBg.textBgRects.join(''),
@@ -12655,7 +12670,7 @@ fabric.Image.filters.GradientTransparency.fromObject = function(object) {
   fabric.Text.fromElement = function(element) {
     // TODO (kangax): implement this
   };
-  
+
   fabric.Text.async = true;
 
 })(typeof exports != 'undefined' ? exports : this);
