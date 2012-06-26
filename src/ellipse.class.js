@@ -1,30 +1,28 @@
-//= require "object.class"
-
 (function(global){
-  
+
   "use strict";
-  
+
   var fabric = global.fabric || (global.fabric = { }),
       piBy2   = Math.PI * 2,
       extend = fabric.util.object.extend;
-  
+
   if (fabric.Ellipse) {
     fabric.warn('fabric.Ellipse is already defined.');
     return;
   }
-  
-  /** 
+
+  /**
    * @class Ellipse
    * @extends fabric.Object
    */
   fabric.Ellipse = fabric.util.createClass(fabric.Object, /** @scope fabric.Ellipse.prototype */ {
-    
+
     /**
      * @property
      * @type String
      */
     type: 'ellipse',
-    
+
     /**
      * Constructor
      * @method initialize
@@ -33,16 +31,16 @@
      */
     initialize: function(options) {
       options = options || { };
-      
+
       this.callSuper('initialize', options);
-      
+
       this.set('rx', options.rx || 0);
       this.set('ry', options.ry || 0);
-      
+
       this.set('width', this.get('rx') * 2);
       this.set('height', this.get('ry') * 2);
     },
-    
+
     /**
      * Returns object representation of an instance
      * @method toObject
@@ -54,7 +52,7 @@
         ry: this.get('ry')
       });
     },
-    
+
     /**
      * Returns svg representation of an instance
      * @method toSVG
@@ -70,7 +68,7 @@
         '/>'
       ].join('');
     },
-    
+
     /**
      * Renders this instance on a given context
      * @method render
@@ -82,7 +80,7 @@
       if (this.rx === 0 || this.ry === 0) return;
       return this.callSuper('render', ctx, noTransform);
     },
-    
+
     /**
      * @private
      * @method _render
@@ -102,7 +100,7 @@
       }
       ctx.restore();
     },
-    
+
     /**
      * Returns complexity of an instance
      * @method complexity
@@ -112,14 +110,14 @@
       return 1;
     }
   });
-  
+
   /**
    * List of attribute names to account for when parsing SVG element (used by {@link fabric.Ellipse.fromElement})
    * @static
    * @see http://www.w3.org/TR/SVG/shapes.html#EllipseElement
    */
   fabric.Ellipse.ATTRIBUTE_NAMES = 'cx cy rx ry fill fill-opacity opacity stroke stroke-width transform'.split(' ');
-  
+
   /**
    * Returns {@link fabric.Ellipse} instance from an SVG element
    * @static
@@ -139,7 +137,7 @@
     }
     return new fabric.Ellipse(extend(parsedAttributes, options));
   };
-  
+
   /**
    * Returns fabric.Ellipse instance from an object representation
    * @static

@@ -1,5 +1,3 @@
-//= require "object.class"
-
 (function(global) {
 
   "use strict";
@@ -294,10 +292,10 @@
 
           textAndBg = this._getSVGTextAndBg(lineTopOffset, textLeftOffset, textLines),
           shadowSpans = this._getSVGShadows(lineTopOffset, textLines);
-      
+
       // move top offset by an ascent
       textTopOffset += ((this._fontAscent / 5) * this.lineHeight);
-      
+
       return [
         '<g transform="', this.getSvgTransform(), '">',
           textAndBg.textBgRects.join(''),
@@ -491,7 +489,7 @@
   fabric.Text.fromElement = function(element) {
     // TODO (kangax): implement this
   };
-  
+
   fabric.Text.async = true;
 
 })(typeof exports != 'undefined' ? exports : this);

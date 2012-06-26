@@ -1,18 +1,16 @@
-//= require 'point.class'
-
 (function(global) {
-  
+
   "use strict";
-  
+
   /* Adaptation of work of Kevin Lindsey (kevin@kevlindev.com) */
-  
+
   var fabric = global.fabric || (global.fabric = { });
-  
-  if (fabric.Intersection) {    
+
+  if (fabric.Intersection) {
     fabric.warn('fabric.Intersection is already defined');
     return;
   }
-  
+
   /**
    * @class Intersection
    * @memberOf fabric
@@ -22,11 +20,11 @@
       this.init(status);
     }
   }
-  
+
   fabric.Intersection = Intersection;
-  
+
   fabric.Intersection.prototype = /** @scope fabric.Intersection.prototype */ {
-    
+
     /**
      * @method init
      * @param {String} status
@@ -35,7 +33,7 @@
       this.status = status;
       this.points = [];
     },
-    
+
     /**
      * @method appendPoint
      * @param {String} status
@@ -43,7 +41,7 @@
     appendPoint: function (point) {
       this.points.push(point);
     },
-    
+
     /**
      * @method appendPoints
      * @param {String} status
@@ -52,7 +50,7 @@
       this.points = this.points.concat(points);
     }
   };
-  
+
   /**
    * @static
    * @method intersectLineLine
@@ -83,19 +81,19 @@
     }
     return result;
   };
-  
+
   /**
    * @method intersectLinePolygon
    */
   fabric.Intersection.intersectLinePolygon = function(a1,a2,points){
     var result = new Intersection("No Intersection"),
         length = points.length;
-        
+
     for (var i = 0; i < length; i++) {
       var b1 = points[i],
           b2 = points[(i+1) % length],
           inter = Intersection.intersectLineLine(a1, a2, b1, b2);
-          
+
       result.appendPoints(inter.points);
     }
     if (result.points.length > 0) {
@@ -103,19 +101,19 @@
     }
     return result;
   };
-  
+
   /**
    * @method intersectPolygonPolygon
    */
   fabric.Intersection.intersectPolygonPolygon = function (points1, points2) {
     var result = new Intersection("No Intersection"),
         length = points1.length;
-        
+
     for (var i = 0; i < length; i++) {
       var a1 = points1[i],
           a2 = points1[(i+1) % length],
           inter = Intersection.intersectLinePolygon(a1, a2, points2);
-          
+
       result.appendPoints(inter.points);
     }
     if (result.points.length > 0) {
@@ -123,7 +121,7 @@
     }
     return result;
   };
-  
+
   /**
    * @method intersectPolygonRectangle
    */
@@ -137,7 +135,7 @@
         inter3 = Intersection.intersectLinePolygon(max, bottomLeft, points),
         inter4 = Intersection.intersectLinePolygon(bottomLeft, min, points),
         result = new Intersection("No Intersection");
-        
+
     result.appendPoints(inter1.points);
     result.appendPoints(inter2.points);
     result.appendPoints(inter3.points);
@@ -147,5 +145,5 @@
     }
     return result;
   };
-  
+
 })(typeof exports != 'undefined' ? exports : this);

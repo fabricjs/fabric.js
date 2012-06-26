@@ -1,5 +1,3 @@
-//= require "object.class"
-
 (function(global){
 
   "use strict";
