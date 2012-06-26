@@ -160,11 +160,19 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       _this.backgroundColor = serialized.background;
 
       if (serialized.backgroundImage) {
-        _this.setBackgroundImage(serialized.backgroundImage, _this.renderAll.bind(_this));
-        _this.backgroundImageOpacity = serialized.backgroundImageOpacity;
-        _this.backgroundImageStretch = serialized.backgroundImageStretch;
+        _this.setBackgroundImage(serialized.backgroundImage, function() {
+
+          _this.backgroundImageOpacity = serialized.backgroundImageOpacity;
+          _this.backgroundImageStretch = serialized.backgroundImageStretch;
+
+          _this.renderAll();
+
+          callback && callback();
+        });
       }
-      callback && callback();
+      else {
+        callback && callback();
+      }
     });
 
     return this;
