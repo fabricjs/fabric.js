@@ -2,17 +2,17 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    
+
     <title>{{ page.title }} | Fabric.js Demos</title>
-    
+
     <link rel="stylesheet" href="../css/master.css">
 
     <script src="../js/master.js"></script>
-    <script src="../lib/fabric_static.min.js"></script>
+    <script src="../lib/fabric_static.js"></script>
     <!--[if lt IE 9]>
       <script src="https://raw.github.com/kangax/fabric.js/master/lib/excanvas.js"></script>
     <![endif]-->
-  
+
     <script>
       // polyfill by @paulirish
       if (!window.requestAnimationFrame ) {
@@ -30,13 +30,13 @@
   </head>
   <body>
     {% include header.html %}
-  
+
     <div id="bd-wrapper">
       <h2><span>Fabric.js demos</span> &middot; {{ page.title }}</h2>
-    
+
       {{ content }}
     </div>
-  
+
     <script>
       (function(){
         var mainScriptEl = document.getElementById('main');
