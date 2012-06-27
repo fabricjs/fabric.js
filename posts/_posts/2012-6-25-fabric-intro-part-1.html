@@ -32,7 +32,7 @@ Future topics:
 
   <img src="https://github.com/kangax/fabric.js/raw/master/lib/screenshot.png" style="width:300px;border:1px solid #ccc;margin-bottom:20px">
 
-  <p>Today I'd like to introduce you to <a href="http://fabricjs.com">Fabric.js</a> &mdash; a powerful Javascript library that makes working with HTML5 canvas a breeze. Fabric provides a missing object model for canvas, as well as an SVG parser, layer of interactivity, and a whole suite of other indespensible tools. It is a fully open-source project, licensed under MIT, with many contributions over the years.</p>
+  <p>Today I'd like to introduce you to <a href="http://fabricjs.com">Fabric.js</a> &mdash; a powerful Javascript library that makes working with HTML5 canvas a breeze. Fabric provides a missing object model for canvas, as well as an SVG parser, layer of interactivity, and a whole suite of other indispensable tools. It is a fully open-source project, licensed under MIT, with many contributions over the years.</p>
 
   <p>I started developing Fabric 3 years ago, after discovering the pains of working with native canvas API. I was creating an interactive design editor for <a href="http://printio.ru">printio.ru</a> &mdash; my startup that allows users to design their own apparel. The kind of interactivity we wanted only existed in Flash apps in those days. Even right now, very few come close to what became possible with Fabric.</p>
 
@@ -46,7 +46,7 @@ Future topics:
 
   <p>Native canvas methods only allow us to fire off simple graphic commands, blindly modifying entire canvas bitmap. Want to draw a rectangle? Use <code>fillRect(left, top, width, height)</code>. Want to draw a line? Use a combination of <code>moveTo(left, top)</code> and <code>lineTo(x, y)</code>. It's as if we're <strong>painting canvas with a brush</strong>, layering more and more oil on top, with very little control.</p>
 
-  <p>Instead of operating on such low level, Fabric provides simple but powerful object model on top of native methods. It takes care of canvas state and rendering, and lets us work with &#8220;objects&#8221; directy.</p>
+  <p>Instead of operating on such low level, Fabric provides simple but powerful object model on top of native methods. It takes care of canvas state and rendering, and lets us work with &#8220;objects&#8221; directly.</p>
 
   <p>Let's take a look at a simple example demonstrating this difference. Let's say we want to draw a red rectangle somewhere on canvas. Here's how we would do this with native &lt;canvas> API.</p>
 
@@ -258,7 +258,7 @@ rect.getStroke(); // null
 rect.getOpacity(); // 1
 </pre>
 
-  <p>Our rectangle got a default set of properties. It's positioned at 0,0, is of black color, fully opaque, has no stroke and <strong>no dimensions</strong> (wdith and height are 0). Because of no dimensions, we can't see it on canvas. But giving it any positive values for width/height would certainly reveal a black rectangle at the left/top corner of canvas.</p>
+  <p>Our rectangle got a default set of properties. It's positioned at 0,0, is of black color, fully opaque, has no stroke and <strong>no dimensions</strong> (width and height are 0). Because of no dimensions, we can't see it on canvas. But giving it any positive values for width/height would certainly reveal a black rectangle at the left/top corner of canvas.</p>
 
   <p><img src="/article_assets/6.png"></p>
 
@@ -331,7 +331,7 @@ canvas.onFpsUpdate = function(){ /* ... */ };
 
   <p>While we're on a subject of canvas element, let's talk about interactivity. One of the unique features of Fabric &mdash; that's built right in &mdash; is a layer of interactivity on top of all that convenient object model we just looked at.</p>
 
-  <p>Object model exists to allow programatic access and manipulation of objects on canvas. But on the outsise, on a user level, there's a way to manipulate those objects via mouse (or touch, on touch devices). As soon as you initialize canvas via <code>new fabric.Canvas('...')</code>, it's possible to select objects, drag them around, scale or rotate them, and even <strong>group together</strong> to manipulate in one chunk!</p>
+  <p>Object model exists to allow programmatic access and manipulation of objects on canvas. But on the outside, on a user level, there's a way to manipulate those objects via mouse (or touch, on touch devices). As soon as you initialize canvas via <code>new fabric.Canvas('...')</code>, it's possible to select objects, drag them around, scale or rotate them, and even <strong>group together</strong> to manipulate in one chunk!</p>
 
   <p><img src="/article_assets/7.png">
   <img src="/article_assets/8.png"></p>
@@ -404,7 +404,7 @@ fabric.Image.fromURL('my_image.png', function(oImg) {
 });
 </pre>
 
-  <p>Looks pretty straightforward, doesn't it? Just call <code>fabric.Image.fromURL</code> with a url of an image, and give it a callback to invoke once image is loaded and created. The callback function receives already-created <code>fabric.Image</code> object as a first argument. At that point, you can add it to canvas or perhaps change first, and then add to canvas:</p>
+  <p>Looks pretty straightforward, doesn't it? Just call <code>fabric.Image.fromURL</code> with a URL of an image, and give it a callback to invoke once image is loaded and created. The callback function receives already-created <code>fabric.Image</code> object as a first argument. At that point, you can add it to canvas or perhaps change first, and then add to canvas:</p>
 
 <pre>
 fabric.Image.fromURL('my_image.png', function(oImg) {
