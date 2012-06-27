@@ -1,0 +1,487 @@
+<!--
+### Table of contents
+
+* Why fabric
+* Objects
+    * Manipulating objects
+    * Default options
+* Canvas
+    * Interactivity
+* Images
+
+Future topics:
+
+### Groups
+### Animation
+### Text (properties, fonts)
+### Parsing SVG
+### Serialization, JSON, toSVG
+### Free drawing
+### Working with events
+### Working with color and gradients (fabric.Color, fabric.Gradient)
+### Subclassing
+### Image filters
+### Fabric on Node
+-->
+
+<link rel="stylesheet" href="/article_assets/bootstrap.css">
+<style>h2 { margin-bottom: 15px } h3 { margin-bottom: 10px; } h4 { margin-bottom: 7px; } </style>
+
+<div class="container" style="margin:30px auto">
+  <h2 id="introduction_to_fabricjs">Introduction to Fabric.js. Part I.</h2>
+
+  <img src="https://github.com/kangax/fabric.js/raw/master/lib/screenshot.png" style="width:300px;border:1px solid #ccc;margin-bottom:20px">
+
+  <p>Today I'd like to introduce you to <a href="http://fabricjs.com">Fabric.js</a> &mdash; a powerful Javascript library that makes working with HTML5 canvas a breeze. Fabric provides a missing object model for canvas, as well as an SVG parser, layer of interactivity, and a whole suite of other indespensible tools. It is a fully open-source project, licensed under MIT, with many contributions over the years.</p>
+
+  <p>I started developing Fabric 3 years ago, after discovering the pains of working with native canvas API. I was creating an interactive design editor for <a href="http://printio.ru">printio.ru</a> &mdash; my startup that allows users to design their own apparel. The kind of interactivity we wanted only existed in Flash apps in those days. Even right now, very few come close to what became possible with Fabric.</p>
+
+  <p>Let's take a closer look!</p>
+
+  <h3 id="why_fabric">Why fabric?</h3>
+
+  <p><a href="http://http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html">Canvas</a> allows us to create some <a href="http://net.tutsplus.com/articles/web-roundups/21-ridiculously-impressive-html5-canvas-experiments/">absolutely</a> <a href="http://speckyboy.com/2011/12/07/20-amazing-implementations-of-html5-canvas/">amazing</a> <a href="http://artatm.com/2012/01/23-truly-amazing-and-unbelievable-html5-canvas-and-javascript-experiments/">graphics</a> on the web these days. But the API it provides is <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#2dcontext">disappointingly low-level</a>. It's one thing if we simply want to draw few basic shapes on canvas and forget about them. But as soon as there's need for any kind of interaction, change of picture at any point, or drawing of more complex shapes &mdash; situtation changes dramatically.</p>
+
+  <p>Fabric aims to solve this problem.</p>
+
+  <p>Native canvas methods only allow us to fire off simple graphic commands, blindly modifying entire canvas bitmap. Want to draw a rectangle? Use <code>fillRect(left, top, width, height)</code>. Want to draw a line? Use a combination of <code>moveTo(left, top)</code> and <code>lineTo(x, y)</code>. It's as if we're <strong>painting canvas with a brush</strong>, layering more and more oil on top, with very little control.</p>
+
+  <p>Instead of operating on such low level, Fabric provides simple but powerful object model on top of native methods. It takes care of canvas state and rendering, and lets us work with &#8220;objects&#8221; directy.</p>
+
+  <p>Let's take a look at a simple example demonstrating this difference. Let's say we want to draw a red rectangle somewhere on canvas. Here's how we would do this with native &lt;canvas> API.</p>
+
+<pre>
+// reference canvas element (with id="c")
+var canvasEl = document.getElementById('c');
+
+// get 2d context to draw on (the "bitmap" mentioned earlier)
+var ctx = canvasEl.getContext('2d');
+
+// set fill color of context
+ctx.fillStyle = 'red';
+
+// create rectangle at a 100,100 point, with 20x20 dimensions
+ctx.fillRect(100, 100, 20, 20);
+</pre>
+
+  <p>Now, let's take a look at doing the same with Fabric:</p>
+
+<pre>
+// create a wrapper around native canvas element (with id="c")
+var canvas = new fabric.Canvas('c');
+
+// create a rectangle object
+var rect = new fabric.Rect({
+  left: 100,
+  top: 100,
+  fill: 'red',
+  width: 20,
+  height: 20
+});
+
+// "add" rectangle onto canvas
+canvas.add(rect);
+</pre>
+
+  <p><img src="/article_assets/1.png"></p>
+
+  <p>At this point, there's almost no difference in size &mdash; the two examples are pretty similar. However, you can already see how different the approach to working with canvas is. With native methods, we <strong>operate on context</strong> &mdash; an object representing entire canvas bitmap. In Fabric, we <strong>operate on objects</strong> &mdash; instantiate them, change their properties, and add them to canvas. You can see that these objects are first-class citizens in Fabric land.</p>
+
+  <p>But rendering plain red rectangle is just so boring. We could have at least made something fun with it! Perhaps, rotate slightly?</p>
+
+  <p>Let's try 45 degrees. First, using native &lt;canvas> methods:</p>
+
+<pre>
+var canvasEl = document.getElementById('c');
+var ctx = canvasEl.getContext('2d');
+ctx.fillStyle = 'red';
+
+<b>ctx.translate(100, 100);
+ctx.rotate(Math.PI / 180 * 45);
+ctx.fillRect(-10, -10, 20, 20);</b>
+</pre>
+
+  <p>and now using Fabric:</p>
+
+<pre>
+var canvas = new fabric.Canvas('c');
+
+// create a rectangle with angle=45
+var rect = new fabric.Rect({
+  left: 100,
+  top: 100,
+  fill: 'red',
+  width: 20,
+  height: 20,
+  <b>angle: 45</b>
+});
+
+canvas.add(rect);
+</pre>
+
+  <p><img src="/article_assets/2.png"></p>
+
+  <p>What happened here?</p>
+
+  <p>All we had to do in Fabric is change object's &#8220;angle&#8221; value to <code>45</code>. With native methods however, things become much more &#8220;fun&#8221;. Remember that we can't operate on objects. Instead, we tweak positioning and angle of entire canvas bitmap (<code>ctx.translate</code>, <code>ctx.rotate</code>) to suit our needs. We then draw rectangle again, but remembering to offset bitmap properly (-10, -10), so that it's still rendered at the point of 100,100. As a bonus exercise, we had to translate degrees to radians when rotating canvas bitmap.</p>
+
+  <p>I'm sure you're starting to see exactly why Fabric exists and how much low-level boilerplate it hides.</p>
+
+  <p>But let's take a look at yet another example &mdash; keeping track of canvas state.</p>
+
+  <p>What if at some point, we wanted to move that now-familiar red rectangle to a slightly different location on canvas? How would we do this without being able to operate on objects? Would we just call another <code>fillRect</code> on a canvas bitmap?</p>
+
+  <p>Not quite. Calling another <code>fillRect</code> command actually draws rectangle on top of whatever is already drawn on canvas. Remember I mentioned painting with a brush earlier? In order to &#8220;move&#8221; it, we'd need to first <strong>erase previously drawn content</strong>, and then draw rectangle at a new location.</p>
+
+<pre>
+var canvasEl = document.getElementById('c');
+
+...
+ctx.strokRect(100, 100, 20, 20);
+...
+
+// erase entire canvas area
+<b>ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
+ctx.fillRect(20, 50, 20, 20);</b>
+</pre>
+
+  <p>And how would we accomplish this with Fabric?</p>
+
+<pre>
+var canvas = new fabric.Canvas('c');
+...
+canvas.add(rect);
+...
+
+<b>rect.set({ left: 20, top: 50 });
+canvas.renderAll();</b>
+</pre>
+
+  <p><img src="/article_assets/3.png"></p>
+
+  <p>Notice a very important difference. With Fabric, we no longer need to erase the content before attempting to &#8220;modify&#8221; any content. We still work with objects, simply changing their properties, and then re-render canvas to get a &#8220;fresh picture&#8221;.</p>
+
+  <h3 id="objects">Objects</h3>
+
+  <p>We already saw how to work with rectangles by instantiating <code>fabric.Rect</code> constructor. But of course Fabric covers all the other basic shapes as well &mdash; circles, triangles, ellipses, and so on. All of them are exposed under <code>fabric</code> &#8220;namespace&#8221; as <code>fabric.Circle</code>, <code>fabric.Triangle</code>, <code>fabric.Ellipse</code>, etc.</p>
+
+  <p>7 basic shapes provided in Fabric:</p>
+
+  <ul>
+  <li><a href="http://fabricjs.com/docs/symbols/fabric.Circle.html">fabric.Circle</a></li>
+  <li><a href="http://fabricjs.com/docs/symbols/fabric.Ellipse.html">fabric.Ellipse</a></li>
+  <li><a href="http://fabricjs.com/docs/symbols/fabric.Line.html">fabric.Line</a></li>
+  <li><a href="http://fabricjs.com/docs/symbols/fabric.Polygon.html">fabric.Polygon</a></li>
+  <li><a href="http://fabricjs.com/docs/symbols/fabric.Polyline.html">fabric.Polyline</a></li>
+  <li><a href="http://fabricjs.com/docs/symbols/fabric.Rect.html">fabric.Rect</a></li>
+  <li><a href="http://fabricjs.com/docs/symbols/fabric.Triangle.html">fabric.Triangle</a></li>
+  </ul>
+
+  <p>Want to draw a circle? Just create a circle object, and add it to canvas. Same with any other basic shape:</p>
+
+<pre>
+var circle = new fabric.Circle({
+  radius: 20, fill: 'green', left: 100, top: 100
+});
+var triangle = new fabric.Triangle({
+  width: 20, height: 30, fill: 'blue', left: 50, top: 50
+});
+
+canvas.add(circle, triangle);
+</pre>
+
+  <p><img src="/article_assets/4.png"></p>
+
+  <p>..and there we have a green circle, drawn at 100,100 location and a blue triangle at 50,50 location.</p>
+
+  <h4 id="manipulating_objects">Manipulating objects</h4>
+
+  <p>Creating graphic objects &mdash; rectangles, circles, or something else &mdash; is certainly only the beginning. At some point, we will probably want to modify those objects. Perhaps certain action will need to trigger change of state, or play animation of some sort. Or we might want to change object properties (color, opacity, size, position) on certain mouse interactions.</p>
+
+  <p>Fabric takes care of canvas rendering and state management for us. We only need to modify objects themselves.</p>
+
+  <p>Earlier example demonstrated <code>set</code> method and how calling <code>set({ left: 20, top: 50 })</code> &#8220;moved&#8221; object from previous location. In a similar fashion, we can change any other property of an object. But what are those properties?</p>
+
+  <p>Well, as you would expect there are those related to positioning &mdash; <strong>left</strong>, <strong>top</strong>; dimension &mdash; <strong>width</strong>, <strong>height</strong>; rendering &mdash; <strong>fill</strong>, <strong>opacity</strong>, <strong>stroke</strong>, <strong>strokeWidth</strong>; scaling and rotation &mdash; <strong>scaleX</strong>, <strong>scaleY</strong>, <strong>angle</strong>; and even those related to flipping &mdash; <strong>flipX</strong>, <strong>flipY</strong>.</p>
+
+  <p>Yes, creating flipped object in Fabric is as easy as setting flip* property to <code>true</code>.</p>
+
+  <p>You can read any of these properties via <code>get</code> method, and set them via <code>set</code>. Let's try changing some of the red rectangle's properties:</p>
+
+<pre>
+var canvas = new fabric.Canvas('c');
+...
+canvas.add(rect);
+
+rect.set('fill', 'red');
+rect.set({ strokeWidth: 5, stroke: 'rgba(100,200,200,0.5)' });
+rect.set('angle', 15).set('flipY', true);
+</pre>
+
+  <p><img src="/article_assets/5.png"></p>
+
+  <p>First, we're setting &#8220;fill&#8221; value to &#8220;red&#8221;, essentially making object of red color. The next statement sets both &#8220;strokeWidth&#8221; and &#8220;stroke&#8221; values, giving rectangle a 5px stroke of pale green color. Finally, we're changing &#8220;angle&#8221; and &#8220;flipY&#8221; properties. Notice how each of the 3 statements used slightly different syntax.</p>
+
+  <p>This demonstrates that <code>set</code> is a universal method. You will probably use it quite often, and so it's meant to be as convenient as possible.</p>
+
+  <p>We've covered setters, and what about getters? Quite obviously, there's generic <code>get</code> method but also a number of specific <code>get*</code> ones. To read &#8220;width&#8221; value of an object, you would use <code>get('width')</code> or <code>getWidth()</code>. To get a &#8220;scaleX&#8221; value &mdash; <code>get('scaleX')</code> or <code>getScaleX()</code>, and so on. There's a method like <code>getWidth</code> or <code>getScaleX</code> for each of the &#8220;public&#8221; object properties (&#8220;stroke&#8221;, &#8220;strokeWidth&#8221;, &#8220;angle&#8221;, etc.)</p>
+
+  <p>You might notice that in earlier examples objects were created with the same configuration hash as the one we just used in <code>set</code> method. That's because it is <strong>exactly the same</strong>. You can either &#8220;configure&#8221; object at the time of creation, or use <code>set</code> method after:</p>
+
+<pre>
+var rect = new fabric.Rect({ width: 10, height: 20, fill: '#f55', opacity: 0.7 });
+
+// or functionally identical
+
+var rect = new fabric.Rect();
+rect.set({ width: 10, height: 20, fill: '#f55', opacity: 0.7 });
+</pre>
+
+  <h4 id="default_options">Default options</h4>
+
+  <p>At this point, you might ask &mdash; what happens when we create an object without passing any &#8220;configuration&#8221; object. Does it still have those properties?</p>
+
+  <p>Yes, of course. Objects in Fabric always have a default set of properties. When omited during creation, it is this default set of properties that's &#8220;given&#8221; to object. We can try and see for ourselves:</p>
+
+<pre>
+var rect = new fabric.Rect(); // notice no options passed in
+
+rect.getWidth(); // 0
+rect.getHeight(); // 0
+
+rect.getLeft(); // 0
+rect.getTop(); // 0
+
+rect.getFill(); // rgb(0,0,0)
+rect.getStroke(); // null
+
+rect.getOpacity(); // 1
+</pre>
+
+  <p>Our rectangle got a default set of properties. It's positioned at 0,0, is of black color, fully opaque, has no stroke and <strong>no dimensions</strong> (wdith and height are 0). Because of no dimensions, we can't see it on canvas. But giving it any positive values for width/height would certainly reveal a black rectangle at the left/top corner of canvas.</p>
+
+  <p><img src="/article_assets/6.png"></p>
+
+  <h4 id="hierarchy_and_inheritance">Hierarchy and Inheritance</h4>
+
+  <p>Fabric objects do not just exist independent of each other. They form a very precise hierarchy.</p>
+
+  <p>Most of the objects inherit from a root <code>fabric.Object</code>. <code>fabric.Object</code> pretty much represents a 2-dimensional shape, positioned in 2-dimensional canvas plane. It's an entity that has left/top and width/height properties, as well as a slew of other graphic characteristics. Those properties that we saw on objects &mdash; fill, stroke, angle, opacity, flip*, etc. &mdash; are common to all Fabric objects that inherit from <code>fabric.Object</code>.</p>
+
+  <p>This inheritance allows us to define methods on <code>fabric.Object</code> and share them among all child &#8220;classes&#8221;. For example, if you wanted to have <code>getAngleInRadians</code> method on all objects, you would simply create it on <code>fabric.Object.prototype</code>:</p>
+
+<pre>
+fabric.Object.prototype.getAngleInRadians = function() {
+  return this.getAngle() / 180 * Math.PI;
+};
+
+var rect = new fabric.Rect({ angle: 45 });
+rect.getAngleInRadians(); // 0.785...
+
+var circle = new fabric.Circle({ angle: 30, radius: 10 });
+circle.getAngleInRadians(); // 0.523...
+
+circle instanceof fabric.Circle; // true
+circle instanceof fabric.Object; // true
+</pre>
+
+  <p>As you can see, method immediately becomes available on all instances.</p>
+
+  <p>While child &#8220;classes&#8221; inherit from <code>fabric.Object</code>, they often also define their own methods and properties. For example, <code>fabric.Circle</code> needs to have &#8220;radius&#8221; property. And <code>fabric.Image</code> &mdash; which we'll look at in a moment &mdash; needs to have <code>getElement</code>/<code>setElement</code> methods for accessing/setting HTML &lt;img> element from which image instance originates.</p>
+
+  <h3 id="canvas">Canvas</h3>
+
+  <p>Now that we covered objects in more detail, let's get back to canvas.</p>
+
+  <p>First thing you can see in all of Fabric examples if creation of canvas object &mdash; <code>new fabric.Canvas('...')</code>. fabric.Canvas serves as a wrapper around &lt;canvas> element, and is responsible for managing all of the fabric objects on that particular canvas. It takes an id of an element, and returns an instance of <code>fabric.Canvas</code>.</p>
+
+  <p>We can <code>add</code> objects onto it, reference them off of it, or remove them:</p>
+
+<pre>
+var canvas = new fabric.Canvas('c');
+var rect = new fabric.Rect();
+
+canvas.add(rect); // add object
+
+canvas.item(0); // reference fabric.Rect added earlier (first object)
+canvas.getObjects(); // get all objects on canvas (rect will be first and only)
+
+canvas.remove(rect); // remove previously-added fabric.Rect
+</pre>
+
+  <p>While managing objects is the main purpose of <code>fabric.Canvas</code>, it also serves as a <strong>configuration</strong> host. Need to set background color or image for an entire canvas? Clip all contents to a certain area? Set different width/height? Specify whether canvas is interactive or not? All of these options (and others) can be set on <code>fabric.Canvas</code>, either at the time of creation or after:</p>
+
+<pre>
+var canvas = new fabric.Canvas('c', {
+  backgroundColor: 'rgb(100,100,200)',
+  selectionColor: 'blue',
+  selectionLineWidth: 2
+  // ...
+});
+
+// or
+
+var canvas = new fabric.Canvas('c');
+canvas.backgroundImage = 'http://...';
+canvas.onFpsUpdate = function(){ /* ... */ };
+// ...
+</pre>
+
+  <h4 id="interactivity">Interactivity</h4>
+
+  <p>While we're on a subject of canvas element, let's talk about interactivity. One of the unique features of Fabric &mdash; that's built right in &mdash; is a layer of interactivity on top of all that convenient object model we just looked at.</p>
+
+  <p>Object model exists to allow programatic access and manipulation of objects on canvas. But on the outsise, on a user level, there's a way to manipulate those objects via mouse (or touch, on touch devices). As soon as you initialize canvas via <code>new fabric.Canvas('...')</code>, it's possible to select objects, drag them around, scale or rotate them, and even <strong>group together</strong> to manipulate in one chunk!</p>
+
+  <p><img src="/article_assets/7.png">
+  <img src="/article_assets/8.png"></p>
+
+  <p>If we wanted user to allow dragging something on canvas &mdash; let's say an image &mdash; all we'd need to do is initialize canvas and add an object on it. No additional configuration or setup required.</p>
+
+  <p>To control this interactivity, we could use Fabric's &#8220;selection&#8221; boolean property on canvas in combination of &#8220;selectable&#8221; boolean property of individual objects.</p>
+
+<pre>
+var canvas = new fabric.Canvas('c');
+...
+canvas.selection = false; // disable group selection
+rect.set('selectable', false); // make object unselectable
+</pre>
+
+  <p>But what if you don't want such interactivity layer at all? If that's the case, you can always substitute <code>fabric.Canvas</code> with <code>fabric.StaticCanvas</code>. The syntax for initialization is absolutely identical; you only use <code>StaticCanvas</code> instead of <code>Canvas</code>.</p>
+
+<pre>
+var staticCanvas = new fabric.StaticCanvas('c');
+
+staticCanvas.add(
+  new fabric.Rect({
+    width: 10, height: 20,
+    left: 100, top: 100,
+    fill: 'yellow',
+    angle: 30
+  }));
+</pre>
+
+  <p>This creates a &#8220;lighter&#8221; version of canvas, without any event handling logic. Note that you <strong>still have an entire object model</strong> to work with &mdash; adding objects, removing or modifying them, as well as changing any of the canvas configuration &mdash; all of this still works. It's only event handling that's gone.</p>
+
+  <p>Later, when we go over custom build option, you'll see that if <code>StaticCanvas</code> is all you need, you can even create a lighter version of Fabric. This could be a nice option, if you need something like non-interactive charts, or non-interactive images with filters in your application.</p>
+
+  <h3 id="images">Images</h3>
+
+  <p>Speaking of images&#8230;</p>
+
+  <p>Adding rectangles and circles on canvas is fun but why don't we play with some images? As you would imagine by now, Fabric makes this easy. Let's instantiate <code>fabric.Image</code> object and add it to canvas:</p>
+
+  <p>(html)</p>
+
+<pre>
+&lt;canvas id="c">&lt;/canvas>
+&lt;img src="my_image.png" id="my-image">
+</pre>
+
+  <p>(js)</p>
+
+<pre>
+var canvas = new fabric.Canvas('c');
+var imgElement = document.getElementById('my-img');
+var imgInstance = new fabric.Image(imgElement, {
+  left: 100,
+  top: 100,
+  angle: 30,
+  opacity: 0.85
+});
+canvas.add(imgInstance);
+</pre>
+
+  <p>Notice how we pass an image element to <code>fabric.Image</code> constructor. This creates an instance of <code>fabric.Image</code> that looks just like the image from the document. Moreover, we immediately set left/top values to 100/100, angle to 30, and opacity to 0.85. Once added to canvas, an image is rendered at 100,100 location, 30 degree angle, and is slightly transparent! Not bad.</p>
+
+  <p><img src="/article_assets/9.png"></p>
+
+  <p>Now, what if we don't really have an image in a document, but only a URL of an image? Not a problem. Let's see how to use <code>fabric.Image.fromURL</code>:</p>
+
+<pre>
+fabric.Image.fromURL('my_image.png', function(oImg) {
+  canvas.add(oImg);
+});
+</pre>
+
+  <p>Looks pretty straightforward, doesn't it? Just call <code>fabric.Image.fromURL</code> with a url of an image, and give it a callback to invoke once image is loaded and created. The callback function receives already-created <code>fabric.Image</code> object as a first argument. At that point, you can add it to canvas or perhaps change first, and then add to canvas:</p>
+
+<pre>
+fabric.Image.fromURL('my_image.png', function(oImg) {
+  // scale image down, and flip it, before adding it onto canvas
+  oImg.scale(0.5).setFlipX(true);
+  canvas.add(oImg);
+});
+</pre>
+
+  <h3 id="path_and_pathgroup">Path and PathGroup</h3>
+
+  <p>We've looked at simple shapes, then images. What about even more complex, rich shapes and content?</p>
+
+  <p>Meet the power couple &mdash; Path and PathGroup.</p>
+
+  <p>Paths in Fabric represent an outline of a shape which can be filled, stroked, and modified in other ways. Paths consist of a series of commands, that essentially mimic a pen going from one point to another. With the help of such commands as &#8220;move&#8221;, &#8220;line&#8221;, &#8220;curve&#8221;, or &#8220;arc&#8221;, paths can form incredibly complex shapes. And with the help of groups of Paths (PathGroup's), the possibilities open up even more.</p>
+
+  <p>Paths in Fabric closely resemble <a href="http://www.w3.org/TR/SVG/paths.html#PathElement">SVG &lt;path> elements</a>. They use the same set of commands, they can be created from &lt;path> elements, and serialized into them. We'll look more closely into serialization and SVG parsing later, but for now it's worth mentioning that you will likely rarely create Path instances by hand. Instead, you'll be using Fabric's built-in SVG parser. But to understand what Path objects are, let's try creating a simple one by hand:</p>
+
+<pre>
+var canvas = new fabric.Canvas('c');
+var path = new fabric.Path('M 0 0 L 200 100 L 170 200 z');
+path.set({ left: 120, top: 120 });
+canvas.add(path);
+</pre>
+
+  <p><img src="/article_assets/10.png"></p>
+
+  <p>We're instantiation <code>fabric.Path</code> object, passing it a string of path instructions. While it looks cryptic, it's actually easy to understand. &#8220;M&#8221; represents &#8220;move&#8221; command, and tells that invisible pen to move to 0, 0 point. &#8220;L&#8221; stands for &#8220;line&#8221; and makes pen draw a line to 200, 100 point. Then, another &#8220;L&#8221; creates a line to 170, 200. Lastly, &#8220;z&#8221; tells forces drawing pen to close current path and finalize the shape. As a result, we get a triangular shape.</p>
+
+  <p>Since <code>fabric.Path</code> is just like any other object in Fabric, we were also able to change some of its properties. But we can modify it even more:</p>
+
+<pre>
+...
+var path = new fabric.Path('M 0 0 L 300 100 L 200 300 z');
+...
+path.set({ fill: 'red', stroke: 'green', opacity: 0.5 });
+canvas.add(path);
+</pre>
+
+  <p><img src="/article_assets/11.png"></p>
+
+  <p>Out of curiosity, let's take a look at a slightly more complex path syntax. You'll see why creating paths by hand might not be the best idea.</p>
+
+<pre>
+...
+var path = new fabric.Path('M121.32,0L44.58,0C36.67,0,29.5,3.22,24.31,8.41\
+c-5.19,5.19-8.41,12.37-8.41,20.28c0,15.82,12.87,28.69,28.69,28.69c0,0,4.4,\
+0,7.48,0C36.66,72.78,8.4,101.04,8.4,101.04C2.98,106.45,0,113.66,0,121.32\
+c0,7.66,2.98,14.87,8.4,20.29l0,0c5.42,5.42,12.62,8.4,20.28,8.4c7.66,0,14.87\
+-2.98,20.29-8.4c0,0,28.26-28.25,43.66-43.66c0,3.08,0,7.48,0,7.48c0,15.82,\
+12.87,28.69,28.69,28.69c7.66,0,14.87-2.99,20.29-8.4c5.42-5.42,8.4-12.62,8.4\
+-20.28l0-76.74c0-7.66-2.98-14.87-8.4-20.29C136.19,2.98,128.98,0,121.32,0z');
+
+canvas.add(path.set({ left: 100, top: 200 }));
+</pre>
+
+  <p>Oh boy, what's going on here?</p>
+
+  <p>Well, &#8220;M&#8221; still stands for &#8220;move&#8221; command, so the pen starts its drawing journey at &#8220;121.32, 0&#8221; point. Then there's &#8220;L&#8221; command that brings it to &#8220;44.58, 0&#8221;. So far so good. What's next? &#8220;C&#8221; command, which stands for &#8220;cubic bezier&#8221;. It makes the pen draw bezier curve from current point to &#8220;36.67, 0&#8221; one. It uses &#8220;29.5, 3.22&#8221; as control point at the beginning of a line, and &#8220;24.31, 8.41&#8221; as the control point at the end of the line. This whole thing is then followed by a dozen of other cubic bezier commands, which finally create a nice-looking shape of an arrow.</p>
+
+  <p><img src="/article_assets/12.png"></p>
+
+  <p>Chances are, you won't be working with such &#8220;beasts&#8221; directly. Instead, you might want to use something like <code>fabric.loadSVGFromString</code> or <code>fabric.loadSVGFromURL</code> methods to load entire SVG file, and let Fabric's SVG parser do its job of walking over all SVG elements and creating corresponding Path objects.</p>
+
+  <p>Speaking of entire SVG documents, while Fabric's Path usually represent SVG &lt;path> elements, a collection of paths that are often present in SVG documents, are represented as PathGroups (<code>fabric.PathGroup</code> instances). As you can imagine, PathGroup is nothing but a group of Path objects. And since <code>fabric.PathGroup</code> inherits from <code>fabric.Object</code>, it can be added to canvas just like any other object, and manipulated the very same way.</p>
+
+  <p>Just like with Paths, you probably won't be working with them directly. But if you stumble upon one after parsing SVG document, you'll know exactly what it is and which purpose it serves.</p>
+
+  <h3 id="afterword">Afterword</h3>
+
+  <p>We've only scratched the surface of what's possible with Fabric. You can now easily create any of the simple shapes, complex shapes, images; add them to canvas, and modify in any way you want &mdash; positions, dimensions, angles, colors, strokes, opacity &mdash; you name it.</p>
+
+  <p>In the next parts of this series, we'll take a look at working with groups; animation; text; SVG parsing, rendering, serialization; events; image filters; and more.</p>
+
+  <p>Meanwhile, feel free to take at look at the <a href="http://fabricjs.com/demos/">annotated demos</a> or <a href="http://fabricjs.com/benchmarks/">benchmarks</a>, join the discussion in <a href="https://groups.google.com/forum/?fromgroups#!forum/fabricjs">google group</a> or <a href="http://stackoverflow.com/questions/tagged/fabricjs">elsewhere</a>, or go straight for the <a href="http://fabricjs.com/docs/">docs</a>, <a href="https://github.com/kangax/fabric.js/wiki">wiki</a>, and <a href="https://github.com/kangax/fabric.js">source</a>.</p>
+
+  <p>Have fun experimenting with Fabric! I hope you enjoy the ride.</p>
+
+</div>
