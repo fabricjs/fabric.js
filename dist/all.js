@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL` */
 /*! Fabric.js Copyright 2008-2012, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.8.28" };
+var fabric = fabric || { version: "0.8.29" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -9511,6 +9511,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     _render: function(ctx) {
       var point;
       ctx.beginPath();
+      ctx.moveTo(this.points[0].x, this.points[0].y);
       for (var i = 0, len = this.points.length; i < len; i++) {
         point = this.points[i];
         ctx.lineTo(point.x, point.y);
@@ -9680,6 +9681,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     _render: function(ctx) {
       var point;
       ctx.beginPath();
+      ctx.moveTo(this.points[0].x, this.points[0].y);
       for (var i = 0, len = this.points.length; i < len; i++) {
         point = this.points[i];
         ctx.lineTo(point.x, point.y);
