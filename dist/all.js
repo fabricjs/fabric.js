@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL` */
 /*! Fabric.js Copyright 2008-2012, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.8.27" };
+var fabric = fabric || { version: "0.8.28" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -8668,14 +8668,16 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       this.set('x2', points[2]);
       this.set('y2', points[3]);
 
-      this._setWidthHeight();
+      this._setWidthHeight(options);
     },
 
-    _setWidthHeight: function() {
-      this.set('width', (this.x2 - this.x1) || 1);
-      this.set('height', (this.y2 - this.y1) || 1);
-      this.set('left', this.x1 + this.width / 2);
-      this.set('top', this.y1 + this.height / 2);
+    _setWidthHeight: function(options) {
+      options || (options = { });
+
+      this.set('width', 'width' in options ? options.width : ((this.x2 - this.x1) || 1));
+      this.set('height', 'height' in options ? options.height : ((this.y2 - this.y1) || 1));
+      this.set('left', 'left' in options ? options.left : (this.x1 + this.width / 2));
+      this.set('top', 'top' in options ? options.top : (this.y1 + this.height / 2));
     },
 
     set: function(name, value) {
