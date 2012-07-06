@@ -42,8 +42,8 @@ function appendFileContents(fileNames, callback) {
   })();
 }
 
-function ifSpecifiedInclude(moduleName, fileName) {
-  return (modules.indexOf(moduleName) > -1 || includeAllModules) ? fileName : '';
+function ifSpecifiedInclude(moduleName, fileName, requireSpecific) {
+  return (modules.indexOf(moduleName) > -1 || (includeAllModules && !requireSpecific)) ? fileName : '';
 }
 
 var filesToInclude = [
@@ -51,7 +51,9 @@ var filesToInclude = [
   'HEADER.js',
 
   ifSpecifiedInclude('serialization', 'lib/json2.js'),
-  ifSpecifiedInclude('text', 'lib/cufon.js'),
+
+  // Don't load cufon by default
+  ifSpecifiedInclude('text-cufon', 'lib/cufon.js', true),
 
   'src/log.js',
   'src/observable.js',
