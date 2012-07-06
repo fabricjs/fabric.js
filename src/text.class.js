@@ -160,57 +160,63 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
-      var o = Cufon.textOptions || (Cufon.textOptions = { });
+      // Run the native method if there is no Cufon
+      if(typeof Cufon === 'undefined') {
+        this._render_native(ctx);
+      }
+      else {
+        var o = Cufon.textOptions || (Cufon.textOptions = { });
 
-      // export options to be used by cufon.js
-      o.left = this.left;
-      o.top = this.top;
-      o.context = ctx;
-      o.color = this.fill;
+        // export options to be used by cufon.js
+        o.left = this.left;
+        o.top = this.top;
+        o.context = ctx;
+        o.color = this.fill;
 
-      var el = this._initDummyElement();
+        var el = this._initDummyElement();
 
-      // set "cursor" to top/left corner
-      this.transform(ctx);
+        // set "cursor" to top/left corner
+        this.transform(ctx);
 
-      // draw text
-      Cufon.replaceElement(el, {
-        engine: 'canvas',
-        separate: 'none',
-        fontFamily: this.fontFamily,
-        fontWeight: this.fontWeight,
-        textDecoration: this.textDecoration,
-        textShadow: this.textShadow,
-        textAlign: this.textAlign,
-        fontStyle: this.fontStyle,
-        lineHeight: this.lineHeight,
-        strokeStyle: this.strokeStyle,
-        strokeWidth: this.strokeWidth,
-        backgroundColor: this.backgroundColor
-      });
+        // draw text
+        Cufon.replaceElement(el, {
+          engine: 'canvas',
+          separate: 'none',
+          fontFamily: this.fontFamily,
+          fontWeight: this.fontWeight,
+          textDecoration: this.textDecoration,
+          textShadow: this.textShadow,
+          textAlign: this.textAlign,
+          fontStyle: this.fontStyle,
+          lineHeight: this.lineHeight,
+          strokeStyle: this.strokeStyle,
+          strokeWidth: this.strokeWidth,
+          backgroundColor: this.backgroundColor
+        });
 
-      // update width, height
-      this.width = o.width;
-      this.height = o.height;
-      this._totalLineHeight = o.totalLineHeight;
-      this._fontAscent = o.fontAscent;
-      this._boundaries = o.boundaries;
-      this._shadowOffsets = o.shadowOffsets;
-      this._shadows = o.shadows || [ ];
+        // update width, height
+        this.width = o.width;
+        this.height = o.height;
+        this._totalLineHeight = o.totalLineHeight;
+        this._fontAscent = o.fontAscent;
+        this._boundaries = o.boundaries;
+        this._shadowOffsets = o.shadowOffsets;
+        this._shadows = o.shadows || [ ];
 
-      // need to set coords _after_ the width/height was retreived from Cufon
-      this.setCoords();
+        // need to set coords _after_ the width/height was retreived from Cufon
+        this.setCoords();
+      }
     },
 
-    // _render: function(context) {
-    //       context.fillStyle = this.fill;
-    //       context.font = this.fontSize + 'px ' + this.fontFamily;
-    //       this.transform(context);
-    //       this.width = context.measureText(this.text).width;
-    //       this.height = this.fontSize;
-    //       context.fillText(this.text, -this.width / 2, 0);
-    //       this.setCoords();
-    //     },
+    _render_native: function(context) {
+      context.fillStyle = this.fill;
+      context.font = this.fontSize + 'px ' + this.fontFamily;
+      this.transform(context);
+      this.width = context.measureText(this.text).width;
+      this.height = this.fontSize;
+      context.fillText(this.text, -this.width / 2, 0);
+      this.setCoords();
+    },
 
     /**
      * @private
