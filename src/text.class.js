@@ -103,6 +103,13 @@
     type:             'text',
 
     /**
+     * If true then text will be rendered using native methods even if Cufon is found on the page.
+     * @property
+     * @type Boolean
+     */
+    useNative:        false,
+
+    /**
      * Constructor
      * @method initialize
      * @param {String} text
@@ -160,57 +167,90 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
-      var o = Cufon.textOptions || (Cufon.textOptions = { });
+      // Run the native method if there is no Cufon
+      if(typeof Cufon === 'undefined' || this.useNative === true) {
+        this._render_native(ctx);
+      }
+      else {
+        var o = Cufon.textOptions || (Cufon.textOptions = { });
 
-      // export options to be used by cufon.js
-      o.left = this.left;
-      o.top = this.top;
-      o.context = ctx;
-      o.color = this.fill;
+        // export options to be used by cufon.js
+        o.left = this.left;
+        o.top = this.top;
+        o.context = ctx;
+        o.color = this.fill;
 
-      var el = this._initDummyElement();
+        var el = this._initDummyElement();
 
-      // set "cursor" to top/left corner
-      this.transform(ctx);
+        // set "cursor" to top/left corner
+        this.transform(ctx);
 
-      // draw text
-      Cufon.replaceElement(el, {
-        engine: 'canvas',
-        separate: 'none',
-        fontFamily: this.fontFamily,
-        fontWeight: this.fontWeight,
-        textDecoration: this.textDecoration,
-        textShadow: this.textShadow,
-        textAlign: this.textAlign,
-        fontStyle: this.fontStyle,
-        lineHeight: this.lineHeight,
-        strokeStyle: this.strokeStyle,
-        strokeWidth: this.strokeWidth,
-        backgroundColor: this.backgroundColor
-      });
+        // draw text
+        Cufon.replaceElement(el, {
+          engine: 'canvas',
+          separate: 'none',
+          fontFamily: this.fontFamily,
+          fontWeight: this.fontWeight,
+          textDecoration: this.textDecoration,
+          textShadow: this.textShadow,
+          textAlign: this.textAlign,
+          fontStyle: this.fontStyle,
+          lineHeight: this.lineHeight,
+          strokeStyle: this.strokeStyle,
+          strokeWidth: this.strokeWidth,
+          backgroundColor: this.backgroundColor
+        });
 
-      // update width, height
-      this.width = o.width;
-      this.height = o.height;
-      this._totalLineHeight = o.totalLineHeight;
-      this._fontAscent = o.fontAscent;
-      this._boundaries = o.boundaries;
-      this._shadowOffsets = o.shadowOffsets;
-      this._shadows = o.shadows || [ ];
+        // update width, height
+        this.width = o.width;
+        this.height = o.height;
+        this._totalLineHeight = o.totalLineHeight;
+        this._fontAscent = o.fontAscent;
+        this._boundaries = o.boundaries;
+        this._shadowOffsets = o.shadowOffsets;
+        this._shadows = o.shadows || [ ];
 
-      // need to set coords _after_ the width/height was retreived from Cufon
-      this.setCoords();
+        // need to set coords _after_ the width/height was retreived from Cufon
+        this.setCoords();
+      }
     },
 
-    // _render: function(context) {
-    //       context.fillStyle = this.fill;
-    //       context.font = this.fontSize + 'px ' + this.fontFamily;
-    //       this.transform(context);
-    //       this.width = context.measureText(this.text).width;
-    //       this.height = this.fontSize;
-    //       context.fillText(this.text, -this.width / 2, 0);
-    //       this.setCoords();
-    //     },
+    /**
+     * Renders text with the native drawing methods, not Cufon.
+     * This method will not listen to textDecoration, textShadow, background or path settings. They are just not possible in native methods.
+     * Background may be possible by overlaying it on another rectangle.
+     * @private
+     * @method _render
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
+    _render_native: function(ctx) {
+      // Create the font string
+      var font = [
+        this.fontStyle,
+        this.fontWeight,
+        this.fontSize + 'px/' + this.lineHeight,
+        this.fontFamily
+      ];
+
+      ctx.fillStyle = this.fill;
+      ctx.strokeStyle = this.strokeStyle;
+      ctx.lineWidth = this.strokeWidth;
+
+      ctx.font = font.join(' ');
+      ctx.textAlign = this.textAlign;
+
+      this.transform(ctx);
+      this.width = ctx.measureText(this.text).width;
+      this.height = this.fontSize;
+
+      ctx.fillText(this.text, -this.width / 2, 0);
+
+      if(this.strokeStyle) {
+        ctx.strokeText(this.text, -this.width / 2, 0);
+      }
+
+      this.setCoords();
+    },
 
     /**
      * @private
