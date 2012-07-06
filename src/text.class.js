@@ -103,6 +103,13 @@
     type:             'text',
 
     /**
+     * If true then text will be rendered using native methods even if Cufon is found on the page.
+     * @property
+     * @type Boolean
+     */
+    useNative:        false,
+
+    /**
      * Constructor
      * @method initialize
      * @param {String} text
@@ -161,7 +168,7 @@
      */
     _render: function(ctx) {
       // Run the native method if there is no Cufon
-      if(typeof Cufon === 'undefined') {
+      if(typeof Cufon === 'undefined' || this.useNative === true) {
         this._render_native(ctx);
       }
       else {
