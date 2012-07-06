@@ -215,13 +215,18 @@
       }
     },
 
-    _render_native: function(context) {
-      context.fillStyle = this.fill;
-      context.font = this.fontSize + 'px ' + this.fontFamily;
-      this.transform(context);
-      this.width = context.measureText(this.text).width;
+    /**
+     * @private
+     * @method _render
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
+    _render_native: function(ctx) {
+      ctx.fillStyle = this.fill;
+      ctx.font = this.fontSize + 'px ' + this.fontFamily;
+      this.transform(ctx);
+      this.width = ctx.measureText(this.text).width;
       this.height = this.fontSize;
-      context.fillText(this.text, -this.width / 2, 0);
+      ctx.fillText(this.text, -this.width / 2, 0);
       this.setCoords();
     },
 
