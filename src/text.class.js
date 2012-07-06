@@ -216,6 +216,9 @@
     },
 
     /**
+     * Renders text with the native drawing methods, not Cufon.
+     * This method will not listen to textDecoration, textShadow, background or path settings. They are just not possible in native methods.
+     * Background may be possible by overlaying it on another rectangle.
      * @private
      * @method _render
      * @param {CanvasRenderingContext2D} ctx Context to render on
