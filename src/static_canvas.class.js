@@ -162,11 +162,11 @@
     setBackgroundImage: function (url, callback, options) {
       return fabric.util.loadImage(url, function(img) {
         this.backgroundImage = img;
-        if (options && options.backgroundOpacity) {
-            this.backgroundOpacity = options.backgroundOpacity;
+        if (options && ('backgroundImageOpacity' in options)) {
+            this.backgroundImageOpacity = options.backgroundImageOpacity;
         }
-        if (options && options.backgroundStretch) {
-            this.backgroundStretch = options.backgroundStretch;
+        if (options && ('backgroundImageStretch' in options)) {
+            this.backgroundImageStretch = options.backgroundImageStretch;
         }
         callback && callback();
       }, this);

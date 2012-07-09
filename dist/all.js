@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL` */
 /*! Fabric.js Copyright 2008-2012, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.8.29" };
+var fabric = fabric || { version: "0.8.30" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -4870,11 +4870,11 @@ fabric.util.string = {
     setBackgroundImage: function (url, callback, options) {
       return fabric.util.loadImage(url, function(img) {
         this.backgroundImage = img;
-        if (options && options.backgroundOpacity) {
-            this.backgroundOpacity = options.backgroundOpacity;
+        if (options && ('backgroundImageOpacity' in options)) {
+            this.backgroundImageOpacity = options.backgroundImageOpacity;
         }
-        if (options && options.backgroundStretch) {
-            this.backgroundStretch = options.backgroundStretch;
+        if (options && ('backgroundImageStretch' in options)) {
+            this.backgroundImageStretch = options.backgroundImageStretch;
         }
         callback && callback();
       }, this);
