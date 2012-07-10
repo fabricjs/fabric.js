@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL` */
 /*! Fabric.js Copyright 2008-2012, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.8.30" };
+var fabric = fabric || { version: "0.8.31" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -1167,10 +1167,10 @@ Cufon.registerEngine('canvas', (function() {
         var x = size.convertFrom(parseFloat(shadow.offX));
         var y = size.convertFrom(parseFloat(shadow.offY));
         shadowOffsets[i] = [ x, y ];
-        if (y < expandTop) expandTop = y;
-        if (x > expandRight) expandRight = x;
-        if (y > expandBottom) expandBottom = y;
-        if (x < expandLeft) expandLeft = x;
+        //if (y < expandTop) expandTop = y;
+        //if (x > expandRight) expandRight = x;
+        //if (y > expandBottom) expandBottom = y;
+        //if (x < expandLeft) expandLeft = x;
       }
     }
 
@@ -1280,7 +1280,7 @@ Cufon.registerEngine('canvas', (function() {
       // we're at the center of an object and need to jump to the top left corner
       // where first character is to be drawn
       -expandLeft - ((1/scale * canvas.width) / 2) + (Cufon.fonts[font.family].offsetLeft || 0),
-      -expandTop - (Cufon.textOptions.height / scale) / 2
+      -expandTop - ((Cufon.textOptions.height / scale) / 2) + (Cufon.fonts[font.family].offsetTop || 0)
     );
 
     g.lineWidth = font.face['underline-thickness'];
@@ -1475,6 +1475,8 @@ Cufon.registerEngine('canvas', (function() {
       }
     }
 
+    g.save();
+    renderBackground();
     if (shadows) {
       for (var i = 0, l = shadows.length; i < l; ++i) {
         var shadow = shadows[i];
@@ -1484,9 +1486,6 @@ Cufon.registerEngine('canvas', (function() {
         g.restore();
       }
     }
-
-    g.save();
-    renderBackground();
     renderText();
     g.restore();
     g.restore();
