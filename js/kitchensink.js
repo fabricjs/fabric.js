@@ -610,4 +610,7 @@
     });
   };
 
+  Cufon.fonts.delicious.offsetLeft = 75;
+  Cufon.fonts.delicious.offsetTop = 25;
+
 })(this);
