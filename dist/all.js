@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL` */
 /*! Fabric.js Copyright 2008-2012, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.8.31" };
+var fabric = fabric || { version: "0.8.32" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -6295,7 +6295,7 @@ fabric.util.string = {
           ? 'scaleX'
           : (corner === 'mt' || corner === 'mb')
             ? 'scaleY'
-            : (corner === 'mtr' || corner === 'mbr')
+            : corner === 'mtr'
               ? 'rotate'
               : (target.hasRotatingPoint)
                 ? 'scale'
@@ -6551,7 +6551,7 @@ fabric.util.string = {
         else {
           if (corner in cursorMap) {
             s.cursor = cursorMap[corner];
-          } else if (corner === 'mtr' || corner === 'mbr') {
+          } else if (corner === 'mtr' && target.hasRotatingPoint) {
             s.cursor = this.rotationCursor;
           } else {
             s.cursor = this.defaulCursor;
@@ -7370,6 +7370,13 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     hasRotatingPoint:         false,
 
     /**
+     * Offset for object's rotating point (when enabled)
+     * @property
+     * @type Number
+     */
+    rotatingPointOffset:      40,
+
+    /**
      * @method callSuper
      * @param {String} methodName
      */
@@ -7795,10 +7802,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         x: tl.x + (this.currentWidth/2 * cosTh),
         y: tl.y + (this.currentWidth/2 * sinTh)
       };
-      var mbr = {
-        x: tl.x + (this.currentWidth/2 * cosTh),
-        y: tl.y + (this.currentWidth/2 * sinTh)
-      };
 
       // debugging
 
@@ -7815,7 +7818,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       //       }, 50);
 
       // clockwise
-      this.oCoords = { tl: tl, tr: tr, br: br, bl: bl, ml: ml, mt: mt, mr: mr, mb: mb, mtr: mtr, mbr: mbr };
+      this.oCoords = { tl: tl, tr: tr, br: br, bl: bl, ml: ml, mt: mt, mr: mr, mb: mb, mtr: mtr };
 
       // set coordinates of the draggable boxes in the corners used to scale/rotate the image
       this._setCornerCoords();
@@ -7885,12 +7888,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       );
 
       if (this.hasRotatingPoint && !this.hideCorners && !this.lockRotation) {
-        var rotateHeight = (-h/2);
+        var rotateHeight = (this.flipY ? h : -h) / 2;
         var rotateWidth = (-w/2);
 
         ctx.beginPath();
         ctx.moveTo(0, rotateHeight);
-        ctx.lineTo(0, rotateHeight - 40);
+        ctx.lineTo(0, rotateHeight + (this.flipY ? this.rotatingPointOffset : -this.rotatingPointOffset));
         ctx.closePath();
         ctx.stroke();
       }
@@ -7981,8 +7984,13 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         // ctx.arc(_left, _top, sizeX / 2, 0, Math.PI * 2, false);
         // ctx.fill();
         // ctx.restore();
+
         _left = left + this.width/2 - scaleOffsetX;
-        _top = top - (45 / this.scaleY);
+
+        _top = this.flipY ?
+          (top + height + (this.rotatingPointOffset / this.scaleY) - sizeY/2)
+          : (top - (this.rotatingPointOffset / this.scaleY) - sizeY/2);
+
         ctx.fillRect(_left, _top, sizeX, sizeY);
       }
 
@@ -8218,6 +8226,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
           lines;
 
       for (var i in this.oCoords) {
+        if (i === 'mtr' && !this.hasRotatingPoint) {
+          return false;
+        }
+
         lines = this._getImageLines(this.oCoords[i].corner, i);
         // debugging
         // canvas.contextTop.fillRect(lines.bottomline.d.x, lines.bottomline.d.y, 2, 2);
@@ -8486,44 +8498,22 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         }
       };
 
-      var rotationPointDistance = 40;
       coords.mtr.corner = {
         tl: {
-          x: coords.mtr.x - sinHalfOffset + (sinTh * rotationPointDistance),
-          y: coords.mtr.y - cosHalfOffset - (cosTh * rotationPointDistance)
+          x: coords.mtr.x - sinHalfOffset + (sinTh * this.rotatingPointOffset),
+          y: coords.mtr.y - cosHalfOffset - (cosTh * this.rotatingPointOffset)
         },
         tr: {
-          x: coords.mtr.x + cosHalfOffset + (sinTh * rotationPointDistance),
-          y: coords.mtr.y - sinHalfOffset - (cosTh * rotationPointDistance)
+          x: coords.mtr.x + cosHalfOffset + (sinTh * this.rotatingPointOffset),
+          y: coords.mtr.y - sinHalfOffset - (cosTh * this.rotatingPointOffset)
         },
         bl: {
-          x: coords.mtr.x - cosHalfOffset + (sinTh * rotationPointDistance),
-          y: coords.mtr.y + sinHalfOffset - (cosTh * rotationPointDistance)
+          x: coords.mtr.x - cosHalfOffset + (sinTh * this.rotatingPointOffset),
+          y: coords.mtr.y + sinHalfOffset - (cosTh * this.rotatingPointOffset)
         },
         br: {
-          x: coords.mtr.x + sinHalfOffset + (sinTh * rotationPointDistance),
-          y: coords.mtr.y + cosHalfOffset - (cosTh * rotationPointDistance)
-        }
-      };
-
-      var bottomRotationPointDistance = (-rotationPointDistance - this.currentHeight);
-
-      coords.mbr.corner = {
-        tl: {
-          x: coords.mbr.x - sinHalfOffset + (sinTh * bottomRotationPointDistance),
-          y: coords.mbr.y - cosHalfOffset - (cosTh * bottomRotationPointDistance)
-        },
-        tr: {
-          x: coords.mbr.x + cosHalfOffset + (sinTh * bottomRotationPointDistance),
-          y: coords.mbr.y - sinHalfOffset - (cosTh * bottomRotationPointDistance)
-        },
-        bl: {
-          x: coords.mbr.x - cosHalfOffset + (sinTh * bottomRotationPointDistance),
-          y: coords.mbr.y + sinHalfOffset - (cosTh * bottomRotationPointDistance)
-        },
-        br: {
-          x: coords.mbr.x + sinHalfOffset + (sinTh * bottomRotationPointDistance),
-          y: coords.mbr.y + cosHalfOffset - (cosTh * bottomRotationPointDistance)
+          x: coords.mtr.x + sinHalfOffset + (sinTh * this.rotatingPointOffset),
+          y: coords.mtr.y + cosHalfOffset - (cosTh * this.rotatingPointOffset)
         }
       };
     },
