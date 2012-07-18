@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL` */
 /*! Fabric.js Copyright 2008-2012, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.8.33" };
+var fabric = fabric || { version: "0.8.34" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -1738,6 +1738,7 @@ fabric.Observable = {
   /**
    * Observes specified event
    * @method observe
+   * @depracated Since 0.8.34. Use `on` instead.
    * @param {String} eventName
    * @param {Function} handler
    */
@@ -1748,7 +1749,7 @@ fabric.Observable = {
     // one object with key/value pairs was passed
     if (arguments.length === 1) {
       for (var prop in eventName) {
-        this.observe(prop, eventName[prop]);
+        this.on(prop, eventName[prop]);
       }
     }
     else {
@@ -1762,6 +1763,7 @@ fabric.Observable = {
   /**
    * Stops event observing for a particular event handler
    * @method stopObserving
+   * @depracated Since 0.8.34. Use `off` instead.
    * @param {String} eventName
    * @param {Function} handler
    */
@@ -1792,6 +1794,16 @@ fabric.Observable = {
     }
   }
 };
+
+/**
+ * @alias on -> observe
+ */
+fabric.Observable.on = fabric.Observable.observe;
+
+/**
+ * @alias off -> stopObserving
+ */
+fabric.Observable.off = fabric.Observable.stopObserving;
 (function() {
 
   /**
@@ -5067,6 +5079,7 @@ fabric.util.string = {
         this.stateful && arguments[i].setupState();
         arguments[i].setCoords();
         this.fire('object:added', { target: arguments[i] });
+        arguments[i].fire('added');
       }
       this.renderOnAddition && this.renderAll();
       return this;
@@ -5092,6 +5105,7 @@ fabric.util.string = {
       object.setCoords();
       this.renderAll();
       this.fire('object:added', { target: object });
+      object.fire('added');
       return this;
     },
 
@@ -5989,6 +6003,7 @@ fabric.util.string = {
         if (this.stateful && target.hasStateChanged()) {
           target.isMoving = false;
           this.fire('object:modified', { target: target });
+          target.fire('modified');
         }
       }
 
@@ -6020,6 +6035,7 @@ fabric.util.string = {
       }, 50);
 
       this.fire('mouse:up', { target: target, e: e });
+      target && target.fire('mouseup', { e: e })
     },
 
     /**
@@ -6042,8 +6058,6 @@ fabric.util.string = {
 
         // capture coordinates immediately; this allows to draw dots (when movement never occurs)
         this._captureDrawingPath(e);
-        this.fire('mouse:down', { e: e });
-
         this.fire('mouse:down', { e: e });
         return;
       }
@@ -6093,6 +6107,7 @@ fabric.util.string = {
       this.renderAll();
 
       this.fire('mouse:down', { target: target, e: e });
+      target && target.fire('mousedown', { e: e });
     },
 
     /**
@@ -6171,12 +6186,14 @@ fabric.util.string = {
             this.fire('object:rotating', {
               target: this._currentTransform.target
             });
+            this._currentTransform.target.fire('rotating');
           }
           if (!this._currentTransform.target.hasRotatingPoint) {
             this._scaleObject(x, y);
             this.fire('object:scaling', {
               target: this._currentTransform.target
             });
+            this._currentTransform.target.fire('scaling');
           }
         }
         else if (this._currentTransform.action === 'scale') {
@@ -6184,6 +6201,7 @@ fabric.util.string = {
           this.fire('object:scaling', {
             target: this._currentTransform.target
           });
+          this._currentTransform.target.fire('scaling');
         }
         else if (this._currentTransform.action === 'scaleX') {
           this._scaleObject(x, y, 'x');
@@ -6191,6 +6209,7 @@ fabric.util.string = {
           this.fire('object:scaling', {
             target: this._currentTransform.target
           });
+          this._currentTransform.target.fire('scaling');
         }
         else if (this._currentTransform.action === 'scaleY') {
           this._scaleObject(x, y, 'y');
@@ -6198,6 +6217,7 @@ fabric.util.string = {
           this.fire('object:scaling', {
             target: this._currentTransform.target
           });
+          this._currentTransform.target.fire('scaling');
         }
         else {
           this._translateObject(x, y);
@@ -6205,11 +6225,13 @@ fabric.util.string = {
           this.fire('object:moving', {
             target: this._currentTransform.target
           });
+          this._currentTransform.target.fire('moving');
         }
         // only commit here. when we are actually moving the pictures
         this.renderAll();
       }
       this.fire('mouse:move', { target: target, e: e });
+      target && target.fire('mousemove', { e: e });
     },
 
     /**
@@ -6768,6 +6790,7 @@ fabric.util.string = {
       this.renderAll();
 
       this.fire('object:selected', { target: object, e: e });
+      object.fire('selected', { e: e });
       return this;
     },
 
@@ -8609,6 +8632,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       })(propName);
     }
   }
+
+  extend(fabric.Object.prototype, fabric.Observable);
 
 })(typeof exports != 'undefined' ? exports : this);
 

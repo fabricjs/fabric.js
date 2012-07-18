@@ -360,6 +360,7 @@
         this.stateful && arguments[i].setupState();
         arguments[i].setCoords();
         this.fire('object:added', { target: arguments[i] });
+        arguments[i].fire('added');
       }
       this.renderOnAddition && this.renderAll();
       return this;
@@ -385,6 +386,7 @@
       object.setCoords();
       this.renderAll();
       this.fire('object:added', { target: object });
+      object.fire('added');
       return this;
     },
 

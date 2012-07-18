@@ -1350,4 +1350,6 @@
     }
   }
 
+  extend(fabric.Object.prototype, fabric.Observable);
+
 })(typeof exports != 'undefined' ? exports : this);
