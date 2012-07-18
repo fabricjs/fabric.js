@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL` */
 /*! Fabric.js Copyright 2008-2012, Bitsonnet (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.8.32" };
+var fabric = fabric || { version: "0.8.33" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -12664,8 +12664,6 @@ fabric.Image.filters.GradientTransparency.fromObject = function(object) {
   fabric.Text.fromElement = function(element) {
     // TODO (kangax): implement this
   };
-
-  fabric.Text.async = true;
 
 })(typeof exports != 'undefined' ? exports : this);
 (function() {
