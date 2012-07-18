@@ -6,6 +6,7 @@ fabric.Observable = {
   /**
    * Observes specified event
    * @method observe
+   * @depracated Since 0.8.34. Use `on` instead.
    * @param {String} eventName
    * @param {Function} handler
    */
@@ -16,7 +17,7 @@ fabric.Observable = {
     // one object with key/value pairs was passed
     if (arguments.length === 1) {
       for (var prop in eventName) {
-        this.observe(prop, eventName[prop]);
+        this.on(prop, eventName[prop]);
       }
     }
     else {
@@ -30,6 +31,7 @@ fabric.Observable = {
   /**
    * Stops event observing for a particular event handler
    * @method stopObserving
+   * @depracated Since 0.8.34. Use `off` instead.
    * @param {String} eventName
    * @param {Function} handler
    */
@@ -60,3 +62,13 @@ fabric.Observable = {
     }
   }
 };
+
+/**
+ * @alias on -> observe
+ */
+fabric.Observable.on = fabric.Observable.observe;
+
+/**
+ * @alias off -> stopObserving
+ */
+fabric.Observable.off = fabric.Observable.stopObserving;
