@@ -308,9 +308,10 @@
      * @param {Object} options Options object
      */
     _initConfig: function(options) {
-      this.setOptions(options || { });
+      options || (options = { });
+      this.setOptions(options);
       this._setBorder();
-      this._setWidthHeight();
+      this._setWidthHeight(options);
     },
 
     /**
@@ -340,10 +341,16 @@
     /**
      * @private
      */
-    _setWidthHeight: function() {
+    _setWidthHeight: function(options) {
       var sidesBorderWidth = 2 * this.currentBorder;
-      this.width = (this.getElement().width || 0) + sidesBorderWidth;
-      this.height = (this.getElement().height || 0) + sidesBorderWidth;
+
+      this.width = 'width' in options
+        ? options.width
+        : ((this.getElement().width || 0) + sidesBorderWidth);
+
+      this.height = 'height' in options
+        ? options.height
+        : ((this.getElement().height || 0) + sidesBorderWidth);
     },
 
     /**
