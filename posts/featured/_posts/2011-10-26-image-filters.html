@@ -67,7 +67,7 @@ function applyFilterValue(index, prop, value) {
 var canvas = new fabric.Canvas('c', { backgroundImage: '../lib/bg.png' }),
     f = fabric.Image.filters;
 
-canvas.observe({
+canvas.on({
   'object:selected': function() {
     fabric.util.toArray(document.getElementsByTagName('input')).forEach(function(el){ el.disabled = false; })
 

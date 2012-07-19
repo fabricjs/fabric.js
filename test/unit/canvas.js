@@ -559,7 +559,7 @@
     var target;
 
 
-    canvas.observe('selection:cleared', function(){
+    canvas.on('selection:cleared', function(){
       eventsFired.selectionCleared = true;
     });
 
@@ -830,7 +830,7 @@
 
   test('selection:cleared', function() {
     var isFired = false;
-    canvas.observe('selection:cleared', function() { isFired = true });
+    canvas.on('selection:cleared', function() { isFired = true });
 
     canvas.add(new fabric.Rect());
     canvas.remove(canvas.item(0));

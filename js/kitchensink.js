@@ -338,8 +338,8 @@
     activeObjectButtons[i].disabled = true;
   }
 
-  canvas.observe('object:selected', onObjectSelected);
-  canvas.observe('group:selected', onObjectSelected);
+  canvas.on('object:selected', onObjectSelected);
+  canvas.on('group:selected', onObjectSelected);
 
   function onObjectSelected(e) {
     var selectedObject = e.target;
@@ -355,7 +355,7 @@
     lockRotationEl.innerHTML = (selectedObject.lockRotation ? 'Unlock rotation' : 'Lock rotation');
   }
 
-  canvas.observe('selection:cleared', function(e) {
+  canvas.on('selection:cleared', function(e) {
     for (var i = activeObjectButtons.length; i--; ) {
       activeObjectButtons[i].disabled = true;
     }
@@ -380,7 +380,7 @@
     }
   };
 
-  canvas.observe('path:created', function() {
+  canvas.on('path:created', function() {
     updateComplexity();
   });
 
@@ -595,7 +595,7 @@
         }
       };
 
-      canvas.observe('object:selected', function(e) {
+      canvas.on('object:selected', function(e) {
         slider.value = e.target.lineHeight;
       });
     })();

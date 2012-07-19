@@ -631,4 +631,39 @@
 
     }, 1000);
   });
+
+  test('observable', function() {
+    var object = new fabric.Object({ left: 20, top: 30, width: 40, height: 50, angle: 43 });
+
+    var fooFired = false,
+        barFired = false;
+
+    object.on('foo', function(){ fooFired = true; });
+    object.on('bar', function(){ barFired = true; });
+
+    object.fire('foo');
+    ok(fooFired);
+    ok(!barFired);
+
+    object.fire('bar');
+    ok(fooFired);
+    ok(barFired);
+
+    var firedOptions;
+    object.on('baz', function(options) { firedOptions = options; })
+    object.fire('baz', { param1: 'abrakadabra', param2: 3.1415 });
+
+    equal('abrakadabra', firedOptions.param1);
+    equal(3.1415, firedOptions.param2);
+  });
+
+  test('object:added', function() {
+    var object = new fabric.Object();
+    var addedEventFired = false;
+
+    object.on('added', function(){ addedEventFired = true; })
+    canvas.add(object);
+
+    ok(addedEventFired);
+  })
 })();

@@ -81,7 +81,7 @@ fabric.instances.push(canvas)})();
   canvas.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
   canvas.item(0).hasControls = canvas.item(0).hasBorders = false;
 
-  canvas.observe({
+  canvas.on({
     'mouse:down': function(e) {
       if (e.target) {
         e.target.opacity = 0.5;
@@ -158,8 +158,8 @@ fabric.instances.push(canvas)})();
       });
     }
   }
-  canvas.observe('mouse:down', function(e) { animate(e, 1); });
-  canvas.observe('mouse:up', function(e) { animate(e, 0); });
+  canvas.on('mouse:down', function(e) { animate(e, 1); });
+  canvas.on('mouse:up', function(e) { animate(e, 0); });
 fabric.instances.push(canvas)})();
 </script>
 </div>

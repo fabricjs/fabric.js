@@ -12,7 +12,7 @@ test('fire + observe', function() {
   fabric.util.object.extend(foo, fabric.Observable);
 
   var eventFired = false;
-  foo.observe('bar:baz', function() {
+  foo.on('bar:baz', function() {
     eventFired = true;
   });
 
@@ -28,7 +28,7 @@ test('stopObserving', function() {
   var handler = function() {
     eventFired = true;
   };
-  foo.observe('bar:baz', handler);
+  foo.on('bar:baz', handler);
   foo.stopObserving('bar:baz', handler);
 
   foo.fire('bar:baz');
@@ -43,7 +43,7 @@ test('observe multiple handlers', function() {
   var blahBlahFired = false;
   var mooFired = false;
 
-  foo.observe({
+  foo.on({
     'bar:baz': function() {
       barBazFired = true;
     },
@@ -69,7 +69,7 @@ test('event options', function() {
   fabric.util.object.extend(foo, fabric.Observable);
 
   var someValue;
-  foo.observe('foo:bar', function(e) {
+  foo.on('foo:bar', function(e) {
     someValue = e.value;
   });
 

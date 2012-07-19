@@ -577,7 +577,7 @@
   test('object:added', function() {
 
     var objectsAdded = [];
-    canvas.observe('object:added', function(e) {
+    canvas.on('object:added', function(e) {
       objectsAdded.push(e.target);
     });
 
@@ -598,5 +598,20 @@
     canvas.insertAt(circle3, 2);
 
     same(objectsAdded[3], circle3);
+  });
+
+  asyncTest('loadFromJSON with text', function() {
+    var json = '{"objects":[{"type":"text","left":150,"top":200,"width":128,"height":64.32,"fill":"#000000","overlayFill":"","stroke":"","strokeWidth":"","scaleX":0.8,"scaleY":0.8,"angle":0,"flipX":false,"flipY":false,"opacity":1,"selectable":true,"text":"NAME HERE","fontSize":24,"fontWeight":"","fontFamily":"Delicious_500","fontStyle":"","lineHeight":"","textDecoration":"","textShadow":"","textAlign":"center","path":"","strokeStyle":"","backgroundColor":""}],"background":"#ffffff"}';
+    canvas.loadFromJSON(json, function() {
+
+      canvas.renderAll();
+
+      equal('text', canvas.item(0).type);
+      equal(150, canvas.item(0).left);
+      equal(200, canvas.item(0).top)
+      equal('NAME HERE', canvas.item(0).text);
+
+      start();
+    });
   });
 })();

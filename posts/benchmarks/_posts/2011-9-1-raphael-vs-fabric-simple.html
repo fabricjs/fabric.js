@@ -72,7 +72,7 @@ title: vs. Raphael (Simple Shape)
           startTime = new Date(),
           circle;
 
-      canvas.observe({
+      canvas.on({
         'object:selected': function(e) {
           e.target.setOpacity(0.75);
         },

@@ -52,7 +52,7 @@ canvas.add(
   makeCircle(line6.get('x2'), line6.get('y2'), line6)
 );
 
-canvas.observe('object:moving', function(e) {
+canvas.on('object:moving', function(e) {
   var p = e.target;
   p.line1 && p.line1.set({ 'x2': p.left, 'y2': p.top });
   p.line2 && p.line2.set({ 'x1': p.left, 'y1': p.top });

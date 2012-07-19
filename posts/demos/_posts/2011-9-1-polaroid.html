@@ -43,7 +43,7 @@ var photo = new PolaroidPhoto('../assets/pug.jpg', {
   scaleX: 0.2,
   scaleY: 0.2
 });
-photo.observe('image:loaded', canvas.renderAll.bind(canvas));
+photo.on('image:loaded', canvas.renderAll.bind(canvas));
 photo.drawBorders = photo.drawCorners = function() { return this };
 
 function makeHandler(arg) {
@@ -56,7 +56,7 @@ function makeHandler(arg) {
     }
   };
 }
-canvas.observe({
+canvas.on({
   'mouse:down': makeHandler('+10'),
   'mouse:up': makeHandler('-10')
 });

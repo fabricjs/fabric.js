@@ -30,10 +30,7 @@ fabric.Image.fromURL('../lib/pug.jpg', function(img) {
 
   canvas.add(img.set({ left: 250, top: 250, angle: 30 }).scale(0.25));
 
-  canvas.observe('object:moving', function(e) {
-    positionBtn(e.target);
-  });
-
+  img.on('moving', function() { positionBtn(img) });
   positionBtn(img);
 });
 

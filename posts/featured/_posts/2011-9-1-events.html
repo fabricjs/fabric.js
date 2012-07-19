@@ -59,8 +59,8 @@ title: Event inspector
 
   function observe(eventName) {
     logObservingEvent(eventName);
-    canvas1.observe(eventName, function(){ log(eventName, 1) });
-    canvas2.observe(eventName, function(){ log(eventName, 2) });
+    canvas1.on(eventName, function(){ log(eventName, 1) });
+    canvas2.on(eventName, function(){ log(eventName, 2) });
   }
 
   observe('object:modified');

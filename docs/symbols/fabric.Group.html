@@ -197,11 +197,21 @@ ul.inheritsList {
 	
 	<li><a href="../symbols/fabric.Image.filters.html">fabric.Image.filters</a></li>
 	
+	<li><a href="../symbols/fabric.Image.filters.Brightness.html">fabric.Image.filters.Brightness</a></li>
+	
+	<li><a href="../symbols/fabric.Image.filters.GradientTransparency.html">fabric.Image.filters.GradientTransparency</a></li>
+	
 	<li><a href="../symbols/fabric.Image.filters.Grayscale.html">fabric.Image.filters.Grayscale</a></li>
 	
 	<li><a href="../symbols/fabric.Image.filters.Invert.html">fabric.Image.filters.Invert</a></li>
 	
+	<li><a href="../symbols/fabric.Image.filters.Noise.html">fabric.Image.filters.Noise</a></li>
+	
 	<li><a href="../symbols/fabric.Image.filters.RemoveWhite.html">fabric.Image.filters.RemoveWhite</a></li>
+	
+	<li><a href="../symbols/fabric.Image.filters.Sepia.html">fabric.Image.filters.Sepia</a></li>
+	
+	<li><a href="../symbols/fabric.Image.filters.Sepia2.html">fabric.Image.filters.Sepia2</a></li>
 	
 	<li><a href="../symbols/fabric.Intersection.html">fabric.Intersection</a></li>
 	
@@ -332,7 +342,7 @@ ul.inheritsList {
 		
 		
 		<dl class="inheritsList">
-		<dt>Fields borrowed from class <a href="../symbols/fabric.Object.html">fabric.Object</a>: </dt><dd><a href="../symbols/fabric.Object.html#hasBorders">hasBorders</a>, <a href="../symbols/fabric.Object.html#hasControls">hasControls</a>, <a href="../symbols/fabric.Object.html#hasRotatingPoint">hasRotatingPoint</a>, <a href="../symbols/fabric.Object.html#includeDefaultValues">includeDefaultValues</a>, <a href="../symbols/fabric.Object.html#MIN_SCALE_LIMIT">MIN_SCALE_LIMIT</a>, <a href="../symbols/fabric.Object.html#NUM_FRACTION_DIGITS">NUM_FRACTION_DIGITS</a>, <a href="../symbols/fabric.Object.html#rotate">rotate</a>, <a href="../symbols/fabric.Object.html#selectable">selectable</a>, <a href="../symbols/fabric.Object.html#stateProperties">stateProperties</a></dd>
+		<dt>Fields borrowed from class <a href="../symbols/fabric.Object.html">fabric.Object</a>: </dt><dd><a href="../symbols/fabric.Object.html#hasBorders">hasBorders</a>, <a href="../symbols/fabric.Object.html#hasControls">hasControls</a>, <a href="../symbols/fabric.Object.html#hasRotatingPoint">hasRotatingPoint</a>, <a href="../symbols/fabric.Object.html#includeDefaultValues">includeDefaultValues</a>, <a href="../symbols/fabric.Object.html#MIN_SCALE_LIMIT">MIN_SCALE_LIMIT</a>, <a href="../symbols/fabric.Object.html#NUM_FRACTION_DIGITS">NUM_FRACTION_DIGITS</a>, <a href="../symbols/fabric.Object.html#rotate">rotate</a>, <a href="../symbols/fabric.Object.html#rotatingPointOffset">rotatingPointOffset</a>, <a href="../symbols/fabric.Object.html#selectable">selectable</a>, <a href="../symbols/fabric.Object.html#stateProperties">stateProperties</a></dd>
 		</dl>
 		
 	
@@ -364,6 +374,15 @@ ul.inheritsList {
 					<td class="attributes">&nbsp;</td>
 					<td class="nameDescription">
 						<div class="fixedFont"><b><a href="../symbols/fabric.Group.html#add">add</a></b>(object)
+						</div>
+						<div class="description">Adds an object to a group</div>
+					</td>
+				</tr>
+			
+				<tr>
+					<td class="attributes">&nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont"><b><a href="../symbols/fabric.Group.html#addWithUpdate">addWithUpdate</a></b>(object)
 						</div>
 						<div class="description">Adds an object to a group; Then recalculates group's dimension, position.</div>
 					</td>
@@ -455,6 +474,15 @@ ul.inheritsList {
 					<td class="nameDescription">
 						<div class="fixedFont"><b><a href="../symbols/fabric.Group.html#remove">remove</a></b>(object)
 						</div>
+						<div class="description">Removes an object from a group</div>
+					</td>
+				</tr>
+			
+				<tr>
+					<td class="attributes">&nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont"><b><a href="../symbols/fabric.Group.html#removeWithUpdate">removeWithUpdate</a></b>(object)
+						</div>
 						<div class="description">Removes an object from a group; Then recalculates group's dimension, position.</div>
 					</td>
 				</tr>
@@ -462,7 +490,7 @@ ul.inheritsList {
 				<tr>
 					<td class="attributes">&nbsp;</td>
 					<td class="nameDescription">
-						<div class="fixedFont"><b><a href="../symbols/fabric.Group.html#render">render</a></b>(ctx)
+						<div class="fixedFont"><b><a href="../symbols/fabric.Group.html#render">render</a></b>(ctx, noTransform)
 						</div>
 						<div class="description">Renders instance on a given context</div>
 					</td>
@@ -483,15 +511,6 @@ ul.inheritsList {
 						<div class="fixedFont"><b><a href="../symbols/fabric.Group.html#set">set</a></b>(name, value)
 						</div>
 						<div class="description">Sets property to a given value</div>
-					</td>
-				</tr>
-			
-				<tr>
-					<td class="attributes">&nbsp;</td>
-					<td class="nameDescription">
-						<div class="fixedFont"><b><a href="../symbols/fabric.Group.html#setActive">setActive</a></b>(value)
-						</div>
-						<div class="description">Activates (makes active) all group objects</div>
 					</td>
 				</tr>
 			
@@ -546,7 +565,7 @@ ul.inheritsList {
 		
 		
 		<dl class="inheritsList">
-		<dt>Methods borrowed from class <a href="../symbols/fabric.Object.html">fabric.Object</a>: </dt><dd><a href="../symbols/fabric.Object.html#animate">animate</a>, <a href="../symbols/fabric.Object.html#callSuper">callSuper</a>, <a href="../symbols/fabric.Object.html#clone">clone</a>, <a href="../symbols/fabric.Object.html#cloneAsImage">cloneAsImage</a>, <a href="../symbols/fabric.Object.html#drawBorders">drawBorders</a>, <a href="../symbols/fabric.Object.html#drawCorners">drawCorners</a>, <a href="../symbols/fabric.Object.html#get">get</a>, <a href="../symbols/fabric.Object.html#getAngle">getAngle</a>, <a href="../symbols/fabric.Object.html#getHeight">getHeight</a>, <a href="../symbols/fabric.Object.html#getSvgStyles">getSvgStyles</a>, <a href="../symbols/fabric.Object.html#getSvgTransform">getSvgTransform</a>, <a href="../symbols/fabric.Object.html#getWidth">getWidth</a>, <a href="../symbols/fabric.Object.html#hasStateChanged">hasStateChanged</a>, <a href="../symbols/fabric.Object.html#intersectsWithObject">intersectsWithObject</a>, <a href="../symbols/fabric.Object.html#intersectsWithRect">intersectsWithRect</a>, <a href="../symbols/fabric.Object.html#isActive">isActive</a>, <a href="../symbols/fabric.Object.html#isContainedWithinObject">isContainedWithinObject</a>, <a href="../symbols/fabric.Object.html#isContainedWithinRect">isContainedWithinRect</a>, <a href="../symbols/fabric.Object.html#isType">isType</a>, <a href="../symbols/fabric.Object.html#saveState">saveState</a>, <a href="../symbols/fabric.Object.html#scale">scale</a>, <a href="../symbols/fabric.Object.html#scaleToHeight">scaleToHeight</a>, <a href="../symbols/fabric.Object.html#scaleToWidth">scaleToWidth</a>, <a href="../symbols/fabric.Object.html#setAngle">setAngle</a>, <a href="../symbols/fabric.Object.html#setCoords">setCoords</a>, <a href="../symbols/fabric.Object.html#setGradientFill">setGradientFill</a>, <a href="../symbols/fabric.Object.html#setOpacity">setOpacity</a>, <a href="../symbols/fabric.Object.html#setOptions">setOptions</a>, <a href="../symbols/fabric.Object.html#setSourcePath">setSourcePath</a>, <a href="../symbols/fabric.Object.html#setupState">setupState</a>, <a href="../symbols/fabric.Object.html#toDatalessObject">toDatalessObject</a>, <a href="../symbols/fabric.Object.html#toDataURL">toDataURL</a>, <a href="../symbols/fabric.Object.html#toggle">toggle</a>, <a href="../symbols/fabric.Object.html#toJSON">toJSON</a>, <a href="../symbols/fabric.Object.html#transform">transform</a></dd>
+		<dt>Methods borrowed from class <a href="../symbols/fabric.Object.html">fabric.Object</a>: </dt><dd><a href="../symbols/fabric.Object.html#animate">animate</a>, <a href="../symbols/fabric.Object.html#callSuper">callSuper</a>, <a href="../symbols/fabric.Object.html#clone">clone</a>, <a href="../symbols/fabric.Object.html#cloneAsImage">cloneAsImage</a>, <a href="../symbols/fabric.Object.html#drawBorders">drawBorders</a>, <a href="../symbols/fabric.Object.html#drawCorners">drawCorners</a>, <a href="../symbols/fabric.Object.html#get">get</a>, <a href="../symbols/fabric.Object.html#getAngle">getAngle</a>, <a href="../symbols/fabric.Object.html#getBoundingRectHeight">getBoundingRectHeight</a>, <a href="../symbols/fabric.Object.html#getBoundingRectWidth">getBoundingRectWidth</a>, <a href="../symbols/fabric.Object.html#getHeight">getHeight</a>, <a href="../symbols/fabric.Object.html#getSvgStyles">getSvgStyles</a>, <a href="../symbols/fabric.Object.html#getSvgTransform">getSvgTransform</a>, <a href="../symbols/fabric.Object.html#getWidth">getWidth</a>, <a href="../symbols/fabric.Object.html#hasStateChanged">hasStateChanged</a>, <a href="../symbols/fabric.Object.html#intersectsWithObject">intersectsWithObject</a>, <a href="../symbols/fabric.Object.html#intersectsWithRect">intersectsWithRect</a>, <a href="../symbols/fabric.Object.html#isActive">isActive</a>, <a href="../symbols/fabric.Object.html#isContainedWithinObject">isContainedWithinObject</a>, <a href="../symbols/fabric.Object.html#isContainedWithinRect">isContainedWithinRect</a>, <a href="../symbols/fabric.Object.html#isType">isType</a>, <a href="../symbols/fabric.Object.html#saveState">saveState</a>, <a href="../symbols/fabric.Object.html#scale">scale</a>, <a href="../symbols/fabric.Object.html#scaleToHeight">scaleToHeight</a>, <a href="../symbols/fabric.Object.html#scaleToWidth">scaleToWidth</a>, <a href="../symbols/fabric.Object.html#setActive">setActive</a>, <a href="../symbols/fabric.Object.html#setAngle">setAngle</a>, <a href="../symbols/fabric.Object.html#setCoords">setCoords</a>, <a href="../symbols/fabric.Object.html#setGradientFill">setGradientFill</a>, <a href="../symbols/fabric.Object.html#setOpacity">setOpacity</a>, <a href="../symbols/fabric.Object.html#setOptions">setOptions</a>, <a href="../symbols/fabric.Object.html#setSourcePath">setSourcePath</a>, <a href="../symbols/fabric.Object.html#setupState">setupState</a>, <a href="../symbols/fabric.Object.html#toDatalessObject">toDatalessObject</a>, <a href="../symbols/fabric.Object.html#toDataURL">toDataURL</a>, <a href="../symbols/fabric.Object.html#toggle">toggle</a>, <a href="../symbols/fabric.Object.html#toJSON">toJSON</a>, <a href="../symbols/fabric.Object.html#transform">transform</a></dd>
 		</dl>
 		
 	
@@ -678,6 +697,49 @@ ul.inheritsList {
 			
 			<span class="light">{<a href="../symbols/fabric.Group.html">fabric.Group</a>}</span>
 			<b>add</b>(object)
+			
+			</div>
+			<div class="description">
+				Adds an object to a group
+				
+				
+			</div>
+			
+			
+			
+				
+					<dl class="detailList">
+					<dt class="heading">Parameters:</dt>
+					
+						<dt>
+							<span class="light fixedFont">{Object}</span> <b>object</b>
+							
+						</dt>
+						<dd></dd>
+					
+					</dl>
+				
+				
+				
+				
+				
+					<dl class="detailList">
+					<dt class="heading">Returns:</dt>
+					
+						<dd><span class="light fixedFont">{<a href="../symbols/fabric.Group.html">fabric.Group</a>}</span> thisArg</dd>
+					
+					</dl>
+				
+				
+				
+
+			<hr />
+		
+			<a name="addWithUpdate"> </a>
+			<div class="fixedFont">
+			
+			<span class="light">{<a href="../symbols/fabric.Group.html">fabric.Group</a>}</span>
+			<b>addWithUpdate</b>(object)
 			
 			</div>
 			<div class="description">
@@ -1079,6 +1141,49 @@ ul.inheritsList {
 			
 			</div>
 			<div class="description">
+				Removes an object from a group
+				
+				
+			</div>
+			
+			
+			
+				
+					<dl class="detailList">
+					<dt class="heading">Parameters:</dt>
+					
+						<dt>
+							<span class="light fixedFont">{Object}</span> <b>object</b>
+							
+						</dt>
+						<dd></dd>
+					
+					</dl>
+				
+				
+				
+				
+				
+					<dl class="detailList">
+					<dt class="heading">Returns:</dt>
+					
+						<dd><span class="light fixedFont">{<a href="../symbols/fabric.Group.html">fabric.Group</a>}</span> thisArg</dd>
+					
+					</dl>
+				
+				
+				
+
+			<hr />
+		
+			<a name="removeWithUpdate"> </a>
+			<div class="fixedFont">
+			
+			<span class="light">{<a href="../symbols/fabric.Group.html">fabric.Group</a>}</span>
+			<b>removeWithUpdate</b>(object)
+			
+			</div>
+			<div class="description">
 				Removes an object from a group; Then recalculates group's dimension, position.
 				
 				
@@ -1118,7 +1223,7 @@ ul.inheritsList {
 			<div class="fixedFont">
 			
 			
-			<b>render</b>(ctx)
+			<b>render</b>(ctx, noTransform)
 			
 			</div>
 			<div class="description">
@@ -1138,6 +1243,12 @@ ul.inheritsList {
 							
 						</dt>
 						<dd>context to render instance on</dd>
+					
+						<dt>
+							<b>noTransform</b>
+							
+						</dt>
+						<dd></dd>
 					
 					</dl>
 				
@@ -1212,49 +1323,6 @@ ul.inheritsList {
 							
 						</dt>
 						<dd></dd>
-					
-					</dl>
-				
-				
-				
-				
-				
-					<dl class="detailList">
-					<dt class="heading">Returns:</dt>
-					
-						<dd><span class="light fixedFont">{<a href="../symbols/fabric.Group.html">fabric.Group</a>}</span> thisArg</dd>
-					
-					</dl>
-				
-				
-				
-
-			<hr />
-		
-			<a name="setActive"> </a>
-			<div class="fixedFont">
-			
-			<span class="light">{<a href="../symbols/fabric.Group.html">fabric.Group</a>}</span>
-			<b>setActive</b>(value)
-			
-			</div>
-			<div class="description">
-				Activates (makes active) all group objects
-				
-				
-			</div>
-			
-			
-			
-				
-					<dl class="detailList">
-					<dt class="heading">Parameters:</dt>
-					
-						<dt>
-							<span class="light fixedFont">{Boolean}</span> <b>value</b>
-							
-						</dt>
-						<dd>`true` to activate object, `false` otherwise</dd>
 					
 					</dl>
 				
@@ -1439,5 +1507,5 @@ ul.inheritsList {
 <!-- ============================== footer ================================= -->
 <div class="fineprint" style="clear:both">
 	
-	Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Wed May 30 2012 15:56:27 GMT+0400 (MSK)
+	Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Thu Jul 19 2012 11:41:14 GMT+0200 (CEST)
 </div>

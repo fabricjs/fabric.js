@@ -32,12 +32,12 @@ canvas.findTarget = (function(originalFn) {
 // now we can observe "object:over" and "object:out" events
 // in this example, object is set to red color on hover over and green color on hover out
 
-canvas.observe('object:over', function(e) {
+canvas.on('object:over', function(e) {
   e.target.setFill('red');
   canvas.renderAll();
 });
 
-canvas.observe('object:out', function(e) {
+canvas.on('object:out', function(e) {
   e.target.setFill('green');
   canvas.renderAll();
 });
