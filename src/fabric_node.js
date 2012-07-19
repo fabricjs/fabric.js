@@ -79,6 +79,13 @@
     });
   };
 
+  /**
+   * Only available when running fabric on node.js
+   * @method createCanvasForNode
+   * @param width Canvas width
+   * @param height Canvas height
+   * @return {Object} wrapped canvas instance
+   */
   fabric.createCanvasForNode = function(width, height) {
 
     var canvasEl = fabric.document.createElement('canvas'),

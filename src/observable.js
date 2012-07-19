@@ -64,11 +64,14 @@ fabric.Observable = {
 };
 
 /**
- * @alias on -> observe
+ * Alias for observe
+ * @method observe
+ * @memberOf fabric.Observable
  */
 fabric.Observable.on = fabric.Observable.observe;
 
 /**
- * @alias off -> stopObserving
+ * Alias for stopObserving
+ * @method off
  */
 fabric.Observable.off = fabric.Observable.stopObserving;
