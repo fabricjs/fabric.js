@@ -233,7 +233,7 @@
 
        /** @ignore */
       replacement.onload = function() {
-        _this.setElement(replacement);
+        _this._element = replacement;
         callback && callback();
         replacement.onload = canvasEl = imgEl = null;
       };
@@ -243,7 +243,7 @@
       if (isLikelyNode) {
         var base64str = canvasEl.toDataURL('image/png').replace(/data:image\/png;base64,/, '');
         replacement.src = new Buffer(base64str, 'base64');
-        _this.setElement(replacement);
+        _this._element = replacement;
 
         // onload doesn't fire in node, so we invoke callback manually
         callback && callback();
