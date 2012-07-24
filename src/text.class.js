@@ -50,7 +50,7 @@
      * @property
      * @type String | null
      */
-    textShadow:       null,
+    textShadow:       '',
 
     /**
      * Determines text alignment. Possible values: "left", "center", or "right".
@@ -69,7 +69,7 @@
      * @property
      * @type Number
      */
-    lineHeight:       1.6,
+    lineHeight:       1.3,
 
     /**
      * @property
@@ -101,8 +101,9 @@
      * @type String
      */
     type:             'text',
-    
+
     /**
+     * Indicates whether canvas native text methods should be used to render text (otherwise, Cufon is used)
      * @property
      * @type Boolean
      */
@@ -167,50 +168,59 @@
      */
     _render: function(ctx) {
       if (typeof Cufon === 'undefined' || this.useNative === true) {
-        this._render_native(ctx);
+        this._renderViaNative(ctx);
       }
       else {
-        var o = Cufon.textOptions || (Cufon.textOptions = { });
-
-        // export options to be used by cufon.js
-        o.left = this.left;
-        o.top = this.top;
-        o.context = ctx;
-        o.color = this.fill;
-
-        var el = this._initDummyElement();
-
-        // set "cursor" to top/left corner
-        this.transform(ctx);
-
-        // draw text
-        Cufon.replaceElement(el, {
-          engine: 'canvas',
-          separate: 'none',
-          fontFamily: this.fontFamily,
-          fontWeight: this.fontWeight,
-          textDecoration: this.textDecoration,
-          textShadow: this.textShadow,
-          textAlign: this.textAlign,
-          fontStyle: this.fontStyle,
-          lineHeight: this.lineHeight,
-          strokeStyle: this.strokeStyle,
-          strokeWidth: this.strokeWidth,
-          backgroundColor: this.backgroundColor
-        });
-
-        // update width, height
-        this.width = o.width;
-        this.height = o.height;
-        this._totalLineHeight = o.totalLineHeight;
-        this._fontAscent = o.fontAscent;
-        this._boundaries = o.boundaries;
-        this._shadowOffsets = o.shadowOffsets;
-        this._shadows = o.shadows || [ ];
-
-        // need to set coords _after_ the width/height was retreived from Cufon
-        this.setCoords();
+        this._renderViaCufon(ctx);
       }
+    },
+
+    /**
+     * @private
+     * @method _renderViaCufon
+     */
+    _renderViaCufon: function(ctx) {
+      var o = Cufon.textOptions || (Cufon.textOptions = { });
+
+      // export options to be used by cufon.js
+      o.left = this.left;
+      o.top = this.top;
+      o.context = ctx;
+      o.color = this.fill;
+
+      var el = this._initDummyElementForCufon();
+
+      // set "cursor" to top/left corner
+      this.transform(ctx);
+
+      // draw text
+      Cufon.replaceElement(el, {
+        engine: 'canvas',
+        separate: 'none',
+        fontFamily: this.fontFamily,
+        fontWeight: this.fontWeight,
+        textDecoration: this.textDecoration,
+        textShadow: this.textShadow,
+        textAlign: this.textAlign,
+        fontStyle: this.fontStyle,
+        lineHeight: this.lineHeight,
+        strokeStyle: this.strokeStyle,
+        strokeWidth: this.strokeWidth,
+        backgroundColor: this.backgroundColor
+      });
+
+      // update width, height
+      this.width = o.width;
+      this.height = o.height;
+
+      this._totalLineHeight = o.totalLineHeight;
+      this._fontAscent = o.fontAscent;
+      this._boundaries = o.boundaries;
+      this._shadowOffsets = o.shadowOffsets;
+      this._shadows = o.shadows || [ ];
+
+      // need to set coords _after_ the width/height was retreived from Cufon
+      this.setCoords();
     },
 
     /**
@@ -218,48 +228,215 @@
      * @method _render_native
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    _render_native: function(ctx) {
-      var font = [
-        this.fontStyle,
-        this.fontWeight,
-        this.fontSize + 'px/' + this.lineHeight,
-        this.fontFamily
-      ].join(' ');
+    _renderViaNative: function(ctx) {
 
+      this.transform(ctx);
+      this._setTextStyles(ctx);
+
+      var textLines = this.text.split(/\r?\n/);
+
+      this.width = this._getTextWidth(ctx, textLines);
+      this.height = this._getTextHeight(ctx, textLines);
+
+      this._renderTextBackground(ctx, textLines);
+
+      if (this.textAlign !== 'left') {
+        ctx.save();
+        ctx.translate(this.textAlign === 'center' ? (this.width / 2) : this.width, 0);
+      }
+
+      this._setTextShadow(ctx);
+      this._renderTextFill(ctx, textLines);
+      this.textShadow && ctx.restore();
+
+      this._renderTextStroke(ctx, textLines);
+      if (this.textAlign !== 'left') {
+        ctx.restore();
+      }
+
+      this._renderTextDecoration(ctx, textLines);
+
+      this.setCoords();
+    },
+
+    /**
+     * @private
+     * @method _setTextStyles
+     */
+    _setTextStyles: function(ctx) {
       ctx.fillStyle = this.fill;
       ctx.strokeStyle = this.strokeStyle;
       ctx.lineWidth = this.strokeWidth;
       ctx.textBaseline = 'top';
       ctx.textAlign = this.textAlign;
-      ctx.font = font;
-
-      this.transform(ctx);
-      this.width = ctx.measureText(this.text).width;
-      this.height = this.fontSize;
-      ctx.fillText(this.text, -this.width / 2, -this.height / 2);
-
-      if(this.strokeStyle) {
-        ctx.strokeText(this.text, -this.width / 2, -this.height / 2);
-      }
-
-      this.setCoords();
+      ctx.font = this._getFontDeclaration();
     },
 
-    // _render: function(context) {
-    //       context.fillStyle = this.fill;
-    //       context.font = this.fontSize + 'px ' + this.fontFamily;
-    //       this.transform(context);
-    //       this.width = context.measureText(this.text).width;
-    //       this.height = this.fontSize;
-    //       context.fillText(this.text, -this.width / 2, 0);
-    //       this.setCoords();
-    //     },
+    /**
+     * @private
+     * @method _getTextHeight
+     */
+    _getTextHeight: function(ctx, textLines) {
+      return this.fontSize * textLines.length * this.lineHeight;
+    },
+
+    /**
+     * @private
+     * @method _getTextWidth
+     */
+    _getTextWidth: function(ctx, textLines) {
+      var maxWidth = ctx.measureText(textLines[0]).width;
+
+      for (var i = 1, len = textLines.length; i < len; i++) {
+        var currentLineWidth = ctx.measureText(textLines[i]).width;
+        if (currentLineWidth > maxWidth) {
+          maxWidth = currentLineWidth;
+        }
+      }
+      return maxWidth;
+    },
+
+    /**
+     * @private
+     * @method _setTextShadow
+     */
+    _setTextShadow: function(ctx) {
+      if (this.textShadow) {
+
+        // "rgba(0,0,0,0.2) 2px 2px 10px"
+        // "rgb(0, 100, 0) 0 0 5px"
+        // "red 2px 2px 1px"
+        // "#f55 123 345 567"
+        var reOffsetsAndBlur = /\s*(-?\d+)(?:px)?\s+(-?\d+)(?:px)?\s+(\d+)(?:px)?\s*/;
+
+        var shadowDeclaration = this.textShadow;
+        var offsetsAndBlur = reOffsetsAndBlur.exec(this.textShadow);
+        var shadowColor = shadowDeclaration.replace(reOffsetsAndBlur, '');
+
+        ctx.save();
+        ctx.shadowColor = shadowColor;
+        ctx.shadowOffsetX = parseInt(offsetsAndBlur[0], 10);
+        ctx.shadowOffsetY = parseInt(offsetsAndBlur[1], 10);
+        ctx.shadowBlur = parseInt(offsetsAndBlur[2], 10);
+      }
+    },
+
+    _renderTextFill: function(ctx, textLines) {
+      for (var i = 0, len = textLines.length; i < len; i++) {
+        ctx.fillText(
+          textLines[i],
+          -this.width / 2,
+          (-this.height / 2) + (i * this.fontSize * this.lineHeight)
+        );
+      }
+    },
+
+    /**
+     * @private
+     * @method _renderTextStroke
+     */
+    _renderTextStroke: function(ctx, textLines) {
+      if (this.strokeStyle) {
+        for (var i = 0, len = textLines.length; i < len; i++) {
+          ctx.strokeText(
+            textLines[i],
+            -this.width / 2,
+            (-this.height / 2) + (i * this.fontSize * this.lineHeight)
+          );
+        }
+      }
+    },
+
+    /**
+     * @private
+     * @_renderTextBackground
+     */
+    _renderTextBackground: function(ctx, textLines) {
+      if (this.backgroundColor) {
+        ctx.save();
+        ctx.fillStyle = this.backgroundColor;
+
+        for (var i = 0, len = textLines.length; i < len; i++) {
+
+          var lineWidth = ctx.measureText(textLines[i]).width;
+          var lineLeftOffset = this._getLineLeftOffset(lineWidth);
+
+          ctx.fillRect(
+            (-this.width / 2) + lineLeftOffset,
+            (-this.height / 2) + (i * this.fontSize * this.lineHeight),
+            lineWidth,
+            this.fontSize
+          );
+        }
+        ctx.restore();
+      }
+    },
+
+    /**
+     * @private
+     * @method _getLineLeftOffset
+     */
+    _getLineLeftOffset: function(lineWidth) {
+      if (this.textAlign === 'center') {
+        return (this.width - lineWidth) / 2;
+      }
+      if (this.textAlign === 'right') {
+        return this.width - lineWidth;
+      }
+      return 0;
+    },
+
+    /**
+     * @private
+     * @method _renderTextDecoration
+     */
+    _renderTextDecoration: function(ctx, textLines) {
+
+      var halfOfVerticalBox = this._getTextHeight(ctx, textLines) / 2;
+
+      function renderLinesAtOffset(offset) {
+        for (var i = 0, len = textLines.length; i < len; i++) {
+
+          var lineWidth = ctx.measureText(textLines[i]).width;
+          var lineLeftOffset = this._getLineLeftOffset(lineWidth);
+
+          ctx.fillRect(
+            (-this.width / 2) + lineLeftOffset,
+            (offset + (i * this.fontSize * this.lineHeight)) - halfOfVerticalBox,
+            lineWidth,
+            1);
+        }
+      }
+
+      if (this.textDecoration.indexOf('underline') > -1) {
+        renderLinesAtOffset.call(this, this.fontSize);
+      }
+      if (this.textDecoration.indexOf('line-through') > -1) {
+        renderLinesAtOffset.call(this, this.fontSize / 2);
+      }
+      if (this.textDecoration.indexOf('overline') > -1) {
+        renderLinesAtOffset.call(this, 0);
+      }
+    },
+
+    /**
+     * @private
+     * @method _getFontDeclaration
+     */
+    _getFontDeclaration: function() {
+      return [
+        this.fontStyle,
+        this.fontWeight,
+        this.fontSize + 'px',
+        this.fontFamily
+      ].join(' ');
+    },
 
     /**
      * @private
      * @method _initDummyElement
      */
-    _initDummyElement: function() {
+    _initDummyElementForCufon: function() {
       var el = fabric.document.createElement('pre'),
           container = fabric.document.createElement('div');
 
@@ -361,6 +538,10 @@
     _getSVGShadows: function(lineTopOffset, textLines) {
       var shadowSpans = [], j, i, jlen, ilen, lineTopOffsetMultiplier = 1;
 
+      if (!this._shadows || !this._boundaries) {
+        return shadowSpans;
+      }
+
       for (j = 0, jlen = this._shadows.length; j < jlen; j++) {
         for (i = 0, ilen = textLines.length; i < ilen; i++) {
           if (textLines[i] !== '') {
@@ -409,7 +590,7 @@
           lineTopOffsetMultiplier++;
         }
 
-        if (!this.backgroundColor) continue;
+        if (!this.backgroundColor || !this._boundaries) continue;
 
         textBgRects.push(
           '<rect ',

@@ -68,21 +68,22 @@ function ifSpecifiedInclude(moduleName, fileName) {
   return ((isInIncludedList || includeAllModules) && !isInExcludedList) ? fileName : '';
 }
 
+function ifSpecifiedDependencyInclude(included, excluded, fileName) {
+  return (
+    (
+      (modulesToInclude.indexOf(included) > -1 || includeAllModules) &&
+      (modulesToExclude.indexOf(excluded) == -1))
+    ? fileName
+    : ''
+  );
+}
+
 var filesToInclude = [
 
   'HEADER.js',
 
-  (
-    (
-      (modulesToInclude.indexOf('serialization') > -1 || includeAllModules) &&
-      (modulesToExclude.indexOf('json') == -1))
-
-    // only include json if serialization module is specified, AND if json is not explicitly excluded
-    ? 'lib/json2.js'
-    : ''
-  ),
-
-  ifSpecifiedInclude('text', 'lib/cufon.js'),
+  ifSpecifiedDependencyInclude('text', 'cufon', 'lib/cufon.js'),
+  ifSpecifiedDependencyInclude('serialization', 'json', 'lib/json2.js'),
 
   'src/log.js',
   'src/observable.js',
