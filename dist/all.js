@@ -10071,13 +10071,13 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
       this.path = fromArray
         ? path
-        : path.match && path.match(/[a-zA-Z][^a-zA-Z]*/g);
+        // one of commands (m,M,l,L,q,Q,c,C,etc.) followed by non-command characters (i.e. command values)
+        : path.match && path.match(/[mzlhvcsqta][^mzlhvcsqta]*/gi);
 
       if (!this.path) return;
 
-      // TODO (kangax): rewrite this idiocracy
       if (!fromArray) {
-        this._initializeFromArray(options);
+        this._initializeFromString(options);
       }
 
       if (options.sourcePath) {
@@ -10087,9 +10087,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
     /**
      * @private
-     * @method _initializeFromArray
+     * @method _initializeFromString
      */
-    _initializeFromArray: function(options) {
+    _initializeFromString: function(options) {
       var isWidthSet = 'width' in options,
           isHeightSet = 'height' in options;
 
