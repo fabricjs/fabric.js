@@ -12363,7 +12363,7 @@ fabric.Image.filters.GradientTransparency.fromObject = function(object) {
      * @property
      * @type String
      */
-    fontFamily:       'Times_New_Roman',
+    fontFamily:       'Times New Roman',
 
     /**
      * @property
@@ -12580,8 +12580,30 @@ fabric.Image.filters.GradientTransparency.fromObject = function(object) {
       }
 
       this._renderTextDecoration(ctx, textLines);
+      this._setBoundaries(ctx, textLines);
+      this._totalLineHeight = 0;
 
       this.setCoords();
+    },
+
+    /**
+     * @private
+     * @method _setBoundaries
+     */
+    _setBoundaries: function(ctx, textLines) {
+      this._boundaries = [ ];
+
+      for (var i = 0, len = textLines.length; i < len; i++) {
+
+        var lineWidth = ctx.measureText(textLines[i]).width;
+        var lineLeftOffset = this._getLineLeftOffset(lineWidth);
+
+        this._boundaries.push({
+          height: this.fontSize,
+          width: lineWidth,
+          left: lineLeftOffset
+        });
+      }
     },
 
     /**
@@ -12643,10 +12665,22 @@ fabric.Image.filters.GradientTransparency.fromObject = function(object) {
         ctx.shadowOffsetX = parseInt(offsetsAndBlur[0], 10);
         ctx.shadowOffsetY = parseInt(offsetsAndBlur[1], 10);
         ctx.shadowBlur = parseInt(offsetsAndBlur[2], 10);
+
+        this._shadows = [{
+          blur: ctx.shadowBlur,
+          color: ctx.shadowColor,
+          offX: ctx.shadowOffsetX,
+          offY: ctx.shadowOffsetY
+        }];
+
+        this._shadowOffsets = [[
+          parseInt(ctx.shadowOffsetX, 10), parseInt(ctx.shadowOffsetY, 10)
+        ]];
       }
     },
 
     _renderTextFill: function(ctx, textLines) {
+      this._boundaries = [ ];
       for (var i = 0, len = textLines.length; i < len; i++) {
         ctx.fillText(
           textLines[i],
@@ -12830,16 +12864,20 @@ fabric.Image.filters.GradientTransparency.fromObject = function(object) {
     toSVG: function() {
 
       var textLines = this.text.split(/\r?\n/),
-          lineTopOffset = -this._fontAscent - ((this._fontAscent / 5) * this.lineHeight),
+          lineTopOffset = this.useNative
+            ? this.fontSize * this.lineHeight
+            : (-this._fontAscent - ((this._fontAscent / 5) * this.lineHeight)),
 
           textLeftOffset = -(this.width/2),
-          textTopOffset = (this.height/2) - (textLines.length * this.fontSize) - this._totalLineHeight,
+          textTopOffset = this.useNative
+            ? this.fontSize - 1
+            : (this.height/2) - (textLines.length * this.fontSize) - this._totalLineHeight,
 
           textAndBg = this._getSVGTextAndBg(lineTopOffset, textLeftOffset, textLines),
           shadowSpans = this._getSVGShadows(lineTopOffset, textLines);
 
       // move top offset by an ascent
-      textTopOffset += ((this._fontAscent / 5) * this.lineHeight);
+      textTopOffset += (this._fontAscent ? ((this._fontAscent / 5) * this.lineHeight) : 0);
 
       return [
         '<g transform="', this.getSvgTransform(), '">',
@@ -12874,8 +12912,10 @@ fabric.Image.filters.GradientTransparency.fromObject = function(object) {
             shadowSpans.push(
               '<tspan x="',
               toFixed((lineLeftOffset + lineTopOffsetMultiplier) + this._shadowOffsets[j][0], 2),
-              (i === 0 ? '" y' : '" dy'), '="',
-              toFixed(lineTopOffset + (i === 0 ? this._shadowOffsets[j][1] : 0), 2),
+              ((i === 0 || this.useNative) ? '" y' : '" dy'), '="',
+              toFixed(this.useNative
+                ? ((lineTopOffset * i) - this.height / 2 + this._shadowOffsets[j][1])
+                : (lineTopOffset + (i === 0 ? this._shadowOffsets[j][1] : 0)), 2),
               '" ',
               this._getFillAttributes(this._shadows[j].color), '>',
               fabric.util.string.escapeXml(textLines[i]),
@@ -12901,8 +12941,8 @@ fabric.Image.filters.GradientTransparency.fromObject = function(object) {
           textSpans.push(
             '<tspan x="',
             lineLeftOffset, '" ',
-            (i === 0 ? 'y' : 'dy'), '="',
-            toFixed(lineTopOffset * lineTopOffsetMultiplier, 2) , '" ',
+            (i === 0 || this.useNative ? 'y' : 'dy'), '="',
+            toFixed(this.useNative ? ((lineTopOffset * i) - this.height / 2) : (lineTopOffset * lineTopOffsetMultiplier), 2) , '" ',
             // doing this on <tspan> elements since setting opacity on containing <text> one doesn't work in Illustrator
             this._getFillAttributes(this.fill), '>',
             fabric.util.string.escapeXml(textLines[i]),
