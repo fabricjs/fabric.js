@@ -352,9 +352,9 @@
 
         ctx.save();
         ctx.shadowColor = shadowColor;
-        ctx.shadowOffsetX = parseInt(offsetsAndBlur[0], 10);
-        ctx.shadowOffsetY = parseInt(offsetsAndBlur[1], 10);
-        ctx.shadowBlur = parseInt(offsetsAndBlur[2], 10);
+        ctx.shadowOffsetX = parseInt(offsetsAndBlur[1], 10);
+        ctx.shadowOffsetY = parseInt(offsetsAndBlur[2], 10);
+        ctx.shadowBlur = parseInt(offsetsAndBlur[3], 10);
 
         this._shadows = [{
           blur: ctx.shadowBlur,
