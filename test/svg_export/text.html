@@ -11,6 +11,14 @@ title: SVG Export (text)
 
 <script src="../../lib/font_definitions.js"></script>
 
+<script>
+  function addText(text, options) {
+    var text = new fabric.Text(text, options);
+    text.useNative = document.location.hash === '#native';
+    __canvas.add(text);
+  }
+</script>
+
 <script type="text/script" id="test-template">
   <div class="test">
     <div class="column">
@@ -29,172 +37,144 @@ title: SVG Export (text)
 </script>
 
 <pre class="test-source">
-  var text = new fabric.Text('hello world', { 
+  addText('hello world', {
     fontFamily: 'Delicious',
     fill: 'red',
     left: 100,
     top: 50
   });
-  text.path = '../../lib/fonts/Delicious.otf';
-  canvas.add(text);
 </pre>
 
 <pre class="test-source">
-  var text = new fabric.Text('hello world', { 
+  addText('hello world', {
     fontFamily: 'Delicious',
     fill: '#555',
     left: 100,
     top: 50,
     textDecoration: 'underline'
   });
-  text.path = '../../lib/fonts/Delicious.otf';
-  canvas.add(text);
 </pre>
 
 <pre class="test-source">
-  var text = new fabric.Text('hello world', { 
+  addText('hello world', {
     fontFamily: 'Delicious',
     fill: '#555',
     left: 100,
     top: 50,
     textDecoration: 'overline'
   });
-  text.path = '../../lib/fonts/Delicious.otf';
-  canvas.add(text);
 </pre>
 
 <pre class="test-source">
-  var text = new fabric.Text('hello world', { 
+  addText('hello world', {
     fontFamily: 'Delicious',
     fill: '#333',
     left: 100,
     top: 50,
     textDecoration: 'line-through'
   });
-  text.path = '../../lib/fonts/Delicious.otf';
-  canvas.add(text);
 </pre>
 
 <pre class="test-source">
-  var text = new fabric.Text('foo bar baz', { 
+  addText('foo bar baz', {
     fontFamily: 'Delicious',
     fill: '#f55',
     left: 100,
     top: 50,
     fontStyle: 'italic'
   });
-  text.path = '../../lib/fonts/Delicious.otf';
-  canvas.add(text);
 </pre>
 
 <pre class="test-source">
-  var text = new fabric.Text('hello world', { 
+  addText('hello world', {
     fontFamily: 'Delicious', fill: '#555', left: 100, top: 50, fontSize: 18, angle: 30
   });
-  text.path = '../../lib/fonts/Delicious.otf';
-  var text2 = new fabric.Text('foo bar baz', { 
+  addText('foo bar baz', {
     fontFamily: 'Delicious', fill: 'green', left: 120, top: 150, fontSize: 24, angle: -30
   });
-  text.path = '../../lib/fonts/Delicious.otf';
-  var text3 = new fabric.Text('foo bar baz', { 
+  addText('foo bar baz', {
     fontFamily: 'Delicious', fill: 'red', left: 60, top: 100, fontSize: 20, opacity: 0.5
   });
-  text.path = '../../lib/fonts/Delicious.otf';
-  canvas.add(text, text2, text3);
 </pre>
 
 <pre class="test-source">
-  var text = new fabric.Text('hello world', { 
-    fontFamily: 'DejaVu_Serif_400',
+  addText('hello world', {
+    fontFamily: 'DejaVu Serif',
     fill: '#555',
     left: 83,
     top: 50,
     fontSize: 26
   });
-  text.path = '../../lib/fonts/DejaVuSerif.ttf';
-  canvas.add(text);
 </pre>
 
 <pre class="test-source">
-  var text = new fabric.Text('this is\na multiline\ntext!', { 
-    fontFamily: 'DejaVu_Serif_400',
+  addText('this is\na multiline\ntext!', {
+    fontFamily: 'DejaVu Serif',
     fill: '#555',
     left: 83,
     top: 50,
     fontSize: 26
   });
-  text.path = '../../lib/fonts/DejaVuSerif.ttf';
-  canvas.add(text);
 </pre>
 
 <pre class="test-source">
-  var text = new fabric.Text('this is\na multiline\ntext!', { 
-    fontFamily: 'DejaVu_Serif_400',
+  addText('this is\na multiline\ntext!', {
+    fontFamily: 'DejaVu Serif',
     fill: '#f55',
     left: 100,
     top: 70,
     fontSize: 24,
     angle: 30
   });
-  text.path = '../../lib/fonts/DejaVuSerif.ttf';
-  canvas.add(text);
 </pre>
 
 <pre class="test-source">
-  var text = new fabric.Text('this is\na multiline\ntext\naligned right!', { 
-    fontFamily: 'DejaVu_Serif_400',
+  addText('this is\na multiline\ntext\naligned right!', {
+    fontFamily: 'DejaVu Serif',
     fill: '#f55',
     left: 100,
     top: 70,
     fontSize: 24,
     textAlign: 'right'
   });
-  text.path = '../../lib/fonts/DejaVuSerif.ttf';
-  canvas.add(text);
 </pre>
 
 <pre class="test-source">
-  var text = new fabric.Text('this text\nis\nmultiline\n&amp;\ncentered!', { 
-    fontFamily: 'DejaVu_Serif_400',
+  addText('this text\nis\nmultiline\n&amp;\ncentered!', {
+    fontFamily: 'DejaVu Serif',
     fill: '#f55',
     left: 150,
     top: 100,
     fontSize: 30,
     textAlign: 'center'
   });
-  text.path = '../../lib/fonts/DejaVuSerif.ttf';
-  canvas.add(text);
 </pre>
 
 <pre class="test-source">
-  var text = new fabric.Text('this is\na multiline\ntext\nwith\nbackground color!', { 
-    fontFamily: 'DejaVu_Serif_400',
+  addText('this is\na multiline\ntext\nwith\nbackground color!', {
+    fontFamily: 'DejaVu Serif',
     fill: '#333',
     left: 100,
     top: 70,
     fontSize: 17,
     backgroundColor: '#aaf'
   });
-  text.path = '../../lib/fonts/DejaVuSerif.ttf';
-  canvas.add(text);
 </pre>
 
 <pre class="test-source">
-  var text = new fabric.Text('this is\na multiline\ntext\nwith\ncustom lineheight!', { 
-    fontFamily: 'DejaVu_Serif_400',
+  addText('this is\na multiline\ntext\nwith\ncustom lineheight!', {
+    fontFamily: 'DejaVu Serif',
     fill: '#333',
     left: 100,
     top: 70,
     fontSize: 17,
     lineHeight: 5
   });
-  text.path = '../../lib/fonts/DejaVuSerif.ttf';
-  canvas.add(text);
 </pre>
 
 <pre class="test-source">
-  var text = new fabric.Text('this is\na multiline\ntext\nwith\ncustom lineheight\n&amp; background!', { 
-    fontFamily: 'DejaVu_Serif_400',
+  addText('this is\na multiline\ntext\nwith\ncustom lineheight\n&amp; background!', {
+    fontFamily: 'DejaVu Serif',
     fill: '#333',
     left: 120,
     top: 100,
@@ -203,13 +183,11 @@ title: SVG Export (text)
     backgroundColor: 'rgba(0,200,0,0.5)',
     angle: 15
   });
-  text.path = '../../lib/fonts/DejaVuSerif.ttf';
-  canvas.add(text);
 </pre>
 
 <pre class="test-source">
-  var text = new fabric.Text('this text is multiline,\ncentered,\n&amp; with background color!', { 
-    fontFamily: 'DejaVu_Serif_400',
+  addText('this text is multiline,\ncentered,\n&amp; with background color!', {
+    fontFamily: 'DejaVu Serif',
     fill: '#f55',
     left: 150,
     top: 100,
@@ -217,53 +195,45 @@ title: SVG Export (text)
     textAlign: 'center',
     backgroundColor: '#ffc'
   });
-  text.path = '../../lib/fonts/DejaVuSerif.ttf';
-  canvas.add(text);
 </pre>
 
 <pre class="test-source">
-  var text = new fabric.Text('this text is multiline,\ncentered,\nwith background color\n&amp; custom lineheight!', { 
-    fontFamily: 'DejaVu_Serif_400',
+  addText('this text is multiline,\ncentered,\nwith background color\n&amp; custom lineheight!', {
+    fontFamily: 'DejaVu Serif',
     fill: '#eee',
     left: 150,
-    top: 100,
+    top: 150,
     fontSize: 18,
     textAlign: 'center',
-    lineHeight: 5,
+    lineHeight: 3,
     backgroundColor: '#555'
   });
-  text.path = '../../lib/fonts/DejaVuSerif.ttf';
-  canvas.add(text);
 </pre>
 
 <pre class="test-source">
-  var text = new fabric.Text('text\nwith\nshadow!', { 
+  addText('text\nwith\nshadow!', {
     fontFamily: 'Delicious',
     fill: 'red',
     left: 120,
     top: 120,
     fontSize: 55,
-    textShadow: 'rgba(0,0,0,0.3) 3px 3px'
+    textShadow: 'rgba(0,0,0,0.3) 3px 3px 3px'
   });
-  text.path = '../../lib/fonts/Delicious.otf';
-  canvas.add(text);
 </pre>
 
-<pre class="test-source">
-  var text = new fabric.Text('text\nwith\nshadows!', { 
+<!--<pre class="test-source">
+  addText('text\nwith\nshadows!', {
     fontFamily: 'Delicious',
     fill: 'red',
     left: 150,
     top: 140,
     fontSize: 55,
-    textShadow: 'rgba(0,0,0,0.3) 3px 3px, rgb(255,255,255) 1px 1px'
+    textShadow: 'rgba(0,0,0,0.3) 3px 3px 3px, rgb(255,255,255) 1px 1px 1px'
   });
-  text.path = '../../lib/fonts/Delicious.otf';
-  canvas.add(text);
 </pre>
 
 <pre class="test-source">
-  var text = new fabric.Text('text\nwith\nshadows!', { 
+  addText('text\nwith\nshadows!', {
     fontFamily: 'Courier New',
     fill: '#555',
     left: 120,
@@ -271,33 +241,24 @@ title: SVG Export (text)
     fontSize: 40,
     textShadow: 'rgba(255,0,0,0.3) 5px 5px, rgba(0,255,0,0.3) 7px 7px, rgba(0,0,255,0.3) 9px 9px'
   });
-  text.path = '../../lib/fonts/CourierNew.otf';
-  canvas.add(text);
-</pre>
+</pre>-->
 
 <pre class="test-source">
-  var path = '../../lib/fonts/CourierNew.ttf';
-  var text1 = new fabric.Text('Brisket turducken', { 
+  addText('Brisket turducken', {
     fontFamily: 'Courier New', fill: '#333', left: 150, top: 70, fontSize: 16,
   });
-  text1.path = path;
-  var text2 = new fabric.Text('filet mignon chuck', { 
+  addText('filet mignon chuck', {
     fontFamily: 'Courier New', fill: '#555', left: 150, top: 100, fontSize: 16,
   });
-  text2.path = path;
-  var text3 = new fabric.Text('Salami pork chop', { 
+  addText('Salami pork chop', {
     fontFamily: 'Courier New', fill: '#777', left: 150, top: 130, fontSize: 16,
   });
-  text3.path = path;
-  var text4 = new fabric.Text('bacon filet mignon', { 
+  addText('bacon filet mignon', {
     fontFamily: 'Courier New', fill: '#999', left: 150, top: 160, fontSize: 16,
   });
-  text4.path = path;
-  var text5 = new fabric.Text('kielbasa ribeye shoulder ', { 
+  addText('kielbasa ribeye shoulder ', {
     fontFamily: 'Courier New', fill: '#bbb', left: 150, top: 190, fontSize: 16,
   });
-  text5.path = path;
-  canvas.add(text1, text2, text3, text4, text5);
 </pre>
 
 <pre class="test-source">
@@ -307,46 +268,40 @@ title: SVG Export (text)
   for (var i = 10; i < 300; i += 10) {
     canvas.add(new fabric.Line([0, i, 300, i], { stroke: '#aaa', fill: '#aaa' }));
   }
-  
-  var text = new fabric.Text('abcdefg\nhijklmn\nopqrstu\nvwxyz', { 
+
+  addText('abcdefg\nhijklmn\nopqrstu\nvwxyz', {
     fontFamily: 'Delicious',
     fill: '#555',
     left: 120,
     top: 145,
     fontSize: 60
   });
-  text.path = '../../lib/fonts/Delicious.otf';
-  canvas.add(text);
 </pre>
 
 <pre class="test-source">
-  var text = new fabric.Text('text\nwith\nrgba() values!', { 
+  addText('text\nwith\nrgba() values!', {
     fontFamily: 'Delicious',
     fill: 'rgba(255,0,0,0.8)',
     backgroundColor: 'rgba(0,0,0,0.85)',
     left: 140,
     top: 120,
     fontSize: 40,
-    textShadow: 'rgba(255,255,255,0.9) 2px 2px'
+    textShadow: 'rgba(255,255,255,0.9) 2px 2px 2px'
   });
-  text.path = '../../lib/fonts/Delicious.otf';
-  canvas.add(text);
 </pre>
 
 <pre class="test-source">
-  var text = new fabric.Text('text\n\nwith\n\ndouble\n\nnewlines!', { 
+  addText('text\n\nwith\n\ndouble\n\nnewlines!', {
     fontFamily: 'Delicious',
     fill: 'green',
     left: 100,
     top: 140,
     fontSize: 30
   });
-  text.path = '../../lib/fonts/Delicious.otf';
-  canvas.add(text);
 </pre>
 
 <pre class="test-source">
-  var text = new fabric.Text('scaled text', { 
+  addText('scaled text', {
     fontFamily: 'Delicious',
     fill: 'purple',
     left: 150,
@@ -355,8 +310,6 @@ title: SVG Export (text)
     scaleX: 2,
     scaleY: 2
   });
-  text.path = '../../lib/fonts/Delicious.otf';
-  canvas.add(text);
-</pre>
+</pre>-->
 
 <script src="master.js"></script>

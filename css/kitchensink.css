@@ -6,11 +6,14 @@
 #rasterize { margin-top: 10px; color: green; }
 #complexity { clear: both; padding-top: 10px; }
 #controls { margin-bottom: 5px; }
-#text-controls { clear: both; margin-top: 20px; overflow: hidden; }
+
+#text-controls { display: inline-block; vertical-align: top; margin-left: 10px; border: 1px dotted #ccc; padding: 10px; }
 #text-controls textarea { float: left; margin-right: 10px; }
-#text-controls button { vertical-align: top; display: block; margin-bottom: 7px; }
 #text-controls label { display: block; }
-#text-control-buttons { float: left; }
+
+#text-controls-additional { display: inline-block; vertical-align: top; border: 1px dotted #ccc; padding: 10px; }
+#text-controls-additional button { vertical-align: top; display: block; margin-bottom: 7px; }
+
 #drawing-mode-options { margin-top: 5px; background: #ffc; padding: 5px; border: 1px solid #aaa; }
 #text { position: relative; width: 350px; height: 200px; }
 #text-cmd-linethrough { text-decoration: line-through; }

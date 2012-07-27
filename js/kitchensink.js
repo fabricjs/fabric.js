@@ -400,13 +400,14 @@
 
   document.getElementById('add-text').onclick = function() {
     var textSample = new fabric.Text(text.slice(0, getRandomInt(0, text.length)), {
-      left: getRandomInt(300, 550),
-      top: getRandomInt(500, 550),
-      fontFamily: 'delicious',
+      left: getRandomInt(350, 400),
+      top: getRandomInt(350, 400),
+      fontFamily: 'helvetica',
       angle: getRandomInt(-10, 10),
       fill: '#' + getRandomColor(),
       scaleX: 0.5,
-      scaleY: 0.5
+      scaleY: 0.5,
+      fontWeight: ''
     });
     canvas.add(textSample);
     updateComplexity();
@@ -521,6 +522,20 @@
     };
   }
 
+  var cmdBoldBtn = document.getElementById('text-cmd-bold');
+  if (cmdBoldBtn) {
+    activeObjectButtons.push(cmdBoldBtn);
+    cmdBoldBtn.disabled = true;
+    cmdBoldBtn.onclick = function() {
+      var activeObject = canvas.getActiveObject();
+      if (activeObject && activeObject.type === 'text') {
+        activeObject.fontWeight = (activeObject.fontWeight == 'bold' ? '' : 'bold');
+        this.className = activeObject.fontWeight ? 'selected' : '';
+        canvas.renderAll();
+      }
+    };
+  }
+
   var cmdItalicBtn = document.getElementById('text-cmd-italic');
   if (cmdItalicBtn) {
     activeObjectButtons.push(cmdItalicBtn);
@@ -543,7 +558,7 @@
       var activeObject = canvas.getActiveObject();
       if (activeObject && activeObject.type === 'text') {
         activeObject.textShadow = !activeObject.textShadow ? 'rgba(0,0,0,0.2) 2px 2px 10px' : '';
-        this.className = activeObject.fontStyle ? 'selected' : '';
+        this.className = activeObject.textShadow ? 'selected' : '';
         canvas.renderAll();
       }
     };
@@ -562,6 +577,19 @@
     };
   }
 
+  var fontFamilySwitch = document.getElementById('font-family');
+  if (fontFamilySwitch) {
+    activeObjectButtons.push(fontFamilySwitch);
+    fontFamilySwitch.disabled = true;
+    fontFamilySwitch.onchange = function() {
+      var activeObject = canvas.getActiveObject();
+      if (activeObject && activeObject.type === 'text') {
+        activeObject.fontFamily = this.value;
+        canvas.renderAll();
+      }
+    };
+  }
+
   var bgColorField = document.getElementById('text-bg-color');
   if (bgColorField) {
     bgColorField.onchange = function() {
@@ -573,14 +601,25 @@
     };
   }
 
+  var strokeColorField = document.getElementById('text-stroke-color');
+  if (strokeColorField) {
+    strokeColorField.onchange = function() {
+      var activeObject = canvas.getActiveObject();
+      if (activeObject && activeObject.type === 'text') {
+        activeObject.strokeStyle = this.value;
+        canvas.renderAll();
+      }
+    };
+  }
+
   if (supportsSlider) {
     (function(){
-      var container = document.getElementById('text-control-buttons');
+      var container = document.getElementById('text-controls');
       var slider = document.createElement('input');
       var label = document.createElement('label');
       label.innerHTML = 'Line height: ';
       try { slider.type = 'range'; } catch(err) { }
-      slider.min = -2;
+      slider.min = 0;
       slider.max = 10;
       slider.step = 0.1;
       slider.value = 1.5;
@@ -610,7 +649,9 @@
     });
   };
 
-  Cufon.fonts.delicious.offsetLeft = 75;
-  Cufon.fonts.delicious.offsetTop = 25;
+  if (typeof Cufon !== 'undefined') {
+    Cufon.fonts.delicious.offsetLeft = 75;
+    Cufon.fonts.delicious.offsetTop = 25;
+  }
 
 })(this);

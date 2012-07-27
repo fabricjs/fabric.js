@@ -4,30 +4,53 @@ title: Kitchensink
 ---
 
 <script src="../lib/fonts/Delicious.font.js"></script>
-<script src="../lib/stats.js"></script>
+<!-- <script src="../lib/stats.js"></script> -->
 
 <link rel="stylesheet" href="../css/kitchensink.css">
+<link href='http://fonts.googleapis.com/css?family=Plaster' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Engagement' rel='stylesheet' type='text/css'>
 
 <div id="controls"></div>
 <div style="position:relative;width:804px;float:left;" id="canvas-wrapper">
   <canvas id="canvas" width="800" height="700"></canvas>
   <div id="complexity">Canvas complexity (number of paths):<strong></strong></div>
+
+  <textarea id="text"></textarea>
   <div id="text-controls">
-    <textarea id="text"></textarea>
-    <div id="text-control-buttons">
-      <button type="button" id="text-cmd-italic">Italic</button>
-      <button type="button" id="text-cmd-underline">Underline</button>
-      <button type="button" id="text-cmd-linethrough">Linethrough</button>
-      <button type="button" id="text-cmd-overline">Overline</button>
-      <button type="button" id="text-cmd-shadow">Shadow</button>
-      <label for="text-align" style="display:inline-block">Text align:</label>
-      <select id="text-align">
-        <option>Left</option>
-        <option>Center</option>
-        <option>Right</option>
-      </select>
-      <label>Bg color: <input type="color" value="" id="text-bg-color" size="10"></label>
-    </div>
+    <label for="font-family" style="display:inline-block">Font family:</label>
+    <select id="font-family">
+      <option>Arial</option>
+      <option selected>Helvetica</option>
+      <option>Myriad Pro</option>
+      <option>Delicious</option>
+      <option>Verdana</option>
+      <option>Georgia</option>
+      <option>Courier</option>
+      <option>Comic Sans MS</option>
+      <option>Impact</option>
+      <option>Monaco</option>
+      <option>Optima</option>
+      <option>Hoefler Text</option>
+      <option>Plaster</option>
+      <option>Engagement</option>
+    </select>
+    <br>
+    <label for="text-align" style="display:inline-block">Text align:</label>
+    <select id="text-align">
+      <option>Left</option>
+      <option>Center</option>
+      <option>Right</option>
+    </select>
+    <label>Background color: <input type="color" value="" id="text-bg-color" size="10"></label>
+    <label>Stroke color: <input type="color" value="" id="text-stroke-color"></label>
+  </div>
+  <div id="text-controls-additional">
+    <button type="button" id="text-cmd-bold">Bold</button>
+    <button type="button" id="text-cmd-italic">Italic</button>
+    <button type="button" id="text-cmd-underline">Underline</button>
+    <button type="button" id="text-cmd-linethrough">Linethrough</button>
+    <button type="button" id="text-cmd-overline">Overline</button>
+    <button type="button" id="text-cmd-shadow">Shadow</button>
   </div>
 </div>
 
@@ -40,7 +63,7 @@ title: Kitchensink
       <button class="triangle">Triangle</button>
     </li>
   </ul>
-  
+
   <p>Add <strong>images</strong> to canvas:</p>
   <ul>
     <li style="margin-top:10px">
@@ -48,7 +71,7 @@ title: Kitchensink
       <button class="image2">Image 2</button>
     </li>
   </ul>
-  
+
   <p>Add <strong>SVG shapes</strong> to canvas:</p>
   <ul class="svg-shapes">
     <!-- <li><button class="shape" id="shape28"><strong>5378</strong> paths</button></li>
@@ -69,7 +92,7 @@ title: Kitchensink
     <li><button class="shape" id="shape85"><strong>xxx</strong> paths</button></li>
     <li><button class="shape" id="shape86"><strong>xxx</strong> paths</button></li>
     <li><button class="shape" id="shape87"><strong>xxx</strong> paths</button></li> -->
-    
+
     <li><button class="shape" id="shape25"><strong>36</strong> paths</button></li>
     <li><button class="shape" id="shape36"><strong>41</strong> paths</button></li>
     <li><button class="shape" id="shape58"><strong>54</strong> paths</button></li>
@@ -147,9 +170,9 @@ title: Kitchensink
     <li><button class="shape" id="shape44"><strong>22375</strong> paths</button></li>
     <li><button class="shape" id="shape72"><strong>29303</strong> paths</button></li>
     <li><button class="shape" id="shape48"><strong>41787</strong> paths</button></li>
-    
+
     <br><br>
-    
+
     <li><button class="shape" id="shape118"><strong>1173</strong> paths</button></li>
     <li><button class="shape" id="shape119"><strong>600</strong> paths</button></li>
     <li><button class="shape" id="shape120"><strong>395</strong> paths</button></li>
@@ -177,27 +200,29 @@ title: Kitchensink
     <li><button class="shape" id="shape144"><strong>308</strong> paths</button></li>
     <li><button class="shape" id="shape146"><strong>160</strong> paths</button></li>
     <li><button class="shape" id="shape147"><strong>841</strong> paths</button></li>
-    
-    <!-- 
+
+    <li><button class="shape" id="shape150"><strong>xxx</strong> paths</button></li>
+
+    <!--
       <line>s are rendered incorrectly
       <li><button class="shape" id="shape145"><strong>xxx</strong> paths</button></li> -->
-    
-    <!-- 
+
+    <!--
       some elements are positioned incorrectly
       <li><button class="shape" id="shape137"><strong>xxx</strong> paths</button></li> -->
-    
-    <!-- 
+
+    <!--
       wrong position of ellipses
       <li><button class="shape" id="shape127"><strong>xxx</strong> paths</button></li> -->
-    
-    <!-- 
+
+    <!--
       bezier curve doesn't seem to be rendered correctly
       <li><button class="shape" id="shape117"><strong>xxx</strong> paths</button></li> -->
-    
+
     <!-- <li><button class="shape" id="shape111"><strong>18229</strong> paths</button></li> -->
-    
+
     <br><br>
-    
+
     <li><button class="shape" id="shape54">Image</button></li>
     <li><button class="shape" id="shape74">Gradient 1</button></li>
     <li><button class="shape" id="shape66">Gradient 2</button></li>
@@ -208,19 +233,19 @@ title: Kitchensink
     <li><button class="shape" id="shape105">Arc(s) 2</button></li>
     <li><button class="shape" id="shape106">Arc(s) 3</button></li>
     <li><button class="shape" id="shape107">Arc(s) 4</button></li>
-    
+
     <li><button class="shape" id="shape103">Transformed paths</button></li>
   </ul>
-  
+
   <ul class="object-controls">
     <li>
       <button id="rasterize">Rasterize canvas to image</button>
       <button class="clear">Clear canvas</button>
       <button id="add-text">Add text</button>
     </li>
-    
+
     <li style="margin-top:10px;"><button id="remove-selected">Remove selected object/group</button></li>
-  
+
     <li style="margin-top:10px;">
       <button id="lock-horizontally">Lock horizontal movement</button>
       <button id="lock-vertically">Lock vertical movement</button>
@@ -228,11 +253,11 @@ title: Kitchensink
       <button id="lock-scaling-y">Lock vertical scaling</button>
       <button id="lock-rotation">Lock rotation</button>
     </li>
-    
+
     <li style="margin-top:10px;">
       <button id="gradientify">Gradientify</button>
     </li>
-  
+
     <li style="margin-top:10px;">
       <button id="drawing-mode">Enter drawing mode</button>
       <div style="display:none;" id="drawing-mode-options">
@@ -242,9 +267,9 @@ title: Kitchensink
         <input type="color" value="rgb(0,0,0)" id="drawing-color" size="15">
       </div>
     </li>
-    
+
     <li style="margin-top:10px">
-      
+
 <label for="svg-console">Load SVG:</label>
 
 <textarea rows="15" cols="55" id="svg-console">
@@ -261,7 +286,7 @@ style="fill:rgb(0,0,255);stroke-width:1;stroke:rgb(0,0,0)"/>
 </textarea>
       <button type="button" id="load-svg">Load</button>
     </li>
-    
+
     <li style="margin-top:10px;">
       <label for="canvas-console">Execute code:</label>
 <textarea rows="15" cols="55" id="canvas-console">
@@ -273,20 +298,20 @@ canvas.clear();
 canvas.remove(canvas.getActiveObject());
 
 // add red rectangle
-canvas.add(new fabric.Rect({ 
-width: 50, 
-height: 50, 
-left: 50, 
-top: 50, 
-fill: 'rgb(255,0,0)' 
+canvas.add(new fabric.Rect({
+width: 50,
+height: 50,
+left: 50,
+top: 50,
+fill: 'rgb(255,0,0)'
 }));
 
 // add green, half-transparent circle
-canvas.add(new fabric.Circle({ 
-radius: 40, 
-left: 50, 
-top: 50, 
-fill: 'rgb(0,255,0)', 
+canvas.add(new fabric.Circle({
+radius: 40,
+left: 50,
+top: 50,
+fill: 'rgb(0,255,0)',
 opacity: 0.5
 }));
 
