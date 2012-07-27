@@ -12446,8 +12446,20 @@ fabric.Image.filters.GradientTransparency.fromObject = function(object) {
       this.text = text;
       this.setOptions(options);
       this.theta = this.angle * Math.PI / 180;
-      this.width = this.getWidth();
+      this._initDimensions();
       this.setCoords();
+    },
+
+    _initDimensions: function() {
+
+      // render on offscreen canvas, so that object would get dimensions
+      var canvasEl = fabric.document.createElement('canvas');
+
+      if (!canvasEl.getContext && typeof G_vmlCanvasManager != 'undefined') {
+        G_vmlCanvasManager.initElement(canvasEl);
+      }
+
+      this._render(canvasEl.getContext('2d'));
     },
 
     /**

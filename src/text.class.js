@@ -121,8 +121,23 @@
       this.text = text;
       this.setOptions(options);
       this.theta = this.angle * Math.PI / 180;
-      this.width = this.getWidth();
+      this._initDimensions();
       this.setCoords();
+    },
+
+    /**
+     * Renders text object on offscreen canvas, so that it would get dimensions
+     * @private
+     * @method _initDimensions
+     */
+    _initDimensions: function() {
+      var canvasEl = fabric.document.createElement('canvas');
+
+      if (!canvasEl.getContext && typeof G_vmlCanvasManager != 'undefined') {
+        G_vmlCanvasManager.initElement(canvasEl);
+      }
+
+      this._render(canvasEl.getContext('2d'));
     },
 
     /**
