@@ -1,0 +1,39 @@
+---
+layout: benchmark
+title: Text performance
+---
+
+<style>
+  h3 { margin: 0; padding: 0; }
+</style>
+
+<script src="../lib/fonts/Delicious.font.js"></script>
+
+<p>Below is a text with 3463 characters. Try dragging/resizing it, to see how responsive it is.</p>
+<label>Use native: <input type="checkbox" id="use-native" checked></label>
+<canvas id="c" width="800" height="800" style="border:1px solid #ccc"></canvas>
+
+<script>
+  (function() {
+
+    var text = 'Lorem ipsum dolor sit amet,consectetur adipisicing elit, sed do eiusmod tempor incididuntut labore et dolore magna aliqua.\nUt enim ad minim veniam,quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.\n\nLorem ipsum dolor sit amet,consectetur adipisicing elit, sed do eiusmod tempor incididuntut labore et dolore magna aliqua.\nUt enim ad minim veniam,quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.\n\nLorem ipsum dolor sit amet,consectetur adipisicing elit, sed do eiusmod tempor incididuntut labore et dolore magna aliqua.\nUt enim ad minim veniam,quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.\n\nLorem ipsum dolor sit amet,consectetur adipisicing elit, sed do eiusmod tempor incididuntut labore et dolore magna aliqua.\nUt enim ad minim veniam,quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.\n\nLorem ipsum dolor sit amet,consectetur adipisicing elit, sed do eiusmod tempor incididuntut labore et dolore magna aliqua.\nUt enim ad minim veniam,quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.\n\nLorem ipsum dolor sit amet,consectetur adipisicing elit, sed do eiusmod tempor incididuntut labore et dolore magna aliqua.\nUt enim ad minim veniam,quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.\n\nLorem ipsum dolor sit amet,consectetur adipisicing elit, sed do eiusmod tempor incididuntut labore et dolore magna aliqua.\nUt enim ad minim veniam,quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.\n\nLorem ipsum dolor sit amet,consectetur adipisicing elit, sed do eiusmod tempor incididuntut labore et dolore magna aliqua.\nUt enim ad minim veniam,quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.\n\nLorem ipsum dolor sit amet,consectetur adipisicing elit, sed do eiusmod tempor incididuntut labore et dolore magna aliqua.\nUt enim ad minim veniam,quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.\n\nLorem ipsum dolor sit amet,consectetur adipisicing elit, sed do eiusmod tempor incididuntut labore et dolore magna aliqua.\nUt enim ad minim veniam,quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.\n\nLorem ipsum dolor sit amet,consectetur adipisicing elit, sed do eiusmod tempor incididuntut labore et dolore magna aliqua.\nUt enim ad minim veniam,quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.\n\nLorem ipsum dolor sit amet,consectetur adipisicing elit, sed do eiusmod tempor incididuntut labore et dolore magna aliqua.\nUt enim ad minim veniam,quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.\n\nLorem ipsum dolor sit amet,consectetur adipisicing elit, sed do eiusmod tempor incididuntut labore et dolore magna aliqua.\nUt enim ad minim veniam,quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.\n\nLorem ipsum dolor sit amet,consectetur adipisicing elit, sed do eiusmod tempor incididuntut labore et dolore magna aliqua.\nUt enim ad minim veniam,quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.\n\nLorem ipsum dolor sit amet,consectetur adipisicing elit, sed do eiusmod tempor incididuntut labore et dolore magna aliqua.\nUt enim ad minim veniam,quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.';
+
+    var canvas = new fabric.Canvas('c');
+    canvas.add(new fabric.Text(text, {
+      left: 400,
+      top: 400,
+      angle: -5,
+      fontFamily: 'delicious',
+      scaleX: 0.4,
+      scaleY: 0.4
+    }));
+
+    console.log(canvas.item(0).text.length);
+
+    document.getElementById('use-native').onclick = function() {
+      canvas.item(0).useNative = this.checked;
+      canvas.renderAll();
+    };
+
+  })();
+</script>
