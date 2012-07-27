@@ -3,10 +3,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="300" height="300" xml:space="preserve">
   <desc>Created with Fabric.js 0.7.10</desc>
   <defs>
-    <style type="text/css"><![CDATA[@font-face {font-family: DejaVu_Serif_400; src: url('DejaVuSerif.ttf')}]]></style>
+    <style type="text/css"><![CDATA[@font-face {font-family: DejaVu Serif; src: url('DejaVuSerif.ttf')}]]></style>
   </defs>
   <g transform="translate(83 50)">
-    <text font-family="'DejaVu_Serif_400'" font-size="26" font-weight="100" style="stroke: none; stroke-width: 1; fill: #555; opacity: 1;" transform="translate(-76.5 -13)">
+    <text font-family="'DejaVu Serif'" font-size="26" font-weight="100" style="stroke: none; stroke-width: 1; fill: #555; opacity: 1;" transform="translate(-76.5 -13)">
       <tspan x="0" y="26.915720930232556">hello world</tspan>
     </text>
   </g>
