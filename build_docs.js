@@ -5,6 +5,6 @@ var command = 'java -jar lib/jsdoc-toolkit/jsrun.jar \
                          -t=lib/jsdoc-toolkit/templates/jsdoc \
                          -d=site/docs HEADER.js src/ src/util/';
 
-exec(command, function (error, output) { 
-  console.log(output)
+exec(command, function (error, output) {
+  console.log(output);
 });
