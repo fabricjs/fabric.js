@@ -344,7 +344,7 @@
         // "rgb(0, 100, 0) 0 0 5px"
         // "red 2px 2px 1px"
         // "#f55 123 345 567"
-        var reOffsetsAndBlur = /\s*(-?\d+)(?:px)?\s+(-?\d+)(?:px)?\s+(\d+)(?:px)?\s*/;
+        var reOffsetsAndBlur = /\s+(-?\d+)(?:px)?\s+(-?\d+)(?:px)?\s+(\d+)(?:px)?\s*/;
 
         var shadowDeclaration = this.textShadow;
         var offsetsAndBlur = reOffsetsAndBlur.exec(this.textShadow);
