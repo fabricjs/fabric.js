@@ -24,7 +24,7 @@
   };
 
   function getPathElement(path) {
-    var el = document.createElement('path');
+    var el = fabric.document.createElement('path');
     el.setAttribute('d', path);
     el.setAttribute('fill', 'rgb(255,0,0)');
     el.setAttribute('stroke', 'blue');
@@ -45,7 +45,7 @@
     return new fabric.PathGroup(getPathObjects());
   }
 
-  module('fabric.PathGroup');
+  QUnit.module('fabric.PathGroup');
 
   test('constructor', function() {
     ok(fabric.PathGroup);
@@ -55,7 +55,7 @@
     ok(pathGroup instanceof fabric.Object);
     //this.assertHasMixin(Enumerable, pathGroup);
 
-    equals(pathGroup.get('type'), 'path-group');
+    equal(pathGroup.get('type'), 'path-group');
   });
 
   test('getObjects', function() {
@@ -67,7 +67,7 @@
     paths[0].group = null;
     paths[1].group = null;
 
-    same(paths, pathGroup.getObjects());
+    deepEqual(paths, pathGroup.getObjects());
   });
 
   test('toObject', function() {
@@ -93,7 +93,7 @@
       return total;
     }, 0);
 
-    equals(pathGroup.complexity(), objectsTotalComplexity);
+    equal(pathGroup.complexity(), objectsTotalComplexity);
   });
 
   test('toDatalessObject', function() {
@@ -105,23 +105,23 @@
       'paths': 'http://example.com/',
       'sourcePath': 'http://example.com/'
     });
-    same(expectedObject, pathGroup.toDatalessObject());
+    deepEqual(expectedObject, pathGroup.toDatalessObject());
   });
 
   test('toString', function() {
     var pathGroup = getPathGroupObject();
     ok(typeof pathGroup.toString == 'function');
-    equals(pathGroup.toString(), '#<fabric.PathGroup (8): { top: 0, left: 0 }>');
+    equal(pathGroup.toString(), '#<fabric.PathGroup (8): { top: 0, left: 0 }>');
   });
 
   test('isSameColor', function() {
     var pathGroup = getPathGroupObject();
 
     ok(typeof pathGroup.isSameColor == 'function');
-    equals(pathGroup.isSameColor(), true);
+    equal(pathGroup.isSameColor(), true);
 
     pathGroup.getObjects()[0].set('fill', 'black');
-    equals(pathGroup.isSameColor(), false);
+    equal(pathGroup.isSameColor(), false);
   });
 
   test('set', function() {
@@ -132,26 +132,26 @@
     pathGroup.getObjects()[1].group = null;
 
     ok(typeof pathGroup.set == 'function');
-    equals(pathGroup.set('fill', fillValue), pathGroup, 'should be chainable');
+    equal(pathGroup.set('fill', fillValue), pathGroup, 'should be chainable');
 
     pathGroup.getObjects().forEach(function(path) {
-      equals(path.get('fill'), fillValue);
+      equal(path.get('fill'), fillValue);
     }, this);
 
-    equals(pathGroup.get('fill'), fillValue);
+    equal(pathGroup.get('fill'), fillValue);
 
     // set different color to one of the paths
     pathGroup.getObjects()[1].set('fill', 'black');
     pathGroup.set('fill', 'rgb(255,255,255)');
 
-    equals(pathGroup.getObjects()[0].get('fill'), 'rgb(100,200,100)',
+    equal(pathGroup.getObjects()[0].get('fill'), 'rgb(100,200,100)',
       'when paths are of different fill, setting fill of a group should not change them');
 
     pathGroup.getObjects()[1].set('fill', 'red');
 
     pathGroup.set('left', 1234);
     ok(pathGroup.getObjects()[0].get('left') !== 1234);
-    equals(pathGroup.get('left'), 1234);
+    equal(pathGroup.get('left'), 1234);
   });
 
   test('grayscale', function() {
@@ -162,7 +162,7 @@
     pathGroup.getObjects()[1].group = null;
 
     ok(typeof pathGroup.toGrayscale == 'function');
-    equals(pathGroup.toGrayscale(), pathGroup, 'should be chainable');
+    equal(pathGroup.toGrayscale(), pathGroup, 'should be chainable');
     var firstObject = pathGroup.getObjects()[0],
         secondObject = pathGroup.getObjects()[1];
 
@@ -174,10 +174,10 @@
 
     pathGroup.toGrayscale();
 
-    equals(firstObject.get('overlayFill'), 'rgb(60,60,60)');
-    equals(secondObject.get('overlayFill'), 'rgb(28,28,28)');
+    equal(firstObject.get('overlayFill'), 'rgb(60,60,60)');
+    equal(secondObject.get('overlayFill'), 'rgb(28,28,28)');
 
-    equals(firstObject.get('fill'), 'rgb(200,0,0)', 'toGrayscale should not change original fill value');
-    equals(new fabric.Color(secondObject.get('fill')).toRgb(), 'rgb(0,0,255)', 'toGrayscale should not change original fill value');
+    equal(firstObject.get('fill'), 'rgb(200,0,0)', 'toGrayscale should not change original fill value');
+    equal(new fabric.Color(secondObject.get('fill')).toRgb(), 'rgb(0,0,255)', 'toGrayscale should not change original fill value');
   });
 })();

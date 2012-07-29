@@ -1,6 +1,6 @@
 (function() {
 
-  module('fabric.Circle');
+  QUnit.module('fabric.Circle');
 
   test('constructor', function(){
     ok(fabric.Circle);
@@ -10,7 +10,7 @@
     ok(circle instanceof fabric.Circle, 'should inherit from fabric.Circle');
     ok(circle instanceof fabric.Object, 'should inherit from fabric.Object');
 
-    same(circle.type, 'circle');
+    deepEqual(circle.type, 'circle');
   });
 
   test('getRadiusX, getRadiusY', function() {
@@ -19,23 +19,23 @@
     ok(typeof circle.getRadiusX == 'function', 'getRadiusX should exist');
     ok(typeof circle.getRadiusY == 'function', 'getRadiusY should exist');
 
-    equals(circle.getRadiusX(), 10);
-    equals(circle.getRadiusY(), 10);
+    equal(circle.getRadiusX(), 10);
+    equal(circle.getRadiusY(), 10);
 
     circle.scale(2);
 
-    equals(circle.getRadiusX(), 20);
-    equals(circle.getRadiusY(), 20);
+    equal(circle.getRadiusX(), 20);
+    equal(circle.getRadiusY(), 20);
 
     circle.set('scaleX', 3);
 
-    equals(circle.getRadiusX(), 30);
-    equals(circle.getRadiusY(), 20);
+    equal(circle.getRadiusX(), 30);
+    equal(circle.getRadiusY(), 20);
 
     circle.set('scaleY', 4);
 
-    equals(circle.getRadiusX(), 30);
-    equals(circle.getRadiusY(), 40);
+    equal(circle.getRadiusX(), 30);
+    equal(circle.getRadiusY(), 40);
   });
 
   test('setRadius', function() {
@@ -54,7 +54,7 @@
   test('complexity', function() {
     var circle = new fabric.Circle();
     ok(typeof circle.complexity == 'function');
-    equals(circle.complexity(), 1);
+    equal(circle.complexity(), 1);
   });
 
   test('toObject', function() {
@@ -82,7 +82,7 @@
       'radius': 0
     };
     ok(typeof circle.toObject == 'function');
-    same(circle.toObject(), defaultProperties);
+    deepEqual(circle.toObject(), defaultProperties);
 
     circle.set('left', 100).set('top', 200).set('radius', 15);
 
@@ -92,13 +92,13 @@
       radius: 15
     });
 
-    same(circle.toObject(), augmentedProperties);
+    deepEqual(circle.toObject(), augmentedProperties);
   });
 
   test('fromElement', function() {
     ok(typeof fabric.Circle.fromElement == 'function');
 
-    var elCircle      = document.createElement('circle'),
+    var elCircle      = fabric.document.createElement('circle'),
         radius        = 10,
         left          = 12,
         top           = 15,
@@ -117,14 +117,14 @@
     var oCircle = fabric.Circle.fromElement(elCircle);
     ok(oCircle instanceof fabric.Circle);
 
-    equals(oCircle.get('radius'), radius);
-    equals(oCircle.get('left'), left);
-    equals(oCircle.get('top'), top);
-    equals(oCircle.get('fill'), fill);
-    equals(oCircle.get('opacity'), fillOpacity);
-    equals(oCircle.get('strokeWidth'), strokeWidth);
+    equal(oCircle.get('radius'), radius);
+    equal(oCircle.get('left'), left);
+    equal(oCircle.get('top'), top);
+    equal(oCircle.get('fill'), fill);
+    equal(oCircle.get('opacity'), fillOpacity);
+    equal(oCircle.get('strokeWidth'), strokeWidth);
 
-    elFaultyCircle = document.createElement('circle');
+    elFaultyCircle = fabric.document.createElement('circle');
     elFaultyCircle.setAttribute('r', '-10');
 
     var error;
@@ -163,15 +163,15 @@
 
     ok(circle instanceof fabric.Circle);
 
-    equals(circle.get('left'), left);
-    equals(circle.get('top'), top);
-    equals(circle.get('radius'), radius);
-    equals(circle.get('fill'), fill);
+    equal(circle.get('left'), left);
+    equal(circle.get('top'), top);
+    equal(circle.get('radius'), radius);
+    equal(circle.get('fill'), fill);
 
     var expected = circle.toObject();
     var actual = fabric.Circle.fromObject(expected).toObject();
 
-    same(expected, actual);
+    deepEqual(expected, actual);
   });
 
   test('cloning and radius, width, height', function() {

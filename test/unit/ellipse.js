@@ -1,6 +1,6 @@
 (function(){
 
-  module('fabric.Ellipse');
+  QUnit.module('fabric.Ellipse');
 
   test('constructor', function() {
     ok(fabric.Ellipse);
@@ -10,13 +10,13 @@
     ok(ellipse instanceof fabric.Ellipse, 'should inherit from fabric.Ellipse');
     ok(ellipse instanceof fabric.Object, 'should inherit from fabric.Object');
 
-    equals(ellipse.type, 'ellipse');
+    equal(ellipse.type, 'ellipse');
   });
 
   test('complexity', function() {
     var ellipse = new fabric.Ellipse();
     ok(typeof ellipse.complexity == 'function');
-    equals(ellipse.complexity(), 1);
+    equal(ellipse.complexity(), 1);
   });
 
   test('toObject', function() {
@@ -45,7 +45,7 @@
       'hasRotatingPoint': false
     };
     ok(typeof ellipse.toObject == 'function');
-    same(defaultProperties, ellipse.toObject());
+    deepEqual(defaultProperties, ellipse.toObject());
 
     ellipse.set('left', 100).set('top', 200).set('rx', 15).set('ry', 25);
 
@@ -56,7 +56,7 @@
       ry: 25
     });
 
-    same(augmentedProperties, ellipse.toObject());
+    deepEqual(augmentedProperties, ellipse.toObject());
   });
 
   test('render', function() {
@@ -70,13 +70,13 @@
     }
     ellipse.render({});
 
-    equals(wasRenderCalled, false, 'should not render when rx/ry are 0');
+    equal(wasRenderCalled, false, 'should not render when rx/ry are 0');
   });
 
   test('fromElement', function() {
     ok(typeof fabric.Ellipse.fromElement == 'function');
 
-    var elEllipse     = document.createElement('ellipse'),
+    var elEllipse     = fabric.document.createElement('ellipse'),
         rx            = 5,
         ry            = 7,
         left          = 12,
@@ -96,13 +96,13 @@
     var oEllipse = fabric.Ellipse.fromElement(elEllipse);
     ok(oEllipse instanceof fabric.Ellipse);
 
-    equals(oEllipse.get('rx'), rx);
-    equals(oEllipse.get('ry'), ry);
-    equals(oEllipse.get('left'), left);
-    equals(oEllipse.get('top'), top);
-    equals(oEllipse.get('fill'), fill);
-    equals(oEllipse.get('opacity'), fillOpacity);
-    equals(oEllipse.get('strokeWidth'), strokeWidth);
+    equal(oEllipse.get('rx'), rx);
+    equal(oEllipse.get('ry'), ry);
+    equal(oEllipse.get('left'), left);
+    equal(oEllipse.get('top'), top);
+    equal(oEllipse.get('fill'), fill);
+    equal(oEllipse.get('opacity'), fillOpacity);
+    equal(oEllipse.get('strokeWidth'), strokeWidth);
   });
 
   test('fromObject', function() {
@@ -119,15 +119,15 @@
     });
     ok(ellipse instanceof fabric.Ellipse);
 
-    equals(ellipse.get('left'), left);
-    equals(ellipse.get('top'), top);
-    equals(ellipse.get('rx'), rx);
-    equals(ellipse.get('ry'), ry);
-    equals(ellipse.get('fill'), fill);
+    equal(ellipse.get('left'), left);
+    equal(ellipse.get('top'), top);
+    equal(ellipse.get('rx'), rx);
+    equal(ellipse.get('ry'), ry);
+    equal(ellipse.get('fill'), fill);
 
     var expected = ellipse.toObject();
     var actual = fabric.Ellipse.fromObject(expected).toObject();
 
-    same(expected, actual);
+    deepEqual(expected, actual);
   });
 })();

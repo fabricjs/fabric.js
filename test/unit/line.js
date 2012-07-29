@@ -26,7 +26,7 @@
     'hasRotatingPoint': false
   };
 
-  module('fabric.Line');
+  QUnit.module('fabric.Line');
 
   test('constructor', function() {
     ok(fabric.Line);
@@ -35,19 +35,19 @@
     ok(line instanceof fabric.Line);
     ok(line instanceof fabric.Object);
 
-    equals(line.type, 'line');
+    equal(line.type, 'line');
 
-    equals(line.get('x1'), 10);
-    equals(line.get('y1'), 11);
-    equals(line.get('x2'), 20);
-    equals(line.get('y2'), 21);
+    equal(line.get('x1'), 10);
+    equal(line.get('y1'), 11);
+    equal(line.get('x2'), 20);
+    equal(line.get('y2'), 21);
 
     var lineWithoutPoints = new fabric.Line();
 
-    equals(lineWithoutPoints.get('x1'), 0);
-    equals(lineWithoutPoints.get('y1'), 0);
-    equals(lineWithoutPoints.get('x2'), 0);
-    equals(lineWithoutPoints.get('y2'), 0);
+    equal(lineWithoutPoints.get('x1'), 0);
+    equal(lineWithoutPoints.get('y1'), 0);
+    equal(lineWithoutPoints.get('x2'), 0);
+    equal(lineWithoutPoints.get('y2'), 0);
   });
 
   test('complexity', function() {
@@ -58,20 +58,20 @@
   test('toObject', function() {
     var line = new fabric.Line([11, 12, 13, 14]);
     ok(typeof line.toObject == 'function');
-    same(LINE_OBJECT, line.toObject());
+    deepEqual(LINE_OBJECT, line.toObject());
   });
 
   test('fromObject', function() {
     ok(typeof fabric.Line.fromObject == 'function');
     var line = fabric.Line.fromObject(LINE_OBJECT);
     ok(line instanceof fabric.Line);
-    same(LINE_OBJECT, line.toObject());
+    deepEqual(LINE_OBJECT, line.toObject());
   });
 
   test('fromElement', function() {
     ok(typeof fabric.Line.fromElement == 'function');
 
-    var lineEl        = document.createElement('line'),
+    var lineEl        = fabric.document.createElement('line'),
         x1            = 11,
         y1            = 23,
         x2            = 34,
@@ -89,44 +89,44 @@
     var oLine = fabric.Line.fromElement(lineEl);
     ok(oLine instanceof fabric.Line);
 
-    equals(oLine.get('x1'), x1);
-    equals(oLine.get('y1'), y1);
-    equals(oLine.get('x2'), x2);
-    equals(oLine.get('y2'), y2);
-    equals(oLine.get('stroke'), stroke);
-    equals(oLine.get('strokeWidth'), strokeWidth);
+    equal(oLine.get('x1'), x1);
+    equal(oLine.get('y1'), y1);
+    equal(oLine.get('x2'), x2);
+    equal(oLine.get('y2'), y2);
+    equal(oLine.get('stroke'), stroke);
+    equal(oLine.get('strokeWidth'), strokeWidth);
 
-    var lineElWithMissingAttributes = document.createElement('line');
+    var lineElWithMissingAttributes = fabric.document.createElement('line');
     lineElWithMissingAttributes.setAttribute('x1', 10);
     lineElWithMissingAttributes.setAttribute('y1', 20);
 
     oLine = fabric.Line.fromElement(lineElWithMissingAttributes);
 
-    equals(oLine.get('x2'), 0, 'missing attributes count as 0 values');
-    equals(oLine.get('y2'), 0, 'missing attributes count as 0 values');
+    equal(oLine.get('x2'), 0, 'missing attributes count as 0 values');
+    equal(oLine.get('y2'), 0, 'missing attributes count as 0 values');
   });
 
   test('straight lines should be displayed', function() {
     var line1 = new fabric.Line([10,10,100,10]),
         line2 = new fabric.Line([10,10,10,100]);
 
-    equals(line1.get('height'), 1);
-    equals(line2.get('width'), 1);
+    equal(line1.get('height'), 1);
+    equal(line2.get('width'), 1);
   });
 
   test('changing x/y coords should update width/height', function() {
     var line = new fabric.Line([ 50, 50, 100, 100]);
 
-    equals(50, line.width);
+    equal(50, line.width);
 
     line.set({ x1: 75, y1: 75, x2: 175, y2: 175 });
 
-    equals(100, line.width);
-    equals(100, line.height);
+    equal(100, line.width);
+    equal(100, line.height);
   });
 
   test('stroke-width in a style', function() {
-    var lineEl = document.createElement('line'),
+    var lineEl = fabric.document.createElement('line'),
         x1 = 0,
         y1 = 0,
         x2 = 10,
@@ -143,8 +143,8 @@
   // test('x1,y1 less than x2,y2 should work', function() {
   //   var line = new fabric.Line([ 400, 200, 300, 400]);
 
-  //   equals(100, line.width);
-  //   equals(200, line.height);
+  //   equal(100, line.width);
+  //   equal(200, line.height);
   // });
 
 })();

@@ -29,17 +29,21 @@
                   '"hasControls":true,"hasBorders":true,"hasRotatingPoint":false,"rx":0,"ry":0}],'+
                   '"background":"#ff5555"}';
 
-  var canvas = this.canvas = new fabric.StaticCanvas('static-canvas');
+  // force creation of static canvas
+  // TODO: fix this
+  var Canvas = fabric.Canvas;
+  fabric.Canvas = null;
+  var canvas = this.canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.StaticCanvas();
+  fabric.Canvas = Canvas;
 
-  var canvasEl = document.getElementById('static-canvas');
-  var canvasContext = canvasEl.getContext('2d');
+  var lowerCanvasEl = canvas.lowerCanvasEl;
 
   function makeRect(options) {
     var defaultOptions = { width: 10, height: 10 };
     return new fabric.Rect(fabric.util.object.extend(defaultOptions, options || { }));
   }
 
-  module('fabric.StaticCanvas', {
+  QUnit.module('fabric.StaticCanvas', {
     teardown: function() {
       canvas.clear();
       canvas.backgroundColor = fabric.StaticCanvas.prototype.backgroundColor;
@@ -49,18 +53,18 @@
 
   test('initialProperties', function() {
     ok('backgroundColor' in canvas);
-    equals(canvas.includeDefaultValues, true);
+    equal(canvas.includeDefaultValues, true);
   });
 
   test('getObjects', function() {
     ok(typeof canvas.getObjects == 'function', 'should respond to `getObjects` method');
-    same([], canvas.getObjects(), 'should return empty array for `getObjects` when empty');
-    equals(canvas.getObjects().length, 0, 'should have a 0 length when empty');
+    deepEqual([], canvas.getObjects(), 'should return empty array for `getObjects` when empty');
+    equal(canvas.getObjects().length, 0, 'should have a 0 length when empty');
   });
 
   test('getElement', function() {
     ok(typeof canvas.getElement == 'function', 'should respond to `getElement` method');
-    equals(canvas.getElement(), canvasEl, 'should return a proper element');
+    equal(canvas.getElement(), lowerCanvasEl, 'should return a proper element');
   });
 
   test('item', function() {
@@ -68,12 +72,12 @@
 
     ok(typeof canvas.item == 'function', 'should respond to item');
     canvas.add(rect);
-    equals(canvas.item(0), rect, 'should return proper item');
+    equal(canvas.item(0), rect, 'should return proper item');
   });
 
   test('calcOffset', function() {
     ok(typeof canvas.calcOffset == 'function', 'should respond to `calcOffset`');
-    equals(canvas, canvas.calcOffset());
+    equal(canvas, canvas.calcOffset());
   });
 
   test('add', function() {
@@ -81,10 +85,10 @@
 
     ok(typeof canvas.add == 'function');
     ok(canvas === canvas.add(rect), 'should be chainable');
-    equals(canvas.item(0), rect);
+    equal(canvas.item(0), rect);
 
     canvas.add(makeRect(), makeRect(), makeRect());
-    equals(canvas.getObjects().length, 4, 'should support multiple arguments');
+    equal(canvas.getObjects().length, 4, 'should support multiple arguments');
   });
 
   test('insertAt', function() {
@@ -97,40 +101,32 @@
 
     var rect = makeRect();
     canvas.insertAt(rect, 1);
-    equals(canvas.item(1), rect);
+    equal(canvas.item(1), rect);
     canvas.insertAt(rect, 2);
-    equals(canvas.item(2), rect);
-    equals(canvas, canvas.insertAt(rect, 2), 'should be chainable');
+    equal(canvas.item(2), rect);
+    equal(canvas, canvas.insertAt(rect, 2), 'should be chainable');
   });
 
   test('clearContext', function() {
     ok(typeof canvas.clearContext == 'function');
-    equals(canvas, canvas.clearContext(canvas.contextContainer), 'chainable');
+    equal(canvas, canvas.clearContext(canvas.contextContainer), 'chainable');
   });
 
   test('clear', function() {
     ok(typeof canvas.clear == 'function');
 
-    equals(canvas, canvas.clear());
-    equals(canvas.getObjects().length, 0);
-
-    canvas.add(makeRect({ left: 100, top: 100, fill: '#ff5555' }));
-
-    if (fabric.Canvas.supports('getImageData')) {
-      //ok(!assertSameColor(canvas._oContextContainer), 'a red rectangle should be rendered on canvas');
-      canvas.clear();
-      //ok(assertSameColor(canvas._oContextContainer), 'color should be the same throughout canvas after clearing');
-    }
+    equal(canvas, canvas.clear());
+    equal(canvas.getObjects().length, 0);
   });
 
   test('renderAll', function() {
     ok(typeof canvas.renderAll == 'function');
-    equals(canvas, canvas.renderAll());
+    equal(canvas, canvas.renderAll());
   });
 
   test('renderTop', function() {
     ok(typeof canvas.renderTop == 'function');
-    equals(canvas, canvas.renderTop());
+    equal(canvas, canvas.renderTop());
   });
 
   test('toDataURL', function() {
@@ -142,8 +138,8 @@
       var dataURL = canvas.toDataURL('png');
       // don't compare actual data url, as it is often browser-dependent
       // this.assertIdentical(emptyImageCanvasData, canvas.toDataURL('png'));
-      equals(typeof dataURL, 'string');
-      equals(dataURL.substring(0, 21), 'data:image/png;base64');
+      equal(typeof dataURL, 'string');
+      equal(dataURL.substring(0, 21), 'data:image/png;base64');
     }
   });
 
@@ -151,41 +147,51 @@
     ok(typeof canvas.centerObjectH == 'function');
     var rect = makeRect({ left: 102, top: 202 });
     canvas.add(rect);
-    equals(canvas.centerObjectH(rect), canvas, 'should be chainable');
-    equals(rect.get('left'), canvasEl.width / 2, 'object\'s "left" property should correspond to canvas element\'s center');
+    equal(canvas.centerObjectH(rect), canvas, 'should be chainable');
+    equal(rect.get('left'), lowerCanvasEl.width / 2, 'object\'s "left" property should correspond to canvas element\'s center');
   });
 
   test('centerObjectV', function() {
     ok(typeof canvas.centerObjectV == 'function');
     var rect = makeRect({ left: 102, top: 202 });
     canvas.add(rect);
-    equals(canvas.centerObjectV(rect), canvas, 'should be chainable');
-    equals(rect.get('top'), canvasEl.height / 2, 'object\'s "top" property should correspond to canvas element\'s center');
+    equal(canvas.centerObjectV(rect), canvas, 'should be chainable');
+    equal(rect.get('top'), lowerCanvasEl.height / 2, 'object\'s "top" property should correspond to canvas element\'s center');
+  });
+
+  test('centerObject', function() {
+    ok(typeof canvas.centerObject == 'function');
+    var rect = makeRect({ left: 102, top: 202 });
+    canvas.add(rect);
+    equal(canvas.centerObject(rect), canvas, 'should be chainable');
+
+    equal(rect.get('top'), lowerCanvasEl.height / 2, 'object\'s "top" property should correspond to canvas element\'s center');
+    equal(rect.get('left'), lowerCanvasEl.height / 2, 'object\'s "left" property should correspond to canvas element\'s center');
   });
 
   test('straightenObject', function() {
     ok(typeof canvas.straightenObject == 'function');
     var rect = makeRect({ angle: 10 })
     canvas.add(rect);
-    equals(canvas.straightenObject(rect), canvas, 'should be chainable');
-    equals(rect.getAngle(), 0, 'angle should be coerced to 0 (from 10)');
+    equal(canvas.straightenObject(rect), canvas, 'should be chainable');
+    equal(rect.getAngle(), 0, 'angle should be coerced to 0 (from 10)');
 
     rect.setAngle('60');
     canvas.straightenObject(rect);
-    equals(rect.getAngle(), 90, 'angle should be coerced to 90 (from 60)');
+    equal(rect.getAngle(), 90, 'angle should be coerced to 90 (from 60)');
 
     rect.setAngle('100');
     canvas.straightenObject(rect);
-    equals(rect.getAngle(), 90, 'angle should be coerced to 90 (from 100)');
+    equal(rect.getAngle(), 90, 'angle should be coerced to 90 (from 100)');
   });
 
   test('toJSON', function() {
     ok(typeof canvas.toJSON == 'function');
-    equals(JSON.stringify(canvas.toJSON()), '{"objects":[],"background":"rgba(0, 0, 0, 0)"}');
+    equal(JSON.stringify(canvas.toJSON()), '{"objects":[],"background":"rgba(0, 0, 0, 0)"}');
     canvas.backgroundColor = '#ff5555';
-    equals(JSON.stringify(canvas.toJSON()), '{"objects":[],"background":"#ff5555"}', '`background` value should be reflected in json');
+    equal(JSON.stringify(canvas.toJSON()), '{"objects":[],"background":"#ff5555"}', '`background` value should be reflected in json');
     canvas.add(makeRect());
-    same(JSON.stringify(canvas.toJSON()), RECT_JSON);
+    deepEqual(JSON.stringify(canvas.toJSON()), RECT_JSON);
   });
 
   test('toDatalessJSON', function() {
@@ -193,7 +199,7 @@
       sourcePath: 'http://example.com/'
     });
     canvas.add(path);
-    equals(JSON.stringify(canvas.toDatalessJSON()), PATH_DATALESS_JSON);
+    equal(JSON.stringify(canvas.toDatalessJSON()), PATH_DATALESS_JSON);
   });
 
   test('toObject', function() {
@@ -202,12 +208,12 @@
       background: canvas.backgroundColor,
       objects: canvas.getObjects()
     };
-    same(expectedObject, canvas.toObject());
+    deepEqual(expectedObject, canvas.toObject());
 
     var rect = makeRect();
     canvas.add(rect);
 
-    equals(canvas.toObject().objects[0].type, rect.type);
+    equal(canvas.toObject().objects[0].type, rect.type);
   });
 
   test('toDatalessObject', function() {
@@ -216,12 +222,12 @@
       background: canvas.backgroundColor,
       objects: canvas.getObjects()
     };
-    same(expectedObject, canvas.toDatalessObject());
+    deepEqual(expectedObject, canvas.toDatalessObject());
 
     var rect = makeRect();
     canvas.add(rect);
 
-    equals(canvas.toObject().objects[0].type, rect.type);
+    equal(canvas.toObject().objects[0].type, rect.type);
     // TODO (kangax): need to test this method with fabric.Path to ensure that path is not populated
   });
 
@@ -239,22 +245,22 @@
       var obj = canvas.item(0);
 
       ok(!canvas.isEmpty(), 'canvas is not empty');
-      equals(obj.type, 'path', 'first object is a path object');
-      equals(canvas.backgroundColor, '#ff5555', 'backgroundColor is populated properly');
+      equal(obj.type, 'path', 'first object is a path object');
+      equal(canvas.backgroundColor, '#ff5555', 'backgroundColor is populated properly');
 
-      equals(obj.get('left'), 268);
-      equals(obj.get('top'), 266);
-      equals(obj.get('width'), 51);
-      equals(obj.get('height'), 49);
-      equals(obj.get('fill'), 'rgb(0,0,0)');
-      equals(obj.get('stroke'), null);
-      equals(obj.get('strokeWidth'), 1);
-      equals(obj.get('scaleX'), 1);
-      equals(obj.get('scaleY'), 1);
-      equals(obj.get('angle'), 0);
-      equals(obj.get('flipX'), false);
-      equals(obj.get('flipY'), false);
-      equals(obj.get('opacity'), 1);
+      equal(obj.get('left'), 268);
+      equal(obj.get('top'), 266);
+      equal(obj.get('width'), 51);
+      equal(obj.get('height'), 49);
+      equal(obj.get('fill'), 'rgb(0,0,0)');
+      equal(obj.get('stroke'), null);
+      equal(obj.get('strokeWidth'), 1);
+      equal(obj.get('scaleX'), 1);
+      equal(obj.get('scaleY'), 1);
+      equal(obj.get('angle'), 0);
+      equal(obj.get('flipX'), false);
+      equal(obj.get('flipY'), false);
+      equal(obj.get('opacity'), 1);
       ok(obj.get('path').length > 0);
     });
   });
@@ -264,8 +270,8 @@
     var rect1 = makeRect(),
         rect2 = makeRect();
     canvas.add(rect1, rect2);
-    equals(canvas.remove(rect1), rect1, 'should return removed object');
-    equals(canvas.item(0), rect2, 'only second object should be left');
+    equal(canvas.remove(rect1), rect1, 'should return removed object');
+    equal(canvas.item(0), rect2, 'only second object should be left');
   });
 
   test('sendToBack', function() {
@@ -278,13 +284,13 @@
     canvas.add(rect1, rect2, rect3);
 
     canvas.sendToBack(rect3);
-    equals(canvas.item(0), rect3, 'third should now be the first one');
+    equal(canvas.item(0), rect3, 'third should now be the first one');
 
     canvas.sendToBack(rect2);
-    equals(canvas.item(0), rect2, 'second should now be the first one');
+    equal(canvas.item(0), rect2, 'second should now be the first one');
 
     canvas.sendToBack(rect2);
-    equals(canvas.item(0), rect2, 'second should *still* be the first one');
+    equal(canvas.item(0), rect2, 'second should *still* be the first one');
   });
 
   test('bringToFront', function() {
@@ -297,13 +303,13 @@
     canvas.add(rect1, rect2, rect3);
 
     canvas.bringToFront(rect1);
-    equals(canvas.item(2), rect1, 'first should now be the last one');
+    equal(canvas.item(2), rect1, 'first should now be the last one');
 
     canvas.bringToFront(rect2);
-    equals(canvas.item(2), rect2, 'second should now be the last one');
+    equal(canvas.item(2), rect2, 'second should now be the last one');
 
     canvas.bringToFront(rect2);
-    equals(canvas.item(2), rect2, 'second should *still* be the last one');
+    equal(canvas.item(2), rect2, 'second should *still* be the last one');
   });
 
   test('sendBackwards', function() {
@@ -316,42 +322,42 @@
     canvas.add(rect1, rect2, rect3);
 
     // [ 1, 2, 3 ]
-    equals(canvas.item(0), rect1);
-    equals(canvas.item(1), rect2);
-    equals(canvas.item(2), rect3);
+    equal(canvas.item(0), rect1);
+    equal(canvas.item(1), rect2);
+    equal(canvas.item(2), rect3);
 
     canvas.sendBackwards(rect3);
 
     // moved 3 one level back — [1, 3, 2]
-    equals(canvas.item(0), rect1);
-    equals(canvas.item(2), rect2);
-    equals(canvas.item(1), rect3);
+    equal(canvas.item(0), rect1);
+    equal(canvas.item(2), rect2);
+    equal(canvas.item(1), rect3);
 
     canvas.sendBackwards(rect3);
 
     // moved 3 one level back — [3, 1, 2]
-    equals(canvas.item(1), rect1);
-    equals(canvas.item(2), rect2);
-    equals(canvas.item(0), rect3);
+    equal(canvas.item(1), rect1);
+    equal(canvas.item(2), rect2);
+    equal(canvas.item(0), rect3);
 
     canvas.sendBackwards(rect3);
 
-    // 3 stays at the same position — [2, 3, 1]
-    equals(canvas.item(1), rect1);
-    equals(canvas.item(2), rect2);
-    equals(canvas.item(0), rect3);
+    // 3 stays at the deepEqual position — [2, 3, 1]
+    equal(canvas.item(1), rect1);
+    equal(canvas.item(2), rect2);
+    equal(canvas.item(0), rect3);
 
     canvas.sendBackwards(rect2);
 
-    equals(canvas.item(2), rect1);
-    equals(canvas.item(1), rect2);
-    equals(canvas.item(0), rect3);
+    equal(canvas.item(2), rect1);
+    equal(canvas.item(1), rect2);
+    equal(canvas.item(0), rect3);
 
     canvas.sendBackwards(rect2);
 
-    equals(canvas.item(2), rect1);
-    equals(canvas.item(0), rect2);
-    equals(canvas.item(1), rect3);
+    equal(canvas.item(2), rect1);
+    equal(canvas.item(0), rect2);
+    equal(canvas.item(1), rect3);
   });
 
   test('bringForward', function() {
@@ -364,37 +370,37 @@
     canvas.add(rect1, rect2, rect3);
 
     // initial position — [ 1, 2, 3 ]
-    equals(canvas.item(0), rect1);
-    equals(canvas.item(1), rect2);
-    equals(canvas.item(2), rect3);
+    equal(canvas.item(0), rect1);
+    equal(canvas.item(1), rect2);
+    equal(canvas.item(2), rect3);
 
     canvas.bringForward(rect1);
 
     // 1 moves one way up — [ 2, 1, 3 ]
-    equals(canvas.item(1), rect1);
-    equals(canvas.item(0), rect2);
-    equals(canvas.item(2), rect3);
+    equal(canvas.item(1), rect1);
+    equal(canvas.item(0), rect2);
+    equal(canvas.item(2), rect3);
 
     canvas.bringForward(rect1);
 
     // 1 moves one way up again — [ 2, 3, 1 ]
-    equals(canvas.item(2), rect1);
-    equals(canvas.item(0), rect2);
-    equals(canvas.item(1), rect3);
+    equal(canvas.item(2), rect1);
+    equal(canvas.item(0), rect2);
+    equal(canvas.item(1), rect3);
 
     canvas.bringForward(rect1);
 
     // 1 is already all the way on top and so doesn't change position — [ 2, 3, 1 ]
-    equals(canvas.item(2), rect1);
-    equals(canvas.item(0), rect2);
-    equals(canvas.item(1), rect3);
+    equal(canvas.item(2), rect1);
+    equal(canvas.item(0), rect2);
+    equal(canvas.item(1), rect3);
 
     canvas.bringForward(rect3);
 
     // 1 is already all the way on top and so doesn't change position — [ 2, 1, 3 ]
-    equals(canvas.item(1), rect1);
-    equals(canvas.item(0), rect2);
-    equals(canvas.item(2), rect3);
+    equal(canvas.item(1), rect1);
+    equal(canvas.item(0), rect2);
+    equal(canvas.item(2), rect3);
   });
 
   test('item', function() {
@@ -405,39 +411,39 @@
 
     canvas.add(rect1, rect2);
 
-    equals(canvas.item(0), rect1);
-    equals(canvas.item(1), rect2);
+    equal(canvas.item(0), rect1);
+    equal(canvas.item(1), rect2);
 
     canvas.remove(canvas.item(0));
 
-    equals(canvas.item(0), rect2);
+    equal(canvas.item(0), rect2);
   });
 
   test('complexity', function() {
     ok(typeof canvas.complexity == 'function');
-    equals(canvas.complexity(), 0);
+    equal(canvas.complexity(), 0);
 
     canvas.add(makeRect());
-    equals(canvas.complexity(), 1);
+    equal(canvas.complexity(), 1);
 
     canvas.add(makeRect(), makeRect());
-    equals(canvas.complexity(), 3);
+    equal(canvas.complexity(), 3);
   });
 
   test('toString', function() {
     ok(typeof canvas.toString == 'function');
 
-    equals(canvas.toString(), '#<fabric.Canvas (0): { objects: 0 }>');
+    equal(canvas.toString(), '#<fabric.Canvas (0): { objects: 0 }>');
 
     canvas.add(makeRect());
-    equals(canvas.toString(), '#<fabric.Canvas (1): { objects: 1 }>');
+    equal(canvas.toString(), '#<fabric.Canvas (1): { objects: 1 }>');
   });
 
   test('dispose', function() {
     ok(typeof canvas.dispose == 'function');
     canvas.add(makeRect(), makeRect(), makeRect());
     canvas.dispose();
-    equals(canvas.getObjects().length, 0, 'dispose should clear canvas');
+    equal(canvas.getObjects().length, 0, 'dispose should clear canvas');
   });
 
   test('clone', function() {
@@ -445,19 +451,19 @@
     // TODO (kangax): test clone
   });
 
-  test('getSetWidth', function() {
-    ok(typeof canvas.getWidth == 'function');
-    equals(canvas.getWidth(), 500);
-    equals(canvas.setWidth(444), canvas, 'chainable');
-    equals(canvas.getWidth(), 444);
-  });
+  // test('getSetWidth', function() {
+  //   ok(typeof canvas.getWidth == 'function');
+  //   equal(canvas.getWidth(), 500);
+  //   equal(canvas.setWidth(444), canvas, 'chainable');
+  //   equal(canvas.getWidth(), 444);
+  // });
 
-  test('getSetHeight', function() {
-    ok(typeof canvas.getHeight == 'function');
-    equals(canvas.getHeight(), 500);
-    equals(canvas.setHeight(765), canvas, 'chainable');
-    equals(canvas.getHeight(), 765);
-  });
+  // test('getSetHeight', function() {
+  //   ok(typeof canvas.getHeight == 'function');
+  //   equal(canvas.getHeight(), 500);
+  //   equal(canvas.setHeight(765), canvas, 'chainable');
+  //   equal(canvas.getHeight(), 765);
+  // });
 
   test('toGrayscale', function() {
     ok(typeof fabric.Canvas.toGrayscale == 'function');
@@ -467,7 +473,7 @@
       return;
     }
 
-    var canvasEl = document.createElement('canvas'),
+    var canvasEl = fabric.isLikelyNode ? new (require('canvas')) : fabric.document.createElement('canvas'),
         context = canvasEl.getContext('2d');
 
     canvasEl.width = canvasEl.height = 10;
@@ -479,7 +485,7 @@
         data = imageData.data,
         firstPixelData = [data[0], data[1], data[2], data[3]];
 
-    same([255, 0, 0, 255], firstPixelData);
+    deepEqual([255, 0, 0, 255], firstPixelData);
 
     fabric.Canvas.toGrayscale(canvasEl);
 
@@ -487,27 +493,27 @@
     data = imageData.data;
     firstPixelData = [data[0], data[1], data[2], data[3]];
 
-    same([85, 85, 85, 255], firstPixelData);
+    deepEqual([85, 85, 85, 255], firstPixelData);
   });
 
-  asyncTest('resizeImageToFit', function() {
-    ok(typeof canvas._resizeImageToFit == 'function');
+  // asyncTest('resizeImageToFit', function() {
+  //   ok(typeof canvas._resizeImageToFit == 'function');
 
-    var imgEl = fabric.util.makeElement('img', { src: '../fixtures/very_large_image.jpg' }),
-        ORIGINAL_WIDTH = 3888,
-        ORIGINAL_HEIGHT = 2592;
+  //   var imgEl = fabric.util.makeElement('img', { src: '../fixtures/very_large_image.jpg' }),
+  //       ORIGINAL_WIDTH = 3888,
+  //       ORIGINAL_HEIGHT = 2592;
 
-    setTimeout(function() {
-      equals(imgEl.width, ORIGINAL_WIDTH);
-      equals(imgEl.height, ORIGINAL_HEIGHT);
+  //   setTimeout(function() {
+  //     equal(imgEl.width, ORIGINAL_WIDTH);
+  //     equal(imgEl.height, ORIGINAL_HEIGHT);
 
-      canvas._resizeImageToFit(imgEl);
+  //     canvas._resizeImageToFit(imgEl);
 
-      ok(imgEl.width < ORIGINAL_WIDTH);
+  //     ok(imgEl.width < ORIGINAL_WIDTH);
 
-      start();
-    }, 2000);
-  });
+  //     start();
+  //   }, 2000);
+  // });
 
   asyncTest('fxRemove', function() {
     ok(typeof canvas.fxRemove == 'function');
@@ -524,7 +530,7 @@
     ok(canvas.fxRemove(rect, { onComplete: onComplete }) === canvas, 'should be chainable');
 
     setTimeout(function() {
-      equals(canvas.item(0), undefined);
+      equal(canvas.item(0), undefined);
       ok(callbackFired);
       start();
     }, 1000);
@@ -548,31 +554,31 @@
 
   });
 
-  asyncTest('backgroundImage', function() {
-    same('', canvas.backgroundImage);
-    canvas.setBackgroundImage('../../assets/pug.jpg');
+  // asyncTest('backgroundImage', function() {
+  //   deepEqual('', canvas.backgroundImage);
+  //   canvas.setBackgroundImage('../../assets/pug.jpg');
 
-    setTimeout(function() {
+  //   setTimeout(function() {
 
-      ok(typeof canvas.backgroundImage == 'object');
-      ok(/pug\.jpg$/.test(canvas.backgroundImage.src));
+  //     ok(typeof canvas.backgroundImage == 'object');
+  //     ok(/pug\.jpg$/.test(canvas.backgroundImage.src));
 
-      start();
-    }, 1000);
-  });
+  //     start();
+  //   }, 1000);
+  // });
 
-  asyncTest('setOverlayImage', function() {
-    same(canvas.overlayImage, undefined);
-    canvas.setOverlayImage('../../assets/pug.jpg');
+  // asyncTest('setOverlayImage', function() {
+  //   deepEqual(canvas.overlayImage, undefined);
+  //   canvas.setOverlayImage('../../assets/pug.jpg');
 
-    setTimeout(function() {
+  //   setTimeout(function() {
 
-      ok(typeof canvas.overlayImage == 'object');
-      ok(/pug\.jpg$/.test(canvas.overlayImage.src));
+  //     ok(typeof canvas.overlayImage == 'object');
+  //     ok(/pug\.jpg$/.test(canvas.overlayImage.src));
 
-      start();
-    }, 1000);
-  });
+  //     start();
+  //   }, 1000);
+  // });
 
   test('object:added', function() {
 
@@ -584,20 +590,20 @@
     var rect = new fabric.Rect({ width: 10, height: 20 });
     canvas.add(rect);
 
-    same(objectsAdded[0], rect);
+    deepEqual(objectsAdded[0], rect);
 
     var circle1 = new fabric.Circle(),
         circle2 = new fabric.Circle();
 
     canvas.add(circle1, circle2);
 
-    same(objectsAdded[1], circle1);
-    same(objectsAdded[2], circle2);
+    deepEqual(objectsAdded[1], circle1);
+    deepEqual(objectsAdded[2], circle2);
 
     var circle3 = new fabric.Circle();
     canvas.insertAt(circle3, 2);
 
-    same(objectsAdded[3], circle3);
+    deepEqual(objectsAdded[3], circle3);
   });
 
   asyncTest('loadFromJSON with text', function() {
@@ -614,4 +620,5 @@
       start();
     });
   });
+
 })();

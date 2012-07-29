@@ -24,7 +24,7 @@
     'ry': 0
   };
 
-  module('fabric.Rect');
+  QUnit.module('fabric.Rect');
 
   test('constructor', function(){
     ok(fabric.Rect);
@@ -34,7 +34,7 @@
     ok(rect instanceof fabric.Rect);
     ok(rect instanceof fabric.Object);
 
-    same(rect.get('type'), 'rect');
+    deepEqual(rect.get('type'), 'rect');
   });
 
   test('complexity', function() {
@@ -48,7 +48,7 @@
     ok(typeof rect.toObject == 'function');
 
     var object = rect.toObject();
-    same(object, REFERENCE_RECT);
+    deepEqual(object, REFERENCE_RECT);
   });
 
   test('fabric.Rect.fromObject', function() {
@@ -56,19 +56,19 @@
 
     var rect = fabric.Rect.fromObject(REFERENCE_RECT);
     ok(rect instanceof fabric.Rect);
-    same(rect.toObject(), REFERENCE_RECT);
+    deepEqual(rect.toObject(), REFERENCE_RECT);
   });
 
   test('fabric.Rect.fromElement', function() {
     ok(typeof fabric.Rect.fromElement == 'function');
 
-    var elRect = document.createElement('rect');
+    var elRect = fabric.document.createElement('rect');
     var rect = fabric.Rect.fromElement(elRect);
 
     ok(rect instanceof fabric.Rect);
-    same(rect.toObject(), REFERENCE_RECT);
+    deepEqual(rect.toObject(), REFERENCE_RECT);
 
-    var elRectWithAttrs = document.createElement('rect');
+    var elRectWithAttrs = fabric.document.createElement('rect');
     elRectWithAttrs.setAttribute('x', 10);
     elRectWithAttrs.setAttribute('y', 20);
     elRectWithAttrs.setAttribute('width', 222);
@@ -96,7 +96,7 @@
       rx: 11,
       ry: 12
     });
-    same(rectWithAttrs.toObject(), expectedObject);
+    deepEqual(rectWithAttrs.toObject(), expectedObject);
 
     ok(fabric.Rect.fromElement() === null);
   });

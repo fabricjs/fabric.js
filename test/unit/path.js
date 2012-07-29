@@ -24,7 +24,7 @@
   };
 
   function getPathElement(path) {
-    var el = document.createElement('path');
+    var el = fabric.document.createElement('path');
     el.setAttribute('d', path);
     el.setAttribute('fill', 'red');
     el.setAttribute('stroke', 'blue');
@@ -40,7 +40,7 @@
     return getPathObject("M 100 100 L 300 100 L 200 300 z");
   }
 
-  module('fabric.Path');
+  QUnit.module('fabric.Path');
 
   test('constructor', function() {
     ok(fabric.Path);
@@ -49,7 +49,7 @@
     ok(path instanceof fabric.Path);
     ok(path instanceof fabric.Object);
 
-    equals(path.get('type'), 'path');
+    equal(path.get('type'), 'path');
 
     var error;
     try {
@@ -65,23 +65,23 @@
   test('toString', function() {
     var path = makePathObject();
     ok(typeof path.toString == 'function');
-    equals('#<fabric.Path (4): { "top": 100, "left": 100 }>', path.toString());
+    equal('#<fabric.Path (4): { "top": 100, "left": 100 }>', path.toString());
   });
 
   test('toObject', function() {
     var path = makePathObject();
     ok(typeof path.toObject == 'function');
-    same(REFERENCE_PATH_OBJECT, path.toObject());
+    deepEqual(REFERENCE_PATH_OBJECT, path.toObject());
   });
 
   test('toDatalessObject', function() {
     var path = makePathObject();
     ok(typeof path.toDatalessObject == 'function');
-    same(REFERENCE_PATH_OBJECT, path.toDatalessObject());
+    deepEqual(REFERENCE_PATH_OBJECT, path.toDatalessObject());
 
     var src = 'http://example.com/';
     path.setSourcePath(src);
-    same(fabric.util.object.extend(fabric.util.object.clone(REFERENCE_PATH_OBJECT), {
+    deepEqual(fabric.util.object.extend(fabric.util.object.clone(REFERENCE_PATH_OBJECT), {
       path: src
     }), path.toDatalessObject());
   });
@@ -95,12 +95,12 @@
     ok(typeof fabric.Path.fromObject == 'function');
     var path = fabric.Path.fromObject(REFERENCE_PATH_OBJECT);
     ok(path instanceof fabric.Path);
-    same(REFERENCE_PATH_OBJECT, path.toObject());
+    deepEqual(REFERENCE_PATH_OBJECT, path.toObject());
   });
 
   test('fromElement', function() {
     ok(typeof fabric.Path.fromElement == 'function');
-    var elPath = document.createElement('path');
+    var elPath = fabric.document.createElement('path');
 
     elPath.setAttribute('d', 'M 100 100 L 300 100 L 200 300 z');
     elPath.setAttribute('fill', 'red');
@@ -115,7 +115,7 @@
     var path = fabric.Path.fromElement(elPath);
     ok(path instanceof fabric.Path);
 
-    same(fabric.util.object.extend(REFERENCE_PATH_OBJECT, {
+    deepEqual(fabric.util.object.extend(REFERENCE_PATH_OBJECT, {
       transformMatrix: [2, 0, 0, 2, 0, 0]
     }), path.toObject());
 
@@ -124,7 +124,7 @@
     elPath.setAttribute('transform', 'rotate(' + ANGLE + ')');
     path = fabric.Path.fromElement(elPath);
 
-    same(
+    deepEqual(
       [ Math.cos(ANGLE), Math.sin(ANGLE), -Math.sin(ANGLE), Math.cos(ANGLE), 0, 0 ],
       path.get('transformMatrix')
     );
@@ -134,15 +134,15 @@
     var el = getPathElement('M100 100 l 200 200 300 300 400 -50 z');
     var obj = fabric.Path.fromElement(el);
 
-    same(['M', 100, 100], obj.path[0]);
-    same(['l', 200, 200], obj.path[1]);
-    same(['l', 300, 300], obj.path[2]);
-    same(['l', 400, -50], obj.path[3]);
+    deepEqual(['M', 100, 100], obj.path[0]);
+    deepEqual(['l', 200, 200], obj.path[1]);
+    deepEqual(['l', 300, 300], obj.path[2]);
+    deepEqual(['l', 400, -50], obj.path[3]);
 
     el = getPathElement('c 0,-53.25604 43.17254,-96.42858 96.42857,-96.42857 53.25603,0 96.42857,43.17254 96.42857,96.42857');
     obj = fabric.Path.fromElement(el);
 
-    same(['c', 0, -53.25604, 43.17254, -96.42858, 96.42857, -96.42857], obj.path[0]);
-    same(['c', 53.25603, 0, 96.42857, 43.17254, 96.42857, 96.42857], obj.path[1]);
+    deepEqual(['c', 0, -53.25604, 43.17254, -96.42858, 96.42857, -96.42857], obj.path[0]);
+    deepEqual(['c', 53.25603, 0, 96.42857, 43.17254, 96.42857, 96.42857], obj.path[1]);
   });
 })();

@@ -1,4 +1,4 @@
-module('fabric.Observable');
+QUnit.module('fabric.Observable');
 
 test('fabric.Observable exists', function() {
   ok(fabric.Observable);
@@ -17,7 +17,7 @@ test('fire + observe', function() {
   });
 
   foo.fire('bar:baz');
-  equals(true, eventFired);
+  equal(true, eventFired);
 });
 
 test('stopObserving', function() {
@@ -32,7 +32,7 @@ test('stopObserving', function() {
   foo.stopObserving('bar:baz', handler);
 
   foo.fire('bar:baz');
-  equals(false, eventFired);
+  equal(false, eventFired);
 });
 
 test('observe multiple handlers', function() {
@@ -59,9 +59,9 @@ test('observe multiple handlers', function() {
   foo.fire('blah:blah');
   foo.fire('moo');
 
-  equals(true, barBazFired);
-  equals(true, blahBlahFired);
-  equals(true, mooFired);
+  equal(true, barBazFired);
+  equal(true, blahBlahFired);
+  equal(true, mooFired);
 });
 
 test('event options', function() {
@@ -75,5 +75,5 @@ test('event options', function() {
 
   foo.fire('foo:bar', { value: 'sekret' });
 
-  equals('sekret', someValue);
+  equal('sekret', someValue);
 });
