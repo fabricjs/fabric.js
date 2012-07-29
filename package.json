@@ -10,12 +10,16 @@
     "url": "http://github.com/kangax/fabric.js/raw/master/LICENSE"
   }],
   "scripts": {
-    "build": "node build.js modules=ALL"
+    "build": "node build.js modules=ALL exclude=json,cufon",
+    "test": "node test.js"
   },
   "dependencies": {
     "canvas": ">=0.8.1",
     "jsdom": ">=0.2.3",
     "xmldom": ">=0.1.7"
+  },
+  "devDependencies": {
+    "qunit": "0.5.x"
   },
   "engines": { "node": ">= 0.4.0 && <= 0.6.18" },
   "main": "./dist/all.js"
