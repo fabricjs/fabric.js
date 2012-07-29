@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL` */
 /*! Fabric.js Copyright 2008-2012, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.8.4" };
+var fabric = fabric || { version: "0.8.41" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -23,6 +23,13 @@ else {
  * @type boolean
  */
 fabric.isTouchSupported = "ontouchstart" in fabric.document.documentElement;
+
+/**
+ * True when in environment that's probably Node.js
+ * @property isLikelyNode
+ * @type boolean
+ */
+fabric.isLikelyNode = typeof Buffer !== 'undefined' && typeof window === 'undefined';
 /*!
  * Copyright (c) 2009 Simo Kinnunen.
  * Licensed under the MIT license.
@@ -6003,6 +6010,13 @@ fabric.util.string = {
     hoverCursor:            'move',
 
     /**
+     * Default cursor value used when moving an object on canvas
+     * @property
+     * @type String
+     */
+    moveCursor:             'move',
+
+    /**
      * Default cursor value used for the entire canvas
      * @property
      * @type String
@@ -6348,6 +6362,9 @@ fabric.util.string = {
           this.fire('object:moving', {
             target: this._currentTransform.target
           });
+
+          this._setCursor(this.moveCursor);
+
           this._currentTransform.target.fire('moving');
         }
         // only commit here. when we are actually moving the pictures
@@ -6699,7 +6716,7 @@ fabric.util.string = {
           } else if (corner === 'mtr' && target.hasRotatingPoint) {
             s.cursor = this.rotationCursor;
           } else {
-            s.cursor = this.defaulCursor;
+            s.cursor = this.defaultCursor;
             return false;
           }
         }
@@ -12682,9 +12699,9 @@ fabric.Image.filters.GradientTransparency.fromObject = function(object) {
 
         ctx.save();
         ctx.shadowColor = shadowColor;
-        ctx.shadowOffsetX = parseInt(offsetsAndBlur[0], 10);
-        ctx.shadowOffsetY = parseInt(offsetsAndBlur[1], 10);
-        ctx.shadowBlur = parseInt(offsetsAndBlur[2], 10);
+        ctx.shadowOffsetX = parseInt(offsetsAndBlur[1], 10);
+        ctx.shadowOffsetY = parseInt(offsetsAndBlur[2], 10);
+        ctx.shadowBlur = parseInt(offsetsAndBlur[3], 10);
 
         this._shadows = [{
           blur: ctx.shadowBlur,
