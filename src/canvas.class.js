@@ -106,6 +106,13 @@
     hoverCursor:            'move',
 
     /**
+     * Default cursor value used when moving an object on canvas
+     * @property
+     * @type String
+     */
+    moveCursor:             'move',
+
+    /**
      * Default cursor value used for the entire canvas
      * @property
      * @type String
@@ -451,6 +458,9 @@
           this.fire('object:moving', {
             target: this._currentTransform.target
           });
+
+          this._setCursor(this.moveCursor);
+
           this._currentTransform.target.fire('moving');
         }
         // only commit here. when we are actually moving the pictures
@@ -802,7 +812,7 @@
           } else if (corner === 'mtr' && target.hasRotatingPoint) {
             s.cursor = this.rotationCursor;
           } else {
-            s.cursor = this.defaulCursor;
+            s.cursor = this.defaultCursor;
             return false;
           }
         }
