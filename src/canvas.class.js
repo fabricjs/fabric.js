@@ -802,7 +802,7 @@
           } else if (corner === 'mtr' && target.hasRotatingPoint) {
             s.cursor = this.rotationCursor;
           } else {
-            s.cursor = this.defaulCursor;
+            s.cursor = this.defaultCursor;
             return false;
           }
         }
