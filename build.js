@@ -134,7 +134,7 @@ var filesToInclude = [
 
   ifSpecifiedInclude('text', 'src/text.class.js'),
 
-  ifSpecifiedInclude('node', 'src/fabric_node.js')
+  ifSpecifiedInclude('node', 'src/node.js')
 ];
 
 appendFileContents(filesToInclude, function() {
