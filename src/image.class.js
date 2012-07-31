@@ -225,7 +225,7 @@
       canvasEl.width = imgEl.width;
       canvasEl.height = imgEl.height;
 
-      canvasEl.getContext('2d').drawImage(imgEl, 0, 0);
+      canvasEl.getContext('2d').drawImage(imgEl, 0, 0, imgEl.width, imgEl.height);
 
       this.filters.forEach(function(filter) {
         filter && filter.applyTo(canvasEl);
