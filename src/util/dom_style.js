@@ -1,5 +1,5 @@
 (function () {
-  
+
   /**
    * Cross-browser wrapper for setting element's style
    * @method setStyle
@@ -10,10 +10,13 @@
    */
   function setStyle(element, styles) {
     var elementStyle = element.style, match;
+    if (!elementStyle) {
+      return element;
+    }
     if (typeof styles === 'string') {
       element.style.cssText += ';' + styles;
-      return styles.indexOf('opacity') > -1 
-        ? setOpacity(element, styles.match(/opacity:\s*(\d?\.?\d*)/)[1]) 
+      return styles.indexOf('opacity') > -1
+        ? setOpacity(element, styles.match(/opacity:\s*(\d?\.?\d*)/)[1])
         : element;
     }
     for (var property in styles) {
@@ -21,8 +24,8 @@
         setOpacity(element, styles[property]);
       }
       else {
-        var normalizedProperty = (property === 'float' || property === 'cssFloat') 
-          ? (typeof elementStyle.styleFloat === 'undefined' ? 'cssFloat' : 'styleFloat') 
+        var normalizedProperty = (property === 'float' || property === 'cssFloat')
+          ? (typeof elementStyle.styleFloat === 'undefined' ? 'cssFloat' : 'styleFloat')
           : property;
         elementStyle[normalizedProperty] = styles[property];
       }
@@ -31,12 +34,12 @@
   }
 
   var parseEl = fabric.document.createElement('div'),
-      supportsOpacity = typeof parseEl.style.opacity === 'string', 
+      supportsOpacity = typeof parseEl.style.opacity === 'string',
       supportsFilters = typeof parseEl.style.filter === 'string',
       view = fabric.document.defaultView,
       supportsGCS = view && typeof view.getComputedStyle !== 'undefined',
       reOpacity = /alpha\s*\(\s*opacity\s*=\s*([^\)]+)\)/,
-      
+
       /** @ignore */
       setOpacity = function (element) { return element; };
 
@@ -66,5 +69,5 @@
   }
 
   fabric.util.setStyle = setStyle;
-  
+
 })();

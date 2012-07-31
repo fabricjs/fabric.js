@@ -1,5 +1,9 @@
 var testrunner = require('qunit');
 
+testrunner.options.log.summary = false;
+testrunner.options.log.tests = false;
+testrunner.options.log.assertions = false;
+
 testrunner.run({
     code: "./dist/all.js",
     tests: [
