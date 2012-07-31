@@ -420,36 +420,36 @@
   //   }
   // });
 
-  // asyncTest('toDataURL', function() {
-  //   var data =
-  //     'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQA'+
-  //     'AABkCAYAAABw4pVUAAAA+UlEQVR4nO3RoRHAQBDEsOu/6YR+B2s'+
-  //     'gIO4Z3919pMwDMCRtHoAhafMADEmbB2BI2jwAQ9LmARiSNg/AkLR5AI'+
-  //     'akzQMwJG0egCFp8wAMSZsHYEjaPABD0uYBGJI2D8CQtHkAhqTNAzAkbR'+
-  //     '6AIWnzAAxJmwdgSNo8AEPS5gEYkjYPwJC0eQCGpM0DMCRtHoAhafMADEm'+
-  //     'bB2BI2jwAQ9LmARiSNg/AkLR5AIakzQMwJG0egCFp8wAMSZsHYEjaPABD0'+
-  //     'uYBGJI2D8CQtHkAhqTNAzAkbR6AIWnzAAxJmwdgSNo8AEPS5gEYkjYPw'+
-  //     'JC0eQCGpM0DMCRtHsDjB5K06yueJFXJAAAAAElFTkSuQmCC';
+  asyncTest('toDataURL', function() {
+    var data =
+      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQA'+
+      'AABkCAYAAABw4pVUAAAA+UlEQVR4nO3RoRHAQBDEsOu/6YR+B2s'+
+      'gIO4Z3919pMwDMCRtHoAhafMADEmbB2BI2jwAQ9LmARiSNg/AkLR5AI'+
+      'akzQMwJG0egCFp8wAMSZsHYEjaPABD0uYBGJI2D8CQtHkAhqTNAzAkbR'+
+      '6AIWnzAAxJmwdgSNo8AEPS5gEYkjYPwJC0eQCGpM0DMCRtHoAhafMADEm'+
+      'bB2BI2jwAQ9LmARiSNg/AkLR5AIakzQMwJG0egCFp8wAMSZsHYEjaPABD0'+
+      'uYBGJI2D8CQtHkAhqTNAzAkbR6AIWnzAAxJmwdgSNo8AEPS5gEYkjYPw'+
+      'JC0eQCGpM0DMCRtHsDjB5K06yueJFXJAAAAAElFTkSuQmCC';
 
-  //   var cObj = new fabric.Rect({
-  //     width: 100, height: 100, fill: 'red'
-  //   });
+    var cObj = new fabric.Rect({
+      width: 100, height: 100, fill: 'red'
+    });
 
-  //   ok(typeof cObj.toDataURL == 'function');
+    ok(typeof cObj.toDataURL == 'function');
 
-  //   if (!fabric.Canvas.supports('toDataURL')) {
-  //     //alert('toDataURL is not supported by this environment. Some of the tests can not be run.');
-  //     start();
-  //   }
-  //   else {
-  //     cObj.toDataURL(function(dataURL) {
-  //       equal(typeof dataURL, 'string');
-  //       equal(dataURL.substring(0, 21), 'data:image/png;base64');
+    if (!fabric.Canvas.supports('toDataURL')) {
+      alert('toDataURL is not supported by this environment. Some of the tests can not be run.');
+      start();
+    }
+    else {
+      cObj.toDataURL(function(dataURL) {
+        equal(typeof dataURL, 'string');
+        equal(dataURL.substring(0, 21), 'data:image/png;base64');
 
-  //       start();
-  //     });
-  //   }
-  // });
+        start();
+      });
+    }
+  });
 
   test('hasStateChanged', function() {
     var cObj = new fabric.Object();

@@ -234,42 +234,42 @@
     ok(!group.containsPoint({ x: 0, y: 0 }));
   });
 
-  // test('forEachObject', function() {
-  //   var group = makeGroupWith2Objects();
+  test('forEachObject', function() {
+    var group = makeGroupWith2Objects();
 
-  //   ok(typeof group.forEachObject == 'function');
-  //   equal(group.forEachObject(function(){}), group, 'should be chainable');
+    ok(typeof group.forEachObject == 'function');
+    equal(group.forEachObject(function(){}), group, 'should be chainable');
 
-  //   var iteratedObjects = [ ];
-  //   group.forEachObject(function(groupObject) {
-  //     iteratedObjects.push(groupObject);
-  //   });
+    var iteratedObjects = [ ];
+    group.forEachObject(function(groupObject) {
+      iteratedObjects.push(groupObject);
+    });
 
-  //   equal(iteratedObjects[1], group.getObjects()[0]);
-  //   equal(iteratedObjects[0], group.getObjects()[1]);
-  // });
+    equal(iteratedObjects[1], group.getObjects()[0]);
+    equal(iteratedObjects[0], group.getObjects()[1]);
+  });
 
-  // asyncTest('fromObject', function() {
-  //   var group = makeGroupWith2Objects();
+  asyncTest('fromObject', function() {
+    var group = makeGroupWith2Objects();
 
-  //   ok(typeof fabric.Group.fromObject == 'function');
-  //   var groupObject = group.toObject();
+    ok(typeof fabric.Group.fromObject == 'function');
+    var groupObject = group.toObject();
 
-  //   fabric.Group.fromObject(groupObject, function(newGroupFromObject) {
+    fabric.Group.fromObject(groupObject, function(newGroupFromObject) {
 
-  //     var objectFromOldGroup = group.toObject();
-  //     var objectFromNewGroup = newGroupFromObject.toObject();
+      var objectFromOldGroup = group.toObject();
+      var objectFromNewGroup = newGroupFromObject.toObject();
 
-  //     ok(newGroupFromObject instanceof fabric.Group);
+      ok(newGroupFromObject instanceof fabric.Group);
 
-  //     // delete `objects` arrays, since `assertHashEqual` fails to compare them for equality
-  //     delete objectFromOldGroup.objects;
-  //     delete objectFromNewGroup.objects;
+      // delete `objects` arrays, since `assertHashEqual` fails to compare them for equality
+      delete objectFromOldGroup.objects;
+      delete objectFromNewGroup.objects;
 
-  //     deepEqual(objectFromOldGroup, objectFromNewGroup);
+      deepEqual(objectFromOldGroup, objectFromNewGroup);
 
-  //     start();
-  //   });
-  // });
+      start();
+    });
+  });
 
 })();

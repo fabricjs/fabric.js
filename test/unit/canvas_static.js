@@ -451,19 +451,19 @@
     // TODO (kangax): test clone
   });
 
-  // test('getSetWidth', function() {
-  //   ok(typeof canvas.getWidth == 'function');
-  //   equal(canvas.getWidth(), 500);
-  //   equal(canvas.setWidth(444), canvas, 'chainable');
-  //   equal(canvas.getWidth(), 444);
-  // });
+  test('getSetWidth', function() {
+    ok(typeof canvas.getWidth == 'function');
+    equal(canvas.getWidth(), 600);
+    equal(canvas.setWidth(444), canvas, 'chainable');
+    equal(canvas.getWidth(), fabric.isLikelyNode ? undefined: 444);
+  });
 
-  // test('getSetHeight', function() {
-  //   ok(typeof canvas.getHeight == 'function');
-  //   equal(canvas.getHeight(), 500);
-  //   equal(canvas.setHeight(765), canvas, 'chainable');
-  //   equal(canvas.getHeight(), 765);
-  // });
+  test('getSetHeight', function() {
+    ok(typeof canvas.getHeight == 'function');
+    equal(canvas.getHeight(), 600);
+    equal(canvas.setHeight(765), canvas, 'chainable');
+    equal(canvas.getHeight(), fabric.isLikelyNode ? undefined : 765);
+  });
 
   test('toGrayscale', function() {
     ok(typeof fabric.Canvas.toGrayscale == 'function');

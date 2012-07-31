@@ -332,33 +332,33 @@
         397,215 423,301 350,250 277,301 303,215 231,161 321,161" />\
     </svg>';
 
-  // asyncTest('fabric.loadSVGFromString', function() {
-  //   equal("function", typeof fabric.loadSVGFromString);
+  asyncTest('fabric.loadSVGFromString', function() {
+    equal("function", typeof fabric.loadSVGFromString);
 
-  //   var loadedObjects = [ ];
-  //   fabric.loadSVGFromString(SVG_DOC_AS_STRING, function(objects) {
-  //     loadedObjects = objects;
-  //   });
+    var loadedObjects = [ ];
+    fabric.loadSVGFromString(SVG_DOC_AS_STRING, function(objects) {
+      loadedObjects = objects;
+    });
 
-  //   setTimeout(function() {
-  //     ok(loadedObjects[0] instanceof fabric.Polygon);
-  //     equal('red', loadedObjects[0].fill);
-  //     start();
-  //   }, 1000);
-  // });
+    setTimeout(function() {
+      ok(loadedObjects[0] instanceof fabric.Polygon);
+      equal('red', loadedObjects[0].fill);
+      start();
+    }, 1000);
+  });
 
-  // asyncTest('fabric.loadSVGFromString with surrounding whitespace', function() {
-  //   var loadedObjects = [ ];
-  //   fabric.loadSVGFromString('   \n\n  ' + SVG_DOC_AS_STRING + '  ', function(objects) {
-  //     loadedObjects = objects;
-  //   });
+  asyncTest('fabric.loadSVGFromString with surrounding whitespace', function() {
+    var loadedObjects = [ ];
+    fabric.loadSVGFromString('   \n\n  ' + SVG_DOC_AS_STRING + '  ', function(objects) {
+      loadedObjects = objects;
+    });
 
-  //   setTimeout(function() {
-  //     ok(loadedObjects[0] instanceof fabric.Polygon);
-  //     equal('red', loadedObjects[0] && loadedObjects[0].fill);
-  //     start();
-  //   }, 1000);
-  // });
+    setTimeout(function() {
+      ok(loadedObjects[0] instanceof fabric.Polygon);
+      equal('red', loadedObjects[0] && loadedObjects[0].fill);
+      start();
+    }, 1000);
+  });
 
   // asyncTest('fabric.util.loadImage', function() {
   //   ok(typeof fabric.util.loadImage == 'function');
@@ -400,22 +400,22 @@
         397,215 423,301 350,250 277,301 303,215 231,161 321,161" />\
     </svg>';
 
-  // asyncTest('fabric.util.groupSVGElements', function() {
-  //   ok(typeof fabric.util.groupSVGElements == 'function');
+  asyncTest('fabric.util.groupSVGElements', function() {
+    ok(typeof fabric.util.groupSVGElements == 'function');
 
-  //   var group1, group2;
-  //   fabric.loadSVGFromString(SVG_WITH_1_ELEMENT, function(objects, options) {
-  //     group1 = fabric.util.groupSVGElements(objects, options);
-  //   });
-  //   fabric.loadSVGFromString(SVG_WITH_2_ELEMENTS, function(objects, options) {
-  //     group2 = fabric.util.groupSVGElements(objects, options);
-  //   });
+    var group1, group2;
+    fabric.loadSVGFromString(SVG_WITH_1_ELEMENT, function(objects, options) {
+      group1 = fabric.util.groupSVGElements(objects, options);
+    });
+    fabric.loadSVGFromString(SVG_WITH_2_ELEMENTS, function(objects, options) {
+      group2 = fabric.util.groupSVGElements(objects, options);
+    });
 
-  //   setTimeout(function() {
-  //     ok(group1 instanceof fabric.Polygon);
-  //     ok(group2 instanceof fabric.PathGroup);
-  //     start();
-  //   }, 1000);
-  // });
+    setTimeout(function() {
+      ok(group1 instanceof fabric.Polygon);
+      ok(group2 instanceof fabric.PathGroup);
+      start();
+    }, 1000);
+  });
 
 })();

@@ -140,19 +140,19 @@
     ok(typeof canvas.findTarget == 'function');
   });
 
-  // test('toDataURL', function() {
-  //   ok(typeof canvas.toDataURL == 'function');
-  //   if (!fabric.Canvas.supports('toDataURL')) {
-  //     // console.log("toDataURL is not supported by this environment. Some of the tests can not be run.");
-  //   }
-  //   else {
-  //     var dataURL = canvas.toDataURL('png');
-  //     // don't compare actual data url, as it is often browser-dependent
-  //     // this.assertIdentical(emptyImageCanvasData, canvas.toDataURL('png'));
-  //     equal(typeof dataURL, 'string');
-  //     equal(dataURL.substring(0, 21), 'data:image/png;base64');
-  //   }
-  // });
+  test('toDataURL', function() {
+    ok(typeof canvas.toDataURL == 'function');
+    if (!fabric.Canvas.supports('toDataURL')) {
+      alert("toDataURL is not supported by this environment. Some of the tests can not be run.");
+    }
+    else {
+      var dataURL = canvas.toDataURL('png');
+      // don't compare actual data url, as it is often browser-dependent
+      // this.assertIdentical(emptyImageCanvasData, canvas.toDataURL('png'));
+      equal(typeof dataURL, 'string');
+      equal(dataURL.substring(0, 21), 'data:image/png;base64');
+    }
+  });
 
   // asyncTest('getPointer', function() {
   //   ok(typeof canvas.getPointer == 'function');
@@ -277,32 +277,32 @@
     ok(!canvas.isEmpty());
   });
 
-  // test('loadFromJSON', function() {
-  //   ok(typeof canvas.loadFromJSON == 'function');
+  test('loadFromJSON', function() {
+    ok(typeof canvas.loadFromJSON == 'function');
 
-  //   canvas.loadFromJSON(PATH_JSON, function(){
-  //     var obj = canvas.item(0);
+    canvas.loadFromJSON(PATH_JSON, function(){
+      var obj = canvas.item(0);
 
-  //     ok(!canvas.isEmpty(), 'canvas is not empty');
-  //     equal(obj.type, 'path', 'first object is a path object');
-  //     equal(canvas.backgroundColor, '#ff5555', 'backgroundColor is populated properly');
+      ok(!canvas.isEmpty(), 'canvas is not empty');
+      equal(obj.type, 'path', 'first object is a path object');
+      equal(canvas.backgroundColor, '#ff5555', 'backgroundColor is populated properly');
 
-  //     equal(obj.get('left'), 268);
-  //     equal(obj.get('top'), 266);
-  //     equal(obj.get('width'), 51);
-  //     equal(obj.get('height'), 49);
-  //     equal(obj.get('fill'), 'rgb(0,0,0)');
-  //     equal(obj.get('stroke'), null);
-  //     equal(obj.get('strokeWidth'), 1);
-  //     equal(obj.get('scaleX'), 1);
-  //     equal(obj.get('scaleY'), 1);
-  //     equal(obj.get('angle'), 0);
-  //     equal(obj.get('flipX'), false);
-  //     equal(obj.get('flipY'), false);
-  //     equal(obj.get('opacity'), 1);
-  //     ok(obj.get('path').length > 0);
-  //   });
-  // });
+      equal(obj.get('left'), 268);
+      equal(obj.get('top'), 266);
+      equal(obj.get('width'), 51);
+      equal(obj.get('height'), 49);
+      equal(obj.get('fill'), 'rgb(0,0,0)');
+      equal(obj.get('stroke'), null);
+      equal(obj.get('strokeWidth'), 1);
+      equal(obj.get('scaleX'), 1);
+      equal(obj.get('scaleY'), 1);
+      equal(obj.get('angle'), 0);
+      equal(obj.get('flipX'), false);
+      equal(obj.get('flipY'), false);
+      equal(obj.get('opacity'), 1);
+      ok(obj.get('path').length > 0);
+    });
+  });
 
   // asyncTest('loadFromJSON with backgroundImage', function() {
   //   canvas.setBackgroundImage('../../assets/pug.jpg');
@@ -636,113 +636,114 @@
   //   assertInvocationsCount();
   // });
 
-  // asyncTest('clone', function() {
-  //   ok(typeof canvas.clone == 'function');
+  asyncTest('clone', function() {
+    ok(typeof canvas.clone == 'function');
 
-  //   canvas.add(new fabric.Rect({ width: 100, height: 110, top: 120, left: 130, fill: 'rgba(0,1,2,0.3)' }));
-  //   var canvasData = JSON.stringify(canvas);
+    canvas.add(new fabric.Rect({ width: 100, height: 110, top: 120, left: 130, fill: 'rgba(0,1,2,0.3)' }));
+    var canvasData = JSON.stringify(canvas);
 
-  //   canvas.clone(function(clone) {
-  //     ok(clone instanceof fabric.Canvas);
+    canvas.clone(function(clone) {
+      ok(clone instanceof fabric.Canvas);
 
-  //     // alert(JSON.stringify(clone));
-  //     equal(canvasData, JSON.stringify(clone), 'data on cloned canvas should be identical');
+      // alert(JSON.stringify(clone));
+      equal(canvasData, JSON.stringify(clone), 'data on cloned canvas should be identical');
 
-  //     equal(canvas.getWidth(), clone.getWidth());
-  //     equal(canvas.getHeight(), clone.getHeight());
+      equal(canvas.getWidth(), clone.getWidth());
+      equal(canvas.getHeight(), clone.getHeight());
 
-  //     start();
-  //   });
-  // });
+      start();
+    });
+  });
 
-  // asyncTest('cloneWithoutData', function() {
-  //   ok(typeof canvas.cloneWithoutData == 'function');
+  asyncTest('cloneWithoutData', function() {
+    ok(typeof canvas.cloneWithoutData == 'function');
 
-  //   canvas.add(new fabric.Rect({ width: 100, height: 110, top: 120, left: 130, fill: 'rgba(0,1,2,0.3)' }));
+    canvas.add(new fabric.Rect({ width: 100, height: 110, top: 120, left: 130, fill: 'rgba(0,1,2,0.3)' }));
 
-  //   canvas.cloneWithoutData(function(clone) {
+    canvas.cloneWithoutData(function(clone) {
 
-  //     ok(clone instanceof fabric.Canvas);
+      ok(clone instanceof fabric.Canvas);
 
-  //     equal(JSON.stringify(clone), EMPTY_JSON, 'data on cloned canvas should be empty');
+      equal(JSON.stringify(clone), EMPTY_JSON, 'data on cloned canvas should be empty');
 
-  //     equal(canvas.getWidth(), clone.getWidth());
-  //     equal(canvas.getHeight(), clone.getHeight());
+      equal(canvas.getWidth(), clone.getWidth());
+      equal(canvas.getHeight(), clone.getHeight());
 
-  //     start();
-  //   });
-  // });
+      start();
+    });
+  });
 
-  // test('getSetWidth', function() {
-  //   ok(typeof canvas.getWidth == 'function');
-  //   equal(canvas.getWidth(), 500);
-  //   equal(canvas.setWidth(444), canvas, 'chainable');
-  //   equal(canvas.getWidth(), 444);
-  // });
+  test('getSetWidth', function() {
+    ok(typeof canvas.getWidth == 'function');
 
-  // test('getSetHeight', function() {
-  //   ok(typeof canvas.getHeight == 'function');
-  //   equal(canvas.getHeight(), 500);
-  //   equal(canvas.setHeight(765), canvas, 'chainable');
-  //   equal(canvas.getHeight(), 765);
-  // });
+    equal(canvas.getWidth(), 600);
+    equal(canvas.setWidth(444), canvas, 'chainable');
+    equal(canvas.getWidth(), fabric.isLikelyNode ? undefined : 444);
+  });
 
-  // test('containsPoint', function() {
-  //   ok(typeof canvas.containsPoint == 'function');
+  test('getSetHeight', function() {
+    ok(typeof canvas.getHeight == 'function');
+    equal(canvas.getHeight(), 600);
+    equal(canvas.setHeight(765), canvas, 'chainable');
+    equal(canvas.getHeight(), fabric.isLikelyNode ? undefined : 765);
+  });
 
-  //   var rect = new fabric.Rect({ left: 100, top: 100, width: 50, height: 50 });
-  //   canvas.add(rect);
+  test('containsPoint', function() {
+    ok(typeof canvas.containsPoint == 'function');
 
-  //   var canvasEl = canvas.getElement(),
-  //       canvasOffset = fabric.util.getElementOffset(canvasEl);
+    var rect = new fabric.Rect({ left: 100, top: 100, width: 50, height: 50 });
+    canvas.add(rect);
 
-  //   var eventStub = {
-  //     pageX: canvasOffset.left + 100,
-  //     pageY: canvasOffset.top + 100
-  //   };
+    var canvasEl = canvas.getElement(),
+        canvasOffset = fabric.util.getElementOffset(canvasEl);
 
-  //   ok(canvas.containsPoint(eventStub, rect), 'point at (100, 100) should be within area (75, 75, 125, 125)');
+    var eventStub = {
+      pageX: canvasOffset.left + 100,
+      pageY: canvasOffset.top + 100
+    };
 
-  //   eventStub = {
-  //     pageX: canvasOffset.left + 200,
-  //     pageY: canvasOffset.top + 200
-  //   };
-  //   ok(!canvas.containsPoint(eventStub, rect), 'point at (200, 200) should NOT be within area (75, 75, 125, 125)');
+    ok(canvas.containsPoint(eventStub, rect), 'point at (100, 100) should be within area (75, 75, 125, 125)');
 
-  //   rect.set('left', 200).set('top', 200).setCoords();
-  //   ok(canvas.containsPoint(eventStub, rect), 'point at (200, 200) should be within area (175, 175, 225, 225)');
-  // });
+    eventStub = {
+      pageX: canvasOffset.left + 200,
+      pageY: canvasOffset.top + 200
+    };
+    ok(!canvas.containsPoint(eventStub, rect), 'point at (200, 200) should NOT be within area (75, 75, 125, 125)');
 
-  // test('toGrayscale', function() {
-  //   ok(typeof fabric.Canvas.toGrayscale == 'function');
+    rect.set('left', 200).set('top', 200).setCoords();
+    ok(canvas.containsPoint(eventStub, rect), 'point at (200, 200) should be within area (175, 175, 225, 225)');
+  });
 
-  //   if (!fabric.Canvas.supports('getImageData')) {
-  //     console.log('getImageData is not supported by this environment. Some of the tests can not be run.');
-  //     return;
-  //   }
+  test('toGrayscale', function() {
+    ok(typeof fabric.Canvas.toGrayscale == 'function');
 
-  //   var canvasEl = fabric.document.createElement('canvas'),
-  //       context = canvasEl.getContext('2d');
+    if (!fabric.Canvas.supports('getImageData')) {
+      console.log('getImageData is not supported by this environment. Some of the tests can not be run.');
+      return;
+    }
 
-  //   canvasEl.width = canvasEl.height = 10;
+    var canvasEl = fabric.document.createElement('canvas'),
+        context = canvasEl.getContext('2d');
 
-  //   context.fillStyle = 'rgb(255,0,0)'; // red
-  //   context.fillRect(0, 0, 10, 10);
+    canvasEl.width = canvasEl.height = 10;
 
-  //   var imageData = context.getImageData(0, 0, 10, 10),
-  //       data = imageData.data,
-  //       firstPixelData = [data[0], data[1], data[2], data[3]];
+    context.fillStyle = 'rgb(255,0,0)'; // red
+    context.fillRect(0, 0, 10, 10);
 
-  //   deepEqual([255, 0, 0, 255], firstPixelData);
+    var imageData = context.getImageData(0, 0, 10, 10),
+        data = imageData.data,
+        firstPixelData = [data[0], data[1], data[2], data[3]];
 
-  //   fabric.Canvas.toGrayscale(canvasEl);
+    deepEqual([255, 0, 0, 255], firstPixelData);
 
-  //   imageData = context.getImageData(0, 0, 10, 10);
-  //   data = imageData.data;
-  //   firstPixelData = [data[0], data[1], data[2], data[3]];
+    fabric.Canvas.toGrayscale(canvasEl);
 
-  //   deepEqual([85, 85, 85, 255], firstPixelData);
-  // });
+    imageData = context.getImageData(0, 0, 10, 10);
+    data = imageData.data;
+    firstPixelData = [data[0], data[1], data[2], data[3]];
+
+    deepEqual([85, 85, 85, 255], firstPixelData);
+  });
 
   // asyncTest('resizeImageToFit', function() {
   //   ok(typeof canvas._resizeImageToFit == 'function');
@@ -763,26 +764,26 @@
   //   }, 2000);
   // });
 
-  // asyncTest('fxRemove', function() {
-  //   ok(typeof canvas.fxRemove == 'function');
+  asyncTest('fxRemove', function() {
+    ok(typeof canvas.fxRemove == 'function');
 
-  //   var rect = new fabric.Rect();
-  //   canvas.add(rect);
+    var rect = new fabric.Rect();
+    canvas.add(rect);
 
-  //   var callbackFired = false;
-  //   function onComplete() {
-  //     callbackFired = true;
-  //   }
+    var callbackFired = false;
+    function onComplete() {
+      callbackFired = true;
+    }
 
-  //   equal(canvas.item(0), rect);
-  //   equal(canvas.fxRemove(rect, { onComplete: onComplete }), canvas, 'should be chainable');
+    equal(canvas.item(0), rect);
+    equal(canvas.fxRemove(rect, { onComplete: onComplete }), canvas, 'should be chainable');
 
-  //   setTimeout(function() {
-  //     equal(canvas.item(0), undefined);
-  //     ok(callbackFired);
-  //     start();
-  //   }, 1000);
-  // });
+    setTimeout(function() {
+      equal(canvas.item(0), undefined);
+      ok(callbackFired);
+      start();
+    }, 1000);
+  });
 
   test('onFpsUpdate', function() {
 
