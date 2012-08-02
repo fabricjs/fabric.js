@@ -957,7 +957,7 @@
      * @return {String|Boolean} corner code (tl, tr, bl, br, etc.), or false if nothing is found
      */
     _findTargetCorner: function(e, offset) {
-      if (!this.hasControls) return false;
+      if (!this.hasControls || !this.active) return false;
 
       var pointer = getPointer(e),
           ex = pointer.x - offset.left,

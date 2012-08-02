@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL` */
 /*! Fabric.js Copyright 2008-2012, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.8.42" };
+var fabric = fabric || { version: "0.8.43" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -8385,7 +8385,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      * @return {String|Boolean} corner code (tl, tr, bl, br, etc.), or false if nothing is found
      */
     _findTargetCorner: function(e, offset) {
-      if (!this.hasControls) return false;
+      if (!this.hasControls || !this.active) return false;
 
       var pointer = getPointer(e),
           ex = pointer.x - offset.left,
