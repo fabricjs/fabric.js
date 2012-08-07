@@ -52,10 +52,12 @@
      * @property
      * @type Array
      */
-    stateProperties:  ('top left width height scaleX scaleY flipX flipY ' +
-                      'theta angle opacity cornersize fill overlayFill stroke ' +
-                      'strokeWidth fillRule borderScaleFactor transformMatrix ' +
-                      'selectable').split(' '),
+    stateProperties:  (
+      'top left width height scaleX scaleY flipX flipY ' +
+      'theta angle opacity cornersize fill overlayFill ' +
+      'stroke strokeWidth strokeDashArray fillRule ' +
+      'borderScaleFactor transformMatrix selectable'
+    ).split(' '),
 
     top:                      0,
     left:                     0,
@@ -77,6 +79,7 @@
     overlayFill:              null,
     stroke:                   null,
     strokeWidth:              1,
+    strokeDashArray:          null,
     borderOpacityWhenMoving:  0.4,
     borderScaleFactor:        1,
     transformMatrix:          null,
@@ -181,6 +184,7 @@
         overlayFill:      this.overlayFill,
         stroke:           this.stroke,
         strokeWidth:      this.strokeWidth,
+        strokeDashArray:  this.strokeDashArray,
         scaleX:           toFixed(this.scaleX, this.NUM_FRACTION_DIGITS),
         scaleY:           toFixed(this.scaleY, this.NUM_FRACTION_DIGITS),
         angle:            toFixed(this.getAngle(), this.NUM_FRACTION_DIGITS),
@@ -218,6 +222,7 @@
       return [
         "stroke: ", (this.stroke ? this.stroke : 'none'), "; ",
         "stroke-width: ", (this.strokeWidth ? this.strokeWidth : '0'), "; ",
+        "stroke-dasharray: ", (this.strokeDashArray ? this.strokeDashArray.join(' ') : "; "),
         "fill: ", (this.fill ? this.fill : 'none'), "; ",
         "opacity: ", (this.opacity ? this.opacity : '1'), ";"
       ].join("");
@@ -379,7 +384,7 @@
         this.transform(ctx);
       }
 
-      if (this.stroke) {
+      if (this.stroke || this.strokeDashArray) {
         ctx.lineWidth = this.strokeWidth;
         ctx.strokeStyle = this.stroke;
       }
@@ -651,6 +656,63 @@
 
       ctx.restore();
       return this;
+    },
+
+    _renderDashedStroke: function(ctx) {
+
+      if (1 & this.strokeDashArray.length /* if odd number of items */) {
+        /* duplicate items */
+        this.strokeDashArray.push.apply(this.strokeDashArray, this.strokeDashArray);
+      }
+
+      var i = 0,
+          x = -this.width/2, y = -this.height/2,
+          _this = this,
+          padding = this.padding,
+          width = this.getWidth(),
+          height = this.getHeight(),
+          dashedArrayLength = this.strokeDashArray.length;
+
+      ctx.save();
+      ctx.beginPath();
+
+      function renderSide(xMultiplier, yMultiplier) {
+
+        var lineLength = 0,
+            sideLength = (yMultiplier ? _this.height : _this.width) + padding * 2;
+
+        while (lineLength < sideLength) {
+
+          var lengthOfSubPath = _this.strokeDashArray[i++];
+          lineLength += lengthOfSubPath;
+
+          if (lineLength > sideLength) {
+            var lengthDiff = lineLength - sideLength;
+          }
+
+          // track coords
+          if (xMultiplier) {
+            x += (lengthOfSubPath * xMultiplier) - (lengthDiff * xMultiplier || 0);
+          }
+          else {
+            y += (lengthOfSubPath * yMultiplier) - (lengthDiff * yMultiplier || 0);
+          }
+
+          ctx[1 & i /* odd */ ? 'moveTo' : 'lineTo'](x, y);
+          if (i >= dashedArrayLength) {
+            i = 0;
+          }
+        }
+      }
+
+      renderSide(1, 0);
+      renderSide(0, 1);
+      renderSide(-1, 0);
+      renderSide(0, -1);
+
+      ctx.stroke();
+      ctx.closePath();
+      ctx.restore();
     },
 
     /**

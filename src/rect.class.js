@@ -99,7 +99,11 @@
       if (this.fill) {
         ctx.fill();
       }
-      if (this.stroke) {
+
+      if (this.strokeDashArray) {
+        this._renderDashedStroke(ctx);
+      }
+      else if (this.stroke) {
         ctx.stroke();
       }
     },
