@@ -21,6 +21,6 @@
   "devDependencies": {
     "qunit": "0.5.x"
   },
-  "engines": { "node": ">= 0.4.0 && <= 0.6.18" },
+  "engines": { "node": ">= 0.4.0 && <= 0.6.8" },
   "main": "./dist/all.js"
 }
