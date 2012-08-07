@@ -281,32 +281,43 @@
     },
 
     /**
-     * Basic setter
-     * @param {Any} property
-     * @param {Any} value
-     * @return {fabric.Object} thisArg
+     * Sets property to a given value
+     * @method set
+     * @param {String} name
+     * @param {Object|Function} value
+     * @return {fabric.Group} thisArg
      * @chainable
      */
-    set: function(property, value) {
-      var shouldConstrainValue = (property === 'scaleX' || property === 'scaleY') && value < this.MIN_SCALE_LIMIT;
-      if (shouldConstrainValue) {
-        value = this.MIN_SCALE_LIMIT;
-      }
-      if (typeof property == 'object') {
-        for (var prop in property) {
-          this.set(prop, property[prop]);
+    set: function(key, value) {
+      if (typeof key === 'object') {
+        for (var prop in key) {
+          this._set(prop, key[prop]);
         }
       }
       else {
-        if (property === 'angle') {
-          this.setAngle(value);
+        if (typeof value === 'function') {
+          this._set(key, value(this.get(key)));
         }
         else {
-          this[property] = value;
+          this._set(key, value);
         }
       }
-
       return this;
+    },
+
+    _set: function(key, value) {
+      var shouldConstrainValue = (key === 'scaleX' || key === 'scaleY') &&
+                                  value < this.MIN_SCALE_LIMIT;
+
+      if (shouldConstrainValue) {
+        value = this.MIN_SCALE_LIMIT;
+      }
+      if (key === 'angle') {
+        this.setAngle(value);
+      }
+      else {
+        this[key] = value;
+      }
     },
 
     /**

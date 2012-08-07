@@ -161,31 +161,19 @@
     },
 
     /**
-     * Sets property to a given value
-     * @method set
-     * @param {String} name
-     * @param {Object|Function} value
-     * @return {fabric.Group} thisArg
-     * @chainable
+     * @private
      */
-    set: function(name, value) {
-      if (typeof value == 'function') {
-        // recurse
-        this.set(name, value(this[name]));
+    _set: function(key, value) {
+      if (key === 'fill' || key === 'opacity') {
+        var i = this.objects.length;
+        this[key] = value;
+        while (i--) {
+          this.objects[i].set(key, value);
+        }
       }
       else {
-        if (name === 'fill' || name === 'opacity') {
-          var i = this.objects.length;
-          this[name] = value;
-          while (i--) {
-            this.objects[i].set(name, value);
-          }
-        }
-        else {
-          this[name] = value;
-        }
+        this[key] = value;
       }
-      return this;
     },
 
     /**
