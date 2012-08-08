@@ -124,6 +124,7 @@
       'overlayFill': null,
       'stroke': null,
       'strokeWidth': 1,
+	  'strokeDashArray': null,
       'scaleX': 1,
       'scaleY': 1,
       'selectable': true,
