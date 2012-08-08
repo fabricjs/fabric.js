@@ -193,13 +193,13 @@
 <span class='line'>186</span> 
 <span class='line'>187</span> </span><span class="WHIT">      </span><span class="NAME">this.path</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">fromArray</span><span class="WHIT">
 <span class='line'>188</span> </span><span class="WHIT">        </span><span class="PUNC">?</span><span class="WHIT"> </span><span class="NAME">path</span><span class="WHIT">
-<span class='line'>189</span> </span><span class="WHIT">        </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">path.match</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">path.match</span><span class="PUNC">(</span><span class="REGX">/[a-zA-Z][^a-zA-Z]*/g</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>190</span> 
-<span class='line'>191</span> </span><span class="WHIT">      </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">this.path</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">return</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>192</span> 
-<span class='line'>193</span> </span><span class="WHIT">      </span><span class="COMM">// TODO (kangax): rewrite this idiocracy</span><span class="WHIT">
+<span class='line'>189</span> </span><span class="WHIT">        </span><span class="COMM">// one of commands (m,M,l,L,q,Q,c,C,etc.) followed by non-command characters (i.e. command values)</span><span class="WHIT">
+<span class='line'>190</span> </span><span class="WHIT">        </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">path.match</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">path.match</span><span class="PUNC">(</span><span class="REGX">/[mzlhvcsqta][^mzlhvcsqta]*/gi</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>191</span> 
+<span class='line'>192</span> </span><span class="WHIT">      </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">this.path</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">return</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>193</span> 
 <span class='line'>194</span> </span><span class="WHIT">      </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">fromArray</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>195</span> </span><span class="WHIT">        </span><span class="NAME">this._initializeFromArray</span><span class="PUNC">(</span><span class="NAME">options</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>195</span> </span><span class="WHIT">        </span><span class="NAME">this._initializeFromString</span><span class="PUNC">(</span><span class="NAME">options</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>196</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
 <span class='line'>197</span> 
 <span class='line'>198</span> </span><span class="WHIT">      </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">options.sourcePath</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
@@ -209,9 +209,9 @@
 <span class='line'>202</span> 
 <span class='line'>203</span> </span><span class="WHIT">    </span><span class="COMM">/**
 <span class='line'>204</span>      * @private
-<span class='line'>205</span>      * @method _initializeFromArray
+<span class='line'>205</span>      * @method _initializeFromString
 <span class='line'>206</span>      */</span><span class="WHIT">
-<span class='line'>207</span> </span><span class="WHIT">    </span><span class="NAME">_initializeFromArray</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">options</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>207</span> </span><span class="WHIT">    </span><span class="NAME">_initializeFromString</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">options</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
 <span class='line'>208</span> </span><span class="WHIT">      </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">isWidthSet</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">'width'</span><span class="WHIT"> </span><span class="KEYW">in</span><span class="WHIT"> </span><span class="NAME">options</span><span class="PUNC">,</span><span class="WHIT">
 <span class='line'>209</span> </span><span class="WHIT">          </span><span class="NAME">isHeightSet</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">'height'</span><span class="WHIT"> </span><span class="KEYW">in</span><span class="WHIT"> </span><span class="NAME">options</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>210</span> 

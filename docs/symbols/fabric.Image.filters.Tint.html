@@ -1,6 +1,6 @@
 ---
 layout: doc
-title: Fabric.js API Reference - fabric.Gradient
+title: Fabric.js API Reference - fabric.Image.filters.Tint
 ---
 
 <style>
@@ -263,7 +263,7 @@ ul.inheritsList {
 <!-- ============================== class title ============================ -->
 	<h1 class="classTitle">
 		
-		Namespace fabric.Gradient
+		Class fabric.Image.filters.Tint
 	</h1>
 
 <!-- ============================== class summary ========================== -->			
@@ -271,17 +271,17 @@ ul.inheritsList {
 		
 		
 	
+		fabric.Image.filters.Tint
 		
 		
-		
-			<br /><i>Defined in: </i> <a href="../symbols/src/src_gradient.js.html">gradient.js</a>.
+			<br /><i>Defined in: </i> <a href="../symbols/src/src_image_filters.js.html">image_filters.js</a>.
 		
 	</p>
 
 <!-- ============================== constructor summary ==================== -->			
 	
-	<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class fabric.Gradient.">
-		<caption>Namespace Summary</caption>
+	<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class fabric.Image.filters.Tint.">
+		<caption>Class Summary</caption>
 		<thead>
 			<tr>
 				<th scope="col">Constructor Attributes</th>
@@ -293,7 +293,7 @@ ul.inheritsList {
 				<td class="attributes">&nbsp;</td>
 				<td class="nameDescription" >
 					<div class="fixedFont">
-						<b><a href="../symbols/fabric.Gradient.html#constructor">fabric.Gradient</a></b>
+						<b><a href="../symbols/fabric.Image.filters.Tint.html#constructor">fabric.Image.filters.Tint</a></b>()
 					</div>
 					<div class="description"></div>
 				</td>
@@ -304,12 +304,40 @@ ul.inheritsList {
 
 <!-- ============================== properties summary ===================== -->
 	
+		
+		
+		<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class fabric.Image.filters.Tint.">
+			<caption>Field Summary</caption>
+			<thead>
+				<tr>
+					<th scope="col">Field Attributes</th>
+					<th scope="col">Field Name and Description</th>
+				</tr>
+			</thead>
+			<tbody>
+			
+				<tr>
+					<td class="attributes">&nbsp;</td>
+					<td class="nameDescription">
+						<div class="fixedFont">
+						<b><a href="../symbols/fabric.Image.filters.Tint.html#type">type</a></b>
+						</div>
+						<div class="description"></div>
+					</td>
+				</tr>
+			
+			</tbody>
+		</table>
+		
+		
+		
+	
 
 <!-- ============================== methods summary ======================== -->
 	
 		
 		
-		<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class fabric.Gradient.">
+		<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class fabric.Image.filters.Tint.">
 			<caption>Method Summary</caption>
 			<thead>
 				<tr>
@@ -320,9 +348,9 @@ ul.inheritsList {
 			<tbody>
 			
 				<tr>
-					<td class="attributes">&lt;static&gt; &nbsp;</td>
+					<td class="attributes">&nbsp;</td>
 					<td class="nameDescription">
-						<div class="fixedFont">fabric.Gradient.<b><a href="../symbols/fabric.Gradient.html#.create">create</a></b>(ctx, options)
+						<div class="fixedFont"><b><a href="../symbols/fabric.Image.filters.Tint.html#applyTo">applyTo</a></b>(canvasEl)
 						</div>
 						<div class="description"></div>
 					</td>
@@ -331,16 +359,16 @@ ul.inheritsList {
 				<tr>
 					<td class="attributes">&lt;static&gt; &nbsp;</td>
 					<td class="nameDescription">
-						<div class="fixedFont">fabric.Gradient.<b><a href="../symbols/fabric.Gradient.html#.forObject">forObject</a></b>(obj, ctx, options)
+						<div class="fixedFont">fabric.Image.filters.Tint.<b><a href="../symbols/fabric.Image.filters.Tint.html#.fromObject">fromObject</a></b>(object)
 						</div>
 						<div class="description"></div>
 					</td>
 				</tr>
 			
 				<tr>
-					<td class="attributes">&lt;static&gt; &nbsp;</td>
+					<td class="attributes">&nbsp;</td>
 					<td class="nameDescription">
-						<div class="fixedFont">fabric.Gradient.<b><a href="../symbols/fabric.Gradient.html#.fromElement">fromElement</a></b>(el, ctx, instance)
+						<div class="fixedFont"><b><a href="../symbols/fabric.Image.filters.Tint.html#toJSON">toJSON</a></b>()
 						</div>
 						<div class="description"></div>
 					</td>
@@ -359,11 +387,11 @@ ul.inheritsList {
 	
 	<div class="details"><a name="constructor"> </a>
 		<div class="sectionTitle">
-			Namespace Detail
+			Class Detail
 		</div>
 		
 		<div class="fixedFont">
-				<b>fabric.Gradient</b>
+				<b>fabric.Image.filters.Tint</b>()
 		</div>
 		
 		<div class="description">
@@ -387,6 +415,33 @@ ul.inheritsList {
 
 <!-- ============================== field details ========================== -->		
 	
+		<div class="sectionTitle">
+			Field Detail
+		</div>
+		
+			<a name="type"> </a>
+			<div class="fixedFont">
+			
+			
+			<b>type</b>
+			
+			</div>
+			<div class="description">
+				
+				
+				
+			</div>
+			
+			
+
+				
+				
+				
+				
+
+			
+		
+	
 
 <!-- ============================== method details ========================= -->		
 	
@@ -394,11 +449,11 @@ ul.inheritsList {
 			Method Detail
 		</div>
 		
-			<a name=".create"> </a>
-			<div class="fixedFont">&lt;static&gt; 
+			<a name="applyTo"> </a>
+			<div class="fixedFont">
 			
 			
-			<span class="light">fabric.Gradient.</span><b>create</b>(ctx, options)
+			<b>applyTo</b>(canvasEl)
 			
 			</div>
 			<div class="description">
@@ -414,13 +469,43 @@ ul.inheritsList {
 					<dt class="heading">Parameters:</dt>
 					
 						<dt>
-							<b>ctx</b>
+							<span class="light fixedFont">{Object}</span> <b>canvasEl</b>
 							
 						</dt>
-						<dd></dd>
+						<dd>Canvas element to apply filter to</dd>
+					
+					</dl>
+				
+				
+				
+				
+				
+				
+				
+
+			<hr />
+		
+			<a name=".fromObject"> </a>
+			<div class="fixedFont">&lt;static&gt; 
+			
+			
+			<span class="light">fabric.Image.filters.Tint.</span><b>fromObject</b>(object)
+			
+			</div>
+			<div class="description">
+				
+				
+				
+			</div>
+			
+			
+			
+				
+					<dl class="detailList">
+					<dt class="heading">Parameters:</dt>
 					
 						<dt>
-							<b>options</b>
+							<b>object</b>
 							
 						</dt>
 						<dd></dd>
@@ -436,59 +521,11 @@ ul.inheritsList {
 
 			<hr />
 		
-			<a name=".forObject"> </a>
-			<div class="fixedFont">&lt;static&gt; 
+			<a name="toJSON"> </a>
+			<div class="fixedFont">
 			
-			
-			<span class="light">fabric.Gradient.</span><b>forObject</b>(obj, ctx, options)
-			
-			</div>
-			<div class="description">
-				
-				
-				
-			</div>
-			
-			
-			
-				
-					<dl class="detailList">
-					<dt class="heading">Parameters:</dt>
-					
-						<dt>
-							<b>obj</b>
-							
-						</dt>
-						<dd></dd>
-					
-						<dt>
-							<b>ctx</b>
-							
-						</dt>
-						<dd></dd>
-					
-						<dt>
-							<b>options</b>
-							
-						</dt>
-						<dd></dd>
-					
-					</dl>
-				
-				
-				
-				
-				
-				
-				
-
-			<hr />
-		
-			<a name=".fromElement"> </a>
-			<div class="fixedFont">&lt;static&gt; 
-			
-			
-			<span class="light">fabric.Gradient.</span><b>fromElement</b>(el, ctx, instance)
+			<span class="light">{<a href="../symbols/String.html">String</a>}</span>
+			<b>toJSON</b>()
 			
 			</div>
 			<div class="description">
@@ -500,41 +537,18 @@ ul.inheritsList {
 			
 			
 				
-					<dl class="detailList">
-					<dt class="heading">Parameters:</dt>
-					
-						<dt>
-							<b>el</b>
-							
-						</dt>
-						<dd></dd>
-					
-						<dt>
-							<b>ctx</b>
-							
-						</dt>
-						<dd></dd>
-					
-						<dt>
-							<b>instance</b>
-							
-						</dt>
-						<dd></dd>
-					
-					</dl>
-				
-				
-				
 				
 				
 				
 				
 					<dl class="detailList">
-					<dt class="heading">See:</dt>
+					<dt class="heading">Returns:</dt>
 					
-						<dd>http://www.w3.org/TR/SVG/pservers.html#LinearGradientElement</dd>
+						<dd><span class="light fixedFont">{<a href="../symbols/String.html">String</a>}</span> json representation of filter</dd>
 					
 					</dl>
+				
+				
 				
 
 			
