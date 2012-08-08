@@ -91,6 +91,10 @@
     group.set('left', function(value){ return value + 1234; });
     equal(group.get('left'), 2468, 'group\'s own "left" property should be set properly via function');
     ok(firstObject.get('left') !== 2468, 'objects\' value should not be affected when set via function');
+
+    group.set({ left: 888, top: 999 });
+    equal(group.get('left'), 888, 'group\'s own "left" property should be set properly via object');
+    equal(group.get('top'), 999, 'group\'s own "top" property should be set properly via object');
   });
 
   test('contains', function() {
