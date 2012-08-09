@@ -8903,6 +8903,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       this._setWidthHeight(options);
     },
 
+    /**
+     * @private
+     * @method _setWidthHeight
+     * @param {Object} options
+     */
     _setWidthHeight: function(options) {
       options || (options = { });
 
@@ -8913,9 +8918,15 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       this.set('top', 'top' in options ? options.top : (this.y1 + this.height / 2));
     },
 
-    set: function(name, value) {
-      parentSet.call(this, name, value);
-      if (name in coordProps) {
+    /**
+     * @private
+     * @method _set
+     * @param {String} key
+     * @param {Any} value
+     */
+    _set: function(key, value) {
+      this[key] = value;
+      if (key in coordProps) {
         this._setWidthHeight();
       }
       return this;
