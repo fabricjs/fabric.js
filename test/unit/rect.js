@@ -10,6 +10,7 @@
     'overlayFill': null,
     'stroke': null,
     'strokeWidth': 1,
+    'strokeDashArray': null,
     'scaleX': 1,
     'scaleY': 1,
     'angle': 0,
@@ -113,6 +114,6 @@
     var rect = new fabric.Rect({ width: 100, height: 100, rx: 20, ry: 30 });
     var svg = rect.toSVG();
 
-    equal('<rect x="-50" y="-50" rx="20" ry="30" width="100" height="100" style="stroke: none; stroke-width: 1; fill: rgb(0,0,0); opacity: 1;" transform="translate(0 0)" />', svg);
+    equal('<rect x="-50" y="-50" rx="20" ry="30" width="100" height="100" style="stroke: none; stroke-width: 1; stroke-dasharray: ; fill: rgb(0,0,0); opacity: 1;" transform="translate(0 0)" />', svg);
   });
 })();
