@@ -111,11 +111,11 @@
 
   test('toJSON', function() {
     var emptyObjectJSON = '{"type":"object","left":0,"top":0,"width":0,"height":0,"fill":"rgb(0,0,0)",'+
-                          '"overlayFill":null,"stroke":null,"strokeWidth":1,"scaleX":1,"scaleY":1,"angle":0,'+
+                          '"overlayFill":null,"stroke":null,"strokeWidth":1,"strokeDashArray":null,"scaleX":1,"scaleY":1,"angle":0,'+
                           '"flipX":false,"flipY":false,"opacity":1,"selectable":true,"hasControls":true,"hasBorders":true,"hasRotatingPoint":false}';
 
     var augmentedJSON = '{"type":"object","left":0,"top":0,"width":122,"height":0,"fill":"rgb(0,0,0)",'+
-                        '"overlayFill":null,"stroke":null,"strokeWidth":1,"scaleX":1.3,"scaleY":1,"angle":0,'+
+                        '"overlayFill":null,"stroke":null,"strokeWidth":1,"strokeDashArray":null,"scaleX":1.3,"scaleY":1,"angle":0,'+
                         '"flipX":false,"flipY":true,"opacity":0.88,"selectable":true,"hasControls":true,"hasBorders":true,"hasRotatingPoint":false}';
 
     var cObj = new fabric.Object();
@@ -137,6 +137,7 @@
       'overlayFill': null,
       'stroke': null,
       'strokeWidth': 1,
+	  'strokeDashArray': null,
       'scaleX': 1,
       'scaleY': 1,
       'angle': 0,
@@ -158,6 +159,7 @@
       'overlayFill': null,
       'stroke': null,
       'strokeWidth': 1,
+	  'strokeDashArray': null,
       'scaleX': 1,
       'scaleY': 1,
       'angle': 0,

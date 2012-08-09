@@ -10,6 +10,7 @@
     'overlayFill': null,
     'stroke': 'blue',
     'strokeWidth': 1,
+    'strokeDashArray': null,
     'scaleX': 1,
     'scaleY': 1,
     'angle': 0,
