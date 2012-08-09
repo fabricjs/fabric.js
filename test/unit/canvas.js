@@ -22,12 +22,12 @@
                   '13.99], ["z", null]]}], "background": "#ff5555"}';
 
   var PATH_DATALESS_JSON = '{"objects":[{"type":"path","left":100,"top":100,"width":200,"height":200,"fill":"rgb(0,0,0)",'+
-                           '"overlayFill":null,"stroke":null,"strokeWidth":1,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,'+
+                           '"overlayFill":null,"stroke":null,"strokeWidth":1,"strokeDashArray":null,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,'+
                            '"flipY":false,"opacity":1,"selectable":true,"hasControls":true,"hasBorders":true,"hasRotatingPoint":false,'+
                            '"path":"http://example.com/"}],"background":"rgba(0, 0, 0, 0)"}';
 
   var RECT_JSON = '{"objects":[{"type":"rect","left":0,"top":0,"width":10,"height":10,"fill":"rgb(0,0,0)","overlayFill":null,'+
-                  '"stroke":null,"strokeWidth":1,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,'+
+                  '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,'+
                   '"selectable":true,"hasControls":true,"hasBorders":true,"hasRotatingPoint":false,"rx":0,"ry":0}],'+
                   '"background":"#ff5555"}';
 
