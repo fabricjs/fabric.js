@@ -444,6 +444,23 @@
       while (i--) {
         this.objects[i].toGrayscale();
       }
+    },
+
+    /**
+     * Returns svg representation of an instance
+     * @method toSVG
+     * @return {string} svg representation of an instance
+     */
+    toSVG: function() {
+      var objectsMarkup = [ ];
+      for (var i = 0, len = this.objects.length; i < len; i++) {
+        objectsMarkup.push(this.objects[i].toSVG());
+      }
+
+      return (
+        '<g transform="' + this.getSvgTransform() + '">' +
+          objectsMarkup.join('') +
+        '</g>');
     }
   });
 

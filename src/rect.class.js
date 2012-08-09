@@ -23,12 +23,15 @@
 
     /**
      * @property
-     * @type Object
+     * @type Number
      */
-    options: {
-      rx: 0,
-      ry: 0
-    },
+    rx: 0,
+
+    /**
+     * @property
+     * @type Number
+     */
+    ry: 0,
 
     /**
      * Constructor

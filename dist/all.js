@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL` */
 /*! Fabric.js Copyright 2008-2012, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.8.44" };
+var fabric = fabric || { version: "0.8.45" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -9491,12 +9491,15 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
     /**
      * @property
-     * @type Object
+     * @type Number
      */
-    options: {
-      rx: 0,
-      ry: 0
-    },
+    rx: 0,
+
+    /**
+     * @property
+     * @type Number
+     */
+    ry: 0,
 
     /**
      * Constructor
@@ -11421,6 +11424,23 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       while (i--) {
         this.objects[i].toGrayscale();
       }
+    },
+
+    /**
+     * Returns svg representation of an instance
+     * @method toSVG
+     * @return {string} svg representation of an instance
+     */
+    toSVG: function() {
+      var objectsMarkup = [ ];
+      for (var i = 0, len = this.objects.length; i < len; i++) {
+        objectsMarkup.push(this.objects[i].toSVG());
+      }
+
+      return (
+        '<g transform="' + this.getSvgTransform() + '">' +
+          objectsMarkup.join('') +
+        '</g>');
     }
   });
 
