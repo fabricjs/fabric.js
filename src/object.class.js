@@ -144,12 +144,8 @@
      * @param {Object} [options]
      */
     setOptions: function(options) {
-      var i = this.stateProperties.length, prop;
-      while (i--) {
-        prop = this.stateProperties[i];
-        if (prop in options) {
-          this.set(prop, options[prop]);
-        }
+	  for(prop in options) {
+	    this.set(prop, options[prop]);
       }
     },
 
