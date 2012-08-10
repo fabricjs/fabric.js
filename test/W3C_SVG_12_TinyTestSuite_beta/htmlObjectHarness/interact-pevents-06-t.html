@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE html PUBLIC  "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+ <html xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+ <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+ <meta name="keywords" content="W3C SVG 1.1 Test Suite testsuite mobile"/>
+ <meta name="description" content="W3C SVG 1.2 Tiny Test Suite"/>
+ <title>
+SVG 1.2 Tiny test:interact-pevents-06-t </title>
+ <style type="text/css">
+ <!--
+ .bodytext    { font-family:verdana, helvetica, sans-serif; font-size: 12pt; line-height: 125%; text-align: Left; margin-top: 0; margin-bottom: 0 }
+ .pageTitle         { line-height: 150%; font-size: 20pt; font-weight : 900; margin-bottom: 20pt }
+ .pageSubTitle  { color : blue; line-height: 100%; font-size: 24pt; font-weight : 900 }
+ .openChapter   { color : blue; line-height: 125%; font-weight : 900 }
+ .openSection   { color : blue; line-height: 125%; font-weight : 900 }
+ .info  { color : black; line-height: 110%; font-size: 10pt; font-weight : 100 }
+ p          { margin-top:0; margin-bottom:0; padding-top:0; padding-bottom:0 }
+ blockquote { margin-top:0; margin-bottom:0; padding-top:0; padding-bottom:0 }
+ .opscript {margin-left: 3%; margin-right: 3%; }
+ .opscript p { margin-top: 0.7em}
+ .navbar {background: black; color: white; font-weight: bold}
+ -->
+ </style>
+ </head>
+ <body class="bodytext">
+
+	<div class="linkbar"> 
+<p>
+<a href="interact-pevents-06-t.html">Tiny version</a></p>
+<p>Specification link: <a target="spec" href="http://www.w3.org/TR/SVGMobile12/interact.html">13 Interactivity</a></p>
+ <p>
+    <a href="interact-pevents-05-t.html">interact-pevents-05-t ←</a> 
+    <a href="index.html">index</a>
+    <a href="interact-pevents-07-t.html">→ interact-pevents-07-t</a>
+</p></div>
+
+	<table align="center" border="0" cellspacing="0" cellpadding="10">
+		<tr>
+			<td align="center" colspan="3">
+				<table border="0" cellpadding="8">
+					<tr>
+						<td align="center" colspan="2" class="pageTitle">
+							<h1>interact-pevents-06-t</h1>
+						</td>
+					</tr>
+					<tr  class="navbar">
+						<td align="center">
+							SVG Image
+						</td>
+						<td align="center">
+							PNG Image
+						</td>
+					</tr>
+					<tr>
+						<td align="right">
+   	    		  			<object data="../svggen/interact-pevents-06-t.svg" width="480" height="360" type="image/svg+xml"><p style="font-size:300%;color:red">FAIL</p></object>
+						</td>
+						<td align="left">
+							<img alt="raster image of interact-pevents-06-t" src="../png/interact-pevents-06-t.png" width="480" height="360"/>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+
+               
+<div class="opscript">
+      <p>Tests the pointer-events attribute with different painting values</p>
+      <p>
+        The test is passed if the following conditions are met:
+        - In the first row of squares, the fill and stroke of squares 1, 3 and 4 only must trigger a pale red rectangle to appear
+        over the squares on mouseover.
+        - In the second row of squares, the fill only of all squares must trigger a pale red rectangle to appear
+        over the squares on mouseover.
+        - In the third row of squares, the stroke only of all must trigger a pale red rectangle to appear
+        over the squares on mouseover.
+        - In the fourth row of squares, the fill and stroke of all squares must trigger a pale red rectangle to appear
+        over the squares on mouseover.
+        - In the fifth row of squares, nothing is to trigger on mouseover.
+      </p>
+      <p>
+        The 2nd and 3rd columns represent respectively rects with no fill/stroke and transparent fill/stroke.
+        The 4th column has visibility set to hidden.
+      </p>
+      <p>
+        The first row tests pointer-events="painted", i.e. event on fill and stroke that are set.
+        The second row tests pointer-events="fill", i.e. event on a fill that is set.
+        The third row tests pointer-events="stroke", i.e. even on a stroke that is et.
+        The fourth row tests pointer-events="all", i.e. event on fill and stroke that are set.
+        The fifth row tests pointer-events="none", i.e. no event.
+      </p>
+
+		</div>
+<div class="linkbar"> <p>
+				<a href="interact-pevents-05-t.html">interact-pevents-05-t ←</a>
+				<a href="index.html">index</a>
+				<a href="interact-pevents-07-t.html">→ interact-pevents-07-t</a>
+						</p></div>
+</body>
+</html>

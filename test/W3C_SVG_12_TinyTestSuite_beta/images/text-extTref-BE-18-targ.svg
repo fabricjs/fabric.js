@@ -1,0 +1,58 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd"> 
+  
+
+
+<!-- ===================================================================== -->
+<!--                                                                       -->
+<!-- text-extTref-BE-18-targ.svg                                           -->
+<!--                                                                       -->
+<!-- Auxiliary file to provide external 'tref' target string for           -->
+<!-- text-extTref-BE-18.svg.                                               -->
+<!--                                                                       -->
+<!-- ===================================================================== -->
+
+
+
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"   id="text-tref-BE-04"  width="450" height="450" >
+	
+<title id="test-title">text-extTref-BE-18-targ</title>
+
+<desc id="test-desc">
+Auxiliary ('tref' target) file for test case text-extTref-BE-18.
+</desc>
+
+<!-- There is no drawn content to this file, except for the legend & frame -->
+
+<g 	id="test-body-content">
+	
+	<defs>
+
+		<text id="tref-external-reference">Simple external referenced text.</text>
+
+	</defs>
+
+</g>
+                                                  
+
+<!-- ====================================================================== -->
+<!-- Legend & frame:        Title, suite and SVG document serialization==== -->
+<!-- ====================================================================== -->
+
+<g 	id="test-legend">	
+
+	<rect x="10" y="390" width="270" height="50" style="fill:none;stroke:#000000"/>
+	<path style="fill:none;stroke:#000000" d="M10 405 h270 M195 405 v35 M195 422.5 h85"/>
+	<text style="font-family:Helvetica;font-size:10" x="30" y="401">Scalable Vector Graphics (SVG) Conformance Suite</text>
+	<text style="font-family:Helvetica;font-size:12" x="65" y="428">text-extTref-BE-18-targ</text>
+	<text style="font-family:Helvetica;font-size:12" x="205" y="418">Release 1.0</text>
+	<text style="font-family:Helvetica;font-size:10" x="205" y="435">$Revision: 1.1 $</text>
+
+      <!-- Test-framing rectangle, drawn just inside viewport boundary. -->
+	<rect id="test-frame" x="1" y="1" width="448" height="448" style="fill:none; stroke:#000000"/>
+
+</g>
+
+
+</svg>
+

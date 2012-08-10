@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="ASL" owner="AE" desc="TextArea with Animated Width and Height" status="accepted"
+    approved="yes"
+    version="$Revision: 1.7 $" testname="$RCSfile: text-area-203-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>TextArea with Animated Width and Height</p>
+      <p>
+        A visible rectangle is drawn the same size as the textArea. The text
+        contained in the textArea should automatically wrap.
+      </p>
+      <p>
+        The textArea starts off as a 24x 24 square and is animated down to full
+        size. The text should continually rewrap as the textArea increases in
+        size.
+      </p>
+      <p>
+        The text is taken from "The Lost Princess of Oz" by Baum, L. Frank
+        (Lyman Frank), 1856-1919
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: text-area-203-t.svg,v $</title>
+  <defs>
+    <font-face font-family="SVGFreeSansASCII" unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii" />
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+    <text xml:id="display-title" x="240" y="30" font-size="14" text-anchor="middle" fill="#000">TextArea with Animated Width and Height</text>
+    <text xml:id="comment-1" x="240" y="45" font-size="11" text-anchor="middle" fill="#555">
+      The text should continually rewrap as the 'textArea' decreases and increases in size.
+    </text>
+    <text x="465" y="290" font-size="8" text-anchor="end" fill="#555">
+      Excerpt from "The Lost Princess of Oz" by Baum, L. Frank (Lyman Frank), 1856-1919
+    </text>
+    <rect x="15" y="60" height="215" width="450" fill="none" stroke="black" stroke-width="0.25">
+      <animate attributeName="width" from="450" to="10" calcMode="paced" begin="1s" dur="3s" fill="freeze"/>
+      <animate attributeName="height" from="215" to="10" calcMode="paced" begin="1s" dur="3s" fill="freeze"/>
+      <animate attributeName="width" from="10" to="450" calcMode="paced" begin="5s" dur="3s" fill="freeze"/>
+      <animate attributeName="height" from="10" to="215" calcMode="paced" begin="5s" dur="3s" fill="freeze"/>
+    </rect>
+    <textArea x="15" y="60" height="215" width="450" font-size="16" fill="#258">
+      <animate attributeName="width" from="450" to="10" calcMode="paced" begin="1s" dur="3s" fill="freeze"/>
+      <animate attributeName="height" from="215" to="10" calcMode="paced" begin="1s" dur="3s" fill="freeze"/>
+      <animate attributeName="width" from="10" to="450" calcMode="paced" begin="5s" dur="3s" fill="freeze"/>
+      <animate attributeName="height" from="10" to="215" calcMode="paced" begin="5s" dur="3s" fill="freeze"/>
+      Together they searched all through the great palace and even to the farthest limits of the palace grounds, which were quite extensive, but nowhere could they find a trace of Ozma.  When Dorothy returned to where Betsy and Trot awaited her, the little girl's face was rather solemn and troubled, for never before had Ozma gone away without telling her friends where she was going, or without an escort that befitted her royal state.  She was gone, however, and none had seen her go.  Dorothy had met and questioned the Scarecrow, Tik-Tok, the Shaggy Man, Button-Bright, Cap'n Bill, and even the wise and powerful Wizard of Oz, but not one of them had seen Ozma since she parted with her friends the evening before and had gone to her own rooms.
+    </textArea>
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.7 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240"
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

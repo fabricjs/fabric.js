@@ -1,0 +1,288 @@
+---
+layout: test
+title: SVG Export (basic geometric shapes, images)
+---
+
+<link rel="stylesheet" href="master.css">
+
+<script type="text/script" id="test-template">
+  <div class="test">
+    <div class="column">
+      <p>Source</p>
+      <pre class="source"><code>#{code}</code></pre>
+    </div>
+    <div class="column">
+      <p>Canvas</p>
+      <canvas class="canvas" width="300" height="300"></canvas>
+    </div>
+    <div class="column">
+      <p>SVG</p>
+      <div class="svg"></div>
+    </div>
+  </div>
+</script>
+
+<pre class="test-source">
+var rect = new fabric.Rect({
+  left: 100, 
+  top: 100, 
+  width: 100, 
+  height: 50, 
+  fill: 'red'
+});
+canvas.add(rect);
+</pre>
+
+<pre class="test-source">
+var rect = new fabric.Rect({
+  left: 100, 
+  top: 100, 
+  width: 100, 
+  height: 50, 
+  fill: 'red',
+  stroke: 'blue',
+  strokeWidth: 5
+});
+canvas.add(rect);
+</pre>
+
+<pre class="test-source">
+var circle = new fabric.Circle({
+  left: 100,
+  top: 100,
+  radius: 50, 
+  fill: 'green'
+});
+canvas.add(circle);
+</pre>
+
+<pre class="test-source">
+var circle = new fabric.Circle({
+  left: 100,
+  top: 100,
+  radius: 75,
+  fill: 'green',
+  stroke: 'rgba(255,0,0,0.6)',
+  strokeWidth: 15
+});
+canvas.add(circle);
+</pre>
+
+
+<pre class="test-source">
+var triangle = new fabric.Triangle({ 
+  left: 100, 
+  top: 100, 
+  width: 70,
+  height: 70,
+  fill: 'blue'
+});
+canvas.add(triangle);
+</pre>
+
+<pre class="test-source">
+var rect = new fabric.Rect({ 
+  left: 100, 
+  top: 100, 
+  width: 70,
+  height: 70,
+  fill: 'red',
+  angle: 30
+});
+canvas.add(rect);
+</pre>
+
+<pre class="test-source">
+var rect = new fabric.Rect({
+  left: 100, top: 100, width: 190, 
+  height: 190, fill: 'rgb(155,155,255)'
+});
+var rect2 = new fabric.Rect({
+  left: 100, top: 100, width: 170, 
+  height: 170, fill: 'rgb(155,255,155)'
+});
+var rect3 = new fabric.Rect({
+  left: 100, top: 100, width: 130, 
+  height: 130, fill: 'rgb(255,155,155)'
+});
+canvas.add(rect, rect2, rect3);
+</pre>
+
+<pre class="test-source">
+var line = new fabric.Line([10, 10, 100, 100], { 
+  fill: 'green',
+  stroke: 'green'
+});
+canvas.add(line);
+</pre>
+
+<pre class="test-source">
+var line = new fabric.Line([100, 50, 40, 150], { 
+  stroke: 'red',
+  fill: 'red',
+  strokeWidth: 10
+});
+canvas.add(line);
+</pre>
+
+<pre class="test-source">
+var ellipse = new fabric.Ellipse({
+  rx: 45,
+  ry: 80,
+  fill: 'yellow',
+  stroke: 'red',
+  strokeWidth: 3,
+  angle: 30,
+  left: 100,
+  top: 100
+});
+canvas.add(ellipse);
+</pre>
+
+<pre class="test-source">
+var poly = new fabric.Polyline([
+    { x: 10, y: 10 }, 
+    { x: 50, y: 30 }, 
+    { x: 40, y: 70 }, 
+    { x: 60, y: 50 }, 
+    { x: 100, y: 150 }, 
+    { x: 40, y: 100 }
+  ], { 
+  stroke: 'red'
+});
+canvas.add(poly);
+</pre>
+
+<pre class="test-source">
+  var poly = new fabric.Polyline([
+      { x: 10, y: 10 }, 
+      { x: 50, y: 30 }, 
+      { x: 40, y: 70 }, 
+      { x: 60, y: 50 }, 
+      { x: 100, y: 150 }, 
+      { x: 40, y: 100 }
+    ], { 
+    stroke: 'red',
+    fill: 'yellow'
+  });
+  canvas.add(poly);
+</pre>
+
+<pre class="test-source">
+  var poly = new fabric.Polygon([
+      { x: 10, y: 10 }, 
+      { x: 50, y: 30 }, 
+      { x: 40, y: 70 }, 
+      { x: 60, y: 50 }, 
+      { x: 100, y: 150 }, 
+      { x: 40, y: 100 }
+    ], { 
+    stroke: 'blue',
+    fill: 'rgba(0,0,255,0.3)',
+    strokeWidth: 3
+  });
+  canvas.add(poly);
+</pre>
+
+<pre class="test-source async">
+var json = '{"objects":[{"type":"path","left":104,"top":96,"width":99,"height":115,"fill":"#00274D","overlayFill":null,"stroke":null,"strokeWidth":1,"scaleX":1.04,"scaleY":1.04,"angle":-25.8,"flipX":false,"flipY":false,"opacity":1,"selectable":true,"path":[["M",67.39,22.39],["c",2.59,-0.43,5.11,1.44,5.54,4.18],["c",0.43,2.66,-1.3,5.26,-3.89,5.69],["c",-1.8,0.29,-3.6,-0.58,-4.61,-2.02],["L",44.5,34.56],["l",10.87,59.62],["c",17.42,-4.46,26.06,-14.18,27.5,-29.02],["l",-10.01,-0.72],["L",88.7,51.91],["l",9.43,21.24],["c",-3.38,-1.95,-5.9,-5.11,-9.29,-7.06],["c",-0.29,25.06,-27.14,32.76,-33.77,47.95],["C",44.42,100.08,26.5,114.77,6.91,82.8],["L",0,92.45],["l",1.51,-21.6],["l",19.66,4.68],["l",-9.43,3.67],["c",7.49,11.59,17.57,19.87,36.43,16.42],["L",36.22,36.57],["l",-18.65,2.38],["c",-0.14,2.16,-1.73,4.03,-3.89,4.39],["c",-2.59,0.43,-5.04,-1.44,-5.54,-4.1],["c",-0.43,-2.74,1.3,-5.26,3.89,-5.69],["c",1.94,-0.36,3.89,0.65,4.9,2.3],["l",17.93,-4.82],["l",-1.37,-6.84],["c",-4.82,-0.79,-8.93,-4.75,-9.79,-10.08],["c",-1.15,-6.62,3.1,-12.89,9.43,-13.97],["c",6.41,-1.01,12.46,3.46,13.54,10.08],["c",0.86,5.18,-1.58,10.15,-5.69,12.6],["l",1.87,6.12],["l",20.74,-2.88],["C",64.01,24.26,65.52,22.75,67.39,22.39],["L",67.39,22.39],["z"],["M",33.91,5.18],["c",-3.46,0.58,-5.76,3.96,-5.11,7.56],["c",0.58,3.6,3.89,6.05,7.27,5.47],["c",3.46,-0.58,5.76,-3.96,5.18,-7.56],["C",40.61,7.05,37.37,4.61,33.91,5.18],["z"]]}],"background":"rgba(0, 0, 0, 0)"}';
+
+canvas.loadFromDatalessJSON(json, proceed);
+</pre>
+
+<pre class="test-source">
+var circle = new fabric.Circle({ 
+  left: 100, top: 75, radius: 50, fill: 'rgb(0,255,0)', opacity: 0.5
+});
+var circle2 = new fabric.Circle({ 
+  left: 125, top: 125, radius: 50, fill: 'rgb(255,0,0)', opacity: 0.5
+});
+var circle3 = new fabric.Circle({ 
+  left: 75, top: 125, radius: 50, fill: 'rgb(0,0,255)', opacity: 0.5
+});
+canvas.add(circle, circle2, circle3);
+</pre>
+
+<pre class="test-source">
+var circle = new fabric.Circle({ 
+  left: 100, top: 75, radius: 50, fill: 'rgba(0,255,0,0.5)'
+});
+var circle2 = new fabric.Circle({ 
+  left: 125, top: 125, radius: 50, fill: 'rgba(255,0,0,0.5)'
+});
+var circle3 = new fabric.Circle({ 
+  left: 75, top: 125, radius: 50, fill: 'rgba(0,0,255,0.5)'
+});
+canvas.add(circle, circle2, circle3);
+</pre>
+
+<pre class="test-source async">
+var src = 'http://kangax.github.com/fabric.js/assets/pug.jpg';
+fabric.util.loadImage(src, function(img) {
+  var oImg = new fabric.Image(img);
+  oImg.set({ 
+    left: 100, 
+    top: 100,
+  });
+  canvas.add(oImg);
+  proceed();
+});
+</pre>
+
+<pre class="test-source async">
+var src = 'http://kangax.github.com/fabric.js/assets/pug.jpg';
+fabric.util.loadImage(src, function(img) {
+  var oImg = new fabric.Image(img);
+  oImg.scale(0.2).set({ 
+    left: 100, 
+    top: 100,
+  });
+  canvas.add(oImg);
+  proceed();
+});
+</pre>
+
+<pre class="test-source async">
+var src = 'http://kangax.github.com/fabric.js/assets/pug.jpg';
+fabric.util.loadImage(src, function(img) {
+  var oImg = new fabric.Image(img);
+  oImg.scale(0.1).set({ 
+    left: 100, 
+    top: 100,
+    angle: 30,
+    opacity: 0.5
+  });
+  canvas.add(oImg);
+  proceed();
+});
+</pre>
+
+<pre class="test-source async">
+var src = 'http://kangax.github.com/fabric.js/assets/pug.jpg';
+fabric.util.loadImage(src, function(img) {
+  var oImg = new fabric.Image(img);
+  oImg.set({ 
+    left: 100, 
+    top: 100,
+    scaleY: 0.1,
+    scaleX: 0.25
+  });
+  canvas.add(oImg);
+  proceed();
+});
+</pre>
+
+<pre class="test-source async">
+var src = 'http://kangax.github.com/fabric.js/assets/logo.png';
+fabric.util.loadImage(src, function(img) {
+  canvas.add(new fabric.Image(img, { left: 50, top: 30, scaleX: 0.3, scaleY: 0.3 }));
+  canvas.add(new fabric.Image(img, { left: 250, top: 30, scaleX: 0.3, scaleY: 0.3 }));
+  canvas.add(new fabric.Image(img, { left: 50, top: 275, scaleX: 0.3, scaleY: 0.3 }));
+  canvas.add(new fabric.Image(img, { left: 250, top: 275, scaleX: 0.3, scaleY: 0.3 }));
+  canvas.add(new fabric.Image(img, { left: 150, top: 150, angle: 30, scaleX: 0.9, scaleY: 0.9 }));
+  proceed();
+});
+</pre>
+
+
+<script src="master.js"></script>

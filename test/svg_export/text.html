@@ -1,0 +1,315 @@
+---
+layout: test
+title: SVG Export (text)
+---
+
+<link rel="stylesheet" href="master.css">
+
+<script src="../../lib/fonts/Delicious.font.js"></script>
+<script src="../../lib/fonts/DejaVuSerif.font.js"></script>
+<script src="../../lib/fonts/CourierNew.font.js"></script>
+
+<script src="../../lib/font_definitions.js"></script>
+
+<script>
+  function addText(text, options) {
+    var text = new fabric.Text(text, options);
+    text.useNative = document.location.hash === '#native';
+    __canvas.add(text);
+  }
+</script>
+
+<script type="text/script" id="test-template">
+  <div class="test">
+    <div class="column">
+      <p>Source</p>
+      <pre class="source"><code>#{code}</code></pre>
+    </div>
+    <div class="column">
+      <p>Canvas</p>
+      <canvas class="canvas" width="300" height="300"></canvas>
+    </div>
+    <div class="column">
+      <p>SVG</p>
+      <div class="svg"></div>
+    </div>
+  </div>
+</script>
+
+<pre class="test-source">
+  addText('hello world', {
+    fontFamily: 'Delicious',
+    fill: 'red',
+    left: 100,
+    top: 50
+  });
+</pre>
+
+<pre class="test-source">
+  addText('hello world', {
+    fontFamily: 'Delicious',
+    fill: '#555',
+    left: 100,
+    top: 50,
+    textDecoration: 'underline'
+  });
+</pre>
+
+<pre class="test-source">
+  addText('hello world', {
+    fontFamily: 'Delicious',
+    fill: '#555',
+    left: 100,
+    top: 50,
+    textDecoration: 'overline'
+  });
+</pre>
+
+<pre class="test-source">
+  addText('hello world', {
+    fontFamily: 'Delicious',
+    fill: '#333',
+    left: 100,
+    top: 50,
+    textDecoration: 'line-through'
+  });
+</pre>
+
+<pre class="test-source">
+  addText('foo bar baz', {
+    fontFamily: 'Delicious',
+    fill: '#f55',
+    left: 100,
+    top: 50,
+    fontStyle: 'italic'
+  });
+</pre>
+
+<pre class="test-source">
+  addText('hello world', {
+    fontFamily: 'Delicious', fill: '#555', left: 100, top: 50, fontSize: 18, angle: 30
+  });
+  addText('foo bar baz', {
+    fontFamily: 'Delicious', fill: 'green', left: 120, top: 150, fontSize: 24, angle: -30
+  });
+  addText('foo bar baz', {
+    fontFamily: 'Delicious', fill: 'red', left: 60, top: 100, fontSize: 20, opacity: 0.5
+  });
+</pre>
+
+<pre class="test-source">
+  addText('hello world', {
+    fontFamily: 'DejaVu Serif',
+    fill: '#555',
+    left: 83,
+    top: 50,
+    fontSize: 26
+  });
+</pre>
+
+<pre class="test-source">
+  addText('this is\na multiline\ntext!', {
+    fontFamily: 'DejaVu Serif',
+    fill: '#555',
+    left: 83,
+    top: 50,
+    fontSize: 26
+  });
+</pre>
+
+<pre class="test-source">
+  addText('this is\na multiline\ntext!', {
+    fontFamily: 'DejaVu Serif',
+    fill: '#f55',
+    left: 100,
+    top: 70,
+    fontSize: 24,
+    angle: 30
+  });
+</pre>
+
+<pre class="test-source">
+  addText('this is\na multiline\ntext\naligned right!', {
+    fontFamily: 'DejaVu Serif',
+    fill: '#f55',
+    left: 100,
+    top: 70,
+    fontSize: 24,
+    textAlign: 'right'
+  });
+</pre>
+
+<pre class="test-source">
+  addText('this text\nis\nmultiline\n&amp;\ncentered!', {
+    fontFamily: 'DejaVu Serif',
+    fill: '#f55',
+    left: 150,
+    top: 100,
+    fontSize: 30,
+    textAlign: 'center'
+  });
+</pre>
+
+<pre class="test-source">
+  addText('this is\na multiline\ntext\nwith\nbackground color!', {
+    fontFamily: 'DejaVu Serif',
+    fill: '#333',
+    left: 100,
+    top: 70,
+    fontSize: 17,
+    backgroundColor: '#aaf'
+  });
+</pre>
+
+<pre class="test-source">
+  addText('this is\na multiline\ntext\nwith\ncustom lineheight!', {
+    fontFamily: 'DejaVu Serif',
+    fill: '#333',
+    left: 100,
+    top: 70,
+    fontSize: 17,
+    lineHeight: 5
+  });
+</pre>
+
+<pre class="test-source">
+  addText('this is\na multiline\ntext\nwith\ncustom lineheight\n&amp; background!', {
+    fontFamily: 'DejaVu Serif',
+    fill: '#333',
+    left: 120,
+    top: 100,
+    fontSize: 17,
+    lineHeight: 5,
+    backgroundColor: 'rgba(0,200,0,0.5)',
+    angle: 15
+  });
+</pre>
+
+<pre class="test-source">
+  addText('this text is multiline,\ncentered,\n&amp; with background color!', {
+    fontFamily: 'DejaVu Serif',
+    fill: '#f55',
+    left: 150,
+    top: 100,
+    fontSize: 20,
+    textAlign: 'center',
+    backgroundColor: '#ffc'
+  });
+</pre>
+
+<pre class="test-source">
+  addText('this text is multiline,\ncentered,\nwith background color\n&amp; custom lineheight!', {
+    fontFamily: 'DejaVu Serif',
+    fill: '#eee',
+    left: 150,
+    top: 150,
+    fontSize: 18,
+    textAlign: 'center',
+    lineHeight: 3,
+    backgroundColor: '#555'
+  });
+</pre>
+
+<pre class="test-source">
+  addText('text\nwith\nshadow!', {
+    fontFamily: 'Delicious',
+    fill: 'red',
+    left: 120,
+    top: 120,
+    fontSize: 55,
+    textShadow: 'rgba(0,0,0,0.3) 3px 3px 3px'
+  });
+</pre>
+
+<!--<pre class="test-source">
+  addText('text\nwith\nshadows!', {
+    fontFamily: 'Delicious',
+    fill: 'red',
+    left: 150,
+    top: 140,
+    fontSize: 55,
+    textShadow: 'rgba(0,0,0,0.3) 3px 3px 3px, rgb(255,255,255) 1px 1px 1px'
+  });
+</pre>
+
+<pre class="test-source">
+  addText('text\nwith\nshadows!', {
+    fontFamily: 'Courier New',
+    fill: '#555',
+    left: 120,
+    top: 100,
+    fontSize: 40,
+    textShadow: 'rgba(255,0,0,0.3) 5px 5px, rgba(0,255,0,0.3) 7px 7px, rgba(0,0,255,0.3) 9px 9px'
+  });
+</pre>-->
+
+<pre class="test-source">
+  addText('Brisket turducken', {
+    fontFamily: 'Courier New', fill: '#333', left: 150, top: 70, fontSize: 16,
+  });
+  addText('filet mignon chuck', {
+    fontFamily: 'Courier New', fill: '#555', left: 150, top: 100, fontSize: 16,
+  });
+  addText('Salami pork chop', {
+    fontFamily: 'Courier New', fill: '#777', left: 150, top: 130, fontSize: 16,
+  });
+  addText('bacon filet mignon', {
+    fontFamily: 'Courier New', fill: '#999', left: 150, top: 160, fontSize: 16,
+  });
+  addText('kielbasa ribeye shoulder ', {
+    fontFamily: 'Courier New', fill: '#bbb', left: 150, top: 190, fontSize: 16,
+  });
+</pre>
+
+<pre class="test-source">
+  for (var i = 10; i < 300; i += 10) {
+    canvas.add(new fabric.Line([i, 0, i, 300], { stroke: '#aaa', fill: '#aaa' }));
+  }
+  for (var i = 10; i < 300; i += 10) {
+    canvas.add(new fabric.Line([0, i, 300, i], { stroke: '#aaa', fill: '#aaa' }));
+  }
+
+  addText('abcdefg\nhijklmn\nopqrstu\nvwxyz', {
+    fontFamily: 'Delicious',
+    fill: '#555',
+    left: 120,
+    top: 145,
+    fontSize: 60
+  });
+</pre>
+
+<pre class="test-source">
+  addText('text\nwith\nrgba() values!', {
+    fontFamily: 'Delicious',
+    fill: 'rgba(255,0,0,0.8)',
+    backgroundColor: 'rgba(0,0,0,0.85)',
+    left: 140,
+    top: 120,
+    fontSize: 40,
+    textShadow: 'rgba(255,255,255,0.9) 2px 2px 2px'
+  });
+</pre>
+
+<pre class="test-source">
+  addText('text\n\nwith\n\ndouble\n\nnewlines!', {
+    fontFamily: 'Delicious',
+    fill: 'green',
+    left: 100,
+    top: 140,
+    fontSize: 30
+  });
+</pre>
+
+<pre class="test-source">
+  addText('scaled text', {
+    fontFamily: 'Delicious',
+    fill: 'purple',
+    left: 150,
+    top: 100,
+    fontSize: 20,
+    scaleX: 2,
+    scaleY: 2
+  });
+</pre>-->
+
+<script src="master.js"></script>

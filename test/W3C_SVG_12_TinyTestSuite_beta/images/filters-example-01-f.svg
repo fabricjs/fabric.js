@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">  
+
+<!--======================================================================-->
+<!--=  Copyright 2000 World Wide Web Consortium, (Massachusetts          =-->
+<!--=  Institute of Technology, Institut National de Recherche en        =-->
+<!--=  Informatique et en Automatique, Keio University). All Rights      =-->
+<!--=  Reserved. See http://www.w3.org/Consortium/Legal/.                =-->
+<!--======================================================================-->
+<!--======================================================================-->
+<!--                                                                      -->
+<!-- filters-many-BE-01.svg                                               -->
+<!-- renamed for 1.1 suite to filters-example-01-f.svg                    -->
+<!--                                                                      -->
+<!-- Overall filter effects test case. Extracted from example filters00   -->
+<!-- in the March 3, 2000 spec.  Uses many filter effects in one image.   -->
+<!--                                                                      -->
+<!-- Author : Jon Ferraiolo, 15 March 2000                                -->
+<!-- Revised for 1.1 : Mike Bultrowicz, 4 February 2002                   -->
+<!--                                                                      -->
+<!-- History:                                                             -->
+<!--  15-Mar-2000, JF: Serial#1 created.  Matches 20000303 SVG spec.      -->
+<!--  16-Mar-2000, LH="editorials" fix name (-02); fix Legend, ser#2.     -->
+<!--  03-Aug-2000, LH=" update DOCTYPE for CR DTD, 20000802" ser# .       -->
+<!--  16-Aug-2000, LH="rename" ser#3.                                     -->
+<!--  28-oct-2000, JF, change attr 'lightColor' to prop 'lighting-color'  -->
+<!--                   new version: #4.                                   -->
+<!--  10-Dec-2000, JF, fixed previous version merge problems, adjusted    -->
+<!--                   specular lighting parameters to make linearRGB     -->
+<!--                   result approximate previous reference image, which -->
+<!--                   was done using sRGB.                               -->
+<!--                                                                      -->
+<!--======================================================================-->
+<!--======================================================================-->
+<!--= Note. After October 2000, revision history is kept as CVS 'commit' =-->
+<!--= log messages, and therefore is no longer in the preceding preamble.=-->
+<!--======================================================================-->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="svg-root" width="480" height="360">
+    <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/">
+       <OperatorScript>
+			<Paragraph>
+				Verify that a typical usage of filtering is operation. 
+				This test case creates a 3D lightiing effect and requires 
+				that several filters are working: feGaussianBlur, feOffset, 
+				feSpecularLighting, feComposite and feMerge. The graphic 
+				consisting of the string "SVG" sitting on top of oval 
+				filled in red and surrounded by an oval outlined in red.
+			</Paragraph> 
+			<Paragraph>
+				The rendered picture should match the reference image 
+				exactly, except for possible variations in the labelling 
+				text (per CSS2 rules).
+			</Paragraph> 
+			<Paragraph>
+				The test uses a nested 'svg' element, 'rect' element, 
+				'path' element, as well as basic fill (solid primary 
+				colors), stroke (solid primary colors with stroke-width 
+				lines), font-family (Helvetica) and font-size properties.
+			</Paragraph> 
+        </OperatorScript>
+    </SVGTestCase>
+	<title id="test-title">filters-example-01-f</title>
+	<desc id="test-desc">Overall filter effects test case. Extracted from example filters00 in the March 3, 2000 spec.</desc>
+	<!--======================================================================-->
+	<!--Content of Test Case follows...                  =====================-->
+	<!--======================================================================-->
+	<g id="test-body-content">
+		<g font-size="12" font-family="Verdana" >
+			<text x="20" y="30">A single filter that uses a combination of filter primitives. You should see</text>
+			<text x="20" y="45">a gray rectangle. Inside, there is an outer ring and an inner button with </text>
+			<text x="20" y="60">"SVG" on it, both in red with a 3D appearance and a lighting effect.</text>
+			<text x="20" y="75"></text>
+		</g>
+		<!-- Here is the test case -->
+		<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="80" y="80" width="300" height="180" viewBox="0 0 200 120">
+			<title>Example filters01.svg - introducing filter effects</title>
+			<desc>An example which combines multiple filter primitives to produce a 3D lighting effect on a graphic consisting of the string "SVG" sitting on top of oval filled in red and surrounded by an oval outlined in red.</desc>
+			<defs>
+				<filter id="MyFilter" filterUnits="userSpaceOnUse" x="0" y="0" width="450" height="450">
+					<feGaussianBlur in="SourceAlpha" stdDeviation="4" result="blur"/>
+					<feOffset in="blur" dx="4" dy="4" result="offsetBlur"/>
+					<feSpecularLighting in="blur" surfaceScale="5" specularConstant=".75" specularExponent="20" lighting-color="white"  result="specOut">
+						<fePointLight x="-5000" y="-10000" z="20000"/>
+					</feSpecularLighting>
+					<feComposite in="specOut" in2="SourceAlpha" operator="in" result="specOut"/>
+					<feComposite in="SourceGraphic" in2="specOut" operator="arithmetic" k1="0" k2="1" k3="1" k4="0" result="litPaint"/>
+					<feMerge>
+						<feMergeNode in="offsetBlur"/>
+						<feMergeNode in="litPaint"/>
+					</feMerge>
+				</filter>
+			</defs>
+			<rect x="1" y="1" width="198" height="118" fill="#888888" stroke="blue" />
+			<g filter="url(#MyFilter)" >
+				<g>
+					<path fill="none" stroke="#D90000" stroke-width="10"  d="M50,90 C0,90 0,30 50,30 L150,30 C200,30 200,90 150,90 z"/>
+					<path fill="#D90000"  d="M60,80 C30,80 30,40 60,40 L140,40 C170,40 170,80 140,80 z"/>
+					<g fill="#FFFFFF" stroke="black" font-size="45" font-family="Verdana" >
+						<text x="52" y="76">SVG</text>
+					</g>
+				</g>
+			</g>
+		</svg>
+	</g>
+	<!--======================================================================-->
+	<!--Legend and frame:      Title, suite and SVG document serialization====-->
+	<!--======================================================================-->
+    <g id="test-legend" fill="black" font-family="Helvetica" font-size="10">
+        <rect x="10" y="300" width="275" height="50" fill="none" stroke="#000000"/>
+        <path fill="none" stroke="#000000" d="M10 315 h275 M205 315 v35 M10 336 h195 M205 332 h80"/>
+        <text x="25" y="311">Scalable Vector Graphics (SVG) v1.1 Conformance Suite</text>
+        <a xlink:href="copyright-documents-19990405.html">
+            <text x="12" y="347" fill="blue" >Copyright 2002 W3C. All Rights Reserved.</text>
+        </a>
+        <text font-size="12" x="35" y="330">filters-example-01</text>
+        <text font-size="10" x="210" y="327">$Revision: 1.1 $</text>
+        <text font-size="10" x="210" y="345">Release 1.0</text>
+        <rect id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000000"/>
+    </g>
+</svg>

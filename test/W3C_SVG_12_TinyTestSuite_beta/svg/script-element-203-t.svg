@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink"  xmlns:xev="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="AE" owner="ED" desc="Tests script element processing" status="accepted"
+    approved="yes"
+    version="$Revision: 1.5 $" testname="$RCSfile: script-element-203-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        The test consists of 8 subtests, each testing requirements from the script processing section.
+        When the test is first loaded it shows 8 red circles. After the scripts have been executed the circles should all be green.
+      </p>
+      <p>
+        The test has passed if all 8 circles are green after the script processing has taken place.
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: script-element-203-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+    <text x="240" y="30" text-anchor="middle" font-size="24">Test script logic</text>
+
+    <g fill="red" transform="translate(100, 200)">
+      <circle xml:id="c1" cx="30" r="15"/>
+      <circle xml:id="c2" cx="60" r="15"/>
+      <circle xml:id="c3" cx="90" r="15"/>
+      <circle xml:id="c4" cx="120" r="15"/>
+      <circle xml:id="c5" cx="150" r="15"/>
+      <circle xml:id="c6" cx="180" r="15"/>
+      <circle xml:id="c7" cx="210" r="15"/>
+      <circle xml:id="c8" cx="240" r="15"/>
+    </g>
+
+    <!-- For subtest 5 below, set up a listener -->
+    <xev:listener event="load" observer="s3" handler="#loadhandler"/>
+
+    <!-- Subtest 1: Check that xlink:href script fragments are executed => mark c1 green -->
+    <script xml:id="s1" xlink:href="../images/script1.js"/>
+
+    <!-- Subtest 2: Check that xlink:href on script elements is not animatable (target element by xlink:href) => mark c2 green -->
+    <set attributeName="xlink:href" to="../images/script2.js" xlink:href="#s1" begin="0s" dur="indefinite">
+      <handler xev:event="beginEvent">
+        if(document.getElementById("c2").getAttributeNS( null,  "fill") != "red")
+        document.getElementById("c2").setAttributeNS( null,  "fill", "green");
+      </handler>
+    </set>
+
+    <!-- Subtest 3: Check that xlink:href on script elements is not animatable (implicit target element) => mark c3 green -->
+    <script xml:id="s2" xlink:href="../images/script3.js">
+      <animate attributeName="xlink:href" to="../images/script4.js" begin="0s" dur="indefinite" fill="freeze"/>
+    </script>
+
+    <!-- Subtest 4: Altering the xlink:href on a script element shall have no effect => mark c4 green -->
+    <script xml:id="s3">
+      document.getElementById("c4").setAttributeNS( null,  "fill", "green");
+      document.getElementById("c5").setAttributeNS( null,  "fill", "green");
+      document.getElementById("s3").setAttributeNS("http://www.w3.org/1999/xlink", "href", "../images/script5.js");
+    </script>
+
+    <!-- Subtest 5: A load event must not be raised on altering the xlink:href => mark c5 green -->
+    <handler xml:id="loadhandler">
+      document.getElementById("c5").setAttributeNS( null,  "fill", "red");
+    </handler>
+
+    <!-- Subtest 6: Check that xlink:href script fragments are executed when created with DOM => mark c6 green -->
+    <script>
+      var s4 = document.createElementNS("http://www.w3.org/2000/svg", "script");
+      s4.setAttributeNS("http://www.w3.org/1999/xlink", "href", "../images/script6.js");
+      document.getElementById("test-body-content").appendChild(s4);
+    </script>
+
+    <!-- Subtest 7: Check that changes of xlink:href before insertion prevents "script7.js" from executing => mark c7 green -->
+    <script>
+      var s5 = document.createElementNS("http://www.w3.org/2000/svg", "script");
+      s5.setAttributeNS("http://www.w3.org/1999/xlink", "href", "../images/script7.js"); // sets red
+      s5.setAttributeNS("http://www.w3.org/1999/xlink", "href", "../images/script8.js"); // sets green
+      document.getElementById("test-body-content").appendChild(s5);
+    </script>
+
+    <!-- Subtest 8: Check that changes of xlink:href before insertion prevents "script7.js" from executing => mark c8 green -->
+    <script>
+      var s6 = document.createElementNS("http://www.w3.org/2000/svg", "script");
+      s6.id = "s6";
+      s6.setAttributeNS("http://www.w3.org/1999/xlink", "href", "../images/script9.js"); // sets green
+      var set = document.createElementNS("http://www.w3.org/2000/svg", "set");
+      set.setAttributeNS( null,  "dur", "indefinite");
+      set.setAttributeNS( null,  "to", "../images/script10.js"); // sets red
+      set.setAttributeNS("http://www.w3.org/1999/xlink", "href", "#s6");
+      set.setAttributeNS( null,  "attributeName", "xlink:href");
+      document.getElementById("test-body-content").appendChild(s6);
+      document.getElementById("test-body-content").appendChild(set);
+    </script>
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.5 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240"
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

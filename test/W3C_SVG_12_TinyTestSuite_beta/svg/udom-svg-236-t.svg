@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root"
+  width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="AZ" owner="AE" desc="Test SVG Traits" status="accepted"
+    approved="yes"
+    version="$Revision: 1.7 $" testname="$RCSfile: udom-svg-236-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        The TraitAccess tests uses a set of common ECMAScript code to test various trait combinations with expected values.  If a result is not as expected, an error is displayed in red text, indicating the returned result and what was expected.  When all subtests have returned success, the result is set to 'passed'.  The pass condition for the test is that all subtests are green, and the word 'passed' is at the bottom right.
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: udom-svg-236-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+
+    <text  x="240" y="40" text-anchor="middle" >TraitAccess.setRectTrait() / getRectTrait()</text>
+
+    <rect xml:id="targetRect" fill="none" x="300" y="20" width="10" height="1">
+      <animateMotion xml:id="animm1" accumulate="sum" additive="replace" calcMode="paced" values="0,0; 100,0" dur="10s" />
+      <animateMotion xml:id="animm2" />
+    </rect>
+
+    <g xml:id="g1" audio-level="0.5" transform="translate(50,50), scale(10,10)"/>
+    <g xml:id="g2" />
+
+  </g>
+
+  <rect xml:id="UnitTest" x="330" y="315" width="130" height="40" stroke="blue" fill="none"/>
+  <g fill="black">
+    <text xml:id="UnitTestStatus" x="333" y="350" font-size="40">failed</text>
+  </g>
+
+  <rect x="1" y="1" width="478" height="358" stroke="black" stroke-width="1" fill="none"/>
+
+  <path xml:id="path1"/>
+
+  <g>
+    <script xlink:href="../images/TraitAccess.common.es" type="text/ecmascript" />
+  </g>
+
+  <g xml:id="test-start">
+    <handler type="text/ecmascript" xe:event="SVGLoad">
+      <![CDATA[
+    try
+    {
+      rowHeight = 10;
+      fontSize  = 8;
+
+      var path1 = document.getElementById( "path1" );
+
+      var rect = topsvg.createSVGRect();
+      rect.x = 0;
+      rect.y = 0;
+      rect.width = 480;
+      rect.height = 360;
+
+      var p1 = topsvg.createSVGPath();
+      p1.moveTo( 10, 10 );
+      p1.lineTo( 20, 20 );
+      p1.close();
+
+      var alphas  = "abcdefghijklmNOPQRSTUVWXYZ";
+
+      runSetTraitIters
+      ( 
+        [
+            new setTraitIter ( "a01" , "setRectTrait" , "getRectTrait"             , 0 , topsvg , "viewBox" , rect    , rect , 0 , 0 , 0 )
+
+          , new setTraitIter ( "a02" , "setRectTrait" , 0                          , 0 , path1 , "d" , rect    , 0    , 0 , DOMException.TYPE_MISMATCH_ERR , "TYPE_MISMATCH_ERR" )
+          , new setTraitIter ( "a02" , "setRectTrait" , 0                          , 0 , path1 , "d" , p1    , 0    , 0 , DOMException.TYPE_MISMATCH_ERR , "TYPE_MISMATCH_ERR" )
+          , new setTraitIter ( "a03" , "setRectTrait" , 0                          , 0 , topsvg , "viewBox" , null    , 0    , 0 , DOMException.INVALID_ACCESS_ERR , "INVALID_ACCESS_ERR" )
+          , new setTraitIter ( "a05" , "setRectTrait" , 0                          , 0 , topsvg , "viewBox" , alphas  , 0    , 0 , DOMException.TYPE_MISMATCH_ERR , "TYPE_MISMATCH_ERR" )
+          , new setTraitIter ( "a07" , "setRectTrait" , 0                          , 0 , topsvg , "viewBox" , ""      , 0    , 0 , DOMException.TYPE_MISMATCH_ERR , "TYPE_MISMATCH_ERR" )
+          , new setTraitIter ( "a08" , "setRectTrait" , 0                          , 0 , topsvg , null         , rect    , 0    , 0 , DOMException.NOT_SUPPORTED_ERR , "NOT_SUPPORTED_ERR" )
+          , new setTraitIter ( "a09" , "setRectTrait" , 0                          , 0 , topsvg , "foo"    , rect    , 0    , 0 , DOMException.NOT_SUPPORTED_ERR , "NOT_SUPPORTED_ERR" )
+        ]                        
+      );                        
+    }
+    catch(e)
+    {
+      isPassed = false;
+      drawString("Main: Unexpected exception thrown! ");
+    }
+
+    if( isPassed )
+    {
+      var status = document.getElementById("UnitTestStatus");
+      status.setTrait("#text", "passed");
+      status.setAttribute("fill", "#0C0");      
+    }
+    ]]>
+    </handler>
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.7 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240"
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

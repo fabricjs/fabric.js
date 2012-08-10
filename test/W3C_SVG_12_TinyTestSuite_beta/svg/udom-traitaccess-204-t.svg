@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="ED" owner="ASl" desc="Tests set/get access on 'fillrule' trait." status="accepted"
+    approved="yes"
+    version="$Revision: 1.4 $" testname="$RCSfile: udom-traitaccess-204-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        Tests set/get access on 'fill-rule' trait.
+        The start should look the same on both sides and the text should read "OK".
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: udom-traitaccess-204-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+    <rect xml:id="referenceframe" x="10" y="30" width="220" height="280" stroke="#000000" fill="none"/>
+    <rect xml:id="testframe" x="249" y="30" width="220" height="280" stroke="#000000" fill="none"/>
+    <rect xml:id="textframe" x="340" y="315" width="120" height="40" stroke="#000000" fill="none"/>
+
+    <text xml:id="title" x="10" y="25" font-size="20">Set/Get-Trait(fillrule) on path</text>
+    <text xml:id="referencetext" x="75" y="50" font-size="20">reference</text>
+    <text xml:id="scripttext" x="325" y="50" font-size="20">scripted</text>
+    <g fill="black">
+      <text xml:id="status" x="350" y="350" font-size="40" fill="red">Error!</text>
+    </g>
+
+    <g>
+      <path xml:id="refelement" fill-rule="evenodd" fill="#6df57e" stroke="#b0001e" stroke-width="5" d="M 120,75 L 193,301 21,161 219,161 47,301 z" />
+      <defs>
+        <path xml:id="pathen" fill-rule="inherit" fill="#6df57e" stroke="#b0001e" stroke-width="5" d="M 360,75 L 433,301 261,161 459,161 287,301 z" />
+      </defs>
+      <use xml:id="useelement" xlink:href="#pathen" fill-rule="nonzero"/>
+    </g>
+
+    <script type="text/ecmascript">
+      <![CDATA[
+        var text = document.getElementById("status");
+        var useel = document.getElementById("useelement");
+        var fillrule = "evenodd";
+        useel.setTrait("fill-rule", fillrule);
+        var getvalue = useel.getTrait("fill-rule");
+        if(getvalue == fillrule)
+        {
+          text.setTrait("#text", "OK!");
+          text.setTrait("fill", "inherit");
+        }
+      ]]>
+    </script>
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.4 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240" 
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

@@ -14,7 +14,7 @@
     "test": "node test.js"
   },
   "dependencies": {
-	"canvas": "git://github.com/LearnBoost/node-canvas.git",
+    "canvas": "git://github.com/LearnBoost/node-canvas.git",
     "jsdom": ">=0.2.3",
     "xmldom": ">=0.1.7"
   },

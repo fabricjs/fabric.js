@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/" reviewer="DOH" owner="AE" desc="Testing 'audio' Element with the 'audio-level' Attribute" status="accepted" approved="yes" version="$Revision: 1.10 $" testname="$RCSfile: media-alevel-202-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>Testing 'video' Element with the 'audio-level' Attribute</p>
+      <p>
+        The scale at the bottom of the slide uses a 'set' element to modify the 'audio-level' on the sample video element.
+      </p>
+      <p>
+        The 'video' element can also be triggered by activating the current focus.
+      </p>
+      <p>
+        If the user agent does not support the 3GP media format, the test is still a pass.
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: media-alevel-202-t.svg,v $</title>
+  <defs>
+    <font-face font-family="SVGFreeSansASCII" unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii" />
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content">
+    <rect x="15" y="70" height="215" width="450" fill="none" stroke="black" stroke-width="0.25"/>
+    <g text-anchor="middle">
+      <text xml:id="display-title" x="240" y="25" font-size="14" fill="#000">Audio Level</text>
+      <g font-size="10" fill="#555">
+        <text xml:id="comment-1" x="240" y="45">
+          The scale at the bottom uses 'set' to modify the 'audio-level' on the sample video element.
+        </text>
+        <text xml:id="comment-2" x="240" y="57">
+          The video element can be triggered by activating the current focus.
+        </text>
+      </g>
+    </g>
+    <g visibility="hidden">
+      <line x1="0" x2="480" y1="180" y2="180" stroke="red"/>
+      <line x1="240" x2="240" y1="0" y2="360" stroke="red"/>
+    </g>
+    <g stroke="gray" stroke-width="1" fill="white" font-size="11" text-anchor="middle" transform="scale(1.20,1),translate(50,100)">
+      <g transform="translate(122.5,30)">
+        <rect fill="#08f" fill-opacity="0.4" xml:id="r" x="0" y="0" width="50" height="50">
+          <animateColor attributeName="fill" begin="audioElement.begin" values="red" fill="freeze"/>
+          <animateColor attributeName="fill" begin="audioElement.end" dur="0.2s" to="blue" fill="freeze"/>
+        </rect>
+        <video xml:id="audioElement" audio-level="0.3" begin="activate" width="50" height="50" xlink:href="../images/skier.3gp" type="video/3gp"/>
+      </g>
+    </g>
+  </g>
+  <g xml:id="volControl" transform="translate(-7.5, -20)">
+    <g stroke="#999" fill="none" transform="scale(1.5,1), translate(65,265)">
+      <line x1="0" x2="200" y1="0" y2="0" stroke="#999"/>
+      <line x1="00" x2="0" y1="-4" y2="4"/>
+      <line x1="20" x2="20" y1="-4" y2="4"/>
+      <line x1="40" x2="40" y1="-4" y2="4"/>
+      <line x1="60" x2="60" y1="-4" y2="4"/>
+      <line x1="80" x2="80" y1="-4" y2="4"/>
+      <line x1="100" x2="100" y1="-4" y2="4"/>
+      <line x1="120" x2="120" y1="-4" y2="4"/>
+      <line x1="140" x2="140" y1="-4" y2="4"/>
+      <line x1="160" x2="160" y1="-4" y2="4"/>
+      <line x1="180" x2="180" y1="-4" y2="4"/>
+      <line x1="200" x2="200" y1="-4" y2="4"/>
+      <g stroke="none" fill="#999" text-anchor="middle" font-size="8">
+        <text x="0" y="12">0</text>
+        <text x="100" y="12">volume</text>
+        <text x="200" y="12">10</text>
+      </g>
+      <rect xml:id="volMarker" x="58" y="-5" width="4" height="10" fill="blue" fill-opacity="0.4" stroke="none"/>
+      <g stroke-width="0.5" stroke="none" fill="white" fill-opacity="0">
+        <rect xml:id="v0" x="0" y="-5" width="10" height="10">
+          <set xlink:href="#audioElement" begin="v0.mouseover" attributeName="audio-level" to="0" fill="freeze"/>
+          <set xlink:href="#volMarker" begin="v0.mouseover" attributeName="x" to="-2" fill="freeze"/>
+        </rect>
+        <rect xml:id="v1" x="10" y="-5" width="20" height="10">
+          <set xlink:href="#audioElement" begin="v1.mouseover" attributeName="audio-level" to="0.1" fill="freeze"/>
+          <set xlink:href="#volMarker" begin="v1.mouseover" attributeName="x" to="18" fill="freeze"/>
+        </rect>
+        <rect xml:id="v2" x="30" y="-5" width="20" height="10">
+          <set xlink:href="#audioElement" begin="v2.mouseover" attributeName="audio-level" to="0.2" fill="freeze"/>
+          <set xlink:href="#volMarker" begin="v2.mouseover" attributeName="x" to="38" fill="freeze"/>
+        </rect>
+        <rect xml:id="v3" x="50" y="-5" width="20" height="10">
+          <set xlink:href="#audioElement" begin="v3.mouseover" attributeName="audio-level" to="0.3" fill="freeze"/>
+          <set xlink:href="#volMarker" begin="v3.mouseover" attributeName="x" to="58" fill="freeze"/>
+        </rect>
+        <rect xml:id="v4" x="70" y="-5" width="20" height="10">
+          <set xlink:href="#audioElement" begin="v4.mouseover" attributeName="audio-level" to="0.4" fill="freeze"/>
+          <set xlink:href="#volMarker" begin="v4.mouseover" attributeName="x" to="78" fill="freeze"/>
+        </rect>
+        <rect xml:id="v5" x="90" y="-5" width="20" height="10">
+          <set xlink:href="#audioElement" begin="v5.mouseover" attributeName="audio-level" to="0.5" fill="freeze"/>
+          <set xlink:href="#volMarker" begin="v5.mouseover" attributeName="x" to="98" fill="freeze"/>
+        </rect>
+        <rect xml:id="v6" x="110" y="-5" width="20" height="10">
+          <set xlink:href="#audioElement" begin="v6.mouseover" attributeName="audio-level" to="0.6" fill="freeze"/>
+          <set xlink:href="#volMarker" begin="v6.mouseover" attributeName="x" to="118" fill="freeze"/>
+        </rect>
+        <rect xml:id="v7" x="130" y="-5" width="20" height="10">
+          <set xlink:href="#audioElement" begin="v7.mouseover" attributeName="audio-level" to="0.7" fill="freeze"/>
+          <set xlink:href="#volMarker" begin="v7.mouseover" attributeName="x" to="138" fill="freeze"/>
+        </rect>
+        <rect xml:id="v8" x="150" y="-5" width="20" height="10">
+          <set xlink:href="#audioElement" begin="v8.mouseover" attributeName="audio-level" to="0.8" fill="freeze"/>
+          <set xlink:href="#volMarker" begin="v8.mouseover" attributeName="x" to="158" fill="freeze"/>
+        </rect>
+        <rect xml:id="v9" x="170" y="-5" width="20" height="10">
+          <set xlink:href="#audioElement" begin="v9.mouseover" attributeName="audio-level" to="0.9" fill="freeze"/>
+          <set xlink:href="#volMarker" begin="v9.mouseover" attributeName="x" to="178" fill="freeze"/>
+        </rect>
+        <rect xml:id="v10" x="190" y="-5" width="10" height="10">
+          <set xlink:href="#audioElement" begin="v10.mouseover" attributeName="audio-level" to="1" fill="freeze"/>
+          <set xlink:href="#volMarker" begin="v10.mouseover" attributeName="x" to="198" fill="freeze"/>
+        </rect>
+      </g>
+    </g>
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none" fill="black">$Revision: 1.10 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000" />
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1" />
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240" text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="AS" owner="DOH" desc="Compare from-to, from-by and by animateMotion with values animateMotion." status="accepted"
+    approved="yes"
+    version="$Revision: 1.5 $" testname="$RCSfile: animate-elem-211-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>Compare from-to, from-by and by animateMotion with values animateMotion.</p>
+      <p>
+        The main indication for a failed test is the appearance of red.
+      </p>
+      <p>
+        SMIL 2 specifies, how from-to, from-by and by animations have to be converted into
+        values animation. Therefore they have to be the same as the related values animation.
+        The conversion is as follows:
+      </p>
+      <!--table>
+      <tr>
+      <th>used</th><th>converted</th>
+      </tr>
+      <tr>
+      <td>from="a" to="b"</td><td>values="a;b"</td>   
+      </tr>
+      <tr>
+      <td>from="a" by="b"</td><td>values="a;a+b"</td>   
+      </tr>
+      <tr>
+      <td>by="a"</td><td>values="0;a" additive="sum" 
+      </td>   
+      </tr>         
+      </table -->
+      <p>
+        (by and from-by animations have only a meaning, if values can be added somehow.
+        '0' is used as a general symbol for the neutral element of addition for the related attribute,
+        this means 0 + a = a + 0 = a. And '0' is not equal to the symbol '1' as the basic unit of the
+        related attribute, '0' is a predecessor of '1' in the related attribute space. For animateMotion
+        the '0' is no motion or is related to a translation given in coordinates: 0,0.)
+      </p>
+      <p>
+        The from-to, from-by and by are applied to animateMotion of different blue stroked
+        paths and are compared with the related values animations including additive and
+        cumulative hehaviour for underlying red paths. Additionally underlying dark red
+        paths simulate the same behaviour using always the defaults additive replace and
+        accumulate  replace. The blue paths cover all red paths. Therefore if something
+        red gets visible, an error is occured. Because fill is always not set and therefore remove,
+        the final value is the value at 2s given with a simple values animateMotion, not very
+        interesting for the test.
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: animate-elem-211-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+    <defs>
+
+      <path id="fromto" xml:id="fromto" d="M-15,-20L-20,20 20,20C-10,-10 30,-20 -15,-20Z"/>
+      <path id="fromby" xml:id="fromby" d="M-20,-15L-20,15 20,20C20,0 -10,-20 -20,-15Z"/>
+      <path id="by" xml:id="by" d="M-20,-20C100,80 40,-60 20,20Z"/>
+
+    </defs>
+
+
+
+    <rect x="0" y="0" width="480" height="360" fill="#fff" />
+
+    <g fill="none" stroke="#f00" stroke-width="10" stroke-linejoin="bevel">
+
+
+      <g>
+        <title>from-to animateMotion</title>
+        <use xlink:href="#fromto" x="40" y="80" stroke="#800">
+          <title>dark red values comparsion for from-to animations - if visible fail</title>
+          <animateMotion values="20,20" begin="2s" />
+
+          <animateMotion values="30,90;50,60" begin="4s" dur="5s"/>
+          <animateMotion values="60,130;80,100" begin="9s" dur="5s"/>
+          <animateMotion values="90,170;110,140" begin="14s" dur="5s"/>
+
+          <animateMotion values="10,70;30,40" begin="20s" dur="5s"/>
+          <animateMotion values="40,110;60,80" begin="25s" dur="5s"/>
+          <animateMotion values="70,150;90,120" begin="30s" dur="5s"/>
+
+          <animateMotion values="30,90;50,60" begin="36s" dur="5s"/>
+          <animateMotion values="30,90;50,60" begin="41s" dur="5s"/>
+          <animateMotion values="30,90;50,60" begin="46s" dur="5s"/>
+
+          <animateMotion values="10,70;30,40" begin="52s" dur="5s"/>
+          <animateMotion values="10,70;30,40" begin="57s" dur="5s"/>
+          <animateMotion values="10,70;30,40" begin="62s" dur="5s"/>
+
+        </use>
+
+        <use xlink:href="#fromto" x="40" y="80" stroke="#f00">
+          <title>red values comparsion for from-to animations - if visible fail</title>
+          <animateMotion values="20,20" begin="2s" />
+          <animateMotion values="10,70;30,40" begin="4s"
+                           dur="5s" repeatCount="3" additive="sum" accumulate="sum"/>
+          <animateMotion values="10,70;30,40" begin="20s"
+                           dur="5s" repeatCount="3" additive="replace" accumulate="sum"/>
+          <animateMotion values="10,70;30,40" begin="36s"
+                           dur="5s" repeatCount="3" additive="sum" accumulate="none"/>
+          <animateMotion values="10,70;30,40" begin="52s"
+                           dur="5s" repeatCount="3" additive="replace" accumulate="none"/>
+        </use>
+
+
+        <use xlink:href="#fromto" x="40" y="80"  stroke="#88f">
+          <title>blue from-to animations</title>
+          <animateMotion values="20,20" begin="2s" />
+          <animateMotion from="10,70"  to="30,40" begin="4s"
+                           dur="5s" repeatCount="3" additive="sum" accumulate="sum"/>
+          <animateMotion from="10,70"  to="30,40" begin="20s"
+                           dur="5s" repeatCount="3" additive="replace" accumulate="sum"/>
+          <animateMotion from="10,70"  to="30,40" begin="36s"
+                           dur="5s" repeatCount="3" additive="sum" accumulate="none"/>
+          <animateMotion from="10,70"  to="30,40" begin="52s"
+                           dur="5s" repeatCount="3" additive="replace" accumulate="none"/>
+          <set attributeName="stroke" to="#00f" begin="20s" />
+          <set attributeName="stroke" to="#00a" begin="36s" />
+          <set attributeName="stroke" to="#006" begin="52s" />
+        </use>
+
+      </g>
+
+
+
+      <g>
+        <title>from-by animateMotion</title>
+        <use xlink:href="#fromby" x="160" y="80" stroke="#800">
+          <title>dark red values comparsion for from-by animations - if visible fail</title>
+          <animateMotion values="20,20" begin="2s" />
+
+          <animateMotion values="30,90;50,60" begin="4s" dur="5s"/>
+          <animateMotion values="60,130;80,100" begin="9s" dur="5s"/>
+          <animateMotion values="90,170;110,140" begin="14s" dur="5s"/>
+
+          <animateMotion values="10,70;30,40" begin="20s" dur="5s"/>
+          <animateMotion values="40,110;60,80" begin="25s" dur="5s"/>
+          <animateMotion values="70,150;90,120" begin="30s" dur="5s"/>
+
+          <animateMotion values="30,90;50,60" begin="36s" dur="5s"/>
+          <animateMotion values="30,90;50,60" begin="41s" dur="5s"/>
+          <animateMotion values="30,90;50,60" begin="46s" dur="5s"/>
+
+          <animateMotion values="10,70;30,40" begin="52s" dur="5s"/>
+          <animateMotion values="10,70;30,40" begin="57s" dur="5s"/>
+          <animateMotion values="10,70;30,40" begin="62s" dur="5s"/>
+
+        </use>
+
+        <use xlink:href="#fromby" x="160" y="80" stroke="#f00">
+          <title>red values comparsion for from-by animations - if visible fail</title>
+          <animateMotion values="20,20" begin="2s" />
+          <animateMotion values="10,70;30,40" begin="4s"
+                           dur="5s" repeatCount="3" additive="sum" accumulate="sum"/>
+          <animateMotion values="10,70;30,40" begin="20s"
+                           dur="5s" repeatCount="3" additive="replace" accumulate="sum"/>
+          <animateMotion values="10,70;30,40" begin="36s"
+                           dur="5s" repeatCount="3" additive="sum" accumulate="none"/>
+          <animateMotion values="10,70;30,40" begin="52s"
+                           dur="5s" repeatCount="3" additive="replace" accumulate="none"/>
+        </use>
+
+
+        <use xlink:href="#fromby" x="160" y="80"  stroke="#88f">
+          <title>blue from-by animations</title>
+          <animateMotion values="20,20" begin="2s" />
+          <animateMotion from="10,70"  by="20,-30" begin="4s"
+                           dur="5s" repeatCount="3" additive="sum" accumulate="sum"/>
+          <animateMotion from="10,70"  by="20,-30" begin="20s"
+                           dur="5s" repeatCount="3" additive="replace" accumulate="sum"/>
+          <animateMotion from="10,70"  by="20,-30" begin="36s"
+                           dur="5s" repeatCount="3" additive="sum" accumulate="none"/>
+          <animateMotion from="10,70"  by="20,-30" begin="52s"
+                           dur="5s" repeatCount="3" additive="replace" accumulate="none"/>
+          <set attributeName="stroke" to="#00f" begin="20s" />
+          <set attributeName="stroke" to="#00a" begin="36s" />
+          <set attributeName="stroke" to="#006" begin="52s" />
+        </use>
+
+      </g>
+
+
+      <g>
+        <title>by animateMotion</title>
+        <use xlink:href="#by" x="300" y="200" stroke="#800">
+          <title>dark red values comparsion for by animations - if visible fail</title>
+          <animateMotion values="20,20" begin="2s" />
+
+          <animateMotion values="20,20;40,-10" begin="4s" dur="5s"/>
+          <animateMotion values="40,-10;60,-40" begin="9s" dur="5s"/>
+          <animateMotion values="60,-40;80,-70" begin="14s" dur="5s"/>
+
+          <animateMotion values="20,20;40,-10" begin="20s" dur="5s"/>
+          <animateMotion values="40,-10;60,-40" begin="25s" dur="5s"/>
+          <animateMotion values="60,-40;80,-70" begin="30s" dur="5s"/>
+
+          <animateMotion values="20,20;40,-10" begin="36s" dur="5s"/>
+          <animateMotion values="20,20;40,-10" begin="41s" dur="5s"/>
+          <animateMotion values="20,20;40,-10" begin="46s" dur="5s"/>
+
+          <animateMotion values="20,20;40,-10" begin="52s" dur="5s"/>
+          <animateMotion values="20,20;40,-10" begin="57s" dur="5s"/>
+          <animateMotion values="20,20;40,-10" begin="62s" dur="5s"/>
+
+        </use>
+
+        <use xlink:href="#by" x="300" y="200" stroke="#f00">
+          <title>red values comparsion for by animations - if visible fail</title>
+          <animateMotion values="20,20" begin="2s" />
+          <animateMotion values="0,0;20,-30" begin="4s"
+                           dur="5s" repeatCount="3" additive="sum" accumulate="sum"/>
+          <animateMotion values="0,0;20,-30" begin="20s"
+                           dur="5s" repeatCount="3" additive="sum" accumulate="sum"/>
+          <animateMotion values="0,0;20,-30" begin="36s"
+                           dur="5s" repeatCount="3" additive="sum" accumulate="none"/>
+          <animateMotion values="0,0;20,-30" begin="52s"
+                           dur="5s" repeatCount="3" additive="sum" accumulate="none"/>
+        </use>
+
+
+        <use xlink:href="#by" x="300" y="200"  stroke="#88f">
+          <title>blue by animations</title>
+          <animateMotion values="20,20" begin="2s" />
+          <animateMotion by="20,-30" begin="4s"
+                           dur="5s" repeatCount="3" additive="sum" accumulate="sum"/>
+          <animateMotion by="20,-30" begin="20s"
+                           dur="5s" repeatCount="3" additive="replace" accumulate="sum"/>
+          <animateMotion by="20,-30" begin="36s"
+                           dur="5s" repeatCount="3" additive="sum" accumulate="none"/>
+          <animateMotion by="20,-30" begin="52s"
+                           dur="5s" repeatCount="3" additive="replace" accumulate="none"/>
+
+          <set attributeName="stroke" to="#00f" begin="20s" />
+          <set attributeName="stroke" to="#00a" begin="36s" />
+          <set attributeName="stroke" to="#006" begin="52s" />
+        </use>
+
+      </g>
+
+
+    </g>
+    <g id="myText" xml:id="myText" font-size="12">
+      <text x="300" y="315">compare from-to, from-by, by</text>
+      <text x="300" y="330">with values animateMotion</text>
+      <text x="300" y="350">red=wrong, no animation: wrong</text>
+      <text x="10" y="275">attributes noted:</text>
+      <text x="10" y="290">
+        <tspan fill="#88f">cumulative/additive;</tspan>
+        <tspan fill="#00f">cumulative/not additive;</tspan>
+      </text>
+      <text x="10" y="305">
+        <tspan fill="#00a">not cumulative/additive;</tspan>
+        <tspan fill="#006">not cumulative/not additive</tspan>
+      </text>
+    </g>
+
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.5 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240" 
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

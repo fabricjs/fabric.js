@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="CL" owner="CM" desc="Test that SVGSVGElement.getCurrentTime returns a sensible value" status="accepted"
+    approved="yes"
+    version="$Revision: 1.10 $" testname="$RCSfile: udom-svg-213-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        This tests that the <tt>getCurrentTime</tt> method of the
+        <b>SVGSVGElement</b> interface returns sensible values.
+      </p>
+      <p>
+        The test shows three rectangles. The test is passed if the first rectangle is blue, and after
+        clicking the second rectangle it turns blue, and after clicking
+        the third rectangle it also turns blue.
+      </p>
+      <p>
+        The first one represents
+        whether calling <tt>getCurrentTime</tt> before the <tt>load</tt>
+        event is dispatched returns 0.  Clicking the second rectangle
+        (which is red to begin with) then tests that the current time is
+        greater than 0.  Finally, clicking the third rectangle (which
+        also is red to begin with) tests that the current time is greater
+        than the time at which the second rectangle was clicked.
+
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: udom-svg-213-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+    <text x='10' y='42'>SVGSVGElement.getCurrentTime() test</text>
+    <rect xml:id='r1' x='10' y='60' width='40' height='40' fill='red'/>
+    <rect xml:id='r2' x='10' y='110' width='40' height='40' fill='red'/>
+    <rect xml:id='r3' x='10' y='160' width='40' height='40' fill='red'/>
+    
+    <!-- To make sure that the SMIL timeline is active -->
+    <animate attributeName="display" from="inline" to="inline" dur="2s" repeatCount="indefinite"/>
+    
+    <g font-size='15'>
+      <text xml:id='t1' x='60' y='85'/>
+      <text xml:id='t2' x='60' y='135'>Click this rectangle.</text>
+      <text xml:id='t3' x='60' y='185'>Then click this one.</text>
+    </g>
+    <script type='application/ecmascript'>
+      <![CDATA[
+      var svg = document.documentElement;
+
+      var t;
+
+      // Time must be 0s before 'load' is dispatched.
+      t0 = svg.getCurrentTime();
+      if (t0 == 0) {
+        document.getElementById('r1').setAttributeNS(null, 'fill', 'blue');
+      }
+      document.getElementById('t1').textContent = 'Current time before document load: ' + t0;
+
+      var r2 = document.getElementById('r2');
+      var r3 = document.getElementById('r3');
+
+      // Test that the first click is some time after 0s.
+      r2.addEventListener('click',
+                          function(evt) {
+                            t = svg.getCurrentTime();
+                            document.getElementById('t2').textContent = 'Current time when clicked: ' + t;
+                            if (t > 0) {
+                              r2.setAttributeNS(null, 'fill', 'blue');
+                            }
+                          }, false);
+
+      // Test that the second click is some time after the first click.
+      r3.addEventListener('click',
+                          function(evt) {
+                            var t2 = svg.getCurrentTime();
+                            document.getElementById('t3').textContent = 'Current time when clicked: ' + t2;
+                            if (t2 > t) {
+                              r3.setAttributeNS(null, 'fill', 'blue');
+                            }
+                          }, false);
+    ]]>
+    </script>
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.10 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240"
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

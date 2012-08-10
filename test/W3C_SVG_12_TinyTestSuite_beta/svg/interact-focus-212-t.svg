@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%" 
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg" 
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="AE" owner="ASl" desc="Tests focus navigation with use element" status="accepted" 
+    approved="yes"
+    version="$Revision: 1.5 $" testname="$RCSfile: interact-focus-212-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        Test on focus with a use-element. Focus should move first to the "g" element and then to its children. 
+        When it gets to the use-element focus is first set on the use (right column) and then its children.
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: interact-focus-212-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18" transform="scale(0.8, 0.9)">
+
+  <g fill="#FF3" stroke="#FA3" transform="translate(50,20)" focusable="true" xml:id="theGroup">
+    <circle   transform="translate(0, 20)" focusable="true" 
+      r="10"/>
+
+    <ellipse  transform="translate(0, 60)" focusable="true" 
+      rx="20" ry="10"/>
+
+    <rect     transform="translate(0,100)" focusable="true" 
+      x="-20" y="-10" width="40" height="20" rx="6" ry="3"/>
+
+    <path     transform="translate(0,140)" focusable="true" 
+      d="M-20,-10 L20,-10 C 40,0 40,0 20,10 L-20,10 Z"/>
+
+    <polygon  transform="translate(0,180)" focusable="true" 
+      points="-20,-10, 20,10, -20,10"/>
+
+    <polyline transform="translate(0,220)" focusable="true" 
+      points="-20,-10, 20,10, -20,10"/>
+
+    <text     transform="translate(0,260)" focusable="true" 
+      text-anchor="middle">text</text>
+
+    <image    transform="translate(0,300)" focusable="true" 
+      x="-20" y="-10" width="50" height="50" xlink:href="../images/earth.jpg"/>
+
+  </g>
+
+  <use   transform="translate(150, 0)" focusable="true" xlink:href="#theGroup"/>
+       
+  <text x="240" y="15">use</text>
+  <text x="260" y="60" font-size="15">Test on focus with a use-element.</text>
+  <text x="260" y="75" font-size="15">Focus should move first to the "g" element and</text>
+  <text x="260" y="90" font-size="15">then to its children. When focus is trans-</text>
+  <text x="260" y="105" font-size="15">ferred to the use-element focus is first</text>
+  <text x="260" y="120" font-size="15">set on the use (whole right column) and</text>
+  <text x="260" y="135" font-size="15">then its children.</text>
+
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+  <text xml:id="revision" x="10" y="340" stroke="none" 
+    fill="black">$Revision: 1.5 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240" 
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events" xml:space="preserve">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="AG" owner="DS" desc="Tests that the value of the 'class' attribute is included in the DOM" status="accepted"
+    approved="yes"
+    version="$Revision: 1.3 $" testname="$RCSfile: struct-class-201-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        Tests that the value of the 'class' attribute is included in the DOM,
+        including space-separated values, and values with extraneous spaces.
+      </p>
+      <p>
+        The rendered picture should match the reference image, except for
+        possible variations in the labelling text (per CSS2 rules). The pass
+        condition is seeing three green circles, with text below each circle
+        reflecting the normalized space-separated values for the class of that
+        circle. The leftmost circle has the value "foo", the middle circle has
+        the value "bar baz", and the rightmost circle has the value
+        " funky   spacing   ", normalized to "funky spacing". If any of the
+        circles are red, the test has failed.
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: struct-class-201-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+  <circle xml:id="circle_1" cx="120" cy="150" r="40" class="foo" />
+  <text id="text_1" x="120" y="210" font-size="18" fill="black" text-anchor="middle"> </text>
+
+  <circle xml:id="circle_2" cx="240" cy="150" r="40" class="bar baz" />
+  <text id="text_2" x="240" y="210" font-size="18" fill="black" text-anchor="middle"> </text>
+
+  <circle xml:id="circle_3" cx="360" cy="150" r="40" class=" funky   spacing   " />
+  <text id="text_3" x="360" y="210" font-size="18" fill="black" text-anchor="middle"> </text>
+
+    <script type="text/ecmascript">
+    <![CDATA[
+    function testAttributeValue( targetElId, outputElId, val )
+    {
+      var targetEl = document.getElementById( targetElId );
+
+      var classVal = targetEl.getAttribute( "class" );
+      //normalize value
+      classVal = classVal.replace(/^\s+|\s+$/g,"").replace(/\s+/g," ");
+      
+      var fill = "red";
+      if ( classVal  == val )
+      {
+        fill = "lime";
+      }
+      targetEl.setAttribute( "fill", fill );
+
+      var outputEl = document.getElementById( outputElId );
+      outputEl.firstChild.nodeValue = classVal;
+    }
+
+    testAttributeValue("circle_1", "text_1", "foo");
+    testAttributeValue("circle_2", "text_2", "bar baz");
+    testAttributeValue("circle_3", "text_3", "funky spacing");
+    ]]>
+    </script>
+
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+  <text xml:id="revision" x="10" y="340" stroke="none"
+              fill="black">$Revision: 1.3 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240"
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

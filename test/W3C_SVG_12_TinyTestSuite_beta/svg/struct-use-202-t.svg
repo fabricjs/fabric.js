@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="AE" owner="ED" desc="Test reference restriction B on the 'use' element." status="accepted"
+    approved="yes"
+    version="$Revision: 1.4 $" testname="$RCSfile: struct-use-202-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        This test tests the reference restriction B on the use element.
+      </p>
+      <p>
+        A compliant SVG Tiny 1.2 user agent must treat each of the invalid IRI:s as if the xlink:href
+        attribute hadn't been specified, which is the same as disabling rendering of the use element
+        in question. Thus for the test to pass the content that the use element tries to reference
+        must be invisible, the end result should be an empty (white) rect.
+      </p>
+      <p>
+        For a user agent that handles at least SVG 1.1 Basic the testcase has still passed if the referenced
+        content in the rect that is labelled "B" is visible since this is allowed for 1.1.
+        If the script in the external resource is executed then the color of the rect will be green.
+        If not then the rect will be red.
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: struct-use-202-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+    <text x="240" y="50" text-anchor="middle">Test &lt;use&gt; reference restriction B</text>
+
+    <g>
+      <!-- it's unclear if this is an invalid IRI, it references a fragment that has a script in it -->
+      <use xlink:href="../images/scriptresource.svg#g" x="110" y="105" width="80" height="80"/>
+      <rect x="105" y="100" width="90" height="120" fill="none" stroke="black"/>
+      <rect x="105" y="190" width="90" height="30" fill="none" stroke="black"/>
+      <text x="150" y="210" text-anchor="middle">B</text>
+    </g>
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.4 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240" 
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="NR" owner="DOH" desc="Centering of stroke on the outline of rectangles." status="accepted"
+    approved="yes"
+    version="$Revision: 1.5 $" testname="$RCSfile: paint-stroke-207-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        Centering of stroke on the outline of rectangles.
+      </p>
+      <p>
+        The main indication for a failed test is the appearence of something red.
+      </p>
+      <p>
+        The width and position of the stroke centered on the outline of a rectangle is tested with four stroked rectangles,
+        one is the thin black stroked test frame rectangle, the second one a large blue rectangle, the third a rectangle
+        with rounded corners, looking like a circle and the fourth a small square.
+      </p>
+      <p>
+        The correct position is tested by a comparsion with several filled rectangles in the background or in the fourth case
+        covering the test square completely. The parts of the background covered with the blue test rectangles are filled red,
+        respectively the test square is stroked red too.
+        Therefore if something red gets visible, the position of the stroke of
+        the related test rectangle is wrong.
+      </p>
+      <p>
+        According to the conformance criteria all visual rendering should be accurate to within one px unit to the mathematically
+        correct result. Therefore possible residuals from the red background parts have to be in this
+        range of accuracy to pass the test.
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: paint-stroke-207-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+
+    <g>
+      <title>background of filled rectangles indicating the position of the stroked test rectangles</title>
+      <rect x="0" y="0" width="480" height="360" fill="#fff" />
+      <rect x="0.5" y="0.5" width="479" height="359" fill="#f00" />
+      <rect x="1.5" y="1.5" width="477" height="357" fill="#fff" />
+      <rect x="60" y="40" width="360" height="240" fill="#f00" />
+      <rect x="80" y="60" width="320" height="200" fill="#fff" />
+      <rect x="119.6" y="109.6" width="100.8" height="100.8" rx="200" fill="#f00" />
+      <rect x="140.4" y="130.4" width="59.2" height="59.2" ry="200" fill="#fff" />
+      <rect x="260" y="110" width="100" height="100" fill="#a00" />
+      <rect x="280" y="130" width="60" height="60" fill="#fff" />
+    </g>
+    <g stroke="#00f" stroke-width="20" fill="none">
+      <rect x="70" y="50" width="340" height="220">
+        <title>large blue stroked test rectangle</title>
+      </rect>
+      <rect x="130" y="120" width="80" height="80" ry="40" rx="40" stroke-width="20.8">
+        <title>small blue stroked test rectangle with rounded corners looking like a circle</title>
+      </rect>
+    </g>
+
+
+
+    <rect x="270" y="120" width="80" height="80" stroke="#f00" stroke-width="20" fill="none">
+      <title>small red stroked test rectangle</title>
+    </rect>
+    <g stroke="none" fill="#00f">
+      <title>small blue rectangles to cover the small red stroked test rectangle</title>
+      <rect x="260" y="110" width="80" height="20" />
+      <rect x="340" y="110" width="20" height="80" />
+      <rect x="280" y="190" width="80" height="20" />
+      <rect x="260" y="130" width="20" height="80" />
+    </g>
+
+
+    <g font-size="12" stroke="none" fill="#ccc">
+      <text x="340" y="315">position of the stroke:</text>
+      <text x="340" y="328">red = wrong</text>
+    </g>
+
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.5 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240" 
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

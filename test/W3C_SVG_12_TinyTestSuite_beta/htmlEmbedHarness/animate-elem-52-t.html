@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE html PUBLIC  "-//CL//DTD XHTML 1.0 Transitional plus Embed//EN"
+ "http://www.w3.org/Graphics/xhtml1-transitional-plus-embed.dtd">
+ <html xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+ <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+ <meta name="keywords" content="W3C SVG 1.1 Test Suite testsuite mobile"/>
+ <meta name="description" content="W3C SVG 1.2 Tiny Test Suite"/>
+ <title>
+SVG 1.2 Tiny test:animate-elem-52-t </title>
+ <style type="text/css">
+ <!--
+ .bodytext    { font-family:verdana, helvetica, sans-serif; font-size: 12pt; line-height: 125%; text-align: Left; margin-top: 0; margin-bottom: 0 }
+ .pageTitle         { line-height: 150%; font-size: 20pt; font-weight : 900; margin-bottom: 20pt }
+ .pageSubTitle  { color : blue; line-height: 100%; font-size: 24pt; font-weight : 900 }
+ .openChapter   { color : blue; line-height: 125%; font-weight : 900 }
+ .openSection   { color : blue; line-height: 125%; font-weight : 900 }
+ .info  { color : black; line-height: 110%; font-size: 10pt; font-weight : 100 }
+ p          { margin-top:0; margin-bottom:0; padding-top:0; padding-bottom:0 }
+ blockquote { margin-top:0; margin-bottom:0; padding-top:0; padding-bottom:0 }
+ .opscript {margin-left: 3%; margin-right: 3%; }
+ .opscript p { margin-top: 0.7em}
+ .navbar {background: black; color: white; font-weight: bold}
+ -->
+ </style>
+ </head>
+ <body class="bodytext">
+
+	<div class="linkbar"> 
+<p>
+<a href="animate-elem-52-t.html">Tiny version</a></p>
+<p>Specification link: <a target="spec" href="http://www.w3.org/TR/SVGMobile12/animate.html">16.2 Animation elements</a></p>
+ <p>
+    <a href="animate-elem-46-t.html">animate-elem-46-t ←</a> 
+    <a href="index.html">index</a>
+    <a href="animate-elem-53-t.html">→ animate-elem-53-t</a>
+</p></div>
+
+	<table align="center" border="0" cellspacing="0" cellpadding="10">
+		<tr>
+			<td align="center" colspan="3">
+				<table border="0" cellpadding="8">
+					<tr>
+						<td align="center" colspan="2" class="pageTitle">
+							<h1>animate-elem-52-t</h1>
+						</td>
+					</tr>
+					<tr  class="navbar">
+						<td align="center">
+							SVG Image
+						</td>
+						<td align="center">
+							PNG Image
+						</td>
+					</tr>
+					<tr>
+						<td align="right">
+   	    		  			<embed src="../svggen/animate-elem-52-t.svg" width="480" height="360"/>
+						</td>
+						<td align="left">
+							<img alt="raster image of animate-elem-52-t" src="../png/animate-elem-52-t.png" width="480" height="360"/>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+
+               
+<div class="opscript">
+      <p>The purpose of this test is to test eventbase targets.</p>
+      <p>
+        The test consists of 4 rectangles named A, B, C, D. The D rectangle contains three animations changing the color
+        of the animation target. Each animation applies to one of the other rectangles by using xlink:href="". Clicking on
+        rect A should change it's color immediately, clicking B changes its color after 2 seconds, clicking C changes its
+        color after 4 seconds and clicking D shows no visible change (although D contains the animations the event target
+        for each animation is the referenced rectangle, this rectangle is also the animation target.)
+      </p>
+      <p>
+        The following sections in <a href='http://www.w3.org/TR/SMIL2/'>SMIL 2.1</a> are relevant as
+        confirmation of this test:
+      </p>
+      <div>
+        <ul>
+          <li>
+            <a href='http://www.w3.org/TR/SMIL2/smil-timing.html#Timing-EventValueSyntax'>
+              10.4.1
+              subsection "Event values"
+            </a> states: "If the Eventbase-element
+            term is missing, the event-base element defaults to the element on
+            which the eventbase timing is specified (the current element)."
+          </li>
+          <li>
+            <a href='http://www.w3.org/TR/SMIL2/animation.html#animationNS-SpecifyingTargetElement'>
+              3.5.1
+              subsection "The target element"
+            </a> says that the animation target may
+            be defined explicitly through the targetElement="" IDREF or href=""
+            URI, according to the host language.  SVG Tiny 1.2 uses the
+            xlink:href="" attribute to specify the target element, so in this
+            test, the animation target is defined through xlink:href="" and the
+            event base per definition is then also this referenced element.
+          </li>
+        </ul>
+      </div>
+
+		</div>
+<div class="linkbar"> <p>
+				<a href="animate-elem-46-t.html">animate-elem-46-t ←</a>
+				<a href="index.html">index</a>
+				<a href="animate-elem-53-t.html">→ animate-elem-53-t</a>
+						</p></div>
+</body>
+</html>

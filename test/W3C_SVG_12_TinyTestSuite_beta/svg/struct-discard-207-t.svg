@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="AE" owner="ED" desc="Tests the discard acts the same as removeChild." status="accepted"
+    approved="yes"
+    version="$Revision: 1.5 $" testname="$RCSfile: struct-discard-207-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        This test tests that discard acts the same as removeChild.
+        First two red rects and a blue circle should be seen. The blue circle has
+        its radius animated to 0 over the course of 3 seconds. At the point where
+        the blue circle disappears the two red rects should be removed from the
+        tree. This reveals two green circles.
+      </p>
+      <p>
+        The test has passed if in the interval 0-3 seconds there are two red rects and a blue circle, and after 3 seconds two green circles can be seen and the text at the bottom says "Test passed".
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: struct-discard-207-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+    <g transform="translate(30,0)">
+      <circle cx="150" cy="100" r="50" fill="green"/>
+      <rect xml:id="r1" x="100" y="50" width="100" height="100" fill="red">
+        <discard xml:id="discard1" begin="circleanim.end"/>
+      </rect>
+
+      <circle cx="260" cy="100" r="50" fill="green"/>
+      <rect xml:id="r2" x="210" y="50" width="100" height="100" fill="red">
+
+      </rect>
+
+      <circle cx="205" cy="210" r="50" fill="blue">
+        <animate xml:id="circleanim" attributeName="r" to="0" dur="3s" fill="freeze">
+          <handler xml:id="discardhandler" xe:event="endEvent">
+            var r2 = document.getElementById("r2");
+            var parenta = r2.parentNode;
+            parenta.removeChild(r2);
+          </handler>
+        </animate>
+        <animate xml:id="circleanim2" attributeName="r" from="0" to="0" begin="circleanim.end+1s" dur="1s" fill="freeze">
+          <handler xml:id="checker" xe:event="beginEvent">
+            <![CDATA[
+              var r1 = document.getElementById("r1");
+              var r2 = document.getElementById("r2");
+              var res = document.getElementById("result");
+              var str = (r1 || r2) ? "Test failed." : "Test passed.";
+              res.textContent = str;
+            ]]>
+          </handler>
+        </animate>
+      </circle>
+    </g>
+    <text xml:id="result" x="240" y="290" text-anchor="middle">Test running...</text>
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.5 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240" 
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

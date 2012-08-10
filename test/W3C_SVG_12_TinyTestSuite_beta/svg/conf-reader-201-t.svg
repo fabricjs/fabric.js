@@ -1,0 +1,153 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="DS" owner="ED" desc="Test for namespaces in XML" status="accepted"
+    approved="yes"
+    version="$Revision: 1.5 $" testname="$RCSfile: conf-reader-201-t.svg,v $">
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        This test checks that namespace prefixes are handled correctly.
+      </p>
+      <p>
+        First, a random 20-character string is generated. The string only contains characters that are valid NCName letters.
+        This string is then used as a custom prefix for an 'href' attribute in the XLink namespace.
+        An 'image' element is created and two image references are added, one is in the "http://www.this.is.not.an/xlink" namespace,
+        and one is in the XLink namespace. Only the attribute with the 20-character prefix is actually in the XLink namespace,
+        which means that that link should be the one that is used when rendering the 'image' element. This first subtest is
+        using the setAttributeNS method.
+      </p>
+      <p>
+        The second subtest generates a new prefix string, and makes sure it's not equal to the first prefix string.
+        Then an svg fragment is generated as a string, to be parsed by a call to the parseXML method.
+        The 'xlink' prefix is bound to the "http://example.net/bar" namespace, and the generated prefix is bound to the XLink namespace.
+        Similar to the first subtest, the image has two references but only one attribute is actually in the XLink namespace.
+        The fragment is parsed and the result is inserted into the document, which should make the 'image' element visible.
+        If an exception is thrown during the parsing or the insertion of the result output will be shown in the status part of the testcase.
+      </p>
+      <p>
+        The testcase has passed if after the script execution has taken place these conditions are met:
+        <ul>
+          <li>There are two pink images visible.</li>
+          <li>None of these two images shows the word "Fail"</li>
+          <li>The status message says "No exceptions"</li>
+        </ul>
+      </p>
+    </d:OperatorScript>
+  </SVGTestCase>
+  <title xml:id="test-title">$RCSfile: conf-reader-201-t.svg,v $</title>
+  <defs>
+    <font-face
+      font-family="SVGFreeSansASCII"
+      unicode-range="U+0-7F">
+      <font-face-src>
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+
+    <script>
+      <![CDATA[
+      /**
+       * Generates a 20 character string consisting of characters from the inchars parameter.
+       * The output string will have no repetitions of a character.
+       */	 
+      function generatePrefix(inchars)
+      {
+            var ncNameStart = "_abcdefghijklmnopqrstuvwxyzåäöQWERTYUIOPÅÄÖLKJHGFDSAZXCVBNM";
+
+        var prefix = ncNameStart[Math.floor(Math.random()*ncNameStart.length)];
+        var leftchars = inchars;
+        var char;
+        for(var i = 0; i < 19; i++)
+        {
+          char = leftchars[Math.floor(Math.random()*leftchars.length)];
+          leftchars = leftchars.replace(char, '');
+          prefix += char;
+        }
+        return prefix;
+      }
+
+      /** 
+       * The main body of the test.
+       */
+      function test()
+      {
+        var letters = "abcdefghijklmnopqrstuvwxyzåäö_-.QWERTYUIOPÅÄÖLKJHGFDSAZXCVBNM0123456789";
+        var prefix = generatePrefix(letters);
+        var g = document.getElementById("test-body-content");
+        var t = document.getElementById("prefix");
+        t.textContent = prefix;
+
+        var elm = document.createElementNS("http://www.w3.org/2000/svg", "image");
+        elm.setAttributeNS(null, "width", 100);
+        elm.setAttributeNS(null, "height", 100);
+        elm.setAttributeNS(null, "x", 100);
+        elm.setAttributeNS(null, "y", 100);
+        elm.setAttributeNS("http://www.w3.org/1999/xlink", prefix+":href", "../images/pinksquidj.png");
+        elm.setAttributeNS("http://www.this.is.not.an/xlink", "xlink:href", "../images/purplesquidj.png");
+        g.appendChild(elm);
+
+        var prefix2 = generatePrefix(letters);
+        while(prefix2 == prefix)
+        {
+          prefix2 = generatePrefix(letters);
+        }
+
+        var t2 = document.getElementById("prefix2");
+        t2.textContent = prefix2;
+        var fragment = "<g xmlns='http://www.w3.org/2000/svg' xmlns:"+prefix2+"='http://www.w3.org/1999/xlink' xmlns:xlink='http://example.net/bar'>" +
+        "	<image xml:id='image2' width='100' height='100' x='210' y='100' xlink:href='../images/purplesquidj.png' " + prefix2 + ":href='../images/pinksquidj.png'/>" +
+        "</g>";
+        try
+        {
+          var doc = parseXML(fragment, document);
+          g.appendChild(doc);
+        }
+        catch(e)
+        {
+          document.getElementById("status").textContent = e;
+        }
+      }
+      ]]>
+    </script>
+
+    <text y="100" x="50">
+      Generated prefix 1: <tspan xml:id="prefix">...</tspan>
+    </text>
+    <text y="120" x="50">
+      Generated prefix 2: <tspan xml:id="prefix2">...</tspan>
+    </text>
+    <text y="220" x="50">
+      Status: <tspan xml:id="status">No exceptions.</tspan>
+    </text>
+
+    <g xmlns:xlink="http://example.net/bar">
+      <image xml:id="image2" width="100" height="100" x="210" y="100" xlink:href="../images/purplesquidj.png"/>
+    </g>
+
+    <handler xe:event="SVGLoad">
+      test();
+    </handler>
+  </g>
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32">
+    <text xml:id="revision" x="10" y="340" stroke="none"
+      fill="black">$Revision: 1.5 $</text>
+  </g>
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000"/>
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240"
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

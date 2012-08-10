@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" xml:id="svg-root" width="100%" height="100%"
+  viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xe="http://www.w3.org/2001/xml-events">
+  <!--======================================================================-->
+  <!--=  Copyright 2008 World Wide Web Consortium, (Massachusetts          =-->
+  <!--=  Institute of Technology, European Research Consortium for         =-->
+  <!--=  Informatics and Mathematics (ERCIM), Keio University).            =-->
+  <!--=  All Rights Reserved.                                              =-->
+  <!--=  See http://www.w3.org/Consortium/Legal/.                          =-->
+  <!--======================================================================-->
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/"
+    reviewer="CL" owner="JF" desc="Test which verifies that the basic facilities of declarative animation are working." status="accepted"
+    approved="yes"
+    version="$Revision: 1.11 $" testname="$RCSfile: animate-elem-22-t.svg,v $"> 
+    <d:OperatorScript xmlns:d="http://www.w3.org/2000/02/svg/testsuite/description/" xmlns="http://www.w3.org/1999/xhtml">
+      <p>Test which verifies that the basic facilities of declarative animation are working.</p>
+      <p>This test uses the following element : 'animate'</p>
+      <p>The test is a nine second animation with no repeats. It shows a rectangle growing from small  to big.</p>
+      <p>
+        The file includes various guides that can be used to verify the correctness of the animation. Outlines exist for
+        the rectangle size and location at times 0s, 3s and 9s.
+      </p>
+    </d:OperatorScript> 
+  </SVGTestCase> 
+  <title xml:id="test-title">$RCSfile: animate-elem-22-t.svg,v $</title> 
+  <defs> 
+    <font-face font-family="SVGFreeSansASCII" unicode-range="U+0-7F"> 
+      <font-face-src> 
+        <font-face-uri xlink:href="../images/SVGFreeSans.svg#ascii" /> 
+      </font-face-src> 
+    </font-face> 
+  </defs> 
+  <g xml:id="test-body-content" font-family="SVGFreeSansASCII,sans-serif" font-size="18">
+    <!-- Guide objects to show where the animation elements belong at which time -->
+    <g font-size="12"> 
+      <text x="200" y="131">Yellow rect at time 0s</text> 
+      <rect x="200" y="135" width="50" height="50" fill="none" stroke="black" /> 
+      <text x="141.6666" y="102.6666">Yellow rect at time 3s</text> 
+      <rect x="141.6666" y="106.6666" width="166.6666" height="111.6666" fill="none" stroke="rgb(0,0,255)" /> 
+      <text x="25" y="46">Yellow rect at time 9s</text> 
+      <rect x="25" y="50" width="400" height="240" fill="none" stroke="rgb(0,0,255)" /> 
+    </g>
+    <rect xml:id="RectElement" x="200" y="135" width="50" height="50" fill="rgb(255,255,0)" fill-opacity=".5"> 
+      <animate attributeName="x" attributeType="XML" begin="0s" dur="9s" fill="freeze" from="200" to="25" /> 
+      <animate attributeName="y" attributeType="XML" begin="0s" dur="9s" fill="freeze" from="135" to="50" /> 
+      <animate attributeName="width" attributeType="XML" begin="0s" dur="9s" fill="freeze" from="50" to="400" /> 
+      <animate attributeName="height" attributeType="XML" begin="0s" dur="9s" fill="freeze" from="50" to="240" /> 
+    </rect>
+  </g> 
+  <g font-family="SVGFreeSansASCII,sans-serif" font-size="32"> 
+    <text xml:id="revision" x="10" y="340" stroke="none" fill="black">$Revision: 1.11 $</text> 
+  </g> 
+  <rect xml:id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000" /> 
+  <!-- comment out this watermark once the test is approved -->
+  <!--<g xml:id="draft-watermark">
+    <rect x="1" y="1" width="478" height="20" fill="red" stroke="black" stroke-width="1"/>
+    <text font-family="SVGFreeSansASCII,sans-serif" font-weight="bold" font-size="20" x="240" 
+      text-anchor="middle" y="18" stroke-width="0.5" stroke="black" fill="white">DRAFT</text>
+  </g>-->
+</svg>

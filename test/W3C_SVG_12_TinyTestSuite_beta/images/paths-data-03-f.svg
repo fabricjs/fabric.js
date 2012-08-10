@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">  
+
+<!--======================================================================-->
+<!--=  Copyright 2000 World Wide Web Consortium, (Massachusetts          =-->
+<!--=  Institute of Technology, Institut National de Recherche en        =-->
+<!--=  Informatique et en Automatique, Keio University). All Rights      =-->
+<!--=  Reserved. See http://www.w3.org/Consortium/Legal/.                =-->
+<!--======================================================================-->
+<!-- ===================================================================== -->
+<!--                                                                       -->
+<!-- path-curves-BE-04.svg                                                 -->
+<!-- renamed for 1.1 suite to paths-data-03-f.svg                          -->
+<!--                                                                       -->
+<!-- Test that the viewer has the basic capability to handle the 'path'    -->
+<!-- element and its data (d) attribute in combination with the elliptical -->
+<!-- arc curveto commands, A, a (plus Mm and Zz).                          -->
+<!--                                                                       -->
+<!-- Author : Lofton Henderson, 29-Feb-2000 (based on work                 -->
+<!--                                           of Mark Sgarlato, Adobe).   -->
+<!--                                                                       -->
+<!-- History:                                                              -->
+<!--  29-Feb-2000, LRH, Ser#1 created.                                     -->
+<!--  12-Mar-2000, LH, fix test-framing rect; ser#2                        -->
+<!--  03-Aug-2000, LH=" update DOCTYPE for CR DTD, 20000802" ser# .         -->
+<!--  29-Oct-2000, JF: add fill-rule:evenodd to one path to get same       -->
+<!--                   visual result as before. Necessary because default  -->
+<!--                   fill-rule is now nonzero. Update to ser#3.          -->
+<!--  15-Nov-2000, LH: add missing test-body-content group.                -->
+<!--                                                                       -->
+<!-- ===================================================================== -->
+<!--======================================================================-->
+<!--= Note. After October 2000, revision history is kept as CVS 'commit' =-->
+<!--= log messages, and therefore is no longer in the preceding preamble.=-->
+<!--======================================================================-->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"  id="svg-root" width="480" height="360">
+
+  <SVGTestCase xmlns="http://www.w3.org/2000/02/svg/testsuite/description/" >
+    <OperatorScript>
+      <Paragraph>
+Test that the viewer has the basic capability to handle the 'path'
+element and its data (d) attribute in combination with the elliptical
+arc curveto commands, A, a (plus Mm and Zz).
+      </Paragraph>
+      <Paragraph>
+There are 6 subtests, each composed from the elliptical arc path commands per
+the label by the subtest.  The curve positions
+are marked by small colored squares.  Subtests are filled, or stroked, or 
+both, using simple style properties and colors.
+      </Paragraph>
+      <Paragraph>
+The rendered picture should match the reference image exactly, except for possible
+variations in the labelling text (per CSS2 rules).  
+      </Paragraph>
+      <Paragraph>
+The test uses the 'rect' element, as well as basic fill (solid primary colors), 
+stroke (primary color wide and 1-pixel lines), font-family (Helvetica) and font-size properties.
+      </Paragraph>
+    </OperatorScript>
+  </SVGTestCase>
+
+	<title id="test-title">paths-data-03-f.svg</title>
+	<desc id="test-desc">Test that the viewer has the basic capability to handle the 'path' element and data (d) attribute in combination with the elliptical Arc curveto commands - A, a (along with Mm and Zz).</desc>
+	<!--======================================================================-->
+	<!--Content of Test Case follows...                  =====================-->
+	<!--======================================================================-->
+	<g id="test-body-content">
+		<text font-family="Helvetica" font-size="12"  x="120" y="14">Elliptical arc curves drawn with commands:</text>
+		<!-- ====================================================================== -->
+		<!-- Simple circle using MAZ  ============================ -->
+		<!-- ====================================================================== -->
+		<path id="Arc_MAZ" fill="none" stroke="#FF0000" stroke-width="10"  d="   M  25   70      A  40   40      0         1      0     25   69   Z    "/>
+		<text font-family="Helvetica" font-size="12"  x="48" y="70">M, A, Z</text>
+		<rect x="23" y="68" width="4" height="4" fill="#00C000" stroke="none" />
+		<rect x="23" y="67" width="4" height="4" fill="#00C000" stroke="none" />
+		<!-- ====================================================================== -->
+		<!-- filled arc using m, a, & z =================== -->
+		<!-- ====================================================================== -->
+		<path id="Arc_fill_maz" fill="#00FF00" stroke="#0000FF"  d="   m  150   100      a  50    40       0          1       0      25   -70   z  "/>
+		<text font-family="Helvetica" font-size="12"  x="124" y="45">m, a, z</text>
+		<rect x="148" y="98" width="4" height="4" fill="#CF0000" stroke="none" />
+		<rect x="173" y="28" width="4" height="4" fill="#CF0000" stroke="none" />
+		<!-- ====================================================================== -->
+		<!-- Unterminated arc using M & a ======================================== -->
+		<!-- ====================================================================== -->
+		<path id="Arc_Ma" fill="none" stroke="#000000"  d="   M  350    245      a   40    40       0          1       0      80    60       "/>
+		<text font-family="Helvetica" font-size="12"  x="390" y="300">M, a</text>
+		<rect x="348" y="243" width="4" height="4" fill="#0000FF" stroke="none" />
+		<rect x="428" y="303" width="4" height="4" fill="#0000FF" stroke="none" />
+		<!-- ====================================================================== -->
+		<!-- Triple Arc using M, A, a, a, & z ===================================== -->
+		<!-- ====================================================================== -->
+		<path id="Tri_MAaaz" fill="#C0C000" stroke="none" fill-rule="evenodd"  d="   M   270   30      A   50    50       0          1       0     345   30         a   50    50       0          1       0      50    0         a   50    50       0          1       0      25    0    z  "/>
+		<text font-family="Helvetica" font-size="12"  x="280" y="135">M, A, a, a, z</text>
+		<rect x="268" y="28" width="4" height="4" fill="#0000FF" stroke="none" />
+		<rect x="343" y="28" width="4" height="4" fill="#0000FF" stroke="none" />
+		<rect x="393" y="28" width="4" height="4" fill="#0000FF" stroke="none" />
+		<rect x="418" y="28" width="4" height="4" fill="#0000FF" stroke="none" />
+		<!-- ====================================================================== -->
+		<!-- Tripple arc using M, a, Z, m, A, Z, m, a & z ===================================== -->
+		<!-- ====================================================================== -->
+		<path id="Arc_MaZmAzmaz" fill="#CF0000" stroke="#000000" stroke-width="3"  d="   M  30   150      a   40    40       0          0       1      65    50          Z                    m   30       30                         A   20       20              0              0              0             125   230        Z             m   40       24                         a   20       20              0              0              1              65    50        z "/>
+		<text font-family="Helvetica" font-size="12"  x="25" y="270">M, a, Z, m, A, Z, m, a, z</text>
+		<rect x="28" y="148" width="4" height="4" fill="#0000FF" stroke="none" />
+		<rect x="93" y="198" width="4" height="4" fill="#0000FF" stroke="none" />
+		<rect x="58" y="178" width="4" height="4" fill="#0000FF" stroke="none" />
+		<rect x="123" y="228" width="4" height="4" fill="#0000FF" stroke="none" />
+		<rect x="98" y="202" width="4" height="4" fill="#0000FF" stroke="none" />
+		<rect x="163" y="252" width="4" height="4" fill="#0000FF" stroke="none" />
+		<!-- ====================================================================== -->
+		<!-- Sin Wave using M, q, t, t, t, t, & z ================================ -->
+		<!-- ====================================================================== -->
+		<path id="Sin_MAAAAA" fill="none" stroke="#FF0000"  d="   M   215    190      A   40    200      10          0       0      265    190    A   40    200      20          0       1     315    190        A   40    200      30          0       0     365    190    A   40    200      40          0       1     415    190        A   40    200      50          0       0     465    190                     "/>
+		<text font-family="Helvetica" font-size="12"  x="215" y="246">M, A, A, A, A</text>
+		<rect x="213" y="188" width="4" height="4" fill="#0000FF" stroke="none" />
+		<rect x="263" y="188" width="4" height="4" fill="#0000FF" stroke="none" />
+		<rect x="313" y="188" width="4" height="4" fill="#0000FF" stroke="none" />
+		<rect x="363" y="188" width="4" height="4" fill="#0000FF" stroke="none" />
+		<rect x="413" y="188" width="4" height="4" fill="#0000FF" stroke="none" />
+		<rect x="463" y="188" width="4" height="4" fill="#0000FF" stroke="none" />
+	</g>
+	<!--======================================================================-->
+	<!--Legend and frame:      Title, suite and SVG document serialization====-->
+	<!--======================================================================-->
+	<g id="test-legend" fill="black" font-family="Helvetica" font-size="10" >
+		<rect x="10" y="300" width="275" height="50" fill="none" stroke="#000000" />
+		<path fill="none" stroke="#000000"  d="M10 315 h275 M205 315 v35 M10 336 h195 M205 332 h80"/>
+		<text x="25" y="311">Scalable Vector Graphics (SVG) v1.1 Conformance Suite</text>
+		<a xlink:href="copyright-documents-19990405.html">
+			<text x="12" y="347" fill="blue" >Copyright 2002 W3C. All Rights Reserved.</text>
+		</a>
+		<text font-size="12"  x="35" y="330">paths-data-03-f</text>
+		<text font-size="10"  x="210" y="327">$Revision: 1.1 $</text>
+		<text font-size="10"  x="210" y="345">Release 1.0</text>
+		<rect id="test-frame" x="1" y="1" width="478" height="358" fill="none" stroke="#000000" />
+	</g>
+</svg>
