@@ -367,43 +367,75 @@
             break;
 
           case 'q': // quadraticCurveTo, relative
-            x += current[3];
-            y += current[4];
+            // transform to absolute x,y
+            tempX = x + current[3];
+            tempY = y + current[4];
+
+            controlX = x + current[1];
+            controlY = y + current[2];
+
             ctx.quadraticCurveTo(
-              current[1] + l,
-              current[2] + t,
-              x + l,
-              y + t
+              controlX + l,
+              controlY + t,
+              tempX + l,
+              tempY + t
             );
+            x = tempX;
+            y = tempY;
             break;
 
           case 'Q': // quadraticCurveTo, absolute
-            x = current[3];
-            y = current[4];
+            tempX = current[3];
+            tempY = current[4];
+
+            ctx.quadraticCurveTo(
+              current[1] + l,
+              current[2] + t,
+              tempX + l,
+              tempY + t
+            );
+            x = tempX;
+            y = tempY;
             controlX = current[1];
             controlY = current[2];
+            break;
+
+          case 't': // shorthand quadraticCurveTo, relative
+            // transform to absolute x,y
+            tempX = x + current[1];
+            tempY = y + current[2];
+
+            // calculate reflection of previous control points
+            controlX = 2 * x - controlX;
+            controlY = 2 * y - controlY;
+
             ctx.quadraticCurveTo(
               controlX + l,
               controlY + t,
-              x + l,
-              y + t
+              tempX + l,
+              tempY + t
             );
+            x = tempX;
+            y = tempY;
+            controlX = x + current[1];
+            controlY = y + current[2];
             break;
 
           case 'T':
-            tempX = x;
-            tempY = y;
-            x = current[1];
-            y = current[2];
+            tempX = current[1];
+            tempY = current[2];
+
             // calculate reflection of previous control points
-            controlX = -controlX + 2 * tempX;
-            controlY = -controlY + 2 * tempY;
+            controlX = 2 * x - controlX;
+            controlY = 2 * y - controlY;
             ctx.quadraticCurveTo(
               controlX + l,
               controlY + t,
-              x + l,
-              y + t
+              tempX + l,
+              tempY + t
             );
+            x = tempX;
+            y = tempY;
             break;
 
           case 'a':
