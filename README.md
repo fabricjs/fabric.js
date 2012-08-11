@@ -81,13 +81,13 @@ Fabric.js started as a foundation for design editor on [printio.ru](http://print
 
 ### Demos
 
-- [Demos](http://kangax.github.com/fabric.js/demos/)
-- [Kitchensink demo](http://kangax.github.com/fabric.js/kitchensink/)
-- [Benchmarks](http://kangax.github.com/fabric.js/benchmarks/)
+- [Demos](http://fabricjs.com/demos/)
+- [Kitchensink demo](http://fabricjs.com/kitchensink/)
+- [Benchmarks](http://fabricjs.com/benchmarks/)
 
 ### Documentation
 
-Documentation is always available at [http://kangax.github.com/fabric.js/docs/](http://kangax.github.com/fabric.js/docs/). You can also build it locally, following step 4 from the "Building" section of this README.
+Documentation is always available at [http://fabricjs.com/docs/](http://fabricjs.com/docs/). You can also build it locally, following step 4 from the "Building" section of this README.
 
 Also see [presentation from BK.js](http://www.slideshare.net/kangax/fabricjs-building-acanvaslibrarybk) and [presentation from Falsy Values](http://www.slideshare.net/kangax/fabric-falsy-values-8067834) for an overview of fabric.js, how it works, and its features.
 
