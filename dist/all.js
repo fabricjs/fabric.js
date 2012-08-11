@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL` */
 /*! Fabric.js Copyright 2008-2012, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.8.45" };
+var fabric = fabric || { version: "0.8.46" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -3365,15 +3365,20 @@ fabric.util.string = {
       clone = fabric.util.object.clone;
 
   var attributesMap = {
-    'cx':             'left',
-    'x':              'left',
-    'cy':             'top',
-    'y':              'top',
-    'r':              'radius',
-    'fill-opacity':   'opacity',
-    'fill-rule':      'fillRule',
-    'stroke-width':   'strokeWidth',
-    'transform':      'transformMatrix'
+    'cx':               'left',
+    'x':                'left',
+    'cy':               'top',
+    'y':                'top',
+    'r':                'radius',
+    'fill-opacity':     'opacity',
+    'fill-rule':        'fillRule',
+    'stroke-width':     'strokeWidth',
+    'transform':        'transformMatrix',
+    'text-decoration':  'textDecoration',
+    'font-size':        'fontSize',
+    'font-weight':      'fontWeight',
+    'font-style':       'fontStyle',
+    'font-family':      'fontFamily'
   };
 
   function normalizeAttr(attr) {
@@ -3788,7 +3793,7 @@ fabric.util.string = {
    */
   fabric.parseSVGDocument = (function() {
 
-    var reAllowedSVGTagNames = /^(path|circle|polygon|polyline|ellipse|rect|line|image)$/;
+    var reAllowedSVGTagNames = /^(path|circle|polygon|polyline|ellipse|rect|line|image|text)$/;
 
     // http://www.w3.org/TR/SVG/coords.html#ViewBoxAttribute
     // \d doesn't quite cut it (as we need to match an actual float number)
@@ -12636,7 +12641,7 @@ fabric.Image.filters.Tint.fromObject = function(object) {
     initialize: function(text, options) {
       this._initStateProperties();
       this.text = text;
-      this.setOptions(options);
+      this.setOptions(options || { });
       this.theta = this.angle * Math.PI / 180;
       this._initDimensions();
       this.setCoords();
@@ -13266,6 +13271,14 @@ fabric.Image.filters.Tint.fromObject = function(object) {
   });
 
   /**
+   * List of attribute names to account for when parsing SVG element (used by `fabric.Text.fromElement`)
+   * @static
+   */
+  fabric.Text.ATTRIBUTE_NAMES =
+    ('x y fill fill-opacity opacity stroke stroke-width transform ' +
+     'font-family font-style font-weight font-size text-decoration').split(' ');
+
+  /**
    * Returns fabric.Text instance from an object representation
    * @static
    * @method fromObject
@@ -13280,10 +13293,20 @@ fabric.Image.filters.Tint.fromObject = function(object) {
    * Returns fabric.Text instance from an SVG element (<b>not yet implemented</b>)
    * @static
    * @method fabric.Text.fromElement
+   * @param element
+   * @param options
    * @return {fabric.Text} an instance
    */
-  fabric.Text.fromElement = function(element) {
-    // TODO (kangax): implement this
+  fabric.Text.fromElement = function(element, options) {
+    if (!element) {
+      return null;
+    }
+
+    var parsedAttributes = fabric.parseAttributes(element, fabric.Text.ATTRIBUTE_NAMES);
+    var options = fabric.util.object.extend((options ? fabric.util.object.clone(options) : { }), parsedAttributes);
+    var text = new fabric.Text(element.textContent, options);
+
+    return text;
   };
 
 })(typeof exports != 'undefined' ? exports : this);

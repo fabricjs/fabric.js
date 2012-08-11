@@ -119,7 +119,7 @@
     initialize: function(text, options) {
       this._initStateProperties();
       this.text = text;
-      this.setOptions(options);
+      this.setOptions(options || { });
       this.theta = this.angle * Math.PI / 180;
       this._initDimensions();
       this.setCoords();
@@ -749,6 +749,14 @@
   });
 
   /**
+   * List of attribute names to account for when parsing SVG element (used by `fabric.Text.fromElement`)
+   * @static
+   */
+  fabric.Text.ATTRIBUTE_NAMES =
+    ('x y fill fill-opacity opacity stroke stroke-width transform ' +
+     'font-family font-style font-weight font-size text-decoration').split(' ');
+
+  /**
    * Returns fabric.Text instance from an object representation
    * @static
    * @method fromObject
@@ -763,10 +771,20 @@
    * Returns fabric.Text instance from an SVG element (<b>not yet implemented</b>)
    * @static
    * @method fabric.Text.fromElement
+   * @param element
+   * @param options
    * @return {fabric.Text} an instance
    */
-  fabric.Text.fromElement = function(element) {
-    // TODO (kangax): implement this
+  fabric.Text.fromElement = function(element, options) {
+    if (!element) {
+      return null;
+    }
+
+    var parsedAttributes = fabric.parseAttributes(element, fabric.Text.ATTRIBUTE_NAMES);
+    var options = fabric.util.object.extend((options ? fabric.util.object.clone(options) : { }), parsedAttributes);
+    var text = new fabric.Text(element.textContent, options);
+
+    return text;
   };
 
 })(typeof exports != 'undefined' ? exports : this);

@@ -13,15 +13,20 @@
       clone = fabric.util.object.clone;
 
   var attributesMap = {
-    'cx':             'left',
-    'x':              'left',
-    'cy':             'top',
-    'y':              'top',
-    'r':              'radius',
-    'fill-opacity':   'opacity',
-    'fill-rule':      'fillRule',
-    'stroke-width':   'strokeWidth',
-    'transform':      'transformMatrix'
+    'cx':               'left',
+    'x':                'left',
+    'cy':               'top',
+    'y':                'top',
+    'r':                'radius',
+    'fill-opacity':     'opacity',
+    'fill-rule':        'fillRule',
+    'stroke-width':     'strokeWidth',
+    'transform':        'transformMatrix',
+    'text-decoration':  'textDecoration',
+    'font-size':        'fontSize',
+    'font-weight':      'fontWeight',
+    'font-style':       'fontStyle',
+    'font-family':      'fontFamily'
   };
 
   function normalizeAttr(attr) {
@@ -436,7 +441,7 @@
    */
   fabric.parseSVGDocument = (function() {
 
-    var reAllowedSVGTagNames = /^(path|circle|polygon|polyline|ellipse|rect|line|image)$/;
+    var reAllowedSVGTagNames = /^(path|circle|polygon|polyline|ellipse|rect|line|image|text)$/;
 
     // http://www.w3.org/TR/SVG/coords.html#ViewBoxAttribute
     // \d doesn't quite cut it (as we need to match an actual float number)

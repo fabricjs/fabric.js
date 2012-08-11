@@ -1,21 +1,22 @@
 (function() {
 
+  QUnit.module('fabric.Text');
+
   function createTextObject() {
-    return new fabric.Text('foo', {
-      fontFamily: 'Modernist_One_400'
-    });
+    return new fabric.Text('foo');
   }
 
   var REFERENCE_TEXT_OBJECT = {
     'type':           'text',
     'left':           0,
     'top':            0,
-    'width':          0,
-    'height':         0,
+    'width':          50,
+    'height':         52,
     'fill':           'rgb(0,0,0)',
     'overlayFill':    null,
     'stroke':         null,
     'strokeWidth':    1,
+    'strokeDashArray': null,
     'scaleX':         1,
     'scaleY':         1,
     'angle':          0,
@@ -23,21 +24,22 @@
     'flipY':          false,
     'opacity':        1,
     'selectable':     true,
+    'hasControls':    true,
+    'hasBorders':     true,
+    'hasRotatingPoint': false,
     'text':           'foo',
     'fontSize':       40,
     'fontWeight':     100,
-    'fontFamily':     'Modernist_One_400',
-    'lineHeight':     1.6,
-    'textDecoration': '',
-    'textShadow':     null,
-    'textAlign':      'left',
-    'strokeStyle':    '',
+    'fontFamily':     'Times New Roman',
     'fontStyle':      '',
-    'path':           null,
+    'lineHeight':     1.3,
+    'textDecoration': '',
+    'textShadow':     '',
+    'textAlign':      'left',
+    'path':            null,
+    'strokeStyle':    '',
     'backgroundColor': ''
   };
-
-  QUnit.module('fabric.Text');
 
   test('constructor', function() {
     ok(fabric.Text);
@@ -54,7 +56,7 @@
   test('toString', function() {
     var text = createTextObject();
     ok(typeof text.toString == 'function');
-    equal(text.toString(), '#<fabric.Text (0): { "text": "foo", "fontFamily": "Modernist_One_400" }>');
+    equal(text.toString(), '#<fabric.Text (0): { "text": "foo", "fontFamily": "Times New Roman" }>');
   });
 
   test('toObject', function() {
@@ -118,4 +120,65 @@
     deepEqual(text.toObject(), REFERENCE_TEXT_OBJECT);
   });
 
-});
+  test('fabric.Text.fromElement', function() {
+    ok(typeof fabric.Text.fromElement == 'function');
+
+    var elText = fabric.document.createElement('text');
+    elText.textContent = 'foo';
+
+    var text = fabric.Text.fromElement(elText);
+
+    ok(text instanceof fabric.Text);
+
+    // temp workaround for text objects not obtaining width under node
+    text.width = 50;
+
+    deepEqual(text.toObject(), REFERENCE_TEXT_OBJECT);
+  });
+
+  test('fabric.Text.fromElement with custom attributes', function() {
+
+    var elTextWithAttrs = fabric.document.createElement('text');
+    elTextWithAttrs.textContent = 'foo';
+
+    elTextWithAttrs.setAttribute('x', 10);
+    elTextWithAttrs.setAttribute('y', 20);
+    elTextWithAttrs.setAttribute('fill', 'rgb(255,255,255)');
+    elTextWithAttrs.setAttribute('fill-opacity', 0.45);
+    elTextWithAttrs.setAttribute('stroke', 'blue');
+    elTextWithAttrs.setAttribute('stroke-width', 3);
+    elTextWithAttrs.setAttribute('font-family', 'Monaco');
+    elTextWithAttrs.setAttribute('font-style', 'italic');
+    elTextWithAttrs.setAttribute('font-weight', 'bold');
+    elTextWithAttrs.setAttribute('font-size', '123');
+    elTextWithAttrs.setAttribute('text-decoration', 'underline');
+
+    var textWithAttrs = fabric.Text.fromElement(elTextWithAttrs);
+    // temp workaround for text objects not obtaining width under node
+    textWithAttrs.width = 50;
+
+    ok(textWithAttrs instanceof fabric.Text);
+
+    var expectedObject = fabric.util.object.extend(REFERENCE_TEXT_OBJECT, {
+      left: 10,
+      top: 20,
+      height: 159.9,
+      fill: 'rgb(255,255,255)',
+      opacity: 0.45,
+      stroke: 'blue',
+      strokeWidth: 3,
+      fontFamily: 'Monaco',
+      fontStyle: 'italic',
+      fontWeight: 'bold',
+      fontSize: 123,
+      textDecoration: 'underline'
+    });
+
+    deepEqual(textWithAttrs.toObject(), expectedObject);
+  });
+
+  test('empty fromElement', function() {
+    ok(fabric.Text.fromElement() === null);
+  });
+
+})();

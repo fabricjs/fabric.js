@@ -68,8 +68,11 @@
 
     ok(rect instanceof fabric.Rect);
     deepEqual(rect.toObject(), REFERENCE_RECT);
+  });
 
+  test('fabric.Rect.fromElement with custom attributes', function() {
     var elRectWithAttrs = fabric.document.createElement('rect');
+
     elRectWithAttrs.setAttribute('x', 10);
     elRectWithAttrs.setAttribute('y', 20);
     elRectWithAttrs.setAttribute('width', 222);
@@ -98,7 +101,9 @@
       ry: 12
     });
     deepEqual(rectWithAttrs.toObject(), expectedObject);
+  });
 
+  test('empty fromElement', function() {
     ok(fabric.Rect.fromElement() === null);
   });
 
