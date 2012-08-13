@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.add_dependency "railties", ">= 3.2.0", "< 5.0"
   s.add_dependency "thor",     "~> 0.14"
 
-  s.files        = `git ls-files rails vendor`.split("\n")
+  s.files        = `git ls-files rails vendor`.split("\n")+%w(fabric-rails.gemspec Gemfile, Gemfile.lock)
   s.executables  = []
   s.require_path = 'rails'
 end
