@@ -18,8 +18,8 @@
     'type':         'image',
     'left':         0,
     'top':          0,
-    'width':        fabric.isLikelyNode ? 0 : IMG_WIDTH, // node-canvas doesn't seem to allow setting width/height on image objects
-    'height':       fabric.isLikelyNode ? 0 : IMG_HEIGHT,
+    'width':        IMG_WIDTH, // node-canvas doesn't seem to allow setting width/height on image objects
+    'height':       IMG_HEIGHT,
     'fill':         'rgb(0,0,0)',
     'overlayFill':  null,
     'stroke':       null,
