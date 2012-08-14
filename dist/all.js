@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL` */
 /*! Fabric.js Copyright 2008-2012, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.8.49" };
+var fabric = fabric || { version: "0.8.50" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -5243,9 +5243,11 @@ fabric.util.string = {
       }
       this.stateful && object.setupState();
       object.setCoords();
-      this.renderAll();
+
       this.fire('object:added', { target: object });
       object.fire('added');
+
+      this.renderOnAddition && this.renderAll();
       return this;
     },
 

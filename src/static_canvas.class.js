@@ -386,9 +386,11 @@
       }
       this.stateful && object.setupState();
       object.setCoords();
-      this.renderAll();
+
       this.fire('object:added', { target: object });
       object.fire('added');
+
+      this.renderOnAddition && this.renderAll();
       return this;
     },
 
