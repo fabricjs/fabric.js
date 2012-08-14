@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL` */
 /*! Fabric.js Copyright 2008-2012, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.8.48" };
+var fabric = fabric || { version: "0.8.49" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -7809,7 +7809,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       ctx.save();
 
       var m = this.transformMatrix;
-      if (m) {
+      if (m && !this.group) {
         ctx.setTransform(m[0], m[1], m[2], m[3], m[4], m[5]);
       }
 
@@ -7830,10 +7830,19 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       }
 
       if (this.group && this.type === 'rect') {
-        ctx.translate(
-          -this.group.width / 2 + this.width / 2,
-          -this.group.height / 2 + this.height / 2
-        );
+        if (m) {
+          ctx.translate(
+            -this.group.width / 2,
+            -this.group.height / 2
+          );
+          ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
+        }
+        else {
+          ctx.translate(
+            -this.group.width / 2 + this.width / 2,
+            -this.group.height / 2 + this.height / 2
+          );
+        }
       }
 
       this._render(ctx, noTransform);

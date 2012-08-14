@@ -376,7 +376,7 @@
       ctx.save();
 
       var m = this.transformMatrix;
-      if (m) {
+      if (m && !this.group) {
         ctx.setTransform(m[0], m[1], m[2], m[3], m[4], m[5]);
       }
 
@@ -397,10 +397,19 @@
       }
 
       if (this.group && this.type === 'rect') {
-        ctx.translate(
-          -this.group.width / 2 + this.width / 2,
-          -this.group.height / 2 + this.height / 2
-        );
+        if (m) {
+          ctx.translate(
+            -this.group.width / 2,
+            -this.group.height / 2
+          );
+          ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
+        }
+        else {
+          ctx.translate(
+            -this.group.width / 2 + this.width / 2,
+            -this.group.height / 2 + this.height / 2
+          );
+        }
       }
 
       this._render(ctx, noTransform);
