@@ -3,14 +3,14 @@
   QUnit.module('fabric.Text');
 
   function createTextObject() {
-    return new fabric.Text('foo');
+    return new fabric.Text('x');
   }
 
   var REFERENCE_TEXT_OBJECT = {
     'type':           'text',
     'left':           0,
     'top':            0,
-    'width':          50,
+    'width':          20,
     'height':         52,
     'fill':           'rgb(0,0,0)',
     'overlayFill':    null,
@@ -27,7 +27,7 @@
     'hasControls':    true,
     'hasBorders':     true,
     'hasRotatingPoint': false,
-    'text':           'foo',
+    'text':           'x',
     'fontSize':       40,
     'fontWeight':     100,
     'fontFamily':     'Times New Roman',
@@ -50,13 +50,13 @@
     ok(text instanceof fabric.Object);
 
     equal(text.get('type'), 'text');
-    equal(text.get('text'), 'foo');
+    equal(text.get('text'), 'x');
   });
 
   test('toString', function() {
     var text = createTextObject();
     ok(typeof text.toString == 'function');
-    equal(text.toString(), '#<fabric.Text (0): { "text": "foo", "fontFamily": "Times New Roman" }>');
+    equal(text.toString(), '#<fabric.Text (0): { "text": "x", "fontFamily": "Times New Roman" }>');
   });
 
   test('toObject', function() {
@@ -103,7 +103,7 @@
   test('getText', function(){
     var text = createTextObject();
     ok(typeof text.getText == 'function');
-    equal(text.getText(), 'foo');
+    equal(text.getText(), 'x');
     equal(text.getText(), text.get('text'));
   });
 
@@ -124,14 +124,14 @@
     ok(typeof fabric.Text.fromElement == 'function');
 
     var elText = fabric.document.createElement('text');
-    elText.textContent = 'foo';
+    elText.textContent = 'x';
 
     var text = fabric.Text.fromElement(elText);
 
     ok(text instanceof fabric.Text);
 
     // temp workaround for text objects not obtaining width under node
-    text.width = 50;
+    // text.width = 20;
 
     deepEqual(text.toObject(), REFERENCE_TEXT_OBJECT);
   });
@@ -139,7 +139,7 @@
   test('fabric.Text.fromElement with custom attributes', function() {
 
     var elTextWithAttrs = fabric.document.createElement('text');
-    elTextWithAttrs.textContent = 'foo';
+    elTextWithAttrs.textContent = 'x';
 
     elTextWithAttrs.setAttribute('x', 10);
     elTextWithAttrs.setAttribute('y', 20);
@@ -155,13 +155,14 @@
 
     var textWithAttrs = fabric.Text.fromElement(elTextWithAttrs);
     // temp workaround for text objects not obtaining width under node
-    textWithAttrs.width = 50;
+    textWithAttrs.width = 20;
 
     ok(textWithAttrs instanceof fabric.Text);
 
     var expectedObject = fabric.util.object.extend(REFERENCE_TEXT_OBJECT, {
       left: 10,
       top: 20,
+      width: 20,
       height: 159.9,
       fill: 'rgb(255,255,255)',
       opacity: 0.45,
