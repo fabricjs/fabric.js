@@ -396,13 +396,13 @@
         ctx.fillStyle = this.fill;
       }
 
-      // TODO: this breaks some shapes, need to look into it
-      // if (this.group) {
-        // ctx.translate(
-        //    -this.group.width / 2 + this.width / 2,
-        //    -this.group.height / 2 + this.height / 2
-        // );
-      // }
+      if (this.group && this.type === 'rect') {
+        ctx.translate(
+          -this.group.width / 2 + this.width / 2,
+          -this.group.height / 2 + this.height / 2
+        );
+      }
+
       this._render(ctx, noTransform);
 
       if (this.active && !noTransform) {

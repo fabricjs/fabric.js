@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL` */
 /*! Fabric.js Copyright 2008-2012, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.8.47" };
+var fabric = fabric || { version: "0.8.48" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -7829,13 +7829,13 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         ctx.fillStyle = this.fill;
       }
 
-      // TODO: this breaks some shapes, need to look into it
-      // if (this.group) {
-        // ctx.translate(
-        //    -this.group.width / 2 + this.width / 2,
-        //    -this.group.height / 2 + this.height / 2
-        // );
-      // }
+      if (this.group && this.type === 'rect') {
+        ctx.translate(
+          -this.group.width / 2 + this.width / 2,
+          -this.group.height / 2 + this.height / 2
+        );
+      }
+
       this._render(ctx, noTransform);
 
       if (this.active && !noTransform) {
@@ -9936,13 +9936,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      */
     _render: function(ctx) {
       var point;
-      var offsetX = this.minX + this.width / 2,
-          offsetY = this.minY + this.height / 2;
       ctx.beginPath();
-      ctx.moveTo(this.points[0].x - offsetX, this.points[0].y - offsetY);
+      ctx.moveTo(this.points[0].x, this.points[0].y);
       for (var i = 0, len = this.points.length; i < len; i++) {
         point = this.points[i];
-        ctx.lineTo(point.x - offsetX, point.y - offsetY);
+        ctx.lineTo(point.x, point.y);
       }
       if (this.fill) {
         ctx.fill();

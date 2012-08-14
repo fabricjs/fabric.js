@@ -98,13 +98,11 @@
      */
     _render: function(ctx) {
       var point;
-      var offsetX = this.minX + this.width / 2,
-          offsetY = this.minY + this.height / 2;
       ctx.beginPath();
-      ctx.moveTo(this.points[0].x - offsetX, this.points[0].y - offsetY);
+      ctx.moveTo(this.points[0].x, this.points[0].y);
       for (var i = 0, len = this.points.length; i < len; i++) {
         point = this.points[i];
-        ctx.lineTo(point.x - offsetX, point.y - offsetY);
+        ctx.lineTo(point.x, point.y);
       }
       if (this.fill) {
         ctx.fill();
