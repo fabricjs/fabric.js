@@ -97,21 +97,26 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
           }
           else if (obj.type === 'text') {
 
-            obj.path = path;
-            var object = fabric.Text.fromObject(obj);
-            var onscriptload = function () {
-              // TODO (kangax): find out why Opera refuses to work without this timeout
-              if (Object.prototype.toString.call(fabric.window.opera) === '[object Opera]') {
-                setTimeout(function () {
-                  onObjectLoaded(object, index);
-                }, 500);
-              }
-              else {
-                onObjectLoaded(object, index);
-              }
+            if (obj.useNative) {
+              onObjectLoaded(fabric.Text.fromObject(obj), index);
             }
+            else {
+              obj.path = path;
+              var object = fabric.Text.fromObject(obj);
+              var onscriptload = function () {
+                // TODO (kangax): find out why Opera refuses to work without this timeout
+                if (Object.prototype.toString.call(fabric.window.opera) === '[object Opera]') {
+                  setTimeout(function () {
+                    onObjectLoaded(object, index);
+                  }, 500);
+                }
+                else {
+                  onObjectLoaded(object, index);
+                }
+              }
 
-            fabric.util.getScript(path, onscriptload);
+              fabric.util.getScript(path, onscriptload);
+            }
           }
           else {
             fabric.loadSVGFromURL(path, function (elements, options) {

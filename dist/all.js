@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL` */
 /*! Fabric.js Copyright 2008-2012, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.8.50" };
+var fabric = fabric || { version: "0.8.52" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -7270,21 +7270,26 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
           }
           else if (obj.type === 'text') {
 
-            obj.path = path;
-            var object = fabric.Text.fromObject(obj);
-            var onscriptload = function () {
-              // TODO (kangax): find out why Opera refuses to work without this timeout
-              if (Object.prototype.toString.call(fabric.window.opera) === '[object Opera]') {
-                setTimeout(function () {
-                  onObjectLoaded(object, index);
-                }, 500);
-              }
-              else {
-                onObjectLoaded(object, index);
-              }
+            if (obj.useNative) {
+              onObjectLoaded(fabric.Text.fromObject(obj), index);
             }
+            else {
+              obj.path = path;
+              var object = fabric.Text.fromObject(obj);
+              var onscriptload = function () {
+                // TODO (kangax): find out why Opera refuses to work without this timeout
+                if (Object.prototype.toString.call(fabric.window.opera) === '[object Opera]') {
+                  setTimeout(function () {
+                    onObjectLoaded(object, index);
+                  }, 500);
+                }
+                else {
+                  onObjectLoaded(object, index);
+                }
+              }
 
-            fabric.util.getScript(path, onscriptload);
+              fabric.util.getScript(path, onscriptload);
+            }
           }
           else {
             fabric.loadSVGFromURL(path, function (elements, options) {
@@ -12724,7 +12729,8 @@ fabric.Image.filters.Tint.fromObject = function(object) {
         'lineHeight',
         'strokeStyle',
         'strokeWidth',
-        'backgroundColor'
+        'backgroundColor',
+        'useNative'
       );
       fabric.util.removeFromArray(this.stateProperties, 'width');
     },
@@ -13093,19 +13099,20 @@ fabric.Image.filters.Tint.fromObject = function(object) {
      */
     toObject: function() {
       return extend(this.callSuper('toObject'), {
-        text:           this.text,
-        fontSize:       this.fontSize,
-        fontWeight:     this.fontWeight,
-        fontFamily:     this.fontFamily,
-        fontStyle:      this.fontStyle,
-        lineHeight:     this.lineHeight,
-        textDecoration: this.textDecoration,
-        textShadow:     this.textShadow,
-        textAlign:      this.textAlign,
-        path:           this.path,
-        strokeStyle:    this.strokeStyle,
-        strokeWidth:    this.strokeWidth,
-        backgroundColor: this.backgroundColor
+        text:             this.text,
+        fontSize:         this.fontSize,
+        fontWeight:       this.fontWeight,
+        fontFamily:       this.fontFamily,
+        fontStyle:        this.fontStyle,
+        lineHeight:       this.lineHeight,
+        textDecoration:   this.textDecoration,
+        textShadow:       this.textShadow,
+        textAlign:        this.textAlign,
+        path:             this.path,
+        strokeStyle:      this.strokeStyle,
+        strokeWidth:      this.strokeWidth,
+        backgroundColor:  this.backgroundColor,
+        useNative:        this.useNative
       });
     },
 

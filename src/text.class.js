@@ -161,7 +161,8 @@
         'lineHeight',
         'strokeStyle',
         'strokeWidth',
-        'backgroundColor'
+        'backgroundColor',
+        'useNative'
       );
       fabric.util.removeFromArray(this.stateProperties, 'width');
     },
@@ -530,19 +531,20 @@
      */
     toObject: function() {
       return extend(this.callSuper('toObject'), {
-        text:           this.text,
-        fontSize:       this.fontSize,
-        fontWeight:     this.fontWeight,
-        fontFamily:     this.fontFamily,
-        fontStyle:      this.fontStyle,
-        lineHeight:     this.lineHeight,
-        textDecoration: this.textDecoration,
-        textShadow:     this.textShadow,
-        textAlign:      this.textAlign,
-        path:           this.path,
-        strokeStyle:    this.strokeStyle,
-        strokeWidth:    this.strokeWidth,
-        backgroundColor: this.backgroundColor
+        text:             this.text,
+        fontSize:         this.fontSize,
+        fontWeight:       this.fontWeight,
+        fontFamily:       this.fontFamily,
+        fontStyle:        this.fontStyle,
+        lineHeight:       this.lineHeight,
+        textDecoration:   this.textDecoration,
+        textShadow:       this.textShadow,
+        textAlign:        this.textAlign,
+        path:             this.path,
+        strokeStyle:      this.strokeStyle,
+        strokeWidth:      this.strokeWidth,
+        backgroundColor:  this.backgroundColor,
+        useNative:        this.useNative
       });
     },
 
