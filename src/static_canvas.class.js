@@ -553,11 +553,12 @@
      * Exports canvas element to a dataurl image.
      * @method toDataURL
      * @param {String} format the format of the output image. Either "jpeg" or "png".
+     * @param {Number} quality quality level (0..1)
      * @return {String}
      */
-    toDataURL: function (format) {
+    toDataURL: function (format, quality) {
       this.renderAll(true);
-      var data = (this.upperCanvasEl || this.lowerCanvasEl).toDataURL('image/' + format);
+      var data = (this.upperCanvasEl || this.lowerCanvasEl).toDataURL('image/' + format, quality);
       this.renderAll();
       return data;
     },
@@ -567,9 +568,10 @@
      * @method toDataURLWithMultiplier
      * @param {String} format (png|jpeg)
      * @param {Number} multiplier
+     * @param {Number} quality (0..1)
      * @return {String}
      */
-    toDataURLWithMultiplier: function (format, multiplier) {
+    toDataURLWithMultiplier: function (format, multiplier, quality) {
 
       var origWidth = this.getWidth(),
           origHeight = this.getHeight(),
@@ -596,7 +598,7 @@
 
       this.renderAll(true);
 
-      var dataURL = this.toDataURL(format);
+      var dataURL = this.toDataURL(format, quality);
 
       this.contextTop.scale(1 / multiplier,  1 / multiplier);
       this.setWidth(origWidth).setHeight(origHeight);
