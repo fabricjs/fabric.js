@@ -5410,11 +5410,12 @@ fabric.util.string = {
      * Exports canvas element to a dataurl image.
      * @method toDataURL
      * @param {String} format the format of the output image. Either "jpeg" or "png".
+     * @param {Number} quality quality level (0..1)
      * @return {String}
      */
-    toDataURL: function (format) {
+    toDataURL: function (format, quality) {
       this.renderAll(true);
-      var data = (this.upperCanvasEl || this.lowerCanvasEl).toDataURL('image/' + format);
+      var data = (this.upperCanvasEl || this.lowerCanvasEl).toDataURL('image/' + format, quality);
       this.renderAll();
       return data;
     },
@@ -5424,9 +5425,10 @@ fabric.util.string = {
      * @method toDataURLWithMultiplier
      * @param {String} format (png|jpeg)
      * @param {Number} multiplier
+     * @param {Number} quality (0..1)
      * @return {String}
      */
-    toDataURLWithMultiplier: function (format, multiplier) {
+    toDataURLWithMultiplier: function (format, multiplier, quality) {
 
       var origWidth = this.getWidth(),
           origHeight = this.getHeight(),
@@ -5453,7 +5455,7 @@ fabric.util.string = {
 
       this.renderAll(true);
 
-      var dataURL = this.toDataURL(format);
+      var dataURL = this.toDataURL(format, quality);
 
       this.contextTop.scale(1 / multiplier,  1 / multiplier);
       this.setWidth(origWidth).setHeight(origHeight);
@@ -10251,12 +10253,15 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      */
     _render: function(ctx) {
       var current, // current instruction
+          previous = null,
           x = 0, // current x
           y = 0, // current y
           controlX = 0, // current control point x
           controlY = 0, // current control point y
           tempX,
           tempY,
+          tempControlX,
+          tempControlY,
           l = -(this.width / 2),
           t = -(this.height / 2);
 
@@ -10425,13 +10430,31 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
             break;
 
           case 't': // shorthand quadraticCurveTo, relative
+            
             // transform to absolute x,y
             tempX = x + current[1];
             tempY = y + current[2];
+            
 
-            // calculate reflection of previous control points
-            controlX = 2 * x - controlX;
-            controlY = 2 * y - controlY;
+            if (previous[0].match(/[QqTt]/) === null) {
+              // If there is no previous command or if the previous command was not a Q, q, T or t, 
+              // assume the control point is coincident with the current point
+              controlX = x;
+              controlY = y;
+            }
+            else if (previous[0] === 't') {
+              // calculate reflection of previous control points for t
+              controlX = 2 * x - tempControlX;
+              controlY = 2 * y - tempControlY;
+            }
+            else if (previous[0] === 'q') {
+              // calculate reflection of previous control points for q
+              controlX = 2 * x - controlX;
+              controlY = 2 * y - controlY;
+            }
+
+            tempControlX = controlX;
+            tempControlY = controlY;
 
             ctx.quadraticCurveTo(
               controlX + l,
@@ -10497,6 +10520,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
             ctx.closePath();
             break;
         }
+    previous = current
       }
     },
 
