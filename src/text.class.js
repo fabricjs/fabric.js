@@ -478,7 +478,7 @@
         this.fontStyle,
         this.fontWeight,
         this.fontSize + 'px',
-        this.fontFamily
+        (fabric.isLikelyNode ? ('"' + this.fontFamily + '"') : this.fontFamily)
       ].join(' ');
     },
 

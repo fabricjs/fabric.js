@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL` */
 /*! Fabric.js Copyright 2008-2012, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.8.52" };
+var fabric = fabric || { version: "0.8.53" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -13046,7 +13046,7 @@ fabric.Image.filters.Tint.fromObject = function(object) {
         this.fontStyle,
         this.fontWeight,
         this.fontSize + 'px',
-        this.fontFamily
+        (fabric.isLikelyNode ? ('"' + this.fontFamily + '"') : this.fontFamily)
       ].join(' ');
     },
 
