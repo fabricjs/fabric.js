@@ -227,12 +227,15 @@
      */
     _render: function(ctx) {
       var current, // current instruction
+          previous = null,
           x = 0, // current x
           y = 0, // current y
           controlX = 0, // current control point x
           controlY = 0, // current control point y
           tempX,
           tempY,
+          tempControlX,
+          tempControlY,
           l = -(this.width / 2),
           t = -(this.height / 2);
 
@@ -401,13 +404,31 @@
             break;
 
           case 't': // shorthand quadraticCurveTo, relative
+            
             // transform to absolute x,y
             tempX = x + current[1];
             tempY = y + current[2];
+            
 
-            // calculate reflection of previous control points
-            controlX = 2 * x - controlX;
-            controlY = 2 * y - controlY;
+            if (previous[0].match(/[QqTt]/) === null) {
+              // If there is no previous command or if the previous command was not a Q, q, T or t, 
+              // assume the control point is coincident with the current point
+              controlX = x;
+              controlY = y;
+            }
+            else if (previous[0] === 't') {
+              // calculate reflection of previous control points for t
+              controlX = 2 * x - tempControlX;
+              controlY = 2 * y - tempControlY;
+            }
+            else if (previous[0] === 'q') {
+              // calculate reflection of previous control points for q
+              controlX = 2 * x - controlX;
+              controlY = 2 * y - controlY;
+            }
+
+            tempControlX = controlX;
+            tempControlY = controlY;
 
             ctx.quadraticCurveTo(
               controlX + l,
@@ -473,6 +494,7 @@
             ctx.closePath();
             break;
         }
+    previous = current
       }
     },
 
