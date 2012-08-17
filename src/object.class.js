@@ -181,6 +181,7 @@
         width:            toFixed(this.width, this.NUM_FRACTION_DIGITS),
         height:           toFixed(this.height, this.NUM_FRACTION_DIGITS),
         fill:             this.fill,
+        gradientDef:      this.gradientDef,
         overlayFill:      this.overlayFill,
         stroke:           this.stroke,
         strokeWidth:      this.strokeWidth,
@@ -319,6 +320,20 @@
       }
       if (key === 'angle') {
         this.setAngle(value);
+      }
+      else if (key === 'gradientDef') {
+        var activeInstance = fabric.Canvas.activeInstance,
+            ctx = activeInstance ? activeInstance.getContext() : null;
+
+        if (!ctx) return;
+
+        this['fill'] = fabric.Gradient.create(ctx, value);
+        this[key] = value;
+      }
+      else if (key === 'fill') {
+        if ((typeof this['gradientDef'] !== 'object')) {
+          this[key] = value;
+        }
       }
       else {
         this[key] = value;
