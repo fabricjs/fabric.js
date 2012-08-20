@@ -993,7 +993,7 @@
 
     /**
      * Returns context of canvas where object selection is drawn
-     * @method getContext
+     * @method getSelectionContext
      * @return {CanvasRenderingContext2D}
      */
     getSelectionContext: function() {
@@ -1002,7 +1002,7 @@
 
     /**
      * Returns &lt;canvas> element on which object selection is drawn
-     * @method getElement
+     * @method getSelectionElement
      * @return {HTMLCanvasElement}
      */
     getSelectionElement: function () {
