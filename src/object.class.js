@@ -146,7 +146,7 @@
      * @method initGradient
      */
     _initGradient: function(options) {
-      if (options.fill && !(options.fill instanceof fabric.Gradient)) {
+      if (options.fill && typeof options.fill == 'object' && !(options.fill instanceof fabric.Gradient)) {
         this.set('fill', new fabric.Gradient(options.fill));
       }
     },
