@@ -320,8 +320,9 @@
    * @param {Array} elements Array of elements to parse
    * @param {Function} callback Being passed an array of fabric instances (transformed from SVG elements)
    * @param {Object} options Options object
+   * @param {Function} [reviver] Method for further parsing of SVG elements, called after each fabric object created.
    */
-  function parseElements(elements, callback, options) {
+  function parseElements(elements, callback, options, reviver) {
     var instances = Array(elements.length), i = elements.length;
 
     function checkIfDone() {
@@ -340,15 +341,18 @@
       if (klass && klass.fromElement) {
         try {
           if (klass.async) {
-            klass.fromElement(el, (function(index) {
+            klass.fromElement(el, (function(index, el) {
               return function(obj) {
+                reviver && reviver(el, obj);
                 instances.splice(index, 0, obj);
                 checkIfDone();
               };
             })(index), options);
           }
           else {
-            instances.splice(index, 0, klass.fromElement(el, options));
+            var obj = klass.fromElement(el, options);
+            reviver && reviver(el, obj);
+            instances.splice(index, 0, obj);
             checkIfDone();
           }
         }
@@ -438,6 +442,7 @@
    * @method parseSVGDocument
    * @param {SVGDocument} doc SVG document to parse
    * @param {Function} callback Callback to call when parsing is finished; It's being passed an array of elements (parsed from a document).
+   * @param {Function} [reviver] Method for further parsing of SVG elements, called after each fabric object created.
    */
   fabric.parseSVGDocument = (function() {
 
@@ -467,7 +472,7 @@
       return false;
     }
 
-    return function(doc, callback) {
+    return function(doc, callback, reviver) {
       if (!doc) return;
 
       var startTime = new Date(),
@@ -525,7 +530,7 @@
         if (callback) {
           callback(instances, options);
         }
-      }, clone(options));
+      }, clone(options), reviver);
     };
   })();
 
@@ -569,8 +574,9 @@
     * @method loadSVGFromURL
     * @param {String} url
     * @param {Function} callback
+    * @param {Function} [reviver] Method for further parsing of SVG elements, called after each fabric object created.
     */
-   function loadSVGFromURL(url, callback) {
+   function loadSVGFromURL(url, callback, reviver) {
 
      url = url.replace(/^\n\s*/, '').trim();
 
@@ -606,7 +612,7 @@
            options: options
          });
          callback(results, options);
-       });
+       }, reviver);
      }
    }
 
@@ -630,8 +636,9 @@
     * @method loadSVGFromString
     * @param {String} string
     * @param {Function} callback
+    * @param {Function} [reviver] Method for further parsing of SVG elements, called after each fabric object created.
     */
-  function loadSVGFromString(string, callback) {
+  function loadSVGFromString(string, callback, reviver) {
     string = string.trim();
     var doc;
     if (typeof DOMParser !== 'undefined') {
@@ -649,7 +656,7 @@
 
     fabric.parseSVGDocument(doc.documentElement, function (results, options) {
       callback(results, options);
-    });
+    }, reviver);
   }
 
   function createSVGFontFacesMarkup(objects) {
