@@ -1417,6 +1417,91 @@
           options.onComplete && options.onComplete();
         }
       });
+    },
+
+    /**
+     * Centers object horizontally on canvas to which it was added last
+     * @method centerH
+     * @return {fabric.Object} thisArg
+     */
+    centerH: function () {
+      this.canvas.centerObjectH(this);
+      return this;
+    },
+
+    /**
+     * Centers object vertically on canvas to which it was added last
+     * @method centerV
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+    centerV: function () {
+      this.canvas.centerObjectV(this);
+      return this;
+    },
+
+    /**
+     * Centers object vertically and horizontally on canvas to which is was added last
+     * @method center
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+    center: function () {
+      return this.centerH().centerV();
+    },
+
+    /**
+     * Removes object from canvas to which it was added last
+     * @method remove
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+    remove: function() {
+      return this.canvas.remove(this);
+    },
+
+    /**
+     * Moves an object to the bottom of the stack of drawn objects
+     * @method sendToBack
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+    sendToBack: function() {
+      this.canvas.sendToBack(this);
+      return this;
+    },
+
+    /**
+     * Moves an object to the top of the stack of drawn objects
+     * @method bringToFront
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+    bringToFront: function() {
+      this.canvas.bringToFront(this);
+      return this;
+    },
+
+    /**
+     * Moves an object one level down in stack of drawn objects
+     * @method sendBackwards
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+    sendBackwards: function() {
+      this.canvas.sendBackwards(this);
+      return this;
+    },
+
+    /**
+     * Moves an object one level up in stack of drawn objects
+     * @method bringForward
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+    bringForward: function() {
+      this.canvas.bringForward(this);
+      return this;
     }
   });
 

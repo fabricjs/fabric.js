@@ -667,5 +667,110 @@
     ok(addedEventFired);
   });
 
+  test('canvas reference', function() {
+    var object = new fabric.Object();
+    var object2 = new fabric.Object();
+
+    canvas.add(object);
+    canvas.insertAt(object2, 0);
+
+    equal(object.canvas, canvas);
+    equal(object2.canvas, canvas);
+  });
+
+  test('remove', function() {
+    var object = new fabric.Object();
+
+    ok(typeof object.remove == 'function');
+
+    canvas.add(object);
+    object.remove();
+
+    equal(canvas.getObjects().length, 0);
+  });
+
+  test('center', function() {
+    var object = new fabric.Object();
+
+    ok(typeof object.center == 'function');
+
+    canvas.add(object);
+    object.center();
+
+    equal(object.getLeft(), canvas.getWidth() / 2);
+    equal(object.getTop(), canvas.getHeight() / 2);
+  });
+
+  test('centerH', function() {
+    var object = new fabric.Object();
+
+    ok(typeof object.centerH == 'function');
+
+    canvas.add(object);
+    object.centerH();
+
+    equal(object.getLeft(), canvas.getWidth() / 2);
+  });
+
+  test('centerV', function() {
+    var object = new fabric.Object();
+
+    ok(typeof object.centerV == 'function');
+
+    canvas.add(object);
+    object.centerV();
+
+    equal(object.getTop(), canvas.getHeight() / 2);
+  });
+
+  test('sendToBack', function() {
+    var object = new fabric.Object();
+
+    ok(typeof object.sendToBack == 'function');
+  });
+
+  test('bringToFront', function() {
+    var object = new fabric.Object();
+
+    ok(typeof object.bringToFront == 'function');
+  });
+
+  test('sendBackwards', function() {
+    var object = new fabric.Object();
+
+    ok(typeof object.bringToFront == 'function');
+  });
+
+  test('bringForward', function() {
+    var object = new fabric.Object();
+
+    ok(typeof object.bringToFront == 'function');
+  });
+
+  test('gradient serialization', function() {
+    var object = new fabric.Object();
+
+    object.fill = new fabric.Gradient({
+      x1: 0,
+      y1: 0,
+      x2: 100,
+      y2: 100,
+      colorStops: {
+        '0': 'red',
+        '1': 'green'
+      }
+    });
+
+    ok(typeof object.toObject().fill == 'object');
+
+    equal(object.toObject().fill.x1, 0);
+    equal(object.toObject().fill.y1, 0);
+
+    equal(object.toObject().fill.x2, 100);
+    equal(object.toObject().fill.y2, 100);
+
+    equal(object.toObject().fill.colorStops['0'], 'red');
+    equal(object.toObject().fill.colorStops['1'], 'green');
+  });
 
 })();
