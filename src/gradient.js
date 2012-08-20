@@ -77,6 +77,7 @@
           el,
           offset,
           colorStops = { },
+          gradientDef = { },
           colorStopFromStyle,
           coords = {
             x1: el.getAttribute('x1') || 0,
@@ -96,13 +97,15 @@
 
       _convertPercentUnitsToValues(instance, coords);
 
-      return fabric.Gradient.create(ctx, {
+      gradientDef = {
         x1: coords.x1,
         y1: coords.y1,
         x2: coords.x2,
         y2: coords.y2,
         colorStops: colorStops
-      });
+      };
+
+      return {'gradient': fabric.Gradient.create(ctx, gradientDef), 'gradientDef': gradientDef};
     },
 
     /**

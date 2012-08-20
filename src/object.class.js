@@ -54,7 +54,7 @@
      */
     stateProperties:  (
       'top left width height scaleX scaleY flipX flipY ' +
-      'theta angle opacity cornersize fill overlayFill ' +
+      'theta angle opacity cornersize fill overlayFill gradientDef ' +
       'stroke strokeWidth strokeDashArray fillRule ' +
       'borderScaleFactor transformMatrix selectable'
     ).split(' '),
@@ -181,6 +181,7 @@
         width:            toFixed(this.width, this.NUM_FRACTION_DIGITS),
         height:           toFixed(this.height, this.NUM_FRACTION_DIGITS),
         fill:             this.fill,
+        gradientDef:      this.gradientDef,
         overlayFill:      this.overlayFill,
         stroke:           this.stroke,
         strokeWidth:      this.strokeWidth,
@@ -319,6 +320,23 @@
       }
       if (key === 'angle') {
         this.setAngle(value);
+      }
+      else if (key === 'gradientDef') {
+        var activeInstance = fabric.Canvas.activeInstance,
+            ctx = activeInstance ? activeInstance.getContext() : null;
+
+        if (!ctx) return;
+
+        this[key] = value;
+
+        if (typeof this['fill'] !== 'object') {
+          this['fill'] = fabric.Gradient.create(ctx, value);
+        }
+      }
+      else if (key === 'fill') {
+        if ((typeof this['gradientDef'] !== 'object')) {
+          this[key] = value;
+        }
       }
       else {
         this[key] = value;

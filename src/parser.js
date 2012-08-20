@@ -305,8 +305,9 @@
         var gradientId = instanceFillValue.slice(5, instanceFillValue.length - 1);
 
         if (fabric.gradientDefs[gradientId]) {
-          instances[i].set('fill',
-            fabric.Gradient.fromElement(fabric.gradientDefs[gradientId], ctx, instances[i]));
+          var oGradient = fabric.Gradient.fromElement(fabric.gradientDefs[gradientId], ctx, instances[i]);
+          instances[i].set('fill', oGradient.gradient);
+          instances[i].set('gradientDef', oGradient.gradientDef);
         }
       }
     }
