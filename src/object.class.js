@@ -54,7 +54,7 @@
      */
     stateProperties:  (
       'top left width height scaleX scaleY flipX flipY ' +
-      'theta angle opacity cornersize fill overlayFill ' +
+      'theta angle opacity cornersize fill overlayFill gradientDef ' +
       'stroke strokeWidth strokeDashArray fillRule ' +
       'borderScaleFactor transformMatrix selectable'
     ).split(' '),
@@ -327,8 +327,11 @@
 
         if (!ctx) return;
 
-        this['fill'] = fabric.Gradient.create(ctx, value);
         this[key] = value;
+
+        if (typeof this['fill'] !== 'object') {
+          this['fill'] = fabric.Gradient.create(ctx, value);
+        }
       }
       else if (key === 'fill') {
         if ((typeof this['gradientDef'] !== 'object')) {
