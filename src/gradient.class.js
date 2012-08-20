@@ -23,38 +23,55 @@
     }
   }
 
-  /** @namespace */
+  /**
+   * @class Object
+   * @memberOf fabric
+   */
+  fabric.Gradient = fabric.util.createClass(/** @scope fabric.Gradient.prototype */ {
 
-  fabric.Gradient = {
+    initialize: function(options) {
 
-    /**
-     * @method create
-     * @static
-     */
-    create: function(ctx, options) {
       options || (options = { });
 
-      var x1 = options.x1 || 0,
-          y1 = options.y1 || 0,
-          x2 = options.x2 || ctx.canvas.width,
-          y2 = options.y2 || 0,
-          colorStops = options.colorStops;
+      this.x1 = options.x1 || 0;
+      this.y1 = options.y1 || 0;
+      this.x2 = options.x2 || 0;
+      this.y2 = options.y2 || 0;
 
-      var gradient = ctx.createLinearGradient(x1, y1, x2, y2);
+      this.colorStops = options.colorStops;
+    },
 
-      for (var position in colorStops) {
-        var colorValue = colorStops[position];
+    toObject: function() {
+      return {
+        x1: this.x1,
+        x2: this.x2,
+        y1: this.y1,
+        y2: this.y2,
+        colorStops: this.colorStops
+      };
+    },
+
+    toLiveGradient: function(ctx) {
+      var gradient = ctx.createLinearGradient(
+        this.x1, this.y1, this.x2 || ctx.canvas.width, this.y2);
+
+      for (var position in this.colorStops) {
+        var colorValue = this.colorStops[position];
         gradient.addColorStop(parseFloat(position), colorValue);
       }
+
       return gradient;
-    },
+    }
+  });
+
+  fabric.util.object.extend(fabric.Gradient, {
 
     /**
      * @method fromElement
      * @static
      * @see http://www.w3.org/TR/SVG/pservers.html#LinearGradientElement
      */
-    fromElement: function(el, ctx, instance) {
+    fromElement: function(el, instance) {
 
       /**
        *  @example:
@@ -96,7 +113,7 @@
 
       _convertPercentUnitsToValues(instance, coords);
 
-      return fabric.Gradient.create(ctx, {
+      return new fabric.Gradient({
         x1: coords.x1,
         y1: coords.y1,
         x2: coords.x2,
@@ -109,22 +126,12 @@
      * @method forObject
      * @static
      */
-    forObject: function(obj, ctx, options) {
+    forObject: function(obj, options) {
       options || (options = { });
-
       _convertPercentUnitsToValues(obj, options);
-
-      var gradient = fabric.Gradient.create(ctx, {
-        x1: options.x1,
-        y1: options.y1,
-        x2: options.x2,
-        y2: options.y2,
-        colorStops: options.colorStops
-      });
-
-      return gradient;
+      return new fabric.Gradient(options);
     }
-  };
+  });
 
   function _convertPercentUnitsToValues(object, options) {
     for (var prop in options) {

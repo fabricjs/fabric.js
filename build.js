@@ -103,7 +103,7 @@ var filesToInclude = [
 
   ifSpecifiedInclude('parser', 'src/parser.js'),
 
-  'src/gradient.js',
+  'src/gradient.class.js',
   'src/point.class.js',
   'src/intersection.class.js',
   'src/color.class.js',
