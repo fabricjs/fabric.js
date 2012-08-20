@@ -136,7 +136,19 @@
      * @param {Object} [options] Options object
      */
     initialize: function(options) {
-      options && this.setOptions(options);
+      if (options) {
+        this._initGradient(options);
+        this.setOptions(options);
+      }
+    },
+
+    /**
+     * @method initGradient
+     */
+    _initGradient: function(options) {
+      if (options.fill && !(options.fill instanceof fabric.Gradient)) {
+        this.setGradientFill(options.fill);
+      }
     },
 
     /**
@@ -180,7 +192,7 @@
         top:              toFixed(this.top, this.NUM_FRACTION_DIGITS),
         width:            toFixed(this.width, this.NUM_FRACTION_DIGITS),
         height:           toFixed(this.height, this.NUM_FRACTION_DIGITS),
-        fill:             this.fill,
+        fill:             (this.fill && this.fill.toObject) ? this.fill.toObject() : this.fill,
         overlayFill:      this.overlayFill,
         stroke:           this.stroke,
         strokeWidth:      this.strokeWidth,
@@ -393,7 +405,9 @@
         ctx.fillStyle = this.overlayFill;
       }
       else if (this.fill) {
-        ctx.fillStyle = this.fill;
+        ctx.fillStyle = this.fill.toLiveGradient
+          ? this.fill.toLiveGradient(ctx)
+          : this.fill;
       }
 
       if (this.group && this.type === 'rect') {
@@ -1371,8 +1385,8 @@
       return this.toObject();
     },
 
-    setGradientFill: function(ctx, options) {
-      this.set('fill', fabric.Gradient.forObject(this, ctx, options));
+    setGradientFill: function(options) {
+      this.set('fill', fabric.Gradient.forObject(this, options));
     },
 
     animate: function(property, to, options) {
