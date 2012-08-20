@@ -76,7 +76,7 @@
       var colorStopEls = el.getElementsByTagName('stop'),
           el,
           offset,
-          colorStops = { }
+          colorStops = { },
           gradientDef = { },
           colorStopFromStyle,
           coords = {
