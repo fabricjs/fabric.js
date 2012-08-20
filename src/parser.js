@@ -320,7 +320,7 @@
    * @param {Array} elements Array of elements to parse
    * @param {Function} callback Being passed an array of fabric instances (transformed from SVG elements)
    * @param {Object} options Options object
-   * @param {Function} [reviver] Method for further pasring of SVG elements, called after each fabric object created.
+   * @param {Function} [reviver] Method for further parsing of SVG elements, called after each fabric object created.
    */
   function parseElements(elements, callback, options, reviver) {
     var instances = Array(elements.length), i = elements.length;
@@ -343,15 +343,15 @@
           if (klass.async) {
             klass.fromElement(el, (function(index, el) {
               return function(obj) {
-				reviver && reviver(el, obj);
+                reviver && reviver(el, obj);
                 instances.splice(index, 0, obj);
                 checkIfDone();
               };
             })(index), options);
           }
           else {
-			var obj = klass.fromElement(el, options);
-			reviver && reviver(el, obj);
+            var obj = klass.fromElement(el, options);
+            reviver && reviver(el, obj);
             instances.splice(index, 0, obj);
             checkIfDone();
           }
@@ -442,7 +442,7 @@
    * @method parseSVGDocument
    * @param {SVGDocument} doc SVG document to parse
    * @param {Function} callback Callback to call when parsing is finished; It's being passed an array of elements (parsed from a document).
-   * @param {Function} [reviver] Method for further pasring of SVG elements, called after each fabric object created.
+   * @param {Function} [reviver] Method for further parsing of SVG elements, called after each fabric object created.
    */
   fabric.parseSVGDocument = (function() {
 
@@ -574,7 +574,7 @@
     * @method loadSVGFromURL
     * @param {String} url
     * @param {Function} callback
-    * @param {Function} [reviver] Method for further pasring of SVG elements, called after each fabric object created.
+    * @param {Function} [reviver] Method for further parsing of SVG elements, called after each fabric object created.
     */
    function loadSVGFromURL(url, callback, reviver) {
 
@@ -636,7 +636,7 @@
     * @method loadSVGFromString
     * @param {String} string
     * @param {Function} callback
-    * @param {Function} [reviver] Method for further pasring of SVG elements, called after each fabric object created.
+    * @param {Function} [reviver] Method for further parsing of SVG elements, called after each fabric object created.
     */
   function loadSVGFromString(string, callback, reviver) {
     string = string.trim();
