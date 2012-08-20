@@ -359,13 +359,22 @@
     add: function () {
       this._objects.push.apply(this._objects, arguments);
       for (var i = arguments.length; i--; ) {
-        this.stateful && arguments[i].setupState();
-        arguments[i].setCoords();
-        this.fire('object:added', { target: arguments[i] });
-        arguments[i].fire('added');
+        this._initObject(arguments[i]);
       }
       this.renderOnAddition && this.renderAll();
       return this;
+    },
+
+    /**
+     * @private
+     * @method _initObject
+     */
+    _initObject: function(obj) {
+      this.stateful && obj.setupState();
+      obj.setCoords();
+      obj.canvas = this;
+      this.fire('object:added', { target: obj });
+      obj.fire('added');
     },
 
     /**
@@ -384,12 +393,7 @@
       else {
         this._objects.splice(index, 0, object);
       }
-      this.stateful && object.setupState();
-      object.setCoords();
-
-      this.fire('object:added', { target: object });
-      object.fire('added');
-
+      this._initObject(object);
       this.renderOnAddition && this.renderAll();
       return this;
     },
