@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL` */
 /*! Fabric.js Copyright 2008-2012, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.8.53" };
+var fabric = fabric || { version: "0.9.0" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -3644,11 +3644,6 @@ fabric.util.string = {
   };
 
   function resolveGradients(instances) {
-    var activeInstance = fabric.Canvas.activeInstance,
-        ctx = activeInstance ? activeInstance.getContext() : null;
-
-    if (!ctx) return;
-
     for (var i = instances.length; i--; ) {
       var instanceFillValue = instances[i].get('fill');
 
@@ -3658,7 +3653,7 @@ fabric.util.string = {
 
         if (fabric.gradientDefs[gradientId]) {
           instances[i].set('fill',
-            fabric.Gradient.fromElement(fabric.gradientDefs[gradientId], ctx, instances[i]));
+            fabric.Gradient.fromElement(fabric.gradientDefs[gradientId], instances[i]));
         }
       }
     }
@@ -3672,8 +3667,9 @@ fabric.util.string = {
    * @param {Array} elements Array of elements to parse
    * @param {Function} callback Being passed an array of fabric instances (transformed from SVG elements)
    * @param {Object} options Options object
+   * @param {Function} [reviver] Method for further parsing of SVG elements, called after each fabric object created.
    */
-  function parseElements(elements, callback, options) {
+  function parseElements(elements, callback, options, reviver) {
     var instances = Array(elements.length), i = elements.length;
 
     function checkIfDone() {
@@ -3692,15 +3688,18 @@ fabric.util.string = {
       if (klass && klass.fromElement) {
         try {
           if (klass.async) {
-            klass.fromElement(el, (function(index) {
+            klass.fromElement(el, (function(index, el) {
               return function(obj) {
+                reviver && reviver(el, obj);
                 instances.splice(index, 0, obj);
                 checkIfDone();
               };
             })(index), options);
           }
           else {
-            instances.splice(index, 0, klass.fromElement(el, options));
+            var obj = klass.fromElement(el, options);
+            reviver && reviver(el, obj);
+            instances.splice(index, 0, obj);
             checkIfDone();
           }
         }
@@ -3790,6 +3789,7 @@ fabric.util.string = {
    * @method parseSVGDocument
    * @param {SVGDocument} doc SVG document to parse
    * @param {Function} callback Callback to call when parsing is finished; It's being passed an array of elements (parsed from a document).
+   * @param {Function} [reviver] Method for further parsing of SVG elements, called after each fabric object created.
    */
   fabric.parseSVGDocument = (function() {
 
@@ -3819,7 +3819,7 @@ fabric.util.string = {
       return false;
     }
 
-    return function(doc, callback) {
+    return function(doc, callback, reviver) {
       if (!doc) return;
 
       var startTime = new Date(),
@@ -3877,7 +3877,7 @@ fabric.util.string = {
         if (callback) {
           callback(instances, options);
         }
-      }, clone(options));
+      }, clone(options), reviver);
     };
   })();
 
@@ -3921,8 +3921,9 @@ fabric.util.string = {
     * @method loadSVGFromURL
     * @param {String} url
     * @param {Function} callback
+    * @param {Function} [reviver] Method for further parsing of SVG elements, called after each fabric object created.
     */
-   function loadSVGFromURL(url, callback) {
+   function loadSVGFromURL(url, callback, reviver) {
 
      url = url.replace(/^\n\s*/, '').trim();
 
@@ -3958,7 +3959,7 @@ fabric.util.string = {
            options: options
          });
          callback(results, options);
-       });
+       }, reviver);
      }
    }
 
@@ -3982,8 +3983,9 @@ fabric.util.string = {
     * @method loadSVGFromString
     * @param {String} string
     * @param {Function} callback
+    * @param {Function} [reviver] Method for further parsing of SVG elements, called after each fabric object created.
     */
-  function loadSVGFromString(string, callback) {
+  function loadSVGFromString(string, callback, reviver) {
     string = string.trim();
     var doc;
     if (typeof DOMParser !== 'undefined') {
@@ -4001,7 +4003,7 @@ fabric.util.string = {
 
     fabric.parseSVGDocument(doc.documentElement, function (results, options) {
       callback(results, options);
-    });
+    }, reviver);
   }
 
   function createSVGFontFacesMarkup(objects) {
@@ -4074,38 +4076,55 @@ fabric.util.string = {
     }
   }
 
-  /** @namespace */
+  /**
+   * @class Object
+   * @memberOf fabric
+   */
+  fabric.Gradient = fabric.util.createClass(/** @scope fabric.Gradient.prototype */ {
 
-  fabric.Gradient = {
+    initialize: function(options) {
 
-    /**
-     * @method create
-     * @static
-     */
-    create: function(ctx, options) {
       options || (options = { });
 
-      var x1 = options.x1 || 0,
-          y1 = options.y1 || 0,
-          x2 = options.x2 || ctx.canvas.width,
-          y2 = options.y2 || 0,
-          colorStops = options.colorStops;
+      this.x1 = options.x1 || 0;
+      this.y1 = options.y1 || 0;
+      this.x2 = options.x2 || 0;
+      this.y2 = options.y2 || 0;
 
-      var gradient = ctx.createLinearGradient(x1, y1, x2, y2);
+      this.colorStops = options.colorStops;
+    },
 
-      for (var position in colorStops) {
-        var colorValue = colorStops[position];
+    toObject: function() {
+      return {
+        x1: this.x1,
+        x2: this.x2,
+        y1: this.y1,
+        y2: this.y2,
+        colorStops: this.colorStops
+      };
+    },
+
+    toLiveGradient: function(ctx) {
+      var gradient = ctx.createLinearGradient(
+        this.x1, this.y1, this.x2 || ctx.canvas.width, this.y2);
+
+      for (var position in this.colorStops) {
+        var colorValue = this.colorStops[position];
         gradient.addColorStop(parseFloat(position), colorValue);
       }
+
       return gradient;
-    },
+    }
+  });
+
+  fabric.util.object.extend(fabric.Gradient, {
 
     /**
      * @method fromElement
      * @static
      * @see http://www.w3.org/TR/SVG/pservers.html#LinearGradientElement
      */
-    fromElement: function(el, ctx, instance) {
+    fromElement: function(el, instance) {
 
       /**
        *  @example:
@@ -4147,7 +4166,7 @@ fabric.util.string = {
 
       _convertPercentUnitsToValues(instance, coords);
 
-      return fabric.Gradient.create(ctx, {
+      return new fabric.Gradient({
         x1: coords.x1,
         y1: coords.y1,
         x2: coords.x2,
@@ -4160,22 +4179,12 @@ fabric.util.string = {
      * @method forObject
      * @static
      */
-    forObject: function(obj, ctx, options) {
+    forObject: function(obj, options) {
       options || (options = { });
-
       _convertPercentUnitsToValues(obj, options);
-
-      var gradient = fabric.Gradient.create(ctx, {
-        x1: options.x1,
-        y1: options.y1,
-        x2: options.x2,
-        y2: options.y2,
-        colorStops: options.colorStops
-      });
-
-      return gradient;
+      return new fabric.Gradient(options);
     }
-  };
+  });
 
   function _convertPercentUnitsToValues(object, options) {
     for (var prop in options) {
@@ -5216,13 +5225,22 @@ fabric.util.string = {
     add: function () {
       this._objects.push.apply(this._objects, arguments);
       for (var i = arguments.length; i--; ) {
-        this.stateful && arguments[i].setupState();
-        arguments[i].setCoords();
-        this.fire('object:added', { target: arguments[i] });
-        arguments[i].fire('added');
+        this._initObject(arguments[i]);
       }
       this.renderOnAddition && this.renderAll();
       return this;
+    },
+
+    /**
+     * @private
+     * @method _initObject
+     */
+    _initObject: function(obj) {
+      this.stateful && obj.setupState();
+      obj.setCoords();
+      obj.canvas = this;
+      this.fire('object:added', { target: obj });
+      obj.fire('added');
     },
 
     /**
@@ -5241,12 +5259,7 @@ fabric.util.string = {
       else {
         this._objects.splice(index, 0, object);
       }
-      this.stateful && object.setupState();
-      object.setCoords();
-
-      this.fire('object:added', { target: object });
-      object.fire('added');
-
+      this._initObject(object);
       this.renderOnAddition && this.renderAll();
       return this;
     },
@@ -6911,7 +6924,7 @@ fabric.util.string = {
 
     /**
      * Returns context of canvas where object selection is drawn
-     * @method getContext
+     * @method getSelectionContext
      * @return {CanvasRenderingContext2D}
      */
     getSelectionContext: function() {
@@ -6920,7 +6933,7 @@ fabric.util.string = {
 
     /**
      * Returns &lt;canvas> element on which object selection is drawn
-     * @method getElement
+     * @method getSelectionElement
      * @return {HTMLCanvasElement}
      */
     getSelectionElement: function () {
@@ -7578,7 +7591,19 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      * @param {Object} [options] Options object
      */
     initialize: function(options) {
-      options && this.setOptions(options);
+      if (options) {
+        this.setOptions(options);
+        this._initGradient(options);
+      }
+    },
+
+    /**
+     * @method initGradient
+     */
+    _initGradient: function(options) {
+      if (options.fill && !(options.fill instanceof fabric.Gradient)) {
+        this.set('fill', new fabric.Gradient(options.fill));
+      }
     },
 
     /**
@@ -7622,7 +7647,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         top:              toFixed(this.top, this.NUM_FRACTION_DIGITS),
         width:            toFixed(this.width, this.NUM_FRACTION_DIGITS),
         height:           toFixed(this.height, this.NUM_FRACTION_DIGITS),
-        fill:             this.fill,
+        fill:             (this.fill && this.fill.toObject) ? this.fill.toObject() : this.fill,
         overlayFill:      this.overlayFill,
         stroke:           this.stroke,
         strokeWidth:      this.strokeWidth,
@@ -7835,7 +7860,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         ctx.fillStyle = this.overlayFill;
       }
       else if (this.fill) {
-        ctx.fillStyle = this.fill;
+        ctx.fillStyle = this.fill.toLiveGradient
+          ? this.fill.toLiveGradient(ctx)
+          : this.fill;
       }
 
       if (this.group && this.type === 'rect') {
@@ -8813,8 +8840,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       return this.toObject();
     },
 
-    setGradientFill: function(ctx, options) {
-      this.set('fill', fabric.Gradient.forObject(this, ctx, options));
+    setGradientFill: function(options) {
+      this.set('fill', fabric.Gradient.forObject(this, options));
     },
 
     animate: function(property, to, options) {
@@ -8845,6 +8872,91 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
           options.onComplete && options.onComplete();
         }
       });
+    },
+
+    /**
+     * Centers object horizontally on canvas to which it was added last
+     * @method centerH
+     * @return {fabric.Object} thisArg
+     */
+    centerH: function () {
+      this.canvas.centerObjectH(this);
+      return this;
+    },
+
+    /**
+     * Centers object vertically on canvas to which it was added last
+     * @method centerV
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+    centerV: function () {
+      this.canvas.centerObjectV(this);
+      return this;
+    },
+
+    /**
+     * Centers object vertically and horizontally on canvas to which is was added last
+     * @method center
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+    center: function () {
+      return this.centerH().centerV();
+    },
+
+    /**
+     * Removes object from canvas to which it was added last
+     * @method remove
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+    remove: function() {
+      return this.canvas.remove(this);
+    },
+
+    /**
+     * Moves an object to the bottom of the stack of drawn objects
+     * @method sendToBack
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+    sendToBack: function() {
+      this.canvas.sendToBack(this);
+      return this;
+    },
+
+    /**
+     * Moves an object to the top of the stack of drawn objects
+     * @method bringToFront
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+    bringToFront: function() {
+      this.canvas.bringToFront(this);
+      return this;
+    },
+
+    /**
+     * Moves an object one level down in stack of drawn objects
+     * @method sendBackwards
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+    sendBackwards: function() {
+      this.canvas.sendBackwards(this);
+      return this;
+    },
+
+    /**
+     * Moves an object one level up in stack of drawn objects
+     * @method bringForward
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+    bringForward: function() {
+      this.canvas.bringForward(this);
+      return this;
     }
   });
 

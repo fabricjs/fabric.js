@@ -137,8 +137,8 @@
      */
     initialize: function(options) {
       if (options) {
-        this._initGradient(options);
         this.setOptions(options);
+        this._initGradient(options);
       }
     },
 
@@ -147,7 +147,7 @@
      */
     _initGradient: function(options) {
       if (options.fill && !(options.fill instanceof fabric.Gradient)) {
-        this.setGradientFill(options.fill);
+        this.set('fill', new fabric.Gradient(options.fill));
       }
     },
 
