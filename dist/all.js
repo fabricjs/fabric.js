@@ -12939,6 +12939,8 @@ fabric.Image.filters.Tint.fromObject = function(object) {
       this._shadowOffsets = o.shadowOffsets;
       this._shadows = o.shadows || [ ];
 
+      el = null;
+
       // need to set coords _after_ the width/height was retreived from Cufon
       this.setCoords();
     },
