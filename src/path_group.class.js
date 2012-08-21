@@ -58,59 +58,27 @@
     },
 
     /**
-     * @private
-     * @method _initProperties
-     */
-    // _initProperties: function() {
-    //       this.stateProperties.forEach(function(prop) {
-    //         if (prop === 'fill') {
-    //           this.set(prop, this.options[prop]);
-    //         }
-    //         else if (prop === 'angle') {
-    //           this.setAngle(this.options[prop]);
-    //         }
-    //         else {
-    //           this[prop] = this.options[prop];
-    //         }
-    //       }, this);
-    //     },
-
-    /**
      * Renders this group on a specified context
      * @method render
      * @param {CanvasRenderingContext2D} ctx Context to render this instance on
      */
     render: function(ctx) {
-      if (this.stub) {
-        // fast-path, rendering image stub
-        ctx.save();
+      ctx.save();
 
-        this.transform(ctx);
-        this.stub.render(ctx, false /* no transform */);
-        if (this.active) {
-          this.drawBorders(ctx);
-          this.drawCorners(ctx);
-        }
-        ctx.restore();
+      var m = this.transformMatrix;
+      if (m) {
+        ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
       }
-      else {
-        ctx.save();
 
-        var m = this.transformMatrix;
-        if (m) {
-          ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
-        }
-
-        this.transform(ctx);
-        for (var i = 0, l = this.paths.length; i < l; ++i) {
-          this.paths[i].render(ctx, true);
-        }
-        if (this.active) {
-          this.drawBorders(ctx);
-          this.hideCorners || this.drawCorners(ctx);
-        }
-        ctx.restore();
+      this.transform(ctx);
+      for (var i = 0, l = this.paths.length; i < l; ++i) {
+        this.paths[i].render(ctx, true);
       }
+      if (this.active) {
+        this.drawBorders(ctx);
+        this.hideCorners || this.drawCorners(ctx);
+      }
+      ctx.restore();
     },
 
     /**

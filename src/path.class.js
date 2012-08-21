@@ -404,14 +404,14 @@
             break;
 
           case 't': // shorthand quadraticCurveTo, relative
-            
+
             // transform to absolute x,y
             tempX = x + current[1];
             tempY = y + current[2];
-            
+
 
             if (previous[0].match(/[QqTt]/) === null) {
-              // If there is no previous command or if the previous command was not a Q, q, T or t, 
+              // If there is no previous command or if the previous command was not a Q, q, T or t,
               // assume the control point is coincident with the current point
               controlX = x;
               controlY = y;
@@ -519,7 +519,9 @@
         ctx.fillStyle = this.overlayFill;
       }
       else if (this.fill) {
-        ctx.fillStyle = this.fill;
+        ctx.fillStyle = this.fill.toLiveGradient
+          ? this.fill.toLiveGradient(ctx)
+          : this.fill;
       }
 
       if (this.stroke) {

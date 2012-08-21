@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL` */
 /*! Fabric.js Copyright 2008-2012, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.9.0" };
+var fabric = fabric || { version: "0.9.1" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -10542,14 +10542,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
             break;
 
           case 't': // shorthand quadraticCurveTo, relative
-            
+
             // transform to absolute x,y
             tempX = x + current[1];
             tempY = y + current[2];
-            
+
 
             if (previous[0].match(/[QqTt]/) === null) {
-              // If there is no previous command or if the previous command was not a Q, q, T or t, 
+              // If there is no previous command or if the previous command was not a Q, q, T or t,
               // assume the control point is coincident with the current point
               controlX = x;
               controlY = y;
@@ -10657,7 +10657,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         ctx.fillStyle = this.overlayFill;
       }
       else if (this.fill) {
-        ctx.fillStyle = this.fill;
+        ctx.fillStyle = this.fill.toLiveGradient
+          ? this.fill.toLiveGradient(ctx)
+          : this.fill;
       }
 
       if (this.stroke) {
@@ -10956,59 +10958,27 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     },
 
     /**
-     * @private
-     * @method _initProperties
-     */
-    // _initProperties: function() {
-    //       this.stateProperties.forEach(function(prop) {
-    //         if (prop === 'fill') {
-    //           this.set(prop, this.options[prop]);
-    //         }
-    //         else if (prop === 'angle') {
-    //           this.setAngle(this.options[prop]);
-    //         }
-    //         else {
-    //           this[prop] = this.options[prop];
-    //         }
-    //       }, this);
-    //     },
-
-    /**
      * Renders this group on a specified context
      * @method render
      * @param {CanvasRenderingContext2D} ctx Context to render this instance on
      */
     render: function(ctx) {
-      if (this.stub) {
-        // fast-path, rendering image stub
-        ctx.save();
+      ctx.save();
 
-        this.transform(ctx);
-        this.stub.render(ctx, false /* no transform */);
-        if (this.active) {
-          this.drawBorders(ctx);
-          this.drawCorners(ctx);
-        }
-        ctx.restore();
+      var m = this.transformMatrix;
+      if (m) {
+        ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
       }
-      else {
-        ctx.save();
 
-        var m = this.transformMatrix;
-        if (m) {
-          ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
-        }
-
-        this.transform(ctx);
-        for (var i = 0, l = this.paths.length; i < l; ++i) {
-          this.paths[i].render(ctx, true);
-        }
-        if (this.active) {
-          this.drawBorders(ctx);
-          this.hideCorners || this.drawCorners(ctx);
-        }
-        ctx.restore();
+      this.transform(ctx);
+      for (var i = 0, l = this.paths.length; i < l; ++i) {
+        this.paths[i].render(ctx, true);
       }
+      if (this.active) {
+        this.drawBorders(ctx);
+        this.hideCorners || this.drawCorners(ctx);
+      }
+      ctx.restore();
     },
 
     /**
