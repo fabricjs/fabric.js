@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL` */
 /*! Fabric.js Copyright 2008-2012, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.9.1" };
+var fabric = fabric || { version: "0.9.2" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -6630,6 +6630,7 @@ fabric.util.string = {
       if (path === "M 0 0 L 0 0 ") {
         // do not create 0 width/height paths, as they are rendered inconsistently across browsers
         // Firefox 4, for example, renders a dot, whereas Chrome 10 renders nothing
+        this.renderAll();
         return;
       }
 
