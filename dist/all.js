@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL` */
 /*! Fabric.js Copyright 2008-2012, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.9.2" };
+var fabric = fabric || { version: "0.9.3" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -4224,12 +4224,12 @@ fabric.util.string = {
 
     for (var i = linearGradientEls.length; i--; ) {
       el = linearGradientEls[i];
-      gradientDefs[el.id] = el;
+      gradientDefs[el.getAttribute('id')] = el;
     }
 
     for (var i = radialGradientEls.length; i--; ) {
       el = radialGradientEls[i];
-      gradientDefs[el.id] = el;
+      gradientDefs[el.getAttribute('id')] = el;
     }
 
     return gradientDefs;

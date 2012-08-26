@@ -171,12 +171,12 @@
 
     for (var i = linearGradientEls.length; i--; ) {
       el = linearGradientEls[i];
-      gradientDefs[el.id] = el;
+      gradientDefs[el.getAttribute('id')] = el;
     }
 
     for (var i = radialGradientEls.length; i--; ) {
       el = radialGradientEls[i];
-      gradientDefs[el.id] = el;
+      gradientDefs[el.getAttribute('id')] = el;
     }
 
     return gradientDefs;
