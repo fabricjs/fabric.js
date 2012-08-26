@@ -7985,8 +7985,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      */
     setCoords: function() {
 
-      this.currentWidth = this.width * this.scaleX;
-      this.currentHeight = this.height * this.scaleY;
+      this.currentWidth = (this.width + this.strokeWidth) * this.scaleX;
+      this.currentHeight = (this.height + this.strokeWidth) * this.scaleY;
 
       this._hypotenuse = Math.sqrt(
         Math.pow(this.currentWidth / 2, 2) +
@@ -8097,8 +8097,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     drawBorders: function(ctx) {
       if (!this.hasBorders) return;
 
-      var padding = this.padding,
-          padding2 = padding * 2;
+      var padding2 = this.padding * 2;
 
       ctx.save();
 
@@ -8116,10 +8115,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
           h = this.getHeight();
 
       ctx.strokeRect(
-        ~~(-(w / 2) - padding) + 0.5, // offset needed to make lines look sharper
-        ~~(-(h / 2) - padding) + 0.5,
-        ~~(w + padding2),
-        ~~(h + padding2)
+        ~~(-(w / 2) - this.padding - this.strokeWidth / 2 * this.scaleX) + 0.5, // offset needed to make lines look sharper
+        ~~(-(h / 2) - this.padding - this.strokeWidth / 2 * this.scaleY) + 0.5,
+        ~~(w + padding2 + this.strokeWidth * this.scaleX),
+        ~~(h + padding2 + this.strokeWidth * this.scaleY)
       );
 
       if (this.hasRotatingPoint && !this.hideCorners && !this.lockRotation) {
@@ -8208,6 +8207,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
       var size = this.cornersize,
           size2 = size / 2,
+          strokeWidth2 = this.strokeWidth / 2,
           padding = this.padding,
           left = -(this.width / 2),
           top = -(this.height / 2),
@@ -8227,42 +8227,42 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       ctx.fillStyle = this.cornerColor;
 
       // top-left
-      _left = left - scaleOffsetX;
-      _top = top - scaleOffsetY;
+      _left = left - scaleOffsetX - strokeWidth2;
+      _top = top - scaleOffsetY - strokeWidth2;
       ctx.fillRect(_left, _top, sizeX, sizeY);
 
       // top-right
-      _left = left + this.width - scaleOffsetX;
-      _top = top - scaleOffsetY;
+      _left = left + this.width - scaleOffsetX + strokeWidth2;
+      _top = top - scaleOffsetY - strokeWidth2;
       ctx.fillRect(_left, _top, sizeX, sizeY);
 
       // bottom-left
-      _left = left - scaleOffsetX;
-      _top = top + height + scaleOffsetSizeY;
+      _left = left - scaleOffsetX - strokeWidth2;
+      _top = top + height + scaleOffsetSizeY + strokeWidth2;
       ctx.fillRect(_left, _top, sizeX, sizeY);
 
       // bottom-right
-      _left = left + this.width + scaleOffsetSizeX;
-      _top = top + height + scaleOffsetSizeY;
+      _left = left + this.width + scaleOffsetSizeX + strokeWidth2;
+      _top = top + height + scaleOffsetSizeY + strokeWidth2;
       ctx.fillRect(_left, _top, sizeX, sizeY);
 
       // middle-top
       _left = left + this.width/2 - scaleOffsetX;
-      _top = top - scaleOffsetY;
+      _top = top - scaleOffsetY - strokeWidth2;
       ctx.fillRect(_left, _top, sizeX, sizeY);
 
       // middle-bottom
       _left = left + this.width/2 - scaleOffsetX;
-      _top = top + height + scaleOffsetSizeY;
+      _top = top + height + scaleOffsetSizeY + strokeWidth2;
       ctx.fillRect(_left, _top, sizeX, sizeY);
 
       // middle-right
-      _left = left + this.width + scaleOffsetSizeX;
+      _left = left + this.width + scaleOffsetSizeX + strokeWidth2;
       _top = top + height/2 - scaleOffsetY;
       ctx.fillRect(_left, _top, sizeX, sizeY);
 
       // middle-left
-      _left = left - scaleOffsetX;
+      _left = left - scaleOffsetX - strokeWidth2;
       _top = top + height/2 - scaleOffsetY;
       ctx.fillRect(_left, _top, sizeX, sizeY);
 
@@ -8280,8 +8280,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         _left = left + this.width/2 - scaleOffsetX;
 
         _top = this.flipY ?
-          (top + height + (this.rotatingPointOffset / this.scaleY) - sizeY/2)
-          : (top - (this.rotatingPointOffset / this.scaleY) - sizeY/2);
+          (top + height + (this.rotatingPointOffset / this.scaleY) - sizeY/2 - strokeWidth2)
+          : (top - (this.rotatingPointOffset / this.scaleY) - sizeY/2 - strokeWidth2);
 
         ctx.fillRect(_left, _top, sizeX, sizeY);
       }
@@ -10633,7 +10633,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
             ctx.closePath();
             break;
         }
-    previous = current
+        previous = current;
       }
     },
 
@@ -10852,7 +10852,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       var minX = min(aX),
           minY = min(aY),
           deltaX = 0,
-          deltaY = 0;
+          deltaY = 0,
+          strokeWidthOffset = this.strokeWidth > 1 ? (this.strokeWidth * 2) : 0;
 
       var o = {
         top: minY - deltaY,
@@ -10861,8 +10862,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         right: max(aX) - deltaX
       };
 
-      o.width = o.right - o.left;
-      o.height = o.bottom - o.top;
+      o.width = o.right - o.left + strokeWidthOffset;
+      o.height = o.bottom - o.top + strokeWidthOffset;
 
       return o;
     }
@@ -11753,6 +11754,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      */
     render: function(ctx, noTransform) {
       ctx.save();
+      var m = this.transformMatrix;
+      this._resetWidthHeight();
+      if (m) {
+        ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
+      }
       if (!noTransform) {
         this.transform(ctx);
       }

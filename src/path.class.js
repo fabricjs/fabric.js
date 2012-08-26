@@ -494,7 +494,7 @@
             ctx.closePath();
             break;
         }
-    previous = current
+        previous = current;
       }
     },
 
