@@ -666,7 +666,7 @@
       );
 
       if (this.hasRotatingPoint && !this.hideCorners && !this.lockRotation) {
-        var rotateHeight = (this.flipY ? h : -h) / 2;
+        var rotateHeight = (this.flipY ? h + this.strokeWidth * this.scaleY : -h - this.strokeWidth * this.scaleY) / 2;
         var rotateWidth = (-w/2);
 
         ctx.beginPath();
@@ -824,7 +824,7 @@
         _left = left + this.width/2 - scaleOffsetX;
 
         _top = this.flipY ?
-          (top + height + (this.rotatingPointOffset / this.scaleY) - sizeY/2 - strokeWidth2)
+          (top + height + (this.rotatingPointOffset / this.scaleY) - sizeY/2 + strokeWidth2)
           : (top - (this.rotatingPointOffset / this.scaleY) - sizeY/2 - strokeWidth2);
 
         ctx.fillRect(_left, _top, sizeX, sizeY);
