@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL` */
 /*! Fabric.js Copyright 2008-2012, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.9.3" };
+var fabric = fabric || { version: "0.9.4" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -4958,6 +4958,13 @@ fabric.util.string = {
     clipTo: null,
 
     /**
+     * Indicates whether object controls (borders/corners) are rendered above overlay image
+     * @property
+     * @type Boolean
+     */
+    controlsAboveOverlay: false,
+
+    /**
      * Callback; invoked right before object is about to be scaled/rotated
      * @method onBeforeScaleRotate
      * @param {fabric.Object} target Object that's about to be scaled/rotated
@@ -5212,7 +5219,18 @@ fabric.util.string = {
      * @private
      */
     _draw: function (ctx, object) {
-      object && object.render(ctx);
+      if (!object) return;
+
+      if (this.controlsAboveOverlay) {
+        var hasBorders = object.hasBorders, hasCorners = object.hasCorners;
+        object.hasBorders = object.hasCorners = false;
+        object.render(ctx);
+        object.hasBorders = hasBorders;
+        object.hasCorners = hasCorners;
+      }
+      else {
+        object.render(ctx);
+      }
     },
 
     /**
@@ -5375,7 +5393,11 @@ fabric.util.string = {
       }
 
       if (this.overlayImage) {
-        (this.contextTop || this.contextContainer).drawImage(this.overlayImage, 0, 0);
+        this.contextContainer.drawImage(this.overlayImage, 0, 0);
+      }
+
+      if (this.controlsAboveOverlay) {
+        this.drawControls(this.contextContainer);
       }
 
       if (this.onFpsUpdate) {
@@ -5399,7 +5421,7 @@ fabric.util.string = {
       this.clearContext(this.contextTop || this.contextContainer);
 
       if (this.overlayImage) {
-        (this.contextTop || this.contextContainer).drawImage(this.overlayImage, 0, 0);
+        this.contextContainer.drawImage(this.overlayImage, 0, 0);
       }
 
       // we render the top context - last object
@@ -5417,6 +5439,31 @@ fabric.util.string = {
       this.fire('after:render');
 
       return this;
+    },
+
+    /**
+     * Draws objects' controls (borders/corners)
+     * @method drawControls
+     * @param {Object} ctx context to render controls on
+     */
+    drawControls: function(ctx) {
+      var activeGroup = this.getActiveGroup();
+      if (activeGroup) {
+        ctx.save();
+        fabric.Group.prototype.transform.call(activeGroup, ctx);
+        activeGroup.drawBorders(ctx).drawCorners(ctx);
+        ctx.restore();
+      }
+      else {
+        for (var i = 0, len = this._objects.length; i < len; ++i) {
+          if (!this._objects[i].active) continue;
+
+          ctx.save();
+          fabric.Object.prototype.transform.call(this._objects[i], ctx);
+          this._objects[i].drawBorders(ctx).drawCorners(ctx);
+          ctx.restore();
+        }
+      }
     },
 
     /**
@@ -10852,8 +10899,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       var minX = min(aX),
           minY = min(aY),
           deltaX = 0,
-          deltaY = 0,
-          strokeWidthOffset = this.strokeWidth > 1 ? (this.strokeWidth * 2) : 0;
+          deltaY = 0;
 
       var o = {
         top: minY - deltaY,
@@ -10862,8 +10908,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         right: max(aX) - deltaX
       };
 
-      o.width = o.right - o.left + strokeWidthOffset;
-      o.height = o.bottom - o.top + strokeWidthOffset;
+      o.width = o.right - o.left;
+      o.height = o.bottom - o.top;
 
       return o;
     }
