@@ -30,58 +30,141 @@
 
     /**
      * @property
+     * @type Number
+     */
+    top:                      0,
+
+    /**
+     * @property
+     * @type Number
+     */
+    left:                     0,
+
+    /**
+     * @property
+     * @type Number
+     */
+    width:                    0,
+
+    /**
+     * @property
+     * @type Number
+     */
+    height:                   0,
+
+    /**
+     * @property
+     * @type Number
+     */
+    scaleX:                   1,
+
+    /**
+     * @property
+     * @type Number
+     */
+    scaleY:                   1,
+
+    /**
+     * @property
      * @type Boolean
      */
-    includeDefaultValues:       true,
+    flipX:                    false,
 
     /**
-     * @constant
+     * @property
+     * @type Boolean
+     */
+    flipY:                    false,
+
+    /**
+     * @property
      * @type Number
      */
-    NUM_FRACTION_DIGITS:        2,
+    opacity:                  1,
 
     /**
-     * @constant
+     * @property
      * @type Number
      */
-    MIN_SCALE_LIMIT:            0.1,
+    angle:                    0,
 
     /**
-     * List of properties to consider when checking if state of an object is changed (fabric.Object#hasStateChanged);
-     * as well as for history (undo/redo) purposes
+     * @property
+     * @type Number
+     */
+    cornersize:               12,
+
+    /**
+     * @property
+     * @type Number
+     */
+    padding:                  0,
+
+    /**
+     * @property
+     * @type String
+     */
+    borderColor:              'rgba(102,153,255,0.75)',
+
+    /**
+     * @property
+     * @type String
+     */
+    cornerColor:              'rgba(102,153,255,0.5)',
+
+    /**
+     * @property
+     * @type String
+     */
+    fill:                     'rgb(0,0,0)',
+
+    /**
+     * @property
+     * @type String
+     */
+    fillRule:                 'source-over',
+
+    /**
+     * @property
+     * @type String
+     */
+    overlayFill:              null,
+
+    /**
+     * @property
+     * @type String
+     */
+    stroke:                   null,
+
+    /**
+     * @property
+     * @type Number
+     */
+    strokeWidth:              1,
+
+    /**
      * @property
      * @type Array
      */
-    stateProperties:  (
-      'top left width height scaleX scaleY flipX flipY ' +
-      'theta angle opacity cornersize fill overlayFill ' +
-      'stroke strokeWidth strokeDashArray fillRule ' +
-      'borderScaleFactor transformMatrix selectable'
-    ).split(' '),
-
-    top:                      0,
-    left:                     0,
-    width:                    0,
-    height:                   0,
-    scaleX:                   1,
-    scaleY:                   1,
-    flipX:                    false,
-    flipY:                    false,
-    theta:                    0,
-    opacity:                  1,
-    angle:                    0,
-    cornersize:               12,
-    padding:                  0,
-    borderColor:              'rgba(102,153,255,0.75)',
-    cornerColor:              'rgba(102,153,255,0.5)',
-    fill:                     'rgb(0,0,0)',
-    fillRule:                 'source-over',
-    overlayFill:              null,
-    stroke:                   null,
-    strokeWidth:              1,
     strokeDashArray:          null,
+
+    /**
+     * @property
+     * @type Number
+     */
     borderOpacityWhenMoving:  0.4,
+
+    /**
+     * @property
+     * @type Number
+     */
     borderScaleFactor:        1,
+
+    /**
+     * Transform matrix
+     * @property
+     * @type Array
+     */
     transformMatrix:          null,
 
     /**
@@ -125,6 +208,19 @@
      * @type Number
      */
     _theta:                    0,
+
+    /**
+     * List of properties to consider when checking if state of an object is changed (fabric.Object#hasStateChanged);
+     * as well as for history (undo/redo) purposes
+     * @property
+     * @type Array
+     */
+    stateProperties:  (
+      'top left width height scaleX scaleY flipX flipY ' +
+      'theta angle opacity cornersize fill overlayFill ' +
+      'stroke strokeWidth strokeDashArray fillRule ' +
+      'borderScaleFactor transformMatrix selectable'
+    ).split(' '),
 
     /**
      * @method callSuper
@@ -193,23 +289,25 @@
      */
     toObject: function() {
 
+      var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
+
       var object = {
         type:             this.type,
-        left:             toFixed(this.left, this.NUM_FRACTION_DIGITS),
-        top:              toFixed(this.top, this.NUM_FRACTION_DIGITS),
-        width:            toFixed(this.width, this.NUM_FRACTION_DIGITS),
-        height:           toFixed(this.height, this.NUM_FRACTION_DIGITS),
+        left:             toFixed(this.left, NUM_FRACTION_DIGITS),
+        top:              toFixed(this.top, NUM_FRACTION_DIGITS),
+        width:            toFixed(this.width, NUM_FRACTION_DIGITS),
+        height:           toFixed(this.height, NUM_FRACTION_DIGITS),
         fill:             (this.fill && this.fill.toObject) ? this.fill.toObject() : this.fill,
         overlayFill:      this.overlayFill,
         stroke:           this.stroke,
         strokeWidth:      this.strokeWidth,
         strokeDashArray:  this.strokeDashArray,
-        scaleX:           toFixed(this.scaleX, this.NUM_FRACTION_DIGITS),
-        scaleY:           toFixed(this.scaleY, this.NUM_FRACTION_DIGITS),
-        angle:            toFixed(this.getAngle(), this.NUM_FRACTION_DIGITS),
+        scaleX:           toFixed(this.scaleX, NUM_FRACTION_DIGITS),
+        scaleY:           toFixed(this.scaleY, NUM_FRACTION_DIGITS),
+        angle:            toFixed(this.getAngle(), NUM_FRACTION_DIGITS),
         flipX:            this.flipX,
         flipY:            this.flipY,
-        opacity:          toFixed(this.opacity, this.NUM_FRACTION_DIGITS),
+        opacity:          toFixed(this.opacity, NUM_FRACTION_DIGITS),
         selectable:       this.selectable,
         hasControls:      this.hasControls,
         hasBorders:       this.hasBorders,
@@ -331,10 +429,10 @@
 
     _set: function(key, value) {
       var shouldConstrainValue = (key === 'scaleX' || key === 'scaleY') &&
-                                  value < this.MIN_SCALE_LIMIT;
+                                  value < fabric.Object.MIN_SCALE_LIMIT;
 
       if (shouldConstrainValue) {
-        value = this.MIN_SCALE_LIMIT;
+        value = fabric.Object.MIN_SCALE_LIMIT;
       }
       if (key === 'angle') {
         this.setAngle(value);
@@ -648,15 +746,16 @@
     drawBorders: function(ctx) {
       if (!this.hasBorders) return;
 
-      var padding2 = this.padding * 2;
+      var padding2 = this.padding * 2,
+          MIN_SCALE_LIMIT = fabric.Object.MIN_SCALE_LIMIT;
 
       ctx.save();
 
       ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
       ctx.strokeStyle = this.borderColor;
 
-      var scaleX = 1 / (this.scaleX < this.MIN_SCALE_LIMIT ? this.MIN_SCALE_LIMIT : this.scaleX),
-          scaleY = 1 / (this.scaleY < this.MIN_SCALE_LIMIT ? this.MIN_SCALE_LIMIT : this.scaleY);
+      var scaleX = 1 / (this.scaleX < MIN_SCALE_LIMIT ? MIN_SCALE_LIMIT : this.scaleX),
+          scaleY = 1 / (this.scaleY < MIN_SCALE_LIMIT ? MIN_SCALE_LIMIT : this.scaleY);
 
       ctx.lineWidth = 1 / this.borderScaleFactor;
 
@@ -1539,5 +1638,23 @@
   }
 
   extend(fabric.Object.prototype, fabric.Observable);
+
+  extend(fabric.Object, {
+
+    /**
+     * @static
+     * @constant
+     * @type Number
+     */
+    NUM_FRACTION_DIGITS:        2,
+
+    /**
+     * @static
+     * @constant
+     * @type Number
+     */
+    MIN_SCALE_LIMIT:            0.1
+
+  });
 
 })(typeof exports != 'undefined' ? exports : this);
