@@ -163,14 +163,17 @@
       return fabric[fabric.util.string.camelize(fabric.util.string.capitalize(type))];
     }
 
-    var enlivenedObjects = [ ],
-        numLoadedAsyncObjects = 0,
-        // get length of all images
-        numTotalAsyncObjects = objects.filter(function (o) {
-          return getKlass(o.type).async;
-        }).length;
+    function onLoaded() {
+      if (++numLoadedObjects === numTotalObjects) {
+        if (callback) {
+          callback(enlivenedObjects);
+        }
+      }
+    }
 
-    var _this = this;
+    var enlivenedObjects = [ ],
+        numLoadedObjects = 0,
+        numTotalObjects = objects.length;
 
     objects.forEach(function (o, index) {
       if (!o.type) {
@@ -180,21 +183,14 @@
       if (klass.async) {
         klass.fromObject(o, function (o) {
           enlivenedObjects[index] = o;
-          if (++numLoadedAsyncObjects === numTotalAsyncObjects) {
-            if (callback) {
-              callback(enlivenedObjects);
-            }
-          }
+          onLoaded();
         });
       }
       else {
         enlivenedObjects[index] = klass.fromObject(o);
+        onLoaded();
       }
     });
-
-    if (numTotalAsyncObjects === 0 && callback) {
-      callback(enlivenedObjects);
-    }
   }
 
   function groupSVGElements(elements, options, path) {
