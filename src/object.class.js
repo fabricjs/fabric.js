@@ -209,6 +209,8 @@
      */
     _theta:                    0,
 
+    includeDefaultValues:      true,
+
     /**
      * List of properties to consider when checking if state of an object is changed (fabric.Object#hasStateChanged);
      * as well as for history (undo/redo) purposes
@@ -634,8 +636,10 @@
      */
     setCoords: function() {
 
-      this.currentWidth = (this.width + this.strokeWidth) * this.scaleX;
-      this.currentHeight = (this.height + this.strokeWidth) * this.scaleY;
+      var strokeWidth = this.strokeWidth > 1 ? this.strokeWidth : 0;
+
+      this.currentWidth = (this.width + strokeWidth) * this.scaleX;
+      this.currentHeight = (this.height + strokeWidth) * this.scaleY;
 
       this._hypotenuse = Math.sqrt(
         Math.pow(this.currentWidth / 2, 2) +
@@ -747,7 +751,8 @@
       if (!this.hasBorders) return;
 
       var padding2 = this.padding * 2,
-          MIN_SCALE_LIMIT = fabric.Object.MIN_SCALE_LIMIT;
+          MIN_SCALE_LIMIT = fabric.Object.MIN_SCALE_LIMIT,
+          strokeWidth = this.strokeWidth > 1 ? this.strokeWidth : 0;
 
       ctx.save();
 
@@ -765,14 +770,14 @@
           h = this.getHeight();
 
       ctx.strokeRect(
-        ~~(-(w / 2) - this.padding - this.strokeWidth / 2 * this.scaleX) + 0.5, // offset needed to make lines look sharper
-        ~~(-(h / 2) - this.padding - this.strokeWidth / 2 * this.scaleY) + 0.5,
-        ~~(w + padding2 + this.strokeWidth * this.scaleX),
-        ~~(h + padding2 + this.strokeWidth * this.scaleY)
+        ~~(-(w / 2) - this.padding - strokeWidth / 2 * this.scaleX) + 0.5, // offset needed to make lines look sharper
+        ~~(-(h / 2) - this.padding - strokeWidth / 2 * this.scaleY) + 0.5,
+        ~~(w + padding2 + strokeWidth * this.scaleX),
+        ~~(h + padding2 + strokeWidth * this.scaleY)
       );
 
       if (this.hasRotatingPoint && !this.hideCorners && !this.lockRotation) {
-        var rotateHeight = (this.flipY ? h + this.strokeWidth * this.scaleY : -h - this.strokeWidth * this.scaleY) / 2;
+        var rotateHeight = (this.flipY ? h + strokeWidth * this.scaleY : -h - strokeWidth * this.scaleY) / 2;
         var rotateWidth = (-w/2);
 
         ctx.beginPath();

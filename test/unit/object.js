@@ -190,7 +190,7 @@
 
     function testFractionDigits(fractionDigits, expectedValue) {
 
-      fabric.Object.prototype.NUM_FRACTION_DIGITS = fractionDigits;
+      fabric.Object.NUM_FRACTION_DIGITS = fractionDigits;
 
       testedProperties.forEach(function(property) {
         cObj.set(property, fractionalValue);
@@ -198,7 +198,7 @@
           'value of ' + property + ' should have ' + fractionDigits + ' fractional digits');
       }, this);
 
-      fabric.Object.prototype.NUM_FRACTION_DIGITS = fractionDigitsDefault;
+      fabric.Object.NUM_FRACTION_DIGITS = fractionDigitsDefault;
     }
 
     testFractionDigits.call(this, 2, 166.67);

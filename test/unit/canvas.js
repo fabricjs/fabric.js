@@ -846,4 +846,25 @@
     equal(isFired, true, 'removing active object should fire "selection:cleared"');
   });
 
+  asyncTest('loadFromJSON with async content', function() {
+    var group = new fabric.Group([
+      new fabric.Rect({ width: 10, height: 20 }),
+      new fabric.Circle({ radius: 10 })
+    ]);
+    var rect = new fabric.Rect({ width: 20, height: 10 });
+    var circle = new fabric.Circle({ radius: 25 });
+
+    canvas.add(group, rect, circle);
+    var json = JSON.stringify(canvas);
+    canvas.clear();
+
+    equal(0, canvas.getObjects().length);
+
+    canvas.loadFromJSON(json, function() {
+      equal(3, canvas.getObjects().length);
+
+      start();
+    });
+  });
+
 })();
