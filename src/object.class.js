@@ -120,6 +120,13 @@
     rotatingPointOffset:      40,
 
     /**
+     * @private
+     * @property
+     * @type Number
+     */
+    _theta:                    0,
+
+    /**
      * @method callSuper
      * @param {String} methodName
      */
@@ -172,7 +179,7 @@
     transform: function(ctx) {
       ctx.globalAlpha = this.opacity;
       ctx.translate(this.left, this.top);
-      ctx.rotate(this.theta);
+      ctx.rotate(this._theta);
       ctx.scale(
         this.scaleX * (this.flipX ? -1 : 1),
         this.scaleY * (this.flipY ? -1 : 1)
@@ -506,7 +513,7 @@
      * @return {Number} angle value
      */
     getAngle: function() {
-      return this.theta * 180 / Math.PI;
+      return this._theta * 180 / Math.PI;
     },
 
     /**
@@ -516,7 +523,7 @@
      * @return {Object} thisArg
      */
     setAngle: function(value) {
-      this.theta = value / 180 * Math.PI;
+      this._theta = value / 180 * Math.PI;
       this.angle = value;
       return this;
     },
@@ -539,9 +546,9 @@
       this._angle = Math.atan(this.currentHeight / this.currentWidth);
 
       // offset added for rotate and scale actions
-      var offsetX = Math.cos(this._angle + this.theta) * this._hypotenuse,
-          offsetY = Math.sin(this._angle + this.theta) * this._hypotenuse,
-          theta = this.theta,
+      var offsetX = Math.cos(this._angle + this._theta) * this._hypotenuse,
+          offsetY = Math.sin(this._angle + this._theta) * this._hypotenuse,
+          theta = this._theta,
           sinTh = Math.sin(theta),
           cosTh = Math.cos(theta);
 
@@ -1179,8 +1186,8 @@
           cornerHypotenuse = Math.sqrt(2 * Math.pow(this.cornersize, 2)) / 2,
           cosHalfOffset = cornerHypotenuse * Math.cos(theta),
           sinHalfOffset = cornerHypotenuse * Math.sin(theta),
-          sinTh = Math.sin(this.theta),
-          cosTh = Math.cos(this.theta);
+          sinTh = Math.sin(this._theta),
+          cosTh = Math.cos(this._theta);
 
       coords.tl.corner = {
         tl: {

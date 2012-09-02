@@ -571,7 +571,7 @@
         ey: pointer.y,
         left: target.left,
         top: target.top,
-        theta: target.theta,
+        theta: target._theta,
         width: target.width * target.scaleX
       };
 
@@ -774,7 +774,7 @@
       var lastAngle = atan2(t.ey - t.top - o.top, t.ex - t.left - o.left),
           curAngle = atan2(y - t.top - o.top, x - t.left - o.left);
 
-      t.target.set('theta', (curAngle - lastAngle) + t.theta);
+      t.target._theta = (curAngle - lastAngle) + t.theta;
     },
 
     /**
