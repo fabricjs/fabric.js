@@ -181,6 +181,7 @@
         klass.fromObject(o, function (o) {
           enlivenedObjects[index] = o;
           if (++numLoadedAsyncObjects === numTotalAsyncObjects) {
+            numTotalAsyncObjects = 0;
             if (callback) {
               callback(enlivenedObjects);
             }
