@@ -54,8 +54,9 @@
           maxX = max(points, 'x'),
           maxY = max(points, 'y');
 
-      this.width = maxX - minX;
-      this.height = maxY - minY;
+      this.width = (maxX - minX) || 1;
+      this.height = (maxY - minY) || 1;
+
       this.minX = minX;
       this.minY = minY;
     },
