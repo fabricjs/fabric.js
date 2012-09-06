@@ -83,6 +83,10 @@
     _render: function(ctx) {
       ctx.beginPath();
 
+      if (this.group) {
+        ctx.translate(-this.group.width/2 + this.left, -this.group.height / 2 + this.top);
+      }
+
       // move from center (of virtual box) to its left/top corner
       ctx.moveTo(this.width === 1 ? 0 : (-this.width / 2), this.height === 1 ? 0 : (-this.height / 2));
       ctx.lineTo(this.width === 1 ? 0 : (this.width / 2), this.height === 1 ? 0 : (this.height / 2));
