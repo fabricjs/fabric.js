@@ -90,6 +90,9 @@
       ctx.beginPath();
       ctx.save();
       ctx.globalAlpha *= this.opacity;
+      if (this.transformMatrix && this.group) {
+        ctx.translate(this.cx, this.cy);
+      }
       ctx.transform(1, 0, 0, this.ry/this.rx, 0, 0);
       ctx.arc(noTransform ? this.left : 0, noTransform ? this.top : 0, this.rx, 0, piBy2, false);
       if (this.stroke) {
@@ -128,14 +131,24 @@
    */
   fabric.Ellipse.fromElement = function(element, options) {
     options || (options = { });
+
     var parsedAttributes = fabric.parseAttributes(element, fabric.Ellipse.ATTRIBUTE_NAMES);
+    var cx = parsedAttributes.left;
+    var cy = parsedAttributes.top;
+
     if ('left' in parsedAttributes) {
       parsedAttributes.left -= (options.width / 2) || 0;
     }
     if ('top' in parsedAttributes) {
       parsedAttributes.top -= (options.height / 2) || 0;
     }
-    return new fabric.Ellipse(extend(parsedAttributes, options));
+
+    var ellipse = new fabric.Ellipse(extend(parsedAttributes, options));
+
+    ellipse.cx = cx || 0;
+    ellipse.cy = cy || 0;
+
+    return ellipse;
   };
 
   /**

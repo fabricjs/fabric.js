@@ -8016,20 +8016,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
           : this.fill;
       }
 
-      if (this.group && this.type === 'rect') {
-        if (m) {
-          ctx.translate(
-            -this.group.width / 2,
-            -this.group.height / 2
-          );
-          ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
-        }
-        else {
-          ctx.translate(
-            -this.group.width / 2 + this.width / 2,
-            -this.group.height / 2 + this.height / 2
-          );
-        }
+      if (m && this.group) {
+        ctx.translate(-this.group.width/2, -this.group.height/2);
+        ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
       }
 
       this._render(ctx, noTransform);
@@ -9735,6 +9724,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       ctx.beginPath();
       ctx.save();
       ctx.globalAlpha *= this.opacity;
+      if (this.transformMatrix && this.group) {
+        ctx.translate(this.cx, this.cy);
+      }
       ctx.transform(1, 0, 0, this.ry/this.rx, 0, 0);
       ctx.arc(noTransform ? this.left : 0, noTransform ? this.top : 0, this.rx, 0, piBy2, false);
       if (this.stroke) {
@@ -9773,14 +9765,24 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
    */
   fabric.Ellipse.fromElement = function(element, options) {
     options || (options = { });
+
     var parsedAttributes = fabric.parseAttributes(element, fabric.Ellipse.ATTRIBUTE_NAMES);
+    var cx = parsedAttributes.left;
+    var cy = parsedAttributes.top;
+
     if ('left' in parsedAttributes) {
       parsedAttributes.left -= (options.width / 2) || 0;
     }
     if ('top' in parsedAttributes) {
       parsedAttributes.top -= (options.height / 2) || 0;
     }
-    return new fabric.Ellipse(extend(parsedAttributes, options));
+
+    var ellipse = new fabric.Ellipse(extend(parsedAttributes, options));
+
+    ellipse.cx = cx || 0;
+    ellipse.cy = cy || 0;
+
+    return ellipse;
   };
 
   /**
@@ -9881,8 +9883,15 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       ctx.beginPath();
       ctx.globalAlpha *= this.opacity;
 
-      if (this.group) {
-        ctx.translate(this.x || 0, this.y || 0);
+      if (this.transformMatrix && this.group) {
+        ctx.translate(
+          this.width / 2 + this.x,
+          this.height / 2 + this.y);
+      }
+      if (!this.transformMatrix && this.group) {
+        ctx.translate(
+          -this.group.width / 2 + this.width / 2 + this.x,
+          -this.group.height / 2 + this.height / 2 + this.y);
       }
 
       ctx.moveTo(x+rx, y);

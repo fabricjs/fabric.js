@@ -84,8 +84,15 @@
       ctx.beginPath();
       ctx.globalAlpha *= this.opacity;
 
-      if (this.group) {
-        ctx.translate(this.x || 0, this.y || 0);
+      if (this.transformMatrix && this.group) {
+        ctx.translate(
+          this.width / 2 + this.x,
+          this.height / 2 + this.y);
+      }
+      if (!this.transformMatrix && this.group) {
+        ctx.translate(
+          -this.group.width / 2 + this.width / 2 + this.x,
+          -this.group.height / 2 + this.height / 2 + this.y);
       }
 
       ctx.moveTo(x+rx, y);
