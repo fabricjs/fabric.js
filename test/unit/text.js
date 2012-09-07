@@ -189,4 +189,12 @@
     ok(fabric.Text.fromElement() === null);
   });
 
+  test('dimensions after text change', function() {
+    var text = new fabric.Text('x');
+    equal(20, text.width);
+
+    text.setText('xx');
+    equal(40, text.width);
+  });
+
 })();

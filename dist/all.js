@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL` */
 /*! Fabric.js Copyright 2008-2012, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.9.6" };
+var fabric = fabric || { version: "0.9.7" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -13010,7 +13010,7 @@ fabric.Image.filters.Tint.fromObject = function(object) {
       this._initStateProperties();
       this.text = text;
       this.setOptions(options || { });
-      this.theta = this.angle * Math.PI / 180;
+      this._theta = this.angle * Math.PI / 180;
       this._initDimensions();
       this.setCoords();
     },
@@ -13592,6 +13592,7 @@ fabric.Image.filters.Tint.fromObject = function(object) {
      */
     setFontsize: function(value) {
       this.set('fontSize', value);
+      this._initDimensions();
       this.setCoords();
       return this;
     },
@@ -13614,6 +13615,7 @@ fabric.Image.filters.Tint.fromObject = function(object) {
      */
     setText: function(value) {
       this.set('text', value);
+      this._initDimensions();
       this.setCoords();
       return this;
     },

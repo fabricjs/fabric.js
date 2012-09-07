@@ -120,7 +120,7 @@
       this._initStateProperties();
       this.text = text;
       this.setOptions(options || { });
-      this.theta = this.angle * Math.PI / 180;
+      this._theta = this.angle * Math.PI / 180;
       this._initDimensions();
       this.setCoords();
     },
@@ -702,6 +702,7 @@
      */
     setFontsize: function(value) {
       this.set('fontSize', value);
+      this._initDimensions();
       this.setCoords();
       return this;
     },
@@ -724,6 +725,7 @@
      */
     setText: function(value) {
       this.set('text', value);
+      this._initDimensions();
       this.setCoords();
       return this;
     },
