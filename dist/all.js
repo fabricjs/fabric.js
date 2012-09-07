@@ -13633,7 +13633,13 @@ fabric.Image.filters.Tint.fromObject = function(object) {
         }
       }
       else {
-        this[name] = value;
+		  if (name === 'angle') {
+			  this.setAngle(value);
+		  }
+		  else {
+			  this[name] = value;
+		  }
+
         if (name === 'fontFamily' && this.path) {
           this.path = this.path.replace(/(.*?)([^\/]*)(\.font\.js)/, '$1' + value + '$3');
         }
