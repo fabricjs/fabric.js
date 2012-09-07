@@ -13626,19 +13626,13 @@ fabric.Image.filters.Tint.fromObject = function(object) {
      * @return {fabric.Text} thisArg
      * @chainable
      */
-    set: function(name, value) {
-      if (typeof name == 'object') {
-        for (var prop in name) {
-          this.set(prop, name[prop]);
-        }
+    _set: function(name, value) {
+      if (name === 'fontFamily' && this.path) {
+        this.path = this.path.replace(/(.*?)([^\/]*)(\.font\.js)/, '$1' + value + '$3');
       }
       else {
-        this[name] = value;
-        if (name === 'fontFamily' && this.path) {
-          this.path = this.path.replace(/(.*?)([^\/]*)(\.font\.js)/, '$1' + value + '$3');
-        }
+        this.callSuper('_set', name, value);
       }
-      return this;
     }
   });
 
