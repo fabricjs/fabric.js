@@ -910,33 +910,35 @@
       ctx.clearRect(_left, _top, sizeX, sizeY);
       ctx.strokeRect(_left, _top, sizeX, sizeY);
 
-      // middle-top
-      _left = left + width/2 - scaleOffsetX;
-      _top = top - scaleOffsetY - strokeWidth2 - paddingY;
+      if (!this.lockUniScaling) {
+        // middle-top
+        _left = left + width/2 - scaleOffsetX;
+        _top = top - scaleOffsetY - strokeWidth2 - paddingY;
 
-      ctx.clearRect(_left, _top, sizeX, sizeY);
-      ctx.strokeRect(_left, _top, sizeX, sizeY);
+        ctx.clearRect(_left, _top, sizeX, sizeY);
+        ctx.strokeRect(_left, _top, sizeX, sizeY);
 
-      // middle-bottom
-      _left = left + width/2 - scaleOffsetX;
-      _top = top + height + scaleOffsetSizeY + strokeWidth2 + paddingY;
+        // middle-bottom
+        _left = left + width/2 - scaleOffsetX;
+        _top = top + height + scaleOffsetSizeY + strokeWidth2 + paddingY;
 
-      ctx.clearRect(_left, _top, sizeX, sizeY);
-      ctx.strokeRect(_left, _top, sizeX, sizeY);
+        ctx.clearRect(_left, _top, sizeX, sizeY);
+        ctx.strokeRect(_left, _top, sizeX, sizeY);
 
-      // middle-right
-      _left = left + width + scaleOffsetSizeX + strokeWidth2 + paddingX;
-      _top = top + height/2 - scaleOffsetY;
+        // middle-right
+        _left = left + width + scaleOffsetSizeX + strokeWidth2 + paddingX;
+        _top = top + height/2 - scaleOffsetY;
 
-      ctx.clearRect(_left, _top, sizeX, sizeY);
-      ctx.strokeRect(_left, _top, sizeX, sizeY);
+        ctx.clearRect(_left, _top, sizeX, sizeY);
+        ctx.strokeRect(_left, _top, sizeX, sizeY);
 
-      // middle-left
-      _left = left - scaleOffsetX - strokeWidth2 - paddingX;
-      _top = top + height/2 - scaleOffsetY;
+        // middle-left
+        _left = left - scaleOffsetX - strokeWidth2 - paddingX;
+        _top = top + height/2 - scaleOffsetY;
 
-      ctx.clearRect(_left, _top, sizeX, sizeY);
-      ctx.strokeRect(_left, _top, sizeX, sizeY);
+        ctx.clearRect(_left, _top, sizeX, sizeY);
+        ctx.strokeRect(_left, _top, sizeX, sizeY);
+      }
 
       // middle-top-rotate
       if (this.hasRotatingPoint) {
@@ -1184,6 +1186,9 @@
 
       for (var i in this.oCoords) {
         if (i === 'mtr' && !this.hasRotatingPoint) {
+          return false;
+        }
+        if (this.lockUniScaling && (i === 'mt' || i === 'mr' || i === 'mb' || i === 'ml')) {
           return false;
         }
 
