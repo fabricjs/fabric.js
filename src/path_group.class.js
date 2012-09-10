@@ -83,24 +83,21 @@
 
     /**
      * Sets certain property to a certain value
-     * @method set
+     * @method _set
      * @param {String} prop
      * @param {Any} value
      * @return {fabric.PathGroup} thisArg
      */
-    set: function(prop, value) {
-      if ((prop === 'fill' || prop === 'overlayFill') && this.isSameColor()) {
-        this[prop] = value;
+    _set: function(prop, value) {
+
+      if ((prop === 'fill' || prop === 'overlayFill') && value && this.isSameColor()) {
         var i = this.paths.length;
         while (i--) {
-          this.paths[i].set(prop, value);
+          this.paths[i]._set(prop, value);
         }
       }
-      else {
-        // skipping parent "class" - fabric.Path
-        parentSet.call(this, prop, value);
-      }
-      return this;
+
+      return this.callSuper('_set', prop, value);
     },
 
     /**
