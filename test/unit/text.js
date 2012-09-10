@@ -197,4 +197,12 @@
     equal(40, text.width);
   });
 
+  test('setting fontFamily', function() {
+    var text = new fabric.Text('x');
+    text.path = 'foobar.js';
+
+    text.set('fontFamily', 'foobar');
+    equal('foobar', text.get('fontFamily'));
+  });
+
 })();

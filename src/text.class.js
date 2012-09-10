@@ -742,9 +742,7 @@
       if (name === 'fontFamily' && this.path) {
         this.path = this.path.replace(/(.*?)([^\/]*)(\.font\.js)/, '$1' + value + '$3');
       }
-      else {
-        this.callSuper('_set', name, value);
-      }
+      this.callSuper('_set', name, value);
     }
   });
 
