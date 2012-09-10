@@ -11142,6 +11142,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
     /**
      * @property
+     * @type String
+     */
+    fill: '',
+
+    /**
+     * @property
      * @type Boolean
      */
     forceFillOverwrite: false,

@@ -29,6 +29,12 @@
 
     /**
      * @property
+     * @type String
+     */
+    fill: '',
+
+    /**
+     * @property
      * @type Boolean
      */
     forceFillOverwrite: false,
