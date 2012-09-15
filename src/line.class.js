@@ -133,6 +133,7 @@
     toSVG: function() {
       return [
         '<line ',
+          'id="', this.id, '" ',
           'x1="', this.get('x1'), '" ',
           'y1="', this.get('y1'), '" ',
           'x2="', this.get('x2'), '" ',
@@ -148,7 +149,7 @@
    * @static
    * @see http://www.w3.org/TR/SVG/shapes.html#LineElement
    */
-  fabric.Line.ATTRIBUTE_NAMES = 'x1 y1 x2 y2 stroke stroke-width transform'.split(' ');
+  fabric.Line.ATTRIBUTE_NAMES = 'id x1 y1 x2 y2 stroke stroke-width transform'.split(' ');
 
   /**
    * Returns fabric.Line instance from an SVG element

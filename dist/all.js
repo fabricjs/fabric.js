@@ -7521,6 +7521,13 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   fabric.Object = fabric.util.createClass(/** @scope fabric.Object.prototype */ {
 
     /**
+     * id of object
+     * @property
+     * @type Number
+     */
+    id: 0,
+
+    /**
      * Type of an object (rect, circle, path, etc)
      * @property
      * @type String
@@ -7717,7 +7724,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      * @type Array
      */
     stateProperties:  (
-      'top left width height scaleX scaleY flipX flipY ' +
+      'id top left width height scaleX scaleY flipX flipY ' +
       'theta angle opacity cornersize fill overlayFill ' +
       'stroke strokeWidth strokeDashArray fillRule ' +
       'borderScaleFactor transformMatrix selectable'
@@ -7793,6 +7800,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
 
       var object = {
+        id:               this.id,
         type:             this.type,
         left:             toFixed(this.left, NUM_FRACTION_DIGITS),
         top:              toFixed(this.top, NUM_FRACTION_DIGITS),
@@ -7822,6 +7830,24 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       return object;
     },
 
+   /**
+    * Returns id of an object
+    * @method getId
+    * @return {Number} id value
+    */
+    getId: function () {
+        return this.id;
+    },
+	
+   /**
+    * Sets id of an object
+    * @method setId
+    * @return {Number} id value
+    */
+    setId: function (newId) {
+        this.id = newId;
+    },
+	
     /**
      * Returns (dataless) object representation of an instance
      * @method toDatalessObject
@@ -9313,6 +9339,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     toSVG: function() {
       return [
         '<line ',
+          'id="', this.id, '" ',
           'x1="', this.get('x1'), '" ',
           'y1="', this.get('y1'), '" ',
           'x2="', this.get('x2'), '" ',
@@ -9328,7 +9355,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
    * @static
    * @see http://www.w3.org/TR/SVG/shapes.html#LineElement
    */
-  fabric.Line.ATTRIBUTE_NAMES = 'x1 y1 x2 y2 stroke stroke-width transform'.split(' ');
+  fabric.Line.ATTRIBUTE_NAMES = 'id x1 y1 x2 y2 stroke stroke-width transform'.split(' ');
 
   /**
    * Returns fabric.Line instance from an SVG element
@@ -9421,6 +9448,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      */
     toSVG: function() {
       return ('<circle ' +
+	    'id="' + this.id + '" ' +
         'cx="0" cy="0" ' +
         'r="' + this.radius + '" ' +
         'style="' + this.getSvgStyles() + '" ' +
@@ -9490,8 +9518,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
    * @static
    * @see: http://www.w3.org/TR/SVG/shapes.html#CircleElement
    */
-  fabric.Circle.ATTRIBUTE_NAMES = 'cx cy r fill fill-opacity opacity stroke stroke-width transform'.split(' ');
-
+  fabric.Circle.ATTRIBUTE_NAMES = 'id cx cy r width height fill fill-opacity opacity stroke stroke-width transform'.split(' ');
+  
   /**
    * Returns {@link fabric.Circle} instance from an SVG element
    * @static
@@ -9704,6 +9732,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     toSVG: function() {
       return [
         '<ellipse ',
+		  'id="' , this.id , '" ', 
           'rx="', this.get('rx'), '" ',
           'ry="', this.get('ry'), '" ',
           'style="', this.getSvgStyles(), '" ',
@@ -9762,7 +9791,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
    * @static
    * @see http://www.w3.org/TR/SVG/shapes.html#EllipseElement
    */
-  fabric.Ellipse.ATTRIBUTE_NAMES = 'cx cy rx ry fill fill-opacity opacity stroke stroke-width transform'.split(' ');
+  fabric.Ellipse.ATTRIBUTE_NAMES = 'id cx cy rx ry fill fill-opacity opacity stroke stroke-width transform'.split(' ');
 
   /**
    * Returns {@link fabric.Ellipse} instance from an SVG element
@@ -9966,6 +9995,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      */
     toSVG: function() {
       return '<rect ' +
+              'id="' + this.id + '" ' +
               'x="' + (-1 * this.width / 2) + '" y="' + (-1 * this.height / 2) + '" ' +
               'rx="' + this.get('rx') + '" ry="' + this.get('ry') + '" ' +
               'width="' + this.width + '" height="' + this.height + '" ' +
@@ -9981,7 +10011,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
    * List of attribute names to account for when parsing SVG element (used by `fabric.Rect.fromElement`)
    * @static
    */
-  fabric.Rect.ATTRIBUTE_NAMES = 'x y width height rx ry fill fill-opacity opacity stroke stroke-width transform'.split(' ');
+  fabric.Rect.ATTRIBUTE_NAMES = 'id x y width height rx ry fill fill-opacity opacity stroke stroke-width transform'.split(' ');
 
   /**
    * @private
@@ -10094,7 +10124,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
       return [
         '<polyline ',
-          'points="', points.join(''), '" ',
+          'id="', this.id, '" ',
+		  'points="', points.join(''), '" ',
           'style="', this.getSvgStyles(), '" ',
           'transform="', this.getSvgTransform(), '" ',
         '/>'
@@ -10137,7 +10168,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
    * @static
    * @see: http://www.w3.org/TR/SVG/shapes.html#PolylineElement
    */
-  fabric.Polyline.ATTRIBUTE_NAMES = 'fill fill-opacity opacity stroke stroke-width transform'.split(' ');
+  fabric.Polyline.ATTRIBUTE_NAMES = 'id fill fill-opacity opacity stroke stroke-width transform'.split(' ');
 
   /**
    * Returns fabric.Polyline instance from an SVG element
@@ -10265,6 +10296,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
       return [
         '<polygon ',
+		  'id="', this.id, '" ',
           'points="', points.join(''), '" ',
           'style="', this.getSvgStyles(), '" ',
           'transform="', this.getSvgTransform(), '" ',
@@ -10309,7 +10341,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
    * @static
    * @see: http://www.w3.org/TR/SVG/shapes.html#PolygonElement
    */
-  fabric.Polygon.ATTRIBUTE_NAMES = 'fill fill-opacity opacity stroke stroke-width transform'.split(' ');
+  fabric.Polygon.ATTRIBUTE_NAMES = 'id fill fill-opacity opacity stroke stroke-width transform'.split(' ');
 
   /**
    * Returns fabric.Polygon instance from an SVG element
@@ -10955,6 +10987,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       return [
         '<g transform="', this.getSvgTransform(), '">',
           '<path ',
+		    'id="', this.id, '"',
             'width="', this.width, '" height="', this.height, '" ',
             'd="', path, '" ',
             'style="', this.getSvgStyles(), '" ',
@@ -11095,7 +11128,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
    * @static
    * @see http://www.w3.org/TR/SVG/paths.html#PathElement
    */
-  fabric.Path.ATTRIBUTE_NAMES = 'd fill fill-opacity opacity fill-rule stroke stroke-width transform'.split(' ');
+  fabric.Path.ATTRIBUTE_NAMES = 'id d fill fill-opacity opacity fill-rule stroke stroke-width transform'.split(' ');
 
   /**
    * Creates an instance of fabric.Path from an SVG <path> element
@@ -12006,7 +12039,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      */
     toSVG: function() {
       return '<g transform="' + this.getSvgTransform() + '">'+
-                '<image xlink:href="' + this.getSvgSrc() + '" '+
+                '<image ' +
+                  'id="' + this.id + '" ' +
+                  'xlink:href="' + this.getSvgSrc() + '" '+
                   'style="' + this.getSvgStyles() + '" ' +
                   // we're essentially moving origin of transformation from top/left corner to the center of the shape
                   // by wrapping it in container <g> element with actual transformation, then offsetting object to the top/left
@@ -12272,7 +12307,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
    * @static
    * @see http://www.w3.org/TR/SVG/struct.html#ImageElement
    */
-  fabric.Image.ATTRIBUTE_NAMES = 'x y width height fill fill-opacity opacity stroke stroke-width transform xlink:href'.split(' ');
+  fabric.Image.ATTRIBUTE_NAMES = 'id x y width height fill fill-opacity opacity stroke stroke-width transform xlink:href'.split(' ');
 
   /**
    * Returns {@link fabric.Image} instance from an SVG element
@@ -13475,6 +13510,7 @@ fabric.Image.filters.Tint.fromObject = function(object) {
         '<g transform="', this.getSvgTransform(), '">',
           textAndBg.textBgRects.join(''),
           '<text ',
+            'id="', this.id, '" ',
             (this.fontFamily ? 'font-family="\'' + this.fontFamily + '\'" ': ''),
             (this.fontSize ? 'font-size="' + this.fontSize + '" ': ''),
             (this.fontStyle ? 'font-style="' + this.fontStyle + '" ': ''),
@@ -13649,7 +13685,7 @@ fabric.Image.filters.Tint.fromObject = function(object) {
    * @static
    */
   fabric.Text.ATTRIBUTE_NAMES =
-    ('x y fill fill-opacity opacity stroke stroke-width transform ' +
+    ('id x y fill fill-opacity opacity stroke stroke-width transform ' +
      'font-family font-style font-weight font-size text-decoration').split(' ');
 
   /**

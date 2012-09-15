@@ -57,6 +57,7 @@
      */
     toSVG: function() {
       return ('<circle ' +
+	    'id="' + this.id + '" ' +
         'cx="0" cy="0" ' +
         'r="' + this.radius + '" ' +
         'style="' + this.getSvgStyles() + '" ' +
@@ -126,8 +127,8 @@
    * @static
    * @see: http://www.w3.org/TR/SVG/shapes.html#CircleElement
    */
-  fabric.Circle.ATTRIBUTE_NAMES = 'cx cy r fill fill-opacity opacity stroke stroke-width transform'.split(' ');
-
+  fabric.Circle.ATTRIBUTE_NAMES = 'id cx cy r width height fill fill-opacity opacity stroke stroke-width transform'.split(' ');
+  
   /**
    * Returns {@link fabric.Circle} instance from an SVG element
    * @static

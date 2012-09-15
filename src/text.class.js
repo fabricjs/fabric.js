@@ -577,6 +577,7 @@
         '<g transform="', this.getSvgTransform(), '">',
           textAndBg.textBgRects.join(''),
           '<text ',
+            'id="', this.id, '" ',
             (this.fontFamily ? 'font-family="\'' + this.fontFamily + '\'" ': ''),
             (this.fontSize ? 'font-size="' + this.fontSize + '" ': ''),
             (this.fontStyle ? 'font-style="' + this.fontStyle + '" ': ''),
@@ -751,7 +752,7 @@
    * @static
    */
   fabric.Text.ATTRIBUTE_NAMES =
-    ('x y fill fill-opacity opacity stroke stroke-width transform ' +
+    ('id x y fill fill-opacity opacity stroke stroke-width transform ' +
      'font-family font-style font-weight font-size text-decoration').split(' ');
 
   /**

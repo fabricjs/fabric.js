@@ -169,7 +169,9 @@
      */
     toSVG: function() {
       return '<g transform="' + this.getSvgTransform() + '">'+
-                '<image xlink:href="' + this.getSvgSrc() + '" '+
+                '<image ' +
+                  'id="' + this.id + '" ' +
+                  'xlink:href="' + this.getSvgSrc() + '" '+
                   'style="' + this.getSvgStyles() + '" ' +
                   // we're essentially moving origin of transformation from top/left corner to the center of the shape
                   // by wrapping it in container <g> element with actual transformation, then offsetting object to the top/left
@@ -435,7 +437,7 @@
    * @static
    * @see http://www.w3.org/TR/SVG/struct.html#ImageElement
    */
-  fabric.Image.ATTRIBUTE_NAMES = 'x y width height fill fill-opacity opacity stroke stroke-width transform xlink:href'.split(' ');
+  fabric.Image.ATTRIBUTE_NAMES = 'id x y width height fill fill-opacity opacity stroke stroke-width transform xlink:href'.split(' ');
 
   /**
    * Returns {@link fabric.Image} instance from an SVG element

@@ -61,6 +61,7 @@
     toSVG: function() {
       return [
         '<ellipse ',
+		  'id="' , this.id , '" ', 
           'rx="', this.get('rx'), '" ',
           'ry="', this.get('ry'), '" ',
           'style="', this.getSvgStyles(), '" ',
@@ -119,7 +120,7 @@
    * @static
    * @see http://www.w3.org/TR/SVG/shapes.html#EllipseElement
    */
-  fabric.Ellipse.ATTRIBUTE_NAMES = 'cx cy rx ry fill fill-opacity opacity stroke stroke-width transform'.split(' ');
+  fabric.Ellipse.ATTRIBUTE_NAMES = 'id cx cy rx ry fill fill-opacity opacity stroke stroke-width transform'.split(' ');
 
   /**
    * Returns {@link fabric.Ellipse} instance from an SVG element

@@ -158,6 +158,7 @@
      */
     toSVG: function() {
       return '<rect ' +
+              'id="' + this.id + '" ' +
               'x="' + (-1 * this.width / 2) + '" y="' + (-1 * this.height / 2) + '" ' +
               'rx="' + this.get('rx') + '" ry="' + this.get('ry') + '" ' +
               'width="' + this.width + '" height="' + this.height + '" ' +
@@ -173,7 +174,7 @@
    * List of attribute names to account for when parsing SVG element (used by `fabric.Rect.fromElement`)
    * @static
    */
-  fabric.Rect.ATTRIBUTE_NAMES = 'x y width height rx ry fill fill-opacity opacity stroke stroke-width transform'.split(' ');
+  fabric.Rect.ATTRIBUTE_NAMES = 'id x y width height rx ry fill fill-opacity opacity stroke stroke-width transform'.split(' ');
 
   /**
    * @private

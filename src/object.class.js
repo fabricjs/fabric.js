@@ -22,6 +22,13 @@
   fabric.Object = fabric.util.createClass(/** @scope fabric.Object.prototype */ {
 
     /**
+     * id of object
+     * @property
+     * @type Number
+     */
+    id: 0,
+
+    /**
      * Type of an object (rect, circle, path, etc)
      * @property
      * @type String
@@ -218,7 +225,7 @@
      * @type Array
      */
     stateProperties:  (
-      'top left width height scaleX scaleY flipX flipY ' +
+      'id top left width height scaleX scaleY flipX flipY ' +
       'theta angle opacity cornersize fill overlayFill ' +
       'stroke strokeWidth strokeDashArray fillRule ' +
       'borderScaleFactor transformMatrix selectable'
@@ -294,6 +301,7 @@
       var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
 
       var object = {
+        id:               this.id,
         type:             this.type,
         left:             toFixed(this.left, NUM_FRACTION_DIGITS),
         top:              toFixed(this.top, NUM_FRACTION_DIGITS),
@@ -323,6 +331,24 @@
       return object;
     },
 
+   /**
+    * Returns id of an object
+    * @method getId
+    * @return {Number} id value
+    */
+    getId: function () {
+        return this.id;
+    },
+	
+   /**
+    * Sets id of an object
+    * @method setId
+    * @return {Number} id value
+    */
+    setId: function (newId) {
+        this.id = newId;
+    },
+	
     /**
      * Returns (dataless) object representation of an instance
      * @method toDatalessObject

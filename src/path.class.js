@@ -604,6 +604,7 @@
       return [
         '<g transform="', this.getSvgTransform(), '">',
           '<path ',
+		    'id="', this.id, '"',
             'width="', this.width, '" height="', this.height, '" ',
             'd="', path, '" ',
             'style="', this.getSvgStyles(), '" ',
@@ -744,7 +745,7 @@
    * @static
    * @see http://www.w3.org/TR/SVG/paths.html#PathElement
    */
-  fabric.Path.ATTRIBUTE_NAMES = 'd fill fill-opacity opacity fill-rule stroke stroke-width transform'.split(' ');
+  fabric.Path.ATTRIBUTE_NAMES = 'id d fill fill-opacity opacity fill-rule stroke stroke-width transform'.split(' ');
 
   /**
    * Creates an instance of fabric.Path from an SVG <path> element
