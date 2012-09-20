@@ -75,6 +75,12 @@
     var text = createTextObject();
     ok(typeof text.set == 'function');
     equal(text.set('text', 'bar'), text, 'should be chainable');
+
+    text.set({ left: 1234, top: 2345, angle: 55 });
+
+    equal(text.get('left'), 1234);
+    equal(text.get('top'), 2345);
+    equal(text.get('angle'), 55);
   });
 
   test('set with "hash"', function() {
@@ -181,6 +187,22 @@
 
   test('empty fromElement', function() {
     ok(fabric.Text.fromElement() === null);
+  });
+
+  test('dimensions after text change', function() {
+    var text = new fabric.Text('x');
+    equal(20, text.width);
+
+    text.setText('xx');
+    equal(40, text.width);
+  });
+
+  test('setting fontFamily', function() {
+    var text = new fabric.Text('x');
+    text.path = 'foobar.js';
+
+    text.set('fontFamily', 'foobar');
+    equal('foobar', text.get('fontFamily'));
   });
 
 })();

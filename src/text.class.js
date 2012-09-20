@@ -120,7 +120,7 @@
       this._initStateProperties();
       this.text = text;
       this.setOptions(options || { });
-      this.theta = this.angle * Math.PI / 180;
+      this._theta = this.angle * Math.PI / 180;
       this._initDimensions();
       this.setCoords();
     },
@@ -702,6 +702,7 @@
      */
     setFontsize: function(value) {
       this.set('fontSize', value);
+      this._initDimensions();
       this.setCoords();
       return this;
     },
@@ -724,6 +725,7 @@
      */
     setText: function(value) {
       this.set('text', value);
+      this._initDimensions();
       this.setCoords();
       return this;
     },
@@ -736,25 +738,11 @@
      * @return {fabric.Text} thisArg
      * @chainable
      */
-    set: function(name, value) {
-      if (typeof name == 'object') {
-        for (var prop in name) {
-          this.set(prop, name[prop]);
-        }
+    _set: function(name, value) {
+      if (name === 'fontFamily' && this.path) {
+        this.path = this.path.replace(/(.*?)([^\/]*)(\.font\.js)/, '$1' + value + '$3');
       }
-      else {
-		  if (name === 'angle') {
-			  this.setAngle(value);
-		  }
-		  else {
-			  this[name] = value;
-		  }
-
-        if (name === 'fontFamily' && this.path) {
-          this.path = this.path.replace(/(.*?)([^\/]*)(\.font\.js)/, '$1' + value + '$3');
-        }
-      }
-      return this;
+      this.callSuper('_set', name, value);
     }
   });
 

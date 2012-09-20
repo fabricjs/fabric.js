@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL` */
 /*! Fabric.js Copyright 2008-2012, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.9.6" };
+var fabric = fabric || { version: "0.9.8" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -8409,33 +8409,35 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       ctx.clearRect(_left, _top, sizeX, sizeY);
       ctx.strokeRect(_left, _top, sizeX, sizeY);
 
-      // middle-top
-      _left = left + width/2 - scaleOffsetX;
-      _top = top - scaleOffsetY - strokeWidth2 - paddingY;
+      if (!this.lockUniScaling) {
+        // middle-top
+        _left = left + width/2 - scaleOffsetX;
+        _top = top - scaleOffsetY - strokeWidth2 - paddingY;
 
-      ctx.clearRect(_left, _top, sizeX, sizeY);
-      ctx.strokeRect(_left, _top, sizeX, sizeY);
+        ctx.clearRect(_left, _top, sizeX, sizeY);
+        ctx.strokeRect(_left, _top, sizeX, sizeY);
 
-      // middle-bottom
-      _left = left + width/2 - scaleOffsetX;
-      _top = top + height + scaleOffsetSizeY + strokeWidth2 + paddingY;
+        // middle-bottom
+        _left = left + width/2 - scaleOffsetX;
+        _top = top + height + scaleOffsetSizeY + strokeWidth2 + paddingY;
 
-      ctx.clearRect(_left, _top, sizeX, sizeY);
-      ctx.strokeRect(_left, _top, sizeX, sizeY);
+        ctx.clearRect(_left, _top, sizeX, sizeY);
+        ctx.strokeRect(_left, _top, sizeX, sizeY);
 
-      // middle-right
-      _left = left + width + scaleOffsetSizeX + strokeWidth2 + paddingX;
-      _top = top + height/2 - scaleOffsetY;
+        // middle-right
+        _left = left + width + scaleOffsetSizeX + strokeWidth2 + paddingX;
+        _top = top + height/2 - scaleOffsetY;
 
-      ctx.clearRect(_left, _top, sizeX, sizeY);
-      ctx.strokeRect(_left, _top, sizeX, sizeY);
+        ctx.clearRect(_left, _top, sizeX, sizeY);
+        ctx.strokeRect(_left, _top, sizeX, sizeY);
 
-      // middle-left
-      _left = left - scaleOffsetX - strokeWidth2 - paddingX;
-      _top = top + height/2 - scaleOffsetY;
+        // middle-left
+        _left = left - scaleOffsetX - strokeWidth2 - paddingX;
+        _top = top + height/2 - scaleOffsetY;
 
-      ctx.clearRect(_left, _top, sizeX, sizeY);
-      ctx.strokeRect(_left, _top, sizeX, sizeY);
+        ctx.clearRect(_left, _top, sizeX, sizeY);
+        ctx.strokeRect(_left, _top, sizeX, sizeY);
+      }
 
       // middle-top-rotate
       if (this.hasRotatingPoint) {
@@ -8683,6 +8685,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
       for (var i in this.oCoords) {
         if (i === 'mtr' && !this.hasRotatingPoint) {
+          return false;
+        }
+        if (this.lockUniScaling && (i === 'mt' || i === 'mr' || i === 'mb' || i === 'ml')) {
           return false;
         }
 
@@ -11137,6 +11142,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
     /**
      * @property
+     * @type String
+     */
+    fill: '',
+
+    /**
+     * @property
      * @type Boolean
      */
     forceFillOverwrite: false,
@@ -11191,24 +11202,21 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
     /**
      * Sets certain property to a certain value
-     * @method set
+     * @method _set
      * @param {String} prop
      * @param {Any} value
      * @return {fabric.PathGroup} thisArg
      */
-    set: function(prop, value) {
-      if ((prop === 'fill' || prop === 'overlayFill') && this.isSameColor()) {
-        this[prop] = value;
+    _set: function(prop, value) {
+
+      if ((prop === 'fill' || prop === 'overlayFill') && value && this.isSameColor()) {
         var i = this.paths.length;
         while (i--) {
-          this.paths[i].set(prop, value);
+          this.paths[i]._set(prop, value);
         }
       }
-      else {
-        // skipping parent "class" - fabric.Path
-        parentSet.call(this, prop, value);
-      }
-      return this;
+
+      return this.callSuper('_set', prop, value);
     },
 
     /**
@@ -13010,7 +13018,7 @@ fabric.Image.filters.Tint.fromObject = function(object) {
       this._initStateProperties();
       this.text = text;
       this.setOptions(options || { });
-      this.theta = this.angle * Math.PI / 180;
+      this._theta = this.angle * Math.PI / 180;
       this._initDimensions();
       this.setCoords();
     },
@@ -13592,6 +13600,7 @@ fabric.Image.filters.Tint.fromObject = function(object) {
      */
     setFontsize: function(value) {
       this.set('fontSize', value);
+      this._initDimensions();
       this.setCoords();
       return this;
     },
@@ -13614,6 +13623,7 @@ fabric.Image.filters.Tint.fromObject = function(object) {
      */
     setText: function(value) {
       this.set('text', value);
+      this._initDimensions();
       this.setCoords();
       return this;
     },
@@ -13626,25 +13636,11 @@ fabric.Image.filters.Tint.fromObject = function(object) {
      * @return {fabric.Text} thisArg
      * @chainable
      */
-    set: function(name, value) {
-      if (typeof name == 'object') {
-        for (var prop in name) {
-          this.set(prop, name[prop]);
-        }
+    _set: function(name, value) {
+      if (name === 'fontFamily' && this.path) {
+        this.path = this.path.replace(/(.*?)([^\/]*)(\.font\.js)/, '$1' + value + '$3');
       }
-      else {
-		  if (name === 'angle') {
-			  this.setAngle(value);
-		  }
-		  else {
-			  this[name] = value;
-		  }
-
-        if (name === 'fontFamily' && this.path) {
-          this.path = this.path.replace(/(.*?)([^\/]*)(\.font\.js)/, '$1' + value + '$3');
-        }
-      }
-      return this;
+      this.callSuper('_set', name, value);
     }
   });
 
