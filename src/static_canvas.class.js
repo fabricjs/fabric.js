@@ -608,8 +608,12 @@
      * @return {String}
      */
     toDataURL: function (format, quality) {
+      var canvasEl = this.upperCanvasEl || this.lowerCanvasEl;
+
       this.renderAll(true);
-      var data = (this.upperCanvasEl || this.lowerCanvasEl).toDataURL('image/' + format, quality);
+      var data = (fabric.StaticCanvas.supports('toDataURLWithQuality'))
+                   ? canvasEl.toDataURL('image/' + format, quality)
+                   : canvasEl.toDataURL('image/' + format);
       this.renderAll();
       return data;
     },
@@ -1033,7 +1037,7 @@
     EMPTY_JSON: '{"objects": [], "background": "white"}',
 
     /**
-     * Takes &lt;canvas> element and transforms its data in such way that it becomes grayscale
+     * Takes <canvas> element and transforms its data in such way that it becomes grayscale
      * @static
      * @method toGrayscale
      * @param {HTMLCanvasElement} canvasEl
@@ -1067,7 +1071,7 @@
      *
      * @method supports
      * @param methodName {String} Method to check support for;
-     *                            Could be one of "getImageData" or "toDataURL"
+     *                            Could be one of "getImageData", "toDataURL" or "toDataURLWithQuality"
      * @return {Boolean | null} `true` if method is supported (or at least exists),
      *                          `null` if canvas element or context can not be initialized
      */
@@ -1093,6 +1097,14 @@
 
         case 'toDataURL':
           return typeof el.toDataURL !== 'undefined';
+
+        case 'toDataURLWithQuality':
+          try {
+            el.toDataURL('image/jpeg', 0);
+            return true;
+          } catch (e) {
+            return false;
+          }
 
         default:
           return null;
