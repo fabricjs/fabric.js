@@ -626,7 +626,22 @@
 
     setTimeout(function() {
 
-      equal(40, Math.round(object.get('left')));
+      equal(40, Math.round(object.getLeft()));
+      start();
+
+    }, 1000);
+  });
+
+  asyncTest('animate multiple properties', function() {
+    var object = new fabric.Object({ left: 123, top: 124 });
+
+    object.animate({ left: 223, top: 224 });
+
+    setTimeout(function() {
+
+      equal(223, Math.round(object.get('left')));
+      equal(224, Math.round(object.get('top')));
+
       start();
 
     }, 1000);

@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL` */
 /*! Fabric.js Copyright 2008-2012, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.9.8" };
+var fabric = fabric || { version: "0.9.10" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -9010,11 +9010,44 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       return this.toObject();
     },
 
+    /**
+     * @method setGradientFill
+     */
     setGradientFill: function(options) {
       this.set('fill', fabric.Gradient.forObject(this, options));
     },
 
-    animate: function(property, to, options) {
+    /**
+     * @method animate
+     *
+     * As object — multiple properties
+     *
+     * object.animate({ left: ..., top: ... });
+     * object.animate({ left: ..., top: ... }, { duration: ... });
+     *
+     * As string — one property
+     *
+     * object.animate('left', ...);
+     * object.animate('left', { duration: ... });
+     *
+     */
+    animate: function() {
+      if (arguments[0] && typeof arguments[0] == 'object') {
+        for (var prop in arguments[0]) {
+          this._animate(prop, arguments[0][prop], arguments[1]);
+        }
+      }
+      else {
+        this._animate.apply(this, arguments);
+      }
+      return this;
+    },
+
+    /**
+     * @private
+     * @method _animate
+     */
+    _animate: function(property, to, options) {
       var obj = this;
 
       options || (options = { });
