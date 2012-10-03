@@ -8685,10 +8685,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
       for (var i in this.oCoords) {
         if (i === 'mtr' && !this.hasRotatingPoint) {
-          return false;
+          continue;
         }
         if (this.lockUniScaling && (i === 'mt' || i === 'mr' || i === 'mb' || i === 'ml')) {
-          return false;
+          continue;
         }
 
         lines = this._getImageLines(this.oCoords[i].corner, i);
