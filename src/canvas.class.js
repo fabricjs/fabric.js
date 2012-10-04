@@ -535,8 +535,9 @@
             //            y = y < 0 ? 0 : y;
         }
 
+        var pixels
         var transparent = true;
-        var imageData = cacheContext.getImageData(x, y, this.transparencyTolerance * 2, this.transparencyTolerance * 2);
+        var imageData = cacheContext.getImageData(x, y, (this.transparencyTolerance * 2) + 1, (this.transparencyTolerance * 2) + 1);
         //Split image data - for tolerance > 1, pixelDataSize = 4;
         for (var i = 3; i < imageData.data.length; i += 4) {
             var temp = imageData.data[i];
