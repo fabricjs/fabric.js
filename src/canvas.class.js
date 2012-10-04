@@ -524,8 +524,7 @@
         var cacheContext = this.contextCache;
 
         //clone target and add to cache canvas
-        var tempObj = target.clone();
-        this._draw(cacheContext, tempObj);
+        this._draw(cacheContext, target);
 
         //If tolerance is > 0 adjust start coords to take into account. If moves off Canvas fix to 0
         if (this.transparencyTolerance > 0) {
@@ -545,7 +544,7 @@
             if (transparent === false) break; //Stop if colour found
         }
 
-        tempObj = imageData = null;
+        imageData = null;
         this.clearContext(cacheContext);
         return transparent;
     },
