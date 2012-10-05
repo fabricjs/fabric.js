@@ -639,6 +639,11 @@
       this.currentWidth = (this.width + strokeWidth) * this.scaleX + padding * 2;
       this.currentHeight = (this.height + strokeWidth) * this.scaleY + padding * 2;
 
+      //If negative width, make positive. Fixes selection issues on paths
+      if (this.currentWidth < 0) {
+          this.currentWidth = Math.abs(this.currentWidth) * 1;
+      }
+
       this._hypotenuse = Math.sqrt(
         Math.pow(this.currentWidth / 2, 2) +
         Math.pow(this.currentHeight / 2, 2));

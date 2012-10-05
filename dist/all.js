@@ -6536,8 +6536,6 @@ fabric.util.string = {
         if (this.transparencyTolerance > 0) {
             x - this.transparencyTolerance > 0 ? x -= this.transparencyTolerance : x = 0;
             y - this.transparencyTolerance > 0 ? y -= this.transparencyTolerance : y = 0;
-            //            x = x < 0 ? 0 : x;
-            //            y = y < 0 ? 0 : y;
         }
 
         var transparent = true;
@@ -8246,6 +8244,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
       this.currentWidth = (this.width + strokeWidth) * this.scaleX + padding * 2;
       this.currentHeight = (this.height + strokeWidth) * this.scaleY + padding * 2;
+
+      //If negative width, make positive. Fixes selection issues on paths
+      if(this.currentWidth < 0){
+        this.currentWidth = Math.abs(this.currentWidth) * 1;
+      }
 
       this._hypotenuse = Math.sqrt(
         Math.pow(this.currentWidth / 2, 2) +
