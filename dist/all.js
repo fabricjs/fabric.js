@@ -2632,28 +2632,7 @@ fabric.util.string = {
    */
   function getPointer(event) {
     // TODO (kangax): this method needs fixing
-    var element = event.target || event.srcElement,
-        scrollLeft = 0,
-        scrollTop = 0,
-        firstFixedAncestor;
-    
-    while (element.parentNode && !firstFixedAncestor) {
-      
-      element = element.parentNode;
-      
-      if (!firstFixedAncestor) {
-        if (element !== document && fabric.util.getElementPosition(element) == 'fixed') firstFixedAncestor = element;
-      };
-      
-      scrollLeft += element.scrollLeft || 0;
-      scrollTop += element.scrollTop || 0;
-      
-    }
-    
-    return {
-      x: event.clientX + scrollLeft,
-      y: event.clientY + scrollTop
-    };
+    return { x: pointerX(event), y: pointerY(event) };
   }
 
   function pointerX(event) {
@@ -2881,16 +2860,6 @@ fabric.util.string = {
     while (element);
     return ({ left: valueL, top: valueT });
   }
-  
-  function getElementPosition(element) {
-    if (fabric.canGetComputedStyle) {
-      return document.defaultView.getComputedStyle(element).position;
-    } else {
-      var value = element.style['position'];
-      if (!value && element.currentStyle) value = element.currentStyle['position'];
-      return value;
-    }
-  }
 
   (function () {
     var style = fabric.document.documentElement.style;
@@ -2992,7 +2961,6 @@ fabric.util.string = {
   fabric.util.addClass = addClass;
   fabric.util.wrapElement = wrapElement;
   fabric.util.getElementOffset = getElementOffset;
-  fabric.util.getElementPosition = getElementPosition;
   
 })();
 (function(){

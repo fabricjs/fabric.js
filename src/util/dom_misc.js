@@ -116,16 +116,6 @@
     return ({ left: valueL, top: valueT });
   }
 
-  function getElementPosition(element) {
-      if (fabric.canGetComputedStyle) {
-          return document.defaultView.getComputedStyle(element).position;
-      } else {
-          var value = element.style['position'];
-          if (!value && element.currentStyle) value = element.currentStyle['position'];
-          return value;
-      }
-  }
-
   (function () {
     var style = fabric.document.documentElement.style;
 
@@ -226,5 +216,5 @@
   fabric.util.addClass = addClass;
   fabric.util.wrapElement = wrapElement;
   fabric.util.getElementOffset = getElementOffset;
-  fabric.util.getElementPosition = getElementPosition;
+  
 })();
