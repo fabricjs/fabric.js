@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL` */
 /*! Fabric.js Copyright 2008-2012, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.9.10" };
+var fabric = fabric || { version: "0.9.11" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -5470,8 +5470,12 @@ fabric.util.string = {
      * @return {String}
      */
     toDataURL: function (format, quality) {
+      var canvasEl = this.upperCanvasEl || this.lowerCanvasEl;
+
       this.renderAll(true);
-      var data = (this.upperCanvasEl || this.lowerCanvasEl).toDataURL('image/' + format, quality);
+      var data = (fabric.StaticCanvas.supports('toDataURLWithQuality'))
+                   ? canvasEl.toDataURL('image/' + format, quality)
+                   : canvasEl.toDataURL('image/' + format);
       this.renderAll();
       return data;
     },
@@ -5895,7 +5899,7 @@ fabric.util.string = {
     EMPTY_JSON: '{"objects": [], "background": "white"}',
 
     /**
-     * Takes &lt;canvas> element and transforms its data in such way that it becomes grayscale
+     * Takes <canvas> element and transforms its data in such way that it becomes grayscale
      * @static
      * @method toGrayscale
      * @param {HTMLCanvasElement} canvasEl
@@ -5929,7 +5933,7 @@ fabric.util.string = {
      *
      * @method supports
      * @param methodName {String} Method to check support for;
-     *                            Could be one of "getImageData" or "toDataURL"
+     *                            Could be one of "getImageData", "toDataURL" or "toDataURLWithQuality"
      * @return {Boolean | null} `true` if method is supported (or at least exists),
      *                          `null` if canvas element or context can not be initialized
      */
@@ -5955,6 +5959,14 @@ fabric.util.string = {
 
         case 'toDataURL':
           return typeof el.toDataURL !== 'undefined';
+
+        case 'toDataURLWithQuality':
+          try {
+            el.toDataURL('image/jpeg', 0);
+            return true;
+          } catch (e) {
+            return false;
+          }
 
         default:
           return null;
@@ -8025,7 +8037,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
       if (this.active && !noTransform) {
         this.drawBorders(ctx);
-        this.hideCorners || this.drawCorners(ctx);
+        this.drawCorners(ctx);
       }
       ctx.restore();
     },
@@ -8266,7 +8278,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         ~~(h + padding2 + strokeWidth * this.scaleY)
       );
 
-      if (this.hasRotatingPoint && !this.hideCorners && !this.lockRotation) {
+      if (this.hasRotatingPoint && !this.lockRotation && this.hasControls) {
 
         var rotateHeight = (
           this.flipY
@@ -8684,26 +8696,30 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
           lines;
 
       for (var i in this.oCoords) {
+
         if (i === 'mtr' && !this.hasRotatingPoint) {
           continue;
         }
+
         if (this.lockUniScaling && (i === 'mt' || i === 'mr' || i === 'mb' || i === 'ml')) {
           continue;
         }
 
         lines = this._getImageLines(this.oCoords[i].corner, i);
+
         // debugging
+
         // canvas.contextTop.fillRect(lines.bottomline.d.x, lines.bottomline.d.y, 2, 2);
-        //         canvas.contextTop.fillRect(lines.bottomline.o.x, lines.bottomline.o.y, 2, 2);
-        //
-        //         canvas.contextTop.fillRect(lines.leftline.d.x, lines.leftline.d.y, 2, 2);
-        //         canvas.contextTop.fillRect(lines.leftline.o.x, lines.leftline.o.y, 2, 2);
-        //
-        //         canvas.contextTop.fillRect(lines.topline.d.x, lines.topline.d.y, 2, 2);
-        //         canvas.contextTop.fillRect(lines.topline.o.x, lines.topline.o.y, 2, 2);
-        //
-        //         canvas.contextTop.fillRect(lines.rightline.d.x, lines.rightline.d.y, 2, 2);
-        //         canvas.contextTop.fillRect(lines.rightline.o.x, lines.rightline.o.y, 2, 2);
+        // canvas.contextTop.fillRect(lines.bottomline.o.x, lines.bottomline.o.y, 2, 2);
+
+        // canvas.contextTop.fillRect(lines.leftline.d.x, lines.leftline.d.y, 2, 2);
+        // canvas.contextTop.fillRect(lines.leftline.o.x, lines.leftline.o.y, 2, 2);
+
+        // canvas.contextTop.fillRect(lines.topline.d.x, lines.topline.d.y, 2, 2);
+        // canvas.contextTop.fillRect(lines.topline.o.x, lines.topline.o.y, 2, 2);
+
+        // canvas.contextTop.fillRect(lines.rightline.d.x, lines.rightline.d.y, 2, 2);
+        // canvas.contextTop.fillRect(lines.rightline.o.x, lines.rightline.o.y, 2, 2);
 
         xpoints = this._findCrossPoints(ex, ey, lines);
         if (xpoints % 2 == 1 && xpoints != 0) {

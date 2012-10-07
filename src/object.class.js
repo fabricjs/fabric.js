@@ -526,7 +526,7 @@
 
       if (this.active && !noTransform) {
         this.drawBorders(ctx);
-        this.hideCorners || this.drawCorners(ctx);
+        this.drawCorners(ctx);
       }
       ctx.restore();
     },
@@ -767,7 +767,7 @@
         ~~(h + padding2 + strokeWidth * this.scaleY)
       );
 
-      if (this.hasRotatingPoint && !this.hideCorners && !this.lockRotation) {
+      if (this.hasRotatingPoint && !this.lockRotation && this.hasControls) {
 
         var rotateHeight = (
           this.flipY
