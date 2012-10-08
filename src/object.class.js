@@ -641,7 +641,7 @@
 
       //If negative width, make positive. Fixes selection issues on paths
       if (this.currentWidth < 0) {
-          this.currentWidth = Math.abs(this.currentWidth) * 1;
+          this.currentWidth = Math.abs(this.currentWidth);
       }
 
       this._hypotenuse = Math.sqrt(
