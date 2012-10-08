@@ -1023,8 +1023,7 @@
         G_vmlCanvasManager.initElement(el);
       }
 
-      this.setCoords();
-      el.width  = this.getBoundingRectWidth();
+      el.width = this.getBoundingRectWidth();
       el.height = this.getBoundingRectHeight();
 
       fabric.util.wrapElement(el, 'div');

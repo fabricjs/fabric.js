@@ -8534,8 +8534,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         G_vmlCanvasManager.initElement(el);
       }
 
-      this.setCoords();
-      el.width  = this.getBoundingRectWidth();
+      el.width = this.getBoundingRectWidth();
       el.height = this.getBoundingRectHeight();
 
       fabric.util.wrapElement(el, 'div');
@@ -11602,7 +11601,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      */
     toObject: function() {
       return extend(this.callSuper('toObject'), {
-        objects: invoke(this.objects, 'clone')
+        objects: invoke(this.objects, 'toObject')
       });
     },
 

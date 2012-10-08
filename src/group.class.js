@@ -193,7 +193,7 @@
      */
     toObject: function() {
       return extend(this.callSuper('toObject'), {
-        objects: invoke(this.objects, 'clone')
+        objects: invoke(this.objects, 'toObject')
       });
     },
 
