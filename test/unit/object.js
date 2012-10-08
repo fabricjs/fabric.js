@@ -296,6 +296,20 @@
     equal(cObj.get('scaleY'), 100/560);
   });
 
+  test('scaleToWidth on rotated object', function() {
+    var obj = new fabric.Object({ height: 100, width: 100 });
+    obj.rotate(45);
+    obj.scaleToWidth(200);
+    equal(Math.round(obj.getBoundingRectWidth()), 200);
+  });
+
+  test('scaleToHeight on rotated object', function() {
+    var obj = new fabric.Object({ height: 100, width: 100 });
+    obj.rotate(45);
+    obj.scaleToHeight(300);
+    equal(Math.round(obj.getBoundingRectHeight()), 300);
+  });
+
   test('setOpacity', function() {
     var cObj = new fabric.Object();
     ok(typeof cObj.setOpacity == 'function');

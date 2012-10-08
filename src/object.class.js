@@ -559,29 +559,34 @@
     scale: function(value) {
       this.scaleX = value;
       this.scaleY = value;
+      this.setCoords();
       return this;
     },
 
     /**
-     * Scales an object to a given width (scaling by x/y equally)
+     * Scales an object to a given width, with respect to bounding box (scaling by x/y equally)
      * @method scaleToWidth
      * @param value {Number} new width value
      * @return {fabric.Object} thisArg
      * @chainable
      */
     scaleToWidth: function(value) {
-      return this.scale(value / this.width);
+      // adjust to bounding rect factor so that rotated shapes would fit as well
+      var boundingRectFactor = this.getBoundingRectWidth() / this.getWidth();
+      return this.scale(value / this.width / boundingRectFactor);
     },
 
     /**
-     * Scales an object to a given height (scaling by x/y equally)
+     * Scales an object to a given height, with respect to bounding box (scaling by x/y equally)
      * @method scaleToHeight
      * @param value {Number} new height value
      * @return {fabric.Object} thisArg
      * @chainable
      */
     scaleToHeight: function(value) {
-      return this.scale(value / this.height);
+      // adjust to bounding rect factor so that rotated shapes would fit as well
+      var boundingRectFactor = this.getBoundingRectHeight() / this.getHeight();
+      return this.scale(value / this.height / boundingRectFactor);
     },
 
     /**
@@ -710,6 +715,7 @@
      * @return {Number} width value
      */
     getBoundingRectWidth: function() {
+      this.oCoords || this.setCoords();
       var xCoords = [this.oCoords.tl.x, this.oCoords.tr.x, this.oCoords.br.x, this.oCoords.bl.x];
       var minX = fabric.util.array.min(xCoords);
       var maxX = fabric.util.array.max(xCoords);
@@ -722,6 +728,7 @@
      * @return {Number} height value
      */
     getBoundingRectHeight: function() {
+      this.oCoords || this.setCoords();
       var yCoords = [this.oCoords.tl.y, this.oCoords.tr.y, this.oCoords.br.y, this.oCoords.bl.y];
       var minY = fabric.util.array.min(yCoords);
       var maxY = fabric.util.array.max(yCoords);
