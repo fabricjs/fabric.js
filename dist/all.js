@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL` */
 /*! Fabric.js Copyright 2008-2012, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.9.12" };
+var fabric = fabric || { version: "0.9.13" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -6025,6 +6025,7 @@ fabric.util.string = {
 
     this._initStatic(el, options);
     this._initInteractive();
+    this._createCacheCanvas();
 
     fabric.Canvas.activeInstance = this;
   };
@@ -6118,6 +6119,10 @@ fabric.util.string = {
      * @type String
      */
     containerClass:        'canvas-container',
+
+    perPixelTargetFind:     false,
+
+    targetFindTolerance: 0,
 
     _initInteractive: function() {
       this._currentTransform = null;
@@ -6505,6 +6510,49 @@ fabric.util.string = {
         y -= activeGroup.top;
       }
       return { x: x, y: y };
+    },
+
+    _isTargetTransparent: function (target, x, y) {
+        var cacheContext = this.contextCache;
+
+        var hasBorders = target.hasBorders, transparentCorners = target.transparentCorners;
+        target.hasBorders = target.transparentCorners = false;
+
+        this._draw(cacheContext, target);
+
+        target.hasBorders = hasBorders;
+        target.transparentCorners = transparentCorners;
+
+        // If tolerance is > 0 adjust start coords to take into account. If moves off Canvas fix to 0
+        if (this.targetFindTolerance > 0) {
+          if (x > this.targetFindTolerance) {
+            x -= this.targetFindTolerance;
+          }
+          else {
+            x = 0;
+          }
+          if (y > this.targetFindTolerance) {
+            y -= this.targetFindTolerance;
+          }
+          else {
+            y = 0;
+          }
+        }
+
+        var isTransparent = true;
+        var imageData = cacheContext.getImageData(
+          x, y, (this.targetFindTolerance * 2) || 1, (this.targetFindTolerance * 2) || 1);
+
+        // Split image data - for tolerance > 1, pixelDataSize = 4;
+        for (var i = 3; i < imageData.data.length; i += 4) {
+            var temp = imageData.data[i];
+            isTransparent = temp <= 0;
+            if (isTransparent === false) break; //Stop if colour found
+        }
+
+        imageData = null;
+        this.clearContext(cacheContext);
+        return isTransparent;
     },
 
     /**
@@ -6899,9 +6947,25 @@ fabric.util.string = {
       }
 
       // then check all of the objects on canvas
+      // Cache all targets where their bounding box contains point.
+      var possibleTargets = [];
       for (var i = this._objects.length; i--; ) {
         if (this._objects[i] && this.containsPoint(e, this._objects[i])) {
-          target = this._objects[i];
+          if (this.perPixelTargetFind || this._objects[i].perPixelTargetFind) {
+            possibleTargets[possibleTargets.length] = this._objects[i];
+          }
+          else {
+            target = this._objects[i];
+            this.relatedTarget = target;
+            break;
+          }
+        }
+      }
+      for (var i = 0, len = possibleTargets.length; i < len; i++) {
+        var pointer = this.getPointer(e);
+        var isTransparent = this._isTargetTransparent(possibleTargets[i], pointer.x, pointer.y);
+        if (!isTransparent) {
+          target = possibleTargets[i];
           this.relatedTarget = target;
           break;
         }
@@ -6937,6 +7001,13 @@ fabric.util.string = {
 
       this._applyCanvasStyle(this.upperCanvasEl);
       this.contextTop = this.upperCanvasEl.getContext('2d');
+    },
+
+    _createCacheCanvas: function () {
+      this.cacheCanvasEl = this._createCanvasElement();
+      this.cacheCanvasEl.setAttribute('width', this.width);
+      this.cacheCanvasEl.setAttribute('height', this.height);
+      this.contextCache = this.cacheCanvasEl.getContext('2d');
     },
 
     /**
@@ -7607,6 +7678,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
     /**
      * @property
+     * @type Boolean
+     */
+    transparentCorners:       true,
+
+    /**
+     * @property
      * @type Number
      */
     padding:                  0,
@@ -7718,9 +7795,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      * @property
      * @type Number
      */
-    _theta:                    0,
+    _theta:                   0,
 
-    includeDefaultValues:      true,
+    perPixelTargetFind:       false,
+
+    includeDefaultValues:     true,
 
     /**
      * List of properties to consider when checking if state of an object is changed (fabric.Object#hasStateChanged);
@@ -7824,7 +7903,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         selectable:       this.selectable,
         hasControls:      this.hasControls,
         hasBorders:       this.hasBorders,
-        hasRotatingPoint: this.hasRotatingPoint
+        hasRotatingPoint: this.hasRotatingPoint,
+        transparentCorners: this.transparentCorners,
+        perPixelTargetFind: this.perPixelTargetFind
       };
 
       if (!this.includeDefaultValues) {
@@ -8391,7 +8472,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
           scaleOffsetSizeX = (size2 - size) / this.scaleX,
           scaleOffsetSizeY = (size2 - size) / this.scaleY,
           height = this.height,
-          width = this.width;
+          width = this.width,
+          methodName = this.transparentCorners ? 'strokeRect' : 'fillRect';
 
       ctx.save();
 
@@ -8405,28 +8487,28 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       _top = top - scaleOffsetY - strokeWidth2 - paddingY;
 
       ctx.clearRect(_left, _top, sizeX, sizeY);
-      ctx.strokeRect(_left, _top, sizeX, sizeY);
+      ctx[methodName](_left, _top, sizeX, sizeY);
 
       // top-right
       _left = left + width - scaleOffsetX + strokeWidth2 + paddingX;
       _top = top - scaleOffsetY - strokeWidth2 - paddingY;
 
       ctx.clearRect(_left, _top, sizeX, sizeY);
-      ctx.strokeRect(_left, _top, sizeX, sizeY);
+      ctx[methodName](_left, _top, sizeX, sizeY);
 
       // bottom-left
       _left = left - scaleOffsetX - strokeWidth2 - paddingX;
       _top = top + height + scaleOffsetSizeY + strokeWidth2 + paddingY;
 
       ctx.clearRect(_left, _top, sizeX, sizeY);
-      ctx.strokeRect(_left, _top, sizeX, sizeY);
+      ctx[methodName](_left, _top, sizeX, sizeY);
 
       // bottom-right
       _left = left + width + scaleOffsetSizeX + strokeWidth2 + paddingX;
       _top = top + height + scaleOffsetSizeY + strokeWidth2 + paddingY;
 
       ctx.clearRect(_left, _top, sizeX, sizeY);
-      ctx.strokeRect(_left, _top, sizeX, sizeY);
+      ctx[methodName](_left, _top, sizeX, sizeY);
 
       if (!this.lockUniScaling) {
         // middle-top
@@ -8434,28 +8516,28 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         _top = top - scaleOffsetY - strokeWidth2 - paddingY;
 
         ctx.clearRect(_left, _top, sizeX, sizeY);
-        ctx.strokeRect(_left, _top, sizeX, sizeY);
+        ctx[methodName](_left, _top, sizeX, sizeY);
 
         // middle-bottom
         _left = left + width/2 - scaleOffsetX;
         _top = top + height + scaleOffsetSizeY + strokeWidth2 + paddingY;
 
         ctx.clearRect(_left, _top, sizeX, sizeY);
-        ctx.strokeRect(_left, _top, sizeX, sizeY);
+        ctx[methodName](_left, _top, sizeX, sizeY);
 
         // middle-right
         _left = left + width + scaleOffsetSizeX + strokeWidth2 + paddingX;
         _top = top + height/2 - scaleOffsetY;
 
         ctx.clearRect(_left, _top, sizeX, sizeY);
-        ctx.strokeRect(_left, _top, sizeX, sizeY);
+        ctx[methodName](_left, _top, sizeX, sizeY);
 
         // middle-left
         _left = left - scaleOffsetX - strokeWidth2 - paddingX;
         _top = top + height/2 - scaleOffsetY;
 
         ctx.clearRect(_left, _top, sizeX, sizeY);
-        ctx.strokeRect(_left, _top, sizeX, sizeY);
+        ctx[methodName](_left, _top, sizeX, sizeY);
       }
 
       // middle-top-rotate
@@ -8468,7 +8550,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
           : (top - (this.rotatingPointOffset / this.scaleY) - sizeY/2 - strokeWidth2 - paddingY);
 
         ctx.clearRect(_left, _top, sizeX, sizeY);
-        ctx.strokeRect(_left, _top, sizeX, sizeY);
+        ctx[methodName](_left, _top, sizeX, sizeY);
       }
 
       ctx.restore();

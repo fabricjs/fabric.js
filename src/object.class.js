@@ -213,9 +213,11 @@
      * @property
      * @type Number
      */
-    _theta:                    0,
+    _theta:                   0,
 
-    includeDefaultValues:      true,
+    perPixelTargetFind:       false,
+
+    includeDefaultValues:     true,
 
     /**
      * List of properties to consider when checking if state of an object is changed (fabric.Object#hasStateChanged);
@@ -319,7 +321,9 @@
         selectable:       this.selectable,
         hasControls:      this.hasControls,
         hasBorders:       this.hasBorders,
-        hasRotatingPoint: this.hasRotatingPoint
+        hasRotatingPoint: this.hasRotatingPoint,
+        transparentCorners: this.transparentCorners,
+        perPixelTargetFind: this.perPixelTargetFind
       };
 
       if (!this.includeDefaultValues) {
