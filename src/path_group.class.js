@@ -113,7 +113,7 @@
      */
     toObject: function() {
       return extend(parentToObject.call(this), {
-        paths: invoke(this.getObjects(), 'clone'),
+        paths: invoke(this.getObjects(), 'toObject'),
         sourcePath: this.sourcePath
       });
     },

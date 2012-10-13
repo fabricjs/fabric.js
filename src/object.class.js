@@ -251,7 +251,6 @@
     initialize: function(options) {
       if (options) {
         this.setOptions(options);
-        this._initGradient(options);
       }
     },
 
@@ -276,6 +275,7 @@
           this.set(prop, options[prop]);
         }
       }
+      this._initGradient(options);
     },
 
     /**

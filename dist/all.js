@@ -7833,7 +7833,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     initialize: function(options) {
       if (options) {
         this.setOptions(options);
-        this._initGradient(options);
       }
     },
 
@@ -7858,6 +7857,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
           this.set(prop, options[prop]);
         }
       }
+      this._initGradient(options);
     },
 
     /**
@@ -11363,7 +11363,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      */
     toObject: function() {
       return extend(parentToObject.call(this), {
-        paths: invoke(this.getObjects(), 'clone'),
+        paths: invoke(this.getObjects(), 'toObject'),
         sourcePath: this.sourcePath
       });
     },
