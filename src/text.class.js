@@ -133,7 +133,7 @@
     _initDimensions: function() {
       var canvasEl = fabric.document.createElement('canvas');
 
-      if (!canvasEl.getContext && typeof G_vmlCanvasManager != 'undefined') {
+      if (!canvasEl.getContext && typeof G_vmlCanvasManager !== 'undefined') {
         G_vmlCanvasManager.initElement(canvasEl);
       }
 
@@ -445,29 +445,30 @@
     _renderTextDecoration: function(ctx, textLines) {
 
       var halfOfVerticalBox = this._getTextHeight(ctx, textLines) / 2;
+      var _this = this;
 
       function renderLinesAtOffset(offset) {
         for (var i = 0, len = textLines.length; i < len; i++) {
 
           var lineWidth = ctx.measureText(textLines[i]).width;
-          var lineLeftOffset = this._getLineLeftOffset(lineWidth);
+          var lineLeftOffset = _this._getLineLeftOffset(lineWidth);
 
           ctx.fillRect(
-            (-this.width / 2) + lineLeftOffset,
-            (offset + (i * this.fontSize * this.lineHeight)) - halfOfVerticalBox,
+            (-_this.width / 2) + lineLeftOffset,
+            (offset + (i * _this.fontSize * _this.lineHeight)) - halfOfVerticalBox,
             lineWidth,
             1);
         }
       }
 
       if (this.textDecoration.indexOf('underline') > -1) {
-        renderLinesAtOffset.call(this, this.fontSize);
+        renderLinesAtOffset(this.fontSize);
       }
       if (this.textDecoration.indexOf('line-through') > -1) {
-        renderLinesAtOffset.call(this, this.fontSize / 2);
+        renderLinesAtOffset(this.fontSize / 2);
       }
       if (this.textDecoration.indexOf('overline') > -1) {
-        renderLinesAtOffset.call(this, 0);
+        renderLinesAtOffset(0);
       }
     },
 
@@ -495,7 +496,7 @@
       // Cufon doesn't play nice with textDecoration=underline if element doesn't have a parent
       container.appendChild(el);
 
-      if (typeof G_vmlCanvasManager == 'undefined') {
+      if (typeof G_vmlCanvasManager === 'undefined') {
         el.innerHTML = this.text;
       }
       else {
@@ -779,10 +780,10 @@
     }
 
     var parsedAttributes = fabric.parseAttributes(element, fabric.Text.ATTRIBUTE_NAMES);
-    var options = fabric.util.object.extend((options ? fabric.util.object.clone(options) : { }), parsedAttributes);
+    options = fabric.util.object.extend((options ? fabric.util.object.clone(options) : { }), parsedAttributes);
     var text = new fabric.Text(element.textContent, options);
 
     return text;
   };
 
-})(typeof exports != 'undefined' ? exports : this);
+})(typeof exports !== 'undefined' ? exports : this);

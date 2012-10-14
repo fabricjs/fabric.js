@@ -27,6 +27,8 @@
     'hasControls':      true,
     'hasBorders':       true,
     'hasRotatingPoint': false,
+    'transparentCorners': true,
+    'perPixelTargetFind': false,
     'text':             'x',
     'fontSize':         40,
     'fontWeight':       100,

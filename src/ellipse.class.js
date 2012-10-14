@@ -162,4 +162,4 @@
     return new fabric.Ellipse(object);
   };
 
-})(typeof exports != 'undefined' ? exports : this);
+})(typeof exports !== 'undefined' ? exports : this);

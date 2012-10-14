@@ -60,7 +60,7 @@
         ua_t = (b2.x - b1.x) * (a1.y - b1.y) - (b2.y - b1.y) * (a1.x - b1.x),
         ub_t = (a2.x - a1.x) * (a1.y - b1.y) - (a2.y - a1.y) * (a1.x - b1.x),
         u_b = (b2.y - b1.y) * (a2.x - a1.x) - (b2.x - b1.x) * (a2.y - a1.y);
-    if (u_b != 0) {
+    if (u_b !== 0) {
       var ua = ua_t / u_b,
           ub = ub_t / u_b;
       if (0 <= ua && ua <= 1 && 0 <= ub && ub <= 1) {
@@ -72,7 +72,7 @@
       }
     }
     else {
-      if (ua_t == 0 || ub_t == 0) {
+      if (ua_t === 0 || ub_t === 0) {
         result = new Intersection("Coincident");
       }
       else {
@@ -146,4 +146,4 @@
     return result;
   };
 
-})(typeof exports != 'undefined' ? exports : this);
+})(typeof exports !== 'undefined' ? exports : this);

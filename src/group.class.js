@@ -193,7 +193,7 @@
      */
     toObject: function() {
       return extend(this.callSuper('toObject'), {
-        objects: invoke(this.objects, 'clone')
+        objects: invoke(this.objects, 'toObject')
       });
     },
 
@@ -208,8 +208,11 @@
 
       var groupScaleFactor = Math.max(this.scaleX, this.scaleY);
 
-      for (var i = 0, len = this.objects.length, object; object = this.objects[i]; i++) {
+      for (var i = 0, len = this.objects.length; i < len; i++) {
+
+        var object = this.objects[i];
         var originalScaleFactor = object.borderScaleFactor;
+
         object.borderScaleFactor = groupScaleFactor;
         object.render(ctx);
         object.borderScaleFactor = originalScaleFactor;
@@ -239,7 +242,7 @@
      */
     complexity: function() {
       return this.getObjects().reduce(function(total, object) {
-        total += (typeof object.complexity == 'function') ? object.complexity() : 0;
+        total += (typeof object.complexity === 'function') ? object.complexity() : 0;
         return total;
       }, 0);
     },
@@ -268,8 +271,6 @@
       var groupLeft = this.get('left'),
           groupTop = this.get('top'),
           groupAngle = this.getAngle() * (Math.PI / 180),
-          objectLeft = object.get('originalLeft'),
-          objectTop = object.get('originalTop'),
           rotatedTop = Math.cos(groupAngle) * object.get('top') + Math.sin(groupAngle) * object.get('left'),
           rotatedLeft = -Math.sin(groupAngle) * object.get('top') + Math.cos(groupAngle) * object.get('left');
 
@@ -399,7 +400,7 @@
           aX.push(o.oCoords[prop].x);
           aY.push(o.oCoords[prop].y);
         }
-      };
+      }
 
       minX = min(aX);
       maxX = max(aX);
@@ -481,4 +482,4 @@
 
   fabric.Group.async = true;
 
-})(typeof exports != 'undefined' ? exports : this);
+})(typeof exports !== 'undefined' ? exports : this);

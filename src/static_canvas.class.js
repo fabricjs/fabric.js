@@ -1,4 +1,4 @@
-(function (global) {
+(function () {
 
   "use strict";
 
@@ -103,7 +103,7 @@
      * @method onBeforeScaleRotate
      * @param {fabric.Object} target Object that's about to be scaled/rotated
      */
-    onBeforeScaleRotate: function (target) {
+    onBeforeScaleRotate: function () {
       /* NOOP */
     },
 
@@ -481,39 +481,24 @@
         this.clearContext(canvasToDrawOn);
       }
 
-      var length = this._objects.length,
-          activeGroup = this.getActiveGroup(),
+      var activeGroup = this.getActiveGroup(),
           startTime = new Date();
 
       if (this.clipTo) {
-        canvasToDrawOn.save();
-        canvasToDrawOn.beginPath();
-        this.clipTo(canvasToDrawOn);
-        canvasToDrawOn.clip();
+        this._clipCanvas(canvasToDrawOn);
       }
 
       canvasToDrawOn.fillStyle = this.backgroundColor;
       canvasToDrawOn.fillRect(0, 0, this.width, this.height);
 
-      if (typeof this.backgroundImage == 'object') {
-        canvasToDrawOn.save();
-        canvasToDrawOn.globalAlpha = this.backgroundImageOpacity;
-
-        if (this.backgroundImageStretch) {
-            canvasToDrawOn.drawImage(this.backgroundImage, 0, 0, this.width, this.height);
-        }
-        else {
-            canvasToDrawOn.drawImage(this.backgroundImage, 0, 0);
-        }
-        canvasToDrawOn.restore();
+      if (typeof this.backgroundImage === 'object') {
+        this._drawBackroundImage(canvasToDrawOn);
       }
 
-      if (length) {
-        for (var i = 0; i < length; ++i) {
-          if (!activeGroup ||
-              (activeGroup && this._objects[i] && !activeGroup.contains(this._objects[i]))) {
-            this._draw(canvasToDrawOn, this._objects[i]);
-          }
+      for (var i = 0, length = this._objects.length; i < length; ++i) {
+        if (!activeGroup ||
+            (activeGroup && this._objects[i] && !activeGroup.contains(this._objects[i]))) {
+          this._draw(canvasToDrawOn, this._objects[i]);
         }
       }
 
@@ -542,6 +527,26 @@
       this.fire('after:render');
 
       return this;
+    },
+
+    _clipCanvas: function(canvasToDrawOn) {
+      canvasToDrawOn.save();
+      canvasToDrawOn.beginPath();
+      this.clipTo(canvasToDrawOn);
+      canvasToDrawOn.clip();
+    },
+
+    _drawBackroundImage: function(canvasToDrawOn) {
+      canvasToDrawOn.save();
+      canvasToDrawOn.globalAlpha = this.backgroundImageOpacity;
+
+      if (this.backgroundImageStretch) {
+        canvasToDrawOn.drawImage(this.backgroundImage, 0, 0, this.width, this.height);
+      }
+      else {
+        canvasToDrawOn.drawImage(this.backgroundImage, 0, 0);
+      }
+      canvasToDrawOn.restore();
     },
 
     /**
@@ -608,8 +613,12 @@
      * @return {String}
      */
     toDataURL: function (format, quality) {
+      var canvasEl = this.upperCanvasEl || this.lowerCanvasEl;
+
       this.renderAll(true);
-      var data = (this.upperCanvasEl || this.lowerCanvasEl).toDataURL('image/' + format, quality);
+      var data = (fabric.StaticCanvas.supports('toDataURLWithQuality'))
+                   ? canvasEl.toDataURL('image/' + format, quality)
+                   : canvasEl.toDataURL('image/' + format);
       this.renderAll();
       return data;
     },
@@ -772,8 +781,9 @@
       var data = {
         objects: this._objects.map(function (instance) {
           // TODO (kangax): figure out how to clean this up
+          var originalValue;
           if (!this.includeDefaultValues) {
-            var originalValue = instance.includeDefaultValues;
+            originalValue = instance.includeDefaultValues;
             instance.includeDefaultValues = false;
           }
           var object = instance[methodName]();
@@ -1033,7 +1043,7 @@
     EMPTY_JSON: '{"objects": [], "background": "white"}',
 
     /**
-     * Takes &lt;canvas> element and transforms its data in such way that it becomes grayscale
+     * Takes <canvas> element and transforms its data in such way that it becomes grayscale
      * @static
      * @method toGrayscale
      * @param {HTMLCanvasElement} canvasEl
@@ -1067,7 +1077,7 @@
      *
      * @method supports
      * @param methodName {String} Method to check support for;
-     *                            Could be one of "getImageData" or "toDataURL"
+     *                            Could be one of "getImageData", "toDataURL" or "toDataURLWithQuality"
      * @return {Boolean | null} `true` if method is supported (or at least exists),
      *                          `null` if canvas element or context can not be initialized
      */
@@ -1094,6 +1104,14 @@
         case 'toDataURL':
           return typeof el.toDataURL !== 'undefined';
 
+        case 'toDataURLWithQuality':
+          try {
+            el.toDataURL('image/jpeg', 0);
+            return true;
+          }
+          catch (e) { }
+          return false;
+
         default:
           return null;
       }
@@ -1108,4 +1126,4 @@
    */
   fabric.StaticCanvas.prototype.toJSON = fabric.StaticCanvas.prototype.toObject;
 
-})(typeof exports != 'undefined' ? exports : this);
+})();

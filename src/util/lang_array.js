@@ -1,7 +1,7 @@
 (function() {
-  
+
   var slice = Array.prototype.slice;
-  
+
   if (!Array.prototype.indexOf) {
     Array.prototype.indexOf = function (searchElement /*, fromIndex */ ) {
       if (this === void 0 || this === null) {
@@ -31,7 +31,7 @@
         }
       }
       return -1;
-    }
+    };
   }
 
   if (!Array.prototype.forEach) {
@@ -39,7 +39,7 @@
       for (var i = 0, len = this.length >>> 0; i < len; i++) {
         if (i in this) {
           fn.call(context, this[i], i, this);
-        }  
+        }
       }
     };
   }
@@ -148,8 +148,8 @@
    */
   function max(array, byProperty) {
     if (!array || array.length === 0) return undefined;
-    
-    var i = array.length - 1, 
+
+    var i = array.length - 1,
         result = byProperty ? array[i][byProperty] : array[i];
     if (byProperty) {
       while (i--) {
@@ -177,8 +177,8 @@
    */
   function min(array, byProperty) {
     if (!array || array.length === 0) return undefined;
-    
-    var i = array.length - 1, 
+
+    var i = array.length - 1,
         result = byProperty ? array[i][byProperty] : array[i];
 
     if (byProperty) {
@@ -204,5 +204,5 @@
     min: min,
     max: max
   };
-  
+
 })();

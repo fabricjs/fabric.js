@@ -111,11 +111,11 @@
   test('toJSON', function() {
     var emptyObjectJSON = '{"type":"object","left":0,"top":0,"width":0,"height":0,"fill":"rgb(0,0,0)",'+
                           '"overlayFill":null,"stroke":null,"strokeWidth":1,"strokeDashArray":null,"scaleX":1,"scaleY":1,"angle":0,'+
-                          '"flipX":false,"flipY":false,"opacity":1,"selectable":true,"hasControls":true,"hasBorders":true,"hasRotatingPoint":false}';
+                          '"flipX":false,"flipY":false,"opacity":1,"selectable":true,"hasControls":true,"hasBorders":true,"hasRotatingPoint":false,"transparentCorners":true,"perPixelTargetFind":false}';
 
     var augmentedJSON = '{"type":"object","left":0,"top":0,"width":122,"height":0,"fill":"rgb(0,0,0)",'+
                         '"overlayFill":null,"stroke":null,"strokeWidth":1,"strokeDashArray":null,"scaleX":1.3,"scaleY":1,"angle":0,'+
-                        '"flipX":false,"flipY":true,"opacity":0.88,"selectable":true,"hasControls":true,"hasBorders":true,"hasRotatingPoint":false}';
+                        '"flipX":false,"flipY":true,"opacity":0.88,"selectable":true,"hasControls":true,"hasBorders":true,"hasRotatingPoint":false,"transparentCorners":true,"perPixelTargetFind":false}';
 
     var cObj = new fabric.Object();
     ok(typeof cObj.toJSON == 'function');
@@ -136,7 +136,7 @@
       'overlayFill': null,
       'stroke': null,
       'strokeWidth': 1,
-	  'strokeDashArray': null,
+      'strokeDashArray': null,
       'scaleX': 1,
       'scaleY': 1,
       'angle': 0,
@@ -146,8 +146,11 @@
       'selectable': true,
       'hasControls': true,
       'hasBorders': true,
-      'hasRotatingPoint': false
-    }
+      'hasRotatingPoint': false,
+      'transparentCorners': true,
+      'perPixelTargetFind': false
+    };
+
     var augmentedObjectRepr = {
       'type': "object",
       'left': 10,
@@ -158,7 +161,7 @@
       'overlayFill': null,
       'stroke': null,
       'strokeWidth': 1,
-	  'strokeDashArray': null,
+      'strokeDashArray': null,
       'scaleX': 1,
       'scaleY': 1,
       'angle': 0,
@@ -168,8 +171,10 @@
       'selectable': false,
       'hasControls': true,
       'hasBorders': true,
-      'hasRotatingPoint': false
-    }
+      'hasRotatingPoint': false,
+      'transparentCorners': true,
+      'perPixelTargetFind': false
+    };
 
     var cObj = new fabric.Object();
     deepEqual(emptyObjectRepr, cObj.toObject());
@@ -294,6 +299,20 @@
     equal(cObj.scaleToHeight(100), cObj, 'chainable');
     equal(cObj.getHeight(), 100);
     equal(cObj.get('scaleY'), 100/560);
+  });
+
+  test('scaleToWidth on rotated object', function() {
+    var obj = new fabric.Object({ height: 100, width: 100 });
+    obj.rotate(45);
+    obj.scaleToWidth(200);
+    equal(Math.round(obj.getBoundingRectWidth()), 200);
+  });
+
+  test('scaleToHeight on rotated object', function() {
+    var obj = new fabric.Object({ height: 100, width: 100 });
+    obj.rotate(45);
+    obj.scaleToHeight(300);
+    equal(Math.round(obj.getBoundingRectHeight()), 300);
   });
 
   test('setOpacity', function() {
@@ -626,7 +645,22 @@
 
     setTimeout(function() {
 
-      equal(40, Math.round(object.get('left')));
+      equal(40, Math.round(object.getLeft()));
+      start();
+
+    }, 1000);
+  });
+
+  asyncTest('animate multiple properties', function() {
+    var object = new fabric.Object({ left: 123, top: 124 });
+
+    object.animate({ left: 223, top: 224 });
+
+    setTimeout(function() {
+
+      equal(223, Math.round(object.get('left')));
+      equal(224, Math.round(object.get('top')));
+
       start();
 
     }, 1000);

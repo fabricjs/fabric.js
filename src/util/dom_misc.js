@@ -1,5 +1,5 @@
 (function() {
-  
+
   var _slice = Array.prototype.slice;
 
   /**
@@ -20,12 +20,13 @@
    * @param {Object} arrayLike
    * @return {Array}
    */
-  function toArray(arrayLike) {
+  var toArray = function(arrayLike) {
     return _slice.call(arrayLike, 0);
-  }
+  };
 
+  var sliceCanConvertNodelists;
   try {
-    var sliceCanConvertNodelists = toArray(fabric.document.childNodes) instanceof Array;
+    sliceCanConvertNodelists = toArray(fabric.document.childNodes) instanceof Array;
   }
   catch(err) { }
 
@@ -73,7 +74,7 @@
   function addClass(element, className) {
     if ((' ' + element.className + ' ').indexOf(' ' + className + ' ') === -1) {
       element.className += (element.className ? ' ' : '') + className;
-    }  
+    }
   }
 
   /**
@@ -111,7 +112,7 @@
       valueT += element.offsetTop  || 0;
       valueL += element.offsetLeft || 0;
       element = element.offsetParent;
-    } 
+    }
     while (element);
     return ({ left: valueL, top: valueT });
   }
@@ -121,12 +122,12 @@
 
     var selectProp = 'userSelect' in style
       ? 'userSelect'
-      : 'MozUserSelect' in style 
-        ? 'MozUserSelect' 
-        : 'WebkitUserSelect' in style 
-          ? 'WebkitUserSelect' 
-          : 'KhtmlUserSelect' in style 
-            ? 'KhtmlUserSelect' 
+      : 'MozUserSelect' in style
+        ? 'MozUserSelect'
+        : 'WebkitUserSelect' in style
+          ? 'WebkitUserSelect'
+          : 'KhtmlUserSelect' in style
+            ? 'KhtmlUserSelect'
             : '';
 
     /**
@@ -143,7 +144,7 @@
       if (selectProp) {
         element.style[selectProp] = 'none';
       }
-      else if (typeof element.unselectable == 'string') {
+      else if (typeof element.unselectable === 'string') {
         element.unselectable = 'on';
       }
       return element;
@@ -163,7 +164,7 @@
       if (selectProp) {
         element.style[selectProp] = '';
       }
-      else if (typeof element.unselectable == 'string') {
+      else if (typeof element.unselectable === 'string') {
         element.unselectable = '';
       }
       return element;
@@ -183,28 +184,28 @@
      * @param {Function} callback Callback to execute when script is finished loading
      */
     function getScript(url, callback) {
-    	var headEl = fabric.document.getElementsByTagName("head")[0],
-    	    scriptEl = fabric.document.createElement('script'), 
-    	    loading = true;
+      var headEl = fabric.document.getElementsByTagName("head")[0],
+          scriptEl = fabric.document.createElement('script'),
+          loading = true;
 
-    	scriptEl.type = 'text/javascript';
-    	scriptEl.setAttribute('runat', 'server');
+      scriptEl.type = 'text/javascript';
+      scriptEl.setAttribute('runat', 'server');
 
-    	/** @ignore */
-    	scriptEl.onload = /** @ignore */ scriptEl.onreadystatechange = function(e) {
-    	  if (loading) {
-    	    if (typeof this.readyState == 'string' && 
-    	        this.readyState !== 'loaded' && 
-    	        this.readyState !== 'complete') return;
-      	  loading = false;
-      		callback(e || fabric.window.event);
-      		scriptEl = scriptEl.onload = scriptEl.onreadystatechange = null;
-      	}
-    	};
-    	scriptEl.src = url;
-    	headEl.appendChild(scriptEl);
-    	// causes issue in Opera
-    	// headEl.removeChild(scriptEl);
+      /** @ignore */
+      scriptEl.onload = /** @ignore */ scriptEl.onreadystatechange = function(e) {
+        if (loading) {
+          if (typeof this.readyState === 'string' &&
+              this.readyState !== 'loaded' &&
+              this.readyState !== 'complete') return;
+          loading = false;
+          callback(e || fabric.window.event);
+          scriptEl = scriptEl.onload = scriptEl.onreadystatechange = null;
+        }
+      };
+      scriptEl.src = url;
+      headEl.appendChild(scriptEl);
+      // causes issue in Opera
+      // headEl.removeChild(scriptEl);
     }
 
     fabric.util.getScript = getScript;
@@ -216,5 +217,5 @@
   fabric.util.addClass = addClass;
   fabric.util.wrapElement = wrapElement;
   fabric.util.getElementOffset = getElementOffset;
-  
+
 })();

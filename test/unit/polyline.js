@@ -26,9 +26,11 @@
     'opacity':      1,
     'points':       getPoints(),
     'selectable':   true,
-    'hasControls': true,
-    'hasBorders': true,
-    'hasRotatingPoint': false
+    'hasControls':  true,
+    'hasBorders':   true,
+    'hasRotatingPoint': false,
+    'transparentCorners': true,
+    'perPixelTargetFind': false
   };
 
   QUnit.module('fabric.Polyline');
