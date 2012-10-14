@@ -21,6 +21,8 @@
     'hasControls':  true,
     'hasBorders':   true,
     'hasRotatingPoint': false,
+    'transparentCorners': true,
+    'perPixelTargetFind': false,
     'paths':        getPathObjects()
   };
 

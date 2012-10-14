@@ -139,6 +139,8 @@
       'hasControls': true,
       'hasBorders': true,
       'hasRotatingPoint': false,
+      'transparentCorners': true,
+      'perPixelTargetFind': false,
       'angle': 0,
       'flipX': false,
       'flipY': false,

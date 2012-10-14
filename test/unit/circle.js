@@ -80,6 +80,8 @@
       'hasControls': true,
       'hasBorders': true,
       'hasRotatingPoint': false,
+      'transparentCorners': true,
+      'perPixelTargetFind': false,
       'radius': 0
     };
     ok(typeof circle.toObject == 'function');
