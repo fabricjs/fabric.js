@@ -8264,11 +8264,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
       this.currentWidth = (this.width + strokeWidth) * this.scaleX + padding * 2;
       this.currentHeight = (this.height + strokeWidth) * this.scaleY + padding * 2;
-	  
-      //If width is negative, make postive. Fixes path selection issue
-      if(this.currentWidth < 0){
-        this.currentWidth = Math.abs(this.currentWidth);
-      }
 
       this._hypotenuse = Math.sqrt(
         Math.pow(this.currentWidth / 2, 2) +
