@@ -1,4 +1,4 @@
-(function (global) {
+(function () {
 
   /* EVENT HANDLING */
 
@@ -183,26 +183,26 @@
     return { x: pointerX(event), y: pointerY(event) };
   }
 
-  function pointerX(event) {
+  var pointerX = function(event) {
     var docElement = fabric.document.documentElement,
         body = fabric.document.body || { scrollLeft: 0 };
 
     // looks like in IE (<9) clientX at certain point (apparently when mouseup fires on VML element)
     // is represented as COM object, with all the consequences, like "unknown" type and error on [[Get]]
     // need to investigate later
-    return event.pageX || ((typeof event.clientX != 'unknown' ? event.clientX : 0) +
+    return event.pageX || ((typeof event.clientX !== 'unknown' ? event.clientX : 0) +
       (docElement.scrollLeft || body.scrollLeft) -
       (docElement.clientLeft || 0));
-  }
+  };
 
-  function pointerY(event) {
+  var pointerY = function(event) {
     var docElement = fabric.document.documentElement,
         body = fabric.document.body || { scrollTop: 0 };
 
-    return  event.pageY || ((typeof event.clientY != 'unknown' ? event.clientY : 0) +
+    return event.pageY || ((typeof event.clientY !== 'unknown' ? event.clientY : 0) +
        (docElement.scrollTop || body.scrollTop) -
        (docElement.clientTop || 0));
-  }
+  };
 
   if (fabric.isTouchSupported) {
     pointerX = function(event) {
@@ -217,4 +217,4 @@
 
   fabric.util.object.extend(fabric.util, fabric.Observable);
 
-})(this);
+})();

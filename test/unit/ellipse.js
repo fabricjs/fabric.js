@@ -31,7 +31,7 @@
       'overlayFill': null,
       'stroke': null,
       'strokeWidth': 1,
-	  'strokeDashArray': null,
+      'strokeDashArray': null,
       'scaleX': 1,
       'scaleY': 1,
       'angle': 0,
@@ -43,7 +43,9 @@
       'selectable': true,
       'hasControls': true,
       'hasBorders': true,
-      'hasRotatingPoint': false
+      'hasRotatingPoint': false,
+      'transparentCorners': true,
+      'perPixelTargetFind': false
     };
     ok(typeof ellipse.toObject == 'function');
     deepEqual(defaultProperties, ellipse.toObject());

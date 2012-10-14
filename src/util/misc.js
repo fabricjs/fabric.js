@@ -21,7 +21,7 @@
       array.splice(idx, 1);
     }
     return array;
-  };
+  }
 
   /**
    * Returns random number between 2 specified ones.
@@ -93,19 +93,19 @@
 
     var start = +new Date(),
       duration = options.duration || 500,
-      finish = start + duration, time, pos,
+      finish = start + duration, time,
       onChange = options.onChange || function() { },
       abort = options.abort || function() { return false; },
       easing = options.easing || function(t, b, c, d) {return -c * Math.cos(t/d * (Math.PI/2)) + c + b;},
       startValue = 'startValue' in options ? options.startValue : 0,
-      endValue = 'endValue' in options ? options.endValue : 100;
+      endValue = 'endValue' in options ? options.endValue : 100,
       byValue = options.byValue || endValue - startValue;
 
     options.onStart && options.onStart();
 
     (function tick() {
       time = +new Date();
-      currentTime = time > finish ? duration : (time - start);
+      var currentTime = time > finish ? duration : (time - start);
       onChange(easing(currentTime, startValue, byValue, duration));
       if (time > finish || abort()) {
         options.onComplete && options.onComplete();
@@ -120,7 +120,7 @@
                           fabric.window.mozRequestAnimationFrame    ||
                           fabric.window.oRequestAnimationFrame      ||
                           fabric.window.msRequestAnimationFrame     ||
-                          function(callback, element) {
+                          function(callback) {
                             fabric.window.setTimeout(callback, 1000 / 60);
                           };
   /**
@@ -193,6 +193,15 @@
     });
   }
 
+  /**
+   * Groups SVG elements (usually those retrieved from SVG document)
+   * @static
+   * @memberOf fabric.util
+   * @method groupSVGElements
+   * @param {Array} elements
+   * @param {Object} options optional
+   * @return {String} path optional
+   */
   function groupSVGElements(elements, options, path) {
     var object = elements.length > 1
       ? new fabric.PathGroup(elements, options)

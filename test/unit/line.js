@@ -24,7 +24,9 @@
     'selectable': true,
     'hasControls': true,
     'hasBorders': true,
-    'hasRotatingPoint': false
+    'hasRotatingPoint': false,
+    'transparentCorners': true,
+    'perPixelTargetFind': false
   };
 
   QUnit.module('fabric.Line');

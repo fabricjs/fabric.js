@@ -217,4 +217,4 @@
     return new fabric.Rect(object);
   };
 
-})(typeof exports != 'undefined' ? exports : this);
+})(typeof exports !== 'undefined' ? exports : this);

@@ -66,7 +66,7 @@
     var sfactor_sq = 1 / d - 0.25;
     if (sfactor_sq < 0) sfactor_sq = 0;
     var sfactor = Math.sqrt(sfactor_sq);
-    if (sweep == large) sfactor = -sfactor;
+    if (sweep === large) sfactor = -sfactor;
     var xc = 0.5 * (x0 + x1) - sfactor * (y1-y0);
     var yc = 0.5 * (y0 + y1) + sfactor * (x1-x0);
 
@@ -74,9 +74,9 @@
     var th1 = Math.atan2(y1-yc, x1-xc);
 
     var th_arc = th1-th0;
-    if (th_arc < 0 && sweep == 1){
+    if (th_arc < 0 && sweep === 1){
       th_arc += 2*Math.PI;
-    } else if (th_arc > 0 && sweep == 0) {
+    } else if (th_arc > 0 && sweep === 0) {
       th_arc -= 2 * Math.PI;
     }
 
@@ -179,7 +179,7 @@
       this.setOptions(options);
 
       if (!path) {
-        throw Error('`path` argument is required');
+        throw new Error('`path` argument is required');
       }
 
       var fromArray = _toString.call(path) === '[object Array]';
@@ -631,7 +631,7 @@
           chunks,
           parsed;
 
-      for (var i = 0, j, chunksParsed, len = this.path.length; i < len; i++) {
+      for (var i = 0, chunksParsed, len = this.path.length; i < len; i++) {
         currentPath = this.path[i];
         chunks = currentPath.slice(1).trim().replace(/(\d)-/g, '$1###-').split(/\s|,|###/);
         chunksParsed = [ currentPath.charAt(0) ];
@@ -759,4 +759,4 @@
     return new fabric.Path(parsedAttributes.d, extend(parsedAttributes, options));
   };
 
-})(typeof exports != 'undefined' ? exports : this);
+})(typeof exports !== 'undefined' ? exports : this);

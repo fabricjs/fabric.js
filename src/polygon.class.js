@@ -13,9 +13,6 @@
     return;
   }
 
-  function byX(p) { return p.x; }
-  function byY(p) { return p.y; }
-
   /**
    * @class Polygon
    * @extends fabric.Object
@@ -168,4 +165,4 @@
     return new fabric.Polygon(object.points, object);
   };
 
-})(typeof exports != 'undefined' ? exports : this);
+})(typeof exports !== 'undefined' ? exports : this);

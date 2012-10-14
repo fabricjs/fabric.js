@@ -46,7 +46,7 @@
 
   function ProtoProxy(){ }
   ProtoProxy.prototype = fabric.StaticCanvas.prototype;
-  fabric.Canvas.prototype = new ProtoProxy;
+  fabric.Canvas.prototype = new ProtoProxy();
 
   var InteractiveMethods = /** @scope fabric.Canvas.prototype */ {
 
@@ -189,7 +189,7 @@
         _this.__onMouseMove(e);
       };
 
-      this._onResize = function (e) {
+      this._onResize = function () {
         _this.calcOffset();
       };
 
@@ -216,6 +216,8 @@
      */
     __onMouseUp: function (e) {
 
+      var target;
+
       if (this.isDrawingMode && this._isCurrentlyDrawing) {
         this._finalizeDrawingPath();
         this.fire('mouse:up', { e: e });
@@ -224,9 +226,9 @@
 
       if (this._currentTransform) {
 
-        var transform = this._currentTransform,
-            target = transform.target;
+        var transform = this._currentTransform;
 
+        target = transform.target;
         if (target._scaling) {
           target._scaling = false;
         }
@@ -273,7 +275,7 @@
       }, 50);
 
       this.fire('mouse:up', { target: target, e: e });
-      target && target.fire('mouseup', { e: e })
+      target && target.fire('mouseup', { e: e });
     },
 
     /**
@@ -288,7 +290,7 @@
     __onMouseDown: function (e) {
 
       // accept only left clicks
-      var isLeftClick  = 'which' in e ? e.which == 1 : e.button == 1;
+      var isLeftClick  = 'which' in e ? e.which === 1 : e.button === 1;
       if (!isLeftClick && !fabric.isTouchSupported) return;
 
       if (this.isDrawingMode) {
@@ -324,7 +326,7 @@
         // rotate and scale will happen at the same time
         this.stateful && target.saveState();
 
-        if (corner = target._findTargetCorner(e, this._offset)) {
+        if ((corner = target._findTargetCorner(e, this._offset))) {
           this.onBeforeScaleRotate(target);
         }
 
@@ -360,6 +362,8 @@
       */
     __onMouseMove: function (e) {
 
+      var target;
+
       if (this.isDrawingMode) {
         if (this._isCurrentlyDrawing) {
           this._captureDrawingPath(e);
@@ -368,11 +372,12 @@
         return;
       }
 
-      var groupSelector = this._groupSelector;
+      var groupSelector = this._groupSelector, pointer;
 
       // We initially clicked in an empty area, so we draw a box for multiple selection.
       if (groupSelector !== null) {
-        var pointer = getPointer(e);
+        pointer = getPointer(e);
+
         groupSelector.left = pointer.x - this._offset.left - groupSelector.ex;
         groupSelector.top = pointer.y - this._offset.top - groupSelector.ey;
         this.renderTop();
@@ -386,7 +391,7 @@
         // what part of the pictures we are hovering to change the caret symbol.
         // We won't do that while dragging or rotating in order to improve the
         // performance.
-        var target = this.findTarget(e);
+        target = this.findTarget(e);
 
         if (!target) {
           // image/text was hovered-out from, we remove its borders
@@ -408,8 +413,9 @@
       }
       else {
         // object is being transformed (scaled/rotated/moved/etc.)
-        var pointer = getPointer(e),
-            x = pointer.x,
+        pointer = getPointer(e);
+
+        var x = pointer.x,
             y = pointer.y;
 
         this._currentTransform.target.isMoving = true;
@@ -596,7 +602,7 @@
           corner,
           pointer = getPointer(e);
 
-      if (corner = target._findTargetCorner(e, this._offset)) {
+      if ((corner = target._findTargetCorner(e, this._offset))) {
         action = (corner === 'ml' || corner === 'mr')
           ? 'scaleX'
           : (corner === 'mt' || corner === 'mb')
@@ -726,17 +732,14 @@
           minY = utilMin(this._freeDrawingYPoints),
           maxX = utilMax(this._freeDrawingXPoints),
           maxY = utilMax(this._freeDrawingYPoints),
-          ctx = this.contextTop,
           path = [ ],
-          xPoint,
-          yPoint,
           xPoints = this._freeDrawingXPoints,
           yPoints = this._freeDrawingYPoints;
 
       path.push('M ', xPoints[0] - minX, ' ', yPoints[0] - minY, ' ');
 
-      for (var i = 1; xPoint = xPoints[i], yPoint = yPoints[i]; i++) {
-        path.push('L ', xPoint - minX, ' ', yPoint - minY, ' ');
+      for (var i = 1, len = xPoints.length; i < len; i++) {
+        path.push('L ', xPoints[i] - minX, ' ', yPoints[i] - minY, ' ');
       }
 
       // TODO (kangax): maybe remove Path creation from here, to decouple fabric.Canvas from fabric.Path,
@@ -901,9 +904,7 @@
     },
 
     _findSelectedObjects: function (e) {
-      var target,
-          targetRegion,
-          group = [ ],
+      var group = [ ],
           x1 = this._groupSelector.ex,
           y1 = this._groupSelector.ey,
           x2 = x1 + this._groupSelector.left,
@@ -932,7 +933,7 @@
         this.setActiveObject(group[0], e);
       }
       else if (group.length > 1) {
-        var group = new fabric.Group(group);
+        group = new fabric.Group(group);
         this.setActiveGroup(group);
         group.saveCoords();
         this.fire('selection:created', { target: group });
@@ -975,11 +976,11 @@
           }
         }
       }
-      for (var i = 0, len = possibleTargets.length; i < len; i++) {
-        var pointer = this.getPointer(e);
-        var isTransparent = this._isTargetTransparent(possibleTargets[i], pointer.x, pointer.y);
+      for (var j = 0, len = possibleTargets.length; j < len; j++) {
+        pointer = this.getPointer(e);
+        var isTransparent = this._isTargetTransparent(possibleTargets[j], pointer.x, pointer.y);
         if (!isTransparent) {
-          target = possibleTargets[i];
+          target = possibleTargets[j];
           this.relatedTarget = target;
           break;
         }

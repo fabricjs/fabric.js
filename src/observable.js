@@ -52,7 +52,7 @@ fabric.Observable = {
    */
   fire: function(eventName, options) {
     if (!this.__eventListeners) {
-      this.__eventListeners = { }
+      this.__eventListeners = { };
     }
     var listenersForEvent = this.__eventListeners[eventName];
     if (!listenersForEvent) return;

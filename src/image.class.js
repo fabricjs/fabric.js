@@ -11,7 +11,7 @@
   if (global.fabric.Image) {
     fabric.warn('fabric.Image is already defined.');
     return;
-  };
+  }
 
   if (!fabric.Object) {
     fabric.warn('fabric.Object is required for fabric.Image initialization');
@@ -109,9 +109,9 @@
      * @method setBorderVisibility
      * @param {Boolean} visible When true, border is set to be visible
      */
-    setBorderVisibility: function(visible) {
+    setBorderVisibility: function() {
       this._resetWidthHeight();
-      this._adjustWidthHeightToBorders(showBorder);
+      this._adjustWidthHeightToBorders();
       this.setCoords();
     },
 
@@ -223,10 +223,10 @@
       var isLikelyNode = typeof Buffer !== 'undefined' && typeof window === 'undefined',
           imgEl = this._originalImage,
           canvasEl = fabric.document.createElement('canvas'),
-          replacement = isLikelyNode ? new (require('canvas').Image) : fabric.document.createElement('img'),
+          replacement = isLikelyNode ? new (require('canvas').Image)() : fabric.document.createElement('img'),
           _this = this;
 
-        if (!canvasEl.getContext && typeof G_vmlCanvasManager != 'undefined') {
+        if (!canvasEl.getContext && typeof G_vmlCanvasManager !== 'undefined') {
           G_vmlCanvasManager.initElement(canvasEl);
         }
 
@@ -456,4 +456,4 @@
 
   fabric.Image.async = true;
 
-})(typeof exports != 'undefined' ? exports : this);
+})(typeof exports !== 'undefined' ? exports : this);

@@ -4,7 +4,6 @@
 
   var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
-      clone = fabric.util.object.clone,
       toFixed = fabric.util.toFixed,
       capitalize = fabric.util.string.capitalize,
       getPointer = fabric.util.getPointer,
@@ -251,7 +250,6 @@
     initialize: function(options) {
       if (options) {
         this.setOptions(options);
-        this._initGradient(options);
       }
     },
 
@@ -259,7 +257,7 @@
      * @method initGradient
      */
     _initGradient: function(options) {
-      if (options.fill && typeof options.fill == 'object' && !(options.fill instanceof fabric.Gradient)) {
+      if (options.fill && typeof options.fill === 'object' && !(options.fill instanceof fabric.Gradient)) {
         this.set('fill', new fabric.Gradient(options.fill));
       }
     },
@@ -276,6 +274,7 @@
           this.set(prop, options[prop]);
         }
       }
+      this._initGradient(options);
     },
 
     /**
@@ -645,8 +644,8 @@
 
       this.currentWidth = (this.width + strokeWidth) * this.scaleX + padding * 2;
       this.currentHeight = (this.height + strokeWidth) * this.scaleY + padding * 2;
-	  
-	  //If negative width, make positive. Fixes selection issues on paths
+
+      //If negative width, make positive. Fixes selection issues on paths
       if(this.currentWidth < 0){
         this.currentWidth = Math.abs(this.currentWidth);
       }
@@ -797,8 +796,6 @@
             : -h - (strokeWidth * this.scaleY) - (padding * 2)
         ) / 2;
 
-        var rotateWidth = (-w/2);
-
         ctx.beginPath();
         ctx.moveTo(0, rotateHeight);
         ctx.lineTo(0, rotateHeight + (this.flipY ? this.rotatingPointOffset : -this.rotatingPointOffset));
@@ -821,8 +818,6 @@
           x = -this.width/2, y = -this.height/2,
           _this = this,
           padding = this.padding,
-          width = this.getWidth(),
-          height = this.getHeight(),
           dashedArrayLength = this.strokeDashArray.length;
 
       ctx.save();
@@ -831,6 +826,7 @@
       function renderSide(xMultiplier, yMultiplier) {
 
         var lineLength = 0,
+            lengthDiff = 0,
             sideLength = (yMultiplier ? _this.height : _this.width) + padding * 2;
 
         while (lineLength < sideLength) {
@@ -839,7 +835,7 @@
           lineLength += lengthOfSubPath;
 
           if (lineLength > sideLength) {
-            var lengthDiff = lineLength - sideLength;
+            lengthDiff = lineLength - sideLength;
           }
 
           // track coords
@@ -1035,7 +1031,7 @@
      */
     toDataURL: function(callback) {
       var el = fabric.document.createElement('canvas');
-      if (!el.getContext && typeof G_vmlCanvasManager != 'undefined') {
+      if (!el.getContext && typeof G_vmlCanvasManager !== 'undefined') {
         G_vmlCanvasManager.initElement(el);
       }
 
@@ -1137,7 +1133,7 @@
           tr: new fabric.Point(oCoords.tr.x, oCoords.tr.y),
           bl: new fabric.Point(oCoords.bl.x, oCoords.bl.y),
           br: new fabric.Point(oCoords.br.x, oCoords.br.y)
-        }
+        };
       }
       var thisCoords = getCoords(this.oCoords),
           otherCoords = getCoords(other.oCoords);
@@ -1171,8 +1167,7 @@
       var oCoords = this.oCoords,
           tl = new fabric.Point(oCoords.tl.x, oCoords.tl.y),
           tr = new fabric.Point(oCoords.tr.x, oCoords.tr.y),
-          bl = new fabric.Point(oCoords.bl.x, oCoords.bl.y),
-          br = new fabric.Point(oCoords.br.x, oCoords.br.y);
+          bl = new fabric.Point(oCoords.bl.x, oCoords.bl.y);
 
       return tl.x > selectionTL.x
         && tr.x < selectionBR.x
@@ -1233,7 +1228,7 @@
         // canvas.contextTop.fillRect(lines.rightline.o.x, lines.rightline.o.y, 2, 2);
 
         xpoints = this._findCrossPoints(ex, ey, lines);
-        if (xpoints % 2 == 1 && xpoints != 0) {
+        if (xpoints % 2 === 1 && xpoints !== 0) {
           this.__corner = i;
           return i;
         }
@@ -1266,7 +1261,7 @@
           continue;
         }
         // optimisation 3: vertical line case
-        if ((iLine.o.x == iLine.d.x) && (iLine.o.x >= ex)) {
+        if ((iLine.o.x === iLine.d.x) && (iLine.o.x >= ex)) {
           xi = iLine.o.x;
           yi = ey;
         }
@@ -1285,7 +1280,7 @@
           xcount += 1;
         }
         // optimisation 4: specific for square images
-        if (xcount == 2) {
+        if (xcount === 2) {
           break;
         }
       }
@@ -1298,7 +1293,7 @@
      * @private
      * @param oCoords {Object} coordinates of the image corners
      */
-    _getImageLines: function(oCoords, i) {
+    _getImageLines: function(oCoords) {
       return {
         topline: {
           o: oCoords.tl,
@@ -1316,7 +1311,7 @@
           o: oCoords.bl,
           d: oCoords.tl
         }
-      }
+      };
     },
 
     /**
@@ -1559,7 +1554,7 @@
      *
      */
     animate: function() {
-      if (arguments[0] && typeof arguments[0] == 'object') {
+      if (arguments[0] && typeof arguments[0] === 'object') {
         for (var prop in arguments[0]) {
           this._animate(prop, arguments[0][prop], arguments[1]);
         }
@@ -1583,7 +1578,7 @@
         options.from = this.get(property);
       }
 
-      if (/[+-]/.test((to + '').charAt(0))) {
+      if (/[+\-]/.test((to + '').charAt(0))) {
         to = this.get(property) + parseFloat(to);
       }
 
@@ -1736,4 +1731,4 @@
 
   });
 
-})(typeof exports != 'undefined' ? exports : this);
+})(typeof exports !== 'undefined' ? exports : this);

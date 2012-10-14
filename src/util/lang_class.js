@@ -13,7 +13,7 @@
   var addMethods = function(klass, source, parent) {
     for (var property in source) {
 
-      if (property in klass.prototype && typeof klass.prototype[property] == 'function') {
+      if (property in klass.prototype && typeof klass.prototype[property] === 'function') {
 
         klass.prototype[property] = (function(property) {
           return function() {
@@ -26,7 +26,7 @@
             if (property !== 'initialize') {
               return returnValue;
             }
-          }
+          };
         })(property);
       }
       else {
@@ -44,7 +44,7 @@
     }
   };
 
-  function subclass() { };
+  function Subclass() { }
 
   /**
    * Helper for creation of "classes"
@@ -66,8 +66,8 @@
     klass.subclasses = [ ];
 
     if (parent) {
-      subclass.prototype = parent.prototype;
-      klass.prototype = new subclass;
+      Subclass.prototype = parent.prototype;
+      klass.prototype = new Subclass();
       parent.subclasses.push(klass);
     }
     for (var i = 0, length = properties.length; i < length; i++) {

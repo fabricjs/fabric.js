@@ -91,10 +91,8 @@
        */
 
       var colorStopEls = el.getElementsByTagName('stop'),
-          el,
           offset,
           colorStops = { },
-          colorStopFromStyle,
           coords = {
             x1: el.getAttribute('x1') || 0,
             y1: el.getAttribute('y1') || 0,
@@ -166,15 +164,17 @@
   function getGradientDefs(doc) {
     var linearGradientEls = doc.getElementsByTagName('linearGradient'),
         radialGradientEls = doc.getElementsByTagName('radialGradient'),
-        el,
+        el, i,
         gradientDefs = { };
 
-    for (var i = linearGradientEls.length; i--; ) {
+    i = linearGradientEls.length;
+    for (; i--; ) {
       el = linearGradientEls[i];
       gradientDefs[el.getAttribute('id')] = el;
     }
 
-    for (var i = radialGradientEls.length; i--; ) {
+    i = radialGradientEls.length;
+    for (; i--; ) {
       el = radialGradientEls[i];
       gradientDefs[el.getAttribute('id')] = el;
     }

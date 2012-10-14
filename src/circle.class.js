@@ -141,7 +141,7 @@
     options || (options = { });
     var parsedAttributes = fabric.parseAttributes(element, fabric.Circle.ATTRIBUTE_NAMES);
     if (!isValidRadius(parsedAttributes)) {
-      throw Error('value of `r` attribute is required and can not be negative');
+      throw new Error('value of `r` attribute is required and can not be negative');
     }
     if ('left' in parsedAttributes) {
       parsedAttributes.left -= (options.width / 2) || 0;
@@ -170,4 +170,4 @@
     return new fabric.Circle(object);
   };
 
-})(typeof exports != 'undefined' ? exports : this);
+})(typeof exports !== 'undefined' ? exports : this);

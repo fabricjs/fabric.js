@@ -21,6 +21,8 @@
     'hasControls': true,
     'hasBorders': true,
     'hasRotatingPoint': false,
+    'transparentCorners': true,
+    'perPixelTargetFind': false,
     'rx': 0,
     'ry': 0
   };
