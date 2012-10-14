@@ -1,9 +1,8 @@
 {
   "globals": {
-    "__fontDefinitions":  true,
+    "fabric":             true,
     "Cufon":              true,
     "G_vmlCanvasManager": true,
-    "fabric":             true,
     "ActiveXObject":      true
   },
 
