@@ -1,4 +1,4 @@
-(function (global) {
+(function () {
 
   "use strict";
 
@@ -103,7 +103,7 @@
      * @method onBeforeScaleRotate
      * @param {fabric.Object} target Object that's about to be scaled/rotated
      */
-    onBeforeScaleRotate: function (target) {
+    onBeforeScaleRotate: function () {
       /* NOOP */
     },
 
@@ -481,39 +481,24 @@
         this.clearContext(canvasToDrawOn);
       }
 
-      var length = this._objects.length,
-          activeGroup = this.getActiveGroup(),
+      var activeGroup = this.getActiveGroup(),
           startTime = new Date();
 
       if (this.clipTo) {
-        canvasToDrawOn.save();
-        canvasToDrawOn.beginPath();
-        this.clipTo(canvasToDrawOn);
-        canvasToDrawOn.clip();
+        this._clipCanvas(canvasToDrawOn);
       }
 
       canvasToDrawOn.fillStyle = this.backgroundColor;
       canvasToDrawOn.fillRect(0, 0, this.width, this.height);
 
-      if (typeof this.backgroundImage == 'object') {
-        canvasToDrawOn.save();
-        canvasToDrawOn.globalAlpha = this.backgroundImageOpacity;
-
-        if (this.backgroundImageStretch) {
-            canvasToDrawOn.drawImage(this.backgroundImage, 0, 0, this.width, this.height);
-        }
-        else {
-            canvasToDrawOn.drawImage(this.backgroundImage, 0, 0);
-        }
-        canvasToDrawOn.restore();
+      if (typeof this.backgroundImage === 'object') {
+        this._drawBackroundImage(canvasToDrawOn);
       }
 
-      if (length) {
-        for (var i = 0; i < length; ++i) {
-          if (!activeGroup ||
-              (activeGroup && this._objects[i] && !activeGroup.contains(this._objects[i]))) {
-            this._draw(canvasToDrawOn, this._objects[i]);
-          }
+      for (var i = 0, length = this._objects.length; i < length; ++i) {
+        if (!activeGroup ||
+            (activeGroup && this._objects[i] && !activeGroup.contains(this._objects[i]))) {
+          this._draw(canvasToDrawOn, this._objects[i]);
         }
       }
 
@@ -542,6 +527,26 @@
       this.fire('after:render');
 
       return this;
+    },
+
+    _clipCanvas: function(canvasToDrawOn) {
+      canvasToDrawOn.save();
+      canvasToDrawOn.beginPath();
+      this.clipTo(canvasToDrawOn);
+      canvasToDrawOn.clip();
+    },
+
+    _drawBackroundImage: function(canvasToDrawOn) {
+      canvasToDrawOn.save();
+      canvasToDrawOn.globalAlpha = this.backgroundImageOpacity;
+
+      if (this.backgroundImageStretch) {
+        canvasToDrawOn.drawImage(this.backgroundImage, 0, 0, this.width, this.height);
+      }
+      else {
+        canvasToDrawOn.drawImage(this.backgroundImage, 0, 0);
+      }
+      canvasToDrawOn.restore();
     },
 
     /**
@@ -776,8 +781,9 @@
       var data = {
         objects: this._objects.map(function (instance) {
           // TODO (kangax): figure out how to clean this up
+          var originalValue;
           if (!this.includeDefaultValues) {
-            var originalValue = instance.includeDefaultValues;
+            originalValue = instance.includeDefaultValues;
             instance.includeDefaultValues = false;
           }
           var object = instance[methodName]();
@@ -1102,9 +1108,9 @@
           try {
             el.toDataURL('image/jpeg', 0);
             return true;
-          } catch (e) {
-            return false;
           }
+          catch (e) { }
+          return false;
 
         default:
           return null;
@@ -1120,4 +1126,4 @@
    */
   fabric.StaticCanvas.prototype.toJSON = fabric.StaticCanvas.prototype.toObject;
 
-})(typeof exports != 'undefined' ? exports : this);
+})();

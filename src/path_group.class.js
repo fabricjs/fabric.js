@@ -5,7 +5,6 @@
   var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       invoke = fabric.util.array.invoke,
-      parentSet = fabric.Object.prototype.set,
       parentToObject = fabric.Object.prototype.toObject,
       camelize = fabric.util.string.camelize,
       capitalize = fabric.util.string.capitalize;
@@ -237,4 +236,4 @@
     return new fabric.PathGroup(paths, object);
   };
 
-})(typeof exports != 'undefined' ? exports : this);
+})(typeof exports !== 'undefined' ? exports : this);

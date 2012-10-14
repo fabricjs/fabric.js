@@ -9,7 +9,7 @@
    * @return {HTMLElement} Element that was passed as a first argument
    */
   function setStyle(element, styles) {
-    var elementStyle = element.style, match;
+    var elementStyle = element.style;
     if (!elementStyle) {
       return element;
     }
@@ -36,8 +36,6 @@
   var parseEl = fabric.document.createElement('div'),
       supportsOpacity = typeof parseEl.style.opacity === 'string',
       supportsFilters = typeof parseEl.style.filter === 'string',
-      view = fabric.document.defaultView,
-      supportsGCS = view && typeof view.getComputedStyle !== 'undefined',
       reOpacity = /alpha\s*\(\s*opacity\s*=\s*([^\)]+)\)/,
 
       /** @ignore */

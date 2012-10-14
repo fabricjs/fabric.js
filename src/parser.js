@@ -87,7 +87,7 @@
 
     ownAttributes = extend(ownAttributes, extend(getGlobalStylesForElement(element), fabric.parseStyleAttribute(element)));
     return extend(parentAttributes, ownAttributes);
-  };
+  }
 
   /**
    * Parses "transform" attribute, returning an array of values
@@ -218,9 +218,9 @@
             matrix = args;
             break;
         }
-      })
+      });
       return matrix;
-    }
+    };
   })();
 
   /**
@@ -240,17 +240,21 @@
     var asPairs = points.indexOf(',') > -1;
 
     points = points.split(/\s+/);
-    var parsedPoints = [ ];
+    var parsedPoints = [ ], i, len;
 
     // points could look like "10,20 30,40" or "10 20 30 40"
     if (asPairs) {
-     for (var i = 0, len = points.length; i < len; i++) {
-       var pair = points[i].split(',');
-       parsedPoints.push({ x: parseFloat(pair[0]), y: parseFloat(pair[1]) });
-     }
+      i = 0;
+      len = points.length;
+      for (; i < len; i++) {
+        var pair = points[i].split(',');
+        parsedPoints.push({ x: parseFloat(pair[0]), y: parseFloat(pair[1]) });
+      }
     }
     else {
-      for (var i = 0, len = points.length; i < len; i+=2) {
+      i = 0;
+      len = points.length;
+      for (; i < len; i+=2) {
         parsedPoints.push({ x: parseFloat(points[i]), y: parseFloat(points[i+1]) });
       }
     }
@@ -261,7 +265,7 @@
     }
 
     return parsedPoints;
-  };
+  }
 
   /**
    * Parses "style" attribute, retuning an object with values
@@ -274,22 +278,24 @@
   function parseStyleAttribute(element) {
     var oStyle = { },
         style = element.getAttribute('style');
-    if (style) {
-      if (typeof style == 'string') {
-        style = style.replace(/;$/, '').split(';').forEach(function (current) {
-            var attr = current.split(':');
-            oStyle[normalizeAttr(attr[0].trim().toLowerCase())] = attr[1].trim();
-        });
-      } else {
-        for (var prop in style) {
-          if (typeof style[prop] !== 'undefined') {
-            oStyle[normalizeAttr(prop.toLowerCase())] = style[prop];
-          }
-        }
+
+    if (!style) return oStyle;
+
+    if (typeof style === 'string') {
+      style = style.replace(/;$/, '').split(';').forEach(function (current) {
+        var attr = current.split(':');
+        oStyle[normalizeAttr(attr[0].trim().toLowerCase())] = attr[1].trim();
+      });
+    }
+    else {
+      for (var prop in style) {
+        if (typeof style[prop] === 'undefined') continue;
+        oStyle[normalizeAttr(prop.toLowerCase())] = style[prop];
       }
     }
+
     return oStyle;
-  };
+  }
 
   function resolveGradients(instances) {
     for (var i = instances.length; i--; ) {
@@ -318,7 +324,7 @@
    * @param {Function} [reviver] Method for further parsing of SVG elements, called after each fabric object created.
    */
   function parseElements(elements, callback, options, reviver) {
-    var instances = Array(elements.length), i = elements.length;
+    var instances = new Array(elements.length), i = elements.length;
 
     function checkIfDone() {
       if (--i === 0) {
@@ -359,7 +365,7 @@
         checkIfDone();
       }
     }
-  };
+  }
 
   /**
    * Returns CSS rules for a given SVG document
@@ -383,12 +389,12 @@
       styleContents = styleContents.replace(/\/\*[\s\S]*?\*\//g, '');
 
       rules = styleContents.match(/[^{]*\{[\s\S]*?\}/g);
-      rules = rules.map(function(rule) { return rule.trim() });
+      rules = rules.map(function(rule) { return rule.trim(); });
 
       rules.forEach(function(rule) {
-        var match = rule.match(/([\s\S]*?)\s*\{([^}]*)\}/),
-            rule = match[1],
-            declaration = match[2].trim(),
+        var match = rule.match(/([\s\S]*?)\s*\{([^}]*)\}/);
+        rule = match[1];
+        var declaration = match[2].trim(),
             propertyValuePairs = declaration.replace(/;$/, '').split(/\s*;\s*/);
 
         if (!allRules[rule]) {
@@ -550,7 +556,7 @@
       * @param {String} url
       * @param {Function} callback
       */
-     get: function (url, callback) {
+     get: function () {
        /* NOOP */
      },
 
@@ -559,7 +565,7 @@
       * @param {String} url
       * @param {Object} object
       */
-     set: function (url, object) {
+     set: function () {
        /* NOOP */
      }
    };
@@ -643,7 +649,7 @@
       }
     }
     else if (fabric.window.ActiveXObject) {
-      var doc = new ActiveXObject('Microsoft.XMLDOM');
+      doc = new ActiveXObject('Microsoft.XMLDOM');
       doc.async = 'false';
       //IE chokes on DOCTYPE
       doc.loadXML(string.replace(/<!DOCTYPE[\s\S]*?(\[[\s\S]*\])*?>/i,''));
@@ -697,4 +703,4 @@
     createSVGFontFacesMarkup: createSVGFontFacesMarkup
   });
 
-})(typeof exports != 'undefined' ? exports : this);
+})(typeof exports !== 'undefined' ? exports : this);

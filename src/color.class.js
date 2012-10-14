@@ -1,14 +1,14 @@
 (function(global) {
-  
+
   "use strict";
-  
+
   var fabric = global.fabric || (global.fabric = { });
-  
+
   if (fabric.Color) {
     fabric.warn('fabric.Color is already defined.');
     return;
   }
-  
+
   /**
    * The purpose of {@link fabric.Color} is to abstract and encapsulate common color operations;
    * {@link fabric.Color} is a constructor and creates instances of {@link fabric.Color} objects.
@@ -25,11 +25,11 @@
       this._tryParsingColor(color);
     }
   }
-  
+
   fabric.Color = Color;
-  
+
   fabric.Color.prototype = /** @scope fabric.Color.prototype */ {
-    
+
     /**
      * @private
      * @method _tryParsingColor
@@ -91,19 +91,19 @@
       var source = this.getSource();
 
       var r = source[0].toString(16);
-      r = (r.length == 1) ? ('0' + r) : r;
+      r = (r.length === 1) ? ('0' + r) : r;
 
       var g = source[1].toString(16);
-      g = (g.length == 1) ? ('0' + g) : g;
+      g = (g.length === 1) ? ('0' + g) : g;
 
       var b = source[2].toString(16);
-      b = (b.length == 1) ? ('0' + b) : b;
+      b = (b.length === 1) ? ('0' + b) : b;
 
       return r.toUpperCase() + g.toUpperCase() + b.toUpperCase();
     },
 
     /**
-     * Gets value of alpha channel for this color 
+     * Gets value of alpha channel for this color
      * @method getAlpha
      * @return {Number} 0-1
      */
@@ -145,8 +145,9 @@
     toBlackWhite: function(threshold) {
       var source = this.getSource(),
           average = (source[0] * 0.3 + source[1] * 0.59 + source[2] * 0.11).toFixed(0),
-          currentAlpha = source[3],
-          threshold = threshold || 127;
+          currentAlpha = source[3];
+
+      threshold = threshold || 127;
 
       average = (Number(average) < Number(threshold)) ? 0 : 255;
       this.setSource([average, average, average, currentAlpha]);
@@ -179,14 +180,14 @@
       return this;
     }
   };
-  
+
   /**
    * Regex matching color in RGB or RGBA formats (ex: rgb(0, 0, 0), rgb(255, 100, 10, 0.5), rgb(1,1,1))
    * @static
    * @field
    */
   fabric.Color.reRGBa = /^rgba?\((\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})(?:\s*,\s*(\d+(?:\.\d+)?))?\)$/;
-  
+
   /**
    * Regex matching color in HEX format (ex: #FF5555, 010155, aff)
    * @static
@@ -203,7 +204,7 @@
   fabric.Color.fromRgb = function(color) {
     return Color.fromSource(Color.sourceFromRgb(color));
   };
-  
+
   /**
    * Returns array represenatation (ex: [100, 100, 200, 1]) of a color that's in RGB or RGBA format
    * @method sourceFromRgb
@@ -241,7 +242,7 @@
   fabric.Color.fromHex = function(color) {
     return Color.fromSource(Color.sourceFromHex(color));
   };
-  
+
   /**
    * Returns array represenatation (ex: [100, 100, 200, 1]) of a color that's in HEX format
    * @static
@@ -265,7 +266,7 @@
       ];
     }
   };
-  
+
   /**
    * Returns new color object, when given color in array representation (ex: [200, 100, 100, 0.5])
    * @static
@@ -278,4 +279,4 @@
     return oColor;
   };
 
-})(typeof exports != 'undefined' ? exports : this);
+})(typeof exports !== 'undefined' ? exports : this);

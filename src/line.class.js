@@ -4,7 +4,6 @@
 
   var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
-      parentSet = fabric.Object.prototype.set,
       coordProps = { 'x1': 1, 'x2': 1, 'y1': 1, 'y2': 1 };
 
   if (fabric.Line) {
@@ -181,4 +180,4 @@
     return new fabric.Line(points, object);
   };
 
-})(typeof exports != 'undefined' ? exports : this);
+})(typeof exports !== 'undefined' ? exports : this);

@@ -1,9 +1,9 @@
 (function(){
-  
+
   function addParamToUrl(url, param) {
     return url + (/\?/.test(url) ? '&' : '?') + param;
   }
-  
+
   var makeXHR = (function() {
     var factories = [
       function() { return new ActiveXObject("Microsoft.XMLHTTP"); },
@@ -22,8 +22,8 @@
     }
   })();
 
-  function emptyFn() { };
-  
+  function emptyFn() { }
+
   /**
    * Cross-browser abstraction for sending XMLHttpRequest
    * @method request
@@ -40,33 +40,33 @@
 
     var method = options.method ? options.method.toUpperCase() : 'GET',
         onComplete = options.onComplete || function() { },
-        request = makeXHR(),
+        xhr = makeXHR(),
         body;
-        
+
     /** @ignore */
-    request.onreadystatechange = function() {
-      if (request.readyState === 4) {
-        onComplete(request);
-        request.onreadystatechange = emptyFn;
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState === 4) {
+        onComplete(xhr);
+        xhr.onreadystatechange = emptyFn;
       }
     };
-    
+
     if (method === 'GET') {
       body = null;
-      if (typeof options.parameters == 'string') {
+      if (typeof options.parameters === 'string') {
         url = addParamToUrl(url, options.parameters);
       }
     }
 
-    request.open(method, url, true);
-    
+    xhr.open(method, url, true);
+
     if (method === 'POST' || method === 'PUT') {
-      request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+      xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
     }
 
-    request.send(body);
-    return request;
-  };
-  
+    xhr.send(body);
+    return xhr;
+  }
+
   fabric.util.request = request;
 })();
