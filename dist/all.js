@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL` */
 /*! Fabric.js Copyright 2008-2012, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.9.14" };
+var fabric = fabric || { version: "0.9.15" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -12032,18 +12032,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
     /**
      * @property
-     * @type Boolean
-     */
-    bordervisibility: false,
-
-    /**
-     * @property
-     * @type Boolean
-     */
-    cornervisibility: false,
-
-    /**
-     * @property
      * @type String
      */
     type: 'image',
@@ -12102,26 +12090,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         width: element.width,
         height: element.height
       };
-    },
-
-    /**
-     * Sets border visibility
-     * @method setBorderVisibility
-     * @param {Boolean} visible When true, border is set to be visible
-     */
-    setBorderVisibility: function() {
-      this._resetWidthHeight();
-      this._adjustWidthHeightToBorders();
-      this.setCoords();
-    },
-
-    /**
-     * Sets corner visibility
-     * @method setCornersVisibility
-     * @param {Boolean} visible When true, corners are set to be visible
-     */
-    setCornersVisibility: function(visible) {
-      this.cornervisibility = !!visible;
     },
 
     /**
@@ -12265,6 +12233,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
     /**
      * @private
+     * @method _render
      */
     _render: function(ctx) {
       ctx.drawImage(
@@ -12278,20 +12247,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
     /**
      * @private
-     */
-    _adjustWidthHeightToBorders: function(showBorder) {
-      if (showBorder) {
-        this.currentBorder = this.borderwidth;
-        this.width += (2 * this.currentBorder);
-        this.height += (2 * this.currentBorder);
-      }
-      else {
-        this.currentBorder = 0;
-      }
-    },
-
-    /**
-     * @private
+     * @method _resetWidthHeight
      */
     _resetWidthHeight: function() {
       var element = this.getElement();
@@ -12303,6 +12259,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * The Image class's initialization method. This method is automatically
      * called by the constructor.
+     * @private
      * @method _initElement
      * @param {HTMLImageElement|String} el The element representing the image
      */
@@ -12312,17 +12269,18 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     },
 
     /**
+     * @private
      * @method _initConfig
      * @param {Object} options Options object
      */
     _initConfig: function(options) {
       options || (options = { });
       this.setOptions(options);
-      this._setBorder();
       this._setWidthHeight(options);
     },
 
     /**
+     * @private
      * @method _initFilters
      * @param {Object} object Object with filters property
      */
@@ -12336,29 +12294,17 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
     /**
      * @private
-     */
-    _setBorder: function() {
-      if (this.bordervisibility) {
-        this.currentBorder = this.borderwidth;
-      }
-      else {
-        this.currentBorder = 0;
-      }
-    },
-
-    /**
-     * @private
+     * @method _setWidthHeight
+     * @param {Object} options Object with width/height properties
      */
     _setWidthHeight: function(options) {
-      var sidesBorderWidth = 2 * this.currentBorder;
-
       this.width = 'width' in options
         ? options.width
-        : ((this.getElement().width || 0) + sidesBorderWidth);
+        : (this.getElement().width || 0);
 
       this.height = 'height' in options
         ? options.height
-        : ((this.getElement().height || 0) + sidesBorderWidth);
+        : (this.getElement().height || 0);
     },
 
     /**

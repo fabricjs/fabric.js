@@ -27,18 +27,6 @@
 
     /**
      * @property
-     * @type Boolean
-     */
-    bordervisibility: false,
-
-    /**
-     * @property
-     * @type Boolean
-     */
-    cornervisibility: false,
-
-    /**
-     * @property
      * @type String
      */
     type: 'image',
@@ -97,26 +85,6 @@
         width: element.width,
         height: element.height
       };
-    },
-
-    /**
-     * Sets border visibility
-     * @method setBorderVisibility
-     * @param {Boolean} visible When true, border is set to be visible
-     */
-    setBorderVisibility: function() {
-      this._resetWidthHeight();
-      this._adjustWidthHeightToBorders();
-      this.setCoords();
-    },
-
-    /**
-     * Sets corner visibility
-     * @method setCornersVisibility
-     * @param {Boolean} visible When true, corners are set to be visible
-     */
-    setCornersVisibility: function(visible) {
-      this.cornervisibility = !!visible;
     },
 
     /**
@@ -260,6 +228,7 @@
 
     /**
      * @private
+     * @method _render
      */
     _render: function(ctx) {
       ctx.drawImage(
@@ -273,20 +242,7 @@
 
     /**
      * @private
-     */
-    _adjustWidthHeightToBorders: function(showBorder) {
-      if (showBorder) {
-        this.currentBorder = this.borderwidth;
-        this.width += (2 * this.currentBorder);
-        this.height += (2 * this.currentBorder);
-      }
-      else {
-        this.currentBorder = 0;
-      }
-    },
-
-    /**
-     * @private
+     * @method _resetWidthHeight
      */
     _resetWidthHeight: function() {
       var element = this.getElement();
@@ -298,6 +254,7 @@
     /**
      * The Image class's initialization method. This method is automatically
      * called by the constructor.
+     * @private
      * @method _initElement
      * @param {HTMLImageElement|String} el The element representing the image
      */
@@ -307,17 +264,18 @@
     },
 
     /**
+     * @private
      * @method _initConfig
      * @param {Object} options Options object
      */
     _initConfig: function(options) {
       options || (options = { });
       this.setOptions(options);
-      this._setBorder();
       this._setWidthHeight(options);
     },
 
     /**
+     * @private
      * @method _initFilters
      * @param {Object} object Object with filters property
      */
@@ -331,29 +289,17 @@
 
     /**
      * @private
-     */
-    _setBorder: function() {
-      if (this.bordervisibility) {
-        this.currentBorder = this.borderwidth;
-      }
-      else {
-        this.currentBorder = 0;
-      }
-    },
-
-    /**
-     * @private
+     * @method _setWidthHeight
+     * @param {Object} options Object with width/height properties
      */
     _setWidthHeight: function(options) {
-      var sidesBorderWidth = 2 * this.currentBorder;
-
       this.width = 'width' in options
         ? options.width
-        : ((this.getElement().width || 0) + sidesBorderWidth);
+        : (this.getElement().width || 0);
 
       this.height = 'height' in options
         ? options.height
-        : ((this.getElement().height || 0) + sidesBorderWidth);
+        : (this.getElement().height || 0);
     },
 
     /**
