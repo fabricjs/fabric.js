@@ -130,10 +130,6 @@
     fabric.warn('fabric.Path is already defined');
     return;
   }
-  if (!fabric.Object) {
-    fabric.warn('fabric.Path requires fabric.Object');
-    return;
-  }
 
   /**
    * @private

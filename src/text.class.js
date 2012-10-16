@@ -11,10 +11,6 @@
     fabric.warn('fabric.Text is already defined');
     return;
   }
-  if (!fabric.Object) {
-    fabric.warn('fabric.Text requires fabric.Object');
-    return;
-  }
 
   /**
    * @class Text
@@ -117,9 +113,11 @@
      * @return {fabric.Text} thisArg
      */
     initialize: function(text, options) {
+      options = options || { };
+
       this._initStateProperties();
       this.text = text;
-      this.setOptions(options || { });
+      this.setOptions(options);
       this._theta = this.angle * Math.PI / 180;
       this._initDimensions();
       this.setCoords();

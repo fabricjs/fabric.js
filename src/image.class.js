@@ -13,11 +13,6 @@
     return;
   }
 
-  if (!fabric.Object) {
-    fabric.warn('fabric.Object is required for fabric.Image initialization');
-    return;
-  }
-
   /**
    * @class Image
    * @extends fabric.Object

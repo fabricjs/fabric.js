@@ -31,6 +31,8 @@
      * @return {fabric.Line} thisArg
      */
     initialize: function(points, options) {
+      options = options || { };
+
       if (!points) {
         points = [0, 0, 0, 0];
       }

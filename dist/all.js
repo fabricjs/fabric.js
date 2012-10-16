@@ -9381,6 +9381,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      * @return {fabric.Line} thisArg
      */
     initialize: function(points, options) {
+      options = options || { };
+
       if (!points) {
         points = [0, 0, 0, 0];
       }
@@ -10017,6 +10019,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      * @return {Object} thisArg
      */
     initialize: function(options) {
+      options = options || { };
+
       this._initStateProperties();
       this.callSuper('initialize', options);
       this._initRxRy();
@@ -10645,10 +10649,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
   if (fabric.Path) {
     fabric.warn('fabric.Path is already defined');
-    return;
-  }
-  if (!fabric.Object) {
-    fabric.warn('fabric.Path requires fabric.Object');
     return;
   }
 
@@ -11551,6 +11551,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      * @return {Object} thisArg
      */
     initialize: function(objects, options) {
+      options = options || { };
+
       this.objects = objects || [];
       this.originalState = { };
 
@@ -12013,11 +12015,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
   if (global.fabric.Image) {
     fabric.warn('fabric.Image is already defined.');
-    return;
-  }
-
-  if (!fabric.Object) {
-    fabric.warn('fabric.Object is required for fabric.Image initialization');
     return;
   }
 
@@ -13075,10 +13072,6 @@ fabric.Image.filters.Tint.fromObject = function(object) {
     fabric.warn('fabric.Text is already defined');
     return;
   }
-  if (!fabric.Object) {
-    fabric.warn('fabric.Text requires fabric.Object');
-    return;
-  }
 
   /**
    * @class Text
@@ -13181,9 +13174,11 @@ fabric.Image.filters.Tint.fromObject = function(object) {
      * @return {fabric.Text} thisArg
      */
     initialize: function(text, options) {
+      options = options || { };
+
       this._initStateProperties();
       this.text = text;
-      this.setOptions(options || { });
+      this.setOptions(options);
       this._theta = this.angle * Math.PI / 180;
       this._initDimensions();
       this.setCoords();

@@ -33,6 +33,8 @@
      * @return {Object} thisArg
      */
     initialize: function(objects, options) {
+      options = options || { };
+
       this.objects = objects || [];
       this.originalState = { };
 
