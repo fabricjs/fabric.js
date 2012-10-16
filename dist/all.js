@@ -11504,7 +11504,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   }
 
   /**
-   * Creates fabric.Triangle instance from an object representation
+   * Creates fabric.PathGroup instance from an object representation
    * @static
    * @method fabric.PathGroup.fromObject
    * @param {Object} object
