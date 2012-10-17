@@ -1043,7 +1043,7 @@
     EMPTY_JSON: '{"objects": [], "background": "white"}',
 
     /**
-     * Takes <canvas> element and transforms its data in such way that it becomes grayscale
+     * Takes &lt;canvas> element and transforms its data in such way that it becomes grayscale
      * @static
      * @method toGrayscale
      * @param {HTMLCanvasElement} canvasEl

@@ -16,18 +16,21 @@
   fabric.Rect = fabric.util.createClass(fabric.Object, /** @scope fabric.Rect.prototype */ {
 
     /**
+     * Type of the instance
      * @property
      * @type String
      */
     type: 'rect',
 
     /**
+     * Horizontal border radius
      * @property
      * @type Number
      */
     rx: 0,
 
     /**
+     * Vertical border radius
      * @property
      * @type Number
      */
@@ -120,7 +123,11 @@
       }
     },
 
-    // since our coordinate system differs from that of SVG
+    /**
+     * @method _normalizeLeftTopProperties
+     * @private
+     * Since coordinate system differs from that of SVG
+     */
     _normalizeLeftTopProperties: function(parsedAttributes) {
       if (parsedAttributes.left) {
         this.set('left', parsedAttributes.left + this.getWidth() / 2);
@@ -134,6 +141,7 @@
     },
 
     /**
+     * Returns complexity of an instance
      * @method complexity
      * @return {Number} complexity
      */
