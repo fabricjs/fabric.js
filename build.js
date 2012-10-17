@@ -14,7 +14,7 @@ buildArgs.forEach(function(arg) {
 var modulesToInclude = buildArgsAsObject.modules ? buildArgsAsObject.modules.split(',') : [ ];
 var modulesToExclude = buildArgsAsObject.exclude ? buildArgsAsObject.exclude.split(',') : [ ];
 
-var minifier = buildArgsAsObject.minifier || 'yui';
+var minifier = buildArgsAsObject.minifier || 'uglifyjs';
 var mininfierCmd;
 
 if (minifier === 'yui') {
@@ -22,6 +22,9 @@ if (minifier === 'yui') {
 }
 else if (minifier === 'closure') {
   mininfierCmd = 'java -jar lib/google_closure_compiler.jar --js dist/all.js --js_output_file dist/all.min.js';
+}
+else if (minifier === 'uglifyjs') {
+  mininfierCmd = 'uglifyjs dist/all.js --o dist/all.min.js';
 }
 
 var includeAllModules = modulesToInclude.length === 1 && modulesToInclude[0] === 'ALL';
