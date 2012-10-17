@@ -5936,7 +5936,7 @@ fabric.util.string = {
     EMPTY_JSON: '{"objects": [], "background": "white"}',
 
     /**
-     * Takes <canvas> element and transforms its data in such way that it becomes grayscale
+     * Takes &lt;canvas> element and transforms its data in such way that it becomes grayscale
      * @static
      * @method toGrayscale
      * @param {HTMLCanvasElement} canvasEl
@@ -10000,18 +10000,21 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   fabric.Rect = fabric.util.createClass(fabric.Object, /** @scope fabric.Rect.prototype */ {
 
     /**
+     * Type of the instance
      * @property
      * @type String
      */
     type: 'rect',
 
     /**
+     * Horizontal border radius
      * @property
      * @type Number
      */
     rx: 0,
 
     /**
+     * Vertical border radius
      * @property
      * @type Number
      */
@@ -10104,7 +10107,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       }
     },
 
-    // since our coordinate system differs from that of SVG
+    /**
+     * @method _normalizeLeftTopProperties
+     * @private
+     * Since coordinate system differs from that of SVG
+     */
     _normalizeLeftTopProperties: function(parsedAttributes) {
       if (parsedAttributes.left) {
         this.set('left', parsedAttributes.left + this.getWidth() / 2);
@@ -10118,6 +10125,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     },
 
     /**
+     * Returns complexity of an instance
      * @method complexity
      * @return {Number} complexity
      */
