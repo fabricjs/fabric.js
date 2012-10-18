@@ -5401,6 +5401,15 @@ fabric.util.string = {
 
       // delegate rendering to group selection (if one exists)
       if (activeGroup) {
+        //Cache objects in group to preserve order
+        var sortedObjects = [];
+        this.forEachObject(function (object) {
+            if (activeGroup.contains(object)) {
+                sortedObjects.push(object);
+            }
+        });
+        //Set group objects to orderd ones.
+        activeGroup._set('objects', sortedObjects);
         this._draw(this.contextTop, activeGroup);
       }
 
@@ -6352,11 +6361,10 @@ fabric.util.string = {
           this.onBeforeScaleRotate(target);
         }
 
-        this._setupCurrentTransform(e, target);
-
         var shouldHandleGroupLogic = e.shiftKey && (activeGroup || this.getActiveObject()) && this.selection;
         if (shouldHandleGroupLogic) {
           this._handleGroupLogic(e, target);
+          target = this.getActiveGroup();
         }
         else {
           if (target !== this.getActiveGroup()) {
@@ -6364,6 +6372,8 @@ fabric.util.string = {
           }
           this.setActiveObject(target, e);
         }
+
+        this._setupCurrentTransform(e, target);
       }
       // we must renderAll so that active image is placed on the top canvas
       this.renderAll();
@@ -6678,6 +6688,10 @@ fabric.util.string = {
         }
         else {
           activeGroup.addWithUpdate(target);
+          //Reset transform!
+          activeGroup.scaleX = 1;
+          activeGroup.scaleY = 1;
+          activeGroup._theta = 0;
         }
         this.fire('selection:created', { target: activeGroup, e: e });
         activeGroup.setActive(true);
@@ -11741,9 +11755,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
       var groupScaleFactor = Math.max(this.scaleX, this.scaleY);
 
-      for (var i = 0, len = this.objects.length; i < len; i++) {
+      //The array is now sorted in order of highest first, so start from end.
+      for (var i = this.objects.length; i > 0; i--) {
 
-        var object = this.objects[i];
+        var object = this.objects[i-1];
         var originalScaleFactor = object.borderScaleFactor;
 
         object.borderScaleFactor = groupScaleFactor;

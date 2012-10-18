@@ -330,11 +330,10 @@
           this.onBeforeScaleRotate(target);
         }
 
-        this._setupCurrentTransform(e, target);
-
         var shouldHandleGroupLogic = e.shiftKey && (activeGroup || this.getActiveObject()) && this.selection;
         if (shouldHandleGroupLogic) {
           this._handleGroupLogic(e, target);
+          target = this.getActiveGroup();
         }
         else {
           if (target !== this.getActiveGroup()) {
@@ -342,6 +341,8 @@
           }
           this.setActiveObject(target, e);
         }
+
+        this._setupCurrentTransform(e, target);
       }
       // we must renderAll so that active image is placed on the top canvas
       this.renderAll();
@@ -656,6 +657,10 @@
         }
         else {
           activeGroup.addWithUpdate(target);
+          //Reset transform!
+          activeGroup.scaleX = 1;
+          activeGroup.scaleY = 1;
+          activeGroup._theta = 0;
         }
         this.fire('selection:created', { target: activeGroup, e: e });
         activeGroup.setActive(true);
