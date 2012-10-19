@@ -649,6 +649,10 @@
       if (activeGroup) {
         if (activeGroup.contains(target)) {
           activeGroup.removeWithUpdate(target);
+          //Reset transform!
+          activeGroup.scaleX = 1;
+          activeGroup.scaleY = 1;
+          activeGroup._theta = 0;
           target.setActive(false);
           if (activeGroup.size() === 1) {
             // remove group alltogether if after removal it only contains 1 object
