@@ -63,6 +63,28 @@
     backgroundImageStretch: true,
 
     /**
+     * Overlay image of canvas instance
+     * Should be set via `setOverlayImage`
+     * @property
+     * @type String
+     */
+    overlayImage: '',
+
+    /**
+     * Left offset of overlay image (if present)
+     * @property
+     * @type Number
+     */
+    overlayImageLeft: 0,
+
+    /**
+     * Top offset of overlay image (if present)
+     * @property
+     * @type Number
+     */
+    overlayImageTop: 0,
+
+    /**
      * Indicates whether toObject/toDatalessObject should include default values
      * @property
      * @type Boolean
@@ -487,6 +509,8 @@
         this._drawBackroundImage(canvasToDrawOn);
       }
 
+      this.fire('before:render');
+
       for (var i = 0, length = this._objects.length; i < length; ++i) {
         if (!activeGroup ||
             (activeGroup && this._objects[i] && !activeGroup.contains(this._objects[i]))) {
@@ -504,16 +528,11 @@
       }
 
       if (this.overlayImage) {
-        this.contextContainer.drawImage(this.overlayImage, 0, 0);
+        this.contextContainer.drawImage(this.overlayImage, this.overlayImageLeft, this.overlayImageTop);
       }
 
       if (this.controlsAboveOverlay) {
         this.drawControls(this.contextContainer);
-      }
-
-      if (this.onFpsUpdate) {
-        var elapsedTime = new Date() - startTime;
-        this.onFpsUpdate(~~(1000 / elapsedTime));
       }
 
       this.fire('after:render');
@@ -552,7 +571,7 @@
       this.clearContext(this.contextTop || this.contextContainer);
 
       if (this.overlayImage) {
-        this.contextContainer.drawImage(this.overlayImage, 0, 0);
+        this.contextContainer.drawImage(this.overlayImage, this.overlayImageLeft, this.overlayImageTop);
       }
 
       // we render the top context - last object
