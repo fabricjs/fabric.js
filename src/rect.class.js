@@ -87,7 +87,7 @@
           h = this.height;
 
       ctx.beginPath();
-      ctx.globalAlpha *= this.opacity;
+      ctx.globalAlpha = this.group ? (ctx.globalAlpha * this.opacity) : this.opacity;
 
       if (this.transformMatrix && this.group) {
         ctx.translate(
