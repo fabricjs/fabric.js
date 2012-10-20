@@ -6680,7 +6680,6 @@ fabric.util.string = {
       if (activeGroup) {
         if (activeGroup.contains(target)) {
           activeGroup.removeWithUpdate(target);
-          this._resetObjectTransform(activeGroup);
           target.setActive(false);
           if (activeGroup.size() === 1) {
             // remove group alltogether if after removal it only contains 1 object
@@ -6689,7 +6688,10 @@ fabric.util.string = {
         }
         else {
           activeGroup.addWithUpdate(target);
-          this._resetObjectTransform(activeGroup);
+          //Reset transform!
+          activeGroup.scaleX = 1;
+          activeGroup.scaleY = 1;
+          activeGroup._theta = 0;
         }
         this.fire('selection:created', { target: activeGroup, e: e });
         activeGroup.setActive(true);
@@ -6867,17 +6869,7 @@ fabric.util.string = {
      */
     _setCursor: function (value) {
       this.upperCanvasEl.style.cursor = value;
-  },
-
-  /**
-  * @private
-  * @method _setupCurrentTransform
-  */
-  _resetObjectTransform: function (target) {
-      target.scaleX = 1;
-      target.scaleY = 1;
-      target.setAngle(0);
-  },
+    },
 
     /**
      * Sets the cursor depending on where the canvas is being hovered.
