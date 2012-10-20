@@ -134,10 +134,24 @@
      */
     containerClass:        'canvas-container',
 
+    /**
+     * When true, object detection happens on per-pixel basis rather than on per-bounding-box
+     * @property
+     * @type Boolean
+     */
     perPixelTargetFind:     false,
 
+    /**
+     * Number of pixels around target pixel to tolerate (consider active) during object detection
+     * @property
+     * @type Number
+     */
     targetFindTolerance: 0,
 
+    /**
+     * @method _initInteractive
+     * @private
+     */
     _initInteractive: function() {
       this._currentTransform = null;
       this._groupSelector = null;
