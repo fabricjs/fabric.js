@@ -107,13 +107,6 @@
       /* NOOP */
     },
 
-    /**
-     * Callback; invoked on every redraw of canvas and is being passed a number indicating current fps
-     * @method onFpsUpdate
-     * @param {Number} fps
-     */
-    onFpsUpdate: null,
-
     _initStatic: function(el, options) {
       this._objects = [];
 
@@ -481,8 +474,7 @@
         this.clearContext(canvasToDrawOn);
       }
 
-      var activeGroup = this.getActiveGroup(),
-          startTime = new Date();
+      var activeGroup = this.getActiveGroup();
 
       if (this.clipTo) {
         this._clipCanvas(canvasToDrawOn);

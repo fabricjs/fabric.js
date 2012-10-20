@@ -785,24 +785,6 @@
     }, 1000);
   });
 
-  test('onFpsUpdate', function() {
-
-    ok(typeof canvas.onFpsUpdate != 'undefined');
-
-    var invoked = false, fps;
-
-    canvas.onFpsUpdate = function(value) {
-      invoked = true;
-      fps = value;
-    };
-
-    canvas.renderAll();
-
-    ok(invoked, 'onFpsUpdate should be invoked');
-    ok(typeof fps == 'number', 'onFpsUpdate must receive numeric value');
-
-  });
-
   // asyncTest('backgroundImage', function() {
   //   deepEqual('', canvas.backgroundImage);
   //   canvas.setBackgroundImage('../../assets/pug.jpg');
