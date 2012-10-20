@@ -35,6 +35,28 @@ test('stopObserving', function() {
   equal(false, eventFired);
 });
 
+test('stopObserving without handler', function() {
+  var foo = { };
+  fabric.util.object.extend(foo, fabric.Observable);
+
+  var eventFired = false, event2Fired = false;
+
+  var handler = function() {
+    eventFired = true;
+  };
+  var handler2 = function() {
+    event2Fired = true;
+  };
+  foo.on('bar:baz', handler);
+  foo.on('bar:baz', handler2);
+
+  foo.stopObserving('bar:baz');
+
+  foo.fire('bar:baz');
+  equal(false, eventFired);
+  equal(false, event2Fired);
+});
+
 test('observe multiple handlers', function() {
   var foo = { };
   fabric.util.object.extend(foo, fabric.Observable);
