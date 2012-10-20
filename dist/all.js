@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL` */
 /*! Fabric.js Copyright 2008-2012, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.9.15" };
+var fabric = fabric || { version: "0.9.16" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -1784,7 +1784,12 @@ fabric.Observable = {
       this.__eventListeners = { };
     }
     if (this.__eventListeners[eventName]) {
-      fabric.util.removeFromArray(this.__eventListeners[eventName], handler);
+      if (handler) {
+        fabric.util.removeFromArray(this.__eventListeners[eventName], handler);
+      }
+      else {
+        this.__eventListeners[eventName].length = 0;
+      }
     }
   },
 
@@ -4956,6 +4961,28 @@ fabric.util.string = {
     backgroundImageStretch: true,
 
     /**
+     * Overlay image of canvas instance
+     * Should be set via `setOverlayImage`
+     * @property
+     * @type String
+     */
+    overlayImage: '',
+
+    /**
+     * Left offset of overlay image (if present)
+     * @property
+     * @type Number
+     */
+    overlayImageLeft: 0,
+
+    /**
+     * Top offset of overlay image (if present)
+     * @property
+     * @type Number
+     */
+    overlayImageTop: 0,
+
+    /**
      * Indicates whether toObject/toDatalessObject should include default values
      * @property
      * @type Boolean
@@ -4999,13 +5026,6 @@ fabric.util.string = {
     onBeforeScaleRotate: function () {
       /* NOOP */
     },
-
-    /**
-     * Callback; invoked on every redraw of canvas and is being passed a number indicating current fps
-     * @method onFpsUpdate
-     * @param {Number} fps
-     */
-    onFpsUpdate: null,
 
     _initStatic: function(el, options) {
       this._objects = [];
@@ -5374,8 +5394,7 @@ fabric.util.string = {
         this.clearContext(canvasToDrawOn);
       }
 
-      var activeGroup = this.getActiveGroup(),
-          startTime = new Date();
+      var activeGroup = this.getActiveGroup();
 
       if (this.clipTo) {
         this._clipCanvas(canvasToDrawOn);
@@ -5387,6 +5406,8 @@ fabric.util.string = {
       if (typeof this.backgroundImage === 'object') {
         this._drawBackroundImage(canvasToDrawOn);
       }
+
+      this.fire('before:render');
 
       for (var i = 0, length = this._objects.length; i < length; ++i) {
         if (!activeGroup ||
@@ -5405,16 +5426,11 @@ fabric.util.string = {
       }
 
       if (this.overlayImage) {
-        this.contextContainer.drawImage(this.overlayImage, 0, 0);
+        this.contextContainer.drawImage(this.overlayImage, this.overlayImageLeft, this.overlayImageTop);
       }
 
       if (this.controlsAboveOverlay) {
         this.drawControls(this.contextContainer);
-      }
-
-      if (this.onFpsUpdate) {
-        var elapsedTime = new Date() - startTime;
-        this.onFpsUpdate(~~(1000 / elapsedTime));
       }
 
       this.fire('after:render');
@@ -5453,7 +5469,7 @@ fabric.util.string = {
       this.clearContext(this.contextTop || this.contextContainer);
 
       if (this.overlayImage) {
-        this.contextContainer.drawImage(this.overlayImage, 0, 0);
+        this.contextContainer.drawImage(this.overlayImage, this.overlayImageLeft, this.overlayImageTop);
       }
 
       // we render the top context - last object
@@ -6156,10 +6172,24 @@ fabric.util.string = {
      */
     containerClass:        'canvas-container',
 
+    /**
+     * When true, object detection happens on per-pixel basis rather than on per-bounding-box
+     * @property
+     * @type Boolean
+     */
     perPixelTargetFind:     false,
 
+    /**
+     * Number of pixels around target pixel to tolerate (consider active) during object detection
+     * @property
+     * @type Number
+     */
     targetFindTolerance: 0,
 
+    /**
+     * @method _initInteractive
+     * @private
+     */
     _initInteractive: function() {
       this._currentTransform = null;
       this._groupSelector = null;
@@ -9612,7 +9642,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     _render: function(ctx, noTransform) {
       ctx.beginPath();
       // multiply by currently set alpha (the one that was set by path group where this object is contained, for example)
-      ctx.globalAlpha *= this.opacity;
+      ctx.globalAlpha = this.group ? (ctx.globalAlpha * this.opacity) : this.opacity;
       ctx.arc(noTransform ? this.left : 0, noTransform ? this.top : 0, this.radius, 0, piBy2, false);
       ctx.closePath();
       if (this.fill) {
@@ -9908,7 +9938,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     _render: function(ctx, noTransform) {
       ctx.beginPath();
       ctx.save();
-      ctx.globalAlpha *= this.opacity;
+      ctx.globalAlpha = this.group ? (ctx.globalAlpha * this.opacity) : this.opacity;
       if (this.transformMatrix && this.group) {
         ctx.translate(this.cx, this.cy);
       }
@@ -10071,7 +10101,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
           h = this.height;
 
       ctx.beginPath();
-      ctx.globalAlpha *= this.opacity;
+      ctx.globalAlpha = this.group ? (ctx.globalAlpha * this.opacity) : this.opacity;
 
       if (this.transformMatrix && this.group) {
         ctx.translate(
