@@ -508,14 +508,13 @@
 
       // delegate rendering to group selection (if one exists)
       if (activeGroup) {
-        //Cache objects in group to preserve order
+        //Store objects in group preserving order, then replace
         var sortedObjects = [];
         this.forEachObject(function (object) {
             if (activeGroup.contains(object)) {
                 sortedObjects.push(object);
             }
         });
-        //Set group objects to orderd ones.
         activeGroup._set('objects', sortedObjects);
         this._draw(this.contextTop, activeGroup);
       }

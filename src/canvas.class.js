@@ -840,7 +840,7 @@
 
   /**
   * @private
-  * @method _setupCurrentTransform
+  * @method _resetObjectTransform: 
   */
   _resetObjectTransform: function (target) {
       target.scaleX = 1;
