@@ -524,6 +524,14 @@
 
       // delegate rendering to group selection (if one exists)
       if (activeGroup) {
+        //Store objects in group preserving order, then replace
+        var sortedObjects = [];
+        this.forEachObject(function (object) {
+            if (activeGroup.contains(object)) {
+                sortedObjects.push(object);
+            }
+        });
+        activeGroup._set('objects', sortedObjects);
         this._draw(this.contextTop, activeGroup);
       }
 
