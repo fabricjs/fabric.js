@@ -2645,8 +2645,24 @@ fabric.util.string = {
    * @param {Event} event
    */
   function getPointer(event) {
-    // TODO (kangax): this method needs fixing
-    return { x: pointerX(event), y: pointerY(event) };
+    var element = event.target || event.srcElement,
+    scrollLeft = 0,
+    scrollTop = 0,
+    firstFixedAncestor;
+
+    while (element.parentNode && !firstFixedAncestor) {
+        element = element.parentNode;
+
+        if (element !== fabric.document && fabric.util.getElementPosition(element) === 'fixed') firstFixedAncestor = element;
+
+        scrollLeft += element.scrollLeft || 0;
+        scrollTop += element.scrollTop || 0;
+    }
+
+    return {
+        x: event.clientX + scrollLeft,
+        y: event.clientY + scrollTop
+    };
   }
 
   var pointerX = function(event) {
@@ -2872,6 +2888,30 @@ fabric.util.string = {
     }
     while (element);
     return ({ left: valueL, top: valueT });
+  }
+
+  /**
+  * Returns position of a given element
+  * @method getElementPosition
+  * @function
+  * @memberOf fabric.util
+  * @param {HTMLElement} element Element to get offset for
+  * @return {Object} position of the given element.
+  */
+  function getElementPosition(element) {
+      if (!!(fabric.document.defaultView && fabric.document.defaultView.getComputedStyle)) {
+          getElementPosition = function (element) {
+              return document.defaultView.getComputedStyle(element).position;
+          };
+      }
+      else {
+          getElementPosition = function (element) {
+              var value = element.style.position;
+              if (!value && element.currentStyle) value = element.currentStyle['position'];
+              return value;
+          };
+      }
+      return getElementPosition(element);
   }
 
   (function () {

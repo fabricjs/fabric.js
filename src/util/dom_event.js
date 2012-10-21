@@ -179,8 +179,24 @@
    * @param {Event} event
    */
   function getPointer(event) {
-    // TODO (kangax): this method needs fixing
-    return { x: pointerX(event), y: pointerY(event) };
+    var element = event.target || event.srcElement,
+    scrollLeft = 0,
+    scrollTop = 0,
+    firstFixedAncestor;
+
+    while (element.parentNode && !firstFixedAncestor) {
+        element = element.parentNode;
+
+        if (element !== fabric.document && fabric.util.getElementPosition(element) === 'fixed') firstFixedAncestor = element;
+
+        scrollLeft += element.scrollLeft || 0;
+        scrollTop += element.scrollTop || 0;
+    }
+
+    return {
+        x: event.clientX + scrollLeft,
+        y: event.clientY + scrollTop
+    };
   }
 
   var pointerX = function(event) {
