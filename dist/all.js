@@ -2650,7 +2650,7 @@ fabric.util.string = {
     scrollTop = 0,
     firstFixedAncestor;
 
-    while (element.parentNode && !firstFixedAncestor) {
+    while (element && element.parentNode && !firstFixedAncestor) {
         element = element.parentNode;
 
         if (element !== fabric.document && fabric.util.getElementPosition(element) === 'fixed') firstFixedAncestor = element;
