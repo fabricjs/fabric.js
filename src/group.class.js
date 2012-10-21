@@ -210,9 +210,10 @@
 
       var groupScaleFactor = Math.max(this.scaleX, this.scaleY);
 
-      for (var i = 0, len = this.objects.length; i < len; i++) {
+      //The array is now sorted in order of highest first, so start from end.
+      for (var i = this.objects.length; i > 0; i--) {
 
-        var object = this.objects[i];
+        var object = this.objects[i-1];
         var originalScaleFactor = object.borderScaleFactor;
 
         object.borderScaleFactor = groupScaleFactor;
