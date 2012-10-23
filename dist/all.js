@@ -2898,21 +2898,19 @@ fabric.util.string = {
   * @param {HTMLElement} element Element to get offset for
   * @return {Object} position of the given element.
   */
-  function getElementPosition(element) {
-      if (!!(fabric.document.defaultView && fabric.document.defaultView.getComputedStyle)) {
-          getElementPosition = function (element) {
-              return document.defaultView.getComputedStyle(element).position;
-          };
-      }
-      else {
-          getElementPosition = function (element) {
-              var value = element.style.position;
-              if (!value && element.currentStyle) value = element.currentStyle['position'];
-              return value;
-          };
-      }
-      return getElementPosition(element);
+  var getElementPosition;
+  if (fabric.document.defaultView && fabric.document.defaultView.getComputedStyle) {
+    getElementPosition = function (element) {
+      return document.defaultView.getComputedStyle(element).position;
+    };
   }
+  else {
+    getElementPosition = function (element) {
+      var value = element.style.position;
+      if (!value && element.currentStyle) value = element.currentStyle['position'];
+      return value;
+    };
+  } 
 
   (function () {
     var style = fabric.document.documentElement.style;
