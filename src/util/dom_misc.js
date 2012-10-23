@@ -117,6 +117,28 @@
     return ({ left: valueL, top: valueT });
   }
 
+  /**
+  * Returns position of a given element
+  * @method getElementPosition
+  * @function
+  * @memberOf fabric.util
+  * @param {HTMLElement} element Element to get offset for
+  * @return {Object} position of the given element.
+  */
+  var getElementPosition;
+  if (fabric.document.defaultView && fabric.document.defaultView.getComputedStyle) {
+    getElementPosition = function (element) {
+      return document.defaultView.getComputedStyle(element).position;
+    };
+  }
+  else {
+    getElementPosition = function (element) {
+      var value = element.style.position;
+      if (!value && element.currentStyle) value = element.currentStyle['position'];
+      return value;
+    };
+  } 
+
   (function () {
     var style = fabric.document.documentElement.style;
 
@@ -217,5 +239,6 @@
   fabric.util.addClass = addClass;
   fabric.util.wrapElement = wrapElement;
   fabric.util.getElementOffset = getElementOffset;
+  fabric.util.getElementPosition = getElementPosition;
 
 })();
