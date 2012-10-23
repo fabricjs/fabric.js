@@ -239,5 +239,6 @@
   fabric.util.addClass = addClass;
   fabric.util.wrapElement = wrapElement;
   fabric.util.getElementOffset = getElementOffset;
+  fabric.util.getElementPosition = getElementPosition;
 
 })();
