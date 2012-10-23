@@ -305,7 +305,7 @@
       ctx.fillStyle = this.fill;
       ctx.strokeStyle = this.strokeStyle;
       ctx.lineWidth = this.strokeWidth;
-      ctx.textBaseline = 'top';
+      ctx.textBaseline = 'alphabetic';
       ctx.textAlign = this.textAlign;
       ctx.font = this._getFontDeclaration();
     },
@@ -376,7 +376,7 @@
         ctx.fillText(
           textLines[i],
           -this.width / 2,
-          (-this.height / 2) + (i * this.fontSize * this.lineHeight)
+          (-this.height / 2) + (i * this.fontSize * this.lineHeight) + this.fontSize
         );
       }
     },
@@ -391,7 +391,7 @@
           ctx.strokeText(
             textLines[i],
             -this.width / 2,
-            (-this.height / 2) + (i * this.fontSize * this.lineHeight)
+            (-this.height / 2) + (i * this.fontSize * this.lineHeight) + this.fontSize
           );
         }
       }

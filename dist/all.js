@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL` */
 /*! Fabric.js Copyright 2008-2012, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.9.16" };
+var fabric = fabric || { version: "0.9.17" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -13100,7 +13100,7 @@ fabric.Image.filters.Tint.fromObject = function(object) {
      * @property
      * @type Number
      */
-    fontWeight:       100,
+    fontWeight:       400,
 
     /**
      * @property
@@ -13377,7 +13377,7 @@ fabric.Image.filters.Tint.fromObject = function(object) {
       ctx.fillStyle = this.fill;
       ctx.strokeStyle = this.strokeStyle;
       ctx.lineWidth = this.strokeWidth;
-      ctx.textBaseline = 'top';
+      ctx.textBaseline = 'alphabetic';
       ctx.textAlign = this.textAlign;
       ctx.font = this._getFontDeclaration();
     },
@@ -13448,7 +13448,7 @@ fabric.Image.filters.Tint.fromObject = function(object) {
         ctx.fillText(
           textLines[i],
           -this.width / 2,
-          (-this.height / 2) + (i * this.fontSize * this.lineHeight)
+          (-this.height / 2) + (i * this.fontSize * this.lineHeight) + this.fontSize
         );
       }
     },
@@ -13463,7 +13463,7 @@ fabric.Image.filters.Tint.fromObject = function(object) {
           ctx.strokeText(
             textLines[i],
             -this.width / 2,
-            (-this.height / 2) + (i * this.fontSize * this.lineHeight)
+            (-this.height / 2) + (i * this.fontSize * this.lineHeight) + this.fontSize
           );
         }
       }
