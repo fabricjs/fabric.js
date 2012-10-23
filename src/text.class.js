@@ -28,7 +28,7 @@
      * @property
      * @type Number
      */
-    fontWeight:       100,
+    fontWeight:       400,
 
     /**
      * @property
