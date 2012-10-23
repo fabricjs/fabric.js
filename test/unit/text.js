@@ -31,7 +31,7 @@
     'perPixelTargetFind': false,
     'text':             'x',
     'fontSize':         40,
-    'fontWeight':       100,
+    'fontWeight':       400,
     'fontFamily':       'Times New Roman',
     'fontStyle':        '',
     'lineHeight':       1.3,
