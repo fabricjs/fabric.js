@@ -8034,10 +8034,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      */
     getSvgTransform: function() {
       var angle = this.getAngle();
+      var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
       return [
-        "translate(", toFixed(this.left, 2), " ", toFixed(this.top, 2), ")",
-        angle !== 0 ? (" rotate(" + toFixed(angle, 2) + ")") : '',
-        (this.scaleX === 1 && this.scaleY === 1) ? '' : (" scale(" + toFixed(this.scaleX, 2) + " " + toFixed(this.scaleY, 2) + ")")
+        "translate(", toFixed(this.left, NUM_FRACTION_DIGITS), " ", toFixed(this.top, NUM_FRACTION_DIGITS), ")",
+        angle !== 0 ? (" rotate(" + toFixed(angle, NUM_FRACTION_DIGITS) + ")") : '',
+        (this.scaleX === 1 && this.scaleY === 1) ? '' : (" scale(" + toFixed(this.scaleX, NUM_FRACTION_DIGITS) + " " + toFixed(this.scaleY, NUM_FRACTION_DIGITS) + ")")
       ].join('');
     },
 
