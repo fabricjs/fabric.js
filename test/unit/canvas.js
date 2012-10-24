@@ -698,15 +698,17 @@
         canvasOffset = fabric.util.getElementOffset(canvasEl);
 
     var eventStub = {
-      pageX: canvasOffset.left + 100,
-      pageY: canvasOffset.top + 100
+      clientX: canvasOffset.left + 100,
+      clientY: canvasOffset.top + 100,
+      target: rect
     };
 
     ok(canvas.containsPoint(eventStub, rect), 'point at (100, 100) should be within area (75, 75, 125, 125)');
 
     eventStub = {
-      pageX: canvasOffset.left + 200,
-      pageY: canvasOffset.top + 200
+      clientX: canvasOffset.left + 200,
+      clientY: canvasOffset.top + 200,
+      target: rect
     };
     ok(!canvas.containsPoint(eventStub, rect), 'point at (200, 200) should NOT be within area (75, 75, 125, 125)');
 
