@@ -128,13 +128,13 @@
   var getElementPosition;
   if (fabric.document.defaultView && fabric.document.defaultView.getComputedStyle) {
     getElementPosition = function (element) {
-      return document.defaultView.getComputedStyle(element).position;
+        return fabric.document.defaultView.getComputedStyle(element).position;
     };
   }
   else {
     getElementPosition = function (element) {
       var value = element.style.position;
-      if (!value && element.currentStyle) value = element.currentStyle['position'];
+      if (!value && element.currentStyle) value = element.currentStyle.position;
       return value;
     };
   } 
