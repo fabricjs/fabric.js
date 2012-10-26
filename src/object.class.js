@@ -364,12 +364,29 @@
     getSvgTransform: function() {
       var angle = this.getAngle();
       var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
-      return [
-        "translate(", toFixed(this.left, NUM_FRACTION_DIGITS), " ", toFixed(this.top, NUM_FRACTION_DIGITS), ")",
-        angle !== 0 ? (" rotate(" + toFixed(angle, NUM_FRACTION_DIGITS) + ")") : '',
-        (this.scaleX === 1 && this.scaleY === 1) ? '' : (" scale(" + toFixed(this.scaleX, NUM_FRACTION_DIGITS) +
-          " " + toFixed(this.scaleY, NUM_FRACTION_DIGITS) + ")")
-      ].join('');
+
+      var translatePart = "translate(" +
+                            toFixed(this.left, NUM_FRACTION_DIGITS) +
+                            " " +
+                            toFixed(this.top, NUM_FRACTION_DIGITS) +
+                          ")";
+
+      var anglePart = angle !== 0
+        ? (" rotate(" + toFixed(angle, NUM_FRACTION_DIGITS) + ")")
+        : '';
+
+      var scalePart = (this.scaleX === 1 && this.scaleY === 1)
+        ? '' :
+        (" scale(" +
+          toFixed(this.scaleX, NUM_FRACTION_DIGITS) +
+          " " +
+          toFixed(this.scaleY, NUM_FRACTION_DIGITS) +
+        ")");
+
+      var flipXPart = this.flipX ? "matrix(-1 0 0 1 0 0) " : "";
+      var flipYPart = this.flipY ? "matrix(1 0 0 -1 0 0)" : "";
+
+      return [ translatePart, anglePart, scalePart, flipXPart, flipYPart ].join('');
     },
 
     /**
