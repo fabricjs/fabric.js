@@ -5568,6 +5568,8 @@ fabric.util.string = {
           fabric.Object.prototype.transform.call(this._objects[i], ctx);
           this._objects[i].drawBorders(ctx).drawCorners(ctx);
           ctx.restore();
+
+          this.lastRenderedObjectWithControlsAboveOverlay = this._objects[i];
         }
       }
     },
@@ -7098,9 +7100,15 @@ fabric.util.string = {
       var target,
           pointer = this.getPointer(e);
 
+      if (this.controlsAboveOverlay &&
+          this.lastRenderedObjectWithControlsAboveOverlay &&
+          this.containsPoint(e, this.lastRenderedObjectWithControlsAboveOverlay)) {
+        target = this.lastRenderedObjectWithControlsAboveOverlay;
+        return target;
+      }
+
       // first check current group (if one exists)
       var activeGroup = this.getActiveGroup();
-
       if (activeGroup && !skipGroup && this.containsPoint(e, activeGroup)) {
         target = activeGroup;
         return target;

@@ -976,9 +976,15 @@
       var target,
           pointer = this.getPointer(e);
 
+      if (this.controlsAboveOverlay &&
+          this.lastRenderedObjectWithControlsAboveOverlay &&
+          this.containsPoint(e, this.lastRenderedObjectWithControlsAboveOverlay)) {
+        target = this.lastRenderedObjectWithControlsAboveOverlay;
+        return target;
+      }
+
       // first check current group (if one exists)
       var activeGroup = this.getActiveGroup();
-
       if (activeGroup && !skipGroup && this.containsPoint(e, activeGroup)) {
         target = activeGroup;
         return target;

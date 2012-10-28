@@ -631,6 +631,8 @@
           fabric.Object.prototype.transform.call(this._objects[i], ctx);
           this._objects[i].drawBorders(ctx).drawCorners(ctx);
           ctx.restore();
+
+          this.lastRenderedObjectWithControlsAboveOverlay = this._objects[i];
         }
       }
     },
