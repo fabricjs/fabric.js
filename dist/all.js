@@ -5870,7 +5870,12 @@ fabric.util.string = {
 
         // traverse down the stack looking for the nearest intersecting object
         for (var i=idx-1; i>=0; --i) {
-          if (object.intersectsWithObject(this._objects[i]) || object.isContainedWithinObject(this._objects[i])) {
+
+          var isIntersecting = object.intersectsWithObject(this._objects[i]) ||
+                               object.isContainedWithinObject(this._objects[i]) ||
+                               this._objects[i].isContainedWithinObject(object);
+
+          if (isIntersecting) {
             nextIntersectingIdx = i;
             break;
           }
@@ -5899,7 +5904,12 @@ fabric.util.string = {
 
         // traverse up the stack looking for the nearest intersecting object
         for (var i = idx + 1, l = this._objects.length; i < l; ++i) {
-          if (object.intersectsWithObject(objects[i]) || object.isContainedWithinObject(this._objects[i])) {
+
+          var isIntersecting = object.intersectsWithObject(objects[i]) ||
+                               object.isContainedWithinObject(this._objects[i]) ||
+                               this._objects[i].isContainedWithinObject(object);
+
+          if (isIntersecting) {
             nextIntersectingIdx = i;
             break;
           }
