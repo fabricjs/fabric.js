@@ -420,10 +420,6 @@
         else {
           // set proper cursor
           this._setCursorFromEvent(e, target);
-          if (target.isActive()) {
-            // display corners when hovering over an image
-            target.setCornersVisibility && target.setCornersVisibility(true);
-          }
         }
       }
       else {
@@ -854,7 +850,7 @@
 
     /**
     * @private
-    * @method _resetObjectTransform: 
+    * @method _resetObjectTransform:
     */
     _resetObjectTransform: function (target) {
         target.scaleX = 1;

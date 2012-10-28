@@ -175,10 +175,21 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
           callback && callback();
         });
+        return;
       }
-      else {
-        callback && callback();
+      if (serialized.overlayImage) {
+        _this.setOverlayImage(serialized.overlayImage, function() {
+
+          _this.overlayImageLeft = serialized.overlayImageLeft || 0;
+          _this.overlayImageTop = serialized.overlayImageTop || 0;
+
+          _this.renderAll();
+
+          callback && callback();
+        });
+        return;
       }
+      callback && callback();
     });
 
     return this;

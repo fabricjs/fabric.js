@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL` */
 /*! Fabric.js Copyright 2008-2012, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.9.18" };
+var fabric = fabric || { version: "0.9.19" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -5098,14 +5098,22 @@ fabric.util.string = {
      * @method setOverlayImage
      * @param {String} url url of an image to set overlay to
      * @param {Function} callback callback to invoke when image is loaded and set as an overlay
+     * @param {Object} options optional options to set for the overlay image
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
-    setOverlayImage: function (url, callback) { // TODO (kangax): test callback
+    setOverlayImage: function (url, callback, options) { // TODO (kangax): test callback
       fabric.util.loadImage(url, function(img) {
         this.overlayImage = img;
+        if (options && ('overlayImageLeft' in options)) {
+          this.overlayImageLeft = options.overlayImageLeft;
+        }
+        if (options && ('overlayImageTop' in options)) {
+          this.overlayImageTop = options.overlayImageTop;
+        }
         callback && callback();
       }, this);
+
       return this;
     },
 
@@ -5119,16 +5127,18 @@ fabric.util.string = {
      * @chainable
      */
     setBackgroundImage: function (url, callback, options) {
-      return fabric.util.loadImage(url, function(img) {
+      fabric.util.loadImage(url, function(img) {
         this.backgroundImage = img;
         if (options && ('backgroundImageOpacity' in options)) {
-            this.backgroundImageOpacity = options.backgroundImageOpacity;
+          this.backgroundImageOpacity = options.backgroundImageOpacity;
         }
         if (options && ('backgroundImageStretch' in options)) {
-            this.backgroundImageStretch = options.backgroundImageStretch;
+          this.backgroundImageStretch = options.backgroundImageStretch;
         }
         callback && callback();
       }, this);
+
+      return this;
     },
 
     /**
@@ -5429,7 +5439,7 @@ fabric.util.string = {
         this.clearContext(this.contextTop);
       }
 
-      if (allOnTop === false || (typeof allOnTop === 'undefined')) {
+      if (!allOnTop) {
         this.clearContext(canvasToDrawOn);
       }
 
@@ -5473,11 +5483,11 @@ fabric.util.string = {
       }
 
       if (this.overlayImage) {
-        this.contextContainer.drawImage(this.overlayImage, this.overlayImageLeft, this.overlayImageTop);
+        canvasToDrawOn.drawImage(this.overlayImage, this.overlayImageLeft, this.overlayImageTop);
       }
 
       if (this.controlsAboveOverlay) {
-        this.drawControls(this.contextContainer);
+        this.drawControls(canvasToDrawOn);
       }
 
       this.fire('after:render');
@@ -5513,11 +5523,8 @@ fabric.util.string = {
      * @chainable
      */
     renderTop: function () {
-      this.clearContext(this.contextTop || this.contextContainer);
-
-      if (this.overlayImage) {
-        this.contextContainer.drawImage(this.overlayImage, this.overlayImageLeft, this.overlayImageTop);
-      }
+      var ctx = this.contextTop || this.contextContainer;
+      this.clearContext(ctx);
 
       // we render the top context - last object
       if (this.selection && this._groupSelector) {
@@ -5528,7 +5535,11 @@ fabric.util.string = {
       // used for drawing selection borders/corners
       var activeGroup = this.getActiveGroup();
       if (activeGroup) {
-        activeGroup.render(this.contextTop);
+        activeGroup.render(ctx);
+      }
+
+      if (this.overlayImage) {
+        ctx.drawImage(this.overlayImage, this.overlayImageLeft, this.overlayImageTop);
       }
 
       this.fire('after:render');
@@ -5755,6 +5766,11 @@ fabric.util.string = {
         data.backgroundImageOpacity = this.backgroundImageOpacity;
         data.backgroundImageStretch = this.backgroundImageStretch;
       }
+      if (this.overlayImage) {
+        data.overlayImage = this.overlayImage.src;
+        data.overlayImageLeft = this.overlayImageLeft;
+        data.overlayImageTop = this.overlayImageTop;
+      }
       return data;
     },
 
@@ -5788,6 +5804,17 @@ fabric.util.string = {
             '" preserveAspectRatio="', (this.backgroundImageStretch ? 'none' : 'defer'),
             '" xlink:href="', this.backgroundImage.src,
             '" style="opacity:', this.backgroundImageOpacity,
+          '"></image>'
+        );
+      }
+
+      if (this.overlayImage) {
+        markup.push(
+          '<image x="', this.overlayImageLeft,
+            '" y="', this.overlayImageTop,
+            '" width="', this.overlayImage.width,
+            '" height="', this.overlayImage.height,
+            '" xlink:href="', this.overlayImage.src,
           '"></image>'
         );
       }
@@ -6515,10 +6542,6 @@ fabric.util.string = {
         else {
           // set proper cursor
           this._setCursorFromEvent(e, target);
-          if (target.isActive()) {
-            // display corners when hovering over an image
-            target.setCornersVisibility && target.setCornersVisibility(true);
-          }
         }
       }
       else {
@@ -6949,7 +6972,7 @@ fabric.util.string = {
 
     /**
     * @private
-    * @method _resetObjectTransform: 
+    * @method _resetObjectTransform:
     */
     _resetObjectTransform: function (target) {
         target.scaleX = 1;
@@ -7627,10 +7650,21 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
           callback && callback();
         });
+        return;
       }
-      else {
-        callback && callback();
+      if (serialized.overlayImage) {
+        _this.setOverlayImage(serialized.overlayImage, function() {
+
+          _this.overlayImageLeft = serialized.overlayImageLeft || 0;
+          _this.overlayImageTop = serialized.overlayImageTop || 0;
+
+          _this.renderAll();
+
+          callback && callback();
+        });
+        return;
       }
+      callback && callback();
     });
 
     return this;
