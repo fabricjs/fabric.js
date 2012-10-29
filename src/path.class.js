@@ -32,7 +32,7 @@
       _join = Array.prototype.join,
       argsString;
 
-  // Copied from Inkscape svgtopdf, thanks!
+  // Generous contribution by Raph Levien, from libsvg-0.1.0.tar.gz
   function arcToSegments(x, y, rx, ry, large, sweep, rotateX, ox, oy) {
     argsString = _join.call(arguments);
     if (arcToSegmentsCache[argsString]) {
