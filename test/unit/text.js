@@ -142,7 +142,12 @@
     // temp workaround for text objects not obtaining width under node
     // text.width = 20;
 
-    deepEqual(text.toObject(), REFERENCE_TEXT_OBJECT);
+    var expectedObject = fabric.util.object.extend(REFERENCE_TEXT_OBJECT, {
+      left: 10,
+      top: -26
+    });
+
+    deepEqual(text.toObject(), expectedObject);
   });
 
   test('fabric.Text.fromElement with custom attributes', function() {
@@ -169,8 +174,8 @@
     ok(textWithAttrs instanceof fabric.Text);
 
     var expectedObject = fabric.util.object.extend(REFERENCE_TEXT_OBJECT, {
-      left: 10,
-      top: 20,
+      left: 12.5,
+      top: -59.95,
       width: 20,
       height: 159.9,
       fill: 'rgb(255,255,255)',

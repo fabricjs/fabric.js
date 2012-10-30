@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL` */
 /*! Fabric.js Copyright 2008-2012, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.9.19" };
+var fabric = fabric || { version: "0.9.20" };
 
 if (typeof exports != 'undefined') {
   exports.fabric = fabric;
@@ -13955,13 +13955,26 @@ fabric.Image.filters.Tint.fromObject = function(object) {
    * @return {fabric.Text} an instance
    */
   fabric.Text.fromElement = function(element, options) {
+
     if (!element) {
       return null;
     }
 
     var parsedAttributes = fabric.parseAttributes(element, fabric.Text.ATTRIBUTE_NAMES);
     options = fabric.util.object.extend((options ? fabric.util.object.clone(options) : { }), parsedAttributes);
+
     var text = new fabric.Text(element.textContent, options);
+
+    /*
+      Adjust positioning:
+        x/y attributes in SVG correspond to the bottom-left corner of text bounding box
+        top/left properties in Fabric correspond to center point of text bounding box
+    */
+
+    text.set({
+      left: text.getLeft() + text.getWidth() / 2,
+      top: text.getTop() - text.getHeight() / 2
+    });
 
     return text;
   };
