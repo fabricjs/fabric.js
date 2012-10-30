@@ -625,7 +625,7 @@
       }
       else {
         for (var i = 0, len = this._objects.length; i < len; ++i) {
-          if (!this._objects[i].active) continue;
+          if (!this._objects[i] || !this._objects[i].active) continue;
 
           ctx.save();
           fabric.Object.prototype.transform.call(this._objects[i], ctx);
