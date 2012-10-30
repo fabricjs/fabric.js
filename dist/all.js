@@ -5277,6 +5277,11 @@ fabric.util.string = {
         this.upperCanvasEl.style[prop] = value + 'px';
       }
 
+      if (this.cacheCanvasEl) {
+        this.cacheCanvasEl[prop] = value;
+        this.cacheCanvasEl.style[prop] = value + 'px';
+      }
+
       if (this.wrapperEl) {
         this.wrapperEl.style[prop] = value + 'px';
       }
