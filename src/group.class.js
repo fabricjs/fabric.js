@@ -213,13 +213,19 @@
       //The array is now sorted in order of highest first, so start from end.
       for (var i = this.objects.length; i > 0; i--) {
 
-        var object = this.objects[i-1];
-        var originalScaleFactor = object.borderScaleFactor;
+        var object = this.objects[i-1],
+            originalScaleFactor = object.borderScaleFactor,
+            originalHasRotatingPoint = object.hasRotatingPoint;
 
         object.borderScaleFactor = groupScaleFactor;
+        object.hasRotatingPoint = false;
+
         object.render(ctx);
+
         object.borderScaleFactor = originalScaleFactor;
+        object.hasRotatingPoint = originalHasRotatingPoint;
       }
+
       if (!noTransform && this.active) {
         this.drawBorders(ctx);
         this.hideCorners || this.drawCorners(ctx);
