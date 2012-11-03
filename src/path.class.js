@@ -276,13 +276,15 @@
           case 'm': // moveTo, relative
             x += current[1];
             y += current[2];
-            ctx.moveTo(x + l, y + t);
+            // draw a line if previous command was moveTo as well (otherwise, it will have no effect)
+            ctx[(previous && (previous[0] === 'm' || previous[0] === 'M')) ? 'lineTo' : 'moveTo'](x + l, y + t);
             break;
 
           case 'M': // moveTo, absolute
             x = current[1];
             y = current[2];
-            ctx.moveTo(x + l, y + t);
+            // draw a line if previous command was moveTo as well (otherwise, it will have no effect)
+            ctx[(previous && (previous[0] === 'm' || previous[0] === 'M')) ? 'lineTo' : 'moveTo'](x + l, y + t);
             break;
 
           case 'c': // bezierCurveTo, relative
@@ -318,12 +320,15 @@
             break;
 
           case 's': // shorthand cubic bezierCurveTo, relative
+
             // transform to absolute x,y
             tempX = x + current[3];
             tempY = y + current[4];
+
             // calculate reflection of previous control points
-            controlX = 2 * x - controlX;
-            controlY = 2 * y - controlY;
+            controlX = controlX ? (2 * x - controlX) : x;
+            controlY = controlY ? (2 * y - controlY) : y;
+
             ctx.bezierCurveTo(
               controlX + l,
               controlY + t,
