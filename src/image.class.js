@@ -95,9 +95,8 @@
     render: function(ctx, noTransform) {
       ctx.save();
       var m = this.transformMatrix;
-      this._resetWidthHeight();
       if (this.group) {
-        ctx.translate(-this.group.width/2 + this.width/2, -this.group.height/2 + this.height/2);
+        ctx.translate(-this.group.width/2 + this.width/2 + this.left, -this.group.height/2 + this.height/2 + this.top);
       }
       if (m) {
         ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
@@ -392,7 +391,7 @@
 
     var parsedAttributes = fabric.parseAttributes(element, fabric.Image.ATTRIBUTE_NAMES);
 
-    fabric.Image.fromURL(parsedAttributes['xlink:href'], callback, extend(parsedAttributes, options));
+    fabric.Image.fromURL(parsedAttributes['xlink:href'], callback, parsedAttributes);
   };
 
   fabric.Image.async = true;
