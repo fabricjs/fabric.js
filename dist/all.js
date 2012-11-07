@@ -13996,6 +13996,15 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
      */
     render: function(ctx, noTransform) {
       ctx.save();
+
+        var m = this.transformMatrix;
+        if (this.group) {
+            ctx.translate(this.group.width/-2, this.group.height/-2);
+        }
+        if (m) {
+            ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
+        }
+
       this._render(ctx);
       if (!noTransform && this.active) {
         this.drawBorders(ctx);
