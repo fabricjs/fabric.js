@@ -12227,6 +12227,19 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     type: 'image',
 
     /**
+     * @property
+     * @type String
+     */
+    preserveAspectRatio: 'xMidYMid',
+
+    /**
+     * @property
+     * @type Object
+     */
+    clipPath: null,
+
+
+    /**
      * Constructor
      * @param {HTMLImageElement | String} element Image element
      * @param {Object} options optional
@@ -12270,6 +12283,15 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     },
 
     /**
+     * Sets clip path for this instance to a specified one
+     * @method setClipPath
+     * @param {fabric.Object} element
+     */
+    setClipPath: function(element) {
+        this.clipPath = element;
+    },
+
+    /**
      * Returns original size of an image
      * @method getOriginalSize
      * @return {Object} object with "width" and "height" properties
@@ -12290,16 +12312,22 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     render: function(ctx, noTransform) {
       ctx.save();
       var m = this.transformMatrix;
-      this._resetWidthHeight();
+      this._preserveAspectRatio();
       if (this.group) {
-        ctx.translate(-this.group.width/2 + this.width/2, -this.group.height/2 + this.height/2);
+        ctx.translate(-this.group.width/2 + this.width/2 + this.left, -this.group.height/2 + this.height/2 + this.top);
       }
       if (m) {
         ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
       }
+
       if (!noTransform) {
         this.transform(ctx);
       }
+        if(this.clipPath){
+            this.clipPath.render(ctx);
+            ctx.clip();
+        }
+
       this._render(ctx);
       if (this.active && !noTransform) {
         this.drawBorders(ctx);
@@ -12447,6 +12475,58 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     },
 
     /**
+     * @private
+     * @method _preserveAspectRatio
+     * @see http://www.w3.org/TR/SVG/coords.html#PreserveAspectRatioAttribute
+     */
+    _preserveAspectRatio: function() {
+        var element = this.getElement(),
+            desiredWidth = this.get('width'),
+            desiredHeight = this.get('height');
+
+        if(this.preserveAspectRatio.indexOf('none') > -1){
+            this.set('width', desiredWidth);
+            this.set('height', desiredHeight);
+            return;
+        }
+
+        var scale = 1;
+        if(desiredHeight > desiredWidth){
+            scale = desiredWidth / element.width;
+        } else {
+            scale = desiredHeight / element.height;
+        }
+        this.set('width', element.width * scale);
+        this.set('height', element.height * scale);
+
+        var posX = this.preserveAspectRatio.substr(0,4),
+            posY = this.preserveAspectRatio.substr(4,4);
+        switch(posX){
+            case "xMin":
+                //this.set('left', this.left);
+                break;
+            case "xMid":
+                this.set('left', this.left + (desiredWidth - this.width)/2);
+                break;
+            case "xMax":
+                this.set('left', this.left + desiredWidth - this.width);
+                break;
+        };
+
+        switch(posY){
+            case "YMin":
+                //this.set('top', this.top );
+                break;
+            case "YMid":
+                this.set('top', this.top + (desiredHeight - this.height)/2);
+                break;
+            case "YMax":
+                this.set('top', this.top + desiredHeight - this.height);
+                break;
+        }
+    },
+
+    /**
      * The Image class's initialization method. This method is automatically
      * called by the constructor.
      * @private
@@ -12467,6 +12547,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       options || (options = { });
       this.setOptions(options);
       this._setWidthHeight(options);
+      this._setPreserveAspectRatio(options);
     },
 
     /**
@@ -12496,6 +12577,19 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         ? options.height
         : (this.getElement().height || 0);
     },
+
+    /**
+     * @private
+     * @method _setPreserveAspectRatio
+     * @param {Object} options Object with preserveAspectRatio property
+     */
+    _setPreserveAspectRatio: function(options) {
+        this.preserveAspectRatio = 'preserveAspectRatio' in options
+            ? options.preserveAspectRatio
+            : 'xMidYMid';
+        },
+
+
 
     /**
      * Returns complexity of an instance
@@ -12571,7 +12665,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
    * @static
    * @see http://www.w3.org/TR/SVG/struct.html#ImageElement
    */
-  fabric.Image.ATTRIBUTE_NAMES = 'x y width height fill fill-opacity opacity stroke stroke-width transform xlink:href'.split(' ');
+  fabric.Image.ATTRIBUTE_NAMES = 'x y width height fill fill-opacity opacity stroke stroke-width transform xlink:href preserveAspectRatio'.split(' ');
 
   /**
    * Returns {@link fabric.Image} instance from an SVG element
@@ -12587,7 +12681,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
     var parsedAttributes = fabric.parseAttributes(element, fabric.Image.ATTRIBUTE_NAMES);
 
-    fabric.Image.fromURL(parsedAttributes['xlink:href'], callback, extend(parsedAttributes, options));
+    fabric.Image.fromURL(parsedAttributes['xlink:href'], callback, parsedAttributes);
   };
 
   fabric.Image.async = true;
@@ -13646,11 +13740,6 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
 
       this._renderTextBackground(ctx, textLines);
 
-      if (this.textAlign !== 'left') {
-        ctx.save();
-        ctx.translate(this.textAlign === 'center' ? (this.width / 2) : this.width, 0);
-      }
-
       this._setTextShadow(ctx);
       this._renderTextFill(ctx, textLines);
       this.textShadow && ctx.restore();
@@ -13763,11 +13852,11 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
     _renderTextFill: function(ctx, textLines) {
       this._boundaries = [ ];
       for (var i = 0, len = textLines.length; i < len; i++) {
-        ctx.fillText(
-          textLines[i],
-          -this.width / 2,
-          (-this.height / 2) + (i * this.fontSize * this.lineHeight) + this.fontSize
-        );
+          ctx.fillText(
+              textLines[i],
+              0,
+              i * this.fontSize * this.lineHeight
+          );
       }
     },
 
@@ -13780,8 +13869,8 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
         for (var i = 0, len = textLines.length; i < len; i++) {
           ctx.strokeText(
             textLines[i],
-            -this.width / 2,
-            (-this.height / 2) + (i * this.fontSize * this.lineHeight) + this.fontSize
+            0,
+            i * this.fontSize * this.lineHeight
           );
         }
       }
@@ -13802,10 +13891,10 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
           var lineLeftOffset = this._getLineLeftOffset(lineWidth);
 
           ctx.fillRect(
-            (-this.width / 2) + lineLeftOffset,
-            (-this.height / 2) + (i * this.fontSize * this.lineHeight),
+            0 + lineLeftOffset,
+            (i-1) * this.fontSize * this.lineHeight,
             lineWidth,
-            this.fontSize
+            this.fontSize * this.lineHeight
           );
         }
         ctx.restore();
@@ -13907,6 +13996,15 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
      */
     render: function(ctx, noTransform) {
       ctx.save();
+
+        var m = this.transformMatrix;
+        if (this.group) {
+            ctx.translate(this.group.width/-2, this.group.height/-2);
+        }
+        if (m) {
+            ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
+        }
+
       this._render(ctx);
       if (!noTransform && this.active) {
         this.drawBorders(ctx);
@@ -14141,7 +14239,7 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
    */
   fabric.Text.ATTRIBUTE_NAMES =
     ('x y fill fill-opacity opacity stroke stroke-width transform ' +
-     'font-family font-style font-weight font-size text-decoration').split(' ');
+     'font-family font-style font-weight font-size text-decoration text-anchor').split(' ');
 
   /**
    * Returns fabric.Text instance from an object representation
@@ -14171,19 +14269,14 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
     var parsedAttributes = fabric.parseAttributes(element, fabric.Text.ATTRIBUTE_NAMES);
     options = fabric.util.object.extend((options ? fabric.util.object.clone(options) : { }), parsedAttributes);
 
+    // convert svg alignment to canvas alignment
+    var map = {start:'left', middle:'center', end:'right'};
+    if(options['text-anchor']){
+        options.textAlign = map[options['text-anchor']];
+        delete options['text-anchor']
+    }
+
     var text = new fabric.Text(element.textContent, options);
-
-    /*
-      Adjust positioning:
-        x/y attributes in SVG correspond to the bottom-left corner of text bounding box
-        top/left properties in Fabric correspond to center point of text bounding box
-    */
-
-    text.set({
-      left: text.getLeft() + text.getWidth() / 2,
-      top: text.getTop() - text.getHeight() / 2
-    });
-
     return text;
   };
 

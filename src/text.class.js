@@ -256,11 +256,6 @@
 
       this._renderTextBackground(ctx, textLines);
 
-      if (this.textAlign !== 'left') {
-        ctx.save();
-        ctx.translate(this.textAlign === 'center' ? (this.width / 2) : this.width, 0);
-      }
-
       this._setTextShadow(ctx);
       this._renderTextFill(ctx, textLines);
       this.textShadow && ctx.restore();
@@ -373,11 +368,11 @@
     _renderTextFill: function(ctx, textLines) {
       this._boundaries = [ ];
       for (var i = 0, len = textLines.length; i < len; i++) {
-        ctx.fillText(
-          textLines[i],
-          -this.width / 2,
-          (-this.height / 2) + (i * this.fontSize * this.lineHeight) + this.fontSize
-        );
+          ctx.fillText(
+              textLines[i],
+              0,
+              i * this.fontSize * this.lineHeight
+          );
       }
     },
 
@@ -390,8 +385,8 @@
         for (var i = 0, len = textLines.length; i < len; i++) {
           ctx.strokeText(
             textLines[i],
-            -this.width / 2,
-            (-this.height / 2) + (i * this.fontSize * this.lineHeight) + this.fontSize
+            0,
+            i * this.fontSize * this.lineHeight
           );
         }
       }
@@ -412,10 +407,10 @@
           var lineLeftOffset = this._getLineLeftOffset(lineWidth);
 
           ctx.fillRect(
-            (-this.width / 2) + lineLeftOffset,
-            (-this.height / 2) + (i * this.fontSize * this.lineHeight),
+            0 + lineLeftOffset,
+            (i-1) * this.fontSize * this.lineHeight,
             lineWidth,
-            this.fontSize
+            this.fontSize * this.lineHeight
           );
         }
         ctx.restore();
@@ -517,6 +512,15 @@
      */
     render: function(ctx, noTransform) {
       ctx.save();
+
+        var m = this.transformMatrix;
+        if (this.group) {
+            ctx.translate(this.group.width/-2, this.group.height/-2);
+        }
+        if (m) {
+            ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
+        }
+
       this._render(ctx);
       if (!noTransform && this.active) {
         this.drawBorders(ctx);
@@ -751,7 +755,7 @@
    */
   fabric.Text.ATTRIBUTE_NAMES =
     ('x y fill fill-opacity opacity stroke stroke-width transform ' +
-     'font-family font-style font-weight font-size text-decoration').split(' ');
+     'font-family font-style font-weight font-size text-decoration text-anchor').split(' ');
 
   /**
    * Returns fabric.Text instance from an object representation
@@ -781,19 +785,14 @@
     var parsedAttributes = fabric.parseAttributes(element, fabric.Text.ATTRIBUTE_NAMES);
     options = fabric.util.object.extend((options ? fabric.util.object.clone(options) : { }), parsedAttributes);
 
+    // convert svg alignment to canvas alignment
+    var map = {start:'left', middle:'center', end:'right'};
+    if(options['text-anchor']){
+        options.textAlign = map[options['text-anchor']];
+        delete options['text-anchor']
+    }
+
     var text = new fabric.Text(element.textContent, options);
-
-    /*
-      Adjust positioning:
-        x/y attributes in SVG correspond to the bottom-left corner of text bounding box
-        top/left properties in Fabric correspond to center point of text bounding box
-    */
-
-    text.set({
-      left: text.getLeft() + text.getWidth() / 2,
-      top: text.getTop() - text.getHeight() / 2
-    });
-
     return text;
   };
 
