@@ -2659,9 +2659,12 @@ fabric.util.string = {
         scrollTop += element.scrollTop || 0;
     }
 
+    var clientX = event.touches && event.touches[0] && event.touches[0].pageX || event.clientX;
+    var clientY = event.touches && event.touches[0] && event.touches[0].pageY || event.clientY;
+
     return {
-        x: event.clientX + scrollLeft,
-        y: event.clientY + scrollTop
+        x: clientX + scrollLeft,
+        y: clientY + scrollTop
     };
   }
 
