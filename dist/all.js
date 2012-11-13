@@ -13296,7 +13296,7 @@ fabric.Image.filters.Convolute = fabric.util.createClass({
     return {
       type: this.type,
       matrix: this.matrix
-    }
+    };
   }
 });
 
@@ -13335,8 +13335,7 @@ fabric.Image.filters.Pixelate = fabric.util.createClass({
         data = imageData.data,
         iLen = imageData.width,
         jLen = imageData.height,
-        index, average, i, j,
-        offsetBlocksize = this.blocksize - 1, r, g, b, a;
+        index, i, j, r, g, b, a;
 
     for (i = 0; i < iLen; i += this.blocksize) {
       for (j = 0; j < jLen; j += this.blocksize) {
