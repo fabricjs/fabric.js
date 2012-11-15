@@ -208,14 +208,16 @@
     rotatingPointOffset:      40,
 
     /**
-     * @private
+     * When set to `true`, objects are "found" on canvas on per-pixel basis rather than according to bounding box
      * @property
-     * @type Number
+     * @type Boolean
      */
-    _theta:                   0,
-
     perPixelTargetFind:       false,
 
+    /**
+     * @property
+     * @type Boolean
+     */
     includeDefaultValues:     true,
 
     /**
@@ -226,7 +228,7 @@
      */
     stateProperties:  (
       'top left width height scaleX scaleY flipX flipY ' +
-      'theta angle opacity cornersize fill overlayFill ' +
+      'angle opacity cornersize fill overlayFill ' +
       'stroke strokeWidth strokeDashArray fillRule ' +
       'borderScaleFactor transformMatrix selectable'
     ).split(' '),
@@ -284,7 +286,7 @@
     transform: function(ctx) {
       ctx.globalAlpha = this.opacity;
       ctx.translate(this.left, this.top);
-      ctx.rotate(this._theta);
+      ctx.rotate(degreesToRadians(this.angle));
       ctx.scale(
         this.scaleX * (this.flipX ? -1 : 1),
         this.scaleY * (this.flipY ? -1 : 1)
@@ -464,12 +466,7 @@
       if (shouldConstrainValue) {
         value = fabric.Object.MIN_SCALE_LIMIT;
       }
-      if (key === 'angle') {
-        this.setAngle(value);
-      }
-      else {
-        this[key] = value;
-      }
+      this[key] = value;
     },
 
     /**
@@ -505,9 +502,7 @@
      * @return {Any} value of a property
      */
     get: function(property) {
-      return (property === 'angle')
-        ? this.getAngle()
-        : this[property];
+      return this[property];
     },
 
     /**
@@ -618,39 +613,6 @@
     },
 
     /**
-     * Sets object opacity
-     * @method setOpacity
-     * @param value {Number} value 0-1
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-    setOpacity: function(value) {
-      this.set('opacity', value);
-      return this;
-    },
-
-    /**
-     * Returns object's angle value
-     * @method getAngle
-     * @return {Number} angle value
-     */
-    getAngle: function() {
-      return this._theta * 180 / Math.PI;
-    },
-
-    /**
-     * Sets object's angle
-     * @method setAngle
-     * @param value {Number} angle value
-     * @return {Object} thisArg
-     */
-    setAngle: function(value) {
-      this._theta = value / 180 * Math.PI;
-      this.angle = value;
-      return this;
-    },
-
-    /**
      * Sets corner position coordinates based on current angle, width and height.
      * @method setCoords
      * return {fabric.Object} thisArg
@@ -659,7 +621,8 @@
     setCoords: function() {
 
       var strokeWidth = this.strokeWidth > 1 ? this.strokeWidth : 0,
-          padding = this.padding;
+          padding = this.padding,
+          theta = degreesToRadians(this.angle);
 
       this.currentWidth = (this.width + strokeWidth) * this.scaleX + padding * 2;
       this.currentHeight = (this.height + strokeWidth) * this.scaleY + padding * 2;
@@ -669,16 +632,15 @@
          this.currentWidth = Math.abs(this.currentWidth);
       }
 
-      this._hypotenuse = Math.sqrt(
+      var _hypotenuse = Math.sqrt(
         Math.pow(this.currentWidth / 2, 2) +
         Math.pow(this.currentHeight / 2, 2));
 
-      this._angle = Math.atan(this.currentHeight / this.currentWidth);
+      var _angle = Math.atan(this.currentHeight / this.currentWidth);
 
       // offset added for rotate and scale actions
-      var offsetX = Math.cos(this._angle + this._theta) * this._hypotenuse,
-          offsetY = Math.sin(this._angle + this._theta) * this._hypotenuse,
-          theta = this._theta,
+      var offsetX = Math.cos(_angle + theta) * _hypotenuse,
+          offsetY = Math.sin(_angle + theta) * _hypotenuse,
           sinTh = Math.sin(theta),
           cosTh = Math.cos(theta);
 
@@ -722,16 +684,16 @@
       // debugging
 
       // setTimeout(function() {
-      //         canvas.contextTop.fillStyle = 'green';
-      //         canvas.contextTop.fillRect(mb.x, mb.y, 3, 3);
-      //         canvas.contextTop.fillRect(bl.x, bl.y, 3, 3);
-      //         canvas.contextTop.fillRect(br.x, br.y, 3, 3);
-      //         canvas.contextTop.fillRect(tl.x, tl.y, 3, 3);
-      //         canvas.contextTop.fillRect(tr.x, tr.y, 3, 3);
-      //         canvas.contextTop.fillRect(ml.x, ml.y, 3, 3);
-      //         canvas.contextTop.fillRect(mr.x, mr.y, 3, 3);
-      //         canvas.contextTop.fillRect(mt.x, mt.y, 3, 3);
-      //       }, 50);
+      //   canvas.contextTop.fillStyle = 'green';
+      //   canvas.contextTop.fillRect(mb.x, mb.y, 3, 3);
+      //   canvas.contextTop.fillRect(bl.x, bl.y, 3, 3);
+      //   canvas.contextTop.fillRect(br.x, br.y, 3, 3);
+      //   canvas.contextTop.fillRect(tl.x, tl.y, 3, 3);
+      //   canvas.contextTop.fillRect(tr.x, tr.y, 3, 3);
+      //   canvas.contextTop.fillRect(ml.x, ml.y, 3, 3);
+      //   canvas.contextTop.fillRect(mr.x, mr.y, 3, 3);
+      //   canvas.contextTop.fillRect(mt.x, mt.y, 3, 3);
+      // }, 50);
 
       // clockwise
       this.oCoords = { tl: tl, tr: tr, br: br, bl: bl, ml: ml, mt: mt, mr: mr, mb: mb, mtr: mtr };
@@ -1341,12 +1303,13 @@
      */
     _setCornerCoords: function() {
       var coords = this.oCoords,
-          theta = degreesToRadians(45 - this.getAngle()),
+          theta = degreesToRadians(this.angle),
+          newTheta = degreesToRadians(45 - this.angle),
           cornerHypotenuse = Math.sqrt(2 * Math.pow(this.cornersize, 2)) / 2,
-          cosHalfOffset = cornerHypotenuse * Math.cos(theta),
-          sinHalfOffset = cornerHypotenuse * Math.sin(theta),
-          sinTh = Math.sin(this._theta),
-          cosTh = Math.cos(this._theta);
+          cosHalfOffset = cornerHypotenuse * Math.cos(newTheta),
+          sinHalfOffset = cornerHypotenuse * Math.sin(newTheta),
+          sinTh = Math.sin(theta),
+          cosTh = Math.cos(theta);
 
       coords.tl.corner = {
         tl: {
@@ -1704,11 +1667,6 @@
     }
   });
 
-  /**
-   * @alias rotate -> setAngle
-   */
-  fabric.Object.prototype.rotate = fabric.Object.prototype.setAngle;
-
   var proto = fabric.Object.prototype;
   for (var i = proto.stateProperties.length; i--; ) {
 
@@ -1729,6 +1687,11 @@
       })(propName);
     }
   }
+
+  /**
+   * @alias rotate -> setAngle
+   */
+  fabric.Object.prototype.rotate = fabric.Object.prototype.setAngle;
 
   extend(fabric.Object.prototype, fabric.Observable);
 

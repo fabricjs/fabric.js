@@ -51,6 +51,18 @@
   }
 
   /**
+   * Transforms radians to degrees.
+   * @static
+   * @method radiansToDegrees
+   * @memberOf fabric.util
+   * @param {Number} radians value in radians
+   * @return {Number} value in degrees
+   */
+  function radiansToDegrees(radians) {
+    return radians / PiBy180;
+  }
+
+  /**
    * A wrapper around Number#toFixed, which contrary to native method returns number, not string.
    * @static
    * @method toFixed
@@ -215,6 +227,7 @@
 
   fabric.util.removeFromArray = removeFromArray;
   fabric.util.degreesToRadians = degreesToRadians;
+  fabric.util.radiansToDegrees = radiansToDegrees;
   fabric.util.toFixed = toFixed;
   fabric.util.getRandomInt = getRandomInt;
   fabric.util.falseFunction = falseFunction;

@@ -118,7 +118,6 @@
       this._initStateProperties();
       this.text = text;
       this.setOptions(options);
-      this._theta = this.angle * Math.PI / 180;
       this._initDimensions();
       this.setCoords();
     },
