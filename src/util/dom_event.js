@@ -12,11 +12,6 @@
     return true;
   }
   var getUniqueId = (function () {
-    if (typeof fabric.document.documentElement.uniqueID !== 'undefined') {
-      return function (element) {
-        return element.uniqueID;
-      };
-    }
     var uid = 0;
     return function (element) {
       return element.__uniqueID || (element.__uniqueID = 'uniqueID__' + uid++);
