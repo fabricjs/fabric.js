@@ -2645,20 +2645,27 @@ fabric.util.string = {
    * @param {Event} event
    */
   function getPointer(event) {
+    var element = event.target || event.srcElement,
+    scrollLeft = 0,
+    scrollTop = 0,
+    firstFixedAncestor;
 
-      var x = event.clientX;
-      var y = event.clientY;
+    while (element && element.parentNode && !firstFixedAncestor) {
+        element = element.parentNode;
 
-      if (event.pageX == null && event.clientX != null) {
-          var eventDoc = event.target.ownerDocument || fabric.document;
-          var doc = eventDoc.documentElement;
-          var body = eventDoc.body;
+        if (element !== fabric.document && fabric.util.getElementPosition(element) === 'fixed') firstFixedAncestor = element;
 
-          x = event.clientX + (doc && doc.scrollLeft || body && body.scrollLeft || 0) - (doc && doc.clientLeft || body && body.clientLeft || 0);
-          y = event.clientY + (doc && doc.scrollTop || body && body.scrollTop || 0) - (doc && doc.clientTop || body && body.clientTop || 0);
-      }
+        scrollLeft += element.scrollLeft || 0;
+        scrollTop += element.scrollTop || 0;
+    }
 
-      return { x: x, y: y };
+    var clientX = event.touches && event.touches[0] && event.touches[0].pageX || event.clientX;
+    var clientY = event.touches && event.touches[0] && event.touches[0].pageY || event.clientY;
+
+    return {
+        x: clientX + scrollLeft,
+        y: clientY + scrollTop
+    };
   }
 
   var pointerX = function(event) {
