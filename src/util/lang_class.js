@@ -29,7 +29,9 @@
           };
         })(property);
       }
-      else {
+      else if( Object.prototype.toString.call( klass.prototype[property] ) === '[object Array]') {
+        klass.prototype[property] = source[property].slice(); //Arrays are passed by reference!
+      }else{
         klass.prototype[property] = source[property];
       }
 
