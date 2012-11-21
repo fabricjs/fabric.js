@@ -6266,6 +6266,20 @@ fabric.util.string = {
      */
     selectionColor:         'rgba(100, 100, 255, 0.3)', // blue
 
+     /**
+     * Indicates whether selection border should be dashed
+     * @property
+     * @type Boolean
+     */
+    selectionDashed:         false,
+
+    /**
+     * Default dash array pattern
+     * @property
+     * @type Array
+     */ 
+    selectionDashArray:      [3, 6],
+
     /**
      * Color of the border of selection (usually slightly darker than color of selection itself)
      * @property
@@ -7113,12 +7127,26 @@ fabric.util.string = {
       this.contextTop.lineWidth = this.selectionLineWidth;
       this.contextTop.strokeStyle = this.selectionBorderColor;
 
-      this.contextTop.strokeRect(
-        groupSelector.ex + STROKE_OFFSET - ((left > 0) ? 0 : aleft),
-        groupSelector.ey + STROKE_OFFSET - ((top > 0) ? 0 : atop),
-        aleft,
-        atop
-      );
+      // selection border
+      if (this.selectionDashed == true && this.selectionDashArray.length > 1) {
+        this.contextTop.beginPath();
+        var px = groupSelector.ex + STROKE_OFFSET - ((left > 0) ? 0: aleft);
+        var py = groupSelector.ey + STROKE_OFFSET - ((top > 0) ? 0: atop);
+        this.contextTop.dashedLine(px, py, px+aleft, py, this.selectionDashArray);
+        this.contextTop.dashedLine(px, py+atop-1, px+aleft, py+atop-1, this.selectionDashArray);
+        this.contextTop.dashedLine(px, py, px+0.001, py+atop, this.selectionDashArray);
+        this.contextTop.dashedLine(px+aleft-1, py, px+aleft+1.1, py+atop-0.001, this.selectionDashArray);
+        this.contextTop.closePath();
+        this.contextTop.stroke();
+      }
+      else {
+        this.contextTop.strokeRect(
+          groupSelector.ex + STROKE_OFFSET - ((left > 0) ? 0 : aleft),
+          groupSelector.ey + STROKE_OFFSET - ((top > 0) ? 0 : atop),
+          aleft,
+          atop
+        );
+      }
     },
 
     _findSelectedObjects: function (e) {
@@ -7445,7 +7473,40 @@ fabric.util.string = {
    * @constructor
    */
   fabric.Element = fabric.Canvas;
+
+  /*
+   * Add dashed line drawing capabilitites to Canvas
+   * this method is used to draw dashed line around selection area.
+   *
+   */
+
+  CanvasRenderingContext2D.prototype.dashedLine = function(x,y,x2,y2,dashArray){
+    if (!dashArray) dashArray=[10,5];
+    var dashCount = dashArray.length;
+    this.moveTo(x, y);
+    var dx = (x2-x), dy = (y2-y);
+    var slope = dy/dx;
+    var distRemaining = Math.sqrt( dx*dx + dy*dy );
+    var dashIndex=0, draw=true;
+    while (distRemaining>=0.1 && dashIndex<10000){
+        var dashLength = dashArray[dashIndex++%dashCount];
+        if (dashLength==0) dashLength = 0.001; // Hack for Safari
+        if (dashLength > distRemaining) dashLength = distRemaining;
+        var xStep = Math.sqrt( dashLength*dashLength / (1 + slope*slope) );
+        x += xStep
+        y += slope*xStep;
+        this[draw ? 'lineTo' : 'moveTo'](x,y);
+        distRemaining -= dashLength;
+        draw = !draw;
+    }
+    // Ensure that the last segment is closed for proper stroking
+    this.moveTo(0,0);
+  }
+
 })();
+
+
+
 fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
   FX_DURATION: 500,
