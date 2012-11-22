@@ -7075,10 +7075,10 @@ fabric.util.string = {
         this.contextTop.beginPath();
         var px = groupSelector.ex + STROKE_OFFSET - ((left > 0) ? 0: aleft);
         var py = groupSelector.ey + STROKE_OFFSET - ((top > 0) ? 0: atop);
-        //this.contextTop.dashedLine(px, py, px+aleft, py, this.selectionDashArray);
-        this.contextTop.dashedLine(px, py-1, px, py+atop-1, this.selectionDashArray);
-        //this.contextTop.dashedLine(px+aleft, py, px+aleft, py+atop, this.selectionDashArray);
-        //this.contextTop.dashedLine(px, py, px+aleft, py, this.selectionDashArray);
+        this.contextTop.dashedLine(px, py, px+aleft, py, this.selectionDashArray);
+        this.contextTop.dashedLine(px, py+atop-1, px+aleft, py+atop-1, this.selectionDashArray);
+        this.contextTop.dashedLine(px, py, px+0.001, py+atop, this.selectionDashArray);
+        this.contextTop.dashedLine(px+aleft-1, py, px+aleft+1.1, py+atop-0.001, this.selectionDashArray);
         this.contextTop.closePath();
         this.contextTop.stroke();
       }
