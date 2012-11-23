@@ -37,17 +37,19 @@ fabric.isLikelyNode = typeof Buffer !== 'undefined' && typeof window === 'undefi
 
 var Cufon = (function() {
 
+  /** @ignore */
   var api = function() {
     return api.replace.apply(null, arguments);
   };
 
+  /** @ignore */
   var DOM = api.DOM = {
 
     ready: (function() {
 
       var complete = false, readyStatus = { loaded: 1, complete: 1 };
 
-      var queue = [], perform = function() {
+      var queue = [], /** @ignore */ perform = function() {
         if (complete) return;
         complete = true;
         for (var fn; fn = queue.shift(); fn());
@@ -89,27 +91,33 @@ var Cufon = (function() {
 
   };
 
-  var CSS = api.CSS = {
+  /** @ignore */
+  var CSS = api.CSS = /** @ignore */ {
 
+    /** @ignore */
     Size: function(value, base) {
 
       this.value = parseFloat(value);
       this.unit = String(value).match(/[a-z%]*$/)[0] || 'px';
 
+      /** @ignore */
       this.convert = function(value) {
         return value / base * this.value;
       };
 
+      /** @ignore */
       this.convertFrom = function(value) {
         return value / this.value * base;
       };
 
+      /** @ignore */
       this.toString = function() {
         return this.value + this.unit;
       };
 
     },
 
+    /** @ignore */
     getStyle: function(el) {
       return new Style(el.style);
       /*
@@ -161,6 +169,7 @@ var Cufon = (function() {
 
     })(),
 
+    /** @ignore */
     supports: function(property, value) {
       var checker = fabric.document.createElement('span').style;
       if (checker[property] === undefined) return false;
@@ -168,6 +177,7 @@ var Cufon = (function() {
       return checker[property] === value;
     },
 
+    /** @ignore */
     textAlign: function(word, style, position, wordCount) {
       if (style.get('textAlign') == 'right') {
         if (position > 0) word = ' ' + word;
@@ -176,6 +186,7 @@ var Cufon = (function() {
       return word;
     },
 
+    /** @ignore */
     textDecoration: function(el, style) {
       if (!style) style = this.getStyle(el);
       var types = {
@@ -225,6 +236,7 @@ var Cufon = (function() {
       return parsed;
     }),
 
+    /** @ignore */
     textTransform: function(text, style) {
       return text[{
         uppercase: 'toUpperCase',
@@ -255,6 +267,7 @@ var Cufon = (function() {
       };
       box.width = box.maxX - box.minX,
       box.height = box.maxY - box.minY;
+      /** @ignore */
       box.toString = function() {
         return [ this.minX, this.minY, this.width, this.height ].join(' ');
       };
@@ -279,6 +292,7 @@ var Cufon = (function() {
       (styles[font.style] || (styles[font.style] = {}))[font.weight] = font;
     };
 
+    /** @ignore */
     this.get = function(style, weight) {
       var weights = styles[style] || styles[mapping[style]]
         || styles.normal || styles.italic || styles.oblique;
@@ -364,6 +378,7 @@ var Cufon = (function() {
       return el.cufid || (el.cufid = ++at);
     }
 
+    /** @ignore */
     this.get = function(el) {
       var id = identify(el);
       return map[id] || (map[id] = {});
@@ -461,6 +476,7 @@ var Cufon = (function() {
     return fragment;
   }
 
+  /** @ignore */
   function replaceElement(el, options) {
     var font, style, nextNode, redraw;
     for (var node = attach(el, options).firstChild; node; node = nextNode) {
@@ -529,11 +545,13 @@ var Cufon = (function() {
     characters: ''
   };
 
+  /** @ignore */
   api.now = function() {
     DOM.ready();
     return api;
   };
 
+  /** @ignore */
   api.refresh = function() {
     var currentHistory = replaceHistory.splice(0, replaceHistory.length);
     for (var i = 0, l = currentHistory.length; i < l; ++i) {
@@ -542,12 +560,14 @@ var Cufon = (function() {
     return api;
   };
 
+  /** @ignore */
   api.registerEngine = function(id, engine) {
     if (!engine) return api;
     engines[id] = engine;
     return api.set('engine', id);
   };
 
+  /** @ignore */
   api.registerFont = function(data) {
     var font = new Font(data), family = font.family;
     if (!fonts[family]) fonts[family] = new FontFamily();
@@ -555,6 +575,7 @@ var Cufon = (function() {
     return api.set('fontFamily', '"' + family + '"');
   };
 
+  /** @ignore */
   api.replace = function(elements, options, ignoreHistory) {
     options = merge(defaultOptions, options);
     if (!options.engine) return api; // there's no browser support so we'll just stop here
@@ -572,6 +593,7 @@ var Cufon = (function() {
     return api;
   };
 
+  /** @ignore */
   api.replaceElement = function(el, options) {
     options = merge(defaultOptions, options);
     if (typeof options.textShadow == 'string' && options.textShadow)
@@ -579,14 +601,14 @@ var Cufon = (function() {
     return replaceElement(el, options);
   };
 
-  // ==>
   api.engines = engines;
   api.fonts = fonts;
+  /** @ignore */
   api.getOptions = function() {
     return merge(defaultOptions);
-  }
-  // <==
+  };
 
+  /** @ignore */
   api.set = function(option, value) {
     defaultOptions[option] = value;
     return api;
@@ -1404,6 +1426,7 @@ if (!JSON) {
 
     if (typeof Date.prototype.toJSON !== 'function') {
 
+        /** @ignore */
         Date.prototype.toJSON = function (key) {
 
             return isFinite(this.valueOf())
@@ -1418,6 +1441,7 @@ if (!JSON) {
 
         String.prototype.toJSON      =
             Number.prototype.toJSON  =
+            /** @ignore */
             Boolean.prototype.toJSON = function (key) {
                 return this.valueOf();
             };
@@ -1587,6 +1611,7 @@ if (!JSON) {
 // If the JSON object does not yet have a stringify method, give it one.
 
     if (typeof JSON.stringify !== 'function') {
+        /** @ignore */
         JSON.stringify = function (value, replacer, space) {
 
 // The stringify method takes a value and an optional replacer, and an optional
@@ -1634,6 +1659,7 @@ if (!JSON) {
 // If the JSON object does not yet have a parse method, give it one.
 
     if (typeof JSON.parse !== 'function') {
+        /** @ignore */
         JSON.parse = function (text, reviver) {
 
 // The parse method takes a text and an optional reviver function, and returns
@@ -1718,7 +1744,7 @@ if (!JSON) {
 /**
  * Wrapper around `console.log` (when available)
  * @method log
- * @param {Any} Values to log
+ * @param {Any} values Values to log
  */
 fabric.log = function() { };
 
@@ -1731,12 +1757,12 @@ fabric.warn = function() { };
 
 if (typeof console !== 'undefined') {
   if (typeof console.log !== 'undefined' && console.log.apply) {
-    fabric.log = function() { 
+    fabric.log = function() {
       return console.log.apply(console, arguments);
     };
   }
   if (typeof console.warn !== 'undefined' && console.warn.apply) {
-    fabric.warn = function() { 
+    fabric.warn = function() {
       return console.warn.apply(console, arguments);
     };
   }
@@ -1815,13 +1841,14 @@ fabric.Observable = {
 /**
  * Alias for observe
  * @method observe
- * @memberOf fabric.Observable
+ * @type function
  */
 fabric.Observable.on = fabric.Observable.observe;
 
 /**
  * Alias for stopObserving
  * @method off
+ * @type function
  */
 fabric.Observable.off = fabric.Observable.stopObserving;
 (function() {
@@ -2373,23 +2400,24 @@ fabric.util.string = {
      * @param {Any[]} [...] Values to pass to a bound function
      * @return {Function}
      */
-     Function.prototype.bind = function(thisArg) {
-       var fn = this, args = slice.call(arguments, 1), bound;
-       if (args.length) {
-         bound = function() {
-           return apply.call(fn, this instanceof Dummy ? this : thisArg, args.concat(slice.call(arguments)));
-         };
-       }
-       else {
-         bound = function() {
-           return apply.call(fn, this instanceof Dummy ? this : thisArg, arguments);
-         };
-       }
-       Dummy.prototype = this.prototype;
-       bound.prototype = new Dummy();
+    Function.prototype.bind = function(thisArg) {
+      var fn = this, args = slice.call(arguments, 1), bound;
+      if (args.length) {
+        bound = function() {
+          return apply.call(fn, this instanceof Dummy ? this : thisArg, args.concat(slice.call(arguments)));
+        };
+      }
+      else {
+        /** @ignore */
+        bound = function() {
+          return apply.call(fn, this instanceof Dummy ? this : thisArg, arguments);
+        };
+      }
+      Dummy.prototype = this.prototype;
+      bound.prototype = new Dummy();
 
-       return bound;
-     };
+      return bound;
+    };
   }
 
 })();
@@ -2441,9 +2469,19 @@ fabric.util.string = {
 
   function Subclass() { }
 
+  function callSuper(methodName) {
+    var fn = this.constructor.superclass.prototype[methodName];
+    return (arguments.length > 1)
+      ? fn.apply(this, slice.call(arguments, 1))
+      : fn.call(this);
+  }
+
   /**
-   * Helper for creation of "classes"
+   * Helper for creation of "classes". Note that pr
    * @method createClass
+   * @param parent optional "Class" to inherit from
+   * @param properties Properties shared by all instances of this class
+   *                  (be careful modifying objects defined here as this would affect all instances)
    * @memberOf fabric.util
    */
   function createClass() {
@@ -2472,6 +2510,7 @@ fabric.util.string = {
       klass.prototype.initialize = emptyFunction;
     }
     klass.prototype.constructor = klass;
+    klass.prototype.callSuper = callSuper;
     return klass;
   }
 
@@ -2913,12 +2952,13 @@ fabric.util.string = {
     };
   }
   else {
+    /** @ignore */
     getElementPosition = function (element) {
       var value = element.style.position;
       if (!value && element.currentStyle) value = element.currentStyle.position;
       return value;
     };
-  } 
+  }
 
   (function () {
     var style = fabric.document.documentElement.style;
@@ -3997,6 +4037,7 @@ fabric.util.string = {
    /**
     * Takes url corresponding to an SVG document, and parses it into a set of fabric objects
     * @method loadSVGFromURL
+    * @memberof fabric
     * @param {String} url
     * @param {Function} callback
     * @param {Function} [reviver] Method for further parsing of SVG elements, called after each fabric object created.
@@ -4059,6 +4100,7 @@ fabric.util.string = {
   /**
     * Takes string corresponding to an SVG document, and parses it into a set of fabric objects
     * @method loadSVGFromString
+    * @memberof fabric
     * @param {String} string
     * @param {Function} callback
     * @param {Function} [reviver] Method for further parsing of SVG elements, called after each fabric object created.
@@ -4155,11 +4197,15 @@ fabric.util.string = {
   }
 
   /**
-   * @class Object
+   * @class Gradient
    * @memberOf fabric
    */
   fabric.Gradient = fabric.util.createClass(/** @scope fabric.Gradient.prototype */ {
 
+    /**
+     * @method initialize
+     * @param options optional Options with x1, y1, x2, y2 and colorStops
+     */
     initialize: function(options) {
 
       options || (options = { });
@@ -4172,6 +4218,10 @@ fabric.util.string = {
       this.colorStops = options.colorStops;
     },
 
+    /**
+     * Returns object representation of a gradient
+     * @method toObject
+     */
     toObject: function() {
       return {
         x1: this.x1,
@@ -4182,6 +4232,11 @@ fabric.util.string = {
       };
     },
 
+    /**
+     * Returns an instance of CanvasGradient
+     * @method toLiveGradient
+     * @param ctx
+     */
     toLiveGradient: function(ctx) {
       var gradient = ctx.createLinearGradient(
         this.x1, this.y1, this.x2 || ctx.canvas.width, this.y2);
@@ -4200,6 +4255,7 @@ fabric.util.string = {
     /**
      * @method fromElement
      * @static
+     * @memberof fabric.Gradient
      * @see http://www.w3.org/TR/SVG/pservers.html#LinearGradientElement
      */
     fromElement: function(el, instance) {
@@ -4254,6 +4310,7 @@ fabric.util.string = {
     /**
      * @method forObject
      * @static
+     * @memberof fabric.Gradient
      */
     forObject: function(obj, options) {
       options || (options = { });
@@ -4678,7 +4735,7 @@ fabric.util.string = {
    *
    * @class Color
    * @memberOf fabric
-   * @param {String} color (optional) in hex or rgb(a) format
+   * @param {String} color optional in hex or rgb(a) format
    */
   function Color(color) {
     if (!color) {
@@ -7381,7 +7438,7 @@ fabric.util.string = {
   /**
    * @class fabric.Element
    * @alias fabric.Canvas
-   * @deprecated
+   * @deprecated Use {@link fabric.Canvas} instead.
    * @constructor
    */
   fabric.Element = fabric.Canvas;
@@ -7590,6 +7647,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
           else {
             obj.path = path;
             var object = fabric.Text.fromObject(obj);
+            /** @ignore */
             var onscriptload = function () {
               // TODO (kangax): find out why Opera refuses to work without this timeout
               if (Object.prototype.toString.call(fabric.window.opera) === '[object Opera]') {
@@ -8010,17 +8068,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     ).split(' '),
 
     /**
-     * @method callSuper
-     * @param {String} methodName
-     */
-    callSuper: function(methodName) {
-      var fn = this.constructor.superclass.prototype[methodName];
-      return (arguments.length > 1)
-        ? fn.apply(this, slice.call(arguments, 1))
-        : fn.call(this);
-    },
-
-    /**
      * Constructor
      * @method initialize
      * @param {Object} [options] Options object
@@ -8032,7 +8079,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     },
 
     /**
-     * @method initGradient
+     * @private
+     * @method _initGradient
      */
     _initGradient: function(options) {
       if (options.fill && typeof options.fill === 'object' && !(options.fill instanceof fabric.Gradient)) {
@@ -8564,6 +8612,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       return this;
     },
 
+    /**
+     * @private
+     * @method _renderDashedStroke
+     */
     _renderDashedStroke: function(ctx) {
 
       if (1 & this.strokeDashArray.length /* if odd number of items */) {
@@ -8580,6 +8632,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       ctx.save();
       ctx.beginPath();
 
+      /** @ignore */
       function renderSide(xMultiplier, yMultiplier) {
 
         var lineLength = 0,
@@ -9638,7 +9691,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   });
 
   /**
-   * List of attribute names to account for when parsing SVG element (used by `fabric.Line.fromElement`)
+   * List of attribute names to account for when parsing SVG element (used by {@link fabric.Line.fromElement})
    * @static
    * @see http://www.w3.org/TR/SVG/shapes.html#LineElement
    */
@@ -10109,7 +10162,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   };
 
   /**
-   * Returns fabric.Ellipse instance from an object representation
+   * Returns {@link fabric.Ellipse} instance from an object representation
    * @static
    * @method fabric.Ellipse.fromObject
    * @param {Object} object Object to create an instance from
@@ -10457,7 +10510,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   });
 
   /**
-   * List of attribute names to account for when parsing SVG element (used by `fabric.Polyline.fromElement`)
+   * List of attribute names to account for when parsing SVG element (used by {@link fabric.Polyline.fromElement})
    * @static
    * @see: http://www.w3.org/TR/SVG/shapes.html#PolylineElement
    */
@@ -12685,6 +12738,7 @@ fabric.Image.filters.Grayscale = fabric.util.createClass( /** @scope fabric.Imag
   type: "Grayscale",
 
   /**
+   * Applies filter to canvas element
    * @method applyTo
    * @memberOf fabric.Image.filters.Grayscale.prototype
    * @param {Object} canvasEl Canvas element to apply filter to
@@ -12713,6 +12767,7 @@ fabric.Image.filters.Grayscale = fabric.util.createClass( /** @scope fabric.Imag
   },
 
   /**
+   * Returns json representation of filter
    * @method toJSON
    * @return {String} json representation of filter
    */
@@ -12747,6 +12802,7 @@ fabric.Image.filters.RemoveWhite = fabric.util.createClass( /** @scope fabric.Im
   },
 
   /**
+   * Applies filter to canvas element
    * @method applyTo
    * @param {Object} canvasEl Canvas element to apply filter to
    */
@@ -12781,6 +12837,7 @@ fabric.Image.filters.RemoveWhite = fabric.util.createClass( /** @scope fabric.Im
   },
 
   /**
+   * Returns json representation of filter
    * @method toJSON
    * @return {String} json representation of filter
    */
@@ -12809,6 +12866,7 @@ fabric.Image.filters.Invert = fabric.util.createClass( /** @scope fabric.Image.f
   type: "Invert",
 
   /**
+   * Applies filter to canvas element
    * @method applyTo
    * @memberOf fabric.Image.filters.Invert.prototype
    * @param {Object} canvasEl Canvas element to apply filter to
@@ -12829,6 +12887,7 @@ fabric.Image.filters.Invert = fabric.util.createClass( /** @scope fabric.Image.f
   },
 
   /**
+   * Returns json representation of filter
    * @method toJSON
    * @return {String} json representation of filter
    */
@@ -12853,6 +12912,7 @@ fabric.Image.filters.Sepia = fabric.util.createClass( /** @scope fabric.Image.fi
   type: "Sepia",
 
   /**
+   * Applies filter to canvas element
    * @method applyTo
    * @memberOf fabric.Image.filters.Sepia.prototype
    * @param {Object} canvasEl Canvas element to apply filter to
@@ -12874,6 +12934,7 @@ fabric.Image.filters.Sepia = fabric.util.createClass( /** @scope fabric.Image.fi
   },
 
   /**
+   * Returns json representation of filter
    * @method toJSON
    * @return {String} json representation of filter
    */
@@ -12898,6 +12959,7 @@ fabric.Image.filters.Sepia2 = fabric.util.createClass( /** @scope fabric.Image.f
   type: "Sepia2",
 
   /**
+   * Applies filter to canvas element
    * @method applyTo
    * @memberOf fabric.Image.filters.Sepia.prototype
    * @param {Object} canvasEl Canvas element to apply filter to
@@ -12923,6 +12985,7 @@ fabric.Image.filters.Sepia2 = fabric.util.createClass( /** @scope fabric.Image.f
   },
 
   /**
+   * Returns json representation of filter
    * @method toJSON
    * @return {String} json representation of filter
    */
@@ -12956,6 +13019,7 @@ fabric.Image.filters.Brightness = fabric.util.createClass( /** @scope fabric.Ima
   },
 
   /**
+   * Applies filter to canvas element
    * @method applyTo
    * @param {Object} canvasEl Canvas element to apply filter to
    */
@@ -12975,6 +13039,7 @@ fabric.Image.filters.Brightness = fabric.util.createClass( /** @scope fabric.Ima
   },
 
   /**
+   * Returns json representation of filter
    * @method toJSON
    * @return {String} json representation of filter
    */
@@ -12991,7 +13056,7 @@ fabric.Image.filters.Brightness.fromObject = function(object) {
 };
 
 /**
- * @class fabric.Image.filters.Brightness
+ * @class fabric.Image.filters.Noise
  * @memberOf fabric.Image.filters
  */
 fabric.Image.filters.Noise = fabric.util.createClass( /** @scope fabric.Image.filters.Noise.prototype */ {
@@ -13002,7 +13067,7 @@ fabric.Image.filters.Noise = fabric.util.createClass( /** @scope fabric.Image.fi
   type: "Noise",
 
   /**
-   * @memberOf fabric.Image.filters.Brightness.prototype
+   * @memberOf fabric.Image.filters.Noise.prototype
    * @param {Object} [options] Options object
    */
   initialize: function(options) {
@@ -13011,6 +13076,7 @@ fabric.Image.filters.Noise = fabric.util.createClass( /** @scope fabric.Image.fi
   },
 
   /**
+   * Applies filter to canvas element
    * @method applyTo
    * @param {Object} canvasEl Canvas element to apply filter to
    */
@@ -13033,6 +13099,7 @@ fabric.Image.filters.Noise = fabric.util.createClass( /** @scope fabric.Image.fi
   },
 
   /**
+   * Returns json representation of filter
    * @method toJSON
    * @return {String} json representation of filter
    */
@@ -13049,7 +13116,7 @@ fabric.Image.filters.Noise.fromObject = function(object) {
 };
 
 /**
- * @class fabric.Image.filters.Brightness
+ * @class fabric.Image.filters.GradientTransparency
  * @memberOf fabric.Image.filters
  */
 fabric.Image.filters.GradientTransparency = fabric.util.createClass( /** @scope fabric.Image.filters.GradientTransparency.prototype */ {
@@ -13060,7 +13127,6 @@ fabric.Image.filters.GradientTransparency = fabric.util.createClass( /** @scope 
   type: "GradientTransparency",
 
   /**
-   * @memberOf fabric.Image.filters.GradientTransparency.prototype
    * @param {Object} [options] Options object
    */
   initialize: function(options) {
@@ -13069,6 +13135,7 @@ fabric.Image.filters.GradientTransparency = fabric.util.createClass( /** @scope 
   },
 
   /**
+   * Applies filter to canvas element
    * @method applyTo
    * @param {Object} canvasEl Canvas element to apply filter to
    */
@@ -13087,6 +13154,7 @@ fabric.Image.filters.GradientTransparency = fabric.util.createClass( /** @scope 
   },
 
   /**
+   * Returns json representation of filter
    * @method toJSON
    * @return {String} json representation of filter
    */
@@ -13123,6 +13191,7 @@ fabric.Image.filters.Tint = fabric.util.createClass( /** @scope fabric.Image.fil
   },
 
   /**
+   * Applies filter to canvas element
    * @method applyTo
    * @param {Object} canvasEl Canvas element to apply filter to
    */
@@ -13154,6 +13223,7 @@ fabric.Image.filters.Tint = fabric.util.createClass( /** @scope fabric.Image.fil
   },
 
   /**
+   * Returns json representation of filter
    * @method toJSON
    * @return {String} json representation of filter
    */
@@ -13170,11 +13240,11 @@ fabric.Image.filters.Tint.fromObject = function(object) {
 };
 
 /**
+ * Adapted from <a href="http://www.html5rocks.com/en/tutorials/canvas/imagefilters/">html5rocks article</a>
  * @class fabric.Image.filters.Convolute
  * @memberOf fabric.Image.filters
- * Adapted from http://www.html5rocks.com/en/tutorials/canvas/imagefilters/
  */
-fabric.Image.filters.Convolute = fabric.util.createClass({
+fabric.Image.filters.Convolute = fabric.util.createClass(/** @scope fabric.Image.filters.Convolute.prototype */ {
 
   /**
    * @param {String} type
@@ -13205,6 +13275,7 @@ fabric.Image.filters.Convolute = fabric.util.createClass({
   },
 
   /**
+   * Applies filter to canvas element
    * @method applyTo
    * @param {Object} canvasEl Canvas element to apply filter to
    */
@@ -13262,6 +13333,7 @@ fabric.Image.filters.Convolute = fabric.util.createClass({
   },
 
   /**
+   * Returns json representation of filter
    * @method toJSON
    * @return {String} json representation of filter
    */
@@ -13281,7 +13353,7 @@ fabric.Image.filters.Convolute.fromObject = function(object) {
  * @class fabric.Image.filters.Pixelate
  * @memberOf fabric.Image.filters
  */
-fabric.Image.filters.Pixelate = fabric.util.createClass({
+fabric.Image.filters.Pixelate = fabric.util.createClass(/** @scope fabric.Image.filters.Pixelate.prototype */ {
 
   /**
    * @param {String} type
@@ -13298,6 +13370,7 @@ fabric.Image.filters.Pixelate = fabric.util.createClass({
   },
 
   /**
+   * Applies filter to canvas element
    * @method applyTo
    * @param {Object} canvasEl Canvas element to apply filter to
    */
@@ -13346,6 +13419,7 @@ fabric.Image.filters.Pixelate = fabric.util.createClass({
   },
 
   /**
+   * Returns json representation of filter
    * @method toJSON
    * @return {String} json representation of filter
    */
@@ -13806,6 +13880,7 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
       var halfOfVerticalBox = this._getTextHeight(ctx, textLines) / 2;
       var _this = this;
 
+      /** @ignore */
       function renderLinesAtOffset(offset) {
         for (var i = 0, len = textLines.length; i < len; i++) {
 
@@ -14107,7 +14182,7 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
   });
 
   /**
-   * List of attribute names to account for when parsing SVG element (used by `fabric.Text.fromElement`)
+   * List of attribute names to account for when parsing SVG element (used by {@link fabric.Text.fromElement})
    * @static
    */
   fabric.Text.ATTRIBUTE_NAMES =
@@ -14220,6 +14295,7 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
     });
   };
 
+  /** @ignore */
   fabric.loadSVGFromString = function(string, callback) {
     var doc = new DOMParser().parseFromString(string);
     fabric.parseSVGDocument(doc.documentElement, function(results, options) {
