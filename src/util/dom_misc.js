@@ -132,12 +132,13 @@
     };
   }
   else {
+    /** @ignore */
     getElementPosition = function (element) {
       var value = element.style.position;
       if (!value && element.currentStyle) value = element.currentStyle.position;
       return value;
     };
-  } 
+  }
 
   (function () {
     var style = fabric.document.documentElement.style;

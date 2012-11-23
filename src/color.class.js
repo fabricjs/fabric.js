@@ -15,7 +15,7 @@
    *
    * @class Color
    * @memberOf fabric
-   * @param {String} color (optional) in hex or rgb(a) format
+   * @param {String} color optional in hex or rgb(a) format
    */
   function Color(color) {
     if (!color) {

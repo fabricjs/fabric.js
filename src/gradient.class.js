@@ -24,11 +24,15 @@
   }
 
   /**
-   * @class Object
+   * @class Gradient
    * @memberOf fabric
    */
   fabric.Gradient = fabric.util.createClass(/** @scope fabric.Gradient.prototype */ {
 
+    /**
+     * @method initialize
+     * @param options optional Options with x1, y1, x2, y2 and colorStops
+     */
     initialize: function(options) {
 
       options || (options = { });
@@ -41,6 +45,10 @@
       this.colorStops = options.colorStops;
     },
 
+    /**
+     * Returns object representation of a gradient
+     * @method toObject
+     */
     toObject: function() {
       return {
         x1: this.x1,
@@ -51,6 +59,11 @@
       };
     },
 
+    /**
+     * Returns an instance of CanvasGradient
+     * @method toLiveGradient
+     * @param ctx
+     */
     toLiveGradient: function(ctx) {
       var gradient = ctx.createLinearGradient(
         this.x1, this.y1, this.x2 || ctx.canvas.width, this.y2);
@@ -69,6 +82,7 @@
     /**
      * @method fromElement
      * @static
+     * @memberof fabric.Gradient
      * @see http://www.w3.org/TR/SVG/pservers.html#LinearGradientElement
      */
     fromElement: function(el, instance) {
@@ -123,6 +137,7 @@
     /**
      * @method forObject
      * @static
+     * @memberof fabric.Gradient
      */
     forObject: function(obj, options) {
       options || (options = { });
