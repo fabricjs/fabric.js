@@ -161,6 +161,13 @@
       return Math.sqrt(dx * dx + dy * dy);
     },
 
+    /**
+     * Return the point between A (x,y) and B (x,y)
+     */ 
+    midPointFrom: function (that) {
+      return new Point(this.x + (that.x - this.x)/2, this.y + (that.y - this.y)/2);
+    },
+
     min: function (that) {
       return new Point(Math.min(this.x, that.x), Math.min(this.y, that.y));
     },
