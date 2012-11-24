@@ -751,11 +751,18 @@
     _captureDrawingPath: function(e) {
       var pointer = this.getPointer(e);
       
-      this._freeDrawingPoints.push(pointer);
-      
-      // We need at least two points
-      if (this._freeDrawingPoints.length < 2) {
-          this.contextTop.lineTo(pointer.x, pointer.y);
+      // Only push point if min_point_distance
+      // is greater than x
+      var MIN_POINT_DISTANCE = 2;
+
+      var lastPointer = this._freeDrawingPoints[this._freeDrawingPoints.length -1];
+      if (this.distanceBetween(pointer, lastPointer) > MIN_POINT_DISTANCE) {
+        this._freeDrawingPoints.push(pointer);
+
+        // We need at least two points
+        if (this._freeDrawingPoints.length < 2) {
+          this._freeDrawingPoints.push(pointer);
+        }
       }
     },
 
@@ -789,6 +796,10 @@
     /**
      * @private
      * @method _finalizeDrawingPath
+     *
+     * We convert the _freeDrawingPoints we collected during
+     * _captureDrawingPath to an SVG path.
+     *
      */
     _finalizeDrawingPath: function() {
 
@@ -798,10 +809,11 @@
       
       var _freeDrawingXPoints = [];
       var _freeDrawingYPoints = [];
-      for (var i = 1, len = this._freeDrawingPoints.length; i < len; i++) {
+      for (var i = 0, len = this._freeDrawingPoints.length; i < len; i++) {
           _freeDrawingXPoints.push(this._freeDrawingPoints[i].x);
           _freeDrawingYPoints.push(this._freeDrawingPoints[i].y);
       }
+
       var minX = utilMin(_freeDrawingXPoints),
           minY = utilMin(_freeDrawingYPoints),
           maxX = utilMax(_freeDrawingXPoints),
@@ -810,17 +822,38 @@
           xPoints = _freeDrawingXPoints,
           yPoints = _freeDrawingYPoints;
 
+      var pStart = {
+          x: xPoints[0] - minX,
+          y: yPoints[0] - minY
+      };
+      var pEnd = {
+          x: xPoints[1] - minX,
+          y: yPoints[1] - minY
+      }
+      // Start point
       path.push('M ', xPoints[0] - minX, ' ', yPoints[0] - minY, ' ');
 
-      for (var i = 1, len = xPoints.length; i < len; i++) {
-        path.push('L ', xPoints[i] - minX, ' ', yPoints[i] - minY, ' ');
+      for (var i = 1, len = this._freeDrawingPoints.length; i < len; i++) {
+        // We need to recalculate the quadratic curve
+        var ctrlPointx = pStart.x + (pEnd.x - pStart.x) / 2;
+        var ctrlPointy = pStart.y + (pEnd.y - pStart.y) / 2;
+        path.push('Q ', pStart.x, ' ', pStart.y, ' ', ctrlPointx, ' ', ctrlPointy, ' ');
+        var pStart = {
+          x: xPoints[i] - minX,
+          y: yPoints[i] - minY
+        };
+        var pEnd = {
+          x: xPoints[i+1] - minX,
+          y: yPoints[i+1] - minY
+        };
       }
+      // last point
+      path.push('M ', pStart.x, ' ', pStart.y, ' ', pEnd.x, ' ', pEnd.y, ' ');
 
       // TODO (kangax): maybe remove Path creation from here, to decouple fabric.Canvas from fabric.Path,
       // and instead fire something like "drawing:completed" event with path string
 
       path = path.join('');
-
       if (path === "M 0 0 L 0 0 ") {
         // do not create 0 width/height paths, as they are rendered inconsistently across browsers
         // Firefox 4, for example, renders a dot, whereas Chrome 10 renders nothing
@@ -834,7 +867,7 @@
       p.stroke = this.freeDrawingColor;
       p.strokeWidth = this.freeDrawingLineWidth;
       this.add(p);
-      p.set("left", minX + (maxX - minX) / 2).set("top", minY + (maxY - minY) / 2).setCoords();
+      p.set("left", (minX + (maxX - minX) / 2)).set("top",(minY + (maxY - minY) / 2)).setCoords();
       this.renderAll();
       this.fire('path:created', { path: p });
     },
