@@ -6307,8 +6307,7 @@ fabric.util.string = {
     _initInteractive: function() {
       this._currentTransform = null;
       this._groupSelector = null;
-      this._freeDrawingXPoints = [ ];
-      this._freeDrawingYPoints = [ ];
+      this._freeDrawingPoints = [];
       this._initWrapperElement();
       this._createUpperCanvas();
       this._initEvents();
@@ -6534,6 +6533,7 @@ fabric.util.string = {
       if (this.isDrawingMode) {
         if (this._isCurrentlyDrawing) {
           this._captureDrawingPath(e);
+          this._renderFreeDrawing();
         }
         this.fire('mouse:move', { e: e });
         return;
@@ -6857,30 +6857,69 @@ fabric.util.string = {
 
       var pointer = this.getPointer(e);
 
-      this._freeDrawingXPoints.length = this._freeDrawingYPoints.length = 0;
+      this._freeDrawingPoints.length = 0;
 
-      this._freeDrawingXPoints.push(pointer.x);
-      this._freeDrawingYPoints.push(pointer.y);
+      this._freeDrawingPoints.push({
+          x: pointer.x,
+          y: pointer.y
+      });
 
-      this.contextTop.beginPath();
       this.contextTop.moveTo(pointer.x, pointer.y);
       this.contextTop.strokeStyle = this.freeDrawingColor;
       this.contextTop.lineWidth = this.freeDrawingLineWidth;
       this.contextTop.lineCap = this.contextTop.lineJoin = 'round';
     },
 
+    /*
+     * Util method measuring distance
+     * between two points
+     */
+    distanceBetween: function(p1, p2) {
+      var dx = p1.x-p2.x;
+      var dy = p1.y-p2.y;
+      return Math.sqrt(dx*dx + dy*dy);
+	},
+ 
     /**
      * @private
      * @method _captureDrawingPath
      */
     _captureDrawingPath: function(e) {
       var pointer = this.getPointer(e);
+      
+      this._freeDrawingPoints.push(pointer);
+      
+      // We need at least two points
+      if (this._freeDrawingPoints.length < 2) {
+          this.contextTop.lineTo(pointer.x, pointer.y);
+      }
+    },
 
-      this._freeDrawingXPoints.push(pointer.x);
-      this._freeDrawingYPoints.push(pointer.y);
+    /**
+     * @private
+     * @method _renderFreeDrawing
+     *
+     * Render live hand drawing path with
+     * quadratricCurve for a smooth effect
+     */
+     _renderFreeDrawing: function() {
+        var ctx = this.contextTop;
+        // clear topCanvas 
+        this.clearContext(ctx);
+        
+        this.contextTop.beginPath();
+        var p1 = this._freeDrawingPoints[0];
+        var p2 = this._freeDrawingPoints[1];
 
-      this.contextTop.lineTo(pointer.x, pointer.y);
-      this.contextTop.stroke();
+        for (var i = 1, len = this._freeDrawingPoints.length; i < len; i++) {
+            // mid quadratic Curve control point
+            var midx = p1.x + (p2.x - p1.x) / 2;
+            var midy = p1.y + (p2.y - p1.y) / 2;
+            ctx.quadraticCurveTo(p1.x, p1.y, midx, midy);
+            var p1 = this._freeDrawingPoints[i];
+            var p2 = this._freeDrawingPoints[i+1];
+        }
+        ctx.stroke();
     },
 
     /**
@@ -6892,14 +6931,21 @@ fabric.util.string = {
       this.contextTop.closePath();
 
       this._isCurrentlyDrawing = false;
-
-      var minX = utilMin(this._freeDrawingXPoints),
-          minY = utilMin(this._freeDrawingYPoints),
-          maxX = utilMax(this._freeDrawingXPoints),
-          maxY = utilMax(this._freeDrawingYPoints),
+      
+      var _freeDrawingXPoints = [];
+      var _freeDrawingYPoints = [];
+      for (var i = 1, len = this._freeDrawingPoints.length; i < len; i++) {
+          _freeDrawingXPoints.push(this._freeDrawingPoints[i].x);
+          _freeDrawingYPoints.push(this._freeDrawingPoints[i].y);
+      }
+      debug.debug(_freeDrawingXPoints);
+      var minX = utilMin(_freeDrawingXPoints),
+          minY = utilMin(_freeDrawingYPoints),
+          maxX = utilMax(_freeDrawingXPoints),
+          maxY = utilMax(_freeDrawingYPoints),
           path = [ ],
-          xPoints = this._freeDrawingXPoints,
-          yPoints = this._freeDrawingYPoints;
+          xPoints = _freeDrawingXPoints,
+          yPoints = _freeDrawingYPoints;
 
       path.push('M ', xPoints[0] - minX, ' ', yPoints[0] - minY, ' ');
 
