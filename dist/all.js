@@ -6209,6 +6209,20 @@ fabric.util.string = {
      */
     selectionColor:         'rgba(100, 100, 255, 0.3)', // blue
 
+     /**
+     * Indicates whether selection border should be dashed
+     * @property
+     * @type Boolean
+     */
+    selectionDashed:         false,
+
+    /**
+     * Default dash array pattern
+     * @property
+     * @type Array
+     */ 
+    selectionDashArray:      [3, 6],
+
     /**
      * Color of the border of selection (usually slightly darker than color of selection itself)
      * @property
@@ -6293,8 +6307,7 @@ fabric.util.string = {
     _initInteractive: function() {
       this._currentTransform = null;
       this._groupSelector = null;
-      this._freeDrawingXPoints = [ ];
-      this._freeDrawingYPoints = [ ];
+      this._freeDrawingPoints = [];
       this._initWrapperElement();
       this._createUpperCanvas();
       this._initEvents();
@@ -6520,6 +6533,7 @@ fabric.util.string = {
       if (this.isDrawingMode) {
         if (this._isCurrentlyDrawing) {
           this._captureDrawingPath(e);
+          this._renderFreeDrawing();
         }
         this.fire('mouse:move', { e: e });
         return;
@@ -6843,30 +6857,83 @@ fabric.util.string = {
 
       var pointer = this.getPointer(e);
 
-      this._freeDrawingXPoints.length = this._freeDrawingYPoints.length = 0;
+      this._freeDrawingPoints.length = 0;
 
-      this._freeDrawingXPoints.push(pointer.x);
-      this._freeDrawingYPoints.push(pointer.y);
+      this._freeDrawingPoints.push({
+          x: pointer.x,
+          y: pointer.y
+      });
 
-      this.contextTop.beginPath();
       this.contextTop.moveTo(pointer.x, pointer.y);
       this.contextTop.strokeStyle = this.freeDrawingColor;
       this.contextTop.lineWidth = this.freeDrawingLineWidth;
       this.contextTop.lineCap = this.contextTop.lineJoin = 'round';
     },
 
+    /*
+     * Util method measuring distance
+     * between two points
+     */
+    distanceBetween: function(p1, p2) {
+      var dx = p1.x-p2.x;
+      var dy = p1.y-p2.y;
+      return Math.sqrt(dx*dx + dy*dy);
+	},
+ 
     /**
      * @private
      * @method _captureDrawingPath
      */
     _captureDrawingPath: function(e) {
       var pointer = this.getPointer(e);
+      
+      // Only push point if min_point_distance
+      // is greater than x
+      var MIN_POINT_DISTANCE = 20;
 
-      this._freeDrawingXPoints.push(pointer.x);
-      this._freeDrawingYPoints.push(pointer.y);
+      var lastPointer = this._freeDrawingPoints[this._freeDrawingPoints.length -1];
+      if (this.distanceBetween(pointer, lastPointer) > MIN_POINT_DISTANCE) {
+        this._freeDrawingPoints.push(pointer);
 
-      this.contextTop.lineTo(pointer.x, pointer.y);
-      this.contextTop.stroke();
+        // We need at least two points
+        if (this._freeDrawingPoints.length < 2) {
+          this._freeDrawingPoints.push(pointer);
+        }
+      }
+    },
+
+    /**
+     * @private
+     * @method _renderFreeDrawing
+     *
+     * Render live hand drawing path with
+     * quadratricCurve for a smooth effect
+     */
+     _renderFreeDrawing: function() {
+        var ctx = this.contextTop;
+        // clear topCanvas 
+        this.clearContext(ctx);
+        
+        this.contextTop.beginPath();
+        var p1 = this._freeDrawingPoints[0];
+        var p2 = this._freeDrawingPoints[1];
+
+        for (var i = 1, len = this._freeDrawingPoints.length; i < len; i++) {
+            // mid quadratic Curve control point
+            var midx = p1.x + (p2.x - p1.x) / 2;
+            var midy = p1.y + (p2.y - p1.y) / 2;
+            ctx.quadraticCurveTo(p1.x, p1.y, midx, midy);
+            // keep the control point for boundingbox 
+            // calculations
+            this.contextTop.fillRect(midx, midy, 4, 4);
+            this._freeDrawingPoints[i].ctrlPoint = {
+                x: midx,
+                y: midy
+            };
+            var p1 = this._freeDrawingPoints[i];
+            var p2 = this._freeDrawingPoints[i+1];
+        }
+        ctx.stroke();
     },
 
     /**
@@ -6878,26 +6945,73 @@ fabric.util.string = {
       this.contextTop.closePath();
 
       this._isCurrentlyDrawing = false;
-
-      var minX = utilMin(this._freeDrawingXPoints),
-          minY = utilMin(this._freeDrawingYPoints),
-          maxX = utilMax(this._freeDrawingXPoints),
-          maxY = utilMax(this._freeDrawingYPoints),
-          path = [ ],
-          xPoints = this._freeDrawingXPoints,
-          yPoints = this._freeDrawingYPoints;
-
-      path.push('M ', xPoints[0] - minX, ' ', yPoints[0] - minY, ' ');
-
-      for (var i = 1, len = xPoints.length; i < len; i++) {
-        path.push('L ', xPoints[i] - minX, ' ', yPoints[i] - minY, ' ');
+      
+      var _freeDrawingXPoints = [];
+      var _freeDrawingYPoints = [];
+      for (var i = 0, len = this._freeDrawingPoints.length; i < len; i++) {
+          _freeDrawingXPoints.push(this._freeDrawingPoints[i].x);
+          _freeDrawingYPoints.push(this._freeDrawingPoints[i].y);
+          // Add ctrl points coordinates as well
+          if (this._freeDrawingPoints.hasOwnProperty('ctrlPoint')) {
+            _freeDrawingXPoints.push(this._freeDrawingPoints.ctrlPoint.x);
+            _freeDrawingYPoints.push(this._freeDrawingPoints.ctrlPoint.y);
+          }
       }
+      debug.debug('Pts X : ' + _freeDrawingXPoints.join(" "));
+      debug.debug('Pts Y : ' + _freeDrawingYPoints.join(" "));
+
+      var minX = utilMin(_freeDrawingXPoints),
+          minY = utilMin(_freeDrawingYPoints),
+          maxX = utilMax(_freeDrawingXPoints),
+          maxY = utilMax(_freeDrawingYPoints),
+          path = [],
+          xPoints = _freeDrawingXPoints,
+          yPoints = _freeDrawingYPoints;
+      debug.debug("X min : " + minX + " max " + maxX);
+      debug.debug("Y min : " + minY + " max " + maxY);
+
+      var pStart = {
+          x: xPoints[0] - minX,
+          y: yPoints[0] - minY
+      };
+      var pEnd = {
+          x: xPoints[1] - minX,
+          y: yPoints[1] - minY
+      }
+      path.push('M ', xPoints[0] - minX, ' ', yPoints[0] - minY, ' ');
+      for (var i = 1, len = this._freeDrawingPoints.length; i < len; i++) {
+        var ctrlPointx = pStart.x + (pEnd.x - pStart.x) / 2;
+        var ctrlPointy = pStart.y + (pEnd.y - pStart.y) / 2;
+
+        // prepare fabric Path
+        path.push('Q ', pStart.x, ' ', pStart.y, ' ', ctrlPointx, ' ', ctrlPointy, ' ');
+        //path.push('M ', pStart.x, ' ', pStart.y, ' ');
+        //path.push('M ', ctrlPointx, ' ', ctrlPointy, ' ');
+        //path.push('M ', pEnd.x, ' ', pEnd.y, ' ');
+        var pStart = {
+          x: xPoints[i] - minX,
+          y: yPoints[i] - minY
+        };
+        var pEnd = {
+          x: xPoints[i+1] - minX,
+          y: yPoints[i+1] - minY
+        };
+      }
+      // last point
+      path.push('L ', pEnd.x, ' ', pEnd.y, ' ');
+      //path.push('M ', xPoints[0] - minX, ' ', yPoints[0] - minY, ' ');
+      //for (var i = 1, len = xPoints.length; i < len ; i++) {
+        //var ctrlPointX = xPoints[i] - minX;
+        //var ctrlPointY = yPoints[i] - minY;
+        //var endPointX = xPoints[i+1] - minX; 
+        //var endPointY = yPoints[i+1] - minY; 
+        //path.push('L ', xPoints[i] - minX, ' ', yPoints[i] - minY, ' ');
+      //}
 
       // TODO (kangax): maybe remove Path creation from here, to decouple fabric.Canvas from fabric.Path,
       // and instead fire something like "drawing:completed" event with path string
 
       path = path.join('');
-
       if (path === "M 0 0 L 0 0 ") {
         // do not create 0 width/height paths, as they are rendered inconsistently across browsers
         // Firefox 4, for example, renders a dot, whereas Chrome 10 renders nothing
@@ -6911,7 +7025,9 @@ fabric.util.string = {
       p.stroke = this.freeDrawingColor;
       p.strokeWidth = this.freeDrawingLineWidth;
       this.add(p);
-      p.set("left", minX + (maxX - minX) / 2).set("top", minY + (maxY - minY) / 2).setCoords();
+      debug.debug("path left", minX + (maxX  - minX) / 2);
+      debug.debug("path top", minY + (maxY  - minY) / 2);
+      p.set("left", (minX + (maxX - minX) / 2)).set("top",(minY + (maxY - minY) / 2)).setCoords();
       this.renderAll();
       this.fire('path:created', { path: p });
     },
@@ -7056,12 +7172,26 @@ fabric.util.string = {
       this.contextTop.lineWidth = this.selectionLineWidth;
       this.contextTop.strokeStyle = this.selectionBorderColor;
 
-      this.contextTop.strokeRect(
-        groupSelector.ex + STROKE_OFFSET - ((left > 0) ? 0 : aleft),
-        groupSelector.ey + STROKE_OFFSET - ((top > 0) ? 0 : atop),
-        aleft,
-        atop
-      );
+      // selection border
+      if (this.selectionDashed == true && this.selectionDashArray.length > 1) {
+        this.contextTop.beginPath();
+        var px = groupSelector.ex + STROKE_OFFSET - ((left > 0) ? 0: aleft);
+        var py = groupSelector.ey + STROKE_OFFSET - ((top > 0) ? 0: atop);
+        this.contextTop.dashedLine(px, py, px+aleft, py, this.selectionDashArray);
+        this.contextTop.dashedLine(px, py+atop-1, px+aleft, py+atop-1, this.selectionDashArray);
+        this.contextTop.dashedLine(px, py, px+0.001, py+atop, this.selectionDashArray);
+        this.contextTop.dashedLine(px+aleft-1, py, px+aleft+1.1, py+atop-0.001, this.selectionDashArray);
+        this.contextTop.closePath();
+        this.contextTop.stroke();
+      }
+      else {
+        this.contextTop.strokeRect(
+          groupSelector.ex + STROKE_OFFSET - ((left > 0) ? 0 : aleft),
+          groupSelector.ey + STROKE_OFFSET - ((top > 0) ? 0 : atop),
+          aleft,
+          atop
+        );
+      }
     },
 
     _findSelectedObjects: function (e) {
@@ -7385,7 +7515,40 @@ fabric.util.string = {
    * @constructor
    */
   fabric.Element = fabric.Canvas;
+
+  /*
+   * Add dashed line drawing capabilitites to Canvas
+   * this method is used to draw dashed line around selection area.
+   *
+   */
+
+  CanvasRenderingContext2D.prototype.dashedLine = function(x,y,x2,y2,dashArray){
+    if (!dashArray) dashArray=[10,5];
+    var dashCount = dashArray.length;
+    this.moveTo(x, y);
+    var dx = (x2-x), dy = (y2-y);
+    var slope = dy/dx;
+    var distRemaining = Math.sqrt( dx*dx + dy*dy );
+    var dashIndex=0, draw=true;
+    while (distRemaining>=0.1 && dashIndex<10000){
+        var dashLength = dashArray[dashIndex++%dashCount];
+        if (dashLength==0) dashLength = 0.001; // Hack for Safari
+        if (dashLength > distRemaining) dashLength = distRemaining;
+        var xStep = Math.sqrt( dashLength*dashLength / (1 + slope*slope) );
+        x += xStep
+        y += slope*xStep;
+        this[draw ? 'lineTo' : 'moveTo'](x,y);
+        distRemaining -= dashLength;
+        draw = !draw;
+    }
+    // Ensure that the last segment is closed for proper stroking
+    this.moveTo(0,0);
+  }
+
 })();
+
+
+
 fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
   FX_DURATION: 500,
