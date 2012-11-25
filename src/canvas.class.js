@@ -753,7 +753,7 @@
       
       // Only push point if min_point_distance
       // is greater than x
-      var MIN_POINT_DISTANCE = 2;
+      var MIN_POINT_DISTANCE = 20;
 
       var lastPointer = this._freeDrawingPoints[this._freeDrawingPoints.length -1];
       if (this.distanceBetween(pointer, lastPointer) > MIN_POINT_DISTANCE) {
@@ -787,6 +787,13 @@
             var midx = p1.x + (p2.x - p1.x) / 2;
             var midy = p1.y + (p2.y - p1.y) / 2;
             ctx.quadraticCurveTo(p1.x, p1.y, midx, midy);
+            // keep the control point for boundingbox 
+            // calculations
+            this.contextTop.fillRect(midx, midy, 4, 4);
+            this._freeDrawingPoints[i].ctrlPoint = {
+                x: midx,
+                y: midy
+            };
             var p1 = this._freeDrawingPoints[i];
             var p2 = this._freeDrawingPoints[i+1];
         }
@@ -796,10 +803,6 @@
     /**
      * @private
      * @method _finalizeDrawingPath
-     *
-     * We convert the _freeDrawingPoints we collected during
-     * _captureDrawingPath to an SVG path.
-     *
      */
     _finalizeDrawingPath: function() {
 
@@ -812,7 +815,14 @@
       for (var i = 0, len = this._freeDrawingPoints.length; i < len; i++) {
           _freeDrawingXPoints.push(this._freeDrawingPoints[i].x);
           _freeDrawingYPoints.push(this._freeDrawingPoints[i].y);
+          // Add ctrl points coordinates as well
+          if (this._freeDrawingPoints.hasOwnProperty('ctrlPoint')) {
+            _freeDrawingXPoints.push(this._freeDrawingPoints.ctrlPoint.x);
+            _freeDrawingYPoints.push(this._freeDrawingPoints.ctrlPoint.y);
+          }
       }
+      debug.debug('Pts X : ' + _freeDrawingXPoints.join(" "));
+      debug.debug('Pts Y : ' + _freeDrawingYPoints.join(" "));
 
       var minX = utilMin(_freeDrawingXPoints),
           minY = utilMin(_freeDrawingYPoints),
@@ -821,6 +831,8 @@
           path = [],
           xPoints = _freeDrawingXPoints,
           yPoints = _freeDrawingYPoints;
+      debug.debug("X min : " + minX + " max " + maxX);
+      debug.debug("Y min : " + minY + " max " + maxY);
 
       var pStart = {
           x: xPoints[0] - minX,
@@ -830,14 +842,16 @@
           x: xPoints[1] - minX,
           y: yPoints[1] - minY
       }
-      // Start point
       path.push('M ', xPoints[0] - minX, ' ', yPoints[0] - minY, ' ');
-
       for (var i = 1, len = this._freeDrawingPoints.length; i < len; i++) {
-        // We need to recalculate the quadratic curve
         var ctrlPointx = pStart.x + (pEnd.x - pStart.x) / 2;
         var ctrlPointy = pStart.y + (pEnd.y - pStart.y) / 2;
+
+        // prepare fabric Path
         path.push('Q ', pStart.x, ' ', pStart.y, ' ', ctrlPointx, ' ', ctrlPointy, ' ');
+        //path.push('M ', pStart.x, ' ', pStart.y, ' ');
+        //path.push('M ', ctrlPointx, ' ', ctrlPointy, ' ');
+        //path.push('M ', pEnd.x, ' ', pEnd.y, ' ');
         var pStart = {
           x: xPoints[i] - minX,
           y: yPoints[i] - minY
@@ -848,7 +862,15 @@
         };
       }
       // last point
-      path.push('M ', pStart.x, ' ', pStart.y, ' ', pEnd.x, ' ', pEnd.y, ' ');
+      path.push('L ', pEnd.x, ' ', pEnd.y, ' ');
+      //path.push('M ', xPoints[0] - minX, ' ', yPoints[0] - minY, ' ');
+      //for (var i = 1, len = xPoints.length; i < len ; i++) {
+        //var ctrlPointX = xPoints[i] - minX;
+        //var ctrlPointY = yPoints[i] - minY;
+        //var endPointX = xPoints[i+1] - minX; 
+        //var endPointY = yPoints[i+1] - minY; 
+        //path.push('L ', xPoints[i] - minX, ' ', yPoints[i] - minY, ' ');
+      //}
 
       // TODO (kangax): maybe remove Path creation from here, to decouple fabric.Canvas from fabric.Path,
       // and instead fire something like "drawing:completed" event with path string
@@ -867,6 +889,8 @@
       p.stroke = this.freeDrawingColor;
       p.strokeWidth = this.freeDrawingLineWidth;
       this.add(p);
+      debug.debug("path left", minX + (maxX  - minX) / 2);
+      debug.debug("path top", minY + (maxY  - minY) / 2);
       p.set("left", (minX + (maxX - minX) / 2)).set("top",(minY + (maxY - minY) / 2)).setCoords();
       this.renderAll();
       this.fire('path:created', { path: p });
