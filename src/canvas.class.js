@@ -1166,7 +1166,10 @@
      */
     setActiveGroup: function (group) {
       this._activeGroup = group;
-      group && group.setActive(true);
+      if (group) {
+        group.canvas = this;
+        group.setActive(true);
+      }
       return this;
     },
 

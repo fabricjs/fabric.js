@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL` */
 /*! Fabric.js Copyright 2008-2012, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.9.22" };
+var fabric = fabric || { version: "0.9.23" };
 
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
@@ -7359,7 +7359,10 @@ fabric.util.string = {
      */
     setActiveGroup: function (group) {
       this._activeGroup = group;
-      group && group.setActive(true);
+      if (group) {
+        group.canvas = this;
+        group.setActive(true);
+      }
       return this;
     },
 
