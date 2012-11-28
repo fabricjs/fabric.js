@@ -10916,8 +10916,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       if (!this.path) return;
 
       if (!fromArray) {
-        this._initializeFromString(options);
+        this.path = this._parsePath();
       }
+      this._initializePath(options);
 
       if (options.sourcePath) {
         this.setSourcePath(options.sourcePath);
@@ -10926,13 +10927,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
     /**
      * @private
-     * @method _initializeFromString
+     * @method _initializePath
      */
-    _initializeFromString: function(options) {
+    _initializePath: function(options) {
       var isWidthSet = 'width' in options,
           isHeightSet = 'height' in options;
-
-      this.path = this._parsePath();
 
       if (!isWidthSet || !isHeightSet) {
         extend(this, this._parseDimensions());
