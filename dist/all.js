@@ -11457,18 +11457,20 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
       var minX = min(aX),
           minY = min(aY),
-          deltaX = 0,
-          deltaY = 0;
+          maxX = max(aX),
+          maxY = max(aY),
+          deltaX = maxX - minX,
+          deltaY = maxY - minY;
 
       var o = {
-        top: minY - deltaY,
-        left: minX - deltaX,
+        top: minY + deltaY / 2,
+        left: minX + deltaX / 2,
         bottom: max(aY) - deltaY,
         right: max(aX) - deltaX
       };
 
-      o.width = o.right - o.left;
-      o.height = o.bottom - o.top;
+      o.width = deltaX;
+      o.height = deltaY;
 
       return o;
     }
