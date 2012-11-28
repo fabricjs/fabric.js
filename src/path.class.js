@@ -215,6 +215,22 @@
           this.height = options.height;
         }
       }
+      else { //Set center location relative to given height/width
+        this.left = this.width / 2;
+        this.top = this.height / 2;
+      }
+      this.pathOffset = this._calculatePathOffset(); //Save top-left coords as offset
+    },
+
+    /**
+     * @private
+     * @method _calculatePathOffset
+     */
+    _calculatePathOffset: function() {
+      return {
+        x: this.left - (this.width / 2),
+        y: this.top - (this.height / 2)
+      };
     },
 
     /**
@@ -232,8 +248,8 @@
           tempY,
           tempControlX,
           tempControlY,
-          l = -(this.width / 2),
-          t = -(this.height / 2);
+          l = -((this.width / 2) + this.pathOffset.x),
+          t = -((this.height / 2) + this.pathOffset.y);
 
       for (var i = 0, len = this.path.length; i < len; ++i) {
 
@@ -713,18 +729,20 @@
 
       var minX = min(aX),
           minY = min(aY),
-          deltaX = 0,
-          deltaY = 0;
+          maxX = max(aX),
+          maxY = max(aY),
+          deltaX = maxX - minX,
+          deltaY = maxY - minY;
 
       var o = {
-        top: minY - deltaY,
-        left: minX - deltaX,
+        top: minY + deltaY / 2,
+        left: minX + deltaX / 2,
         bottom: max(aY) - deltaY,
         right: max(aX) - deltaX
       };
 
-      o.width = o.right - o.left;
-      o.height = o.bottom - o.top;
+      o.width = deltaX;
+      o.height = deltaY;
 
       return o;
     }
