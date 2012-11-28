@@ -10943,6 +10943,22 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
           this.height = options.height;
         }
       }
+      else { //Set center location relative to given height/width
+        this.left = this.width / 2;
+        this.top = this.height / 2;
+      }
+      this.pathOffset = this._calculatePathOffset(); //Save top-left coords as offset
+    },
+
+    /**
+     * @private
+     * @method _calculatePathOffset
+     */
+    _calculatePathOffset: function() {
+      return {
+        x: this.left - (this.width / 2),
+        y: this.top - (this.height / 2)
+      };
     },
 
     /**
@@ -10960,8 +10976,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
           tempY,
           tempControlX,
           tempControlY,
-          l = -(this.width / 2),
-          t = -(this.height / 2);
+          l = -((this.width / 2) + this.pathOffset.x),
+          t = -((this.height / 2) + this.pathOffset.y);
 
       for (var i = 0, len = this.path.length; i < len; ++i) {
 
