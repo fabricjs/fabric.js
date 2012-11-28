@@ -74,6 +74,14 @@
     selectionColor:         'rgba(100, 100, 255, 0.3)', // blue
 
     /**
+     * Default dash array pattern
+     * If not empty the selection border is dashed
+     * @property
+     * @type Array
+     */
+    selectionDashArray:      [ ],
+
+    /**
      * Color of the border of selection (usually slightly darker than color of selection itself)
      * @property
      * @type String
@@ -902,30 +910,86 @@
      * @private
      */
     _drawSelection: function () {
-      var groupSelector = this._groupSelector,
+      var ctx = this.contextTop,
+          groupSelector = this._groupSelector,
           left = groupSelector.left,
           top = groupSelector.top,
           aleft = abs(left),
           atop = abs(top);
 
-      this.contextTop.fillStyle = this.selectionColor;
+      ctx.fillStyle = this.selectionColor;
 
-      this.contextTop.fillRect(
+      ctx.fillRect(
         groupSelector.ex - ((left > 0) ? 0 : -left),
         groupSelector.ey - ((top > 0) ? 0 : -top),
         aleft,
         atop
       );
 
-      this.contextTop.lineWidth = this.selectionLineWidth;
-      this.contextTop.strokeStyle = this.selectionBorderColor;
+      ctx.lineWidth = this.selectionLineWidth;
+      ctx.strokeStyle = this.selectionBorderColor;
 
-      this.contextTop.strokeRect(
-        groupSelector.ex + STROKE_OFFSET - ((left > 0) ? 0 : aleft),
-        groupSelector.ey + STROKE_OFFSET - ((top > 0) ? 0 : atop),
-        aleft,
-        atop
-      );
+      // selection border
+      if (this.selectionDashArray.length > 1) {
+        var px = groupSelector.ex + STROKE_OFFSET - ((left > 0) ? 0: aleft);
+        var py = groupSelector.ey + STROKE_OFFSET - ((top > 0) ? 0: atop);
+        ctx.beginPath();
+        this.drawDashedLine(ctx, px, py, px+aleft, py, this.selectionDashArray);
+        this.drawDashedLine(ctx, px, py+atop-1, px+aleft, py+atop-1, this.selectionDashArray);
+        this.drawDashedLine(ctx, px, py, px, py+atop, this.selectionDashArray);
+        this.drawDashedLine(ctx, px+aleft-1, py, px+aleft-1, py+atop, this.selectionDashArray);
+        ctx.closePath();
+        ctx.stroke();
+      }
+      else {
+        ctx.strokeRect(
+          groupSelector.ex + STROKE_OFFSET - ((left > 0) ? 0 : aleft),
+          groupSelector.ey + STROKE_OFFSET - ((top > 0) ? 0 : atop),
+          aleft,
+          atop
+        );
+      }
+    },
+
+    /*
+     * Draws a dashed line between two points
+     *
+     * this method is used to draw dashed line around selection area.
+     * http://stackoverflow.com/questions/4576724/dotted-stroke-in-canvas
+     *
+     * @method drawDashedLine
+     * @param ctx {Canvas} context
+     * @param x {number} start x coordinate
+     * @param y {number} start y coordinate
+     * @param x2 {number} end x coordinate
+     * @param y2 {number} end y coordinate
+     * @param da {Array} dash array pattern
+     */
+    drawDashedLine: function(ctx, x, y, x2, y2, da) {
+      var dx = x2 - x,
+          dy = y2 - y,
+          len = Math.sqrt(dx*dx + dy*dy),
+          rot = Math.atan2(dy, dx),
+          dc = da.length,
+          di = 0,
+          draw = true;
+
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.moveTo(0, 0);
+      ctx.rotate(rot);
+
+      x = 0;
+      while (len > x) {
+        x += da[di++ % dc];
+        if (x > len) {
+          x = len;
+        }
+        ctx[draw ? 'lineTo' : 'moveTo'](x, 0);
+        draw = !draw;
+      }
+
+      ctx.restore();
     },
 
     _findSelectedObjects: function (e) {
