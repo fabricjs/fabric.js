@@ -6214,14 +6214,14 @@ fabric.util.string = {
     return;
   }
 
-  fabric.FreeDrawing = FreeDrawing;
-  
-  function FreeDrawing(fabricCanvas) {
-    this.init(fabricCanvas);
-  }
+  fabric.FreeDrawing = fabric.util.createClass(fabric.Object, {
 
-  FreeDrawing.prototype =  { 
-    constructor: FreeDrawing,
+    /**
+     * @class FreeDrawing
+     * @extends fabric.Object
+     */
+    type: 'FreeDrawing',
+
 
     /**
      * Free Drawer handles scribbling on a fabricCanvas.
@@ -6229,14 +6229,14 @@ fabric.util.string = {
      * path to the canvas.
      *
      * @metod init
-     * @param fabricCavnas {FabricCanvas}
+     * @param fabricCanvas {FabricCanvas}
      * 
      */
-    init: function(fabricCanvas) {
+    initialize: function(fabricCanvas) {
       this.canvas = fabricCanvas;
       this._points = [];
-      this._color = this.canvas.freeDrawingColor;
-      this._strokeWidth = this.canvas.freeDrawingLineWidth;
+      this.setColor(this.canvas.freeDrawingColor);
+      this.setThickness(this.canvas.freeDrawingLineWidth);
     },
 
     /**
@@ -6310,16 +6310,8 @@ fabric.util.string = {
      *   related to the canvas.
      */
      _captureDrawingPath: function(pointer) {
-       var MIN_POINT_DISTANCE = 2;
        var pointerPoint = new fabric.Point(pointer.x, pointer.y); 
-       // Only push point if min_point_distance is reached
-       var lastPoint = this._points[this._points.length -1];
-
-       if (pointerPoint.distanceFrom(lastPoint) > MIN_POINT_DISTANCE) 
-         this._addPoint(pointerPoint);
-
-       if (this._points.length < 2) 
-         this._addPoint(pointerPoint);
+       this._addPoint(pointerPoint);
     },
 
     /**
@@ -6435,6 +6427,7 @@ fabric.util.string = {
      */
 
     _finalizeAndAddPath: function() {
+        this.canvas._isCurrentlyDrawing = false;
         var ctx = this.canvas.contextTop;
         ctx.closePath();
         var path = this._getSVGPathData();
@@ -6471,7 +6464,7 @@ fabric.util.string = {
         // fire event 'path' created
         this.canvas.fire('path:created', { path: p });
     }
-  };
+  });
 
 })(typeof exports !== 'undefined' ? exports : this);
 
@@ -6725,7 +6718,6 @@ fabric.util.string = {
       var target;
 
       if (this.isDrawingMode && this._isCurrentlyDrawing) {
-        this._isCurrentlyDrawing = false;
         this.freeDrawing._finalizeAndAddPath();
         this.fire('mouse:up', { e: e });
         return;

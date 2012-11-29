@@ -248,7 +248,6 @@
       var target;
 
       if (this.isDrawingMode && this._isCurrentlyDrawing) {
-        this._isCurrentlyDrawing = false;
         this.freeDrawing._finalizeAndAddPath();
         this.fire('mouse:up', { e: e });
         return;

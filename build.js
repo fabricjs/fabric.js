@@ -113,7 +113,8 @@ var filesToInclude = [
 
   'src/static_canvas.class.js',
 
-  ifSpecifiedInclude('interaction', 'src/freedrawing.class.js'),
+  ifSpecifiedInclude('freedrawing', 'src/freedrawing.class.js'),
+
   ifSpecifiedInclude('interaction', 'src/canvas.class.js'),
 
   'src/canvas.animation.js',
