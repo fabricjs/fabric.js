@@ -154,8 +154,8 @@
      * @method toObject
      * @return {Object} object representation of an instance
      */
-    toObject: function() {
-      return fabric.util.object.extend(this.callSuper('toObject'), {
+    toObject: function(propertiesToInclude) {
+      return fabric.util.object.extend(this.callSuper('toObject', propertiesToInclude), {
         rx: this.get('rx') || 0,
         ry: this.get('ry') || 0
       });

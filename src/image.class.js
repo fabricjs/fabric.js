@@ -118,8 +118,8 @@
      * @method toObject
      * @return {Object} Object representation of an instance
      */
-    toObject: function() {
-      return extend(this.callSuper('toObject'), {
+    toObject: function(propertiesToInclude) {
+      return extend(this.callSuper('toObject', propertiesToInclude), {
         src: this._originalImage.src || this._originalImage._src,
         filters: this.filters.concat()
       });

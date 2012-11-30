@@ -530,8 +530,8 @@
      * @method toObject
      * @return {Object} Object representation of text object
      */
-    toObject: function() {
-      return extend(this.callSuper('toObject'), {
+    toObject: function(propertiesToInclude) {
+      return extend(this.callSuper('toObject', propertiesToInclude), {
         text:             this.text,
         fontSize:         this.fontSize,
         fontWeight:       this.fontWeight,

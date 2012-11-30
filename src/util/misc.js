@@ -225,6 +225,23 @@
     return object;
   }
 
+  /**
+   * Populates an object with properties of another object
+   * @static
+   * @memberOf fabric.util
+   * @method populateWithProperties
+   * @param {Object} source
+   * @param {Object} destination
+   * @return {Array} properties
+   */
+  function populateWithProperties(source, destination, properties) {
+    if (properties && Object.prototype.toString.call(properties) === '[object Array]') {
+      for (var i = 0, len = properties.length; i < len; i++) {
+        destination[properties[i]] = source[properties[i]];
+      }
+    }
+  }
+
   fabric.util.removeFromArray = removeFromArray;
   fabric.util.degreesToRadians = degreesToRadians;
   fabric.util.radiansToDegrees = radiansToDegrees;
@@ -236,4 +253,5 @@
   fabric.util.loadImage = loadImage;
   fabric.util.enlivenObjects = enlivenObjects;
   fabric.util.groupSVGElements = groupSVGElements;
+  fabric.util.populateWithProperties = populateWithProperties;
 })();

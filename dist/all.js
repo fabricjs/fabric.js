@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL` */
 /*! Fabric.js Copyright 2008-2012, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.9.24" };
+var fabric = fabric || { version: "0.9.25" };
 
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
@@ -2078,6 +2078,23 @@ fabric.Observable.off = fabric.Observable.stopObserving;
     return object;
   }
 
+  /**
+   * Populates an object with properties of another object
+   * @static
+   * @memberOf fabric.util
+   * @method populateWithProperties
+   * @param {Object} source
+   * @param {Object} destination
+   * @return {Array} properties
+   */
+  function populateWithProperties(source, destination, properties) {
+    if (properties && Object.prototype.toString.call(properties) === '[object Array]') {
+      for (var i = 0, len = properties.length; i < len; i++) {
+        destination[properties[i]] = source[properties[i]];
+      }
+    }
+  }
+
   fabric.util.removeFromArray = removeFromArray;
   fabric.util.degreesToRadians = degreesToRadians;
   fabric.util.radiansToDegrees = radiansToDegrees;
@@ -2089,6 +2106,7 @@ fabric.Observable.off = fabric.Observable.stopObserving;
   fabric.util.loadImage = loadImage;
   fabric.util.enlivenObjects = enlivenObjects;
   fabric.util.groupSVGElements = groupSVGElements;
+  fabric.util.populateWithProperties = populateWithProperties;
 })();
 (function() {
 
@@ -5791,8 +5809,8 @@ fabric.util.string = {
      * @method toDatalessJSON
      * @return {String} json string
      */
-    toDatalessJSON: function () {
-      return this.toDatalessObject();
+    toDatalessJSON: function (propertiesToInclude) {
+      return this.toDatalessObject(propertiesToInclude);
     },
 
     /**
@@ -5800,8 +5818,8 @@ fabric.util.string = {
      * @method toObject
      * @return {Object}
      */
-    toObject: function () {
-      return this._toObjectMethod('toObject');
+    toObject: function (propertiesToInclude) {
+      return this._toObjectMethod('toObject', propertiesToInclude);
     },
 
     /**
@@ -5809,15 +5827,15 @@ fabric.util.string = {
      * @method toDatalessObject
      * @return {Object}
      */
-    toDatalessObject: function () {
-      return this._toObjectMethod('toDatalessObject');
+    toDatalessObject: function (propertiesToInclude) {
+      return this._toObjectMethod('toDatalessObject', propertiesToInclude);
     },
 
     /**
      * @private
      * @method _toObjectMethod
      */
-    _toObjectMethod: function (methodName) {
+    _toObjectMethod: function (methodName, propertiesToInclude) {
       var data = {
         objects: this._objects.map(function (instance) {
           // TODO (kangax): figure out how to clean this up
@@ -5826,7 +5844,7 @@ fabric.util.string = {
             originalValue = instance.includeDefaultValues;
             instance.includeDefaultValues = false;
           }
-          var object = instance[methodName]();
+          var object = instance[methodName](propertiesToInclude);
           if (!this.includeDefaultValues) {
             instance.includeDefaultValues = originalValue;
           }
@@ -5844,6 +5862,7 @@ fabric.util.string = {
         data.overlayImageLeft = this.overlayImageLeft;
         data.overlayImageTop = this.overlayImageTop;
       }
+      fabric.util.populateWithProperties(this, data, propertiesToInclude);
       return data;
     },
 
@@ -8162,12 +8181,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      * @param {Object} [options]
      */
     setOptions: function(options) {
-      var i = this.stateProperties.length, prop;
-      while (i--) {
-        prop = this.stateProperties[i];
-        if (prop in options) {
-          this.set(prop, options[prop]);
-        }
+      for (var prop in options) {
+        this.set(prop, options[prop]);
       }
       this._initGradient(options);
     },
@@ -8191,7 +8206,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      * @method toObject
      * @return {Object}
      */
-    toObject: function() {
+    toObject: function(propertiesToInclude) {
 
       var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
 
@@ -8223,6 +8238,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       if (!this.includeDefaultValues) {
         object = this._removeDefaultValues(object);
       }
+      fabric.util.populateWithProperties(this, object, propertiesToInclude);
 
       return object;
     },
@@ -8231,9 +8247,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      * Returns (dataless) object representation of an instance
      * @method toDatalessObject
      */
-    toDatalessObject: function() {
+    toDatalessObject: function(propertiesToInclude) {
       // will be overwritten by subclasses
-      return this.toObject();
+      return this.toObject(propertiesToInclude);
     },
 
     /**
@@ -9407,9 +9423,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      * @method toJSON
      * @return {String} json
      */
-    toJSON: function() {
+    toJSON: function(propertiesToInclude) {
       // delegate, not alias
-      return this.toObject();
+      return this.toObject(propertiesToInclude);
     },
 
     /**
@@ -9732,8 +9748,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      * @methd toObject
      * @return {Object}
      */
-    toObject: function() {
-      return extend(this.callSuper('toObject'), {
+    toObject: function(propertiesToInclude) {
+      return extend(this.callSuper('toObject', propertiesToInclude), {
         x1: this.get('x1'),
         y1: this.get('y1'),
         x2: this.get('x2'),
@@ -9844,8 +9860,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      * @method toObject
      * @return {Object} object representation of an instance
      */
-    toObject: function() {
-      return extend(this.callSuper('toObject'), {
+    toObject: function(propertiesToInclude) {
+      return extend(this.callSuper('toObject', propertiesToInclude), {
         radius: this.get('radius')
       });
     },
@@ -10125,8 +10141,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      * @method toObject
      * @return {Object} object representation of an instance
      */
-    toObject: function() {
-      return extend(this.callSuper('toObject'), {
+    toObject: function(propertiesToInclude) {
+      return extend(this.callSuper('toObject', propertiesToInclude), {
         rx: this.get('rx'),
         ry: this.get('ry')
       });
@@ -10398,8 +10414,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      * @method toObject
      * @return {Object} object representation of an instance
      */
-    toObject: function() {
-      return fabric.util.object.extend(this.callSuper('toObject'), {
+    toObject: function(propertiesToInclude) {
+      return fabric.util.object.extend(this.callSuper('toObject', propertiesToInclude), {
         rx: this.get('rx') || 0,
         ry: this.get('ry') || 0
       });
@@ -10523,8 +10539,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      * @method toObject
      * @return {Object} Object representation of an instance
      */
-    toObject: function() {
-      return fabric.Polygon.prototype.toObject.call(this);
+    toObject: function(propertiesToInclude) {
+      return fabric.Polygon.prototype.toObject.call(this, propertiesToInclude);
     },
 
     /**
@@ -10689,8 +10705,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      * @method toObject
      * @return {Object} object representation of an instance
      */
-    toObject: function() {
-      return extend(this.callSuper('toObject'), {
+    toObject: function(propertiesToInclude) {
+      return extend(this.callSuper('toObject', propertiesToInclude), {
         points: this.points.concat()
       });
     },
@@ -11372,8 +11388,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      * @method toObject
      * @return {Object}
      */
-    toObject: function() {
-      var o = extend(this.callSuper('toObject'), {
+    toObject: function(propertiesToInclude) {
+      var o = extend(this.callSuper('toObject', propertiesToInclude), {
         path: this.path
       });
       if (this.sourcePath) {
@@ -11684,9 +11700,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      * @method toObject
      * @return {Object} object representation of an instance
      */
-    toObject: function() {
-      return extend(parentToObject.call(this), {
-        paths: invoke(this.getObjects(), 'toObject'),
+    toObject: function(propertiesToInclude) {
+      return extend(parentToObject.call(this, propertiesToInclude), {
+        paths: invoke(this.getObjects(), 'toObject', propertiesToInclude),
         sourcePath: this.sourcePath
       });
     },
@@ -12006,8 +12022,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      * @method toObject
      * @return {Object} object representation of an instance
      */
-    toObject: function() {
-      return extend(this.callSuper('toObject'), {
+    toObject: function(propertiesToInclude) {
+      return extend(this.callSuper('toObject', propertiesToInclude), {
         objects: invoke(this.objects, 'toObject')
       });
     },
@@ -12425,8 +12441,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      * @method toObject
      * @return {Object} Object representation of an instance
      */
-    toObject: function() {
-      return extend(this.callSuper('toObject'), {
+    toObject: function(propertiesToInclude) {
+      return extend(this.callSuper('toObject', propertiesToInclude), {
         src: this._originalImage.src || this._originalImage._src,
         filters: this.filters.concat()
       });
@@ -14052,8 +14068,8 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
      * @method toObject
      * @return {Object} Object representation of text object
      */
-    toObject: function() {
-      return extend(this.callSuper('toObject'), {
+    toObject: function(propertiesToInclude) {
+      return extend(this.callSuper('toObject', propertiesToInclude), {
         text:             this.text,
         fontSize:         this.fontSize,
         fontWeight:       this.fontWeight,

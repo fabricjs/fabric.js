@@ -19,7 +19,7 @@
                   '["c", 0.877, -9.979, 2.893, -12.905, 4.942, -15.621], ["C", 17.878, 21.775, 18.713, 17.397, 18.511, '+
                   '13.99], ["z", null]]}], "background": "#ff5555"}';
 
-  var PATH_DATALESS_JSON = '{"objects":[{"type":"path","left":100,"top":100,"width":200,"height":200,"fill":"rgb(0,0,0)",'+
+  var PATH_DATALESS_JSON = '{"objects":[{"type":"path","left":200,"top":200,"width":200,"height":200,"fill":"rgb(0,0,0)",'+
                            '"overlayFill":null,"stroke":null,"strokeWidth":1,"strokeDashArray":null,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,'+
                            '"flipY":false,"opacity":1,"selectable":true,"hasControls":true,"hasBorders":true,"hasRotatingPoint":false,"transparentCorners":true,"perPixelTargetFind":false,'+
                            '"path":"http://example.com/"}],"background":"rgba(0, 0, 0, 0)"}';
@@ -28,6 +28,11 @@
                   '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,"selectable":true,'+
                   '"hasControls":true,"hasBorders":true,"hasRotatingPoint":false,"transparentCorners":true,"perPixelTargetFind":false,"rx":0,"ry":0}],'+
                   '"background":"#ff5555"}';
+
+  var RECT_JSON_WITH_PADDING = '{"objects":[{"type":"rect","left":0,"top":0,"width":10,"height":20,"fill":"rgb(0,0,0)","overlayFill":null,'+
+                               '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,"selectable":true,'+
+                               '"hasControls":true,"hasBorders":true,"hasRotatingPoint":false,"transparentCorners":true,"perPixelTargetFind":false,"padding":123,"foo":"bar","rx":0,"ry":0}],'+
+                               '"background":"rgba(0, 0, 0, 0)"}';
 
   // force creation of static canvas
   // TODO: fix this
@@ -231,6 +236,26 @@
     // TODO (kangax): need to test this method with fabric.Path to ensure that path is not populated
   });
 
+  test('toObject with additional properties', function() {
+
+    canvas.freeDrawingColor = 'red';
+    canvas.foobar = 123;
+
+    var expectedObject = {
+      background: canvas.backgroundColor,
+      objects: canvas.getObjects(),
+      freeDrawingColor: 'red',
+      foobar: 123
+    };
+    deepEqual(expectedObject, canvas.toObject(['freeDrawingColor', 'foobar']));
+
+    var rect = makeRect();
+    canvas.add(rect);
+
+    ok(!('rotatingPointOffset' in canvas.toObject(['smthelse']).objects[0]));
+    ok('rotatingPointOffset' in canvas.toObject(['rotatingPointOffset']).objects[0]);
+  });
+
   test('isEmpty', function() {
     ok(typeof canvas.isEmpty == 'function');
     ok(canvas.isEmpty());
@@ -261,7 +286,30 @@
       equal(obj.get('flipX'), false);
       equal(obj.get('flipY'), false);
       equal(obj.get('opacity'), 1);
+
       ok(obj.get('path').length > 0);
+    });
+  });
+
+  test('loadFromJSON custom properties', function() {
+    var rect = new fabric.Rect({ width: 10, height: 20 });
+    rect.padding = 123;
+    rect.foo = "bar";
+
+    canvas.add(rect);
+
+    var jsonWithoutFoo = JSON.stringify(canvas.toJSON(['padding']));
+    var jsonWithFoo = JSON.stringify(canvas.toJSON(['padding', 'foo']));
+
+    equal(jsonWithFoo, RECT_JSON_WITH_PADDING);
+    ok(jsonWithoutFoo !== RECT_JSON_WITH_PADDING);
+
+    canvas.clear();
+    canvas.loadFromJSON(jsonWithFoo, function() {
+      var obj = canvas.item(0);
+
+      equal(obj.padding, 123, 'padding on object is set properly');
+      equal(obj.foo, 'bar', '"foo" property on object is set properly');
     });
   });
 

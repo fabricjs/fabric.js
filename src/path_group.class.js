@@ -110,9 +110,9 @@
      * @method toObject
      * @return {Object} object representation of an instance
      */
-    toObject: function() {
-      return extend(parentToObject.call(this), {
-        paths: invoke(this.getObjects(), 'toObject'),
+    toObject: function(propertiesToInclude) {
+      return extend(parentToObject.call(this, propertiesToInclude), {
+        paths: invoke(this.getObjects(), 'toObject', propertiesToInclude),
         sourcePath: this.sourcePath
       });
     },
