@@ -12,14 +12,7 @@
     return;
   }
 
-  fabric.FreeDrawing = fabric.util.createClass(fabric.Object, {
-
-    /**
-     * @class FreeDrawing
-     * @extends fabric.Object
-     */
-    type: 'FreeDrawing',
-
+  fabric.FreeDrawing = fabric.util.createClass({
 
     /**
      * Free Drawer handles scribbling on a fabricCanvas.

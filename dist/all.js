@@ -6216,14 +6216,7 @@ fabric.util.string = {
     return;
   }
 
-  fabric.FreeDrawing = fabric.util.createClass(fabric.Object, {
-
-    /**
-     * @class FreeDrawing
-     * @extends fabric.Object
-     */
-    type: 'FreeDrawing',
-
+  fabric.FreeDrawing = fabric.util.createClass({
 
     /**
      * Free Drawer handles scribbling on a fabricCanvas.
@@ -6651,7 +6644,7 @@ fabric.util.string = {
     _initInteractive: function() {
       this._currentTransform = null;
       this._groupSelector = null;
-      this.freeDrawing = new fabric.FreeDrawing(this);
+      this.freeDrawing = fabric.FreeDrawing && new fabric.FreeDrawing(this);
       this._initWrapperElement();
       this._createUpperCanvas();
       this._initEvents();
