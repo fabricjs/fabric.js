@@ -73,6 +73,20 @@
      */
     selectionColor:         'rgba(100, 100, 255, 0.3)', // blue
 
+     /**
+     * Indicates whether selection border should be dashed
+     * @property
+     * @type Boolean
+     */
+    selectionDashed:         false,
+
+    /**
+     * Default dash array pattern
+     * @property
+     * @type Array
+     */ 
+    selectionDashArray:      [3, 6],
+
     /**
      * Default dash array pattern
      * If not empty the selection border is dashed
@@ -165,8 +179,7 @@
     _initInteractive: function() {
       this._currentTransform = null;
       this._groupSelector = null;
-      this._freeDrawingXPoints = [ ];
-      this._freeDrawingYPoints = [ ];
+      this.freeDrawing = new fabric.FreeDrawing(this);
       this._initWrapperElement();
       this._createUpperCanvas();
       this._initEvents();
@@ -243,7 +256,7 @@
       var target;
 
       if (this.isDrawingMode && this._isCurrentlyDrawing) {
-        this._finalizeDrawingPath();
+        this.freeDrawing._finalizeAndAddPath();
         this.fire('mouse:up', { e: e });
         return;
       }
@@ -318,10 +331,13 @@
       if (!isLeftClick && !fabric.isTouchSupported) return;
 
       if (this.isDrawingMode) {
-        this._prepareForDrawing(e);
+        var pointer = this.getPointer(e);
+        this.freeDrawing._prepareForDrawing(pointer);
 
-        // capture coordinates immediately; this allows to draw dots (when movement never occurs)
-        this._captureDrawingPath(e);
+        // capture coordinates immediately; 
+        // this allows to draw dots (when movement never occurs) 
+        this.freeDrawing._captureDrawingPath(pointer);
+
         this.fire('mouse:down', { e: e });
         return;
       }
@@ -391,7 +407,13 @@
 
       if (this.isDrawingMode) {
         if (this._isCurrentlyDrawing) {
-          this._captureDrawingPath(e);
+          var pointer = this.getPointer(e);
+          this.freeDrawing._captureDrawingPath(pointer);
+          
+          // redraw curve
+          // clear top canvas
+          this.clearContext(this.contextTop);
+          this.freeDrawing._render(this.contextTop);
         }
         this.fire('mouse:move', { e: e });
         return;
@@ -701,91 +723,6 @@
       if (activeGroup) {
         activeGroup.saveCoords();
       }
-    },
-
-    /**
-     * @private
-     * @method _prepareForDrawing
-     */
-    _prepareForDrawing: function(e) {
-
-      this._isCurrentlyDrawing = true;
-
-      this.discardActiveObject().renderAll();
-
-      var pointer = this.getPointer(e);
-
-      this._freeDrawingXPoints.length = this._freeDrawingYPoints.length = 0;
-
-      this._freeDrawingXPoints.push(pointer.x);
-      this._freeDrawingYPoints.push(pointer.y);
-
-      this.contextTop.beginPath();
-      this.contextTop.moveTo(pointer.x, pointer.y);
-      this.contextTop.strokeStyle = this.freeDrawingColor;
-      this.contextTop.lineWidth = this.freeDrawingLineWidth;
-      this.contextTop.lineCap = this.contextTop.lineJoin = 'round';
-    },
-
-    /**
-     * @private
-     * @method _captureDrawingPath
-     */
-    _captureDrawingPath: function(e) {
-      var pointer = this.getPointer(e);
-
-      this._freeDrawingXPoints.push(pointer.x);
-      this._freeDrawingYPoints.push(pointer.y);
-
-      this.contextTop.lineTo(pointer.x, pointer.y);
-      this.contextTop.stroke();
-    },
-
-    /**
-     * @private
-     * @method _finalizeDrawingPath
-     */
-    _finalizeDrawingPath: function() {
-
-      this.contextTop.closePath();
-
-      this._isCurrentlyDrawing = false;
-
-      var minX = utilMin(this._freeDrawingXPoints),
-          minY = utilMin(this._freeDrawingYPoints),
-          maxX = utilMax(this._freeDrawingXPoints),
-          maxY = utilMax(this._freeDrawingYPoints),
-          path = [ ],
-          xPoints = this._freeDrawingXPoints,
-          yPoints = this._freeDrawingYPoints;
-
-      path.push('M ', xPoints[0] - minX, ' ', yPoints[0] - minY, ' ');
-
-      for (var i = 1, len = xPoints.length; i < len; i++) {
-        path.push('L ', xPoints[i] - minX, ' ', yPoints[i] - minY, ' ');
-      }
-
-      // TODO (kangax): maybe remove Path creation from here, to decouple fabric.Canvas from fabric.Path,
-      // and instead fire something like "drawing:completed" event with path string
-
-      path = path.join('');
-
-      if (path === "M 0 0 L 0 0 ") {
-        // do not create 0 width/height paths, as they are rendered inconsistently across browsers
-        // Firefox 4, for example, renders a dot, whereas Chrome 10 renders nothing
-        this.renderAll();
-        return;
-      }
-
-      var p = new fabric.Path(path);
-
-      p.fill = null;
-      p.stroke = this.freeDrawingColor;
-      p.strokeWidth = this.freeDrawingLineWidth;
-      this.add(p);
-      p.set("left", minX + (maxX - minX) / 2).set("top", minY + (maxY - minY) / 2).setCoords();
-      this.renderAll();
-      this.fire('path:created', { path: p });
     },
 
     /**
@@ -1316,4 +1253,36 @@
    * @constructor
    */
   fabric.Element = fabric.Canvas;
+
+  /*
+   * Add dashed line drawing capabilitites to Canvas
+   * this method is used to draw dashed line around selection area.
+   *
+   */
+
+  CanvasRenderingContext2D.prototype.dashedLine = function(x,y,x2,y2,dashArray){
+    if (!dashArray) dashArray=[10,5];
+    var dashCount = dashArray.length;
+    this.moveTo(x, y);
+    var dx = (x2-x), dy = (y2-y);
+    var slope = dy/dx;
+    var distRemaining = Math.sqrt( dx*dx + dy*dy );
+    var dashIndex=0, draw=true;
+    while (distRemaining>=0.1 && dashIndex<10000){
+        var dashLength = dashArray[dashIndex++%dashCount];
+        if (dashLength==0) dashLength = 0.001; // Hack for Safari
+        if (dashLength > distRemaining) dashLength = distRemaining;
+        var xStep = Math.sqrt( dashLength*dashLength / (1 + slope*slope) );
+        x += xStep
+        y += slope*xStep;
+        this[draw ? 'lineTo' : 'moveTo'](x,y);
+        distRemaining -= dashLength;
+        draw = !draw;
+    }
+    // Ensure that the last segment is closed for proper stroking
+    this.moveTo(0,0);
+  }
+
 })();
+
+
