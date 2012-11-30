@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL` */
 /*! Fabric.js Copyright 2008-2012, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.9.23" };
+var fabric = fabric || { version: "0.9.24" };
 
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
@@ -5684,16 +5684,18 @@ fabric.util.string = {
           scaledWidth = origWidth * multiplier,
           scaledHeight = origHeight * multiplier,
           activeObject = this.getActiveObject(),
-          activeGroup = this.getActiveGroup();
+          activeGroup = this.getActiveGroup(),
+
+          ctx = this.contextTop || this.contextContainer;
 
       this.setWidth(scaledWidth).setHeight(scaledHeight);
-      this.contextTop.scale(multiplier, multiplier);
+      ctx.scale(multiplier, multiplier);
 
       if (activeGroup) {
         // not removing group due to complications with restoring it with correct state afterwords
         this._tempRemoveBordersCornersFromGroup(activeGroup);
       }
-      else if (activeObject) {
+      else if (activeObject && this.deactivateAll) {
         this.deactivateAll();
       }
 
@@ -5706,13 +5708,13 @@ fabric.util.string = {
 
       var dataURL = this.toDataURL(format, quality);
 
-      this.contextTop.scale(1 / multiplier,  1 / multiplier);
+      ctx.scale(1 / multiplier,  1 / multiplier);
       this.setWidth(origWidth).setHeight(origHeight);
 
       if (activeGroup) {
         this._restoreBordersCornersOnGroup(activeGroup);
       }
-      else if (activeObject) {
+      else if (activeObject && this.setActiveObject) {
         this.setActiveObject(activeObject);
       }
 
@@ -6558,6 +6560,14 @@ fabric.util.string = {
     selectionDashArray:      [3, 6],
 
     /**
+     * Default dash array pattern
+     * If not empty the selection border is dashed
+     * @property
+     * @type Array
+     */
+    selectionDashArray:      [ ],
+
+    /**
      * Color of the border of selection (usually slightly darker than color of selection itself)
      * @property
      * @type String
@@ -7309,44 +7319,86 @@ fabric.util.string = {
      * @private
      */
     _drawSelection: function () {
-      var groupSelector = this._groupSelector,
+      var ctx = this.contextTop,
+          groupSelector = this._groupSelector,
           left = groupSelector.left,
           top = groupSelector.top,
           aleft = abs(left),
           atop = abs(top);
 
-      this.contextTop.fillStyle = this.selectionColor;
+      ctx.fillStyle = this.selectionColor;
 
-      this.contextTop.fillRect(
+      ctx.fillRect(
         groupSelector.ex - ((left > 0) ? 0 : -left),
         groupSelector.ey - ((top > 0) ? 0 : -top),
         aleft,
         atop
       );
 
-      this.contextTop.lineWidth = this.selectionLineWidth;
-      this.contextTop.strokeStyle = this.selectionBorderColor;
+      ctx.lineWidth = this.selectionLineWidth;
+      ctx.strokeStyle = this.selectionBorderColor;
 
       // selection border
-      if (this.selectionDashed == true && this.selectionDashArray.length > 1) {
-        this.contextTop.beginPath();
+      if (this.selectionDashArray.length > 1) {
         var px = groupSelector.ex + STROKE_OFFSET - ((left > 0) ? 0: aleft);
         var py = groupSelector.ey + STROKE_OFFSET - ((top > 0) ? 0: atop);
-        this.contextTop.dashedLine(px, py, px+aleft, py, this.selectionDashArray);
-        this.contextTop.dashedLine(px, py+atop-1, px+aleft, py+atop-1, this.selectionDashArray);
-        this.contextTop.dashedLine(px, py, px+0.001, py+atop, this.selectionDashArray);
-        this.contextTop.dashedLine(px+aleft-1, py, px+aleft+1.1, py+atop-0.001, this.selectionDashArray);
-        this.contextTop.closePath();
-        this.contextTop.stroke();
+        ctx.beginPath();
+        this.drawDashedLine(ctx, px, py, px+aleft, py, this.selectionDashArray);
+        this.drawDashedLine(ctx, px, py+atop-1, px+aleft, py+atop-1, this.selectionDashArray);
+        this.drawDashedLine(ctx, px, py, px, py+atop, this.selectionDashArray);
+        this.drawDashedLine(ctx, px+aleft-1, py, px+aleft-1, py+atop, this.selectionDashArray);
+        ctx.closePath();
+        ctx.stroke();
       }
       else {
-        this.contextTop.strokeRect(
+        ctx.strokeRect(
           groupSelector.ex + STROKE_OFFSET - ((left > 0) ? 0 : aleft),
           groupSelector.ey + STROKE_OFFSET - ((top > 0) ? 0 : atop),
           aleft,
           atop
         );
       }
+    },
+
+    /*
+     * Draws a dashed line between two points
+     *
+     * this method is used to draw dashed line around selection area.
+     * http://stackoverflow.com/questions/4576724/dotted-stroke-in-canvas
+     *
+     * @method drawDashedLine
+     * @param ctx {Canvas} context
+     * @param x {number} start x coordinate
+     * @param y {number} start y coordinate
+     * @param x2 {number} end x coordinate
+     * @param y2 {number} end y coordinate
+     * @param da {Array} dash array pattern
+     */
+    drawDashedLine: function(ctx, x, y, x2, y2, da) {
+      var dx = x2 - x,
+          dy = y2 - y,
+          len = Math.sqrt(dx*dx + dy*dy),
+          rot = Math.atan2(dy, dx),
+          dc = da.length,
+          di = 0,
+          draw = true;
+
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.moveTo(0, 0);
+      ctx.rotate(rot);
+
+      x = 0;
+      while (len > x) {
+        x += da[di++ % dc];
+        if (x > len) {
+          x = len;
+        }
+        ctx[draw ? 'lineTo' : 'moveTo'](x, 0);
+        draw = !draw;
+      }
+
+      ctx.restore();
     },
 
     _findSelectedObjects: function (e) {
@@ -11177,8 +11229,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       if (!this.path) return;
 
       if (!fromArray) {
-        this._initializeFromString(options);
+        this.path = this._parsePath();
       }
+      this._initializePath(options);
 
       if (options.sourcePath) {
         this.setSourcePath(options.sourcePath);
@@ -11187,13 +11240,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
     /**
      * @private
-     * @method _initializeFromString
+     * @method _initializePath
      */
-    _initializeFromString: function(options) {
+    _initializePath: function (options) {
       var isWidthSet = 'width' in options,
           isHeightSet = 'height' in options;
-
-      this.path = this._parsePath();
 
       if (!isWidthSet || !isHeightSet) {
         extend(this, this._parseDimensions());
@@ -11204,6 +11255,22 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
           this.height = options.height;
         }
       }
+      else { //Set center location relative to given height/width
+        this.left = this.width / 2;
+        this.top = this.height / 2;
+      }
+      this.pathOffset = this._calculatePathOffset(); //Save top-left coords as offset
+    },
+
+    /**
+     * @private
+     * @method _calculatePathOffset
+     */
+    _calculatePathOffset: function () {
+      return {
+        x: this.left - (this.width / 2),
+        y: this.top - (this.height / 2)
+      };
     },
 
     /**
@@ -11221,8 +11288,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
           tempY,
           tempControlX,
           tempControlY,
-          l = -(this.width / 2),
-          t = -(this.height / 2);
+          l = -((this.width / 2) + this.pathOffset.x),
+          t = -((this.height / 2) + this.pathOffset.y);
 
       for (var i = 0, len = this.path.length; i < len; ++i) {
 
@@ -11702,18 +11769,20 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
       var minX = min(aX),
           minY = min(aY),
-          deltaX = 0,
-          deltaY = 0;
+          maxX = max(aX),
+          maxY = max(aY),
+          deltaX = maxX - minX,
+          deltaY = maxY - minY;
 
       var o = {
-        top: minY - deltaY,
-        left: minX - deltaX,
+        top: minY + deltaY / 2,
+        left: minX + deltaX / 2,
         bottom: max(aY) - deltaY,
         right: max(aX) - deltaX
       };
 
-      o.width = o.right - o.left;
-      o.height = o.bottom - o.top;
+      o.width = deltaX;
+      o.height = deltaY;
 
       return o;
     }
