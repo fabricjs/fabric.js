@@ -2,6 +2,8 @@
 
   QUnit.module('fabric.util');
 
+  function K (x) { return x }
+
   test('fabric.util.toFixed', function(){
     ok(typeof fabric.util.toFixed == 'function');
 
@@ -97,6 +99,24 @@
     equal(camelize('and_something_with_underscores'), 'and_something_with_underscores');
     equal(camelize('underscores_and-dashes'), 'underscores_andDashes');
     equal(camelize('--double'), 'Double');
+  });
+
+  test('fabric.util.string.escapeXml', function() {
+    var escapeXml = fabric.util.string.escapeXml;
+
+    ok(typeof escapeXml == 'function');
+
+    // borrowed from Prototype.js
+    equal('foo bar', escapeXml('foo bar'));
+    equal('foo &lt;span&gt;bar&lt;/span&gt;', escapeXml('foo <span>bar</span>'));
+    equal('foo ß bar', escapeXml('foo ß bar'));
+
+    equal('ウィメンズ2007\nクルーズコレクション', escapeXml('ウィメンズ2007\nクルーズコレクション'));
+
+    equal('a&lt;a href=&quot;blah&quot;&gt;blub&lt;/a&gt;b&lt;span&gt;&lt;div&gt;&lt;/div&gt;&lt;/span&gt;cdef&lt;strong&gt;!!!!&lt;/strong&gt;g',
+          escapeXml('a<a href="blah">blub</a>b<span><div></div></span>cdef<strong>!!!!</strong>g'));
+
+    equal('1\n2', escapeXml('1\n2'));
   });
 
   test('fabric.util.string.capitalize', function() {
@@ -416,6 +436,277 @@
       ok(group2 instanceof fabric.PathGroup);
       start();
     }, 1000);
+  });
+
+  test('Array.prototype.indexOf', function() {
+
+    // borrowed from Prototype.js
+    equal(-1, [].indexOf(1));
+    equal(-1, [0].indexOf(1));
+    equal(0, [1].indexOf(1));
+    equal(1, [0,1,2].indexOf(1));
+    equal(0, [1,2,1].indexOf(1));
+    equal(2, [1,2,1].indexOf(1, -1));
+    equal(1, [undefined,null].indexOf(null));
+
+    // ES5 compatibility tests.
+    var undef;
+    var array = [1, 2, 3, 4, 5, undef, 6, 7, 1, 2, 3];
+
+    equal(2, array.indexOf(3, -47), "large negative value for fromIndex");
+    equal(10, array.indexOf(3, 4));
+    equal(10, array.indexOf(3, -5))
+    equal(2, array.indexOf(3, {}), "nonsensical value for fromIndex");
+    equal(2, array.indexOf(3, ""), "nonsensical value for fromIndex");
+    equal(-1, array.indexOf(3, 41), "fromIndex value larger than the length of the array");
+  });
+
+  test('Array.prototype.forEach', function() {
+    ok(typeof Array.prototype.forEach === 'function');
+
+    var arr = [1,2,3];
+    var result = [ ];
+
+    arr.forEach(function(val, index, arr) {
+      result.push(val, index, arr);
+    });
+
+    deepEqual(result, [1, 0, arr, 2, 1, arr, 3, 2, arr]);
+  });
+
+  test('Array.prototype.map', function() {
+
+    ok(typeof Array.prototype.map === 'function');
+
+    // borrowed from Prototype.js but modified to conform to standard
+
+    deepEqual([2,4,6], [1,2,3].map(function(x) { return x * 2; }));
+
+    var x = [1,2,3,4];
+    delete x[1];
+    delete x[3];
+    deepEqual([1, undefined, 3, undefined], x.map(K));
+    deepEqual(4, x.map(K).length);
+
+    var traversed = [];
+    x.map(function(val) {
+      traversed.push(val);
+    });
+    deepEqual([1, 3], traversed);
+    equal(2, traversed.length);
+  });
+
+  test('Array.prototype.every', function() {
+
+    ok(typeof Array.prototype.every === 'function');
+
+    // borrowed from Prototype.js but modified to conform to standard
+    ok([].every(K));
+
+    ok([true, true, true].every(K));
+    ok(![true, false, false].every(K));
+    ok(![false, false, false].every(K));
+
+    ok([1,2,3,4,5].every(function(value) {
+      return value > 0;
+    }));
+    ok(![1,2,3,4,5].every(function(value) {
+      return value > 1;
+    }));
+
+    var x = [1,2,3], traversed = [];
+    delete x[1];
+    x.every(function(val) { traversed.push(val); return true; });
+
+    deepEqual([1, 3], traversed);
+    equal(2, traversed.length);
+  });
+
+  test('Array.prototype.some', function() {
+    ok(typeof Array.prototype.some === 'function');
+
+    // borrowed from Prototype.js but modified to conform to standard
+    ok(!([].some(K)));
+
+    ok([true, true, true].some(K));
+    ok([true, false, false].some(K));
+    ok(![false, false, false].some(K));
+
+    ok([1,2,3,4,5].some(function(value) {
+      return value > 2;
+    }));
+    ok(![1,2,3,4,5].some(function(value) {
+      return value > 5;
+    }));
+
+    var x = [1,2,3], traversed = [];
+    delete x[1];
+    x.some(function(val) { traversed.push(val); });
+
+    deepEqual([1, 3], traversed);
+    equal(2, traversed.length);
+  });
+
+  test('Array.prototype.filter', function() {
+    ok(typeof Array.prototype.filter === 'function');
+
+    var arr = [1,2,3,4,5];
+    deepEqual([3,4,5], arr.filter(function(val){ return val > 2 }));
+    deepEqual([], arr.filter(function(val){ return val > 5 }));
+    deepEqual([1,2], arr.filter(function(val){ return val <= 2 }));
+  });
+
+  test('Array.prototype.reduce', function() {
+    ok(typeof Array.prototype.reduce === 'function');
+
+    var arr = [1,2,3,4,5];
+    equal(15,
+      arr.reduce(function(memo, val) { return memo + val }), 0);
+
+    deepEqual(['1!', '2!', '3!', '4!', '5!'],
+      arr.reduce(function(memo, val) { memo.push(val + '!'); return memo }, [ ]));
+
+    var arr = 'foobar'.split('');
+    equal('f0o1o2b3a4r5',
+      arr.reduce(function(memo, val, index) { return memo + val + index }, ''));
+  });
+
+  test('fabric.util.createClass', function() {
+    var Klass = fabric.util.createClass();
+
+    ok(typeof Klass === 'function');
+    ok(typeof new Klass() === 'object');
+
+    var Person = fabric.util.createClass({
+      initialize: function(firstName, lastName) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+      },
+      toString: function() {
+        return 'My name is ' + this.firstName + ' ' + this.lastName;
+      }
+    });
+
+    ok(typeof Person === 'function');
+    ok(typeof new Person() === 'object');
+
+    var john = new Person('John', 'Meadows');
+    ok(john instanceof Person);
+
+    equal(john.firstName, 'John');
+    equal(john.lastName, 'Meadows');
+    equal(john + '', 'My name is John Meadows');
+
+
+    var WebDeveloper = fabric.util.createClass(Person, {
+      initialize: function(firstName, lastName, skills) {
+        this.callSuper('initialize', firstName, lastName);
+        this.skills = skills;
+      },
+      toString: function() {
+        return this.callSuper('toString') + ' and my skills are ' + this.skills.join(', ');
+      }
+    });
+
+    ok(typeof WebDeveloper === 'function');
+    var dan = new WebDeveloper('Dan', 'Trink', ['HTML', 'CSS', 'Javascript']);
+    ok(dan instanceof Person);
+    ok(dan instanceof WebDeveloper);
+
+    equal(dan.firstName, 'Dan');
+    equal(dan.lastName, 'Trink');
+    deepEqual(dan.skills, ['HTML', 'CSS', 'Javascript']);
+
+    equal(dan + '', 'My name is Dan Trink and my skills are HTML, CSS, Javascript');
+  });
+
+  // test('fabric.util.setStyle', function() {
+  // });
+
+  // test('fabric.util.request', function() {
+  // });
+
+  // test('fabric.util.getPointer', function() {
+  // });
+
+  // test('fabric.util.addListener', function() {
+  // });
+
+  // test('fabric.util.removeListener', function() {
+  // });
+
+  test('fabric.util.array.invoke', function() {
+    ok(typeof fabric.util.array.invoke === 'function');
+
+    var obj1 = { toString: function(){ return 'obj1' } };
+    var obj2 = { toString: function(){ return 'obj2' } };
+    var obj3 = { toString: function(){ return 'obj3' } };
+
+    deepEqual(['obj1', 'obj2', 'obj3'],
+      fabric.util.array.invoke([ obj1, obj2, obj3 ], 'toString'));
+
+    deepEqual(['f', 'b', 'b'],
+      fabric.util.array.invoke(['foo', 'bar', 'baz'], 'charAt', 0));
+
+    deepEqual(['o', 'a', 'a'],
+      fabric.util.array.invoke(['foo', 'bar', 'baz'], 'charAt', 1));
+  });
+
+  test('fabric.util.array.min', function() {
+    ok(typeof fabric.util.array.min === 'function');
+
+    equal(1, fabric.util.array.min([1, 3, 2]));
+    equal(-1, fabric.util.array.min([3, 1, 'f', 3, -1, 3]));
+    equal(-3, fabric.util.array.min([-1, -2, -3]));
+    equal('a', fabric.util.array.min(['a', 'c', 'b']));
+
+    var obj1 = { valueOf: function(){ return 1 } };
+    var obj2 = { valueOf: function(){ return 2 } };
+    var obj3 = { valueOf: function(){ return 3 } };
+
+    equal(obj1, fabric.util.array.min([ obj1, obj3, obj2 ]));
+  });
+
+  test('fabric.util.array.max', function() {
+    ok(typeof fabric.util.array.max === 'function');
+
+    equal(3, fabric.util.array.max([1, 3, 2]));
+    equal(3, fabric.util.array.max([3, 1, 'f', 3, -1, 3]));
+    equal(-1, fabric.util.array.max([-1, -2, -3]));
+    equal('c', fabric.util.array.max(['a', 'c', 'b']));
+
+    var obj1 = { valueOf: function(){ return 1 } };
+    var obj2 = { valueOf: function(){ return 2 } };
+    var obj3 = { valueOf: function(){ return 3 } };
+
+    equal(obj3, fabric.util.array.max([ obj1, obj3, obj2 ]));
+  });
+
+  test('fabric.util.populateWithProperties', function() {
+    ok(typeof fabric.util.populateWithProperties == 'function')
+
+    var source = {
+      foo: 'bar',
+      baz: 123,
+      qux: function() { }
+    },
+    destination = { };
+
+    fabric.util.populateWithProperties(source, destination);
+    ok(typeof destination.foo === 'undefined');
+    ok(typeof destination.baz === 'undefined');
+    ok(typeof destination.qux === 'undefined');
+
+    fabric.util.populateWithProperties(source, destination, ['foo']);
+    equal(destination.foo, 'bar');
+    ok(typeof destination.baz === 'undefined');
+    ok(typeof destination.qux === 'undefined');
+
+    fabric.util.populateWithProperties(source, destination, ['foo', 'baz', 'ffffffffff']);
+    equal(destination.foo, 'bar');
+    equal(destination.baz, 123);
+    ok(typeof destination.qux === 'undefined');
+    ok(typeof destination.ffffffffff === 'undefined');
   });
 
 })();
