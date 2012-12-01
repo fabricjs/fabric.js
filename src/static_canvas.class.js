@@ -787,6 +787,7 @@
     /**
      * Returs dataless JSON representation of canvas
      * @method toDatalessJSON
+     * @param {Array} propertiesToInclude
      * @return {String} json string
      */
     toDatalessJSON: function (propertiesToInclude) {
@@ -796,7 +797,8 @@
     /**
      * Returns object representation of canvas
      * @method toObject
-     * @return {Object}
+     * @param {Array} propertiesToInclude
+     * @return {Object} object representation of an instance
      */
     toObject: function (propertiesToInclude) {
       return this._toObjectMethod('toObject', propertiesToInclude);
@@ -805,7 +807,8 @@
     /**
      * Returns dataless object representation of canvas
      * @method toDatalessObject
-     * @return {Object}
+     * @param {Array} propertiesToInclude
+     * @return {Object} object representation of an instance
      */
     toDatalessObject: function (propertiesToInclude) {
       return this._toObjectMethod('toDatalessObject', propertiesToInclude);
