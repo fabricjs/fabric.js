@@ -203,7 +203,9 @@
      */
     _initializePath: function (options) {
       var isWidthSet = 'width' in options,
-          isHeightSet = 'height' in options;
+          isHeightSet = 'height' in options,
+          isLeftSet = 'left' in options,
+          isTopSet = 'top' in options;
 
       if (!isWidthSet || !isHeightSet) {
         extend(this, this._parseDimensions());
@@ -214,21 +216,25 @@
           this.height = options.height;
         }
       }
-      else { //Set center location relative to given height/width
-        this.left = this.width / 2;
-        this.top = this.height / 2;
+      else { //Set center location relative to given height/width if not specified
+        if (!isTopSet) {
+          this.top = this.height / 2;
+        }
+        if (!isLeftSet) {
+          this.left = this.width / 2;
+        }
       }
-      this.pathOffset = this._calculatePathOffset(); //Save top-left coords as offset
+      this.pathOffset = this._calculatePathOffset(isTopSet || isLeftSet); //Save top-left coords as offset
     },
 
     /**
      * @private
      * @method _calculatePathOffset
      */
-    _calculatePathOffset: function () {
+    _calculatePathOffset: function (positionSet) {
       return {
-        x: this.left - (this.width / 2),
-        y: this.top - (this.height / 2)
+        x: positionSet ? 0 : this.left - (this.width / 2),
+        y: positionSet ? 0 : this.top - (this.height / 2)
       };
     },
 
