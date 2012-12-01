@@ -528,7 +528,8 @@
     /**
      * Returns object representation of an instance
      * @method toObject
-     * @return {Object} Object representation of text object
+     * @param {Array} propertiesToInclude
+     * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
       return extend(this.callSuper('toObject', propertiesToInclude), {

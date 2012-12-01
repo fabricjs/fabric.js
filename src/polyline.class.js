@@ -47,7 +47,8 @@
     /**
      * Returns object representation of an instance
      * @method toObject
-     * @return {Object} Object representation of an instance
+     * @param {Array} propertiesToInclude
+     * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
       return fabric.Polygon.prototype.toObject.call(this, propertiesToInclude);

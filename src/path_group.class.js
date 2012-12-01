@@ -108,6 +108,7 @@
     /**
      * Returns object representation of this path group
      * @method toObject
+     * @param {Array} propertiesToInclude
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
@@ -120,10 +121,11 @@
     /**
      * Returns dataless object representation of this path group
      * @method toDatalessObject
+     * @param {Array} propertiesToInclude
      * @return {Object} dataless object representation of an instance
      */
-    toDatalessObject: function() {
-      var o = this.toObject();
+    toDatalessObject: function(propertiesToInclude) {
+      var o = this.toObject(propertiesToInclude);
       if (this.sourcePath) {
         o.paths = this.sourcePath;
       }

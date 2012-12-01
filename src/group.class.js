@@ -191,11 +191,12 @@
     /**
      * Returns object representation of an instance
      * @method toObject
+     * @param {Array} propertiesToInclude
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
       return extend(this.callSuper('toObject', propertiesToInclude), {
-        objects: invoke(this.objects, 'toObject')
+        objects: invoke(this.objects, 'toObject', propertiesToInclude)
       });
     },
 
