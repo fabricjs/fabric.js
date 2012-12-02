@@ -427,15 +427,17 @@
 
         for (var i = 0, len = textLines.length; i < len; i++) {
 
-          var lineWidth = ctx.measureText(textLines[i]).width;
-          var lineLeftOffset = this._getLineLeftOffset(lineWidth);
+          if (textLines[i] !== '') {
+            var lineWidth = ctx.measureText(textLines[i]).width;
+            var lineLeftOffset = this._getLineLeftOffset(lineWidth);
 
-          ctx.fillRect(
-            (-this.width / 2) + lineLeftOffset,
-            (-this.height / 2) + (i * this.fontSize * this.lineHeight),
-            lineWidth,
-            this.fontSize * this.lineHeight
-          );
+            ctx.fillRect(
+              (-this.width / 2) + lineLeftOffset,
+              (-this.height / 2) + (i * this.fontSize * this.lineHeight),
+              lineWidth,
+              this.fontSize * this.lineHeight
+            );
+          }
         }
         ctx.restore();
       }
