@@ -5427,7 +5427,7 @@ fabric.util.string = {
     },
 
     /**
-     * Adds objects to canvas, then renders canvas;
+     * Adds objects to canvas, then renders canvas (if `renderOnAddition` is not `false`).
      * Objects should be instances of (or inherit from) fabric.Object
      * @method add
      * @param [...] Zero or more fabric instances
@@ -5818,6 +5818,7 @@ fabric.util.string = {
     /**
      * Returs dataless JSON representation of canvas
      * @method toDatalessJSON
+     * @param {Array} propertiesToInclude
      * @return {String} json string
      */
     toDatalessJSON: function (propertiesToInclude) {
@@ -5827,7 +5828,8 @@ fabric.util.string = {
     /**
      * Returns object representation of canvas
      * @method toObject
-     * @return {Object}
+     * @param {Array} propertiesToInclude
+     * @return {Object} object representation of an instance
      */
     toObject: function (propertiesToInclude) {
       return this._toObjectMethod('toObject', propertiesToInclude);
@@ -5836,7 +5838,8 @@ fabric.util.string = {
     /**
      * Returns dataless object representation of canvas
      * @method toDatalessObject
-     * @return {Object}
+     * @param {Array} propertiesToInclude
+     * @return {Object} object representation of an instance
      */
     toDatalessObject: function (propertiesToInclude) {
       return this._toObjectMethod('toDatalessObject', propertiesToInclude);
@@ -8215,7 +8218,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * Returns an object representation of an instance
      * @method toObject
-     * @return {Object}
+     * @param {Array} propertiesToInclude
+     * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
 
@@ -8257,6 +8261,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * Returns (dataless) object representation of an instance
      * @method toDatalessObject
+     * @param {Array} propertiesToInclude
+     * @return {Object} object representation of an instance
      */
     toDatalessObject: function(propertiesToInclude) {
       // will be overwritten by subclasses
@@ -8886,14 +8892,15 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * Clones an instance
      * @method clone
-     * @param {Object} options object
+     * @param {Function} callback Callback is invoked with a clone as a first argument
+     * @param {Array} propertiesToInclude
      * @return {fabric.Object} clone of an instance
      */
-    clone: function(options) {
+    clone: function(callback, propertiesToInclude) {
       if (this.constructor.fromObject) {
-        return this.constructor.fromObject(this.toObject(), options);
+        return this.constructor.fromObject(this.toObject(propertiesToInclude), callback);
       }
-      return new fabric.Object(this.toObject());
+      return new fabric.Object(this.toObject(propertiesToInclude));
     },
 
     /**
@@ -9432,6 +9439,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * Returns a JSON representation of an instance
      * @method toJSON
+     * @param {Array} propertiesToInclude
      * @return {String} json
      */
     toJSON: function(propertiesToInclude) {
@@ -9757,7 +9765,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * Returns object representation of an instance
      * @methd toObject
-     * @return {Object}
+     * @param {Array} propertiesToInclude
+     * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
       return extend(this.callSuper('toObject', propertiesToInclude), {
@@ -9869,6 +9878,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * Returns object representation of an instance
      * @method toObject
+     * @param {Array} propertiesToInclude
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
@@ -10150,6 +10160,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * Returns object representation of an instance
      * @method toObject
+     * @param {Array} propertiesToInclude
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
@@ -10273,7 +10284,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
   "use strict";
 
-  var fabric = global.fabric || (global.fabric = { });
+  var fabric = global.fabric || (global.fabric = { }),
+      extend = fabric.util.object.extend;
 
   if (fabric.Rect) {
     console.warn('fabric.Rect is already defined');
@@ -10423,10 +10435,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * Returns object representation of an instance
      * @method toObject
+     * @param {Array} propertiesToInclude
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
-      return fabric.util.object.extend(this.callSuper('toObject', propertiesToInclude), {
+      return extend(this.callSuper('toObject', propertiesToInclude), {
         rx: this.get('rx') || 0,
         ry: this.get('ry') || 0
       });
@@ -10481,7 +10494,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     var parsedAttributes = fabric.parseAttributes(element, fabric.Rect.ATTRIBUTE_NAMES);
     parsedAttributes = _setDefaultLeftTopValues(parsedAttributes);
 
-    var rect = new fabric.Rect(fabric.util.object.extend((options ? fabric.util.object.clone(options) : { }), parsedAttributes));
+    var rect = new fabric.Rect(extend((options ? fabric.util.object.clone(options) : { }), parsedAttributes));
     rect._normalizeLeftTopProperties(parsedAttributes);
 
     return rect;
@@ -10548,7 +10561,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * Returns object representation of an instance
      * @method toObject
-     * @return {Object} Object representation of an instance
+     * @param {Array} propertiesToInclude
+     * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
       return fabric.Polygon.prototype.toObject.call(this, propertiesToInclude);
@@ -10714,6 +10728,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * Returns object representation of an instance
      * @method toObject
+     * @param {Array} propertiesToInclude
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
@@ -11024,7 +11039,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      */
     _initializePath: function (options) {
       var isWidthSet = 'width' in options,
-          isHeightSet = 'height' in options;
+          isHeightSet = 'height' in options,
+          isLeftSet = 'left' in options,
+          isTopSet = 'top' in options;
 
       if (!isWidthSet || !isHeightSet) {
         extend(this, this._parseDimensions());
@@ -11035,21 +11052,25 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
           this.height = options.height;
         }
       }
-      else { //Set center location relative to given height/width
-        this.left = this.width / 2;
-        this.top = this.height / 2;
+      else { //Set center location relative to given height/width if not specified
+        if (!isTopSet) {
+          this.top = this.height / 2;
+        }
+        if (!isLeftSet) {
+          this.left = this.width / 2;
+        }
       }
-      this.pathOffset = this._calculatePathOffset(); //Save top-left coords as offset
+      this.pathOffset = this._calculatePathOffset(isTopSet || isLeftSet); //Save top-left coords as offset
     },
 
     /**
      * @private
      * @method _calculatePathOffset
      */
-    _calculatePathOffset: function () {
+    _calculatePathOffset: function (positionSet) {
       return {
-        x: this.left - (this.width / 2),
-        y: this.top - (this.height / 2)
+        x: positionSet ? 0 : this.left - (this.width / 2),
+        y: positionSet ? 0 : this.top - (this.height / 2)
       };
     },
 
@@ -11397,7 +11418,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * Returns object representation of an instance
      * @method toObject
-     * @return {Object}
+     * @param {Array} propertiesToInclude
+     * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
       var o = extend(this.callSuper('toObject', propertiesToInclude), {
@@ -11415,10 +11437,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * Returns dataless object representation of an instance
      * @method toDatalessObject
-     * @return {Object}
+     * @param {Array} propertiesToInclude
+     * @return {Object} object representation of an instance
      */
-    toDatalessObject: function() {
-      var o = this.toObject();
+    toDatalessObject: function(propertiesToInclude) {
+      var o = this.toObject(propertiesToInclude);
       if (this.sourcePath) {
         o.path = this.sourcePath;
       }
@@ -11709,6 +11732,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * Returns object representation of this path group
      * @method toObject
+     * @param {Array} propertiesToInclude
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
@@ -11721,10 +11745,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * Returns dataless object representation of this path group
      * @method toDatalessObject
+     * @param {Array} propertiesToInclude
      * @return {Object} dataless object representation of an instance
      */
-    toDatalessObject: function() {
-      var o = this.toObject();
+    toDatalessObject: function(propertiesToInclude) {
+      var o = this.toObject(propertiesToInclude);
       if (this.sourcePath) {
         o.paths = this.sourcePath;
       }
@@ -12031,11 +12056,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * Returns object representation of an instance
      * @method toObject
+     * @param {Array} propertiesToInclude
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
       return extend(this.callSuper('toObject', propertiesToInclude), {
-        objects: invoke(this.objects, 'toObject')
+        objects: invoke(this.objects, 'toObject', propertiesToInclude)
       });
     },
 
@@ -12450,7 +12476,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * Returns object representation of an instance
      * @method toObject
-     * @return {Object} Object representation of an instance
+     * @param {Array} propertiesToInclude
+     * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
       return extend(this.callSuper('toObject', propertiesToInclude), {
@@ -12498,10 +12525,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * Returns a clone of an instance
      * @mthod clone
+     * @param {Array} propertiesToInclude
      * @param {Function} callback Callback is invoked with a clone as a first argument
      */
-    clone: function(callback) {
-      this.constructor.fromObject(this.toObject(), callback);
+    clone: function(callback, propertiesToInclude) {
+      this.constructor.fromObject(this.toObject(propertiesToInclude), callback);
     },
 
     /**
@@ -14077,7 +14105,8 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
     /**
      * Returns object representation of an instance
      * @method toObject
-     * @return {Object} Object representation of text object
+     * @param {Array} propertiesToInclude
+     * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
       return extend(this.callSuper('toObject', propertiesToInclude), {
