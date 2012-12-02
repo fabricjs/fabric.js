@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL` */
 /*! Fabric.js Copyright 2008-2012, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.9.25" };
+var fabric = fabric || { version: "0.9.26" };
 
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
@@ -5075,7 +5075,7 @@ fabric.util.string = {
     backgroundImageOpacity: 1.0,
 
     /**
-     * Indicatus whether the background image should be stretched to fit the
+     * Indicates whether the background image should be stretched to fit the
      * dimensions of the canvas instance.
      * @property
      * @type Boolean
@@ -5119,7 +5119,7 @@ fabric.util.string = {
     stateful: true,
 
     /**
-     * Indicates whether fabric.Canvas#add should also re-render canvas.
+     * Indicates whether {@link fabric.Canvas.prototype.add} should also re-render canvas.
      * Disabling this option could give a great performance boost when adding a lot of objects to canvas at once
      * (followed by a manual rendering after addition)
      * @property
@@ -5151,6 +5151,10 @@ fabric.util.string = {
       /* NOOP */
     },
 
+     /**
+      * @method _initStatic
+      * @private
+      */
     _initStatic: function(el, options) {
       this._objects = [];
 
@@ -5183,7 +5187,7 @@ fabric.util.string = {
      * @method setOverlayImage
      * @param {String} url url of an image to set overlay to
      * @param {Function} callback callback to invoke when image is loaded and set as an overlay
-     * @param {Object} options optional options to set for the overlay image
+     * @param {Object} [options] optional options to set for the overlay image
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
@@ -5207,7 +5211,7 @@ fabric.util.string = {
      * @method setBackgroundImage
      * @param {String} url url of an image to set background to
      * @param {Function} callback callback to invoke when image is loaded and set as background
-     * @param {Object} options optional options to set for the background image
+     * @param {Object} [options] optional options to set for the background image
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
@@ -5229,7 +5233,6 @@ fabric.util.string = {
     /**
      * @private
      * @method _createCanvasElement
-     * @param {Element} element
      */
     _createCanvasElement: function() {
       var element = fabric.document.createElement('canvas');
@@ -5243,6 +5246,10 @@ fabric.util.string = {
       return element;
     },
 
+    /**
+     * @method _initCanvasElement
+     * @param {HTMLElement} element
+     */
     _initCanvasElement: function(element) {
       if (typeof element.getContext === 'undefined' &&
           typeof G_vmlCanvasManager !== 'undefined' &&
@@ -5274,7 +5281,7 @@ fabric.util.string = {
     },
 
     /**
-     * Creates a secondary canvas
+     * Creates a bottom canvas
      * @method _createLowerCanvas
      */
     _createLowerCanvas: function (canvasEl) {
@@ -5744,6 +5751,10 @@ fabric.util.string = {
       return dataURL;
     },
 
+    /**
+     * @private
+     * @method _tempRemoveBordersCornersFromGroup
+     */
     _tempRemoveBordersCornersFromGroup: function(group) {
       group.origHideCorners = group.hideCorners;
       group.origBorderColor = group.borderColor;
@@ -5756,6 +5767,11 @@ fabric.util.string = {
         o.borderColor = 'rgba(0,0,0,0)';
       });
     },
+
+    /**
+     * @private
+     * @method _restoreBordersCornersOnGroup
+     */
     _restoreBordersCornersOnGroup: function(group) {
       group.hideCorners = group.origHideCorners;
       group.borderColor = group.origBorderColor;
@@ -7943,8 +7959,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       toFixed = fabric.util.toFixed,
       capitalize = fabric.util.string.capitalize,
       getPointer = fabric.util.getPointer,
-      degreesToRadians = fabric.util.degreesToRadians,
-      slice = Array.prototype.slice;
+      degreesToRadians = fabric.util.degreesToRadians;
 
   if (fabric.Object) {
     return;
@@ -8024,18 +8039,21 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     angle:                    0,
 
     /**
+     * Size of object's corners
      * @property
      * @type Number
      */
     cornersize:               12,
 
     /**
+     * When true, object's corners are rendered as transparent inside (i.e. stroke instead of fill)
      * @property
      * @type Boolean
      */
     transparentCorners:       true,
 
     /**
+     * Padding between object and its borders
      * @property
      * @type Number
      */
@@ -8072,12 +8090,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     overlayFill:              null,
 
     /**
+     * When `true`, an object is rendered via stroke
      * @property
      * @type String
      */
     stroke:                   null,
 
     /**
+     * Width of a stroke used to render this object
      * @property
      * @type Number
      */
@@ -9622,6 +9642,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   }
 
   /**
+   * Alias for {@link fabric.Object.prototype.setAngle}
    * @alias rotate -> setAngle
    */
   fabric.Object.prototype.rotate = fabric.Object.prototype.setAngle;
@@ -10299,7 +10320,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   fabric.Rect = fabric.util.createClass(fabric.Object, /** @scope fabric.Rect.prototype */ {
 
     /**
-     * Type of the instance
+     * Type of an object
      * @property
      * @type String
      */
@@ -10531,6 +10552,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   fabric.Polyline = fabric.util.createClass(fabric.Object, /** @scope fabric.Polyline.prototype */ {
 
     /**
+     * Type of an object
      * @property
      * @type String
      */
@@ -10687,6 +10709,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   fabric.Polygon = fabric.util.createClass(fabric.Object, /** @scope fabric.Polygon.prototype */ {
 
     /**
+     * Type of an object
      * @property
      * @type String
      */
@@ -10994,6 +11017,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   fabric.Path = fabric.util.createClass(fabric.Object, /** @scope fabric.Path.prototype */ {
 
     /**
+     * Type of an object
      * @property
      * @type String
      */
@@ -11645,6 +11669,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   fabric.PathGroup = fabric.util.createClass(fabric.Path, /** @scope fabric.PathGroup.prototype */ {
 
     /**
+     * Type of an object
      * @property
      * @type String
      */
@@ -14488,6 +14513,7 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
     return fabricCanvas;
   };
 
+  /** @ignore */
   fabric.StaticCanvas.prototype.createPNGStream = function() {
     return this.nodeCanvas.createPNGStream();
   };

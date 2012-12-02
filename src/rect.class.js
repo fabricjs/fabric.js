@@ -17,7 +17,7 @@
   fabric.Rect = fabric.util.createClass(fabric.Object, /** @scope fabric.Rect.prototype */ {
 
     /**
-     * Type of the instance
+     * Type of an object
      * @property
      * @type String
      */

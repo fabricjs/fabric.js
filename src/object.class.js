@@ -7,8 +7,7 @@
       toFixed = fabric.util.toFixed,
       capitalize = fabric.util.string.capitalize,
       getPointer = fabric.util.getPointer,
-      degreesToRadians = fabric.util.degreesToRadians,
-      slice = Array.prototype.slice;
+      degreesToRadians = fabric.util.degreesToRadians;
 
   if (fabric.Object) {
     return;
@@ -88,18 +87,21 @@
     angle:                    0,
 
     /**
+     * Size of object's corners
      * @property
      * @type Number
      */
     cornersize:               12,
 
     /**
+     * When true, object's corners are rendered as transparent inside (i.e. stroke instead of fill)
      * @property
      * @type Boolean
      */
     transparentCorners:       true,
 
     /**
+     * Padding between object and its borders
      * @property
      * @type Number
      */
@@ -136,12 +138,14 @@
     overlayFill:              null,
 
     /**
+     * When `true`, an object is rendered via stroke
      * @property
      * @type String
      */
     stroke:                   null,
 
     /**
+     * Width of a stroke used to render this object
      * @property
      * @type Number
      */
@@ -1686,6 +1690,7 @@
   }
 
   /**
+   * Alias for {@link fabric.Object.prototype.setAngle}
    * @alias rotate -> setAngle
    */
   fabric.Object.prototype.rotate = fabric.Object.prototype.setAngle;
