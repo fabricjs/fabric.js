@@ -22,88 +22,93 @@
      * @property
      * @type Number
      */
-    fontSize:         40,
+    fontSize:             40,
 
     /**
      * @property
      * @type Number
      */
-    fontWeight:       400,
+    fontWeight:           400,
 
     /**
      * @property
      * @type String
      */
-    fontFamily:       'Times New Roman',
+    fontFamily:           'Times New Roman',
 
     /**
      * @property
      * @type String
      */
-    textDecoration:   '',
+    textDecoration:       '',
 
     /**
      * @property
      * @type String | null
      */
-    textShadow:       '',
+    textShadow:           '',
 
     /**
      * Determines text alignment. Possible values: "left", "center", or "right".
      * @property
      * @type String
      */
-    textAlign:        'left',
+    textAlign:            'left',
 
     /**
      * @property
      * @type String
      */
-    fontStyle:        '',
+    fontStyle:            '',
 
     /**
      * @property
      * @type Number
      */
-    lineHeight:       1.3,
+    lineHeight:           1.3,
 
     /**
      * @property
      * @type String
      */
-    strokeStyle:      '',
+    strokeStyle:          '',
 
     /**
      * @property
      * @type Number
      */
-    strokeWidth:      1,
+    strokeWidth:          1,
 
     /**
      * @property
      * @type String
      */
-    backgroundColor:  '',
+    backgroundColor:      '',
 
+    /**
+     * @property
+     * @type String
+     */
+    textBackgroundColor:  '',
 
     /**
      * @property
      * @type String | null
      */
-    path:             null,
+    path:                 null,
 
     /**
      * @property
      * @type String
      */
-    type:             'text',
+    type:                 'text',
 
     /**
      * Indicates whether canvas native text methods should be used to render text (otherwise, Cufon is used)
      * @property
      * @type Boolean
      */
-     useNative:       true,
+     useNative:           true,
 
     /**
      * Constructor
@@ -159,6 +164,7 @@
         'strokeStyle',
         'strokeWidth',
         'backgroundColor',
+        'textBackgroundColor',
         'useNative'
       );
       fabric.util.removeFromArray(this.stateProperties, 'width');
@@ -289,7 +295,7 @@
         var lineLeftOffset = this._getLineLeftOffset(lineWidth);
 
         this._boundaries.push({
-          height: this.fontSize,
+          height: this.fontSize * this.lineHeight,
           width: lineWidth,
           left: lineLeftOffset
         });
@@ -405,6 +411,20 @@
         ctx.save();
         ctx.fillStyle = this.backgroundColor;
 
+        ctx.fillRect(
+          (-this.width / 2),
+          (-this.height / 2),
+          this.width,
+          this.height
+        );
+
+        ctx.restore();
+      }
+
+      if (this.textBackgroundColor) {
+        ctx.save();
+        ctx.fillStyle = this.textBackgroundColor;
+
         for (var i = 0, len = textLines.length; i < len; i++) {
 
           var lineWidth = ctx.measureText(textLines[i]).width;
@@ -414,7 +434,7 @@
             (-this.width / 2) + lineLeftOffset,
             (-this.height / 2) + (i * this.fontSize * this.lineHeight),
             lineWidth,
-            this.fontSize
+            this.fontSize * this.lineHeight
           );
         }
         ctx.restore();
@@ -533,20 +553,21 @@
      */
     toObject: function(propertiesToInclude) {
       return extend(this.callSuper('toObject', propertiesToInclude), {
-        text:             this.text,
-        fontSize:         this.fontSize,
-        fontWeight:       this.fontWeight,
-        fontFamily:       this.fontFamily,
-        fontStyle:        this.fontStyle,
-        lineHeight:       this.lineHeight,
-        textDecoration:   this.textDecoration,
-        textShadow:       this.textShadow,
-        textAlign:        this.textAlign,
-        path:             this.path,
-        strokeStyle:      this.strokeStyle,
-        strokeWidth:      this.strokeWidth,
-        backgroundColor:  this.backgroundColor,
-        useNative:        this.useNative
+        text:                 this.text,
+        fontSize:             this.fontSize,
+        fontWeight:           this.fontWeight,
+        fontFamily:           this.fontFamily,
+        fontStyle:            this.fontStyle,
+        lineHeight:           this.lineHeight,
+        textDecoration:       this.textDecoration,
+        textShadow:           this.textShadow,
+        textAlign:            this.textAlign,
+        path:                 this.path,
+        strokeStyle:          this.strokeStyle,
+        strokeWidth:          this.strokeWidth,
+        backgroundColor:      this.backgroundColor,
+        textBackgroundColor:  this.textBackgroundColor,
+        useNative:            this.useNative
       });
     },
 
@@ -628,7 +649,23 @@
     _getSVGTextAndBg: function(lineTopOffset, textLeftOffset, textLines) {
       var textSpans = [ ], textBgRects = [ ], i, lineLeftOffset, len, lineTopOffsetMultiplier = 1;
 
-      // text and background
+      // bounding-box background
+      if (this.backgroundColor && this._boundaries) {
+        textBgRects.push(
+          '<rect ',
+            this._getFillAttributes(this.backgroundColor),
+            ' x="',
+            toFixed(-this.width / 2, 2),
+            '" y="',
+            toFixed(-this.height / 2, 2),
+            '" width="',
+            toFixed(this.width, 2),
+            '" height="',
+            toFixed(this.height, 2),
+          '"></rect>');
+      }
+
+      // text and text-background
       for (i = 0, len = textLines.length; i < len; i++) {
         if (textLines[i] !== '') {
           lineLeftOffset = (this._boundaries && this._boundaries[i]) ? toFixed(this._boundaries[i].left, 2) : 0;
@@ -649,11 +686,11 @@
           lineTopOffsetMultiplier++;
         }
 
-        if (!this.backgroundColor || !this._boundaries) continue;
+        if (!this.textBackgroundColor || !this._boundaries) continue;
 
         textBgRects.push(
           '<rect ',
-            this._getFillAttributes(this.backgroundColor),
+            this._getFillAttributes(this.textBackgroundColor),
             ' x="',
             toFixed(textLeftOffset + this._boundaries[i].left, 2),
             '" y="',
