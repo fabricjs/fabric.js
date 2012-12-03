@@ -225,7 +225,8 @@
         lineHeight: this.lineHeight,
         strokeStyle: this.strokeStyle,
         strokeWidth: this.strokeWidth,
-        backgroundColor: this.backgroundColor
+        backgroundColor: this.backgroundColor,
+        textBackgroundColor: this.textBackgroundColor
       });
 
       // update width, height
