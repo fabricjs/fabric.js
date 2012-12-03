@@ -41,6 +41,7 @@
     'path':             null,
     'strokeStyle':      '',
     'backgroundColor':  '',
+    'textBackgroundColor':  '',
     'useNative':        true
   };
 
