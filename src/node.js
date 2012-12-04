@@ -46,7 +46,7 @@
     var img = new Image();
   	if ( url && url.indexOf('data') == 0 )
   	{
-  		img.src = url;
+  		img.src = img._src = url;
   		callback(img);
   	}
   	else if ( url )
