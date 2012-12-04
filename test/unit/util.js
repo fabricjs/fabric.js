@@ -380,29 +380,29 @@
     }, 1000);
   });
 
-  // asyncTest('fabric.util.loadImage', function() {
-  //   ok(typeof fabric.util.loadImage == 'function');
+  asyncTest('fabric.util.loadImage', function() {
+    ok(typeof fabric.util.loadImage == 'function');
 
-  //   var callbackInvoked = false,
-  //       objectPassedToCallback;
+    var callbackInvoked = false,
+        objectPassedToCallback,
+        NodeCanvasImage = require('canvas').Image;
 
-  //   fabric.util.loadImage('../fixtures/very_large_image.jpg', function(obj) {
-  //     callbackInvoked = true;
-  //     objectPassedToCallback = obj;
-  //   });
+    fabric.util.loadImage('../fixtures/very_large_image.jpg', function(obj) {
+      callbackInvoked = true;
+      objectPassedToCallback = obj;
+    });
 
-  //   setTimeout(function() {
-  //     ok(callbackInvoked, 'callback should be invoked');
+    setTimeout(function() {
+      ok(callbackInvoked, 'callback should be invoked');
 
-  //     if (objectPassedToCallback) {
-  //       ok(objectPassedToCallback.tagName && objectPassedToCallback.tagName.toUpperCase() === 'IMG', 'object passed to callback should be an image element');
-  //       var oImg = new fabric.Image(objectPassedToCallback);
-  //       ok(/fixtures\/very_large_image\.jpg$/.test(oImg.getSrc()), 'image should have correct src');
-  //     }
+      if (objectPassedToCallback) {
+        var oImg = new fabric.Image(objectPassedToCallback);
+        ok(/fixtures\/very_large_image\.jpg$/.test(oImg.getSrc()), 'image should have correct src');
+      }
 
-  //     start();
-  //   }, 2000);
-  // });
+      start();
+    }, 2000);
+  });
 
   var SVG_WITH_1_ELEMENT = '<?xml version="1.0"?>\
     <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\
