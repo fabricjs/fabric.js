@@ -2973,7 +2973,7 @@ fabric.util.string = {
   var getElementPosition;
   if (fabric.document.defaultView && fabric.document.defaultView.getComputedStyle) {
     getElementPosition = function (element) {
-      return fabric.document.defaultView.getComputedStyle(element).position;
+      return fabric.document.defaultView.getComputedStyle(element, null).position;
     };
   }
   else {
