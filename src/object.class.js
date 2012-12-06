@@ -27,67 +27,91 @@
     type:                       'object',
 
     /**
+     * Horizontal origin of transformation of an object (one of "left", "right", "center")
+     * @property
+     * @type String
+     */
+    originX:                  'center',
+
+    /**
+     * Vertical origin of transformation of an object (one of "top", "bottom", "center")
+     * @property
+     * @type String
+     */
+    originY:                  'center',
+
+    /**
+     * Top position of an object
      * @property
      * @type Number
      */
     top:                      0,
 
     /**
+     * Left position of an object
      * @property
      * @type Number
      */
     left:                     0,
 
     /**
+     * Width of an object
      * @property
      * @type Number
      */
     width:                    0,
 
     /**
+     * Height of an object
      * @property
      * @type Number
      */
     height:                   0,
 
     /**
+     * Horizontal scale of an object
      * @property
      * @type Number
      */
     scaleX:                   1,
 
     /**
+     * Vertical scale of an object
      * @property
      * @type Number
      */
     scaleY:                   1,
 
     /**
+     * When true, an object is rendered as flipped horizontally
      * @property
      * @type Boolean
      */
     flipX:                    false,
 
     /**
+     * When true, an object is rendered as flipped vertically
      * @property
      * @type Boolean
      */
     flipY:                    false,
 
     /**
+     * Opacity of an object
      * @property
      * @type Number
      */
     opacity:                  1,
 
     /**
+     * Angle of an object (in degrees)
      * @property
      * @type Number
      */
     angle:                    0,
 
     /**
-     * Size of object's corners
+     * Size of object's corners (in pixels)
      * @property
      * @type Number
      */
@@ -101,25 +125,28 @@
     transparentCorners:       true,
 
     /**
-     * Padding between object and its borders
+     * Padding between object and its borders (in pixels)
      * @property
      * @type Number
      */
     padding:                  0,
 
     /**
+     * Color of object's borders (when in active state)
      * @property
      * @type String
      */
     borderColor:              'rgba(102,153,255,0.75)',
 
     /**
+     * Color of object's corners (when in active state)
      * @property
      * @type String
      */
     cornerColor:              'rgba(102,153,255,0.5)',
 
     /**
+     * Color of object's fill
      * @property
      * @type String
      */
@@ -138,7 +165,7 @@
     overlayFill:              null,
 
     /**
-     * When `true`, an object is rendered via stroke
+     * When `true`, an object is rendered via stroke and this property specifies its color
      * @property
      * @type String
      */
@@ -152,12 +179,14 @@
     strokeWidth:              1,
 
     /**
+     * Dash pattern of a stroke for this object
      * @property
      * @type Array
      */
     strokeDashArray:          null,
 
     /**
+     * Border opacity when object is active and moving
      * @property
      * @type Number
      */
@@ -170,11 +199,18 @@
     borderScaleFactor:        1,
 
     /**
-     * Transform matrix
+     * Transform matrix (similar to SVG's transform matrix)
      * @property
      * @type Array
      */
     transformMatrix:          null,
+
+    /**
+     * Minimum allowed scale value of an object
+     * @property
+     * @type Number
+     */
+    minScaleLimit:            0.01,
 
     /**
      * When set to `false`, an object can not be selected for modification (using either point-click-based or group-based selection)
@@ -205,7 +241,7 @@
     hasRotatingPoint:         false,
 
     /**
-     * Offset for object's rotating point (when enabled)
+     * Offset for object's rotating point (when enabled via `hasRotatingPoint`)
      * @property
      * @type Number
      */
@@ -219,6 +255,7 @@
     perPixelTargetFind:       false,
 
     /**
+     * When `false`, default object's values are not included in its serialization
      * @property
      * @type Boolean
      */
@@ -232,7 +269,7 @@
      */
     stateProperties:  (
       'top left width height scaleX scaleY flipX flipY ' +
-      'angle opacity cornersize fill overlayFill ' +
+      'angle opacity cornersize fill overlayFill originX originY ' +
       'stroke strokeWidth strokeDashArray fillRule ' +
       'borderScaleFactor transformMatrix selectable'
     ).split(' '),
@@ -275,7 +312,9 @@
      */
     transform: function(ctx) {
       ctx.globalAlpha = this.opacity;
-      ctx.translate(this.left, this.top);
+
+      var center = this.getCenterPoint();
+      ctx.translate(center.x, center.y);
       ctx.rotate(degreesToRadians(this.angle));
       ctx.scale(
         this.scaleX * (this.flipX ? -1 : 1),
@@ -295,6 +334,8 @@
 
       var object = {
         type:             this.type,
+        originX:          this.originX,
+        originY:          this.originY,
         left:             toFixed(this.left, NUM_FRACTION_DIGITS),
         top:              toFixed(this.top, NUM_FRACTION_DIGITS),
         width:            toFixed(this.width, NUM_FRACTION_DIGITS),
@@ -359,12 +400,14 @@
      */
     getSvgTransform: function() {
       var angle = this.getAngle();
+      var center = this.getCenterPoint();
+
       var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
 
       var translatePart = "translate(" +
-                            toFixed(this.left, NUM_FRACTION_DIGITS) +
+                            toFixed(center.x, NUM_FRACTION_DIGITS) +
                             " " +
-                            toFixed(this.top, NUM_FRACTION_DIGITS) +
+                            toFixed(center.y, NUM_FRACTION_DIGITS) +
                           ")";
 
       var anglePart = angle !== 0
@@ -429,6 +472,24 @@
     },
 
     /**
+     * Makes sure the scale is valid and modifies it if necessary
+     * @private
+     * @method _constrainScale
+     * @param {Number} value
+     * @return {Number}
+     */
+    _constrainScale: function(value) {
+      if (Math.abs(value) < this.minScaleLimit) {
+        if (value < 0)
+          return -this.minScaleLimit;
+        else
+          return this.minScaleLimit;
+      }
+
+      return value;
+    },
+
+    /**
      * Sets property to a given value
      * @method set
      * @param {String} name
@@ -454,13 +515,26 @@
     },
 
     _set: function(key, value) {
-      var shouldConstrainValue = (key === 'scaleX' || key === 'scaleY') &&
-                                  value < fabric.Object.MIN_SCALE_LIMIT;
+      var shouldConstrainValue = (key === 'scaleX' || key === 'scaleY');
 
       if (shouldConstrainValue) {
-        value = fabric.Object.MIN_SCALE_LIMIT;
+        value = this._constrainScale(value);
       }
+      if (key === 'scaleX' && value < 0) {
+        this.flipX = !this.flipX;
+        value *= -1;
+      }
+      else if (key === 'scaleY' && value < 0) {
+        this.flipY = !this.flipY;
+        value *= -1;
+      }
+      else if (key === 'width' || key === 'height') {
+        this.minScaleLimit = Math.min(0.1, 1/Math.max(this.width, this.height));
+      }
+
       this[key] = value;
+
+      return this;
     },
 
     /**
@@ -567,6 +641,162 @@
     },
 
     /**
+     * Translates the coordinates from origin to center coordinates (based on the object's dimensions)
+     * @method translateToCenterPoint
+     * @param {fabric.Point} point The point which corresponds to the originX and originY params
+     * @param {string} enum('left', 'center', 'right') Horizontal origin
+     * @param {string} enum('top', 'center', 'bottom') Vertical origin
+     * @return {fabric.Point}
+     */
+    translateToCenterPoint: function(point, originX, originY) {
+      var cx = point.x, cy = point.y;
+
+      if ( originX === "left" ) {
+        cx = point.x + this.getWidth() / 2;
+      }
+      else if ( originX === "right" ) {
+        cx = point.x - this.getWidth() / 2;
+      }
+
+      if ( originY === "top" ) {
+        cy = point.y + this.getHeight() / 2;
+      }
+      else if ( originY === "bottom" ) {
+        cy = point.y - this.getHeight() / 2;
+      }
+
+      // Apply the reverse rotation to the point (it's already scaled properly)
+      return fabric.util.rotatePoint(new fabric.Point(cx, cy), point, degreesToRadians(this.angle));
+    },
+
+    /**
+     * Translates the coordinates from center to origin coordinates (based on the object's dimensions)
+     * @method translateToOriginPoint
+     * @param {fabric.Point} point The point which corresponds to center of the object
+     * @param {string} enum('left', 'center', 'right') Horizontal origin
+     * @param {string} enum('top', 'center', 'bottom') Vertical origin
+     * @return {fabric.Point}
+     */
+    translateToOriginPoint: function(center, originX, originY) {
+      var x = center.x, y = center.y;
+
+      // Get the point coordinates
+      if ( originX === "left" ) {
+        x = center.x - this.getWidth() / 2;
+      }
+      else if ( originX === "right" ) {
+        x = center.x + this.getWidth() / 2;
+      }
+      if ( originY === "top" ) {
+        y = center.y - this.getHeight() / 2;
+      }
+      else if ( originY === "bottom" ) {
+        y = center.y + this.getHeight() / 2;
+      }
+
+      // Apply the rotation to the point (it's already scaled properly)
+      return fabric.util.rotatePoint(new fabric.Point(x, y), center, degreesToRadians(this.angle));
+    },
+
+    /**
+     * Returns the real center coordinates of the object
+     * @method getCenterPoint
+     * @return {fabric.Point}
+     */
+    getCenterPoint: function() {
+      return this.translateToCenterPoint(
+        new fabric.Point(this.left, this.top), this.originX, this.originY);
+    },
+
+    /**
+     * Returns the coordinates of the object based on center coordinates
+     * @method getOriginPoint
+     * @param {fabric.Point} point The point which corresponds to the originX and originY params
+     * @return {fabric.Point}
+     */
+    getOriginPoint: function(center) {
+      return this.translateToOriginPoint(center, this.originX, this.originY);
+    },
+
+    /**
+     * Returns the coordinates of the object as if it has a different origin
+     * @method getPointByOrigin
+     * @param {string} enum('left', 'center', 'right') Horizontal origin
+     * @param {string} enum('top', 'center', 'bottom') Vertical origin
+     * @return {fabric.Point}
+     */
+    getPointByOrigin: function(originX, originY) {
+      var center = this.getCenterPoint();
+
+      return this.translateToOriginPoint(center, originX, originY);
+    },
+
+    /**
+     * Returns the point in local coordinates
+     * @method toLocalPoint
+     * @param {fabric.Point} The point relative to the global coordinate system
+     * @return {fabric.Point}
+     */
+    toLocalPoint: function(point, originX, originY) {
+      var center = this.getCenterPoint();
+
+      var x, y;
+      if (originX !== undefined && originY !== undefined) {
+        if ( originX === "left" ) {
+          x = center.x - this.getWidth() / 2;
+        }
+        else if ( originX === "right" ) {
+          x = center.x + this.getWidth() / 2;
+        }
+        else {
+          x = center.x;
+        }
+
+        if ( originY === "top" ) {
+          y = center.y - this.getHeight() / 2;
+        }
+        else if ( originY === "bottom" ) {
+          y = center.y + this.getHeight() / 2;
+        }
+        else {
+          y = center.y;
+        }
+      }
+      else {
+        x = this.left;
+        y = this.top;
+      }
+
+      return fabric.util.rotatePoint(new fabric.Point(point.x, point.y), center, -degreesToRadians(this.angle)).subtractEquals(new fabric.Point(x, y));
+    },
+
+    /**
+     * Returns the point in global coordinates
+     * @method toGlobalPoint
+     * @param {fabric.Point} The point relative to the local coordinate system
+     * @return {fabric.Point}
+     */
+    toGlobalPoint: function(point) {
+      return fabric.util.rotatePoint(point, this.getCenterPoint(), degreesToRadians(this.angle)).addEquals(new fabric.Point(this.left, this.top));
+    },
+
+    /**
+     * Sets the position of the object taking into consideration the object's origin
+     * @method setPositionByOrigin
+     * @param {fabric.Point} point The new position of the object
+     * @param {string} enum('left', 'center', 'right') Horizontal origin
+     * @param {string} enum('top', 'center', 'bottom') Vertical origin
+     * @return {void}
+     */
+    setPositionByOrigin: function(pos, originX, originY) {
+      var center = this.translateToCenterPoint(pos, originX, originY);
+      var position = this.translateToOriginPoint(center, this.originX, this.originY);
+
+      this.set('left', position.x);
+      this.set('top', position.y);
+    },
+
+    /**
      * Scales an object (equally by x and y)
      * @method scale
      * @param value {Number} scale factor
@@ -574,6 +804,14 @@
      * @chainable
      */
     scale: function(value) {
+      value = this._constrainScale(value);
+
+      if (value < 0) {
+        this.flipX = !this.flipX;
+        this.flipY = !this.flipY;
+        value *= -1;
+      }
+
       this.scaleX = value;
       this.scaleY = value;
       this.setCoords();
@@ -638,9 +876,10 @@
           sinTh = Math.sin(theta),
           cosTh = Math.cos(theta);
 
+      var coords = this.getCenterPoint();
       var tl = {
-        x: this.left - offsetX,
-        y: this.top - offsetY
+        x: coords.x - offsetX,
+        y: coords.y - offsetY
       };
       var tr = {
         x: tl.x + (this.currentWidth * cosTh),
@@ -736,8 +975,7 @@
     drawBorders: function(ctx) {
       if (!this.hasBorders) return;
 
-      var MIN_SCALE_LIMIT = fabric.Object.MIN_SCALE_LIMIT,
-          padding = this.padding,
+      var padding = this.padding,
           padding2 = padding * 2,
           strokeWidth = this.strokeWidth > 1 ? this.strokeWidth : 0;
 
@@ -746,8 +984,8 @@
       ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
       ctx.strokeStyle = this.borderColor;
 
-      var scaleX = 1 / (this.scaleX < MIN_SCALE_LIMIT ? MIN_SCALE_LIMIT : this.scaleX),
-          scaleY = 1 / (this.scaleY < MIN_SCALE_LIMIT ? MIN_SCALE_LIMIT : this.scaleY);
+      var scaleX = 1 / this._constrainScale(this.scaleX),
+          scaleY = 1 / this._constrainScale(this.scaleY);
 
       ctx.lineWidth = 1 / this.borderScaleFactor;
 
@@ -1704,15 +1942,7 @@
      * @constant
      * @type Number
      */
-    NUM_FRACTION_DIGITS:        2,
-
-    /**
-     * @static
-     * @constant
-     * @type Number
-     */
-    MIN_SCALE_LIMIT:            0.1
-
+    NUM_FRACTION_DIGITS:        2
   });
 
 })(typeof exports !== 'undefined' ? exports : this);

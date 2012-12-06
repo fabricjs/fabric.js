@@ -1923,6 +1923,28 @@ fabric.Observable.off = fabric.Observable.stopObserving;
   }
 
   /**
+   * Rotates `point` around `origin` with `radians`
+   * @static
+   * @method rotatePoint
+   * @memberOf fabric.util
+   * @param {fabric.Point} The point to rotate
+   * @param {fabric.Point} The origin of the rotation
+   * @param {Number} The radians of the angle for the rotation
+   * @return {fabric.Point} The new rotated point
+   */
+  function rotatePoint(point, origin, radians) {
+    var sin = Math.sin(radians),
+        cos = Math.cos(radians);
+
+    point.subtractEquals(origin);
+
+    var rx = point.x * cos - point.y * sin;
+    var ry = point.x * sin + point.y * cos;
+
+    return new fabric.Point(rx, ry).addEquals(origin);
+  }
+
+  /**
    * A wrapper around Number#toFixed, which contrary to native method returns number, not string.
    * @static
    * @method toFixed
@@ -2105,6 +2127,7 @@ fabric.Observable.off = fabric.Observable.stopObserving;
   fabric.util.removeFromArray = removeFromArray;
   fabric.util.degreesToRadians = degreesToRadians;
   fabric.util.radiansToDegrees = radiansToDegrees;
+  fabric.util.rotatePoint = rotatePoint;
   fabric.util.toFixed = toFixed;
   fabric.util.getRandomInt = getRandomInt;
   fabric.util.falseFunction = falseFunction;
@@ -6272,7 +6295,6 @@ fabric.util.string = {
       utilMax = fabric.util.array.max,
 
       sqrt = Math.sqrt,
-      pow = Math.pow,
       atan2 = Math.atan2,
       abs = Math.abs,
       min = Math.min,
@@ -6520,6 +6542,11 @@ fabric.util.string = {
           this.fire('object:modified', { target: target });
           target.fire('modified');
         }
+
+        if (this._previousOriginX) {
+          this._adjustPosition(this._currentTransform.target, this._previousOriginX);
+          this._previousOriginX = null;
+        }
       }
 
       this._currentTransform = null;
@@ -6598,7 +6625,6 @@ fabric.util.string = {
       }
       else {
         // determine if it's a drag or rotate case
-        // rotate and scale will happen at the same time
         this.stateful && target.saveState();
 
         if ((corner = target._findTargetCorner(e, this._offset))) {
@@ -6624,6 +6650,14 @@ fabric.util.string = {
 
       this.fire('mouse:down', { target: target, e: e });
       target && target.fire('mousedown', { e: e });
+
+      // center origin when rotating
+      if (corner === 'mtr') {
+        this._previousOriginX = this._currentTransform.target.originX;
+        this._adjustPosition(this._currentTransform.target, 'center');
+        this._currentTransform.left = this._currentTransform.target.left;
+        this._currentTransform.top = this._currentTransform.target.top;
+      }
     },
 
     /**
@@ -6692,33 +6726,77 @@ fabric.util.string = {
 
         this._currentTransform.target.isMoving = true;
 
+        var t = this._currentTransform, reset = false;
+        if (
+            (t.action === 'scale' || t.action === 'scaleX' || t.action === 'scaleY')
+            &&
+            (
+              // Switch from a normal resize to center-based
+              (e.altKey && (t.originX !== 'center' || t.originY !== 'center'))
+              ||
+              // Switch from center-based resize to normal one
+              (!e.altKey && t.originX === 'center' && t.originY === 'center')
+            )
+           ) {
+          this._resetCurrentTransform(e);
+          reset = true;
+        }
+
         if (this._currentTransform.action === 'rotate') {
+          this._rotateObject(x, y);
+
+          this.fire('object:rotating', {
+            target: this._currentTransform.target
+          });
+          this._currentTransform.target.fire('rotating');
+        }
+        else if (this._currentTransform.action === 'scale') {
           // rotate object only if shift key is not pressed
           // and if it is not a group we are transforming
 
-          if (!e.shiftKey) {
+          // TODO
+          /*if (!e.shiftKey) {
             this._rotateObject(x, y);
 
             this.fire('object:rotating', {
               target: this._currentTransform.target
             });
             this._currentTransform.target.fire('rotating');
-          }
-          if (!this._currentTransform.target.hasRotatingPoint) {
+          }*/
+
+          // if (!this._currentTransform.target.hasRotatingPoint) {
+          //   this._scaleObject(x, y);
+          //   this.fire('object:scaling', {
+          //     target: this._currentTransform.target
+          //   });
+          //   this._currentTransform.target.fire('scaling');
+          // }
+
+          if (e.shiftKey) {
+            this._currentTransform.currentAction = 'scale';
             this._scaleObject(x, y);
-            this.fire('object:scaling', {
-              target: this._currentTransform.target
-            });
-            this._currentTransform.target.fire('scaling');
           }
-        }
-        else if (this._currentTransform.action === 'scale') {
-          this._scaleObject(x, y);
+          else {
+            if (!reset && t.currentAction === 'scale') {
+              // Switch from a normal resize to proportional
+              this._resetCurrentTransform(e);
+            }
+
+            this._currentTransform.currentAction = 'scaleEqually';
+            this._scaleObject(x, y, 'equally');
+          }
+
           this.fire('object:scaling', {
             target: this._currentTransform.target
           });
-          this._currentTransform.target.fire('scaling');
         }
+        // else if (this._currentTransform.action === 'scale') {
+        //   this._scaleObject(x, y);
+        //   this.fire('object:scaling', {
+        //     target: this._currentTransform.target
+        //   });
+        //   this._currentTransform.target.fire('scaling');
+        // }
         else if (this._currentTransform.action === 'scaleX') {
           this._scaleObject(x, y, 'x');
 
@@ -6751,6 +6829,45 @@ fabric.util.string = {
       }
       this.fire('mouse:move', { target: target, e: e });
       target && target.fire('mousemove', { e: e });
+    },
+
+    /**
+     * Resets the current transform to its original values and chooses the type of resizing based on the event
+     * @method _resetCurrentTransform
+     * @param e {Event} Event object fired on mousemove
+     */
+    _resetCurrentTransform: function(e) {
+      var t = this._currentTransform;
+      t.target.set('scaleX', t.original.scaleX);
+      t.target.set('scaleY', t.original.scaleY);
+      t.target.set('left', t.original.left);
+      t.target.set('top', t.original.top);
+
+      if (e.altKey) {
+        if (t.originX !== 'center') {
+          if (t.originX === 'right') {
+            t.mouseXSign = -1;
+          }
+          else {
+            t.mouseXSign = 1;
+          }
+        }
+        if (t.originY !== 'center') {
+          if (t.originY === 'bottom') {
+            t.mouseYSign = -1;
+          }
+          else {
+            t.mouseYSign = 1;
+          }
+        }
+
+        t.originX = 'center';
+        t.originY = 'center';
+      }
+      else {
+        t.originX = t.original.originX;
+        t.originY = t.original.originY;
+      }
     },
 
     /**
@@ -6874,18 +6991,39 @@ fabric.util.string = {
           corner,
           pointer = getPointer(e);
 
-      if ((corner = target._findTargetCorner(e, this._offset))) {
+      corner = target._findTargetCorner(e, this._offset);
+      if (corner) {
         action = (corner === 'ml' || corner === 'mr')
           ? 'scaleX'
           : (corner === 'mt' || corner === 'mb')
             ? 'scaleY'
             : corner === 'mtr'
               ? 'rotate'
-              : (target.hasRotatingPoint)
-                ? 'scale'
-                : 'rotate';
+              : 'scale';
       }
 
+      var originX = "center", originY = "center";
+
+      if (corner === 'ml' || corner === 'tl' || corner === 'bl') {
+        originX = "right";
+      }
+      else if (corner === 'mr' || corner === 'tr' || corner === 'br') {
+        originX = "left";
+      }
+
+      if (corner === 'tl' || corner === 'mt' || corner === 'tr') {
+        originY = "bottom";
+      }
+      else if (corner === 'bl' || corner === 'mb' || corner === 'br') {
+        originY = "top";
+      }
+
+      if (corner === 'mtr') {
+        originX = 'center';
+        originY = 'center';
+      }
+
+      // var center = target.getCenterPoint();
       this._currentTransform = {
         target: target,
         action: action,
@@ -6893,18 +7031,28 @@ fabric.util.string = {
         scaleY: target.scaleY,
         offsetX: pointer.x - target.left,
         offsetY: pointer.y - target.top,
+        originX: originX,
+        originY: originY,
         ex: pointer.x,
         ey: pointer.y,
         left: target.left,
         top: target.top,
         theta: degreesToRadians(target.angle),
-        width: target.width * target.scaleX
+        width: target.width * target.scaleX,
+        mouseXSign: 1,
+        mouseYSign: 1
       };
 
       this._currentTransform.original = {
         left: target.left,
-        top: target.top
+        top: target.top,
+        scaleX: target.scaleX,
+        scaleY: target.scaleY,
+        originX: originX,
+        originY: originY
       };
+
+      this._resetCurrentTransform(e);
     },
 
     _handleGroupLogic: function (e, target) {
@@ -7064,23 +7212,81 @@ fabric.util.string = {
           offset = this._offset,
           target = t.target;
 
+      // Nothing to do here...
       if (target.lockScalingX && target.lockScalingY) return;
 
-      var lastLen = sqrt(pow(t.ey - t.top - offset.top, 2) + pow(t.ex - t.left - offset.left, 2)),
-          curLen = sqrt(pow(y - t.top - offset.top, 2) + pow(x - t.left - offset.left, 2));
+      // Get the constraint point
+      var constraintPosition = target.translateToOriginPoint(target.getCenterPoint(), t.originX, t.originY);
+      var localMouse = target.toLocalPoint(new fabric.Point(x - offset.left, y - offset.top), t.originX, t.originY);
 
-      target._scaling = true;
+      if (t.originX === 'right') {
+        localMouse.x *= -1;
+      }
+      else if (t.originX === 'center') {
+        localMouse.x *= t.mouseXSign * 2;
 
-      if (!by) {
-        target.lockScalingX || target.set('scaleX', t.scaleX * curLen/lastLen);
-        target.lockScalingY || target.set('scaleY', t.scaleY * curLen/lastLen);
+        if (localMouse.x < 0) {
+          t.mouseXSign = -t.mouseXSign;
+        }
+      }
+
+      if (t.originY === 'bottom') {
+        localMouse.y *= -1;
+      }
+      else if (t.originY === 'center') {
+        localMouse.y *= t.mouseYSign * 2;
+
+        if (localMouse.y < 0) {
+          t.mouseYSign = -t.mouseYSign;
+        }
+      }
+
+      // Actually scale the object
+      var newScaleX = target.scaleX, newScaleY = target.scaleY;
+      if (by === 'equally' && !target.lockScalingX && !target.lockScalingY) {
+        var dist = localMouse.y + localMouse.x;
+         var lastDist = target.height * t.original.scaleY + target.width * t.original.scaleX;
+
+        // We use t.scaleX/Y instead of target.scaleX/Y because the object may have a min scale and we'll loose the proportions
+        newScaleX = t.original.scaleX * dist/lastDist;
+        newScaleY = t.original.scaleY * dist/lastDist;
+        target.set('scaleX', newScaleX);
+        target.set('scaleY', newScaleY);
+      }
+      else if (!by) {
+        newScaleX = localMouse.x/target.width;
+        newScaleY = localMouse.y/target.height;
+        target.lockScalingX || target.set('scaleX', newScaleX);
+        target.lockScalingY || target.set('scaleY', newScaleY);
       }
       else if (by === 'x' && !target.lockUniScaling) {
-        target.lockScalingX || target.set('scaleX', t.scaleX * curLen/lastLen);
+        newScaleX = localMouse.x/target.width;
+        target.lockScalingX || target.set('scaleX', newScaleX);
       }
       else if (by === 'y' && !target.lockUniScaling) {
-        target.lockScalingY || target.set('scaleY', t.scaleY * curLen/lastLen);
+        newScaleY = localMouse.y/target.height;
+        target.lockScalingY || target.set('scaleY', newScaleY);
       }
+
+      // Check if we flipped
+      if (newScaleX < 0)
+      {
+        if (t.originX === 'left')
+          t.originX = 'right';
+        else if (t.originX === 'right')
+          t.originX = 'left';
+      }
+
+      if (newScaleY < 0)
+      {
+        if (t.originY === 'top')
+          t.originY = 'bottom';
+        else if (t.originY === 'bottom')
+          t.originY = 'top';
+      }
+
+      // Make sure the constraints apply
+      target.setPositionByOrigin(constraintPosition, t.originX, t.originY);
     },
 
     /**
@@ -7219,8 +7425,8 @@ fabric.util.string = {
     drawDashedLine: function(ctx, x, y, x2, y2, da) {
       var dx = x2 - x,
           dy = y2 - y,
-          len = Math.sqrt(dx*dx + dy*dy),
-          rot = Math.atan2(dy, dx),
+          len = sqrt(dx*dx + dy*dy),
+          rot = atan2(dy, dx),
           dc = da.length,
           di = 0,
           draw = true;
@@ -7542,6 +7748,46 @@ fabric.util.string = {
         this.fire('selection:cleared');
       }
       return this;
+    },
+
+    _adjustPosition: function(obj, to) {
+      console.log('adjusting position');
+
+      var angle = fabric.util.degreesToRadians(obj.angle);
+
+      var hypotHalf = obj.getWidth() / 2;
+      var xHalf = Math.cos(angle) * hypotHalf;
+      var yHalf = Math.sin(angle) * hypotHalf;
+
+      var hypotFull = obj.getWidth();
+      var xFull = Math.cos(angle) * hypotFull;
+      var yFull = Math.sin(angle) * hypotFull;
+
+      if (obj.originX === 'center' && to === 'left' ||
+          obj.originX === 'right' && to === 'center') {
+        // move half left
+        obj.left -= xHalf;
+        obj.top -= yHalf;
+      }
+      else if (obj.originX === 'left' && to === 'center' ||
+               obj.originX === 'center' && to === 'right') {
+        // move half right
+        obj.left += xHalf;
+        obj.top += yHalf;
+      }
+      else if (obj.originX === 'left' && to === 'right') {
+        // move full right
+        obj.left += xFull;
+        obj.top += yFull;
+      }
+      else if (obj.originX === 'right' && to === 'left') {
+        // move full left
+        obj.left -= xFull;
+        obj.top -= yFull;
+      }
+
+      obj.setCoords();
+      obj.originX = to;
     }
   };
 
@@ -7986,67 +8232,91 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     type:                       'object',
 
     /**
+     * Horizontal origin of transformation of an object (one of "left", "right", "center")
+     * @property
+     * @type String
+     */
+    originX:                  'center',
+
+    /**
+     * Vertical origin of transformation of an object (one of "top", "bottom", "center")
+     * @property
+     * @type String
+     */
+    originY:                  'center',
+
+    /**
+     * Top position of an object
      * @property
      * @type Number
      */
     top:                      0,
 
     /**
+     * Left position of an object
      * @property
      * @type Number
      */
     left:                     0,
 
     /**
+     * Width of an object
      * @property
      * @type Number
      */
     width:                    0,
 
     /**
+     * Height of an object
      * @property
      * @type Number
      */
     height:                   0,
 
     /**
+     * Horizontal scale of an object
      * @property
      * @type Number
      */
     scaleX:                   1,
 
     /**
+     * Vertical scale of an object
      * @property
      * @type Number
      */
     scaleY:                   1,
 
     /**
+     * When true, an object is rendered as flipped horizontally
      * @property
      * @type Boolean
      */
     flipX:                    false,
 
     /**
+     * When true, an object is rendered as flipped vertically
      * @property
      * @type Boolean
      */
     flipY:                    false,
 
     /**
+     * Opacity of an object
      * @property
      * @type Number
      */
     opacity:                  1,
 
     /**
+     * Angle of an object (in degrees)
      * @property
      * @type Number
      */
     angle:                    0,
 
     /**
-     * Size of object's corners
+     * Size of object's corners (in pixels)
      * @property
      * @type Number
      */
@@ -8060,25 +8330,28 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     transparentCorners:       true,
 
     /**
-     * Padding between object and its borders
+     * Padding between object and its borders (in pixels)
      * @property
      * @type Number
      */
     padding:                  0,
 
     /**
+     * Color of object's borders (when in active state)
      * @property
      * @type String
      */
     borderColor:              'rgba(102,153,255,0.75)',
 
     /**
+     * Color of object's corners (when in active state)
      * @property
      * @type String
      */
     cornerColor:              'rgba(102,153,255,0.5)',
 
     /**
+     * Color of object's fill
      * @property
      * @type String
      */
@@ -8097,7 +8370,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     overlayFill:              null,
 
     /**
-     * When `true`, an object is rendered via stroke
+     * When `true`, an object is rendered via stroke and this property specifies its color
      * @property
      * @type String
      */
@@ -8111,12 +8384,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     strokeWidth:              1,
 
     /**
+     * Dash pattern of a stroke for this object
      * @property
      * @type Array
      */
     strokeDashArray:          null,
 
     /**
+     * Border opacity when object is active and moving
      * @property
      * @type Number
      */
@@ -8129,11 +8404,18 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     borderScaleFactor:        1,
 
     /**
-     * Transform matrix
+     * Transform matrix (similar to SVG's transform matrix)
      * @property
      * @type Array
      */
     transformMatrix:          null,
+
+    /**
+     * Minimum allowed scale value of an object
+     * @property
+     * @type Number
+     */
+    minScaleLimit:            0.01,
 
     /**
      * When set to `false`, an object can not be selected for modification (using either point-click-based or group-based selection)
@@ -8164,7 +8446,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     hasRotatingPoint:         false,
 
     /**
-     * Offset for object's rotating point (when enabled)
+     * Offset for object's rotating point (when enabled via `hasRotatingPoint`)
      * @property
      * @type Number
      */
@@ -8178,6 +8460,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     perPixelTargetFind:       false,
 
     /**
+     * When `false`, default object's values are not included in its serialization
      * @property
      * @type Boolean
      */
@@ -8191,7 +8474,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      */
     stateProperties:  (
       'top left width height scaleX scaleY flipX flipY ' +
-      'angle opacity cornersize fill overlayFill ' +
+      'angle opacity cornersize fill overlayFill originX originY ' +
       'stroke strokeWidth strokeDashArray fillRule ' +
       'borderScaleFactor transformMatrix selectable'
     ).split(' '),
@@ -8234,7 +8517,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      */
     transform: function(ctx) {
       ctx.globalAlpha = this.opacity;
-      ctx.translate(this.left, this.top);
+
+      var center = this.getCenterPoint();
+      ctx.translate(center.x, center.y);
       ctx.rotate(degreesToRadians(this.angle));
       ctx.scale(
         this.scaleX * (this.flipX ? -1 : 1),
@@ -8254,6 +8539,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
       var object = {
         type:             this.type,
+        originX:          this.originX,
+        originY:          this.originY,
         left:             toFixed(this.left, NUM_FRACTION_DIGITS),
         top:              toFixed(this.top, NUM_FRACTION_DIGITS),
         width:            toFixed(this.width, NUM_FRACTION_DIGITS),
@@ -8318,12 +8605,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      */
     getSvgTransform: function() {
       var angle = this.getAngle();
+      var center = this.getCenterPoint();
+
       var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
 
       var translatePart = "translate(" +
-                            toFixed(this.left, NUM_FRACTION_DIGITS) +
+                            toFixed(center.x, NUM_FRACTION_DIGITS) +
                             " " +
-                            toFixed(this.top, NUM_FRACTION_DIGITS) +
+                            toFixed(center.y, NUM_FRACTION_DIGITS) +
                           ")";
 
       var anglePart = angle !== 0
@@ -8388,6 +8677,24 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     },
 
     /**
+     * Makes sure the scale is valid and modifies it if necessary
+     * @private
+     * @method _constrainScale
+     * @param {Number} value
+     * @return {Number}
+     */
+    _constrainScale: function(value) {
+      if (Math.abs(value) < this.minScaleLimit) {
+        if (value < 0)
+          return -this.minScaleLimit;
+        else
+          return this.minScaleLimit;
+      }
+
+      return value;
+    },
+
+    /**
      * Sets property to a given value
      * @method set
      * @param {String} name
@@ -8413,13 +8720,26 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     },
 
     _set: function(key, value) {
-      var shouldConstrainValue = (key === 'scaleX' || key === 'scaleY') &&
-                                  value < fabric.Object.MIN_SCALE_LIMIT;
+      var shouldConstrainValue = (key === 'scaleX' || key === 'scaleY');
 
       if (shouldConstrainValue) {
-        value = fabric.Object.MIN_SCALE_LIMIT;
+        value = this._constrainScale(value);
       }
+      if (key === 'scaleX' && value < 0) {
+        this.flipX = !this.flipX;
+        value *= -1;
+      }
+      else if (key === 'scaleY' && value < 0) {
+        this.flipY = !this.flipY;
+        value *= -1;
+      }
+      else if (key === 'width' || key === 'height') {
+        this.minScaleLimit = Math.min(0.1, 1/Math.max(this.width, this.height));
+      }
+
       this[key] = value;
+
+      return this;
     },
 
     /**
@@ -8526,6 +8846,162 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     },
 
     /**
+     * Translates the coordinates from origin to center coordinates (based on the object's dimensions)
+     * @method translateToCenterPoint
+     * @param {fabric.Point} point The point which corresponds to the originX and originY params
+     * @param {string} enum('left', 'center', 'right') Horizontal origin
+     * @param {string} enum('top', 'center', 'bottom') Vertical origin
+     * @return {fabric.Point}
+     */
+    translateToCenterPoint: function(point, originX, originY) {
+      var cx = point.x, cy = point.y;
+
+      if ( originX === "left" ) {
+        cx = point.x + this.getWidth() / 2;
+      }
+      else if ( originX === "right" ) {
+        cx = point.x - this.getWidth() / 2;
+      }
+
+      if ( originY === "top" ) {
+        cy = point.y + this.getHeight() / 2;
+      }
+      else if ( originY === "bottom" ) {
+        cy = point.y - this.getHeight() / 2;
+      }
+
+      // Apply the reverse rotation to the point (it's already scaled properly)
+      return fabric.util.rotatePoint(new fabric.Point(cx, cy), point, degreesToRadians(this.angle));
+    },
+
+    /**
+     * Translates the coordinates from center to origin coordinates (based on the object's dimensions)
+     * @method translateToOriginPoint
+     * @param {fabric.Point} point The point which corresponds to center of the object
+     * @param {string} enum('left', 'center', 'right') Horizontal origin
+     * @param {string} enum('top', 'center', 'bottom') Vertical origin
+     * @return {fabric.Point}
+     */
+    translateToOriginPoint: function(center, originX, originY) {
+      var x = center.x, y = center.y;
+
+      // Get the point coordinates
+      if ( originX === "left" ) {
+        x = center.x - this.getWidth() / 2;
+      }
+      else if ( originX === "right" ) {
+        x = center.x + this.getWidth() / 2;
+      }
+      if ( originY === "top" ) {
+        y = center.y - this.getHeight() / 2;
+      }
+      else if ( originY === "bottom" ) {
+        y = center.y + this.getHeight() / 2;
+      }
+
+      // Apply the rotation to the point (it's already scaled properly)
+      return fabric.util.rotatePoint(new fabric.Point(x, y), center, degreesToRadians(this.angle));
+    },
+
+    /**
+     * Returns the real center coordinates of the object
+     * @method getCenterPoint
+     * @return {fabric.Point}
+     */
+    getCenterPoint: function() {
+      return this.translateToCenterPoint(
+        new fabric.Point(this.left, this.top), this.originX, this.originY);
+    },
+
+    /**
+     * Returns the coordinates of the object based on center coordinates
+     * @method getOriginPoint
+     * @param {fabric.Point} point The point which corresponds to the originX and originY params
+     * @return {fabric.Point}
+     */
+    getOriginPoint: function(center) {
+      return this.translateToOriginPoint(center, this.originX, this.originY);
+    },
+
+    /**
+     * Returns the coordinates of the object as if it has a different origin
+     * @method getPointByOrigin
+     * @param {string} enum('left', 'center', 'right') Horizontal origin
+     * @param {string} enum('top', 'center', 'bottom') Vertical origin
+     * @return {fabric.Point}
+     */
+    getPointByOrigin: function(originX, originY) {
+      var center = this.getCenterPoint();
+
+      return this.translateToOriginPoint(center, originX, originY);
+    },
+
+    /**
+     * Returns the point in local coordinates
+     * @method toLocalPoint
+     * @param {fabric.Point} The point relative to the global coordinate system
+     * @return {fabric.Point}
+     */
+    toLocalPoint: function(point, originX, originY) {
+      var center = this.getCenterPoint();
+
+      var x, y;
+      if (originX !== undefined && originY !== undefined) {
+        if ( originX === "left" ) {
+          x = center.x - this.getWidth() / 2;
+        }
+        else if ( originX === "right" ) {
+          x = center.x + this.getWidth() / 2;
+        }
+        else {
+          x = center.x;
+        }
+
+        if ( originY === "top" ) {
+          y = center.y - this.getHeight() / 2;
+        }
+        else if ( originY === "bottom" ) {
+          y = center.y + this.getHeight() / 2;
+        }
+        else {
+          y = center.y;
+        }
+      }
+      else {
+        x = this.left;
+        y = this.top;
+      }
+
+      return fabric.util.rotatePoint(new fabric.Point(point.x, point.y), center, -degreesToRadians(this.angle)).subtractEquals(new fabric.Point(x, y));
+    },
+
+    /**
+     * Returns the point in global coordinates
+     * @method toGlobalPoint
+     * @param {fabric.Point} The point relative to the local coordinate system
+     * @return {fabric.Point}
+     */
+    toGlobalPoint: function(point) {
+      return fabric.util.rotatePoint(point, this.getCenterPoint(), degreesToRadians(this.angle)).addEquals(new fabric.Point(this.left, this.top));
+    },
+
+    /**
+     * Sets the position of the object taking into consideration the object's origin
+     * @method setPositionByOrigin
+     * @param {fabric.Point} point The new position of the object
+     * @param {string} enum('left', 'center', 'right') Horizontal origin
+     * @param {string} enum('top', 'center', 'bottom') Vertical origin
+     * @return {void}
+     */
+    setPositionByOrigin: function(pos, originX, originY) {
+      var center = this.translateToCenterPoint(pos, originX, originY);
+      var position = this.translateToOriginPoint(center, this.originX, this.originY);
+
+      this.set('left', position.x);
+      this.set('top', position.y);
+    },
+
+    /**
      * Scales an object (equally by x and y)
      * @method scale
      * @param value {Number} scale factor
@@ -8533,6 +9009,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      * @chainable
      */
     scale: function(value) {
+      value = this._constrainScale(value);
+
+      if (value < 0) {
+        this.flipX = !this.flipX;
+        this.flipY = !this.flipY;
+        value *= -1;
+      }
+
       this.scaleX = value;
       this.scaleY = value;
       this.setCoords();
@@ -8597,9 +9081,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
           sinTh = Math.sin(theta),
           cosTh = Math.cos(theta);
 
+      var coords = this.getCenterPoint();
       var tl = {
-        x: this.left - offsetX,
-        y: this.top - offsetY
+        x: coords.x - offsetX,
+        y: coords.y - offsetY
       };
       var tr = {
         x: tl.x + (this.currentWidth * cosTh),
@@ -8695,8 +9180,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     drawBorders: function(ctx) {
       if (!this.hasBorders) return;
 
-      var MIN_SCALE_LIMIT = fabric.Object.MIN_SCALE_LIMIT,
-          padding = this.padding,
+      var padding = this.padding,
           padding2 = padding * 2,
           strokeWidth = this.strokeWidth > 1 ? this.strokeWidth : 0;
 
@@ -8705,8 +9189,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
       ctx.strokeStyle = this.borderColor;
 
-      var scaleX = 1 / (this.scaleX < MIN_SCALE_LIMIT ? MIN_SCALE_LIMIT : this.scaleX),
-          scaleY = 1 / (this.scaleY < MIN_SCALE_LIMIT ? MIN_SCALE_LIMIT : this.scaleY);
+      var scaleX = 1 / this._constrainScale(this.scaleX),
+          scaleY = 1 / this._constrainScale(this.scaleY);
 
       ctx.lineWidth = 1 / this.borderScaleFactor;
 
@@ -9663,15 +10147,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      * @constant
      * @type Number
      */
-    NUM_FRACTION_DIGITS:        2,
-
-    /**
-     * @static
-     * @constant
-     * @type Number
-     */
-    MIN_SCALE_LIMIT:            0.1
-
+    NUM_FRACTION_DIGITS:        2
   });
 
 })(typeof exports !== 'undefined' ? exports : this);

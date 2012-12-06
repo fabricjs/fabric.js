@@ -21,7 +21,6 @@
       utilMax = fabric.util.array.max,
 
       sqrt = Math.sqrt,
-      pow = Math.pow,
       atan2 = Math.atan2,
       abs = Math.abs,
       min = Math.min,
@@ -269,6 +268,11 @@
           this.fire('object:modified', { target: target });
           target.fire('modified');
         }
+
+        if (this._previousOriginX) {
+          this._adjustPosition(this._currentTransform.target, this._previousOriginX);
+          this._previousOriginX = null;
+        }
       }
 
       this._currentTransform = null;
@@ -347,7 +351,6 @@
       }
       else {
         // determine if it's a drag or rotate case
-        // rotate and scale will happen at the same time
         this.stateful && target.saveState();
 
         if ((corner = target._findTargetCorner(e, this._offset))) {
@@ -373,6 +376,14 @@
 
       this.fire('mouse:down', { target: target, e: e });
       target && target.fire('mousedown', { e: e });
+
+      // center origin when rotating
+      if (corner === 'mtr') {
+        this._previousOriginX = this._currentTransform.target.originX;
+        this._adjustPosition(this._currentTransform.target, 'center');
+        this._currentTransform.left = this._currentTransform.target.left;
+        this._currentTransform.top = this._currentTransform.target.top;
+      }
     },
 
     /**
@@ -441,33 +452,77 @@
 
         this._currentTransform.target.isMoving = true;
 
+        var t = this._currentTransform, reset = false;
+        if (
+            (t.action === 'scale' || t.action === 'scaleX' || t.action === 'scaleY')
+            &&
+            (
+              // Switch from a normal resize to center-based
+              (e.altKey && (t.originX !== 'center' || t.originY !== 'center'))
+              ||
+              // Switch from center-based resize to normal one
+              (!e.altKey && t.originX === 'center' && t.originY === 'center')
+            )
+           ) {
+          this._resetCurrentTransform(e);
+          reset = true;
+        }
+
         if (this._currentTransform.action === 'rotate') {
+          this._rotateObject(x, y);
+
+          this.fire('object:rotating', {
+            target: this._currentTransform.target
+          });
+          this._currentTransform.target.fire('rotating');
+        }
+        else if (this._currentTransform.action === 'scale') {
           // rotate object only if shift key is not pressed
           // and if it is not a group we are transforming
 
-          if (!e.shiftKey) {
+          // TODO
+          /*if (!e.shiftKey) {
             this._rotateObject(x, y);
 
             this.fire('object:rotating', {
               target: this._currentTransform.target
             });
             this._currentTransform.target.fire('rotating');
-          }
-          if (!this._currentTransform.target.hasRotatingPoint) {
+          }*/
+
+          // if (!this._currentTransform.target.hasRotatingPoint) {
+          //   this._scaleObject(x, y);
+          //   this.fire('object:scaling', {
+          //     target: this._currentTransform.target
+          //   });
+          //   this._currentTransform.target.fire('scaling');
+          // }
+
+          if (e.shiftKey) {
+            this._currentTransform.currentAction = 'scale';
             this._scaleObject(x, y);
-            this.fire('object:scaling', {
-              target: this._currentTransform.target
-            });
-            this._currentTransform.target.fire('scaling');
           }
-        }
-        else if (this._currentTransform.action === 'scale') {
-          this._scaleObject(x, y);
+          else {
+            if (!reset && t.currentAction === 'scale') {
+              // Switch from a normal resize to proportional
+              this._resetCurrentTransform(e);
+            }
+
+            this._currentTransform.currentAction = 'scaleEqually';
+            this._scaleObject(x, y, 'equally');
+          }
+
           this.fire('object:scaling', {
             target: this._currentTransform.target
           });
-          this._currentTransform.target.fire('scaling');
         }
+        // else if (this._currentTransform.action === 'scale') {
+        //   this._scaleObject(x, y);
+        //   this.fire('object:scaling', {
+        //     target: this._currentTransform.target
+        //   });
+        //   this._currentTransform.target.fire('scaling');
+        // }
         else if (this._currentTransform.action === 'scaleX') {
           this._scaleObject(x, y, 'x');
 
@@ -500,6 +555,45 @@
       }
       this.fire('mouse:move', { target: target, e: e });
       target && target.fire('mousemove', { e: e });
+    },
+
+    /**
+     * Resets the current transform to its original values and chooses the type of resizing based on the event
+     * @method _resetCurrentTransform
+     * @param e {Event} Event object fired on mousemove
+     */
+    _resetCurrentTransform: function(e) {
+      var t = this._currentTransform;
+      t.target.set('scaleX', t.original.scaleX);
+      t.target.set('scaleY', t.original.scaleY);
+      t.target.set('left', t.original.left);
+      t.target.set('top', t.original.top);
+
+      if (e.altKey) {
+        if (t.originX !== 'center') {
+          if (t.originX === 'right') {
+            t.mouseXSign = -1;
+          }
+          else {
+            t.mouseXSign = 1;
+          }
+        }
+        if (t.originY !== 'center') {
+          if (t.originY === 'bottom') {
+            t.mouseYSign = -1;
+          }
+          else {
+            t.mouseYSign = 1;
+          }
+        }
+
+        t.originX = 'center';
+        t.originY = 'center';
+      }
+      else {
+        t.originX = t.original.originX;
+        t.originY = t.original.originY;
+      }
     },
 
     /**
@@ -623,18 +717,39 @@
           corner,
           pointer = getPointer(e);
 
-      if ((corner = target._findTargetCorner(e, this._offset))) {
+      corner = target._findTargetCorner(e, this._offset);
+      if (corner) {
         action = (corner === 'ml' || corner === 'mr')
           ? 'scaleX'
           : (corner === 'mt' || corner === 'mb')
             ? 'scaleY'
             : corner === 'mtr'
               ? 'rotate'
-              : (target.hasRotatingPoint)
-                ? 'scale'
-                : 'rotate';
+              : 'scale';
       }
 
+      var originX = "center", originY = "center";
+
+      if (corner === 'ml' || corner === 'tl' || corner === 'bl') {
+        originX = "right";
+      }
+      else if (corner === 'mr' || corner === 'tr' || corner === 'br') {
+        originX = "left";
+      }
+
+      if (corner === 'tl' || corner === 'mt' || corner === 'tr') {
+        originY = "bottom";
+      }
+      else if (corner === 'bl' || corner === 'mb' || corner === 'br') {
+        originY = "top";
+      }
+
+      if (corner === 'mtr') {
+        originX = 'center';
+        originY = 'center';
+      }
+
+      // var center = target.getCenterPoint();
       this._currentTransform = {
         target: target,
         action: action,
@@ -642,18 +757,28 @@
         scaleY: target.scaleY,
         offsetX: pointer.x - target.left,
         offsetY: pointer.y - target.top,
+        originX: originX,
+        originY: originY,
         ex: pointer.x,
         ey: pointer.y,
         left: target.left,
         top: target.top,
         theta: degreesToRadians(target.angle),
-        width: target.width * target.scaleX
+        width: target.width * target.scaleX,
+        mouseXSign: 1,
+        mouseYSign: 1
       };
 
       this._currentTransform.original = {
         left: target.left,
-        top: target.top
+        top: target.top,
+        scaleX: target.scaleX,
+        scaleY: target.scaleY,
+        originX: originX,
+        originY: originY
       };
+
+      this._resetCurrentTransform(e);
     },
 
     _handleGroupLogic: function (e, target) {
@@ -813,23 +938,81 @@
           offset = this._offset,
           target = t.target;
 
+      // Nothing to do here...
       if (target.lockScalingX && target.lockScalingY) return;
 
-      var lastLen = sqrt(pow(t.ey - t.top - offset.top, 2) + pow(t.ex - t.left - offset.left, 2)),
-          curLen = sqrt(pow(y - t.top - offset.top, 2) + pow(x - t.left - offset.left, 2));
+      // Get the constraint point
+      var constraintPosition = target.translateToOriginPoint(target.getCenterPoint(), t.originX, t.originY);
+      var localMouse = target.toLocalPoint(new fabric.Point(x - offset.left, y - offset.top), t.originX, t.originY);
 
-      target._scaling = true;
+      if (t.originX === 'right') {
+        localMouse.x *= -1;
+      }
+      else if (t.originX === 'center') {
+        localMouse.x *= t.mouseXSign * 2;
 
-      if (!by) {
-        target.lockScalingX || target.set('scaleX', t.scaleX * curLen/lastLen);
-        target.lockScalingY || target.set('scaleY', t.scaleY * curLen/lastLen);
+        if (localMouse.x < 0) {
+          t.mouseXSign = -t.mouseXSign;
+        }
+      }
+
+      if (t.originY === 'bottom') {
+        localMouse.y *= -1;
+      }
+      else if (t.originY === 'center') {
+        localMouse.y *= t.mouseYSign * 2;
+
+        if (localMouse.y < 0) {
+          t.mouseYSign = -t.mouseYSign;
+        }
+      }
+
+      // Actually scale the object
+      var newScaleX = target.scaleX, newScaleY = target.scaleY;
+      if (by === 'equally' && !target.lockScalingX && !target.lockScalingY) {
+        var dist = localMouse.y + localMouse.x;
+         var lastDist = target.height * t.original.scaleY + target.width * t.original.scaleX;
+
+        // We use t.scaleX/Y instead of target.scaleX/Y because the object may have a min scale and we'll loose the proportions
+        newScaleX = t.original.scaleX * dist/lastDist;
+        newScaleY = t.original.scaleY * dist/lastDist;
+        target.set('scaleX', newScaleX);
+        target.set('scaleY', newScaleY);
+      }
+      else if (!by) {
+        newScaleX = localMouse.x/target.width;
+        newScaleY = localMouse.y/target.height;
+        target.lockScalingX || target.set('scaleX', newScaleX);
+        target.lockScalingY || target.set('scaleY', newScaleY);
       }
       else if (by === 'x' && !target.lockUniScaling) {
-        target.lockScalingX || target.set('scaleX', t.scaleX * curLen/lastLen);
+        newScaleX = localMouse.x/target.width;
+        target.lockScalingX || target.set('scaleX', newScaleX);
       }
       else if (by === 'y' && !target.lockUniScaling) {
-        target.lockScalingY || target.set('scaleY', t.scaleY * curLen/lastLen);
+        newScaleY = localMouse.y/target.height;
+        target.lockScalingY || target.set('scaleY', newScaleY);
       }
+
+      // Check if we flipped
+      if (newScaleX < 0)
+      {
+        if (t.originX === 'left')
+          t.originX = 'right';
+        else if (t.originX === 'right')
+          t.originX = 'left';
+      }
+
+      if (newScaleY < 0)
+      {
+        if (t.originY === 'top')
+          t.originY = 'bottom';
+        else if (t.originY === 'bottom')
+          t.originY = 'top';
+      }
+
+      // Make sure the constraints apply
+      target.setPositionByOrigin(constraintPosition, t.originX, t.originY);
     },
 
     /**
@@ -968,8 +1151,8 @@
     drawDashedLine: function(ctx, x, y, x2, y2, da) {
       var dx = x2 - x,
           dy = y2 - y,
-          len = Math.sqrt(dx*dx + dy*dy),
-          rot = Math.atan2(dy, dx),
+          len = sqrt(dx*dx + dy*dy),
+          rot = atan2(dy, dx),
           dc = da.length,
           di = 0,
           draw = true;
@@ -1291,6 +1474,46 @@
         this.fire('selection:cleared');
       }
       return this;
+    },
+
+    _adjustPosition: function(obj, to) {
+      console.log('adjusting position');
+
+      var angle = fabric.util.degreesToRadians(obj.angle);
+
+      var hypotHalf = obj.getWidth() / 2;
+      var xHalf = Math.cos(angle) * hypotHalf;
+      var yHalf = Math.sin(angle) * hypotHalf;
+
+      var hypotFull = obj.getWidth();
+      var xFull = Math.cos(angle) * hypotFull;
+      var yFull = Math.sin(angle) * hypotFull;
+
+      if (obj.originX === 'center' && to === 'left' ||
+          obj.originX === 'right' && to === 'center') {
+        // move half left
+        obj.left -= xHalf;
+        obj.top -= yHalf;
+      }
+      else if (obj.originX === 'left' && to === 'center' ||
+               obj.originX === 'center' && to === 'right') {
+        // move half right
+        obj.left += xHalf;
+        obj.top += yHalf;
+      }
+      else if (obj.originX === 'left' && to === 'right') {
+        // move full right
+        obj.left += xFull;
+        obj.top += yFull;
+      }
+      else if (obj.originX === 'right' && to === 'left') {
+        // move full left
+        obj.left -= xFull;
+        obj.top -= yFull;
+      }
+
+      obj.setCoords();
+      obj.originX = to;
     }
   };
 

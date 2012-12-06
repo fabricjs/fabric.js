@@ -63,6 +63,28 @@
   }
 
   /**
+   * Rotates `point` around `origin` with `radians`
+   * @static
+   * @method rotatePoint
+   * @memberOf fabric.util
+   * @param {fabric.Point} The point to rotate
+   * @param {fabric.Point} The origin of the rotation
+   * @param {Number} The radians of the angle for the rotation
+   * @return {fabric.Point} The new rotated point
+   */
+  function rotatePoint(point, origin, radians) {
+    var sin = Math.sin(radians),
+        cos = Math.cos(radians);
+
+    point.subtractEquals(origin);
+
+    var rx = point.x * cos - point.y * sin;
+    var ry = point.x * sin + point.y * cos;
+
+    return new fabric.Point(rx, ry).addEquals(origin);
+  }
+
+  /**
    * A wrapper around Number#toFixed, which contrary to native method returns number, not string.
    * @static
    * @method toFixed
@@ -245,6 +267,7 @@
   fabric.util.removeFromArray = removeFromArray;
   fabric.util.degreesToRadians = degreesToRadians;
   fabric.util.radiansToDegrees = radiansToDegrees;
+  fabric.util.rotatePoint = rotatePoint;
   fabric.util.toFixed = toFixed;
   fabric.util.getRandomInt = getRandomInt;
   fabric.util.falseFunction = falseFunction;
