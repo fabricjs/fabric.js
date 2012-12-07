@@ -627,7 +627,7 @@
       var path = chunks.join(' ');
 
       return [
-        '<g transform="', this.getSvgTransform(), '">',
+        '<g transform="', (this.group ? '' : this.getSvgTransform()), '">',
           '<path ',
             'width="', this.width, '" height="', this.height, '" ',
             'd="', path, '" ',

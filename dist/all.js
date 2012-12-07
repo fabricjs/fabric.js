@@ -6856,21 +6856,16 @@ fabric.util.string = {
       // ignore if some object is being transformed at this moment
       if (this._currentTransform) return;
 
-      var target = this.findTarget(e),
-          activeGroup = this.getActiveGroup(),
-          corner;
-
+      var target = this.findTarget(e), corner;
       pointer = this.getPointer(e);
 
       if (this._shouldClearSelection(e)) {
-
         this._groupSelector = {
           ex: pointer.x,
           ey: pointer.y,
           top: 0,
           left: 0
         };
-
         this.deactivateAllWithDispatch();
       }
       else {
@@ -6881,8 +6876,7 @@ fabric.util.string = {
           this.onBeforeScaleRotate(target);
         }
 
-        var shouldHandleGroupLogic = e.shiftKey && (activeGroup || this.getActiveObject()) && this.selection;
-        if (shouldHandleGroupLogic) {
+        if (this._shouldHandleGroupLogic(e, target)) {
           this._handleGroupLogic(e, target);
           target = this.getActiveGroup();
         }
@@ -6908,6 +6902,13 @@ fabric.util.string = {
         this._currentTransform.left = this._currentTransform.target.left;
         this._currentTransform.top = this._currentTransform.target.top;
       }
+    },
+
+    _shouldHandleGroupLogic: function(e, target) {
+      var activeObject = this.getActiveObject();
+      return e.shiftKey &&
+            (this.getActiveGroup() || (activeObject && activeObject !== target))
+            && this.selection;
     },
 
     /**
@@ -7423,26 +7424,31 @@ fabric.util.string = {
       var newScaleX = target.scaleX, newScaleY = target.scaleY;
       if (by === 'equally' && !lockScalingX && !lockScalingY) {
         var dist = localMouse.y + localMouse.x;
-         var lastDist = target.height * t.original.scaleY + target.width * t.original.scaleX;
+        var lastDist = (target.height) * t.original.scaleY +
+                       (target.width) * t.original.scaleX +
+                       (target.padding * 2) -
+                       (target.strokeWidth * 2) + 1 /* additional offset needed probably due to subpixel rendering, and avoids jerk when scaling an object */;
 
         // We use t.scaleX/Y instead of target.scaleX/Y because the object may have a min scale and we'll loose the proportions
         newScaleX = t.original.scaleX * dist/lastDist;
         newScaleY = t.original.scaleY * dist/lastDist;
+
         target.set('scaleX', newScaleX);
         target.set('scaleY', newScaleY);
       }
       else if (!by) {
-        newScaleX = localMouse.x/target.width;
-        newScaleY = localMouse.y/target.height;
+        newScaleX = localMouse.x/(target.width+target.padding);
+        newScaleY = localMouse.y/(target.height+target.padding);
+
         lockScalingX || target.set('scaleX', newScaleX);
         lockScalingY || target.set('scaleY', newScaleY);
       }
       else if (by === 'x' && !target.get('lockUniScaling')) {
-        newScaleX = localMouse.x/target.width;
+        newScaleX = localMouse.x/(target.width+target.padding);
         lockScalingX || target.set('scaleX', newScaleX);
       }
       else if (by === 'y' && !target.get('lockUniScaling')) {
-        newScaleY = localMouse.y/target.height;
+        newScaleY = localMouse.y/(target.height+target.padding);
         lockScalingY || target.set('scaleY', newScaleY);
       }
 
@@ -12147,7 +12153,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       var path = chunks.join(' ');
 
       return [
-        '<g transform="', this.getSvgTransform(), '">',
+        '<g transform="', (this.group ? '' : this.getSvgTransform()), '">',
           '<path ',
             'width="', this.width, '" height="', this.height, '" ',
             'd="', path, '" ',
