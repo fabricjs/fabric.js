@@ -13,6 +13,15 @@
     return;
   }
 
+  var _lockProperties = {
+    lockMovementX:  true,
+    lockMovementY:  true,
+    lockRotation:   true,
+    lockScalingX:   true,
+    lockScalingY:   true,
+    lockUniScaling: true
+  };
+
   /**
    * @class Group
    * @extends fabric.Object
@@ -460,7 +469,7 @@
     /**
      * Returns svg representation of an instance
      * @method toSVG
-     * @return {string} svg representation of an instance
+     * @return {String} svg representation of an instance
      */
     toSVG: function() {
       var objectsMarkup = [ ];
@@ -472,6 +481,31 @@
         '<g transform="' + this.getSvgTransform() + '">' +
           objectsMarkup.join('') +
         '</g>');
+    },
+
+    /**
+     * Returns true if any of the objects have truthy specified property
+     * @method some
+     * @param {String} prop Property to check
+     * @return {Boolean}
+     */
+    get: function(prop) {
+      if (prop in _lockProperties) {
+        if (this[prop]) {
+          return this[prop];
+        }
+        else {
+          for (var i = 0, len = this.objects.length; i < len; i++) {
+            if (this.objects[i][prop]) {
+              return true;
+            }
+          }
+          return false;
+        }
+      }
+      else {
+        return this[prop];
+      }
     }
   });
 

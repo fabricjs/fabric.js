@@ -17,9 +17,6 @@
         'mb': 's-resize'
       },
 
-      utilMin = fabric.util.array.min,
-      utilMax = fabric.util.array.max,
-
       sqrt = Math.sqrt,
       atan2 = Math.atan2,
       abs = Math.abs,
@@ -164,8 +161,7 @@
     _initInteractive: function() {
       this._currentTransform = null;
       this._groupSelector = null;
-      this._freeDrawingXPoints = [ ];
-      this._freeDrawingYPoints = [ ];
+      this.freeDrawing = fabric.FreeDrawing && new fabric.FreeDrawing(this);
       this._initWrapperElement();
       this._createUpperCanvas();
       this._initEvents();
@@ -242,7 +238,7 @@
       var target;
 
       if (this.isDrawingMode && this._isCurrentlyDrawing) {
-        this._finalizeDrawingPath();
+        this.freeDrawing._finalizeAndAddPath();
         this.fire('mouse:up', { e: e });
         return;
       }
@@ -317,15 +313,20 @@
      */
     __onMouseDown: function (e) {
 
+      var pointer;
+
       // accept only left clicks
       var isLeftClick  = 'which' in e ? e.which === 1 : e.button === 1;
       if (!isLeftClick && !fabric.isTouchSupported) return;
 
       if (this.isDrawingMode) {
-        this._prepareForDrawing(e);
+        pointer = this.getPointer(e);
+        this.freeDrawing._prepareForDrawing(pointer);
 
-        // capture coordinates immediately; this allows to draw dots (when movement never occurs)
-        this._captureDrawingPath(e);
+        // capture coordinates immediately;
+        // this allows to draw dots (when movement never occurs)
+        this.freeDrawing._captureDrawingPath(pointer);
+
         this.fire('mouse:down', { e: e });
         return;
       }
@@ -334,9 +335,10 @@
       if (this._currentTransform) return;
 
       var target = this.findTarget(e),
-          pointer = this.getPointer(e),
           activeGroup = this.getActiveGroup(),
           corner;
+
+      pointer = this.getPointer(e);
 
       if (this._shouldClearSelection(e)) {
 
@@ -398,17 +400,23 @@
       */
     __onMouseMove: function (e) {
 
-      var target;
+      var target, pointer;
 
       if (this.isDrawingMode) {
         if (this._isCurrentlyDrawing) {
-          this._captureDrawingPath(e);
+          pointer = this.getPointer(e);
+          this.freeDrawing._captureDrawingPath(pointer);
+
+          // redraw curve
+          // clear top canvas
+          this.clearContext(this.contextTop);
+          this.freeDrawing._render(this.contextTop);
         }
         this.fire('mouse:move', { e: e });
         return;
       }
 
-      var groupSelector = this._groupSelector, pointer;
+      var groupSelector = this._groupSelector;
 
       // We initially clicked in an empty area, so we draw a box for multiple selection.
       if (groupSelector !== null) {
@@ -829,91 +837,6 @@
     },
 
     /**
-     * @private
-     * @method _prepareForDrawing
-     */
-    _prepareForDrawing: function(e) {
-
-      this._isCurrentlyDrawing = true;
-
-      this.discardActiveObject().renderAll();
-
-      var pointer = this.getPointer(e);
-
-      this._freeDrawingXPoints.length = this._freeDrawingYPoints.length = 0;
-
-      this._freeDrawingXPoints.push(pointer.x);
-      this._freeDrawingYPoints.push(pointer.y);
-
-      this.contextTop.beginPath();
-      this.contextTop.moveTo(pointer.x, pointer.y);
-      this.contextTop.strokeStyle = this.freeDrawingColor;
-      this.contextTop.lineWidth = this.freeDrawingLineWidth;
-      this.contextTop.lineCap = this.contextTop.lineJoin = 'round';
-    },
-
-    /**
-     * @private
-     * @method _captureDrawingPath
-     */
-    _captureDrawingPath: function(e) {
-      var pointer = this.getPointer(e);
-
-      this._freeDrawingXPoints.push(pointer.x);
-      this._freeDrawingYPoints.push(pointer.y);
-
-      this.contextTop.lineTo(pointer.x, pointer.y);
-      this.contextTop.stroke();
-    },
-
-    /**
-     * @private
-     * @method _finalizeDrawingPath
-     */
-    _finalizeDrawingPath: function() {
-
-      this.contextTop.closePath();
-
-      this._isCurrentlyDrawing = false;
-
-      var minX = utilMin(this._freeDrawingXPoints),
-          minY = utilMin(this._freeDrawingYPoints),
-          maxX = utilMax(this._freeDrawingXPoints),
-          maxY = utilMax(this._freeDrawingYPoints),
-          path = [ ],
-          xPoints = this._freeDrawingXPoints,
-          yPoints = this._freeDrawingYPoints;
-
-      path.push('M ', xPoints[0] - minX, ' ', yPoints[0] - minY, ' ');
-
-      for (var i = 1, len = xPoints.length; i < len; i++) {
-        path.push('L ', xPoints[i] - minX, ' ', yPoints[i] - minY, ' ');
-      }
-
-      // TODO (kangax): maybe remove Path creation from here, to decouple fabric.Canvas from fabric.Path,
-      // and instead fire something like "drawing:completed" event with path string
-
-      path = path.join('');
-
-      if (path === "M 0 0 L 0 0 ") {
-        // do not create 0 width/height paths, as they are rendered inconsistently across browsers
-        // Firefox 4, for example, renders a dot, whereas Chrome 10 renders nothing
-        this.renderAll();
-        return;
-      }
-
-      var p = new fabric.Path(path);
-
-      p.fill = null;
-      p.stroke = this.freeDrawingColor;
-      p.strokeWidth = this.freeDrawingLineWidth;
-      this.add(p);
-      p.set("left", minX + (maxX - minX) / 2).set("top", minY + (maxY - minY) / 2).setCoords();
-      this.renderAll();
-      this.fire('path:created', { path: p });
-    },
-
-    /**
      * Translates object by "setting" its left/top
      * @method _translateObject
      * @param x {Number} pointer's x coordinate
@@ -921,8 +844,13 @@
      */
     _translateObject: function (x, y) {
       var target = this._currentTransform.target;
-      target.lockMovementX || target.set('left', x - this._currentTransform.offsetX);
-      target.lockMovementY || target.set('top', y - this._currentTransform.offsetY);
+
+      if (!target.get('lockMovementX')) {
+        target.set('left', x - this._currentTransform.offsetX);
+      }
+      if (!target.get('lockMovementY')) {
+        target.set('top', y - this._currentTransform.offsetY);
+      }
     },
 
     /**
@@ -938,8 +866,10 @@
           offset = this._offset,
           target = t.target;
 
-      // Nothing to do here...
-      if (target.lockScalingX && target.lockScalingY) return;
+      var lockScalingX = target.get('lockScalingX'),
+          lockScalingY = target.get('lockScalingY');
+
+      if (lockScalingX && lockScalingY) return;
 
       // Get the constraint point
       var constraintPosition = target.translateToOriginPoint(target.getCenterPoint(), t.originX, t.originY);
@@ -969,7 +899,7 @@
 
       // Actually scale the object
       var newScaleX = target.scaleX, newScaleY = target.scaleY;
-      if (by === 'equally' && !target.lockScalingX && !target.lockScalingY) {
+      if (by === 'equally' && !lockScalingX && !lockScalingY) {
         var dist = localMouse.y + localMouse.x;
          var lastDist = target.height * t.original.scaleY + target.width * t.original.scaleX;
 
@@ -982,16 +912,16 @@
       else if (!by) {
         newScaleX = localMouse.x/target.width;
         newScaleY = localMouse.y/target.height;
-        target.lockScalingX || target.set('scaleX', newScaleX);
-        target.lockScalingY || target.set('scaleY', newScaleY);
+        lockScalingX || target.set('scaleX', newScaleX);
+        lockScalingY || target.set('scaleY', newScaleY);
       }
-      else if (by === 'x' && !target.lockUniScaling) {
+      else if (by === 'x' && !target.get('lockUniScaling')) {
         newScaleX = localMouse.x/target.width;
-        target.lockScalingX || target.set('scaleX', newScaleX);
+        lockScalingX || target.set('scaleX', newScaleX);
       }
-      else if (by === 'y' && !target.lockUniScaling) {
+      else if (by === 'y' && !target.get('lockUniScaling')) {
         newScaleY = localMouse.y/target.height;
-        target.lockScalingY || target.set('scaleY', newScaleY);
+        lockScalingY || target.set('scaleY', newScaleY);
       }
 
       // Check if we flipped
@@ -1026,7 +956,7 @@
       var t = this._currentTransform,
           o = this._offset;
 
-      if (t.target.lockRotation) return;
+      if (t.target.get('lockRotation')) return;
 
       var lastAngle = atan2(t.ey - t.top - o.top, t.ex - t.left - o.left),
           curAngle = atan2(y - t.top - o.top, x - t.left - o.left);
