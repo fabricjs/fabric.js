@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL` */
 /*! Fabric.js Copyright 2008-2012, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.9.28" };
+var fabric = fabric || { version: "0.9.29" };
 
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
@@ -7218,8 +7218,13 @@ fabric.util.string = {
      */
     _translateObject: function (x, y) {
       var target = this._currentTransform.target;
-      target.lockMovementX || target.set('left', x - this._currentTransform.offsetX);
-      target.lockMovementY || target.set('top', y - this._currentTransform.offsetY);
+
+      if (!target.get('lockMovementX')) {
+        target.set('left', x - this._currentTransform.offsetX);
+      }
+      if (!target.get('lockMovementY')) {
+        target.set('top', y - this._currentTransform.offsetY);
+      }
     },
 
     /**
@@ -7235,7 +7240,10 @@ fabric.util.string = {
           offset = this._offset,
           target = t.target;
 
-      if (target.lockScalingX && target.lockScalingY) return;
+      var lockScalingX = target.get('lockScalingX'),
+          lockScalingY = target.get('lockScalingY');
+
+      if (lockScalingX && lockScalingY) return;
 
       var lastLen = sqrt(pow(t.ey - t.top - offset.top, 2) + pow(t.ex - t.left - offset.left, 2)),
           curLen = sqrt(pow(y - t.top - offset.top, 2) + pow(x - t.left - offset.left, 2));
@@ -7243,14 +7251,18 @@ fabric.util.string = {
       target._scaling = true;
 
       if (!by) {
-        target.lockScalingX || target.set('scaleX', t.scaleX * curLen/lastLen);
-        target.lockScalingY || target.set('scaleY', t.scaleY * curLen/lastLen);
+        if (!lockScalingX) {
+          target.set('scaleX', t.scaleX * curLen/lastLen);
+        }
+        if (!lockScalingY) {
+          target.set('scaleY', t.scaleY * curLen/lastLen);
+        }
       }
-      else if (by === 'x' && !target.lockUniScaling) {
-        target.lockScalingX || target.set('scaleX', t.scaleX * curLen/lastLen);
+      else if (by === 'x' && !target.get('lockUniScaling')) {
+        lockScalingX || target.set('scaleX', t.scaleX * curLen/lastLen);
       }
-      else if (by === 'y' && !target.lockUniScaling) {
-        target.lockScalingY || target.set('scaleY', t.scaleY * curLen/lastLen);
+      else if (by === 'y' && !target.get('lockUniScaling')) {
+        lockScalingY || target.set('scaleY', t.scaleY * curLen/lastLen);
       }
     },
 
@@ -7265,7 +7277,7 @@ fabric.util.string = {
       var t = this._currentTransform,
           o = this._offset;
 
-      if (t.target.lockRotation) return;
+      if (t.target.get('lockRotation')) return;
 
       var lastAngle = atan2(t.ey - t.top - o.top, t.ex - t.left - o.left),
           curAngle = atan2(y - t.top - o.top, x - t.left - o.left);
@@ -8893,7 +8905,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         ~~(h + padding2 + strokeWidth * this.scaleY)
       );
 
-      if (this.hasRotatingPoint && !this.lockRotation && this.hasControls) {
+      if (this.hasRotatingPoint && !this.get('lockRotation') && this.hasControls) {
 
         var rotateHeight = (
           this.flipY
@@ -9039,7 +9051,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       ctx.clearRect(_left, _top, sizeX, sizeY);
       ctx[methodName](_left, _top, sizeX, sizeY);
 
-      if (!this.lockUniScaling) {
+      if (!this.get('lockUniScaling')) {
         // middle-top
         _left = left + width/2 - scaleOffsetX;
         _top = top - scaleOffsetY - strokeWidth2 - paddingY;
@@ -9318,7 +9330,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
           continue;
         }
 
-        if (this.lockUniScaling && (i === 'mt' || i === 'mr' || i === 'mb' || i === 'ml')) {
+        if (this.get('lockUniScaling') && (i === 'mt' || i === 'mr' || i === 'mb' || i === 'ml')) {
           continue;
         }
 
@@ -12082,6 +12094,15 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     return;
   }
 
+  var _lockProperties = {
+    lockMovementX:  true,
+    lockMovementY:  true,
+    lockRotation:   true,
+    lockScalingX:   true,
+    lockScalingY:   true,
+    lockUniScaling: true
+  };
+
   /**
    * @class Group
    * @extends fabric.Object
@@ -12529,7 +12550,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * Returns svg representation of an instance
      * @method toSVG
-     * @return {string} svg representation of an instance
+     * @return {String} svg representation of an instance
      */
     toSVG: function() {
       var objectsMarkup = [ ];
@@ -12541,6 +12562,31 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         '<g transform="' + this.getSvgTransform() + '">' +
           objectsMarkup.join('') +
         '</g>');
+    },
+
+    /**
+     * Returns true if any of the objects have truthy specified property
+     * @method some
+     * @param {String} prop Property to check
+     * @return {Boolean}
+     */
+    get: function(prop) {
+      if (prop in _lockProperties) {
+        if (this[prop]) {
+          return this[prop];
+        }
+        else {
+          for (var i = 0, len = this.objects.length; i < len; i++) {
+            if (this.objects[i][prop]) {
+              return true;
+            }
+          }
+          return false;
+        }
+      }
+      else {
+        return this[prop];
+      }
     }
   });
 
@@ -14667,13 +14713,19 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
   }
 
   fabric.util.loadImage = function(url, callback) {
-    request(url, 'binary', function(body) {
-      var img = new Image();
-      img.src = new Buffer(body, 'binary');
-      // preserving original url, which seems to be lost in node-canvas
-      img._src = url;
+    var img = new Image();
+    if (url && url.indexOf('data') === 0) {
+      img.src = img._src = url;
       callback(img);
-    });
+    }
+    else if (url) {
+      request(url, 'binary', function(body) {
+        img.src = new Buffer(body, 'binary');
+        // preserving original url, which seems to be lost in node-canvas
+        img._src = url;
+        callback(img);
+      });
+    }
   };
 
   fabric.loadSVGFromURL = function(url, callback) {

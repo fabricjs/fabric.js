@@ -719,8 +719,13 @@
      */
     _translateObject: function (x, y) {
       var target = this._currentTransform.target;
-      target.lockMovementX || target.set('left', x - this._currentTransform.offsetX);
-      target.lockMovementY || target.set('top', y - this._currentTransform.offsetY);
+
+      if (!target.get('lockMovementX')) {
+        target.set('left', x - this._currentTransform.offsetX);
+      }
+      if (!target.get('lockMovementY')) {
+        target.set('top', y - this._currentTransform.offsetY);
+      }
     },
 
     /**
@@ -736,7 +741,10 @@
           offset = this._offset,
           target = t.target;
 
-      if (target.lockScalingX && target.lockScalingY) return;
+      var lockScalingX = target.get('lockScalingX'),
+          lockScalingY = target.get('lockScalingY');
+
+      if (lockScalingX && lockScalingY) return;
 
       var lastLen = sqrt(pow(t.ey - t.top - offset.top, 2) + pow(t.ex - t.left - offset.left, 2)),
           curLen = sqrt(pow(y - t.top - offset.top, 2) + pow(x - t.left - offset.left, 2));
@@ -744,14 +752,18 @@
       target._scaling = true;
 
       if (!by) {
-        target.lockScalingX || target.set('scaleX', t.scaleX * curLen/lastLen);
-        target.lockScalingY || target.set('scaleY', t.scaleY * curLen/lastLen);
+        if (!lockScalingX) {
+          target.set('scaleX', t.scaleX * curLen/lastLen);
+        }
+        if (!lockScalingY) {
+          target.set('scaleY', t.scaleY * curLen/lastLen);
+        }
       }
-      else if (by === 'x' && !target.lockUniScaling) {
-        target.lockScalingX || target.set('scaleX', t.scaleX * curLen/lastLen);
+      else if (by === 'x' && !target.get('lockUniScaling')) {
+        lockScalingX || target.set('scaleX', t.scaleX * curLen/lastLen);
       }
-      else if (by === 'y' && !target.lockUniScaling) {
-        target.lockScalingY || target.set('scaleY', t.scaleY * curLen/lastLen);
+      else if (by === 'y' && !target.get('lockUniScaling')) {
+        lockScalingY || target.set('scaleY', t.scaleY * curLen/lastLen);
       }
     },
 
@@ -766,7 +778,7 @@
       var t = this._currentTransform,
           o = this._offset;
 
-      if (t.target.lockRotation) return;
+      if (t.target.get('lockRotation')) return;
 
       var lastAngle = atan2(t.ey - t.top - o.top, t.ex - t.left - o.left),
           curAngle = atan2(y - t.top - o.top, x - t.left - o.left);

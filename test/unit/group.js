@@ -302,6 +302,28 @@
     });
   });
 
+  test('get with locked objects', function() {
+    var group = makeGroupWith2Objects();
+
+    equal(group.get('lockMovementX'), false);
+
+    group.objects[0].lockMovementX = true;
+    equal(group.get('lockMovementX'), true);
+
+    group.objects[0].lockMovementX = false;
+    equal(group.get('lockMovementX'), false);
+
+    group.set('lockMovementX', true);
+    equal(group.get('lockMovementX'), true);
+
+    group.set('lockMovementX', false);
+    group.objects[0].lockMovementY = true;
+    group.objects[1].lockRotation = true;
+
+    equal(group.get('lockMovementY'), true);
+    equal(group.get('lockRotation'), true);
+  });
+
   // asyncTest('cloning group with image', function() {
   //   var rect = new fabric.Rect({ top: 100, left: 100, width: 30, height: 10 }),
   //       img = new fabric.Image(_createImageElement()),

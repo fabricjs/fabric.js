@@ -763,7 +763,7 @@
         ~~(h + padding2 + strokeWidth * this.scaleY)
       );
 
-      if (this.hasRotatingPoint && !this.lockRotation && this.hasControls) {
+      if (this.hasRotatingPoint && !this.get('lockRotation') && this.hasControls) {
 
         var rotateHeight = (
           this.flipY
@@ -909,7 +909,7 @@
       ctx.clearRect(_left, _top, sizeX, sizeY);
       ctx[methodName](_left, _top, sizeX, sizeY);
 
-      if (!this.lockUniScaling) {
+      if (!this.get('lockUniScaling')) {
         // middle-top
         _left = left + width/2 - scaleOffsetX;
         _top = top - scaleOffsetY - strokeWidth2 - paddingY;
@@ -1188,7 +1188,7 @@
           continue;
         }
 
-        if (this.lockUniScaling && (i === 'mt' || i === 'mr' || i === 'mb' || i === 'ml')) {
+        if (this.get('lockUniScaling') && (i === 'mt' || i === 'mr' || i === 'mb' || i === 'ml')) {
           continue;
         }
 
