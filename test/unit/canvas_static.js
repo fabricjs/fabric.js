@@ -263,10 +263,38 @@
     ok(!canvas.isEmpty());
   });
 
-  test('loadFromJSON', function() {
+  test('loadFromJSON with json string', function() {
     ok(typeof canvas.loadFromJSON == 'function');
 
     canvas.loadFromJSON(PATH_JSON, function(){
+      var obj = canvas.item(0);
+
+      ok(!canvas.isEmpty(), 'canvas is not empty');
+      equal(obj.type, 'path', 'first object is a path object');
+      equal(canvas.backgroundColor, '#ff5555', 'backgroundColor is populated properly');
+
+      equal(obj.get('left'), 268);
+      equal(obj.get('top'), 266);
+      equal(obj.get('width'), 51);
+      equal(obj.get('height'), 49);
+      equal(obj.get('fill'), 'rgb(0,0,0)');
+      equal(obj.get('stroke'), null);
+      equal(obj.get('strokeWidth'), 1);
+      equal(obj.get('scaleX'), 1);
+      equal(obj.get('scaleY'), 1);
+      equal(obj.get('angle'), 0);
+      equal(obj.get('flipX'), false);
+      equal(obj.get('flipY'), false);
+      equal(obj.get('opacity'), 1);
+
+      ok(obj.get('path').length > 0);
+    });
+  });
+
+  test('loadFromJSON with json object', function() {
+    ok(typeof canvas.loadFromJSON == 'function');
+
+    canvas.loadFromJSON(JSON.parse(PATH_JSON), function(){
       var obj = canvas.item(0);
 
       ok(!canvas.isEmpty(), 'canvas is not empty');
