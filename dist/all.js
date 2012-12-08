@@ -6904,6 +6904,12 @@ fabric.util.string = {
       }
     },
 
+    /**
+     * @method _shouldHandleGroupLogic
+     * @param e {Event}
+     * @param target {fabric.Object}
+     * @return {Boolean}
+     */
     _shouldHandleGroupLogic: function(e, target) {
       var activeObject = this.getActiveObject();
       return e.shiftKey &&
