@@ -7866,7 +7866,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
    * Populates canvas with data from the specified dataless JSON
    * JSON format must conform to the one of `fabric.Canvas#toDatalessJSON`
    * @method loadFromDatalessJSON
-   * @param {String} json JSON string
+   * @param {String|Object} json JSON string or object
    * @param {Function} callback Callback, invoked when json is parsed
    *                            and corresponding objects (e.g: fabric.Image)
    *                            are initialized
@@ -8010,7 +8010,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
    * Populates canvas with data from the specified JSON
    * JSON format must conform to the one of `fabric.Canvas#toJSON`
    * @method loadFromJSON
-   * @param {String} json JSON string
+   * @param {String|Object} json JSON string or object
    * @param {Function} callback Callback, invoked when json is parsed
    *                            and corresponding objects (e.g: fabric.Image)
    *                            are initialized
@@ -8020,7 +8020,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   loadFromJSON: function (json, callback) {
     if (!json) return;
 
-    var serialized = JSON.parse(json);
+    // serialize if it wasn't already
+    var serialized = (typeof json === 'string')
+      ? JSON.parse(json)
+      : json;
+
     if (!serialized || (serialized && !serialized.objects)) return;
 
     this.clear();
