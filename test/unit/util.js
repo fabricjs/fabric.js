@@ -4,6 +4,20 @@
 
   function K (x) { return x }
 
+  function getAbsolutePath(path) {
+    var isAbsolute = /^https?:/.test(path);
+    if (isAbsolute) return path;
+    var imgEl = _createImageElement();
+    imgEl.src = path;
+    var src = imgEl.src;
+    imgEl = null;
+    return src;
+  }
+
+  var IMG_URL = fabric.isLikelyNode ?
+    (__dirname + '/../fixtures/very_large_image.jpg') :
+    getAbsolutePath('../fixtures/very_large_image.jpg');
+
   test('fabric.util.toFixed', function(){
     ok(typeof fabric.util.toFixed == 'function');
 
@@ -387,7 +401,9 @@
         objectPassedToCallback,
         NodeCanvasImage = require('canvas').Image;
 
-    fabric.util.loadImage('../fixtures/very_large_image.jpg', function(obj) {
+    fabric.log('IMG_URL', IMG_URL);
+
+    fabric.util.loadImage(IMG_URL, function(obj) {
       callbackInvoked = true;
       objectPassedToCallback = obj;
     });
