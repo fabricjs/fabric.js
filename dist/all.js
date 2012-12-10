@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL` */
 /*! Fabric.js Copyright 2008-2012, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.9.29" };
+var fabric = fabric || { version: "0.9.30" };
 
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
@@ -2732,30 +2732,20 @@ fabric.util.string = {
     }
 
     return {
-        x: event.clientX + scrollLeft,
-        y: event.clientY + scrollTop
+        x: pointerX(event) + scrollLeft,
+        y: pointerY(event) + scrollTop
     };
   }
 
   var pointerX = function(event) {
-    var docElement = fabric.document.documentElement,
-        body = fabric.document.body || { scrollLeft: 0 };
-
     // looks like in IE (<9) clientX at certain point (apparently when mouseup fires on VML element)
     // is represented as COM object, with all the consequences, like "unknown" type and error on [[Get]]
     // need to investigate later
-    return event.pageX || ((typeof event.clientX !== 'unknown' ? event.clientX : 0) +
-      (docElement.scrollLeft || body.scrollLeft) -
-      (docElement.clientLeft || 0));
+    return (typeof event.clientX !== 'unknown' ? event.clientX : 0);
   };
 
   var pointerY = function(event) {
-    var docElement = fabric.document.documentElement,
-        body = fabric.document.body || { scrollTop: 0 };
-
-    return event.pageY || ((typeof event.clientY !== 'unknown' ? event.clientY : 0) +
-       (docElement.scrollTop || body.scrollTop) -
-       (docElement.clientTop || 0));
+    return (typeof event.clientY !== 'unknown' ? event.clientY : 0);
   };
 
   if (fabric.isTouchSupported) {
@@ -12754,7 +12744,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
                   // so that object's center aligns with container's left/top
                   'transform="translate('+ (-this.width/2) + ' ' + (-this.height/2) + ')" ' +
                   'width="' + this.width + '" ' +
-                  'height="' + this.height + '"' + '/>'+
+                  'height="' + this.height + '"' + '></image>' +
               '</g>';
     },
 
