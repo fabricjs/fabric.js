@@ -1,5 +1,7 @@
 (function() {
 
+  var path = require("path");
+
   QUnit.module('fabric.util');
 
   function K (x) { return x }
@@ -14,9 +16,9 @@
     return src;
   }
 
-  var IMG_URL = fabric.isLikelyNode ?
-    (__dirname + '/../fixtures/very_large_image.jpg') :
-    getAbsolutePath('../fixtures/very_large_image.jpg');
+  var IMG_URL = fabric.isLikelyNode
+    ? path.join(__dirname, '../fixtures/', 'very_large_image.jpg')
+    : getAbsolutePath('../fixtures/very_large_image.jpg');
 
   test('fabric.util.toFixed', function(){
     ok(typeof fabric.util.toFixed == 'function');
