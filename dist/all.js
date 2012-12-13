@@ -2071,8 +2071,8 @@ fabric.Observable.off = fabric.Observable.stopObserving;
    * @memberOf fabric.util
    * @method groupSVGElements
    * @param {Array} elements
-   * @param {Object} options optional
-   * @return {String} path optional
+   * @param {Object} [options] Options object
+   * @return {fabric.Object|fabric.PathGroup}
    */
   function groupSVGElements(elements, options, path) {
     var object = elements.length > 1
@@ -3799,7 +3799,7 @@ fabric.util.string = {
    * @method parseElements
    * @param {Array} elements Array of elements to parse
    * @param {Function} callback Being passed an array of fabric instances (transformed from SVG elements)
-   * @param {Object} options Options object
+   * @param {Object} [options] Options object
    * @param {Function} [reviver] Method for further parsing of SVG elements, called after each fabric object created.
    */
   function parseElements(elements, callback, options, reviver) {
@@ -4218,6 +4218,7 @@ fabric.util.string = {
   fabric.Gradient = fabric.util.createClass(/** @scope fabric.Gradient.prototype */ {
 
     /**
+     * Constructor
      * @method initialize
      * @param options optional Options with x1, y1, x2, y2 and colorStops
      */
@@ -4268,6 +4269,7 @@ fabric.util.string = {
   fabric.util.object.extend(fabric.Gradient, {
 
     /**
+     * Returns {@link fabric.Gradient} instance from an SVG element
      * @method fromElement
      * @static
      * @memberof fabric.Gradient
@@ -4323,8 +4325,11 @@ fabric.util.string = {
     },
 
     /**
+     * Returns {@link fabric.Gradient} instance from its object representation
      * @method forObject
      * @static
+     * @param obj
+     * @param [options]
      * @memberof fabric.Gradient
      */
     forObject: function(obj, options) {
@@ -5269,7 +5274,7 @@ fabric.util.string = {
 
     /**
      * @method _initOptions
-     * @param {Object} options
+     * @param {Object} [options]
      */
     _initOptions: function (options) {
       for (var prop in options) {
@@ -6269,9 +6274,9 @@ fabric.util.string = {
      * It converts the hand writting to a SVG Path and adds this
      * path to the canvas.
      *
-     * @metod init
-     * @param fabricCanvas {FabricCanvas}
-     *
+     * @metod initialize
+     * @param fabricCanvas {fabric.Canvas}
+     * @return {fabric.FreeDrawing}
      */
     initialize: function(fabricCanvas) {
       this.canvas = fabricCanvas;
@@ -6377,9 +6382,11 @@ fabric.util.string = {
      },
 
      /**
-     * @method getPathBoundingBox
-     * @param points {Array of points}
-     */
+      * Retursn bounding box of a path based on given points
+      * @method getPathBoundingBox
+      * @param points {Array}
+      * @return {Object}
+      */
      getPathBoundingBox: function(points) {
       var xBounds = [],
           yBounds = [],
@@ -9867,12 +9874,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   }
 
   /**
+   * Line class
    * @class Line
    * @extends fabric.Object
    */
   fabric.Line = fabric.util.createClass(fabric.Object, /** @scope fabric.Line.prototype */ {
 
     /**
+     * Type of an object
      * @property
      * @type String
      */
@@ -9905,7 +9914,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * @private
      * @method _setWidthHeight
-     * @param {Object} options
+     * @param {Object} [options] Options
      */
     _setWidthHeight: function(options) {
       options || (options = { });
@@ -9983,9 +9992,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     },
 
     /**
-     * Returns svg representation of an instance
+     * Returns SVG representation of an instance
      * @method toSVG
-     * @return {string} svg representation of an instance
+     * @return {String} svg representation of an instance
      */
     toSVG: function() {
       return [
@@ -10053,12 +10062,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   }
 
   /**
+   * Circle class
    * @class Circle
    * @extends fabric.Object
    */
   fabric.Circle = fabric.util.createClass(fabric.Object, /** @scope fabric.Circle.prototype */ {
 
     /**
+     * Type of an object
      * @property
      * @type String
      */
@@ -10174,10 +10185,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
    * Returns {@link fabric.Circle} instance from an SVG element
    * @static
    * @method fabric.Circle.fromElement
-   * @param element {SVGElement} element to parse
-   * @param options {Object} options object
+   * @param {SVGElement} element Element to parse
+   * @param {Object} [options] Options object
    * @throws {Error} If value of `r` attribute is missing or invalid
-   * @return {Object} instance of fabric.Circle
+   * @return {Object} Instance of fabric.Circle
    */
   fabric.Circle.fromElement = function(element, options) {
     options || (options = { });
@@ -10225,12 +10236,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   }
 
   /**
+   * Triangle class
    * @class Triangle
    * @extends fabric.Object
    */
   fabric.Triangle = fabric.util.createClass(fabric.Object, /** @scope fabric.Triangle.prototype */ {
 
     /**
+     * Type of an object
      * @property
      * @type String
      */
@@ -10239,7 +10252,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * Constructor
      * @method initialize
-     * @param options {Object} options object
+     * @param {Object} [options] Options object
      * @return {Object} thisArg
      */
     initialize: function(options) {
@@ -10284,9 +10297,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     },
 
     /**
-     * Returns svg representation of an instance
+     * Returns SVG representation of an instance
      * @method toSVG
-     * @return {string} svg representation of an instance
+     * @return {String} svg representation of an instance
      */
     toSVG: function() {
 
@@ -10333,12 +10346,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   }
 
   /**
+   * Ellipse class
    * @class Ellipse
    * @extends fabric.Object
    */
   fabric.Ellipse = fabric.util.createClass(fabric.Object, /** @scope fabric.Ellipse.prototype */ {
 
     /**
+     * Type of an object
      * @property
      * @type String
      */
@@ -10348,7 +10363,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      * Constructor
      * @method initialize
      * @param {Object} [options] Options object
-     * @return {Object} thisArg
+     * @return {fabric.Ellipse} thisArg
      */
     initialize: function(options) {
       options = options || { };
@@ -10498,6 +10513,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   }
 
   /**
+   * Rectangle class
    * @class Rect
    * @extends fabric.Object
    */
@@ -10527,7 +10543,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * Constructor
      * @method initialize
-     * @param options {Object} options object
+     * @param {Object} [options] Options object
      * @return {Object} thisArg
      */
     initialize: function(options) {
@@ -10536,6 +10552,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       this._initStateProperties();
       this.callSuper('initialize', options);
       this._initRxRy();
+
+      this.x = 0;
+      this.y = 0;
     },
 
     /**
@@ -10549,6 +10568,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     },
 
     /**
+     * Initializes rx/ry attributes
      * @private
      * @method _initRxRy
      */
@@ -10653,7 +10673,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * Returns svg representation of an instance
      * @method toSVG
-     * @return {string} svg representation of an instance
+     * @return {String} svg representation of an instance
      */
     toSVG: function() {
       return '<rect ' +
@@ -10665,8 +10685,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
               '/>';
     }
   });
-
-  // TODO (kangax): implement rounded rectangles (both parsing and rendering)
 
   /**
    * List of attribute names to account for when parsing SVG element (used by `fabric.Rect.fromElement`)
@@ -10684,12 +10702,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   }
 
   /**
-   * Returns fabric.Rect instance from an SVG element
+   * Returns {@link fabric.Rect} instance from an SVG element
    * @static
    * @method fabric.Rect.fromElement
-   * @param element {SVGElement} element to parse
-   * @param options {Object} options object
-   * @return {fabric.Rect} instance of fabric.Rect
+   * @param {SVGElement} element Element to parse
+   * @param {Object} [options] Options object
+   * @return {fabric.Rect} Instance of fabric.Rect
    */
   fabric.Rect.fromElement = function(element, options) {
     if (!element) {
@@ -10706,7 +10724,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   };
 
   /**
-   * Returns fabric.Rect instance from an object representation
+   * Returns {@link fabric.Rect} instance from an object representation
    * @static
    * @method fabric.Rect.fromObject
    * @param object {Object} object to create an instance from
@@ -10730,6 +10748,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   }
 
   /**
+   * Polyline class
    * @class Polyline
    * @extends fabric.Object
    */
@@ -10775,7 +10794,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     },
 
     /**
-     * Returns svg representation of an instance
+     * Returns SVG representation of an instance
      * @method toSVG
      * @return {string} svg representation of an instance
      */
@@ -10887,6 +10906,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   }
 
   /**
+   * Polygon class
    * @class Polygon
    * @extends fabric.Object
    */
@@ -10903,7 +10923,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      * Constructor
      * @method initialize
      * @param {Array} points Array of points
-     * @param {Object} options Options object
+     * @param {Object} [options] Options object
      * @return {fabric.Polygon} thisArg
      */
     initialize: function(points, options) {
@@ -10947,7 +10967,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * Returns svg representation of an instance
      * @method toSVG
-     * @return {string} svg representation of an instance
+     * @return {String} svg representation of an instance
      */
     toSVG: function() {
       var points = [];
@@ -11004,11 +11024,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   fabric.Polygon.ATTRIBUTE_NAMES = 'fill fill-opacity opacity stroke stroke-width transform'.split(' ');
 
   /**
-   * Returns fabric.Polygon instance from an SVG element
+   * Returns {@link fabric.Polygon} instance from an SVG element
    * @static
    * @method fabric.Polygon.fromElement
    * @param {SVGElement} element Element to parse
-   * @param {Object} options Options object
+   * @param {Object} [options] Options object
    * @return {fabric.Polygon}
    */
   fabric.Polygon.fromElement = function(element, options) {
@@ -11821,7 +11841,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
    * @static
    * @method fabric.Path.fromElement
    * @param {SVGElement} element to parse
-   * @param {Object} options object
+   * @param {Object} [options] Options object
    * @return {fabric.Path} Instance of fabric.Path
    */
   fabric.Path.fromElement = function(element, options) {
@@ -12098,12 +12118,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   };
 
   /**
+   * Group class
    * @class Group
    * @extends fabric.Object
    */
   fabric.Group = fabric.util.createClass(fabric.Object, /** @scope fabric.Group.prototype */ {
 
     /**
+     * Type of an object
      * @property
      * @type String
      */
@@ -12585,12 +12607,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   });
 
   /**
-   * Returns fabric.Group instance from an object representation
+   * Returns {@link fabric.Group} instance from an object representation
    * @static
    * @method fabric.Group.fromObject
-   * @param object {Object} object to create a group from
-   * @param options {Object} options object
-   * @return {fabric.Group} an instance of fabric.Group
+   * @param {Object} object Object to create a group from
+   * @param {Object} [options] Options object
+   * @return {fabric.Group} An instance of fabric.Group
    */
   fabric.Group.fromObject = function(object, callback) {
     fabric.util.enlivenObjects(object.objects, function(enlivenedObjects) {
@@ -12618,18 +12640,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   }
 
   /**
+   * Image class
    * @class Image
    * @extends fabric.Object
    */
   fabric.Image = fabric.util.createClass(fabric.Object, /** @scope fabric.Image.prototype */ {
 
     /**
-     * @property
-     * @type Boolean
-     */
-    active: false,
-
-    /**
+     * Type of an object
      * @property
      * @type String
      */
@@ -12638,7 +12656,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * Constructor
      * @param {HTMLImageElement | String} element Image element
-     * @param {Object} options optional
+     * @param {Object} [options] Options object
+     * @return {fabric.Image}
      */
     initialize: function(element, options) {
       options || (options = { });
@@ -12731,9 +12750,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     },
 
     /**
-     * Returns svg representation of an instance
+     * Returns SVG representation of an instance
      * @method toSVG
-     * @return {string} svg representation of an instance
+     * @return {String} svg representation of an instance
      */
     toSVG: function() {
       return '<g transform="' + this.getSvgTransform() + '">'+
@@ -12768,7 +12787,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
     /**
      * Returns a clone of an instance
-     * @mthod clone
+     * @method clone
      * @param {Array} propertiesToInclude
      * @param {Function} callback Callback is invoked with a clone as a first argument
      */
@@ -12872,7 +12891,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * @private
      * @method _initConfig
-     * @param {Object} options Options object
+     * @param {Object} [options] Options object
      */
     _initConfig: function(options) {
       options || (options = { });
@@ -12896,7 +12915,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * @private
      * @method _setWidthHeight
-     * @param {Object} options Object with width/height properties
+     * @param {Object} [options] Object with width/height properties
      */
     _setWidthHeight: function(options) {
       this.width = 'width' in options
@@ -12925,14 +12944,19 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
    */
   fabric.Image.CSS_CANVAS = "canvas-img";
 
+  /**
+   * Alias for getSrc
+   * @static
+   * @method getSvgSrc
+   */
   fabric.Image.prototype.getSvgSrc = fabric.Image.prototype.getSrc;
 
   /**
    * Creates an instance of fabric.Image from its object representation
    * @static
    * @method fromObject
-   * @param object {Object}
-   * @param callback {Function} optional
+   * @param {Object} object
+   * @param {Function} [callback] Callback to invoke when an image instance is created
    */
   fabric.Image.fromObject = function(object, callback) {
     var img = fabric.document.createElement('img'),
@@ -13001,6 +13025,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     fabric.Image.fromURL(parsedAttributes['xlink:href'], callback, extend(parsedAttributes, options));
   };
 
+  /**
+   * Indicates that instances of this type are async
+   * @static
+   * @type Boolean
+   */
   fabric.Image.async = true;
 
 })(typeof exports !== 'undefined' ? exports : this);
@@ -14398,7 +14427,7 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
     },
 
     /**
-     * Returns svg representation of an instance
+     * Returns SVG representation of an instance
      * @method toSVG
      * @return {string} svg representation of an instance
      */
