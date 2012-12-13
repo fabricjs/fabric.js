@@ -96,6 +96,8 @@
       var p1 = this._points[0];
       var p2 = this._points[1];
 
+      ctx.moveTo(p1.x, p1.y);
+
       for (var i = 1, len = this._points.length; i < len; i++) {
         // we pick the point between pi+1 & pi+2 as the
         // end point and p1 as our control point.
