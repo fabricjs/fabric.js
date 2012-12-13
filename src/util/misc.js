@@ -211,8 +211,8 @@
    * @memberOf fabric.util
    * @method groupSVGElements
    * @param {Array} elements
-   * @param {Object} options optional
-   * @return {String} path optional
+   * @param {Object} [options] Options object
+   * @return {fabric.Object|fabric.PathGroup}
    */
   function groupSVGElements(elements, options, path) {
     var object = elements.length > 1

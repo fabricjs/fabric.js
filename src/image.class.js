@@ -14,18 +14,14 @@
   }
 
   /**
+   * Image class
    * @class Image
    * @extends fabric.Object
    */
   fabric.Image = fabric.util.createClass(fabric.Object, /** @scope fabric.Image.prototype */ {
 
     /**
-     * @property
-     * @type Boolean
-     */
-    active: false,
-
-    /**
+     * Type of an object
      * @property
      * @type String
      */
@@ -34,7 +30,8 @@
     /**
      * Constructor
      * @param {HTMLImageElement | String} element Image element
-     * @param {Object} options optional
+     * @param {Object} [options] Options object
+     * @return {fabric.Image}
      */
     initialize: function(element, options) {
       options || (options = { });
@@ -127,9 +124,9 @@
     },
 
     /**
-     * Returns svg representation of an instance
+     * Returns SVG representation of an instance
      * @method toSVG
-     * @return {string} svg representation of an instance
+     * @return {String} svg representation of an instance
      */
     toSVG: function() {
       return '<g transform="' + this.getSvgTransform() + '">'+
@@ -164,7 +161,7 @@
 
     /**
      * Returns a clone of an instance
-     * @mthod clone
+     * @method clone
      * @param {Array} propertiesToInclude
      * @param {Function} callback Callback is invoked with a clone as a first argument
      */
@@ -268,7 +265,7 @@
     /**
      * @private
      * @method _initConfig
-     * @param {Object} options Options object
+     * @param {Object} [options] Options object
      */
     _initConfig: function(options) {
       options || (options = { });
@@ -292,7 +289,7 @@
     /**
      * @private
      * @method _setWidthHeight
-     * @param {Object} options Object with width/height properties
+     * @param {Object} [options] Object with width/height properties
      */
     _setWidthHeight: function(options) {
       this.width = 'width' in options
@@ -321,14 +318,19 @@
    */
   fabric.Image.CSS_CANVAS = "canvas-img";
 
+  /**
+   * Alias for getSrc
+   * @static
+   * @method getSvgSrc
+   */
   fabric.Image.prototype.getSvgSrc = fabric.Image.prototype.getSrc;
 
   /**
    * Creates an instance of fabric.Image from its object representation
    * @static
    * @method fromObject
-   * @param object {Object}
-   * @param callback {Function} optional
+   * @param {Object} object
+   * @param {Function} [callback] Callback to invoke when an image instance is created
    */
   fabric.Image.fromObject = function(object, callback) {
     var img = fabric.document.createElement('img'),
@@ -397,6 +399,11 @@
     fabric.Image.fromURL(parsedAttributes['xlink:href'], callback, extend(parsedAttributes, options));
   };
 
+  /**
+   * Indicates that instances of this type are async
+   * @static
+   * @type Boolean
+   */
   fabric.Image.async = true;
 
 })(typeof exports !== 'undefined' ? exports : this);

@@ -30,6 +30,7 @@
   fabric.Gradient = fabric.util.createClass(/** @scope fabric.Gradient.prototype */ {
 
     /**
+     * Constructor
      * @method initialize
      * @param options optional Options with x1, y1, x2, y2 and colorStops
      */
@@ -80,6 +81,7 @@
   fabric.util.object.extend(fabric.Gradient, {
 
     /**
+     * Returns {@link fabric.Gradient} instance from an SVG element
      * @method fromElement
      * @static
      * @memberof fabric.Gradient
@@ -135,8 +137,11 @@
     },
 
     /**
+     * Returns {@link fabric.Gradient} instance from its object representation
      * @method forObject
      * @static
+     * @param obj
+     * @param [options]
      * @memberof fabric.Gradient
      */
     forObject: function(obj, options) {

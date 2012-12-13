@@ -12,12 +12,14 @@
   }
 
   /**
+   * Ellipse class
    * @class Ellipse
    * @extends fabric.Object
    */
   fabric.Ellipse = fabric.util.createClass(fabric.Object, /** @scope fabric.Ellipse.prototype */ {
 
     /**
+     * Type of an object
      * @property
      * @type String
      */
@@ -27,7 +29,7 @@
      * Constructor
      * @method initialize
      * @param {Object} [options] Options object
-     * @return {Object} thisArg
+     * @return {fabric.Ellipse} thisArg
      */
     initialize: function(options) {
       options = options || { };

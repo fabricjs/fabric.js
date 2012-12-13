@@ -19,9 +19,9 @@
      * It converts the hand writting to a SVG Path and adds this
      * path to the canvas.
      *
-     * @metod init
-     * @param fabricCanvas {FabricCanvas}
-     *
+     * @metod initialize
+     * @param fabricCanvas {fabric.Canvas}
+     * @return {fabric.FreeDrawing}
      */
     initialize: function(fabricCanvas) {
       this.canvas = fabricCanvas;
@@ -127,9 +127,11 @@
      },
 
      /**
-     * @method getPathBoundingBox
-     * @param points {Array of points}
-     */
+      * Retursn bounding box of a path based on given points
+      * @method getPathBoundingBox
+      * @param points {Array}
+      * @return {Object}
+      */
      getPathBoundingBox: function(points) {
       var xBounds = [],
           yBounds = [],

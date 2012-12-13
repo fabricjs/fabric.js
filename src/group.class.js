@@ -23,12 +23,14 @@
   };
 
   /**
+   * Group class
    * @class Group
    * @extends fabric.Object
    */
   fabric.Group = fabric.util.createClass(fabric.Object, /** @scope fabric.Group.prototype */ {
 
     /**
+     * Type of an object
      * @property
      * @type String
      */
@@ -510,12 +512,12 @@
   });
 
   /**
-   * Returns fabric.Group instance from an object representation
+   * Returns {@link fabric.Group} instance from an object representation
    * @static
    * @method fabric.Group.fromObject
-   * @param object {Object} object to create a group from
-   * @param options {Object} options object
-   * @return {fabric.Group} an instance of fabric.Group
+   * @param {Object} object Object to create a group from
+   * @param {Object} [options] Options object
+   * @return {fabric.Group} An instance of fabric.Group
    */
   fabric.Group.fromObject = function(object, callback) {
     fabric.util.enlivenObjects(object.objects, function(enlivenedObjects) {
