@@ -223,7 +223,7 @@
       var originLeft = this.box.minx  + (this.box.maxx - this.box.minx) /2;
       var originTop = this.box.miny  + (this.box.maxy - this.box.miny) /2;
 
-      this.canvas.contextTop.arc(originLeft, originTop, 3, 0, Math.PI * 2);
+      this.canvas.contextTop.arc(originLeft, originTop, 3, 0, Math.PI * 2, false);
 
       p.set({ left: originLeft, top: originTop });
 
