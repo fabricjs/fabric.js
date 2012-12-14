@@ -395,6 +395,7 @@
      */
     _renderTextStroke: function(ctx, textLines) {
       if (this.strokeStyle) {
+        ctx.beginPath();
         for (var i = 0, len = textLines.length; i < len; i++) {
           ctx.strokeText(
             textLines[i],
@@ -402,6 +403,7 @@
             (-this.height / 2) + (i * this.fontSize * this.lineHeight) + this.fontSize
           );
         }
+        ctx.closePath();
       }
     },
 
