@@ -49,6 +49,20 @@
   var InteractiveMethods = /** @scope fabric.Canvas.prototype */ {
 
     /**
+     * When true, objects can be transformed by one side (unproportionally)
+     * @property
+     * @type Boolean
+     */
+    uniScaleTransform:      false,
+
+    /**
+     * When true, objects use center point as the origin of transformation
+     * @property
+     * @type Boolean
+     */
+    centerTransform:        false,
+
+    /**
      * Indicates that canvas is interactive. This property should not be changed.
      * @property
      * @type Boolean
@@ -513,7 +527,7 @@
           //   this._currentTransform.target.fire('scaling');
           // }
 
-          if (e.shiftKey) {
+          if (e.shiftKey || this.uniScaleTransform) {
             this._currentTransform.currentAction = 'scale';
             this._scaleObject(x, y);
           }
@@ -584,7 +598,7 @@
       t.target.set('left', t.original.left);
       t.target.set('top', t.original.top);
 
-      if (e.altKey) {
+      if (e.altKey || this.centerTransform) {
         if (t.originX !== 'center') {
           if (t.originX === 'right') {
             t.mouseXSign = -1;
