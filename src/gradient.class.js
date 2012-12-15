@@ -24,6 +24,7 @@
   }
 
   /**
+   * Gradient class
    * @class Gradient
    * @memberOf fabric
    */
@@ -32,7 +33,8 @@
     /**
      * Constructor
      * @method initialize
-     * @param options optional Options with x1, y1, x2, y2 and colorStops
+     * @param [options] Options object with x1, y1, x2, y2 and colorStops
+     * @return {fabric.Gradient} thisArg
      */
     initialize: function(options) {
 
@@ -49,6 +51,7 @@
     /**
      * Returns object representation of a gradient
      * @method toObject
+     * @return {Object}
      */
     toObject: function() {
       return {
@@ -64,6 +67,7 @@
      * Returns an instance of CanvasGradient
      * @method toLiveGradient
      * @param ctx
+     * @return {CanvasGradient}
      */
     toLiveGradient: function(ctx) {
       var gradient = ctx.createLinearGradient(

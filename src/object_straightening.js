@@ -1,9 +1,9 @@
 fabric.util.object.extend(fabric.Object.prototype, {
 
   /**
+   * @private
    * @method _getAngleValueForStraighten
    * @return {Number} angle value
-   * @private
    */
   _getAngleValueForStraighten: function() {
     var angle = this.get('angle');
@@ -22,6 +22,7 @@ fabric.util.object.extend(fabric.Object.prototype, {
   },
 
   /**
+   * Straightens an object (rotating it from current angle to one of 0, 90, 180, 270, etc. depending on which is closer)
    * @method straighten
    * @return {fabric.Object} thisArg
    * @chainable
@@ -33,6 +34,7 @@ fabric.util.object.extend(fabric.Object.prototype, {
   },
 
   /**
+   * Same as {@link fabric.Object.prototype.straghten} but with animation
    * @method fxStraighten
    * @param {Object} callbacks
    *                  - onComplete: invoked on completion
@@ -86,7 +88,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   },
 
   /**
-   * Same as `fabric.Canvas#straightenObject`, but animated
+   * Same as {@link fabric.Canvas.prototype.straightenObject}, but animated
    * @method fxStraightenObject
    * @param {fabric.Object} object Object to straighten
    * @return {fabric.Canvas} thisArg

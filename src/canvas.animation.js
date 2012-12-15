@@ -1,5 +1,9 @@
 fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
+  /**
+   * Animation duration (in ms) for fx* methods
+   * @type Number
+   */
   FX_DURATION: 500,
 
   /**

@@ -13,91 +13,105 @@
   }
 
   /**
+   * Text class
    * @class Text
    * @extends fabric.Object
    */
   fabric.Text = fabric.util.createClass(fabric.Object, /** @scope fabric.Text.prototype */ {
 
     /**
+     * Font size
      * @property
      * @type Number
      */
     fontSize:             40,
 
     /**
+     * Font weight (e.g. bold, normal, 400, 600, 800)
      * @property
      * @type Number
      */
     fontWeight:           400,
 
     /**
+     * Font family
      * @property
      * @type String
      */
     fontFamily:           'Times New Roman',
 
     /**
+     * Text decoration (e.g. underline, overline)
      * @property
      * @type String
      */
     textDecoration:       '',
 
     /**
+     * Text shadow
      * @property
      * @type String | null
      */
     textShadow:           '',
 
     /**
-     * Determines text alignment. Possible values: "left", "center", or "right".
+     * Text alignment. Possible values: "left", "center", or "right".
      * @property
      * @type String
      */
     textAlign:            'left',
 
     /**
+     * Font style (e.g. italic)
      * @property
      * @type String
      */
     fontStyle:            '',
 
     /**
+     * Line height
      * @property
      * @type Number
      */
     lineHeight:           1.3,
 
     /**
+     * Stroke style. When specified, text is rendered with stroke
      * @property
      * @type String
      */
     strokeStyle:          '',
 
     /**
+     * Stroke width
      * @property
      * @type Number
      */
     strokeWidth:          1,
 
     /**
+     * Background color of an entire text box
      * @property
      * @type String
      */
     backgroundColor:      '',
 
     /**
+     * Background color of text lines
      * @property
      * @type String
      */
     textBackgroundColor:  '',
 
     /**
+     * URL of a font file, when using Cufon
      * @property
      * @type String | null
      */
     path:                 null,
 
     /**
+     * Type of an object
      * @property
      * @type String
      */
@@ -378,6 +392,10 @@
       }
     },
 
+    /**
+     * @private
+     * @method _renderTextFill
+     */
     _renderTextFill: function(ctx, textLines) {
       this._boundaries = [ ];
       for (var i = 0, len = textLines.length; i < len; i++) {
@@ -581,7 +599,7 @@
     /**
      * Returns SVG representation of an instance
      * @method toSVG
-     * @return {string} svg representation of an instance
+     * @return {String} svg representation of an instance
      */
     toSVG: function() {
 
@@ -620,6 +638,10 @@
       ].join('');
     },
 
+    /**
+     * @private
+     * @method _getSVGShadows
+     */
     _getSVGShadows: function(lineTopOffset, textLines) {
       var shadowSpans = [], j, i, jlen, ilen, lineTopOffsetMultiplier = 1;
 
@@ -653,6 +675,10 @@
       return shadowSpans;
     },
 
+    /**
+     * @private
+     * @method _getSVGTextAndBg
+     */
     _getSVGTextAndBg: function(lineTopOffset, textLeftOffset, textLines) {
       var textSpans = [ ], textBgRects = [ ], i, lineLeftOffset, len, lineTopOffsetMultiplier = 1;
 
@@ -715,8 +741,13 @@
       };
     },
 
-    // Adobe Illustrator (at least CS5) is unable to render rgba()-based fill values
-    // we work around it by "moving" alpha channel into opacity attribute and setting fill's alpha to 1
+    /**
+     * Adobe Illustrator (at least CS5) is unable to render rgba()-based fill values
+     * we work around it by "moving" alpha channel into opacity attribute and setting fill's alpha to 1
+     *
+     * @private
+     * @method _getFillAttributes
+     */
     _getFillAttributes: function(value) {
       var fillColor = value ? new fabric.Color(value) : '';
       if (!fillColor || !fillColor.getSource() || fillColor.getAlpha() === 1) {

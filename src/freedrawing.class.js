@@ -12,13 +12,18 @@
     return;
   }
 
+  /**
+   * Free drawing class
+   * Free Drawer handles scribbling on a fabric canvas
+   * It converts the hand writting to a SVG Path and adds this path to the canvas
+   *
+   * @class FreeDrawing
+   * @memberOf fabric
+   */
   fabric.FreeDrawing = fabric.util.createClass({
 
     /**
-     * Free Drawer handles scribbling on a fabricCanvas.
-     * It converts the hand writting to a SVG Path and adds this
-     * path to the canvas.
-     *
+     * Constructor
      * @metod initialize
      * @param fabricCanvas {fabric.Canvas}
      * @return {fabric.FreeDrawing}
@@ -129,10 +134,10 @@
      },
 
      /**
-      * Retursn bounding box of a path based on given points
+      * Returns bounding box of a path based on given points
       * @method getPathBoundingBox
-      * @param points {Array}
-      * @return {Object}
+      * @param {Array} points
+      * @return {Object} object with minx, miny, maxx, maxy
       */
      getPathBoundingBox: function(points) {
       var xBounds = [],
@@ -165,9 +170,11 @@
      };
     },
 
-   /**
+    /**
+     * Converts points to SVG path
      * @method convertPointsToSVGPath
-     * @param points {Array of points}
+     * @param {Array} points Array of points
+     * @return {String} SVG path
      */
     convertPointsToSVGPath: function(points, minX, maxX, minY, maxY) {
       var path = [];
@@ -196,9 +203,7 @@
      * and add it to the fabric canvas.
      *
      * @method _finalizeAndAddPath
-     *
      */
-
     _finalizeAndAddPath: function() {
       this.canvas._isCurrentlyDrawing = false;
       var ctx = this.canvas.contextTop;
