@@ -32,9 +32,10 @@
     constructor: Point,
 
     /**
+     * Constructor
      * @method init
-     * @param {Number} x
-     * @param {Number} y
+     * @param {Number} x left offset
+     * @param {Number} y top offset
      */
     init: function (x, y) {
       this.x = x;
@@ -101,60 +102,126 @@
       return this;
     },
 
+    /**
+     * @method scalarSubtract
+     * @param {Number} scalar
+     * @return {fabric.Point}
+     */
     scalarSubtract: function (scalar) {
       return new Point(this.x - scalar, this.y - scalar);
     },
 
+    /**
+     * @method scalarSubtractEquals
+     * @param {Number} scalar
+     * @return {fabric.Point} thisArg
+     */
     scalarSubtractEquals: function (scalar) {
       this.x -= scalar;
       this.y -= scalar;
       return this;
     },
 
+    /**
+     * @method multiply
+     * @param {Number} scalar
+     * @return {fabric.Point}
+     */
     multiply: function (scalar) {
       return new Point(this.x * scalar, this.y * scalar);
     },
 
+    /**
+     * @method multiplyEquals
+     * @param {Number} scalar
+     * @return {fabric.Point} thisArg
+     */
     multiplyEquals: function (scalar) {
       this.x *= scalar;
       this.y *= scalar;
       return this;
     },
 
+    /**
+     * @method divide
+     * @param {Number} scalar
+     * @return {fabric.Point}
+     */
     divide: function (scalar) {
       return new Point(this.x / scalar, this.y / scalar);
     },
 
+    /**
+     * @method divideEquals
+     * @param {Number} scalar
+     * @return {fabric.Point} thisArg
+     */
     divideEquals: function (scalar) {
       this.x /= scalar;
       this.y /= scalar;
       return this;
     },
 
+    /**
+     * @method eq
+     * @param {fabric.Point} that
+     * @return {Boolean}
+     */
     eq: function (that) {
       return (this.x === that.x && this.y === that.y);
     },
 
+    /**
+     * @method lt
+     * @param {fabric.Point} that
+     * @return {Boolean}
+     */
     lt: function (that) {
       return (this.x < that.x && this.y < that.y);
     },
 
+    /**
+     * @method lte
+     * @param {fabric.Point} that
+     * @return {Boolean}
+     */
     lte: function (that) {
       return (this.x <= that.x && this.y <= that.y);
     },
 
+    /**
+     * @method gt
+     * @param {fabric.Point} that
+     * @return {Boolean}
+     */
     gt: function (that) {
       return (this.x > that.x && this.y > that.y);
     },
 
+    /**
+     * @method gte
+     * @param {fabric.Point} that
+     * @return {Boolean}
+     */
     gte: function (that) {
       return (this.x >= that.x && this.y >= that.y);
     },
 
+    /**
+     * @method lerp
+     * @param {fabric.Point} that
+     * @param {Number} t
+     * @return {fabric.Point}
+     */
     lerp: function (that, t) {
       return new Point(this.x + (that.x - this.x) * t, this.y + (that.y - this.y) * t);
     },
 
+    /**
+     * @method distanceFrom
+     * @param {fabric.Point} that
+     * @return {Number}
+     */
     distanceFrom: function (that) {
       var dx = this.x - that.x,
           dy = this.y - that.y;
@@ -163,7 +230,7 @@
 
     /**
      * Return the point between A (x,y) and B (x,y)
-     */ 
+     */
     midPointFrom: function (that) {
       return new Point(this.x + (that.x - this.x)/2, this.y + (that.y - this.y)/2);
     },

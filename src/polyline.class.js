@@ -11,6 +11,7 @@
   }
 
   /**
+   * Polyline class
    * @class Polyline
    * @extends fabric.Object
    */
@@ -56,7 +57,7 @@
     },
 
     /**
-     * Returns svg representation of an instance
+     * Returns SVG representation of an instance
      * @method toSVG
      * @return {string} svg representation of an instance
      */

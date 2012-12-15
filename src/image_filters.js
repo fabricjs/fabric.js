@@ -4,12 +4,14 @@
 fabric.Image.filters = { };
 
 /**
+ * Grayscale image filter class
  * @class fabric.Image.filters.Grayscale
  * @memberOf fabric.Image.filters
  */
 fabric.Image.filters.Grayscale = fabric.util.createClass( /** @scope fabric.Image.filters.Grayscale.prototype */ {
 
   /**
+   * Filter type
    * @param {String} type
    */
   type: "Grayscale",
@@ -64,6 +66,7 @@ fabric.Image.filters.Grayscale.fromObject = function() {
 fabric.Image.filters.RemoveWhite = fabric.util.createClass( /** @scope fabric.Image.filters.RemoveWhite.prototype */ {
 
   /**
+   * Filter type
    * @param {String} type
    */
   type: "RemoveWhite",
@@ -138,6 +141,7 @@ fabric.Image.filters.RemoveWhite.fromObject = function(object) {
 fabric.Image.filters.Invert = fabric.util.createClass( /** @scope fabric.Image.filters.Invert.prototype */ {
 
   /**
+   * Filter type
    * @param {String} type
    */
   type: "Invert",
@@ -184,6 +188,7 @@ fabric.Image.filters.Invert.fromObject = function() {
 fabric.Image.filters.Sepia = fabric.util.createClass( /** @scope fabric.Image.filters.Sepia.prototype */ {
 
   /**
+   * Filter type
    * @param {String} type
    */
   type: "Sepia",
@@ -231,6 +236,7 @@ fabric.Image.filters.Sepia.fromObject = function() {
 fabric.Image.filters.Sepia2 = fabric.util.createClass( /** @scope fabric.Image.filters.Sepia2.prototype */ {
 
   /**
+   * Filter type
    * @param {String} type
    */
   type: "Sepia2",
@@ -282,6 +288,7 @@ fabric.Image.filters.Sepia2.fromObject = function() {
 fabric.Image.filters.Brightness = fabric.util.createClass( /** @scope fabric.Image.filters.Brightness.prototype */ {
 
   /**
+   * Filter type
    * @param {String} type
    */
   type: "Brightness",
@@ -339,6 +346,7 @@ fabric.Image.filters.Brightness.fromObject = function(object) {
 fabric.Image.filters.Noise = fabric.util.createClass( /** @scope fabric.Image.filters.Noise.prototype */ {
 
   /**
+   * Filter type
    * @param {String} type
    */
   type: "Noise",
@@ -399,6 +407,7 @@ fabric.Image.filters.Noise.fromObject = function(object) {
 fabric.Image.filters.GradientTransparency = fabric.util.createClass( /** @scope fabric.Image.filters.GradientTransparency.prototype */ {
 
   /**
+   * Filter type
    * @param {String} type
    */
   type: "GradientTransparency",
@@ -454,6 +463,7 @@ fabric.Image.filters.GradientTransparency.fromObject = function(object) {
 fabric.Image.filters.Tint = fabric.util.createClass( /** @scope fabric.Image.filters.Tint.prototype */ {
 
   /**
+   * Filter type
    * @param {String} type
    */
   type: "Tint",
@@ -524,6 +534,7 @@ fabric.Image.filters.Tint.fromObject = function(object) {
 fabric.Image.filters.Convolute = fabric.util.createClass(/** @scope fabric.Image.filters.Convolute.prototype */ {
 
   /**
+   * Filter type
    * @param {String} type
    */
   type: 'Convolute',
@@ -633,6 +644,7 @@ fabric.Image.filters.Convolute.fromObject = function(object) {
 fabric.Image.filters.Pixelate = fabric.util.createClass(/** @scope fabric.Image.filters.Pixelate.prototype */ {
 
   /**
+   * Filter type
    * @param {String} type
    */
   type: 'Pixelate',

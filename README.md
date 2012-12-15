@@ -10,7 +10,7 @@ Contributions are very much welcome!
 
 ### Goals
 
-- Unit tested (1300+ tests at the moment)
+- Unit tested (1400+ tests at the moment)
 - Modular (~20 small "classes" and modules)
 - Cross-browser
 - [Fast](https://github.com/kangax/fabric.js/wiki/Focus-on-speed)
@@ -102,6 +102,7 @@ These are the optional modules that could be specified for inclusion, when build
 - **image_filters** — Adds support for image filters, such as grayscale of white removal.
 - **easing** - Adds support for animation easing functions
 - **node** — Adds support for running fabric under node.js, with help of [jsdom](https://github.com/tmpvar/jsdom) and [node-canvas](https://github.com/learnboost/node-canvas) libraries.
+- **freedrawing** - Adds support for free drawing
 
 ### Examples of use
 

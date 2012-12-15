@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL` */
 /*! Fabric.js Copyright 2008-2012, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.9.29" };
+var fabric = fabric || { version: "0.9.30" };
 
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
@@ -2093,8 +2093,8 @@ fabric.Observable.off = fabric.Observable.stopObserving;
    * @memberOf fabric.util
    * @method groupSVGElements
    * @param {Array} elements
-   * @param {Object} options optional
-   * @return {String} path optional
+   * @param {Object} [options] Options object
+   * @return {fabric.Object|fabric.PathGroup}
    */
   function groupSVGElements(elements, options, path) {
     var object = elements.length > 1
@@ -2755,30 +2755,20 @@ fabric.util.string = {
     }
 
     return {
-        x: event.clientX + scrollLeft,
-        y: event.clientY + scrollTop
+        x: pointerX(event) + scrollLeft,
+        y: pointerY(event) + scrollTop
     };
   }
 
   var pointerX = function(event) {
-    var docElement = fabric.document.documentElement,
-        body = fabric.document.body || { scrollLeft: 0 };
-
     // looks like in IE (<9) clientX at certain point (apparently when mouseup fires on VML element)
     // is represented as COM object, with all the consequences, like "unknown" type and error on [[Get]]
     // need to investigate later
-    return event.pageX || ((typeof event.clientX !== 'unknown' ? event.clientX : 0) +
-      (docElement.scrollLeft || body.scrollLeft) -
-      (docElement.clientLeft || 0));
+    return (typeof event.clientX !== 'unknown' ? event.clientX : 0);
   };
 
   var pointerY = function(event) {
-    var docElement = fabric.document.documentElement,
-        body = fabric.document.body || { scrollTop: 0 };
-
-    return event.pageY || ((typeof event.clientY !== 'unknown' ? event.clientY : 0) +
-       (docElement.scrollTop || body.scrollTop) -
-       (docElement.clientTop || 0));
+    return (typeof event.clientY !== 'unknown' ? event.clientY : 0);
   };
 
   if (fabric.isTouchSupported) {
@@ -3832,7 +3822,7 @@ fabric.util.string = {
    * @method parseElements
    * @param {Array} elements Array of elements to parse
    * @param {Function} callback Being passed an array of fabric instances (transformed from SVG elements)
-   * @param {Object} options Options object
+   * @param {Object} [options] Options object
    * @param {Function} [reviver] Method for further parsing of SVG elements, called after each fabric object created.
    */
   function parseElements(elements, callback, options, reviver) {
@@ -4245,14 +4235,17 @@ fabric.util.string = {
   }
 
   /**
+   * Gradient class
    * @class Gradient
    * @memberOf fabric
    */
   fabric.Gradient = fabric.util.createClass(/** @scope fabric.Gradient.prototype */ {
 
     /**
+     * Constructor
      * @method initialize
-     * @param options optional Options with x1, y1, x2, y2 and colorStops
+     * @param [options] Options object with x1, y1, x2, y2 and colorStops
+     * @return {fabric.Gradient} thisArg
      */
     initialize: function(options) {
 
@@ -4269,6 +4262,7 @@ fabric.util.string = {
     /**
      * Returns object representation of a gradient
      * @method toObject
+     * @return {Object}
      */
     toObject: function() {
       return {
@@ -4284,6 +4278,7 @@ fabric.util.string = {
      * Returns an instance of CanvasGradient
      * @method toLiveGradient
      * @param ctx
+     * @return {CanvasGradient}
      */
     toLiveGradient: function(ctx) {
       var gradient = ctx.createLinearGradient(
@@ -4301,6 +4296,7 @@ fabric.util.string = {
   fabric.util.object.extend(fabric.Gradient, {
 
     /**
+     * Returns {@link fabric.Gradient} instance from an SVG element
      * @method fromElement
      * @static
      * @memberof fabric.Gradient
@@ -4356,8 +4352,11 @@ fabric.util.string = {
     },
 
     /**
+     * Returns {@link fabric.Gradient} instance from its object representation
      * @method forObject
      * @static
+     * @param obj
+     * @param [options]
      * @memberof fabric.Gradient
      */
     forObject: function(obj, options) {
@@ -4372,18 +4371,18 @@ fabric.util.string = {
       if (typeof options[prop] === 'string' && /^\d+%$/.test(options[prop])) {
         var percents = parseFloat(options[prop], 10);
         if (prop === 'x1' || prop === 'x2') {
-          options[prop] = object.width * percents / 100;
+          options[prop] = fabric.util.toFixed(object.width * percents / 100, 2);
         }
         else if (prop === 'y1' || prop === 'y2') {
-          options[prop] = object.height * percents / 100;
+          options[prop] = fabric.util.toFixed(object.height * percents / 100, 2);
         }
       }
       // normalize rendering point (should be from top/left corner rather than center of the shape)
       if (prop === 'x1' || prop === 'x2') {
-        options[prop] -= object.width / 2;
+        options[prop] -= fabric.util.toFixed(object.width / 2, 2);
       }
       else if (prop === 'y1' || prop === 'y2') {
-        options[prop] -= object.height / 2;
+        options[prop] -= fabric.util.toFixed(object.height / 2, 2);
       }
     }
   }
@@ -4455,9 +4454,10 @@ fabric.util.string = {
     constructor: Point,
 
     /**
+     * Constructor
      * @method init
-     * @param {Number} x
-     * @param {Number} y
+     * @param {Number} x left offset
+     * @param {Number} y top offset
      */
     init: function (x, y) {
       this.x = x;
@@ -4524,60 +4524,126 @@ fabric.util.string = {
       return this;
     },
 
+    /**
+     * @method scalarSubtract
+     * @param {Number} scalar
+     * @return {fabric.Point}
+     */
     scalarSubtract: function (scalar) {
       return new Point(this.x - scalar, this.y - scalar);
     },
 
+    /**
+     * @method scalarSubtractEquals
+     * @param {Number} scalar
+     * @return {fabric.Point} thisArg
+     */
     scalarSubtractEquals: function (scalar) {
       this.x -= scalar;
       this.y -= scalar;
       return this;
     },
 
+    /**
+     * @method multiply
+     * @param {Number} scalar
+     * @return {fabric.Point}
+     */
     multiply: function (scalar) {
       return new Point(this.x * scalar, this.y * scalar);
     },
 
+    /**
+     * @method multiplyEquals
+     * @param {Number} scalar
+     * @return {fabric.Point} thisArg
+     */
     multiplyEquals: function (scalar) {
       this.x *= scalar;
       this.y *= scalar;
       return this;
     },
 
+    /**
+     * @method divide
+     * @param {Number} scalar
+     * @return {fabric.Point}
+     */
     divide: function (scalar) {
       return new Point(this.x / scalar, this.y / scalar);
     },
 
+    /**
+     * @method divideEquals
+     * @param {Number} scalar
+     * @return {fabric.Point} thisArg
+     */
     divideEquals: function (scalar) {
       this.x /= scalar;
       this.y /= scalar;
       return this;
     },
 
+    /**
+     * @method eq
+     * @param {fabric.Point} that
+     * @return {Boolean}
+     */
     eq: function (that) {
       return (this.x === that.x && this.y === that.y);
     },
 
+    /**
+     * @method lt
+     * @param {fabric.Point} that
+     * @return {Boolean}
+     */
     lt: function (that) {
       return (this.x < that.x && this.y < that.y);
     },
 
+    /**
+     * @method lte
+     * @param {fabric.Point} that
+     * @return {Boolean}
+     */
     lte: function (that) {
       return (this.x <= that.x && this.y <= that.y);
     },
 
+    /**
+     * @method gt
+     * @param {fabric.Point} that
+     * @return {Boolean}
+     */
     gt: function (that) {
       return (this.x > that.x && this.y > that.y);
     },
 
+    /**
+     * @method gte
+     * @param {fabric.Point} that
+     * @return {Boolean}
+     */
     gte: function (that) {
       return (this.x >= that.x && this.y >= that.y);
     },
 
+    /**
+     * @method lerp
+     * @param {fabric.Point} that
+     * @param {Number} t
+     * @return {fabric.Point}
+     */
     lerp: function (that, t) {
       return new Point(this.x + (that.x - this.x) * t, this.y + (that.y - this.y) * t);
     },
 
+    /**
+     * @method distanceFrom
+     * @param {fabric.Point} that
+     * @return {Number}
+     */
     distanceFrom: function (that) {
       var dx = this.x - that.x,
           dy = this.y - that.y;
@@ -4586,7 +4652,7 @@ fabric.util.string = {
 
     /**
      * Return the point between A (x,y) and B (x,y)
-     */ 
+     */
     midPointFrom: function (that) {
       return new Point(this.x + (that.x - this.x)/2, this.y + (that.y - this.y)/2);
     },
@@ -4639,6 +4705,7 @@ fabric.util.string = {
   }
 
   /**
+   * Intersection class
    * @class Intersection
    * @memberOf fabric
    */
@@ -4653,6 +4720,7 @@ fabric.util.string = {
   fabric.Intersection.prototype = /** @scope fabric.Intersection.prototype */ {
 
     /**
+     * Constructor
      * @method init
      * @param {String} status
      */
@@ -4662,16 +4730,18 @@ fabric.util.string = {
     },
 
     /**
+     * Appends a point to intersection
      * @method appendPoint
-     * @param {String} status
+     * @param {fabric.Point} point
      */
     appendPoint: function (point) {
       this.points.push(point);
     },
 
     /**
+     * Appends points to intersection
      * @method appendPoints
-     * @param {String} status
+     * @param {Array} points
      */
     appendPoints: function (points) {
       this.points = this.points.concat(points);
@@ -4786,12 +4856,14 @@ fabric.util.string = {
   }
 
   /**
+   * Color class
    * The purpose of {@link fabric.Color} is to abstract and encapsulate common color operations;
    * {@link fabric.Color} is a constructor and creates instances of {@link fabric.Color} objects.
    *
    * @class Color
    * @memberOf fabric
    * @param {String} color optional in hex or rgb(a) format
+   * @return {fabric.Color} thisArg
    */
   function Color(color) {
     if (!color) {
@@ -5302,7 +5374,7 @@ fabric.util.string = {
 
     /**
      * @method _initOptions
-     * @param {Object} options
+     * @param {Object} [options]
      */
     _initOptions: function (options) {
       for (var prop in options) {
@@ -6295,16 +6367,21 @@ fabric.util.string = {
     return;
   }
 
+  /**
+   * Free drawing class
+   * Free Drawer handles scribbling on a fabric canvas
+   * It converts the hand writting to a SVG Path and adds this path to the canvas
+   *
+   * @class FreeDrawing
+   * @memberOf fabric
+   */
   fabric.FreeDrawing = fabric.util.createClass({
 
     /**
-     * Free Drawer handles scribbling on a fabricCanvas.
-     * It converts the hand writting to a SVG Path and adds this
-     * path to the canvas.
-     *
-     * @metod init
-     * @param fabricCanvas {FabricCanvas}
-     *
+     * Constructor
+     * @metod initialize
+     * @param fabricCanvas {fabric.Canvas}
+     * @return {fabric.FreeDrawing}
      */
     initialize: function(fabricCanvas) {
       this.canvas = fabricCanvas;
@@ -6410,9 +6487,11 @@ fabric.util.string = {
      },
 
      /**
-     * @method getPathBoundingBox
-     * @param points {Array of points}
-     */
+      * Returns bounding box of a path based on given points
+      * @method getPathBoundingBox
+      * @param {Array} points
+      * @return {Object} object with minx, miny, maxx, maxy
+      */
      getPathBoundingBox: function(points) {
       var xBounds = [],
           yBounds = [],
@@ -6444,9 +6523,11 @@ fabric.util.string = {
      };
     },
 
-   /**
+    /**
+     * Converts points to SVG path
      * @method convertPointsToSVGPath
-     * @param points {Array of points}
+     * @param {Array} points Array of points
+     * @return {String} SVG path
      */
     convertPointsToSVGPath: function(points, minX, maxX, minY, maxY) {
       var path = [];
@@ -6475,9 +6556,7 @@ fabric.util.string = {
      * and add it to the fabric canvas.
      *
      * @method _finalizeAndAddPath
-     *
      */
-
     _finalizeAndAddPath: function() {
       this.canvas._isCurrentlyDrawing = false;
       var ctx = this.canvas.contextTop;
@@ -6500,11 +6579,11 @@ fabric.util.string = {
       p.strokeWidth = this.canvas.freeDrawingLineWidth;
       this.canvas.add(p);
 
-      // set path origin coordinates based on our bouding box
+      // set path origin coordinates based on our bounding box
       var originLeft = this.box.minx  + (this.box.maxx - this.box.minx) /2;
       var originTop = this.box.miny  + (this.box.maxy - this.box.miny) /2;
 
-      this.canvas.contextTop.arc(originLeft, originTop, 3);
+      this.canvas.contextTop.arc(originLeft, originTop, 3, 0, Math.PI * 2);
 
       p.set({ left: originLeft, top: originTop });
 
@@ -6569,6 +6648,20 @@ fabric.util.string = {
   fabric.Canvas.prototype = new ProtoProxy();
 
   var InteractiveMethods = /** @scope fabric.Canvas.prototype */ {
+
+    /**
+     * When true, objects can be transformed by one side (unproportionally)
+     * @property
+     * @type Boolean
+     */
+    uniScaleTransform:      false,
+
+    /**
+     * When true, objects use center point as the origin of transformation
+     * @property
+     * @type Boolean
+     */
+    centerTransform:        false,
 
     /**
      * Indicates that canvas is interactive. This property should not be changed.
@@ -7035,7 +7128,7 @@ fabric.util.string = {
           //   this._currentTransform.target.fire('scaling');
           // }
 
-          if (e.shiftKey) {
+          if (e.shiftKey || this.uniScaleTransform) {
             this._currentTransform.currentAction = 'scale';
             this._scaleObject(x, y);
           }
@@ -7106,7 +7199,7 @@ fabric.util.string = {
       t.target.set('left', t.original.left);
       t.target.set('top', t.original.top);
 
-      if (e.altKey) {
+      if (e.altKey || this.centerTransform) {
         if (t.originX !== 'center') {
           if (t.originX === 'right') {
             t.mouseXSign = -1;
@@ -8006,6 +8099,10 @@ fabric.util.string = {
 })();
 fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
+  /**
+   * Animation duration (in ms) for fx* methods
+   * @type Number
+   */
   FX_DURATION: 500,
 
   /**
@@ -8413,6 +8510,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   }
 
   /**
+   * Root object class from which all 2d shape classes inherit from
    * @class Object
    * @memberOf fabric
    */
@@ -8468,14 +8566,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     height:                   0,
 
     /**
-     * Horizontal scale of an object
+     * Object scale factor (horizontal)
      * @property
      * @type Number
      */
     scaleX:                   1,
 
     /**
-     * Vertical scale of an object
+     * Object scale factor (vertical)
      * @property
      * @type Number
      */
@@ -8503,7 +8601,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     opacity:                  1,
 
     /**
-     * Angle of an object (in degrees)
+     * Angle of rotation of an object (in degrees)
      * @property
      * @type Number
      */
@@ -8531,14 +8629,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     padding:                  0,
 
     /**
-     * Color of object's borders (when in active state)
+     * Border color of an object (when it's active)
      * @property
      * @type String
      */
     borderColor:              'rgba(102,153,255,0.75)',
 
     /**
-     * Color of object's corners (when in active state)
+     * Corner color of an object (when it's active)
      * @property
      * @type String
      */
@@ -8552,12 +8650,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     fill:                     'rgb(0,0,0)',
 
     /**
+     * Fill rule used to fill an object
      * @property
      * @type String
      */
     fillRule:                 'source-over',
 
     /**
+     * Overlay fill (takes precedence over fill value)
      * @property
      * @type String
      */
@@ -8578,7 +8678,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     strokeWidth:              1,
 
     /**
-     * Dash pattern of a stroke for this object
+     * Array specifying dash pattern of an object's stroke
      * @property
      * @type Array
      */
@@ -8592,6 +8692,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     borderOpacityWhenMoving:  0.4,
 
     /**
+     * Border scale factor
      * @property
      * @type Number
      */
@@ -8695,6 +8796,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     },
 
     /**
+     * Sets object's properties from options
      * @method setOptions
      * @param {Object} [options]
      */
@@ -8706,6 +8808,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     },
 
     /**
+     * Transforms context when rendering an object
      * @method transform
      * @param {CanvasRenderingContext2D} ctx Context
      */
@@ -8769,7 +8872,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * Returns (dataless) object representation of an instance
      * @method toDatalessObject
-     * @param {Array} propertiesToInclude
+     * @param {Array} [propertiesToInclude]
      * @return {Object} object representation of an instance
      */
     toDatalessObject: function(propertiesToInclude) {
@@ -8780,7 +8883,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * Returns styles-string for svg-export
      * @method getSvgStyles
-     * @return {string}
+     * @return {String}
      */
     getSvgStyles: function() {
       return [
@@ -8795,7 +8898,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * Returns transform-string for svg-export
      * @method getSvgTransform
-     * @return {string}
+     * @return {String}
      */
     getSvgTransform: function() {
       var angle = this.getAngle();
@@ -8913,6 +9016,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       return this;
     },
 
+    /**
+     * @private
+     * @method _set
+     * @param key
+     * @param value
+     */
     _set: function(key, value) {
       var shouldConstrainValue = (key === 'scaleX' || key === 'scaleY');
 
@@ -8928,7 +9037,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         value *= -1;
       }
       else if (key === 'width' || key === 'height') {
-        this.minScaleLimit = Math.min(0.1, 1/Math.max(this.width, this.height));
+        this.minScaleLimit = toFixed(Math.min(0.1, 1/Math.max(this.width, this.height)), 2);
       }
 
       this[key] = value;
@@ -8952,6 +9061,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     },
 
     /**
+     * Sets sourcePath of an object
      * @method setSourcePath
      * @param {String} value
      * @return {fabric.Object} thisArg
@@ -8965,7 +9075,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * Basic getter
      * @method get
-     * @param {Any} property
+     * @param {String} property
      * @return {Any} value of a property
      */
     get: function(property) {
@@ -8973,6 +9083,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     },
 
     /**
+     * Renders an object on a specified context
      * @method render
      * @param {CanvasRenderingContext2D} ctx context to render on
      * @param {Boolean} noTransform
@@ -9686,6 +9797,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     },
 
     /**
+     * Returns true if object state (one of its state properties) was changed
      * @method hasStateChanged
      * @return {Boolean} true if instance' state has changed
      */
@@ -9696,6 +9808,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     },
 
     /**
+     * Saves state of an object
      * @method saveState
      * @return {fabric.Object} thisArg
      * @chainable
@@ -9708,6 +9821,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     },
 
     /**
+     * Setups state of an object
      * @method setupState
      */
     setupState: function() {
@@ -9794,9 +9908,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     },
 
     /**
+     * Returns true if specified type is identical to the type of an instance
      * @method isType
      * @param type {String} type to check against
-     * @return {Boolean} true if specified type is identical to the type of instance
+     * @return {Boolean}
      */
     isType: function(type) {
       return this.type === type;
@@ -10134,8 +10249,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     },
 
     /**
+     * Returns complexity of an instance
      * @method complexity
-     * @return {Number}
+     * @return {Number} complexity
      */
     complexity: function() {
       return 0;
@@ -10153,6 +10269,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     },
 
     /**
+     * Sets gradient fill of an object
      * @method setGradientFill
      */
     setGradientFill: function(options) {
@@ -10160,6 +10277,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     },
 
     /**
+     * Animates object's properties
      * @method animate
      *
      * As object — multiple properties
@@ -10360,12 +10478,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   }
 
   /**
+   * Line class
    * @class Line
    * @extends fabric.Object
    */
   fabric.Line = fabric.util.createClass(fabric.Object, /** @scope fabric.Line.prototype */ {
 
     /**
+     * Type of an object
      * @property
      * @type String
      */
@@ -10374,7 +10494,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * Constructor
      * @method initialize
-     * @param {Array} points Array of points
+     * @param {Array} [points] Array of points
      * @param {Object} [options] Options object
      * @return {fabric.Line} thisArg
      */
@@ -10398,7 +10518,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * @private
      * @method _setWidthHeight
-     * @param {Object} options
+     * @param {Object} [options] Options
      */
     _setWidthHeight: function(options) {
       options || (options = { });
@@ -10476,9 +10596,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     },
 
     /**
-     * Returns svg representation of an instance
+     * Returns SVG representation of an instance
      * @method toSVG
-     * @return {string} svg representation of an instance
+     * @return {String} svg representation of an instance
      */
     toSVG: function() {
       return [
@@ -10546,12 +10666,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   }
 
   /**
+   * Circle class
    * @class Circle
    * @extends fabric.Object
    */
   fabric.Circle = fabric.util.createClass(fabric.Object, /** @scope fabric.Circle.prototype */ {
 
     /**
+     * Type of an object
      * @property
      * @type String
      */
@@ -10588,7 +10710,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * Returns svg representation of an instance
      * @method toSVG
-     * @return {string} svg representation of an instance
+     * @return {String} svg representation of an instance
      */
     toSVG: function() {
       return ('<circle ' +
@@ -10667,10 +10789,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
    * Returns {@link fabric.Circle} instance from an SVG element
    * @static
    * @method fabric.Circle.fromElement
-   * @param element {SVGElement} element to parse
-   * @param options {Object} options object
+   * @param {SVGElement} element Element to parse
+   * @param {Object} [options] Options object
    * @throws {Error} If value of `r` attribute is missing or invalid
-   * @return {Object} instance of fabric.Circle
+   * @return {Object} Instance of fabric.Circle
    */
   fabric.Circle.fromElement = function(element, options) {
     options || (options = { });
@@ -10718,12 +10840,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   }
 
   /**
+   * Triangle class
    * @class Triangle
    * @extends fabric.Object
    */
   fabric.Triangle = fabric.util.createClass(fabric.Object, /** @scope fabric.Triangle.prototype */ {
 
     /**
+     * Type of an object
      * @property
      * @type String
      */
@@ -10732,7 +10856,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * Constructor
      * @method initialize
-     * @param options {Object} options object
+     * @param {Object} [options] Options object
      * @return {Object} thisArg
      */
     initialize: function(options) {
@@ -10777,9 +10901,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     },
 
     /**
-     * Returns svg representation of an instance
+     * Returns SVG representation of an instance
      * @method toSVG
-     * @return {string} svg representation of an instance
+     * @return {String} svg representation of an instance
      */
     toSVG: function() {
 
@@ -10826,12 +10950,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   }
 
   /**
+   * Ellipse class
    * @class Ellipse
    * @extends fabric.Object
    */
   fabric.Ellipse = fabric.util.createClass(fabric.Object, /** @scope fabric.Ellipse.prototype */ {
 
     /**
+     * Type of an object
      * @property
      * @type String
      */
@@ -10841,7 +10967,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      * Constructor
      * @method initialize
      * @param {Object} [options] Options object
-     * @return {Object} thisArg
+     * @return {fabric.Ellipse} thisArg
      */
     initialize: function(options) {
       options = options || { };
@@ -10871,7 +10997,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * Returns svg representation of an instance
      * @method toSVG
-     * @return {string} svg representation of an instance
+     * @return {String} svg representation of an instance
      */
     toSVG: function() {
       return [
@@ -10991,6 +11117,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   }
 
   /**
+   * Rectangle class
    * @class Rect
    * @extends fabric.Object
    */
@@ -11020,7 +11147,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * Constructor
      * @method initialize
-     * @param options {Object} options object
+     * @param {Object} [options] Options object
      * @return {Object} thisArg
      */
     initialize: function(options) {
@@ -11029,6 +11156,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       this._initStateProperties();
       this.callSuper('initialize', options);
       this._initRxRy();
+
+      this.x = 0;
+      this.y = 0;
     },
 
     /**
@@ -11042,6 +11172,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     },
 
     /**
+     * Initializes rx/ry attributes
      * @private
      * @method _initRxRy
      */
@@ -11146,7 +11277,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * Returns svg representation of an instance
      * @method toSVG
-     * @return {string} svg representation of an instance
+     * @return {String} svg representation of an instance
      */
     toSVG: function() {
       return '<rect ' +
@@ -11158,8 +11289,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
               '/>';
     }
   });
-
-  // TODO (kangax): implement rounded rectangles (both parsing and rendering)
 
   /**
    * List of attribute names to account for when parsing SVG element (used by `fabric.Rect.fromElement`)
@@ -11177,12 +11306,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   }
 
   /**
-   * Returns fabric.Rect instance from an SVG element
+   * Returns {@link fabric.Rect} instance from an SVG element
    * @static
    * @method fabric.Rect.fromElement
-   * @param element {SVGElement} element to parse
-   * @param options {Object} options object
-   * @return {fabric.Rect} instance of fabric.Rect
+   * @param {SVGElement} element Element to parse
+   * @param {Object} [options] Options object
+   * @return {fabric.Rect} Instance of fabric.Rect
    */
   fabric.Rect.fromElement = function(element, options) {
     if (!element) {
@@ -11199,7 +11328,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   };
 
   /**
-   * Returns fabric.Rect instance from an object representation
+   * Returns {@link fabric.Rect} instance from an object representation
    * @static
    * @method fabric.Rect.fromObject
    * @param object {Object} object to create an instance from
@@ -11223,6 +11352,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   }
 
   /**
+   * Polyline class
    * @class Polyline
    * @extends fabric.Object
    */
@@ -11268,7 +11398,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     },
 
     /**
-     * Returns svg representation of an instance
+     * Returns SVG representation of an instance
      * @method toSVG
      * @return {string} svg representation of an instance
      */
@@ -11380,6 +11510,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   }
 
   /**
+   * Polygon class
    * @class Polygon
    * @extends fabric.Object
    */
@@ -11396,7 +11527,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      * Constructor
      * @method initialize
      * @param {Array} points Array of points
-     * @param {Object} options Options object
+     * @param {Object} [options] Options object
      * @return {fabric.Polygon} thisArg
      */
     initialize: function(points, options) {
@@ -11440,7 +11571,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * Returns svg representation of an instance
      * @method toSVG
-     * @return {string} svg representation of an instance
+     * @return {String} svg representation of an instance
      */
     toSVG: function() {
       var points = [];
@@ -11497,11 +11628,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   fabric.Polygon.ATTRIBUTE_NAMES = 'fill fill-opacity opacity stroke stroke-width transform'.split(' ');
 
   /**
-   * Returns fabric.Polygon instance from an SVG element
+   * Returns {@link fabric.Polygon} instance from an SVG element
    * @static
    * @method fabric.Polygon.fromElement
    * @param {SVGElement} element Element to parse
-   * @param {Object} options Options object
+   * @param {Object} [options] Options object
    * @return {fabric.Polygon}
    */
   fabric.Polygon.fromElement = function(element, options) {
@@ -12314,7 +12445,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
    * @static
    * @method fabric.Path.fromElement
    * @param {SVGElement} element to parse
-   * @param {Object} options object
+   * @param {Object} [options] Options object
    * @return {fabric.Path} Instance of fabric.Path
    */
   fabric.Path.fromElement = function(element, options) {
@@ -12341,6 +12472,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   }
 
   /**
+   * Path group class
    * @class PathGroup
    * @extends fabric.Path
    */
@@ -12354,16 +12486,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     type: 'path-group',
 
     /**
+     * Fill value
      * @property
      * @type String
      */
     fill: '',
-
-    /**
-     * @property
-     * @type Boolean
-     */
-    forceFillOverwrite: false,
 
     /**
      * Constructor
@@ -12435,7 +12562,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * Returns object representation of this path group
      * @method toObject
-     * @param {Array} propertiesToInclude
+     * @param {Array} [propertiesToInclude]
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
@@ -12448,7 +12575,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * Returns dataless object representation of this path group
      * @method toDatalessObject
-     * @param {Array} propertiesToInclude
+     * @param {Array} [propertiesToInclude]
      * @return {Object} dataless object representation of an instance
      */
     toDatalessObject: function(propertiesToInclude) {
@@ -12462,7 +12589,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * Returns svg representation of an instance
      * @method toSVG
-     * @return {string} svg representation of an instance
+     * @return {String} svg representation of an instance
      */
     toSVG: function() {
       var objects = this.getObjects();
@@ -12483,11 +12610,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       return markup.join('');
     },
 
-     /**
-      * Returns a string representation of this path group
-      * @method toString
-      * @return {String} string representation of an object
-      */
+    /**
+     * Returns a string representation of this path group
+     * @method toString
+     * @return {String} string representation of an object
+     */
     toString: function() {
       return '#<fabric.PathGroup (' + this.complexity() +
         '): { top: ' + this.top + ', left: ' + this.left + ' }>';
@@ -12506,10 +12633,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     },
 
     /**
-      * Returns number representation of object's complexity
-      * @method complexity
-      * @return {Number} complexity
-      */
+     * Returns number representation of object's complexity
+     * @method complexity
+     * @return {Number} complexity
+     */
     complexity: function() {
       return this.paths.reduce(function(total, path) {
         return total + ((path && path.complexity) ? path.complexity() : 0);
@@ -12581,6 +12708,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     return;
   }
 
+  // lock-related properties, for use in fabric.Group#get
+  // to enable locking behavior on group
+  // when one of its objects has lock-related properties set
   var _lockProperties = {
     lockMovementX:  true,
     lockMovementY:  true,
@@ -12591,12 +12721,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   };
 
   /**
+   * Group class
    * @class Group
    * @extends fabric.Object
    */
   fabric.Group = fabric.util.createClass(fabric.Object, /** @scope fabric.Group.prototype */ {
 
     /**
+     * Type of an object
      * @property
      * @type String
      */
@@ -12740,10 +12872,24 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     },
 
     /**
+     * Properties that are delegated to group objects when reading/writing
+     */
+    delegatedProperties: {
+      fill:             true,
+      opacity:          true,
+      fontFamily:       true,
+      fontWeight:       true,
+      lineHeight:       true,
+      textDecoration:   true,
+      textShadow:       true,
+      backgroundColor:  true
+    },
+
+    /**
      * @private
      */
     _set: function(key, value) {
-      if (key === 'fill' || key === 'opacity') {
+      if (key in this.delegatedProperties) {
         var i = this.objects.length;
         this[key] = value;
         while (i--) {
@@ -13026,12 +13172,15 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * Makes all of this group's objects grayscale (i.e. calling `toGrayscale` on them)
      * @method toGrayscale
+     * @return {fabric.Group} thisArg
+     * @chainable
      */
     toGrayscale: function() {
       var i = this.objects.length;
       while (i--) {
         this.objects[i].toGrayscale();
       }
+      return this;
     },
 
     /**
@@ -13052,10 +13201,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     },
 
     /**
-     * Returns true if any of the objects have truthy specified property
-     * @method some
-     * @param {String} prop Property to check
-     * @return {Boolean}
+     * Returns requested property
+     * @method get
+     * @param {String} prop Property to get
+     * @return {Any}
      */
     get: function(prop) {
       if (prop in _lockProperties) {
@@ -13078,12 +13227,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   });
 
   /**
-   * Returns fabric.Group instance from an object representation
+   * Returns {@link fabric.Group} instance from an object representation
    * @static
    * @method fabric.Group.fromObject
-   * @param object {Object} object to create a group from
-   * @param options {Object} options object
-   * @return {fabric.Group} an instance of fabric.Group
+   * @param {Object} object Object to create a group from
+   * @param {Object} [options] Options object
+   * @return {fabric.Group} An instance of fabric.Group
    */
   fabric.Group.fromObject = function(object, callback) {
     fabric.util.enlivenObjects(object.objects, function(enlivenedObjects) {
@@ -13092,6 +13241,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     });
   };
 
+  /**
+   * Indicates that instances of this type are async
+   * @static
+   * @type Boolean
+   */
   fabric.Group.async = true;
 
 })(typeof exports !== 'undefined' ? exports : this);
@@ -13111,18 +13265,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   }
 
   /**
+   * Image class
    * @class Image
    * @extends fabric.Object
    */
   fabric.Image = fabric.util.createClass(fabric.Object, /** @scope fabric.Image.prototype */ {
 
     /**
-     * @property
-     * @type Boolean
-     */
-    active: false,
-
-    /**
+     * Type of an object
      * @property
      * @type String
      */
@@ -13131,7 +13281,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * Constructor
      * @param {HTMLImageElement | String} element Image element
-     * @param {Object} options optional
+     * @param {Object} [options] Options object
+     * @return {fabric.Image}
      */
     initialize: function(element, options) {
       options || (options = { });
@@ -13224,9 +13375,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     },
 
     /**
-     * Returns svg representation of an instance
+     * Returns SVG representation of an instance
      * @method toSVG
-     * @return {string} svg representation of an instance
+     * @return {String} svg representation of an instance
      */
     toSVG: function() {
       return '<g transform="' + this.getSvgTransform() + '">'+
@@ -13237,7 +13388,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
                   // so that object's center aligns with container's left/top
                   'transform="translate('+ (-this.width/2) + ' ' + (-this.height/2) + ')" ' +
                   'width="' + this.width + '" ' +
-                  'height="' + this.height + '"' + '/>'+
+                  'height="' + this.height + '"' + '></image>' +
               '</g>';
     },
 
@@ -13261,7 +13412,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
     /**
      * Returns a clone of an instance
-     * @mthod clone
+     * @method clone
      * @param {Array} propertiesToInclude
      * @param {Function} callback Callback is invoked with a clone as a first argument
      */
@@ -13273,6 +13424,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      * Applies filters assigned to this image (from "filters" array)
      * @mthod applyFilters
      * @param {Function} callback Callback is invoked when all filters have been applied and new image is generated
+     * @return {fabric.Image} thisArg
+     * @chainable
      */
     applyFilters: function(callback) {
 
@@ -13328,6 +13481,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * @private
      * @method _render
+     * @param ctx
      */
     _render: function(ctx) {
       ctx.drawImage(
@@ -13365,7 +13519,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * @private
      * @method _initConfig
-     * @param {Object} options Options object
+     * @param {Object} [options] Options object
      */
     _initConfig: function(options) {
       options || (options = { });
@@ -13389,7 +13543,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * @private
      * @method _setWidthHeight
-     * @param {Object} options Object with width/height properties
+     * @param {Object} [options] Object with width/height properties
      */
     _setWidthHeight: function(options) {
       this.width = 'width' in options
@@ -13418,14 +13572,19 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
    */
   fabric.Image.CSS_CANVAS = "canvas-img";
 
+  /**
+   * Alias for getSrc
+   * @static
+   * @method getSvgSrc
+   */
   fabric.Image.prototype.getSvgSrc = fabric.Image.prototype.getSrc;
 
   /**
    * Creates an instance of fabric.Image from its object representation
    * @static
    * @method fromObject
-   * @param object {Object}
-   * @param callback {Function} optional
+   * @param {Object} object
+   * @param {Function} [callback] Callback to invoke when an image instance is created
    */
   fabric.Image.fromObject = function(object, callback) {
     var img = fabric.document.createElement('img'),
@@ -13494,6 +13653,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     fabric.Image.fromURL(parsedAttributes['xlink:href'], callback, extend(parsedAttributes, options));
   };
 
+  /**
+   * Indicates that instances of this type are async
+   * @static
+   * @type Boolean
+   */
   fabric.Image.async = true;
 
 })(typeof exports !== 'undefined' ? exports : this);
@@ -13501,9 +13665,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 fabric.util.object.extend(fabric.Object.prototype, {
 
   /**
+   * @private
    * @method _getAngleValueForStraighten
    * @return {Number} angle value
-   * @private
    */
   _getAngleValueForStraighten: function() {
     var angle = this.get('angle');
@@ -13522,6 +13686,7 @@ fabric.util.object.extend(fabric.Object.prototype, {
   },
 
   /**
+   * Straightens an object (rotating it from current angle to one of 0, 90, 180, 270, etc. depending on which is closer)
    * @method straighten
    * @return {fabric.Object} thisArg
    * @chainable
@@ -13533,6 +13698,7 @@ fabric.util.object.extend(fabric.Object.prototype, {
   },
 
   /**
+   * Same as {@link fabric.Object.prototype.straghten} but with animation
    * @method fxStraighten
    * @param {Object} callbacks
    *                  - onComplete: invoked on completion
@@ -13586,7 +13752,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   },
 
   /**
-   * Same as `fabric.Canvas#straightenObject`, but animated
+   * Same as {@link fabric.Canvas.prototype.straightenObject}, but animated
    * @method fxStraightenObject
    * @param {fabric.Object} object Object to straighten
    * @return {fabric.Canvas} thisArg
@@ -13605,12 +13771,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 fabric.Image.filters = { };
 
 /**
+ * Grayscale image filter class
  * @class fabric.Image.filters.Grayscale
  * @memberOf fabric.Image.filters
  */
 fabric.Image.filters.Grayscale = fabric.util.createClass( /** @scope fabric.Image.filters.Grayscale.prototype */ {
 
   /**
+   * Filter type
    * @param {String} type
    */
   type: "Grayscale",
@@ -13665,6 +13833,7 @@ fabric.Image.filters.Grayscale.fromObject = function() {
 fabric.Image.filters.RemoveWhite = fabric.util.createClass( /** @scope fabric.Image.filters.RemoveWhite.prototype */ {
 
   /**
+   * Filter type
    * @param {String} type
    */
   type: "RemoveWhite",
@@ -13739,6 +13908,7 @@ fabric.Image.filters.RemoveWhite.fromObject = function(object) {
 fabric.Image.filters.Invert = fabric.util.createClass( /** @scope fabric.Image.filters.Invert.prototype */ {
 
   /**
+   * Filter type
    * @param {String} type
    */
   type: "Invert",
@@ -13785,6 +13955,7 @@ fabric.Image.filters.Invert.fromObject = function() {
 fabric.Image.filters.Sepia = fabric.util.createClass( /** @scope fabric.Image.filters.Sepia.prototype */ {
 
   /**
+   * Filter type
    * @param {String} type
    */
   type: "Sepia",
@@ -13832,6 +14003,7 @@ fabric.Image.filters.Sepia.fromObject = function() {
 fabric.Image.filters.Sepia2 = fabric.util.createClass( /** @scope fabric.Image.filters.Sepia2.prototype */ {
 
   /**
+   * Filter type
    * @param {String} type
    */
   type: "Sepia2",
@@ -13883,6 +14055,7 @@ fabric.Image.filters.Sepia2.fromObject = function() {
 fabric.Image.filters.Brightness = fabric.util.createClass( /** @scope fabric.Image.filters.Brightness.prototype */ {
 
   /**
+   * Filter type
    * @param {String} type
    */
   type: "Brightness",
@@ -13940,6 +14113,7 @@ fabric.Image.filters.Brightness.fromObject = function(object) {
 fabric.Image.filters.Noise = fabric.util.createClass( /** @scope fabric.Image.filters.Noise.prototype */ {
 
   /**
+   * Filter type
    * @param {String} type
    */
   type: "Noise",
@@ -14000,6 +14174,7 @@ fabric.Image.filters.Noise.fromObject = function(object) {
 fabric.Image.filters.GradientTransparency = fabric.util.createClass( /** @scope fabric.Image.filters.GradientTransparency.prototype */ {
 
   /**
+   * Filter type
    * @param {String} type
    */
   type: "GradientTransparency",
@@ -14055,6 +14230,7 @@ fabric.Image.filters.GradientTransparency.fromObject = function(object) {
 fabric.Image.filters.Tint = fabric.util.createClass( /** @scope fabric.Image.filters.Tint.prototype */ {
 
   /**
+   * Filter type
    * @param {String} type
    */
   type: "Tint",
@@ -14125,6 +14301,7 @@ fabric.Image.filters.Tint.fromObject = function(object) {
 fabric.Image.filters.Convolute = fabric.util.createClass(/** @scope fabric.Image.filters.Convolute.prototype */ {
 
   /**
+   * Filter type
    * @param {String} type
    */
   type: 'Convolute',
@@ -14234,6 +14411,7 @@ fabric.Image.filters.Convolute.fromObject = function(object) {
 fabric.Image.filters.Pixelate = fabric.util.createClass(/** @scope fabric.Image.filters.Pixelate.prototype */ {
 
   /**
+   * Filter type
    * @param {String} type
    */
   type: 'Pixelate',
@@ -14327,91 +14505,105 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
   }
 
   /**
+   * Text class
    * @class Text
    * @extends fabric.Object
    */
   fabric.Text = fabric.util.createClass(fabric.Object, /** @scope fabric.Text.prototype */ {
 
     /**
+     * Font size
      * @property
      * @type Number
      */
     fontSize:             40,
 
     /**
+     * Font weight (e.g. bold, normal, 400, 600, 800)
      * @property
      * @type Number
      */
     fontWeight:           400,
 
     /**
+     * Font family
      * @property
      * @type String
      */
     fontFamily:           'Times New Roman',
 
     /**
+     * Text decoration (e.g. underline, overline)
      * @property
      * @type String
      */
     textDecoration:       '',
 
     /**
+     * Text shadow
      * @property
      * @type String | null
      */
     textShadow:           '',
 
     /**
-     * Determines text alignment. Possible values: "left", "center", or "right".
+     * Text alignment. Possible values: "left", "center", or "right".
      * @property
      * @type String
      */
     textAlign:            'left',
 
     /**
+     * Font style (e.g. italic)
      * @property
      * @type String
      */
     fontStyle:            '',
 
     /**
+     * Line height
      * @property
      * @type Number
      */
     lineHeight:           1.3,
 
     /**
+     * Stroke style. When specified, text is rendered with stroke
      * @property
      * @type String
      */
     strokeStyle:          '',
 
     /**
+     * Stroke width
      * @property
      * @type Number
      */
     strokeWidth:          1,
 
     /**
+     * Background color of an entire text box
      * @property
      * @type String
      */
     backgroundColor:      '',
 
     /**
+     * Background color of text lines
      * @property
      * @type String
      */
     textBackgroundColor:  '',
 
     /**
+     * URL of a font file, when using Cufon
      * @property
      * @type String | null
      */
     path:                 null,
 
     /**
+     * Type of an object
      * @property
      * @type String
      */
@@ -14692,6 +14884,10 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
       }
     },
 
+    /**
+     * @private
+     * @method _renderTextFill
+     */
     _renderTextFill: function(ctx, textLines) {
       this._boundaries = [ ];
       for (var i = 0, len = textLines.length; i < len; i++) {
@@ -14891,9 +15087,9 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
     },
 
     /**
-     * Returns svg representation of an instance
+     * Returns SVG representation of an instance
      * @method toSVG
-     * @return {string} svg representation of an instance
+     * @return {String} svg representation of an instance
      */
     toSVG: function() {
 
@@ -14932,6 +15128,10 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
       ].join('');
     },
 
+    /**
+     * @private
+     * @method _getSVGShadows
+     */
     _getSVGShadows: function(lineTopOffset, textLines) {
       var shadowSpans = [], j, i, jlen, ilen, lineTopOffsetMultiplier = 1;
 
@@ -14965,6 +15165,10 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
       return shadowSpans;
     },
 
+    /**
+     * @private
+     * @method _getSVGTextAndBg
+     */
     _getSVGTextAndBg: function(lineTopOffset, textLeftOffset, textLines) {
       var textSpans = [ ], textBgRects = [ ], i, lineLeftOffset, len, lineTopOffsetMultiplier = 1;
 
@@ -15027,8 +15231,13 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
       };
     },
 
-    // Adobe Illustrator (at least CS5) is unable to render rgba()-based fill values
-    // we work around it by "moving" alpha channel into opacity attribute and setting fill's alpha to 1
+    /**
+     * Adobe Illustrator (at least CS5) is unable to render rgba()-based fill values
+     * we work around it by "moving" alpha channel into opacity attribute and setting fill's alpha to 1
+     *
+     * @private
+     * @method _getFillAttributes
+     */
     _getFillAttributes: function(value) {
       var fillColor = value ? new fabric.Color(value) : '';
       if (!fillColor || !fillColor.getSource() || fillColor.getAlpha() === 1) {
