@@ -259,9 +259,10 @@
           this._objects[i].setCoords();
         }
 
+        target.isMoving = false;
+
         // only fire :modified event if target coordinates were changed during mousedown-mouseup
         if (this.stateful && target.hasStateChanged()) {
-          target.isMoving = false;
           this.fire('object:modified', { target: target });
           target.fire('modified');
         }
