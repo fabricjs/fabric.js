@@ -173,6 +173,8 @@
      * Applies filters assigned to this image (from "filters" array)
      * @mthod applyFilters
      * @param {Function} callback Callback is invoked when all filters have been applied and new image is generated
+     * @return {fabric.Image} thisArg
+     * @chainable
      */
     applyFilters: function(callback) {
 
@@ -228,6 +230,7 @@
     /**
      * @private
      * @method _render
+     * @param ctx
      */
     _render: function(ctx) {
       ctx.drawImage(

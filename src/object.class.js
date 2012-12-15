@@ -14,6 +14,7 @@
   }
 
   /**
+   * Root object class from which all 2d shape classes inherit from
    * @class Object
    * @memberOf fabric
    */
@@ -27,60 +28,70 @@
     type:                       'object',
 
     /**
+     * Object top offset
      * @property
      * @type Number
      */
     top:                      0,
 
     /**
+     * Object left offset
      * @property
      * @type Number
      */
     left:                     0,
 
     /**
+     * Object width
      * @property
      * @type Number
      */
     width:                    0,
 
     /**
+     * Object height
      * @property
      * @type Number
      */
     height:                   0,
 
     /**
+     * Object scale factor (horizontal)
      * @property
      * @type Number
      */
     scaleX:                   1,
 
     /**
+     * Object scale factor (vertical)
      * @property
      * @type Number
      */
     scaleY:                   1,
 
     /**
+     * When true, an object is rendered as flipped horizontally
      * @property
      * @type Boolean
      */
     flipX:                    false,
 
     /**
+     * When true, an object is rendered as flipped vertically
      * @property
      * @type Boolean
      */
     flipY:                    false,
 
     /**
+     * Opacity of an object
      * @property
      * @type Number
      */
     opacity:                  1,
 
     /**
+     * Angle of rotation of an object
      * @property
      * @type Number
      */
@@ -108,30 +119,35 @@
     padding:                  0,
 
     /**
+     * Border color of an object (when it's active)
      * @property
      * @type String
      */
     borderColor:              'rgba(102,153,255,0.75)',
 
     /**
+     * Corner color of an object (when it's active)
      * @property
      * @type String
      */
     cornerColor:              'rgba(102,153,255,0.5)',
 
     /**
+     * Color of object's fill
      * @property
      * @type String
      */
     fill:                     'rgb(0,0,0)',
 
     /**
+     * Fill rule used to fill an object
      * @property
      * @type String
      */
     fillRule:                 'source-over',
 
     /**
+     * Overlay fill (takes precedence over fill value)
      * @property
      * @type String
      */
@@ -152,18 +168,21 @@
     strokeWidth:              1,
 
     /**
+     * Array specifying dash pattern of an object's stroke
      * @property
      * @type Array
      */
     strokeDashArray:          null,
 
     /**
+     * Opacity of a border when moving an object
      * @property
      * @type Number
      */
     borderOpacityWhenMoving:  0.4,
 
     /**
+     * Border scale factor
      * @property
      * @type Number
      */
@@ -219,6 +238,7 @@
     perPixelTargetFind:       false,
 
     /**
+     * When false, default values are not included in serialization result
      * @property
      * @type Boolean
      */
@@ -259,6 +279,7 @@
     },
 
     /**
+     * Sets object's properties from options
      * @method setOptions
      * @param {Object} [options]
      */
@@ -270,6 +291,7 @@
     },
 
     /**
+     * Transforms context when rendering an object
      * @method transform
      * @param {CanvasRenderingContext2D} ctx Context
      */
@@ -329,7 +351,7 @@
     /**
      * Returns (dataless) object representation of an instance
      * @method toDatalessObject
-     * @param {Array} propertiesToInclude
+     * @param {Array} [propertiesToInclude]
      * @return {Object} object representation of an instance
      */
     toDatalessObject: function(propertiesToInclude) {
@@ -340,7 +362,7 @@
     /**
      * Returns styles-string for svg-export
      * @method getSvgStyles
-     * @return {string}
+     * @return {String}
      */
     getSvgStyles: function() {
       return [
@@ -355,7 +377,7 @@
     /**
      * Returns transform-string for svg-export
      * @method getSvgTransform
-     * @return {string}
+     * @return {String}
      */
     getSvgTransform: function() {
       var angle = this.getAngle();
@@ -453,6 +475,12 @@
       return this;
     },
 
+    /**
+     * @private
+     * @method _set
+     * @param key
+     * @param value
+     */
     _set: function(key, value) {
       var shouldConstrainValue = (key === 'scaleX' || key === 'scaleY') &&
                                   value < fabric.Object.MIN_SCALE_LIMIT;
@@ -479,6 +507,7 @@
     },
 
     /**
+     * Sets sourcePath of an object
      * @method setSourcePath
      * @param {String} value
      * @return {fabric.Object} thisArg
@@ -492,7 +521,7 @@
     /**
      * Basic getter
      * @method get
-     * @param {Any} property
+     * @param {String} property
      * @return {Any} value of a property
      */
     get: function(property) {
@@ -500,6 +529,7 @@
     },
 
     /**
+     * Renders an object on a specified context
      * @method render
      * @param {CanvasRenderingContext2D} ctx context to render on
      * @param {Boolean} noTransform
@@ -1049,6 +1079,7 @@
     },
 
     /**
+     * Returns true if object state (one of its state properties) was changed
      * @method hasStateChanged
      * @return {Boolean} true if instance' state has changed
      */
@@ -1059,6 +1090,7 @@
     },
 
     /**
+     * Saves state of an object
      * @method saveState
      * @return {fabric.Object} thisArg
      * @chainable
@@ -1071,6 +1103,7 @@
     },
 
     /**
+     * Setups state of an object
      * @method setupState
      */
     setupState: function() {
@@ -1157,9 +1190,10 @@
     },
 
     /**
+     * Returns true if specified type is identical to the type of an instance
      * @method isType
      * @param type {String} type to check against
-     * @return {Boolean} true if specified type is identical to the type of instance
+     * @return {Boolean}
      */
     isType: function(type) {
       return this.type === type;
@@ -1497,8 +1531,9 @@
     },
 
     /**
+     * Returns complexity of an instance
      * @method complexity
-     * @return {Number}
+     * @return {Number} complexity
      */
     complexity: function() {
       return 0;
@@ -1516,6 +1551,7 @@
     },
 
     /**
+     * Sets gradient fill of an object
      * @method setGradientFill
      */
     setGradientFill: function(options) {
@@ -1523,6 +1559,7 @@
     },
 
     /**
+     * Animates object's properties
      * @method animate
      *
      * As object — multiple properties
@@ -1707,6 +1744,7 @@
     NUM_FRACTION_DIGITS:        2,
 
     /**
+     * Minimum allowed scale value of an object
      * @static
      * @constant
      * @type Number

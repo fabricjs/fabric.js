@@ -10,12 +10,14 @@
   }
 
   /**
+   * Color class
    * The purpose of {@link fabric.Color} is to abstract and encapsulate common color operations;
    * {@link fabric.Color} is a constructor and creates instances of {@link fabric.Color} objects.
    *
    * @class Color
    * @memberOf fabric
    * @param {String} color optional in hex or rgb(a) format
+   * @return {fabric.Color} thisArg
    */
   function Color(color) {
     if (!color) {

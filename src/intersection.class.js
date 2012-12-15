@@ -12,6 +12,7 @@
   }
 
   /**
+   * Intersection class
    * @class Intersection
    * @memberOf fabric
    */
@@ -26,6 +27,7 @@
   fabric.Intersection.prototype = /** @scope fabric.Intersection.prototype */ {
 
     /**
+     * Constructor
      * @method init
      * @param {String} status
      */
@@ -35,16 +37,18 @@
     },
 
     /**
+     * Appends a point to intersection
      * @method appendPoint
-     * @param {String} status
+     * @param {fabric.Point} point
      */
     appendPoint: function (point) {
       this.points.push(point);
     },
 
     /**
+     * Appends points to intersection
      * @method appendPoints
-     * @param {String} status
+     * @param {Array} points
      */
     appendPoints: function (points) {
       this.points = this.points.concat(points);

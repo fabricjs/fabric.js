@@ -13,6 +13,9 @@
     return;
   }
 
+  // lock-related properties, for use in fabric.Group#get
+  // to enable locking behavior on group
+  // when one of its objects has lock-related properties set
   var _lockProperties = {
     lockMovementX:  true,
     lockMovementY:  true,
@@ -174,10 +177,24 @@
     },
 
     /**
+     * Properties that are delegated to group objects when reading/writing
+     */
+    delegatedProperties: {
+      fill:             true,
+      opacity:          true,
+      fontFamily:       true,
+      fontWeight:       true,
+      lineHeight:       true,
+      textDecoration:   true,
+      textShadow:       true,
+      backgroundColor:  true
+    },
+
+    /**
      * @private
      */
     _set: function(key, value) {
-      if (key === 'fill' || key === 'opacity') {
+      if (key in this.delegatedProperties) {
         var i = this.objects.length;
         this[key] = value;
         while (i--) {
@@ -460,12 +477,15 @@
     /**
      * Makes all of this group's objects grayscale (i.e. calling `toGrayscale` on them)
      * @method toGrayscale
+     * @return {fabric.Group} thisArg
+     * @chainable
      */
     toGrayscale: function() {
       var i = this.objects.length;
       while (i--) {
         this.objects[i].toGrayscale();
       }
+      return this;
     },
 
     /**
@@ -486,10 +506,10 @@
     },
 
     /**
-     * Returns true if any of the objects have truthy specified property
-     * @method some
-     * @param {String} prop Property to check
-     * @return {Boolean}
+     * Returns requested property
+     * @method get
+     * @param {String} prop Property to get
+     * @return {Any}
      */
     get: function(prop) {
       if (prop in _lockProperties) {
@@ -526,6 +546,11 @@
     });
   };
 
+  /**
+   * Indicates that instances of this type are async
+   * @static
+   * @type Boolean
+   */
   fabric.Group.async = true;
 
 })(typeof exports !== 'undefined' ? exports : this);

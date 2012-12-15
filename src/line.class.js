@@ -28,7 +28,7 @@
     /**
      * Constructor
      * @method initialize
-     * @param {Array} points Array of points
+     * @param {Array} [points] Array of points
      * @param {Object} [options] Options object
      * @return {fabric.Line} thisArg
      */
