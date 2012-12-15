@@ -529,7 +529,7 @@
         value *= -1;
       }
       else if (key === 'width' || key === 'height') {
-        this.minScaleLimit = Math.min(0.1, 1/Math.max(this.width, this.height));
+        this.minScaleLimit = toFixed(Math.min(0.1, 1/Math.max(this.width, this.height)), 2);
       }
 
       this[key] = value;

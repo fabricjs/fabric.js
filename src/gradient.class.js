@@ -151,18 +151,18 @@
       if (typeof options[prop] === 'string' && /^\d+%$/.test(options[prop])) {
         var percents = parseFloat(options[prop], 10);
         if (prop === 'x1' || prop === 'x2') {
-          options[prop] = object.width * percents / 100;
+          options[prop] = fabric.util.toFixed(object.width * percents / 100, 2);
         }
         else if (prop === 'y1' || prop === 'y2') {
-          options[prop] = object.height * percents / 100;
+          options[prop] = fabric.util.toFixed(object.height * percents / 100, 2);
         }
       }
       // normalize rendering point (should be from top/left corner rather than center of the shape)
       if (prop === 'x1' || prop === 'x2') {
-        options[prop] -= object.width / 2;
+        options[prop] -= fabric.util.toFixed(object.width / 2, 2);
       }
       else if (prop === 'y1' || prop === 'y2') {
-        options[prop] -= object.height / 2;
+        options[prop] -= fabric.util.toFixed(object.height / 2, 2);
       }
     }
   }
