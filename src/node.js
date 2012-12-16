@@ -11,6 +11,7 @@
       Canvas = require('canvas'),
       Image = require('canvas').Image;
 
+  /** @private */
   function request(url, encoding, callback) {
     var oURL = URL.parse(url),
         client = HTTP.createClient(oURL.port, oURL.hostname),
@@ -65,7 +66,6 @@
     });
   };
 
-  /** @ignore */
   fabric.loadSVGFromString = function(string, callback) {
     var doc = new DOMParser().parseFromString(string);
     fabric.parseSVGDocument(doc.documentElement, function(results, options) {

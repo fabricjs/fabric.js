@@ -562,47 +562,51 @@
       return { x: x, y: y };
     },
 
+    /**
+     * @private
+     * @method _isTargetTransparent
+     */
     _isTargetTransparent: function (target, x, y) {
-        var cacheContext = this.contextCache;
+      var cacheContext = this.contextCache;
 
-        var hasBorders = target.hasBorders, transparentCorners = target.transparentCorners;
-        target.hasBorders = target.transparentCorners = false;
+      var hasBorders = target.hasBorders, transparentCorners = target.transparentCorners;
+      target.hasBorders = target.transparentCorners = false;
 
-        this._draw(cacheContext, target);
+      this._draw(cacheContext, target);
 
-        target.hasBorders = hasBorders;
-        target.transparentCorners = transparentCorners;
+      target.hasBorders = hasBorders;
+      target.transparentCorners = transparentCorners;
 
-        // If tolerance is > 0 adjust start coords to take into account. If moves off Canvas fix to 0
-        if (this.targetFindTolerance > 0) {
-          if (x > this.targetFindTolerance) {
-            x -= this.targetFindTolerance;
-          }
-          else {
-            x = 0;
-          }
-          if (y > this.targetFindTolerance) {
-            y -= this.targetFindTolerance;
-          }
-          else {
-            y = 0;
-          }
+      // If tolerance is > 0 adjust start coords to take into account. If moves off Canvas fix to 0
+      if (this.targetFindTolerance > 0) {
+        if (x > this.targetFindTolerance) {
+          x -= this.targetFindTolerance;
         }
-
-        var isTransparent = true;
-        var imageData = cacheContext.getImageData(
-          x, y, (this.targetFindTolerance * 2) || 1, (this.targetFindTolerance * 2) || 1);
-
-        // Split image data - for tolerance > 1, pixelDataSize = 4;
-        for (var i = 3; i < imageData.data.length; i += 4) {
-            var temp = imageData.data[i];
-            isTransparent = temp <= 0;
-            if (isTransparent === false) break; //Stop if colour found
+        else {
+          x = 0;
         }
+        if (y > this.targetFindTolerance) {
+          y -= this.targetFindTolerance;
+        }
+        else {
+          y = 0;
+        }
+      }
 
-        imageData = null;
-        this.clearContext(cacheContext);
-        return isTransparent;
+      var isTransparent = true;
+      var imageData = cacheContext.getImageData(
+        x, y, (this.targetFindTolerance * 2) || 1, (this.targetFindTolerance * 2) || 1);
+
+      // Split image data - for tolerance > 1, pixelDataSize = 4;
+      for (var i = 3; i < imageData.data.length; i += 4) {
+          var temp = imageData.data[i];
+          isTransparent = temp <= 0;
+          if (isTransparent === false) break; //Stop if colour found
+      }
+
+      imageData = null;
+      this.clearContext(cacheContext);
+      return isTransparent;
     },
 
     /**
@@ -665,6 +669,10 @@
       };
     },
 
+    /**
+     * @private
+     * @method _handleGroupLogic
+     */
     _handleGroupLogic: function (e, target) {
       if (target === this.getActiveGroup()) {
         // if it's a group, find target again, this time skipping group
@@ -895,10 +903,10 @@
      *
      * @method drawDashedLine
      * @param ctx {Canvas} context
-     * @param x {number} start x coordinate
-     * @param y {number} start y coordinate
-     * @param x2 {number} end x coordinate
-     * @param y2 {number} end y coordinate
+     * @param x {Number} start x coordinate
+     * @param y {Number} start y coordinate
+     * @param x2 {Number} end x coordinate
+     * @param y2 {Number} end y coordinate
      * @param da {Array} dash array pattern
      */
     drawDashedLine: function(ctx, x, y, x2, y2, da) {
@@ -928,6 +936,10 @@
       ctx.restore();
     },
 
+    /**
+     * @private
+     * @method _findSelectedObjects
+     */
     _findSelectedObjects: function (e) {
       var group = [ ],
           x1 = this._groupSelector.ex,
@@ -1035,6 +1047,7 @@
     },
 
     /**
+     * @private
      * @method _createUpperCanvas
      * @param {HTMLElement|String} canvasEl Canvas element
      * @throws {CANVAS_INIT_ERROR} If canvas can not be initialized
@@ -1049,6 +1062,10 @@
       this.contextTop = this.upperCanvasEl.getContext('2d');
     },
 
+    /**
+     * @private
+     * @method _createCacheCanvas
+     */
     _createCacheCanvas: function () {
       this.cacheCanvasEl = this._createCanvasElement();
       this.cacheCanvasEl.setAttribute('width', this.width);

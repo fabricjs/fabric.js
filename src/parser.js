@@ -414,6 +414,9 @@
     return allRules;
   }
 
+  /**
+   * @private
+   */
   function getGlobalStylesForElement(element) {
     var nodeName = element.nodeName,
         className = element.getAttribute('class'),
@@ -662,6 +665,12 @@
     }, reviver);
   }
 
+  /**
+   * Creates markup containing SVG font faces
+   * @method createSVGFontFacesMarkup
+   * @param {Array} objects Array of fabric objects
+   * @return {String}
+   */
   function createSVGFontFacesMarkup(objects) {
     var markup = '';
 

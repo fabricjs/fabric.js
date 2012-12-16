@@ -16,6 +16,7 @@
       CANVAS_INIT_ERROR = new Error('Could not initialize `canvas` element');
 
   /**
+   * Static canvas class
    * @class fabric.StaticCanvas
    * @constructor
    * @param {HTMLElement | String} el &lt;canvas> element to initialize instance on
@@ -278,7 +279,7 @@
     },
 
     /**
-     * Returns canvas width
+     * Returns canvas width (in px)
      * @method getWidth
      * @return {Number}
      */
@@ -287,7 +288,7 @@
     },
 
     /**
-     * Returns canvas height
+     * Returns canvas height (in px)
      * @method getHeight
      * @return {Number}
      */
@@ -449,7 +450,8 @@
      * @param object {Object} Object to insert
      * @param index {Number} index to insert object at
      * @param nonSplicing {Boolean} when `true`, no splicing (shifting) of objects occurs
-     * @return {fabric.Canvas} instance
+     * @return {fabric.Canvas} thisArg
+     * @chainable
      */
     insertAt: function (object, index, nonSplicing) {
       if (nonSplicing) {
@@ -580,6 +582,10 @@
       return this;
     },
 
+    /**
+     * @private
+     * @method _clipCanvas
+     */
     _clipCanvas: function(canvasToDrawOn) {
       canvasToDrawOn.save();
       canvasToDrawOn.beginPath();
@@ -587,6 +593,10 @@
       canvasToDrawOn.clip();
     },
 
+    /**
+     * @private
+     * @method _drawBackroundImage
+     */
     _drawBackroundImage: function(canvasToDrawOn) {
       canvasToDrawOn.save();
       canvasToDrawOn.globalAlpha = this.backgroundImageOpacity;
