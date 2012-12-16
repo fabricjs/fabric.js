@@ -109,11 +109,11 @@
   });
 
   test('toJSON', function() {
-    var emptyObjectJSON = '{"type":"object","left":0,"top":0,"width":0,"height":0,"fill":"rgb(0,0,0)",'+
+    var emptyObjectJSON = '{"type":"object","originX":"center","originY":"center","left":0,"top":0,"width":0,"height":0,"fill":"rgb(0,0,0)",'+
                           '"overlayFill":null,"stroke":null,"strokeWidth":1,"strokeDashArray":null,"scaleX":1,"scaleY":1,"angle":0,'+
                           '"flipX":false,"flipY":false,"opacity":1,"selectable":true,"hasControls":true,"hasBorders":true,"hasRotatingPoint":false,"transparentCorners":true,"perPixelTargetFind":false}';
 
-    var augmentedJSON = '{"type":"object","left":0,"top":0,"width":122,"height":0,"fill":"rgb(0,0,0)",'+
+    var augmentedJSON = '{"type":"object","originX":"center","originY":"center","left":0,"top":0,"width":122,"height":0,"fill":"rgb(0,0,0)",'+
                         '"overlayFill":null,"stroke":null,"strokeWidth":1,"strokeDashArray":null,"scaleX":1.3,"scaleY":1,"angle":0,'+
                         '"flipX":false,"flipY":true,"opacity":0.88,"selectable":true,"hasControls":true,"hasBorders":true,"hasRotatingPoint":false,"transparentCorners":true,"perPixelTargetFind":false}';
 
@@ -128,6 +128,8 @@
   test('toObject', function() {
     var emptyObjectRepr = {
       'type': "object",
+      'originX': 'center',
+      'originY': 'center',
       'left': 0,
       'top': 0,
       'width': 0,
@@ -153,6 +155,8 @@
 
     var augmentedObjectRepr = {
       'type': "object",
+      'originX': 'center',
+      'originY': 'center',
       'left': 10,
       'top': 20,
       'width': 30,

@@ -61,6 +61,8 @@
     var circle = new fabric.Circle();
     var defaultProperties = {
       'type': 'circle',
+      'originX': 'center',
+      'originY': 'center',
       'left': 0,
       'top': 0,
       'width': 0,
@@ -69,7 +71,7 @@
       'overlayFill': null,
       'stroke': null,
       'strokeWidth': 1,
-	  'strokeDashArray': null,
+      'strokeDashArray': null,
       'scaleX': 1,
       'scaleY': 1,
       'angle': 0,

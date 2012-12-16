@@ -2,6 +2,8 @@
 
   var REFERENCE_RECT = {
     'type': 'rect',
+    'originX': 'center',
+    'originY': 'center',
     'left': 0,
     'top': 0,
     'width': 0,

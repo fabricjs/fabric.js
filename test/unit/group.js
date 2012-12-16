@@ -124,6 +124,8 @@
 
     var expectedObject = {
       'type': 'group',
+      'originX': 'center',
+      'originY': 'center',
       'left': 80,
       'top': 117.5,
       'width': 70,

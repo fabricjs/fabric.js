@@ -9,6 +9,8 @@
 
   var REFERENCE_OBJECT = {
     'type':         'polyline',
+    'originX':      'center',
+    'originY':      'center',
     'left':         0,
     'top':          0,
     'width':        10,
