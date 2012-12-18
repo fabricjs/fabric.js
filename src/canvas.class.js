@@ -459,51 +459,57 @@
             this._rotateObject(x, y);
 
             this.fire('object:rotating', {
-              target: this._currentTransform.target
+              target: this._currentTransform.target,
+              e: e
             });
-            this._currentTransform.target.fire('rotating');
+            this._currentTransform.target.fire('rotating', { e: e });
           }
           if (!this._currentTransform.target.hasRotatingPoint) {
             this._scaleObject(x, y);
             this.fire('object:scaling', {
-              target: this._currentTransform.target
+              target: this._currentTransform.target,
+              e: e
             });
-            this._currentTransform.target.fire('scaling');
+            this._currentTransform.target.fire('scaling', { e: e });
           }
         }
         else if (this._currentTransform.action === 'scale') {
           this._scaleObject(x, y);
           this.fire('object:scaling', {
-            target: this._currentTransform.target
+            target: this._currentTransform.target,
+            e: e
           });
-          this._currentTransform.target.fire('scaling');
+          this._currentTransform.target.fire('scaling', { e: e });
         }
         else if (this._currentTransform.action === 'scaleX') {
           this._scaleObject(x, y, 'x');
 
           this.fire('object:scaling', {
-            target: this._currentTransform.target
+            target: this._currentTransform.target,
+            e: e
           });
-          this._currentTransform.target.fire('scaling');
+          this._currentTransform.target.fire('scaling', { e: e });
         }
         else if (this._currentTransform.action === 'scaleY') {
           this._scaleObject(x, y, 'y');
 
           this.fire('object:scaling', {
-            target: this._currentTransform.target
+            target: this._currentTransform.target,
+            e: e
           });
-          this._currentTransform.target.fire('scaling');
+          this._currentTransform.target.fire('scaling', { e: e });
         }
         else {
           this._translateObject(x, y);
 
           this.fire('object:moving', {
-            target: this._currentTransform.target
+            target: this._currentTransform.target,
+            e: e
           });
 
           this._setCursor(this.moveCursor);
 
-          this._currentTransform.target.fire('moving');
+          this._currentTransform.target.fire('moving', { e: e });
         }
         // only commit here. when we are actually moving the pictures
         this.renderAll();
