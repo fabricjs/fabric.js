@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL` */
 /*! Fabric.js Copyright 2008-2012, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.9.32" };
+var fabric = fabric || { version: "0.9.33" };
 
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
@@ -14590,7 +14590,7 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
 
       this._renderTextBackground(ctx, textLines);
 
-      if (this.textAlign !== 'left') {
+      if (this.textAlign !== 'left' && this.textAlign !== 'justify') {
         ctx.save();
         ctx.translate(this.textAlign === 'center' ? (this.width / 2) : this.width, 0);
       }
@@ -14600,7 +14600,7 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
       this.textShadow && ctx.restore();
 
       this._renderTextStroke(ctx, textLines);
-      if (this.textAlign !== 'left') {
+      if (this.textAlign !== 'left' && this.textAlign !== 'justify') {
         ctx.restore();
       }
 
@@ -14620,7 +14620,7 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
 
       for (var i = 0, len = textLines.length; i < len; i++) {
 
-        var lineWidth = ctx.measureText(textLines[i]).width;
+        var lineWidth = this._getLineWidth(ctx, textLines[i]);
         var lineLeftOffset = this._getLineLeftOffset(lineWidth);
 
         this._boundaries.push({
@@ -14708,12 +14708,54 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
 
     /**
      * @private
+     * @method _drawTextLine
+     * @param method
+     * @param ctx
+     * @param line
+     * @param left
+     * param top
+     */
+    _drawTextLine: function(method, ctx, line, left, top) {
+
+      // short-circuit
+      if (this.textAlign !== 'justify') {
+        ctx[method](line, left, top);
+        return;
+      }
+
+      var lineWidth = ctx.measureText(line).width;
+      var totalWidth = this.width;
+
+      if (totalWidth > lineWidth) {
+        // stretch the line
+
+        var words = line.split(/\s+/);
+        var wordsWidth = ctx.measureText(line.replace(/\s+/g, '')).width;
+        var widthDiff = totalWidth - wordsWidth;
+        var numSpaces = words.length - 1;
+        var spaceWidth = widthDiff / numSpaces;
+
+        var leftOffset = 0;
+        for (var i = 0, len = words.length; i < len; i++) {
+          ctx[method](words[i], left + leftOffset, top);
+          leftOffset += ctx.measureText(words[i]).width + spaceWidth;
+        }
+      }
+      else {
+        ctx[method](line, left, top);
+      }
+    },
+
+    /**
+     * @private
      * @method _renderTextFill
      */
     _renderTextFill: function(ctx, textLines) {
       this._boundaries = [ ];
       for (var i = 0, len = textLines.length; i < len; i++) {
-        ctx.fillText(
+        this._drawTextLine(
+          'fillText',
+          ctx,
           textLines[i],
           -this.width / 2,
           (-this.height / 2) + (i * this.fontSize * this.lineHeight) + this.fontSize
@@ -14729,7 +14771,9 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
       if (this.strokeStyle) {
         ctx.beginPath();
         for (var i = 0, len = textLines.length; i < len; i++) {
-          ctx.strokeText(
+          this._drawTextLine(
+            'strokeText',
+            ctx,
             textLines[i],
             -this.width / 2,
             (-this.height / 2) + (i * this.fontSize * this.lineHeight) + this.fontSize
@@ -14741,9 +14785,18 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
 
     /**
      * @private
-     * @_renderTextBackground
+     * @method _renderTextBackground
      */
     _renderTextBackground: function(ctx, textLines) {
+      this._renderTextBoxBackground(ctx);
+      this._renderTextLinesBackground(ctx, textLines);
+    },
+
+    /**
+     * @private
+     * @method _renderTextBoxBackground
+     */
+    _renderTextBoxBackground: function(ctx) {
       if (this.backgroundColor) {
         ctx.save();
         ctx.fillStyle = this.backgroundColor;
@@ -14757,7 +14810,13 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
 
         ctx.restore();
       }
+    },
 
+    /**
+     * @private
+     * @method _renderTextLinesBackground
+     */
+    _renderTextLinesBackground: function(ctx, textLines) {
       if (this.textBackgroundColor) {
         ctx.save();
         ctx.fillStyle = this.textBackgroundColor;
@@ -14765,7 +14824,8 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
         for (var i = 0, len = textLines.length; i < len; i++) {
 
           if (textLines[i] !== '') {
-            var lineWidth = ctx.measureText(textLines[i]).width;
+
+            var lineWidth = this._getLineWidth(ctx, textLines[i]);
             var lineLeftOffset = this._getLineLeftOffset(lineWidth);
 
             ctx.fillRect(
@@ -14796,6 +14856,18 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
 
     /**
      * @private
+     * @method _getLineWidth
+     * @param ctx
+     * @param line
+     */
+    _getLineWidth: function(ctx, line) {
+      return this.textAlign === 'justify'
+        ? this.width
+        : ctx.measureText(line).width;
+    },
+
+    /**
+     * @private
      * @method _renderTextDecoration
      */
     _renderTextDecoration: function(ctx, textLines) {
@@ -14807,7 +14879,7 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
       function renderLinesAtOffset(offset) {
         for (var i = 0, len = textLines.length; i < len; i++) {
 
-          var lineWidth = ctx.measureText(textLines[i]).width;
+          var lineWidth = _this._getLineWidth(ctx, textLines[i]);
           var lineLeftOffset = _this._getLineLeftOffset(lineWidth);
 
           ctx.fillRect(
@@ -15018,16 +15090,17 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
           lineLeftOffset = (this._boundaries && this._boundaries[i]) ? toFixed(this._boundaries[i].left, 2) : 0;
           textSpans.push(
             '<tspan x="',
-            lineLeftOffset, '" ',
-            (i === 0 || this.useNative ? 'y' : 'dy'), '="',
-            toFixed(this.useNative ? ((lineTopOffset * i) - this.height / 2) : (lineTopOffset * lineTopOffsetMultiplier), 2) , '" ',
-            // doing this on <tspan> elements since setting opacity on containing <text> one doesn't work in Illustrator
-            this._getFillAttributes(this.fill), '>',
-            fabric.util.string.escapeXml(textLines[i]),
+              lineLeftOffset, '" ',
+              (i === 0 || this.useNative ? 'y' : 'dy'), '="',
+              toFixed(this.useNative ? ((lineTopOffset * i) - this.height / 2) : (lineTopOffset * lineTopOffsetMultiplier), 2) , '" ',
+              // doing this on <tspan> elements since setting opacity on containing <text> one doesn't work in Illustrator
+              this._getFillAttributes(this.fill), '>',
+              fabric.util.string.escapeXml(textLines[i]),
             '</tspan>'
           );
           lineTopOffsetMultiplier = 1;
-        } else {
+        }
+        else {
           // in some environments (e.g. IE 7 & 8) empty tspans are completely ignored, using a lineTopOffsetMultiplier
           // prevents empty tspans
           lineTopOffsetMultiplier++;
