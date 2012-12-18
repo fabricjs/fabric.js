@@ -20,7 +20,7 @@
    * @class FreeDrawing
    * @memberOf fabric
    */
-  fabric.FreeDrawing = fabric.util.createClass({
+  fabric.FreeDrawing = fabric.util.createClass( /** @scope fabric.FreeDrawing.prototype */ {
 
     /**
      * Constructor

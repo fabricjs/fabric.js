@@ -637,9 +637,9 @@
     },
 
     /**
-     * Sets corner position coordinates based on current angle, width and height.
+     * Sets corner position coordinates based on current angle, width and height
      * @method setCoords
-     * return {fabric.Object} thisArg
+     * @return {fabric.Object} thisArg
      * @chainable
      */
     setCoords: function() {

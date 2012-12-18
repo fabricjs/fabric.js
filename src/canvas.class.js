@@ -27,6 +27,7 @@
       STROKE_OFFSET = 0.5;
 
   /**
+   * Canvas class
    * @class fabric.Canvas
    * @constructor
    * @extends fabric.StaticCanvas
@@ -895,11 +896,11 @@
       }
     },
 
-    /*
+    /**
      * Draws a dashed line between two points
      *
-     * this method is used to draw dashed line around selection area.
-     * http://stackoverflow.com/questions/4576724/dotted-stroke-in-canvas
+     * This method is used to draw dashed line around selection area.
+     * See <a href="http://stackoverflow.com/questions/4576724/dotted-stroke-in-canvas">dotted stroke in canvas</a>
      *
      * @method drawDashedLine
      * @param ctx {Canvas} context
@@ -1036,6 +1037,7 @@
     /**
      * Returns pointer coordinates relative to canvas.
      * @method getPointer
+     * @param {Event} e
      * @return {Object} object with "x" and "y" number values
      */
     getPointer: function (e) {

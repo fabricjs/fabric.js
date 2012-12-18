@@ -2029,6 +2029,14 @@ fabric.Observable.off = fabric.Observable.stopObserving;
     }
   }
 
+  /**
+   * Creates corresponding fabric instances from their object representations
+   * @static
+   * @memberOf fabric.util
+   * @method enlivenObjects
+   * @param {Array} objects Objects to enliven
+   * @param {Function} callback Callback to invoke when all objects are created
+   */
   function enlivenObjects(objects, callback) {
 
     function getKlass(type) {
@@ -6534,7 +6542,7 @@ fabric.util.string = {
    * @class FreeDrawing
    * @memberOf fabric
    */
-  fabric.FreeDrawing = fabric.util.createClass({
+  fabric.FreeDrawing = fabric.util.createClass( /** @scope fabric.FreeDrawing.prototype */ {
 
     /**
      * Constructor
@@ -6789,6 +6797,7 @@ fabric.util.string = {
       STROKE_OFFSET = 0.5;
 
   /**
+   * Canvas class
    * @class fabric.Canvas
    * @constructor
    * @extends fabric.StaticCanvas
@@ -7657,11 +7666,11 @@ fabric.util.string = {
       }
     },
 
-    /*
+    /**
      * Draws a dashed line between two points
      *
-     * this method is used to draw dashed line around selection area.
-     * http://stackoverflow.com/questions/4576724/dotted-stroke-in-canvas
+     * This method is used to draw dashed line around selection area.
+     * See <a href="http://stackoverflow.com/questions/4576724/dotted-stroke-in-canvas">dotted stroke in canvas</a>
      *
      * @method drawDashedLine
      * @param ctx {Canvas} context
@@ -7798,6 +7807,7 @@ fabric.util.string = {
     /**
      * Returns pointer coordinates relative to canvas.
      * @method getPointer
+     * @param {Event} e
      * @return {Object} object with "x" and "y" number values
      */
     getPointer: function (e) {
@@ -9068,9 +9078,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     },
 
     /**
-     * Sets corner position coordinates based on current angle, width and height.
+     * Sets corner position coordinates based on current angle, width and height
      * @method setCoords
-     * return {fabric.Object} thisArg
+     * @return {fabric.Object} thisArg
      * @chainable
      */
     setCoords: function() {
@@ -11122,7 +11132,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * Returns SVG representation of an instance
      * @method toSVG
-     * @return {string} svg representation of an instance
+     * @return {String} svg representation of an instance
      */
     toSVG: function() {
       var points = [];
@@ -13569,6 +13579,7 @@ fabric.Image.filters.RemoveWhite = fabric.util.createClass( /** @scope fabric.Im
   type: "RemoveWhite",
 
   /**
+   * Constructor
    * @memberOf fabric.Image.filters.RemoveWhite.prototype
    * @param {Object} [options] Options object
    */
@@ -13819,6 +13830,7 @@ fabric.Image.filters.Brightness = fabric.util.createClass( /** @scope fabric.Ima
   type: "Brightness",
 
   /**
+   * Constructor
    * @memberOf fabric.Image.filters.Brightness.prototype
    * @param {Object} [options] Options object
    */
@@ -13884,6 +13896,7 @@ fabric.Image.filters.Noise = fabric.util.createClass( /** @scope fabric.Image.fi
   type: "Noise",
 
   /**
+   * Constructor
    * @memberOf fabric.Image.filters.Noise.prototype
    * @param {Object} [options] Options object
    */
@@ -13952,6 +13965,8 @@ fabric.Image.filters.GradientTransparency = fabric.util.createClass( /** @scope 
   type: "GradientTransparency",
 
   /**
+   * Constructor
+   * @memberOf fabric.Image.filters.GradientTransparency
    * @param {Object} [options] Options object
    */
   initialize: function(options) {
@@ -14015,6 +14030,7 @@ fabric.Image.filters.Tint = fabric.util.createClass( /** @scope fabric.Image.fil
   type: "Tint",
 
   /**
+   * Constructor
    * @memberOf fabric.Image.filters.Tint.prototype
    * @param {Object} [options] Options object
    */
@@ -14092,6 +14108,7 @@ fabric.Image.filters.Convolute = fabric.util.createClass(/** @scope fabric.Image
   type: 'Convolute',
 
   /**
+   * Constructor
    * @memberOf fabric.Image.filters.Convolute.prototype
    * @param {Object} [options] Options object
    */
@@ -14209,6 +14226,7 @@ fabric.Image.filters.Pixelate = fabric.util.createClass(/** @scope fabric.Image.
   type: 'Pixelate',
 
   /**
+   * Constructor
    * @memberOf fabric.Image.filters.Pixelate.prototype
    * @param {Object} [options] Options object
    */

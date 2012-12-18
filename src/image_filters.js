@@ -79,6 +79,7 @@ fabric.Image.filters.RemoveWhite = fabric.util.createClass( /** @scope fabric.Im
   type: "RemoveWhite",
 
   /**
+   * Constructor
    * @memberOf fabric.Image.filters.RemoveWhite.prototype
    * @param {Object} [options] Options object
    */
@@ -329,6 +330,7 @@ fabric.Image.filters.Brightness = fabric.util.createClass( /** @scope fabric.Ima
   type: "Brightness",
 
   /**
+   * Constructor
    * @memberOf fabric.Image.filters.Brightness.prototype
    * @param {Object} [options] Options object
    */
@@ -394,6 +396,7 @@ fabric.Image.filters.Noise = fabric.util.createClass( /** @scope fabric.Image.fi
   type: "Noise",
 
   /**
+   * Constructor
    * @memberOf fabric.Image.filters.Noise.prototype
    * @param {Object} [options] Options object
    */
@@ -462,6 +465,8 @@ fabric.Image.filters.GradientTransparency = fabric.util.createClass( /** @scope 
   type: "GradientTransparency",
 
   /**
+   * Constructor
+   * @memberOf fabric.Image.filters.GradientTransparency
    * @param {Object} [options] Options object
    */
   initialize: function(options) {
@@ -525,6 +530,7 @@ fabric.Image.filters.Tint = fabric.util.createClass( /** @scope fabric.Image.fil
   type: "Tint",
 
   /**
+   * Constructor
    * @memberOf fabric.Image.filters.Tint.prototype
    * @param {Object} [options] Options object
    */
@@ -602,6 +608,7 @@ fabric.Image.filters.Convolute = fabric.util.createClass(/** @scope fabric.Image
   type: 'Convolute',
 
   /**
+   * Constructor
    * @memberOf fabric.Image.filters.Convolute.prototype
    * @param {Object} [options] Options object
    */
@@ -719,6 +726,7 @@ fabric.Image.filters.Pixelate = fabric.util.createClass(/** @scope fabric.Image.
   type: 'Pixelate',
 
   /**
+   * Constructor
    * @memberOf fabric.Image.filters.Pixelate.prototype
    * @param {Object} [options] Options object
    */
