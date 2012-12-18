@@ -20,7 +20,7 @@
    * @class FreeDrawing
    * @memberOf fabric
    */
-  fabric.FreeDrawing = fabric.util.createClass({
+  fabric.FreeDrawing = fabric.util.createClass( /** @scope fabric.FreeDrawing.prototype */ {
 
     /**
      * Constructor
@@ -100,6 +100,8 @@
 
       var p1 = this._points[0];
       var p2 = this._points[1];
+
+      ctx.moveTo(p1.x, p1.y);
 
       for (var i = 1, len = this._points.length; i < len; i++) {
         // we pick the point between pi+1 & pi+2 as the
@@ -228,7 +230,7 @@
       var originLeft = this.box.minx  + (this.box.maxx - this.box.minx) /2;
       var originTop = this.box.miny  + (this.box.maxy - this.box.miny) /2;
 
-      this.canvas.contextTop.arc(originLeft, originTop, 3, 0, Math.PI * 2);
+      this.canvas.contextTop.arc(originLeft, originTop, 3, 0, Math.PI * 2, false);
 
       p.set({ left: originLeft, top: originTop });
 

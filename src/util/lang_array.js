@@ -3,6 +3,12 @@
   var slice = Array.prototype.slice;
 
   if (!Array.prototype.indexOf) {
+    /**
+     * Finds index of an element in an array
+     * @method indexOf
+     * @param {Any} searchElement
+     * @param {Number} [fromIndex]
+     */
     Array.prototype.indexOf = function (searchElement /*, fromIndex */ ) {
       if (this === void 0 || this === null) {
         throw new TypeError();
@@ -35,6 +41,12 @@
   }
 
   if (!Array.prototype.forEach) {
+    /**
+     * Iterates an array, invoking callback for each element
+     * @method forEach
+     * @param {Function} fn Callback to invoke for each element
+     * @param {Object} [context] Context to invoke callback in
+     */
     Array.prototype.forEach = function(fn, context) {
       for (var i = 0, len = this.length >>> 0; i < len; i++) {
         if (i in this) {
@@ -45,6 +57,12 @@
   }
 
   if (!Array.prototype.map) {
+    /**
+     * Returns a result of iterating over an array, invoking callback for each element
+     * @method map
+     * @param {Function} fn Callback to invoke for each element
+     * @param {Object} [context] Context to invoke callback in
+     */
     Array.prototype.map = function(fn, context) {
       var result = [ ];
       for (var i = 0, len = this.length >>> 0; i < len; i++) {
@@ -57,6 +75,12 @@
   }
 
   if (!Array.prototype.every) {
+    /**
+     * Returns true if a callback returns truthy value for all elements in an array
+     * @method every
+     * @param {Function} fn Callback to invoke for each element
+     * @param {Object} [context] Context to invoke callback in
+     */
     Array.prototype.every = function(fn, context) {
       for (var i = 0, len = this.length >>> 0; i < len; i++) {
         if (i in this && !fn.call(context, this[i], i, this)) {
@@ -68,6 +92,12 @@
   }
 
   if (!Array.prototype.some) {
+    /**
+     * Returns true if a callback returns truthy value for at least one element in an array
+     * @method every
+     * @param {Function} fn Callback to invoke for each element
+     * @param {Object} [context] Context to invoke callback in
+     */
     Array.prototype.some = function(fn, context) {
       for (var i = 0, len = this.length >>> 0; i < len; i++) {
         if (i in this && fn.call(context, this[i], i, this)) {
@@ -79,6 +109,12 @@
   }
 
   if (!Array.prototype.filter) {
+    /**
+     * Returns the result of iterating over elements in an array
+     * @method filter
+     * @param {Function} fn Callback to invoke for each element
+     * @param {Object} [context] Context to invoke callback in
+     */
     Array.prototype.filter = function(fn, context) {
       var result = [ ], val;
       for (var i = 0, len = this.length >>> 0; i < len; i++) {
@@ -94,6 +130,12 @@
   }
 
   if (!Array.prototype.reduce) {
+    /**
+     * Returns "folded" (reduced) result of iterating over elements in an array
+     * @method filter
+     * @param {Function} fn Callback to invoke for each element
+     * @param {Object} [context] Context to invoke callback in
+     */
     Array.prototype.reduce = function(fn /*, initial*/) {
       var len = this.length >>> 0,
           i = 0,

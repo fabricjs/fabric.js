@@ -152,6 +152,7 @@
   }
 
   /**
+   * Path class
    * @class Path
    * @extends fabric.Object
    */
@@ -617,7 +618,7 @@
     /**
      * Returns svg representation of an instance
      * @method toSVG
-     * @return {string} svg representation of an instance
+     * @return {String} svg representation of an instance
      */
     toSVG: function() {
       var chunks = [];

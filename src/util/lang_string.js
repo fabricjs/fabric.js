@@ -36,6 +36,13 @@ function capitalize(string) {
   return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
 }
 
+/**
+ * Escapes XML in a string
+ * @memberOf fabric.util.string
+ * @method escapeXml
+ * @param {String} string String to escape
+ * @return {String} Escaped version of a string
+ */
 function escapeXml(string) {
   return string.replace(/&/g, '&amp;')
      .replace(/"/g, '&quot;')

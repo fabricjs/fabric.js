@@ -55,11 +55,18 @@ fabric.Image.filters.Grayscale = fabric.util.createClass( /** @scope fabric.Imag
   }
 });
 
+/**
+ * Returns filter instance from an object representation
+ * @static
+ * @method fabric.Image.filters.Grayscale.fromObject
+ * @return {fabric.Image.filters.Grayscale}
+ */
 fabric.Image.filters.Grayscale.fromObject = function() {
   return new fabric.Image.filters.Grayscale();
 };
 
 /**
+ * Remove white filter class
  * @class fabric.Image.filters.RemoveWhite
  * @memberOf fabric.Image.filters
  */
@@ -72,6 +79,7 @@ fabric.Image.filters.RemoveWhite = fabric.util.createClass( /** @scope fabric.Im
   type: "RemoveWhite",
 
   /**
+   * Constructor
    * @memberOf fabric.Image.filters.RemoveWhite.prototype
    * @param {Object} [options] Options object
    */
@@ -130,11 +138,18 @@ fabric.Image.filters.RemoveWhite = fabric.util.createClass( /** @scope fabric.Im
   }
 });
 
+/**
+ * Returns filter instance from an object representation
+ * @static
+ * @method fabric.Image.filters.RemoveWhite.fromObject
+ * @return {fabric.Image.filters.RemoveWhite}
+ */
 fabric.Image.filters.RemoveWhite.fromObject = function(object) {
   return new fabric.Image.filters.RemoveWhite(object);
 };
 
 /**
+ * Invert filter class
  * @class fabric.Image.filters.Invert
  * @memberOf fabric.Image.filters
  */
@@ -177,11 +192,18 @@ fabric.Image.filters.Invert = fabric.util.createClass( /** @scope fabric.Image.f
   }
 });
 
+/**
+ * Returns filter instance from an object representation
+ * @static
+ * @method fabric.Image.filters.Invert.fromObject
+ * @return {fabric.Image.filters.Invert}
+ */
 fabric.Image.filters.Invert.fromObject = function() {
   return new fabric.Image.filters.Invert();
 };
 
 /**
+ * Sepia filter class
  * @class fabric.Image.filters.Sepia
  * @memberOf fabric.Image.filters
  */
@@ -225,11 +247,18 @@ fabric.Image.filters.Sepia = fabric.util.createClass( /** @scope fabric.Image.fi
   }
 });
 
+/**
+ * Returns filter instance from an object representation
+ * @static
+ * @method fabric.Image.filters.Sepia.fromObject
+ * @return {fabric.Image.filters.Sepia}
+ */
 fabric.Image.filters.Sepia.fromObject = function() {
   return new fabric.Image.filters.Sepia();
 };
 
 /**
+ * Sepia2 filter class
  * @class fabric.Image.filters.Sepia2
  * @memberOf fabric.Image.filters
  */
@@ -277,11 +306,18 @@ fabric.Image.filters.Sepia2 = fabric.util.createClass( /** @scope fabric.Image.f
   }
 });
 
+/**
+ * Returns filter instance from an object representation
+ * @static
+ * @method fabric.Image.filters.Sepia2.fromObject
+ * @return {fabric.Image.filters.Sepia2}
+ */
 fabric.Image.filters.Sepia2.fromObject = function() {
   return new fabric.Image.filters.Sepia2();
 };
 
 /**
+ * Brightness filter class
  * @class fabric.Image.filters.Brightness
  * @memberOf fabric.Image.filters
  */
@@ -294,6 +330,7 @@ fabric.Image.filters.Brightness = fabric.util.createClass( /** @scope fabric.Ima
   type: "Brightness",
 
   /**
+   * Constructor
    * @memberOf fabric.Image.filters.Brightness.prototype
    * @param {Object} [options] Options object
    */
@@ -335,11 +372,18 @@ fabric.Image.filters.Brightness = fabric.util.createClass( /** @scope fabric.Ima
   }
 });
 
+/**
+ * Returns filter instance from an object representation
+ * @static
+ * @method fabric.Image.filters.Brightness.fromObject
+ * @return {fabric.Image.filters.Brightness}
+ */
 fabric.Image.filters.Brightness.fromObject = function(object) {
   return new fabric.Image.filters.Brightness(object);
 };
 
 /**
+ * Noise filter class
  * @class fabric.Image.filters.Noise
  * @memberOf fabric.Image.filters
  */
@@ -352,6 +396,7 @@ fabric.Image.filters.Noise = fabric.util.createClass( /** @scope fabric.Image.fi
   type: "Noise",
 
   /**
+   * Constructor
    * @memberOf fabric.Image.filters.Noise.prototype
    * @param {Object} [options] Options object
    */
@@ -396,11 +441,18 @@ fabric.Image.filters.Noise = fabric.util.createClass( /** @scope fabric.Image.fi
   }
 });
 
+/**
+ * Returns filter instance from an object representation
+ * @static
+ * @method fabric.Image.filters.Noise.fromObject
+ * @return {fabric.Image.filters.Noise}
+ */
 fabric.Image.filters.Noise.fromObject = function(object) {
   return new fabric.Image.filters.Noise(object);
 };
 
 /**
+ * GradientTransparency filter class
  * @class fabric.Image.filters.GradientTransparency
  * @memberOf fabric.Image.filters
  */
@@ -413,6 +465,8 @@ fabric.Image.filters.GradientTransparency = fabric.util.createClass( /** @scope 
   type: "GradientTransparency",
 
   /**
+   * Constructor
+   * @memberOf fabric.Image.filters.GradientTransparency
    * @param {Object} [options] Options object
    */
   initialize: function(options) {
@@ -452,11 +506,18 @@ fabric.Image.filters.GradientTransparency = fabric.util.createClass( /** @scope 
   }
 });
 
+/**
+ * Returns filter instance from an object representation
+ * @static
+ * @method fabric.Image.filters.GradientTransparency.fromObject
+ * @return {fabric.Image.filters.GradientTransparency}
+ */
 fabric.Image.filters.GradientTransparency.fromObject = function(object) {
   return new fabric.Image.filters.GradientTransparency(object);
 };
 
 /**
+ * Tint filter class
  * @class fabric.Image.filters.Tint
  * @memberOf fabric.Image.filters
  */
@@ -469,6 +530,7 @@ fabric.Image.filters.Tint = fabric.util.createClass( /** @scope fabric.Image.fil
   type: "Tint",
 
   /**
+   * Constructor
    * @memberOf fabric.Image.filters.Tint.prototype
    * @param {Object} [options] Options object
    */
@@ -522,6 +584,12 @@ fabric.Image.filters.Tint = fabric.util.createClass( /** @scope fabric.Image.fil
   }
 });
 
+/**
+ * Returns filter instance from an object representation
+ * @static
+ * @method fabric.Image.filters.Tint.fromObject
+ * @return {fabric.Image.filters.Tint}
+ */
 fabric.Image.filters.Tint.fromObject = function(object) {
   return new fabric.Image.filters.Tint(object);
 };
@@ -540,6 +608,7 @@ fabric.Image.filters.Convolute = fabric.util.createClass(/** @scope fabric.Image
   type: 'Convolute',
 
   /**
+   * Constructor
    * @memberOf fabric.Image.filters.Convolute.prototype
    * @param {Object} [options] Options object
    */
@@ -633,11 +702,18 @@ fabric.Image.filters.Convolute = fabric.util.createClass(/** @scope fabric.Image
   }
 });
 
+/**
+ * Returns filter instance from an object representation
+ * @static
+ * @method fabric.Image.filters.Convolute.fromObject
+ * @return {fabric.Image.filters.Convolute}
+ */
 fabric.Image.filters.Convolute.fromObject = function(object) {
   return new fabric.Image.filters.Convolute(object);
 };
 
 /**
+ * Pixelate filter class
  * @class fabric.Image.filters.Pixelate
  * @memberOf fabric.Image.filters
  */
@@ -650,6 +726,7 @@ fabric.Image.filters.Pixelate = fabric.util.createClass(/** @scope fabric.Image.
   type: 'Pixelate',
 
   /**
+   * Constructor
    * @memberOf fabric.Image.filters.Pixelate.prototype
    * @param {Object} [options] Options object
    */
@@ -720,6 +797,12 @@ fabric.Image.filters.Pixelate = fabric.util.createClass(/** @scope fabric.Image.
   }
 });
 
+/**
+ * Returns filter instance from an object representation
+ * @static
+ * @method fabric.Image.filters.Pixelate.fromObject
+ * @return {fabric.Image.filters.Pixelate}
+ */
 fabric.Image.filters.Pixelate.fromObject = function(object) {
   return new fabric.Image.filters.Pixelate(object);
 };
