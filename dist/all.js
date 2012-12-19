@@ -10039,14 +10039,18 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     _animate: function(property, to, options) {
       var obj = this;
 
+      to = to.toString();
       options || (options = { });
 
       if (!('from' in options)) {
         options.from = this.get(property);
       }
 
-      if (/[+\-]/.test((to + '').charAt(0))) {
-        to = this.get(property) + parseFloat(to);
+      if (~to.indexOf('=')) {
+        to = this.get(property) + parseFloat(to.replace('=', ''));
+      }
+      else {
+        to = parseFloat(to);
       }
 
       fabric.util.animate({
