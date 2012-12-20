@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL` */
 /*! Fabric.js Copyright 2008-2012, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.9.33" };
+var fabric = fabric || { version: "0.9.34" };
 
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
@@ -8458,6 +8458,17 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
   if (fabric.Object) {
     return;
+  }
+
+  var Image = global.Image;
+  try {
+    var NodeImage = require('canvas').Image;
+    if (NodeImage) {
+      Image = NodeImage;
+    }
+  }
+  catch(err) {
+    fabric.log(err);
   }
 
   /**

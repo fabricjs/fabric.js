@@ -415,30 +415,30 @@
     equal(cObj.getAngle(), 0);
   });
 
-  // asyncTest('cloneAsImage', function() {
-  //   var cObj = new fabric.Rect({ width: 100, height: 100, fill: 'red' });
+  asyncTest('cloneAsImage', function() {
+    var cObj = new fabric.Rect({ width: 100, height: 100, fill: 'red' });
 
-  //   ok(typeof cObj.cloneAsImage == 'function');
+    ok(typeof cObj.cloneAsImage == 'function');
 
-  //   if (!fabric.Canvas.supports('toDataURL')) {
-  //     //alert('`toDataURL` is not supported by this environment; skipping `cloneAsImage` test (as it relies on `toDataURL`)');
-  //     start();
-  //   }
-  //   else {
-  //     var image;
-  //     var _this = this;
+    if (!fabric.Canvas.supports('toDataURL')) {
+      fabric.log('`toDataURL` is not supported by this environment; skipping `cloneAsImage` test (as it relies on `toDataURL`)');
+      start();
+    }
+    else {
+      var image;
+      var _this = this;
 
-  //     setTimeout(function() {
-  //       ok(image);
-  //       ok(image instanceof fabric.Image);
-  //       start();
-  //     }, 500);
+      setTimeout(function() {
+        ok(image);
+        ok(image instanceof fabric.Image);
+        start();
+      }, 500);
 
-  //     cObj.cloneAsImage(function(i) {
-  //       image = i;
-  //     });
-  //   }
-  // });
+      cObj.cloneAsImage(function(i) {
+        image = i;
+      });
+    }
+  });
 
   asyncTest('toDataURL', function() {
     var data =

@@ -13,6 +13,17 @@
     return;
   }
 
+  var Image = global.Image;
+  try {
+    var NodeImage = require('canvas').Image;
+    if (NodeImage) {
+      Image = NodeImage;
+    }
+  }
+  catch(err) {
+    fabric.log(err);
+  }
+
   /**
    * Root object class from which all 2d shape classes inherit from
    * @class Object
