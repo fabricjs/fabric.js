@@ -8560,7 +8560,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      * @property
      * @type Number
      */
-    cornersize:               12,
+    cornerSize:               12,
 
     /**
      * When true, object's corners are rendered as transparent inside (i.e. stroke instead of fill)
@@ -8710,7 +8710,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      */
     stateProperties:  (
       'top left width height scaleX scaleY flipX flipY ' +
-      'angle opacity cornersize fill overlayFill ' +
+      'angle opacity cornerSize fill overlayFill ' +
       'stroke strokeWidth strokeDashArray fillRule ' +
       'borderScaleFactor transformMatrix selectable'
     ).split(' '),
@@ -9334,7 +9334,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * Draws corners of an object's bounding box.
      * Requires public properties: width, height, scaleX, scaleY
-     * Requires public options: cornersize, padding
+     * Requires public options: cornerSize, padding
      * @method drawCorners
      * @param {CanvasRenderingContext2D} ctx Context to draw on
      * @return {fabric.Object} thisArg
@@ -9343,7 +9343,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     drawCorners: function(ctx) {
       if (!this.hasControls) return;
 
-      var size = this.cornersize,
+      var size = this.cornerSize,
           size2 = size / 2,
           strokeWidth2 = this.strokeWidth / 2,
           left = -(this.width / 2),
@@ -9797,7 +9797,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       var coords = this.oCoords,
           theta = degreesToRadians(this.angle),
           newTheta = degreesToRadians(45 - this.angle),
-          cornerHypotenuse = Math.sqrt(2 * Math.pow(this.cornersize, 2)) / 2,
+          cornerHypotenuse = Math.sqrt(2 * Math.pow(this.cornerSize, 2)) / 2,
           cosHalfOffset = cornerHypotenuse * Math.cos(newTheta),
           sinHalfOffset = cornerHypotenuse * Math.sin(newTheta),
           sinTh = Math.sin(theta),
