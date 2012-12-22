@@ -587,7 +587,7 @@
 
     object.setAngle(999);
     object.straighten();
-    equal(object.get('angle'), 360);
+    equal(object.get('angle'), 270);
   });
 
   test('toGrayscale', function() {
