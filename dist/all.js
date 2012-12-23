@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL` */
 /*! Fabric.js Copyright 2008-2012, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.9.34" };
+var fabric = fabric || { version: "0.9.35" };
 
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
@@ -2078,14 +2078,35 @@ fabric.Observable.off = fabric.Observable.stopObserving;
    * @static
    * @memberOf fabric.util
    * @method groupSVGElements
-   * @param {Array} elements
+   * @param {Array} elements SVG elements to group
    * @param {Object} [options] Options object
    * @return {fabric.Object|fabric.PathGroup}
    */
   function groupSVGElements(elements, options, path) {
-    var object = elements.length > 1
-      ? new fabric.PathGroup(elements, options)
-      : elements[0];
+    var object;
+
+    if (elements.length > 1) {
+      var hasText = elements.some(function(el) { return el.type === 'text'; });
+
+      if (hasText) {
+        object = new fabric.Group([ ], options);
+        elements.reverse().forEach(function(obj) {
+          if (obj.cx) {
+            obj.left = obj.cx;
+          }
+          if (obj.cy) {
+            obj.top = obj.cy;
+          }
+          object.addWithUpdate(obj);
+        });
+      }
+      else {
+        object = new fabric.PathGroup(elements, options);
+      }
+    }
+    else {
+      object = elements[0];
+    }
 
     if (typeof path !== 'undefined') {
       object.setSourcePath(path);
@@ -2098,9 +2119,9 @@ fabric.Observable.off = fabric.Observable.stopObserving;
    * @static
    * @memberOf fabric.util
    * @method populateWithProperties
-   * @param {Object} source
-   * @param {Object} destination
-   * @return {Array} properties
+   * @param {Object} source Source object
+   * @param {Object} destination Destination object
+   * @return {Array} properties Propertie names to include
    */
   function populateWithProperties(source, destination, properties) {
     if (properties && Object.prototype.toString.call(properties) === '[object Array]') {
@@ -3852,14 +3873,20 @@ fabric.util.string = {
 
     if (typeof style === 'string') {
       style = style.replace(/;$/, '').split(';').forEach(function (current) {
+
         var attr = current.split(':');
-        oStyle[normalizeAttr(attr[0].trim().toLowerCase())] = attr[1].trim();
+        var value = attr[1].trim();
+        var parsed = parseFloat(value);
+
+        oStyle[normalizeAttr(attr[0].trim().toLowerCase())] = isNaN(parsed) ? value : parsed;
       });
     }
     else {
       for (var prop in style) {
         if (typeof style[prop] === 'undefined') continue;
-        oStyle[normalizeAttr(prop.toLowerCase())] = style[prop];
+
+        var parsed = parseFloat(style[prop]);
+        oStyle[normalizeAttr(prop.toLowerCase())] = isNaN(parsed) ? style[prop] : parsed;
       }
     }
 
@@ -8462,7 +8489,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
   var Image = global.Image;
   try {
-    var NodeImage = require('canvas').Image;
+    var NodeImage = (typeof require !== 'undefined') && require('canvas').Image;
     if (NodeImage) {
       Image = NodeImage;
     }
@@ -10559,7 +10586,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     if ('top' in parsedAttributes) {
       parsedAttributes.top -= (options.height / 2) || 0;
     }
-    return new fabric.Circle(extend(parsedAttributes, options));
+    var obj = new fabric.Circle(extend(parsedAttributes, options));
+
+    obj.cx = parseFloat(element.getAttribute('cx')) || 0;
+    obj.cy = parseFloat(element.getAttribute('cy')) || 0;
+
+    return obj;
   };
 
   /**

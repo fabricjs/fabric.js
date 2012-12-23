@@ -286,6 +286,8 @@
 
         var attr = current.split(':');
         var value = attr[1].trim();
+
+        // TODO: need to normalize em, %, pt, etc. to px (!)
         var parsed = parseFloat(value);
 
         oStyle[normalizeAttr(attr[0].trim().toLowerCase())] = isNaN(parsed) ? value : parsed;

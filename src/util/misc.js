@@ -223,8 +223,11 @@
    * @return {fabric.Object|fabric.PathGroup}
    */
   function groupSVGElements(elements, options, path) {
+    var object;
+
     if (elements.length > 1) {
       var hasText = elements.some(function(el) { return el.type === 'text'; });
+
       if (hasText) {
         object = new fabric.Group([ ], options);
         elements.reverse().forEach(function(obj) {
