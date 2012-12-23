@@ -283,14 +283,20 @@
 
     if (typeof style === 'string') {
       style = style.replace(/;$/, '').split(';').forEach(function (current) {
+
         var attr = current.split(':');
-        oStyle[normalizeAttr(attr[0].trim().toLowerCase())] = attr[1].trim();
+        var value = attr[1].trim();
+        var parsed = parseFloat(value);
+
+        oStyle[normalizeAttr(attr[0].trim().toLowerCase())] = isNaN(parsed) ? value : parsed;
       });
     }
     else {
       for (var prop in style) {
         if (typeof style[prop] === 'undefined') continue;
-        oStyle[normalizeAttr(prop.toLowerCase())] = style[prop];
+
+        var parsed = parseFloat(style[prop]);
+        oStyle[normalizeAttr(prop.toLowerCase())] = isNaN(parsed) ? style[prop] : parsed;
       }
     }
 
