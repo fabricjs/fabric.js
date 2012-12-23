@@ -31,7 +31,10 @@
                   '"selectable":true,"hasControls":true,"hasBorders":true,"hasRotatingPoint":false,"transparentCorners":true,"perPixelTargetFind":false,"rx":0,"ry":0}],'+
                   '"background":"#ff5555"}';
 
-  var canvas = this.canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.Canvas();
+  var el = fabric.document.createElement('canvas');
+  el.width = 600; el.height = 600;
+
+  var canvas = this.canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.Canvas(el);
   var upperCanvasEl = canvas.upperCanvasEl;
   var lowerCanvasEl = canvas.lowerCanvasEl;
 
