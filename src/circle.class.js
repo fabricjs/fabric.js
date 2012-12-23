@@ -152,7 +152,12 @@
     if ('top' in parsedAttributes) {
       parsedAttributes.top -= (options.height / 2) || 0;
     }
-    return new fabric.Circle(extend(parsedAttributes, options));
+    var obj = new fabric.Circle(extend(parsedAttributes, options));
+
+    obj.cx = parseFloat(element.getAttribute('cx')) || 0;
+    obj.cy = parseFloat(element.getAttribute('cy')) || 0;
+
+    return obj;
   };
 
   /**
