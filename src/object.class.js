@@ -15,7 +15,7 @@
 
   var Image = global.Image;
   try {
-    var NodeImage = require('canvas').Image;
+    var NodeImage = (typeof require !== 'undefined') && require('canvas').Image;
     if (NodeImage) {
       Image = NodeImage;
     }
