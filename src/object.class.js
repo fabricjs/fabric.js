@@ -13,6 +13,17 @@
     return;
   }
 
+  var Image = global.Image;
+  try {
+    var NodeImage = (typeof require !== 'undefined') && require('canvas').Image;
+    if (NodeImage) {
+      Image = NodeImage;
+    }
+  }
+  catch(err) {
+    fabric.log(err);
+  }
+
   /**
    * Root object class from which all 2d shape classes inherit from
    * @class Object
@@ -116,7 +127,7 @@
      * @property
      * @type Number
      */
-    cornersize:               12,
+    cornerSize:               12,
 
     /**
      * When true, object's corners are rendered as transparent inside (i.e. stroke instead of fill)
@@ -242,7 +253,7 @@
      * @property
      * @type Boolean
      */
-    hasRotatingPoint:         false,
+    hasRotatingPoint:         true,
 
     /**
      * Offset for object's rotating point (when enabled via `hasRotatingPoint`)
@@ -273,7 +284,7 @@
      */
     stateProperties:  (
       'top left width height scaleX scaleY flipX flipY ' +
-      'angle opacity cornersize fill overlayFill originX originY ' +
+      'angle opacity cornerSize fill overlayFill originX originY ' +
       'stroke strokeWidth strokeDashArray fillRule ' +
       'borderScaleFactor transformMatrix selectable'
     ).split(' '),
@@ -1098,7 +1109,7 @@
     /**
      * Draws corners of an object's bounding box.
      * Requires public properties: width, height, scaleX, scaleY
-     * Requires public options: cornersize, padding
+     * Requires public options: cornerSize, padding
      * @method drawCorners
      * @param {CanvasRenderingContext2D} ctx Context to draw on
      * @return {fabric.Object} thisArg
@@ -1107,7 +1118,7 @@
     drawCorners: function(ctx) {
       if (!this.hasControls) return;
 
-      var size = this.cornersize,
+      var size = this.cornerSize,
           size2 = size / 2,
           strokeWidth2 = this.strokeWidth / 2,
           left = -(this.width / 2),
@@ -1561,7 +1572,7 @@
       var coords = this.oCoords,
           theta = degreesToRadians(this.angle),
           newTheta = degreesToRadians(45 - this.angle),
-          cornerHypotenuse = Math.sqrt(2 * Math.pow(this.cornersize, 2)) / 2,
+          cornerHypotenuse = Math.sqrt(2 * Math.pow(this.cornerSize, 2)) / 2,
           cosHalfOffset = cornerHypotenuse * Math.cos(newTheta),
           sinHalfOffset = cornerHypotenuse * Math.sin(newTheta),
           sinTh = Math.sin(theta),
@@ -1814,14 +1825,18 @@
     _animate: function(property, to, options) {
       var obj = this;
 
+      to = to.toString();
       options || (options = { });
 
       if (!('from' in options)) {
         options.from = this.get(property);
       }
 
-      if (/[+\-]/.test((to + '').charAt(0))) {
-        to = this.get(property) + parseFloat(to);
+      if (~to.indexOf('=')) {
+        to = this.get(property) + parseFloat(to.replace('=', ''));
+      }
+      else {
+        to = parseFloat(to);
       }
 
       fabric.util.animate({

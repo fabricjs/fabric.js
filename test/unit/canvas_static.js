@@ -38,7 +38,10 @@
   // TODO: fix this
   var Canvas = fabric.Canvas;
   fabric.Canvas = null;
-  var canvas = this.canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.StaticCanvas();
+  var el = fabric.document.createElement('canvas');
+  el.width = 600; el.height = 600;
+
+  var canvas = this.canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.StaticCanvas(el);
   fabric.Canvas = Canvas;
 
   var lowerCanvasEl = canvas.lowerCanvasEl;

@@ -56,7 +56,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       delete obj[pathProp];
 
       if (typeof path !== 'string') {
-        if (obj.type === 'image') {
+        if (obj.type === 'image' || obj.type === 'group') {
           fabric[fabric.util.string.capitalize(obj.type)].fromObject(obj, function (o) {
             onObjectLoaded(o, index);
           });

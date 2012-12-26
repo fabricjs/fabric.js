@@ -1,10 +1,12 @@
 (function() {
 
-  var path = require("path");
-
   QUnit.module('fabric.util');
 
   function K (x) { return x }
+
+  function _createImageElement() {
+    return fabric.isLikelyNode ? new (require('canvas').Image) : fabric.document.createElement('img');
+  }
 
   function getAbsolutePath(path) {
     var isAbsolute = /^https?:/.test(path);
@@ -17,7 +19,7 @@
   }
 
   var IMG_URL = fabric.isLikelyNode
-    ? path.join(__dirname, '../fixtures/', 'very_large_image.jpg')
+    ? require("path").join(__dirname, '../fixtures/', 'very_large_image.jpg')
     : getAbsolutePath('../fixtures/very_large_image.jpg');
 
   test('fabric.util.toFixed', function(){
@@ -400,8 +402,7 @@
     ok(typeof fabric.util.loadImage == 'function');
 
     var callbackInvoked = false,
-        objectPassedToCallback,
-        NodeCanvasImage = require('canvas').Image;
+        objectPassedToCallback;
 
     if (IMG_URL.indexOf('/home/travis') === 0) {
       // image can not be accessed on travis so we're returning early

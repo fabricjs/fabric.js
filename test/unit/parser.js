@@ -127,10 +127,10 @@
     element.setAttribute('style', 'left:10px;top:22.3em;width:103.45pt;height:20%;');
 
     var expectedObject = {
-      'left':   '10px',
-      'top':    '22.3em',
-      'width':  '103.45pt',
-      'height': '20%'
+      'left':   10,
+      'top':    22.3,
+      'width':  103.45,
+      'height': 20
     };
     deepEqual(expectedObject, fabric.parseStyleAttribute(element));
   });
@@ -140,7 +140,7 @@
     element.setAttribute('style', 'left:10px');
 
     var expectedObject = {
-      'left': '10px'
+      'left': 10
     };
     deepEqual(expectedObject, fabric.parseStyleAttribute(element));
   });

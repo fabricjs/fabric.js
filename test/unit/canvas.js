@@ -31,7 +31,10 @@
                   '"selectable":true,"hasControls":true,"hasBorders":true,"hasRotatingPoint":false,"transparentCorners":true,"perPixelTargetFind":false,"rx":0,"ry":0}],'+
                   '"background":"#ff5555"}';
 
-  var canvas = this.canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.Canvas();
+  var el = fabric.document.createElement('canvas');
+  el.width = 600; el.height = 600;
+
+  var canvas = this.canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.Canvas(el);
   var upperCanvasEl = canvas.upperCanvasEl;
   var lowerCanvasEl = canvas.lowerCanvasEl;
 
@@ -873,6 +876,31 @@
 
     canvas.loadFromJSON(json, function() {
       equal(3, canvas.getObjects().length);
+
+      start();
+    });
+  });
+
+  asyncTest('loadFromDatalessJSON with async content', function() {
+
+    var circ1 = new fabric.Circle({ radius: 30, fill: '#55f', top: 0, left: 0 });
+    var circ2 = new fabric.Circle({ radius: 30, fill: '#f55', top: 50, left: 50 });
+    var circ3 = new fabric.Circle({ radius: 30, fill: '#5f5', top: 50, left: 50 });
+
+    var arr = [circ1, circ2];
+    var group = new fabric.Group(arr, { top: 150, left: 150 });
+
+    canvas.add(circ3);
+    canvas.add(group);
+    canvas.renderAll();
+
+    canvas.deactivateAll();
+    var json = JSON.stringify( canvas.toDatalessJSON() );
+    canvas.clear();
+    canvas.loadFromDatalessJSON(json, function() {
+
+      equal(2, canvas.getObjects().length);
+      equal('group', canvas.getObjects()[1].type);
 
       start();
     });

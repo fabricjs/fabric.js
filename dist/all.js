@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL` */
 /*! Fabric.js Copyright 2008-2012, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.9.33" };
+var fabric = fabric || { version: "0.9.35" };
 
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
@@ -2100,14 +2100,35 @@ fabric.Observable.off = fabric.Observable.stopObserving;
    * @static
    * @memberOf fabric.util
    * @method groupSVGElements
-   * @param {Array} elements
+   * @param {Array} elements SVG elements to group
    * @param {Object} [options] Options object
    * @return {fabric.Object|fabric.PathGroup}
    */
   function groupSVGElements(elements, options, path) {
-    var object = elements.length > 1
-      ? new fabric.PathGroup(elements, options)
-      : elements[0];
+    var object;
+
+    if (elements.length > 1) {
+      var hasText = elements.some(function(el) { return el.type === 'text'; });
+
+      if (hasText) {
+        object = new fabric.Group([ ], options);
+        elements.reverse().forEach(function(obj) {
+          if (obj.cx) {
+            obj.left = obj.cx;
+          }
+          if (obj.cy) {
+            obj.top = obj.cy;
+          }
+          object.addWithUpdate(obj);
+        });
+      }
+      else {
+        object = new fabric.PathGroup(elements, options);
+      }
+    }
+    else {
+      object = elements[0];
+    }
 
     if (typeof path !== 'undefined') {
       object.setSourcePath(path);
@@ -2120,9 +2141,9 @@ fabric.Observable.off = fabric.Observable.stopObserving;
    * @static
    * @memberOf fabric.util
    * @method populateWithProperties
-   * @param {Object} source
-   * @param {Object} destination
-   * @return {Array} properties
+   * @param {Object} source Source object
+   * @param {Object} destination Destination object
+   * @return {Array} properties Propertie names to include
    */
   function populateWithProperties(source, destination, properties) {
     if (properties && Object.prototype.toString.call(properties) === '[object Array]') {
@@ -3875,14 +3896,22 @@ fabric.util.string = {
 
     if (typeof style === 'string') {
       style = style.replace(/;$/, '').split(';').forEach(function (current) {
+
         var attr = current.split(':');
-        oStyle[normalizeAttr(attr[0].trim().toLowerCase())] = attr[1].trim();
+        var value = attr[1].trim();
+
+        // TODO: need to normalize em, %, pt, etc. to px (!)
+        var parsed = parseFloat(value);
+
+        oStyle[normalizeAttr(attr[0].trim().toLowerCase())] = isNaN(parsed) ? value : parsed;
       });
     }
     else {
       for (var prop in style) {
         if (typeof style[prop] === 'undefined') continue;
-        oStyle[normalizeAttr(prop.toLowerCase())] = style[prop];
+
+        var parsed = parseFloat(style[prop]);
+        oStyle[normalizeAttr(prop.toLowerCase())] = isNaN(parsed) ? style[prop] : parsed;
       }
     }
 
@@ -8251,8 +8280,13 @@ fabric.util.string = {
       return this;
     },
 
+    /**
+     * @private
+     * @method _adjustPosition
+     * @param obj
+     * @param {String} to One of left, center, right
+     */
     _adjustPosition: function(obj, to) {
-      console.log('adjusting position');
 
       var angle = fabric.util.degreesToRadians(obj.angle);
 
@@ -8486,7 +8520,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       delete obj[pathProp];
 
       if (typeof path !== 'string') {
-        if (obj.type === 'image') {
+        if (obj.type === 'image' || obj.type === 'group') {
           fabric[fabric.util.string.capitalize(obj.type)].fromObject(obj, function (o) {
             onObjectLoaded(o, index);
           });
@@ -8727,6 +8761,17 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     return;
   }
 
+  var Image = global.Image;
+  try {
+    var NodeImage = (typeof require !== 'undefined') && require('canvas').Image;
+    if (NodeImage) {
+      Image = NodeImage;
+    }
+  }
+  catch(err) {
+    fabric.log(err);
+  }
+
   /**
    * Root object class from which all 2d shape classes inherit from
    * @class Object
@@ -8830,7 +8875,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      * @property
      * @type Number
      */
-    cornersize:               12,
+    cornerSize:               12,
 
     /**
      * When true, object's corners are rendered as transparent inside (i.e. stroke instead of fill)
@@ -8956,7 +9001,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      * @property
      * @type Boolean
      */
-    hasRotatingPoint:         false,
+    hasRotatingPoint:         true,
 
     /**
      * Offset for object's rotating point (when enabled via `hasRotatingPoint`)
@@ -8987,7 +9032,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      */
     stateProperties:  (
       'top left width height scaleX scaleY flipX flipY ' +
-      'angle opacity cornersize fill overlayFill originX originY ' +
+      'angle opacity cornerSize fill overlayFill originX originY ' +
       'stroke strokeWidth strokeDashArray fillRule ' +
       'borderScaleFactor transformMatrix selectable'
     ).split(' '),
@@ -9812,7 +9857,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * Draws corners of an object's bounding box.
      * Requires public properties: width, height, scaleX, scaleY
-     * Requires public options: cornersize, padding
+     * Requires public options: cornerSize, padding
      * @method drawCorners
      * @param {CanvasRenderingContext2D} ctx Context to draw on
      * @return {fabric.Object} thisArg
@@ -9821,7 +9866,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     drawCorners: function(ctx) {
       if (!this.hasControls) return;
 
-      var size = this.cornersize,
+      var size = this.cornerSize,
           size2 = size / 2,
           strokeWidth2 = this.strokeWidth / 2,
           left = -(this.width / 2),
@@ -10275,7 +10320,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       var coords = this.oCoords,
           theta = degreesToRadians(this.angle),
           newTheta = degreesToRadians(45 - this.angle),
-          cornerHypotenuse = Math.sqrt(2 * Math.pow(this.cornersize, 2)) / 2,
+          cornerHypotenuse = Math.sqrt(2 * Math.pow(this.cornerSize, 2)) / 2,
           cosHalfOffset = cornerHypotenuse * Math.cos(newTheta),
           sinHalfOffset = cornerHypotenuse * Math.sin(newTheta),
           sinTh = Math.sin(theta),
@@ -10528,14 +10573,18 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     _animate: function(property, to, options) {
       var obj = this;
 
+      to = to.toString();
       options || (options = { });
 
       if (!('from' in options)) {
         options.from = this.get(property);
       }
 
-      if (/[+\-]/.test((to + '').charAt(0))) {
-        to = this.get(property) + parseFloat(to);
+      if (~to.indexOf('=')) {
+        to = this.get(property) + parseFloat(to.replace('=', ''));
+      }
+      else {
+        to = parseFloat(to);
       }
 
       fabric.util.animate({
@@ -11024,7 +11073,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     if ('top' in parsedAttributes) {
       parsedAttributes.top -= (options.height / 2) || 0;
     }
-    return new fabric.Circle(extend(parsedAttributes, options));
+    var obj = new fabric.Circle(extend(parsedAttributes, options));
+
+    obj.cx = parseFloat(element.getAttribute('cx')) || 0;
+    obj.cy = parseFloat(element.getAttribute('cy')) || 0;
+
+    return obj;
   };
 
   /**
@@ -13889,19 +13943,11 @@ fabric.util.object.extend(fabric.Object.prototype, {
    * @return {Number} angle value
    */
   _getAngleValueForStraighten: function() {
-    var angle = this.get('angle');
-
-    // TODO (kangax): can this be simplified?
-
-    if      (angle > -225 && angle <= -135) { return -180;  }
-    else if (angle > -135 && angle <= -45)  { return  -90;  }
-    else if (angle > -45  && angle <= 45)   { return    0;  }
-    else if (angle > 45   && angle <= 135)  { return   90;  }
-    else if (angle > 135  && angle <= 225 ) { return  180;  }
-    else if (angle > 225  && angle <= 315)  { return  270;  }
-    else if (angle > 315)                   { return  360;  }
-
-    return 0;
+    var angle = this.getAngle() % 360;
+    if (angle > 0) {
+      return Math.round((angle-1)/90) * 90;
+    }
+    return Math.round(angle/90) * 90;
   },
 
   /**
@@ -13911,8 +13957,7 @@ fabric.util.object.extend(fabric.Object.prototype, {
    * @chainable
    */
   straighten: function() {
-    var angle = this._getAngleValueForStraighten();
-    this.setAngle(angle);
+    this.setAngle(this._getAngleValueForStraighten());
     return this;
   },
 
