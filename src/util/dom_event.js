@@ -174,10 +174,12 @@
    * @param {Event} event
    */
   function getPointer(event) {
+    event || (event = fabric.window.event);
+
     var element = event.target || event.srcElement,
-    scrollLeft = 0,
-    scrollTop = 0,
-    firstFixedAncestor;
+        scrollLeft = 0,
+        scrollTop = 0,
+        firstFixedAncestor;
 
     while (element && element.parentNode && !firstFixedAncestor) {
         element = element.parentNode;
