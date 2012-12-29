@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL` */
 /*! Fabric.js Copyright 2008-2012, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "0.9.35" };
+var fabric = fabric || { version: "1.0.0" };
 
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
@@ -2818,10 +2818,12 @@ fabric.util.string = {
    * @param {Event} event
    */
   function getPointer(event) {
+    event || (event = fabric.window.event);
+
     var element = event.target || event.srcElement,
-    scrollLeft = 0,
-    scrollTop = 0,
-    firstFixedAncestor;
+        scrollLeft = 0,
+        scrollTop = 0,
+        firstFixedAncestor;
 
     while (element && element.parentNode && !firstFixedAncestor) {
         element = element.parentNode;

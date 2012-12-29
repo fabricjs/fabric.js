@@ -28,7 +28,7 @@
     'selectable':       true,
     'hasControls':      true,
     'hasBorders':       true,
-    'hasRotatingPoint': false,
+    'hasRotatingPoint': true,
     'transparentCorners': true,
     'perPixelTargetFind': false,
     'text':             'x',
