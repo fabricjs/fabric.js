@@ -22,7 +22,7 @@
   var PATH_DATALESS_JSON = '{"objects":[{"type":"path","originX":"center","originY":"center","left":200,"top":200,"width":200,"height":200,"fill":"rgb(0,0,0)",'+
                            '"overlayFill":null,"stroke":null,"strokeWidth":1,"strokeDashArray":null,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,'+
                            '"flipY":false,"opacity":1,"selectable":true,"hasControls":true,"hasBorders":true,"hasRotatingPoint":true,"transparentCorners":true,"perPixelTargetFind":false,'+
-                           '"path":"http://example.com/"}],"background":"rgba(0, 0, 0, 0)"}';
+                           '"path":"http://example.com/"}],"background":""}';
 
   var RECT_JSON = '{"objects":[{"type":"rect","originX":"center","originY":"center","left":0,"top":0,"width":10,"height":10,"fill":"rgb(0,0,0)","overlayFill":null,'+
                   '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,"selectable":true,'+
@@ -32,7 +32,7 @@
   var RECT_JSON_WITH_PADDING = '{"objects":[{"type":"rect","originX":"center","originY":"center","left":0,"top":0,"width":10,"height":20,"fill":"rgb(0,0,0)","overlayFill":null,'+
                                '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,"selectable":true,'+
                                '"hasControls":true,"hasBorders":true,"hasRotatingPoint":true,"transparentCorners":true,"perPixelTargetFind":false,"padding":123,"foo":"bar","rx":0,"ry":0}],'+
-                               '"background":"rgba(0, 0, 0, 0)"}';
+                               '"background":""}';
 
   // force creation of static canvas
   // TODO: fix this
@@ -195,7 +195,7 @@
 
   test('toJSON', function() {
     ok(typeof canvas.toJSON == 'function');
-    equal(JSON.stringify(canvas.toJSON()), '{"objects":[],"background":"rgba(0, 0, 0, 0)"}');
+    equal(JSON.stringify(canvas.toJSON()), '{"objects":[],"background":""}');
     canvas.backgroundColor = '#ff5555';
     equal(JSON.stringify(canvas.toJSON()), '{"objects":[],"background":"#ff5555"}', '`background` value should be reflected in json');
     canvas.add(makeRect());
