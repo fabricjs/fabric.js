@@ -2562,7 +2562,9 @@ fabric.util.string = {
   var addMethods = function(klass, source, parent) {
     for (var property in source) {
 
-      if (property in klass.prototype && typeof klass.prototype[property] === 'function') {
+      if (property in klass.prototype &&
+          typeof klass.prototype[property] === 'function' &&
+          (source[property] + '').indexOf('callSuper') > -1) {
 
         klass.prototype[property] = (function(property) {
           return function() {
@@ -5380,7 +5382,7 @@ fabric.util.string = {
      * @property
      * @type String
      */
-    backgroundColor: 'rgba(0, 0, 0, 0)',
+    backgroundColor: '',
 
     /**
      * Background image of canvas instance
@@ -5864,7 +5866,7 @@ fabric.util.string = {
 
       var canvasToDrawOn = this[(allOnTop === true && this.interactive) ? 'contextTop' : 'contextContainer'];
 
-      if (this.contextTop) {
+      if (this.contextTop && this.selection) {
         this.clearContext(this.contextTop);
       }
 
@@ -5872,14 +5874,14 @@ fabric.util.string = {
         this.clearContext(canvasToDrawOn);
       }
 
-      var activeGroup = this.getActiveGroup();
-
       if (this.clipTo) {
         this._clipCanvas(canvasToDrawOn);
       }
 
-      canvasToDrawOn.fillStyle = this.backgroundColor;
-      canvasToDrawOn.fillRect(0, 0, this.width, this.height);
+      if (this.backgroundColor) {
+        canvasToDrawOn.fillStyle = this.backgroundColor;
+        canvasToDrawOn.fillRect(0, 0, this.width, this.height);
+      }
 
       if (typeof this.backgroundImage === 'object') {
         this._drawBackroundImage(canvasToDrawOn);
@@ -5887,6 +5889,7 @@ fabric.util.string = {
 
       this.fire('before:render');
 
+      var activeGroup = this.getActiveGroup();
       for (var i = 0, length = this._objects.length; i < length; ++i) {
         if (!activeGroup ||
             (activeGroup && this._objects[i] && !activeGroup.contains(this._objects[i]))) {
@@ -13618,7 +13621,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     render: function(ctx, noTransform) {
       ctx.save();
       var m = this.transformMatrix;
-      this._resetWidthHeight();
+      // this._resetWidthHeight();
       if (this.group) {
         ctx.translate(-this.group.width/2 + this.width/2, -this.group.height/2 + this.height/2);
       }
@@ -13760,8 +13763,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
      */
     _render: function(ctx) {
       ctx.drawImage(
-        this.getElement(),
-        - this.width / 2,
+        this._element,
+        -this.width / 2,
         -this.height / 2,
         this.width,
         this.height

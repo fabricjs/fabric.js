@@ -92,7 +92,7 @@
     render: function(ctx, noTransform) {
       ctx.save();
       var m = this.transformMatrix;
-      this._resetWidthHeight();
+      // this._resetWidthHeight();
       if (this.group) {
         ctx.translate(-this.group.width/2 + this.width/2, -this.group.height/2 + this.height/2);
       }
@@ -234,8 +234,8 @@
      */
     _render: function(ctx) {
       ctx.drawImage(
-        this.getElement(),
-        - this.width / 2,
+        this._element,
+        -this.width / 2,
         -this.height / 2,
         this.width,
         this.height

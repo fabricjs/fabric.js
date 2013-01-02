@@ -38,7 +38,7 @@
      * @property
      * @type String
      */
-    backgroundColor: 'rgba(0, 0, 0, 0)',
+    backgroundColor: '',
 
     /**
      * Background image of canvas instance
@@ -522,7 +522,7 @@
 
       var canvasToDrawOn = this[(allOnTop === true && this.interactive) ? 'contextTop' : 'contextContainer'];
 
-      if (this.contextTop) {
+      if (this.contextTop && this.selection) {
         this.clearContext(this.contextTop);
       }
 
@@ -530,14 +530,14 @@
         this.clearContext(canvasToDrawOn);
       }
 
-      var activeGroup = this.getActiveGroup();
-
       if (this.clipTo) {
         this._clipCanvas(canvasToDrawOn);
       }
 
-      canvasToDrawOn.fillStyle = this.backgroundColor;
-      canvasToDrawOn.fillRect(0, 0, this.width, this.height);
+      if (this.backgroundColor) {
+        canvasToDrawOn.fillStyle = this.backgroundColor;
+        canvasToDrawOn.fillRect(0, 0, this.width, this.height);
+      }
 
       if (typeof this.backgroundImage === 'object') {
         this._drawBackroundImage(canvasToDrawOn);
@@ -545,6 +545,7 @@
 
       this.fire('before:render');
 
+      var activeGroup = this.getActiveGroup();
       for (var i = 0, length = this._objects.length; i < length; ++i) {
         if (!activeGroup ||
             (activeGroup && this._objects[i] && !activeGroup.contains(this._objects[i]))) {
