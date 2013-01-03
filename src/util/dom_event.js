@@ -176,7 +176,7 @@
   function getPointer(event) {
     event || (event = fabric.window.event);
 
-    var element = event.target || event.srcElement,
+    var element = event.target || (typeof event.srcElement !== 'unknown' ? event.srcElement : null),
         scrollLeft = 0,
         scrollTop = 0,
         firstFixedAncestor;

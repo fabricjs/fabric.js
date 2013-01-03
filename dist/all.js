@@ -2822,7 +2822,7 @@ fabric.util.string = {
   function getPointer(event) {
     event || (event = fabric.window.event);
 
-    var element = event.target || event.srcElement,
+    var element = event.target || (typeof event.srcElement !== 'unknown' ? event.srcElement : null),
         scrollLeft = 0,
         scrollTop = 0,
         firstFixedAncestor;
@@ -9888,7 +9888,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
           scaleOffsetSizeY = (size2 - size) / this.scaleY,
           height = this.height,
           width = this.width,
-          methodName = this.transparentCorners ? 'strokeRect' : 'fillRect';
+          methodName = this.transparentCorners ? 'strokeRect' : 'fillRect',
+          isVML = typeof G_vmlCanvasManager !== 'undefined';
 
       ctx.save();
 
@@ -9901,28 +9902,28 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       _left = left - scaleOffsetX - strokeWidth2 - paddingX;
       _top = top - scaleOffsetY - strokeWidth2 - paddingY;
 
-      ctx.clearRect(_left, _top, sizeX, sizeY);
+      isVML || ctx.clearRect(_left, _top, sizeX, sizeY);
       ctx[methodName](_left, _top, sizeX, sizeY);
 
       // top-right
       _left = left + width - scaleOffsetX + strokeWidth2 + paddingX;
       _top = top - scaleOffsetY - strokeWidth2 - paddingY;
 
-      ctx.clearRect(_left, _top, sizeX, sizeY);
+      isVML || ctx.clearRect(_left, _top, sizeX, sizeY);
       ctx[methodName](_left, _top, sizeX, sizeY);
 
       // bottom-left
       _left = left - scaleOffsetX - strokeWidth2 - paddingX;
       _top = top + height + scaleOffsetSizeY + strokeWidth2 + paddingY;
 
-      ctx.clearRect(_left, _top, sizeX, sizeY);
+      isVML || ctx.clearRect(_left, _top, sizeX, sizeY);
       ctx[methodName](_left, _top, sizeX, sizeY);
 
       // bottom-right
       _left = left + width + scaleOffsetSizeX + strokeWidth2 + paddingX;
       _top = top + height + scaleOffsetSizeY + strokeWidth2 + paddingY;
 
-      ctx.clearRect(_left, _top, sizeX, sizeY);
+      isVML || ctx.clearRect(_left, _top, sizeX, sizeY);
       ctx[methodName](_left, _top, sizeX, sizeY);
 
       if (!this.get('lockUniScaling')) {
@@ -9930,28 +9931,28 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         _left = left + width/2 - scaleOffsetX;
         _top = top - scaleOffsetY - strokeWidth2 - paddingY;
 
-        ctx.clearRect(_left, _top, sizeX, sizeY);
+        isVML || ctx.clearRect(_left, _top, sizeX, sizeY);
         ctx[methodName](_left, _top, sizeX, sizeY);
 
         // middle-bottom
         _left = left + width/2 - scaleOffsetX;
         _top = top + height + scaleOffsetSizeY + strokeWidth2 + paddingY;
 
-        ctx.clearRect(_left, _top, sizeX, sizeY);
+        isVML || ctx.clearRect(_left, _top, sizeX, sizeY);
         ctx[methodName](_left, _top, sizeX, sizeY);
 
         // middle-right
         _left = left + width + scaleOffsetSizeX + strokeWidth2 + paddingX;
         _top = top + height/2 - scaleOffsetY;
 
-        ctx.clearRect(_left, _top, sizeX, sizeY);
+        isVML || ctx.clearRect(_left, _top, sizeX, sizeY);
         ctx[methodName](_left, _top, sizeX, sizeY);
 
         // middle-left
         _left = left - scaleOffsetX - strokeWidth2 - paddingX;
         _top = top + height/2 - scaleOffsetY;
 
-        ctx.clearRect(_left, _top, sizeX, sizeY);
+        isVML || ctx.clearRect(_left, _top, sizeX, sizeY);
         ctx[methodName](_left, _top, sizeX, sizeY);
       }
 
@@ -9959,12 +9960,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       if (this.hasRotatingPoint) {
 
         _left = left + width/2 - scaleOffsetX;
-
         _top = this.flipY ?
           (top + height + (this.rotatingPointOffset / this.scaleY) - sizeY/2 + strokeWidth2 + paddingY)
           : (top - (this.rotatingPointOffset / this.scaleY) - sizeY/2 - strokeWidth2 - paddingY);
 
-        ctx.clearRect(_left, _top, sizeX, sizeY);
+        isVML || ctx.clearRect(_left, _top, sizeX, sizeY);
         ctx[methodName](_left, _top, sizeX, sizeY);
       }
 
