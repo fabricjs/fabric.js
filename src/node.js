@@ -43,18 +43,18 @@
     });
   }
 
-  fabric.util.loadImage = function(url, callback) {
+  fabric.util.loadImage = function(url, callback, context) {
     var img = new Image();
     if (url && url.indexOf('data') === 0) {
       img.src = img._src = url;
-      callback(img);
+      callback && callback.call(context, img);
     }
     else if (url) {
       request(url, 'binary', function(body) {
         img.src = new Buffer(body, 'binary');
         // preserving original url, which seems to be lost in node-canvas
         img._src = url;
-        callback(img);
+        callback && callback.call(context, img);
       });
     }
   };
