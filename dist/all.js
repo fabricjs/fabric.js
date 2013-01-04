@@ -2083,8 +2083,10 @@ fabric.Observable.off = fabric.Observable.stopObserving;
       }
       var klass = getKlass(o.type);
       if (klass.async) {
-        klass.fromObject(o, function (o) {
-          enlivenedObjects[index] = o;
+        klass.fromObject(o, function (o, error) {
+          if (!error) {
+            enlivenedObjects[index] = o;
+          }
           onLoaded();
         });
       }
@@ -13881,8 +13883,15 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
       var instance = new fabric.Image(img, object);
       callback && callback(instance);
-      img = img.onload = null;
-    };
+        img = img.onload = img.onerror = null;
+      };
+
+      /** @ignore */
+      img.onerror = function(e) {
+        fabric.log('Error loading ' + img.src);
+        callback && callback(null, true);
+        img = img.onload = img.onerror = null;
+      };
     img.src = src;
   };
 
@@ -15836,18 +15845,18 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
     });
   }
 
-  fabric.util.loadImage = function(url, callback) {
+  fabric.util.loadImage = function(url, callback, context) {
     var img = new Image();
     if (url && url.indexOf('data') === 0) {
       img.src = img._src = url;
-      callback(img);
+      callback && callback.call(context, img);
     }
     else if (url) {
       request(url, 'binary', function(body) {
         img.src = new Buffer(body, 'binary');
         // preserving original url, which seems to be lost in node-canvas
         img._src = url;
-        callback(img);
+        callback && callback.call(context, img);
       });
     }
   };
