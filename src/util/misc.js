@@ -223,8 +223,10 @@
       }
       var klass = getKlass(o.type);
       if (klass.async) {
-        klass.fromObject(o, function (o) {
-          enlivenedObjects[index] = o;
+        klass.fromObject(o, function (o, error) {
+          if (!error) {
+            enlivenedObjects[index] = o;
+          }
           onLoaded();
         });
       }
