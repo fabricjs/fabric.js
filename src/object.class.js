@@ -1826,7 +1826,13 @@
       var obj = this;
 
       to = to.toString();
-      options || (options = { });
+
+      if (!options) {
+        options = { };
+      }
+      else {
+        options = fabric.util.object.clone(options);
+      }
 
       if (!('from' in options)) {
         options.from = this.get(property);
