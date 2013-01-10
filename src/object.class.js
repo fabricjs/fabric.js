@@ -1271,7 +1271,7 @@
     /**
      * Converts an object into a data-url-like string
      * @method toDataURL
-     * @return {String} string of data
+     * @param callback {Function} callback that recieves resulting data-url string
      */
     toDataURL: function(callback) {
       var el = fabric.document.createElement('canvas');
