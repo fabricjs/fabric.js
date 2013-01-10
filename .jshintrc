@@ -2,6 +2,7 @@
   "globals": {
     "fabric":             true,
     "Cufon":              true,
+    "Event":              true,
     "G_vmlCanvasManager": true,
     "ActiveXObject":      true
   },

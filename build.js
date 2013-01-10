@@ -88,6 +88,8 @@ var filesToInclude = [
   ifSpecifiedDependencyInclude('text', 'cufon', 'lib/cufon.js'),
   ifSpecifiedDependencyInclude('serialization', 'json', 'lib/json2.js'),
 
+  ifSpecifiedInclude('gestures', 'lib/event.js'),
+
   'src/log.js',
   'src/observable.js',
 
@@ -120,6 +122,7 @@ var filesToInclude = [
   'src/canvas.animation.js',
 
   ifSpecifiedInclude('serialization', 'src/canvas.serialization.js'),
+  ifSpecifiedInclude('gestures', 'src/canvas.gestures.js'),
 
   'src/object.class.js',
   'src/line.class.js',
