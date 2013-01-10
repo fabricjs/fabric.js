@@ -356,7 +356,7 @@
       };
 
       /** @ignore */
-      img.onerror = function(e) {
+      img.onerror = function() {
         fabric.log('Error loading ' + img.src);
         callback && callback(null, true);
         img = img.onload = img.onerror = null;
