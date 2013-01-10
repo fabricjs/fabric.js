@@ -142,6 +142,13 @@
     defaultCursor:          'default',
 
     /**
+     * Cursor value used during free drawing
+     * @property
+     * @type String
+     */
+    freeDrawingCursor:      'crosshair',
+
+    /**
      * Cursor value used for rotation point
      * @property
      * @type String
@@ -435,6 +442,7 @@
           this.clearContext(this.contextTop);
           this.freeDrawing._render(this.contextTop);
         }
+        this.upperCanvasEl.style.cursor = this.freeDrawingCursor;
         this.fire('mouse:move', { e: e });
         return;
       }
