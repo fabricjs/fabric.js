@@ -6580,45 +6580,118 @@ fabric.util.string = {
 
 })();
 
-(function(global) {
-
-  "use strict";
-
-  var fabric = global.fabric || (global.fabric = { });
+(function() {
 
   var utilMin = fabric.util.array.min,
       utilMax = fabric.util.array.max;
 
-  if (fabric.FreeDrawing) {
-    fabric.warn('fabric.FreeDrawing is already defined');
-    return;
-  }
-
   /**
-   * Free drawing class
-   * Free Drawer handles scribbling on a fabric canvas
-   * It converts the hand writting to a SVG Path and adds this path to the canvas
-   *
-   * @class FreeDrawing
-   * @memberOf fabric
+   * PencilBrush class
+   * @class fabric.PencilBrush
    */
-  fabric.FreeDrawing = fabric.util.createClass( /** @scope fabric.FreeDrawing.prototype */ {
+  fabric.PencilBrush = fabric.util.createClass( /** @scope fabric.PencilBrush.prototype */ {
+
+    /**
+     * Color of the pencil
+     * @property
+     * @type String
+     */
+    color:       'rgb(0, 0, 0)',
+
+    /**
+     * Width of a pencil
+     * @property
+     * @type Number
+     */
+    width:        1,
+
+    /**
+     * Shadow blur of a pencil
+     * @property
+     * @type Number
+     */
+    shadowBlur:   0,
+
+    /**
+     * Shadow color of a pencil
+     * @property
+     * @type String
+     */
+    shadowColor:  '',
+
+    /**
+     * Shadow offset x of a pencil
+     * @property
+     * @type Number
+     */
+    shadowOffsetX: 0,
+
+    /**
+     * Shadow offset y of a pencil
+     * @property
+     * @type Number
+     */
+    shadowOffsetY: 0,
 
     /**
      * Constructor
-     * @metod initialize
-     * @param fabricCanvas {fabric.Canvas}
-     * @return {fabric.FreeDrawing}
+     * @method initialize
+     * @param {fabric.Canvas} canvas
+     * @return {fabric.PencilBrush} Instance of a pencil brush
      */
-    initialize: function(fabricCanvas) {
-      this.canvas = fabricCanvas;
-      this._points = [];
+    initialize: function(canvas) {
+      this.canvas = canvas;
+      this._points = [ ];
+    },
+
+    /**
+     * @method onMouseDown
+     * @param {Object} pointer
+     */
+    onMouseDown: function(pointer) {
+      this._prepareForDrawing(pointer);
+      // capture coordinates immediately
+      // this allows to draw dots (when movement never occurs)
+      this._captureDrawingPath(pointer);
+    },
+
+    /**
+     * @method onMouseMove
+     * @param {Object} pointer
+     */
+    onMouseMove: function(pointer) {
+      this._captureDrawingPath(pointer);
+      // redraw curve
+      // clear top canvas
+      this.canvas.clearContext(this.canvas.contextTop);
+      this._render(this.canvas.contextTop);
+    },
+
+    /**
+     * @method onMouseUp
+     */
+    onMouseUp: function() {
+      this._finalizeAndAddPath();
+    },
+
+    /**
+     * @method _prepareForDrawing
+     * @param {Object} pointer
+     */
+    _prepareForDrawing: function(pointer) {
+
+      var p = new fabric.Point(pointer.x, pointer.y);
+
+      this._reset();
+      this._addPoint(p);
+
+      this.canvas.contextTop.moveTo(p.x, p.y);
     },
 
     /**
      * @private
      * @method _addPoint
-     *
+     * @param {fabric.Point} point
      */
     _addPoint: function(point) {
       this._points.push(point);
@@ -6634,26 +6707,20 @@ fabric.util.string = {
      */
     _reset: function() {
       this._points.length = 0;
+
       var ctx = this.canvas.contextTop;
 
-      // set freehanddrawing line canvas parameters
-      ctx.strokeStyle = this.canvas.freeDrawingColor;
-      ctx.lineWidth = this.canvas.freeDrawingLineWidth;
+      ctx.strokeStyle = this.color;
+      ctx.lineWidth = this.width;
+
+      if (this.shadowBlur) {
+        ctx.shadowBlur = this.shadowBlur;
+        ctx.shadowColor = this.shadowColor || this.color;
+        ctx.shadowOffsetX = this.shadowOffsetX;
+        ctx.shadowOffsetY = this.shadowOffsetY;
+      }
+
       ctx.lineCap = ctx.lineJoin = 'round';
-    },
-
-     /**
-     * @method _prepareForDrawing
-     */
-     _prepareForDrawing: function(pointer) {
-
-      this.canvas._isCurrentlyDrawing = true;
-      this.canvas.discardActiveObject().renderAll();
-
-      var p = new fabric.Point(pointer.x, pointer.y);
-      this._reset();
-      this._addPoint(p);
-      this.canvas.contextTop.moveTo(p.x, p.y);
     },
 
     /**
@@ -6669,12 +6736,10 @@ fabric.util.string = {
     },
 
     /**
-     * Draw a smooth path on the topCanvas using
-     * quadraticCurveTo.
+     * Draw a smooth path on the topCanvas using quadraticCurveTo
      *
      * @private
      * @method _render
-     *
      */
     _render: function() {
       var ctx  = this.canvas.contextTop;
@@ -6702,12 +6767,10 @@ fabric.util.string = {
     },
 
     /**
-     * Return an SVG path based on our
-     * captured points and their boundinb box.
+     * Return an SVG path based on our captured points and their bounding box
      *
      * @private
      * @method _getSVGPathData
-     *
      */
     _getSVGPathData: function() {
       this.box = this.getPathBoundingBox(this._points);
@@ -6787,9 +6850,9 @@ fabric.util.string = {
      * @method _finalizeAndAddPath
      */
     _finalizeAndAddPath: function() {
-      this.canvas._isCurrentlyDrawing = false;
       var ctx = this.canvas.contextTop;
       ctx.closePath();
+
       var path = this._getSVGPathData();
       path = path.join('');
 
@@ -6804,8 +6867,8 @@ fabric.util.string = {
 
       var p = new fabric.Path(path);
       p.fill = null;
-      p.stroke = this.canvas.freeDrawingColor;
-      p.strokeWidth = this.canvas.freeDrawingLineWidth;
+      p.stroke = this.color;
+      p.strokeWidth = this.width;
       this.canvas.add(p);
 
       // set path origin coordinates based on our bounding box
@@ -6825,9 +6888,7 @@ fabric.util.string = {
       this.canvas.fire('path:created', { path: p });
     }
   });
-
-})(typeof exports !== 'undefined' ? exports : this);
-
+})();
 (function() {
 
   var extend = fabric.util.object.extend,
@@ -6937,20 +6998,6 @@ fabric.util.string = {
     selectionLineWidth:     1,
 
     /**
-     * Color of the line used in free drawing mode
-     * @property
-     * @type String
-     */
-    freeDrawingColor:       'rgb(0, 0, 0)',
-
-    /**
-     * Width of a line used in free drawing mode
-     * @property
-     * @type Number
-     */
-    freeDrawingLineWidth:   1,
-
-    /**
      * Default cursor value used when hovering over an object on canvas
      * @property
      * @type String
@@ -6970,6 +7017,13 @@ fabric.util.string = {
      * @type String
      */
     defaultCursor:          'default',
+
+    /**
+     * Cursor value used during free drawing
+     * @property
+     * @type String
+     */
+    freeDrawingCursor:      'crosshair',
 
     /**
      * Cursor value used for rotation point
@@ -7006,10 +7060,12 @@ fabric.util.string = {
     _initInteractive: function() {
       this._currentTransform = null;
       this._groupSelector = null;
-      this.freeDrawing = fabric.FreeDrawing && new fabric.FreeDrawing(this);
       this._initWrapperElement();
       this._createUpperCanvas();
       this._initEvents();
+
+      this.freeDrawingBrush = fabric.PencilBrush && new fabric.PencilBrush(this);
+
       this.calcOffset();
     },
 
@@ -7083,7 +7139,8 @@ fabric.util.string = {
       var target;
 
       if (this.isDrawingMode && this._isCurrentlyDrawing) {
-        this.freeDrawing._finalizeAndAddPath();
+        this._isCurrentlyDrawing = false;
+        this.freeDrawingBrush.onMouseUp();
         this.fire('mouse:up', { e: e });
         return;
       }
@@ -7167,12 +7224,11 @@ fabric.util.string = {
 
       if (this.isDrawingMode) {
         pointer = this.getPointer(e);
-        this.freeDrawing._prepareForDrawing(pointer);
 
-        // capture coordinates immediately;
-        // this allows to draw dots (when movement never occurs)
-        this.freeDrawing._captureDrawingPath(pointer);
+        this._isCurrentlyDrawing = true;
+        this.discardActiveObject().renderAll();
 
+        this.freeDrawingBrush.onMouseDown(pointer);
         this.fire('mouse:down', { e: e });
         return;
       }
@@ -7258,13 +7314,9 @@ fabric.util.string = {
       if (this.isDrawingMode) {
         if (this._isCurrentlyDrawing) {
           pointer = this.getPointer(e);
-          this.freeDrawing._captureDrawingPath(pointer);
-
-          // redraw curve
-          // clear top canvas
-          this.clearContext(this.contextTop);
-          this.freeDrawing._render(this.contextTop);
+          this.freeDrawingBrush.onMouseMove(pointer);
         }
+        this.upperCanvasEl.style.cursor = this.freeDrawingCursor;
         this.fire('mouse:move', { e: e });
         return;
       }
@@ -8637,9 +8689,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     if (!serialized || (serialized && !serialized.objects)) return;
 
     this.clear();
+
     var _this = this;
     this._enlivenObjects(serialized.objects, function () {
       _this.backgroundColor = serialized.background;
+      var backgroundImageLoaded, overlayImageLoaded;
 
       if (serialized.backgroundImage) {
         _this.setBackgroundImage(serialized.backgroundImage, function() {
@@ -8648,11 +8702,15 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
           _this.backgroundImageStretch = serialized.backgroundImageStretch;
 
           _this.renderAll();
+          backgroundImageLoaded = true;
 
-          callback && callback();
+          callback && overlayImageLoaded && callback();
         });
-        return;
       }
+      else {
+        backgroundImageLoaded = true;
+      }
+
       if (serialized.overlayImage) {
         _this.setOverlayImage(serialized.overlayImage, function() {
 
@@ -8660,12 +8718,18 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
           _this.overlayImageTop = serialized.overlayImageTop || 0;
 
           _this.renderAll();
+          overlayImageLoaded = true;
 
-          callback && callback();
+          callback && backgroundImageLoaded && callback();
         });
-        return;
       }
-      callback && callback();
+      else {
+        overlayImageLoaded = true;
+      }
+
+      if (!serialized.backgroundImage && !serialized.overlayImage) {
+        callback && callback();
+      }
     });
 
     return this;
@@ -9397,7 +9461,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
       if (this.active && !noTransform) {
         this.drawBorders(ctx);
-        this.drawCorners(ctx);
+        this.hideCorners || this.drawCorners(ctx);
       }
       ctx.restore();
     },
@@ -10026,7 +10090,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
     /**
      * Converts an object into a data-url-like string
      * @method toDataURL
-     * @return {String} string of data
+     * @param callback {Function} callback that recieves resulting data-url string
      */
     toDataURL: function(callback) {
       var el = fabric.document.createElement('canvas');
@@ -10581,7 +10645,13 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       var obj = this;
 
       to = to.toString();
-      options || (options = { });
+
+      if (!options) {
+        options = { };
+      }
+      else {
+        options = fabric.util.object.clone(options);
+      }
 
       if (!('from' in options)) {
         options.from = this.get(property);
@@ -13887,7 +13957,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       };
 
       /** @ignore */
-      img.onerror = function(e) {
+      img.onerror = function() {
         fabric.log('Error loading ' + img.src);
         callback && callback(null, true);
         img = img.onload = img.onerror = null;

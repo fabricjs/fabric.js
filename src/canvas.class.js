@@ -107,20 +107,6 @@
     selectionLineWidth:     1,
 
     /**
-     * Color of the line used in free drawing mode
-     * @property
-     * @type String
-     */
-    freeDrawingColor:       'rgb(0, 0, 0)',
-
-    /**
-     * Width of a line used in free drawing mode
-     * @property
-     * @type Number
-     */
-    freeDrawingLineWidth:   1,
-
-    /**
      * Default cursor value used when hovering over an object on canvas
      * @property
      * @type String
@@ -183,10 +169,12 @@
     _initInteractive: function() {
       this._currentTransform = null;
       this._groupSelector = null;
-      this.freeDrawing = fabric.FreeDrawing && new fabric.FreeDrawing(this);
       this._initWrapperElement();
       this._createUpperCanvas();
       this._initEvents();
+
+      this.freeDrawingBrush = fabric.PencilBrush && new fabric.PencilBrush(this);
+
       this.calcOffset();
     },
 
@@ -260,7 +248,8 @@
       var target;
 
       if (this.isDrawingMode && this._isCurrentlyDrawing) {
-        this.freeDrawing._finalizeAndAddPath();
+        this._isCurrentlyDrawing = false;
+        this.freeDrawingBrush.onMouseUp();
         this.fire('mouse:up', { e: e });
         return;
       }
@@ -344,12 +333,11 @@
 
       if (this.isDrawingMode) {
         pointer = this.getPointer(e);
-        this.freeDrawing._prepareForDrawing(pointer);
 
-        // capture coordinates immediately;
-        // this allows to draw dots (when movement never occurs)
-        this.freeDrawing._captureDrawingPath(pointer);
+        this._isCurrentlyDrawing = true;
+        this.discardActiveObject().renderAll();
 
+        this.freeDrawingBrush.onMouseDown(pointer);
         this.fire('mouse:down', { e: e });
         return;
       }
@@ -435,12 +423,7 @@
       if (this.isDrawingMode) {
         if (this._isCurrentlyDrawing) {
           pointer = this.getPointer(e);
-          this.freeDrawing._captureDrawingPath(pointer);
-
-          // redraw curve
-          // clear top canvas
-          this.clearContext(this.contextTop);
-          this.freeDrawing._render(this.contextTop);
+          this.freeDrawingBrush.onMouseMove(pointer);
         }
         this.upperCanvasEl.style.cursor = this.freeDrawingCursor;
         this.fire('mouse:move', { e: e });
