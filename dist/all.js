@@ -1,4 +1,4 @@
-/* build: `node build.js modules=ALL` */
+/* build: `node build.js modules=ALL exclude=gestures` */
 /*! Fabric.js Copyright 2008-2012, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
 var fabric = fabric || { version: "1.0.0" };
@@ -5849,6 +5849,9 @@ fabric.util.string = {
      */
     clear: function () {
       this._objects.length = 0;
+      if (this.discardActiveGroup) {
+        this.discardActiveGroup();
+      }
       this.clearContext(this.contextContainer);
       if (this.contextTop) {
         this.clearContext(this.contextTop);
@@ -7256,6 +7259,12 @@ fabric.CircleBrush = fabric.util.createClass( /** @scope fabric.CircleBrush.prot
       if (fabric.isTouchSupported) {
         addListener(this.upperCanvasEl, 'touchstart', this._onMouseDown);
         addListener(this.upperCanvasEl, 'touchmove', this._onMouseMove);
+
+        if (typeof Event !== 'undefined' && 'add' in Event) {
+          Event.add(this.upperCanvasEl, 'gesture', function(e, s) {
+            _this.__onTransformGesture(e, s);
+          });
+        }
       }
       else {
         addListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
@@ -13951,7 +13960,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       replacement.height = imgEl.height;
 
       if (isLikelyNode) {
-        var base64str = canvasEl.toDataURL('image/png').replace(/data:image\/png;base64,/, '');
+        // cut off data:image/png;base64, part in the beginning
+        var base64str = canvasEl.toDataURL('image/png').substring(22);
         replacement.src = new Buffer(base64str, 'base64');
         _this._element = replacement;
 

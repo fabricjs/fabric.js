@@ -228,6 +228,12 @@
       if (fabric.isTouchSupported) {
         addListener(this.upperCanvasEl, 'touchstart', this._onMouseDown);
         addListener(this.upperCanvasEl, 'touchmove', this._onMouseMove);
+
+        if (typeof Event !== 'undefined' && 'add' in Event) {
+          Event.add(this.upperCanvasEl, 'gesture', function(e, s) {
+            _this.__onTransformGesture(e, s);
+          });
+        }
       }
       else {
         addListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);

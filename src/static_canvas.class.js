@@ -503,6 +503,9 @@
      */
     clear: function () {
       this._objects.length = 0;
+      if (this.discardActiveGroup) {
+        this.discardActiveGroup();
+      }
       this.clearContext(this.contextContainer);
       if (this.contextTop) {
         this.clearContext(this.contextTop);

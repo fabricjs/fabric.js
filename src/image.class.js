@@ -213,7 +213,8 @@
       replacement.height = imgEl.height;
 
       if (isLikelyNode) {
-        var base64str = canvasEl.toDataURL('image/png').replace(/data:image\/png;base64,/, '');
+        // cut off data:image/png;base64, part in the beginning
+        var base64str = canvasEl.toDataURL('image/png').substring(22);
         replacement.src = new Buffer(base64str, 'base64');
         _this._element = replacement;
 
