@@ -1216,7 +1216,8 @@
 
       if (this.controlsAboveOverlay &&
           this.lastRenderedObjectWithControlsAboveOverlay &&
-          this.containsPoint(e, this.lastRenderedObjectWithControlsAboveOverlay)) {
+          this.containsPoint(e, this.lastRenderedObjectWithControlsAboveOverlay) &&
+          this.lastRenderedObjectWithControlsAboveOverlay._findTargetCorner(e, this._offset)) {
         target = this.lastRenderedObjectWithControlsAboveOverlay;
         return target;
       }
