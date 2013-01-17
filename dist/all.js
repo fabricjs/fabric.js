@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures` */
 /*! Fabric.js Copyright 2008-2012, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.0.1" };
+var fabric = fabric || { version: "1.0.2" };
 
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
@@ -8049,7 +8049,8 @@ fabric.util.string = {
 
       if (this.controlsAboveOverlay &&
           this.lastRenderedObjectWithControlsAboveOverlay &&
-          this.containsPoint(e, this.lastRenderedObjectWithControlsAboveOverlay)) {
+          this.containsPoint(e, this.lastRenderedObjectWithControlsAboveOverlay) &&
+          this.lastRenderedObjectWithControlsAboveOverlay._findTargetCorner(e, this._offset)) {
         target = this.lastRenderedObjectWithControlsAboveOverlay;
         return target;
       }
@@ -8373,6 +8374,7 @@ fabric.util.string = {
    */
   fabric.Element = fabric.Canvas;
 })();
+
 fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
   /**
