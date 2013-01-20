@@ -1,5 +1,8 @@
 (function() {
 
+  var sqrt = Math.sqrt,
+      atan2 = Math.atan2;
+
   /**
    * @namespace
    */
@@ -295,6 +298,47 @@
     }
   }
 
+  /**
+   * Draws a dashed line between two points
+   *
+   * This method is used to draw dashed line around selection area.
+   * See <a href="http://stackoverflow.com/questions/4576724/dotted-stroke-in-canvas">dotted stroke in canvas</a>
+   *
+   * @method drawDashedLine
+   * @param ctx {Canvas} context
+   * @param x {Number} start x coordinate
+   * @param y {Number} start y coordinate
+   * @param x2 {Number} end x coordinate
+   * @param y2 {Number} end y coordinate
+   * @param da {Array} dash array pattern
+   */
+  function drawDashedLine(ctx, x, y, x2, y2, da) {
+    var dx = x2 - x,
+        dy = y2 - y,
+        len = sqrt(dx*dx + dy*dy),
+        rot = atan2(dy, dx),
+        dc = da.length,
+        di = 0,
+        draw = true;
+
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.moveTo(0, 0);
+    ctx.rotate(rot);
+
+    x = 0;
+    while (len > x) {
+      x += da[di++ % dc];
+      if (x > len) {
+        x = len;
+      }
+      ctx[draw ? 'lineTo' : 'moveTo'](x, 0);
+      draw = !draw;
+    }
+
+    ctx.restore();
+  }
+
   fabric.util.removeFromArray = removeFromArray;
   fabric.util.degreesToRadians = degreesToRadians;
   fabric.util.radiansToDegrees = radiansToDegrees;
@@ -308,4 +352,6 @@
   fabric.util.enlivenObjects = enlivenObjects;
   fabric.util.groupSVGElements = groupSVGElements;
   fabric.util.populateWithProperties = populateWithProperties;
+  fabric.util.drawDashedLine = drawDashedLine;
+
 })();

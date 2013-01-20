@@ -91,7 +91,7 @@ var filesToInclude = [
   ifSpecifiedInclude('gestures', 'lib/event.js'),
 
   'src/log.js',
-  'src/observable.js',
+  'src/observable.mixin.js',
 
   'src/util/misc.js',
   'src/util/lang_array.js',
@@ -121,10 +121,15 @@ var filesToInclude = [
 
   'src/canvas.animation.js',
 
-  ifSpecifiedInclude('serialization', 'src/canvas.serialization.js'),
-  ifSpecifiedInclude('gestures', 'src/canvas.gestures.js'),
+  ifSpecifiedInclude('serialization', 'src/canvas_serialization.mixin.js'),
+  ifSpecifiedInclude('gestures', 'src/canvas_gestures.mixin.js'),
 
   'src/object.class.js',
+  'src/object_origin.mixin.js',
+  'src/object_geometry.mixin.js',
+
+  ifSpecifiedInclude('interaction', 'src/object_interactivity.mixin.js'),
+
   'src/line.class.js',
   'src/circle.class.js',
   'src/triangle.class.js',
@@ -137,7 +142,7 @@ var filesToInclude = [
   'src/group.class.js',
   'src/image.class.js',
 
-  ifSpecifiedInclude('object_straightening', 'src/object_straightening.js'),
+  ifSpecifiedInclude('object_straightening', 'src/object_straightening.mixin.js'),
 
   ifSpecifiedInclude('image_filters', 'src/image_filters.js'),
 

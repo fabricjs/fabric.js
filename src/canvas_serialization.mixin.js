@@ -1,4 +1,4 @@
-fabric.util.object.extend(fabric.StaticCanvas.prototype, {
+fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.StaticCanvas.prototype */ {
 
   /**
    * Populates canvas with data from the specified dataless JSON
@@ -13,9 +13,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
    */
   loadFromDatalessJSON: function (json, callback) {
 
-    if (!json) {
-      return;
-    }
+    if (!json) return;
 
     // serialize if it wasn't already
     var serialized = (typeof json === 'string')
@@ -26,9 +24,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
     this.clear();
 
-    // TODO: test this
-    this.backgroundColor = serialized.background;
-    this._enlivenDatalessObjects(serialized.objects, callback);
+    var _this = this;
+    this._enlivenDatalessObjects(serialized.objects, function() {
+      _this._setBgOverlayImages(serialized, callback);
+    });
   },
 
   /**
@@ -37,6 +36,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
    * @param {Function} callback
    */
   _enlivenDatalessObjects: function (objects, callback) {
+    var _this = this,
+        numLoadedObjects = 0,
+        numTotalObjects = objects.length;
 
     /** @ignore */
     function onObjectLoaded(object, index) {
@@ -128,10 +130,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
       }
     }
 
-    var _this = this,
-        numLoadedObjects = 0,
-        numTotalObjects = objects.length;
-
     if (numTotalObjects === 0 && callback) {
       callback();
     }
@@ -169,47 +167,56 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
     var _this = this;
     this._enlivenObjects(serialized.objects, function () {
-      _this.backgroundColor = serialized.background;
-      var backgroundImageLoaded, overlayImageLoaded;
-
-      if (serialized.backgroundImage) {
-        _this.setBackgroundImage(serialized.backgroundImage, function() {
-
-          _this.backgroundImageOpacity = serialized.backgroundImageOpacity;
-          _this.backgroundImageStretch = serialized.backgroundImageStretch;
-
-          _this.renderAll();
-          backgroundImageLoaded = true;
-
-          callback && overlayImageLoaded && callback();
-        });
-      }
-      else {
-        backgroundImageLoaded = true;
-      }
-
-      if (serialized.overlayImage) {
-        _this.setOverlayImage(serialized.overlayImage, function() {
-
-          _this.overlayImageLeft = serialized.overlayImageLeft || 0;
-          _this.overlayImageTop = serialized.overlayImageTop || 0;
-
-          _this.renderAll();
-          overlayImageLoaded = true;
-
-          callback && backgroundImageLoaded && callback();
-        });
-      }
-      else {
-        overlayImageLoaded = true;
-      }
-
-      if (!serialized.backgroundImage && !serialized.overlayImage) {
-        callback && callback();
-      }
+      _this._setBgOverlayImages(serialized, callback);
     });
 
     return this;
+  },
+
+  _setBgOverlayImages: function(serialized, callback) {
+
+    var _this = this,
+        backgroundImageLoaded,
+        overlayImageLoaded;
+
+    this.backgroundColor = serialized.background;
+
+    if (serialized.backgroundImage) {
+      this.setBackgroundImage(serialized.backgroundImage, function() {
+
+        _this.backgroundImageOpacity = serialized.backgroundImageOpacity;
+        _this.backgroundImageStretch = serialized.backgroundImageStretch;
+
+        _this.renderAll();
+
+        backgroundImageLoaded = true;
+
+        callback && overlayImageLoaded && callback();
+      });
+    }
+    else {
+      backgroundImageLoaded = true;
+    }
+
+    if (serialized.overlayImage) {
+      this.setOverlayImage(serialized.overlayImage, function() {
+
+        _this.overlayImageLeft = serialized.overlayImageLeft || 0;
+        _this.overlayImageTop = serialized.overlayImageTop || 0;
+
+        _this.renderAll();
+        overlayImageLoaded = true;
+
+        callback && backgroundImageLoaded && callback();
+      });
+    }
+    else {
+      overlayImageLoaded = true;
+    }
+
+    if (!serialized.backgroundImage && !serialized.overlayImage) {
+      callback && callback();
+    }
   },
 
   /**

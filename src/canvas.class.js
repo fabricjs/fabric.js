@@ -16,8 +16,6 @@
         'mr': 'e-resize',
         'mb': 's-resize'
       },
-
-      sqrt = Math.sqrt,
       atan2 = Math.atan2,
       abs = Math.abs,
       min = Math.min,
@@ -199,42 +197,6 @@
     _initEvents: function () {
       var _this = this;
 
-      this._onMouseDown = function (e) {
-        _this.__onMouseDown(e);
-
-        addListener(fabric.document, 'mouseup', _this._onMouseUp);
-        fabric.isTouchSupported && addListener(fabric.document, 'touchend', _this._onMouseUp);
-
-        addListener(fabric.document, 'mousemove', _this._onMouseMove);
-        fabric.isTouchSupported && addListener(fabric.document, 'touchmove', _this._onMouseMove);
-
-        removeListener(_this.upperCanvasEl, 'mousemove', _this._onMouseMove);
-        fabric.isTouchSupported && removeListener(_this.upperCanvasEl, 'touchmove', _this._onMouseMove);
-      };
-
-      this._onMouseUp = function (e) {
-        _this.__onMouseUp(e);
-
-        removeListener(fabric.document, 'mouseup', _this._onMouseUp);
-        fabric.isTouchSupported && removeListener(fabric.document, 'touchend', _this._onMouseUp);
-
-        removeListener(fabric.document, 'mousemove', _this._onMouseMove);
-        fabric.isTouchSupported && removeListener(fabric.document, 'touchmove', _this._onMouseMove);
-
-        addListener(_this.upperCanvasEl, 'mousemove', _this._onMouseMove);
-        fabric.isTouchSupported && addListener(_this.upperCanvasEl, 'touchmove', _this._onMouseMove);
-      };
-
-      this._onMouseMove = function (e) {
-        e.preventDefault && e.preventDefault();
-        _this.__onMouseMove(e);
-      };
-
-      this._onResize = function () {
-        _this.calcOffset();
-      };
-
-
       addListener(fabric.window, 'resize', this._onResize);
 
       if (fabric.isTouchSupported) {
@@ -251,6 +213,57 @@
         addListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
         addListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
       }
+    },
+
+    /**
+     * @method _onMouseDown
+     * @private
+     */
+    _onMouseDown: function (e) {
+      this.__onMouseDown(e);
+
+      addListener(fabric.document, 'mouseup', this._onMouseUp);
+      fabric.isTouchSupported && addListener(fabric.document, 'touchend', this._onMouseUp);
+
+      addListener(fabric.document, 'mousemove', this._onMouseMove);
+      fabric.isTouchSupported && addListener(fabric.document, 'touchmove', this._onMouseMove);
+
+      removeListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
+      fabric.isTouchSupported && removeListener(this.upperCanvasEl, 'touchmove', this._onMouseMove);
+    },
+
+    /**
+     * @method _onMouseUp
+     * @private
+     */
+    _onMouseUp: function (e) {
+      this.__onMouseUp(e);
+
+      removeListener(fabric.document, 'mouseup', this._onMouseUp);
+      fabric.isTouchSupported && removeListener(fabric.document, 'touchend', this._onMouseUp);
+
+      removeListener(fabric.document, 'mousemove', this._onMouseMove);
+      fabric.isTouchSupported && removeListener(fabric.document, 'touchmove', this._onMouseMove);
+
+      addListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
+      fabric.isTouchSupported && addListener(this.upperCanvasEl, 'touchmove', this._onMouseMove);
+    },
+
+    /**
+     * @method _onMouseMove
+     * @private
+     */
+    _onMouseMove: function (e) {
+      e.preventDefault && e.preventDefault();
+      this.__onMouseMove(e);
+    },
+
+    /**
+     * @method _onResize
+     * @private
+     */
+    _onResize: function () {
+      this.calcOffset();
     },
 
     /**
@@ -295,7 +308,7 @@
         }
 
         if (this._previousOriginX) {
-          this._adjustPosition(this._currentTransform.target, this._previousOriginX);
+          this._currentTransform.target.adjustPosition(this._previousOriginX);
           this._previousOriginX = null;
         }
       }
@@ -405,7 +418,7 @@
       // center origin when rotating
       if (corner === 'mtr') {
         this._previousOriginX = this._currentTransform.target.originX;
-        this._adjustPosition(this._currentTransform.target, 'center');
+        this._currentTransform.target.adjustPosition('center');
         this._currentTransform.left = this._currentTransform.target.left;
         this._currentTransform.top = this._currentTransform.target.top;
       }
@@ -614,6 +627,7 @@
      */
     _resetCurrentTransform: function(e) {
       var t = this._currentTransform;
+
       t.target.set('scaleX', t.original.scaleX);
       t.target.set('scaleY', t.original.scaleY);
       t.target.set('left', t.original.left);
@@ -1062,9 +1076,11 @@
         else {
           if (corner in cursorMap) {
             s.cursor = cursorMap[corner];
-          } else if (corner === 'mtr' && target.hasRotatingPoint) {
+          }
+          else if (corner === 'mtr' && target.hasRotatingPoint) {
             s.cursor = this.rotationCursor;
-          } else {
+          }
+          else {
             s.cursor = this.defaultCursor;
             return false;
           }
@@ -1099,13 +1115,17 @@
 
       // selection border
       if (this.selectionDashArray.length > 1) {
+
         var px = groupSelector.ex + STROKE_OFFSET - ((left > 0) ? 0: aleft);
         var py = groupSelector.ey + STROKE_OFFSET - ((top > 0) ? 0: atop);
+
         ctx.beginPath();
-        this.drawDashedLine(ctx, px, py, px+aleft, py, this.selectionDashArray);
-        this.drawDashedLine(ctx, px, py+atop-1, px+aleft, py+atop-1, this.selectionDashArray);
-        this.drawDashedLine(ctx, px, py, px, py+atop, this.selectionDashArray);
-        this.drawDashedLine(ctx, px+aleft-1, py, px+aleft-1, py+atop, this.selectionDashArray);
+
+        fabric.util.drawDashedLine(ctx, px, py, px+aleft, py, this.selectionDashArray);
+        fabric.util.drawDashedLine(ctx, px, py+atop-1, px+aleft, py+atop-1, this.selectionDashArray);
+        fabric.util.drawDashedLine(ctx, px, py, px, py+atop, this.selectionDashArray);
+        fabric.util.drawDashedLine(ctx, px+aleft-1, py, px+aleft-1, py+atop, this.selectionDashArray);
+
         ctx.closePath();
         ctx.stroke();
       }
@@ -1117,47 +1137,6 @@
           atop
         );
       }
-    },
-
-    /**
-     * Draws a dashed line between two points
-     *
-     * This method is used to draw dashed line around selection area.
-     * See <a href="http://stackoverflow.com/questions/4576724/dotted-stroke-in-canvas">dotted stroke in canvas</a>
-     *
-     * @method drawDashedLine
-     * @param ctx {Canvas} context
-     * @param x {Number} start x coordinate
-     * @param y {Number} start y coordinate
-     * @param x2 {Number} end x coordinate
-     * @param y2 {Number} end y coordinate
-     * @param da {Array} dash array pattern
-     */
-    drawDashedLine: function(ctx, x, y, x2, y2, da) {
-      var dx = x2 - x,
-          dy = y2 - y,
-          len = sqrt(dx*dx + dy*dy),
-          rot = atan2(dy, dx),
-          dc = da.length,
-          di = 0,
-          draw = true;
-
-      ctx.save();
-      ctx.translate(x, y);
-      ctx.moveTo(0, 0);
-      ctx.rotate(rot);
-
-      x = 0;
-      while (len > x) {
-        x += da[di++ % dc];
-        if (x > len) {
-          x = len;
-        }
-        ctx[draw ? 'lineTo' : 'moveTo'](x, 0);
-        draw = !draw;
-      }
-
-      ctx.restore();
     },
 
     /**
@@ -1470,51 +1449,6 @@
         this.fire('selection:cleared');
       }
       return this;
-    },
-
-    /**
-     * @private
-     * @method _adjustPosition
-     * @param obj
-     * @param {String} to One of left, center, right
-     */
-    _adjustPosition: function(obj, to) {
-
-      var angle = fabric.util.degreesToRadians(obj.angle);
-
-      var hypotHalf = obj.getWidth() / 2;
-      var xHalf = Math.cos(angle) * hypotHalf;
-      var yHalf = Math.sin(angle) * hypotHalf;
-
-      var hypotFull = obj.getWidth();
-      var xFull = Math.cos(angle) * hypotFull;
-      var yFull = Math.sin(angle) * hypotFull;
-
-      if (obj.originX === 'center' && to === 'left' ||
-          obj.originX === 'right' && to === 'center') {
-        // move half left
-        obj.left -= xHalf;
-        obj.top -= yHalf;
-      }
-      else if (obj.originX === 'left' && to === 'center' ||
-               obj.originX === 'center' && to === 'right') {
-        // move half right
-        obj.left += xHalf;
-        obj.top += yHalf;
-      }
-      else if (obj.originX === 'left' && to === 'right') {
-        // move full right
-        obj.left += xFull;
-        obj.top += yFull;
-      }
-      else if (obj.originX === 'right' && to === 'left') {
-        // move full left
-        obj.left -= xFull;
-        obj.top -= yFull;
-      }
-
-      obj.setCoords();
-      obj.originX = to;
     }
   };
 

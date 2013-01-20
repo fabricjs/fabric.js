@@ -130,6 +130,67 @@
     },
 
     /**
+     * @private
+     * @method _renderDashedStroke
+     */
+    _renderDashedStroke: function(ctx) {
+
+      if (1 & this.strokeDashArray.length /* if odd number of items */) {
+        /* duplicate items */
+        this.strokeDashArray.push.apply(this.strokeDashArray, this.strokeDashArray);
+      }
+
+      var i = 0,
+          x = -this.width/2, y = -this.height/2,
+          _this = this,
+          padding = this.padding,
+          dashedArrayLength = this.strokeDashArray.length;
+
+      ctx.save();
+      ctx.beginPath();
+
+      /** @ignore */
+      function renderSide(xMultiplier, yMultiplier) {
+
+        var lineLength = 0,
+            lengthDiff = 0,
+            sideLength = (yMultiplier ? _this.height : _this.width) + padding * 2;
+
+        while (lineLength < sideLength) {
+
+          var lengthOfSubPath = _this.strokeDashArray[i++];
+          lineLength += lengthOfSubPath;
+
+          if (lineLength > sideLength) {
+            lengthDiff = lineLength - sideLength;
+          }
+
+          // track coords
+          if (xMultiplier) {
+            x += (lengthOfSubPath * xMultiplier) - (lengthDiff * xMultiplier || 0);
+          }
+          else {
+            y += (lengthOfSubPath * yMultiplier) - (lengthDiff * yMultiplier || 0);
+          }
+
+          ctx[1 & i /* odd */ ? 'moveTo' : 'lineTo'](x, y);
+          if (i >= dashedArrayLength) {
+            i = 0;
+          }
+        }
+      }
+
+      renderSide(1, 0);
+      renderSide(0, 1);
+      renderSide(-1, 0);
+      renderSide(0, -1);
+
+      ctx.stroke();
+      ctx.closePath();
+      ctx.restore();
+    },
+
+    /**
      * @method _normalizeLeftTopProperties
      * @private
      * Since coordinate system differs from that of SVG
