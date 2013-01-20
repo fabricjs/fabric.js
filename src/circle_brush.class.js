@@ -2,14 +2,7 @@
  * CircleBrush class
  * @class fabric.CircleBrush
  */
-fabric.CircleBrush = fabric.util.createClass( /** @scope fabric.CircleBrush.prototype */ {
-
-  /**
-   * Color of the brush
-   * @property
-   * @type String
-   */
-  color: 'rgb(0, 0, 0)',
+fabric.CircleBrush = fabric.util.createClass( fabric.BaseBrush, /** @scope fabric.CircleBrush.prototype */ {
 
   /**
    * Width of a brush
@@ -17,34 +10,6 @@ fabric.CircleBrush = fabric.util.createClass( /** @scope fabric.CircleBrush.prot
    * @type Number
    */
   width: 10,
-
-  /**
-   * Shadow blur of a pencil
-   * @property
-   * @type Number
-   */
-  shadowBlur:   0,
-
-  /**
-   * Shadow color of a pencil
-   * @property
-   * @type String
-   */
-  shadowColor:  '',
-
-  /**
-   * Shadow offset x of a pencil
-   * @property
-   * @type Number
-   */
-  shadowOffsetX: 0,
-
-  /**
-   * Shadow offset y of a pencil
-   * @property
-   * @type Number
-   */
-  shadowOffsetY: 0,
 
   /**
    * Constructor

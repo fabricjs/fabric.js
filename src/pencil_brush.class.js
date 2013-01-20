@@ -6,50 +6,9 @@
   /**
    * PencilBrush class
    * @class fabric.PencilBrush
+   * @extends fabric.BaseBrush
    */
-  fabric.PencilBrush = fabric.util.createClass( /** @scope fabric.PencilBrush.prototype */ {
-
-    /**
-     * Color of the pencil
-     * @property
-     * @type String
-     */
-    color:       'rgb(0, 0, 0)',
-
-    /**
-     * Width of a pencil
-     * @property
-     * @type Number
-     */
-    width:        1,
-
-    /**
-     * Shadow blur of a pencil
-     * @property
-     * @type Number
-     */
-    shadowBlur:   0,
-
-    /**
-     * Shadow color of a pencil
-     * @property
-     * @type String
-     */
-    shadowColor:  '',
-
-    /**
-     * Shadow offset x of a pencil
-     * @property
-     * @type Number
-     */
-    shadowOffsetX: 0,
-
-    /**
-     * Shadow offset y of a pencil
-     * @property
-     * @type Number
-     */
-    shadowOffsetY: 0,
+  fabric.PencilBrush = fabric.util.createClass( fabric.BaseBrush, /** @scope fabric.PencilBrush.prototype */ {
 
     /**
      * Constructor
@@ -126,19 +85,8 @@
     _reset: function() {
       this._points.length = 0;
 
-      var ctx = this.canvas.contextTop;
-
-      ctx.strokeStyle = this.color;
-      ctx.lineWidth = this.width;
-
-      if (this.shadowBlur) {
-        ctx.shadowBlur = this.shadowBlur;
-        ctx.shadowColor = this.shadowColor || this.color;
-        ctx.shadowOffsetX = this.shadowOffsetX;
-        ctx.shadowOffsetY = this.shadowOffsetY;
-      }
-
-      ctx.lineCap = ctx.lineJoin = 'round';
+      this.setBrushStyles();
+      this.setShadowStyles();
     },
 
     /**
