@@ -118,8 +118,9 @@ var filesToInclude = [
   ifSpecifiedInclude('freedrawing', 'src/freedrawing.class.js'),
 
   ifSpecifiedInclude('interaction', 'src/canvas.class.js'),
+  ifSpecifiedInclude('interaction', 'src/canvas_events.mixin.js'),
 
-  'src/canvas.animation.js',
+  'src/canvas_animation.mixin.js',
 
   ifSpecifiedInclude('serialization', 'src/canvas_serialization.mixin.js'),
   ifSpecifiedInclude('gestures', 'src/canvas_gestures.mixin.js'),
