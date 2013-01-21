@@ -533,6 +533,8 @@
         this.clearContext(canvasToDrawOn);
       }
 
+      this.fire('before:render');
+
       if (this.clipTo) {
         this._clipCanvas(canvasToDrawOn);
       }
@@ -545,8 +547,6 @@
       if (typeof this.backgroundImage === 'object') {
         this._drawBackroundImage(canvasToDrawOn);
       }
-
-      this.fire('before:render');
 
       var activeGroup = this.getActiveGroup();
       for (var i = 0, length = this._objects.length; i < length; ++i) {
