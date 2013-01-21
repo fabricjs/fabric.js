@@ -18,13 +18,13 @@ var minifier = buildArgsAsObject.minifier || 'uglifyjs';
 var mininfierCmd;
 
 if (minifier === 'yui') {
-  mininfierCmd = 'java -jar lib/yuicompressor-2.4.2.jar dist/all.js -o dist/all.min.js';
+  mininfierCmd = 'java -jar lib/yuicompressor-2.4.6.jar dist/all.js -o dist/all.min.js';
 }
 else if (minifier === 'closure') {
   mininfierCmd = 'java -jar lib/google_closure_compiler.jar --js dist/all.js --js_output_file dist/all.min.js';
 }
 else if (minifier === 'uglifyjs') {
-  mininfierCmd = 'uglifyjs -o dist/all.min.js dist/all.js';
+  mininfierCmd = 'uglifyjs --source-map dist/all.js.map --output dist/all.min.js dist/all.js';
 }
 
 var includeAllModules = modulesToInclude.length === 1 && modulesToInclude[0] === 'ALL';
