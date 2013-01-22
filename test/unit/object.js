@@ -305,6 +305,14 @@
     equal(cObj.get('scaleY'), 100/560);
   });
 
+  test('resizeToFit', function() {
+    var cObj = new fabric.Object({ width: 500, height: 600 });
+    ok(typeof cObj.resizeToFit == 'function');
+    equal(cObj.resizeToFit(100, 200), cObj, 'chainable');
+    equal(cObj.get('scaleY'), cObj.get('scaleX'));
+    equal(cObj.get('scaleY'), 100/500);
+  });
+
   test('scaleToWidth on rotated object', function() {
     var obj = new fabric.Object({ height: 100, width: 100 });
     obj.rotate(45);
