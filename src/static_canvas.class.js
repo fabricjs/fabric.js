@@ -510,6 +510,7 @@
       if (this.contextTop) {
         this.clearContext(this.contextTop);
       }
+      this.fire('canvas:cleared');
       this.renderAll();
       return this;
     },
@@ -959,14 +960,22 @@
      * @return {Object} removed object
      */
     remove: function (object) {
-      removeFromArray(this._objects, object);
+      // removing active object should fire "selection:cleared" events
       if (this.getActiveObject() === object) {
-
-        // removing active object should fire "selection:cleared" events
         this.fire('before:selection:cleared', { target: object });
         this.discardActiveObject();
         this.fire('selection:cleared');
       }
+
+      var objects = this._objects;
+      var index = objects.indexOf(object);
+
+      // removing any object should fire "objct:removed" events
+      if (index !== -1) {
+        objects.splice(index,1);
+        this.fire('object:removed', { target: object });
+      }
+
       this.renderAll();
       return object;
     },
