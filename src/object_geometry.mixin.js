@@ -193,6 +193,22 @@
     },
 
     /**
+     * Resizes an object to fit within the specified dimensions while retaining the original aspect ratio.
+     * @method resizeToFit
+     * @param width {Number} new width value
+     * @param height {Number} new height value
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+    resizeToFit: function(width, height) {
+      var xRatio = width / this.getWidth(),
+        yRatio = height / this.getHeight(),
+        ratio = Math.min(xRatio, yRatio);
+
+      return this.scale(ratio);
+    },
+
+    /**
      * Sets corner position coordinates based on current angle, width and height
      * @method setCoords
      * @return {fabric.Object} thisArg
