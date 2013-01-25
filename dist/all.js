@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures` */
 /*! Fabric.js Copyright 2008-2012, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.0.2" };
+var fabric = fabric || { version: "1.0.3" };
 
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
@@ -2199,6 +2199,14 @@ fabric.Observable.off = fabric.Observable.stopObserving;
     ctx.restore();
   }
 
+  function createCanvasElement() {
+    var canvasEl = fabric.document.createElement('canvas');
+    if (!canvasEl.getContext && typeof G_vmlCanvasManager !== 'undefined') {
+      G_vmlCanvasManager.initElement(canvasEl);
+    }
+    return canvasEl;
+  }
+
   fabric.util.removeFromArray = removeFromArray;
   fabric.util.degreesToRadians = degreesToRadians;
   fabric.util.radiansToDegrees = radiansToDegrees;
@@ -2213,6 +2221,7 @@ fabric.Observable.off = fabric.Observable.stopObserving;
   fabric.util.groupSVGElements = groupSVGElements;
   fabric.util.populateWithProperties = populateWithProperties;
   fabric.util.drawDashedLine = drawDashedLine;
+  fabric.util.createCanvasElement = createCanvasElement;
 
 })();
 (function() {
@@ -5624,12 +5633,8 @@ fabric.util.string = {
      * @param {HTMLElement} element
      */
     _initCanvasElement: function(element) {
-      if (typeof element.getContext === 'undefined' &&
-          typeof G_vmlCanvasManager !== 'undefined' &&
-          G_vmlCanvasManager.initElement) {
+      fabric.util.createCanvasElement(element);
 
-        G_vmlCanvasManager.initElement(element);
-      }
       if (typeof element.getContext === 'undefined') {
         throw CANVAS_INIT_ERROR;
       }
@@ -5902,6 +5907,7 @@ fabric.util.string = {
       if (this.contextTop) {
         this.clearContext(this.contextTop);
       }
+      this.fire('canvas:cleared');
       this.renderAll();
       return this;
     },
@@ -5925,6 +5931,8 @@ fabric.util.string = {
         this.clearContext(canvasToDrawOn);
       }
 
+      this.fire('before:render');
+
       if (this.clipTo) {
         this._clipCanvas(canvasToDrawOn);
       }
@@ -5937,8 +5945,6 @@ fabric.util.string = {
       if (typeof this.backgroundImage === 'object') {
         this._drawBackroundImage(canvasToDrawOn);
       }
-
-      this.fire('before:render');
 
       var activeGroup = this.getActiveGroup();
       for (var i = 0, length = this._objects.length; i < length; ++i) {
@@ -6079,6 +6085,8 @@ fabric.util.string = {
       var data = (fabric.StaticCanvas.supports('toDataURLWithQuality'))
                    ? canvasEl.toDataURL('image/' + format, quality)
                    : canvasEl.toDataURL('image/' + format);
+
+      this.contextTop && this.clearContext(this.contextTop);
       this.renderAll();
       return data;
     },
@@ -6132,6 +6140,7 @@ fabric.util.string = {
         this.setActiveObject(activeObject);
       }
 
+      this.contextTop && this.clearContext(this.contextTop);
       this.renderAll();
 
       return dataURL;
@@ -6351,14 +6360,22 @@ fabric.util.string = {
      * @return {Object} removed object
      */
     remove: function (object) {
-      removeFromArray(this._objects, object);
+      // removing active object should fire "selection:cleared" events
       if (this.getActiveObject() === object) {
-
-        // removing active object should fire "selection:cleared" events
         this.fire('before:selection:cleared', { target: object });
         this.discardActiveObject();
         this.fire('selection:cleared');
       }
+
+      var objects = this._objects;
+      var index = objects.indexOf(object);
+
+      // removing any object should fire "objct:removed" events
+      if (index !== -1) {
+        objects.splice(index,1);
+        this.fire('object:removed', { target: object });
+      }
+
       this.renderAll();
       return object;
     },
@@ -6583,11 +6600,8 @@ fabric.util.string = {
      *                          `null` if canvas element or context can not be initialized
      */
     supports: function (methodName) {
-      var el = fabric.document.createElement('canvas');
+      var el = fabric.util.createCanvasElement();
 
-      if (typeof G_vmlCanvasManager !== 'undefined') {
-        G_vmlCanvasManager.initElement(el);
-      }
       if (!el || !el.getContext) {
         return null;
       }
@@ -7942,13 +7956,13 @@ fabric.util.string = {
     _onMouseDown: function (e) {
       this.__onMouseDown(e);
 
-      addListener(fabric.document, 'mouseup', this._onMouseUp);
+      !fabric.isTouchSupported && addListener(fabric.document, 'mouseup', this._onMouseUp);
       fabric.isTouchSupported && addListener(fabric.document, 'touchend', this._onMouseUp);
 
-      addListener(fabric.document, 'mousemove', this._onMouseMove);
+      !fabric.isTouchSupported && addListener(fabric.document, 'mousemove', this._onMouseMove);
       fabric.isTouchSupported && addListener(fabric.document, 'touchmove', this._onMouseMove);
 
-      removeListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
+      !fabric.isTouchSupported && removeListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
       fabric.isTouchSupported && removeListener(this.upperCanvasEl, 'touchmove', this._onMouseMove);
     },
 
@@ -7959,13 +7973,13 @@ fabric.util.string = {
     _onMouseUp: function (e) {
       this.__onMouseUp(e);
 
-      removeListener(fabric.document, 'mouseup', this._onMouseUp);
+      !fabric.isTouchSupported && removeListener(fabric.document, 'mouseup', this._onMouseUp);
       fabric.isTouchSupported && removeListener(fabric.document, 'touchend', this._onMouseUp);
 
-      removeListener(fabric.document, 'mousemove', this._onMouseMove);
+      !fabric.isTouchSupported && removeListener(fabric.document, 'mousemove', this._onMouseMove);
       fabric.isTouchSupported && removeListener(fabric.document, 'touchmove', this._onMouseMove);
 
-      addListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
+      !fabric.isTouchSupported && addListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
       fabric.isTouchSupported && addListener(this.upperCanvasEl, 'touchmove', this._onMouseMove);
     },
 
@@ -8366,6 +8380,7 @@ fabric.util.string = {
     }
   });
 })();
+
 fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.StaticCanvas.prototype */ {
 
   /**
@@ -9456,10 +9471,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
      * @param callback {Function} callback that recieves resulting data-url string
      */
     toDataURL: function(callback) {
-      var el = fabric.document.createElement('canvas');
-      if (!el.getContext && typeof G_vmlCanvasManager !== 'undefined') {
-        G_vmlCanvasManager.initElement(el);
-      }
+      var el = fabric.util.createCanvasElement();
 
       el.width = this.getBoundingRectWidth();
       el.height = this.getBoundingRectHeight();
@@ -13813,13 +13825,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
 
       var isLikelyNode = typeof Buffer !== 'undefined' && typeof window === 'undefined',
           imgEl = this._originalImage,
-          canvasEl = fabric.document.createElement('canvas'),
+          canvasEl = fabric.util.createCanvasElement(),
           replacement = isLikelyNode ? new (require('canvas').Image)() : fabric.document.createElement('img'),
           _this = this;
-
-        if (!canvasEl.getContext && typeof G_vmlCanvasManager !== 'undefined') {
-          G_vmlCanvasManager.initElement(canvasEl);
-        }
 
       canvasEl.width = imgEl.width;
       canvasEl.height = imgEl.height;
@@ -14762,7 +14770,8 @@ fabric.Image.filters.Convolute = fabric.util.createClass(/** @scope fabric.Image
                                       0, 1, 0,
                                       0, 0, 0 ];
 
-    this.tmpCtx = fabric.document.createElement('canvas').getContext('2d');
+    var canvasEl = fabric.util.createCanvasElement();
+    this.tmpCtx = canvasEl.getContext('2d');
   },
 
   /**
@@ -15097,11 +15106,7 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
      * @method _initDimensions
      */
     _initDimensions: function() {
-      var canvasEl = fabric.document.createElement('canvas');
-
-      if (!canvasEl.getContext && typeof G_vmlCanvasManager !== 'undefined') {
-        G_vmlCanvasManager.initElement(canvasEl);
-      }
+      var canvasEl = fabric.util.createCanvasElement();
 
       this._render(canvasEl.getContext('2d'));
     },

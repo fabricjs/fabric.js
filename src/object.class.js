@@ -672,10 +672,7 @@
      * @param callback {Function} callback that recieves resulting data-url string
      */
     toDataURL: function(callback) {
-      var el = fabric.document.createElement('canvas');
-      if (!el.getContext && typeof G_vmlCanvasManager !== 'undefined') {
-        G_vmlCanvasManager.initElement(el);
-      }
+      var el = fabric.util.createCanvasElement();
 
       el.width = this.getBoundingRectWidth();
       el.height = this.getBoundingRectHeight();

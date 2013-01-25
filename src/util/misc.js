@@ -339,6 +339,14 @@
     ctx.restore();
   }
 
+  function createCanvasElement() {
+    var canvasEl = fabric.document.createElement('canvas');
+    if (!canvasEl.getContext && typeof G_vmlCanvasManager !== 'undefined') {
+      G_vmlCanvasManager.initElement(canvasEl);
+    }
+    return canvasEl;
+  }
+
   fabric.util.removeFromArray = removeFromArray;
   fabric.util.degreesToRadians = degreesToRadians;
   fabric.util.radiansToDegrees = radiansToDegrees;
@@ -353,5 +361,6 @@
   fabric.util.groupSVGElements = groupSVGElements;
   fabric.util.populateWithProperties = populateWithProperties;
   fabric.util.drawDashedLine = drawDashedLine;
+  fabric.util.createCanvasElement = createCanvasElement;
 
 })();

@@ -147,11 +147,7 @@
      * @method _initDimensions
      */
     _initDimensions: function() {
-      var canvasEl = fabric.document.createElement('canvas');
-
-      if (!canvasEl.getContext && typeof G_vmlCanvasManager !== 'undefined') {
-        G_vmlCanvasManager.initElement(canvasEl);
-      }
+      var canvasEl = fabric.util.createCanvasElement();
 
       this._render(canvasEl.getContext('2d'));
     },
