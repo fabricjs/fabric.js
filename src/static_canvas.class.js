@@ -688,6 +688,8 @@
       var data = (fabric.StaticCanvas.supports('toDataURLWithQuality'))
                    ? canvasEl.toDataURL('image/' + format, quality)
                    : canvasEl.toDataURL('image/' + format);
+
+      this.contextTop && this.clearContext(this.contextTop);
       this.renderAll();
       return data;
     },
@@ -741,6 +743,7 @@
         this.setActiveObject(activeObject);
       }
 
+      this.contextTop && this.clearContext(this.contextTop);
       this.renderAll();
 
       return dataURL;
