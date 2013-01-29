@@ -82,30 +82,50 @@
         && bl.y < selectionBR.y;
     },
 
-     /**
+    /**
      * Returns width of an object's bounding rectangle
+     * @deprecated since 1.0.4
      * @method getBoundingRectWidth
      * @return {Number} width value
      */
     getBoundingRectWidth: function() {
-      this.oCoords || this.setCoords();
-      var xCoords = [this.oCoords.tl.x, this.oCoords.tr.x, this.oCoords.br.x, this.oCoords.bl.x];
-      var minX = fabric.util.array.min(xCoords);
-      var maxX = fabric.util.array.max(xCoords);
-      return Math.abs(minX - maxX);
+      return this.getBoundingRect().width;
     },
 
     /**
      * Returns height of an object's bounding rectangle
+     * @deprecated since 1.0.4
      * @method getBoundingRectHeight
      * @return {Number} height value
      */
     getBoundingRectHeight: function() {
+      return this.getBoundingRect().height;
+    },
+
+    /**
+     * Returns coordinates of object's bounding rectangle (left, top, width, height)
+     * @method getBoundingRect
+     * @return {Object} Object with left, top, width, height properties
+     */
+    getBoundingRect: function() {
       this.oCoords || this.setCoords();
+
+      var xCoords = [this.oCoords.tl.x, this.oCoords.tr.x, this.oCoords.br.x, this.oCoords.bl.x];
+      var minX = fabric.util.array.min(xCoords);
+      var maxX = fabric.util.array.max(xCoords);
+      var width = Math.abs(minX - maxX);
+
       var yCoords = [this.oCoords.tl.y, this.oCoords.tr.y, this.oCoords.br.y, this.oCoords.bl.y];
       var minY = fabric.util.array.min(yCoords);
       var maxY = fabric.util.array.max(yCoords);
-      return Math.abs(minY - maxY);
+      var height = Math.abs(minY - maxY);
+
+      return {
+        left: minX,
+        top: minY,
+        width: width,
+        height: height
+      };
     },
 
     /**
