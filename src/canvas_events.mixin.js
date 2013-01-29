@@ -350,7 +350,8 @@
           this._rotateObject(x, y);
 
           this.fire('object:rotating', {
-            target: this._currentTransform.target
+            target: this._currentTransform.target,
+            e: e
           });
           this._currentTransform.target.fire('rotating');
         }
