@@ -16,7 +16,7 @@
     _findTargetCorner: function(e, offset) {
       if (!this.hasControls || !this.active) return false;
 
-      var pointer = getPointer(e),
+      var pointer = getPointer(e, this.canvas.upperCanvasEl),
           ex = pointer.x - offset.left,
           ey = pointer.y - offset.top,
           xpoints,
