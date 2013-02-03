@@ -158,6 +158,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
   loadFromJSON: function (json, callback) {
     if (!json) return;
 
+    // serialize if it wasn't already
+    var serialized = (typeof json === 'string')
+      ? JSON.parse(json)
+      : json;
+
     var _this = this;
     this._enlivenObjects(serialized.objects, function () {
       _this._setBgOverlayImages(serialized, callback);

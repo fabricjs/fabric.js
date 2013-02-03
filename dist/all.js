@@ -2875,27 +2875,41 @@ fabric.util.string = {
    * @method getPointer
    * @memberOf fabric.util
    * @param {Event} event
+   * @param {HTMLCanvasElement} upperCanvasEl &lt;canvas> element on which object selection is drawn
    */
-  function getPointer(event) {
+  function getPointer(event, upperCanvasEl) {
     event || (event = fabric.window.event);
 
     var element = event.target || (typeof event.srcElement !== 'unknown' ? event.srcElement : null),
+        body = fabric.document.body || {scrollLeft: 0, scrollTop: 0},
+        docElement = fabric.document.documentElement,
+        orgElement = element,
         scrollLeft = 0,
         scrollTop = 0,
         firstFixedAncestor;
 
     while (element && element.parentNode && !firstFixedAncestor) {
-        element = element.parentNode;
+      element = element.parentNode;
 
-        if (element !== fabric.document && fabric.util.getElementPosition(element) === 'fixed') firstFixedAncestor = element;
+      if (element !== fabric.document && fabric.util.getElementPosition(element) === 'fixed') firstFixedAncestor = element;
 
+      if (element !== fabric.document && orgElement !== upperCanvasEl && fabric.util.getElementPosition(element) === 'absolute') {
+        scrollLeft = 0;
+        scrollTop = 0;
+      }
+      else if (element === fabric.document && orgElement !== upperCanvasEl) {
+        scrollLeft = body.scrollLeft || docElement.scrollLeft || 0;
+        scrollTop = body.scrollTop ||  docElement.scrollTop || 0;
+      }
+      else {
         scrollLeft += element.scrollLeft || 0;
         scrollTop += element.scrollTop || 0;
+      }
     }
 
     return {
-        x: pointerX(event) + scrollLeft,
-        y: pointerY(event) + scrollTop
+      x: pointerX(event) + scrollLeft,
+      y: pointerY(event) + scrollTop
     };
   }
 
@@ -2912,10 +2926,10 @@ fabric.util.string = {
 
   if (fabric.isTouchSupported) {
     pointerX = function(event) {
-      return event.touches && event.touches[0] && event.touches[0].pageX || event.clientX;
+      return (event.touches && event.touches[0] ? (event.touches[0].pageX - (event.touches[0].pageX - event.touches[0].clientX)) || event.clientX : event.clientX);
     };
     pointerY = function(event) {
-      return event.touches && event.touches[0] && event.touches[0].pageY || event.clientY;
+      return (event.touches && event.touches[0] ? (event.touches[0].pageY - (event.touches[0].pageY - event.touches[0].clientY)) || event.clientY : event.clientY);
     };
   }
 
@@ -7337,7 +7351,7 @@ fabric.Pattern = fabric.util.createClass(/** @scope fabric.Pattern.prototype */ 
     _setupCurrentTransform: function (e, target) {
       var action = 'drag',
           corner,
-          pointer = getPointer(e);
+          pointer = getPointer(e, target.canvas.upperCanvasEl);
 
       corner = target._findTargetCorner(e, this._offset);
       if (corner) {
@@ -7772,7 +7786,7 @@ fabric.Pattern = fabric.util.createClass(/** @scope fabric.Pattern.prototype */ 
      * @return {Object} object with "x" and "y" number values
      */
     getPointer: function (e) {
-      var pointer = getPointer(e);
+      var pointer = getPointer(e, this.upperCanvasEl);
       return {
         x: pointer.x - this._offset.left,
         y: pointer.y - this._offset.top
@@ -8296,7 +8310,7 @@ fabric.Pattern = fabric.util.createClass(/** @scope fabric.Pattern.prototype */ 
 
       // We initially clicked in an empty area, so we draw a box for multiple selection.
       if (groupSelector !== null) {
-        pointer = getPointer(e);
+        pointer = getPointer(e, this.upperCanvasEl);
 
         groupSelector.left = pointer.x - this._offset.left - groupSelector.ex;
         groupSelector.top = pointer.y - this._offset.top - groupSelector.ey;
@@ -8329,7 +8343,7 @@ fabric.Pattern = fabric.util.createClass(/** @scope fabric.Pattern.prototype */ 
       }
       else {
         // object is being transformed (scaled/rotated/moved/etc.)
-        pointer = getPointer(e);
+        pointer = getPointer(e, this.upperCanvasEl);
 
         var x = pointer.x,
             y = pointer.y;
@@ -8759,6 +8773,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
    */
   loadFromJSON: function (json, callback) {
     if (!json) return;
+
+    // serialize if it wasn't already
+    var serialized = (typeof json === 'string')
+      ? JSON.parse(json)
+      : json;
 
     var _this = this;
     this._enlivenObjects(serialized.objects, function () {
@@ -10453,7 +10472,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
     _findTargetCorner: function(e, offset) {
       if (!this.hasControls || !this.active) return false;
 
-      var pointer = getPointer(e),
+      var pointer = getPointer(e, this.canvas.upperCanvasEl),
           ex = pointer.x - offset.left,
           ey = pointer.y - offset.top,
           xpoints,
