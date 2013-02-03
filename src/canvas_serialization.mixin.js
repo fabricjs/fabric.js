@@ -20,6 +20,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
       ? JSON.parse(json)
       : json;
 
+    this.setBackgroundColor(serialized.background, this.renderAll.bind(this));
+
     if (!serialized || (serialized && !serialized.objects)) return;
 
     this.clear();
@@ -155,15 +157,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
    */
   loadFromJSON: function (json, callback) {
     if (!json) return;
-
-    // serialize if it wasn't already
-    var serialized = (typeof json === 'string')
-      ? JSON.parse(json)
-      : json;
-
-    if (!serialized || (serialized && !serialized.objects)) return;
-
-    this.clear();
 
     var _this = this;
     this._enlivenObjects(serialized.objects, function () {

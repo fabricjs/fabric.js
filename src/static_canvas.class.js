@@ -148,6 +148,9 @@
       if (options.backgroundImage) {
         this.setBackgroundImage(options.backgroundImage, this.renderAll.bind(this));
       }
+      if (options.backgroundColor) {
+        this.setBackgroundColor(options.backgroundColor, this.renderAll.bind(this));
+      }
       this.calcOffset();
     },
 
@@ -207,6 +210,33 @@
         }
         callback && callback();
       }, this);
+
+      return this;
+    },
+
+    /**
+     * Sets background color for this canvas
+     * @method setBackgroundColor
+     * @param {String|fabric.Pattern} Color of pattern to set background color to
+     * @param {Function} callback callback to invoke when background color is set
+     * @return {fabric.Canvas} thisArg
+     * @chainable
+     */
+    setBackgroundColor: function(backgroundColor, callback) {
+      if (backgroundColor.source) {
+        var _this = this;
+        fabric.util.loadImage(backgroundColor.source, function(img) {
+          _this.backgroundColor = new fabric.Pattern({
+            source: img,
+            pattern: backgroundColor.pattern
+          });
+          callback && callback();
+        });
+      }
+      else {
+        this.backgroundColor = backgroundColor;
+        callback && callback();
+      }
 
       return this;
     },
@@ -537,7 +567,10 @@
       }
 
       if (this.backgroundColor) {
-        canvasToDrawOn.fillStyle = this.backgroundColor;
+        canvasToDrawOn.fillStyle = this.backgroundColor.toLive
+          ? this.backgroundColor.toLive(canvasToDrawOn)
+          : this.backgroundColor;
+
         canvasToDrawOn.fillRect(0, 0, this.width, this.height);
       }
 
@@ -874,7 +907,9 @@
           }
           return object;
         }, this),
-        background: this.backgroundColor
+        background: (this.backgroundColor && this.backgroundColor.toObject)
+                      ? this.backgroundColor.toObject()
+                      : this.backgroundColor
       };
       if (this.backgroundImage) {
         data.backgroundImage = this.backgroundImage.src;

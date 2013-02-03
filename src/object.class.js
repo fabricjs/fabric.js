@@ -300,6 +300,29 @@
     },
 
     /**
+     * @private
+     * @method _initGradient
+     */
+    _initGradient: function(options) {
+      if (options.fill && options.fill.colorStops && !(options.fill instanceof fabric.Gradient)) {
+        this.set('fill', new fabric.Gradient(options.fill));
+      }
+    },
+
+    /**
+     * @private
+     * @method _initPattern
+     */
+    _initPattern: function(options) {
+      if (options.fill && options.fill.source && !(options.fill instanceof fabric.Pattern)) {
+        this.set('fill', new fabric.Pattern(options.fill));
+      }
+      if (options.stroke && options.stroke.source && !(options.stroke instanceof fabric.Pattern)) {
+        this.set('stroke', new fabric.Pattern(options.stroke));
+      }
+    },
+
+    /**
      * Sets object's properties from options
      * @method setOptions
      * @param {Object} [options]
@@ -309,6 +332,7 @@
         this.set(prop, options[prop]);
       }
       this._initGradient(options);
+      this._initPattern(options);
     },
 
     /**
@@ -348,7 +372,7 @@
         height:           toFixed(this.height, NUM_FRACTION_DIGITS),
         fill:             (this.fill && this.fill.toObject) ? this.fill.toObject() : this.fill,
         overlayFill:      this.overlayFill,
-        stroke:           this.stroke,
+        stroke:           (this.stroke && this.stroke.toObject) ? this.stroke.toObject() : this.stroke,
         strokeWidth:      this.strokeWidth,
         strokeDashArray:  this.strokeDashArray,
         scaleX:           toFixed(this.scaleX, NUM_FRACTION_DIGITS),
@@ -592,15 +616,20 @@
 
       if (this.stroke || this.strokeDashArray) {
         ctx.lineWidth = this.strokeWidth;
-        ctx.strokeStyle = this.stroke;
+        if (this.stroke && this.stroke.toLive) {
+          ctx.strokeStyle = this.stroke.toLive(ctx);
+        }
+        else {
+          ctx.strokeStyle = this.stroke;
+        }
       }
 
       if (this.overlayFill) {
         ctx.fillStyle = this.overlayFill;
       }
       else if (this.fill) {
-        ctx.fillStyle = this.fill.toLiveGradient
-          ? this.fill.toLiveGradient(ctx)
+        ctx.fillStyle = this.fill.toLive
+          ? this.fill.toLive(ctx)
           : this.fill;
       }
 
@@ -791,13 +820,11 @@
     },
 
     /**
-     * @private
-     * @method _initGradient
+     * Sets pattern fill of an object
+     * @method setPatternFill
      */
-    _initGradient: function(options) {
-      if (options.fill && typeof options.fill === 'object' && !(options.fill instanceof fabric.Gradient)) {
-        this.set('fill', new fabric.Gradient(options.fill));
-      }
+    setPatternFill: function(options) {
+      this.set('fill', new fabric.Pattern(options));
     },
 
     /**
