@@ -290,7 +290,7 @@
 
       // We initially clicked in an empty area, so we draw a box for multiple selection.
       if (groupSelector !== null) {
-        pointer = getPointer(e);
+        pointer = getPointer(e, this.upperCanvasEl);
 
         groupSelector.left = pointer.x - this._offset.left - groupSelector.ex;
         groupSelector.top = pointer.y - this._offset.top - groupSelector.ey;
@@ -323,7 +323,7 @@
       }
       else {
         // object is being transformed (scaled/rotated/moved/etc.)
-        pointer = getPointer(e);
+        pointer = getPointer(e, this.upperCanvasEl);
 
         var x = pointer.x,
             y = pointer.y;
