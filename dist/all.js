@@ -4646,6 +4646,9 @@ fabric.Pattern = fabric.util.createClass(/** @scope fabric.Pattern.prototype */ 
         ? new Function(options.source)
         : options.source;
     }
+    if (options.repeat) {
+      this.repeat = options.repeat;
+    }
   },
 
   /**
