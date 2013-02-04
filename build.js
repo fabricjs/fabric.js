@@ -110,6 +110,7 @@ var filesToInclude = [
 
   'src/gradient.class.js',
   'src/pattern.class.js',
+  'src/shadow.class.js',
   'src/point.class.js',
   'src/intersection.class.js',
   'src/color.class.js',

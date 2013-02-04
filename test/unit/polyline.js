@@ -32,7 +32,8 @@
     'hasBorders':   true,
     'hasRotatingPoint': true,
     'transparentCorners': true,
-    'perPixelTargetFind': false
+    'perPixelTargetFind': false,
+    'shadow': null
   };
 
   QUnit.module('fabric.Polyline');
@@ -46,7 +47,7 @@
     ok(polyline instanceof fabric.Object);
 
     equal(polyline.type, 'polyline');
-    deepEqual(polyline.get('points'), getPoints());
+    deepEqual(polyline.get('points'), [ { x: 5, y: 7 }, { x: 15, y: 17 } ]);
   });
 
   test('complexity', function() {
@@ -57,7 +58,11 @@
   test('toObject', function() {
     var polyline = new fabric.Polyline(getPoints());
     ok(typeof polyline.toObject == 'function');
-    deepEqual(polyline.toObject(), REFERENCE_OBJECT);
+    var objectWithOriginalPoints = fabric.util.object.extend(polyline.toObject(), {
+      points: getPoints()
+    });
+
+    deepEqual(objectWithOriginalPoints, REFERENCE_OBJECT);
   });
 
   test('fromObject', function() {

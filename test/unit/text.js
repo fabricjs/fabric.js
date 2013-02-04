@@ -31,6 +31,7 @@
     'hasRotatingPoint': true,
     'transparentCorners': true,
     'perPixelTargetFind': false,
+    'shadow':           null,
     'text':             'x',
     'fontSize':         40,
     'fontWeight':       400,

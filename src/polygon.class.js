@@ -56,6 +56,15 @@
       this.width = (maxX - minX) || 1;
       this.height = (maxY - minY) || 1;
 
+      var halfWidth = this.width / 2,
+          halfHeight = this.height / 2;
+
+      // change points to offset polygon into a bounding box
+      this.points.forEach(function(p) {
+        p.x -= halfWidth;
+        p.y -= halfHeight;
+      }, this);
+
       this.minX = minX;
       this.minY = minY;
     },
@@ -108,6 +117,7 @@
       if (this.fill) {
         ctx.fill();
       }
+      this._removeShadow(ctx);
       if (this.stroke) {
         ctx.closePath();
         ctx.stroke();

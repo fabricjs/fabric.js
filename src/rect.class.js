@@ -121,6 +121,8 @@
         ctx.fill();
       }
 
+      this._removeShadow(ctx);
+
       if (this.strokeDashArray) {
         this._renderDashedStroke(ctx);
       }

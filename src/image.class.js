@@ -102,7 +102,11 @@
       if (!noTransform) {
         this.transform(ctx);
       }
+
+      this._setShadow(ctx);
       this._render(ctx);
+      this._removeShadow(ctx);
+
       if (this.active && !noTransform) {
         this.drawBorders(ctx);
         this.hideCorners || this.drawCorners(ctx);

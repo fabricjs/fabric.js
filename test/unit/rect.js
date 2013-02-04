@@ -25,6 +25,7 @@
     'hasRotatingPoint': true,
     'transparentCorners': true,
     'perPixelTargetFind': false,
+    'shadow': null,
     'rx': 0,
     'ry': 0
   };

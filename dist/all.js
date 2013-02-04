@@ -4687,6 +4687,76 @@ fabric.Pattern = fabric.util.createClass(/** @scope fabric.Pattern.prototype */ 
     return ctx.createPattern(source, this.repeat);
   }
 });
+/**
+ * Shadow class
+ * @class Shadow
+ * @memberOf fabric
+ */
+fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
+
+  /**
+   * Shadow color
+   * @property
+   * @type String
+   */
+  color: 'rgb(0,0,0)',
+
+  /**
+   * Shadow blur
+   * @property
+   * @type Number
+   */
+  blur: 0,
+
+  /**
+   * Shadow horizontal offset
+   * @property
+   * @type Number
+   */
+  offsetX: 0,
+
+  /**
+   * Shadow vertical offset
+   * @property
+   * @type Number
+   */
+  offsetY: 0,
+
+  /**
+   * Constructor
+   * @method initialize
+   * @param [options] Options object with any of color, blur, offsetX, offsetX properties
+   * @return {fabric.Shadow} thisArg
+   */
+  initialize: function(options) {
+    for (var prop in options) {
+      this[prop] = options[prop];
+    }
+  },
+
+  /**
+   * Returns object representation of a shadow
+   * @method toObject
+   * @return {Object}
+   */
+  toObject: function() {
+    return {
+      color: this.color,
+      blur: this.blur,
+      offsetX: this.offsetX,
+      offsetY: this.offsetY
+    };
+  },
+
+  /**
+   * Returns SVG representation of a shadow
+   * @method toSVG
+   * @return {String}
+   */
+  toSVG: function() {
+
+  }
+});
 (function(global) {
 
   "use strict";
@@ -8951,11 +9021,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
   fabric.Object = fabric.util.createClass(/** @scope fabric.Object.prototype */ {
 
     /**
-     * Type of an object (rect, circle, path, etc)
+     * Type of an object (rect, circle, path, etc.)
      * @property
      * @type String
      */
-    type:                       'object',
+    type:                     'object',
 
     /**
      * Horizontal origin of transformation of an object (one of "left", "right", "center")
@@ -9119,6 +9189,13 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
     strokeDashArray:          null,
 
     /**
+     * Shadow object representing shadow of this shape
+     * @property
+     * @type fabric.Shadow
+     */
+    shadow:                   null,
+
+    /**
      * Border opacity when object is active and moving
      * @property
      * @type Number
@@ -9243,6 +9320,16 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
     },
 
     /**
+     * @private
+     * @method _initShadow
+     */
+    _initShadow: function(options) {
+      if (options.shadow && !(options.shadow instanceof fabric.Shadow)) {
+        this.setShadow(options.shadow);
+      }
+    },
+
+    /**
      * Sets object's properties from options
      * @method setOptions
      * @param {Object} [options]
@@ -9253,6 +9340,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
       }
       this._initGradient(options);
       this._initPattern(options);
+      this._initShadow(options);
     },
 
     /**
@@ -9283,30 +9371,31 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
       var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
 
       var object = {
-        type:             this.type,
-        originX:          this.originX,
-        originY:          this.originY,
-        left:             toFixed(this.left, NUM_FRACTION_DIGITS),
-        top:              toFixed(this.top, NUM_FRACTION_DIGITS),
-        width:            toFixed(this.width, NUM_FRACTION_DIGITS),
-        height:           toFixed(this.height, NUM_FRACTION_DIGITS),
-        fill:             (this.fill && this.fill.toObject) ? this.fill.toObject() : this.fill,
-        overlayFill:      this.overlayFill,
-        stroke:           (this.stroke && this.stroke.toObject) ? this.stroke.toObject() : this.stroke,
-        strokeWidth:      this.strokeWidth,
-        strokeDashArray:  this.strokeDashArray,
-        scaleX:           toFixed(this.scaleX, NUM_FRACTION_DIGITS),
-        scaleY:           toFixed(this.scaleY, NUM_FRACTION_DIGITS),
-        angle:            toFixed(this.getAngle(), NUM_FRACTION_DIGITS),
-        flipX:            this.flipX,
-        flipY:            this.flipY,
-        opacity:          toFixed(this.opacity, NUM_FRACTION_DIGITS),
-        selectable:       this.selectable,
-        hasControls:      this.hasControls,
-        hasBorders:       this.hasBorders,
-        hasRotatingPoint: this.hasRotatingPoint,
+        type:               this.type,
+        originX:            this.originX,
+        originY:            this.originY,
+        left:               toFixed(this.left, NUM_FRACTION_DIGITS),
+        top:                toFixed(this.top, NUM_FRACTION_DIGITS),
+        width:              toFixed(this.width, NUM_FRACTION_DIGITS),
+        height:             toFixed(this.height, NUM_FRACTION_DIGITS),
+        fill:               (this.fill && this.fill.toObject) ? this.fill.toObject() : this.fill,
+        overlayFill:        this.overlayFill,
+        stroke:             (this.stroke && this.stroke.toObject) ? this.stroke.toObject() : this.stroke,
+        strokeWidth:        this.strokeWidth,
+        strokeDashArray:    this.strokeDashArray,
+        scaleX:             toFixed(this.scaleX, NUM_FRACTION_DIGITS),
+        scaleY:             toFixed(this.scaleY, NUM_FRACTION_DIGITS),
+        angle:              toFixed(this.getAngle(), NUM_FRACTION_DIGITS),
+        flipX:              this.flipX,
+        flipY:              this.flipY,
+        opacity:            toFixed(this.opacity, NUM_FRACTION_DIGITS),
+        selectable:         this.selectable,
+        hasControls:        this.hasControls,
+        hasBorders:         this.hasBorders,
+        hasRotatingPoint:   this.hasRotatingPoint,
         transparentCorners: this.transparentCorners,
-        perPixelTargetFind: this.perPixelTargetFind
+        perPixelTargetFind: this.perPixelTargetFind,
+        shadow:             (this.shadow && this.shadow.toObject) ? this.shadow.toObject() : this.shadow
       };
 
       if (!this.includeDefaultValues) {
@@ -9558,13 +9647,37 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
         ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
       }
 
+      this._setShadow(ctx);
       this._render(ctx, noTransform);
+      this._removeShadow(ctx);
 
       if (this.active && !noTransform) {
         this.drawBorders(ctx);
         this.hideCorners || this.drawCorners(ctx);
       }
       ctx.restore();
+    },
+
+    /**
+     * @private
+     * @method _setShadow
+     */
+    _setShadow: function(ctx) {
+      if (!this.shadow) return;
+
+      ctx.shadowColor = this.shadow.color;
+      ctx.shadowBlur = this.shadow.blur;
+      ctx.shadowOffsetX = this.shadow.offsetX;
+      ctx.shadowOffsetY = this.shadow.offsetY;
+    },
+
+    /**
+     * @private
+     * @method _removeShadow
+     */
+    _removeShadow: function(ctx) {
+      ctx.shadowColor = '';
+      ctx.shadowBlur = ctx.shadowOffsetX = ctx.shadowOffsetY = 0;
     },
 
     /**
@@ -9745,6 +9858,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
      */
     setPatternFill: function(options) {
       this.set('fill', new fabric.Pattern(options));
+    },
+
+    /**
+     * Sets shadow of an object
+     * @method setShadow
+     */
+    setShadow: function(options) {
+      this.set('shadow', new fabric.Shadow(options));
     },
 
     /**
@@ -11224,6 +11345,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
       if (this.fill) {
         ctx.fill();
       }
+      this._removeShadow(ctx);
       if (this.stroke) {
         ctx.stroke();
       }
@@ -11533,6 +11655,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
       if (this.stroke) {
         ctx.stroke();
       }
+      this._removeShadow(ctx);
       if (this.fill) {
         ctx.fill();
       }
@@ -11720,6 +11843,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
       if (this.fill) {
         ctx.fill();
       }
+
+      this._removeShadow(ctx);
 
       if (this.strokeDashArray) {
         this._renderDashedStroke(ctx);
@@ -11988,6 +12113,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
       if (this.fill) {
         ctx.fill();
       }
+      this._removeShadow(ctx);
       if (this.stroke) {
         ctx.stroke();
       }
@@ -12107,6 +12233,15 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
       this.width = (maxX - minX) || 1;
       this.height = (maxY - minY) || 1;
 
+      var halfWidth = this.width / 2,
+          halfHeight = this.height / 2;
+
+      // change points to offset polygon into a bounding box
+      this.points.forEach(function(p) {
+        p.x -= halfWidth;
+        p.y -= halfHeight;
+      }, this);
+
       this.minX = minX;
       this.minY = minY;
     },
@@ -12159,6 +12294,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
       if (this.fill) {
         ctx.fill();
       }
+      this._removeShadow(ctx);
       if (this.stroke) {
         ctx.closePath();
         ctx.stroke();
@@ -12777,11 +12913,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
       }
       ctx.beginPath();
 
+      this._setShadow(ctx);
       this._render(ctx);
 
       if (this.fill) {
         ctx.fill();
       }
+      this._removeShadow(ctx);
+
       if (this.stroke) {
         ctx.strokeStyle = this.stroke;
         ctx.lineWidth = this.strokeWidth;
@@ -13088,9 +13227,13 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
       }
 
       this.transform(ctx);
+
+      this._setShadow(ctx);
       for (var i = 0, l = this.paths.length; i < l; ++i) {
         this.paths[i].render(ctx, true);
       }
+      this._removeShadow(ctx);
+
       if (this.active) {
         this.drawBorders(ctx);
         this.hideCorners || this.drawCorners(ctx);
@@ -13911,7 +14054,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
       if (!noTransform) {
         this.transform(ctx);
       }
+
+      this._setShadow(ctx);
       this._render(ctx);
+      this._removeShadow(ctx);
+
       if (this.active && !noTransform) {
         this.drawBorders(ctx);
         this.hideCorners || this.drawCorners(ctx);

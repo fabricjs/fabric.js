@@ -92,6 +92,7 @@
       if (this.fill) {
         ctx.fill();
       }
+      this._removeShadow(ctx);
       if (this.stroke) {
         ctx.stroke();
       }

@@ -555,11 +555,14 @@
       }
       ctx.beginPath();
 
+      this._setShadow(ctx);
       this._render(ctx);
 
       if (this.fill) {
         ctx.fill();
       }
+      this._removeShadow(ctx);
+
       if (this.stroke) {
         ctx.strokeStyle = this.stroke;
         ctx.lineWidth = this.strokeWidth;

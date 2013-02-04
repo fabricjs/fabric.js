@@ -40,6 +40,7 @@
     'hasRotatingPoint': true,
     'transparentCorners': true,
     'perPixelTargetFind': false,
+    'shadow':       null,
     'filters':      []
   };
 
