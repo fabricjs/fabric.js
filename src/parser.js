@@ -365,8 +365,8 @@
             checkIfDone();
           }
         }
-        catch(e) {
-          fabric.log(e.message || e);
+        catch(err) {
+          fabric.log(err);
         }
       }
       else {

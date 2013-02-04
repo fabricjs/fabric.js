@@ -138,7 +138,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
       objects.forEach(loadObject, this);
     }
     catch(e) {
-      fabric.log(e.message);
+      fabric.log(e);
     }
   },
 
