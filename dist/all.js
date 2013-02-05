@@ -8718,8 +8718,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
       ? JSON.parse(json)
       : json;
 
-    this.setBackgroundColor(serialized.background, this.renderAll.bind(this));
-
     if (!serialized || (serialized && !serialized.objects)) return;
 
     this.clear();
@@ -8872,10 +8870,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
   _setBgOverlayImages: function(serialized, callback) {
 
     var _this = this,
+        backgroundPatternLoaded,
         backgroundImageLoaded,
         overlayImageLoaded;
-
-    this.backgroundColor = serialized.background;
 
     if (serialized.backgroundImage) {
       this.setBackgroundImage(serialized.backgroundImage, function() {
@@ -8887,7 +8884,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
 
         backgroundImageLoaded = true;
 
-        callback && overlayImageLoaded && callback();
+        callback && overlayImageLoaded && backgroundPatternLoaded && callback();
       });
     }
     else {
@@ -8903,14 +8900,27 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
         _this.renderAll();
         overlayImageLoaded = true;
 
-        callback && backgroundImageLoaded && callback();
+        callback && backgroundImageLoaded && backgroundPatternLoaded && callback();
       });
     }
     else {
       overlayImageLoaded = true;
     }
 
-    if (!serialized.backgroundImage && !serialized.overlayImage) {
+    if (serialized.background) {
+      this.setBackgroundColor(serialized.background, function() {
+
+        _this.renderAll();
+        backgroundPatternLoaded = true;
+
+        callback && overlayImageLoaded && backgroundImageLoaded && callback();
+      });
+    }
+    else {
+      backgroundPatternLoaded = true;
+    }
+
+    if (!serialized.backgroundImage && !serialized.overlayImage && !serialized.background) {
       callback && callback();
     }
   },
@@ -9909,7 +9919,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
      * @method _animate
      */
     _animate: function(property, to, options) {
-      var obj = this;
+      var obj = this, propPair;
 
       to = to.toString();
 
@@ -9920,12 +9930,20 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
         options = fabric.util.object.clone(options);
       }
 
+      if (~property.indexOf('.')) {
+        propPair = property.split('.');
+      }
+
+      var currentValue = propPair
+        ? this.get(propPair[0])[propPair[1]]
+        : this.get(property);
+
       if (!('from' in options)) {
-        options.from = this.get(property);
+        options.from = currentValue;
       }
 
       if (~to.indexOf('=')) {
-        to = this.get(property) + parseFloat(to.replace('=', ''));
+        to = currentValue + parseFloat(to.replace('=', ''));
       }
       else {
         to = parseFloat(to);
@@ -9938,7 +9956,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
         easing: options.easing,
         duration: options.duration,
         onChange: function(value) {
-          obj.set(property, value);
+          if (propPair) {
+            obj[propPair[0]][propPair[1]] = value;
+          }
+          else {
+            obj.set(property, value);
+          }
           options.onChange && options.onChange();
         },
         onComplete: function() {
