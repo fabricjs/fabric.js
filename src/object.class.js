@@ -910,7 +910,7 @@
      * @method _animate
      */
     _animate: function(property, to, options) {
-      var obj = this;
+      var obj = this, propPair;
 
       to = to.toString();
 
@@ -921,12 +921,20 @@
         options = fabric.util.object.clone(options);
       }
 
+      if (~property.indexOf('.')) {
+        propPair = property.split('.');
+      }
+
+      var currentValue = propPair
+        ? this.get(propPair[0])[propPair[1]]
+        : this.get(property);
+
       if (!('from' in options)) {
-        options.from = this.get(property);
+        options.from = currentValue;
       }
 
       if (~to.indexOf('=')) {
-        to = this.get(property) + parseFloat(to.replace('=', ''));
+        to = currentValue + parseFloat(to.replace('=', ''));
       }
       else {
         to = parseFloat(to);
@@ -939,7 +947,12 @@
         easing: options.easing,
         duration: options.duration,
         onChange: function(value) {
-          obj.set(property, value);
+          if (propPair) {
+            obj[propPair[0]][propPair[1]] = value;
+          }
+          else {
+            obj.set(property, value);
+          }
           options.onChange && options.onChange();
         },
         onComplete: function() {
