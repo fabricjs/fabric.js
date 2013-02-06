@@ -65,11 +65,11 @@
 
     /**
      * Returns an instance of CanvasGradient
-     * @method toLiveGradient
+     * @method toLive
      * @param ctx
      * @return {CanvasGradient}
      */
-    toLiveGradient: function(ctx) {
+    toLive: function(ctx) {
       var gradient = ctx.createLinearGradient(
         this.x1, this.y1, this.x2 || ctx.canvas.width, this.y2);
 

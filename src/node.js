@@ -121,6 +121,10 @@
     return this.nodeCanvas.createPNGStream();
   };
 
+  fabric.StaticCanvas.prototype.createJPEGStream = function(opts) {
+    return this.nodeCanvas.createJPEGStream(opts);
+  };
+
   var origSetWidth = fabric.StaticCanvas.prototype.setWidth;
   fabric.StaticCanvas.prototype.setWidth = function(width) {
     origSetWidth.call(this);

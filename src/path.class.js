@@ -543,21 +543,26 @@
         ctx.fillStyle = this.overlayFill;
       }
       else if (this.fill) {
-        ctx.fillStyle = this.fill.toLiveGradient
-          ? this.fill.toLiveGradient(ctx)
+        ctx.fillStyle = this.fill.toLive
+          ? this.fill.toLive(ctx)
           : this.fill;
       }
 
       if (this.stroke) {
-        ctx.strokeStyle = this.stroke;
+        ctx.strokeStyle = this.stroke.toLive
+          ? this.stroke.toLive(ctx)
+          : this.stroke;
       }
       ctx.beginPath();
 
+      this._setShadow(ctx);
       this._render(ctx);
 
       if (this.fill) {
         ctx.fill();
       }
+      this._removeShadow(ctx);
+
       if (this.stroke) {
         ctx.strokeStyle = this.stroke;
         ctx.lineWidth = this.strokeWidth;

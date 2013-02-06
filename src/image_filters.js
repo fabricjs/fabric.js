@@ -620,7 +620,8 @@ fabric.Image.filters.Convolute = fabric.util.createClass(/** @scope fabric.Image
                                       0, 1, 0,
                                       0, 0, 0 ];
 
-    this.tmpCtx = fabric.document.createElement('canvas').getContext('2d');
+    var canvasEl = fabric.util.createCanvasElement();
+    this.tmpCtx = canvasEl.getContext('2d');
   },
 
   /**

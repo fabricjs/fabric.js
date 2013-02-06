@@ -84,6 +84,7 @@
       'hasRotatingPoint': true,
       'transparentCorners': true,
       'perPixelTargetFind': false,
+      'shadow': null,
       'radius': 0
     };
     ok(typeof circle.toObject == 'function');

@@ -209,6 +209,20 @@
     },
 
     /**
+     * Creates fabric.Path object to add on canvas
+     * @method createPath
+     * @param {String} pathData Path data
+     * @return {fabric.Path} path to add on canvas
+     */
+    createPath: function(pathData) {
+      var path = new fabric.Path(pathData);
+      path.fill = null;
+      path.stroke = this.canvas.freeDrawingColor;
+      path.strokeWidth = this.canvas.freeDrawingLineWidth;
+      return path;
+    },
+
+    /**
      * On mouseup after drawing the path on contextTop canvas
      * we use the points captured to create an new fabric path object
      * and add it to the fabric canvas.
@@ -219,10 +233,8 @@
       var ctx = this.canvas.contextTop;
       ctx.closePath();
 
-      var path = this._getSVGPathData();
-      path = path.join('');
-
-      if (path === "M 0 0 Q 0 0 0 0 L 0 0") {
+      var pathData = this._getSVGPathData().join('');
+      if (pathData === "M 0 0 Q 0 0 0 0 L 0 0") {
         // do not create 0 width/height paths, as they are
         // rendered inconsistently across browsers
         // Firefox 4, for example, renders a dot,
@@ -231,27 +243,23 @@
         return;
       }
 
-      var p = new fabric.Path(path);
-      p.fill = null;
-      p.stroke = this.color;
-      p.strokeWidth = this.width;
-      this.canvas.add(p);
-
       // set path origin coordinates based on our bounding box
       var originLeft = this.box.minx  + (this.box.maxx - this.box.minx) /2;
       var originTop = this.box.miny  + (this.box.maxy - this.box.miny) /2;
 
       this.canvas.contextTop.arc(originLeft, originTop, 3, 0, Math.PI * 2, false);
 
-      p.set({ left: originLeft, top: originTop });
+      var path = this.createPath(pathData);
+      path.set({ left: originLeft, top: originTop });
 
-      // does not change position
-      p.setCoords();
+      this.canvas.add(path);
+      path.setCoords();
 
+      this.canvas.contextTop && this.canvas.clearContext(this.canvas.contextTop);
       this.canvas.renderAll();
 
       // fire event 'path' created
-      this.canvas.fire('path:created', { path: p });
+      this.canvas.fire('path:created', { path: path });
     }
   });
 })();

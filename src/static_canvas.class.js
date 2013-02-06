@@ -148,6 +148,9 @@
       if (options.backgroundImage) {
         this.setBackgroundImage(options.backgroundImage, this.renderAll.bind(this));
       }
+      if (options.backgroundColor) {
+        this.setBackgroundColor(options.backgroundColor, this.renderAll.bind(this));
+      }
       this.calcOffset();
     },
 
@@ -212,6 +215,33 @@
     },
 
     /**
+     * Sets background color for this canvas
+     * @method setBackgroundColor
+     * @param {String|fabric.Pattern} Color of pattern to set background color to
+     * @param {Function} callback callback to invoke when background color is set
+     * @return {fabric.Canvas} thisArg
+     * @chainable
+     */
+    setBackgroundColor: function(backgroundColor, callback) {
+      if (backgroundColor.source) {
+        var _this = this;
+        fabric.util.loadImage(backgroundColor.source, function(img) {
+          _this.backgroundColor = new fabric.Pattern({
+            source: img,
+            pattern: backgroundColor.pattern
+          });
+          callback && callback();
+        });
+      }
+      else {
+        this.backgroundColor = backgroundColor;
+        callback && callback();
+      }
+
+      return this;
+    },
+
+    /**
      * @private
      * @method _createCanvasElement
      */
@@ -232,12 +262,8 @@
      * @param {HTMLElement} element
      */
     _initCanvasElement: function(element) {
-      if (typeof element.getContext === 'undefined' &&
-          typeof G_vmlCanvasManager !== 'undefined' &&
-          G_vmlCanvasManager.initElement) {
+      fabric.util.createCanvasElement(element);
 
-        G_vmlCanvasManager.initElement(element);
-      }
       if (typeof element.getContext === 'undefined') {
         throw CANVAS_INIT_ERROR;
       }
@@ -510,6 +536,7 @@
       if (this.contextTop) {
         this.clearContext(this.contextTop);
       }
+      this.fire('canvas:cleared');
       this.renderAll();
       return this;
     },
@@ -533,20 +560,23 @@
         this.clearContext(canvasToDrawOn);
       }
 
+      this.fire('before:render');
+
       if (this.clipTo) {
         this._clipCanvas(canvasToDrawOn);
       }
 
       if (this.backgroundColor) {
-        canvasToDrawOn.fillStyle = this.backgroundColor;
+        canvasToDrawOn.fillStyle = this.backgroundColor.toLive
+          ? this.backgroundColor.toLive(canvasToDrawOn)
+          : this.backgroundColor;
+
         canvasToDrawOn.fillRect(0, 0, this.width, this.height);
       }
 
       if (typeof this.backgroundImage === 'object') {
         this._drawBackroundImage(canvasToDrawOn);
       }
-
-      this.fire('before:render');
 
       var activeGroup = this.getActiveGroup();
       for (var i = 0, length = this._objects.length; i < length; ++i) {
@@ -687,6 +717,8 @@
       var data = (fabric.StaticCanvas.supports('toDataURLWithQuality'))
                    ? canvasEl.toDataURL('image/' + format, quality)
                    : canvasEl.toDataURL('image/' + format);
+
+      this.contextTop && this.clearContext(this.contextTop);
       this.renderAll();
       return data;
     },
@@ -740,6 +772,7 @@
         this.setActiveObject(activeObject);
       }
 
+      this.contextTop && this.clearContext(this.contextTop);
       this.renderAll();
 
       return dataURL;
@@ -874,7 +907,9 @@
           }
           return object;
         }, this),
-        background: this.backgroundColor
+        background: (this.backgroundColor && this.backgroundColor.toObject)
+                      ? this.backgroundColor.toObject()
+                      : this.backgroundColor
       };
       if (this.backgroundImage) {
         data.backgroundImage = this.backgroundImage.src;
@@ -894,13 +929,22 @@
      * Returns SVG representation of canvas
      * @function
      * @method toSVG
+     * @param {Object} [options] Options for SVG output ("suppressPreamble: true"
+     * will start the svg output directly at "<svg...")
      * @return {String}
      */
-    toSVG: function() {
-      var markup = [
-        '<?xml version="1.0" standalone="no" ?>',
-          '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN" ',
-            '"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">',
+    toSVG: function(options) {
+      options || (options = { });
+      var markup = [];
+
+      if (!options.suppressPreamble) {
+        markup.push(
+          '<?xml version="1.0" standalone="no" ?>',
+            '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN" ',
+              '"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">'
+        );
+      }
+      markup.push(
           '<svg ',
             'xmlns="http://www.w3.org/2000/svg" ',
             'xmlns:xlink="http://www.w3.org/1999/xlink" ',
@@ -910,7 +954,7 @@
             'xml:space="preserve">',
           '<desc>Created with Fabric.js ', fabric.version, '</desc>',
           fabric.createSVGFontFacesMarkup(this.getObjects())
-      ];
+      );
 
       if (this.backgroundImage) {
         markup.push(
@@ -959,14 +1003,22 @@
      * @return {Object} removed object
      */
     remove: function (object) {
-      removeFromArray(this._objects, object);
+      // removing active object should fire "selection:cleared" events
       if (this.getActiveObject() === object) {
-
-        // removing active object should fire "selection:cleared" events
         this.fire('before:selection:cleared', { target: object });
         this.discardActiveObject();
         this.fire('selection:cleared');
       }
+
+      var objects = this._objects;
+      var index = objects.indexOf(object);
+
+      // removing any object should fire "objct:removed" events
+      if (index !== -1) {
+        objects.splice(index,1);
+        this.fire('object:removed', { target: object });
+      }
+
       this.renderAll();
       return object;
     },
@@ -1191,11 +1243,8 @@
      *                          `null` if canvas element or context can not be initialized
      */
     supports: function (methodName) {
-      var el = fabric.document.createElement('canvas');
+      var el = fabric.util.createCanvasElement();
 
-      if (typeof G_vmlCanvasManager !== 'undefined') {
-        G_vmlCanvasManager.initElement(el);
-      }
       if (!el || !el.getContext) {
         return null;
       }

@@ -18,13 +18,13 @@ var minifier = buildArgsAsObject.minifier || 'uglifyjs';
 var mininfierCmd;
 
 if (minifier === 'yui') {
-  mininfierCmd = 'java -jar lib/yuicompressor-2.4.2.jar dist/all.js -o dist/all.min.js';
+  mininfierCmd = 'java -jar lib/yuicompressor-2.4.6.jar dist/all.js -o dist/all.min.js';
 }
 else if (minifier === 'closure') {
   mininfierCmd = 'java -jar lib/google_closure_compiler.jar --js dist/all.js --js_output_file dist/all.min.js';
 }
 else if (minifier === 'uglifyjs') {
-  mininfierCmd = 'uglifyjs -o dist/all.min.js dist/all.js';
+  mininfierCmd = 'uglifyjs --output dist/all.min.js dist/all.js';
 }
 
 var includeAllModules = modulesToInclude.length === 1 && modulesToInclude[0] === 'ALL';
@@ -91,7 +91,7 @@ var filesToInclude = [
   ifSpecifiedInclude('gestures', 'lib/event.js'),
 
   'src/log.js',
-  'src/observable.js',
+  'src/observable.mixin.js',
 
   'src/util/misc.js',
   'src/util/lang_array.js',
@@ -109,6 +109,8 @@ var filesToInclude = [
   ifSpecifiedInclude('parser', 'src/parser.js'),
 
   'src/gradient.class.js',
+  'src/pattern.class.js',
+  'src/shadow.class.js',
   'src/point.class.js',
   'src/intersection.class.js',
   'src/color.class.js',
@@ -123,13 +125,19 @@ var filesToInclude = [
   ifSpecifiedInclude('freedrawing', 'src/pattern_brush.class.js'),
 
   ifSpecifiedInclude('interaction', 'src/canvas.class.js'),
+  ifSpecifiedInclude('interaction', 'src/canvas_events.mixin.js'),
 
-  'src/canvas.animation.js',
+  'src/canvas_animation.mixin.js',
 
-  ifSpecifiedInclude('serialization', 'src/canvas.serialization.js'),
-  ifSpecifiedInclude('gestures', 'src/canvas.gestures.js'),
+  ifSpecifiedInclude('serialization', 'src/canvas_serialization.mixin.js'),
+  ifSpecifiedInclude('gestures', 'src/canvas_gestures.mixin.js'),
 
   'src/object.class.js',
+  'src/object_origin.mixin.js',
+  'src/object_geometry.mixin.js',
+
+  ifSpecifiedInclude('interaction', 'src/object_interactivity.mixin.js'),
+
   'src/line.class.js',
   'src/circle.class.js',
   'src/triangle.class.js',
@@ -142,7 +150,7 @@ var filesToInclude = [
   'src/group.class.js',
   'src/image.class.js',
 
-  ifSpecifiedInclude('object_straightening', 'src/object_straightening.js'),
+  ifSpecifiedInclude('object_straightening', 'src/object_straightening.mixin.js'),
 
   ifSpecifiedInclude('image_filters', 'src/image_filters.js'),
 

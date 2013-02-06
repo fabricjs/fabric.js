@@ -6,12 +6,12 @@
 
 Using Fabric.js, you can create and populate objects on canvas; objects like simple geometrical shapes — rectangles, circles, ellipses, polygons, or more complex shapes consisting of hundreds or thousands of simple paths. You can then scale, move, and rotate these objects with the mouse; modify their properties — color, transparency, z-index, etc. You can also manipulate these objects altogether — grouping them with a simple mouse selection.
 
-Contributions are very much welcome!
+[Contributions](https://github.com/kangax/fabric.js/wiki/Love-Fabric%3F-Help-us-by...) are very much welcome!
 
 ### Goals
 
 - Unit tested (1400+ tests at the moment)
-- Modular (~20 small "classes" and modules)
+- Modular (~40 small "classes", modules, mixins)
 - Cross-browser
 - [Fast](https://github.com/kangax/fabric.js/wiki/Focus-on-speed)
 - Encapsulated in one object
@@ -89,7 +89,7 @@ Fabric.js started as a foundation for design editor on [printio.ru](http://print
 
 Documentation is always available at [http://fabricjs.com/docs/](http://fabricjs.com/docs/). You can also build it locally, following step 4 from the "Building" section of this README.
 
-Also see [presentation from BK.js](http://www.slideshare.net/kangax/fabricjs-building-acanvaslibrarybk) and [presentation from Falsy Values](http://www.slideshare.net/kangax/fabric-falsy-values-8067834) for an overview of fabric.js, how it works, and its features.
+Also see [official 4-part intro series](http://fabricjs.com/articles), [presentation from BK.js](http://www.slideshare.net/kangax/fabricjs-building-acanvaslibrarybk) and [presentation from Falsy Values](http://www.slideshare.net/kangax/fabric-falsy-values-8067834) for an overview of fabric.js, how it works, and its features.
 
 ### Optional modules
 
@@ -103,6 +103,7 @@ These are the optional modules that could be specified for inclusion, when build
 - **easing** - Adds support for animation easing functions
 - **node** — Adds support for running fabric under node.js, with help of [jsdom](https://github.com/tmpvar/jsdom) and [node-canvas](https://github.com/learnboost/node-canvas) libraries.
 - **freedrawing** - Adds support for free drawing
+- **gestures** - Adds support for multitouch gestures
 
 ### Examples of use
 
@@ -131,11 +132,11 @@ Follow [@fabric.js](http://twitter.com/fabricjs) or [@kangax](http://twitter.com
 - Ernest Delgado for the original idea of [manipulating images on canvas](http://www.ernestdelgado.com/archive/canvas/).
 - [Maxim "hakunin" Chernyak](http://twitter.com/hakunin) for ideas, and help with various parts of the library throughout its life.
 - [Sergey Nisnevich](http://nisnya.com) for help with geometry logic.
-- Github contributors: @Kingsquare, @cleercode, @jarek-itmore, @sunrei, @khronnuz, @ollym, @Kienz, @willmcneilly, @davidjrice
+- Github contributors: @Kingsquare, @cleercode, @jarek-itmore, @sunrei, @khronnuz, @ollym, @Kienz, @garg, @sjpemberton09, @willmcneilly, @davidjrice, @coulix, and [more](https://github.com/kangax/fabric.js/graphs/contributors)
 
 ### MIT License
 
-Copyright (c) 2008-2012 Printio (Juriy Zaytsev, Maxim Chernyak)
+Copyright (c) 2008-2013 Printio (Juriy Zaytsev, Maxim Chernyak)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

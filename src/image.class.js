@@ -102,7 +102,11 @@
       if (!noTransform) {
         this.transform(ctx);
       }
+
+      this._setShadow(ctx);
       this._render(ctx);
+      this._removeShadow(ctx);
+
       if (this.active && !noTransform) {
         this.drawBorders(ctx);
         this.hideCorners || this.drawCorners(ctx);
@@ -186,13 +190,9 @@
 
       var isLikelyNode = typeof Buffer !== 'undefined' && typeof window === 'undefined',
           imgEl = this._originalImage,
-          canvasEl = fabric.document.createElement('canvas'),
+          canvasEl = fabric.util.createCanvasElement(),
           replacement = isLikelyNode ? new (require('canvas').Image)() : fabric.document.createElement('img'),
           _this = this;
-
-        if (!canvasEl.getContext && typeof G_vmlCanvasManager !== 'undefined') {
-          G_vmlCanvasManager.initElement(canvasEl);
-        }
 
       canvasEl.width = imgEl.width;
       canvasEl.height = imgEl.height;

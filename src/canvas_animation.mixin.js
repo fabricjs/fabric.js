@@ -1,4 +1,4 @@
-fabric.util.object.extend(fabric.StaticCanvas.prototype, {
+fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.StaticCanvas.prototype */ {
 
   /**
    * Animation duration (in ms) for fx* methods

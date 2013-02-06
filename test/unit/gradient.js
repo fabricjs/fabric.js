@@ -48,10 +48,10 @@
     equal(object.colorStops, gradient.colorStops);
   });
 
-  test('toLiveGradient', function() {
+  test('toLive', function() {
     var gradient = createGradient();
 
-    ok(typeof gradient.toLiveGradient == 'function');
+    ok(typeof gradient.toLive == 'function');
   });
 
   test('fromElement', function() {

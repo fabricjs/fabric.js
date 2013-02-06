@@ -20,7 +20,7 @@
   fabric.Text = fabric.util.createClass(fabric.Object, /** @scope fabric.Text.prototype */ {
 
     /**
-     * Font size
+     * Font size (in pixels)
      * @property
      * @type Number
      */
@@ -147,11 +147,7 @@
      * @method _initDimensions
      */
     _initDimensions: function() {
-      var canvasEl = fabric.document.createElement('canvas');
-
-      if (!canvasEl.getContext && typeof G_vmlCanvasManager !== 'undefined') {
-        G_vmlCanvasManager.initElement(canvasEl);
-      }
+      var canvasEl = fabric.util.createCanvasElement();
 
       this._render(canvasEl.getContext('2d'));
     },
@@ -322,8 +318,8 @@
      * @method _setTextStyles
      */
     _setTextStyles: function(ctx) {
-      ctx.fillStyle = this.fill.toLiveGradient
-          ? this.fill.toLiveGradient(ctx)
+      ctx.fillStyle = this.fill.toLive
+          ? this.fill.toLive(ctx)
           : this.fill;
       ctx.strokeStyle = this.strokeStyle;
       ctx.lineWidth = this.strokeWidth;

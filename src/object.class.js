@@ -6,7 +6,6 @@
       extend = fabric.util.object.extend,
       toFixed = fabric.util.toFixed,
       capitalize = fabric.util.string.capitalize,
-      getPointer = fabric.util.getPointer,
       degreesToRadians = fabric.util.degreesToRadians;
 
   if (fabric.Object) {
@@ -32,11 +31,11 @@
   fabric.Object = fabric.util.createClass(/** @scope fabric.Object.prototype */ {
 
     /**
-     * Type of an object (rect, circle, path, etc)
+     * Type of an object (rect, circle, path, etc.)
      * @property
      * @type String
      */
-    type:                       'object',
+    type:                     'object',
 
     /**
      * Horizontal origin of transformation of an object (one of "left", "right", "center")
@@ -200,6 +199,13 @@
     strokeDashArray:          null,
 
     /**
+     * Shadow object representing shadow of this shape
+     * @property
+     * @type fabric.Shadow
+     */
+    shadow:                   null,
+
+    /**
      * Border opacity when object is active and moving
      * @property
      * @type Number
@@ -286,7 +292,7 @@
       'top left width height scaleX scaleY flipX flipY ' +
       'angle opacity cornerSize fill overlayFill originX originY ' +
       'stroke strokeWidth strokeDashArray fillRule ' +
-      'borderScaleFactor transformMatrix selectable'
+      'borderScaleFactor transformMatrix selectable shadow'
     ).split(' '),
 
     /**
@@ -305,8 +311,31 @@
      * @method _initGradient
      */
     _initGradient: function(options) {
-      if (options.fill && typeof options.fill === 'object' && !(options.fill instanceof fabric.Gradient)) {
+      if (options.fill && options.fill.colorStops && !(options.fill instanceof fabric.Gradient)) {
         this.set('fill', new fabric.Gradient(options.fill));
+      }
+    },
+
+    /**
+     * @private
+     * @method _initPattern
+     */
+    _initPattern: function(options) {
+      if (options.fill && options.fill.source && !(options.fill instanceof fabric.Pattern)) {
+        this.set('fill', new fabric.Pattern(options.fill));
+      }
+      if (options.stroke && options.stroke.source && !(options.stroke instanceof fabric.Pattern)) {
+        this.set('stroke', new fabric.Pattern(options.stroke));
+      }
+    },
+
+    /**
+     * @private
+     * @method _initShadow
+     */
+    _initShadow: function(options) {
+      if (options.shadow && !(options.shadow instanceof fabric.Shadow)) {
+        this.setShadow(options.shadow);
       }
     },
 
@@ -320,6 +349,8 @@
         this.set(prop, options[prop]);
       }
       this._initGradient(options);
+      this._initPattern(options);
+      this._initShadow(options);
     },
 
     /**
@@ -350,30 +381,31 @@
       var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
 
       var object = {
-        type:             this.type,
-        originX:          this.originX,
-        originY:          this.originY,
-        left:             toFixed(this.left, NUM_FRACTION_DIGITS),
-        top:              toFixed(this.top, NUM_FRACTION_DIGITS),
-        width:            toFixed(this.width, NUM_FRACTION_DIGITS),
-        height:           toFixed(this.height, NUM_FRACTION_DIGITS),
-        fill:             (this.fill && this.fill.toObject) ? this.fill.toObject() : this.fill,
-        overlayFill:      this.overlayFill,
-        stroke:           this.stroke,
-        strokeWidth:      this.strokeWidth,
-        strokeDashArray:  this.strokeDashArray,
-        scaleX:           toFixed(this.scaleX, NUM_FRACTION_DIGITS),
-        scaleY:           toFixed(this.scaleY, NUM_FRACTION_DIGITS),
-        angle:            toFixed(this.getAngle(), NUM_FRACTION_DIGITS),
-        flipX:            this.flipX,
-        flipY:            this.flipY,
-        opacity:          toFixed(this.opacity, NUM_FRACTION_DIGITS),
-        selectable:       this.selectable,
-        hasControls:      this.hasControls,
-        hasBorders:       this.hasBorders,
-        hasRotatingPoint: this.hasRotatingPoint,
+        type:               this.type,
+        originX:            this.originX,
+        originY:            this.originY,
+        left:               toFixed(this.left, NUM_FRACTION_DIGITS),
+        top:                toFixed(this.top, NUM_FRACTION_DIGITS),
+        width:              toFixed(this.width, NUM_FRACTION_DIGITS),
+        height:             toFixed(this.height, NUM_FRACTION_DIGITS),
+        fill:               (this.fill && this.fill.toObject) ? this.fill.toObject() : this.fill,
+        overlayFill:        this.overlayFill,
+        stroke:             (this.stroke && this.stroke.toObject) ? this.stroke.toObject() : this.stroke,
+        strokeWidth:        this.strokeWidth,
+        strokeDashArray:    this.strokeDashArray,
+        scaleX:             toFixed(this.scaleX, NUM_FRACTION_DIGITS),
+        scaleY:             toFixed(this.scaleY, NUM_FRACTION_DIGITS),
+        angle:              toFixed(this.getAngle(), NUM_FRACTION_DIGITS),
+        flipX:              this.flipX,
+        flipY:              this.flipY,
+        opacity:            toFixed(this.opacity, NUM_FRACTION_DIGITS),
+        selectable:         this.selectable,
+        hasControls:        this.hasControls,
+        hasBorders:         this.hasBorders,
+        hasRotatingPoint:   this.hasRotatingPoint,
         transparentCorners: this.transparentCorners,
-        perPixelTargetFind: this.perPixelTargetFind
+        perPixelTargetFind: this.perPixelTargetFind,
+        shadow:             (this.shadow && this.shadow.toObject) ? this.shadow.toObject() : this.shadow
       };
 
       if (!this.includeDefaultValues) {
@@ -489,21 +521,13 @@
     },
 
     /**
-     * Makes sure the scale is valid and modifies it if necessary
-     * @private
-     * @method _constrainScale
-     * @param {Number} value
-     * @return {Number}
+     * Basic getter
+     * @method get
+     * @param {String} property
+     * @return {Any} value of a property
      */
-    _constrainScale: function(value) {
-      if (Math.abs(value) < this.minScaleLimit) {
-        if (value < 0)
-          return -this.minScaleLimit;
-        else
-          return this.minScaleLimit;
-      }
-
-      return value;
+    get: function(property) {
+      return this[property];
     },
 
     /**
@@ -588,16 +612,6 @@
     },
 
     /**
-     * Basic getter
-     * @method get
-     * @param {String} property
-     * @return {Any} value of a property
-     */
-    get: function(property) {
-      return this[property];
-    },
-
-    /**
      * Renders an object on a specified context
      * @method render
      * @param {CanvasRenderingContext2D} ctx context to render on
@@ -621,15 +635,20 @@
 
       if (this.stroke || this.strokeDashArray) {
         ctx.lineWidth = this.strokeWidth;
-        ctx.strokeStyle = this.stroke;
+        if (this.stroke && this.stroke.toLive) {
+          ctx.strokeStyle = this.stroke.toLive(ctx);
+        }
+        else {
+          ctx.strokeStyle = this.stroke;
+        }
       }
 
       if (this.overlayFill) {
         ctx.fillStyle = this.overlayFill;
       }
       else if (this.fill) {
-        ctx.fillStyle = this.fill.toLiveGradient
-          ? this.fill.toLiveGradient(ctx)
+        ctx.fillStyle = this.fill.toLive
+          ? this.fill.toLive(ctx)
           : this.fill;
       }
 
@@ -638,7 +657,9 @@
         ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
       }
 
+      this._setShadow(ctx);
       this._render(ctx, noTransform);
+      this._removeShadow(ctx);
 
       if (this.active && !noTransform) {
         this.drawBorders(ctx);
@@ -648,576 +669,25 @@
     },
 
     /**
-     * Returns width of an object
-     * @method getWidth
-     * @return {Number} width value
+     * @private
+     * @method _setShadow
      */
-    getWidth: function() {
-      return this.width * this.scaleX;
-    },
+    _setShadow: function(ctx) {
+      if (!this.shadow) return;
 
-    /**
-     * Returns height of an object
-     * @method getHeight
-     * @return {Number} height value
-     */
-    getHeight: function() {
-      return this.height * this.scaleY;
-    },
-
-    /**
-     * Translates the coordinates from origin to center coordinates (based on the object's dimensions)
-     * @method translateToCenterPoint
-     * @param {fabric.Point} point The point which corresponds to the originX and originY params
-     * @param {string} enum('left', 'center', 'right') Horizontal origin
-     * @param {string} enum('top', 'center', 'bottom') Vertical origin
-     * @return {fabric.Point}
-     */
-    translateToCenterPoint: function(point, originX, originY) {
-      var cx = point.x, cy = point.y;
-
-      if ( originX === "left" ) {
-        cx = point.x + this.getWidth() / 2;
-      }
-      else if ( originX === "right" ) {
-        cx = point.x - this.getWidth() / 2;
-      }
-
-      if ( originY === "top" ) {
-        cy = point.y + this.getHeight() / 2;
-      }
-      else if ( originY === "bottom" ) {
-        cy = point.y - this.getHeight() / 2;
-      }
-
-      // Apply the reverse rotation to the point (it's already scaled properly)
-      return fabric.util.rotatePoint(new fabric.Point(cx, cy), point, degreesToRadians(this.angle));
-    },
-
-    /**
-     * Translates the coordinates from center to origin coordinates (based on the object's dimensions)
-     * @method translateToOriginPoint
-     * @param {fabric.Point} point The point which corresponds to center of the object
-     * @param {string} enum('left', 'center', 'right') Horizontal origin
-     * @param {string} enum('top', 'center', 'bottom') Vertical origin
-     * @return {fabric.Point}
-     */
-    translateToOriginPoint: function(center, originX, originY) {
-      var x = center.x, y = center.y;
-
-      // Get the point coordinates
-      if ( originX === "left" ) {
-        x = center.x - this.getWidth() / 2;
-      }
-      else if ( originX === "right" ) {
-        x = center.x + this.getWidth() / 2;
-      }
-      if ( originY === "top" ) {
-        y = center.y - this.getHeight() / 2;
-      }
-      else if ( originY === "bottom" ) {
-        y = center.y + this.getHeight() / 2;
-      }
-
-      // Apply the rotation to the point (it's already scaled properly)
-      return fabric.util.rotatePoint(new fabric.Point(x, y), center, degreesToRadians(this.angle));
-    },
-
-    /**
-     * Returns the real center coordinates of the object
-     * @method getCenterPoint
-     * @return {fabric.Point}
-     */
-    getCenterPoint: function() {
-      return this.translateToCenterPoint(
-        new fabric.Point(this.left, this.top), this.originX, this.originY);
-    },
-
-    /**
-     * Returns the coordinates of the object based on center coordinates
-     * @method getOriginPoint
-     * @param {fabric.Point} point The point which corresponds to the originX and originY params
-     * @return {fabric.Point}
-     */
-    getOriginPoint: function(center) {
-      return this.translateToOriginPoint(center, this.originX, this.originY);
-    },
-
-    /**
-     * Returns the coordinates of the object as if it has a different origin
-     * @method getPointByOrigin
-     * @param {string} enum('left', 'center', 'right') Horizontal origin
-     * @param {string} enum('top', 'center', 'bottom') Vertical origin
-     * @return {fabric.Point}
-     */
-    getPointByOrigin: function(originX, originY) {
-      var center = this.getCenterPoint();
-
-      return this.translateToOriginPoint(center, originX, originY);
-    },
-
-    /**
-     * Returns the point in local coordinates
-     * @method toLocalPoint
-     * @param {fabric.Point} The point relative to the global coordinate system
-     * @return {fabric.Point}
-     */
-    toLocalPoint: function(point, originX, originY) {
-      var center = this.getCenterPoint();
-
-      var x, y;
-      if (originX !== undefined && originY !== undefined) {
-        if ( originX === "left" ) {
-          x = center.x - this.getWidth() / 2;
-        }
-        else if ( originX === "right" ) {
-          x = center.x + this.getWidth() / 2;
-        }
-        else {
-          x = center.x;
-        }
-
-        if ( originY === "top" ) {
-          y = center.y - this.getHeight() / 2;
-        }
-        else if ( originY === "bottom" ) {
-          y = center.y + this.getHeight() / 2;
-        }
-        else {
-          y = center.y;
-        }
-      }
-      else {
-        x = this.left;
-        y = this.top;
-      }
-
-      return fabric.util.rotatePoint(new fabric.Point(point.x, point.y), center, -degreesToRadians(this.angle)).subtractEquals(new fabric.Point(x, y));
-    },
-
-    /**
-     * Returns the point in global coordinates
-     * @method toGlobalPoint
-     * @param {fabric.Point} The point relative to the local coordinate system
-     * @return {fabric.Point}
-     */
-    toGlobalPoint: function(point) {
-      return fabric.util.rotatePoint(point, this.getCenterPoint(), degreesToRadians(this.angle)).addEquals(new fabric.Point(this.left, this.top));
-    },
-
-    /**
-     * Sets the position of the object taking into consideration the object's origin
-     * @method setPositionByOrigin
-     * @param {fabric.Point} point The new position of the object
-     * @param {string} enum('left', 'center', 'right') Horizontal origin
-     * @param {string} enum('top', 'center', 'bottom') Vertical origin
-     * @return {void}
-     */
-    setPositionByOrigin: function(pos, originX, originY) {
-      var center = this.translateToCenterPoint(pos, originX, originY);
-      var position = this.translateToOriginPoint(center, this.originX, this.originY);
-
-      this.set('left', position.x);
-      this.set('top', position.y);
-    },
-
-    /**
-     * Scales an object (equally by x and y)
-     * @method scale
-     * @param value {Number} scale factor
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-    scale: function(value) {
-      value = this._constrainScale(value);
-
-      if (value < 0) {
-        this.flipX = !this.flipX;
-        this.flipY = !this.flipY;
-        value *= -1;
-      }
-
-      this.scaleX = value;
-      this.scaleY = value;
-      this.setCoords();
-      return this;
-    },
-
-    /**
-     * Scales an object to a given width, with respect to bounding box (scaling by x/y equally)
-     * @method scaleToWidth
-     * @param value {Number} new width value
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-    scaleToWidth: function(value) {
-      // adjust to bounding rect factor so that rotated shapes would fit as well
-      var boundingRectFactor = this.getBoundingRectWidth() / this.getWidth();
-      return this.scale(value / this.width / boundingRectFactor);
-    },
-
-    /**
-     * Scales an object to a given height, with respect to bounding box (scaling by x/y equally)
-     * @method scaleToHeight
-     * @param value {Number} new height value
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-    scaleToHeight: function(value) {
-      // adjust to bounding rect factor so that rotated shapes would fit as well
-      var boundingRectFactor = this.getBoundingRectHeight() / this.getHeight();
-      return this.scale(value / this.height / boundingRectFactor);
-    },
-
-    /**
-     * Sets corner position coordinates based on current angle, width and height
-     * @method setCoords
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-    setCoords: function() {
-
-      var strokeWidth = this.strokeWidth > 1 ? this.strokeWidth : 0,
-          padding = this.padding,
-          theta = degreesToRadians(this.angle);
-
-      this.currentWidth = (this.width + strokeWidth) * this.scaleX + padding * 2;
-      this.currentHeight = (this.height + strokeWidth) * this.scaleY + padding * 2;
-
-      //If width is negative, make postive. Fixes path selection issue
-      if(this.currentWidth < 0){
-         this.currentWidth = Math.abs(this.currentWidth);
-      }
-
-      var _hypotenuse = Math.sqrt(
-        Math.pow(this.currentWidth / 2, 2) +
-        Math.pow(this.currentHeight / 2, 2));
-
-      var _angle = Math.atan(this.currentHeight / this.currentWidth);
-
-      // offset added for rotate and scale actions
-      var offsetX = Math.cos(_angle + theta) * _hypotenuse,
-          offsetY = Math.sin(_angle + theta) * _hypotenuse,
-          sinTh = Math.sin(theta),
-          cosTh = Math.cos(theta);
-
-      var coords = this.getCenterPoint();
-      var tl = {
-        x: coords.x - offsetX,
-        y: coords.y - offsetY
-      };
-      var tr = {
-        x: tl.x + (this.currentWidth * cosTh),
-        y: tl.y + (this.currentWidth * sinTh)
-      };
-      var br = {
-        x: tr.x - (this.currentHeight * sinTh),
-        y: tr.y + (this.currentHeight * cosTh)
-      };
-      var bl = {
-        x: tl.x - (this.currentHeight * sinTh),
-        y: tl.y + (this.currentHeight * cosTh)
-      };
-      var ml = {
-        x: tl.x - (this.currentHeight/2 * sinTh),
-        y: tl.y + (this.currentHeight/2 * cosTh)
-      };
-      var mt = {
-        x: tl.x + (this.currentWidth/2 * cosTh),
-        y: tl.y + (this.currentWidth/2 * sinTh)
-      };
-      var mr = {
-        x: tr.x - (this.currentHeight/2 * sinTh),
-        y: tr.y + (this.currentHeight/2 * cosTh)
-      };
-      var mb = {
-        x: bl.x + (this.currentWidth/2 * cosTh),
-        y: bl.y + (this.currentWidth/2 * sinTh)
-      };
-      var mtr = {
-        x: tl.x + (this.currentWidth/2 * cosTh),
-        y: tl.y + (this.currentWidth/2 * sinTh)
-      };
-
-      // debugging
-
-      // setTimeout(function() {
-      //   canvas.contextTop.fillStyle = 'green';
-      //   canvas.contextTop.fillRect(mb.x, mb.y, 3, 3);
-      //   canvas.contextTop.fillRect(bl.x, bl.y, 3, 3);
-      //   canvas.contextTop.fillRect(br.x, br.y, 3, 3);
-      //   canvas.contextTop.fillRect(tl.x, tl.y, 3, 3);
-      //   canvas.contextTop.fillRect(tr.x, tr.y, 3, 3);
-      //   canvas.contextTop.fillRect(ml.x, ml.y, 3, 3);
-      //   canvas.contextTop.fillRect(mr.x, mr.y, 3, 3);
-      //   canvas.contextTop.fillRect(mt.x, mt.y, 3, 3);
-      // }, 50);
-
-      // clockwise
-      this.oCoords = { tl: tl, tr: tr, br: br, bl: bl, ml: ml, mt: mt, mr: mr, mb: mb, mtr: mtr };
-
-      // set coordinates of the draggable boxes in the corners used to scale/rotate the image
-      this._setCornerCoords();
-
-      return this;
-    },
-
-     /**
-     * Returns width of an object's bounding rectangle
-     * @method getBoundingRectWidth
-     * @return {Number} width value
-     */
-    getBoundingRectWidth: function() {
-      this.oCoords || this.setCoords();
-      var xCoords = [this.oCoords.tl.x, this.oCoords.tr.x, this.oCoords.br.x, this.oCoords.bl.x];
-      var minX = fabric.util.array.min(xCoords);
-      var maxX = fabric.util.array.max(xCoords);
-      return Math.abs(minX - maxX);
-    },
-
-    /**
-     * Returns height of an object's bounding rectangle
-     * @method getBoundingRectHeight
-     * @return {Number} height value
-     */
-    getBoundingRectHeight: function() {
-      this.oCoords || this.setCoords();
-      var yCoords = [this.oCoords.tl.y, this.oCoords.tr.y, this.oCoords.br.y, this.oCoords.bl.y];
-      var minY = fabric.util.array.min(yCoords);
-      var maxY = fabric.util.array.max(yCoords);
-      return Math.abs(minY - maxY);
-    },
-
-    /**
-     * Draws borders of an object's bounding box.
-     * Requires public properties: width, height
-     * Requires public options: padding, borderColor
-     * @method drawBorders
-     * @param {CanvasRenderingContext2D} ctx Context to draw on
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-    drawBorders: function(ctx) {
-      if (!this.hasBorders) return;
-
-      var padding = this.padding,
-          padding2 = padding * 2,
-          strokeWidth = this.strokeWidth > 1 ? this.strokeWidth : 0;
-
-      ctx.save();
-
-      ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
-      ctx.strokeStyle = this.borderColor;
-
-      var scaleX = 1 / this._constrainScale(this.scaleX),
-          scaleY = 1 / this._constrainScale(this.scaleY);
-
-      ctx.lineWidth = 1 / this.borderScaleFactor;
-
-      ctx.scale(scaleX, scaleY);
-
-      var w = this.getWidth(),
-          h = this.getHeight();
-
-      ctx.strokeRect(
-        ~~(-(w / 2) - padding - strokeWidth / 2 * this.scaleX) + 0.5, // offset needed to make lines look sharper
-        ~~(-(h / 2) - padding - strokeWidth / 2 * this.scaleY) + 0.5,
-        ~~(w + padding2 + strokeWidth * this.scaleX),
-        ~~(h + padding2 + strokeWidth * this.scaleY)
-      );
-
-      if (this.hasRotatingPoint && !this.get('lockRotation') && this.hasControls) {
-
-        var rotateHeight = (
-          this.flipY
-            ? h + (strokeWidth * this.scaleY) + (padding * 2)
-            : -h - (strokeWidth * this.scaleY) - (padding * 2)
-        ) / 2;
-
-        ctx.beginPath();
-        ctx.moveTo(0, rotateHeight);
-        ctx.lineTo(0, rotateHeight + (this.flipY ? this.rotatingPointOffset : -this.rotatingPointOffset));
-        ctx.closePath();
-        ctx.stroke();
-      }
-
-      ctx.restore();
-      return this;
+      ctx.shadowColor = this.shadow.color;
+      ctx.shadowBlur = this.shadow.blur;
+      ctx.shadowOffsetX = this.shadow.offsetX;
+      ctx.shadowOffsetY = this.shadow.offsetY;
     },
 
     /**
      * @private
-     * @method _renderDashedStroke
+     * @method _removeShadow
      */
-    _renderDashedStroke: function(ctx) {
-
-      if (1 & this.strokeDashArray.length /* if odd number of items */) {
-        /* duplicate items */
-        this.strokeDashArray.push.apply(this.strokeDashArray, this.strokeDashArray);
-      }
-
-      var i = 0,
-          x = -this.width/2, y = -this.height/2,
-          _this = this,
-          padding = this.padding,
-          dashedArrayLength = this.strokeDashArray.length;
-
-      ctx.save();
-      ctx.beginPath();
-
-      /** @ignore */
-      function renderSide(xMultiplier, yMultiplier) {
-
-        var lineLength = 0,
-            lengthDiff = 0,
-            sideLength = (yMultiplier ? _this.height : _this.width) + padding * 2;
-
-        while (lineLength < sideLength) {
-
-          var lengthOfSubPath = _this.strokeDashArray[i++];
-          lineLength += lengthOfSubPath;
-
-          if (lineLength > sideLength) {
-            lengthDiff = lineLength - sideLength;
-          }
-
-          // track coords
-          if (xMultiplier) {
-            x += (lengthOfSubPath * xMultiplier) - (lengthDiff * xMultiplier || 0);
-          }
-          else {
-            y += (lengthOfSubPath * yMultiplier) - (lengthDiff * yMultiplier || 0);
-          }
-
-          ctx[1 & i /* odd */ ? 'moveTo' : 'lineTo'](x, y);
-          if (i >= dashedArrayLength) {
-            i = 0;
-          }
-        }
-      }
-
-      renderSide(1, 0);
-      renderSide(0, 1);
-      renderSide(-1, 0);
-      renderSide(0, -1);
-
-      ctx.stroke();
-      ctx.closePath();
-      ctx.restore();
-    },
-
-    /**
-     * Draws corners of an object's bounding box.
-     * Requires public properties: width, height, scaleX, scaleY
-     * Requires public options: cornerSize, padding
-     * @method drawCorners
-     * @param {CanvasRenderingContext2D} ctx Context to draw on
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-    drawCorners: function(ctx) {
-      if (!this.hasControls) return;
-
-      var size = this.cornerSize,
-          size2 = size / 2,
-          strokeWidth2 = this.strokeWidth / 2,
-          left = -(this.width / 2),
-          top = -(this.height / 2),
-          _left,
-          _top,
-          sizeX = size / this.scaleX,
-          sizeY = size / this.scaleY,
-          paddingX = this.padding / this.scaleX,
-          paddingY = this.padding / this.scaleY,
-          scaleOffsetY = size2 / this.scaleY,
-          scaleOffsetX = size2 / this.scaleX,
-          scaleOffsetSizeX = (size2 - size) / this.scaleX,
-          scaleOffsetSizeY = (size2 - size) / this.scaleY,
-          height = this.height,
-          width = this.width,
-          methodName = this.transparentCorners ? 'strokeRect' : 'fillRect',
-          isVML = typeof G_vmlCanvasManager !== 'undefined';
-
-      ctx.save();
-
-      ctx.lineWidth = 1 / Math.max(this.scaleX, this.scaleY);
-
-      ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
-      ctx.strokeStyle = ctx.fillStyle = this.cornerColor;
-
-      // top-left
-      _left = left - scaleOffsetX - strokeWidth2 - paddingX;
-      _top = top - scaleOffsetY - strokeWidth2 - paddingY;
-
-      isVML || ctx.clearRect(_left, _top, sizeX, sizeY);
-      ctx[methodName](_left, _top, sizeX, sizeY);
-
-      // top-right
-      _left = left + width - scaleOffsetX + strokeWidth2 + paddingX;
-      _top = top - scaleOffsetY - strokeWidth2 - paddingY;
-
-      isVML || ctx.clearRect(_left, _top, sizeX, sizeY);
-      ctx[methodName](_left, _top, sizeX, sizeY);
-
-      // bottom-left
-      _left = left - scaleOffsetX - strokeWidth2 - paddingX;
-      _top = top + height + scaleOffsetSizeY + strokeWidth2 + paddingY;
-
-      isVML || ctx.clearRect(_left, _top, sizeX, sizeY);
-      ctx[methodName](_left, _top, sizeX, sizeY);
-
-      // bottom-right
-      _left = left + width + scaleOffsetSizeX + strokeWidth2 + paddingX;
-      _top = top + height + scaleOffsetSizeY + strokeWidth2 + paddingY;
-
-      isVML || ctx.clearRect(_left, _top, sizeX, sizeY);
-      ctx[methodName](_left, _top, sizeX, sizeY);
-
-      if (!this.get('lockUniScaling')) {
-        // middle-top
-        _left = left + width/2 - scaleOffsetX;
-        _top = top - scaleOffsetY - strokeWidth2 - paddingY;
-
-        isVML || ctx.clearRect(_left, _top, sizeX, sizeY);
-        ctx[methodName](_left, _top, sizeX, sizeY);
-
-        // middle-bottom
-        _left = left + width/2 - scaleOffsetX;
-        _top = top + height + scaleOffsetSizeY + strokeWidth2 + paddingY;
-
-        isVML || ctx.clearRect(_left, _top, sizeX, sizeY);
-        ctx[methodName](_left, _top, sizeX, sizeY);
-
-        // middle-right
-        _left = left + width + scaleOffsetSizeX + strokeWidth2 + paddingX;
-        _top = top + height/2 - scaleOffsetY;
-
-        isVML || ctx.clearRect(_left, _top, sizeX, sizeY);
-        ctx[methodName](_left, _top, sizeX, sizeY);
-
-        // middle-left
-        _left = left - scaleOffsetX - strokeWidth2 - paddingX;
-        _top = top + height/2 - scaleOffsetY;
-
-        isVML || ctx.clearRect(_left, _top, sizeX, sizeY);
-        ctx[methodName](_left, _top, sizeX, sizeY);
-      }
-
-      // middle-top-rotate
-      if (this.hasRotatingPoint) {
-
-        _left = left + width/2 - scaleOffsetX;
-        _top = this.flipY ?
-          (top + height + (this.rotatingPointOffset / this.scaleY) - sizeY/2 + strokeWidth2 + paddingY)
-          : (top - (this.rotatingPointOffset / this.scaleY) - sizeY/2 - strokeWidth2 - paddingY);
-
-        isVML || ctx.clearRect(_left, _top, sizeX, sizeY);
-        ctx[methodName](_left, _top, sizeX, sizeY);
-      }
-
-      ctx.restore();
-
-      return this;
+    _removeShadow: function(ctx) {
+      ctx.shadowColor = '';
+      ctx.shadowBlur = ctx.shadowOffsetX = ctx.shadowOffsetY = 0;
     },
 
     /**
@@ -1274,10 +744,7 @@
      * @param callback {Function} callback that recieves resulting data-url string
      */
     toDataURL: function(callback) {
-      var el = fabric.document.createElement('canvas');
-      if (!el.getContext && typeof G_vmlCanvasManager !== 'undefined') {
-        G_vmlCanvasManager.initElement(el);
-      }
+      var el = fabric.util.createCanvasElement();
 
       el.width = this.getBoundingRectWidth();
       el.height = this.getBoundingRectHeight();
@@ -1345,84 +812,6 @@
     },
 
     /**
-     * Returns true if object intersects with an area formed by 2 points
-     * @method intersectsWithRect
-     * @param {Object} selectionTL
-     * @param {Object} selectionBR
-     * @return {Boolean}
-     */
-    intersectsWithRect: function(selectionTL, selectionBR) {
-      var oCoords = this.oCoords,
-          tl = new fabric.Point(oCoords.tl.x, oCoords.tl.y),
-          tr = new fabric.Point(oCoords.tr.x, oCoords.tr.y),
-          bl = new fabric.Point(oCoords.bl.x, oCoords.bl.y),
-          br = new fabric.Point(oCoords.br.x, oCoords.br.y);
-
-      var intersection = fabric.Intersection.intersectPolygonRectangle(
-        [tl, tr, br, bl],
-        selectionTL,
-        selectionBR
-      );
-      return (intersection.status === 'Intersection');
-    },
-
-    /**
-     * Returns true if object intersects with another object
-     * @method intersectsWithObject
-     * @param {Object} other Object to test
-     * @return {Boolean}
-     */
-    intersectsWithObject: function(other) {
-      // extracts coords
-      function getCoords(oCoords) {
-        return {
-          tl: new fabric.Point(oCoords.tl.x, oCoords.tl.y),
-          tr: new fabric.Point(oCoords.tr.x, oCoords.tr.y),
-          bl: new fabric.Point(oCoords.bl.x, oCoords.bl.y),
-          br: new fabric.Point(oCoords.br.x, oCoords.br.y)
-        };
-      }
-      var thisCoords = getCoords(this.oCoords),
-          otherCoords = getCoords(other.oCoords);
-
-      var intersection = fabric.Intersection.intersectPolygonPolygon(
-        [thisCoords.tl, thisCoords.tr, thisCoords.br, thisCoords.bl],
-        [otherCoords.tl, otherCoords.tr, otherCoords.br, otherCoords.bl]
-      );
-
-      return (intersection.status === 'Intersection');
-    },
-
-    /**
-     * Returns true if object is fully contained within area of another object
-     * @method isContainedWithinObject
-     * @param {Object} other Object to test
-     * @return {Boolean}
-     */
-    isContainedWithinObject: function(other) {
-      return this.isContainedWithinRect(other.oCoords.tl, other.oCoords.br);
-    },
-
-    /**
-     * Returns true if object is fully contained within area formed by 2 points
-     * @method isContainedWithinRect
-     * @param {Object} selectionTL
-     * @param {Object} selectionBR
-     * @return {Boolean}
-     */
-    isContainedWithinRect: function(selectionTL, selectionBR) {
-      var oCoords = this.oCoords,
-          tl = new fabric.Point(oCoords.tl.x, oCoords.tl.y),
-          tr = new fabric.Point(oCoords.tr.x, oCoords.tr.y),
-          bl = new fabric.Point(oCoords.bl.x, oCoords.bl.y);
-
-      return tl.x > selectionTL.x
-        && tr.x < selectionBR.x
-        && tl.y > selectionTL.y
-        && bl.y < selectionBR.y;
-    },
-
-    /**
      * Returns true if specified type is identical to the type of an instance
      * @method isType
      * @param type {String} type to check against
@@ -1430,324 +819,6 @@
      */
     isType: function(type) {
       return this.type === type;
-    },
-
-    /**
-     * Determines which one of the four corners has been clicked
-     * @method _findTargetCorner
-     * @private
-     * @param e {Event} event object
-     * @param offset {Object} canvas offset
-     * @return {String|Boolean} corner code (tl, tr, bl, br, etc.), or false if nothing is found
-     */
-    _findTargetCorner: function(e, offset) {
-      if (!this.hasControls || !this.active) return false;
-
-      var pointer = getPointer(e),
-          ex = pointer.x - offset.left,
-          ey = pointer.y - offset.top,
-          xpoints,
-          lines;
-
-      for (var i in this.oCoords) {
-
-        if (i === 'mtr' && !this.hasRotatingPoint) {
-          continue;
-        }
-
-        if (this.get('lockUniScaling') && (i === 'mt' || i === 'mr' || i === 'mb' || i === 'ml')) {
-          continue;
-        }
-
-        lines = this._getImageLines(this.oCoords[i].corner, i);
-
-        // debugging
-
-        // canvas.contextTop.fillRect(lines.bottomline.d.x, lines.bottomline.d.y, 2, 2);
-        // canvas.contextTop.fillRect(lines.bottomline.o.x, lines.bottomline.o.y, 2, 2);
-
-        // canvas.contextTop.fillRect(lines.leftline.d.x, lines.leftline.d.y, 2, 2);
-        // canvas.contextTop.fillRect(lines.leftline.o.x, lines.leftline.o.y, 2, 2);
-
-        // canvas.contextTop.fillRect(lines.topline.d.x, lines.topline.d.y, 2, 2);
-        // canvas.contextTop.fillRect(lines.topline.o.x, lines.topline.o.y, 2, 2);
-
-        // canvas.contextTop.fillRect(lines.rightline.d.x, lines.rightline.d.y, 2, 2);
-        // canvas.contextTop.fillRect(lines.rightline.o.x, lines.rightline.o.y, 2, 2);
-
-        xpoints = this._findCrossPoints(ex, ey, lines);
-        if (xpoints % 2 === 1 && xpoints !== 0) {
-          this.__corner = i;
-          return i;
-        }
-      }
-      return false;
-    },
-
-    /**
-     * Helper method to determine how many cross points are between the 4 image edges
-     * and the horizontal line determined by the position of our mouse when clicked on canvas
-     * @method _findCrossPoints
-     * @private
-     * @param ex {Number} x coordinate of the mouse
-     * @param ey {Number} y coordinate of the mouse
-     * @param oCoords {Object} Coordinates of the image being evaluated
-     */
-    _findCrossPoints: function(ex, ey, oCoords) {
-      var b1, b2, a1, a2, xi, yi,
-          xcount = 0,
-          iLine;
-
-      for (var lineKey in oCoords) {
-        iLine = oCoords[lineKey];
-        // optimisation 1: line below dot. no cross
-        if ((iLine.o.y < ey) && (iLine.d.y < ey)) {
-          continue;
-        }
-        // optimisation 2: line above dot. no cross
-        if ((iLine.o.y >= ey) && (iLine.d.y >= ey)) {
-          continue;
-        }
-        // optimisation 3: vertical line case
-        if ((iLine.o.x === iLine.d.x) && (iLine.o.x >= ex)) {
-          xi = iLine.o.x;
-          yi = ey;
-        }
-        // calculate the intersection point
-        else {
-          b1 = 0;
-          b2 = (iLine.d.y-iLine.o.y)/(iLine.d.x-iLine.o.x);
-          a1 = ey-b1*ex;
-          a2 = iLine.o.y-b2*iLine.o.x;
-
-          xi = - (a1-a2)/(b1-b2);
-          yi = a1+b1*xi;
-        }
-        // dont count xi < ex cases
-        if (xi >= ex) {
-          xcount += 1;
-        }
-        // optimisation 4: specific for square images
-        if (xcount === 2) {
-          break;
-        }
-      }
-      return xcount;
-    },
-
-    /**
-     * Method that returns an object with the image lines in it given the coordinates of the corners
-     * @method _getImageLines
-     * @private
-     * @param oCoords {Object} coordinates of the image corners
-     */
-    _getImageLines: function(oCoords) {
-      return {
-        topline: {
-          o: oCoords.tl,
-          d: oCoords.tr
-        },
-        rightline: {
-          o: oCoords.tr,
-          d: oCoords.br
-        },
-        bottomline: {
-          o: oCoords.br,
-          d: oCoords.bl
-        },
-        leftline: {
-          o: oCoords.bl,
-          d: oCoords.tl
-        }
-      };
-    },
-
-    /**
-     * Sets the coordinates of the draggable boxes in the corners of
-     * the image used to scale/rotate it.
-     * @method _setCornerCoords
-     * @private
-     */
-    _setCornerCoords: function() {
-      var coords = this.oCoords,
-          theta = degreesToRadians(this.angle),
-          newTheta = degreesToRadians(45 - this.angle),
-          cornerHypotenuse = Math.sqrt(2 * Math.pow(this.cornerSize, 2)) / 2,
-          cosHalfOffset = cornerHypotenuse * Math.cos(newTheta),
-          sinHalfOffset = cornerHypotenuse * Math.sin(newTheta),
-          sinTh = Math.sin(theta),
-          cosTh = Math.cos(theta);
-
-      coords.tl.corner = {
-        tl: {
-          x: coords.tl.x - sinHalfOffset,
-          y: coords.tl.y - cosHalfOffset
-        },
-        tr: {
-          x: coords.tl.x + cosHalfOffset,
-          y: coords.tl.y - sinHalfOffset
-        },
-        bl: {
-          x: coords.tl.x - cosHalfOffset,
-          y: coords.tl.y + sinHalfOffset
-        },
-        br: {
-          x: coords.tl.x + sinHalfOffset,
-          y: coords.tl.y + cosHalfOffset
-        }
-      };
-
-      coords.tr.corner = {
-        tl: {
-          x: coords.tr.x - sinHalfOffset,
-          y: coords.tr.y - cosHalfOffset
-        },
-        tr: {
-          x: coords.tr.x + cosHalfOffset,
-          y: coords.tr.y - sinHalfOffset
-        },
-        br: {
-          x: coords.tr.x + sinHalfOffset,
-          y: coords.tr.y + cosHalfOffset
-        },
-        bl: {
-          x: coords.tr.x - cosHalfOffset,
-          y: coords.tr.y + sinHalfOffset
-        }
-      };
-
-      coords.bl.corner = {
-        tl: {
-          x: coords.bl.x - sinHalfOffset,
-          y: coords.bl.y - cosHalfOffset
-        },
-        bl: {
-          x: coords.bl.x - cosHalfOffset,
-          y: coords.bl.y + sinHalfOffset
-        },
-        br: {
-          x: coords.bl.x + sinHalfOffset,
-          y: coords.bl.y + cosHalfOffset
-        },
-        tr: {
-          x: coords.bl.x + cosHalfOffset,
-          y: coords.bl.y - sinHalfOffset
-        }
-      };
-
-      coords.br.corner = {
-        tr: {
-          x: coords.br.x + cosHalfOffset,
-          y: coords.br.y - sinHalfOffset
-        },
-        bl: {
-          x: coords.br.x - cosHalfOffset,
-          y: coords.br.y + sinHalfOffset
-        },
-        br: {
-          x: coords.br.x + sinHalfOffset,
-          y: coords.br.y + cosHalfOffset
-        },
-        tl: {
-          x: coords.br.x - sinHalfOffset,
-          y: coords.br.y - cosHalfOffset
-        }
-      };
-
-      coords.ml.corner = {
-        tl: {
-          x: coords.ml.x - sinHalfOffset,
-          y: coords.ml.y - cosHalfOffset
-        },
-        tr: {
-          x: coords.ml.x + cosHalfOffset,
-          y: coords.ml.y - sinHalfOffset
-        },
-        bl: {
-          x: coords.ml.x - cosHalfOffset,
-          y: coords.ml.y + sinHalfOffset
-        },
-        br: {
-          x: coords.ml.x + sinHalfOffset,
-          y: coords.ml.y + cosHalfOffset
-        }
-      };
-
-      coords.mt.corner = {
-        tl: {
-          x: coords.mt.x - sinHalfOffset,
-          y: coords.mt.y - cosHalfOffset
-        },
-        tr: {
-          x: coords.mt.x + cosHalfOffset,
-          y: coords.mt.y - sinHalfOffset
-        },
-        bl: {
-          x: coords.mt.x - cosHalfOffset,
-          y: coords.mt.y + sinHalfOffset
-        },
-        br: {
-          x: coords.mt.x + sinHalfOffset,
-          y: coords.mt.y + cosHalfOffset
-        }
-      };
-
-      coords.mr.corner = {
-        tl: {
-          x: coords.mr.x - sinHalfOffset,
-          y: coords.mr.y - cosHalfOffset
-        },
-        tr: {
-          x: coords.mr.x + cosHalfOffset,
-          y: coords.mr.y - sinHalfOffset
-        },
-        bl: {
-          x: coords.mr.x - cosHalfOffset,
-          y: coords.mr.y + sinHalfOffset
-        },
-        br: {
-          x: coords.mr.x + sinHalfOffset,
-          y: coords.mr.y + cosHalfOffset
-        }
-      };
-
-      coords.mb.corner = {
-        tl: {
-          x: coords.mb.x - sinHalfOffset,
-          y: coords.mb.y - cosHalfOffset
-        },
-        tr: {
-          x: coords.mb.x + cosHalfOffset,
-          y: coords.mb.y - sinHalfOffset
-        },
-        bl: {
-          x: coords.mb.x - cosHalfOffset,
-          y: coords.mb.y + sinHalfOffset
-        },
-        br: {
-          x: coords.mb.x + sinHalfOffset,
-          y: coords.mb.y + cosHalfOffset
-        }
-      };
-
-      coords.mtr.corner = {
-        tl: {
-          x: coords.mtr.x - sinHalfOffset + (sinTh * this.rotatingPointOffset),
-          y: coords.mtr.y - cosHalfOffset - (cosTh * this.rotatingPointOffset)
-        },
-        tr: {
-          x: coords.mtr.x + cosHalfOffset + (sinTh * this.rotatingPointOffset),
-          y: coords.mtr.y - sinHalfOffset - (cosTh * this.rotatingPointOffset)
-        },
-        bl: {
-          x: coords.mtr.x - cosHalfOffset + (sinTh * this.rotatingPointOffset),
-          y: coords.mtr.y + sinHalfOffset - (cosTh * this.rotatingPointOffset)
-        },
-        br: {
-          x: coords.mtr.x + sinHalfOffset + (sinTh * this.rotatingPointOffset),
-          y: coords.mtr.y + cosHalfOffset - (cosTh * this.rotatingPointOffset)
-        }
-      };
     },
 
     /**
@@ -1792,6 +863,22 @@
     },
 
     /**
+     * Sets pattern fill of an object
+     * @method setPatternFill
+     */
+    setPatternFill: function(options) {
+      this.set('fill', new fabric.Pattern(options));
+    },
+
+    /**
+     * Sets shadow of an object
+     * @method setShadow
+     */
+    setShadow: function(options) {
+      this.set('shadow', new fabric.Shadow(options));
+    },
+
+    /**
      * Animates object's properties
      * @method animate
      *
@@ -1823,7 +910,7 @@
      * @method _animate
      */
     _animate: function(property, to, options) {
-      var obj = this;
+      var obj = this, propPair;
 
       to = to.toString();
 
@@ -1834,12 +921,20 @@
         options = fabric.util.object.clone(options);
       }
 
+      if (~property.indexOf('.')) {
+        propPair = property.split('.');
+      }
+
+      var currentValue = propPair
+        ? this.get(propPair[0])[propPair[1]]
+        : this.get(property);
+
       if (!('from' in options)) {
-        options.from = this.get(property);
+        options.from = currentValue;
       }
 
       if (~to.indexOf('=')) {
-        to = this.get(property) + parseFloat(to.replace('=', ''));
+        to = currentValue + parseFloat(to.replace('=', ''));
       }
       else {
         to = parseFloat(to);
@@ -1852,7 +947,12 @@
         easing: options.easing,
         duration: options.duration,
         onChange: function(value) {
-          obj.set(property, value);
+          if (propPair) {
+            obj[propPair[0]][propPair[1]] = value;
+          }
+          else {
+            obj.set(property, value);
+          }
           options.onChange && options.onChange();
         },
         onComplete: function() {
@@ -1977,14 +1077,11 @@
 
   extend(fabric.Object.prototype, fabric.Observable);
 
-  extend(fabric.Object, {
-
-    /**
-     * @static
-     * @constant
-     * @type Number
-     */
-    NUM_FRACTION_DIGITS:        2
-  });
+  /**
+   * @static
+   * @constant
+   * @type Number
+   */
+  fabric.Object.NUM_FRACTION_DIGITS = 2;
 
 })(typeof exports !== 'undefined' ? exports : this);

@@ -25,7 +25,9 @@ testrunner.run({
       './test/unit/parser.js',
       './test/unit/canvas.js',
       './test/unit/canvas_static.js',
-      './test/unit/gradient.js'
+      './test/unit/gradient.js',
+      './test/unit/pattern.js',
+      './test/unit/shadow.js'
     ]
 }, function(err, report) {
   if(report.failed > 0){

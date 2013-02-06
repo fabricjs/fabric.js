@@ -73,9 +73,13 @@
       }
 
       this.transform(ctx);
+
+      this._setShadow(ctx);
       for (var i = 0, l = this.paths.length; i < l; ++i) {
         this.paths[i].render(ctx, true);
       }
+      this._removeShadow(ctx);
+
       if (this.active) {
         this.drawBorders(ctx);
         this.hideCorners || this.drawCorners(ctx);

@@ -1,6 +1,7 @@
 src/
 lib/
+dist/all.min.js
+dist/all.min.js.gz
 .DS_Store
 HEADER.js
-build_docs.js
 build.js

@@ -143,6 +143,7 @@
       'hasRotatingPoint': true,
       'transparentCorners': true,
       'perPixelTargetFind': false,
+      'shadow': null,
       'angle': 0,
       'flipX': false,
       'flipY': false,

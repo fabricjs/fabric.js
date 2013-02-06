@@ -1,4 +1,4 @@
-fabric.util.object.extend(fabric.Object.prototype, {
+fabric.util.object.extend(fabric.Object.prototype, /** @scope fabric.Object.prototype */ {
 
   /**
    * @private

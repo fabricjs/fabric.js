@@ -172,27 +172,41 @@
    * @method getPointer
    * @memberOf fabric.util
    * @param {Event} event
+   * @param {HTMLCanvasElement} upperCanvasEl &lt;canvas> element on which object selection is drawn
    */
-  function getPointer(event) {
+  function getPointer(event, upperCanvasEl) {
     event || (event = fabric.window.event);
 
     var element = event.target || (typeof event.srcElement !== 'unknown' ? event.srcElement : null),
+        body = fabric.document.body || {scrollLeft: 0, scrollTop: 0},
+        docElement = fabric.document.documentElement,
+        orgElement = element,
         scrollLeft = 0,
         scrollTop = 0,
         firstFixedAncestor;
 
     while (element && element.parentNode && !firstFixedAncestor) {
-        element = element.parentNode;
+      element = element.parentNode;
 
-        if (element !== fabric.document && fabric.util.getElementPosition(element) === 'fixed') firstFixedAncestor = element;
+      if (element !== fabric.document && fabric.util.getElementPosition(element) === 'fixed') firstFixedAncestor = element;
 
+      if (element !== fabric.document && orgElement !== upperCanvasEl && fabric.util.getElementPosition(element) === 'absolute') {
+        scrollLeft = 0;
+        scrollTop = 0;
+      }
+      else if (element === fabric.document && orgElement !== upperCanvasEl) {
+        scrollLeft = body.scrollLeft || docElement.scrollLeft || 0;
+        scrollTop = body.scrollTop ||  docElement.scrollTop || 0;
+      }
+      else {
         scrollLeft += element.scrollLeft || 0;
         scrollTop += element.scrollTop || 0;
+      }
     }
 
     return {
-        x: pointerX(event) + scrollLeft,
-        y: pointerY(event) + scrollTop
+      x: pointerX(event) + scrollLeft,
+      y: pointerY(event) + scrollTop
     };
   }
 
@@ -209,10 +223,10 @@
 
   if (fabric.isTouchSupported) {
     pointerX = function(event) {
-      return event.touches && event.touches[0] && event.touches[0].pageX || event.clientX;
+      return (event.touches && event.touches[0] ? (event.touches[0].pageX - (event.touches[0].pageX - event.touches[0].clientX)) || event.clientX : event.clientX);
     };
     pointerY = function(event) {
-      return event.touches && event.touches[0] && event.touches[0].pageY || event.clientY;
+      return (event.touches && event.touches[0] ? (event.touches[0].pageY - (event.touches[0].pageY - event.touches[0].clientY)) || event.clientY : event.clientY);
     };
   }
 
