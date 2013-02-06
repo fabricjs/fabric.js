@@ -6478,13 +6478,22 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
      * Returns SVG representation of canvas
      * @function
      * @method toSVG
+     * @param {Object} [options] Options for SVG output ("suppressPreamble: true"
+     * will start the svg output directly at "<svg...")
      * @return {String}
      */
-    toSVG: function() {
-      var markup = [
-        '<?xml version="1.0" standalone="no" ?>',
-          '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN" ',
-            '"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">',
+    toSVG: function(options) {
+      options || (options = { });
+      var markup = [];
+
+      if (!options.suppressPreamble) {
+        markup.push(
+          '<?xml version="1.0" standalone="no" ?>',
+            '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN" ',
+              '"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">'
+        );
+      }
+      markup.push(
           '<svg ',
             'xmlns="http://www.w3.org/2000/svg" ',
             'xmlns:xlink="http://www.w3.org/1999/xlink" ',
@@ -6494,7 +6503,7 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
             'xml:space="preserve">',
           '<desc>Created with Fabric.js ', fabric.version, '</desc>',
           fabric.createSVGFontFacesMarkup(this.getObjects())
-      ];
+      );
 
       if (this.backgroundImage) {
         markup.push(
