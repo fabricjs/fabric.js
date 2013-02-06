@@ -217,8 +217,15 @@
     createPath: function(pathData) {
       var path = new fabric.Path(pathData);
       path.fill = null;
-      path.stroke = this.canvas.freeDrawingColor;
-      path.strokeWidth = this.canvas.freeDrawingLineWidth;
+      path.stroke = this.color;
+      path.strokeWidth = this.width;
+      path.setShadow({
+        color: this.shadowColor || this.color,
+        blur: this.shadowBlur,
+        offsetX: this.shadowOffsetX,
+        offsetY: this.shadowOffsetY,
+        affectStroke: true
+      });
       return path;
     },
 

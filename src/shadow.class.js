@@ -34,6 +34,13 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
   offsetY: 0,
 
   /**
+   * Whether the shadow should affect stroke operations
+   * @property
+   * @type Boolean
+   */
+  affectStroke: false,
+
+  /**
    * Constructor
    * @method initialize
    * @param [options] Options object with any of color, blur, offsetX, offsetX properties

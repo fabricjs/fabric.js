@@ -1,9 +1,5 @@
 /* build: `node build.js modules=ALL exclude=gestures` */
-<<<<<<< HEAD
-/*! Fabric.js Copyright 2008-2012, Printio (Juriy Zaytsev, Maxim Chernyak) */
-=======
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
->>>>>>> master
 
 var fabric = fabric || { version: "1.0.6" };
 
@@ -4732,6 +4728,13 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
   offsetY: 0,
 
   /**
+   * Whether the shadow should affect stroke operations
+   * @property
+   * @type Boolean
+   */
+  affectStroke: false,
+
+  /**
    * Constructor
    * @method initialize
    * @param [options] Options object with any of color, blur, offsetX, offsetX properties
@@ -6844,6 +6847,81 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
 
 })();
 
+/**
+ * BaseBrush class
+ * @class fabric.BaseBrush
+ */
+fabric.BaseBrush = fabric.util.createClass({
+
+  /**
+   * Color of a brush
+   * @property
+   * @type String
+   */
+  color:       'rgb(0, 0, 0)',
+
+  /**
+   * Width of a brush
+   * @property
+   * @type Number
+   */
+  width:        1,
+
+  /**
+   * Shadow blur of a brush
+   * @property
+   * @type Number
+   */
+  shadowBlur:   0,
+
+  /**
+   * Shadow color of a brush
+   * @property
+   * @type String
+   */
+  shadowColor:  '',
+
+  /**
+   * Shadow offset x of a brush
+   * @property
+   * @type Number
+   */
+  shadowOffsetX: 0,
+
+  /**
+   * Shadow offset y of a brush
+   * @property
+   * @type Number
+   */
+  shadowOffsetY: 0,
+
+  /**
+   * Sets brush styles
+   * @method setBrushStyles
+   */
+  setBrushStyles: function() {
+    var ctx = this.canvas.contextTop;
+
+    ctx.strokeStyle = this.color;
+    ctx.lineWidth = this.width;
+    ctx.lineCap = ctx.lineJoin = 'round';
+  },
+
+  /**
+   * Sets brush shadow styles
+   * @method setShadowStyles
+   */
+  setShadowStyles: function() {
+    var ctx = this.canvas.contextTop;
+
+    if (this.shadowBlur) {
+      ctx.shadowBlur = this.shadowBlur;
+      ctx.shadowColor = this.shadowColor || this.color;
+      ctx.shadowOffsetX = this.shadowOffsetX;
+      ctx.shadowOffsetY = this.shadowOffsetY;
+    }
+  }
+});
 (function() {
 
   var utilMin = fabric.util.array.min,
@@ -6852,50 +6930,9 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
   /**
    * PencilBrush class
    * @class fabric.PencilBrush
+   * @extends fabric.BaseBrush
    */
-  fabric.PencilBrush = fabric.util.createClass( /** @scope fabric.PencilBrush.prototype */ {
-
-    /**
-     * Color of the pencil
-     * @property
-     * @type String
-     */
-    color:       'rgb(0, 0, 0)',
-
-    /**
-     * Width of a pencil
-     * @property
-     * @type Number
-     */
-    width:        1,
-
-    /**
-     * Shadow blur of a pencil
-     * @property
-     * @type Number
-     */
-    shadowBlur:   0,
-
-    /**
-     * Shadow color of a pencil
-     * @property
-     * @type String
-     */
-    shadowColor:  '',
-
-    /**
-     * Shadow offset x of a pencil
-     * @property
-     * @type Number
-     */
-    shadowOffsetX: 0,
-
-    /**
-     * Shadow offset y of a pencil
-     * @property
-     * @type Number
-     */
-    shadowOffsetY: 0,
+  fabric.PencilBrush = fabric.util.createClass( fabric.BaseBrush, /** @scope fabric.PencilBrush.prototype */ {
 
     /**
      * Constructor
@@ -6972,19 +7009,8 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
     _reset: function() {
       this._points.length = 0;
 
-      var ctx = this.canvas.contextTop;
-
-      ctx.strokeStyle = this.color;
-      ctx.lineWidth = this.width;
-
-      if (this.shadowBlur) {
-        ctx.shadowBlur = this.shadowBlur;
-        ctx.shadowColor = this.shadowColor || this.color;
-        ctx.shadowOffsetX = this.shadowOffsetX;
-        ctx.shadowOffsetY = this.shadowOffsetY;
-      }
-
-      ctx.lineCap = ctx.lineJoin = 'round';
+      this.setBrushStyles();
+      this.setShadowStyles();
     },
 
     /**
@@ -7115,8 +7141,15 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
     createPath: function(pathData) {
       var path = new fabric.Path(pathData);
       path.fill = null;
-      path.stroke = this.canvas.freeDrawingColor;
-      path.strokeWidth = this.canvas.freeDrawingLineWidth;
+      path.stroke = this.color;
+      path.strokeWidth = this.width;
+      path.setShadow({
+        color: this.shadowColor || this.color,
+        blur: this.shadowBlur,
+        offsetX: this.shadowOffsetX,
+        offsetY: this.shadowOffsetY,
+        affectStroke: true
+      });
       return path;
     },
 
@@ -7130,12 +7163,6 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
     _finalizeAndAddPath: function() {
       var ctx = this.canvas.contextTop;
       ctx.closePath();
-<<<<<<< HEAD
-
-      var path = this._getSVGPathData();
-      path = path.join('');
-=======
->>>>>>> master
 
       var pathData = this._getSVGPathData().join('');
       if (pathData === "M 0 0 Q 0 0 0 0 L 0 0") {
@@ -7147,15 +7174,6 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
         return;
       }
 
-<<<<<<< HEAD
-      var p = new fabric.Path(path);
-      p.fill = null;
-      p.stroke = this.color;
-      p.strokeWidth = this.width;
-      this.canvas.add(p);
-
-=======
->>>>>>> master
       // set path origin coordinates based on our bounding box
       var originLeft = this.box.minx  + (this.box.maxx - this.box.minx) /2;
       var originTop = this.box.miny  + (this.box.maxy - this.box.miny) /2;
@@ -7176,18 +7194,12 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
     }
   });
 })();
+
 /**
  * CircleBrush class
  * @class fabric.CircleBrush
  */
-fabric.CircleBrush = fabric.util.createClass( /** @scope fabric.CircleBrush.prototype */ {
-
-  /**
-   * Color of the brush
-   * @property
-   * @type String
-   */
-  color: 'rgb(0, 0, 0)',
+fabric.CircleBrush = fabric.util.createClass( fabric.BaseBrush, /** @scope fabric.CircleBrush.prototype */ {
 
   /**
    * Width of a brush
@@ -7195,34 +7207,6 @@ fabric.CircleBrush = fabric.util.createClass( /** @scope fabric.CircleBrush.prot
    * @type Number
    */
   width: 10,
-
-  /**
-   * Shadow blur of a pencil
-   * @property
-   * @type Number
-   */
-  shadowBlur:   0,
-
-  /**
-   * Shadow color of a pencil
-   * @property
-   * @type String
-   */
-  shadowColor:  '',
-
-  /**
-   * Shadow offset x of a pencil
-   * @property
-   * @type Number
-   */
-  shadowOffsetX: 0,
-
-  /**
-   * Shadow offset y of a pencil
-   * @property
-   * @type Number
-   */
-  shadowOffsetY: 0,
 
   /**
    * Constructor
@@ -7281,7 +7265,13 @@ fabric.CircleBrush = fabric.util.createClass( /** @scope fabric.CircleBrush.prot
         radius: point.radius,
         left: point.x,
         top: point.y,
-        fill: point.fill
+        fill: point.fill,
+        shadow: {
+          color: this.shadowColor || this.color,
+          blur: this.shadowBlur,
+          offsetX: this.shadowOffsetX,
+          offsetY: this.shadowOffsetY
+        }
       });
       this.canvas.add(circle);
     }
@@ -7311,6 +7301,229 @@ fabric.CircleBrush = fabric.util.createClass( /** @scope fabric.CircleBrush.prot
     this.points.push(pointerPoint);
 
     return pointerPoint;
+  }
+});
+/**
+ * SprayBrush class
+ * @class fabric.SprayBrush
+ */
+fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @scope fabric.SprayBrush.prototype */ {
+
+  /**
+   * Width of a spray
+   * @property
+   * @type Number
+   */
+  width:              10,
+
+  /**
+   * Density of a spray (number of dots per chunk)
+   * @property
+   * @type Number
+   */
+  density:            20,
+
+  /**
+   * Width of spray dots
+   * @property
+   * @type Number
+   */
+  dotWidth:           1,
+
+  /**
+   * Width variance of spray dots
+   * @property
+   * @type Number
+   */
+  dotWidthVariance:   1,
+
+  /**
+   * Whether opacity of a dot should be random
+   * @property
+   * @type Boolean
+   */
+  randomOpacity:      false,
+
+  /**
+   * Constructor
+   * @method initialize
+   * @param {fabric.Canvas} canvas
+   * @return {fabric.SprayBrush} Instance of a spray brush
+   */
+  initialize: function(canvas) {
+    this.canvas = canvas;
+    this.sprayChunks = [ ];
+  },
+
+  /**
+   * @method onMouseDown
+   * @param {Object} pointer
+   */
+  onMouseDown: function(pointer) {
+    this.sprayChunks.length = 0;
+    this.canvas.clearContext(this.canvas.contextTop);
+    this.setShadowStyles();
+
+    this.addSprayChunk(pointer);
+    this.render();
+  },
+
+  /**
+   * @method onMouseMove
+   * @param {Object} pointer
+   */
+  onMouseMove: function(pointer) {
+    this.addSprayChunk(pointer);
+    this.render();
+  },
+
+  /**
+   * @method onMouseUp
+   */
+  onMouseUp: function() {
+    var originalRenderOnAddition = this.canvas.renderOnAddition;
+    this.canvas.renderOnAddition = false;
+
+    for (var i = 0, ilen = this.sprayChunks.length; i < ilen; i++) {
+      var sprayChunk = this.sprayChunks[i];
+
+      for (var j = 0, jlen = sprayChunk.length; j < jlen; j++) {
+
+        var rect = new fabric.Rect({
+          width: sprayChunk[j].width,
+          height: sprayChunk[j].width,
+          left: sprayChunk[j].x + 1,
+          top: sprayChunk[j].y + 1,
+          fill: this.color,
+          shadow: {
+            color: this.shadowColor || this.color,
+            blur: this.shadowBlur,
+            offsetX: this.shadowOffsetX,
+            offsetY: this.shadowOffsetY
+          }
+        });
+
+        this.canvas.add(rect);
+      }
+    }
+
+    this.canvas.renderOnAddition = originalRenderOnAddition;
+    this.canvas.clearContext(this.canvas.contextTop);
+    this.canvas.renderAll();
+  },
+
+  /**
+   * @method render
+   */
+  render: function() {
+    var ctx = this.canvas.contextTop;
+    ctx.fillStyle = this.color;
+    ctx.save();
+
+    for (var i = 0, len = this.sprayChunkPoints.length; i < len; i++) {
+      var point = this.sprayChunkPoints[i];
+      if (typeof point.opacity !== 'undefined') {
+        ctx.globalAlpha = point.opacity;
+      }
+      ctx.fillRect(point.x, point.y, point.width, point.width);
+    }
+    ctx.restore();
+  },
+
+  /**
+   * @method addSprayChunk
+   * @param {Object} pointer
+   */
+  addSprayChunk: function(pointer) {
+    this.sprayChunkPoints = [ ];
+
+    var x, y, width, radius = this.width / 2;
+
+    for (var i = 0; i < this.density; i++) {
+
+      x = fabric.util.getRandomInt(pointer.x - radius, pointer.x + radius);
+      y = fabric.util.getRandomInt(pointer.y - radius, pointer.y + radius);
+
+      if (this.dotWidthVariance) {
+        width = fabric.util.getRandomInt(
+          // bottom clamp width to 1
+          Math.max(1, this.dotWidth - this.dotWidthVariance),
+          this.dotWidth + this.dotWidthVariance);
+      }
+      else {
+        width = this.dotWidth;
+      }
+
+      var point = { x: x, y: y, width: width };
+
+      if (this.randomOpacity) {
+        point.opacity = fabric.util.getRandomInt(0, 100) / 100;
+      }
+
+      this.sprayChunkPoints.push(point);
+    }
+
+    this.sprayChunks.push(this.sprayChunkPoints);
+  }
+});
+/**
+ * PatternBrush class
+ * @class fabric.PatternBrush
+ * @extends fabric.BaseBrush
+ */
+fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @scope fabric.PatternBrush.prototype */ {
+
+  getPatternSrc: function() {
+
+    var dotWidth = 20,
+        dotDistance = 5,
+        patternCanvas = fabric.document.createElement('canvas'),
+        patternCtx = patternCanvas.getContext('2d');
+
+    patternCanvas.width = patternCanvas.height = dotWidth + dotDistance;
+
+    patternCtx.fillStyle = this.color;
+    patternCtx.beginPath();
+    patternCtx.arc(dotWidth / 2, dotWidth / 2, dotWidth / 2, 0, Math.PI * 2, false);
+    patternCtx.closePath();
+    patternCtx.fill();
+
+    return patternCanvas;
+  },
+
+  getPatternSrcBody: function() {
+    return String(this.getPatternSrc)
+      .match(/function\s+\w*\s*\(.*\)\s+\{([\s\S]*)\}/)[1]
+      .replace('this.color', '"' + this.color + '"');
+  },
+
+  /**
+   * Creates "pattern" instance property
+   * @method getPattern
+   */
+  getPattern: function() {
+    return this.canvas.contextTop.createPattern(this.source || this.getPatternSrc(), 'repeat');
+  },
+
+  /**
+   * Sets brush styles
+   * @method setBrushStyles
+   */
+  setBrushStyles: function() {
+    this.callSuper('setBrushStyles');
+    this.canvas.contextTop.strokeStyle = this.getPattern();
+  },
+
+  /**
+   * Creates path
+   * @method createPath
+   */
+  createPath: function(pathData) {
+    var path = this.callSuper('createPath', pathData);
+    path.stroke = new fabric.Pattern({
+      source: this.source || this.getPatternSrcBody()
+    });
+    return path;
   }
 });
 (function() {
@@ -7470,10 +7683,12 @@ fabric.CircleBrush = fabric.util.createClass( /** @scope fabric.CircleBrush.prot
     _initInteractive: function() {
       this._currentTransform = null;
       this._groupSelector = null;
-      this.freeDrawing = fabric.FreeDrawing && new fabric.FreeDrawing(this);
       this._initWrapperElement();
       this._createUpperCanvas();
       this._initEvents();
+
+      this.freeDrawingBrush = fabric.PencilBrush && new fabric.PencilBrush(this);
+
       this.calcOffset();
     },
 
@@ -7549,18 +7764,6 @@ fabric.CircleBrush = fabric.util.createClass( /** @scope fabric.CircleBrush.prot
      * @private
      * @method _normalizePointer
      */
-<<<<<<< HEAD
-    _initInteractive: function() {
-      this._currentTransform = null;
-      this._groupSelector = null;
-      this._initWrapperElement();
-      this._createUpperCanvas();
-      this._initEvents();
-
-      this.freeDrawingBrush = fabric.PencilBrush && new fabric.PencilBrush(this);
-
-      this.calcOffset();
-=======
     _normalizePointer: function (object, pointer) {
 
       var activeGroup = this.getActiveGroup(),
@@ -7578,7 +7781,6 @@ fabric.CircleBrush = fabric.util.createClass( /** @scope fabric.CircleBrush.prot
         y -= activeGroup.top;
       }
       return { x: x, y: y };
->>>>>>> master
     },
 
     /**
@@ -7707,14 +7909,6 @@ fabric.CircleBrush = fabric.util.createClass( /** @scope fabric.CircleBrush.prot
         mouseYSign: 1
       };
 
-<<<<<<< HEAD
-      if (this.isDrawingMode && this._isCurrentlyDrawing) {
-        this._isCurrentlyDrawing = false;
-        this.freeDrawingBrush.onMouseUp();
-        this.fire('mouse:up', { e: e });
-        return;
-      }
-=======
       this._currentTransform.original = {
         left: target.left,
         top: target.top,
@@ -7723,7 +7917,6 @@ fabric.CircleBrush = fabric.util.createClass( /** @scope fabric.CircleBrush.prot
         originX: originX,
         originY: originY
       };
->>>>>>> master
 
       this._resetCurrentTransform(e);
     },
@@ -7825,17 +8018,6 @@ fabric.CircleBrush = fabric.util.createClass( /** @scope fabric.CircleBrush.prot
       var lockScalingX = target.get('lockScalingX'),
           lockScalingY = target.get('lockScalingY');
 
-<<<<<<< HEAD
-      if (this.isDrawingMode) {
-        pointer = this.getPointer(e);
-
-        this._isCurrentlyDrawing = true;
-        this.discardActiveObject().renderAll();
-
-        this.freeDrawingBrush.onMouseDown(pointer);
-        this.fire('mouse:down', { e: e });
-        return;
-=======
       if (lockScalingX && lockScalingY) return;
 
       // Get the constraint point
@@ -7844,7 +8026,6 @@ fabric.CircleBrush = fabric.util.createClass( /** @scope fabric.CircleBrush.prot
 
       if (t.originX === 'right') {
         localMouse.x *= -1;
->>>>>>> master
       }
       else if (t.originX === 'center') {
         localMouse.x *= t.mouseXSign * 2;
@@ -7897,16 +8078,6 @@ fabric.CircleBrush = fabric.util.createClass( /** @scope fabric.CircleBrush.prot
         lockScalingY || target.set('scaleY', newScaleY);
       }
 
-<<<<<<< HEAD
-      if (this.isDrawingMode) {
-        if (this._isCurrentlyDrawing) {
-          pointer = this.getPointer(e);
-          this.freeDrawingBrush.onMouseMove(pointer);
-        }
-        this.upperCanvasEl.style.cursor = this.freeDrawingCursor;
-        this.fire('mouse:move', { e: e });
-        return;
-=======
       // Check if we flipped
       if (newScaleX < 0)
       {
@@ -7922,7 +8093,6 @@ fabric.CircleBrush = fabric.util.createClass( /** @scope fabric.CircleBrush.prot
           t.originY = 'bottom';
         else if (t.originY === 'bottom')
           t.originY = 'top';
->>>>>>> master
       }
 
       // Make sure the constraints apply
@@ -8466,7 +8636,8 @@ fabric.CircleBrush = fabric.util.createClass( /** @scope fabric.CircleBrush.prot
       var target;
 
       if (this.isDrawingMode && this._isCurrentlyDrawing) {
-        this.freeDrawing._finalizeAndAddPath();
+        this._isCurrentlyDrawing = false;
+        this.freeDrawingBrush.onMouseUp();
         this.fire('mouse:up', { e: e });
         return;
       }
@@ -8550,12 +8721,9 @@ fabric.CircleBrush = fabric.util.createClass( /** @scope fabric.CircleBrush.prot
 
       if (this.isDrawingMode) {
         pointer = this.getPointer(e);
-        this.freeDrawing._prepareForDrawing(pointer);
-
-        // capture coordinates immediately;
-        // this allows to draw dots (when movement never occurs)
-        this.freeDrawing._captureDrawingPath(pointer);
-
+        this._isCurrentlyDrawing = true;
+        this.discardActiveObject().renderAll();
+        this.freeDrawingBrush.onMouseDown(pointer);
         this.fire('mouse:down', { e: e });
         return;
       }
@@ -8628,12 +8796,7 @@ fabric.CircleBrush = fabric.util.createClass( /** @scope fabric.CircleBrush.prot
       if (this.isDrawingMode) {
         if (this._isCurrentlyDrawing) {
           pointer = this.getPointer(e);
-          this.freeDrawing._captureDrawingPath(pointer);
-
-          // redraw curve
-          // clear top canvas
-          this.clearContext(this.contextTop);
-          this.freeDrawing._render(this.contextTop);
+          this.freeDrawingBrush.onMouseMove(pointer);
         }
         this.upperCanvasEl.style.cursor = this.freeDrawingCursor;
         this.fire('mouse:move', { e: e });
@@ -13203,7 +13366,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
       if (this.fill) {
         ctx.fill();
       }
-      this._removeShadow(ctx);
+      if (this.shadow && !this.shadow.affectStroke) {
+        this._removeShadow(ctx);
+      }
 
       if (this.stroke) {
         ctx.strokeStyle = this.stroke;
@@ -13211,6 +13376,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
         ctx.lineCap = ctx.lineJoin = 'round';
         ctx.stroke();
       }
+      this._removeShadow(ctx);
+
       if (!noTransform && this.active) {
         this.drawBorders(ctx);
         this.hideCorners || this.drawCorners(ctx);
@@ -15580,7 +15747,7 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
   fabric.Text = fabric.util.createClass(fabric.Object, /** @scope fabric.Text.prototype */ {
 
     /**
-     * Font size
+     * Font size (in pixels)
      * @property
      * @type Number
      */

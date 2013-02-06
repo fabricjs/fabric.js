@@ -89,7 +89,13 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @scope fabric
           height: sprayChunk[j].width,
           left: sprayChunk[j].x + 1,
           top: sprayChunk[j].y + 1,
-          fill: this.color
+          fill: this.color,
+          shadow: {
+            color: this.shadowColor || this.color,
+            blur: this.shadowBlur,
+            offsetX: this.shadowOffsetX,
+            offsetY: this.shadowOffsetY
+          }
         });
 
         this.canvas.add(rect);

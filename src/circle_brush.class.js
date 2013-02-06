@@ -68,7 +68,13 @@ fabric.CircleBrush = fabric.util.createClass( fabric.BaseBrush, /** @scope fabri
         radius: point.radius,
         left: point.x,
         top: point.y,
-        fill: point.fill
+        fill: point.fill,
+        shadow: {
+          color: this.shadowColor || this.color,
+          blur: this.shadowBlur,
+          offsetX: this.shadowOffsetX,
+          offsetY: this.shadowOffsetY
+        }
       });
       this.canvas.add(circle);
     }

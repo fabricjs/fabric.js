@@ -561,7 +561,9 @@
       if (this.fill) {
         ctx.fill();
       }
-      this._removeShadow(ctx);
+      if (this.shadow && !this.shadow.affectStroke) {
+        this._removeShadow(ctx);
+      }
 
       if (this.stroke) {
         ctx.strokeStyle = this.stroke;
@@ -569,6 +571,8 @@
         ctx.lineCap = ctx.lineJoin = 'round';
         ctx.stroke();
       }
+      this._removeShadow(ctx);
+
       if (!noTransform && this.active) {
         this.drawBorders(ctx);
         this.hideCorners || this.drawCorners(ctx);
