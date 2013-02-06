@@ -7048,8 +7048,8 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
     createPath: function(pathData) {
       var path = new fabric.Path(pathData);
       path.fill = null;
-      path.stroke = this.color;
-      path.strokeWidth = this.width;
+      path.stroke = this.canvas.freeDrawingColor;
+      path.strokeWidth = this.canvas.freeDrawingLineWidth;
       return path;
     },
 
