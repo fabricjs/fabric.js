@@ -5,6 +5,11 @@
  */
 fabric.Pattern = fabric.util.createClass(/** @scope fabric.Pattern.prototype */ {
 
+  /**
+   * Repeat property of a pattern (one of repeat, repeat-x, repeat-y)
+   * @property
+   * @type String
+   */
   repeat: 'repeat',
 
   /**
@@ -27,7 +32,7 @@ fabric.Pattern = fabric.util.createClass(/** @scope fabric.Pattern.prototype */ 
   },
 
   /**
-   * Returns object representation of a gradient
+   * Returns object representation of a pattern
    * @method toObject
    * @return {Object}
    */
@@ -52,10 +57,10 @@ fabric.Pattern = fabric.util.createClass(/** @scope fabric.Pattern.prototype */ 
   },
 
   /**
-   * Returns an instance of CanvasGradient
+   * Returns an instance of CanvasPattern
    * @method toLive
    * @param ctx
-   * @return {CanvasGradient}
+   * @return {CanvasPattern}
    */
   toLive: function(ctx) {
     var source = typeof this.source === 'function' ? this.source() : this.source;
