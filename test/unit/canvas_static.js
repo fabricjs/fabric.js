@@ -193,6 +193,15 @@
     equal(rect.getAngle(), 90, 'angle should be coerced to 90 (from 100)');
   });
 
+  test('toSVG without preamble', function() {
+    ok(typeof canvas.toSVG == 'function');
+    var withPreamble = canvas.toSVG();
+    var withoutPreamble = canvas.toSVG({suppressPreamble: true});
+    ok(withPreamble != withoutPreamble);
+    equal(withoutPreamble.slice(0, 4), '<svg', 'svg should start with root node when premable is suppressed');
+  });
+
+
   test('toJSON', function() {
     ok(typeof canvas.toJSON == 'function');
     equal(JSON.stringify(canvas.toJSON()), '{"objects":[],"background":""}');
