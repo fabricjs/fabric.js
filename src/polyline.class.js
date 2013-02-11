@@ -29,21 +29,22 @@
      * @method initialize
      * @param {Array} points array of points
      * @param {Object} [options] Options object
+     * @param {Boolean} Whether points offsetting should be skipped
      * @return {Object} thisArg
      */
-    initialize: function(points, options) {
+    initialize: function(points, options, skipOffset) {
       options = options || { };
       this.set('points', points);
       this.callSuper('initialize', options);
-      this._calcDimensions();
+      this._calcDimensions(skipOffset);
     },
 
     /**
      * @private
      * @method _calcDimensions
      */
-    _calcDimensions: function() {
-      return fabric.Polygon.prototype._calcDimensions.call(this);
+    _calcDimensions: function(skipOffset) {
+      return fabric.Polygon.prototype._calcDimensions.call(this, skipOffset);
     },
 
     /**
@@ -138,7 +139,7 @@
       points[i].y -= (options.height / 2) || 0;
     }
 
-    return new fabric.Polyline(points, fabric.util.object.extend(parsedAttributes, options));
+    return new fabric.Polyline(points, fabric.util.object.extend(parsedAttributes, options), true);
   };
 
   /**

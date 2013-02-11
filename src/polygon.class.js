@@ -32,20 +32,21 @@
      * @method initialize
      * @param {Array} points Array of points
      * @param {Object} [options] Options object
+     * @param {Boolean} Whether points offsetting should be skipped
      * @return {fabric.Polygon} thisArg
      */
-    initialize: function(points, options) {
+    initialize: function(points, options, skipOffset) {
       options = options || { };
       this.points = points;
       this.callSuper('initialize', options);
-      this._calcDimensions();
+      this._calcDimensions(skipOffset);
     },
 
     /**
      * @private
      * @method _calcDimensions
      */
-    _calcDimensions: function() {
+    _calcDimensions: function(skipOffset) {
 
       var points = this.points,
           minX = min(points, 'x'),
@@ -56,17 +57,19 @@
       this.width = (maxX - minX) || 1;
       this.height = (maxY - minY) || 1;
 
-      // var halfWidth = this.width / 2,
-      //     halfHeight = this.height / 2;
-
-      // change points to offset polygon into a bounding box
-      // this.points.forEach(function(p) {
-      //   p.x -= halfWidth;
-      //   p.y -= halfHeight;
-      // }, this);
-
       this.minX = minX;
       this.minY = minY;
+
+      if (skipOffset) return;
+
+      var halfWidth = this.width / 2,
+          halfHeight = this.height / 2;
+
+      // change points to offset polygon into a bounding box
+      this.points.forEach(function(p) {
+        p.x -= halfWidth;
+        p.y -= halfHeight;
+      }, this);
     },
 
     /**
@@ -164,7 +167,7 @@
       points[i].y -= (options.height / 2) || 0;
     }
 
-    return new fabric.Polygon(points, extend(parsedAttributes, options));
+    return new fabric.Polygon(points, extend(parsedAttributes, options), true);
   };
 
   /**
