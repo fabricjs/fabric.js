@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures` */
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.0.6" };
+var fabric = fabric || { version: "1.0.7" };
 
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
@@ -1828,6 +1828,7 @@ fabric.Observable = {
 
   /**
    * Fires event with an optional options object
+   * @deprecated since 1.0.7
    * @method fire
    * @param {String} eventName
    * @param {Object} [options]
@@ -1858,6 +1859,13 @@ fabric.Observable.on = fabric.Observable.observe;
  * @type function
  */
 fabric.Observable.off = fabric.Observable.stopObserving;
+
+/**
+ * Alias for fire
+ * @method trigger
+ * @type function
+ */
+fabric.Observable.trigger = fabric.Observable.fire;
 (function() {
 
   var sqrt = Math.sqrt,
@@ -12087,21 +12095,22 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
      * @method initialize
      * @param {Array} points array of points
      * @param {Object} [options] Options object
+     * @param {Boolean} Whether points offsetting should be skipped
      * @return {Object} thisArg
      */
-    initialize: function(points, options) {
+    initialize: function(points, options, skipOffset) {
       options = options || { };
       this.set('points', points);
       this.callSuper('initialize', options);
-      this._calcDimensions();
+      this._calcDimensions(skipOffset);
     },
 
     /**
      * @private
      * @method _calcDimensions
      */
-    _calcDimensions: function() {
-      return fabric.Polygon.prototype._calcDimensions.call(this);
+    _calcDimensions: function(skipOffset) {
+      return fabric.Polygon.prototype._calcDimensions.call(this, skipOffset);
     },
 
     /**
@@ -12196,7 +12205,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
       points[i].y -= (options.height / 2) || 0;
     }
 
-    return new fabric.Polyline(points, fabric.util.object.extend(parsedAttributes, options));
+    return new fabric.Polyline(points, fabric.util.object.extend(parsedAttributes, options), true);
   };
 
   /**
@@ -12246,20 +12255,21 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
      * @method initialize
      * @param {Array} points Array of points
      * @param {Object} [options] Options object
+     * @param {Boolean} Whether points offsetting should be skipped
      * @return {fabric.Polygon} thisArg
      */
-    initialize: function(points, options) {
+    initialize: function(points, options, skipOffset) {
       options = options || { };
       this.points = points;
       this.callSuper('initialize', options);
-      this._calcDimensions();
+      this._calcDimensions(skipOffset);
     },
 
     /**
      * @private
      * @method _calcDimensions
      */
-    _calcDimensions: function() {
+    _calcDimensions: function(skipOffset) {
 
       var points = this.points,
           minX = min(points, 'x'),
@@ -12270,17 +12280,19 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
       this.width = (maxX - minX) || 1;
       this.height = (maxY - minY) || 1;
 
-      // var halfWidth = this.width / 2,
-      //     halfHeight = this.height / 2;
-
-      // change points to offset polygon into a bounding box
-      // this.points.forEach(function(p) {
-      //   p.x -= halfWidth;
-      //   p.y -= halfHeight;
-      // }, this);
-
       this.minX = minX;
       this.minY = minY;
+
+      if (skipOffset) return;
+
+      var halfWidth = this.width / 2,
+          halfHeight = this.height / 2;
+
+      // change points to offset polygon into a bounding box
+      this.points.forEach(function(p) {
+        p.x -= halfWidth;
+        p.y -= halfHeight;
+      }, this);
     },
 
     /**
@@ -12378,7 +12390,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
       points[i].y -= (options.height / 2) || 0;
     }
 
-    return new fabric.Polygon(points, extend(parsedAttributes, options));
+    return new fabric.Polygon(points, extend(parsedAttributes, options), true);
   };
 
   /**
@@ -15333,7 +15345,7 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
   fabric.Text = fabric.util.createClass(fabric.Object, /** @scope fabric.Text.prototype */ {
 
     /**
-     * Font size
+     * Font size (in pixels)
      * @property
      * @type Number
      */
