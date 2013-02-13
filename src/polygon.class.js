@@ -178,7 +178,7 @@
    * @return {fabric.Polygon}
    */
   fabric.Polygon.fromObject = function(object) {
-    return new fabric.Polygon(object.points, object);
+    return new fabric.Polygon(object.points, object, true);
   };
 
 })(typeof exports !== 'undefined' ? exports : this);
