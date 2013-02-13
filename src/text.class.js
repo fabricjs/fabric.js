@@ -31,7 +31,7 @@
      * @property
      * @type Number
      */
-    fontWeight:           400,
+    fontWeight:           'normal',
 
     /**
      * Font family
@@ -589,8 +589,9 @@
      */
     _getFontDeclaration: function() {
       return [
-        this.fontStyle,
-        this.fontWeight,
+        // node-canvas needs "weight style", while browsers need "style weight"
+        (fabric.isLikelyNode ? this.fontWeight : this.fontStyle),
+        (fabric.isLikelyNode ? this.fontStyle : this.fontWeight),
         this.fontSize + 'px',
         (fabric.isLikelyNode ? ('"' + this.fontFamily + '"') : this.fontFamily)
       ].join(' ');

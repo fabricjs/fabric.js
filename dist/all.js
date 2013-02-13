@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures` */
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.0.7" };
+var fabric = fabric || { version: "1.0.9" };
 
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
@@ -15356,7 +15356,7 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
      * @property
      * @type Number
      */
-    fontWeight:           400,
+    fontWeight:           'normal',
 
     /**
      * Font family
@@ -15914,8 +15914,9 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
      */
     _getFontDeclaration: function() {
       return [
-        this.fontStyle,
-        this.fontWeight,
+        // node-canvas needs "weight style", while browsers need "style weight"
+        (fabric.isLikelyNode ? this.fontWeight : this.fontStyle),
+        (fabric.isLikelyNode ? this.fontStyle : this.fontWeight),
         this.fontSize + 'px',
         (fabric.isLikelyNode ? ('"' + this.fontFamily + '"') : this.fontFamily)
       ].join(' ');
@@ -16382,6 +16383,7 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
     var fabricCanvas = new FabricCanvas(canvasEl);
     fabricCanvas.contextContainer = nodeCanvas.getContext('2d');
     fabricCanvas.nodeCanvas = nodeCanvas;
+    fabricCanvas.Font = Canvas.Font;
 
     return fabricCanvas;
   };
