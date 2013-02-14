@@ -372,9 +372,13 @@
    * @param {String} url URL to create an image from
    * @param {Function} [callback] Callback to invoke when image is created (newly created image is passed as a first argument)
    * @param {Object} [imgOptions] Options object
+   * @param {Boolean} [crossOrigin] Allow cross-origin images w/o tainting the canvas. This still requires an Access-Control-Allow-Origin header to be sent by the server (@see https://developer.mozilla.org/en-US/docs/HTML/CORS_Enabled_Image)
    */
-  fabric.Image.fromURL = function(url, callback, imgOptions) {
+  fabric.Image.fromURL = function(url, callback, imgOptions, crossOrigin) {
     var img = fabric.document.createElement('img');
+
+    if (crossOrigin)
+        img.crossOrigin = "Anonymous";
 
     /** @ignore */
     img.onload = function() {
