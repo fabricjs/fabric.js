@@ -495,7 +495,7 @@
      */
     toSVG: function() {
       var objectsMarkup = [ ];
-      for (var i = 0, len = this.objects.length; i < len; i++) {
+      for (var i = this.objects.length; i--; ) {
         objectsMarkup.push(this.objects[i].toSVG());
       }
 
