@@ -960,8 +960,8 @@
       if (this.backgroundColor && this.backgroundColor.source) {
         markup.push(
           '<rect x="0" y="0" ',
-            'width="', (this.backgroundColor.repeat !== 'repeat-y' ? this.width : this.backgroundColor.source.width),
-            '" height="', (this.backgroundColor.repeat !== 'repeat-x' ? this.height : this.backgroundColor.source.height),
+            'width="', (this.backgroundColor.repeat === 'repeat-y' || this.backgroundColor.repeat === 'no-repeat' ? this.backgroundColor.source.width : this.width),
+            '" height="', (this.backgroundColor.repeat === 'repeat-x' || this.backgroundColor.repeat === 'no-repeat' ? this.backgroundColor.source.height : this.height),
             '" fill="url(#backgroundColorPattern)"',
           '></rect>'
         );
