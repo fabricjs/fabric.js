@@ -34,7 +34,7 @@
     'shadow':           null,
     'text':             'x',
     'fontSize':         40,
-    'fontWeight':       400,
+    'fontWeight':       'normal',
     'fontFamily':       'Times New Roman',
     'fontStyle':        '',
     'lineHeight':       1.3,
@@ -146,7 +146,7 @@
     // temp workaround for text objects not obtaining width under node
     // text.width = 20;
 
-    var expectedObject = fabric.util.object.extend(REFERENCE_TEXT_OBJECT, {
+    var expectedObject = fabric.util.object.extend(fabric.util.object.clone(REFERENCE_TEXT_OBJECT), {
       left: 10,
       top: -26
     });
@@ -177,9 +177,9 @@
 
     ok(textWithAttrs instanceof fabric.Text);
 
-    var expectedObject = fabric.util.object.extend(REFERENCE_TEXT_OBJECT, {
-      /* left varies slightly due to node-canvas rendering so we're not testing for it */
-      left: textWithAttrs.left,
+    var expectedObject = fabric.util.object.extend(fabric.util.object.clone(REFERENCE_TEXT_OBJECT), {
+      /* left varies slightly due to node-canvas rendering */
+      left: fabric.util.toFixed(textWithAttrs.left + '', 2),
       top: -59.95,
       width: 20,
       height: 159.9,
