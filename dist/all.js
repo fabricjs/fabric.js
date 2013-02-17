@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures` */
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.0.9" };
+var fabric = fabric || { version: "1.0.10" };
 
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
@@ -4391,13 +4391,37 @@ fabric.util.string = {
 
     if (markup) {
       markup = [
-        '<defs>',
-          '<style type="text/css">',
-            '<![CDATA[',
-              markup,
-            ']]>',
-          '</style>',
-        '</defs>'
+        '<style type="text/css">',
+          '<![CDATA[',
+            markup,
+          ']]>',
+        '</style>'
+      ].join('');
+    }
+
+    return markup;
+  }
+
+  /**
+   * Creates markup containing SVG referenced elements like patterns, gradients etc.
+   * @method createSVGRefElementsMarkup
+   * @param {fabric.Canvas} canvas instance of fabric.Canvas
+   * @return {String}
+   */
+  function createSVGRefElementsMarkup(canvas) {
+    var markup = '';
+
+    if (canvas.backgroundColor && canvas.backgroundColor.source) {
+      markup = [
+        '<pattern x="0" y="0" id="backgroundColorPattern" ',
+          'width="', canvas.backgroundColor.source.width,
+          '" height="', canvas.backgroundColor.source.height,
+          '" patternUnits="userSpaceOnUse">',
+        '<image x="0" y="0" ',
+        'width="', canvas.backgroundColor.source.width,
+        '" height="', canvas.backgroundColor.source.height,
+        '" xlink:href="', canvas.backgroundColor.source.src,
+        '"></image></pattern>'
       ].join('');
     }
 
@@ -4406,16 +4430,17 @@ fabric.util.string = {
 
   extend(fabric, {
 
-    parseAttributes:          parseAttributes,
-    parseElements:            parseElements,
-    parseStyleAttribute:      parseStyleAttribute,
-    parsePointsAttribute:     parsePointsAttribute,
-    getCSSRules:              getCSSRules,
+    parseAttributes:            parseAttributes,
+    parseElements:              parseElements,
+    parseStyleAttribute:        parseStyleAttribute,
+    parsePointsAttribute:       parsePointsAttribute,
+    getCSSRules:                getCSSRules,
 
-    loadSVGFromURL:           loadSVGFromURL,
-    loadSVGFromString:        loadSVGFromString,
+    loadSVGFromURL:             loadSVGFromURL,
+    loadSVGFromString:          loadSVGFromString,
 
-    createSVGFontFacesMarkup: createSVGFontFacesMarkup
+    createSVGFontFacesMarkup:   createSVGFontFacesMarkup,
+    createSVGRefElementsMarkup: createSVGRefElementsMarkup
   });
 
 })(typeof exports !== 'undefined' ? exports : this);
@@ -5790,7 +5815,7 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
         fabric.util.loadImage(backgroundColor.source, function(img) {
           _this.backgroundColor = new fabric.Pattern({
             source: img,
-            pattern: backgroundColor.pattern
+            repeat: backgroundColor.repeat
           });
           callback && callback();
         });
@@ -6513,16 +6538,27 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
             'version="1.1" ',
             'width="', this.width, '" ',
             'height="', this.height, '" ',
+            (this.backgroundColor && !this.backgroundColor.source) ? 'style="background-color: ' + this.backgroundColor +'" ' : null,
             'xml:space="preserve">',
           '<desc>Created with Fabric.js ', fabric.version, '</desc>',
-          fabric.createSVGFontFacesMarkup(this.getObjects())
+          '<defs>', fabric.createSVGFontFacesMarkup(this.getObjects()), fabric.createSVGRefElementsMarkup(this), '</defs>'
       );
+
+      if (this.backgroundColor && this.backgroundColor.source) {
+        markup.push(
+          '<rect x="0" y="0" ',
+            'width="', (this.backgroundColor.repeat === 'repeat-y' || this.backgroundColor.repeat === 'no-repeat' ? this.backgroundColor.source.width : this.width),
+            '" height="', (this.backgroundColor.repeat === 'repeat-x' || this.backgroundColor.repeat === 'no-repeat' ? this.backgroundColor.source.height : this.height),
+            '" fill="url(#backgroundColorPattern)"',
+          '></rect>'
+        );
+      }
 
       if (this.backgroundImage) {
         markup.push(
           '<image x="0" y="0" ',
-            'width="', this.width,
-            '" height="', this.height,
+            'width="', (this.backgroundImageStretch ? this.width : this.backgroundImage.width),
+            '" height="', (this.backgroundImageStretch ? this.height : this.backgroundImage.height),
             '" preserveAspectRatio="', (this.backgroundImageStretch ? 'none' : 'defer'),
             '" xlink:href="', this.backgroundImage.src,
             '" style="opacity:', this.backgroundImageOpacity,
@@ -12217,7 +12253,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
    */
   fabric.Polyline.fromObject = function(object) {
     var points = object.points;
-    return new fabric.Polyline(points, object);
+    return new fabric.Polyline(points, object, true);
   };
 
 })(typeof exports !== 'undefined' ? exports : this);
@@ -12401,7 +12437,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
    * @return {fabric.Polygon}
    */
   fabric.Polygon.fromObject = function(object) {
-    return new fabric.Polygon(object.points, object);
+    return new fabric.Polygon(object.points, object, true);
   };
 
 })(typeof exports !== 'undefined' ? exports : this);
@@ -13940,7 +13976,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
      */
     toSVG: function() {
       var objectsMarkup = [ ];
-      for (var i = 0, len = this.objects.length; i < len; i++) {
+      for (var i = this.objects.length; i--; ) {
         objectsMarkup.push(this.objects[i].toSVG());
       }
 
@@ -13999,6 +14035,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
   fabric.Group.async = true;
 
 })(typeof exports !== 'undefined' ? exports : this);
+
 (function(global) {
 
   "use strict";
