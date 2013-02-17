@@ -699,7 +699,7 @@
           '<![CDATA[',
             markup,
           ']]>',
-        '</style>',
+        '</style>'
       ].join('');
     }
 
@@ -721,7 +721,7 @@
           'width="', canvas.backgroundColor.source.width,
           '" height="', canvas.backgroundColor.source.height,
           '" patternUnits="userSpaceOnUse">',
-        '<image x="0" y="0" ', 
+        '<image x="0" y="0" ',
         'width="', canvas.backgroundColor.source.width,
         '" height="', canvas.backgroundColor.source.height,
         '" xlink:href="', canvas.backgroundColor.source.src,
