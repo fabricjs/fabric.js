@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures` */
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.0.10" };
+var fabric = fabric || { version: "1.0.11" };
 
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
@@ -2215,6 +2215,30 @@ fabric.Observable.trigger = fabric.Observable.fire;
     return canvasEl;
   }
 
+  function createAccessors(klass) {
+    var proto = klass.prototype;
+
+    for (var i = proto.stateProperties.length; i--; ) {
+
+      var propName = proto.stateProperties[i],
+          capitalizedPropName = propName.charAt(0).toUpperCase() + propName.slice(1),
+          setterName = 'set' + capitalizedPropName,
+          getterName = 'get' + capitalizedPropName;
+
+      // using `new Function` for better introspection
+      if (!proto[getterName]) {
+        proto[getterName] = (function(property) {
+          return new Function('return this.get("' + property + '")');
+        })(propName);
+      }
+      if (!proto[setterName]) {
+        proto[setterName] = (function(property) {
+          return new Function('value', 'return this.set("' + property + '", value)');
+        })(propName);
+      }
+    }
+  }
+
   fabric.util.removeFromArray = removeFromArray;
   fabric.util.degreesToRadians = degreesToRadians;
   fabric.util.radiansToDegrees = radiansToDegrees;
@@ -2230,6 +2254,7 @@ fabric.Observable.trigger = fabric.Observable.fire;
   fabric.util.populateWithProperties = populateWithProperties;
   fabric.util.drawDashedLine = drawDashedLine;
   fabric.util.createCanvasElement = createCanvasElement;
+  fabric.util.createAccessors = createAccessors;
 
 })();
 (function() {
@@ -10106,26 +10131,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
     }
   });
 
-  var proto = fabric.Object.prototype;
-  for (var i = proto.stateProperties.length; i--; ) {
-
-    var propName = proto.stateProperties[i],
-        capitalizedPropName = propName.charAt(0).toUpperCase() + propName.slice(1),
-        setterName = 'set' + capitalizedPropName,
-        getterName = 'get' + capitalizedPropName;
-
-    // using `new Function` for better introspection
-    if (!proto[getterName]) {
-      proto[getterName] = (function(property) {
-        return new Function('return this.get("' + property + '")');
-      })(propName);
-    }
-    if (!proto[setterName]) {
-      proto[setterName] = (function(property) {
-        return new Function('value', 'return this.set("' + property + '", value)');
-      })(propName);
-    }
-  }
+  fabric.util.createAccessors(fabric.Object);
 
   /**
    * Alias for {@link fabric.Object.prototype.setAngle}
@@ -15374,6 +15380,37 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
     return;
   }
 
+  var dimensionAffectingProps = {
+    fontSize: true,
+    fontWeight: true,
+    fontFamily: true,
+    textDecoration: true,
+    fontStyle: true,
+    lineHeight: true,
+    strokeStyle: true,
+    strokeWidth: true,
+    text: true
+  };
+
+  var stateProperties = fabric.Object.prototype.stateProperties.concat();
+  stateProperties.push(
+    'fontFamily',
+    'fontWeight',
+    'fontSize',
+    'path',
+    'text',
+    'textDecoration',
+    'textShadow',
+    'textAlign',
+    'fontStyle',
+    'lineHeight',
+    'strokeStyle',
+    'strokeWidth',
+    'backgroundColor',
+    'textBackgroundColor',
+    'useNative'
+  );
+
   /**
    * Text class
    * @class Text
@@ -15486,6 +15523,14 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
      */
      useNative:           true,
 
+     /**
+      * List of properties to consider when checking if state of an object is changed (fabric.Object#hasStateChanged)
+      * as well as for history (undo/redo) purposes
+      * @property
+      * @type Array
+      */
+     stateProperties:     stateProperties,
+
     /**
      * Constructor
      * @method initialize
@@ -15496,7 +15541,6 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
     initialize: function(text, options) {
       options = options || { };
 
-      this._initStateProperties();
       this.text = text;
       this.setOptions(options);
       this._initDimensions();
@@ -15510,36 +15554,7 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
      */
     _initDimensions: function() {
       var canvasEl = fabric.util.createCanvasElement();
-
       this._render(canvasEl.getContext('2d'));
-    },
-
-    /**
-     * Creates `stateProperties` list on an instance, and adds `fabric.Text` -specific ones to it
-     * (such as "fontFamily", "fontWeight", etc.)
-     * @private
-     * @method _initStateProperties
-     */
-    _initStateProperties: function() {
-      this.stateProperties = this.stateProperties.concat();
-      this.stateProperties.push(
-        'fontFamily',
-        'fontWeight',
-        'fontSize',
-        'path',
-        'text',
-        'textDecoration',
-        'textShadow',
-        'textAlign',
-        'fontStyle',
-        'lineHeight',
-        'strokeStyle',
-        'strokeWidth',
-        'backgroundColor',
-        'textBackgroundColor',
-        'useNative'
-      );
-      fabric.util.removeFromArray(this.stateProperties, 'width');
     },
 
     /**
@@ -16201,40 +16216,12 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
     },
 
     /**
-     * Sets fontSize of an instance and updates its coordinates
-     * @method setFontsize
-     * @param {Number} value
-     * @return {fabric.Text} thisArg
-     * @chainable
-     */
-    setFontsize: function(value) {
-      this.set('fontSize', value);
-      this._initDimensions();
-      this.setCoords();
-      return this;
-    },
-
-    /**
      * Returns actual text value of an instance
      * @method getText
      * @return {String}
      */
     getText: function() {
       return this.text;
-    },
-
-    /**
-     * Sets text of an instance, and updates its coordinates
-     * @method setText
-     * @param {String} value
-     * @return {fabric.Text} thisArg
-     * @chainable
-     */
-    setText: function(value) {
-      this.set('text', value);
-      this._initDimensions();
-      this.setCoords();
-      return this;
     },
 
     /**
@@ -16250,6 +16237,11 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
         this.path = this.path.replace(/(.*?)([^\/]*)(\.font\.js)/, '$1' + value + '$3');
       }
       this.callSuper('_set', name, value);
+
+      if (name in dimensionAffectingProps) {
+        this._initDimensions();
+        this.setCoords();
+      }
     }
   });
 
@@ -16304,6 +16296,8 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
 
     return text;
   };
+
+  fabric.util.createAccessors(fabric.Text);
 
 })(typeof exports !== 'undefined' ? exports : this);
 (function() {

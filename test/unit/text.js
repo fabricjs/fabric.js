@@ -106,10 +106,10 @@
     equal(text.get('fill'), '123456');
   });
 
-  test('setFontsize', function(){
+  test('setFontSize', function(){
     var text = createTextObject();
-    ok(typeof text.setFontsize == 'function');
-    equal(text.setFontsize(12), text);
+    ok(typeof text.setFontSize == 'function');
+    equal(text.setFontSize(12), text);
     equal(text.get('fontSize'), 12);
   });
 
