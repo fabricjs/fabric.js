@@ -2207,14 +2207,29 @@ fabric.Observable.trigger = fabric.Observable.fire;
     ctx.restore();
   }
 
-  function createCanvasElement() {
-    var canvasEl = fabric.document.createElement('canvas');
+  /**
+   * Creates canvas element and initializes it via excanvas if necessary
+   * @static
+   * @memberOf fabric.util
+   * @method createCanvasElement
+   * @param {CanvasElement} [canvasEl] optional canvas element to initialize; when not given, element is created implicitly
+   * @return {CanvasElement} initialized canvas element
+   */
+  function createCanvasElement(canvasEl) {
+    canvasEl || (canvasEl = fabric.document.createElement('canvas'));
     if (!canvasEl.getContext && typeof G_vmlCanvasManager !== 'undefined') {
       G_vmlCanvasManager.initElement(canvasEl);
     }
     return canvasEl;
   }
 
+  /**
+   * Creates accessors (getXXX, setXXX) for a "class", based on "stateProperties" array
+   * @static
+   * @memberOf fabric.util
+   * @method createAccessors
+   * @param {Object} klass "Class" to create accessors for
+   */
   function createAccessors(klass) {
     var proto = klass.prototype;
 
@@ -14447,11 +14462,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
    * @return {fabric.Image}
    */
   fabric.Image.fromElement = function(element, callback, options) {
-    options || (options = { });
-
     var parsedAttributes = fabric.parseAttributes(element, fabric.Image.ATTRIBUTE_NAMES);
 
-    fabric.Image.fromURL(parsedAttributes['xlink:href'], callback, extend(parsedAttributes, options));
+    fabric.Image.fromURL(parsedAttributes['xlink:href'], callback, extend((options ? fabric.util.object.clone(options) : { }), parsedAttributes));
   };
 
   /**
