@@ -91,7 +91,7 @@
         object.setCoords();
 
         // do not display corners of objects enclosed in a group
-        object.hideCorners = true;
+        object.hasControls = false;
       }, this);
     },
 
@@ -257,7 +257,7 @@
 
       if (!noTransform && this.active) {
         this.drawBorders(ctx);
-        this.hideCorners || this.drawCorners(ctx);
+        this.drawControls(ctx);
       }
       ctx.restore();
       this.setCoords();
@@ -321,7 +321,7 @@
       object.set('scaleY', object.get('scaleY') * this.get('scaleY'));
 
       object.setCoords();
-      object.hideCorners = false;
+      object.hasControls = true;
       object.setActive(false);
       object.setCoords();
 

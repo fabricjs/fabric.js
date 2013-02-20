@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures` */
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.0.11" };
+var fabric = fabric || { version: "1.0.12" };
 
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
@@ -5744,7 +5744,7 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
     clipTo: null,
 
     /**
-     * Indicates whether object controls (borders/corners) are rendered above overlay image
+     * Indicates whether object controls (borders/controls) are rendered above overlay image
      * @property
      * @type Boolean
      */
@@ -6056,11 +6056,11 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
       if (!object) return;
 
       if (this.controlsAboveOverlay) {
-        var hasBorders = object.hasBorders, hasCorners = object.hasCorners;
-        object.hasBorders = object.hasCorners = false;
+        var hasBorders = object.hasBorders, hasControls = object.hasControls;
+        object.hasBorders = object.hasControls = false;
         object.render(ctx);
         object.hasBorders = hasBorders;
-        object.hasCorners = hasCorners;
+        object.hasControls = hasControls;
       }
       else {
         object.render(ctx);
@@ -6288,7 +6288,7 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
       }
 
       // delegate rendering to group selection if one exists
-      // used for drawing selection borders/corners
+      // used for drawing selection borders/controls
       var activeGroup = this.getActiveGroup();
       if (activeGroup) {
         activeGroup.render(ctx);
@@ -6304,7 +6304,7 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
     },
 
     /**
-     * Draws objects' controls (borders/corners)
+     * Draws objects' controls (borders/controls)
      * @method drawControls
      * @param {Object} ctx context to render controls on
      */
@@ -6313,7 +6313,7 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
       if (activeGroup) {
         ctx.save();
         fabric.Group.prototype.transform.call(activeGroup, ctx);
-        activeGroup.drawBorders(ctx).drawCorners(ctx);
+        activeGroup.drawBorders(ctx).drawControls(ctx);
         ctx.restore();
       }
       else {
@@ -6322,7 +6322,7 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
 
           ctx.save();
           fabric.Object.prototype.transform.call(this._objects[i], ctx);
-          this._objects[i].drawBorders(ctx).drawCorners(ctx);
+          this._objects[i].drawBorders(ctx).drawControls(ctx);
           ctx.restore();
 
           this.lastRenderedObjectWithControlsAboveOverlay = this._objects[i];
@@ -6374,7 +6374,7 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
 
       if (activeGroup) {
         // not removing group due to complications with restoring it with correct state afterwords
-        this._tempRemoveBordersCornersFromGroup(activeGroup);
+        this._tempRemoveBordersControlsFromGroup(activeGroup);
       }
       else if (activeObject && this.deactivateAll) {
         this.deactivateAll();
@@ -6393,7 +6393,7 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
       this.setWidth(origWidth).setHeight(origHeight);
 
       if (activeGroup) {
-        this._restoreBordersCornersOnGroup(activeGroup);
+        this._restoreBordersControlsOnGroup(activeGroup);
       }
       else if (activeObject && this.setActiveObject) {
         this.setActiveObject(activeObject);
@@ -6407,13 +6407,13 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
 
     /**
      * @private
-     * @method _tempRemoveBordersCornersFromGroup
+     * @method _tempRemoveBordersControlsFromGroup
      */
-    _tempRemoveBordersCornersFromGroup: function(group) {
-      group.origHideCorners = group.hideCorners;
+    _tempRemoveBordersControlsFromGroup: function(group) {
+      group.origHasControls = group.hasControls;
       group.origBorderColor = group.borderColor;
 
-      group.hideCorners = true;
+      group.hasControls = true;
       group.borderColor = 'rgba(0,0,0,0)';
 
       group.forEachObject(function(o) {
@@ -6424,10 +6424,10 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
 
     /**
      * @private
-     * @method _restoreBordersCornersOnGroup
+     * @method _restoreBordersControlsOnGroup
      */
-    _restoreBordersCornersOnGroup: function(group) {
-      group.hideCorners = group.origHideCorners;
+    _restoreBordersControlsOnGroup: function(group) {
+      group.hideControls = group.origHideControls;
       group.borderColor = group.origBorderColor;
 
       group.forEachObject(function(o) {
@@ -9761,7 +9761,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
 
       if (this.active && !noTransform) {
         this.drawBorders(ctx);
-        this.hideCorners || this.drawCorners(ctx);
+        this.drawControls(ctx);
       }
       ctx.restore();
     },
@@ -11065,12 +11065,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
      * Draws corners of an object's bounding box.
      * Requires public properties: width, height, scaleX, scaleY
      * Requires public options: cornerSize, padding
-     * @method drawCorners
+     * @method drawControls
      * @param {CanvasRenderingContext2D} ctx Context to draw on
      * @return {fabric.Object} thisArg
      * @chainable
      */
-    drawCorners: function(ctx) {
+    drawControls: function(ctx) {
       if (!this.hasControls) return;
 
       var size = this.cornerSize,
@@ -13035,7 +13035,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
       }
       if (!noTransform && this.active) {
         this.drawBorders(ctx);
-        this.hideCorners || this.drawCorners(ctx);
+        this.drawControls(ctx);
       }
       ctx.restore();
     },
@@ -13342,7 +13342,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
 
       if (this.active) {
         this.drawBorders(ctx);
-        this.hideCorners || this.drawCorners(ctx);
+        this.drawControls(ctx);
       }
       ctx.restore();
     },
@@ -13593,7 +13593,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
         object.setCoords();
 
         // do not display corners of objects enclosed in a group
-        object.hideCorners = true;
+        object.hasControls = false;
       }, this);
     },
 
@@ -13759,7 +13759,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
 
       if (!noTransform && this.active) {
         this.drawBorders(ctx);
-        this.hideCorners || this.drawCorners(ctx);
+        this.drawControls(ctx);
       }
       ctx.restore();
       this.setCoords();
@@ -13823,7 +13823,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
       object.set('scaleY', object.get('scaleY') * this.get('scaleY'));
 
       object.setCoords();
-      object.hideCorners = false;
+      object.hasControls = true;
       object.setActive(false);
       object.setCoords();
 
@@ -14168,7 +14168,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
 
       if (this.active && !noTransform) {
         this.drawBorders(ctx);
-        this.hideCorners || this.drawCorners(ctx);
+        this.drawControls(ctx);
       }
       ctx.restore();
     },
@@ -16024,7 +16024,7 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
       this._render(ctx);
       if (!noTransform && this.active) {
         this.drawBorders(ctx);
-        this.hideCorners || this.drawCorners(ctx);
+        this.drawControls(ctx);
       }
       ctx.restore();
     },
