@@ -635,7 +635,6 @@
       return [
         '<g transform="', (this.group ? '' : this.getSvgTransform()), '">',
           '<path ',
-            'width="', this.width, '" height="', this.height, '" ',
             'd="', path, '" ',
             'style="', this.getSvgStyles(), '" ',
             'transform="translate(', (-this.width / 2), ' ', (-this.height/2), ')" />',
