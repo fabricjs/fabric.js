@@ -9632,8 +9632,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
      * Sets property to a given value
      * @method set
      * @param {String} name
-     * @param {Object|Function} value
-     * @return {fabric.Group} thisArg
+     * @param {Object|Function} value (if function, the value is passed into it and its return value is used as a new one)
+     * @return {fabric.Object} thisArg
      * @chainable
      */
     set: function(key, value) {
