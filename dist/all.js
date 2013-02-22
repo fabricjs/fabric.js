@@ -6567,8 +6567,8 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
       if (!options.suppressPreamble) {
         markup.push(
           '<?xml version="1.0" standalone="no" ?>',
-            '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN" ',
-              '"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">'
+            '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" ',
+              '"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">'
         );
       }
       markup.push(
@@ -13099,7 +13099,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
       return [
         '<g transform="', (this.group ? '' : this.getSvgTransform()), '">',
           '<path ',
-            'width="', this.width, '" height="', this.height, '" ',
             'd="', path, '" ',
             'style="', this.getSvgStyles(), '" ',
             'transform="translate(', (-this.width / 2), ' ', (-this.height/2), ')" />',
@@ -13402,8 +13401,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
       var objects = this.getObjects();
       var markup = [
         '<g ',
-          'width="', this.width, '" ',
-          'height="', this.height, '" ',
           'style="', this.getSvgStyles(), '" ',
           'transform="', this.getSvgTransform(), '" ',
         '>'
@@ -16329,20 +16326,12 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
   /** @private */
   function request(url, encoding, callback) {
     var oURL = URL.parse(url),
-        client = HTTP.createClient(oURL.port, oURL.hostname),
-        req = client.request('GET', oURL.pathname, { 'host': oURL.hostname });
-
-    client.addListener('error', function(err) {
-      if (err.errno === process.ECONNREFUSED) {
-        fabric.log('ECONNREFUSED: connection refused to ' + client.host + ':' + client.port);
-      }
-      else {
-        fabric.log(err.message);
-      }
-    });
-
-    req.end();
-    req.on('response', function (response) {
+    req = HTTP.request({
+      hostname: oURL.hostname,
+      port: oURL.port,
+      path: oURL.pathname,
+      method: 'GET'
+    }, function(response){
       var body = "";
       if (encoding) {
         response.setEncoding(encoding);
@@ -16356,21 +16345,47 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
         }
       });
     });
+
+    req.on('error', function(err) {
+      if (err.errno === process.ECONNREFUSED) {
+        fabric.log('ECONNREFUSED: connection refused to ' + oURL.hostname + ':' + oURL.port);
+      }
+      else {
+        fabric.log(err.message);
+      }
+    });
+  }
+
+  /** @private */
+  function request_fs(url, callback){
+    var fs = require('fs'),
+    stream = fs.createReadStream(url),
+    body = '';
+    stream.on('data', function(chunk){
+        body += chunk;
+    });
+    stream.on('end', function(){
+      callback(body);
+    });
   }
 
   fabric.util.loadImage = function(url, callback, context) {
+    var createImageAndCallBack = function(data){
+      img.src = new Buffer(data, 'binary');
+      // preserving original url, which seems to be lost in node-canvas
+      img._src = url;
+      callback && callback.call(context, img);
+    };
     var img = new Image();
     if (url && url.indexOf('data') === 0) {
       img.src = img._src = url;
       callback && callback.call(context, img);
     }
+    else if (url && url.indexOf('http') !== 0) {
+      request_fs(url, createImageAndCallBack);
+    }
     else if (url) {
-      request(url, 'binary', function(body) {
-        img.src = new Buffer(body, 'binary');
-        // preserving original url, which seems to be lost in node-canvas
-        img._src = url;
-        callback && callback.call(context, img);
-      });
+      request(url, 'binary', createImageAndCallBack);
     }
   };
 

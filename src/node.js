@@ -19,7 +19,7 @@
       port: oURL.port,
       path: oURL.pathname,
       method: 'GET'
-    }, function(res){
+    }, function(response){
       var body = "";
       if (encoding) {
         response.setEncoding(encoding);
@@ -42,8 +42,9 @@
         fabric.log(err.message);
       }
     });
-
   }
+
+  /** @private */
   function request_fs(url, callback){
     var fs = require('fs'),
     stream = fs.createReadStream(url),
@@ -54,7 +55,7 @@
     stream.on('end', function(){
       callback(body);
     });
-  };
+  }
 
   fabric.util.loadImage = function(url, callback, context) {
     var createImageAndCallBack = function(data){
