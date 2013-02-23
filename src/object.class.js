@@ -434,10 +434,10 @@
      */
     getSvgStyles: function() {
       return [
-        "stroke: ", (this.stroke ? this.stroke : 'none'), "; ",
+        "stroke: ", (this.stroke ? (this.stroke && this.stroke.toLive ? 'url(#SVGID_' + this.stroke.id + ')' : this.stroke) : 'none'), "; ",
         "stroke-width: ", (this.strokeWidth ? this.strokeWidth : '0'), "; ",
         "stroke-dasharray: ", (this.strokeDashArray ? this.strokeDashArray.join(' ') : "; "),
-        "fill: ", (this.fill ? this.fill : 'none'), "; ",
+        "fill: ", (this.fill ? (this.fill && this.fill.toLive ? 'url(#SVGID_' + this.fill.id + ')' : this.fill) : 'none'), "; ",
         "opacity: ", (this.opacity ? this.opacity : '1'), ";"
       ].join("");
     },
@@ -855,11 +855,13 @@
     },
 
     /**
-     * Sets gradient fill of an object
-     * @method setGradientFill
+     * Sets gradient (fill or stroke) of an object
+     * @method setGradient
+     * @param {String} property Property name 'stroke' or 'fill'
+     * @param {Object} [options] Options object
      */
-    setGradientFill: function(options) {
-      this.set('fill', fabric.Gradient.forObject(this, options));
+    setGradient: function(property, options) {
+      this.set(property, fabric.Gradient.forObject(this, options));
     },
 
     /**
@@ -1064,5 +1066,11 @@
    * @type Number
    */
   fabric.Object.NUM_FRACTION_DIGITS = 2;
+
+  /**
+   * @static
+   * @type Number
+   */
+  fabric.Object.__uid = 0;
 
 })(typeof exports !== 'undefined' ? exports : this);
