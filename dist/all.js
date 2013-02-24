@@ -6918,6 +6918,7 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
    * Returs JSON representation of canvas
    * @function
    * @method toJSON
+   * @param {Array} propertiesToInclude
    * @return {String} json string
    */
   fabric.StaticCanvas.prototype.toJSON = fabric.StaticCanvas.prototype.toObject;

@@ -846,7 +846,7 @@
     /**
      * Returns a JSON representation of an instance
      * @method toJSON
-     * @param {Array} propertiesToInclude
+     * @param {Array} propertiesToInclude Any properties that you might want to additionally include in the output
      * @return {String} json
      */
     toJSON: function(propertiesToInclude) {
@@ -857,6 +857,7 @@
     /**
      * Sets gradient fill of an object
      * @method setGradientFill
+     * @param {Object} options
      */
     setGradientFill: function(options) {
       this.set('fill', fabric.Gradient.forObject(this, options));
@@ -865,6 +866,7 @@
     /**
      * Sets pattern fill of an object
      * @method setPatternFill
+     * @param {Object} options
      */
     setPatternFill: function(options) {
       this.set('fill', new fabric.Pattern(options));
@@ -873,6 +875,7 @@
     /**
      * Sets shadow of an object
      * @method setShadow
+     * @param {Object} options
      */
     setShadow: function(options) {
       this.set('shadow', new fabric.Shadow(options));
