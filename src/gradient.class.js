@@ -88,11 +88,14 @@
     /**
      * Adds another colorStop
      * @method add
-     * @param {Object} colorStop Object with offset, color and opacity
+     * @param {Object} colorStop Object with offset and color
      * @return {fabric.Gradient} thisArg
      */
     addColorStop: function(colorStop) {
-      this.colorStops.push(colorStop);
+      for (var position in colorStop) {
+        var color = new fabric.Color(colorStop[position]);
+        this.colorStops.push({offset: position, color: color.toRgb(), opacity: color.getAlpha()});
+      }
       return this;
     },
 
