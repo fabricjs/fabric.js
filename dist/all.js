@@ -12326,7 +12326,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
      * @private
      * @method _calcDimensions
      */
-    _calcDimensions: function(skipOffset) {
+    _calcDimensions: function() {
 
       var points = this.points,
           minX = min(points, 'x'),
@@ -12339,17 +12339,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
 
       this.minX = minX;
       this.minY = minY;
-
-      if (skipOffset) return;
-
-      var halfWidth = this.width / 2,
-          halfHeight = this.height / 2;
-
-      // change points to offset polygon into a bounding box
-      this.points.forEach(function(p) {
-        p.x -= halfWidth;
-        p.y -= halfHeight;
-      }, this);
+      this.left = minX + this.width / 2;
+      this.top = minY + this.height / 2; 
     },
 
     /**
