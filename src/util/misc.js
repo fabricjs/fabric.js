@@ -4,7 +4,7 @@
       atan2 = Math.atan2;
 
   /**
-   * @namespace
+   * @namespace Various utilities
    */
   fabric.util = { };
 

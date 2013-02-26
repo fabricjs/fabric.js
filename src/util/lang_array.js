@@ -240,7 +240,9 @@
     return result;
   }
 
-  /** @namespace */
+  /**
+   * @namespace Array utilities
+   */
   fabric.util.array = {
     invoke: invoke,
     min: min,

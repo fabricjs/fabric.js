@@ -1,5 +1,5 @@
 /**
- * @namespace
+ * @namespace Image filters
  */
 fabric.Image.filters = { };
 

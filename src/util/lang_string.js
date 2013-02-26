@@ -51,7 +51,7 @@ function escapeXml(string) {
      .replace(/>/g, '&gt;');
 }
 
-/** @namespace */
+/** @namespace String utilities */
 fabric.util.string = {
   camelize: camelize,
   capitalize: capitalize,
