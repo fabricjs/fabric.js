@@ -177,6 +177,8 @@
     },
 
     /**
+     * @param delegatedProperties
+     * @type Object
      * Properties that are delegated to group objects when reading/writing
      */
     delegatedProperties: {
@@ -184,9 +186,11 @@
       opacity:          true,
       fontFamily:       true,
       fontWeight:       true,
+      fontSize:         true,
       lineHeight:       true,
       textDecoration:   true,
       textShadow:       true,
+      textAlign:        true
       backgroundColor:  true
     },
 
@@ -526,6 +530,9 @@
         }
       }
       else {
+        if (prop in this.delegatedProperties) {
+          return this.objects[0] && this.objects[0].get(prop);
+        }
         return this[prop];
       }
     }
