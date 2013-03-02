@@ -91,6 +91,7 @@
         object.setCoords();
 
         // do not display corners of objects enclosed in a group
+        object.__origHasControls = object.hasControls;
         object.hasControls = false;
       }, this);
     },
@@ -190,7 +191,7 @@
       lineHeight:       true,
       textDecoration:   true,
       textShadow:       true,
-      textAlign:        true
+      textAlign:        true,
       backgroundColor:  true
     },
 
@@ -325,7 +326,8 @@
       object.set('scaleY', object.get('scaleY') * this.get('scaleY'));
 
       object.setCoords();
-      object.hasControls = true;
+      object.hasControls = object.__origHasControls;
+      delete object.__origHasControls;
       object.setActive(false);
       object.setCoords();
 
