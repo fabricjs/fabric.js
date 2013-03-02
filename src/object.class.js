@@ -792,13 +792,21 @@
     /**
      * Saves state of an object
      * @method saveState
+     * @param {Object} [options] Object with additional `stateProperties` array to include when saving state
      * @return {fabric.Object} thisArg
      * @chainable
      */
-    saveState: function() {
+    saveState: function(options) {
       this.stateProperties.forEach(function(prop) {
         this.originalState[prop] = this.get(prop);
       }, this);
+
+      if (options && options.stateProperties) {
+        options.stateProperties.forEach(function(prop) {
+          this.originalState[prop] = this.get(prop);
+        }, this);
+      }
+
       return this;
     },
 
