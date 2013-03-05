@@ -188,6 +188,7 @@
       fontFamily:       true,
       fontWeight:       true,
       fontSize:         true,
+      fontStyle:        true,
       lineHeight:       true,
       textDecoration:   true,
       textShadow:       true,
