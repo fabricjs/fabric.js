@@ -724,13 +724,13 @@
         };
 
         var orig = {
-          angle: this.get('angle'),
-          flipX: this.get('flipX'),
-          flipY: this.get('flipY')
+          angle: this.getAngle(),
+          flipX: this.getFlipX(),
+          flipY: this.getFlipY()
         };
 
         // normalize angle
-        this.set('angle', 0).set('flipX', false).set('flipY', false);
+        this.set({ angle: 0, flipX: false, flipY: false });
         this.toDataURL(function(dataURL) {
           i.src = dataURL;
         });
