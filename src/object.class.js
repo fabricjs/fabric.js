@@ -241,6 +241,13 @@
     selectable:               true,
 
     /**
+     * When set to `false`, an object is not rendered on canvas
+     * @property
+     * @type Boolean
+     */
+    visible:                  true,
+
+    /**
      * When set to `false`, object's controls are not displayed and can not be used to manipulate object
      * @property
      * @type Boolean
@@ -292,7 +299,7 @@
       'top left width height scaleX scaleY flipX flipY ' +
       'angle opacity cornerSize fill overlayFill originX originY ' +
       'stroke strokeWidth strokeDashArray fillRule ' +
-      'borderScaleFactor transformMatrix selectable shadow'
+      'borderScaleFactor transformMatrix selectable shadow visible'
     ).split(' '),
 
     /**
@@ -405,7 +412,8 @@
         hasRotatingPoint:   this.hasRotatingPoint,
         transparentCorners: this.transparentCorners,
         perPixelTargetFind: this.perPixelTargetFind,
-        shadow:             (this.shadow && this.shadow.toObject) ? this.shadow.toObject() : this.shadow
+        shadow:             (this.shadow && this.shadow.toObject) ? this.shadow.toObject() : this.shadow,
+        visible:            this.visible
       };
 
       if (!this.includeDefaultValues) {
@@ -438,7 +446,8 @@
         "stroke-width: ", (this.strokeWidth ? this.strokeWidth : '0'), "; ",
         "stroke-dasharray: ", (this.strokeDashArray ? this.strokeDashArray.join(' ') : "; "),
         "fill: ", (this.fill ? this.fill : 'none'), "; ",
-        "opacity: ", (this.opacity ? this.opacity : '1'), ";"
+        "opacity: ", (this.opacity ? this.opacity : '1'), "; ",
+        (this.visible ? '' : "visibility: hidden;")
       ].join("");
     },
 
@@ -620,7 +629,7 @@
     render: function(ctx, noTransform) {
 
       // do not render if width or height are zeros
-      if (this.width === 0 || this.height === 0) return;
+      if (this.width === 0 || this.height === 0 || !this.visible) return;
 
       ctx.save();
 

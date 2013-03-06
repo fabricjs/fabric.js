@@ -29,7 +29,8 @@
     'hasRotatingPoint': true,
     'transparentCorners': true,
     'perPixelTargetFind': false,
-    'shadow': null
+    'shadow': null,
+    'visible': true
   };
 
   QUnit.module('fabric.Line');

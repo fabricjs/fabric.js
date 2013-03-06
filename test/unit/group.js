@@ -144,6 +144,7 @@
       'transparentCorners': true,
       'perPixelTargetFind': false,
       'shadow': null,
+      'visible': true,
       'angle': 0,
       'flipX': false,
       'flipY': false,

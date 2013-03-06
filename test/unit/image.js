@@ -41,6 +41,7 @@
     'transparentCorners': true,
     'perPixelTargetFind': false,
     'shadow':       null,
+    'visible':      true,
     'filters':      []
   };
 

@@ -32,6 +32,7 @@
     'transparentCorners': true,
     'perPixelTargetFind': false,
     'shadow':           null,
+    'visible':          true,
     'text':             'x',
     'fontSize':         40,
     'fontWeight':       'normal',

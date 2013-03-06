@@ -111,11 +111,13 @@
   test('toJSON', function() {
     var emptyObjectJSON = '{"type":"object","originX":"center","originY":"center","left":0,"top":0,"width":0,"height":0,"fill":"rgb(0,0,0)",'+
                           '"overlayFill":null,"stroke":null,"strokeWidth":1,"strokeDashArray":null,"scaleX":1,"scaleY":1,"angle":0,'+
-                          '"flipX":false,"flipY":false,"opacity":1,"selectable":true,"hasControls":true,"hasBorders":true,"hasRotatingPoint":true,"transparentCorners":true,"perPixelTargetFind":false,"shadow":null}';
+                          '"flipX":false,"flipY":false,"opacity":1,"selectable":true,"hasControls":true,"hasBorders":true,"hasRotatingPoint":true,'+
+                          '"transparentCorners":true,"perPixelTargetFind":false,"shadow":null,"visible":true}';
 
     var augmentedJSON = '{"type":"object","originX":"center","originY":"center","left":0,"top":0,"width":122,"height":0,"fill":"rgb(0,0,0)",'+
                         '"overlayFill":null,"stroke":null,"strokeWidth":1,"strokeDashArray":null,"scaleX":1.3,"scaleY":1,"angle":0,'+
-                        '"flipX":false,"flipY":true,"opacity":0.88,"selectable":true,"hasControls":true,"hasBorders":true,"hasRotatingPoint":true,"transparentCorners":true,"perPixelTargetFind":false,"shadow":null}';
+                        '"flipX":false,"flipY":true,"opacity":0.88,"selectable":true,"hasControls":true,"hasBorders":true,"hasRotatingPoint":true,'+
+                        '"transparentCorners":true,"perPixelTargetFind":false,"shadow":null,"visible":true}';
 
     var cObj = new fabric.Object();
     ok(typeof cObj.toJSON == 'function');
@@ -151,7 +153,8 @@
       'hasRotatingPoint': true,
       'transparentCorners': true,
       'perPixelTargetFind': false,
-      'shadow': null
+      'shadow': null,
+      'visible': true
     };
 
     var augmentedObjectRepr = {
@@ -179,7 +182,8 @@
       'hasRotatingPoint': true,
       'transparentCorners': true,
       'perPixelTargetFind': false,
-      'shadow': null
+      'shadow': null,
+      'visible': true
     };
 
     var cObj = new fabric.Object();

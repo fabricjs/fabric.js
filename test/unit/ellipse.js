@@ -48,7 +48,8 @@
       'hasRotatingPoint': true,
       'transparentCorners': true,
       'perPixelTargetFind': false,
-      'shadow': null
+      'shadow': null,
+      'visible': true
     };
     ok(typeof ellipse.toObject == 'function');
     deepEqual(defaultProperties, ellipse.toObject());

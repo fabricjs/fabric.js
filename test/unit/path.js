@@ -26,7 +26,8 @@
     'hasRotatingPoint': true,
     'transparentCorners': true,
     'perPixelTargetFind': false,
-    'shadow': null
+    'shadow': null,
+    'visible': true
   };
 
   function getPathElement(path) {
