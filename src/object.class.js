@@ -446,8 +446,8 @@
         "stroke-width: ", (this.strokeWidth ? this.strokeWidth : '0'), "; ",
         "stroke-dasharray: ", (this.strokeDashArray ? this.strokeDashArray.join(' ') : "; "),
         "fill: ", (this.fill ? this.fill : 'none'), "; ",
-        "opacity: ", (this.opacity ? this.opacity : '1'), "; ",
-        (this.visible ? '' : "visibility: hidden;")
+        "opacity: ", (this.opacity ? this.opacity : '1'), ";",
+        (this.visible ? '' : " visibility: hidden;")
       ].join("");
     },
 
