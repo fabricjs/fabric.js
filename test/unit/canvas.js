@@ -149,7 +149,7 @@
       alert("toDataURL is not supported by this environment. Some of the tests can not be run.");
     }
     else {
-      var dataURL = canvas.toDataURL('png');
+      var dataURL = canvas.toDataURL();
       // don't compare actual data url, as it is often browser-dependent
       // this.assertIdentical(emptyImageCanvasData, canvas.toDataURL('png'));
       equal(typeof dataURL, 'string');

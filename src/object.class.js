@@ -778,7 +778,7 @@
         clone.setActive(false);
 
         canvas.add(clone);
-        var data = canvas.toDataURL('png');
+        var data = canvas.toDataURL();
 
         canvas.dispose();
         canvas = clone = null;

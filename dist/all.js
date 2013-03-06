@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures` */
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.0.12" };
+var fabric = fabric || { version: "1.0.13" };
 
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
@@ -1872,7 +1872,7 @@ fabric.Observable.trigger = fabric.Observable.fire;
       atan2 = Math.atan2;
 
   /**
-   * @namespace
+   * @namespace Various utilities
    */
   fabric.util = { };
 
@@ -2514,7 +2514,9 @@ fabric.Observable.trigger = fabric.Observable.fire;
     return result;
   }
 
-  /** @namespace */
+  /**
+   * @namespace Array utilities
+   */
   fabric.util.array = {
     invoke: invoke,
     min: min,
@@ -2523,7 +2525,7 @@ fabric.Observable.trigger = fabric.Observable.fire;
 
 })();
 (function(){
-  
+
   /**
    * Copies all enumerable properties of one object to another
    * @memberOf fabric.util.object
@@ -2549,12 +2551,12 @@ fabric.Observable.trigger = fabric.Observable.fire;
     return extend({ }, object);
   }
 
-  /** @namespace fabric.util.object */
+  /** @namespace Object utilities */
   fabric.util.object = {
     extend: extend,
     clone: clone
   };
-  
+
 })();
 (function() {
 
@@ -2609,7 +2611,7 @@ function escapeXml(string) {
      .replace(/>/g, '&gt;');
 }
 
-/** @namespace */
+/** @namespace String utilities */
 fabric.util.string = {
   camelize: camelize,
   capitalize: capitalize,
@@ -2974,10 +2976,16 @@ fabric.util.string = {
 
   if (fabric.isTouchSupported) {
     pointerX = function(event) {
-      return (event.touches && event.touches[0] ? (event.touches[0].pageX - (event.touches[0].pageX - event.touches[0].clientX)) || event.clientX : event.clientX);
+      if (event.type !== 'touchend') {
+        return (event.touches && event.touches[0] ? (event.touches[0].pageX - (event.touches[0].pageX - event.touches[0].clientX)) || event.clientX : event.clientX);
+      }
+      return (event.changedTouches && event.changedTouches[0] ? (event.changedTouches[0].pageX - (event.changedTouches[0].pageX - event.changedTouches[0].clientX)) || event.clientX : event.clientX);
     };
     pointerY = function(event) {
-      return (event.touches && event.touches[0] ? (event.touches[0].pageY - (event.touches[0].pageY - event.touches[0].clientY)) || event.clientY : event.clientY);
+      if (event.type !== 'touchend') {
+        return (event.touches && event.touches[0] ? (event.touches[0].pageY - (event.touches[0].pageY - event.touches[0].clientY)) || event.clientY : event.clientY);
+      }
+      return (event.changedTouches && event.changedTouches[0] ? (event.changedTouches[0].pageY - (event.changedTouches[0].pageY - event.changedTouches[0].clientY)) || event.clientY : event.clientY);
     };
   }
 
@@ -2986,6 +2994,7 @@ fabric.util.string = {
   fabric.util.object.extend(fabric.util, fabric.Observable);
 
 })();
+
 (function () {
 
   /**
@@ -6333,17 +6342,39 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
     /**
      * Exports canvas element to a dataurl image.
      * @method toDataURL
-     * @param {String} format the format of the output image. Either "jpeg" or "png".
-     * @param {Number} quality quality level (0..1)
+     * @param {Object} options
+     *
+     *  `format` the format of the output image. Either "jpeg" or "png".
+     *  `quality` quality level (0..1)
+     *  `multiplier` multiplier to scale by {Number}
+     *
      * @return {String}
      */
-    toDataURL: function (format, quality) {
-      var canvasEl = this.upperCanvasEl || this.lowerCanvasEl;
+    toDataURL: function (options) {
+      options || (options = { });
 
+      var format = options.format || 'png',
+          quality = options.quality || 1,
+          multiplier = options.multiplier || 1;
+
+      if (multiplier !== 1) {
+        return this.__toDataURLWithMultiplier(format, quality, multiplier);
+      }
+      else {
+        return this.__toDataURL(format, quality);
+      }
+    },
+
+    /**
+     * @method _toDataURL
+     * @private
+     */
+    __toDataURL: function(format, quality) {
       this.renderAll(true);
+      var canvasEl = this.upperCanvasEl || this.lowerCanvasEl;
       var data = (fabric.StaticCanvas.supports('toDataURLWithQuality'))
-                   ? canvasEl.toDataURL('image/' + format, quality)
-                   : canvasEl.toDataURL('image/' + format);
+                ? canvasEl.toDataURL('image/' + format, quality)
+                : canvasEl.toDataURL('image/' + format);
 
       this.contextTop && this.clearContext(this.contextTop);
       this.renderAll();
@@ -6351,14 +6382,10 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
     },
 
     /**
-     * Exports canvas element to a dataurl image (allowing to change image size via multiplier).
-     * @method toDataURLWithMultiplier
-     * @param {String} format (png|jpeg)
-     * @param {Number} multiplier
-     * @param {Number} quality (0..1)
-     * @return {String}
+     * @method _toDataURLWithMultiplier
+     * @private
      */
-    toDataURLWithMultiplier: function (format, multiplier, quality) {
+    __toDataURLWithMultiplier: function(format, quality, multiplier) {
 
       var origWidth = this.getWidth(),
           origHeight = this.getHeight(),
@@ -6387,7 +6414,7 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
 
       this.renderAll(true);
 
-      var dataURL = this.toDataURL(format, quality);
+      var data = this.toDataURL(format, quality);
 
       ctx.scale(1 / multiplier,  1 / multiplier);
       this.setWidth(origWidth).setHeight(origHeight);
@@ -6402,7 +6429,24 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
       this.contextTop && this.clearContext(this.contextTop);
       this.renderAll();
 
-      return dataURL;
+      return data;
+    },
+
+    /**
+     * Exports canvas element to a dataurl image (allowing to change image size via multiplier).
+     * @deprecated since 1.0.13
+     * @method toDataURLWithMultiplier
+     * @param {String} format (png|jpeg)
+     * @param {Number} multiplier
+     * @param {Number} quality (0..1)
+     * @return {String}
+     */
+    toDataURLWithMultiplier: function (format, multiplier, quality) {
+      return this.toDataURL({
+        format: format,
+        multiplier: multiplier,
+        quality: quality
+      });
     },
 
     /**
@@ -9340,6 +9384,13 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
     selectable:               true,
 
     /**
+     * When set to `false`, an object is not rendered on canvas
+     * @property
+     * @type Boolean
+     */
+    visible:                  true,
+
+    /**
      * When set to `false`, object's controls are not displayed and can not be used to manipulate object
      * @property
      * @type Boolean
@@ -9391,7 +9442,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
       'top left width height scaleX scaleY flipX flipY ' +
       'angle opacity cornerSize fill overlayFill originX originY ' +
       'stroke strokeWidth strokeDashArray fillRule ' +
-      'borderScaleFactor transformMatrix selectable shadow'
+      'borderScaleFactor transformMatrix selectable shadow visible'
     ).split(' '),
 
     /**
@@ -9504,7 +9555,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
         hasRotatingPoint:   this.hasRotatingPoint,
         transparentCorners: this.transparentCorners,
         perPixelTargetFind: this.perPixelTargetFind,
-        shadow:             (this.shadow && this.shadow.toObject) ? this.shadow.toObject() : this.shadow
+        shadow:             (this.shadow && this.shadow.toObject) ? this.shadow.toObject() : this.shadow,
+        visible:            this.visible
       };
 
       if (!this.includeDefaultValues) {
@@ -9537,7 +9589,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
         "stroke-width: ", (this.strokeWidth ? this.strokeWidth : '0'), "; ",
         "stroke-dasharray: ", (this.strokeDashArray ? this.strokeDashArray.join(' ') : "; "),
         "fill: ", (this.fill ? this.fill : 'none'), "; ",
-        "opacity: ", (this.opacity ? this.opacity : '1'), ";"
+        "opacity: ", (this.opacity ? this.opacity : '1'), "; ",
+        (this.visible ? '' : "visibility: hidden;")
       ].join("");
     },
 
@@ -9719,7 +9772,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
     render: function(ctx, noTransform) {
 
       // do not render if width or height are zeros
-      if (this.width === 0 || this.height === 0) return;
+      if (this.width === 0 || this.height === 0 || !this.visible) return;
 
       ctx.save();
 
@@ -9823,13 +9876,13 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
         };
 
         var orig = {
-          angle: this.get('angle'),
-          flipX: this.get('flipX'),
-          flipY: this.get('flipY')
+          angle: this.getAngle(),
+          flipX: this.getFlipX(),
+          flipY: this.getFlipY()
         };
 
         // normalize angle
-        this.set('angle', 0).set('flipX', false).set('flipY', false);
+        this.set({ angle: 0, flipX: false, flipY: false });
         this.toDataURL(function(dataURL) {
           i.src = dataURL;
         });
@@ -9868,7 +9921,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
         clone.setActive(false);
 
         canvas.add(clone);
-        var data = canvas.toDataURL('png');
+        var data = canvas.toDataURL();
 
         canvas.dispose();
         canvas = clone = null;
@@ -9891,13 +9944,21 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
     /**
      * Saves state of an object
      * @method saveState
+     * @param {Object} [options] Object with additional `stateProperties` array to include when saving state
      * @return {fabric.Object} thisArg
      * @chainable
      */
-    saveState: function() {
+    saveState: function(options) {
       this.stateProperties.forEach(function(prop) {
         this.originalState[prop] = this.get(prop);
       }, this);
+
+      if (options && options.stateProperties) {
+        options.stateProperties.forEach(function(prop) {
+          this.originalState[prop] = this.get(prop);
+        }, this);
+      }
+
       return this;
     },
 
@@ -9945,7 +10006,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
     /**
      * Returns a JSON representation of an instance
      * @method toJSON
-     * @param {Array} propertiesToInclude
+     * @param {Array} propertiesToInclude Any properties that you might want to additionally include in the output
      * @return {String} json
      */
     toJSON: function(propertiesToInclude) {
@@ -9956,6 +10017,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
     /**
      * Sets gradient fill of an object
      * @method setGradientFill
+     * @param {Object} options
      */
     setGradientFill: function(options) {
       this.set('fill', fabric.Gradient.forObject(this, options));
@@ -9964,6 +10026,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
     /**
      * Sets pattern fill of an object
      * @method setPatternFill
+     * @param {Object} options
      */
     setPatternFill: function(options) {
       this.set('fill', new fabric.Pattern(options));
@@ -9972,6 +10035,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
     /**
      * Sets shadow of an object
      * @method setShadow
+     * @param {Object} options
      */
     setShadow: function(options) {
       this.set('shadow', new fabric.Shadow(options));
@@ -13591,6 +13655,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
         object.setCoords();
 
         // do not display corners of objects enclosed in a group
+        object.__origHasControls = object.hasControls;
         object.hasControls = false;
       }, this);
     },
@@ -13677,6 +13742,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
     },
 
     /**
+     * @param delegatedProperties
+     * @type Object
      * Properties that are delegated to group objects when reading/writing
      */
     delegatedProperties: {
@@ -13684,9 +13751,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
       opacity:          true,
       fontFamily:       true,
       fontWeight:       true,
+      fontSize:         true,
+      fontStyle:        true,
       lineHeight:       true,
       textDecoration:   true,
       textShadow:       true,
+      textAlign:        true,
       backgroundColor:  true
     },
 
@@ -13821,7 +13891,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
       object.set('scaleY', object.get('scaleY') * this.get('scaleY'));
 
       object.setCoords();
-      object.hasControls = true;
+      object.hasControls = object.__origHasControls;
+      delete object.__origHasControls;
       object.setActive(false);
       object.setCoords();
 
@@ -14026,6 +14097,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
         }
       }
       else {
+        if (prop in this.delegatedProperties) {
+          return this.objects[0] && this.objects[0].get(prop);
+        }
         return this[prop];
       }
     }
@@ -14569,7 +14643,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
   }
 });
 /**
- * @namespace
+ * @namespace Image filters
  */
 fabric.Image.filters = { };
 
