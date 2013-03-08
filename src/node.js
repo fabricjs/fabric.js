@@ -146,11 +146,7 @@
 
   var origSetWidth = fabric.StaticCanvas.prototype.setWidth;
   fabric.StaticCanvas.prototype.setWidth = function(width) {
-<<<<<<< HEAD
     origSetWidth.call(this, width);
-=======
-    origSetWidth.call(this, height);
->>>>>>> f84a8628c3dc7cbdaf34c4a2487fc2d6eae33277
     this.nodeCanvas.width = width;
     return this;
   };
