@@ -37,7 +37,14 @@
      * @method _tryParsingColor
      */
     _tryParsingColor: function(color) {
-      var source = Color.sourceFromHex(color);
+      var source;
+
+      if (color in Color.colorNameMap) {
+        color = Color.colorNameMap[color];
+      }
+
+      source = Color.sourceFromHex(color);
+
       if (!source) {
         source = Color.sourceFromRgb(color);
       }
@@ -196,6 +203,30 @@
    * @field
    */
   fabric.Color.reHex = /^#?([0-9a-f]{6}|[0-9a-f]{3})$/i;
+
+  /**
+   * Map of the 16 basic color names with HEX code
+   * @static
+   * @field
+   */
+  fabric.Color.colorNameMap = {
+    'aqua':    '#00FFFF',
+    'black':   '#000000',
+    'blue':    '#0000FF',
+    'fuchsia': '#FF00FF',
+    'gray':    '#808080',
+    'green':   '#008000',
+    'lime':    '#00FF00',
+    'maroon':  '#800000',
+    'navy':    '#000080',
+    'olive':   '#808000',
+    'purple':  '#800080',
+    'red':     '#FF0000',
+    'silver':  '#C0C0C0',
+    'teal':    '#008080',
+    'white':   '#FFFFFF',
+    'yellow':  '#FFFF00',
+  };
 
   /**
    * Returns new color object, when given a color in RGB format
