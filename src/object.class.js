@@ -628,7 +628,7 @@
      */
     render: function(ctx, noTransform) {
 
-      // do not render if width or height are zeros
+      // do not render if width/height are zeros or object is not visible
       if (this.width === 0 || this.height === 0 || !this.visible) return;
 
       ctx.save();
