@@ -11,7 +11,7 @@
   }],
   "scripts": {
     "build": "node build.js modules=ALL exclude=json,cufon,gestures",
-    "test": "node test.js"
+    "test": "node test.js && jshint src"
   },
   "dependencies": {
     "canvas": "~1.0.0",
