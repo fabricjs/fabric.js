@@ -76,8 +76,8 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function() {
-
-      var widthBy2 = this.width / 2,
+      var markup = [],
+          widthBy2 = this.width / 2,
           heightBy2 = this.height / 2;
 
       var points = [
@@ -86,11 +86,22 @@
         widthBy2 + " " + heightBy2
       ].join(",");
 
-      return '<polygon ' +
-              'points="' + points + '" ' +
-              'style="' + this.getSvgStyles() + '" ' +
-              'transform="' + this.getSvgTransform() + '" ' +
-              '/>';
+      if (this.fill && this.fill.toLive) {
+        markup.push(this.fill.toSVG(this, true));
+      }
+      if (this.stroke && this.stroke.toLive) {
+        markup.push(this.stroke.toSVG(this, true));
+      }
+
+      markup.push(
+        '<polygon ',
+          'points="', points,
+          '" style="', this.getSvgStyles(),
+          '" transform="', this.getSvgTransform(),
+        '"/>'
+      );
+
+      return markup.join('');
     }
   });
 

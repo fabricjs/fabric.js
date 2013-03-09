@@ -445,7 +445,7 @@
         "stroke: ", (this.stroke ? this.stroke : 'none'), "; ",
         "stroke-width: ", (this.strokeWidth ? this.strokeWidth : '0'), "; ",
         "stroke-dasharray: ", (this.strokeDashArray ? this.strokeDashArray.join(' ') : "; "),
-        "fill: ", (this.fill ? this.fill : 'none'), "; ",
+        "fill: ", (this.fill ? (this.fill && this.fill.toLive ? 'url(#SVGID_' + this.fill.id + ')' : this.fill) : 'none'), "; ",
         "opacity: ", (this.opacity ? this.opacity : '1'), ";",
         (this.visible ? '' : " visibility: hidden;")
       ].join("");
@@ -872,12 +872,35 @@
     },
 
     /**
-     * Sets gradient fill of an object
-     * @method setGradientFill
-     * @param {Object} options
+     * Sets gradient (fill or stroke) of an object
+     * @method setGradient
+     * @param {String} property Property name 'stroke' or 'fill'
+     * @param {Object} [options] Options object
      */
-    setGradientFill: function(options) {
-      this.set('fill', fabric.Gradient.forObject(this, options));
+    setGradient: function(property, options) {
+      options || (options = { });
+
+      var gradient = {colorStops: []};
+
+      gradient.type = options.type || (options.r1 || options.r2 ? 'radial' : 'linear');
+      gradient.coords = {
+        x1: options.x1,
+        y1: options.y1,
+        x2: options.x2,
+        y2: options.y2
+      };
+
+      if (options.r1 || options.r2) {
+        gradient.coords.r1 = options.r1;
+        gradient.coords.r2 = options.r2;
+      }
+
+      for (var position in options.colorStops) {
+        var color = new fabric.Color(options.colorStops[position]);
+        gradient.colorStops.push({offset: position, color: color.toRgb(), opacity: color.getAlpha()});
+      }
+
+      this.set(property, fabric.Gradient.forObject(this, gradient));
     },
 
     /**
@@ -1084,5 +1107,11 @@
    * @type Number
    */
   fabric.Object.NUM_FRACTION_DIGITS = 2;
+
+  /**
+   * @static
+   * @type Number
+   */
+  fabric.Object.__uid = 0;
 
 })(typeof exports !== 'undefined' ? exports : this);

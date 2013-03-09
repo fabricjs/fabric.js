@@ -63,18 +63,29 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function() {
-      var points = [];
+      var points = [],
+          markup = [];
+
       for (var i = 0, len = this.points.length; i < len; i++) {
         points.push(toFixed(this.points[i].x, 2), ',', toFixed(this.points[i].y, 2), ' ');
       }
 
-      return [
+      if (this.fill && this.fill.toLive) {
+        markup.push(this.fill.toSVG(this, false));
+      }
+      if (this.stroke && this.stroke.toLive) {
+        markup.push(this.stroke.toSVG(this, false));
+      }
+
+      markup.push(
         '<polyline ',
-          'points="', points.join(''), '" ',
-          'style="', this.getSvgStyles(), '" ',
-          'transform="', this.getSvgTransform(), '" ',
-        '/>'
-      ].join('');
+          'points="', points.join(''),
+          '" style="', this.getSvgStyles(),
+          '" transform="', this.getSvgTransform(),
+        '"/>'
+      );
+
+      return markup.join('');
     },
 
     /**
