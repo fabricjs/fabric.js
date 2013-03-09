@@ -225,7 +225,7 @@
     'silver':  '#C0C0C0',
     'teal':    '#008080',
     'white':   '#FFFFFF',
-    'yellow':  '#FFFF00',
+    'yellow':  '#FFFF00'
   };
 
   /**
