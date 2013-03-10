@@ -553,14 +553,16 @@
           ? this.stroke.toLive(ctx)
           : this.stroke;
       }
-      ctx.beginPath();
-
       this._setShadow(ctx);
+      this.clipTo && fabric.util.clipContext(this, ctx);
+
+      ctx.beginPath();
       this._render(ctx);
 
       if (this.fill) {
         ctx.fill();
       }
+      this.clipTo && ctx.restore();
       this._removeShadow(ctx);
 
       if (this.stroke) {

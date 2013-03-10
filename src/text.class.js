@@ -287,10 +287,12 @@
       }
 
       this._setTextShadow(ctx);
+      this.clipTo && fabric.util.clipContext(this, ctx);
       this._renderTextFill(ctx, textLines);
+      this._renderTextStroke(ctx, textLines);
+      this.clipTo && ctx.restore();
       this.textShadow && ctx.restore();
 
-      this._renderTextStroke(ctx, textLines);
       if (this.textAlign !== 'left' && this.textAlign !== 'justify') {
         ctx.restore();
       }

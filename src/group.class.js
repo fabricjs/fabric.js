@@ -245,6 +245,8 @@
 
       var groupScaleFactor = Math.max(this.scaleX, this.scaleY);
 
+      this.clipTo && fabric.util.clipContext(this, ctx);
+
       //The array is now sorted in order of highest first, so start from end.
       for (var i = this.objects.length; i > 0; i--) {
 
@@ -260,6 +262,7 @@
         object.borderScaleFactor = originalScaleFactor;
         object.hasRotatingPoint = originalHasRotatingPoint;
       }
+      this.clipTo && ctx.restore();
 
       if (!noTransform && this.active) {
         this.drawBorders(ctx);

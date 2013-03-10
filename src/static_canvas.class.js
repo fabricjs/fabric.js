@@ -563,7 +563,7 @@
       this.fire('before:render');
 
       if (this.clipTo) {
-        this._clipCanvas(canvasToDrawOn);
+        fabric.util.clipCanvas(this, canvasToDrawOn);
       }
 
       if (this.backgroundColor) {
@@ -614,17 +614,6 @@
       this.fire('after:render');
 
       return this;
-    },
-
-    /**
-     * @private
-     * @method _clipCanvas
-     */
-    _clipCanvas: function(canvasToDrawOn) {
-      canvasToDrawOn.save();
-      canvasToDrawOn.beginPath();
-      this.clipTo(canvasToDrawOn);
-      canvasToDrawOn.clip();
     },
 
     /**

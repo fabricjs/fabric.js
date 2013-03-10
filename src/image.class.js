@@ -104,7 +104,9 @@
       }
 
       this._setShadow(ctx);
+      this.clipTo && fabric.util.clipContext(this, ctx);
       this._render(ctx);
+      this.clipTo && ctx.restore();
       this._removeShadow(ctx);
 
       if (this.active && !noTransform) {

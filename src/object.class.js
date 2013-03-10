@@ -290,6 +290,13 @@
     includeDefaultValues:     true,
 
     /**
+     * Function that determines clipping of an object (context is passed as a first argument)
+     * @property
+     * @type Function
+     */
+    clipTo:                   null,
+
+    /**
      * List of properties to consider when checking if state of an object is changed (fabric.Object#hasStateChanged);
      * as well as for history (undo/redo) purposes
      * @property
@@ -667,7 +674,9 @@
       }
 
       this._setShadow(ctx);
+      this.clipTo && fabric.util.clipContext(this, ctx);
       this._render(ctx, noTransform);
+      this.clipTo && ctx.restore();
       this._removeShadow(ctx);
 
       if (this.active && !noTransform) {
