@@ -26,6 +26,20 @@
     type: 'ellipse',
 
     /**
+     * Horizontal radius
+     * @property
+     * @type Number
+     */
+    rx: 0,
+
+    /**
+     * Vertical radius
+     * @property
+     * @type Number
+     */
+    ry: 0,
+
+    /**
      * Constructor
      * @method initialize
      * @param {Object} [options] Options object
