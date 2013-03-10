@@ -4,10 +4,12 @@
 
   function createGradient() {
     return new fabric.Gradient({
-      x1: 0,
-      y1: 10,
-      x2: 100,
-      y2: 200,
+      coords: {
+        x1: 0,
+        y1: 10,
+        x2: 100,
+        y2: 200,
+      },
       colorStops: {
         '0': 'red',
         '1': 'green'
@@ -25,10 +27,10 @@
   test('properties', function() {
     var gradient = createGradient();
 
-    equal(gradient.x1, 0);
-    equal(gradient.y1, 10);
-    equal(gradient.x2, 100);
-    equal(gradient.y2, 200);
+    equal(gradient.coords.x1, 0);
+    equal(gradient.coords.y1, 10);
+    equal(gradient.coords.x2, 100);
+    equal(gradient.coords.y2, 200);
 
     equal(gradient.colorStops['0'], 'red');
     equal(gradient.colorStops['1'], 'green');
@@ -41,10 +43,11 @@
 
     var object = gradient.toObject();
 
-    equal(object.x1, gradient.x1);
-    equal(object.x2, gradient.x2);
-    equal(object.y1, gradient.y1);
-    equal(object.y2, gradient.y2);
+    equal(object.coords.x1, gradient.coords.x1);
+    equal(object.coords.x2, gradient.coords.x2);
+    equal(object.coords.y1, gradient.coords.y1);
+    equal(object.coords.y2, gradient.coords.y2);
+
     equal(object.colorStops, gradient.colorStops);
   });
 
@@ -77,14 +80,17 @@
 
     // TODO: need to double check these values
 
-    equal(gradient.x1, -50);
-    equal(gradient.y1, -50);
+    equal(gradient.coords.x1, 0);
+    equal(gradient.coords.y1, 0);
 
-    equal(gradient.x2, 50);
-    equal(gradient.y2, -50);
+    //equal(gradient.coords.x2, 100);
+    //equal(gradient.coords.y2, 100);
 
-    equal(gradient.colorStops[0], 'white');
-    equal(gradient.colorStops[1], 'black');
+    equal(gradient.colorStops[0].offset, 1);
+    equal(gradient.colorStops[1].offset, 0);
+
+    equal(gradient.colorStops[0].color, 'rgb(0,0,0)');
+    equal(gradient.colorStops[1].color, 'rgb(255,255,255)');
   });
 
   test('forObject', function() {
@@ -93,10 +99,12 @@
     var object = new fabric.Object({ width: 50, height: 50 });
 
     var gradient = fabric.Gradient.forObject(object, {
-      x1: 10,
-      y1: 10,
-      x2: 20,
-      y2: 20,
+      coords: {
+        x1: 10,
+        y1: 10,
+        x2: 20,
+        y2: 20,
+      },
       colorStops: {
         '0': 'red',
         '0.5': 'green',
@@ -108,11 +116,11 @@
 
     // TODO: need to double check these values
 
-    equal(gradient.x1, -15);
-    equal(gradient.y1, -15);
+    equal(gradient.coords.x1, 10);
+    equal(gradient.coords.y1, 10);
 
-    equal(gradient.x2, -5);
-    equal(gradient.y2, -5);
+    equal(gradient.coords.x2, 20);
+    equal(gradient.coords.y2, 20);
   });
 
 })();

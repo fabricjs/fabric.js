@@ -794,27 +794,31 @@
   test('gradient serialization', function() {
     var object = new fabric.Object();
 
-    object.fill = new fabric.Gradient({
+    object.setGradient('fill', {
       x1: 0,
       y1: 0,
       x2: 100,
       y2: 100,
       colorStops: {
-        '0': 'red',
-        '1': 'green'
+        '0': 'rgb(255,0,0)',
+        '1': 'rgb(0,128,0)'
       }
     });
 
     ok(typeof object.toObject().fill == 'object');
 
-    equal(object.toObject().fill.x1, 0);
-    equal(object.toObject().fill.y1, 0);
+    equal(object.toObject().fill.type, 'linear');
 
-    equal(object.toObject().fill.x2, 100);
-    equal(object.toObject().fill.y2, 100);
+    equal(object.toObject().fill.coords.x1, 0);
+    equal(object.toObject().fill.coords.y1, 0);
 
-    equal(object.toObject().fill.colorStops['0'], 'red');
-    equal(object.toObject().fill.colorStops['1'], 'green');
+    equal(object.toObject().fill.coords.x2, 100);
+    equal(object.toObject().fill.coords.y2, 100);
+
+    equal(object.toObject().fill.colorStops[0].offset, 0);
+    equal(object.toObject().fill.colorStops[1].offset, 1);
+    equal(object.toObject().fill.colorStops[0].color, 'rgb(255,0,0)');
+    equal(object.toObject().fill.colorStops[1].color, 'rgb(0,128,0)');
   });
 
   test('setShadow', function() {
