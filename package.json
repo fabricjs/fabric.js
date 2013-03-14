@@ -14,14 +14,14 @@
     "test": "node test.js && jshint src"
   },
   "dependencies": {
-    "canvas": "~1.0.0",
-    "jsdom": ">=0.2.3",
-    "xmldom": ">=0.1.7"
+    "canvas": "1.0.x",
+    "jsdom": "0.5.x",
+    "xmldom": "0.1.x"
   },
   "devDependencies": {
     "qunit": "0.5.x",
-    "jshint": "0.9.x",
-    "uglify-js": ">=2.0.0"
+    "jshint": "1.1.x",
+    "uglify-js": "2.2.x"
   },
   "engines": { "node": ">=0.4.0 && <1.0.0" },
   "main": "./dist/all.js"
