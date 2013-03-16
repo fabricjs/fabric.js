@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures` */
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.1.0" };
+var fabric = fabric || { version: "1.1.1" };
 
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
@@ -4576,10 +4576,10 @@ fabric.util.string = {
       this.type = options.type || 'linear';
 
       coords = {
-        x1: options.coords ? options.coords.x1 : 0,
-        y1: options.coords ? options.coords.y1 : 0,
-        x2: options.coords ? options.coords.x2 : 0,
-        y2: options.coords ? options.coords.y2 : 0
+        x1: options.coords.x1 || 0,
+        y1: options.coords.y1 || 0,
+        x2: options.coords.x2 || 0,
+        y2: options.coords.y2 || 0
       };
 
       if (this.type === 'radial') {
@@ -6932,7 +6932,7 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
     sendToBack: function (object) {
       removeFromArray(this._objects, object);
       this._objects.unshift(object);
-      return this.renderAll();
+      return this.renderAll && this.renderAll();
     },
 
     /**
@@ -6945,7 +6945,7 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
     bringToFront: function (object) {
       removeFromArray(this._objects, object);
       this._objects.push(object);
-      return this.renderAll();
+      return this.renderAll && this.renderAll();
     },
 
     /**
@@ -6977,7 +6977,7 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
         removeFromArray(this._objects, object);
         this._objects.splice(nextIntersectingIdx, 0, object);
       }
-      return this.renderAll();
+      return this.renderAll && this.renderAll();
     },
 
     /**
@@ -7011,7 +7011,7 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
         removeFromArray(objects, object);
         objects.splice(nextIntersectingIdx, 0, object);
       }
-      this.renderAll();
+      return this.renderAll && this.renderAll();
     },
 
     /**
@@ -10422,7 +10422,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
      * @chainable
      */
     sendToBack: function() {
-      this.canvas.sendToBack(this);
+      if (this.group) {
+        fabric.StaticCanvas.prototype.sendToBack.call(this.group, this);
+      }
+      else {
+        this.canvas.sendToBack(this);
+      }
       return this;
     },
 
@@ -10433,7 +10438,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
      * @chainable
      */
     bringToFront: function() {
-      this.canvas.bringToFront(this);
+      if (this.group) {
+        fabric.StaticCanvas.prototype.bringToFront.call(this.group, this);
+      }
+      else {
+        this.canvas.bringToFront(this);
+      }
       return this;
     },
 
@@ -10444,7 +10454,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
      * @chainable
      */
     sendBackwards: function() {
-      this.canvas.sendBackwards(this);
+      if (this.group) {
+        fabric.StaticCanvas.prototype.sendBackwards.call(this.group, this);
+      }
+      else {
+        this.canvas.sendBackwards(this);
+      }
       return this;
     },
 
@@ -10455,7 +10470,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
      * @chainable
      */
     bringForward: function() {
-      this.canvas.bringForward(this);
+      if (this.group) {
+        fabric.StaticCanvas.prototype.bringForward.call(this.group, this);
+      }
+      else {
+        this.canvas.bringForward(this);
+      }
       return this;
     }
   });
@@ -12964,7 +12984,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
       result[i] = [xc, yc, th2, th3, rx, ry, sin_th, cos_th];
     }
 
-    return (arcToSegmentsCache[argsString] = result);
+    arcToSegmentsCache[argsString] = result;
+    return result;
   }
 
   function segmentToBezier(cx, cy, th0, th1, rx, ry, sin_th, cos_th) {
@@ -12987,11 +13008,13 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
     var x2 = x3 + t * Math.sin(th1);
     var y2 = y3 - t * Math.cos(th1);
 
-    return (segmentToBezierCache[argsString] = [
+    segmentToBezierCache[argsString] = [
       a00 * x1 + a01 * y1,      a10 * x1 + a11 * y1,
       a00 * x2 + a01 * y2,      a10 * x2 + a11 * y2,
       a00 * x3 + a01 * y3,      a10 * x3 + a11 * y3
-    ]);
+    ];
+
+    return segmentToBezierCache[argsString];
   }
 
   "use strict";
@@ -13981,9 +14004,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
     initialize: function(objects, options) {
       options = options || { };
 
-      this.objects = objects || [];
-      this.originalState = { };
+      this._objects = objects || [];
+      for (var i = this._objects.length; i--; ) {
+        this._objects[i].group = this;
+      }
 
+      this.originalState = { };
       this.callSuper('initialize');
 
       this._calcBounds();
@@ -14043,7 +14069,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
      * @return {Array} group objects
      */
     getObjects: function() {
-      return this.objects;
+      return this._objects;
     },
 
     /**
@@ -14055,7 +14081,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
      */
     addWithUpdate: function(object) {
       this._restoreObjectsState();
-      this.objects.push(object);
+      this._objects.push(object);
+      object.group = this;
       this._calcBounds();
       this._updateObjectsCoords();
       return this;
@@ -14070,7 +14097,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
      */
     removeWithUpdate: function(object) {
       this._restoreObjectsState();
-      removeFromArray(this.objects, object);
+      removeFromArray(this._objects, object);
+      delete object.group;
       object.setActive(false);
       this._calcBounds();
       this._updateObjectsCoords();
@@ -14085,7 +14113,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
      * @chainable
      */
     add: function(object) {
-      this.objects.push(object);
+      this._objects.push(object);
+      object.group = this;
       return this;
     },
 
@@ -14097,7 +14126,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
      * @chainable
      */
     remove: function(object) {
-      removeFromArray(this.objects, object);
+      removeFromArray(this._objects, object);
+      delete object.group;
       return this;
     },
 
@@ -14133,10 +14163,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
      */
     _set: function(key, value) {
       if (key in this.delegatedProperties) {
-        var i = this.objects.length;
+        var i = this._objects.length;
         this[key] = value;
         while (i--) {
-          this.objects[i].set(key, value);
+          this._objects[i].set(key, value);
         }
       }
       else {
@@ -14151,7 +14181,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
      * @return {Boolean} `true` if group contains an object
      */
     contains: function(object) {
-      return this.objects.indexOf(object) > -1;
+      return this._objects.indexOf(object) > -1;
     },
 
     /**
@@ -14162,7 +14192,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
      */
     toObject: function(propertiesToInclude) {
       return extend(this.callSuper('toObject', propertiesToInclude), {
-        objects: invoke(this.objects, 'toObject', propertiesToInclude)
+        objects: invoke(this._objects, 'toObject', propertiesToInclude)
       });
     },
 
@@ -14180,9 +14210,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
       this.clipTo && fabric.util.clipContext(this, ctx);
 
       //The array is now sorted in order of highest first, so start from end.
-      for (var i = this.objects.length; i > 0; i--) {
+      for (var i = this._objects.length; i > 0; i--) {
 
-        var object = this.objects[i-1],
+        var object = this._objects[i-1],
             originalScaleFactor = object.borderScaleFactor,
             originalHasRotatingPoint = object.hasRotatingPoint;
 
@@ -14234,7 +14264,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
      * @chainable
      */
     _restoreObjectsState: function() {
-      this.objects.forEach(this._restoreObjectState, this);
+      this._objects.forEach(this._restoreObjectState, this);
       return this;
     },
 
@@ -14266,6 +14296,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
       delete object.__origHasControls;
       object.setActive(false);
       object.setCoords();
+      delete object.group;
 
       return this;
     },
@@ -14371,10 +14402,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
           aY = [],
           minX, minY, maxX, maxY, o, width, height,
           i = 0,
-          len = this.objects.length;
+          len = this._objects.length;
 
       for (; i < len; ++i) {
-        o = this.objects[i];
+        o = this._objects[i];
         o.setCoords();
         for (var prop in o.oCoords) {
           aX.push(o.oCoords[prop].x);
@@ -14423,9 +14454,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
      * @chainable
      */
     toGrayscale: function() {
-      var i = this.objects.length;
+      var i = this._objects.length;
       while (i--) {
-        this.objects[i].toGrayscale();
+        this._objects[i].toGrayscale();
       }
       return this;
     },
@@ -14437,8 +14468,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
      */
     toSVG: function() {
       var objectsMarkup = [ ];
-      for (var i = this.objects.length; i--; ) {
-        objectsMarkup.push(this.objects[i].toSVG());
+      for (var i = this._objects.length; i--; ) {
+        objectsMarkup.push(this._objects[i].toSVG());
       }
 
       return (
@@ -14459,8 +14490,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
           return this[prop];
         }
         else {
-          for (var i = 0, len = this.objects.length; i < len; i++) {
-            if (this.objects[i][prop]) {
+          for (var i = 0, len = this._objects.length; i < len; i++) {
+            if (this._objects[i][prop]) {
               return true;
             }
           }
@@ -14469,7 +14500,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
       }
       else {
         if (prop in this.delegatedProperties) {
-          return this.objects[0] && this.objects[0].get(prop);
+          return this._objects[0] && this._objects[0].get(prop);
         }
         return this[prop];
       }
