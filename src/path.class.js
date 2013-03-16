@@ -88,7 +88,8 @@
       result[i] = [xc, yc, th2, th3, rx, ry, sin_th, cos_th];
     }
 
-    return (arcToSegmentsCache[argsString] = result);
+    arcToSegmentsCache[argsString] = result;
+    return result;
   }
 
   function segmentToBezier(cx, cy, th0, th1, rx, ry, sin_th, cos_th) {
@@ -111,11 +112,13 @@
     var x2 = x3 + t * Math.sin(th1);
     var y2 = y3 - t * Math.cos(th1);
 
-    return (segmentToBezierCache[argsString] = [
+    segmentToBezierCache[argsString] = [
       a00 * x1 + a01 * y1,      a10 * x1 + a11 * y1,
       a00 * x2 + a01 * y2,      a10 * x2 + a11 * y2,
       a00 * x3 + a01 * y3,      a10 * x3 + a11 * y3
-    ]);
+    ];
+
+    return segmentToBezierCache[argsString];
   }
 
   "use strict";
