@@ -1062,7 +1062,12 @@
      * @chainable
      */
     sendToBack: function() {
-      this.canvas.sendToBack(this);
+      if (this.group) {
+        fabric.StaticCanvas.prototype.sendToBack.call(this.group, this);
+      }
+      else {
+        this.canvas.sendToBack(this);
+      }
       return this;
     },
 
@@ -1073,7 +1078,12 @@
      * @chainable
      */
     bringToFront: function() {
-      this.canvas.bringToFront(this);
+      if (this.group) {
+        fabric.StaticCanvas.prototype.bringToFront.call(this.group, this);
+      }
+      else {
+        this.canvas.bringToFront(this);
+      }
       return this;
     },
 
@@ -1084,7 +1094,12 @@
      * @chainable
      */
     sendBackwards: function() {
-      this.canvas.sendBackwards(this);
+      if (this.group) {
+        fabric.StaticCanvas.prototype.sendBackwards.call(this.group, this);
+      }
+      else {
+        this.canvas.sendBackwards(this);
+      }
       return this;
     },
 
@@ -1095,7 +1110,12 @@
      * @chainable
      */
     bringForward: function() {
-      this.canvas.bringForward(this);
+      if (this.group) {
+        fabric.StaticCanvas.prototype.bringForward.call(this.group, this);
+      }
+      else {
+        this.canvas.bringForward(this);
+      }
       return this;
     }
   });

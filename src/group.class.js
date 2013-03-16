@@ -49,9 +49,12 @@
     initialize: function(objects, options) {
       options = options || { };
 
-      this.objects = objects || [];
-      this.originalState = { };
+      this._objects = objects || [];
+      for (var i = this._objects.length; i--; ) {
+        this._objects[i].group = this;
+      }
 
+      this.originalState = { };
       this.callSuper('initialize');
 
       this._calcBounds();
@@ -111,7 +114,7 @@
      * @return {Array} group objects
      */
     getObjects: function() {
-      return this.objects;
+      return this._objects;
     },
 
     /**
@@ -123,7 +126,8 @@
      */
     addWithUpdate: function(object) {
       this._restoreObjectsState();
-      this.objects.push(object);
+      this._objects.push(object);
+      object.group = this;
       this._calcBounds();
       this._updateObjectsCoords();
       return this;
@@ -138,7 +142,8 @@
      */
     removeWithUpdate: function(object) {
       this._restoreObjectsState();
-      removeFromArray(this.objects, object);
+      removeFromArray(this._objects, object);
+      delete object.group;
       object.setActive(false);
       this._calcBounds();
       this._updateObjectsCoords();
@@ -153,7 +158,8 @@
      * @chainable
      */
     add: function(object) {
-      this.objects.push(object);
+      this._objects.push(object);
+      object.group = this;
       return this;
     },
 
@@ -165,7 +171,8 @@
      * @chainable
      */
     remove: function(object) {
-      removeFromArray(this.objects, object);
+      removeFromArray(this._objects, object);
+      delete object.group;
       return this;
     },
 
@@ -201,10 +208,10 @@
      */
     _set: function(key, value) {
       if (key in this.delegatedProperties) {
-        var i = this.objects.length;
+        var i = this._objects.length;
         this[key] = value;
         while (i--) {
-          this.objects[i].set(key, value);
+          this._objects[i].set(key, value);
         }
       }
       else {
@@ -219,7 +226,7 @@
      * @return {Boolean} `true` if group contains an object
      */
     contains: function(object) {
-      return this.objects.indexOf(object) > -1;
+      return this._objects.indexOf(object) > -1;
     },
 
     /**
@@ -230,7 +237,7 @@
      */
     toObject: function(propertiesToInclude) {
       return extend(this.callSuper('toObject', propertiesToInclude), {
-        objects: invoke(this.objects, 'toObject', propertiesToInclude)
+        objects: invoke(this._objects, 'toObject', propertiesToInclude)
       });
     },
 
@@ -248,9 +255,9 @@
       this.clipTo && fabric.util.clipContext(this, ctx);
 
       //The array is now sorted in order of highest first, so start from end.
-      for (var i = this.objects.length; i > 0; i--) {
+      for (var i = this._objects.length; i > 0; i--) {
 
-        var object = this.objects[i-1],
+        var object = this._objects[i-1],
             originalScaleFactor = object.borderScaleFactor,
             originalHasRotatingPoint = object.hasRotatingPoint;
 
@@ -302,7 +309,7 @@
      * @chainable
      */
     _restoreObjectsState: function() {
-      this.objects.forEach(this._restoreObjectState, this);
+      this._objects.forEach(this._restoreObjectState, this);
       return this;
     },
 
@@ -334,6 +341,7 @@
       delete object.__origHasControls;
       object.setActive(false);
       object.setCoords();
+      delete object.group;
 
       return this;
     },
@@ -439,10 +447,10 @@
           aY = [],
           minX, minY, maxX, maxY, o, width, height,
           i = 0,
-          len = this.objects.length;
+          len = this._objects.length;
 
       for (; i < len; ++i) {
-        o = this.objects[i];
+        o = this._objects[i];
         o.setCoords();
         for (var prop in o.oCoords) {
           aX.push(o.oCoords[prop].x);
@@ -491,9 +499,9 @@
      * @chainable
      */
     toGrayscale: function() {
-      var i = this.objects.length;
+      var i = this._objects.length;
       while (i--) {
-        this.objects[i].toGrayscale();
+        this._objects[i].toGrayscale();
       }
       return this;
     },
@@ -505,8 +513,8 @@
      */
     toSVG: function() {
       var objectsMarkup = [ ];
-      for (var i = this.objects.length; i--; ) {
-        objectsMarkup.push(this.objects[i].toSVG());
+      for (var i = this._objects.length; i--; ) {
+        objectsMarkup.push(this._objects[i].toSVG());
       }
 
       return (
@@ -527,8 +535,8 @@
           return this[prop];
         }
         else {
-          for (var i = 0, len = this.objects.length; i < len; i++) {
-            if (this.objects[i][prop]) {
+          for (var i = 0, len = this._objects.length; i < len; i++) {
+            if (this._objects[i][prop]) {
               return true;
             }
           }
@@ -537,7 +545,7 @@
       }
       else {
         if (prop in this.delegatedProperties) {
-          return this.objects[0] && this.objects[0].get(prop);
+          return this._objects[0] && this._objects[0].get(prop);
         }
         return this[prop];
       }
