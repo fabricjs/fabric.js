@@ -47,14 +47,8 @@
   /** @private */
   function request_fs(url, callback){
     var fs = require('fs'),
-    stream = fs.createReadStream(url),
-    body = '';
-    stream.on('data', function(chunk){
-        body += chunk;
-    });
-    stream.on('end', function(){
-      callback(body);
-    });
+    body = fs.readFileSync(url);
+    callback(body);
   }
 
   fabric.util.loadImage = function(url, callback, context) {
