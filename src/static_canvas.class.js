@@ -767,7 +767,7 @@
 
       this.renderAll(true);
 
-      var data = this.toDataURL(format, quality);
+      var data = this.__toDataURL(format, quality);
 
       ctx.scale(1 / multiplier,  1 / multiplier);
       this.setWidth(origWidth).setHeight(origHeight);
