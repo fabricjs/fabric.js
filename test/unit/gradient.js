@@ -10,10 +10,10 @@
         x2: 100,
         y2: 200,
       },
-      colorStops: {
-        '0': 'red',
-        '1': 'green'
-      }
+      colorStops: [
+        { offset: 0, color: 'red' },
+        { offset: 1, color: 'green' }
+      ]
     });
   }
 
@@ -32,8 +32,11 @@
     equal(gradient.coords.x2, 100);
     equal(gradient.coords.y2, 200);
 
-    equal(gradient.colorStops['0'], 'red');
-    equal(gradient.colorStops['1'], 'green');
+    equal(gradient.colorStops[0].offset, 0);
+    equal(gradient.colorStops[0].color, 'red');
+
+    equal(gradient.colorStops[1].offset, 1);
+    equal(gradient.colorStops[1].color, 'green');
   });
 
   test('toObject', function() {
@@ -105,11 +108,11 @@
         x2: 20,
         y2: 20,
       },
-      colorStops: {
-        '0': 'red',
-        '0.5': 'green',
-        '1': 'blue'
-      }
+      colorStops: [
+        { offset: 0, color: 'red' },
+        { offset: 0.5, color: 'green' },
+        { offset: 1, color: 'blue' }
+      ]
     });
 
     ok(gradient instanceof fabric.Gradient);

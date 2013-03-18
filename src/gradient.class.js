@@ -82,7 +82,7 @@
 
       this.coords = coords;
       this.gradientUnits = options.gradientUnits || 'objectBoundingBox';
-      this.colorStops = fabric.util.object.clone(options.colorStops);
+      this.colorStops = options.colorStops.slice();
     },
 
     /**
