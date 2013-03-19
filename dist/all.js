@@ -8849,6 +8849,7 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
             target: this._currentTransform.target,
             e: e
           });
+          this._currentTransform.target.fire('scaling', { e: e });
         }
         // else if (this._currentTransform.action === 'scale') {
         //   this._scaleObject(x, y);
