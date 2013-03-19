@@ -9412,14 +9412,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
     originY:                  'center',
 
     /**
-     * Top position of an object
+     * Top position of an object. Note that by default it's relative to object center. You can change this by setting originY={top/center/bottom}
      * @property
      * @type Number
      */
     top:                      0,
 
     /**
-     * Left position of an object
+     * Left position of an object. Note that by default it's relative to object center. You can change this by setting originX={left/center/right}
      * @property
      * @type Number
      */
@@ -14202,6 +14202,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
      * @param {CanvasRenderingContext2D} ctx context to render instance on
      */
     render: function(ctx, noTransform) {
+      // do not render if object is not visible
+      if (!this.visible) return;
+
       ctx.save();
       this.transform(ctx);
 
@@ -14215,6 +14218,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
         var object = this._objects[i-1],
             originalScaleFactor = object.borderScaleFactor,
             originalHasRotatingPoint = object.hasRotatingPoint;
+
+        // do not render if object is not visible
+        if (!object.visible) continue;
 
         object.borderScaleFactor = groupScaleFactor;
         object.hasRotatingPoint = false;
