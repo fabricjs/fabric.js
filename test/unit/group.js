@@ -144,6 +144,7 @@
       'transparentCorners': true,
       'perPixelTargetFind': false,
       'shadow': null,
+      'visible': true,
       'angle': 0,
       'flipX': false,
       'flipY': false,
@@ -290,7 +291,7 @@
     var group = makeGroupWith2Objects();
     ok(typeof group.toSVG == 'function');
 
-    var expectedSVG = '<g transform="translate(80 117.5)"><rect x="-15" y="-5" rx="0" ry="0" width="30" height="10" style="stroke: none; stroke-width: 1; stroke-dasharray: ; fill: rgb(0,0,0); opacity: 1;" transform="translate(20 -17.5)" /><rect x="-5" y="-20" rx="0" ry="0" width="10" height="40" style="stroke: none; stroke-width: 1; stroke-dasharray: ; fill: rgb(0,0,0); opacity: 1;" transform="translate(-30 2.5)" /></g>';
+    var expectedSVG = '<g transform="translate(80 117.5)"><rect x="-5" y="-20" rx="0" ry="0" width="10" height="40" style="stroke: none; stroke-width: 1; stroke-dasharray: ; fill: rgb(0,0,0); opacity: 1;" transform="translate(-30 2.5)"/><rect x="-15" y="-5" rx="0" ry="0" width="30" height="10" style="stroke: none; stroke-width: 1; stroke-dasharray: ; fill: rgb(0,0,0); opacity: 1;" transform="translate(20 -17.5)"/></g>';
     equal(group.toSVG(), expectedSVG);
   });
 
@@ -310,21 +311,60 @@
 
     equal(group.get('lockMovementX'), false);
 
-    group.objects[0].lockMovementX = true;
+    group.getObjects()[0].lockMovementX = true;
     equal(group.get('lockMovementX'), true);
 
-    group.objects[0].lockMovementX = false;
+    group.getObjects()[0].lockMovementX = false;
     equal(group.get('lockMovementX'), false);
 
     group.set('lockMovementX', true);
     equal(group.get('lockMovementX'), true);
 
     group.set('lockMovementX', false);
-    group.objects[0].lockMovementY = true;
-    group.objects[1].lockRotation = true;
+    group.getObjects()[0].lockMovementY = true;
+    group.getObjects()[1].lockRotation = true;
 
     equal(group.get('lockMovementY'), true);
     equal(group.get('lockRotation'), true);
+  });
+
+  test('z-index methods with group objects', function() {
+
+    var textBg = new fabric.Rect({
+      fill : '#abc',
+      width : 100,
+      height : 100
+    });
+
+    var text = new fabric.Text('text');
+    var group = new fabric.Group([ textBg, text ]);
+
+    canvas.add(group);
+
+    ok(group.getObjects()[0] === textBg);
+    ok(group.getObjects()[1] === text);
+
+    textBg.bringToFront();
+
+    ok(group.getObjects()[0] === text);
+    ok(group.getObjects()[1] === textBg);
+
+    textBg.sendToBack();
+
+    ok(group.getObjects()[0] === textBg);
+    ok(group.getObjects()[1] === text);
+  });
+
+  test('group reference on an object', function() {
+    var group = makeGroupWith2Objects();
+    var firstObjInGroup = group.getObjects()[0];
+    var secondObjInGroup = group.getObjects()[1];
+
+    equal(firstObjInGroup.group, group);
+    equal(secondObjInGroup.group, group);
+
+    group.remove(firstObjInGroup);
+    ok(typeof firstObjInGroup.group == 'undefined');
   });
 
   // asyncTest('cloning group with image', function() {

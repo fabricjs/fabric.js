@@ -49,9 +49,12 @@
     initialize: function(objects, options) {
       options = options || { };
 
-      this.objects = objects || [];
-      this.originalState = { };
+      this._objects = objects || [];
+      for (var i = this._objects.length; i--; ) {
+        this._objects[i].group = this;
+      }
 
+      this.originalState = { };
       this.callSuper('initialize');
 
       this._calcBounds();
@@ -91,7 +94,8 @@
         object.setCoords();
 
         // do not display corners of objects enclosed in a group
-        object.hideCorners = true;
+        object.__origHasControls = object.hasControls;
+        object.hasControls = false;
       }, this);
     },
 
@@ -110,7 +114,7 @@
      * @return {Array} group objects
      */
     getObjects: function() {
-      return this.objects;
+      return this._objects;
     },
 
     /**
@@ -122,7 +126,8 @@
      */
     addWithUpdate: function(object) {
       this._restoreObjectsState();
-      this.objects.push(object);
+      this._objects.push(object);
+      object.group = this;
       this._calcBounds();
       this._updateObjectsCoords();
       return this;
@@ -137,7 +142,8 @@
      */
     removeWithUpdate: function(object) {
       this._restoreObjectsState();
-      removeFromArray(this.objects, object);
+      removeFromArray(this._objects, object);
+      delete object.group;
       object.setActive(false);
       this._calcBounds();
       this._updateObjectsCoords();
@@ -152,7 +158,8 @@
      * @chainable
      */
     add: function(object) {
-      this.objects.push(object);
+      this._objects.push(object);
+      object.group = this;
       return this;
     },
 
@@ -164,7 +171,8 @@
      * @chainable
      */
     remove: function(object) {
-      removeFromArray(this.objects, object);
+      removeFromArray(this._objects, object);
+      delete object.group;
       return this;
     },
 
@@ -177,6 +185,8 @@
     },
 
     /**
+     * @param delegatedProperties
+     * @type Object
      * Properties that are delegated to group objects when reading/writing
      */
     delegatedProperties: {
@@ -184,9 +194,12 @@
       opacity:          true,
       fontFamily:       true,
       fontWeight:       true,
+      fontSize:         true,
+      fontStyle:        true,
       lineHeight:       true,
       textDecoration:   true,
       textShadow:       true,
+      textAlign:        true,
       backgroundColor:  true
     },
 
@@ -195,10 +208,10 @@
      */
     _set: function(key, value) {
       if (key in this.delegatedProperties) {
-        var i = this.objects.length;
+        var i = this._objects.length;
         this[key] = value;
         while (i--) {
-          this.objects[i].set(key, value);
+          this._objects[i].set(key, value);
         }
       }
       else {
@@ -213,7 +226,7 @@
      * @return {Boolean} `true` if group contains an object
      */
     contains: function(object) {
-      return this.objects.indexOf(object) > -1;
+      return this._objects.indexOf(object) > -1;
     },
 
     /**
@@ -224,7 +237,7 @@
      */
     toObject: function(propertiesToInclude) {
       return extend(this.callSuper('toObject', propertiesToInclude), {
-        objects: invoke(this.objects, 'toObject', propertiesToInclude)
+        objects: invoke(this._objects, 'toObject', propertiesToInclude)
       });
     },
 
@@ -234,17 +247,25 @@
      * @param {CanvasRenderingContext2D} ctx context to render instance on
      */
     render: function(ctx, noTransform) {
+      // do not render if object is not visible
+      if (!this.visible) return;
+
       ctx.save();
       this.transform(ctx);
 
       var groupScaleFactor = Math.max(this.scaleX, this.scaleY);
 
-      //The array is now sorted in order of highest first, so start from end.
-      for (var i = this.objects.length; i > 0; i--) {
+      this.clipTo && fabric.util.clipContext(this, ctx);
 
-        var object = this.objects[i-1],
+      //The array is now sorted in order of highest first, so start from end.
+      for (var i = this._objects.length; i > 0; i--) {
+
+        var object = this._objects[i-1],
             originalScaleFactor = object.borderScaleFactor,
             originalHasRotatingPoint = object.hasRotatingPoint;
+
+        // do not render if object is not visible
+        if (!object.visible) continue;
 
         object.borderScaleFactor = groupScaleFactor;
         object.hasRotatingPoint = false;
@@ -254,10 +275,11 @@
         object.borderScaleFactor = originalScaleFactor;
         object.hasRotatingPoint = originalHasRotatingPoint;
       }
+      this.clipTo && ctx.restore();
 
       if (!noTransform && this.active) {
         this.drawBorders(ctx);
-        this.hideCorners || this.drawCorners(ctx);
+        this.drawControls(ctx);
       }
       ctx.restore();
       this.setCoords();
@@ -293,7 +315,7 @@
      * @chainable
      */
     _restoreObjectsState: function() {
-      this.objects.forEach(this._restoreObjectState, this);
+      this._objects.forEach(this._restoreObjectState, this);
       return this;
     },
 
@@ -321,9 +343,11 @@
       object.set('scaleY', object.get('scaleY') * this.get('scaleY'));
 
       object.setCoords();
-      object.hideCorners = false;
+      object.hasControls = object.__origHasControls;
+      delete object.__origHasControls;
       object.setActive(false);
       object.setCoords();
+      delete object.group;
 
       return this;
     },
@@ -429,10 +453,10 @@
           aY = [],
           minX, minY, maxX, maxY, o, width, height,
           i = 0,
-          len = this.objects.length;
+          len = this._objects.length;
 
       for (; i < len; ++i) {
-        o = this.objects[i];
+        o = this._objects[i];
         o.setCoords();
         for (var prop in o.oCoords) {
           aX.push(o.oCoords[prop].x);
@@ -481,9 +505,9 @@
      * @chainable
      */
     toGrayscale: function() {
-      var i = this.objects.length;
+      var i = this._objects.length;
       while (i--) {
-        this.objects[i].toGrayscale();
+        this._objects[i].toGrayscale();
       }
       return this;
     },
@@ -495,8 +519,8 @@
      */
     toSVG: function() {
       var objectsMarkup = [ ];
-      for (var i = 0, len = this.objects.length; i < len; i++) {
-        objectsMarkup.push(this.objects[i].toSVG());
+      for (var i = this._objects.length; i--; ) {
+        objectsMarkup.push(this._objects[i].toSVG());
       }
 
       return (
@@ -517,8 +541,8 @@
           return this[prop];
         }
         else {
-          for (var i = 0, len = this.objects.length; i < len; i++) {
-            if (this.objects[i][prop]) {
+          for (var i = 0, len = this._objects.length; i < len; i++) {
+            if (this._objects[i][prop]) {
               return true;
             }
           }
@@ -526,6 +550,9 @@
         }
       }
       else {
+        if (prop in this.delegatedProperties) {
+          return this._objects[0] && this._objects[0].get(prop);
+        }
         return this[prop];
       }
     }

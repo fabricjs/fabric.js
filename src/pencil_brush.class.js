@@ -187,7 +187,7 @@
      * @param {Array} points Array of points
      * @return {String} SVG path
      */
-    convertPointsToSVGPath: function(points, minX, maxX, minY, maxY) {
+    convertPointsToSVGPath: function(points, minX, maxX, minY) {
       var path = [];
       var p1 = new fabric.Point(points[0].x - minX, points[0].y - minY);
       var p2 = new fabric.Point(points[1].x - minX, points[1].y - minY);

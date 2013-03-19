@@ -88,7 +88,8 @@
       result[i] = [xc, yc, th2, th3, rx, ry, sin_th, cos_th];
     }
 
-    return (arcToSegmentsCache[argsString] = result);
+    arcToSegmentsCache[argsString] = result;
+    return result;
   }
 
   function segmentToBezier(cx, cy, th0, th1, rx, ry, sin_th, cos_th) {
@@ -111,11 +112,13 @@
     var x2 = x3 + t * Math.sin(th1);
     var y2 = y3 - t * Math.cos(th1);
 
-    return (segmentToBezierCache[argsString] = [
+    segmentToBezierCache[argsString] = [
       a00 * x1 + a01 * y1,      a10 * x1 + a11 * y1,
       a00 * x2 + a01 * y2,      a10 * x2 + a11 * y2,
       a00 * x3 + a01 * y3,      a10 * x3 + a11 * y3
-    ]);
+    ];
+
+    return segmentToBezierCache[argsString];
   }
 
   "use strict";
@@ -553,14 +556,17 @@
           ? this.stroke.toLive(ctx)
           : this.stroke;
       }
-      ctx.beginPath();
-
       this._setShadow(ctx);
+      this.clipTo && fabric.util.clipContext(this, ctx);
+
+      ctx.beginPath();
       this._render(ctx);
 
       if (this.fill) {
         ctx.fill();
       }
+
+      this.clipTo && ctx.restore();
       if (this.shadow && !this.shadow.affectStroke) {
         this._removeShadow(ctx);
       }
@@ -575,7 +581,7 @@
 
       if (!noTransform && this.active) {
         this.drawBorders(ctx);
-        this.hideCorners || this.drawCorners(ctx);
+        this.drawControls(ctx);
       }
       ctx.restore();
     },
@@ -630,21 +636,33 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function() {
-      var chunks = [];
+      var chunks = [],
+          markup = [];
+
       for (var i = 0, len = this.path.length; i < len; i++) {
         chunks.push(this.path[i].join(' '));
       }
       var path = chunks.join(' ');
 
-      return [
+      if (this.fill && this.fill.toLive) {
+        markup.push(this.fill.toSVG(this, true));
+      }
+      if (this.stroke && this.stroke.toLive) {
+        markup.push(this.stroke.toSVG(this, true));
+      }
+
+      markup.push(
         '<g transform="', (this.group ? '' : this.getSvgTransform()), '">',
           '<path ',
-            'width="', this.width, '" height="', this.height, '" ',
-            'd="', path, '" ',
-            'style="', this.getSvgStyles(), '" ',
-            'transform="translate(', (-this.width / 2), ' ', (-this.height/2), ')" />',
+            'd="', path,
+            '" style="', this.getSvgStyles(),
+            '" transform="translate(', (-this.width / 2), ' ', (-this.height/2), ')',
+            '" stroke-linecap="round" ',
+          '/>',
         '</g>'
-      ].join('');
+      );
+
+      return markup.join('');
     },
 
     /**

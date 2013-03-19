@@ -1,5 +1,5 @@
 (function(){
-  
+
   /**
    * Copies all enumerable properties of one object to another
    * @memberOf fabric.util.object
@@ -25,10 +25,10 @@
     return extend({ }, object);
   }
 
-  /** @namespace fabric.util.object */
+  /** @namespace Object utilities */
   fabric.util.object = {
     extend: extend,
     clone: clone
   };
-  
+
 })();

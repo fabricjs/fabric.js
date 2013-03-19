@@ -111,11 +111,13 @@
   test('toJSON', function() {
     var emptyObjectJSON = '{"type":"object","originX":"center","originY":"center","left":0,"top":0,"width":0,"height":0,"fill":"rgb(0,0,0)",'+
                           '"overlayFill":null,"stroke":null,"strokeWidth":1,"strokeDashArray":null,"scaleX":1,"scaleY":1,"angle":0,'+
-                          '"flipX":false,"flipY":false,"opacity":1,"selectable":true,"hasControls":true,"hasBorders":true,"hasRotatingPoint":true,"transparentCorners":true,"perPixelTargetFind":false,"shadow":null}';
+                          '"flipX":false,"flipY":false,"opacity":1,"selectable":true,"hasControls":true,"hasBorders":true,"hasRotatingPoint":true,'+
+                          '"transparentCorners":true,"perPixelTargetFind":false,"shadow":null,"visible":true}';
 
     var augmentedJSON = '{"type":"object","originX":"center","originY":"center","left":0,"top":0,"width":122,"height":0,"fill":"rgb(0,0,0)",'+
                         '"overlayFill":null,"stroke":null,"strokeWidth":1,"strokeDashArray":null,"scaleX":1.3,"scaleY":1,"angle":0,'+
-                        '"flipX":false,"flipY":true,"opacity":0.88,"selectable":true,"hasControls":true,"hasBorders":true,"hasRotatingPoint":true,"transparentCorners":true,"perPixelTargetFind":false,"shadow":null}';
+                        '"flipX":false,"flipY":true,"opacity":0.88,"selectable":true,"hasControls":true,"hasBorders":true,"hasRotatingPoint":true,'+
+                        '"transparentCorners":true,"perPixelTargetFind":false,"shadow":null,"visible":true}';
 
     var cObj = new fabric.Object();
     ok(typeof cObj.toJSON == 'function');
@@ -151,7 +153,8 @@
       'hasRotatingPoint': true,
       'transparentCorners': true,
       'perPixelTargetFind': false,
-      'shadow': null
+      'shadow': null,
+      'visible': true
     };
 
     var augmentedObjectRepr = {
@@ -179,7 +182,8 @@
       'hasRotatingPoint': true,
       'transparentCorners': true,
       'perPixelTargetFind': false,
-      'shadow': null
+      'shadow': null,
+      'visible': true
     };
 
     var cObj = new fabric.Object();
@@ -392,7 +396,7 @@
     equal(cObj.drawBorders(dummyContext), cObj, 'chainable');
   });
 
-  test('drawCorners', function() {
+  test('drawControls', function() {
     var cObj = new fabric.Object(), canvas = fabric.document.createElement('canvas');
 
     //let excanvas kick in for IE8 and lower
@@ -400,8 +404,8 @@
         G_vmlCanvasManager.initElement(canvas)
     }
     var dummyContext = canvas.getContext('2d');
-    ok(typeof cObj.drawCorners == 'function');
-    equal(cObj.drawCorners(dummyContext), cObj, 'chainable');
+    ok(typeof cObj.drawControls == 'function');
+    equal(cObj.drawControls(dummyContext), cObj, 'chainable');
   });
 
   test('clone', function() {
@@ -790,27 +794,31 @@
   test('gradient serialization', function() {
     var object = new fabric.Object();
 
-    object.fill = new fabric.Gradient({
+    object.setGradient('fill', {
       x1: 0,
       y1: 0,
       x2: 100,
       y2: 100,
       colorStops: {
-        '0': 'red',
-        '1': 'green'
+        '0': 'rgb(255,0,0)',
+        '1': 'rgb(0,128,0)'
       }
     });
 
     ok(typeof object.toObject().fill == 'object');
 
-    equal(object.toObject().fill.x1, 0);
-    equal(object.toObject().fill.y1, 0);
+    equal(object.toObject().fill.type, 'linear');
 
-    equal(object.toObject().fill.x2, 100);
-    equal(object.toObject().fill.y2, 100);
+    equal(object.toObject().fill.coords.x1, 0);
+    equal(object.toObject().fill.coords.y1, 0);
 
-    equal(object.toObject().fill.colorStops['0'], 'red');
-    equal(object.toObject().fill.colorStops['1'], 'green');
+    equal(object.toObject().fill.coords.x2, 100);
+    equal(object.toObject().fill.coords.y2, 100);
+
+    equal(object.toObject().fill.colorStops[0].offset, 0);
+    equal(object.toObject().fill.colorStops[1].offset, 1);
+    equal(object.toObject().fill.colorStops[0].color, 'rgb(255,0,0)');
+    equal(object.toObject().fill.colorStops[1].color, 'rgb(0,128,0)');
   });
 
   test('setShadow', function() {

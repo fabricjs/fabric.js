@@ -85,6 +85,7 @@
       'transparentCorners': true,
       'perPixelTargetFind': false,
       'shadow': null,
+      'visible': true,
       'radius': 0
     };
     ok(typeof circle.toObject == 'function');

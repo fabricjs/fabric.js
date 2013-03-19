@@ -117,7 +117,7 @@
     clipTo: null,
 
     /**
-     * Indicates whether object controls (borders/corners) are rendered above overlay image
+     * Indicates whether object controls (borders/controls) are rendered above overlay image
      * @property
      * @type Boolean
      */
@@ -228,7 +228,7 @@
         fabric.util.loadImage(backgroundColor.source, function(img) {
           _this.backgroundColor = new fabric.Pattern({
             source: img,
-            pattern: backgroundColor.pattern
+            repeat: backgroundColor.repeat
           });
           callback && callback();
         });
@@ -429,11 +429,11 @@
       if (!object) return;
 
       if (this.controlsAboveOverlay) {
-        var hasBorders = object.hasBorders, hasCorners = object.hasCorners;
-        object.hasBorders = object.hasCorners = false;
+        var hasBorders = object.hasBorders, hasControls = object.hasControls;
+        object.hasBorders = object.hasControls = false;
         object.render(ctx);
         object.hasBorders = hasBorders;
-        object.hasCorners = hasCorners;
+        object.hasControls = hasControls;
       }
       else {
         object.render(ctx);
@@ -563,7 +563,7 @@
       this.fire('before:render');
 
       if (this.clipTo) {
-        this._clipCanvas(canvasToDrawOn);
+        fabric.util.clipCanvas(this, canvasToDrawOn);
       }
 
       if (this.backgroundColor) {
@@ -618,17 +618,6 @@
 
     /**
      * @private
-     * @method _clipCanvas
-     */
-    _clipCanvas: function(canvasToDrawOn) {
-      canvasToDrawOn.save();
-      canvasToDrawOn.beginPath();
-      this.clipTo(canvasToDrawOn);
-      canvasToDrawOn.clip();
-    },
-
-    /**
-     * @private
      * @method _drawBackroundImage
      */
     _drawBackroundImage: function(canvasToDrawOn) {
@@ -661,7 +650,7 @@
       }
 
       // delegate rendering to group selection if one exists
-      // used for drawing selection borders/corners
+      // used for drawing selection borders/controls
       var activeGroup = this.getActiveGroup();
       if (activeGroup) {
         activeGroup.render(ctx);
@@ -677,7 +666,7 @@
     },
 
     /**
-     * Draws objects' controls (borders/corners)
+     * Draws objects' controls (borders/controls)
      * @method drawControls
      * @param {Object} ctx context to render controls on
      */
@@ -686,7 +675,7 @@
       if (activeGroup) {
         ctx.save();
         fabric.Group.prototype.transform.call(activeGroup, ctx);
-        activeGroup.drawBorders(ctx).drawCorners(ctx);
+        activeGroup.drawBorders(ctx).drawControls(ctx);
         ctx.restore();
       }
       else {
@@ -695,7 +684,7 @@
 
           ctx.save();
           fabric.Object.prototype.transform.call(this._objects[i], ctx);
-          this._objects[i].drawBorders(ctx).drawCorners(ctx);
+          this._objects[i].drawBorders(ctx).drawControls(ctx);
           ctx.restore();
 
           this.lastRenderedObjectWithControlsAboveOverlay = this._objects[i];
@@ -706,17 +695,39 @@
     /**
      * Exports canvas element to a dataurl image.
      * @method toDataURL
-     * @param {String} format the format of the output image. Either "jpeg" or "png".
-     * @param {Number} quality quality level (0..1)
+     * @param {Object} options
+     *
+     *  `format` the format of the output image. Either "jpeg" or "png".
+     *  `quality` quality level (0..1)
+     *  `multiplier` multiplier to scale by {Number}
+     *
      * @return {String}
      */
-    toDataURL: function (format, quality) {
-      var canvasEl = this.upperCanvasEl || this.lowerCanvasEl;
+    toDataURL: function (options) {
+      options || (options = { });
 
+      var format = options.format || 'png',
+          quality = options.quality || 1,
+          multiplier = options.multiplier || 1;
+
+      if (multiplier !== 1) {
+        return this.__toDataURLWithMultiplier(format, quality, multiplier);
+      }
+      else {
+        return this.__toDataURL(format, quality);
+      }
+    },
+
+    /**
+     * @method _toDataURL
+     * @private
+     */
+    __toDataURL: function(format, quality) {
       this.renderAll(true);
+      var canvasEl = this.upperCanvasEl || this.lowerCanvasEl;
       var data = (fabric.StaticCanvas.supports('toDataURLWithQuality'))
-                   ? canvasEl.toDataURL('image/' + format, quality)
-                   : canvasEl.toDataURL('image/' + format);
+                ? canvasEl.toDataURL('image/' + format, quality)
+                : canvasEl.toDataURL('image/' + format);
 
       this.contextTop && this.clearContext(this.contextTop);
       this.renderAll();
@@ -724,14 +735,10 @@
     },
 
     /**
-     * Exports canvas element to a dataurl image (allowing to change image size via multiplier).
-     * @method toDataURLWithMultiplier
-     * @param {String} format (png|jpeg)
-     * @param {Number} multiplier
-     * @param {Number} quality (0..1)
-     * @return {String}
+     * @method _toDataURLWithMultiplier
+     * @private
      */
-    toDataURLWithMultiplier: function (format, multiplier, quality) {
+    __toDataURLWithMultiplier: function(format, quality, multiplier) {
 
       var origWidth = this.getWidth(),
           origHeight = this.getHeight(),
@@ -747,7 +754,7 @@
 
       if (activeGroup) {
         // not removing group due to complications with restoring it with correct state afterwords
-        this._tempRemoveBordersCornersFromGroup(activeGroup);
+        this._tempRemoveBordersControlsFromGroup(activeGroup);
       }
       else if (activeObject && this.deactivateAll) {
         this.deactivateAll();
@@ -760,13 +767,13 @@
 
       this.renderAll(true);
 
-      var dataURL = this.toDataURL(format, quality);
+      var data = this.__toDataURL(format, quality);
 
       ctx.scale(1 / multiplier,  1 / multiplier);
       this.setWidth(origWidth).setHeight(origHeight);
 
       if (activeGroup) {
-        this._restoreBordersCornersOnGroup(activeGroup);
+        this._restoreBordersControlsOnGroup(activeGroup);
       }
       else if (activeObject && this.setActiveObject) {
         this.setActiveObject(activeObject);
@@ -775,18 +782,35 @@
       this.contextTop && this.clearContext(this.contextTop);
       this.renderAll();
 
-      return dataURL;
+      return data;
+    },
+
+    /**
+     * Exports canvas element to a dataurl image (allowing to change image size via multiplier).
+     * @deprecated since 1.0.13
+     * @method toDataURLWithMultiplier
+     * @param {String} format (png|jpeg)
+     * @param {Number} multiplier
+     * @param {Number} quality (0..1)
+     * @return {String}
+     */
+    toDataURLWithMultiplier: function (format, multiplier, quality) {
+      return this.toDataURL({
+        format: format,
+        multiplier: multiplier,
+        quality: quality
+      });
     },
 
     /**
      * @private
-     * @method _tempRemoveBordersCornersFromGroup
+     * @method _tempRemoveBordersControlsFromGroup
      */
-    _tempRemoveBordersCornersFromGroup: function(group) {
-      group.origHideCorners = group.hideCorners;
+    _tempRemoveBordersControlsFromGroup: function(group) {
+      group.origHasControls = group.hasControls;
       group.origBorderColor = group.borderColor;
 
-      group.hideCorners = true;
+      group.hasControls = true;
       group.borderColor = 'rgba(0,0,0,0)';
 
       group.forEachObject(function(o) {
@@ -797,10 +821,10 @@
 
     /**
      * @private
-     * @method _restoreBordersCornersOnGroup
+     * @method _restoreBordersControlsOnGroup
      */
-    _restoreBordersCornersOnGroup: function(group) {
-      group.hideCorners = group.origHideCorners;
+    _restoreBordersControlsOnGroup: function(group) {
+      group.hideControls = group.origHideControls;
       group.borderColor = group.origBorderColor;
 
       group.forEachObject(function(o) {
@@ -940,8 +964,8 @@
       if (!options.suppressPreamble) {
         markup.push(
           '<?xml version="1.0" standalone="no" ?>',
-            '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN" ',
-              '"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">'
+            '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" ',
+              '"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">'
         );
       }
       markup.push(
@@ -951,16 +975,27 @@
             'version="1.1" ',
             'width="', this.width, '" ',
             'height="', this.height, '" ',
+            (this.backgroundColor && !this.backgroundColor.source) ? 'style="background-color: ' + this.backgroundColor +'" ' : null,
             'xml:space="preserve">',
           '<desc>Created with Fabric.js ', fabric.version, '</desc>',
-          fabric.createSVGFontFacesMarkup(this.getObjects())
+          '<defs>', fabric.createSVGFontFacesMarkup(this.getObjects()), fabric.createSVGRefElementsMarkup(this), '</defs>'
       );
+
+      if (this.backgroundColor && this.backgroundColor.source) {
+        markup.push(
+          '<rect x="0" y="0" ',
+            'width="', (this.backgroundColor.repeat === 'repeat-y' || this.backgroundColor.repeat === 'no-repeat' ? this.backgroundColor.source.width : this.width),
+            '" height="', (this.backgroundColor.repeat === 'repeat-x' || this.backgroundColor.repeat === 'no-repeat' ? this.backgroundColor.source.height : this.height),
+            '" fill="url(#backgroundColorPattern)"',
+          '></rect>'
+        );
+      }
 
       if (this.backgroundImage) {
         markup.push(
           '<image x="0" y="0" ',
-            'width="', this.width,
-            '" height="', this.height,
+            'width="', (this.backgroundImageStretch ? this.width : this.backgroundImage.width),
+            '" height="', (this.backgroundImageStretch ? this.height : this.backgroundImage.height),
             '" preserveAspectRatio="', (this.backgroundImageStretch ? 'none' : 'defer'),
             '" xlink:href="', this.backgroundImage.src,
             '" style="opacity:', this.backgroundImageOpacity,
@@ -1033,7 +1068,7 @@
     sendToBack: function (object) {
       removeFromArray(this._objects, object);
       this._objects.unshift(object);
-      return this.renderAll();
+      return this.renderAll && this.renderAll();
     },
 
     /**
@@ -1046,7 +1081,7 @@
     bringToFront: function (object) {
       removeFromArray(this._objects, object);
       this._objects.push(object);
-      return this.renderAll();
+      return this.renderAll && this.renderAll();
     },
 
     /**
@@ -1078,7 +1113,7 @@
         removeFromArray(this._objects, object);
         this._objects.splice(nextIntersectingIdx, 0, object);
       }
-      return this.renderAll();
+      return this.renderAll && this.renderAll();
     },
 
     /**
@@ -1112,7 +1147,7 @@
         removeFromArray(objects, object);
         objects.splice(nextIntersectingIdx, 0, object);
       }
-      this.renderAll();
+      return this.renderAll && this.renderAll();
     },
 
     /**
@@ -1280,6 +1315,7 @@
    * Returs JSON representation of canvas
    * @function
    * @method toJSON
+   * @param {Array} propertiesToInclude
    * @return {String} json string
    */
   fabric.StaticCanvas.prototype.toJSON = fabric.StaticCanvas.prototype.toObject;

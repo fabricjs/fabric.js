@@ -26,6 +26,20 @@
     type: 'ellipse',
 
     /**
+     * Horizontal radius
+     * @property
+     * @type Number
+     */
+    rx: 0,
+
+    /**
+     * Vertical radius
+     * @property
+     * @type Number
+     */
+    ry: 0,
+
+    /**
      * Constructor
      * @method initialize
      * @param {Object} [options] Options object
@@ -62,14 +76,25 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function() {
-      return [
+      var markup = [];
+
+      if (this.fill && this.fill.toLive) {
+        markup.push(this.fill.toSVG(this, false));
+      }
+      if (this.stroke && this.stroke.toLive) {
+        markup.push(this.stroke.toSVG(this, false));
+      }
+
+      markup.push(
         '<ellipse ',
-          'rx="', this.get('rx'), '" ',
-          'ry="', this.get('ry'), '" ',
-          'style="', this.getSvgStyles(), '" ',
-          'transform="', this.getSvgTransform(), '" ',
-        '/>'
-      ].join('');
+          'rx="', this.get('rx'),
+          '" ry="', this.get('ry'),
+          '" style="', this.getSvgStyles(),
+          '" transform="', this.getSvgTransform(),
+        '"/>'
+      );
+
+      return markup.join('');
     },
 
     /**

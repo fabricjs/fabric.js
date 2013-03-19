@@ -51,6 +51,7 @@ fabric.Observable = {
 
   /**
    * Fires event with an optional options object
+   * @deprecated since 1.0.7
    * @method fire
    * @param {String} eventName
    * @param {Object} [options]
@@ -81,3 +82,10 @@ fabric.Observable.on = fabric.Observable.observe;
  * @type function
  */
 fabric.Observable.off = fabric.Observable.stopObserving;
+
+/**
+ * Alias for fire
+ * @method trigger
+ * @type function
+ */
+fabric.Observable.trigger = fabric.Observable.fire;

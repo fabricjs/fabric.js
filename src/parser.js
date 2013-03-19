@@ -695,13 +695,37 @@
 
     if (markup) {
       markup = [
-        '<defs>',
-          '<style type="text/css">',
-            '<![CDATA[',
-              markup,
-            ']]>',
-          '</style>',
-        '</defs>'
+        '<style type="text/css">',
+          '<![CDATA[',
+            markup,
+          ']]>',
+        '</style>'
+      ].join('');
+    }
+
+    return markup;
+  }
+
+  /**
+   * Creates markup containing SVG referenced elements like patterns, gradients etc.
+   * @method createSVGRefElementsMarkup
+   * @param {fabric.Canvas} canvas instance of fabric.Canvas
+   * @return {String}
+   */
+  function createSVGRefElementsMarkup(canvas) {
+    var markup = '';
+
+    if (canvas.backgroundColor && canvas.backgroundColor.source) {
+      markup = [
+        '<pattern x="0" y="0" id="backgroundColorPattern" ',
+          'width="', canvas.backgroundColor.source.width,
+          '" height="', canvas.backgroundColor.source.height,
+          '" patternUnits="userSpaceOnUse">',
+        '<image x="0" y="0" ',
+        'width="', canvas.backgroundColor.source.width,
+        '" height="', canvas.backgroundColor.source.height,
+        '" xlink:href="', canvas.backgroundColor.source.src,
+        '"></image></pattern>'
       ].join('');
     }
 
@@ -710,16 +734,17 @@
 
   extend(fabric, {
 
-    parseAttributes:          parseAttributes,
-    parseElements:            parseElements,
-    parseStyleAttribute:      parseStyleAttribute,
-    parsePointsAttribute:     parsePointsAttribute,
-    getCSSRules:              getCSSRules,
+    parseAttributes:            parseAttributes,
+    parseElements:              parseElements,
+    parseStyleAttribute:        parseStyleAttribute,
+    parsePointsAttribute:       parsePointsAttribute,
+    getCSSRules:                getCSSRules,
 
-    loadSVGFromURL:           loadSVGFromURL,
-    loadSVGFromString:        loadSVGFromString,
+    loadSVGFromURL:             loadSVGFromURL,
+    loadSVGFromString:          loadSVGFromString,
 
-    createSVGFontFacesMarkup: createSVGFontFacesMarkup
+    createSVGFontFacesMarkup:   createSVGFontFacesMarkup,
+    createSVGRefElementsMarkup: createSVGRefElementsMarkup
   });
 
 })(typeof exports !== 'undefined' ? exports : this);

@@ -12,6 +12,37 @@
     return;
   }
 
+  var dimensionAffectingProps = {
+    fontSize: true,
+    fontWeight: true,
+    fontFamily: true,
+    textDecoration: true,
+    fontStyle: true,
+    lineHeight: true,
+    strokeStyle: true,
+    strokeWidth: true,
+    text: true
+  };
+
+  var stateProperties = fabric.Object.prototype.stateProperties.concat();
+  stateProperties.push(
+    'fontFamily',
+    'fontWeight',
+    'fontSize',
+    'path',
+    'text',
+    'textDecoration',
+    'textShadow',
+    'textAlign',
+    'fontStyle',
+    'lineHeight',
+    'strokeStyle',
+    'strokeWidth',
+    'backgroundColor',
+    'textBackgroundColor',
+    'useNative'
+  );
+
   /**
    * Text class
    * @class Text
@@ -31,7 +62,7 @@
      * @property
      * @type Number
      */
-    fontWeight:           400,
+    fontWeight:           'normal',
 
     /**
      * Font family
@@ -124,6 +155,14 @@
      */
      useNative:           true,
 
+     /**
+      * List of properties to consider when checking if state of an object is changed (fabric.Object#hasStateChanged)
+      * as well as for history (undo/redo) purposes
+      * @property
+      * @type Array
+      */
+     stateProperties:     stateProperties,
+
     /**
      * Constructor
      * @method initialize
@@ -134,7 +173,6 @@
     initialize: function(text, options) {
       options = options || { };
 
-      this._initStateProperties();
       this.text = text;
       this.setOptions(options);
       this._initDimensions();
@@ -148,36 +186,7 @@
      */
     _initDimensions: function() {
       var canvasEl = fabric.util.createCanvasElement();
-
       this._render(canvasEl.getContext('2d'));
-    },
-
-    /**
-     * Creates `stateProperties` list on an instance, and adds `fabric.Text` -specific ones to it
-     * (such as "fontFamily", "fontWeight", etc.)
-     * @private
-     * @method _initStateProperties
-     */
-    _initStateProperties: function() {
-      this.stateProperties = this.stateProperties.concat();
-      this.stateProperties.push(
-        'fontFamily',
-        'fontWeight',
-        'fontSize',
-        'path',
-        'text',
-        'textDecoration',
-        'textShadow',
-        'textAlign',
-        'fontStyle',
-        'lineHeight',
-        'strokeStyle',
-        'strokeWidth',
-        'backgroundColor',
-        'textBackgroundColor',
-        'useNative'
-      );
-      fabric.util.removeFromArray(this.stateProperties, 'width');
     },
 
     /**
@@ -278,10 +287,12 @@
       }
 
       this._setTextShadow(ctx);
+      this.clipTo && fabric.util.clipContext(this, ctx);
       this._renderTextFill(ctx, textLines);
+      this._renderTextStroke(ctx, textLines);
+      this.clipTo && ctx.restore();
       this.textShadow && ctx.restore();
 
-      this._renderTextStroke(ctx, textLines);
       if (this.textAlign !== 'left' && this.textAlign !== 'justify') {
         ctx.restore();
       }
@@ -589,8 +600,9 @@
      */
     _getFontDeclaration: function() {
       return [
-        this.fontStyle,
-        this.fontWeight,
+        // node-canvas needs "weight style", while browsers need "style weight"
+        (fabric.isLikelyNode ? this.fontWeight : this.fontStyle),
+        (fabric.isLikelyNode ? this.fontStyle : this.fontWeight),
         this.fontSize + 'px',
         (fabric.isLikelyNode ? ('"' + this.fontFamily + '"') : this.fontFamily)
       ].join(' ');
@@ -633,7 +645,7 @@
       this._render(ctx);
       if (!noTransform && this.active) {
         this.drawBorders(ctx);
-        this.hideCorners || this.drawCorners(ctx);
+        this.drawControls(ctx);
       }
       ctx.restore();
     },
@@ -838,40 +850,12 @@
     },
 
     /**
-     * Sets fontSize of an instance and updates its coordinates
-     * @method setFontsize
-     * @param {Number} value
-     * @return {fabric.Text} thisArg
-     * @chainable
-     */
-    setFontsize: function(value) {
-      this.set('fontSize', value);
-      this._initDimensions();
-      this.setCoords();
-      return this;
-    },
-
-    /**
      * Returns actual text value of an instance
      * @method getText
      * @return {String}
      */
     getText: function() {
       return this.text;
-    },
-
-    /**
-     * Sets text of an instance, and updates its coordinates
-     * @method setText
-     * @param {String} value
-     * @return {fabric.Text} thisArg
-     * @chainable
-     */
-    setText: function(value) {
-      this.set('text', value);
-      this._initDimensions();
-      this.setCoords();
-      return this;
     },
 
     /**
@@ -887,6 +871,11 @@
         this.path = this.path.replace(/(.*?)([^\/]*)(\.font\.js)/, '$1' + value + '$3');
       }
       this.callSuper('_set', name, value);
+
+      if (name in dimensionAffectingProps) {
+        this._initDimensions();
+        this.setCoords();
+      }
     }
   });
 
@@ -941,5 +930,7 @@
 
     return text;
   };
+
+  fabric.util.createAccessors(fabric.Text);
 
 })(typeof exports !== 'undefined' ? exports : this);

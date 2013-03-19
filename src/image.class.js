@@ -104,12 +104,14 @@
       }
 
       this._setShadow(ctx);
+      this.clipTo && fabric.util.clipContext(this, ctx);
       this._render(ctx);
+      this.clipTo && ctx.restore();
       this._removeShadow(ctx);
 
       if (this.active && !noTransform) {
         this.drawBorders(ctx);
-        this.hideCorners || this.drawCorners(ctx);
+        this.drawControls(ctx);
       }
       ctx.restore();
     },
@@ -403,11 +405,9 @@
    * @return {fabric.Image}
    */
   fabric.Image.fromElement = function(element, callback, options) {
-    options || (options = { });
-
     var parsedAttributes = fabric.parseAttributes(element, fabric.Image.ATTRIBUTE_NAMES);
 
-    fabric.Image.fromURL(parsedAttributes['xlink:href'], callback, extend(parsedAttributes, options));
+    fabric.Image.fromURL(parsedAttributes['xlink:href'], callback, extend((options ? fabric.util.object.clone(options) : { }), parsedAttributes));
   };
 
   /**

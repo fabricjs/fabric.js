@@ -383,12 +383,12 @@
      * Draws corners of an object's bounding box.
      * Requires public properties: width, height, scaleX, scaleY
      * Requires public options: cornerSize, padding
-     * @method drawCorners
+     * @method drawControls
      * @param {CanvasRenderingContext2D} ctx Context to draw on
      * @return {fabric.Object} thisArg
      * @chainable
      */
-    drawCorners: function(ctx) {
+    drawControls: function(ctx) {
       if (!this.hasControls) return;
 
       var size = this.cornerSize,

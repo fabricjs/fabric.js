@@ -33,7 +33,8 @@
     'hasRotatingPoint': true,
     'transparentCorners': true,
     'perPixelTargetFind': false,
-    'shadow': null
+    'shadow': null,
+    'visible': true
   };
 
   QUnit.module('fabric.Polygon');
@@ -83,7 +84,13 @@
     var polygon = fabric.Polygon.fromElement(elPolygon);
 
     ok(polygon instanceof fabric.Polygon);
-    deepEqual(REFERENCE_OBJECT, polygon.toObject());
+
+    var expected = fabric.util.object.extend(
+      fabric.util.object.clone(REFERENCE_OBJECT), {
+        points: [ { x: 10, y: 12 }, { x: 20, y: 22 } ]
+      });
+
+    deepEqual(expected, polygon.toObject());
 
     var elPolygonWithAttrs = fabric.document.createElement('polygon');
     elPolygonWithAttrs.setAttribute('points', '10,10 20,20 30,30 10,10');
@@ -95,10 +102,10 @@
 
     var polygonWithAttrs = fabric.Polygon.fromElement(elPolygonWithAttrs);
     var expectedPoints = [
-      { x: 0, y: 0 },
       { x: 10, y: 10 },
       { x: 20, y: 20 },
-      { x: 0, y: 0 }
+      { x: 30, y: 30 },
+      { x: 10, y: 10 }
     ];
 
     deepEqual(fabric.util.object.extend(REFERENCE_OBJECT, {

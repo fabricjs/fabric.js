@@ -65,6 +65,10 @@
      * @param {CanvasRenderingContext2D} ctx Context to render this instance on
      */
     render: function(ctx) {
+
+      // do not render if object is not visible
+      if (!this.visible) return;
+
       ctx.save();
 
       var m = this.transformMatrix;
@@ -75,14 +79,16 @@
       this.transform(ctx);
 
       this._setShadow(ctx);
+      this.clipTo && fabric.util.clipContext(this, ctx);
       for (var i = 0, l = this.paths.length; i < l; ++i) {
         this.paths[i].render(ctx, true);
       }
+      this.clipTo && ctx.restore();
       this._removeShadow(ctx);
 
       if (this.active) {
         this.drawBorders(ctx);
-        this.hideCorners || this.drawCorners(ctx);
+        this.drawControls(ctx);
       }
       ctx.restore();
     },
@@ -142,8 +148,6 @@
       var objects = this.getObjects();
       var markup = [
         '<g ',
-          'width="', this.width, '" ',
-          'height="', this.height, '" ',
           'style="', this.getSvgStyles(), '" ',
           'transform="', this.getSvgTransform(), '" ',
         '>'

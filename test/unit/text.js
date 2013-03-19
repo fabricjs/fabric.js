@@ -32,9 +32,10 @@
     'transparentCorners': true,
     'perPixelTargetFind': false,
     'shadow':           null,
+    'visible':          true,
     'text':             'x',
     'fontSize':         40,
-    'fontWeight':       400,
+    'fontWeight':       'normal',
     'fontFamily':       'Times New Roman',
     'fontStyle':        '',
     'lineHeight':       1.3,
@@ -106,10 +107,10 @@
     equal(text.get('fill'), '123456');
   });
 
-  test('setFontsize', function(){
+  test('setFontSize', function(){
     var text = createTextObject();
-    ok(typeof text.setFontsize == 'function');
-    equal(text.setFontsize(12), text);
+    ok(typeof text.setFontSize == 'function');
+    equal(text.setFontSize(12), text);
     equal(text.get('fontSize'), 12);
   });
 
@@ -146,7 +147,7 @@
     // temp workaround for text objects not obtaining width under node
     // text.width = 20;
 
-    var expectedObject = fabric.util.object.extend(REFERENCE_TEXT_OBJECT, {
+    var expectedObject = fabric.util.object.extend(fabric.util.object.clone(REFERENCE_TEXT_OBJECT), {
       left: 10,
       top: -26
     });
@@ -177,9 +178,9 @@
 
     ok(textWithAttrs instanceof fabric.Text);
 
-    var expectedObject = fabric.util.object.extend(REFERENCE_TEXT_OBJECT, {
-      /* left varies slightly due to node-canvas rendering so we're not testing for it */
-      left: textWithAttrs.left,
+    var expectedObject = fabric.util.object.extend(fabric.util.object.clone(REFERENCE_TEXT_OBJECT), {
+      /* left varies slightly due to node-canvas rendering */
+      left: fabric.util.toFixed(textWithAttrs.left + '', 2),
       top: -59.95,
       width: 20,
       height: 159.9,

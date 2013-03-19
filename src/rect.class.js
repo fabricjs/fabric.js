@@ -237,13 +237,26 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function() {
-      return '<rect ' +
-              'x="' + (-1 * this.width / 2) + '" y="' + (-1 * this.height / 2) + '" ' +
-              'rx="' + this.get('rx') + '" ry="' + this.get('ry') + '" ' +
-              'width="' + this.width + '" height="' + this.height + '" ' +
-              'style="' + this.getSvgStyles() + '" ' +
-              'transform="' + this.getSvgTransform() + '" ' +
-              '/>';
+      var markup = [];
+
+      if (this.fill && this.fill.toLive) {
+        markup.push(this.fill.toSVG(this, false));
+      }
+      if (this.stroke && this.stroke.toLive) {
+        markup.push(this.stroke.toSVG(this, false));
+      }
+
+      markup.push(
+        '<rect ',
+          'x="', (-1 * this.width / 2), '" y="', (-1 * this.height / 2),
+          '" rx="', this.get('rx'), '" ry="', this.get('ry'),
+          '" width="', this.width, '" height="', this.height,
+          '" style="', this.getSvgStyles(),
+          '" transform="', this.getSvgTransform(),
+        '"/>'
+      );
+
+      return markup.join('');
     }
   });
 

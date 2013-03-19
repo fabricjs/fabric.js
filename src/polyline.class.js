@@ -29,21 +29,22 @@
      * @method initialize
      * @param {Array} points array of points
      * @param {Object} [options] Options object
+     * @param {Boolean} Whether points offsetting should be skipped
      * @return {Object} thisArg
      */
-    initialize: function(points, options) {
+    initialize: function(points, options, skipOffset) {
       options = options || { };
       this.set('points', points);
       this.callSuper('initialize', options);
-      this._calcDimensions();
+      this._calcDimensions(skipOffset);
     },
 
     /**
      * @private
      * @method _calcDimensions
      */
-    _calcDimensions: function() {
-      return fabric.Polygon.prototype._calcDimensions.call(this);
+    _calcDimensions: function(skipOffset) {
+      return fabric.Polygon.prototype._calcDimensions.call(this, skipOffset);
     },
 
     /**
@@ -62,18 +63,29 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function() {
-      var points = [];
+      var points = [],
+          markup = [];
+
       for (var i = 0, len = this.points.length; i < len; i++) {
         points.push(toFixed(this.points[i].x, 2), ',', toFixed(this.points[i].y, 2), ' ');
       }
 
-      return [
+      if (this.fill && this.fill.toLive) {
+        markup.push(this.fill.toSVG(this, false));
+      }
+      if (this.stroke && this.stroke.toLive) {
+        markup.push(this.stroke.toSVG(this, false));
+      }
+
+      markup.push(
         '<polyline ',
-          'points="', points.join(''), '" ',
-          'style="', this.getSvgStyles(), '" ',
-          'transform="', this.getSvgTransform(), '" ',
-        '/>'
-      ].join('');
+          'points="', points.join(''),
+          '" style="', this.getSvgStyles(),
+          '" transform="', this.getSvgTransform(),
+        '"/>'
+      );
+
+      return markup.join('');
     },
 
     /**
@@ -138,7 +150,7 @@
       points[i].y -= (options.height / 2) || 0;
     }
 
-    return new fabric.Polyline(points, fabric.util.object.extend(parsedAttributes, options));
+    return new fabric.Polyline(points, fabric.util.object.extend(parsedAttributes, options), true);
   };
 
   /**
@@ -150,7 +162,7 @@
    */
   fabric.Polyline.fromObject = function(object) {
     var points = object.points;
-    return new fabric.Polyline(points, object);
+    return new fabric.Polyline(points, object, true);
   };
 
 })(typeof exports !== 'undefined' ? exports : this);

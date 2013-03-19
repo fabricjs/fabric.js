@@ -4,7 +4,7 @@
       atan2 = Math.atan2;
 
   /**
-   * @namespace
+   * @namespace Various utilities
    */
   fabric.util = { };
 
@@ -339,12 +339,61 @@
     ctx.restore();
   }
 
-  function createCanvasElement() {
-    var canvasEl = fabric.document.createElement('canvas');
+  /**
+   * Creates canvas element and initializes it via excanvas if necessary
+   * @static
+   * @memberOf fabric.util
+   * @method createCanvasElement
+   * @param {CanvasElement} [canvasEl] optional canvas element to initialize; when not given, element is created implicitly
+   * @return {CanvasElement} initialized canvas element
+   */
+  function createCanvasElement(canvasEl) {
+    canvasEl || (canvasEl = fabric.document.createElement('canvas'));
     if (!canvasEl.getContext && typeof G_vmlCanvasManager !== 'undefined') {
       G_vmlCanvasManager.initElement(canvasEl);
     }
     return canvasEl;
+  }
+
+  /**
+   * Creates accessors (getXXX, setXXX) for a "class", based on "stateProperties" array
+   * @static
+   * @memberOf fabric.util
+   * @method createAccessors
+   * @param {Object} klass "Class" to create accessors for
+   */
+  function createAccessors(klass) {
+    var proto = klass.prototype;
+
+    for (var i = proto.stateProperties.length; i--; ) {
+
+      var propName = proto.stateProperties[i],
+          capitalizedPropName = propName.charAt(0).toUpperCase() + propName.slice(1),
+          setterName = 'set' + capitalizedPropName,
+          getterName = 'get' + capitalizedPropName;
+
+      // using `new Function` for better introspection
+      if (!proto[getterName]) {
+        proto[getterName] = (function(property) {
+          return new Function('return this.get("' + property + '")');
+        })(propName);
+      }
+      if (!proto[setterName]) {
+        proto[setterName] = (function(property) {
+          return new Function('value', 'return this.set("' + property + '", value)');
+        })(propName);
+      }
+    }
+  }
+
+  /**
+   * @method clipContext
+   */
+  function clipContext(receiver, ctx) {
+    ctx.save();
+    ctx.beginPath();
+    receiver.clipTo(ctx);
+    ctx.clip();
   }
 
   fabric.util.removeFromArray = removeFromArray;
@@ -362,5 +411,7 @@
   fabric.util.populateWithProperties = populateWithProperties;
   fabric.util.drawDashedLine = drawDashedLine;
   fabric.util.createCanvasElement = createCanvasElement;
+  fabric.util.createAccessors = createAccessors;
+  fabric.util.clipContext = clipContext;
 
 })();

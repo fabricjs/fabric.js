@@ -52,14 +52,14 @@
     originY:                  'center',
 
     /**
-     * Top position of an object
+     * Top position of an object. Note that by default it's relative to object center. You can change this by setting originY={top/center/bottom}
      * @property
      * @type Number
      */
     top:                      0,
 
     /**
-     * Left position of an object
+     * Left position of an object. Note that by default it's relative to object center. You can change this by setting originX={left/center/right}
      * @property
      * @type Number
      */
@@ -241,6 +241,13 @@
     selectable:               true,
 
     /**
+     * When set to `false`, an object is not rendered on canvas
+     * @property
+     * @type Boolean
+     */
+    visible:                  true,
+
+    /**
      * When set to `false`, object's controls are not displayed and can not be used to manipulate object
      * @property
      * @type Boolean
@@ -283,6 +290,13 @@
     includeDefaultValues:     true,
 
     /**
+     * Function that determines clipping of an object (context is passed as a first argument)
+     * @property
+     * @type Function
+     */
+    clipTo:                   null,
+
+    /**
      * List of properties to consider when checking if state of an object is changed (fabric.Object#hasStateChanged);
      * as well as for history (undo/redo) purposes
      * @property
@@ -292,7 +306,7 @@
       'top left width height scaleX scaleY flipX flipY ' +
       'angle opacity cornerSize fill overlayFill originX originY ' +
       'stroke strokeWidth strokeDashArray fillRule ' +
-      'borderScaleFactor transformMatrix selectable shadow'
+      'borderScaleFactor transformMatrix selectable shadow visible'
     ).split(' '),
 
     /**
@@ -405,7 +419,8 @@
         hasRotatingPoint:   this.hasRotatingPoint,
         transparentCorners: this.transparentCorners,
         perPixelTargetFind: this.perPixelTargetFind,
-        shadow:             (this.shadow && this.shadow.toObject) ? this.shadow.toObject() : this.shadow
+        shadow:             (this.shadow && this.shadow.toObject) ? this.shadow.toObject() : this.shadow,
+        visible:            this.visible
       };
 
       if (!this.includeDefaultValues) {
@@ -437,8 +452,9 @@
         "stroke: ", (this.stroke ? this.stroke : 'none'), "; ",
         "stroke-width: ", (this.strokeWidth ? this.strokeWidth : '0'), "; ",
         "stroke-dasharray: ", (this.strokeDashArray ? this.strokeDashArray.join(' ') : "; "),
-        "fill: ", (this.fill ? this.fill : 'none'), "; ",
-        "opacity: ", (this.opacity ? this.opacity : '1'), ";"
+        "fill: ", (this.fill ? (this.fill && this.fill.toLive ? 'url(#SVGID_' + this.fill.id + ')' : this.fill) : 'none'), "; ",
+        "opacity: ", (this.opacity ? this.opacity : '1'), ";",
+        (this.visible ? '' : " visibility: hidden;")
       ].join("");
     },
 
@@ -534,8 +550,8 @@
      * Sets property to a given value
      * @method set
      * @param {String} name
-     * @param {Object|Function} value
-     * @return {fabric.Group} thisArg
+     * @param {Object|Function} value (if function, the value is passed into it and its return value is used as a new one)
+     * @return {fabric.Object} thisArg
      * @chainable
      */
     set: function(key, value) {
@@ -619,8 +635,8 @@
      */
     render: function(ctx, noTransform) {
 
-      // do not render if width or height are zeros
-      if (this.width === 0 || this.height === 0) return;
+      // do not render if width/height are zeros or object is not visible
+      if (this.width === 0 || this.height === 0 || !this.visible) return;
 
       ctx.save();
 
@@ -658,12 +674,14 @@
       }
 
       this._setShadow(ctx);
+      this.clipTo && fabric.util.clipContext(this, ctx);
       this._render(ctx, noTransform);
+      this.clipTo && ctx.restore();
       this._removeShadow(ctx);
 
       if (this.active && !noTransform) {
         this.drawBorders(ctx);
-        this.hideCorners || this.drawCorners(ctx);
+        this.drawControls(ctx);
       }
       ctx.restore();
     },
@@ -724,13 +742,13 @@
         };
 
         var orig = {
-          angle: this.get('angle'),
-          flipX: this.get('flipX'),
-          flipY: this.get('flipY')
+          angle: this.getAngle(),
+          flipX: this.getFlipX(),
+          flipY: this.getFlipY()
         };
 
         // normalize angle
-        this.set('angle', 0).set('flipX', false).set('flipY', false);
+        this.set({ angle: 0, flipX: false, flipY: false });
         this.toDataURL(function(dataURL) {
           i.src = dataURL;
         });
@@ -769,7 +787,7 @@
         clone.setActive(false);
 
         canvas.add(clone);
-        var data = canvas.toDataURL('png');
+        var data = canvas.toDataURL();
 
         canvas.dispose();
         canvas = clone = null;
@@ -792,13 +810,21 @@
     /**
      * Saves state of an object
      * @method saveState
+     * @param {Object} [options] Object with additional `stateProperties` array to include when saving state
      * @return {fabric.Object} thisArg
      * @chainable
      */
-    saveState: function() {
+    saveState: function(options) {
       this.stateProperties.forEach(function(prop) {
         this.originalState[prop] = this.get(prop);
       }, this);
+
+      if (options && options.stateProperties) {
+        options.stateProperties.forEach(function(prop) {
+          this.originalState[prop] = this.get(prop);
+        }, this);
+      }
+
       return this;
     },
 
@@ -846,7 +872,7 @@
     /**
      * Returns a JSON representation of an instance
      * @method toJSON
-     * @param {Array} propertiesToInclude
+     * @param {Array} propertiesToInclude Any properties that you might want to additionally include in the output
      * @return {String} json
      */
     toJSON: function(propertiesToInclude) {
@@ -855,16 +881,41 @@
     },
 
     /**
-     * Sets gradient fill of an object
-     * @method setGradientFill
+     * Sets gradient (fill or stroke) of an object
+     * @method setGradient
+     * @param {String} property Property name 'stroke' or 'fill'
+     * @param {Object} [options] Options object
      */
-    setGradientFill: function(options) {
-      this.set('fill', fabric.Gradient.forObject(this, options));
+    setGradient: function(property, options) {
+      options || (options = { });
+
+      var gradient = {colorStops: []};
+
+      gradient.type = options.type || (options.r1 || options.r2 ? 'radial' : 'linear');
+      gradient.coords = {
+        x1: options.x1,
+        y1: options.y1,
+        x2: options.x2,
+        y2: options.y2
+      };
+
+      if (options.r1 || options.r2) {
+        gradient.coords.r1 = options.r1;
+        gradient.coords.r2 = options.r2;
+      }
+
+      for (var position in options.colorStops) {
+        var color = new fabric.Color(options.colorStops[position]);
+        gradient.colorStops.push({offset: position, color: color.toRgb(), opacity: color.getAlpha()});
+      }
+
+      this.set(property, fabric.Gradient.forObject(this, gradient));
     },
 
     /**
      * Sets pattern fill of an object
      * @method setPatternFill
+     * @param {Object} options
      */
     setPatternFill: function(options) {
       this.set('fill', new fabric.Pattern(options));
@@ -873,6 +924,7 @@
     /**
      * Sets shadow of an object
      * @method setShadow
+     * @param {Object} options
      */
     setShadow: function(options) {
       this.set('shadow', new fabric.Shadow(options));
@@ -1010,7 +1062,12 @@
      * @chainable
      */
     sendToBack: function() {
-      this.canvas.sendToBack(this);
+      if (this.group) {
+        fabric.StaticCanvas.prototype.sendToBack.call(this.group, this);
+      }
+      else {
+        this.canvas.sendToBack(this);
+      }
       return this;
     },
 
@@ -1021,7 +1078,12 @@
      * @chainable
      */
     bringToFront: function() {
-      this.canvas.bringToFront(this);
+      if (this.group) {
+        fabric.StaticCanvas.prototype.bringToFront.call(this.group, this);
+      }
+      else {
+        this.canvas.bringToFront(this);
+      }
       return this;
     },
 
@@ -1032,7 +1094,12 @@
      * @chainable
      */
     sendBackwards: function() {
-      this.canvas.sendBackwards(this);
+      if (this.group) {
+        fabric.StaticCanvas.prototype.sendBackwards.call(this.group, this);
+      }
+      else {
+        this.canvas.sendBackwards(this);
+      }
       return this;
     },
 
@@ -1043,31 +1110,17 @@
      * @chainable
      */
     bringForward: function() {
-      this.canvas.bringForward(this);
+      if (this.group) {
+        fabric.StaticCanvas.prototype.bringForward.call(this.group, this);
+      }
+      else {
+        this.canvas.bringForward(this);
+      }
       return this;
     }
   });
 
-  var proto = fabric.Object.prototype;
-  for (var i = proto.stateProperties.length; i--; ) {
-
-    var propName = proto.stateProperties[i],
-        capitalizedPropName = propName.charAt(0).toUpperCase() + propName.slice(1),
-        setterName = 'set' + capitalizedPropName,
-        getterName = 'get' + capitalizedPropName;
-
-    // using `new Function` for better introspection
-    if (!proto[getterName]) {
-      proto[getterName] = (function(property) {
-        return new Function('return this.get("' + property + '")');
-      })(propName);
-    }
-    if (!proto[setterName]) {
-      proto[setterName] = (function(property) {
-        return new Function('value', 'return this.set("' + property + '", value)');
-      })(propName);
-    }
-  }
+  fabric.util.createAccessors(fabric.Object);
 
   /**
    * Alias for {@link fabric.Object.prototype.setAngle}
@@ -1083,5 +1136,11 @@
    * @type Number
    */
   fabric.Object.NUM_FRACTION_DIGITS = 2;
+
+  /**
+   * @static
+   * @type Number
+   */
+  fabric.Object.__uid = 0;
 
 })(typeof exports !== 'undefined' ? exports : this);

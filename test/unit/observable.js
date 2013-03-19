@@ -99,3 +99,16 @@ test('event options', function() {
 
   equal('sekret', someValue);
 });
+
+test('trigger', function() {
+  var foo = { };
+  fabric.util.object.extend(foo, fabric.Observable);
+
+  var eventFired = false;
+  foo.on('bar:baz', function() {
+    eventFired = true;
+  });
+
+  foo.trigger('bar:baz');
+  equal(true, eventFired);
+});

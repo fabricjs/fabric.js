@@ -135,15 +135,23 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function() {
-      return [
+      var markup = [];
+
+      if (this.stroke && this.stroke.toLive) {
+        markup.push(this.stroke.toSVG(this, true));
+      }
+
+      markup.push(
         '<line ',
-          'x1="', this.get('x1'), '" ',
-          'y1="', this.get('y1'), '" ',
-          'x2="', this.get('x2'), '" ',
-          'y2="', this.get('y2'), '" ',
-          'style="', this.getSvgStyles(), '" ',
-        '/>'
-      ].join('');
+          'x1="', this.get('x1'),
+          '" y1="', this.get('y1'),
+          '" x2="', this.get('x2'),
+          '" y2="', this.get('y2'),
+          '" style="', this.getSvgStyles(),
+        '"/>'
+      );
+
+      return markup.join('');
     }
   });
 
