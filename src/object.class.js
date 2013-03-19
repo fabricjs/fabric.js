@@ -52,14 +52,14 @@
     originY:                  'center',
 
     /**
-     * Top position of an object
+     * Top position of an object. Note that by default it's relative to object center. You can change this by setting originY={top/center/bottom}
      * @property
      * @type Number
      */
     top:                      0,
 
     /**
-     * Left position of an object
+     * Left position of an object. Note that by default it's relative to object center. You can change this by setting originX={left/center/right}
      * @property
      * @type Number
      */
