@@ -713,6 +713,7 @@
 
       if (this.controlsAboveOverlay &&
           this.lastRenderedObjectWithControlsAboveOverlay &&
+          this.lastRenderedObjectWithControlsAboveOverlay.visible &&
           this.containsPoint(e, this.lastRenderedObjectWithControlsAboveOverlay) &&
           this.lastRenderedObjectWithControlsAboveOverlay._findTargetCorner(e, this._offset)) {
         target = this.lastRenderedObjectWithControlsAboveOverlay;
@@ -730,7 +731,7 @@
       // Cache all targets where their bounding box contains point.
       var possibleTargets = [];
       for (var i = this._objects.length; i--; ) {
-        if (this._objects[i] && this.containsPoint(e, this._objects[i])) {
+        if (this._objects[i] && this._objects[i].visible && this.containsPoint(e, this._objects[i])) {
           if (this.perPixelTargetFind || this._objects[i].perPixelTargetFind) {
             possibleTargets[possibleTargets.length] = this._objects[i];
           }
