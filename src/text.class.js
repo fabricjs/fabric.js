@@ -641,6 +641,9 @@
      * @param ctx {CanvasRenderingContext2D} context to render on
      */
     render: function(ctx, noTransform) {
+      // do not render if object is not visible
+      if (!this.visible) return;
+
       ctx.save();
       this._render(ctx);
       if (!noTransform && this.active) {
