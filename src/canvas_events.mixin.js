@@ -30,6 +30,10 @@
       this._onMouseUp = this._onMouseUp.bind(this);
       this._onResize = this._onResize.bind(this);
 
+      this._onGesture = function(e, s) {
+        _this.__onTransformGesture(e, s);
+      };
+
       addListener(fabric.window, 'resize', this._onResize);
 
       if (fabric.isTouchSupported) {
@@ -37,9 +41,7 @@
         addListener(this.upperCanvasEl, 'touchmove', this._onMouseMove);
 
         if (typeof Event !== 'undefined' && 'add' in Event) {
-          Event.add(this.upperCanvasEl, 'gesture', function(e, s) {
-            _this.__onTransformGesture(e, s);
-          });
+          Event.add(this.upperCanvasEl, 'gesture', this._onGesture);
         }
       }
       else {

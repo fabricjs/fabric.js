@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures` */
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.1.2" };
+var fabric = fabric || { version: "1.1.3" };
 
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
@@ -1866,6 +1866,9 @@ fabric.Observable.off = fabric.Observable.stopObserving;
  * @type function
  */
 fabric.Observable.trigger = fabric.Observable.fire;
+/**
+ * @namespace
+ */
 fabric.Collection = {
 
   /**
@@ -7124,7 +7127,17 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
      */
     dispose: function () {
       this.clear();
-      if (this.interactive) {
+
+      if (!this.interactive) return this;
+
+      if (fabric.isTouchSupported) {
+        removeListener(this.upperCanvasEl, 'touchstart', this._onMouseDown);
+        removeListener(this.upperCanvasEl, 'touchmove', this._onMouseMove);
+        if (typeof Event !== 'undefined' && 'remove' in Event) {
+          Event.remove(this.upperCanvasEl, 'gesture', this._onGesture);
+        }
+      }
+      else {
         removeListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
         removeListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
         removeListener(fabric.window, 'resize', this._onResize);
@@ -8959,6 +8972,10 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @scope fab
       this._onMouseUp = this._onMouseUp.bind(this);
       this._onResize = this._onResize.bind(this);
 
+      this._onGesture = function(e, s) {
+        _this.__onTransformGesture(e, s);
+      };
+
       addListener(fabric.window, 'resize', this._onResize);
 
       if (fabric.isTouchSupported) {
@@ -8966,9 +8983,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @scope fab
         addListener(this.upperCanvasEl, 'touchmove', this._onMouseMove);
 
         if (typeof Event !== 'undefined' && 'add' in Event) {
-          Event.add(this.upperCanvasEl, 'gesture', function(e, s) {
-            _this.__onTransformGesture(e, s);
-          });
+          Event.add(this.upperCanvasEl, 'gesture', this._onGesture);
         }
       }
       else {

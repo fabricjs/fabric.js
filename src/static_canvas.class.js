@@ -1108,7 +1108,17 @@
      */
     dispose: function () {
       this.clear();
-      if (this.interactive) {
+
+      if (!this.interactive) return this;
+
+      if (fabric.isTouchSupported) {
+        removeListener(this.upperCanvasEl, 'touchstart', this._onMouseDown);
+        removeListener(this.upperCanvasEl, 'touchmove', this._onMouseMove);
+        if (typeof Event !== 'undefined' && 'remove' in Event) {
+          Event.remove(this.upperCanvasEl, 'gesture', this._onGesture);
+        }
+      }
+      else {
         removeListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
         removeListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
         removeListener(fabric.window, 'resize', this._onResize);

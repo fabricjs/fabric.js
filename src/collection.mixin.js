@@ -1,3 +1,6 @@
+/**
+ * @namespace
+ */
 fabric.Collection = {
 
   /**
