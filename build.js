@@ -92,6 +92,7 @@ var filesToInclude = [
 
   'src/log.js',
   'src/observable.mixin.js',
+  'src/collection.mixin.js',
 
   'src/util/misc.js',
   'src/util/lang_array.js',

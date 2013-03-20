@@ -30,6 +30,7 @@
   };
 
   extend(fabric.StaticCanvas.prototype, fabric.Observable);
+  extend(fabric.StaticCanvas.prototype, fabric.Collection);
 
   extend(fabric.StaticCanvas.prototype, /** @scope fabric.StaticCanvas.prototype */ {
 
@@ -441,27 +442,10 @@
     },
 
     /**
-     * Adds objects to canvas, then renders canvas (if `renderOnAddition` is not `false`).
-     * Objects should be instances of (or inherit from) fabric.Object
-     * @method add
-     * @param [...] Zero or more fabric instances
-     * @return {fabric.Canvas} thisArg
-     * @chainable
-     */
-    add: function () {
-      this._objects.push.apply(this._objects, arguments);
-      for (var i = arguments.length; i--; ) {
-        this._initObject(arguments[i]);
-      }
-      this.renderOnAddition && this.renderAll();
-      return this;
-    },
-
-    /**
      * @private
      * @method _initObject
      */
-    _initObject: function(obj) {
+    _onObjectAdded: function(obj) {
       this.stateful && obj.setupState();
       obj.setCoords();
       obj.canvas = this;
@@ -470,25 +454,10 @@
     },
 
     /**
-     * Inserts an object to canvas at specified index and renders canvas.
-     * An object should be an instance of (or inherit from) fabric.Object
-     * @method insertAt
-     * @param object {Object} Object to insert
-     * @param index {Number} index to insert object at
-     * @param nonSplicing {Boolean} when `true`, no splicing (shifting) of objects occurs
-     * @return {fabric.Canvas} thisArg
-     * @chainable
+     * @method private
      */
-    insertAt: function (object, index, nonSplicing) {
-      if (nonSplicing) {
-        this._objects[index] = object;
-      }
-      else {
-        this._objects.splice(index, 0, object);
-      }
-      this._initObject(object);
-      this.renderOnAddition && this.renderAll();
-      return this;
+    _onObjectRemoved: function(obj) {
+      this.fire('object:removed', { target: obj });
     },
 
     /**
@@ -1023,15 +992,6 @@
     },
 
     /**
-     * Returns true if canvas contains no objects
-     * @method isEmpty
-     * @return {Boolean} true if canvas is empty
-     */
-    isEmpty: function () {
-      return this._objects.length === 0;
-    },
-
-    /**
      * Removes an object from canvas and returns it
      * @method remove
      * @param object {Object} Object to remove
@@ -1045,17 +1005,7 @@
         this.fire('selection:cleared');
       }
 
-      var objects = this._objects;
-      var index = objects.indexOf(object);
-
-      // removing any object should fire "objct:removed" events
-      if (index !== -1) {
-        objects.splice(index,1);
-        this.fire('object:removed', { target: object });
-      }
-
-      this.renderAll();
-      return object;
+      return fabric.Collection.remove.call(this, object);
     },
 
     /**
@@ -1148,42 +1098,6 @@
         objects.splice(nextIntersectingIdx, 0, object);
       }
       return this.renderAll && this.renderAll();
-    },
-
-    /**
-     * Returns object at specified index
-     * @method item
-     * @param {Number} index
-     * @return {fabric.Object}
-     */
-    item: function (index) {
-      return this.getObjects()[index];
-    },
-
-    /**
-     * Returns number representation of an instance complexity
-     * @method complexity
-     * @return {Number} complexity
-     */
-    complexity: function () {
-      return this.getObjects().reduce(function (memo, current) {
-        memo += current.complexity ? current.complexity() : 0;
-        return memo;
-      }, 0);
-    },
-
-    /**
-     * Iterates over all objects, invoking callback for each one of them
-     * @method forEachObject
-     * @return {fabric.Canvas} thisArg
-     */
-    forEachObject: function(callback, context) {
-      var objects = this.getObjects(),
-          i = objects.length;
-      while (i--) {
-        callback.call(context, objects[i], i, objects);
-      }
-      return this;
     },
 
     /**

@@ -1866,6 +1866,151 @@ fabric.Observable.off = fabric.Observable.stopObserving;
  * @type function
  */
 fabric.Observable.trigger = fabric.Observable.fire;
+fabric.Collection = {
+
+  /**
+   * Adds objects to collection, then renders canvas (if `renderOnAddition` is not `false`)
+   * Objects should be instances of (or inherit from) fabric.Object
+   * @method add
+   * @param [...] Zero or more fabric instances
+   * @chainable
+   */
+  add: function () {
+    this._objects.push.apply(this._objects, arguments);
+    for (var i = arguments.length; i--; ) {
+      this._onObjectAdded(arguments[i]);
+    }
+    this.renderOnAddition && this.renderAll();
+    return this;
+  },
+
+  /**
+   * Inserts an object into collection at specified index and renders canvas
+   * An object should be an instance of (or inherit from) fabric.Object
+   * @method insertAt
+   * @param object {Object} Object to insert
+   * @param index {Number} index to insert object at
+   * @param nonSplicing {Boolean} when `true`, no splicing (shifting) of objects occurs
+   * @chainable
+   */
+  insertAt: function (object, index, nonSplicing) {
+    var objects = this.getObjects();
+    if (nonSplicing) {
+      objects[index] = object;
+    }
+    else {
+      objects.splice(index, 0, object);
+    }
+    this._onObjectAdded(object);
+    this.renderOnAddition && this.renderAll();
+    return this;
+  },
+
+  /**
+   * Removes an object from a group
+   * @method remove
+   * @param {Object} object
+   * @return {fabric.Group} thisArg
+   * @chainable
+   */
+  remove: function(object) {
+
+    var objects = this.getObjects();
+    var index = objects.indexOf(object);
+
+    // only call onObjectRemoved if an object was actually removed
+    if (index !== -1) {
+      objects.splice(index, 1);
+      this._onObjectRemoved(object);
+    }
+
+    this.renderAll && this.renderAll();
+    return object;
+  },
+
+  /**
+   * Executes given function for each object in this group
+   * @method forEachObject
+   * @param {Function} callback
+   *                   Callback invoked with current object as first argument,
+   *                   index - as second and an array of all objects - as third.
+   *                   Iteration happens in reverse order (for performance reasons).
+   *                   Callback is invoked in a context of Global Object (e.g. `window`)
+   *                   when no `context` argument is given
+   *
+   * @param {Object} context Context (aka thisObject)
+   * @chainable
+   */
+  forEachObject: function(callback, context) {
+    var objects = this.getObjects(),
+        i = objects.length;
+    while (i--) {
+      callback.call(context, objects[i], i, objects);
+    }
+    return this;
+  },
+
+  /**
+   * Returns object at specified index
+   * @method item
+   * @param {Number} index
+   * @return {fabric.Object}
+   */
+  item: function (index) {
+    return this.getObjects()[index];
+  },
+
+  /**
+   * Returns true if collection contains no objects
+   * @method isEmpty
+   * @return {Boolean} true if collection is empty
+   */
+  isEmpty: function () {
+    return this.getObjects().length === 0;
+  },
+
+  /**
+   * Returns a size of a collection (i.e: length of an array containing its objects)
+   * @return {Number} Collection size
+   */
+  size: function() {
+    return this.getObjects().length;
+  },
+
+  /**
+   * Returns true if collection contains an object
+   * @method contains
+   * @param {Object} object Object to check against
+   * @return {Boolean} `true` if collection contains an object
+   */
+  contains: function(object) {
+    return this.getObjects().indexOf(object) > -1;
+  },
+
+  /**
+   * Returns number representation of a collection complexity
+   * @method complexity
+   * @return {Number} complexity
+   */
+  complexity: function () {
+    return this.getObjects().reduce(function (memo, current) {
+      memo += current.complexity ? current.complexity() : 0;
+      return memo;
+    }, 0);
+  },
+
+  /**
+   * Makes all of the collection objects grayscale (i.e. calling `toGrayscale` on them)
+   * @method toGrayscale
+   * @return {fabric.Group} thisArg
+   * @chainable
+   */
+  toGrayscale: function() {
+    return this.forEachObject(function(obj) {
+      obj.toGrayscale();
+    });
+  }
+};
 (function() {
 
   var sqrt = Math.sqrt,
@@ -5901,6 +6046,7 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
   };
 
   extend(fabric.StaticCanvas.prototype, fabric.Observable);
+  extend(fabric.StaticCanvas.prototype, fabric.Collection);
 
   extend(fabric.StaticCanvas.prototype, /** @scope fabric.StaticCanvas.prototype */ {
 
@@ -6312,27 +6458,10 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
     },
 
     /**
-     * Adds objects to canvas, then renders canvas (if `renderOnAddition` is not `false`).
-     * Objects should be instances of (or inherit from) fabric.Object
-     * @method add
-     * @param [...] Zero or more fabric instances
-     * @return {fabric.Canvas} thisArg
-     * @chainable
-     */
-    add: function () {
-      this._objects.push.apply(this._objects, arguments);
-      for (var i = arguments.length; i--; ) {
-        this._initObject(arguments[i]);
-      }
-      this.renderOnAddition && this.renderAll();
-      return this;
-    },
-
-    /**
      * @private
      * @method _initObject
      */
-    _initObject: function(obj) {
+    _onObjectAdded: function(obj) {
       this.stateful && obj.setupState();
       obj.setCoords();
       obj.canvas = this;
@@ -6341,25 +6470,10 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
     },
 
     /**
-     * Inserts an object to canvas at specified index and renders canvas.
-     * An object should be an instance of (or inherit from) fabric.Object
-     * @method insertAt
-     * @param object {Object} Object to insert
-     * @param index {Number} index to insert object at
-     * @param nonSplicing {Boolean} when `true`, no splicing (shifting) of objects occurs
-     * @return {fabric.Canvas} thisArg
-     * @chainable
+     * @method private
      */
-    insertAt: function (object, index, nonSplicing) {
-      if (nonSplicing) {
-        this._objects[index] = object;
-      }
-      else {
-        this._objects.splice(index, 0, object);
-      }
-      this._initObject(object);
-      this.renderOnAddition && this.renderAll();
-      return this;
+    _onObjectRemoved: function(obj) {
+      this.fire('object:removed', { target: obj });
     },
 
     /**
@@ -6894,15 +7008,6 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
     },
 
     /**
-     * Returns true if canvas contains no objects
-     * @method isEmpty
-     * @return {Boolean} true if canvas is empty
-     */
-    isEmpty: function () {
-      return this._objects.length === 0;
-    },
-
-    /**
      * Removes an object from canvas and returns it
      * @method remove
      * @param object {Object} Object to remove
@@ -6916,17 +7021,7 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
         this.fire('selection:cleared');
       }
 
-      var objects = this._objects;
-      var index = objects.indexOf(object);
-
-      // removing any object should fire "objct:removed" events
-      if (index !== -1) {
-        objects.splice(index,1);
-        this.fire('object:removed', { target: object });
-      }
-
-      this.renderAll();
-      return object;
+      return fabric.Collection.remove.call(this, object);
     },
 
     /**
@@ -7019,42 +7114,6 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
         objects.splice(nextIntersectingIdx, 0, object);
       }
       return this.renderAll && this.renderAll();
-    },
-
-    /**
-     * Returns object at specified index
-     * @method item
-     * @param {Number} index
-     * @return {fabric.Object}
-     */
-    item: function (index) {
-      return this.getObjects()[index];
-    },
-
-    /**
-     * Returns number representation of an instance complexity
-     * @method complexity
-     * @return {Number} complexity
-     */
-    complexity: function () {
-      return this.getObjects().reduce(function (memo, current) {
-        memo += current.complexity ? current.complexity() : 0;
-        return memo;
-      }, 0);
-    },
-
-    /**
-     * Iterates over all objects, invoking callback for each one of them
-     * @method forEachObject
-     * @return {fabric.Canvas} thisArg
-     */
-    forEachObject: function(callback, context) {
-      var objects = this.getObjects(),
-          i = objects.length;
-      while (i--) {
-        callback.call(context, objects[i], i, objects);
-      }
-      return this;
     },
 
     /**
@@ -14377,8 +14436,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
       extend = fabric.util.object.extend,
       min = fabric.util.array.min,
       max = fabric.util.array.max,
-      invoke = fabric.util.array.invoke,
-      removeFromArray = fabric.util.removeFromArray;
+      invoke = fabric.util.array.invoke;
 
   if (fabric.Group) {
     return;
@@ -14401,7 +14459,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
    * @class Group
    * @extends fabric.Object
    */
-  fabric.Group = fabric.util.createClass(fabric.Object, /** @scope fabric.Group.prototype */ {
+  fabric.Group = fabric.util.createClass(fabric.Object, fabric.Collection, /** @scope fabric.Group.prototype */ {
 
     /**
      * Type of an object
@@ -14513,8 +14571,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
      */
     removeWithUpdate: function(object) {
       this._restoreObjectsState();
-      removeFromArray(this._objects, object);
-      delete object.group;
+      this.remove(object);
       object.setActive(false);
       this._calcBounds();
       this._updateObjectsCoords();
@@ -14522,37 +14579,17 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
     },
 
     /**
-     * Adds an object to a group
-     * @method add
-     * @param {Object} object
-     * @return {fabric.Group} thisArg
-     * @chainable
+     * @private
      */
-    add: function(object) {
-      this._objects.push(object);
+    _onObjectAdded: function(object) {
       object.group = this;
-      return this;
     },
 
     /**
-     * Removes an object from a group
-     * @method remove
-     * @param {Object} object
-     * @return {fabric.Group} thisArg
-     * @chainable
+     * @private
      */
-    remove: function(object) {
-      removeFromArray(this._objects, object);
+    _onObjectRemoved: function(object) {
       delete object.group;
-      return this;
-    },
-
-    /**
-     * Returns a size of a group (i.e: length of an array containing its objects)
-     * @return {Number} Group size
-     */
-    size: function() {
-      return this.getObjects().length;
     },
 
     /**
@@ -14588,16 +14625,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
       else {
         this[key] = value;
       }
-    },
-
-    /**
-     * Returns true if a group contains an object
-     * @method contains
-     * @param {Object} object Object to check against
-     * @return {Boolean} `true` if group contains an object
-     */
-    contains: function(object) {
-      return this._objects.indexOf(object) > -1;
     },
 
     /**
@@ -14654,28 +14681,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
       }
       ctx.restore();
       this.setCoords();
-    },
-
-    /**
-     * Returns object from the group at the specified index
-     * @method item
-     * @param index {Number} index of item to get
-     * @return {fabric.Object}
-     */
-    item: function(index) {
-      return this.getObjects()[index];
-    },
-
-    /**
-     * Returns complexity of an instance
-     * @method complexity
-     * @return {Number} complexity
-     */
-    complexity: function() {
-      return this.getObjects().reduce(function(total, object) {
-        total += (typeof object.complexity === 'function') ? object.complexity() : 0;
-        return total;
-      }, 0);
     },
 
     /**
@@ -14782,23 +14787,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
     },
 
     /**
-     * Executes given function for each object in this group
-     * @method forEachObject
-     * @param {Function} callback
-     *                   Callback invoked with current object as first argument,
-     *                   index - as second and an array of all objects - as third.
-     *                   Iteration happens in reverse order (for performance reasons).
-     *                   Callback is invoked in a context of Global Object (e.g. `window`)
-     *                   when no `context` argument is given
-     *
-     * @param {Object} context Context (aka thisObject)
-     *
-     * @return {fabric.Group} thisArg
-     * @chainable
-     */
-    forEachObject: fabric.StaticCanvas.prototype.forEachObject,
-
-    /**
      * @private
      * @method _setOpacityIfSame
      */
@@ -14867,20 +14855,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
               centerX + halfWidth > point.x &&
               centerY - halfHeight < point.y &&
               centerY + halfHeight > point.y;
-    },
-
-    /**
-     * Makes all of this group's objects grayscale (i.e. calling `toGrayscale` on them)
-     * @method toGrayscale
-     * @return {fabric.Group} thisArg
-     * @chainable
-     */
-    toGrayscale: function() {
-      var i = this._objects.length;
-      while (i--) {
-        this._objects[i].toGrayscale();
-      }
-      return this;
     },
 
     /**

@@ -6,8 +6,7 @@
       extend = fabric.util.object.extend,
       min = fabric.util.array.min,
       max = fabric.util.array.max,
-      invoke = fabric.util.array.invoke,
-      removeFromArray = fabric.util.removeFromArray;
+      invoke = fabric.util.array.invoke;
 
   if (fabric.Group) {
     return;
@@ -30,7 +29,7 @@
    * @class Group
    * @extends fabric.Object
    */
-  fabric.Group = fabric.util.createClass(fabric.Object, /** @scope fabric.Group.prototype */ {
+  fabric.Group = fabric.util.createClass(fabric.Object, fabric.Collection, /** @scope fabric.Group.prototype */ {
 
     /**
      * Type of an object
@@ -142,8 +141,7 @@
      */
     removeWithUpdate: function(object) {
       this._restoreObjectsState();
-      removeFromArray(this._objects, object);
-      delete object.group;
+      this.remove(object);
       object.setActive(false);
       this._calcBounds();
       this._updateObjectsCoords();
@@ -151,37 +149,17 @@
     },
 
     /**
-     * Adds an object to a group
-     * @method add
-     * @param {Object} object
-     * @return {fabric.Group} thisArg
-     * @chainable
+     * @private
      */
-    add: function(object) {
-      this._objects.push(object);
+    _onObjectAdded: function(object) {
       object.group = this;
-      return this;
     },
 
     /**
-     * Removes an object from a group
-     * @method remove
-     * @param {Object} object
-     * @return {fabric.Group} thisArg
-     * @chainable
+     * @private
      */
-    remove: function(object) {
-      removeFromArray(this._objects, object);
+    _onObjectRemoved: function(object) {
       delete object.group;
-      return this;
-    },
-
-    /**
-     * Returns a size of a group (i.e: length of an array containing its objects)
-     * @return {Number} Group size
-     */
-    size: function() {
-      return this.getObjects().length;
     },
 
     /**
@@ -217,16 +195,6 @@
       else {
         this[key] = value;
       }
-    },
-
-    /**
-     * Returns true if a group contains an object
-     * @method contains
-     * @param {Object} object Object to check against
-     * @return {Boolean} `true` if group contains an object
-     */
-    contains: function(object) {
-      return this._objects.indexOf(object) > -1;
     },
 
     /**
@@ -283,28 +251,6 @@
       }
       ctx.restore();
       this.setCoords();
-    },
-
-    /**
-     * Returns object from the group at the specified index
-     * @method item
-     * @param index {Number} index of item to get
-     * @return {fabric.Object}
-     */
-    item: function(index) {
-      return this.getObjects()[index];
-    },
-
-    /**
-     * Returns complexity of an instance
-     * @method complexity
-     * @return {Number} complexity
-     */
-    complexity: function() {
-      return this.getObjects().reduce(function(total, object) {
-        total += (typeof object.complexity === 'function') ? object.complexity() : 0;
-        return total;
-      }, 0);
     },
 
     /**
@@ -411,23 +357,6 @@
     },
 
     /**
-     * Executes given function for each object in this group
-     * @method forEachObject
-     * @param {Function} callback
-     *                   Callback invoked with current object as first argument,
-     *                   index - as second and an array of all objects - as third.
-     *                   Iteration happens in reverse order (for performance reasons).
-     *                   Callback is invoked in a context of Global Object (e.g. `window`)
-     *                   when no `context` argument is given
-     *
-     * @param {Object} context Context (aka thisObject)
-     *
-     * @return {fabric.Group} thisArg
-     * @chainable
-     */
-    forEachObject: fabric.StaticCanvas.prototype.forEachObject,
-
-    /**
      * @private
      * @method _setOpacityIfSame
      */
@@ -496,20 +425,6 @@
               centerX + halfWidth > point.x &&
               centerY - halfHeight < point.y &&
               centerY + halfHeight > point.y;
-    },
-
-    /**
-     * Makes all of this group's objects grayscale (i.e. calling `toGrayscale` on them)
-     * @method toGrayscale
-     * @return {fabric.Group} thisArg
-     * @chainable
-     */
-    toGrayscale: function() {
-      var i = this._objects.length;
-      while (i--) {
-        this._objects[i].toGrayscale();
-      }
-      return this;
     },
 
     /**

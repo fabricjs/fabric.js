@@ -63,7 +63,7 @@
         group = new fabric.Group([ rect1, rect2, rect3 ]);
 
     ok(typeof group.remove == 'function');
-    equal(group.remove(rect2), group, 'should be chainable');
+    equal(group.remove(rect2), rect2, 'should return removed object');
     deepEqual([rect1, rect3], group.getObjects(), 'should remove object properly');
   });
 
@@ -74,7 +74,8 @@
     equal(group.size(), 2);
     group.add(new fabric.Rect());
     equal(group.size(), 3);
-    group.remove(group.getObjects()[0]).remove(group.getObjects()[0]);
+    group.remove(group.getObjects()[0]);
+    group.remove(group.getObjects()[0]);
     equal(group.size(), 1);
   });
 
@@ -365,6 +366,22 @@
 
     group.remove(firstObjInGroup);
     ok(typeof firstObjInGroup.group == 'undefined');
+  });
+
+  test('insertAt', function() {
+    var rect1 = new fabric.Rect(),
+        rect2 = new fabric.Rect(),
+        group = new fabric.Group();
+
+    group.add(rect1, rect2);
+
+    ok(typeof group.insertAt == 'function', 'should respond to `insertAt` method');
+
+    group.insertAt(rect1, 1);
+    equal(group.item(1), rect1);
+    group.insertAt(rect2, 2);
+    equal(group.item(2), rect2);
+    equal(group, group.insertAt(rect1, 2), 'should be chainable');
   });
 
   // asyncTest('cloning group with image', function() {
