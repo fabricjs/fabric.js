@@ -598,6 +598,30 @@
     object.setAngle(999);
     object.straighten();
     equal(object.get('angle'), 270);
+
+    object.setAngle(123.456);
+    object.straighten(45);
+    equal(object.get('angle'), 135);
+
+    object.setAngle(97.111);
+    object.straighten(45);
+    equal(object.get('angle'), 90);
+
+    object.setAngle(3.45);
+    object.straighten(45);
+    equal(object.get('angle'), 0);
+
+    object.setAngle(-157);
+    object.straighten(45);
+    equal(object.get('angle'), -135);
+
+    object.setAngle(159);
+    object.straighten(45);
+    equal(object.get('angle'), 180);
+
+    object.setAngle(999);
+    object.straighten(45);
+    equal(object.get('angle'), 270);
   });
 
   test('toGrayscale', function() {
