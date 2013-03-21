@@ -22,9 +22,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @scope fabric.Object.prot
    * @chainable
    */
   straighten: function(angleSteps) {
-    if(!angleSteps){
-      var angleSteps = 90;
-    }
+    angleSteps || (angleSteps = 90);
     this.setAngle(this._getAngleValueForStraighten(angleSteps));
     return this;
   },
@@ -41,9 +39,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @scope fabric.Object.prot
    */
   fxStraighten: function(callbacks, angleSteps) {
     callbacks = callbacks || { };
-    if(!angleSteps){
-      var angleSteps = 90;
-    }
+    angleSteps || (angleSteps = 90);
     
     var empty = function() { },
         onComplete = callbacks.onComplete || empty,
@@ -82,9 +78,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
    * @chainable
    */
   straightenObject: function (object, angleSteps) {
-    if(!angleSteps){
-      var angleSteps = 90;
-    }
+    angleSteps || (angleSteps = 90);
     object.straighten(angleSteps);
     this.renderAll();
     return this;
@@ -99,9 +93,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
    * @chainable
    */
   fxStraightenObject: function (object, angleSteps) {
-    if(!angleSteps){
-      var angleSteps = 90;
-    }
+    angleSteps || (angleSteps = 90);
     object.fxStraighten({
       onChange: this.renderAll.bind(this)
     }, angleSteps);
