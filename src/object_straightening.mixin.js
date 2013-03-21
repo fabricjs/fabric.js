@@ -3,40 +3,44 @@ fabric.util.object.extend(fabric.Object.prototype, /** @scope fabric.Object.prot
   /**
    * @private
    * @method _getAngleValueForStraighten
+   * @param {Int} angleSteps
    * @return {Number} angle value
    */
-  _getAngleValueForStraighten: function() {
+  _getAngleValueForStraighten: function(angleSteps) {
     var angle = this.getAngle() % 360;
     if (angle > 0) {
-      return Math.round((angle-1)/90) * 90;
+      return Math.round((angle-1)/angleSteps) * angleSteps;
     }
-    return Math.round(angle/90) * 90;
+    return Math.round(angle/angleSteps) * angleSteps;
   },
 
   /**
-   * Straightens an object (rotating it from current angle to one of 0, 90, 180, 270, etc. depending on which is closer)
+   * Straightens an object with angleSteps of x degrees, for example passing 45 to the function will rotate it from current angle to one of 0, 45, 90, 135, 180, 225, 270, etc. depending on which is closer. Default is 90.
    * @method straighten
+   * @param {Int} angleSteps
    * @return {fabric.Object} thisArg
    * @chainable
    */
-  straighten: function() {
-    this.setAngle(this._getAngleValueForStraighten());
+  straighten: function(angleSteps) {
+    angleSteps || (angleSteps = 90);
+    this.setAngle(this._getAngleValueForStraighten(angleSteps));
     return this;
   },
 
   /**
-   * Same as {@link fabric.Object.prototype.straghten} but with animation
+   * Same as {@link fabric.Object.prototype.straighten} but with animation
    * @method fxStraighten
    * @param {Object} callbacks
    *                  - onComplete: invoked on completion
    *                  - onChange: invoked on every step of animation
-   *
+   * @param {Int} angleSteps
    * @return {fabric.Object} thisArg
    * @chainable
    */
-  fxStraighten: function(callbacks) {
+  fxStraighten: function(callbacks, angleSteps) {
     callbacks = callbacks || { };
-
+    angleSteps || (angleSteps = 90);
+    
     var empty = function() { },
         onComplete = callbacks.onComplete || empty,
         onChange = callbacks.onChange || empty,
@@ -44,7 +48,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @scope fabric.Object.prot
 
     fabric.util.animate({
       startValue: this.get('angle'),
-      endValue: this._getAngleValueForStraighten(),
+      endValue: this._getAngleValueForStraighten(angleSteps),
       duration: this.FX_DURATION,
       onChange: function(value) {
         _this.setAngle(value);
@@ -69,11 +73,13 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
    * Straightens object, then rerenders canvas
    * @method straightenObject
    * @param {fabric.Object} object Object to straighten
+   * @param {Int} angleSteps
    * @return {fabric.Canvas} thisArg
    * @chainable
    */
-  straightenObject: function (object) {
-    object.straighten();
+  straightenObject: function (object, angleSteps) {
+    angleSteps || (angleSteps = 90);
+    object.straighten(angleSteps);
     this.renderAll();
     return this;
   },
@@ -82,13 +88,15 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
    * Same as {@link fabric.Canvas.prototype.straightenObject}, but animated
    * @method fxStraightenObject
    * @param {fabric.Object} object Object to straighten
+   * @param {Int} angleSteps
    * @return {fabric.Canvas} thisArg
    * @chainable
    */
-  fxStraightenObject: function (object) {
+  fxStraightenObject: function (object, angleSteps) {
+    angleSteps || (angleSteps = 90);
     object.fxStraighten({
       onChange: this.renderAll.bind(this)
-    });
+    }, angleSteps);
     return this;
   }
 });

@@ -191,6 +191,18 @@
     rect.setAngle('100');
     canvas.straightenObject(rect);
     equal(rect.getAngle(), 90, 'angle should be coerced to 90 (from 100)');
+
+    rect.setAngle('0');
+    equal(canvas.straightenObject(rect, 45), canvas, 'should be chainable');
+    equal(rect.getAngle(), 0, 'angle should be coerced to 0 (from 10)');
+
+    rect.setAngle('60');
+    canvas.straightenObject(rect, 45);
+    equal(rect.getAngle(), 45, 'angle should be coerced to 45 (from 60)');
+
+    rect.setAngle('100');
+    canvas.straightenObject(rect, 45);
+    equal(rect.getAngle(), 90, 'angle should be coerced to 90 (from 100)');
   });
 
   test('toSVG without preamble', function() {
