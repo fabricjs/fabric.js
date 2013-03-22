@@ -922,8 +922,8 @@
      * Returns SVG representation of canvas
      * @function
      * @method toSVG
-     * @param {Object} [options] Options for SVG output ("suppressPreamble: true"
-     * will start the svg output directly at "<svg...")
+     * @param {Object} [options] Options for SVG output (suppressPreamble: true/false (if true xml tag is not included), 
+     * viewBox: {x, y, width, height} to define the svg output viewBox)
      * @return {String}
      */
     toSVG: function(options) {
@@ -942,9 +942,10 @@
             'xmlns="http://www.w3.org/2000/svg" ',
             'xmlns:xlink="http://www.w3.org/1999/xlink" ',
             'version="1.1" ',
-            'width="', this.width, '" ',
-            'height="', this.height, '" ',
-            (this.backgroundColor && !this.backgroundColor.source) ? 'style="background-color: ' + this.backgroundColor +'" ' : null,
+            'width="', (options.viewBox ? options.viewBox.width : this.width), '" ',
+            'height="', (options.viewBox ? options.viewBox.height : this.height), '" ',
+            (this.backgroundColor && !this.backgroundColor.source ? 'style="background-color: ' + this.backgroundColor +'" ' : null),
+            (options.viewBox ? 'viewBox="' + options.viewBox.x + ' ' + options.viewBox.y + ' ' + options.viewBox.width + ' ' + options.viewBox.height + '" ' : null),
             'xml:space="preserve">',
           '<desc>Created with Fabric.js ', fabric.version, '</desc>',
           '<defs>', fabric.createSVGFontFacesMarkup(this.getObjects()), fabric.createSVGRefElementsMarkup(this), '</defs>'
