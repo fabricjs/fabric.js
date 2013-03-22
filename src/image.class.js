@@ -88,8 +88,12 @@
      * Renders image on a specified context
      * @method render
      * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Boolean} [noTransform] When true, context is not transformed
      */
     render: function(ctx, noTransform) {
+      // do not render if object is not visible
+      if (!this.visible) return;
+
       ctx.save();
       var m = this.transformMatrix;
       // this._resetWidthHeight();
@@ -120,7 +124,7 @@
      * Returns object representation of an instance
      * @method toObject
      * @param {Array} propertiesToInclude
-     * @return {Object} object representation of an instance
+     * @return {Object} propertiesToInclude Object representation of an instance
      */
     toObject: function(propertiesToInclude) {
       return extend(this.callSuper('toObject', propertiesToInclude), {

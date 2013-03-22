@@ -639,6 +639,7 @@
      * Renders text instance on a specified context
      * @method render
      * @param ctx {CanvasRenderingContext2D} context to render on
+     * @param {Boolean} [noTransform] When true, context is not transformed
      */
     render: function(ctx, noTransform) {
       // do not render if object is not visible
