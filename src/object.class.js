@@ -631,10 +631,9 @@
      * Renders an object on a specified context
      * @method render
      * @param {CanvasRenderingContext2D} ctx context to render on
-     * @param {Boolean} noTransform
+     * @param {Boolean} [noTransform] When true, context is not transformed
      */
     render: function(ctx, noTransform) {
-
       // do not render if width/height are zeros or object is not visible
       if (this.width === 0 || this.height === 0 || !this.visible) return;
 

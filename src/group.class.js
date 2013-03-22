@@ -213,6 +213,7 @@
      * Renders instance on a given context
      * @method render
      * @param {CanvasRenderingContext2D} ctx context to render instance on
+     * @param {Boolean} [noTransform] When true, context is not transformed
      */
     render: function(ctx, noTransform) {
       // do not render if object is not visible
