@@ -791,6 +791,12 @@
     ok(typeof object.bringToFront == 'function');
   });
 
+  test('moveTo', function() {
+    var object = new fabric.Object();
+
+    ok(typeof object.moveTo == 'function');
+  });
+
   test('gradient serialization', function() {
     var object = new fabric.Object();
 
