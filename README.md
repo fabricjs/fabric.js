@@ -32,7 +32,7 @@ Using Fabric.js, you can create and populate objects on canvas; objects like sim
 - IE8 (incomplete — about 17 failing tests at the moment)
 - IE7,6 (incomplete - about 27 failing tests at the moment)
 
-You can [run automated unit tests](http://kangax.github.com/fabric.js/test/unit/) right in the browser.
+You can [run automated unit tests](http://fabricjs.com/test/unit/) right in the browser.
 
 ### History
 
@@ -75,10 +75,6 @@ Fabric.js started as a foundation for design editor on [printio.ru](http://print
         # or Google Closure Compiler
         $ node build.js modules=... minifier=closure
 
-4. Optionally, you can build documentation
-
-        $ node build_docs.js
-
 ### Demos
 
 - [Demos](http://fabricjs.com/demos/)
@@ -87,7 +83,7 @@ Fabric.js started as a foundation for design editor on [printio.ru](http://print
 
 ### Documentation
 
-Documentation is always available at [http://fabricjs.com/docs/](http://fabricjs.com/docs/). You can also build it locally, following step 4 from the "Building" section of this README.
+Documentation is always available at [http://fabricjs.com/docs/](http://fabricjs.com/docs/).
 
 Also see [official 4-part intro series](http://fabricjs.com/articles), [presentation from BK.js](http://www.slideshare.net/kangax/fabricjs-building-acanvaslibrarybk) and [presentation from Falsy Values](http://www.slideshare.net/kangax/fabric-falsy-values-8067834) for an overview of fabric.js, how it works, and its features.
 
