@@ -491,6 +491,63 @@
     equal(canvas.item(2), rect3);
   });
 
+  test('moveTo', function() {
+    ok(typeof canvas.moveTo == 'function');
+
+    var rect1 = makeRect(),
+        rect2 = makeRect(),
+        rect3 = makeRect();
+
+    canvas.add(rect1, rect2, rect3);
+
+    // [ 1, 2, 3 ]
+    equal(canvas.item(0), rect1);
+    equal(canvas.item(1), rect2);
+    equal(canvas.item(2), rect3);
+
+    canvas.moveTo(rect3, 0);
+
+    // moved 3 to level 0 — [3, 1, 2]
+    equal(canvas.item(1), rect1);
+    equal(canvas.item(2), rect2);
+    equal(canvas.item(0), rect3);
+
+    canvas.moveTo(rect3, 1);
+
+    // moved 3 to level 1 — [1, 3, 2]
+    equal(canvas.item(0), rect1);
+    equal(canvas.item(2), rect2);
+    equal(canvas.item(1), rect3);
+
+    canvas.moveTo(rect3, 2);
+
+    // moved 3 to level 2 — [1, 2, 3]
+    equal(canvas.item(0), rect1);
+    equal(canvas.item(1), rect2);
+    equal(canvas.item(2), rect3);
+
+    canvas.moveTo(rect3, 2);
+
+    // moved 3 to same level 2 and so doesn't change position — [1, 2, 3]
+    equal(canvas.item(0), rect1);
+    equal(canvas.item(1), rect2);
+    equal(canvas.item(2), rect3);
+
+    canvas.moveTo(rect2, 0);
+
+    // moved 2 to level 0 — [2, 1, 3]
+    equal(canvas.item(1), rect1);
+    equal(canvas.item(0), rect2);
+    equal(canvas.item(2), rect3);
+
+    canvas.moveTo(rect2, 2);
+
+    // moved 2 to level 2 — [1, 3, 2]
+    equal(canvas.item(0), rect1);
+    equal(canvas.item(2), rect2);
+    equal(canvas.item(1), rect3);
+  });
+
   test('item', function() {
     ok(typeof canvas.item == 'function');
 

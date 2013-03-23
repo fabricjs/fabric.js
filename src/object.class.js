@@ -1116,6 +1116,23 @@
         this.canvas.bringForward(this);
       }
       return this;
+    },
+
+    /**
+     * Moves an object to specified level in stack of drawn objects
+     * @method moveTo
+     * @param {Number} index New position of object
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+    moveTo: function(index) {
+      if (this.group) {
+        fabric.StaticCanvas.prototype.moveTo.call(this.group, this, index);
+      }
+      else {
+        this.canvas.moveTo(this, index);
+      }
+      return this;
     }
   });
 

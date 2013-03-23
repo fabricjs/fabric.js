@@ -13,6 +13,15 @@
     return new fabric.Group([ rect1, rect2 ]);
   }
 
+  function makeGroupWith4Objects() {
+    var rect1 = new fabric.Rect({ top: 100, left: 100, width: 30, height: 10 }),
+        rect2 = new fabric.Rect({ top: 120, left: 50, width: 10, height: 40 }),
+        rect3 = new fabric.Rect({ top: 40, left: 0, width: 20, height: 40 }),
+        rect4 = new fabric.Rect({ top: 75, left: 75, width: 40, height: 40 });
+
+    return new fabric.Group([ rect1, rect2, rect3, rect4 ]);
+  }
+
   QUnit.module('fabric.Group', {
     teardown: function() {
       canvas.clear();
@@ -171,6 +180,41 @@
     ok(typeof group.item == 'function');
     equal(group.item(0), group.getObjects()[0]);
     equal(group.item(1), group.getObjects()[1]);
+    equal(group.item(9999), undefined);
+  });
+
+  test('moveTo', function() {
+    var group = makeGroupWith4Objects(),
+        groupEl1 = group.getObjects()[0],
+        groupEl2 = group.getObjects()[1],
+        groupEl3 = group.getObjects()[2],
+        groupEl4 = group.getObjects()[3];
+
+    ok(typeof group.item(0).moveTo == 'function');
+
+    // [ 1, 2, 3, 4 ]
+    equal(group.item(0), groupEl1);
+    equal(group.item(1), groupEl2);
+    equal(group.item(2), groupEl3);
+    equal(group.item(3), groupEl4);
+    equal(group.item(9999), undefined);
+
+    group.item(0).moveTo(3);
+
+    // moved 1 to level 3 — [2, 3, 4, 1]
+    equal(group.item(3), groupEl1);
+    equal(group.item(0), groupEl2);
+    equal(group.item(1), groupEl3);
+    equal(group.item(2), groupEl4);
+    equal(group.item(9999), undefined);
+
+    group.item(0).moveTo(2);
+
+    // moved 2 to level 2 — [3, 4, 2, 1]
+    equal(group.item(3), groupEl1);
+    equal(group.item(2), groupEl2);
+    equal(group.item(0), groupEl3);
+    equal(group.item(1), groupEl4);
     equal(group.item(9999), undefined);
   });
 
