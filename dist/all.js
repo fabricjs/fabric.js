@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures` */
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.1.3" };
+var fabric = fabric || { version: "1.1.4" };
 
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
@@ -6941,8 +6941,8 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
      * Returns SVG representation of canvas
      * @function
      * @method toSVG
-     * @param {Object} [options] Options for SVG output ("suppressPreamble: true"
-     * will start the svg output directly at "<svg...")
+     * @param {Object} [options] Options for SVG output (suppressPreamble: true/false (if true xml tag is not included), 
+     * viewBox: {x, y, width, height} to define the svg output viewBox)
      * @return {String}
      */
     toSVG: function(options) {
@@ -6961,9 +6961,10 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
             'xmlns="http://www.w3.org/2000/svg" ',
             'xmlns:xlink="http://www.w3.org/1999/xlink" ',
             'version="1.1" ',
-            'width="', this.width, '" ',
-            'height="', this.height, '" ',
-            (this.backgroundColor && !this.backgroundColor.source) ? 'style="background-color: ' + this.backgroundColor +'" ' : null,
+            'width="', (options.viewBox ? options.viewBox.width : this.width), '" ',
+            'height="', (options.viewBox ? options.viewBox.height : this.height), '" ',
+            (this.backgroundColor && !this.backgroundColor.source ? 'style="background-color: ' + this.backgroundColor +'" ' : null),
+            (options.viewBox ? 'viewBox="' + options.viewBox.x + ' ' + options.viewBox.y + ' ' + options.viewBox.width + ' ' + options.viewBox.height + '" ' : null),
             'xml:space="preserve">',
           '<desc>Created with Fabric.js ', fabric.version, '</desc>',
           '<defs>', fabric.createSVGFontFacesMarkup(this.getObjects()), fabric.createSVGRefElementsMarkup(this), '</defs>'
@@ -7116,6 +7117,20 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
         removeFromArray(objects, object);
         objects.splice(nextIntersectingIdx, 0, object);
       }
+      return this.renderAll && this.renderAll();
+    },
+
+    /**
+     * Moves an object to specified level in stack of drawn objects
+     * @method moveTo
+     * @param object {fabric.Object} Object to send
+     * @param {Number} index Position to move to
+     * @return {fabric.Canvas} thisArg
+     * @chainable
+     */
+    moveTo: function (object, index) {
+      removeFromArray(this._objects, object);
+      this._objects.splice(index, 0, object);
       return this.renderAll && this.renderAll();
     },
 
@@ -10477,10 +10492,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
      * Renders an object on a specified context
      * @method render
      * @param {CanvasRenderingContext2D} ctx context to render on
-     * @param {Boolean} noTransform
+     * @param {Boolean} [noTransform] When true, context is not transformed
      */
     render: function(ctx, noTransform) {
-
       // do not render if width/height are zeros or object is not visible
       if (this.width === 0 || this.height === 0 || !this.visible) return;
 
@@ -10961,6 +10975,23 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
       }
       else {
         this.canvas.bringForward(this);
+      }
+      return this;
+    },
+
+    /**
+     * Moves an object to specified level in stack of drawn objects
+     * @method moveTo
+     * @param {Number} index New position of object
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+    moveTo: function(index) {
+      if (this.group) {
+        fabric.StaticCanvas.prototype.moveTo.call(this.group, this, index);
+      }
+      else {
+        this.canvas.moveTo(this, index);
       }
       return this;
     }
@@ -13911,9 +13942,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
      * Renders path on a specified context
      * @method render
      * @param {CanvasRenderingContext2D} ctx context to render path on
-     * @param {Boolean} noTransform When true, context is not transformed
+     * @param {Boolean} [noTransform] When true, context is not transformed
      */
     render: function(ctx, noTransform) {
+      // do not render if object is not visible
+      if (!this.visible) return;
+
       ctx.save();
       var m = this.transformMatrix;
       if (m) {
@@ -14265,7 +14299,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
      * @param {CanvasRenderingContext2D} ctx Context to render this instance on
      */
     render: function(ctx) {
-
       // do not render if object is not visible
       if (!this.visible) return;
 
@@ -14659,6 +14692,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
      * Renders instance on a given context
      * @method render
      * @param {CanvasRenderingContext2D} ctx context to render instance on
+     * @param {Boolean} [noTransform] When true, context is not transformed
      */
     render: function(ctx, noTransform) {
       // do not render if object is not visible
@@ -15033,8 +15067,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
      * Renders image on a specified context
      * @method render
      * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Boolean} [noTransform] When true, context is not transformed
      */
     render: function(ctx, noTransform) {
+      // do not render if object is not visible
+      if (!this.visible) return;
+
       ctx.save();
       var m = this.transformMatrix;
       // this._resetWidthHeight();
@@ -15065,7 +15103,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
      * Returns object representation of an instance
      * @method toObject
      * @param {Array} propertiesToInclude
-     * @return {Object} object representation of an instance
+     * @return {Object} propertiesToInclude Object representation of an instance
      */
     toObject: function(propertiesToInclude) {
       return extend(this.callSuper('toObject', propertiesToInclude), {
@@ -16904,6 +16942,7 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
      * Renders text instance on a specified context
      * @method render
      * @param ctx {CanvasRenderingContext2D} context to render on
+     * @param {Boolean} [noTransform] When true, context is not transformed
      */
     render: function(ctx, noTransform) {
       // do not render if object is not visible
@@ -17218,16 +17257,13 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
 
   /** @private */
   function request(url, encoding, callback) {
-    var oURL = URL.parse(url);
-
-    var opts = {
+    var oURL = URL.parse(url),
+    req = HTTP.request({
       hostname: oURL.hostname,
-      port: oURL.port || 80,
+      port: oURL.port,
       path: oURL.pathname,
       method: 'GET'
-    };
-
-    var req = HTTP.request(opts, function(response){
+    }, function(response){
       var body = "";
       if (encoding) {
         response.setEncoding(encoding);
