@@ -79,9 +79,16 @@
 
   fabric.loadSVGFromURL = function(url, callback) {
     url = url.replace(/^\n\s*/, '').replace(/\?.*$/, '').trim();
-    request(url, '', function(body) {
-      fabric.loadSVGFromString(body, callback);
-    });
+    if (url.indexOf('http') !== 0) {
+      request_fs(url, function(body) {
+        fabric.loadSVGFromString(body, callback);
+      });
+    }
+    else {
+      request(url, '', function(body) {
+        fabric.loadSVGFromString(body, callback);
+      });
+    }
   };
 
   fabric.loadSVGFromString = function(string, callback) {
