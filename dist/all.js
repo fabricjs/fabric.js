@@ -17260,7 +17260,7 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
     var oURL = URL.parse(url),
     req = HTTP.request({
       hostname: oURL.hostname,
-      port: oURL.port,
+      port: oURL.port || 80,
       path: oURL.pathname,
       method: 'GET'
     }, function(response){
@@ -17286,6 +17286,8 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
         fabric.log(err.message);
       }
     });
+
+    req.end();
   }
 
   /** @private */
@@ -17323,9 +17325,16 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
 
   fabric.loadSVGFromURL = function(url, callback) {
     url = url.replace(/^\n\s*/, '').replace(/\?.*$/, '').trim();
-    request(url, '', function(body) {
-      fabric.loadSVGFromString(body, callback);
-    });
+    if (url.indexOf('http') !== 0) {
+      request_fs(url, function(body) {
+        fabric.loadSVGFromString(body, callback);
+      });
+    }
+    else {
+      request(url, '', function(body) {
+        fabric.loadSVGFromString(body, callback);
+      });
+    }
   };
 
   fabric.loadSVGFromString = function(string, callback) {
