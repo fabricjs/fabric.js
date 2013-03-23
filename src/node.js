@@ -16,7 +16,7 @@
     var oURL = URL.parse(url),
     req = HTTP.request({
       hostname: oURL.hostname,
-      port: oURL.port,
+      port: oURL.port || 80,
       path: oURL.pathname,
       method: 'GET'
     }, function(response){
@@ -42,6 +42,8 @@
         fabric.log(err.message);
       }
     });
+
+    req.end();
   }
 
   /** @private */
