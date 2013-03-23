@@ -1102,6 +1102,20 @@
     },
 
     /**
+     * Moves an object to specified level in stack of drawn objects
+     * @method moveTo
+     * @param object {fabric.Object} Object to send
+     * @param {Number} index Position to move to
+     * @return {fabric.Canvas} thisArg
+     * @chainable
+     */
+    moveTo: function (object, index) {
+      removeFromArray(this._objects, object);
+      this._objects.splice(index, 0, object);
+      return this.renderAll && this.renderAll();
+    },
+
+    /**
      * Clears a canvas element and removes all event handlers.
      * @method dispose
      * @return {fabric.Canvas} thisArg
