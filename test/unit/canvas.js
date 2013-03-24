@@ -906,4 +906,21 @@
     });
   });
 
+  test('clipTo', function() {
+    canvas.clipTo = function(ctx) {
+      ctx.arc(0, 0, 10, 0, Math.PI * 2, false);
+    };
+
+    var error;
+    try {
+      canvas.renderAll();
+    }
+    catch(err) {
+      error = err;
+    }
+    delete canvas.clipTo;
+
+    ok(typeof error == 'undefined', 'renderAll with clipTo does not throw');
+  });
+
 })();

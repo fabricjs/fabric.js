@@ -6551,7 +6551,7 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
       this.fire('before:render');
 
       if (this.clipTo) {
-        fabric.util.clipCanvas(this, canvasToDrawOn);
+        fabric.util.clipContext(this, canvasToDrawOn);
       }
 
       if (this.backgroundColor) {
@@ -6941,7 +6941,7 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
      * Returns SVG representation of canvas
      * @function
      * @method toSVG
-     * @param {Object} [options] Options for SVG output (suppressPreamble: true/false (if true xml tag is not included), 
+     * @param {Object} [options] Options for SVG output (suppressPreamble: true/false (if true xml tag is not included),
      * viewBox: {x, y, width, height} to define the svg output viewBox)
      * @return {String}
      */
