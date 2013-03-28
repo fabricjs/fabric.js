@@ -501,6 +501,9 @@
       if (this.discardActiveGroup) {
         this.discardActiveGroup();
       }
+      if (this.discardActiveObject) {
+        this.discardActiveObject();
+      }
       this.clearContext(this.contextContainer);
       if (this.contextTop) {
         this.clearContext(this.contextTop);
