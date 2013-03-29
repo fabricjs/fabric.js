@@ -71,5 +71,12 @@ fabric.BaseBrush = fabric.util.createClass({
       ctx.shadowOffsetX = this.shadowOffsetX;
       ctx.shadowOffsetY = this.shadowOffsetY;
     }
+  },
+  /**
+   * Sets brush width
+   * @method setWidth
+   */
+  setWidth: function(width) {
+    this.width=parseInt(width);
   }
 });
