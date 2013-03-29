@@ -229,7 +229,7 @@
           this.left = this.width / 2;
         }
       }
-      this.pathOffset = this._calculatePathOffset(isTopSet || isLeftSet); //Save top-left coords as offset
+      this.pathOffset = this.pathOffset || this._calculatePathOffset(isTopSet || isLeftSet); //Save top-left coords as offset
     },
 
     /**
@@ -607,7 +607,8 @@
      */
     toObject: function(propertiesToInclude) {
       var o = extend(this.callSuper('toObject', propertiesToInclude), {
-        path: this.path
+        path: this.path,
+        pathOffset: this.pathOffset
       });
       if (this.sourcePath) {
         o.sourcePath = this.sourcePath;
