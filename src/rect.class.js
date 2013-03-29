@@ -90,17 +90,18 @@
           x = -this.width / 2,
           y = -this.height / 2,
           w = this.width,
-          h = this.height;
+          h = this.height,
+          isInPathGroup = this.group && this.group.type !== 'group';
 
       ctx.beginPath();
-      ctx.globalAlpha = this.group ? (ctx.globalAlpha * this.opacity) : this.opacity;
+      ctx.globalAlpha = isInPathGroup ? (ctx.globalAlpha * this.opacity) : this.opacity;
 
-      if (this.transformMatrix && this.group) {
+      if (this.transformMatrix && isInPathGroup) {
         ctx.translate(
           this.width / 2 + this.x,
           this.height / 2 + this.y);
       }
-      if (!this.transformMatrix && this.group) {
+      if (!this.transformMatrix && isInPathGroup) {
         ctx.translate(
           -this.group.width / 2 + this.width / 2 + this.x,
           -this.group.height / 2 + this.height / 2 + this.y);
