@@ -95,7 +95,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
       endValue: 0,
       duration: this.FX_DURATION,
       onStart: function() {
-        object.setActive(false);
+        object.set('active', false);
       },
       onChange: function(value) {
         object.set('opacity', value);

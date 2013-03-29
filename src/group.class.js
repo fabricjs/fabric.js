@@ -64,11 +64,8 @@
       }
       this._setOpacityIfSame();
 
-      // group is active by default
       this.setCoords(true);
       this.saveCoords();
-
-      //this.activateAllObjects();
     },
 
     /**
@@ -142,7 +139,7 @@
     removeWithUpdate: function(object) {
       this._restoreObjectsState();
       this.remove(object);
-      object.setActive(false);
+      object.set('active', false);
       this._calcBounds();
       this._updateObjectsCoords();
       return this;
@@ -292,7 +289,7 @@
       object.setCoords();
       object.hasControls = object.__origHasControls;
       delete object.__origHasControls;
-      object.setActive(false);
+      object.set('active', false);
       object.setCoords();
       delete object.group;
 
@@ -340,19 +337,6 @@
     setObjectsCoords: function() {
       this.forEachObject(function(object) {
         object.setCoords();
-      });
-      return this;
-    },
-
-    /**
-     * Activates (makes active) all group objects
-     * @method activateAllObjects
-     * @return {fabric.Group} thisArg
-     * @chainable
-     */
-    activateAllObjects: function() {
-      this.forEachObject(function(object) {
-        object.setActive();
       });
       return this;
     },

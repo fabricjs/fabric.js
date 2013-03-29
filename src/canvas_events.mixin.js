@@ -306,7 +306,7 @@
           // image/text was hovered-out from, we remove its borders
           for (var i = this._objects.length; i--; ) {
             if (this._objects[i] && !this._objects[i].active) {
-              this._objects[i].setActive(false);
+              this._objects[i].set('active', false);
             }
           }
           style.cursor = this.defaultCursor;

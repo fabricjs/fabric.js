@@ -8388,7 +8388,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @scope fab
         if (activeGroup.contains(target)) {
           activeGroup.removeWithUpdate(target);
           this._resetObjectTransform(activeGroup);
-          target.setActive(false);
+          target.set('active', false);
           if (activeGroup.size() === 1) {
             // remove group alltogether if after removal it only contains 1 object
             this.discardActiveGroup();
@@ -8399,7 +8399,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @scope fab
           this._resetObjectTransform(activeGroup);
         }
         this.fire('selection:created', { target: activeGroup, e: e });
-        activeGroup.setActive(true);
+        activeGroup.set('active', true);
       }
       else {
         // group does not exist
@@ -8413,7 +8413,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @scope fab
           }
         }
         // activate target object in any case
-        target.setActive(true);
+        target.set('active', true);
       }
 
       if (activeGroup) {
@@ -8644,7 +8644,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @scope fab
             currentObject.isContainedWithinRect(selectionX1Y1, selectionX2Y2)) {
 
           if (this.selection && currentObject.selectable) {
-            currentObject.setActive(true);
+            currentObject.set('active', true);
             group.push(currentObject);
           }
         }
@@ -8819,7 +8819,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @scope fab
     },
 
     /**
-     * Sets given object as active
+     * Sets given object as the only active object on canvas
      * @method setActiveObject
      * @param object {fabric.Object} Object to set as an active one
      * @return {fabric.Canvas} thisArg
@@ -8827,10 +8827,10 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @scope fab
      */
     setActiveObject: function (object, e) {
       if (this._activeObject) {
-        this._activeObject.setActive(false);
+        this._activeObject.set('active', false);
       }
       this._activeObject = object;
-      object.setActive(true);
+      object.set('active', true);
 
       this.renderAll();
 
@@ -8856,7 +8856,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @scope fab
      */
     discardActiveObject: function () {
       if (this._activeObject) {
-        this._activeObject.setActive(false);
+        this._activeObject.set('active', false);
       }
       this._activeObject = null;
       return this;
@@ -8873,7 +8873,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @scope fab
       this._activeGroup = group;
       if (group) {
         group.canvas = this;
-        group.setActive(true);
+        group.set('active', true);
       }
       return this;
     },
@@ -8901,7 +8901,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @scope fab
     },
 
     /**
-     * Deactivates all objects by calling their setActive(false)
+     * Deactivates all objects on canvas, removing any active group or object
      * @method deactivateAll
      * @return {fabric.Canvas} thisArg
      */
@@ -8910,7 +8910,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @scope fab
           i = 0,
           len = allObjects.length;
       for ( ; i < len; i++) {
-        allObjects[i].setActive(false);
+        allObjects[i].set('active', false);
       }
       this.discardActiveGroup();
       this.discardActiveObject();
@@ -9267,7 +9267,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @scope fab
           // image/text was hovered-out from, we remove its borders
           for (var i = this._objects.length; i--; ) {
             if (this._objects[i] && !this._objects[i].active) {
-              this._objects[i].setActive(false);
+              this._objects[i].set('active', false);
             }
           }
           style.cursor = this.defaultCursor;
@@ -9535,7 +9535,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
       endValue: 0,
       duration: this.FX_DURATION,
       onStart: function() {
-        object.setActive(false);
+        object.set('active', false);
       },
       onChange: function(value) {
         object.set('opacity', value);
@@ -10374,25 +10374,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
     },
 
     /**
-     * Returns true if an object is in its active state
-     * @return {Boolean} true if an object is in its active state
-     */
-    isActive: function() {
-      return !!this.active;
-    },
-
-    /**
-     * Sets state of an object - `true` makes it active, `false` - inactive
-     * @param {Boolean} active
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-    setActive: function(active) {
-      this.active = !!active;
-      return this;
-    },
-
-    /**
      * Returns a string representation of an instance
      * @return {String}
      */
@@ -10647,7 +10628,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
         clone.left = el.width / 2;
         clone.top = el.height / 2;
 
-        clone.setActive(false);
+        clone.set('active', false);
 
         canvas.add(clone);
         var data = canvas.toDataURL();
@@ -14549,11 +14530,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
       }
       this._setOpacityIfSame();
 
-      // group is active by default
       this.setCoords(true);
       this.saveCoords();
-
-      //this.activateAllObjects();
     },
 
     /**
@@ -14627,7 +14605,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
     removeWithUpdate: function(object) {
       this._restoreObjectsState();
       this.remove(object);
-      object.setActive(false);
+      object.set('active', false);
       this._calcBounds();
       this._updateObjectsCoords();
       return this;
@@ -14777,7 +14755,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
       object.setCoords();
       object.hasControls = object.__origHasControls;
       delete object.__origHasControls;
-      object.setActive(false);
+      object.set('active', false);
       object.setCoords();
       delete object.group;
 
@@ -14825,19 +14803,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
     setObjectsCoords: function() {
       this.forEachObject(function(object) {
         object.setCoords();
-      });
-      return this;
-    },
-
-    /**
-     * Activates (makes active) all group objects
-     * @method activateAllObjects
-     * @return {fabric.Group} thisArg
-     * @chainable
-     */
-    activateAllObjects: function() {
-      this.forEachObject(function(object) {
-        object.setActive();
       });
       return this;
     },
@@ -15461,7 +15426,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @scope fabric.Object.prot
         onComplete();
       },
       onStart: function() {
-        _this.setActive(false);
+        _this.set('active', false);
       }
     });
 

@@ -510,25 +510,6 @@
     },
 
     /**
-     * Returns true if an object is in its active state
-     * @return {Boolean} true if an object is in its active state
-     */
-    isActive: function() {
-      return !!this.active;
-    },
-
-    /**
-     * Sets state of an object - `true` makes it active, `false` - inactive
-     * @param {Boolean} active
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-    setActive: function(active) {
-      this.active = !!active;
-      return this;
-    },
-
-    /**
      * Returns a string representation of an instance
      * @return {String}
      */
@@ -783,7 +764,7 @@
         clone.left = el.width / 2;
         clone.top = el.height / 2;
 
-        clone.setActive(false);
+        clone.set('active', false);
 
         canvas.add(clone);
         var data = canvas.toDataURL();

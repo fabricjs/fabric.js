@@ -424,7 +424,7 @@
         if (activeGroup.contains(target)) {
           activeGroup.removeWithUpdate(target);
           this._resetObjectTransform(activeGroup);
-          target.setActive(false);
+          target.set('active', false);
           if (activeGroup.size() === 1) {
             // remove group alltogether if after removal it only contains 1 object
             this.discardActiveGroup();
@@ -435,7 +435,7 @@
           this._resetObjectTransform(activeGroup);
         }
         this.fire('selection:created', { target: activeGroup, e: e });
-        activeGroup.setActive(true);
+        activeGroup.set('active', true);
       }
       else {
         // group does not exist
@@ -449,7 +449,7 @@
           }
         }
         // activate target object in any case
-        target.setActive(true);
+        target.set('active', true);
       }
 
       if (activeGroup) {
@@ -680,7 +680,7 @@
             currentObject.isContainedWithinRect(selectionX1Y1, selectionX2Y2)) {
 
           if (this.selection && currentObject.selectable) {
-            currentObject.setActive(true);
+            currentObject.set('active', true);
             group.push(currentObject);
           }
         }
@@ -855,7 +855,7 @@
     },
 
     /**
-     * Sets given object as active
+     * Sets given object as the only active object on canvas
      * @method setActiveObject
      * @param object {fabric.Object} Object to set as an active one
      * @return {fabric.Canvas} thisArg
@@ -863,10 +863,10 @@
      */
     setActiveObject: function (object, e) {
       if (this._activeObject) {
-        this._activeObject.setActive(false);
+        this._activeObject.set('active', false);
       }
       this._activeObject = object;
-      object.setActive(true);
+      object.set('active', true);
 
       this.renderAll();
 
@@ -892,7 +892,7 @@
      */
     discardActiveObject: function () {
       if (this._activeObject) {
-        this._activeObject.setActive(false);
+        this._activeObject.set('active', false);
       }
       this._activeObject = null;
       return this;
@@ -909,7 +909,7 @@
       this._activeGroup = group;
       if (group) {
         group.canvas = this;
-        group.setActive(true);
+        group.set('active', true);
       }
       return this;
     },
@@ -937,7 +937,7 @@
     },
 
     /**
-     * Deactivates all objects by calling their setActive(false)
+     * Deactivates all objects on canvas, removing any active group or object
      * @method deactivateAll
      * @return {fabric.Canvas} thisArg
      */
@@ -946,7 +946,7 @@
           i = 0,
           len = allObjects.length;
       for ( ; i < len; i++) {
-        allObjects[i].setActive(false);
+        allObjects[i].set('active', false);
       }
       this.discardActiveGroup();
       this.discardActiveObject();

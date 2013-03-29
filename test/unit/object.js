@@ -227,23 +227,6 @@
     deepEqual(cObj.toObject(), cObj.toDatalessObject());
   });
 
-  test('isActive', function() {
-    var cObj = new fabric.Object();
-    ok(typeof cObj.isActive == 'function');
-    ok(!cObj.isActive(), 'initially not active');
-    cObj.setActive(true);
-    ok(cObj.isActive());
-  });
-
-  test('setActive', function() {
-    var cObj = new fabric.Object();
-    ok(typeof cObj.setActive == 'function');
-    equal(cObj.setActive(true), cObj, 'chainable?');
-    ok(cObj.isActive());
-    cObj.setActive(false);
-    ok(!cObj.isActive());
-  });
-
   test('toString', function() {
     var cObj = new fabric.Object();
     equal(cObj.toString(), '#<fabric.Object>');

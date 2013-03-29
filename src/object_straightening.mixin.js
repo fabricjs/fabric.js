@@ -55,7 +55,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @scope fabric.Object.prot
         onComplete();
       },
       onStart: function() {
-        _this.setActive(false);
+        _this.set('active', false);
       }
     });
 
