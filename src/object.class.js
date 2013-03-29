@@ -547,7 +547,7 @@
     },
 
     /**
-     * Sets property to a given value
+     * Sets property to a given value. When changing position/dimension -related properties (left, top, scale, angle, etc.) `set` does not update position of object's borders/controls. If you need to update those, call `setCoords()`.
      * @method set
      * @param {String} name
      * @param {Object|Function} value (if function, the value is passed into it and its return value is used as a new one)
@@ -1147,6 +1147,7 @@
   extend(fabric.Object.prototype, fabric.Observable);
 
   /**
+   * Defines the number of fraction digits when serializing object values. You can use it to increase/decrease precision of such values like left, top, scaleX, scaleY, etc.
    * @static
    * @constant
    * @type Number
