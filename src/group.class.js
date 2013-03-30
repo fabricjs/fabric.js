@@ -124,6 +124,8 @@
       this._restoreObjectsState();
       this._objects.push(object);
       object.group = this;
+      // since _restoreObjectsState set objects inactive
+      this.forEachObject(function(o){ o.set('active', true) });
       this._calcBounds();
       this._updateObjectsCoords();
       return this;
@@ -138,8 +140,10 @@
      */
     removeWithUpdate: function(object) {
       this._restoreObjectsState();
+      // since _restoreObjectsState set objects inactive
+      this.forEachObject(function(o){ o.set('active', true) });
+
       this.remove(object);
-      object.set('active', false);
       this._calcBounds();
       this._updateObjectsCoords();
       return this;
@@ -157,6 +161,7 @@
      */
     _onObjectRemoved: function(object) {
       delete object.group;
+      object.set('active', false);
     },
 
     /**
@@ -224,9 +229,9 @@
       this.clipTo && fabric.util.clipContext(this, ctx);
 
       //The array is now sorted in order of highest first, so start from end.
-      for (var i = this._objects.length; i > 0; i--) {
+      for (var i = 0, len = this._objects.length; i < len; i++) {
 
-        var object = this._objects[i-1],
+        var object = this._objects[i],
             originalScaleFactor = object.borderScaleFactor,
             originalHasRotatingPoint = object.hasRotatingPoint;
 

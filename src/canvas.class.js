@@ -325,6 +325,8 @@
      * @method _setupCurrentTransform
      */
     _setupCurrentTransform: function (e, target) {
+      if (!target) return;
+
       var action = 'drag',
           corner,
           pointer = getPointer(e, target.canvas.upperCanvasEl);
