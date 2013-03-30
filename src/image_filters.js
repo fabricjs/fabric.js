@@ -746,8 +746,8 @@ fabric.Image.filters.Pixelate = fabric.util.createClass(/** @scope fabric.Image.
     var context = canvasEl.getContext('2d'),
         imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
         data = imageData.data,
-        iLen = imageData.width,
-        jLen = imageData.height,
+        iLen = imageData.height,
+        jLen = imageData.width,
         index, i, j, r, g, b, a;
 
     for (i = 0; i < iLen; i += this.blocksize) {
