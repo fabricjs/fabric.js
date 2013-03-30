@@ -354,25 +354,6 @@
           // rotate object only if shift key is not pressed
           // and if it is not a group we are transforming
 
-          // TODO
-          /*if (!e.shiftKey) {
-            this._rotateObject(x, y);
-
-            this.fire('object:rotating', {
-              target: this._currentTransform.target,
-              e: e
-            });
-            this._currentTransform.target.fire('rotating');
-          }*/
-
-          // if (!this._currentTransform.target.hasRotatingPoint) {
-          //   this._scaleObject(x, y);
-          //   this.fire('object:scaling', {
-          //     target: this._currentTransform.target
-          //   });
-          //   this._currentTransform.target.fire('scaling');
-          // }
-
           if (e.shiftKey || this.uniScaleTransform) {
             this._currentTransform.currentAction = 'scale';
             this._scaleObject(x, y);
@@ -393,13 +374,6 @@
           });
           this._currentTransform.target.fire('scaling', { e: e });
         }
-        // else if (this._currentTransform.action === 'scale') {
-        //   this._scaleObject(x, y);
-        //   this.fire('object:scaling', {
-        //     target: this._currentTransform.target
-        //   });
-        //   this._currentTransform.target.fire('scaling');
-        // }
         else if (this._currentTransform.action === 'scaleX') {
           this._scaleObject(x, y, 'x');
 
@@ -425,12 +399,10 @@
             target: this._currentTransform.target,
             e: e
           });
-
-          this._setCursor(this.moveCursor);
-
           this._currentTransform.target.fire('moving', { e: e });
+          this._setCursor(this.moveCursor);
         }
-        // only commit here. when we are actually moving the pictures
+
         this.renderAll();
       }
       this.fire('mouse:move', { target: target, e: e });
