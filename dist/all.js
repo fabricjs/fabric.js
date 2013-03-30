@@ -8289,6 +8289,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @scope fab
      * @method _setupCurrentTransform
      */
     _setupCurrentTransform: function (e, target) {
+      if (!target) return;
+
       var action = 'drag',
           corner,
           pointer = getPointer(e, target.canvas.upperCanvasEl);
@@ -9315,25 +9317,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @scope fab
           // rotate object only if shift key is not pressed
           // and if it is not a group we are transforming
 
-          // TODO
-          /*if (!e.shiftKey) {
-            this._rotateObject(x, y);
-
-            this.fire('object:rotating', {
-              target: this._currentTransform.target,
-              e: e
-            });
-            this._currentTransform.target.fire('rotating');
-          }*/
-
-          // if (!this._currentTransform.target.hasRotatingPoint) {
-          //   this._scaleObject(x, y);
-          //   this.fire('object:scaling', {
-          //     target: this._currentTransform.target
-          //   });
-          //   this._currentTransform.target.fire('scaling');
-          // }
-
           if (e.shiftKey || this.uniScaleTransform) {
             this._currentTransform.currentAction = 'scale';
             this._scaleObject(x, y);
@@ -9354,13 +9337,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @scope fab
           });
           this._currentTransform.target.fire('scaling', { e: e });
         }
-        // else if (this._currentTransform.action === 'scale') {
-        //   this._scaleObject(x, y);
-        //   this.fire('object:scaling', {
-        //     target: this._currentTransform.target
-        //   });
-        //   this._currentTransform.target.fire('scaling');
-        // }
         else if (this._currentTransform.action === 'scaleX') {
           this._scaleObject(x, y, 'x');
 
@@ -9386,12 +9362,10 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @scope fab
             target: this._currentTransform.target,
             e: e
           });
-
-          this._setCursor(this.moveCursor);
-
           this._currentTransform.target.fire('moving', { e: e });
+          this._setCursor(this.moveCursor);
         }
-        // only commit here. when we are actually moving the pictures
+
         this.renderAll();
       }
       this.fire('mouse:move', { target: target, e: e });
@@ -14590,6 +14564,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
       this._restoreObjectsState();
       this._objects.push(object);
       object.group = this;
+      // since _restoreObjectsState set objects inactive
+      this.forEachObject(function(o){ o.set('active', true) });
       this._calcBounds();
       this._updateObjectsCoords();
       return this;
@@ -14604,8 +14580,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
      */
     removeWithUpdate: function(object) {
       this._restoreObjectsState();
+      // since _restoreObjectsState set objects inactive
+      this.forEachObject(function(o){ o.set('active', true) });
+
       this.remove(object);
-      object.set('active', false);
       this._calcBounds();
       this._updateObjectsCoords();
       return this;
@@ -14623,6 +14601,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
      */
     _onObjectRemoved: function(object) {
       delete object.group;
+      object.set('active', false);
     },
 
     /**
@@ -14690,9 +14669,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
       this.clipTo && fabric.util.clipContext(this, ctx);
 
       //The array is now sorted in order of highest first, so start from end.
-      for (var i = this._objects.length; i > 0; i--) {
+      for (var i = 0, len = this._objects.length; i < len; i++) {
 
-        var object = this._objects[i-1],
+        var object = this._objects[i],
             originalScaleFactor = object.borderScaleFactor,
             originalHasRotatingPoint = object.hasRotatingPoint;
 
@@ -16211,8 +16190,8 @@ fabric.Image.filters.Pixelate = fabric.util.createClass(/** @scope fabric.Image.
     var context = canvasEl.getContext('2d'),
         imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
         data = imageData.data,
-        iLen = imageData.width,
-        jLen = imageData.height,
+        iLen = imageData.height,
+        jLen = imageData.width,
         index, i, j, r, g, b, a;
 
     for (i = 0; i < iLen; i += this.blocksize) {
