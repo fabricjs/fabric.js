@@ -46,7 +46,7 @@ Fabric.js started as a foundation for design editor on [printio.ru](http://print
 
         $ node build.js
 
-    - Or build a custom distribution file, by passing (comma separated) module names to be included.<br>
+    - Or build a custom distribution file, by passing (comma separated) module names to be included.
 
             $ node build.js modules=text,serialization,parser
             // or
@@ -96,10 +96,11 @@ These are the optional modules that could be specified for inclusion, when build
 - **interaction** — Adds support for interactive features of fabric — selecting/transforming objects/groups via mouse/touch devices.
 - **parser** — Adds support for `fabric.parseSVGDocument`, `fabric.loadSVGFromURL`, and `fabric.loadSVGFromString`
 - **image_filters** — Adds support for image filters, such as grayscale of white removal.
-- **easing** - Adds support for animation easing functions
+- **easing** — Adds support for animation easing functions
 - **node** — Adds support for running fabric under node.js, with help of [jsdom](https://github.com/tmpvar/jsdom) and [node-canvas](https://github.com/learnboost/node-canvas) libraries.
-- **freedrawing** - Adds support for free drawing
-- **gestures** - Adds support for multitouch gestures
+- **freedrawing** — Adds support for free drawing
+- **gestures** — Adds support for multitouch gestures
+- **object_straightening** — Adds support for rotating an object to one of 0, 90, 180, 270, etc. depending on which is angle is closer.
 
 ### Examples of use
 
