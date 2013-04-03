@@ -220,6 +220,7 @@
           left: 0
         };
         this.deactivateAllWithDispatch();
+        target && this.setActiveObject(target, e);
       }
       else {
         // determine if it's a drag or rotate case
