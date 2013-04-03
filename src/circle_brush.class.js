@@ -29,15 +29,7 @@ fabric.CircleBrush = fabric.util.createClass( fabric.BaseBrush, /** @scope fabri
   onMouseDown: function() {
     this.points.length = 0;
     this.canvas.clearContext(this.canvas.contextTop);
-
-    var ctx = this.canvas.contextTop;
-
-    if (this.shadowBlur) {
-      ctx.shadowBlur = this.shadowBlur;
-      ctx.shadowColor = this.shadowColor || this.color;
-      ctx.shadowOffsetX = this.shadowOffsetX;
-      ctx.shadowOffsetY = this.shadowOffsetY;
-    }
+    this.setShadowStyles();
   },
 
   /**
