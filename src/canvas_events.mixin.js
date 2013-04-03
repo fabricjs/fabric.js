@@ -237,8 +237,8 @@
         else {
           if (target !== this.getActiveGroup()) {
             this.deactivateAll();
+            this.setActiveObject(target, e);
           }
-          this.setActiveObject(target, e);
         }
 
         this._setupCurrentTransform(e, target);
