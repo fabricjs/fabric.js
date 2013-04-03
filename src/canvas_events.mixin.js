@@ -220,6 +220,7 @@
           left: 0
         };
         this.deactivateAllWithDispatch();
+        target && this.setActiveObject(target, e);
       }
       else {
         // determine if it's a drag or rotate case
@@ -236,8 +237,8 @@
         else {
           if (target !== this.getActiveGroup()) {
             this.deactivateAll();
+            this.setActiveObject(target, e);
           }
-          this.setActiveObject(target, e);
         }
 
         this._setupCurrentTransform(e, target);
