@@ -96,8 +96,10 @@
 
       ctx.save();
       var m = this.transformMatrix;
+      var isInPathGroup = this.group && this.group.type !== 'group';
+
       // this._resetWidthHeight();
-      if (this.group) {
+      if (isInPathGroup) {
         ctx.translate(-this.group.width/2 + this.width/2, -this.group.height/2 + this.height/2);
       }
       if (m) {

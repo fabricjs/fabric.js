@@ -86,7 +86,8 @@
     _render: function(ctx) {
       ctx.beginPath();
 
-      if (this.group) {
+      var isInPathGroup = this.group && this.group.type !== 'group';
+      if (isInPathGroup) {
         ctx.translate(-this.group.width/2 + this.left, -this.group.height / 2 + this.top);
       }
 
