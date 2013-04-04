@@ -113,10 +113,26 @@
       this.clipTo && ctx.restore();
       this._removeShadow(ctx);
 
+      if (this.stroke) {
+        this._stroke(ctx);
+      }
+
       if (this.active && !noTransform) {
         this.drawBorders(ctx);
         this.drawControls(ctx);
       }
+      ctx.restore();
+    },
+
+    _stroke: function(ctx) {
+      ctx.save();
+      ctx.lineWidth = this.strokeWidth;
+      ctx.strokeStyle = this.stroke;
+      ctx.strokeRect(
+        -this.width / 2,
+        -this.height / 2,
+        this.width,
+        this.height);
       ctx.restore();
     },
 
