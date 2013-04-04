@@ -39,6 +39,13 @@
     ry: 0,
 
     /**
+     * Used to specify dash pattern for stroke on this object
+     * @property
+     * @type Array
+     */
+    strokeDashArray: null,
+
+    /**
      * Constructor
      * @method initialize
      * @param {Object} [options] Options object
