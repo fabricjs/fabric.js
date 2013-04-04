@@ -19,7 +19,7 @@
     textDecoration: true,
     fontStyle: true,
     lineHeight: true,
-    strokeStyle: true,
+    stroke: true,
     strokeWidth: true,
     text: true
   };
@@ -36,7 +36,7 @@
     'textAlign',
     'fontStyle',
     'lineHeight',
-    'strokeStyle',
+    'stroke',
     'strokeWidth',
     'backgroundColor',
     'textBackgroundColor',
@@ -111,7 +111,7 @@
      * @property
      * @type String
      */
-    strokeStyle:          '',
+    stroke:               '',
 
     /**
      * Stroke width
@@ -242,7 +242,7 @@
         textAlign: this.textAlign,
         fontStyle: this.fontStyle,
         lineHeight: this.lineHeight,
-        strokeStyle: this.strokeStyle,
+        stroke: this.stroke,
         strokeWidth: this.strokeWidth,
         backgroundColor: this.backgroundColor,
         textBackgroundColor: this.textBackgroundColor
@@ -332,7 +332,7 @@
       ctx.fillStyle = this.fill.toLive
           ? this.fill.toLive(ctx)
           : this.fill;
-      ctx.strokeStyle = this.strokeStyle;
+      ctx.strokeStyle = this.stroke;
       ctx.lineWidth = this.strokeWidth;
       ctx.textBaseline = 'alphabetic';
       ctx.textAlign = this.textAlign;
@@ -461,7 +461,7 @@
      * @method _renderTextStroke
      */
     _renderTextStroke: function(ctx, textLines) {
-      if (this.strokeStyle) {
+      if (this.stroke) {
         ctx.beginPath();
         for (var i = 0, len = textLines.length; i < len; i++) {
           this._drawTextLine(
@@ -672,7 +672,7 @@
         textShadow:           this.textShadow,
         textAlign:            this.textAlign,
         path:                 this.path,
-        strokeStyle:          this.strokeStyle,
+        stroke:               this.stroke,
         strokeWidth:          this.strokeWidth,
         backgroundColor:      this.backgroundColor,
         textBackgroundColor:  this.textBackgroundColor,
