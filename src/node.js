@@ -22,9 +22,9 @@
     }
 
     // assign request handler based on protocol
-    var req_handler = ( oURL.port === 443 ) ? HTTPS : HTTP;
+    var reqHandler = ( oURL.port === 443 ) ? HTTPS : HTTP;
 
-    var req = req_handler.request({
+    var req = reqHandler.request({
       hostname: oURL.hostname,
       port: oURL.port,
       path: oURL.pathname,
