@@ -607,8 +607,7 @@
      */
     toObject: function(propertiesToInclude) {
       var o = extend(this.callSuper('toObject', propertiesToInclude), {
-        path: this.path,
-        pathOffset: this.pathOffset
+        path: this.path
       });
       if (this.sourcePath) {
         o.sourcePath = this.sourcePath;
