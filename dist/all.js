@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures` */
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.1.5" };
+var fabric = fabric || { version: "1.1.6" };
 
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
@@ -30,6 +30,7 @@ fabric.isTouchSupported = "ontouchstart" in fabric.document.documentElement;
  * @type boolean
  */
 fabric.isLikelyNode = typeof Buffer !== 'undefined' && typeof window === 'undefined';
+
 /*!
  * Copyright (c) 2009 Simo Kinnunen.
  * Licensed under the MIT license.
@@ -7351,12 +7352,10 @@ fabric.BaseBrush = fabric.util.createClass({
   setShadowStyles: function() {
     var ctx = this.canvas.contextTop;
 
-    if (this.shadowBlur) {
-      ctx.shadowBlur = this.shadowBlur;
-      ctx.shadowColor = this.shadowColor || this.color;
-      ctx.shadowOffsetX = this.shadowOffsetX;
-      ctx.shadowOffsetY = this.shadowOffsetY;
-    }
+    ctx.shadowBlur = this.shadowBlur;
+    ctx.shadowColor = this.shadowColor || this.color;
+    ctx.shadowOffsetX = this.shadowOffsetX;
+    ctx.shadowOffsetY = this.shadowOffsetY;
   }
 });
 (function() {
@@ -7663,15 +7662,7 @@ fabric.CircleBrush = fabric.util.createClass( fabric.BaseBrush, /** @scope fabri
   onMouseDown: function() {
     this.points.length = 0;
     this.canvas.clearContext(this.canvas.contextTop);
-
-    var ctx = this.canvas.contextTop;
-
-    if (this.shadowBlur) {
-      ctx.shadowBlur = this.shadowBlur;
-      ctx.shadowColor = this.shadowColor || this.color;
-      ctx.shadowOffsetX = this.shadowOffsetX;
-      ctx.shadowOffsetY = this.shadowOffsetY;
-    }
+    this.setShadowStyles();
   },
 
   /**
@@ -9184,6 +9175,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @scope fab
           left: 0
         };
         this.deactivateAllWithDispatch();
+        target && this.setActiveObject(target, e);
       }
       else {
         // determine if it's a drag or rotate case
@@ -9200,8 +9192,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @scope fab
         else {
           if (target !== this.getActiveGroup()) {
             this.deactivateAll();
+            this.setActiveObject(target, e);
           }
-          this.setActiveObject(target, e);
         }
 
         this._setupCurrentTransform(e, target);
@@ -11993,6 +11985,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
     }
   });
 })();
+
 (function(global) {
 
   "use strict";
@@ -12081,7 +12074,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
     _render: function(ctx) {
       ctx.beginPath();
 
-      if (this.group) {
+      var isInPathGroup = this.group && this.group.type !== 'group';
+      if (isInPathGroup) {
         ctx.translate(-this.group.width/2 + this.left, -this.group.height / 2 + this.top);
       }
 
@@ -12189,6 +12183,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
   };
 
 })(typeof exports !== 'undefined' ? exports : this);
+
 (function(global) {
 
   "use strict";
@@ -12738,6 +12733,13 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
     ry: 0,
 
     /**
+     * Used to specify dash pattern for stroke on this object
+     * @property
+     * @type Array
+     */
+    strokeDashArray: null,
+
+    /**
      * Constructor
      * @method initialize
      * @param {Object} [options] Options object
@@ -13009,6 +13011,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
   };
 
 })(typeof exports !== 'undefined' ? exports : this);
+
 (function(global) {
 
   "use strict";
@@ -13981,8 +13984,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
      */
     toObject: function(propertiesToInclude) {
       var o = extend(this.callSuper('toObject', propertiesToInclude), {
-        path: this.path,
-        pathOffset: this.pathOffset
+        path: this.path
       });
       if (this.sourcePath) {
         o.sourcePath = this.sourcePath;
@@ -14566,7 +14568,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
       this._objects.push(object);
       object.group = this;
       // since _restoreObjectsState set objects inactive
-      this.forEachObject(function(o){ o.set('active', true) });
+      this.forEachObject(function(o){ o.set('active', true); o.group = this; }, this);
       this._calcBounds();
       this._updateObjectsCoords();
       return this;
@@ -14582,7 +14584,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
     removeWithUpdate: function(object) {
       this._restoreObjectsState();
       // since _restoreObjectsState set objects inactive
-      this.forEachObject(function(o){ o.set('active', true) });
+      this.forEachObject(function(o){ o.set('active', true); o.group = this; }, this);
 
       this.remove(object);
       this._calcBounds();
@@ -15026,8 +15028,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
 
       ctx.save();
       var m = this.transformMatrix;
+      var isInPathGroup = this.group && this.group.type !== 'group';
+
       // this._resetWidthHeight();
-      if (this.group) {
+      if (isInPathGroup) {
         ctx.translate(-this.group.width/2 + this.width/2, -this.group.height/2 + this.height/2);
       }
       if (m) {
@@ -15043,10 +15047,26 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
       this.clipTo && ctx.restore();
       this._removeShadow(ctx);
 
+      if (this.stroke) {
+        this._stroke(ctx);
+      }
+
       if (this.active && !noTransform) {
         this.drawBorders(ctx);
         this.drawControls(ctx);
       }
+      ctx.restore();
+    },
+
+    _stroke: function(ctx) {
+      ctx.save();
+      ctx.lineWidth = this.strokeWidth;
+      ctx.strokeStyle = this.stroke;
+      ctx.strokeRect(
+        -this.width / 2,
+        -this.height / 2,
+        this.width,
+        this.height);
       ctx.restore();
     },
 
@@ -15102,8 +15122,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
     /**
      * Returns a clone of an instance
      * @method clone
-     * @param {Array} propertiesToInclude
      * @param {Function} callback Callback is invoked with a clone as a first argument
+     * @param {Array} propertiesToInclude
      */
     clone: function(callback, propertiesToInclude) {
       this.constructor.fromObject(this.toObject(propertiesToInclude), callback);
@@ -16273,7 +16293,7 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
     textDecoration: true,
     fontStyle: true,
     lineHeight: true,
-    strokeStyle: true,
+    stroke: true,
     strokeWidth: true,
     text: true
   };
@@ -16290,7 +16310,7 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
     'textAlign',
     'fontStyle',
     'lineHeight',
-    'strokeStyle',
+    'stroke',
     'strokeWidth',
     'backgroundColor',
     'textBackgroundColor',
@@ -16365,7 +16385,7 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
      * @property
      * @type String
      */
-    strokeStyle:          '',
+    stroke:               '',
 
     /**
      * Stroke width
@@ -16496,7 +16516,7 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
         textAlign: this.textAlign,
         fontStyle: this.fontStyle,
         lineHeight: this.lineHeight,
-        strokeStyle: this.strokeStyle,
+        stroke: this.stroke,
         strokeWidth: this.strokeWidth,
         backgroundColor: this.backgroundColor,
         textBackgroundColor: this.textBackgroundColor
@@ -16586,7 +16606,7 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
       ctx.fillStyle = this.fill.toLive
           ? this.fill.toLive(ctx)
           : this.fill;
-      ctx.strokeStyle = this.strokeStyle;
+      ctx.strokeStyle = this.stroke;
       ctx.lineWidth = this.strokeWidth;
       ctx.textBaseline = 'alphabetic';
       ctx.textAlign = this.textAlign;
@@ -16715,7 +16735,7 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
      * @method _renderTextStroke
      */
     _renderTextStroke: function(ctx, textLines) {
-      if (this.strokeStyle) {
+      if (this.stroke) {
         ctx.beginPath();
         for (var i = 0, len = textLines.length; i < len; i++) {
           this._drawTextLine(
@@ -16926,7 +16946,7 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
         textShadow:           this.textShadow,
         textAlign:            this.textAlign,
         path:                 this.path,
-        strokeStyle:          this.strokeStyle,
+        stroke:               this.stroke,
         strokeWidth:          this.strokeWidth,
         backgroundColor:      this.backgroundColor,
         textBackgroundColor:  this.textBackgroundColor,
@@ -17217,9 +17237,9 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
     }
 
     // assign request handler based on protocol
-    var req_handler = ( oURL.port === 443 ) ? HTTPS : HTTP;
+    var reqHandler = ( oURL.port === 443 ) ? HTTPS : HTTP;
 
-    var req = req_handler.request({
+    var req = reqHandler.request({
       hostname: oURL.hostname,
       port: oURL.port,
       path: oURL.pathname,
