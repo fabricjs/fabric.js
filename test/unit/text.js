@@ -16,7 +16,7 @@
     'height':           52,
     'fill':             'rgb(0,0,0)',
     'overlayFill':      null,
-    'stroke':           null,
+    'stroke':           '',
     'strokeWidth':      1,
     'strokeDashArray':  null,
     'scaleX':           1,
@@ -43,7 +43,6 @@
     'textShadow':       '',
     'textAlign':        'left',
     'path':             null,
-    'strokeStyle':      '',
     'backgroundColor':  '',
     'textBackgroundColor':  '',
     'useNative':        true
