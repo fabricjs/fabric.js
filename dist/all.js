@@ -4486,7 +4486,7 @@ fabric.util.string = {
    };
 
    /**
-    * Takes url corresponding to an SVG document, and parses it into a set of fabric objects
+    * Takes url corresponding to an SVG document, and parses it into a set of fabric objects. Note that SVG is fetched via XMLHttpRequest, so it needs to conform to SOP (Same Origin Policy)
     * @method loadSVGFromURL
     * @memberof fabric
     * @param {String} url
@@ -6477,6 +6477,7 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
      */
     _onObjectRemoved: function(obj) {
       this.fire('object:removed', { target: obj });
+      obj.fire('removed');
     },
 
     /**
@@ -17201,16 +17202,26 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
   var DOMParser = new require('xmldom').DOMParser,
       URL = require('url'),
       HTTP = require('http'),
+      HTTPS = require('https'),
 
       Canvas = require('canvas'),
       Image = require('canvas').Image;
 
   /** @private */
   function request(url, encoding, callback) {
-    var oURL = URL.parse(url),
-    req = HTTP.request({
+    var oURL = URL.parse(url);
+
+    // detect if http or https is used
+    if ( !oURL.port ) {
+      oURL.port = ( oURL.protocol.indexOf('https:') === 0 ) ? 443 : 80;
+    }
+
+    // assign request handler based on protocol
+    var req_handler = ( oURL.port === 443 ) ? HTTPS : HTTP;
+
+    var req = req_handler.request({
       hostname: oURL.hostname,
-      port: oURL.port || 80,
+      port: oURL.port,
       path: oURL.pathname,
       method: 'GET'
     }, function(response){
