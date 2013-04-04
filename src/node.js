@@ -7,16 +7,26 @@
   var DOMParser = new require('xmldom').DOMParser,
       URL = require('url'),
       HTTP = require('http'),
+      HTTPS = require('https'),
 
       Canvas = require('canvas'),
       Image = require('canvas').Image;
 
   /** @private */
   function request(url, encoding, callback) {
-    var oURL = URL.parse(url),
-    req = HTTP.request({
+    var oURL = URL.parse(url);
+
+    // detect if http or https is used
+    if ( !oURL.port ) {
+      oURL.port = ( oURL.protocol.indexOf('https:') === 0 ) ? 443 : 80;
+    }
+
+    // assign request handler based on protocol
+    var req_handler = ( oURL.port === 443 ) ? HTTPS : HTTP;
+
+    var req = req_handler.request({
       hostname: oURL.hostname,
-      port: oURL.port || 80,
+      port: oURL.port,
       path: oURL.pathname,
       method: 'GET'
     }, function(response){
