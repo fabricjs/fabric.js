@@ -356,7 +356,7 @@
                 instances.splice(index, 0, obj);
                 checkIfDone();
               };
-            })(index), options);
+            })(index, el), options);
           }
           else {
             var obj = klass.fromElement(el, options);
