@@ -10785,7 +10785,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
     /**
      * @private
      * @method _animate
-     * @parm property
+     * @param {String} property
+     * @param {String} to
+     * @param {Object} [options]
+     * @param {Boolean} [skipCallbacks]
      */
     _animate: function(property, to, options, skipCallbacks) {
       var obj = this, propPair;
