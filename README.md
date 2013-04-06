@@ -32,6 +32,8 @@ Using Fabric.js, you can create and populate objects on canvas; objects like sim
 - IE8 (incomplete — about 17 failing tests at the moment)
 - IE7,6 (incomplete - about 27 failing tests at the moment)
 
+See [Fabric limitations in Old IE](https://github.com/kangax/fabric.js/wiki/Fabric-limitations-in-oldIE).
+
 You can [run automated unit tests](http://fabricjs.com/test/unit/) right in the browser.
 
 ### History

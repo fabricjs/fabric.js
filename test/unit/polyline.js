@@ -80,10 +80,10 @@
 
     elPolyline.setAttribute('points', '10,12 20,22');
 
-    //var polyline = fabric.Polyline.fromElement(elPolyline);
+    var polyline = fabric.Polyline.fromElement(elPolyline);
+    ok(polyline instanceof fabric.Polyline);
 
-    //ok(polyline instanceof fabric.Polyline);
-    //deepEqual(REFERENCE_OBJECT, polyline.toObject());
+    deepEqual(polyline.toObject(), REFERENCE_OBJECT);
 
     var elPolylineWithAttrs = fabric.document.createElement('polyline');
     elPolylineWithAttrs.setAttribute('points', '10,10 20,20 30,30 10,10');
@@ -95,9 +95,9 @@
 
     var polylineWithAttrs = fabric.Polyline.fromElement(elPolylineWithAttrs);
 
-    //var expectedPoints = [{x: 10, y: 10}, {x: 20, y: 20}, {x: 30, y: 30}, {x: 10, y: 10}];
-    /*
-    deepEqual(fabric.util.object.extend(REFERENCE_OBJECT, {
+    var expectedPoints = [{x: 10, y: 10}, {x: 20, y: 20}, {x: 30, y: 30}, {x: 10, y: 10}];
+
+    deepEqual(polylineWithAttrs.toObject(), fabric.util.object.extend(REFERENCE_OBJECT, {
       'width': 20,
       'height': 20,
       'fill': 'rgb(255,255,255)',
@@ -105,17 +105,21 @@
       'strokeWidth': 3,
       'opacity': 0.34,
       'points': expectedPoints
-    }), polylineWithAttrs.toObject());
+    }));
 
-    deepEqual([ 2, 0, 0, 2, -10, -20 ], polylineWithAttrs.get('transformMatrix'));
+    // deepEqual(polylineWithAttrs.get('transformMatrix'), [ 2, 0, 0, 2, -10, -20 ]);
 
     var elPolylineWithoutPoints = fabric.document.createElement('polyline');
-    /*
-    this.assertRaise('TypeError', function(){
-      fabric.Polyline.fromElement(elPolylineWithoutPoints);
-    }, 'missing points attribute should result in error');
 
+    var error;
+    try {
+      fabric.Polyline.fromElement(elPolylineWithoutPoints);
+    }
+    catch(err) {
+      error = err;
+    }
+
+    ok(typeof error !== 'undefined', 'missing points attribute should result in error');
     equal(fabric.Polyline.fromElement(), null);
-    */
   });
 })();

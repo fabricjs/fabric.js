@@ -184,10 +184,13 @@
   //   ok(typeof fabric.Image.fromObject == 'function');
 
   //   // should not throw error when no callback is given
-  //   fabric.Image.fromObject(REFERENCE_IMG_OBJECT);
+  //   var obj = fabric.util.object.extend(fabric.util.object.clone(REFERENCE_IMG_OBJECT), {
+  //     src: IMG_SRC
+  //   });
+  //   fabric.Image.fromObject(obj);
 
   //   var image;
-  //   fabric.Image.fromObject(REFERENCE_IMG_OBJECT, function(instance){
+  //   fabric.Image.fromObject(obj, function(instance){
   //     image = instance;
   //   });
 

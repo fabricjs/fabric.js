@@ -10758,8 +10758,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
      */
     animate: function() {
       if (arguments[0] && typeof arguments[0] === 'object') {
-        for (var prop in arguments[0]) {
-          this._animate(prop, arguments[0][prop], arguments[1]);
+        var propsToAnimate = [ ], prop, skipCallbacks;
+        for (prop in arguments[0]) {
+          propsToAnimate.push(prop);
+        }
+        for (var i = 0, len = propsToAnimate.length; i<len; i++) {
+          prop = propsToAnimate[i];
+          skipCallbacks = i !== len - 1;
+          this._animate(prop, arguments[0][prop], arguments[1], skipCallbacks);
         }
       }
       else {
@@ -10772,7 +10778,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
      * @private
      * @method _animate
      */
-    _animate: function(property, to, options) {
+    _animate: function(property, to, options, skipCallbacks) {
       var obj = this, propPair;
 
       to = to.toString();
@@ -10816,9 +10822,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
           else {
             obj.set(property, value);
           }
+          if (skipCallbacks) return;
           options.onChange && options.onChange();
         },
         onComplete: function() {
+          if (skipCallbacks) return;
+
           obj.setCoords();
           options.onComplete && options.onComplete();
         }
