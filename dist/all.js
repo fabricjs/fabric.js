@@ -4261,7 +4261,7 @@ fabric.util.string = {
                 instances.splice(index, 0, obj);
                 checkIfDone();
               };
-            })(index), options);
+            })(index, el), options);
           }
           else {
             var obj = klass.fromElement(el, options);
@@ -10726,24 +10726,32 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
     /**
      * Sets pattern fill of an object
      * @method setPatternFill
-     * @param {Object} options
+     * @param {Object} [options] Options object
+     * @return {fabric.Object} thisArg
+     * @chainable
      */
     setPatternFill: function(options) {
-      this.set('fill', new fabric.Pattern(options));
+      return this.set('fill', new fabric.Pattern(options));
     },
 
     /**
      * Sets shadow of an object
      * @method setShadow
-     * @param {Object} options
+     * @param {Object} [options] Options object
+     * @return {fabric.Object} thisArg
+     * @chainable
      */
     setShadow: function(options) {
-      this.set('shadow', new fabric.Shadow(options));
+      return this.set('shadow', new fabric.Shadow(options));
     },
 
     /**
      * Animates object's properties
      * @method animate
+     * @param {String|Object} property to animate (if string) or properties to animate (if object)
+     * @param {Number|Object} value to animate property to (if string was given first) or options object
+     * @return {fabric.Object} thisArg
+     * @chainable
      *
      * As object — multiple properties
      *
@@ -10777,6 +10785,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
     /**
      * @private
      * @method _animate
+     * @parm property
      */
     _animate: function(property, to, options, skipCallbacks) {
       var obj = this, propPair;
