@@ -834,7 +834,7 @@
      * @method _getFillAttributes
      */
     _getFillAttributes: function(value) {
-      var fillColor = value ? new fabric.Color(value) : '';
+      var fillColor = (value && typeof value === 'string') ? new fabric.Color(value) : '';
       if (!fillColor || !fillColor.getSource() || fillColor.getAlpha() === 1) {
         return 'fill="' + value + '"';
       }
