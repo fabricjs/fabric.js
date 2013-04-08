@@ -206,11 +206,11 @@
      * Since coordinate system differs from that of SVG
      */
     _normalizeLeftTopProperties: function(parsedAttributes) {
-      if (parsedAttributes.left) {
+      if ('left' in parsedAttributes) {
         this.set('left', parsedAttributes.left + this.getWidth() / 2);
       }
       this.set('x', parsedAttributes.left || 0);
-      if (parsedAttributes.top) {
+      if ('top' in parsedAttributes) {
         this.set('top', parsedAttributes.top + this.getHeight() / 2);
       }
       this.set('y', parsedAttributes.top || 0);
