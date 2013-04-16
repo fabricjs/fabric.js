@@ -396,6 +396,15 @@
     ctx.clip();
   }
 
+  /**
+   * Multiply matrix A by matrix B to nest transformations
+   * @static
+   * @memberOf fabric.util
+   * @method nestTransformMatrices
+   * @param  {Array} matrixA First transformMatrix
+   * @param  {Array} matrixB Second transformMatrix
+   * @return {Array} The product of the two transform matrices
+   */
   function nestTransformMatrices(matrixA, matrixB) {
     // Matrix multiply matrixA * matrixB
     var a = [
