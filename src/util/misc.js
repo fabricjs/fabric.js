@@ -396,6 +396,43 @@
     ctx.clip();
   }
 
+  function nestTransformMatrices(matrixA, matrixB) {
+    // Matrix multiply matrixA * matrixB
+    var a = [
+      [matrixA[0], matrixA[2], matrixA[4]],
+      [matrixA[1], matrixA[3], matrixA[5]],
+      [0         , 0         , 1         ]
+    ];
+
+    var b = [
+      [matrixB[0], matrixB[2], matrixB[4]],
+      [matrixB[1], matrixB[3], matrixB[5]],
+      [0         , 0         , 1         ]
+    ];
+
+    var result = [];
+    for (var r=0; r<3; r++) {
+      result[r] = [];
+      for (var c=0; c<3; c++) {
+        var sum = 0;
+        for (var k=0; k<3; k++) {
+          sum += a[r][k]*b[k][c];
+        }
+
+        result[r][c] = sum;
+      }
+    }
+
+    return [
+      result[0][0],
+      result[1][0],
+      result[0][1],
+      result[1][1],
+      result[0][2],
+      result[1][2]
+    ];
+  }
+
   fabric.util.removeFromArray = removeFromArray;
   fabric.util.degreesToRadians = degreesToRadians;
   fabric.util.radiansToDegrees = radiansToDegrees;
@@ -413,5 +450,6 @@
   fabric.util.createCanvasElement = createCanvasElement;
   fabric.util.createAccessors = createAccessors;
   fabric.util.clipContext = clipContext;
+  fabric.util.nestTransformMatrices = nestTransformMatrices;
 
 })();
