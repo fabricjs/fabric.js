@@ -6545,7 +6545,7 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
 
       var canvasToDrawOn = this[(allOnTop === true && this.interactive) ? 'contextTop' : 'contextContainer'];
 
-      if (this.contextTop && this.selection) {
+      if (this.contextTop && this.selection && !this._groupSelector) {
         this.clearContext(this.contextTop);
       }
 
@@ -10128,6 +10128,48 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
     clipTo:                   null,
 
     /**
+     * When `true`, object horizontal movement is locked
+     * @property
+     * @type Boolean
+     */
+    lockMovementX:  false,
+
+    /**
+     * When `true`, object vertical movement is locked
+     * @property
+     * @type Boolean
+     */
+    lockMovementY:  false,
+
+    /**
+     * When `true`, object rotation is locked
+     * @property
+     * @type Boolean
+     */
+    lockRotation:   false,
+
+    /**
+     * When `true`, object horizontal scaling is locked
+     * @property
+     * @type Boolean
+     */
+    lockScalingX:   false,
+
+    /**
+     * When `true`, object vertical scaling is locked
+     * @property
+     * @type Boolean
+     */
+    lockScalingY:   false,
+
+    /**
+     * When `true`, object non-uniform scaling is locked
+     * @property
+     * @type Boolean
+     */
+    lockUniScaling: false,
+
+    /**
      * List of properties to consider when checking if state of an object is changed (fabric.Object#hasStateChanged);
      * as well as for history (undo/redo) purposes
      * @property
@@ -12921,11 +12963,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
      * Since coordinate system differs from that of SVG
      */
     _normalizeLeftTopProperties: function(parsedAttributes) {
-      if (parsedAttributes.left) {
+      if ('left' in parsedAttributes) {
         this.set('left', parsedAttributes.left + this.getWidth() / 2);
       }
       this.set('x', parsedAttributes.left || 0);
-      if (parsedAttributes.top) {
+      if ('top' in parsedAttributes) {
         this.set('top', parsedAttributes.top + this.getHeight() / 2);
       }
       this.set('y', parsedAttributes.top || 0);
