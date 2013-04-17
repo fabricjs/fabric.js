@@ -11886,7 +11886,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
      * @chainable
      */
     drawBorders: function(ctx) {
-      if (!this.hasBorders) return;
+      if (!this.hasBorders) return this;
 
       var padding = this.padding,
           padding2 = padding * 2,
@@ -11943,7 +11943,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
      * @chainable
      */
     drawControls: function(ctx) {
-      if (!this.hasControls) return;
+      if (!this.hasControls) return this;
 
       var size = this.cornerSize,
           size2 = size / 2,
