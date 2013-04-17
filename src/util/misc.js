@@ -400,12 +400,12 @@
    * Multiply matrix A by matrix B to nest transformations
    * @static
    * @memberOf fabric.util
-   * @method nestTransformMatrices
+   * @method multiplyTransformMatrices
    * @param  {Array} matrixA First transformMatrix
    * @param  {Array} matrixB Second transformMatrix
    * @return {Array} The product of the two transform matrices
    */
-  function nestTransformMatrices(matrixA, matrixB) {
+  function multiplyTransformMatrices(matrixA, matrixB) {
     // Matrix multiply matrixA * matrixB
     var a = [
       [matrixA[0], matrixA[2], matrixA[4]],
@@ -459,6 +459,6 @@
   fabric.util.createCanvasElement = createCanvasElement;
   fabric.util.createAccessors = createAccessors;
   fabric.util.clipContext = clipContext;
-  fabric.util.nestTransformMatrices = nestTransformMatrices;
+  fabric.util.multiplyTransformMatrices = multiplyTransformMatrices;
 
 })();

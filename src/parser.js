@@ -11,7 +11,7 @@
       extend = fabric.util.object.extend,
       capitalize = fabric.util.string.capitalize,
       clone = fabric.util.object.clone,
-      nestTransformMatrices = fabric.util.nestTransformMatrices;
+      multiplyTransformMatrices = fabric.util.multiplyTransformMatrices;
 
   var attributesMap = {
     'cx':               'left',
@@ -76,7 +76,7 @@
         }
         if (attr === 'transform') {
           if (parentAttributes.transformMatrix) {
-            value = nestTransformMatrices(parentAttributes.transformMatrix, fabric.parseTransformAttribute(value));
+            value = multiplyTransformMatrices(parentAttributes.transformMatrix, fabric.parseTransformAttribute(value));
           }
           else {
             value = fabric.parseTransformAttribute(value);
