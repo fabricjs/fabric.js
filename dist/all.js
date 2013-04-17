@@ -10181,6 +10181,48 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
     clipTo:                   null,
 
     /**
+     * When `true`, object horizontal movement is locked
+     * @property
+     * @type Boolean
+     */
+    lockMovementX:  false,
+
+    /**
+     * When `true`, object vertical movement is locked
+     * @property
+     * @type Boolean
+     */
+    lockMovementY:  false,
+
+    /**
+     * When `true`, object rotation is locked
+     * @property
+     * @type Boolean
+     */
+    lockRotation:   false,
+
+    /**
+     * When `true`, object horizontal scaling is locked
+     * @property
+     * @type Boolean
+     */
+    lockScalingX:   false,
+
+    /**
+     * When `true`, object vertical scaling is locked
+     * @property
+     * @type Boolean
+     */
+    lockScalingY:   false,
+
+    /**
+     * When `true`, object non-uniform scaling is locked
+     * @property
+     * @type Boolean
+     */
+    lockUniScaling: false,
+
+    /**
      * List of properties to consider when checking if state of an object is changed (fabric.Object#hasStateChanged);
      * as well as for history (undo/redo) purposes
      * @property
