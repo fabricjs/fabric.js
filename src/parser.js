@@ -10,7 +10,8 @@
   var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       capitalize = fabric.util.string.capitalize,
-      clone = fabric.util.object.clone;
+      clone = fabric.util.object.clone,
+      multiplyTransformMatrices = fabric.util.multiplyTransformMatrices;
 
   var attributesMap = {
     'cx':               'left',
@@ -74,7 +75,12 @@
           value = (value === 'evenodd') ? 'destination-over' : value;
         }
         if (attr === 'transform') {
-          value = fabric.parseTransformAttribute(value);
+          if (parentAttributes.transformMatrix) {
+            value = multiplyTransformMatrices(parentAttributes.transformMatrix, fabric.parseTransformAttribute(value));
+          }
+          else {
+            value = fabric.parseTransformAttribute(value);
+          }
         }
         attr = normalizeAttr(attr);
         memo[attr] = isNaN(parsed) ? value : parsed;
