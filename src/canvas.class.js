@@ -754,9 +754,8 @@
           break;
         }
       }
-      if (target && target.selectable) {
-        return target;
-      }
+
+      return target;
     },
 
     /**
