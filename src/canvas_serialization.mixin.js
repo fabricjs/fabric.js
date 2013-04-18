@@ -20,7 +20,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
       ? JSON.parse(json)
       : json;
 
-    if (!serialized || (serialized && !serialized.objects)) return;
+    if (!serialized) return;
+    
+    if (!serialized.objects) {
+      serialized.objects = [];
+    }
 
     this.clear();
 
@@ -175,6 +179,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
         backgroundPatternLoaded,
         backgroundImageLoaded,
         overlayImageLoaded;
+    
+    var cbIfLoaded = function () {
+      callback && backgroundImageLoaded && overlayImageLoaded && backgroundPatternLoaded && callback();
+    };
 
     if (serialized.backgroundImage) {
       this.setBackgroundImage(serialized.backgroundImage, function() {
@@ -186,7 +194,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
 
         backgroundImageLoaded = true;
 
-        callback && overlayImageLoaded && backgroundPatternLoaded && callback();
+        cbIfLoaded();
       });
     }
     else {
@@ -202,7 +210,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
         _this.renderAll();
         overlayImageLoaded = true;
 
-        callback && backgroundImageLoaded && backgroundPatternLoaded && callback();
+        cbIfLoaded();
       });
     }
     else {
@@ -215,7 +223,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
         _this.renderAll();
         backgroundPatternLoaded = true;
 
-        callback && overlayImageLoaded && backgroundImageLoaded && callback();
+        cbIfLoaded();
       });
     }
     else {
