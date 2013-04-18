@@ -306,17 +306,18 @@
      * @private
      * @method _shouldClearSelection
      */
-    _shouldClearSelection: function (e) {
-      var target = this.findTarget(e),
-          activeGroup = this.getActiveGroup();
+    _shouldClearSelection: function (e, target) {
+      var activeGroup = this.getActiveGroup();
+
       return (
         !target || (
-          target &&
-          activeGroup &&
-          !activeGroup.contains(target) &&
-          activeGroup !== target &&
-          !e.shiftKey
-        )
+        target &&
+        activeGroup &&
+        !activeGroup.contains(target) &&
+        activeGroup !== target &&
+        !e.shiftKey) || (
+        target && 
+        !target.selectable)
       );
     },
 
