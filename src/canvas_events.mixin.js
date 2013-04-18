@@ -212,7 +212,7 @@
       var target = this.findTarget(e), corner;
       pointer = this.getPointer(e);
 
-      if (this._shouldClearSelection(e)) {
+      if (this._shouldClearSelection(e, target)) {
         this._groupSelector = {
           ex: pointer.x,
           ey: pointer.y,
@@ -220,7 +220,7 @@
           left: 0
         };
         this.deactivateAllWithDispatch();
-        target && this.setActiveObject(target, e);
+        target && target.selectable && this.setActiveObject(target, e);
       }
       else {
         // determine if it's a drag or rotate case
@@ -303,7 +303,7 @@
         // performance.
         target = this.findTarget(e);
 
-        if (!target) {
+        if (!target || target && !target.selectable) {
           // image/text was hovered-out from, we remove its borders
           for (var i = this._objects.length; i--; ) {
             if (this._objects[i] && !this._objects[i].active) {
