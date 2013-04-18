@@ -181,7 +181,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
         overlayImageLoaded;
     
     var cbIfLoaded = function () {
-      callback && backgroundPatternLoaded && overlayImageLoaded && backgroundPatternLoaded && callback();
+      callback && backgroundImageLoaded && overlayImageLoaded && backgroundPatternLoaded && callback();
     };
 
     if (serialized.backgroundImage) {
