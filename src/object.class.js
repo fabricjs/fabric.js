@@ -495,7 +495,7 @@
         "stroke-width: ", (this.strokeWidth ? this.strokeWidth : '0'), "; ",
         "stroke-dasharray: ", (this.strokeDashArray ? this.strokeDashArray.join(' ') : "; "),
         "fill: ", (this.fill ? (this.fill && this.fill.toLive ? 'url(#SVGID_' + this.fill.id + ')' : this.fill) : 'none'), "; ",
-        "opacity: ", (this.opacity ? this.opacity : '1'), ";",
+        "opacity: ", (typeof this.opacity !== 'undefined' ? this.opacity : '1'), ";",
         (this.visible ? '' : " visibility: hidden;")
       ].join("");
     },
