@@ -183,12 +183,13 @@
         reTransformList = new RegExp(transform_list),
         // == end transform regexp
 
-        reTransform = new RegExp(transform);
+        reTransform = new RegExp(transform, 'g');
 
     return function(attributeValue) {
 
       // start with identity matrix
       var matrix = iMatrix.concat();
+      var matrices = [ ];
 
       // return if no argument was given or
       // an argument does not match transform attribute regexp
@@ -224,8 +225,19 @@
             matrix = args;
             break;
         }
+
+        // snapshot current matrix into matrices array
+        matrices.push(matrix.concat());
+        // reset
+        matrix = iMatrix.concat();
       });
-      return matrix;
+
+      var combinedMatrix = matrices[0];
+      while (matrices.length > 1) {
+        matrices.shift();
+        combinedMatrix = fabric.util.multiplyTransformMatrices(combinedMatrix, matrices[0]);
+      }
+      return combinedMatrix;
     };
   })();
 

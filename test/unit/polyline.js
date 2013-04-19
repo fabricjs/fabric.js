@@ -107,7 +107,7 @@
       'points': expectedPoints
     }));
 
-    // deepEqual(polylineWithAttrs.get('transformMatrix'), [ 2, 0, 0, 2, -10, -20 ]);
+    deepEqual([ 2, 0, 0, 2, -10, -20 ], polylineWithAttrs.get('transformMatrix'));
 
     var elPolylineWithoutPoints = fabric.document.createElement('polyline');
 

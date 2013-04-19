@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures` */
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.1.6" };
+var fabric = fabric || { version: "1.1.7" };
 
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
@@ -2270,23 +2270,23 @@ fabric.Collection = {
     var object;
 
     if (elements.length > 1) {
-      var hasText = elements.some(function(el) { return el.type === 'text'; });
+      //var hasText = elements.some(function(el) { return el.type === 'text'; });
 
-      if (hasText) {
-        object = new fabric.Group([ ], options);
-        elements.reverse().forEach(function(obj) {
-          if (obj.cx) {
-            obj.left = obj.cx;
-          }
-          if (obj.cy) {
-            obj.top = obj.cy;
-          }
-          object.addWithUpdate(obj);
-        });
-      }
-      else {
+      // if (hasText) {
+      //   object = new fabric.Group([ ], options);
+      //   elements.reverse().forEach(function(obj) {
+      //     if (obj.cx) {
+      //       obj.left = obj.cx;
+      //     }
+      //     if (obj.cy) {
+      //       obj.top = obj.cy;
+      //     }
+      //     object.addWithUpdate(obj);
+      //   });
+      // }
+      // else {
         object = new fabric.PathGroup(elements, options);
-      }
+      //}
     }
     else {
       object = elements[0];
@@ -2413,6 +2413,52 @@ fabric.Collection = {
     ctx.clip();
   }
 
+  /**
+   * Multiply matrix A by matrix B to nest transformations
+   * @static
+   * @memberOf fabric.util
+   * @method multiplyTransformMatrices
+   * @param  {Array} matrixA First transformMatrix
+   * @param  {Array} matrixB Second transformMatrix
+   * @return {Array} The product of the two transform matrices
+   */
+  function multiplyTransformMatrices(matrixA, matrixB) {
+    // Matrix multiply matrixA * matrixB
+    var a = [
+      [matrixA[0], matrixA[2], matrixA[4]],
+      [matrixA[1], matrixA[3], matrixA[5]],
+      [0         , 0         , 1         ]
+    ];
+
+    var b = [
+      [matrixB[0], matrixB[2], matrixB[4]],
+      [matrixB[1], matrixB[3], matrixB[5]],
+      [0         , 0         , 1         ]
+    ];
+
+    var result = [];
+    for (var r=0; r<3; r++) {
+      result[r] = [];
+      for (var c=0; c<3; c++) {
+        var sum = 0;
+        for (var k=0; k<3; k++) {
+          sum += a[r][k]*b[k][c];
+        }
+
+        result[r][c] = sum;
+      }
+    }
+
+    return [
+      result[0][0],
+      result[1][0],
+      result[0][1],
+      result[1][1],
+      result[0][2],
+      result[1][2]
+    ];
+  }
+
   fabric.util.removeFromArray = removeFromArray;
   fabric.util.degreesToRadians = degreesToRadians;
   fabric.util.radiansToDegrees = radiansToDegrees;
@@ -2430,8 +2476,10 @@ fabric.Collection = {
   fabric.util.createCanvasElement = createCanvasElement;
   fabric.util.createAccessors = createAccessors;
   fabric.util.clipContext = clipContext;
+  fabric.util.multiplyTransformMatrices = multiplyTransformMatrices;
 
 })();
+
 (function() {
 
   var slice = Array.prototype.slice;
@@ -3915,7 +3963,8 @@ fabric.util.string = {
   var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       capitalize = fabric.util.string.capitalize,
-      clone = fabric.util.object.clone;
+      clone = fabric.util.object.clone,
+      multiplyTransformMatrices = fabric.util.multiplyTransformMatrices;
 
   var attributesMap = {
     'cx':               'left',
@@ -3979,7 +4028,12 @@ fabric.util.string = {
           value = (value === 'evenodd') ? 'destination-over' : value;
         }
         if (attr === 'transform') {
-          value = fabric.parseTransformAttribute(value);
+          if (parentAttributes.transformMatrix) {
+            value = multiplyTransformMatrices(parentAttributes.transformMatrix, fabric.parseTransformAttribute(value));
+          }
+          else {
+            value = fabric.parseTransformAttribute(value);
+          }
         }
         attr = normalizeAttr(attr);
         memo[attr] = isNaN(parsed) ? value : parsed;
@@ -4082,12 +4136,13 @@ fabric.util.string = {
         reTransformList = new RegExp(transform_list),
         // == end transform regexp
 
-        reTransform = new RegExp(transform);
+        reTransform = new RegExp(transform, 'g');
 
     return function(attributeValue) {
 
       // start with identity matrix
       var matrix = iMatrix.concat();
+      var matrices = [ ];
 
       // return if no argument was given or
       // an argument does not match transform attribute regexp
@@ -4123,8 +4178,19 @@ fabric.util.string = {
             matrix = args;
             break;
         }
+
+        // snapshot current matrix into matrices array
+        matrices.push(matrix.concat());
+        // reset
+        matrix = iMatrix.concat();
       });
-      return matrix;
+
+      var combinedMatrix = matrices[0];
+      while (matrices.length > 1) {
+        matrices.shift();
+        combinedMatrix = fabric.util.multiplyTransformMatrices(combinedMatrix, matrices[0]);
+      }
+      return combinedMatrix;
     };
   })();
 
@@ -12138,8 +12204,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
       ctx.beginPath();
 
       var isInPathGroup = this.group && this.group.type !== 'group';
-      if (isInPathGroup) {
+      if (isInPathGroup && !this.transformMatrix) {
         ctx.translate(-this.group.width/2 + this.left, -this.group.height / 2 + this.top);
+      }
+      else {
+        ctx.translate(this.left, this.top);
       }
 
       // move from center (of virtual box) to its left/top corner
@@ -12152,7 +12221,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
       // make sure setting "fill" changes color of a line
       // (by copying fillStyle to strokeStyle, since line is stroked, not filled)
       var origStrokeStyle = ctx.strokeStyle;
-      ctx.strokeStyle = ctx.fillStyle;
+      ctx.strokeStyle = this.stroke || ctx.fillStyle;
       ctx.stroke();
       ctx.strokeStyle = origStrokeStyle;
     },
@@ -16542,6 +16611,15 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
+
+      var isInPathGroup = this.group && this.group.type !== 'group';
+      if (isInPathGroup && !this.transformMatrix) {
+        ctx.translate(-this.group.width/2 + this.left, -this.group.height / 2 + this.top);
+      }
+      else if (isInPathGroup && this.transformMatrix) {
+        ctx.translate(-this.group.width/2, -this.group.height/2);
+      }
+
       if (typeof Cufon === 'undefined' || this.useNative === true) {
         this._renderViaNative(ctx);
       }

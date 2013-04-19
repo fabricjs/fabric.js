@@ -87,8 +87,11 @@
       ctx.beginPath();
 
       var isInPathGroup = this.group && this.group.type !== 'group';
-      if (isInPathGroup) {
+      if (isInPathGroup && !this.transformMatrix) {
         ctx.translate(-this.group.width/2 + this.left, -this.group.height / 2 + this.top);
+      }
+      else {
+        ctx.translate(this.left, this.top);
       }
 
       // move from center (of virtual box) to its left/top corner
@@ -101,7 +104,7 @@
       // make sure setting "fill" changes color of a line
       // (by copying fillStyle to strokeStyle, since line is stroked, not filled)
       var origStrokeStyle = ctx.strokeStyle;
-      ctx.strokeStyle = ctx.fillStyle;
+      ctx.strokeStyle = this.stroke || ctx.fillStyle;
       ctx.stroke();
       ctx.strokeStyle = origStrokeStyle;
     },
