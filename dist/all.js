@@ -8328,17 +8328,18 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @scope fab
      * @private
      * @method _shouldClearSelection
      */
-    _shouldClearSelection: function (e) {
-      var target = this.findTarget(e),
-          activeGroup = this.getActiveGroup();
+    _shouldClearSelection: function (e, target) {
+      var activeGroup = this.getActiveGroup();
+
       return (
         !target || (
-          target &&
-          activeGroup &&
-          !activeGroup.contains(target) &&
-          activeGroup !== target &&
-          !e.shiftKey
-        )
+        target &&
+        activeGroup &&
+        !activeGroup.contains(target) &&
+        activeGroup !== target &&
+        !e.shiftKey) || (
+        target && 
+        !target.selectable)
       );
     },
 
@@ -8775,9 +8776,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @scope fab
           break;
         }
       }
-      if (target && target.selectable) {
-        return target;
-      }
+
+      return target;
     },
 
     /**
@@ -9233,7 +9233,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @scope fab
       var target = this.findTarget(e), corner;
       pointer = this.getPointer(e);
 
-      if (this._shouldClearSelection(e)) {
+      if (this._shouldClearSelection(e, target)) {
         this._groupSelector = {
           ex: pointer.x,
           ey: pointer.y,
@@ -9241,7 +9241,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @scope fab
           left: 0
         };
         this.deactivateAllWithDispatch();
-        target && this.setActiveObject(target, e);
+        target && target.selectable && this.setActiveObject(target, e);
       }
       else {
         // determine if it's a drag or rotate case
@@ -9306,7 +9306,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @scope fab
       var groupSelector = this._groupSelector;
 
       // We initially clicked in an empty area, so we draw a box for multiple selection.
-      if (groupSelector !== null) {
+      if (groupSelector) {
         pointer = getPointer(e, this.upperCanvasEl);
 
         groupSelector.left = pointer.x - this._offset.left - groupSelector.ex;
@@ -9324,7 +9324,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @scope fab
         // performance.
         target = this.findTarget(e);
 
-        if (!target) {
+        if (!target || target && !target.selectable) {
           // image/text was hovered-out from, we remove its borders
           for (var i = this._objects.length; i--; ) {
             if (this._objects[i] && !this._objects[i].active) {
@@ -9343,85 +9343,66 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @scope fab
         pointer = getPointer(e, this.upperCanvasEl);
 
         var x = pointer.x,
-            y = pointer.y;
+            y = pointer.y,
+            reset = false,
+            transform = this._currentTransform;
 
-        this._currentTransform.target.isMoving = true;
+        target = transform.target;
+        target.isMoving = true;
 
-        var t = this._currentTransform, reset = false;
-        if (
-            (t.action === 'scale' || t.action === 'scaleX' || t.action === 'scaleY')
-            &&
-            (
-              // Switch from a normal resize to center-based
-              (e.altKey && (t.originX !== 'center' || t.originY !== 'center'))
-              ||
-              // Switch from center-based resize to normal one
-              (!e.altKey && t.originX === 'center' && t.originY === 'center')
-            )
-           ) {
+        if ((transform.action === 'scale' || transform.action === 'scaleX' || transform.action === 'scaleY') &&
+           // Switch from a normal resize to center-based
+           ((e.altKey && (transform.originX !== 'center' || transform.originY !== 'center')) ||
+           // Switch from center-based resize to normal one
+           (!e.altKey && transform.originX === 'center' && transform.originY === 'center'))
+        ) {
           this._resetCurrentTransform(e);
           reset = true;
         }
 
-        if (this._currentTransform.action === 'rotate') {
+        if (transform.action === 'rotate') {
           this._rotateObject(x, y);
 
-          this.fire('object:rotating', {
-            target: this._currentTransform.target,
-            e: e
-          });
-          this._currentTransform.target.fire('rotating');
+          this.fire('object:rotating', { target: target, e: e });
+          target.fire('rotating', { e: e });
         }
-        else if (this._currentTransform.action === 'scale') {
+        else if (transform.action === 'scale') {
           // rotate object only if shift key is not pressed
           // and if it is not a group we are transforming
-
-          if (e.shiftKey || this.uniScaleTransform) {
-            this._currentTransform.currentAction = 'scale';
+          if ((e.shiftKey || this.uniScaleTransform) && !target.get('lockUniScaling')) {
+            transform.currentAction = 'scale';
             this._scaleObject(x, y);
           }
           else {
-            if (!reset && t.currentAction === 'scale') {
-              // Switch from a normal resize to proportional
+            // Switch from a normal resize to proportional
+            if (!reset && transform.currentAction === 'scale') {
               this._resetCurrentTransform(e);
             }
 
-            this._currentTransform.currentAction = 'scaleEqually';
+            transform.currentAction = 'scaleEqually';
             this._scaleObject(x, y, 'equally');
           }
 
-          this.fire('object:scaling', {
-            target: this._currentTransform.target,
-            e: e
-          });
-          this._currentTransform.target.fire('scaling', { e: e });
+          this.fire('object:scaling', { target: target, e: e });
+          target.fire('scaling', { e: e });
         }
-        else if (this._currentTransform.action === 'scaleX') {
+        else if (transform.action === 'scaleX') {
           this._scaleObject(x, y, 'x');
 
-          this.fire('object:scaling', {
-            target: this._currentTransform.target,
-            e: e
-          });
-          this._currentTransform.target.fire('scaling', { e: e });
+          this.fire('object:scaling', { target: target, e: e});
+          target.fire('scaling', { e: e });
         }
-        else if (this._currentTransform.action === 'scaleY') {
+        else if (transform.action === 'scaleY') {
           this._scaleObject(x, y, 'y');
 
-          this.fire('object:scaling', {
-            target: this._currentTransform.target,
-            e: e
-          });
-          this._currentTransform.target.fire('scaling', { e: e });
+          this.fire('object:scaling', { target: target, e: e});
+          target.fire('scaling', { e: e });
         }
         else {
           this._translateObject(x, y);
 
-          this.fire('object:moving', {
-            target: this._currentTransform.target,
-            e: e
-          });
-          this._currentTransform.target.fire('moving', { e: e });
+          this.fire('object:moving', { target: target, e: e});
+          target.fire('moving', { e: e });
           this._setCursor(this.moveCursor);
         }
 
@@ -9606,7 +9587,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
       ? JSON.parse(json)
       : json;
 
-    if (!serialized || (serialized && !serialized.objects)) return;
+    if (!serialized) return;
+    
+    if (!serialized.objects) {
+      serialized.objects = [];
+    }
 
     this.clear();
 
@@ -9761,6 +9746,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
         backgroundPatternLoaded,
         backgroundImageLoaded,
         overlayImageLoaded;
+    
+    var cbIfLoaded = function () {
+      callback && backgroundImageLoaded && overlayImageLoaded && backgroundPatternLoaded && callback();
+    };
 
     if (serialized.backgroundImage) {
       this.setBackgroundImage(serialized.backgroundImage, function() {
@@ -9772,7 +9761,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
 
         backgroundImageLoaded = true;
 
-        callback && overlayImageLoaded && backgroundPatternLoaded && callback();
+        cbIfLoaded();
       });
     }
     else {
@@ -9788,7 +9777,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
         _this.renderAll();
         overlayImageLoaded = true;
 
-        callback && backgroundImageLoaded && backgroundPatternLoaded && callback();
+        cbIfLoaded();
       });
     }
     else {
@@ -9801,7 +9790,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
         _this.renderAll();
         backgroundPatternLoaded = true;
 
-        callback && overlayImageLoaded && backgroundImageLoaded && callback();
+        cbIfLoaded();
       });
     }
     else {
@@ -10392,7 +10381,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
         "stroke-width: ", (this.strokeWidth ? this.strokeWidth : '0'), "; ",
         "stroke-dasharray: ", (this.strokeDashArray ? this.strokeDashArray.join(' ') : "; "),
         "fill: ", (this.fill ? (this.fill && this.fill.toLive ? 'url(#SVGID_' + this.fill.id + ')' : this.fill) : 'none'), "; ",
-        "opacity: ", (this.opacity ? this.opacity : '1'), ";",
+        "opacity: ", (typeof this.opacity !== 'undefined' ? this.opacity : '1'), ";",
         (this.visible ? '' : " visibility: hidden;")
       ].join("");
     },
@@ -16591,8 +16580,10 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
      * @method _initDimensions
      */
     _initDimensions: function() {
-      var canvasEl = fabric.util.createCanvasElement();
-      this._render(canvasEl.getContext('2d'));
+      if (!this._ctxForDimensions) {
+        this._ctxForDimensions = fabric.util.createCanvasElement().getContext('2d');
+      }
+      this._render(this._ctxForDimensions);
     },
 
     /**
