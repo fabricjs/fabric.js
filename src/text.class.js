@@ -185,8 +185,10 @@
      * @method _initDimensions
      */
     _initDimensions: function() {
-      var canvasEl = fabric.util.createCanvasElement();
-      this._render(canvasEl.getContext('2d'));
+      if (!this._ctxForDimensions) {
+        this._ctxForDimensions = fabric.util.createCanvasElement().getContext('2d');
+      }
+      this._render(this._ctxForDimensions);
     },
 
     /**
