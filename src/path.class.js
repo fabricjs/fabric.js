@@ -563,11 +563,9 @@
       this.clipTo && fabric.util.clipContext(this, ctx);
 
       ctx.beginPath();
-      this._render(ctx);
 
-      if (this.fill) {
-        ctx.fill();
-      }
+      this._render(ctx);
+      this._renderFill(ctx);
 
       this.clipTo && ctx.restore();
       if (this.shadow && !this.shadow.affectStroke) {

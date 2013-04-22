@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures` */
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.1.7" };
+var fabric = fabric || { version: "1.1.8" };
 
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
@@ -5132,6 +5132,20 @@ fabric.Pattern = fabric.util.createClass(/** @scope fabric.Pattern.prototype */ 
   repeat: 'repeat',
 
   /**
+   * Pattern horizontal offset from object's left/top corner
+   * @property
+   * @type Number
+   */
+  offsetX: 0,
+
+  /**
+   * Pattern vertical offset from object's left/top corner
+   * @property
+   * @type String
+   */
+  offsetY: 0,
+
+  /**
    * Constructor
    * @method initialize
    * @param {Object} [options]
@@ -5147,6 +5161,12 @@ fabric.Pattern = fabric.util.createClass(/** @scope fabric.Pattern.prototype */ 
     }
     if (options.repeat) {
       this.repeat = options.repeat;
+    }
+    if (options.offsetX) {
+      this.offsetX = options.offsetX;
+    }
+    if (options.offsetY) {
+      this.offsetY = options.offsetY;
     }
   },
 
@@ -5171,7 +5191,9 @@ fabric.Pattern = fabric.util.createClass(/** @scope fabric.Pattern.prototype */ 
 
     return {
       source: source,
-      repeat: this.repeat
+      repeat: this.repeat,
+      offsetX: this.offsetX,
+      offsetY: this.offsetY
     };
   },
 
@@ -5186,6 +5208,7 @@ fabric.Pattern = fabric.util.createClass(/** @scope fabric.Pattern.prototype */ 
     return ctx.createPattern(source, this.repeat);
   }
 });
+
 /**
  * Shadow class
  * @class Shadow
@@ -6630,7 +6653,11 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
           ? this.backgroundColor.toLive(canvasToDrawOn)
           : this.backgroundColor;
 
-        canvasToDrawOn.fillRect(0, 0, this.width, this.height);
+        canvasToDrawOn.fillRect(
+          this.backgroundColor.offsetX || 0,
+          this.backgroundColor.offsetY || 0,
+          this.width,
+          this.height);
       }
 
       if (typeof this.backgroundImage === 'object') {
@@ -10617,6 +10644,25 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
     },
 
     /**
+     * @private
+     * @method _renderFill
+     */
+    _renderFill: function(ctx) {
+      if (!this.fill) return;
+
+      if (this.fill.toLive) {
+        ctx.save();
+        ctx.translate(
+          -this.width / 2 + this.fill.offsetX,
+          -this.height / 2 + this.fill.offsetY);
+      }
+      ctx.fill();
+      if (this.fill.toLive) {
+        ctx.restore();
+      }
+    },
+
+    /**
      * Clones an instance
      * @method clone
      * @param {Function} callback Callback is invoked with a clone as a first argument
@@ -12398,9 +12444,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
       ctx.globalAlpha = this.group ? (ctx.globalAlpha * this.opacity) : this.opacity;
       ctx.arc(noTransform ? this.left : 0, noTransform ? this.top : 0, this.radius, 0, piBy2, false);
       ctx.closePath();
-      if (this.fill) {
-        ctx.fill();
-      }
+      this._renderFill(ctx);
       this._removeShadow(ctx);
       if (this.stroke) {
         ctx.stroke();
@@ -12500,6 +12544,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
   };
 
 })(typeof exports !== 'undefined' ? exports : this);
+
 (function(global) {
 
   "use strict";
@@ -12555,9 +12600,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
       ctx.lineTo(widthBy2, heightBy2);
       ctx.closePath();
 
-      if (this.fill) {
-        ctx.fill();
-      }
+      this._renderFill(ctx);
+
       if (this.stroke) {
         ctx.stroke();
       }
@@ -12619,6 +12663,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
   };
 
 })(typeof exports !== 'undefined' ? exports : this);
+
 (function(global){
 
   "use strict";
@@ -12748,9 +12793,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
         ctx.stroke();
       }
       this._removeShadow(ctx);
-      if (this.fill) {
-        ctx.fill();
-      }
+      this._renderFill(ctx);
       ctx.restore();
     },
 
@@ -12813,6 +12856,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
   };
 
 })(typeof exports !== 'undefined' ? exports : this);
+
 (function(global) {
 
   "use strict";
@@ -12940,10 +12984,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
       ctx.quadraticCurveTo(x,y,x+rx,y,x+rx,y);
       ctx.closePath();
 
-      if (this.fill) {
-        ctx.fill();
-      }
-
+      this._renderFill(ctx);
       this._removeShadow(ctx);
 
       if (this.strokeDashArray) {
@@ -13236,9 +13277,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
         point = this.points[i];
         ctx.lineTo(point.x, point.y);
       }
-      if (this.fill) {
-        ctx.fill();
-      }
+      this._renderFill(ctx);
       this._removeShadow(ctx);
       if (this.stroke) {
         ctx.stroke();
@@ -13301,6 +13340,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
   };
 
 })(typeof exports !== 'undefined' ? exports : this);
+
 (function(global) {
 
   "use strict";
@@ -13431,9 +13471,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
         point = this.points[i];
         ctx.lineTo(point.x, point.y);
       }
-      if (this.fill) {
-        ctx.fill();
-      }
+      this._renderFill(ctx);
       this._removeShadow(ctx);
       if (this.stroke) {
         ctx.closePath();
@@ -13496,6 +13534,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
   };
 
 })(typeof exports !== 'undefined' ? exports : this);
+
 (function(global) {
 
   var commandLengths = {
@@ -14061,11 +14100,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
       this.clipTo && fabric.util.clipContext(this, ctx);
 
       ctx.beginPath();
-      this._render(ctx);
 
-      if (this.fill) {
-        ctx.fill();
-      }
+      this._render(ctx);
+      this._renderFill(ctx);
 
       this.clipTo && ctx.restore();
       if (this.shadow && !this.shadow.affectStroke) {

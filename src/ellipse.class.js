@@ -127,9 +127,7 @@
         ctx.stroke();
       }
       this._removeShadow(ctx);
-      if (this.fill) {
-        ctx.fill();
-      }
+      this._renderFill(ctx);
       ctx.restore();
     },
 

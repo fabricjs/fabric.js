@@ -53,9 +53,8 @@
       ctx.lineTo(widthBy2, heightBy2);
       ctx.closePath();
 
-      if (this.fill) {
-        ctx.fill();
-      }
+      this._renderFill(ctx);
+
       if (this.stroke) {
         ctx.stroke();
       }

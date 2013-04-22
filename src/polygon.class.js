@@ -128,9 +128,7 @@
         point = this.points[i];
         ctx.lineTo(point.x, point.y);
       }
-      if (this.fill) {
-        ctx.fill();
-      }
+      this._renderFill(ctx);
       this._removeShadow(ctx);
       if (this.stroke) {
         ctx.closePath();

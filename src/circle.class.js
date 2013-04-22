@@ -91,9 +91,7 @@
       ctx.globalAlpha = this.group ? (ctx.globalAlpha * this.opacity) : this.opacity;
       ctx.arc(noTransform ? this.left : 0, noTransform ? this.top : 0, this.radius, 0, piBy2, false);
       ctx.closePath();
-      if (this.fill) {
-        ctx.fill();
-      }
+      this._renderFill(ctx);
       this._removeShadow(ctx);
       if (this.stroke) {
         ctx.stroke();

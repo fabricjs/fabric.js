@@ -544,7 +544,11 @@
           ? this.backgroundColor.toLive(canvasToDrawOn)
           : this.backgroundColor;
 
-        canvasToDrawOn.fillRect(0, 0, this.width, this.height);
+        canvasToDrawOn.fillRect(
+          this.backgroundColor.offsetX || 0,
+          this.backgroundColor.offsetY || 0,
+          this.width,
+          this.height);
       }
 
       if (typeof this.backgroundImage === 'object') {

@@ -13,6 +13,20 @@ fabric.Pattern = fabric.util.createClass(/** @scope fabric.Pattern.prototype */ 
   repeat: 'repeat',
 
   /**
+   * Pattern horizontal offset from object's left/top corner
+   * @property
+   * @type Number
+   */
+  offsetX: 0,
+
+  /**
+   * Pattern vertical offset from object's left/top corner
+   * @property
+   * @type String
+   */
+  offsetY: 0,
+
+  /**
    * Constructor
    * @method initialize
    * @param {Object} [options]
@@ -28,6 +42,12 @@ fabric.Pattern = fabric.util.createClass(/** @scope fabric.Pattern.prototype */ 
     }
     if (options.repeat) {
       this.repeat = options.repeat;
+    }
+    if (options.offsetX) {
+      this.offsetX = options.offsetX;
+    }
+    if (options.offsetY) {
+      this.offsetY = options.offsetY;
     }
   },
 
@@ -52,7 +72,9 @@ fabric.Pattern = fabric.util.createClass(/** @scope fabric.Pattern.prototype */ 
 
     return {
       source: source,
-      repeat: this.repeat
+      repeat: this.repeat,
+      offsetX: this.offsetX,
+      offsetY: this.offsetY
     };
   },
 

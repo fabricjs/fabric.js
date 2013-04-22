@@ -731,6 +731,25 @@
     },
 
     /**
+     * @private
+     * @method _renderFill
+     */
+    _renderFill: function(ctx) {
+      if (!this.fill) return;
+
+      if (this.fill.toLive) {
+        ctx.save();
+        ctx.translate(
+          -this.width / 2 + this.fill.offsetX,
+          -this.height / 2 + this.fill.offsetY);
+      }
+      ctx.fill();
+      if (this.fill.toLive) {
+        ctx.restore();
+      }
+    },
+
+    /**
      * Clones an instance
      * @method clone
      * @param {Function} callback Callback is invoked with a clone as a first argument

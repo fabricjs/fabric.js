@@ -125,10 +125,7 @@
       ctx.quadraticCurveTo(x,y,x+rx,y,x+rx,y);
       ctx.closePath();
 
-      if (this.fill) {
-        ctx.fill();
-      }
-
+      this._renderFill(ctx);
       this._removeShadow(ctx);
 
       if (this.strokeDashArray) {
