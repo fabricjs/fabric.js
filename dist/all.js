@@ -5141,7 +5141,7 @@ fabric.Pattern = fabric.util.createClass(/** @scope fabric.Pattern.prototype */ 
   /**
    * Pattern vertical offset from object's left/top corner
    * @property
-   * @type String
+   * @type Number
    */
   offsetY: 0,
 
