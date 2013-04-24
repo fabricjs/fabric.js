@@ -174,7 +174,9 @@
       options = options || { };
 
       this.text = text;
+      this.__skipDimension = true;
       this.setOptions(options);
+      this.__skipDimension = false;
       this._initDimensions();
       this.setCoords();
     },
@@ -185,10 +187,9 @@
      * @method _initDimensions
      */
     _initDimensions: function() {
-      if (!this._ctxForDimensions) {
-        this._ctxForDimensions = fabric.util.createCanvasElement().getContext('2d');
-      }
-      this._render(this._ctxForDimensions);
+      if (this.__skipDimension) return;
+      var canvasEl = fabric.util.createCanvasElement();
+      this._render(canvasEl.getContext('2d'));
     },
 
     /**
@@ -282,7 +283,13 @@
      */
     _renderViaNative: function(ctx) {
 
-      this.transform(ctx);
+      if (this.originX === 'left') {
+        ctx.translate(this.left, this.top);
+      }
+      else {
+        this.transform(ctx);
+      }
+
       this._setTextStyles(ctx);
 
       var textLines = this.text.split(/\r?\n/);
@@ -450,6 +457,14 @@
       }
     },
 
+    _getLeftOffset: function() {
+      return this.originX === 'left' ? 0 : -this.width / 2;
+    },
+
+    _getTopOffset: function() {
+      return this.originY === 'top' ? 0 : -this.height / 2;
+    },
+
     /**
      * @private
      * @method _renderTextFill
@@ -461,8 +476,8 @@
           'fillText',
           ctx,
           textLines[i],
-          -this.width / 2,
-          (-this.height / 2) + (i * this.fontSize * this.lineHeight) + this.fontSize
+          this._getLeftOffset(),
+          this._getTopOffset() + (i * this.fontSize * this.lineHeight) + this.fontSize
         );
       }
     },
@@ -479,8 +494,8 @@
             'strokeText',
             ctx,
             textLines[i],
-            -this.width / 2,
-            (-this.height / 2) + (i * this.fontSize * this.lineHeight) + this.fontSize
+            this._getLeftOffset(),
+            this._getTopOffset() + (i * this.fontSize * this.lineHeight) + this.fontSize
           );
         }
         ctx.closePath();
@@ -506,8 +521,8 @@
         ctx.fillStyle = this.backgroundColor;
 
         ctx.fillRect(
-          (-this.width / 2),
-          (-this.height / 2),
+          this._getLeftOffset(),
+          this._getTopOffset(),
           this.width,
           this.height
         );
@@ -533,8 +548,8 @@
             var lineLeftOffset = this._getLineLeftOffset(lineWidth);
 
             ctx.fillRect(
-              (-this.width / 2) + lineLeftOffset,
-              (-this.height / 2) + (i * this.fontSize * this.lineHeight),
+              this._getLeftOffset() + lineLeftOffset,
+              this._getTopOffset() + (i * this.fontSize * this.lineHeight),
               lineWidth,
               this.fontSize * this.lineHeight
             );
@@ -576,7 +591,7 @@
      */
     _renderTextDecoration: function(ctx, textLines) {
 
-      var halfOfVerticalBox = this._getTextHeight(ctx, textLines) / 2;
+      var halfOfVerticalBox = this.originY === 'top' ? 0 : this._getTextHeight(ctx, textLines) / 2;
       var _this = this;
 
       /** @ignore */
@@ -587,7 +602,7 @@
           var lineLeftOffset = _this._getLineLeftOffset(lineWidth);
 
           ctx.fillRect(
-            (-_this.width / 2) + lineLeftOffset,
+            _this._getLeftOffset() + lineLeftOffset,
             (offset + (i * _this.fontSize * _this.lineHeight)) - halfOfVerticalBox,
             lineWidth,
             1);
