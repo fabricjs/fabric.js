@@ -1,13 +1,11 @@
 /**
  * Wrapper around `console.log` (when available)
- * @method log
  * @param {Any} values Values to log
  */
 fabric.log = function() { };
 
 /**
  * Wrapper around `console.warn` (when available)
- * @method warn
  * @param {Any} Values to log as a warning
  */
 fabric.warn = function() { };

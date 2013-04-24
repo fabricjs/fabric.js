@@ -3,11 +3,10 @@
   var getPointer = fabric.util.getPointer,
       degreesToRadians = fabric.util.degreesToRadians;
 
-  fabric.util.object.extend(fabric.Object.prototype, /** @scope fabric.Object.prototype */ {
+  fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
 
     /**
      * Determines which one of the four corners has been clicked
-     * @method _findTargetCorner
      * @private
      * @param e {Event} event object
      * @param offset {Object} canvas offset
@@ -60,7 +59,6 @@
     /**
      * Helper method to determine how many cross points are between the 4 image edges
      * and the horizontal line determined by the position of our mouse when clicked on canvas
-     * @method _findCrossPoints
      * @private
      * @param ex {Number} x coordinate of the mouse
      * @param ey {Number} y coordinate of the mouse
@@ -110,7 +108,6 @@
 
     /**
      * Method that returns an object with the image lines in it given the coordinates of the corners
-     * @method _getImageLines
      * @private
      * @param oCoords {Object} coordinates of the image corners
      */
@@ -138,7 +135,6 @@
     /**
      * Sets the coordinates of the draggable boxes in the corners of
      * the image used to scale/rotate it.
-     * @method _setCornerCoords
      * @private
      */
     _setCornerCoords: function() {
@@ -326,7 +322,6 @@
      * Draws borders of an object's bounding box.
      * Requires public properties: width, height
      * Requires public options: padding, borderColor
-     * @method drawBorders
      * @param {CanvasRenderingContext2D} ctx Context to draw on
      * @return {fabric.Object} thisArg
      * @chainable
@@ -383,7 +378,6 @@
      * Draws corners of an object's bounding box.
      * Requires public properties: width, height, scaleX, scaleY
      * Requires public options: cornerSize, padding
-     * @method drawControls
      * @param {CanvasRenderingContext2D} ctx Context to draw on
      * @return {fabric.Object} thisArg
      * @chainable

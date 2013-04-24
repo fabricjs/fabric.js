@@ -169,7 +169,6 @@
 
   /**
    * Cross-browser wrapper for getting event's coordinates
-   * @method getPointer
    * @memberOf fabric.util
    * @param {Event} event
    * @param {HTMLCanvasElement} upperCanvasEl &lt;canvas> element on which object selection is drawn

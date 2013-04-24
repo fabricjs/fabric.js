@@ -26,7 +26,6 @@
 
   /**
    * Cross-browser abstraction for sending XMLHttpRequest
-   * @method request
    * @memberOf fabric.util
    * @param {String} url URL to send XMLHttpRequest to
    * @param {Object} [options] Options object

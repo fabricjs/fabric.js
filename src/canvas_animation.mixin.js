@@ -1,4 +1,4 @@
-fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.StaticCanvas.prototype */ {
+fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.StaticCanvas.prototype */ {
 
   /**
    * Animation duration (in ms) for fx* methods
@@ -8,7 +8,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
 
   /**
    * Centers object horizontally with animation.
-   * @method fxCenterObjectH
    * @param {fabric.Object} object Object to center
    * @param {Object} [callbacks] Callbacks object with optional "onComplete" and/or "onChange" properties
    * @return {fabric.Canvas} thisArg
@@ -42,7 +41,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
 
   /**
    * Centers object vertically with animation.
-   * @method fxCenterObjectV
    * @param {fabric.Object} object Object to center
    * @param {Object} [callbacks] Callbacks object with optional "onComplete" and/or "onChange" properties
    * @return {fabric.Canvas} thisArg
@@ -76,7 +74,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
 
   /**
    * Same as `fabric.Canvas#remove` but animated
-   * @method fxRemove
    * @param {fabric.Object} object Object to remove
    * @param {Function} callback Callback, invoked on effect completion
    * @return {fabric.Canvas} thisArg

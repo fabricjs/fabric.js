@@ -24,11 +24,10 @@
 
   fabric.Intersection = Intersection;
 
-  fabric.Intersection.prototype = /** @scope fabric.Intersection.prototype */ {
+  fabric.Intersection.prototype = /** @lends fabric.Intersection.prototype */ {
 
     /**
      * Constructor
-     * @method init
      * @param {String} status
      */
     init: function (status) {
@@ -38,7 +37,6 @@
 
     /**
      * Appends a point to intersection
-     * @method appendPoint
      * @param {fabric.Point} point
      */
     appendPoint: function (point) {
@@ -47,7 +45,6 @@
 
     /**
      * Appends points to intersection
-     * @method appendPoints
      * @param {Array} points
      */
     appendPoints: function (points) {
@@ -58,7 +55,6 @@
   /**
    * Checks if one line intersects another
    * @static
-   * @method intersectLineLine
    * @param {fabric.Point} a1
    * @param {fabric.Point} a2
    * @param {fabric.Point} b1
@@ -94,7 +90,6 @@
 
   /**
    * Checks if line intersects polygon
-   * @method intersectLinePolygon
    * @static
    * @param {fabric.Point} a1
    * @param {fabric.Point} a2
@@ -120,7 +115,6 @@
 
   /**
    * Checks if polygon intersects another polygon
-   * @method intersectPolygonPolygon
    * @static
    * @param {Array} points1
    * @param {Array} points2
@@ -145,7 +139,6 @@
 
   /**
    * Checks if polygon intersects rectangle
-   * @method intersectPolygonRectangle
 
    * @static
    * @param {Array} points

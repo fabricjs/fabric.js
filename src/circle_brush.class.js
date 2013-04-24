@@ -2,18 +2,16 @@
  * CircleBrush class
  * @class fabric.CircleBrush
  */
-fabric.CircleBrush = fabric.util.createClass( fabric.BaseBrush, /** @scope fabric.CircleBrush.prototype */ {
+fabric.CircleBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric.CircleBrush.prototype */ {
 
   /**
    * Width of a brush
-   * @property
    * @type Number
    */
   width: 10,
 
   /**
    * Constructor
-   * @method initialize
    * @param {fabric.Canvas} canvas
    * @return {fabric.CircleBrush} Instance of a circle brush
    */
@@ -23,7 +21,7 @@ fabric.CircleBrush = fabric.util.createClass( fabric.BaseBrush, /** @scope fabri
   },
 
   /**
-   * @method onMouseDown
+   * Invoked on mouse down
    * @param {Object} pointer
    */
   onMouseDown: function() {
@@ -33,7 +31,7 @@ fabric.CircleBrush = fabric.util.createClass( fabric.BaseBrush, /** @scope fabri
   },
 
   /**
-   * @method onMouseMove
+   * Invoked on mouse move
    * @param {Object} pointer
    */
   onMouseMove: function(pointer) {
@@ -48,7 +46,7 @@ fabric.CircleBrush = fabric.util.createClass( fabric.BaseBrush, /** @scope fabri
   },
 
   /**
-   * @method onMouseUp
+   * Invoked on mouse up
    */
   onMouseUp: function() {
     var originalRenderOnAddition = this.canvas.renderOnAddition;
@@ -76,7 +74,6 @@ fabric.CircleBrush = fabric.util.createClass( fabric.BaseBrush, /** @scope fabri
   },
 
   /**
-   * @method addPoint
    * @param {Object} pointer
    * @return {fabric.Point} Just added pointer point
    */

@@ -18,11 +18,10 @@
    * @class Image
    * @extends fabric.Object
    */
-  fabric.Image = fabric.util.createClass(fabric.Object, /** @scope fabric.Image.prototype */ {
+  fabric.Image = fabric.util.createClass(fabric.Object, /** @lends fabric.Image.prototype */ {
 
     /**
      * Type of an object
-     * @property
      * @type String
      */
     type: 'image',
@@ -51,7 +50,6 @@
 
     /**
      * Returns image element which this instance if based on
-     * @method getElement
      * @return {HTMLImageElement} image element
      */
     getElement: function() {
@@ -60,7 +58,6 @@
 
     /**
      * Sets image element for this instance to a specified one
-     * @method setElement
      * @param {HTMLImageElement} element
      * @return {fabric.Image} thisArg
      * @chainable
@@ -73,7 +70,6 @@
 
     /**
      * Returns original size of an image
-     * @method getOriginalSize
      * @return {Object} object with "width" and "height" properties
      */
     getOriginalSize: function() {
@@ -86,7 +82,6 @@
 
     /**
      * Renders image on a specified context
-     * @method render
      * @param {CanvasRenderingContext2D} ctx Context to render on
      * @param {Boolean} [noTransform] When true, context is not transformed
      */
@@ -140,7 +135,6 @@
 
     /**
      * Returns object representation of an instance
-     * @method toObject
      * @param {Array} propertiesToInclude
      * @return {Object} propertiesToInclude Object representation of an instance
      */
@@ -153,7 +147,6 @@
 
     /**
      * Returns SVG representation of an instance
-     * @method toSVG
      * @return {String} svg representation of an instance
      */
     toSVG: function() {
@@ -171,7 +164,6 @@
 
     /**
      * Returns source of an image
-     * @method getSrc
      * @return {String} Source of an image
      */
     getSrc: function() {
@@ -180,7 +172,6 @@
 
     /**
      * Returns string representation of an instance
-     * @method toString
      * @return {String} String representation of an instance
      */
     toString: function() {
@@ -189,7 +180,6 @@
 
     /**
      * Returns a clone of an instance
-     * @method clone
      * @param {Function} callback Callback is invoked with a clone as a first argument
      * @param {Array} propertiesToInclude
      */
@@ -256,7 +246,6 @@
 
     /**
      * @private
-     * @method _render
      * @param ctx
      */
     _render: function(ctx) {
@@ -271,7 +260,6 @@
 
     /**
      * @private
-     * @method _resetWidthHeight
      */
     _resetWidthHeight: function() {
       var element = this.getElement();
@@ -284,7 +272,6 @@
      * The Image class's initialization method. This method is automatically
      * called by the constructor.
      * @private
-     * @method _initElement
      * @param {HTMLImageElement|String} el The element representing the image
      */
     _initElement: function(element) {
@@ -294,7 +281,6 @@
 
     /**
      * @private
-     * @method _initConfig
      * @param {Object} [options] Options object
      */
     _initConfig: function(options) {
@@ -305,7 +291,6 @@
 
     /**
      * @private
-     * @method _initFilters
      * @param {Object} object Object with filters property
      */
     _initFilters: function(object) {
@@ -318,7 +303,6 @@
 
     /**
      * @private
-     * @method _setWidthHeight
      * @param {Object} [options] Object with width/height properties
      */
     _setWidthHeight: function(options) {
@@ -333,7 +317,6 @@
 
     /**
      * Returns complexity of an instance
-     * @method complexity
      * @return {Number} complexity
      */
     complexity: function() {
@@ -351,14 +334,12 @@
   /**
    * Alias for getSrc
    * @static
-   * @method getSvgSrc
    */
   fabric.Image.prototype.getSvgSrc = fabric.Image.prototype.getSrc;
 
   /**
    * Creates an instance of fabric.Image from its object representation
    * @static
-   * @method fromObject
    * @param {Object} object
    * @param {Function} [callback] Callback to invoke when an image instance is created
    */
@@ -394,7 +375,6 @@
   /**
    * Creates an instance of fabric.Image from an URL string
    * @static
-   * @method fromURL
    * @param {String} url URL to create an image from
    * @param {Function} [callback] Callback to invoke when image is created (newly created image is passed as a first argument)
    * @param {Object} [imgOptions] Options object
@@ -415,7 +395,6 @@
   /**
    * Returns {@link fabric.Image} instance from an SVG element
    * @static
-   * @method fabric.Image.fromElement
    * @param {SVGElement} element Element to parse
    * @param {Function} callback Callback to execute when fabric.Image object is created
    * @param {Object} [options] Options object

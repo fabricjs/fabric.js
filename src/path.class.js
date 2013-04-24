@@ -159,18 +159,16 @@
    * @class Path
    * @extends fabric.Object
    */
-  fabric.Path = fabric.util.createClass(fabric.Object, /** @scope fabric.Path.prototype */ {
+  fabric.Path = fabric.util.createClass(fabric.Object, /** @lends fabric.Path.prototype */ {
 
     /**
      * Type of an object
-     * @property
      * @type String
      */
     type: 'path',
 
     /**
      * Constructor
-     * @method initialize
      * @param {Array|String} path Path data (sequence of coordinates and corresponding "command" tokens)
      * @param {Object} [options] Options object
      */
@@ -204,7 +202,6 @@
 
     /**
      * @private
-     * @method _initializePath
      */
     _initializePath: function (options) {
       var isWidthSet = 'width' in options,
@@ -234,7 +231,6 @@
 
     /**
      * @private
-     * @method _calculatePathOffset
      */
     _calculatePathOffset: function (positionSet) {
       return {
@@ -245,7 +241,6 @@
 
     /**
      * @private
-     * @method _render
      */
     _render: function(ctx) {
       var current, // current instruction
@@ -527,7 +522,6 @@
 
     /**
      * Renders path on a specified context
-     * @method render
      * @param {CanvasRenderingContext2D} ctx context to render path on
      * @param {Boolean} [noTransform] When true, context is not transformed
      */
@@ -589,7 +583,6 @@
 
     /**
      * Returns string representation of an instance
-     * @method toString
      * @return {String} string representation of an instance
      */
     toString: function() {
@@ -599,7 +592,6 @@
 
     /**
      * Returns object representation of an instance
-     * @method toObject
      * @param {Array} propertiesToInclude
      * @return {Object} object representation of an instance
      */
@@ -618,7 +610,6 @@
 
     /**
      * Returns dataless object representation of an instance
-     * @method toDatalessObject
      * @param {Array} propertiesToInclude
      * @return {Object} object representation of an instance
      */
@@ -633,7 +624,6 @@
 
     /**
      * Returns svg representation of an instance
-     * @method toSVG
      * @return {String} svg representation of an instance
      */
     toSVG: function() {
@@ -668,7 +658,6 @@
 
     /**
      * Returns number representation of an instance complexity
-     * @method complexity
      * @return {Number} complexity
      */
     complexity: function() {
@@ -677,7 +666,6 @@
 
     /**
      * @private
-     * @method _parsePath
      */
     _parsePath: function() {
       var result = [ ],
@@ -714,7 +702,7 @@
     },
 
     /**
-     * @method _parseDimensions
+     * @private
      */
     _parseDimensions: function() {
       var aX = [],
@@ -788,7 +776,6 @@
   /**
    * Creates an instance of fabric.Path from an object
    * @static
-   * @method fabric.Path.fromObject
    * @return {fabric.Path} Instance of fabric.Path
    */
   fabric.Path.fromObject = function(object) {
@@ -805,7 +792,6 @@
   /**
    * Creates an instance of fabric.Path from an SVG <path> element
    * @static
-   * @method fabric.Path.fromElement
    * @param {SVGElement} element to parse
    * @param {Object} [options] Options object
    * @return {fabric.Path} Instance of fabric.Path

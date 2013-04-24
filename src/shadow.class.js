@@ -3,46 +3,40 @@
  * @class Shadow
  * @memberOf fabric
  */
-fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
+fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
 
   /**
    * Shadow color
-   * @property
    * @type String
    */
   color: 'rgb(0,0,0)',
 
   /**
    * Shadow blur
-   * @property
    * @type Number
    */
   blur: 0,
 
   /**
    * Shadow horizontal offset
-   * @property
    * @type Number
    */
   offsetX: 0,
 
   /**
    * Shadow vertical offset
-   * @property
    * @type Number
    */
   offsetY: 0,
 
   /**
    * Whether the shadow should affect stroke operations
-   * @property
    * @type Boolean
    */
   affectStroke: false,
 
   /**
    * Constructor
-   * @method initialize
    * @param [options] Options object with any of color, blur, offsetX, offsetX properties
    * @return {fabric.Shadow} thisArg
    */
@@ -54,7 +48,6 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
 
   /**
    * Returns object representation of a shadow
-   * @method toObject
    * @return {Object}
    */
   toObject: function() {
@@ -68,7 +61,6 @@ fabric.Shadow = fabric.util.createClass(/** @scope fabric.Shadow.prototype */ {
 
   /**
    * Returns SVG representation of a shadow
-   * @method toSVG
    * @return {String}
    */
   toSVG: function() {

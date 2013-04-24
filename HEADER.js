@@ -18,14 +18,12 @@ else {
 
 /**
  * True when in environment that supports touch events
- * @property isTouchSupported
  * @type boolean
  */
 fabric.isTouchSupported = "ontouchstart" in fabric.document.documentElement;
 
 /**
  * True when in environment that's probably Node.js
- * @property isLikelyNode
  * @type boolean
  */
 fabric.isLikelyNode = typeof Buffer !== 'undefined' && typeof window === 'undefined';

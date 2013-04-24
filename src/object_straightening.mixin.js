@@ -1,8 +1,7 @@
-fabric.util.object.extend(fabric.Object.prototype, /** @scope fabric.Object.prototype */ {
+fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
 
   /**
    * @private
-   * @method _getAngleValueForStraighten
    * @return {Number} angle value
    */
   _getAngleValueForStraighten: function() {
@@ -15,7 +14,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @scope fabric.Object.prot
 
   /**
    * Straightens an object (rotating it from current angle to one of 0, 90, 180, 270, etc. depending on which is closer)
-   * @method straighten
    * @return {fabric.Object} thisArg
    * @chainable
    */
@@ -26,7 +24,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @scope fabric.Object.prot
 
   /**
    * Same as {@link fabric.Object.prototype.straghten} but with animation
-   * @method fxStraighten
    * @param {Object} callbacks
    *                  - onComplete: invoked on completion
    *                  - onChange: invoked on every step of animation
@@ -63,11 +60,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @scope fabric.Object.prot
   }
 });
 
-fabric.util.object.extend(fabric.StaticCanvas.prototype, {
+fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.StaticCanvas.prototype */ {
 
   /**
    * Straightens object, then rerenders canvas
-   * @method straightenObject
    * @param {fabric.Object} object Object to straighten
    * @return {fabric.Canvas} thisArg
    * @chainable
@@ -80,7 +76,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
 
   /**
    * Same as {@link fabric.Canvas.prototype.straightenObject}, but animated
-   * @method fxStraightenObject
    * @param {fabric.Object} object Object to straighten
    * @return {fabric.Canvas} thisArg
    * @chainable

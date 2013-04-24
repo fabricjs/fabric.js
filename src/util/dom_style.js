@@ -2,7 +2,6 @@
 
   /**
    * Cross-browser wrapper for setting element's style
-   * @method setStyle
    * @memberOf fabric.util
    * @param {HTMLElement} element
    * @param {Object} styles

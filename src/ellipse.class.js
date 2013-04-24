@@ -16,32 +16,28 @@
    * @class Ellipse
    * @extends fabric.Object
    */
-  fabric.Ellipse = fabric.util.createClass(fabric.Object, /** @scope fabric.Ellipse.prototype */ {
+  fabric.Ellipse = fabric.util.createClass(fabric.Object, /** @lends fabric.Ellipse.prototype */ {
 
     /**
      * Type of an object
-     * @property
      * @type String
      */
     type: 'ellipse',
 
     /**
      * Horizontal radius
-     * @property
      * @type Number
      */
     rx: 0,
 
     /**
      * Vertical radius
-     * @property
      * @type Number
      */
     ry: 0,
 
     /**
      * Constructor
-     * @method initialize
      * @param {Object} [options] Options object
      * @return {fabric.Ellipse} thisArg
      */
@@ -59,7 +55,6 @@
 
     /**
      * Returns object representation of an instance
-     * @method toObject
      * @param {Array} propertiesToInclude
      * @return {Object} object representation of an instance
      */
@@ -72,7 +67,6 @@
 
     /**
      * Returns svg representation of an instance
-     * @method toSVG
      * @return {String} svg representation of an instance
      */
     toSVG: function() {
@@ -99,7 +93,6 @@
 
     /**
      * Renders this instance on a given context
-     * @method render
      * @param ctx {CanvasRenderingContext2D} context to render on
      * @param noTransform {Boolean} context is not transformed when set to true
      */
@@ -111,7 +104,6 @@
 
     /**
      * @private
-     * @method _render
      * @param ctx {CanvasRenderingContext2D} context to render on
      */
     _render: function(ctx, noTransform) {
@@ -133,7 +125,6 @@
 
     /**
      * Returns complexity of an instance
-     * @method complexity
      * @return {Number} complexity
      */
     complexity: function() {
@@ -151,7 +142,6 @@
   /**
    * Returns {@link fabric.Ellipse} instance from an SVG element
    * @static
-   * @method fabric.Ellipse.fromElement
    * @param {SVGElement} element Element to parse
    * @param {Object} [options] Options object
    * @return {fabric.Ellipse}
@@ -181,7 +171,6 @@
   /**
    * Returns {@link fabric.Ellipse} instance from an object representation
    * @static
-   * @method fabric.Ellipse.fromObject
    * @param {Object} object Object to create an instance from
    * @return {fabric.Ellipse}
    */

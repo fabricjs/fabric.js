@@ -3,7 +3,7 @@
  * @class fabric.PatternBrush
  * @extends fabric.BaseBrush
  */
-fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @scope fabric.PatternBrush.prototype */ {
+fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fabric.PatternBrush.prototype */ {
 
   getPatternSrc: function() {
 
@@ -31,7 +31,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @scope fab
 
   /**
    * Creates "pattern" instance property
-   * @method getPattern
    */
   getPattern: function() {
     return this.canvas.contextTop.createPattern(this.source || this.getPatternSrc(), 'repeat');
@@ -39,7 +38,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @scope fab
 
   /**
    * Sets brush styles
-   * @method setBrushStyles
    */
   setBrushStyles: function() {
     this.callSuper('setBrushStyles');
@@ -48,7 +46,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @scope fab
 
   /**
    * Creates path
-   * @method createPath
    */
   createPath: function(pathData) {
     var path = this.callSuper('createPath', pathData);

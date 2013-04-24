@@ -1,9 +1,8 @@
 (function(){
   /**
    * @private
-   * @method iterateData
    * @param {CanvasRenderingContext2D} ctx context to test
-   * @param {Function} fn Callback, invoked with `currentValue`, `previousValue` and `index`. 
+   * @param {Function} fn Callback, invoked with `currentValue`, `previousValue` and `index`.
    *                      Breaks out of the loop if callback returns `false`.
    */
   function iterateData(ctx, fn) {
@@ -14,12 +13,11 @@
       }
     }
   }
-  
+
   /**
-   * @method assertColor
    * @param {CanvasRenderingContext2D} ctx context to test
    * @param {String} color color in a hex value
-   * @return {Boolean | null} `true` if all canvas pixels are of a given color, `null` if wrong color is given 
+   * @return {Boolean | null} `true` if all canvas pixels are of a given color, `null` if wrong color is given
    * @example `assertColor(canvas._oContextContainer, 'ff5555');`
    */
   function assertColor(ctx, color) {
@@ -40,9 +38,8 @@
     });
     return result;
   }
-  
+
   /**
-   * @method assertSameColor
    * @param {CanvasRenderingContext2D} ctx context to test
    * @return {Boolean} `true` if all canvas pixels are of the same color
    * @example `assertSameColor(canvas._oContextContainer);`

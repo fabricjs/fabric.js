@@ -14,13 +14,11 @@
   removeListener = fabric.util.removeListener,
   getPointer = fabric.util.getPointer;
 
-  fabric.util.object.extend(fabric.Canvas.prototype, /** @scope fabric.Canvas.prototype */ {
+  fabric.util.object.extend(fabric.Canvas.prototype, /** @lends fabric.Canvas.prototype */ {
 
     /**
-     * Adds mouse listeners to  canvas
-     * @method _initEvents
+     * Adds mouse listeners to canvas
      * @private
-     * See configuration documentation for more details.
      */
     _initEvents: function () {
       var _this = this;
@@ -51,7 +49,6 @@
     },
 
     /**
-     * @method _onMouseDown
      * @private
      */
     _onMouseDown: function (e) {
@@ -68,7 +65,6 @@
     },
 
     /**
-     * @method _onMouseUp
      * @private
      */
     _onMouseUp: function (e) {
@@ -85,7 +81,6 @@
     },
 
     /**
-     * @method _onMouseMove
      * @private
      */
     _onMouseMove: function (e) {
@@ -94,7 +89,6 @@
     },
 
     /**
-     * @method _onResize
      * @private
      */
     _onResize: function () {
@@ -105,9 +99,8 @@
      * Method that defines the actions when mouse is released on canvas.
      * The method resets the currentTransform parameters, store the image corner
      * position in the image object and render the canvas on top.
-     * @method __onMouseUp
+     * @private
      * @param {Event} e Event object fired on mouseup
-     *
      */
     __onMouseUp: function (e) {
 
@@ -185,9 +178,8 @@
      * The method inits the currentTransform parameters and renders all the
      * canvas so the current image can be placed on the top canvas and the rest
      * in on the container one.
-     * @method __onMouseDown
+     * @private
      * @param e {Event} Event object fired on mousedown
-     *
      */
     __onMouseDown: function (e) {
 
@@ -264,9 +256,8 @@
       * an image or neither of them (only hovering). A group selection is also possible and would cancel
       * all any other type of action.
       * In case of an image transformation only the top canvas will be rendered.
-      * @method __onMouseMove
+      * @private
       * @param e {Event} Event object fired on mousemove
-      *
       */
     __onMouseMove: function (e) {
 
@@ -393,7 +384,6 @@
     /**
      * Sets the cursor depending on where the canvas is being hovered.
      * Note: very buggy in Opera
-     * @method _setCursorFromEvent
      * @param e {Event} Event object
      * @param target {Object} Object that the mouse is hovering, if so.
      */

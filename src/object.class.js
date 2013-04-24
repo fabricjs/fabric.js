@@ -25,315 +25,271 @@
 
   /**
    * Root object class from which all 2d shape classes inherit from
-   * @class Object
+   * @class fabric.Object
    * @memberOf fabric
    */
-  fabric.Object = fabric.util.createClass(/** @scope fabric.Object.prototype */ {
+  fabric.Object = fabric.util.createClass(/** @lends fabric.Object.prototype */ {
 
     /**
      * Type of an object (rect, circle, path, etc.)
-     * @property
      * @type String
      */
     type:                     'object',
 
     /**
      * Horizontal origin of transformation of an object (one of "left", "right", "center")
-     * @property
      * @type String
      */
     originX:                  'center',
 
     /**
      * Vertical origin of transformation of an object (one of "top", "bottom", "center")
-     * @property
      * @type String
      */
     originY:                  'center',
 
     /**
      * Top position of an object. Note that by default it's relative to object center. You can change this by setting originY={top/center/bottom}
-     * @property
      * @type Number
      */
     top:                      0,
 
     /**
      * Left position of an object. Note that by default it's relative to object center. You can change this by setting originX={left/center/right}
-     * @property
      * @type Number
      */
     left:                     0,
 
     /**
      * Object width
-     * @property
      * @type Number
      */
     width:                    0,
 
     /**
      * Object height
-     * @property
      * @type Number
      */
     height:                   0,
 
     /**
      * Object scale factor (horizontal)
-     * @property
      * @type Number
      */
     scaleX:                   1,
 
     /**
      * Object scale factor (vertical)
-     * @property
      * @type Number
      */
     scaleY:                   1,
 
     /**
      * When true, an object is rendered as flipped horizontally
-     * @property
      * @type Boolean
      */
     flipX:                    false,
 
     /**
      * When true, an object is rendered as flipped vertically
-     * @property
      * @type Boolean
      */
     flipY:                    false,
 
     /**
      * Opacity of an object
-     * @property
      * @type Number
      */
     opacity:                  1,
 
     /**
      * Angle of rotation of an object (in degrees)
-     * @property
      * @type Number
      */
     angle:                    0,
 
     /**
      * Size of object's corners (in pixels)
-     * @property
      * @type Number
      */
     cornerSize:               12,
 
     /**
      * When true, object's corners are rendered as transparent inside (i.e. stroke instead of fill)
-     * @property
      * @type Boolean
      */
     transparentCorners:       true,
 
     /**
      * Padding between object and its borders (in pixels)
-     * @property
      * @type Number
      */
     padding:                  0,
 
     /**
      * Border color of an object (when it's active)
-     * @property
      * @type String
      */
     borderColor:              'rgba(102,153,255,0.75)',
 
     /**
      * Corner color of an object (when it's active)
-     * @property
      * @type String
      */
     cornerColor:              'rgba(102,153,255,0.5)',
 
     /**
      * Color of object's fill
-     * @property
      * @type String
      */
     fill:                     'rgb(0,0,0)',
 
     /**
      * Fill rule used to fill an object
-     * @property
      * @type String
      */
     fillRule:                 'source-over',
 
     /**
      * Overlay fill (takes precedence over fill value)
-     * @property
      * @type String
      */
     overlayFill:              null,
 
     /**
      * When `true`, an object is rendered via stroke and this property specifies its color
-     * @property
      * @type String
      */
     stroke:                   null,
 
     /**
      * Width of a stroke used to render this object
-     * @property
      * @type Number
      */
     strokeWidth:              1,
 
     /**
      * Array specifying dash pattern of an object's stroke
-     * @property
      * @type Array
      */
     strokeDashArray:          null,
 
     /**
      * Shadow object representing shadow of this shape
-     * @property
      * @type fabric.Shadow
      */
     shadow:                   null,
 
     /**
      * Border opacity when object is active and moving
-     * @property
      * @type Number
      */
     borderOpacityWhenMoving:  0.4,
 
     /**
      * Border scale factor
-     * @property
      * @type Number
      */
     borderScaleFactor:        1,
 
     /**
      * Transform matrix (similar to SVG's transform matrix)
-     * @property
      * @type Array
      */
     transformMatrix:          null,
 
     /**
      * Minimum allowed scale value of an object
-     * @property
      * @type Number
      */
     minScaleLimit:            0.01,
 
     /**
      * When set to `false`, an object can not be selected for modification (using either point-click-based or group-based selection)
-     * @property
      * @type Boolean
      */
     selectable:               true,
 
     /**
      * When set to `false`, an object is not rendered on canvas
-     * @property
      * @type Boolean
      */
     visible:                  true,
 
     /**
      * When set to `false`, object's controls are not displayed and can not be used to manipulate object
-     * @property
      * @type Boolean
      */
     hasControls:              true,
 
     /**
      * When set to `false`, object's borders are not rendered
-     * @property
      * @type Boolean
      */
     hasBorders:               true,
 
     /**
      * When set to `false`, object's rotating point will not be visible or selectable
-     * @property
      * @type Boolean
      */
     hasRotatingPoint:         true,
 
     /**
      * Offset for object's rotating point (when enabled via `hasRotatingPoint`)
-     * @property
      * @type Number
      */
     rotatingPointOffset:      40,
 
     /**
      * When set to `true`, objects are "found" on canvas on per-pixel basis rather than according to bounding box
-     * @property
      * @type Boolean
      */
     perPixelTargetFind:       false,
 
     /**
      * When `false`, default object's values are not included in its serialization
-     * @property
      * @type Boolean
      */
     includeDefaultValues:     true,
 
     /**
      * Function that determines clipping of an object (context is passed as a first argument)
-     * @property
      * @type Function
      */
     clipTo:                   null,
 
     /**
      * When `true`, object horizontal movement is locked
-     * @property
      * @type Boolean
      */
     lockMovementX:  false,
 
     /**
      * When `true`, object vertical movement is locked
-     * @property
      * @type Boolean
      */
     lockMovementY:  false,
 
     /**
      * When `true`, object rotation is locked
-     * @property
      * @type Boolean
      */
     lockRotation:   false,
 
     /**
      * When `true`, object horizontal scaling is locked
-     * @property
      * @type Boolean
      */
     lockScalingX:   false,
 
     /**
      * When `true`, object vertical scaling is locked
-     * @property
      * @type Boolean
      */
     lockScalingY:   false,
 
     /**
      * When `true`, object non-uniform scaling is locked
-     * @property
      * @type Boolean
      */
     lockUniScaling: false,
@@ -341,7 +297,6 @@
     /**
      * List of properties to consider when checking if state of an object is changed (fabric.Object#hasStateChanged);
      * as well as for history (undo/redo) purposes
-     * @property
      * @type Array
      */
     stateProperties:  (
@@ -353,7 +308,6 @@
 
     /**
      * Constructor
-     * @method initialize
      * @param {Object} [options] Options object
      */
     initialize: function(options) {
@@ -364,7 +318,6 @@
 
     /**
      * @private
-     * @method _initGradient
      */
     _initGradient: function(options) {
       if (options.fill && options.fill.colorStops && !(options.fill instanceof fabric.Gradient)) {
@@ -374,7 +327,6 @@
 
     /**
      * @private
-     * @method _initPattern
      */
     _initPattern: function(options) {
       if (options.fill && options.fill.source && !(options.fill instanceof fabric.Pattern)) {
@@ -387,7 +339,6 @@
 
     /**
      * @private
-     * @method _initShadow
      */
     _initShadow: function(options) {
       if (options.shadow && !(options.shadow instanceof fabric.Shadow)) {
@@ -397,7 +348,6 @@
 
     /**
      * Sets object's properties from options
-     * @method setOptions
      * @param {Object} [options]
      */
     setOptions: function(options) {
@@ -411,7 +361,6 @@
 
     /**
      * Transforms context when rendering an object
-     * @method transform
      * @param {CanvasRenderingContext2D} ctx Context
      */
     transform: function(ctx) {
@@ -428,7 +377,6 @@
 
     /**
      * Returns an object representation of an instance
-     * @method toObject
      * @param {Array} propertiesToInclude
      * @return {Object} object representation of an instance
      */
@@ -475,7 +423,6 @@
 
     /**
      * Returns (dataless) object representation of an instance
-     * @method toDatalessObject
      * @param {Array} [propertiesToInclude]
      * @return {Object} object representation of an instance
      */
@@ -486,7 +433,6 @@
 
     /**
      * Returns styles-string for svg-export
-     * @method getSvgStyles
      * @return {String}
      */
     getSvgStyles: function() {
@@ -502,7 +448,6 @@
 
     /**
      * Returns transform-string for svg-export
-     * @method getSvgTransform
      * @return {String}
      */
     getSvgTransform: function() {
@@ -537,7 +482,6 @@
 
     /**
      * @private
-     * @method _removeDefaultValues
      */
     _removeDefaultValues: function(object) {
       var defaultOptions = fabric.Object.prototype.options;
@@ -561,7 +505,6 @@
 
     /**
      * Basic getter
-     * @method get
      * @param {String} property
      * @return {Any} value of a property
      */
@@ -571,7 +514,6 @@
 
     /**
      * Sets property to a given value. When changing position/dimension -related properties (left, top, scale, angle, etc.) `set` does not update position of object's borders/controls. If you need to update those, call `setCoords()`.
-     * @method set
      * @param {String} name
      * @param {Object|Function} value (if function, the value is passed into it and its return value is used as a new one)
      * @return {fabric.Object} thisArg
@@ -596,7 +538,6 @@
 
     /**
      * @private
-     * @method _set
      * @param key
      * @param value
      */
@@ -625,7 +566,6 @@
 
     /**
      * Toggles specified property from `true` to `false` or from `false` to `true`
-     * @method toggle
      * @param {String} property property to toggle
      * @return {fabric.Object} thisArg
      * @chainable
@@ -640,7 +580,6 @@
 
     /**
      * Sets sourcePath of an object
-     * @method setSourcePath
      * @param {String} value
      * @return {fabric.Object} thisArg
      * @chainable
@@ -652,7 +591,6 @@
 
     /**
      * Renders an object on a specified context
-     * @method render
      * @param {CanvasRenderingContext2D} ctx context to render on
      * @param {Boolean} [noTransform] When true, context is not transformed
      */
@@ -710,7 +648,6 @@
 
     /**
      * @private
-     * @method _setShadow
      */
     _setShadow: function(ctx) {
       if (!this.shadow) return;
@@ -723,7 +660,6 @@
 
     /**
      * @private
-     * @method _removeShadow
      */
     _removeShadow: function(ctx) {
       ctx.shadowColor = '';
@@ -732,7 +668,6 @@
 
     /**
      * @private
-     * @method _renderFill
      */
     _renderFill: function(ctx) {
       if (!this.fill) return;
@@ -751,7 +686,6 @@
 
     /**
      * Clones an instance
-     * @method clone
      * @param {Function} callback Callback is invoked with a clone as a first argument
      * @param {Array} propertiesToInclude
      * @return {fabric.Object} clone of an instance
@@ -765,7 +699,6 @@
 
     /**
      * Creates an instance of fabric.Image out of an object
-     * @method cloneAsImage
      * @param callback {Function} callback, invoked with an instance as a first argument
      * @return {fabric.Object} thisArg
      * @chainable
@@ -799,7 +732,6 @@
 
     /**
      * Converts an object into a data-url-like string
-     * @method toDataURL
      * @param callback {Function} callback that recieves resulting data-url string
      */
     toDataURL: function(callback) {
@@ -839,7 +771,6 @@
 
     /**
      * Returns true if object state (one of its state properties) was changed
-     * @method hasStateChanged
      * @return {Boolean} true if instance' state has changed
      */
     hasStateChanged: function() {
@@ -850,7 +781,6 @@
 
     /**
      * Saves state of an object
-     * @method saveState
      * @param {Object} [options] Object with additional `stateProperties` array to include when saving state
      * @return {fabric.Object} thisArg
      * @chainable
@@ -871,7 +801,6 @@
 
     /**
      * Setups state of an object
-     * @method setupState
      */
     setupState: function() {
       this.originalState = { };
@@ -880,7 +809,6 @@
 
     /**
      * Returns true if specified type is identical to the type of an instance
-     * @method isType
      * @param type {String} type to check against
      * @return {Boolean}
      */
@@ -890,7 +818,6 @@
 
     /**
      * Makes object's color grayscale
-     * @method toGrayscale
      * @return {fabric.Object} thisArg
      */
     toGrayscale: function() {
@@ -903,7 +830,6 @@
 
     /**
      * Returns complexity of an instance
-     * @method complexity
      * @return {Number} complexity
      */
     complexity: function() {
@@ -912,9 +838,8 @@
 
     /**
      * Returns a JSON representation of an instance
-     * @method toJSON
      * @param {Array} propertiesToInclude Any properties that you might want to additionally include in the output
-     * @return {String} json
+     * @return {Object} JSON
      */
     toJSON: function(propertiesToInclude) {
       // delegate, not alias
@@ -923,7 +848,6 @@
 
     /**
      * Sets gradient (fill or stroke) of an object
-     * @method setGradient
      * @param {String} property Property name 'stroke' or 'fill'
      * @param {Object} [options] Options object
      */
@@ -955,7 +879,6 @@
 
     /**
      * Sets pattern fill of an object
-     * @method setPatternFill
      * @param {Object} [options] Options object
      * @return {fabric.Object} thisArg
      * @chainable
@@ -966,7 +889,6 @@
 
     /**
      * Sets shadow of an object
-     * @method setShadow
      * @param {Object} [options] Options object
      * @return {fabric.Object} thisArg
      * @chainable
@@ -977,7 +899,6 @@
 
     /**
      * Animates object's properties
-     * @method animate
      * @param {String|Object} property to animate (if string) or properties to animate (if object)
      * @param {Number|Object} value to animate property to (if string was given first) or options object
      * @return {fabric.Object} thisArg
@@ -1014,7 +935,6 @@
 
     /**
      * @private
-     * @method _animate
      * @param {String} property
      * @param {String} to
      * @param {Object} [options]
@@ -1078,7 +998,6 @@
 
     /**
      * Centers object horizontally on canvas to which it was added last
-     * @method centerH
      * @return {fabric.Object} thisArg
      */
     centerH: function () {
@@ -1088,7 +1007,6 @@
 
     /**
      * Centers object vertically on canvas to which it was added last
-     * @method centerV
      * @return {fabric.Object} thisArg
      * @chainable
      */
@@ -1099,7 +1017,6 @@
 
     /**
      * Centers object vertically and horizontally on canvas to which is was added last
-     * @method center
      * @return {fabric.Object} thisArg
      * @chainable
      */
@@ -1109,7 +1026,6 @@
 
     /**
      * Removes object from canvas to which it was added last
-     * @method remove
      * @return {fabric.Object} thisArg
      * @chainable
      */
@@ -1119,7 +1035,6 @@
 
     /**
      * Moves an object to the bottom of the stack of drawn objects
-     * @method sendToBack
      * @return {fabric.Object} thisArg
      * @chainable
      */
@@ -1135,7 +1050,6 @@
 
     /**
      * Moves an object to the top of the stack of drawn objects
-     * @method bringToFront
      * @return {fabric.Object} thisArg
      * @chainable
      */
@@ -1151,7 +1065,6 @@
 
     /**
      * Moves an object one level down in stack of drawn objects
-     * @method sendBackwards
      * @return {fabric.Object} thisArg
      * @chainable
      */
@@ -1167,7 +1080,6 @@
 
     /**
      * Moves an object one level up in stack of drawn objects
-     * @method bringForward
      * @return {fabric.Object} thisArg
      * @chainable
      */
@@ -1183,7 +1095,6 @@
 
     /**
      * Moves an object to specified level in stack of drawn objects
-     * @method moveTo
      * @param {Number} index New position of object
      * @return {fabric.Object} thisArg
      * @chainable

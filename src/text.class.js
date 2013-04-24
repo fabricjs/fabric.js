@@ -52,105 +52,90 @@
 
     /**
      * Font size (in pixels)
-     * @property
      * @type Number
      */
     fontSize:             40,
 
     /**
      * Font weight (e.g. bold, normal, 400, 600, 800)
-     * @property
      * @type Number
      */
     fontWeight:           'normal',
 
     /**
      * Font family
-     * @property
      * @type String
      */
     fontFamily:           'Times New Roman',
 
     /**
      * Text decoration (e.g. underline, overline)
-     * @property
      * @type String
      */
     textDecoration:       '',
 
     /**
      * Text shadow
-     * @property
      * @type String | null
      */
     textShadow:           '',
 
     /**
      * Text alignment. Possible values: "left", "center", or "right".
-     * @property
      * @type String
      */
     textAlign:            'left',
 
     /**
      * Font style (e.g. italic)
-     * @property
      * @type String
      */
     fontStyle:            '',
 
     /**
      * Line height
-     * @property
      * @type Number
      */
     lineHeight:           1.3,
 
     /**
      * Stroke style. When specified, text is rendered with stroke
-     * @property
      * @type String
      */
     stroke:               '',
 
     /**
      * Stroke width
-     * @property
      * @type Number
      */
     strokeWidth:          1,
 
     /**
      * Background color of an entire text box
-     * @property
      * @type String
      */
     backgroundColor:      '',
 
     /**
      * Background color of text lines
-     * @property
      * @type String
      */
     textBackgroundColor:  '',
 
     /**
      * URL of a font file, when using Cufon
-     * @property
      * @type String | null
      */
     path:                 null,
 
     /**
      * Type of an object
-     * @property
      * @type String
      */
     type:                 'text',
 
     /**
      * Indicates whether canvas native text methods should be used to render text (otherwise, Cufon is used)
-     * @property
      * @type Boolean
      */
      useNative:           true,
@@ -158,7 +143,6 @@
      /**
       * List of properties to consider when checking if state of an object is changed (fabric.Object#hasStateChanged)
       * as well as for history (undo/redo) purposes
-      * @property
       * @type Array
       */
      stateProperties:     stateProperties,

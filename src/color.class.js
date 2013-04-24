@@ -30,11 +30,10 @@
 
   fabric.Color = Color;
 
-  fabric.Color.prototype = /** @scope fabric.Color.prototype */ {
+  fabric.Color.prototype = /** @lends fabric.Color.prototype */ {
 
     /**
      * @private
-     * @method _tryParsingColor
      */
     _tryParsingColor: function(color) {
       var source;
@@ -55,7 +54,6 @@
 
     /**
      * Returns source of this color (where source is an array representation; ex: [200, 200, 100, 1])
-     * @method getSource
      * @return {Array}
      */
     getSource: function() {
@@ -64,7 +62,6 @@
 
     /**
      * Sets source of this color (where source is an array representation; ex: [200, 200, 100, 1])
-     * @method setSource
      * @param {Array} source
      */
     setSource: function(source) {
@@ -73,7 +70,6 @@
 
     /**
      * Returns color represenation in RGB format
-     * @method toRgb
      * @return {String} ex: rgb(0-255,0-255,0-255)
      */
     toRgb: function() {
@@ -83,7 +79,6 @@
 
     /**
      * Returns color represenation in RGBA format
-     * @method toRgba
      * @return {String} ex: rgba(0-255,0-255,0-255,0-1)
      */
     toRgba: function() {
@@ -93,7 +88,6 @@
 
     /**
      * Returns color represenation in HEX format
-     * @method toHex
      * @return {String} ex: FF5555
      */
     toHex: function() {
@@ -113,7 +107,6 @@
 
     /**
      * Gets value of alpha channel for this color
-     * @method getAlpha
      * @return {Number} 0-1
      */
     getAlpha: function() {
@@ -122,7 +115,6 @@
 
     /**
      * Sets value of alpha channel for this color
-     * @method setAlpha
      * @param {Number} 0-1
      * @return {fabric.Color} thisArg
      */
@@ -135,7 +127,6 @@
 
     /**
      * Transforms color to its grayscale representation
-     * @method toGrayscale
      * @return {fabric.Color} thisArg
      */
     toGrayscale: function() {
@@ -148,7 +139,6 @@
 
     /**
      * Transforms color to its black and white representation
-     * @method toGrayscale
      * @return {fabric.Color} thisArg
      */
     toBlackWhite: function(threshold) {
@@ -165,7 +155,6 @@
 
     /**
      * Overlays color with another color
-     * @method overlayWith
      * @param {String|fabric.Color} otherColor
      * @return {fabric.Color} thisArg
      */
@@ -230,7 +219,6 @@
 
   /**
    * Returns new color object, when given a color in RGB format
-   * @method fromRgb
    * @param {String} color ex: rgb(0-255,0-255,0-255)
    * @return {fabric.Color}
    */
@@ -240,7 +228,6 @@
 
   /**
    * Returns array represenatation (ex: [100, 100, 200, 1]) of a color that's in RGB or RGBA format
-   * @method sourceFromRgb
    * @param {String} color ex: rgb(0-255,0-255,0-255)
    * @return {Array} source
    */
@@ -260,7 +247,6 @@
    * Returns new color object, when given a color in RGBA format
    * @static
    * @function
-   * @method fromRgba
    * @param {String} color
    * @return {fabric.Color}
    */
@@ -269,7 +255,6 @@
   /**
    * Returns new color object, when given a color in HEX format
    * @static
-   * @method fromHex
    * @return {fabric.Color}
    */
   fabric.Color.fromHex = function(color) {
@@ -279,7 +264,6 @@
   /**
    * Returns array represenatation (ex: [100, 100, 200, 1]) of a color that's in HEX format
    * @static
-   * @method sourceFromHex
    * @param {String} color ex: FF5555
    * @return {Array} source
    */
@@ -303,7 +287,6 @@
   /**
    * Returns new color object, when given color in array representation (ex: [200, 100, 100, 0.5])
    * @static
-   * @method fromSource
    * @return {fabric.Color}
    */
   fabric.Color.fromSource = function(source) {

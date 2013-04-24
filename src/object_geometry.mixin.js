@@ -2,11 +2,10 @@
 
   var degreesToRadians = fabric.util.degreesToRadians;
 
-  fabric.util.object.extend(fabric.Object.prototype, /** @scope fabric.Object.prototype */ {
+  fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
 
     /**
      * Returns true if object intersects with an area formed by 2 points
-     * @method intersectsWithRect
      * @param {Object} selectionTL
      * @param {Object} selectionBR
      * @return {Boolean}
@@ -28,7 +27,6 @@
 
     /**
      * Returns true if object intersects with another object
-     * @method intersectsWithObject
      * @param {Object} other Object to test
      * @return {Boolean}
      */
@@ -55,7 +53,6 @@
 
     /**
      * Returns true if object is fully contained within area of another object
-     * @method isContainedWithinObject
      * @param {Object} other Object to test
      * @return {Boolean}
      */
@@ -65,7 +62,6 @@
 
     /**
      * Returns true if object is fully contained within area formed by 2 points
-     * @method isContainedWithinRect
      * @param {Object} selectionTL
      * @param {Object} selectionBR
      * @return {Boolean}
@@ -85,7 +81,6 @@
     /**
      * Returns width of an object's bounding rectangle
      * @deprecated since 1.0.4
-     * @method getBoundingRectWidth
      * @return {Number} width value
      */
     getBoundingRectWidth: function() {
@@ -95,7 +90,6 @@
     /**
      * Returns height of an object's bounding rectangle
      * @deprecated since 1.0.4
-     * @method getBoundingRectHeight
      * @return {Number} height value
      */
     getBoundingRectHeight: function() {
@@ -104,7 +98,6 @@
 
     /**
      * Returns coordinates of object's bounding rectangle (left, top, width, height)
-     * @method getBoundingRect
      * @return {Object} Object with left, top, width, height properties
      */
     getBoundingRect: function() {
@@ -130,7 +123,6 @@
 
     /**
      * Returns width of an object
-     * @method getWidth
      * @return {Number} width value
      */
     getWidth: function() {
@@ -139,7 +131,6 @@
 
     /**
      * Returns height of an object
-     * @method getHeight
      * @return {Number} height value
      */
     getHeight: function() {
@@ -149,7 +140,6 @@
     /**
      * Makes sure the scale is valid and modifies it if necessary
      * @private
-     * @method _constrainScale
      * @param {Number} value
      * @return {Number}
      */
@@ -166,7 +156,6 @@
 
     /**
      * Scales an object (equally by x and y)
-     * @method scale
      * @param value {Number} scale factor
      * @return {fabric.Object} thisArg
      * @chainable
@@ -188,7 +177,6 @@
 
     /**
      * Scales an object to a given width, with respect to bounding box (scaling by x/y equally)
-     * @method scaleToWidth
      * @param value {Number} new width value
      * @return {fabric.Object} thisArg
      * @chainable
@@ -201,7 +189,6 @@
 
     /**
      * Scales an object to a given height, with respect to bounding box (scaling by x/y equally)
-     * @method scaleToHeight
      * @param value {Number} new height value
      * @return {fabric.Object} thisArg
      * @chainable
@@ -214,7 +201,6 @@
 
     /**
      * Sets corner position coordinates based on current angle, width and height
-     * @method setCoords
      * @return {fabric.Object} thisArg
      * @chainable
      */

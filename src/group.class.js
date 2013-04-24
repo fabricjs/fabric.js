@@ -29,18 +29,16 @@
    * @class Group
    * @extends fabric.Object
    */
-  fabric.Group = fabric.util.createClass(fabric.Object, fabric.Collection, /** @scope fabric.Group.prototype */ {
+  fabric.Group = fabric.util.createClass(fabric.Object, fabric.Collection, /** @lends fabric.Group.prototype */ {
 
     /**
      * Type of an object
-     * @property
      * @type String
      */
     type: 'group',
 
     /**
      * Constructor
-     * @method initialized
      * @param {Object} objects Group objects
      * @param {Object} [options] Options object
      * @return {Object} thisArg
@@ -70,7 +68,6 @@
 
     /**
      * @private
-     * @method _updateObjectsCoords
      */
     _updateObjectsCoords: function() {
       var groupDeltaX = this.left,
@@ -97,7 +94,6 @@
 
     /**
      * Returns string represenation of a group
-     * @method toString
      * @return {String}
      */
     toString: function() {
@@ -106,7 +102,6 @@
 
     /**
      * Returns an array of all objects in this group
-     * @method getObjects
      * @return {Array} group objects
      */
     getObjects: function() {
@@ -115,7 +110,6 @@
 
     /**
      * Adds an object to a group; Then recalculates group's dimension, position.
-     * @method addWithUpdate
      * @param {Object} object
      * @return {fabric.Group} thisArg
      * @chainable
@@ -133,7 +127,6 @@
 
     /**
      * Removes an object from a group; Then recalculates group's dimension, position.
-     * @method removeWithUpdate
      * @param {Object} object
      * @return {fabric.Group} thisArg
      * @chainable
@@ -201,7 +194,6 @@
 
     /**
      * Returns object representation of an instance
-     * @method toObject
      * @param {Array} propertiesToInclude
      * @return {Object} object representation of an instance
      */
@@ -213,7 +205,6 @@
 
     /**
      * Renders instance on a given context
-     * @method render
      * @param {CanvasRenderingContext2D} ctx context to render instance on
      * @param {Boolean} [noTransform] When true, context is not transformed
      */
@@ -259,7 +250,6 @@
     /**
      * Retores original state of each of group objects (original state is that which was before group was created).
      * @private
-     * @method _restoreObjectsState
      * @return {fabric.Group} thisArg
      * @chainable
      */
@@ -271,7 +261,6 @@
     /**
      * Restores original state of a specified object in group
      * @private
-     * @method _restoreObjectState
      * @param {fabric.Object} object
      * @return {fabric.Group} thisArg
      */
@@ -303,7 +292,6 @@
 
     /**
      * Destroys a group (restoring state of its objects)
-     * @method destroy
      * @return {fabric.Group} thisArg
      * @chainable
      */
@@ -325,7 +313,6 @@
 
     /**
      * Checks whether this group was moved (since `saveCoords` was called last)
-     * @method hasMoved
      * @return {Boolean} true if an object was moved (since fabric.Group#saveCoords was called)
      */
     hasMoved: function() {
@@ -335,7 +322,6 @@
 
     /**
      * Sets coordinates of all group objects
-     * @method setObjectsCoords
      * @return {fabric.Group} thisArg
      * @chainable
      */
@@ -348,7 +334,6 @@
 
     /**
      * @private
-     * @method _setOpacityIfSame
      */
     _setOpacityIfSame: function() {
       var objects = this.getObjects(),
@@ -365,7 +350,6 @@
 
     /**
      * @private
-     * @method _calcBounds
      */
     _calcBounds: function() {
       var aX = [],
@@ -400,7 +384,6 @@
 
     /**
      * Checks if point is contained within the group
-     * @method containsPoint
      * @param {fabric.Point} point point with `x` and `y` properties
      * @return {Boolean} true if point is contained within group
      */
@@ -419,7 +402,6 @@
 
     /**
      * Returns svg representation of an instance
-     * @method toSVG
      * @return {String} svg representation of an instance
      */
     toSVG: function() {
@@ -436,7 +418,6 @@
 
     /**
      * Returns requested property
-     * @method get
      * @param {String} prop Property to get
      * @return {Any}
      */
@@ -466,7 +447,6 @@
   /**
    * Returns {@link fabric.Group} instance from an object representation
    * @static
-   * @method fabric.Group.fromObject
    * @param {Object} object Object to create a group from
    * @param {Object} [options] Options object
    * @return {fabric.Group} An instance of fabric.Group

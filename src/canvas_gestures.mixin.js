@@ -3,13 +3,12 @@
   var degreesToRadians = fabric.util.degreesToRadians,
       radiansToDegrees = fabric.util.radiansToDegrees;
 
-  fabric.util.object.extend(fabric.Canvas.prototype, /** @scope fabric.Canvas.prototype */ {
+  fabric.util.object.extend(fabric.Canvas.prototype, /** @lends fabric.Canvas.prototype */ {
 
     /**
      * Method that defines actions when an Event.js gesture is detected on an object. Currently only supports
      * 2 finger gestures.
      *
-     * @method __onTransformGesture
      * @param e Event object by Event.js
      * @param self Event proxy object by Event.js
      */

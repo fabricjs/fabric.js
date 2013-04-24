@@ -14,18 +14,16 @@
    * @class Triangle
    * @extends fabric.Object
    */
-  fabric.Triangle = fabric.util.createClass(fabric.Object, /** @scope fabric.Triangle.prototype */ {
+  fabric.Triangle = fabric.util.createClass(fabric.Object, /** @lends fabric.Triangle.prototype */ {
 
     /**
      * Type of an object
-     * @property
      * @type String
      */
     type: 'triangle',
 
     /**
      * Constructor
-     * @method initialize
      * @param {Object} [options] Options object
      * @return {Object} thisArg
      */
@@ -40,7 +38,6 @@
 
     /**
      * @private
-     * @method _render
      * @param ctx {CanvasRenderingContext2D} Context to render on
      */
     _render: function(ctx) {
@@ -62,7 +59,6 @@
 
     /**
      * Returns complexity of an instance
-     * @method complexity
      * @return {Number} complexity of this instance
      */
     complexity: function() {
@@ -71,7 +67,6 @@
 
     /**
      * Returns SVG representation of an instance
-     * @method toSVG
      * @return {String} svg representation of an instance
      */
     toSVG: function() {
@@ -107,7 +102,6 @@
   /**
    * Returns fabric.Triangle instance from an object representation
    * @static
-   * @method Canvas.Trangle.fromObject
    * @param object {Object} object to create an instance from
    * @return {Object} instance of Canvas.Triangle
    */

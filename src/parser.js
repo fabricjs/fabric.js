@@ -43,7 +43,6 @@
    * Parses parent "g" nodes recursively upwards.
    * @static
    * @memberOf fabric
-   * @method parseAttributes
    * @param {DOMElement} element Element to parse
    * @param {Array} attributes Array of attributes to parse
    * @return {Object} object containing parsed attributes' names/values
@@ -100,7 +99,6 @@
    * @static
    * @function
    * @memberOf fabric
-   * @method parseTransformAttribute
    * @param attributeValue {String} string containing attribute value
    * @return {Array} array of 6 elements representing transformation matrix
    */
@@ -245,7 +243,6 @@
    * Parses "points" attribute, returning an array of values
    * @static
    * @memberOf fabric
-   * @method parsePointsAttribute
    * @param points {String} points attribute string
    * @return {Array} array of points
    */
@@ -289,7 +286,6 @@
    * Parses "style" attribute, retuning an object with values
    * @static
    * @memberOf fabric
-   * @method parseStyleAttribute
    * @param {SVGElement} element Element to parse
    * @return {Object} Objects with values parsed from style attribute of an element
    */
@@ -343,7 +339,6 @@
    * Transforms an array of svg elements to corresponding fabric.* instances
    * @static
    * @memberOf fabric
-   * @method parseElements
    * @param {Array} elements Array of elements to parse
    * @param {Function} callback Being passed an array of fabric instances (transformed from SVG elements)
    * @param {Object} [options] Options object
@@ -398,7 +393,6 @@
    * @static
    * @function
    * @memberOf fabric
-   * @method getCSSRules
    * @param {SVGDocument} doc SVG document to parse
    * @return {Object} CSS rules of this document
    */
@@ -469,7 +463,6 @@
    * @static
    * @function
    * @memberOf fabric
-   * @method parseSVGDocument
    * @param {SVGDocument} doc SVG document to parse
    * @param {Function} callback Callback to call when parsing is finished; It's being passed an array of elements (parsed from a document).
    * @param {Function} [reviver] Method for further parsing of SVG elements, called after each fabric object created.
@@ -564,15 +557,13 @@
     };
   })();
 
-  /**
+   /**
     * Used for caching SVG documents (loaded via `fabric.Canvas#loadSVGFromURL`)
-    * @property
     * @namespace
     */
    var svgCache = {
 
      /**
-      * @method has
       * @param {String} name
       * @param {Function} callback
       */
@@ -581,7 +572,6 @@
      },
 
      /**
-      * @method get
       * @param {String} url
       * @param {Function} callback
       */
@@ -590,7 +580,6 @@
      },
 
      /**
-      * @method set
       * @param {String} url
       * @param {Object} object
       */
@@ -601,7 +590,6 @@
 
    /**
     * Takes url corresponding to an SVG document, and parses it into a set of fabric objects. Note that SVG is fetched via XMLHttpRequest, so it needs to conform to SOP (Same Origin Policy)
-    * @method loadSVGFromURL
     * @memberof fabric
     * @param {String} url
     * @param {Function} callback
@@ -648,8 +636,8 @@
    }
 
   /**
-  * @method _enlivenCachedObject
-  */
+   * @private
+   */
   function _enlivenCachedObject(cachedObject) {
 
    var objects = cachedObject.objects,
@@ -664,7 +652,6 @@
 
   /**
     * Takes string corresponding to an SVG document, and parses it into a set of fabric objects
-    * @method loadSVGFromString
     * @memberof fabric
     * @param {String} string
     * @param {Function} callback
@@ -693,7 +680,6 @@
 
   /**
    * Creates markup containing SVG font faces
-   * @method createSVGFontFacesMarkup
    * @param {Array} objects Array of fabric objects
    * @return {String}
    */
@@ -726,7 +712,6 @@
 
   /**
    * Creates markup containing SVG referenced elements like patterns, gradients etc.
-   * @method createSVGRefElementsMarkup
    * @param {fabric.Canvas} canvas instance of fabric.Canvas
    * @return {String}
    */

@@ -28,13 +28,12 @@
     }
   }
 
-  Point.prototype = /** @scope fabric.Point.prototype */ {
+  Point.prototype = /** @lends fabric.Point.prototype */ {
 
     constructor: Point,
 
     /**
      * Constructor
-     * @method init
      * @param {Number} x left offset
      * @param {Number} y top offset
      */
@@ -45,7 +44,6 @@
 
     /**
      * Adds another point to this one and returns another one
-     * @method add
      * @param {fabric.Point} that
      * @return {fabric.Point} new Point instance with added values
      */
@@ -55,7 +53,6 @@
 
     /**
      * Adds another point to this one
-     * @method addEquals
      * @param {fabric.Point} that
      * @return {fabric.Point} thisArg
      */
@@ -67,7 +64,6 @@
 
     /**
      * Adds value to this point and returns a new one
-     * @method scalarAdd
      * @param {Number} scalar
      * @return {fabric.Point} new Point with added value
      */
@@ -77,7 +73,6 @@
 
     /**
      * Adds value to this point
-     * @method scalarAddEquals
      * @param {Number} scalar
      * @param {fabric.Point} thisArg
      */
@@ -89,7 +84,6 @@
 
     /**
      * Subtracts another point from this point and returns a new one
-     * @method subtract
      * @param {fabric.Point} that
      * @return {fabric.Point} new Point object with subtracted values
      */
@@ -99,7 +93,6 @@
 
     /**
      * Subtracts another point from this point
-     * @method subtractEquals
      * @param {fabric.Point} that
      * @return {fabric.Point} thisArg
      */
@@ -111,7 +104,6 @@
 
     /**
      * Subtracts value from this point and returns a new one
-     * @method scalarSubtract
      * @param {Number} scalar
      * @return {fabric.Point}
      */
@@ -121,7 +113,6 @@
 
     /**
      * Subtracts value from this point
-     * @method scalarSubtractEquals
      * @param {Number} scalar
      * @return {fabric.Point} thisArg
      */
@@ -133,7 +124,6 @@
 
     /**
      * Miltiplies this point by a value and returns a new one
-     * @method multiply
      * @param {Number} scalar
      * @return {fabric.Point}
      */
@@ -143,7 +133,6 @@
 
     /**
      * Miltiplies this point by a value
-     * @method multiplyEquals
      * @param {Number} scalar
      * @return {fabric.Point} thisArg
      */
@@ -155,7 +144,6 @@
 
     /**
      * Divides this point by a value and returns a new one
-     * @method divide
      * @param {Number} scalar
      * @return {fabric.Point}
      */
@@ -165,7 +153,6 @@
 
     /**
      * Divides this point by a value
-     * @method divideEquals
      * @param {Number} scalar
      * @return {fabric.Point} thisArg
      */
@@ -177,7 +164,6 @@
 
     /**
      * Returns true if this point is equal to another one
-     * @method eq
      * @param {fabric.Point} that
      * @return {Boolean}
      */
@@ -187,7 +173,6 @@
 
     /**
      * Returns true if this point is less than another one
-     * @method lt
      * @param {fabric.Point} that
      * @return {Boolean}
      */
@@ -197,7 +182,6 @@
 
     /**
      * Returns true if this point is less than or equal to another one
-     * @method lte
      * @param {fabric.Point} that
      * @return {Boolean}
      */
@@ -208,7 +192,6 @@
     /**
 
      * Returns true if this point is greater another one
-     * @method gt
      * @param {fabric.Point} that
      * @return {Boolean}
      */
@@ -218,7 +201,6 @@
 
     /**
      * Returns true if this point is greater than or equal to another one
-     * @method gte
      * @param {fabric.Point} that
      * @return {Boolean}
      */
@@ -228,7 +210,6 @@
 
     /**
      * Returns new point which is the result of linear interpolation with this one and another one
-     * @method lerp
      * @param {fabric.Point} that
      * @param {Number} t
      * @return {fabric.Point}
@@ -239,7 +220,6 @@
 
     /**
      * Returns distance from this point and another one
-     * @method distanceFrom
      * @param {fabric.Point} that
      * @return {Number}
      */
@@ -251,7 +231,6 @@
 
     /**
      * Returns the point between this point and another one
-     * @method midPointFrom
      * @param {fabric.Point} that
      * @return {fabric.Point}
      */
@@ -261,7 +240,6 @@
 
     /**
      * Returns a new point which is the min of this and another one
-     * @method min
      * @param {fabric.Point} that
      * @return {fabric.Point}
      */
@@ -271,7 +249,6 @@
 
     /**
      * Returns a new point which is the max of this and another one
-     * @method max
      * @param {fabric.Point} that
      * @return {fabric.Point}
      */
@@ -281,7 +258,6 @@
 
     /**
      * Returns string representation of this point
-     * @method toString
      * @return {String}
      */
     toString: function () {
@@ -290,7 +266,6 @@
 
     /**
      * Sets x/y of this point
-     * @method setXY
      * @param {Number} x
      * @return {Number} y
      */
@@ -301,7 +276,6 @@
 
     /**
      * Sets x/y of this point from another point
-     * @method setFromPoint
      * @param {fabric.Point} that
      */
     setFromPoint: function (that) {
@@ -311,7 +285,6 @@
 
     /**
      * Swaps x/y of this point and another point
-     * @method setFromPoint
      * @param {fabric.Point} that
      */
     swap: function (that) {

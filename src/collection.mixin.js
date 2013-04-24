@@ -1,14 +1,13 @@
 /**
- * @namespace
+ * @namespace fabric.Collection
  */
 fabric.Collection = {
 
   /**
    * Adds objects to collection, then renders canvas (if `renderOnAddition` is not `false`)
    * Objects should be instances of (or inherit from) fabric.Object
-   * @method add
    * @param [...] Zero or more fabric instances
-   * @chainable
+   * @return {Self} thisArg
    */
   add: function () {
     this._objects.push.apply(this._objects, arguments);
@@ -22,11 +21,10 @@ fabric.Collection = {
   /**
    * Inserts an object into collection at specified index and renders canvas
    * An object should be an instance of (or inherit from) fabric.Object
-   * @method insertAt
    * @param object {Object} Object to insert
    * @param index {Number} index to insert object at
    * @param nonSplicing {Boolean} when `true`, no splicing (shifting) of objects occurs
-   * @chainable
+   * @return {Self} thisArg
    */
   insertAt: function (object, index, nonSplicing) {
     var objects = this.getObjects();
@@ -43,10 +41,8 @@ fabric.Collection = {
 
   /**
    * Removes an object from a group
-   * @method remove
    * @param {Object} object
-   * @return {fabric.Group} thisArg
-   * @chainable
+   * @return {Self} thisArg
    */
   remove: function(object) {
 
@@ -65,7 +61,6 @@ fabric.Collection = {
 
   /**
    * Executes given function for each object in this group
-   * @method forEachObject
    * @param {Function} callback
    *                   Callback invoked with current object as first argument,
    *                   index - as second and an array of all objects - as third.
@@ -74,7 +69,7 @@ fabric.Collection = {
    *                   when no `context` argument is given
    *
    * @param {Object} context Context (aka thisObject)
-   * @chainable
+   * @return {Self} thisArg
    */
   forEachObject: function(callback, context) {
     var objects = this.getObjects(),
@@ -87,9 +82,8 @@ fabric.Collection = {
 
   /**
    * Returns object at specified index
-   * @method item
    * @param {Number} index
-   * @return {fabric.Object}
+   * @return {Self} thisArg
    */
   item: function (index) {
     return this.getObjects()[index];
@@ -97,7 +91,6 @@ fabric.Collection = {
 
   /**
    * Returns true if collection contains no objects
-   * @method isEmpty
    * @return {Boolean} true if collection is empty
    */
   isEmpty: function () {
@@ -114,7 +107,6 @@ fabric.Collection = {
 
   /**
    * Returns true if collection contains an object
-   * @method contains
    * @param {Object} object Object to check against
    * @return {Boolean} `true` if collection contains an object
    */
@@ -124,7 +116,6 @@ fabric.Collection = {
 
   /**
    * Returns number representation of a collection complexity
-   * @method complexity
    * @return {Number} complexity
    */
   complexity: function () {
@@ -136,9 +127,7 @@ fabric.Collection = {
 
   /**
    * Makes all of the collection objects grayscale (i.e. calling `toGrayscale` on them)
-   * @method toGrayscale
-   * @return {fabric.Group} thisArg
-   * @chainable
+   * @return {Self} thisArg
    */
   toGrayscale: function() {
     return this.forEachObject(function(obj) {

@@ -16,18 +16,16 @@
    * @class Line
    * @extends fabric.Object
    */
-  fabric.Line = fabric.util.createClass(fabric.Object, /** @scope fabric.Line.prototype */ {
+  fabric.Line = fabric.util.createClass(fabric.Object, /** @lends fabric.Line.prototype */ {
 
     /**
      * Type of an object
-     * @property
      * @type String
      */
     type: 'line',
 
     /**
      * Constructor
-     * @method initialize
      * @param {Array} [points] Array of points
      * @param {Object} [options] Options object
      * @return {fabric.Line} thisArg
@@ -51,7 +49,6 @@
 
     /**
      * @private
-     * @method _setWidthHeight
      * @param {Object} [options] Options
      */
     _setWidthHeight: function(options) {
@@ -66,7 +63,6 @@
 
     /**
      * @private
-     * @method _set
      * @param {String} key
      * @param {Any} value
      */
@@ -80,7 +76,6 @@
 
     /**
      * @private
-     * @method _render
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
@@ -111,7 +106,6 @@
 
     /**
      * Returns complexity of an instance
-     * @method complexity
      * @return {Number} complexity
      */
     complexity: function() {
@@ -135,7 +129,6 @@
 
     /**
      * Returns SVG representation of an instance
-     * @method toSVG
      * @return {String} svg representation of an instance
      */
     toSVG: function() {
@@ -169,7 +162,6 @@
   /**
    * Returns fabric.Line instance from an SVG element
    * @static
-   * @method fabric.Line.fromElement
    * @param {SVGElement} element Element to parse
    * @param {Object} [options] Options object
    * @return {fabric.Line} instance of fabric.Line
@@ -188,7 +180,6 @@
   /**
    * Returns fabric.Line instance from an object representation
    * @static
-   * @method fabric.Line.fromObject
    * @param {Object} object Object to create an instance from
    * @return {fabric.Line} instance of fabric.Line
    */

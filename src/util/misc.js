@@ -4,7 +4,7 @@
       atan2 = Math.atan2;
 
   /**
-   * @namespace Various utilities
+   * @namespace fabric.util
    */
   fabric.util = { };
 
@@ -13,7 +13,6 @@
    * Presence of value (and its position in an array) is determined via `Array.prototype.indexOf`
    * @static
    * @memberOf fabric.util
-   * @method removeFromArray
    * @param {Array} array
    * @param {Any} value
    * @return {Array} original array
@@ -29,7 +28,6 @@
   /**
    * Returns random number between 2 specified ones.
    * @static
-   * @method getRandomInt
    * @memberOf fabric.util
    * @param {Number} min lower limit
    * @param {Number} max upper limit
@@ -44,7 +42,6 @@
   /**
    * Transforms degrees to radians.
    * @static
-   * @method degreesToRadians
    * @memberOf fabric.util
    * @param {Number} degrees value in degrees
    * @return {Number} value in radians
@@ -56,7 +53,6 @@
   /**
    * Transforms radians to degrees.
    * @static
-   * @method radiansToDegrees
    * @memberOf fabric.util
    * @param {Number} radians value in radians
    * @return {Number} value in degrees
@@ -68,7 +64,6 @@
   /**
    * Rotates `point` around `origin` with `radians`
    * @static
-   * @method rotatePoint
    * @memberOf fabric.util
    * @param {fabric.Point} The point to rotate
    * @param {fabric.Point} The origin of the rotation
@@ -90,7 +85,6 @@
   /**
    * A wrapper around Number#toFixed, which contrary to native method returns number, not string.
    * @static
-   * @method toFixed
    * @memberOf fabric.util
    * @param {Number | String} number number to operate on
    * @param {Number} fractionDigits number of fraction digits to "leave"
@@ -103,7 +97,6 @@
    /**
     * Function which always returns `false`.
     * @static
-    * @method falseFunction
     * @memberOf fabric.util
     * @return {Boolean}
     */
@@ -113,7 +106,6 @@
 
    /**
     * Changes value from one to another within certain period of time, invoking callbacks as value is being changed.
-    * @method animate
     * @memberOf fabric.util
     * @param {Object} [options] Animation options
     * @param {Function} [options.onChange] Callback; invoked on every value change
@@ -162,7 +154,6 @@
                           };
   /**
     * requestAnimationFrame polyfill based on http://paulirish.com/2011/requestanimationframe-for-smart-animating/
-    * @method requestAnimFrame
     * @memberOf fabric.util
     * @param {Function} callback Callback to invoke
     * @param {DOMElement} element optional Element to associate with animation
@@ -173,7 +164,6 @@
 
   /**
     * Loads image element from given url and passes it to a callback
-    * @method loadImage
     * @memberOf fabric.util
     * @param {String} url URL representing an image
     * @param {Function} callback Callback; invoked with loaded image
@@ -198,7 +188,6 @@
    * Creates corresponding fabric instances from their object representations
    * @static
    * @memberOf fabric.util
-   * @method enlivenObjects
    * @param {Array} objects Objects to enliven
    * @param {Function} callback Callback to invoke when all objects are created
    */
@@ -244,7 +233,6 @@
    * Groups SVG elements (usually those retrieved from SVG document)
    * @static
    * @memberOf fabric.util
-   * @method groupSVGElements
    * @param {Array} elements SVG elements to group
    * @param {Object} [options] Options object
    * @return {fabric.Object|fabric.PathGroup}
@@ -285,7 +273,6 @@
    * Populates an object with properties of another object
    * @static
    * @memberOf fabric.util
-   * @method populateWithProperties
    * @param {Object} source Source object
    * @param {Object} destination Destination object
    * @return {Array} properties Propertie names to include
@@ -304,7 +291,6 @@
    * This method is used to draw dashed line around selection area.
    * See <a href="http://stackoverflow.com/questions/4576724/dotted-stroke-in-canvas">dotted stroke in canvas</a>
    *
-   * @method drawDashedLine
    * @param ctx {Canvas} context
    * @param x {Number} start x coordinate
    * @param y {Number} start y coordinate
@@ -343,7 +329,6 @@
    * Creates canvas element and initializes it via excanvas if necessary
    * @static
    * @memberOf fabric.util
-   * @method createCanvasElement
    * @param {CanvasElement} [canvasEl] optional canvas element to initialize; when not given, element is created implicitly
    * @return {CanvasElement} initialized canvas element
    */
@@ -359,7 +344,6 @@
    * Creates accessors (getXXX, setXXX) for a "class", based on "stateProperties" array
    * @static
    * @memberOf fabric.util
-   * @method createAccessors
    * @param {Object} klass "Class" to create accessors for
    */
   function createAccessors(klass) {
@@ -387,7 +371,10 @@
   }
 
   /**
-   * @method clipContext
+   * @static
+   * @memberOf fabric.util
+   * @param {fabric.Object} receiver Object implementing `clipTo` method
+   * @param {CanvasRenderingContext2D} ctx Context to clip
    */
   function clipContext(receiver, ctx) {
     ctx.save();
@@ -400,7 +387,6 @@
    * Multiply matrix A by matrix B to nest transformations
    * @static
    * @memberOf fabric.util
-   * @method multiplyTransformMatrices
    * @param  {Array} matrixA First transformMatrix
    * @param  {Array} matrixB Second transformMatrix
    * @return {Array} The product of the two transform matrices

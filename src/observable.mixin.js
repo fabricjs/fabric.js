@@ -1,16 +1,14 @@
-/**
- * @namespace
- */
-fabric.Observable = {
+(function(){
 
   /**
    * Observes specified event
-   * @method observe
-   * @depracated Since 0.8.34. Use `on` instead.
+   * @deprecated `observe` deprecated since 0.8.34 (use `on` instead)
+   * @memberOf fabric.Observable
+   * @alias on
    * @param {String} eventName
    * @param {Function} handler
    */
-  observe: function(eventName, handler) {
+  function observe(eventName, handler) {
     if (!this.__eventListeners) {
       this.__eventListeners = { };
     }
@@ -26,16 +24,17 @@ fabric.Observable = {
       }
       this.__eventListeners[eventName].push(handler);
     }
-  },
+  }
 
   /**
    * Stops event observing for a particular event handler
-   * @method stopObserving
-   * @depracated Since 0.8.34. Use `off` instead.
+   * @deprecated `stopObserving` deprecated since 0.8.34 (use `off` instead)
+   * @memberOf fabric.Observable
+   * @alias off
    * @param {String} eventName
    * @param {Function} handler
    */
-  stopObserving: function(eventName, handler) {
+  function stopObserving(eventName, handler) {
     if (!this.__eventListeners) {
       this.__eventListeners = { };
     }
@@ -47,16 +46,17 @@ fabric.Observable = {
         this.__eventListeners[eventName].length = 0;
       }
     }
-  },
+  }
 
   /**
    * Fires event with an optional options object
-   * @deprecated since 1.0.7
-   * @method fire
+   * @deprecated `fire` deprecated since 1.0.7 (use `trigger` instead)
+   * @memberOf fabric.Observable
+   * @alias trigger
    * @param {String} eventName
    * @param {Object} [options]
    */
-  fire: function(eventName, options) {
+  function fire(eventName, options) {
     if (!this.__eventListeners) {
       this.__eventListeners = { };
     }
@@ -67,25 +67,17 @@ fabric.Observable = {
       listenersForEvent[i](options || { });
     }
   }
-};
 
-/**
- * Alias for observe
- * @method observe
- * @type function
- */
-fabric.Observable.on = fabric.Observable.observe;
+  /**
+   * @namespace fabric.Observable
+   */
+  fabric.Observable = {
+    observe: observe,
+    stopObserving: stopObserving,
+    fire: fire,
 
-/**
- * Alias for stopObserving
- * @method off
- * @type function
- */
-fabric.Observable.off = fabric.Observable.stopObserving;
-
-/**
- * Alias for fire
- * @method trigger
- * @type function
- */
-fabric.Observable.trigger = fabric.Observable.fire;
+    on: observe,
+    off: stopObserving,
+    trigger: fire
+  };
+})();

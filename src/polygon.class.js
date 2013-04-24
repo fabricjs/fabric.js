@@ -18,18 +18,16 @@
    * @class Polygon
    * @extends fabric.Object
    */
-  fabric.Polygon = fabric.util.createClass(fabric.Object, /** @scope fabric.Polygon.prototype */ {
+  fabric.Polygon = fabric.util.createClass(fabric.Object, /** @lends fabric.Polygon.prototype */ {
 
     /**
      * Type of an object
-     * @property
      * @type String
      */
     type: 'polygon',
 
     /**
      * Constructor
-     * @method initialize
      * @param {Array} points Array of points
      * @param {Object} [options] Options object
      * @param {Boolean} Whether points offsetting should be skipped
@@ -44,7 +42,6 @@
 
     /**
      * @private
-     * @method _calcDimensions
      */
     _calcDimensions: function(skipOffset) {
 
@@ -74,7 +71,6 @@
 
     /**
      * Returns object representation of an instance
-     * @method toObject
      * @param {Array} propertiesToInclude
      * @return {Object} object representation of an instance
      */
@@ -86,7 +82,6 @@
 
     /**
      * Returns svg representation of an instance
-     * @method toSVG
      * @return {String} svg representation of an instance
      */
     toSVG: function() {
@@ -117,7 +112,6 @@
 
     /**
      * @private
-     * @method _render
      * @param ctx {CanvasRenderingContext2D} context to render on
      */
     _render: function(ctx) {
@@ -138,7 +132,6 @@
 
     /**
      * Returns complexity of an instance
-     * @method complexity
      * @return {Number} complexity of this instance
      */
     complexity: function() {
@@ -156,7 +149,6 @@
   /**
    * Returns {@link fabric.Polygon} instance from an SVG element
    * @static
-   * @method fabric.Polygon.fromElement
    * @param {SVGElement} element Element to parse
    * @param {Object} [options] Options object
    * @return {fabric.Polygon}
@@ -182,7 +174,6 @@
   /**
    * Returns fabric.Polygon instance from an object representation
    * @static
-   * @method fabric.Polygon.fromObject
    * @param {Object} object Object to create an instance from
    * @return {fabric.Polygon}
    */

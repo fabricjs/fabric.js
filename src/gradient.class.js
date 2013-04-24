@@ -52,11 +52,10 @@
    * @class Gradient
    * @memberOf fabric
    */
-  fabric.Gradient = fabric.util.createClass(/** @scope fabric.Gradient.prototype */ {
+  fabric.Gradient = fabric.util.createClass(/** @lends fabric.Gradient.prototype */ {
 
     /**
      * Constructor
-     * @method initialize
      * @param {Object} [options] Options object with type, coords, gradientUnits and colorStops
      * @return {fabric.Gradient} thisArg
      */
@@ -87,7 +86,6 @@
 
     /**
      * Adds another colorStop
-     * @method add
      * @param {Object} colorStop Object with offset and color
      * @return {fabric.Gradient} thisArg
      */
@@ -101,7 +99,6 @@
 
     /**
      * Returns object representation of a gradient
-     * @method toObject
      * @return {Object}
      */
     toObject: function() {
@@ -115,7 +112,6 @@
 
     /**
      * Returns an instance of CanvasGradient
-     * @method toLive
      * @param ctx
      * @return {CanvasGradient}
      */
@@ -149,7 +145,6 @@
 
     /**
      * Returns SVG representation of an gradient
-     * @method toSVG
      * @param {Object} object Object to create a gradient for
      * @param {Boolean} normalize Whether coords should be normalized
      * @return {String} SVG representation of an gradient (linear/radial)
@@ -219,7 +214,6 @@
 
     /**
      * Returns {@link fabric.Gradient} instance from an SVG element
-     * @method fromElement
      * @static
      * @memberof fabric.Gradient
      * @see http://www.w3.org/TR/SVG/pservers.html#LinearGradientElement
@@ -301,7 +295,6 @@
 
     /**
      * Returns {@link fabric.Gradient} instance from its object representation
-     * @method forObject
      * @static
      * @param {Object} obj
      * @param {Object} [options] Options object
@@ -316,7 +309,6 @@
 
   /**
    * @private
-   * @method _convertPercentUnitsToValues
    */
   function _convertPercentUnitsToValues(object, options) {
     for (var prop in options) {
@@ -341,7 +333,6 @@
 
   /**
    * @private
-   * @method _convertValuesToPercentUnits
    */
   function _convertValuesToPercentUnits(object, options) {
     for (var prop in options) {
@@ -367,7 +358,6 @@
    * @static
    * @function
    * @memberOf fabric
-   * @method getGradientDefs
    * @param {SVGDocument} doc SVG document to parse
    * @return {Object} Gradient definitions; key corresponds to element id, value -- to gradient definition element
    */

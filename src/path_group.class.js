@@ -19,25 +19,22 @@
    * @class PathGroup
    * @extends fabric.Path
    */
-  fabric.PathGroup = fabric.util.createClass(fabric.Path, /** @scope fabric.PathGroup.prototype */ {
+  fabric.PathGroup = fabric.util.createClass(fabric.Path, /** @lends fabric.PathGroup.prototype */ {
 
     /**
      * Type of an object
-     * @property
      * @type String
      */
     type: 'path-group',
 
     /**
      * Fill value
-     * @property
      * @type String
      */
     fill: '',
 
     /**
      * Constructor
-     * @method initialize
      * @param {Array} paths
      * @param {Object} [options] Options object
      * @return {fabric.PathGroup} thisArg
@@ -61,7 +58,6 @@
 
     /**
      * Renders this group on a specified context
-     * @method render
      * @param {CanvasRenderingContext2D} ctx Context to render this instance on
      */
     render: function(ctx) {
@@ -94,7 +90,6 @@
 
     /**
      * Sets certain property to a certain value
-     * @method _set
      * @param {String} prop
      * @param {Any} value
      * @return {fabric.PathGroup} thisArg
@@ -113,7 +108,6 @@
 
     /**
      * Returns object representation of this path group
-     * @method toObject
      * @param {Array} [propertiesToInclude]
      * @return {Object} object representation of an instance
      */
@@ -126,7 +120,6 @@
 
     /**
      * Returns dataless object representation of this path group
-     * @method toDatalessObject
      * @param {Array} [propertiesToInclude]
      * @return {Object} dataless object representation of an instance
      */
@@ -140,7 +133,6 @@
 
     /**
      * Returns svg representation of an instance
-     * @method toSVG
      * @return {String} svg representation of an instance
      */
     toSVG: function() {
@@ -162,7 +154,6 @@
 
     /**
      * Returns a string representation of this path group
-     * @method toString
      * @return {String} string representation of an object
      */
     toString: function() {
@@ -172,7 +163,6 @@
 
     /**
      * Returns true if all paths in this group are of same color
-     * @method isSameColor
      * @return {Boolean} true if all paths are of the same color (`fill`)
      */
     isSameColor: function() {
@@ -184,7 +174,6 @@
 
     /**
      * Returns number representation of object's complexity
-     * @method complexity
      * @return {Number} complexity
      */
     complexity: function() {
@@ -195,7 +184,6 @@
 
     /**
       * Makes path group grayscale
-      * @method toGrayscale
       * @return {fabric.PathGroup} thisArg
       */
     toGrayscale: function() {
@@ -208,7 +196,6 @@
 
     /**
      * Returns all paths in this path group
-     * @method getObjects
      * @return {Array} array of path objects included in this path group
      */
     getObjects: function() {
@@ -218,7 +205,6 @@
 
   /**
    * @private
-   * @method instantiatePaths
    */
   function instantiatePaths(paths) {
     for (var i = 0, len = paths.length; i < len; i++) {
@@ -233,7 +219,6 @@
   /**
    * Creates fabric.PathGroup instance from an object representation
    * @static
-   * @method fabric.PathGroup.fromObject
    * @param {Object} object
    * @return {fabric.PathGroup}
    */

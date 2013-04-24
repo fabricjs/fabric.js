@@ -57,7 +57,6 @@
 
   /**
    * Helper for creation of "classes". Note that pr
-   * @method createClass
    * @param parent optional "Class" to inherit from
    * @param properties Properties shared by all instances of this class
    *                  (be careful modifying objects defined here as this would affect all instances)

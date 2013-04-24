@@ -1,5 +1,6 @@
 /**
- * @namespace Image filters
+ * @namespace fabric.Image.filters
+ * @memberOf fabric.Image
  */
 fabric.Image.filters = { };
 
@@ -8,7 +9,7 @@ fabric.Image.filters = { };
  * @class fabric.Image.filters.Grayscale
  * @memberOf fabric.Image.filters
  */
-fabric.Image.filters.Grayscale = fabric.util.createClass( /** @scope fabric.Image.filters.Grayscale.prototype */ {
+fabric.Image.filters.Grayscale = fabric.util.createClass( /** @lends fabric.Image.filters.Grayscale.prototype */ {
 
   /**
    * Filter type
@@ -18,7 +19,6 @@ fabric.Image.filters.Grayscale = fabric.util.createClass( /** @scope fabric.Imag
 
   /**
    * Applies filter to canvas element
-   * @method applyTo
    * @memberOf fabric.Image.filters.Grayscale.prototype
    * @param {Object} canvasEl Canvas element to apply filter to
    */
@@ -47,8 +47,7 @@ fabric.Image.filters.Grayscale = fabric.util.createClass( /** @scope fabric.Imag
 
   /**
    * Returns json representation of filter
-   * @method toJSON
-   * @return {String} json representation of filter
+   * @return {Object} JSON representation of filter
    */
   toJSON: function() {
     return { type: this.type };
@@ -58,7 +57,6 @@ fabric.Image.filters.Grayscale = fabric.util.createClass( /** @scope fabric.Imag
 /**
  * Returns filter instance from an object representation
  * @static
- * @method fabric.Image.filters.Grayscale.fromObject
  * @return {fabric.Image.filters.Grayscale}
  */
 fabric.Image.filters.Grayscale.fromObject = function() {
@@ -70,7 +68,7 @@ fabric.Image.filters.Grayscale.fromObject = function() {
  * @class fabric.Image.filters.RemoveWhite
  * @memberOf fabric.Image.filters
  */
-fabric.Image.filters.RemoveWhite = fabric.util.createClass( /** @scope fabric.Image.filters.RemoveWhite.prototype */ {
+fabric.Image.filters.RemoveWhite = fabric.util.createClass( /** @lends fabric.Image.filters.RemoveWhite.prototype */ {
 
   /**
    * Filter type
@@ -91,7 +89,6 @@ fabric.Image.filters.RemoveWhite = fabric.util.createClass( /** @scope fabric.Im
 
   /**
    * Applies filter to canvas element
-   * @method applyTo
    * @param {Object} canvasEl Canvas element to apply filter to
    */
   applyTo: function(canvasEl) {
@@ -126,8 +123,7 @@ fabric.Image.filters.RemoveWhite = fabric.util.createClass( /** @scope fabric.Im
 
   /**
    * Returns json representation of filter
-   * @method toJSON
-   * @return {String} json representation of filter
+   * @return {Object} JSON representation of filter
    */
   toJSON: function() {
     return {
@@ -141,7 +137,6 @@ fabric.Image.filters.RemoveWhite = fabric.util.createClass( /** @scope fabric.Im
 /**
  * Returns filter instance from an object representation
  * @static
- * @method fabric.Image.filters.RemoveWhite.fromObject
  * @return {fabric.Image.filters.RemoveWhite}
  */
 fabric.Image.filters.RemoveWhite.fromObject = function(object) {
@@ -153,7 +148,7 @@ fabric.Image.filters.RemoveWhite.fromObject = function(object) {
  * @class fabric.Image.filters.Invert
  * @memberOf fabric.Image.filters
  */
-fabric.Image.filters.Invert = fabric.util.createClass( /** @scope fabric.Image.filters.Invert.prototype */ {
+fabric.Image.filters.Invert = fabric.util.createClass( /** @lends fabric.Image.filters.Invert.prototype */ {
 
   /**
    * Filter type
@@ -163,7 +158,6 @@ fabric.Image.filters.Invert = fabric.util.createClass( /** @scope fabric.Image.f
 
   /**
    * Applies filter to canvas element
-   * @method applyTo
    * @memberOf fabric.Image.filters.Invert.prototype
    * @param {Object} canvasEl Canvas element to apply filter to
    */
@@ -184,7 +178,6 @@ fabric.Image.filters.Invert = fabric.util.createClass( /** @scope fabric.Image.f
 
   /**
    * Returns json representation of filter
-   * @method toJSON
    * @return {String} json representation of filter
    */
   toJSON: function() {
@@ -195,7 +188,6 @@ fabric.Image.filters.Invert = fabric.util.createClass( /** @scope fabric.Image.f
 /**
  * Returns filter instance from an object representation
  * @static
- * @method fabric.Image.filters.Invert.fromObject
  * @return {fabric.Image.filters.Invert}
  */
 fabric.Image.filters.Invert.fromObject = function() {
@@ -207,7 +199,7 @@ fabric.Image.filters.Invert.fromObject = function() {
  * @class fabric.Image.filters.Sepia
  * @memberOf fabric.Image.filters
  */
-fabric.Image.filters.Sepia = fabric.util.createClass( /** @scope fabric.Image.filters.Sepia.prototype */ {
+fabric.Image.filters.Sepia = fabric.util.createClass( /** @lends fabric.Image.filters.Sepia.prototype */ {
 
   /**
    * Filter type
@@ -217,7 +209,6 @@ fabric.Image.filters.Sepia = fabric.util.createClass( /** @scope fabric.Image.fi
 
   /**
    * Applies filter to canvas element
-   * @method applyTo
    * @memberOf fabric.Image.filters.Sepia.prototype
    * @param {Object} canvasEl Canvas element to apply filter to
    */
@@ -239,7 +230,6 @@ fabric.Image.filters.Sepia = fabric.util.createClass( /** @scope fabric.Image.fi
 
   /**
    * Returns json representation of filter
-   * @method toJSON
    * @return {String} json representation of filter
    */
   toJSON: function() {
@@ -250,7 +240,6 @@ fabric.Image.filters.Sepia = fabric.util.createClass( /** @scope fabric.Image.fi
 /**
  * Returns filter instance from an object representation
  * @static
- * @method fabric.Image.filters.Sepia.fromObject
  * @return {fabric.Image.filters.Sepia}
  */
 fabric.Image.filters.Sepia.fromObject = function() {
@@ -262,7 +251,7 @@ fabric.Image.filters.Sepia.fromObject = function() {
  * @class fabric.Image.filters.Sepia2
  * @memberOf fabric.Image.filters
  */
-fabric.Image.filters.Sepia2 = fabric.util.createClass( /** @scope fabric.Image.filters.Sepia2.prototype */ {
+fabric.Image.filters.Sepia2 = fabric.util.createClass( /** @lends fabric.Image.filters.Sepia2.prototype */ {
 
   /**
    * Filter type
@@ -272,7 +261,6 @@ fabric.Image.filters.Sepia2 = fabric.util.createClass( /** @scope fabric.Image.f
 
   /**
    * Applies filter to canvas element
-   * @method applyTo
    * @memberOf fabric.Image.filters.Sepia.prototype
    * @param {Object} canvasEl Canvas element to apply filter to
    */
@@ -298,7 +286,6 @@ fabric.Image.filters.Sepia2 = fabric.util.createClass( /** @scope fabric.Image.f
 
   /**
    * Returns json representation of filter
-   * @method toJSON
    * @return {String} json representation of filter
    */
   toJSON: function() {
@@ -309,7 +296,6 @@ fabric.Image.filters.Sepia2 = fabric.util.createClass( /** @scope fabric.Image.f
 /**
  * Returns filter instance from an object representation
  * @static
- * @method fabric.Image.filters.Sepia2.fromObject
  * @return {fabric.Image.filters.Sepia2}
  */
 fabric.Image.filters.Sepia2.fromObject = function() {
@@ -321,7 +307,7 @@ fabric.Image.filters.Sepia2.fromObject = function() {
  * @class fabric.Image.filters.Brightness
  * @memberOf fabric.Image.filters
  */
-fabric.Image.filters.Brightness = fabric.util.createClass( /** @scope fabric.Image.filters.Brightness.prototype */ {
+fabric.Image.filters.Brightness = fabric.util.createClass( /** @lends fabric.Image.filters.Brightness.prototype */ {
 
   /**
    * Filter type
@@ -341,7 +327,6 @@ fabric.Image.filters.Brightness = fabric.util.createClass( /** @scope fabric.Ima
 
   /**
    * Applies filter to canvas element
-   * @method applyTo
    * @param {Object} canvasEl Canvas element to apply filter to
    */
   applyTo: function(canvasEl) {
@@ -361,7 +346,6 @@ fabric.Image.filters.Brightness = fabric.util.createClass( /** @scope fabric.Ima
 
   /**
    * Returns json representation of filter
-   * @method toJSON
    * @return {String} json representation of filter
    */
   toJSON: function() {
@@ -375,7 +359,6 @@ fabric.Image.filters.Brightness = fabric.util.createClass( /** @scope fabric.Ima
 /**
  * Returns filter instance from an object representation
  * @static
- * @method fabric.Image.filters.Brightness.fromObject
  * @return {fabric.Image.filters.Brightness}
  */
 fabric.Image.filters.Brightness.fromObject = function(object) {
@@ -387,7 +370,7 @@ fabric.Image.filters.Brightness.fromObject = function(object) {
  * @class fabric.Image.filters.Noise
  * @memberOf fabric.Image.filters
  */
-fabric.Image.filters.Noise = fabric.util.createClass( /** @scope fabric.Image.filters.Noise.prototype */ {
+fabric.Image.filters.Noise = fabric.util.createClass( /** @lends fabric.Image.filters.Noise.prototype */ {
 
   /**
    * Filter type
@@ -407,7 +390,6 @@ fabric.Image.filters.Noise = fabric.util.createClass( /** @scope fabric.Image.fi
 
   /**
    * Applies filter to canvas element
-   * @method applyTo
    * @param {Object} canvasEl Canvas element to apply filter to
    */
   applyTo: function(canvasEl) {
@@ -430,7 +412,6 @@ fabric.Image.filters.Noise = fabric.util.createClass( /** @scope fabric.Image.fi
 
   /**
    * Returns json representation of filter
-   * @method toJSON
    * @return {String} json representation of filter
    */
   toJSON: function() {
@@ -444,7 +425,6 @@ fabric.Image.filters.Noise = fabric.util.createClass( /** @scope fabric.Image.fi
 /**
  * Returns filter instance from an object representation
  * @static
- * @method fabric.Image.filters.Noise.fromObject
  * @return {fabric.Image.filters.Noise}
  */
 fabric.Image.filters.Noise.fromObject = function(object) {
@@ -456,7 +436,7 @@ fabric.Image.filters.Noise.fromObject = function(object) {
  * @class fabric.Image.filters.GradientTransparency
  * @memberOf fabric.Image.filters
  */
-fabric.Image.filters.GradientTransparency = fabric.util.createClass( /** @scope fabric.Image.filters.GradientTransparency.prototype */ {
+fabric.Image.filters.GradientTransparency = fabric.util.createClass( /** @lends fabric.Image.filters.GradientTransparency.prototype */ {
 
   /**
    * Filter type
@@ -476,7 +456,6 @@ fabric.Image.filters.GradientTransparency = fabric.util.createClass( /** @scope 
 
   /**
    * Applies filter to canvas element
-   * @method applyTo
    * @param {Object} canvasEl Canvas element to apply filter to
    */
   applyTo: function(canvasEl) {
@@ -495,7 +474,6 @@ fabric.Image.filters.GradientTransparency = fabric.util.createClass( /** @scope 
 
   /**
    * Returns json representation of filter
-   * @method toJSON
    * @return {String} json representation of filter
    */
   toJSON: function() {
@@ -509,7 +487,6 @@ fabric.Image.filters.GradientTransparency = fabric.util.createClass( /** @scope 
 /**
  * Returns filter instance from an object representation
  * @static
- * @method fabric.Image.filters.GradientTransparency.fromObject
  * @return {fabric.Image.filters.GradientTransparency}
  */
 fabric.Image.filters.GradientTransparency.fromObject = function(object) {
@@ -521,7 +498,7 @@ fabric.Image.filters.GradientTransparency.fromObject = function(object) {
  * @class fabric.Image.filters.Tint
  * @memberOf fabric.Image.filters
  */
-fabric.Image.filters.Tint = fabric.util.createClass( /** @scope fabric.Image.filters.Tint.prototype */ {
+fabric.Image.filters.Tint = fabric.util.createClass( /** @lends fabric.Image.filters.Tint.prototype */ {
 
   /**
    * Filter type
@@ -541,7 +518,6 @@ fabric.Image.filters.Tint = fabric.util.createClass( /** @scope fabric.Image.fil
 
   /**
    * Applies filter to canvas element
-   * @method applyTo
    * @param {Object} canvasEl Canvas element to apply filter to
    */
   applyTo: function(canvasEl) {
@@ -573,7 +549,6 @@ fabric.Image.filters.Tint = fabric.util.createClass( /** @scope fabric.Image.fil
 
   /**
    * Returns json representation of filter
-   * @method toJSON
    * @return {String} json representation of filter
    */
   toJSON: function() {
@@ -587,7 +562,6 @@ fabric.Image.filters.Tint = fabric.util.createClass( /** @scope fabric.Image.fil
 /**
  * Returns filter instance from an object representation
  * @static
- * @method fabric.Image.filters.Tint.fromObject
  * @return {fabric.Image.filters.Tint}
  */
 fabric.Image.filters.Tint.fromObject = function(object) {
@@ -599,7 +573,7 @@ fabric.Image.filters.Tint.fromObject = function(object) {
  * @class fabric.Image.filters.Convolute
  * @memberOf fabric.Image.filters
  */
-fabric.Image.filters.Convolute = fabric.util.createClass(/** @scope fabric.Image.filters.Convolute.prototype */ {
+fabric.Image.filters.Convolute = fabric.util.createClass(/** @lends fabric.Image.filters.Convolute.prototype */ {
 
   /**
    * Filter type
@@ -626,7 +600,6 @@ fabric.Image.filters.Convolute = fabric.util.createClass(/** @scope fabric.Image
 
   /**
    * @private
-   * @method _createImageData
    */
   _createImageData: function(w, h) {
     return this.tmpCtx.createImageData(w, h);
@@ -634,7 +607,6 @@ fabric.Image.filters.Convolute = fabric.util.createClass(/** @scope fabric.Image
 
   /**
    * Applies filter to canvas element
-   * @method applyTo
    * @param {Object} canvasEl Canvas element to apply filter to
    */
   applyTo: function(canvasEl) {
@@ -692,7 +664,6 @@ fabric.Image.filters.Convolute = fabric.util.createClass(/** @scope fabric.Image
 
   /**
    * Returns json representation of filter
-   * @method toJSON
    * @return {String} json representation of filter
    */
   toJSON: function() {
@@ -706,7 +677,6 @@ fabric.Image.filters.Convolute = fabric.util.createClass(/** @scope fabric.Image
 /**
  * Returns filter instance from an object representation
  * @static
- * @method fabric.Image.filters.Convolute.fromObject
  * @return {fabric.Image.filters.Convolute}
  */
 fabric.Image.filters.Convolute.fromObject = function(object) {
@@ -718,7 +688,7 @@ fabric.Image.filters.Convolute.fromObject = function(object) {
  * @class fabric.Image.filters.Pixelate
  * @memberOf fabric.Image.filters
  */
-fabric.Image.filters.Pixelate = fabric.util.createClass(/** @scope fabric.Image.filters.Pixelate.prototype */ {
+fabric.Image.filters.Pixelate = fabric.util.createClass(/** @lends fabric.Image.filters.Pixelate.prototype */ {
 
   /**
    * Filter type
@@ -738,7 +708,6 @@ fabric.Image.filters.Pixelate = fabric.util.createClass(/** @scope fabric.Image.
 
   /**
    * Applies filter to canvas element
-   * @method applyTo
    * @param {Object} canvasEl Canvas element to apply filter to
    */
   applyTo: function(canvasEl) {
@@ -787,7 +756,6 @@ fabric.Image.filters.Pixelate = fabric.util.createClass(/** @scope fabric.Image.
 
   /**
    * Returns json representation of filter
-   * @method toJSON
    * @return {String} json representation of filter
    */
   toJSON: function() {
@@ -801,7 +769,6 @@ fabric.Image.filters.Pixelate = fabric.util.createClass(/** @scope fabric.Image.
 /**
  * Returns filter instance from an object representation
  * @static
- * @method fabric.Image.filters.Pixelate.fromObject
  * @return {fabric.Image.filters.Pixelate}
  */
 fabric.Image.filters.Pixelate.fromObject = function(object) {
