@@ -1,7 +1,6 @@
 /**
  * Pattern class
- * @class Pattern
- * @memberOf fabric
+ * @class fabric.Pattern
  */
 fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ {
 

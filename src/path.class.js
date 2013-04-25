@@ -156,7 +156,7 @@
 
   /**
    * Path class
-   * @class Path
+   * @class fabric.Path
    * @extends fabric.Object
    */
   fabric.Path = fabric.util.createClass(fabric.Object, /** @lends fabric.Path.prototype */ {

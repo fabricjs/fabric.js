@@ -4685,8 +4685,7 @@ fabric.util.string = {
 
   /**
    * Gradient class
-   * @class Gradient
-   * @memberOf fabric
+   * @class fabric.Gradient
    */
   fabric.Gradient = fabric.util.createClass(/** @lends fabric.Gradient.prototype */ {
 
@@ -5024,8 +5023,7 @@ fabric.util.string = {
 
 /**
  * Pattern class
- * @class Pattern
- * @memberOf fabric
+ * @class fabric.Pattern
  */
 fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ {
 
@@ -5110,8 +5108,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
 
 /**
  * Shadow class
- * @class Shadow
- * @memberOf fabric
+ * @class fabric.Shadow
  */
 fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
 
@@ -5195,8 +5192,7 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
 
   /**
    * Point class
-   * @name Point
-   * @memberOf fabric
+   * @class fabric.Point
    * @constructor
    * @param {Number} x
    * @param {Number} y
@@ -5494,8 +5490,8 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
 
   /**
    * Intersection class
-   * @class Intersection
-   * @memberOf fabric
+   * @class fabric.Intersection
+   * @constructor
    */
   function Intersection(status) {
     if (arguments.length > 0) {
@@ -5667,8 +5663,7 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
    * The purpose of {@link fabric.Color} is to abstract and encapsulate common color operations;
    * {@link fabric.Color} is a constructor and creates instances of {@link fabric.Color} objects.
    *
-   * @class Color
-   * @memberOf fabric
+   * @class fabric.Color
    * @param {String} color optional in hex or rgb(a) format
    * @return {fabric.Color} thisArg
    */
@@ -5975,9 +5970,8 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
    * @param {HTMLElement | String} el &lt;canvas> element to initialize instance on
    * @param {Object} [options] Options object
    *
-   * @borrows fabric.Observable.observe as fabric.StaticCanvas#observe
-   * @borrows fabric.Observable.stopObserving as fabric.StaticCanvas#stopObserving
-   * @borrows fabric.Observable.fire as fabric.StaticCanvas#fire
+   * @extends fabric.Collection
+   * @extends fabric.Observable
    */
   fabric.StaticCanvas = function (el, options) {
     options || (options = { });
@@ -9636,7 +9630,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
   /**
    * Root object class from which all 2d shape classes inherit from
    * @class fabric.Object
-   * @memberOf fabric
    */
   fabric.Object = fabric.util.createClass(/** @lends fabric.Object.prototype */ {
 
@@ -11746,7 +11739,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
   /**
    * Line class
-   * @class Line
+   * @class fabric.Line
    * @extends fabric.Object
    */
   fabric.Line = fabric.util.createClass(fabric.Object, /** @lends fabric.Line.prototype */ {
@@ -11938,7 +11931,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
   /**
    * Circle class
-   * @class Circle
+   * @class fabric.Circle
    * @extends fabric.Object
    */
   fabric.Circle = fabric.util.createClass(fabric.Object, /** @lends fabric.Circle.prototype */ {
@@ -12119,8 +12112,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
   /**
    * Triangle class
-   * @class Triangle
+   * @class fabric.Triangle
    * @extends fabric.Object
+   * @return {fabric.Triangle} thisArg
    */
   fabric.Triangle = fabric.util.createClass(fabric.Object, /** @lends fabric.Triangle.prototype */ {
 
@@ -12234,8 +12228,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
   /**
    * Ellipse class
-   * @class Ellipse
+   * @class fabric.Ellipse
    * @extends fabric.Object
+   * @return {fabric.Ellipse} thisArg
    */
   fabric.Ellipse = fabric.util.createClass(fabric.Object, /** @lends fabric.Ellipse.prototype */ {
 
@@ -12415,8 +12410,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
   /**
    * Rectangle class
-   * @class Rect
+   * @class fabric.Rect
    * @extends fabric.Object
+   * @return {fabric.Rect} thisArg
    */
   fabric.Rect = fabric.util.createClass(fabric.Object, /** @lends fabric.Rect.prototype */ {
 
@@ -12717,7 +12713,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
   /**
    * Polyline class
-   * @class Polyline
+   * @class fabric.Polyline
    * @extends fabric.Object
    */
   fabric.Polyline = fabric.util.createClass(fabric.Object, /** @lends fabric.Polyline.prototype */ {
@@ -12733,7 +12729,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @param {Array} points array of points
      * @param {Object} [options] Options object
      * @param {Boolean} Whether points offsetting should be skipped
-     * @return {Object} thisArg
+     * @return {fabric.Polyline} thisArg
      */
     initialize: function(points, options, skipOffset) {
       options = options || { };
@@ -12878,7 +12874,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
   /**
    * Polygon class
-   * @class Polygon
+   * @class fabric.Polygon
    * @extends fabric.Object
    */
   fabric.Polygon = fabric.util.createClass(fabric.Object, /** @lends fabric.Polygon.prototype */ {
@@ -13204,7 +13200,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
   /**
    * Path class
-   * @class Path
+   * @class fabric.Path
    * @extends fabric.Object
    */
   fabric.Path = fabric.util.createClass(fabric.Object, /** @lends fabric.Path.prototype */ {
@@ -13869,7 +13865,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
   /**
    * Path group class
-   * @class PathGroup
+   * @class fabric.PathGroup
    * @extends fabric.Path
    */
   fabric.PathGroup = fabric.util.createClass(fabric.Path, /** @lends fabric.PathGroup.prototype */ {
@@ -14110,8 +14106,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
   /**
    * Group class
-   * @class Group
+   * @class fabric.Group
    * @extends fabric.Object
+   * @extends fabric.Collection
    */
   fabric.Group = fabric.util.createClass(fabric.Object, fabric.Collection, /** @lends fabric.Group.prototype */ {
 
@@ -14568,7 +14565,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
   /**
    * Image class
-   * @class Image
+   * @class fabric.Image
    * @extends fabric.Object
    */
   fabric.Image = fabric.util.createClass(fabric.Object, /** @lends fabric.Image.prototype */ {
@@ -14903,6 +14900,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     if (object.width) {
       img.width = object.width;
     }
+
     if (object.height) {
       img.height = object.height;
     }
@@ -14913,15 +14911,16 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
       var instance = new fabric.Image(img, object);
       callback && callback(instance);
-        img = img.onload = img.onerror = null;
-      };
+      img = img.onload = img.onerror = null;
+    };
 
-      /** @ignore */
-      img.onerror = function() {
-        fabric.log('Error loading ' + img.src);
-        callback && callback(null, true);
-        img = img.onload = img.onerror = null;
-      };
+    /** @ignore */
+    img.onerror = function() {
+      fabric.log('Error loading ' + img.src);
+      callback && callback(null, true);
+      img = img.onload = img.onerror = null;
+    };
+
     img.src = src;
   };
 
@@ -15883,8 +15882,9 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
 
   /**
    * Text class
-   * @class Text
+   * @class fabric.Text
    * @extends fabric.Object
+   * @return {fabric.Text} thisArg
    */
   fabric.Text = fabric.util.createClass(fabric.Object, /** @lends fabric.Text.prototype */ {
 

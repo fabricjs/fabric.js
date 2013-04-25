@@ -13,8 +13,9 @@
 
   /**
    * Ellipse class
-   * @class Ellipse
+   * @class fabric.Ellipse
    * @extends fabric.Object
+   * @return {fabric.Ellipse} thisArg
    */
   fabric.Ellipse = fabric.util.createClass(fabric.Object, /** @lends fabric.Ellipse.prototype */ {
 

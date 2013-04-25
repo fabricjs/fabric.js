@@ -11,8 +11,9 @@
 
   /**
    * Triangle class
-   * @class Triangle
+   * @class fabric.Triangle
    * @extends fabric.Object
+   * @return {fabric.Triangle} thisArg
    */
   fabric.Triangle = fabric.util.createClass(fabric.Object, /** @lends fabric.Triangle.prototype */ {
 

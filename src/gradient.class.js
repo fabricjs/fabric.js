@@ -49,8 +49,7 @@
 
   /**
    * Gradient class
-   * @class Gradient
-   * @memberOf fabric
+   * @class fabric.Gradient
    */
   fabric.Gradient = fabric.util.createClass(/** @lends fabric.Gradient.prototype */ {
 

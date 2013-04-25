@@ -45,8 +45,9 @@
 
   /**
    * Text class
-   * @class Text
+   * @class fabric.Text
    * @extends fabric.Object
+   * @return {fabric.Text} thisArg
    */
   fabric.Text = fabric.util.createClass(fabric.Object, /** @lends fabric.Text.prototype */ {
 

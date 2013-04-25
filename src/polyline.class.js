@@ -12,7 +12,7 @@
 
   /**
    * Polyline class
-   * @class Polyline
+   * @class fabric.Polyline
    * @extends fabric.Object
    */
   fabric.Polyline = fabric.util.createClass(fabric.Object, /** @lends fabric.Polyline.prototype */ {
@@ -28,7 +28,7 @@
      * @param {Array} points array of points
      * @param {Object} [options] Options object
      * @param {Boolean} Whether points offsetting should be skipped
-     * @return {Object} thisArg
+     * @return {fabric.Polyline} thisArg
      */
     initialize: function(points, options, skipOffset) {
       options = options || { };

@@ -23,9 +23,8 @@
    * @param {HTMLElement | String} el &lt;canvas> element to initialize instance on
    * @param {Object} [options] Options object
    *
-   * @borrows fabric.Observable.observe as fabric.StaticCanvas#observe
-   * @borrows fabric.Observable.stopObserving as fabric.StaticCanvas#stopObserving
-   * @borrows fabric.Observable.fire as fabric.StaticCanvas#fire
+   * @extends fabric.Collection
+   * @extends fabric.Observable
    */
   fabric.StaticCanvas = function (el, options) {
     options || (options = { });

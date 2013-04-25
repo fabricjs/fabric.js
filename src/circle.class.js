@@ -13,7 +13,7 @@
 
   /**
    * Circle class
-   * @class Circle
+   * @class fabric.Circle
    * @extends fabric.Object
    */
   fabric.Circle = fabric.util.createClass(fabric.Object, /** @lends fabric.Circle.prototype */ {

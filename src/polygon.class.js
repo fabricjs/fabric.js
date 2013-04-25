@@ -15,7 +15,7 @@
 
   /**
    * Polygon class
-   * @class Polygon
+   * @class fabric.Polygon
    * @extends fabric.Object
    */
   fabric.Polygon = fabric.util.createClass(fabric.Object, /** @lends fabric.Polygon.prototype */ {

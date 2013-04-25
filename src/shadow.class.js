@@ -1,7 +1,6 @@
 /**
  * Shadow class
- * @class Shadow
- * @memberOf fabric
+ * @class fabric.Shadow
  */
 fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
 

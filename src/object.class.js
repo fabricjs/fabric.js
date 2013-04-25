@@ -26,7 +26,6 @@
   /**
    * Root object class from which all 2d shape classes inherit from
    * @class fabric.Object
-   * @memberOf fabric
    */
   fabric.Object = fabric.util.createClass(/** @lends fabric.Object.prototype */ {
 

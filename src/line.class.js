@@ -13,7 +13,7 @@
 
   /**
    * Line class
-   * @class Line
+   * @class fabric.Line
    * @extends fabric.Object
    */
   fabric.Line = fabric.util.createClass(fabric.Object, /** @lends fabric.Line.prototype */ {

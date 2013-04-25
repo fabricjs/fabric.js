@@ -16,7 +16,7 @@
 
   /**
    * Path group class
-   * @class PathGroup
+   * @class fabric.PathGroup
    * @extends fabric.Path
    */
   fabric.PathGroup = fabric.util.createClass(fabric.Path, /** @lends fabric.PathGroup.prototype */ {

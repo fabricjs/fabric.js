@@ -13,8 +13,8 @@
 
   /**
    * Intersection class
-   * @class Intersection
-   * @memberOf fabric
+   * @class fabric.Intersection
+   * @constructor
    */
   function Intersection(status) {
     if (arguments.length > 0) {

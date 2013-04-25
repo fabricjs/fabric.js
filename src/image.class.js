@@ -15,7 +15,7 @@
 
   /**
    * Image class
-   * @class Image
+   * @class fabric.Image
    * @extends fabric.Object
    */
   fabric.Image = fabric.util.createClass(fabric.Object, /** @lends fabric.Image.prototype */ {

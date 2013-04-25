@@ -12,8 +12,9 @@
 
   /**
    * Rectangle class
-   * @class Rect
+   * @class fabric.Rect
    * @extends fabric.Object
+   * @return {fabric.Rect} thisArg
    */
   fabric.Rect = fabric.util.createClass(fabric.Object, /** @lends fabric.Rect.prototype */ {
 
