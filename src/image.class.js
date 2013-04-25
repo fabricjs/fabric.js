@@ -350,6 +350,7 @@
     if (object.width) {
       img.width = object.width;
     }
+
     if (object.height) {
       img.height = object.height;
     }
@@ -360,15 +361,16 @@
 
       var instance = new fabric.Image(img, object);
       callback && callback(instance);
-        img = img.onload = img.onerror = null;
-      };
+      img = img.onload = img.onerror = null;
+    };
 
-      /** @ignore */
-      img.onerror = function() {
-        fabric.log('Error loading ' + img.src);
-        callback && callback(null, true);
-        img = img.onload = img.onerror = null;
-      };
+    /** @ignore */
+    img.onerror = function() {
+      fabric.log('Error loading ' + img.src);
+      callback && callback(null, true);
+      img = img.onload = img.onerror = null;
+    };
+
     img.src = src;
   };
 
