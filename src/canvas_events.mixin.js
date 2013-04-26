@@ -227,7 +227,7 @@
           target = this.getActiveGroup();
         }
         else {
-          if (target !== this.getActiveGroup()) {
+          if (target !== this.getActiveGroup() && target !== this.getActiveObject()) {
             this.deactivateAll();
             this.setActiveObject(target, e);
           }
