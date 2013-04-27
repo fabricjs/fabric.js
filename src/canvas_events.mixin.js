@@ -144,7 +144,7 @@
 
       this._currentTransform = null;
 
-      if (this._groupSelector) {
+      if (this.selection && this._groupSelector) {
         // group selection was completed, determine its bounds
         this._findSelectedObjects(e);
       }

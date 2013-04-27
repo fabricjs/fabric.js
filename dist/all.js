@@ -8470,9 +8470,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         this.setActiveGroup(group);
         group.saveCoords();
         this.fire('selection:created', { target: group });
+        this.renderAll();
       }
-
-      this.renderAll();
     },
 
     /**
@@ -8900,7 +8899,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
       this._currentTransform = null;
 
-      if (this._groupSelector) {
+      if (this.selection && this._groupSelector) {
         // group selection was completed, determine its bounds
         this._findSelectedObjects(e);
       }

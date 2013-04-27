@@ -672,9 +672,8 @@
         this.setActiveGroup(group);
         group.saveCoords();
         this.fire('selection:created', { target: group });
+        this.renderAll();
       }
-
-      this.renderAll();
     },
 
     /**
