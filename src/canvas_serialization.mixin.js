@@ -12,28 +12,34 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
    * @chainable
    */
   loadFromDatalessJSON: function (json, callback) {
+  	this._loadFromJson(json, true, true, callback);
+  },
 
-    if (!json) return;
-
-    // serialize if it wasn't already
+  _loadFromJson: function (json, dataless, clear, callback) {
+  	if (!json) return;
+  	
+  	// serialize if it wasn't already
     var serialized = (typeof json === 'string')
       ? JSON.parse(json)
       : json;
-
-    if (!serialized) return;
     
-    if (!serialized.objects) {
-      serialized.objects = [];
-    }
-
-    this.clear();
-
-    var _this = this;
-    this._enlivenDatalessObjects(serialized.objects, function() {
+	  if (!serialized) return;
+	  
+	  if (!serialized.objects) {
+	    serialized.objects = [];
+	  }
+	  
+	  clear && this.clear(); 
+	  
+	  var enlivenObjFunc = dataless
+	  		? this._enlivenDatalessObjects 
+	  		: this._enlivenObjects;
+	  
+	  var _this = this;
+	  enlivenObjFunc(serialized.objects, function() {
       _this._setBgOverlayImages(serialized, callback);
     });
   },
-
   /**
    * @method _enlivenDatalessObjects
    * @param {Array} objects
@@ -158,21 +164,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
    * @chainable
    */
   loadFromJSON: function (json, callback) {
-    if (!json) return;
-
-    // serialize if it wasn't already
-    var serialized = (typeof json === 'string')
-      ? JSON.parse(json)
-      : json;
-
-    var _this = this;
-    this._enlivenObjects(serialized.objects, function () {
-      _this._setBgOverlayImages(serialized, callback);
-    });
-
-    return this;
+  	this._loadFromJson(json, false, false, callback);
   },
-
+  
   _setBgOverlayImages: function(serialized, callback) {
 
     var _this = this,
