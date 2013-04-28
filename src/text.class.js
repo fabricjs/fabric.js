@@ -45,112 +45,98 @@
 
   /**
    * Text class
-   * @class Text
+   * @class fabric.Text
    * @extends fabric.Object
+   * @return {fabric.Text} thisArg
    */
-  fabric.Text = fabric.util.createClass(fabric.Object, /** @scope fabric.Text.prototype */ {
+  fabric.Text = fabric.util.createClass(fabric.Object, /** @lends fabric.Text.prototype */ {
 
     /**
      * Font size (in pixels)
-     * @property
      * @type Number
      */
     fontSize:             40,
 
     /**
      * Font weight (e.g. bold, normal, 400, 600, 800)
-     * @property
      * @type Number
      */
     fontWeight:           'normal',
 
     /**
      * Font family
-     * @property
      * @type String
      */
     fontFamily:           'Times New Roman',
 
     /**
      * Text decoration (e.g. underline, overline)
-     * @property
      * @type String
      */
     textDecoration:       '',
 
     /**
      * Text shadow
-     * @property
      * @type String | null
      */
     textShadow:           '',
 
     /**
      * Text alignment. Possible values: "left", "center", or "right".
-     * @property
      * @type String
      */
     textAlign:            'left',
 
     /**
      * Font style (e.g. italic)
-     * @property
      * @type String
      */
     fontStyle:            '',
 
     /**
      * Line height
-     * @property
      * @type Number
      */
     lineHeight:           1.3,
 
     /**
      * Stroke style. When specified, text is rendered with stroke
-     * @property
      * @type String
      */
     stroke:               '',
 
     /**
      * Stroke width
-     * @property
      * @type Number
      */
     strokeWidth:          1,
 
     /**
      * Background color of an entire text box
-     * @property
      * @type String
      */
     backgroundColor:      '',
 
     /**
      * Background color of text lines
-     * @property
      * @type String
      */
     textBackgroundColor:  '',
 
     /**
      * URL of a font file, when using Cufon
-     * @property
      * @type String | null
      */
     path:                 null,
 
     /**
      * Type of an object
-     * @property
      * @type String
      */
     type:                 'text',
 
     /**
      * Indicates whether canvas native text methods should be used to render text (otherwise, Cufon is used)
-     * @property
      * @type Boolean
      */
      useNative:           true,
@@ -158,14 +144,12 @@
      /**
       * List of properties to consider when checking if state of an object is changed (fabric.Object#hasStateChanged)
       * as well as for history (undo/redo) purposes
-      * @property
       * @type Array
       */
      stateProperties:     stateProperties,
 
     /**
      * Constructor
-     * @method initialize
      * @param {String} text
      * @param {Object} [options]
      * @return {fabric.Text} thisArg
@@ -174,7 +158,9 @@
       options = options || { };
 
       this.text = text;
+      this.__skipDimension = true;
       this.setOptions(options);
+      this.__skipDimension = false;
       this._initDimensions();
       this.setCoords();
     },
@@ -182,16 +168,15 @@
     /**
      * Renders text object on offscreen canvas, so that it would get dimensions
      * @private
-     * @method _initDimensions
      */
     _initDimensions: function() {
+      if (this.__skipDimension) return;
       var canvasEl = fabric.util.createCanvasElement();
       this._render(canvasEl.getContext('2d'));
     },
 
     /**
      * Returns string representation of an instance
-     * @method toString
      * @return {String} String representation of text object
      */
     toString: function() {
@@ -201,10 +186,18 @@
 
     /**
      * @private
-     * @method _render
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
+
+      var isInPathGroup = this.group && this.group.type !== 'group';
+      if (isInPathGroup && !this.transformMatrix) {
+        ctx.translate(-this.group.width/2 + this.left, -this.group.height / 2 + this.top);
+      }
+      else if (isInPathGroup && this.transformMatrix) {
+        ctx.translate(-this.group.width/2, -this.group.height/2);
+      }
+
       if (typeof Cufon === 'undefined' || this.useNative === true) {
         this._renderViaNative(ctx);
       }
@@ -215,7 +208,6 @@
 
     /**
      * @private
-     * @method _renderViaCufon
      */
     _renderViaCufon: function(ctx) {
       var o = Cufon.textOptions || (Cufon.textOptions = { });
@@ -266,12 +258,17 @@
 
     /**
      * @private
-     * @method _render_native
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _renderViaNative: function(ctx) {
 
-      this.transform(ctx);
+      if (this.originX === 'left') {
+        ctx.translate(this.left, this.top);
+      }
+      else {
+        this.transform(ctx);
+      }
+
       this._setTextStyles(ctx);
 
       var textLines = this.text.split(/\r?\n/);
@@ -306,7 +303,6 @@
 
     /**
      * @private
-     * @method _setBoundaries
      */
     _setBoundaries: function(ctx, textLines) {
       this._boundaries = [ ];
@@ -326,7 +322,6 @@
 
     /**
      * @private
-     * @method _setTextStyles
      */
     _setTextStyles: function(ctx) {
       ctx.fillStyle = this.fill.toLive
@@ -341,7 +336,6 @@
 
     /**
      * @private
-     * @method _getTextHeight
      */
     _getTextHeight: function(ctx, textLines) {
       return this.fontSize * textLines.length * this.lineHeight;
@@ -349,7 +343,6 @@
 
     /**
      * @private
-     * @method _getTextWidth
      */
     _getTextWidth: function(ctx, textLines) {
       var maxWidth = ctx.measureText(textLines[0]).width;
@@ -365,7 +358,6 @@
 
     /**
      * @private
-     * @method _setTextShadow
      */
     _setTextShadow: function(ctx) {
       if (this.textShadow) {
@@ -401,7 +393,6 @@
 
     /**
      * @private
-     * @method _drawTextLine
      * @param method
      * @param ctx
      * @param line
@@ -439,9 +430,16 @@
       }
     },
 
+    _getLeftOffset: function() {
+      return this.originX === 'left' ? 0 : -this.width / 2;
+    },
+
+    _getTopOffset: function() {
+      return this.originY === 'top' ? 0 : -this.height / 2;
+    },
+
     /**
      * @private
-     * @method _renderTextFill
      */
     _renderTextFill: function(ctx, textLines) {
       this._boundaries = [ ];
@@ -450,15 +448,14 @@
           'fillText',
           ctx,
           textLines[i],
-          -this.width / 2,
-          (-this.height / 2) + (i * this.fontSize * this.lineHeight) + this.fontSize
+          this._getLeftOffset(),
+          this._getTopOffset() + (i * this.fontSize * this.lineHeight) + this.fontSize
         );
       }
     },
 
     /**
      * @private
-     * @method _renderTextStroke
      */
     _renderTextStroke: function(ctx, textLines) {
       if (this.stroke) {
@@ -468,8 +465,8 @@
             'strokeText',
             ctx,
             textLines[i],
-            -this.width / 2,
-            (-this.height / 2) + (i * this.fontSize * this.lineHeight) + this.fontSize
+            this._getLeftOffset(),
+            this._getTopOffset() + (i * this.fontSize * this.lineHeight) + this.fontSize
           );
         }
         ctx.closePath();
@@ -478,7 +475,6 @@
 
     /**
      * @private
-     * @method _renderTextBackground
      */
     _renderTextBackground: function(ctx, textLines) {
       this._renderTextBoxBackground(ctx);
@@ -487,7 +483,6 @@
 
     /**
      * @private
-     * @method _renderTextBoxBackground
      */
     _renderTextBoxBackground: function(ctx) {
       if (this.backgroundColor) {
@@ -495,8 +490,8 @@
         ctx.fillStyle = this.backgroundColor;
 
         ctx.fillRect(
-          (-this.width / 2),
-          (-this.height / 2),
+          this._getLeftOffset(),
+          this._getTopOffset(),
           this.width,
           this.height
         );
@@ -507,7 +502,6 @@
 
     /**
      * @private
-     * @method _renderTextLinesBackground
      */
     _renderTextLinesBackground: function(ctx, textLines) {
       if (this.textBackgroundColor) {
@@ -522,8 +516,8 @@
             var lineLeftOffset = this._getLineLeftOffset(lineWidth);
 
             ctx.fillRect(
-              (-this.width / 2) + lineLeftOffset,
-              (-this.height / 2) + (i * this.fontSize * this.lineHeight),
+              this._getLeftOffset() + lineLeftOffset,
+              this._getTopOffset() + (i * this.fontSize * this.lineHeight),
               lineWidth,
               this.fontSize * this.lineHeight
             );
@@ -535,7 +529,6 @@
 
     /**
      * @private
-     * @method _getLineLeftOffset
      */
     _getLineLeftOffset: function(lineWidth) {
       if (this.textAlign === 'center') {
@@ -549,7 +542,6 @@
 
     /**
      * @private
-     * @method _getLineWidth
      * @param ctx
      * @param line
      */
@@ -561,11 +553,10 @@
 
     /**
      * @private
-     * @method _renderTextDecoration
      */
     _renderTextDecoration: function(ctx, textLines) {
 
-      var halfOfVerticalBox = this._getTextHeight(ctx, textLines) / 2;
+      var halfOfVerticalBox = this.originY === 'top' ? 0 : this._getTextHeight(ctx, textLines) / 2;
       var _this = this;
 
       /** @ignore */
@@ -576,7 +567,7 @@
           var lineLeftOffset = _this._getLineLeftOffset(lineWidth);
 
           ctx.fillRect(
-            (-_this.width / 2) + lineLeftOffset,
+            _this._getLeftOffset() + lineLeftOffset,
             (offset + (i * _this.fontSize * _this.lineHeight)) - halfOfVerticalBox,
             lineWidth,
             1);
@@ -596,7 +587,6 @@
 
     /**
      * @private
-     * @method _getFontDeclaration
      */
     _getFontDeclaration: function() {
       return [
@@ -610,7 +600,6 @@
 
     /**
      * @private
-     * @method _initDummyElement
      */
     _initDummyElementForCufon: function() {
       var el = fabric.document.createElement('pre'),
@@ -637,7 +626,6 @@
 
     /**
      * Renders text instance on a specified context
-     * @method render
      * @param ctx {CanvasRenderingContext2D} context to render on
      * @param {Boolean} [noTransform] When true, context is not transformed
      */
@@ -656,7 +644,6 @@
 
     /**
      * Returns object representation of an instance
-     * @method toObject
      * @param {Array} propertiesToInclude
      * @return {Object} object representation of an instance
      */
@@ -682,7 +669,6 @@
 
     /**
      * Returns SVG representation of an instance
-     * @method toSVG
      * @return {String} svg representation of an instance
      */
     toSVG: function() {
@@ -724,7 +710,6 @@
 
     /**
      * @private
-     * @method _getSVGShadows
      */
     _getSVGShadows: function(lineTopOffset, textLines) {
       var shadowSpans = [], j, i, jlen, ilen, lineTopOffsetMultiplier = 1;
@@ -761,7 +746,6 @@
 
     /**
      * @private
-     * @method _getSVGTextAndBg
      */
     _getSVGTextAndBg: function(lineTopOffset, textLeftOffset, textLines) {
       var textSpans = [ ], textBgRects = [ ], i, lineLeftOffset, len, lineTopOffsetMultiplier = 1;
@@ -831,7 +815,6 @@
      * we work around it by "moving" alpha channel into opacity attribute and setting fill's alpha to 1
      *
      * @private
-     * @method _getFillAttributes
      */
     _getFillAttributes: function(value) {
       var fillColor = (value && typeof value === 'string') ? new fabric.Color(value) : '';
@@ -843,7 +826,6 @@
 
     /**
      * Sets "color" of an instance (alias of `set('fill', &hellip;)`)
-     * @method setColor
      * @param {String} value
      * @return {fabric.Text} thisArg
      * @chainable
@@ -855,7 +837,6 @@
 
     /**
      * Returns actual text value of an instance
-     * @method getText
      * @return {String}
      */
     getText: function() {
@@ -864,7 +845,6 @@
 
     /**
      * Sets specified property to a specified value
-     * @method set
      * @param {String} name
      * @param {Any} value
      * @return {fabric.Text} thisArg
@@ -894,7 +874,6 @@
   /**
    * Returns fabric.Text instance from an object representation
    * @static
-   * @method fromObject
    * @param {Object} object to create an instance from
    * @return {fabric.Text} an instance
    */
@@ -905,7 +884,6 @@
   /**
    * Returns fabric.Text instance from an SVG element (<b>not yet implemented</b>)
    * @static
-   * @method fabric.Text.fromElement
    * @param element
    * @param options
    * @return {fabric.Text} an instance

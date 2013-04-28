@@ -3,7 +3,7 @@
 if (!String.prototype.trim) {
   /**
    * Trims a string (removing whitespace from the beginning and the end)
-   * @method trim
+   * @function external:String#trim
    * @see <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String/Trim">String#trim on MDN</a>
    */
   String.prototype.trim = function () {
@@ -15,7 +15,6 @@ if (!String.prototype.trim) {
 /**
  * Camelizes a string
  * @memberOf fabric.util.string
- * @method camelize
  * @param {String} string String to camelize
  * @return {String} Camelized version of a string
  */
@@ -28,7 +27,6 @@ function camelize(string) {
 /**
  * Capitalizes a string
  * @memberOf fabric.util.string
- * @method capitalize
  * @param {String} string String to capitalize
  * @return {String} Capitalized version of a string
  */
@@ -39,7 +37,6 @@ function capitalize(string) {
 /**
  * Escapes XML in a string
  * @memberOf fabric.util.string
- * @method escapeXml
  * @param {String} string String to escape
  * @return {String} Escaped version of a string
  */
@@ -51,7 +48,10 @@ function escapeXml(string) {
      .replace(/>/g, '&gt;');
 }
 
-/** @namespace String utilities */
+/**
+ * String utilities
+ * @namespace fabric.util.string
+ */
 fabric.util.string = {
   camelize: camelize,
   capitalize: capitalize,

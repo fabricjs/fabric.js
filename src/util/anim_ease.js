@@ -2,7 +2,6 @@
 
   /**
    * Quadratic easing in
-   * @method easeInQuad
    * @memberOf fabric.util.ease
    */
   function easeInQuad(t, b, c, d) {
@@ -11,7 +10,6 @@
 
   /**
    * Quadratic easing out
-   * @method easeOutQuad
    * @memberOf fabric.util.ease
    */
   function easeOutQuad(t, b, c, d) {
@@ -20,7 +18,6 @@
 
   /**
    * Quadratic easing in and out
-   * @method easeInOutQuad
    * @memberOf fabric.util.ease
    */
   function easeInOutQuad(t, b, c, d) {
@@ -31,7 +28,6 @@
 
   /**
    * Cubic easing in
-   * @method easeInCubic
    * @memberOf fabric.util.ease
    */
   function easeInCubic(t, b, c, d) {
@@ -40,7 +36,6 @@
 
   /**
    * Cubic easing out
-   * @method easeOutCubic
    * @memberOf fabric.util.ease
    */
   function easeOutCubic(t, b, c, d) {
@@ -49,7 +44,6 @@
 
   /**
    * Cubic easing in and out
-   * @method easeInOutCubic
    * @memberOf fabric.util.ease
    */
   function easeInOutCubic(t, b, c, d) {
@@ -60,7 +54,6 @@
 
   /**
    * Quartic easing in
-   * @method easeInQuart
    * @memberOf fabric.util.ease
    */
   function easeInQuart(t, b, c, d) {
@@ -69,7 +62,6 @@
 
   /**
    * Quartic easing out
-   * @method easeOutQuart
    * @memberOf fabric.util.ease
    */
   function easeOutQuart(t, b, c, d) {
@@ -78,7 +70,6 @@
 
   /**
    * Quartic easing in and out
-   * @method easeInOutQuart
    * @memberOf fabric.util.ease
    */
   function easeInOutQuart(t, b, c, d) {
@@ -89,7 +80,6 @@
 
   /**
    * Quintic easing in
-   * @method easeInQuint
    * @memberOf fabric.util.ease
    */
   function easeInQuint(t, b, c, d) {
@@ -98,7 +88,6 @@
 
   /**
    * Quintic easing out
-   * @method easeOutQuint
    * @memberOf fabric.util.ease
    */
   function easeOutQuint(t, b, c, d) {
@@ -107,7 +96,6 @@
 
   /**
    * Quintic easing in and out
-   * @method easeInOutQuint
    * @memberOf fabric.util.ease
    */
   function easeInOutQuint(t, b, c, d) {
@@ -118,7 +106,6 @@
 
   /**
    * Sinusoidal easing in
-   * @method easeInSine
    * @memberOf fabric.util.ease
    */
   function easeInSine(t, b, c, d) {
@@ -127,7 +114,6 @@
 
   /**
    * Sinusoidal easing out
-   * @method easeOutSine
    * @memberOf fabric.util.ease
    */
   function easeOutSine(t, b, c, d) {
@@ -136,7 +122,6 @@
 
   /**
    * Sinusoidal easing in and out
-   * @method easeInOutSine
    * @memberOf fabric.util.ease
    */
   function easeInOutSine(t, b, c, d) {
@@ -145,7 +130,6 @@
 
   /**
    * Exponential easing in
-   * @method easeInExpo
    * @memberOf fabric.util.ease
    */
   function easeInExpo(t, b, c, d) {
@@ -154,7 +138,6 @@
 
   /**
    * Exponential easing out
-   * @method easeOutExpo
    * @memberOf fabric.util.ease
    */
   function easeOutExpo(t, b, c, d) {
@@ -163,7 +146,6 @@
 
   /**
    * Exponential easing in and out
-   * @method easeInOutExpo
    * @memberOf fabric.util.ease
    */
   function easeInOutExpo(t, b, c, d) {
@@ -176,7 +158,6 @@
 
   /**
    * Circular easing in
-   * @method easeInCirc
    * @memberOf fabric.util.ease
    */
   function easeInCirc(t, b, c, d) {
@@ -185,7 +166,6 @@
 
   /**
    * Circular easing out
-   * @method easeOutCirc
    * @memberOf fabric.util.ease
    */
   function easeOutCirc(t, b, c, d) {
@@ -194,7 +174,6 @@
 
   /**
    * Circular easing in and out
-   * @method easeInOutCirc
    * @memberOf fabric.util.ease
    */
   function easeInOutCirc(t, b, c, d) {
@@ -205,7 +184,6 @@
 
   /**
    * Elastic easing in
-   * @method easeInElastic
    * @memberOf fabric.util.ease
    */
   function easeInElastic(t, b, c, d) {
@@ -221,7 +199,6 @@
 
   /**
    * Elastic easing out
-   * @method easeOutElastic
    * @memberOf fabric.util.ease
    */
   function easeOutElastic(t, b, c, d) {
@@ -237,7 +214,6 @@
 
   /**
    * Elastic easing in and out
-   * @method easeInOutElastic
    * @memberOf fabric.util.ease
    */
   function easeInOutElastic(t, b, c, d) {
@@ -254,7 +230,6 @@
 
   /**
    * Backwards easing in
-   * @method easeInBack
    * @memberOf fabric.util.ease
    */
   function easeInBack(t, b, c, d, s) {
@@ -264,7 +239,6 @@
 
   /**
    * Backwards easing out
-   * @method easeOutBack
    * @memberOf fabric.util.ease
    */
   function easeOutBack(t, b, c, d, s) {
@@ -274,7 +248,6 @@
 
   /**
    * Backwards easing in and out
-   * @method easeInOutBack
    * @memberOf fabric.util.ease
    */
   function easeInOutBack(t, b, c, d, s) {
@@ -286,7 +259,6 @@
 
   /**
    * Bouncing easing in
-   * @method easeInBounce
    * @memberOf fabric.util.ease
    */
   function easeInBounce(t, b, c, d) {
@@ -295,7 +267,6 @@
 
   /**
    * Bouncing easing out
-   * @method easeOutBounce
    * @memberOf fabric.util.ease
    */
   function easeOutBounce(t, b, c, d) {
@@ -312,7 +283,6 @@
 
   /**
    * Bouncing easing in and out
-   * @method easeInOutBounce
    * @memberOf fabric.util.ease
    */
   function easeInOutBounce(t, b, c, d) {
@@ -321,6 +291,7 @@
   }
 
   /**
+   * Easing functions
    * See <a href="http://gizma.com/easing/">Easing Equations by Robert Penner</a>
    * @namespace fabric.util.ease
    */

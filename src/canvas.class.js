@@ -33,39 +33,34 @@
   ProtoProxy.prototype = fabric.StaticCanvas.prototype;
   fabric.Canvas.prototype = new ProtoProxy();
 
-  var InteractiveMethods = /** @scope fabric.Canvas.prototype */ {
+  var InteractiveMethods = /** @lends fabric.Canvas.prototype */ {
 
     /**
      * When true, objects can be transformed by one side (unproportionally)
-     * @property
      * @type Boolean
      */
     uniScaleTransform:      false,
 
     /**
      * When true, objects use center point as the origin of transformation
-     * @property
      * @type Boolean
      */
     centerTransform:        false,
 
     /**
      * Indicates that canvas is interactive. This property should not be changed.
-     * @property
      * @type Boolean
      */
     interactive:            true,
 
     /**
      * Indicates whether group selection should be enabled
-     * @property
      * @type Boolean
      */
     selection:              true,
 
     /**
      * Color of selection
-     * @property
      * @type String
      */
     selectionColor:         'rgba(100, 100, 255, 0.3)', // blue
@@ -73,83 +68,71 @@
     /**
      * Default dash array pattern
      * If not empty the selection border is dashed
-     * @property
      * @type Array
      */
     selectionDashArray:      [ ],
 
     /**
      * Color of the border of selection (usually slightly darker than color of selection itself)
-     * @property
      * @type String
      */
     selectionBorderColor:   'rgba(255, 255, 255, 0.3)',
 
     /**
      * Width of a line used in object/group selection
-     * @property
      * @type Number
      */
     selectionLineWidth:     1,
 
     /**
      * Default cursor value used when hovering over an object on canvas
-     * @property
      * @type String
      */
     hoverCursor:            'move',
 
     /**
      * Default cursor value used when moving an object on canvas
-     * @property
      * @type String
      */
     moveCursor:             'move',
 
     /**
      * Default cursor value used for the entire canvas
-     * @property
      * @type String
      */
     defaultCursor:          'default',
 
     /**
      * Cursor value used during free drawing
-     * @property
      * @type String
      */
     freeDrawingCursor:      'crosshair',
 
     /**
      * Cursor value used for rotation point
-     * @property
      * @type String
      */
     rotationCursor:         'crosshair',
 
     /**
      * Default element class that's given to wrapper (div) element of canvas
-     * @property
      * @type String
      */
     containerClass:        'canvas-container',
 
     /**
      * When true, object detection happens on per-pixel basis rather than on per-bounding-box
-     * @property
      * @type Boolean
      */
     perPixelTargetFind:     false,
 
     /**
      * Number of pixels around target pixel to tolerate (consider active) during object detection
-     * @property
      * @type Number
      */
     targetFindTolerance: 0,
 
     /**
-     * @method _initInteractive
      * @private
      */
     _initInteractive: function() {
@@ -166,7 +149,7 @@
 
     /**
      * Resets the current transform to its original values and chooses the type of resizing based on the event
-     * @method _resetCurrentTransform
+     * @private
      * @param e {Event} Event object fired on mousemove
      */
     _resetCurrentTransform: function(e) {
@@ -206,7 +189,6 @@
 
     /**
      * Applies one implementation of 'point inside polygon' algorithm
-     * @method containsPoint
      * @param e { Event } event object
      * @param target { fabric.Object } object to test against
      * @return {Boolean} true if point contains within area of given object
@@ -234,7 +216,6 @@
 
     /**
      * @private
-     * @method _normalizePointer
      */
     _normalizePointer: function (object, pointer) {
 
@@ -257,7 +238,6 @@
 
     /**
      * @private
-     * @method _isTargetTransparent
      */
     _isTargetTransparent: function (target, x, y) {
       var cacheContext = this.contextCache;
@@ -304,25 +284,24 @@
 
     /**
      * @private
-     * @method _shouldClearSelection
      */
-    _shouldClearSelection: function (e) {
-      var target = this.findTarget(e),
-          activeGroup = this.getActiveGroup();
+    _shouldClearSelection: function (e, target) {
+      var activeGroup = this.getActiveGroup();
+
       return (
         !target || (
-          target &&
-          activeGroup &&
-          !activeGroup.contains(target) &&
-          activeGroup !== target &&
-          !e.shiftKey
-        )
+        target &&
+        activeGroup &&
+        !activeGroup.contains(target) &&
+        activeGroup !== target &&
+        !e.shiftKey) || (
+        target &&
+        !target.selectable)
       );
     },
 
     /**
      * @private
-     * @method _setupCurrentTransform
      */
     _setupCurrentTransform: function (e, target) {
       if (!target) return;
@@ -396,7 +375,7 @@
     },
 
     /**
-     * @method _shouldHandleGroupLogic
+     * @private
      * @param e {Event}
      * @param target {fabric.Object}
      * @return {Boolean}
@@ -410,7 +389,6 @@
 
     /**
      * @private
-     * @method _handleGroupLogic
      */
     _handleGroupLogic: function (e, target) {
       if (target === this.getActiveGroup()) {
@@ -461,7 +439,7 @@
 
     /**
      * Translates object by "setting" its left/top
-     * @method _translateObject
+     * @private
      * @param x {Number} pointer's x coordinate
      * @param y {Number} pointer's y coordinate
      */
@@ -478,7 +456,7 @@
 
     /**
      * Scales object by invoking its scaleX/scaleY methods
-     * @method _scaleObject
+     * @private
      * @param x {Number} pointer's x coordinate
      * @param y {Number} pointer's y coordinate
      * @param by {String} Either 'x' or 'y' - specifies dimension constraint by which to scale an object.
@@ -575,7 +553,7 @@
 
     /**
      * Rotates object by invoking its rotate method
-     * @method _rotateObject
+     * @private
      * @param x {Number} pointer's x coordinate
      * @param y {Number} pointer's y coordinate
      */
@@ -593,16 +571,15 @@
     },
 
     /**
-     * @method _setCursor
+     * @private
      */
     _setCursor: function (value) {
       this.upperCanvasEl.style.cursor = value;
     },
 
     /**
-    * @private
-    * @method _resetObjectTransform:
-    */
+     * @private
+     */
     _resetObjectTransform: function (target) {
       target.scaleX = 1;
       target.scaleY = 1;
@@ -610,7 +587,6 @@
     },
 
     /**
-     * @method _drawSelection
      * @private
      */
     _drawSelection: function () {
@@ -661,7 +637,6 @@
 
     /**
      * @private
-     * @method _findSelectedObjects
      */
     _findSelectedObjects: function (e) {
       var group = [ ],
@@ -697,14 +672,12 @@
         this.setActiveGroup(group);
         group.saveCoords();
         this.fire('selection:created', { target: group });
+        this.renderAll();
       }
-
-      this.renderAll();
     },
 
     /**
      * Method that determines what object we are clicking on
-     * @method findTarget
      * @param {Event} e mouse event
      * @param {Boolean} skipGroup when true, group is skipped and only objects are traversed through
      */
@@ -753,14 +726,12 @@
           break;
         }
       }
-      if (target && target.selectable) {
-        return target;
-      }
+
+      return target;
     },
 
     /**
      * Returns pointer coordinates relative to canvas.
-     * @method getPointer
      * @param {Event} e
      * @return {Object} object with "x" and "y" number values
      */
@@ -774,7 +745,6 @@
 
     /**
      * @private
-     * @method _createUpperCanvas
      * @param {HTMLElement|String} canvasEl Canvas element
      * @throws {CANVAS_INIT_ERROR} If canvas can not be initialized
      */
@@ -790,7 +760,6 @@
 
     /**
      * @private
-     * @method _createCacheCanvas
      */
     _createCacheCanvas: function () {
       this.cacheCanvasEl = this._createCanvasElement();
@@ -801,7 +770,6 @@
 
     /**
      * @private
-     * @method _initWrapperElement
      * @param {Number} width
      * @param {Number} height
      */
@@ -819,7 +787,6 @@
 
     /**
      * @private
-     * @method _applyCanvasStyle
      * @param {Element} element
      */
     _applyCanvasStyle: function (element) {
@@ -840,7 +807,6 @@
 
     /**
      * Returns context of canvas where object selection is drawn
-     * @method getSelectionContext
      * @return {CanvasRenderingContext2D}
      */
     getSelectionContext: function() {
@@ -849,7 +815,6 @@
 
     /**
      * Returns &lt;canvas> element on which object selection is drawn
-     * @method getSelectionElement
      * @return {HTMLCanvasElement}
      */
     getSelectionElement: function () {
@@ -858,7 +823,6 @@
 
     /**
      * Sets given object as the only active object on canvas
-     * @method setActiveObject
      * @param object {fabric.Object} Object to set as an active one
      * @return {fabric.Canvas} thisArg
      * @chainable
@@ -879,7 +843,6 @@
 
     /**
      * Returns currently active object
-     * @method getActiveObject
      * @return {fabric.Object} active object
      */
     getActiveObject: function () {
@@ -888,7 +851,6 @@
 
     /**
      * Discards currently active object
-     * @method discardActiveObject
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
@@ -902,7 +864,6 @@
 
     /**
      * Sets active group to a speicified one
-     * @method setActiveGroup
      * @param {fabric.Group} group Group to set as a current one
      * @return {fabric.Canvas} thisArg
      * @chainable
@@ -918,7 +879,6 @@
 
     /**
      * Returns currently active group
-     * @method getActiveGroup
      * @return {fabric.Group} Current group
      */
     getActiveGroup: function () {
@@ -927,7 +887,6 @@
 
     /**
      * Removes currently active group
-     * @method discardActiveGroup
      * @return {fabric.Canvas} thisArg
      */
     discardActiveGroup: function () {
@@ -940,7 +899,6 @@
 
     /**
      * Deactivates all objects on canvas, removing any active group or object
-     * @method deactivateAll
      * @return {fabric.Canvas} thisArg
      */
     deactivateAll: function () {
@@ -957,7 +915,6 @@
 
     /**
      * Deactivates all objects and dispatches appropriate events
-     * @method deactivateAllWithDispatch
      * @return {fabric.Canvas} thisArg
      */
     deactivateAllWithDispatch: function () {
@@ -985,6 +942,7 @@
   }
 
   if (fabric.isTouchSupported) {
+    /** @ignore */
     fabric.Canvas.prototype._setCursorFromEvent = function() { };
   }
 

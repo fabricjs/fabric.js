@@ -118,7 +118,7 @@
       'points': expectedPoints
     }), polygonWithAttrs.toObject());
 
-    deepEqual([ 1, 0, 0, 1, -10, -20 ], polygonWithAttrs.get('transformMatrix'));
+    deepEqual([ 2, 0, 0, 2, -10, -20 ], polygonWithAttrs.get('transformMatrix'));
 
     var elPolygonWithoutPoints = fabric.document.createElement('polygon');
 

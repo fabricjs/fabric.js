@@ -3,7 +3,6 @@ fabric.util.object.extend(fabric.Object.prototype, {
   /**
    * List of properties to consider when checking if state of an object is changed (fabric.Object#hasStateChanged);
    * as well as for history (undo/redo) purposes
-   * @property
    * @type Array
    */
   stateProperties:  (
@@ -15,7 +14,6 @@ fabric.util.object.extend(fabric.Object.prototype, {
 
   /**
    * Returns true if state of an object (one if its state properties) was changed
-   * @method hasStateChanged
    * @return {Boolean} true if instance' state has changed
    */
   hasStateChanged: function() {
@@ -26,7 +24,6 @@ fabric.util.object.extend(fabric.Object.prototype, {
 
   /**
    * Saves a snapshot of object's state (its state properties)
-   * @method saveState
    * @return {fabric.Object} thisArg
    * @chainable
    */
@@ -39,7 +36,6 @@ fabric.util.object.extend(fabric.Object.prototype, {
 
   /**
    * Setups state of an object
-   * @method setupState
    */
   setupState: function() {
     this.originalState = { };

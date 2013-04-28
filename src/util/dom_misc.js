@@ -4,7 +4,6 @@
 
   /**
    * Takes id and returns an element with that id (if one exists in a document)
-   * @method getById
    * @memberOf fabric.util
    * @param {String|HTMLElement} id
    * @return {HTMLElement|null}
@@ -15,7 +14,6 @@
 
   /**
    * Converts an array-like object (e.g. arguments or NodeList) to an array
-   * @method toArray
    * @memberOf fabric.util
    * @param {Object} arrayLike
    * @return {Array}
@@ -42,7 +40,6 @@
 
   /**
    * Creates specified element with specified attributes
-   * @method makeElement
    * @memberOf fabric.util
    * @param {String} tagName Type of an element to create
    * @param {Object} [attributes] Attributes to set on an element
@@ -66,7 +63,6 @@
 
   /**
    * Adds class to an element
-   * @method addClass
    * @memberOf fabric.util
    * @param {HTMLElement} element Element to add class to
    * @param {String} className Class to add to an element
@@ -79,7 +75,6 @@
 
   /**
    * Wraps element with another element
-   * @method wrapElement
    * @memberOf fabric.util
    * @param {HTMLElement} element Element to wrap
    * @param {HTMLElement|String} wrapper Element to wrap with
@@ -99,7 +94,6 @@
 
   /**
    * Returns offset for a given element
-   * @method getElementOffset
    * @function
    * @memberOf fabric.util
    * @param {HTMLElement} element Element to get offset for
@@ -119,7 +113,6 @@
 
   /**
   * Returns position of a given element
-  * @method getElementPosition
   * @function
   * @memberOf fabric.util
   * @param {HTMLElement} element Element to get offset for
@@ -155,7 +148,6 @@
 
     /**
      * Makes element unselectable
-     * @method makeElementUnselectable
      * @memberOf fabric.util
      * @param {HTMLElement} element Element to make unselectable
      * @return {HTMLElement} Element that was passed in
@@ -175,7 +167,6 @@
 
     /**
      * Makes element selectable
-     * @method makeElementSelectable
      * @memberOf fabric.util
      * @param {HTMLElement} element Element to make selectable
      * @return {HTMLElement} Element that was passed in
@@ -201,7 +192,6 @@
 
     /**
      * Inserts a script element with a given url into a document; invokes callback, when that script is finished loading
-     * @method getScript
      * @memberOf fabric.util
      * @param {String} url URL of a script to load
      * @param {Function} callback Callback to execute when script is finished loading

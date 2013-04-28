@@ -1,9 +1,8 @@
-fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.StaticCanvas.prototype */ {
+fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.StaticCanvas.prototype */ {
 
   /**
    * Populates canvas with data from the specified dataless JSON
    * JSON format must conform to the one of `fabric.Canvas#toDatalessJSON`
-   * @method loadFromDatalessJSON
    * @param {String|Object} json JSON string or object
    * @param {Function} callback Callback, invoked when json is parsed
    *                            and corresponding objects (e.g: fabric.Image)
@@ -41,7 +40,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
     });
   },
   /**
-   * @method _enlivenDatalessObjects
+   * @private
    * @param {Array} objects
    * @param {Function} callback
    */
@@ -155,7 +154,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
   /**
    * Populates canvas with data from the specified JSON
    * JSON format must conform to the one of `fabric.Canvas#toJSON`
-   * @method loadFromJSON
    * @param {String|Object} json JSON string or object
    * @param {Function} callback Callback, invoked when json is parsed
    *                            and corresponding objects (e.g: fabric.Image)
@@ -173,7 +171,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
         backgroundPatternLoaded,
         backgroundImageLoaded,
         overlayImageLoaded;
-    
+
     var cbIfLoaded = function () {
       callback && backgroundImageLoaded && overlayImageLoaded && backgroundPatternLoaded && callback();
     };
@@ -230,7 +228,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
   },
 
   /**
-   * @method _enlivenObjects
+   * @private
    * @param {Array} objects
    * @param {Function} callback
    */
@@ -246,7 +244,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
 
   /**
    * @private
-   * @method _toDataURL
    * @param {String} format
    * @param {Function} callback
    */
@@ -258,7 +255,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
 
   /**
    * @private
-   * @method _toDataURLWithMultiplier
    * @param {String} format
    * @param {Number} multiplier
    * @param {Function} callback
@@ -271,7 +267,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
 
   /**
    * Clones canvas instance
-   * @method clone
    * @param {Object} [callback] Receives cloned instance as a first argument
    */
   clone: function (callback) {
@@ -287,7 +282,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @scope fabric.Stati
    * Clones canvas instance without cloning existing data.
    * This essentially copies canvas dimensions, clipping properties, etc.
    * but leaves data empty (so that you can populate it with your own)
-   * @method cloneWithoutData
    * @param {Object} [callback] Receives cloned instance as a first argument
    */
   cloneWithoutData: function(callback) {

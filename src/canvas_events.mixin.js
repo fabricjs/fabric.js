@@ -14,13 +14,11 @@
   removeListener = fabric.util.removeListener,
   getPointer = fabric.util.getPointer;
 
-  fabric.util.object.extend(fabric.Canvas.prototype, /** @scope fabric.Canvas.prototype */ {
+  fabric.util.object.extend(fabric.Canvas.prototype, /** @lends fabric.Canvas.prototype */ {
 
     /**
-     * Adds mouse listeners to  canvas
-     * @method _initEvents
+     * Adds mouse listeners to canvas
      * @private
-     * See configuration documentation for more details.
      */
     _initEvents: function () {
       var _this = this;
@@ -51,7 +49,6 @@
     },
 
     /**
-     * @method _onMouseDown
      * @private
      */
     _onMouseDown: function (e) {
@@ -68,7 +65,6 @@
     },
 
     /**
-     * @method _onMouseUp
      * @private
      */
     _onMouseUp: function (e) {
@@ -85,7 +81,6 @@
     },
 
     /**
-     * @method _onMouseMove
      * @private
      */
     _onMouseMove: function (e) {
@@ -94,7 +89,6 @@
     },
 
     /**
-     * @method _onResize
      * @private
      */
     _onResize: function () {
@@ -105,9 +99,8 @@
      * Method that defines the actions when mouse is released on canvas.
      * The method resets the currentTransform parameters, store the image corner
      * position in the image object and render the canvas on top.
-     * @method __onMouseUp
+     * @private
      * @param {Event} e Event object fired on mouseup
-     *
      */
     __onMouseUp: function (e) {
 
@@ -151,7 +144,7 @@
 
       this._currentTransform = null;
 
-      if (this._groupSelector) {
+      if (this.selection && this._groupSelector) {
         // group selection was completed, determine its bounds
         this._findSelectedObjects(e);
       }
@@ -185,9 +178,8 @@
      * The method inits the currentTransform parameters and renders all the
      * canvas so the current image can be placed on the top canvas and the rest
      * in on the container one.
-     * @method __onMouseDown
+     * @private
      * @param e {Event} Event object fired on mousedown
-     *
      */
     __onMouseDown: function (e) {
 
@@ -212,7 +204,7 @@
       var target = this.findTarget(e), corner;
       pointer = this.getPointer(e);
 
-      if (this._shouldClearSelection(e)) {
+      if (this._shouldClearSelection(e, target)) {
         this._groupSelector = {
           ex: pointer.x,
           ey: pointer.y,
@@ -220,7 +212,7 @@
           left: 0
         };
         this.deactivateAllWithDispatch();
-        target && this.setActiveObject(target, e);
+        target && target.selectable && this.setActiveObject(target, e);
       }
       else {
         // determine if it's a drag or rotate case
@@ -235,7 +227,7 @@
           target = this.getActiveGroup();
         }
         else {
-          if (target !== this.getActiveGroup()) {
+          if (target !== this.getActiveGroup() && target !== this.getActiveObject()) {
             this.deactivateAll();
             this.setActiveObject(target, e);
           }
@@ -264,9 +256,8 @@
       * an image or neither of them (only hovering). A group selection is also possible and would cancel
       * all any other type of action.
       * In case of an image transformation only the top canvas will be rendered.
-      * @method __onMouseMove
+      * @private
       * @param e {Event} Event object fired on mousemove
-      *
       */
     __onMouseMove: function (e) {
 
@@ -285,7 +276,7 @@
       var groupSelector = this._groupSelector;
 
       // We initially clicked in an empty area, so we draw a box for multiple selection.
-      if (groupSelector !== null) {
+      if (groupSelector) {
         pointer = getPointer(e, this.upperCanvasEl);
 
         groupSelector.left = pointer.x - this._offset.left - groupSelector.ex;
@@ -303,7 +294,7 @@
         // performance.
         target = this.findTarget(e);
 
-        if (!target) {
+        if (!target || target && !target.selectable) {
           // image/text was hovered-out from, we remove its borders
           for (var i = this._objects.length; i--; ) {
             if (this._objects[i] && !this._objects[i].active) {
@@ -322,85 +313,66 @@
         pointer = getPointer(e, this.upperCanvasEl);
 
         var x = pointer.x,
-            y = pointer.y;
+            y = pointer.y,
+            reset = false,
+            transform = this._currentTransform;
 
-        this._currentTransform.target.isMoving = true;
+        target = transform.target;
+        target.isMoving = true;
 
-        var t = this._currentTransform, reset = false;
-        if (
-            (t.action === 'scale' || t.action === 'scaleX' || t.action === 'scaleY')
-            &&
-            (
-              // Switch from a normal resize to center-based
-              (e.altKey && (t.originX !== 'center' || t.originY !== 'center'))
-              ||
-              // Switch from center-based resize to normal one
-              (!e.altKey && t.originX === 'center' && t.originY === 'center')
-            )
-           ) {
+        if ((transform.action === 'scale' || transform.action === 'scaleX' || transform.action === 'scaleY') &&
+           // Switch from a normal resize to center-based
+           ((e.altKey && (transform.originX !== 'center' || transform.originY !== 'center')) ||
+           // Switch from center-based resize to normal one
+           (!e.altKey && transform.originX === 'center' && transform.originY === 'center'))
+        ) {
           this._resetCurrentTransform(e);
           reset = true;
         }
 
-        if (this._currentTransform.action === 'rotate') {
+        if (transform.action === 'rotate') {
           this._rotateObject(x, y);
 
-          this.fire('object:rotating', {
-            target: this._currentTransform.target,
-            e: e
-          });
-          this._currentTransform.target.fire('rotating');
+          this.fire('object:rotating', { target: target, e: e });
+          target.fire('rotating', { e: e });
         }
-        else if (this._currentTransform.action === 'scale') {
+        else if (transform.action === 'scale') {
           // rotate object only if shift key is not pressed
           // and if it is not a group we are transforming
-
-          if (e.shiftKey || this.uniScaleTransform) {
-            this._currentTransform.currentAction = 'scale';
+          if ((e.shiftKey || this.uniScaleTransform) && !target.get('lockUniScaling')) {
+            transform.currentAction = 'scale';
             this._scaleObject(x, y);
           }
           else {
-            if (!reset && t.currentAction === 'scale') {
-              // Switch from a normal resize to proportional
+            // Switch from a normal resize to proportional
+            if (!reset && transform.currentAction === 'scale') {
               this._resetCurrentTransform(e);
             }
 
-            this._currentTransform.currentAction = 'scaleEqually';
+            transform.currentAction = 'scaleEqually';
             this._scaleObject(x, y, 'equally');
           }
 
-          this.fire('object:scaling', {
-            target: this._currentTransform.target,
-            e: e
-          });
-          this._currentTransform.target.fire('scaling', { e: e });
+          this.fire('object:scaling', { target: target, e: e });
+          target.fire('scaling', { e: e });
         }
-        else if (this._currentTransform.action === 'scaleX') {
+        else if (transform.action === 'scaleX') {
           this._scaleObject(x, y, 'x');
 
-          this.fire('object:scaling', {
-            target: this._currentTransform.target,
-            e: e
-          });
-          this._currentTransform.target.fire('scaling', { e: e });
+          this.fire('object:scaling', { target: target, e: e});
+          target.fire('scaling', { e: e });
         }
-        else if (this._currentTransform.action === 'scaleY') {
+        else if (transform.action === 'scaleY') {
           this._scaleObject(x, y, 'y');
 
-          this.fire('object:scaling', {
-            target: this._currentTransform.target,
-            e: e
-          });
-          this._currentTransform.target.fire('scaling', { e: e });
+          this.fire('object:scaling', { target: target, e: e});
+          target.fire('scaling', { e: e });
         }
         else {
           this._translateObject(x, y);
 
-          this.fire('object:moving', {
-            target: this._currentTransform.target,
-            e: e
-          });
-          this._currentTransform.target.fire('moving', { e: e });
+          this.fire('object:moving', { target: target, e: e});
+          target.fire('moving', { e: e });
           this._setCursor(this.moveCursor);
         }
 
@@ -412,7 +384,6 @@
     /**
      * Sets the cursor depending on where the canvas is being hovered.
      * Note: very buggy in Opera
-     * @method _setCursorFromEvent
      * @param e {Event} Event object
      * @param target {Object} Object that the mouse is hovering, if so.
      */

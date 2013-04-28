@@ -13,21 +13,19 @@
 
   /**
    * Circle class
-   * @class Circle
+   * @class fabric.Circle
    * @extends fabric.Object
    */
-  fabric.Circle = fabric.util.createClass(fabric.Object, /** @scope fabric.Circle.prototype */ {
+  fabric.Circle = fabric.util.createClass(fabric.Object, /** @lends fabric.Circle.prototype */ {
 
     /**
      * Type of an object
-     * @property
      * @type String
      */
     type: 'circle',
 
     /**
      * Constructor
-     * @method initialize
      * @param {Object} [options] Options object
      * @return {fabric.Circle} thisArg
      */
@@ -43,7 +41,6 @@
 
     /**
      * Returns object representation of an instance
-     * @method toObject
      * @param {Array} propertiesToInclude
      * @return {Object} object representation of an instance
      */
@@ -55,7 +52,6 @@
 
     /**
      * Returns svg representation of an instance
-     * @method toSVG
      * @return {String} svg representation of an instance
      */
     toSVG: function() {
@@ -82,7 +78,6 @@
 
     /**
      * @private
-     * @method _render
      * @param ctx {CanvasRenderingContext2D} context to render on
      */
     _render: function(ctx, noTransform) {
@@ -91,9 +86,7 @@
       ctx.globalAlpha = this.group ? (ctx.globalAlpha * this.opacity) : this.opacity;
       ctx.arc(noTransform ? this.left : 0, noTransform ? this.top : 0, this.radius, 0, piBy2, false);
       ctx.closePath();
-      if (this.fill) {
-        ctx.fill();
-      }
+      this._renderFill(ctx);
       this._removeShadow(ctx);
       if (this.stroke) {
         ctx.stroke();
@@ -102,7 +95,6 @@
 
     /**
      * Returns horizontal radius of an object (according to how an object is scaled)
-     * @method getRadiusX
      * @return {Number}
      */
     getRadiusX: function() {
@@ -111,7 +103,6 @@
 
     /**
      * Returns vertical radius of an object (according to how an object is scaled)
-     * @method getRadiusY
      * @return {Number}
      */
     getRadiusY: function() {
@@ -120,7 +111,6 @@
 
     /**
      * Sets radius of an object (and updates width accordingly)
-     * @method setRadius
      * @return {Number}
      */
     setRadius: function(value) {
@@ -130,7 +120,6 @@
 
     /**
      * Returns complexity of an instance
-     * @method complexity
      * @return {Number} complexity of this instance
      */
     complexity: function() {
@@ -148,11 +137,10 @@
   /**
    * Returns {@link fabric.Circle} instance from an SVG element
    * @static
-   * @method fabric.Circle.fromElement
    * @param {SVGElement} element Element to parse
    * @param {Object} [options] Options object
    * @throws {Error} If value of `r` attribute is missing or invalid
-   * @return {Object} Instance of fabric.Circle
+   * @return {fabric.Circle} Instance of fabric.Circle
    */
   fabric.Circle.fromElement = function(element, options) {
     options || (options = { });
@@ -184,7 +172,6 @@
   /**
    * Returns {@link fabric.Circle} instance from an object representation
    * @static
-   * @method fabric.Circle.fromObject
    * @param {Object} object Object to create an instance from
    * @return {Object} Instance of fabric.Circle
    */

@@ -2,46 +2,40 @@
  * SprayBrush class
  * @class fabric.SprayBrush
  */
-fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @scope fabric.SprayBrush.prototype */ {
+fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric.SprayBrush.prototype */ {
 
   /**
    * Width of a spray
-   * @property
    * @type Number
    */
   width:              10,
 
   /**
    * Density of a spray (number of dots per chunk)
-   * @property
    * @type Number
    */
   density:            20,
 
   /**
    * Width of spray dots
-   * @property
    * @type Number
    */
   dotWidth:           1,
 
   /**
    * Width variance of spray dots
-   * @property
    * @type Number
    */
   dotWidthVariance:   1,
 
   /**
    * Whether opacity of a dot should be random
-   * @property
    * @type Boolean
    */
   randomOpacity:      false,
 
   /**
    * Constructor
-   * @method initialize
    * @param {fabric.Canvas} canvas
    * @return {fabric.SprayBrush} Instance of a spray brush
    */
@@ -51,7 +45,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @scope fabric
   },
 
   /**
-   * @method onMouseDown
+   * Invoked on mouse down
    * @param {Object} pointer
    */
   onMouseDown: function(pointer) {
@@ -64,7 +58,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @scope fabric
   },
 
   /**
-   * @method onMouseMove
+   * Invoked on mouse move
    * @param {Object} pointer
    */
   onMouseMove: function(pointer) {
@@ -73,7 +67,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @scope fabric
   },
 
   /**
-   * @method onMouseUp
+   * Invoked on mouse up
    */
   onMouseUp: function() {
     var originalRenderOnAddition = this.canvas.renderOnAddition;
@@ -108,7 +102,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @scope fabric
   },
 
   /**
-   * @method render
+   * Renders brush
    */
   render: function() {
     var ctx = this.canvas.contextTop;
@@ -126,7 +120,6 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @scope fabric
   },
 
   /**
-   * @method addSprayChunk
    * @param {Object} pointer
    */
   addSprayChunk: function(pointer) {

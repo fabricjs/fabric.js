@@ -43,6 +43,8 @@
 
     equal(pattern.source, img);
     equal(pattern.repeat, 'repeat');
+    equal(pattern.offsetX, 0);
+    equal(pattern.offsetY, 0);
   });
 
   test('toObject', function() {
@@ -57,6 +59,8 @@
       equal(object.source, '../fixtures/greyfloral.png');
     }
     equal(object.repeat, 'repeat');
+    equal(object.offsetX, 0);
+    equal(object.offsetY, 0);
 
     var sourceExecuted;
     var patternWithGetSource = new fabric.Pattern({

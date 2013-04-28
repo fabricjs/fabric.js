@@ -13,21 +13,19 @@
 
   /**
    * Line class
-   * @class Line
+   * @class fabric.Line
    * @extends fabric.Object
    */
-  fabric.Line = fabric.util.createClass(fabric.Object, /** @scope fabric.Line.prototype */ {
+  fabric.Line = fabric.util.createClass(fabric.Object, /** @lends fabric.Line.prototype */ {
 
     /**
      * Type of an object
-     * @property
      * @type String
      */
     type: 'line',
 
     /**
      * Constructor
-     * @method initialize
      * @param {Array} [points] Array of points
      * @param {Object} [options] Options object
      * @return {fabric.Line} thisArg
@@ -51,7 +49,6 @@
 
     /**
      * @private
-     * @method _setWidthHeight
      * @param {Object} [options] Options
      */
     _setWidthHeight: function(options) {
@@ -66,7 +63,6 @@
 
     /**
      * @private
-     * @method _set
      * @param {String} key
      * @param {Any} value
      */
@@ -80,15 +76,17 @@
 
     /**
      * @private
-     * @method _render
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
       ctx.beginPath();
 
       var isInPathGroup = this.group && this.group.type !== 'group';
-      if (isInPathGroup) {
+      if (isInPathGroup && !this.transformMatrix) {
         ctx.translate(-this.group.width/2 + this.left, -this.group.height / 2 + this.top);
+      }
+      else {
+        ctx.translate(this.left, this.top);
       }
 
       // move from center (of virtual box) to its left/top corner
@@ -101,14 +99,13 @@
       // make sure setting "fill" changes color of a line
       // (by copying fillStyle to strokeStyle, since line is stroked, not filled)
       var origStrokeStyle = ctx.strokeStyle;
-      ctx.strokeStyle = ctx.fillStyle;
+      ctx.strokeStyle = this.stroke || ctx.fillStyle;
       ctx.stroke();
       ctx.strokeStyle = origStrokeStyle;
     },
 
     /**
      * Returns complexity of an instance
-     * @method complexity
      * @return {Number} complexity
      */
     complexity: function() {
@@ -132,7 +129,6 @@
 
     /**
      * Returns SVG representation of an instance
-     * @method toSVG
      * @return {String} svg representation of an instance
      */
     toSVG: function() {
@@ -166,7 +162,6 @@
   /**
    * Returns fabric.Line instance from an SVG element
    * @static
-   * @method fabric.Line.fromElement
    * @param {SVGElement} element Element to parse
    * @param {Object} [options] Options object
    * @return {fabric.Line} instance of fabric.Line
@@ -185,7 +180,6 @@
   /**
    * Returns fabric.Line instance from an object representation
    * @static
-   * @method fabric.Line.fromObject
    * @param {Object} object Object to create an instance from
    * @return {fabric.Line} instance of fabric.Line
    */

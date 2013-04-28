@@ -5,9 +5,9 @@
   if (!Array.prototype.indexOf) {
     /**
      * Finds index of an element in an array
-     * @method indexOf
      * @param {Any} searchElement
      * @param {Number} [fromIndex]
+     * @return {Number}
      */
     Array.prototype.indexOf = function (searchElement /*, fromIndex */ ) {
       if (this === void 0 || this === null) {
@@ -43,9 +43,9 @@
   if (!Array.prototype.forEach) {
     /**
      * Iterates an array, invoking callback for each element
-     * @method forEach
      * @param {Function} fn Callback to invoke for each element
      * @param {Object} [context] Context to invoke callback in
+     * @return {Array}
      */
     Array.prototype.forEach = function(fn, context) {
       for (var i = 0, len = this.length >>> 0; i < len; i++) {
@@ -59,9 +59,9 @@
   if (!Array.prototype.map) {
     /**
      * Returns a result of iterating over an array, invoking callback for each element
-     * @method map
      * @param {Function} fn Callback to invoke for each element
      * @param {Object} [context] Context to invoke callback in
+     * @return {Array}
      */
     Array.prototype.map = function(fn, context) {
       var result = [ ];
@@ -77,9 +77,9 @@
   if (!Array.prototype.every) {
     /**
      * Returns true if a callback returns truthy value for all elements in an array
-     * @method every
      * @param {Function} fn Callback to invoke for each element
      * @param {Object} [context] Context to invoke callback in
+     * @return {Boolean}
      */
     Array.prototype.every = function(fn, context) {
       for (var i = 0, len = this.length >>> 0; i < len; i++) {
@@ -94,9 +94,9 @@
   if (!Array.prototype.some) {
     /**
      * Returns true if a callback returns truthy value for at least one element in an array
-     * @method every
      * @param {Function} fn Callback to invoke for each element
      * @param {Object} [context] Context to invoke callback in
+     * @return {Boolean}
      */
     Array.prototype.some = function(fn, context) {
       for (var i = 0, len = this.length >>> 0; i < len; i++) {
@@ -111,9 +111,9 @@
   if (!Array.prototype.filter) {
     /**
      * Returns the result of iterating over elements in an array
-     * @method filter
      * @param {Function} fn Callback to invoke for each element
      * @param {Object} [context] Context to invoke callback in
+     * @return {Array}
      */
     Array.prototype.filter = function(fn, context) {
       var result = [ ], val;
@@ -132,9 +132,9 @@
   if (!Array.prototype.reduce) {
     /**
      * Returns "folded" (reduced) result of iterating over elements in an array
-     * @method filter
      * @param {Function} fn Callback to invoke for each element
      * @param {Object} [context] Context to invoke callback in
+     * @return {Any}
      */
     Array.prototype.reduce = function(fn /*, initial*/) {
       var len = this.length >>> 0,
@@ -168,10 +168,10 @@
 
   /**
    * Invokes method on all items in a given array
-   * @method invoke
    * @memberOf fabric.util.array
    * @param {Array} array Array to iterate over
    * @param {String} method Name of a method to invoke
+   * @return {Array}
    */
   function invoke(array, method) {
     var args = slice.call(arguments, 2), result = [ ];
@@ -183,10 +183,10 @@
 
   /**
    * Finds maximum value in array (not necessarily "first" one)
-   * @method max
    * @memberOf fabric.util.array
    * @param {Array} array Array to iterate over
    * @param {String} byProperty
+   * @return {Any}
    */
   function max(array, byProperty) {
     if (!array || array.length === 0) return undefined;
@@ -212,10 +212,10 @@
 
   /**
    * Finds minimum value in array (not necessarily "first" one)
-   * @method min
    * @memberOf fabric.util.array
    * @param {Array} array Array to iterate over
    * @param {String} byProperty
+   * @return {Any}
    */
   function min(array, byProperty) {
     if (!array || array.length === 0) return undefined;
@@ -241,7 +241,7 @@
   }
 
   /**
-   * @namespace Array utilities
+   * @namespace fabric.util.array
    */
   fabric.util.array = {
     invoke: invoke,

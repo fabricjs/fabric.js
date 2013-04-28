@@ -12,42 +12,38 @@
 
   /**
    * Rectangle class
-   * @class Rect
+   * @class fabric.Rect
    * @extends fabric.Object
+   * @return {fabric.Rect} thisArg
    */
-  fabric.Rect = fabric.util.createClass(fabric.Object, /** @scope fabric.Rect.prototype */ {
+  fabric.Rect = fabric.util.createClass(fabric.Object, /** @lends fabric.Rect.prototype */ {
 
     /**
      * Type of an object
-     * @property
      * @type String
      */
     type: 'rect',
 
     /**
      * Horizontal border radius
-     * @property
      * @type Number
      */
     rx: 0,
 
     /**
      * Vertical border radius
-     * @property
      * @type Number
      */
     ry: 0,
 
     /**
      * Used to specify dash pattern for stroke on this object
-     * @property
      * @type Array
      */
     strokeDashArray: null,
 
     /**
      * Constructor
-     * @method initialize
      * @param {Object} [options] Options object
      * @return {Object} thisArg
      */
@@ -66,7 +62,6 @@
      * Creates `stateProperties` list on an instance, and adds `fabric.Rect` -specific ones to it
      * (such as "rx", "ry", etc.)
      * @private
-     * @method _initStateProperties
      */
     _initStateProperties: function() {
       this.stateProperties = this.stateProperties.concat(['rx', 'ry']);
@@ -75,7 +70,6 @@
     /**
      * Initializes rx/ry attributes
      * @private
-     * @method _initRxRy
      */
     _initRxRy: function() {
       if (this.rx && !this.ry) {
@@ -88,7 +82,6 @@
 
     /**
      * @private
-     * @method _render
      * @param ctx {CanvasRenderingContext2D} context to render on
      */
     _render: function(ctx) {
@@ -125,10 +118,7 @@
       ctx.quadraticCurveTo(x,y,x+rx,y,x+rx,y);
       ctx.closePath();
 
-      if (this.fill) {
-        ctx.fill();
-      }
-
+      this._renderFill(ctx);
       this._removeShadow(ctx);
 
       if (this.strokeDashArray) {
@@ -141,7 +131,6 @@
 
     /**
      * @private
-     * @method _renderDashedStroke
      */
     _renderDashedStroke: function(ctx) {
 
@@ -201,9 +190,8 @@
     },
 
     /**
-     * @method _normalizeLeftTopProperties
-     * @private
      * Since coordinate system differs from that of SVG
+     * @private
      */
     _normalizeLeftTopProperties: function(parsedAttributes) {
       if ('left' in parsedAttributes) {
@@ -219,7 +207,6 @@
 
     /**
      * Returns complexity of an instance
-     * @method complexity
      * @return {Number} complexity
      */
     complexity: function() {
@@ -228,7 +215,6 @@
 
     /**
      * Returns object representation of an instance
-     * @method toObject
      * @param {Array} propertiesToInclude
      * @return {Object} object representation of an instance
      */
@@ -241,7 +227,6 @@
 
     /**
      * Returns svg representation of an instance
-     * @method toSVG
      * @return {String} svg representation of an instance
      */
     toSVG: function() {
@@ -286,7 +271,6 @@
   /**
    * Returns {@link fabric.Rect} instance from an SVG element
    * @static
-   * @method fabric.Rect.fromElement
    * @param {SVGElement} element Element to parse
    * @param {Object} [options] Options object
    * @return {fabric.Rect} Instance of fabric.Rect
@@ -308,7 +292,6 @@
   /**
    * Returns {@link fabric.Rect} instance from an object representation
    * @static
-   * @method fabric.Rect.fromObject
    * @param object {Object} object to create an instance from
    * @return {Object} instance of fabric.Rect
    */

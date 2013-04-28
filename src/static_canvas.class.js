@@ -19,8 +19,12 @@
    * Static canvas class
    * @class fabric.StaticCanvas
    * @constructor
+   *
    * @param {HTMLElement | String} el &lt;canvas> element to initialize instance on
    * @param {Object} [options] Options object
+   *
+   * @extends fabric.Collection
+   * @extends fabric.Observable
    */
   fabric.StaticCanvas = function (el, options) {
     options || (options = { });
@@ -32,26 +36,23 @@
   extend(fabric.StaticCanvas.prototype, fabric.Observable);
   extend(fabric.StaticCanvas.prototype, fabric.Collection);
 
-  extend(fabric.StaticCanvas.prototype, /** @scope fabric.StaticCanvas.prototype */ {
+  extend(fabric.StaticCanvas.prototype, /** @lends fabric.StaticCanvas.prototype */ {
 
     /**
      * Background color of canvas instance
-     * @property
      * @type String
      */
     backgroundColor: '',
 
     /**
      * Background image of canvas instance
-     * Should be set via `setBackgroundImage`
-     * @property
+     * Should be set via {@link fabric.StaticCanvas#setBackgroundImage}
      * @type String
      */
     backgroundImage: '',
 
     /**
      * Opacity of the background image of the canvas instance
-     * @property
      * @type Float
      */
     backgroundImageOpacity: 1.0,
@@ -59,43 +60,37 @@
     /**
      * Indicates whether the background image should be stretched to fit the
      * dimensions of the canvas instance.
-     * @property
      * @type Boolean
      */
     backgroundImageStretch: true,
 
     /**
      * Overlay image of canvas instance
-     * Should be set via `setOverlayImage`
-     * @property
+     * Should be set via {@link fabric.StaticCanvas#setOverlayImage}
      * @type String
      */
     overlayImage: '',
 
     /**
      * Left offset of overlay image (if present)
-     * @property
      * @type Number
      */
     overlayImageLeft: 0,
 
     /**
      * Top offset of overlay image (if present)
-     * @property
      * @type Number
      */
     overlayImageTop: 0,
 
     /**
      * Indicates whether toObject/toDatalessObject should include default values
-     * @property
      * @type Boolean
      */
     includeDefaultValues: true,
 
     /**
      * Indicates whether objects' state should be saved
-     * @property
      * @type Boolean
      */
     stateful: true,
@@ -104,29 +99,25 @@
      * Indicates whether {@link fabric.Canvas.prototype.add} should also re-render canvas.
      * Disabling this option could give a great performance boost when adding a lot of objects to canvas at once
      * (followed by a manual rendering after addition)
-     * @property
      * @type Boolean
      */
     renderOnAddition: true,
 
     /**
      * Function that determines clipping of entire canvas area
-     * Being passed context as first argument. See clipping canvas area in https://github.com/kangax/fabric.js/wiki/FAQ
-     * @property
+     * Being passed context as first argument. See clipping canvas area in {@link https://github.com/kangax/fabric.js/wiki/FAQ}
      * @type Function
      */
     clipTo: null,
 
     /**
      * Indicates whether object controls (borders/controls) are rendered above overlay image
-     * @property
      * @type Boolean
      */
     controlsAboveOverlay: false,
 
     /**
      * Callback; invoked right before object is about to be scaled/rotated
-     * @method onBeforeScaleRotate
      * @param {fabric.Object} target Object that's about to be scaled/rotated
      */
     onBeforeScaleRotate: function () {
@@ -134,7 +125,6 @@
     },
 
      /**
-      * @method _initStatic
       * @private
       */
     _initStatic: function(el, options) {
@@ -158,7 +148,6 @@
     /**
      * Calculates canvas element offset relative to the document
      * This method is also attached as "resize" event handler of window
-     * @method calcOffset
      * @return {fabric.Canvas} instance
      * @chainable
      */
@@ -169,7 +158,6 @@
 
     /**
      * Sets overlay image for this canvas
-     * @method setOverlayImage
      * @param {String} url url of an image to set overlay to
      * @param {Function} callback callback to invoke when image is loaded and set as an overlay
      * @param {Object} [options] optional options to set for the overlay image
@@ -193,7 +181,6 @@
 
     /**
      * Sets background image for this canvas
-     * @method setBackgroundImage
      * @param {String} url url of an image to set background to
      * @param {Function} callback callback to invoke when image is loaded and set as background
      * @param {Object} [options] optional options to set for the background image
@@ -217,7 +204,6 @@
 
     /**
      * Sets background color for this canvas
-     * @method setBackgroundColor
      * @param {String|fabric.Pattern} Color of pattern to set background color to
      * @param {Function} callback callback to invoke when background color is set
      * @return {fabric.Canvas} thisArg
@@ -244,7 +230,6 @@
 
     /**
      * @private
-     * @method _createCanvasElement
      */
     _createCanvasElement: function() {
       var element = fabric.document.createElement('canvas');
@@ -259,7 +244,7 @@
     },
 
     /**
-     * @method _initCanvasElement
+     * @private
      * @param {HTMLElement} element
      */
     _initCanvasElement: function(element) {
@@ -271,7 +256,7 @@
     },
 
     /**
-     * @method _initOptions
+     * @private
      * @param {Object} [options]
      */
     _initOptions: function (options) {
@@ -290,7 +275,7 @@
 
     /**
      * Creates a bottom canvas
-     * @method _createLowerCanvas
+     * @private
      */
     _createLowerCanvas: function (canvasEl) {
       this.lowerCanvasEl = fabric.util.getById(canvasEl) || this._createCanvasElement();
@@ -307,7 +292,6 @@
 
     /**
      * Returns canvas width (in px)
-     * @method getWidth
      * @return {Number}
      */
     getWidth: function () {
@@ -316,7 +300,6 @@
 
     /**
      * Returns canvas height (in px)
-     * @method getHeight
      * @return {Number}
      */
     getHeight: function () {
@@ -325,7 +308,6 @@
 
     /**
      * Sets width of this canvas instance
-     * @method setWidth
      * @param {Number} width value to set width to
      * @return {fabric.Canvas} instance
      * @chainable true
@@ -336,7 +318,6 @@
 
     /**
      * Sets height of this canvas instance
-     * @method setHeight
      * @param {Number} height value to set height to
      * @return {fabric.Canvas} instance
      * @chainable true
@@ -347,7 +328,6 @@
 
     /**
      * Sets dimensions (width, height) of this canvas instance
-     * @method setDimensions
      * @param {Object} dimensions
      * @return {fabric.Canvas} thisArg
      * @chainable
@@ -362,7 +342,6 @@
     /**
      * Helper for setting width/height
      * @private
-     * @method _setDimensions
      * @param {String} prop property (width|height)
      * @param {Number} value value to set property to
      * @return {fabric.Canvas} instance
@@ -395,7 +374,6 @@
 
     /**
      * Returns &lt;canvas> element corresponding to this instance
-     * @method getElement
      * @return {HTMLCanvasElement}
      */
     getElement: function () {
@@ -404,7 +382,6 @@
 
     /**
      * Returns currently selected object, if any
-     * @method getActiveObject
      * @return {fabric.Object}
      */
     getActiveObject: function() {
@@ -413,7 +390,6 @@
 
     /**
      * Returns currently selected group of object, if any
-     * @method getActiveGroup
      * @return {fabric.Group}
      */
     getActiveGroup: function() {
@@ -443,7 +419,6 @@
 
     /**
      * @private
-     * @method _initObject
      */
     _onObjectAdded: function(obj) {
       this.stateful && obj.setupState();
@@ -454,7 +429,7 @@
     },
 
     /**
-     * @method private
+     * @private
      */
     _onObjectRemoved: function(obj) {
       this.fire('object:removed', { target: obj });
@@ -463,7 +438,6 @@
 
     /**
      * Returns an array of objects this instance has
-     * @method getObjects
      * @return {Array}
      */
     getObjects: function () {
@@ -472,7 +446,6 @@
 
     /**
      * Clears specified context of canvas element
-     * @method clearContext
      * @param context {Object} ctx context to clear
      * @return {fabric.Canvas} thisArg
      * @chainable
@@ -484,7 +457,6 @@
 
     /**
      * Returns context of canvas where objects are drawn
-     * @method getContext
      * @return {CanvasRenderingContext2D}
      */
     getContext: function () {
@@ -493,7 +465,6 @@
 
     /**
      * Clears all contexts (background, main, top) of an instance
-     * @method clear
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
@@ -516,7 +487,6 @@
 
     /**
      * Renders both the top canvas and the secondary container canvas.
-     * @method renderAll
      * @param allOnTop {Boolean} optional Whether we want to force all images to be rendered on the top canvas
      * @return {fabric.Canvas} instance
      * @chainable
@@ -544,7 +514,11 @@
           ? this.backgroundColor.toLive(canvasToDrawOn)
           : this.backgroundColor;
 
-        canvasToDrawOn.fillRect(0, 0, this.width, this.height);
+        canvasToDrawOn.fillRect(
+          this.backgroundColor.offsetX || 0,
+          this.backgroundColor.offsetY || 0,
+          this.width,
+          this.height);
       }
 
       if (typeof this.backgroundImage === 'object') {
@@ -591,7 +565,6 @@
 
     /**
      * @private
-     * @method _drawBackroundImage
      */
     _drawBackroundImage: function(canvasToDrawOn) {
       canvasToDrawOn.save();
@@ -609,7 +582,6 @@
     /**
      * Method to render only the top canvas.
      * Also used to render the group selection box.
-     * @method renderTop
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
@@ -640,7 +612,6 @@
 
     /**
      * Draws objects' controls (borders/controls)
-     * @method drawControls
      * @param {Object} ctx context to render controls on
      */
     drawControls: function(ctx) {
@@ -667,7 +638,6 @@
 
     /**
      * Exports canvas element to a dataurl image.
-     * @method toDataURL
      * @param {Object} options
      *
      *  `format` the format of the output image. Either "jpeg" or "png".
@@ -692,7 +662,6 @@
     },
 
     /**
-     * @method _toDataURL
      * @private
      */
     __toDataURL: function(format, quality) {
@@ -708,7 +677,6 @@
     },
 
     /**
-     * @method _toDataURLWithMultiplier
      * @private
      */
     __toDataURLWithMultiplier: function(format, quality, multiplier) {
@@ -761,7 +729,6 @@
     /**
      * Exports canvas element to a dataurl image (allowing to change image size via multiplier).
      * @deprecated since 1.0.13
-     * @method toDataURLWithMultiplier
      * @param {String} format (png|jpeg)
      * @param {Number} multiplier
      * @param {Number} quality (0..1)
@@ -777,7 +744,6 @@
 
     /**
      * @private
-     * @method _tempRemoveBordersControlsFromGroup
      */
     _tempRemoveBordersControlsFromGroup: function(group) {
       group.origHasControls = group.hasControls;
@@ -794,7 +760,6 @@
 
     /**
      * @private
-     * @method _restoreBordersControlsOnGroup
      */
     _restoreBordersControlsOnGroup: function(group) {
       group.hideControls = group.origHideControls;
@@ -809,7 +774,6 @@
     /**
      * Returns coordinates of a center of canvas.
      * Returned value is an object with top and left properties
-     * @method getCenter
      * @return {Object} object with "top" and "left" number values
      */
     getCenter: function () {
@@ -821,7 +785,6 @@
 
     /**
      * Centers object horizontally.
-     * @method centerObjectH
      * @param {fabric.Object} object Object to center
      * @return {fabric.Canvas} thisArg
      */
@@ -833,7 +796,6 @@
 
     /**
      * Centers object vertically.
-     * @method centerObjectH
      * @param {fabric.Object} object Object to center
      * @return {fabric.Canvas} thisArg
      * @chainable
@@ -846,7 +808,6 @@
 
     /**
      * Centers object vertically and horizontally.
-     * @method centerObject
      * @param {fabric.Object} object Object to center
      * @return {fabric.Canvas} thisArg
      * @chainable
@@ -857,7 +818,6 @@
 
     /**
      * Returs dataless JSON representation of canvas
-     * @method toDatalessJSON
      * @param {Array} propertiesToInclude
      * @return {String} json string
      */
@@ -867,7 +827,6 @@
 
     /**
      * Returns object representation of canvas
-     * @method toObject
      * @param {Array} propertiesToInclude
      * @return {Object} object representation of an instance
      */
@@ -877,7 +836,6 @@
 
     /**
      * Returns dataless object representation of canvas
-     * @method toDatalessObject
      * @param {Array} propertiesToInclude
      * @return {Object} object representation of an instance
      */
@@ -887,7 +845,6 @@
 
     /**
      * @private
-     * @method _toObjectMethod
      */
     _toObjectMethod: function (methodName, propertiesToInclude) {
       var data = {
@@ -925,7 +882,6 @@
     /**
      * Returns SVG representation of canvas
      * @function
-     * @method toSVG
      * @param {Object} [options] Options for SVG output (suppressPreamble: true/false (if true xml tag is not included),
      * viewBox: {x, y, width, height} to define the svg output viewBox)
      * @return {String}
@@ -998,7 +954,6 @@
 
     /**
      * Removes an object from canvas and returns it
-     * @method remove
      * @param object {Object} Object to remove
      * @return {Object} removed object
      */
@@ -1015,7 +970,6 @@
 
     /**
      * Moves an object to the bottom of the stack of drawn objects
-     * @method sendToBack
      * @param object {fabric.Object} Object to send to back
      * @return {fabric.Canvas} thisArg
      * @chainable
@@ -1028,7 +982,6 @@
 
     /**
      * Moves an object to the top of the stack of drawn objects
-     * @method bringToFront
      * @param object {fabric.Object} Object to send
      * @return {fabric.Canvas} thisArg
      * @chainable
@@ -1041,7 +994,6 @@
 
     /**
      * Moves an object one level down in stack of drawn objects
-     * @method sendBackwards
      * @param object {fabric.Object} Object to send
      * @return {fabric.Canvas} thisArg
      * @chainable
@@ -1073,7 +1025,6 @@
 
     /**
      * Moves an object one level up in stack of drawn objects
-     * @method bringForward
      * @param object {fabric.Object} Object to send
      * @return {fabric.Canvas} thisArg
      * @chainable
@@ -1107,7 +1058,6 @@
 
     /**
      * Moves an object to specified level in stack of drawn objects
-     * @method moveTo
      * @param object {fabric.Object} Object to send
      * @param {Number} index Position to move to
      * @return {fabric.Canvas} thisArg
@@ -1121,7 +1071,6 @@
 
     /**
      * Clears a canvas element and removes all event handlers.
-     * @method dispose
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
@@ -1147,7 +1096,6 @@
 
     /**
      * @private
-     * @method _resizeImageToFit
      * @param {HTMLImageElement} imgEl
      */
     _resizeImageToFit: function (imgEl) {
@@ -1164,7 +1112,6 @@
 
   /**
    * Returns a string representation of an instance
-   * @method toString
    * @return {String} string representation of an instance
    */
   fabric.StaticCanvas.prototype.toString = function () { // Assign explicitly since `extend` doesn't take care of DontEnum bug yet
@@ -1172,11 +1119,10 @@
            '{ objects: ' + this.getObjects().length + ' }>';
   };
 
-  extend(fabric.StaticCanvas, /** @scope fabric.StaticCanvas */ {
+  extend(fabric.StaticCanvas, /** @lends fabric.StaticCanvas */ {
 
     /**
      * @static
-     * @property EMPTY_JSON
      * @type String
      */
     EMPTY_JSON: '{"objects": [], "background": "white"}',
@@ -1184,7 +1130,6 @@
     /**
      * Takes &lt;canvas> element and transforms its data in such way that it becomes grayscale
      * @static
-     * @method toGrayscale
      * @param {HTMLCanvasElement} canvasEl
      */
     toGrayscale: function (canvasEl) {
@@ -1214,7 +1159,6 @@
      * Provides a way to check support of some of the canvas methods
      * (either those of HTMLCanvasElement itself, or rendering context)
      *
-     * @method supports
      * @param methodName {String} Method to check support for;
      *                            Could be one of "getImageData", "toDataURL" or "toDataURLWithQuality"
      * @return {Boolean | null} `true` if method is supported (or at least exists),
@@ -1257,7 +1201,6 @@
   /**
    * Returs JSON representation of canvas
    * @function
-   * @method toJSON
    * @param {Array} propertiesToInclude
    * @return {String} json string
    */

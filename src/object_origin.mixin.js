@@ -2,11 +2,10 @@
 
   var degreesToRadians = fabric.util.degreesToRadians;
 
-  fabric.util.object.extend(fabric.Object.prototype, /** @scope fabric.Object.prototype */ {
+  fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
 
     /**
      * Translates the coordinates from origin to center coordinates (based on the object's dimensions)
-     * @method translateToCenterPoint
      * @param {fabric.Point} point The point which corresponds to the originX and originY params
      * @param {string} enum('left', 'center', 'right') Horizontal origin
      * @param {string} enum('top', 'center', 'bottom') Vertical origin
@@ -35,7 +34,6 @@
 
     /**
      * Translates the coordinates from center to origin coordinates (based on the object's dimensions)
-     * @method translateToOriginPoint
      * @param {fabric.Point} point The point which corresponds to center of the object
      * @param {string} enum('left', 'center', 'right') Horizontal origin
      * @param {string} enum('top', 'center', 'bottom') Vertical origin
@@ -64,7 +62,6 @@
 
     /**
      * Returns the real center coordinates of the object
-     * @method getCenterPoint
      * @return {fabric.Point}
      */
     getCenterPoint: function() {
@@ -74,7 +71,6 @@
 
     /**
      * Returns the coordinates of the object based on center coordinates
-     * @method getOriginPoint
      * @param {fabric.Point} point The point which corresponds to the originX and originY params
      * @return {fabric.Point}
      */
@@ -84,7 +80,6 @@
 
     /**
      * Returns the coordinates of the object as if it has a different origin
-     * @method getPointByOrigin
      * @param {string} enum('left', 'center', 'right') Horizontal origin
      * @param {string} enum('top', 'center', 'bottom') Vertical origin
      * @return {fabric.Point}
@@ -97,7 +92,6 @@
 
     /**
      * Returns the point in local coordinates
-     * @method toLocalPoint
      * @param {fabric.Point} The point relative to the global coordinate system
      * @return {fabric.Point}
      */
@@ -136,7 +130,6 @@
 
     /**
      * Returns the point in global coordinates
-     * @method toGlobalPoint
      * @param {fabric.Point} The point relative to the local coordinate system
      * @return {fabric.Point}
      */
@@ -146,7 +139,6 @@
 
     /**
      * Sets the position of the object taking into consideration the object's origin
-     * @method setPositionByOrigin
      * @param {fabric.Point} point The new position of the object
      * @param {string} enum('left', 'center', 'right') Horizontal origin
      * @param {string} enum('top', 'center', 'bottom') Vertical origin
@@ -161,7 +153,6 @@
     },
 
     /**
-     * @method adjustPosition
      * @param {String} to One of left, center, right
      */
     adjustPosition: function(to) {

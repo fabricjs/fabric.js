@@ -1,20 +1,29 @@
 /**
  * Pattern class
- * @class Pattern
- * @memberOf fabric
+ * @class fabric.Pattern
  */
-fabric.Pattern = fabric.util.createClass(/** @scope fabric.Pattern.prototype */ {
+fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ {
 
   /**
    * Repeat property of a pattern (one of repeat, repeat-x, repeat-y)
-   * @property
    * @type String
    */
   repeat: 'repeat',
 
   /**
+   * Pattern horizontal offset from object's left/top corner
+   * @type Number
+   */
+  offsetX: 0,
+
+  /**
+   * Pattern vertical offset from object's left/top corner
+   * @type Number
+   */
+  offsetY: 0,
+
+  /**
    * Constructor
-   * @method initialize
    * @param {Object} [options]
    * @return {fabric.Pattern} thisArg
    */
@@ -29,11 +38,16 @@ fabric.Pattern = fabric.util.createClass(/** @scope fabric.Pattern.prototype */ 
     if (options.repeat) {
       this.repeat = options.repeat;
     }
+    if (options.offsetX) {
+      this.offsetX = options.offsetX;
+    }
+    if (options.offsetY) {
+      this.offsetY = options.offsetY;
+    }
   },
 
   /**
    * Returns object representation of a pattern
-   * @method toObject
    * @return {Object}
    */
   toObject: function() {
@@ -52,13 +66,14 @@ fabric.Pattern = fabric.util.createClass(/** @scope fabric.Pattern.prototype */ 
 
     return {
       source: source,
-      repeat: this.repeat
+      repeat: this.repeat,
+      offsetX: this.offsetX,
+      offsetY: this.offsetY
     };
   },
 
   /**
    * Returns an instance of CanvasPattern
-   * @method toLive
    * @param ctx
    * @return {CanvasPattern}
    */

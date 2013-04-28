@@ -12,25 +12,23 @@
 
   /**
    * Polyline class
-   * @class Polyline
+   * @class fabric.Polyline
    * @extends fabric.Object
    */
-  fabric.Polyline = fabric.util.createClass(fabric.Object, /** @scope fabric.Polyline.prototype */ {
+  fabric.Polyline = fabric.util.createClass(fabric.Object, /** @lends fabric.Polyline.prototype */ {
 
     /**
      * Type of an object
-     * @property
      * @type String
      */
     type: 'polyline',
 
     /**
      * Constructor
-     * @method initialize
      * @param {Array} points array of points
      * @param {Object} [options] Options object
      * @param {Boolean} Whether points offsetting should be skipped
-     * @return {Object} thisArg
+     * @return {fabric.Polyline} thisArg
      */
     initialize: function(points, options, skipOffset) {
       options = options || { };
@@ -41,7 +39,6 @@
 
     /**
      * @private
-     * @method _calcDimensions
      */
     _calcDimensions: function(skipOffset) {
       return fabric.Polygon.prototype._calcDimensions.call(this, skipOffset);
@@ -49,7 +46,6 @@
 
     /**
      * Returns object representation of an instance
-     * @method toObject
      * @param {Array} propertiesToInclude
      * @return {Object} object representation of an instance
      */
@@ -59,7 +55,6 @@
 
     /**
      * Returns SVG representation of an instance
-     * @method toSVG
      * @return {String} svg representation of an instance
      */
     toSVG: function() {
@@ -90,7 +85,6 @@
 
     /**
      * @private
-     * @method _render
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
@@ -101,9 +95,7 @@
         point = this.points[i];
         ctx.lineTo(point.x, point.y);
       }
-      if (this.fill) {
-        ctx.fill();
-      }
+      this._renderFill(ctx);
       this._removeShadow(ctx);
       if (this.stroke) {
         ctx.stroke();
@@ -112,7 +104,6 @@
 
     /**
      * Returns complexity of an instance
-     * @method complexity
      * @return {Number} complexity
      */
     complexity: function() {
@@ -130,7 +121,6 @@
   /**
    * Returns fabric.Polyline instance from an SVG element
    * @static
-   * @method fabric.Polyline.fromElement
    * @param {SVGElement} element Element to parse
    * @param {Object} [options] Options object
    * @return {Object} instance of fabric.Polyline
@@ -156,7 +146,6 @@
   /**
    * Returns fabric.Polyline instance from an object representation
    * @static
-   * @method fabric.Polyline.fromObject
    * @param {Object} [object] Object to create an instance from
    * @return {fabric.Polyline}
    */
