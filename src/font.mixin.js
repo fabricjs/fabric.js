@@ -56,7 +56,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     var markup = '@font-face { font-family: "' + font.name + '";';
     
     for (var format in font.srcFormats) {
-        markup += 'src: url("' + font.srcFormats[format] + '");'; // @todo add support for IE and format
+        markup += 'src: local("' + font.name + '"), url("' + font.srcFormats[format] + '");'; // @todo add support for IE and format
     };
     
     markup += ' }';
