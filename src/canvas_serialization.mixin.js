@@ -11,34 +11,47 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * @chainable
    */
   loadFromDatalessJSON: function (json, callback) {
-  	this._loadFromJson(json, true, true, callback);
+    this._loadFromJson(json, true, true, callback);
   },
 
+  /**
+   * @private
+   * @param {String|Object} json
+   * @param {Boolean} dataless
+   * @param {Boolean} clear
+   * @param {Function} callback
+   * @chainable
+   */
   _loadFromJson: function (json, dataless, clear, callback) {
-  	if (!json) return;
-  	
-  	// serialize if it wasn't already
+    if (!json) return;
+    
+    // serialize if it wasn't already
     var serialized = (typeof json === 'string')
       ? JSON.parse(json)
       : json;
     
-	  if (!serialized) return;
-	  
-	  if (!serialized.objects) {
-	    serialized.objects = [];
-	  }
-	  
-	  clear && this.clear(); 
-	  
-	  var enlivenObjFunc = dataless
-	  		? this._enlivenDatalessObjects 
-	  		: this._enlivenObjects;
-	  
-	  var _this = this;
-	  enlivenObjFunc(serialized.objects, function() {
+    if (!serialized) return;
+    
+    if (!serialized.objects) {
+      serialized.objects = [];
+    }
+    
+    clear && this.clear(); 
+    
+    if (json.fonts) {
+      this.addFonts(json.fonts);
+    }
+    
+    var enlivenObjFunc = dataless
+      ? this._enlivenDatalessObjects 
+      : this._enlivenObjects;
+    
+    var _this = this;
+    enlivenObjFunc.call(this, serialized.objects, function() {
       _this._setBgOverlayImages(serialized, callback);
     });
   },
+  
   /**
    * @private
    * @param {Array} objects
@@ -46,8 +59,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    */
   _enlivenDatalessObjects: function (objects, callback) {
     var _this = this,
-        numLoadedObjects = 0,
-        numTotalObjects = objects.length;
+      numLoadedObjects = 0,
+      numTotalObjects = objects.length;
 
     /** @ignore */
     function onObjectLoaded(object, index) {
@@ -162,7 +175,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * @chainable
    */
   loadFromJSON: function (json, callback) {
-  	this._loadFromJson(json, false, false, callback);
+    this._loadFromJson(json, false, false, callback);
   },
   
   _setBgOverlayImages: function(serialized, callback) {

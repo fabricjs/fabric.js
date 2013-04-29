@@ -863,7 +863,8 @@
         }, this),
         background: (this.backgroundColor && this.backgroundColor.toObject)
                       ? this.backgroundColor.toObject()
-                      : this.backgroundColor
+                      : this.backgroundColor,
+        fonts: this._fonts
       };
       if (this.backgroundImage) {
         data.backgroundImage = this.backgroundImage.src;
