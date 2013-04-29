@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures` */
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.1.9" };
+var fabric = fabric || { version: "1.1.10" };
 
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
@@ -8982,7 +8982,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
           target = this.getActiveGroup();
         }
         else {
-          if (target !== this.getActiveGroup()) {
+          if (target !== this.getActiveGroup() && target !== this.getActiveObject()) {
             this.deactivateAll();
             this.setActiveObject(target, e);
           }
@@ -13712,32 +13712,42 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      */
     _parsePath: function() {
       var result = [ ],
+          coords = [ ],
           currentPath,
-          chunks,
-          parsed;
+          parsed,
+          re = /(-?\.\d+)|(-?\d+(\.\d+)?)/g,
+          match,
+          coordsStr;
 
-      for (var i = 0, chunksParsed, len = this.path.length; i < len; i++) {
+      for (var i = 0, coordsParsed, len = this.path.length; i < len; i++) {
         currentPath = this.path[i];
-        chunks = currentPath.slice(1).trim().replace(/(\d)-/g, '$1###-').split(/\s|,|###/);
-        chunksParsed = [ currentPath.charAt(0) ];
 
-        for (var j = 0, jlen = chunks.length; j < jlen; j++) {
-          parsed = parseFloat(chunks[j]);
+        coordsStr = currentPath.slice(1).trim();
+        coords.length = 0;
+
+        while ((match = re.exec(coordsStr))) {
+          coords.push(match[0]);
+        }
+
+        coordsParsed = [ currentPath.charAt(0) ];
+
+        for (var j = 0, jlen = coords.length; j < jlen; j++) {
+          parsed = parseFloat(coords[j]);
           if (!isNaN(parsed)) {
-            chunksParsed.push(parsed);
+            coordsParsed.push(parsed);
           }
         }
 
-        var command = chunksParsed[0].toLowerCase(),
+        var command = coordsParsed[0].toLowerCase(),
             commandLength = commandLengths[command];
 
-        if (chunksParsed.length - 1 > commandLength) {
-          for (var k = 1, klen = chunksParsed.length; k < klen; k += commandLength) {
-            result.push([ chunksParsed[0] ].concat(chunksParsed.slice(k, k + commandLength)));
+        if (coordsParsed.length - 1 > commandLength) {
+          for (var k = 1, klen = coordsParsed.length; k < klen; k += commandLength) {
+            result.push([ coordsParsed[0] ].concat(coordsParsed.slice(k, k + commandLength)));
           }
         }
         else {
-          result.push(chunksParsed);
+          result.push(coordsParsed);
         }
       }
 
