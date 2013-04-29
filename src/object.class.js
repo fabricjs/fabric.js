@@ -12,17 +12,6 @@
     return;
   }
 
-  var Image = global.Image;
-  try {
-    var NodeImage = (typeof require !== 'undefined') && require('canvas').Image;
-    if (NodeImage) {
-      Image = NodeImage;
-    }
-  }
-  catch(err) {
-    fabric.log(err);
-  }
-
   /**
    * Root object class from which all 2d shape classes inherit from
    * @class fabric.Object
@@ -704,16 +693,6 @@
      */
     cloneAsImage: function(callback) {
       if (fabric.Image) {
-        var i = new Image();
-
-        /** @ignore */
-        i.onload = function() {
-          if (callback) {
-            callback(new fabric.Image(i), orig);
-          }
-          i = i.onload = null;
-        };
-
         var orig = {
           angle: this.getAngle(),
           flipX: this.getFlipX(),
@@ -722,9 +701,14 @@
 
         // normalize angle
         this.set({ angle: 0, flipX: false, flipY: false });
-        this.toDataURL(function(dataURL) {
-          i.src = dataURL;
+        this.toDataURL(function(dataUrl) {
+          fabric.util.loadImage(dataUrl, function(img) {
+            if (callback) {
+              callback(new fabric.Image(img), orig);
+            }
+          });
         });
+
       }
       return this;
     },

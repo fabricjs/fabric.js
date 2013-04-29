@@ -202,12 +202,9 @@
         return;
       }
 
-      var isLikelyNode = typeof Buffer !== 'undefined' && typeof window === 'undefined',
-          imgEl = this._originalImage,
+      var imgEl = this._originalImage,
           canvasEl = fabric.util.createCanvasElement(),
-          replacement = isLikelyNode
-            ? new (require('canvas').Image)()
-            : fabric.document.createElement('img'),
+          replacement = fabric.util.createImage(),
           _this = this;
 
       canvasEl.width = imgEl.width;
@@ -228,7 +225,7 @@
       replacement.width = imgEl.width;
       replacement.height = imgEl.height;
 
-      if (isLikelyNode) {
+      if (fabric.isLikelyNode) {
         // cut off data:image/png;base64, part in the beginning
         var base64str = canvasEl.toDataURL('image/png').substring(22);
         replacement.src = new Buffer(base64str, 'base64');

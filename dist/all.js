@@ -2167,7 +2167,7 @@ fabric.Collection = {
     */
   function loadImage(url, callback, context) {
     if (url) {
-      var img = new Image();
+      var img = fabric.util.createImage();
       /** @ignore */
       img.onload = function () {
         callback && callback.call(context, img);
@@ -2337,6 +2337,18 @@ fabric.Collection = {
   }
 
   /**
+   * Creates image element (works on client and node)
+   * @static
+   * @memberOf fabric.util
+   * @return {Image} image element
+   */
+  function createImage() {
+    return fabric.isLikelyNode
+      ? new (require('canvas').Image)()
+      : fabric.document.createElement('img');
+  }
+
+  /**
    * Creates accessors (getXXX, setXXX) for a "class", based on "stateProperties" array
    * @static
    * @memberOf fabric.util
@@ -2439,6 +2451,7 @@ fabric.Collection = {
   fabric.util.populateWithProperties = populateWithProperties;
   fabric.util.drawDashedLine = drawDashedLine;
   fabric.util.createCanvasElement = createCanvasElement;
+  fabric.util.createImage = createImage;
   fabric.util.createAccessors = createAccessors;
   fabric.util.clipContext = clipContext;
   fabric.util.multiplyTransformMatrices = multiplyTransformMatrices;
@@ -9615,17 +9628,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     return;
   }
 
-  var Image = global.Image;
-  try {
-    var NodeImage = (typeof require !== 'undefined') && require('canvas').Image;
-    if (NodeImage) {
-      Image = NodeImage;
-    }
-  }
-  catch(err) {
-    fabric.log(err);
-  }
-
   /**
    * Root object class from which all 2d shape classes inherit from
    * @class fabric.Object
@@ -10307,16 +10309,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      */
     cloneAsImage: function(callback) {
       if (fabric.Image) {
-        var i = new Image();
-
-        /** @ignore */
-        i.onload = function() {
-          if (callback) {
-            callback(new fabric.Image(i), orig);
-          }
-          i = i.onload = null;
-        };
-
         var orig = {
           angle: this.getAngle(),
           flipX: this.getFlipX(),
@@ -10325,9 +10317,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
         // normalize angle
         this.set({ angle: 0, flipX: false, flipY: false });
-        this.toDataURL(function(dataURL) {
-          i.src = dataURL;
+        this.toDataURL(function(dataUrl) {
+          fabric.util.loadImage(dataUrl, function(img) {
+            if (callback) {
+              callback(new fabric.Image(img), orig);
+            }
+          });
         });
+
       }
       return this;
     },
@@ -14761,12 +14758,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         return;
       }
 
-      var isLikelyNode = typeof Buffer !== 'undefined' && typeof window === 'undefined',
-          imgEl = this._originalImage,
+      var imgEl = this._originalImage,
           canvasEl = fabric.util.createCanvasElement(),
-          replacement = isLikelyNode
-            ? new (require('canvas').Image)()
-            : fabric.document.createElement('img'),
+          replacement = fabric.util.createImage(),
           _this = this;
 
       canvasEl.width = imgEl.width;
@@ -14787,7 +14781,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       replacement.width = imgEl.width;
       replacement.height = imgEl.height;
 
-      if (isLikelyNode) {
+      if (fabric.isLikelyNode) {
         // cut off data:image/png;base64, part in the beginning
         var base64str = canvasEl.toDataURL('image/png').substring(22);
         replacement.src = new Buffer(base64str, 'base64');

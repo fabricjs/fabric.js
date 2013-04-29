@@ -171,7 +171,7 @@
     */
   function loadImage(url, callback, context) {
     if (url) {
-      var img = new Image();
+      var img = fabric.util.createImage();
       /** @ignore */
       img.onload = function () {
         callback && callback.call(context, img);
@@ -341,6 +341,18 @@
   }
 
   /**
+   * Creates image element (works on client and node)
+   * @static
+   * @memberOf fabric.util
+   * @return {Image} image element
+   */
+  function createImage() {
+    return fabric.isLikelyNode
+      ? new (require('canvas').Image)()
+      : fabric.document.createElement('img');
+  }
+
+  /**
    * Creates accessors (getXXX, setXXX) for a "class", based on "stateProperties" array
    * @static
    * @memberOf fabric.util
@@ -443,6 +455,7 @@
   fabric.util.populateWithProperties = populateWithProperties;
   fabric.util.drawDashedLine = drawDashedLine;
   fabric.util.createCanvasElement = createCanvasElement;
+  fabric.util.createImage = createImage;
   fabric.util.createAccessors = createAccessors;
   fabric.util.clipContext = clipContext;
   fabric.util.multiplyTransformMatrices = multiplyTransformMatrices;
