@@ -663,8 +663,8 @@
       if (this.fill.toLive) {
         ctx.save();
         ctx.translate(
-          -this.width / 2 + this.fill.offsetX,
-          -this.height / 2 + this.fill.offsetY);
+          -this.width / 2 + this.fill.offsetX || 0,
+          -this.height / 2 + this.fill.offsetY || 0);
       }
       ctx.fill();
       if (this.fill.toLive) {
