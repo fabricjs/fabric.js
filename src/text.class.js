@@ -142,7 +142,7 @@
      useNative:           true,
 
      /**
-      * List of properties to consider when checking if state of an object is changed (fabric.Object#hasStateChanged)
+      * List of properties to consider when checking if state of an object is changed ({@link fabric.Object#hasStateChanged})
       * as well as for history (undo/redo) purposes
       * @type Array
       */

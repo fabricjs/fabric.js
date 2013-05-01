@@ -11214,7 +11214,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
   /**
    * Returns true if object state (one of its state properties) was changed
-   * @return {Boolean} true if instance' state has changed since `saveState` was called
+   * @return {Boolean} true if instance' state has changed since `{@link fabric.Object#saveState}` was called
    */
   hasStateChanged: function() {
     return this.stateProperties.some(function(prop) {
@@ -16006,7 +16006,7 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
      useNative:           true,
 
      /**
-      * List of properties to consider when checking if state of an object is changed (fabric.Object#hasStateChanged)
+      * List of properties to consider when checking if state of an object is changed ({@link fabric.Object#hasStateChanged})
       * as well as for history (undo/redo) purposes
       * @type Array
       */

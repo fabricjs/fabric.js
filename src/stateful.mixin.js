@@ -5,7 +5,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
   /**
    * Returns true if object state (one of its state properties) was changed
-   * @return {Boolean} true if instance' state has changed since `saveState` was called
+   * @return {Boolean} true if instance' state has changed since `{@link fabric.Object#saveState}` was called
    */
   hasStateChanged: function() {
     return this.stateProperties.some(function(prop) {
