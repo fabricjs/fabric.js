@@ -10288,8 +10288,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       if (this.fill.toLive) {
         ctx.save();
         ctx.translate(
-          -this.width / 2 + this.fill.offsetX,
-          -this.height / 2 + this.fill.offsetY);
+          -this.width / 2 + this.fill.offsetX || 0,
+          -this.height / 2 + this.fill.offsetY || 0);
       }
       ctx.fill();
       if (this.fill.toLive) {
@@ -11209,8 +11209,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         y: bl.y + (this.currentWidth/2 * sinTh)
       };
       var mtr = {
-        x: tl.x + (this.currentWidth/2 * cosTh),
-        y: tl.y + (this.currentWidth/2 * sinTh)
+        x: mt.x,
+        y: mt.y
       };
 
       // debugging
@@ -11227,8 +11227,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       //   canvas.contextTop.fillRect(mt.x, mt.y, 3, 3);
       // }, 50);
 
-      // clockwise
-      this.oCoords = { tl: tl, tr: tr, br: br, bl: bl, ml: ml, mt: mt, mr: mr, mb: mb, mtr: mtr };
+      this.oCoords = {
+        // corners
+        tl: tl, tr: tr, br: br, bl: bl,
+        // middle
+        ml: ml, mt: mt, mr: mr, mb: mb,
+        // rotating point
+        mtr: mtr
+      };
 
       // set coordinates of the draggable boxes in the corners used to scale/rotate the image
       this._setCornerCoords();

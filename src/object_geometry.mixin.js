@@ -264,8 +264,8 @@
         y: bl.y + (this.currentWidth/2 * sinTh)
       };
       var mtr = {
-        x: tl.x + (this.currentWidth/2 * cosTh),
-        y: tl.y + (this.currentWidth/2 * sinTh)
+        x: mt.x,
+        y: mt.y
       };
 
       // debugging
@@ -282,8 +282,14 @@
       //   canvas.contextTop.fillRect(mt.x, mt.y, 3, 3);
       // }, 50);
 
-      // clockwise
-      this.oCoords = { tl: tl, tr: tr, br: br, bl: bl, ml: ml, mt: mt, mr: mr, mb: mb, mtr: mtr };
+      this.oCoords = {
+        // corners
+        tl: tl, tr: tr, br: br, bl: bl,
+        // middle
+        ml: ml, mt: mt, mr: mr, mb: mb,
+        // rotating point
+        mtr: mtr
+      };
 
       // set coordinates of the draggable boxes in the corners used to scale/rotate the image
       this._setCornerCoords();
