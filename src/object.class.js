@@ -283,7 +283,8 @@
     lockUniScaling: false,
 
     /**
-     * List of properties to consider when checking if state of an object is changed (fabric.Object#hasStateChanged);
+     * List of properties to consider when checking if state
+     * of an object is changed (fabric.Object#hasStateChanged)
      * as well as for history (undo/redo) purposes
      * @type Array
      */
@@ -750,44 +751,6 @@
 
         callback && callback(data);
       }
-    },
-
-    /**
-     * Returns true if object state (one of its state properties) was changed
-     * @return {Boolean} true if instance' state has changed
-     */
-    hasStateChanged: function() {
-      return this.stateProperties.some(function(prop) {
-        return this[prop] !== this.originalState[prop];
-      }, this);
-    },
-
-    /**
-     * Saves state of an object
-     * @param {Object} [options] Object with additional `stateProperties` array to include when saving state
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-    saveState: function(options) {
-      this.stateProperties.forEach(function(prop) {
-        this.originalState[prop] = this.get(prop);
-      }, this);
-
-      if (options && options.stateProperties) {
-        options.stateProperties.forEach(function(prop) {
-          this.originalState[prop] = this.get(prop);
-        }, this);
-      }
-
-      return this;
-    },
-
-    /**
-     * Setups state of an object
-     */
-    setupState: function() {
-      this.originalState = { };
-      this.saveState();
     },
 
     /**
