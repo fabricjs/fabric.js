@@ -10322,37 +10322,23 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * Creates an instance of fabric.Image out of an object
      * @param callback {Function} callback, invoked with an instance as a first argument
      * @return {fabric.Object} thisArg
-     * @chainable
      */
     cloneAsImage: function(callback) {
-      if (fabric.Image) {
-        var orig = {
-          angle: this.getAngle(),
-          flipX: this.getFlipX(),
-          flipY: this.getFlipY()
-        };
-
-        // normalize angle
-        this.set({ angle: 0, flipX: false, flipY: false });
-        this.toDataURL(function(dataUrl) {
-          fabric.util.loadImage(dataUrl, function(img) {
-            if (callback) {
-              callback(new fabric.Image(img), orig);
-            }
-          });
-        });
-
-      }
+      var dataUrl = this.toDataURL();
+      fabric.util.loadImage(dataUrl, function(img) {
+        if (callback) {
+          callback(new fabric.Image(img));
+        }
+      });
       return this;
     },
 
     /**
      * Converts an object into a data-url-like string
-     * @param callback {Function} callback that recieves resulting data-url string
+     * @return {String} data url representing an image of this object
      */
-    toDataURL: function(callback) {
+    toDataURL: function() {
       var el = fabric.util.createCanvasElement();
-
       el.width = this.getBoundingRectWidth();
       el.height = this.getBoundingRectHeight();
 
@@ -10362,27 +10348,27 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       canvas.backgroundColor = 'transparent';
       canvas.renderAll();
 
-      if (this.constructor.async) {
-        this.clone(proceed);
-      }
-      else {
-        proceed(this.clone());
-      }
+      var origParams = {
+        active: this.get('active'),
+        left: this.getLeft(),
+        top: this.getTop()
+      };
 
-      function proceed(clone) {
-        clone.left = el.width / 2;
-        clone.top = el.height / 2;
+      this.set({
+        'active': false,
+        left: el.width / 2,
+        top: el.height / 2
+      });
 
-        clone.set('active', false);
+      canvas.add(this);
+      var data = canvas.toDataURL();
 
-        canvas.add(clone);
-        var data = canvas.toDataURL();
+      this.set(origParams).setCoords();
 
-        canvas.dispose();
-        canvas = clone = null;
+      canvas.dispose();
+      canvas = null;
 
-        callback && callback(data);
-      }
+      return data;
     },
 
     /**
