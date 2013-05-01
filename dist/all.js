@@ -3933,6 +3933,23 @@ fabric.util.string = {
     return attr;
   }
 
+  function normalizeValue(attr, value, parentAttributes) {
+    if ((attr === 'fill' || attr === 'stroke') && value === 'none') {
+      return '';
+    }
+    if (attr === 'fill-rule') {
+      return (value === 'evenodd') ? 'destination-over' : value;
+    }
+    if (attr === 'transform') {
+      if (parentAttributes && parentAttributes.transformMatrix) {
+        return multiplyTransformMatrices(
+          parentAttributes.transformMatrix, fabric.parseTransformAttribute(value));
+      }
+      return fabric.parseTransformAttribute(value);
+    }
+    return value;
+  }
+
   /**
    * Returns an object of attributes' name/value, given element and an array of attribute names;
    * Parses parent "g" nodes recursively upwards.
@@ -3961,22 +3978,9 @@ fabric.util.string = {
       value = element.getAttribute(attr);
       parsed = parseFloat(value);
       if (value) {
-        // "normalize" attribute values
-        if ((attr === 'fill' || attr === 'stroke') && value === 'none') {
-          value = '';
-        }
-        if (attr === 'fill-rule') {
-          value = (value === 'evenodd') ? 'destination-over' : value;
-        }
-        if (attr === 'transform') {
-          if (parentAttributes.transformMatrix) {
-            value = multiplyTransformMatrices(parentAttributes.transformMatrix, fabric.parseTransformAttribute(value));
-          }
-          else {
-            value = fabric.parseTransformAttribute(value);
-          }
-        }
+        value = normalizeValue(attr, value, parentAttributes);
         attr = normalizeAttr(attr);
+
         memo[attr] = isNaN(parsed) ? value : parsed;
       }
       return memo;
@@ -3985,7 +3989,8 @@ fabric.util.string = {
     // add values parsed from style, which take precedence over attributes
     // (see: http://www.w3.org/TR/SVG/styling.html#UsingPresentationAttributes)
 
-    ownAttributes = extend(ownAttributes, extend(getGlobalStylesForElement(element), fabric.parseStyleAttribute(element)));
+    ownAttributes = extend(ownAttributes,
+      extend(getGlobalStylesForElement(element), fabric.parseStyleAttribute(element)));
     return extend(parentAttributes, ownAttributes);
   }
 
@@ -4193,21 +4198,25 @@ fabric.util.string = {
     if (typeof style === 'string') {
       style = style.replace(/;$/, '').split(';').forEach(function (current) {
 
-        var attr = current.split(':');
-        var value = attr[1].trim();
+        var pair = current.split(':');
+        var attr = normalizeAttr(pair[0].trim().toLowerCase());
+        var value = normalizeValue(attr, pair[1].trim());
 
         // TODO: need to normalize em, %, pt, etc. to px (!)
         var parsed = parseFloat(value);
 
-        oStyle[normalizeAttr(attr[0].trim().toLowerCase())] = isNaN(parsed) ? value : parsed;
+        oStyle[attr] = isNaN(parsed) ? value : parsed;
       });
     }
     else {
       for (var prop in style) {
         if (typeof style[prop] === 'undefined') continue;
 
-        var parsed = parseFloat(style[prop]);
-        oStyle[normalizeAttr(prop.toLowerCase())] = isNaN(parsed) ? style[prop] : parsed;
+        var attr = normalizeAttr(prop.toLowerCase());
+        var value = normalizeValue(attr, style[prop]);
+        var parsed = parseFloat(value);
+
+        oStyle[attr] = isNaN(parsed) ? value : parsed;
       }
     }
 
