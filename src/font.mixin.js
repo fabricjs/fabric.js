@@ -61,9 +61,18 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     
     markup += ' }';
     
-    var css = '<style type="text/css"><![CDATA[' + markup + ']]></style>';
+    var tag = document.createElement('style');
+    tag.type = 'text/css';
+    if (tag.styleSheet){
+    	tag.styleSheet.cssText = css;
+	} else {
+		tag.appendChild(document.createTextNode(markup));
+	}
     
-    document.getElementsByTagName('head')[0].innerHTML += css;
+    document.getElementsByTagName('head')[0].appendChild(tag);
+    
+    //var css = '<style type="text/css"><![CDATA[' + markup + ']]></style>';
+    //document.getElementsByTagName('head')[0].innerHTML += css;
     
     return true;
   },
