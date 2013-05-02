@@ -38,8 +38,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     
     clear && this.clear(); 
     
-    if (json.fonts) {
-      this.addFonts(json.fonts);
+    if (serialized.fonts) {
+      this.addFonts(serialized.fonts);
     }
     
     var enlivenObjFunc = dataless
