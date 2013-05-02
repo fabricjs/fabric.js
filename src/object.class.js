@@ -12,17 +12,6 @@
     return;
   }
 
-  var Image = global.Image;
-  try {
-    var NodeImage = (typeof require !== 'undefined') && require('canvas').Image;
-    if (NodeImage) {
-      Image = NodeImage;
-    }
-  }
-  catch(err) {
-    fabric.log(err);
-  }
-
   /**
    * Root object class from which all 2d shape classes inherit from
    * @class fabric.Object
@@ -294,7 +283,8 @@
     lockUniScaling: false,
 
     /**
-     * List of properties to consider when checking if state of an object is changed (fabric.Object#hasStateChanged);
+     * List of properties to consider when checking if state
+     * of an object is changed (fabric.Object#hasStateChanged)
      * as well as for history (undo/redo) purposes
      * @type Array
      */
@@ -674,8 +664,8 @@
       if (this.fill.toLive) {
         ctx.save();
         ctx.translate(
-          -this.width / 2 + this.fill.offsetX,
-          -this.height / 2 + this.fill.offsetY);
+          -this.width / 2 + this.fill.offsetX || 0,
+          -this.height / 2 + this.fill.offsetY || 0);
       }
       ctx.fill();
       if (this.fill.toLive) {
@@ -700,42 +690,23 @@
      * Creates an instance of fabric.Image out of an object
      * @param callback {Function} callback, invoked with an instance as a first argument
      * @return {fabric.Object} thisArg
-     * @chainable
      */
     cloneAsImage: function(callback) {
-      if (fabric.Image) {
-        var i = new Image();
-
-        /** @ignore */
-        i.onload = function() {
-          if (callback) {
-            callback(new fabric.Image(i), orig);
-          }
-          i = i.onload = null;
-        };
-
-        var orig = {
-          angle: this.getAngle(),
-          flipX: this.getFlipX(),
-          flipY: this.getFlipY()
-        };
-
-        // normalize angle
-        this.set({ angle: 0, flipX: false, flipY: false });
-        this.toDataURL(function(dataURL) {
-          i.src = dataURL;
-        });
-      }
+      var dataUrl = this.toDataURL();
+      fabric.util.loadImage(dataUrl, function(img) {
+        if (callback) {
+          callback(new fabric.Image(img));
+        }
+      });
       return this;
     },
 
     /**
      * Converts an object into a data-url-like string
-     * @param callback {Function} callback that recieves resulting data-url string
+     * @return {String} data url representing an image of this object
      */
-    toDataURL: function(callback) {
+    toDataURL: function() {
       var el = fabric.util.createCanvasElement();
-
       el.width = this.getBoundingRectWidth();
       el.height = this.getBoundingRectHeight();
 
@@ -745,65 +716,27 @@
       canvas.backgroundColor = 'transparent';
       canvas.renderAll();
 
-      if (this.constructor.async) {
-        this.clone(proceed);
-      }
-      else {
-        proceed(this.clone());
-      }
+      var origParams = {
+        active: this.get('active'),
+        left: this.getLeft(),
+        top: this.getTop()
+      };
 
-      function proceed(clone) {
-        clone.left = el.width / 2;
-        clone.top = el.height / 2;
+      this.set({
+        'active': false,
+        left: el.width / 2,
+        top: el.height / 2
+      });
 
-        clone.set('active', false);
+      canvas.add(this);
+      var data = canvas.toDataURL();
 
-        canvas.add(clone);
-        var data = canvas.toDataURL();
+      this.set(origParams).setCoords();
 
-        canvas.dispose();
-        canvas = clone = null;
+      canvas.dispose();
+      canvas = null;
 
-        callback && callback(data);
-      }
-    },
-
-    /**
-     * Returns true if object state (one of its state properties) was changed
-     * @return {Boolean} true if instance' state has changed
-     */
-    hasStateChanged: function() {
-      return this.stateProperties.some(function(prop) {
-        return this[prop] !== this.originalState[prop];
-      }, this);
-    },
-
-    /**
-     * Saves state of an object
-     * @param {Object} [options] Object with additional `stateProperties` array to include when saving state
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-    saveState: function(options) {
-      this.stateProperties.forEach(function(prop) {
-        this.originalState[prop] = this.get(prop);
-      }, this);
-
-      if (options && options.stateProperties) {
-        options.stateProperties.forEach(function(prop) {
-          this.originalState[prop] = this.get(prop);
-        }, this);
-      }
-
-      return this;
-    },
-
-    /**
-     * Setups state of an object
-     */
-    setupState: function() {
-      this.originalState = { };
-      this.saveState();
+      return data;
     },
 
     /**

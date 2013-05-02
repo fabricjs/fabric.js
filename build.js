@@ -136,6 +136,7 @@ var filesToInclude = [
   'src/object.class.js',
   'src/object_origin.mixin.js',
   'src/object_geometry.mixin.js',
+  'src/stateful.mixin.js',
 
   ifSpecifiedInclude('interaction', 'src/object_interactivity.mixin.js'),
 

@@ -145,6 +145,16 @@
     deepEqual(expectedObject, fabric.parseStyleAttribute(element));
   });
 
+  test('parseStyleAttribute with value normalization', function() {
+    var element = fabric.document.createElement('path');
+    element.setAttribute('style', 'fill:none');
+
+    var expectedObject = {
+      'fill': ''
+    };
+    deepEqual(expectedObject, fabric.parseStyleAttribute(element));
+  });
+
   test('parseAttributes (style to have higher priority than attribute)', function() {
     var element = fabric.document.createElement('path');
     element.setAttribute('style', 'fill:red');
@@ -219,15 +229,13 @@
     var parsedValue = fabric.parseTransformAttribute(element.getAttribute('transform'));
     deepEqual([1,2,3,4,5,6], parsedValue);
 
-    // TODO (kangax): matrices multiplication is not yet supported
+    element.setAttribute('transform', 'translate(21,31) translate(11,22)');
+    var parsedValue = fabric.parseTransformAttribute(element.getAttribute('transform'));
+    deepEqual([1,0,0,1,32,53], parsedValue);
 
-    // element.setAttribute('transform', 'translate(21,31) translate(11,22)');
-    // var parsedValue = fabric.parseTransformAttribute(element.getAttribute('transform'));
-    // this.assertEnumEqual([1,0,0,1,32,53], parsedValue);
-
-    // element.setAttribute('transform', 'scale(2 13) translate(5,15) skewX(11.22)');
-    // var parsedValue = fabric.parseTransformAttribute(element.getAttribute('transform'));
-    // deepEqual([2,0,11.22,13,5,15], parsedValue);
+    element.setAttribute('transform', 'scale(2 13) translate(5,15) skewX(11.22)');
+    var parsedValue = fabric.parseTransformAttribute(element.getAttribute('transform'));
+    deepEqual([2,0,22.44,13,10,195], parsedValue);
 
   });
 

@@ -152,4 +152,15 @@
     deepEqual(['c', 0, -53.25604, 43.17254, -96.42858, 96.42857, -96.42857], obj.path[0]);
     deepEqual(['c', 53.25603, 0, 96.42857, 43.17254, 96.42857, 96.42857], obj.path[1]);
   });
+
+  test('compressed path commands', function() {
+
+    var el = getPathElement('M56.224 84.12c-.047.132-.138.221-.322.215.046-.131.137-.221.322-.215z');
+    var obj = fabric.Path.fromElement(el);
+
+    deepEqual(['M', 56.224, 84.12], obj.path[0]);
+    deepEqual(['c', -0.047, 0.132, -0.138, 0.221, -0.322, 0.215], obj.path[1]);
+    deepEqual(['c', 0.046, -0.131, 0.137, -0.221, 0.322, -0.215], obj.path[2]);
+    deepEqual(['z'], obj.path[3]);
+  });
 })();

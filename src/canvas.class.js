@@ -237,12 +237,18 @@
     },
 
     /**
-     * @private
+     * Returns true if object is transparent at a certain location
+     * @param {fabric.Object} target Object to check
+     * @param {Number} x Left coordinate
+     * @param {Number} y Top coordinate
+     * @return {Boolean}
      */
-    _isTargetTransparent: function (target, x, y) {
+    isTargetTransparent: function (target, x, y) {
       var cacheContext = this.contextCache;
 
-      var hasBorders = target.hasBorders, transparentCorners = target.transparentCorners;
+      var hasBorders = target.hasBorders,
+          transparentCorners = target.transparentCorners;
+
       target.hasBorders = target.transparentCorners = false;
 
       this._draw(cacheContext, target);
@@ -271,14 +277,15 @@
         x, y, (this.targetFindTolerance * 2) || 1, (this.targetFindTolerance * 2) || 1);
 
       // Split image data - for tolerance > 1, pixelDataSize = 4;
-      for (var i = 3; i < imageData.data.length; i += 4) {
-          var temp = imageData.data[i];
-          isTransparent = temp <= 0;
-          if (isTransparent === false) break; //Stop if colour found
+      for (var i = 3, l = imageData.data.length; i < l; i += 4) {
+        var temp = imageData.data[i];
+        isTransparent = temp <= 0;
+        if (isTransparent === false) break; //Stop if colour found
       }
 
       imageData = null;
       this.clearContext(cacheContext);
+
       return isTransparent;
     },
 
@@ -719,7 +726,7 @@
       }
       for (var j = 0, len = possibleTargets.length; j < len; j++) {
         pointer = this.getPointer(e);
-        var isTransparent = this._isTargetTransparent(possibleTargets[j], pointer.x, pointer.y);
+        var isTransparent = this.isTargetTransparent(possibleTargets[j], pointer.x, pointer.y);
         if (!isTransparent) {
           target = possibleTargets[j];
           this.relatedTarget = target;

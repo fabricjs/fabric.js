@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures` */
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.1.9" };
+var fabric = fabric || { version: "1.1.10" };
 
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
@@ -2167,7 +2167,7 @@ fabric.Collection = {
     */
   function loadImage(url, callback, context) {
     if (url) {
-      var img = new Image();
+      var img = fabric.util.createImage();
       /** @ignore */
       img.onload = function () {
         callback && callback.call(context, img);
@@ -2337,6 +2337,18 @@ fabric.Collection = {
   }
 
   /**
+   * Creates image element (works on client and node)
+   * @static
+   * @memberOf fabric.util
+   * @return {Image} image element
+   */
+  function createImage() {
+    return fabric.isLikelyNode
+      ? new (require('canvas').Image)()
+      : fabric.document.createElement('img');
+  }
+
+  /**
    * Creates accessors (getXXX, setXXX) for a "class", based on "stateProperties" array
    * @static
    * @memberOf fabric.util
@@ -2439,6 +2451,7 @@ fabric.Collection = {
   fabric.util.populateWithProperties = populateWithProperties;
   fabric.util.drawDashedLine = drawDashedLine;
   fabric.util.createCanvasElement = createCanvasElement;
+  fabric.util.createImage = createImage;
   fabric.util.createAccessors = createAccessors;
   fabric.util.clipContext = clipContext;
   fabric.util.multiplyTransformMatrices = multiplyTransformMatrices;
@@ -3920,6 +3933,23 @@ fabric.util.string = {
     return attr;
   }
 
+  function normalizeValue(attr, value, parentAttributes) {
+    if ((attr === 'fill' || attr === 'stroke') && value === 'none') {
+      return '';
+    }
+    if (attr === 'fill-rule') {
+      return (value === 'evenodd') ? 'destination-over' : value;
+    }
+    if (attr === 'transform') {
+      if (parentAttributes && parentAttributes.transformMatrix) {
+        return multiplyTransformMatrices(
+          parentAttributes.transformMatrix, fabric.parseTransformAttribute(value));
+      }
+      return fabric.parseTransformAttribute(value);
+    }
+    return value;
+  }
+
   /**
    * Returns an object of attributes' name/value, given element and an array of attribute names;
    * Parses parent "g" nodes recursively upwards.
@@ -3948,22 +3978,9 @@ fabric.util.string = {
       value = element.getAttribute(attr);
       parsed = parseFloat(value);
       if (value) {
-        // "normalize" attribute values
-        if ((attr === 'fill' || attr === 'stroke') && value === 'none') {
-          value = '';
-        }
-        if (attr === 'fill-rule') {
-          value = (value === 'evenodd') ? 'destination-over' : value;
-        }
-        if (attr === 'transform') {
-          if (parentAttributes.transformMatrix) {
-            value = multiplyTransformMatrices(parentAttributes.transformMatrix, fabric.parseTransformAttribute(value));
-          }
-          else {
-            value = fabric.parseTransformAttribute(value);
-          }
-        }
+        value = normalizeValue(attr, value, parentAttributes);
         attr = normalizeAttr(attr);
+
         memo[attr] = isNaN(parsed) ? value : parsed;
       }
       return memo;
@@ -3972,7 +3989,8 @@ fabric.util.string = {
     // add values parsed from style, which take precedence over attributes
     // (see: http://www.w3.org/TR/SVG/styling.html#UsingPresentationAttributes)
 
-    ownAttributes = extend(ownAttributes, extend(getGlobalStylesForElement(element), fabric.parseStyleAttribute(element)));
+    ownAttributes = extend(ownAttributes,
+      extend(getGlobalStylesForElement(element), fabric.parseStyleAttribute(element)));
     return extend(parentAttributes, ownAttributes);
   }
 
@@ -4180,21 +4198,25 @@ fabric.util.string = {
     if (typeof style === 'string') {
       style = style.replace(/;$/, '').split(';').forEach(function (current) {
 
-        var attr = current.split(':');
-        var value = attr[1].trim();
+        var pair = current.split(':');
+        var attr = normalizeAttr(pair[0].trim().toLowerCase());
+        var value = normalizeValue(attr, pair[1].trim());
 
         // TODO: need to normalize em, %, pt, etc. to px (!)
         var parsed = parseFloat(value);
 
-        oStyle[normalizeAttr(attr[0].trim().toLowerCase())] = isNaN(parsed) ? value : parsed;
+        oStyle[attr] = isNaN(parsed) ? value : parsed;
       });
     }
     else {
       for (var prop in style) {
         if (typeof style[prop] === 'undefined') continue;
 
-        var parsed = parseFloat(style[prop]);
-        oStyle[normalizeAttr(prop.toLowerCase())] = isNaN(parsed) ? style[prop] : parsed;
+        var attr = normalizeAttr(prop.toLowerCase());
+        var value = normalizeValue(attr, style[prop]);
+        var parsed = parseFloat(value);
+
+        oStyle[attr] = isNaN(parsed) ? value : parsed;
       }
     }
 
@@ -8035,12 +8057,18 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     },
 
     /**
-     * @private
+     * Returns true if object is transparent at a certain location
+     * @param {fabric.Object} target Object to check
+     * @param {Number} x Left coordinate
+     * @param {Number} y Top coordinate
+     * @return {Boolean}
      */
-    _isTargetTransparent: function (target, x, y) {
+    isTargetTransparent: function (target, x, y) {
       var cacheContext = this.contextCache;
 
-      var hasBorders = target.hasBorders, transparentCorners = target.transparentCorners;
+      var hasBorders = target.hasBorders,
+          transparentCorners = target.transparentCorners;
+
       target.hasBorders = target.transparentCorners = false;
 
       this._draw(cacheContext, target);
@@ -8069,14 +8097,15 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         x, y, (this.targetFindTolerance * 2) || 1, (this.targetFindTolerance * 2) || 1);
 
       // Split image data - for tolerance > 1, pixelDataSize = 4;
-      for (var i = 3; i < imageData.data.length; i += 4) {
-          var temp = imageData.data[i];
-          isTransparent = temp <= 0;
-          if (isTransparent === false) break; //Stop if colour found
+      for (var i = 3, l = imageData.data.length; i < l; i += 4) {
+        var temp = imageData.data[i];
+        isTransparent = temp <= 0;
+        if (isTransparent === false) break; //Stop if colour found
       }
 
       imageData = null;
       this.clearContext(cacheContext);
+
       return isTransparent;
     },
 
@@ -8517,7 +8546,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       }
       for (var j = 0, len = possibleTargets.length; j < len; j++) {
         pointer = this.getPointer(e);
-        var isTransparent = this._isTargetTransparent(possibleTargets[j], pointer.x, pointer.y);
+        var isTransparent = this.isTargetTransparent(possibleTargets[j], pointer.x, pointer.y);
         if (!isTransparent) {
           target = possibleTargets[j];
           this.relatedTarget = target;
@@ -8982,7 +9011,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
           target = this.getActiveGroup();
         }
         else {
-          if (target !== this.getActiveGroup()) {
+          if (target !== this.getActiveGroup() && target !== this.getActiveObject()) {
             this.deactivateAll();
             this.setActiveObject(target, e);
           }
@@ -9615,17 +9644,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     return;
   }
 
-  var Image = global.Image;
-  try {
-    var NodeImage = (typeof require !== 'undefined') && require('canvas').Image;
-    if (NodeImage) {
-      Image = NodeImage;
-    }
-  }
-  catch(err) {
-    fabric.log(err);
-  }
-
   /**
    * Root object class from which all 2d shape classes inherit from
    * @class fabric.Object
@@ -9897,7 +9915,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     lockUniScaling: false,
 
     /**
-     * List of properties to consider when checking if state of an object is changed (fabric.Object#hasStateChanged);
+     * List of properties to consider when checking if state
+     * of an object is changed (fabric.Object#hasStateChanged)
      * as well as for history (undo/redo) purposes
      * @type Array
      */
@@ -10277,8 +10296,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       if (this.fill.toLive) {
         ctx.save();
         ctx.translate(
-          -this.width / 2 + this.fill.offsetX,
-          -this.height / 2 + this.fill.offsetY);
+          -this.width / 2 + this.fill.offsetX || 0,
+          -this.height / 2 + this.fill.offsetY || 0);
       }
       ctx.fill();
       if (this.fill.toLive) {
@@ -10303,42 +10322,23 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * Creates an instance of fabric.Image out of an object
      * @param callback {Function} callback, invoked with an instance as a first argument
      * @return {fabric.Object} thisArg
-     * @chainable
      */
     cloneAsImage: function(callback) {
-      if (fabric.Image) {
-        var i = new Image();
-
-        /** @ignore */
-        i.onload = function() {
-          if (callback) {
-            callback(new fabric.Image(i), orig);
-          }
-          i = i.onload = null;
-        };
-
-        var orig = {
-          angle: this.getAngle(),
-          flipX: this.getFlipX(),
-          flipY: this.getFlipY()
-        };
-
-        // normalize angle
-        this.set({ angle: 0, flipX: false, flipY: false });
-        this.toDataURL(function(dataURL) {
-          i.src = dataURL;
-        });
-      }
+      var dataUrl = this.toDataURL();
+      fabric.util.loadImage(dataUrl, function(img) {
+        if (callback) {
+          callback(new fabric.Image(img));
+        }
+      });
       return this;
     },
 
     /**
      * Converts an object into a data-url-like string
-     * @param callback {Function} callback that recieves resulting data-url string
+     * @return {String} data url representing an image of this object
      */
-    toDataURL: function(callback) {
+    toDataURL: function() {
       var el = fabric.util.createCanvasElement();
-
       el.width = this.getBoundingRectWidth();
       el.height = this.getBoundingRectHeight();
 
@@ -10348,65 +10348,27 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       canvas.backgroundColor = 'transparent';
       canvas.renderAll();
 
-      if (this.constructor.async) {
-        this.clone(proceed);
-      }
-      else {
-        proceed(this.clone());
-      }
+      var origParams = {
+        active: this.get('active'),
+        left: this.getLeft(),
+        top: this.getTop()
+      };
 
-      function proceed(clone) {
-        clone.left = el.width / 2;
-        clone.top = el.height / 2;
+      this.set({
+        'active': false,
+        left: el.width / 2,
+        top: el.height / 2
+      });
 
-        clone.set('active', false);
+      canvas.add(this);
+      var data = canvas.toDataURL();
 
-        canvas.add(clone);
-        var data = canvas.toDataURL();
+      this.set(origParams).setCoords();
 
-        canvas.dispose();
-        canvas = clone = null;
+      canvas.dispose();
+      canvas = null;
 
-        callback && callback(data);
-      }
-    },
-
-    /**
-     * Returns true if object state (one of its state properties) was changed
-     * @return {Boolean} true if instance' state has changed
-     */
-    hasStateChanged: function() {
-      return this.stateProperties.some(function(prop) {
-        return this[prop] !== this.originalState[prop];
-      }, this);
-    },
-
-    /**
-     * Saves state of an object
-     * @param {Object} [options] Object with additional `stateProperties` array to include when saving state
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-    saveState: function(options) {
-      this.stateProperties.forEach(function(prop) {
-        this.originalState[prop] = this.get(prop);
-      }, this);
-
-      if (options && options.stateProperties) {
-        options.stateProperties.forEach(function(prop) {
-          this.originalState[prop] = this.get(prop);
-        }, this);
-      }
-
-      return this;
-    },
-
-    /**
-     * Setups state of an object
-     */
-    setupState: function() {
-      this.originalState = { };
-      this.saveState();
+      return data;
     },
 
     /**
@@ -11203,8 +11165,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         y: bl.y + (this.currentWidth/2 * sinTh)
       };
       var mtr = {
-        x: tl.x + (this.currentWidth/2 * cosTh),
-        y: tl.y + (this.currentWidth/2 * sinTh)
+        x: mt.x,
+        y: mt.y
       };
 
       // debugging
@@ -11221,8 +11183,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       //   canvas.contextTop.fillRect(mt.x, mt.y, 3, 3);
       // }, 50);
 
-      // clockwise
-      this.oCoords = { tl: tl, tr: tr, br: br, bl: bl, ml: ml, mt: mt, mr: mr, mb: mb, mtr: mtr };
+      this.oCoords = {
+        // corners
+        tl: tl, tr: tr, br: br, bl: bl,
+        // middle
+        ml: ml, mt: mt, mr: mr, mb: mb,
+        // rotating point
+        mtr: mtr
+      };
 
       // set coordinates of the draggable boxes in the corners used to scale/rotate the image
       this._setCornerCoords();
@@ -11231,6 +11199,52 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     }
   });
 })();
+
+/*
+  Depends on `stateProperties`
+*/
+fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
+
+  /**
+   * Returns true if object state (one of its state properties) was changed
+   * @return {Boolean} true if instance' state has changed since `{@link fabric.Object#saveState}` was called
+   */
+  hasStateChanged: function() {
+    return this.stateProperties.some(function(prop) {
+      return this[prop] !== this.originalState[prop];
+    }, this);
+  },
+
+  /**
+   * Saves state of an object
+   * @param {Object} [options] Object with additional `stateProperties` array to include when saving state
+   * @return {fabric.Object} thisArg
+   */
+  saveState: function(options) {
+    this.stateProperties.forEach(function(prop) {
+      this.originalState[prop] = this.get(prop);
+    }, this);
+
+    if (options && options.stateProperties) {
+      options.stateProperties.forEach(function(prop) {
+        this.originalState[prop] = this.get(prop);
+      }, this);
+    }
+
+    return this;
+  },
+
+  /**
+   * Setups state of an object
+   * @return {fabric.Object} thisArg
+   */
+  setupState: function() {
+    this.originalState = { };
+    this.saveState();
+
+    return this;
+  }
+});
 
 (function(){
 
@@ -13712,32 +13726,42 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      */
     _parsePath: function() {
       var result = [ ],
+          coords = [ ],
           currentPath,
-          chunks,
-          parsed;
+          parsed,
+          re = /(-?\.\d+)|(-?\d+(\.\d+)?)/g,
+          match,
+          coordsStr;
 
-      for (var i = 0, chunksParsed, len = this.path.length; i < len; i++) {
+      for (var i = 0, coordsParsed, len = this.path.length; i < len; i++) {
         currentPath = this.path[i];
-        chunks = currentPath.slice(1).trim().replace(/(\d)-/g, '$1###-').split(/\s|,|###/);
-        chunksParsed = [ currentPath.charAt(0) ];
 
-        for (var j = 0, jlen = chunks.length; j < jlen; j++) {
-          parsed = parseFloat(chunks[j]);
+        coordsStr = currentPath.slice(1).trim();
+        coords.length = 0;
+
+        while ((match = re.exec(coordsStr))) {
+          coords.push(match[0]);
+        }
+
+        coordsParsed = [ currentPath.charAt(0) ];
+
+        for (var j = 0, jlen = coords.length; j < jlen; j++) {
+          parsed = parseFloat(coords[j]);
           if (!isNaN(parsed)) {
-            chunksParsed.push(parsed);
+            coordsParsed.push(parsed);
           }
         }
 
-        var command = chunksParsed[0].toLowerCase(),
+        var command = coordsParsed[0].toLowerCase(),
             commandLength = commandLengths[command];
 
-        if (chunksParsed.length - 1 > commandLength) {
-          for (var k = 1, klen = chunksParsed.length; k < klen; k += commandLength) {
-            result.push([ chunksParsed[0] ].concat(chunksParsed.slice(k, k + commandLength)));
+        if (coordsParsed.length - 1 > commandLength) {
+          for (var k = 1, klen = coordsParsed.length; k < klen; k += commandLength) {
+            result.push([ coordsParsed[0] ].concat(coordsParsed.slice(k, k + commandLength)));
           }
         }
         else {
-          result.push(chunksParsed);
+          result.push(coordsParsed);
         }
       }
 
@@ -14751,12 +14775,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         return;
       }
 
-      var isLikelyNode = typeof Buffer !== 'undefined' && typeof window === 'undefined',
-          imgEl = this._originalImage,
+      var imgEl = this._originalImage,
           canvasEl = fabric.util.createCanvasElement(),
-          replacement = isLikelyNode
-            ? new (require('canvas').Image)()
-            : fabric.document.createElement('img'),
+          replacement = fabric.util.createImage(),
           _this = this;
 
       canvasEl.width = imgEl.width;
@@ -14777,7 +14798,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       replacement.width = imgEl.width;
       replacement.height = imgEl.height;
 
-      if (isLikelyNode) {
+      if (fabric.isLikelyNode) {
         // cut off data:image/png;base64, part in the beginning
         var base64str = canvasEl.toDataURL('image/png').substring(22);
         replacement.src = new Buffer(base64str, 'base64');
@@ -15978,7 +15999,7 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
      useNative:           true,
 
      /**
-      * List of properties to consider when checking if state of an object is changed (fabric.Object#hasStateChanged)
+      * List of properties to consider when checking if state of an object is changed ({@link fabric.Object#hasStateChanged})
       * as well as for history (undo/redo) purposes
       * @type Array
       */
