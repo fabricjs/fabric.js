@@ -38,7 +38,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     var fontFound = null;
     
     this._fonts.forEach(function(font) {
-      if (font.name == name) {
+      if (font.name === name) {
         fontFound = font;
         return;
       }
