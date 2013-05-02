@@ -22,7 +22,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       name: name,
       srcFormats: srcFormats,
       weight: weight,
-      style: style,
+      style: style
     };
     
     this._registerFont(font);
@@ -96,7 +96,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     fontMap.forEach(function (font, i) {
       that.addFont(font.name, font.srcFormats, font.weight, font.style);
     });
-  },
+  }
   
 });
 
