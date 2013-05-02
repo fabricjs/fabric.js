@@ -157,6 +157,8 @@ var filesToInclude = [
   ifSpecifiedInclude('image_filters', 'src/image_filters.js'),
 
   ifSpecifiedInclude('text', 'src/text.class.js'),
+  
+  ifSpecifiedDependencyInclude('text', 'font', 'src/font.mixin.js'),
 
   ifSpecifiedInclude('node', 'src/node.js')
 ];
