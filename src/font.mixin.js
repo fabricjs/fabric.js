@@ -53,21 +53,21 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * @returns {Boolean}
    */
   _registerFont: function (font) {
-    var markup = '@font-face { font-family: "' + font.name + '";';
+    var markup = '@font-face { font-family: "' + font.name + '"; ';
     
     for (var format in font.srcFormats) {
         markup += 'src: local("' + font.name + '"), url("' + font.srcFormats[format] + '");'; // @todo add support for IE and format
-    };
+    }
     
     markup += ' }';
     
     var tag = document.createElement('style');
     tag.type = 'text/css';
     if (tag.styleSheet){
-    	tag.styleSheet.cssText = css;
-	} else {
-		tag.appendChild(document.createTextNode(markup));
-	}
+      tag.styleSheet.cssText = markup;
+    } else {
+      tag.appendChild(document.createTextNode(markup));
+    }
     
     document.getElementsByTagName('head')[0].appendChild(tag);
     
@@ -93,7 +93,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    */
   addFonts: function (fontMap) {
     var that = this;
-    fontMap.forEach(function (font, i) {
+    fontMap.forEach(function (font) {
       that.addFont(font.name, font.srcFormats, font.weight, font.style);
     });
   }
