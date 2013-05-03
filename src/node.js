@@ -27,7 +27,7 @@
     var req = reqHandler.request({
       hostname: oURL.hostname,
       port: oURL.port,
-      path: oURL.pathname,
+      path: oURL.path,
       method: 'GET'
     }, function(response){
       var body = "";
