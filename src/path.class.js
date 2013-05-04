@@ -561,17 +561,14 @@
       this._render(ctx);
       this._renderFill(ctx);
 
-      this.clipTo && ctx.restore();
-      if (this.shadow && !this.shadow.affectStroke) {
-        this._removeShadow(ctx);
-      }
-
       if (this.stroke) {
         ctx.strokeStyle = this.stroke;
         ctx.lineWidth = this.strokeWidth;
         ctx.lineCap = ctx.lineJoin = 'round';
-        ctx.stroke();
+        this._renderStroke(ctx);
       }
+      this.clipTo && ctx.restore();
+
       this._removeShadow(ctx);
 
       if (!noTransform && this.active) {

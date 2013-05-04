@@ -69,6 +69,8 @@ fabric.CircleBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabri
       this.canvas.add(circle);
     }
 
+    this.canvas.clearContext(this.canvas.contextTop);
+    this.removeShadowStyles();
     this.canvas.renderOnAddition = originalRenderOnAddition;
     this.canvas.renderAll();
   },

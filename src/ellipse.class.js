@@ -116,11 +116,9 @@
       }
       ctx.transform(1, 0, 0, this.ry/this.rx, 0, 0);
       ctx.arc(noTransform ? this.left : 0, noTransform ? this.top : 0, this.rx, 0, piBy2, false);
-      if (this.stroke) {
-        ctx.stroke();
-      }
-      this._removeShadow(ctx);
+
       this._renderFill(ctx);
+      this._renderStroke(ctx);
       ctx.restore();
     },
 

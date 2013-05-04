@@ -89,9 +89,11 @@
         ctx.translate(this.left, this.top);
       }
 
-      // move from center (of virtual box) to its left/top corner
-      ctx.moveTo(this.width === 1 ? 0 : (-this.width / 2), this.height === 1 ? 0 : (-this.height / 2));
-      ctx.lineTo(this.width === 1 ? 0 : (this.width / 2), this.height === 1 ? 0 : (this.height / 2));
+      if (!this.strokeDashArray || this.strokeDashArray && fabric.StaticCanvas.supports('setLineDash')) {
+        // move from center (of virtual box) to its left/top corner
+        ctx.moveTo(this.width === 1 ? 0 : (-this.width / 2), this.height === 1 ? 0 : (-this.height / 2));
+        ctx.lineTo(this.width === 1 ? 0 : (this.width / 2), this.height === 1 ? 0 : (this.height / 2));
+      }
 
       ctx.lineWidth = this.strokeWidth;
 
@@ -100,8 +102,21 @@
       // (by copying fillStyle to strokeStyle, since line is stroked, not filled)
       var origStrokeStyle = ctx.strokeStyle;
       ctx.strokeStyle = this.stroke || ctx.fillStyle;
-      ctx.stroke();
+      this._renderStroke(ctx);
       ctx.strokeStyle = origStrokeStyle;
+    },
+
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
+    _renderDashedStroke: function(ctx) {
+      var x = this.width === 1 ? 0 : -this.width / 2,
+          y = this.height === 1 ? 0 : -this.height / 2;
+
+      ctx.beginPath();
+      fabric.util.drawDashedLine(ctx, x, y, -x, -y, this.strokeDashArray);
+      ctx.closePath();
     },
 
     /**
