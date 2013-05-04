@@ -251,7 +251,8 @@
       this.canvas.add(path);
       path.setCoords();
 
-      this.canvas.contextTop && this.canvas.clearContext(this.canvas.contextTop);
+      this.canvas.clearContext(this.canvas.contextTop);
+      this.removeShadowStyles();
       this.canvas.renderAll();
 
       // fire event 'path' created

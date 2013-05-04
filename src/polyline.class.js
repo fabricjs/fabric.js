@@ -27,7 +27,7 @@
      * Constructor
      * @param {Array} points array of points
      * @param {Object} [options] Options object
-     * @param {Boolean} Whether points offsetting should be skipped
+     * @param {Boolean} skipOffset Whether points offsetting should be skipped
      * @return {fabric.Polyline} thisArg
      */
     initialize: function(points, options, skipOffset) {
@@ -39,6 +39,7 @@
 
     /**
      * @private
+     * @param {Boolean} skipOffset Whether points offsetting should be skipped
      */
     _calcDimensions: function(skipOffset) {
       return fabric.Polygon.prototype._calcDimensions.call(this, skipOffset);
@@ -95,10 +96,23 @@
         point = this.points[i];
         ctx.lineTo(point.x, point.y);
       }
+
       this._renderFill(ctx);
-      this._removeShadow(ctx);
-      if (this.stroke) {
-        ctx.stroke();
+      this._renderStroke(ctx);
+    },
+
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
+    _renderDashedStroke: function(ctx) {
+      var p1, p2;
+
+      ctx.beginPath();
+      for (var i = 0, len = this.points.length; i < len; i++) {
+        p1 = this.points[i],
+        p2 = this.points[i+1] || p1;
+        fabric.util.drawDashedLine(ctx, p1.x, p1.y, p2.x, p2.y, this.strokeDashArray);
       }
     },
 

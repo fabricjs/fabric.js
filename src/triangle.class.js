@@ -52,10 +52,22 @@
       ctx.closePath();
 
       this._renderFill(ctx);
+      this._renderStroke(ctx);
+    },
 
-      if (this.stroke) {
-        ctx.stroke();
-      }
+    /**
+     * @private
+     * @param ctx {CanvasRenderingContext2D} Context to render on
+     */
+    _renderDashedStroke: function(ctx) {
+      var widthBy2 = this.width / 2,
+          heightBy2 = this.height / 2;
+
+      ctx.beginPath();
+      fabric.util.drawDashedLine(ctx, -widthBy2, heightBy2, 0, -heightBy2, this.strokeDashArray);
+      fabric.util.drawDashedLine(ctx, 0, -heightBy2, widthBy2, heightBy2, this.strokeDashArray);
+      fabric.util.drawDashedLine(ctx, widthBy2, heightBy2, -widthBy2, heightBy2, this.strokeDashArray);
+      ctx.closePath();
     },
 
     /**

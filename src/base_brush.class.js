@@ -61,5 +61,15 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
     ctx.shadowColor = this.shadowColor || this.color;
     ctx.shadowOffsetX = this.shadowOffsetX;
     ctx.shadowOffsetY = this.shadowOffsetY;
+  },
+
+  /**
+   * Remove brush shadow styles
+   */
+  removeShadowStyles: function() {
+    var ctx = this.canvas.contextTop;
+
+    ctx.shadowColor = '';
+    ctx.shadowBlur = ctx.shadowOffsetX = ctx.shadowOffsetY = 0;
   }
 });

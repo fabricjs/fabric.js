@@ -96,8 +96,9 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
       }
     }
 
-    this.canvas.renderOnAddition = originalRenderOnAddition;
     this.canvas.clearContext(this.canvas.contextTop);
+    this.removeShadowStyles();
+    this.canvas.renderOnAddition = originalRenderOnAddition;
     this.canvas.renderAll();
   },
 
