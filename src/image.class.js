@@ -107,12 +107,11 @@
       this._setShadow(ctx);
       this.clipTo && fabric.util.clipContext(this, ctx);
       this._render(ctx);
-      this.clipTo && ctx.restore();
-      this._removeShadow(ctx);
-
-      if (this.stroke) {
-        this._stroke(ctx);
+      if (this.shadow && !this.shadow.affectStroke) {
+        this._removeShadow(ctx);
       }
+      this._renderStroke(ctx);
+      this.clipTo && ctx.restore();
 
       if (this.active && !noTransform) {
         this.drawBorders(ctx);
@@ -121,16 +120,38 @@
       ctx.restore();
     },
 
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
     _stroke: function(ctx) {
       ctx.save();
       ctx.lineWidth = this.strokeWidth;
       ctx.strokeStyle = this.stroke;
-      ctx.strokeRect(
-        -this.width / 2,
-        -this.height / 2,
-        this.width,
-        this.height);
+      ctx.beginPath();
+      ctx.strokeRect(-this.width / 2, -this.height / 2, this.width, this.height);
+      ctx.beginPath();
       ctx.restore();
+    },
+
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
+    _renderDashedStroke: function(ctx) {
+     var x = -this.width/2,
+         y = -this.height/2,
+         w = this.width,
+         h = this.height;
+
+      ctx.lineWidth = this.strokeWidth;
+      ctx.strokeStyle = this.stroke;
+      ctx.beginPath();
+      fabric.util.drawDashedLine(ctx, x, y, x+w, y, this.strokeDashArray);
+      fabric.util.drawDashedLine(ctx, x+w, y, x+w, y+h, this.strokeDashArray);
+      fabric.util.drawDashedLine(ctx, x+w, y+h, x, y+h, this.strokeDashArray);
+      fabric.util.drawDashedLine(ctx, x, y+h, x, y, this.strokeDashArray);
+      ctx.closePath();
     },
 
     /**
@@ -150,16 +171,37 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function() {
-      return '<g transform="' + this.getSvgTransform() + '">'+
-                '<image xlink:href="' + this.getSvgSrc() + '" '+
-                  'style="' + this.getSvgStyles() + '" ' +
-                  // we're essentially moving origin of transformation from top/left corner to the center of the shape
-                  // by wrapping it in container <g> element with actual transformation, then offsetting object to the top/left
-                  // so that object's center aligns with container's left/top
-                  'transform="translate('+ (-this.width/2) + ' ' + (-this.height/2) + ')" ' +
-                  'width="' + this.width + '" ' +
-                  'height="' + this.height + '"' + '></image>' +
-              '</g>';
+      var markup = [];
+
+      markup.push(
+        '<g transform="', this.getSvgTransform(), '">',
+          '<image xlink:href="', this.getSvgSrc(),
+            '" style="', this.getSvgStyles(),
+            // we're essentially moving origin of transformation from top/left corner to the center of the shape
+            // by wrapping it in container <g> element with actual transformation, then offsetting object to the top/left
+            // so that object's center aligns with container's left/top
+            '" transform="translate(' + (-this.width/2) + ' ' + (-this.height/2) + ')',
+            '" width="', this.width,
+            '" height="', this.height,
+          '"></image>'
+      );
+
+      if (this.stroke || this.strokeDashArray) {
+        var origFill = this.fill;
+        this.fill = null;
+        markup.push(
+          '<rect ',
+            'x="', (-1 * this.width / 2), '" y="', (-1 * this.height / 2),
+            '" width="', this.width, '" height="', this.height,
+            '" style="', this.getSvgStyles(),
+          '"/>'
+        );
+        this.fill = origFill;
+      }
+
+      markup.push('</g>');
+
+      return markup.join('');
     },
 
     /**

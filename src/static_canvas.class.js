@@ -1160,7 +1160,7 @@
      * (either those of HTMLCanvasElement itself, or rendering context)
      *
      * @param methodName {String} Method to check support for;
-     *                            Could be one of "getImageData", "toDataURL" or "toDataURLWithQuality"
+     *                            Could be one of "getImageData", "toDataURL", "toDataURLWithQuality" or "setLineDash"
      * @return {Boolean | null} `true` if method is supported (or at least exists),
      *                          `null` if canvas element or context can not be initialized
      */
@@ -1180,6 +1180,9 @@
 
         case 'getImageData':
           return typeof ctx.getImageData !== 'undefined';
+
+        case 'setLineDash':
+          return typeof ctx.setLineDash !== 'undefined';
 
         case 'toDataURL':
           return typeof el.toDataURL !== 'undefined';

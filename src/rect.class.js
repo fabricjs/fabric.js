@@ -119,74 +119,25 @@
       ctx.closePath();
 
       this._renderFill(ctx);
-      this._removeShadow(ctx);
-
-      if (this.strokeDashArray) {
-        this._renderDashedStroke(ctx);
-      }
-      else if (this.stroke) {
-        ctx.stroke();
-      }
+      this._renderStroke(ctx);
     },
 
     /**
      * @private
+     * @param ctx {CanvasRenderingContext2D} context to render on
      */
     _renderDashedStroke: function(ctx) {
+     var x = -this.width/2,
+         y = -this.height/2,
+         w = this.width,
+         h = this.height;
 
-      if (1 & this.strokeDashArray.length /* if odd number of items */) {
-        /* duplicate items */
-        this.strokeDashArray.push.apply(this.strokeDashArray, this.strokeDashArray);
-      }
-
-      var i = 0,
-          x = -this.width/2, y = -this.height/2,
-          _this = this,
-          padding = this.padding,
-          dashedArrayLength = this.strokeDashArray.length;
-
-      ctx.save();
       ctx.beginPath();
-
-      /** @ignore */
-      function renderSide(xMultiplier, yMultiplier) {
-
-        var lineLength = 0,
-            lengthDiff = 0,
-            sideLength = (yMultiplier ? _this.height : _this.width) + padding * 2;
-
-        while (lineLength < sideLength) {
-
-          var lengthOfSubPath = _this.strokeDashArray[i++];
-          lineLength += lengthOfSubPath;
-
-          if (lineLength > sideLength) {
-            lengthDiff = lineLength - sideLength;
-          }
-
-          // track coords
-          if (xMultiplier) {
-            x += (lengthOfSubPath * xMultiplier) - (lengthDiff * xMultiplier || 0);
-          }
-          else {
-            y += (lengthOfSubPath * yMultiplier) - (lengthDiff * yMultiplier || 0);
-          }
-
-          ctx[1 & i /* odd */ ? 'moveTo' : 'lineTo'](x, y);
-          if (i >= dashedArrayLength) {
-            i = 0;
-          }
-        }
-      }
-
-      renderSide(1, 0);
-      renderSide(0, 1);
-      renderSide(-1, 0);
-      renderSide(0, -1);
-
-      ctx.stroke();
+      fabric.util.drawDashedLine(ctx, x, y, x+w, y, this.strokeDashArray);
+      fabric.util.drawDashedLine(ctx, x+w, y, x+w, y+h, this.strokeDashArray);
+      fabric.util.drawDashedLine(ctx, x+w, y+h, x, y+h, this.strokeDashArray);
+      fabric.util.drawDashedLine(ctx, x, y+h, x, y, this.strokeDashArray);
       ctx.closePath();
-      ctx.restore();
     },
 
     /**

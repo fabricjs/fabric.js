@@ -428,7 +428,7 @@
       return [
         "stroke: ", (this.stroke ? this.stroke : 'none'), "; ",
         "stroke-width: ", (this.strokeWidth ? this.strokeWidth : '0'), "; ",
-        "stroke-dasharray: ", (this.strokeDashArray ? this.strokeDashArray.join(' ') : "; "),
+        "stroke-dasharray: ", (this.strokeDashArray ? this.strokeDashArray.join(' ') : ''), "; ",
         "fill: ", (this.fill ? (this.fill && this.fill.toLive ? 'url(#SVGID_' + this.fill.id + ')' : this.fill) : 'none'), "; ",
         "opacity: ", (typeof this.opacity !== 'undefined' ? this.opacity : '1'), ";",
         (this.visible ? '' : " visibility: hidden;")
@@ -637,6 +637,7 @@
 
     /**
      * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _setShadow: function(ctx) {
       if (!this.shadow) return;
@@ -649,6 +650,7 @@
 
     /**
      * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _removeShadow: function(ctx) {
       ctx.shadowColor = '';
@@ -657,6 +659,7 @@
 
     /**
      * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _renderFill: function(ctx) {
       if (!this.fill) return;
@@ -671,6 +674,37 @@
       if (this.fill.toLive) {
         ctx.restore();
       }
+      if (this.shadow && !this.shadow.affectStroke) {
+        this._removeShadow(ctx);
+      }
+    },
+
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
+    _renderStroke: function(ctx) {
+      if (!this.stroke && !this.strokeDashArray) return;
+
+      if (this.strokeDashArray) {
+        // Spec requires the concatenation of two copies the dash list when the number of elements is odd
+        if (1 & this.strokeDashArray.length) {
+          this.strokeDashArray.push.apply(this.strokeDashArray, this.strokeDashArray);
+        }
+
+        if (fabric.StaticCanvas.supports('setLineDash')) {
+          ctx.setLineDash(this.strokeDashArray);
+          this._stroke && this._stroke(ctx);
+        }
+        else {
+          this._renderDashedStroke && this._renderDashedStroke(ctx);
+        }
+        ctx.stroke();
+      }
+      else {
+        this._stroke ? this._stroke(ctx) : ctx.stroke();
+      }
+      this._removeShadow(ctx);
     },
 
     /**
