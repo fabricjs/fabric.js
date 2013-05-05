@@ -6,7 +6,8 @@
       extend = fabric.util.object.extend,
       toFixed = fabric.util.toFixed,
       capitalize = fabric.util.string.capitalize,
-      degreesToRadians = fabric.util.degreesToRadians;
+      degreesToRadians = fabric.util.degreesToRadians,
+      supportsLineDash = fabric.StaticCanvas.supports('setLineDash');
 
   if (fabric.Object) {
     return;
@@ -692,7 +693,7 @@
           this.strokeDashArray.push.apply(this.strokeDashArray, this.strokeDashArray);
         }
 
-        if (fabric.StaticCanvas.supports('setLineDash')) {
+        if (supportsLineDash) {
           ctx.setLineDash(this.strokeDashArray);
           this._stroke && this._stroke(ctx);
         }

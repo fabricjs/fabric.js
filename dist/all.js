@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures` */
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.1.10" };
+var fabric = fabric || { version: "1.1.11" };
 
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
@@ -7129,7 +7129,7 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
      * (either those of HTMLCanvasElement itself, or rendering context)
      *
      * @param methodName {String} Method to check support for;
-     *                            Could be one of "getImageData", "toDataURL" or "toDataURLWithQuality"
+     *                            Could be one of "getImageData", "toDataURL", "toDataURLWithQuality" or "setLineDash"
      * @return {Boolean | null} `true` if method is supported (or at least exists),
      *                          `null` if canvas element or context can not be initialized
      */
@@ -7149,6 +7149,9 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
 
         case 'getImageData':
           return typeof ctx.getImageData !== 'undefined';
+
+        case 'setLineDash':
+          return typeof ctx.setLineDash !== 'undefined';
 
         case 'toDataURL':
           return typeof el.toDataURL !== 'undefined';
@@ -7240,6 +7243,16 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
     ctx.shadowColor = this.shadowColor || this.color;
     ctx.shadowOffsetX = this.shadowOffsetX;
     ctx.shadowOffsetY = this.shadowOffsetY;
+  },
+
+  /**
+   * Remove brush shadow styles
+   */
+  removeShadowStyles: function() {
+    var ctx = this.canvas.contextTop;
+
+    ctx.shadowColor = '';
+    ctx.shadowBlur = ctx.shadowOffsetX = ctx.shadowOffsetY = 0;
   }
 });
 
@@ -7496,7 +7509,8 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
       this.canvas.add(path);
       path.setCoords();
 
-      this.canvas.contextTop && this.canvas.clearContext(this.canvas.contextTop);
+      this.canvas.clearContext(this.canvas.contextTop);
+      this.removeShadowStyles();
       this.canvas.renderAll();
 
       // fire event 'path' created
@@ -7576,6 +7590,8 @@ fabric.CircleBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabri
       this.canvas.add(circle);
     }
 
+    this.canvas.clearContext(this.canvas.contextTop);
+    this.removeShadowStyles();
     this.canvas.renderOnAddition = originalRenderOnAddition;
     this.canvas.renderAll();
   },
@@ -7701,8 +7717,9 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
       }
     }
 
-    this.canvas.renderOnAddition = originalRenderOnAddition;
     this.canvas.clearContext(this.canvas.contextTop);
+    this.removeShadowStyles();
+    this.canvas.renderOnAddition = originalRenderOnAddition;
     this.canvas.renderAll();
   },
 
@@ -9638,7 +9655,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       extend = fabric.util.object.extend,
       toFixed = fabric.util.toFixed,
       capitalize = fabric.util.string.capitalize,
-      degreesToRadians = fabric.util.degreesToRadians;
+      degreesToRadians = fabric.util.degreesToRadians,
+      supportsLineDash = fabric.StaticCanvas.supports('setLineDash');
 
   if (fabric.Object) {
     return;
@@ -10060,7 +10078,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       return [
         "stroke: ", (this.stroke ? this.stroke : 'none'), "; ",
         "stroke-width: ", (this.strokeWidth ? this.strokeWidth : '0'), "; ",
-        "stroke-dasharray: ", (this.strokeDashArray ? this.strokeDashArray.join(' ') : "; "),
+        "stroke-dasharray: ", (this.strokeDashArray ? this.strokeDashArray.join(' ') : ''), "; ",
         "fill: ", (this.fill ? (this.fill && this.fill.toLive ? 'url(#SVGID_' + this.fill.id + ')' : this.fill) : 'none'), "; ",
         "opacity: ", (typeof this.opacity !== 'undefined' ? this.opacity : '1'), ";",
         (this.visible ? '' : " visibility: hidden;")
@@ -10269,6 +10287,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
     /**
      * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _setShadow: function(ctx) {
       if (!this.shadow) return;
@@ -10281,6 +10300,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
     /**
      * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _removeShadow: function(ctx) {
       ctx.shadowColor = '';
@@ -10289,6 +10309,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
     /**
      * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _renderFill: function(ctx) {
       if (!this.fill) return;
@@ -10303,6 +10324,37 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       if (this.fill.toLive) {
         ctx.restore();
       }
+      if (this.shadow && !this.shadow.affectStroke) {
+        this._removeShadow(ctx);
+      }
+    },
+
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
+    _renderStroke: function(ctx) {
+      if (!this.stroke && !this.strokeDashArray) return;
+
+      if (this.strokeDashArray) {
+        // Spec requires the concatenation of two copies the dash list when the number of elements is odd
+        if (1 & this.strokeDashArray.length) {
+          this.strokeDashArray.push.apply(this.strokeDashArray, this.strokeDashArray);
+        }
+
+        if (supportsLineDash) {
+          ctx.setLineDash(this.strokeDashArray);
+          this._stroke && this._stroke(ctx);
+        }
+        else {
+          this._renderDashedStroke && this._renderDashedStroke(ctx);
+        }
+        ctx.stroke();
+      }
+      else {
+        this._stroke ? this._stroke(ctx) : ctx.stroke();
+      }
+      this._removeShadow(ctx);
     },
 
     /**
@@ -11743,7 +11795,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
   var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
-      coordProps = { 'x1': 1, 'x2': 1, 'y1': 1, 'y2': 1 };
+      coordProps = { 'x1': 1, 'x2': 1, 'y1': 1, 'y2': 1 },
+      supportsLineDash = fabric.StaticCanvas.supports('setLineDash');
 
   if (fabric.Line) {
     fabric.warn('fabric.Line is already defined');
@@ -11828,9 +11881,11 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         ctx.translate(this.left, this.top);
       }
 
-      // move from center (of virtual box) to its left/top corner
-      ctx.moveTo(this.width === 1 ? 0 : (-this.width / 2), this.height === 1 ? 0 : (-this.height / 2));
-      ctx.lineTo(this.width === 1 ? 0 : (this.width / 2), this.height === 1 ? 0 : (this.height / 2));
+      if (!this.strokeDashArray || this.strokeDashArray && supportsLineDash) {
+        // move from center (of virtual box) to its left/top corner
+        ctx.moveTo(this.width === 1 ? 0 : (-this.width / 2), this.height === 1 ? 0 : (-this.height / 2));
+        ctx.lineTo(this.width === 1 ? 0 : (this.width / 2), this.height === 1 ? 0 : (this.height / 2));
+      }
 
       ctx.lineWidth = this.strokeWidth;
 
@@ -11839,8 +11894,21 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       // (by copying fillStyle to strokeStyle, since line is stroked, not filled)
       var origStrokeStyle = ctx.strokeStyle;
       ctx.strokeStyle = this.stroke || ctx.fillStyle;
-      ctx.stroke();
+      this._renderStroke(ctx);
       ctx.strokeStyle = origStrokeStyle;
+    },
+
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
+    _renderDashedStroke: function(ctx) {
+      var x = this.width === 1 ? 0 : -this.width / 2,
+          y = this.height === 1 ? 0 : -this.height / 2;
+
+      ctx.beginPath();
+      fabric.util.drawDashedLine(ctx, x, y, -x, -y, this.strokeDashArray);
+      ctx.closePath();
     },
 
     /**
@@ -12017,11 +12085,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       ctx.globalAlpha = this.group ? (ctx.globalAlpha * this.opacity) : this.opacity;
       ctx.arc(noTransform ? this.left : 0, noTransform ? this.top : 0, this.radius, 0, piBy2, false);
       ctx.closePath();
+
       this._renderFill(ctx);
-      this._removeShadow(ctx);
-      if (this.stroke) {
-        ctx.stroke();
-      }
+      this._renderStroke(ctx);
     },
 
     /**
@@ -12166,10 +12232,22 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       ctx.closePath();
 
       this._renderFill(ctx);
+      this._renderStroke(ctx);
+    },
 
-      if (this.stroke) {
-        ctx.stroke();
-      }
+    /**
+     * @private
+     * @param ctx {CanvasRenderingContext2D} Context to render on
+     */
+    _renderDashedStroke: function(ctx) {
+      var widthBy2 = this.width / 2,
+          heightBy2 = this.height / 2;
+
+      ctx.beginPath();
+      fabric.util.drawDashedLine(ctx, -widthBy2, heightBy2, 0, -heightBy2, this.strokeDashArray);
+      fabric.util.drawDashedLine(ctx, 0, -heightBy2, widthBy2, heightBy2, this.strokeDashArray);
+      fabric.util.drawDashedLine(ctx, widthBy2, heightBy2, -widthBy2, heightBy2, this.strokeDashArray);
+      ctx.closePath();
     },
 
     /**
@@ -12344,11 +12422,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       }
       ctx.transform(1, 0, 0, this.ry/this.rx, 0, 0);
       ctx.arc(noTransform ? this.left : 0, noTransform ? this.top : 0, this.rx, 0, piBy2, false);
-      if (this.stroke) {
-        ctx.stroke();
-      }
-      this._removeShadow(ctx);
+
       this._renderFill(ctx);
+      this._renderStroke(ctx);
       ctx.restore();
     },
 
@@ -12530,74 +12606,25 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       ctx.closePath();
 
       this._renderFill(ctx);
-      this._removeShadow(ctx);
-
-      if (this.strokeDashArray) {
-        this._renderDashedStroke(ctx);
-      }
-      else if (this.stroke) {
-        ctx.stroke();
-      }
+      this._renderStroke(ctx);
     },
 
     /**
      * @private
+     * @param ctx {CanvasRenderingContext2D} context to render on
      */
     _renderDashedStroke: function(ctx) {
+     var x = -this.width/2,
+         y = -this.height/2,
+         w = this.width,
+         h = this.height;
 
-      if (1 & this.strokeDashArray.length /* if odd number of items */) {
-        /* duplicate items */
-        this.strokeDashArray.push.apply(this.strokeDashArray, this.strokeDashArray);
-      }
-
-      var i = 0,
-          x = -this.width/2, y = -this.height/2,
-          _this = this,
-          padding = this.padding,
-          dashedArrayLength = this.strokeDashArray.length;
-
-      ctx.save();
       ctx.beginPath();
-
-      /** @ignore */
-      function renderSide(xMultiplier, yMultiplier) {
-
-        var lineLength = 0,
-            lengthDiff = 0,
-            sideLength = (yMultiplier ? _this.height : _this.width) + padding * 2;
-
-        while (lineLength < sideLength) {
-
-          var lengthOfSubPath = _this.strokeDashArray[i++];
-          lineLength += lengthOfSubPath;
-
-          if (lineLength > sideLength) {
-            lengthDiff = lineLength - sideLength;
-          }
-
-          // track coords
-          if (xMultiplier) {
-            x += (lengthOfSubPath * xMultiplier) - (lengthDiff * xMultiplier || 0);
-          }
-          else {
-            y += (lengthOfSubPath * yMultiplier) - (lengthDiff * yMultiplier || 0);
-          }
-
-          ctx[1 & i /* odd */ ? 'moveTo' : 'lineTo'](x, y);
-          if (i >= dashedArrayLength) {
-            i = 0;
-          }
-        }
-      }
-
-      renderSide(1, 0);
-      renderSide(0, 1);
-      renderSide(-1, 0);
-      renderSide(0, -1);
-
-      ctx.stroke();
+      fabric.util.drawDashedLine(ctx, x, y, x+w, y, this.strokeDashArray);
+      fabric.util.drawDashedLine(ctx, x+w, y, x+w, y+h, this.strokeDashArray);
+      fabric.util.drawDashedLine(ctx, x+w, y+h, x, y+h, this.strokeDashArray);
+      fabric.util.drawDashedLine(ctx, x, y+h, x, y, this.strokeDashArray);
       ctx.closePath();
-      ctx.restore();
     },
 
     /**
@@ -12741,7 +12768,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * Constructor
      * @param {Array} points array of points
      * @param {Object} [options] Options object
-     * @param {Boolean} Whether points offsetting should be skipped
+     * @param {Boolean} skipOffset Whether points offsetting should be skipped
      * @return {fabric.Polyline} thisArg
      */
     initialize: function(points, options, skipOffset) {
@@ -12753,6 +12780,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
     /**
      * @private
+     * @param {Boolean} skipOffset Whether points offsetting should be skipped
      */
     _calcDimensions: function(skipOffset) {
       return fabric.Polygon.prototype._calcDimensions.call(this, skipOffset);
@@ -12809,10 +12837,23 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         point = this.points[i];
         ctx.lineTo(point.x, point.y);
       }
+
       this._renderFill(ctx);
-      this._removeShadow(ctx);
-      if (this.stroke) {
-        ctx.stroke();
+      this._renderStroke(ctx);
+    },
+
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
+    _renderDashedStroke: function(ctx) {
+      var p1, p2;
+
+      ctx.beginPath();
+      for (var i = 0, len = this.points.length; i < len; i++) {
+        p1 = this.points[i];
+        p2 = this.points[i+1] || p1;
+        fabric.util.drawDashedLine(ctx, p1.x, p1.y, p2.x, p2.y, this.strokeDashArray);
       }
     },
 
@@ -12995,11 +13036,26 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         ctx.lineTo(point.x, point.y);
       }
       this._renderFill(ctx);
-      this._removeShadow(ctx);
-      if (this.stroke) {
+      if (this.stroke || this.strokeDashArray) {
         ctx.closePath();
-        ctx.stroke();
+        this._renderStroke(ctx);
       }
+    },
+
+    /**
+     * @private
+     * @param ctx {CanvasRenderingContext2D} context to render on
+     */
+    _renderDashedStroke: function(ctx) {
+      var p1, p2;
+
+      ctx.beginPath();
+      for (var i = 0, len = this.points.length; i < len; i++) {
+        p1 = this.points[i];
+        p2 = this.points[i+1] || this.points[0];
+        fabric.util.drawDashedLine(ctx, p1.x, p1.y, p2.x, p2.y, this.strokeDashArray);
+      }
+      ctx.closePath();
     },
 
     /**
@@ -13618,17 +13674,14 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       this._render(ctx);
       this._renderFill(ctx);
 
-      this.clipTo && ctx.restore();
-      if (this.shadow && !this.shadow.affectStroke) {
-        this._removeShadow(ctx);
-      }
-
       if (this.stroke) {
         ctx.strokeStyle = this.stroke;
         ctx.lineWidth = this.strokeWidth;
         ctx.lineCap = ctx.lineJoin = 'round';
-        ctx.stroke();
+        this._renderStroke(ctx);
       }
+      this.clipTo && ctx.restore();
+
       this._removeShadow(ctx);
 
       if (!noTransform && this.active) {
@@ -14680,12 +14733,11 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       this._setShadow(ctx);
       this.clipTo && fabric.util.clipContext(this, ctx);
       this._render(ctx);
-      this.clipTo && ctx.restore();
-      this._removeShadow(ctx);
-
-      if (this.stroke) {
-        this._stroke(ctx);
+      if (this.shadow && !this.shadow.affectStroke) {
+        this._removeShadow(ctx);
       }
+      this._renderStroke(ctx);
+      this.clipTo && ctx.restore();
 
       if (this.active && !noTransform) {
         this.drawBorders(ctx);
@@ -14694,16 +14746,38 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       ctx.restore();
     },
 
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
     _stroke: function(ctx) {
       ctx.save();
       ctx.lineWidth = this.strokeWidth;
       ctx.strokeStyle = this.stroke;
-      ctx.strokeRect(
-        -this.width / 2,
-        -this.height / 2,
-        this.width,
-        this.height);
+      ctx.beginPath();
+      ctx.strokeRect(-this.width / 2, -this.height / 2, this.width, this.height);
+      ctx.beginPath();
       ctx.restore();
+    },
+
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
+    _renderDashedStroke: function(ctx) {
+     var x = -this.width/2,
+         y = -this.height/2,
+         w = this.width,
+         h = this.height;
+
+      ctx.lineWidth = this.strokeWidth;
+      ctx.strokeStyle = this.stroke;
+      ctx.beginPath();
+      fabric.util.drawDashedLine(ctx, x, y, x+w, y, this.strokeDashArray);
+      fabric.util.drawDashedLine(ctx, x+w, y, x+w, y+h, this.strokeDashArray);
+      fabric.util.drawDashedLine(ctx, x+w, y+h, x, y+h, this.strokeDashArray);
+      fabric.util.drawDashedLine(ctx, x, y+h, x, y, this.strokeDashArray);
+      ctx.closePath();
     },
 
     /**
@@ -14723,16 +14797,37 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @return {String} svg representation of an instance
      */
     toSVG: function() {
-      return '<g transform="' + this.getSvgTransform() + '">'+
-                '<image xlink:href="' + this.getSvgSrc() + '" '+
-                  'style="' + this.getSvgStyles() + '" ' +
-                  // we're essentially moving origin of transformation from top/left corner to the center of the shape
-                  // by wrapping it in container <g> element with actual transformation, then offsetting object to the top/left
-                  // so that object's center aligns with container's left/top
-                  'transform="translate('+ (-this.width/2) + ' ' + (-this.height/2) + ')" ' +
-                  'width="' + this.width + '" ' +
-                  'height="' + this.height + '"' + '></image>' +
-              '</g>';
+      var markup = [];
+
+      markup.push(
+        '<g transform="', this.getSvgTransform(), '">',
+          '<image xlink:href="', this.getSvgSrc(),
+            '" style="', this.getSvgStyles(),
+            // we're essentially moving origin of transformation from top/left corner to the center of the shape
+            // by wrapping it in container <g> element with actual transformation, then offsetting object to the top/left
+            // so that object's center aligns with container's left/top
+            '" transform="translate(' + (-this.width/2) + ' ' + (-this.height/2) + ')',
+            '" width="', this.width,
+            '" height="', this.height,
+          '"></image>'
+      );
+
+      if (this.stroke || this.strokeDashArray) {
+        var origFill = this.fill;
+        this.fill = null;
+        markup.push(
+          '<rect ',
+            'x="', (-1 * this.width / 2), '" y="', (-1 * this.height / 2),
+            '" width="', this.width, '" height="', this.height,
+            '" style="', this.getSvgStyles(),
+          '"/>'
+        );
+        this.fill = origFill;
+      }
+
+      markup.push('</g>');
+
+      return markup.join('');
     },
 
     /**
@@ -16803,7 +16898,7 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
     var req = reqHandler.request({
       hostname: oURL.hostname,
       port: oURL.port,
-      path: oURL.pathname,
+      path: oURL.path,
       method: 'GET'
     }, function(response){
       var body = "";

@@ -4,7 +4,8 @@
 
   var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
-      coordProps = { 'x1': 1, 'x2': 1, 'y1': 1, 'y2': 1 };
+      coordProps = { 'x1': 1, 'x2': 1, 'y1': 1, 'y2': 1 },
+      supportsLineDash = fabric.StaticCanvas.supports('setLineDash');
 
   if (fabric.Line) {
     fabric.warn('fabric.Line is already defined');
@@ -89,7 +90,7 @@
         ctx.translate(this.left, this.top);
       }
 
-      if (!this.strokeDashArray || this.strokeDashArray && fabric.StaticCanvas.supports('setLineDash')) {
+      if (!this.strokeDashArray || this.strokeDashArray && supportsLineDash) {
         // move from center (of virtual box) to its left/top corner
         ctx.moveTo(this.width === 1 ? 0 : (-this.width / 2), this.height === 1 ? 0 : (-this.height / 2));
         ctx.lineTo(this.width === 1 ? 0 : (this.width / 2), this.height === 1 ? 0 : (this.height / 2));
