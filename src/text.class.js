@@ -262,12 +262,7 @@
      */
     _renderViaNative: function(ctx) {
 
-      if (this.originX === 'left') {
-        ctx.translate(this.left, this.top);
-      }
-      else {
-        this.transform(ctx);
-      }
+      this.transform(ctx, fabric.isLikelyNode);
 
       this._setTextStyles(ctx);
 
@@ -431,11 +426,17 @@
     },
 
     _getLeftOffset: function() {
-      return this.originX === 'left' ? 0 : -this.width / 2;
+      if (fabric.isLikelyNode && (this.originX === 'left' || this.originX === 'center')) {
+        return 0;
+      }
+      return -this.width / 2;
     },
 
     _getTopOffset: function() {
-      return this.originY === 'top' ? 0 : -this.height / 2;
+      if (fabric.isLikelyNode && (this.originY === 'top' || this.originY === 'center')) {
+        return 0;
+      }
+      return -this.height / 2;
     },
 
     /**

@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures` */
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.1.11" };
+var fabric = fabric || { version: "1.1.12" };
 
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
@@ -10001,11 +10001,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     /**
      * Transforms context when rendering an object
      * @param {CanvasRenderingContext2D} ctx Context
+     * @param {Boolean} when true, context is transformed to object's top/left corner. This is used when rendering text on Node
      */
-    transform: function(ctx) {
+    transform: function(ctx, fromLeft) {
       ctx.globalAlpha = this.opacity;
 
-      var center = this.getCenterPoint();
+      var center = fromLeft ? this._getLeftTopCoords() : this.getCenterPoint();
       ctx.translate(center.x, center.y);
       ctx.rotate(degreesToRadians(this.angle));
       ctx.scale(
@@ -10946,6 +10947,37 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
       this.setCoords();
       this.originX = to;
+    },
+
+    /**
+     * @private
+     */
+    _getLeftTopCoords: function() {
+      var angle = degreesToRadians(this.angle);
+
+      var hypotHalf = this.getWidth() / 2;
+      var xHalf = Math.cos(angle) * hypotHalf;
+      var yHalf = Math.sin(angle) * hypotHalf;
+
+      var hypotFull = this.getWidth();
+      var xFull = Math.cos(angle) * hypotFull;
+      var yFull = Math.sin(angle) * hypotFull;
+
+      var x = this.left;
+      var y = this.top;
+
+      if (this.originX === 'center') {
+        // move half left
+        x -= xHalf;
+        y -= yHalf;
+      }
+      else if (this.originX === 'right') {
+        // move full left
+        x -= xFull;
+        y -= yFull;
+      }
+
+      return { x: x, y: y };
     }
   });
 
@@ -16214,12 +16246,7 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
      */
     _renderViaNative: function(ctx) {
 
-      if (this.originX === 'left') {
-        ctx.translate(this.left, this.top);
-      }
-      else {
-        this.transform(ctx);
-      }
+      this.transform(ctx, fabric.isLikelyNode);
 
       this._setTextStyles(ctx);
 
@@ -16383,11 +16410,17 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
     },
 
     _getLeftOffset: function() {
-      return this.originX === 'left' ? 0 : -this.width / 2;
+      if (fabric.isLikelyNode && (this.originX === 'left' || this.originX === 'center')) {
+        return 0;
+      }
+      return -this.width / 2;
     },
 
     _getTopOffset: function() {
-      return this.originY === 'top' ? 0 : -this.height / 2;
+      if (fabric.isLikelyNode && (this.originY === 'top' || this.originY === 'center')) {
+        return 0;
+      }
+      return -this.height / 2;
     },
 
     /**

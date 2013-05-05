@@ -352,11 +352,12 @@
     /**
      * Transforms context when rendering an object
      * @param {CanvasRenderingContext2D} ctx Context
+     * @param {Boolean} when true, context is transformed to object's top/left corner. This is used when rendering text on Node
      */
-    transform: function(ctx) {
+    transform: function(ctx, fromLeft) {
       ctx.globalAlpha = this.opacity;
 
-      var center = this.getCenterPoint();
+      var center = fromLeft ? this._getLeftTopCoords() : this.getCenterPoint();
       ctx.translate(center.x, center.y);
       ctx.rotate(degreesToRadians(this.angle));
       ctx.scale(
