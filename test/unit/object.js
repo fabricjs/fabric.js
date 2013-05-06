@@ -457,6 +457,14 @@
       var dataURL = cObj.toDataURL();
       equal(typeof dataURL, 'string');
       equal(dataURL.substring(0, 21), 'data:image/png;base64');
+
+      try {
+        cObj.toDataURL({ format: 'jpeg' });
+        equal(dataURL.substring(0, 22), 'data:image/jpeg;base64');
+      }
+      catch(err) {
+        fabric.log('jpeg toDataURL not supported');
+      }
     }
   });
 

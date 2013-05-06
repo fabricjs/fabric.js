@@ -10388,9 +10388,15 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
     /**
      * Converts an object into a data-url-like string
+     * @param {Object} options
+     *
+     *  `format` the format of the output image. Either "jpeg" or "png".
+     *  `quality` quality level (0..1)
+     *  `multiplier` multiplier to scale by {Number}
+     *
      * @return {String} data url representing an image of this object
      */
-    toDataURL: function() {
+    toDataURL: function(options) {
       var el = fabric.util.createCanvasElement();
       el.width = this.getBoundingRectWidth();
       el.height = this.getBoundingRectHeight();
@@ -10414,7 +10420,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       });
 
       canvas.add(this);
-      var data = canvas.toDataURL();
+      var data = canvas.toDataURL(options);
 
       this.set(origParams).setCoords();
 
