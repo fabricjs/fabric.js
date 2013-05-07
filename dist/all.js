@@ -8923,13 +8923,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
           target._scaling = false;
         }
 
-        // determine the new coords everytime the image changes its position
-        var i = this._objects.length;
-        while (i--) {
-          this._objects[i].setCoords();
-        }
-
         target.isMoving = false;
+        target.setCoords();
 
         // only fire :modified event if target coordinates were changed during mousedown-mouseup
         if (this.stateful && target.hasStateChanged()) {
@@ -10397,6 +10392,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @return {String} data url representing an image of this object
      */
     toDataURL: function(options) {
+      options || (options = { });
+
       var el = fabric.util.createCanvasElement();
       el.width = this.getBoundingRectWidth();
       el.height = this.getBoundingRectHeight();
@@ -10404,8 +10401,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       fabric.util.wrapElement(el, 'div');
 
       var canvas = new fabric.Canvas(el);
-      canvas.backgroundColor = 'transparent';
-      canvas.renderAll();
+      if (options.format === 'jpeg') {
+        canvas.backgroundColor = '#fff';
+      }
 
       var origParams = {
         active: this.get('active'),

@@ -748,6 +748,8 @@
      * @return {String} data url representing an image of this object
      */
     toDataURL: function(options) {
+      options || (options = { });
+
       var el = fabric.util.createCanvasElement();
       el.width = this.getBoundingRectWidth();
       el.height = this.getBoundingRectHeight();
@@ -755,8 +757,9 @@
       fabric.util.wrapElement(el, 'div');
 
       var canvas = new fabric.Canvas(el);
-      canvas.backgroundColor = 'transparent';
-      canvas.renderAll();
+      if (options.format === 'jpeg') {
+        canvas.backgroundColor = '#fff';
+      }
 
       var origParams = {
         active: this.get('active'),
