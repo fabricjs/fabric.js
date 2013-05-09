@@ -54,6 +54,7 @@
       return fabric.Polygon.prototype.toObject.call(this, propertiesToInclude);
     },
 
+    /* _TO_SVG_START_ */
     /**
      * Returns SVG representation of an instance
      * @return {String} svg representation of an instance
@@ -83,6 +84,7 @@
 
       return markup.join('');
     },
+    /* _TO_SVG_END_ */
 
     /**
      * @private

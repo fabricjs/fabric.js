@@ -50,6 +50,7 @@
       });
     },
 
+    /* _TO_SVG_START_ */
     /**
      * Returns svg representation of an instance
      * @return {String} svg representation of an instance
@@ -75,6 +76,7 @@
 
       return markup.join('');
     },
+    /* _TO_SVG_END_ */
 
     /**
      * @private

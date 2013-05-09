@@ -109,39 +109,7 @@
       };
     },
 
-    /**
-     * Returns an instance of CanvasGradient
-     * @param ctx
-     * @return {CanvasGradient}
-     */
-    toLive: function(ctx) {
-      var gradient;
-
-      if (!this.type) return;
-
-      if (this.type === 'linear') {
-        gradient = ctx.createLinearGradient(
-          this.coords.x1, this.coords.y1, this.coords.x2 || ctx.canvas.width, this.coords.y2);
-      }
-      else if (this.type === 'radial') {
-        gradient = ctx.createRadialGradient(
-          this.coords.x1, this.coords.y1, this.coords.r1, this.coords.x2, this.coords.y2, this.coords.r2);
-      }
-
-      for (var i = 0; i < this.colorStops.length; i++) {
-        var color = this.colorStops[i].color,
-            opacity = this.colorStops[i].opacity,
-            offset = this.colorStops[i].offset;
-
-        if (opacity) {
-          color = new fabric.Color(color).setAlpha(opacity).toRgba();
-        }
-        gradient.addColorStop(parseFloat(offset), color);
-      }
-
-      return gradient;
-    },
-
+    /* _TO_SVG_START_ */
     /**
      * Returns SVG representation of an gradient
      * @param {Object} object Object to create a gradient for
@@ -206,6 +174,40 @@
       markup.push((this.type === 'linear' ? '</linearGradient>' : '</radialGradient>'));
 
       return markup.join('');
+    },
+    /* _TO_SVG_END_ */
+
+    /**
+     * Returns an instance of CanvasGradient
+     * @param ctx
+     * @return {CanvasGradient}
+     */
+    toLive: function(ctx) {
+      var gradient;
+
+      if (!this.type) return;
+
+      if (this.type === 'linear') {
+        gradient = ctx.createLinearGradient(
+          this.coords.x1, this.coords.y1, this.coords.x2 || ctx.canvas.width, this.coords.y2);
+      }
+      else if (this.type === 'radial') {
+        gradient = ctx.createRadialGradient(
+          this.coords.x1, this.coords.y1, this.coords.r1, this.coords.x2, this.coords.y2, this.coords.r2);
+      }
+
+      for (var i = 0; i < this.colorStops.length; i++) {
+        var color = this.colorStops[i].color,
+            opacity = this.colorStops[i].opacity,
+            offset = this.colorStops[i].offset;
+
+        if (opacity) {
+          color = new fabric.Color(color).setAlpha(opacity).toRgba();
+        }
+        gradient.addColorStop(parseFloat(offset), color);
+      }
+
+      return gradient;
     }
   });
 

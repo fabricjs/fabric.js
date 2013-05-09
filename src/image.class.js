@@ -166,6 +166,7 @@
       });
     },
 
+    /* _TO_SVG_START_ */
     /**
      * Returns SVG representation of an instance
      * @return {String} svg representation of an instance
@@ -203,6 +204,7 @@
 
       return markup.join('');
     },
+    /* _TO_SVG_END_ */
 
     /**
      * Returns source of an image
@@ -259,7 +261,7 @@
       });
 
        /** @ignore */
-      
+
       replacement.width = imgEl.width;
       replacement.height = imgEl.height;
 
@@ -267,7 +269,7 @@
         // cut off data:image/png;base64, part in the beginning
         var base64str = canvasEl.toDataURL('image/png').substring(22);
         replacement.src = new Buffer(base64str, 'base64');
-        
+
         // onload doesn't fire in some node versions, so we invoke callback manually
         _this._element = replacement;
         callback && callback();

@@ -4767,39 +4767,7 @@ fabric.util.string = {
       };
     },
 
-    /**
-     * Returns an instance of CanvasGradient
-     * @param ctx
-     * @return {CanvasGradient}
-     */
-    toLive: function(ctx) {
-      var gradient;
-
-      if (!this.type) return;
-
-      if (this.type === 'linear') {
-        gradient = ctx.createLinearGradient(
-          this.coords.x1, this.coords.y1, this.coords.x2 || ctx.canvas.width, this.coords.y2);
-      }
-      else if (this.type === 'radial') {
-        gradient = ctx.createRadialGradient(
-          this.coords.x1, this.coords.y1, this.coords.r1, this.coords.x2, this.coords.y2, this.coords.r2);
-      }
-
-      for (var i = 0; i < this.colorStops.length; i++) {
-        var color = this.colorStops[i].color,
-            opacity = this.colorStops[i].opacity,
-            offset = this.colorStops[i].offset;
-
-        if (opacity) {
-          color = new fabric.Color(color).setAlpha(opacity).toRgba();
-        }
-        gradient.addColorStop(parseFloat(offset), color);
-      }
-
-      return gradient;
-    },
-
+    /* _TO_SVG_START_ */
     /**
      * Returns SVG representation of an gradient
      * @param {Object} object Object to create a gradient for
@@ -4864,6 +4832,40 @@ fabric.util.string = {
       markup.push((this.type === 'linear' ? '</linearGradient>' : '</radialGradient>'));
 
       return markup.join('');
+    },
+    /* _TO_SVG_END_ */
+
+    /**
+     * Returns an instance of CanvasGradient
+     * @param ctx
+     * @return {CanvasGradient}
+     */
+    toLive: function(ctx) {
+      var gradient;
+
+      if (!this.type) return;
+
+      if (this.type === 'linear') {
+        gradient = ctx.createLinearGradient(
+          this.coords.x1, this.coords.y1, this.coords.x2 || ctx.canvas.width, this.coords.y2);
+      }
+      else if (this.type === 'radial') {
+        gradient = ctx.createRadialGradient(
+          this.coords.x1, this.coords.y1, this.coords.r1, this.coords.x2, this.coords.y2, this.coords.r2);
+      }
+
+      for (var i = 0; i < this.colorStops.length; i++) {
+        var color = this.colorStops[i].color,
+            opacity = this.colorStops[i].opacity,
+            offset = this.colorStops[i].offset;
+
+        if (opacity) {
+          color = new fabric.Color(color).setAlpha(opacity).toRgba();
+        }
+        gradient.addColorStop(parseFloat(offset), color);
+      }
+
+      return gradient;
     }
   });
 
@@ -6848,6 +6850,7 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
       return data;
     },
 
+    /* _TO_SVG_START_ */
     /**
      * Returns SVG representation of canvas
      * @function
@@ -6920,6 +6923,7 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
 
       return markup.join('');
     },
+    /* _TO_SVG_END_ */
 
     /**
      * Removes an object from canvas and returns it
@@ -8025,10 +8029,10 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     },
 
     /**
-     * Applies one implementation of 'point inside polygon' algorithm
-     * @param e { Event } event object
-     * @param target { fabric.Object } object to test against
-     * @return {Boolean} true if point contains within area of given object
+     * Checks if point is contained within an area of given object
+     * @param {Event} e Event object
+     * @param {fabric.Object} target Object to test against
+     * @return {Boolean} true if point is contained within an area of given object
      */
     containsPoint: function (e, target) {
       var pointer = this.getPointer(e),
@@ -11211,7 +11215,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         Math.pow(this.currentWidth / 2, 2) +
         Math.pow(this.currentHeight / 2, 2));
 
-      var _angle = Math.atan(this.currentHeight / this.currentWidth);
+      var _angle = Math.atan(isFinite(this.currentHeight / this.currentWidth) ? this.currentHeight / this.currentWidth : 0);
 
       // offset added for rotate and scale actions
       var offsetX = Math.cos(_angle + theta) * _hypotenuse,
@@ -11344,8 +11348,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     /**
      * Determines which one of the four corners has been clicked
      * @private
-     * @param e {Event} event object
-     * @param offset {Object} canvas offset
+     * @param {Event} e Event object
+     * @param {Object} offset Canvas offset
      * @return {String|Boolean} corner code (tl, tr, bl, br, etc.), or false if nothing is found
      */
     _findTargetCorner: function(e, offset) {
@@ -11443,9 +11447,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     },
 
     /**
-     * Method that returns an object with the image lines in it given the coordinates of the corners
+     * Method that returns an object with the object edges in it, given the coordinates of the corners
      * @private
-     * @param oCoords {Object} coordinates of the image corners
+     * @param {Object} oCoords Coordinates of the image corners
      */
     _getImageLines: function(oCoords) {
       return {
@@ -11948,14 +11952,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     },
 
     /**
-     * Returns complexity of an instance
-     * @return {Number} complexity
-     */
-    complexity: function() {
-      return 1;
-    },
-
-    /**
      * Returns object representation of an instance
      * @methd toObject
      * @param {Array} propertiesToInclude
@@ -11970,6 +11966,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       });
     },
 
+    /* _TO_SVG_START_ */
     /**
      * Returns SVG representation of an instance
      * @return {String} svg representation of an instance
@@ -11992,6 +11989,15 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       );
 
       return markup.join('');
+    },
+    /* _TO_SVG_END_ */
+
+    /**
+     * Returns complexity of an instance
+     * @return {Number} complexity
+     */
+    complexity: function() {
+      return 1;
     }
   });
 
@@ -12085,6 +12091,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       });
     },
 
+    /* _TO_SVG_START_ */
     /**
      * Returns svg representation of an instance
      * @return {String} svg representation of an instance
@@ -12110,6 +12117,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       return markup.join('');
     },
+    /* _TO_SVG_END_ */
 
     /**
      * @private
@@ -12286,14 +12294,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       ctx.closePath();
     },
 
-    /**
-     * Returns complexity of an instance
-     * @return {Number} complexity of this instance
-     */
-    complexity: function() {
-      return 1;
-    },
-
+    /* _TO_SVG_START_ */
     /**
      * Returns SVG representation of an instance
      * @return {String} svg representation of an instance
@@ -12325,6 +12326,15 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       );
 
       return markup.join('');
+    },
+    /* _TO_SVG_END_ */
+
+    /**
+     * Returns complexity of an instance
+     * @return {Number} complexity of this instance
+     */
+    complexity: function() {
+      return 1;
     }
   });
 
@@ -12408,6 +12418,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       });
     },
 
+    /* _TO_SVG_START_ */
     /**
      * Returns svg representation of an instance
      * @return {String} svg representation of an instance
@@ -12433,6 +12444,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       return markup.join('');
     },
+    /* _TO_SVG_END_ */
 
     /**
      * Renders this instance on a given context
@@ -12680,14 +12692,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     },
 
     /**
-     * Returns complexity of an instance
-     * @return {Number} complexity
-     */
-    complexity: function() {
-      return 1;
-    },
-
-    /**
      * Returns object representation of an instance
      * @param {Array} propertiesToInclude
      * @return {Object} object representation of an instance
@@ -12699,6 +12703,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       });
     },
 
+    /* _TO_SVG_START_ */
     /**
      * Returns svg representation of an instance
      * @return {String} svg representation of an instance
@@ -12724,6 +12729,15 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       );
 
       return markup.join('');
+    },
+    /* _TO_SVG_END_ */
+
+    /**
+     * Returns complexity of an instance
+     * @return {Number} complexity
+     */
+    complexity: function() {
+      return 1;
     }
   });
 
@@ -12831,6 +12845,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       return fabric.Polygon.prototype.toObject.call(this, propertiesToInclude);
     },
 
+    /* _TO_SVG_START_ */
     /**
      * Returns SVG representation of an instance
      * @return {String} svg representation of an instance
@@ -12860,6 +12875,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       return markup.join('');
     },
+    /* _TO_SVG_END_ */
 
     /**
      * @private
@@ -13029,6 +13045,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       });
     },
 
+    /* _TO_SVG_START_ */
     /**
      * Returns svg representation of an instance
      * @return {String} svg representation of an instance
@@ -13058,6 +13075,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       return markup.join('');
     },
+    /* _TO_SVG_END_ */
 
     /**
      * @private
@@ -13768,6 +13786,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       return o;
     },
 
+    /* _TO_SVG_START_ */
     /**
      * Returns svg representation of an instance
      * @return {String} svg representation of an instance
@@ -13801,6 +13820,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       return markup.join('');
     },
+    /* _TO_SVG_END_ */
 
     /**
      * Returns number representation of an instance complexity
@@ -14092,6 +14112,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       return o;
     },
 
+    /* _TO_SVG_START_ */
     /**
      * Returns svg representation of an instance
      * @return {String} svg representation of an instance
@@ -14112,6 +14133,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       return markup.join('');
     },
+    /* _TO_SVG_END_ */
 
     /**
      * Returns a string representation of this path group
@@ -14593,6 +14615,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
               centerY + halfHeight > point.y;
     },
 
+    /* _TO_SVG_START_ */
     /**
      * Returns svg representation of an instance
      * @return {String} svg representation of an instance
@@ -14608,6 +14631,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           objectsMarkup.join('') +
         '</g>');
     },
+    /* _TO_SVG_END_ */
 
     /**
      * Returns requested property
@@ -14828,6 +14852,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       });
     },
 
+    /* _TO_SVG_START_ */
     /**
      * Returns SVG representation of an instance
      * @return {String} svg representation of an instance
@@ -14865,6 +14890,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       return markup.join('');
     },
+    /* _TO_SVG_END_ */
 
     /**
      * Returns source of an image
@@ -14921,7 +14947,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       });
 
        /** @ignore */
-      
+
       replacement.width = imgEl.width;
       replacement.height = imgEl.height;
 
@@ -14929,7 +14955,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         // cut off data:image/png;base64, part in the beginning
         var base64str = canvasEl.toDataURL('image/png').substring(22);
         replacement.src = new Buffer(base64str, 'base64');
-        
+
         // onload doesn't fire in some node versions, so we invoke callback manually
         _this._element = replacement;
         callback && callback();
@@ -16657,6 +16683,7 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
       });
     },
 
+    /* _TO_SVG_START_ */
     /**
      * Returns SVG representation of an instance
      * @return {String} svg representation of an instance
@@ -16813,6 +16840,7 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
       }
       return 'opacity="' + fillColor.getAlpha() + '" fill="' + fillColor.setAlpha(1).toRgb() + '"';
     },
+    /* _TO_SVG_END_ */
 
     /**
      * Sets "color" of an instance (alias of `set('fill', &hellip;)`)

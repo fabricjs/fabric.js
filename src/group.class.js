@@ -401,6 +401,7 @@
               centerY + halfHeight > point.y;
     },
 
+    /* _TO_SVG_START_ */
     /**
      * Returns svg representation of an instance
      * @return {String} svg representation of an instance
@@ -416,6 +417,7 @@
           objectsMarkup.join('') +
         '</g>');
     },
+    /* _TO_SVG_END_ */
 
     /**
      * Returns requested property

@@ -668,6 +668,7 @@
       });
     },
 
+    /* _TO_SVG_START_ */
     /**
      * Returns SVG representation of an instance
      * @return {String} svg representation of an instance
@@ -824,6 +825,7 @@
       }
       return 'opacity="' + fillColor.getAlpha() + '" fill="' + fillColor.setAlpha(1).toRgb() + '"';
     },
+    /* _TO_SVG_END_ */
 
     /**
      * Sets "color" of an instance (alias of `set('fill', &hellip;)`)

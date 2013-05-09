@@ -879,6 +879,7 @@
       return data;
     },
 
+    /* _TO_SVG_START_ */
     /**
      * Returns SVG representation of canvas
      * @function
@@ -951,6 +952,7 @@
 
       return markup.join('');
     },
+    /* _TO_SVG_END_ */
 
     /**
      * Removes an object from canvas and returns it

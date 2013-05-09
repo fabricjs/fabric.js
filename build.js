@@ -29,12 +29,14 @@ else if (minifier === 'uglifyjs') {
 
 var includeAllModules = modulesToInclude.length === 1 && modulesToInclude[0] === 'ALL';
 var noStrict = 'no-strict' in buildArgsAsObject;
+var noSVGExport = 'no-svg-export' in buildArgsAsObject;
 
 var distFileContents =
   '/* build: `node build.js modules=' +
     modulesToInclude.join(',') +
     (modulesToExclude.length ? (' exclude=' + modulesToExclude.join(',')) : '') +
     (noStrict ? ' no-strict' : '') +
+    (noSVGExport ? ' no-svg-export' : '') +
   '` */\n';
 
 function appendFileContents(fileNames, callback) {
@@ -53,10 +55,14 @@ function appendFileContents(fileNames, callback) {
 
     fs.readFile(__dirname + '/' + fileName, function (err, data) {
       if (err) throw err;
+      var strData = String(data);
       if (noStrict) {
-        data = String(data).replace(/"use strict";?\n?/, '');
+        strData = strData.replace(/"use strict";?\n?/, '');
       }
-      distFileContents += (data + '\n');
+      if (noSVGExport) {
+        strData = strData.replace(/\/\* _TO_SVG_START_ \*\/[\s\S]*\/\* _TO_SVG_END_ \*\//, '');
+      }
+      distFileContents += (strData + '\n');
       readNextFile();
     });
 

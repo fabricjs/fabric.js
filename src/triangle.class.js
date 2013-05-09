@@ -70,14 +70,7 @@
       ctx.closePath();
     },
 
-    /**
-     * Returns complexity of an instance
-     * @return {Number} complexity of this instance
-     */
-    complexity: function() {
-      return 1;
-    },
-
+    /* _TO_SVG_START_ */
     /**
      * Returns SVG representation of an instance
      * @return {String} svg representation of an instance
@@ -109,6 +102,15 @@
       );
 
       return markup.join('');
+    },
+    /* _TO_SVG_END_ */
+
+    /**
+     * Returns complexity of an instance
+     * @return {Number} complexity of this instance
+     */
+    complexity: function() {
+      return 1;
     }
   });
 
