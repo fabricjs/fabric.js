@@ -222,7 +222,7 @@
         Math.pow(this.currentWidth / 2, 2) +
         Math.pow(this.currentHeight / 2, 2));
 
-      var _angle = Math.atan(this.currentHeight / this.currentWidth);
+      var _angle = Math.atan(isFinite(this.currentHeight / this.currentWidth) ? this.currentHeight / this.currentWidth : 0);
 
       // offset added for rotate and scale actions
       var offsetX = Math.cos(_angle + theta) * _hypotenuse,
