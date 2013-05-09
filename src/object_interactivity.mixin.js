@@ -8,8 +8,8 @@
     /**
      * Determines which one of the four corners has been clicked
      * @private
-     * @param e {Event} event object
-     * @param offset {Object} canvas offset
+     * @param {Event} e Event object
+     * @param {Object} offset Canvas offset
      * @return {String|Boolean} corner code (tl, tr, bl, br, etc.), or false if nothing is found
      */
     _findTargetCorner: function(e, offset) {
@@ -107,9 +107,9 @@
     },
 
     /**
-     * Method that returns an object with the image lines in it given the coordinates of the corners
+     * Method that returns an object with the object edges in it, given the coordinates of the corners
      * @private
-     * @param oCoords {Object} coordinates of the image corners
+     * @param {Object} oCoords Coordinates of the image corners
      */
     _getImageLines: function(oCoords) {
       return {

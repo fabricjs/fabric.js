@@ -188,10 +188,10 @@
     },
 
     /**
-     * Applies one implementation of 'point inside polygon' algorithm
-     * @param e { Event } event object
-     * @param target { fabric.Object } object to test against
-     * @return {Boolean} true if point contains within area of given object
+     * Checks if point is contained within an area of given object
+     * @param {Event} e Event object
+     * @param {fabric.Object} target Object to test against
+     * @return {Boolean} true if point is contained within an area of given object
      */
     containsPoint: function (e, target) {
       var pointer = this.getPointer(e),
