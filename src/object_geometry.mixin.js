@@ -5,12 +5,12 @@
   fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
 
     /**
-     * Returns true if object intersects with an area formed by 2 points
-     * @param {Object} selectionTL
-     * @param {Object} selectionBR
-     * @return {Boolean}
+     * Checks if object intersects with an area formed by 2 points
+     * @param {Object} pointTL top-left point of area
+     * @param {Object} pointBR bottom-right point of area
+     * @return {Boolean} true if object intersects with an area formed by 2 points
      */
-    intersectsWithRect: function(selectionTL, selectionBR) {
+    intersectsWithRect: function(pointTL, pointBR) {
       var oCoords = this.oCoords,
           tl = new fabric.Point(oCoords.tl.x, oCoords.tl.y),
           tr = new fabric.Point(oCoords.tr.x, oCoords.tr.y),
@@ -19,16 +19,16 @@
 
       var intersection = fabric.Intersection.intersectPolygonRectangle(
         [tl, tr, br, bl],
-        selectionTL,
-        selectionBR
+        pointTL,
+        pointBR
       );
       return intersection.status === 'Intersection';
     },
 
     /**
-     * Returns true if object intersects with another object
+     * Checks if object intersects with another object
      * @param {Object} other Object to test
-     * @return {Boolean}
+     * @return {Boolean} true if object intersects with another object
      */
     intersectsWithObject: function(other) {
       // extracts coords
@@ -52,30 +52,121 @@
     },
 
     /**
-     * Returns true if object is fully contained within area of another object
+     * Checks if object is fully contained within area of another object
      * @param {Object} other Object to test
-     * @return {Boolean}
+     * @return {Boolean} true if object is fully contained within area of another object
      */
     isContainedWithinObject: function(other) {
-      return this.isContainedWithinRect(other.oCoords.tl, other.oCoords.br);
+      var boundingRect = other.getBoundingRect(),
+          point1 = new fabric.Point(boundingRect.left, boundingRect.top),
+          point2 = new fabric.Point(boundingRect.left + boundingRect.width, boundingRect.top + boundingRect.height);
+
+      return this.isContainedWithinRect(point1, point2);
     },
 
     /**
-     * Returns true if object is fully contained within area formed by 2 points
-     * @param {Object} selectionTL
-     * @param {Object} selectionBR
-     * @return {Boolean}
+     * Checks if object is fully contained within area formed by 2 points
+     * @param {Object} pointTL top-left point of area
+     * @param {Object} pointBR bottom-right point of area
+     * @return {Boolean} true if object is fully contained within area formed by 2 points
      */
-    isContainedWithinRect: function(selectionTL, selectionBR) {
-      var oCoords = this.oCoords,
-          tl = new fabric.Point(oCoords.tl.x, oCoords.tl.y),
-          tr = new fabric.Point(oCoords.tr.x, oCoords.tr.y),
-          bl = new fabric.Point(oCoords.bl.x, oCoords.bl.y);
+    isContainedWithinRect: function(pointTL, pointBR) {
+      var boundingRect = this.getBoundingRect();
 
-      return tl.x > selectionTL.x
-        && tr.x < selectionBR.x
-        && tl.y > selectionTL.y
-        && bl.y < selectionBR.y;
+      return (
+        boundingRect.left > pointTL.x &&
+        boundingRect.left + boundingRect.width < pointBR.x &&
+        boundingRect.top > pointTL.y &&
+        boundingRect.top + boundingRect.height < pointBR.y
+      );
+    },
+
+    /**
+     * Checks if point is inside the object
+     * @param {Object} point
+     * @return {Boolean} true if point is inside the object
+     */
+    containsPoint: function(point) {
+      var lines = this._getImageLines(this.oCoords),
+          xPoints = this._findCrossPoints(point, lines);
+
+      // if xPoints is odd then point is inside the object
+      return (xPoints !== 0 && xPoints % 2 === 1);
+    },
+
+    /**
+     * Method that returns an object with the object edges in it, given the coordinates of the corners
+     * @private
+     * @param {Object} oCoords Coordinates of the object corners
+     */
+    _getImageLines: function(oCoords) {
+      return {
+        topline: {
+          o: oCoords.tl,
+          d: oCoords.tr
+        },
+        rightline: {
+          o: oCoords.tr,
+          d: oCoords.br
+        },
+        bottomline: {
+          o: oCoords.br,
+          d: oCoords.bl
+        },
+        leftline: {
+          o: oCoords.bl,
+          d: oCoords.tl
+        }
+      };
+    },
+
+    /**
+     * Helper method to determine how many cross points are between the 4 object edges
+     * and the horizontal line determined by a point on canvas
+     * @private
+     * @param {Object} point
+     * @param {Object} oCoords Coordinates of the image being evaluated
+     */
+    _findCrossPoints: function(point, oCoords) {
+      var b1, b2, a1, a2, xi, yi,
+          xcount = 0,
+          iLine;
+
+      for (var lineKey in oCoords) {
+        iLine = oCoords[lineKey];
+        // optimisation 1: line below point. no cross
+        if ((iLine.o.y < point.y) && (iLine.d.y < point.y)) {
+          continue;
+        }
+        // optimisation 2: line above point. no cross
+        if ((iLine.o.y >= point.y) && (iLine.d.y >= point.y)) {
+          continue;
+        }
+        // optimisation 3: vertical line case
+        if ((iLine.o.x === iLine.d.x) && (iLine.o.x >= point.x)) {
+          xi = iLine.o.x;
+          yi = point.y;
+        }
+        // calculate the intersection point
+        else {
+          b1 = 0;
+          b2 = (iLine.d.y - iLine.o.y) / (iLine.d.x - iLine.o.x);
+          a1 = point.y- b1 * point.x;
+          a2 = iLine.o.y - b2 * iLine.o.x;
+
+          xi = - (a1 - a2) / (b1 - b2);
+          yi = a1 + b1 * xi;
+        }
+        // dont count xi < point.x cases
+        if (xi >= point.x) {
+          xcount += 1;
+        }
+        // optimisation 4: specific for square images
+        if (xcount === 2) {
+          break;
+        }
+      }
+      return xcount;
     },
 
     /**

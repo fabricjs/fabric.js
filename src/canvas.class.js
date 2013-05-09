@@ -195,23 +195,11 @@
      */
     containsPoint: function (e, target) {
       var pointer = this.getPointer(e),
-          xy = this._normalizePointer(target, pointer),
-          x = xy.x,
-          y = xy.y;
+          xy = this._normalizePointer(target, pointer);
 
       // http://www.geog.ubc.ca/courses/klink/gis.notes/ncgia/u32.html
       // http://idav.ucdavis.edu/~okreylos/TAship/Spring2000/PointInPolygon.html
-
-      // we iterate through each object. If target found, return it.
-      var iLines = target._getImageLines(target.oCoords),
-          xpoints = target._findCrossPoints(x, y, iLines);
-
-      // if xcount is odd then we clicked inside the object
-      // For the specific case of square images xcount === 1 in all true cases
-      if ((xpoints && xpoints % 2 === 1) || target._findTargetCorner(e, this._offset)) {
-        return true;
-      }
-      return false;
+      return (target.containsPoint(xy) || target._findTargetCorner(e, this._offset));
     },
 
     /**
@@ -661,7 +649,9 @@
         if (!currentObject) continue;
 
         if (currentObject.intersectsWithRect(selectionX1Y1, selectionX2Y2) ||
-            currentObject.isContainedWithinRect(selectionX1Y1, selectionX2Y2)) {
+            currentObject.isContainedWithinRect(selectionX1Y1, selectionX2Y2) ||
+            currentObject.containsPoint(selectionX1Y1) ||
+            currentObject.containsPoint(selectionX2Y2)) {
 
           if (this.selection && currentObject.selectable) {
             currentObject.set('active', true);

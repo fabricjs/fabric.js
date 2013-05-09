@@ -18,7 +18,7 @@
       var pointer = getPointer(e, this.canvas.upperCanvasEl),
           ex = pointer.x - offset.left,
           ey = pointer.y - offset.top,
-          xpoints,
+          xPoints,
           lines;
 
       for (var i in this.oCoords) {
@@ -31,7 +31,7 @@
           continue;
         }
 
-        lines = this._getImageLines(this.oCoords[i].corner, i);
+        lines = this._getImageLines(this.oCoords[i].corner);
 
         // debugging
 
@@ -47,89 +47,13 @@
         // canvas.contextTop.fillRect(lines.rightline.d.x, lines.rightline.d.y, 2, 2);
         // canvas.contextTop.fillRect(lines.rightline.o.x, lines.rightline.o.y, 2, 2);
 
-        xpoints = this._findCrossPoints(ex, ey, lines);
-        if (xpoints % 2 === 1 && xpoints !== 0) {
+        xPoints = this._findCrossPoints({x: ex, y: ey}, lines);
+        if (xPoints !== 0 && xPoints % 2 === 1) {
           this.__corner = i;
           return i;
         }
       }
       return false;
-    },
-
-    /**
-     * Helper method to determine how many cross points are between the 4 image edges
-     * and the horizontal line determined by the position of our mouse when clicked on canvas
-     * @private
-     * @param ex {Number} x coordinate of the mouse
-     * @param ey {Number} y coordinate of the mouse
-     * @param oCoords {Object} Coordinates of the image being evaluated
-     */
-    _findCrossPoints: function(ex, ey, oCoords) {
-      var b1, b2, a1, a2, xi, yi,
-          xcount = 0,
-          iLine;
-
-      for (var lineKey in oCoords) {
-        iLine = oCoords[lineKey];
-        // optimisation 1: line below dot. no cross
-        if ((iLine.o.y < ey) && (iLine.d.y < ey)) {
-          continue;
-        }
-        // optimisation 2: line above dot. no cross
-        if ((iLine.o.y >= ey) && (iLine.d.y >= ey)) {
-          continue;
-        }
-        // optimisation 3: vertical line case
-        if ((iLine.o.x === iLine.d.x) && (iLine.o.x >= ex)) {
-          xi = iLine.o.x;
-          yi = ey;
-        }
-        // calculate the intersection point
-        else {
-          b1 = 0;
-          b2 = (iLine.d.y-iLine.o.y)/(iLine.d.x-iLine.o.x);
-          a1 = ey-b1*ex;
-          a2 = iLine.o.y-b2*iLine.o.x;
-
-          xi = - (a1-a2)/(b1-b2);
-          yi = a1+b1*xi;
-        }
-        // dont count xi < ex cases
-        if (xi >= ex) {
-          xcount += 1;
-        }
-        // optimisation 4: specific for square images
-        if (xcount === 2) {
-          break;
-        }
-      }
-      return xcount;
-    },
-
-    /**
-     * Method that returns an object with the object edges in it, given the coordinates of the corners
-     * @private
-     * @param {Object} oCoords Coordinates of the image corners
-     */
-    _getImageLines: function(oCoords) {
-      return {
-        topline: {
-          o: oCoords.tl,
-          d: oCoords.tr
-        },
-        rightline: {
-          o: oCoords.tr,
-          d: oCoords.br
-        },
-        bottomline: {
-          o: oCoords.br,
-          d: oCoords.bl
-        },
-        leftline: {
-          o: oCoords.bl,
-          d: oCoords.tl
-        }
-      };
     },
 
     /**
