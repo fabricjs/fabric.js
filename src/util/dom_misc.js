@@ -100,15 +100,25 @@
    * @return {Object} Object with "left" and "top" properties
    */
   function getElementOffset(element) {
-    // TODO (kangax): need to fix this method
-    var valueT = 0, valueL = 0;
-    do {
-      valueT += element.offsetTop  || 0;
-      valueL += element.offsetLeft || 0;
-      element = element.offsetParent;
+    var docElem, win,
+        box = {left: 0, top: 0},
+        doc = element && element.ownerDocument;
+    if (!doc){
+      return {left: 0, top: 0}
     }
-    while (element);
-    return ({ left: valueL, top: valueT });
+    docElem = doc.documentElement;
+    if ( typeof element.getBoundingClientRect !== "undefined" ) {
+      box = element.getBoundingClientRect();
+    }
+    if(doc != null && doc == doc.window){
+      win = doc;
+    } else {
+      win = doc.nodeType === 9 && doc.defaultView;
+    }
+    return {
+      left: box.left + win.pageXOffset - (docElem.clientLeft || 0),
+      top: box.top + win.pageYOffset - (docElem.clientTop || 0)
+    };
   }
 
   /**
