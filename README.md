@@ -106,6 +106,15 @@ These are the optional modules that could be specified for inclusion, when build
 - **gestures** — Adds support for multitouch gestures with help of [Event.js](https://github.com/mudcube/Event.js)
 - **object_straightening** — Adds support for rotating an object to one of 0, 90, 180, 270, etc. depending on which is angle is closer.
 
+Additional flags for build script are:
+
+- **no-strict** — Strips "use strict" directives from source
+- **no-svg-export** — Removes svg exporting functionality
+
+For example:
+
+    node build.js modules=ALL exclude=json no-strict no-svg-export
+
 ### Examples of use
 
 #### Adding red rectangle to canvas
