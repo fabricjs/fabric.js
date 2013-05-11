@@ -26,23 +26,17 @@ fabric.Image.filters.Grayscale = fabric.util.createClass( /** @lends fabric.Imag
     var context = canvasEl.getContext('2d'),
         imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
         data = imageData.data,
-        iLen = imageData.width,
-        jLen = imageData.height,
-        index, average, i, j;
-
-     for (i = 0; i < iLen; i++) {
-       for (j = 0; j < jLen; j++) {
-
-         index = (i * 4) * jLen + (j * 4);
-         average = (data[index] + data[index + 1] + data[index + 2]) / 3;
-
-         data[index]     = average;
-         data[index + 1] = average;
-         data[index + 2] = average;
-       }
-     }
-
-     context.putImageData(imageData, 0, 0);
+        len = imageData.width * imageData.height * 4,
+        index = 0,
+        average;
+    while (index < len) {
+      average = (data[index] + data[index + 1] + data[index + 2]) / 3;
+      data[index]     = average;
+      data[index + 1] = average;
+      data[index + 2] = average;
+      index += 4;
+    }
+    context.putImageData(imageData, 0, 0);
   },
 
   /**
