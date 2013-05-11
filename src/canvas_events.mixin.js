@@ -50,6 +50,7 @@
 
     /**
      * @private
+     * @param {Event} e Event object fired on mousedown
      */
     _onMouseDown: function (e) {
       this.__onMouseDown(e);
@@ -66,6 +67,7 @@
 
     /**
      * @private
+     * @param {Event} e Event object fired on mouseup
      */
     _onMouseUp: function (e) {
       this.__onMouseUp(e);
@@ -82,6 +84,7 @@
 
     /**
      * @private
+     * @param {Event} e Event object fired on mousemove
      */
     _onMouseMove: function (e) {
       e.preventDefault && e.preventDefault();
@@ -174,7 +177,7 @@
      * canvas so the current image can be placed on the top canvas and the rest
      * in on the container one.
      * @private
-     * @param e {Event} Event object fired on mousedown
+     * @param {Event} e Event object fired on mousedown
      */
     __onMouseDown: function (e) {
 
@@ -209,6 +212,10 @@
         this.deactivateAllWithDispatch();
         target && target.selectable && this.setActiveObject(target, e);
       }
+      else if (this._shouldHandleGroupLogic(e, target)) {
+        this._handleGroupLogic(e, target);
+        target = this.getActiveGroup();
+      }
       else {
         // determine if it's a drag or rotate case
         this.stateful && target.saveState();
@@ -217,15 +224,9 @@
           this.onBeforeScaleRotate(target);
         }
 
-        if (this._shouldHandleGroupLogic(e, target)) {
-          this._handleGroupLogic(e, target);
-          target = this.getActiveGroup();
-        }
-        else {
-          if (target !== this.getActiveGroup() && target !== this.getActiveObject()) {
-            this.deactivateAll();
-            this.setActiveObject(target, e);
-          }
+        if (target !== this.getActiveGroup() && target !== this.getActiveObject()) {
+          this.deactivateAll();
+          this.setActiveObject(target, e);
         }
 
         this._setupCurrentTransform(e, target);
@@ -252,7 +253,7 @@
       * all any other type of action.
       * In case of an image transformation only the top canvas will be rendered.
       * @private
-      * @param e {Event} Event object fired on mousemove
+      * @param {Event} e Event object fired on mousemove
       */
     __onMouseMove: function (e) {
 
@@ -379,8 +380,8 @@
     /**
      * Sets the cursor depending on where the canvas is being hovered.
      * Note: very buggy in Opera
-     * @param e {Event} Event object
-     * @param target {Object} Object that the mouse is hovering, if so.
+     * @param {Event} e Event object
+     * @param {Object} target Object that the mouse is hovering, if so.
      */
     _setCursorFromEvent: function (e, target) {
       var s = this.upperCanvasEl.style;
