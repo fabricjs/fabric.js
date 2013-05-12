@@ -1,4 +1,4 @@
-### Fabric 
+### Fabric
 [![Build Status](https://secure.travis-ci.org/kangax/fabric.js.png?branch=master)](http://travis-ci.org/#!/kangax/fabric.js)
 <a href="https://npmjs.org/package/fabric"><img src="https://badge.fury.io/js/fabric.png"></a>
 
@@ -12,7 +12,7 @@ Using Fabric.js, you can create and populate objects on canvas; objects like sim
 
 ### Goals
 
-- Unit tested (1500+ tests at the moment)
+- Unit tested (1570+ tests at the moment)
 - Modular (~40 small "classes", modules, mixins)
 - Cross-browser
 - [Fast](https://github.com/kangax/fabric.js/wiki/Focus-on-speed)

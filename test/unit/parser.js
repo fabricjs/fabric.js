@@ -155,6 +155,18 @@
     deepEqual(expectedObject, fabric.parseStyleAttribute(element));
   });
 
+  test('parseStyleAttribute with short font declaration', function() {
+    var element = fabric.document.createElement('path');
+    element.setAttribute('style', 'font: italic 12px Arial,Helvetica,sans-serif');
+
+    var expectedObject = {
+      'fontSize': 12,
+      'fontStyle': 'italic',
+      'fontFamily': 'Arial,Helvetica,sans-serif'
+    };
+    deepEqual(expectedObject, fabric.parseStyleAttribute(element));
+  });
+
   test('parseAttributes (style to have higher priority than attribute)', function() {
     var element = fabric.document.createElement('path');
     element.setAttribute('style', 'fill:red');

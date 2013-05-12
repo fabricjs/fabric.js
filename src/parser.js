@@ -287,6 +287,34 @@
     return parsedPoints;
   }
 
+  function parseFontDeclaration(value, oStyle) {
+
+    // TODO: support non-px font size
+    var match = value.match(/(normal|italic)?\s*(normal|small-caps)?\s*(normal|bold|bolder|lighter|100|200|300|400|500|600|700|800|900)?\s*(\d+)px\s+(.*)/);
+
+    if (!match) return;
+
+    var fontStyle = match[1];
+    // Font variant is not used
+    // var fontVariant = match[2];
+    var fontWeight = match[3];
+    var fontSize = match[4];
+    var fontFamily = match[5];
+
+    if (fontStyle) {
+      oStyle.fontStyle = fontStyle;
+    }
+    if (fontWeight) {
+      oStyle.fontSize = isNaN(parseFloat(fontWeight)) ? fontWeight : parseFloat(fontWeight);
+    }
+    if (fontSize) {
+      oStyle.fontSize = parseFloat(fontSize);
+    }
+    if (fontFamily) {
+      oStyle.fontFamily = fontFamily;
+    }
+  }
+
   /**
    * Parses "style" attribute, retuning an object with values
    * @static
@@ -301,16 +329,20 @@
     if (!style) return oStyle;
 
     if (typeof style === 'string') {
-      style = style.replace(/;$/, '').split(';').forEach(function (current) {
+      style.replace(/;$/, '').split(';').forEach(function (chunk) {
 
-        var pair = current.split(':');
+        var pair = chunk.split(':');
         var attr = normalizeAttr(pair[0].trim().toLowerCase());
         var value = normalizeValue(attr, pair[1].trim());
 
-        // TODO: need to normalize em, %, pt, etc. to px (!)
-        var parsed = parseFloat(value);
-
-        oStyle[attr] = isNaN(parsed) ? value : parsed;
+        if (attr === 'font') {
+          parseFontDeclaration(value, oStyle);
+        }
+        else {
+          // TODO: need to normalize em, %, pt, etc. to px (!)
+          var parsed = parseFloat(value);
+          oStyle[attr] = isNaN(parsed) ? value : parsed;
+        }
       });
     }
     else {
@@ -319,9 +351,15 @@
 
         var attr = normalizeAttr(prop.toLowerCase());
         var value = normalizeValue(attr, style[prop]);
-        var parsed = parseFloat(value);
 
-        oStyle[attr] = isNaN(parsed) ? value : parsed;
+        if (attr === 'font') {
+          parseFontDeclaration(value, oStyle);
+        }
+        else {
+          // TODO: need to normalize em, %, pt, etc. to px (!)
+          var parsed = parseFloat(value);
+          oStyle[attr] = isNaN(parsed) ? value : parsed;
+        }
       }
     }
 
