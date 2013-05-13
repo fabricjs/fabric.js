@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures` */
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.1.13" };
+var fabric = fabric || { version: "1.1.14" };
 
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
@@ -10995,23 +10995,13 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       var hypotHalf = this.getWidth() / 2;
       var xHalf = Math.cos(angle) * hypotHalf;
       var yHalf = Math.sin(angle) * hypotHalf;
-
-      var hypotFull = this.getWidth();
-      var xFull = Math.cos(angle) * hypotFull;
-      var yFull = Math.sin(angle) * hypotFull;
-
       var x = this.left;
       var y = this.top;
 
-      if (this.originX === 'center') {
+      if (this.originX === 'center' || this.originX === 'right') {
         // move half left
         x -= xHalf;
         y -= yHalf;
-      }
-      else if (this.originX === 'right') {
-        // move full left
-        x -= xFull;
-        y -= yFull;
       }
 
       return { x: x, y: y };

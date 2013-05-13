@@ -203,23 +203,13 @@
       var hypotHalf = this.getWidth() / 2;
       var xHalf = Math.cos(angle) * hypotHalf;
       var yHalf = Math.sin(angle) * hypotHalf;
-
-      var hypotFull = this.getWidth();
-      var xFull = Math.cos(angle) * hypotFull;
-      var yFull = Math.sin(angle) * hypotFull;
-
       var x = this.left;
       var y = this.top;
 
-      if (this.originX === 'center') {
+      if (this.originX === 'center' || this.originX === 'right') {
         // move half left
         x -= xHalf;
         y -= yHalf;
-      }
-      else if (this.originX === 'right') {
-        // move full left
-        x -= xFull;
-        y -= yFull;
       }
 
       return { x: x, y: y };
