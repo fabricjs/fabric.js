@@ -2462,6 +2462,8 @@ fabric.Collection = {
 
   var slice = Array.prototype.slice;
 
+  /* _ES5_COMPAT_START_ */
+
   if (!Array.prototype.indexOf) {
     /**
      * Finds index of an element in an array
@@ -2626,6 +2628,8 @@ fabric.Collection = {
     };
   }
 
+  /* _ES5_COMPAT_END_ */
+
   /**
    * Invokes method on all items in a given array
    * @memberOf fabric.util.array
@@ -2748,6 +2752,7 @@ fabric.Collection = {
 
 (function() {
 
+/* _ES5_COMPAT_START_ */
 if (!String.prototype.trim) {
   /**
    * Trims a string (removing whitespace from the beginning and the end)
@@ -2759,6 +2764,7 @@ if (!String.prototype.trim) {
     return this.replace(/^[\s\xA0]+/, '').replace(/[\s\xA0]+$/, '');
   };
 }
+/* _ES5_COMPAT_END_ */
 
 /**
  * Camelizes a string
@@ -2807,6 +2813,7 @@ fabric.util.string = {
 };
 }());
 
+/* _ES5_COMPAT_START_ */
 (function() {
 
   var slice = Array.prototype.slice,
@@ -2842,6 +2849,8 @@ fabric.util.string = {
   }
 
 })();
+/* _ES5_COMPAT_END_ */
+
 (function() {
 
   var slice = Array.prototype.slice, emptyFunction = function() { };
@@ -3455,9 +3464,6 @@ fabric.util.string = {
       var headEl = fabric.document.getElementsByTagName("head")[0],
           scriptEl = fabric.document.createElement('script'),
           loading = true;
-
-      scriptEl.type = 'text/javascript';
-      scriptEl.setAttribute('runat', 'server');
 
       /** @ignore */
       scriptEl.onload = /** @ignore */ scriptEl.onreadystatechange = function(e) {
