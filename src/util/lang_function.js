@@ -1,3 +1,4 @@
+/* _ES5_COMPAT_START_ */
 (function() {
 
   var slice = Array.prototype.slice,
@@ -33,3 +34,4 @@
   }
 
 })();
+/* _ES5_COMPAT_END_ */

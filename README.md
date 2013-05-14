@@ -110,6 +110,7 @@ Additional flags for build script are:
 
 - **no-strict** — Strips "use strict" directives from source
 - **no-svg-export** — Removes svg exporting functionality
+- **no-es5-compat** - Removes ES5 compat methods (Array.prototype.*, String.prototype.*, Function.prototype.*)
 
 For example:
 

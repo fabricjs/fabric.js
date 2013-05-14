@@ -1,5 +1,6 @@
 (function() {
 
+/* _ES5_COMPAT_START_ */
 if (!String.prototype.trim) {
   /**
    * Trims a string (removing whitespace from the beginning and the end)
@@ -11,6 +12,7 @@ if (!String.prototype.trim) {
     return this.replace(/^[\s\xA0]+/, '').replace(/[\s\xA0]+$/, '');
   };
 }
+/* _ES5_COMPAT_END_ */
 
 /**
  * Camelizes a string
