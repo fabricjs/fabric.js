@@ -211,9 +211,6 @@
           scriptEl = fabric.document.createElement('script'),
           loading = true;
 
-      scriptEl.type = 'text/javascript';
-      scriptEl.setAttribute('runat', 'server');
-
       /** @ignore */
       scriptEl.onload = /** @ignore */ scriptEl.onreadystatechange = function(e) {
         if (loading) {

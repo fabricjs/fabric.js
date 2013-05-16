@@ -2,6 +2,8 @@
 
   var slice = Array.prototype.slice;
 
+  /* _ES5_COMPAT_START_ */
+
   if (!Array.prototype.indexOf) {
     /**
      * Finds index of an element in an array
@@ -165,6 +167,8 @@
       return rv;
     };
   }
+
+  /* _ES5_COMPAT_END_ */
 
   /**
    * Invokes method on all items in a given array

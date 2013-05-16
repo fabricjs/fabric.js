@@ -1,4 +1,4 @@
-### Fabric 
+### Fabric
 [![Build Status](https://secure.travis-ci.org/kangax/fabric.js.png?branch=master)](http://travis-ci.org/#!/kangax/fabric.js)
 <a href="https://npmjs.org/package/fabric"><img src="https://badge.fury.io/js/fabric.png"></a>
 
@@ -12,7 +12,7 @@ Using Fabric.js, you can create and populate objects on canvas; objects like sim
 
 ### Goals
 
-- Unit tested (1500+ tests at the moment)
+- Unit tested (1570+ tests at the moment)
 - Modular (~40 small "classes", modules, mixins)
 - Cross-browser
 - [Fast](https://github.com/kangax/fabric.js/wiki/Focus-on-speed)
@@ -105,6 +105,16 @@ These are the optional modules that could be specified for inclusion, when build
 - **freedrawing** — Adds support for free drawing
 - **gestures** — Adds support for multitouch gestures with help of [Event.js](https://github.com/mudcube/Event.js)
 - **object_straightening** — Adds support for rotating an object to one of 0, 90, 180, 270, etc. depending on which is angle is closer.
+
+Additional flags for build script are:
+
+- **no-strict** — Strips "use strict" directives from source
+- **no-svg-export** — Removes svg exporting functionality
+- **no-es5-compat** - Removes ES5 compat methods (Array.prototype.*, String.prototype.*, Function.prototype.*)
+
+For example:
+
+    node build.js modules=ALL exclude=json no-strict no-svg-export
 
 ### Examples of use
 

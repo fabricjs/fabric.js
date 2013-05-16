@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures` */
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.1.13" };
+var fabric = fabric || { version: "1.1.14" };
 
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
@@ -2462,6 +2462,8 @@ fabric.Collection = {
 
   var slice = Array.prototype.slice;
 
+  /* _ES5_COMPAT_START_ */
+
   if (!Array.prototype.indexOf) {
     /**
      * Finds index of an element in an array
@@ -2626,6 +2628,8 @@ fabric.Collection = {
     };
   }
 
+  /* _ES5_COMPAT_END_ */
+
   /**
    * Invokes method on all items in a given array
    * @memberOf fabric.util.array
@@ -2748,6 +2752,7 @@ fabric.Collection = {
 
 (function() {
 
+/* _ES5_COMPAT_START_ */
 if (!String.prototype.trim) {
   /**
    * Trims a string (removing whitespace from the beginning and the end)
@@ -2759,6 +2764,7 @@ if (!String.prototype.trim) {
     return this.replace(/^[\s\xA0]+/, '').replace(/[\s\xA0]+$/, '');
   };
 }
+/* _ES5_COMPAT_END_ */
 
 /**
  * Camelizes a string
@@ -2807,6 +2813,7 @@ fabric.util.string = {
 };
 }());
 
+/* _ES5_COMPAT_START_ */
 (function() {
 
   var slice = Array.prototype.slice,
@@ -2842,6 +2849,8 @@ fabric.util.string = {
   }
 
 })();
+/* _ES5_COMPAT_END_ */
+
 (function() {
 
   var slice = Array.prototype.slice, emptyFunction = function() { };
@@ -3455,9 +3464,6 @@ fabric.util.string = {
       var headEl = fabric.document.getElementsByTagName("head")[0],
           scriptEl = fabric.document.createElement('script'),
           loading = true;
-
-      scriptEl.type = 'text/javascript';
-      scriptEl.setAttribute('runat', 'server');
 
       /** @ignore */
       scriptEl.onload = /** @ignore */ scriptEl.onreadystatechange = function(e) {
@@ -4182,6 +4188,34 @@ fabric.util.string = {
     return parsedPoints;
   }
 
+  function parseFontDeclaration(value, oStyle) {
+
+    // TODO: support non-px font size
+    var match = value.match(/(normal|italic)?\s*(normal|small-caps)?\s*(normal|bold|bolder|lighter|100|200|300|400|500|600|700|800|900)?\s*(\d+)px\s+(.*)/);
+
+    if (!match) return;
+
+    var fontStyle = match[1];
+    // Font variant is not used
+    // var fontVariant = match[2];
+    var fontWeight = match[3];
+    var fontSize = match[4];
+    var fontFamily = match[5];
+
+    if (fontStyle) {
+      oStyle.fontStyle = fontStyle;
+    }
+    if (fontWeight) {
+      oStyle.fontSize = isNaN(parseFloat(fontWeight)) ? fontWeight : parseFloat(fontWeight);
+    }
+    if (fontSize) {
+      oStyle.fontSize = parseFloat(fontSize);
+    }
+    if (fontFamily) {
+      oStyle.fontFamily = fontFamily;
+    }
+  }
+
   /**
    * Parses "style" attribute, retuning an object with values
    * @static
@@ -4196,16 +4230,20 @@ fabric.util.string = {
     if (!style) return oStyle;
 
     if (typeof style === 'string') {
-      style = style.replace(/;$/, '').split(';').forEach(function (current) {
+      style.replace(/;$/, '').split(';').forEach(function (chunk) {
 
-        var pair = current.split(':');
+        var pair = chunk.split(':');
         var attr = normalizeAttr(pair[0].trim().toLowerCase());
         var value = normalizeValue(attr, pair[1].trim());
 
-        // TODO: need to normalize em, %, pt, etc. to px (!)
-        var parsed = parseFloat(value);
-
-        oStyle[attr] = isNaN(parsed) ? value : parsed;
+        if (attr === 'font') {
+          parseFontDeclaration(value, oStyle);
+        }
+        else {
+          // TODO: need to normalize em, %, pt, etc. to px (!)
+          var parsed = parseFloat(value);
+          oStyle[attr] = isNaN(parsed) ? value : parsed;
+        }
       });
     }
     else {
@@ -4214,9 +4252,15 @@ fabric.util.string = {
 
         var attr = normalizeAttr(prop.toLowerCase());
         var value = normalizeValue(attr, style[prop]);
-        var parsed = parseFloat(value);
 
-        oStyle[attr] = isNaN(parsed) ? value : parsed;
+        if (attr === 'font') {
+          parseFontDeclaration(value, oStyle);
+        }
+        else {
+          // TODO: need to normalize em, %, pt, etc. to px (!)
+          var parsed = parseFloat(value);
+          oStyle[attr] = isNaN(parsed) ? value : parsed;
+        }
       }
     }
 
@@ -8845,6 +8889,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
     /**
      * @private
+     * @param {Event} e Event object fired on mousedown
      */
     _onMouseDown: function (e) {
       this.__onMouseDown(e);
@@ -8861,6 +8906,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
     /**
      * @private
+     * @param {Event} e Event object fired on mouseup
      */
     _onMouseUp: function (e) {
       this.__onMouseUp(e);
@@ -8877,6 +8923,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
     /**
      * @private
+     * @param {Event} e Event object fired on mousemove
      */
     _onMouseMove: function (e) {
       e.preventDefault && e.preventDefault();
@@ -8969,7 +9016,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * canvas so the current image can be placed on the top canvas and the rest
      * in on the container one.
      * @private
-     * @param e {Event} Event object fired on mousedown
+     * @param {Event} e Event object fired on mousedown
      */
     __onMouseDown: function (e) {
 
@@ -9004,6 +9051,10 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         this.deactivateAllWithDispatch();
         target && target.selectable && this.setActiveObject(target, e);
       }
+      else if (this._shouldHandleGroupLogic(e, target)) {
+        this._handleGroupLogic(e, target);
+        target = this.getActiveGroup();
+      }
       else {
         // determine if it's a drag or rotate case
         this.stateful && target.saveState();
@@ -9012,15 +9063,9 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
           this.onBeforeScaleRotate(target);
         }
 
-        if (this._shouldHandleGroupLogic(e, target)) {
-          this._handleGroupLogic(e, target);
-          target = this.getActiveGroup();
-        }
-        else {
-          if (target !== this.getActiveGroup() && target !== this.getActiveObject()) {
-            this.deactivateAll();
-            this.setActiveObject(target, e);
-          }
+        if (target !== this.getActiveGroup() && target !== this.getActiveObject()) {
+          this.deactivateAll();
+          this.setActiveObject(target, e);
         }
 
         this._setupCurrentTransform(e, target);
@@ -9047,7 +9092,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       * all any other type of action.
       * In case of an image transformation only the top canvas will be rendered.
       * @private
-      * @param e {Event} Event object fired on mousemove
+      * @param {Event} e Event object fired on mousemove
       */
     __onMouseMove: function (e) {
 
@@ -9174,8 +9219,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     /**
      * Sets the cursor depending on where the canvas is being hovered.
      * Note: very buggy in Opera
-     * @param e {Event} Event object
-     * @param target {Object} Object that the mouse is hovering, if so.
+     * @param {Event} e Event object
+     * @param {Object} target Object that the mouse is hovering, if so.
      */
     _setCursorFromEvent: function (e, target) {
       var s = this.upperCanvasEl.style;
@@ -10909,38 +10954,29 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @param {String} to One of left, center, right
      */
     adjustPosition: function(to) {
-
       var angle = degreesToRadians(this.angle);
-
       var hypotHalf = this.getWidth() / 2;
       var xHalf = Math.cos(angle) * hypotHalf;
-      var yHalf = Math.sin(angle) * hypotHalf;
-
       var hypotFull = this.getWidth();
       var xFull = Math.cos(angle) * hypotFull;
-      var yFull = Math.sin(angle) * hypotFull;
 
       if (this.originX === 'center' && to === 'left' ||
           this.originX === 'right' && to === 'center') {
         // move half left
         this.left -= xHalf;
-        this.top -= yHalf;
       }
       else if (this.originX === 'left' && to === 'center' ||
                this.originX === 'center' && to === 'right') {
         // move half right
         this.left += xHalf;
-        this.top += yHalf;
       }
       else if (this.originX === 'left' && to === 'right') {
         // move full right
         this.left += xFull;
-        this.top += yFull;
       }
       else if (this.originX === 'right' && to === 'left') {
         // move full left
         this.left -= xFull;
-        this.top -= yFull;
       }
 
       this.setCoords();
@@ -10956,23 +10992,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       var hypotHalf = this.getWidth() / 2;
       var xHalf = Math.cos(angle) * hypotHalf;
       var yHalf = Math.sin(angle) * hypotHalf;
-
-      var hypotFull = this.getWidth();
-      var xFull = Math.cos(angle) * hypotFull;
-      var yFull = Math.sin(angle) * hypotFull;
-
       var x = this.left;
       var y = this.top;
 
-      if (this.originX === 'center') {
-        // move half left
+      if (this.originX === 'center' || this.originX === 'right') {
         x -= xHalf;
-        y -= yHalf;
       }
-      else if (this.originX === 'right') {
-        // move full left
-        x -= xFull;
-        y -= yFull;
+      if (this.originY === 'center' || this.originY === 'bottom') {
+        y -= yHalf;
       }
 
       return { x: x, y: y };
@@ -15269,23 +15296,17 @@ fabric.Image.filters.Grayscale = fabric.util.createClass( /** @lends fabric.Imag
     var context = canvasEl.getContext('2d'),
         imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
         data = imageData.data,
-        iLen = imageData.width,
-        jLen = imageData.height,
-        index, average, i, j;
-
-     for (i = 0; i < iLen; i++) {
-       for (j = 0; j < jLen; j++) {
-
-         index = (i * 4) * jLen + (j * 4);
-         average = (data[index] + data[index + 1] + data[index + 2]) / 3;
-
-         data[index]     = average;
-         data[index + 1] = average;
-         data[index + 2] = average;
-       }
-     }
-
-     context.putImageData(imageData, 0, 0);
+        len = imageData.width * imageData.height * 4,
+        index = 0,
+        average;
+    while (index < len) {
+      average = (data[index] + data[index + 1] + data[index + 2]) / 3;
+      data[index]     = average;
+      data[index + 1] = average;
+      data[index + 2] = average;
+      index += 4;
+    }
+    context.putImageData(imageData, 0, 0);
   },
 
   /**

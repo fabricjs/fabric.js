@@ -30,6 +30,7 @@ else if (minifier === 'uglifyjs') {
 var includeAllModules = modulesToInclude.length === 1 && modulesToInclude[0] === 'ALL';
 var noStrict = 'no-strict' in buildArgsAsObject;
 var noSVGExport = 'no-svg-export' in buildArgsAsObject;
+var noES5Compat = 'no-es5-compat' in buildArgsAsObject;
 
 var distFileContents =
   '/* build: `node build.js modules=' +
@@ -37,6 +38,7 @@ var distFileContents =
     (modulesToExclude.length ? (' exclude=' + modulesToExclude.join(',')) : '') +
     (noStrict ? ' no-strict' : '') +
     (noSVGExport ? ' no-svg-export' : '') +
+    (noES5Compat ? ' no-es5-compat' : '') +
   '` */\n';
 
 function appendFileContents(fileNames, callback) {
@@ -61,6 +63,9 @@ function appendFileContents(fileNames, callback) {
       }
       if (noSVGExport) {
         strData = strData.replace(/\/\* _TO_SVG_START_ \*\/[\s\S]*\/\* _TO_SVG_END_ \*\//, '');
+      }
+      if (noES5Compat) {
+        strData = strData.replace(/\/\* _ES5_COMPAT_START_ \*\/[\s\S]*\/\* _ES5_COMPAT_END_ \*\//, '');
       }
       distFileContents += (strData + '\n');
       readNextFile();
@@ -142,7 +147,8 @@ var filesToInclude = [
   'src/object.class.js',
   'src/object_origin.mixin.js',
   'src/object_geometry.mixin.js',
-  'src/stateful.mixin.js',
+
+  ifSpecifiedInclude('stateful', 'src/stateful.mixin.js'),
 
   ifSpecifiedInclude('interaction', 'src/object_interactivity.mixin.js'),
 
