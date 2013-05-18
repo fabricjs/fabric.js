@@ -213,10 +213,7 @@
    * List of attribute names to account for when parsing SVG element (used by `fabric.Rect.fromElement`)
    * @static
    */
-  fabric.Rect.ATTRIBUTE_NAMES = (
-    'x y width height rx ry fill fill-opacity opacity stroke stroke-width stroke-dasharray ' +
-    'stroke-linejoin stroke-linecap stroke-miterlimit transform'
-  ).split(' ');
+  fabric.Rect.ATTRIBUTE_NAMES = fabric.SHARED_ATTRIBUTES.concat('x y rx ry width height'.split(' '));
 
   /**
    * @private

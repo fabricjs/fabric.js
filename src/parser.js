@@ -13,6 +13,13 @@
       clone = fabric.util.object.clone,
       multiplyTransformMatrices = fabric.util.multiplyTransformMatrices;
 
+  fabric.SHARED_ATTRIBUTES = [
+    "transform",
+    "fill", "fill-rule", "fill-opacity",
+    "opacity",
+    "stroke", "stroke-dasharray", "stroke-linecap", "stroke-linejoin", "stroke-miterlimit", "stroke-width"
+  ];
+
   var attributesMap = {
     'cx':               'left',
     'x':                'left',

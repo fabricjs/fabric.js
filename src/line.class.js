@@ -176,10 +176,7 @@
    * @static
    * @see http://www.w3.org/TR/SVG/shapes.html#LineElement
    */
-  fabric.Line.ATTRIBUTE_NAMES = (
-    'x1 y1 x2 y2 stroke stroke-width stroke-dasharray ' +
-    'stroke-linejoin stroke-linecap stroke-miterlimit transform'
-  ).split(' ');
+  fabric.Line.ATTRIBUTE_NAMES = fabric.SHARED_ATTRIBUTES.concat('x1 y1 x2 y2'.split(' '));
 
   /**
    * Returns fabric.Line instance from an SVG element

@@ -162,10 +162,7 @@
    * @static
    * @see: http://www.w3.org/TR/SVG/shapes.html#PolygonElement
    */
-  fabric.Polygon.ATTRIBUTE_NAMES = (
-    'fill fill-opacity opacity stroke stroke-width stroke-dasharray ' +
-    'stroke-linejoin stroke-linecap stroke-miterlimit transform'
-  ).split(' ');
+  fabric.Polygon.ATTRIBUTE_NAMES = fabric.SHARED_ATTRIBUTES.concat();
 
   /**
    * Returns {@link fabric.Polygon} instance from an SVG element

@@ -796,10 +796,7 @@
    * @static
    * @see http://www.w3.org/TR/SVG/paths.html#PathElement
    */
-  fabric.Path.ATTRIBUTE_NAMES = (
-    'd fill fill-opacity opacity fill-rule stroke stroke-width stroke-dasharray ' +
-    'stroke-linejoin stroke-linecap stroke-miterlimit transform'
-  ).split(' ');
+  fabric.Path.ATTRIBUTE_NAMES = fabric.SHARED_ATTRIBUTES.concat(['d']);
 
   /**
    * Creates an instance of fabric.Path from an SVG <path> element

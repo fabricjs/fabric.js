@@ -102,8 +102,8 @@ var filesToInclude = [
   ifSpecifiedInclude('gestures', 'lib/event.js'),
 
   'src/log.js',
-  'src/observable.mixin.js',
-  'src/collection.mixin.js',
+  'src/mixins/observable.mixin.js',
+  'src/mixins/collection.mixin.js',
 
   'src/util/misc.js',
   'src/util/lang_array.js',
@@ -129,28 +129,28 @@ var filesToInclude = [
 
   'src/static_canvas.class.js',
 
-  ifSpecifiedInclude('freedrawing', 'src/base_brush.class.js'),
+  ifSpecifiedInclude('freedrawing', 'src/brushes/base_brush.class.js'),
 
-  ifSpecifiedInclude('freedrawing', 'src/pencil_brush.class.js'),
-  ifSpecifiedInclude('freedrawing', 'src/circle_brush.class.js'),
-  ifSpecifiedInclude('freedrawing', 'src/spray_brush.class.js'),
-  ifSpecifiedInclude('freedrawing', 'src/pattern_brush.class.js'),
+  ifSpecifiedInclude('freedrawing', 'src/brushes/pencil_brush.class.js'),
+  ifSpecifiedInclude('freedrawing', 'src/brushes/circle_brush.class.js'),
+  ifSpecifiedInclude('freedrawing', 'src/brushes/spray_brush.class.js'),
+  ifSpecifiedInclude('freedrawing', 'src/brushes/pattern_brush.class.js'),
 
   ifSpecifiedInclude('interaction', 'src/canvas.class.js'),
-  ifSpecifiedInclude('interaction', 'src/canvas_events.mixin.js'),
+  ifSpecifiedInclude('interaction', 'src/mixins/canvas_events.mixin.js'),
 
-  'src/canvas_animation.mixin.js',
+  'src/mixins/canvas_animation.mixin.js',
 
-  ifSpecifiedInclude('serialization', 'src/canvas_serialization.mixin.js'),
-  ifSpecifiedInclude('gestures', 'src/canvas_gestures.mixin.js'),
+  ifSpecifiedInclude('serialization', 'src/mixins/canvas_serialization.mixin.js'),
+  ifSpecifiedInclude('gestures', 'src/mixins/canvas_gestures.mixin.js'),
 
   'src/object.class.js',
-  'src/object_origin.mixin.js',
-  'src/object_geometry.mixin.js',
+  'src/mixins/object_origin.mixin.js',
+  'src/mixins/object_geometry.mixin.js',
 
-  ifSpecifiedInclude('stateful', 'src/stateful.mixin.js'),
+  ifSpecifiedInclude('stateful', 'src/mixins/stateful.mixin.js'),
 
-  ifSpecifiedInclude('interaction', 'src/object_interactivity.mixin.js'),
+  ifSpecifiedInclude('interaction', 'src/mixins/object_interactivity.mixin.js'),
 
   'src/line.class.js',
   'src/circle.class.js',
@@ -164,7 +164,7 @@ var filesToInclude = [
   'src/group.class.js',
   'src/image.class.js',
 
-  ifSpecifiedInclude('object_straightening', 'src/object_straightening.mixin.js'),
+  ifSpecifiedInclude('object_straightening', 'src/mixins/object_straightening.mixin.js'),
 
   ifSpecifiedInclude('image_filters', 'src/image_filters.js'),
 

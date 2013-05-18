@@ -907,11 +907,8 @@
    * List of attribute names to account for when parsing SVG element (used by {@link fabric.Text.fromElement})
    * @static
    */
-  fabric.Text.ATTRIBUTE_NAMES = (
-    'x y fill fill-opacity opacity stroke stroke-width stroke-dasharray ' +
-    'stroke-linejoin stroke-linecap stroke-miterlimit transform ' +
-    'font-family font-style font-weight font-size text-decoration'
-  ).split(' ');
+  fabric.Text.ATTRIBUTE_NAMES = fabric.SHARED_ATTRIBUTES.concat(
+    'x y font-family font-style font-weight font-size text-decoration'.split(' '));
 
   /**
    * Returns fabric.Text instance from an object representation
