@@ -133,33 +133,36 @@
     var clone = group.toObject();
 
     var expectedObject = {
-      'type': 'group',
-      'originX': 'center',
-      'originY': 'center',
-      'left': 80,
-      'top': 117.5,
-      'width': 70,
-      'height': 45,
-      'fill': 'rgb(0,0,0)',
-      'overlayFill': null,
-      'stroke': null,
-      'strokeWidth': 1,
-      'strokeDashArray': null,
-      'scaleX': 1,
-      'scaleY': 1,
-      'selectable': true,
-      'hasControls': true,
-      'hasBorders': true,
-      'hasRotatingPoint': true,
+      'type':               'group',
+      'originX':            'center',
+      'originY':            'center',
+      'left':               80,
+      'top':                117.5,
+      'width':              70,
+      'height':             45,
+      'fill':               'rgb(0,0,0)',
+      'overlayFill':        null,
+      'stroke':             null,
+      'strokeWidth':        1,
+      'strokeDashArray':    null,
+      'strokeLineCap':      'butt',
+      'strokeLineJoin':     'miter',
+      'strokeMiterLimit':   10,
+      'scaleX':             1,
+      'scaleY':             1,
+      'selectable':         true,
+      'hasControls':        true,
+      'hasBorders':         true,
+      'hasRotatingPoint':   true,
       'transparentCorners': true,
       'perPixelTargetFind': false,
-      'shadow': null,
-      'visible': true,
-      'angle': 0,
-      'flipX': false,
-      'flipY': false,
-      'opacity': 1,
-      'objects': clone.objects
+      'shadow':             null,
+      'visible':            true,
+      'angle':              0,
+      'flipX':              false,
+      'flipY':              false,
+      'opacity':            1,
+      'objects':            clone.objects
     };
 
     deepEqual(clone, expectedObject);
@@ -336,7 +339,7 @@
     var group = makeGroupWith2Objects();
     ok(typeof group.toSVG == 'function');
 
-    var expectedSVG = '<g transform="translate(80 117.5)"><rect x="-5" y="-20" rx="0" ry="0" width="10" height="40" style="stroke: none; stroke-width: 1; stroke-dasharray: ; fill: rgb(0,0,0); opacity: 1;" transform="translate(-30 2.5)"/><rect x="-15" y="-5" rx="0" ry="0" width="30" height="10" style="stroke: none; stroke-width: 1; stroke-dasharray: ; fill: rgb(0,0,0); opacity: 1;" transform="translate(20 -17.5)"/></g>';
+    var expectedSVG = '<g transform="translate(80 117.5)"><rect x="-5" y="-20" rx="0" ry="0" width="10" height="40" style="stroke: none; stroke-width: 1; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); opacity: 1;" transform="translate(-30 2.5)"/><rect x="-15" y="-5" rx="0" ry="0" width="30" height="10" style="stroke: none; stroke-width: 1; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); opacity: 1;" transform="translate(20 -17.5)"/></g>';
     equal(group.toSVG(), expectedSVG);
   });
 

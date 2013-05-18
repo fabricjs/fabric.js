@@ -21,20 +21,23 @@
     /**
      * Type of an object
      * @type String
+     * @default
      */
     type: 'rect',
 
     /**
      * Horizontal border radius
      * @type Number
+     * @default
      */
-    rx: 0,
+    rx:   0,
 
     /**
      * Vertical border radius
      * @type Number
+     * @default
      */
-    ry: 0,
+    ry:   0,
 
     /**
      * Used to specify dash pattern for stroke on this object
@@ -210,7 +213,10 @@
    * List of attribute names to account for when parsing SVG element (used by `fabric.Rect.fromElement`)
    * @static
    */
-  fabric.Rect.ATTRIBUTE_NAMES = 'x y width height rx ry fill fill-opacity opacity stroke stroke-width transform'.split(' ');
+  fabric.Rect.ATTRIBUTE_NAMES = (
+    'x y width height rx ry fill fill-opacity opacity stroke stroke-width stroke-dasharray ' +
+    'stroke-linejoin stroke-linecap stroke-miterlimit transform'
+  ).split(' ');
 
   /**
    * @private

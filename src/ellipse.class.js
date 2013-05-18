@@ -22,20 +22,23 @@
     /**
      * Type of an object
      * @type String
+     * @default
      */
     type: 'ellipse',
 
     /**
      * Horizontal radius
      * @type Number
+     * @default
      */
-    rx: 0,
+    rx:   0,
 
     /**
      * Vertical radius
      * @type Number
+     * @default
      */
-    ry: 0,
+    ry:   0,
 
     /**
      * Constructor
@@ -138,7 +141,10 @@
    * @static
    * @see http://www.w3.org/TR/SVG/shapes.html#EllipseElement
    */
-  fabric.Ellipse.ATTRIBUTE_NAMES = 'cx cy rx ry fill fill-opacity opacity stroke stroke-width transform'.split(' ');
+  fabric.Ellipse.ATTRIBUTE_NAMES = (
+    'cx cy rx ry fill fill-opacity opacity stroke stroke-width stroke-dasharray ' +
+    'stroke-linejoin stroke-linecap stroke-miterlimit transform'
+  ).split(' ');
 
   /**
    * Returns {@link fabric.Ellipse} instance from an SVG element

@@ -164,6 +164,7 @@
     /**
      * Type of an object
      * @type String
+     * @default
      */
     type: 'path',
 
@@ -539,6 +540,7 @@
       }
       // ctx.globalCompositeOperation = this.fillRule;
 
+      ctx.save();
       if (this.overlayFill) {
         ctx.fillStyle = this.overlayFill;
       }
@@ -549,27 +551,25 @@
       }
 
       if (this.stroke) {
+        ctx.lineWidth = this.strokeWidth;
+        ctx.lineCap = this.strokeLineCap;
+        ctx.lineJoin = this.strokeLineJoin;
+        ctx.miterLimit = this.strokeMiterLimit;
         ctx.strokeStyle = this.stroke.toLive
           ? this.stroke.toLive(ctx)
           : this.stroke;
       }
+
       this._setShadow(ctx);
       this.clipTo && fabric.util.clipContext(this, ctx);
-
       ctx.beginPath();
 
       this._render(ctx);
       this._renderFill(ctx);
-
-      if (this.stroke) {
-        ctx.strokeStyle = this.stroke;
-        ctx.lineWidth = this.strokeWidth;
-        ctx.lineCap = ctx.lineJoin = 'round';
-        this._renderStroke(ctx);
-      }
+      this._renderStroke(ctx);
       this.clipTo && ctx.restore();
-
       this._removeShadow(ctx);
+      ctx.restore();
 
       if (!noTransform && this.active) {
         this.drawBorders(ctx);
@@ -796,7 +796,10 @@
    * @static
    * @see http://www.w3.org/TR/SVG/paths.html#PathElement
    */
-  fabric.Path.ATTRIBUTE_NAMES = 'd fill fill-opacity opacity fill-rule stroke stroke-width transform'.split(' ');
+  fabric.Path.ATTRIBUTE_NAMES = (
+    'd fill fill-opacity opacity fill-rule stroke stroke-width stroke-dasharray ' +
+    'stroke-linejoin stroke-linecap stroke-miterlimit transform'
+  ).split(' ');
 
   /**
    * Creates an instance of fabric.Path from an SVG <path> element

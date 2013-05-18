@@ -8,33 +8,36 @@
   }
 
   var REFERENCE_OBJECT = {
-    'type':         'polyline',
-    'originX':      'center',
-    'originY':      'center',
-    'left':         0,
-    'top':          0,
-    'width':        10,
-    'height':       10,
-    'fill':         'rgb(0,0,0)',
-    'overlayFill':  null,
-    'stroke':       null,
-    'strokeWidth':  1,
-    'strokeDashArray': null,
-    'scaleX':       1,
-    'scaleY':       1,
-    'angle':        0,
-    'flipX':        false,
-    'flipY':        false,
-    'opacity':      1,
-    'points':       getPoints(),
-    'selectable':   true,
-    'hasControls':  true,
-    'hasBorders':   true,
-    'hasRotatingPoint': true,
+    'type':               'polyline',
+    'originX':            'center',
+    'originY':            'center',
+    'left':               0,
+    'top':                0,
+    'width':              10,
+    'height':             10,
+    'fill':               'rgb(0,0,0)',
+    'overlayFill':        null,
+    'stroke':             null,
+    'strokeWidth':        1,
+    'strokeDashArray':    null,
+    'strokeLineCap':      'butt',
+    'strokeLineJoin':     'miter',
+    'strokeMiterLimit':   10,
+    'scaleX':             1,
+    'scaleY':             1,
+    'angle':              0,
+    'flipX':              false,
+    'flipY':              false,
+    'opacity':            1,
+    'points':             getPoints(),
+    'selectable':         true,
+    'hasControls':        true,
+    'hasBorders':         true,
+    'hasRotatingPoint':   true,
     'transparentCorners': true,
     'perPixelTargetFind': false,
-    'shadow': null,
-    'visible': true
+    'shadow':             null,
+    'visible':            true
   };
 
   QUnit.module('fabric.Polyline');
@@ -92,6 +95,10 @@
     elPolylineWithAttrs.setAttribute('stroke-width', '3');
     elPolylineWithAttrs.setAttribute('stroke', 'blue');
     elPolylineWithAttrs.setAttribute('transform', 'translate(-10,-20) scale(2)');
+    elPolylineWithAttrs.setAttribute('stroke-dasharray', '5, 2');
+    elPolylineWithAttrs.setAttribute('stroke-linecap', 'round');
+    elPolylineWithAttrs.setAttribute('stroke-linejoin', 'bevil');
+    elPolylineWithAttrs.setAttribute('stroke-miterlimit', '5');
 
     var polylineWithAttrs = fabric.Polyline.fromElement(elPolylineWithAttrs);
 
@@ -103,6 +110,10 @@
       'fill': 'rgb(255,255,255)',
       'stroke': 'blue',
       'strokeWidth': 3,
+      'strokeDashArray': [5, 2],
+      'strokeLineCap': 'round',
+      'strokeLineJoin': 'bevil',
+      'strokeMiterLimit': 5,
       'opacity': 0.34,
       'points': expectedPoints
     }));

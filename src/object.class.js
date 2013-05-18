@@ -22,146 +22,190 @@
     /**
      * Type of an object (rect, circle, path, etc.)
      * @type String
+     * @default
      */
     type:                     'object',
 
     /**
      * Horizontal origin of transformation of an object (one of "left", "right", "center")
      * @type String
+     * @default
      */
     originX:                  'center',
 
     /**
      * Vertical origin of transformation of an object (one of "top", "bottom", "center")
      * @type String
+     * @default
      */
     originY:                  'center',
 
     /**
      * Top position of an object. Note that by default it's relative to object center. You can change this by setting originY={top/center/bottom}
      * @type Number
+     * @default
      */
     top:                      0,
 
     /**
      * Left position of an object. Note that by default it's relative to object center. You can change this by setting originX={left/center/right}
      * @type Number
+     * @default
      */
     left:                     0,
 
     /**
      * Object width
      * @type Number
+     * @default
      */
     width:                    0,
 
     /**
      * Object height
      * @type Number
+     * @default
      */
     height:                   0,
 
     /**
      * Object scale factor (horizontal)
      * @type Number
+     * @default
      */
     scaleX:                   1,
 
     /**
      * Object scale factor (vertical)
      * @type Number
+     * @default
      */
     scaleY:                   1,
 
     /**
      * When true, an object is rendered as flipped horizontally
      * @type Boolean
+     * @default
      */
     flipX:                    false,
 
     /**
      * When true, an object is rendered as flipped vertically
      * @type Boolean
+     * @default
      */
     flipY:                    false,
 
     /**
      * Opacity of an object
      * @type Number
+     * @default
      */
     opacity:                  1,
 
     /**
      * Angle of rotation of an object (in degrees)
      * @type Number
+     * @default
      */
     angle:                    0,
 
     /**
      * Size of object's corners (in pixels)
      * @type Number
+     * @default
      */
     cornerSize:               12,
 
     /**
      * When true, object's corners are rendered as transparent inside (i.e. stroke instead of fill)
      * @type Boolean
+     * @default
      */
     transparentCorners:       true,
 
     /**
      * Padding between object and its borders (in pixels)
      * @type Number
+     * @default
      */
     padding:                  0,
 
     /**
      * Border color of an object (when it's active)
      * @type String
+     * @default
      */
     borderColor:              'rgba(102,153,255,0.75)',
 
     /**
      * Corner color of an object (when it's active)
      * @type String
+     * @default
      */
     cornerColor:              'rgba(102,153,255,0.5)',
 
     /**
      * Color of object's fill
      * @type String
+     * @default
      */
     fill:                     'rgb(0,0,0)',
 
     /**
      * Fill rule used to fill an object
      * @type String
+     * @default
      */
     fillRule:                 'source-over',
 
     /**
      * Overlay fill (takes precedence over fill value)
      * @type String
+     * @default
      */
     overlayFill:              null,
 
     /**
      * When `true`, an object is rendered via stroke and this property specifies its color
      * @type String
+     * @default
      */
     stroke:                   null,
 
     /**
      * Width of a stroke used to render this object
      * @type Number
+     * @default
      */
     strokeWidth:              1,
 
     /**
-     * Array specifying dash pattern of an object's stroke
+     * Array specifying dash pattern of an object's stroke (stroke must be defined)
      * @type Array
      */
     strokeDashArray:          null,
+
+    /**
+     * Line endings style of an object's stroke (one of "butt", "round", "square")
+     * @type String
+     * @default
+     */
+    strokeLineCap:            'butt',
+
+    /**
+     * Corner style of an object's stroke (one of "bevil", "round", "miter")
+     * @type String
+     * @default
+     */
+    strokeLineJoin:           'miter',
+
+    /**
+     * Maximum miter length (used for strokeLineJoin = "miter") of an object's stroke
+     * @type Number
+     * @default
+     */
+    strokeMiterLimit:         10,
 
     /**
      * Shadow object representing shadow of this shape
@@ -172,12 +216,14 @@
     /**
      * Border opacity when object is active and moving
      * @type Number
+     * @default
      */
     borderOpacityWhenMoving:  0.4,
 
     /**
      * Border scale factor
      * @type Number
+     * @default
      */
     borderScaleFactor:        1,
 
@@ -190,54 +236,63 @@
     /**
      * Minimum allowed scale value of an object
      * @type Number
+     * @default
      */
     minScaleLimit:            0.01,
 
     /**
      * When set to `false`, an object can not be selected for modification (using either point-click-based or group-based selection)
      * @type Boolean
+     * @default
      */
     selectable:               true,
 
     /**
      * When set to `false`, an object is not rendered on canvas
      * @type Boolean
+     * @default
      */
     visible:                  true,
 
     /**
      * When set to `false`, object's controls are not displayed and can not be used to manipulate object
      * @type Boolean
+     * @default
      */
     hasControls:              true,
 
     /**
      * When set to `false`, object's borders are not rendered
      * @type Boolean
+     * @default
      */
     hasBorders:               true,
 
     /**
      * When set to `false`, object's rotating point will not be visible or selectable
      * @type Boolean
+     * @default
      */
     hasRotatingPoint:         true,
 
     /**
      * Offset for object's rotating point (when enabled via `hasRotatingPoint`)
      * @type Number
+     * @default
      */
     rotatingPointOffset:      40,
 
     /**
      * When set to `true`, objects are "found" on canvas on per-pixel basis rather than according to bounding box
      * @type Boolean
+     * @default
      */
     perPixelTargetFind:       false,
 
     /**
      * When `false`, default object's values are not included in its serialization
      * @type Boolean
+     * @default
      */
     includeDefaultValues:     true,
 
@@ -250,38 +305,44 @@
     /**
      * When `true`, object horizontal movement is locked
      * @type Boolean
+     * @default
      */
-    lockMovementX:  false,
+    lockMovementX:            false,
 
     /**
      * When `true`, object vertical movement is locked
      * @type Boolean
+     * @default
      */
-    lockMovementY:  false,
+    lockMovementY:            false,
 
     /**
      * When `true`, object rotation is locked
      * @type Boolean
+     * @default
      */
-    lockRotation:   false,
+    lockRotation:             false,
 
     /**
      * When `true`, object horizontal scaling is locked
      * @type Boolean
+     * @default
      */
-    lockScalingX:   false,
+    lockScalingX:             false,
 
     /**
      * When `true`, object vertical scaling is locked
      * @type Boolean
+     * @default
      */
-    lockScalingY:   false,
+    lockScalingY:             false,
 
     /**
      * When `true`, object non-uniform scaling is locked
      * @type Boolean
+     * @default
      */
-    lockUniScaling: false,
+    lockUniScaling:           false,
 
     /**
      * List of properties to consider when checking if state
@@ -386,8 +447,11 @@
         fill:               (this.fill && this.fill.toObject) ? this.fill.toObject() : this.fill,
         overlayFill:        this.overlayFill,
         stroke:             (this.stroke && this.stroke.toObject) ? this.stroke.toObject() : this.stroke,
-        strokeWidth:        this.strokeWidth,
+        strokeWidth:        toFixed(this.strokeWidth, NUM_FRACTION_DIGITS),
         strokeDashArray:    this.strokeDashArray,
+        strokeLineCap:      this.strokeLineCap,
+        strokeLineJoin:     this.strokeLineJoin,
+        strokeMiterLimit:   toFixed(this.strokeMiterLimit, NUM_FRACTION_DIGITS),
         scaleX:             toFixed(this.scaleX, NUM_FRACTION_DIGITS),
         scaleY:             toFixed(this.scaleY, NUM_FRACTION_DIGITS),
         angle:              toFixed(this.getAngle(), NUM_FRACTION_DIGITS),
@@ -431,6 +495,9 @@
         "stroke: ", (this.stroke ? this.stroke : 'none'), "; ",
         "stroke-width: ", (this.strokeWidth ? this.strokeWidth : '0'), "; ",
         "stroke-dasharray: ", (this.strokeDashArray ? this.strokeDashArray.join(' ') : ''), "; ",
+        "stroke-linecap: ", (this.strokeLineCap ? this.strokeLineCap : 'butt'), "; ",
+        "stroke-linejoin: ", (this.strokeLineJoin ? this.strokeLineJoin : 'miter'), "; ",
+        "stroke-miterlimit: ", (this.strokeMiterLimit ? this.strokeMiterLimit : '4'), "; ",
         "fill: ", (this.fill ? (this.fill && this.fill.toLive ? 'url(#SVGID_' + this.fill.id + ')' : this.fill) : 'none'), "; ",
         "opacity: ", (typeof this.opacity !== 'undefined' ? this.opacity : '1'), ";",
         (this.visible ? '' : " visibility: hidden;")
@@ -600,14 +667,15 @@
         this.transform(ctx);
       }
 
-      if (this.stroke || this.strokeDashArray) {
+      ctx.save();
+      if (this.stroke) {
         ctx.lineWidth = this.strokeWidth;
-        if (this.stroke && this.stroke.toLive) {
-          ctx.strokeStyle = this.stroke.toLive(ctx);
-        }
-        else {
-          ctx.strokeStyle = this.stroke;
-        }
+        ctx.lineCap = this.strokeLineCap;
+        ctx.lineJoin = this.strokeLineJoin;
+        ctx.miterLimit = this.strokeMiterLimit;
+        ctx.strokeStyle = this.stroke.toLive
+          ? this.stroke.toLive(ctx)
+          : this.stroke;
       }
 
       if (this.overlayFill) {
@@ -629,6 +697,7 @@
       this._render(ctx, noTransform);
       this.clipTo && ctx.restore();
       this._removeShadow(ctx);
+      ctx.restore();
 
       if (this.active && !noTransform) {
         this.drawBorders(ctx);
@@ -686,7 +755,7 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _renderStroke: function(ctx) {
-      if (!this.stroke && !this.strokeDashArray) return;
+      if (!this.stroke) return;
 
       if (this.strokeDashArray) {
         // Spec requires the concatenation of two copies the dash list when the number of elements is odd

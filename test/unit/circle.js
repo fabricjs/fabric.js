@@ -60,33 +60,36 @@
   test('toObject', function() {
     var circle = new fabric.Circle();
     var defaultProperties = {
-      'type': 'circle',
-      'originX': 'center',
-      'originY': 'center',
-      'left': 0,
-      'top': 0,
-      'width': 0,
-      'height': 0,
-      'fill': 'rgb(0,0,0)',
-      'overlayFill': null,
-      'stroke': null,
-      'strokeWidth': 1,
-      'strokeDashArray': null,
-      'scaleX': 1,
-      'scaleY': 1,
-      'angle': 0,
-      'flipX': false,
-      'flipY': false,
-      'opacity': 1,
-      'selectable': true,
-      'hasControls': true,
-      'hasBorders': true,
-      'hasRotatingPoint': true,
+      'type':               'circle',
+      'originX':            'center',
+      'originY':            'center',
+      'left':               0,
+      'top':                0,
+      'width':              0,
+      'height':             0,
+      'fill':               'rgb(0,0,0)',
+      'overlayFill':        null,
+      'stroke':             null,
+      'strokeWidth':        1,
+      'strokeDashArray':    null,
+      'strokeLineCap':      'butt',
+      'strokeLineJoin':     'miter',
+      'strokeMiterLimit':   10,
+      'scaleX':             1,
+      'scaleY':             1,
+      'angle':              0,
+      'flipX':              false,
+      'flipY':              false,
+      'opacity':            1,
+      'selectable':         true,
+      'hasControls':        true,
+      'hasBorders':         true,
+      'hasRotatingPoint':   true,
       'transparentCorners': true,
       'perPixelTargetFind': false,
-      'shadow': null,
-      'visible': true,
-      'radius': 0
+      'shadow':             null,
+      'visible':            true,
+      'radius':             0
     };
     ok(typeof circle.toObject == 'function');
     deepEqual(circle.toObject(), defaultProperties);
@@ -105,13 +108,17 @@
   test('fromElement', function() {
     ok(typeof fabric.Circle.fromElement == 'function');
 
-    var elCircle      = fabric.document.createElement('circle'),
-        radius        = 10,
-        left          = 12,
-        top           = 15,
-        fill          = 'ff5555',
-        fillOpacity   = 0.5,
-        strokeWidth   = 2;
+    var elCircle         = fabric.document.createElement('circle'),
+        radius           = 10,
+        left             = 12,
+        top              = 15,
+        fill             = 'ff5555',
+        fillOpacity      = 0.5,
+        strokeWidth      = 2,
+        strokeDashArray  = [5, 2],
+        strokeLineCap    = 'round',
+        strokeLineJoin   = 'bevil',
+        strokeMiterLimit = 5;
 
 
     elCircle.setAttribute('r', radius);
@@ -120,6 +127,10 @@
     elCircle.setAttribute('fill', fill);
     elCircle.setAttribute('fill-opacity', fillOpacity);
     elCircle.setAttribute('stroke-width', strokeWidth);
+    elCircle.setAttribute('stroke-dasharray', '5, 2');
+    elCircle.setAttribute('stroke-linecap', strokeLineCap);
+    elCircle.setAttribute('stroke-linejoin', strokeLineJoin);
+    elCircle.setAttribute('stroke-miterlimit', strokeMiterLimit);
 
     var oCircle = fabric.Circle.fromElement(elCircle);
     ok(oCircle instanceof fabric.Circle);
@@ -130,6 +141,10 @@
     equal(oCircle.get('fill'), fill);
     equal(oCircle.get('opacity'), fillOpacity);
     equal(oCircle.get('strokeWidth'), strokeWidth);
+    deepEqual(oCircle.get('strokeDashArray'), strokeDashArray);
+    equal(oCircle.get('strokeLineCap'), strokeLineCap);
+    equal(oCircle.get('strokeLineJoin'), strokeLineJoin);
+    equal(oCircle.get('strokeMiterLimit'), strokeMiterLimit);
 
     elFaultyCircle = fabric.document.createElement('circle');
     elFaultyCircle.setAttribute('r', '-10');

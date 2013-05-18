@@ -24,12 +24,14 @@
     /**
      * Type of an object
      * @type String
+     * @default
      */
     type: 'path-group',
 
     /**
      * Fill value
      * @type String
+     * @default
      */
     fill: '',
 

@@ -23,6 +23,7 @@
     /**
      * Type of an object
      * @type String
+     * @default
      */
     type: 'polygon',
 
@@ -161,7 +162,10 @@
    * @static
    * @see: http://www.w3.org/TR/SVG/shapes.html#PolygonElement
    */
-  fabric.Polygon.ATTRIBUTE_NAMES = 'fill fill-opacity opacity stroke stroke-width transform'.split(' ');
+  fabric.Polygon.ATTRIBUTE_NAMES = (
+    'fill fill-opacity opacity stroke stroke-width stroke-dasharray ' +
+    'stroke-linejoin stroke-linecap stroke-miterlimit transform'
+  ).split(' ');
 
   /**
    * Returns {@link fabric.Polygon} instance from an SVG element

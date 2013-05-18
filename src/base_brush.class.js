@@ -7,38 +7,58 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
   /**
    * Color of a brush
    * @type String
+   * @default
    */
-  color:       'rgb(0, 0, 0)',
+  color:            'rgb(0, 0, 0)',
 
   /**
    * Width of a brush
    * @type Number
+   * @default
    */
-  width:        1,
+  width:            1,
 
   /**
    * Shadow blur of a brush
    * @type Number
+   * @default
    */
-  shadowBlur:   0,
+  shadowBlur:       0,
 
   /**
    * Shadow color of a brush
    * @type String
+   * @default
    */
-  shadowColor:  '',
+  shadowColor:      '',
 
   /**
    * Shadow offset x of a brush
    * @type Number
+   * @default
    */
-  shadowOffsetX: 0,
+  shadowOffsetX:    0,
 
   /**
    * Shadow offset y of a brush
    * @type Number
+   * @default
    */
-  shadowOffsetY: 0,
+  shadowOffsetY:    0,
+
+  /**
+   * Line endings style of a brush (one of "butt", "round", "square")
+   * @type String
+   * @default
+   */
+  strokeLineCap:    'round',
+
+  /**
+   * Corner style of a brush (one of "bevil", "round", "miter")
+   * @type String
+   * @default
+   */
+  strokeLineJoin:   'round',
 
   /**
    * Sets brush styles
@@ -48,7 +68,8 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
 
     ctx.strokeStyle = this.color;
     ctx.lineWidth = this.width;
-    ctx.lineCap = ctx.lineJoin = 'round';
+    ctx.lineCap = this.strokeLineCap;
+    ctx.lineJoin = this.strokeLineJoin;
   },
 
   /**

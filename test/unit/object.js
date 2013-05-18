@@ -110,80 +110,94 @@
 
   test('toJSON', function() {
     var emptyObjectJSON = '{"type":"object","originX":"center","originY":"center","left":0,"top":0,"width":0,"height":0,"fill":"rgb(0,0,0)",'+
-                          '"overlayFill":null,"stroke":null,"strokeWidth":1,"strokeDashArray":null,"scaleX":1,"scaleY":1,"angle":0,'+
-                          '"flipX":false,"flipY":false,"opacity":1,"selectable":true,"hasControls":true,"hasBorders":true,"hasRotatingPoint":true,'+
+                          '"overlayFill":null,"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,'+
+                          '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,"selectable":true,"hasControls":true,"hasBorders":true,"hasRotatingPoint":true,'+
                           '"transparentCorners":true,"perPixelTargetFind":false,"shadow":null,"visible":true}';
 
     var augmentedJSON = '{"type":"object","originX":"center","originY":"center","left":0,"top":0,"width":122,"height":0,"fill":"rgb(0,0,0)",'+
-                        '"overlayFill":null,"stroke":null,"strokeWidth":1,"strokeDashArray":null,"scaleX":1.3,"scaleY":1,"angle":0,'+
-                        '"flipX":false,"flipY":true,"opacity":0.88,"selectable":true,"hasControls":true,"hasBorders":true,"hasRotatingPoint":true,'+
+                        '"overlayFill":null,"stroke":null,"strokeWidth":1,"strokeDashArray":[5,2],"strokeLineCap":"round","strokeLineJoin":"bevil","strokeMiterLimit":5,'+
+                        '"scaleX":1.3,"scaleY":1,"angle":0,"flipX":false,"flipY":true,"opacity":0.88,"selectable":true,"hasControls":true,"hasBorders":true,"hasRotatingPoint":true,'+
                         '"transparentCorners":true,"perPixelTargetFind":false,"shadow":null,"visible":true}';
 
     var cObj = new fabric.Object();
     ok(typeof cObj.toJSON == 'function');
     equal(JSON.stringify(cObj.toJSON()), emptyObjectJSON);
 
-    cObj.set('opacity', 0.88).set('scaleX', 1.3).set('width', 122).set('flipY', true);
+    cObj.set('opacity', 0.88)
+        .set('scaleX', 1.3)
+        .set('width', 122)
+        .set('flipY', true)
+        .set('strokeDashArray', [5, 2])
+        .set('strokeLineCap', 'round')
+        .set('strokeLineJoin', 'bevil')
+        .set('strokeMiterLimit', 5);
+
     equal(JSON.stringify(cObj.toJSON()), augmentedJSON);
   });
 
   test('toObject', function() {
     var emptyObjectRepr = {
-      'type': "object",
-      'originX': 'center',
-      'originY': 'center',
-      'left': 0,
-      'top': 0,
-      'width': 0,
-      'height': 0,
-      'fill': 'rgb(0,0,0)',
-      'overlayFill': null,
-      'stroke': null,
-      'strokeWidth': 1,
-      'strokeDashArray': null,
-      'scaleX': 1,
-      'scaleY': 1,
-      'angle': 0,
-      'flipX': false,
-      'flipY': false,
-      'opacity': 1,
-      'selectable': true,
-      'hasControls': true,
-      'hasBorders': true,
-      'hasRotatingPoint': true,
+      'type':               "object",
+      'originX':            'center',
+      'originY':            'center',
+      'left':               0,
+      'top':                0,
+      'width':              0,
+      'height':             0,
+      'fill':               'rgb(0,0,0)',
+      'overlayFill':        null,
+      'stroke':             null,
+      'strokeWidth':        1,
+      'strokeDashArray':    null,
+      'strokeLineCap':      'butt',
+      'strokeLineJoin':     'miter',
+      'strokeMiterLimit':   10,
+      'scaleX':             1,
+      'scaleY':             1,
+      'angle':              0,
+      'flipX':              false,
+      'flipY':              false,
+      'opacity':            1,
+      'selectable':         true,
+      'hasControls':        true,
+      'hasBorders':         true,
+      'hasRotatingPoint':   true,
       'transparentCorners': true,
       'perPixelTargetFind': false,
-      'shadow': null,
-      'visible': true
+      'shadow':             null,
+      'visible':            true
     };
 
     var augmentedObjectRepr = {
-      'type': "object",
-      'originX': 'center',
-      'originY': 'center',
-      'left': 10,
-      'top': 20,
-      'width': 30,
-      'height': 40,
-      'fill': 'rgb(0,0,0)',
-      'overlayFill': null,
-      'stroke': null,
-      'strokeWidth': 1,
-      'strokeDashArray': null,
-      'scaleX': 1,
-      'scaleY': 1,
-      'angle': 0,
-      'flipX': true,
-      'flipY': false,
-      'opacity': 0.13,
-      'selectable': false,
-      'hasControls': true,
-      'hasBorders': true,
-      'hasRotatingPoint': true,
+      'type':               "object",
+      'originX':            'center',
+      'originY':            'center',
+      'left':               10,
+      'top':                20,
+      'width':              30,
+      'height':             40,
+      'fill':               'rgb(0,0,0)',
+      'overlayFill':        null,
+      'stroke':             null,
+      'strokeWidth':        1,
+      'strokeDashArray':    [5, 2],
+      'strokeLineCap':      'round',
+      'strokeLineJoin':     'bevil',
+      'strokeMiterLimit':   5,
+      'scaleX':             1,
+      'scaleY':             1,
+      'angle':              0,
+      'flipX':              true,
+      'flipY':              false,
+      'opacity':            0.13,
+      'selectable':         false,
+      'hasControls':        true,
+      'hasBorders':         true,
+      'hasRotatingPoint':   true,
       'transparentCorners': true,
       'perPixelTargetFind': false,
-      'shadow': null,
-      'visible': true
+      'shadow':             null,
+      'visible':            true
     };
 
     var cObj = new fabric.Object();
@@ -195,7 +209,11 @@
         .set('height', 40)
         .set('flipX', true)
         .set('opacity', 0.13)
-        .set('selectable', false);
+        .set('selectable', false)
+        .set('strokeDashArray', [5, 2])
+        .set('strokeLineCap', 'round')
+        .set('strokeLineJoin', 'bevil')
+        .set('strokeMiterLimit', 5);
 
     deepEqual(augmentedObjectRepr, cObj.toObject());
 

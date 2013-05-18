@@ -21,6 +21,7 @@
     /**
      * Type of an object
      * @type String
+     * @default
      */
     type: 'circle',
 
@@ -132,7 +133,10 @@
    * @static
    * @see: http://www.w3.org/TR/SVG/shapes.html#CircleElement
    */
-  fabric.Circle.ATTRIBUTE_NAMES = 'cx cy r fill fill-opacity opacity stroke stroke-width transform'.split(' ');
+  fabric.Circle.ATTRIBUTE_NAMES = (
+    'cx cy r fill fill-opacity opacity stroke stroke-width stroke-dasharray ' +
+    'stroke-linejoin stroke-linecap stroke-miterlimit transform'
+  ).split(' ');
 
   /**
    * Returns {@link fabric.Circle} instance from an SVG element
