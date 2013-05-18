@@ -22,6 +22,10 @@
     'fill-opacity':     'opacity',
     'fill-rule':        'fillRule',
     'stroke-width':     'strokeWidth',
+    'stroke-dasharray': 'strokeDashArray',
+    'stroke-linecap':   'strokeLineCap',
+    'stroke-linejoin':  'strokeLineJoin',
+    'stroke-miterlimit':'strokeMiterLimit',
     'transform':        'transformMatrix',
     'text-decoration':  'textDecoration',
     'font-size':        'fontSize',
@@ -39,20 +43,31 @@
   }
 
   function normalizeValue(attr, value, parentAttributes) {
+    var isArray;
+
     if ((attr === 'fill' || attr === 'stroke') && value === 'none') {
-      return '';
+      value = '';
     }
-    if (attr === 'fill-rule') {
-      return (value === 'evenodd') ? 'destination-over' : value;
+    else if (attr === 'fillRule') {
+      value = (value === 'evenodd') ? 'destination-over' : value;
     }
-    if (attr === 'transform') {
+    else if (attr === 'strokeDashArray') {
+      value = value.replace(/,/g, ' ').split(/\s+/);
+    }
+    else if (attr === 'transformMatrix') {
       if (parentAttributes && parentAttributes.transformMatrix) {
-        return multiplyTransformMatrices(
+        value = multiplyTransformMatrices(
           parentAttributes.transformMatrix, fabric.parseTransformAttribute(value));
       }
-      return fabric.parseTransformAttribute(value);
+      value = fabric.parseTransformAttribute(value);
     }
-    return value;
+
+    isArray = Object.prototype.toString.call(value) === '[object Array]';
+
+    // TODO: need to normalize em, %, pt, etc. to px (!)
+    var parsed = isArray ? value.map(parseFloat) : parseFloat(value);
+
+    return (!isArray && isNaN(parsed) ? value : parsed);
   }
 
   /**
@@ -71,7 +86,6 @@
     }
 
     var value,
-        parsed,
         parentAttributes = { };
 
     // if there's a parent container (`g` node), parse its attributes recursively upwards
@@ -81,12 +95,11 @@
 
     var ownAttributes = attributes.reduce(function(memo, attr) {
       value = element.getAttribute(attr);
-      parsed = parseFloat(value);
       if (value) {
-        value = normalizeValue(attr, value, parentAttributes);
         attr = normalizeAttr(attr);
+        value = normalizeValue(attr, value, parentAttributes);
 
-        memo[attr] = isNaN(parsed) ? value : parsed;
+        memo[attr] = value;
       }
       return memo;
     }, { });
@@ -324,24 +337,23 @@
    */
   function parseStyleAttribute(element) {
     var oStyle = { },
-        style = element.getAttribute('style');
+        style = element.getAttribute('style'),
+        attr, value;
 
     if (!style) return oStyle;
 
     if (typeof style === 'string') {
       style.replace(/;$/, '').split(';').forEach(function (chunk) {
-
         var pair = chunk.split(':');
-        var attr = normalizeAttr(pair[0].trim().toLowerCase());
-        var value = normalizeValue(attr, pair[1].trim());
+
+        attr = normalizeAttr(pair[0].trim().toLowerCase());
+        value = normalizeValue(attr, pair[1].trim());
 
         if (attr === 'font') {
           parseFontDeclaration(value, oStyle);
         }
         else {
-          // TODO: need to normalize em, %, pt, etc. to px (!)
-          var parsed = parseFloat(value);
-          oStyle[attr] = isNaN(parsed) ? value : parsed;
+          oStyle[attr] = value;
         }
       });
     }
@@ -349,16 +361,14 @@
       for (var prop in style) {
         if (typeof style[prop] === 'undefined') continue;
 
-        var attr = normalizeAttr(prop.toLowerCase());
-        var value = normalizeValue(attr, style[prop]);
+        attr = normalizeAttr(prop.toLowerCase());
+        value = normalizeValue(attr, style[prop]);
 
         if (attr === 'font') {
           parseFontDeclaration(value, oStyle);
         }
         else {
-          // TODO: need to normalize em, %, pt, etc. to px (!)
-          var parsed = parseFloat(value);
-          oStyle[attr] = isNaN(parsed) ? value : parsed;
+          oStyle[attr] = value;
         }
       }
     }

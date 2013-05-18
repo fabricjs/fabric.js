@@ -8,33 +8,36 @@
   }
 
   var REFERENCE_OBJECT = {
-    'type':         'polygon',
-    'originX':      'center',
-    'originY':      'center',
-    'left':         0,
-    'top':          0,
-    'width':        10,
-    'height':       10,
-    'fill':         'rgb(0,0,0)',
-    'overlayFill':  null,
-    'stroke':       null,
-    'strokeWidth':  1,
-    'strokeDashArray': null,
-    'scaleX':       1,
-    'scaleY':       1,
-    'angle':        0,
-    'flipX':        false,
-    'flipY':        false,
-    'opacity':      1,
-    'points':       getPoints(),
-    'selectable':   true,
-    'hasControls':  true,
-    'hasBorders':   true,
-    'hasRotatingPoint': true,
+    'type':               'polygon',
+    'originX':            'center',
+    'originY':            'center',
+    'left':               0,
+    'top':                0,
+    'width':              10,
+    'height':             10,
+    'fill':               'rgb(0,0,0)',
+    'overlayFill':        null,
+    'stroke':             null,
+    'strokeWidth':        1,
+    'strokeDashArray':    null,
+    'strokeLineCap':      'butt',
+    'strokeLineJoin':     'miter',
+    'strokeMiterLimit':   10,
+    'scaleX':             1,
+    'scaleY':             1,
+    'angle':              0,
+    'flipX':              false,
+    'flipY':              false,
+    'opacity':            1,
+    'points':             getPoints(),
+    'selectable':         true,
+    'hasControls':        true,
+    'hasBorders':         true,
+    'hasRotatingPoint':   true,
     'transparentCorners': true,
     'perPixelTargetFind': false,
-    'shadow': null,
-    'visible': true
+    'shadow':             null,
+    'visible':            true
   };
 
   QUnit.module('fabric.Polygon');
@@ -99,6 +102,10 @@
     elPolygonWithAttrs.setAttribute('stroke-width', '3');
     elPolygonWithAttrs.setAttribute('stroke', 'blue');
     elPolygonWithAttrs.setAttribute('transform', 'translate(-10,-20) scale(2)');
+    elPolygonWithAttrs.setAttribute('stroke-dasharray', '5, 2');
+    elPolygonWithAttrs.setAttribute('stroke-linecap', 'round');
+    elPolygonWithAttrs.setAttribute('stroke-linejoin', 'bevil');
+    elPolygonWithAttrs.setAttribute('stroke-miterlimit', '5');
 
     var polygonWithAttrs = fabric.Polygon.fromElement(elPolygonWithAttrs);
     var expectedPoints = [
@@ -114,6 +121,10 @@
       'fill': 'rgb(255,255,255)',
       'stroke': 'blue',
       'strokeWidth': 3,
+      'strokeDashArray': [5, 2],
+      'strokeLineCap': 'round',
+      'strokeLineJoin': 'bevil',
+      'strokeMiterLimit': 5,
       'opacity': 0.34,
       'points': expectedPoints
     }), polygonWithAttrs.toObject());

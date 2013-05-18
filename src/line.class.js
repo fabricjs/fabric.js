@@ -22,6 +22,7 @@
     /**
      * Type of an object
      * @type String
+     * @default
      */
     type: 'line',
 
@@ -175,7 +176,10 @@
    * @static
    * @see http://www.w3.org/TR/SVG/shapes.html#LineElement
    */
-  fabric.Line.ATTRIBUTE_NAMES = 'x1 y1 x2 y2 stroke stroke-width transform'.split(' ');
+  fabric.Line.ATTRIBUTE_NAMES = (
+    'x1 y1 x2 y2 stroke stroke-width stroke-dasharray ' +
+    'stroke-linejoin stroke-linecap stroke-miterlimit transform'
+  ).split(' ');
 
   /**
    * Returns fabric.Line instance from an SVG element

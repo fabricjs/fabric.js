@@ -7,45 +7,48 @@
   }
 
   var REFERENCE_TEXT_OBJECT = {
-    'type':             'text',
-    'originX':          'center',
-    'originY':          'center',
-    'left':             0,
-    'top':              0,
-    'width':            20,
-    'height':           52,
-    'fill':             'rgb(0,0,0)',
-    'overlayFill':      null,
-    'stroke':           '',
-    'strokeWidth':      1,
-    'strokeDashArray':  null,
-    'scaleX':           1,
-    'scaleY':           1,
-    'angle':            0,
-    'flipX':            false,
-    'flipY':            false,
-    'opacity':          1,
-    'selectable':       true,
-    'hasControls':      true,
-    'hasBorders':       true,
-    'hasRotatingPoint': true,
-    'transparentCorners': true,
-    'perPixelTargetFind': false,
-    'shadow':           null,
-    'visible':          true,
-    'text':             'x',
-    'fontSize':         40,
-    'fontWeight':       'normal',
-    'fontFamily':       'Times New Roman',
-    'fontStyle':        '',
-    'lineHeight':       1.3,
-    'textDecoration':   '',
-    'textShadow':       '',
-    'textAlign':        'left',
-    'path':             null,
-    'backgroundColor':  '',
-    'textBackgroundColor':  '',
-    'useNative':        true
+    'type':                'text',
+    'originX':             'center',
+    'originY':             'center',
+    'left':                0,
+    'top':                 0,
+    'width':               20,
+    'height':              52,
+    'fill':                'rgb(0,0,0)',
+    'overlayFill':         null,
+    'stroke':              '',
+    'strokeWidth':         1,
+    'strokeDashArray':     null,
+    'strokeLineCap':       'butt',
+    'strokeLineJoin':      'miter',
+    'strokeMiterLimit':    10,
+    'scaleX':              1,
+    'scaleY':              1,
+    'angle':               0,
+    'flipX':               false,
+    'flipY':               false,
+    'opacity':             1,
+    'selectable':          true,
+    'hasControls':         true,
+    'hasBorders':          true,
+    'hasRotatingPoint':    true,
+    'transparentCorners':  true,
+    'perPixelTargetFind':  false,
+    'shadow':              null,
+    'visible':             true,
+    'text':                'x',
+    'fontSize':            40,
+    'fontWeight':          'normal',
+    'fontFamily':          'Times New Roman',
+    'fontStyle':           '',
+    'lineHeight':          1.3,
+    'textDecoration':      '',
+    'textShadow':          '',
+    'textAlign':           'left',
+    'path':                null,
+    'backgroundColor':     '',
+    'textBackgroundColor': '',
+    'useNative':           true
   };
 
   test('constructor', function() {
@@ -165,6 +168,10 @@
     elTextWithAttrs.setAttribute('fill-opacity', 0.45);
     elTextWithAttrs.setAttribute('stroke', 'blue');
     elTextWithAttrs.setAttribute('stroke-width', 3);
+    elTextWithAttrs.setAttribute('stroke-dasharray', '5, 2');
+    elTextWithAttrs.setAttribute('stroke-linecap', 'round');
+    elTextWithAttrs.setAttribute('stroke-linejoin', 'bevil');
+    elTextWithAttrs.setAttribute('stroke-miterlimit', 5);
     elTextWithAttrs.setAttribute('font-family', 'Monaco');
     elTextWithAttrs.setAttribute('font-style', 'italic');
     elTextWithAttrs.setAttribute('font-weight', 'bold');
@@ -179,19 +186,23 @@
 
     var expectedObject = fabric.util.object.extend(fabric.util.object.clone(REFERENCE_TEXT_OBJECT), {
       /* left varies slightly due to node-canvas rendering */
-      left: fabric.util.toFixed(textWithAttrs.left + '', 2),
-      top: -59.95,
-      width: 20,
-      height: 159.9,
-      fill: 'rgb(255,255,255)',
-      opacity: 0.45,
-      stroke: 'blue',
-      strokeWidth: 3,
-      fontFamily: 'Monaco',
-      fontStyle: 'italic',
-      fontWeight: 'bold',
-      fontSize: 123,
-      textDecoration: 'underline'
+      left:             fabric.util.toFixed(textWithAttrs.left + '', 2),
+      top:              -59.95,
+      width:            20,
+      height:           159.9,
+      fill:             'rgb(255,255,255)',
+      opacity:          0.45,
+      stroke:           'blue',
+      strokeWidth:      3,
+      strokeDashArray:  [5, 2],
+      strokeLineCap:    'round',
+      strokeLineJoin:   'bevil',
+      strokeMiterLimit: 5,
+      fontFamily:       'Monaco',
+      fontStyle:        'italic',
+      fontWeight:       'bold',
+      fontSize:         123,
+      textDecoration:   'underline'
     });
 
     deepEqual(textWithAttrs.toObject(), expectedObject);

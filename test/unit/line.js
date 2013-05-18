@@ -1,36 +1,39 @@
 (function(){
 
   var LINE_OBJECT = {
-    'type': 'line',
-    'originX': 'center',
-    'originY': 'center',
-    'left': 12,
-    'top': 13,
-    'width': 2,
-    'height': 2,
-    'fill': 'rgb(0,0,0)',
-    'overlayFill': null,
-    'stroke': null,
-    'strokeWidth': 1,
-    'strokeDashArray': null,
-    'scaleX': 1,
-    'scaleY': 1,
-    'angle': 0,
-    'flipX': false,
-    'flipY': false,
-    'opacity': 1,
-    'x1': 11,
-    'y1': 12,
-    'x2': 13,
-    'y2': 14,
-    'selectable': true,
-    'hasControls': true,
-    'hasBorders': true,
-    'hasRotatingPoint': true,
+    'type':               'line',
+    'originX':            'center',
+    'originY':            'center',
+    'left':               12,
+    'top':                13,
+    'width':              2,
+    'height':             2,
+    'fill':               'rgb(0,0,0)',
+    'overlayFill':        null,
+    'stroke':             null,
+    'strokeWidth':        1,
+    'strokeDashArray':    null,
+    'strokeLineCap':      'butt',
+    'strokeLineJoin':     'miter',
+    'strokeMiterLimit':   10,
+    'scaleX':             1,
+    'scaleY':             1,
+    'angle':              0,
+    'flipX':              false,
+    'flipY':              false,
+    'opacity':            1,
+    'x1':                 11,
+    'y1':                 12,
+    'x2':                 13,
+    'y2':                 14,
+    'selectable':         true,
+    'hasControls':        true,
+    'hasBorders':         true,
+    'hasRotatingPoint':   true,
     'transparentCorners': true,
     'perPixelTargetFind': false,
-    'shadow': null,
-    'visible': true
+    'shadow':             null,
+    'visible':            true
   };
 
   QUnit.module('fabric.Line');
@@ -78,13 +81,17 @@
   test('fromElement', function() {
     ok(typeof fabric.Line.fromElement == 'function');
 
-    var lineEl        = fabric.document.createElement('line'),
-        x1            = 11,
-        y1            = 23,
-        x2            = 34,
-        y2            = 7,
-        stroke        = 'ff5555',
-        strokeWidth   = 2;
+    var lineEl           = fabric.document.createElement('line'),
+        x1               = 11,
+        y1               = 23,
+        x2               = 34,
+        y2               = 7,
+        stroke           = 'ff5555',
+        strokeWidth      = 2,
+        strokeDashArray  = [5, 2],
+        strokeLineCap    = 'round',
+        strokeLineJoin   = 'bevil',
+        strokeMiterLimit = 5;
 
     lineEl.setAttribute('x1', x1);
     lineEl.setAttribute('x2', x2);
@@ -92,6 +99,10 @@
     lineEl.setAttribute('y2', y2);
     lineEl.setAttribute('stroke', stroke);
     lineEl.setAttribute('stroke-width', strokeWidth);
+    lineEl.setAttribute('stroke-dasharray', '5, 2');
+    lineEl.setAttribute('stroke-linecap', strokeLineCap);
+    lineEl.setAttribute('stroke-linejoin', strokeLineJoin);
+    lineEl.setAttribute('stroke-miterlimit', strokeMiterLimit);
 
     var oLine = fabric.Line.fromElement(lineEl);
     ok(oLine instanceof fabric.Line);
@@ -102,6 +113,10 @@
     equal(oLine.get('y2'), y2);
     equal(oLine.get('stroke'), stroke);
     equal(oLine.get('strokeWidth'), strokeWidth);
+    deepEqual(oLine.get('strokeDashArray'), strokeDashArray);
+    equal(oLine.get('strokeLineCap'), strokeLineCap);
+    equal(oLine.get('strokeLineJoin'), strokeLineJoin);
+    equal(oLine.get('strokeMiterLimit'), strokeMiterLimit);
 
     var lineElWithMissingAttributes = fabric.document.createElement('line');
     lineElWithMissingAttributes.setAttribute('x1', 10);
