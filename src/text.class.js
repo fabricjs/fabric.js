@@ -5,7 +5,8 @@
   var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       clone = fabric.util.object.clone,
-      toFixed = fabric.util.toFixed;
+      toFixed = fabric.util.toFixed,
+      supportsLineDash = fabric.StaticCanvas.supports('setLineDash');
 
   if (fabric.Text) {
     fabric.warn('fabric.Text is already defined');
@@ -54,90 +55,105 @@
     /**
      * Font size (in pixels)
      * @type Number
+     * @default
      */
     fontSize:             40,
 
     /**
      * Font weight (e.g. bold, normal, 400, 600, 800)
      * @type Number
+     * @default
      */
     fontWeight:           'normal',
 
     /**
      * Font family
      * @type String
+     * @default
      */
     fontFamily:           'Times New Roman',
 
     /**
      * Text decoration (e.g. underline, overline)
      * @type String
+     * @default
      */
     textDecoration:       '',
 
     /**
      * Text shadow
      * @type String | null
+     * @default
      */
     textShadow:           '',
 
     /**
      * Text alignment. Possible values: "left", "center", or "right".
      * @type String
+     * @default
      */
     textAlign:            'left',
 
     /**
      * Font style (e.g. italic)
      * @type String
+     * @default
      */
     fontStyle:            '',
 
     /**
      * Line height
      * @type Number
+     * @default
      */
     lineHeight:           1.3,
 
     /**
      * Stroke style. When specified, text is rendered with stroke
      * @type String
+     * @default
      */
     stroke:               '',
 
     /**
      * Stroke width
      * @type Number
+     * @default
      */
     strokeWidth:          1,
 
     /**
      * Background color of an entire text box
      * @type String
+     * @default
      */
     backgroundColor:      '',
 
     /**
      * Background color of text lines
      * @type String
+     * @default
      */
     textBackgroundColor:  '',
 
     /**
      * URL of a font file, when using Cufon
      * @type String | null
+     * @default
      */
     path:                 null,
 
     /**
      * Type of an object
      * @type String
+     * @default
      */
     type:                 'text',
 
     /**
      * Indicates whether canvas native text methods should be used to render text (otherwise, Cufon is used)
      * @type Boolean
+     * @default
      */
      useNative:           true,
 
@@ -278,12 +294,14 @@
         ctx.translate(this.textAlign === 'center' ? (this.width / 2) : this.width, 0);
       }
 
+      ctx.save();
       this._setTextShadow(ctx);
       this.clipTo && fabric.util.clipContext(this, ctx);
       this._renderTextFill(ctx, textLines);
       this._renderTextStroke(ctx, textLines);
       this.clipTo && ctx.restore();
       this.textShadow && ctx.restore();
+      ctx.restore();
 
       if (this.textAlign !== 'left' && this.textAlign !== 'justify') {
         ctx.restore();
@@ -319,11 +337,20 @@
      * @private
      */
     _setTextStyles: function(ctx) {
-      ctx.fillStyle = this.fill.toLive
-          ? this.fill.toLive(ctx)
-          : this.fill;
-      ctx.strokeStyle = this.stroke;
-      ctx.lineWidth = this.strokeWidth;
+      if (this.fill) {
+        ctx.fillStyle = this.fill.toLive
+            ? this.fill.toLive(ctx)
+            : this.fill;
+      }
+      if (this.stroke) {
+        ctx.lineWidth = this.strokeWidth;
+        ctx.lineCap = this.strokeLineCap;
+        ctx.lineJoin = this.strokeLineJoin;
+        ctx.miterLimit = this.strokeMiterLimit;
+        ctx.strokeStyle = this.stroke.toLive
+          ? this.stroke.toLive(ctx)
+          : this.stroke;
+      }
       ctx.textBaseline = 'alphabetic';
       ctx.textAlign = this.textAlign;
       ctx.font = this._getFontDeclaration();
@@ -443,15 +470,17 @@
      * @private
      */
     _renderTextFill: function(ctx, textLines) {
-      this._boundaries = [ ];
-      for (var i = 0, len = textLines.length; i < len; i++) {
-        this._drawTextLine(
-          'fillText',
-          ctx,
-          textLines[i],
-          this._getLeftOffset(),
-          this._getTopOffset() + (i * this.fontSize * this.lineHeight) + this.fontSize
-        );
+      if (this.fill) {
+        this._boundaries = [ ];
+        for (var i = 0, len = textLines.length; i < len; i++) {
+          this._drawTextLine(
+            'fillText',
+            ctx,
+            textLines[i],
+            this._getLeftOffset(),
+            this._getTopOffset() + (i * this.fontSize * this.lineHeight) + this.fontSize
+          );
+        }
       }
     },
 
@@ -460,6 +489,14 @@
      */
     _renderTextStroke: function(ctx, textLines) {
       if (this.stroke) {
+        if (this.strokeDashArray) {
+          // Spec requires the concatenation of two copies the dash list when the number of elements is odd
+          if (1 & this.strokeDashArray.length) {
+            this.strokeDashArray.push.apply(this.strokeDashArray, this.strokeDashArray);
+          }
+          supportsLineDash && ctx.setLineDash(this.strokeDashArray);
+        }
+
         ctx.beginPath();
         for (var i = 0, len = textLines.length; i < len; i++) {
           this._drawTextLine(
@@ -870,9 +907,11 @@
    * List of attribute names to account for when parsing SVG element (used by {@link fabric.Text.fromElement})
    * @static
    */
-  fabric.Text.ATTRIBUTE_NAMES =
-    ('x y fill fill-opacity opacity stroke stroke-width transform ' +
-     'font-family font-style font-weight font-size text-decoration').split(' ');
+  fabric.Text.ATTRIBUTE_NAMES = (
+    'x y fill fill-opacity opacity stroke stroke-width stroke-dasharray ' +
+    'stroke-linejoin stroke-linecap stroke-miterlimit transform ' +
+    'font-family font-style font-weight font-size text-decoration'
+  ).split(' ');
 
   /**
    * Returns fabric.Text instance from an object representation

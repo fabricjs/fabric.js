@@ -35,6 +35,7 @@
     /**
      * Type of an object
      * @type String
+     * @default
      */
     type: 'group',
 

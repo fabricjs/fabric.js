@@ -1,33 +1,36 @@
 (function() {
 
   var REFERENCE_PATH_OBJECT = {
-    'type': 'path',
-    'originX': 'center',
-    'originY': 'center',
-    'left': 200,
-    'top': 200,
-    'width': 200,
-    'height': 200,
-    'fill': 'red',
-    'overlayFill': null,
-    'stroke': 'blue',
-    'strokeWidth': 1,
-    'strokeDashArray': null,
-    'scaleX': 1,
-    'scaleY': 1,
-    'angle': 0,
-    'flipX': false,
-    'flipY': false,
-    'opacity': 1,
-    'path': [['M', 100, 100], ['L', 300, 100], ['L', 200, 300], ['z']],
-    'selectable': true,
-    'hasControls': true,
-    'hasBorders': true,
-    'hasRotatingPoint': true,
+    'type':               'path',
+    'originX':            'center',
+    'originY':            'center',
+    'left':               200,
+    'top':                200,
+    'width':              200,
+    'height':             200,
+    'fill':               'red',
+    'overlayFill':        null,
+    'stroke':             'blue',
+    'strokeWidth':        1,
+    'strokeDashArray':    null,
+    'strokeLineCap':      'butt',
+    'strokeLineJoin':     'miter',
+    'strokeMiterLimit':   10,
+    'scaleX':             1,
+    'scaleY':             1,
+    'angle':              0,
+    'flipX':              false,
+    'flipY':              false,
+    'opacity':            1,
+    'path':               [['M', 100, 100], ['L', 300, 100], ['L', 200, 300], ['z']],
+    'selectable':         true,
+    'hasControls':        true,
+    'hasBorders':         true,
+    'hasRotatingPoint':   true,
     'transparentCorners': true,
     'perPixelTargetFind': false,
-    'shadow': null,
-    'visible': true
+    'shadow':             null,
+    'visible':            true
   };
 
   function getPathElement(path) {
@@ -35,7 +38,10 @@
     el.setAttribute('d', path);
     el.setAttribute('fill', 'red');
     el.setAttribute('stroke', 'blue');
-    el.setAttribute('troke-width', 3);
+    el.setAttribute('stroke-width', 1);
+    el.setAttribute('stroke-linecap', 'butt');
+    el.setAttribute('stroke-linejoin', 'miter');
+    el.setAttribute('stroke-miterlimit', 10);
     return el;
   }
 
@@ -114,16 +120,24 @@
     elPath.setAttribute('fill-opacity', '1');
     elPath.setAttribute('stroke', 'blue');
     elPath.setAttribute('stroke-width', '1');
+    elPath.setAttribute('stroke-dasharray', '5, 2');
+    elPath.setAttribute('stroke-linecap', 'round');
+    elPath.setAttribute('stroke-linejoin', 'bevil');
+    elPath.setAttribute('stroke-miterlimit', '5');
 
     // TODO (kangax): to support multiple transformation keywords, we need to do proper matrix multiplication
-    // elPath.setAttribute('transform', 'scale(2) translate(10, -20)');
+    //elPath.setAttribute('transform', 'scale(2) translate(10, -20)');
     elPath.setAttribute('transform', 'scale(2)');
 
     var path = fabric.Path.fromElement(elPath);
     ok(path instanceof fabric.Path);
 
     deepEqual(fabric.util.object.extend(REFERENCE_PATH_OBJECT, {
-      transformMatrix: [2, 0, 0, 2, 0, 0]
+      strokeDashArray:  [5, 2],
+      strokeLineCap:    'round',
+      strokeLineJoin:   'bevil',
+      strokeMiterLimit: 5,
+      transformMatrix:  [2, 0, 0, 2, 0, 0]
     }), path.toObject());
 
     var ANGLE = 90;

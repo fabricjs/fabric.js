@@ -209,6 +209,8 @@
       path.fill = null;
       path.stroke = this.color;
       path.strokeWidth = this.width;
+      path.strokeLineCap = this.strokeLineCap;
+      path.strokeLineJoin = this.strokeLineJoin;
       path.setShadow({
         color: this.shadowColor || this.color,
         blur: this.shadowBlur,
