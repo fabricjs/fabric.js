@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures` */
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.1.14" };
+var fabric = fabric || { version: "1.1.15" };
 
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
@@ -3923,6 +3923,10 @@ fabric.util.string = {
     'fill-opacity':     'opacity',
     'fill-rule':        'fillRule',
     'stroke-width':     'strokeWidth',
+    'stroke-dasharray': 'strokeDashArray',
+    'stroke-linecap':   'strokeLineCap',
+    'stroke-linejoin':  'strokeLineJoin',
+    'stroke-miterlimit':'strokeMiterLimit',
     'transform':        'transformMatrix',
     'text-decoration':  'textDecoration',
     'font-size':        'fontSize',
@@ -3940,20 +3944,31 @@ fabric.util.string = {
   }
 
   function normalizeValue(attr, value, parentAttributes) {
+    var isArray;
+
     if ((attr === 'fill' || attr === 'stroke') && value === 'none') {
-      return '';
+      value = '';
     }
-    if (attr === 'fill-rule') {
-      return (value === 'evenodd') ? 'destination-over' : value;
+    else if (attr === 'fillRule') {
+      value = (value === 'evenodd') ? 'destination-over' : value;
     }
-    if (attr === 'transform') {
+    else if (attr === 'strokeDashArray') {
+      value = value.replace(/,/g, ' ').split(/\s+/);
+    }
+    else if (attr === 'transformMatrix') {
       if (parentAttributes && parentAttributes.transformMatrix) {
-        return multiplyTransformMatrices(
+        value = multiplyTransformMatrices(
           parentAttributes.transformMatrix, fabric.parseTransformAttribute(value));
       }
-      return fabric.parseTransformAttribute(value);
+      value = fabric.parseTransformAttribute(value);
     }
-    return value;
+
+    isArray = Object.prototype.toString.call(value) === '[object Array]';
+
+    // TODO: need to normalize em, %, pt, etc. to px (!)
+    var parsed = isArray ? value.map(parseFloat) : parseFloat(value);
+
+    return (!isArray && isNaN(parsed) ? value : parsed);
   }
 
   /**
@@ -3972,7 +3987,6 @@ fabric.util.string = {
     }
 
     var value,
-        parsed,
         parentAttributes = { };
 
     // if there's a parent container (`g` node), parse its attributes recursively upwards
@@ -3982,12 +3996,11 @@ fabric.util.string = {
 
     var ownAttributes = attributes.reduce(function(memo, attr) {
       value = element.getAttribute(attr);
-      parsed = parseFloat(value);
       if (value) {
-        value = normalizeValue(attr, value, parentAttributes);
         attr = normalizeAttr(attr);
+        value = normalizeValue(attr, value, parentAttributes);
 
-        memo[attr] = isNaN(parsed) ? value : parsed;
+        memo[attr] = value;
       }
       return memo;
     }, { });
@@ -4225,24 +4238,23 @@ fabric.util.string = {
    */
   function parseStyleAttribute(element) {
     var oStyle = { },
-        style = element.getAttribute('style');
+        style = element.getAttribute('style'),
+        attr, value;
 
     if (!style) return oStyle;
 
     if (typeof style === 'string') {
       style.replace(/;$/, '').split(';').forEach(function (chunk) {
-
         var pair = chunk.split(':');
-        var attr = normalizeAttr(pair[0].trim().toLowerCase());
-        var value = normalizeValue(attr, pair[1].trim());
+
+        attr = normalizeAttr(pair[0].trim().toLowerCase());
+        value = normalizeValue(attr, pair[1].trim());
 
         if (attr === 'font') {
           parseFontDeclaration(value, oStyle);
         }
         else {
-          // TODO: need to normalize em, %, pt, etc. to px (!)
-          var parsed = parseFloat(value);
-          oStyle[attr] = isNaN(parsed) ? value : parsed;
+          oStyle[attr] = value;
         }
       });
     }
@@ -4250,16 +4262,14 @@ fabric.util.string = {
       for (var prop in style) {
         if (typeof style[prop] === 'undefined') continue;
 
-        var attr = normalizeAttr(prop.toLowerCase());
-        var value = normalizeValue(attr, style[prop]);
+        attr = normalizeAttr(prop.toLowerCase());
+        value = normalizeValue(attr, style[prop]);
 
         if (attr === 'font') {
           parseFontDeclaration(value, oStyle);
         }
         else {
-          // TODO: need to normalize em, %, pt, etc. to px (!)
-          var parsed = parseFloat(value);
-          oStyle[attr] = isNaN(parsed) ? value : parsed;
+          oStyle[attr] = value;
         }
       }
     }
@@ -7237,38 +7247,58 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
   /**
    * Color of a brush
    * @type String
+   * @default
    */
-  color:       'rgb(0, 0, 0)',
+  color:            'rgb(0, 0, 0)',
 
   /**
    * Width of a brush
    * @type Number
+   * @default
    */
-  width:        1,
+  width:            1,
 
   /**
    * Shadow blur of a brush
    * @type Number
+   * @default
    */
-  shadowBlur:   0,
+  shadowBlur:       0,
 
   /**
    * Shadow color of a brush
    * @type String
+   * @default
    */
-  shadowColor:  '',
+  shadowColor:      '',
 
   /**
    * Shadow offset x of a brush
    * @type Number
+   * @default
    */
-  shadowOffsetX: 0,
+  shadowOffsetX:    0,
 
   /**
    * Shadow offset y of a brush
    * @type Number
+   * @default
    */
-  shadowOffsetY: 0,
+  shadowOffsetY:    0,
+
+  /**
+   * Line endings style of a brush (one of "butt", "round", "square")
+   * @type String
+   * @default
+   */
+  strokeLineCap:    'round',
+
+  /**
+   * Corner style of a brush (one of "bevil", "round", "miter")
+   * @type String
+   * @default
+   */
+  strokeLineJoin:   'round',
 
   /**
    * Sets brush styles
@@ -7278,7 +7308,8 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
 
     ctx.strokeStyle = this.color;
     ctx.lineWidth = this.width;
-    ctx.lineCap = ctx.lineJoin = 'round';
+    ctx.lineCap = this.strokeLineCap;
+    ctx.lineJoin = this.strokeLineJoin;
   },
 
   /**
@@ -7515,6 +7546,8 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
       path.fill = null;
       path.stroke = this.color;
       path.strokeWidth = this.width;
+      path.strokeLineCap = this.strokeLineCap;
+      path.strokeLineJoin = this.strokeLineJoin;
       path.setShadow({
         color: this.shadowColor || this.color,
         blur: this.shadowBlur,
@@ -9705,146 +9738,190 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     /**
      * Type of an object (rect, circle, path, etc.)
      * @type String
+     * @default
      */
     type:                     'object',
 
     /**
      * Horizontal origin of transformation of an object (one of "left", "right", "center")
      * @type String
+     * @default
      */
     originX:                  'center',
 
     /**
      * Vertical origin of transformation of an object (one of "top", "bottom", "center")
      * @type String
+     * @default
      */
     originY:                  'center',
 
     /**
      * Top position of an object. Note that by default it's relative to object center. You can change this by setting originY={top/center/bottom}
      * @type Number
+     * @default
      */
     top:                      0,
 
     /**
      * Left position of an object. Note that by default it's relative to object center. You can change this by setting originX={left/center/right}
      * @type Number
+     * @default
      */
     left:                     0,
 
     /**
      * Object width
      * @type Number
+     * @default
      */
     width:                    0,
 
     /**
      * Object height
      * @type Number
+     * @default
      */
     height:                   0,
 
     /**
      * Object scale factor (horizontal)
      * @type Number
+     * @default
      */
     scaleX:                   1,
 
     /**
      * Object scale factor (vertical)
      * @type Number
+     * @default
      */
     scaleY:                   1,
 
     /**
      * When true, an object is rendered as flipped horizontally
      * @type Boolean
+     * @default
      */
     flipX:                    false,
 
     /**
      * When true, an object is rendered as flipped vertically
      * @type Boolean
+     * @default
      */
     flipY:                    false,
 
     /**
      * Opacity of an object
      * @type Number
+     * @default
      */
     opacity:                  1,
 
     /**
      * Angle of rotation of an object (in degrees)
      * @type Number
+     * @default
      */
     angle:                    0,
 
     /**
      * Size of object's corners (in pixels)
      * @type Number
+     * @default
      */
     cornerSize:               12,
 
     /**
      * When true, object's corners are rendered as transparent inside (i.e. stroke instead of fill)
      * @type Boolean
+     * @default
      */
     transparentCorners:       true,
 
     /**
      * Padding between object and its borders (in pixels)
      * @type Number
+     * @default
      */
     padding:                  0,
 
     /**
      * Border color of an object (when it's active)
      * @type String
+     * @default
      */
     borderColor:              'rgba(102,153,255,0.75)',
 
     /**
      * Corner color of an object (when it's active)
      * @type String
+     * @default
      */
     cornerColor:              'rgba(102,153,255,0.5)',
 
     /**
      * Color of object's fill
      * @type String
+     * @default
      */
     fill:                     'rgb(0,0,0)',
 
     /**
      * Fill rule used to fill an object
      * @type String
+     * @default
      */
     fillRule:                 'source-over',
 
     /**
      * Overlay fill (takes precedence over fill value)
      * @type String
+     * @default
      */
     overlayFill:              null,
 
     /**
      * When `true`, an object is rendered via stroke and this property specifies its color
      * @type String
+     * @default
      */
     stroke:                   null,
 
     /**
      * Width of a stroke used to render this object
      * @type Number
+     * @default
      */
     strokeWidth:              1,
 
     /**
-     * Array specifying dash pattern of an object's stroke
+     * Array specifying dash pattern of an object's stroke (stroke must be defined)
      * @type Array
      */
     strokeDashArray:          null,
+
+    /**
+     * Line endings style of an object's stroke (one of "butt", "round", "square")
+     * @type String
+     * @default
+     */
+    strokeLineCap:            'butt',
+
+    /**
+     * Corner style of an object's stroke (one of "bevil", "round", "miter")
+     * @type String
+     * @default
+     */
+    strokeLineJoin:           'miter',
+
+    /**
+     * Maximum miter length (used for strokeLineJoin = "miter") of an object's stroke
+     * @type Number
+     * @default
+     */
+    strokeMiterLimit:         10,
 
     /**
      * Shadow object representing shadow of this shape
@@ -9855,12 +9932,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     /**
      * Border opacity when object is active and moving
      * @type Number
+     * @default
      */
     borderOpacityWhenMoving:  0.4,
 
     /**
      * Border scale factor
      * @type Number
+     * @default
      */
     borderScaleFactor:        1,
 
@@ -9873,54 +9952,63 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     /**
      * Minimum allowed scale value of an object
      * @type Number
+     * @default
      */
     minScaleLimit:            0.01,
 
     /**
      * When set to `false`, an object can not be selected for modification (using either point-click-based or group-based selection)
      * @type Boolean
+     * @default
      */
     selectable:               true,
 
     /**
      * When set to `false`, an object is not rendered on canvas
      * @type Boolean
+     * @default
      */
     visible:                  true,
 
     /**
      * When set to `false`, object's controls are not displayed and can not be used to manipulate object
      * @type Boolean
+     * @default
      */
     hasControls:              true,
 
     /**
      * When set to `false`, object's borders are not rendered
      * @type Boolean
+     * @default
      */
     hasBorders:               true,
 
     /**
      * When set to `false`, object's rotating point will not be visible or selectable
      * @type Boolean
+     * @default
      */
     hasRotatingPoint:         true,
 
     /**
      * Offset for object's rotating point (when enabled via `hasRotatingPoint`)
      * @type Number
+     * @default
      */
     rotatingPointOffset:      40,
 
     /**
      * When set to `true`, objects are "found" on canvas on per-pixel basis rather than according to bounding box
      * @type Boolean
+     * @default
      */
     perPixelTargetFind:       false,
 
     /**
      * When `false`, default object's values are not included in its serialization
      * @type Boolean
+     * @default
      */
     includeDefaultValues:     true,
 
@@ -9933,38 +10021,44 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     /**
      * When `true`, object horizontal movement is locked
      * @type Boolean
+     * @default
      */
-    lockMovementX:  false,
+    lockMovementX:            false,
 
     /**
      * When `true`, object vertical movement is locked
      * @type Boolean
+     * @default
      */
-    lockMovementY:  false,
+    lockMovementY:            false,
 
     /**
      * When `true`, object rotation is locked
      * @type Boolean
+     * @default
      */
-    lockRotation:   false,
+    lockRotation:             false,
 
     /**
      * When `true`, object horizontal scaling is locked
      * @type Boolean
+     * @default
      */
-    lockScalingX:   false,
+    lockScalingX:             false,
 
     /**
      * When `true`, object vertical scaling is locked
      * @type Boolean
+     * @default
      */
-    lockScalingY:   false,
+    lockScalingY:             false,
 
     /**
      * When `true`, object non-uniform scaling is locked
      * @type Boolean
+     * @default
      */
-    lockUniScaling: false,
+    lockUniScaling:           false,
 
     /**
      * List of properties to consider when checking if state
@@ -10069,8 +10163,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         fill:               (this.fill && this.fill.toObject) ? this.fill.toObject() : this.fill,
         overlayFill:        this.overlayFill,
         stroke:             (this.stroke && this.stroke.toObject) ? this.stroke.toObject() : this.stroke,
-        strokeWidth:        this.strokeWidth,
+        strokeWidth:        toFixed(this.strokeWidth, NUM_FRACTION_DIGITS),
         strokeDashArray:    this.strokeDashArray,
+        strokeLineCap:      this.strokeLineCap,
+        strokeLineJoin:     this.strokeLineJoin,
+        strokeMiterLimit:   toFixed(this.strokeMiterLimit, NUM_FRACTION_DIGITS),
         scaleX:             toFixed(this.scaleX, NUM_FRACTION_DIGITS),
         scaleY:             toFixed(this.scaleY, NUM_FRACTION_DIGITS),
         angle:              toFixed(this.getAngle(), NUM_FRACTION_DIGITS),
@@ -10114,6 +10211,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         "stroke: ", (this.stroke ? this.stroke : 'none'), "; ",
         "stroke-width: ", (this.strokeWidth ? this.strokeWidth : '0'), "; ",
         "stroke-dasharray: ", (this.strokeDashArray ? this.strokeDashArray.join(' ') : ''), "; ",
+        "stroke-linecap: ", (this.strokeLineCap ? this.strokeLineCap : 'butt'), "; ",
+        "stroke-linejoin: ", (this.strokeLineJoin ? this.strokeLineJoin : 'miter'), "; ",
+        "stroke-miterlimit: ", (this.strokeMiterLimit ? this.strokeMiterLimit : '4'), "; ",
         "fill: ", (this.fill ? (this.fill && this.fill.toLive ? 'url(#SVGID_' + this.fill.id + ')' : this.fill) : 'none'), "; ",
         "opacity: ", (typeof this.opacity !== 'undefined' ? this.opacity : '1'), ";",
         (this.visible ? '' : " visibility: hidden;")
@@ -10283,14 +10383,15 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         this.transform(ctx);
       }
 
-      if (this.stroke || this.strokeDashArray) {
+      ctx.save();
+      if (this.stroke) {
         ctx.lineWidth = this.strokeWidth;
-        if (this.stroke && this.stroke.toLive) {
-          ctx.strokeStyle = this.stroke.toLive(ctx);
-        }
-        else {
-          ctx.strokeStyle = this.stroke;
-        }
+        ctx.lineCap = this.strokeLineCap;
+        ctx.lineJoin = this.strokeLineJoin;
+        ctx.miterLimit = this.strokeMiterLimit;
+        ctx.strokeStyle = this.stroke.toLive
+          ? this.stroke.toLive(ctx)
+          : this.stroke;
       }
 
       if (this.overlayFill) {
@@ -10312,6 +10413,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       this._render(ctx, noTransform);
       this.clipTo && ctx.restore();
       this._removeShadow(ctx);
+      ctx.restore();
 
       if (this.active && !noTransform) {
         this.drawBorders(ctx);
@@ -10369,7 +10471,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _renderStroke: function(ctx) {
-      if (!this.stroke && !this.strokeDashArray) return;
+      if (!this.stroke) return;
 
       if (this.strokeDashArray) {
         // Spec requires the concatenation of two copies the dash list when the number of elements is odd
@@ -11885,6 +11987,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     /**
      * Type of an object
      * @type String
+     * @default
      */
     type: 'line',
 
@@ -12038,7 +12141,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @static
    * @see http://www.w3.org/TR/SVG/shapes.html#LineElement
    */
-  fabric.Line.ATTRIBUTE_NAMES = 'x1 y1 x2 y2 stroke stroke-width transform'.split(' ');
+  fabric.Line.ATTRIBUTE_NAMES = (
+    'x1 y1 x2 y2 stroke stroke-width stroke-dasharray ' +
+    'stroke-linejoin stroke-linecap stroke-miterlimit transform'
+  ).split(' ');
 
   /**
    * Returns fabric.Line instance from an SVG element
@@ -12094,6 +12200,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     /**
      * Type of an object
      * @type String
+     * @default
      */
     type: 'circle',
 
@@ -12205,7 +12312,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @static
    * @see: http://www.w3.org/TR/SVG/shapes.html#CircleElement
    */
-  fabric.Circle.ATTRIBUTE_NAMES = 'cx cy r fill fill-opacity opacity stroke stroke-width transform'.split(' ');
+  fabric.Circle.ATTRIBUTE_NAMES = (
+    'cx cy r fill fill-opacity opacity stroke stroke-width stroke-dasharray ' +
+    'stroke-linejoin stroke-linecap stroke-miterlimit transform'
+  ).split(' ');
 
   /**
    * Returns {@link fabric.Circle} instance from an SVG element
@@ -12276,6 +12386,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     /**
      * Type of an object
      * @type String
+     * @default
      */
     type: 'triangle',
 
@@ -12406,20 +12517,23 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     /**
      * Type of an object
      * @type String
+     * @default
      */
     type: 'ellipse',
 
     /**
      * Horizontal radius
      * @type Number
+     * @default
      */
-    rx: 0,
+    rx:   0,
 
     /**
      * Vertical radius
      * @type Number
+     * @default
      */
-    ry: 0,
+    ry:   0,
 
     /**
      * Constructor
@@ -12522,7 +12636,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @static
    * @see http://www.w3.org/TR/SVG/shapes.html#EllipseElement
    */
-  fabric.Ellipse.ATTRIBUTE_NAMES = 'cx cy rx ry fill fill-opacity opacity stroke stroke-width transform'.split(' ');
+  fabric.Ellipse.ATTRIBUTE_NAMES = (
+    'cx cy rx ry fill fill-opacity opacity stroke stroke-width stroke-dasharray ' +
+    'stroke-linejoin stroke-linecap stroke-miterlimit transform'
+  ).split(' ');
 
   /**
    * Returns {@link fabric.Ellipse} instance from an SVG element
@@ -12588,20 +12705,23 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     /**
      * Type of an object
      * @type String
+     * @default
      */
     type: 'rect',
 
     /**
      * Horizontal border radius
      * @type Number
+     * @default
      */
-    rx: 0,
+    rx:   0,
 
     /**
      * Vertical border radius
      * @type Number
+     * @default
      */
-    ry: 0,
+    ry:   0,
 
     /**
      * Used to specify dash pattern for stroke on this object
@@ -12777,7 +12897,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * List of attribute names to account for when parsing SVG element (used by `fabric.Rect.fromElement`)
    * @static
    */
-  fabric.Rect.ATTRIBUTE_NAMES = 'x y width height rx ry fill fill-opacity opacity stroke stroke-width transform'.split(' ');
+  fabric.Rect.ATTRIBUTE_NAMES = (
+    'x y width height rx ry fill fill-opacity opacity stroke stroke-width stroke-dasharray ' +
+    'stroke-linejoin stroke-linecap stroke-miterlimit transform'
+  ).split(' ');
 
   /**
    * @private
@@ -12843,6 +12966,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     /**
      * Type of an object
      * @type String
+     * @default
      */
     type: 'polyline',
 
@@ -12955,7 +13079,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @static
    * @see: http://www.w3.org/TR/SVG/shapes.html#PolylineElement
    */
-  fabric.Polyline.ATTRIBUTE_NAMES = 'fill fill-opacity opacity stroke stroke-width transform'.split(' ');
+  fabric.Polyline.ATTRIBUTE_NAMES = (
+    'fill fill-opacity opacity stroke stroke-width stroke-dasharray ' +
+    'stroke-linejoin stroke-linecap stroke-miterlimit transform'
+  ).split(' ');
 
   /**
    * Returns fabric.Polyline instance from an SVG element
@@ -13020,6 +13147,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     /**
      * Type of an object
      * @type String
+     * @default
      */
     type: 'polygon',
 
@@ -13158,7 +13286,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @static
    * @see: http://www.w3.org/TR/SVG/shapes.html#PolygonElement
    */
-  fabric.Polygon.ATTRIBUTE_NAMES = 'fill fill-opacity opacity stroke stroke-width transform'.split(' ');
+  fabric.Polygon.ATTRIBUTE_NAMES = (
+    'fill fill-opacity opacity stroke stroke-width stroke-dasharray ' +
+    'stroke-linejoin stroke-linecap stroke-miterlimit transform'
+  ).split(' ');
 
   /**
    * Returns {@link fabric.Polygon} instance from an SVG element
@@ -13363,6 +13494,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     /**
      * Type of an object
      * @type String
+     * @default
      */
     type: 'path',
 
@@ -13738,6 +13870,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       }
       // ctx.globalCompositeOperation = this.fillRule;
 
+      ctx.save();
       if (this.overlayFill) {
         ctx.fillStyle = this.overlayFill;
       }
@@ -13748,27 +13881,25 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       }
 
       if (this.stroke) {
+        ctx.lineWidth = this.strokeWidth;
+        ctx.lineCap = this.strokeLineCap;
+        ctx.lineJoin = this.strokeLineJoin;
+        ctx.miterLimit = this.strokeMiterLimit;
         ctx.strokeStyle = this.stroke.toLive
           ? this.stroke.toLive(ctx)
           : this.stroke;
       }
+
       this._setShadow(ctx);
       this.clipTo && fabric.util.clipContext(this, ctx);
-
       ctx.beginPath();
 
       this._render(ctx);
       this._renderFill(ctx);
-
-      if (this.stroke) {
-        ctx.strokeStyle = this.stroke;
-        ctx.lineWidth = this.strokeWidth;
-        ctx.lineCap = ctx.lineJoin = 'round';
-        this._renderStroke(ctx);
-      }
+      this._renderStroke(ctx);
       this.clipTo && ctx.restore();
-
       this._removeShadow(ctx);
+      ctx.restore();
 
       if (!noTransform && this.active) {
         this.drawBorders(ctx);
@@ -13995,7 +14126,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @static
    * @see http://www.w3.org/TR/SVG/paths.html#PathElement
    */
-  fabric.Path.ATTRIBUTE_NAMES = 'd fill fill-opacity opacity fill-rule stroke stroke-width transform'.split(' ');
+  fabric.Path.ATTRIBUTE_NAMES = (
+    'd fill fill-opacity opacity fill-rule stroke stroke-width stroke-dasharray ' +
+    'stroke-linejoin stroke-linecap stroke-miterlimit transform'
+  ).split(' ');
 
   /**
    * Creates an instance of fabric.Path from an SVG <path> element
@@ -14037,12 +14171,14 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     /**
      * Type of an object
      * @type String
+     * @default
      */
     type: 'path-group',
 
     /**
      * Fill value
      * @type String
+     * @default
      */
     fill: '',
 
@@ -14281,6 +14417,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     /**
      * Type of an object
      * @type String
+     * @default
      */
     type: 'group',
 
@@ -14741,6 +14878,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     /**
      * Type of an object
      * @type String
+     * @default
      */
     type: 'image',
 
@@ -14822,6 +14960,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         this.transform(ctx);
       }
 
+      ctx.save();
       this._setShadow(ctx);
       this.clipTo && fabric.util.clipContext(this, ctx);
       this._render(ctx);
@@ -14830,6 +14969,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       }
       this._renderStroke(ctx);
       this.clipTo && ctx.restore();
+      ctx.restore();
 
       if (this.active && !noTransform) {
         this.drawBorders(ctx);
@@ -14845,7 +14985,12 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     _stroke: function(ctx) {
       ctx.save();
       ctx.lineWidth = this.strokeWidth;
-      ctx.strokeStyle = this.stroke;
+      ctx.lineCap = this.strokeLineCap;
+      ctx.lineJoin = this.strokeLineJoin;
+      ctx.miterLimit = this.strokeMiterLimit;
+      ctx.strokeStyle = this.stroke.toLive
+        ? this.stroke.toLive(ctx)
+        : this.stroke;
       ctx.beginPath();
       ctx.strokeRect(-this.width / 2, -this.height / 2, this.width, this.height);
       ctx.beginPath();
@@ -14863,7 +15008,12 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
          h = this.height;
 
       ctx.lineWidth = this.strokeWidth;
-      ctx.strokeStyle = this.stroke;
+      ctx.lineCap = this.strokeLineCap;
+      ctx.lineJoin = this.strokeLineJoin;
+      ctx.miterLimit = this.strokeMiterLimit;
+      ctx.strokeStyle = this.stroke.toLive
+        ? this.stroke.toLive(ctx)
+        : this.stroke;
       ctx.beginPath();
       fabric.util.drawDashedLine(ctx, x, y, x+w, y, this.strokeDashArray);
       fabric.util.drawDashedLine(ctx, x+w, y, x+w, y+h, this.strokeDashArray);
@@ -15152,7 +15302,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @static
    * @see http://www.w3.org/TR/SVG/struct.html#ImageElement
    */
-  fabric.Image.ATTRIBUTE_NAMES = 'x y width height fill fill-opacity opacity stroke stroke-width transform xlink:href'.split(' ');
+  fabric.Image.ATTRIBUTE_NAMES = 'x y width height fill fill-opacity opacity transform xlink:href'.split(' ');
 
   /**
    * Returns {@link fabric.Image} instance from an SVG element
@@ -16046,7 +16196,8 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
   var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       clone = fabric.util.object.clone,
-      toFixed = fabric.util.toFixed;
+      toFixed = fabric.util.toFixed,
+      supportsLineDash = fabric.StaticCanvas.supports('setLineDash');
 
   if (fabric.Text) {
     fabric.warn('fabric.Text is already defined');
@@ -16095,90 +16246,105 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
     /**
      * Font size (in pixels)
      * @type Number
+     * @default
      */
     fontSize:             40,
 
     /**
      * Font weight (e.g. bold, normal, 400, 600, 800)
      * @type Number
+     * @default
      */
     fontWeight:           'normal',
 
     /**
      * Font family
      * @type String
+     * @default
      */
     fontFamily:           'Times New Roman',
 
     /**
      * Text decoration (e.g. underline, overline)
      * @type String
+     * @default
      */
     textDecoration:       '',
 
     /**
      * Text shadow
      * @type String | null
+     * @default
      */
     textShadow:           '',
 
     /**
      * Text alignment. Possible values: "left", "center", or "right".
      * @type String
+     * @default
      */
     textAlign:            'left',
 
     /**
      * Font style (e.g. italic)
      * @type String
+     * @default
      */
     fontStyle:            '',
 
     /**
      * Line height
      * @type Number
+     * @default
      */
     lineHeight:           1.3,
 
     /**
      * Stroke style. When specified, text is rendered with stroke
      * @type String
+     * @default
      */
     stroke:               '',
 
     /**
      * Stroke width
      * @type Number
+     * @default
      */
     strokeWidth:          1,
 
     /**
      * Background color of an entire text box
      * @type String
+     * @default
      */
     backgroundColor:      '',
 
     /**
      * Background color of text lines
      * @type String
+     * @default
      */
     textBackgroundColor:  '',
 
     /**
      * URL of a font file, when using Cufon
      * @type String | null
+     * @default
      */
     path:                 null,
 
     /**
      * Type of an object
      * @type String
+     * @default
      */
     type:                 'text',
 
     /**
      * Indicates whether canvas native text methods should be used to render text (otherwise, Cufon is used)
      * @type Boolean
+     * @default
      */
      useNative:           true,
 
@@ -16319,12 +16485,14 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
         ctx.translate(this.textAlign === 'center' ? (this.width / 2) : this.width, 0);
       }
 
+      ctx.save();
       this._setTextShadow(ctx);
       this.clipTo && fabric.util.clipContext(this, ctx);
       this._renderTextFill(ctx, textLines);
       this._renderTextStroke(ctx, textLines);
       this.clipTo && ctx.restore();
       this.textShadow && ctx.restore();
+      ctx.restore();
 
       if (this.textAlign !== 'left' && this.textAlign !== 'justify') {
         ctx.restore();
@@ -16360,11 +16528,20 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
      * @private
      */
     _setTextStyles: function(ctx) {
-      ctx.fillStyle = this.fill.toLive
-          ? this.fill.toLive(ctx)
-          : this.fill;
-      ctx.strokeStyle = this.stroke;
-      ctx.lineWidth = this.strokeWidth;
+      if (this.fill) {
+        ctx.fillStyle = this.fill.toLive
+            ? this.fill.toLive(ctx)
+            : this.fill;
+      }
+      if (this.stroke) {
+        ctx.lineWidth = this.strokeWidth;
+        ctx.lineCap = this.strokeLineCap;
+        ctx.lineJoin = this.strokeLineJoin;
+        ctx.miterLimit = this.strokeMiterLimit;
+        ctx.strokeStyle = this.stroke.toLive
+          ? this.stroke.toLive(ctx)
+          : this.stroke;
+      }
       ctx.textBaseline = 'alphabetic';
       ctx.textAlign = this.textAlign;
       ctx.font = this._getFontDeclaration();
@@ -16484,15 +16661,17 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
      * @private
      */
     _renderTextFill: function(ctx, textLines) {
-      this._boundaries = [ ];
-      for (var i = 0, len = textLines.length; i < len; i++) {
-        this._drawTextLine(
-          'fillText',
-          ctx,
-          textLines[i],
-          this._getLeftOffset(),
-          this._getTopOffset() + (i * this.fontSize * this.lineHeight) + this.fontSize
-        );
+      if (this.fill) {
+        this._boundaries = [ ];
+        for (var i = 0, len = textLines.length; i < len; i++) {
+          this._drawTextLine(
+            'fillText',
+            ctx,
+            textLines[i],
+            this._getLeftOffset(),
+            this._getTopOffset() + (i * this.fontSize * this.lineHeight) + this.fontSize
+          );
+        }
       }
     },
 
@@ -16501,6 +16680,14 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
      */
     _renderTextStroke: function(ctx, textLines) {
       if (this.stroke) {
+        if (this.strokeDashArray) {
+          // Spec requires the concatenation of two copies the dash list when the number of elements is odd
+          if (1 & this.strokeDashArray.length) {
+            this.strokeDashArray.push.apply(this.strokeDashArray, this.strokeDashArray);
+          }
+          supportsLineDash && ctx.setLineDash(this.strokeDashArray);
+        }
+
         ctx.beginPath();
         for (var i = 0, len = textLines.length; i < len; i++) {
           this._drawTextLine(
@@ -16911,9 +17098,11 @@ fabric.Image.filters.Pixelate.fromObject = function(object) {
    * List of attribute names to account for when parsing SVG element (used by {@link fabric.Text.fromElement})
    * @static
    */
-  fabric.Text.ATTRIBUTE_NAMES =
-    ('x y fill fill-opacity opacity stroke stroke-width transform ' +
-     'font-family font-style font-weight font-size text-decoration').split(' ');
+  fabric.Text.ATTRIBUTE_NAMES = (
+    'x y fill fill-opacity opacity stroke stroke-width stroke-dasharray ' +
+    'stroke-linejoin stroke-linecap stroke-miterlimit transform ' +
+    'font-family font-style font-weight font-size text-decoration'
+  ).split(' ');
 
   /**
    * Returns fabric.Text instance from an object representation
