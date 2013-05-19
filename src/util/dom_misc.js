@@ -104,13 +104,13 @@
         box = {left: 0, top: 0},
         doc = element && element.ownerDocument;
     if (!doc){
-      return {left: 0, top: 0}
+      return {left: 0, top: 0};
     }
     docElem = doc.documentElement;
     if ( typeof element.getBoundingClientRect !== "undefined" ) {
       box = element.getBoundingClientRect();
     }
-    if(doc != null && doc == doc.window){
+    if(doc != null && doc === doc.window){
       win = doc;
     } else {
       win = doc.nodeType === 9 && doc.defaultView;
