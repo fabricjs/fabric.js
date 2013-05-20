@@ -900,6 +900,14 @@
         this._initDimensions();
         this.setCoords();
       }
+    },
+
+    /**
+     * Returns complexity of an instance
+     * @return {Number} complexity
+     */
+    complexity: function() {
+      return 1;
     }
   });
 
