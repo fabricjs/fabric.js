@@ -66,7 +66,7 @@
   test('toString', function() {
     var text = createTextObject();
     ok(typeof text.toString == 'function');
-    equal(text.toString(), '#<fabric.Text (0): { "text": "x", "fontFamily": "Times New Roman" }>');
+    equal(text.toString(), '#<fabric.Text (1): { "text": "x", "fontFamily": "Times New Roman" }>');
   });
 
   test('toObject', function() {
@@ -78,6 +78,7 @@
   test('complexity', function(){
     var text = createTextObject();
     ok(typeof text.complexity == 'function');
+    equal(text.complexity(), 1);
   });
 
   test('set', function() {
