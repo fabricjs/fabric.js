@@ -295,6 +295,20 @@
     ok(group.containsPoint({ x: 50, y: 120 }));
     ok(group.containsPoint({ x: 100, y: 100 }));
     ok(!group.containsPoint({ x: 0, y: 0 }));
+
+    group.scale(2);
+    ok(group.containsPoint({ x: 50, y: 120 }));
+    ok(group.containsPoint({ x: 100, y: 160 }));
+    ok(!group.containsPoint({ x: 0, y: 0 }));
+    ok(!group.containsPoint({ x: 100, y: 170 }));
+
+    group.scale(1);
+    group.padding = 30;
+    group.setCoords();
+    ok(group.containsPoint({ x: 50, y: 120 }));
+    ok(group.containsPoint({ x: 100, y: 170 }));
+    ok(!group.containsPoint({ x: 0, y: 0 }));
+    ok(!group.containsPoint({ x: 100, y: 172 }));
   });
 
   test('forEachObject', function() {
