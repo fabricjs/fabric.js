@@ -3,6 +3,7 @@ node_js:
   - 0.6
   - 0.8
   - 0.10
+script: 'npm run-script build && npm test'
 before_install:
  - sudo apt-get update -qq
  - sudo apt-get install -qq libgif-dev libpng-dev libjpeg8-dev libpango1.0-dev libcairo2-dev
