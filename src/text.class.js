@@ -478,7 +478,7 @@
             ctx,
             textLines[i],
             this._getLeftOffset(),
-            this._getTopOffset() + (i * this.fontSize * this.lineHeight) + this.fontSize
+            this._getTopOffset() + ((i + 1) * this.fontSize * this.lineHeight)
           );
         }
       }
@@ -504,7 +504,7 @@
             ctx,
             textLines[i],
             this._getLeftOffset(),
-            this._getTopOffset() + (i * this.fontSize * this.lineHeight) + this.fontSize
+            this._getTopOffset() + ((i + 1) * this.fontSize * this.lineHeight)
           );
         }
         ctx.closePath();
@@ -613,10 +613,10 @@
       }
 
       if (this.textDecoration.indexOf('underline') > -1) {
-        renderLinesAtOffset(this.fontSize);
+        renderLinesAtOffset(this.fontSize * this.lineHeight);
       }
       if (this.textDecoration.indexOf('line-through') > -1) {
-        renderLinesAtOffset(this.fontSize / 2);
+        renderLinesAtOffset((this.fontSize * this.lineHeight) - (this.fontSize / 2));
       }
       if (this.textDecoration.indexOf('overline') > -1) {
         renderLinesAtOffset(0);
