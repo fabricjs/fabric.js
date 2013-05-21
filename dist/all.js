@@ -12038,8 +12038,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     _setWidthHeight: function(options) {
       options || (options = { });
 
-      this.set('width', (this.x2 - this.x1) || 1);
-      this.set('height', (this.y2 - this.y1) || 1);
+      this.set('width', Math.abs(this.x2 - this.x1) || 1);
+      this.set('height', Math.abs(this.y2 - this.y1) || 1);
 
       this.set('left', 'left' in options ? options.left : (this.x1 + this.width / 2));
       this.set('top', 'top' in options ? options.top : (this.y1 + this.height / 2));
