@@ -31,7 +31,7 @@
      * Constructor
      * @param {HTMLImageElement | String} element Image element
      * @param {Object} [options] Options object
-     * @return {fabric.Image}
+     * @return {fabric.Image} thisArg
      */
     initialize: function(element, options) {
       options || (options = { });
@@ -105,7 +105,6 @@
         this.transform(ctx);
       }
 
-      ctx.save();
       this._setShadow(ctx);
       this.clipTo && fabric.util.clipContext(this, ctx);
       this._render(ctx);
@@ -114,7 +113,6 @@
       }
       this._renderStroke(ctx);
       this.clipTo && ctx.restore();
-      ctx.restore();
 
       if (this.active && !noTransform) {
         this.drawBorders(ctx);
@@ -128,7 +126,6 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _stroke: function(ctx) {
-      ctx.save();
       ctx.lineWidth = this.strokeWidth;
       ctx.lineCap = this.strokeLineCap;
       ctx.lineJoin = this.strokeLineJoin;
@@ -136,10 +133,10 @@
       ctx.strokeStyle = this.stroke.toLive
         ? this.stroke.toLive(ctx)
         : this.stroke;
+
       ctx.beginPath();
       ctx.strokeRect(-this.width / 2, -this.height / 2, this.width, this.height);
-      ctx.beginPath();
-      ctx.restore();
+      ctx.closePath();
     },
 
     /**
@@ -159,6 +156,7 @@
       ctx.strokeStyle = this.stroke.toLive
         ? this.stroke.toLive(ctx)
         : this.stroke;
+
       ctx.beginPath();
       fabric.util.drawDashedLine(ctx, x, y, x+w, y, this.strokeDashArray);
       fabric.util.drawDashedLine(ctx, x+w, y, x+w, y+h, this.strokeDashArray);
@@ -455,7 +453,7 @@
    * @param {SVGElement} element Element to parse
    * @param {Function} callback Callback to execute when fabric.Image object is created
    * @param {Object} [options] Options object
-   * @return {fabric.Image}
+   * @return {fabric.Image} Instance of fabric.Image
    */
   fabric.Image.fromElement = function(element, callback, options) {
     var parsedAttributes = fabric.parseAttributes(element, fabric.Image.ATTRIBUTE_NAMES);

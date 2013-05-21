@@ -15,8 +15,10 @@
     'width':               20,
     'height':              52,
     'fill':                'rgb(0,0,0)',
+    'fillOpacity':         1,
     'overlayFill':         null,
-    'stroke':              '',
+    'stroke':              null,
+    'strokeOpacity':       1,
     'strokeWidth':         1,
     'strokeDashArray':     null,
     'strokeLineCap':       'butt',
@@ -168,6 +170,7 @@
     elTextWithAttrs.setAttribute('fill', 'rgb(255,255,255)');
     elTextWithAttrs.setAttribute('fill-opacity', 0.45);
     elTextWithAttrs.setAttribute('stroke', 'blue');
+    elTextWithAttrs.setAttribute('stroke-opacity', 0.9);
     elTextWithAttrs.setAttribute('stroke-width', 3);
     elTextWithAttrs.setAttribute('stroke-dasharray', '5, 2');
     elTextWithAttrs.setAttribute('stroke-linecap', 'round');
@@ -177,6 +180,7 @@
     elTextWithAttrs.setAttribute('font-style', 'italic');
     elTextWithAttrs.setAttribute('font-weight', 'bold');
     elTextWithAttrs.setAttribute('font-size', '123');
+    elTextWithAttrs.setAttribute('opacity', 0.6);
     elTextWithAttrs.setAttribute('text-decoration', 'underline');
 
     var textWithAttrs = fabric.Text.fromElement(elTextWithAttrs);
@@ -192,8 +196,10 @@
       width:            20,
       height:           159.9,
       fill:             'rgb(255,255,255)',
-      opacity:          0.45,
+      fillOpacity:      0.45,
+      opacity:          0.6,
       stroke:           'blue',
+      strokeOpacity:    0.9,
       strokeWidth:      3,
       strokeDashArray:  [5, 2],
       strokeLineCap:    'round',

@@ -68,8 +68,10 @@
       'width':              0,
       'height':             0,
       'fill':               'rgb(0,0,0)',
+      'fillOpacity':        1,
       'overlayFill':        null,
       'stroke':             null,
+      'strokeOpacity':      1,
       'strokeWidth':        1,
       'strokeDashArray':    null,
       'strokeLineCap':      'butt',
@@ -114,6 +116,8 @@
         top              = 15,
         fill             = 'ff5555',
         fillOpacity      = 0.5,
+        opacity          = 0.95,
+        strokeOpacity    = 0.7,
         strokeWidth      = 2,
         strokeDashArray  = [5, 2],
         strokeLineCap    = 'round',
@@ -126,6 +130,8 @@
     elCircle.setAttribute('cy', top);
     elCircle.setAttribute('fill', fill);
     elCircle.setAttribute('fill-opacity', fillOpacity);
+    elCircle.setAttribute('opacity', opacity);
+    elCircle.setAttribute('stroke-opacity', strokeOpacity);
     elCircle.setAttribute('stroke-width', strokeWidth);
     elCircle.setAttribute('stroke-dasharray', '5, 2');
     elCircle.setAttribute('stroke-linecap', strokeLineCap);
@@ -139,7 +145,9 @@
     equal(oCircle.get('left'), left);
     equal(oCircle.get('top'), top);
     equal(oCircle.get('fill'), fill);
-    equal(oCircle.get('opacity'), fillOpacity);
+    equal(oCircle.get('fillOpacity'), fillOpacity);
+    equal(oCircle.get('opacity'), opacity);
+    equal(oCircle.get('strokeOpacity'), strokeOpacity);
     equal(oCircle.get('strokeWidth'), strokeWidth);
     deepEqual(oCircle.get('strokeDashArray'), strokeDashArray);
     equal(oCircle.get('strokeLineCap'), strokeLineCap);

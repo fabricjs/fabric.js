@@ -16,8 +16,10 @@
     'width':              10,
     'height':             10,
     'fill':               'rgb(0,0,0)',
+    'fillOpacity':        1,
     'overlayFill':        null,
     'stroke':             null,
+    'strokeOpacity':      1,
     'strokeWidth':        1,
     'strokeDashArray':    null,
     'strokeLineCap':      'butt',
@@ -92,13 +94,15 @@
     elPolylineWithAttrs.setAttribute('points', '10,10 20,20 30,30 10,10');
     elPolylineWithAttrs.setAttribute('fill', 'rgb(255,255,255)');
     elPolylineWithAttrs.setAttribute('fill-opacity', '0.34');
-    elPolylineWithAttrs.setAttribute('stroke-width', '3');
     elPolylineWithAttrs.setAttribute('stroke', 'blue');
-    elPolylineWithAttrs.setAttribute('transform', 'translate(-10,-20) scale(2)');
+    elPolylineWithAttrs.setAttribute('stroke-opacity', '0.6');
+    elPolylineWithAttrs.setAttribute('stroke-width', '3');
     elPolylineWithAttrs.setAttribute('stroke-dasharray', '5, 2');
     elPolylineWithAttrs.setAttribute('stroke-linecap', 'round');
     elPolylineWithAttrs.setAttribute('stroke-linejoin', 'bevil');
     elPolylineWithAttrs.setAttribute('stroke-miterlimit', '5');
+    elPolylineWithAttrs.setAttribute('opacity', '0.9');
+    elPolylineWithAttrs.setAttribute('transform', 'translate(-10,-20) scale(2)');
 
     var polylineWithAttrs = fabric.Polyline.fromElement(elPolylineWithAttrs);
 
@@ -108,13 +112,15 @@
       'width': 20,
       'height': 20,
       'fill': 'rgb(255,255,255)',
+      'fillOpacity': 0.34,
       'stroke': 'blue',
+      'strokeOpacity': 0.6,
       'strokeWidth': 3,
       'strokeDashArray': [5, 2],
       'strokeLineCap': 'round',
       'strokeLineJoin': 'bevil',
       'strokeMiterLimit': 5,
-      'opacity': 0.34,
+      'opacity': 0.9,
       'points': expectedPoints
     }));
 

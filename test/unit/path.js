@@ -9,8 +9,10 @@
     'width':              200,
     'height':             200,
     'fill':               'red',
+    'fillOpacity':        1,
     'overlayFill':        null,
     'stroke':             'blue',
+    'strokeOpacity':      1,
     'strokeWidth':        1,
     'strokeDashArray':    null,
     'strokeLineCap':      'butt',
@@ -117,13 +119,15 @@
 
     elPath.setAttribute('d', 'M 100 100 L 300 100 L 200 300 z');
     elPath.setAttribute('fill', 'red');
-    elPath.setAttribute('fill-opacity', '1');
+    elPath.setAttribute('fill-opacity', '0.6');
     elPath.setAttribute('stroke', 'blue');
+    elPath.setAttribute('stroke-opacity', '0.55');
     elPath.setAttribute('stroke-width', '1');
     elPath.setAttribute('stroke-dasharray', '5, 2');
     elPath.setAttribute('stroke-linecap', 'round');
     elPath.setAttribute('stroke-linejoin', 'bevil');
     elPath.setAttribute('stroke-miterlimit', '5');
+    elPath.setAttribute('opacity', '0.2');
 
     // TODO (kangax): to support multiple transformation keywords, we need to do proper matrix multiplication
     //elPath.setAttribute('transform', 'scale(2) translate(10, -20)');
@@ -133,10 +137,13 @@
     ok(path instanceof fabric.Path);
 
     deepEqual(fabric.util.object.extend(REFERENCE_PATH_OBJECT, {
+      fillOpacity:      0.6,
+      strokeOpacity:    0.55,
       strokeDashArray:  [5, 2],
       strokeLineCap:    'round',
       strokeLineJoin:   'bevil',
       strokeMiterLimit: 5,
+      opacity:          0.2,
       transformMatrix:  [2, 0, 0, 2, 0, 0]
     }), path.toObject());
 

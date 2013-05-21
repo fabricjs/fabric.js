@@ -141,8 +141,10 @@
       'width':              70,
       'height':             45,
       'fill':               'rgb(0,0,0)',
+      'fillOpacity':        1,
       'overlayFill':        null,
       'stroke':             null,
+      'strokeOpacity':      1,
       'strokeWidth':        1,
       'strokeDashArray':    null,
       'strokeLineCap':      'butt',
@@ -353,7 +355,7 @@
     var group = makeGroupWith2Objects();
     ok(typeof group.toSVG == 'function');
 
-    var expectedSVG = '<g transform="translate(80 117.5)"><rect x="-5" y="-20" rx="0" ry="0" width="10" height="40" style="stroke: none; stroke-width: 1; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); opacity: 1;" transform="translate(-30 2.5)"/><rect x="-15" y="-5" rx="0" ry="0" width="30" height="10" style="stroke: none; stroke-width: 1; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); opacity: 1;" transform="translate(20 -17.5)"/></g>';
+    var expectedSVG = '<g transform="translate(80 117.5)"><rect x="-5" y="-20" rx="0" ry="0" width="10" height="40" style="stroke: none; stroke-opacity: 1; stroke-width: 1; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-opacity: 1; opacity: 1;" transform="translate(-30 2.5)"/><rect x="-15" y="-5" rx="0" ry="0" width="30" height="10" style="stroke: none; stroke-opacity: 1; stroke-width: 1; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-opacity: 1; opacity: 1;" transform="translate(20 -17.5)"/></g>';
     equal(group.toSVG(), expectedSVG);
   });
 

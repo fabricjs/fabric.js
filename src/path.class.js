@@ -172,6 +172,7 @@
      * Constructor
      * @param {Array|String} path Path data (sequence of coordinates and corresponding "command" tokens)
      * @param {Object} [options] Options object
+     * @return {fabric.Path} thisArg
      */
     initialize: function(path, options) {
       options = options || { };
@@ -540,7 +541,6 @@
       }
       // ctx.globalCompositeOperation = this.fillRule;
 
-      ctx.save();
       if (this.overlayFill) {
         ctx.fillStyle = this.overlayFill;
       }
@@ -569,7 +569,6 @@
       this._renderStroke(ctx);
       this.clipTo && ctx.restore();
       this._removeShadow(ctx);
-      ctx.restore();
 
       if (!noTransform && this.active) {
         this.drawBorders(ctx);
@@ -589,7 +588,7 @@
 
     /**
      * Returns object representation of an instance
-     * @param {Array} propertiesToInclude
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
@@ -607,8 +606,8 @@
 
     /**
      * Returns dataless object representation of an instance
-     * @param {Array} propertiesToInclude
-     * @return {Object} object representation of an instance
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+     * @return {Object} Object representation of an instance
      */
     toDatalessObject: function(propertiesToInclude) {
       var o = this.toObject(propertiesToInclude);
@@ -785,6 +784,7 @@
   /**
    * Creates an instance of fabric.Path from an object
    * @static
+   * @param object {Object} object Object to create an instance from
    * @return {fabric.Path} Instance of fabric.Path
    */
   fabric.Path.fromObject = function(object) {
@@ -801,7 +801,7 @@
   /**
    * Creates an instance of fabric.Path from an SVG <path> element
    * @static
-   * @param {SVGElement} element to parse
+   * @param {SVGElement} element Element to parse
    * @param {Object} [options] Options object
    * @return {fabric.Path} Instance of fabric.Path
    */

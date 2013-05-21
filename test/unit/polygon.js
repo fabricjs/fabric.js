@@ -16,8 +16,10 @@
     'width':              10,
     'height':             10,
     'fill':               'rgb(0,0,0)',
+    'fillOpacity':        1,
     'overlayFill':        null,
     'stroke':             null,
+    'strokeOpacity':      1,
     'strokeWidth':        1,
     'strokeDashArray':    null,
     'strokeLineCap':      'butt',
@@ -101,11 +103,13 @@
     elPolygonWithAttrs.setAttribute('fill-opacity', '0.34');
     elPolygonWithAttrs.setAttribute('stroke-width', '3');
     elPolygonWithAttrs.setAttribute('stroke', 'blue');
-    elPolygonWithAttrs.setAttribute('transform', 'translate(-10,-20) scale(2)');
+    elPolygonWithAttrs.setAttribute('stroke-opacity', '0.9');
     elPolygonWithAttrs.setAttribute('stroke-dasharray', '5, 2');
     elPolygonWithAttrs.setAttribute('stroke-linecap', 'round');
     elPolygonWithAttrs.setAttribute('stroke-linejoin', 'bevil');
     elPolygonWithAttrs.setAttribute('stroke-miterlimit', '5');
+    elPolygonWithAttrs.setAttribute('opacity', '0.6');
+    elPolygonWithAttrs.setAttribute('transform', 'translate(-10,-20) scale(2)');
 
     var polygonWithAttrs = fabric.Polygon.fromElement(elPolygonWithAttrs);
     var expectedPoints = [
@@ -116,17 +120,19 @@
     ];
 
     deepEqual(fabric.util.object.extend(REFERENCE_OBJECT, {
-      'width': 20,
-      'height': 20,
-      'fill': 'rgb(255,255,255)',
-      'stroke': 'blue',
-      'strokeWidth': 3,
-      'strokeDashArray': [5, 2],
-      'strokeLineCap': 'round',
-      'strokeLineJoin': 'bevil',
+      'width':            20,
+      'height':           20,
+      'fill':             'rgb(255,255,255)',
+      'fillOpacity':      0.34,
+      'stroke':           'blue',
+      'strokeOpacity':    0.9,
+      'strokeWidth':      3,
+      'strokeDashArray':  [5, 2],
+      'strokeLineCap':    'round',
+      'strokeLineJoin':   'bevil',
       'strokeMiterLimit': 5,
-      'opacity': 0.34,
-      'points': expectedPoints
+      'opacity':          0.6,
+      'points':           expectedPoints
     }), polygonWithAttrs.toObject());
 
     deepEqual([ 2, 0, 0, 2, -10, -20 ], polygonWithAttrs.get('transformMatrix'));

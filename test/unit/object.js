@@ -109,13 +109,13 @@
   });
 
   test('toJSON', function() {
-    var emptyObjectJSON = '{"type":"object","originX":"center","originY":"center","left":0,"top":0,"width":0,"height":0,"fill":"rgb(0,0,0)",'+
-                          '"overlayFill":null,"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,'+
+    var emptyObjectJSON = '{"type":"object","originX":"center","originY":"center","left":0,"top":0,"width":0,"height":0,"fill":"rgb(0,0,0)","fillOpacity":1,'+
+                          '"overlayFill":null,"stroke":null,"strokeOpacity":1,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,'+
                           '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,"selectable":true,"hasControls":true,"hasBorders":true,"hasRotatingPoint":true,'+
                           '"transparentCorners":true,"perPixelTargetFind":false,"shadow":null,"visible":true}';
 
-    var augmentedJSON = '{"type":"object","originX":"center","originY":"center","left":0,"top":0,"width":122,"height":0,"fill":"rgb(0,0,0)",'+
-                        '"overlayFill":null,"stroke":null,"strokeWidth":1,"strokeDashArray":[5,2],"strokeLineCap":"round","strokeLineJoin":"bevil","strokeMiterLimit":5,'+
+    var augmentedJSON = '{"type":"object","originX":"center","originY":"center","left":0,"top":0,"width":122,"height":0,"fill":"rgb(0,0,0)","fillOpacity":0.7,'+
+                        '"overlayFill":null,"stroke":null,"strokeOpacity":0.4,"strokeWidth":1,"strokeDashArray":[5,2],"strokeLineCap":"round","strokeLineJoin":"bevil","strokeMiterLimit":5,'+
                         '"scaleX":1.3,"scaleY":1,"angle":0,"flipX":false,"flipY":true,"opacity":0.88,"selectable":true,"hasControls":true,"hasBorders":true,"hasRotatingPoint":true,'+
                         '"transparentCorners":true,"perPixelTargetFind":false,"shadow":null,"visible":true}';
 
@@ -127,6 +127,8 @@
         .set('scaleX', 1.3)
         .set('width', 122)
         .set('flipY', true)
+        .set('fillOpacity', 0.7)
+        .set('strokeOpacity', 0.4)
         .set('strokeDashArray', [5, 2])
         .set('strokeLineCap', 'round')
         .set('strokeLineJoin', 'bevil')
@@ -145,8 +147,10 @@
       'width':              0,
       'height':             0,
       'fill':               'rgb(0,0,0)',
+      'fillOpacity':        1,
       'overlayFill':        null,
       'stroke':             null,
+      'strokeOpacity':      1,
       'strokeWidth':        1,
       'strokeDashArray':    null,
       'strokeLineCap':      'butt',
@@ -177,8 +181,10 @@
       'width':              30,
       'height':             40,
       'fill':               'rgb(0,0,0)',
+      'fillOpacity':        0.5,
       'overlayFill':        null,
       'stroke':             null,
+      'strokeOpacity':      0.95,
       'strokeWidth':        1,
       'strokeDashArray':    [5, 2],
       'strokeLineCap':      'round',
@@ -208,8 +214,10 @@
         .set('width', 30)
         .set('height', 40)
         .set('flipX', true)
+        .set('fillOpacity', 0.5)
         .set('opacity', 0.13)
         .set('selectable', false)
+        .set('strokeOpacity', 0.95)
         .set('strokeDashArray', [5, 2])
         .set('strokeLineCap', 'round')
         .set('strokeLineJoin', 'bevil')
