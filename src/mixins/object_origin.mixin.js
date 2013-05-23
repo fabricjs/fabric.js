@@ -159,26 +159,32 @@
       var angle = degreesToRadians(this.angle);
       var hypotHalf = this.getWidth() / 2;
       var xHalf = Math.cos(angle) * hypotHalf;
+      var yHalf = Math.sin(angle) * hypotHalf;
       var hypotFull = this.getWidth();
       var xFull = Math.cos(angle) * hypotFull;
+      var yFull = Math.sin(angle) * hypotFull;
 
       if (this.originX === 'center' && to === 'left' ||
           this.originX === 'right' && to === 'center') {
         // move half left
         this.left -= xHalf;
+        this.top -= yHalf;
       }
       else if (this.originX === 'left' && to === 'center' ||
                this.originX === 'center' && to === 'right') {
         // move half right
         this.left += xHalf;
+        this.top += yHalf;
       }
       else if (this.originX === 'left' && to === 'right') {
         // move full right
         this.left += xFull;
+        this.top += yFull;
       }
       else if (this.originX === 'right' && to === 'left') {
         // move full left
         this.left -= xFull;
+        this.top -= yFull;
       }
 
       this.setCoords();
