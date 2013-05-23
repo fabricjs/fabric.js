@@ -9,8 +9,10 @@
     'width':              0,
     'height':             0,
     'fill':               'rgb(0,0,0)',
+    'fillOpacity':        1,
     'overlayFill':        null,
     'stroke':             null,
+    'strokeOpacity':      1,
     'strokeWidth':        1,
     'strokeDashArray':    null,
     'strokeLineCap':      'butt',
@@ -90,7 +92,9 @@
     elRectWithAttrs.setAttribute('ry', 12);
     elRectWithAttrs.setAttribute('fill', 'rgb(255,255,255)');
     elRectWithAttrs.setAttribute('fill-opacity', 0.45);
+    elRectWithAttrs.setAttribute('opacity', 0.5);
     elRectWithAttrs.setAttribute('stroke', 'blue');
+    elRectWithAttrs.setAttribute('stroke-opacity', 0.9);
     elRectWithAttrs.setAttribute('stroke-width', 3);
     elRectWithAttrs.setAttribute('stroke-dasharray', '5, 2');
     elRectWithAttrs.setAttribute('stroke-linecap', 'round');
@@ -107,8 +111,10 @@
       width: 222,
       height: 333,
       fill: 'rgb(255,255,255)',
-      opacity: 0.45,
+      fillOpacity: 0.45,
+      opacity: 0.5,
       stroke: 'blue',
+      strokeOpacity: 0.9,
       strokeWidth: 3,
       strokeDashArray: [5, 2],
       strokeLineCap: 'round',
@@ -136,6 +142,6 @@
     var rect = new fabric.Rect({ width: 100, height: 100, rx: 20, ry: 30 });
     var svg = rect.toSVG();
 
-    equal('<rect x="-50" y="-50" rx="20" ry="30" width="100" height="100" style="stroke: none; stroke-width: 1; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); opacity: 1;" transform="translate(0 0)"/>', svg);
+    equal('<rect x="-50" y="-50" rx="20" ry="30" width="100" height="100" style="stroke: none; stroke-opacity: 1; stroke-width: 1; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-opacity: 1; opacity: 1;" transform="translate(0 0)"/>', svg);
   });
 })();

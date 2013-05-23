@@ -9,8 +9,10 @@
     'width':              2,
     'height':             2,
     'fill':               'rgb(0,0,0)',
+    'fillOpacity':        1,
     'overlayFill':        null,
     'stroke':             null,
+    'strokeOpacity':      1,
     'strokeWidth':        1,
     'strokeDashArray':    null,
     'strokeLineCap':      'butt',
@@ -86,7 +88,10 @@
         y1               = 23,
         x2               = 34,
         y2               = 7,
+        fillOpacity      = 0.4,
+        opacity          = 0.95,
         stroke           = 'ff5555',
+        strokeOpacity    = 0.6,
         strokeWidth      = 2,
         strokeDashArray  = [5, 2],
         strokeLineCap    = 'round',
@@ -97,7 +102,10 @@
     lineEl.setAttribute('x2', x2);
     lineEl.setAttribute('y1', y1);
     lineEl.setAttribute('y2', y2);
+    lineEl.setAttribute('opacity', opacity);
+    lineEl.setAttribute('fill-opacity', fillOpacity);
     lineEl.setAttribute('stroke', stroke);
+    lineEl.setAttribute('stroke-opacity', strokeOpacity);
     lineEl.setAttribute('stroke-width', strokeWidth);
     lineEl.setAttribute('stroke-dasharray', '5, 2');
     lineEl.setAttribute('stroke-linecap', strokeLineCap);
@@ -111,7 +119,10 @@
     equal(oLine.get('y1'), y1);
     equal(oLine.get('x2'), x2);
     equal(oLine.get('y2'), y2);
+    equal(oLine.get('opacity'), opacity);
+    equal(oLine.get('fillOpacity'), fillOpacity);
     equal(oLine.get('stroke'), stroke);
+    equal(oLine.get('strokeOpacity'), strokeOpacity);
     equal(oLine.get('strokeWidth'), strokeWidth);
     deepEqual(oLine.get('strokeDashArray'), strokeDashArray);
     equal(oLine.get('strokeLineCap'), strokeLineCap);

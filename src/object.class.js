@@ -97,7 +97,7 @@
     flipY:                    false,
 
     /**
-     * Opacity of an object
+     * Opacity of an object (affects fillOpacity and strokeOpacity)
      * @type Number
      * @default
      */
@@ -153,6 +153,13 @@
     fill:                     'rgb(0,0,0)',
 
     /**
+     * Opacity of an object's fill
+     * @type Number
+     * @default
+     */
+    fillOpacity:              1,
+
+    /**
      * Fill rule used to fill an object
      * @type String
      * @default
@@ -167,11 +174,18 @@
     overlayFill:              null,
 
     /**
-     * When `true`, an object is rendered via stroke and this property specifies its color
+     * When defined, an object is rendered via stroke and this property specifies its color
      * @type String
      * @default
      */
     stroke:                   null,
+
+    /**
+     * Opacity of an object's stroke
+     * @type Number
+     * @default
+     */
+    strokeOpacity:            1,
 
     /**
      * Width of a stroke used to render this object
@@ -413,7 +427,7 @@
     /**
      * Transforms context when rendering an object
      * @param {CanvasRenderingContext2D} ctx Context
-     * @param {Boolean} when true, context is transformed to object's top/left corner. This is used when rendering text on Node
+     * @param {Boolean} fromLeft When true, context is transformed to object's top/left corner. This is used when rendering text on Node
      */
     transform: function(ctx, fromLeft) {
       ctx.globalAlpha = this.opacity;
@@ -429,7 +443,7 @@
 
     /**
      * Returns an object representation of an instance
-     * @param {Array} propertiesToInclude
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
@@ -445,8 +459,10 @@
         width:              toFixed(this.width, NUM_FRACTION_DIGITS),
         height:             toFixed(this.height, NUM_FRACTION_DIGITS),
         fill:               (this.fill && this.fill.toObject) ? this.fill.toObject() : this.fill,
+        fillOpacity:        toFixed(this.fillOpacity, NUM_FRACTION_DIGITS),
         overlayFill:        this.overlayFill,
         stroke:             (this.stroke && this.stroke.toObject) ? this.stroke.toObject() : this.stroke,
+        strokeOpacity:      toFixed(this.strokeOpacity, NUM_FRACTION_DIGITS),
         strokeWidth:        toFixed(this.strokeWidth, NUM_FRACTION_DIGITS),
         strokeDashArray:    this.strokeDashArray,
         strokeLineCap:      this.strokeLineCap,
@@ -478,7 +494,7 @@
 
     /**
      * Returns (dataless) object representation of an instance
-     * @param {Array} [propertiesToInclude]
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} object representation of an instance
      */
     toDatalessObject: function(propertiesToInclude) {
@@ -493,12 +509,14 @@
     getSvgStyles: function() {
       return [
         "stroke: ", (this.stroke ? this.stroke : 'none'), "; ",
+        "stroke-opacity: ",(typeof this.strokeOpacity !== 'undefined' ? this.strokeOpacity : '1'), "; ",
         "stroke-width: ", (this.strokeWidth ? this.strokeWidth : '0'), "; ",
         "stroke-dasharray: ", (this.strokeDashArray ? this.strokeDashArray.join(' ') : ''), "; ",
         "stroke-linecap: ", (this.strokeLineCap ? this.strokeLineCap : 'butt'), "; ",
         "stroke-linejoin: ", (this.strokeLineJoin ? this.strokeLineJoin : 'miter'), "; ",
         "stroke-miterlimit: ", (this.strokeMiterLimit ? this.strokeMiterLimit : '4'), "; ",
         "fill: ", (this.fill ? (this.fill && this.fill.toLive ? 'url(#SVGID_' + this.fill.id + ')' : this.fill) : 'none'), "; ",
+        "fill-opacity: ", (typeof this.fillOpacity !== 'undefined' ? this.fillOpacity : '1'), "; ",
         "opacity: ", (typeof this.opacity !== 'undefined' ? this.opacity : '1'), ";",
         (this.visible ? '' : " visibility: hidden;")
       ].join("");
@@ -540,6 +558,7 @@
 
     /**
      * @private
+     * @param {Object} object
      */
     _removeDefaultValues: function(object) {
       var defaultOptions = fabric.Object.prototype.options;
@@ -572,7 +591,7 @@
 
     /**
      * Sets property to a given value. When changing position/dimension -related properties (left, top, scale, angle, etc.) `set` does not update position of object's borders/controls. If you need to update those, call `setCoords()`.
-     * @param {String} name
+     * @param {String|Object} key (if object, iterate over the object properties)
      * @param {Object|Function} value (if function, the value is passed into it and its return value is used as a new one)
      * @return {fabric.Object} thisArg
      * @chainable
@@ -596,8 +615,9 @@
 
     /**
      * @private
-     * @param key
-     * @param value
+     * @param {String} key
+     * @param {Any} value
+     * @return {fabric.Object} thisArg
      */
     _set: function(key, value) {
       var shouldConstrainValue = (key === 'scaleX' || key === 'scaleY');
@@ -667,7 +687,6 @@
         this.transform(ctx);
       }
 
-      ctx.save();
       if (this.stroke) {
         ctx.lineWidth = this.strokeWidth;
         ctx.lineCap = this.strokeLineCap;
@@ -697,7 +716,6 @@
       this._render(ctx, noTransform);
       this.clipTo && ctx.restore();
       this._removeShadow(ctx);
-      ctx.restore();
 
       if (this.active && !noTransform) {
         this.drawBorders(ctx);
@@ -735,6 +753,9 @@
     _renderFill: function(ctx) {
       if (!this.fill) return;
 
+      ctx.save();
+      ctx.globalAlpha = ctx.globalAlpha * this.fillOpacity;
+
       if (this.fill.toLive) {
         ctx.save();
         ctx.translate(
@@ -748,6 +769,7 @@
       if (this.shadow && !this.shadow.affectStroke) {
         this._removeShadow(ctx);
       }
+      ctx.restore();
     },
 
     /**
@@ -756,6 +778,9 @@
      */
     _renderStroke: function(ctx) {
       if (!this.stroke) return;
+
+      ctx.save();
+      ctx.globalAlpha = ctx.globalAlpha * this.strokeOpacity;
 
       if (this.strokeDashArray) {
         // Spec requires the concatenation of two copies the dash list when the number of elements is odd
@@ -776,12 +801,13 @@
         this._stroke ? this._stroke(ctx) : ctx.stroke();
       }
       this._removeShadow(ctx);
+      ctx.restore();
     },
 
     /**
      * Clones an instance
      * @param {Function} callback Callback is invoked with a clone as a first argument
-     * @param {Array} propertiesToInclude
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {fabric.Object} clone of an instance
      */
     clone: function(callback, propertiesToInclude) {
@@ -884,7 +910,7 @@
 
     /**
      * Returns a JSON representation of an instance
-     * @param {Array} propertiesToInclude Any properties that you might want to additionally include in the output
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} JSON
      */
     toJSON: function(propertiesToInclude) {

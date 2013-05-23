@@ -30,8 +30,10 @@
       'width':              0,
       'height':             0,
       'fill':               'rgb(0,0,0)',
+      'fillOpacity':        1,
       'overlayFill':        null,
       'stroke':             null,
+      'strokeOpacity':      1,
       'strokeWidth':        1,
       'strokeDashArray':    null,
       'strokeLineCap':      'butt',
@@ -93,6 +95,8 @@
         top              = 15,
         fill             = 'ff5555',
         fillOpacity      = 0.5,
+        opacity          = 0.6,
+        strokeOpacity    = 0.95,
         strokeWidth      = 2,
         strokeDashArray  = [5, 2],
         strokeLineCap    = 'round',
@@ -105,11 +109,13 @@
     elEllipse.setAttribute('cy', top);
     elEllipse.setAttribute('fill', fill);
     elEllipse.setAttribute('fill-opacity', fillOpacity);
+    elEllipse.setAttribute('stroke-opacity', strokeOpacity);
     elEllipse.setAttribute('stroke-width', strokeWidth);
     elEllipse.setAttribute('stroke-dasharray', '5, 2');
     elEllipse.setAttribute('stroke-linecap', strokeLineCap);
     elEllipse.setAttribute('stroke-linejoin', strokeLineJoin);
     elEllipse.setAttribute('stroke-miterlimit', strokeMiterLimit);
+    elEllipse.setAttribute('opacity', opacity);
 
     var oEllipse = fabric.Ellipse.fromElement(elEllipse);
     ok(oEllipse instanceof fabric.Ellipse);
@@ -119,7 +125,9 @@
     equal(oEllipse.get('left'), left);
     equal(oEllipse.get('top'), top);
     equal(oEllipse.get('fill'), fill);
-    equal(oEllipse.get('opacity'), fillOpacity);
+    equal(oEllipse.get('fillOpacity'), fillOpacity);
+    equal(oEllipse.get('opacity'), opacity);
+    equal(oEllipse.get('strokeOpacity'), strokeOpacity);
     equal(oEllipse.get('strokeWidth'), strokeWidth);
     deepEqual(oEllipse.get('strokeDashArray'), strokeDashArray);
     equal(oEllipse.get('strokeLineCap'), strokeLineCap);
