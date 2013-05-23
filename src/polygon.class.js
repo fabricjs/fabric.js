@@ -31,7 +31,7 @@
      * Constructor
      * @param {Array} points Array of points
      * @param {Object} [options] Options object
-     * @param {Boolean} Whether points offsetting should be skipped
+     * @param {Boolean} [skipOffset] Whether points offsetting should be skipped
      * @return {fabric.Polygon} thisArg
      */
     initialize: function(points, options, skipOffset) {
@@ -43,6 +43,7 @@
 
     /**
      * @private
+     * @param {Boolean} [skipOffset] Whether points offsetting should be skipped
      */
     _calcDimensions: function(skipOffset) {
 
@@ -60,8 +61,8 @@
 
       if (skipOffset) return;
 
-      var halfWidth = this.width / 2,
-          halfHeight = this.height / 2;
+      var halfWidth = this.width / 2 + this.minX,
+          halfHeight = this.height / 2 + this.minY;
 
       // change points to offset polygon into a bounding box
       this.points.forEach(function(p) {
@@ -72,8 +73,8 @@
 
     /**
      * Returns object representation of an instance
-     * @param {Array} propertiesToInclude
-     * @return {Object} object representation of an instance
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+     * @return {Object} Object representation of an instance
      */
     toObject: function(propertiesToInclude) {
       return extend(this.callSuper('toObject', propertiesToInclude), {
@@ -115,7 +116,7 @@
 
     /**
      * @private
-     * @param ctx {CanvasRenderingContext2D} context to render on
+     * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
       var point;
@@ -134,7 +135,7 @@
 
     /**
      * @private
-     * @param ctx {CanvasRenderingContext2D} context to render on
+     * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _renderDashedStroke: function(ctx) {
       var p1, p2;
@@ -169,7 +170,7 @@
    * @static
    * @param {SVGElement} element Element to parse
    * @param {Object} [options] Options object
-   * @return {fabric.Polygon}
+   * @return {fabric.Polygon} Instance of fabric.Polygon
    */
   fabric.Polygon.fromElement = function(element, options) {
     if (!element) {
@@ -178,12 +179,17 @@
     options || (options = { });
 
     var points = fabric.parsePointsAttribute(element.getAttribute('points')),
-        parsedAttributes = fabric.parseAttributes(element, fabric.Polygon.ATTRIBUTE_NAMES);
+        parsedAttributes = fabric.parseAttributes(element, fabric.Polygon.ATTRIBUTE_NAMES),
+        minX = min(points, 'x'),
+        minY = min(points, 'y');
+
+    minX = minX < 0 ? minX : 0;
+    minY = minX < 0 ? minY : 0;
 
     for (var i = 0, len = points.length; i < len; i++) {
       // normalize coordinates, according to containing box (dimensions of which are passed via `options`)
-      points[i].x -= (options.width / 2) || 0;
-      points[i].y -= (options.height / 2) || 0;
+      points[i].x -= (options.width / 2 + minX) || 0;
+      points[i].y -= (options.height / 2 + minY) || 0;
     }
 
     return new fabric.Polygon(points, extend(parsedAttributes, options), true);
@@ -192,8 +198,8 @@
   /**
    * Returns fabric.Polygon instance from an object representation
    * @static
-   * @param {Object} object Object to create an instance from
-   * @return {fabric.Polygon}
+   * @param object {Object} object Object to create an instance from
+   * @return {fabric.Polygon} Instance of fabric.Polygon
    */
   fabric.Polygon.fromObject = function(object) {
     return new fabric.Polygon(object.points, object, true);
