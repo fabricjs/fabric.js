@@ -3,7 +3,8 @@
   "use strict";
 
   var fabric = global.fabric || (global.fabric = { }),
-      toFixed = fabric.util.toFixed;
+      toFixed = fabric.util.toFixed,
+      min = fabric.util.array.min;
 
   if (fabric.Polyline) {
     fabric.warn('fabric.Polyline is already defined');
@@ -26,9 +27,9 @@
 
     /**
      * Constructor
-     * @param {Array} points array of points
+     * @param {Array} points Array of points
      * @param {Object} [options] Options object
-     * @param {Boolean} skipOffset Whether points offsetting should be skipped
+     * @param {Boolean} [skipOffset] Whether points offsetting should be skipped
      * @return {fabric.Polyline} thisArg
      */
     initialize: function(points, options, skipOffset) {
@@ -40,7 +41,7 @@
 
     /**
      * @private
-     * @param {Boolean} skipOffset Whether points offsetting should be skipped
+     * @param {Boolean} [skipOffset] Whether points offsetting should be skipped
      */
     _calcDimensions: function(skipOffset) {
       return fabric.Polygon.prototype._calcDimensions.call(this, skipOffset);
@@ -48,8 +49,8 @@
 
     /**
      * Returns object representation of an instance
-     * @param {Array} propertiesToInclude
-     * @return {Object} object representation of an instance
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+     * @return {Object} Object representation of an instance
      */
     toObject: function(propertiesToInclude) {
       return fabric.Polygon.prototype.toObject.call(this, propertiesToInclude);
@@ -121,7 +122,7 @@
 
     /**
      * Returns complexity of an instance
-     * @return {Number} complexity
+     * @return {Number} complexity of this instance
      */
     complexity: function() {
       return this.get('points').length;
@@ -140,7 +141,7 @@
    * @static
    * @param {SVGElement} element Element to parse
    * @param {Object} [options] Options object
-   * @return {Object} instance of fabric.Polyline
+   * @return {fabric.Polyline} Instance of fabric.Polyline
    */
   fabric.Polyline.fromElement = function(element, options) {
     if (!element) {
@@ -149,12 +150,17 @@
     options || (options = { });
 
     var points = fabric.parsePointsAttribute(element.getAttribute('points')),
-        parsedAttributes = fabric.parseAttributes(element, fabric.Polyline.ATTRIBUTE_NAMES);
+        parsedAttributes = fabric.parseAttributes(element, fabric.Polyline.ATTRIBUTE_NAMES),
+        minX = min(points, 'x'),
+        minY = min(points, 'y');
+
+    minX = minX < 0 ? minX : 0;
+    minY = minX < 0 ? minY : 0;
 
     for (var i = 0, len = points.length; i < len; i++) {
       // normalize coordinates, according to containing box (dimensions of which are passed via `options`)
-      points[i].x -= (options.width / 2) || 0;
-      points[i].y -= (options.height / 2) || 0;
+      points[i].x -= (options.width / 2 + minX) || 0;
+      points[i].y -= (options.height / 2 + minY) || 0;
     }
 
     return new fabric.Polyline(points, fabric.util.object.extend(parsedAttributes, options), true);
@@ -163,8 +169,8 @@
   /**
    * Returns fabric.Polyline instance from an object representation
    * @static
-   * @param {Object} [object] Object to create an instance from
-   * @return {fabric.Polyline}
+   * @param object {Object} object Object to create an instance from
+   * @return {fabric.Polyline} Instance of fabric.Polyline
    */
   fabric.Polyline.fromObject = function(object) {
     var points = object.points;
