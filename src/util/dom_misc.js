@@ -102,10 +102,23 @@
   function getElementOffset(element) {
     var docElem, win,
         box = {left: 0, top: 0},
-        doc = element && element.ownerDocument;
+        doc = element && element.ownerDocument,
+        offset = {left: 0, top: 0},
+        offsetAttributes = {
+           'borderLeftWidth': 'left',
+           'borderTopWidth':  'top',
+           'paddingLeft':     'left',
+           'paddingTop':      'top'
+        };
+
     if (!doc){
       return {left: 0, top: 0};
     }
+
+    for (var attr in offsetAttributes) {
+      offset[offsetAttributes[attr]] += parseInt(getElementStyle(element, attr), 10) || 0;
+    }
+
     docElem = doc.documentElement;
     if ( typeof element.getBoundingClientRect !== "undefined" ) {
       box = element.getBoundingClientRect();
@@ -116,31 +129,29 @@
       win = doc.nodeType === 9 && doc.defaultView;
     }
     return {
-      left: box.left + win.pageXOffset - (docElem.clientLeft || 0),
-      top: box.top + win.pageYOffset - (docElem.clientTop || 0)
+      left: box.left + win.pageXOffset - (docElem.clientLeft || 0) + offset.left,
+      top: box.top + win.pageYOffset - (docElem.clientTop || 0)  + offset.top
     };
   }
 
   /**
-  * Returns position of a given element
-  * @function
+  * Returns style attribute value of a given element
   * @memberOf fabric.util
-  * @param {HTMLElement} element Element to get offset for
-  * @return {Object} position of the given element.
+  * @param {HTMLElement} element Element to get style attribute for
+  * @param {String} attr Style attribute to get for element
+  * @return {String} Style attribute value of the given element.
   */
-  var getElementPosition;
-  if (fabric.document.defaultView && fabric.document.defaultView.getComputedStyle) {
-    getElementPosition = function (element) {
-      return fabric.document.defaultView.getComputedStyle(element, null).position;
-    };
-  }
-  else {
-    /** @ignore */
-    getElementPosition = function (element) {
-      var value = element.style.position;
-      if (!value && element.currentStyle) value = element.currentStyle.position;
-      return value;
-    };
+  function getElementStyle(element, attr) {
+    element.style = element.style || { };
+
+    if (element.currentStyle) {
+      return element.currentStyle[attr];
+    }
+    else if (fabric.document.defaultView && fabric.document.defaultView.getComputedStyle) {
+      return fabric.document.defaultView.getComputedStyle(element, null)[attr];
+    }
+
+    return element.style[attr];
   }
 
   (function () {
@@ -237,6 +248,6 @@
   fabric.util.addClass = addClass;
   fabric.util.wrapElement = wrapElement;
   fabric.util.getElementOffset = getElementOffset;
-  fabric.util.getElementPosition = getElementPosition;
+  fabric.util.getElementStyle = getElementStyle;
 
 })();
