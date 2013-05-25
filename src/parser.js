@@ -43,6 +43,11 @@
     'transform':        'transformMatrix'
   };
 
+  var colorAttributes = {
+    'stroke': 'strokeOpacity',
+    'fill':   'fillOpacity'
+  };
+
   function normalizeAttr(attr) {
     // transform attribute names
     if (attr in attributesMap) {
@@ -84,11 +89,6 @@
    * @param {Object} attributes Array of attributes to parse
    */
   function _setStrokeFillOpacity(attributes) {
-    var colorAttributes = {
-      'stroke': 'strokeOpacity',
-      'fill':   'fillOpacity'
-    };
-
     for (var attr in colorAttributes) {
       if (!attributes[attr] || typeof attributes[colorAttributes[attr]] === 'undefined') continue;
 

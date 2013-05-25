@@ -80,7 +80,7 @@
     fontFamily:           'Times New Roman',
 
     /**
-     * Text decoration Possible valus: "", "underline", "overline" or "line-through".
+     * Text decoration Possible values: "", "underline", "overline" or "line-through".
      * @type String
      * @default
      */

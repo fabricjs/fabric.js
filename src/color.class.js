@@ -295,6 +295,22 @@
   };
 
   /**
+   * @private
+   * @param {Number} p
+   * @param {Number} q
+   * @param {Number} t
+   * @return {Number}
+   */
+  function hue2rgb(p, q, t){
+      if(t < 0) t += 1;
+      if(t > 1) t -= 1;
+      if(t < 1/6) return p + (q - p) * 6 * t;
+      if(t < 1/2) return q;
+      if(t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+      return p;
+  }
+
+  /**
    * Returns new color object, when given a color in RGB format
    * @param {String} color ex: rgb(0-255,0-255,0-255)
    * @return {fabric.Color}
@@ -357,15 +373,6 @@
         s = parseFloat(match[2]) / (/%$/.test(match[2]) ? 100 : 1),
         l = parseFloat(match[3]) / (/%$/.test(match[3]) ? 100 : 1),
         r, g, b;
-
-    function hue2rgb(p, q, t){
-        if(t < 0) t += 1;
-        if(t > 1) t -= 1;
-        if(t < 1/6) return p + (q - p) * 6 * t;
-        if(t < 1/2) return q;
-        if(t < 2/3) return p + (q - p) * (2/3 - t) * 6;
-        return p;
-    }
 
     if (s === 0) {
       r = g = b = l;

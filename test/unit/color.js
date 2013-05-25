@@ -126,7 +126,7 @@
     equal(oColor.toHex(), 'FFFFFF');
   });
 
-  test('fromRgb (with withspaces)', function() {
+  test('fromRgb (with whitespaces)', function() {
     ok(typeof fabric.Color.fromRgb == 'function');
     var originalRgb = 'rgb( 255 , 255 , 255 )';
     var oColor = fabric.Color.fromRgb(originalRgb);
@@ -167,7 +167,7 @@
     equal(oColor.getAlpha(), 0.5, 'alpha should be set properly');
   });
 
-  test('fromRgba (with withspaces)', function() {
+  test('fromRgba (with whitespaces)', function() {
     var originalRgba = 'rgba( 255 , 255 , 255 , 0.5 )';
     oColor = fabric.Color.fromRgba(originalRgba);
     ok(oColor);
@@ -207,6 +207,16 @@
     equal(oColor.toHex(), '180637');
   });
 
+  test('fromHsl (with whitespaces)', function() {
+    ok(typeof fabric.Color.fromHsl == 'function');
+    var originalHsl = 'hsl( 262 , 80% , 12% )';
+    var oColor = fabric.Color.fromHsl(originalHsl);
+    ok(oColor);
+    ok(oColor instanceof fabric.Color);
+    equal(oColor.toHsl(), 'hsl(262,80%,12%)');
+    equal(oColor.toHex(), '180637');
+  });
+
   test('fromHsla', function() {
     ok(typeof fabric.Color.fromHsla == 'function');
     var originalHsla = 'hsla(262,80%,12%,0.2)';
@@ -214,6 +224,17 @@
     ok(oColor);
     ok(oColor instanceof fabric.Color);
     equal(oColor.toHsla(), originalHsla);
+    equal(oColor.toHex(), '180637');
+    equal(oColor.getAlpha(), 0.2, 'alpha should be set properly');
+  });
+
+  test('fromHsla (with whitespaces)', function() {
+    ok(typeof fabric.Color.fromHsla == 'function');
+    var originalHsla = 'hsla( 262 , 80% , 12% , 0.2 )';
+    var oColor = fabric.Color.fromHsla(originalHsla);
+    ok(oColor);
+    ok(oColor instanceof fabric.Color);
+    equal(oColor.toHsla(), 'hsla(262,80%,12%,0.2)');
     equal(oColor.toHex(), '180637');
     equal(oColor.getAlpha(), 0.2, 'alpha should be set properly');
   });
