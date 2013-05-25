@@ -11,34 +11,36 @@
       extend = fabric.util.object.extend,
       capitalize = fabric.util.string.capitalize,
       clone = fabric.util.object.clone,
+      toFixed = fabric.util.toFixed,
       multiplyTransformMatrices = fabric.util.multiplyTransformMatrices;
 
   fabric.SHARED_ATTRIBUTES = [
     "transform",
-    "fill", "fill-rule", "fill-opacity",
+    "fill", "fill-opacity", "fill-rule",
     "opacity",
-    "stroke", "stroke-dasharray", "stroke-linecap", "stroke-linejoin", "stroke-miterlimit", "stroke-width"
+    "stroke", "stroke-dasharray", "stroke-linecap", "stroke-linejoin", "stroke-miterlimit", "stroke-opacity", "stroke-width"
   ];
 
   var attributesMap = {
+    'fill-opacity':     'fillOpacity',
+    'fill-rule':        'fillRule',
+    'font-family':      'fontFamily',
+    'font-size':        'fontSize',
+    'font-style':       'fontStyle',
+    'font-weight':      'fontWeight',
     'cx':               'left',
     'x':                'left',
-    'cy':               'top',
-    'y':                'top',
     'r':                'radius',
-    'fill-opacity':     'opacity',
-    'fill-rule':        'fillRule',
-    'stroke-width':     'strokeWidth',
     'stroke-dasharray': 'strokeDashArray',
     'stroke-linecap':   'strokeLineCap',
     'stroke-linejoin':  'strokeLineJoin',
     'stroke-miterlimit':'strokeMiterLimit',
-    'transform':        'transformMatrix',
+    'stroke-opacity':   'strokeOpacity',
+    'stroke-width':     'strokeWidth',
     'text-decoration':  'textDecoration',
-    'font-size':        'fontSize',
-    'font-weight':      'fontWeight',
-    'font-style':       'fontStyle',
-    'font-family':      'fontFamily'
+    'cy':               'top',
+    'y':                'top',
+    'transform':        'transformMatrix'
   };
 
   function normalizeAttr(attr) {
@@ -75,6 +77,27 @@
     var parsed = isArray ? value.map(parseFloat) : parseFloat(value);
 
     return (!isArray && isNaN(parsed) ? value : parsed);
+  }
+
+  /**
+   * @private
+   * @param {Object} attributes Array of attributes to parse
+   */
+  function _setStrokeFillOpacity(attributes) {
+    var colorAttributes = {
+      'stroke': 'strokeOpacity',
+      'fill':   'fillOpacity'
+    };
+
+    for (var attr in colorAttributes) {
+      if (!attributes[attr] || typeof attributes[colorAttributes[attr]] === 'undefined') continue;
+
+      var color = new fabric.Color(attributes[attr]);
+      attributes[attr] = color.setAlpha(toFixed(color.getAlpha() * attributes[colorAttributes[attr]], 2)).toRgba();
+
+      delete attributes[colorAttributes[attr]];
+    }
+    return attributes;
   }
 
   /**
@@ -116,7 +139,7 @@
 
     ownAttributes = extend(ownAttributes,
       extend(getGlobalStylesForElement(element), fabric.parseStyleAttribute(element)));
-    return extend(parentAttributes, ownAttributes);
+    return _setStrokeFillOpacity(extend(parentAttributes, ownAttributes));
   }
 
   /**

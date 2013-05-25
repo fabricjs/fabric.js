@@ -8,7 +8,7 @@
       'cy':           103,
       'y':            104,
       'r':            105,
-      'fill-opacity': 0.45,
+      'opacity':      0.45,
       'fill-rule':    'foo',
       'stroke-width': 4
     };
@@ -26,17 +26,17 @@
     ok(fabric.parseAttributes);
 
     var element = makeElement();
-    var attributeNames = 'cx cy x y r fill-opacity fill-rule stroke-width transform fill fill-rule'.split(' ');
+    var attributeNames = 'cx cy x y r opacity fill-rule stroke-width transform fill fill-rule'.split(' ');
     var parsedAttributes = fabric.parseAttributes(element, attributeNames);
 
-    deepEqual({
+    deepEqual(parsedAttributes, {
       left:         102,
       top:          104,
       radius:       105,
       opacity:      0.45,
       fillRule:     'foo',
       strokeWidth:  4
-    }, parsedAttributes);
+    });
   });
 
   test('parseAttributesNoneValues', function() {
@@ -44,27 +44,27 @@
     element.setAttribute('fill', 'none');
     element.setAttribute('stroke', 'none');
 
-    deepEqual({ fill: '', stroke: '' }, fabric.parseAttributes(element, 'fill stroke'.split(' ')));
+    deepEqual(fabric.parseAttributes(element, 'fill stroke'.split(' ')), { fill: '', stroke: '' });
   });
 
   test('parseAttributesFillRule', function() {
     var element = fabric.document.createElement('path');
     element.setAttribute('fill-rule', 'evenodd');
 
-    deepEqual({ fillRule: 'destination-over' }, fabric.parseAttributes(element, ['fill-rule']));
+    deepEqual(fabric.parseAttributes(element, ['fill-rule']), { fillRule: 'destination-over' });
   });
 
   test('parseAttributesFillRuleWithoutTransformation', function() {
     var element = fabric.document.createElement('path');
     element.setAttribute('fill-rule', 'inherit');
 
-    deepEqual({ fillRule: 'inherit' }, fabric.parseAttributes(element, ['fill-rule']));
+    deepEqual(fabric.parseAttributes(element, ['fill-rule']), { fillRule: 'inherit' });
   });
 
   test('parseAttributesTransform', function() {
     var element = fabric.document.createElement('path');
     element.setAttribute('transform', 'translate(5, 10)');
-    deepEqual({ transformMatrix: [1, 0, 0, 1, 5, 10] }, fabric.parseAttributes(element, ['transform']));
+    deepEqual(fabric.parseAttributes(element, ['transform']), { transformMatrix: [1, 0, 0, 1, 5, 10] });
   });
 
   test('parseAttributesWithParent', function() {
@@ -79,8 +79,8 @@
     parent.setAttribute('y', '200');
     grandParent.setAttribute('fill', 'red');
 
-    deepEqual({ fill: 'red', left: 100, top: 200 },
-      fabric.parseAttributes(element, 'x y fill'.split(' ')));
+    deepEqual(fabric.parseAttributes(element, 'x y fill'.split(' ')),
+      { fill: 'red', left: 100, top: 200 });
   });
 
   asyncTest('parseElements', function() {
@@ -132,7 +132,7 @@
       'width':  103.45,
       'height': 20
     };
-    deepEqual(expectedObject, fabric.parseStyleAttribute(element));
+    deepEqual(fabric.parseStyleAttribute(element), expectedObject);
   });
 
   test('parseStyleAttribute with one pair', function() {
@@ -142,7 +142,7 @@
     var expectedObject = {
       'left': 10
     };
-    deepEqual(expectedObject, fabric.parseStyleAttribute(element));
+    deepEqual(fabric.parseStyleAttribute(element), expectedObject);
   });
 
   test('parseStyleAttribute with value normalization', function() {
@@ -152,7 +152,7 @@
     var expectedObject = {
       'fill': ''
     };
-    deepEqual(expectedObject, fabric.parseStyleAttribute(element));
+    deepEqual(fabric.parseStyleAttribute(element), expectedObject);
   });
 
   test('parseStyleAttribute with short font declaration', function() {
@@ -164,7 +164,7 @@
       'fontStyle': 'italic',
       'fontFamily': 'Arial,Helvetica,sans-serif'
     };
-    deepEqual(expectedObject, fabric.parseStyleAttribute(element));
+    deepEqual(fabric.parseStyleAttribute(element), expectedObject);
   });
 
   test('parseAttributes (style to have higher priority than attribute)', function() {
@@ -175,7 +175,21 @@
     var expectedObject = {
       'fill': 'red'
     };
-    deepEqual(expectedObject, fabric.parseAttributes(element, ['path']));
+    deepEqual(fabric.parseAttributes(element, fabric.Path.ATTRIBUTE_NAMES), expectedObject);
+  });
+
+  test('parseAttributes stroke-opacity and fill-opacity', function() {
+    var element = fabric.document.createElement('path');
+    element.setAttribute('style', 'fill:rgb(100,200,50);fill-opacity:0.2;');
+    element.setAttribute('stroke', 'green');
+    element.setAttribute('stroke-opacity', '0.5');
+    element.setAttribute('fill', 'green');
+
+    var expectedObject = {
+      'fill': 'rgba(100,200,50,0.2)',
+      'stroke': 'rgba(0,128,0,0.5)'
+    };
+    deepEqual(fabric.parseAttributes(element, fabric.Path.ATTRIBUTE_NAMES), expectedObject);
   });
 
   test('parsePointsAttribute', function() {
@@ -210,44 +224,44 @@
 
     element.setAttribute('transform', 'translate(5,10)');
     var parsedValue = fabric.parseTransformAttribute(element.getAttribute('transform'));
-    deepEqual([1,0,0,1,5,10], parsedValue);
+    deepEqual(parsedValue, [1,0,0,1,5,10]);
 
     element.setAttribute('transform', 'translate(-10,-20)');
     var parsedValue = fabric.parseTransformAttribute(element.getAttribute('transform'));
-    deepEqual([1,0,0,1,-10,-20], parsedValue);
+    deepEqual(parsedValue, [1,0,0,1,-10,-20]);
 
     var ANGLE = 90;
     element.setAttribute('transform', 'rotate(' + ANGLE + ')');
     var parsedValue = fabric.parseTransformAttribute(element.getAttribute('transform'));
-    deepEqual([Math.cos(ANGLE), Math.sin(ANGLE), -Math.sin(ANGLE), Math.cos(ANGLE), 0, 0], parsedValue);
+    deepEqual(parsedValue, [Math.cos(ANGLE), Math.sin(ANGLE), -Math.sin(ANGLE), Math.cos(ANGLE), 0, 0]);
 
     element.setAttribute('transform', 'scale(3.5)');
     var parsedValue = fabric.parseTransformAttribute(element.getAttribute('transform'));
-    deepEqual([3.5,0,0,3.5,0,0], parsedValue);
+    deepEqual(parsedValue, [3.5,0,0,3.5,0,0]);
 
     element.setAttribute('transform', 'scale(2 13)');
     var parsedValue = fabric.parseTransformAttribute(element.getAttribute('transform'));
-    deepEqual([2,0,0,13,0,0], parsedValue);
+    deepEqual(parsedValue, [2,0,0,13,0,0]);
 
     element.setAttribute('transform', 'skewX(2)');
     var parsedValue = fabric.parseTransformAttribute(element.getAttribute('transform'));
-    deepEqual([1,0,2,1,0,0], parsedValue);
+    deepEqual(parsedValue, [1,0,2,1,0,0]);
 
     element.setAttribute('transform', 'skewY(234.111)');
     var parsedValue = fabric.parseTransformAttribute(element.getAttribute('transform'));
-    deepEqual([1,234.111,0,1,0,0], parsedValue);
+    deepEqual(parsedValue, [1,234.111,0,1,0,0]);
 
     element.setAttribute('transform', 'matrix(1,2,3,4,5,6)');
     var parsedValue = fabric.parseTransformAttribute(element.getAttribute('transform'));
-    deepEqual([1,2,3,4,5,6], parsedValue);
+    deepEqual(parsedValue, [1,2,3,4,5,6]);
 
     element.setAttribute('transform', 'translate(21,31) translate(11,22)');
     var parsedValue = fabric.parseTransformAttribute(element.getAttribute('transform'));
-    deepEqual([1,0,0,1,32,53], parsedValue);
+    deepEqual(parsedValue, [1,0,0,1,32,53]);
 
     element.setAttribute('transform', 'scale(2 13) translate(5,15) skewX(11.22)');
     var parsedValue = fabric.parseTransformAttribute(element.getAttribute('transform'));
-    deepEqual([2,0,22.44,13,10,195], parsedValue);
+    deepEqual(parsedValue, [2,0,22.44,13,10,195]);
 
   });
 
@@ -321,7 +335,7 @@
       el.setAttribute('opacity', opacityValue);
       var obj = fabric.Rect.fromElement(el);
 
-      equal(parseFloat(opacityValue), obj.opacity,
+      equal(obj.opacity, parseFloat(opacityValue),
         'opacity should be parsed correctly from "opacity" attribute of ' + tagNames[i] + ' element');
     }
   });

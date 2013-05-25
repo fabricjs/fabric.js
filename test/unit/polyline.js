@@ -91,7 +91,7 @@
     var elPolylineWithAttrs = fabric.document.createElement('polyline');
     elPolylineWithAttrs.setAttribute('points', '10,10 20,20 30,30 10,10');
     elPolylineWithAttrs.setAttribute('fill', 'rgb(255,255,255)');
-    elPolylineWithAttrs.setAttribute('fill-opacity', '0.34');
+    elPolylineWithAttrs.setAttribute('opacity', '0.34');
     elPolylineWithAttrs.setAttribute('stroke-width', '3');
     elPolylineWithAttrs.setAttribute('stroke', 'blue');
     elPolylineWithAttrs.setAttribute('transform', 'translate(-10,-20) scale(2)');
@@ -118,7 +118,7 @@
       'points': expectedPoints
     }));
 
-    deepEqual([ 2, 0, 0, 2, -10, -20 ], polylineWithAttrs.get('transformMatrix'));
+    deepEqual(polylineWithAttrs.get('transformMatrix'), [ 2, 0, 0, 2, -10, -20 ]);
 
     var elPolylineWithoutPoints = fabric.document.createElement('polyline');
 

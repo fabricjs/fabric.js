@@ -37,8 +37,6 @@
     'textAlign',
     'fontStyle',
     'lineHeight',
-    'stroke',
-    'strokeWidth',
     'backgroundColor',
     'textBackgroundColor',
     'useNative'
@@ -51,6 +49,14 @@
    * @return {fabric.Text} thisArg
    */
   fabric.Text = fabric.util.createClass(fabric.Object, /** @lends fabric.Text.prototype */ {
+
+
+    /**
+     * Type of an object
+     * @type String
+     * @default
+     */
+    type:                 'text',
 
     /**
      * Font size (in pixels)
@@ -74,7 +80,7 @@
     fontFamily:           'Times New Roman',
 
     /**
-     * Text decoration (e.g. underline, overline)
+     * Text decoration Possible valus: "", "underline", "overline" or "line-through".
      * @type String
      * @default
      */
@@ -95,7 +101,7 @@
     textAlign:            'left',
 
     /**
-     * Font style (e.g. italic)
+     * Font style . Possible values: "", "normal", "italic" or "oblique".
      * @type String
      * @default
      */
@@ -107,20 +113,6 @@
      * @default
      */
     lineHeight:           1.3,
-
-    /**
-     * Stroke style. When specified, text is rendered with stroke
-     * @type String
-     * @default
-     */
-    stroke:               '',
-
-    /**
-     * Stroke width
-     * @type Number
-     * @default
-     */
-    strokeWidth:          1,
 
     /**
      * Background color of an entire text box
@@ -144,13 +136,6 @@
     path:                 null,
 
     /**
-     * Type of an object
-     * @type String
-     * @default
-     */
-    type:                 'text',
-
-    /**
      * Indicates whether canvas native text methods should be used to render text (otherwise, Cufon is used)
      * @type Boolean
      * @default
@@ -166,8 +151,8 @@
 
     /**
      * Constructor
-     * @param {String} text
-     * @param {Object} [options]
+     * @param {String} text Text string
+     * @param {Object} [options] Options object
      * @return {fabric.Text} thisArg
      */
     initialize: function(text, options) {
@@ -224,6 +209,7 @@
 
     /**
      * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _renderViaCufon: function(ctx) {
       var o = Cufon.textOptions || (Cufon.textOptions = { });
@@ -316,6 +302,8 @@
 
     /**
      * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Array} textLines Array of all text lines
      */
     _setBoundaries: function(ctx, textLines) {
       this._boundaries = [ ];
@@ -335,6 +323,7 @@
 
     /**
      * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _setTextStyles: function(ctx) {
       if (this.fill) {
@@ -358,6 +347,9 @@
 
     /**
      * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Array} textLines Array of all text lines
+     * @return {Number} Height of fabric.Text object
      */
     _getTextHeight: function(ctx, textLines) {
       return this.fontSize * textLines.length * this.lineHeight;
@@ -365,6 +357,9 @@
 
     /**
      * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Array} textLines Array of all text lines
+     * @return {Number} Maximum width of fabric.Text object
      */
     _getTextWidth: function(ctx, textLines) {
       var maxWidth = ctx.measureText(textLines[0]).width;
@@ -380,46 +375,46 @@
 
     /**
      * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _setTextShadow: function(ctx) {
-      if (this.textShadow) {
+      if (!this.textShadow) return;
 
-        // "rgba(0,0,0,0.2) 2px 2px 10px"
-        // "rgb(0, 100, 0) 0 0 5px"
-        // "red 2px 2px 1px"
-        // "#f55 123 345 567"
-        var reOffsetsAndBlur = /\s+(-?\d+)(?:px)?\s+(-?\d+)(?:px)?\s+(\d+)(?:px)?\s*/;
+      // "rgba(0,0,0,0.2) 2px 2px 10px"
+      // "rgb(0, 100, 0) 0 0 5px"
+      // "red 2px 2px 1px"
+      // "#f55 123 345 567"
+      var reOffsetsAndBlur = /\s+(-?\d+)(?:px)?\s+(-?\d+)(?:px)?\s+(\d+)(?:px)?\s*/;
 
-        var shadowDeclaration = this.textShadow;
-        var offsetsAndBlur = reOffsetsAndBlur.exec(this.textShadow);
-        var shadowColor = shadowDeclaration.replace(reOffsetsAndBlur, '');
+      var shadowDeclaration = this.textShadow;
+      var offsetsAndBlur = reOffsetsAndBlur.exec(this.textShadow);
+      var shadowColor = shadowDeclaration.replace(reOffsetsAndBlur, '');
 
-        ctx.save();
-        ctx.shadowColor = shadowColor;
-        ctx.shadowOffsetX = parseInt(offsetsAndBlur[1], 10);
-        ctx.shadowOffsetY = parseInt(offsetsAndBlur[2], 10);
-        ctx.shadowBlur = parseInt(offsetsAndBlur[3], 10);
+      ctx.save();
+      ctx.shadowColor = shadowColor;
+      ctx.shadowOffsetX = parseInt(offsetsAndBlur[1], 10);
+      ctx.shadowOffsetY = parseInt(offsetsAndBlur[2], 10);
+      ctx.shadowBlur = parseInt(offsetsAndBlur[3], 10);
 
-        this._shadows = [{
-          blur: ctx.shadowBlur,
-          color: ctx.shadowColor,
-          offX: ctx.shadowOffsetX,
-          offY: ctx.shadowOffsetY
-        }];
+      this._shadows = [{
+        blur: ctx.shadowBlur,
+        color: ctx.shadowColor,
+        offX: ctx.shadowOffsetX,
+        offY: ctx.shadowOffsetY
+      }];
 
-        this._shadowOffsets = [[
-          parseInt(ctx.shadowOffsetX, 10), parseInt(ctx.shadowOffsetY, 10)
-        ]];
-      }
+      this._shadowOffsets = [[
+        parseInt(ctx.shadowOffsetX, 10), parseInt(ctx.shadowOffsetY, 10)
+      ]];
     },
 
     /**
      * @private
-     * @param method
-     * @param ctx
-     * @param line
-     * @param left
-     * param top
+     * @param {String} method Method name ("fillText" or "strokeText")
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {String} line Text to render
+     * @param {Number} left Left position of text
+     * @param {Number} top Top position of text
      */
     _drawTextLine: function(method, ctx, line, left, top) {
 
@@ -452,6 +447,10 @@
       }
     },
 
+    /**
+     * @private
+     * @return {Number} Left offset
+     */
     _getLeftOffset: function() {
       if (fabric.isLikelyNode && (this.originX === 'left' || this.originX === 'center')) {
         return 0;
@@ -459,6 +458,10 @@
       return -this.width / 2;
     },
 
+    /**
+     * @private
+     * @return {Number} Top offset
+     */
     _getTopOffset: function() {
       if (fabric.isLikelyNode && (this.originY === 'top' || this.originY === 'center')) {
         return 0;
@@ -468,51 +471,59 @@
 
     /**
      * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Array} textLines Array of all text lines
      */
     _renderTextFill: function(ctx, textLines) {
-      if (this.fill) {
-        this._boundaries = [ ];
-        for (var i = 0, len = textLines.length; i < len; i++) {
-          this._drawTextLine(
-            'fillText',
-            ctx,
-            textLines[i],
-            this._getLeftOffset(),
-            this._getTopOffset() + ((i + 1) * this.fontSize * this.lineHeight)
-          );
-        }
+      if (!this.fill) return;
+
+      this._boundaries = [ ];
+      for (var i = 0, len = textLines.length; i < len; i++) {
+        this._drawTextLine(
+          'fillText',
+          ctx,
+          textLines[i],
+          this._getLeftOffset(),
+          this._getTopOffset() + ((i + 1) * this.fontSize * this.lineHeight)
+        );
       }
     },
 
     /**
      * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Array} textLines Array of all text lines
      */
     _renderTextStroke: function(ctx, textLines) {
-      if (this.stroke) {
-        if (this.strokeDashArray) {
-          // Spec requires the concatenation of two copies the dash list when the number of elements is odd
-          if (1 & this.strokeDashArray.length) {
-            this.strokeDashArray.push.apply(this.strokeDashArray, this.strokeDashArray);
-          }
-          supportsLineDash && ctx.setLineDash(this.strokeDashArray);
-        }
+      if (!this.stroke) return;
 
-        ctx.beginPath();
-        for (var i = 0, len = textLines.length; i < len; i++) {
-          this._drawTextLine(
-            'strokeText',
-            ctx,
-            textLines[i],
-            this._getLeftOffset(),
-            this._getTopOffset() + ((i + 1) * this.fontSize * this.lineHeight)
-          );
+      ctx.save();
+      if (this.strokeDashArray) {
+        // Spec requires the concatenation of two copies the dash list when the number of elements is odd
+        if (1 & this.strokeDashArray.length) {
+          this.strokeDashArray.push.apply(this.strokeDashArray, this.strokeDashArray);
         }
-        ctx.closePath();
+        supportsLineDash && ctx.setLineDash(this.strokeDashArray);
       }
+
+      ctx.beginPath();
+      for (var i = 0, len = textLines.length; i < len; i++) {
+        this._drawTextLine(
+          'strokeText',
+          ctx,
+          textLines[i],
+          this._getLeftOffset(),
+          this._getTopOffset() + ((i + 1) * this.fontSize * this.lineHeight)
+        );
+      }
+      ctx.closePath();
+      ctx.restore();
     },
 
     /**
      * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Array} textLines Array of all text lines
      */
     _renderTextBackground: function(ctx, textLines) {
       this._renderTextBoxBackground(ctx);
@@ -521,52 +532,57 @@
 
     /**
      * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _renderTextBoxBackground: function(ctx) {
-      if (this.backgroundColor) {
-        ctx.save();
-        ctx.fillStyle = this.backgroundColor;
+      if (!this.backgroundColor) return;
 
-        ctx.fillRect(
-          this._getLeftOffset(),
-          this._getTopOffset(),
-          this.width,
-          this.height
-        );
+      ctx.save();
+      ctx.fillStyle = this.backgroundColor;
 
-        ctx.restore();
-      }
+      ctx.fillRect(
+        this._getLeftOffset(),
+        this._getTopOffset(),
+        this.width,
+        this.height
+      );
+
+      ctx.restore();
     },
 
     /**
      * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Array} textLines Array of all text lines
      */
     _renderTextLinesBackground: function(ctx, textLines) {
-      if (this.textBackgroundColor) {
-        ctx.save();
-        ctx.fillStyle = this.textBackgroundColor;
+      if (!this.textBackgroundColor) return;
 
-        for (var i = 0, len = textLines.length; i < len; i++) {
+      ctx.save();
+      ctx.fillStyle = this.textBackgroundColor;
 
-          if (textLines[i] !== '') {
+      for (var i = 0, len = textLines.length; i < len; i++) {
 
-            var lineWidth = this._getLineWidth(ctx, textLines[i]);
-            var lineLeftOffset = this._getLineLeftOffset(lineWidth);
+        if (textLines[i] !== '') {
 
-            ctx.fillRect(
-              this._getLeftOffset() + lineLeftOffset,
-              this._getTopOffset() + (i * this.fontSize * this.lineHeight),
-              lineWidth,
-              this.fontSize * this.lineHeight
-            );
-          }
+          var lineWidth = this._getLineWidth(ctx, textLines[i]);
+          var lineLeftOffset = this._getLineLeftOffset(lineWidth);
+
+          ctx.fillRect(
+            this._getLeftOffset() + lineLeftOffset,
+            this._getTopOffset() + (i * this.fontSize * this.lineHeight),
+            lineWidth,
+            this.fontSize * this.lineHeight
+          );
         }
-        ctx.restore();
       }
+      ctx.restore();
     },
 
     /**
      * @private
+     * @param {Number} lineWidth Width of text line
+     * @return {Number} Line left offset
      */
     _getLineLeftOffset: function(lineWidth) {
       if (this.textAlign === 'center') {
@@ -580,8 +596,9 @@
 
     /**
      * @private
-     * @param ctx
-     * @param line
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {String} line Text line
+     * @return {Number} Line width
      */
     _getLineWidth: function(ctx, line) {
       return this.textAlign === 'justify'
@@ -591,8 +608,11 @@
 
     /**
      * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Array} textLines Array of all text lines
      */
     _renderTextDecoration: function(ctx, textLines) {
+      if (!this.textDecoration) return;
 
       var halfOfVerticalBox = this.originY === 'top' ? 0 : this._getTextHeight(ctx, textLines) / 2;
       var _this = this;
@@ -664,7 +684,7 @@
 
     /**
      * Renders text instance on a specified context
-     * @param ctx {CanvasRenderingContext2D} context to render on
+     * @param {CanvasRenderingContext2D} ctx Context to render on
      * @param {Boolean} [noTransform] When true, context is not transformed
      */
     render: function(ctx, noTransform) {
@@ -682,8 +702,8 @@
 
     /**
      * Returns object representation of an instance
-     * @param {Array} propertiesToInclude
-     * @return {Object} object representation of an instance
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+     * @return {Object} Object representation of an instance
      */
     toObject: function(propertiesToInclude) {
       return extend(this.callSuper('toObject', propertiesToInclude), {
@@ -697,8 +717,6 @@
         textShadow:           this.textShadow,
         textAlign:            this.textAlign,
         path:                 this.path,
-        stroke:               this.stroke,
-        strokeWidth:          this.strokeWidth,
         backgroundColor:      this.backgroundColor,
         textBackgroundColor:  this.textBackgroundColor,
         useNative:            this.useNative
@@ -749,6 +767,9 @@
 
     /**
      * @private
+     * @param {Number} lineTopOffset Line top offset
+     * @param {Array} textLines Array of all text lines
+     * @return {Array}
      */
     _getSVGShadows: function(lineTopOffset, textLines) {
       var shadowSpans = [], j, i, jlen, ilen, lineTopOffsetMultiplier = 1;
@@ -785,6 +806,10 @@
 
     /**
      * @private
+     * @param {Number} lineTopOffset Line top offset
+     * @param {Number} textLeftOffset Text left offset
+     * @param {Array} textLines Array of all text lines
+     * @return {Object}
      */
     _getSVGTextAndBg: function(lineTopOffset, textLeftOffset, textLines) {
       var textSpans = [ ], textBgRects = [ ], i, lineLeftOffset, len, lineTopOffsetMultiplier = 1;
@@ -854,6 +879,8 @@
      * we work around it by "moving" alpha channel into opacity attribute and setting fill's alpha to 1
      *
      * @private
+     * @param {Any} value
+     * @return {String}
      */
     _getFillAttributes: function(value) {
       var fillColor = (value && typeof value === 'string') ? new fabric.Color(value) : '';
@@ -921,8 +948,8 @@
   /**
    * Returns fabric.Text instance from an object representation
    * @static
-   * @param {Object} object to create an instance from
-   * @return {fabric.Text} an instance
+   * @param object {Object} object Object to create an instance from
+   * @return {fabric.Text} Instance of fabric.Text
    */
   fabric.Text.fromObject = function(object) {
     return new fabric.Text(object.text, clone(object));
@@ -931,9 +958,9 @@
   /**
    * Returns fabric.Text instance from an SVG element (<b>not yet implemented</b>)
    * @static
-   * @param element
-   * @param options
-   * @return {fabric.Text} an instance
+   * @param {SVGElement} element Element to parse
+   * @param {Object} [options] Options object
+   * @return {fabric.Text} Instance of fabric.Text
    */
   fabric.Text.fromElement = function(element, options) {
 
