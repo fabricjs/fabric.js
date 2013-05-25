@@ -187,9 +187,9 @@
     while (element && element.parentNode && !firstFixedAncestor) {
       element = element.parentNode;
 
-      if (element !== fabric.document && fabric.util.getElementPosition(element) === 'fixed') firstFixedAncestor = element;
+      if (element !== fabric.document && fabric.util.getElementStyle(element, 'position') === 'fixed') firstFixedAncestor = element;
 
-      if (element !== fabric.document && orgElement !== upperCanvasEl && fabric.util.getElementPosition(element) === 'absolute') {
+      if (element !== fabric.document && orgElement !== upperCanvasEl && fabric.util.getElementStyle(element, 'position') === 'absolute') {
         scrollLeft = 0;
         scrollTop = 0;
       }
