@@ -746,11 +746,14 @@
      * @throws {CANVAS_INIT_ERROR} If canvas can not be initialized
      */
     _createUpperCanvas: function () {
+      var lowerCanvasClass = this.lowerCanvasEl.className.replace(/\s*lower-canvas\s*/, '');
+
       this.upperCanvasEl = this._createCanvasElement();
-      this.upperCanvasEl.className = 'upper-canvas';
+      fabric.util.addClass(this.upperCanvasEl, 'upper-canvas ' + lowerCanvasClass);
 
       this.wrapperEl.appendChild(this.upperCanvasEl);
 
+      this._copyCanvasStyle(this.lowerCanvasEl, this.upperCanvasEl);
       this._applyCanvasStyle(this.upperCanvasEl);
       this.contextTop = this.upperCanvasEl.getContext('2d');
     },
@@ -800,6 +803,16 @@
       element.width = width;
       element.height = height;
       fabric.util.makeElementUnselectable(element);
+    },
+
+    /**
+     * Copys the the entire inline style from one element (fromEl) to another (toEl)
+     * @private
+     * @param {Element} fromEl Element style is copied from
+     * @param {Element} toEl Element copied style is applied to
+     */
+    _copyCanvasStyle: function (fromEl, toEl) {
+      toEl.style.cssText = fromEl.style.cssText;
     },
 
     /**
