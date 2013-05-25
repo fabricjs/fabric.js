@@ -142,7 +142,9 @@
   * @return {String} Style attribute value of the given element.
   */
   function getElementStyle(element, attr) {
-    element.style = element.style || { };
+    if (!element.style) {
+      element.style = { };
+    }
 
     if (fabric.document.defaultView && fabric.document.defaultView.getComputedStyle) {
       return fabric.document.defaultView.getComputedStyle(element, null)[attr];
