@@ -144,14 +144,14 @@
   function getElementStyle(element, attr) {
     element.style = element.style || { };
 
-    if (element.currentStyle) {
-      return element.currentStyle[attr];
-    }
-    else if (fabric.document.defaultView && fabric.document.defaultView.getComputedStyle) {
+    if (fabric.document.defaultView && fabric.document.defaultView.getComputedStyle) {
       return fabric.document.defaultView.getComputedStyle(element, null)[attr];
     }
-
-    return element.style[attr];
+    else {
+      var value = element.style[attr];
+      if (!value && element.currentStyle) value = element.currentStyle[attr];
+      return value;
+    }
   }
 
   (function () {
