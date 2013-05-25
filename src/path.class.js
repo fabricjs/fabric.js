@@ -172,6 +172,7 @@
      * Constructor
      * @param {Array|String} path Path data (sequence of coordinates and corresponding "command" tokens)
      * @param {Object} [options] Options object
+     * @return {fabric.Path} thisArg
      */
     initialize: function(path, options) {
       options = options || { };
@@ -203,6 +204,7 @@
 
     /**
      * @private
+     * @param {Object} [options] Options object
      */
     _initializePath: function (options) {
       var isWidthSet = 'width' in options,
@@ -232,6 +234,7 @@
 
     /**
      * @private
+     * @param {Boolean} positionSet When false, path offset is returned otherwise 0
      */
     _calculatePathOffset: function (positionSet) {
       return {
@@ -242,6 +245,7 @@
 
     /**
      * @private
+     * @param {CanvasRenderingContext2D} ctx context to render path on
      */
     _render: function(ctx) {
       var current, // current instruction
@@ -540,7 +544,6 @@
       }
       // ctx.globalCompositeOperation = this.fillRule;
 
-      ctx.save();
       if (this.overlayFill) {
         ctx.fillStyle = this.overlayFill;
       }
@@ -569,7 +572,6 @@
       this._renderStroke(ctx);
       this.clipTo && ctx.restore();
       this._removeShadow(ctx);
-      ctx.restore();
 
       if (!noTransform && this.active) {
         this.drawBorders(ctx);
@@ -589,7 +591,7 @@
 
     /**
      * Returns object representation of an instance
-     * @param {Array} propertiesToInclude
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
@@ -607,7 +609,7 @@
 
     /**
      * Returns dataless object representation of an instance
-     * @param {Array} propertiesToInclude
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} object representation of an instance
      */
     toDatalessObject: function(propertiesToInclude) {
@@ -657,7 +659,7 @@
 
     /**
      * Returns number representation of an instance complexity
-     * @return {Number} complexity
+     * @return {Number} complexity of this instance
      */
     complexity: function() {
       return this.path.length;

@@ -78,25 +78,25 @@
   test('toString', function() {
     var path = makePathObject();
     ok(typeof path.toString == 'function');
-    equal('#<fabric.Path (4): { "top": 200, "left": 200 }>', path.toString());
+    equal(path.toString(), '#<fabric.Path (4): { "top": 200, "left": 200 }>');
   });
 
   test('toObject', function() {
     var path = makePathObject();
     ok(typeof path.toObject == 'function');
-    deepEqual(REFERENCE_PATH_OBJECT, path.toObject());
+    deepEqual(path.toObject(), REFERENCE_PATH_OBJECT);
   });
 
   test('toDatalessObject', function() {
     var path = makePathObject();
     ok(typeof path.toDatalessObject == 'function');
-    deepEqual(REFERENCE_PATH_OBJECT, path.toDatalessObject());
+    deepEqual(path.toDatalessObject(), REFERENCE_PATH_OBJECT);
 
     var src = 'http://example.com/';
     path.setSourcePath(src);
-    deepEqual(fabric.util.object.extend(fabric.util.object.clone(REFERENCE_PATH_OBJECT), {
-      path: src
-    }), path.toDatalessObject());
+    deepEqual(path.toDatalessObject(), fabric.util.object.extend(fabric.util.object.clone(REFERENCE_PATH_OBJECT), {
+        path: src
+    }));
   });
 
   test('complexity', function() {
@@ -108,7 +108,7 @@
     ok(typeof fabric.Path.fromObject == 'function');
     var path = fabric.Path.fromObject(REFERENCE_PATH_OBJECT);
     ok(path instanceof fabric.Path);
-    deepEqual(REFERENCE_PATH_OBJECT, path.toObject());
+    deepEqual(path.toObject(), REFERENCE_PATH_OBJECT);
   });
 
   test('fromElement', function() {
@@ -117,7 +117,7 @@
 
     elPath.setAttribute('d', 'M 100 100 L 300 100 L 200 300 z');
     elPath.setAttribute('fill', 'red');
-    elPath.setAttribute('fill-opacity', '1');
+    elPath.setAttribute('opacity', '1');
     elPath.setAttribute('stroke', 'blue');
     elPath.setAttribute('stroke-width', '1');
     elPath.setAttribute('stroke-dasharray', '5, 2');
@@ -132,13 +132,13 @@
     var path = fabric.Path.fromElement(elPath);
     ok(path instanceof fabric.Path);
 
-    deepEqual(fabric.util.object.extend(REFERENCE_PATH_OBJECT, {
+    deepEqual(path.toObject(), fabric.util.object.extend(REFERENCE_PATH_OBJECT, {
       strokeDashArray:  [5, 2],
       strokeLineCap:    'round',
       strokeLineJoin:   'bevil',
       strokeMiterLimit: 5,
       transformMatrix:  [2, 0, 0, 2, 0, 0]
-    }), path.toObject());
+    }));
 
     var ANGLE = 90;
 
@@ -146,8 +146,8 @@
     path = fabric.Path.fromElement(elPath);
 
     deepEqual(
-      [ Math.cos(ANGLE), Math.sin(ANGLE), -Math.sin(ANGLE), Math.cos(ANGLE), 0, 0 ],
-      path.get('transformMatrix')
+      path.get('transformMatrix'),
+      [ Math.cos(ANGLE), Math.sin(ANGLE), -Math.sin(ANGLE), Math.cos(ANGLE), 0, 0 ]
     );
   });
 
@@ -155,16 +155,16 @@
     var el = getPathElement('M100 100 l 200 200 300 300 400 -50 z');
     var obj = fabric.Path.fromElement(el);
 
-    deepEqual(['M', 100, 100], obj.path[0]);
-    deepEqual(['l', 200, 200], obj.path[1]);
-    deepEqual(['l', 300, 300], obj.path[2]);
-    deepEqual(['l', 400, -50], obj.path[3]);
+    deepEqual(obj.path[0], ['M', 100, 100]);
+    deepEqual(obj.path[1], ['l', 200, 200]);
+    deepEqual(obj.path[2], ['l', 300, 300]);
+    deepEqual(obj.path[3], ['l', 400, -50]);
 
     el = getPathElement('c 0,-53.25604 43.17254,-96.42858 96.42857,-96.42857 53.25603,0 96.42857,43.17254 96.42857,96.42857');
     obj = fabric.Path.fromElement(el);
 
-    deepEqual(['c', 0, -53.25604, 43.17254, -96.42858, 96.42857, -96.42857], obj.path[0]);
-    deepEqual(['c', 53.25603, 0, 96.42857, 43.17254, 96.42857, 96.42857], obj.path[1]);
+    deepEqual(obj.path[0], ['c', 0, -53.25604, 43.17254, -96.42858, 96.42857, -96.42857]);
+    deepEqual(obj.path[1], ['c', 53.25603, 0, 96.42857, 43.17254, 96.42857, 96.42857]);
   });
 
   test('compressed path commands', function() {
@@ -172,9 +172,9 @@
     var el = getPathElement('M56.224 84.12c-.047.132-.138.221-.322.215.046-.131.137-.221.322-.215z');
     var obj = fabric.Path.fromElement(el);
 
-    deepEqual(['M', 56.224, 84.12], obj.path[0]);
-    deepEqual(['c', -0.047, 0.132, -0.138, 0.221, -0.322, 0.215], obj.path[1]);
-    deepEqual(['c', 0.046, -0.131, 0.137, -0.221, 0.322, -0.215], obj.path[2]);
-    deepEqual(['z'], obj.path[3]);
+    deepEqual(obj.path[0], ['M', 56.224, 84.12]);
+    deepEqual(obj.path[1], ['c', -0.047, 0.132, -0.138, 0.221, -0.322, 0.215]);
+    deepEqual(obj.path[2], ['c', 0.046, -0.131, 0.137, -0.221, 0.322, -0.215]);
+    deepEqual(obj.path[3], ['z']);
   });
 })();

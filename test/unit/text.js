@@ -16,7 +16,7 @@
     'height':              52,
     'fill':                'rgb(0,0,0)',
     'overlayFill':         null,
-    'stroke':              '',
+    'stroke':              null,
     'strokeWidth':         1,
     'strokeDashArray':     null,
     'strokeLineCap':       'butt',
@@ -98,9 +98,9 @@
 
     text.set({ opacity: 0.123, fill: 'red', fontFamily: 'blah' });
 
-    equal(0.123, text.getOpacity());
-    equal('red', text.getFill());
-    equal('blah', text.get('fontFamily'));
+    equal(text.getOpacity(), 0.123);
+    equal(text.getFill(), 'red');
+    equal(text.get('fontFamily'), 'blah');
   });
 
   test('setColor', function(){
@@ -166,7 +166,7 @@
     elTextWithAttrs.setAttribute('x', 10);
     elTextWithAttrs.setAttribute('y', 20);
     elTextWithAttrs.setAttribute('fill', 'rgb(255,255,255)');
-    elTextWithAttrs.setAttribute('fill-opacity', 0.45);
+    elTextWithAttrs.setAttribute('opacity', 0.45);
     elTextWithAttrs.setAttribute('stroke', 'blue');
     elTextWithAttrs.setAttribute('stroke-width', 3);
     elTextWithAttrs.setAttribute('stroke-dasharray', '5, 2');
@@ -215,10 +215,10 @@
 
   test('dimensions after text change', function() {
     var text = new fabric.Text('x');
-    equal(20, text.width);
+    equal(text.width, 20);
 
     text.setText('xx');
-    equal(40, text.width);
+    equal(text.width, 40);
   });
 
   test('setting fontFamily', function() {
@@ -226,7 +226,7 @@
     text.path = 'foobar.js';
 
     text.set('fontFamily', 'foobar');
-    equal('foobar', text.get('fontFamily'));
+    equal(text.get('fontFamily'), 'foobar');
   });
 
 })();

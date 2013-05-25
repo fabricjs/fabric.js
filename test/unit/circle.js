@@ -44,11 +44,11 @@
     ok(typeof circle.setRadius == 'function');
     circle.setRadius(20);
 
-    equal(20, circle.getRadiusX());
-    equal(20, circle.getRadiusY());
+    equal(circle.getRadiusX(), 20);
+    equal(circle.getRadiusY(), 20);
 
-    equal(40, circle.getWidth());
-    equal(40, circle.getHeight());
+    equal(circle.getWidth(), 40);
+    equal(circle.getHeight(), 40);
   });
 
   test('complexity', function() {
@@ -97,8 +97,8 @@
     circle.set('left', 100).set('top', 200).set('radius', 15);
 
     var augmentedProperties = fabric.util.object.extend(fabric.util.object.clone(defaultProperties), {
-      left: 100,
-      top: 200,
+      left:   100,
+      top:    200,
       radius: 15
     });
 
@@ -113,7 +113,7 @@
         left             = 12,
         top              = 15,
         fill             = 'ff5555',
-        fillOpacity      = 0.5,
+        opacity          = 0.5,
         strokeWidth      = 2,
         strokeDashArray  = [5, 2],
         strokeLineCap    = 'round',
@@ -125,7 +125,7 @@
     elCircle.setAttribute('cx', left);
     elCircle.setAttribute('cy', top);
     elCircle.setAttribute('fill', fill);
-    elCircle.setAttribute('fill-opacity', fillOpacity);
+    elCircle.setAttribute('opacity', opacity);
     elCircle.setAttribute('stroke-width', strokeWidth);
     elCircle.setAttribute('stroke-dasharray', '5, 2');
     elCircle.setAttribute('stroke-linecap', strokeLineCap);
@@ -139,7 +139,7 @@
     equal(oCircle.get('left'), left);
     equal(oCircle.get('top'), top);
     equal(oCircle.get('fill'), fill);
-    equal(oCircle.get('opacity'), fillOpacity);
+    equal(oCircle.get('opacity'), opacity);
     equal(oCircle.get('strokeWidth'), strokeWidth);
     deepEqual(oCircle.get('strokeDashArray'), strokeDashArray);
     equal(oCircle.get('strokeLineCap'), strokeLineCap);
@@ -193,7 +193,7 @@
     var expected = circle.toObject();
     var actual = fabric.Circle.fromObject(expected).toObject();
 
-    deepEqual(expected, actual);
+    deepEqual(actual, expected);
   });
 
   test('cloning and radius, width, height', function() {
@@ -202,9 +202,9 @@
 
     var clone = circle.clone();
 
-    equal(40, clone.getWidth());
-    equal(40, clone.getHeight());
+    equal(clone.getWidth(), 40);
+    equal(clone.getHeight(), 40);
 
-    equal(10, clone.radius);
+    equal(clone.radius, 10);
   });
 })();

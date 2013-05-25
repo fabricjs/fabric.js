@@ -12,6 +12,16 @@
     ok(oColor);
     ok(oColor instanceof fabric.Color);
     equal(oColor.toRgb(), 'rgb(100,100,100)');
+
+    var oColor = new fabric.Color('rgba(100,100,100, 0.5)');
+    ok(oColor);
+    ok(oColor instanceof fabric.Color);
+    equal(oColor.toRgba(), 'rgba(100,100,100,0.5)');
+
+    var oColor = new fabric.Color('hsl(262,80%,12%)');
+    ok(oColor);
+    ok(oColor instanceof fabric.Color);
+    equal(oColor.toHsl(), 'hsl(262,80%,12%)');
   });
 
   test('getSource', function() {
@@ -41,6 +51,22 @@
     equal(oColor.toRgba(), 'rgba(255,255,255,1)');
     oColor.setSource([0,0,0,0.5]);
     equal(oColor.toRgba(), 'rgba(0,0,0,0.5)');
+  });
+
+  test('toHsl', function() {
+    var oColor = new fabric.Color('ffffff');
+    ok(typeof oColor.toHsl == 'function');
+    equal(oColor.toHsl(), 'hsl(0,0%,100%)');
+    oColor.setSource([0,0,0,0.5]);
+    equal(oColor.toHsl(), 'hsl(0,0%,0%)');
+  });
+
+  test('toHsla', function() {
+    var oColor = new fabric.Color('ffffff');
+    ok(typeof oColor.toHsla == 'function');
+    equal(oColor.toHsla(), 'hsla(0,0%,100%,1)');
+    oColor.setSource([0,0,0,0.5]);
+    equal(oColor.toHsla(), 'hsla(0,0%,0%,0.5)');
   });
 
   test('toHex', function() {
@@ -100,6 +126,36 @@
     equal(oColor.toHex(), 'FFFFFF');
   });
 
+  test('fromRgb (with whitespaces)', function() {
+    ok(typeof fabric.Color.fromRgb == 'function');
+    var originalRgb = 'rgb( 255 , 255 , 255 )';
+    var oColor = fabric.Color.fromRgb(originalRgb);
+    ok(oColor);
+    ok(oColor instanceof fabric.Color);
+    equal(oColor.toRgb(), 'rgb(255,255,255)');
+    equal(oColor.toHex(), 'FFFFFF');
+  });
+
+  test('fromRgb (percentage values)', function() {
+    ok(typeof fabric.Color.fromRgb == 'function');
+    var originalRgb = 'rgb(100%,100%,100%)';
+    var oColor = fabric.Color.fromRgb(originalRgb);
+    ok(oColor);
+    ok(oColor instanceof fabric.Color);
+    equal(oColor.toRgb(), 'rgb(255,255,255)');
+    equal(oColor.toHex(), 'FFFFFF');
+  });
+
+  test('fromRgb (percentage values with whitespaces)', function() {
+    ok(typeof fabric.Color.fromRgb == 'function');
+    var originalRgb = 'rgb( 100% , 100% , 100% )';
+    var oColor = fabric.Color.fromRgb(originalRgb);
+    ok(oColor);
+    ok(oColor instanceof fabric.Color);
+    equal(oColor.toRgb(), 'rgb(255,255,255)');
+    equal(oColor.toHex(), 'FFFFFF');
+  });
+
   test('fromRgba', function() {
     ok(typeof fabric.Color.fromRgba == 'function');
     var originalRgba = 'rgba(255,255,255,0.5)';
@@ -109,6 +165,78 @@
     equal(oColor.toRgba(), originalRgba);
     equal(oColor.toHex(), 'FFFFFF');
     equal(oColor.getAlpha(), 0.5, 'alpha should be set properly');
+  });
+
+  test('fromRgba (with whitespaces)', function() {
+    var originalRgba = 'rgba( 255 , 255 , 255 , 0.5 )';
+    oColor = fabric.Color.fromRgba(originalRgba);
+    ok(oColor);
+    ok(oColor instanceof fabric.Color);
+    equal(oColor.toRgba(), 'rgba(255,255,255,0.5)');
+    equal(oColor.toHex(), 'FFFFFF');
+    equal(oColor.getAlpha(), 0.5, 'alpha should be set properly');
+  });
+
+  test('fromRgba (percentage values)', function() {
+    var originalRgba = 'rgba(100%,100%,100%,0.5)';
+    oColor = fabric.Color.fromRgba(originalRgba);
+    ok(oColor);
+    ok(oColor instanceof fabric.Color);
+    equal(oColor.toRgba(), 'rgba(255,255,255,0.5)');
+    equal(oColor.toHex(), 'FFFFFF');
+    equal(oColor.getAlpha(), 0.5, 'alpha should be set properly');
+  });
+
+  test('fromRgba (percentage values with whitespaces)', function() {
+    var originalRgba = 'rgba( 100% , 100% , 100% , 0.5 )';
+    oColor = fabric.Color.fromRgba(originalRgba);
+    ok(oColor);
+    ok(oColor instanceof fabric.Color);
+    equal(oColor.toRgba(), 'rgba(255,255,255,0.5)');
+    equal(oColor.toHex(), 'FFFFFF');
+    equal(oColor.getAlpha(), 0.5, 'alpha should be set properly');
+  });
+
+  test('fromHsl', function() {
+    ok(typeof fabric.Color.fromHsl == 'function');
+    var originalHsl = 'hsl(262,80%,12%)';
+    var oColor = fabric.Color.fromHsl(originalHsl);
+    ok(oColor);
+    ok(oColor instanceof fabric.Color);
+    equal(oColor.toHsl(), originalHsl);
+    equal(oColor.toHex(), '180637');
+  });
+
+  test('fromHsl (with whitespaces)', function() {
+    ok(typeof fabric.Color.fromHsl == 'function');
+    var originalHsl = 'hsl( 262 , 80% , 12% )';
+    var oColor = fabric.Color.fromHsl(originalHsl);
+    ok(oColor);
+    ok(oColor instanceof fabric.Color);
+    equal(oColor.toHsl(), 'hsl(262,80%,12%)');
+    equal(oColor.toHex(), '180637');
+  });
+
+  test('fromHsla', function() {
+    ok(typeof fabric.Color.fromHsla == 'function');
+    var originalHsla = 'hsla(262,80%,12%,0.2)';
+    var oColor = fabric.Color.fromHsla(originalHsla);
+    ok(oColor);
+    ok(oColor instanceof fabric.Color);
+    equal(oColor.toHsla(), originalHsla);
+    equal(oColor.toHex(), '180637');
+    equal(oColor.getAlpha(), 0.2, 'alpha should be set properly');
+  });
+
+  test('fromHsla (with whitespaces)', function() {
+    ok(typeof fabric.Color.fromHsla == 'function');
+    var originalHsla = 'hsla( 262 , 80% , 12% , 0.2 )';
+    var oColor = fabric.Color.fromHsla(originalHsla);
+    ok(oColor);
+    ok(oColor instanceof fabric.Color);
+    equal(oColor.toHsla(), 'hsla(262,80%,12%,0.2)');
+    equal(oColor.toHex(), '180637');
+    equal(oColor.getAlpha(), 0.2, 'alpha should be set properly');
   });
 
   test('fromHex', function() {
@@ -123,24 +251,30 @@
 
   test('sourceFromRgb', function() {
     ok(typeof fabric.Color.sourceFromRgb == 'function');
-    deepEqual([255,255,255,1], fabric.Color.sourceFromRgb('rgb(255,255,255)'));
-    deepEqual([100,150,200,1], fabric.Color.sourceFromRgb('rgb(100,150,200)'));
+    deepEqual(fabric.Color.sourceFromRgb('rgb(255,255,255)'), [255,255,255,1]);
+    deepEqual(fabric.Color.sourceFromRgb('rgb(100,150,200)'), [100,150,200,1]);
+  });
+
+  test('sourceFromHsl', function() {
+    ok(typeof fabric.Color.sourceFromHsl == 'function');
+    deepEqual(fabric.Color.sourceFromHsl('hsl(360,100%,100%)'), [255,255,255,1]);
+    deepEqual(fabric.Color.sourceFromHsl('hsl(180,50%,40%)'), [51,153,153,1]);
   });
 
   test('sourceFromHex', function() {
     ok(typeof fabric.Color.sourceFromHex == 'function');
 
     // uppercase
-    deepEqual([255,255,255,1], fabric.Color.sourceFromHex('FFFFFF'));
-    deepEqual([255,255,255,1], fabric.Color.sourceFromHex('FFF'));
-    deepEqual([255,255,255,1], fabric.Color.sourceFromHex('#FFFFFF'));
-    deepEqual([255,255,255,1], fabric.Color.sourceFromHex('#FFF'));
+    deepEqual(fabric.Color.sourceFromHex('FFFFFF'), [255,255,255,1]);
+    deepEqual(fabric.Color.sourceFromHex('FFF'), [255,255,255,1]);
+    deepEqual(fabric.Color.sourceFromHex('#FFFFFF'), [255,255,255,1]);
+    deepEqual(fabric.Color.sourceFromHex('#FFF'), [255,255,255,1]);
 
     // lowercase
-    deepEqual([255,255,255,1], fabric.Color.sourceFromHex('#ffffff'));
-    deepEqual([255,255,255,1], fabric.Color.sourceFromHex('#fff'));
-    deepEqual([255,255,255,1], fabric.Color.sourceFromHex('ffffff'));
-    deepEqual([255,255,255,1], fabric.Color.sourceFromHex('fff'));
+    deepEqual(fabric.Color.sourceFromHex('#ffffff'), [255,255,255,1]);
+    deepEqual(fabric.Color.sourceFromHex('#fff'), [255,255,255,1]);
+    deepEqual(fabric.Color.sourceFromHex('ffffff'), [255,255,255,1]);
+    deepEqual(fabric.Color.sourceFromHex('fff'), [255,255,255,1]);
   });
 
   test('fromSource', function() {
