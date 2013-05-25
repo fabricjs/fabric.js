@@ -89,7 +89,7 @@
     elRectWithAttrs.setAttribute('rx', 11);
     elRectWithAttrs.setAttribute('ry', 12);
     elRectWithAttrs.setAttribute('fill', 'rgb(255,255,255)');
-    elRectWithAttrs.setAttribute('fill-opacity', 0.45);
+    elRectWithAttrs.setAttribute('opacity', 0.45);
     elRectWithAttrs.setAttribute('stroke', 'blue');
     elRectWithAttrs.setAttribute('stroke-width', 3);
     elRectWithAttrs.setAttribute('stroke-dasharray', '5, 2');
@@ -102,20 +102,20 @@
     ok(rectWithAttrs instanceof fabric.Rect);
 
     var expectedObject = fabric.util.object.extend(REFERENCE_RECT, {
-      left: 121,
-      top: 186.5,
-      width: 222,
-      height: 333,
-      fill: 'rgb(255,255,255)',
-      opacity: 0.45,
-      stroke: 'blue',
-      strokeWidth: 3,
-      strokeDashArray: [5, 2],
-      strokeLineCap: 'round',
-      strokeLineJoin: 'bevil',
+      left:             121,
+      top:              186.5,
+      width:            222,
+      height:           333,
+      fill:             'rgb(255,255,255)',
+      opacity:          0.45,
+      stroke:           'blue',
+      strokeWidth:      3,
+      strokeDashArray:  [5, 2],
+      strokeLineCap:    'round',
+      strokeLineJoin:   'bevil',
       strokeMiterLimit: 5,
-      rx: 11,
-      ry: 12
+      rx:               11,
+      ry:               12
     });
     deepEqual(rectWithAttrs.toObject(), expectedObject);
   });
@@ -136,6 +136,6 @@
     var rect = new fabric.Rect({ width: 100, height: 100, rx: 20, ry: 30 });
     var svg = rect.toSVG();
 
-    equal('<rect x="-50" y="-50" rx="20" ry="30" width="100" height="100" style="stroke: none; stroke-width: 1; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); opacity: 1;" transform="translate(0 0)"/>', svg);
+    equal(svg, '<rect x="-50" y="-50" rx="20" ry="30" width="100" height="100" style="stroke: none; stroke-width: 1; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); opacity: 1;" transform="translate(0 0)"/>');
   });
 })();

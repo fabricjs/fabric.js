@@ -167,7 +167,7 @@
     overlayFill:              null,
 
     /**
-     * When `true`, an object is rendered via stroke and this property specifies its color
+     * When defined, an object is rendered via stroke and this property specifies its color
      * @type String
      * @default
      */
@@ -413,7 +413,7 @@
     /**
      * Transforms context when rendering an object
      * @param {CanvasRenderingContext2D} ctx Context
-     * @param {Boolean} when true, context is transformed to object's top/left corner. This is used when rendering text on Node
+     * @param {Boolean} fromLeft When true, context is transformed to object's top/left corner. This is used when rendering text on Node
      */
     transform: function(ctx, fromLeft) {
       ctx.globalAlpha = this.opacity;
@@ -429,8 +429,8 @@
 
     /**
      * Returns an object representation of an instance
-     * @param {Array} propertiesToInclude
-     * @return {Object} object representation of an instance
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+     * @return {Object} Object representation of an instance
      */
     toObject: function(propertiesToInclude) {
 
@@ -478,8 +478,8 @@
 
     /**
      * Returns (dataless) object representation of an instance
-     * @param {Array} [propertiesToInclude]
-     * @return {Object} object representation of an instance
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+     * @return {Object} Object representation of an instance
      */
     toDatalessObject: function(propertiesToInclude) {
       // will be overwritten by subclasses
@@ -540,6 +540,7 @@
 
     /**
      * @private
+     * @param {Object} object
      */
     _removeDefaultValues: function(object) {
       var defaultOptions = fabric.Object.prototype.options;
@@ -572,7 +573,7 @@
 
     /**
      * Sets property to a given value. When changing position/dimension -related properties (left, top, scale, angle, etc.) `set` does not update position of object's borders/controls. If you need to update those, call `setCoords()`.
-     * @param {String} name
+     * @param {String|Object} key (if object, iterate over the object properties)
      * @param {Object|Function} value (if function, the value is passed into it and its return value is used as a new one)
      * @return {fabric.Object} thisArg
      * @chainable
@@ -596,8 +597,9 @@
 
     /**
      * @private
-     * @param key
-     * @param value
+     * @param {String} key
+     * @param {Any} value
+     * @return {fabric.Object} thisArg
      */
     _set: function(key, value) {
       var shouldConstrainValue = (key === 'scaleX' || key === 'scaleY');
@@ -667,7 +669,6 @@
         this.transform(ctx);
       }
 
-      ctx.save();
       if (this.stroke) {
         ctx.lineWidth = this.strokeWidth;
         ctx.lineCap = this.strokeLineCap;
@@ -697,7 +698,6 @@
       this._render(ctx, noTransform);
       this.clipTo && ctx.restore();
       this._removeShadow(ctx);
-      ctx.restore();
 
       if (this.active && !noTransform) {
         this.drawBorders(ctx);
@@ -757,6 +757,7 @@
     _renderStroke: function(ctx) {
       if (!this.stroke) return;
 
+      ctx.save();
       if (this.strokeDashArray) {
         // Spec requires the concatenation of two copies the dash list when the number of elements is odd
         if (1 & this.strokeDashArray.length) {
@@ -776,12 +777,13 @@
         this._stroke ? this._stroke(ctx) : ctx.stroke();
       }
       this._removeShadow(ctx);
+      ctx.restore();
     },
 
     /**
      * Clones an instance
      * @param {Function} callback Callback is invoked with a clone as a first argument
-     * @param {Array} propertiesToInclude
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the outpu
      * @return {fabric.Object} clone of an instance
      */
     clone: function(callback, propertiesToInclude) {
@@ -808,7 +810,7 @@
 
     /**
      * Converts an object into a data-url-like string
-     * @param {Object} options
+     * @param {Object} options Options object
      *
      *  `format` the format of the output image. Either "jpeg" or "png".
      *  `quality` quality level (0..1)
@@ -876,7 +878,7 @@
 
     /**
      * Returns complexity of an instance
-     * @return {Number} complexity
+     * @return {Number} complexity of this instance
      */
     complexity: function() {
       return 0;
@@ -884,7 +886,7 @@
 
     /**
      * Returns a JSON representation of an instance
-     * @param {Array} propertiesToInclude Any properties that you might want to additionally include in the output
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} JSON
      */
     toJSON: function(propertiesToInclude) {

@@ -38,7 +38,7 @@
     el.setAttribute('d', path);
     el.setAttribute('fill', 'rgb(255,0,0)');
     el.setAttribute('stroke', 'blue');
-    el.setAttribute('troke-width', 3);
+    el.setAttribute('stroke-width', 3);
     return el;
   }
 
@@ -77,7 +77,7 @@
     paths[0].group = null;
     paths[1].group = null;
 
-    deepEqual(paths, pathGroup.getObjects());
+    deepEqual(pathGroup.getObjects(), paths);
   });
 
   test('toObject', function() {
@@ -115,7 +115,7 @@
       'paths': 'http://example.com/',
       'sourcePath': 'http://example.com/'
     });
-    deepEqual(expectedObject, pathGroup.toDatalessObject());
+    deepEqual(pathGroup.toDatalessObject(), expectedObject);
   });
 
   test('toString', function() {

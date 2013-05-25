@@ -31,7 +31,7 @@
      * Constructor
      * @param {HTMLImageElement | String} element Image element
      * @param {Object} [options] Options object
-     * @return {fabric.Image}
+     * @return {fabric.Image} thisArg
      */
     initialize: function(element, options) {
       options || (options = { });
@@ -51,7 +51,7 @@
 
     /**
      * Returns image element which this instance if based on
-     * @return {HTMLImageElement} image element
+     * @return {HTMLImageElement} Image element
      */
     getElement: function() {
       return this._element;
@@ -136,9 +136,10 @@
       ctx.strokeStyle = this.stroke.toLive
         ? this.stroke.toLive(ctx)
         : this.stroke;
+
       ctx.beginPath();
       ctx.strokeRect(-this.width / 2, -this.height / 2, this.width, this.height);
-      ctx.beginPath();
+      ctx.closePath();
       ctx.restore();
     },
 
@@ -152,6 +153,7 @@
          w = this.width,
          h = this.height;
 
+      ctx.save();
       ctx.lineWidth = this.strokeWidth;
       ctx.lineCap = this.strokeLineCap;
       ctx.lineJoin = this.strokeLineJoin;
@@ -159,12 +161,14 @@
       ctx.strokeStyle = this.stroke.toLive
         ? this.stroke.toLive(ctx)
         : this.stroke;
+
       ctx.beginPath();
       fabric.util.drawDashedLine(ctx, x, y, x+w, y, this.strokeDashArray);
       fabric.util.drawDashedLine(ctx, x+w, y, x+w, y+h, this.strokeDashArray);
       fabric.util.drawDashedLine(ctx, x+w, y+h, x, y+h, this.strokeDashArray);
       fabric.util.drawDashedLine(ctx, x, y+h, x, y, this.strokeDashArray);
       ctx.closePath();
+      ctx.restore();
     },
 
     /**
@@ -372,7 +376,7 @@
 
     /**
      * Returns complexity of an instance
-     * @return {Number} complexity
+     * @return {Number} complexity of this instance
      */
     complexity: function() {
       return 1;
@@ -455,7 +459,7 @@
    * @param {SVGElement} element Element to parse
    * @param {Function} callback Callback to execute when fabric.Image object is created
    * @param {Object} [options] Options object
-   * @return {fabric.Image}
+   * @return {fabric.Image} Instance of fabric.Image
    */
   fabric.Image.fromElement = function(element, callback, options) {
     var parsedAttributes = fabric.parseAttributes(element, fabric.Image.ATTRIBUTE_NAMES);
