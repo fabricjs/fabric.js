@@ -12047,8 +12047,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       this.set('width', Math.abs(this.x2 - this.x1) || 1);
       this.set('height', Math.abs(this.y2 - this.y1) || 1);
 
-      this.set('left', 'left' in options ? options.left : (this.x1 + this.width / 2));
-      this.set('top', 'top' in options ? options.top : (this.y1 + this.height / 2));
+      this.set('left', 'left' in options ? options.left : (Math.min(this.x1, this.x2) + this.width / 2));
+      this.set('top', 'top' in options ? options.top : (Math.min(this.y1, this.y2) + this.height / 2));
     },
 
     /**
@@ -12077,9 +12077,19 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       }
 
       if (!this.strokeDashArray || this.strokeDashArray && supportsLineDash) {
+
         // move from center (of virtual box) to its left/top corner
-        ctx.moveTo(this.width === 1 ? 0 : (-this.width / 2), this.height === 1 ? 0 : (-this.height / 2));
-        ctx.lineTo(this.width === 1 ? 0 : (this.width / 2), this.height === 1 ? 0 : (this.height / 2));
+        // we can't assume x1, y1 is top left and x2, y2 is bottom right
+        var xMult = this.x1 <= this.x2 ? -1 : 1;
+        var yMult = this.y1 <= this.y2 ? -1 : 1;
+
+        ctx.moveTo(
+          this.width === 1 ? 0 : (xMult * this.width / 2),
+          this.height === 1 ? 0 : (yMult * this.height / 2));
+
+        ctx.lineTo(
+          this.width === 1 ? 0 : (xMult * -1 * this.width / 2),
+          this.height === 1 ? 0 : (yMult * -1 * this.height / 2));
       }
 
       ctx.lineWidth = this.strokeWidth;
