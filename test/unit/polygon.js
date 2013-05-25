@@ -51,7 +51,7 @@
     ok(polygon instanceof fabric.Object);
 
     equal(polygon.type, 'polygon');
-    deepEqual(polygon.get('points'), [ { x: 5, y: 7 }, { x: 15, y: 17 } ]);
+    deepEqual(polygon.get('points'), [ { x: -5, y: -5 }, { x: 5, y: 5 } ]);
   });
 
   test('complexity', function() {

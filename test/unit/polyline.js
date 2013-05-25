@@ -51,7 +51,7 @@
     ok(polyline instanceof fabric.Object);
 
     equal(polyline.type, 'polyline');
-    deepEqual(polyline.get('points'), [ { x: 5, y: 7 }, { x: 15, y: 17 } ]);
+    deepEqual(polyline.get('points'), [ { x: -5, y: -5 }, { x: 5, y: 5 } ]);
   });
 
   test('complexity', function() {
