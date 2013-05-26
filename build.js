@@ -166,7 +166,17 @@ var filesToInclude = [
 
   ifSpecifiedInclude('object_straightening', 'src/mixins/object_straightening.mixin.js'),
 
-  ifSpecifiedInclude('image_filters', 'src/image_filters.js'),
+  ifSpecifiedInclude('image_filters', 'src/filters/brightness_filter.class.js'),
+  ifSpecifiedInclude('image_filters', 'src/filters/convolute_filter.class.js'),
+  ifSpecifiedInclude('image_filters', 'src/filters/gradienttransparency_filter.class.js'),
+  ifSpecifiedInclude('image_filters', 'src/filters/grayscale_filter.class.js'),
+  ifSpecifiedInclude('image_filters', 'src/filters/invert_filter.class.js'),
+  ifSpecifiedInclude('image_filters', 'src/filters/noise_filter.class.js'),
+  ifSpecifiedInclude('image_filters', 'src/filters/pixelate_filter.class.js'),
+  ifSpecifiedInclude('image_filters', 'src/filters/removewhite_filter.class.js'),
+  ifSpecifiedInclude('image_filters', 'src/filters/sepia_filter.class.js'),
+  ifSpecifiedInclude('image_filters', 'src/filters/sepia2_filter.class.js'),
+  ifSpecifiedInclude('image_filters', 'src/filters/tint_filter.class.js'),
 
   ifSpecifiedInclude('text', 'src/text.class.js'),
 
