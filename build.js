@@ -27,10 +27,14 @@ else if (minifier === 'uglifyjs') {
   mininfierCmd = 'uglifyjs --output dist/all.min.js dist/all.js';
 }
 
-var includeAllModules = modulesToInclude.length === 1 && modulesToInclude[0] === 'ALL';
 var noStrict = 'no-strict' in buildArgsAsObject;
 var noSVGExport = 'no-svg-export' in buildArgsAsObject;
 var noES5Compat = 'no-es5-compat' in buildArgsAsObject;
+
+var buildSh = 'build-sh' in buildArgsAsObject;
+var buildMinified = 'build-minified' in buildArgsAsObject;
+
+var includeAllModules = (modulesToInclude.length === 1 && modulesToInclude[0] === 'ALL') || buildMinified;
 
 var distFileContents =
   '/* build: `node build.js modules=' +
@@ -39,7 +43,7 @@ var distFileContents =
     (noStrict ? ' no-strict' : '') +
     (noSVGExport ? ' no-svg-export' : '') +
     (noES5Compat ? ' no-es5-compat' : '') +
-  '` */\n';
+  '` */';
 
 function appendFileContents(fileNames, callback) {
 
@@ -67,7 +71,7 @@ function appendFileContents(fileNames, callback) {
       if (noES5Compat) {
         strData = strData.replace(/\/\* _ES5_COMPAT_START_ \*\/[\s\S]*\/\* _ES5_COMPAT_END_ \*\//, '');
       }
-      distFileContents += (strData + '\n');
+      distFileContents += ('\n' + strData + '\n');
       readNextFile();
     });
 
@@ -93,7 +97,6 @@ function ifSpecifiedDependencyInclude(included, excluded, fileName) {
 }
 
 var filesToInclude = [
-
   'HEADER.js',
 
   ifSpecifiedDependencyInclude('text', 'cufon', 'lib/cufon.js'),
@@ -183,26 +186,58 @@ var filesToInclude = [
   ifSpecifiedInclude('node', 'src/node.js')
 ];
 
-appendFileContents(filesToInclude, function() {
-  fs.writeFile('dist/all.js', distFileContents, function (err) {
-    if (err) {
-      console.log(err);
-      throw err;
-    }
+if (buildMinified) {
+  for (var i = 0; i < filesToInclude.length; i++) {
+    var fileNameWithoutSlashes = filesToInclude[i].replace(/\//g, '^');
 
-    console.log('Built distribution to dist/all.js');
+    if (!filesToInclude[i]) continue;
 
-    exec(mininfierCmd, function (error, output) {
-      if (!error) {
-        console.log('Minified using', minifier, 'to dist/all.min.js');
+    exec('uglifyjs -nc ' + filesToInclude[i] + ' > tmp/' + fileNameWithoutSlashes);
+  }
+}
+else if (buildSh) {
+
+  var filesStr = filesToInclude.join(' ');
+  var isBasicBuild = modulesToInclude.length === 0;
+
+  var minFilesStr = filesToInclude
+    .filter(function(f) { return f !== '' })
+    .map(function(fileName) {
+      return 'tmp/' + fileName.replace(/\//g, '^');
+    })
+    .join(' ');
+
+  var fileName = isBasicBuild ? 'fabric' : modulesToInclude.join(',');
+
+  var escapedHeader = distFileContents.replace(/`/g, '\\`');
+  var path = '../fabricjs.com/build/files/' + fileName + '.js';
+  fs.appendFile('build.sh',
+    'echo "' + escapedHeader + '" > ' + path + ' && cat ' +
+    filesStr + ' >> ' + path + '\n');
+
+  path = '../fabricjs.com/build/files/' + fileName + '.min.js';
+  fs.appendFile('build.sh',
+    'echo "' + escapedHeader + '" > ' + path + ' && cat ' +
+    minFilesStr + ' >> ' + path + '\n')
+}
+else {
+  appendFileContents(filesToInclude, function() {
+    fs.writeFile('dist/all.js', distFileContents, function (err) {
+      if (err) {
+        console.log(err);
+        throw err;
       }
-      exec('gzip -c dist/all.min.js > dist/all.min.js.gz', function (error, output) {
-        console.log('Gzipped to dist/all.min.js.gz');
 
-        exec('ls -l dist', function (error, output) {
-          console.log(output.replace(/^.*/, ''));
+      console.log('Built distribution to dist/all.js');
+
+      exec(mininfierCmd, function (error, output) {
+        if (!error) {
+          console.log('Minified using', minifier, 'to dist/all.min.js');
+        }
+        exec('gzip -c dist/all.min.js > dist/all.min.js.gz', function (error, output) {
+          console.log('Gzipped to dist/all.min.js.gz');
         });
       });
     });
   });
-});
+}

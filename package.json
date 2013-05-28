@@ -21,7 +21,8 @@
   "devDependencies": {
     "qunit": "0.5.x",
     "jshint": "1.1.x",
-    "uglify-js": "2.2.x"
+    "uglify-js": "2.2.x",
+    "execSync": "0.0.4"
   },
   "engines": { "node": ">=0.4.0 && <1.0.0" },
   "main": "./dist/all.js"

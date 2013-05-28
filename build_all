@@ -1,0 +1,6 @@
+node build.js build-minified;           # builds minified src files
+node create_build_script.js;            # creates build.js with all module combinations (minified and not)
+rm -rf ../fabricjs.com/build/files/*;   # remove all previous module files
+./build.sh;                             # builds actual distribution files with all module combinations (minified and not)
+rm -rf tmp/*;                           # remove tmp files
+echo "" > build.sh;                      # erase build.sh
