@@ -3,7 +3,7 @@ var fs = require('fs'),
 
 var modules = [
   'text',
-  // 'cufon',
+  'cufon',
   // 'json',
   'gestures',
   'easing',
