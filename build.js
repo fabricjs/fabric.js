@@ -36,6 +36,8 @@ var buildMinified = 'build-minified' in buildArgsAsObject;
 
 var includeAllModules = (modulesToInclude.length === 1 && modulesToInclude[0] === 'ALL') || buildMinified;
 
+var noSVGImport = (modulesToInclude.indexOf('parser') === -1 && !includeAllModules) || modulesToExclude.indexOf('parser') > -1;
+
 var distFileContents =
   '/* build: `node build.js modules=' +
     modulesToInclude.join(',') +
@@ -66,10 +68,13 @@ function appendFileContents(fileNames, callback) {
         strData = strData.replace(/"use strict";?\n?/, '');
       }
       if (noSVGExport) {
-        strData = strData.replace(/\/\* _TO_SVG_START_ \*\/[\s\S]*\/\* _TO_SVG_END_ \*\//, '');
+        strData = strData.replace(/\/\* _TO_SVG_START_ \*\/[\s\S]*?\/\* _TO_SVG_END_ \*\//g, '');
       }
       if (noES5Compat) {
-        strData = strData.replace(/\/\* _ES5_COMPAT_START_ \*\/[\s\S]*\/\* _ES5_COMPAT_END_ \*\//, '');
+        strData = strData.replace(/\/\* _ES5_COMPAT_START_ \*\/[\s\S]*?\/\* _ES5_COMPAT_END_ \*\//g, '');
+      }
+      if (noSVGImport) {
+        strData = strData.replace(/\/\* _FROM_SVG_START_ \*\/[\s\S]*?\/\* _FROM_SVG_END_ \*\//g, '');
       }
       distFileContents += ('\n' + strData + '\n');
       readNextFile();
@@ -101,8 +106,7 @@ var filesToInclude = [
 
   ifSpecifiedDependencyInclude('text', 'cufon', 'lib/cufon.js'),
   ifSpecifiedDependencyInclude('serialization', 'json', 'lib/json2.js'),
-
-  ifSpecifiedInclude('gestures', 'lib/event.js'),
+  ifSpecifiedDependencyInclude('gestures', 'interaction', 'lib/event.js'),
 
   'src/log.js',
   'src/mixins/observable.mixin.js',
@@ -123,10 +127,10 @@ var filesToInclude = [
 
   ifSpecifiedInclude('parser', 'src/parser.js'),
 
+  'src/point.class.js',
   'src/gradient.class.js',
   'src/pattern.class.js',
   'src/shadow.class.js',
-  'src/point.class.js',
   'src/intersection.class.js',
   'src/color.class.js',
 
@@ -147,25 +151,25 @@ var filesToInclude = [
   ifSpecifiedInclude('serialization', 'src/mixins/canvas_serialization.mixin.js'),
   ifSpecifiedInclude('gestures', 'src/mixins/canvas_gestures.mixin.js'),
 
-  'src/object.class.js',
+  'src/shapes/object.class.js',
   'src/mixins/object_origin.mixin.js',
   'src/mixins/object_geometry.mixin.js',
 
-  ifSpecifiedInclude('stateful', 'src/mixins/stateful.mixin.js'),
+  'src/mixins/stateful.mixin.js',
 
   ifSpecifiedInclude('interaction', 'src/mixins/object_interactivity.mixin.js'),
 
-  'src/line.class.js',
-  'src/circle.class.js',
-  'src/triangle.class.js',
-  'src/ellipse.class.js',
-  'src/rect.class.js',
-  'src/polyline.class.js',
-  'src/polygon.class.js',
-  'src/path.class.js',
-  'src/path_group.class.js',
-  'src/group.class.js',
-  'src/image.class.js',
+  'src/shapes/line.class.js',
+  'src/shapes/circle.class.js',
+  'src/shapes/triangle.class.js',
+  'src/shapes/ellipse.class.js',
+  'src/shapes/rect.class.js',
+  'src/shapes/polyline.class.js',
+  'src/shapes/polygon.class.js',
+  'src/shapes/path.class.js',
+  'src/shapes/path_group.class.js',
+  'src/shapes/group.class.js',
+  'src/shapes/image.class.js',
 
   ifSpecifiedInclude('object_straightening', 'src/mixins/object_straightening.mixin.js'),
 

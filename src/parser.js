@@ -822,6 +822,35 @@
     return markup;
   }
 
+  /**
+   * Parses an SVG document, returning all of the gradient declarations found in it
+   * @static
+   * @function
+   * @memberOf fabric
+   * @param {SVGDocument} doc SVG document to parse
+   * @return {Object} Gradient definitions; key corresponds to element id, value -- to gradient definition element
+   */
+  function getGradientDefs(doc) {
+    var linearGradientEls = doc.getElementsByTagName('linearGradient'),
+        radialGradientEls = doc.getElementsByTagName('radialGradient'),
+        el, i,
+        gradientDefs = { };
+
+    i = linearGradientEls.length;
+    for (; i--; ) {
+      el = linearGradientEls[i];
+      gradientDefs[el.getAttribute('id')] = el;
+    }
+
+    i = radialGradientEls.length;
+    for (; i--; ) {
+      el = radialGradientEls[i];
+      gradientDefs[el.getAttribute('id')] = el;
+    }
+
+    return gradientDefs;
+  }
+
   extend(fabric, {
 
     parseAttributes:            parseAttributes,
@@ -834,7 +863,9 @@
     loadSVGFromString:          loadSVGFromString,
 
     createSVGFontFacesMarkup:   createSVGFontFacesMarkup,
-    createSVGRefElementsMarkup: createSVGRefElementsMarkup
+    createSVGRefElementsMarkup: createSVGRefElementsMarkup,
+
+    getGradientDefs:            getGradientDefs
   });
 
 })(typeof exports !== 'undefined' ? exports : this);

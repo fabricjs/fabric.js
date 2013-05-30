@@ -383,7 +383,7 @@
       };
 
       // set coordinates of the draggable boxes in the corners used to scale/rotate the image
-      this._setCornerCoords();
+      this._setCornerCoords && this._setCornerCoords();
 
       return this;
     }

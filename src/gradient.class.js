@@ -1,5 +1,6 @@
 (function() {
 
+  /* _FROM_SVG_START_ */
   function getColorStop(el) {
     var style = el.getAttribute('style'),
         offset = el.getAttribute('offset'),
@@ -46,6 +47,7 @@
       opacity: opacity
     };
   }
+  /* _FROM_SVG_END_ */
 
   /**
    * Gradient class
@@ -213,6 +215,7 @@
 
   fabric.util.object.extend(fabric.Gradient, {
 
+    /* _FROM_SVG_START_ */
     /**
      * Returns {@link fabric.Gradient} instance from an SVG element
      * @static
@@ -293,6 +296,7 @@
         colorStops: colorStops
       });
     },
+    /* _FROM_SVG_END_ */
 
     /**
      * Returns {@link fabric.Gradient} instance from its object representation
@@ -332,6 +336,7 @@
     }
   }
 
+  /* _TO_SVG_START_ */
   /**
    * @private
    */
@@ -353,36 +358,6 @@
       }
     }
   }
-
-  /**
-   * Parses an SVG document, returning all of the gradient declarations found in it
-   * @static
-   * @function
-   * @memberOf fabric
-   * @param {SVGDocument} doc SVG document to parse
-   * @return {Object} Gradient definitions; key corresponds to element id, value -- to gradient definition element
-   */
-  function getGradientDefs(doc) {
-    var linearGradientEls = doc.getElementsByTagName('linearGradient'),
-        radialGradientEls = doc.getElementsByTagName('radialGradient'),
-        el, i,
-        gradientDefs = { };
-
-    i = linearGradientEls.length;
-    for (; i--; ) {
-      el = linearGradientEls[i];
-      gradientDefs[el.getAttribute('id')] = el;
-    }
-
-    i = radialGradientEls.length;
-    for (; i--; ) {
-      el = radialGradientEls[i];
-      gradientDefs[el.getAttribute('id')] = el;
-    }
-
-    return gradientDefs;
-  }
-
-  fabric.getGradientDefs = getGradientDefs;
+  /* _TO_SVG_END_ */
 
 })();
