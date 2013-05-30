@@ -106,7 +106,7 @@ var filesToInclude = [
 
   ifSpecifiedDependencyInclude('text', 'cufon', 'lib/cufon.js'),
   ifSpecifiedDependencyInclude('serialization', 'json', 'lib/json2.js'),
-  ifSpecifiedDependencyInclude('gestures', 'interaction', 'lib/event.js'),
+  ifSpecifiedDependencyInclude('gestures', 'lib/event.js'),
 
   'src/log.js',
   'src/mixins/observable.mixin.js',
@@ -154,7 +154,6 @@ var filesToInclude = [
   'src/shapes/object.class.js',
   'src/mixins/object_origin.mixin.js',
   'src/mixins/object_geometry.mixin.js',
-
   'src/mixins/stateful.mixin.js',
 
   ifSpecifiedInclude('interaction', 'src/mixins/object_interactivity.mixin.js'),
@@ -185,7 +184,7 @@ var filesToInclude = [
   ifSpecifiedInclude('image_filters', 'src/filters/sepia2_filter.class.js'),
   ifSpecifiedInclude('image_filters', 'src/filters/tint_filter.class.js'),
 
-  ifSpecifiedInclude('text', 'src/text.class.js'),
+  ifSpecifiedInclude('text', 'src/shapes/text.class.js'),
 
   ifSpecifiedInclude('node', 'src/node.js')
 ];
