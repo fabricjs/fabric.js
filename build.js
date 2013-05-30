@@ -191,10 +191,8 @@ var filesToInclude = [
 
 if (buildMinified) {
   for (var i = 0; i < filesToInclude.length; i++) {
-    var fileNameWithoutSlashes = filesToInclude[i].replace(/\//g, '^');
-
     if (!filesToInclude[i]) continue;
-
+    var fileNameWithoutSlashes = filesToInclude[i].replace(/\//g, '^');
     exec('uglifyjs -nc ' + filesToInclude[i] + ' > tmp/' + fileNameWithoutSlashes);
   }
 }
