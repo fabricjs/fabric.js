@@ -446,6 +446,7 @@
     });
   };
 
+  /* _FROM_SVG_START_ */
   /**
    * List of attribute names to account for when parsing SVG element (used by {@link fabric.Image.fromElement})
    * @static
@@ -467,6 +468,7 @@
     fabric.Image.fromURL(parsedAttributes['xlink:href'], callback,
       extend((options ? fabric.util.object.clone(options) : { }), parsedAttributes));
   };
+  /* _FROM_SVG_END_ */
 
   /**
    * Indicates that instances of this type are async

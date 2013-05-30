@@ -129,6 +129,7 @@
     }
   });
 
+  /* _FROM_SVG_START_ */
   /**
    * List of attribute names to account for when parsing SVG element (used by {@link fabric.Polyline.fromElement})
    * @static
@@ -165,6 +166,7 @@
 
     return new fabric.Polyline(points, fabric.util.object.extend(parsedAttributes, options), true);
   };
+  /* _FROM_SVG_END_ */
 
   /**
    * Returns fabric.Polyline instance from an object representation

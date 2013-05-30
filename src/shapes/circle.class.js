@@ -128,6 +128,7 @@
     }
   });
 
+  /* _FROM_SVG_START_ */
   /**
    * List of attribute names to account for when parsing SVG element (used by {@link fabric.Circle.fromElement})
    * @static
@@ -169,6 +170,7 @@
   function isValidRadius(attributes) {
     return (('radius' in attributes) && (attributes.radius > 0));
   }
+  /* _FROM_SVG_END_ */
 
   /**
    * Returns {@link fabric.Circle} instance from an object representation

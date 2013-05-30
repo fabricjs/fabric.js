@@ -178,6 +178,7 @@
     }
   });
 
+  /* _FROM_SVG_START_ */
   /**
    * List of attribute names to account for when parsing SVG element (used by {@link fabric.Line.fromElement})
    * @static
@@ -202,6 +203,7 @@
     ];
     return new fabric.Line(points, extend(parsedAttributes, options));
   };
+  /* _FROM_SVG_END_ */
 
   /**
    * Returns fabric.Line instance from an object representation

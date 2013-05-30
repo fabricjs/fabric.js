@@ -486,6 +486,7 @@
       return this.toObject(propertiesToInclude);
     },
 
+    /* _TO_SVG_START_ */
     /**
      * Returns styles-string for svg-export
      * @return {String}
@@ -537,6 +538,7 @@
 
       return [ translatePart, anglePart, scalePart, flipXPart, flipYPart ].join('');
     },
+    /* _TO_SVG_END_ */
 
     /**
      * @private

@@ -793,6 +793,7 @@
     return new fabric.Path(object.path, object);
   };
 
+  /* _FROM_SVG_START_ */
   /**
    * List of attribute names to account for when parsing SVG element (used by `fabric.Path.fromElement`)
    * @static
@@ -811,5 +812,6 @@
     var parsedAttributes = fabric.parseAttributes(element, fabric.Path.ATTRIBUTE_NAMES);
     return new fabric.Path(parsedAttributes.d, extend(parsedAttributes, options));
   };
+  /* _FROM_SVG_END_ */
 
 })(typeof exports !== 'undefined' ? exports : this);

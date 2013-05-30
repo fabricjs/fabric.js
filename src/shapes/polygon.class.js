@@ -158,6 +158,7 @@
     }
   });
 
+  /* _FROM_SVG_START_ */
   /**
    * List of attribute names to account for when parsing SVG element (used by `fabric.Polygon.fromElement`)
    * @static
@@ -194,6 +195,7 @@
 
     return new fabric.Polygon(points, extend(parsedAttributes, options), true);
   };
+  /* _FROM_SVG_END_ */
 
   /**
    * Returns fabric.Polygon instance from an object representation
