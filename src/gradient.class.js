@@ -191,7 +191,7 @@
 
       if (this.type === 'linear') {
         gradient = ctx.createLinearGradient(
-          this.coords.x1, this.coords.y1, this.coords.x2 || ctx.canvas.width, this.coords.y2);
+          this.coords.x1, this.coords.y1, this.coords.x2, this.coords.y2);
       }
       else if (this.type === 'radial') {
         gradient = ctx.createRadialGradient(
