@@ -51,7 +51,7 @@ fabric.Image.filters.Mask = fabric.util.createClass(/** @lends fabric.Image.filt
       data[ i + 3 ] = maskData[ i + channel ];
     }
     context.putImageData( imageData, 0, 0 );
-  }
+  },
 
   /**
    * Returns json representation of filter
