@@ -106,7 +106,7 @@ var filesToInclude = [
 
   ifSpecifiedDependencyInclude('text', 'cufon', 'lib/cufon.js'),
   ifSpecifiedDependencyInclude('serialization', 'json', 'lib/json2.js'),
-  ifSpecifiedDependencyInclude('gestures', 'lib/event.js'),
+  ifSpecifiedInclude('gestures', 'lib/event.js'),
 
   'src/log.js',
   'src/mixins/observable.mixin.js',
