@@ -163,6 +163,16 @@
   };
 
   /**
+    * Returns klass "Class" object of given fabric.Object type
+    * @memberOf fabric.util
+    * @param {String} type Type of object (eg. 'circle')
+    * @return {Object} klass "Class"
+    */
+  function getKlass(type) {
+    return fabric[fabric.util.string.camelize(fabric.util.string.capitalize(type))];
+  }
+
+  /**
     * Loads image element from given url and passes it to a callback
     * @memberOf fabric.util
     * @param {String} url URL representing an image
@@ -193,10 +203,6 @@
    */
   function enlivenObjects(objects, callback) {
 
-    function getKlass(type) {
-      return fabric[fabric.util.string.camelize(fabric.util.string.capitalize(type))];
-    }
-
     function onLoaded() {
       if (++numLoadedObjects === numTotalObjects) {
         if (callback) {
@@ -213,7 +219,7 @@
       if (!o.type) {
         return;
       }
-      var klass = getKlass(o.type);
+      var klass = fabric.util.getKlass(o.type);
       if (klass.async) {
         klass.fromObject(o, function (o, error) {
           if (!error) {
@@ -449,6 +455,7 @@
   fabric.util.falseFunction = falseFunction;
   fabric.util.animate = animate;
   fabric.util.requestAnimFrame = requestAnimFrame;
+  fabric.util.getKlass = getKlass;
   fabric.util.loadImage = loadImage;
   fabric.util.enlivenObjects = enlivenObjects;
   fabric.util.groupSVGElements = groupSVGElements;

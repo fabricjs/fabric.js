@@ -12,8 +12,8 @@ Using Fabric.js, you can create and populate objects on canvas; objects like sim
 
 ### Goals
 
-- Unit tested (1570+ tests at the moment)
-- Modular (~40 small "classes", modules, mixins)
+- Unit tested (1660+ tests at the moment)
+- Modular (~60 small "classes", modules, mixins)
 - Cross-browser
 - [Fast](https://github.com/kangax/fabric.js/wiki/Focus-on-speed)
 - Encapsulated in one object
