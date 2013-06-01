@@ -8135,7 +8135,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
   getPatternSrcBody: function() {
     return String(this.getPatternSrc)
-      .match(/function\s+\w*\s*\(.*\)\s+\{([\s\S]*)\}/)[1]
+      .match(/function\s*\w*\s*(.*)\s*\{([\s\S]*)\}/)[1]
       .replace('this.color', '"' + this.color + '"');
   },
 
