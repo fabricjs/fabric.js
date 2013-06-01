@@ -732,4 +732,17 @@
     ok(typeof destination.ffffffffff === 'undefined');
   });
 
+  test('fabric.util.getFunctionBody', function() {
+    equal(fabric.util.getFunctionBody('function(){}'), '');
+
+    equal(fabric.util.getFunctionBody('function(){return 1 + 2}'),
+      'return 1 + 2');
+
+    equal(fabric.util.getFunctionBody('function () {\n  return "blah" }'),
+      '\n  return "blah" ');
+
+    equal(fabric.util.getFunctionBody('function foo (a , boo_bar, baz123 )\n{\n if (1) { alert(12345) } }'),
+      '\n if (1) { alert(12345) } ');
+  });
+
 })();

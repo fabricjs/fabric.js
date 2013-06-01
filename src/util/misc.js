@@ -446,6 +446,10 @@
     ];
   }
 
+  function getFunctionBody(fn) {
+    return String(fn).match(/function[^{]*\{([\s\S]*)\}/)[1];
+  }
+
   fabric.util.removeFromArray = removeFromArray;
   fabric.util.degreesToRadians = degreesToRadians;
   fabric.util.radiansToDegrees = radiansToDegrees;
@@ -466,5 +470,6 @@
   fabric.util.createAccessors = createAccessors;
   fabric.util.clipContext = clipContext;
   fabric.util.multiplyTransformMatrices = multiplyTransformMatrices;
+  fabric.util.getFunctionBody = getFunctionBody;
 
 })();

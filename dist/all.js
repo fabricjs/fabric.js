@@ -2448,6 +2448,10 @@ fabric.Collection = {
     ];
   }
 
+  function getFunctionBody(fn) {
+    return String(fn).match(/function[^{]*\{([\s\S]*)\}/)[1];
+  }
+
   fabric.util.removeFromArray = removeFromArray;
   fabric.util.degreesToRadians = degreesToRadians;
   fabric.util.radiansToDegrees = radiansToDegrees;
@@ -2468,6 +2472,7 @@ fabric.Collection = {
   fabric.util.createAccessors = createAccessors;
   fabric.util.clipContext = clipContext;
   fabric.util.multiplyTransformMatrices = multiplyTransformMatrices;
+  fabric.util.getFunctionBody = getFunctionBody;
 
 })();
 
@@ -5543,8 +5548,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
 
     // callback
     if (typeof this.source === 'function') {
-      source = String(this.source)
-                .match(/function\s+\w*\s*\(.*\)\s+\{([\s\S]*)\}/)[1];
+      source = fabric.util.getFunctionBody(this.source);
     }
     // <img> element
     else if (typeof this.source.src === 'string') {
@@ -8134,9 +8138,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
   },
 
   getPatternSrcBody: function() {
-    return String(this.getPatternSrc)
-      .match(/function\s*\w*\s*(.*)\s*\{([\s\S]*)\}/)[1]
-      .replace('this.color', '"' + this.color + '"');
+    return fabric.util.getFunctionBody(this.getPatternSrc)
+            .replace('this.color', '"' + this.color + '"');
   },
 
   /**

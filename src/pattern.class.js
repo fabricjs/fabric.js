@@ -56,8 +56,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
 
     // callback
     if (typeof this.source === 'function') {
-      source = String(this.source)
-                .match(/function\s+\w*\s*\(.*\)\s+\{([\s\S]*)\}/)[1];
+      source = fabric.util.getFunctionBody(this.source);
     }
     // <img> element
     else if (typeof this.source.src === 'string') {
