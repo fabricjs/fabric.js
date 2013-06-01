@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures` */
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.1.16" };
+var fabric = fabric || { version: "1.1.17" };
 
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
@@ -2165,6 +2165,16 @@ fabric.Collection = {
   };
 
   /**
+    * Returns klass "Class" object of given fabric.Object type
+    * @memberOf fabric.util
+    * @param {String} type Type of object (eg. 'circle')
+    * @return {Object} klass "Class"
+    */
+  function getKlass(type) {
+    return fabric[fabric.util.string.camelize(fabric.util.string.capitalize(type))];
+  }
+
+  /**
     * Loads image element from given url and passes it to a callback
     * @memberOf fabric.util
     * @param {String} url URL representing an image
@@ -2195,10 +2205,6 @@ fabric.Collection = {
    */
   function enlivenObjects(objects, callback) {
 
-    function getKlass(type) {
-      return fabric[fabric.util.string.camelize(fabric.util.string.capitalize(type))];
-    }
-
     function onLoaded() {
       if (++numLoadedObjects === numTotalObjects) {
         if (callback) {
@@ -2215,7 +2221,7 @@ fabric.Collection = {
       if (!o.type) {
         return;
       }
-      var klass = getKlass(o.type);
+      var klass = fabric.util.getKlass(o.type);
       if (klass.async) {
         klass.fromObject(o, function (o, error) {
           if (!error) {
@@ -2451,6 +2457,7 @@ fabric.Collection = {
   fabric.util.falseFunction = falseFunction;
   fabric.util.animate = animate;
   fabric.util.requestAnimFrame = requestAnimFrame;
+  fabric.util.getKlass = getKlass;
   fabric.util.loadImage = loadImage;
   fabric.util.enlivenObjects = enlivenObjects;
   fabric.util.groupSVGElements = groupSVGElements;
@@ -5306,7 +5313,7 @@ fabric.util.string = {
 
       if (this.type === 'linear') {
         gradient = ctx.createLinearGradient(
-          this.coords.x1, this.coords.y1, this.coords.x2 || ctx.canvas.width, this.coords.y2);
+          this.coords.x1, this.coords.y1, this.coords.x2, this.coords.y2);
       }
       else if (this.type === 'radial') {
         gradient = ctx.createRadialGradient(
