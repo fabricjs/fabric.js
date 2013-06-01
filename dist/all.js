@@ -3404,11 +3404,11 @@ fabric.util.string = {
     if(doc != null && doc === doc.window){
       win = doc;
     } else {
-      win = doc.nodeType === 9 && doc.defaultView;
+      win = doc.nodeType === 9 && (doc.defaultView || doc.parentWindow);
     }
     return {
-      left: box.left + win.pageXOffset - (docElem.clientLeft || 0) + offset.left,
-      top: box.top + win.pageYOffset - (docElem.clientTop || 0)  + offset.top
+      left: box.left + (win.pageXOffset || docElem.scrollLeft) - (docElem.clientLeft || 0) + offset.left,
+      top: box.top + (win.pageYOffset || docElem.scrollTop) - (docElem.clientTop || 0)  + offset.top
     };
   }
 
