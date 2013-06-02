@@ -463,10 +463,15 @@
      * @return {Number} Top offset
      */
     _getTopOffset: function() {
-      if (fabric.isLikelyNode && (this.originY === 'top' || this.originY === 'center')) {
-        return 0;
+      if (fabric.isLikelyNode) {
+        if (this.originY === 'center') {
+          return -this.height / 2;
+        }
+        else if (this.originY === 'bottom') {
+          return -this.height;
+        }
       }
-      return -this.height / 2;
+      return 0;
     },
 
     /**
