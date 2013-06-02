@@ -201,7 +201,6 @@
     equal(withoutPreamble.slice(0, 4), '<svg', 'svg should start with root node when premable is suppressed');
   });
 
-
   test('toJSON', function() {
     ok(typeof canvas.toJSON == 'function');
     equal(JSON.stringify(canvas.toJSON()), '{"objects":[],"background":""}');

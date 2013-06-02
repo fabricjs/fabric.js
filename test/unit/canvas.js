@@ -244,6 +244,18 @@
     equal(JSON.stringify(canvas.toDatalessJSON()), PATH_DATALESS_JSON);
   });
 
+  test('toJSON with active group', function() {
+    var rect = new fabric.Rect({ width: 50, height: 50, left: 100, top: 100 });
+    var circle = new fabric.Circle({ radius: 50, left: 50, top: 50 });
+    canvas.add(rect, circle);
+    var json = JSON.stringify(canvas);
+
+    canvas.setActiveGroup(new fabric.Group([ rect, circle ])).renderAll();
+    var jsonWithActiveGroup = JSON.stringify(canvas);
+
+    equal(json, jsonWithActiveGroup);
+  });
+
   test('toObject', function() {
     ok(typeof canvas.toObject == 'function');
     var expectedObject = {
@@ -622,6 +634,18 @@
 
     canvas.add(makeRect());
     equal(canvas.toString(), '#<fabric.Canvas (1): { objects: 1 }>');
+  });
+
+  test('toSVG with active group', function() {
+    var rect = new fabric.Rect({ width: 50, height: 50, left: 100, top: 100 });
+    var circle = new fabric.Circle({ radius: 50, left: 50, top: 50 });
+    canvas.add(rect, circle);
+    var svg = canvas.toSVG();
+
+    canvas.setActiveGroup(new fabric.Group([ rect, circle ])).renderAll();
+    var svgWithActiveGroup = canvas.toSVG();
+
+    equal(svg, svgWithActiveGroup);
   });
 
   // test('dispose', function() {

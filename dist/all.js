@@ -7136,8 +7136,13 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
      * @private
      */
     _toObjectMethod: function (methodName, propertiesToInclude) {
+
+      var activeGroup = this.getActiveGroup();
+      if (activeGroup) {
+        this.discardActiveGroup();
+      }
       var data = {
-        objects: this._objects.map(function (instance) {
+        objects: this.getObjects().map(function (instance) {
           // TODO (kangax): figure out how to clean this up
           var originalValue;
           if (!this.includeDefaultValues) {
@@ -7165,6 +7170,10 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
         data.overlayImageTop = this.overlayImageTop;
       }
       fabric.util.populateWithProperties(this, data, propertiesToInclude);
+      if (activeGroup) {
+        this.setActiveGroup(new fabric.Group(activeGroup.objects));
+        activeGroup.forEachObject(function(o) { o.set('active', true) });
+      }
       return data;
     },
 
@@ -7234,8 +7243,16 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
         );
       }
 
+      var activeGroup = this.getActiveGroup();
+      if (activeGroup) {
+        this.discardActiveGroup();
+      }
       for (var i = 0, objects = this.getObjects(), len = objects.length; i < len; i++) {
         markup.push(objects[i].toSVG());
+      }
+      if (activeGroup) {
+        this.setActiveGroup(new fabric.Group(activeGroup.objects));
+        activeGroup.forEachObject(function(o) { o.set('active', true) });
       }
       markup.push('</svg>');
 
