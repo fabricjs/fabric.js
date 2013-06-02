@@ -447,7 +447,7 @@
   }
 
   function getFunctionBody(fn) {
-    return String(fn).match(/function[^{]*\{([\s\S]*)\}/)[1];
+    return (String(fn).match(/function[^{]*\{([\s\S]*)\}/) || {})[1];
   }
 
   fabric.util.removeFromArray = removeFromArray;

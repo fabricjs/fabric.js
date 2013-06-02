@@ -31,9 +31,24 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
     options || (options = { });
 
     if (options.source) {
-      this.source = typeof options.source === 'string'
-        ? new Function(options.source)
-        : options.source;
+      if (typeof options.source === 'string') {
+        // function string
+        if (typeof fabric.util.getFunctionBody(options.source) !== 'undefined') {
+          this.source = new Function(fabric.util.getFunctionBody(options.source));
+        }
+        else {
+          // img src string
+          var _this = this;
+          this.source = fabric.util.createImage();
+          fabric.util.loadImage(options.source, function(img) {
+            _this.source = img;
+          });
+        }
+      }
+      else {
+        // img element
+        this.source = options.source;
+      }
     }
     if (options.repeat) {
       this.repeat = options.repeat;
@@ -56,7 +71,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
 
     // callback
     if (typeof this.source === 'function') {
-      source = fabric.util.getFunctionBody(this.source);
+      source = String(this.source);
     }
     // <img> element
     else if (typeof this.source.src === 'string') {

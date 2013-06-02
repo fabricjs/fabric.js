@@ -1,4 +1,5 @@
 (function() {
+  var IMG_SRC = fabric.isLikelyNode ? (__dirname + '/../fixtures/greyfloral.png') : '../fixtures/greyfloral.png';
 
   function createImageElement() {
     return fabric.isLikelyNode ? new (require('canvas').Image) : fabric.document.createElement('img');
@@ -21,9 +22,7 @@
   QUnit.module('fabric.Pattern');
 
   var img = createImageElement();
-  setSrc(img, fabric.isLikelyNode ?
-    (__dirname + '/../fixtures/greyfloral.png')
-    : '../fixtures/greyfloral.png');
+  setSrc(img, IMG_SRC);
 
   function createPattern() {
     return new fabric.Pattern({
@@ -68,7 +67,7 @@
     });
 
     var object2 = patternWithGetSource.toObject();
-    equal(object2.source, 'return fabric.document.createElement("canvas")');
+    equal(object2.source, 'function () {return fabric.document.createElement("canvas")}');
     equal(object2.repeat, 'repeat');
   });
 
@@ -76,6 +75,40 @@
     var pattern = createPattern();
 
     ok(typeof pattern.toLive == 'function');
+  });
+
+  test('pattern serialization / deserialization (function)', function() {
+    var pattern = new fabric.Pattern({
+      source: function() {
+        patternSourceCanvas.setDimensions({
+          width: img.getWidth() + padding,
+          height: img.getHeight() + padding
+        });
+        return patternSourceCanvas.getElement();
+      },
+      repeat: 'repeat'
+    });
+
+    var obj = pattern.toObject();
+    var patternDeserialized = new fabric.Pattern(obj);
+
+    equal(typeof patternDeserialized.source, 'function');
+    equal(patternDeserialized.repeat, 'repeat');
+  });
+
+  test('pattern serialization / deserialization (image source)', function() {
+    var pattern = createPattern();
+    var obj = pattern.toObject();
+
+    // node-canvas doesn't give <img> "src"
+    if (obj.src) {
+      var patternDeserialized = new fabric.Pattern(obj);
+      equal(typeof patternDeserialized.source, 'object');
+      equal(patternDeserialized.repeat, 'repeat');
+    }
+    else {
+      ok(true);
+    }
   });
 
 })();

@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures` */
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.1.17" };
+var fabric = fabric || { version: "1.1.18" };
 
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
@@ -2449,7 +2449,7 @@ fabric.Collection = {
   }
 
   function getFunctionBody(fn) {
-    return String(fn).match(/function[^{]*\{([\s\S]*)\}/)[1];
+    return (String(fn).match(/function[^{]*\{([\s\S]*)\}/) || {})[1];
   }
 
   fabric.util.removeFromArray = removeFromArray;
@@ -5523,9 +5523,24 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
     options || (options = { });
 
     if (options.source) {
-      this.source = typeof options.source === 'string'
-        ? new Function(options.source)
-        : options.source;
+      if (typeof options.source === 'string') {
+        // function string
+        if (typeof fabric.util.getFunctionBody(options.source) !== 'undefined') {
+          this.source = new Function(fabric.util.getFunctionBody(options.source));
+        }
+        else {
+          // img src string
+          var _this = this;
+          this.source = fabric.util.createImage();
+          fabric.util.loadImage(options.source, function(img) {
+            _this.source = img;
+          });
+        }
+      }
+      else {
+        // img element
+        this.source = options.source;
+      }
     }
     if (options.repeat) {
       this.repeat = options.repeat;
@@ -5548,7 +5563,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
 
     // callback
     if (typeof this.source === 'function') {
-      source = fabric.util.getFunctionBody(this.source);
+      source = String(this.source);
     }
     // <img> element
     else if (typeof this.source.src === 'string') {
@@ -8137,9 +8152,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     return patternCanvas;
   },
 
-  getPatternSrcBody: function() {
-    return fabric.util.getFunctionBody(this.getPatternSrc)
-            .replace('this.color', '"' + this.color + '"');
+  getPatternSrcFunction: function() {
+    return String(this.getPatternSrc).replace('this.color', '"' + this.color + '"');
   },
 
   /**
@@ -8163,7 +8177,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
   createPath: function(pathData) {
     var path = this.callSuper('createPath', pathData);
     path.stroke = new fabric.Pattern({
-      source: this.source || this.getPatternSrcBody()
+      source: this.source || this.getPatternSrcFunction()
     });
     return path;
   }
@@ -17040,10 +17054,15 @@ fabric.Image.filters.Tint.fromObject = function(object) {
      * @return {Number} Top offset
      */
     _getTopOffset: function() {
-      if (fabric.isLikelyNode && (this.originY === 'top' || this.originY === 'center')) {
-        return 0;
+      if (fabric.isLikelyNode) {
+        if (this.originY === 'center') {
+          return -this.height / 2;
+        }
+        else if (this.originY === 'bottom') {
+          return -this.height;
+        }
       }
-      return -this.height / 2;
+      return 0;
     },
 
     /**
