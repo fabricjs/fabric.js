@@ -158,6 +158,7 @@
       'perPixelTargetFind': false,
       'shadow':             null,
       'visible':            true,
+      'clipTo':             null,
       'angle':              0,
       'flipX':              false,
       'flipY':              false,

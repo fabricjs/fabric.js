@@ -89,6 +89,7 @@
       'perPixelTargetFind': false,
       'shadow':             null,
       'visible':            true,
+      'clipTo':             null,
       'radius':             0
     };
     ok(typeof circle.toObject == 'function');

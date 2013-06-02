@@ -30,7 +30,8 @@
     'transparentCorners': true,
     'perPixelTargetFind': false,
     'shadow':             null,
-    'visible':            true
+    'visible':            true,
+    'clipTo':             null
   };
 
   function getPathElement(path) {

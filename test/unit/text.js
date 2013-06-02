@@ -36,6 +36,7 @@
     'perPixelTargetFind':  false,
     'shadow':              null,
     'visible':             true,
+    'clipTo':              null,
     'text':                'x',
     'fontSize':            40,
     'fontWeight':          'normal',

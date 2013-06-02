@@ -45,6 +45,7 @@
     'perPixelTargetFind': false,
     'shadow':             null,
     'visible':            true,
+    'clipTo':             null,
     'filters':            []
   };
 

@@ -37,7 +37,8 @@
     'transparentCorners': true,
     'perPixelTargetFind': false,
     'shadow':             null,
-    'visible':            true
+    'visible':            true,
+    'clipTo':             null
   };
 
   QUnit.module('fabric.Polyline');

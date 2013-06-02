@@ -52,7 +52,8 @@
       'transparentCorners': true,
       'perPixelTargetFind': false,
       'shadow':             null,
-      'visible':            true
+      'visible':            true,
+      'clipTo':             null
     };
     ok(typeof ellipse.toObject == 'function');
     deepEqual(ellipse.toObject(), defaultProperties);

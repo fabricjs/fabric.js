@@ -112,12 +112,12 @@
     var emptyObjectJSON = '{"type":"object","originX":"center","originY":"center","left":0,"top":0,"width":0,"height":0,"fill":"rgb(0,0,0)",'+
                           '"overlayFill":null,"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,'+
                           '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,"selectable":true,"hasControls":true,"hasBorders":true,"hasRotatingPoint":true,'+
-                          '"transparentCorners":true,"perPixelTargetFind":false,"shadow":null,"visible":true}';
+                          '"transparentCorners":true,"perPixelTargetFind":false,"shadow":null,"visible":true,"clipTo":null}';
 
     var augmentedJSON = '{"type":"object","originX":"center","originY":"center","left":0,"top":0,"width":122,"height":0,"fill":"rgb(0,0,0)",'+
                         '"overlayFill":null,"stroke":null,"strokeWidth":1,"strokeDashArray":[5,2],"strokeLineCap":"round","strokeLineJoin":"bevil","strokeMiterLimit":5,'+
                         '"scaleX":1.3,"scaleY":1,"angle":0,"flipX":false,"flipY":true,"opacity":0.88,"selectable":true,"hasControls":true,"hasBorders":true,"hasRotatingPoint":true,'+
-                        '"transparentCorners":true,"perPixelTargetFind":false,"shadow":null,"visible":true}';
+                        '"transparentCorners":true,"perPixelTargetFind":false,"shadow":null,"visible":true,"clipTo":null}';
 
     var cObj = new fabric.Object();
     ok(typeof cObj.toJSON == 'function');
@@ -165,7 +165,8 @@
       'transparentCorners': true,
       'perPixelTargetFind': false,
       'shadow':             null,
-      'visible':            true
+      'visible':            true,
+      'clipTo':             null
     };
 
     var augmentedObjectRepr = {
@@ -197,7 +198,8 @@
       'transparentCorners': true,
       'perPixelTargetFind': false,
       'shadow':             null,
-      'visible':            true
+      'visible':            true,
+      'clipTo':             null
     };
 
     var cObj = new fabric.Object();
@@ -1054,6 +1056,21 @@
     equal(object.containsPoint(point5), false);
     // point5 is outside of object (top)
     equal(object.containsPoint(point6), false);
+  });
+
+  test('clipTo', function() {
+    var object = new fabric.Object({
+      left: 40,
+      top: 40,
+      width: 40,
+      height: 50,
+      clipTo: function(ctx) { ctx.arc(10, 10, 10, 0, Math.PI * 2, false) }
+    });
+
+    equal(typeof object.clipTo, 'function');
+
+    var deserializedObject = new fabric.Object(JSON.parse(JSON.stringify(object)));
+    equal(typeof deserializedObject.clipTo, 'function');
   });
 
 })();

@@ -398,6 +398,18 @@
     },
 
     /**
+     * @private
+     */
+    _initClipping: function(options) {
+      if (!options.clipTo || typeof options.clipTo !== 'string') return;
+
+      var functionBody = fabric.util.getFunctionBody(options.clipTo);
+      if (typeof functionBody !== 'undefined') {
+        this.clipTo = new Function('ctx', functionBody);
+      }
+    },
+
+    /**
      * Sets object's properties from options
      * @param {Object} [options]
      */
@@ -408,6 +420,7 @@
       this._initGradient(options);
       this._initPattern(options);
       this._initShadow(options);
+      this._initClipping(options);
     },
 
     /**
@@ -465,7 +478,8 @@
         transparentCorners: this.transparentCorners,
         perPixelTargetFind: this.perPixelTargetFind,
         shadow:             (this.shadow && this.shadow.toObject) ? this.shadow.toObject() : this.shadow,
-        visible:            this.visible
+        visible:            this.visible,
+        clipTo:             this.clipTo && String(this.clipTo)
       };
 
       if (!this.includeDefaultValues) {
@@ -587,7 +601,7 @@
         }
       }
       else {
-        if (typeof value === 'function') {
+        if (typeof value === 'function' && key !== 'clipTo') {
           this._set(key, value(this.get(key)));
         }
         else {

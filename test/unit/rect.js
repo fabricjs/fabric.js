@@ -30,6 +30,7 @@
     'perPixelTargetFind': false,
     'shadow':             null,
     'visible':            true,
+    'clipTo':             null,
     'rx':                 0,
     'ry':                 0
   };
