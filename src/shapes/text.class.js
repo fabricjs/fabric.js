@@ -464,14 +464,16 @@
      */
     _getTopOffset: function() {
       if (fabric.isLikelyNode) {
-        if (this.originY === 'center') {
+        if (this.originY === 'center' || this.originY === 'top') {
           return -this.height / 2;
         }
         else if (this.originY === 'bottom') {
           return -this.height;
         }
+        return 0;
       }
-      return 0;
+      // in browser, text drawing always starts at vertical center
+      return -this.height / 2;
     },
 
     /**
