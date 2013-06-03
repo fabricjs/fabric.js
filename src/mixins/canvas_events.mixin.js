@@ -1,14 +1,24 @@
 (function(){
 
-  var cursorMap = {
-    'tr': 'ne-resize',
-    'br': 'se-resize',
-    'bl': 'sw-resize',
-    'tl': 'nw-resize',
-    'ml': 'w-resize',
-    'mt': 'n-resize',
-    'mr': 'e-resize',
-    'mb': 's-resize'
+  var cursorMap = [
+      'n-resize',
+      'ne-resize',
+      'e-resize',
+      'se-resize',
+      's-resize',
+      'sw-resize',
+      'w-resize',
+      'nw-resize'
+  ],
+  cursorOffset = {
+    'mt': 0, // n
+    'tr': 1, // ne
+    'mr': 2, // e
+    'br': 3, // se
+    'mb': 4, // s
+    'bl': 5, // sw
+    'ml': 6, // w
+    'tl': 7 // nw
   },
   addListener = fabric.util.addListener,
   removeListener = fabric.util.removeListener,
@@ -400,8 +410,15 @@
           s.cursor = this.hoverCursor;
         }
         else {
-          if (corner in cursorMap) {
-            s.cursor = cursorMap[corner];
+          if (corner in cursorOffset) {
+            var n = Math.round((target.getAngle() % 360) / 45);
+            if (n<0) {
+              n += 8; // full circle ahead
+            }
+            n += cursorOffset[corner];
+            // normalize n to be from 0 to 7
+            n %= 8;
+            s.cursor = cursorMap[n];
           }
           else if (corner === 'mtr' && target.hasRotatingPoint) {
             s.cursor = this.rotationCursor;
