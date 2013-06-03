@@ -13080,8 +13080,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       this.callSuper('initialize', options);
       this._initRxRy();
 
-      this.x = 0;
-      this.y = 0;
+      this.x = options.x || 0;
+      this.y = options.y || 0;
     },
 
     /**
@@ -13190,7 +13190,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     toObject: function(propertiesToInclude) {
       return extend(this.callSuper('toObject', propertiesToInclude), {
         rx: this.get('rx') || 0,
-        ry: this.get('ry') || 0
+        ry: this.get('ry') || 0,
+        x: this.get('x'),
+        y: this.get('y')
       });
     },
 
