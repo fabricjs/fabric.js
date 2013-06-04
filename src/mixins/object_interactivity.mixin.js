@@ -309,11 +309,9 @@
     drawControls: function(ctx) {
       if (!this.hasControls) return this;
 
-      var strokeWidth = this.strokeWidth > 1 ? this.strokeWidth : 0;
-
       var size = this.cornerSize,
           size2 = size / 2,
-          strokeWidth2 = (strokeWidth / 2),
+          strokeWidth2 = this.strokeWidth > 1 ? (strokeWidth / 2) : 0,
           left = -(this.width / 2),
           top = -(this.height / 2),
           _left,
