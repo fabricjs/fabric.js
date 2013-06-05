@@ -464,7 +464,7 @@
      */
     _getTopOffset: function() {
       if (fabric.isLikelyNode) {
-        if (this.originY === 'center' || this.originY === 'top') {
+        if (this.originY === 'center') {
           return -this.height / 2;
         }
         else if (this.originY === 'bottom') {
