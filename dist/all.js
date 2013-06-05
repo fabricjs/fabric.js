@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures` */
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.1.19" };
+var fabric = fabric || { version: "1.1.20" };
 
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
@@ -9171,15 +9171,25 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
 (function(){
 
-  var cursorMap = {
-    'tr': 'ne-resize',
-    'br': 'se-resize',
-    'bl': 'sw-resize',
-    'tl': 'nw-resize',
-    'ml': 'w-resize',
-    'mt': 'n-resize',
-    'mr': 'e-resize',
-    'mb': 's-resize'
+  var cursorMap = [
+      'n-resize',
+      'ne-resize',
+      'e-resize',
+      'se-resize',
+      's-resize',
+      'sw-resize',
+      'w-resize',
+      'nw-resize'
+  ],
+  cursorOffset = {
+    'mt': 0, // n
+    'tr': 1, // ne
+    'mr': 2, // e
+    'br': 3, // se
+    'mb': 4, // s
+    'bl': 5, // sw
+    'ml': 6, // w
+    'tl': 7 // nw
   },
   addListener = fabric.util.addListener,
   removeListener = fabric.util.removeListener,
@@ -9571,8 +9581,15 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
           s.cursor = this.hoverCursor;
         }
         else {
-          if (corner in cursorMap) {
-            s.cursor = cursorMap[corner];
+          if (corner in cursorOffset) {
+            var n = Math.round((target.getAngle() % 360) / 45);
+            if (n<0) {
+              n += 8; // full circle ahead
+            }
+            n += cursorOffset[corner];
+            // normalize n to be from 0 to 7
+            n %= 8;
+            s.cursor = cursorMap[n];
           }
           else if (corner === 'mtr' && target.hasRotatingPoint) {
             s.cursor = this.rotationCursor;
@@ -12191,7 +12208,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       var size = this.cornerSize,
           size2 = size / 2,
-          strokeWidth2 = this.strokeWidth / 2,
+          strokeWidth2 = this.strokeWidth > 1 ? (this.strokeWidth / 2) : 0,
           left = -(this.width / 2),
           top = -(this.height / 2),
           _left,
@@ -12207,6 +12224,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           height = this.height,
           width = this.width,
           methodName = this.transparentCorners ? 'strokeRect' : 'fillRect',
+          transparent = this.transparentCorners,
           isVML = typeof G_vmlCanvasManager !== 'undefined';
 
       ctx.save();
@@ -12220,28 +12238,28 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       _left = left - scaleOffsetX - strokeWidth2 - paddingX;
       _top = top - scaleOffsetY - strokeWidth2 - paddingY;
 
-      isVML || ctx.clearRect(_left, _top, sizeX, sizeY);
+      isVML || transparent || ctx.clearRect(_left, _top, sizeX, sizeY);
       ctx[methodName](_left, _top, sizeX, sizeY);
 
       // top-right
       _left = left + width - scaleOffsetX + strokeWidth2 + paddingX;
       _top = top - scaleOffsetY - strokeWidth2 - paddingY;
 
-      isVML || ctx.clearRect(_left, _top, sizeX, sizeY);
+      isVML || transparent || ctx.clearRect(_left, _top, sizeX, sizeY);
       ctx[methodName](_left, _top, sizeX, sizeY);
 
       // bottom-left
       _left = left - scaleOffsetX - strokeWidth2 - paddingX;
       _top = top + height + scaleOffsetSizeY + strokeWidth2 + paddingY;
 
-      isVML || ctx.clearRect(_left, _top, sizeX, sizeY);
+      isVML || transparent || ctx.clearRect(_left, _top, sizeX, sizeY);
       ctx[methodName](_left, _top, sizeX, sizeY);
 
       // bottom-right
       _left = left + width + scaleOffsetSizeX + strokeWidth2 + paddingX;
       _top = top + height + scaleOffsetSizeY + strokeWidth2 + paddingY;
 
-      isVML || ctx.clearRect(_left, _top, sizeX, sizeY);
+      isVML || transparent || ctx.clearRect(_left, _top, sizeX, sizeY);
       ctx[methodName](_left, _top, sizeX, sizeY);
 
       if (!this.get('lockUniScaling')) {
@@ -12249,28 +12267,28 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         _left = left + width/2 - scaleOffsetX;
         _top = top - scaleOffsetY - strokeWidth2 - paddingY;
 
-        isVML || ctx.clearRect(_left, _top, sizeX, sizeY);
+        isVML || transparent || ctx.clearRect(_left, _top, sizeX, sizeY);
         ctx[methodName](_left, _top, sizeX, sizeY);
 
         // middle-bottom
         _left = left + width/2 - scaleOffsetX;
         _top = top + height + scaleOffsetSizeY + strokeWidth2 + paddingY;
 
-        isVML || ctx.clearRect(_left, _top, sizeX, sizeY);
+        isVML || transparent || ctx.clearRect(_left, _top, sizeX, sizeY);
         ctx[methodName](_left, _top, sizeX, sizeY);
 
         // middle-right
         _left = left + width + scaleOffsetSizeX + strokeWidth2 + paddingX;
         _top = top + height/2 - scaleOffsetY;
 
-        isVML || ctx.clearRect(_left, _top, sizeX, sizeY);
+        isVML || transparent || ctx.clearRect(_left, _top, sizeX, sizeY);
         ctx[methodName](_left, _top, sizeX, sizeY);
 
         // middle-left
         _left = left - scaleOffsetX - strokeWidth2 - paddingX;
         _top = top + height/2 - scaleOffsetY;
 
-        isVML || ctx.clearRect(_left, _top, sizeX, sizeY);
+        isVML || transparent || ctx.clearRect(_left, _top, sizeX, sizeY);
         ctx[methodName](_left, _top, sizeX, sizeY);
       }
 
@@ -12282,7 +12300,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           (top + height + (this.rotatingPointOffset / this.scaleY) - sizeY/2 + strokeWidth2 + paddingY)
           : (top - (this.rotatingPointOffset / this.scaleY) - sizeY/2 - strokeWidth2 - paddingY);
 
-        isVML || ctx.clearRect(_left, _top, sizeX, sizeY);
+        isVML || transparent || ctx.clearRect(_left, _top, sizeX, sizeY);
         ctx[methodName](_left, _top, sizeX, sizeY);
       }
 
@@ -17088,7 +17106,7 @@ fabric.Image.filters.Tint.fromObject = function(object) {
      */
     _getTopOffset: function() {
       if (fabric.isLikelyNode) {
-        if (this.originY === 'center' || this.originY === 'top') {
+        if (this.originY === 'center') {
           return -this.height / 2;
         }
         else if (this.originY === 'bottom') {
