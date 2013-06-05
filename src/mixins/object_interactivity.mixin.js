@@ -311,7 +311,7 @@
 
       var size = this.cornerSize,
           size2 = size / 2,
-          strokeWidth2 = this.strokeWidth / 2,
+          strokeWidth2 = this.strokeWidth > 1 ? (this.strokeWidth / 2) : 0,
           left = -(this.width / 2),
           top = -(this.height / 2),
           _left,
