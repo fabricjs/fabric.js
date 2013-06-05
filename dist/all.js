@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures` */
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.1.20" };
+var fabric = fabric || { version: "1.1.21" };
 
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
@@ -17133,7 +17133,7 @@ fabric.Image.filters.Tint.fromObject = function(object) {
           ctx,
           textLines[i],
           this._getLeftOffset(),
-          this._getTopOffset() + ((i + 1) * this.fontSize * this.lineHeight)
+          this._getTopOffset() + (i * this.fontSize * this.lineHeight) + this.fontSize
         );
       }
     },
@@ -17162,7 +17162,7 @@ fabric.Image.filters.Tint.fromObject = function(object) {
           ctx,
           textLines[i],
           this._getLeftOffset(),
-          this._getTopOffset() + ((i + 1) * this.fontSize * this.lineHeight)
+          this._getTopOffset() + (i * this.fontSize * this.lineHeight) + this.fontSize
         );
       }
       ctx.closePath();
@@ -17282,10 +17282,10 @@ fabric.Image.filters.Tint.fromObject = function(object) {
       }
 
       if (this.textDecoration.indexOf('underline') > -1) {
-        renderLinesAtOffset(this.fontSize * this.lineHeight);
+        renderLinesAtOffset(this.fontSize);
       }
       if (this.textDecoration.indexOf('line-through') > -1) {
-        renderLinesAtOffset((this.fontSize * this.lineHeight) - (this.fontSize / 2));
+        renderLinesAtOffset(this.fontSize / 2);
       }
       if (this.textDecoration.indexOf('overline') > -1) {
         renderLinesAtOffset(0);
