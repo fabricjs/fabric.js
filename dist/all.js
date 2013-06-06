@@ -2452,6 +2452,115 @@ fabric.Collection = {
     return (String(fn).match(/function[^{]*\{([\s\S]*)\}/) || {})[1];
   }
 
+  function drawArc(ctx, x, y, coords) {
+    var rx = coords[0];
+    var ry = coords[1];
+    var rot = coords[2];
+    var large = coords[3];
+    var sweep = coords[4];
+    var ex = coords[5];
+    var ey = coords[6];
+    var segs = arcToSegments(ex, ey, rx, ry, large, sweep, rot, x, y);
+    for (var i=0; i<segs.length; i++) {
+     var bez = segmentToBezier.apply(this, segs[i]);
+     ctx.bezierCurveTo.apply(ctx, bez);
+    }
+  }
+
+  var arcToSegmentsCache = { },
+      segmentToBezierCache = { },
+      _join = Array.prototype.join,
+      argsString;
+
+  // Generous contribution by Raph Levien, from libsvg-0.1.0.tar.gz
+  function arcToSegments(x, y, rx, ry, large, sweep, rotateX, ox, oy) {
+    argsString = _join.call(arguments);
+    if (arcToSegmentsCache[argsString]) {
+      return arcToSegmentsCache[argsString];
+    }
+
+    var th = rotateX * (Math.PI/180);
+    var sin_th = Math.sin(th);
+    var cos_th = Math.cos(th);
+    rx = Math.abs(rx);
+    ry = Math.abs(ry);
+    var px = cos_th * (ox - x) * 0.5 + sin_th * (oy - y) * 0.5;
+    var py = cos_th * (oy - y) * 0.5 - sin_th * (ox - x) * 0.5;
+    var pl = (px*px) / (rx*rx) + (py*py) / (ry*ry);
+    if (pl > 1) {
+      pl = Math.sqrt(pl);
+      rx *= pl;
+      ry *= pl;
+    }
+
+    var a00 = cos_th / rx;
+    var a01 = sin_th / rx;
+    var a10 = (-sin_th) / ry;
+    var a11 = (cos_th) / ry;
+    var x0 = a00 * ox + a01 * oy;
+    var y0 = a10 * ox + a11 * oy;
+    var x1 = a00 * x + a01 * y;
+    var y1 = a10 * x + a11 * y;
+
+    var d = (x1-x0) * (x1-x0) + (y1-y0) * (y1-y0);
+    var sfactor_sq = 1 / d - 0.25;
+    if (sfactor_sq < 0) sfactor_sq = 0;
+    var sfactor = Math.sqrt(sfactor_sq);
+    if (sweep === large) sfactor = -sfactor;
+    var xc = 0.5 * (x0 + x1) - sfactor * (y1-y0);
+    var yc = 0.5 * (y0 + y1) + sfactor * (x1-x0);
+
+    var th0 = Math.atan2(y0-yc, x0-xc);
+    var th1 = Math.atan2(y1-yc, x1-xc);
+
+    var th_arc = th1-th0;
+    if (th_arc < 0 && sweep === 1){
+      th_arc += 2*Math.PI;
+    } else if (th_arc > 0 && sweep === 0) {
+      th_arc -= 2 * Math.PI;
+    }
+
+    var segments = Math.ceil(Math.abs(th_arc / (Math.PI * 0.5 + 0.001)));
+    var result = [];
+    for (var i=0; i<segments; i++) {
+      var th2 = th0 + i * th_arc / segments;
+      var th3 = th0 + (i+1) * th_arc / segments;
+      result[i] = [xc, yc, th2, th3, rx, ry, sin_th, cos_th];
+    }
+
+    arcToSegmentsCache[argsString] = result;
+    return result;
+  }
+
+  function segmentToBezier(cx, cy, th0, th1, rx, ry, sin_th, cos_th) {
+    argsString = _join.call(arguments);
+    if (segmentToBezierCache[argsString]) {
+      return segmentToBezierCache[argsString];
+    }
+
+    var a00 = cos_th * rx;
+    var a01 = -sin_th * ry;
+    var a10 = sin_th * rx;
+    var a11 = cos_th * ry;
+
+    var th_half = 0.5 * (th1 - th0);
+    var t = (8/3) * Math.sin(th_half * 0.5) * Math.sin(th_half * 0.5) / Math.sin(th_half);
+    var x1 = cx + Math.cos(th0) - t * Math.sin(th0);
+    var y1 = cy + Math.sin(th0) + t * Math.cos(th0);
+    var x3 = cx + Math.cos(th1);
+    var y3 = cy + Math.sin(th1);
+    var x2 = x3 + t * Math.sin(th1);
+    var y2 = y3 - t * Math.cos(th1);
+
+    segmentToBezierCache[argsString] = [
+      a00 * x1 + a01 * y1,      a10 * x1 + a11 * y1,
+      a00 * x2 + a01 * y2,      a10 * x2 + a11 * y2,
+      a00 * x3 + a01 * y3,      a10 * x3 + a11 * y3
+    ];
+
+    return segmentToBezierCache[argsString];
+  }
+
   fabric.util.removeFromArray = removeFromArray;
   fabric.util.degreesToRadians = degreesToRadians;
   fabric.util.radiansToDegrees = radiansToDegrees;
@@ -2473,6 +2582,7 @@ fabric.Collection = {
   fabric.util.clipContext = clipContext;
   fabric.util.multiplyTransformMatrices = multiplyTransformMatrices;
   fabric.util.getFunctionBody = getFunctionBody;
+  fabric.util.drawArc = drawArc;
 
 })();
 
@@ -4848,24 +4958,13 @@ fabric.util.string = {
    * @return {fabric.Point} thisArg
    */
   function Point(x, y) {
-    if (arguments.length > 0) {
-      this.init(x, y);
-    }
+    this.x = x;
+    this.y = y;
   }
 
   Point.prototype = /** @lends fabric.Point.prototype */ {
 
     constructor: Point,
-
-    /**
-     * Constructor
-     * @param {Number} x left offset
-     * @param {Number} y top offset
-     */
-    init: function (x, y) {
-      this.x = x;
-      this.y = y;
-    },
 
     /**
      * Adds another point to this one and returns another one
@@ -5681,23 +5780,13 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
    * @constructor
    */
   function Intersection(status) {
-    if (arguments.length > 0) {
-      this.init(status);
-    }
+    this.status = status;
+    this.points = [];
   }
 
   fabric.Intersection = Intersection;
 
   fabric.Intersection.prototype = /** @lends fabric.Intersection.prototype */ {
-
-    /**
-     * Constructor
-     * @param {String} status
-     */
-    init: function (status) {
-      this.status = status;
-      this.points = [];
-    },
 
     /**
      * Appends a point to intersection
@@ -5738,7 +5827,7 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
         result.points.push(new fabric.Point(a1.x + ua * (a2.x - a1.x), a1.y + ua * (a2.y - a1.y)));
       }
       else {
-        result = new Intersection("No Intersection");
+        result = new Intersection();
       }
     }
     else {
@@ -5761,7 +5850,7 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
    * @return {fabric.Intersection}
    */
   fabric.Intersection.intersectLinePolygon = function(a1,a2,points){
-    var result = new Intersection("No Intersection"),
+    var result = new Intersection(),
         length = points.length;
 
     for (var i = 0; i < length; i++) {
@@ -5785,7 +5874,7 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
    * @return {fabric.Intersection}
    */
   fabric.Intersection.intersectPolygonPolygon = function (points1, points2) {
-    var result = new Intersection("No Intersection"),
+    var result = new Intersection(),
         length = points1.length;
 
     for (var i = 0; i < length; i++) {
@@ -5803,7 +5892,6 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
 
   /**
    * Checks if polygon intersects rectangle
-
    * @static
    * @param {Array} points
    * @param {Number} r1
@@ -5819,7 +5907,7 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
         inter2 = Intersection.intersectLinePolygon(topRight, max, points),
         inter3 = Intersection.intersectLinePolygon(max, bottomLeft, points),
         inter4 = Intersection.intersectLinePolygon(bottomLeft, min, points),
-        result = new Intersection("No Intersection");
+        result = new Intersection();
 
     result.appendPoints(inter1.points);
     result.appendPoints(inter2.points);
@@ -6344,7 +6432,7 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
      * Opacity of the background image of the canvas instance
      * @type Float
      */
-    backgroundImageOpacity: 1.0,
+    backgroundImageOpacity: 1,
 
     /**
      * Indicates whether the background image should be stretched to fit the
@@ -13713,122 +13801,14 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     a: 7
   };
 
-  function drawArc(ctx, x, y, coords) {
-    var rx = coords[0];
-    var ry = coords[1];
-    var rot = coords[2];
-    var large = coords[3];
-    var sweep = coords[4];
-    var ex = coords[5];
-    var ey = coords[6];
-    var segs = arcToSegments(ex, ey, rx, ry, large, sweep, rot, x, y);
-    for (var i=0; i<segs.length; i++) {
-     var bez = segmentToBezier.apply(this, segs[i]);
-     ctx.bezierCurveTo.apply(ctx, bez);
-    }
-  }
-
-  var arcToSegmentsCache = { },
-      segmentToBezierCache = { },
-      _join = Array.prototype.join,
-      argsString;
-
-  // Generous contribution by Raph Levien, from libsvg-0.1.0.tar.gz
-  function arcToSegments(x, y, rx, ry, large, sweep, rotateX, ox, oy) {
-    argsString = _join.call(arguments);
-    if (arcToSegmentsCache[argsString]) {
-      return arcToSegmentsCache[argsString];
-    }
-
-    var th = rotateX * (Math.PI/180);
-    var sin_th = Math.sin(th);
-    var cos_th = Math.cos(th);
-    rx = Math.abs(rx);
-    ry = Math.abs(ry);
-    var px = cos_th * (ox - x) * 0.5 + sin_th * (oy - y) * 0.5;
-    var py = cos_th * (oy - y) * 0.5 - sin_th * (ox - x) * 0.5;
-    var pl = (px*px) / (rx*rx) + (py*py) / (ry*ry);
-    if (pl > 1) {
-      pl = Math.sqrt(pl);
-      rx *= pl;
-      ry *= pl;
-    }
-
-    var a00 = cos_th / rx;
-    var a01 = sin_th / rx;
-    var a10 = (-sin_th) / ry;
-    var a11 = (cos_th) / ry;
-    var x0 = a00 * ox + a01 * oy;
-    var y0 = a10 * ox + a11 * oy;
-    var x1 = a00 * x + a01 * y;
-    var y1 = a10 * x + a11 * y;
-
-    var d = (x1-x0) * (x1-x0) + (y1-y0) * (y1-y0);
-    var sfactor_sq = 1 / d - 0.25;
-    if (sfactor_sq < 0) sfactor_sq = 0;
-    var sfactor = Math.sqrt(sfactor_sq);
-    if (sweep === large) sfactor = -sfactor;
-    var xc = 0.5 * (x0 + x1) - sfactor * (y1-y0);
-    var yc = 0.5 * (y0 + y1) + sfactor * (x1-x0);
-
-    var th0 = Math.atan2(y0-yc, x0-xc);
-    var th1 = Math.atan2(y1-yc, x1-xc);
-
-    var th_arc = th1-th0;
-    if (th_arc < 0 && sweep === 1){
-      th_arc += 2*Math.PI;
-    } else if (th_arc > 0 && sweep === 0) {
-      th_arc -= 2 * Math.PI;
-    }
-
-    var segments = Math.ceil(Math.abs(th_arc / (Math.PI * 0.5 + 0.001)));
-    var result = [];
-    for (var i=0; i<segments; i++) {
-      var th2 = th0 + i * th_arc / segments;
-      var th3 = th0 + (i+1) * th_arc / segments;
-      result[i] = [xc, yc, th2, th3, rx, ry, sin_th, cos_th];
-    }
-
-    arcToSegmentsCache[argsString] = result;
-    return result;
-  }
-
-  function segmentToBezier(cx, cy, th0, th1, rx, ry, sin_th, cos_th) {
-    argsString = _join.call(arguments);
-    if (segmentToBezierCache[argsString]) {
-      return segmentToBezierCache[argsString];
-    }
-
-    var a00 = cos_th * rx;
-    var a01 = -sin_th * ry;
-    var a10 = sin_th * rx;
-    var a11 = cos_th * ry;
-
-    var th_half = 0.5 * (th1 - th0);
-    var t = (8/3) * Math.sin(th_half * 0.5) * Math.sin(th_half * 0.5) / Math.sin(th_half);
-    var x1 = cx + Math.cos(th0) - t * Math.sin(th0);
-    var y1 = cy + Math.sin(th0) + t * Math.cos(th0);
-    var x3 = cx + Math.cos(th1);
-    var y3 = cy + Math.sin(th1);
-    var x2 = x3 + t * Math.sin(th1);
-    var y2 = y3 - t * Math.cos(th1);
-
-    segmentToBezierCache[argsString] = [
-      a00 * x1 + a01 * y1,      a10 * x1 + a11 * y1,
-      a00 * x2 + a01 * y2,      a10 * x2 + a11 * y2,
-      a00 * x3 + a01 * y3,      a10 * x3 + a11 * y3
-    ];
-
-    return segmentToBezierCache[argsString];
-  }
-
   "use strict";
 
   var fabric = global.fabric || (global.fabric = { }),
       min = fabric.util.array.min,
       max = fabric.util.array.max,
       extend = fabric.util.object.extend,
-      _toString = Object.prototype.toString;
+      _toString = Object.prototype.toString,
+      drawArc = fabric.util.drawArc;
 
   if (fabric.Path) {
     fabric.warn('fabric.Path is already defined');
@@ -16655,18 +16635,6 @@ fabric.Image.filters.Tint.fromObject = function(object) {
     return;
   }
 
-  var dimensionAffectingProps = {
-    fontSize: true,
-    fontWeight: true,
-    fontFamily: true,
-    textDecoration: true,
-    fontStyle: true,
-    lineHeight: true,
-    stroke: true,
-    strokeWidth: true,
-    text: true
-  };
-
   var stateProperties = fabric.Object.prototype.stateProperties.concat();
   stateProperties.push(
     'fontFamily',
@@ -16692,6 +16660,22 @@ fabric.Image.filters.Tint.fromObject = function(object) {
    */
   fabric.Text = fabric.util.createClass(fabric.Object, /** @lends fabric.Text.prototype */ {
 
+    /**
+     * Properties which when set cause object to change dimensions
+     * @type Object
+     * @private
+     */
+    _dimensionAffectingProps: {
+      fontSize: true,
+      fontWeight: true,
+      fontFamily: true,
+      textDecoration: true,
+      fontStyle: true,
+      lineHeight: true,
+      stroke: true,
+      strokeWidth: true,
+      text: true
+    },
 
     /**
      * Type of an object
@@ -17572,7 +17556,7 @@ fabric.Image.filters.Tint.fromObject = function(object) {
       }
       this.callSuper('_set', name, value);
 
-      if (name in dimensionAffectingProps) {
+      if (name in this._dimensionAffectingProps) {
         this._initDimensions();
         this.setCoords();
       }

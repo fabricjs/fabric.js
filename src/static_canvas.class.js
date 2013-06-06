@@ -55,7 +55,7 @@
      * Opacity of the background image of the canvas instance
      * @type Float
      */
-    backgroundImageOpacity: 1.0,
+    backgroundImageOpacity: 1,
 
     /**
      * Indicates whether the background image should be stretched to fit the

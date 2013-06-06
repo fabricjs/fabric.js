@@ -13,18 +13,6 @@
     return;
   }
 
-  var dimensionAffectingProps = {
-    fontSize: true,
-    fontWeight: true,
-    fontFamily: true,
-    textDecoration: true,
-    fontStyle: true,
-    lineHeight: true,
-    stroke: true,
-    strokeWidth: true,
-    text: true
-  };
-
   var stateProperties = fabric.Object.prototype.stateProperties.concat();
   stateProperties.push(
     'fontFamily',
@@ -50,6 +38,22 @@
    */
   fabric.Text = fabric.util.createClass(fabric.Object, /** @lends fabric.Text.prototype */ {
 
+    /**
+     * Properties which when set cause object to change dimensions
+     * @type Object
+     * @private
+     */
+    _dimensionAffectingProps: {
+      fontSize: true,
+      fontWeight: true,
+      fontFamily: true,
+      textDecoration: true,
+      fontStyle: true,
+      lineHeight: true,
+      stroke: true,
+      strokeWidth: true,
+      text: true
+    },
 
     /**
      * Type of an object
@@ -930,7 +934,7 @@
       }
       this.callSuper('_set', name, value);
 
-      if (name in dimensionAffectingProps) {
+      if (name in this._dimensionAffectingProps) {
         this._initDimensions();
         this.setCoords();
       }
