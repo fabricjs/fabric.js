@@ -22,24 +22,13 @@
    * @return {fabric.Point} thisArg
    */
   function Point(x, y) {
-    if (arguments.length > 0) {
-      this.init(x, y);
-    }
+    this.x = x;
+    this.y = y;
   }
 
   Point.prototype = /** @lends fabric.Point.prototype */ {
 
     constructor: Point,
-
-    /**
-     * Constructor
-     * @param {Number} x left offset
-     * @param {Number} y top offset
-     */
-    init: function (x, y) {
-      this.x = x;
-      this.y = y;
-    },
 
     /**
      * Adds another point to this one and returns another one
