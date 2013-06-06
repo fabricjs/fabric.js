@@ -147,6 +147,7 @@ var filesToInclude = [
   ifSpecifiedInclude('interaction', 'src/mixins/canvas_events.mixin.js'),
 
   'src/mixins/canvas_animation.mixin.js',
+  'src/mixins/canvas_dataurl_exporter.mixin.js',
 
   ifSpecifiedInclude('serialization', 'src/mixins/canvas_serialization.mixin.js'),
   ifSpecifiedInclude('gestures', 'src/mixins/canvas_gestures.mixin.js'),
@@ -185,6 +186,7 @@ var filesToInclude = [
   ifSpecifiedInclude('image_filters', 'src/filters/tint_filter.class.js'),
 
   ifSpecifiedInclude('text', 'src/shapes/text.class.js'),
+  ifSpecifiedInclude('cufon', 'src/shapes/text.cufon.js'),
 
   ifSpecifiedInclude('node', 'src/node.js')
 ];

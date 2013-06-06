@@ -198,7 +198,7 @@
           this.coords.x1, this.coords.y1, this.coords.r1, this.coords.x2, this.coords.y2, this.coords.r2);
       }
 
-      for (var i = 0; i < this.colorStops.length; i++) {
+      for (var i = 0, len = this.colorStops.length; i < len; i++) {
         var color = this.colorStops[i].color,
             opacity = this.colorStops[i].opacity,
             offset = this.colorStops[i].offset;

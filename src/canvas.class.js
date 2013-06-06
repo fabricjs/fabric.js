@@ -937,6 +937,32 @@
         this.fire('selection:cleared');
       }
       return this;
+    },
+
+    /**
+     * Draws objects' controls (borders/controls)
+     * @param {Object} ctx context to render controls on
+     */
+    drawControls: function(ctx) {
+      var activeGroup = this.getActiveGroup();
+      if (activeGroup) {
+        ctx.save();
+        fabric.Group.prototype.transform.call(activeGroup, ctx);
+        activeGroup.drawBorders(ctx).drawControls(ctx);
+        ctx.restore();
+      }
+      else {
+        for (var i = 0, len = this._objects.length; i < len; ++i) {
+          if (!this._objects[i] || !this._objects[i].active) continue;
+
+          ctx.save();
+          fabric.Object.prototype.transform.call(this._objects[i], ctx);
+          this._objects[i].drawBorders(ctx).drawControls(ctx);
+          ctx.restore();
+
+          this.lastRenderedObjectWithControlsAboveOverlay = this._objects[i];
+        }
+      }
     }
   };
 
