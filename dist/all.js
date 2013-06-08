@@ -7099,7 +7099,7 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
       }
       fabric.util.populateWithProperties(this, data, propertiesToInclude);
       if (activeGroup) {
-        this.setActiveGroup(new fabric.Group(activeGroup.objects));
+        this.setActiveGroup(new fabric.Group(activeGroup.getObjects()));
         activeGroup.forEachObject(function(o) { o.set('active', true) });
       }
       return data;
@@ -7179,7 +7179,7 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
         markup.push(objects[i].toSVG());
       }
       if (activeGroup) {
-        this.setActiveGroup(new fabric.Group(activeGroup.objects));
+        this.setActiveGroup(new fabric.Group(activeGroup.getObjects()));
         activeGroup.forEachObject(function(o) { o.set('active', true) });
       }
       markup.push('</svg>');
@@ -13229,15 +13229,17 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           -this.group.height / 2 + this.height / 2 + this.y);
       }
 
+      var isRounded = rx !== 0 || ry !== 0;
+
       ctx.moveTo(x+rx, y);
       ctx.lineTo(x+w-rx, y);
-      ctx.quadraticCurveTo(x+w, y, x+w, y+ry, x+w, y+ry);
+      isRounded && ctx.quadraticCurveTo(x+w, y, x+w, y+ry, x+w, y+ry);
       ctx.lineTo(x+w, y+h-ry);
-      ctx.quadraticCurveTo(x+w,y+h,x+w-rx,y+h,x+w-rx,y+h);
+      isRounded && ctx.quadraticCurveTo(x+w,y+h,x+w-rx,y+h,x+w-rx,y+h);
       ctx.lineTo(x+rx,y+h);
-      ctx.quadraticCurveTo(x,y+h,x,y+h-ry,x,y+h-ry);
+      isRounded && ctx.quadraticCurveTo(x,y+h,x,y+h-ry,x,y+h-ry);
       ctx.lineTo(x,y+ry);
-      ctx.quadraticCurveTo(x,y,x+rx,y,x+rx,y);
+      isRounded && ctx.quadraticCurveTo(x,y,x+rx,y,x+rx,y);
       ctx.closePath();
 
       this._renderFill(ctx);
