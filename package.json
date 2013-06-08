@@ -22,7 +22,8 @@
     "qunit": "0.5.x",
     "jshint": "1.1.x",
     "uglify-js": "2.2.x",
-    "execSync": "0.0.4"
+    "execSync": "0.0.4",
+    "plato": "0.5.0"
   },
   "engines": { "node": ">=0.4.0 && <1.0.0" },
   "main": "./dist/all.js"
