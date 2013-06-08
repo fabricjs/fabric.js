@@ -722,7 +722,7 @@
       }
       fabric.util.populateWithProperties(this, data, propertiesToInclude);
       if (activeGroup) {
-        this.setActiveGroup(new fabric.Group(activeGroup.objects));
+        this.setActiveGroup(new fabric.Group(activeGroup.getObjects()));
         activeGroup.forEachObject(function(o) { o.set('active', true) });
       }
       return data;
@@ -802,7 +802,7 @@
         markup.push(objects[i].toSVG());
       }
       if (activeGroup) {
-        this.setActiveGroup(new fabric.Group(activeGroup.objects));
+        this.setActiveGroup(new fabric.Group(activeGroup.getObjects()));
         activeGroup.forEachObject(function(o) { o.set('active', true) });
       }
       markup.push('</svg>');
