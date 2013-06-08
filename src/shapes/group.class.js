@@ -271,13 +271,13 @@
       var groupLeft = this.get('left'),
           groupTop = this.get('top'),
           groupAngle = this.getAngle() * (Math.PI / 180),
-          rotatedTop = Math.cos(groupAngle) * object.get('top') + Math.sin(groupAngle) * object.get('left'),
-          rotatedLeft = -Math.sin(groupAngle) * object.get('top') + Math.cos(groupAngle) * object.get('left');
+          rotatedTop = Math.cos(groupAngle) * object.get('top') * this.get('scaleY') + Math.sin(groupAngle) * object.get('left') * this.get('scaleX'),
+          rotatedLeft = -Math.sin(groupAngle) * object.get('top') * this.get('scaleY') + Math.cos(groupAngle) * object.get('left') * this.get('scaleX');
 
       object.setAngle(object.getAngle() + this.getAngle());
 
-      object.set('left', groupLeft + rotatedLeft * this.get('scaleX'));
-      object.set('top', groupTop + rotatedTop * this.get('scaleY'));
+      object.set('left', groupLeft + rotatedLeft);
+      object.set('top', groupTop + rotatedTop);
 
       object.set('scaleX', object.get('scaleX') * this.get('scaleX'));
       object.set('scaleY', object.get('scaleY') * this.get('scaleY'));
