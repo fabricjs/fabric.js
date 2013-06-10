@@ -663,14 +663,11 @@
           deltaY = maxY - minY;
 
       var o = {
-        top: minY + deltaY / 2,
         left: minX + deltaX / 2,
-        bottom: max(aY) - deltaY,
-        right: max(aX) - deltaX
+        top: minY + deltaY / 2,
+        width: deltaX,
+        height: deltaY
       };
-
-      o.width = deltaX;
-      o.height = deltaY;
 
       return o;
     }

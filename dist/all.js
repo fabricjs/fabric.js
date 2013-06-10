@@ -8612,12 +8612,10 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       // Actually scale the object
       var newScaleX = target.scaleX, newScaleY = target.scaleY;
       if (by === 'equally' && !lockScalingX && !lockScalingY) {
-        var dist = localMouse.y + localMouse.x;
-        var lastDist = (target.height) * t.original.scaleY +
-                       (target.width) * t.original.scaleX +
-                       (target.padding * 2) -
-                       (target.strokeWidth * 2) + 1 /* additional offset needed probably due to subpixel rendering, and avoids jerk when scaling an object */;
-
+        var dist = Math.sqrt(Math.pow(localMouse.y,2) + Math.pow(localMouse.x,2));
+        var lastDist = Math.sqrt(Math.pow((target.height + (target.padding/2) + (target.strokeWidth/2)) * t.original.scaleY,2) +
+                       Math.pow((target.width + (target.padding/2) + (target.strokeWidth/2)) * t.original.scaleX,2));
+                       
         // We use t.scaleX/Y instead of target.scaleX/Y because the object may have a min scale and we'll loose the proportions
         newScaleX = t.original.scaleX * dist/lastDist;
         newScaleY = t.original.scaleY * dist/lastDist;
@@ -8626,18 +8624,18 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         target.set('scaleY', newScaleY);
       }
       else if (!by) {
-        newScaleX = localMouse.x/(target.width+target.padding);
-        newScaleY = localMouse.y/(target.height+target.padding);
+        newScaleX = localMouse.x/(target.width+(target.padding/2)+(target.strokeWidth/2));
+        newScaleY = localMouse.y/(target.height+(target.padding/2)+(target.strokeWidth/2));
 
         lockScalingX || target.set('scaleX', newScaleX);
         lockScalingY || target.set('scaleY', newScaleY);
       }
       else if (by === 'x' && !target.get('lockUniScaling')) {
-        newScaleX = localMouse.x/(target.width+target.padding);
+        newScaleX = localMouse.x/(target.width+(target.padding/2)+(target.strokeWidth/2));
         lockScalingX || target.set('scaleX', newScaleX);
       }
       else if (by === 'y' && !target.get('lockUniScaling')) {
-        newScaleY = localMouse.y/(target.height+target.padding);
+        newScaleY = localMouse.y/(target.height+(target.padding/2)+(target.strokeWidth/2));
         lockScalingY || target.set('scaleY', newScaleY);
       }
 
@@ -14444,14 +14442,11 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           deltaY = maxY - minY;
 
       var o = {
-        top: minY + deltaY / 2,
         left: minX + deltaX / 2,
-        bottom: max(aY) - deltaY,
-        right: max(aX) - deltaX
+        top: minY + deltaY / 2,
+        width: deltaX,
+        height: deltaY
       };
-
-      o.width = deltaX;
-      o.height = deltaY;
 
       return o;
     }
@@ -14999,13 +14994,13 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       var groupLeft = this.get('left'),
           groupTop = this.get('top'),
           groupAngle = this.getAngle() * (Math.PI / 180),
-          rotatedTop = Math.cos(groupAngle) * object.get('top') + Math.sin(groupAngle) * object.get('left'),
-          rotatedLeft = -Math.sin(groupAngle) * object.get('top') + Math.cos(groupAngle) * object.get('left');
+          rotatedTop = Math.cos(groupAngle) * object.get('top') * this.get('scaleY') + Math.sin(groupAngle) * object.get('left') * this.get('scaleX'),
+          rotatedLeft = -Math.sin(groupAngle) * object.get('top') * this.get('scaleY') + Math.cos(groupAngle) * object.get('left') * this.get('scaleX');
 
       object.setAngle(object.getAngle() + this.getAngle());
 
-      object.set('left', groupLeft + rotatedLeft * this.get('scaleX'));
-      object.set('top', groupTop + rotatedTop * this.get('scaleY'));
+      object.set('left', groupLeft + rotatedLeft);
+      object.set('top', groupTop + rotatedTop);
 
       object.set('scaleX', object.get('scaleX') * this.get('scaleX'));
       object.set('scaleY', object.get('scaleY') * this.get('scaleY'));
