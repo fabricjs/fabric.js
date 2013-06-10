@@ -4,16 +4,14 @@ var fs = require('fs'),
 var modules = [
   'text',
   'cufon',
-  // 'json',
   'gestures',
   'easing',
   'parser',
   'freedrawing',
   'interaction',
   'serialization',
-  // 'stateful',
-  // 'object_straightening',
   'image_filters',
+  'gradient',
   'node'
 ];
 
