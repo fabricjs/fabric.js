@@ -496,12 +496,10 @@
       // Actually scale the object
       var newScaleX = target.scaleX, newScaleY = target.scaleY;
       if (by === 'equally' && !lockScalingX && !lockScalingY) {
-        var dist = localMouse.y + localMouse.x;
-        var lastDist = (target.height) * t.original.scaleY +
-                       (target.width) * t.original.scaleX +
-                       (target.padding * 2) -
-                       (target.strokeWidth * 2) + 1 /* additional offset needed probably due to subpixel rendering, and avoids jerk when scaling an object */;
-
+        var dist = Math.sqrt(Math.pow(localMouse.y,2) + Math.pow(localMouse.x,2));
+        var lastDist = Math.sqrt(Math.pow((target.height + (target.padding/2) + (target.strokeWidth/2)) * t.original.scaleY,2) +
+                       Math.pow((target.width + (target.padding/2) + (target.strokeWidth/2)) * t.original.scaleX,2));
+                       
         // We use t.scaleX/Y instead of target.scaleX/Y because the object may have a min scale and we'll loose the proportions
         newScaleX = t.original.scaleX * dist/lastDist;
         newScaleY = t.original.scaleY * dist/lastDist;
@@ -510,18 +508,18 @@
         target.set('scaleY', newScaleY);
       }
       else if (!by) {
-        newScaleX = localMouse.x/(target.width+target.padding);
-        newScaleY = localMouse.y/(target.height+target.padding);
+        newScaleX = localMouse.x/(target.width+(target.padding/2)+(target.strokeWidth/2));
+        newScaleY = localMouse.y/(target.height+(target.padding/2)+(target.strokeWidth/2));
 
         lockScalingX || target.set('scaleX', newScaleX);
         lockScalingY || target.set('scaleY', newScaleY);
       }
       else if (by === 'x' && !target.get('lockUniScaling')) {
-        newScaleX = localMouse.x/(target.width+target.padding);
+        newScaleX = localMouse.x/(target.width+(target.padding/2)+(target.strokeWidth/2));
         lockScalingX || target.set('scaleX', newScaleX);
       }
       else if (by === 'y' && !target.get('lockUniScaling')) {
-        newScaleY = localMouse.y/(target.height+target.padding);
+        newScaleY = localMouse.y/(target.height+(target.padding/2)+(target.strokeWidth/2));
         lockScalingY || target.set('scaleY', newScaleY);
       }
 
