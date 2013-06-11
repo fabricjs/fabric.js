@@ -501,7 +501,7 @@
                        Math.pow((target.width + (target.padding/2) + (target.strokeWidth/2)) * t.original.scaleX,2));
 
         if (localMouse.y < 0 || localMouse.x < 0) {
-            dist *= -1;
+          dist *= -1;
         }
 
         // We use t.scaleX/Y instead of target.scaleX/Y because the object may have a min scale and we'll loose the proportions
