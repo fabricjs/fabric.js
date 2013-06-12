@@ -496,13 +496,17 @@
       // Actually scale the object
       var newScaleX = target.scaleX, newScaleY = target.scaleY;
       if (by === 'equally' && !lockScalingX && !lockScalingY) {
-        var dist = Math.sqrt(Math.pow(localMouse.y,2) + Math.pow(localMouse.x,2));
-        var lastDist = Math.sqrt(Math.pow((target.height + (target.padding/2) + (target.strokeWidth/2)) * t.original.scaleY,2) +
-                       Math.pow((target.width + (target.padding/2) + (target.strokeWidth/2)) * t.original.scaleX,2));
+        var dist = localMouse.y + localMouse.x;
+        var lastDist = (target.height + (target.padding/2) + (target.strokeWidth/2)) * t.original.scaleY + 
+                       (target.width + (target.padding/2) + (target.strokeWidth/2)) * t.original.scaleX;
+        
+        //var dist = Math.sqrt(Math.pow(localMouse.y,2) + Math.pow(localMouse.x,2));
+        //var lastDist = Math.sqrt(Math.pow((target.height + (target.padding/2) + (target.strokeWidth/2)) * t.original.scaleY,2) +
+        //               Math.pow((target.width + (target.padding/2) + (target.strokeWidth/2)) * t.original.scaleX,2));
 
-        if (localMouse.y < 0 && localMouse.x < 0) {
-          dist *= -1;
-        }
+        //if (localMouse.y < 0 && localMouse.x < 0) {
+        //  dist *= -1;
+        //}
 
         // We use t.scaleX/Y instead of target.scaleX/Y because the object may have a min scale and we'll loose the proportions
         newScaleX = t.original.scaleX * dist/lastDist;
