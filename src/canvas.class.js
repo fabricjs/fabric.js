@@ -500,7 +500,7 @@
         var lastDist = Math.sqrt(Math.pow((target.height + (target.padding/2) + (target.strokeWidth/2)) * t.original.scaleY,2) +
                        Math.pow((target.width + (target.padding/2) + (target.strokeWidth/2)) * t.original.scaleX,2));
 
-        if (localMouse.y < 0 || localMouse.x < 0) {
+        if (localMouse.y < 0 && localMouse.x < 0) {
           dist *= -1;
         }
 
