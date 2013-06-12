@@ -421,6 +421,7 @@
             var group = new fabric.Group([ this._activeObject, target ]);
             this.setActiveGroup(group);
             activeGroup = this.getActiveGroup();
+            this.fire('selection:created', { target: activeGroup, e: e });
           }
         }
         // activate target object in any case
