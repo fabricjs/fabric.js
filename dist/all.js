@@ -4136,7 +4136,9 @@ fabric.util.string = {
         value = multiplyTransformMatrices(
           parentAttributes.transformMatrix, fabric.parseTransformAttribute(value));
       }
-      value = fabric.parseTransformAttribute(value);
+      else {
+        value = fabric.parseTransformAttribute(value);
+      }
     }
 
     isArray = Object.prototype.toString.call(value) === '[object Array]';

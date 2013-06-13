@@ -265,6 +265,18 @@
 
   });
 
+  test('parseNestedTransformAttribute', function() {
+    var element = fabric.document.createElement('path');
+    var parent = fabric.document.createElement('g');
+    parent.appendChild(element);
+
+    parent.setAttribute('transform', 'translate(50)');
+    element.setAttribute('transform', 'translate(10 10)');
+
+    var parsedAttributes = fabric.parseAttributes(element, ['transform']);
+    deepEqual(parsedAttributes.transformMatrix, [1, 0, 0, 1, 60, 10]);
+  });
+
   // asyncTest('parseSVGDocument', function() {
   //   ok(fabric.parseSVGDocument);
 
