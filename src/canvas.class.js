@@ -492,20 +492,27 @@
           t.mouseYSign = -t.mouseYSign;
         }
       }
+
+      // adjust the mouse coordinates when dealing with padding      
+      if (abs(localMouse.x) > target.padding) {
+        if (localMouse.x < 0 ) {
+          localMouse.x += target.padding;
+        } else {
+          localMouse.x -= target.padding;
+        }
+      } else { // mouse is within the padding, set to 0
+        localMouse.x = 0
+      }
       
-      if (localMouse.x < 0 ) {
-        localMouse.x += target.padding;
+      if (abs(localMouse.y) > target.padding) {
+        if (localMouse.y < 0 ) {
+          localMouse.y += target.padding;
+        } else {
+          localMouse.y -= target.padding;
+        }      
       } else {
-        localMouse.x -= target.padding;
-      }      
-
-      if (localMouse.y < 0 ) {
-        localMouse.y += target.padding;
-      } else {
-        localMouse.y -= target.padding;
-      }      
-
-
+        localMouse.y = 0
+      }
 
       // Actually scale the object
       var newScaleX = target.scaleX, newScaleY = target.scaleY;
