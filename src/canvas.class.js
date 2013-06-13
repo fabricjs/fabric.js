@@ -510,7 +510,7 @@
       // Actually scale the object
       var newScaleX = target.scaleX, newScaleY = target.scaleY;
       if (by === 'equally' && !lockScalingX && !lockScalingY) {
-        var dist = localMouse.y + localMouse.x
+        var dist = localMouse.y + localMouse.x;
         var lastDist = (target.height + (target.strokeWidth)) * t.original.scaleY + 
                        (target.width + (target.strokeWidth)) * t.original.scaleX;
         
