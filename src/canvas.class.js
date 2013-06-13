@@ -492,13 +492,27 @@
           t.mouseYSign = -t.mouseYSign;
         }
       }
+      
+      if (localMouse.x < 0 ) {
+        localMouse.x += target.padding;
+      } else {
+        localMouse.x -= target.padding;
+      }      
+
+      if (localMouse.y < 0 ) {
+        localMouse.y += target.padding;
+      } else {
+        localMouse.y -= target.padding;
+      }      
+
+
 
       // Actually scale the object
       var newScaleX = target.scaleX, newScaleY = target.scaleY;
       if (by === 'equally' && !lockScalingX && !lockScalingY) {
-        var dist = localMouse.y + localMouse.x;
-        var lastDist = (target.height + (target.padding/2) + (target.strokeWidth/2)) * t.original.scaleY + 
-                       (target.width + (target.padding/2) + (target.strokeWidth/2)) * t.original.scaleX;
+        var dist = localMouse.y + localMouse.x
+        var lastDist = (target.height + (target.strokeWidth)) * t.original.scaleY + 
+                       (target.width + (target.strokeWidth)) * t.original.scaleX;
         
         // We use t.scaleX/Y instead of target.scaleX/Y because the object may have a min scale and we'll loose the proportions
         newScaleX = t.original.scaleX * dist/lastDist;
@@ -508,18 +522,18 @@
         target.set('scaleY', newScaleY);
       }
       else if (!by) {
-        newScaleX = localMouse.x/(target.width+(target.padding/2)+(target.strokeWidth/2));
-        newScaleY = localMouse.y/(target.height+(target.padding/2)+(target.strokeWidth/2));
+        newScaleX = localMouse.x/(target.width+target.strokeWidth);
+        newScaleY = localMouse.y/(target.height+target.strokeWidth);
 
         lockScalingX || target.set('scaleX', newScaleX);
         lockScalingY || target.set('scaleY', newScaleY);
       }
       else if (by === 'x' && !target.get('lockUniScaling')) {
-        newScaleX = localMouse.x/(target.width+(target.padding/2)+(target.strokeWidth/2));
+        newScaleX = localMouse.x/(target.width + target.strokeWidth);
         lockScalingX || target.set('scaleX', newScaleX);
       }
       else if (by === 'y' && !target.get('lockUniScaling')) {
-        newScaleY = localMouse.y/(target.height+(target.padding/2)+(target.strokeWidth/2));
+        newScaleY = localMouse.y/(target.height + target.strokeWidth);
         lockScalingY || target.set('scaleY', newScaleY);
       }
 
