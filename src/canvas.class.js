@@ -501,7 +501,7 @@
           localMouse.x -= target.padding;
         }
       } else { // mouse is within the padding, set to 0
-        localMouse.x = 0
+        localMouse.x = 0;
       }
       
       if (abs(localMouse.y) > target.padding) {
@@ -511,7 +511,7 @@
           localMouse.y -= target.padding;
         }      
       } else {
-        localMouse.y = 0
+        localMouse.y = 0;
       }
 
       // Actually scale the object
