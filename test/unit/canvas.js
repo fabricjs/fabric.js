@@ -346,6 +346,23 @@
     });
   });
 
+  asyncTest('loadFromJSON with no objects', function() {
+    var c1 = new fabric.Canvas('c1', { backgroundColor: 'green' }),
+        c2 = new fabric.Canvas('c2', { backgroundColor: 'red' });
+
+    var json = c1.toJSON();
+    var fired = false;
+    c2.loadFromJSON(json, function() {
+      fired = true;
+    });
+
+    setTimeout(function() {
+      ok(fired, 'Callback should be fired even if no objects');
+      equal(c2.backgroundColor, 'green', 'Color should be set properly');
+      start();
+    }, 500);
+  });
+
   // asyncTest('loadFromJSON with backgroundImage', function() {
   //   canvas.setBackgroundImage('../../assets/pug.jpg');
   //   var anotherCanvas = new fabric.Canvas();

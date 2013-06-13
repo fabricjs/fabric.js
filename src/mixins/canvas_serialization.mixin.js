@@ -240,6 +240,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    */
   _enlivenObjects: function (objects, callback) {
     var _this = this;
+    if (objects.length === 0) {
+      callback && callback();
+    }
     fabric.util.enlivenObjects(objects, function(enlivenedObjects) {
       enlivenedObjects.forEach(function(obj, index) {
         _this.insertAt(obj, index, true);

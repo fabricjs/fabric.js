@@ -8537,6 +8537,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
             var group = new fabric.Group([ this._activeObject, target ]);
             this.setActiveGroup(group);
             activeGroup = this.getActiveGroup();
+            this.fire('selection:created', { target: activeGroup, e: e });
           }
         }
         // activate target object in any case
@@ -8615,7 +8616,11 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         var dist = Math.sqrt(Math.pow(localMouse.y,2) + Math.pow(localMouse.x,2));
         var lastDist = Math.sqrt(Math.pow((target.height + (target.padding/2) + (target.strokeWidth/2)) * t.original.scaleY,2) +
                        Math.pow((target.width + (target.padding/2) + (target.strokeWidth/2)) * t.original.scaleX,2));
-                       
+
+        if (localMouse.y < 0 || localMouse.x < 0) {
+          dist *= -1;
+        }
+
         // We use t.scaleX/Y instead of target.scaleX/Y because the object may have a min scale and we'll loose the proportions
         newScaleX = t.original.scaleX * dist/lastDist;
         newScaleY = t.original.scaleY * dist/lastDist;
@@ -10036,6 +10041,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    */
   _enlivenObjects: function (objects, callback) {
     var _this = this;
+    if (objects.length === 0) {
+      callback && callback();
+    }
     fabric.util.enlivenObjects(objects, function(enlivenedObjects) {
       enlivenedObjects.forEach(function(obj, index) {
         _this.insertAt(obj, index, true);
@@ -11329,17 +11337,17 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       var cx = point.x, cy = point.y;
 
       if ( originX === "left" ) {
-        cx = point.x + this.getWidth() / 2;
+        cx = point.x + ( this.getWidth() + (this.strokeWidth*this.scaleX) )/ 2;
       }
       else if ( originX === "right" ) {
-        cx = point.x - this.getWidth() / 2;
+        cx = point.x - ( this.getWidth() + (this.strokeWidth*this.scaleX) ) / 2;
       }
 
       if ( originY === "top" ) {
-        cy = point.y + this.getHeight() / 2;
+        cy = point.y +( this.getHeight() + (this.strokeWidth*this.scaleY) ) / 2;
       }
       else if ( originY === "bottom" ) {
-        cy = point.y - this.getHeight() / 2;
+        cy = point.y - ( this.getHeight() + (this.strokeWidth*this.scaleY) )  / 2;
       }
 
       // Apply the reverse rotation to the point (it's already scaled properly)
@@ -11358,16 +11366,16 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
       // Get the point coordinates
       if ( originX === "left" ) {
-        x = center.x - this.getWidth() / 2;
+        x = center.x - ( this.getWidth() + (this.strokeWidth*this.scaleX) ) / 2;
       }
       else if ( originX === "right" ) {
-        x = center.x + this.getWidth() / 2;
+        x = center.x + ( this.getWidth() + (this.strokeWidth*this.scaleX) ) / 2;
       }
       if ( originY === "top" ) {
-        y = center.y - this.getHeight() / 2;
+        y = center.y - ( this.getHeight() + (this.strokeWidth*this.scaleY) )/ 2;
       }
       else if ( originY === "bottom" ) {
-        y = center.y + this.getHeight() / 2;
+        y = center.y + ( this.getHeight() + (this.strokeWidth*this.scaleY) )/ 2;
       }
 
       // Apply the rotation to the point (it's already scaled properly)
@@ -11415,20 +11423,20 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       var x, y;
       if (originX !== undefined && originY !== undefined) {
         if ( originX === "left" ) {
-          x = center.x - this.getWidth() / 2;
+          x = center.x - (this.getWidth() + this.strokeWidth*this.scaleX) / 2;
         }
         else if ( originX === "right" ) {
-          x = center.x + this.getWidth() / 2;
+          x = center.x + (this.getWidth() + this.strokeWidth*this.scaleX)/ 2;
         }
         else {
           x = center.x;
         }
 
         if ( originY === "top" ) {
-          y = center.y - this.getHeight() / 2;
+          y = center.y - (this.getHeight() + this.strokeWidth*this.scaleY) / 2;
         }
         else if ( originY === "bottom" ) {
-          y = center.y + this.getHeight() / 2;
+          y = center.y + (this.getHeight() + this.strokeWidth*this.scaleY)/ 2;
         }
         else {
           y = center.y;
