@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures` */
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.1.21" };
+var fabric = fabric || { version: "1.2.0" };
 
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
@@ -8612,17 +8612,34 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         }
       }
 
+      // adjust the mouse coordinates when dealing with padding      
+      if (abs(localMouse.x) > target.padding) {
+        if (localMouse.x < 0 ) {
+          localMouse.x += target.padding;
+        } else {
+          localMouse.x -= target.padding;
+        }
+      } else { // mouse is within the padding, set to 0
+        localMouse.x = 0;
+      }
+      
+      if (abs(localMouse.y) > target.padding) {
+        if (localMouse.y < 0 ) {
+          localMouse.y += target.padding;
+        } else {
+          localMouse.y -= target.padding;
+        }      
+      } else {
+        localMouse.y = 0;
+      }
+
       // Actually scale the object
       var newScaleX = target.scaleX, newScaleY = target.scaleY;
       if (by === 'equally' && !lockScalingX && !lockScalingY) {
-        var dist = Math.sqrt(Math.pow(localMouse.y,2) + Math.pow(localMouse.x,2));
-        var lastDist = Math.sqrt(Math.pow((target.height + (target.padding/2) + (target.strokeWidth/2)) * t.original.scaleY,2) +
-                       Math.pow((target.width + (target.padding/2) + (target.strokeWidth/2)) * t.original.scaleX,2));
-
-        if (localMouse.y < 0 || localMouse.x < 0) {
-          dist *= -1;
-        }
-
+        var dist = localMouse.y + localMouse.x;
+        var lastDist = (target.height + (target.strokeWidth)) * t.original.scaleY + 
+                       (target.width + (target.strokeWidth)) * t.original.scaleX;
+        
         // We use t.scaleX/Y instead of target.scaleX/Y because the object may have a min scale and we'll loose the proportions
         newScaleX = t.original.scaleX * dist/lastDist;
         newScaleY = t.original.scaleY * dist/lastDist;
@@ -8631,18 +8648,18 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         target.set('scaleY', newScaleY);
       }
       else if (!by) {
-        newScaleX = localMouse.x/(target.width+(target.padding/2)+(target.strokeWidth/2));
-        newScaleY = localMouse.y/(target.height+(target.padding/2)+(target.strokeWidth/2));
+        newScaleX = localMouse.x/(target.width+target.strokeWidth);
+        newScaleY = localMouse.y/(target.height+target.strokeWidth);
 
         lockScalingX || target.set('scaleX', newScaleX);
         lockScalingY || target.set('scaleY', newScaleY);
       }
       else if (by === 'x' && !target.get('lockUniScaling')) {
-        newScaleX = localMouse.x/(target.width+(target.padding/2)+(target.strokeWidth/2));
+        newScaleX = localMouse.x/(target.width + target.strokeWidth);
         lockScalingX || target.set('scaleX', newScaleX);
       }
       else if (by === 'y' && !target.get('lockUniScaling')) {
-        newScaleY = localMouse.y/(target.height+(target.padding/2)+(target.strokeWidth/2));
+        newScaleY = localMouse.y/(target.height + target.strokeWidth);
         lockScalingY || target.set('scaleY', newScaleY);
       }
 
