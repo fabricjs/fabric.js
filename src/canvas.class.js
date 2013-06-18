@@ -418,7 +418,11 @@
           // only if there's an active object
           if (target !== this._activeObject) {
             // and that object is not the actual target
-            var group = new fabric.Group([ this._activeObject, target ]);
+            var objects = this.getObjects();
+            var isActiveLower = objects.indexOf(this._activeObject) < objects.indexOf(target);
+            var group = new fabric.Group(
+              isActiveLower ? [ target, this._activeObject ] : [ this._activeObject, target ]);
+
             this.setActiveGroup(group);
             activeGroup = this.getActiveGroup();
             this.fire('selection:created', { target: activeGroup, e: e });
@@ -494,7 +498,7 @@
         }
       }
 
-      // adjust the mouse coordinates when dealing with padding      
+      // adjust the mouse coordinates when dealing with padding
       if (abs(localMouse.x) > target.padding) {
         if (localMouse.x < 0 ) {
           localMouse.x += target.padding;
@@ -504,13 +508,13 @@
       } else { // mouse is within the padding, set to 0
         localMouse.x = 0;
       }
-      
+
       if (abs(localMouse.y) > target.padding) {
         if (localMouse.y < 0 ) {
           localMouse.y += target.padding;
         } else {
           localMouse.y -= target.padding;
-        }      
+        }
       } else {
         localMouse.y = 0;
       }
@@ -519,9 +523,9 @@
       var newScaleX = target.scaleX, newScaleY = target.scaleY;
       if (by === 'equally' && !lockScalingX && !lockScalingY) {
         var dist = localMouse.y + localMouse.x;
-        var lastDist = (target.height + (target.strokeWidth)) * t.original.scaleY + 
+        var lastDist = (target.height + (target.strokeWidth)) * t.original.scaleY +
                        (target.width + (target.strokeWidth)) * t.original.scaleX;
-        
+
         // We use t.scaleX/Y instead of target.scaleX/Y because the object may have a min scale and we'll loose the proportions
         newScaleX = t.original.scaleX * dist/lastDist;
         newScaleY = t.original.scaleY * dist/lastDist;
