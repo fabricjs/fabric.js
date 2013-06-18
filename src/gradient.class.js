@@ -203,7 +203,7 @@
             opacity = this.colorStops[i].opacity,
             offset = this.colorStops[i].offset;
 
-        if (opacity) {
+        if (typeof opacity !== 'undefined') {
           color = new fabric.Color(color).setAlpha(opacity).toRgba();
         }
         gradient.addColorStop(parseFloat(offset), color);
