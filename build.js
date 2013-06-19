@@ -234,9 +234,12 @@ else {
       console.log('Built distribution to dist/all.js');
 
       exec(mininfierCmd, function (error, output) {
-        if (!error) {
-          console.log('Minified using', minifier, 'to dist/all.min.js');
+        if (error) {
+          console.error('Minification failed using', minifier, 'with', mininfierCmd);
+          process.exit(1);
         }
+        console.log('Minified using', minifier, 'to dist/all.min.js');
+
         exec('gzip -c dist/all.min.js > dist/all.min.js.gz', function (error, output) {
           console.log('Gzipped to dist/all.min.js.gz');
         });
