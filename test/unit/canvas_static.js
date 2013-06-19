@@ -352,6 +352,24 @@
     });
   });
 
+  test('toJSON custom properties non-existence check', function() {
+    var rect = new fabric.Rect({ width: 10, height: 20 });
+    rect.padding = 123;
+    canvas.add(rect);
+    rect.foo = 'bar';
+
+    canvas.bar = 456;
+
+    var data = canvas.toJSON(['padding', 'foo', 'bar', 'baz']);
+    ok('padding' in data.objects[0]);
+    ok('foo' in data.objects[0], 'foo shouldn\'t be included if it\'s not in an object');
+    ok(!('bar' in data.objects[0]), 'bar shouldn\'t be included if it\'s not in an object');
+    ok(!('baz' in data.objects[0]), 'bar shouldn\'t be included if it\'s not in an object');
+    ok(!('foo' in data));
+    ok(!('baz' in data));
+    ok('bar' in data);
+  });
+
   test('remove', function() {
     ok(typeof canvas.remove == 'function');
     var rect1 = makeRect(),
