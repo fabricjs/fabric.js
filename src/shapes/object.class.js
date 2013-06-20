@@ -146,6 +146,13 @@
     cornerColor:              'rgba(102,153,255,0.5)',
 
     /**
+     * When true, this object will center point as the origin of transformation
+     * when being resized via the controls.
+     * @type Boolean
+     */
+    centerTransform:        false,
+
+    /**
      * Color of object's fill
      * @type String
      * @default
