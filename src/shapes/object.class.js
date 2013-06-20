@@ -146,8 +146,8 @@
     cornerColor:              'rgba(102,153,255,0.5)',
 
     /**
-     * When true, this object will center point as the origin of transformation
-     * when being resized via the controls.
+     * When true, this object will use center point as the origin of transformation
+     * when being resized via the controls
      * @type Boolean
      */
     centerTransform:        false,
