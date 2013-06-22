@@ -247,23 +247,7 @@
     var object;
 
     if (elements.length > 1) {
-      //var hasText = elements.some(function(el) { return el.type === 'text'; });
-
-      // if (hasText) {
-      //   object = new fabric.Group([ ], options);
-      //   elements.reverse().forEach(function(obj) {
-      //     if (obj.cx) {
-      //       obj.left = obj.cx;
-      //     }
-      //     if (obj.cy) {
-      //       obj.top = obj.cy;
-      //     }
-      //     object.addWithUpdate(obj);
-      //   });
-      // }
-      // else {
-        object = new fabric.PathGroup(elements, options);
-      //}
+      object = new fabric.PathGroup(elements, options);
     }
     else {
       object = elements[0];
