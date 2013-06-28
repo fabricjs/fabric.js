@@ -7,7 +7,7 @@
    * fabric.Textbox A class to create TextBoxes, with or without images as their boxes
    */
   
-  var fabric = global.fabric || (global.fabric = { }), extend = fabric.util.object.extend, clone = fabric.util.object.clone, toFixed = fabric.util.toFixed;
+  var fabric = global.fabric || (global.fabric = { }), extend = fabric.util.object.extend, clone = fabric.util.object.clone;
 
   if (fabric.Textbox) {
     fabric.warn('fabric.Textbox is already defined');
@@ -21,7 +21,7 @@
   var stateProperties = fabric.Object.prototype.stateProperties.concat();
   // properties for the box and the text
   var newProperties = [
-  	'fontFamily',
+    'fontFamily',
     'fontWeight',
     'fontSize',
     'path',
@@ -55,7 +55,7 @@
    */
   fabric.Textbox = fabric.util.createClass(fabric.Object, /** @lends fabric.Textbox.prototype */
   {
-  	/**
+    /**
      * Type of an object
      * @type String
      * @default
@@ -317,7 +317,7 @@
 
       propertiesToInclude = propertiesToInclude.concat(newProperties);
 
-      return fabric.util.object.extend(this.callSuper('toObject', propertiesToInclude));
+      return extend(this.callSuper('toObject', propertiesToInclude));
     },
 
     /**
@@ -328,8 +328,8 @@
      * @chainable
      */
     toggle: function(property) {
-      this.boxImage.toggle(prop);
-      return this.callSuper('toggle', prop);
+      this.boxImage.toggle(property);
+      return this.callSuper('toggle', property);
     },
 
     /**
@@ -343,7 +343,7 @@
       else scale = scale.toLowerCase();
 
       if (!this.boxImage || !this.scaleTextPadding) {
-      	return this.textPadding;
+        return this.textPadding;
       } else {
         var scales = {}, originalScales = this.originalScales;
         if (originalScales) {
@@ -381,7 +381,7 @@
 
       if (this.boxImage) {
         // move and render the box image
-        this._moveImageBox(ctx);
+        this._moveImageBox();
         this.boxImage.render(ctx, true);
       }
 
@@ -409,17 +409,17 @@
      * @param {Boolean} noScale True if scale(x|y) must be reseted to 1, false if not
      */
     _preRenderTransform: function(ctx, noTransform, noScale) {
-    	var m = this.transformMatrix;
+      var m = this.transformMatrix;
       if (m && !this.group) {
         ctx.setTransform(m[0], m[1], m[2], m[3], m[4], m[5]);
       }
 
       if (!noTransform) {
-      	if (noScale) {
-	        this.originalScales = [this.scaleX, this.scaleY];
-	        this.scaleX = 1;
-	        this.scaleY = 1;
-	      }
+        if (noScale) {
+          this.originalScales = [this.scaleX, this.scaleY];
+          this.scaleX = 1;
+          this.scaleY = 1;
+        }
         this.transform(ctx);
       }
 
@@ -473,18 +473,18 @@
       var x = 0, y = 0;
 
       // horizontal alignment
-      if (this.textAlign == 'left') {
+      if (this.textAlign === 'left') {
         x = x - ((this.get("width") * scaleX) / 2) + (this.textObject.get('width') / 2) + (this.getTextPadding('x'));
-      } else if (this.textAlign == 'right') {
+      } else if (this.textAlign === 'right') {
         x = x + ((this.get("width") * scaleX) / 2) - (this.textObject.get('width') / 2) - (this.getTextPadding('x'));
       }
 
       // vertical alignment
-      if (this.vAlign == "top") {
+      if (this.vAlign === "top") {
         y = y + ((this.textObject.get('height') / 2)
             - ((this.get('height')*scaleY)/2)
           ) + (this.getTextPadding('y'));
-      } else if (this.vAlign == 'bottom') {
+      } else if (this.vAlign === 'bottom') {
         y = y - ((this.textObject.get('height') / 2)
             - ((this.get('height')*scaleY)/2)
           ) - (this.getTextPadding('y'));
@@ -596,9 +596,8 @@
     /**
      * Applyes the coordinates and dimensions to the box image
      * @method _moveImageBox
-     * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    _moveImageBox: function(ctx) {
+    _moveImageBox: function() {
       var x = (this.get('left') + (this.get('width') / 2)),
         y = (this.get('top'));
 
@@ -633,4 +632,4 @@
     });
     return instance;
   };
-})( typeof exports != 'undefined' ? exports : this);
+})( typeof exports !== 'undefined' ? exports : this);
