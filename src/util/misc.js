@@ -461,19 +461,11 @@
     var utilMin = fabric.util.array.min,
         utilMax = fabric.util.array.max;
 
-    var xBounds = [],
-        yBounds = [];
-
-    for (var i=0, len=points.length; i<len; i++) {
-      xBounds.push(Number(points[i].x));
-      yBounds.push(Number(points[i].y));
-    }
-
     var rect = {
-      x1: utilMin(xBounds),
-      y1: utilMin(yBounds),
-      x2: utilMax(xBounds),
-      y2: utilMax(yBounds)
+      x1: utilMin(points, 'x'),
+      y1: utilMin(points, 'y'),
+      x2: utilMax(points, 'x'),
+      y2: utilMax(points, 'y')
     };
 
     rect.width = rect.x2 - rect.x1;
