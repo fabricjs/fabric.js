@@ -180,17 +180,18 @@
     options || (options = { });
 
     var points = fabric.parsePointsAttribute(element.getAttribute('points')),
-        parsedAttributes = fabric.parseAttributes(element, fabric.Polygon.ATTRIBUTE_NAMES),
-        minX = min(points, 'x'),
-        minY = min(points, 'y');
+        parsedAttributes = fabric.parseAttributes(element, fabric.Polygon.ATTRIBUTE_NAMES);
 
-    minX = minX < 0 ? minX : 0;
-    minY = minX < 0 ? minY : 0;
+    var boundingRect = fabric.util.getBoundingRect(points);
+    var width = boundingRect.width;
+    var height = boundingRect.height;
+    options.top = boundingRect.y1 + height / 2;
+    options.left = boundingRect.x1 + width / 2;
 
     for (var i = 0, len = points.length; i < len; i++) {
-      // normalize coordinates, according to containing box (dimensions of which are passed via `options`)
-      points[i].x -= (options.width / 2 + minX) || 0;
-      points[i].y -= (options.height / 2 + minY) || 0;
+      // normalize coordinates, according to containing box (dimensions of which are calculated above)
+      points[i].x -= options.left;
+      points[i].y -= options.top;
     }
 
     return new fabric.Polygon(points, extend(parsedAttributes, options), true);
