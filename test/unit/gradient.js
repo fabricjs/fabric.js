@@ -213,6 +213,126 @@
     equal(gradient.colorStops[1].color, 'rgb(255,255,255)');
   });
 
+  test('fromElement linearGradient colorStop attributes/styles', function() {
+    ok(typeof fabric.Gradient.fromElement == 'function');
+
+    var element = fabric.document.createElement('linearGradient');
+    var stop1 = fabric.document.createElement('stop');
+    var stop2 = fabric.document.createElement('stop');
+    var stop3 = fabric.document.createElement('stop');
+    var stop4 = fabric.document.createElement('stop');
+
+    stop1.setAttribute('offset', '0%');
+    stop1.setAttribute('stop-color', '');
+    stop1.setAttribute('stop-opacity', '');
+
+    stop2.setAttribute('offset', '0.5');
+    stop2.setAttribute('style', 'stop-color: black; stop-opacity:;');
+    stop2.setAttribute('stop-color', 'white');
+
+    stop3.setAttribute('offset', '75%');
+    stop3.setAttribute('style', 'stop-color:; stop-opacity:;');
+    stop3.setAttribute('stop-opacity', '0.9');
+    stop3.setAttribute('stop-color', 'blue');
+
+    stop4.setAttribute('offset', '100%');
+    stop4.setAttribute('style', 'stop-color: red; stop-opacity: 0.5;');
+    stop4.setAttribute('stop-opacity', '0.9');
+
+    element.appendChild(stop1);
+    element.appendChild(stop2);
+    element.appendChild(stop3);
+    element.appendChild(stop4);
+
+    var object = new fabric.Object({ width: 100, height: 100 });
+    var gradient = fabric.Gradient.fromElement(element, object);
+
+    ok(gradient instanceof fabric.Gradient);
+
+    // TODO: need to double check these values
+
+    equal(gradient.coords.x1, 0);
+    equal(gradient.coords.y1, 0);
+
+    //equal(gradient.coords.x2, 100);
+    //equal(gradient.coords.y2, 100);
+
+    equal(gradient.colorStops[0].offset, 1);
+    equal(gradient.colorStops[1].offset, 0.75);
+    equal(gradient.colorStops[2].offset, 0.5);
+    equal(gradient.colorStops[3].offset, 0);
+
+    equal(gradient.colorStops[0].color, 'rgb(255,0,0)');
+    equal(gradient.colorStops[1].color, 'rgb(0,0,255)');
+    equal(gradient.colorStops[2].color, 'rgb(0,0,0)');
+    equal(gradient.colorStops[3].color, 'rgb(0,0,0)');
+
+    equal(gradient.colorStops[0].opacity, 0.5);
+    equal(gradient.colorStops[1].opacity, 0.9);
+    equal(gradient.colorStops[2].opacity, 1);
+    equal(gradient.colorStops[3].opacity, 1);
+  });
+
+  test('fromElement radialGradient colorStop attributes/styles', function() {
+    ok(typeof fabric.Gradient.fromElement == 'function');
+
+    var element = fabric.document.createElement('radialGradient');
+    var stop1 = fabric.document.createElement('stop');
+    var stop2 = fabric.document.createElement('stop');
+    var stop3 = fabric.document.createElement('stop');
+    var stop4 = fabric.document.createElement('stop');
+
+    stop1.setAttribute('offset', '0%');
+    stop1.setAttribute('stop-color', '');
+    stop1.setAttribute('stop-opacity', '');
+
+    stop2.setAttribute('offset', '0.5');
+    stop2.setAttribute('style', 'stop-color: black; stop-opacity:;');
+    stop2.setAttribute('stop-color', 'white');
+
+    stop3.setAttribute('offset', '75%');
+    stop3.setAttribute('style', 'stop-color:; stop-opacity:;');
+    stop3.setAttribute('stop-opacity', '0.9');
+    stop3.setAttribute('stop-color', 'blue');
+
+    stop4.setAttribute('offset', '100%');
+    stop4.setAttribute('style', 'stop-color: red; stop-opacity: 0.5;');
+    stop4.setAttribute('stop-opacity', '0.9');
+
+    element.appendChild(stop1);
+    element.appendChild(stop2);
+    element.appendChild(stop3);
+    element.appendChild(stop4);
+
+    var object = new fabric.Object({ width: 100, height: 100 });
+    var gradient = fabric.Gradient.fromElement(element, object);
+
+    ok(gradient instanceof fabric.Gradient);
+
+    // TODO: need to double check these values
+
+    equal(gradient.coords.x1, 0);
+    equal(gradient.coords.y1, 0);
+
+    //equal(gradient.coords.x2, 100);
+    //equal(gradient.coords.y2, 100);
+
+    equal(gradient.colorStops[0].offset, 1);
+    equal(gradient.colorStops[1].offset, 0.75);
+    equal(gradient.colorStops[2].offset, 0.5);
+    equal(gradient.colorStops[3].offset, 0);
+
+    equal(gradient.colorStops[0].color, 'rgb(255,0,0)');
+    equal(gradient.colorStops[1].color, 'rgb(0,0,255)');
+    equal(gradient.colorStops[2].color, 'rgb(0,0,0)');
+    equal(gradient.colorStops[3].color, 'rgb(0,0,0)');
+
+    equal(gradient.colorStops[0].opacity, 0.5);
+    equal(gradient.colorStops[1].opacity, 0.9);
+    equal(gradient.colorStops[2].opacity, 1);
+    equal(gradient.colorStops[3].opacity, 1);
+  });
+
   test('forObject linearCradient', function() {
     ok(typeof fabric.Gradient.forObject == 'function');
 
