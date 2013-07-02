@@ -32,7 +32,7 @@
     }
 
     if (!color) {
-      color = el.getAttribute('stop-color');
+      color = el.getAttribute('stop-color') || 'rgb(0,0,0)';
     }
     if (!opacity) {
       opacity = el.getAttribute('stop-opacity');
@@ -44,7 +44,7 @@
     return {
       offset: offset,
       color: color,
-      opacity: opacity
+      opacity: isNaN(parseFloat(opacity)) ? 1 : parseFloat(opacity)
     };
   }
   /* _FROM_SVG_END_ */
