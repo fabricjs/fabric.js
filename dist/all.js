@@ -3281,6 +3281,14 @@ fabric.util.string = {
         scrollLeft = body.scrollLeft || docElement.scrollLeft || 0;
         scrollTop = body.scrollTop ||  docElement.scrollTop || 0;
       }
+      /**
+      * by kwicher - makes it work in scrolling divs
+      */
+      else if (element === fabric.document ) {
+        scrollLeft = body.scrollLeft || docElement.scrollLeft || 0;
+        scrollTop = body.scrollTop ||  docElement.scrollTop || 0;
+      }
+      //end
       else {
         scrollLeft += element.scrollLeft || 0;
         scrollTop += element.scrollTop || 0;
