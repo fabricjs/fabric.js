@@ -1135,31 +1135,33 @@
     },
 
     /**
-     * Moves an object one level down in stack of drawn objects
+     * Moves an object down in stack of drawn objects
+     * @param intersecting {Boolean} If `true`, send object behind next lower intersecting object
      * @return {fabric.Object} thisArg
      * @chainable
      */
-    sendBackwards: function() {
+    sendBackwards: function(intersecting) {
       if (this.group) {
-        fabric.StaticCanvas.prototype.sendBackwards.call(this.group, this);
+        fabric.StaticCanvas.prototype.sendBackwards.call(this.group, this, intersecting);
       }
       else {
-        this.canvas.sendBackwards(this);
+        this.canvas.sendBackwards(this, intersecting);
       }
       return this;
     },
 
     /**
-     * Moves an object one level up in stack of drawn objects
+     * Moves an object up in stack of drawn objects
+     * @param intersecting {Boolean} If `true`, send object in front of next upper intersecting object
      * @return {fabric.Object} thisArg
      * @chainable
      */
-    bringForward: function() {
+    bringForward: function(intersecting) {
       if (this.group) {
-        fabric.StaticCanvas.prototype.bringForward.call(this.group, this);
+        fabric.StaticCanvas.prototype.bringForward.call(this.group, this, intersecting);
       }
       else {
-        this.canvas.bringForward(this);
+        this.canvas.bringForward(this, intersecting);
       }
       return this;
     },
