@@ -128,11 +128,12 @@ var filesToInclude = [
   ifSpecifiedInclude('parser', 'src/parser.js'),
 
   'src/point.class.js',
-  ifSpecifiedInclude('gradient', 'src/gradient.class.js'),
-  'src/pattern.class.js',
-  'src/shadow.class.js',
   'src/intersection.class.js',
   'src/color.class.js',
+
+  ifSpecifiedInclude('gradient', 'src/gradient.class.js'),
+  ifSpecifiedInclude('pattern', 'src/pattern.class.js'),
+  ifSpecifiedInclude('shadow', 'src/shadow.class.js'),
 
   'src/static_canvas.class.js',
 
