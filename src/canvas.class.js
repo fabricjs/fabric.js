@@ -671,9 +671,10 @@
           y2 = y1 + this._groupSelector.top,
           currentObject,
           selectionX1Y1 = new fabric.Point(min(x1, x2), min(y1, y2)),
-          selectionX2Y2 = new fabric.Point(max(x1, x2), max(y1, y2));
+          selectionX2Y2 = new fabric.Point(max(x1, x2), max(y1, y2)),
+          isClick = x1 == x2 && y1 === y2;
 
-      for (var i = 0, len = this._objects.length; i < len; ++i) {
+      for (var i = this._objects.length; i--; ) {
         currentObject = this._objects[i];
 
         if (!currentObject) continue;
@@ -686,6 +687,9 @@
           if (this.selection && currentObject.selectable) {
             currentObject.set('active', true);
             group.push(currentObject);
+
+            // only add one object if it's a click
+            if (isClick) break;
           }
         }
       }
@@ -695,7 +699,7 @@
         this.setActiveObject(group[0], e);
       }
       else if (group.length > 1) {
-        group = new fabric.Group(group);
+        group = new fabric.Group(group.reverse());
         this.setActiveGroup(group);
         group.saveCoords();
         this.fire('selection:created', { target: group });
