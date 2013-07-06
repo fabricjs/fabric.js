@@ -99,10 +99,12 @@
      * @param {Object} [options] Options object
      */
     _initializePath: function (options) {
-      var isWidthSet = 'width' in options,
-          isHeightSet = 'height' in options,
+      var isWidthSet = 'width' in options && options.width != null,
+          isHeightSet = 'height' in options && options.width != null,
           isLeftSet = 'left' in options,
-          isTopSet = 'top' in options;
+          isTopSet = 'top' in options,
+          origLeft = isLeftSet ? this.left : 0,
+          origTop = isTopSet ? this.top : 0;
 
       if (!isWidthSet || !isHeightSet) {
         extend(this, this._parseDimensions());
@@ -121,17 +123,17 @@
           this.left = this.width / 2;
         }
       }
-      this.pathOffset = this.pathOffset || this._calculatePathOffset(isTopSet || isLeftSet); //Save top-left coords as offset
+      this.pathOffset = this.pathOffset || this._calculatePathOffset(origLeft, origTop); //Save top-left coords as offset
     },
 
     /**
      * @private
      * @param {Boolean} positionSet When false, path offset is returned otherwise 0
      */
-    _calculatePathOffset: function (positionSet) {
+    _calculatePathOffset: function (origLeft, origTop) {
       return {
-        x: positionSet ? 0 : this.left - (this.width / 2),
-        y: positionSet ? 0 : this.top - (this.height / 2)
+        x: this.left - origLeft - (this.width / 2),
+        y: this.top - origTop - (this.height / 2)
       };
     },
 
@@ -488,7 +490,8 @@
      */
     toObject: function(propertiesToInclude) {
       var o = extend(this.callSuper('toObject', propertiesToInclude), {
-        path: this.path
+        path: this.path,
+        pathOffset: this.pathOffset
       });
       if (this.sourcePath) {
         o.sourcePath = this.sourcePath;
@@ -663,8 +666,8 @@
           deltaY = maxY - minY;
 
       var o = {
-        left: minX + deltaX / 2,
-        top: minY + deltaY / 2,
+        left: this.left + (minX + deltaX / 2),
+        top: this.top + (minY + deltaY / 2),
         width: deltaX,
         height: deltaY
       };
