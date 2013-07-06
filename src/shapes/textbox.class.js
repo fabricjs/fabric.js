@@ -38,8 +38,10 @@
     'textPadding',
     'boxPath',
     'vAlign',
+    'fill',
     'boxImageScaleX',
-    'boxImageScaleY'
+    'boxImageScaleY',
+    'wrappedText'
   ];
   
   stateProperties = stateProperties.concat(newProperties);
@@ -227,7 +229,13 @@
      * @type String
      * @default
      */
-    fill: "rgba(221,204,197,0.6)",
+    fill: "#000000",
+
+    /**
+     * The wrapped text with the calculated line breaks
+     *  @type String
+    */
+    wrappedText: '',
 
     /**
      * @method initialize
@@ -244,10 +252,10 @@
 
       var _this = this;
 
-      var createBox = function(objects, options) {
+      var createBox = function(objects, opt) {
         var boxImage = {};
         if (objects.length > 1) {
-          var opts = clone(options);
+          var opts = clone(opt);
           boxImage = new fabric.PathGroup(objects, opts);
         } else {
           if (Object.prototype.toString.call(objects) === "[object Array]") {
@@ -381,8 +389,8 @@
 
       if (this.boxImage) {
         // move and render the box image
-        this._moveImageBox();
-        this.boxImage.render(ctx, true);
+        this._moveImageBox(ctx);
+        this.boxImage.render(ctx, noTransform);
       }
 
       if (this.textObject) {
@@ -445,9 +453,7 @@
           w = this.width,
           h = this.height;
 
-        ctx.fillStyle = this.fill.toLive
-          ? this.fill.toLive(ctx)
-          : this.fill;
+        ctx.fillStyle = "rgba(221,204,197,0.6)";
 
         ctx.fillRect(x, y, w, h);
 
@@ -531,7 +537,8 @@
         wrapped_text.push(line);
       }
 
-      return wrapped_text.join("\n");
+      this.wrappedText = wrapped_text.join("\n");
+      return this.wrappedText;
     },
 
     /**
@@ -596,8 +603,9 @@
     /**
      * Applyes the coordinates and dimensions to the box image
      * @method _moveImageBox
+     * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    _moveImageBox: function() {
+    _moveImageBox: function(ctx) {
       var x = (this.get('left') + (this.get('width') / 2)),
         y = (this.get('top'));
 
