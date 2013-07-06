@@ -672,7 +672,7 @@
           currentObject,
           selectionX1Y1 = new fabric.Point(min(x1, x2), min(y1, y2)),
           selectionX2Y2 = new fabric.Point(max(x1, x2), max(y1, y2)),
-          isClick = x1 == x2 && y1 === y2;
+          isClick = x1 === x2 && y1 === y2;
 
       for (var i = this._objects.length; i--; ) {
         currentObject = this._objects[i];

@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures` */
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.2.0" };
+var fabric = fabric || { version: "1.2.1" };
 
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
@@ -2249,23 +2249,7 @@ fabric.Collection = {
     var object;
 
     if (elements.length > 1) {
-      //var hasText = elements.some(function(el) { return el.type === 'text'; });
-
-      // if (hasText) {
-      //   object = new fabric.Group([ ], options);
-      //   elements.reverse().forEach(function(obj) {
-      //     if (obj.cx) {
-      //       obj.left = obj.cx;
-      //     }
-      //     if (obj.cy) {
-      //       obj.top = obj.cy;
-      //     }
-      //     object.addWithUpdate(obj);
-      //   });
-      // }
-      // else {
-        object = new fabric.PathGroup(elements, options);
-      //}
+      object = new fabric.PathGroup(elements, options);
     }
     else {
       object = elements[0];
@@ -2288,7 +2272,9 @@ fabric.Collection = {
   function populateWithProperties(source, destination, properties) {
     if (properties && Object.prototype.toString.call(properties) === '[object Array]') {
       for (var i = 0, len = properties.length; i < len; i++) {
-        destination[properties[i]] = source[properties[i]];
+        if (properties[i] in source) {
+          destination[properties[i]] = source[properties[i]];
+        }
       }
     }
   }
@@ -5226,543 +5212,6 @@ fabric.util.string = {
 })(typeof exports !== 'undefined' ? exports : this);
 
 
-(function() {
-
-  /* _FROM_SVG_START_ */
-  function getColorStop(el) {
-    var style = el.getAttribute('style'),
-        offset = el.getAttribute('offset'),
-        color, opacity;
-
-    // convert percents to absolute values
-    offset = parseFloat(offset) / (/%$/.test(offset) ? 100 : 1);
-
-    if (style) {
-      var keyValuePairs = style.split(/\s*;\s*/);
-
-      if (keyValuePairs[keyValuePairs.length-1] === '') {
-        keyValuePairs.pop();
-      }
-
-      for (var i = keyValuePairs.length; i--; ) {
-
-        var split = keyValuePairs[i].split(/\s*:\s*/),
-            key = split[0].trim(),
-            value = split[1].trim();
-
-        if (key === 'stop-color') {
-          color = value;
-        }
-        else if (key === 'stop-opacity') {
-          opacity = value;
-        }
-      }
-    }
-
-    if (!color) {
-      color = el.getAttribute('stop-color');
-    }
-    if (!opacity) {
-      opacity = el.getAttribute('stop-opacity');
-    }
-
-    // convert rgba color to rgb color - alpha value has no affect in svg
-    color = new fabric.Color(color).toRgb();
-
-    return {
-      offset: offset,
-      color: color,
-      opacity: opacity
-    };
-  }
-  /* _FROM_SVG_END_ */
-
-  /**
-   * Gradient class
-   * @class fabric.Gradient
-   */
-  fabric.Gradient = fabric.util.createClass(/** @lends fabric.Gradient.prototype */ {
-
-    /**
-     * Constructor
-     * @param {Object} [options] Options object with type, coords, gradientUnits and colorStops
-     * @return {fabric.Gradient} thisArg
-     */
-    initialize: function(options) {
-      options || (options = { });
-
-      var coords = { };
-
-      this.id = fabric.Object.__uid++;
-      this.type = options.type || 'linear';
-
-      coords = {
-        x1: options.coords.x1 || 0,
-        y1: options.coords.y1 || 0,
-        x2: options.coords.x2 || 0,
-        y2: options.coords.y2 || 0
-      };
-
-      if (this.type === 'radial') {
-        coords.r1 = options.coords.r1 || 0;
-        coords.r2 = options.coords.r2 || 0;
-      }
-
-      this.coords = coords;
-      this.gradientUnits = options.gradientUnits || 'objectBoundingBox';
-      this.colorStops = options.colorStops.slice();
-    },
-
-    /**
-     * Adds another colorStop
-     * @param {Object} colorStop Object with offset and color
-     * @return {fabric.Gradient} thisArg
-     */
-    addColorStop: function(colorStop) {
-      for (var position in colorStop) {
-        var color = new fabric.Color(colorStop[position]);
-        this.colorStops.push({offset: position, color: color.toRgb(), opacity: color.getAlpha()});
-      }
-      return this;
-    },
-
-    /**
-     * Returns object representation of a gradient
-     * @return {Object}
-     */
-    toObject: function() {
-      return {
-        type: this.type,
-        coords: this.coords,
-        gradientUnits: this.gradientUnits,
-        colorStops: this.colorStops
-      };
-    },
-
-    /* _TO_SVG_START_ */
-    /**
-     * Returns SVG representation of an gradient
-     * @param {Object} object Object to create a gradient for
-     * @param {Boolean} normalize Whether coords should be normalized
-     * @return {String} SVG representation of an gradient (linear/radial)
-     */
-    toSVG: function(object, normalize) {
-      var coords = fabric.util.object.clone(this.coords),
-          markup;
-
-      // colorStops must be sorted ascending
-      this.colorStops.sort(function(a, b) {
-        return a.offset - b.offset;
-      });
-
-      if (normalize && this.gradientUnits === 'userSpaceOnUse') {
-        coords.x1 += object.width / 2;
-        coords.y1 += object.height / 2;
-        coords.x2 += object.width / 2;
-        coords.y2 += object.height / 2;
-      }
-      else if (this.gradientUnits === 'objectBoundingBox') {
-        _convertValuesToPercentUnits(object, coords);
-      }
-
-      if (this.type === 'linear') {
-        markup = [
-          '<linearGradient ',
-            'id="SVGID_', this.id,
-            '" gradientUnits="', this.gradientUnits,
-            '" x1="', coords.x1,
-            '" y1="', coords.y1,
-            '" x2="', coords.x2,
-            '" y2="', coords.y2,
-          '">'
-        ];
-      }
-      else if (this.type === 'radial') {
-        markup = [
-          '<radialGradient ',
-            'id="SVGID_', this.id,
-            '" gradientUnits="', this.gradientUnits,
-            '" cx="', coords.x2,
-            '" cy="', coords.y2,
-            '" r="', coords.r2,
-            '" fx="', coords.x1,
-            '" fy="', coords.y1,
-          '">'
-        ];
-      }
-
-      for (var i = 0; i < this.colorStops.length; i++) {
-        markup.push(
-          '<stop ',
-            'offset="', (this.colorStops[i].offset * 100) + '%',
-            '" style="stop-color:', this.colorStops[i].color,
-            (this.colorStops[i].opacity ? ';stop-opacity: ' + this.colorStops[i].opacity : ';'),
-          '"/>'
-        );
-      }
-
-      markup.push((this.type === 'linear' ? '</linearGradient>' : '</radialGradient>'));
-
-      return markup.join('');
-    },
-    /* _TO_SVG_END_ */
-
-    /**
-     * Returns an instance of CanvasGradient
-     * @param ctx
-     * @return {CanvasGradient}
-     */
-    toLive: function(ctx) {
-      var gradient;
-
-      if (!this.type) return;
-
-      if (this.type === 'linear') {
-        gradient = ctx.createLinearGradient(
-          this.coords.x1, this.coords.y1, this.coords.x2, this.coords.y2);
-      }
-      else if (this.type === 'radial') {
-        gradient = ctx.createRadialGradient(
-          this.coords.x1, this.coords.y1, this.coords.r1, this.coords.x2, this.coords.y2, this.coords.r2);
-      }
-
-      for (var i = 0, len = this.colorStops.length; i < len; i++) {
-        var color = this.colorStops[i].color,
-            opacity = this.colorStops[i].opacity,
-            offset = this.colorStops[i].offset;
-
-        if (opacity) {
-          color = new fabric.Color(color).setAlpha(opacity).toRgba();
-        }
-        gradient.addColorStop(parseFloat(offset), color);
-      }
-
-      return gradient;
-    }
-  });
-
-  fabric.util.object.extend(fabric.Gradient, {
-
-    /* _FROM_SVG_START_ */
-    /**
-     * Returns {@link fabric.Gradient} instance from an SVG element
-     * @static
-     * @memberof fabric.Gradient
-     * @see http://www.w3.org/TR/SVG/pservers.html#LinearGradientElement
-     * @see http://www.w3.org/TR/SVG/pservers.html#RadialGradientElement
-     */
-    fromElement: function(el, instance) {
-
-      /**
-       *  @example:
-       *
-       *  <linearGradient id="linearGrad1">
-       *    <stop offset="0%" stop-color="white"/>
-       *    <stop offset="100%" stop-color="black"/>
-       *  </linearGradient>
-       *
-       *  OR
-       *
-       *  <linearGradient id="linearGrad2">
-       *    <stop offset="0" style="stop-color:rgb(255,255,255)"/>
-       *    <stop offset="1" style="stop-color:rgb(0,0,0)"/>
-       *  </linearGradient>
-       *
-       *  OR
-       *
-       *  <radialGradient id="radialGrad1">
-       *    <stop offset="0%" stop-color="white" stop-opacity="1" />
-       *    <stop offset="50%" stop-color="black" stop-opacity="0.5" />
-       *    <stop offset="100%" stop-color="white" stop-opacity="1" />
-       *  </radialGradient>
-       *
-       *  OR
-       *
-       *  <radialGradient id="radialGrad2">
-       *    <stop offset="0" stop-color="rgb(255,255,255)" />
-       *    <stop offset="0.5" stop-color="rgb(0,0,0)" />
-       *    <stop offset="1" stop-color="rgb(255,255,255)" />
-       *  </radialGradient>
-       *
-       */
-
-      var colorStopEls = el.getElementsByTagName('stop'),
-          type = (el.nodeName === 'linearGradient' ? 'linear' : 'radial'),
-          gradientUnits = el.getAttribute('gradientUnits') || 'objectBoundingBox',
-          colorStops = [],
-          coords = { };
-
-      if (type === 'linear') {
-        coords = {
-          x1: el.getAttribute('x1') || 0,
-          y1: el.getAttribute('y1') || 0,
-          x2: el.getAttribute('x2') || '100%',
-          y2: el.getAttribute('y2') || 0
-        };
-      }
-      else if (type === 'radial') {
-        coords = {
-          x1: el.getAttribute('fx') || el.getAttribute('cx') || '50%',
-          y1: el.getAttribute('fy') || el.getAttribute('cy') || '50%',
-          r1: 0,
-          x2: el.getAttribute('cx') || '50%',
-          y2: el.getAttribute('cy') || '50%',
-          r2: el.getAttribute('r') || '50%'
-        };
-      }
-
-      for (var i = colorStopEls.length; i--; ) {
-        colorStops.push(getColorStop(colorStopEls[i]));
-      }
-
-      _convertPercentUnitsToValues(instance, coords);
-
-      return new fabric.Gradient({
-        type: type,
-        coords: coords,
-        gradientUnits: gradientUnits,
-        colorStops: colorStops
-      });
-    },
-    /* _FROM_SVG_END_ */
-
-    /**
-     * Returns {@link fabric.Gradient} instance from its object representation
-     * @static
-     * @param {Object} obj
-     * @param {Object} [options] Options object
-     * @memberof fabric.Gradient
-     */
-    forObject: function(obj, options) {
-      options || (options = { });
-      _convertPercentUnitsToValues(obj, options);
-      return new fabric.Gradient(options);
-    }
-  });
-
-  /**
-   * @private
-   */
-  function _convertPercentUnitsToValues(object, options) {
-    for (var prop in options) {
-      if (typeof options[prop] === 'string' && /^\d+%$/.test(options[prop])) {
-        var percents = parseFloat(options[prop], 10);
-        if (prop === 'x1' || prop === 'x2' || prop === 'r2') {
-          options[prop] = fabric.util.toFixed(object.width * percents / 100, 2);
-        }
-        else if (prop === 'y1' || prop === 'y2') {
-          options[prop] = fabric.util.toFixed(object.height * percents / 100, 2);
-        }
-      }
-      // normalize rendering point (should be from top/left corner rather than center of the shape)
-      if (prop === 'x1' || prop === 'x2') {
-        options[prop] -= fabric.util.toFixed(object.width / 2, 2);
-      }
-      else if (prop === 'y1' || prop === 'y2') {
-        options[prop] -= fabric.util.toFixed(object.height / 2, 2);
-      }
-    }
-  }
-
-  /* _TO_SVG_START_ */
-  /**
-   * @private
-   */
-  function _convertValuesToPercentUnits(object, options) {
-    for (var prop in options) {
-      // normalize rendering point (should be from center rather than top/left corner of the shape)
-      if (prop === 'x1' || prop === 'x2') {
-        options[prop] += fabric.util.toFixed(object.width / 2, 2);
-      }
-      else if (prop === 'y1' || prop === 'y2') {
-        options[prop] += fabric.util.toFixed(object.height / 2, 2);
-      }
-      // convert to percent units
-      if (prop === 'x1' || prop === 'x2' || prop === 'r2') {
-        options[prop] = fabric.util.toFixed(options[prop] / object.width * 100, 2) + '%';
-      }
-      else if (prop === 'y1' || prop === 'y2') {
-        options[prop] = fabric.util.toFixed(options[prop] / object.height * 100, 2) + '%';
-      }
-    }
-  }
-  /* _TO_SVG_END_ */
-
-})();
-
-
-/**
- * Pattern class
- * @class fabric.Pattern
- */
-fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ {
-
-  /**
-   * Repeat property of a pattern (one of repeat, repeat-x, repeat-y)
-   * @type String
-   */
-  repeat: 'repeat',
-
-  /**
-   * Pattern horizontal offset from object's left/top corner
-   * @type Number
-   */
-  offsetX: 0,
-
-  /**
-   * Pattern vertical offset from object's left/top corner
-   * @type Number
-   */
-  offsetY: 0,
-
-  /**
-   * Constructor
-   * @param {Object} [options]
-   * @return {fabric.Pattern} thisArg
-   */
-  initialize: function(options) {
-    options || (options = { });
-
-    if (options.source) {
-      if (typeof options.source === 'string') {
-        // function string
-        if (typeof fabric.util.getFunctionBody(options.source) !== 'undefined') {
-          this.source = new Function(fabric.util.getFunctionBody(options.source));
-        }
-        else {
-          // img src string
-          var _this = this;
-          this.source = fabric.util.createImage();
-          fabric.util.loadImage(options.source, function(img) {
-            _this.source = img;
-          });
-        }
-      }
-      else {
-        // img element
-        this.source = options.source;
-      }
-    }
-    if (options.repeat) {
-      this.repeat = options.repeat;
-    }
-    if (options.offsetX) {
-      this.offsetX = options.offsetX;
-    }
-    if (options.offsetY) {
-      this.offsetY = options.offsetY;
-    }
-  },
-
-  /**
-   * Returns object representation of a pattern
-   * @return {Object}
-   */
-  toObject: function() {
-
-    var source;
-
-    // callback
-    if (typeof this.source === 'function') {
-      source = String(this.source);
-    }
-    // <img> element
-    else if (typeof this.source.src === 'string') {
-      source = this.source.src;
-    }
-
-    return {
-      source: source,
-      repeat: this.repeat,
-      offsetX: this.offsetX,
-      offsetY: this.offsetY
-    };
-  },
-
-  /**
-   * Returns an instance of CanvasPattern
-   * @param ctx
-   * @return {CanvasPattern}
-   */
-  toLive: function(ctx) {
-    var source = typeof this.source === 'function' ? this.source() : this.source;
-    return ctx.createPattern(source, this.repeat);
-  }
-});
-
-
-/**
- * Shadow class
- * @class fabric.Shadow
- */
-fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
-
-  /**
-   * Shadow color
-   * @type String
-   */
-  color: 'rgb(0,0,0)',
-
-  /**
-   * Shadow blur
-   * @type Number
-   */
-  blur: 0,
-
-  /**
-   * Shadow horizontal offset
-   * @type Number
-   */
-  offsetX: 0,
-
-  /**
-   * Shadow vertical offset
-   * @type Number
-   */
-  offsetY: 0,
-
-  /**
-   * Whether the shadow should affect stroke operations
-   * @type Boolean
-   */
-  affectStroke: false,
-
-  /**
-   * Constructor
-   * @param [options] Options object with any of color, blur, offsetX, offsetX properties
-   * @return {fabric.Shadow} thisArg
-   */
-  initialize: function(options) {
-    for (var prop in options) {
-      this[prop] = options[prop];
-    }
-  },
-
-  /**
-   * Returns object representation of a shadow
-   * @return {Object}
-   */
-  toObject: function() {
-    return {
-      color: this.color,
-      blur: this.blur,
-      offsetX: this.offsetX,
-      offsetY: this.offsetY
-    };
-  },
-
-  /* _TO_SVG_START_ */
-  /**
-   * Returns SVG representation of a shadow
-   * @return {String}
-   */
-  toSVG: function() {
-
-  }
-  /* _TO_SVG_END_ */
-});
-
-
 (function(global) {
 
   "use strict";
@@ -6375,6 +5824,543 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
   };
 
 })(typeof exports !== 'undefined' ? exports : this);
+
+
+(function() {
+
+  /* _FROM_SVG_START_ */
+  function getColorStop(el) {
+    var style = el.getAttribute('style'),
+        offset = el.getAttribute('offset'),
+        color, opacity;
+
+    // convert percents to absolute values
+    offset = parseFloat(offset) / (/%$/.test(offset) ? 100 : 1);
+
+    if (style) {
+      var keyValuePairs = style.split(/\s*;\s*/);
+
+      if (keyValuePairs[keyValuePairs.length-1] === '') {
+        keyValuePairs.pop();
+      }
+
+      for (var i = keyValuePairs.length; i--; ) {
+
+        var split = keyValuePairs[i].split(/\s*:\s*/),
+            key = split[0].trim(),
+            value = split[1].trim();
+
+        if (key === 'stop-color') {
+          color = value;
+        }
+        else if (key === 'stop-opacity') {
+          opacity = value;
+        }
+      }
+    }
+
+    if (!color) {
+      color = el.getAttribute('stop-color') || 'rgb(0,0,0)';
+    }
+    if (!opacity) {
+      opacity = el.getAttribute('stop-opacity');
+    }
+
+    // convert rgba color to rgb color - alpha value has no affect in svg
+    color = new fabric.Color(color).toRgb();
+
+    return {
+      offset: offset,
+      color: color,
+      opacity: isNaN(parseFloat(opacity)) ? 1 : parseFloat(opacity)
+    };
+  }
+  /* _FROM_SVG_END_ */
+
+  /**
+   * Gradient class
+   * @class fabric.Gradient
+   */
+  fabric.Gradient = fabric.util.createClass(/** @lends fabric.Gradient.prototype */ {
+
+    /**
+     * Constructor
+     * @param {Object} [options] Options object with type, coords, gradientUnits and colorStops
+     * @return {fabric.Gradient} thisArg
+     */
+    initialize: function(options) {
+      options || (options = { });
+
+      var coords = { };
+
+      this.id = fabric.Object.__uid++;
+      this.type = options.type || 'linear';
+
+      coords = {
+        x1: options.coords.x1 || 0,
+        y1: options.coords.y1 || 0,
+        x2: options.coords.x2 || 0,
+        y2: options.coords.y2 || 0
+      };
+
+      if (this.type === 'radial') {
+        coords.r1 = options.coords.r1 || 0;
+        coords.r2 = options.coords.r2 || 0;
+      }
+
+      this.coords = coords;
+      this.gradientUnits = options.gradientUnits || 'objectBoundingBox';
+      this.colorStops = options.colorStops.slice();
+    },
+
+    /**
+     * Adds another colorStop
+     * @param {Object} colorStop Object with offset and color
+     * @return {fabric.Gradient} thisArg
+     */
+    addColorStop: function(colorStop) {
+      for (var position in colorStop) {
+        var color = new fabric.Color(colorStop[position]);
+        this.colorStops.push({offset: position, color: color.toRgb(), opacity: color.getAlpha()});
+      }
+      return this;
+    },
+
+    /**
+     * Returns object representation of a gradient
+     * @return {Object}
+     */
+    toObject: function() {
+      return {
+        type: this.type,
+        coords: this.coords,
+        gradientUnits: this.gradientUnits,
+        colorStops: this.colorStops
+      };
+    },
+
+    /* _TO_SVG_START_ */
+    /**
+     * Returns SVG representation of an gradient
+     * @param {Object} object Object to create a gradient for
+     * @param {Boolean} normalize Whether coords should be normalized
+     * @return {String} SVG representation of an gradient (linear/radial)
+     */
+    toSVG: function(object, normalize) {
+      var coords = fabric.util.object.clone(this.coords),
+          markup;
+
+      // colorStops must be sorted ascending
+      this.colorStops.sort(function(a, b) {
+        return a.offset - b.offset;
+      });
+
+      if (normalize && this.gradientUnits === 'userSpaceOnUse') {
+        coords.x1 += object.width / 2;
+        coords.y1 += object.height / 2;
+        coords.x2 += object.width / 2;
+        coords.y2 += object.height / 2;
+      }
+      else if (this.gradientUnits === 'objectBoundingBox') {
+        _convertValuesToPercentUnits(object, coords);
+      }
+
+      if (this.type === 'linear') {
+        markup = [
+          '<linearGradient ',
+            'id="SVGID_', this.id,
+            '" gradientUnits="', this.gradientUnits,
+            '" x1="', coords.x1,
+            '" y1="', coords.y1,
+            '" x2="', coords.x2,
+            '" y2="', coords.y2,
+          '">'
+        ];
+      }
+      else if (this.type === 'radial') {
+        markup = [
+          '<radialGradient ',
+            'id="SVGID_', this.id,
+            '" gradientUnits="', this.gradientUnits,
+            '" cx="', coords.x2,
+            '" cy="', coords.y2,
+            '" r="', coords.r2,
+            '" fx="', coords.x1,
+            '" fy="', coords.y1,
+          '">'
+        ];
+      }
+
+      for (var i = 0; i < this.colorStops.length; i++) {
+        markup.push(
+          '<stop ',
+            'offset="', (this.colorStops[i].offset * 100) + '%',
+            '" style="stop-color:', this.colorStops[i].color,
+            (this.colorStops[i].opacity ? ';stop-opacity: ' + this.colorStops[i].opacity : ';'),
+          '"/>'
+        );
+      }
+
+      markup.push((this.type === 'linear' ? '</linearGradient>' : '</radialGradient>'));
+
+      return markup.join('');
+    },
+    /* _TO_SVG_END_ */
+
+    /**
+     * Returns an instance of CanvasGradient
+     * @param ctx
+     * @return {CanvasGradient}
+     */
+    toLive: function(ctx) {
+      var gradient;
+
+      if (!this.type) return;
+
+      if (this.type === 'linear') {
+        gradient = ctx.createLinearGradient(
+          this.coords.x1, this.coords.y1, this.coords.x2, this.coords.y2);
+      }
+      else if (this.type === 'radial') {
+        gradient = ctx.createRadialGradient(
+          this.coords.x1, this.coords.y1, this.coords.r1, this.coords.x2, this.coords.y2, this.coords.r2);
+      }
+
+      for (var i = 0, len = this.colorStops.length; i < len; i++) {
+        var color = this.colorStops[i].color,
+            opacity = this.colorStops[i].opacity,
+            offset = this.colorStops[i].offset;
+
+        if (typeof opacity !== 'undefined') {
+          color = new fabric.Color(color).setAlpha(opacity).toRgba();
+        }
+        gradient.addColorStop(parseFloat(offset), color);
+      }
+
+      return gradient;
+    }
+  });
+
+  fabric.util.object.extend(fabric.Gradient, {
+
+    /* _FROM_SVG_START_ */
+    /**
+     * Returns {@link fabric.Gradient} instance from an SVG element
+     * @static
+     * @memberof fabric.Gradient
+     * @see http://www.w3.org/TR/SVG/pservers.html#LinearGradientElement
+     * @see http://www.w3.org/TR/SVG/pservers.html#RadialGradientElement
+     */
+    fromElement: function(el, instance) {
+
+      /**
+       *  @example:
+       *
+       *  <linearGradient id="linearGrad1">
+       *    <stop offset="0%" stop-color="white"/>
+       *    <stop offset="100%" stop-color="black"/>
+       *  </linearGradient>
+       *
+       *  OR
+       *
+       *  <linearGradient id="linearGrad2">
+       *    <stop offset="0" style="stop-color:rgb(255,255,255)"/>
+       *    <stop offset="1" style="stop-color:rgb(0,0,0)"/>
+       *  </linearGradient>
+       *
+       *  OR
+       *
+       *  <radialGradient id="radialGrad1">
+       *    <stop offset="0%" stop-color="white" stop-opacity="1" />
+       *    <stop offset="50%" stop-color="black" stop-opacity="0.5" />
+       *    <stop offset="100%" stop-color="white" stop-opacity="1" />
+       *  </radialGradient>
+       *
+       *  OR
+       *
+       *  <radialGradient id="radialGrad2">
+       *    <stop offset="0" stop-color="rgb(255,255,255)" />
+       *    <stop offset="0.5" stop-color="rgb(0,0,0)" />
+       *    <stop offset="1" stop-color="rgb(255,255,255)" />
+       *  </radialGradient>
+       *
+       */
+
+      var colorStopEls = el.getElementsByTagName('stop'),
+          type = (el.nodeName === 'linearGradient' ? 'linear' : 'radial'),
+          gradientUnits = el.getAttribute('gradientUnits') || 'objectBoundingBox',
+          colorStops = [],
+          coords = { };
+
+      if (type === 'linear') {
+        coords = {
+          x1: el.getAttribute('x1') || 0,
+          y1: el.getAttribute('y1') || 0,
+          x2: el.getAttribute('x2') || '100%',
+          y2: el.getAttribute('y2') || 0
+        };
+      }
+      else if (type === 'radial') {
+        coords = {
+          x1: el.getAttribute('fx') || el.getAttribute('cx') || '50%',
+          y1: el.getAttribute('fy') || el.getAttribute('cy') || '50%',
+          r1: 0,
+          x2: el.getAttribute('cx') || '50%',
+          y2: el.getAttribute('cy') || '50%',
+          r2: el.getAttribute('r') || '50%'
+        };
+      }
+
+      for (var i = colorStopEls.length; i--; ) {
+        colorStops.push(getColorStop(colorStopEls[i]));
+      }
+
+      _convertPercentUnitsToValues(instance, coords);
+
+      return new fabric.Gradient({
+        type: type,
+        coords: coords,
+        gradientUnits: gradientUnits,
+        colorStops: colorStops
+      });
+    },
+    /* _FROM_SVG_END_ */
+
+    /**
+     * Returns {@link fabric.Gradient} instance from its object representation
+     * @static
+     * @param {Object} obj
+     * @param {Object} [options] Options object
+     * @memberof fabric.Gradient
+     */
+    forObject: function(obj, options) {
+      options || (options = { });
+      _convertPercentUnitsToValues(obj, options);
+      return new fabric.Gradient(options);
+    }
+  });
+
+  /**
+   * @private
+   */
+  function _convertPercentUnitsToValues(object, options) {
+    for (var prop in options) {
+      if (typeof options[prop] === 'string' && /^\d+%$/.test(options[prop])) {
+        var percents = parseFloat(options[prop], 10);
+        if (prop === 'x1' || prop === 'x2' || prop === 'r2') {
+          options[prop] = fabric.util.toFixed(object.width * percents / 100, 2);
+        }
+        else if (prop === 'y1' || prop === 'y2') {
+          options[prop] = fabric.util.toFixed(object.height * percents / 100, 2);
+        }
+      }
+      // normalize rendering point (should be from top/left corner rather than center of the shape)
+      if (prop === 'x1' || prop === 'x2') {
+        options[prop] -= fabric.util.toFixed(object.width / 2, 2);
+      }
+      else if (prop === 'y1' || prop === 'y2') {
+        options[prop] -= fabric.util.toFixed(object.height / 2, 2);
+      }
+    }
+  }
+
+  /* _TO_SVG_START_ */
+  /**
+   * @private
+   */
+  function _convertValuesToPercentUnits(object, options) {
+    for (var prop in options) {
+      // normalize rendering point (should be from center rather than top/left corner of the shape)
+      if (prop === 'x1' || prop === 'x2') {
+        options[prop] += fabric.util.toFixed(object.width / 2, 2);
+      }
+      else if (prop === 'y1' || prop === 'y2') {
+        options[prop] += fabric.util.toFixed(object.height / 2, 2);
+      }
+      // convert to percent units
+      if (prop === 'x1' || prop === 'x2' || prop === 'r2') {
+        options[prop] = fabric.util.toFixed(options[prop] / object.width * 100, 2) + '%';
+      }
+      else if (prop === 'y1' || prop === 'y2') {
+        options[prop] = fabric.util.toFixed(options[prop] / object.height * 100, 2) + '%';
+      }
+    }
+  }
+  /* _TO_SVG_END_ */
+
+})();
+
+
+/**
+ * Pattern class
+ * @class fabric.Pattern
+ */
+fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ {
+
+  /**
+   * Repeat property of a pattern (one of repeat, repeat-x, repeat-y)
+   * @type String
+   */
+  repeat: 'repeat',
+
+  /**
+   * Pattern horizontal offset from object's left/top corner
+   * @type Number
+   */
+  offsetX: 0,
+
+  /**
+   * Pattern vertical offset from object's left/top corner
+   * @type Number
+   */
+  offsetY: 0,
+
+  /**
+   * Constructor
+   * @param {Object} [options]
+   * @return {fabric.Pattern} thisArg
+   */
+  initialize: function(options) {
+    options || (options = { });
+
+    if (options.source) {
+      if (typeof options.source === 'string') {
+        // function string
+        if (typeof fabric.util.getFunctionBody(options.source) !== 'undefined') {
+          this.source = new Function(fabric.util.getFunctionBody(options.source));
+        }
+        else {
+          // img src string
+          var _this = this;
+          this.source = fabric.util.createImage();
+          fabric.util.loadImage(options.source, function(img) {
+            _this.source = img;
+          });
+        }
+      }
+      else {
+        // img element
+        this.source = options.source;
+      }
+    }
+    if (options.repeat) {
+      this.repeat = options.repeat;
+    }
+    if (options.offsetX) {
+      this.offsetX = options.offsetX;
+    }
+    if (options.offsetY) {
+      this.offsetY = options.offsetY;
+    }
+  },
+
+  /**
+   * Returns object representation of a pattern
+   * @return {Object}
+   */
+  toObject: function() {
+
+    var source;
+
+    // callback
+    if (typeof this.source === 'function') {
+      source = String(this.source);
+    }
+    // <img> element
+    else if (typeof this.source.src === 'string') {
+      source = this.source.src;
+    }
+
+    return {
+      source: source,
+      repeat: this.repeat,
+      offsetX: this.offsetX,
+      offsetY: this.offsetY
+    };
+  },
+
+  /**
+   * Returns an instance of CanvasPattern
+   * @param ctx
+   * @return {CanvasPattern}
+   */
+  toLive: function(ctx) {
+    var source = typeof this.source === 'function' ? this.source() : this.source;
+    return ctx.createPattern(source, this.repeat);
+  }
+});
+
+
+/**
+ * Shadow class
+ * @class fabric.Shadow
+ */
+fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
+
+  /**
+   * Shadow color
+   * @type String
+   */
+  color: 'rgb(0,0,0)',
+
+  /**
+   * Shadow blur
+   * @type Number
+   */
+  blur: 0,
+
+  /**
+   * Shadow horizontal offset
+   * @type Number
+   */
+  offsetX: 0,
+
+  /**
+   * Shadow vertical offset
+   * @type Number
+   */
+  offsetY: 0,
+
+  /**
+   * Whether the shadow should affect stroke operations
+   * @type Boolean
+   */
+  affectStroke: false,
+
+  /**
+   * Constructor
+   * @param [options] Options object with any of color, blur, offsetX, offsetX properties
+   * @return {fabric.Shadow} thisArg
+   */
+  initialize: function(options) {
+    for (var prop in options) {
+      this[prop] = options[prop];
+    }
+  },
+
+  /**
+   * Returns object representation of a shadow
+   * @return {Object}
+   */
+  toObject: function() {
+    return {
+      color: this.color,
+      blur: this.blur,
+      offsetX: this.offsetX,
+      offsetY: this.offsetY
+    };
+  },
+
+  /* _TO_SVG_START_ */
+  /**
+   * Returns SVG representation of a shadow
+   * @return {String}
+   */
+  toSVG: function() {
+
+  }
+  /* _TO_SVG_END_ */
+});
 
 
 (function () {
@@ -7231,67 +7217,85 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
     },
 
     /**
-     * Moves an object one level down in stack of drawn objects
+     * Moves an object down in stack of drawn objects
      * @param object {fabric.Object} Object to send
+     * @param intersecting {Boolean} If `true`, send object behind next lower intersecting object
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
-    sendBackwards: function (object) {
-      var idx = this._objects.indexOf(object),
-          nextIntersectingIdx = idx;
+    sendBackwards: function (object, intersecting) {
+      var idx = this._objects.indexOf(object);
 
       // if object is not on the bottom of stack
       if (idx !== 0) {
+        var newIdx;
 
-        // traverse down the stack looking for the nearest intersecting object
-        for (var i=idx-1; i>=0; --i) {
+        if (intersecting) {
+          newIdx = idx;
+          
+          // traverse down the stack looking for the nearest intersecting object
+          for (var i=idx-1; i>=0; --i) {
 
-          var isIntersecting = object.intersectsWithObject(this._objects[i]) ||
-                               object.isContainedWithinObject(this._objects[i]) ||
-                               this._objects[i].isContainedWithinObject(object);
+            var isIntersecting = object.intersectsWithObject(this._objects[i]) ||
+                                 object.isContainedWithinObject(this._objects[i]) ||
+                                 this._objects[i].isContainedWithinObject(object);
 
-          if (isIntersecting) {
-            nextIntersectingIdx = i;
-            break;
+            if (isIntersecting) {
+              newIdx = i;
+              break;
+            }
           }
         }
+        else {
+          newIdx = idx-1;
+        }
+
         removeFromArray(this._objects, object);
-        this._objects.splice(nextIntersectingIdx, 0, object);
+        this._objects.splice(newIdx, 0, object);
+        this.renderAll && this.renderAll();
       }
-      return this.renderAll && this.renderAll();
+      return this;
     },
 
     /**
-     * Moves an object one level up in stack of drawn objects
+     * Moves an object up in stack of drawn objects
      * @param object {fabric.Object} Object to send
+     * @param intersecting {Boolean} If `true`, send object in front of next upper intersecting object
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
-    bringForward: function (object) {
-      var objects = this.getObjects(),
-          idx = objects.indexOf(object),
-          nextIntersectingIdx = idx;
-
+    bringForward: function (object, intersecting) {
+      var idx = this._objects.indexOf(object);
 
       // if object is not on top of stack (last item in an array)
-      if (idx !== objects.length-1) {
+      if (idx !== this._objects.length-1) {
+        var newIdx;
 
-        // traverse up the stack looking for the nearest intersecting object
-        for (var i = idx + 1, l = this._objects.length; i < l; ++i) {
+        if (intersecting) {
+          newIdx = idx;
 
-          var isIntersecting = object.intersectsWithObject(objects[i]) ||
-                               object.isContainedWithinObject(this._objects[i]) ||
-                               this._objects[i].isContainedWithinObject(object);
+          // traverse up the stack looking for the nearest intersecting object
+          for (var i = idx + 1; i < this._objects.length; ++i) {
 
-          if (isIntersecting) {
-            nextIntersectingIdx = i;
-            break;
+            var isIntersecting = object.intersectsWithObject(this._objects[i]) ||
+                                 object.isContainedWithinObject(this._objects[i]) ||
+                                 this._objects[i].isContainedWithinObject(object);
+
+            if (isIntersecting) {
+              newIdx = i;
+              break;
+            }
           }
         }
-        removeFromArray(objects, object);
-        objects.splice(nextIntersectingIdx, 0, object);
+        else {
+          newIdx = idx+1;
+        }
+        
+        removeFromArray(this._objects, object);
+        this._objects.splice(newIdx, 0, object);
+        this.renderAll && this.renderAll();
       }
-      return this.renderAll && this.renderAll();
+      return this;
     },
 
     /**
@@ -8278,7 +8282,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       t.target.set('left', t.original.left);
       t.target.set('top', t.original.top);
 
-      if (e.altKey || this.centerTransform) {
+      if (e.altKey || this.centerTransform || t.target.centerTransform) {
         if (t.originX !== 'center') {
           if (t.originX === 'right') {
             t.mouseXSign = -1;
@@ -8536,7 +8540,11 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
           // only if there's an active object
           if (target !== this._activeObject) {
             // and that object is not the actual target
-            var group = new fabric.Group([ this._activeObject, target ]);
+            var objects = this.getObjects();
+            var isActiveLower = objects.indexOf(this._activeObject) < objects.indexOf(target);
+            var group = new fabric.Group(
+              isActiveLower ? [ target, this._activeObject ] : [ this._activeObject, target ]);
+
             this.setActiveGroup(group);
             activeGroup = this.getActiveGroup();
             this.fire('selection:created', { target: activeGroup, e: e });
@@ -8612,7 +8620,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         }
       }
 
-      // adjust the mouse coordinates when dealing with padding      
+      // adjust the mouse coordinates when dealing with padding
       if (abs(localMouse.x) > target.padding) {
         if (localMouse.x < 0 ) {
           localMouse.x += target.padding;
@@ -8622,13 +8630,13 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       } else { // mouse is within the padding, set to 0
         localMouse.x = 0;
       }
-      
+
       if (abs(localMouse.y) > target.padding) {
         if (localMouse.y < 0 ) {
           localMouse.y += target.padding;
         } else {
           localMouse.y -= target.padding;
-        }      
+        }
       } else {
         localMouse.y = 0;
       }
@@ -8637,9 +8645,9 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       var newScaleX = target.scaleX, newScaleY = target.scaleY;
       if (by === 'equally' && !lockScalingX && !lockScalingY) {
         var dist = localMouse.y + localMouse.x;
-        var lastDist = (target.height + (target.strokeWidth)) * t.original.scaleY + 
+        var lastDist = (target.height + (target.strokeWidth)) * t.original.scaleY +
                        (target.width + (target.strokeWidth)) * t.original.scaleX;
-        
+
         // We use t.scaleX/Y instead of target.scaleX/Y because the object may have a min scale and we'll loose the proportions
         newScaleX = t.original.scaleX * dist/lastDist;
         newScaleY = t.original.scaleY * dist/lastDist;
@@ -8698,9 +8706,15 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       if (t.target.get('lockRotation')) return;
 
       var lastAngle = atan2(t.ey - t.top - o.top, t.ex - t.left - o.left),
-          curAngle = atan2(y - t.top - o.top, x - t.left - o.left);
+          curAngle = atan2(y - t.top - o.top, x - t.left - o.left),
+          angle = radiansToDegrees(curAngle - lastAngle + t.theta);
 
-      t.target.angle = radiansToDegrees(curAngle - lastAngle + t.theta);
+      // normalize angle to positive value
+      if (angle < 0) {
+        angle = 360 + angle;
+      }
+
+      t.target.angle = angle;
     },
 
     /**
@@ -8779,9 +8793,10 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
           y2 = y1 + this._groupSelector.top,
           currentObject,
           selectionX1Y1 = new fabric.Point(min(x1, x2), min(y1, y2)),
-          selectionX2Y2 = new fabric.Point(max(x1, x2), max(y1, y2));
+          selectionX2Y2 = new fabric.Point(max(x1, x2), max(y1, y2)),
+          isClick = x1 === x2 && y1 === y2;
 
-      for (var i = 0, len = this._objects.length; i < len; ++i) {
+      for (var i = this._objects.length; i--; ) {
         currentObject = this._objects[i];
 
         if (!currentObject) continue;
@@ -8794,6 +8809,9 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
           if (this.selection && currentObject.selectable) {
             currentObject.set('active', true);
             group.push(currentObject);
+
+            // only add one object if it's a click
+            if (isClick) break;
           }
         }
       }
@@ -8803,7 +8821,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         this.setActiveObject(group[0], e);
       }
       else if (group.length > 1) {
-        group = new fabric.Group(group);
+        group = new fabric.Group(group.reverse());
         this.setActiveGroup(group);
         group.saveCoords();
         this.fire('selection:created', { target: group });
@@ -10284,6 +10302,13 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     cornerColor:              'rgba(102,153,255,0.5)',
 
     /**
+     * When true, this object will use center point as the origin of transformation
+     * when being resized via the controls
+     * @type Boolean
+     */
+    centerTransform:        false,
+
+    /**
      * Color of object's fill
      * @type String
      * @default
@@ -11266,31 +11291,33 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     },
 
     /**
-     * Moves an object one level down in stack of drawn objects
+     * Moves an object down in stack of drawn objects
+     * @param intersecting {Boolean} If `true`, send object behind next lower intersecting object
      * @return {fabric.Object} thisArg
      * @chainable
      */
-    sendBackwards: function() {
+    sendBackwards: function(intersecting) {
       if (this.group) {
-        fabric.StaticCanvas.prototype.sendBackwards.call(this.group, this);
+        fabric.StaticCanvas.prototype.sendBackwards.call(this.group, this, intersecting);
       }
       else {
-        this.canvas.sendBackwards(this);
+        this.canvas.sendBackwards(this, intersecting);
       }
       return this;
     },
 
     /**
-     * Moves an object one level up in stack of drawn objects
+     * Moves an object up in stack of drawn objects
+     * @param intersecting {Boolean} If `true`, send object in front of next upper intersecting object
      * @return {fabric.Object} thisArg
      * @chainable
      */
-    bringForward: function() {
+    bringForward: function(intersecting) {
       if (this.group) {
-        fabric.StaticCanvas.prototype.bringForward.call(this.group, this);
+        fabric.StaticCanvas.prototype.bringForward.call(this.group, this, intersecting);
       }
       else {
-        this.canvas.bringForward(this);
+        this.canvas.bringForward(this, intersecting);
       }
       return this;
     },
@@ -13905,10 +13932,12 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @param {Object} [options] Options object
      */
     _initializePath: function (options) {
-      var isWidthSet = 'width' in options,
-          isHeightSet = 'height' in options,
+      var isWidthSet = 'width' in options && options.width != null,
+          isHeightSet = 'height' in options && options.width != null,
           isLeftSet = 'left' in options,
-          isTopSet = 'top' in options;
+          isTopSet = 'top' in options,
+          origLeft = isLeftSet ? this.left : 0,
+          origTop = isTopSet ? this.top : 0;
 
       if (!isWidthSet || !isHeightSet) {
         extend(this, this._parseDimensions());
@@ -13927,17 +13956,17 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           this.left = this.width / 2;
         }
       }
-      this.pathOffset = this.pathOffset || this._calculatePathOffset(isTopSet || isLeftSet); //Save top-left coords as offset
+      this.pathOffset = this.pathOffset || this._calculatePathOffset(origLeft, origTop); //Save top-left coords as offset
     },
 
     /**
      * @private
      * @param {Boolean} positionSet When false, path offset is returned otherwise 0
      */
-    _calculatePathOffset: function (positionSet) {
+    _calculatePathOffset: function (origLeft, origTop) {
       return {
-        x: positionSet ? 0 : this.left - (this.width / 2),
-        y: positionSet ? 0 : this.top - (this.height / 2)
+        x: this.left - origLeft - (this.width / 2),
+        y: this.top - origTop - (this.height / 2)
       };
     },
 
@@ -14294,7 +14323,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     toObject: function(propertiesToInclude) {
       var o = extend(this.callSuper('toObject', propertiesToInclude), {
-        path: this.path
+        path: this.path,
+        pathOffset: this.pathOffset
       });
       if (this.sourcePath) {
         o.sourcePath = this.sourcePath;
@@ -14469,8 +14499,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           deltaY = maxY - minY;
 
       var o = {
-        left: minX + deltaX / 2,
-        top: minY + deltaY / 2,
+        left: this.left + (minX + deltaX / 2),
+        top: this.top + (minY + deltaY / 2),
         width: deltaX,
         height: deltaY
       };
@@ -17724,7 +17754,7 @@ fabric.util.object.extend(fabric.Text.prototype, {
       callback && callback.call(context, img);
     };
     var img = new Image();
-    if (url && url.indexOf('data') === 0) {
+    if (url && (url instanceof Buffer || url.indexOf('data') === 0)) {
       img.src = img._src = url;
       callback && callback.call(context, img);
     }
