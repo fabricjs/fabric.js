@@ -3284,13 +3284,18 @@ fabric.util.string = {
     while (element && element.parentNode && !firstFixedAncestor) {
       element = element.parentNode;
 
-      if (element !== fabric.document && fabric.util.getElementStyle(element, 'position') === 'fixed') firstFixedAncestor = element;
+      if (element !== fabric.document &&
+          fabric.util.getElementStyle(element, 'position') === 'fixed') {
+        firstFixedAncestor = element;
+      }
 
-      if (element !== fabric.document && orgElement !== upperCanvasEl && fabric.util.getElementStyle(element, 'position') === 'absolute') {
+      if (element !== fabric.document &&
+          orgElement !== upperCanvasEl &&
+          fabric.util.getElementStyle(element, 'position') === 'absolute') {
         scrollLeft = 0;
         scrollTop = 0;
       }
-      else if (element === fabric.document && orgElement !== upperCanvasEl) {
+      else if (element === fabric.document) {
         scrollLeft = body.scrollLeft || docElement.scrollLeft || 0;
         scrollTop = body.scrollTop ||  docElement.scrollTop || 0;
       }
@@ -3320,15 +3325,19 @@ fabric.util.string = {
   if (fabric.isTouchSupported) {
     pointerX = function(event) {
       if (event.type !== 'touchend') {
-        return (event.touches && event.touches[0] ? (event.touches[0].pageX - (event.touches[0].pageX - event.touches[0].clientX)) || event.clientX : event.clientX);
+        return (event.touches && event.touches[0] ?
+          (event.touches[0].pageX - (event.touches[0].pageX - event.touches[0].clientX)) || event.clientX : event.clientX);
       }
-      return (event.changedTouches && event.changedTouches[0] ? (event.changedTouches[0].pageX - (event.changedTouches[0].pageX - event.changedTouches[0].clientX)) || event.clientX : event.clientX);
+      return (event.changedTouches && event.changedTouches[0]
+        ? (event.changedTouches[0].pageX - (event.changedTouches[0].pageX - event.changedTouches[0].clientX)) || event.clientX : event.clientX);
     };
     pointerY = function(event) {
       if (event.type !== 'touchend') {
-        return (event.touches && event.touches[0] ? (event.touches[0].pageY - (event.touches[0].pageY - event.touches[0].clientY)) || event.clientY : event.clientY);
+        return (event.touches && event.touches[0]
+          ? (event.touches[0].pageY - (event.touches[0].pageY - event.touches[0].clientY)) || event.clientY : event.clientY);
       }
-      return (event.changedTouches && event.changedTouches[0] ? (event.changedTouches[0].pageY - (event.changedTouches[0].pageY - event.changedTouches[0].clientY)) || event.clientY : event.clientY);
+      return (event.changedTouches && event.changedTouches[0]
+        ? (event.changedTouches[0].pageY - (event.changedTouches[0].pageY - event.changedTouches[0].clientY)) || event.clientY : event.clientY);
     };
   }
 
