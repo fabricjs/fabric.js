@@ -150,13 +150,11 @@
     options || (options = { });
 
     var points = fabric.parsePointsAttribute(element.getAttribute('points')),
-        parsedAttributes = fabric.parseAttributes(element, fabric.Polyline.ATTRIBUTE_NAMES);
+        parsedAttributes = fabric.parseAttributes(element, fabric.Polyline.ATTRIBUTE_NAMES),
+        boundingRect = fabric.util.getBoundingRect(points);
 
-    var boundingRect = fabric.util.getBoundingRect(points);
-    var width = boundingRect.width;
-    var height = boundingRect.height;
-    options.top = boundingRect.y1 + height / 2;
-    options.left = boundingRect.x1 + width / 2;
+    options.top = boundingRect.y1 + boundingRect.height / 2;
+    options.left = boundingRect.x1 + boundingRect.width / 2;
 
     for (var i = 0, len = points.length; i < len; i++) {
       // normalize coordinates, according to containing box (dimensions of which are calculated above)

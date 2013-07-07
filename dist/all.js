@@ -2434,6 +2434,32 @@ fabric.Collection = {
     ];
   }
 
+  /**
+   * Takes an array of points and returns a bounding rectangle around them
+   * @static
+   * @memberOf fabric.util
+   * @param  {Array.<Object>} points An array of objects with x and y properties.
+   * @return {Object}                An object with x1, y1, x2, and y2 properties
+   *                                 corresponding to the points of the rect, and
+   *                                 width and height properties.
+   */
+  function getBoundingRect(points) {
+    var utilMin = fabric.util.array.min,
+        utilMax = fabric.util.array.max;
+
+    var rect = {
+      x1: utilMin(points, 'x'),
+      y1: utilMin(points, 'y'),
+      x2: utilMax(points, 'x'),
+      y2: utilMax(points, 'y')
+    };
+
+    rect.width = rect.x2 - rect.x1;
+    rect.height = rect.y2 - rect.y1;
+
+    return rect;
+  }
+
   function getFunctionBody(fn) {
     return (String(fn).match(/function[^{]*\{([\s\S]*)\}/) || {})[1];
   }
@@ -2567,6 +2593,7 @@ fabric.Collection = {
   fabric.util.createAccessors = createAccessors;
   fabric.util.clipContext = clipContext;
   fabric.util.multiplyTransformMatrices = multiplyTransformMatrices;
+  fabric.util.getBoundingRect = getBoundingRect;
   fabric.util.getFunctionBody = getFunctionBody;
   fabric.util.drawArc = drawArc;
 
@@ -13440,8 +13467,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   "use strict";
 
   var fabric = global.fabric || (global.fabric = { }),
-      toFixed = fabric.util.toFixed,
-      min = fabric.util.array.min;
+      toFixed = fabric.util.toFixed;
 
   if (fabric.Polyline) {
     fabric.warn('fabric.Polyline is already defined');
@@ -13589,16 +13615,15 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
     var points = fabric.parsePointsAttribute(element.getAttribute('points')),
         parsedAttributes = fabric.parseAttributes(element, fabric.Polyline.ATTRIBUTE_NAMES),
-        minX = min(points, 'x'),
-        minY = min(points, 'y');
+        boundingRect = fabric.util.getBoundingRect(points);
 
-    minX = minX < 0 ? minX : 0;
-    minY = minX < 0 ? minY : 0;
+    options.top = boundingRect.y1 + boundingRect.height / 2;
+    options.left = boundingRect.x1 + boundingRect.width / 2;
 
     for (var i = 0, len = points.length; i < len; i++) {
-      // normalize coordinates, according to containing box (dimensions of which are passed via `options`)
-      points[i].x -= (options.width / 2 + minX) || 0;
-      points[i].y -= (options.height / 2 + minY) || 0;
+      // normalize coordinates, according to containing box (dimensions of which are calculated above)
+      points[i].x -= options.left;
+      points[i].y -= options.top;
     }
 
     return new fabric.Polyline(points, fabric.util.object.extend(parsedAttributes, options), true);
@@ -13802,16 +13827,15 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
     var points = fabric.parsePointsAttribute(element.getAttribute('points')),
         parsedAttributes = fabric.parseAttributes(element, fabric.Polygon.ATTRIBUTE_NAMES),
-        minX = min(points, 'x'),
-        minY = min(points, 'y');
+        boundingRect = fabric.util.getBoundingRect(points);
 
-    minX = minX < 0 ? minX : 0;
-    minY = minX < 0 ? minY : 0;
+    options.top = boundingRect.y1 + boundingRect.height / 2;
+    options.left = boundingRect.x1 + boundingRect.width / 2;
 
     for (var i = 0, len = points.length; i < len; i++) {
-      // normalize coordinates, according to containing box (dimensions of which are passed via `options`)
-      points[i].x -= (options.width / 2 + minX) || 0;
-      points[i].y -= (options.height / 2 + minY) || 0;
+      // normalize coordinates, according to containing box (dimensions of which are calculated above)
+      points[i].x -= options.left;
+      points[i].y -= options.top;
     }
 
     return new fabric.Polygon(points, extend(parsedAttributes, options), true);

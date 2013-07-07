@@ -91,7 +91,9 @@
 
     var expected = fabric.util.object.extend(
       fabric.util.object.clone(REFERENCE_OBJECT), {
-        points: [ { x: 10, y: 12 }, { x: 20, y: 22 } ]
+        points: [ { x: -5, y: -5 }, { x: 5, y: 5 } ],
+        left: 15,
+        top: 17
       });
 
     deepEqual(polygon.toObject(), expected);
@@ -110,10 +112,10 @@
 
     var polygonWithAttrs = fabric.Polygon.fromElement(elPolygonWithAttrs);
     var expectedPoints = [
+      { x: -10, y: -10 },
+      { x: 0, y: 0 },
       { x: 10, y: 10 },
-      { x: 20, y: 20 },
-      { x: 30, y: 30 },
-      { x: 10, y: 10 }
+      { x: -10, y: -10 }
     ];
 
     deepEqual(polygonWithAttrs.toObject(), fabric.util.object.extend(REFERENCE_OBJECT, {
@@ -127,7 +129,9 @@
       'strokeLineJoin':   'bevil',
       'strokeMiterLimit': 5,
       'opacity':          0.34,
-      'points':           expectedPoints
+      'points':           expectedPoints,
+      'left':             20,
+      'top':              20
     }));
 
     deepEqual(polygonWithAttrs.get('transformMatrix'), [ 2, 0, 0, 2, -10, -20 ]);
