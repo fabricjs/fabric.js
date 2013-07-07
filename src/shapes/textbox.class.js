@@ -603,9 +603,8 @@
     /**
      * Applyes the coordinates and dimensions to the box image
      * @method _moveImageBox
-     * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    _moveImageBox: function(ctx) {
+    _moveImageBox: function() {
       var x = (this.get('left') + (this.get('width') / 2)),
         y = (this.get('top'));
 
