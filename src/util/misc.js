@@ -432,32 +432,6 @@
     ];
   }
 
-  /**
-   * Takes an array of points and returns a bounding rectangle around them
-   * @static
-   * @memberOf fabric.util
-   * @param  {Array.<Object>} points An array of objects with x and y properties.
-   * @return {Object}                An object with x1, y1, x2, and y2 properties
-   *                                 corresponding to the points of the rect, and
-   *                                 width and height properties.
-   */
-  function getBoundingRect(points) {
-    var utilMin = fabric.util.array.min,
-        utilMax = fabric.util.array.max;
-
-    var rect = {
-      x1: utilMin(points, 'x'),
-      y1: utilMin(points, 'y'),
-      x2: utilMax(points, 'x'),
-      y2: utilMax(points, 'y')
-    };
-
-    rect.width = rect.x2 - rect.x1;
-    rect.height = rect.y2 - rect.y1;
-
-    return rect;
-  }
-
   function getFunctionBody(fn) {
     return (String(fn).match(/function[^{]*\{([\s\S]*)\}/) || {})[1];
   }
@@ -591,7 +565,6 @@
   fabric.util.createAccessors = createAccessors;
   fabric.util.clipContext = clipContext;
   fabric.util.multiplyTransformMatrices = multiplyTransformMatrices;
-  fabric.util.getBoundingRect = getBoundingRect;
   fabric.util.getFunctionBody = getFunctionBody;
   fabric.util.drawArc = drawArc;
 

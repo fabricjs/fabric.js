@@ -3,7 +3,8 @@
   "use strict";
 
   var fabric = global.fabric || (global.fabric = { }),
-      toFixed = fabric.util.toFixed;
+      toFixed = fabric.util.toFixed,
+      min = fabric.util.array.min;
 
   if (fabric.Polyline) {
     fabric.warn('fabric.Polyline is already defined');
@@ -151,15 +152,16 @@
 
     var points = fabric.parsePointsAttribute(element.getAttribute('points')),
         parsedAttributes = fabric.parseAttributes(element, fabric.Polyline.ATTRIBUTE_NAMES),
-        boundingRect = fabric.util.getBoundingRect(points);
+        minX = min(points, 'x'),
+        minY = min(points, 'y');
 
-    options.top = boundingRect.y1 + boundingRect.height / 2;
-    options.left = boundingRect.x1 + boundingRect.width / 2;
+    minX = minX < 0 ? minX : 0;
+    minY = minX < 0 ? minY : 0;
 
     for (var i = 0, len = points.length; i < len; i++) {
-      // normalize coordinates, according to containing box (dimensions of which are calculated above)
-      points[i].x -= options.left;
-      points[i].y -= options.top;
+      // normalize coordinates, according to containing box (dimensions of which are passed via `options`)
+      points[i].x -= (options.width / 2 + minX) || 0;
+      points[i].y -= (options.height / 2 + minY) || 0;
     }
 
     return new fabric.Polyline(points, fabric.util.object.extend(parsedAttributes, options), true);
