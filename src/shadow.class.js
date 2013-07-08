@@ -56,14 +56,14 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
       offsetX: this.offsetX,
       offsetY: this.offsetY
     };
-  },
+  }
 
   /* _TO_SVG_START_ */
   /**
    * Returns SVG representation of a shadow
    * @return {String}
    */
-  toSVG: function() {
+  ,toSVG: function() {
 
   }
   /* _TO_SVG_END_ */
