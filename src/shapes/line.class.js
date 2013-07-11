@@ -120,8 +120,11 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _renderDashedStroke: function(ctx) {
-      var x = this.width === 1 ? 0 : -this.width / 2,
-          y = this.height === 1 ? 0 : -this.height / 2;
+      var
+        xMult = this.x1 <= this.x2 ? -1 : 1,
+        yMult = this.y1 <= this.y2 ? -1 : 1,
+        x = this.width === 1 ? 0 : xMult * this.width / 2,
+        y = this.height === 1 ? 0 : yMult * this.height / 2;
 
       ctx.beginPath();
       fabric.util.drawDashedLine(ctx, x, y, -x, -y, this.strokeDashArray);
