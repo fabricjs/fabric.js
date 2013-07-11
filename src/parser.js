@@ -335,7 +335,7 @@
   function parseFontDeclaration(value, oStyle) {
 
     // TODO: support non-px font size
-    var match = value.match(/(normal|italic)?\s*(normal|small-caps)?\s*(normal|bold|bolder|lighter|100|200|300|400|500|600|700|800|900)?\s*(\d+)px\s+(.*)/);
+    var match = value.match(/(normal|italic)?\s*(normal|small-caps)?\s*(normal|bold|bolder|lighter|100|200|300|400|500|600|700|800|900)?\s*(\d+)px(?:\/(normal|[\d\.]+))?\s+(.*)/);
 
     if (!match) return;
 
@@ -344,7 +344,8 @@
     // var fontVariant = match[2];
     var fontWeight = match[3];
     var fontSize = match[4];
-    var fontFamily = match[5];
+    var lineHeight = match[5];
+    var fontFamily = match[6];
 
     if (fontStyle) {
       oStyle.fontStyle = fontStyle;
@@ -357,6 +358,9 @@
     }
     if (fontFamily) {
       oStyle.fontFamily = fontFamily;
+    }
+    if (lineHeight) {
+      oStyle.lineHeight = lineHeight === 'normal' ? 1 : lineHeight;
     }
   }
 
