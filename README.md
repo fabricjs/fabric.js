@@ -19,7 +19,7 @@ Using Fabric.js, you can create and populate objects on canvas; objects like sim
 - Encapsulated in one object
 - No browser sniffing for critical functionality
 - Runs under ES5 strict mode
-- Runs on a server under [Node.js](http://nodejs.org/)
+- Runs on a server under [Node.js](http://nodejs.org/) (0.6, 0.8, 0.10)
 
 ### Supported browsers
 
@@ -27,7 +27,7 @@ Using Fabric.js, you can create and populate objects on canvas; objects like sim
 - Safari 3+
 - Opera 9.64+
 - Chrome (all versions should work)
-- IE9+
+- IE9, IE10, IE11
 
 #### With help of [Explorer Canvas](http://code.google.com/p/explorercanvas/)
 
