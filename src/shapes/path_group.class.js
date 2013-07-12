@@ -226,9 +226,25 @@
    * @param {Object} object
    * @return {fabric.PathGroup}
    */
-  fabric.PathGroup.fromObject = function(object) {
-    var paths = instantiatePaths(object.paths);
-    return new fabric.PathGroup(paths, object);
+  fabric.PathGroup.fromObject = function(object, callback) {
+    if (typeof object.paths === 'string') {
+      fabric.loadSVGFromURL(object.paths, function (elements) {
+        delete object.paths;
+        var pathGroup = fabric.util.groupSVGElements(elements, object, object.paths);
+        callback(pathGroup);
+      });
+    }
+    else {
+      var paths = instantiatePaths(object.paths);
+      callback(new fabric.PathGroup(paths, object));
+    }
   };
+
+  /**
+   * Indicates that instances of this type are async
+   * @static
+   * @type Boolean
+   */
+  fabric.PathGroup.async = true;
 
 })(typeof exports !== 'undefined' ? exports : this);

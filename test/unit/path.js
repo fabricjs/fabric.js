@@ -106,11 +106,13 @@
     ok(typeof path.complexity == 'function');
   });
 
-  test('fromObject', function() {
+  asyncTest('fromObject', function() {
     ok(typeof fabric.Path.fromObject == 'function');
-    var path = fabric.Path.fromObject(REFERENCE_PATH_OBJECT);
-    ok(path instanceof fabric.Path);
-    deepEqual(path.toObject(), REFERENCE_PATH_OBJECT);
+    fabric.Path.fromObject(REFERENCE_PATH_OBJECT, function(path) {
+      ok(path instanceof fabric.Path);
+      deepEqual(path.toObject(), REFERENCE_PATH_OBJECT);
+      start();
+    });
   });
 
   test('fromElement', function() {

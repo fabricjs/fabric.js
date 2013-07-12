@@ -681,8 +681,17 @@
    * @static
    * @return {fabric.Path} Instance of fabric.Path
    */
-  fabric.Path.fromObject = function(object) {
-    return new fabric.Path(object.path, object);
+  fabric.Path.fromObject = function(object, callback) {
+    if (typeof object.path === 'string') {
+      fabric.loadSVGFromURL(object.path, function (elements) {
+        var path = fabric.util.groupSVGElements(elements, object, object.path);
+        // fabric.util.object.extend(path, object);
+        callback(path);
+      });
+    }
+    else {
+      callback(new fabric.Path(object.path, object));
+    }
   };
 
   /* _FROM_SVG_START_ */
@@ -705,5 +714,12 @@
     return new fabric.Path(parsedAttributes.d, extend(parsedAttributes, options));
   };
   /* _FROM_SVG_END_ */
+
+  /**
+   * Indicates that instances of this type are async
+   * @static
+   * @type Boolean
+   */
+  fabric.Path.async = true;
 
 })(typeof exports !== 'undefined' ? exports : this);

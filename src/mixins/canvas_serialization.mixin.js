@@ -3,6 +3,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
   /**
    * Populates canvas with data from the specified dataless JSON
    * JSON format must conform to the one of `fabric.Canvas#toDatalessJSON`
+   * @deprecated since 1.2.2
    * @param {String|Object} json JSON string or object
    * @param {Function} callback Callback, invoked when json is parsed
    *                            and corresponding objects (e.g: fabric.Image)
@@ -11,138 +12,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * @chainable
    */
   loadFromDatalessJSON: function (json, callback) {
-
-    if (!json) return;
-
-    // serialize if it wasn't already
-    var serialized = (typeof json === 'string')
-      ? JSON.parse(json)
-      : json;
-
-    if (!serialized) return;
-
-    if (!serialized.objects) {
-      serialized.objects = [];
-    }
-
-    this.clear();
-
-    var _this = this;
-    this._enlivenDatalessObjects(serialized.objects, function() {
-      _this._setBgOverlayImages(serialized, callback);
-    });
-  },
-
-  /**
-   * @private
-   * @param {Array} objects
-   * @param {Function} callback
-   */
-  _enlivenDatalessObjects: function (objects, callback) {
-    var _this = this,
-        numLoadedObjects = 0,
-        numTotalObjects = objects.length;
-
-    /** @ignore */
-    function onObjectLoaded(object, index) {
-      _this.insertAt(object, index, true);
-      object.setCoords();
-      if (++numLoadedObjects === numTotalObjects) {
-        callback && callback();
-      }
-    }
-
-    /** @ignore */
-    function loadObject(obj, index) {
-
-      var pathProp = obj.paths ? 'paths' : 'path';
-      var path = obj[pathProp];
-
-      delete obj[pathProp];
-
-      if (typeof path !== 'string') {
-        if (obj.type === 'image' || obj.type === 'group') {
-          fabric[fabric.util.string.capitalize(obj.type)].fromObject(obj, function (o) {
-            onObjectLoaded(o, index);
-          });
-        }
-        else {
-          var klass = fabric[fabric.util.string.camelize(fabric.util.string.capitalize(obj.type))];
-          if (!klass || !klass.fromObject) return;
-
-          // restore path
-          if (path) {
-            obj[pathProp] = path;
-          }
-          onObjectLoaded(klass.fromObject(obj), index);
-        }
-      }
-      else {
-        if (obj.type === 'image') {
-          fabric.util.loadImage(path, function (image) {
-            var oImg = new fabric.Image(image);
-
-            oImg.setSourcePath(path);
-
-            fabric.util.object.extend(oImg, obj);
-            oImg.setAngle(obj.angle);
-
-            onObjectLoaded(oImg, index);
-          });
-        }
-        else if (obj.type === 'text') {
-
-          if (obj.useNative) {
-            onObjectLoaded(fabric.Text.fromObject(obj), index);
-          }
-          else {
-            obj.path = path;
-            var object = fabric.Text.fromObject(obj);
-            /** @ignore */
-            var onscriptload = function () {
-              // TODO (kangax): find out why Opera refuses to work without this timeout
-              if (Object.prototype.toString.call(fabric.window.opera) === '[object Opera]') {
-                setTimeout(function () {
-                  onObjectLoaded(object, index);
-                }, 500);
-              }
-              else {
-                onObjectLoaded(object, index);
-              }
-            };
-
-            fabric.util.getScript(path, onscriptload);
-          }
-        }
-        else {
-          fabric.loadSVGFromURL(path, function (elements) {
-            var object = fabric.util.groupSVGElements(elements, obj, path);
-
-            // copy parameters from serialied json to object (left, top, scaleX, scaleY, etc.)
-            // skip this step if an object is a PathGroup, since we already passed it options object before
-            if (!(object instanceof fabric.PathGroup)) {
-              fabric.util.object.extend(object, obj);
-              if (typeof obj.angle !== 'undefined') {
-                object.setAngle(obj.angle);
-              }
-            }
-
-            onObjectLoaded(object, index);
-          });
-        }
-      }
-    }
-
-    if (numTotalObjects === 0 && callback) {
-      callback();
-    }
-
-    try {
-      objects.forEach(loadObject, this);
-    }
-    catch(e) {
-      fabric.log(e);
-    }
+    return this.loadFromJSON(json, callback);
   },
 
   /**
@@ -162,6 +32,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     var serialized = (typeof json === 'string')
       ? JSON.parse(json)
       : json;
+
+    this.clear();
 
     var _this = this;
     this._enlivenObjects(serialized.objects, function () {
@@ -246,6 +118,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     fabric.util.enlivenObjects(objects, function(enlivenedObjects) {
       enlivenedObjects.forEach(function(obj, index) {
         _this.insertAt(obj, index, true);
+        obj.setCoords();
       });
       callback && callback();
     });
