@@ -15,15 +15,15 @@
   },
   "dependencies": {
     "canvas": "1.0.x",
-    "jsdom": "0.5.6",
+    "jsdom": "0.7.x",
     "xmldom": "0.1.x"
   },
   "devDependencies": {
     "qunit": "0.5.x",
-    "jshint": "1.1.x",
-    "uglify-js": "2.2.x",
-    "execSync": "0.0.4",
-    "plato": "0.5.0"
+    "jshint": "2.1.x",
+    "uglify-js": "2.3.x",
+    "execSync": "0.0.x",
+    "plato": "0.6.x"
   },
   "engines": { "node": ">=0.4.0 && <1.0.0" },
   "main": "./dist/all.js"
