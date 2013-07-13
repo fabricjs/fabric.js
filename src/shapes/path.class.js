@@ -715,9 +715,9 @@
    * @param {Object} [options] Options object
    * @return {fabric.Path} Instance of fabric.Path
    */
-  fabric.Path.fromElement = function(element, options) {
+  fabric.Path.fromElement = function(element, callback, options) {
     var parsedAttributes = fabric.parseAttributes(element, fabric.Path.ATTRIBUTE_NAMES);
-    return new fabric.Path(parsedAttributes.d, extend(parsedAttributes, options));
+    callback && callback(new fabric.Path(parsedAttributes.d, extend(parsedAttributes, options)));
   };
   /* _FROM_SVG_END_ */
 

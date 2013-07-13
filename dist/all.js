@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures` */
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.2.4" };
+var fabric = fabric || { version: "1.2.5" };
 
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
@@ -14437,9 +14437,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @param {Object} [options] Options object
    * @return {fabric.Path} Instance of fabric.Path
    */
-  fabric.Path.fromElement = function(element, options) {
+  fabric.Path.fromElement = function(element, callback, options) {
     var parsedAttributes = fabric.parseAttributes(element, fabric.Path.ATTRIBUTE_NAMES);
-    return new fabric.Path(parsedAttributes.d, extend(parsedAttributes, options));
+    callback && callback(new fabric.Path(parsedAttributes.d, extend(parsedAttributes, options)));
   };
   /* _FROM_SVG_END_ */
 
