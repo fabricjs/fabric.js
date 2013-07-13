@@ -684,8 +684,14 @@
   fabric.Path.fromObject = function(object, callback) {
     if (typeof object.path === 'string') {
       fabric.loadSVGFromURL(object.path, function (elements) {
-        var path = fabric.util.groupSVGElements(elements, object, object.path);
-        // fabric.util.object.extend(path, object);
+        var path = elements[0];
+
+        var pathUrl = object.path;
+        delete object.path;
+
+        fabric.util.object.extend(path, object);
+        path.setSourcePath(pathUrl);
+
         callback(path);
       });
     }

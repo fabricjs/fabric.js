@@ -229,8 +229,12 @@
   fabric.PathGroup.fromObject = function(object, callback) {
     if (typeof object.paths === 'string') {
       fabric.loadSVGFromURL(object.paths, function (elements) {
+
+        var pathUrl = object.paths;
         delete object.paths;
-        var pathGroup = fabric.util.groupSVGElements(elements, object, object.paths);
+
+        var pathGroup = fabric.util.groupSVGElements(elements, object, pathUrl);
+
         callback(pathGroup);
       });
     }

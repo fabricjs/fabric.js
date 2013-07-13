@@ -14406,8 +14406,14 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   fabric.Path.fromObject = function(object, callback) {
     if (typeof object.path === 'string') {
       fabric.loadSVGFromURL(object.path, function (elements) {
-        var path = fabric.util.groupSVGElements(elements, object, object.path);
-        // fabric.util.object.extend(path, object);
+        var path = elements[0];
+
+        var pathUrl = object.path;
+        delete object.path;
+
+        fabric.util.object.extend(path, object);
+        path.setSourcePath(pathUrl);
+
         callback(path);
       });
     }
@@ -14678,8 +14684,12 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   fabric.PathGroup.fromObject = function(object, callback) {
     if (typeof object.paths === 'string') {
       fabric.loadSVGFromURL(object.paths, function (elements) {
+
+        var pathUrl = object.paths;
         delete object.paths;
-        var pathGroup = fabric.util.groupSVGElements(elements, object, object.paths);
+
+        var pathGroup = fabric.util.groupSVGElements(elements, object, pathUrl);
+
         callback(pathGroup);
       });
     }
