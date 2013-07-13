@@ -16810,6 +16810,8 @@ fabric.Image.filters.Tint.fromObject = function(object) {
       this.width = this._getTextWidth(ctx, textLines);
       this.height = this._getTextHeight(ctx, textLines);
 
+      this.clipTo && fabric.util.clipContext(this, ctx);
+
       this._renderTextBackground(ctx, textLines);
 
       if (this.textAlign !== 'left' && this.textAlign !== 'justify') {
@@ -16819,10 +16821,8 @@ fabric.Image.filters.Tint.fromObject = function(object) {
 
       ctx.save();
       this._setTextShadow(ctx);
-      this.clipTo && fabric.util.clipContext(this, ctx);
       this._renderTextFill(ctx, textLines);
       this._renderTextStroke(ctx, textLines);
-      this.clipTo && ctx.restore();
       this.textShadow && ctx.restore();
       ctx.restore();
 
@@ -16831,6 +16831,8 @@ fabric.Image.filters.Tint.fromObject = function(object) {
       }
 
       this._renderTextDecoration(ctx, textLines);
+      this.clipTo && ctx.restore();
+
       this._setBoundaries(ctx, textLines);
       this._totalLineHeight = 0;
 
