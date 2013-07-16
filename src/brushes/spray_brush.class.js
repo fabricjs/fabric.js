@@ -93,6 +93,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
         });
 
         this.canvas.add(rect);
+        this.canvas.fire('path:created', { path: rect });
       }
     }
 

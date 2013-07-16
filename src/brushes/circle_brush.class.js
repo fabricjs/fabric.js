@@ -67,6 +67,7 @@ fabric.CircleBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabri
         }
       });
       this.canvas.add(circle);
+      this.canvas.fire('path:created', { path: circle });
     }
 
     this.canvas.clearContext(this.canvas.contextTop);
