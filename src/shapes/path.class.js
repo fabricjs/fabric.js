@@ -679,7 +679,8 @@
   /**
    * Creates an instance of fabric.Path from an object
    * @static
-   * @return {fabric.Path} Instance of fabric.Path
+   * @param {Object} object
+   * @param {Function} callback Callback to invoke when an fabric.Path instance is created
    */
   fabric.Path.fromObject = function(object, callback) {
     if (typeof object.path === 'string') {
@@ -712,8 +713,8 @@
    * Creates an instance of fabric.Path from an SVG <path> element
    * @static
    * @param {SVGElement} element to parse
+   * @param {Function} callback Callback to invoke when an fabric.Path instance is created
    * @param {Object} [options] Options object
-   * @return {fabric.Path} Instance of fabric.Path
    */
   fabric.Path.fromElement = function(element, callback, options) {
     var parsedAttributes = fabric.parseAttributes(element, fabric.Path.ATTRIBUTE_NAMES);
