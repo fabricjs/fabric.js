@@ -7885,6 +7885,7 @@ fabric.CircleBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabri
         }
       });
       this.canvas.add(circle);
+      this.canvas.fire('path:created', { path: circle });
     }
 
     this.canvas.clearContext(this.canvas.contextTop);
@@ -8012,6 +8013,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
         });
 
         this.canvas.add(rect);
+        this.canvas.fire('path:created', { path: rect });
       }
     }
 
@@ -9963,14 +9965,20 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    */
   _enlivenObjects: function (objects, callback) {
     var _this = this;
+
     if (objects.length === 0) {
       callback && callback();
     }
+
+    var renderOnAddition = this.renderOnAddition;
+    this.renderOnAddition = false;
+
     fabric.util.enlivenObjects(objects, function(enlivenedObjects) {
       enlivenedObjects.forEach(function(obj, index) {
         _this.insertAt(obj, index, true);
-        obj.setCoords();
       });
+
+      _this.renderOnAddition = renderOnAddition;
       callback && callback();
     });
   },
