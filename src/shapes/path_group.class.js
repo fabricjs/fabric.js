@@ -208,23 +208,10 @@
   });
 
   /**
-   * @private
-   */
-  function instantiatePaths(paths) {
-    for (var i = 0, len = paths.length; i < len; i++) {
-      if (!(paths[i] instanceof fabric.Object)) {
-        var klassName = camelize(capitalize(paths[i].type));
-        paths[i] = fabric[klassName].fromObject(paths[i]);
-      }
-    }
-    return paths;
-  }
-
-  /**
    * Creates fabric.PathGroup instance from an object representation
    * @static
    * @param {Object} object
-   * @return {fabric.PathGroup}
+   * @param {Function} callback Callback to invoke when an fabric.PathGroup instance is created
    */
   fabric.PathGroup.fromObject = function(object, callback) {
     if (typeof object.paths === 'string') {
@@ -239,8 +226,10 @@
       });
     }
     else {
-      var paths = instantiatePaths(object.paths);
-      callback(new fabric.PathGroup(paths, object));
+      fabric.util.enlivenObjects(object.paths, function(enlivenedObjects) {
+        delete object.paths;
+        callback(new fabric.PathGroup(enlivenedObjects, object));
+      });
     }
   };
 
