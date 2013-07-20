@@ -136,7 +136,15 @@ For example:
 
 ### Staying in touch
 
-Follow [@fabric.js](http://twitter.com/fabricjs) or [@kangax](http://twitter.com/kangax) on twitter. Questions, suggestions — [fabric.js on Google Groups](http://groups.google.com/group/fabricjs).
+Follow [@fabric.js](http://twitter.com/fabricjs) or [@kangax](http://twitter.com/kangax) on twitter.
+
+Questions, suggestions — [fabric.js on Google Groups](http://groups.google.com/group/fabricjs).
+
+See [Fabric questions on Stackoverflow](stackoverflow.com/questions/tagged/fabricjs), 
+Fabric snippets on [jsfiddle](http://jsfiddle.net/user/fabricjs/fiddles/) 
+or [codepen.io](http://codepen.io/tag/fabricjs).
+
+Get help in Fabric's IRC channel — irc://irc.freenode.net/#fabric.js
 
 ### Credits
 
