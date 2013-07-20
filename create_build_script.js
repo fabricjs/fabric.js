@@ -12,6 +12,7 @@ var modules = [
   'serialization',
   'image_filters',
   'gradient',
+  'pattern',
   'node'
 ];
 
