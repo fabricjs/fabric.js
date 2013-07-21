@@ -6236,6 +6236,8 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
   initialize: function(options) {
     options || (options = { });
 
+    this.id = fabric.Object.__uid++;
+
     if (options.source) {
       if (typeof options.source === 'string') {
         // function string
@@ -6291,6 +6293,38 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
       offsetY: this.offsetY
     };
   },
+
+  /* _TO_SVG_START_ */
+  /**
+   * Returns SVG representation of a pattern
+   * @return {String} SVG representation of a pattern
+   */
+  toSVG: function() {
+    var patternSource = typeof this.source === 'function' ? this.source() : this.source;
+    var patternWidth = patternSource.width;
+    var patternHeight = patternSource.height;
+    var patternImgSrc = '';
+
+    if (patternSource.src) {
+      patternImgSrc = patternSource.src;
+    }
+    else if (patternSource.toDataURL) {
+      patternImgSrc = patternSource.toDataURL();
+    }
+
+    return '<pattern id="SVGID_' + this.id +
+                  '" x="' + this.offsetX +
+                  '" y="' + this.offsetY +
+                  '" width="' + patternWidth +
+                  '" height="' + patternHeight + '">' +
+             '<image x="0" y="0"' +
+                    ' width="' + patternWidth +
+                    '" height="' + patternHeight +
+                    '" src="' + patternImgSrc +
+             '"></image>' +
+           '</pattern>';
+  },
+  /* _TO_SVG_END_ */
 
   /**
    * Returns an instance of CanvasPattern
@@ -10563,17 +10597,35 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @return {String}
      */
     getSvgStyles: function() {
+
+      var fill = this.fill
+        ? (this.fill.toLive ? 'url(#SVGID_' + this.fill.id + ')' : this.fill)
+        : 'none';
+
+      var stroke = this.stroke
+        ? (this.stroke.toLive ? 'url(#SVGID_' + this.stroke.id + ')' : this.stroke)
+        : 'none';
+
+      var strokeWidth = this.strokeWidth ? this.strokeWidth : '0';
+      var strokeDashArray = this.strokeDashArray ? this.strokeDashArray.join(' ') : '';
+      var strokeLineCap = this.strokeLineCap ? this.strokeLineCap : 'butt';
+      var strokeLineJoin = this.strokeLineJoin ? this.strokeLineJoin : 'miter';
+      var strokeMiterLimit = this.strokeMiterLimit ? this.strokeMiterLimit : '4';
+      var opacity = typeof this.opacity !== 'undefined' ? this.opacity : '1';
+
+      var visibility = this.visible ? '' : " visibility: hidden;";
+
       return [
-        "stroke: ", (this.stroke ? this.stroke : 'none'), "; ",
-        "stroke-width: ", (this.strokeWidth ? this.strokeWidth : '0'), "; ",
-        "stroke-dasharray: ", (this.strokeDashArray ? this.strokeDashArray.join(' ') : ''), "; ",
-        "stroke-linecap: ", (this.strokeLineCap ? this.strokeLineCap : 'butt'), "; ",
-        "stroke-linejoin: ", (this.strokeLineJoin ? this.strokeLineJoin : 'miter'), "; ",
-        "stroke-miterlimit: ", (this.strokeMiterLimit ? this.strokeMiterLimit : '4'), "; ",
-        "fill: ", (this.fill ? (this.fill && this.fill.toLive ? 'url(#SVGID_' + this.fill.id + ')' : this.fill) : 'none'), "; ",
-        "opacity: ", (typeof this.opacity !== 'undefined' ? this.opacity : '1'), ";",
-        (this.visible ? '' : " visibility: hidden;")
-      ].join("");
+        "stroke: ", stroke, "; ",
+        "stroke-width: ", strokeWidth, "; ",
+        "stroke-dasharray: ", strokeDashArray, "; ",
+        "stroke-linecap: ", strokeLineCap, "; ",
+        "stroke-linejoin: ", strokeLineJoin, "; ",
+        "stroke-miterlimit: ", strokeMiterLimit, "; ",
+        "fill: ", fill, "; ",
+        "opacity: ", opacity, ";",
+        visibility
+      ].join('');
     },
 
     /**

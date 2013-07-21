@@ -30,6 +30,8 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
   initialize: function(options) {
     options || (options = { });
 
+    this.id = fabric.Object.__uid++;
+
     if (options.source) {
       if (typeof options.source === 'string') {
         // function string
@@ -85,6 +87,38 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
       offsetY: this.offsetY
     };
   },
+
+  /* _TO_SVG_START_ */
+  /**
+   * Returns SVG representation of a pattern
+   * @return {String} SVG representation of a pattern
+   */
+  toSVG: function() {
+    var patternSource = typeof this.source === 'function' ? this.source() : this.source;
+    var patternWidth = patternSource.width;
+    var patternHeight = patternSource.height;
+    var patternImgSrc = '';
+
+    if (patternSource.src) {
+      patternImgSrc = patternSource.src;
+    }
+    else if (patternSource.toDataURL) {
+      patternImgSrc = patternSource.toDataURL();
+    }
+
+    return '<pattern id="SVGID_' + this.id +
+                  '" x="' + this.offsetX +
+                  '" y="' + this.offsetY +
+                  '" width="' + patternWidth +
+                  '" height="' + patternHeight + '">' +
+             '<image x="0" y="0"' +
+                    ' width="' + patternWidth +
+                    '" height="' + patternHeight +
+                    '" src="' + patternImgSrc +
+             '"></image>' +
+           '</pattern>';
+  },
+  /* _TO_SVG_END_ */
 
   /**
    * Returns an instance of CanvasPattern

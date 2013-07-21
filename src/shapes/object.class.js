@@ -513,17 +513,35 @@
      * @return {String}
      */
     getSvgStyles: function() {
+
+      var fill = this.fill
+        ? (this.fill.toLive ? 'url(#SVGID_' + this.fill.id + ')' : this.fill)
+        : 'none';
+
+      var stroke = this.stroke
+        ? (this.stroke.toLive ? 'url(#SVGID_' + this.stroke.id + ')' : this.stroke)
+        : 'none';
+
+      var strokeWidth = this.strokeWidth ? this.strokeWidth : '0';
+      var strokeDashArray = this.strokeDashArray ? this.strokeDashArray.join(' ') : '';
+      var strokeLineCap = this.strokeLineCap ? this.strokeLineCap : 'butt';
+      var strokeLineJoin = this.strokeLineJoin ? this.strokeLineJoin : 'miter';
+      var strokeMiterLimit = this.strokeMiterLimit ? this.strokeMiterLimit : '4';
+      var opacity = typeof this.opacity !== 'undefined' ? this.opacity : '1';
+
+      var visibility = this.visible ? '' : " visibility: hidden;";
+
       return [
-        "stroke: ", (this.stroke ? this.stroke : 'none'), "; ",
-        "stroke-width: ", (this.strokeWidth ? this.strokeWidth : '0'), "; ",
-        "stroke-dasharray: ", (this.strokeDashArray ? this.strokeDashArray.join(' ') : ''), "; ",
-        "stroke-linecap: ", (this.strokeLineCap ? this.strokeLineCap : 'butt'), "; ",
-        "stroke-linejoin: ", (this.strokeLineJoin ? this.strokeLineJoin : 'miter'), "; ",
-        "stroke-miterlimit: ", (this.strokeMiterLimit ? this.strokeMiterLimit : '4'), "; ",
-        "fill: ", (this.fill ? (this.fill && this.fill.toLive ? 'url(#SVGID_' + this.fill.id + ')' : this.fill) : 'none'), "; ",
-        "opacity: ", (typeof this.opacity !== 'undefined' ? this.opacity : '1'), ";",
-        (this.visible ? '' : " visibility: hidden;")
-      ].join("");
+        "stroke: ", stroke, "; ",
+        "stroke-width: ", strokeWidth, "; ",
+        "stroke-dasharray: ", strokeDashArray, "; ",
+        "stroke-linecap: ", strokeLineCap, "; ",
+        "stroke-linejoin: ", strokeLineJoin, "; ",
+        "stroke-miterlimit: ", strokeMiterLimit, "; ",
+        "fill: ", fill, "; ",
+        "opacity: ", opacity, ";",
+        visibility
+      ].join('');
     },
 
     /**
