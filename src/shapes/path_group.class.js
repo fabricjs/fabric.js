@@ -5,9 +5,7 @@
   var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       invoke = fabric.util.array.invoke,
-      parentToObject = fabric.Object.prototype.toObject,
-      camelize = fabric.util.string.camelize,
-      capitalize = fabric.util.string.capitalize;
+      parentToObject = fabric.Object.prototype.toObject;
 
   if (fabric.PathGroup) {
     fabric.warn('fabric.PathGroup is already defined');

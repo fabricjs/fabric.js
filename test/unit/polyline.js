@@ -87,11 +87,7 @@
     var polyline = fabric.Polyline.fromElement(elPolyline);
     ok(polyline instanceof fabric.Polyline);
 
-    deepEqual(polyline.toObject(), fabric.util.object.extend(REFERENCE_OBJECT, {
-      points: [ { x: -5, y: -5 }, { x: 5, y: 5 } ],
-      left: 15,
-      top: 17
-    }));
+    deepEqual(polyline.toObject(), REFERENCE_OBJECT);
 
     var elPolylineWithAttrs = fabric.document.createElement('polyline');
     elPolylineWithAttrs.setAttribute('points', '10,10 20,20 30,30 10,10');
@@ -107,12 +103,7 @@
 
     var polylineWithAttrs = fabric.Polyline.fromElement(elPolylineWithAttrs);
 
-    var expectedPoints = [
-      { x: -10, y: -10 },
-      { x: 0, y: 0 },
-      { x: 10, y: 10 },
-      { x: -10, y: -10 }
-    ];
+    var expectedPoints = [{x: 10, y: 10}, {x: 20, y: 20}, {x: 30, y: 30}, {x: 10, y: 10}];
 
     deepEqual(polylineWithAttrs.toObject(), fabric.util.object.extend(REFERENCE_OBJECT, {
       'width': 20,
@@ -125,9 +116,7 @@
       'strokeLineJoin': 'bevil',
       'strokeMiterLimit': 5,
       'opacity': 0.34,
-      'points': expectedPoints,
-      'left': 20,
-      'top': 20
+      'points': expectedPoints
     }));
 
     deepEqual(polylineWithAttrs.get('transformMatrix'), [ 2, 0, 0, 2, -10, -20 ]);
