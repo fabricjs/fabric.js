@@ -111,4 +111,12 @@
     }
   });
 
+  test('toSVG', function() {
+    var pattern = createPattern();
+
+    ok(typeof pattern.toSVG == 'function');
+
+    // TODO: test toSVG
+  });
+
 })();

@@ -427,4 +427,12 @@
     equal(gradient.colorStops[2].opacity, 0.5);
   });
 
+  test('toSVG', function() {
+    var gradient = createLinearGradient();
+
+    ok(typeof gradient.toSVG == 'function');
+
+    // TODO: test toSVG
+  });
+
 })();

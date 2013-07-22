@@ -93,10 +93,10 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
    * Returns SVG representation of a pattern
    * @return {String} SVG representation of a pattern
    */
-  toSVG: function() {
+  toSVG: function(object) {
     var patternSource = typeof this.source === 'function' ? this.source() : this.source;
-    var patternWidth = patternSource.width;
-    var patternHeight = patternSource.height;
+    var patternWidth = patternSource.width / object.getWidth();
+    var patternHeight = patternSource.height / object.getHeight();
     var patternImgSrc = '';
 
     if (patternSource.src) {
@@ -114,7 +114,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
              '<image x="0" y="0"' +
                     ' width="' + patternWidth +
                     '" height="' + patternHeight +
-                    '" src="' + patternImgSrc +
+                    '" xlink:href="' + patternImgSrc +
              '"></image>' +
            '</pattern>';
   },
