@@ -7156,7 +7156,7 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
         markup.push(
           '<?xml version="1.0" standalone="no" ?>',
             '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" ',
-              '"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">'
+              '"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n'
         );
       }
       markup.push(
@@ -7279,7 +7279,7 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
 
         if (intersecting) {
           newIdx = idx;
-          
+
           // traverse down the stack looking for the nearest intersecting object
           for (var i=idx-1; i>=0; --i) {
 
@@ -7337,7 +7337,7 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
         else {
           newIdx = idx+1;
         }
-        
+
         removeFromArray(this._objects, object);
         this._objects.splice(newIdx, 0, object);
         this.renderAll && this.renderAll();
