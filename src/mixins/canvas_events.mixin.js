@@ -121,6 +121,9 @@
 
       if (this.isDrawingMode && this._isCurrentlyDrawing) {
         this._isCurrentlyDrawing = false;
+        if (this.clipTo) {
+          this.contextTop.restore();
+        }
         this.freeDrawingBrush.onMouseUp();
         this.fire('mouse:up', { e: e });
         return;
@@ -201,6 +204,9 @@
         pointer = this.getPointer(e);
         this._isCurrentlyDrawing = true;
         this.discardActiveObject().renderAll();
+        if (this.clipTo) {
+          fabric.util.clipContext(this, this.contextTop);
+        }
         this.freeDrawingBrush.onMouseDown(pointer);
         this.fire('mouse:down', { e: e });
         return;
