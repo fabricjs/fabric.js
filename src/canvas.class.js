@@ -38,30 +38,35 @@
     /**
      * When true, objects can be transformed by one side (unproportionally)
      * @type Boolean
+     * @default
      */
     uniScaleTransform:      false,
 
     /**
      * When true, objects use center point as the origin of transformation
      * @type Boolean
+     * @default
      */
     centerTransform:        false,
 
     /**
      * Indicates that canvas is interactive. This property should not be changed.
      * @type Boolean
+     * @default
      */
     interactive:            true,
 
     /**
      * Indicates whether group selection should be enabled
      * @type Boolean
+     * @default
      */
     selection:              true,
 
     /**
      * Color of selection
      * @type String
+     * @default
      */
     selectionColor:         'rgba(100, 100, 255, 0.3)', // blue
 
@@ -75,62 +80,72 @@
     /**
      * Color of the border of selection (usually slightly darker than color of selection itself)
      * @type String
+     * @default
      */
     selectionBorderColor:   'rgba(255, 255, 255, 0.3)',
 
     /**
      * Width of a line used in object/group selection
      * @type Number
+     * @default
      */
     selectionLineWidth:     1,
 
     /**
      * Default cursor value used when hovering over an object on canvas
      * @type String
+     * @default
      */
     hoverCursor:            'move',
 
     /**
      * Default cursor value used when moving an object on canvas
      * @type String
+     * @default
      */
     moveCursor:             'move',
 
     /**
      * Default cursor value used for the entire canvas
      * @type String
+     * @default
      */
     defaultCursor:          'default',
 
     /**
      * Cursor value used during free drawing
      * @type String
+     * @default
      */
     freeDrawingCursor:      'crosshair',
 
     /**
      * Cursor value used for rotation point
      * @type String
+     * @default
      */
     rotationCursor:         'crosshair',
 
     /**
      * Default element class that's given to wrapper (div) element of canvas
      * @type String
+     * @default
      */
     containerClass:        'canvas-container',
 
     /**
      * When true, object detection happens on per-pixel basis rather than on per-bounding-box
      * @type Boolean
+     * @default
      */
     perPixelTargetFind:     false,
 
     /**
      * Number of pixels around target pixel to tolerate (consider active) during object detection
      * @type Number
+     * @default
      */
-    targetFindTolerance: 0,
+    targetFindTolerance:    0,
 
     /**
      * @private
@@ -150,7 +165,7 @@
     /**
      * Resets the current transform to its original values and chooses the type of resizing based on the event
      * @private
-     * @param e {Event} Event object fired on mousemove
+     * @param {Event} e Event object fired on mousemove
      */
     _resetCurrentTransform: function(e) {
       var t = this._currentTransform;
@@ -206,7 +221,6 @@
      * @private
      */
     _normalizePointer: function (object, pointer) {
-
       var activeGroup = this.getActiveGroup(),
           x = pointer.x,
           y = pointer.y;
@@ -279,6 +293,8 @@
 
     /**
      * @private
+     * @param {Event} e
+     * @param {fabric.Object} target
      */
     _shouldClearSelection: function (e, target) {
       var activeGroup = this.getActiveGroup();
@@ -297,6 +313,8 @@
 
     /**
      * @private
+     * @param {Event} e
+     * @param {fabric.Object} target
      */
     _setupCurrentTransform: function (e, target) {
       if (!target) return;
@@ -371,8 +389,8 @@
 
     /**
      * @private
-     * @param e {Event}
-     * @param target {fabric.Object}
+     * @param {Event} e
+     * @param {fabric.Object} target
      * @return {Boolean}
      */
     _shouldHandleGroupLogic: function(e, target) {
@@ -384,6 +402,8 @@
 
     /**
      * @private
+     * @param {Event} e
+     * @param {fabric.Object} target
      */
     _handleGroupLogic: function (e, target) {
       if (target === this.getActiveGroup()) {
@@ -424,6 +444,7 @@
               isActiveLower ? [ target, this._activeObject ] : [ this._activeObject, target ]);
 
             this.setActiveGroup(group);
+            this._activeObject = null;
             activeGroup = this.getActiveGroup();
             this.fire('selection:created', { target: activeGroup, e: e });
           }
@@ -867,7 +888,8 @@
 
     /**
      * Sets given object as the only active object on canvas
-     * @param object {fabric.Object} Object to set as an active one
+     * @param {fabric.Object} object Object to set as an active one
+     * @param {Event} e
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
@@ -975,7 +997,7 @@
 
     /**
      * Draws objects' controls (borders/controls)
-     * @param {Object} ctx context to render controls on
+     * @param {CanvasRenderingContext2D} ctx Context to render controls on
      */
     drawControls: function(ctx) {
       var activeGroup = this.getActiveGroup();
