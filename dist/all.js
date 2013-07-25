@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures` */
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.2.6" };
+var fabric = fabric || { version: "1.2.7" };
 
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
@@ -6383,15 +6383,33 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
     for (var prop in options) {
       this[prop] = options[prop];
     }
+
+    this.id = fabric.Object.__uid++;
   },
 
   /* _TO_SVG_START_ */
   /**
    * Returns SVG representation of a shadow
-   * @return {String}
+   * @return {String} SVG representation of a shadow
    */
-  toSVG: function() {
+  toSVG: function(object) {
+    var mode = 'SourceAlpha';
 
+    if (object.fill === this.color || object.stroke === this.color) {
+      mode = 'SourceGraphic';
+    }
+
+    return (
+      '<filter id="SVGID_' + this.id + '">' +
+        '<feGaussianBlur in="' + mode + '" stdDeviation="' +
+          (this.blur ? this.blur / 3 : 0) +
+        '"></feGaussianBlur>' +
+        '<feOffset dx="' + this.offsetX + '" dy="' + this.offsetY + '"></feOffset>' +
+        '<feMerge>' +
+          '<feMergeNode></feMergeNode>' +
+          '<feMergeNode in="SourceGraphic"></feMergeNode>' +
+        '</feMerge>' +
+      '</filter>');
   },
   /* _TO_SVG_END_ */
 
@@ -10642,6 +10660,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       var opacity = typeof this.opacity !== 'undefined' ? this.opacity : '1';
 
       var visibility = this.visible ? '' : " visibility: hidden;";
+      var filter = this.shadow ? 'filter: url(#SVGID_' + this.shadow.id + ');' : '';
 
       return [
         "stroke: ", stroke, "; ",
@@ -10652,6 +10671,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         "stroke-miterlimit: ", strokeMiterLimit, "; ",
         "fill: ", fill, "; ",
         "opacity: ", opacity, ";",
+        filter,
         visibility
       ].join('');
     },
@@ -10688,6 +10708,21 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       var flipYPart = this.flipY ? "matrix(1 0 0 -1 0 0)" : "";
 
       return [ translatePart, anglePart, scalePart, flipXPart, flipYPart ].join('');
+    },
+
+    _createBaseSVGMarkup: function() {
+      var markup = [ ];
+
+      if (this.fill && this.fill.toLive) {
+        markup.push(this.fill.toSVG(this, false));
+      }
+      if (this.stroke && this.stroke.toLive) {
+        markup.push(this.stroke.toSVG(this, false));
+      }
+      if (this.shadow) {
+        markup.push(this.shadow.toSVG(this));
+      }
+      return markup;
     },
     /* _TO_SVG_END_ */
 
@@ -12570,11 +12605,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @return {String} svg representation of an instance
      */
     toSVG: function() {
-      var markup = [];
-
-      if (this.stroke && this.stroke.toLive) {
-        markup.push(this.stroke.toSVG(this, true));
-      }
+      var markup = this._createBaseSVGMarkup();
 
       markup.push(
         '<line ',
@@ -12699,14 +12730,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @return {String} svg representation of an instance
      */
     toSVG: function() {
-      var markup = [];
-
-      if (this.fill && this.fill.toLive) {
-        markup.push(this.fill.toSVG(this, false));
-      }
-      if (this.stroke && this.stroke.toLive) {
-        markup.push(this.stroke.toSVG(this, false));
-      }
+      var markup = this._createBaseSVGMarkup();
 
       markup.push(
         '<circle ',
@@ -12906,7 +12930,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @return {String} svg representation of an instance
      */
     toSVG: function() {
-      var markup = [],
+      var markup = this._createBaseSVGMarkup(),
           widthBy2 = this.width / 2,
           heightBy2 = this.height / 2;
 
@@ -12915,13 +12939,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         "0 " + -heightBy2,
         widthBy2 + " " + heightBy2
       ].join(",");
-
-      if (this.fill && this.fill.toLive) {
-        markup.push(this.fill.toSVG(this, true));
-      }
-      if (this.stroke && this.stroke.toLive) {
-        markup.push(this.stroke.toSVG(this, true));
-      }
 
       markup.push(
         '<polygon ',
@@ -13034,14 +13051,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @return {String} svg representation of an instance
      */
     toSVG: function() {
-      var markup = [];
-
-      if (this.fill && this.fill.toLive) {
-        markup.push(this.fill.toSVG(this, false));
-      }
-      if (this.stroke && this.stroke.toLive) {
-        markup.push(this.stroke.toSVG(this, false));
-      }
+      var markup = this._createBaseSVGMarkup();
 
       markup.push(
         '<ellipse ',
@@ -13329,14 +13339,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @return {String} svg representation of an instance
      */
     toSVG: function() {
-      var markup = [];
-
-      if (this.fill && this.fill.toLive) {
-        markup.push(this.fill.toSVG(this, false));
-      }
-      if (this.stroke && this.stroke.toLive) {
-        markup.push(this.stroke.toSVG(this, false));
-      }
+      var markup = this._createBaseSVGMarkup();
 
       markup.push(
         '<rect ',
@@ -13477,17 +13480,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     toSVG: function() {
       var points = [],
-          markup = [];
+          markup = this._createBaseSVGMarkup();
 
       for (var i = 0, len = this.points.length; i < len; i++) {
         points.push(toFixed(this.points[i].x, 2), ',', toFixed(this.points[i].y, 2), ' ');
-      }
-
-      if (this.fill && this.fill.toLive) {
-        markup.push(this.fill.toSVG(this, false));
-      }
-      if (this.stroke && this.stroke.toLive) {
-        markup.push(this.stroke.toSVG(this, false));
       }
 
       markup.push(
@@ -13687,17 +13683,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     toSVG: function() {
       var points = [],
-          markup = [];
+          markup = this._createBaseSVGMarkup();
 
       for (var i = 0, len = this.points.length; i < len; i++) {
         points.push(toFixed(this.points[i].x, 2), ',', toFixed(this.points[i].y, 2), ' ');
-      }
-
-      if (this.fill && this.fill.toLive) {
-        markup.push(this.fill.toSVG(this, false));
-      }
-      if (this.stroke && this.stroke.toLive) {
-        markup.push(this.stroke.toSVG(this, false));
       }
 
       markup.push(
@@ -14333,19 +14322,12 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     toSVG: function() {
       var chunks = [],
-          markup = [];
+          markup = this._createBaseSVGMarkup();
 
       for (var i = 0, len = this.path.length; i < len; i++) {
         chunks.push(this.path[i].join(' '));
       }
       var path = chunks.join(' ');
-
-      if (this.fill && this.fill.toLive) {
-        markup.push(this.fill.toSVG(this, true));
-      }
-      if (this.stroke && this.stroke.toLive) {
-        markup.push(this.stroke.toSVG(this, true));
-      }
 
       markup.push(
         '<g transform="', (this.group ? '' : this.getSvgTransform()), '">',

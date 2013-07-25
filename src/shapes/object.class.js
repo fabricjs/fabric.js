@@ -530,6 +530,7 @@
       var opacity = typeof this.opacity !== 'undefined' ? this.opacity : '1';
 
       var visibility = this.visible ? '' : " visibility: hidden;";
+      var filter = this.shadow ? 'filter: url(#SVGID_' + this.shadow.id + ');' : '';
 
       return [
         "stroke: ", stroke, "; ",
@@ -540,6 +541,7 @@
         "stroke-miterlimit: ", strokeMiterLimit, "; ",
         "fill: ", fill, "; ",
         "opacity: ", opacity, ";",
+        filter,
         visibility
       ].join('');
     },
@@ -576,6 +578,21 @@
       var flipYPart = this.flipY ? "matrix(1 0 0 -1 0 0)" : "";
 
       return [ translatePart, anglePart, scalePart, flipXPart, flipYPart ].join('');
+    },
+
+    _createBaseSVGMarkup: function() {
+      var markup = [ ];
+
+      if (this.fill && this.fill.toLive) {
+        markup.push(this.fill.toSVG(this, false));
+      }
+      if (this.stroke && this.stroke.toLive) {
+        markup.push(this.stroke.toSVG(this, false));
+      }
+      if (this.shadow) {
+        markup.push(this.shadow.toSVG(this));
+      }
+      return markup;
     },
     /* _TO_SVG_END_ */
 

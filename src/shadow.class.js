@@ -43,15 +43,33 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
     for (var prop in options) {
       this[prop] = options[prop];
     }
+
+    this.id = fabric.Object.__uid++;
   },
 
   /* _TO_SVG_START_ */
   /**
    * Returns SVG representation of a shadow
-   * @return {String}
+   * @return {String} SVG representation of a shadow
    */
-  toSVG: function() {
+  toSVG: function(object) {
+    var mode = 'SourceAlpha';
 
+    if (object.fill === this.color || object.stroke === this.color) {
+      mode = 'SourceGraphic';
+    }
+
+    return (
+      '<filter id="SVGID_' + this.id + '">' +
+        '<feGaussianBlur in="' + mode + '" stdDeviation="' +
+          (this.blur ? this.blur / 3 : 0) +
+        '"></feGaussianBlur>' +
+        '<feOffset dx="' + this.offsetX + '" dy="' + this.offsetY + '"></feOffset>' +
+        '<feMerge>' +
+          '<feMergeNode></feMergeNode>' +
+          '<feMergeNode in="SourceGraphic"></feMergeNode>' +
+        '</feMerge>' +
+      '</filter>');
   },
   /* _TO_SVG_END_ */
 
