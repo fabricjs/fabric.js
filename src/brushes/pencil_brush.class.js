@@ -29,7 +29,7 @@
       // capture coordinates immediately
       // this allows to draw dots (when movement never occurs)
       this._captureDrawingPath(pointer);
-	  this._render();
+      this._render();
     },
 
     /**
@@ -108,18 +108,18 @@
 
       var p1 = this._points[0];
       var p2 = this._points[1];
-	  
-	  //if we only have 2 points in the path and they are the same
-	  //it means that the user only clicked the canvas without moving the mouse
-	  //then we should be drawing a dot. A path isn't drawn between two identical dots
-	  //that's why we set them apart a bit
-	  if(this._points.length == 2 && p1.x == p2.x && p1.y == p2.y) {
-		  p1.x -= 0.5;
-		  p2.x += 0.5;
-	  }
-		ctx.moveTo(p1.x, p1.y);
+      
+      //if we only have 2 points in the path and they are the same
+      //it means that the user only clicked the canvas without moving the mouse
+      //then we should be drawing a dot. A path isn't drawn between two identical dots
+      //that's why we set them apart a bit
+      if(this._points.length === 2 && p1.x === p2.x && p1.y === p2.y) {
+          p1.x -= 0.5;
+          p2.x += 0.5;
+      }
+        ctx.moveTo(p1.x, p1.y);
 
-		for (var i = 1, len = this._points.length; i < len; i++) {
+        for (var i = 1, len = this._points.length; i < len; i++) {
         // we pick the point between pi+1 & pi+2 as the
         // end point and p1 as our control point.
         var midPoint = p1.midPointFrom(p2);
