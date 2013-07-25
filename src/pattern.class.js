@@ -112,8 +112,8 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
                   '" width="' + patternWidth +
                   '" height="' + patternHeight + '">' +
              '<image x="0" y="0"' +
-                    ' width="' + patternWidth +
-                    '" height="' + patternHeight +
+                    ' width="' + patternSource.width +
+                    '" height="' + patternSource.height +
                     '" xlink:href="' + patternImgSrc +
              '"></image>' +
            '</pattern>';
