@@ -283,9 +283,7 @@
       replacement.height = imgEl.height;
 
       if (fabric.isLikelyNode) {
-        // cut off data:image/png;base64, part in the beginning
-        var base64str = canvasEl.toDataURL('image/png').substring(22);
-        replacement.src = new Buffer(base64str, 'base64');
+        replacement.src = canvasEl.toBuffer();
 
         // onload doesn't fire in some node versions, so we invoke callback manually
         _this._element = replacement;
