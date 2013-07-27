@@ -60,7 +60,7 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
     }
 
     return (
-      '<filter id="SVGID_' + this.id + '">' +
+      '<filter id="SVGID_' + this.id + '" y="-40%" height="180%">' +
         '<feGaussianBlur in="' + mode + '" stdDeviation="' +
           (this.blur ? this.blur / 3 : 0) +
         '"></feGaussianBlur>' +
