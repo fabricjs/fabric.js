@@ -2106,64 +2106,6 @@ fabric.Collection = {
      return false;
    }
 
-   /**
-    * Changes value from one to another within certain period of time, invoking callbacks as value is being changed.
-    * @memberOf fabric.util
-    * @param {Object} [options] Animation options
-    * @param {Function} [options.onChange] Callback; invoked on every value change
-    * @param {Function} [options.onComplete] Callback; invoked when value change is completed
-    * @param {Number} [options.startValue=0] Starting value
-    * @param {Number} [options.endValue=100] Ending value
-    * @param {Number} [options.byValue=100] Value to modify the property by
-    * @param {Function} [options.easing] Easing function
-    * @param {Number} [options.duration=500] Duration of change
-    */
-  function animate(options) {
-
-    options || (options = { });
-
-    var start = +new Date(),
-      duration = options.duration || 500,
-      finish = start + duration, time,
-      onChange = options.onChange || function() { },
-      abort = options.abort || function() { return false; },
-      easing = options.easing || function(t, b, c, d) {return -c * Math.cos(t/d * (Math.PI/2)) + c + b;},
-      startValue = 'startValue' in options ? options.startValue : 0,
-      endValue = 'endValue' in options ? options.endValue : 100,
-      byValue = options.byValue || endValue - startValue;
-
-    options.onStart && options.onStart();
-
-    (function tick() {
-      time = +new Date();
-      var currentTime = time > finish ? duration : (time - start);
-      onChange(easing(currentTime, startValue, byValue, duration));
-      if (time > finish || abort()) {
-        options.onComplete && options.onComplete();
-        return;
-      }
-      requestAnimFrame(tick);
-    })();
-  }
-
-  var _requestAnimFrame = fabric.window.requestAnimationFrame       ||
-                          fabric.window.webkitRequestAnimationFrame ||
-                          fabric.window.mozRequestAnimationFrame    ||
-                          fabric.window.oRequestAnimationFrame      ||
-                          fabric.window.msRequestAnimationFrame     ||
-                          function(callback) {
-                            fabric.window.setTimeout(callback, 1000 / 60);
-                          };
-  /**
-    * requestAnimationFrame polyfill based on http://paulirish.com/2011/requestanimationframe-for-smart-animating/
-    * @memberOf fabric.util
-    * @param {Function} callback Callback to invoke
-    * @param {DOMElement} element optional Element to associate with animation
-    */
-  var requestAnimFrame = function() {
-    return _requestAnimFrame.apply(fabric.window, arguments);
-  };
-
   /**
     * Returns klass "Class" object of given fabric.Object type
     * @memberOf fabric.util
@@ -2554,8 +2496,6 @@ fabric.Collection = {
   fabric.util.toFixed = toFixed;
   fabric.util.getRandomInt = getRandomInt;
   fabric.util.falseFunction = falseFunction;
-  fabric.util.animate = animate;
-  fabric.util.requestAnimFrame = requestAnimFrame;
   fabric.util.getKlass = getKlass;
   fabric.util.loadImage = loadImage;
   fabric.util.enlivenObjects = enlivenObjects;
@@ -3720,6 +3660,72 @@ fabric.util.string = {
   }
 
   fabric.util.request = request;
+})();
+
+
+(function() {
+
+   /**
+    * Changes value from one to another within certain period of time, invoking callbacks as value is being changed.
+    * @memberOf fabric.util
+    * @param {Object} [options] Animation options
+    * @param {Function} [options.onChange] Callback; invoked on every value change
+    * @param {Function} [options.onComplete] Callback; invoked when value change is completed
+    * @param {Number} [options.startValue=0] Starting value
+    * @param {Number} [options.endValue=100] Ending value
+    * @param {Number} [options.byValue=100] Value to modify the property by
+    * @param {Function} [options.easing] Easing function
+    * @param {Number} [options.duration=500] Duration of change
+    */
+  function animate(options) {
+
+    options || (options = { });
+
+    var start = +new Date(),
+      duration = options.duration || 500,
+      finish = start + duration, time,
+      onChange = options.onChange || function() { },
+      abort = options.abort || function() { return false; },
+      easing = options.easing || function(t, b, c, d) {return -c * Math.cos(t/d * (Math.PI/2)) + c + b;},
+      startValue = 'startValue' in options ? options.startValue : 0,
+      endValue = 'endValue' in options ? options.endValue : 100,
+      byValue = options.byValue || endValue - startValue;
+
+    options.onStart && options.onStart();
+
+    (function tick() {
+      time = +new Date();
+      var currentTime = time > finish ? duration : (time - start);
+      onChange(easing(currentTime, startValue, byValue, duration));
+      if (time > finish || abort()) {
+        options.onComplete && options.onComplete();
+        return;
+      }
+      requestAnimFrame(tick);
+    })();
+  }
+
+  var _requestAnimFrame = fabric.window.requestAnimationFrame       ||
+                          fabric.window.webkitRequestAnimationFrame ||
+                          fabric.window.mozRequestAnimationFrame    ||
+                          fabric.window.oRequestAnimationFrame      ||
+                          fabric.window.msRequestAnimationFrame     ||
+                          function(callback) {
+                            fabric.window.setTimeout(callback, 1000 / 60);
+                          };
+  /**
+    * requestAnimationFrame polyfill based on http://paulirish.com/2011/requestanimationframe-for-smart-animating/
+    * @memberOf fabric.util
+    * @param {Function} callback Callback to invoke
+    * @param {DOMElement} element optional Element to associate with animation
+    */
+  var requestAnimFrame = function() {
+    return _requestAnimFrame.apply(fabric.window, arguments);
+  };
+
+  fabric.util.animate = animate;
+  fabric.util.requestAnimFrame = requestAnimFrame;
+
 })();
 
 
@@ -9791,6 +9797,107 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
   }
 });
 
+fabric.util.object.extend(fabric.Object.prototype, {
+  /**
+   * Animates object's properties
+   * @param {String|Object} property to animate (if string) or properties to animate (if object)
+   * @param {Number|Object} value to animate property to (if string was given first) or options object
+   * @return {fabric.Object} thisArg
+   * @chainable
+   *
+   * As object — multiple properties
+   *
+   * object.animate({ left: ..., top: ... });
+   * object.animate({ left: ..., top: ... }, { duration: ... });
+   *
+   * As string — one property
+   *
+   * object.animate('left', ...);
+   * object.animate('left', { duration: ... });
+   *
+   */
+  animate: function() {
+    if (arguments[0] && typeof arguments[0] === 'object') {
+      var propsToAnimate = [ ], prop, skipCallbacks;
+      for (prop in arguments[0]) {
+        propsToAnimate.push(prop);
+      }
+      for (var i = 0, len = propsToAnimate.length; i<len; i++) {
+        prop = propsToAnimate[i];
+        skipCallbacks = i !== len - 1;
+        this._animate(prop, arguments[0][prop], arguments[1], skipCallbacks);
+      }
+    }
+    else {
+      this._animate.apply(this, arguments);
+    }
+    return this;
+  },
+
+  /**
+   * @private
+   * @param {String} property
+   * @param {String} to
+   * @param {Object} [options]
+   * @param {Boolean} [skipCallbacks]
+   */
+  _animate: function(property, to, options, skipCallbacks) {
+    var obj = this, propPair;
+
+    to = to.toString();
+
+    if (!options) {
+      options = { };
+    }
+    else {
+      options = fabric.util.object.clone(options);
+    }
+
+    if (~property.indexOf('.')) {
+      propPair = property.split('.');
+    }
+
+    var currentValue = propPair
+      ? this.get(propPair[0])[propPair[1]]
+      : this.get(property);
+
+    if (!('from' in options)) {
+      options.from = currentValue;
+    }
+
+    if (~to.indexOf('=')) {
+      to = currentValue + parseFloat(to.replace('=', ''));
+    }
+    else {
+      to = parseFloat(to);
+    }
+
+    fabric.util.animate({
+      startValue: options.from,
+      endValue: to,
+      byValue: options.by,
+      easing: options.easing,
+      duration: options.duration,
+      onChange: function(value) {
+        if (propPair) {
+          obj[propPair[0]][propPair[1]] = value;
+        }
+        else {
+          obj.set(property, value);
+        }
+        if (skipCallbacks) return;
+        options.onChange && options.onChange();
+      },
+      onComplete: function() {
+        if (skipCallbacks) return;
+
+        obj.setCoords();
+        options.onComplete && options.onComplete();
+      }
+    });
+  }
+});
+
 
 fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.StaticCanvas.prototype */ {
 
@@ -11131,105 +11238,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      */
     setShadow: function(options) {
       return this.set('shadow', new fabric.Shadow(options));
-    },
-
-    /**
-     * Animates object's properties
-     * @param {String|Object} property to animate (if string) or properties to animate (if object)
-     * @param {Number|Object} value to animate property to (if string was given first) or options object
-     * @return {fabric.Object} thisArg
-     * @chainable
-     *
-     * As object — multiple properties
-     *
-     * object.animate({ left: ..., top: ... });
-     * object.animate({ left: ..., top: ... }, { duration: ... });
-     *
-     * As string — one property
-     *
-     * object.animate('left', ...);
-     * object.animate('left', { duration: ... });
-     *
-     */
-    animate: function() {
-      if (arguments[0] && typeof arguments[0] === 'object') {
-        var propsToAnimate = [ ], prop, skipCallbacks;
-        for (prop in arguments[0]) {
-          propsToAnimate.push(prop);
-        }
-        for (var i = 0, len = propsToAnimate.length; i<len; i++) {
-          prop = propsToAnimate[i];
-          skipCallbacks = i !== len - 1;
-          this._animate(prop, arguments[0][prop], arguments[1], skipCallbacks);
-        }
-      }
-      else {
-        this._animate.apply(this, arguments);
-      }
-      return this;
-    },
-
-    /**
-     * @private
-     * @param {String} property
-     * @param {String} to
-     * @param {Object} [options]
-     * @param {Boolean} [skipCallbacks]
-     */
-    _animate: function(property, to, options, skipCallbacks) {
-      var obj = this, propPair;
-
-      to = to.toString();
-
-      if (!options) {
-        options = { };
-      }
-      else {
-        options = fabric.util.object.clone(options);
-      }
-
-      if (~property.indexOf('.')) {
-        propPair = property.split('.');
-      }
-
-      var currentValue = propPair
-        ? this.get(propPair[0])[propPair[1]]
-        : this.get(property);
-
-      if (!('from' in options)) {
-        options.from = currentValue;
-      }
-
-      if (~to.indexOf('=')) {
-        to = currentValue + parseFloat(to.replace('=', ''));
-      }
-      else {
-        to = parseFloat(to);
-      }
-
-      fabric.util.animate({
-        startValue: options.from,
-        endValue: to,
-        byValue: options.by,
-        easing: options.easing,
-        duration: options.duration,
-        onChange: function(value) {
-          if (propPair) {
-            obj[propPair[0]][propPair[1]] = value;
-          }
-          else {
-            obj.set(property, value);
-          }
-          if (skipCallbacks) return;
-          options.onChange && options.onChange();
-        },
-        onComplete: function() {
-          if (skipCallbacks) return;
-
-          obj.setCoords();
-          options.onComplete && options.onComplete();
-        }
-      });
     },
 
     /**
@@ -15508,9 +15516,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       replacement.height = imgEl.height;
 
       if (fabric.isLikelyNode) {
-        // cut off data:image/png;base64, part in the beginning
-        var base64str = canvasEl.toDataURL('image/png').substring(22);
-        replacement.src = new Buffer(base64str, 'base64');
+        replacement.src = canvasEl.toBuffer();
 
         // onload doesn't fire in some node versions, so we invoke callback manually
         _this._element = replacement;

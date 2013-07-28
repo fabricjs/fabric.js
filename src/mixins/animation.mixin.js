@@ -108,3 +108,104 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     return this;
   }
 });
+
+fabric.util.object.extend(fabric.Object.prototype, {
+  /**
+   * Animates object's properties
+   * @param {String|Object} property to animate (if string) or properties to animate (if object)
+   * @param {Number|Object} value to animate property to (if string was given first) or options object
+   * @return {fabric.Object} thisArg
+   * @chainable
+   *
+   * As object — multiple properties
+   *
+   * object.animate({ left: ..., top: ... });
+   * object.animate({ left: ..., top: ... }, { duration: ... });
+   *
+   * As string — one property
+   *
+   * object.animate('left', ...);
+   * object.animate('left', { duration: ... });
+   *
+   */
+  animate: function() {
+    if (arguments[0] && typeof arguments[0] === 'object') {
+      var propsToAnimate = [ ], prop, skipCallbacks;
+      for (prop in arguments[0]) {
+        propsToAnimate.push(prop);
+      }
+      for (var i = 0, len = propsToAnimate.length; i<len; i++) {
+        prop = propsToAnimate[i];
+        skipCallbacks = i !== len - 1;
+        this._animate(prop, arguments[0][prop], arguments[1], skipCallbacks);
+      }
+    }
+    else {
+      this._animate.apply(this, arguments);
+    }
+    return this;
+  },
+
+  /**
+   * @private
+   * @param {String} property
+   * @param {String} to
+   * @param {Object} [options]
+   * @param {Boolean} [skipCallbacks]
+   */
+  _animate: function(property, to, options, skipCallbacks) {
+    var obj = this, propPair;
+
+    to = to.toString();
+
+    if (!options) {
+      options = { };
+    }
+    else {
+      options = fabric.util.object.clone(options);
+    }
+
+    if (~property.indexOf('.')) {
+      propPair = property.split('.');
+    }
+
+    var currentValue = propPair
+      ? this.get(propPair[0])[propPair[1]]
+      : this.get(property);
+
+    if (!('from' in options)) {
+      options.from = currentValue;
+    }
+
+    if (~to.indexOf('=')) {
+      to = currentValue + parseFloat(to.replace('=', ''));
+    }
+    else {
+      to = parseFloat(to);
+    }
+
+    fabric.util.animate({
+      startValue: options.from,
+      endValue: to,
+      byValue: options.by,
+      easing: options.easing,
+      duration: options.duration,
+      onChange: function(value) {
+        if (propPair) {
+          obj[propPair[0]][propPair[1]] = value;
+        }
+        else {
+          obj.set(property, value);
+        }
+        if (skipCallbacks) return;
+        options.onChange && options.onChange();
+      },
+      onComplete: function() {
+        if (skipCallbacks) return;
+
+        obj.setCoords();
+        options.onComplete && options.onComplete();
+      }
+    });
+  }
+});

@@ -46,7 +46,7 @@ Fabric.js started as a foundation for design editor on [printio.ru](http://print
 
 1. [Install Node.js](https://github.com/joyent/node/wiki/Installation)
 
-2. Build distribution file  **[~76K minified, ~22K gzipped]**
+2. Build distribution file  **[~77K minified, ~20K gzipped]**
 
         $ node build.js
 
@@ -105,6 +105,7 @@ These are the optional modules that could be specified for inclusion, when build
 - **freedrawing** — Adds support for free drawing
 - **gestures** — Adds support for multitouch gestures with help of [Event.js](https://github.com/mudcube/Event.js)
 - **object_straightening** — Adds support for rotating an object to one of 0, 90, 180, 270, etc. depending on which is angle is closer.
+- **animation** — Adds support for animation (fabric.util.animate, fabric.util.requestAnimFrame, fabric.Object#animate, fabric.Canvas#fxCenterObjectH/#fxCenterObjectV/#fxRemove)
 
 Additional flags for build script are:
 
@@ -140,8 +141,8 @@ Follow [@fabric.js](http://twitter.com/fabricjs) or [@kangax](http://twitter.com
 
 Questions, suggestions — [fabric.js on Google Groups](http://groups.google.com/group/fabricjs).
 
-See [Fabric questions on Stackoverflow](stackoverflow.com/questions/tagged/fabricjs), 
-Fabric snippets on [jsfiddle](http://jsfiddle.net/user/fabricjs/fiddles/) 
+See [Fabric questions on Stackoverflow](stackoverflow.com/questions/tagged/fabricjs),
+Fabric snippets on [jsfiddle](http://jsfiddle.net/user/fabricjs/fiddles/)
 or [codepen.io](http://codepen.io/tag/fabricjs).
 
 Get help in Fabric's IRC channel — irc://irc.freenode.net/#fabric.js
