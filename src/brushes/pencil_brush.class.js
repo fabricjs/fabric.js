@@ -211,13 +211,17 @@
       path.strokeWidth = this.width;
       path.strokeLineCap = this.strokeLineCap;
       path.strokeLineJoin = this.strokeLineJoin;
-      path.setShadow({
-        color: this.shadowColor || this.color,
-        blur: this.shadowBlur,
-        offsetX: this.shadowOffsetX,
-        offsetY: this.shadowOffsetY,
-        affectStroke: true
-      });
+
+      if (this.shadowColor) {
+        path.setShadow({
+          color: this.shadowColor,
+          blur: this.shadowBlur,
+          offsetX: this.shadowOffsetX,
+          offsetY: this.shadowOffsetY,
+          affectStroke: true
+        });
+      }
+
       return path;
     },
 

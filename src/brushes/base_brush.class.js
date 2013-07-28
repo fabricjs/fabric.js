@@ -76,10 +76,12 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
    * Sets brush shadow styles
    */
   setShadowStyles: function() {
+    if (!this.shadowColor) return;
+
     var ctx = this.canvas.contextTop;
 
     ctx.shadowBlur = this.shadowBlur;
-    ctx.shadowColor = this.shadowColor || this.color;
+    ctx.shadowColor = this.shadowColor;
     ctx.shadowOffsetX = this.shadowOffsetX;
     ctx.shadowOffsetY = this.shadowOffsetY;
   },

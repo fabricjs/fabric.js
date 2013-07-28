@@ -7,6 +7,7 @@ fabric.CircleBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabri
   /**
    * Width of a brush
    * @type Number
+   * @default
    */
   width: 10,
 
@@ -22,7 +23,6 @@ fabric.CircleBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabri
 
   /**
    * Invoked on mouse down
-   * @param {Object} pointer
    */
   onMouseDown: function() {
     this.points.length = 0;
@@ -58,14 +58,18 @@ fabric.CircleBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabri
         radius: point.radius,
         left: point.x,
         top: point.y,
-        fill: point.fill,
-        shadow: {
-          color: this.shadowColor || this.color,
+        fill: point.fill
+      });
+
+      if (this.shadowColor) {
+        circle.setShadow({
+          color: this.shadowColor,
           blur: this.shadowBlur,
           offsetX: this.shadowOffsetX,
           offsetY: this.shadowOffsetY
-        }
-      });
+        });
+      }
+
       this.canvas.add(circle);
       this.canvas.fire('path:created', { path: circle });
     }
