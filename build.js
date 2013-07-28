@@ -148,8 +148,6 @@ var filesToInclude = [
   ifSpecifiedInclude('interaction', 'src/canvas.class.js'),
   ifSpecifiedInclude('interaction', 'src/mixins/canvas_events.mixin.js'),
 
-  ifSpecifiedInclude('animation', 'src/mixins/animation.mixin.js'),
-
   'src/mixins/canvas_dataurl_exporter.mixin.js',
 
   ifSpecifiedInclude('serialization', 'src/mixins/canvas_serialization.mixin.js'),
@@ -161,6 +159,8 @@ var filesToInclude = [
   'src/mixins/stateful.mixin.js',
 
   ifSpecifiedInclude('interaction', 'src/mixins/object_interactivity.mixin.js'),
+
+  ifSpecifiedInclude('animation', 'src/mixins/animation.mixin.js'),
 
   'src/shapes/line.class.js',
   'src/shapes/circle.class.js',

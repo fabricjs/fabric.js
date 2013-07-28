@@ -30,12 +30,13 @@ testrunner.run({
       './test/unit/shadow.js'
     ]
 }, function(err, report) {
+  if (err) {
+    console.log(err);
+    process.exit(1);
+  }
   if(report.failed > 0){
     process.on('exit', function() {
       process.exit(1);
     });
-  }
-  if (err) {
-    console.log(err);
   }
 });
