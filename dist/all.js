@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures` */
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.2.7" };
+var fabric = fabric || { version: "1.2.8" };
 
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
@@ -7591,10 +7591,12 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
    * Sets brush shadow styles
    */
   setShadowStyles: function() {
+    if (!this.shadowColor) return;
+
     var ctx = this.canvas.contextTop;
 
     ctx.shadowBlur = this.shadowBlur;
-    ctx.shadowColor = this.shadowColor || this.color;
+    ctx.shadowColor = this.shadowColor;
     ctx.shadowOffsetX = this.shadowOffsetX;
     ctx.shadowOffsetY = this.shadowOffsetY;
   },
@@ -7824,13 +7826,17 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
       path.strokeWidth = this.width;
       path.strokeLineCap = this.strokeLineCap;
       path.strokeLineJoin = this.strokeLineJoin;
-      path.setShadow({
-        color: this.shadowColor || this.color,
-        blur: this.shadowBlur,
-        offsetX: this.shadowOffsetX,
-        offsetY: this.shadowOffsetY,
-        affectStroke: true
-      });
+
+      if (this.shadowColor) {
+        path.setShadow({
+          color: this.shadowColor,
+          blur: this.shadowBlur,
+          offsetX: this.shadowOffsetX,
+          offsetY: this.shadowOffsetY,
+          affectStroke: true
+        });
+      }
+
       return path;
     },
 
@@ -7886,6 +7892,7 @@ fabric.CircleBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabri
   /**
    * Width of a brush
    * @type Number
+   * @default
    */
   width: 10,
 
@@ -7901,7 +7908,6 @@ fabric.CircleBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabri
 
   /**
    * Invoked on mouse down
-   * @param {Object} pointer
    */
   onMouseDown: function() {
     this.points.length = 0;
@@ -7937,14 +7943,18 @@ fabric.CircleBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabri
         radius: point.radius,
         left: point.x,
         top: point.y,
-        fill: point.fill,
-        shadow: {
-          color: this.shadowColor || this.color,
+        fill: point.fill
+      });
+
+      if (this.shadowColor) {
+        circle.setShadow({
+          color: this.shadowColor,
           blur: this.shadowBlur,
           offsetX: this.shadowOffsetX,
           offsetY: this.shadowOffsetY
-        }
-      });
+        });
+      }
+
       this.canvas.add(circle);
       this.canvas.fire('path:created', { path: circle });
     }
@@ -7988,30 +7998,35 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
   /**
    * Width of a spray
    * @type Number
+   * @default
    */
   width:              10,
 
   /**
    * Density of a spray (number of dots per chunk)
    * @type Number
+   * @default
    */
   density:            20,
 
   /**
    * Width of spray dots
    * @type Number
+   * @default
    */
   dotWidth:           1,
 
   /**
    * Width variance of spray dots
    * @type Number
+   * @default
    */
   dotWidthVariance:   1,
 
   /**
    * Whether opacity of a dot should be random
    * @type Boolean
+   * @default
    */
   randomOpacity:      false,
 
@@ -8064,14 +8079,17 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
           height: sprayChunk[j].width,
           left: sprayChunk[j].x + 1,
           top: sprayChunk[j].y + 1,
-          fill: this.color,
-          shadow: {
-            color: this.shadowColor || this.color,
+          fill: this.color
+        });
+
+        if (this.shadowColor) {
+          rect.setShadow({
+            color: this.shadowColor,
             blur: this.shadowBlur,
             offsetX: this.shadowOffsetX,
             offsetY: this.shadowOffsetY
-          }
-        });
+          });
+        }
 
         this.canvas.add(rect);
         this.canvas.fire('path:created', { path: rect });
