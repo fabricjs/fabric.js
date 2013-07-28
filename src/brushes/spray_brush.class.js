@@ -7,30 +7,35 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
   /**
    * Width of a spray
    * @type Number
+   * @default
    */
   width:              10,
 
   /**
    * Density of a spray (number of dots per chunk)
    * @type Number
+   * @default
    */
   density:            20,
 
   /**
    * Width of spray dots
    * @type Number
+   * @default
    */
   dotWidth:           1,
 
   /**
    * Width variance of spray dots
    * @type Number
+   * @default
    */
   dotWidthVariance:   1,
 
   /**
    * Whether opacity of a dot should be random
    * @type Boolean
+   * @default
    */
   randomOpacity:      false,
 
@@ -83,14 +88,17 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
           height: sprayChunk[j].width,
           left: sprayChunk[j].x + 1,
           top: sprayChunk[j].y + 1,
-          fill: this.color,
-          shadow: {
-            color: this.shadowColor || this.color,
+          fill: this.color
+        });
+
+        if (this.shadowColor) {
+          rect.setShadow({
+            color: this.shadowColor,
             blur: this.shadowBlur,
             offsetX: this.shadowOffsetX,
             offsetY: this.shadowOffsetY
-          }
-        });
+          });
+        }
 
         this.canvas.add(rect);
         this.canvas.fire('path:created', { path: rect });
