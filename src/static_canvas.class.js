@@ -625,6 +625,7 @@
 
     /**
      * Centers object horizontally.
+     * You might need to call `setCoords` on an object after centering, to update controls area.
      * @param {fabric.Object} object Object to center
      * @return {fabric.Canvas} thisArg
      */
@@ -636,6 +637,7 @@
 
     /**
      * Centers object vertically.
+     * You might need to call `setCoords` on an object after centering, to update controls area.
      * @param {fabric.Object} object Object to center
      * @return {fabric.Canvas} thisArg
      * @chainable
@@ -648,6 +650,7 @@
 
     /**
      * Centers object vertically and horizontally.
+     * You might need to call `setCoords` on an object after centering, to update controls area.
      * @param {fabric.Object} object Object to center
      * @return {fabric.Canvas} thisArg
      * @chainable

@@ -1004,7 +1004,8 @@
     },
 
     /**
-     * Centers object horizontally on canvas to which it was added last
+     * Centers object horizontally on canvas to which it was added last.
+     * You might need to call `setCoords` on an object after centering, to update controls area.
      * @return {fabric.Object} thisArg
      */
     centerH: function () {
@@ -1013,7 +1014,8 @@
     },
 
     /**
-     * Centers object vertically on canvas to which it was added last
+     * Centers object vertically on canvas to which it was added last.
+     * You might need to call `setCoords` on an object after centering, to update controls area.
      * @return {fabric.Object} thisArg
      * @chainable
      */
@@ -1024,6 +1026,7 @@
 
     /**
      * Centers object vertically and horizontally on canvas to which is was added last
+     * You might need to call `setCoords` on an object after centering, to update controls area.
      * @return {fabric.Object} thisArg
      * @chainable
      */
