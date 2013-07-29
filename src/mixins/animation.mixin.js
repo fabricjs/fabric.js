@@ -190,6 +190,7 @@ fabric.util.object.extend(fabric.Object.prototype, {
       byValue: options.by,
       easing: options.easing,
       duration: options.duration,
+      abort: options.abort,
       onChange: function(value) {
         if (propPair) {
           obj[propPair[0]][propPair[1]] = value;
