@@ -113,7 +113,7 @@
       //it means that the user only clicked the canvas without moving the mouse
       //then we should be drawing a dot. A path isn't drawn between two identical dots
       //that's why we set them apart a bit
-      if(this._points.length === 2 && p1.x === p2.x && p1.y === p2.y) {
+      if (this._points.length === 2 && p1.x === p2.x && p1.y === p2.y) {
           p1.x -= 0.5;
           p2.x += 0.5;
       }

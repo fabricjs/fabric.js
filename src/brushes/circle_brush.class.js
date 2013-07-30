@@ -23,7 +23,7 @@ fabric.CircleBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabri
   * Invoked inside on mouse down and mouse move
   * @param {Object} pointer
   */
-  putPaint: function(pointer) {
+  drawDot: function(pointer) {
     var point = this.addPoint(pointer);
     var ctx = this.canvas.contextTop;
 
@@ -42,7 +42,7 @@ fabric.CircleBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabri
     this.points.length = 0;
     this.canvas.clearContext(this.canvas.contextTop);
     this.setShadowStyles();
-  this.putPaint(pointer);
+    this.drawDot(pointer);
   },
 
   /**
@@ -50,7 +50,7 @@ fabric.CircleBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabri
    * @param {Object} pointer
    */
   onMouseMove: function(pointer) {
-    this.putPaint(pointer);
+    this.drawDot(pointer);
   },
 
   /**
