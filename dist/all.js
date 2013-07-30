@@ -11420,6 +11420,13 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
   fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
 
     /**
+     * Object containing coordinates of object's controls
+     * @type Object
+     * @default
+     */
+    oCoords: null,
+
+    /**
      * Checks if object intersects with an area formed by 2 points
      * @param {Object} pointTL top-left point of area
      * @param {Object} pointBR bottom-right point of area
