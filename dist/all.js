@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures` */
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.2.8" };
+var fabric = fabric || { version: "1.2.9" };
 
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
@@ -7644,6 +7644,7 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
       // capture coordinates immediately
       // this allows to draw dots (when movement never occurs)
       this._captureDrawingPath(pointer);
+      this._render();
     },
 
     /**
@@ -7655,7 +7656,7 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
       // redraw curve
       // clear top canvas
       this.canvas.clearContext(this.canvas.contextTop);
-      this._render(this.canvas.contextTop);
+      this._render();
     },
 
     /**
@@ -7722,7 +7723,15 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
 
       var p1 = this._points[0];
       var p2 = this._points[1];
-
+      
+      //if we only have 2 points in the path and they are the same
+      //it means that the user only clicked the canvas without moving the mouse
+      //then we should be drawing a dot. A path isn't drawn between two identical dots
+      //that's why we set them apart a bit
+      if (this._points.length === 2 && p1.x === p2.x && p1.y === p2.y) {
+          p1.x -= 0.5;
+          p2.x += 0.5;
+      }
       ctx.moveTo(p1.x, p1.y);
 
       for (var i = 1, len = this._points.length; i < len; i++) {
@@ -7905,21 +7914,11 @@ fabric.CircleBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabri
     this.canvas = canvas;
     this.points = [ ];
   },
-
   /**
-   * Invoked on mouse down
-   */
-  onMouseDown: function() {
-    this.points.length = 0;
-    this.canvas.clearContext(this.canvas.contextTop);
-    this.setShadowStyles();
-  },
-
-  /**
-   * Invoked on mouse move
-   * @param {Object} pointer
-   */
-  onMouseMove: function(pointer) {
+  * Invoked inside on mouse down and mouse move
+  * @param {Object} pointer
+  */
+  drawDot: function(pointer) {
     var point = this.addPoint(pointer);
     var ctx = this.canvas.contextTop;
 
@@ -7928,6 +7927,24 @@ fabric.CircleBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabri
     ctx.arc(point.x, point.y, point.radius, 0, Math.PI * 2, false);
     ctx.closePath();
     ctx.fill();
+  },
+
+  /**
+   * Invoked on mouse down
+   */
+  onMouseDown: function(pointer) {
+    this.points.length = 0;
+    this.canvas.clearContext(this.canvas.contextTop);
+    this.setShadowStyles();
+    this.drawDot(pointer);
+  },
+
+  /**
+   * Invoked on mouse move
+   * @param {Object} pointer
+   */
+  onMouseMove: function(pointer) {
+    this.drawDot(pointer);
   },
 
   /**
