@@ -283,7 +283,7 @@
       replacement.height = imgEl.height;
 
       if (fabric.isLikelyNode) {
-        replacement.src = canvasEl.toBuffer();
+        replacement.src = canvasEl.toBuffer(undefined, fabric.Image.pngCompression);
 
         // onload doesn't fire in some node versions, so we invoke callback manually
         _this._element = replacement;
@@ -474,5 +474,12 @@
    * @type Boolean
    */
   fabric.Image.async = true;
+
+  /**
+   * Indicates compression level used when generating PNG under Node (in applyFilters)
+   * @static
+   * @type Number [0-9]
+   */
+  fabric.Image.pngCompression = 1;
 
 })(typeof exports !== 'undefined' ? exports : this);
