@@ -628,10 +628,14 @@
      * @private
      */
     _getFontDeclaration: function() {
+      
+       // @font-face fonts do not aways offer italic versions, and if they do require the loading of seperate fon files.  Therefore, do not use native canvas 'italic' declaration.
+      var fontstyle = (this.fontStyle === 'italic') ? 'normal' : this.fontStyle;
+      
       return [
         // node-canvas needs "weight style", while browsers need "style weight"
-        (fabric.isLikelyNode ? this.fontWeight : this.fontStyle),
-        (fabric.isLikelyNode ? this.fontStyle : this.fontWeight),
+        (fabric.isLikelyNode ? this.fontWeight : fontstyle),
+        (fabric.isLikelyNode ? fontstyle : this.fontWeight),
         this.fontSize + 'px',
         (fabric.isLikelyNode ? ('"' + this.fontFamily + '"') : this.fontFamily)
       ].join(' ');
