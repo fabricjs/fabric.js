@@ -238,7 +238,7 @@
       ctx.save();
       //Apply simple skew if font-style is 'italic'.  Using a transform rather than a native declaration so that non-system (@font-face) fonts also work
       if(this.fontStyle === 'italic'){
-                ctx.transform(1, 0, -0.25, 1, 0, 0);
+                 ctx.transform(1, 0, -0.25, 1, this.fontSize*0.1, 0);
       }
       this._setTextShadow(ctx);
       this._renderTextFill(ctx, textLines);
