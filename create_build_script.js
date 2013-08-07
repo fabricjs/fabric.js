@@ -13,6 +13,7 @@ var modules = [
   'image_filters',
   'gradient',
   'pattern',
+  'shadow',
   'node'
 ];
 
