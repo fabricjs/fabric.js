@@ -92,7 +92,10 @@
    */
   function _setStrokeFillOpacity(attributes) {
     for (var attr in colorAttributes) {
+
       if (!attributes[attr] || typeof attributes[colorAttributes[attr]] === 'undefined') continue;
+
+      if (attributes[attr].indexOf('url(') === 0) continue;
 
       var color = new fabric.Color(attributes[attr]);
       attributes[attr] = color.setAlpha(toFixed(color.getAlpha() * attributes[colorAttributes[attr]], 2)).toRgba();
