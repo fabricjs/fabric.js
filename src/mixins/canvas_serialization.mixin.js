@@ -117,15 +117,15 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       callback && callback();
     }
 
-    var renderOnAddition = this.renderOnAddition;
-    this.renderOnAddition = false;
+    var renderOnAddRemove = this.renderOnAddRemove;
+    this.renderOnAddRemove = false;
 
     fabric.util.enlivenObjects(objects, function(enlivenedObjects) {
       enlivenedObjects.forEach(function(obj, index) {
         _this.insertAt(obj, index, true);
       });
 
-      _this.renderOnAddition = renderOnAddition;
+      _this.renderOnAddRemove = renderOnAddRemove;
       callback && callback();
     });
   },

@@ -99,6 +99,36 @@
     equal(canvas.getObjects().length, 4, 'should support multiple arguments');
   });
 
+  test('add renderOnAddRemove disabled', function() {
+    var rect = makeRect(),
+        originalRenderOnAddition,
+        renderAllCount = 0;
+
+    function countRenderAll() {
+      renderAllCount++;
+    }
+
+    originalRenderOnAddition = canvas.renderOnAddRemove;
+    canvas.renderOnAddRemove = false;
+
+    canvas.on('after:render', countRenderAll);
+
+    ok(canvas === canvas.add(rect), 'should be chainable');
+    equal(renderAllCount, 0);
+
+    equal(canvas.item(0), rect);
+
+    canvas.add(makeRect(), makeRect(), makeRect());
+    equal(canvas.getObjects().length, 4, 'should support multiple arguments');
+    equal(renderAllCount, 0);
+
+    canvas.renderAll();
+    equal(renderAllCount, 1);
+
+    canvas.off('after:render', countRenderAll);
+    canvas.renderOnAddRemove = originalRenderOnAddition;
+  });
+
   test('insertAt', function() {
     var rect1 = makeRect(),
         rect2 = makeRect();
@@ -113,6 +143,40 @@
     canvas.insertAt(rect, 2);
     equal(canvas.item(2), rect);
     equal(canvas, canvas.insertAt(rect, 2), 'should be chainable');
+  });
+
+  test('insertAt renderOnAddRemove disabled', function() {
+    var rect1 = makeRect(),
+        rect2 = makeRect(),
+        originalRenderOnAddition,
+        renderAllCount = 0;
+
+    function countRenderAll() {
+      renderAllCount++;
+    }
+
+    originalRenderOnAddition = canvas.renderOnAddRemove;
+    canvas.renderOnAddRemove = false;
+
+    canvas.on('after:render', countRenderAll);
+
+    canvas.add(rect1, rect2);
+    equal(renderAllCount, 0);
+
+    var rect = makeRect();
+
+    canvas.insertAt(rect, 1);
+    equal(renderAllCount, 0);
+
+    equal(canvas.item(1), rect);
+    canvas.insertAt(rect, 2);
+    equal(renderAllCount, 0);
+
+    canvas.renderAll();
+    equal(renderAllCount, 1);
+
+    canvas.off('after:render', countRenderAll);
+    canvas.renderOnAddRemove = originalRenderOnAddition;
   });
 
   test('clearContext', function() {
@@ -377,6 +441,35 @@
     canvas.add(rect1, rect2);
     equal(canvas.remove(rect1), rect1, 'should return removed object');
     equal(canvas.item(0), rect2, 'only second object should be left');
+  });
+
+  test('remove renderOnAddRemove disabled', function() {
+    var rect1 = makeRect(),
+        rect2 = makeRect(),
+        originalRenderOnAddition,
+        renderAllCount = 0;
+
+    function countRenderAll() {
+      renderAllCount++;
+    }
+
+    originalRenderOnAddition = canvas.renderOnAddRemove;
+    canvas.renderOnAddRemove = false;
+
+    canvas.on('after:render', countRenderAll);
+
+    canvas.add(rect1, rect2);
+    equal(renderAllCount, 0);
+
+    equal(canvas.remove(rect1), rect1, 'should return removed object');
+    equal(renderAllCount, 0);
+    equal(canvas.item(0), rect2, 'only second object should be left');
+
+    canvas.renderAll();
+    equal(renderAllCount, 1);
+
+    canvas.off('after:render', countRenderAll);
+    canvas.renderOnAddRemove = originalRenderOnAddition;
   });
 
   test('sendToBack', function() {
