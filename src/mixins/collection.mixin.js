@@ -4,7 +4,7 @@
 fabric.Collection = {
 
   /**
-   * Adds objects to collection, then renders canvas (if `renderOnAddition` is not `false`)
+   * Adds objects to collection, then renders canvas (if `renderOnAddRemove` is not `false`)
    * Objects should be instances of (or inherit from) fabric.Object
    * @param [...] Zero or more fabric instances
    * @return {Self} thisArg
@@ -14,16 +14,16 @@ fabric.Collection = {
     for (var i = arguments.length; i--; ) {
       this._onObjectAdded(arguments[i]);
     }
-    this.renderOnAddition && this.renderAll();
+    this.renderOnAddRemove && this.renderAll();
     return this;
   },
 
   /**
-   * Inserts an object into collection at specified index and renders canvas
+   * Inserts an object into collection at specified index, then renders canvas (if `renderOnAddRemove` is not `false`)
    * An object should be an instance of (or inherit from) fabric.Object
-   * @param object {Object} Object to insert
-   * @param index {Number} index to insert object at
-   * @param nonSplicing {Boolean} when `true`, no splicing (shifting) of objects occurs
+   * @param {Object} object Object to insert
+   * @param {Number} index Index to insert object at
+   * @param {Boolean} nonSplicing When `true`, no splicing (shifting) of objects occurs
    * @return {Self} thisArg
    */
   insertAt: function (object, index, nonSplicing) {
@@ -35,19 +35,18 @@ fabric.Collection = {
       objects.splice(index, 0, object);
     }
     this._onObjectAdded(object);
-    this.renderOnAddition && this.renderAll();
+    this.renderOnAddRemove && this.renderAll();
     return this;
   },
 
   /**
-   * Removes an object from a group
-   * @param {Object} object
+   * Removes an object from a collection, then renders canvas (if `renderOnAddRemove` is not `false`)
+   * @param {Object} object Object to remove
    * @return {Self} thisArg
    */
   remove: function(object) {
-
-    var objects = this.getObjects();
-    var index = objects.indexOf(object);
+    var objects = this.getObjects(),
+        index = objects.indexOf(object);
 
     // only call onObjectRemoved if an object was actually removed
     if (index !== -1) {
@@ -55,7 +54,7 @@ fabric.Collection = {
       this._onObjectRemoved(object);
     }
 
-    this.renderAll && this.renderAll();
+    this.renderOnAddRemove && this.renderAll();
     return object;
   },
 
