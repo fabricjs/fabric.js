@@ -57,8 +57,8 @@ fabric.CircleBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabri
    * Invoked on mouse up
    */
   onMouseUp: function() {
-    var originalRenderOnAddition = this.canvas.renderOnAddition;
-    this.canvas.renderOnAddition = false;
+    var originalRenderOnAddRemove = this.canvas.renderOnAddRemove;
+    this.canvas.renderOnAddRemove = false;
 
     for (var i = 0, len = this.points.length; i < len; i++) {
       var point = this.points[i];
@@ -84,7 +84,7 @@ fabric.CircleBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabri
 
     this.canvas.clearContext(this.canvas.contextTop);
     this.removeShadowStyles();
-    this.canvas.renderOnAddition = originalRenderOnAddition;
+    this.canvas.renderOnAddRemove = originalRenderOnAddRemove;
     this.canvas.renderAll();
   },
 
