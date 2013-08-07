@@ -271,7 +271,7 @@
   fabric.Color.reHex = /^#?([0-9a-f]{6}|[0-9a-f]{3})$/i;
 
   /**
-   * Map of the 16 basic color names with HEX code
+   * Map of the 17 basic color names with HEX code
    * @static
    * @field
    */
@@ -286,6 +286,7 @@
     'maroon':  '#800000',
     'navy':    '#000080',
     'olive':   '#808000',
+    'orange':  '#FFA500',
     'purple':  '#800080',
     'red':     '#FF0000',
     'silver':  '#C0C0C0',
