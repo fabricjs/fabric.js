@@ -111,6 +111,7 @@
   /**
    * Returns fabric.Triangle instance from an object representation
    * @static
+   * @memberOf fabric.Triangle
    * @param object {Object} object to create an instance from
    * @return {Object} instance of Canvas.Triangle
    */

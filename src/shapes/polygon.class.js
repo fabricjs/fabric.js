@@ -155,6 +155,7 @@
   /**
    * List of attribute names to account for when parsing SVG element (used by `fabric.Polygon.fromElement`)
    * @static
+   * @memberOf fabric.Polygon
    * @see: http://www.w3.org/TR/SVG/shapes.html#PolygonElement
    */
   fabric.Polygon.ATTRIBUTE_NAMES = fabric.SHARED_ATTRIBUTES.concat();
@@ -162,6 +163,7 @@
   /**
    * Returns {@link fabric.Polygon} instance from an SVG element
    * @static
+   * @memberOf fabric.Polygon
    * @param {SVGElement} element Element to parse
    * @param {Object} [options] Options object
    * @return {fabric.Polygon} Instance of fabric.Polygon
@@ -193,6 +195,7 @@
   /**
    * Returns fabric.Polygon instance from an object representation
    * @static
+   * @memberOf fabric.Polygon
    * @param object {Object} object Object to create an instance from
    * @return {fabric.Polygon} Instance of fabric.Polygon
    */

@@ -147,9 +147,8 @@
 
   /**
    * Adds an event listener to an element
-   * @mthod addListener
-   * @memberOf fabric.util
    * @function
+   * @memberOf fabric.util
    * @param {HTMLElement} element
    * @param {String} eventName
    * @param {Function} handler
@@ -158,9 +157,8 @@
 
   /**
    * Removes an event listener from an element
-   * @mthod removeListener
-   * @memberOf fabric.util
    * @function
+   * @memberOf fabric.util
    * @param {HTMLElement} element
    * @param {String} eventName
    * @param {Function} handler

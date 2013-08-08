@@ -7,18 +7,21 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
   /**
    * Repeat property of a pattern (one of repeat, repeat-x, repeat-y)
    * @type String
+   * @default
    */
   repeat: 'repeat',
 
   /**
    * Pattern horizontal offset from object's left/top corner
    * @type Number
+   * @default
    */
   offsetX: 0,
 
   /**
    * Pattern vertical offset from object's left/top corner
    * @type Number
+   * @default
    */
   offsetY: 0,
 
@@ -65,7 +68,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
 
   /**
    * Returns object representation of a pattern
-   * @return {Object}
+   * @return {Object} Object representation of a pattern instance
    */
   toObject: function() {
 
@@ -91,6 +94,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
   /* _TO_SVG_START_ */
   /**
    * Returns SVG representation of a pattern
+   * @param {Object} object
    * @return {String} SVG representation of a pattern
    */
   toSVG: function(object) {
@@ -122,7 +126,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
 
   /**
    * Returns an instance of CanvasPattern
-   * @param ctx
+   * @param {CanvasRenderingContext2D} ctx Context to create pattern
    * @return {CanvasPattern}
    */
   toLive: function(ctx) {

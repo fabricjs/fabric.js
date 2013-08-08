@@ -472,6 +472,7 @@
    * Indicates that instances of this type are async
    * @static
    * @type Boolean
+   * @default
    */
   fabric.Image.async = true;
 
@@ -479,6 +480,7 @@
    * Indicates compression level used when generating PNG under Node (in applyFilters)
    * @static
    * @type Number [0-9]
+   * @default
    */
   fabric.Image.pngCompression = 1;
 

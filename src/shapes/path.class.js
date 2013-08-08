@@ -672,6 +672,7 @@
   /**
    * Creates an instance of fabric.Path from an object
    * @static
+   * @memberOf fabric.Path
    * @param {Object} object
    * @param {Function} callback Callback to invoke when an fabric.Path instance is created
    */
@@ -698,6 +699,7 @@
   /**
    * List of attribute names to account for when parsing SVG element (used by `fabric.Path.fromElement`)
    * @static
+   * @memberOf fabric.Path
    * @see http://www.w3.org/TR/SVG/paths.html#PathElement
    */
   fabric.Path.ATTRIBUTE_NAMES = fabric.SHARED_ATTRIBUTES.concat(['d']);
@@ -705,6 +707,7 @@
   /**
    * Creates an instance of fabric.Path from an SVG <path> element
    * @static
+   * @memberOf fabric.Path
    * @param {SVGElement} element to parse
    * @param {Function} callback Callback to invoke when an fabric.Path instance is created
    * @param {Object} [options] Options object
@@ -718,7 +721,9 @@
   /**
    * Indicates that instances of this type are async
    * @static
+   * @memberOf fabric.Path
    * @type Boolean
+   * @default
    */
   fabric.Path.async = true;
 

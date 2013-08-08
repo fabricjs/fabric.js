@@ -125,6 +125,7 @@
   /**
    * List of attribute names to account for when parsing SVG element (used by {@link fabric.Circle.fromElement})
    * @static
+   * @memberOf fabric.Circle
    * @see: http://www.w3.org/TR/SVG/shapes.html#CircleElement
    */
   fabric.Circle.ATTRIBUTE_NAMES = fabric.SHARED_ATTRIBUTES.concat('cx cy r'.split(' '));
@@ -132,6 +133,7 @@
   /**
    * Returns {@link fabric.Circle} instance from an SVG element
    * @static
+   * @memberOf fabric.Circle
    * @param {SVGElement} element Element to parse
    * @param {Object} [options] Options object
    * @throws {Error} If value of `r` attribute is missing or invalid
@@ -168,6 +170,7 @@
   /**
    * Returns {@link fabric.Circle} instance from an object representation
    * @static
+   * @memberOf fabric.Circle
    * @param {Object} object Object to create an instance from
    * @return {Object} Instance of fabric.Circle
    */
