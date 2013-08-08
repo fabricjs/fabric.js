@@ -235,11 +235,7 @@
         ctx.translate(this.textAlign === 'center' ? (this.width / 2) : this.width, 0);
       }
 
-      ctx.save();
-      //Apply simple skew if font-style is 'italic'.  Using a transform rather than a native declaration so that non-system (@font-face) fonts also work
-      if(this.fontStyle === 'italic'){
-                 ctx.transform(1, 0, -0.25, 1, this.fontSize*0.1, 0);
-      }
+      ctx.save();     
       this._setTextShadow(ctx);
       this._renderTextFill(ctx, textLines);
       this._renderTextStroke(ctx, textLines);
@@ -376,7 +372,22 @@
      * @param {Number} top Top position of text
      */
     _drawChars: function(method, ctx, chars, left, top) {
-      ctx[method](chars, left, top);
+       
+       var isItalic = (this.fontStyle === 'italic');
+
+            if(isItalic){
+                ctx.save();
+                ctx.translate(left, top);
+                ctx.transform(1, 0, -0.25, 1, 0, 0);
+                ctx.translate(-left, -top);
+                ctx[method](chars, left, top);
+                ctx.restore();
+            }
+            else{
+              ctx[method](chars, left, top);
+            }
+                     
+           
     },
 
     /**
