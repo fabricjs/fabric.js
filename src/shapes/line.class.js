@@ -181,6 +181,7 @@
   /**
    * List of attribute names to account for when parsing SVG element (used by {@link fabric.Line.fromElement})
    * @static
+   * @memberOf fabric.Line
    * @see http://www.w3.org/TR/SVG/shapes.html#LineElement
    */
   fabric.Line.ATTRIBUTE_NAMES = fabric.SHARED_ATTRIBUTES.concat('x1 y1 x2 y2'.split(' '));
@@ -188,6 +189,7 @@
   /**
    * Returns fabric.Line instance from an SVG element
    * @static
+   * @memberOf fabric.Line
    * @param {SVGElement} element Element to parse
    * @param {Object} [options] Options object
    * @return {fabric.Line} instance of fabric.Line
@@ -207,6 +209,7 @@
   /**
    * Returns fabric.Line instance from an object representation
    * @static
+   * @memberOf fabric.Line
    * @param {Object} object Object to create an instance from
    * @return {fabric.Line} instance of fabric.Line
    */

@@ -1004,6 +1004,7 @@
     /**
      * @static
      * @type String
+     * @default
      */
     EMPTY_JSON: '{"objects": [], "background": "white"}',
 

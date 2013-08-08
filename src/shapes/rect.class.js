@@ -210,6 +210,8 @@
   /**
    * List of attribute names to account for when parsing SVG element (used by `fabric.Rect.fromElement`)
    * @static
+   * @memberOf fabric.Rect
+   * @see: http://www.w3.org/TR/SVG/shapes.html#RectElement
    */
   fabric.Rect.ATTRIBUTE_NAMES = fabric.SHARED_ATTRIBUTES.concat('x y rx ry width height'.split(' '));
 
@@ -225,6 +227,7 @@
   /**
    * Returns {@link fabric.Rect} instance from an SVG element
    * @static
+   * @memberOf fabric.Rect
    * @param {SVGElement} element Element to parse
    * @param {Object} [options] Options object
    * @return {fabric.Rect} Instance of fabric.Rect
@@ -247,6 +250,7 @@
   /**
    * Returns {@link fabric.Rect} instance from an object representation
    * @static
+   * @memberOf fabric.Rect
    * @param object {Object} object to create an instance from
    * @return {Object} instance of fabric.Rect
    */

@@ -278,6 +278,7 @@
    * @static
    * @field
    * @memberOf fabric.Color
+   * @see: http://www.w3.org/TR/CSS2/syndata.html#color-units
    */
   fabric.Color.colorNameMap = {
     'aqua':    '#00FFFF',
@@ -317,8 +318,8 @@
 
   /**
    * Returns new color object, when given a color in RGB format
-   * @param {String} color ex: rgb(0-255,0-255,0-255)
    * @memberOf fabric.Color
+   * @param {String} color ex: rgb(0-255,0-255,0-255)
    * @return {fabric.Color}
    */
   fabric.Color.fromRgb = function(color) {
@@ -327,8 +328,8 @@
 
   /**
    * Returns array represenatation (ex: [100, 100, 200, 1]) of a color that's in RGB or RGBA format
-   * @param {String} color ex: rgb(0-255,0-255,0-255), rgb(0%-100%,0%-100%,0%-100%)
    * @memberOf fabric.Color
+   * @param {String} color ex: rgb(0-255,0-255,0-255), rgb(0%-100%,0%-100%,0%-100%)
    * @return {Array} source
    */
   fabric.Color.sourceFromRgb = function(color) {
@@ -351,8 +352,8 @@
    * Returns new color object, when given a color in RGBA format
    * @static
    * @function
-   * @param {String} color
    * @memberOf fabric.Color
+   * @param {String} color
    * @return {fabric.Color}
    */
   fabric.Color.fromRgba = Color.fromRgb;
@@ -370,8 +371,8 @@
   /**
    * Returns array represenatation (ex: [100, 100, 200, 1]) of a color that's in HSL or HSLA format.
    * Adapted from <a href="https://rawgithub.com/mjijackson/mjijackson.github.com/master/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript.html">https://github.com/mjijackson</a>
-   * @param {String} color ex: hsl(0-360,0%-100%,0%-100%) or hsla(0-360,0%-100%,0%-100%, 0-1)
    * @memberOf fabric.Color
+   * @param {String} color ex: hsl(0-360,0%-100%,0%-100%) or hsla(0-360,0%-100%,0%-100%, 0-1)
    * @return {Array} source
    * @see http://http://www.w3.org/TR/css3-color/#hsl-color
    */
@@ -408,8 +409,8 @@
    * Returns new color object, when given a color in HSLA format
    * @static
    * @function
-   * @param {String} color
    * @memberOf fabric.Color
+   * @param {String} color
    * @return {fabric.Color}
    */
   fabric.Color.fromHsla = Color.fromHsl;
@@ -427,8 +428,8 @@
   /**
    * Returns array represenatation (ex: [100, 100, 200, 1]) of a color that's in HEX format
    * @static
-   * @param {String} color ex: FF5555
    * @memberOf fabric.Color
+   * @param {String} color ex: FF5555
    * @return {Array} source
    */
   fabric.Color.sourceFromHex = function(color) {
@@ -451,8 +452,8 @@
   /**
    * Returns new color object, when given color in array representation (ex: [200, 100, 100, 0.5])
    * @static
-   * @param {Array} source
    * @memberOf fabric.Color
+   * @param {Array} source
    * @return {fabric.Color}
    */
   fabric.Color.fromSource = function(source) {
