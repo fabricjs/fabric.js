@@ -373,7 +373,7 @@
      */
     _drawChars: function(method, ctx, chars, left, top) {
        
-       var isItalic = (this.fontStyle === 'italic');
+         var isItalic = (this.fontStyle === 'italic' && !this.fontSupport.italic);
 
             if(isItalic){
                 ctx.save();
@@ -634,14 +634,47 @@
         renderLinesAtOffset(0);
       }
     },
+      _detectBoldItalic : function(font){
+        // Create canvas
+        var canvas = document.createElement('canvas');
+        canvas.width = 1000;
+        canvas.height = 30;
+        var context = canvas.getContext("2d");
+        var test = {}, results = {};
 
+            var styles = ["normal", "bold", "italic"];
+            test = {};
+            results = {};
+            for (var j = 0; j < styles.length; j++) {
+                // Draw text in canvas
+                context.font = styles[j] + " 16px " + font;
+                context.fillText("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ12345678910", 10, 20);
+                // Convert canvas to png
+                test[styles[j]] = canvas.toDataURL("image/png");
+                // Clear canvas
+                context.setTransform(1, 0, 0, 1, 0, 0);
+                context.clearRect(0, 0, canvas.width, canvas.height);
+            }
+
+                results["bold"] = test["normal"] !== test["bold"] ? true:false; // Support bold
+                results["italic"] = test["normal"] !== test["italic"] ? true:false; // Support italic
+
+
+        return results;
+    },
     /**
      * @private
      */
     _getFontDeclaration: function() {
       
-       // @font-face fonts do not aways offer italic versions, and if they do require the loading of seperate fon files.  Therefore, do not use native canvas 'italic' declaration.
-      var fontstyle = (this.fontStyle === 'italic') ? 'normal' : this.fontStyle;
+       
+            if(this.fontFamily !== this.prevFont){
+                this.fontSupport = this._detectBoldItalic(this.fontFamily);
+            }
+
+            this.prevFont = this.fontFamily;
+            
+            var fontstyle = (this.fontStyle === 'italic' && !this.fontSupport.italic) ? 'normal' : this.fontStyle;
       
       return [
         // node-canvas needs "weight style", while browsers need "style weight"
