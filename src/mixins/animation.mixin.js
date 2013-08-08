@@ -109,7 +109,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
   }
 });
 
-fabric.util.object.extend(fabric.Object.prototype, {
+fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
   /**
    * Animates object's properties
    * @param {String|Object} property to animate (if string) or properties to animate (if object)
