@@ -893,6 +893,8 @@
   /**
    * List of attribute names to account for when parsing SVG element (used by {@link fabric.Text.fromElement})
    * @static
+   * @memberOf fabric.Text
+   * @see: http://www.w3.org/TR/SVG/text.html#TextElement
    */
   fabric.Text.ATTRIBUTE_NAMES = fabric.SHARED_ATTRIBUTES.concat(
     'x y font-family font-style font-weight font-size text-decoration'.split(' '));
@@ -900,12 +902,12 @@
   /**
    * Returns fabric.Text instance from an SVG element (<b>not yet implemented</b>)
    * @static
+   * @memberOf fabric.Text
    * @param {SVGElement} element Element to parse
    * @param {Object} [options] Options object
    * @return {fabric.Text} Instance of fabric.Text
    */
   fabric.Text.fromElement = function(element, options) {
-
     if (!element) {
       return null;
     }
@@ -933,6 +935,7 @@
   /**
    * Returns fabric.Text instance from an object representation
    * @static
+   * @memberOf fabric.Text
    * @param object {Object} object Object to create an instance from
    * @return {fabric.Text} Instance of fabric.Text
    */

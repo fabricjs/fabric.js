@@ -56,11 +56,11 @@
   }
 
   /**
-   * Helper for creation of "classes". Note that pr
+   * Helper for creation of "classes".
+   * @memberOf fabric.util
    * @param parent optional "Class" to inherit from
    * @param properties Properties shared by all instances of this class
    *                  (be careful modifying objects defined here as this would affect all instances)
-   * @memberOf fabric.util
    */
   function createClass() {
     var parent = null,

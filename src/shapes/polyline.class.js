@@ -126,6 +126,7 @@
   /**
    * List of attribute names to account for when parsing SVG element (used by {@link fabric.Polyline.fromElement})
    * @static
+   * @memberOf fabric.Polyline
    * @see: http://www.w3.org/TR/SVG/shapes.html#PolylineElement
    */
   fabric.Polyline.ATTRIBUTE_NAMES = fabric.SHARED_ATTRIBUTES.concat();
@@ -133,6 +134,7 @@
   /**
    * Returns fabric.Polyline instance from an SVG element
    * @static
+   * @memberOf fabric.Polyline
    * @param {SVGElement} element Element to parse
    * @param {Object} [options] Options object
    * @return {fabric.Polyline} Instance of fabric.Polyline
@@ -164,6 +166,7 @@
   /**
    * Returns fabric.Polyline instance from an object representation
    * @static
+   * @memberOf fabric.Polyline
    * @param object {Object} object Object to create an instance from
    * @return {fabric.Polyline} Instance of fabric.Polyline
    */

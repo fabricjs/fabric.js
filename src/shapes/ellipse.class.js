@@ -133,6 +133,7 @@
   /**
    * List of attribute names to account for when parsing SVG element (used by {@link fabric.Ellipse.fromElement})
    * @static
+   * @memberOf fabric.Ellipse
    * @see http://www.w3.org/TR/SVG/shapes.html#EllipseElement
    */
   fabric.Ellipse.ATTRIBUTE_NAMES = fabric.SHARED_ATTRIBUTES.concat('cx cy rx ry'.split(' '));
@@ -140,6 +141,7 @@
   /**
    * Returns {@link fabric.Ellipse} instance from an SVG element
    * @static
+   * @memberOf fabric.Ellipse
    * @param {SVGElement} element Element to parse
    * @param {Object} [options] Options object
    * @return {fabric.Ellipse}
@@ -170,6 +172,7 @@
   /**
    * Returns {@link fabric.Ellipse} instance from an object representation
    * @static
+   * @memberOf fabric.Ellipse
    * @param {Object} object Object to create an instance from
    * @return {fabric.Ellipse}
    */

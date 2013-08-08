@@ -7,6 +7,7 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
   /**
    * Shadow color
    * @type String
+   * @default
    */
   color: 'rgb(0,0,0)',
 
@@ -19,24 +20,27 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
   /**
    * Shadow horizontal offset
    * @type Number
+   * @default
    */
   offsetX: 0,
 
   /**
    * Shadow vertical offset
    * @type Number
+   * @default
    */
   offsetY: 0,
 
   /**
    * Whether the shadow should affect stroke operations
    * @type Boolean
+   * @default
    */
   affectStroke: false,
 
   /**
    * Constructor
-   * @param [options] Options object with any of color, blur, offsetX, offsetX properties
+   * @param {Object} [options] Options object with any of color, blur, offsetX, offsetX properties
    * @return {fabric.Shadow} thisArg
    */
   initialize: function(options) {
@@ -50,6 +54,7 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
   /* _TO_SVG_START_ */
   /**
    * Returns SVG representation of a shadow
+   * @param {Object} object
    * @return {String} SVG representation of a shadow
    */
   toSVG: function(object) {
@@ -75,7 +80,7 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
 
   /**
    * Returns object representation of a shadow
-   * @return {Object}
+   * @return {Object} Object representation of a shadow instance
    */
   toObject: function() {
     return {

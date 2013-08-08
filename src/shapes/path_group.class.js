@@ -208,6 +208,7 @@
   /**
    * Creates fabric.PathGroup instance from an object representation
    * @static
+   * @memberOf fabric.PathGroup
    * @param {Object} object
    * @param {Function} callback Callback to invoke when an fabric.PathGroup instance is created
    */
@@ -234,7 +235,9 @@
   /**
    * Indicates that instances of this type are async
    * @static
+   * @memberOf fabric.PathGroup
    * @type Boolean
+   * @default
    */
   fabric.PathGroup.async = true;
 
