@@ -60,6 +60,15 @@ fabric.Image.filters.Tint = fabric.util.createClass(/** @lends fabric.Image.filt
       type: this.type,
       color: this.color
     };
+  },
+
+  /**
+   * Returns a JSON representation of an instance
+   * @return {Object} JSON
+   */
+  toJSON: function() {
+    // delegate, not alias
+    return this.toObject();
   }
 });
 

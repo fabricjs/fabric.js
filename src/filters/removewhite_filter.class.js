@@ -66,6 +66,15 @@ fabric.Image.filters.RemoveWhite = fabric.util.createClass(/** @lends fabric.Ima
       threshold: this.threshold,
       distance: this.distance
     };
+  },
+
+  /**
+   * Returns a JSON representation of an instance
+   * @return {Object} JSON
+   */
+  toJSON: function() {
+    // delegate, not alias
+    return this.toObject();
   }
 });
 

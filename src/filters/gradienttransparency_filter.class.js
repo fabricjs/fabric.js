@@ -49,6 +49,15 @@ fabric.Image.filters.GradientTransparency = fabric.util.createClass(/** @lends f
       type: this.type,
       threshold: this.threshold
     };
+  },
+
+  /**
+   * Returns a JSON representation of an instance
+   * @return {Object} JSON
+   */
+  toJSON: function() {
+    // delegate, not alias
+    return this.toObject();
   }
 });
 

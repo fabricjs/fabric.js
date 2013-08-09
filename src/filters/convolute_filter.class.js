@@ -102,6 +102,15 @@ fabric.Image.filters.Convolute = fabric.util.createClass(/** @lends fabric.Image
       opaque: this.opaque,
       matrix: this.matrix
     };
+  },
+
+  /**
+   * Returns a JSON representation of an instance
+   * @return {Object} JSON
+   */
+  toJSON: function() {
+    // delegate, not alias
+    return this.toObject();
   }
 });
 

@@ -32,6 +32,14 @@
     equal(JSON.stringify(object), '{"type":"Brightness","brightness":100}');
   });
 
+  test('toJSON', function() {
+    var filter = new fabric.Image.filters.Brightness();
+    ok(typeof filter.toJSON == 'function');
+
+    var json = filter.toJSON();
+    equal(JSON.stringify(json), '{"type":"Brightness","brightness":100}');
+  });
+
   test('fromObject', function() {
     var filter = new fabric.Image.filters.Brightness();
 
@@ -73,6 +81,14 @@
     equal(JSON.stringify(object), '{"type":"Convolute","opaque":1,"matrix":[0,0,0,0,1,0,0,0,0]}');
   });
 
+  test('toJSON', function() {
+    var filter = new fabric.Image.filters.Convolute({opaque: 1});
+    ok(typeof filter.toJSON == 'function');
+
+    var json = filter.toJSON();
+    equal(JSON.stringify(json), '{"type":"Convolute","opaque":1,"matrix":[0,0,0,0,1,0,0,0,0]}');
+  });
+
   test('fromObject', function() {
     var filter = new fabric.Image.filters.Convolute();
 
@@ -111,6 +127,14 @@
     equal(JSON.stringify(object), '{"type":"GradientTransparency","threshold":100}');
   });
 
+  test('toJSON', function() {
+    var filter = new fabric.Image.filters.GradientTransparency();
+    ok(typeof filter.toJSON == 'function');
+
+    var json = filter.toJSON();
+    equal(JSON.stringify(json), '{"type":"GradientTransparency","threshold":100}');
+  });
+
   test('fromObject', function() {
     var filter = new fabric.Image.filters.GradientTransparency();
 
@@ -146,6 +170,14 @@
     equal(JSON.stringify(object), '{"type":"Grayscale"}');
   });
 
+  test('toJSON', function() {
+    var filter = new fabric.Image.filters.Grayscale();
+    ok(typeof filter.toJSON == 'function');
+
+    var json = filter.toJSON();
+    equal(JSON.stringify(json), '{"type":"Grayscale"}');
+  });
+
   test('fromObject', function() {
     var filter = new fabric.Image.filters.Grayscale();
 
@@ -179,6 +211,14 @@
 
     var object = filter.toObject();
     equal(JSON.stringify(object), '{"type":"Invert"}');
+  });
+
+  test('toJSON', function() {
+    var filter = new fabric.Image.filters.Invert();
+    ok(typeof filter.toJSON == 'function');
+
+    var json = filter.toJSON();
+    equal(JSON.stringify(json), '{"type":"Invert"}');
   });
 
   test('fromObject', function() {
@@ -220,6 +260,14 @@
     equal(JSON.stringify(object), '{"type":"Noise","noise":100}');
   });
 
+  test('toJSON', function() {
+    var filter = new fabric.Image.filters.Noise();
+    ok(typeof filter.toJSON == 'function');
+
+    var json = filter.toJSON();
+    equal(JSON.stringify(json), '{"type":"Noise","noise":100}');
+  });
+
   test('fromObject', function() {
     var filter = new fabric.Image.filters.Noise();
 
@@ -257,6 +305,14 @@
 
     var object = filter.toObject();
     equal(JSON.stringify(object), '{"type":"Pixelate","blocksize":4}');
+  });
+
+  test('toJSON', function() {
+    var filter = new fabric.Image.filters.Pixelate();
+    ok(typeof filter.toJSON == 'function');
+
+    var json = filter.toJSON();
+    equal(JSON.stringify(json), '{"type":"Pixelate","blocksize":4}');
   });
 
   test('fromObject', function() {
@@ -300,6 +356,14 @@
     equal(JSON.stringify(object), '{"type":"RemoveWhite","threshold":30,"distance":20}');
   });
 
+  test('toJSON', function() {
+    var filter = new fabric.Image.filters.RemoveWhite();
+    ok(typeof filter.toJSON == 'function');
+
+    var json = filter.toJSON();
+    equal(JSON.stringify(json), '{"type":"RemoveWhite","threshold":30,"distance":20}');
+  });
+
   test('fromObject', function() {
     var filter = new fabric.Image.filters.RemoveWhite();
 
@@ -335,6 +399,14 @@
     equal(JSON.stringify(object), '{"type":"Sepia2"}');
   });
 
+  test('toJSON', function() {
+    var filter = new fabric.Image.filters.Sepia2();
+    ok(typeof filter.toJSON == 'function');
+
+    var json = filter.toJSON();
+    equal(JSON.stringify(json), '{"type":"Sepia2"}');
+  });
+
   test('fromObject', function() {
     var filter = new fabric.Image.filters.Sepia2();
 
@@ -368,6 +440,14 @@
 
     var object = filter.toObject();
     equal(JSON.stringify(object), '{"type":"Sepia"}');
+  });
+
+  test('toJSON', function() {
+    var filter = new fabric.Image.filters.Sepia();
+    ok(typeof filter.toJSON == 'function');
+
+    var json = filter.toJSON();
+    equal(JSON.stringify(json), '{"type":"Sepia"}');
   });
 
   test('fromObject', function() {
@@ -407,6 +487,14 @@
 
     var object = filter.toObject();
     equal(JSON.stringify(object), '{"type":"Tint","color":0}');
+  });
+
+  test('toJSON', function() {
+    var filter = new fabric.Image.filters.Tint();
+    ok(typeof filter.toJSON == 'function');
+
+    var json = filter.toJSON();
+    equal(JSON.stringify(json), '{"type":"Tint","color":0}');
   });
 
   test('fromObject', function() {

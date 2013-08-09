@@ -78,6 +78,15 @@ fabric.Image.filters.Pixelate = fabric.util.createClass(/** @lends fabric.Image.
       type: this.type,
       blocksize: this.blocksize
     };
+  },
+
+  /**
+   * Returns a JSON representation of an instance
+   * @return {Object} JSON
+   */
+  toJSON: function() {
+    // delegate, not alias
+    return this.toObject();
   }
 });
 

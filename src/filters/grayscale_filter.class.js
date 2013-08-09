@@ -42,6 +42,15 @@ fabric.Image.filters.Grayscale = fabric.util.createClass(/** @lends fabric.Image
    */
   toObject: function() {
     return { type: this.type };
+  },
+
+  /**
+   * Returns a JSON representation of an instance
+   * @return {Object} JSON
+   */
+  toJSON: function() {
+    // delegate, not alias
+    return this.toObject();
   }
 });
 

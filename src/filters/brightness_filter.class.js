@@ -50,6 +50,15 @@ fabric.Image.filters.Brightness = fabric.util.createClass(/** @lends fabric.Imag
       type: this.type,
       brightness: this.brightness
     };
+  },
+
+  /**
+   * Returns a JSON representation of an instance
+   * @return {Object} JSON
+   */
+  toJSON: function() {
+    // delegate, not alias
+    return this.toObject();
   }
 });
 

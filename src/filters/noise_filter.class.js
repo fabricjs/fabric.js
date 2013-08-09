@@ -53,6 +53,15 @@ fabric.Image.filters.Noise = fabric.util.createClass(/** @lends fabric.Image.fil
       type: this.type,
       noise: this.noise
     };
+  },
+
+  /**
+   * Returns a JSON representation of an instance
+   * @return {Object} JSON
+   */
+  toJSON: function() {
+    // delegate, not alias
+    return this.toObject();
   }
 });
 
