@@ -145,6 +145,7 @@
       var elImage = _createImageElement();
       equal(image.setElement(elImage), image, 'chainable');
       equal(image.getElement(), elImage);
+      equal(image._originalElement, elImage);
 
       start();
     });

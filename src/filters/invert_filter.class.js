@@ -1,10 +1,4 @@
 /**
- * @namespace fabric.Image.filters
- * @memberOf fabric.Image
- */
-fabric.Image.filters = fabric.Image.filters || { };
-
-/**
  * Invert filter class
  * @class fabric.Image.filters.Invert
  * @memberOf fabric.Image.filters
@@ -39,10 +33,10 @@ fabric.Image.filters.Invert = fabric.util.createClass(/** @lends fabric.Image.fi
   },
 
   /**
-   * Returns json representation of filter
-   * @return {String} json representation of filter
+   * Returns object representation of an instance
+   * @return {Object} Object representation of an instance
    */
-  toJSON: function() {
+  toObject: function() {
     return { type: this.type };
   }
 });

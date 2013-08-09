@@ -1,10 +1,4 @@
 /**
- * @namespace fabric.Image.filters
- * @memberOf fabric.Image
- */
-fabric.Image.filters = fabric.Image.filters || { };
-
-/**
  * Adapted from <a href="http://www.html5rocks.com/en/tutorials/canvas/imagefilters/">html5rocks article</a>
  * @class fabric.Image.filters.Convolute
  * @memberOf fabric.Image.filters
@@ -99,10 +93,10 @@ fabric.Image.filters.Convolute = fabric.util.createClass(/** @lends fabric.Image
   },
 
   /**
-   * Returns json representation of filter
-   * @return {String} json representation of filter
+   * Returns object representation of an instance
+   * @return {Object} Object representation of an instance
    */
-  toJSON: function() {
+  toObject: function() {
     return {
       type: this.type,
       opaque: this.opaque,

@@ -1,10 +1,4 @@
 /**
- * @namespace fabric.Image.filters
- * @memberOf fabric.Image
- */
-fabric.Image.filters = fabric.Image.filters || { };
-
-/**
  * Remove white filter class
  * @class fabric.Image.filters.RemoveWhite
  * @memberOf fabric.Image.filters
@@ -63,10 +57,10 @@ fabric.Image.filters.RemoveWhite = fabric.util.createClass(/** @lends fabric.Ima
   },
 
   /**
-   * Returns json representation of filter
-   * @return {Object} JSON representation of filter
+   * Returns object representation of an instance
+   * @return {Object} Object representation of an instance
    */
-  toJSON: function() {
+  toObject: function() {
     return {
       type: this.type,
       threshold: this.threshold,

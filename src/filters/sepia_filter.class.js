@@ -1,10 +1,4 @@
 /**
- * @namespace fabric.Image.filters
- * @memberOf fabric.Image
- */
-fabric.Image.filters = fabric.Image.filters || { };
-
-/**
  * Sepia filter class
  * @class fabric.Image.filters.Sepia
  * @memberOf fabric.Image.filters
@@ -40,10 +34,10 @@ fabric.Image.filters.Sepia = fabric.util.createClass(/** @lends fabric.Image.fil
   },
 
   /**
-   * Returns json representation of filter
-   * @return {String} json representation of filter
+   * Returns object representation of an instance
+   * @return {Object} Object representation of an instance
    */
-  toJSON: function() {
+  toObject: function() {
     return { type: this.type };
   }
 });

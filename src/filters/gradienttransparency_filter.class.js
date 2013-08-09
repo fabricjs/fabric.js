@@ -1,10 +1,4 @@
 /**
- * @namespace fabric.Image.filters
- * @memberOf fabric.Image
- */
-fabric.Image.filters = fabric.Image.filters || { };
-
-/**
  * GradientTransparency filter class
  * @class fabric.Image.filters.GradientTransparency
  * @memberOf fabric.Image.filters
@@ -47,10 +41,10 @@ fabric.Image.filters.GradientTransparency = fabric.util.createClass(/** @lends f
   },
 
   /**
-   * Returns json representation of filter
-   * @return {String} json representation of filter
+   * Returns object representation of an instance
+   * @return {Object} Object representation of an instance
    */
-  toJSON: function() {
+  toObject: function() {
     return {
       type: this.type,
       threshold: this.threshold

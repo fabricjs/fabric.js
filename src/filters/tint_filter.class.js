@@ -1,10 +1,4 @@
 /**
- * @namespace fabric.Image.filters
- * @memberOf fabric.Image
- */
-fabric.Image.filters = fabric.Image.filters || { };
-
-/**
  * Tint filter class
  * @class fabric.Image.filters.Tint
  * @memberOf fabric.Image.filters
@@ -58,10 +52,10 @@ fabric.Image.filters.Tint = fabric.util.createClass(/** @lends fabric.Image.filt
   },
 
   /**
-   * Returns json representation of filter
-   * @return {Object} json representation of filter
+   * Returns object representation of an instance
+   * @return {Object} Object representation of an instance
    */
-  toJSON: function() {
+  toObject: function() {
     return {
       type: this.type,
       color: this.color
