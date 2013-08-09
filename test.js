@@ -21,6 +21,7 @@ testrunner.run({
       './test/unit/text.js',
       './test/unit/util.js',
       './test/unit/image.js',
+      './test/unit/image_filters.js',
       './test/unit/group.js',
       './test/unit/parser.js',
       './test/unit/canvas.js',

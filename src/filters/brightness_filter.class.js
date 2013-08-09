@@ -1,10 +1,4 @@
 /**
- * @namespace fabric.Image.filters
- * @memberOf fabric.Image
- */
-fabric.Image.filters = fabric.Image.filters || { };
-
-/**
  * Brightness filter class
  * @class fabric.Image.filters.Brightness
  * @memberOf fabric.Image.filters
@@ -48,14 +42,23 @@ fabric.Image.filters.Brightness = fabric.util.createClass(/** @lends fabric.Imag
   },
 
   /**
-   * Returns json representation of filter
-   * @return {String} json representation of filter
+   * Returns object representation of an instance
+   * @return {Object} Object representation of an instance
    */
-  toJSON: function() {
+  toObject: function() {
     return {
       type: this.type,
       brightness: this.brightness
     };
+  },
+
+  /**
+   * Returns a JSON representation of an instance
+   * @return {Object} JSON
+   */
+  toJSON: function() {
+    // delegate, not alias
+    return this.toObject();
   }
 });
 
