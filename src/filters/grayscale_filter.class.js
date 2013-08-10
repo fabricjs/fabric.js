@@ -1,10 +1,4 @@
 /**
- * @namespace fabric.Image.filters
- * @memberOf fabric.Image
- */
-fabric.Image.filters = fabric.Image.filters || { };
-
-/**
  * Grayscale image filter class
  * @class fabric.Image.filters.Grayscale
  * @memberOf fabric.Image.filters
@@ -43,11 +37,20 @@ fabric.Image.filters.Grayscale = fabric.util.createClass(/** @lends fabric.Image
   },
 
   /**
-   * Returns json representation of filter
-   * @return {Object} JSON representation of filter
+   * Returns object representation of an instance
+   * @return {Object} Object representation of an instance
+   */
+  toObject: function() {
+    return { type: this.type };
+  },
+
+  /**
+   * Returns a JSON representation of an instance
+   * @return {Object} JSON
    */
   toJSON: function() {
-    return { type: this.type };
+    // delegate, not alias
+    return this.toObject();
   }
 });
 
