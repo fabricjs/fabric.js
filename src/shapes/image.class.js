@@ -479,10 +479,10 @@
   fabric.Image.async = true;
 
   /**
-   * Indicates compression level used when generating PNG under Node (in applyFilters)
+   * Indicates compression level used when generating PNG under Node (in applyFilters). Any of 0-9
    * @static
-   * @type Number [0-9]
    * @default
+   * @type Number
    */
   fabric.Image.pngCompression = 1;
 

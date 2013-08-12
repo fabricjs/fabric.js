@@ -1867,7 +1867,7 @@ if (typeof console !== 'undefined') {
 fabric.Collection = {
 
   /**
-   * Adds objects to collection, then renders canvas (if `renderOnAddition` is not `false`)
+   * Adds objects to collection, then renders canvas (if `renderOnAddRemove` is not `false`)
    * Objects should be instances of (or inherit from) fabric.Object
    * @param [...] Zero or more fabric instances
    * @return {Self} thisArg
@@ -1877,16 +1877,16 @@ fabric.Collection = {
     for (var i = arguments.length; i--; ) {
       this._onObjectAdded(arguments[i]);
     }
-    this.renderOnAddition && this.renderAll();
+    this.renderOnAddRemove && this.renderAll();
     return this;
   },
 
   /**
-   * Inserts an object into collection at specified index and renders canvas
+   * Inserts an object into collection at specified index, then renders canvas (if `renderOnAddRemove` is not `false`)
    * An object should be an instance of (or inherit from) fabric.Object
-   * @param object {Object} Object to insert
-   * @param index {Number} index to insert object at
-   * @param nonSplicing {Boolean} when `true`, no splicing (shifting) of objects occurs
+   * @param {Object} object Object to insert
+   * @param {Number} index Index to insert object at
+   * @param {Boolean} nonSplicing When `true`, no splicing (shifting) of objects occurs
    * @return {Self} thisArg
    */
   insertAt: function (object, index, nonSplicing) {
@@ -1898,19 +1898,18 @@ fabric.Collection = {
       objects.splice(index, 0, object);
     }
     this._onObjectAdded(object);
-    this.renderOnAddition && this.renderAll();
+    this.renderOnAddRemove && this.renderAll();
     return this;
   },
 
   /**
-   * Removes an object from a group
-   * @param {Object} object
+   * Removes an object from a collection, then renders canvas (if `renderOnAddRemove` is not `false`)
+   * @param {Object} object Object to remove
    * @return {Self} thisArg
    */
   remove: function(object) {
-
-    var objects = this.getObjects();
-    var index = objects.indexOf(object);
+    var objects = this.getObjects(),
+        index = objects.indexOf(object);
 
     // only call onObjectRemoved if an object was actually removed
     if (index !== -1) {
@@ -1918,7 +1917,7 @@ fabric.Collection = {
       this._onObjectRemoved(object);
     }
 
-    this.renderAll && this.renderAll();
+    this.renderOnAddRemove && this.renderAll();
     return object;
   },
 
@@ -5672,7 +5671,7 @@ fabric.util.string = {
   fabric.Color.reHex = /^#?([0-9a-f]{6}|[0-9a-f]{3})$/i;
 
   /**
-   * Map of the 16 basic color names with HEX code
+   * Map of the 17 basic color names with HEX code
    * @static
    * @field
    * @memberOf fabric.Color
@@ -5688,6 +5687,7 @@ fabric.util.string = {
     'maroon':  '#800000',
     'navy':    '#000080',
     'olive':   '#808000',
+    'orange':  '#FFA500',
     'purple':  '#800080',
     'red':     '#FF0000',
     'silver':  '#C0C0C0',
@@ -6494,6 +6494,7 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
     /**
      * Background color of canvas instance
      * @type String
+     * @default
      */
     backgroundColor: '',
 
@@ -6501,12 +6502,14 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
      * Background image of canvas instance
      * Should be set via {@link fabric.StaticCanvas#setBackgroundImage}
      * @type String
+     * @default
      */
     backgroundImage: '',
 
     /**
      * Opacity of the background image of the canvas instance
      * @type Float
+     * @default
      */
     backgroundImageOpacity: 1,
 
@@ -6514,6 +6517,7 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
      * Indicates whether the background image should be stretched to fit the
      * dimensions of the canvas instance.
      * @type Boolean
+     * @default
      */
     backgroundImageStretch: true,
 
@@ -6521,51 +6525,59 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
      * Overlay image of canvas instance
      * Should be set via {@link fabric.StaticCanvas#setOverlayImage}
      * @type String
+     * @default
      */
     overlayImage: '',
 
     /**
      * Left offset of overlay image (if present)
      * @type Number
+     * @default
      */
     overlayImageLeft: 0,
 
     /**
      * Top offset of overlay image (if present)
      * @type Number
+     * @default
      */
     overlayImageTop: 0,
 
     /**
      * Indicates whether toObject/toDatalessObject should include default values
      * @type Boolean
+     * @default
      */
     includeDefaultValues: true,
 
     /**
      * Indicates whether objects' state should be saved
      * @type Boolean
+     * @default
      */
     stateful: true,
 
     /**
-     * Indicates whether {@link fabric.Canvas.prototype.add} should also re-render canvas.
-     * Disabling this option could give a great performance boost when adding a lot of objects to canvas at once
-     * (followed by a manual rendering after addition)
+     * Indicates whether {@link fabric.Collection.add}, {@link fabric.Collection.insertAt} and {@link fabric.Collection.remove} should also re-render canvas.
+     * Disabling this option could give a great performance boost when adding/removing a lot of objects to/from canvas at once
+     * (followed by a manual rendering after addition/deletion)
      * @type Boolean
+     * @default
      */
-    renderOnAddition: true,
+    renderOnAddRemove: true,
 
     /**
      * Function that determines clipping of entire canvas area
      * Being passed context as first argument. See clipping canvas area in {@link https://github.com/kangax/fabric.js/wiki/FAQ}
      * @type Function
+     * @default
      */
     clipTo: null,
 
     /**
      * Indicates whether object controls (borders/controls) are rendered above overlay image
      * @type Boolean
+     * @default
      */
     controlsAboveOverlay: false,
 
@@ -6577,9 +6589,11 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
       /* NOOP */
     },
 
-     /**
-      * @private
-      */
+    /**
+     * @private
+     * @param {HTMLElement | String} el &lt;canvas> element to initialize instance on
+     * @param {Object} [options] Options object
+     */
     _initStatic: function(el, options) {
       this._objects = [];
 
@@ -6729,6 +6743,7 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
     /**
      * Creates a bottom canvas
      * @private
+     * @param {HTMLElement} [canvasEl]
      */
     _createLowerCanvas: function (canvasEl) {
       this.lowerCanvasEl = fabric.util.getById(canvasEl) || this._createCanvasElement();
@@ -7967,8 +7982,8 @@ fabric.CircleBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabri
    * Invoked on mouse up
    */
   onMouseUp: function() {
-    var originalRenderOnAddition = this.canvas.renderOnAddition;
-    this.canvas.renderOnAddition = false;
+    var originalRenderOnAddRemove = this.canvas.renderOnAddRemove;
+    this.canvas.renderOnAddRemove = false;
 
     for (var i = 0, len = this.points.length; i < len; i++) {
       var point = this.points[i];
@@ -7994,7 +8009,7 @@ fabric.CircleBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabri
 
     this.canvas.clearContext(this.canvas.contextTop);
     this.removeShadowStyles();
-    this.canvas.renderOnAddition = originalRenderOnAddition;
+    this.canvas.renderOnAddRemove = originalRenderOnAddRemove;
     this.canvas.renderAll();
   },
 
@@ -8099,8 +8114,8 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
    * Invoked on mouse up
    */
   onMouseUp: function() {
-    var originalRenderOnAddition = this.canvas.renderOnAddition;
-    this.canvas.renderOnAddition = false;
+    var originalRenderOnAddRemove = this.canvas.renderOnAddRemove;
+    this.canvas.renderOnAddRemove = false;
 
     for (var i = 0, ilen = this.sprayChunks.length; i < ilen; i++) {
       var sprayChunk = this.sprayChunks[i];
@@ -8131,7 +8146,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
 
     this.canvas.clearContext(this.canvas.contextTop);
     this.removeShadowStyles();
-    this.canvas.renderOnAddition = originalRenderOnAddition;
+    this.canvas.renderOnAddRemove = originalRenderOnAddRemove;
     this.canvas.renderAll();
   },
 
@@ -9998,15 +10013,15 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       callback && callback();
     }
 
-    var renderOnAddition = this.renderOnAddition;
-    this.renderOnAddition = false;
+    var renderOnAddRemove = this.renderOnAddRemove;
+    this.renderOnAddRemove = false;
 
     fabric.util.enlivenObjects(objects, function(enlivenedObjects) {
       enlivenedObjects.forEach(function(obj, index) {
         _this.insertAt(obj, index, true);
       });
 
-      _this.renderOnAddition = renderOnAddition;
+      _this.renderOnAddRemove = renderOnAddRemove;
       callback && callback();
     });
   },
@@ -15002,9 +15017,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     },
 
     /**
-     * @param delegatedProperties
-     * @type Object
      * Properties that are delegated to group objects when reading/writing
+     * @param {Object} delegatedProperties
      */
     delegatedProperties: {
       fill:             true,
@@ -15556,7 +15570,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     applyFilters: function(callback) {
 
       if (this.filters.length === 0) {
-        this.setElement(this._originalImage);
+        this._element = this._originalImage;
         callback && callback();
         return;
       }
@@ -15774,9 +15788,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   fabric.Image.async = true;
 
   /**
-   * Indicates compression level used when generating PNG under Node (in applyFilters)
+   * Indicates compression level used when generating PNG under Node (in applyFilters). Any of 0-9
    * @static
-   * @type Number [0-9]
+   * @type Number
    */
   fabric.Image.pngCompression = 1;
 

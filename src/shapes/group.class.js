@@ -160,9 +160,8 @@
     },
 
     /**
-     * @param delegatedProperties
-     * @type Object
      * Properties that are delegated to group objects when reading/writing
+     * @param {Object} delegatedProperties
      */
     delegatedProperties: {
       fill:             true,
