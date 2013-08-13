@@ -1,72 +1,72 @@
-/**
- * GradientTransparency filter class
- * @class fabric.Image.filters.GradientTransparency
- * @memberOf fabric.Image.filters
- */
-fabric.Image.filters.GradientTransparency = fabric.util.createClass(/** @lends fabric.Image.filters.GradientTransparency.prototype */ {
+(function(global) {
+
+  "use strict";
+
+  var fabric  = global.fabric || (global.fabric = { }),
+      extend = fabric.util.object.extend;
 
   /**
-   * Filter type
-   * @param {String} type
-   * @default
+   * GradientTransparency filter class
+   * @class fabric.Image.filters.GradientTransparency
+   * @memberOf fabric.Image.filters
+   * @extends fabric.Image.filters.BaseFilter
    */
-  type: 'GradientTransparency',
+  fabric.Image.filters.GradientTransparency = fabric.util.createClass(fabric.Image.filters.BaseFilter, /** @lends fabric.Image.filters.GradientTransparency.prototype */ {
 
-  /**
-   * Constructor
-   * @memberOf fabric.Image.filters.GradientTransparency
-   * @param {Object} [options] Options object
-   */
-  initialize: function(options) {
-    options = options || { };
-    this.threshold = options.threshold || 100;
-  },
+    /**
+     * Filter type
+     * @param {String} type
+     * @default
+     */
+    type: 'GradientTransparency',
 
-  /**
-   * Applies filter to canvas element
-   * @param {Object} canvasEl Canvas element to apply filter to
-   */
-  applyTo: function(canvasEl) {
-    var context = canvasEl.getContext('2d'),
-        imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
-        data = imageData.data,
-        threshold = this.threshold,
-        total = data.length;
+    /**
+     * Constructor
+     * @memberOf fabric.Image.filters.GradientTransparency
+     * @param {Object} [options] Options object
+     */
+    initialize: function(options) {
+      options = options || { };
+      this.threshold = options.threshold || 100;
+    },
 
-    for (var i = 0, len = data.length; i < len; i += 4) {
-      data[i + 3] = threshold + 255 * (total - i) / total;
+    /**
+     * Applies filter to canvas element
+     * @param {Object} canvasEl Canvas element to apply filter to
+     */
+    applyTo: function(canvasEl) {
+      var context = canvasEl.getContext('2d'),
+          imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
+          data = imageData.data,
+          threshold = this.threshold,
+          total = data.length;
+
+      for (var i = 0, len = data.length; i < len; i += 4) {
+        data[i + 3] = threshold + 255 * (total - i) / total;
+      }
+
+      context.putImageData(imageData, 0, 0);
+    },
+
+    /**
+     * Returns object representation of an instance
+     * @return {Object} Object representation of an instance
+     */
+    toObject: function() {
+      return extend(this.callSuper('toObject'), {
+        threshold: this.threshold
+      });
     }
-
-    context.putImageData(imageData, 0, 0);
-  },
+  });
 
   /**
-   * Returns object representation of an instance
-   * @return {Object} Object representation of an instance
+   * Returns filter instance from an object representation
+   * @static
+   * @param {Object} object Object to create an instance from
+   * @return {fabric.Image.filters.GradientTransparency} Instance of fabric.Image.filters.GradientTransparency
    */
-  toObject: function() {
-    return {
-      type: this.type,
-      threshold: this.threshold
-    };
-  },
+  fabric.Image.filters.GradientTransparency.fromObject = function(object) {
+    return new fabric.Image.filters.GradientTransparency(object);
+  };
 
-  /**
-   * Returns a JSON representation of an instance
-   * @return {Object} JSON
-   */
-  toJSON: function() {
-    // delegate, not alias
-    return this.toObject();
-  }
-});
-
-/**
- * Returns filter instance from an object representation
- * @static
- * @param {Object} object Object to create an instance from
- * @return {fabric.Image.filters.GradientTransparency} Instance of fabric.Image.filters.GradientTransparency
- */
-fabric.Image.filters.GradientTransparency.fromObject = function(object) {
-  return new fabric.Image.filters.GradientTransparency(object);
-};
+})(typeof exports !== 'undefined' ? exports : this);

@@ -1,101 +1,101 @@
-/**
- * Pixelate filter class
- * @class fabric.Image.filters.Pixelate
- * @memberOf fabric.Image.filters
- */
-fabric.Image.filters.Pixelate = fabric.util.createClass(/** @lends fabric.Image.filters.Pixelate.prototype */ {
+(function(global) {
+
+  "use strict";
+
+  var fabric  = global.fabric || (global.fabric = { }),
+      extend = fabric.util.object.extend;
 
   /**
-   * Filter type
-   * @param {String} type
-   * @default
+   * Pixelate filter class
+   * @class fabric.Image.filters.Pixelate
+   * @memberOf fabric.Image.filters
+   * @extends fabric.Image.filters.BaseFilter
    */
-  type: 'Pixelate',
+  fabric.Image.filters.Pixelate = fabric.util.createClass(fabric.Image.filters.BaseFilter, /** @lends fabric.Image.filters.Pixelate.prototype */ {
 
-  /**
-   * Constructor
-   * @memberOf fabric.Image.filters.Pixelate.prototype
-   * @param {Object} [options] Options object
-   */
-  initialize: function(options) {
-    options = options || { };
-    this.blocksize = options.blocksize || 4;
-  },
+    /**
+     * Filter type
+     * @param {String} type
+     * @default
+     */
+    type: 'Pixelate',
 
-  /**
-   * Applies filter to canvas element
-   * @param {Object} canvasEl Canvas element to apply filter to
-   */
-  applyTo: function(canvasEl) {
-    var context = canvasEl.getContext('2d'),
-        imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
-        data = imageData.data,
-        iLen = imageData.height,
-        jLen = imageData.width,
-        index, i, j, r, g, b, a;
+    /**
+     * Constructor
+     * @memberOf fabric.Image.filters.Pixelate.prototype
+     * @param {Object} [options] Options object
+     */
+    initialize: function(options) {
+      options = options || { };
+      this.blocksize = options.blocksize || 4;
+    },
 
-    for (i = 0; i < iLen; i += this.blocksize) {
-      for (j = 0; j < jLen; j += this.blocksize) {
+    /**
+     * Applies filter to canvas element
+     * @param {Object} canvasEl Canvas element to apply filter to
+     */
+    applyTo: function(canvasEl) {
+      var context = canvasEl.getContext('2d'),
+          imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
+          data = imageData.data,
+          iLen = imageData.height,
+          jLen = imageData.width,
+          index, i, j, r, g, b, a;
 
-        index = (i * 4) * jLen + (j * 4);
+      for (i = 0; i < iLen; i += this.blocksize) {
+        for (j = 0; j < jLen; j += this.blocksize) {
 
-        r = data[index];
-        g = data[index+1];
-        b = data[index+2];
-        a = data[index+3];
+          index = (i * 4) * jLen + (j * 4);
 
-        /*
-         blocksize: 4
+          r = data[index];
+          g = data[index+1];
+          b = data[index+2];
+          a = data[index+3];
 
-         [1,x,x,x,1]
-         [x,x,x,x,1]
-         [x,x,x,x,1]
-         [x,x,x,x,1]
-         [1,1,1,1,1]
-         */
+          /*
+           blocksize: 4
 
-        for (var _i = i, _ilen = i + this.blocksize; _i < _ilen; _i++) {
-          for (var _j = j, _jlen = j + this.blocksize; _j < _jlen; _j++) {
-            index = (_i * 4) * jLen + (_j * 4);
-            data[index] = r;
-            data[index + 1] = g;
-            data[index + 2] = b;
-            data[index + 3] = a;
+           [1,x,x,x,1]
+           [x,x,x,x,1]
+           [x,x,x,x,1]
+           [x,x,x,x,1]
+           [1,1,1,1,1]
+           */
+
+          for (var _i = i, _ilen = i + this.blocksize; _i < _ilen; _i++) {
+            for (var _j = j, _jlen = j + this.blocksize; _j < _jlen; _j++) {
+              index = (_i * 4) * jLen + (_j * 4);
+              data[index] = r;
+              data[index + 1] = g;
+              data[index + 2] = b;
+              data[index + 3] = a;
+            }
           }
         }
       }
+
+      context.putImageData(imageData, 0, 0);
+    },
+
+    /**
+     * Returns object representation of an instance
+     * @return {Object} Object representation of an instance
+     */
+    toObject: function() {
+      return extend(this.callSuper('toObject'), {
+        blocksize: this.blocksize
+      });
     }
-
-    context.putImageData(imageData, 0, 0);
-  },
+  });
 
   /**
-   * Returns object representation of an instance
-   * @return {Object} Object representation of an instance
+   * Returns filter instance from an object representation
+   * @static
+   * @param {Object} object Object to create an instance from
+   * @return {fabric.Image.filters.Pixelate} Instance of fabric.Image.filters.Pixelate
    */
-  toObject: function() {
-    return {
-      type: this.type,
-      blocksize: this.blocksize
-    };
-  },
+  fabric.Image.filters.Pixelate.fromObject = function(object) {
+    return new fabric.Image.filters.Pixelate(object);
+  };
 
-  /**
-   * Returns a JSON representation of an instance
-   * @return {Object} JSON
-   */
-  toJSON: function() {
-    // delegate, not alias
-    return this.toObject();
-  }
-});
-
-/**
- * Returns filter instance from an object representation
- * @static
- * @param {Object} object Object to create an instance from
- * @return {fabric.Image.filters.Pixelate} Instance of fabric.Image.filters.Pixelate
- */
-fabric.Image.filters.Pixelate.fromObject = function(object) {
-  return new fabric.Image.filters.Pixelate(object);
-};
+})(typeof exports !== 'undefined' ? exports : this);
