@@ -1,61 +1,53 @@
-/**
- * Sepia filter class
- * @class fabric.Image.filters.Sepia
- * @memberOf fabric.Image.filters
- */
-fabric.Image.filters.Sepia = fabric.util.createClass(/** @lends fabric.Image.filters.Sepia.prototype */ {
+(function(global) {
+
+  "use strict";
+
+  var fabric  = global.fabric || (global.fabric = { });
 
   /**
-   * Filter type
-   * @param {String} type
-   * @default
+   * Sepia filter class
+   * @class fabric.Image.filters.Sepia
+   * @memberOf fabric.Image.filters
+   * @extends fabric.Image.filters.BaseFilter
    */
-  type: 'Sepia',
+  fabric.Image.filters.Sepia = fabric.util.createClass(fabric.Image.filters.BaseFilter, /** @lends fabric.Image.filters.Sepia.prototype */ {
 
-  /**
-   * Applies filter to canvas element
-   * @memberOf fabric.Image.filters.Sepia.prototype
-   * @param {Object} canvasEl Canvas element to apply filter to
-   */
-  applyTo: function(canvasEl) {
-    var context = canvasEl.getContext('2d'),
-        imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
-        data = imageData.data,
-        iLen = data.length, i, avg;
+    /**
+     * Filter type
+     * @param {String} type
+     * @default
+     */
+    type: 'Sepia',
 
-    for (i = 0; i < iLen; i+=4) {
-      avg = 0.3  * data[i] + 0.59 * data[i + 1] + 0.11 * data[i + 2];
-      data[i] = avg + 100;
-      data[i + 1] = avg + 50;
-      data[i + 2] = avg + 255;
+    /**
+     * Applies filter to canvas element
+     * @memberOf fabric.Image.filters.Sepia.prototype
+     * @param {Object} canvasEl Canvas element to apply filter to
+     */
+    applyTo: function(canvasEl) {
+      var context = canvasEl.getContext('2d'),
+          imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
+          data = imageData.data,
+          iLen = data.length, i, avg;
+
+      for (i = 0; i < iLen; i+=4) {
+        avg = 0.3  * data[i] + 0.59 * data[i + 1] + 0.11 * data[i + 2];
+        data[i] = avg + 100;
+        data[i + 1] = avg + 50;
+        data[i + 2] = avg + 255;
+      }
+
+      context.putImageData(imageData, 0, 0);
     }
-
-    context.putImageData(imageData, 0, 0);
-  },
+  });
 
   /**
-   * Returns object representation of an instance
-   * @return {Object} Object representation of an instance
+   * Returns filter instance from an object representation
+   * @static
+   * @return {fabric.Image.filters.Sepia} Instance of fabric.Image.filters.Sepia
    */
-  toObject: function() {
-    return { type: this.type };
-  },
+  fabric.Image.filters.Sepia.fromObject = function() {
+    return new fabric.Image.filters.Sepia();
+  };
 
-  /**
-   * Returns a JSON representation of an instance
-   * @return {Object} JSON
-   */
-  toJSON: function() {
-    // delegate, not alias
-    return this.toObject();
-  }
-});
-
-/**
- * Returns filter instance from an object representation
- * @static
- * @return {fabric.Image.filters.Sepia} Instance of fabric.Image.filters.Sepia
- */
-fabric.Image.filters.Sepia.fromObject = function() {
-  return new fabric.Image.filters.Sepia();
-};
+})(typeof exports !== 'undefined' ? exports : this);
