@@ -251,8 +251,6 @@
 
       this._setBoundaries(ctx, textLines);
       this._totalLineHeight = 0;
-
-      this.setCoords();
     },
 
     /**
