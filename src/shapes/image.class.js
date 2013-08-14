@@ -79,7 +79,7 @@
 
     /**
      * Returns original size of an image
-     * @return {Object} object with "width" and "height" properties
+     * @return {Object} Object with "width" and "height" properties
      */
     getOriginalSize: function() {
       var element = this.getElement();
@@ -181,7 +181,7 @@
 
     /**
      * Returns object representation of an instance
-     * @param {Array} propertiesToInclude
+     * @param {Array} propertiesToInclude Any properties that you might want to additionally include in the output
      * @return {Object} Object representation of an instance
      */
     toObject: function(propertiesToInclude) {
@@ -252,7 +252,7 @@
     /**
      * Returns a clone of an instance
      * @param {Function} callback Callback is invoked with a clone as a first argument
-     * @param {Array} propertiesToInclude
+     * @param {Array} propertiesToInclude Any properties that you might want to additionally include in the output
      */
     clone: function(callback, propertiesToInclude) {
       this.constructor.fromObject(this.toObject(propertiesToInclude), callback);
@@ -313,7 +313,7 @@
 
     /**
      * @private
-     * @param ctx
+     * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
       ctx.drawImage(
@@ -339,7 +339,7 @@
      * The Image class's initialization method. This method is automatically
      * called by the constructor.
      * @private
-     * @param {HTMLImageElement|String} el The element representing the image
+     * @param {HTMLImageElement|String} element The element representing the image
      */
     _initElement: function(element) {
       this.setElement(fabric.util.getById(element));
@@ -359,12 +359,13 @@
     /**
      * @private
      * @param {Object} object Object with filters property
+     * @param {Function} callback Callback to invoke when all fabric.Image.filters instances are created
      */
-    _initFilters: function(object) {
+    _initFilters: function(object, callback) {
       if (object.filters && object.filters.length) {
-        this.filters = object.filters.map(function(filterObj) {
-          return filterObj && fabric.Image.filters[filterObj.type].fromObject(filterObj);
-        });
+        fabric.util.enlivenObjects(object.filters, function(enlivenedObjects) {
+          callback(enlivenedObjects);
+        }, 'fabric.Image.filters');
       }
     },
 
@@ -395,6 +396,7 @@
    * Default CSS class name for canvas
    * @static
    * @type String
+   * @default
    */
   fabric.Image.CSS_CANVAS = "canvas-img";
 
@@ -416,11 +418,13 @@
 
     /** @ignore */
     img.onload = function() {
-      fabric.Image.prototype._initFilters.call(object, object);
+      fabric.Image.prototype._initFilters.call(object, object, function(filters) {
+        object.filters = filters;
 
-      var instance = new fabric.Image(img, object);
-      callback && callback(instance);
-      img = img.onload = img.onerror = null;
+        var instance = new fabric.Image(img, object);
+        callback && callback(instance);
+        img = img.onload = img.onerror = null;
+      });
     };
 
     /** @ignore */
@@ -481,8 +485,8 @@
   /**
    * Indicates compression level used when generating PNG under Node (in applyFilters). Any of 0-9
    * @static
-   * @default
    * @type Number
+   * @default
    */
   fabric.Image.pngCompression = 1;
 
