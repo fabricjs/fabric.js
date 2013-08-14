@@ -105,13 +105,34 @@
    }
 
   /**
-    * Returns klass "Class" object of given fabric.Object type
+    * Returns klass "Class" object of given namespace
     * @memberOf fabric.util
     * @param {String} type Type of object (eg. 'circle')
+    * @param {String} namespace Namespace to get klass "Class" object from
     * @return {Object} klass "Class"
     */
-  function getKlass(type) {
-    return fabric[fabric.util.string.camelize(fabric.util.string.capitalize(type))];
+  function getKlass(type, namespace) {
+    return resolveNamespace(namespace)[fabric.util.string.camelize(fabric.util.string.capitalize(type))];
+  }
+
+  /**
+    * Returns object of given namespace
+    * @memberOf fabric.util
+    * @param {String} namespace Namespace string e.g. 'fabric.Image.filter' or 'fabric'
+    * @return {Object} Object for given namespace (default fabric)
+    */
+  function resolveNamespace(namespace) {
+    namespace = namespace || 'fabric';
+
+    var parts = namespace.split('.'),
+        len = parts.length,
+        obj = fabric.window;
+
+    for (var i = 0; i < len; ++i) {
+      obj = obj[parts[i]];
+    }
+
+    return obj;
   }
 
   /**
@@ -143,7 +164,7 @@
    * @param {Array} objects Objects to enliven
    * @param {Function} callback Callback to invoke when all objects are created
    */
-  function enlivenObjects(objects, callback) {
+  function enlivenObjects(objects, callback, namespace) {
 
     function onLoaded() {
       if (++numLoadedObjects === numTotalObjects) {
@@ -161,7 +182,7 @@
       if (!o.type) {
         return;
       }
-      var klass = fabric.util.getKlass(o.type);
+      var klass = fabric.util.getKlass(o.type, namespace);
       if (klass.async) {
         klass.fromObject(o, function (o, error) {
           if (!error) {
@@ -278,7 +299,7 @@
    * Creates image element (works on client and node)
    * @static
    * @memberOf fabric.util
-   * @return {Image} image element
+   * @return {HTMLImageElement} HTML image element
    */
   function createImage() {
     return fabric.isLikelyNode
@@ -495,6 +516,7 @@
   fabric.util.getRandomInt = getRandomInt;
   fabric.util.falseFunction = falseFunction;
   fabric.util.getKlass = getKlass;
+  fabric.util.resolveNamespace = resolveNamespace;
   fabric.util.loadImage = loadImage;
   fabric.util.enlivenObjects = enlivenObjects;
   fabric.util.groupSVGElements = groupSVGElements;
