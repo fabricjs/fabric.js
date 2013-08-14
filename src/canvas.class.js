@@ -148,6 +148,13 @@
     targetFindTolerance:    0,
 
     /**
+     * When true, target detection is skipped when hovering over canvas. This can be used to improve performance.
+     * @type Boolean
+     * @default
+     */
+    skipTargetFind: false,
+
+    /**
      * @private
      */
     _initInteractive: function() {
@@ -734,6 +741,7 @@
      * @param {Boolean} skipGroup when true, group is skipped and only objects are traversed through
      */
     findTarget: function (e, skipGroup) {
+      if (this.skipTargetFind) return;
 
       var target,
           pointer = this.getPointer(e);
