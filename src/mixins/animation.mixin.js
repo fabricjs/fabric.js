@@ -149,10 +149,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
   /**
    * @private
-   * @param {String} property
-   * @param {String} to
-   * @param {Object} [options]
-   * @param {Boolean} [skipCallbacks]
+   * @param {String} property Property to animate
+   * @param {String} to Value to animate to
+   * @param {Object} [options] Options object
+   * @param {Boolean} [skipCallbacks] When true, callbacks like onchange and oncomplete are not invoked
    */
   _animate: function(property, to, options, skipCallbacks) {
     var obj = this, propPair;

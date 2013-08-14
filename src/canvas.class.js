@@ -889,7 +889,7 @@
     /**
      * Sets given object as the only active object on canvas
      * @param {fabric.Object} object Object to set as an active one
-     * @param {Event} e
+     * @param {Event} [e] Event (passed along when firing "object:selected")
      * @return {fabric.Canvas} thisArg
      * @chainable
      */

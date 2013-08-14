@@ -53,8 +53,8 @@
    * @deprecated `fire` deprecated since 1.0.7 (use `trigger` instead)
    * @memberOf fabric.Observable
    * @alias trigger
-   * @param {String} eventName
-   * @param {Object} [options]
+   * @param {String} eventName Event name to fire
+   * @param {Object} [options] Options object
    */
   function fire(eventName, options) {
     if (!this.__eventListeners) {

@@ -272,7 +272,7 @@
 
     /**
      * @private
-     * @param {Object} [options]
+     * @param {Object} [options] Options object
      */
     _initOptions: function (options) {
       for (var prop in options) {
@@ -344,7 +344,7 @@
 
     /**
      * Sets dimensions (width, height) of this canvas instance
-     * @param {Object} dimensions
+     * @param {Object} dimensions Object with width/height properties
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
@@ -676,7 +676,7 @@
 
     /**
      * Returs dataless JSON representation of canvas
-     * @param {Array} propertiesToInclude
+     * @param {Array} propertiesToInclude Any properties that you might want to additionally include in the output
      * @return {String} json string
      */
     toDatalessJSON: function (propertiesToInclude) {
@@ -685,7 +685,7 @@
 
     /**
      * Returns object representation of canvas
-     * @param {Array} propertiesToInclude
+     * @param {Array} propertiesToInclude Any properties that you might want to additionally include in the output
      * @return {Object} object representation of an instance
      */
     toObject: function (propertiesToInclude) {
@@ -694,7 +694,7 @@
 
     /**
      * Returns dataless object representation of canvas
-     * @param {Array} propertiesToInclude
+     * @param {Array} propertiesToInclude Any properties that you might want to additionally include in the output
      * @return {Object} object representation of an instance
      */
     toDatalessObject: function (propertiesToInclude) {
@@ -1085,7 +1085,7 @@
   /**
    * Returs JSON representation of canvas
    * @function
-   * @param {Array} propertiesToInclude
+   * @param {Array} propertiesToInclude Any properties that you might want to additionally include in the output
    * @return {String} json string
    */
   fabric.StaticCanvas.prototype.toJSON = fabric.StaticCanvas.prototype.toObject;

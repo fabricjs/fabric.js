@@ -419,7 +419,7 @@
 
     /**
      * Sets object's properties from options
-     * @param {Object} [options]
+     * @param {Object} [options] Options object
      */
     setOptions: function(options) {
       for (var prop in options) {
@@ -699,7 +699,7 @@
 
     /**
      * Sets sourcePath of an object
-     * @param {String} value
+     * @param {String} value Value to set sourcePath to
      * @return {fabric.Object} thisArg
      * @chainable
      */

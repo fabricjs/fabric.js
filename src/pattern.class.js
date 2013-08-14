@@ -27,7 +27,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
 
   /**
    * Constructor
-   * @param {Object} [options]
+   * @param {Object} [options] Options object
    * @return {fabric.Pattern} thisArg
    */
   initialize: function(options) {

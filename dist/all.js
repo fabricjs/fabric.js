@@ -1831,8 +1831,8 @@ if (typeof console !== 'undefined') {
    * @deprecated `fire` deprecated since 1.0.7 (use `trigger` instead)
    * @memberOf fabric.Observable
    * @alias trigger
-   * @param {String} eventName
-   * @param {Object} [options]
+   * @param {String} eventName Event name to fire
+   * @param {Object} [options] Options object
    */
   function fire(eventName, options) {
     if (!this.__eventListeners) {
@@ -6256,7 +6256,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
 
   /**
    * Constructor
-   * @param {Object} [options]
+   * @param {Object} [options] Options object
    * @return {fabric.Pattern} thisArg
    */
   initialize: function(options) {
@@ -6734,7 +6734,7 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
 
     /**
      * @private
-     * @param {Object} [options]
+     * @param {Object} [options] Options object
      */
     _initOptions: function (options) {
       for (var prop in options) {
@@ -6806,7 +6806,7 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
 
     /**
      * Sets dimensions (width, height) of this canvas instance
-     * @param {Object} dimensions
+     * @param {Object} dimensions Object with width/height properties
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
@@ -7138,7 +7138,7 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
 
     /**
      * Returs dataless JSON representation of canvas
-     * @param {Array} propertiesToInclude
+     * @param {Array} propertiesToInclude Any properties that you might want to additionally include in the output
      * @return {String} json string
      */
     toDatalessJSON: function (propertiesToInclude) {
@@ -7147,7 +7147,7 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
 
     /**
      * Returns object representation of canvas
-     * @param {Array} propertiesToInclude
+     * @param {Array} propertiesToInclude Any properties that you might want to additionally include in the output
      * @return {Object} object representation of an instance
      */
     toObject: function (propertiesToInclude) {
@@ -7156,7 +7156,7 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
 
     /**
      * Returns dataless object representation of canvas
-     * @param {Array} propertiesToInclude
+     * @param {Array} propertiesToInclude Any properties that you might want to additionally include in the output
      * @return {Object} object representation of an instance
      */
     toDatalessObject: function (propertiesToInclude) {
@@ -7547,7 +7547,7 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
   /**
    * Returs JSON representation of canvas
    * @function
-   * @param {Array} propertiesToInclude
+   * @param {Array} propertiesToInclude Any properties that you might want to additionally include in the output
    * @return {String} json string
    */
   fabric.StaticCanvas.prototype.toJSON = fabric.StaticCanvas.prototype.toObject;
@@ -9164,7 +9164,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     /**
      * Sets given object as the only active object on canvas
      * @param {fabric.Object} object Object to set as an active one
-     * @param {Event} e
+     * @param {Event} [e] Event (passed along when firing "object:selected")
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
@@ -10523,7 +10523,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
     /**
      * Sets object's properties from options
-     * @param {Object} [options]
+     * @param {Object} [options] Options object
      */
     setOptions: function(options) {
       for (var prop in options) {
@@ -10803,7 +10803,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
     /**
      * Sets sourcePath of an object
-     * @param {String} value
+     * @param {String} value Value to set sourcePath to
      * @return {fabric.Object} thisArg
      * @chainable
      */
@@ -12491,10 +12491,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
   /**
    * @private
-   * @param {String} property
-   * @param {String} to
-   * @param {Object} [options]
-   * @param {Boolean} [skipCallbacks]
+   * @param {String} property Property to animate
+   * @param {String} to Value to animate to
+   * @param {Object} [options] Options object
+   * @param {Boolean} [skipCallbacks] When true, callbacks like onchange and oncomplete are not invoked
    */
   _animate: function(property, to, options, skipCallbacks) {
     var obj = this, propPair;
@@ -17288,7 +17288,7 @@ fabric.Image.filters.Tint.fromObject = function(object) {
      * @param {Array} textLines Array of all text lines
      */
     _renderTextFill: function(ctx, textLines) {
-      if (!this.fill) return;
+      if (!this.fill && !this.skipFillStrokeCheck) return;
 
       this._boundaries = [ ];
       for (var i = 0, len = textLines.length; i < len; i++) {
@@ -17309,7 +17309,7 @@ fabric.Image.filters.Tint.fromObject = function(object) {
      * @param {Array} textLines Array of all text lines
      */
     _renderTextStroke: function(ctx, textLines) {
-      if (!this.stroke) return;
+      if (!this.stroke && !this.skipFillStrokeCheck) return;
 
       ctx.save();
       if (this.strokeDashArray) {
