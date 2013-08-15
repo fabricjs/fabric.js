@@ -235,7 +235,7 @@
         ctx.translate(this.textAlign === 'center' ? (this.width / 2) : this.width, 0);
       }
 
-      ctx.save();
+      ctx.save();     
       this._setTextShadow(ctx);
       this._renderTextFill(ctx, textLines);
       this._renderTextStroke(ctx, textLines);
@@ -370,7 +370,22 @@
      * @param {Number} top Top position of text
      */
     _drawChars: function(method, ctx, chars, left, top) {
-      ctx[method](chars, left, top);
+       
+         var isItalic = (this.fontStyle === 'italic' && !this.fontSupport.italic);
+
+            if(isItalic){
+                ctx.save();
+                ctx.translate(left, top);
+                ctx.transform(1, 0, -0.25, 1, 0, 0);
+                ctx.translate(-left, -top);
+                ctx[method](chars, left, top);
+                ctx.restore();
+            }
+            else{
+              ctx[method](chars, left, top);
+            }
+                     
+           
     },
 
     /**
@@ -617,15 +632,52 @@
         renderLinesAtOffset(0);
       }
     },
+      _detectBoldItalic : function(font){
+        // Create canvas
+        var canvas = document.createElement('canvas');
+        canvas.width = 1000;
+        canvas.height = 30;
+        var context = canvas.getContext("2d");
+        var test = {}, results = {};
 
+            var styles = ["normal", "bold", "italic"];
+            test = {};
+            results = {};
+            for (var j = 0; j < styles.length; j++) {
+                // Draw text in canvas
+                context.font = styles[j] + " 16px " + font;
+                context.fillText("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ12345678910", 10, 20);
+                // Convert canvas to png
+                test[styles[j]] = canvas.toDataURL("image/png");
+                // Clear canvas
+                context.setTransform(1, 0, 0, 1, 0, 0);
+                context.clearRect(0, 0, canvas.width, canvas.height);
+            }
+
+                results["bold"] = test["normal"] !== test["bold"] ? true:false; // Support bold
+                results["italic"] = test["normal"] !== test["italic"] ? true:false; // Support italic
+
+
+        return results;
+    },
     /**
      * @private
      */
     _getFontDeclaration: function() {
+      
+       
+            if(this.fontFamily !== this.prevFont){
+                this.fontSupport = this._detectBoldItalic(this.fontFamily);
+            }
+
+            this.prevFont = this.fontFamily;
+            
+            var fontstyle = (this.fontStyle === 'italic' && !this.fontSupport.italic) ? 'normal' : this.fontStyle;
+      
       return [
         // node-canvas needs "weight style", while browsers need "style weight"
-        (fabric.isLikelyNode ? this.fontWeight : this.fontStyle),
-        (fabric.isLikelyNode ? this.fontStyle : this.fontWeight),
+        (fabric.isLikelyNode ? this.fontWeight : fontstyle),
+        (fabric.isLikelyNode ? fontstyle : this.fontWeight),
         this.fontSize + 'px',
         (fabric.isLikelyNode ? ('"' + this.fontFamily + '"') : this.fontFamily)
       ].join(' ');
