@@ -172,8 +172,7 @@
 
       this._setCursorFromEvent(e, target);
 
-      // fix for FF
-      this._setCursor('');
+  
 
       var _this = this;
       setTimeout(function () {
