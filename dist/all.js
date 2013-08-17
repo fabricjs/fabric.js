@@ -2106,13 +2106,34 @@ fabric.Collection = {
    }
 
   /**
-    * Returns klass "Class" object of given fabric.Object type
+    * Returns klass "Class" object of given namespace
     * @memberOf fabric.util
     * @param {String} type Type of object (eg. 'circle')
+    * @param {String} namespace Namespace to get klass "Class" object from
     * @return {Object} klass "Class"
     */
-  function getKlass(type) {
-    return fabric[fabric.util.string.camelize(fabric.util.string.capitalize(type))];
+  function getKlass(type, namespace) {
+    return resolveNamespace(namespace)[fabric.util.string.camelize(fabric.util.string.capitalize(type))];
+  }
+
+  /**
+    * Returns object of given namespace
+    * @memberOf fabric.util
+    * @param {String} namespace Namespace string e.g. 'fabric.Image.filter' or 'fabric'
+    * @return {Object} Object for given namespace (default fabric)
+    */
+  function resolveNamespace(namespace) {
+    namespace = namespace || 'fabric';
+
+    var parts = namespace.split('.'),
+        len = parts.length,
+        obj = fabric.window;
+
+    for (var i = 0; i < len; ++i) {
+      obj = obj[parts[i]];
+    }
+
+    return obj;
   }
 
   /**
@@ -2144,7 +2165,7 @@ fabric.Collection = {
    * @param {Array} objects Objects to enliven
    * @param {Function} callback Callback to invoke when all objects are created
    */
-  function enlivenObjects(objects, callback) {
+  function enlivenObjects(objects, callback, namespace) {
 
     function onLoaded() {
       if (++numLoadedObjects === numTotalObjects) {
@@ -2162,7 +2183,7 @@ fabric.Collection = {
       if (!o.type) {
         return;
       }
-      var klass = fabric.util.getKlass(o.type);
+      var klass = fabric.util.getKlass(o.type, namespace);
       if (klass.async) {
         klass.fromObject(o, function (o, error) {
           if (!error) {
@@ -2279,7 +2300,7 @@ fabric.Collection = {
    * Creates image element (works on client and node)
    * @static
    * @memberOf fabric.util
-   * @return {Image} image element
+   * @return {HTMLImageElement} HTML image element
    */
   function createImage() {
     return fabric.isLikelyNode
@@ -2496,6 +2517,7 @@ fabric.Collection = {
   fabric.util.getRandomInt = getRandomInt;
   fabric.util.falseFunction = falseFunction;
   fabric.util.getKlass = getKlass;
+  fabric.util.resolveNamespace = resolveNamespace;
   fabric.util.loadImage = loadImage;
   fabric.util.enlivenObjects = enlivenObjects;
   fabric.util.groupSVGElements = groupSVGElements;
@@ -9505,9 +9527,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
       this._setCursorFromEvent(e, target);
 
-      // fix for FF
-      this._setCursor('');
-
       var _this = this;
       setTimeout(function () {
         _this._setCursorFromEvent(e, target);
@@ -15446,7 +15465,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
     /**
      * Returns original size of an image
-     * @return {Object} object with "width" and "height" properties
+     * @return {Object} Object with "width" and "height" properties
      */
     getOriginalSize: function() {
       var element = this.getElement();
@@ -15548,7 +15567,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
     /**
      * Returns object representation of an instance
-     * @param {Array} propertiesToInclude
+     * @param {Array} propertiesToInclude Any properties that you might want to additionally include in the output
      * @return {Object} Object representation of an instance
      */
     toObject: function(propertiesToInclude) {
@@ -15619,7 +15638,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     /**
      * Returns a clone of an instance
      * @param {Function} callback Callback is invoked with a clone as a first argument
-     * @param {Array} propertiesToInclude
+     * @param {Array} propertiesToInclude Any properties that you might want to additionally include in the output
      */
     clone: function(callback, propertiesToInclude) {
       this.constructor.fromObject(this.toObject(propertiesToInclude), callback);
@@ -15680,7 +15699,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
     /**
      * @private
-     * @param ctx
+     * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
       ctx.drawImage(
@@ -15706,7 +15725,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * The Image class's initialization method. This method is automatically
      * called by the constructor.
      * @private
-     * @param {HTMLImageElement|String} el The element representing the image
+     * @param {HTMLImageElement|String} element The element representing the image
      */
     _initElement: function(element) {
       this.setElement(fabric.util.getById(element));
@@ -15726,12 +15745,13 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     /**
      * @private
      * @param {Object} object Object with filters property
+     * @param {Function} callback Callback to invoke when all fabric.Image.filters instances are created
      */
-    _initFilters: function(object) {
+    _initFilters: function(object, callback) {
       if (object.filters && object.filters.length) {
-        this.filters = object.filters.map(function(filterObj) {
-          return filterObj && fabric.Image.filters[filterObj.type].fromObject(filterObj);
-        });
+        fabric.util.enlivenObjects(object.filters, function(enlivenedObjects) {
+          callback(enlivenedObjects);
+        }, 'fabric.Image.filters');
       }
     },
 
@@ -15762,6 +15782,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * Default CSS class name for canvas
    * @static
    * @type String
+   * @default
    */
   fabric.Image.CSS_CANVAS = "canvas-img";
 
@@ -15783,11 +15804,13 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
     /** @ignore */
     img.onload = function() {
-      fabric.Image.prototype._initFilters.call(object, object);
+      fabric.Image.prototype._initFilters.call(object, object, function(filters) {
+        object.filters = filters;
 
-      var instance = new fabric.Image(img, object);
-      callback && callback(instance);
-      img = img.onload = img.onerror = null;
+        var instance = new fabric.Image(img, object);
+        callback && callback(instance);
+        img = img.onload = img.onerror = null;
+      });
     };
 
     /** @ignore */
@@ -15848,8 +15871,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   /**
    * Indicates compression level used when generating PNG under Node (in applyFilters). Any of 0-9
    * @static
-   * @default
    * @type Number
+   * @default
    */
   fabric.Image.pngCompression = 1;
 
@@ -16371,6 +16394,122 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
   fabric.Image.filters.Invert.fromObject = function() {
     return new fabric.Image.filters.Invert();
   };
+
+})(typeof exports !== 'undefined' ? exports : this);
+
+
+(function(global) {
+
+  "use strict";
+
+  var fabric  = global.fabric || (global.fabric = { }),
+      extend = fabric.util.object.extend;
+
+  /**
+   * Mask filter class
+   * @class fabric.Image.filters.Mask
+   * @memberOf fabric.Image.filters
+   * @extends fabric.Image.filters.BaseFilter
+   */
+  fabric.Image.filters.Mask = fabric.util.createClass(fabric.Image.filters.BaseFilter, /** @lends fabric.Image.filters.Mask.prototype */ {
+
+    /**
+     * Filter type
+     * @param {String} type
+     * @default
+     */
+    type: 'Mask',
+
+    /**
+     * Constructor
+     * @memberOf fabric.Image.filters.Mask.prototype
+     * @param {Object} [options] Options object
+     */
+    initialize: function(options) {
+      options = options || { };
+
+      this.mask = options.mask;
+      this.channel = [ 0, 1, 2, 3 ].indexOf(options.channel) > -1 ? options.channel : 0;
+    },
+
+    /**
+     * Applies filter to canvas element
+     * @param {Object} canvasEl Canvas element to apply filter to
+     */
+    applyTo: function(canvasEl) {
+      if (!this.mask) return;
+
+      var context = canvasEl.getContext('2d'),
+          imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
+          data = imageData.data,
+          maskEl = this.mask.getElement(),
+          maskCanvasEl = fabric.util.createCanvasElement(),
+          channel = this.channel,
+          i,
+          iLen = imageData.width * imageData.height * 4;
+
+      maskCanvasEl.width = maskEl.width;
+      maskCanvasEl.height = maskEl.height;
+
+      maskCanvasEl.getContext('2d').drawImage(maskEl, 0, 0, maskEl.width, maskEl.height);
+
+      var maskImageData = maskCanvasEl.getContext('2d').getImageData(0, 0, maskEl.width, maskEl.height),
+          maskData = maskImageData.data;
+
+      for (i = 0; i < iLen; i += 4) {
+        data[i + 3] = maskData[i + channel];
+      }
+
+      context.putImageData(imageData, 0, 0);
+    },
+
+    /**
+     * Returns object representation of an instance
+     * @return {Object} Object representation of an instance
+     */
+    toObject: function() {
+      return extend(this.callSuper('toObject'), {
+        mask: this.mask.toObject(),
+        channel: this.channel
+      });
+    }
+  });
+
+  /**
+   * Returns filter instance from an object representation
+   * @static
+   * @param {Object} object Object to create an instance from
+   * @param {Function} [callback] Callback to invoke when a mask filter instance is created
+   */
+  fabric.Image.filters.Mask.fromObject = function(object, callback) {
+    var img = fabric.document.createElement('img'),
+        src = object.mask.src;
+
+    /** @ignore */
+    img.onload = function() {
+      object.mask = new fabric.Image(img, object.mask);
+
+      callback && callback(new fabric.Image.filters.Mask(object));
+      img = img.onload = img.onerror = null;
+    };
+
+    /** @ignore */
+    img.onerror = function() {
+      fabric.log('Error loading ' + img.src);
+      callback && callback(null, true);
+      img = img.onload = img.onerror = null;
+    };
+
+    img.src = src;
+  };
+
+  /**
+   * Indicates that instances of this type are async
+   * @static
+   * @type Boolean
+   * @default
+   */
+  fabric.Image.filters.Mask.async = true;
 
 })(typeof exports !== 'undefined' ? exports : this);
 
