@@ -5,7 +5,6 @@ var modules = [
   'text',
   'cufon',
   'gestures',
-  'animation',
   'easing',
   'parser',
   'freedrawing',
