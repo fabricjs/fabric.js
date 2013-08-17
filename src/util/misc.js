@@ -122,7 +122,7 @@
     * @return {Object} Object for given namespace (default fabric)
     */
   function resolveNamespace(namespace) {
-    namespace = namespace || 'fabric';
+    if (!namespace) return fabric;
 
     var parts = namespace.split('.'),
         len = parts.length,
