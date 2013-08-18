@@ -1,5 +1,85 @@
 (function() {
 
+  function getAbsolutePath(path) {
+    var isAbsolute = /^https?:/.test(path);
+    if (isAbsolute) return path;
+    var imgEl = _createImageElement();
+    imgEl.src = path;
+    var src = imgEl.src;
+    imgEl = null;
+    return src;
+  }
+
+  var IMG_SRC     = fabric.isLikelyNode ? (__dirname + '/../fixtures/test_image.gif') : getAbsolutePath('../fixtures/test_image.gif'),
+      IMG_WIDTH   = 276,
+      IMG_HEIGHT  = 110;
+
+  var REFERENCE_IMG_OBJECT = {
+    'type':               'image',
+    'originX':            'center',
+    'originY':            'center',
+    'left':               0,
+    'top':                0,
+    'width':              IMG_WIDTH, // node-canvas doesn't seem to allow setting width/height on image objects
+    'height':             IMG_HEIGHT, // or does it now?
+    'fill':               'rgb(0,0,0)',
+    'overlayFill':        null,
+    'stroke':             null,
+    'strokeWidth':        1,
+    'strokeDashArray':    null,
+    'strokeLineCap':      'butt',
+    'strokeLineJoin':     'miter',
+    'strokeMiterLimit':   10,
+    'scaleX':             1,
+    'scaleY':             1,
+    'angle':              0,
+    'flipX':              false,
+    'flipY':              false,
+    'opacity':            1,
+    'src':                fabric.isLikelyNode ? undefined : IMG_SRC,
+    'selectable':         true,
+    'hasControls':        true,
+    'hasBorders':         true,
+    'hasRotatingPoint':   true,
+    'transparentCorners': true,
+    'perPixelTargetFind': false,
+    'shadow':             null,
+    'visible':            true,
+    'clipTo':             null,
+    'filters':            []
+  };
+
+  function _createImageElement() {
+    return fabric.isLikelyNode ? new (require('canvas').Image) : fabric.document.createElement('img');
+  }
+
+  function _createImageObject(width, height, callback) {
+    var elImage = _createImageElement();
+    elImage.width = width;
+    elImage.height = height;
+    setSrc(elImage, IMG_SRC, function() {
+      callback(new fabric.Image(elImage));
+    });
+  }
+
+  function createImageObject(callback) {
+    return _createImageObject(IMG_WIDTH, IMG_HEIGHT, callback)
+  }
+
+  function setSrc(img, src, callback) {
+    if (fabric.isLikelyNode) {
+      require('fs').readFile(src, function(err, imgData) {
+        if (err) throw err;
+        img.src = imgData;
+        callback && callback();
+      });
+    }
+    else {
+      img.src = src;
+      callback && callback();
+    }
+  }
+
   QUnit.module('fabric.Image.filters.Brightness');
 
   test('constructor', function() {
@@ -43,7 +123,9 @@
   test('fromObject', function() {
     var filter = new fabric.Image.filters.Brightness();
 
-    deepEqual(fabric.Image.filters.Brightness.fromObject(filter), filter);
+    var object = filter.toObject();
+
+    deepEqual(fabric.Image.filters.Brightness.fromObject(object), filter);
   });
 
 
@@ -92,7 +174,9 @@
   test('fromObject', function() {
     var filter = new fabric.Image.filters.Convolute();
 
-    deepEqual(fabric.Image.filters.Convolute.fromObject(filter), filter);
+    var object = filter.toObject();
+
+    deepEqual(fabric.Image.filters.Convolute.fromObject(object), filter);
   });
 
   QUnit.module('fabric.Image.filters.GradientTransparency');
@@ -138,7 +222,9 @@
   test('fromObject', function() {
     var filter = new fabric.Image.filters.GradientTransparency();
 
-    deepEqual(fabric.Image.filters.GradientTransparency.fromObject(filter), filter);
+    var object = filter.toObject();
+
+    deepEqual(fabric.Image.filters.GradientTransparency.fromObject(object), filter);
   });
 
 
@@ -181,7 +267,9 @@
   test('fromObject', function() {
     var filter = new fabric.Image.filters.Grayscale();
 
-    deepEqual(fabric.Image.filters.Grayscale.fromObject(filter), filter);
+    var object = filter.toObject();
+
+    deepEqual(fabric.Image.filters.Grayscale.fromObject(object), filter);
   });
 
 
@@ -224,7 +312,9 @@
   test('fromObject', function() {
     var filter = new fabric.Image.filters.Invert();
 
-    deepEqual(fabric.Image.filters.Invert.fromObject(filter), filter);
+    var object = filter.toObject();
+
+    deepEqual(fabric.Image.filters.Invert.fromObject(object), filter);
   });
 
 
@@ -271,7 +361,9 @@
   test('fromObject', function() {
     var filter = new fabric.Image.filters.Noise();
 
-    deepEqual(fabric.Image.filters.Noise.fromObject(filter), filter);
+    var object = filter.toObject();
+
+    deepEqual(fabric.Image.filters.Noise.fromObject(object), filter);
   });
 
 
@@ -318,7 +410,9 @@
   test('fromObject', function() {
     var filter = new fabric.Image.filters.Pixelate();
 
-    deepEqual(fabric.Image.filters.Pixelate.fromObject(filter), filter);
+    var object = filter.toObject();
+
+    deepEqual(fabric.Image.filters.Pixelate.fromObject(object), filter);
   });
 
 
@@ -367,7 +461,9 @@
   test('fromObject', function() {
     var filter = new fabric.Image.filters.RemoveWhite();
 
-    deepEqual(fabric.Image.filters.RemoveWhite.fromObject(filter), filter);
+    var object = filter.toObject();
+
+    deepEqual(fabric.Image.filters.RemoveWhite.fromObject(object), filter);
   });
 
 
@@ -410,7 +506,9 @@
   test('fromObject', function() {
     var filter = new fabric.Image.filters.Sepia2();
 
-    deepEqual(fabric.Image.filters.Sepia2.fromObject(filter), filter);
+    var object = filter.toObject();
+
+    deepEqual(fabric.Image.filters.Sepia2.fromObject(object), filter);
   });
 
 
@@ -453,7 +551,9 @@
   test('fromObject', function() {
     var filter = new fabric.Image.filters.Sepia();
 
-    deepEqual(fabric.Image.filters.Sepia.fromObject(filter), filter);
+    var object = filter.toObject();
+
+    deepEqual(fabric.Image.filters.Sepia.fromObject(object), filter);
   });
 
 
@@ -500,6 +600,94 @@
   test('fromObject', function() {
     var filter = new fabric.Image.filters.Tint();
 
-    deepEqual(fabric.Image.filters.Tint.fromObject(filter), filter);
+    var object = filter.toObject();
+
+    deepEqual(fabric.Image.filters.Tint.fromObject(object), filter);
   });
+
+  QUnit.module('fabric.Image.filters.Mask');
+
+  test('constructor', function() {
+    ok(fabric.Image.filters.Mask);
+
+    var filter = new fabric.Image.filters.Mask();
+    ok(filter instanceof fabric.Image.filters.Mask, 'should inherit from fabric.Image.filters.Mask');
+  });
+
+  asyncTest('properties', function() {
+    var filter = new fabric.Image.filters.Mask();
+
+    equal(filter.type, 'Mask');
+    equal(filter.mask, undefined);
+    equal(filter.channel, 0);
+
+    createImageObject(function(image) {
+      var filter2 = new fabric.Image.filters.Mask({mask: image, channel: 2});
+      equal(filter2.mask, image);
+      equal(filter2.channel, 2);
+
+      start();
+    });
+  });
+
+  test('applyTo', function() {
+    var filter = new fabric.Image.filters.Mask();
+    ok(typeof filter.applyTo == 'function');
+  });
+
+  asyncTest('toObject', function() {
+    createImageObject(function(image) {
+      var filter = new fabric.Image.filters.Mask({mask: image});
+      ok(typeof filter.toObject == 'function');
+
+      var object = filter.toObject(),
+          maskObj = object.mask;
+
+      // workaround for node-canvas sometimes producing images with width/height and sometimes not
+      if (maskObj.width === 0) {
+        maskObj.width = IMG_WIDTH;
+      }
+      if (maskObj.height === 0) {
+        maskObj.height = IMG_HEIGHT;
+      }
+      equal(JSON.stringify(object), '{"type":"Mask","mask":'+JSON.stringify(maskObj)+',"channel":0}');
+
+      start();
+    });
+  });
+
+  asyncTest('toJSON', function() {
+    createImageObject(function(image) {
+      var filter = new fabric.Image.filters.Mask({mask: image});
+      ok(typeof filter.toJSON == 'function');
+
+      var json = filter.toJSON(),
+          maskObj = json.mask;
+
+      // workaround for node-canvas sometimes producing images with width/height and sometimes not
+      if (maskObj.width === 0) {
+        maskObj.width = IMG_WIDTH;
+      }
+      if (maskObj.height === 0) {
+        maskObj.height = IMG_HEIGHT;
+      }
+      equal(JSON.stringify(json), '{"type":"Mask","mask":'+JSON.stringify(maskObj)+',"channel":0}');
+
+      start();
+    });
+  });
+
+  // asyncTest('fromObject', function() {
+  //   createImageObject(function(image) {
+  //     var filter = new fabric.Image.filters.Mask({mask: image});
+
+  //     var object = filter.toObject();
+
+  //     fabric.Image.filters.Mask.fromObject(object, function(filterObj) {
+  //       deepEqual(filterObj, filter);
+
+  //       start();
+  //     });
+  //   });
+  // });
 })();
