@@ -97,7 +97,7 @@
      * @param {Event} e Event object fired on mousemove
      */
     _onMouseMove: function (e) {
-      e.preventDefault && e.preventDefault();
+      !this.allowTouchScrolling && e.preventDefault && e.preventDefault();
       this.__onMouseMove(e);
     },
 
