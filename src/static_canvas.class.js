@@ -128,6 +128,13 @@
      * @default
      */
     controlsAboveOverlay: false,
+    
+    /**
+     * Indicates whether the browser can be scrolled when using a touchscreen and dragging on the canvas
+     * @type Boolean
+     * @default
+     */
+     allowTouchScrolling: false,
 
     /**
      * Callback; invoked right before object is about to be scaled/rotated
