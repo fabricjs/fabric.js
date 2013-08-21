@@ -106,7 +106,7 @@
   fabric.loadSVGFromString = function(string, callback, reviver) {
     var doc = new DOMParser().parseFromString(string);
     fabric.parseSVGDocument(doc.documentElement, function(results, options) {
-      callback(results, options);
+      callback && callback(results, options);
     }, reviver);
   };
 
@@ -122,8 +122,10 @@
       var oImg = new fabric.Image(img);
 
       oImg._initConfig(object);
-      oImg._initFilters(object);
-      callback(oImg);
+      oImg._initFilters(object, function(filters) {
+        oImg.filters = filters || [ ];
+        callback && callback(oImg);
+      });
     });
   };
 
