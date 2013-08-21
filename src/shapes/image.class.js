@@ -364,8 +364,11 @@
     _initFilters: function(object, callback) {
       if (object.filters && object.filters.length) {
         fabric.util.enlivenObjects(object.filters, function(enlivenedObjects) {
-          callback(enlivenedObjects);
+          callback && callback(enlivenedObjects);
         }, 'fabric.Image.filters');
+      }
+      else {
+        callback && callback();
       }
     },
 
@@ -419,7 +422,7 @@
     /** @ignore */
     img.onload = function() {
       fabric.Image.prototype._initFilters.call(object, object, function(filters) {
-        object.filters = filters;
+        object.filters = filters || [ ];
 
         var instance = new fabric.Image(img, object);
         callback && callback(instance);
