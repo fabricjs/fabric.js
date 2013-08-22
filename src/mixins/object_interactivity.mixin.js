@@ -255,7 +255,7 @@
 
       var padding = this.padding,
           padding2 = padding * 2,
-          strokeWidth = this.strokeWidth > 1 ? this.strokeWidth : 0;
+          strokeWidth = ~~(this.strokeWidth / 2) * 2; // Round down to even number
 
       ctx.save();
 
@@ -273,10 +273,10 @@
           h = this.getHeight();
 
       ctx.strokeRect(
-        ~~(-(w / 2) - padding - strokeWidth / 2 * this.scaleX) + 0.5, // offset needed to make lines look sharper
-        ~~(-(h / 2) - padding - strokeWidth / 2 * this.scaleY) + 0.5,
-        ~~(w + padding2 + strokeWidth * this.scaleX),
-        ~~(h + padding2 + strokeWidth * this.scaleY)
+        ~~(-(w / 2) - padding - strokeWidth / 2 * this.scaleX) - 0.5, // offset needed to make lines look sharper
+        ~~(-(h / 2) - padding - strokeWidth / 2 * this.scaleY) - 0.5,
+        ~~(w + padding2 + strokeWidth * this.scaleX) + 1, // double offset needed to make lines look sharper
+        ~~(h + padding2 + strokeWidth * this.scaleY) + 1
       );
 
       if (this.hasRotatingPoint && !this.get('lockRotation') && this.hasControls) {
@@ -311,7 +311,7 @@
 
       var size = this.cornerSize,
           size2 = size / 2,
-          strokeWidth2 = this.strokeWidth > 1 ? (this.strokeWidth / 2) : 0,
+          strokeWidth2 = ~~(this.strokeWidth / 2), // half strokeWidth rounded down
           left = -(this.width / 2),
           top = -(this.height / 2),
           _left,
