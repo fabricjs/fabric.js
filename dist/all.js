@@ -12567,7 +12567,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       byValue: options.by,
       easing: options.easing,
       duration: options.duration,
-      abort: options.abort,
+      abort: options.abort && function() {
+        return options.abort.call(obj);
+      },
       onChange: function(value) {
         if (propPair) {
           obj[propPair[0]][propPair[1]] = value;

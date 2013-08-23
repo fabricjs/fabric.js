@@ -747,6 +747,29 @@
     }, 1000);
   });
 
+  asyncTest('animate with abort', function() {
+    var object = new fabric.Object({ left: 123, top: 124 });
+
+    var context;
+    object.animate({ left: 223, top: 224 }, {
+      abort: function() {
+        context = this;
+        return true;
+      }
+    });
+
+    setTimeout(function() {
+
+      equal(123, Math.round(object.get('left')));
+      equal(124, Math.round(object.get('top')));
+
+      equal(context, object, 'abort should be called in context of an object');
+
+      start();
+
+    }, 100);
+  });
+
   test('observable', function() {
     var object = new fabric.Object({ left: 20, top: 30, width: 40, height: 50, angle: 43 });
 
