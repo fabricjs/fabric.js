@@ -50,6 +50,10 @@ fs.writeFile('build.sh', '#!/usr/bin/env sh\n\n', function() {
     var command = 'node build.js build-sh modules=' + modulesStr;
 
     execSync(command);
+
+    if (i % 100 === 0) {
+      console.log(i + '/' + len);
+    }
   }
 
   // create basic (minimal) build
