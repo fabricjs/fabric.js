@@ -128,7 +128,7 @@
      * @default
      */
     controlsAboveOverlay: false,
-    
+
     /**
      * Indicates whether the browser can be scrolled when using a touchscreen and dragging on the canvas
      * @type Boolean
@@ -758,7 +758,7 @@
      * Returns SVG representation of canvas
      * @function
      * @param {Object} [options] Options for SVG output (suppressPreamble: true/false (if true xml tag is not included),
-     * viewBox: {x, y, width, height} to define the svg output viewBox)
+     * viewBox: {x, y, width, height} to define the svg output viewBox), encoding default: UTF-8
      * @return {String}
      */
     toSVG: function(options) {
@@ -767,7 +767,7 @@
 
       if (!options.suppressPreamble) {
         markup.push(
-          '<?xml version="1.0" standalone="no" ?>',
+          '<?xml version="1.0" encoding="', (options.encoding || 'UTF-8'), '" standalone="no" ?>',
             '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" ',
               '"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n'
         );
