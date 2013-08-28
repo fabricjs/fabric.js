@@ -6502,26 +6502,23 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
   /**
    * Static canvas class
    * @class fabric.StaticCanvas
-   * @constructor
-   *
-   * @param {HTMLElement | String} el &lt;canvas> element to initialize instance on
-   * @param {Object} [options] Options object
-   *
    * @extends fabric.Collection
    * @extends fabric.Observable
    */
-  fabric.StaticCanvas = function (el, options) {
-    options || (options = { });
+  fabric.StaticCanvas = fabric.util.createClass(/** @lends fabric.StaticCanvas.prototype */ {
 
-    this._initStatic(el, options);
-    fabric.StaticCanvas.activeInstance = this;
-  };
+    /**
+     * Constructor
+     * @param {HTMLElement | String} el &lt;canvas> element to initialize instance on
+     * @param {Object} [options] Options object
+     * @return {Object} thisArg
+     */
+    initialize: function(el, options) {
+      options || (options = { });
 
-  extend(fabric.StaticCanvas.prototype, fabric.Observable);
-  extend(fabric.StaticCanvas.prototype, fabric.Collection);
-  extend(fabric.StaticCanvas.prototype, fabric.DataURLExporter);
-
-  extend(fabric.StaticCanvas.prototype, /** @lends fabric.StaticCanvas.prototype */ {
+      this._initStatic(el, options);
+      fabric.StaticCanvas.activeInstance = this;
+    },
 
     /**
      * Background color of canvas instance
@@ -6612,7 +6609,7 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
      * @default
      */
     controlsAboveOverlay: false,
-    
+
     /**
      * Indicates whether the browser can be scrolled when using a touchscreen and dragging on the canvas
      * @type Boolean
@@ -7242,7 +7239,7 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
      * Returns SVG representation of canvas
      * @function
      * @param {Object} [options] Options for SVG output (suppressPreamble: true/false (if true xml tag is not included),
-     * viewBox: {x, y, width, height} to define the svg output viewBox)
+     * viewBox: {x, y, width, height} to define the svg output viewBox), encoding default: UTF-8
      * @return {String}
      */
     toSVG: function(options) {
@@ -7251,7 +7248,7 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
 
       if (!options.suppressPreamble) {
         markup.push(
-          '<?xml version="1.0" standalone="no" ?>',
+          '<?xml version="1.0" encoding="', (options.encoding || 'UTF-8'), '" standalone="no" ?>',
             '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" ',
               '"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n'
         );
@@ -7478,17 +7475,21 @@ fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
         removeListener(fabric.window, 'resize', this._onResize);
       }
       return this;
+    },
+
+    /**
+     * Returns a string representation of an instance
+     * @return {String} string representation of an instance
+     */
+    toString: function () {
+      return '#<fabric.Canvas (' + this.complexity() + '): '+
+               '{ objects: ' + this.getObjects().length + ' }>';
     }
   });
 
-  /**
-   * Returns a string representation of an instance
-   * @return {String} string representation of an instance
-   */
-  fabric.StaticCanvas.prototype.toString = function () { // Assign explicitly since `extend` doesn't take care of DontEnum bug yet
-    return '#<fabric.Canvas (' + this.complexity() + '): '+
-           '{ objects: ' + this.getObjects().length + ' }>';
-  };
+  extend(fabric.StaticCanvas.prototype, fabric.Observable);
+  extend(fabric.StaticCanvas.prototype, fabric.Collection);
+  extend(fabric.StaticCanvas.prototype, fabric.DataURLExporter);
 
   extend(fabric.StaticCanvas, /** @lends fabric.StaticCanvas */ {
 
@@ -8304,8 +8305,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
 (function() {
 
-  var extend = fabric.util.object.extend,
-      getPointer = fabric.util.getPointer,
+  var getPointer = fabric.util.getPointer,
       degreesToRadians = fabric.util.degreesToRadians,
       radiansToDegrees = fabric.util.radiansToDegrees,
       atan2 = Math.atan2,
@@ -8318,26 +8318,25 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
   /**
    * Canvas class
    * @class fabric.Canvas
-   * @constructor
    * @extends fabric.StaticCanvas
-   * @param {HTMLElement | String} el &lt;canvas> element to initialize instance on
-   * @param {Object} [options] Options object
    */
-  fabric.Canvas = function(el, options) {
-    options || (options = { });
+  fabric.Canvas = fabric.util.createClass(fabric.StaticCanvas, /** @lends fabric.Canvas.prototype */ {
 
-    this._initStatic(el, options);
-    this._initInteractive();
-    this._createCacheCanvas();
+    /**
+     * Constructor
+     * @param {HTMLElement | String} el &lt;canvas> element to initialize instance on
+     * @param {Object} [options] Options object
+     * @return {Object} thisArg
+     */
+    initialize: function(el, options) {
+      options || (options = { });
 
-    fabric.Canvas.activeInstance = this;
-  };
+      this._initStatic(el, options);
+      this._initInteractive();
+      this._createCacheCanvas();
 
-  function ProtoProxy(){ }
-  ProtoProxy.prototype = fabric.StaticCanvas.prototype;
-  fabric.Canvas.prototype = new ProtoProxy();
-
-  var InteractiveMethods = /** @lends fabric.Canvas.prototype */ {
+      fabric.Canvas.activeInstance = this;
+    },
 
     /**
      * When true, objects can be transformed by one side (unproportionally)
@@ -9332,12 +9331,9 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         }
       }
     }
-  };
+  });
 
-  fabric.Canvas.prototype.toString = fabric.StaticCanvas.prototype.toString;
-  extend(fabric.Canvas.prototype, InteractiveMethods);
-
-  // iterating manually to workaround Opera's bug
+  // copying static properties manually to work around Opera's bug,
   // where "prototype" property is enumerable and overrides existing prototype
   for (var prop in fabric.StaticCanvas) {
     if (prop !== 'prototype') {
