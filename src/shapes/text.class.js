@@ -678,7 +678,6 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function() {
-
       var textLines = this.text.split(/\r?\n/),
           lineTopOffset = this.useNative
             ? this.fontSize * this.lineHeight
@@ -699,7 +698,7 @@
         '<g transform="', this.getSvgTransform(), '">',
           textAndBg.textBgRects.join(''),
           '<text ',
-            (this.fontFamily ? 'font-family="\'' + this.fontFamily + '\'" ': ''),
+            (this.fontFamily ? 'font-family="' + this.fontFamily.replace(/"/g,'\'') + '" ': ''),
             (this.fontSize ? 'font-size="' + this.fontSize + '" ': ''),
             (this.fontStyle ? 'font-style="' + this.fontStyle + '" ': ''),
             (this.fontWeight ? 'font-weight="' + this.fontWeight + '" ': ''),
