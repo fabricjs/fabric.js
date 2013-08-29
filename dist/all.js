@@ -16951,6 +16951,9 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 
       var rgb = parseInt(this.color, 10).toString(16);
 
+      // Pad with leading zeros that may have been stripped off in conversion.
+      while (rgb.length < 6) rgb = '0' + rgb;
+
       var cr = parseInt('0x' + rgb.substr(0, 2), 16);
       var cg = parseInt('0x' + rgb.substr(2, 2), 16);
       var cb = parseInt('0x' + rgb.substr(4, 2), 16);
