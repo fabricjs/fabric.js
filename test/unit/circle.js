@@ -42,6 +42,13 @@
     var circle = new fabric.Circle({ radius: 10 });
 
     ok(typeof circle.setRadius == 'function');
+
+    equal(circle.getRadiusX(), 10);
+    equal(circle.getRadiusY(), 10);
+
+    equal(circle.getWidth(), 20);
+    equal(circle.getHeight(), 20);
+
     circle.setRadius(20);
 
     equal(circle.getRadiusX(), 20);
