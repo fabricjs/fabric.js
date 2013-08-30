@@ -107,6 +107,8 @@
     var augmentedProperties = fabric.util.object.extend(fabric.util.object.clone(defaultProperties), {
       left:   100,
       top:    200,
+      width:  30,
+      height: 30,
       radius: 15
     });
 

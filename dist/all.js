@@ -12847,9 +12847,22 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       this.set('radius', options.radius || 0);
       this.callSuper('initialize', options);
+    },
 
-      var diameter = this.get('radius') * 2;
-      this.set('width', diameter).set('height', diameter);
+    /**
+     * @private
+     * @param {String} key
+     * @param {Any} value
+     * @return {fabric.Circle} thisArg
+     */
+    _set: function(key, value) {
+      this.callSuper('_set', key, value);
+
+      if (key === 'radius') {
+        this.setRadius(value);
+      }
+
+      return this;
     },
 
     /**
@@ -17675,7 +17688,6 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @return {String} svg representation of an instance
      */
     toSVG: function() {
-
       var textLines = this.text.split(/\r?\n/),
           lineTopOffset = this.useNative
             ? this.fontSize * this.lineHeight
@@ -17696,7 +17708,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
         '<g transform="', this.getSvgTransform(), '">',
           textAndBg.textBgRects.join(''),
           '<text ',
-            (this.fontFamily ? 'font-family="\'' + this.fontFamily + '\'" ': ''),
+            (this.fontFamily ? 'font-family="' + this.fontFamily.replace(/"/g,'\'') + '" ': ''),
             (this.fontSize ? 'font-size="' + this.fontSize + '" ': ''),
             (this.fontStyle ? 'font-style="' + this.fontStyle + '" ': ''),
             (this.fontWeight ? 'font-weight="' + this.fontWeight + '" ': ''),
