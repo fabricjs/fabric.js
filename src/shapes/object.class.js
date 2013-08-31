@@ -150,7 +150,7 @@
      * when being resized via the controls
      * @type Boolean
      */
-    centerTransform:        false,
+    centerTransform:          false,
 
     /**
      * Color of object's fill
@@ -955,6 +955,7 @@
 
     /**
      * Sets gradient (fill or stroke) of an object
+     * <b>Backwards incompatibility note:</b> This method was named "setGradientFill" until v1.1.0
      * @param {String} property Property name 'stroke' or 'fill'
      * @param {Object} [options] Options object
      */

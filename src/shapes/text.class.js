@@ -144,14 +144,22 @@
      * @type Boolean
      * @default
      */
-     useNative:           true,
+    useNative:           true,
 
-     /**
-      * List of properties to consider when checking if state of an object is changed ({@link fabric.Object#hasStateChanged})
-      * as well as for history (undo/redo) purposes
-      * @type Array
-      */
-     stateProperties:     stateProperties,
+    /**
+     * List of properties to consider when checking if state of an object is changed ({@link fabric.Object#hasStateChanged})
+     * as well as for history (undo/redo) purposes
+     * @type Array
+     */
+    stateProperties:     stateProperties,
+
+    /**
+     * When defined, an object is rendered via stroke and this property specifies its color.
+     * <b>Backwards incompatibility note:</b> This property was named "strokeStyle" until v1.1.6
+     * @type String
+     * @default
+     */
+    stroke:              null,
 
     /**
      * Constructor
