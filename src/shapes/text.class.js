@@ -459,13 +459,18 @@
       if (!this.fill && !this.skipFillStrokeCheck) return;
 
       this._boundaries = [ ];
+      var lineHeights = 0;
+
       for (var i = 0, len = textLines.length; i < len; i++) {
+        var heightOfLine = this._getHeightOfLine(ctx, i, textLines);
+        lineHeights += heightOfLine;
+
         this._drawTextLine(
           'fillText',
           ctx,
           textLines[i],
           this._getLeftOffset(),
-          this._getTopOffset() + (i * this.fontSize * this.lineHeight) + this.fontSize,
+          this._getTopOffset() + lineHeights,
           i
         );
       }
@@ -479,6 +484,8 @@
     _renderTextStroke: function(ctx, textLines) {
       if (!this.stroke && !this.skipFillStrokeCheck) return;
 
+      var lineHeights = 0;
+
       ctx.save();
       if (this.strokeDashArray) {
         // Spec requires the concatenation of two copies the dash list when the number of elements is odd
@@ -490,17 +497,24 @@
 
       ctx.beginPath();
       for (var i = 0, len = textLines.length; i < len; i++) {
+        var heightOfLine = this._getHeightOfLine(ctx, i, textLines);
+        lineHeights += heightOfLine;
+
         this._drawTextLine(
           'strokeText',
           ctx,
           textLines[i],
           this._getLeftOffset(),
-          this._getTopOffset() + (i * this.fontSize * this.lineHeight) + this.fontSize,
+          this._getTopOffset() + lineHeights,
           i
         );
       }
       ctx.closePath();
       ctx.restore();
+    },
+
+    _getHeightOfLine: function() {
+      return this.fontSize * this.lineHeight;
     },
 
     /**
@@ -609,20 +623,22 @@
 
           ctx.fillRect(
             _this._getLeftOffset() + lineLeftOffset,
-            (offset + (i * _this.fontSize * _this.lineHeight)) - halfOfVerticalBox,
+            (offset + (i * _this._getHeightOfLine(ctx, i, textLines))) - halfOfVerticalBox,
             lineWidth,
             1);
         }
       }
 
+      var fractionOfFontSize = this.fontSize / 4;
+
       if (this.textDecoration.indexOf('underline') > -1) {
-        renderLinesAtOffset(this.fontSize);
+        renderLinesAtOffset(this.fontSize * this.lineHeight);
       }
       if (this.textDecoration.indexOf('line-through') > -1) {
-        renderLinesAtOffset(this.fontSize / 2);
+        renderLinesAtOffset(this.fontSize * this.lineHeight - fractionOfFontSize);
       }
       if (this.textDecoration.indexOf('overline') > -1) {
-        renderLinesAtOffset(0);
+        renderLinesAtOffset(fractionOfFontSize);
       }
     },
 
