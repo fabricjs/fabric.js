@@ -113,7 +113,7 @@ These are the optional modules that could be specified for inclusion, when build
 
 Additional flags for build script are:
 
-- **requirejs** — Makes fabric requirejs module compatible
+- **requirejs** — Makes fabric requirejs AMD-compatible in `dist/all.js`. *Note:* an unminified, requirejs-compatible version is always created in `dist/all.requirejs.js`
 - **no-strict** — Strips "use strict" directives from source
 - **no-svg-export** — Removes svg exporting functionality
 - **no-es5-compat** - Removes ES5 compat methods (Array.prototype.*, String.prototype.*, Function.prototype.*)

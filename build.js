@@ -27,7 +27,7 @@ var amdLib = requirejs;
 
 // if we want requirejs AMD support, use uglify
 var amdUglifyFlags = " -r 'require,exports,window,fabric' -e window:window,undefined ";
-if (amdLib === 'requirejs') {
+if (amdLib === 'requirejs' && minifier !== 'uglifyjs') {
   console.log('[notice]: require.js support requires uglifyjs as minifier; changed minifier to uglifyjs.');
   minifier = 'uglifyjs';
 }
@@ -56,6 +56,7 @@ var distFileContents =
     (noStrict ? ' no-strict' : '') +
     (noSVGExport ? ' no-svg-export' : '') +
     (noES5Compat ? ' no-es5-compat' : '') +
+    (requirejs ? ' requirejs' : '') +
   '` */';
 
 function appendFileContents(fileNames, callback) {
@@ -115,7 +116,7 @@ function ifSpecifiedDependencyInclude(included, excluded, fileName) {
 function ifSpecifiedAMDInclude(amdLib) {
   var supportedLibraries = ['requirejs'];
   if (supportedLibraries.indexOf(amdLib) > -1) {
-    console.log ('incl: src/amd/' + amdLib + '.js');
+    //console.log ('incl: src/amd/' + amdLib + '.js');
     return 'src/amd/' + amdLib + '.js';
   }
   return '';
@@ -265,13 +266,15 @@ else {
         exec('uglifyjs dist/all.js ' + amdUglifyFlags + ' -b --output dist/all.js');
       }
 
-      // TODO: DELETE CLAUSE BELOW... just demo'ing the requirejs in every build for git review
-      if (true || alwaysCreateRequireJsBuild) {
-        console.log('[notice]: created dist/all.requirejs.js version for demo.');
-        exec('uglifyjs dist/all.js ' + amdUglifyFlags + ' -b --output dist/all.requirejs.js');
-      }
+      // always create AMD-module version of fabric in dist/all.requirejs.js
+      exec('uglifyjs dist/all.js ' + amdUglifyFlags + ' -b --output dist/all.requirejs.js');      
+      console.log('Built as AMD module to dist/all.requirejs.js');
 
-      console.log('Built distribution to dist/all.js');
+      if (amdLib !== false) {
+        console.log('Built distribution to dist/all.js (' + amdLib + '-compatible)');
+      } else {
+        console.log('Built distribution to dist/all.js');
+      }
 
       exec(mininfierCmd, function (error, output) {
         if (error) {

@@ -4,8 +4,6 @@ testrunner.options.log.summary = true;
 testrunner.options.log.tests = false;
 testrunner.options.log.assertions = false;
 
-var window;
-
 testrunner.run({
     code: "./dist/all.js",
     tests: [
