@@ -4,6 +4,8 @@
 
 - [BACK_INCOMPAT] fabric.BaseBrush shadow properties are combined into one property => fabric.BaseBrush.shadow (shadowColor, shadowBlur, shadowOffsetX, shadowOffsetY no longer exist)
 
+- [BACK_INCOMPAT] `fabric.Path.fromObject` is now async. `fabric.Canvas#loadFromDatalessJSON` is deprecated.
+
 **Version 1.2.0**
 
 - [BACK_INCOMPAT] Make `fabric.Object#toDataURL` synchronous.
