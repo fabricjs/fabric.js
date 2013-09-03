@@ -8,7 +8,7 @@
    * @class fabric.PencilBrush
    * @extends fabric.BaseBrush
    */
-  fabric.PencilBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric.PencilBrush.prototype */ {
+  fabric.PencilBrush = fabric.util.createClass(fabric.BaseBrush, /** @lends fabric.PencilBrush.prototype */ {
 
     /**
      * Constructor
@@ -82,8 +82,8 @@
     _reset: function() {
       this._points.length = 0;
 
-      this.setBrushStyles();
-      this.setShadowStyles();
+      this._setBrushStyles();
+      this._setShadow();
     },
 
     /**
@@ -221,14 +221,9 @@
       path.strokeLineCap = this.strokeLineCap;
       path.strokeLineJoin = this.strokeLineJoin;
 
-      if (this.shadowColor) {
-        path.setShadow({
-          color: this.shadowColor,
-          blur: this.shadowBlur,
-          offsetX: this.shadowOffsetX,
-          offsetY: this.shadowOffsetY,
-          affectStroke: true
-        });
+      if (this.shadow) {
+        this.shadow.affectStroke = true;
+        path.setShadow(this.shadow);
       }
 
       return path;
@@ -267,7 +262,7 @@
       path.setCoords();
 
       this.canvas.clearContext(this.canvas.contextTop);
-      this.removeShadowStyles();
+      this._resetShadow();
       this.canvas.renderAll();
 
       // fire event 'path' created

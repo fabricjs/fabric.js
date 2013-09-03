@@ -2,7 +2,7 @@
  * CircleBrush class
  * @class fabric.CircleBrush
  */
-fabric.CircleBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric.CircleBrush.prototype */ {
+fabric.CircleBrush = fabric.util.createClass(fabric.BaseBrush, /** @lends fabric.CircleBrush.prototype */ {
 
   /**
    * Width of a brush
@@ -41,7 +41,7 @@ fabric.CircleBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabri
   onMouseDown: function(pointer) {
     this.points.length = 0;
     this.canvas.clearContext(this.canvas.contextTop);
-    this.setShadowStyles();
+    this._setShadow();
     this.drawDot(pointer);
   },
 
@@ -69,21 +69,14 @@ fabric.CircleBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabri
         fill: point.fill
       });
 
-      if (this.shadowColor) {
-        circle.setShadow({
-          color: this.shadowColor,
-          blur: this.shadowBlur,
-          offsetX: this.shadowOffsetX,
-          offsetY: this.shadowOffsetY
-        });
-      }
+      this.shadow && circle.setShadow(this.shadow);
 
       this.canvas.add(circle);
       this.canvas.fire('path:created', { path: circle });
     }
 
     this.canvas.clearContext(this.canvas.contextTop);
-    this.removeShadowStyles();
+    this._resetShadow();
     this.canvas.renderOnAddRemove = originalRenderOnAddRemove;
     this.canvas.renderAll();
   },

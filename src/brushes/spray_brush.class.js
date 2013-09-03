@@ -56,7 +56,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
   onMouseDown: function(pointer) {
     this.sprayChunks.length = 0;
     this.canvas.clearContext(this.canvas.contextTop);
-    this.setShadowStyles();
+    this._setShadow();
 
     this.addSprayChunk(pointer);
     this.render();
@@ -91,14 +91,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
           fill: this.color
         });
 
-        if (this.shadowColor) {
-          rect.setShadow({
-            color: this.shadowColor,
-            blur: this.shadowBlur,
-            offsetX: this.shadowOffsetX,
-            offsetY: this.shadowOffsetY
-          });
-        }
+        this.shadow && rect.setShadow(this.shadow);
 
         this.canvas.add(rect);
         this.canvas.fire('path:created', { path: rect });
@@ -106,7 +99,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
     }
 
     this.canvas.clearContext(this.canvas.contextTop);
-    this.removeShadowStyles();
+    this._resetShadow();
     this.canvas.renderOnAddRemove = originalRenderOnAddRemove;
     this.canvas.renderAll();
   },
