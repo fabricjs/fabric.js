@@ -763,8 +763,14 @@
       // then check all of the objects on canvas
       // Cache all targets where their bounding box contains point.
       var possibleTargets = [];
+
       for (var i = this._objects.length; i--; ) {
-        if (this._objects[i] && this._objects[i].visible && this.containsPoint(e, this._objects[i])) {
+
+        if (this._objects[i] &&
+            this._objects[i].visible &&
+            this._objects[i].selectable &&
+            this.containsPoint(e, this._objects[i])) {
+
           if (this.perPixelTargetFind || this._objects[i].perPixelTargetFind) {
             possibleTargets[possibleTargets.length] = this._objects[i];
           }

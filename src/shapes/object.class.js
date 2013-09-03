@@ -256,7 +256,8 @@
     minScaleLimit:            0.01,
 
     /**
-     * When set to `false`, an object can not be selected for modification (using either point-click-based or group-based selection)
+     * When set to `false`, an object can not be selected for modification (using either point-click-based or group-based selection).
+     * All events propagate through it.
      * @type Boolean
      * @default
      */
