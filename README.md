@@ -84,6 +84,10 @@ Fabric.js started as a foundation for design editor on [printio.ru](http://print
         # or Google Closure Compiler
         $ node build.js modules=... minifier=closure
 
+4. Enable AMD support via require.js (requires uglify)
+
+        $ node build.js requirejs modules=... 
+
 ### Demos
 
 - [Demos](http://fabricjs.com/demos/)
@@ -114,6 +118,7 @@ These are the optional modules that could be specified for inclusion, when build
 
 Additional flags for build script are:
 
+- **requirejs** — Makes fabric requirejs AMD-compatible in `dist/all.js`. *Note:* an unminified, requirejs-compatible version is always created in `dist/all.require.js`
 - **no-strict** — Strips "use strict" directives from source
 - **no-svg-export** — Removes svg exporting functionality
 - **no-es5-compat** - Removes ES5 compat methods (Array.prototype.*, String.prototype.*, Function.prototype.*)
