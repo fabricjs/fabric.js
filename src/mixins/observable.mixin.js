@@ -7,6 +7,8 @@
    * @alias on
    * @param {String} eventName
    * @param {Function} handler
+   * @return {Self} thisArg
+   * @chainable
    */
   function observe(eventName, handler) {
     if (!this.__eventListeners) {
@@ -24,6 +26,7 @@
       }
       this.__eventListeners[eventName].push(handler);
     }
+    return this;
   }
 
   /**
@@ -33,6 +36,8 @@
    * @alias off
    * @param {String} eventName
    * @param {Function} handler
+   * @return {Self} thisArg
+   * @chainable
    */
   function stopObserving(eventName, handler) {
     if (!this.__eventListeners) {
@@ -46,6 +51,7 @@
         this.__eventListeners[eventName].length = 0;
       }
     }
+    return this;
   }
 
   /**
@@ -55,6 +61,8 @@
    * @alias trigger
    * @param {String} eventName Event name to fire
    * @param {Object} [options] Options object
+   * @return {Self} thisArg
+   * @chainable
    */
   function fire(eventName, options) {
     if (!this.__eventListeners) {
@@ -66,6 +74,7 @@
       // avoiding try/catch for perf. reasons
       listenersForEvent[i].call(this, options || { });
     }
+    return this;
   }
 
   /**

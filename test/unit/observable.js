@@ -112,3 +112,31 @@ test('trigger', function() {
   foo.trigger('bar:baz');
   equal(true, eventFired);
 });
+
+test('chaining', function() {
+  var foo = { };
+  fabric.util.object.extend(foo, fabric.Observable);
+
+  var event1Fired = false, event2Fired = false;
+  foo
+    .on('event1', function() {
+      event1Fired = true;
+    })
+    .on('event2', function() {
+      event2Fired = true;
+    });
+
+  foo.trigger('event2').trigger('event1');
+
+  equal(true, event1Fired);
+  equal(true, event2Fired);
+
+  event1Fired = false;
+  event2Fired = false;
+
+  foo.off('event1').off('event2');
+  foo.trigger('event2').trigger('event1');
+
+  equal(false, event1Fired);
+  equal(false, event2Fired);
+});
