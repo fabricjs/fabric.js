@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures` */
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.2.10" };
+var fabric = fabric || { version: "1.2.11" };
 
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
@@ -1785,6 +1785,8 @@ if (typeof console !== 'undefined') {
    * @alias on
    * @param {String} eventName
    * @param {Function} handler
+   * @return {Self} thisArg
+   * @chainable
    */
   function observe(eventName, handler) {
     if (!this.__eventListeners) {
@@ -1802,6 +1804,7 @@ if (typeof console !== 'undefined') {
       }
       this.__eventListeners[eventName].push(handler);
     }
+    return this;
   }
 
   /**
@@ -1811,6 +1814,8 @@ if (typeof console !== 'undefined') {
    * @alias off
    * @param {String} eventName
    * @param {Function} handler
+   * @return {Self} thisArg
+   * @chainable
    */
   function stopObserving(eventName, handler) {
     if (!this.__eventListeners) {
@@ -1824,6 +1829,7 @@ if (typeof console !== 'undefined') {
         this.__eventListeners[eventName].length = 0;
       }
     }
+    return this;
   }
 
   /**
@@ -1833,6 +1839,8 @@ if (typeof console !== 'undefined') {
    * @alias trigger
    * @param {String} eventName Event name to fire
    * @param {Object} [options] Options object
+   * @return {Self} thisArg
+   * @chainable
    */
   function fire(eventName, options) {
     if (!this.__eventListeners) {
@@ -1842,8 +1850,9 @@ if (typeof console !== 'undefined') {
     if (!listenersForEvent) return;
     for (var i = 0, len = listenersForEvent.length; i < len; i++) {
       // avoiding try/catch for perf. reasons
-      listenersForEvent[i](options || { });
+      listenersForEvent[i].call(this, options || { });
     }
+    return this;
   }
 
   /**
@@ -9068,8 +9077,14 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       // then check all of the objects on canvas
       // Cache all targets where their bounding box contains point.
       var possibleTargets = [];
+
       for (var i = this._objects.length; i--; ) {
-        if (this._objects[i] && this._objects[i].visible && this.containsPoint(e, this._objects[i])) {
+
+        if (this._objects[i] &&
+            this._objects[i].visible &&
+            this._objects[i].selectable &&
+            this.containsPoint(e, this._objects[i])) {
+
           if (this.perPixelTargetFind || this._objects[i].perPixelTargetFind) {
             possibleTargets[possibleTargets.length] = this._objects[i];
           }
@@ -9768,7 +9783,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
                       && target._findTargetCorner(e, this._offset);
 
         if (!corner) {
-          s.cursor = this.hoverCursor;
+          s.cursor = target.hoverCursor || this.hoverCursor;
         }
         else {
           if (corner in cursorOffset) {
@@ -10259,6 +10274,13 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     transparentCorners:       true,
 
     /**
+     * Default cursor value used when hovering over this object on canvas
+     * @type String
+     * @default
+     */
+    hoverCursor:              null,
+
+    /**
      * Padding between object and its controlling borders (in pixels)
      * @type Number
      * @default
@@ -10383,7 +10405,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     minScaleLimit:            0.01,
 
     /**
-     * When set to `false`, an object can not be selected for modification (using either point-click-based or group-based selection)
+     * When set to `false`, an object can not be selected for modification (using either point-click-based or group-based selection).
+     * All events propagate through it.
      * @type Boolean
      * @default
      */
