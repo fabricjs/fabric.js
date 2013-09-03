@@ -1,3 +1,9 @@
+**Edge**
+
+- [BACK_INCOMPAT] fabric.Text#textShadow has been removed - new fabric.Text.shadow property (type of fabric.Shadow)
+
+- [BACK_INCOMPAT] fabric.BaseBrush shadow properties are combined into one property => fabric.BaseBrush.shadow (shadowColor, shadowBlur, shadowOffsetX, shadowOffsetY no longer exist)
+
 **Version 1.2.0**
 
 - [BACK_INCOMPAT] Make `fabric.Object#toDataURL` synchronous.
