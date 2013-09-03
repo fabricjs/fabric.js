@@ -304,12 +304,7 @@
         target = this.findTarget(e);
 
         if (!target || target && !target.selectable) {
-          // image/text was hovered-out from, we remove its borders
-          for (var i = this._objects.length; i--; ) {
-            if (this._objects[i] && !this._objects[i].active) {
-              this._objects[i].set('active', false);
-            }
-          }
+          // no target - set default cursor
           style.cursor = this.defaultCursor;
         }
         else {
