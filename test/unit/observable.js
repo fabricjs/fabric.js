@@ -105,12 +105,15 @@ test('trigger', function() {
   fabric.util.object.extend(foo, fabric.Observable);
 
   var eventFired = false;
+  var context;
   foo.on('bar:baz', function() {
+    context = this;
     eventFired = true;
   });
 
   foo.trigger('bar:baz');
   equal(true, eventFired);
+  equal(foo, context);
 });
 
 test('chaining', function() {
