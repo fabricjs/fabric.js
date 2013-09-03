@@ -611,7 +611,8 @@
     _renderTextDecoration: function(ctx, textLines) {
       if (!this.textDecoration) return;
 
-      var halfOfVerticalBox = this.originY === 'top' ? 0 : this._getTextHeight(ctx, textLines) / 2;
+      // var halfOfVerticalBox = this.originY === 'top' ? 0 : this._getTextHeight(ctx, textLines) / 2;
+      var halfOfVerticalBox = this._getTextHeight(ctx, textLines) / 2;
       var _this = this;
 
       /** @ignore */
