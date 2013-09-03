@@ -939,6 +939,26 @@
     equal(object.shadow.offsetY, 15);
   });
 
+
+  test('set shadow', function() {
+    var object = new fabric.Object();
+
+    object.set('shadow', '10px 5px 0 #FF0000');
+
+    ok(object.shadow instanceof fabric.Shadow);
+
+    equal(object.shadow.color, '#FF0000');
+    equal(object.shadow.blur, 0);
+    equal(object.shadow.offsetX, 10);
+    equal(object.shadow.offsetY, 5);
+
+    object.set('shadow', null);
+
+    ok(!(object.shadow instanceof fabric.Shadow));
+
+    equal(object.shadow, null);
+  });
+
   test('intersectsWithRect', function() {
     var object = new fabric.Object({ left: 20, top: 30, width: 40, height: 50, angle: 160 }),
         point1 = new fabric.Point(0, 0),

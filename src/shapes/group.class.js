@@ -172,7 +172,6 @@
       fontStyle:        true,
       lineHeight:       true,
       textDecoration:   true,
-      textShadow:       true,
       textAlign:        true,
       backgroundColor:  true
     },

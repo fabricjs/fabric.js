@@ -19,32 +19,13 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
   width:            1,
 
   /**
-   * Shadow blur of a brush
-   * @type Number
+   * Shadow object representing shadow of this shape.
+   * <b>Backwards incompatibility note:</b> This property replaces "shadowColor" (String), "shadowOffsetX" (Number),
+   * "shadowOffsetY" (Number) and "shadowBlur" (Number) since v1.2.12
+   * @type fabric.Shadow
    * @default
    */
-  shadowBlur:       0,
-
-  /**
-   * Shadow color of a brush
-   * @type String
-   * @default
-   */
-  shadowColor:      '',
-
-  /**
-   * Shadow offset x of a brush
-   * @type Number
-   * @default
-   */
-  shadowOffsetX:    0,
-
-  /**
-   * Shadow offset y of a brush
-   * @type Number
-   * @default
-   */
-  shadowOffsetY:    0,
+  shadow:          null,
 
   /**
    * Line endings style of a brush (one of "butt", "round", "square")
@@ -61,9 +42,21 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
   strokeLineJoin:   'round',
 
   /**
-   * Sets brush styles
+   * Sets shadow of an object
+   * @param {Object|String} [options] Options object or string (e.g. "2px 2px 10px rgba(0,0,0,0.2)")
+   * @return {fabric.Object} thisArg
+   * @chainable
    */
-  setBrushStyles: function() {
+  setShadow: function(options) {
+    this.shadow = new fabric.Shadow(options);
+    return this;
+  },
+
+  /**
+   * Sets brush styles
+   * @private
+   */
+  _setBrushStyles: function() {
     var ctx = this.canvas.contextTop;
 
     ctx.strokeStyle = this.color;
@@ -74,22 +67,24 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
 
   /**
    * Sets brush shadow styles
+   * @private
    */
-  setShadowStyles: function() {
-    if (!this.shadowColor) return;
+  _setShadow: function() {
+    if (!this.shadow) return;
 
     var ctx = this.canvas.contextTop;
 
-    ctx.shadowBlur = this.shadowBlur;
-    ctx.shadowColor = this.shadowColor;
-    ctx.shadowOffsetX = this.shadowOffsetX;
-    ctx.shadowOffsetY = this.shadowOffsetY;
+    ctx.shadowColor = this.shadow.color;
+    ctx.shadowBlur = this.shadow.blur;
+    ctx.shadowOffsetX = this.shadow.offsetX;
+    ctx.shadowOffsetY = this.shadow.offsetY;
   },
 
   /**
-   * Remove brush shadow styles
+   * Removes brush shadow styles
+   * @private
    */
-  removeShadowStyles: function() {
+  _resetShadow: function() {
     var ctx = this.canvas.contextTop;
 
     ctx.shadowColor = '';
