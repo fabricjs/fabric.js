@@ -64,7 +64,7 @@
     if (!listenersForEvent) return;
     for (var i = 0, len = listenersForEvent.length; i < len; i++) {
       // avoiding try/catch for perf. reasons
-      listenersForEvent[i](options || { });
+      listenersForEvent[i].call(this, options || { });
     }
   }
 
