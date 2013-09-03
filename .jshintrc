@@ -1,5 +1,7 @@
 {
   "globals": {
+    "define":             true,
+    "exports":            true,
     "fabric":             true,
     "Cufon":              true,
     "Event":              true,

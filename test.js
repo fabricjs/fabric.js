@@ -5,6 +5,7 @@ testrunner.options.log.tests = false;
 testrunner.options.log.assertions = false;
 
 testrunner.run({
+    deps: "./test/fixtures/test_script.js",
     code: "./dist/all.js",
     tests: [
       './test/unit/rect.js',

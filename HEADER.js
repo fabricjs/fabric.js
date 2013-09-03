@@ -1,10 +1,10 @@
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.2.9" };
+var exports = exports || {};
+var fabric = fabric || { version: "1.2.9" };  
 
-if (typeof exports !== 'undefined') {
-  exports.fabric = fabric;
-}
+// make sure exports.fabric is always defined when used as 'global' later scopes
+exports.fabric = fabric;
 
 if (typeof document !== 'undefined' && typeof window !== 'undefined') {
   fabric.document = document;

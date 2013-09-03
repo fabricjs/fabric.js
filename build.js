@@ -17,6 +17,21 @@ var modulesToExclude = buildArgsAsObject.exclude ? buildArgsAsObject.exclude.spl
 var minifier = buildArgsAsObject.minifier || 'uglifyjs';
 var mininfierCmd;
 
+var noStrict = 'no-strict' in buildArgsAsObject;
+var noSVGExport = 'no-svg-export' in buildArgsAsObject;
+var noES5Compat = 'no-es5-compat' in buildArgsAsObject;
+var requirejs = 'requirejs' in buildArgsAsObject ? 'requirejs' : false;
+
+// set amdLib var to encourage later support of other AMD systems
+var amdLib = requirejs;
+
+// if we want requirejs AMD support, use uglify
+var amdUglifyFlags = " -r 'require,exports,window,fabric' -e window:window,undefined ";
+if (amdLib === 'requirejs' && minifier !== 'uglifyjs') {
+  console.log('[notice]: require.js support requires uglifyjs as minifier; changed minifier to uglifyjs.');
+  minifier = 'uglifyjs';
+}
+
 if (minifier === 'yui') {
   mininfierCmd = 'java -jar lib/yuicompressor-2.4.6.jar dist/all.js -o dist/all.min.js';
 }
@@ -24,12 +39,8 @@ else if (minifier === 'closure') {
   mininfierCmd = 'java -jar lib/google_closure_compiler.jar --js dist/all.js --js_output_file dist/all.min.js';
 }
 else if (minifier === 'uglifyjs') {
-  mininfierCmd = 'uglifyjs --output dist/all.min.js dist/all.js';
+  mininfierCmd = 'uglifyjs ' + amdUglifyFlags + ' --output dist/all.min.js dist/all.js';
 }
-
-var noStrict = 'no-strict' in buildArgsAsObject;
-var noSVGExport = 'no-svg-export' in buildArgsAsObject;
-var noES5Compat = 'no-es5-compat' in buildArgsAsObject;
 
 var buildSh = 'build-sh' in buildArgsAsObject;
 var buildMinified = 'build-minified' in buildArgsAsObject;
@@ -45,6 +56,7 @@ var distFileContents =
     (noStrict ? ' no-strict' : '') +
     (noSVGExport ? ' no-svg-export' : '') +
     (noES5Compat ? ' no-es5-compat' : '') +
+    (requirejs ? ' requirejs' : '') +
   '` */';
 
 function appendFileContents(fileNames, callback) {
@@ -99,6 +111,14 @@ function ifSpecifiedDependencyInclude(included, excluded, fileName) {
     ? fileName
     : ''
   );
+}
+
+function ifSpecifiedAMDInclude(amdLib) {
+  var supportedLibraries = ['requirejs'];
+  if (supportedLibraries.indexOf(amdLib) > -1) {
+    return 'src/amd/' + amdLib + '.js';
+  }
+  return '';
 }
 
 var filesToInclude = [
@@ -195,14 +215,16 @@ var filesToInclude = [
   ifSpecifiedInclude('text', 'src/shapes/text.class.js'),
   ifSpecifiedInclude('cufon', 'src/shapes/text.cufon.js'),
 
-  ifSpecifiedInclude('node', 'src/node.js')
+  ifSpecifiedInclude('node', 'src/node.js'),
+
+  ifSpecifiedAMDInclude(amdLib)
 ];
 
 if (buildMinified) {
   for (var i = 0; i < filesToInclude.length; i++) {
     if (!filesToInclude[i]) continue;
     var fileNameWithoutSlashes = filesToInclude[i].replace(/\//g, '^');
-    exec('uglifyjs -nc ' + filesToInclude[i] + ' > tmp/' + fileNameWithoutSlashes);
+    exec('uglifyjs -nc ' + amdUglifyFlags + filesToInclude[i] + ' > tmp/' + fileNameWithoutSlashes);
   }
 }
 else if (buildSh) {
@@ -238,7 +260,16 @@ else {
         throw err;
       }
 
-      console.log('Built distribution to dist/all.js');
+      // add js wrapping in AMD closure for requirejs if necessary
+      if (amdLib !== false) {
+        exec('uglifyjs dist/all.js ' + amdUglifyFlags + ' -b --output dist/all.js');
+      }
+
+      if (amdLib !== false) {
+        console.log('Built distribution to dist/all.js (' + amdLib + '-compatible)');
+      } else {
+        console.log('Built distribution to dist/all.js');
+      }
 
       exec(mininfierCmd, function (error, output) {
         if (error) {
@@ -251,6 +282,28 @@ else {
           console.log('Gzipped to dist/all.min.js.gz');
         });
       });
+
+      // Always build requirejs AMD module in dist/all.require.js
+      // add necessary requirejs footer code to filesToInclude if we haven't before
+      if (amdLib === false) {
+        amdLib = "requirejs";
+        filesToInclude[filesToInclude.length] = ifSpecifiedAMDInclude(amdLib);
+      }
+
+      appendFileContents(filesToInclude, function() {
+        fs.writeFile('dist/all.require.js', distFileContents, function (err) {
+          if (err) {
+            console.log(err);
+            throw err;
+          }
+          exec('uglifyjs dist/all.require.js ' + amdUglifyFlags + ' -b --output dist/all.require.js');
+          console.log('Built distribution to dist/all.require.js (requirejs-compatible)');
+        });
+      });
+
     });
   });
+
+  
+
 }
