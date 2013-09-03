@@ -25,7 +25,7 @@ fabric.util.object.extend(fabric.Text.prototype, {
       fontFamily: this.fontFamily,
       fontWeight: this.fontWeight,
       textDecoration: this.textDecoration,
-      textShadow: this.textShadow,
+      textShadow: this.shadow && this.shadow.getShadow(),
       textAlign: this.textAlign,
       fontStyle: this.fontStyle,
       lineHeight: this.lineHeight,
@@ -42,8 +42,6 @@ fabric.util.object.extend(fabric.Text.prototype, {
     this._totalLineHeight = o.totalLineHeight;
     this._fontAscent = o.fontAscent;
     this._boundaries = o.boundaries;
-    this._shadowOffsets = o.shadowOffsets;
-    this._shadows = o.shadows || [ ];
 
     el = null;
 

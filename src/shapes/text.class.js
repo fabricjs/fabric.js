@@ -21,7 +21,6 @@
     'path',
     'text',
     'textDecoration',
-    'textShadow',
     'textAlign',
     'fontStyle',
     'lineHeight',
@@ -91,13 +90,6 @@
     textDecoration:       '',
 
     /**
-     * Text shadow
-     * @type String | null
-     * @default
-     */
-    textShadow:           '',
-
-    /**
      * Text alignment. Possible values: "left", "center", or "right".
      * @type String
      * @default
@@ -144,14 +136,14 @@
      * @type Boolean
      * @default
      */
-    useNative:           true,
+    useNative:            true,
 
     /**
      * List of properties to consider when checking if state of an object is changed ({@link fabric.Object#hasStateChanged})
      * as well as for history (undo/redo) purposes
      * @type Array
      */
-    stateProperties:     stateProperties,
+    stateProperties:      stateProperties,
 
     /**
      * When defined, an object is rendered via stroke and this property specifies its color.
@@ -159,7 +151,15 @@
      * @type String
      * @default
      */
-    stroke:              null,
+    stroke:               null,
+
+    /**
+     * Shadow object representing shadow of this shape.
+     * <b>Backwards incompatibility note:</b> This property was named "textShadow" (String) until v1.2.11
+     * @type fabric.Shadow
+     * @default
+     */
+    shadow:               null,
 
     /**
      * Constructor
@@ -244,10 +244,10 @@
       }
 
       ctx.save();
-      this._setTextShadow(ctx);
+      this._setShadow(ctx);
       this._renderTextFill(ctx, textLines);
       this._renderTextStroke(ctx, textLines);
-      this.textShadow && ctx.restore();
+      this._removeShadow(ctx);
       ctx.restore();
 
       if (this.textAlign !== 'left' && this.textAlign !== 'justify') {
@@ -332,41 +332,6 @@
         }
       }
       return maxWidth;
-    },
-
-    /**
-     * @private
-     * @param {CanvasRenderingContext2D} ctx Context to render on
-     */
-    _setTextShadow: function(ctx) {
-      if (!this.textShadow) return;
-
-      // "rgba(0,0,0,0.2) 2px 2px 10px"
-      // "rgb(0, 100, 0) 0 0 5px"
-      // "red 2px 2px 1px"
-      // "#f55 123 345 567"
-      var reOffsetsAndBlur = /\s+(-?\d+)(?:px)?\s+(-?\d+)(?:px)?\s+(\d+)(?:px)?\s*/;
-
-      var shadowDeclaration = this.textShadow;
-      var offsetsAndBlur = reOffsetsAndBlur.exec(this.textShadow);
-      var shadowColor = shadowDeclaration.replace(reOffsetsAndBlur, '');
-
-      ctx.save();
-      ctx.shadowColor = shadowColor;
-      ctx.shadowOffsetX = parseInt(offsetsAndBlur[1], 10);
-      ctx.shadowOffsetY = parseInt(offsetsAndBlur[2], 10);
-      ctx.shadowBlur = parseInt(offsetsAndBlur[3], 10);
-
-      this._shadows = [{
-        blur: ctx.shadowBlur,
-        color: ctx.shadowColor,
-        offX: ctx.shadowOffsetX,
-        offY: ctx.shadowOffsetY
-      }];
-
-      this._shadowOffsets = [[
-        parseInt(ctx.shadowOffsetX, 10), parseInt(ctx.shadowOffsetY, 10)
-      ]];
     },
 
     /**
@@ -687,7 +652,6 @@
         fontStyle:            this.fontStyle,
         lineHeight:           this.lineHeight,
         textDecoration:       this.textDecoration,
-        textShadow:           this.textShadow,
         textAlign:            this.textAlign,
         path:                 this.path,
         backgroundColor:      this.backgroundColor,
@@ -744,35 +708,36 @@
      * @return {Array}
      */
     _getSVGShadows: function(lineTopOffset, textLines) {
-      var shadowSpans = [], j, i, jlen, ilen, lineTopOffsetMultiplier = 1;
+      var shadowSpans = [],
+          i, len,
+          lineTopOffsetMultiplier = 1;
 
-      if (!this._shadows || !this._boundaries) {
+      if (!this.shadow || !this._boundaries) {
         return shadowSpans;
       }
 
-      for (j = 0, jlen = this._shadows.length; j < jlen; j++) {
-        for (i = 0, ilen = textLines.length; i < ilen; i++) {
-          if (textLines[i] !== '') {
-            var lineLeftOffset = (this._boundaries && this._boundaries[i]) ? this._boundaries[i].left : 0;
-            shadowSpans.push(
-              '<tspan x="',
-              toFixed((lineLeftOffset + lineTopOffsetMultiplier) + this._shadowOffsets[j][0], 2),
-              ((i === 0 || this.useNative) ? '" y' : '" dy'), '="',
-              toFixed(this.useNative
-                ? ((lineTopOffset * i) - this.height / 2 + this._shadowOffsets[j][1])
-                : (lineTopOffset + (i === 0 ? this._shadowOffsets[j][1] : 0)), 2),
-              '" ',
-              this._getFillAttributes(this._shadows[j].color), '>',
-              fabric.util.string.escapeXml(textLines[i]),
-            '</tspan>');
-            lineTopOffsetMultiplier = 1;
-          } else {
-            // in some environments (e.g. IE 7 & 8) empty tspans are completely ignored, using a lineTopOffsetMultiplier
-            // prevents empty tspans
-            lineTopOffsetMultiplier++;
-          }
+      for (i = 0, len = textLines.length; i < len; i++) {
+        if (textLines[i] !== '') {
+          var lineLeftOffset = (this._boundaries && this._boundaries[i]) ? this._boundaries[i].left : 0;
+          shadowSpans.push(
+            '<tspan x="',
+            toFixed((lineLeftOffset + lineTopOffsetMultiplier) + this.shadow.offsetX, 2),
+            ((i === 0 || this.useNative) ? '" y' : '" dy'), '="',
+            toFixed(this.useNative
+              ? ((lineTopOffset * i) - this.height / 2 + this.shadow.offsetY)
+              : (lineTopOffset + (i === 0 ? this.shadow.offsetY : 0)), 2),
+            '" ',
+            this._getFillAttributes(this.shadow.color), '>',
+            fabric.util.string.escapeXml(textLines[i]),
+          '</tspan>');
+          lineTopOffsetMultiplier = 1;
+        } else {
+          // in some environments (e.g. IE 7 & 8) empty tspans are completely ignored, using a lineTopOffsetMultiplier
+          // prevents empty tspans
+          lineTopOffsetMultiplier++;
         }
       }
+
       return shadowSpans;
     },
 
@@ -875,27 +840,19 @@
     },
 
     /**
-     * Returns actual text value of an instance
-     * @return {String}
-     */
-    getText: function() {
-      return this.text;
-    },
-
-    /**
      * Sets specified property to a specified value
-     * @param {String} name
+     * @param {String} key
      * @param {Any} value
      * @return {fabric.Text} thisArg
      * @chainable
      */
-    _set: function(name, value) {
-      if (name === 'fontFamily' && this.path) {
+    _set: function(key, value) {
+      if (key === 'fontFamily' && this.path) {
         this.path = this.path.replace(/(.*?)([^\/]*)(\.font\.js)/, '$1' + value + '$3');
       }
-      this.callSuper('_set', name, value);
+      this.callSuper('_set', key, value);
 
-      if (name in this._dimensionAffectingProps) {
+      if (key in this._dimensionAffectingProps) {
         this._initDimensions();
         this.setCoords();
       }

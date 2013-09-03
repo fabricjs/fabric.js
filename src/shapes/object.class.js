@@ -407,15 +407,6 @@
     /**
      * @private
      */
-    _initShadow: function(options) {
-      if (options.shadow && !(options.shadow instanceof fabric.Shadow)) {
-        this.setShadow(options.shadow);
-      }
-    },
-
-    /**
-     * @private
-     */
     _initClipping: function(options) {
       if (!options.clipTo || typeof options.clipTo !== 'string') return;
 
@@ -435,7 +426,6 @@
       }
       this._initGradient(options);
       this._initPattern(options);
-      this._initShadow(options);
       this._initClipping(options);
     },
 
@@ -539,7 +529,7 @@
       var opacity = typeof this.opacity !== 'undefined' ? this.opacity : '1';
 
       var visibility = this.visible ? '' : " visibility: hidden;";
-      var filter = this.shadow ? 'filter: url(#SVGID_' + this.shadow.id + ');' : '';
+      var filter = this.shadow && this.type !== 'text' ? 'filter: url(#SVGID_' + this.shadow.id + ');' : '';
 
       return [
         "stroke: ", stroke, "; ",
@@ -684,6 +674,9 @@
       }
       else if (key === 'width' || key === 'height') {
         this.minScaleLimit = toFixed(Math.min(0.1, 1/Math.max(this.width, this.height)), 2);
+      }
+      else if (key === 'shadow' && value && !(value instanceof fabric.Shadow)) {
+        value = new fabric.Shadow(value);
       }
 
       this[key] = value;
@@ -1005,7 +998,7 @@
 
     /**
      * Sets shadow of an object
-     * @param {Object} [options] Options object
+     * @param {Object|String} [options] Options object or string (e.g. "2px 2px 10px rgba(0,0,0,0.2)")
      * @return {fabric.Object} thisArg
      * @chainable
      */

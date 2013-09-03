@@ -44,7 +44,6 @@
     'fontStyle':           '',
     'lineHeight':          1.3,
     'textDecoration':      '',
-    'textShadow':          '',
     'textAlign':           'left',
     'path':                null,
     'backgroundColor':     '',
@@ -104,6 +103,18 @@
     equal(text.getOpacity(), 0.123);
     equal(text.getFill(), 'red');
     equal(text.get('fontFamily'), 'blah');
+  });
+
+  test('setShadow', function(){
+    var text = createTextObject();
+    ok(typeof text.setShadow == 'function');
+    equal(text.setShadow('10px 8px 2px red'), text, 'should be chainable');
+
+    ok(text.shadow instanceof fabric.Shadow, 'should inherit from fabric.Shadow');
+    equal(text.shadow.color, 'red');
+    equal(text.shadow.offsetX, 10);
+    equal(text.shadow.offsetY, 8);
+    equal(text.shadow.blur, 2);
   });
 
   test('setColor', function(){
