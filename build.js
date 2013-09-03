@@ -26,10 +26,11 @@ var requirejs = 'requirejs' in buildArgsAsObject ? 'requirejs' : false;
 var amdLib = requirejs;
 
 // if we want requirejs AMD support, use uglify
-var amdUglifyFlags = " -r 'require,exports,window,fabric' -e window:window,undefined ";
+var amdUglifyFlags = '';
 if (amdLib === 'requirejs' && minifier !== 'uglifyjs') {
   console.log('[notice]: require.js support requires uglifyjs as minifier; changed minifier to uglifyjs.');
   minifier = 'uglifyjs';
+  amdUglifyFlags = " -r 'require,exports,window,fabric' -e window:window,undefined ";
 }
 
 if (minifier === 'yui') {
@@ -304,6 +305,6 @@ else {
     });
   });
 
-  
+
 
 }

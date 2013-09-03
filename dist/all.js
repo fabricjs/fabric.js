@@ -1,11 +1,11 @@
 /* build: `node build.js modules=ALL exclude=gestures` */
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
+var exports = exports || {};
 var fabric = fabric || { version: "1.2.11" };
 
-if (typeof exports !== 'undefined') {
-  exports.fabric = fabric;
-}
+// make sure exports.fabric is always defined when used as 'global' later scopes
+exports.fabric = fabric;
 
 if (typeof document !== 'undefined' && typeof window !== 'undefined') {
   fabric.document = document;
@@ -9677,12 +9677,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         target = this.findTarget(e);
 
         if (!target || target && !target.selectable) {
-          // image/text was hovered-out from, we remove its borders
-          for (var i = this._objects.length; i--; ) {
-            if (this._objects[i] && !this._objects[i].active) {
-              this._objects[i].set('active', false);
-            }
-          }
+          // no target - set default cursor
           style.cursor = this.defaultCursor;
         }
         else {

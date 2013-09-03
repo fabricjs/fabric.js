@@ -2,6 +2,6 @@
 
 window.fabric = fabric;
 
-if ( typeof define === "function" && define.amd) {
-    define( "fabric", [], function () { return fabric; } );
+if (typeof define === "function" && define.amd) {
+  define("fabric", [], function() { return fabric });
 }
