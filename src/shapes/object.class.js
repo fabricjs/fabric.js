@@ -125,6 +125,13 @@
     transparentCorners:       true,
 
     /**
+     * Default cursor value used when hovering over this object on canvas
+     * @type String
+     * @default
+     */
+    hoverCursor:              null,
+
+    /**
      * Padding between object and its controlling borders (in pixels)
      * @type Number
      * @default
