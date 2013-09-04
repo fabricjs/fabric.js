@@ -6396,99 +6396,151 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
 });
 
 
-/**
- * Shadow class
- * @class fabric.Shadow
- */
-fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
+(function(global) {
 
-  /**
-   * Shadow color
-   * @type String
-   * @default
-   */
-  color: 'rgb(0,0,0)',
+  "use strict";
 
-  /**
-   * Shadow blur
-   * @type Number
-   */
-  blur: 0,
+  var fabric = global.fabric || (global.fabric = { });
 
-  /**
-   * Shadow horizontal offset
-   * @type Number
-   * @default
-   */
-  offsetX: 0,
-
-  /**
-   * Shadow vertical offset
-   * @type Number
-   * @default
-   */
-  offsetY: 0,
-
-  /**
-   * Whether the shadow should affect stroke operations
-   * @type Boolean
-   * @default
-   */
-  affectStroke: false,
-
-  /**
-   * Constructor
-   * @param {Object} [options] Options object with any of color, blur, offsetX, offsetX properties
-   * @return {fabric.Shadow} thisArg
-   */
-  initialize: function(options) {
-    for (var prop in options) {
-      this[prop] = options[prop];
-    }
-
-    this.id = fabric.Object.__uid++;
-  },
-
-  /* _TO_SVG_START_ */
-  /**
-   * Returns SVG representation of a shadow
-   * @param {Object} object
-   * @return {String} SVG representation of a shadow
-   */
-  toSVG: function(object) {
-    var mode = 'SourceAlpha';
-
-    if (object.fill === this.color || object.stroke === this.color) {
-      mode = 'SourceGraphic';
-    }
-
-    return (
-      '<filter id="SVGID_' + this.id + '" y="-40%" height="180%">' +
-        '<feGaussianBlur in="' + mode + '" stdDeviation="' +
-          (this.blur ? this.blur / 3 : 0) +
-        '"></feGaussianBlur>' +
-        '<feOffset dx="' + this.offsetX + '" dy="' + this.offsetY + '"></feOffset>' +
-        '<feMerge>' +
-          '<feMergeNode></feMergeNode>' +
-          '<feMergeNode in="SourceGraphic"></feMergeNode>' +
-        '</feMerge>' +
-      '</filter>');
-  },
-  /* _TO_SVG_END_ */
-
-  /**
-   * Returns object representation of a shadow
-   * @return {Object} Object representation of a shadow instance
-   */
-  toObject: function() {
-    return {
-      color: this.color,
-      blur: this.blur,
-      offsetX: this.offsetX,
-      offsetY: this.offsetY
-    };
+  if (fabric.Shadow) {
+    fabric.warn('fabric.Shadow is already defined.');
+    return;
   }
-});
+
+  /**
+   * Shadow class
+   * @class fabric.Shadow
+   */
+  fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
+
+    /**
+     * Shadow color
+     * @type String
+     * @default
+     */
+    color: 'rgb(0,0,0)',
+
+    /**
+     * Shadow blur
+     * @type Number
+     */
+    blur: 0,
+
+    /**
+     * Shadow horizontal offset
+     * @type Number
+     * @default
+     */
+    offsetX: 0,
+
+    /**
+     * Shadow vertical offset
+     * @type Number
+     * @default
+     */
+    offsetY: 0,
+
+    /**
+     * Whether the shadow should affect stroke operations
+     * @type Boolean
+     * @default
+     */
+    affectStroke: false,
+
+    /**
+     * Constructor
+     * @param {Object|String} [options] Options object with any of color, blur, offsetX, offsetX properties or string (e.g. "rgba(0,0,0,0.2) 2px 2px 10px, "2px 2px 10px rgba(0,0,0,0.2)")
+     * @return {fabric.Shadow} thisArg
+     */
+    initialize: function(options) {
+      if (typeof options === 'string') {
+        options = this._parseShadow(options);
+      }
+
+      for (var prop in options) {
+        this[prop] = options[prop];
+      }
+
+      this.id = fabric.Object.__uid++;
+    },
+
+    /**
+     * @private
+     * @param {String} shadow Shadow value to parse
+     * @return {Object} Shadow object with color, offsetX, offsetY and blur
+     */
+    _parseShadow: function(shadow) {
+      var shadowStr = shadow.trim();
+
+      var offsetsAndBlur = fabric.Shadow.reOffsetsAndBlur.exec(shadowStr) || [ ],
+          color = shadowStr.replace(fabric.Shadow.reOffsetsAndBlur, '') || 'rgb(0,0,0)';
+
+      return {
+        color: color.trim(),
+        offsetX: parseInt(offsetsAndBlur[1], 10) || 0,
+        offsetY: parseInt(offsetsAndBlur[2], 10) || 0,
+        blur: parseInt(offsetsAndBlur[3], 10) || 0
+      };
+    },
+
+    /**
+     * @return {String} Returns CSS3 text-shadow declaration
+     * @see http://www.w3.org/TR/css-text-decor-3/#text-shadow
+     */
+    getShadow: function() {
+      return [this.offsetX, this.offsetY, this.blur, this.color].join('px ');
+    },
+
+    /* _TO_SVG_START_ */
+    /**
+     * Returns SVG representation of a shadow
+     * @param {Object} object
+     * @return {String} SVG representation of a shadow
+     */
+    toSVG: function(object) {
+      var mode = 'SourceAlpha';
+
+      if (object && (object.fill === this.color || object.stroke === this.color)) {
+        mode = 'SourceGraphic';
+      }
+
+      return (
+        '<filter id="SVGID_' + this.id + '" y="-40%" height="180%">' +
+          '<feGaussianBlur in="' + mode + '" stdDeviation="' +
+            (this.blur ? this.blur / 3 : 0) +
+          '"></feGaussianBlur>' +
+          '<feOffset dx="' + this.offsetX + '" dy="' + this.offsetY + '"></feOffset>' +
+          '<feMerge>' +
+            '<feMergeNode></feMergeNode>' +
+            '<feMergeNode in="SourceGraphic"></feMergeNode>' +
+          '</feMerge>' +
+        '</filter>');
+    },
+    /* _TO_SVG_END_ */
+
+    /**
+     * Returns object representation of a shadow
+     * @return {Object} Object representation of a shadow instance
+     */
+    toObject: function() {
+      return {
+        color: this.color,
+        blur: this.blur,
+        offsetX: this.offsetX,
+        offsetY: this.offsetY
+      };
+    }
+  });
+
+  /**
+   * Regex matching shadow offsetX, offsetY and blur (ex: "2px 2px 10px rgba(0,0,0,0.2)", "rgb(0,255,0) 2px 2px")
+   * @static
+   * @field
+   * @memberOf fabric.Shadow
+   */
+  fabric.Shadow.reOffsetsAndBlur = /(?:\s|^)(-?\d+(?:px)?(?:\s?|$))?(-?\d+(?:px)?(?:\s?|$))?(\d+(?:px)?)?(?:\s?|$)(?:$|\s)/;
+
+})(typeof exports !== 'undefined' ? exports : this);
 
 
 (function () {
@@ -7615,32 +7667,13 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
   width:            1,
 
   /**
-   * Shadow blur of a brush
-   * @type Number
+   * Shadow object representing shadow of this shape.
+   * <b>Backwards incompatibility note:</b> This property replaces "shadowColor" (String), "shadowOffsetX" (Number),
+   * "shadowOffsetY" (Number) and "shadowBlur" (Number) since v1.2.12
+   * @type fabric.Shadow
    * @default
    */
-  shadowBlur:       0,
-
-  /**
-   * Shadow color of a brush
-   * @type String
-   * @default
-   */
-  shadowColor:      '',
-
-  /**
-   * Shadow offset x of a brush
-   * @type Number
-   * @default
-   */
-  shadowOffsetX:    0,
-
-  /**
-   * Shadow offset y of a brush
-   * @type Number
-   * @default
-   */
-  shadowOffsetY:    0,
+  shadow:          null,
 
   /**
    * Line endings style of a brush (one of "butt", "round", "square")
@@ -7657,9 +7690,21 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
   strokeLineJoin:   'round',
 
   /**
-   * Sets brush styles
+   * Sets shadow of an object
+   * @param {Object|String} [options] Options object or string (e.g. "2px 2px 10px rgba(0,0,0,0.2)")
+   * @return {fabric.Object} thisArg
+   * @chainable
    */
-  setBrushStyles: function() {
+  setShadow: function(options) {
+    this.shadow = new fabric.Shadow(options);
+    return this;
+  },
+
+  /**
+   * Sets brush styles
+   * @private
+   */
+  _setBrushStyles: function() {
     var ctx = this.canvas.contextTop;
 
     ctx.strokeStyle = this.color;
@@ -7670,22 +7715,24 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
 
   /**
    * Sets brush shadow styles
+   * @private
    */
-  setShadowStyles: function() {
-    if (!this.shadowColor) return;
+  _setShadow: function() {
+    if (!this.shadow) return;
 
     var ctx = this.canvas.contextTop;
 
-    ctx.shadowBlur = this.shadowBlur;
-    ctx.shadowColor = this.shadowColor;
-    ctx.shadowOffsetX = this.shadowOffsetX;
-    ctx.shadowOffsetY = this.shadowOffsetY;
+    ctx.shadowColor = this.shadow.color;
+    ctx.shadowBlur = this.shadow.blur;
+    ctx.shadowOffsetX = this.shadow.offsetX;
+    ctx.shadowOffsetY = this.shadow.offsetY;
   },
 
   /**
-   * Remove brush shadow styles
+   * Removes brush shadow styles
+   * @private
    */
-  removeShadowStyles: function() {
+  _resetShadow: function() {
     var ctx = this.canvas.contextTop;
 
     ctx.shadowColor = '';
@@ -7704,7 +7751,7 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
    * @class fabric.PencilBrush
    * @extends fabric.BaseBrush
    */
-  fabric.PencilBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric.PencilBrush.prototype */ {
+  fabric.PencilBrush = fabric.util.createClass(fabric.BaseBrush, /** @lends fabric.PencilBrush.prototype */ {
 
     /**
      * Constructor
@@ -7778,8 +7825,8 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
     _reset: function() {
       this._points.length = 0;
 
-      this.setBrushStyles();
-      this.setShadowStyles();
+      this._setBrushStyles();
+      this._setShadow();
     },
 
     /**
@@ -7917,14 +7964,9 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
       path.strokeLineCap = this.strokeLineCap;
       path.strokeLineJoin = this.strokeLineJoin;
 
-      if (this.shadowColor) {
-        path.setShadow({
-          color: this.shadowColor,
-          blur: this.shadowBlur,
-          offsetX: this.shadowOffsetX,
-          offsetY: this.shadowOffsetY,
-          affectStroke: true
-        });
+      if (this.shadow) {
+        this.shadow.affectStroke = true;
+        path.setShadow(this.shadow);
       }
 
       return path;
@@ -7963,7 +8005,7 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
       path.setCoords();
 
       this.canvas.clearContext(this.canvas.contextTop);
-      this.removeShadowStyles();
+      this._resetShadow();
       this.canvas.renderAll();
 
       // fire event 'path' created
@@ -7977,7 +8019,7 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
  * CircleBrush class
  * @class fabric.CircleBrush
  */
-fabric.CircleBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric.CircleBrush.prototype */ {
+fabric.CircleBrush = fabric.util.createClass(fabric.BaseBrush, /** @lends fabric.CircleBrush.prototype */ {
 
   /**
    * Width of a brush
@@ -8016,7 +8058,7 @@ fabric.CircleBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabri
   onMouseDown: function(pointer) {
     this.points.length = 0;
     this.canvas.clearContext(this.canvas.contextTop);
-    this.setShadowStyles();
+    this._setShadow();
     this.drawDot(pointer);
   },
 
@@ -8044,21 +8086,14 @@ fabric.CircleBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabri
         fill: point.fill
       });
 
-      if (this.shadowColor) {
-        circle.setShadow({
-          color: this.shadowColor,
-          blur: this.shadowBlur,
-          offsetX: this.shadowOffsetX,
-          offsetY: this.shadowOffsetY
-        });
-      }
+      this.shadow && circle.setShadow(this.shadow);
 
       this.canvas.add(circle);
       this.canvas.fire('path:created', { path: circle });
     }
 
     this.canvas.clearContext(this.canvas.contextTop);
-    this.removeShadowStyles();
+    this._resetShadow();
     this.canvas.renderOnAddRemove = originalRenderOnAddRemove;
     this.canvas.renderAll();
   },
@@ -8145,7 +8180,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
   onMouseDown: function(pointer) {
     this.sprayChunks.length = 0;
     this.canvas.clearContext(this.canvas.contextTop);
-    this.setShadowStyles();
+    this._setShadow();
 
     this.addSprayChunk(pointer);
     this.render();
@@ -8180,14 +8215,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
           fill: this.color
         });
 
-        if (this.shadowColor) {
-          rect.setShadow({
-            color: this.shadowColor,
-            blur: this.shadowBlur,
-            offsetX: this.shadowOffsetX,
-            offsetY: this.shadowOffsetY
-          });
-        }
+        this.shadow && rect.setShadow(this.shadow);
 
         this.canvas.add(rect);
         this.canvas.fire('path:created', { path: rect });
@@ -8195,7 +8223,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
     }
 
     this.canvas.clearContext(this.canvas.contextTop);
-    this.removeShadowStyles();
+    this._resetShadow();
     this.canvas.renderOnAddRemove = originalRenderOnAddRemove;
     this.canvas.renderAll();
   },
@@ -10551,15 +10579,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     /**
      * @private
      */
-    _initShadow: function(options) {
-      if (options.shadow && !(options.shadow instanceof fabric.Shadow)) {
-        this.setShadow(options.shadow);
-      }
-    },
-
-    /**
-     * @private
-     */
     _initClipping: function(options) {
       if (!options.clipTo || typeof options.clipTo !== 'string') return;
 
@@ -10579,7 +10598,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       }
       this._initGradient(options);
       this._initPattern(options);
-      this._initShadow(options);
       this._initClipping(options);
     },
 
@@ -10683,7 +10701,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       var opacity = typeof this.opacity !== 'undefined' ? this.opacity : '1';
 
       var visibility = this.visible ? '' : " visibility: hidden;";
-      var filter = this.shadow ? 'filter: url(#SVGID_' + this.shadow.id + ');' : '';
+      var filter = this.shadow && this.type !== 'text' ? 'filter: url(#SVGID_' + this.shadow.id + ');' : '';
 
       return [
         "stroke: ", stroke, "; ",
@@ -10828,6 +10846,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       }
       else if (key === 'width' || key === 'height') {
         this.minScaleLimit = toFixed(Math.min(0.1, 1/Math.max(this.width, this.height)), 2);
+      }
+      else if (key === 'shadow' && value && !(value instanceof fabric.Shadow)) {
+        value = new fabric.Shadow(value);
       }
 
       this[key] = value;
@@ -11149,7 +11170,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
     /**
      * Sets shadow of an object
-     * @param {Object} [options] Options object
+     * @param {Object|String} [options] Options object or string (e.g. "2px 2px 10px rgba(0,0,0,0.2)")
      * @return {fabric.Object} thisArg
      * @chainable
      */
@@ -15137,7 +15158,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       fontStyle:        true,
       lineHeight:       true,
       textDecoration:   true,
-      textShadow:       true,
       textAlign:        true,
       backgroundColor:  true
     },
@@ -17050,7 +17070,6 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     'path',
     'text',
     'textDecoration',
-    'textShadow',
     'textAlign',
     'fontStyle',
     'lineHeight',
@@ -17120,13 +17139,6 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     textDecoration:       '',
 
     /**
-     * Text shadow
-     * @type String | null
-     * @default
-     */
-    textShadow:           '',
-
-    /**
      * Text alignment. Possible values: "left", "center", or "right".
      * @type String
      * @default
@@ -17173,14 +17185,14 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @type Boolean
      * @default
      */
-    useNative:           true,
+    useNative:            true,
 
     /**
      * List of properties to consider when checking if state of an object is changed ({@link fabric.Object#hasStateChanged})
      * as well as for history (undo/redo) purposes
      * @type Array
      */
-    stateProperties:     stateProperties,
+    stateProperties:      stateProperties,
 
     /**
      * When defined, an object is rendered via stroke and this property specifies its color.
@@ -17188,7 +17200,15 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @type String
      * @default
      */
-    stroke:              null,
+    stroke:               null,
+
+    /**
+     * Shadow object representing shadow of this shape.
+     * <b>Backwards incompatibility note:</b> This property was named "textShadow" (String) until v1.2.11
+     * @type fabric.Shadow
+     * @default
+     */
+    shadow:               null,
 
     /**
      * Constructor
@@ -17273,10 +17293,10 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       }
 
       ctx.save();
-      this._setTextShadow(ctx);
+      this._setShadow(ctx);
       this._renderTextFill(ctx, textLines);
       this._renderTextStroke(ctx, textLines);
-      this.textShadow && ctx.restore();
+      this._removeShadow(ctx);
       ctx.restore();
 
       if (this.textAlign !== 'left' && this.textAlign !== 'justify') {
@@ -17361,41 +17381,6 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
         }
       }
       return maxWidth;
-    },
-
-    /**
-     * @private
-     * @param {CanvasRenderingContext2D} ctx Context to render on
-     */
-    _setTextShadow: function(ctx) {
-      if (!this.textShadow) return;
-
-      // "rgba(0,0,0,0.2) 2px 2px 10px"
-      // "rgb(0, 100, 0) 0 0 5px"
-      // "red 2px 2px 1px"
-      // "#f55 123 345 567"
-      var reOffsetsAndBlur = /\s+(-?\d+)(?:px)?\s+(-?\d+)(?:px)?\s+(\d+)(?:px)?\s*/;
-
-      var shadowDeclaration = this.textShadow;
-      var offsetsAndBlur = reOffsetsAndBlur.exec(this.textShadow);
-      var shadowColor = shadowDeclaration.replace(reOffsetsAndBlur, '');
-
-      ctx.save();
-      ctx.shadowColor = shadowColor;
-      ctx.shadowOffsetX = parseInt(offsetsAndBlur[1], 10);
-      ctx.shadowOffsetY = parseInt(offsetsAndBlur[2], 10);
-      ctx.shadowBlur = parseInt(offsetsAndBlur[3], 10);
-
-      this._shadows = [{
-        blur: ctx.shadowBlur,
-        color: ctx.shadowColor,
-        offX: ctx.shadowOffsetX,
-        offY: ctx.shadowOffsetY
-      }];
-
-      this._shadowOffsets = [[
-        parseInt(ctx.shadowOffsetX, 10), parseInt(ctx.shadowOffsetY, 10)
-      ]];
     },
 
     /**
@@ -17717,7 +17702,6 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
         fontStyle:            this.fontStyle,
         lineHeight:           this.lineHeight,
         textDecoration:       this.textDecoration,
-        textShadow:           this.textShadow,
         textAlign:            this.textAlign,
         path:                 this.path,
         backgroundColor:      this.backgroundColor,
@@ -17774,35 +17758,36 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @return {Array}
      */
     _getSVGShadows: function(lineTopOffset, textLines) {
-      var shadowSpans = [], j, i, jlen, ilen, lineTopOffsetMultiplier = 1;
+      var shadowSpans = [],
+          i, len,
+          lineTopOffsetMultiplier = 1;
 
-      if (!this._shadows || !this._boundaries) {
+      if (!this.shadow || !this._boundaries) {
         return shadowSpans;
       }
 
-      for (j = 0, jlen = this._shadows.length; j < jlen; j++) {
-        for (i = 0, ilen = textLines.length; i < ilen; i++) {
-          if (textLines[i] !== '') {
-            var lineLeftOffset = (this._boundaries && this._boundaries[i]) ? this._boundaries[i].left : 0;
-            shadowSpans.push(
-              '<tspan x="',
-              toFixed((lineLeftOffset + lineTopOffsetMultiplier) + this._shadowOffsets[j][0], 2),
-              ((i === 0 || this.useNative) ? '" y' : '" dy'), '="',
-              toFixed(this.useNative
-                ? ((lineTopOffset * i) - this.height / 2 + this._shadowOffsets[j][1])
-                : (lineTopOffset + (i === 0 ? this._shadowOffsets[j][1] : 0)), 2),
-              '" ',
-              this._getFillAttributes(this._shadows[j].color), '>',
-              fabric.util.string.escapeXml(textLines[i]),
-            '</tspan>');
-            lineTopOffsetMultiplier = 1;
-          } else {
-            // in some environments (e.g. IE 7 & 8) empty tspans are completely ignored, using a lineTopOffsetMultiplier
-            // prevents empty tspans
-            lineTopOffsetMultiplier++;
-          }
+      for (i = 0, len = textLines.length; i < len; i++) {
+        if (textLines[i] !== '') {
+          var lineLeftOffset = (this._boundaries && this._boundaries[i]) ? this._boundaries[i].left : 0;
+          shadowSpans.push(
+            '<tspan x="',
+            toFixed((lineLeftOffset + lineTopOffsetMultiplier) + this.shadow.offsetX, 2),
+            ((i === 0 || this.useNative) ? '" y' : '" dy'), '="',
+            toFixed(this.useNative
+              ? ((lineTopOffset * i) - this.height / 2 + this.shadow.offsetY)
+              : (lineTopOffset + (i === 0 ? this.shadow.offsetY : 0)), 2),
+            '" ',
+            this._getFillAttributes(this.shadow.color), '>',
+            fabric.util.string.escapeXml(textLines[i]),
+          '</tspan>');
+          lineTopOffsetMultiplier = 1;
+        } else {
+          // in some environments (e.g. IE 7 & 8) empty tspans are completely ignored, using a lineTopOffsetMultiplier
+          // prevents empty tspans
+          lineTopOffsetMultiplier++;
         }
       }
+
       return shadowSpans;
     },
 
@@ -17905,27 +17890,19 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     },
 
     /**
-     * Returns actual text value of an instance
-     * @return {String}
-     */
-    getText: function() {
-      return this.text;
-    },
-
-    /**
      * Sets specified property to a specified value
-     * @param {String} name
+     * @param {String} key
      * @param {Any} value
      * @return {fabric.Text} thisArg
      * @chainable
      */
-    _set: function(name, value) {
-      if (name === 'fontFamily' && this.path) {
+    _set: function(key, value) {
+      if (key === 'fontFamily' && this.path) {
         this.path = this.path.replace(/(.*?)([^\/]*)(\.font\.js)/, '$1' + value + '$3');
       }
-      this.callSuper('_set', name, value);
+      this.callSuper('_set', key, value);
 
-      if (name in this._dimensionAffectingProps) {
+      if (key in this._dimensionAffectingProps) {
         this._initDimensions();
         this.setCoords();
       }
@@ -18026,7 +18003,7 @@ fabric.util.object.extend(fabric.Text.prototype, {
       fontFamily: this.fontFamily,
       fontWeight: this.fontWeight,
       textDecoration: this.textDecoration,
-      textShadow: this.textShadow,
+      textShadow: this.shadow && this.shadow.getShadow(),
       textAlign: this.textAlign,
       fontStyle: this.fontStyle,
       lineHeight: this.lineHeight,
@@ -18043,8 +18020,6 @@ fabric.util.object.extend(fabric.Text.prototype, {
     this._totalLineHeight = o.totalLineHeight;
     this._fontAscent = o.fontAscent;
     this._boundaries = o.boundaries;
-    this._shadowOffsets = o.shadowOffsets;
-    this._shadows = o.shadows || [ ];
 
     el = null;
 
