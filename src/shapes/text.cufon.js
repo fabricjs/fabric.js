@@ -25,7 +25,7 @@ fabric.util.object.extend(fabric.Text.prototype, {
       fontFamily: this.fontFamily,
       fontWeight: this.fontWeight,
       textDecoration: this.textDecoration,
-      textShadow: this.shadow && this.shadow.getShadow(),
+      textShadow: this.shadow && this.shadow.toString(),
       textAlign: this.textAlign,
       fontStyle: this.fontStyle,
       lineHeight: this.lineHeight,

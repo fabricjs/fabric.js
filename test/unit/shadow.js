@@ -120,11 +120,11 @@
     equal(shadow.offsetY, 0);
   });
 
-  test('getShadow', function() {
+  test('toString', function() {
     var shadow = new fabric.Shadow();
-    ok(typeof shadow.getShadow == 'function');
+    ok(typeof shadow.toString == 'function');
 
-    equal(shadow.getShadow(), '0px 0px 0px rgb(0,0,0)');
+    equal(shadow.toString(), '0px 0px 0px rgb(0,0,0)');
   });
 
   test('toObject', function() {
