@@ -86,10 +86,11 @@
     },
 
     /**
-     * @return {String} Returns CSS3 text-shadow declaration
+     * Returns a string representation of an instance
      * @see http://www.w3.org/TR/css-text-decor-3/#text-shadow
+     * @return {String} Returns CSS3 text-shadow declaration
      */
-    getShadow: function() {
+    toString: function() {
       return [this.offsetX, this.offsetY, this.blur, this.color].join('px ');
     },
 
