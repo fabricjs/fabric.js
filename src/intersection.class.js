@@ -14,6 +14,7 @@
   /**
    * Intersection class
    * @class fabric.Intersection
+   * @memberOf fabric
    * @constructor
    */
   function Intersection(status) {

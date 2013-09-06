@@ -16,6 +16,7 @@
   /**
    * Point class
    * @class fabric.Point
+   * @memberOf fabric
    * @constructor
    * @param {Number} x
    * @param {Number} y

@@ -4990,6 +4990,7 @@ fabric.util.string = {
   /**
    * Point class
    * @class fabric.Point
+   * @memberOf fabric
    * @constructor
    * @param {Number} x
    * @param {Number} y
@@ -5278,6 +5279,7 @@ fabric.util.string = {
   /**
    * Intersection class
    * @class fabric.Intersection
+   * @memberOf fabric
    * @constructor
    */
   function Intersection(status) {
@@ -6484,10 +6486,11 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
     },
 
     /**
-     * @return {String} Returns CSS3 text-shadow declaration
+     * Returns a string representation of an instance
      * @see http://www.w3.org/TR/css-text-decor-3/#text-shadow
+     * @return {String} Returns CSS3 text-shadow declaration
      */
-    getShadow: function() {
+    toString: function() {
       return [this.offsetX, this.offsetY, this.blur, this.color].join('px ');
     },
 
@@ -18003,7 +18006,7 @@ fabric.util.object.extend(fabric.Text.prototype, {
       fontFamily: this.fontFamily,
       fontWeight: this.fontWeight,
       textDecoration: this.textDecoration,
-      textShadow: this.shadow && this.shadow.getShadow(),
+      textShadow: this.shadow && this.shadow.toString(),
       textAlign: this.textAlign,
       fontStyle: this.fontStyle,
       lineHeight: this.lineHeight,
@@ -18114,15 +18117,15 @@ fabric.util.object.extend(fabric.Text.prototype, {
   }
 
   /** @private */
-  function request_fs(url, callback){
-    var fs = require('fs'),
-    stream = fs.createReadStream(url),
-    body = '';
-    stream.on('data', function(chunk){
-        body += chunk;
-    });
-    stream.on('end', function(){
-      callback(body);
+  function request_fs(path, callback){
+    var fs = require('fs');
+    fs.readFile(path, function (err, data) {
+      if (err) {
+        fabric.log(err);
+        throw err;
+      } else {
+        callback(data);
+      }
     });
   }
 
