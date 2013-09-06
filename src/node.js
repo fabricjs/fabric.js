@@ -57,9 +57,9 @@
   }
 
   /** @private */
-  function request_fs(url, callback){
+  function request_fs(path, callback){
     var fs = require('fs');
-    fs.readFile(url, function (err, data) {
+    fs.readFile(path, function (err, data) {
       if (err) {
         fabric.log(err);
         throw err;
