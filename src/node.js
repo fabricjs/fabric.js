@@ -57,15 +57,15 @@
   }
 
   /** @private */
-  function request_fs(url, callback){
-    var fs = require('fs'),
-    stream = fs.createReadStream(url),
-    body = '';
-    stream.on('data', function(chunk){
-        body += chunk;
-    });
-    stream.on('end', function(){
-      callback(body);
+  function request_fs(path, callback){
+    var fs = require('fs');
+    fs.readFile(path, function (err, data) {
+      if (err) {
+        fabric.log(err);
+        throw err;
+      } else {
+        callback(data);
+      }
     });
   }
 
