@@ -11960,7 +11960,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    */
   hasStateChanged: function() {
     return this.stateProperties.some(function(prop) {
-      return this[prop] !== this.originalState[prop];
+      return this.get(prop) !== this.originalState[prop];
     }, this);
   },
 
