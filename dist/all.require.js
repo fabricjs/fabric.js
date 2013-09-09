@@ -2,7 +2,7 @@
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
 var exports = exports || {};
-var fabric = fabric || { version: "1.2.11" };
+var fabric = fabric || { version: "1.2.12" };
 
 // make sure exports.fabric is always defined when used as 'global' later scopes
 exports.fabric = fabric;
@@ -8684,7 +8684,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
               : 'scale';
       }
 
-      var originX = "center", originY = "center";
+      var originX = target.originX, originY = target.originY;
 
       if (corner === 'ml' || corner === 'tl' || corner === 'bl') {
         originX = "right";
@@ -8700,10 +8700,10 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         originY = "top";
       }
 
-      if (corner === 'mtr') {
-        originX = 'center';
-        originY = 'center';
-      }
+      // if (corner === 'mtr') {
+      //   originX = 'center';
+      //   originY = 'center';
+      // }
 
       // var center = target.getCenterPoint();
       this._currentTransform = {
@@ -9551,9 +9551,21 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
           target.fire('modified');
         }
 
-        if (this._previousOriginX) {
-          this._currentTransform.target.adjustPosition(this._previousOriginX);
+        if (this._previousOriginX && this._previousOriginY) {
+
+          var originPoint = target.translateToOriginPoint(
+            target.getCenterPoint(),
+            this._previousOriginX,
+            this._previousOriginY);
+
+          target.originX = this._previousOriginX;
+          target.originY = this._previousOriginY;
+
+          target.left = originPoint.x;
+          target.top = originPoint.y;
+
           this._previousOriginX = null;
+          this._previousOriginY = null;
         }
       }
 
@@ -9654,12 +9666,21 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       this.fire('mouse:down', { target: target, e: e });
       target && target.fire('mousedown', { e: e });
 
-      // center origin when rotating
-      if (corner === 'mtr') {
+      if (corner === 'mtr' && target.centerTransform) {
+
         this._previousOriginX = this._currentTransform.target.originX;
-        this._currentTransform.target.adjustPosition('center');
-        this._currentTransform.left = this._currentTransform.target.left;
-        this._currentTransform.top = this._currentTransform.target.top;
+        this._previousOriginY = this._currentTransform.target.originY;
+
+        var center = target.getCenterPoint();
+
+        target.originX = 'center';
+        target.originY = 'center';
+
+        target.left = center.x;
+        target.top = center.y;
+
+        this._currentTransform.left = target.left;
+        this._currentTransform.top = target.top;
       }
     },
 

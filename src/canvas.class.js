@@ -339,7 +339,7 @@
               : 'scale';
       }
 
-      var originX = "center", originY = "center";
+      var originX = target.originX, originY = target.originY;
 
       if (corner === 'ml' || corner === 'tl' || corner === 'bl') {
         originX = "right";
@@ -355,10 +355,10 @@
         originY = "top";
       }
 
-      if (corner === 'mtr') {
-        originX = 'center';
-        originY = 'center';
-      }
+      // if (corner === 'mtr') {
+      //   originX = 'center';
+      //   originY = 'center';
+      // }
 
       // var center = target.getCenterPoint();
       this._currentTransform = {
