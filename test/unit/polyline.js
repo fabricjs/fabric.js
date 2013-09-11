@@ -30,12 +30,6 @@
     'flipY':              false,
     'opacity':            1,
     'points':             getPoints(),
-    'selectable':         true,
-    'hasControls':        true,
-    'hasBorders':         true,
-    'hasRotatingPoint':   true,
-    'transparentCorners': true,
-    'perPixelTargetFind': false,
     'shadow':             null,
     'visible':            true,
     'clipTo':             null

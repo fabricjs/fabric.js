@@ -1,7 +1,7 @@
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
 var exports = exports || {};
-var fabric = fabric || { version: "1.2.12" };
+var fabric = fabric || { version: "1.2.13" };
 
 // make sure exports.fabric is always defined when used as 'global' later scopes
 exports.fabric = fabric;

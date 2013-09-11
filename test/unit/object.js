@@ -111,13 +111,13 @@
   test('toJSON', function() {
     var emptyObjectJSON = '{"type":"object","originX":"center","originY":"center","left":0,"top":0,"width":0,"height":0,"fill":"rgb(0,0,0)",'+
                           '"overlayFill":null,"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,'+
-                          '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,"selectable":true,"hasControls":true,"hasBorders":true,"hasRotatingPoint":true,'+
-                          '"transparentCorners":true,"perPixelTargetFind":false,"shadow":null,"visible":true,"clipTo":null}';
+                          '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,'+
+                          '"shadow":null,"visible":true,"clipTo":null}';
 
     var augmentedJSON = '{"type":"object","originX":"center","originY":"center","left":0,"top":0,"width":122,"height":0,"fill":"rgb(0,0,0)",'+
                         '"overlayFill":null,"stroke":null,"strokeWidth":1,"strokeDashArray":[5,2],"strokeLineCap":"round","strokeLineJoin":"bevil","strokeMiterLimit":5,'+
-                        '"scaleX":1.3,"scaleY":1,"angle":0,"flipX":false,"flipY":true,"opacity":0.88,"selectable":true,"hasControls":true,"hasBorders":true,"hasRotatingPoint":true,'+
-                        '"transparentCorners":true,"perPixelTargetFind":false,"shadow":null,"visible":true,"clipTo":null}';
+                        '"scaleX":1.3,"scaleY":1,"angle":0,"flipX":false,"flipY":true,"opacity":0.88,'+
+                        '"shadow":null,"visible":true,"clipTo":null}';
 
     var cObj = new fabric.Object();
     ok(typeof cObj.toJSON == 'function');
@@ -158,12 +158,6 @@
       'flipX':              false,
       'flipY':              false,
       'opacity':            1,
-      'selectable':         true,
-      'hasControls':        true,
-      'hasBorders':         true,
-      'hasRotatingPoint':   true,
-      'transparentCorners': true,
-      'perPixelTargetFind': false,
       'shadow':             null,
       'visible':            true,
       'clipTo':             null
@@ -191,12 +185,6 @@
       'flipX':              true,
       'flipY':              false,
       'opacity':            0.13,
-      'selectable':         false,
-      'hasControls':        true,
-      'hasBorders':         true,
-      'hasRotatingPoint':   true,
-      'transparentCorners': true,
-      'perPixelTargetFind': false,
       'shadow':             null,
       'visible':            true,
       'clipTo':             null
@@ -211,7 +199,6 @@
         .set('height', 40)
         .set('flipX', true)
         .set('opacity', 0.13)
-        .set('selectable', false)
         .set('strokeDashArray', [5, 2])
         .set('strokeLineCap', 'round')
         .set('strokeLineJoin', 'bevil')
@@ -239,6 +226,42 @@
     testFractionDigits.call(this, 2, 166.67);
     testFractionDigits.call(this, 3, 166.667);
     testFractionDigits.call(this, 0, 167);
+  });
+
+  test('toObject without default values', function() {
+
+    var emptyObjectRepr = { type: 'object' };
+
+    var augmentedObjectRepr = {
+      type: 'object',
+      left: 10,
+      top: 20,
+      width: 30,
+      height: 40,
+      strokeDashArray: [ 5, 2 ],
+      strokeLineCap: 'round',
+      strokeLineJoin: 'bevil',
+      strokeMiterLimit: 5,
+      flipX: true,
+      opacity: 0.13
+    };
+
+    var cObj = new fabric.Object();
+    cObj.includeDefaultValues = false;
+    deepEqual(emptyObjectRepr, cObj.toObject());
+
+    cObj.set('left', 10)
+        .set('top', 20)
+        .set('width', 30)
+        .set('height', 40)
+        .set('flipX', true)
+        .set('opacity', 0.13)
+        .set('strokeDashArray', [5, 2])
+        .set('strokeLineCap', 'round')
+        .set('strokeLineJoin', 'bevil')
+        .set('strokeMiterLimit', 5);
+
+    deepEqual(augmentedObjectRepr, cObj.toObject());
   });
 
   test('toDatalessObject', function() {

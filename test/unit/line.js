@@ -26,12 +26,6 @@
     'y1':                 12,
     'x2':                 13,
     'y2':                 14,
-    'selectable':         true,
-    'hasControls':        true,
-    'hasBorders':         true,
-    'hasRotatingPoint':   true,
-    'transparentCorners': true,
-    'perPixelTargetFind': false,
     'shadow':             null,
     'visible':            true,
     'clipTo':             null

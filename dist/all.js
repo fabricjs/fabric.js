@@ -2,7 +2,7 @@
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
 var exports = exports || {};
-var fabric = fabric || { version: "1.2.12" };
+var fabric = fabric || { version: "1.2.13" };
 
 // make sure exports.fabric is always defined when used as 'global' later scopes
 exports.fabric = fabric;
@@ -10563,10 +10563,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @type Array
      */
     stateProperties:  (
-      'top left width height scaleX scaleY flipX flipY ' +
-      'angle opacity cornerSize fill overlayFill originX originY ' +
-      'stroke strokeWidth strokeDashArray fillRule ' +
-      'borderScaleFactor transformMatrix selectable shadow visible'
+      'top left width height scaleX scaleY flipX flipY originX originY transformMatrix ' +
+      'stroke strokeWidth strokeDashArray strokeLineCap strokeLineJoin strokeMiterLimit ' +
+      'angle opacity fill fillRule overlayFill shadow clipTo visible'
     ).split(' '),
 
     /**
@@ -10673,12 +10672,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         flipX:              this.flipX,
         flipY:              this.flipY,
         opacity:            toFixed(this.opacity, NUM_FRACTION_DIGITS),
-        selectable:         this.selectable,
-        hasControls:        this.hasControls,
-        hasBorders:         this.hasBorders,
-        hasRotatingPoint:   this.hasRotatingPoint,
-        transparentCorners: this.transparentCorners,
-        perPixelTargetFind: this.perPixelTargetFind,
         shadow:             (this.shadow && this.shadow.toObject) ? this.shadow.toObject() : this.shadow,
         visible:            this.visible,
         clipTo:             this.clipTo && String(this.clipTo)
@@ -10687,6 +10680,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       if (!this.includeDefaultValues) {
         object = this._removeDefaultValues(object);
       }
+
       fabric.util.populateWithProperties(this, object, propertiesToInclude);
 
       return object;
@@ -10796,14 +10790,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @param {Object} object
      */
     _removeDefaultValues: function(object) {
-      var defaultOptions = fabric.Object.prototype.options;
-      if (defaultOptions) {
-        this.stateProperties.forEach(function(prop) {
-          if (object[prop] === defaultOptions[prop]) {
-            delete object[prop];
-          }
-        });
-      }
+      this.stateProperties.forEach(function(prop) {
+        if (object[prop] === this.constructor.prototype[prop]) {
+          delete object[prop];
+        }
+      }, this);
       return object;
     },
 

@@ -27,18 +27,18 @@
 
   var PATH_DATALESS_JSON = '{"objects":[{"type":"path","originX":"center","originY":"center","left":200,"top":200,"width":200,"height":200,"fill":"rgb(0,0,0)",'+
                            '"overlayFill":null,"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,'+
-                           '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,"selectable":true,"hasControls":true,"hasBorders":true,"hasRotatingPoint":true,"transparentCorners":true,'+
-                           '"perPixelTargetFind":false,"shadow":null,"visible":true,"clipTo":null,"path":"http://example.com/","pathOffset":{"x":100,"y":100}}],"background":""}';
+                           '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,'+
+                           '"shadow":null,"visible":true,"clipTo":null,"path":"http://example.com/","pathOffset":{"x":100,"y":100}}],"background":""}';
 
   var RECT_JSON = '{"objects":[{"type":"rect","originX":"center","originY":"center","left":0,"top":0,"width":10,"height":10,"fill":"rgb(0,0,0)","overlayFill":null,'+
                   '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,'+
-                  '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,"selectable":true,"hasControls":true,"hasBorders":true,"hasRotatingPoint":true,'+
-                  '"transparentCorners":true,"perPixelTargetFind":false,"shadow":null,"visible":true,"clipTo":null,"rx":0,"ry":0,"x":0,"y":0}],"background":"#ff5555"}';
+                  '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,'+
+                  '"shadow":null,"visible":true,"clipTo":null,"rx":0,"ry":0,"x":0,"y":0}],"background":"#ff5555"}';
 
   var RECT_JSON_WITH_PADDING = '{"objects":[{"type":"rect","originX":"center","originY":"center","left":0,"top":0,"width":10,"height":20,"fill":"rgb(0,0,0)","overlayFill":null,'+
                                '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,'+
-                               '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,"selectable":true,"hasControls":true,"hasBorders":true,"hasRotatingPoint":true,'+
-                               '"transparentCorners":true,"perPixelTargetFind":false,"shadow":null,"visible":true,"clipTo":null,"padding":123,"foo":"bar","rx":0,"ry":0,"x":0,"y":0}],"background":""}';
+                               '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,'+
+                               '"shadow":null,"visible":true,"clipTo":null,"padding":123,"foo":"bar","rx":0,"ry":0,"x":0,"y":0}],"background":""}';
 
   // force creation of static canvas
   // TODO: fix this
@@ -876,7 +876,7 @@
   });
 
   asyncTest('loadFromJSON with text', function() {
-    var json = '{"objects":[{"type":"text","left":150,"top":200,"width":128,"height":64.32,"fill":"#000000","overlayFill":"","stroke":"","strokeWidth":"","scaleX":0.8,"scaleY":0.8,"angle":0,"flipX":false,"flipY":false,"opacity":1,"selectable":true,"text":"NAME HERE","fontSize":24,"fontWeight":"","fontFamily":"Delicious_500","fontStyle":"","lineHeight":"","textDecoration":"","textAlign":"center","path":"","strokeStyle":"","backgroundColor":""}],"background":"#ffffff"}';
+    var json = '{"objects":[{"type":"text","left":150,"top":200,"width":128,"height":64.32,"fill":"#000000","overlayFill":"","stroke":"","strokeWidth":"","scaleX":0.8,"scaleY":0.8,"angle":0,"flipX":false,"flipY":false,"opacity":1,"text":"NAME HERE","fontSize":24,"fontWeight":"","fontFamily":"Delicious_500","fontStyle":"","lineHeight":"","textDecoration":"","textAlign":"center","path":"","strokeStyle":"","backgroundColor":""}],"background":"#ffffff"}';
     canvas.loadFromJSON(json, function() {
 
       canvas.renderAll();

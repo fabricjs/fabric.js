@@ -45,12 +45,6 @@
       'opacity':            1,
       'rx':                 0,
       'ry':                 0,
-      'selectable':         true,
-      'hasControls':        true,
-      'hasBorders':         true,
-      'hasRotatingPoint':   true,
-      'transparentCorners': true,
-      'perPixelTargetFind': false,
       'shadow':             null,
       'visible':            true,
       'clipTo':             null
