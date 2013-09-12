@@ -8,11 +8,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * @param {Function} callback Callback, invoked when json is parsed
    *                            and corresponding objects (e.g: fabric.Image)
    *                            are initialized
+   * @param {Function} [reviver] Method for further parsing of JSON elements, called after each fabric object created.
    * @return {fabric.Canvas} instance
    * @chainable
    */
-  loadFromDatalessJSON: function (json, callback) {
-    return this.loadFromJSON(json, callback);
+  loadFromDatalessJSON: function (json, callback, reviver) {
+    return this.loadFromJSON(json, callback, reviver);
   },
 
   /**
@@ -22,10 +23,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * @param {Function} callback Callback, invoked when json is parsed
    *                            and corresponding objects (e.g: fabric.Image)
    *                            are initialized
+   * @param {Function} [reviver] Method for further parsing of JSON elements, called after each fabric object created.
    * @return {fabric.Canvas} instance
    * @chainable
    */
-  loadFromJSON: function (json, callback) {
+  loadFromJSON: function (json, callback, reviver) {
     if (!json) return;
 
     // serialize if it wasn't already
@@ -38,7 +40,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     var _this = this;
     this._enlivenObjects(serialized.objects, function () {
       _this._setBgOverlayImages(serialized, callback);
-    });
+    }, reviver);
 
     return this;
   },
@@ -109,8 +111,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * @private
    * @param {Array} objects
    * @param {Function} callback
+   * @param {Function} [reviver]
    */
-  _enlivenObjects: function (objects, callback) {
+  _enlivenObjects: function (objects, callback, reviver) {
     var _this = this;
 
     if (objects.length === 0) {
@@ -127,7 +130,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
       _this.renderOnAddRemove = renderOnAddRemove;
       callback && callback();
-    });
+    }, null, reviver);
   },
 
   /**

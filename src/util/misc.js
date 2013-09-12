@@ -163,8 +163,9 @@
    * @memberOf fabric.util
    * @param {Array} objects Objects to enliven
    * @param {Function} callback Callback to invoke when all objects are created
+   * @param {Function} [reviver] Method for further parsing of object elements, called after each fabric object created.
    */
-  function enlivenObjects(objects, callback, namespace) {
+  function enlivenObjects(objects, callback, namespace, reviver) {
 
     function onLoaded() {
       if (++numLoadedObjects === numTotalObjects) {
@@ -184,15 +185,17 @@
       }
       var klass = fabric.util.getKlass(o.type, namespace);
       if (klass.async) {
-        klass.fromObject(o, function (o, error) {
+        klass.fromObject(o, function (obj, error) {
           if (!error) {
-            enlivenedObjects[index] = o;
+            enlivenedObjects[index] = obj;
+            reviver && reviver(o, enlivenedObjects[index]);
           }
           onLoaded();
         });
       }
       else {
         enlivenedObjects[index] = klass.fromObject(o);
+        reviver && reviver(o, enlivenedObjects[index]);
         onLoaded();
       }
     });
