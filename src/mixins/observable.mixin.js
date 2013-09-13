@@ -6,13 +6,13 @@
    * @param {Function} handler
    */
   function _removeEventListener(eventName, handler) {
-    if (this.__eventListeners[eventName]) {
-      if (handler) {
-        fabric.util.removeFromArray(this.__eventListeners[eventName], handler);
-      }
-      else {
-        this.__eventListeners[eventName].length = 0;
-      }
+    if (!this.__eventListeners[eventName]) return;
+
+    if (handler) {
+      fabric.util.removeFromArray(this.__eventListeners[eventName], handler);
+    }
+    else {
+      this.__eventListeners[eventName].length = 0;
     }
   }
 
@@ -56,9 +56,8 @@
    * @chainable
    */
   function stopObserving(eventName, handler) {
-    if (!this.__eventListeners) {
-      this.__eventListeners = { };
-    }
+    if (!this.__eventListeners) return;
+
     // one object with key/value pairs was passed
     if (arguments.length === 1 && typeof arguments[0] === 'object') {
       for (var prop in eventName) {
@@ -82,9 +81,8 @@
    * @chainable
    */
   function fire(eventName, options) {
-    if (!this.__eventListeners) {
-      this.__eventListeners = { };
-    }
+    if (!this.__eventListeners) return;
+
     var listenersForEvent = this.__eventListeners[eventName];
     if (!listenersForEvent) return;
     for (var i = 0, len = listenersForEvent.length; i < len; i++) {
