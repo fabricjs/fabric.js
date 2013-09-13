@@ -17082,7 +17082,6 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     'fontFamily',
     'fontWeight',
     'fontSize',
-    'path',
     'text',
     'textDecoration',
     'textAlign',
@@ -17090,7 +17089,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     'lineHeight',
     'backgroundColor',
     'textBackgroundColor',
-    'useNative'
+    'useNative',
+    'path'
   );
 
   /**
@@ -17119,6 +17119,150 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     },
 
     /**
+     * Retrieves object's fontSize
+     * @method getFontSize
+     * @memberOf fabric.Text.prototype
+     * @return {String} Font size (in pixels)
+     */
+
+    /**
+     * Sets object's fontSize
+     * @method setFontSize
+     * @memberOf fabric.Text.prototype
+     * @param {Number} fontSize Font size (in pixels)
+     * @return {fabric.Text}
+     * @chainable
+     */
+
+    /**
+     * Retrieves object's fontWeight
+     * @method getFontWeight
+     * @memberOf fabric.Text.prototype
+     * @return {(String|Number)} Font weight
+     */
+
+    /**
+     * Sets object's fontWeight
+     * @method setFontWeight
+     * @memberOf fabric.Text.prototype
+     * @param {(Number|String)} fontWeight Font weight
+     * @return {fabric.Text}
+     * @chainable
+     */
+
+    /**
+     * Retrieves object's fontFamily
+     * @method getFontFamily
+     * @memberOf fabric.Text.prototype
+     * @return {String} Font family
+     */
+
+    /**
+     * Sets object's fontFamily
+     * @method setFontFamily
+     * @memberOf fabric.Text.prototype
+     * @param {String} fontFamily Font family
+     * @return {fabric.Text}
+     * @chainable
+     */
+
+    /**
+     * Retrieves object's text
+     * @method getText
+     * @memberOf fabric.Text.prototype
+     * @return {String} text
+     */
+
+    /**
+     * Sets object's text
+     * @method setText
+     * @memberOf fabric.Text.prototype
+     * @param {String} text Text
+     * @return {fabric.Text}
+     * @chainable
+     */
+
+    /**
+     * Retrieves object's textDecoration
+     * @method getTextDecoration
+     * @memberOf fabric.Text.prototype
+     * @return {String} Text decoration
+     */
+
+    /**
+     * Sets object's textDecoration
+     * @method setTextDecoration
+     * @memberOf fabric.Text.prototype
+     * @param {String} textDecoration Text decoration
+     * @return {fabric.Text}
+     * @chainable
+     */
+
+    /**
+     * Retrieves object's fontStyle
+     * @method getFontStyle
+     * @memberOf fabric.Text.prototype
+     * @return {String} Font style
+     */
+
+    /**
+     * Sets object's fontStyle
+     * @method setFontStyle
+     * @memberOf fabric.Text.prototype
+     * @param {String} fontStyle Font style
+     * @return {fabric.Text}
+     * @chainable
+     */
+
+    /**
+     * Retrieves object's lineHeight
+     * @method getLineHeight
+     * @memberOf fabric.Text.prototype
+     * @return {Number} Line height
+     */
+
+    /**
+     * Sets object's lineHeight
+     * @method setLineHeight
+     * @memberOf fabric.Text.prototype
+     * @param {Number} lineHeight Line height
+     * @return {fabric.Text}
+     * @chainable
+     */
+
+    /**
+     * Retrieves object's textAlign
+     * @method getTextAlign
+     * @memberOf fabric.Text.prototype
+     * @return {String} Text alignment
+     */
+
+    /**
+     * Sets object's textAlign
+     * @method setTextAlign
+     * @memberOf fabric.Text.prototype
+     * @param {String} textAlign Text alignment
+     * @return {fabric.Text}
+     * @chainable
+     */
+
+    /**
+     * Retrieves object's textBackgroundColor
+     * @method getTextBackgroundColor
+     * @memberOf fabric.Text.prototype
+     * @return {String} Text background color
+     */
+
+    /**
+     * Sets object's textBackgroundColor
+     * @method setTextBackgroundColor
+     * @memberOf fabric.Text.prototype
+     * @param {String} textBackgroundColor Text background color
+     * @return {fabric.Text}
+     * @chainable
+     */
+
+    /**
      * Type of an object
      * @type String
      * @default
@@ -17134,7 +17278,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 
     /**
      * Font weight (e.g. bold, normal, 400, 600, 800)
-     * @type Number
+     * @type {(Number|String)}
      * @default
      */
     fontWeight:           'normal',
