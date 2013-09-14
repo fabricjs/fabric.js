@@ -10,6 +10,9 @@
     return;
   }
 
+  var stateProperties = fabric.Object.prototype.stateProperties.concat();
+  stateProperties.push('rx', 'ry');
+
   /**
    * Rectangle class
    * @class fabric.Rect
@@ -17,6 +20,13 @@
    * @return {fabric.Rect} thisArg
    */
   fabric.Rect = fabric.util.createClass(fabric.Object, /** @lends fabric.Rect.prototype */ {
+
+    /**
+     * List of properties to consider when checking if state of an object is changed ({@link fabric.Object#hasStateChanged})
+     * as well as for history (undo/redo) purposes
+     * @type Array
+     */
+    stateProperties: stateProperties,
 
     /**
      * Type of an object
@@ -53,21 +63,11 @@
     initialize: function(options) {
       options = options || { };
 
-      this._initStateProperties();
       this.callSuper('initialize', options);
       this._initRxRy();
 
       this.x = options.x || 0;
       this.y = options.y || 0;
-    },
-
-    /**
-     * Creates `stateProperties` list on an instance, and adds `fabric.Rect` -specific ones to it
-     * (such as "rx", "ry", etc.)
-     * @private
-     */
-    _initStateProperties: function() {
-      this.stateProperties = this.stateProperties.concat(['rx', 'ry']);
     },
 
     /**
