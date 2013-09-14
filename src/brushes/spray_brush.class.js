@@ -78,6 +78,8 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
     var originalRenderOnAddRemove = this.canvas.renderOnAddRemove;
     this.canvas.renderOnAddRemove = false;
 
+    var rects = [ ];
+
     for (var i = 0, ilen = this.sprayChunks.length; i < ilen; i++) {
       var sprayChunk = this.sprayChunks[i];
 
@@ -92,11 +94,12 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
         });
 
         this.shadow && rect.setShadow(this.shadow);
-
-        this.canvas.add(rect);
-        this.canvas.fire('path:created', { path: rect });
+        rects.push(rect);
       }
     }
+    var group = new fabric.Group(rects);
+    this.canvas.add(group);
+    this.canvas.fire('path:created', { path: group });
 
     this.canvas.clearContext(this.canvas.contextTop);
     this._resetShadow();
