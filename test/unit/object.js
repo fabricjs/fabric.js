@@ -2,6 +2,47 @@
 
   var canvas = this.canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.StaticCanvas();
 
+  function getAbsolutePath(path) {
+    var isAbsolute = /^https?:/.test(path);
+    if (isAbsolute) return path;
+    var imgEl = _createImageElement();
+    imgEl.src = path;
+    var src = imgEl.src;
+    imgEl = null;
+    return src;
+  }
+
+  var IMG_SRC     = fabric.isLikelyNode ? (__dirname + '/../fixtures/test_image.gif') : getAbsolutePath('../fixtures/test_image.gif'),
+      IMG_WIDTH   = 276,
+      IMG_HEIGHT  = 110;
+
+  function _createImageElement() {
+    return fabric.isLikelyNode ? new (require('canvas').Image) : fabric.document.createElement('img');
+  }
+
+  function createImageObject(callback) {
+    var elImage = _createImageElement();
+    elImage.width = IMG_WIDTH;
+    elImage.height = IMG_HEIGHT;
+    setSrc(elImage, IMG_SRC, function() {
+      callback(elImage);
+    });
+  }
+
+  function setSrc(img, src, callback) {
+    if (fabric.isLikelyNode) {
+      require('fs').readFile(src, function(err, imgData) {
+        if (err) throw err;
+        img.src = imgData;
+        callback && callback();
+      });
+    }
+    else {
+      img.src = src;
+      callback && callback();
+    }
+  }
+
   QUnit.module('fabric.Object', {
     teardown: function() {
       canvas.clear();
@@ -845,7 +886,7 @@
     ok(typeof object.remove == 'function');
 
     canvas.add(object);
-    object.remove();
+    equal(object.remove(), object, 'should be chainable');
 
     equal(canvas.getObjects().length, 0);
   });
@@ -856,7 +897,7 @@
     ok(typeof object.center == 'function');
 
     canvas.add(object);
-    object.center();
+    equal(object.center(), object, 'should be chainable');
 
     equal(object.getLeft(), canvas.getWidth() / 2);
     equal(object.getTop(), canvas.getHeight() / 2);
@@ -868,7 +909,7 @@
     ok(typeof object.centerH == 'function');
 
     canvas.add(object);
-    object.centerH();
+    equal(object.centerH(), object, 'should be chainable');
 
     equal(object.getLeft(), canvas.getWidth() / 2);
   });
@@ -879,7 +920,7 @@
     ok(typeof object.centerV == 'function');
 
     canvas.add(object);
-    object.centerV();
+    equal(object.centerV(), object, 'should be chainable');
 
     equal(object.getTop(), canvas.getHeight() / 2);
   });
@@ -888,36 +929,53 @@
     var object = new fabric.Object();
 
     ok(typeof object.sendToBack == 'function');
+
+    canvas.add(object);
+    equal(object.sendToBack(), object, 'should be chainable');
   });
 
   test('bringToFront', function() {
     var object = new fabric.Object();
 
     ok(typeof object.bringToFront == 'function');
+
+    canvas.add(object);
+    equal(object.bringToFront(), object, 'should be chainable');
   });
 
   test('sendBackwards', function() {
     var object = new fabric.Object();
 
-    ok(typeof object.bringToFront == 'function');
+    ok(typeof object.sendBackwards == 'function');
+
+    canvas.add(object);
+    equal(object.sendBackwards(), object, 'should be chainable');
   });
 
   test('bringForward', function() {
     var object = new fabric.Object();
 
-    ok(typeof object.bringToFront == 'function');
+    ok(typeof object.bringForward == 'function');
+
+    canvas.add(object);
+    equal(object.bringForward(), object, 'should be chainable');
   });
 
   test('moveTo', function() {
     var object = new fabric.Object();
 
     ok(typeof object.moveTo == 'function');
+
+    canvas.add(object);
+    equal(object.moveTo(), object, 'should be chainable');
   });
 
-  test('gradient serialization', function() {
+  test('setGradient', function() {
     var object = new fabric.Object();
 
-    object.setGradient('fill', {
+    ok(typeof object.setGradient == 'function');
+
+    equal(object.setGradient('fill', {
       x1: 0,
       y1: 0,
       x2: 100,
@@ -926,34 +984,70 @@
         '0': 'rgb(255,0,0)',
         '1': 'rgb(0,128,0)'
       }
-    });
+    }), object, 'should be chainable');
 
     ok(typeof object.toObject().fill == 'object');
+    ok(object.fill instanceof fabric.Gradient);
 
-    equal(object.toObject().fill.type, 'linear');
+    var fill = object.fill;
 
-    equal(object.toObject().fill.coords.x1, 0);
-    equal(object.toObject().fill.coords.y1, 0);
+    equal(fill.type, 'linear');
 
-    equal(object.toObject().fill.coords.x2, 100);
-    equal(object.toObject().fill.coords.y2, 100);
+    equal(fill.coords.x1, 0);
+    equal(fill.coords.y1, 0);
 
-    equal(object.toObject().fill.colorStops[0].offset, 0);
-    equal(object.toObject().fill.colorStops[1].offset, 1);
-    equal(object.toObject().fill.colorStops[0].color, 'rgb(255,0,0)');
-    equal(object.toObject().fill.colorStops[1].color, 'rgb(0,128,0)');
+    equal(fill.coords.x2, 100);
+    equal(fill.coords.y2, 100);
+
+    equal(fill.colorStops[0].offset, 0);
+    equal(fill.colorStops[1].offset, 1);
+    equal(fill.colorStops[0].color, 'rgb(255,0,0)');
+    equal(fill.colorStops[1].color, 'rgb(0,128,0)');
+  });
+
+  asyncTest('setPatternFill', function() {
+    var object = new fabric.Object();
+
+    ok(typeof object.setPatternFill == 'function');
+
+    createImageObject(function(img) {
+      equal(object.setPatternFill({source: img}), object, 'should be chainable');
+
+      ok(typeof object.toObject().fill == 'object');
+      ok(object.fill instanceof fabric.Pattern);
+
+      equal(object.fill.source, img);
+      equal(object.fill.repeat, 'repeat');
+      equal(object.fill.offsetX, 0);
+      equal(object.fill.offsetY, 0);
+
+      equal(object.setPatternFill({source: img, repeat: 'repeat-y', offsetX: 100, offsetY: 50}), object, 'should be chainable');
+
+      ok(typeof object.fill == 'object');
+      ok(object.fill instanceof fabric.Pattern);
+
+      equal(object.fill.source, img);
+      equal(object.fill.repeat, 'repeat-y');
+      equal(object.fill.offsetX, 100);
+      equal(object.fill.offsetY, 50);
+
+      start();
+    });
   });
 
   test('setShadow', function() {
     var object = new fabric.Object();
 
-    object.setShadow({
+    ok(typeof object.setShadow == 'function');
+
+    equal(object.setShadow({
       color: 'red',
       blur: 10,
       offsetX: 5,
       offsetY: 15
-    });
+    }), object, 'should be chainable');
 
+    ok(typeof object.toObject().shadow == 'object');
     ok(object.shadow instanceof fabric.Shadow);
 
     equal(object.shadow.color, 'red');
@@ -961,7 +1055,6 @@
     equal(object.shadow.offsetX, 5);
     equal(object.shadow.offsetY, 15);
   });
-
 
   test('set shadow', function() {
     var object = new fabric.Object();
@@ -980,6 +1073,15 @@
     ok(!(object.shadow instanceof fabric.Shadow));
 
     equal(object.shadow, null);
+  });
+
+  test('setColor', function(){
+    var object = new fabric.Object();
+
+    ok(typeof object.setColor == 'function');
+
+    equal(object.setColor('123456'), object, 'should be chainable');
+    equal(object.get('fill'), '123456');
   });
 
   test('intersectsWithRect', function() {
