@@ -974,17 +974,6 @@
     /* _TO_SVG_END_ */
 
     /**
-     * Sets "color" of an instance (alias of `set('fill', &hellip;)`)
-     * @param {String} value
-     * @return {fabric.Text} thisArg
-     * @chainable
-     */
-    setColor: function(value) {
-      this.set('fill', value);
-      return this;
-    },
-
-    /**
      * Sets specified property to a specified value
      * @param {String} key
      * @param {Any} value
