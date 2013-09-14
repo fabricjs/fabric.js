@@ -111,17 +111,10 @@
     equal(text.shadow.blur, 2);
   });
 
-  test('setColor', function(){
-    var text = createTextObject();
-    ok(typeof text.setColor == 'function');
-    equal(text.setColor('123456'), text, 'should be chainable');
-    equal(text.get('fill'), '123456');
-  });
-
   test('setFontSize', function(){
     var text = createTextObject();
     ok(typeof text.setFontSize == 'function');
-    equal(text.setFontSize(12), text);
+    equal(text.setFontSize(12), text, 'should be chainable');
     equal(text.get('fontSize'), 12);
   });
 

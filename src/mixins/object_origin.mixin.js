@@ -7,8 +7,8 @@
     /**
      * Translates the coordinates from origin to center coordinates (based on the object's dimensions)
      * @param {fabric.Point} point The point which corresponds to the originX and originY params
-     * @param {string} enum('left', 'center', 'right') Horizontal origin
-     * @param {string} enum('top', 'center', 'bottom') Vertical origin
+     * @param {String} originX Horizontal origin: 'left', 'center' or 'right'
+     * @param {String} originY Vertical origin: 'top', 'center' or 'bottom'
      * @return {fabric.Point}
      */
     translateToCenterPoint: function(point, originX, originY) {
@@ -35,8 +35,8 @@
     /**
      * Translates the coordinates from center to origin coordinates (based on the object's dimensions)
      * @param {fabric.Point} point The point which corresponds to center of the object
-     * @param {string} enum('left', 'center', 'right') Horizontal origin
-     * @param {string} enum('top', 'center', 'bottom') Vertical origin
+     * @param {String} originX Horizontal origin: 'left', 'center' or 'right'
+     * @param {String} originY Vertical origin: 'top', 'center' or 'bottom'
      * @return {fabric.Point}
      */
     translateToOriginPoint: function(center, originX, originY) {
@@ -80,8 +80,8 @@
 
     /**
      * Returns the coordinates of the object as if it has a different origin
-     * @param {string} enum('left', 'center', 'right') Horizontal origin
-     * @param {string} enum('top', 'center', 'bottom') Vertical origin
+     * @param {String} originX Horizontal origin: 'left', 'center' or 'right'
+     * @param {String} originY Vertical origin: 'top', 'center' or 'bottom'
      * @return {fabric.Point}
      */
     // getPointByOrigin: function(originX, originY) {
@@ -140,8 +140,8 @@
     /**
      * Sets the position of the object taking into consideration the object's origin
      * @param {fabric.Point} point The new position of the object
-     * @param {string} enum('left', 'center', 'right') Horizontal origin
-     * @param {string} enum('top', 'center', 'bottom') Vertical origin
+     * @param {String} originX Horizontal origin: 'left', 'center' or 'right'
+     * @param {String} originY Vertical origin: 'top', 'center' or 'bottom'
      * @return {void}
      */
     setPositionByOrigin: function(pos, originX, originY) {
