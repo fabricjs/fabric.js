@@ -221,6 +221,22 @@
     }
   });
 
+  test('toDataURL jpg', function() {
+    if (!fabric.Canvas.supports('toDataURL')) {
+      alert("toDataURL is not supported by this environment. Some of the tests can not be run.");
+    }
+    else {
+      try {
+        var dataURL = canvas.toDataURL({ format: 'jpg' });
+        equal(dataURL.substring(0, 22), 'data:image/jpeg;base64');
+      }
+      // node-canvas does not support jpeg data urls
+      catch(err) {
+        ok(true);
+      }
+    }
+  });
+
   test('centerObjectH', function() {
     ok(typeof canvas.centerObjectH == 'function');
     var rect = makeRect({ left: 102, top: 202 });
