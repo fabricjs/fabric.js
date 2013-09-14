@@ -1,12 +1,16 @@
 fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.StaticCanvas.prototype */ {
 
   /**
-   * Exports canvas element to a dataurl image.
+   * Exports canvas element to a dataurl image. Note that when multiplier is used, cropping is scaled appropriately
    * @param {Object} options
    *
    *  `format` the format of the output image. Either "jpeg" or "png".
    *  `quality` quality level (0..1)
    *  `multiplier` multiplier to scale by {Number}
+   *  `left` cropping left offset
+   *  `top` cropping top offset
+   *  `width` cropping width
+   *  `height` cropping height
    *
    * @return {String}
    */
@@ -15,35 +19,77 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
     var format = options.format || 'png',
         quality = options.quality || 1,
-        multiplier = options.multiplier || 1;
+        multiplier = options.multiplier || 1,
+        cropping = {
+          left: options.left,
+          top: options.top,
+          width: options.width,
+          height: options.height
+        };
 
     if (multiplier !== 1) {
-      return this.__toDataURLWithMultiplier(format, quality, multiplier);
+      return this.__toDataURLWithMultiplier(format, quality, cropping, multiplier);
     }
     else {
-      return this.__toDataURL(format, quality);
+      return this.__toDataURL(format, quality, cropping);
     }
   },
 
   /**
    * @private
    */
-  __toDataURL: function(format, quality) {
+  __toDataURL: function(format, quality, cropping) {
+
     this.renderAll(true);
+
     var canvasEl = this.upperCanvasEl || this.lowerCanvasEl;
+    var croppedCanvasEl = this.__getCroppedCanvas(canvasEl, cropping);
+
     var data = (fabric.StaticCanvas.supports('toDataURLWithQuality'))
-              ? canvasEl.toDataURL('image/' + format, quality)
-              : canvasEl.toDataURL('image/' + format);
+              ? (croppedCanvasEl || canvasEl).toDataURL('image/' + format, quality)
+              : (croppedCanvasEl || canvasEl).toDataURL('image/' + format);
 
     this.contextTop && this.clearContext(this.contextTop);
     this.renderAll();
+
+    if (croppedCanvasEl) {
+      croppedCanvasEl = null;
+    }
+
     return data;
   },
 
   /**
    * @private
    */
-  __toDataURLWithMultiplier: function(format, quality, multiplier) {
+  __getCroppedCanvas: function(canvasEl, cropping) {
+
+    var croppedCanvasEl,
+        croppedCtx;
+
+    var shouldCrop = 'left' in cropping ||
+                     'top' in cropping ||
+                     'width' in cropping ||
+                     'height' in cropping;
+
+    if (shouldCrop) {
+
+      croppedCanvasEl = fabric.util.createCanvasElement();
+      croppedCtx = croppedCanvasEl.getContext('2d');
+
+      croppedCanvasEl.width = cropping.width || this.width;
+      croppedCanvasEl.height = cropping.height || this.height;
+
+      croppedCtx.drawImage(canvasEl, -cropping.left || 0, -cropping.top || 0);
+    }
+
+    return croppedCanvasEl;
+  },
+
+  /**
+   * @private
+   */
+  __toDataURLWithMultiplier: function(format, quality, cropping, multiplier) {
 
     var origWidth = this.getWidth(),
         origHeight = this.getHeight(),
@@ -56,6 +102,19 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
     this.setWidth(scaledWidth).setHeight(scaledHeight);
     ctx.scale(multiplier, multiplier);
+
+    if (cropping.left) {
+      cropping.left *= multiplier;
+    }
+    if (cropping.top) {
+      cropping.top *= multiplier;
+    }
+    if (cropping.width) {
+      cropping.width *= multiplier;
+    }
+    if (cropping.height) {
+      cropping.height *= multiplier;
+    }
 
     if (activeGroup) {
       // not removing group due to complications with restoring it with correct state afterwords
@@ -72,7 +131,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
     this.renderAll(true);
 
-    var data = this.__toDataURL(format, quality);
+    var data = this.__toDataURL(format, quality, cropping);
 
     ctx.scale(1 / multiplier,  1 / multiplier);
     this.setWidth(origWidth).setHeight(origHeight);
