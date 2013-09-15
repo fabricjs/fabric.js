@@ -9624,6 +9624,20 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     },
 
     /**
+     * @private
+     * @param {Event} e Event object fired on mousedown
+     */
+    _onMouseDownInDrawingMode: function(e) {
+      this._isCurrentlyDrawing = true;
+      this.discardActiveObject().renderAll();
+      if (this.clipTo) {
+        fabric.util.clipContext(this, this.contextTop);
+      }
+      this.freeDrawingBrush.onMouseDown(this.getPointer(e));
+      this.fire('mouse:down', { e: e });
+    },
+
+    /**
      * Method that defines the actions when mouse is clic ked on canvas.
      * The method inits the currentTransform parameters and renders all the
      * canvas so the current image can be placed on the top canvas and the rest
@@ -9633,29 +9647,21 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      */
     __onMouseDown: function (e) {
 
-      var pointer;
-
       // accept only left clicks
       var isLeftClick  = 'which' in e ? e.which === 1 : e.button === 1;
       if (!isLeftClick && !fabric.isTouchSupported) return;
 
       if (this.isDrawingMode) {
-        pointer = this.getPointer(e);
-        this._isCurrentlyDrawing = true;
-        this.discardActiveObject().renderAll();
-        if (this.clipTo) {
-          fabric.util.clipContext(this, this.contextTop);
-        }
-        this.freeDrawingBrush.onMouseDown(pointer);
-        this.fire('mouse:down', { e: e });
+        this._onMouseDownInDrawingMode(e);
         return;
       }
 
       // ignore if some object is being transformed at this moment
       if (this._currentTransform) return;
 
-      var target = this.findTarget(e), corner;
-      pointer = this.getPointer(e);
+      var target = this.findTarget(e),
+          pointer = this.getPointer(e),
+          corner;
 
       if (this._shouldClearSelection(e, target)) {
         this._groupSelector = {
@@ -9693,21 +9699,28 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       target && target.fire('mousedown', { e: e });
 
       if (corner === 'mtr' && target.centerTransform) {
-
-        this._previousOriginX = this._currentTransform.target.originX;
-        this._previousOriginY = this._currentTransform.target.originY;
-
-        var center = target.getCenterPoint();
-
-        target.originX = 'center';
-        target.originY = 'center';
-
-        target.left = center.x;
-        target.top = center.y;
-
-        this._currentTransform.left = target.left;
-        this._currentTransform.top = target.top;
+        this._setOriginToCenter(target);
       }
+    },
+
+    /**
+     * @private
+     */
+    _setOriginToCenter: function(target) {
+
+      this._previousOriginX = this._currentTransform.target.originX;
+      this._previousOriginY = this._currentTransform.target.originY;
+
+      var center = target.getCenterPoint();
+
+      target.originX = 'center';
+      target.originY = 'center';
+
+      target.left = center.x;
+      target.top = center.y;
+
+      this._currentTransform.left = target.left;
+      this._currentTransform.top = target.top;
     },
 
     /**
@@ -9836,6 +9849,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       this.fire('mouse:move', { target: target, e: e });
       target && target.fire('mousemove', { e: e });
     },
+
     /**
      * Sets the cursor depending on where the canvas is being hovered.
      * Note: very buggy in Opera
