@@ -11165,23 +11165,32 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     /**
      * Converts an object into a data-url-like string
      * @param {Object} options Options object
-     *
-     *  `format` the format of the output image. Either "jpeg" or "png".
-     *  `quality` quality level (0..1)
-     *  `multiplier` multiplier to scale by {Number}
-     *
-     * @return {String} data url representing an image of this object
+     * @param {String} [options.format=png] The format of the output image. Either "jpeg" or "png"
+     * @param {Number} [options.quality=1] Quality level (0..1). Only used for jpeg.
+     * @param {Number} [options.multiplier=1] Multiplier to scale by
+     * @param {Number} [options.left] Cropping left offset
+     * @param {Number} [options.top] Cropping top offset
+     * @param {Number} [options.width] Cropping width
+     * @param {Number} [options.height] Cropping height
+     * @return {String} Returns a data: URL containing a representation of the object in the format specified by options.format
      */
     toDataURL: function(options) {
       options || (options = { });
 
-      var el = fabric.util.createCanvasElement();
-      el.width = this.getBoundingRectWidth();
-      el.height = this.getBoundingRectHeight();
+      var el = fabric.util.createCanvasElement(),
+          boundingRect = this.getBoundingRect();
+
+      el.width = boundingRect.width;
+      el.height = boundingRect.height;
 
       fabric.util.wrapElement(el, 'div');
-
       var canvas = new fabric.Canvas(el);
+
+      // to avoid common confusion https://github.com/kangax/fabric.js/issues/806
+      if (options.format === 'jpg') {
+        options.format = 'jpeg';
+      }
+
       if (options.format === 'jpeg') {
         canvas.backgroundColor = '#fff';
       }
@@ -11192,11 +11201,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         top: this.getTop()
       };
 
-      this.set({
-        'active': false,
-        left: el.width / 2,
-        top: el.height / 2
-      });
+      this.set('active', false);
+      this.setPositionByOrigin(new fabric.Point(el.width / 2, el.height / 2), 'center', 'center');
 
       canvas.add(this);
       var data = canvas.toDataURL(options);
