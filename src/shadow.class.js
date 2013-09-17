@@ -97,7 +97,7 @@
     /* _TO_SVG_START_ */
     /**
      * Returns SVG representation of a shadow
-     * @param {Object} object
+     * @param {fabric.Object} object
      * @return {String} SVG representation of a shadow
      */
     toSVG: function(object) {

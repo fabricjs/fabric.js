@@ -834,7 +834,7 @@
     /**
      * Clones an instance
      * @param {Function} callback Callback is invoked with a clone as a first argument
-     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the outpu
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {fabric.Object} clone of an instance
      */
     clone: function(callback, propertiesToInclude) {
@@ -956,6 +956,15 @@
      * <b>Backwards incompatibility note:</b> This method was named "setGradientFill" until v1.1.0
      * @param {String} property Property name 'stroke' or 'fill'
      * @param {Object} [options] Options object
+     * @param {String} [options.type] Type of gradient 'radial' or 'linear'
+     * @param {Number} [options.x1=0] x-coordinate of start point
+     * @param {Number} [options.y1=0] y-coordinate of start point
+     * @param {Number} [options.x2=0] x-coordinate of end point
+     * @param {Number} [options.y2=0] y-coordinate of end point
+     * @param {Number} [options.r1=0] Radius of start point (only for radial gradients)
+     * @param {Number} [options.r2=0] Radius of end point (only for radial gradients)
+     * @param {Object} [options.colorStops] Color stops object eg. {0: 'ff0000', 1: '000000'}
+     * @return {fabric.Object} thisArg
      * @chainable
      */
     setGradient: function(property, options) {
@@ -986,7 +995,11 @@
 
     /**
      * Sets pattern fill of an object
-     * @param {Object} [options] Options object
+     * @param {Object} options Options object
+     * @param {(String|HTMLImageElement)} options.source Pattern source
+     * @param {String} [options.repeat=repeat] Repeat property of a pattern (one of repeat, repeat-x, repeat-y or no-repeat)
+     * @param {Number} [options.offsetX=0] Pattern horizontal offset from object's left/top corner
+     * @param {Number} [options.offsetY=0] Pattern vertical offset from object's left/top corner
      * @return {fabric.Object} thisArg
      * @chainable
      */
@@ -997,6 +1010,10 @@
     /**
      * Sets shadow of an object
      * @param {Object|String} [options] Options object or string (e.g. "2px 2px 10px rgba(0,0,0,0.2)")
+     * @param {String} [options.color=rgb(0,0,0)] Shadow color
+     * @param {Number} [options.blur=0] Shadow blur
+     * @param {Number} [options.offsetX=0] Shadow horizontal offset
+     * @param {Number} [options.offsetY=0] Shadow vertical offset
      * @return {fabric.Object} thisArg
      * @chainable
      */
@@ -1088,7 +1105,7 @@
 
     /**
      * Moves an object down in stack of drawn objects
-     * @param intersecting {Boolean} If `true`, send object behind next lower intersecting object
+     * @param {Boolean} [intersecting] If `true`, send object behind next lower intersecting object
      * @return {fabric.Object} thisArg
      * @chainable
      */
@@ -1104,7 +1121,7 @@
 
     /**
      * Moves an object up in stack of drawn objects
-     * @param intersecting {Boolean} If `true`, send object in front of next upper intersecting object
+     * @param {Boolean} [intersecting] If `true`, send object in front of next upper intersecting object
      * @return {fabric.Object} thisArg
      * @chainable
      */
