@@ -2,17 +2,15 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
   /**
    * Exports canvas element to a dataurl image. Note that when multiplier is used, cropping is scaled appropriately
-   * @param {Object} options
-   *
-   *  `format` the format of the output image. Either "jpeg" or "png".
-   *  `quality` quality level (0..1)
-   *  `multiplier` multiplier to scale by {Number}
-   *  `left` cropping left offset
-   *  `top` cropping top offset
-   *  `width` cropping width
-   *  `height` cropping height
-   *
-   * @return {String}
+   * @param {Object} [options] Options object
+   * @param {String} [options.format=png] The format of the output image. Either "jpeg" or "png"
+   * @param {Number} [options.quality=1] Quality level (0..1). Only used for jpeg.
+   * @param {Number} [options.multiplier=1] Multiplier to scale by
+   * @param {Number} [options.left] Cropping left offset
+   * @param {Number} [options.top] Cropping top offset
+   * @param {Number} [options.width] Cropping width
+   * @param {Number} [options.height] Cropping height
+   * @return {String} Returns a data: URL containing a representation of the object in the format specified by options.format
    */
   toDataURL: function (options) {
     options || (options = { });

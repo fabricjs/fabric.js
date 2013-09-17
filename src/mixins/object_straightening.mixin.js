@@ -23,11 +23,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   },
 
   /**
-   * Same as {@link fabric.Object.prototype.straghten} but with animation
-   * @param {Object} callbacks
-   *                  - onComplete: invoked on completion
-   *                  - onChange: invoked on every step of animation
-   *
+   * Same as {@link fabric.Object.prototype.straighten} but with animation
+   * @param {Object} callbacks Object with callback functions
+   * @param {Function} [callbacks.onComplete] Invoked on completion
+   * @param {Function} [callbacks.onChange] Invoked on every step of animation
    * @return {fabric.Object} thisArg
    * @chainable
    */

@@ -179,7 +179,9 @@
      * Sets overlay image for this canvas
      * @param {String} url url of an image to set overlay to
      * @param {Function} callback callback to invoke when image is loaded and set as an overlay
-     * @param {Object} [options] optional options to set for the overlay image
+     * @param {Object} [options] Optional options to set for the overlay image
+     * @param {Number} [options.overlayImageLeft] Left offset of overlay image
+     * @param {Number} [options.overlayImageTop] Top offset of overlay image
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
@@ -202,7 +204,9 @@
      * Sets background image for this canvas
      * @param {String} url url of an image to set background to
      * @param {Function} callback callback to invoke when image is loaded and set as background
-     * @param {Object} [options] optional options to set for the background image
+     * @param {Object} [options] Optional options to set for the background image
+     * @param {Float} [options.backgroundImageOpacity] Opacity of the background image of the canvas instance
+     * @param {Boolean} [options.backgroundImageStretch] Indicates whether the background image should be stretched to fit the canvas
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
@@ -223,7 +227,7 @@
 
     /**
      * Sets background color for this canvas
-     * @param {String|fabric.Pattern} Color of pattern to set background color to
+     * @param {String|fabric.Pattern} backgroundColor Color of pattern to set background color to
      * @param {Function} callback callback to invoke when background color is set
      * @return {fabric.Canvas} thisArg
      * @chainable
@@ -349,6 +353,8 @@
     /**
      * Sets dimensions (width, height) of this canvas instance
      * @param {Object} dimensions Object with width/height properties
+     * @param {Number} [dimensions.width] Width of canvas element
+     * @param {Number} [dimensions.height] Height of canvas element
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
@@ -418,8 +424,8 @@
 
     /**
      * Given a context, renders an object on that context
-     * @param ctx {Object} context to render object on
-     * @param object {Object} object to render
+     * @param {CanvasRenderingContext2D} ctx Context to render object on
+     * @param {fabric.Object} object Object to render
      * @private
      */
     _draw: function (ctx, object) {
@@ -439,6 +445,7 @@
 
     /**
      * @private
+     * @param {fabric.Object} obj Object that was added
      */
     _onObjectAdded: function(obj) {
       this.stateful && obj.setupState();
@@ -450,6 +457,7 @@
 
     /**
      * @private
+     * @param {fabric.Object} obj Object that was removed
      */
     _onObjectRemoved: function(obj) {
       this.fire('object:removed', { target: obj });
@@ -466,7 +474,7 @@
 
     /**
      * Clears specified context of canvas element
-     * @param context {Object} ctx context to clear
+     * @param {CanvasRenderingContext2D} ctx Context to clear
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
@@ -507,7 +515,7 @@
 
     /**
      * Renders both the top canvas and the secondary container canvas.
-     * @param allOnTop {Boolean} optional Whether we want to force all images to be rendered on the top canvas
+     * @param {Boolean} [allOnTop] Whether we want to force all images to be rendered on the top canvas
      * @return {fabric.Canvas} instance
      * @chainable
      */
@@ -585,6 +593,7 @@
 
     /**
      * @private
+     * @param {CanvasRenderingContext2D} canvasToDrawOn Context to render on
      */
     _drawBackroundImage: function(canvasToDrawOn) {
       canvasToDrawOn.save();
@@ -680,7 +689,7 @@
 
     /**
      * Returs dataless JSON representation of canvas
-     * @param {Array} propertiesToInclude Any properties that you might want to additionally include in the output
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {String} json string
      */
     toDatalessJSON: function (propertiesToInclude) {
@@ -689,7 +698,7 @@
 
     /**
      * Returns object representation of canvas
-     * @param {Array} propertiesToInclude Any properties that you might want to additionally include in the output
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} object representation of an instance
      */
     toObject: function (propertiesToInclude) {
@@ -698,7 +707,7 @@
 
     /**
      * Returns dataless object representation of canvas
-     * @param {Array} propertiesToInclude Any properties that you might want to additionally include in the output
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} object representation of an instance
      */
     toDatalessObject: function (propertiesToInclude) {
@@ -754,8 +763,14 @@
     /**
      * Returns SVG representation of canvas
      * @function
-     * @param {Object} [options] Options for SVG output (suppressPreamble: true/false (if true xml tag is not included),
-     * viewBox: {x, y, width, height} to define the svg output viewBox), encoding default: UTF-8
+     * @param {Object} [options] Options object for SVG output
+     * @param {Boolean} [options.suppressPreamble=false] If true xml tag is not included
+     * @param {Object} [options.viewBox] SVG viewbox object
+     * @param {Number} [options.viewBox.x] x-cooridnate of viewbox
+     * @param {Number} [options.viewBox.y] y-coordinate of viewbox
+     * @param {Number} [options.viewBox.width] Width of viewbox
+     * @param {Number} [options.viewBox.height] Height of viewbox
+     * @param {String} [options.encoding=UTF-8] Encoding of SVG output
      * @return {String}
      */
     toSVG: function(options) {
@@ -835,8 +850,8 @@
 
     /**
      * Removes an object from canvas and returns it
-     * @param object {Object} Object to remove
-     * @return {Object} removed object
+     * @param {fabric.Object} object Object to remove
+     * @return {fabric.Object} removed object
      */
     remove: function (object) {
       // removing active object should fire "selection:cleared" events
@@ -851,7 +866,7 @@
 
     /**
      * Moves an object to the bottom of the stack of drawn objects
-     * @param object {fabric.Object} Object to send to back
+     * @param {fabric.Object} object Object to send to back
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
@@ -863,7 +878,7 @@
 
     /**
      * Moves an object to the top of the stack of drawn objects
-     * @param object {fabric.Object} Object to send
+     * @param {fabric.Object} object Object to send
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
@@ -875,8 +890,8 @@
 
     /**
      * Moves an object down in stack of drawn objects
-     * @param object {fabric.Object} Object to send
-     * @param intersecting {Boolean} If `true`, send object behind next lower intersecting object
+     * @param {fabric.Object} object Object to send
+     * @param {Boolean} [intersecting] If `true`, send object behind next lower intersecting object
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
@@ -916,8 +931,8 @@
 
     /**
      * Moves an object up in stack of drawn objects
-     * @param object {fabric.Object} Object to send
-     * @param intersecting {Boolean} If `true`, send object in front of next upper intersecting object
+     * @param {fabric.Object} object Object to send
+     * @param {Boolean} [intersecting] If `true`, send object in front of next upper intersecting object
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
@@ -957,7 +972,7 @@
 
     /**
      * Moves an object to specified level in stack of drawn objects
-     * @param object {fabric.Object} Object to send
+     * @param {fabric.Object} object Object to send
      * @param {Number} index Position to move to
      * @return {fabric.Canvas} thisArg
      * @chainable
