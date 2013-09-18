@@ -201,7 +201,7 @@
       var activeGroup = this.getActiveGroup();
       if (activeGroup) {
         activeGroup.setObjectsCoords();
-        activeGroup.isMoving = false
+        activeGroup.isMoving = false;
         this._setCursor(this.defaultCursor);
       }
 
