@@ -109,6 +109,28 @@
     },
 
     /**
+     * Decides whether the canvas should be redrawn in mouseup and mousedown events.
+     * @private
+     * @param {Object} target
+     * @param {Object} pointer
+     */
+    _shouldRender: function(target, pointer) {
+      var activeObject = this.getActiveGroup() || this.getActiveObject();
+
+      return (
+        (target && (
+        target.isMoving ||
+        target !== activeObject)) ||
+        (!target && activeObject) ||
+        (pointer &&
+        this._previousPointer &&
+        this.selection && (
+        pointer.x !== this._previousPointer.x ||
+        pointer.y !== this._previousPointer.y))
+      );
+    },
+
+    /**
      * Method that defines the actions when mouse is released on canvas.
      * The method resets the currentTransform parameters, store the image corner
      * position in the image object and render the canvas on top.
@@ -117,7 +139,9 @@
      */
     __onMouseUp: function (e) {
 
-      var target;
+      var target,
+          pointer,
+          render;
 
       if (this.isDrawingMode && this._isCurrentlyDrawing) {
         this._isCurrentlyDrawing = false;
@@ -138,7 +162,6 @@
           target._scaling = false;
         }
 
-        target.isMoving = false;
         target.setCoords();
 
         // only fire :modified event if target coordinates were changed during mousedown-mouseup
@@ -164,23 +187,33 @@
           this._previousOriginY = null;
         }
       }
+      else {
+        pointer = this.getPointer(e);
+      }
 
-      this._currentTransform = null;
+      render = this._shouldRender(target, pointer);
 
       if (this.selection && this._groupSelector) {
         // group selection was completed, determine its bounds
         this._findSelectedObjects(e);
       }
+
       var activeGroup = this.getActiveGroup();
       if (activeGroup) {
         activeGroup.setObjectsCoords();
-        activeGroup.set('isMoving', false);
+        activeGroup.isMoving = false;
         this._setCursor(this.defaultCursor);
       }
 
-      // clear selection
+      // clear selection and current transformation
       this._groupSelector = null;
-      this.renderAll();
+      this._currentTransform = null;
+
+      if (target) {
+        target.isMoving = false;
+      }
+
+      render && this.renderAll();
 
       this._setCursorFromEvent(e, target);
 
@@ -231,15 +264,23 @@
 
       var target = this.findTarget(e),
           pointer = this.getPointer(e),
-          corner;
+          corner,
+          render;
+
+      // save pointer for check in __onMouseUp event
+      this._previousPointer = pointer;
+
+      render = this._shouldRender(target, pointer);
 
       if (this._shouldClearSelection(e, target)) {
-        this._groupSelector = {
-          ex: pointer.x,
-          ey: pointer.y,
-          top: 0,
-          left: 0
-        };
+        if (this.selection) {
+          this._groupSelector = {
+            ex: pointer.x,
+            ey: pointer.y,
+            top: 0,
+            left: 0
+          };
+        }
         this.deactivateAllWithDispatch();
         target && target.selectable && this.setActiveObject(target, e);
       }
@@ -263,7 +304,7 @@
         this._setupCurrentTransform(e, target);
       }
       // we must renderAll so that active image is placed on the top canvas
-      this.renderAll();
+      render && this.renderAll();
 
       this.fire('mouse:down', { target: target, e: e });
       target && target.fire('mousedown', { e: e });
