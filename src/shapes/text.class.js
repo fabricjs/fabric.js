@@ -500,6 +500,8 @@
      * @param {Number} lineIndex Index of a line in a text
      */
     _drawTextLine: function(method, ctx, line, left, top, lineIndex) {
+      // lift the line by quarter of fontSize
+      top -= this.fontSize / 4;
 
       // short-circuit
       if (this.textAlign !== 'justify') {
@@ -512,7 +514,6 @@
 
       if (totalWidth > lineWidth) {
         // stretch the line
-
         var words = line.split(/\s+/);
         var wordsWidth = ctx.measureText(line.replace(/\s+/g, '')).width;
         var widthDiff = totalWidth - wordsWidth;
