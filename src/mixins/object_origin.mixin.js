@@ -65,8 +65,8 @@
      * @return {fabric.Point}
      */
     getCenterPoint: function() {
-      return this.translateToCenterPoint(
-        new fabric.Point(this.left, this.top), this.originX, this.originY);
+      var leftTop = new fabric.Point(this.left, this.top);
+      return this.translateToCenterPoint(leftTop, this.originX, this.originY);
     },
 
     /**
@@ -84,11 +84,10 @@
      * @param {String} originY Vertical origin: 'top', 'center' or 'bottom'
      * @return {fabric.Point}
      */
-    // getPointByOrigin: function(originX, originY) {
-    //   var center = this.getCenterPoint();
-
-    //   return this.translateToOriginPoint(center, originX, originY);
-    // },
+    getPointByOrigin: function(originX, originY) {
+      var center = this.getCenterPoint();
+      return this.translateToOriginPoint(center, originX, originY);
+    },
 
     /**
      * Returns the point in local coordinates
@@ -125,7 +124,8 @@
         y = this.top;
       }
 
-      return fabric.util.rotatePoint(new fabric.Point(point.x, point.y), center, -degreesToRadians(this.angle)).subtractEquals(new fabric.Point(x, y));
+      return fabric.util.rotatePoint(new fabric.Point(point.x, point.y), center, -degreesToRadians(this.angle))
+        .subtractEquals(new fabric.Point(x, y));
     },
 
     /**
