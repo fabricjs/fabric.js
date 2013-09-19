@@ -2,7 +2,7 @@
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
 var exports = exports || {};
-var fabric = fabric || { version: "1.2.14" };
+var fabric = fabric || { version: "1.3.0" };
 
 // make sure exports.fabric is always defined when used as 'global' later scopes
 exports.fabric = fabric;
@@ -3742,11 +3742,11 @@ fabric.util.string = {
     (function tick() {
       time = +new Date();
       var currentTime = time > finish ? duration : (time - start);
-      onChange(easing(currentTime, startValue, byValue, duration));
       if (time > finish || abort()) {
         options.onComplete && options.onComplete();
         return;
       }
+      onChange(easing(currentTime, startValue, byValue, duration));
       requestAnimFrame(tick);
     })();
   }
@@ -11535,8 +11535,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @return {fabric.Point}
      */
     getCenterPoint: function() {
-      return this.translateToCenterPoint(
-        new fabric.Point(this.left, this.top), this.originX, this.originY);
+      var leftTop = new fabric.Point(this.left, this.top);
+      return this.translateToCenterPoint(leftTop, this.originX, this.originY);
     },
 
     /**
@@ -11554,11 +11554,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @param {String} originY Vertical origin: 'top', 'center' or 'bottom'
      * @return {fabric.Point}
      */
-    // getPointByOrigin: function(originX, originY) {
-    //   var center = this.getCenterPoint();
-
-    //   return this.translateToOriginPoint(center, originX, originY);
-    // },
+    getPointByOrigin: function(originX, originY) {
+      var center = this.getCenterPoint();
+      return this.translateToOriginPoint(center, originX, originY);
+    },
 
     /**
      * Returns the point in local coordinates
@@ -11595,7 +11594,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         y = this.top;
       }
 
-      return fabric.util.rotatePoint(new fabric.Point(point.x, point.y), center, -degreesToRadians(this.angle)).subtractEquals(new fabric.Point(x, y));
+      return fabric.util.rotatePoint(new fabric.Point(point.x, point.y), center, -degreesToRadians(this.angle))
+        .subtractEquals(new fabric.Point(x, y));
     },
 
     /**
