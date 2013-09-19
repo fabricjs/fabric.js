@@ -1,4 +1,4 @@
-**Edge**
+**Version 1.3.0**
 
 - [BACK_INCOMPAT] Remove selectable, hasControls, hasBorders, hasRotatingPoint, transparentCorners, perPixelTargetFind from default object/json representation of objects.
 
