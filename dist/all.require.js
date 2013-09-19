@@ -5634,7 +5634,7 @@ fabric.util.string = {
 
     /**
      * Sets value of alpha channel for this color
-     * @param {Number} alpha 0-1
+     * @param {Number} alpha Alpha value 0-1
      * @return {fabric.Color} thisArg
      */
     setAlpha: function(alpha) {
@@ -5769,7 +5769,7 @@ fabric.util.string = {
   /**
    * Returns new color object, when given a color in RGB format
    * @memberOf fabric.Color
-   * @param {String} color ex: rgb(0-255,0-255,0-255)
+   * @param {String} color Color value ex: rgb(0-255,0-255,0-255)
    * @return {fabric.Color}
    */
   fabric.Color.fromRgb = function(color) {
@@ -5779,7 +5779,7 @@ fabric.util.string = {
   /**
    * Returns array represenatation (ex: [100, 100, 200, 1]) of a color that's in RGB or RGBA format
    * @memberOf fabric.Color
-   * @param {String} color ex: rgb(0-255,0-255,0-255), rgb(0%-100%,0%-100%,0%-100%)
+   * @param {String} color Color value ex: rgb(0-255,0-255,0-255), rgb(0%-100%,0%-100%,0%-100%)
    * @return {Array} source
    */
   fabric.Color.sourceFromRgb = function(color) {
@@ -5810,7 +5810,7 @@ fabric.util.string = {
 
   /**
    * Returns new color object, when given a color in HSL format
-   * @param {String} color ex: hsl(0-260,0%-100%,0%-100%)
+   * @param {String} color Color value ex: hsl(0-260,0%-100%,0%-100%)
    * @memberOf fabric.Color
    * @return {fabric.Color}
    */
@@ -5822,7 +5822,7 @@ fabric.util.string = {
    * Returns array represenatation (ex: [100, 100, 200, 1]) of a color that's in HSL or HSLA format.
    * Adapted from <a href="https://rawgithub.com/mjijackson/mjijackson.github.com/master/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript.html">https://github.com/mjijackson</a>
    * @memberOf fabric.Color
-   * @param {String} color ex: hsl(0-360,0%-100%,0%-100%) or hsla(0-360,0%-100%,0%-100%, 0-1)
+   * @param {String} color Color value ex: hsl(0-360,0%-100%,0%-100%) or hsla(0-360,0%-100%,0%-100%, 0-1)
    * @return {Array} source
    * @see http://http://www.w3.org/TR/css3-color/#hsl-color
    */
@@ -5869,6 +5869,7 @@ fabric.util.string = {
    * Returns new color object, when given a color in HEX format
    * @static
    * @memberOf fabric.Color
+   * @param {String} color Color value ex: FF5555
    * @return {fabric.Color}
    */
   fabric.Color.fromHex = function(color) {
@@ -6098,7 +6099,7 @@ fabric.util.string = {
 
     /**
      * Returns an instance of CanvasGradient
-     * @param ctx
+     * @param {CanvasRenderingContext2D} ctx Context to render on
      * @return {CanvasGradient}
      */
     toLive: function(ctx) {
@@ -6138,7 +6139,8 @@ fabric.util.string = {
      * @static
      * @memberof fabric.Gradient
      * @param {SVGGradientElement} el SVG gradient element
-     * @param {Object} instance
+     * @param {fabric.Object} instance
+     * @return {fabric.Gradient} Gradient instance
      * @see http://www.w3.org/TR/SVG/pservers.html#LinearGradientElement
      * @see http://www.w3.org/TR/SVG/pservers.html#RadialGradientElement
      */
@@ -6289,7 +6291,7 @@ fabric.util.string = {
 fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ {
 
   /**
-   * Repeat property of a pattern (one of repeat, repeat-x, repeat-y)
+   * Repeat property of a pattern (one of repeat, repeat-x, repeat-y or no-repeat)
    * @type String
    * @default
    */
@@ -6378,7 +6380,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
   /* _TO_SVG_START_ */
   /**
    * Returns SVG representation of a pattern
-   * @param {Object} object
+   * @param {fabric.Object} object
    * @return {String} SVG representation of a pattern
    */
   toSVG: function(object) {
@@ -6519,7 +6521,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
     /* _TO_SVG_START_ */
     /**
      * Returns SVG representation of a shadow
-     * @param {Object} object
+     * @param {fabric.Object} object
      * @return {String} SVG representation of a shadow
      */
     toSVG: function(object) {
@@ -6749,7 +6751,9 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * Sets overlay image for this canvas
      * @param {String} url url of an image to set overlay to
      * @param {Function} callback callback to invoke when image is loaded and set as an overlay
-     * @param {Object} [options] optional options to set for the overlay image
+     * @param {Object} [options] Optional options to set for the overlay image
+     * @param {Number} [options.overlayImageLeft] Left offset of overlay image
+     * @param {Number} [options.overlayImageTop] Top offset of overlay image
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
@@ -6772,7 +6776,9 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * Sets background image for this canvas
      * @param {String} url url of an image to set background to
      * @param {Function} callback callback to invoke when image is loaded and set as background
-     * @param {Object} [options] optional options to set for the background image
+     * @param {Object} [options] Optional options to set for the background image
+     * @param {Float} [options.backgroundImageOpacity] Opacity of the background image of the canvas instance
+     * @param {Boolean} [options.backgroundImageStretch] Indicates whether the background image should be stretched to fit the canvas
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
@@ -6793,7 +6799,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
 
     /**
      * Sets background color for this canvas
-     * @param {String|fabric.Pattern} Color of pattern to set background color to
+     * @param {String|fabric.Pattern} backgroundColor Color of pattern to set background color to
      * @param {Function} callback callback to invoke when background color is set
      * @return {fabric.Canvas} thisArg
      * @chainable
@@ -6919,6 +6925,8 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
     /**
      * Sets dimensions (width, height) of this canvas instance
      * @param {Object} dimensions Object with width/height properties
+     * @param {Number} [dimensions.width] Width of canvas element
+     * @param {Number} [dimensions.height] Height of canvas element
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
@@ -6988,8 +6996,8 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
 
     /**
      * Given a context, renders an object on that context
-     * @param ctx {Object} context to render object on
-     * @param object {Object} object to render
+     * @param {CanvasRenderingContext2D} ctx Context to render object on
+     * @param {fabric.Object} object Object to render
      * @private
      */
     _draw: function (ctx, object) {
@@ -7009,6 +7017,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
 
     /**
      * @private
+     * @param {fabric.Object} obj Object that was added
      */
     _onObjectAdded: function(obj) {
       this.stateful && obj.setupState();
@@ -7020,6 +7029,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
 
     /**
      * @private
+     * @param {fabric.Object} obj Object that was removed
      */
     _onObjectRemoved: function(obj) {
       this.fire('object:removed', { target: obj });
@@ -7036,7 +7046,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
 
     /**
      * Clears specified context of canvas element
-     * @param context {Object} ctx context to clear
+     * @param {CanvasRenderingContext2D} ctx Context to clear
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
@@ -7077,7 +7087,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
 
     /**
      * Renders both the top canvas and the secondary container canvas.
-     * @param allOnTop {Boolean} optional Whether we want to force all images to be rendered on the top canvas
+     * @param {Boolean} [allOnTop] Whether we want to force all images to be rendered on the top canvas
      * @return {fabric.Canvas} instance
      * @chainable
      */
@@ -7155,6 +7165,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
 
     /**
      * @private
+     * @param {CanvasRenderingContext2D} canvasToDrawOn Context to render on
      */
     _drawBackroundImage: function(canvasToDrawOn) {
       canvasToDrawOn.save();
@@ -7250,7 +7261,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
 
     /**
      * Returs dataless JSON representation of canvas
-     * @param {Array} propertiesToInclude Any properties that you might want to additionally include in the output
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {String} json string
      */
     toDatalessJSON: function (propertiesToInclude) {
@@ -7259,7 +7270,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
 
     /**
      * Returns object representation of canvas
-     * @param {Array} propertiesToInclude Any properties that you might want to additionally include in the output
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} object representation of an instance
      */
     toObject: function (propertiesToInclude) {
@@ -7268,7 +7279,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
 
     /**
      * Returns dataless object representation of canvas
-     * @param {Array} propertiesToInclude Any properties that you might want to additionally include in the output
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} object representation of an instance
      */
     toDatalessObject: function (propertiesToInclude) {
@@ -7324,8 +7335,14 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
     /**
      * Returns SVG representation of canvas
      * @function
-     * @param {Object} [options] Options for SVG output (suppressPreamble: true/false (if true xml tag is not included),
-     * viewBox: {x, y, width, height} to define the svg output viewBox), encoding default: UTF-8
+     * @param {Object} [options] Options object for SVG output
+     * @param {Boolean} [options.suppressPreamble=false] If true xml tag is not included
+     * @param {Object} [options.viewBox] SVG viewbox object
+     * @param {Number} [options.viewBox.x] x-cooridnate of viewbox
+     * @param {Number} [options.viewBox.y] y-coordinate of viewbox
+     * @param {Number} [options.viewBox.width] Width of viewbox
+     * @param {Number} [options.viewBox.height] Height of viewbox
+     * @param {String} [options.encoding=UTF-8] Encoding of SVG output
      * @return {String}
      */
     toSVG: function(options) {
@@ -7405,8 +7422,8 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
 
     /**
      * Removes an object from canvas and returns it
-     * @param object {Object} Object to remove
-     * @return {Object} removed object
+     * @param {fabric.Object} object Object to remove
+     * @return {fabric.Object} removed object
      */
     remove: function (object) {
       // removing active object should fire "selection:cleared" events
@@ -7421,7 +7438,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
 
     /**
      * Moves an object to the bottom of the stack of drawn objects
-     * @param object {fabric.Object} Object to send to back
+     * @param {fabric.Object} object Object to send to back
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
@@ -7433,7 +7450,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
 
     /**
      * Moves an object to the top of the stack of drawn objects
-     * @param object {fabric.Object} Object to send
+     * @param {fabric.Object} object Object to send
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
@@ -7445,8 +7462,8 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
 
     /**
      * Moves an object down in stack of drawn objects
-     * @param object {fabric.Object} Object to send
-     * @param intersecting {Boolean} If `true`, send object behind next lower intersecting object
+     * @param {fabric.Object} object Object to send
+     * @param {Boolean} [intersecting] If `true`, send object behind next lower intersecting object
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
@@ -7486,8 +7503,8 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
 
     /**
      * Moves an object up in stack of drawn objects
-     * @param object {fabric.Object} Object to send
-     * @param intersecting {Boolean} If `true`, send object in front of next upper intersecting object
+     * @param {fabric.Object} object Object to send
+     * @param {Boolean} [intersecting] If `true`, send object in front of next upper intersecting object
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
@@ -7527,7 +7544,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
 
     /**
      * Moves an object to specified level in stack of drawn objects
-     * @param object {fabric.Object} Object to send
+     * @param {fabric.Object} object Object to send
      * @param {Number} index Position to move to
      * @return {fabric.Canvas} thisArg
      * @chainable
@@ -8355,8 +8372,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
   /**
    * Sets brush styles
    */
-  setBrushStyles: function() {
-    this.callSuper('setBrushStyles');
+  _setBrushStyles: function() {
+    this.callSuper('_setBrushStyles');
     this.canvas.contextTop.strokeStyle = this.getPattern();
   },
 
@@ -9543,6 +9560,28 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     },
 
     /**
+     * Decides whether the canvas should be redrawn in mouseup and mousedown events.
+     * @private
+     * @param {Object} target
+     * @param {Object} pointer
+     */
+    _shouldRender: function(target, pointer) {
+      var activeObject = this.getActiveGroup() || this.getActiveObject();
+
+      return (
+        (target && (
+        target.isMoving ||
+        target !== activeObject)) ||
+        (!target && activeObject) ||
+        (pointer &&
+        this._previousPointer &&
+        this.selection && (
+        pointer.x !== this._previousPointer.x ||
+        pointer.y !== this._previousPointer.y))
+      );
+    },
+
+    /**
      * Method that defines the actions when mouse is released on canvas.
      * The method resets the currentTransform parameters, store the image corner
      * position in the image object and render the canvas on top.
@@ -9551,7 +9590,9 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      */
     __onMouseUp: function (e) {
 
-      var target;
+      var target,
+          pointer,
+          render;
 
       if (this.isDrawingMode && this._isCurrentlyDrawing) {
         this._isCurrentlyDrawing = false;
@@ -9572,7 +9613,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
           target._scaling = false;
         }
 
-        target.isMoving = false;
         target.setCoords();
 
         // only fire :modified event if target coordinates were changed during mousedown-mouseup
@@ -9598,23 +9638,33 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
           this._previousOriginY = null;
         }
       }
+      else {
+        pointer = this.getPointer(e);
+      }
 
-      this._currentTransform = null;
+      render = this._shouldRender(target, pointer);
 
       if (this.selection && this._groupSelector) {
         // group selection was completed, determine its bounds
         this._findSelectedObjects(e);
       }
+
       var activeGroup = this.getActiveGroup();
       if (activeGroup) {
         activeGroup.setObjectsCoords();
-        activeGroup.set('isMoving', false);
+        activeGroup.isMoving = false;
         this._setCursor(this.defaultCursor);
       }
 
-      // clear selection
+      // clear selection and current transformation
       this._groupSelector = null;
-      this.renderAll();
+      this._currentTransform = null;
+
+      if (target) {
+        target.isMoving = false;
+      }
+
+      render && this.renderAll();
 
       this._setCursorFromEvent(e, target);
 
@@ -9665,15 +9715,23 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
       var target = this.findTarget(e),
           pointer = this.getPointer(e),
-          corner;
+          corner,
+          render;
+
+      // save pointer for check in __onMouseUp event
+      this._previousPointer = pointer;
+
+      render = this._shouldRender(target, pointer);
 
       if (this._shouldClearSelection(e, target)) {
-        this._groupSelector = {
-          ex: pointer.x,
-          ey: pointer.y,
-          top: 0,
-          left: 0
-        };
+        if (this.selection) {
+          this._groupSelector = {
+            ex: pointer.x,
+            ey: pointer.y,
+            top: 0,
+            left: 0
+          };
+        }
         this.deactivateAllWithDispatch();
         target && target.selectable && this.setActiveObject(target, e);
       }
@@ -9697,7 +9755,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         this._setupCurrentTransform(e, target);
       }
       // we must renderAll so that active image is placed on the top canvas
-      this.renderAll();
+      render && this.renderAll();
 
       this.fire('mouse:down', { target: target, e: e });
       target && target.fire('mousedown', { e: e });
@@ -9906,17 +9964,15 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
   /**
    * Exports canvas element to a dataurl image. Note that when multiplier is used, cropping is scaled appropriately
-   * @param {Object} options
-   *
-   *  `format` the format of the output image. Either "jpeg" or "png".
-   *  `quality` quality level (0..1)
-   *  `multiplier` multiplier to scale by {Number}
-   *  `left` cropping left offset
-   *  `top` cropping top offset
-   *  `width` cropping width
-   *  `height` cropping height
-   *
-   * @return {String}
+   * @param {Object} [options] Options object
+   * @param {String} [options.format=png] The format of the output image. Either "jpeg" or "png"
+   * @param {Number} [options.quality=1] Quality level (0..1). Only used for jpeg.
+   * @param {Number} [options.multiplier=1] Multiplier to scale by
+   * @param {Number} [options.left] Cropping left offset
+   * @param {Number} [options.top] Cropping top offset
+   * @param {Number} [options.width] Cropping width
+   * @param {Number} [options.height] Cropping height
+   * @return {String} Returns a data: URL containing a representation of the object in the format specified by options.format
    */
   toDataURL: function (options) {
     options || (options = { });
@@ -11141,7 +11197,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     /**
      * Clones an instance
      * @param {Function} callback Callback is invoked with a clone as a first argument
-     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the outpu
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {fabric.Object} clone of an instance
      */
     clone: function(callback, propertiesToInclude) {
@@ -11263,6 +11319,15 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * <b>Backwards incompatibility note:</b> This method was named "setGradientFill" until v1.1.0
      * @param {String} property Property name 'stroke' or 'fill'
      * @param {Object} [options] Options object
+     * @param {String} [options.type] Type of gradient 'radial' or 'linear'
+     * @param {Number} [options.x1=0] x-coordinate of start point
+     * @param {Number} [options.y1=0] y-coordinate of start point
+     * @param {Number} [options.x2=0] x-coordinate of end point
+     * @param {Number} [options.y2=0] y-coordinate of end point
+     * @param {Number} [options.r1=0] Radius of start point (only for radial gradients)
+     * @param {Number} [options.r2=0] Radius of end point (only for radial gradients)
+     * @param {Object} [options.colorStops] Color stops object eg. {0: 'ff0000', 1: '000000'}
+     * @return {fabric.Object} thisArg
      * @chainable
      */
     setGradient: function(property, options) {
@@ -11293,7 +11358,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
     /**
      * Sets pattern fill of an object
-     * @param {Object} [options] Options object
+     * @param {Object} options Options object
+     * @param {(String|HTMLImageElement)} options.source Pattern source
+     * @param {String} [options.repeat=repeat] Repeat property of a pattern (one of repeat, repeat-x, repeat-y or no-repeat)
+     * @param {Number} [options.offsetX=0] Pattern horizontal offset from object's left/top corner
+     * @param {Number} [options.offsetY=0] Pattern vertical offset from object's left/top corner
      * @return {fabric.Object} thisArg
      * @chainable
      */
@@ -11304,6 +11373,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     /**
      * Sets shadow of an object
      * @param {Object|String} [options] Options object or string (e.g. "2px 2px 10px rgba(0,0,0,0.2)")
+     * @param {String} [options.color=rgb(0,0,0)] Shadow color
+     * @param {Number} [options.blur=0] Shadow blur
+     * @param {Number} [options.offsetX=0] Shadow horizontal offset
+     * @param {Number} [options.offsetY=0] Shadow vertical offset
      * @return {fabric.Object} thisArg
      * @chainable
      */
@@ -11395,7 +11468,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
     /**
      * Moves an object down in stack of drawn objects
-     * @param intersecting {Boolean} If `true`, send object behind next lower intersecting object
+     * @param {Boolean} [intersecting] If `true`, send object behind next lower intersecting object
      * @return {fabric.Object} thisArg
      * @chainable
      */
@@ -11411,7 +11484,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
     /**
      * Moves an object up in stack of drawn objects
-     * @param intersecting {Boolean} If `true`, send object in front of next upper intersecting object
+     * @param {Boolean} [intersecting] If `true`, send object in front of next upper intersecting object
      * @return {fabric.Object} thisArg
      * @chainable
      */
@@ -12568,6 +12641,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * Centers object horizontally with animation.
    * @param {fabric.Object} object Object to center
    * @param {Object} [callbacks] Callbacks object with optional "onComplete" and/or "onChange" properties
+   * @param {Function} [callbacks.onComplete] Invoked on completion
+   * @param {Function} [callbacks.onChange] Invoked on every step of animation
    * @return {fabric.Canvas} thisArg
    * @chainable
    */
@@ -12601,6 +12676,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * Centers object vertically with animation.
    * @param {fabric.Object} object Object to center
    * @param {Object} [callbacks] Callbacks object with optional "onComplete" and/or "onChange" properties
+   * @param {Function} [callbacks.onComplete] Invoked on completion
+   * @param {Function} [callbacks.onChange] Invoked on every step of animation
    * @return {fabric.Canvas} thisArg
    * @chainable
    */
@@ -12633,7 +12710,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
   /**
    * Same as `fabric.Canvas#remove` but animated
    * @param {fabric.Object} object Object to remove
-   * @param {Function} callback Callback, invoked on effect completion
+   * @param {Object} [callbacks] Callbacks object with optional "onComplete" and/or "onChange" properties
+   * @param {Function} [callbacks.onComplete] Invoked on completion
+   * @param {Function} [callbacks.onChange] Invoked on every step of animation
    * @return {fabric.Canvas} thisArg
    * @chainable
    */
@@ -15520,7 +15599,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     toSVG: function() {
       var objectsMarkup = [ ];
-      for (var i = this._objects.length; i--; ) {
+      for (var i = 0, len = this._objects.length; i < len; i++) {
         objectsMarkup.push(this._objects[i].toSVG());
       }
 
@@ -16109,11 +16188,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   },
 
   /**
-   * Same as {@link fabric.Object.prototype.straghten} but with animation
-   * @param {Object} callbacks
-   *                  - onComplete: invoked on completion
-   *                  - onChange: invoked on every step of animation
-   *
+   * Same as {@link fabric.Object.prototype.straighten} but with animation
+   * @param {Object} callbacks Object with callback functions
+   * @param {Function} [callbacks.onComplete] Invoked on completion
+   * @param {Function} [callbacks.onChange] Invoked on every step of animation
    * @return {fabric.Object} thisArg
    * @chainable
    */
@@ -17694,6 +17772,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @param {Number} lineIndex Index of a line in a text
      */
     _drawTextLine: function(method, ctx, line, left, top, lineIndex) {
+      // lift the line by quarter of fontSize
+      top -= this.fontSize / 4;
 
       // short-circuit
       if (this.textAlign !== 'justify') {
@@ -17706,7 +17786,6 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 
       if (totalWidth > lineWidth) {
         // stretch the line
-
         var words = line.split(/\s+/);
         var wordsWidth = ctx.measureText(line.replace(/\s+/g, '')).width;
         var widthDiff = totalWidth - wordsWidth;
