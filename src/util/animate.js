@@ -31,11 +31,15 @@
     (function tick() {
       time = +new Date();
       var currentTime = time > finish ? duration : (time - start);
-      if (time > finish || abort()) {
+      if (abort()) {
         options.onComplete && options.onComplete();
         return;
       }
       onChange(easing(currentTime, startValue, byValue, duration));
+      if (time > finish) {
+        options.onComplete && options.onComplete();
+        return;
+      }
       requestAnimFrame(tick);
     })();
   }
