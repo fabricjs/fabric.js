@@ -7,6 +7,7 @@
 
   /**
    * Tint filter class
+   * Adapted from <a href="https://github.com/mezzoblue/PaintbrushJS">https://github.com/mezzoblue/PaintbrushJS</a>
    * @class fabric.Image.filters.Tint
    * @memberOf fabric.Image.filters
    * @extends fabric.Image.filters.BaseFilter
@@ -24,10 +25,16 @@
      * Constructor
      * @memberOf fabric.Image.filters.Tint.prototype
      * @param {Object} [options] Options object
+     * @param {String} [options.color=#000000] Color to tint the image with
+     * @param {Number} [options.opacity] Opacity value that controls the tint effect's transparency (0..1)
      */
     initialize: function(options) {
       options = options || { };
-      this.color = options.color || 0;
+
+      this.color = options.color || '#000000';
+      this.opacity = typeof options.opacity !== 'undefined'
+                      ? options.opacity
+                      : new fabric.Color(this.color).getAlpha();
     },
 
     /**
@@ -38,25 +45,31 @@
       var context = canvasEl.getContext('2d'),
           imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
           data = imageData.data,
-          iLen = data.length, i, a;
+          iLen = data.length, i,
+          tintR, tintG, tintB,
+          r, g, b, alpha1,
+          color, source;
 
-      var rgb = parseInt(this.color, 10).toString(16);
+      color = this.color instanceof fabric.Color
+                ? this.color
+                : new fabric.Color(this.color);
+      source = color.getSource();
 
-      // Pad with leading zeros that may have been stripped off in conversion.
-      while (rgb.length < 6) rgb = '0' + rgb;
+      tintR = source[0] * this.opacity;
+      tintG = source[1] * this.opacity;
+      tintB = source[2] * this.opacity;
 
-      var cr = parseInt('0x' + rgb.substr(0, 2), 16);
-      var cg = parseInt('0x' + rgb.substr(2, 2), 16);
-      var cb = parseInt('0x' + rgb.substr(4, 2), 16);
+      alpha1 = 1 - this.opacity;
 
       for (i = 0; i < iLen; i+=4) {
-        a = data[i+3];
+        r = data[i];
+        g = data[i + 1];
+        b = data[i + 2];
 
-        if (a > 0){
-          data[i] = cr;
-          data[i+1] = cg;
-          data[i+2] = cb;
-        }
+        // alpha compositing
+        data[i] = tintR + r * alpha1;
+        data[i + 1] = tintG + g * alpha1;
+        data[i + 2] = tintB + b * alpha1;
       }
 
       context.putImageData(imageData, 0, 0);
@@ -68,7 +81,8 @@
      */
     toObject: function() {
       return extend(this.callSuper('toObject'), {
-        color: this.color
+        color: this.color,
+        opacity: this.opacity
       });
     }
   });

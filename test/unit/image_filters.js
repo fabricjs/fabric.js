@@ -570,10 +570,17 @@
     var filter = new fabric.Image.filters.Tint();
 
     equal(filter.type, 'Tint');
-    equal(filter.color, 0);
 
-    var filter2 = new fabric.Image.filters.Tint({color: 122});
-    equal(filter2.color, 122);
+    equal(filter.color, '#000000');
+    equal(filter.opacity, 1);
+
+    var filter2 = new fabric.Image.filters.Tint({color: 'rgba(0,0,255,0.5)', opacity: 0.2});
+    equal(filter2.color, 'rgba(0,0,255,0.5)');
+    equal(filter2.opacity, 0.2);
+
+    var filter3 = new fabric.Image.filters.Tint({color: 'rgba(0,0,255,0.5)'});
+    equal(filter3.color, 'rgba(0,0,255,0.5)');
+    equal(filter3.opacity, 0.5);
   });
 
   test('applyTo', function() {
@@ -586,7 +593,11 @@
     ok(typeof filter.toObject == 'function');
 
     var object = filter.toObject();
-    equal(JSON.stringify(object), '{"type":"Tint","color":0}');
+    equal(JSON.stringify(object), '{"type":"Tint","color":"#000000","opacity":1}');
+
+    filter.color = '#FF00FF';
+    filter.opacity = 0.2;
+    equal(JSON.stringify(filter.toObject()), '{"type":"Tint","color":"#FF00FF","opacity":0.2}');
   });
 
   test('toJSON', function() {
@@ -594,15 +605,22 @@
     ok(typeof filter.toJSON == 'function');
 
     var json = filter.toJSON();
-    equal(JSON.stringify(json), '{"type":"Tint","color":0}');
+    equal(JSON.stringify(json), '{"type":"Tint","color":"#000000","opacity":1}');
+
+    filter.color = '#FF00FF';
+    filter.opacity = 0.2;
+    equal(JSON.stringify(filter.toJSON()), '{"type":"Tint","color":"#FF00FF","opacity":0.2}');
   });
 
   test('fromObject', function() {
     var filter = new fabric.Image.filters.Tint();
 
     var object = filter.toObject();
-
     deepEqual(fabric.Image.filters.Tint.fromObject(object), filter);
+
+    filter.color = '#FF0000';
+    filter.opacity = 0.8;
+    deepEqual(fabric.Image.filters.Tint.fromObject(filter.toObject()), filter);
   });
 
   QUnit.module('fabric.Image.filters.Mask');

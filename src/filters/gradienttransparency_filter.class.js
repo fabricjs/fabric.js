@@ -24,6 +24,7 @@
      * Constructor
      * @memberOf fabric.Image.filters.GradientTransparency
      * @param {Object} [options] Options object
+     * @param {Number} [options.threshold=100] Threshold value
      */
     initialize: function(options) {
       options = options || { };

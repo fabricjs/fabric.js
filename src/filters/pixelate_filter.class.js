@@ -24,6 +24,7 @@
      * Constructor
      * @memberOf fabric.Image.filters.Pixelate.prototype
      * @param {Object} [options] Options object
+     * @param {Number} [options.blocksize=4] Blocksize for pixelate
      */
     initialize: function(options) {
       options = options || { };

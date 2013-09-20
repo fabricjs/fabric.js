@@ -24,6 +24,8 @@
      * Constructor
      * @memberOf fabric.Image.filters.Convolute.prototype
      * @param {Object} [options] Options object
+     * @param {Boolean} [options.opaque=false] Opaque value (true/false)
+     * @param {Array} [options.matrix] Filter matrix
      */
     initialize: function(options) {
       options = options || { };

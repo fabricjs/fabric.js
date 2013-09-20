@@ -24,6 +24,8 @@
      * Constructor
      * @memberOf fabric.Image.filters.RemoveWhite.prototype
      * @param {Object} [options] Options object
+     * @param {Number} [options.threshold=30] Threshold value
+     * @param {Number} [options.distance=20] Distance value
      */
     initialize: function(options) {
       options = options || { };
