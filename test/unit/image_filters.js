@@ -571,7 +571,6 @@
 
     equal(filter.type, 'Tint');
 
-    ok(filter.color instanceof fabric.Color, 'should inherit from fabric.Color');
     equal(filter.color, '#000000');
     equal(filter.opacity, 1);
 
