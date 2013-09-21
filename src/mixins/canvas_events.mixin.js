@@ -42,6 +42,10 @@
         _this.__onTransformGesture(e, s);
       };
 
+      this._onMouseWheel = function(e, s) {
+        _this.__onMouseWheel(e, s);
+      };
+
       addListener(fabric.window, 'resize', this._onResize);
 
       if (fabric.isTouchSupported) {
@@ -55,6 +59,7 @@
       else {
         addListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
         addListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
+        addListener(this.upperCanvasEl, 'mousewheel', this._onMouseWheel);
       }
     },
 
