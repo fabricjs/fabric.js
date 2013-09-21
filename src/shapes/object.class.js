@@ -506,13 +506,12 @@
      * @return {String}
      */
     getSvgStyles: function() {
-
       var fill = this.fill
-        ? (this.fill.toLive ? 'url(#SVGID_' + this.fill.id + ')' : this.fill)
+        ? (this.fill.toLive ? 'url(#SVGID_' + this.fill.id + ')' : this._rgbaToSVGAttrs(this.fill))
         : 'none';
 
       var stroke = this.stroke
-        ? (this.stroke.toLive ? 'url(#SVGID_' + this.stroke.id + ')' : this.stroke)
+        ? (this.stroke.toLive ? 'url(#SVGID_' + this.stroke.id + ')' : this._rgbaToSVGAttrs(this.stroke))
         : 'none';
 
       var strokeWidth = this.strokeWidth ? this.strokeWidth : '0';
@@ -526,13 +525,15 @@
       var filter = this.shadow && this.type !== 'text' ? 'filter: url(#SVGID_' + this.shadow.id + ');' : '';
 
       return [
-        "stroke: ", stroke, "; ",
+        "stroke: ", stroke.color || stroke, "; ",
+        "stroke-opacity: ", stroke.opacity || 1, ";",
         "stroke-width: ", strokeWidth, "; ",
         "stroke-dasharray: ", strokeDashArray, "; ",
         "stroke-linecap: ", strokeLineCap, "; ",
         "stroke-linejoin: ", strokeLineJoin, "; ",
         "stroke-miterlimit: ", strokeMiterLimit, "; ",
-        "fill: ", fill, "; ",
+        "fill: ", fill.color || fill, "; ",
+        "fill-opacity: ", fill.opacity || 1, ";",
         "opacity: ", opacity, ";",
         filter,
         visibility
@@ -571,6 +572,23 @@
       var flipYPart = this.flipY ? "matrix(1 0 0 -1 0 0)" : "";
 
       return [ translatePart, anglePart, scalePart, flipXPart, flipYPart ].join('');
+    },
+
+    _rgbaToSVGAttrs: function(color) {
+        var regex, rgba;
+        color = color.replace(' ', '');
+
+        if (color.indexOf('rgba(') !== 0) return color;
+
+        regex = /(.*?)rgba\((\d+),(\d+),(\d+),([0-9]+\.[0-9]+|\d)\)/;
+        rgba = regex.exec(color);
+
+        if (!rgba) return color;
+
+        return {
+            color: 'rgb(' + rgba.splice(2, 3).join(',') + ')',
+            opacity: rgba[5] || "1"
+        };
     },
 
     _createBaseSVGMarkup: function() {
