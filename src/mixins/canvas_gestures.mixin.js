@@ -29,6 +29,26 @@
     },
 
     /**
+     * Method that defines actions when an Event.js drag is detected.
+     *
+     * @param e Event object by Event.js
+     * @param self Event proxy object by Event.js
+     */
+    __onDrag: function(e, self) {
+      this.fire('touch:drag', {e: e, self: self});
+    },
+
+    /**
+     * Method that defines actions when an Event.js orientation event is detected.
+     *
+     * @param e Event object by Event.js
+     * @param self Event proxy object by Event.js
+     */
+    __onOrientationChange: function(e, self) {
+      this.fire('touch:orientation', {e: e, self: self});
+    },
+
+    /**
      * Scales an object by a factor
      * @param s {Number} The scale factor to apply to the current scale level
      * @param by {String} Either 'x' or 'y' - specifies dimension constraint by which to scale an object.

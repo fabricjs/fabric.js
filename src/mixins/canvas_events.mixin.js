@@ -42,8 +42,20 @@
         _this.__onTransformGesture(e, s);
       };
 
+      this._onDrag = function(e, s) {
+        _this.__onDrag(e, s);
+      };
+
       this._onMouseWheel = function(e, s) {
         _this.__onMouseWheel(e, s);
+      };
+
+      this._onOrientationChange = function(e,s) {
+        _this.__onOrientationChange(e,s);
+      };
+
+      this._onShake = function(e,s) {
+        _this.__onShake(e,s);
       };
 
       addListener(fabric.window, 'resize', this._onResize);
@@ -54,6 +66,9 @@
 
         if (typeof Event !== 'undefined' && 'add' in Event) {
           Event.add(this.upperCanvasEl, 'gesture', this._onGesture);
+          Event.add(this.upperCanvasEl, 'drag', this._onDrag);
+          Event.add(this.upperCanvasEl, 'orientation', this._onOrientationChange);
+          Event.add(this.upperCanvasEl, 'shake', this._onShake);
         }
       }
       else {
