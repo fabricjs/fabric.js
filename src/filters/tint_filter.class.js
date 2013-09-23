@@ -48,12 +48,9 @@
           iLen = data.length, i,
           tintR, tintG, tintB,
           r, g, b, alpha1,
-          color, source;
+          source;
 
-      color = this.color instanceof fabric.Color
-                ? this.color
-                : new fabric.Color(this.color);
-      source = color.getSource();
+      source = new fabric.Color(this.color).getSource();
 
       tintR = source[0] * this.opacity;
       tintG = source[1] * this.opacity;
