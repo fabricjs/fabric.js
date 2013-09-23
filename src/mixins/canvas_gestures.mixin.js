@@ -49,6 +49,16 @@
     },
 
     /**
+     * Method that defines actions when an Event.js shake event is detected.
+     *
+     * @param e Event object by Event.js
+     * @param self Event proxy object by Event.js
+     */
+    __onShake: function(e, self) {
+      this.fire('touch:shake', {e: e, self: self});
+    },
+
+    /**
      * Scales an object by a factor
      * @param s {Number} The scale factor to apply to the current scale level
      * @param by {String} Either 'x' or 'y' - specifies dimension constraint by which to scale an object.
