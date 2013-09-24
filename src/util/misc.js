@@ -182,7 +182,9 @@
         numTotalObjects = objects.length;
 
     objects.forEach(function (o, index) {
-      if (!o.type) {
+      // if sparse array
+      if (!o || !o.type) {
+        numLoadedObjects++;
         return;
       }
       var klass = fabric.util.getKlass(o.type, namespace);

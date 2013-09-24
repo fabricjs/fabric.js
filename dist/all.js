@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures` */
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.3.2" };
+var fabric = fabric || { version: "1.3.3" };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -2206,7 +2206,9 @@ fabric.Collection = {
         numTotalObjects = objects.length;
 
     objects.forEach(function (o, index) {
-      if (!o.type) {
+      // if sparse array
+      if (!o || !o.type) {
+        numLoadedObjects++;
         return;
       }
       var klass = fabric.util.getKlass(o.type, namespace);
@@ -17243,12 +17245,9 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
           iLen = data.length, i,
           tintR, tintG, tintB,
           r, g, b, alpha1,
-          color, source;
+          source;
 
-      color = this.color instanceof fabric.Color
-                ? this.color
-                : new fabric.Color(this.color);
-      source = color.getSource();
+      source = new fabric.Color(this.color).getSource();
 
       tintR = source[0] * this.opacity;
       tintG = source[1] * this.opacity;
