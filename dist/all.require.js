@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures` */
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.3.1" };
+var fabric = fabric || { version: "1.3.2" };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -2022,7 +2022,7 @@ fabric.Collection = {
 };
 
 
-(function() {
+(function(global) {
 
   var sqrt = Math.sqrt,
       atan2 = Math.atan2;
@@ -2136,7 +2136,9 @@ fabric.Collection = {
     * @return {Object} klass "Class"
     */
   function getKlass(type, namespace) {
-    return resolveNamespace(namespace)[fabric.util.string.camelize(fabric.util.string.capitalize(type))];
+    // capitalize first letter only
+    type = fabric.util.string.camelize(type.charAt(0).toUpperCase() + type.slice(1));
+    return resolveNamespace(namespace)[type];
   }
 
   /**
@@ -2150,7 +2152,7 @@ fabric.Collection = {
 
     var parts = namespace.split('.'),
         len = parts.length,
-        obj = fabric.window;
+        obj = global || fabric.window;
 
     for (var i = 0; i < len; ++i) {
       obj = obj[parts[i]];
@@ -2557,7 +2559,7 @@ fabric.Collection = {
   fabric.util.getFunctionBody = getFunctionBody;
   fabric.util.drawArc = drawArc;
 
-})();
+})(typeof exports !== 'undefined' ? exports : this);
 
 
 (function() {
