@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures` */
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.3.3" };
+var fabric = fabric || { version: "1.3.4" };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -2208,7 +2208,7 @@ fabric.Collection = {
     objects.forEach(function (o, index) {
       // if sparse array
       if (!o || !o.type) {
-        numLoadedObjects++;
+        onLoaded();
         return;
       }
       var klass = fabric.util.getKlass(o.type, namespace);

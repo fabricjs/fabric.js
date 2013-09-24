@@ -184,7 +184,7 @@
     objects.forEach(function (o, index) {
       // if sparse array
       if (!o || !o.type) {
-        numLoadedObjects++;
+        onLoaded();
         return;
       }
       var klass = fabric.util.getKlass(o.type, namespace);
