@@ -271,11 +271,11 @@
       center.y *= -1;
       var newOrigin = object.translateToOriginPoint(center, object.get('originX'), object.get('originY'));
       if (this.flipX) {
-        object.set('flipX', true);
+        object.toggle('flipX');
         object.set('left', newOrigin.x);
       }
       if (this.flipY) {
-        object.set('flipY', true);
+        object.toggle('flipY');
         object.set('top', newOrigin.y);
       }
 
