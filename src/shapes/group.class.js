@@ -266,6 +266,19 @@
      */
     _restoreObjectState: function(object) {
 
+      var center = object.getCenterPoint();
+      center.x *= -1;
+      center.y *= -1;
+      var newOrigin = object.translateToOriginPoint(center, object.get('originX'), object.get('originY'));
+      if (this.flipX) {
+        object.set('flipX', true);
+        object.set('left', newOrigin.x);
+      }
+      if (this.flipY) {
+        object.set('flipY', true);
+        object.set('top', newOrigin.y);
+      }
+
       var groupLeft = this.get('left'),
           groupTop = this.get('top'),
           groupAngle = this.getAngle() * (Math.PI / 180),
