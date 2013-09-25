@@ -312,7 +312,7 @@
         activeGroup !== target &&
         !e.shiftKey) || (
         target &&
-        !target.selectable)
+        !target.evented)
       );
     },
 
@@ -768,7 +768,7 @@
 
         if (this._objects[i] &&
             this._objects[i].visible &&
-            this._objects[i].selectable &&
+            this._objects[i].evented &&
             this.containsPoint(e, this._objects[i])) {
 
           if (this.perPixelTargetFind || this._objects[i].perPixelTargetFind) {
