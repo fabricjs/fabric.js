@@ -269,15 +269,17 @@
       var oldOriginX = object.get('originX');
       var oldOriginY = object.get('originY');
       var center = object.getCenterPoint();
-      object.set('originX', 'center');
-      object.set('originY', 'center');
-      object.set('left', center.x);
-      object.set('top', center.y);
+      object.set({
+        originX: 'center',
+        originY: 'center',
+        left: center.x,
+        top: center.y
+      });
 
       if (this.flipX) {
         object.toggle('flipX');
         object.set('left', -object.get('left'));
-        object.setAngle(-object.getAngle() + 180);
+        object.setAngle(-object.getAngle());
       }
       if (this.flipY) {
         object.toggle('flipY');
@@ -286,10 +288,12 @@
       }
 
       var newOrigin = object.getPointByOrigin(oldOriginX, oldOriginY);
-      object.set('originX', oldOriginX);
-      object.set('originY', oldOriginY);
-      object.set('left', newOrigin.x);
-      object.set('top', newOrigin.y);
+      object.set({
+        originX: oldOriginX,
+        originY: oldOriginY,
+        left: newOrigin.x,
+        top: newOrigin.y
+      });
 
       var groupLeft = this.get('left'),
           groupTop = this.get('top'),
