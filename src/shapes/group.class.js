@@ -134,6 +134,7 @@
      * @chainable
      */
     removeWithUpdate: function(object) {
+      this._moveFlippedObject(object);
       this._restoreObjectsState();
       // since _restoreObjectsState set objects inactive
       this.forEachObject(function(o){ o.set('active', true); o.group = this; }, this);
@@ -259,13 +260,12 @@
     },
 
     /**
-     * Restores original state of a specified object in group
+     * Moves a flipped object to the position where it's displayed
      * @private
      * @param {fabric.Object} object
      * @return {fabric.Group} thisArg
      */
-    _restoreObjectState: function(object) {
-
+    _moveFlippedObject: function(object) {
       var oldOriginX = object.get('originX');
       var oldOriginY = object.get('originY');
       var center = object.getCenterPoint();
@@ -294,7 +294,16 @@
         left: newOrigin.x,
         top: newOrigin.y
       });
+      return this;
+    },
 
+    /**
+     * Restores original state of a specified object in group
+     * @private
+     * @param {fabric.Object} object
+     * @return {fabric.Group} thisArg
+     */
+    _restoreObjectState: function(object) {
       var groupLeft = this.get('left'),
           groupTop = this.get('top'),
           groupAngle = this.getAngle() * (Math.PI / 180),
@@ -325,6 +334,7 @@
      * @chainable
      */
     destroy: function() {
+      this._objects.forEach(this._moveFlippedObject, this);
       return this._restoreObjectsState();
     },
 
