@@ -266,18 +266,30 @@
      */
     _restoreObjectState: function(object) {
 
+      var oldOriginX = object.get('originX');
+      var oldOriginY = object.get('originY');
       var center = object.getCenterPoint();
-      center.x *= -1;
-      center.y *= -1;
-      var newOrigin = object.translateToOriginPoint(center, object.get('originX'), object.get('originY'));
+      object.set('originX', 'center');
+      object.set('originY', 'center');
+      object.set('left', center.x);
+      object.set('top', center.y);
+
       if (this.flipX) {
         object.toggle('flipX');
-        object.set('left', newOrigin.x);
+        object.set('left', -object.get('left'));
+        object.setAngle(-object.getAngle() + 180);
       }
       if (this.flipY) {
         object.toggle('flipY');
-        object.set('top', newOrigin.y);
+        object.set('top', -object.get('top'));
+        object.setAngle(-object.getAngle());
       }
+
+      var newOrigin = object.getPointByOrigin(oldOriginX, oldOriginY);
+      object.set('originX', oldOriginX);
+      object.set('originY', oldOriginY);
+      object.set('left', newOrigin.x);
+      object.set('top', newOrigin.y);
 
       var groupLeft = this.get('left'),
           groupTop = this.get('top'),
