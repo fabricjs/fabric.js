@@ -8409,6 +8409,13 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
    * Canvas class
    * @class fabric.Canvas
    * @extends fabric.StaticCanvas
+   * @fires object:modified
+   * @fires object:rotating
+   * @fires object:scaling
+   * @fires object:moving
+   * @fires object:selected
+   * @fires object:added
+   * @fires object:removed
    */
   fabric.Canvas = fabric.util.createClass(fabric.StaticCanvas, /** @lends fabric.Canvas.prototype */ {
 
