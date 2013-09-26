@@ -154,10 +154,23 @@
 
     /**
      * When true, this object will use center point as the origin of transformation
-     * when being resized via the controls
+     * when being scaled via the controls.
+     * <b>Backwards incompatibility note:</b> This property replaces "centerTransform" (Boolean).
+     * @since 1.3.4
      * @type Boolean
+     * @default
      */
-    centerTransform:          false,
+    centeredScaling:          false,
+
+    /**
+     * When true, this object will use center point as the origin of transformation
+     * when being rotated via the controls.
+     * <b>Backwards incompatibility note:</b> This property replaces "centerTransform" (Boolean).
+     * @since 1.3.4
+     * @type Boolean
+     * @default
+     */
+    centeredRotation:         false,
 
     /**
      * Color of object's fill
@@ -264,7 +277,7 @@
     selectable:               true,
 
     /**
-     * When set to `false`, an object can not be a target of events. All events propagate through it. Introduced in v1.3.4
+     * When set to `false`, an object can not be a target of events. All events propagate through it.
      * @type Boolean
      * @default
      */
@@ -872,10 +885,10 @@
      * @param {String} [options.format=png] The format of the output image. Either "jpeg" or "png"
      * @param {Number} [options.quality=1] Quality level (0..1). Only used for jpeg.
      * @param {Number} [options.multiplier=1] Multiplier to scale by
-     * @param {Number} [options.left] Cropping left offset. Introduced in v1.2.14
-     * @param {Number} [options.top] Cropping top offset. Introduced in v1.2.14
-     * @param {Number} [options.width] Cropping width. Introduced in v1.2.14
-     * @param {Number} [options.height] Cropping height. Introduced in v1.2.14
+     * @param {Number} [options.left] Cropping left offset
+     * @param {Number} [options.top] Cropping top offset
+     * @param {Number} [options.width] Cropping width
+     * @param {Number} [options.height] Cropping height
      * @return {String} Returns a data: URL containing a representation of the object in the format specified by options.format
      */
     toDataURL: function(options) {
