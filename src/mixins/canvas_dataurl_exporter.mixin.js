@@ -11,6 +11,25 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * @param {Number} [options.width] Cropping width. Introduced in v1.2.14
    * @param {Number} [options.height] Cropping height. Introduced in v1.2.14
    * @return {String} Returns a data: URL containing a representation of the object in the format specified by options.format
+   * @see {@link http://jsfiddle.net/fabricjs/NfZVb/|jsFiddle demo}
+   * @example <caption>Generate jpeg dataURL with lower quality</caption>
+   * var dataURL = canvas.toDataURL({
+   *   format: 'jpeg',
+   *   quality: 0.8
+   * });
+   * @example <caption>Generate cropped png dataURL (clipping of canvas)</caption>
+   * var dataURL = canvas.toDataURL({
+   *   format: 'png',
+   *   left: 100,
+   *   top: 100,
+   *   width: 200,
+   *   height: 200
+   * });
+   * @example <caption>Generate double scaled png dataURL</caption>
+   * var dataURL = canvas.toDataURL({
+   *   format: 'png',
+   *   multiplier: 2
+   * });
    */
   toDataURL: function (options) {
     options || (options = { });
