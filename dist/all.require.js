@@ -8443,11 +8443,22 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     uniScaleTransform:      false,
 
     /**
-     * When true, objects use center point as the origin of transformation
+     * When true, objects use center point as the origin of scale transformation.
+     * <b>Backwards incompatibility note:</b> This property replaces "centerTransform" (Boolean).
+     * @since 1.3.4
      * @type Boolean
      * @default
      */
-    centerTransform:        false,
+    centeredScaling:        false,
+
+    /**
+     * When true, objects use center point as the origin of rotate transformation.
+     * <b>Backwards incompatibility note:</b> This property replaces "centerTransform" (Boolean).
+     * @since 1.3.4
+     * @type Boolean
+     * @default
+     */
+    centeredRotation:       false,
 
     /**
      * Indicates that canvas is interactive. This property should not be changed.
@@ -8475,7 +8486,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * If not empty the selection border is dashed
      * @type Array
      */
-    selectionDashArray:      [ ],
+    selectionDashArray:     [ ],
 
     /**
      * Color of the border of selection (usually slightly darker than color of selection itself)
@@ -8531,7 +8542,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @type String
      * @default
      */
-    containerClass:        'canvas-container',
+    containerClass:         'canvas-container',
 
     /**
      * When true, object detection happens on per-pixel basis rather than on per-bounding-box
@@ -8552,7 +8563,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @type Boolean
      * @default
      */
-    skipTargetFind: false,
+    skipTargetFind:         false,
 
     /**
      * @private
@@ -8577,31 +8588,38 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     _resetCurrentTransform: function(e) {
       var t = this._currentTransform;
 
-      t.target.set('scaleX', t.original.scaleX);
-      t.target.set('scaleY', t.original.scaleY);
-      t.target.set('left', t.original.left);
-      t.target.set('top', t.original.top);
+      t.target.set({
+        'scaleX': t.original.scaleX,
+        'scaleY': t.original.scaleY,
+        'left': t.original.left,
+        'top': t.original.top
+      });
 
-      if (e.altKey || this.centerTransform || t.target.centerTransform) {
-        if (t.originX !== 'center') {
-          if (t.originX === 'right') {
-            t.mouseXSign = -1;
-          }
-          else {
-            t.mouseXSign = 1;
-          }
+      if (this._shouldCenterTransform(e, t.target)) {
+        if (t.action === 'rotate') {
+          this._setOriginToCenter(t.target);
         }
-        if (t.originY !== 'center') {
-          if (t.originY === 'bottom') {
-            t.mouseYSign = -1;
+        else {
+          if (t.originX !== 'center') {
+            if (t.originX === 'right') {
+              t.mouseXSign = -1;
+            }
+            else {
+              t.mouseXSign = 1;
+            }
           }
-          else {
-            t.mouseYSign = 1;
+          if (t.originY !== 'center') {
+            if (t.originY === 'bottom') {
+              t.mouseYSign = -1;
+            }
+            else {
+              t.mouseYSign = 1;
+            }
           }
-        }
 
-        t.originX = 'center';
-        t.originY = 'center';
+          t.originX = 'center';
+          t.originY = 'center';
+        }
       }
       else {
         t.originX = t.original.originX;
@@ -8723,6 +8741,27 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @param {Event} e Event object
      * @param {fabric.Object} target
      */
+    _shouldCenterTransform: function (e, target) {
+      if (!target) return;
+
+      var t = this._currentTransform,
+          centerTransform;
+
+      if (t.action === 'scale' || t.action === 'scaleX' || t.action === 'scaleY') {
+        centerTransform = this.centeredScaling || target.centeredScaling;
+      }
+      else if (t.action === 'rotate') {
+        centerTransform = this.centeredRotation || target.centeredRotation;
+      }
+
+      return centerTransform ? !e.altKey : e.altKey;
+    },
+
+    /**
+     * @private
+     * @param {Event} e Event object
+     * @param {fabric.Object} target
+     */
     _setupCurrentTransform: function (e, target) {
       if (!target) return;
 
@@ -8741,7 +8780,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
               : 'scale';
       }
 
-      var originX = target.originX, originY = target.originY;
+      var originX = target.originX,
+          originY = target.originY;
 
       if (corner === 'ml' || corner === 'tl' || corner === 'bl') {
         originX = "right";
@@ -8757,12 +8797,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         originY = "top";
       }
 
-      // if (corner === 'mtr') {
-      //   originX = 'center';
-      //   originY = 'center';
-      // }
-
-      // var center = target.getCenterPoint();
       this._currentTransform = {
         target: target,
         action: action,
@@ -9599,7 +9633,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @param {Event} e Event object fired on mouseup
      */
     __onMouseUp: function (e) {
-
       var target,
           pointer,
           render;
@@ -9710,7 +9743,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @param {Event} e Event object fired on mousedown
      */
     __onMouseDown: function (e) {
-
       // accept only left clicks
       var isLeftClick  = 'which' in e ? e.which === 1 : e.button === 1;
       if (!isLeftClick && !fabric.isTouchSupported) return;
@@ -9769,17 +9801,13 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
       this.fire('mouse:down', { target: target, e: e });
       target && target.fire('mousedown', { e: e });
-
-      if (corner === 'mtr' && target.centerTransform) {
-        this._setOriginToCenter(target);
-      }
     },
 
     /**
      * @private
+     * @param {Object} target Object for that origin is set to center
      */
     _setOriginToCenter: function(target) {
-
       this._previousOriginX = this._currentTransform.target.originX;
       this._previousOriginY = this._currentTransform.target.originY;
 
@@ -9796,6 +9824,26 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     },
 
     /**
+     * @private
+     * @param {Object} target Object for that center is set to origin
+     */
+    _setCenterToOrigin: function(target) {
+      var originPoint = target.translateToOriginPoint(
+        target.getCenterPoint(),
+        this._previousOriginX,
+        this._previousOriginY);
+
+      target.originX = this._previousOriginX;
+      target.originY = this._previousOriginY;
+
+      target.left = originPoint.x;
+      target.top = originPoint.y;
+
+      this._previousOriginX = null;
+      this._previousOriginY = null;
+    },
+
+    /**
       * Method that defines the actions when mouse is hovering the canvas.
       * The currentTransform parameter will definde whether the user is rotating/scaling/translating
       * an image or neither of them (only hovering). A group selection is also possible and would cancel
@@ -9805,7 +9853,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       * @param {Event} e Event object fired on mousemove
       */
     __onMouseMove: function (e) {
-
       var target, pointer;
 
       if (this.isDrawingMode) {
@@ -9855,19 +9902,23 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         var x = pointer.x,
             y = pointer.y,
             reset = false,
+            centerTransform,
             transform = this._currentTransform;
 
         target = transform.target;
         target.isMoving = true;
 
-        if ((transform.action === 'scale' || transform.action === 'scaleX' || transform.action === 'scaleY') &&
-           // Switch from a normal resize to center-based
-           ((e.altKey && (transform.originX !== 'center' || transform.originY !== 'center')) ||
-           // Switch from center-based resize to normal one
-           (!e.altKey && transform.originX === 'center' && transform.originY === 'center'))
-        ) {
-          this._resetCurrentTransform(e);
-          reset = true;
+        if (transform.action === 'scale' || transform.action === 'scaleX' || transform.action === 'scaleY') {
+          centerTransform = this._shouldCenterTransform(e, target);
+
+             // Switch from a normal resize to center-based
+          if ((centerTransform && (transform.originX !== 'center' || transform.originY !== 'center')) ||
+             // Switch from center-based resize to normal one
+             (!centerTransform && transform.originX === 'center' && transform.originY === 'center')
+          ) {
+            this._resetCurrentTransform(e);
+            reset = true;
+          }
         }
 
         if (transform.action === 'rotate') {
@@ -9886,7 +9937,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
           else {
             // Switch from a normal resize to proportional
             if (!reset && transform.currentAction === 'scale') {
-              this._resetCurrentTransform(e);
+              this._resetCurrentTransform(e, target);
             }
 
             transform.currentAction = 'scaleEqually';
@@ -10392,6 +10443,208 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    */
   fabric.Object = fabric.util.createClass(/** @lends fabric.Object.prototype */ {
 
+    // TODO: maybe document these too
+    // strokeDashArray strokeLineCap strokeLineJoin strokeMiterLimit clipTo transformMatrix visible
+
+    /**
+     * Retrieves object's shadow
+     * @method getShadow
+     * @memberOf fabric.Object.prototype
+     * @return {Object} Shadow instance
+     */
+
+    /**
+     * Retrieves object's stroke
+     * @method getStroke
+     * @memberOf fabric.Object.prototype
+     * @return {String} stroke value
+     */
+
+    /**
+     * Sets object's stroke
+     * @method setStroke
+     * @memberOf fabric.Object.prototype
+     * @param {String} value stroke value
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+
+    /**
+     * Retrieves object's strokeWidth
+     * @method getStrokeWidth
+     * @memberOf fabric.Object.prototype
+     * @return {Number} strokeWidth value
+     */
+
+    /**
+     * Sets object's strokeWidth
+     * @method setStrokeWidth
+     * @memberOf fabric.Object.prototype
+     * @param {Number} value strokeWidth value
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+
+    /**
+     * Retrieves object's originX
+     * @method getOriginX
+     * @memberOf fabric.Object.prototype
+     * @return {String} originX value
+     */
+
+    /**
+     * Sets object's originX
+     * @method setOriginX
+     * @memberOf fabric.Object.prototype
+     * @param {String} value originX value
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+
+    /**
+     * Retrieves object's originY
+     * @method getOriginY
+     * @memberOf fabric.Object.prototype
+     * @return {String} originY value
+     */
+
+    /**
+     * Sets object's originY
+     * @method setOriginY
+     * @memberOf fabric.Object.prototype
+     * @param {String} value originY value
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+
+    /**
+     * Retrieves object's fill
+     * @method getFill
+     * @memberOf fabric.Object.prototype
+     * @return {String} Fill value (0-1)
+     */
+
+    /**
+     * Sets object's fill
+     * @method setFill
+     * @memberOf fabric.Object.prototype
+     * @param {String} value Fill value
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+
+    /**
+     * Retrieves object's opacity
+     * @method getOpacity
+     * @memberOf fabric.Object.prototype
+     * @return {Number} Opacity value (0-1)
+     */
+
+    /**
+     * Sets object's opacity
+     * @method setOpacity
+     * @memberOf fabric.Object.prototype
+     * @param {Number} value Opacity value (0-1)
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+
+    /**
+     * Retrieves object's top position
+     * @method getTop
+     * @memberOf fabric.Object.prototype
+     * @return {Number} Top value (in pixels)
+     */
+
+    /**
+     * Sets object's top position
+     * @method setTop
+     * @memberOf fabric.Object.prototype
+     * @param {Number} value Top value (in pixels)
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+
+    /**
+     * Retrieves object's left position
+     * @method getLeft
+     * @memberOf fabric.Object.prototype
+     * @return {Number} Left value (in pixels)
+     */
+
+    /**
+     * Sets object's left position
+     * @method setLeft
+     * @memberOf fabric.Object.prototype
+     * @param {Number} value Left value (in pixels)
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+
+    /**
+     * Retrieves object's scaleX value
+     * @method getScaleX
+     * @memberOf fabric.Object.prototype
+     * @return {Number} scaleX value
+     */
+
+    /**
+     * Sets object's scaleX value
+     * @method setScaleX
+     * @memberOf fabric.Object.prototype
+     * @param {Number} value scaleX value
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+
+    /**
+     * Retrieves object's scaleY value
+     * @method getScaleY
+     * @memberOf fabric.Object.prototype
+     * @return {Number} scaleY value
+     */
+
+    /**
+     * Sets object's scaleY value
+     * @method setScaleY
+     * @memberOf fabric.Object.prototype
+     * @param {Number} value scaleY value
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+
+    /**
+     * Retrieves object's flipX value
+     * @method getFlipX
+     * @memberOf fabric.Object.prototype
+     * @return {Boolean} flipX value
+     */
+
+    /**
+     * Sets object's flipX value
+     * @method setFlipX
+     * @memberOf fabric.Object.prototype
+     * @param {Boolean} value flipX value
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+
+    /**
+     * Retrieves object's flipY value
+     * @method getFlipY
+     * @memberOf fabric.Object.prototype
+     * @return {Boolean} flipY value
+     */
+
+    /**
+     * Sets object's flipY value
+     * @method setFlipY
+     * @memberOf fabric.Object.prototype
+     * @param {Boolean} value flipY value
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+
     /**
      * Type of an object (rect, circle, path, etc.)
      * @type String
@@ -10527,10 +10780,23 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
     /**
      * When true, this object will use center point as the origin of transformation
-     * when being resized via the controls
+     * when being scaled via the controls.
+     * <b>Backwards incompatibility note:</b> This property replaces "centerTransform" (Boolean).
+     * @since 1.3.4
      * @type Boolean
+     * @default
      */
-    centerTransform:          false,
+    centeredScaling:          false,
+
+    /**
+     * When true, this object will use center point as the origin of transformation
+     * when being rotated via the controls.
+     * <b>Backwards incompatibility note:</b> This property replaces "centerTransform" (Boolean).
+     * @since 1.3.4
+     * @type Boolean
+     * @default
+     */
+    centeredRotation:         false,
 
     /**
      * Color of object's fill
@@ -11544,7 +11810,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
   extend(fabric.Object.prototype, fabric.Observable);
 
   /**
-   * Defines the number of fraction digits when serializing object values. You can use it to increase/decrease precision of such values like left, top, scaleX, scaleY, etc.
+   * Defines the number of fraction digits to use when serializing object values.
+   * You can use it to increase/decrease precision of such values like left, top, scaleX, scaleY, etc.
    * @static
    * @memberof fabric.Object
    * @constant
@@ -11553,6 +11820,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
   fabric.Object.NUM_FRACTION_DIGITS = 2;
 
   /**
+   * Unique id used internally when creating SVG elements
    * @static
    * @memberof fabric.Object
    * @type Number
@@ -15361,6 +15629,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @chainable
      */
     removeWithUpdate: function(object) {
+      this._moveFlippedObject(object);
       this._restoreObjectsState();
       // since _restoreObjectsState set objects inactive
       this.forEachObject(function(o){ o.set('active', true); o.group = this; }, this);
@@ -15486,13 +15755,50 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     },
 
     /**
+     * Moves a flipped object to the position where it's displayed
+     * @private
+     * @param {fabric.Object} object
+     * @return {fabric.Group} thisArg
+     */
+    _moveFlippedObject: function(object) {
+      var oldOriginX = object.get('originX');
+      var oldOriginY = object.get('originY');
+      var center = object.getCenterPoint();
+      object.set({
+        originX: 'center',
+        originY: 'center',
+        left: center.x,
+        top: center.y
+      });
+
+      if (this.flipX) {
+        object.toggle('flipX');
+        object.set('left', -object.get('left'));
+        object.setAngle(-object.getAngle());
+      }
+      if (this.flipY) {
+        object.toggle('flipY');
+        object.set('top', -object.get('top'));
+        object.setAngle(-object.getAngle());
+      }
+
+      var newOrigin = object.getPointByOrigin(oldOriginX, oldOriginY);
+      object.set({
+        originX: oldOriginX,
+        originY: oldOriginY,
+        left: newOrigin.x,
+        top: newOrigin.y
+      });
+      return this;
+    },
+
+    /**
      * Restores original state of a specified object in group
      * @private
      * @param {fabric.Object} object
      * @return {fabric.Group} thisArg
      */
     _restoreObjectState: function(object) {
-
       var groupLeft = this.get('left'),
           groupTop = this.get('top'),
           groupAngle = this.getAngle() * (Math.PI / 180),
@@ -15523,6 +15829,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @chainable
      */
     destroy: function() {
+      this._objects.forEach(this._moveFlippedObject, this);
       return this._restoreObjectsState();
     },
 

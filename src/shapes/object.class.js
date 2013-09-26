@@ -19,6 +19,208 @@
    */
   fabric.Object = fabric.util.createClass(/** @lends fabric.Object.prototype */ {
 
+    // TODO: maybe document these too
+    // strokeDashArray strokeLineCap strokeLineJoin strokeMiterLimit clipTo transformMatrix visible
+
+    /**
+     * Retrieves object's shadow
+     * @method getShadow
+     * @memberOf fabric.Object.prototype
+     * @return {Object} Shadow instance
+     */
+
+    /**
+     * Retrieves object's stroke
+     * @method getStroke
+     * @memberOf fabric.Object.prototype
+     * @return {String} stroke value
+     */
+
+    /**
+     * Sets object's stroke
+     * @method setStroke
+     * @memberOf fabric.Object.prototype
+     * @param {String} value stroke value
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+
+    /**
+     * Retrieves object's strokeWidth
+     * @method getStrokeWidth
+     * @memberOf fabric.Object.prototype
+     * @return {Number} strokeWidth value
+     */
+
+    /**
+     * Sets object's strokeWidth
+     * @method setStrokeWidth
+     * @memberOf fabric.Object.prototype
+     * @param {Number} value strokeWidth value
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+
+    /**
+     * Retrieves object's originX
+     * @method getOriginX
+     * @memberOf fabric.Object.prototype
+     * @return {String} originX value
+     */
+
+    /**
+     * Sets object's originX
+     * @method setOriginX
+     * @memberOf fabric.Object.prototype
+     * @param {String} value originX value
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+
+    /**
+     * Retrieves object's originY
+     * @method getOriginY
+     * @memberOf fabric.Object.prototype
+     * @return {String} originY value
+     */
+
+    /**
+     * Sets object's originY
+     * @method setOriginY
+     * @memberOf fabric.Object.prototype
+     * @param {String} value originY value
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+
+    /**
+     * Retrieves object's fill
+     * @method getFill
+     * @memberOf fabric.Object.prototype
+     * @return {String} Fill value (0-1)
+     */
+
+    /**
+     * Sets object's fill
+     * @method setFill
+     * @memberOf fabric.Object.prototype
+     * @param {String} value Fill value
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+
+    /**
+     * Retrieves object's opacity
+     * @method getOpacity
+     * @memberOf fabric.Object.prototype
+     * @return {Number} Opacity value (0-1)
+     */
+
+    /**
+     * Sets object's opacity
+     * @method setOpacity
+     * @memberOf fabric.Object.prototype
+     * @param {Number} value Opacity value (0-1)
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+
+    /**
+     * Retrieves object's top position
+     * @method getTop
+     * @memberOf fabric.Object.prototype
+     * @return {Number} Top value (in pixels)
+     */
+
+    /**
+     * Sets object's top position
+     * @method setTop
+     * @memberOf fabric.Object.prototype
+     * @param {Number} value Top value (in pixels)
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+
+    /**
+     * Retrieves object's left position
+     * @method getLeft
+     * @memberOf fabric.Object.prototype
+     * @return {Number} Left value (in pixels)
+     */
+
+    /**
+     * Sets object's left position
+     * @method setLeft
+     * @memberOf fabric.Object.prototype
+     * @param {Number} value Left value (in pixels)
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+
+    /**
+     * Retrieves object's scaleX value
+     * @method getScaleX
+     * @memberOf fabric.Object.prototype
+     * @return {Number} scaleX value
+     */
+
+    /**
+     * Sets object's scaleX value
+     * @method setScaleX
+     * @memberOf fabric.Object.prototype
+     * @param {Number} value scaleX value
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+
+    /**
+     * Retrieves object's scaleY value
+     * @method getScaleY
+     * @memberOf fabric.Object.prototype
+     * @return {Number} scaleY value
+     */
+
+    /**
+     * Sets object's scaleY value
+     * @method setScaleY
+     * @memberOf fabric.Object.prototype
+     * @param {Number} value scaleY value
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+
+    /**
+     * Retrieves object's flipX value
+     * @method getFlipX
+     * @memberOf fabric.Object.prototype
+     * @return {Boolean} flipX value
+     */
+
+    /**
+     * Sets object's flipX value
+     * @method setFlipX
+     * @memberOf fabric.Object.prototype
+     * @param {Boolean} value flipX value
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+
+    /**
+     * Retrieves object's flipY value
+     * @method getFlipY
+     * @memberOf fabric.Object.prototype
+     * @return {Boolean} flipY value
+     */
+
+    /**
+     * Sets object's flipY value
+     * @method setFlipY
+     * @memberOf fabric.Object.prototype
+     * @param {Boolean} value flipY value
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+
     /**
      * Type of an object (rect, circle, path, etc.)
      * @type String
@@ -1184,7 +1386,8 @@
   extend(fabric.Object.prototype, fabric.Observable);
 
   /**
-   * Defines the number of fraction digits when serializing object values. You can use it to increase/decrease precision of such values like left, top, scaleX, scaleY, etc.
+   * Defines the number of fraction digits to use when serializing object values.
+   * You can use it to increase/decrease precision of such values like left, top, scaleX, scaleY, etc.
    * @static
    * @memberof fabric.Object
    * @constant
@@ -1193,6 +1396,7 @@
   fabric.Object.NUM_FRACTION_DIGITS = 2;
 
   /**
+   * Unique id used internally when creating SVG elements
    * @static
    * @memberof fabric.Object
    * @type Number
