@@ -1,3 +1,8 @@
+**Edge**
+
+- [BACK_INCOMPAT] Split `centerTransform` into the properties `centeredScaling` and `centeredRotation`. Object rotation now happens around originX/originY point UNLESS `centeredRotation=true`.
+                Object scaling now happens non-centered UNLESS `centeredScaling=true`.
+
 **Version 1.3.0**
 
 - [BACK_INCOMPAT] Remove selectable, hasControls, hasBorders, hasRotatingPoint, transparentCorners, perPixelTargetFind from default object/json representation of objects.
