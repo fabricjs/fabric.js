@@ -3229,7 +3229,7 @@ fabric.util.string = {
   /**
    * Cross-browser wrapper for getting event's coordinates
    * @memberOf fabric.util
-   * @param {Event} event
+   * @param {Event} event Event object
    * @param {HTMLCanvasElement} upperCanvasEl &lt;canvas> element on which object selection is drawn
    */
   function getPointer(event, upperCanvasEl) {
@@ -7683,7 +7683,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
   /**
    * Returs JSON representation of canvas
    * @function
-   * @param {Array} propertiesToInclude Any properties that you might want to additionally include in the output
+   * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {String} json string
    */
   fabric.StaticCanvas.prototype.toJSON = fabric.StaticCanvas.prototype.toObject;
@@ -8693,7 +8693,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
     /**
      * @private
-     * @param {Event} e
+     * @param {Event} e Event object
      * @param {fabric.Object} target
      */
     _shouldClearSelection: function (e, target) {
@@ -8713,7 +8713,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
     /**
      * @private
-     * @param {Event} e
+     * @param {Event} e Event object
      * @param {fabric.Object} target
      */
     _setupCurrentTransform: function (e, target) {
@@ -8789,7 +8789,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
     /**
      * @private
-     * @param {Event} e
+     * @param {Event} e Event object
      * @param {fabric.Object} target
      * @return {Boolean}
      */
@@ -8802,7 +8802,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
     /**
      * @private
-     * @param {Event} e
+     * @param {Event} e Event object
      * @param {fabric.Object} target
      */
     _handleGroupLogic: function (e, target) {
@@ -9971,10 +9971,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * @param {String} [options.format=png] The format of the output image. Either "jpeg" or "png"
    * @param {Number} [options.quality=1] Quality level (0..1). Only used for jpeg.
    * @param {Number} [options.multiplier=1] Multiplier to scale by
-   * @param {Number} [options.left] Cropping left offset
-   * @param {Number} [options.top] Cropping top offset
-   * @param {Number} [options.width] Cropping width
-   * @param {Number} [options.height] Cropping height
+   * @param {Number} [options.left] Cropping left offset. Introduced in v1.2.14
+   * @param {Number} [options.top] Cropping top offset. Introduced in v1.2.14
+   * @param {Number} [options.width] Cropping width. Introduced in v1.2.14
+   * @param {Number} [options.height] Cropping height. Introduced in v1.2.14
    * @return {String} Returns a data: URL containing a representation of the object in the format specified by options.format
    */
   toDataURL: function (options) {
@@ -10630,7 +10630,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     selectable:               true,
 
     /**
-     * When set to `false`, an object can not be a target of events. All events propagate through it.
+     * When set to `false`, an object can not be a target of events. All events propagate through it. Introduced in v1.3.4
      * @type Boolean
      * @default
      */
@@ -11238,10 +11238,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @param {String} [options.format=png] The format of the output image. Either "jpeg" or "png"
      * @param {Number} [options.quality=1] Quality level (0..1). Only used for jpeg.
      * @param {Number} [options.multiplier=1] Multiplier to scale by
-     * @param {Number} [options.left] Cropping left offset
-     * @param {Number} [options.top] Cropping top offset
-     * @param {Number} [options.width] Cropping width
-     * @param {Number} [options.height] Cropping height
+     * @param {Number} [options.left] Cropping left offset. Introduced in v1.2.14
+     * @param {Number} [options.top] Cropping top offset. Introduced in v1.2.14
+     * @param {Number} [options.width] Cropping width. Introduced in v1.2.14
+     * @param {Number} [options.height] Cropping height. Introduced in v1.2.14
      * @return {String} Returns a data: URL containing a representation of the object in the format specified by options.format
      */
     toDataURL: function(options) {
@@ -12997,7 +12997,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     /**
      * Returns object representation of an instance
      * @methd toObject
-     * @param {Array} propertiesToInclude
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
@@ -13141,7 +13141,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
     /**
      * Returns object representation of an instance
-     * @param {Array} propertiesToInclude
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
@@ -13465,7 +13465,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
     /**
      * Returns object representation of an instance
-     * @param {Array} propertiesToInclude
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
@@ -13754,7 +13754,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
     /**
      * Returns object representation of an instance
-     * @param {Array} propertiesToInclude
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
@@ -15414,7 +15414,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
     /**
      * Returns object representation of an instance
-     * @param {Array} propertiesToInclude
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
@@ -15858,7 +15858,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
     /**
      * Returns object representation of an instance
-     * @param {Array} propertiesToInclude Any properties that you might want to additionally include in the output
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} Object representation of an instance
      */
     toObject: function(propertiesToInclude) {
@@ -15929,7 +15929,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     /**
      * Returns a clone of an instance
      * @param {Function} callback Callback is invoked with a clone as a first argument
-     * @param {Array} propertiesToInclude Any properties that you might want to additionally include in the output
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      */
     clone: function(callback, propertiesToInclude) {
       this.constructor.fromObject(this.toObject(propertiesToInclude), callback);

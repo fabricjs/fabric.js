@@ -181,7 +181,7 @@
 
     /**
      * Returns object representation of an instance
-     * @param {Array} propertiesToInclude Any properties that you might want to additionally include in the output
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} Object representation of an instance
      */
     toObject: function(propertiesToInclude) {
@@ -252,7 +252,7 @@
     /**
      * Returns a clone of an instance
      * @param {Function} callback Callback is invoked with a clone as a first argument
-     * @param {Array} propertiesToInclude Any properties that you might want to additionally include in the output
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      */
     clone: function(callback, propertiesToInclude) {
       this.constructor.fromObject(this.toObject(propertiesToInclude), callback);

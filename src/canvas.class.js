@@ -298,7 +298,7 @@
 
     /**
      * @private
-     * @param {Event} e
+     * @param {Event} e Event object
      * @param {fabric.Object} target
      */
     _shouldClearSelection: function (e, target) {
@@ -318,7 +318,7 @@
 
     /**
      * @private
-     * @param {Event} e
+     * @param {Event} e Event object
      * @param {fabric.Object} target
      */
     _setupCurrentTransform: function (e, target) {
@@ -394,7 +394,7 @@
 
     /**
      * @private
-     * @param {Event} e
+     * @param {Event} e Event object
      * @param {fabric.Object} target
      * @return {Boolean}
      */
@@ -407,7 +407,7 @@
 
     /**
      * @private
-     * @param {Event} e
+     * @param {Event} e Event object
      * @param {fabric.Object} target
      */
     _handleGroupLogic: function (e, target) {

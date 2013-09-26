@@ -194,7 +194,7 @@
 
     /**
      * Returns object representation of an instance
-     * @param {Array} propertiesToInclude
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {

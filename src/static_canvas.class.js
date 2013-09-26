@@ -1108,7 +1108,7 @@
   /**
    * Returs JSON representation of canvas
    * @function
-   * @param {Array} propertiesToInclude Any properties that you might want to additionally include in the output
+   * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {String} json string
    */
   fabric.StaticCanvas.prototype.toJSON = fabric.StaticCanvas.prototype.toObject;
