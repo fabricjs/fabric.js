@@ -48,11 +48,22 @@
     uniScaleTransform:      false,
 
     /**
-     * When true, objects use center point as the origin of transformation
+     * When true, objects use center point as the origin of scale transformation.
+     * <b>Backwards incompatibility note:</b> This property replaces "centerTransform" (Boolean).
+     * @since 1.3.4
      * @type Boolean
      * @default
      */
-    centerTransform:        false,
+    centeredScaling:        false,
+
+    /**
+     * When true, objects use center point as the origin of rotate transformation.
+     * <b>Backwards incompatibility note:</b> This property replaces "centerTransform" (Boolean).
+     * @since 1.3.4
+     * @type Boolean
+     * @default
+     */
+    centeredRotation:       false,
 
     /**
      * Indicates that canvas is interactive. This property should not be changed.
@@ -80,7 +91,7 @@
      * If not empty the selection border is dashed
      * @type Array
      */
-    selectionDashArray:      [ ],
+    selectionDashArray:     [ ],
 
     /**
      * Color of the border of selection (usually slightly darker than color of selection itself)
@@ -136,7 +147,7 @@
      * @type String
      * @default
      */
-    containerClass:        'canvas-container',
+    containerClass:         'canvas-container',
 
     /**
      * When true, object detection happens on per-pixel basis rather than on per-bounding-box
@@ -157,7 +168,7 @@
      * @type Boolean
      * @default
      */
-    skipTargetFind: false,
+    skipTargetFind:         false,
 
     /**
      * @private
@@ -182,31 +193,38 @@
     _resetCurrentTransform: function(e) {
       var t = this._currentTransform;
 
-      t.target.set('scaleX', t.original.scaleX);
-      t.target.set('scaleY', t.original.scaleY);
-      t.target.set('left', t.original.left);
-      t.target.set('top', t.original.top);
+      t.target.set({
+        'scaleX': t.original.scaleX,
+        'scaleY': t.original.scaleY,
+        'left': t.original.left,
+        'top': t.original.top
+      });
 
-      if (e.altKey || this.centerTransform || t.target.centerTransform) {
-        if (t.originX !== 'center') {
-          if (t.originX === 'right') {
-            t.mouseXSign = -1;
-          }
-          else {
-            t.mouseXSign = 1;
-          }
+      if (this._shouldCenterTransform(e, t.target)) {
+        if (t.action === 'rotate') {
+          this._setOriginToCenter(t.target);
         }
-        if (t.originY !== 'center') {
-          if (t.originY === 'bottom') {
-            t.mouseYSign = -1;
+        else {
+          if (t.originX !== 'center') {
+            if (t.originX === 'right') {
+              t.mouseXSign = -1;
+            }
+            else {
+              t.mouseXSign = 1;
+            }
           }
-          else {
-            t.mouseYSign = 1;
+          if (t.originY !== 'center') {
+            if (t.originY === 'bottom') {
+              t.mouseYSign = -1;
+            }
+            else {
+              t.mouseYSign = 1;
+            }
           }
-        }
 
-        t.originX = 'center';
-        t.originY = 'center';
+          t.originX = 'center';
+          t.originY = 'center';
+        }
       }
       else {
         t.originX = t.original.originX;
@@ -328,6 +346,27 @@
      * @param {Event} e Event object
      * @param {fabric.Object} target
      */
+    _shouldCenterTransform: function (e, target) {
+      if (!target) return;
+
+      var t = this._currentTransform,
+          centerTransform;
+
+      if (t.action === 'scale' || t.action === 'scaleX' || t.action === 'scaleY') {
+        centerTransform = this.centeredScaling || target.centeredScaling;
+      }
+      else if (t.action === 'rotate') {
+        centerTransform = this.centeredRotation || target.centeredRotation;
+      }
+
+      return centerTransform ? !e.altKey : e.altKey;
+    },
+
+    /**
+     * @private
+     * @param {Event} e Event object
+     * @param {fabric.Object} target
+     */
     _setupCurrentTransform: function (e, target) {
       if (!target) return;
 
@@ -346,7 +385,8 @@
               : 'scale';
       }
 
-      var originX = target.originX, originY = target.originY;
+      var originX = target.originX,
+          originY = target.originY;
 
       if (corner === 'ml' || corner === 'tl' || corner === 'bl') {
         originX = "right";
@@ -362,12 +402,6 @@
         originY = "top";
       }
 
-      // if (corner === 'mtr') {
-      //   originX = 'center';
-      //   originY = 'center';
-      // }
-
-      // var center = target.getCenterPoint();
       this._currentTransform = {
         target: target,
         action: action,

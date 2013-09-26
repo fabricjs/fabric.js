@@ -138,7 +138,6 @@
      * @param {Event} e Event object fired on mouseup
      */
     __onMouseUp: function (e) {
-
       var target,
           pointer,
           render;
@@ -249,7 +248,6 @@
      * @param {Event} e Event object fired on mousedown
      */
     __onMouseDown: function (e) {
-
       // accept only left clicks
       var isLeftClick  = 'which' in e ? e.which === 1 : e.button === 1;
       if (!isLeftClick && !fabric.isTouchSupported) return;
@@ -308,17 +306,13 @@
 
       this.fire('mouse:down', { target: target, e: e });
       target && target.fire('mousedown', { e: e });
-
-      if (corner === 'mtr' && target.centerTransform) {
-        this._setOriginToCenter(target);
-      }
     },
 
     /**
      * @private
+     * @param {Object} target Object for that origin is set to center
      */
     _setOriginToCenter: function(target) {
-
       this._previousOriginX = this._currentTransform.target.originX;
       this._previousOriginY = this._currentTransform.target.originY;
 
@@ -335,6 +329,26 @@
     },
 
     /**
+     * @private
+     * @param {Object} target Object for that center is set to origin
+     */
+    _setCenterToOrigin: function(target) {
+      var originPoint = target.translateToOriginPoint(
+        target.getCenterPoint(),
+        this._previousOriginX,
+        this._previousOriginY);
+
+      target.originX = this._previousOriginX;
+      target.originY = this._previousOriginY;
+
+      target.left = originPoint.x;
+      target.top = originPoint.y;
+
+      this._previousOriginX = null;
+      this._previousOriginY = null;
+    },
+
+    /**
       * Method that defines the actions when mouse is hovering the canvas.
       * The currentTransform parameter will definde whether the user is rotating/scaling/translating
       * an image or neither of them (only hovering). A group selection is also possible and would cancel
@@ -344,7 +358,6 @@
       * @param {Event} e Event object fired on mousemove
       */
     __onMouseMove: function (e) {
-
       var target, pointer;
 
       if (this.isDrawingMode) {
@@ -394,19 +407,23 @@
         var x = pointer.x,
             y = pointer.y,
             reset = false,
+            centerTransform,
             transform = this._currentTransform;
 
         target = transform.target;
         target.isMoving = true;
 
-        if ((transform.action === 'scale' || transform.action === 'scaleX' || transform.action === 'scaleY') &&
-           // Switch from a normal resize to center-based
-           ((e.altKey && (transform.originX !== 'center' || transform.originY !== 'center')) ||
-           // Switch from center-based resize to normal one
-           (!e.altKey && transform.originX === 'center' && transform.originY === 'center'))
-        ) {
-          this._resetCurrentTransform(e);
-          reset = true;
+        if (transform.action === 'scale' || transform.action === 'scaleX' || transform.action === 'scaleY') {
+          centerTransform = this._shouldCenterTransform(e, target);
+
+             // Switch from a normal resize to center-based
+          if ((centerTransform && (transform.originX !== 'center' || transform.originY !== 'center')) ||
+             // Switch from center-based resize to normal one
+             (!centerTransform && transform.originX === 'center' && transform.originY === 'center')
+          ) {
+            this._resetCurrentTransform(e);
+            reset = true;
+          }
         }
 
         if (transform.action === 'rotate') {
@@ -425,7 +442,7 @@
           else {
             // Switch from a normal resize to proportional
             if (!reset && transform.currentAction === 'scale') {
-              this._resetCurrentTransform(e);
+              this._resetCurrentTransform(e, target);
             }
 
             transform.currentAction = 'scaleEqually';
