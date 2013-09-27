@@ -20,6 +20,11 @@
    * @class fabric.StaticCanvas
    * @mixes fabric.Collection
    * @mixes fabric.Observable
+   * @fires before:render
+   * @fires after:render
+   * @fires canvas:cleared
+   * @fires object:added
+   * @fires object:removed
    */
   fabric.StaticCanvas = fabric.util.createClass(/** @lends fabric.StaticCanvas.prototype */ {
 

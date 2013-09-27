@@ -14,13 +14,22 @@
    * Canvas class
    * @class fabric.Canvas
    * @extends fabric.StaticCanvas
+   *
    * @fires object:modified
    * @fires object:rotating
    * @fires object:scaling
    * @fires object:moving
    * @fires object:selected
-   * @fires object:added
-   * @fires object:removed
+   *
+   * @fires before:selection:cleared
+   * @fires selection:cleared
+   * @fires selection:created
+   *
+   * @fires path:created
+   * @fires mouse:down
+   * @fires mouse:move
+   * @fires mouse:up
+   *
    */
   fabric.Canvas = fabric.util.createClass(fabric.StaticCanvas, /** @lends fabric.Canvas.prototype */ {
 

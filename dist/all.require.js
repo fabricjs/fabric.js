@@ -6595,6 +6595,11 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
    * @class fabric.StaticCanvas
    * @mixes fabric.Collection
    * @mixes fabric.Observable
+   * @fires before:render
+   * @fires after:render
+   * @fires canvas:cleared
+   * @fires object:added
+   * @fires object:removed
    */
   fabric.StaticCanvas = fabric.util.createClass(/** @lends fabric.StaticCanvas.prototype */ {
 
@@ -8409,13 +8414,22 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
    * Canvas class
    * @class fabric.Canvas
    * @extends fabric.StaticCanvas
+   *
    * @fires object:modified
    * @fires object:rotating
    * @fires object:scaling
    * @fires object:moving
    * @fires object:selected
-   * @fires object:added
-   * @fires object:removed
+   *
+   * @fires before:selection:cleared
+   * @fires selection:cleared
+   * @fires selection:created
+   *
+   * @fires path:created
+   * @fires mouse:down
+   * @fires mouse:move
+   * @fires mouse:up
+   *
    */
   fabric.Canvas = fabric.util.createClass(fabric.StaticCanvas, /** @lends fabric.Canvas.prototype */ {
 
@@ -10230,7 +10244,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * @deprecated since 1.2.2
    * @param {String|Object} json JSON string or object
    * @param {Function} callback Callback, invoked when json is parsed
-   *                            and corresponding objects (e.g: fabric.Image)
+   *                            and corresponding objects (e.g: {@link fabric.Image})
    *                            are initialized
    * @param {Function} [reviver] Method for further parsing of JSON elements, called after each fabric object created.
    * @return {fabric.Canvas} instance
@@ -10245,7 +10259,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * JSON format must conform to the one of `fabric.Canvas#toJSON`
    * @param {String|Object} json JSON string or object
    * @param {Function} callback Callback, invoked when json is parsed
-   *                            and corresponding objects (e.g: fabric.Image)
+   *                            and corresponding objects (e.g: {@link fabric.Image})
    *                            are initialized
    * @param {Function} [reviver] Method for further parsing of JSON elements, called after each fabric object created.
    * @return {fabric.Canvas} instance
@@ -10440,6 +10454,18 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
   /**
    * Root object class from which all 2d shape classes inherit from
    * @class fabric.Object
+   *
+   * @fires added
+   * @fires removed
+   *
+   * @fires selected
+   * @fires modified
+   * @fires rotating
+   * @fires scaling
+   * @fires moving
+   *
+   * @fires mousedown
+   * @fires mouseup
    */
   fabric.Object = fabric.util.createClass(/** @lends fabric.Object.prototype */ {
 
@@ -17018,6 +17044,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 
   /**
    * Mask filter class
+   * See http://resources.aleph-1.com/mask/
    * @class fabric.Image.filters.Mask
    * @memberOf fabric.Image.filters
    * @extends fabric.Image.filters.BaseFilter

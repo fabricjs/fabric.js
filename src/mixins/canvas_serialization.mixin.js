@@ -6,7 +6,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * @deprecated since 1.2.2
    * @param {String|Object} json JSON string or object
    * @param {Function} callback Callback, invoked when json is parsed
-   *                            and corresponding objects (e.g: fabric.Image)
+   *                            and corresponding objects (e.g: {@link fabric.Image})
    *                            are initialized
    * @param {Function} [reviver] Method for further parsing of JSON elements, called after each fabric object created.
    * @return {fabric.Canvas} instance
@@ -21,7 +21,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * JSON format must conform to the one of `fabric.Canvas#toJSON`
    * @param {String|Object} json JSON string or object
    * @param {Function} callback Callback, invoked when json is parsed
-   *                            and corresponding objects (e.g: fabric.Image)
+   *                            and corresponding objects (e.g: {@link fabric.Image})
    *                            are initialized
    * @param {Function} [reviver] Method for further parsing of JSON elements, called after each fabric object created.
    * @return {fabric.Canvas} instance

@@ -16,6 +16,18 @@
   /**
    * Root object class from which all 2d shape classes inherit from
    * @class fabric.Object
+   *
+   * @fires added
+   * @fires removed
+   *
+   * @fires selected
+   * @fires modified
+   * @fires rotating
+   * @fires scaling
+   * @fires moving
+   *
+   * @fires mousedown
+   * @fires mouseup
    */
   fabric.Object = fabric.util.createClass(/** @lends fabric.Object.prototype */ {
 
