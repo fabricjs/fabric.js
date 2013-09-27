@@ -7,6 +7,7 @@
 
   /**
    * Mask filter class
+   * See http://resources.aleph-1.com/mask/
    * @class fabric.Image.filters.Mask
    * @memberOf fabric.Image.filters
    * @extends fabric.Image.filters.BaseFilter
