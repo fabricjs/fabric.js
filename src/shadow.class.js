@@ -12,6 +12,7 @@
   /**
    * Shadow class
    * @class fabric.Shadow
+   * @see {@link http://fabricjs.com/shadows/|Shadow demo}
    */
   fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
 

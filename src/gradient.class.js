@@ -52,6 +52,7 @@
   /**
    * Gradient class
    * @class fabric.Gradient
+   * @tutorial {@link http://fabricjs.com/fabric-intro-part-2/#gradients}
    */
   fabric.Gradient = fabric.util.createClass(/** @lends fabric.Gradient.prototype */ {
 

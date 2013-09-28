@@ -20,6 +20,7 @@
    * @class fabric.StaticCanvas
    * @mixes fabric.Collection
    * @mixes fabric.Observable
+   * @see {@link http://fabricjs.com/static_canvas/|StaticCanvas demo}
    * @fires before:render
    * @fires after:render
    * @fires canvas:cleared
@@ -181,14 +182,22 @@
     },
 
     /**
-     * Sets overlay image for this canvas
+     * Sets {@link fabric.StaticCanvas#overlayImage|overlay image} for this canvas
      * @param {String} url url of an image to set overlay to
      * @param {Function} callback callback to invoke when image is loaded and set as an overlay
      * @param {Object} [options] Optional options to set for the overlay image
-     * @param {Number} [options.overlayImageLeft] Left offset of overlay image
-     * @param {Number} [options.overlayImageTop] Top offset of overlay image
+     * @param {Number} [options.overlayImageLeft] {@link fabric.StaticCanvas#overlayImageLeft|Left offset} of overlay image
+     * @param {Number} [options.overlayImageTop] {@link fabric.StaticCanvas#overlayImageTop|Top offset} of overlay image
      * @return {fabric.Canvas} thisArg
      * @chainable
+     * @see {@link http://jsfiddle.net/fabricjs/MnzHT/|jsFiddle demo}
+     * @example <caption>Normal overlayImage</caption>
+     * canvas.setOverlayImage('http://fabricjs.com/assets/jail_cell_bars.png', canvas.renderAll.bind(canvas));
+     * @example <caption>Displaced overlayImage (left and top != 0)</caption>
+     * canvas.setOverlayImage('http://fabricjs.com/assets/jail_cell_bars.png', canvas.renderAll.bind(canvas), {
+     *   overlayImageLeft: 100,
+     *   overlayImageTop: 100
+     * });
      */
     setOverlayImage: function (url, callback, options) { // TODO (kangax): test callback
       fabric.util.loadImage(url, function(img) {
@@ -206,14 +215,22 @@
     },
 
     /**
-     * Sets background image for this canvas
-     * @param {String} url url of an image to set background to
+     * Sets {@link fabric.StaticCanvas#backgroundImage|background image} for this canvas
+     * @param {String} url URL of an image to set background to
      * @param {Function} callback callback to invoke when image is loaded and set as background
      * @param {Object} [options] Optional options to set for the background image
-     * @param {Float} [options.backgroundImageOpacity] Opacity of the background image of the canvas instance
-     * @param {Boolean} [options.backgroundImageStretch] Indicates whether the background image should be stretched to fit the canvas
+     * @param {Float} [options.backgroundImageOpacity] {@link fabric.StaticCanvas#backgroundImageOpacity|Opacity} of the background image of the canvas instance
+     * @param {Boolean} [options.backgroundImageStretch] Indicates whether the background image should be {@link fabric.StaticCanvas#backgroundImageStretch|strechted} to fit the canvas
      * @return {fabric.Canvas} thisArg
      * @chainable
+     * @see {@link http://jsfiddle.net/fabricjs/YH9yD/|jsFiddle demo}
+     * @example <caption>Normal backgroundImage</caption>
+     * canvas.setBackgroundImage('http://fabricjs.com/assets/jail_cell_bars.png', canvas.renderAll.bind(canvas));
+     * @example <caption>Stretched backgroundImage with opacity</caption>
+     * canvas.setBackgroundImage('http://fabricjs.com/assets/jail_cell_bars.png', canvas.renderAll.bind(canvas), {
+     *   backgroundImageOpacity: 0.5,
+     *   backgroundImageStretch: true
+     * });
      */
     setBackgroundImage: function (url, callback, options) {
       fabric.util.loadImage(url, function(img) {
@@ -231,11 +248,18 @@
     },
 
     /**
-     * Sets background color for this canvas
-     * @param {String|fabric.Pattern} backgroundColor Color of pattern to set background color to
+     * Sets {@link fabric.StaticCanvas#backgroundColor|background color} for this canvas
+     * @param {String|fabric.Pattern} backgroundColor Color or pattern to set background color to
      * @param {Function} callback callback to invoke when background color is set
      * @return {fabric.Canvas} thisArg
      * @chainable
+     * @see {@link http://jsfiddle.net/fabricjs/hXzvk/|jsFiddle demo}
+     * @example <caption>Normal backgroundColor - color value</caption>
+     * canvas.setBackgroundColor('rgba(255, 73, 64, 0.6)', canvas.renderAll.bind(canvas));
+     * @example <caption>fabric.Pattern used as backgroundColor</caption>
+     * canvas.setBackgroundColor({
+     *   source: 'http://fabricjs.com/assets/escheresque_ste.png'
+     * }, canvas.renderAll.bind(canvas));
      */
     setBackgroundColor: function(backgroundColor, callback) {
       if (backgroundColor.source) {
@@ -776,7 +800,24 @@
      * @param {Number} [options.viewBox.width] Width of viewbox
      * @param {Number} [options.viewBox.height] Height of viewbox
      * @param {String} [options.encoding=UTF-8] Encoding of SVG output
-     * @return {String}
+     * @return {String} SVG string
+     * @tutorial {@link http://fabricjs.com/fabric-intro-part-3/#serialization}
+     * @see {@link http://jsfiddle.net/fabricjs/jQ3ZZ/|jsFiddle demo}
+     * @example <caption>Normal SVG output</caption>
+     * var svg = canvas.toSVG();
+     * @example <caption>SVG output without preamble (without &lt;?xml ../>)</caption>
+     * var svg = canvas.toSVG({suppressPreamble: true});
+     * @example <caption>SVG output with viewBox attribute</caption>
+     * var svg = canvas.toSVG({
+     *   viewBox: {
+     *     x: 100,
+     *     y: 100,
+     *     width: 200,
+     *     height: 300
+     *   }
+     * });
+     * @example <caption>SVG output with different encoding (default: UTF-8)</caption>
+     * var svg = canvas.toSVG({encoding: 'ISO-8859-1'});
      */
     toSVG: function(options) {
       options || (options = { });
@@ -1111,10 +1152,19 @@
   });
 
   /**
-   * Returs JSON representation of canvas
+   * Returns JSON representation of canvas
    * @function
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-   * @return {String} json string
+   * @return {String} JSON string
+   * @tutorial {@link http://fabricjs.com/fabric-intro-part-3/#serialization}
+   * @see {@link http://jsfiddle.net/fabricjs/pec86/|jsFiddle demo}
+   * @example <caption>JSON without additional properties</caption>
+   * var json = canvas.toJSON();
+   * @example <caption>JSON with additional properties included</caption>
+   * var json = canvas.toJSON(['lockMovementX', 'lockMovementY', 'lockRotation', 'lockScalingX', 'lockScalingY', 'lockUniScaling']);
+   * @example <caption>JSON without default values</caption>
+   * canvas.includeDefaultValues = false;
+   * var json = canvas.toJSON();
    */
   fabric.StaticCanvas.prototype.toJSON = fabric.StaticCanvas.prototype.toObject;
 

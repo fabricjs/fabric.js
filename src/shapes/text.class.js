@@ -34,6 +34,7 @@
    * @class fabric.Text
    * @extends fabric.Object
    * @return {fabric.Text} thisArg
+   * @tutorial {@link http://fabricjs.com/fabric-intro-part-2/#text}
    */
   fabric.Text = fabric.util.createClass(fabric.Object, /** @lends fabric.Text.prototype */ {
 

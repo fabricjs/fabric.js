@@ -29,6 +29,7 @@
    * @class fabric.Group
    * @extends fabric.Object
    * @mixes fabric.Collection
+   * @tutorial {@link http://fabricjs.com/fabric-intro-part-3/#groups}
    */
   fabric.Group = fabric.util.createClass(fabric.Object, fabric.Collection, /** @lends fabric.Group.prototype */ {
 

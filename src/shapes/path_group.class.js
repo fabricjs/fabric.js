@@ -16,6 +16,7 @@
    * Path group class
    * @class fabric.PathGroup
    * @extends fabric.Path
+   * @tutorial {@link http://fabricjs.com/fabric-intro-part-1/#path_and_pathgroup}
    */
   fabric.PathGroup = fabric.util.createClass(fabric.Path, /** @lends fabric.PathGroup.prototype */ {
 

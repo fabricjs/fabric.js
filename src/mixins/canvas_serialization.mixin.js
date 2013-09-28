@@ -1,8 +1,8 @@
 fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.StaticCanvas.prototype */ {
 
   /**
-   * Populates canvas with data from the specified dataless JSON
-   * JSON format must conform to the one of `fabric.Canvas#toDatalessJSON`
+   * Populates canvas with data from the specified dataless JSON.
+   * JSON format must conform to the one of {@link fabric.Canvas#toDatalessJSON}
    * @deprecated since 1.2.2
    * @param {String|Object} json JSON string or object
    * @param {Function} callback Callback, invoked when json is parsed
@@ -11,14 +11,15 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * @param {Function} [reviver] Method for further parsing of JSON elements, called after each fabric object created.
    * @return {fabric.Canvas} instance
    * @chainable
+   * @tutorial {@link http://fabricjs.com/fabric-intro-part-3/#deserialization}
    */
   loadFromDatalessJSON: function (json, callback, reviver) {
     return this.loadFromJSON(json, callback, reviver);
   },
 
   /**
-   * Populates canvas with data from the specified JSON
-   * JSON format must conform to the one of `fabric.Canvas#toJSON`
+   * Populates canvas with data from the specified JSON.
+   * JSON format must conform to the one of {@link fabric.Canvas#toJSON}
    * @param {String|Object} json JSON string or object
    * @param {Function} callback Callback, invoked when json is parsed
    *                            and corresponding objects (e.g: {@link fabric.Image})
@@ -26,6 +27,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * @param {Function} [reviver] Method for further parsing of JSON elements, called after each fabric object created.
    * @return {fabric.Canvas} instance
    * @chainable
+   * @tutorial {@link http://fabricjs.com/fabric-intro-part-3/#deserialization}
    * @see {@link http://jsfiddle.net/fabricjs/fmgXt/|jsFiddle demo}
    * @example <caption>loadFromJSON</caption>
    * canvas.loadFromJSON(json, canvas.renderAll.bind(canvas));

@@ -16,6 +16,7 @@
   /**
    * Root object class from which all 2d shape classes inherit from
    * @class fabric.Object
+   * @tutorial {@link http://fabricjs.com/fabric-intro-part-1/#objects}
    *
    * @fires added
    * @fires removed
@@ -32,14 +33,14 @@
   fabric.Object = fabric.util.createClass(/** @lends fabric.Object.prototype */ {
 
     /**
-     * Retrieves object's clipping function (if any)
+     * Retrieves object's {@link fabric.Object#clipTo|clipping function}
      * @method getClipTo
      * @memberOf fabric.Object.prototype
      * @return {Function}
      */
 
     /**
-     * Sets object's clipping function
+     * Sets object's {@link fabric.Object#clipTo|clipping function}
      * @method setClipTo
      * @memberOf fabric.Object.prototype
      * @param {Function} clipTo Clipping function
@@ -48,14 +49,14 @@
      */
 
     /**
-     * Retrieves object's transformMatrix
+     * Retrieves object's {@link fabric.Object#transformMatrix|transformMatrix}
      * @method getTransformMatrix
      * @memberOf fabric.Object.prototype
      * @return {Array} transformMatrix
      */
 
     /**
-     * Sets object's transformMatrix
+     * Sets object's {@link fabric.Object#transformMatrix|transformMatrix}
      * @method setTransformMatrix
      * @memberOf fabric.Object.prototype
      * @param {Array} transformMatrix
@@ -64,14 +65,14 @@
      */
 
     /**
-     * Retrieves object's visible state
+     * Retrieves object's {@link fabric.Object#visible|visible} state
      * @method getVisible
      * @memberOf fabric.Object.prototype
      * @return {Boolean} True if visible
      */
 
     /**
-     * Sets object's visible state
+     * Sets object's {@link fabric.Object#visible|visible} state
      * @method setVisible
      * @memberOf fabric.Object.prototype
      * @param {Boolean} value visible value
@@ -80,28 +81,21 @@
      */
 
     /**
-     * Retrieves object's stroke
-     * @method getStroke
-     * @memberOf fabric.Object.prototype
-     * @return {String} stroke value
-     */
-
-    /**
-     * Retrieves object's shadow
+     * Retrieves object's {@link fabric.Object#shadow|shadow}
      * @method getShadow
      * @memberOf fabric.Object.prototype
      * @return {Object} Shadow instance
      */
 
     /**
-     * Retrieves object's stroke
+     * Retrieves object's {@link fabric.Object#stroke|stroke}
      * @method getStroke
      * @memberOf fabric.Object.prototype
      * @return {String} stroke value
      */
 
     /**
-     * Sets object's stroke
+     * Sets object's {@link fabric.Object#stroke|stroke}
      * @method setStroke
      * @memberOf fabric.Object.prototype
      * @param {String} value stroke value
@@ -110,14 +104,14 @@
      */
 
     /**
-     * Retrieves object's strokeWidth
+     * Retrieves object's {@link fabric.Object#strokeWidth|strokeWidth}
      * @method getStrokeWidth
      * @memberOf fabric.Object.prototype
      * @return {Number} strokeWidth value
      */
 
     /**
-     * Sets object's strokeWidth
+     * Sets object's {@link fabric.Object#strokeWidth|strokeWidth}
      * @method setStrokeWidth
      * @memberOf fabric.Object.prototype
      * @param {Number} value strokeWidth value
@@ -126,14 +120,14 @@
      */
 
     /**
-     * Retrieves object's originX
+     * Retrieves object's {@link fabric.Object#originX|originX}
      * @method getOriginX
      * @memberOf fabric.Object.prototype
      * @return {String} originX value
      */
 
     /**
-     * Sets object's originX
+     * Sets object's {@link fabric.Object#originX|originX}
      * @method setOriginX
      * @memberOf fabric.Object.prototype
      * @param {String} value originX value
@@ -142,14 +136,14 @@
      */
 
     /**
-     * Retrieves object's originY
+     * Retrieves object's {@link fabric.Object#originY|originY}
      * @method getOriginY
      * @memberOf fabric.Object.prototype
      * @return {String} originY value
      */
 
     /**
-     * Sets object's originY
+     * Sets object's {@link fabric.Object#originY|originY}
      * @method setOriginY
      * @memberOf fabric.Object.prototype
      * @param {String} value originY value
@@ -158,14 +152,14 @@
      */
 
     /**
-     * Retrieves object's fill
+     * Retrieves object's {@link fabric.Object#fill|fill}
      * @method getFill
      * @memberOf fabric.Object.prototype
-     * @return {String} Fill value (0-1)
+     * @return {String} Fill value
      */
 
     /**
-     * Sets object's fill
+     * Sets object's {@link fabric.Object#fill|fill}
      * @method setFill
      * @memberOf fabric.Object.prototype
      * @param {String} value Fill value
@@ -174,14 +168,14 @@
      */
 
     /**
-     * Retrieves object's opacity
+     * Retrieves object's {@link fabric.Object#opacity|opacity}
      * @method getOpacity
      * @memberOf fabric.Object.prototype
      * @return {Number} Opacity value (0-1)
      */
 
     /**
-     * Sets object's opacity
+     * Sets object's {@link fabric.Object#opacity|opacity}
      * @method setOpacity
      * @memberOf fabric.Object.prototype
      * @param {Number} value Opacity value (0-1)
@@ -190,14 +184,30 @@
      */
 
     /**
-     * Retrieves object's top position
+     * Retrieves object's {@link fabric.Object#angle|angle} (in degrees)
+     * @method getAngle
+     * @memberOf fabric.Object.prototype
+     * @return {Number}
+     */
+
+    /**
+     * Sets object's {@link fabric.Object#angle|angle}
+     * @method setAngle
+     * @memberOf fabric.Object.prototype
+     * @param {Number} value Angle value (in degrees)
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+
+    /**
+     * Retrieves object's {@link fabric.Object#top|top position}
      * @method getTop
      * @memberOf fabric.Object.prototype
      * @return {Number} Top value (in pixels)
      */
 
     /**
-     * Sets object's top position
+     * Sets object's {@link fabric.Object#top|top position}
      * @method setTop
      * @memberOf fabric.Object.prototype
      * @param {Number} value Top value (in pixels)
@@ -206,14 +216,14 @@
      */
 
     /**
-     * Retrieves object's left position
+     * Retrieves object's {@link fabric.Object#left|left position}
      * @method getLeft
      * @memberOf fabric.Object.prototype
      * @return {Number} Left value (in pixels)
      */
 
     /**
-     * Sets object's left position
+     * Sets object's {@link fabric.Object#left|left position}
      * @method setLeft
      * @memberOf fabric.Object.prototype
      * @param {Number} value Left value (in pixels)
@@ -222,14 +232,14 @@
      */
 
     /**
-     * Retrieves object's scaleX value
+     * Retrieves object's {@link fabric.Object#scaleX|scaleX} value
      * @method getScaleX
      * @memberOf fabric.Object.prototype
      * @return {Number} scaleX value
      */
 
     /**
-     * Sets object's scaleX value
+     * Sets object's {@link fabric.Object#scaleX|scaleX} value
      * @method setScaleX
      * @memberOf fabric.Object.prototype
      * @param {Number} value scaleX value
@@ -238,14 +248,14 @@
      */
 
     /**
-     * Retrieves object's scaleY value
+     * Retrieves object's {@link fabric.Object#scaleY|scaleY} value
      * @method getScaleY
      * @memberOf fabric.Object.prototype
      * @return {Number} scaleY value
      */
 
     /**
-     * Sets object's scaleY value
+     * Sets object's {@link fabric.Object#scaleY|scaleY} value
      * @method setScaleY
      * @memberOf fabric.Object.prototype
      * @param {Number} value scaleY value
@@ -254,14 +264,14 @@
      */
 
     /**
-     * Retrieves object's flipX value
+     * Retrieves object's {@link fabric.Object#flipX|flipX} value
      * @method getFlipX
      * @memberOf fabric.Object.prototype
      * @return {Boolean} flipX value
      */
 
     /**
-     * Sets object's flipX value
+     * Sets object's {@link fabric.Object#flipX|flipX} value
      * @method setFlipX
      * @memberOf fabric.Object.prototype
      * @param {Boolean} value flipX value
@@ -270,14 +280,14 @@
      */
 
     /**
-     * Retrieves object's flipY value
+     * Retrieves object's {@link fabric.Object#flipY|flipY} value
      * @method getFlipY
      * @memberOf fabric.Object.prototype
      * @return {Boolean} flipY value
      */
 
     /**
-     * Sets object's flipY value
+     * Sets object's {@link fabric.Object#flipY|flipY} value
      * @method setFlipY
      * @memberOf fabric.Object.prototype
      * @param {Boolean} value flipY value
@@ -1334,7 +1344,7 @@
     },
 
     /**
-     * Sets shadow of an object
+     * Sets {@link fabric.Object#shadow|shadow} of an object
      * @param {Object|String} [options] Options object or string (e.g. "2px 2px 10px rgba(0,0,0,0.2)")
      * @param {String} [options.color=rgb(0,0,0)] Shadow color
      * @param {Number} [options.blur=0] Shadow blur

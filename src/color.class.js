@@ -17,6 +17,7 @@
    * @class fabric.Color
    * @param {String} color optional in hex or rgb(a) format
    * @return {fabric.Color} thisArg
+   * @tutorial {@link http://fabricjs.com/fabric-intro-part-2/#colors}
    */
   function Color(color) {
     if (!color) {

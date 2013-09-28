@@ -1,6 +1,7 @@
 /**
  * BaseBrush class
  * @class fabric.BaseBrush
+ * @see {@link http://fabricjs.com/freedrawing/|Freedrawing demo}
  */
 fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype */ {
 
