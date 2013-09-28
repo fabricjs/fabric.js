@@ -890,11 +890,15 @@
      * @param {Object} object
      */
     _removeDefaultValues: function(object) {
-      this.stateProperties.forEach(function(prop) {
-        if (object[prop] === this.constructor.prototype[prop]) {
+      var prototype = fabric.util.getKlass(object.type).prototype;
+      var stateProperties = prototype.stateProperties;
+
+      stateProperties.forEach(function(prop) {
+        if (object[prop] === prototype[prop]) {
           delete object[prop];
         }
-      }, this);
+      });
+
       return object;
     },
 
