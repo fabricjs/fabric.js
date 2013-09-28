@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures` */
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.3.4" };
+var fabric = fabric || { version: "1.3.5" };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -3258,8 +3258,8 @@ fabric.util.string = {
         scrollTop = 0;
       }
       else if (element === fabric.document) {
-        scrollLeft += body.scrollLeft || docElement.scrollLeft || 0;
-        scrollTop += body.scrollTop ||  docElement.scrollTop || 0;
+        scrollLeft = body.scrollLeft || docElement.scrollLeft || 0;
+        scrollTop = body.scrollTop ||  docElement.scrollTop || 0;
       }
       else {
         scrollLeft += element.scrollLeft || 0;
@@ -7612,34 +7612,6 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
     EMPTY_JSON: '{"objects": [], "background": "white"}',
 
     /**
-     * Takes &lt;canvas> element and transforms its data in such way that it becomes grayscale
-     * @static
-     * @param {HTMLCanvasElement} canvasEl
-     */
-    toGrayscale: function (canvasEl) {
-       var context = canvasEl.getContext('2d'),
-           imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
-           data = imageData.data,
-           iLen = imageData.width,
-           jLen = imageData.height,
-           index, average, i, j;
-
-       for (i = 0; i < iLen; i++) {
-         for (j = 0; j < jLen; j++) {
-
-           index = (i * 4) * jLen + (j * 4);
-           average = (data[index] + data[index + 1] + data[index + 2]) / 3;
-
-           data[index]     = average;
-           data[index + 1] = average;
-           data[index + 2] = average;
-         }
-       }
-
-       context.putImageData(imageData, 0, 0);
-     },
-
-    /**
      * Provides a way to check support of some of the canvas methods
      * (either those of HTMLCanvasElement itself, or rendering context)
      *
@@ -8216,7 +8188,14 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
    * @type Boolean
    * @default
    */
-  randomOpacity:      false,
+  randomOpacity:        false,
+
+  /**
+   * Whether overlapping dots (rectangles) should be removed (for performance reasons)
+   * @type Boolean
+   * @default
+   */
+  optimizeOverlapping:  true,
 
   /**
    * Constructor
@@ -8276,6 +8255,11 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
         rects.push(rect);
       }
     }
+
+    if (this.optimizeOverlapping) {
+      rects = this._getOptimizedRects(rects);
+    }
+
     var group = new fabric.Group(rects);
     this.canvas.add(group);
     this.canvas.fire('path:created', { path: group });
@@ -8284,6 +8268,25 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
     this._resetShadow();
     this.canvas.renderOnAddRemove = originalRenderOnAddRemove;
     this.canvas.renderAll();
+  },
+
+  _getOptimizedRects: function(rects) {
+
+    // avoid creating duplicate rects at the same coordinates
+    var uniqueRects = { }, key;
+
+    for (var i = 0, len = rects.length; i < len; i++) {
+      key = rects[i].left + '' + rects[i].top;
+      if (!uniqueRects[key]) {
+        uniqueRects[key] = rects[i];
+      }
+    }
+    var uniqueRectsArray = [ ];
+    for (key in uniqueRects) {
+      uniqueRectsArray.push(uniqueRects[key]);
+    }
+
+    return uniqueRectsArray;
   },
 
   /**
@@ -10048,6 +10051,25 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * @param {Number} [options.width] Cropping width. Introduced in v1.2.14
    * @param {Number} [options.height] Cropping height. Introduced in v1.2.14
    * @return {String} Returns a data: URL containing a representation of the object in the format specified by options.format
+   * @see {@link http://jsfiddle.net/fabricjs/NfZVb/|jsFiddle demo}
+   * @example <caption>Generate jpeg dataURL with lower quality</caption>
+   * var dataURL = canvas.toDataURL({
+   *   format: 'jpeg',
+   *   quality: 0.8
+   * });
+   * @example <caption>Generate cropped png dataURL (clipping of canvas)</caption>
+   * var dataURL = canvas.toDataURL({
+   *   format: 'png',
+   *   left: 100,
+   *   top: 100,
+   *   width: 200,
+   *   height: 200
+   * });
+   * @example <caption>Generate double scaled png dataURL</caption>
+   * var dataURL = canvas.toDataURL({
+   *   format: 'png',
+   *   multiplier: 2
+   * });
    */
   toDataURL: function (options) {
     options || (options = { });
@@ -10264,6 +10286,15 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * @param {Function} [reviver] Method for further parsing of JSON elements, called after each fabric object created.
    * @return {fabric.Canvas} instance
    * @chainable
+   * @see {@link http://jsfiddle.net/fabricjs/fmgXt/|jsFiddle demo}
+   * @example <caption>loadFromJSON</caption>
+   * canvas.loadFromJSON(json, canvas.renderAll.bind(canvas));
+   * @example <caption>loadFromJSON with reviver</caption>
+   * canvas.loadFromJSON(json, canvas.renderAll.bind(canvas), function(o, object) {
+   *   // `o` = json object
+   *   // `object` = fabric.Object instance
+   *   // ... do some stuff ...
+   * });
    */
   loadFromJSON: function (json, callback, reviver) {
     if (!json) return;
@@ -10891,11 +10922,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     fillRule:                 'source-over',
 
     /**
-     * Overlay fill (takes precedence over fill value)
+     * Background color of an object. Only works with text objects at the moment.
      * @type String
      * @default
      */
-    overlayFill:              null,
+    backgroundColor:          '',
 
     /**
      * When defined, an object is rendered via stroke and this property specifies its color
@@ -11093,7 +11124,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     stateProperties:  (
       'top left width height scaleX scaleY flipX flipY originX originY transformMatrix ' +
       'stroke strokeWidth strokeDashArray strokeLineCap strokeLineJoin strokeMiterLimit ' +
-      'angle opacity fill fillRule overlayFill shadow clipTo visible'
+      'angle opacity fill fillRule shadow clipTo visible backgroundColor'
     ).split(' '),
 
     /**
@@ -11187,7 +11218,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         width:              toFixed(this.width, NUM_FRACTION_DIGITS),
         height:             toFixed(this.height, NUM_FRACTION_DIGITS),
         fill:               (this.fill && this.fill.toObject) ? this.fill.toObject() : this.fill,
-        overlayFill:        this.overlayFill,
         stroke:             (this.stroke && this.stroke.toObject) ? this.stroke.toObject() : this.stroke,
         strokeWidth:        toFixed(this.strokeWidth, NUM_FRACTION_DIGITS),
         strokeDashArray:    this.strokeDashArray,
@@ -11202,7 +11232,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         opacity:            toFixed(this.opacity, NUM_FRACTION_DIGITS),
         shadow:             (this.shadow && this.shadow.toObject) ? this.shadow.toObject() : this.shadow,
         visible:            this.visible,
-        clipTo:             this.clipTo && String(this.clipTo)
+        clipTo:             this.clipTo && String(this.clipTo),
+        backgroundColor:    this.backgroundColor
       };
 
       if (!this.includeDefaultValues) {
@@ -11318,11 +11349,15 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @param {Object} object
      */
     _removeDefaultValues: function(object) {
-      this.stateProperties.forEach(function(prop) {
-        if (object[prop] === this.constructor.prototype[prop]) {
+      var prototype = fabric.util.getKlass(object.type).prototype;
+      var stateProperties = prototype.stateProperties;
+
+      stateProperties.forEach(function(prop) {
+        if (object[prop] === prototype[prop]) {
           delete object[prop];
         }
-      }, this);
+      });
+
       return object;
     },
 
@@ -11454,10 +11489,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
           : this.stroke;
       }
 
-      if (this.overlayFill) {
-        ctx.fillStyle = this.overlayFill;
-      }
-      else if (this.fill) {
+      if (this.fill) {
         ctx.fillStyle = this.fill.toLive
           ? this.fill.toLive(ctx)
           : this.fill;
@@ -11646,18 +11678,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     },
 
     /**
-     * Makes object's color grayscale
-     * @return {fabric.Object} thisArg
-     */
-    toGrayscale: function() {
-      var fillValue = this.get('fill');
-      if (fillValue) {
-        this.set('overlayFill', new fabric.Color(fillValue).toGrayscale().toRgb());
-      }
-      return this;
-    },
-
-    /**
      * Returns complexity of an instance
      * @return {Number} complexity of this instance
      */
@@ -11690,6 +11710,37 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @param {Object} [options.colorStops] Color stops object eg. {0: 'ff0000', 1: '000000'}
      * @return {fabric.Object} thisArg
      * @chainable
+     * @see {@link http://jsfiddle.net/fabricjs/58y8b/|jsFiddle demo}
+     * @example <caption>Set linear gradient</caption>
+     * object.setGradient('fill', {
+     *   type: 'linear',
+     *   x1: -object.width / 2,
+     *   y1: 0,
+     *   x2: object.width / 2,
+     *   y2: 0,
+     *   colorStops: {
+     *     0: 'red',
+     *     0.5: '#005555',
+     *     1: 'rgba(0,0,255,0.5)'
+     *   }
+     * });
+     * canvas.renderAll();
+     * @example <caption>Set radial gradient</caption>
+     * object.setGradient('fill', {
+     *   type: 'radial',
+     *   x1: 0,
+     *   y1: 0,
+     *   x2: 0,
+     *   y2: 0,
+     *   r1: object.width / 2,
+     *   r2: 10,
+     *   colorStops: {
+     *     0: 'red',
+     *     0.5: '#005555',
+     *     1: 'rgba(0,0,255,0.5)'
+     *   }
+     * });
+     * canvas.renderAll();
      */
     setGradient: function(property, options) {
       options || (options = { });
@@ -11726,6 +11777,15 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @param {Number} [options.offsetY=0] Pattern vertical offset from object's left/top corner
      * @return {fabric.Object} thisArg
      * @chainable
+     * @see {@link http://jsfiddle.net/fabricjs/QT3pa/|jsFiddle demo}
+     * @example <caption>Set pattern</caption>
+     * fabric.util.loadImage('http://fabricjs.com/assets/escheresque_ste.png', function(img) {
+     *   object.setPatternFill({
+     *     source: img,
+     *     repeat: 'repeat'
+     *   });
+     *   canvas.renderAll();
+     * });
      */
     setPatternFill: function(options) {
       return this.set('fill', new fabric.Pattern(options));
@@ -11740,6 +11800,18 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @param {Number} [options.offsetY=0] Shadow vertical offset
      * @return {fabric.Object} thisArg
      * @chainable
+     * @see {@link http://jsfiddle.net/fabricjs/7gvJG/|jsFiddle demo}
+     * @example <caption>Set shadow with string notation</caption>
+     * object.setShadow('2px 2px 10px rgba(0,0,0,0.2)');
+     * canvas.renderAll();
+     * @example <caption>Set shadow with object notation</caption>
+     * object.setShadow({
+     *   color: 'red',
+     *   blur: 10,
+     *   offsetX: 20,
+     *   offsetY: 20
+     * });
+     * canvas.renderAll();
      */
     setShadow: function(options) {
       return this.set('shadow', new fabric.Shadow(options));
@@ -13955,7 +14027,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   }
 
   var stateProperties = fabric.Object.prototype.stateProperties.concat();
-  stateProperties.push('rx', 'ry');
+  stateProperties.push('rx', 'ry', 'x', 'y');
 
   /**
    * Rectangle class
@@ -13992,6 +14064,18 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @default
      */
     ry:   0,
+
+    /**
+     * @type Number
+     * @default
+     */
+    x: 0,
+
+    /**
+     * @type Number
+     * @default
+     */
+    y: 0,
 
     /**
      * Used to specify dash pattern for stroke on this object
@@ -14111,12 +14195,16 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
-      return extend(this.callSuper('toObject', propertiesToInclude), {
+      var object = extend(this.callSuper('toObject', propertiesToInclude), {
         rx: this.get('rx') || 0,
         ry: this.get('ry') || 0,
         x: this.get('x'),
         y: this.get('y')
       });
+      if (!this.includeDefaultValues) {
+        this._removeDefaultValues(object);
+      }
+      return object;
     },
 
     /* _TO_SVG_START_ */
@@ -15033,10 +15121,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       }
       // ctx.globalCompositeOperation = this.fillRule;
 
-      if (this.overlayFill) {
-        ctx.fillStyle = this.overlayFill;
-      }
-      else if (this.fill) {
+      if (this.fill) {
         ctx.fillStyle = this.fill.toLive
           ? this.fill.toLive(ctx)
           : this.fill;
@@ -15423,7 +15508,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     _set: function(prop, value) {
 
-      if ((prop === 'fill' || prop === 'overlayFill') && value && this.isSameColor()) {
+      if (prop === 'fill' && value && this.isSameColor()) {
         var i = this.paths.length;
         while (i--) {
           this.paths[i]._set(prop, value);
@@ -17719,7 +17804,6 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     'textAlign',
     'fontStyle',
     'lineHeight',
-    'backgroundColor',
     'textBackgroundColor',
     'useNative',
     'path'
@@ -17949,13 +18033,6 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @default
      */
     lineHeight:           1.3,
-
-    /**
-     * Background color of an entire text box
-     * @type String
-     * @default
-     */
-    backgroundColor:      '',
 
     /**
      * Background color of text lines
@@ -18496,7 +18573,6 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
         textDecoration:       this.textDecoration,
         textAlign:            this.textAlign,
         path:                 this.path,
-        backgroundColor:      this.backgroundColor,
         textBackgroundColor:  this.textBackgroundColor,
         useNative:            this.useNative
       });
