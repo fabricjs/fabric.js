@@ -87,7 +87,6 @@
       'width':              0,
       'height':             0,
       'fill':               'rgb(0,0,0)',
-      'overlayFill':        null,
       'stroke':             null,
       'strokeWidth':        1,
       'strokeDashArray':    null,
@@ -102,6 +101,7 @@
       'opacity':            1,
       'shadow':             null,
       'visible':            true,
+      'backgroundColor':    '',
       'clipTo':             null,
       'radius':             0
     };

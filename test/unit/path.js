@@ -9,7 +9,6 @@
     'width':              200,
     'height':             200,
     'fill':               'red',
-    'overlayFill':        null,
     'stroke':             'blue',
     'strokeWidth':        1,
     'strokeDashArray':    null,
@@ -26,6 +25,7 @@
     'pathOffset':         { x: 100, y: 100 },
     'shadow':             null,
     'visible':            true,
+    'backgroundColor':    '',
     'clipTo':             null
   };
 

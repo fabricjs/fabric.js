@@ -97,7 +97,7 @@
      */
     _set: function(prop, value) {
 
-      if ((prop === 'fill' || prop === 'overlayFill') && value && this.isSameColor()) {
+      if (prop === 'fill' && value && this.isSameColor()) {
         var i = this.paths.length;
         while (i--) {
           this.paths[i]._set(prop, value);

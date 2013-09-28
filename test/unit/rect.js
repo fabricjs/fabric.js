@@ -9,7 +9,6 @@
     'width':              0,
     'height':             0,
     'fill':               'rgb(0,0,0)',
-    'overlayFill':        null,
     'stroke':             null,
     'strokeWidth':        1,
     'strokeDashArray':    null,
@@ -24,6 +23,7 @@
     'opacity':            1,
     'shadow':             null,
     'visible':            true,
+    'backgroundColor':    '',
     'clipTo':             null,
     'rx':                 0,
     'ry':                 0,
@@ -136,5 +136,12 @@
     var svg = rect.toSVG();
 
     equal(svg, '<rect x="-50" y="-50" rx="20" ry="30" width="100" height="100" style="stroke: none; stroke-width: 1; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); opacity: 1;" transform="translate(0 0)"/>');
+  });
+
+  test('toObject without default values', function() {
+    var options = { type: 'rect', width: 69, height: 50, left: 10, top: 20 };
+    var rect = new fabric.Rect(options);
+    rect.includeDefaultValues = false;
+    deepEqual(rect.toObject(), options);
   });
 })();

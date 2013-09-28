@@ -30,7 +30,6 @@
       'width':              0,
       'height':             0,
       'fill':               'rgb(0,0,0)',
-      'overlayFill':        null,
       'stroke':             null,
       'strokeWidth':        1,
       'strokeDashArray':    null,
@@ -47,6 +46,7 @@
       'ry':                 0,
       'shadow':             null,
       'visible':            true,
+      'backgroundColor':    '',
       'clipTo':             null
     };
     ok(typeof ellipse.toObject == 'function');

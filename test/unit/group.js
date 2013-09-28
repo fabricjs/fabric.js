@@ -141,7 +141,6 @@
       'width':              70,
       'height':             45,
       'fill':               'rgb(0,0,0)',
-      'overlayFill':        null,
       'stroke':             null,
       'strokeWidth':        1,
       'strokeDashArray':    null,
@@ -152,6 +151,7 @@
       'scaleY':             1,
       'shadow':             null,
       'visible':            true,
+      'backgroundColor':    '',
       'clipTo':             null,
       'angle':              0,
       'flipX':              false,
@@ -166,6 +166,23 @@
     ok(group.getObjects() !== clone.objects, 'should produce different object array');
     ok(group.getObjects()[0] !== clone.objects[0], 'should produce different objects in array');
   });
+
+test('toObject without default values', function() {
+  var group = makeGroupWith2Objects();
+  group.includeDefaultValues = false;
+  var clone = group.toObject();
+
+  var expectedObject = {
+    'type':               'group',
+    'left':               80,
+    'top':                117.5,
+    'width':              70,
+    'height':             45,
+    'objects':            clone.objects
+  };
+
+  deepEqual(clone, expectedObject);
+});
 
   test('render', function() {
     var group = makeGroupWith2Objects();

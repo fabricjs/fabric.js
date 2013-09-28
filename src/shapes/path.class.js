@@ -439,10 +439,7 @@
       }
       // ctx.globalCompositeOperation = this.fillRule;
 
-      if (this.overlayFill) {
-        ctx.fillStyle = this.overlayFill;
-      }
-      else if (this.fill) {
+      if (this.fill) {
         ctx.fillStyle = this.fill.toLive
           ? this.fill.toLive(ctx)
           : this.fill;

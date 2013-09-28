@@ -151,14 +151,14 @@
 
   test('toJSON', function() {
     var emptyObjectJSON = '{"type":"object","originX":"center","originY":"center","left":0,"top":0,"width":0,"height":0,"fill":"rgb(0,0,0)",'+
-                          '"overlayFill":null,"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,'+
+                          '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,'+
                           '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,'+
-                          '"shadow":null,"visible":true,"clipTo":null}';
+                          '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":""}';
 
     var augmentedJSON = '{"type":"object","originX":"center","originY":"center","left":0,"top":0,"width":122,"height":0,"fill":"rgb(0,0,0)",'+
-                        '"overlayFill":null,"stroke":null,"strokeWidth":1,"strokeDashArray":[5,2],"strokeLineCap":"round","strokeLineJoin":"bevil","strokeMiterLimit":5,'+
+                        '"stroke":null,"strokeWidth":1,"strokeDashArray":[5,2],"strokeLineCap":"round","strokeLineJoin":"bevil","strokeMiterLimit":5,'+
                         '"scaleX":1.3,"scaleY":1,"angle":0,"flipX":false,"flipY":true,"opacity":0.88,'+
-                        '"shadow":null,"visible":true,"clipTo":null}';
+                        '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":""}';
 
     var cObj = new fabric.Object();
     ok(typeof cObj.toJSON == 'function');
@@ -186,7 +186,6 @@
       'width':              0,
       'height':             0,
       'fill':               'rgb(0,0,0)',
-      'overlayFill':        null,
       'stroke':             null,
       'strokeWidth':        1,
       'strokeDashArray':    null,
@@ -201,6 +200,7 @@
       'opacity':            1,
       'shadow':             null,
       'visible':            true,
+      'backgroundColor':    '',
       'clipTo':             null
     };
 
@@ -213,7 +213,6 @@
       'width':              30,
       'height':             40,
       'fill':               'rgb(0,0,0)',
-      'overlayFill':        null,
       'stroke':             null,
       'strokeWidth':        1,
       'strokeDashArray':    [5, 2],
@@ -228,6 +227,7 @@
       'opacity':            0.13,
       'shadow':             null,
       'visible':            true,
+      'backgroundColor':    '',
       'clipTo':             null
     };
 
@@ -703,24 +703,6 @@
     object.setAngle(999);
     object.straighten();
     equal(object.get('angle'), 270);
-  });
-
-  test('toGrayscale', function() {
-    var object = new fabric.Object({ left: 100, top: 124, width: 210, height: 66 });
-    ok(typeof object.toGrayscale == 'function');
-    equal(object.toGrayscale(), object, 'should be chainable');
-
-    object.set('fill', 'rgb(200,0,0)'); // set color to red
-
-    object.toGrayscale();
-
-    equal(object.get('overlayFill'), 'rgb(60,60,60)');
-    equal(object.get('fill'), 'rgb(200,0,0)', 'toGrayscale should not overwrite original fill value');
-
-    object.set('fill', '').set('overlayFill', '');
-    object.toGrayscale();
-
-    equal(object.get('overlayFill'), '', 'Empty fill values should be left intact');
   });
 
   asyncTest('fxStraighten', function() {

@@ -463,11 +463,11 @@
     fillRule:                 'source-over',
 
     /**
-     * Overlay fill (takes precedence over fill value)
+     * Background color of an object. Only works with text objects at the moment.
      * @type String
      * @default
      */
-    overlayFill:              null,
+    backgroundColor:          '',
 
     /**
      * When defined, an object is rendered via stroke and this property specifies its color
@@ -665,7 +665,7 @@
     stateProperties:  (
       'top left width height scaleX scaleY flipX flipY originX originY transformMatrix ' +
       'stroke strokeWidth strokeDashArray strokeLineCap strokeLineJoin strokeMiterLimit ' +
-      'angle opacity fill fillRule overlayFill shadow clipTo visible'
+      'angle opacity fill fillRule shadow clipTo visible backgroundColor'
     ).split(' '),
 
     /**
@@ -759,7 +759,6 @@
         width:              toFixed(this.width, NUM_FRACTION_DIGITS),
         height:             toFixed(this.height, NUM_FRACTION_DIGITS),
         fill:               (this.fill && this.fill.toObject) ? this.fill.toObject() : this.fill,
-        overlayFill:        this.overlayFill,
         stroke:             (this.stroke && this.stroke.toObject) ? this.stroke.toObject() : this.stroke,
         strokeWidth:        toFixed(this.strokeWidth, NUM_FRACTION_DIGITS),
         strokeDashArray:    this.strokeDashArray,
@@ -774,7 +773,8 @@
         opacity:            toFixed(this.opacity, NUM_FRACTION_DIGITS),
         shadow:             (this.shadow && this.shadow.toObject) ? this.shadow.toObject() : this.shadow,
         visible:            this.visible,
-        clipTo:             this.clipTo && String(this.clipTo)
+        clipTo:             this.clipTo && String(this.clipTo),
+        backgroundColor:    this.backgroundColor
       };
 
       if (!this.includeDefaultValues) {
@@ -1026,10 +1026,7 @@
           : this.stroke;
       }
 
-      if (this.overlayFill) {
-        ctx.fillStyle = this.overlayFill;
-      }
-      else if (this.fill) {
+      if (this.fill) {
         ctx.fillStyle = this.fill.toLive
           ? this.fill.toLive(ctx)
           : this.fill;
@@ -1215,18 +1212,6 @@
      */
     isType: function(type) {
       return this.type === type;
-    },
-
-    /**
-     * Makes object's color grayscale
-     * @return {fabric.Object} thisArg
-     */
-    toGrayscale: function() {
-      var fillValue = this.get('fill');
-      if (fillValue) {
-        this.set('overlayFill', new fabric.Color(fillValue).toGrayscale().toRgb());
-      }
-      return this;
     },
 
     /**

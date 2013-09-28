@@ -23,7 +23,6 @@
     'textAlign',
     'fontStyle',
     'lineHeight',
-    'backgroundColor',
     'textBackgroundColor',
     'useNative',
     'path'
@@ -254,13 +253,6 @@
      * @default
      */
     lineHeight:           1.3,
-
-    /**
-     * Background color of an entire text box
-     * @type String
-     * @default
-     */
-    backgroundColor:      '',
 
     /**
      * Background color of text lines
@@ -801,7 +793,6 @@
         textDecoration:       this.textDecoration,
         textAlign:            this.textAlign,
         path:                 this.path,
-        backgroundColor:      this.backgroundColor,
         textBackgroundColor:  this.textBackgroundColor,
         useNative:            this.useNative
       });

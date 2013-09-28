@@ -1078,34 +1078,6 @@
     EMPTY_JSON: '{"objects": [], "background": "white"}',
 
     /**
-     * Takes &lt;canvas> element and transforms its data in such way that it becomes grayscale
-     * @static
-     * @param {HTMLCanvasElement} canvasEl
-     */
-    toGrayscale: function (canvasEl) {
-       var context = canvasEl.getContext('2d'),
-           imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
-           data = imageData.data,
-           iLen = imageData.width,
-           jLen = imageData.height,
-           index, average, i, j;
-
-       for (i = 0; i < iLen; i++) {
-         for (j = 0; j < jLen; j++) {
-
-           index = (i * 4) * jLen + (j * 4);
-           average = (data[index] + data[index + 1] + data[index + 2]) / 3;
-
-           data[index]     = average;
-           data[index + 1] = average;
-           data[index + 2] = average;
-         }
-       }
-
-       context.putImageData(imageData, 0, 0);
-     },
-
-    /**
      * Provides a way to check support of some of the canvas methods
      * (either those of HTMLCanvasElement itself, or rendering context)
      *

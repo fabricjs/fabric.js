@@ -9,7 +9,7 @@
                            '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="300" height="300" viewBox="100 100 300 300" xml:space="preserve"><desc>Created with Fabric.js ' + fabric.version + '</desc><defs></defs></svg>';
 
   var PATH_JSON = '{"objects": [{"type": "path", "originX": "center", "originY": "center", "left": 268, "top": 266, "width": 51, "height": 49,'+
-                  ' "fill": "rgb(0,0,0)", "overlayFill": null, "stroke": null, "strokeWidth": 1, "scaleX": 1, "scaleY": 1, '+
+                  ' "fill": "rgb(0,0,0)", "stroke": null, "strokeWidth": 1, "scaleX": 1, "scaleY": 1, '+
                   '"angle": 0, "flipX": false, "flipY": false, "opacity": 1, "path": [["M", 18.511, 13.99],'+
                   ' ["c", 0, 0, -2.269, -4.487, -12.643, 4.411], ["c", 0, 0, 4.824, -14.161, 19.222, -9.059],'+
                   ' ["l", 0.379, -2.1], ["c", -0.759, -0.405, -1.375, -1.139, -1.645, -2.117], ["c", -0.531, '+
@@ -26,19 +26,19 @@
                   '13.99], ["z", null]]}], "background": "#ff5555"}';
 
   var PATH_DATALESS_JSON = '{"objects":[{"type":"path","originX":"center","originY":"center","left":200,"top":200,"width":200,"height":200,"fill":"rgb(0,0,0)",'+
-                           '"overlayFill":null,"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,'+
+                           '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,'+
                            '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,'+
-                           '"shadow":null,"visible":true,"clipTo":null,"path":"http://example.com/","pathOffset":{"x":100,"y":100}}],"background":""}';
+                           '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","path":"http://example.com/","pathOffset":{"x":100,"y":100}}],"background":""}';
 
-  var RECT_JSON = '{"objects":[{"type":"rect","originX":"center","originY":"center","left":0,"top":0,"width":10,"height":10,"fill":"rgb(0,0,0)","overlayFill":null,'+
+  var RECT_JSON = '{"objects":[{"type":"rect","originX":"center","originY":"center","left":0,"top":0,"width":10,"height":10,"fill":"rgb(0,0,0)",'+
                   '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,'+
                   '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,'+
-                  '"shadow":null,"visible":true,"clipTo":null,"rx":0,"ry":0,"x":0,"y":0}],"background":"#ff5555"}';
+                  '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","rx":0,"ry":0,"x":0,"y":0}],"background":"#ff5555"}';
 
-  var RECT_JSON_WITH_PADDING = '{"objects":[{"type":"rect","originX":"center","originY":"center","left":0,"top":0,"width":10,"height":20,"fill":"rgb(0,0,0)","overlayFill":null,'+
+  var RECT_JSON_WITH_PADDING = '{"objects":[{"type":"rect","originX":"center","originY":"center","left":0,"top":0,"width":10,"height":20,"fill":"rgb(0,0,0)",'+
                                '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,'+
                                '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,'+
-                               '"shadow":null,"visible":true,"clipTo":null,"padding":123,"foo":"bar","rx":0,"ry":0,"x":0,"y":0}],"background":""}';
+                               '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","padding":123,"foo":"bar","rx":0,"ry":0,"x":0,"y":0}],"background":""}';
 
   // force creation of static canvas
   // TODO: fix this
@@ -768,37 +768,6 @@
     equal(canvas.getHeight(), 765);
   });
 
-  test('toGrayscale', function() {
-    ok(typeof fabric.Canvas.toGrayscale == 'function');
-
-    if (!fabric.Canvas.supports('getImageData')) {
-      alert('getImageData is not supported by this environment. Some of the tests can not be run.');
-      return;
-    }
-
-    var canvasEl = fabric.isLikelyNode ? new (require('canvas')) : fabric.document.createElement('canvas'),
-        context = canvasEl.getContext('2d');
-
-    canvasEl.width = canvasEl.height = 10;
-
-    context.fillStyle = 'rgb(255,0,0)'; // red
-    context.fillRect(0, 0, 10, 10);
-
-    var imageData = context.getImageData(0, 0, 10, 10),
-        data = imageData.data,
-        firstPixelData = [data[0], data[1], data[2], data[3]];
-
-    deepEqual([255, 0, 0, 255], firstPixelData);
-
-    fabric.Canvas.toGrayscale(canvasEl);
-
-    imageData = context.getImageData(0, 0, 10, 10);
-    data = imageData.data;
-    firstPixelData = [data[0], data[1], data[2], data[3]];
-
-    deepEqual([85, 85, 85, 255], firstPixelData);
-  });
-
   // asyncTest('resizeImageToFit', function() {
   //   ok(typeof canvas._resizeImageToFit == 'function');
 
@@ -892,7 +861,7 @@
   });
 
   asyncTest('loadFromJSON with text', function() {
-    var json = '{"objects":[{"type":"text","left":150,"top":200,"width":128,"height":64.32,"fill":"#000000","overlayFill":"","stroke":"","strokeWidth":"","scaleX":0.8,"scaleY":0.8,"angle":0,"flipX":false,"flipY":false,"opacity":1,"text":"NAME HERE","fontSize":24,"fontWeight":"","fontFamily":"Delicious_500","fontStyle":"","lineHeight":"","textDecoration":"","textAlign":"center","path":"","strokeStyle":"","backgroundColor":""}],"background":"#ffffff"}';
+    var json = '{"objects":[{"type":"text","left":150,"top":200,"width":128,"height":64.32,"fill":"#000000","stroke":"","strokeWidth":"","scaleX":0.8,"scaleY":0.8,"angle":0,"flipX":false,"flipY":false,"opacity":1,"text":"NAME HERE","fontSize":24,"fontWeight":"","fontFamily":"Delicious_500","fontStyle":"","lineHeight":"","textDecoration":"","textAlign":"center","path":"","strokeStyle":"","backgroundColor":""}],"background":"#ffffff"}';
     canvas.loadFromJSON(json, function() {
 
       canvas.renderAll();

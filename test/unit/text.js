@@ -15,7 +15,6 @@
     'width':               20,
     'height':              52,
     'fill':                'rgb(0,0,0)',
-    'overlayFill':         null,
     'stroke':              null,
     'strokeWidth':         1,
     'strokeDashArray':     null,
