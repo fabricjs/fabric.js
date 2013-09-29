@@ -819,6 +819,10 @@
      * });
      * @example <caption>SVG output with different encoding (default: UTF-8)</caption>
      * var svg = canvas.toSVG({encoding: 'ISO-8859-1'});
+     * @example <caption>Modify SVG output with reviver function</caption>
+     * var svg = canvas.toSVG(null, function(svg) {
+     *   return svg.replace('stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; ', '');
+     * });
      */
     toSVG: function(options, reviver) {
       options || (options = { });
