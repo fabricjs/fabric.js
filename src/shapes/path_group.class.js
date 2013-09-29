@@ -186,18 +186,6 @@
     },
 
     /**
-      * Makes path group grayscale
-      * @return {fabric.PathGroup} thisArg
-      */
-    toGrayscale: function() {
-      var i = this.paths.length;
-      while (i--) {
-        this.paths[i].toGrayscale();
-      }
-      return this;
-    },
-
-    /**
      * Returns all paths in this path group
      * @return {Array} array of path objects included in this path group
      */

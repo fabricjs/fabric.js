@@ -122,15 +122,5 @@ fabric.Collection = {
       memo += current.complexity ? current.complexity() : 0;
       return memo;
     }, 0);
-  },
-
-  /**
-   * Makes all of the collection objects grayscale (i.e. calling `toGrayscale` on them)
-   * @return {Self} thisArg
-   */
-  toGrayscale: function() {
-    return this.forEachObject(function(obj) {
-      obj.toGrayscale();
-    });
   }
 };
