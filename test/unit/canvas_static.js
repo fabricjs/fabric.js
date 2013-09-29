@@ -344,7 +344,7 @@
     }
 
     var svg = canvas.toSVG(null, reviver);
-    equal(reviverCount, 1);
+    equal(reviverCount, len);
     canvas.renderOnAddRemove = true;
   });
 
