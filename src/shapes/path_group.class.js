@@ -109,19 +109,22 @@
 
     /**
      * Returns object representation of this path group
-     * @param {Array} [propertiesToInclude]
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
-      return extend(parentToObject.call(this, propertiesToInclude), {
-        paths: invoke(this.getObjects(), 'toObject', propertiesToInclude),
-        sourcePath: this.sourcePath
+      var o = extend(parentToObject.call(this, propertiesToInclude), {
+        paths: invoke(this.getObjects(), 'toObject', propertiesToInclude)
       });
+      if (this.sourcePath) {
+        o.sourcePath = this.sourcePath;
+      }
+      return o;
     },
 
     /**
      * Returns dataless object representation of this path group
-     * @param {Array} [propertiesToInclude]
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} dataless object representation of an instance
      */
     toDatalessObject: function(propertiesToInclude) {
@@ -198,7 +201,7 @@
    * Creates fabric.PathGroup instance from an object representation
    * @static
    * @memberOf fabric.PathGroup
-   * @param {Object} object
+   * @param {Object} object Object to create an instance from
    * @param {Function} callback Callback to invoke when an fabric.PathGroup instance is created
    */
   fabric.PathGroup.fromObject = function(object, callback) {
