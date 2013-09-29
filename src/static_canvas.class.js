@@ -800,6 +800,7 @@
      * @param {Number} [options.viewBox.width] Width of viewbox
      * @param {Number} [options.viewBox.height] Height of viewbox
      * @param {String} [options.encoding=UTF-8] Encoding of SVG output
+     * @param {Function} [reviver] Method for further parsing of svg elements, called after each fabric object converted into svg representation.
      * @return {String} SVG string
      * @tutorial {@link http://fabricjs.com/fabric-intro-part-3/#serialization}
      * @see {@link http://jsfiddle.net/fabricjs/jQ3ZZ/|jsFiddle demo}
@@ -819,7 +820,7 @@
      * @example <caption>SVG output with different encoding (default: UTF-8)</caption>
      * var svg = canvas.toSVG({encoding: 'ISO-8859-1'});
      */
-    toSVG: function(options) {
+    toSVG: function(options, reviver) {
       options || (options = { });
       var markup = [];
 
@@ -882,7 +883,7 @@
         this.discardActiveGroup();
       }
       for (var i = 0, objects = this.getObjects(), len = objects.length; i < len; i++) {
-        markup.push(objects[i].toSVG());
+        markup.push(objects[i].toSVG(reviver));
       }
       if (activeGroup) {
         this.setActiveGroup(new fabric.Group(activeGroup.getObjects()));

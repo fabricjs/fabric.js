@@ -313,6 +313,41 @@
     equal(svg, CANVAS_SVG_VIEWBOX);
   });
 
+  test('toSVG with reviver', function() {
+    ok(typeof canvas.toSVG == 'function');
+    canvas.clear();
+
+    var circle = new fabric.Circle(),
+        rect = new fabric.Rect(),
+        path1 = new fabric.Path('M 100 100 L 300 100 L 200 300 z'),
+        tria = new fabric.Triangle(),
+        polygon = new fabric.Polygon([{x: 10, y: 12},{x: 20, y: 22}]),
+        polyline = new fabric.Polyline([{x: 10, y: 12},{x: 20, y: 22}]),
+        line = new fabric.Line(),
+        text = new fabric.Text('Text'),
+        group = new fabric.Group([text, line]),
+        ellipse = new fabric.Ellipse(),
+        image = new fabric.Image({width: 0, height: 0}),
+        path2 = new fabric.Path('M 0 0 L 200 100 L 200 300 z'),
+        path3 = new fabric.Path('M 50 50 L 100 300 L 400 400 z'),
+        pathGroup = new fabric.PathGroup([path2, path3]);
+
+    canvas.renderOnAddRemove = false;
+    canvas.add(circle, rect, path1, tria, polygon, polyline, group, ellipse, image, pathGroup);
+
+    var reviverCount = 0,
+        len = canvas.size() + group.size() + pathGroup.paths.length;
+
+    function reviver(svg) {
+      reviverCount++;
+      return svg;
+    }
+
+    var svg = canvas.toSVG(null, reviver);
+    equal(reviverCount, 1);
+    canvas.renderOnAddRemove = true;
+  });
+
   test('toJSON', function() {
     ok(typeof canvas.toJSON == 'function');
     equal(JSON.stringify(canvas.toJSON()), '{"objects":[],"background":""}');

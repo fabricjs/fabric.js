@@ -801,10 +801,12 @@
     /* _TO_SVG_START_ */
     /**
      * Returns SVG representation of an instance
+     * @param {Function} [reviver] Method for further parsing of svg representation.
      * @return {String} svg representation of an instance
      */
-    toSVG: function() {
-      var textLines = this.text.split(/\r?\n/),
+    toSVG: function(reviver) {
+      var markup = [ ],
+          textLines = this.text.split(/\r?\n/),
           lineTopOffset = this.useNative
             ? this.fontSize * this.lineHeight
             : (-this._fontAscent - ((this._fontAscent / 5) * this.lineHeight)),
@@ -820,7 +822,7 @@
       // move top offset by an ascent
       textTopOffset += (this._fontAscent ? ((this._fontAscent / 5) * this.lineHeight) : 0);
 
-      return [
+      markup.push(
         '<g transform="', this.getSvgTransform(), '">',
           textAndBg.textBgRects.join(''),
           '<text ',
@@ -836,7 +838,9 @@
             textAndBg.textSpans.join(''),
           '</text>',
         '</g>'
-      ].join('');
+      );
+
+      return reviver ? reviver(markup.join('')) : markup.join('');
     },
 
     /**
