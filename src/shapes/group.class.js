@@ -425,18 +425,23 @@
     /* _TO_SVG_START_ */
     /**
      * Returns svg representation of an instance
+     * @param {Function} [reviver] Method for further parsing of svg representation.
      * @return {String} svg representation of an instance
      */
-    toSVG: function() {
-      var objectsMarkup = [ ];
+    toSVG: function(reviver) {
+      var markup = [
+        '<g ',
+          'transform="', this.getSvgTransform(),
+        '">'
+      ];
+
       for (var i = 0, len = this._objects.length; i < len; i++) {
-        objectsMarkup.push(this._objects[i].toSVG());
+        markup.push(this._objects[i].toSVG(reviver));
       }
 
-      return (
-        '<g transform="' + this.getSvgTransform() + '">' +
-          objectsMarkup.join('') +
-        '</g>');
+      markup.push('</g>');
+
+      return reviver ? reviver(markup.join('')) : markup.join('');
     },
     /* _TO_SVG_END_ */
 
