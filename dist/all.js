@@ -1871,6 +1871,8 @@ if (typeof console !== 'undefined') {
 
   /**
    * @namespace fabric.Observable
+   * @tutorial {@link http://fabricjs.com/fabric-intro-part-2/#events}
+   * @see {@link http://fabricjs.com/events/|Events demo}
    */
   fabric.Observable = {
     observe: observe,
@@ -5470,6 +5472,7 @@ fabric.util.string = {
    * @class fabric.Color
    * @param {String} color optional in hex or rgb(a) format
    * @return {fabric.Color} thisArg
+   * @tutorial {@link http://fabricjs.com/fabric-intro-part-2/#colors}
    */
   function Color(color) {
     if (!color) {
@@ -5973,6 +5976,7 @@ fabric.util.string = {
   /**
    * Gradient class
    * @class fabric.Gradient
+   * @tutorial {@link http://fabricjs.com/fabric-intro-part-2/#gradients}
    */
   fabric.Gradient = fabric.util.createClass(/** @lends fabric.Gradient.prototype */ {
 
@@ -6290,6 +6294,8 @@ fabric.util.string = {
 /**
  * Pattern class
  * @class fabric.Pattern
+ * @see {@link http://fabricjs.com/patterns/|Pattern demo}
+ * @see {@link http://fabricjs.com/dynamic-patterns/|DynamicPattern demo}
  */
 fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ {
 
@@ -6439,6 +6445,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
   /**
    * Shadow class
    * @class fabric.Shadow
+   * @see {@link http://fabricjs.com/shadows/|Shadow demo}
    */
   fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
 
@@ -6595,6 +6602,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
    * @class fabric.StaticCanvas
    * @mixes fabric.Collection
    * @mixes fabric.Observable
+   * @see {@link http://fabricjs.com/static_canvas/|StaticCanvas demo}
    * @fires before:render
    * @fires after:render
    * @fires canvas:cleared
@@ -6756,14 +6764,22 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
     },
 
     /**
-     * Sets overlay image for this canvas
+     * Sets {@link fabric.StaticCanvas#overlayImage|overlay image} for this canvas
      * @param {String} url url of an image to set overlay to
      * @param {Function} callback callback to invoke when image is loaded and set as an overlay
      * @param {Object} [options] Optional options to set for the overlay image
-     * @param {Number} [options.overlayImageLeft] Left offset of overlay image
-     * @param {Number} [options.overlayImageTop] Top offset of overlay image
+     * @param {Number} [options.overlayImageLeft] {@link fabric.StaticCanvas#overlayImageLeft|Left offset} of overlay image
+     * @param {Number} [options.overlayImageTop] {@link fabric.StaticCanvas#overlayImageTop|Top offset} of overlay image
      * @return {fabric.Canvas} thisArg
      * @chainable
+     * @see {@link http://jsfiddle.net/fabricjs/MnzHT/|jsFiddle demo}
+     * @example <caption>Normal overlayImage</caption>
+     * canvas.setOverlayImage('http://fabricjs.com/assets/jail_cell_bars.png', canvas.renderAll.bind(canvas));
+     * @example <caption>Displaced overlayImage (left and top != 0)</caption>
+     * canvas.setOverlayImage('http://fabricjs.com/assets/jail_cell_bars.png', canvas.renderAll.bind(canvas), {
+     *   overlayImageLeft: 100,
+     *   overlayImageTop: 100
+     * });
      */
     setOverlayImage: function (url, callback, options) { // TODO (kangax): test callback
       fabric.util.loadImage(url, function(img) {
@@ -6781,14 +6797,22 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
     },
 
     /**
-     * Sets background image for this canvas
-     * @param {String} url url of an image to set background to
+     * Sets {@link fabric.StaticCanvas#backgroundImage|background image} for this canvas
+     * @param {String} url URL of an image to set background to
      * @param {Function} callback callback to invoke when image is loaded and set as background
      * @param {Object} [options] Optional options to set for the background image
-     * @param {Float} [options.backgroundImageOpacity] Opacity of the background image of the canvas instance
-     * @param {Boolean} [options.backgroundImageStretch] Indicates whether the background image should be stretched to fit the canvas
+     * @param {Float} [options.backgroundImageOpacity] {@link fabric.StaticCanvas#backgroundImageOpacity|Opacity} of the background image of the canvas instance
+     * @param {Boolean} [options.backgroundImageStretch] Indicates whether the background image should be {@link fabric.StaticCanvas#backgroundImageStretch|strechted} to fit the canvas
      * @return {fabric.Canvas} thisArg
      * @chainable
+     * @see {@link http://jsfiddle.net/fabricjs/YH9yD/|jsFiddle demo}
+     * @example <caption>Normal backgroundImage</caption>
+     * canvas.setBackgroundImage('http://fabricjs.com/assets/jail_cell_bars.png', canvas.renderAll.bind(canvas));
+     * @example <caption>Stretched backgroundImage with opacity</caption>
+     * canvas.setBackgroundImage('http://fabricjs.com/assets/jail_cell_bars.png', canvas.renderAll.bind(canvas), {
+     *   backgroundImageOpacity: 0.5,
+     *   backgroundImageStretch: true
+     * });
      */
     setBackgroundImage: function (url, callback, options) {
       fabric.util.loadImage(url, function(img) {
@@ -6806,11 +6830,18 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
     },
 
     /**
-     * Sets background color for this canvas
-     * @param {String|fabric.Pattern} backgroundColor Color of pattern to set background color to
+     * Sets {@link fabric.StaticCanvas#backgroundColor|background color} for this canvas
+     * @param {String|fabric.Pattern} backgroundColor Color or pattern to set background color to
      * @param {Function} callback callback to invoke when background color is set
      * @return {fabric.Canvas} thisArg
      * @chainable
+     * @see {@link http://jsfiddle.net/fabricjs/hXzvk/|jsFiddle demo}
+     * @example <caption>Normal backgroundColor - color value</caption>
+     * canvas.setBackgroundColor('rgba(255, 73, 64, 0.6)', canvas.renderAll.bind(canvas));
+     * @example <caption>fabric.Pattern used as backgroundColor</caption>
+     * canvas.setBackgroundColor({
+     *   source: 'http://fabricjs.com/assets/escheresque_ste.png'
+     * }, canvas.renderAll.bind(canvas));
      */
     setBackgroundColor: function(backgroundColor, callback) {
       if (backgroundColor.source) {
@@ -7351,7 +7382,24 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * @param {Number} [options.viewBox.width] Width of viewbox
      * @param {Number} [options.viewBox.height] Height of viewbox
      * @param {String} [options.encoding=UTF-8] Encoding of SVG output
-     * @return {String}
+     * @return {String} SVG string
+     * @tutorial {@link http://fabricjs.com/fabric-intro-part-3/#serialization}
+     * @see {@link http://jsfiddle.net/fabricjs/jQ3ZZ/|jsFiddle demo}
+     * @example <caption>Normal SVG output</caption>
+     * var svg = canvas.toSVG();
+     * @example <caption>SVG output without preamble (without &lt;?xml ../>)</caption>
+     * var svg = canvas.toSVG({suppressPreamble: true});
+     * @example <caption>SVG output with viewBox attribute</caption>
+     * var svg = canvas.toSVG({
+     *   viewBox: {
+     *     x: 100,
+     *     y: 100,
+     *     width: 200,
+     *     height: 300
+     *   }
+     * });
+     * @example <caption>SVG output with different encoding (default: UTF-8)</caption>
+     * var svg = canvas.toSVG({encoding: 'ISO-8859-1'});
      */
     toSVG: function(options) {
       options || (options = { });
@@ -7658,10 +7706,19 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
   });
 
   /**
-   * Returs JSON representation of canvas
+   * Returns JSON representation of canvas
    * @function
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-   * @return {String} json string
+   * @return {String} JSON string
+   * @tutorial {@link http://fabricjs.com/fabric-intro-part-3/#serialization}
+   * @see {@link http://jsfiddle.net/fabricjs/pec86/|jsFiddle demo}
+   * @example <caption>JSON without additional properties</caption>
+   * var json = canvas.toJSON();
+   * @example <caption>JSON with additional properties included</caption>
+   * var json = canvas.toJSON(['lockMovementX', 'lockMovementY', 'lockRotation', 'lockScalingX', 'lockScalingY', 'lockUniScaling']);
+   * @example <caption>JSON without default values</caption>
+   * canvas.includeDefaultValues = false;
+   * var json = canvas.toJSON();
    */
   fabric.StaticCanvas.prototype.toJSON = fabric.StaticCanvas.prototype.toObject;
 
@@ -7671,6 +7728,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
 /**
  * BaseBrush class
  * @class fabric.BaseBrush
+ * @see {@link http://fabricjs.com/freedrawing/|Freedrawing demo}
  */
 fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype */ {
 
@@ -8417,6 +8475,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
    * Canvas class
    * @class fabric.Canvas
    * @extends fabric.StaticCanvas
+   * @tutorial {@link http://fabricjs.com/fabric-intro-part-1/#canvas}
    *
    * @fires object:modified
    * @fires object:rotating
@@ -10261,8 +10320,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.StaticCanvas.prototype */ {
 
   /**
-   * Populates canvas with data from the specified dataless JSON
-   * JSON format must conform to the one of `fabric.Canvas#toDatalessJSON`
+   * Populates canvas with data from the specified dataless JSON.
+   * JSON format must conform to the one of {@link fabric.Canvas#toDatalessJSON}
    * @deprecated since 1.2.2
    * @param {String|Object} json JSON string or object
    * @param {Function} callback Callback, invoked when json is parsed
@@ -10271,14 +10330,15 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * @param {Function} [reviver] Method for further parsing of JSON elements, called after each fabric object created.
    * @return {fabric.Canvas} instance
    * @chainable
+   * @tutorial {@link http://fabricjs.com/fabric-intro-part-3/#deserialization}
    */
   loadFromDatalessJSON: function (json, callback, reviver) {
     return this.loadFromJSON(json, callback, reviver);
   },
 
   /**
-   * Populates canvas with data from the specified JSON
-   * JSON format must conform to the one of `fabric.Canvas#toJSON`
+   * Populates canvas with data from the specified JSON.
+   * JSON format must conform to the one of {@link fabric.Canvas#toJSON}
    * @param {String|Object} json JSON string or object
    * @param {Function} callback Callback, invoked when json is parsed
    *                            and corresponding objects (e.g: {@link fabric.Image})
@@ -10286,6 +10346,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * @param {Function} [reviver] Method for further parsing of JSON elements, called after each fabric object created.
    * @return {fabric.Canvas} instance
    * @chainable
+   * @tutorial {@link http://fabricjs.com/fabric-intro-part-3/#deserialization}
    * @see {@link http://jsfiddle.net/fabricjs/fmgXt/|jsFiddle demo}
    * @example <caption>loadFromJSON</caption>
    * canvas.loadFromJSON(json, canvas.renderAll.bind(canvas));
@@ -10485,6 +10546,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
   /**
    * Root object class from which all 2d shape classes inherit from
    * @class fabric.Object
+   * @tutorial {@link http://fabricjs.com/fabric-intro-part-1/#objects}
    *
    * @fires added
    * @fires removed
@@ -10501,14 +10563,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
   fabric.Object = fabric.util.createClass(/** @lends fabric.Object.prototype */ {
 
     /**
-     * Retrieves object's clipping function (if any)
+     * Retrieves object's {@link fabric.Object#clipTo|clipping function}
      * @method getClipTo
      * @memberOf fabric.Object.prototype
      * @return {Function}
      */
 
     /**
-     * Sets object's clipping function
+     * Sets object's {@link fabric.Object#clipTo|clipping function}
      * @method setClipTo
      * @memberOf fabric.Object.prototype
      * @param {Function} clipTo Clipping function
@@ -10517,14 +10579,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      */
 
     /**
-     * Retrieves object's transformMatrix
+     * Retrieves object's {@link fabric.Object#transformMatrix|transformMatrix}
      * @method getTransformMatrix
      * @memberOf fabric.Object.prototype
      * @return {Array} transformMatrix
      */
 
     /**
-     * Sets object's transformMatrix
+     * Sets object's {@link fabric.Object#transformMatrix|transformMatrix}
      * @method setTransformMatrix
      * @memberOf fabric.Object.prototype
      * @param {Array} transformMatrix
@@ -10533,14 +10595,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      */
 
     /**
-     * Retrieves object's visible state
+     * Retrieves object's {@link fabric.Object#visible|visible} state
      * @method getVisible
      * @memberOf fabric.Object.prototype
      * @return {Boolean} True if visible
      */
 
     /**
-     * Sets object's visible state
+     * Sets object's {@link fabric.Object#visible|visible} state
      * @method setVisible
      * @memberOf fabric.Object.prototype
      * @param {Boolean} value visible value
@@ -10549,28 +10611,21 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      */
 
     /**
-     * Retrieves object's stroke
-     * @method getStroke
-     * @memberOf fabric.Object.prototype
-     * @return {String} stroke value
-     */
-
-    /**
-     * Retrieves object's shadow
+     * Retrieves object's {@link fabric.Object#shadow|shadow}
      * @method getShadow
      * @memberOf fabric.Object.prototype
      * @return {Object} Shadow instance
      */
 
     /**
-     * Retrieves object's stroke
+     * Retrieves object's {@link fabric.Object#stroke|stroke}
      * @method getStroke
      * @memberOf fabric.Object.prototype
      * @return {String} stroke value
      */
 
     /**
-     * Sets object's stroke
+     * Sets object's {@link fabric.Object#stroke|stroke}
      * @method setStroke
      * @memberOf fabric.Object.prototype
      * @param {String} value stroke value
@@ -10579,14 +10634,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      */
 
     /**
-     * Retrieves object's strokeWidth
+     * Retrieves object's {@link fabric.Object#strokeWidth|strokeWidth}
      * @method getStrokeWidth
      * @memberOf fabric.Object.prototype
      * @return {Number} strokeWidth value
      */
 
     /**
-     * Sets object's strokeWidth
+     * Sets object's {@link fabric.Object#strokeWidth|strokeWidth}
      * @method setStrokeWidth
      * @memberOf fabric.Object.prototype
      * @param {Number} value strokeWidth value
@@ -10595,14 +10650,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      */
 
     /**
-     * Retrieves object's originX
+     * Retrieves object's {@link fabric.Object#originX|originX}
      * @method getOriginX
      * @memberOf fabric.Object.prototype
      * @return {String} originX value
      */
 
     /**
-     * Sets object's originX
+     * Sets object's {@link fabric.Object#originX|originX}
      * @method setOriginX
      * @memberOf fabric.Object.prototype
      * @param {String} value originX value
@@ -10611,14 +10666,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      */
 
     /**
-     * Retrieves object's originY
+     * Retrieves object's {@link fabric.Object#originY|originY}
      * @method getOriginY
      * @memberOf fabric.Object.prototype
      * @return {String} originY value
      */
 
     /**
-     * Sets object's originY
+     * Sets object's {@link fabric.Object#originY|originY}
      * @method setOriginY
      * @memberOf fabric.Object.prototype
      * @param {String} value originY value
@@ -10627,14 +10682,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      */
 
     /**
-     * Retrieves object's fill
+     * Retrieves object's {@link fabric.Object#fill|fill}
      * @method getFill
      * @memberOf fabric.Object.prototype
-     * @return {String} Fill value (0-1)
+     * @return {String} Fill value
      */
 
     /**
-     * Sets object's fill
+     * Sets object's {@link fabric.Object#fill|fill}
      * @method setFill
      * @memberOf fabric.Object.prototype
      * @param {String} value Fill value
@@ -10643,14 +10698,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      */
 
     /**
-     * Retrieves object's opacity
+     * Retrieves object's {@link fabric.Object#opacity|opacity}
      * @method getOpacity
      * @memberOf fabric.Object.prototype
      * @return {Number} Opacity value (0-1)
      */
 
     /**
-     * Sets object's opacity
+     * Sets object's {@link fabric.Object#opacity|opacity}
      * @method setOpacity
      * @memberOf fabric.Object.prototype
      * @param {Number} value Opacity value (0-1)
@@ -10659,14 +10714,30 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      */
 
     /**
-     * Retrieves object's top position
+     * Retrieves object's {@link fabric.Object#angle|angle} (in degrees)
+     * @method getAngle
+     * @memberOf fabric.Object.prototype
+     * @return {Number}
+     */
+
+    /**
+     * Sets object's {@link fabric.Object#angle|angle}
+     * @method setAngle
+     * @memberOf fabric.Object.prototype
+     * @param {Number} value Angle value (in degrees)
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+
+    /**
+     * Retrieves object's {@link fabric.Object#top|top position}
      * @method getTop
      * @memberOf fabric.Object.prototype
      * @return {Number} Top value (in pixels)
      */
 
     /**
-     * Sets object's top position
+     * Sets object's {@link fabric.Object#top|top position}
      * @method setTop
      * @memberOf fabric.Object.prototype
      * @param {Number} value Top value (in pixels)
@@ -10675,14 +10746,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      */
 
     /**
-     * Retrieves object's left position
+     * Retrieves object's {@link fabric.Object#left|left position}
      * @method getLeft
      * @memberOf fabric.Object.prototype
      * @return {Number} Left value (in pixels)
      */
 
     /**
-     * Sets object's left position
+     * Sets object's {@link fabric.Object#left|left position}
      * @method setLeft
      * @memberOf fabric.Object.prototype
      * @param {Number} value Left value (in pixels)
@@ -10691,14 +10762,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      */
 
     /**
-     * Retrieves object's scaleX value
+     * Retrieves object's {@link fabric.Object#scaleX|scaleX} value
      * @method getScaleX
      * @memberOf fabric.Object.prototype
      * @return {Number} scaleX value
      */
 
     /**
-     * Sets object's scaleX value
+     * Sets object's {@link fabric.Object#scaleX|scaleX} value
      * @method setScaleX
      * @memberOf fabric.Object.prototype
      * @param {Number} value scaleX value
@@ -10707,14 +10778,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      */
 
     /**
-     * Retrieves object's scaleY value
+     * Retrieves object's {@link fabric.Object#scaleY|scaleY} value
      * @method getScaleY
      * @memberOf fabric.Object.prototype
      * @return {Number} scaleY value
      */
 
     /**
-     * Sets object's scaleY value
+     * Sets object's {@link fabric.Object#scaleY|scaleY} value
      * @method setScaleY
      * @memberOf fabric.Object.prototype
      * @param {Number} value scaleY value
@@ -10723,14 +10794,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      */
 
     /**
-     * Retrieves object's flipX value
+     * Retrieves object's {@link fabric.Object#flipX|flipX} value
      * @method getFlipX
      * @memberOf fabric.Object.prototype
      * @return {Boolean} flipX value
      */
 
     /**
-     * Sets object's flipX value
+     * Sets object's {@link fabric.Object#flipX|flipX} value
      * @method setFlipX
      * @memberOf fabric.Object.prototype
      * @param {Boolean} value flipX value
@@ -10739,14 +10810,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      */
 
     /**
-     * Retrieves object's flipY value
+     * Retrieves object's {@link fabric.Object#flipY|flipY} value
      * @method getFlipY
      * @memberOf fabric.Object.prototype
      * @return {Boolean} flipY value
      */
 
     /**
-     * Sets object's flipY value
+     * Sets object's {@link fabric.Object#flipY|flipY} value
      * @method setFlipY
      * @memberOf fabric.Object.prototype
      * @param {Boolean} value flipY value
@@ -11792,7 +11863,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     },
 
     /**
-     * Sets shadow of an object
+     * Sets {@link fabric.Object#shadow|shadow} of an object
      * @param {Object|String} [options] Options object or string (e.g. "2px 2px 10px rgba(0,0,0,0.2)")
      * @param {String} [options.color=rgb(0,0,0)] Shadow color
      * @param {Number} [options.blur=0] Shadow blur
@@ -13187,6 +13258,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @param {String|Object} property to animate (if string) or properties to animate (if object)
    * @param {Number|Object} value to animate property to (if string was given first) or options object
    * @return {fabric.Object} thisArg
+   * @tutorial {@link http://fabricjs.com/fabric-intro-part-2/#animation}
    * @chainable
    *
    * As object — multiple properties
@@ -14733,6 +14805,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * Path class
    * @class fabric.Path
    * @extends fabric.Object
+   * @tutorial {@link http://fabricjs.com/fabric-intro-part-1/#path_and_pathgroup}
    */
   fabric.Path = fabric.util.createClass(fabric.Object, /** @lends fabric.Path.prototype */ {
 
@@ -15428,6 +15501,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * Path group class
    * @class fabric.PathGroup
    * @extends fabric.Path
+   * @tutorial {@link http://fabricjs.com/fabric-intro-part-1/#path_and_pathgroup}
    */
   fabric.PathGroup = fabric.util.createClass(fabric.Path, /** @lends fabric.PathGroup.prototype */ {
 
@@ -15687,6 +15761,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @class fabric.Group
    * @extends fabric.Object
    * @mixes fabric.Collection
+   * @tutorial {@link http://fabricjs.com/fabric-intro-part-3/#groups}
    */
   fabric.Group = fabric.util.createClass(fabric.Object, fabric.Collection, /** @lends fabric.Group.prototype */ {
 
@@ -16171,6 +16246,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * Image class
    * @class fabric.Image
    * @extends fabric.Object
+   * @tutorial {@link http://fabricjs.com/fabric-intro-part-1/#images}
    */
   fabric.Image = fabric.util.createClass(fabric.Object, /** @lends fabric.Image.prototype */ {
 
@@ -16743,6 +16819,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 /**
  * @namespace fabric.Image.filters
  * @memberOf fabric.Image
+ * @tutorial {@link http://fabricjs.com/fabric-intro-part-2/#image_filters}
+ * @see {@link http://fabricjs.com/image-filters/|ImageFilters demo}
  */
 fabric.Image.filters = fabric.Image.filters || { };
 
@@ -17814,6 +17892,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
    * @class fabric.Text
    * @extends fabric.Object
    * @return {fabric.Text} thisArg
+   * @tutorial {@link http://fabricjs.com/fabric-intro-part-2/#text}
    */
   fabric.Text = fabric.util.createClass(fabric.Object, /** @lends fabric.Text.prototype */ {
 
@@ -18507,22 +18586,20 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 
           ctx.fillRect(
             _this._getLeftOffset() + lineLeftOffset,
-            (offset + (i * _this._getHeightOfLine(ctx, i, textLines))) - halfOfVerticalBox,
+            ~~((offset + (i * _this._getHeightOfLine(ctx, i, textLines))) - halfOfVerticalBox),
             lineWidth,
             1);
         }
       }
 
-      var fractionOfFontSize = this.fontSize / 4;
-
       if (this.textDecoration.indexOf('underline') > -1) {
         renderLinesAtOffset(this.fontSize * this.lineHeight);
       }
       if (this.textDecoration.indexOf('line-through') > -1) {
-        renderLinesAtOffset(this.fontSize * this.lineHeight - fractionOfFontSize);
+        renderLinesAtOffset(this.fontSize * this.lineHeight - this.fontSize / 2);
       }
       if (this.textDecoration.indexOf('overline') > -1) {
-        renderLinesAtOffset(fractionOfFontSize);
+        renderLinesAtOffset(this.fontSize * this.lineHeight - this.fontSize);
       }
     },
 
@@ -18563,7 +18640,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @return {Object} Object representation of an instance
      */
     toObject: function(propertiesToInclude) {
-      return extend(this.callSuper('toObject', propertiesToInclude), {
+      var object = extend(this.callSuper('toObject', propertiesToInclude), {
         text:                 this.text,
         fontSize:             this.fontSize,
         fontWeight:           this.fontWeight,
@@ -18576,6 +18653,10 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
         textBackgroundColor:  this.textBackgroundColor,
         useNative:            this.useNative
       });
+      if (!this.includeDefaultValues) {
+        this._removeDefaultValues(object);
+      }
+      return object;
     },
 
     /* _TO_SVG_START_ */
