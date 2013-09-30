@@ -727,22 +727,20 @@
 
           ctx.fillRect(
             _this._getLeftOffset() + lineLeftOffset,
-            (offset + (i * _this._getHeightOfLine(ctx, i, textLines))) - halfOfVerticalBox,
+            ~~((offset + (i * _this._getHeightOfLine(ctx, i, textLines))) - halfOfVerticalBox),
             lineWidth,
             1);
         }
       }
 
-      var fractionOfFontSize = this.fontSize / 4;
-
       if (this.textDecoration.indexOf('underline') > -1) {
         renderLinesAtOffset(this.fontSize * this.lineHeight);
       }
       if (this.textDecoration.indexOf('line-through') > -1) {
-        renderLinesAtOffset(this.fontSize * this.lineHeight - fractionOfFontSize);
+        renderLinesAtOffset(this.fontSize * this.lineHeight - this.fontSize / 2);
       }
       if (this.textDecoration.indexOf('overline') > -1) {
-        renderLinesAtOffset(fractionOfFontSize);
+        renderLinesAtOffset(this.fontSize * this.lineHeight - this.fontSize);
       }
     },
 
