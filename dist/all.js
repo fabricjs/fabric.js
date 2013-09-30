@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures` */
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.3.5" };
+var fabric = fabric || { version: "1.3.6" };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -12243,22 +12243,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @private
      */
     _getLeftTopCoords: function() {
-      var angle = degreesToRadians(this.angle);
-
-      var hypotHalf = this.getWidth() / 2;
-      var xHalf = Math.cos(angle) * hypotHalf;
-      var yHalf = Math.sin(angle) * hypotHalf;
-      var x = this.left;
-      var y = this.top;
-
-      if (this.originX === 'center' || this.originX === 'right') {
-        x -= xHalf;
-      }
-      if (this.originY === 'center' || this.originY === 'bottom') {
-        y -= yHalf;
-      }
-
-      return { x: x, y: y };
+      return this.translateToOriginPoint(this.getCenterPoint(), 'left', 'center');
     }
   });
 
@@ -18400,16 +18385,6 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @return {Number} Top offset
      */
     _getTopOffset: function() {
-      if (fabric.isLikelyNode) {
-        if (this.originY === 'center') {
-          return -this.height / 2;
-        }
-        else if (this.originY === 'bottom') {
-          return -this.height;
-        }
-        return 0;
-      }
-      // in browser, text drawing always starts at vertical center
       return -this.height / 2;
     },
 
