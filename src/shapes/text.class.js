@@ -529,7 +529,7 @@
      * @return {Number} Left offset
      */
     _getLeftOffset: function() {
-      if (fabric.isLikelyNode && (this.originX === 'left' || this.originX === 'center')) {
+      if (fabric.isLikelyNode) {
         return 0;
       }
       return -this.width / 2;
