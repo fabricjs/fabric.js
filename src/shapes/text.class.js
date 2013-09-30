@@ -783,7 +783,7 @@
      * @return {Object} Object representation of an instance
      */
     toObject: function(propertiesToInclude) {
-      return extend(this.callSuper('toObject', propertiesToInclude), {
+      var object = extend(this.callSuper('toObject', propertiesToInclude), {
         text:                 this.text,
         fontSize:             this.fontSize,
         fontWeight:           this.fontWeight,
@@ -796,6 +796,10 @@
         textBackgroundColor:  this.textBackgroundColor,
         useNative:            this.useNative
       });
+      if (!this.includeDefaultValues) {
+        this._removeDefaultValues(object);
+      }
+      return object;
     },
 
     /* _TO_SVG_START_ */
