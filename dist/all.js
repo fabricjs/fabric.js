@@ -2010,16 +2010,6 @@ fabric.Collection = {
       memo += current.complexity ? current.complexity() : 0;
       return memo;
     }, 0);
-  },
-
-  /**
-   * Makes all of the collection objects grayscale (i.e. calling `toGrayscale` on them)
-   * @return {Self} thisArg
-   */
-  toGrayscale: function() {
-    return this.forEachObject(function(obj) {
-      obj.toGrayscale();
-    });
   }
 };
 
@@ -7382,6 +7372,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * @param {Number} [options.viewBox.width] Width of viewbox
      * @param {Number} [options.viewBox.height] Height of viewbox
      * @param {String} [options.encoding=UTF-8] Encoding of SVG output
+     * @param {Function} [reviver] Method for further parsing of svg elements, called after each fabric object converted into svg representation.
      * @return {String} SVG string
      * @tutorial {@link http://fabricjs.com/fabric-intro-part-3/#serialization}
      * @see {@link http://jsfiddle.net/fabricjs/jQ3ZZ/|jsFiddle demo}
@@ -7400,8 +7391,12 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * });
      * @example <caption>SVG output with different encoding (default: UTF-8)</caption>
      * var svg = canvas.toSVG({encoding: 'ISO-8859-1'});
+     * @example <caption>Modify SVG output with reviver function</caption>
+     * var svg = canvas.toSVG(null, function(svg) {
+     *   return svg.replace('stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; ', '');
+     * });
      */
-    toSVG: function(options) {
+    toSVG: function(options, reviver) {
       options || (options = { });
       var markup = [];
 
@@ -7464,7 +7459,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
         this.discardActiveGroup();
       }
       for (var i = 0, objects = this.getObjects(), len = objects.length; i < len; i++) {
-        markup.push(objects[i].toSVG());
+        markup.push(objects[i].toSVG(reviver));
       }
       if (activeGroup) {
         this.setActiveGroup(new fabric.Group(activeGroup.getObjects()));
@@ -13509,9 +13504,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     /* _TO_SVG_START_ */
     /**
      * Returns SVG representation of an instance
+     * @param {Function} [reviver] Method for further parsing of svg representation.
      * @return {String} svg representation of an instance
      */
-    toSVG: function() {
+    toSVG: function(reviver) {
       var markup = this._createBaseSVGMarkup();
 
       markup.push(
@@ -13524,7 +13520,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         '"/>'
       );
 
-      return markup.join('');
+      return reviver ? reviver(markup.join('')) : markup.join('');
     },
     /* _TO_SVG_END_ */
 
@@ -13650,9 +13646,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     /* _TO_SVG_START_ */
     /**
      * Returns svg representation of an instance
+     * @param {Function} [reviver] Method for further parsing of svg representation.
      * @return {String} svg representation of an instance
      */
-    toSVG: function() {
+    toSVG: function(reviver) {
       var markup = this._createBaseSVGMarkup();
 
       markup.push(
@@ -13664,7 +13661,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         '"/>'
       );
 
-      return markup.join('');
+      return reviver ? reviver(markup.join('')) : markup.join('');
     },
     /* _TO_SVG_END_ */
 
@@ -13853,9 +13850,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     /* _TO_SVG_START_ */
     /**
      * Returns SVG representation of an instance
+     * @param {Function} [reviver] Method for further parsing of svg representation.
      * @return {String} svg representation of an instance
      */
-    toSVG: function() {
+    toSVG: function(reviver) {
       var markup = this._createBaseSVGMarkup(),
           widthBy2 = this.width / 2,
           heightBy2 = this.height / 2;
@@ -13874,7 +13872,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         '"/>'
       );
 
-      return markup.join('');
+      return reviver ? reviver(markup.join('')) : markup.join('');
     },
     /* _TO_SVG_END_ */
 
@@ -13975,9 +13973,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     /* _TO_SVG_START_ */
     /**
      * Returns svg representation of an instance
+     * @param {Function} [reviver] Method for further parsing of svg representation.
      * @return {String} svg representation of an instance
      */
-    toSVG: function() {
+    toSVG: function(reviver) {
       var markup = this._createBaseSVGMarkup();
 
       markup.push(
@@ -13989,7 +13988,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         '"/>'
       );
 
-      return markup.join('');
+      return reviver ? reviver(markup.join('')) : markup.join('');
     },
     /* _TO_SVG_END_ */
 
@@ -14282,9 +14281,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     /* _TO_SVG_START_ */
     /**
      * Returns svg representation of an instance
+     * @param {Function} [reviver] Method for further parsing of svg representation.
      * @return {String} svg representation of an instance
      */
-    toSVG: function() {
+    toSVG: function(reviver) {
       var markup = this._createBaseSVGMarkup();
 
       markup.push(
@@ -14297,7 +14297,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         '"/>'
       );
 
-      return markup.join('');
+      return reviver ? reviver(markup.join('')) : markup.join('');
     },
     /* _TO_SVG_END_ */
 
@@ -14426,9 +14426,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     /* _TO_SVG_START_ */
     /**
      * Returns SVG representation of an instance
+     * @param {Function} [reviver] Method for further parsing of svg representation.
      * @return {String} svg representation of an instance
      */
-    toSVG: function() {
+    toSVG: function(reviver) {
       var points = [],
           markup = this._createBaseSVGMarkup();
 
@@ -14444,7 +14445,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         '"/>'
       );
 
-      return markup.join('');
+      return reviver ? reviver(markup.join('')) : markup.join('');
     },
     /* _TO_SVG_END_ */
 
@@ -14632,9 +14633,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     /* _TO_SVG_START_ */
     /**
      * Returns svg representation of an instance
+     * @param {Function} [reviver] Method for further parsing of svg representation.
      * @return {String} svg representation of an instance
      */
-    toSVG: function() {
+    toSVG: function(reviver) {
       var points = [],
           markup = this._createBaseSVGMarkup();
 
@@ -14650,7 +14652,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         '"/>'
       );
 
-      return markup.join('');
+      return reviver ? reviver(markup.join('')) : markup.join('');
     },
     /* _TO_SVG_END_ */
 
@@ -15272,9 +15274,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     /* _TO_SVG_START_ */
     /**
      * Returns svg representation of an instance
+     * @param {Function} [reviver] Method for further parsing of svg representation.
      * @return {String} svg representation of an instance
      */
-    toSVG: function() {
+    toSVG: function(reviver) {
       var chunks = [],
           markup = this._createBaseSVGMarkup();
 
@@ -15294,7 +15297,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         '</g>'
       );
 
-      return markup.join('');
+      return reviver ? reviver(markup.join('')) : markup.join('');
     },
     /* _TO_SVG_END_ */
 
@@ -15594,19 +15597,22 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
     /**
      * Returns object representation of this path group
-     * @param {Array} [propertiesToInclude]
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
-      return extend(parentToObject.call(this, propertiesToInclude), {
-        paths: invoke(this.getObjects(), 'toObject', propertiesToInclude),
-        sourcePath: this.sourcePath
+      var o = extend(parentToObject.call(this, propertiesToInclude), {
+        paths: invoke(this.getObjects(), 'toObject', propertiesToInclude)
       });
+      if (this.sourcePath) {
+        o.sourcePath = this.sourcePath;
+      }
+      return o;
     },
 
     /**
      * Returns dataless object representation of this path group
-     * @param {Array} [propertiesToInclude]
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} dataless object representation of an instance
      */
     toDatalessObject: function(propertiesToInclude) {
@@ -15620,9 +15626,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     /* _TO_SVG_START_ */
     /**
      * Returns svg representation of an instance
+     * @param {Function} [reviver] Method for further parsing of svg representation.
      * @return {String} svg representation of an instance
      */
-    toSVG: function() {
+    toSVG: function(reviver) {
       var objects = this.getObjects();
       var markup = [
         '<g ',
@@ -15632,11 +15639,11 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       ];
 
       for (var i = 0, len = objects.length; i < len; i++) {
-        markup.push(objects[i].toSVG());
+        markup.push(objects[i].toSVG(reviver));
       }
       markup.push('</g>');
 
-      return markup.join('');
+      return reviver ? reviver(markup.join('')) : markup.join('');
     },
     /* _TO_SVG_END_ */
 
@@ -15671,18 +15678,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     },
 
     /**
-      * Makes path group grayscale
-      * @return {fabric.PathGroup} thisArg
-      */
-    toGrayscale: function() {
-      var i = this.paths.length;
-      while (i--) {
-        this.paths[i].toGrayscale();
-      }
-      return this;
-    },
-
-    /**
      * Returns all paths in this path group
      * @return {Array} array of path objects included in this path group
      */
@@ -15695,7 +15690,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * Creates fabric.PathGroup instance from an object representation
    * @static
    * @memberOf fabric.PathGroup
-   * @param {Object} object
+   * @param {Object} object Object to create an instance from
    * @param {Function} callback Callback to invoke when an fabric.PathGroup instance is created
    */
   fabric.PathGroup.fromObject = function(object, callback) {
@@ -16157,18 +16152,23 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     /* _TO_SVG_START_ */
     /**
      * Returns svg representation of an instance
+     * @param {Function} [reviver] Method for further parsing of svg representation.
      * @return {String} svg representation of an instance
      */
-    toSVG: function() {
-      var objectsMarkup = [ ];
+    toSVG: function(reviver) {
+      var markup = [
+        '<g ',
+          'transform="', this.getSvgTransform(),
+        '">'
+      ];
+
       for (var i = 0, len = this._objects.length; i < len; i++) {
-        objectsMarkup.push(this._objects[i].toSVG());
+        markup.push(this._objects[i].toSVG(reviver));
       }
 
-      return (
-        '<g transform="' + this.getSvgTransform() + '">' +
-          objectsMarkup.join('') +
-        '</g>');
+      markup.push('</g>');
+
+      return reviver ? reviver(markup.join('')) : markup.join('');
     },
     /* _TO_SVG_END_ */
 
@@ -16426,9 +16426,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     /* _TO_SVG_START_ */
     /**
      * Returns SVG representation of an instance
+     * @param {Function} [reviver] Method for further parsing of svg representation.
      * @return {String} svg representation of an instance
      */
-    toSVG: function() {
+    toSVG: function(reviver) {
       var markup = [];
 
       markup.push(
@@ -16459,7 +16460,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       markup.push('</g>');
 
-      return markup.join('');
+      return reviver ? reviver(markup.join('')) : markup.join('');
     },
     /* _TO_SVG_END_ */
 
@@ -18662,10 +18663,12 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     /* _TO_SVG_START_ */
     /**
      * Returns SVG representation of an instance
+     * @param {Function} [reviver] Method for further parsing of svg representation.
      * @return {String} svg representation of an instance
      */
-    toSVG: function() {
-      var textLines = this.text.split(/\r?\n/),
+    toSVG: function(reviver) {
+      var markup = [ ],
+          textLines = this.text.split(/\r?\n/),
           lineTopOffset = this.useNative
             ? this.fontSize * this.lineHeight
             : (-this._fontAscent - ((this._fontAscent / 5) * this.lineHeight)),
@@ -18681,7 +18684,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       // move top offset by an ascent
       textTopOffset += (this._fontAscent ? ((this._fontAscent / 5) * this.lineHeight) : 0);
 
-      return [
+      markup.push(
         '<g transform="', this.getSvgTransform(), '">',
           textAndBg.textBgRects.join(''),
           '<text ',
@@ -18697,7 +18700,9 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
             textAndBg.textSpans.join(''),
           '</text>',
         '</g>'
-      ].join('');
+      );
+
+      return reviver ? reviver(markup.join('')) : markup.join('');
     },
 
     /**
