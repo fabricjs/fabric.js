@@ -195,22 +195,7 @@
      * @private
      */
     _getLeftTopCoords: function() {
-      var angle = degreesToRadians(this.angle);
-
-      var hypotHalf = this.getWidth() / 2;
-      var xHalf = Math.cos(angle) * hypotHalf;
-      var yHalf = Math.sin(angle) * hypotHalf;
-      var x = this.left;
-      var y = this.top;
-
-      if (this.originX === 'center' || this.originX === 'right') {
-        x -= xHalf;
-      }
-      if (this.originY === 'center' || this.originY === 'bottom') {
-        y -= yHalf;
-      }
-
-      return { x: x, y: y };
+      return this.translateToOriginPoint(this.getCenterPoint(), 'left', 'center');
     }
   });
 
