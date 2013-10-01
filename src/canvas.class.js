@@ -347,7 +347,7 @@
         activeGroup !== target &&
         !e.shiftKey) || (
         target &&
-        !target.evented)
+        (!target.evented || !target.selectable))
       );
     },
 

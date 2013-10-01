@@ -8803,7 +8803,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         activeGroup !== target &&
         !e.shiftKey) || (
         target &&
-        !target.evented)
+        (!target.evented || !target.selectable))
       );
     },
 
