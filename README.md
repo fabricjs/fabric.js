@@ -19,7 +19,7 @@ Using Fabric.js, you can create and populate objects on canvas; objects like sim
 - Encapsulated in one object
 - No browser sniffing for critical functionality
 - Runs under ES5 strict mode
-- Runs on a server under [Node.js](http://nodejs.org/) (0.6, 0.8, 0.10)
+- Runs on a server under [Node.js](http://nodejs.org/) (0.6, 0.8, 0.10) (see [Node.js limitations](https://github.com/kangax/fabric.js/wiki/Fabric-limitations-in-node.js))
 
 ### Supported browsers
 
