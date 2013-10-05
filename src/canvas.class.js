@@ -15,6 +15,7 @@
    * @class fabric.Canvas
    * @extends fabric.StaticCanvas
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-1/#canvas}
+   * @see {@link fabric.Canvas#initialize} for constructor definition
    *
    * @fires object:modified
    * @fires object:rotating
