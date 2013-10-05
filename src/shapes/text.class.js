@@ -439,7 +439,9 @@
           : this.stroke;
       }
       ctx.textBaseline = 'alphabetic';
-      ctx.textAlign = this.textAlign;
+      if (!this.skipTextAlign) {
+        ctx.textAlign = this.textAlign;
+      }
       ctx.font = this._getFontDeclaration();
     },
 
