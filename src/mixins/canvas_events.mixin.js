@@ -527,19 +527,6 @@
       target && target.fire('mousemove', { e: e });
     },
 
-<<<<<<< Updated upstream
-=======
-    /**
-     * Method that defines actions when a wheel event is detected.
-     *
-     * @param e Event object by Event.js
-     * @param self Event proxy object by Event.js
-     */
-    __onMouseWheel: function(e, self) {
-      this.fire('mouse:wheel', {e: e, self: self});
-    },
-
->>>>>>> Stashed changes
     /**
      * Sets the cursor depending on where the canvas is being hovered.
      * Note: very buggy in Opera
