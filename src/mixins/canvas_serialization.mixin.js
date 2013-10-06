@@ -170,9 +170,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
   /**
    * Clones canvas instance
    * @param {Object} [callback] Receives cloned instance as a first argument
+   * @param {Array} [properties] Array of properties to include in the cloned canvas and children
    */
-  clone: function (callback) {
-    var data = JSON.stringify(this);
+  clone: function (callback, properties) {
+    var data = JSON.stringify(this.toJSON(properties));
     this.cloneWithoutData(function(clone) {
       clone.loadFromJSON(data, function() {
         callback && callback(clone);
