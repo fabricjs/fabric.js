@@ -7,6 +7,7 @@
 
   /**
    * Mask filter class
+   * See http://resources.aleph-1.com/mask/
    * @class fabric.Image.filters.Mask
    * @memberOf fabric.Image.filters
    * @extends fabric.Image.filters.BaseFilter
@@ -24,6 +25,8 @@
      * Constructor
      * @memberOf fabric.Image.filters.Mask.prototype
      * @param {Object} [options] Options object
+     * @param {fabric.Image} [options.mask] Mask image object
+     * @param {Number} [options.channel=0] Rgb channel (0, 1, 2 or 3)
      */
     initialize: function(options) {
       options = options || { };

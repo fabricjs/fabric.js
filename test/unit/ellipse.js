@@ -30,7 +30,6 @@
       'width':              0,
       'height':             0,
       'fill':               'rgb(0,0,0)',
-      'overlayFill':        null,
       'stroke':             null,
       'strokeWidth':        1,
       'strokeDashArray':    null,
@@ -45,14 +44,9 @@
       'opacity':            1,
       'rx':                 0,
       'ry':                 0,
-      'selectable':         true,
-      'hasControls':        true,
-      'hasBorders':         true,
-      'hasRotatingPoint':   true,
-      'transparentCorners': true,
-      'perPixelTargetFind': false,
       'shadow':             null,
       'visible':            true,
+      'backgroundColor':    '',
       'clipTo':             null
     };
     ok(typeof ellipse.toObject == 'function');

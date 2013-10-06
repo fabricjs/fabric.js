@@ -18,8 +18,14 @@
   /**
    * Static canvas class
    * @class fabric.StaticCanvas
-   * @extends fabric.Collection
-   * @extends fabric.Observable
+   * @mixes fabric.Collection
+   * @mixes fabric.Observable
+   * @see {@link http://fabricjs.com/static_canvas/|StaticCanvas demo}
+   * @fires before:render
+   * @fires after:render
+   * @fires canvas:cleared
+   * @fires object:added
+   * @fires object:removed
    */
   fabric.StaticCanvas = fabric.util.createClass(/** @lends fabric.StaticCanvas.prototype */ {
 
@@ -176,12 +182,22 @@
     },
 
     /**
-     * Sets overlay image for this canvas
+     * Sets {@link fabric.StaticCanvas#overlayImage|overlay image} for this canvas
      * @param {String} url url of an image to set overlay to
      * @param {Function} callback callback to invoke when image is loaded and set as an overlay
-     * @param {Object} [options] optional options to set for the overlay image
+     * @param {Object} [options] Optional options to set for the overlay image
+     * @param {Number} [options.overlayImageLeft] {@link fabric.StaticCanvas#overlayImageLeft|Left offset} of overlay image
+     * @param {Number} [options.overlayImageTop] {@link fabric.StaticCanvas#overlayImageTop|Top offset} of overlay image
      * @return {fabric.Canvas} thisArg
      * @chainable
+     * @see {@link http://jsfiddle.net/fabricjs/MnzHT/|jsFiddle demo}
+     * @example <caption>Normal overlayImage</caption>
+     * canvas.setOverlayImage('http://fabricjs.com/assets/jail_cell_bars.png', canvas.renderAll.bind(canvas));
+     * @example <caption>Displaced overlayImage (left and top != 0)</caption>
+     * canvas.setOverlayImage('http://fabricjs.com/assets/jail_cell_bars.png', canvas.renderAll.bind(canvas), {
+     *   overlayImageLeft: 100,
+     *   overlayImageTop: 100
+     * });
      */
     setOverlayImage: function (url, callback, options) { // TODO (kangax): test callback
       fabric.util.loadImage(url, function(img) {
@@ -199,12 +215,22 @@
     },
 
     /**
-     * Sets background image for this canvas
-     * @param {String} url url of an image to set background to
+     * Sets {@link fabric.StaticCanvas#backgroundImage|background image} for this canvas
+     * @param {String} url URL of an image to set background to
      * @param {Function} callback callback to invoke when image is loaded and set as background
-     * @param {Object} [options] optional options to set for the background image
+     * @param {Object} [options] Optional options to set for the background image
+     * @param {Float} [options.backgroundImageOpacity] {@link fabric.StaticCanvas#backgroundImageOpacity|Opacity} of the background image of the canvas instance
+     * @param {Boolean} [options.backgroundImageStretch] Indicates whether the background image should be {@link fabric.StaticCanvas#backgroundImageStretch|strechted} to fit the canvas
      * @return {fabric.Canvas} thisArg
      * @chainable
+     * @see {@link http://jsfiddle.net/fabricjs/YH9yD/|jsFiddle demo}
+     * @example <caption>Normal backgroundImage</caption>
+     * canvas.setBackgroundImage('http://fabricjs.com/assets/jail_cell_bars.png', canvas.renderAll.bind(canvas));
+     * @example <caption>Stretched backgroundImage with opacity</caption>
+     * canvas.setBackgroundImage('http://fabricjs.com/assets/jail_cell_bars.png', canvas.renderAll.bind(canvas), {
+     *   backgroundImageOpacity: 0.5,
+     *   backgroundImageStretch: true
+     * });
      */
     setBackgroundImage: function (url, callback, options) {
       fabric.util.loadImage(url, function(img) {
@@ -222,11 +248,18 @@
     },
 
     /**
-     * Sets background color for this canvas
-     * @param {String|fabric.Pattern} Color of pattern to set background color to
+     * Sets {@link fabric.StaticCanvas#backgroundColor|background color} for this canvas
+     * @param {String|fabric.Pattern} backgroundColor Color or pattern to set background color to
      * @param {Function} callback callback to invoke when background color is set
      * @return {fabric.Canvas} thisArg
      * @chainable
+     * @see {@link http://jsfiddle.net/fabricjs/hXzvk/|jsFiddle demo}
+     * @example <caption>Normal backgroundColor - color value</caption>
+     * canvas.setBackgroundColor('rgba(255, 73, 64, 0.6)', canvas.renderAll.bind(canvas));
+     * @example <caption>fabric.Pattern used as backgroundColor</caption>
+     * canvas.setBackgroundColor({
+     *   source: 'http://fabricjs.com/assets/escheresque_ste.png'
+     * }, canvas.renderAll.bind(canvas));
      */
     setBackgroundColor: function(backgroundColor, callback) {
       if (backgroundColor.source) {
@@ -349,6 +382,8 @@
     /**
      * Sets dimensions (width, height) of this canvas instance
      * @param {Object} dimensions Object with width/height properties
+     * @param {Number} [dimensions.width] Width of canvas element
+     * @param {Number} [dimensions.height] Height of canvas element
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
@@ -418,8 +453,8 @@
 
     /**
      * Given a context, renders an object on that context
-     * @param ctx {Object} context to render object on
-     * @param object {Object} object to render
+     * @param {CanvasRenderingContext2D} ctx Context to render object on
+     * @param {fabric.Object} object Object to render
      * @private
      */
     _draw: function (ctx, object) {
@@ -439,6 +474,7 @@
 
     /**
      * @private
+     * @param {fabric.Object} obj Object that was added
      */
     _onObjectAdded: function(obj) {
       this.stateful && obj.setupState();
@@ -450,6 +486,7 @@
 
     /**
      * @private
+     * @param {fabric.Object} obj Object that was removed
      */
     _onObjectRemoved: function(obj) {
       this.fire('object:removed', { target: obj });
@@ -466,7 +503,7 @@
 
     /**
      * Clears specified context of canvas element
-     * @param context {Object} ctx context to clear
+     * @param {CanvasRenderingContext2D} ctx Context to clear
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
@@ -507,7 +544,7 @@
 
     /**
      * Renders both the top canvas and the secondary container canvas.
-     * @param allOnTop {Boolean} optional Whether we want to force all images to be rendered on the top canvas
+     * @param {Boolean} [allOnTop] Whether we want to force all images to be rendered on the top canvas
      * @return {fabric.Canvas} instance
      * @chainable
      */
@@ -585,6 +622,7 @@
 
     /**
      * @private
+     * @param {CanvasRenderingContext2D} canvasToDrawOn Context to render on
      */
     _drawBackroundImage: function(canvasToDrawOn) {
       canvasToDrawOn.save();
@@ -680,7 +718,7 @@
 
     /**
      * Returs dataless JSON representation of canvas
-     * @param {Array} propertiesToInclude Any properties that you might want to additionally include in the output
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {String} json string
      */
     toDatalessJSON: function (propertiesToInclude) {
@@ -689,7 +727,7 @@
 
     /**
      * Returns object representation of canvas
-     * @param {Array} propertiesToInclude Any properties that you might want to additionally include in the output
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} object representation of an instance
      */
     toObject: function (propertiesToInclude) {
@@ -698,7 +736,7 @@
 
     /**
      * Returns dataless object representation of canvas
-     * @param {Array} propertiesToInclude Any properties that you might want to additionally include in the output
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} object representation of an instance
      */
     toDatalessObject: function (propertiesToInclude) {
@@ -754,11 +792,39 @@
     /**
      * Returns SVG representation of canvas
      * @function
-     * @param {Object} [options] Options for SVG output (suppressPreamble: true/false (if true xml tag is not included),
-     * viewBox: {x, y, width, height} to define the svg output viewBox), encoding default: UTF-8
-     * @return {String}
+     * @param {Object} [options] Options object for SVG output
+     * @param {Boolean} [options.suppressPreamble=false] If true xml tag is not included
+     * @param {Object} [options.viewBox] SVG viewbox object
+     * @param {Number} [options.viewBox.x] x-cooridnate of viewbox
+     * @param {Number} [options.viewBox.y] y-coordinate of viewbox
+     * @param {Number} [options.viewBox.width] Width of viewbox
+     * @param {Number} [options.viewBox.height] Height of viewbox
+     * @param {String} [options.encoding=UTF-8] Encoding of SVG output
+     * @param {Function} [reviver] Method for further parsing of svg elements, called after each fabric object converted into svg representation.
+     * @return {String} SVG string
+     * @tutorial {@link http://fabricjs.com/fabric-intro-part-3/#serialization}
+     * @see {@link http://jsfiddle.net/fabricjs/jQ3ZZ/|jsFiddle demo}
+     * @example <caption>Normal SVG output</caption>
+     * var svg = canvas.toSVG();
+     * @example <caption>SVG output without preamble (without &lt;?xml ../>)</caption>
+     * var svg = canvas.toSVG({suppressPreamble: true});
+     * @example <caption>SVG output with viewBox attribute</caption>
+     * var svg = canvas.toSVG({
+     *   viewBox: {
+     *     x: 100,
+     *     y: 100,
+     *     width: 200,
+     *     height: 300
+     *   }
+     * });
+     * @example <caption>SVG output with different encoding (default: UTF-8)</caption>
+     * var svg = canvas.toSVG({encoding: 'ISO-8859-1'});
+     * @example <caption>Modify SVG output with reviver function</caption>
+     * var svg = canvas.toSVG(null, function(svg) {
+     *   return svg.replace('stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; ', '');
+     * });
      */
-    toSVG: function(options) {
+    toSVG: function(options, reviver) {
       options || (options = { });
       var markup = [];
 
@@ -821,7 +887,7 @@
         this.discardActiveGroup();
       }
       for (var i = 0, objects = this.getObjects(), len = objects.length; i < len; i++) {
-        markup.push(objects[i].toSVG());
+        markup.push(objects[i].toSVG(reviver));
       }
       if (activeGroup) {
         this.setActiveGroup(new fabric.Group(activeGroup.getObjects()));
@@ -835,8 +901,8 @@
 
     /**
      * Removes an object from canvas and returns it
-     * @param object {Object} Object to remove
-     * @return {Object} removed object
+     * @param {fabric.Object} object Object to remove
+     * @return {fabric.Object} removed object
      */
     remove: function (object) {
       // removing active object should fire "selection:cleared" events
@@ -851,7 +917,7 @@
 
     /**
      * Moves an object to the bottom of the stack of drawn objects
-     * @param object {fabric.Object} Object to send to back
+     * @param {fabric.Object} object Object to send to back
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
@@ -863,7 +929,7 @@
 
     /**
      * Moves an object to the top of the stack of drawn objects
-     * @param object {fabric.Object} Object to send
+     * @param {fabric.Object} object Object to send
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
@@ -875,8 +941,8 @@
 
     /**
      * Moves an object down in stack of drawn objects
-     * @param object {fabric.Object} Object to send
-     * @param intersecting {Boolean} If `true`, send object behind next lower intersecting object
+     * @param {fabric.Object} object Object to send
+     * @param {Boolean} [intersecting] If `true`, send object behind next lower intersecting object
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
@@ -916,8 +982,8 @@
 
     /**
      * Moves an object up in stack of drawn objects
-     * @param object {fabric.Object} Object to send
-     * @param intersecting {Boolean} If `true`, send object in front of next upper intersecting object
+     * @param {fabric.Object} object Object to send
+     * @param {Boolean} [intersecting] If `true`, send object in front of next upper intersecting object
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
@@ -957,7 +1023,7 @@
 
     /**
      * Moves an object to specified level in stack of drawn objects
-     * @param object {fabric.Object} Object to send
+     * @param {fabric.Object} object Object to send
      * @param {Number} index Position to move to
      * @return {fabric.Canvas} thisArg
      * @chainable
@@ -1022,34 +1088,6 @@
     EMPTY_JSON: '{"objects": [], "background": "white"}',
 
     /**
-     * Takes &lt;canvas> element and transforms its data in such way that it becomes grayscale
-     * @static
-     * @param {HTMLCanvasElement} canvasEl
-     */
-    toGrayscale: function (canvasEl) {
-       var context = canvasEl.getContext('2d'),
-           imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
-           data = imageData.data,
-           iLen = imageData.width,
-           jLen = imageData.height,
-           index, average, i, j;
-
-       for (i = 0; i < iLen; i++) {
-         for (j = 0; j < jLen; j++) {
-
-           index = (i * 4) * jLen + (j * 4);
-           average = (data[index] + data[index + 1] + data[index + 2]) / 3;
-
-           data[index]     = average;
-           data[index + 1] = average;
-           data[index + 2] = average;
-         }
-       }
-
-       context.putImageData(imageData, 0, 0);
-     },
-
-    /**
      * Provides a way to check support of some of the canvas methods
      * (either those of HTMLCanvasElement itself, or rendering context)
      *
@@ -1096,10 +1134,19 @@
   });
 
   /**
-   * Returs JSON representation of canvas
+   * Returns JSON representation of canvas
    * @function
-   * @param {Array} propertiesToInclude Any properties that you might want to additionally include in the output
-   * @return {String} json string
+   * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+   * @return {String} JSON string
+   * @tutorial {@link http://fabricjs.com/fabric-intro-part-3/#serialization}
+   * @see {@link http://jsfiddle.net/fabricjs/pec86/|jsFiddle demo}
+   * @example <caption>JSON without additional properties</caption>
+   * var json = canvas.toJSON();
+   * @example <caption>JSON with additional properties included</caption>
+   * var json = canvas.toJSON(['lockMovementX', 'lockMovementY', 'lockRotation', 'lockScalingX', 'lockScalingY', 'lockUniScaling']);
+   * @example <caption>JSON without default values</caption>
+   * canvas.includeDefaultValues = false;
+   * var json = canvas.toJSON();
    */
   fabric.StaticCanvas.prototype.toJSON = fabric.StaticCanvas.prototype.toObject;
 

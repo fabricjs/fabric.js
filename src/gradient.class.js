@@ -52,6 +52,7 @@
   /**
    * Gradient class
    * @class fabric.Gradient
+   * @tutorial {@link http://fabricjs.com/fabric-intro-part-2/#gradients}
    */
   fabric.Gradient = fabric.util.createClass(/** @lends fabric.Gradient.prototype */ {
 
@@ -181,7 +182,7 @@
 
     /**
      * Returns an instance of CanvasGradient
-     * @param ctx
+     * @param {CanvasRenderingContext2D} ctx Context to render on
      * @return {CanvasGradient}
      */
     toLive: function(ctx) {
@@ -221,7 +222,8 @@
      * @static
      * @memberof fabric.Gradient
      * @param {SVGGradientElement} el SVG gradient element
-     * @param {Object} instance
+     * @param {fabric.Object} instance
+     * @return {fabric.Gradient} Gradient instance
      * @see http://www.w3.org/TR/SVG/pservers.html#LinearGradientElement
      * @see http://www.w3.org/TR/SVG/pservers.html#RadialGradientElement
      */

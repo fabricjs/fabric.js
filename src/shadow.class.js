@@ -12,6 +12,7 @@
   /**
    * Shadow class
    * @class fabric.Shadow
+   * @see {@link http://fabricjs.com/shadows/|Shadow demo}
    */
   fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
 
@@ -97,7 +98,7 @@
     /* _TO_SVG_START_ */
     /**
      * Returns SVG representation of a shadow
-     * @param {Object} object
+     * @param {fabric.Object} object
      * @return {String} SVG representation of a shadow
      */
     toSVG: function(object) {

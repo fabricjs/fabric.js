@@ -24,6 +24,7 @@
      * Constructor
      * @memberOf fabric.Image.filters.Brightness.prototype
      * @param {Object} [options] Options object
+     * @param {Number} [options.brightness=100] Value to brighten the image up (0..255)
      */
     initialize: function(options) {
       options = options || { };

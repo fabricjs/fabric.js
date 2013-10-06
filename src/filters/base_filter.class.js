@@ -1,6 +1,8 @@
 /**
  * @namespace fabric.Image.filters
  * @memberOf fabric.Image
+ * @tutorial {@link http://fabricjs.com/fabric-intro-part-2/#image_filters}
+ * @see {@link http://fabricjs.com/image-filters/|ImageFilters demo}
  */
 fabric.Image.filters = fabric.Image.filters || { };
 

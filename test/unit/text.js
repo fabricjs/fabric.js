@@ -15,7 +15,6 @@
     'width':               20,
     'height':              52,
     'fill':                'rgb(0,0,0)',
-    'overlayFill':         null,
     'stroke':              null,
     'strokeWidth':         1,
     'strokeDashArray':     null,
@@ -28,12 +27,6 @@
     'flipX':               false,
     'flipY':               false,
     'opacity':             1,
-    'selectable':          true,
-    'hasControls':         true,
-    'hasBorders':          true,
-    'hasRotatingPoint':    true,
-    'transparentCorners':  true,
-    'perPixelTargetFind':  false,
     'shadow':              null,
     'visible':             true,
     'clipTo':              null,
@@ -117,17 +110,10 @@
     equal(text.shadow.blur, 2);
   });
 
-  test('setColor', function(){
-    var text = createTextObject();
-    ok(typeof text.setColor == 'function');
-    equal(text.setColor('123456'), text, 'should be chainable');
-    equal(text.get('fill'), '123456');
-  });
-
   test('setFontSize', function(){
     var text = createTextObject();
     ok(typeof text.setFontSize == 'function');
-    equal(text.setFontSize(12), text);
+    equal(text.setFontSize(12), text, 'should be chainable');
     equal(text.get('fontSize'), 12);
   });
 

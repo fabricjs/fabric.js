@@ -18,15 +18,14 @@
     'fontFamily',
     'fontWeight',
     'fontSize',
-    'path',
     'text',
     'textDecoration',
     'textAlign',
     'fontStyle',
     'lineHeight',
-    'backgroundColor',
     'textBackgroundColor',
-    'useNative'
+    'useNative',
+    'path'
   );
 
   /**
@@ -34,6 +33,7 @@
    * @class fabric.Text
    * @extends fabric.Object
    * @return {fabric.Text} thisArg
+   * @tutorial {@link http://fabricjs.com/fabric-intro-part-2/#text}
    */
   fabric.Text = fabric.util.createClass(fabric.Object, /** @lends fabric.Text.prototype */ {
 
@@ -55,6 +55,150 @@
     },
 
     /**
+     * Retrieves object's fontSize
+     * @method getFontSize
+     * @memberOf fabric.Text.prototype
+     * @return {String} Font size (in pixels)
+     */
+
+    /**
+     * Sets object's fontSize
+     * @method setFontSize
+     * @memberOf fabric.Text.prototype
+     * @param {Number} fontSize Font size (in pixels)
+     * @return {fabric.Text}
+     * @chainable
+     */
+
+    /**
+     * Retrieves object's fontWeight
+     * @method getFontWeight
+     * @memberOf fabric.Text.prototype
+     * @return {(String|Number)} Font weight
+     */
+
+    /**
+     * Sets object's fontWeight
+     * @method setFontWeight
+     * @memberOf fabric.Text.prototype
+     * @param {(Number|String)} fontWeight Font weight
+     * @return {fabric.Text}
+     * @chainable
+     */
+
+    /**
+     * Retrieves object's fontFamily
+     * @method getFontFamily
+     * @memberOf fabric.Text.prototype
+     * @return {String} Font family
+     */
+
+    /**
+     * Sets object's fontFamily
+     * @method setFontFamily
+     * @memberOf fabric.Text.prototype
+     * @param {String} fontFamily Font family
+     * @return {fabric.Text}
+     * @chainable
+     */
+
+    /**
+     * Retrieves object's text
+     * @method getText
+     * @memberOf fabric.Text.prototype
+     * @return {String} text
+     */
+
+    /**
+     * Sets object's text
+     * @method setText
+     * @memberOf fabric.Text.prototype
+     * @param {String} text Text
+     * @return {fabric.Text}
+     * @chainable
+     */
+
+    /**
+     * Retrieves object's textDecoration
+     * @method getTextDecoration
+     * @memberOf fabric.Text.prototype
+     * @return {String} Text decoration
+     */
+
+    /**
+     * Sets object's textDecoration
+     * @method setTextDecoration
+     * @memberOf fabric.Text.prototype
+     * @param {String} textDecoration Text decoration
+     * @return {fabric.Text}
+     * @chainable
+     */
+
+    /**
+     * Retrieves object's fontStyle
+     * @method getFontStyle
+     * @memberOf fabric.Text.prototype
+     * @return {String} Font style
+     */
+
+    /**
+     * Sets object's fontStyle
+     * @method setFontStyle
+     * @memberOf fabric.Text.prototype
+     * @param {String} fontStyle Font style
+     * @return {fabric.Text}
+     * @chainable
+     */
+
+    /**
+     * Retrieves object's lineHeight
+     * @method getLineHeight
+     * @memberOf fabric.Text.prototype
+     * @return {Number} Line height
+     */
+
+    /**
+     * Sets object's lineHeight
+     * @method setLineHeight
+     * @memberOf fabric.Text.prototype
+     * @param {Number} lineHeight Line height
+     * @return {fabric.Text}
+     * @chainable
+     */
+
+    /**
+     * Retrieves object's textAlign
+     * @method getTextAlign
+     * @memberOf fabric.Text.prototype
+     * @return {String} Text alignment
+     */
+
+    /**
+     * Sets object's textAlign
+     * @method setTextAlign
+     * @memberOf fabric.Text.prototype
+     * @param {String} textAlign Text alignment
+     * @return {fabric.Text}
+     * @chainable
+     */
+
+    /**
+     * Retrieves object's textBackgroundColor
+     * @method getTextBackgroundColor
+     * @memberOf fabric.Text.prototype
+     * @return {String} Text background color
+     */
+
+    /**
+     * Sets object's textBackgroundColor
+     * @method setTextBackgroundColor
+     * @memberOf fabric.Text.prototype
+     * @param {String} textBackgroundColor Text background color
+     * @return {fabric.Text}
+     * @chainable
+     */
+
+    /**
      * Type of an object
      * @type String
      * @default
@@ -70,7 +214,7 @@
 
     /**
      * Font weight (e.g. bold, normal, 400, 600, 800)
-     * @type Number
+     * @type {(Number|String)}
      * @default
      */
     fontWeight:           'normal',
@@ -109,13 +253,6 @@
      * @default
      */
     lineHeight:           1.3,
-
-    /**
-     * Background color of an entire text box
-     * @type String
-     * @default
-     */
-    backgroundColor:      '',
 
     /**
      * Background color of text lines
@@ -302,7 +439,9 @@
           : this.stroke;
       }
       ctx.textBaseline = 'alphabetic';
-      ctx.textAlign = this.textAlign;
+      if (!this.skipTextAlign) {
+        ctx.textAlign = this.textAlign;
+      }
       ctx.font = this._getFontDeclaration();
     },
 
@@ -356,6 +495,8 @@
      * @param {Number} lineIndex Index of a line in a text
      */
     _drawTextLine: function(method, ctx, line, left, top, lineIndex) {
+      // lift the line by quarter of fontSize
+      top -= this.fontSize / 4;
 
       // short-circuit
       if (this.textAlign !== 'justify') {
@@ -368,7 +509,6 @@
 
       if (totalWidth > lineWidth) {
         // stretch the line
-
         var words = line.split(/\s+/);
         var wordsWidth = ctx.measureText(line.replace(/\s+/g, '')).width;
         var widthDiff = totalWidth - wordsWidth;
@@ -391,7 +531,7 @@
      * @return {Number} Left offset
      */
     _getLeftOffset: function() {
-      if (fabric.isLikelyNode && (this.originX === 'left' || this.originX === 'center')) {
+      if (fabric.isLikelyNode) {
         return 0;
       }
       return -this.width / 2;
@@ -402,16 +542,6 @@
      * @return {Number} Top offset
      */
     _getTopOffset: function() {
-      if (fabric.isLikelyNode) {
-        if (this.originY === 'center') {
-          return -this.height / 2;
-        }
-        else if (this.originY === 'bottom') {
-          return -this.height;
-        }
-        return 0;
-      }
-      // in browser, text drawing always starts at vertical center
       return -this.height / 2;
     },
 
@@ -589,22 +719,20 @@
 
           ctx.fillRect(
             _this._getLeftOffset() + lineLeftOffset,
-            (offset + (i * _this._getHeightOfLine(ctx, i, textLines))) - halfOfVerticalBox,
+            ~~((offset + (i * _this._getHeightOfLine(ctx, i, textLines))) - halfOfVerticalBox),
             lineWidth,
             1);
         }
       }
 
-      var fractionOfFontSize = this.fontSize / 4;
-
       if (this.textDecoration.indexOf('underline') > -1) {
         renderLinesAtOffset(this.fontSize * this.lineHeight);
       }
       if (this.textDecoration.indexOf('line-through') > -1) {
-        renderLinesAtOffset(this.fontSize * this.lineHeight - fractionOfFontSize);
+        renderLinesAtOffset(this.fontSize * this.lineHeight - this.fontSize / 2);
       }
       if (this.textDecoration.indexOf('overline') > -1) {
-        renderLinesAtOffset(fractionOfFontSize);
+        renderLinesAtOffset(this.fontSize * this.lineHeight - this.fontSize);
       }
     },
 
@@ -645,7 +773,7 @@
      * @return {Object} Object representation of an instance
      */
     toObject: function(propertiesToInclude) {
-      return extend(this.callSuper('toObject', propertiesToInclude), {
+      var object = extend(this.callSuper('toObject', propertiesToInclude), {
         text:                 this.text,
         fontSize:             this.fontSize,
         fontWeight:           this.fontWeight,
@@ -655,19 +783,24 @@
         textDecoration:       this.textDecoration,
         textAlign:            this.textAlign,
         path:                 this.path,
-        backgroundColor:      this.backgroundColor,
         textBackgroundColor:  this.textBackgroundColor,
         useNative:            this.useNative
       });
+      if (!this.includeDefaultValues) {
+        this._removeDefaultValues(object);
+      }
+      return object;
     },
 
     /* _TO_SVG_START_ */
     /**
      * Returns SVG representation of an instance
+     * @param {Function} [reviver] Method for further parsing of svg representation.
      * @return {String} svg representation of an instance
      */
-    toSVG: function() {
-      var textLines = this.text.split(/\r?\n/),
+    toSVG: function(reviver) {
+      var markup = [ ],
+          textLines = this.text.split(/\r?\n/),
           lineTopOffset = this.useNative
             ? this.fontSize * this.lineHeight
             : (-this._fontAscent - ((this._fontAscent / 5) * this.lineHeight)),
@@ -683,7 +816,7 @@
       // move top offset by an ascent
       textTopOffset += (this._fontAscent ? ((this._fontAscent / 5) * this.lineHeight) : 0);
 
-      return [
+      markup.push(
         '<g transform="', this.getSvgTransform(), '">',
           textAndBg.textBgRects.join(''),
           '<text ',
@@ -699,7 +832,9 @@
             textAndBg.textSpans.join(''),
           '</text>',
         '</g>'
-      ].join('');
+      );
+
+      return reviver ? reviver(markup.join('')) : markup.join('');
     },
 
     /**
@@ -828,17 +963,6 @@
       return 'opacity="' + fillColor.getAlpha() + '" fill="' + fillColor.setAlpha(1).toRgb() + '"';
     },
     /* _TO_SVG_END_ */
-
-    /**
-     * Sets "color" of an instance (alias of `set('fill', &hellip;)`)
-     * @param {String} value
-     * @return {fabric.Text} thisArg
-     * @chainable
-     */
-    setColor: function(value) {
-      this.set('fill', value);
-      return this;
-    },
 
     /**
      * Sets specified property to a specified value

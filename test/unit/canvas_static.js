@@ -9,7 +9,7 @@
                            '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="300" height="300" viewBox="100 100 300 300" xml:space="preserve"><desc>Created with Fabric.js ' + fabric.version + '</desc><defs></defs></svg>';
 
   var PATH_JSON = '{"objects": [{"type": "path", "originX": "center", "originY": "center", "left": 268, "top": 266, "width": 51, "height": 49,'+
-                  ' "fill": "rgb(0,0,0)", "overlayFill": null, "stroke": null, "strokeWidth": 1, "scaleX": 1, "scaleY": 1, '+
+                  ' "fill": "rgb(0,0,0)", "stroke": null, "strokeWidth": 1, "scaleX": 1, "scaleY": 1, '+
                   '"angle": 0, "flipX": false, "flipY": false, "opacity": 1, "path": [["M", 18.511, 13.99],'+
                   ' ["c", 0, 0, -2.269, -4.487, -12.643, 4.411], ["c", 0, 0, 4.824, -14.161, 19.222, -9.059],'+
                   ' ["l", 0.379, -2.1], ["c", -0.759, -0.405, -1.375, -1.139, -1.645, -2.117], ["c", -0.531, '+
@@ -26,19 +26,19 @@
                   '13.99], ["z", null]]}], "background": "#ff5555"}';
 
   var PATH_DATALESS_JSON = '{"objects":[{"type":"path","originX":"center","originY":"center","left":200,"top":200,"width":200,"height":200,"fill":"rgb(0,0,0)",'+
-                           '"overlayFill":null,"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,'+
-                           '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,"selectable":true,"hasControls":true,"hasBorders":true,"hasRotatingPoint":true,"transparentCorners":true,'+
-                           '"perPixelTargetFind":false,"shadow":null,"visible":true,"clipTo":null,"path":"http://example.com/","pathOffset":{"x":100,"y":100}}],"background":""}';
+                           '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,'+
+                           '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,'+
+                           '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","path":"http://example.com/","pathOffset":{"x":100,"y":100}}],"background":""}';
 
-  var RECT_JSON = '{"objects":[{"type":"rect","originX":"center","originY":"center","left":0,"top":0,"width":10,"height":10,"fill":"rgb(0,0,0)","overlayFill":null,'+
+  var RECT_JSON = '{"objects":[{"type":"rect","originX":"center","originY":"center","left":0,"top":0,"width":10,"height":10,"fill":"rgb(0,0,0)",'+
                   '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,'+
-                  '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,"selectable":true,"hasControls":true,"hasBorders":true,"hasRotatingPoint":true,'+
-                  '"transparentCorners":true,"perPixelTargetFind":false,"shadow":null,"visible":true,"clipTo":null,"rx":0,"ry":0,"x":0,"y":0}],"background":"#ff5555"}';
+                  '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,'+
+                  '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","rx":0,"ry":0,"x":0,"y":0}],"background":"#ff5555"}';
 
-  var RECT_JSON_WITH_PADDING = '{"objects":[{"type":"rect","originX":"center","originY":"center","left":0,"top":0,"width":10,"height":20,"fill":"rgb(0,0,0)","overlayFill":null,'+
+  var RECT_JSON_WITH_PADDING = '{"objects":[{"type":"rect","originX":"center","originY":"center","left":0,"top":0,"width":10,"height":20,"fill":"rgb(0,0,0)",'+
                                '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,'+
-                               '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,"selectable":true,"hasControls":true,"hasBorders":true,"hasRotatingPoint":true,'+
-                               '"transparentCorners":true,"perPixelTargetFind":false,"shadow":null,"visible":true,"clipTo":null,"padding":123,"foo":"bar","rx":0,"ry":0,"x":0,"y":0}],"background":""}';
+                               '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,'+
+                               '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","padding":123,"foo":"bar","rx":0,"ry":0,"x":0,"y":0}],"background":""}';
 
   // force creation of static canvas
   // TODO: fix this
@@ -221,6 +221,22 @@
     }
   });
 
+  test('toDataURL jpg', function() {
+    if (!fabric.Canvas.supports('toDataURL')) {
+      alert("toDataURL is not supported by this environment. Some of the tests can not be run.");
+    }
+    else {
+      try {
+        var dataURL = canvas.toDataURL({ format: 'jpg' });
+        equal(dataURL.substring(0, 22), 'data:image/jpeg;base64');
+      }
+      // node-canvas does not support jpeg data urls
+      catch(err) {
+        ok(true);
+      }
+    }
+  });
+
   test('centerObjectH', function() {
     ok(typeof canvas.centerObjectH == 'function');
     var rect = makeRect({ left: 102, top: 202 });
@@ -295,6 +311,41 @@
 
     var svg = canvas.toSVG({viewBox: {x: 100, y: 100, width: 300, height: 300}});
     equal(svg, CANVAS_SVG_VIEWBOX);
+  });
+
+  test('toSVG with reviver', function() {
+    ok(typeof canvas.toSVG == 'function');
+    canvas.clear();
+
+    var circle = new fabric.Circle(),
+        rect = new fabric.Rect(),
+        path1 = new fabric.Path('M 100 100 L 300 100 L 200 300 z'),
+        tria = new fabric.Triangle(),
+        polygon = new fabric.Polygon([{x: 10, y: 12},{x: 20, y: 22}]),
+        polyline = new fabric.Polyline([{x: 10, y: 12},{x: 20, y: 22}]),
+        line = new fabric.Line(),
+        text = new fabric.Text('Text'),
+        group = new fabric.Group([text, line]),
+        ellipse = new fabric.Ellipse(),
+        image = new fabric.Image({width: 0, height: 0}),
+        path2 = new fabric.Path('M 0 0 L 200 100 L 200 300 z'),
+        path3 = new fabric.Path('M 50 50 L 100 300 L 400 400 z'),
+        pathGroup = new fabric.PathGroup([path2, path3]);
+
+    canvas.renderOnAddRemove = false;
+    canvas.add(circle, rect, path1, tria, polygon, polyline, group, ellipse, image, pathGroup);
+
+    var reviverCount = 0,
+        len = canvas.size() + group.size() + pathGroup.paths.length;
+
+    function reviver(svg) {
+      reviverCount++;
+      return svg;
+    }
+
+    var svg = canvas.toSVG(null, reviver);
+    equal(reviverCount, len);
+    canvas.renderOnAddRemove = true;
   });
 
   test('toJSON', function() {
@@ -752,37 +803,6 @@
     equal(canvas.getHeight(), 765);
   });
 
-  test('toGrayscale', function() {
-    ok(typeof fabric.Canvas.toGrayscale == 'function');
-
-    if (!fabric.Canvas.supports('getImageData')) {
-      alert('getImageData is not supported by this environment. Some of the tests can not be run.');
-      return;
-    }
-
-    var canvasEl = fabric.isLikelyNode ? new (require('canvas')) : fabric.document.createElement('canvas'),
-        context = canvasEl.getContext('2d');
-
-    canvasEl.width = canvasEl.height = 10;
-
-    context.fillStyle = 'rgb(255,0,0)'; // red
-    context.fillRect(0, 0, 10, 10);
-
-    var imageData = context.getImageData(0, 0, 10, 10),
-        data = imageData.data,
-        firstPixelData = [data[0], data[1], data[2], data[3]];
-
-    deepEqual([255, 0, 0, 255], firstPixelData);
-
-    fabric.Canvas.toGrayscale(canvasEl);
-
-    imageData = context.getImageData(0, 0, 10, 10);
-    data = imageData.data;
-    firstPixelData = [data[0], data[1], data[2], data[3]];
-
-    deepEqual([85, 85, 85, 255], firstPixelData);
-  });
-
   // asyncTest('resizeImageToFit', function() {
   //   ok(typeof canvas._resizeImageToFit == 'function');
 
@@ -876,7 +896,7 @@
   });
 
   asyncTest('loadFromJSON with text', function() {
-    var json = '{"objects":[{"type":"text","left":150,"top":200,"width":128,"height":64.32,"fill":"#000000","overlayFill":"","stroke":"","strokeWidth":"","scaleX":0.8,"scaleY":0.8,"angle":0,"flipX":false,"flipY":false,"opacity":1,"selectable":true,"text":"NAME HERE","fontSize":24,"fontWeight":"","fontFamily":"Delicious_500","fontStyle":"","lineHeight":"","textDecoration":"","textAlign":"center","path":"","strokeStyle":"","backgroundColor":""}],"background":"#ffffff"}';
+    var json = '{"objects":[{"type":"text","left":150,"top":200,"width":128,"height":64.32,"fill":"#000000","stroke":"","strokeWidth":"","scaleX":0.8,"scaleY":0.8,"angle":0,"flipX":false,"flipY":false,"opacity":1,"text":"NAME HERE","fontSize":24,"fontWeight":"","fontFamily":"Delicious_500","fontStyle":"","lineHeight":"","textDecoration":"","textAlign":"center","path":"","strokeStyle":"","backgroundColor":""}],"background":"#ffffff"}';
     canvas.loadFromJSON(json, function() {
 
       canvas.renderAll();

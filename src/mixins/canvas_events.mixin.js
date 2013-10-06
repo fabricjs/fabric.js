@@ -129,6 +129,28 @@
     },
 
     /**
+     * Decides whether the canvas should be redrawn in mouseup and mousedown events.
+     * @private
+     * @param {Object} target
+     * @param {Object} pointer
+     */
+    _shouldRender: function(target, pointer) {
+      var activeObject = this.getActiveGroup() || this.getActiveObject();
+
+      return (
+        (target && (
+        target.isMoving ||
+        target !== activeObject)) ||
+        (!target && activeObject) ||
+        (pointer &&
+        this._previousPointer &&
+        this.selection && (
+        pointer.x !== this._previousPointer.x ||
+        pointer.y !== this._previousPointer.y))
+      );
+    },
+
+    /**
      * Method that defines the actions when mouse is released on canvas.
      * The method resets the currentTransform parameters, store the image corner
      * position in the image object and render the canvas on top.
@@ -136,8 +158,9 @@
      * @param {Event} e Event object fired on mouseup
      */
     __onMouseUp: function (e) {
-
-      var target;
+      var target,
+          pointer,
+          render;
 
       if (this.isDrawingMode && this._isCurrentlyDrawing) {
         this._isCurrentlyDrawing = false;
@@ -158,7 +181,6 @@
           target._scaling = false;
         }
 
-        target.isMoving = false;
         target.setCoords();
 
         // only fire :modified event if target coordinates were changed during mousedown-mouseup
@@ -167,28 +189,50 @@
           target.fire('modified');
         }
 
-        if (this._previousOriginX) {
-          this._currentTransform.target.adjustPosition(this._previousOriginX);
+        if (this._previousOriginX && this._previousOriginY) {
+
+          var originPoint = target.translateToOriginPoint(
+            target.getCenterPoint(),
+            this._previousOriginX,
+            this._previousOriginY);
+
+          target.originX = this._previousOriginX;
+          target.originY = this._previousOriginY;
+
+          target.left = originPoint.x;
+          target.top = originPoint.y;
+
           this._previousOriginX = null;
+          this._previousOriginY = null;
         }
       }
+      else {
+        pointer = this.getPointer(e);
+      }
 
-      this._currentTransform = null;
+      render = this._shouldRender(target, pointer);
 
       if (this.selection && this._groupSelector) {
         // group selection was completed, determine its bounds
         this._findSelectedObjects(e);
       }
+
       var activeGroup = this.getActiveGroup();
       if (activeGroup) {
         activeGroup.setObjectsCoords();
-        activeGroup.set('isMoving', false);
+        activeGroup.isMoving = false;
         this._setCursor(this.defaultCursor);
       }
 
-      // clear selection
+      // clear selection and current transformation
       this._groupSelector = null;
-      this.renderAll();
+      this._currentTransform = null;
+
+      if (target) {
+        target.isMoving = false;
+      }
+
+      render && this.renderAll();
 
       this._setCursorFromEvent(e, target);
 
@@ -202,6 +246,20 @@
     },
 
     /**
+     * @private
+     * @param {Event} e Event object fired on mousedown
+     */
+    _onMouseDownInDrawingMode: function(e) {
+      this._isCurrentlyDrawing = true;
+      this.discardActiveObject().renderAll();
+      if (this.clipTo) {
+        fabric.util.clipContext(this, this.contextTop);
+      }
+      this.freeDrawingBrush.onMouseDown(this.getPointer(e));
+      this.fire('mouse:down', { e: e });
+    },
+
+    /**
      * Method that defines the actions when mouse is clic ked on canvas.
      * The method inits the currentTransform parameters and renders all the
      * canvas so the current image can be placed on the top canvas and the rest
@@ -210,38 +268,37 @@
      * @param {Event} e Event object fired on mousedown
      */
     __onMouseDown: function (e) {
-
-      var pointer;
-
       // accept only left clicks
       var isLeftClick  = 'which' in e ? e.which === 1 : e.button === 1;
       if (!isLeftClick && !fabric.isTouchSupported) return;
 
       if (this.isDrawingMode) {
-        pointer = this.getPointer(e);
-        this._isCurrentlyDrawing = true;
-        this.discardActiveObject().renderAll();
-        if (this.clipTo) {
-          fabric.util.clipContext(this, this.contextTop);
-        }
-        this.freeDrawingBrush.onMouseDown(pointer);
-        this.fire('mouse:down', { e: e });
+        this._onMouseDownInDrawingMode(e);
         return;
       }
 
       // ignore if some object is being transformed at this moment
       if (this._currentTransform) return;
 
-      var target = this.findTarget(e), corner;
-      pointer = this.getPointer(e);
+      var target = this.findTarget(e),
+          pointer = this.getPointer(e),
+          corner,
+          render;
+
+      // save pointer for check in __onMouseUp event
+      this._previousPointer = pointer;
+
+      render = this._shouldRender(target, pointer);
 
       if (this._shouldClearSelection(e, target)) {
-        this._groupSelector = {
-          ex: pointer.x,
-          ey: pointer.y,
-          top: 0,
-          left: 0
-        };
+        if (this.selection) {
+          this._groupSelector = {
+            ex: pointer.x,
+            ey: pointer.y,
+            top: 0,
+            left: 0
+          };
+        }
         this.deactivateAllWithDispatch();
         target && target.selectable && this.setActiveObject(target, e);
       }
@@ -265,18 +322,50 @@
         this._setupCurrentTransform(e, target);
       }
       // we must renderAll so that active image is placed on the top canvas
-      this.renderAll();
+      render && this.renderAll();
 
       this.fire('mouse:down', { target: target, e: e });
       target && target.fire('mousedown', { e: e });
+    },
 
-      // center origin when rotating
-      if (corner === 'mtr') {
-        this._previousOriginX = this._currentTransform.target.originX;
-        this._currentTransform.target.adjustPosition('center');
-        this._currentTransform.left = this._currentTransform.target.left;
-        this._currentTransform.top = this._currentTransform.target.top;
-      }
+    /**
+     * @private
+     * @param {Object} target Object for that origin is set to center
+     */
+    _setOriginToCenter: function(target) {
+      this._previousOriginX = this._currentTransform.target.originX;
+      this._previousOriginY = this._currentTransform.target.originY;
+
+      var center = target.getCenterPoint();
+
+      target.originX = 'center';
+      target.originY = 'center';
+
+      target.left = center.x;
+      target.top = center.y;
+
+      this._currentTransform.left = target.left;
+      this._currentTransform.top = target.top;
+    },
+
+    /**
+     * @private
+     * @param {Object} target Object for that center is set to origin
+     */
+    _setCenterToOrigin: function(target) {
+      var originPoint = target.translateToOriginPoint(
+        target.getCenterPoint(),
+        this._previousOriginX,
+        this._previousOriginY);
+
+      target.originX = this._previousOriginX;
+      target.originY = this._previousOriginY;
+
+      target.left = originPoint.x;
+      target.top = originPoint.y;
+
+      this._previousOriginX = null;
+      this._previousOriginY = null;
     },
 
     /**
@@ -289,7 +378,6 @@
       * @param {Event} e Event object fired on mousemove
       */
     __onMouseMove: function (e) {
-
       var target, pointer;
 
       if (this.isDrawingMode) {
@@ -339,19 +427,23 @@
         var x = pointer.x,
             y = pointer.y,
             reset = false,
+            centerTransform,
             transform = this._currentTransform;
 
         target = transform.target;
         target.isMoving = true;
 
-        if ((transform.action === 'scale' || transform.action === 'scaleX' || transform.action === 'scaleY') &&
-           // Switch from a normal resize to center-based
-           ((e.altKey && (transform.originX !== 'center' || transform.originY !== 'center')) ||
-           // Switch from center-based resize to normal one
-           (!e.altKey && transform.originX === 'center' && transform.originY === 'center'))
-        ) {
-          this._resetCurrentTransform(e);
-          reset = true;
+        if (transform.action === 'scale' || transform.action === 'scaleX' || transform.action === 'scaleY') {
+          centerTransform = this._shouldCenterTransform(e, target);
+
+             // Switch from a normal resize to center-based
+          if ((centerTransform && (transform.originX !== 'center' || transform.originY !== 'center')) ||
+             // Switch from center-based resize to normal one
+             (!centerTransform && transform.originX === 'center' && transform.originY === 'center')
+          ) {
+            this._resetCurrentTransform(e);
+            reset = true;
+          }
         }
 
         if (transform.action === 'rotate') {
@@ -370,7 +462,7 @@
           else {
             // Switch from a normal resize to proportional
             if (!reset && transform.currentAction === 'scale') {
-              this._resetCurrentTransform(e);
+              this._resetCurrentTransform(e, target);
             }
 
             transform.currentAction = 'scaleEqually';
@@ -405,6 +497,7 @@
       this.fire('mouse:move', { target: target, e: e });
       target && target.fire('mousemove', { e: e });
     },
+
     /**
      * Sets the cursor depending on where the canvas is being hovered.
      * Note: very buggy in Opera

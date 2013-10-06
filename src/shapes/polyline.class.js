@@ -15,6 +15,7 @@
    * Polyline class
    * @class fabric.Polyline
    * @extends fabric.Object
+   * @see {@link fabric.Polyline#initialize} for constructor definition
    */
   fabric.Polyline = fabric.util.createClass(fabric.Object, /** @lends fabric.Polyline.prototype */ {
 
@@ -27,10 +28,23 @@
 
     /**
      * Constructor
-     * @param {Array} points Array of points
+     * @param {Array} points Array of points (where each point is an object with x and y)
      * @param {Object} [options] Options object
      * @param {Boolean} [skipOffset] Whether points offsetting should be skipped
      * @return {fabric.Polyline} thisArg
+     * @example
+     * var poly = new fabric.Polyline([
+     *     { x: 10, y: 10 },
+     *     { x: 50, y: 30 },
+     *     { x: 40, y: 70 },
+     *     { x: 60, y: 50 },
+     *     { x: 100, y: 150 },
+     *     { x: 40, y: 100 }
+     *   ], {
+     *   stroke: 'red',
+     *   left: 100,
+     *   top: 100
+     * });
      */
     initialize: function(points, options, skipOffset) {
       options = options || { };
@@ -59,9 +73,10 @@
     /* _TO_SVG_START_ */
     /**
      * Returns SVG representation of an instance
+     * @param {Function} [reviver] Method for further parsing of svg representation.
      * @return {String} svg representation of an instance
      */
-    toSVG: function() {
+    toSVG: function(reviver) {
       var points = [],
           markup = this._createBaseSVGMarkup();
 
@@ -77,7 +92,7 @@
         '"/>'
       );
 
-      return markup.join('');
+      return reviver ? reviver(markup.join('')) : markup.join('');
     },
     /* _TO_SVG_END_ */
 

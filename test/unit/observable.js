@@ -17,7 +17,7 @@ test('fire + observe', function() {
   });
 
   foo.fire('bar:baz');
-  equal(true, eventFired);
+  equal(eventFired, true);
 });
 
 test('stopObserving', function() {
@@ -32,7 +32,7 @@ test('stopObserving', function() {
   foo.stopObserving('bar:baz', handler);
 
   foo.fire('bar:baz');
-  equal(false, eventFired);
+  equal(eventFired, false);
 });
 
 test('stopObserving without handler', function() {
@@ -53,8 +53,39 @@ test('stopObserving without handler', function() {
   foo.stopObserving('bar:baz');
 
   foo.fire('bar:baz');
-  equal(false, eventFired);
-  equal(false, event2Fired);
+  equal(eventFired, false);
+  equal(event2Fired, false);
+
+  foo.on('bar:baz', handler);
+  foo.on('bar:baz', handler2);
+
+  foo.stopObserving({'bar:baz': null});
+
+  foo.fire('bar:baz');
+  equal(eventFired, false);
+  equal(event2Fired, false);
+});
+
+test('stopObserving multiple handlers', function() {
+  var foo = { };
+  fabric.util.object.extend(foo, fabric.Observable);
+
+  var eventFired = false, event2Fired = false;
+
+  var handler = function() {
+    eventFired = true;
+  };
+  var handler2 = function() {
+    event2Fired = true;
+  };
+  foo.on({'bar:baz': handler, 'blah:blah': handler2});
+
+  foo.stopObserving({'bar:baz': handler, 'blah:blah': handler2});
+
+  foo.fire('bar:baz');
+  equal(eventFired, false);
+  foo.fire('blah:blah');
+  equal(event2Fired, false);
 });
 
 test('observe multiple handlers', function() {
@@ -81,9 +112,9 @@ test('observe multiple handlers', function() {
   foo.fire('blah:blah');
   foo.fire('moo');
 
-  equal(true, barBazFired);
-  equal(true, blahBlahFired);
-  equal(true, mooFired);
+  equal(barBazFired, true);
+  equal(blahBlahFired, true);
+  equal(mooFired, true);
 });
 
 test('event options', function() {
@@ -97,7 +128,7 @@ test('event options', function() {
 
   foo.fire('foo:bar', { value: 'sekret' });
 
-  equal('sekret', someValue);
+  equal(someValue, 'sekret');
 });
 
 test('trigger', function() {
@@ -112,8 +143,8 @@ test('trigger', function() {
   });
 
   foo.trigger('bar:baz');
-  equal(true, eventFired);
-  equal(foo, context);
+  equal(eventFired, true);
+  equal(context, foo);
 });
 
 test('chaining', function() {
@@ -131,8 +162,8 @@ test('chaining', function() {
 
   foo.trigger('event2').trigger('event1');
 
-  equal(true, event1Fired);
-  equal(true, event2Fired);
+  equal(event1Fired, true);
+  equal(event2Fired, true);
 
   event1Fired = false;
   event2Fired = false;
@@ -140,6 +171,6 @@ test('chaining', function() {
   foo.off('event1').off('event2');
   foo.trigger('event2').trigger('event1');
 
-  equal(false, event1Fired);
-  equal(false, event2Fired);
+  equal(event1Fired, false);
+  equal(event2Fired, false);
 });

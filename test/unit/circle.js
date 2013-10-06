@@ -87,7 +87,6 @@
       'width':              0,
       'height':             0,
       'fill':               'rgb(0,0,0)',
-      'overlayFill':        null,
       'stroke':             null,
       'strokeWidth':        1,
       'strokeDashArray':    null,
@@ -100,14 +99,9 @@
       'flipX':              false,
       'flipY':              false,
       'opacity':            1,
-      'selectable':         true,
-      'hasControls':        true,
-      'hasBorders':         true,
-      'hasRotatingPoint':   true,
-      'transparentCorners': true,
-      'perPixelTargetFind': false,
       'shadow':             null,
       'visible':            true,
+      'backgroundColor':    '',
       'clipTo':             null,
       'radius':             0
     };

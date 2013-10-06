@@ -1,31 +1,44 @@
 fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.StaticCanvas.prototype */ {
 
   /**
-   * Populates canvas with data from the specified dataless JSON
-   * JSON format must conform to the one of `fabric.Canvas#toDatalessJSON`
+   * Populates canvas with data from the specified dataless JSON.
+   * JSON format must conform to the one of {@link fabric.Canvas#toDatalessJSON}
    * @deprecated since 1.2.2
    * @param {String|Object} json JSON string or object
    * @param {Function} callback Callback, invoked when json is parsed
-   *                            and corresponding objects (e.g: fabric.Image)
+   *                            and corresponding objects (e.g: {@link fabric.Image})
    *                            are initialized
+   * @param {Function} [reviver] Method for further parsing of JSON elements, called after each fabric object created.
    * @return {fabric.Canvas} instance
    * @chainable
+   * @tutorial {@link http://fabricjs.com/fabric-intro-part-3/#deserialization}
    */
-  loadFromDatalessJSON: function (json, callback) {
-    return this.loadFromJSON(json, callback);
+  loadFromDatalessJSON: function (json, callback, reviver) {
+    return this.loadFromJSON(json, callback, reviver);
   },
 
   /**
-   * Populates canvas with data from the specified JSON
-   * JSON format must conform to the one of `fabric.Canvas#toJSON`
+   * Populates canvas with data from the specified JSON.
+   * JSON format must conform to the one of {@link fabric.Canvas#toJSON}
    * @param {String|Object} json JSON string or object
    * @param {Function} callback Callback, invoked when json is parsed
-   *                            and corresponding objects (e.g: fabric.Image)
+   *                            and corresponding objects (e.g: {@link fabric.Image})
    *                            are initialized
+   * @param {Function} [reviver] Method for further parsing of JSON elements, called after each fabric object created.
    * @return {fabric.Canvas} instance
    * @chainable
+   * @tutorial {@link http://fabricjs.com/fabric-intro-part-3/#deserialization}
+   * @see {@link http://jsfiddle.net/fabricjs/fmgXt/|jsFiddle demo}
+   * @example <caption>loadFromJSON</caption>
+   * canvas.loadFromJSON(json, canvas.renderAll.bind(canvas));
+   * @example <caption>loadFromJSON with reviver</caption>
+   * canvas.loadFromJSON(json, canvas.renderAll.bind(canvas), function(o, object) {
+   *   // `o` = json object
+   *   // `object` = fabric.Object instance
+   *   // ... do some stuff ...
+   * });
    */
-  loadFromJSON: function (json, callback) {
+  loadFromJSON: function (json, callback, reviver) {
     if (!json) return;
 
     // serialize if it wasn't already
@@ -38,7 +51,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     var _this = this;
     this._enlivenObjects(serialized.objects, function () {
       _this._setBgOverlayImages(serialized, callback);
-    });
+    }, reviver);
 
     return this;
   },
@@ -109,8 +122,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * @private
    * @param {Array} objects
    * @param {Function} callback
+   * @param {Function} [reviver]
    */
-  _enlivenObjects: function (objects, callback) {
+  _enlivenObjects: function (objects, callback, reviver) {
     var _this = this;
 
     if (objects.length === 0) {
@@ -127,7 +141,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
       _this.renderOnAddRemove = renderOnAddRemove;
       callback && callback();
-    });
+    }, null, reviver);
   },
 
   /**

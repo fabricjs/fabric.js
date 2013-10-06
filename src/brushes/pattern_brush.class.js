@@ -37,8 +37,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
   /**
    * Sets brush styles
    */
-  setBrushStyles: function() {
-    this.callSuper('setBrushStyles');
+  _setBrushStyles: function() {
+    this.callSuper('_setBrushStyles');
     this.canvas.contextTop.strokeStyle = this.getPattern();
   },
 

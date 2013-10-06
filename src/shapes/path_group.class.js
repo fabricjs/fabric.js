@@ -16,6 +16,7 @@
    * Path group class
    * @class fabric.PathGroup
    * @extends fabric.Path
+   * @tutorial {@link http://fabricjs.com/fabric-intro-part-1/#path_and_pathgroup}
    */
   fabric.PathGroup = fabric.util.createClass(fabric.Path, /** @lends fabric.PathGroup.prototype */ {
 
@@ -96,7 +97,7 @@
      */
     _set: function(prop, value) {
 
-      if ((prop === 'fill' || prop === 'overlayFill') && value && this.isSameColor()) {
+      if (prop === 'fill' && value && this.isSameColor()) {
         var i = this.paths.length;
         while (i--) {
           this.paths[i]._set(prop, value);
@@ -108,19 +109,22 @@
 
     /**
      * Returns object representation of this path group
-     * @param {Array} [propertiesToInclude]
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
-      return extend(parentToObject.call(this, propertiesToInclude), {
-        paths: invoke(this.getObjects(), 'toObject', propertiesToInclude),
-        sourcePath: this.sourcePath
+      var o = extend(parentToObject.call(this, propertiesToInclude), {
+        paths: invoke(this.getObjects(), 'toObject', propertiesToInclude)
       });
+      if (this.sourcePath) {
+        o.sourcePath = this.sourcePath;
+      }
+      return o;
     },
 
     /**
      * Returns dataless object representation of this path group
-     * @param {Array} [propertiesToInclude]
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} dataless object representation of an instance
      */
     toDatalessObject: function(propertiesToInclude) {
@@ -134,9 +138,10 @@
     /* _TO_SVG_START_ */
     /**
      * Returns svg representation of an instance
+     * @param {Function} [reviver] Method for further parsing of svg representation.
      * @return {String} svg representation of an instance
      */
-    toSVG: function() {
+    toSVG: function(reviver) {
       var objects = this.getObjects();
       var markup = [
         '<g ',
@@ -146,11 +151,11 @@
       ];
 
       for (var i = 0, len = objects.length; i < len; i++) {
-        markup.push(objects[i].toSVG());
+        markup.push(objects[i].toSVG(reviver));
       }
       markup.push('</g>');
 
-      return markup.join('');
+      return reviver ? reviver(markup.join('')) : markup.join('');
     },
     /* _TO_SVG_END_ */
 
@@ -185,18 +190,6 @@
     },
 
     /**
-      * Makes path group grayscale
-      * @return {fabric.PathGroup} thisArg
-      */
-    toGrayscale: function() {
-      var i = this.paths.length;
-      while (i--) {
-        this.paths[i].toGrayscale();
-      }
-      return this;
-    },
-
-    /**
      * Returns all paths in this path group
      * @return {Array} array of path objects included in this path group
      */
@@ -209,7 +202,7 @@
    * Creates fabric.PathGroup instance from an object representation
    * @static
    * @memberOf fabric.PathGroup
-   * @param {Object} object
+   * @param {Object} object Object to create an instance from
    * @param {Function} callback Callback to invoke when an fabric.PathGroup instance is created
    */
   fabric.PathGroup.fromObject = function(object, callback) {

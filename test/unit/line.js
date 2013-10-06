@@ -9,7 +9,6 @@
     'width':              2,
     'height':             2,
     'fill':               'rgb(0,0,0)',
-    'overlayFill':        null,
     'stroke':             null,
     'strokeWidth':        1,
     'strokeDashArray':    null,
@@ -26,15 +25,10 @@
     'y1':                 12,
     'x2':                 13,
     'y2':                 14,
-    'selectable':         true,
-    'hasControls':        true,
-    'hasBorders':         true,
-    'hasRotatingPoint':   true,
-    'transparentCorners': true,
-    'perPixelTargetFind': false,
     'shadow':             null,
     'visible':            true,
-    'clipTo':             null
+    'clipTo':             null,
+    'backgroundColor':    ''
   };
 
   QUnit.module('fabric.Line');

@@ -1,4 +1,4 @@
-(function() {
+(function(global) {
 
   var sqrt = Math.sqrt,
       atan2 = Math.atan2;
@@ -112,7 +112,9 @@
     * @return {Object} klass "Class"
     */
   function getKlass(type, namespace) {
-    return resolveNamespace(namespace)[fabric.util.string.camelize(fabric.util.string.capitalize(type))];
+    // capitalize first letter only
+    type = fabric.util.string.camelize(type.charAt(0).toUpperCase() + type.slice(1));
+    return resolveNamespace(namespace)[type];
   }
 
   /**
@@ -126,7 +128,7 @@
 
     var parts = namespace.split('.'),
         len = parts.length,
-        obj = fabric.window;
+        obj = global || fabric.window;
 
     for (var i = 0; i < len; ++i) {
       obj = obj[parts[i]];
@@ -163,8 +165,9 @@
    * @memberOf fabric.util
    * @param {Array} objects Objects to enliven
    * @param {Function} callback Callback to invoke when all objects are created
+   * @param {Function} [reviver] Method for further parsing of object elements, called after each fabric object created.
    */
-  function enlivenObjects(objects, callback, namespace) {
+  function enlivenObjects(objects, callback, namespace, reviver) {
 
     function onLoaded() {
       if (++numLoadedObjects === numTotalObjects) {
@@ -179,20 +182,24 @@
         numTotalObjects = objects.length;
 
     objects.forEach(function (o, index) {
-      if (!o.type) {
+      // if sparse array
+      if (!o || !o.type) {
+        onLoaded();
         return;
       }
       var klass = fabric.util.getKlass(o.type, namespace);
       if (klass.async) {
-        klass.fromObject(o, function (o, error) {
+        klass.fromObject(o, function (obj, error) {
           if (!error) {
-            enlivenedObjects[index] = o;
+            enlivenedObjects[index] = obj;
+            reviver && reviver(o, enlivenedObjects[index]);
           }
           onLoaded();
         });
       }
       else {
         enlivenedObjects[index] = klass.fromObject(o);
+        reviver && reviver(o, enlivenedObjects[index]);
         onLoaded();
       }
     });
@@ -530,4 +537,4 @@
   fabric.util.getFunctionBody = getFunctionBody;
   fabric.util.drawArc = drawArc;
 
-})();
+})(typeof exports !== 'undefined' ? exports : this);

@@ -7,8 +7,8 @@
     /**
      * Translates the coordinates from origin to center coordinates (based on the object's dimensions)
      * @param {fabric.Point} point The point which corresponds to the originX and originY params
-     * @param {string} enum('left', 'center', 'right') Horizontal origin
-     * @param {string} enum('top', 'center', 'bottom') Vertical origin
+     * @param {String} originX Horizontal origin: 'left', 'center' or 'right'
+     * @param {String} originY Vertical origin: 'top', 'center' or 'bottom'
      * @return {fabric.Point}
      */
     translateToCenterPoint: function(point, originX, originY) {
@@ -35,8 +35,8 @@
     /**
      * Translates the coordinates from center to origin coordinates (based on the object's dimensions)
      * @param {fabric.Point} point The point which corresponds to center of the object
-     * @param {string} enum('left', 'center', 'right') Horizontal origin
-     * @param {string} enum('top', 'center', 'bottom') Vertical origin
+     * @param {String} originX Horizontal origin: 'left', 'center' or 'right'
+     * @param {String} originY Vertical origin: 'top', 'center' or 'bottom'
      * @return {fabric.Point}
      */
     translateToOriginPoint: function(center, originX, originY) {
@@ -65,8 +65,8 @@
      * @return {fabric.Point}
      */
     getCenterPoint: function() {
-      return this.translateToCenterPoint(
-        new fabric.Point(this.left, this.top), this.originX, this.originY);
+      var leftTop = new fabric.Point(this.left, this.top);
+      return this.translateToCenterPoint(leftTop, this.originX, this.originY);
     },
 
     /**
@@ -80,15 +80,14 @@
 
     /**
      * Returns the coordinates of the object as if it has a different origin
-     * @param {string} enum('left', 'center', 'right') Horizontal origin
-     * @param {string} enum('top', 'center', 'bottom') Vertical origin
+     * @param {String} originX Horizontal origin: 'left', 'center' or 'right'
+     * @param {String} originY Vertical origin: 'top', 'center' or 'bottom'
      * @return {fabric.Point}
      */
-    // getPointByOrigin: function(originX, originY) {
-    //   var center = this.getCenterPoint();
-
-    //   return this.translateToOriginPoint(center, originX, originY);
-    // },
+    getPointByOrigin: function(originX, originY) {
+      var center = this.getCenterPoint();
+      return this.translateToOriginPoint(center, originX, originY);
+    },
 
     /**
      * Returns the point in local coordinates
@@ -125,7 +124,8 @@
         y = this.top;
       }
 
-      return fabric.util.rotatePoint(new fabric.Point(point.x, point.y), center, -degreesToRadians(this.angle)).subtractEquals(new fabric.Point(x, y));
+      return fabric.util.rotatePoint(new fabric.Point(point.x, point.y), center, -degreesToRadians(this.angle))
+        .subtractEquals(new fabric.Point(x, y));
     },
 
     /**
@@ -140,8 +140,8 @@
     /**
      * Sets the position of the object taking into consideration the object's origin
      * @param {fabric.Point} point The new position of the object
-     * @param {string} enum('left', 'center', 'right') Horizontal origin
-     * @param {string} enum('top', 'center', 'bottom') Vertical origin
+     * @param {String} originX Horizontal origin: 'left', 'center' or 'right'
+     * @param {String} originY Vertical origin: 'top', 'center' or 'bottom'
      * @return {void}
      */
     setPositionByOrigin: function(pos, originX, originY) {
@@ -195,22 +195,7 @@
      * @private
      */
     _getLeftTopCoords: function() {
-      var angle = degreesToRadians(this.angle);
-
-      var hypotHalf = this.getWidth() / 2;
-      var xHalf = Math.cos(angle) * hypotHalf;
-      var yHalf = Math.sin(angle) * hypotHalf;
-      var x = this.left;
-      var y = this.top;
-
-      if (this.originX === 'center' || this.originX === 'right') {
-        x -= xHalf;
-      }
-      if (this.originY === 'center' || this.originY === 'bottom') {
-        y -= yHalf;
-      }
-
-      return { x: x, y: y };
+      return this.translateToOriginPoint(this.getCenterPoint(), 'left', 'center');
     }
   });
 

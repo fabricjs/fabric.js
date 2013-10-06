@@ -24,6 +24,7 @@
      * Constructor
      * @memberOf fabric.Image.filters.Noise.prototype
      * @param {Object} [options] Options object
+     * @param {Number} [options.noise=100] Noise value
      */
     initialize: function(options) {
       options = options || { };

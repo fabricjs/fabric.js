@@ -50,6 +50,7 @@
    * Path class
    * @class fabric.Path
    * @extends fabric.Object
+   * @tutorial {@link http://fabricjs.com/fabric-intro-part-1/#path_and_pathgroup}
    */
   fabric.Path = fabric.util.createClass(fabric.Object, /** @lends fabric.Path.prototype */ {
 
@@ -438,10 +439,7 @@
       }
       // ctx.globalCompositeOperation = this.fillRule;
 
-      if (this.overlayFill) {
-        ctx.fillStyle = this.overlayFill;
-      }
-      else if (this.fill) {
+      if (this.fill) {
         ctx.fillStyle = this.fill.toLive
           ? this.fill.toLive(ctx)
           : this.fill;
@@ -519,9 +517,10 @@
     /* _TO_SVG_START_ */
     /**
      * Returns svg representation of an instance
+     * @param {Function} [reviver] Method for further parsing of svg representation.
      * @return {String} svg representation of an instance
      */
-    toSVG: function() {
+    toSVG: function(reviver) {
       var chunks = [],
           markup = this._createBaseSVGMarkup();
 
@@ -541,7 +540,7 @@
         '</g>'
       );
 
-      return markup.join('');
+      return reviver ? reviver(markup.join('')) : markup.join('');
     },
     /* _TO_SVG_END_ */
 

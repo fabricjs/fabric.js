@@ -1,11 +1,13 @@
 /**
  * Pattern class
  * @class fabric.Pattern
+ * @see {@link http://fabricjs.com/patterns/|Pattern demo}
+ * @see {@link http://fabricjs.com/dynamic-patterns/|DynamicPattern demo}
  */
 fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ {
 
   /**
-   * Repeat property of a pattern (one of repeat, repeat-x, repeat-y)
+   * Repeat property of a pattern (one of repeat, repeat-x, repeat-y or no-repeat)
    * @type String
    * @default
    */
@@ -94,7 +96,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
   /* _TO_SVG_START_ */
   /**
    * Returns SVG representation of a pattern
-   * @param {Object} object
+   * @param {fabric.Object} object
    * @return {String} SVG representation of a pattern
    */
   toSVG: function(object) {

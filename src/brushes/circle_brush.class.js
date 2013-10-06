@@ -60,6 +60,8 @@ fabric.CircleBrush = fabric.util.createClass(fabric.BaseBrush, /** @lends fabric
     var originalRenderOnAddRemove = this.canvas.renderOnAddRemove;
     this.canvas.renderOnAddRemove = false;
 
+    var circles = [ ];
+
     for (var i = 0, len = this.points.length; i < len; i++) {
       var point = this.points[i];
       var circle = new fabric.Circle({
@@ -71,9 +73,12 @@ fabric.CircleBrush = fabric.util.createClass(fabric.BaseBrush, /** @lends fabric
 
       this.shadow && circle.setShadow(this.shadow);
 
-      this.canvas.add(circle);
-      this.canvas.fire('path:created', { path: circle });
+      circles.push(circle);
     }
+    var group = new fabric.Group(circles);
+
+    this.canvas.add(group);
+    this.canvas.fire('path:created', { path: group });
 
     this.canvas.clearContext(this.canvas.contextTop);
     this._resetShadow();

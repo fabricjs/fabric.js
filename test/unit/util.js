@@ -745,4 +745,17 @@
       '\n if (1) { alert(12345) } ');
   });
 
+  test('getKlass', function() {
+    equal(fabric.util.getKlass('circle'), fabric.Circle);
+    equal(fabric.util.getKlass('rect'), fabric.Rect);
+    equal(fabric.util.getKlass('RemoveWhite', 'fabric.Image.filters'), fabric.Image.filters.RemoveWhite);
+    equal(fabric.util.getKlass('Sepia2', 'fabric.Image.filters'), fabric.Image.filters.Sepia2);
+  });
+
+  test('resolveNamespace', function() {
+    equal(fabric.util.resolveNamespace('fabric'), fabric);
+    equal(fabric.util.resolveNamespace('fabric.Image'), fabric.Image);
+    equal(fabric.util.resolveNamespace('fabric.Image.filters'), fabric.Image.filters);
+  });
+
 })();

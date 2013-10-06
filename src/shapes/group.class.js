@@ -28,7 +28,8 @@
    * Group class
    * @class fabric.Group
    * @extends fabric.Object
-   * @extends fabric.Collection
+   * @mixes fabric.Collection
+   * @tutorial {@link http://fabricjs.com/fabric-intro-part-3/#groups}
    */
   fabric.Group = fabric.util.createClass(fabric.Object, fabric.Collection, /** @lends fabric.Group.prototype */ {
 
@@ -134,6 +135,7 @@
      * @chainable
      */
     removeWithUpdate: function(object) {
+      this._moveFlippedObject(object);
       this._restoreObjectsState();
       // since _restoreObjectsState set objects inactive
       this.forEachObject(function(o){ o.set('active', true); o.group = this; }, this);
@@ -194,7 +196,7 @@
 
     /**
      * Returns object representation of an instance
-     * @param {Array} propertiesToInclude
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
@@ -259,13 +261,50 @@
     },
 
     /**
+     * Moves a flipped object to the position where it's displayed
+     * @private
+     * @param {fabric.Object} object
+     * @return {fabric.Group} thisArg
+     */
+    _moveFlippedObject: function(object) {
+      var oldOriginX = object.get('originX');
+      var oldOriginY = object.get('originY');
+      var center = object.getCenterPoint();
+      object.set({
+        originX: 'center',
+        originY: 'center',
+        left: center.x,
+        top: center.y
+      });
+
+      if (this.flipX) {
+        object.toggle('flipX');
+        object.set('left', -object.get('left'));
+        object.setAngle(-object.getAngle());
+      }
+      if (this.flipY) {
+        object.toggle('flipY');
+        object.set('top', -object.get('top'));
+        object.setAngle(-object.getAngle());
+      }
+
+      var newOrigin = object.getPointByOrigin(oldOriginX, oldOriginY);
+      object.set({
+        originX: oldOriginX,
+        originY: oldOriginY,
+        left: newOrigin.x,
+        top: newOrigin.y
+      });
+      return this;
+    },
+
+    /**
      * Restores original state of a specified object in group
      * @private
      * @param {fabric.Object} object
      * @return {fabric.Group} thisArg
      */
     _restoreObjectState: function(object) {
-
       var groupLeft = this.get('left'),
           groupTop = this.get('top'),
           groupAngle = this.getAngle() * (Math.PI / 180),
@@ -296,6 +335,7 @@
      * @chainable
      */
     destroy: function() {
+      this._objects.forEach(this._moveFlippedObject, this);
       return this._restoreObjectsState();
     },
 
@@ -385,18 +425,23 @@
     /* _TO_SVG_START_ */
     /**
      * Returns svg representation of an instance
+     * @param {Function} [reviver] Method for further parsing of svg representation.
      * @return {String} svg representation of an instance
      */
-    toSVG: function() {
-      var objectsMarkup = [ ];
-      for (var i = this._objects.length; i--; ) {
-        objectsMarkup.push(this._objects[i].toSVG());
+    toSVG: function(reviver) {
+      var markup = [
+        '<g ',
+          'transform="', this.getSvgTransform(),
+        '">'
+      ];
+
+      for (var i = 0, len = this._objects.length; i < len; i++) {
+        markup.push(this._objects[i].toSVG(reviver));
       }
 
-      return (
-        '<g transform="' + this.getSvgTransform() + '">' +
-          objectsMarkup.join('') +
-        '</g>');
+      markup.push('</g>');
+
+      return reviver ? reviver(markup.join('')) : markup.join('');
     },
     /* _TO_SVG_END_ */
 

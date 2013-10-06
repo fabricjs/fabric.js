@@ -144,8 +144,8 @@ var filesToInclude = [
   'src/util/dom_misc.js',
   'src/util/dom_request.js',
 
-  //ifSpecifiedInclude('animation', 'src/util/animate.js'),
-  'src/util/animate.js',
+  ifSpecifiedInclude('animation', 'src/util/animate.js'),
+  //'src/util/animate.js',
   ifSpecifiedInclude('easing', 'src/util/anim_ease.js'),
 
   ifSpecifiedInclude('parser', 'src/parser.js'),
@@ -183,8 +183,8 @@ var filesToInclude = [
 
   ifSpecifiedInclude('interaction', 'src/mixins/object_interactivity.mixin.js'),
 
-  // ifSpecifiedInclude('animation', 'src/mixins/animation.mixin.js'),
-  'src/mixins/animation.mixin.js',
+  ifSpecifiedInclude('animation', 'src/mixins/animation.mixin.js'),
+  //'src/mixins/animation.mixin.js',
 
   'src/shapes/line.class.js',
   'src/shapes/circle.class.js',

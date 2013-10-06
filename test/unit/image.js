@@ -23,7 +23,6 @@
     'width':              IMG_WIDTH, // node-canvas doesn't seem to allow setting width/height on image objects
     'height':             IMG_HEIGHT, // or does it now?
     'fill':               'rgb(0,0,0)',
-    'overlayFill':        null,
     'stroke':             null,
     'strokeWidth':        1,
     'strokeDashArray':    null,
@@ -37,14 +36,9 @@
     'flipY':              false,
     'opacity':            1,
     'src':                fabric.isLikelyNode ? undefined : IMG_SRC,
-    'selectable':         true,
-    'hasControls':        true,
-    'hasBorders':         true,
-    'hasRotatingPoint':   true,
-    'transparentCorners': true,
-    'perPixelTargetFind': false,
     'shadow':             null,
     'visible':            true,
+    'backgroundColor':    '',
     'clipTo':             null,
     'filters':            []
   };

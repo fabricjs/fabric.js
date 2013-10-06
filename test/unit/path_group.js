@@ -9,7 +9,6 @@
     'width':              0,
     'height':             0,
     'fill':               '',
-    'overlayFill':        null,
     'stroke':             null,
     'strokeWidth':        1,
     'strokeDashArray':    null,
@@ -22,15 +21,10 @@
     'flipX':              false,
     'flipY':              false,
     'opacity':            1,
-    'selectable':         true,
-    'hasControls':        true,
-    'hasBorders':         true,
-    'hasRotatingPoint':   true,
-    'transparentCorners': true,
-    'perPixelTargetFind': false,
     'shadow':             null,
     'visible':            true,
     'clipTo':             null,
+    'backgroundColor':    '',
     'paths':              getPathObjects()
   };
 
@@ -216,35 +210,6 @@
       pathGroup.set('left', 1234);
       ok(pathGroup.getObjects()[0].get('left') !== 1234);
       equal(pathGroup.get('left'), 1234);
-      start();
-    });
-  });
-
-  asyncTest('grayscale', function() {
-
-    getPathGroupObject(function(pathGroup) {
-
-      pathGroup.getObjects()[0].group = null;
-      pathGroup.getObjects()[1].group = null;
-
-      ok(typeof pathGroup.toGrayscale == 'function');
-      equal(pathGroup.toGrayscale(), pathGroup, 'should be chainable');
-      var firstObject = pathGroup.getObjects()[0],
-          secondObject = pathGroup.getObjects()[1];
-
-      firstObject.set('overlayFill', null);
-      secondObject.set('overlayFill', null);
-
-      firstObject.set('fill', 'rgb(200,0,0)');
-      secondObject.set('fill', '0000FF');
-
-      pathGroup.toGrayscale();
-
-      equal(firstObject.get('overlayFill'), 'rgb(60,60,60)');
-      equal(secondObject.get('overlayFill'), 'rgb(28,28,28)');
-
-      equal(firstObject.get('fill'), 'rgb(200,0,0)', 'toGrayscale should not change original fill value');
-      equal(new fabric.Color(secondObject.get('fill')).toRgb(), 'rgb(0,0,255)', 'toGrayscale should not change original fill value');
       start();
     });
   });

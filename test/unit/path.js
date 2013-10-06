@@ -9,7 +9,6 @@
     'width':              200,
     'height':             200,
     'fill':               'red',
-    'overlayFill':        null,
     'stroke':             'blue',
     'strokeWidth':        1,
     'strokeDashArray':    null,
@@ -24,14 +23,9 @@
     'opacity':            1,
     'path':               [['M', 100, 100], ['L', 300, 100], ['L', 200, 300], ['z']],
     'pathOffset':         { x: 100, y: 100 },
-    'selectable':         true,
-    'hasControls':        true,
-    'hasBorders':         true,
-    'hasRotatingPoint':   true,
-    'transparentCorners': true,
-    'perPixelTargetFind': false,
     'shadow':             null,
     'visible':            true,
+    'backgroundColor':    '',
     'clipTo':             null
   };
 
