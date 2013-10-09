@@ -739,8 +739,11 @@
 
     /**
      * @private
+     * @param {Event} e mouse event
      */
     _findSelectedObjects: function (e) {
+      if (!this.selection) return;
+
       var group = [ ],
           x1 = this._groupSelector.ex,
           y1 = this._groupSelector.ey,
@@ -754,20 +757,18 @@
       for (var i = this._objects.length; i--; ) {
         currentObject = this._objects[i];
 
-        if (!currentObject) continue;
+        if (!currentObject || !currentObject.selectable || !currentObject.visible) continue;
 
         if (currentObject.intersectsWithRect(selectionX1Y1, selectionX2Y2) ||
             currentObject.isContainedWithinRect(selectionX1Y1, selectionX2Y2) ||
             currentObject.containsPoint(selectionX1Y1) ||
-            currentObject.containsPoint(selectionX2Y2)) {
+            currentObject.containsPoint(selectionX2Y2)
+        ) {
+          currentObject.set('active', true);
+          group.push(currentObject);
 
-          if (this.selection && currentObject.selectable) {
-            currentObject.set('active', true);
-            group.push(currentObject);
-
-            // only add one object if it's a click
-            if (isClick) break;
-          }
+          // only add one object if it's a click
+          if (isClick) break;
         }
       }
 
