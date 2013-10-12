@@ -31,16 +31,16 @@
      * @private
      */
     _initEvents: function () {
-      var _this = this;
 
       this._onMouseDown = this._onMouseDown.bind(this);
       this._onMouseMove = this._onMouseMove.bind(this);
       this._onMouseUp = this._onMouseUp.bind(this);
       this._onResize = this._onResize.bind(this);
-
-      this._onGesture = function(e, s) {
-        _this.__onTransformGesture(e, s);
-      };
+      this._onGesture = this._onGesture.bind(this);
+      this._onDrag = this._onDrag.bind(this);
+      this._onShake = this._onShake.bind(this);
+      this._onOrientationChange = this._onOrientationChange.bind(this);
+      this._onMouseWheel = this._onMouseWheel.bind(this);
 
       addListener(fabric.window, 'resize', this._onResize);
 
@@ -50,12 +50,61 @@
 
         if (typeof Event !== 'undefined' && 'add' in Event) {
           Event.add(this.upperCanvasEl, 'gesture', this._onGesture);
+          Event.add(this.upperCanvasEl, 'drag', this._onDrag);
+          Event.add(this.upperCanvasEl, 'orientation', this._onOrientationChange);
+          Event.add(this.upperCanvasEl, 'shake', this._onShake);
         }
       }
       else {
         addListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
         addListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
+        addListener(this.upperCanvasEl, 'mousewheel', this._onMouseWheel);
       }
+    },
+
+    /**
+     * @private
+     * @param {Event} [e] Event object fired on Event.js gesture
+     * @param {Event} [self] Inner Event object
+     */
+    _onGesture: function(e, s) {
+      this.__onTransformGesture(e, s);
+    },
+
+    /**
+     * @private
+     * @param {Event} [e] Event object fired on Event.js drag
+     * @param {Event} [self] Inner Event object
+     */
+    _onDrag: function(e, s) {
+      this.__onDrag(e, s);
+    },
+
+    /**
+     * @private
+     * @param {Event} [e] Event object fired on Event.js wheel event
+     * @param {Event} [self] Inner Event object
+     */
+    _onMouseWheel: function(e, s) {
+      this.__onMouseWheel(e, s);
+    },
+
+    /**
+     * @private
+     * @param {Event} [e] Event object fired on Event.js orientation change
+     * @param {Event} [self] Inner Event object
+     */
+    _onOrientationChange: function(e,s) {
+      this.__onOrientationChange(e,s);
+    },
+
+    /**
+     * @private
+     * @param {Event} [e] Event object fired on Event.js shake
+     * @param {Event} [self] Inner Event object
+     */
+    _onShake: function(e,s) {
+      this.__onShake(e,s);
     },
 
     /**
