@@ -55,14 +55,14 @@ Fabric.js started as a foundation for design editor on [printio.ru](http://print
 
         $ node build.js
 
-    - Or build a custom distribution file, by passing (comma separated) module names to be included.
+    2.1 Or build a custom distribution file, by passing (comma separated) module names to be included.
 
-            $ node build.js modules=text,serialization,parser
-            // or
-            $ node build.js modules=text
-            // or
-            $ node build.js modules=parser,text
-            // etc.
+          $ node build.js modules=text,serialization,parser
+          // or
+          $ node build.js modules=text
+          // or
+          $ node build.js modules=parser,text
+          // etc.
 
       By default (when none of the modules are specified) only basic functionality is included.
       See the list of modules below for more information on each one of them.
@@ -70,11 +70,15 @@ Fabric.js started as a foundation for design editor on [printio.ru](http://print
 
       To get minimal distribution with interactivity, make sure to include corresponding module:
 
-            $ node build.js modules=interaction
+          $ node build.js modules=interaction
 
-    - You can also include all modules like so:
+    2.2 You can also include all modules like so:
 
-            $ node build.js modules=ALL
+          $ node build.js modules=ALL
+
+    2.3 You can exclude a few modules like so:
+
+          $ node build.js modules=ALL exclude=gestures,image_filters
 
 3. Create a minified distribution file
 
@@ -86,7 +90,15 @@ Fabric.js started as a foundation for design editor on [printio.ru](http://print
 
 4. Enable AMD support via require.js (requires uglify)
 
-        $ node build.js requirejs modules=... 
+        $ node build.js requirejs modules=...
+
+5. Create source map file for better productive debugging (requires uglify or google closure compiler).<br>More information about [source maps](http://www.html5rocks.com/en/tutorials/developertools/sourcemaps/).
+
+        $ node build.js sourcemap modules=...
+
+    If you use google closure compiler you have to add `sourceMappingURL` manually at the end of the minified file all.min.js (see issue https://code.google.com/p/closure-compiler/issues/detail?id=941).
+
+        //# sourceMappingURL=all.min.js.map
 
 ### Demos
 
@@ -122,6 +134,7 @@ Additional flags for build script are:
 - **no-strict** — Strips "use strict" directives from source
 - **no-svg-export** — Removes svg exporting functionality
 - **no-es5-compat** - Removes ES5 compat methods (Array.prototype.*, String.prototype.*, Function.prototype.*)
+- **sourcemap** - Generates a sourceMap file and adds the `sourceMappingURL` (only if uglifyjs is used) to `dist/all.min.js`
 
 For example:
 
