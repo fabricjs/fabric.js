@@ -7,5 +7,5 @@ var exports = exports || {};
 exports.fabric = fabric;
 
 if (typeof define === "function" && define.amd) {
-  define("fabric", [], function() { return fabric });
+  define([], function() { return fabric });
 }
