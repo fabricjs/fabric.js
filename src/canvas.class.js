@@ -479,6 +479,8 @@
           if (activeGroup.size() === 1) {
             // remove group alltogether if after removal it only contains 1 object
             this.discardActiveGroup();
+            // activate last remaining object
+            this.setActiveObject(activeGroup.item(0));
           }
         }
         else {

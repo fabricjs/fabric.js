@@ -166,11 +166,12 @@
     _shouldRender: function(target, pointer) {
       var activeObject = this.getActiveGroup() || this.getActiveObject();
 
-      return (
+      return !!(
         (target && (
         target.isMoving ||
         target !== activeObject)) ||
-        (!target && activeObject) ||
+        (!target && !!activeObject) ||
+        (!target && !activeObject && !this._groupSelector) ||
         (pointer &&
         this._previousPointer &&
         this.selection && (
