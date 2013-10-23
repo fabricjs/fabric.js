@@ -476,11 +476,13 @@
           activeGroup.removeWithUpdate(target);
           this._resetObjectTransform(activeGroup);
           target.set('active', false);
+
           if (activeGroup.size() === 1) {
             // remove group alltogether if after removal it only contains 1 object
             this.discardActiveGroup();
             // activate last remaining object
             this.setActiveObject(activeGroup.item(0));
+            return;
           }
         }
         else {
