@@ -1021,15 +1021,7 @@
         this.transform(ctx);
       }
 
-      if (this.stroke) {
-        ctx.lineWidth = this.strokeWidth;
-        ctx.lineCap = this.strokeLineCap;
-        ctx.lineJoin = this.strokeLineJoin;
-        ctx.miterLimit = this.strokeMiterLimit;
-        ctx.strokeStyle = this.stroke.toLive
-          ? this.stroke.toLive(ctx)
-          : this.stroke;
-      }
+      this._setStrokeStyles(ctx);
 
       if (this.fill) {
         ctx.fillStyle = this.fill.toLive
@@ -1053,6 +1045,18 @@
         this.drawControls(ctx);
       }
       ctx.restore();
+    },
+
+    _setStrokeStyles: function(ctx) {
+      if (this.stroke) {
+        ctx.lineWidth = this.strokeWidth;
+        ctx.lineCap = this.strokeLineCap;
+        ctx.lineJoin = this.strokeLineJoin;
+        ctx.miterLimit = this.strokeMiterLimit;
+        ctx.strokeStyle = this.stroke.toLive
+          ? this.stroke.toLive(ctx)
+          : this.stroke;
+      }
     },
 
     /**

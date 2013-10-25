@@ -139,14 +139,7 @@
      */
     _stroke: function(ctx) {
       ctx.save();
-      ctx.lineWidth = this.strokeWidth;
-      ctx.lineCap = this.strokeLineCap;
-      ctx.lineJoin = this.strokeLineJoin;
-      ctx.miterLimit = this.strokeMiterLimit;
-      ctx.strokeStyle = this.stroke.toLive
-        ? this.stroke.toLive(ctx)
-        : this.stroke;
-
+      this._setStrokeStyles(ctx);
       ctx.beginPath();
       ctx.strokeRect(-this.width / 2, -this.height / 2, this.width, this.height);
       ctx.closePath();
@@ -164,13 +157,7 @@
          h = this.height;
 
       ctx.save();
-      ctx.lineWidth = this.strokeWidth;
-      ctx.lineCap = this.strokeLineCap;
-      ctx.lineJoin = this.strokeLineJoin;
-      ctx.miterLimit = this.strokeMiterLimit;
-      ctx.strokeStyle = this.stroke.toLive
-        ? this.stroke.toLive(ctx)
-        : this.stroke;
+      this._setStrokeStyles(ctx);
 
       ctx.beginPath();
       fabric.util.drawDashedLine(ctx, x, y, x+w, y, this.strokeDashArray);

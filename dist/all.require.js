@@ -11657,15 +11657,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         this.transform(ctx);
       }
 
-      if (this.stroke) {
-        ctx.lineWidth = this.strokeWidth;
-        ctx.lineCap = this.strokeLineCap;
-        ctx.lineJoin = this.strokeLineJoin;
-        ctx.miterLimit = this.strokeMiterLimit;
-        ctx.strokeStyle = this.stroke.toLive
-          ? this.stroke.toLive(ctx)
-          : this.stroke;
-      }
+      this._setStrokeStyles(ctx);
 
       if (this.fill) {
         ctx.fillStyle = this.fill.toLive
@@ -11689,6 +11681,18 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         this.drawControls(ctx);
       }
       ctx.restore();
+    },
+
+    _setStrokeStyles: function(ctx) {
+      if (this.stroke) {
+        ctx.lineWidth = this.strokeWidth;
+        ctx.lineCap = this.strokeLineCap;
+        ctx.lineJoin = this.strokeLineJoin;
+        ctx.miterLimit = this.strokeMiterLimit;
+        ctx.strokeStyle = this.stroke.toLive
+          ? this.stroke.toLive(ctx)
+          : this.stroke;
+      }
     },
 
     /**
@@ -15320,16 +15324,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           : this.fill;
       }
 
-      if (this.stroke) {
-        ctx.lineWidth = this.strokeWidth;
-        ctx.lineCap = this.strokeLineCap;
-        ctx.lineJoin = this.strokeLineJoin;
-        ctx.miterLimit = this.strokeMiterLimit;
-        ctx.strokeStyle = this.stroke.toLive
-          ? this.stroke.toLive(ctx)
-          : this.stroke;
-      }
-
+      this._setStrokeStyles(ctx);
       this._setShadow(ctx);
       this.clipTo && fabric.util.clipContext(this, ctx);
       ctx.beginPath();
@@ -16494,14 +16489,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     _stroke: function(ctx) {
       ctx.save();
-      ctx.lineWidth = this.strokeWidth;
-      ctx.lineCap = this.strokeLineCap;
-      ctx.lineJoin = this.strokeLineJoin;
-      ctx.miterLimit = this.strokeMiterLimit;
-      ctx.strokeStyle = this.stroke.toLive
-        ? this.stroke.toLive(ctx)
-        : this.stroke;
-
+      this._setStrokeStyles(ctx);
       ctx.beginPath();
       ctx.strokeRect(-this.width / 2, -this.height / 2, this.width, this.height);
       ctx.closePath();
@@ -16519,13 +16507,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
          h = this.height;
 
       ctx.save();
-      ctx.lineWidth = this.strokeWidth;
-      ctx.lineCap = this.strokeLineCap;
-      ctx.lineJoin = this.strokeLineJoin;
-      ctx.miterLimit = this.strokeMiterLimit;
-      ctx.strokeStyle = this.stroke.toLive
-        ? this.stroke.toLive(ctx)
-        : this.stroke;
+      this._setStrokeStyles(ctx);
 
       ctx.beginPath();
       fabric.util.drawDashedLine(ctx, x, y, x+w, y, this.strokeDashArray);
@@ -18529,15 +18511,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
             ? this.fill.toLive(ctx)
             : this.fill;
       }
-      if (this.stroke) {
-        ctx.lineWidth = this.strokeWidth;
-        ctx.lineCap = this.strokeLineCap;
-        ctx.lineJoin = this.strokeLineJoin;
-        ctx.miterLimit = this.strokeMiterLimit;
-        ctx.strokeStyle = this.stroke.toLive
-          ? this.stroke.toLive(ctx)
-          : this.stroke;
-      }
+      this._setStrokeStyles(ctx);
       ctx.textBaseline = 'alphabetic';
       if (!this.skipTextAlign) {
         ctx.textAlign = this.textAlign;

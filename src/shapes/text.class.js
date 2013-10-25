@@ -430,15 +430,7 @@
             ? this.fill.toLive(ctx)
             : this.fill;
       }
-      if (this.stroke) {
-        ctx.lineWidth = this.strokeWidth;
-        ctx.lineCap = this.strokeLineCap;
-        ctx.lineJoin = this.strokeLineJoin;
-        ctx.miterLimit = this.strokeMiterLimit;
-        ctx.strokeStyle = this.stroke.toLive
-          ? this.stroke.toLive(ctx)
-          : this.stroke;
-      }
+      this._setStrokeStyles(ctx);
       ctx.textBaseline = 'alphabetic';
       if (!this.skipTextAlign) {
         ctx.textAlign = this.textAlign;
