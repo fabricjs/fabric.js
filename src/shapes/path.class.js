@@ -606,49 +606,10 @@
     _parseDimensions: function() {
       var aX = [],
           aY = [],
-          previousX,
-          previousY,
-          isLowerCase = false,
-          x,
-          y;
+          previous = { };
 
       this.path.forEach(function(item, i) {
-        if (item[0] !== 'H') {
-          previousX = (i === 0) ? getX(item) : getX(this.path[i-1]);
-        }
-        if (item[0] !== 'V') {
-          previousY = (i === 0) ? getY(item) : getY(this.path[i-1]);
-        }
-
-        // lowercased letter denotes relative position;
-        // transform to absolute
-        if (item[0] === item[0].toLowerCase()) {
-          isLowerCase = true;
-        }
-
-        // last 2 items in an array of coordinates are the actualy x/y (except H/V);
-        // collect them
-
-        // TODO (kangax): support relative h/v commands
-
-        x = isLowerCase
-          ? previousX + getX(item)
-          : item[0] === 'V'
-            ? previousX
-            : getX(item);
-
-        y = isLowerCase
-          ? previousY + getY(item)
-          : item[0] === 'H'
-            ? previousY
-            : getY(item);
-
-        var val = parseInt(x, 10);
-        if (!isNaN(val)) aX.push(val);
-
-        val = parseInt(y, 10);
-        if (!isNaN(val)) aY.push(val);
-
+        this._getCoordsFromCommand(item, i, aX, aY, previous);
       }, this);
 
       var minX = min(aX),
@@ -666,6 +627,46 @@
       };
 
       return o;
+    },
+
+    _getCoordsFromCommand: function(item, i, aX, aY, previous) {
+      var isLowerCase = false;
+
+      if (item[0] !== 'H') {
+        previous.x = (i === 0) ? getX(item) : getX(this.path[i - 1]);
+      }
+      if (item[0] !== 'V') {
+        previous.y = (i === 0) ? getY(item) : getY(this.path[i - 1]);
+      }
+
+      // lowercased letter denotes relative position;
+      // transform to absolute
+      if (item[0] === item[0].toLowerCase()) {
+        isLowerCase = true;
+      }
+
+      // last 2 items in an array of coordinates are the actualy x/y (except H/V);
+      // collect them
+
+      // TODO (kangax): support relative h/v commands
+
+      var x = isLowerCase
+        ? previous.x + getX(item)
+        : item[0] === 'V'
+          ? previous.x
+          : getX(item);
+
+      var y = isLowerCase
+        ? previous.y + getY(item)
+        : item[0] === 'H'
+          ? previous.y
+          : getY(item);
+
+      var val = parseInt(x, 10);
+      if (!isNaN(val)) aX.push(val);
+
+      val = parseInt(y, 10);
+      if (!isNaN(val)) aY.push(val);
     }
   });
 
