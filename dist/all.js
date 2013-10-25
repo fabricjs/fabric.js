@@ -1,4 +1,4 @@
-/* build: `node build.js modules=ALL exclude=gestures` */
+/* build: `node build.js modules=ALL exclude=gestures minifier=uglifyjs` */
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
 var fabric = fabric || { version: "1.3.7" };
@@ -7643,17 +7643,22 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
 
       if (!this.interactive) return this;
 
+      removeListener(fabric.window, 'resize', this._onResize);
+      
       if (fabric.isTouchSupported) {
         removeListener(this.upperCanvasEl, 'touchstart', this._onMouseDown);
         removeListener(this.upperCanvasEl, 'touchmove', this._onMouseMove);
         if (typeof Event !== 'undefined' && 'remove' in Event) {
           Event.remove(this.upperCanvasEl, 'gesture', this._onGesture);
+          Event.remove(this.upperCanvasEl, 'drag', this._onDrag);
+          Event.remove(this.upperCanvasEl, 'orientation', this._onOrientationChange);
+          Event.remove(this.upperCanvasEl, 'shake', this._onShake);
         }
       }
       else {
         removeListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
         removeListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
-        removeListener(fabric.window, 'resize', this._onResize);
+        removeListener(this.upperCanvasEl, 'mousewheel', this._onMouseWheel);
       }
       return this;
     },
@@ -8960,9 +8965,13 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
           activeGroup.removeWithUpdate(target);
           this._resetObjectTransform(activeGroup);
           target.set('active', false);
+
           if (activeGroup.size() === 1) {
             // remove group alltogether if after removal it only contains 1 object
             this.discardActiveGroup();
+            // activate last remaining object
+            this.setActiveObject(activeGroup.item(0));
+            return;
           }
         }
         else {
@@ -9223,8 +9232,11 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
     /**
      * @private
+     * @param {Event} e mouse event
      */
     _findSelectedObjects: function (e) {
+      if (!this.selection) return;
+
       var group = [ ],
           x1 = this._groupSelector.ex,
           y1 = this._groupSelector.ey,
@@ -9238,20 +9250,18 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       for (var i = this._objects.length; i--; ) {
         currentObject = this._objects[i];
 
-        if (!currentObject) continue;
+        if (!currentObject || !currentObject.selectable || !currentObject.visible) continue;
 
         if (currentObject.intersectsWithRect(selectionX1Y1, selectionX2Y2) ||
             currentObject.isContainedWithinRect(selectionX1Y1, selectionX2Y2) ||
             currentObject.containsPoint(selectionX1Y1) ||
-            currentObject.containsPoint(selectionX2Y2)) {
+            currentObject.containsPoint(selectionX2Y2)
+        ) {
+          currentObject.set('active', true);
+          group.push(currentObject);
 
-          if (this.selection && currentObject.selectable) {
-            currentObject.set('active', true);
-            group.push(currentObject);
-
-            // only add one object if it's a click
-            if (isClick) break;
-          }
+          // only add one object if it's a click
+          if (isClick) break;
         }
       }
 
@@ -9625,16 +9635,16 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @private
      */
     _initEvents: function () {
-      var _this = this;
 
       this._onMouseDown = this._onMouseDown.bind(this);
       this._onMouseMove = this._onMouseMove.bind(this);
       this._onMouseUp = this._onMouseUp.bind(this);
       this._onResize = this._onResize.bind(this);
-
-      this._onGesture = function(e, s) {
-        _this.__onTransformGesture(e, s);
-      };
+      this._onGesture = this._onGesture.bind(this);
+      this._onDrag = this._onDrag.bind(this);
+      this._onShake = this._onShake.bind(this);
+      this._onOrientationChange = this._onOrientationChange.bind(this);
+      this._onMouseWheel = this._onMouseWheel.bind(this);
 
       addListener(fabric.window, 'resize', this._onResize);
 
@@ -9644,12 +9654,61 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
         if (typeof Event !== 'undefined' && 'add' in Event) {
           Event.add(this.upperCanvasEl, 'gesture', this._onGesture);
+          Event.add(this.upperCanvasEl, 'drag', this._onDrag);
+          Event.add(this.upperCanvasEl, 'orientation', this._onOrientationChange);
+          Event.add(this.upperCanvasEl, 'shake', this._onShake);
         }
       }
       else {
         addListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
         addListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
+        addListener(this.upperCanvasEl, 'mousewheel', this._onMouseWheel);
       }
+    },
+
+    /**
+     * @private
+     * @param {Event} [e] Event object fired on Event.js gesture
+     * @param {Event} [self] Inner Event object
+     */
+    _onGesture: function(e, s) {
+      this.__onTransformGesture(e, s);
+    },
+
+    /**
+     * @private
+     * @param {Event} [e] Event object fired on Event.js drag
+     * @param {Event} [self] Inner Event object
+     */
+    _onDrag: function(e, s) {
+      this.__onDrag(e, s);
+    },
+
+    /**
+     * @private
+     * @param {Event} [e] Event object fired on Event.js wheel event
+     * @param {Event} [self] Inner Event object
+     */
+    _onMouseWheel: function(e, s) {
+      this.__onMouseWheel(e, s);
+    },
+
+    /**
+     * @private
+     * @param {Event} [e] Event object fired on Event.js orientation change
+     * @param {Event} [self] Inner Event object
+     */
+    _onOrientationChange: function(e,s) {
+      this.__onOrientationChange(e,s);
+    },
+
+    /**
+     * @private
+     * @param {Event} [e] Event object fired on Event.js shake
+     * @param {Event} [self] Inner Event object
+     */
+    _onShake: function(e,s) {
+      this.__onShake(e,s);
     },
 
     /**
@@ -9711,11 +9770,12 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     _shouldRender: function(target, pointer) {
       var activeObject = this.getActiveGroup() || this.getActiveObject();
 
-      return (
+      return !!(
         (target && (
         target.isMoving ||
         target !== activeObject)) ||
-        (!target && activeObject) ||
+        (!target && !!activeObject) ||
+        (!target && !activeObject && !this._groupSelector) ||
         (pointer &&
         this._previousPointer &&
         this.selection && (
@@ -10512,9 +10572,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
   /**
    * Clones canvas instance
    * @param {Object} [callback] Receives cloned instance as a first argument
+   * @param {Array} [properties] Array of properties to include in the cloned canvas and children
    */
-  clone: function (callback) {
-    var data = JSON.stringify(this);
+  clone: function (callback, properties) {
+    var data = JSON.stringify(this.toJSON(properties));
     this.cloneWithoutData(function(clone) {
       clone.loadFromJSON(data, function() {
         callback && callback(clone);
@@ -16909,6 +16970,14 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
    * @class fabric.Image.filters.Brightness
    * @memberOf fabric.Image.filters
    * @extends fabric.Image.filters.BaseFilter
+   * @see {@link fabric.Image.filters.Brightness#initialize} for constructor definition
+   * @see {@link http://fabricjs.com/image-filters/|ImageFilters demo}
+   * @example
+   * var filter = new fabric.Image.filters.Brightness({
+   *   brightness: 200
+   * });
+   * object.filters.push(filter);
+   * object.applyFilters(canvas.renderAll.bind(canvas));
    */
   fabric.Image.filters.Brightness = fabric.util.createClass(fabric.Image.filters.BaseFilter, /** @lends fabric.Image.filters.Brightness.prototype */ {
 
@@ -16985,6 +17054,41 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
    * @class fabric.Image.filters.Convolute
    * @memberOf fabric.Image.filters
    * @extends fabric.Image.filters.BaseFilter
+   * @see {@link fabric.Image.filters.Convolute#initialize} for constructor definition
+   * @see {@link http://fabricjs.com/image-filters/|ImageFilters demo}
+   * @example <caption>Sharpen filter</caption>
+   * var filter = new fabric.Image.filters.Convolute({
+   *   matrix: [ 0, -1,  0,
+   *            -1,  5, -1,
+   *             0, -1,  0 ]
+   * });
+   * object.filters.push(filter);
+   * object.applyFilters(canvas.renderAll.bind(canvas));
+   * @example <caption>Blur filter</caption>
+   * var filter = new fabric.Image.filters.Convolute({
+   *   matrix: [ 1/9, 1/9, 1/9,
+   *             1/9, 1/9, 1/9,
+   *             1/9, 1/9, 1/9 ]
+   * });
+   * object.filters.push(filter);
+   * object.applyFilters(canvas.renderAll.bind(canvas));
+   * @example <caption>Emboss filter</caption>
+   * var filter = new fabric.Image.filters.Convolute({
+   *   matrix: [ 1,   1,  1,
+   *             1, 0.7, -1,
+   *            -1,  -1, -1 ]
+   * });
+   * object.filters.push(filter);
+   * object.applyFilters(canvas.renderAll.bind(canvas));
+   * @example <caption>Emboss filter with opaqueness</caption>
+   * var filter = new fabric.Image.filters.Convolute({
+   *   opaque: true,
+   *   matrix: [ 1,   1,  1,
+   *             1, 0.7, -1,
+   *            -1,  -1, -1 ]
+   * });
+   * object.filters.push(filter);
+   * object.applyFilters(canvas.renderAll.bind(canvas));
    */
   fabric.Image.filters.Convolute = fabric.util.createClass(fabric.Image.filters.BaseFilter, /** @lends fabric.Image.filters.Convolute.prototype */ {
 
@@ -17114,6 +17218,14 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
    * @class fabric.Image.filters.GradientTransparency
    * @memberOf fabric.Image.filters
    * @extends fabric.Image.filters.BaseFilter
+   * @see {@link fabric.Image.filters.GradientTransparency#initialize} for constructor definition
+   * @see {@link http://fabricjs.com/image-filters/|ImageFilters demo}
+   * @example
+   * var filter = new fabric.Image.filters.GradientTransparency({
+   *   threshold: 200
+   * });
+   * object.filters.push(filter);
+   * object.applyFilters(canvas.renderAll.bind(canvas));
    */
   fabric.Image.filters.GradientTransparency = fabric.util.createClass(fabric.Image.filters.BaseFilter, /** @lends fabric.Image.filters.GradientTransparency.prototype */ {
 
@@ -17126,7 +17238,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 
     /**
      * Constructor
-     * @memberOf fabric.Image.filters.GradientTransparency
+     * @memberOf fabric.Image.filters.GradientTransparency.prototype
      * @param {Object} [options] Options object
      * @param {Number} [options.threshold=100] Threshold value
      */
@@ -17188,6 +17300,11 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
    * @class fabric.Image.filters.Grayscale
    * @memberOf fabric.Image.filters
    * @extends fabric.Image.filters.BaseFilter
+   * @see {@link http://fabricjs.com/image-filters/|ImageFilters demo}
+   * @example
+   * var filter = new fabric.Image.filters.Grayscale();
+   * object.filters.push(filter);
+   * object.applyFilters(canvas.renderAll.bind(canvas));
    */
   fabric.Image.filters.Grayscale = fabric.util.createClass(fabric.Image.filters.BaseFilter, /** @lends fabric.Image.filters.Grayscale.prototype */ {
 
@@ -17246,6 +17363,11 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
    * @class fabric.Image.filters.Invert
    * @memberOf fabric.Image.filters
    * @extends fabric.Image.filters.BaseFilter
+   * @see {@link http://fabricjs.com/image-filters/|ImageFilters demo}
+   * @example
+   * var filter = new fabric.Image.filters.Invert();
+   * object.filters.push(filter);
+   * object.applyFilters(canvas.renderAll.bind(canvas));
    */
   fabric.Image.filters.Invert = fabric.util.createClass(fabric.Image.filters.BaseFilter, /** @lends fabric.Image.filters.Invert.prototype */ {
 
@@ -17302,6 +17424,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
    * @class fabric.Image.filters.Mask
    * @memberOf fabric.Image.filters
    * @extends fabric.Image.filters.BaseFilter
+   * @see {@link fabric.Image.filters.Mask#initialize} for constructor definition
    */
   fabric.Image.filters.Mask = fabric.util.createClass(fabric.Image.filters.BaseFilter, /** @lends fabric.Image.filters.Mask.prototype */ {
 
@@ -17420,6 +17543,14 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
    * @class fabric.Image.filters.Noise
    * @memberOf fabric.Image.filters
    * @extends fabric.Image.filters.BaseFilter
+   * @see {@link fabric.Image.filters.Noise#initialize} for constructor definition
+   * @see {@link http://fabricjs.com/image-filters/|ImageFilters demo}
+   * @example
+   * var filter = new fabric.Image.filters.Noise({
+   *   noise: 700
+   * });
+   * object.filters.push(filter);
+   * object.applyFilters(canvas.renderAll.bind(canvas));
    */
   fabric.Image.filters.Noise = fabric.util.createClass(fabric.Image.filters.BaseFilter, /** @lends fabric.Image.filters.Noise.prototype */ {
 
@@ -17499,6 +17630,14 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
    * @class fabric.Image.filters.Pixelate
    * @memberOf fabric.Image.filters
    * @extends fabric.Image.filters.BaseFilter
+   * @see {@link fabric.Image.filters.Pixelate#initialize} for constructor definition
+   * @see {@link http://fabricjs.com/image-filters/|ImageFilters demo}
+   * @example
+   * var filter = new fabric.Image.filters.Pixelate({
+   *   blocksize: 8
+   * });
+   * object.filters.push(filter);
+   * object.applyFilters(canvas.renderAll.bind(canvas));
    */
   fabric.Image.filters.Pixelate = fabric.util.createClass(fabric.Image.filters.BaseFilter, /** @lends fabric.Image.filters.Pixelate.prototype */ {
 
@@ -17603,6 +17742,15 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
    * @class fabric.Image.filters.RemoveWhite
    * @memberOf fabric.Image.filters
    * @extends fabric.Image.filters.BaseFilter
+   * @see {@link fabric.Image.filters.RemoveWhite#initialize} for constructor definition
+   * @see {@link http://fabricjs.com/image-filters/|ImageFilters demo}
+   * @example
+   * var filter = new fabric.Image.filters.RemoveWhite({
+   *   threshold: 40,
+   *   distance: 140
+   * });
+   * object.filters.push(filter);
+   * object.applyFilters(canvas.renderAll.bind(canvas));
    */
   fabric.Image.filters.RemoveWhite = fabric.util.createClass(fabric.Image.filters.BaseFilter, /** @lends fabric.Image.filters.RemoveWhite.prototype */ {
 
@@ -17695,6 +17843,11 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
    * @class fabric.Image.filters.Sepia
    * @memberOf fabric.Image.filters
    * @extends fabric.Image.filters.BaseFilter
+   * @see {@link http://fabricjs.com/image-filters/|ImageFilters demo}
+   * @example
+   * var filter = new fabric.Image.filters.Sepia();
+   * object.filters.push(filter);
+   * object.applyFilters(canvas.renderAll.bind(canvas));
    */
   fabric.Image.filters.Sepia = fabric.util.createClass(fabric.Image.filters.BaseFilter, /** @lends fabric.Image.filters.Sepia.prototype */ {
 
@@ -17750,6 +17903,11 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
    * @class fabric.Image.filters.Sepia2
    * @memberOf fabric.Image.filters
    * @extends fabric.Image.filters.BaseFilter
+   * @see {@link http://fabricjs.com/image-filters/|ImageFilters demo}
+   * @example
+   * var filter = new fabric.Image.filters.Sepia2();
+   * object.filters.push(filter);
+   * object.applyFilters(canvas.renderAll.bind(canvas));
    */
   fabric.Image.filters.Sepia2 = fabric.util.createClass(fabric.Image.filters.BaseFilter, /** @lends fabric.Image.filters.Sepia2.prototype */ {
 
@@ -17810,6 +17968,21 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
    * @class fabric.Image.filters.Tint
    * @memberOf fabric.Image.filters
    * @extends fabric.Image.filters.BaseFilter
+   * @see {@link fabric.Image.filters.Tint#initialize} for constructor definition
+   * @see {@link http://fabricjs.com/image-filters/|ImageFilters demo}
+   * @example <caption>Tint filter with hex color and opacity</caption>
+   * var filter = new fabric.Image.filters.Tint({
+   *   color: '#3513B0',
+   *   opacity: 0.5
+   * });
+   * object.filters.push(filter);
+   * object.applyFilters(canvas.renderAll.bind(canvas));
+   * @example <caption>Tint filter with rgba color</caption>
+   * var filter = new fabric.Image.filters.Tint({
+   *   color: 'rgba(53, 21, 176, 0.5)'
+   * });
+   * object.filters.push(filter);
+   * object.applyFilters(canvas.renderAll.bind(canvas));
    */
   fabric.Image.filters.Tint = fabric.util.createClass(fabric.Image.filters.BaseFilter, /** @lends fabric.Image.filters.Tint.prototype */ {
 
