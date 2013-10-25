@@ -8861,19 +8861,31 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       return centerTransform ? !e.altKey : e.altKey;
     },
 
-    /**
-     * @private
-     * @param {Event} e Event object
-     * @param {fabric.Object} target
-     */
-    _setupCurrentTransform: function (e, target) {
-      if (!target) return;
+    _getOriginFromCorner: function(target, corner) {
+      var origin = {
+        x: target.originX,
+        y: target.originY
+      };
 
-      var action = 'drag',
-          corner,
-          pointer = getPointer(e, target.canvas.upperCanvasEl);
+      if (corner === 'ml' || corner === 'tl' || corner === 'bl') {
+        origin.x = 'right';
+      }
+      else if (corner === 'mr' || corner === 'tr' || corner === 'br') {
+        origin.x = 'left';
+      }
 
-      corner = target._findTargetCorner(e, this._offset);
+      if (corner === 'tl' || corner === 'mt' || corner === 'tr') {
+        origin.y = 'bottom';
+      }
+      else if (corner === 'bl' || corner === 'mb' || corner === 'br') {
+        origin.y = 'top';
+      }
+
+      return origin;
+    },
+
+    _getActionFromCorner: function(target, corner) {
+      var action = 'drag';
       if (corner) {
         action = (corner === 'ml' || corner === 'mr')
           ? 'scaleX'
@@ -8883,23 +8895,21 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
               ? 'rotate'
               : 'scale';
       }
+      return action;
+    },
 
-      var originX = target.originX,
-          originY = target.originY;
+    /**
+     * @private
+     * @param {Event} e Event object
+     * @param {fabric.Object} target
+     */
+    _setupCurrentTransform: function (e, target) {
+      if (!target) return;
 
-      if (corner === 'ml' || corner === 'tl' || corner === 'bl') {
-        originX = "right";
-      }
-      else if (corner === 'mr' || corner === 'tr' || corner === 'br') {
-        originX = "left";
-      }
-
-      if (corner === 'tl' || corner === 'mt' || corner === 'tr') {
-        originY = "bottom";
-      }
-      else if (corner === 'bl' || corner === 'mb' || corner === 'br') {
-        originY = "top";
-      }
+      var corner = target._findTargetCorner(e, this._offset),
+          pointer = getPointer(e, target.canvas.upperCanvasEl),
+          action = this._getActionFromCorner(target, corner),
+          origin = this._getOriginFromCorner(target, corner);
 
       this._currentTransform = {
         target: target,
@@ -8908,8 +8918,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         scaleY: target.scaleY,
         offsetX: pointer.x - target.left,
         offsetY: pointer.y - target.top,
-        originX: originX,
-        originY: originY,
+        originX: origin.x,
+        originY: origin.y,
         ex: pointer.x,
         ey: pointer.y,
         left: target.left,
@@ -8925,8 +8935,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         top: target.top,
         scaleX: target.scaleX,
         scaleY: target.scaleY,
-        originX: originX,
-        originY: originY
+        originX: origin.x,
+        originY: origin.y
       };
 
       this._resetCurrentTransform(e);
