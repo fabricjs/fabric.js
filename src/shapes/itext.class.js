@@ -313,28 +313,33 @@
     },
 
     /**
+     * Finds index corresponding to beginning or end of a word
+     * @param {Number} selectionStart Index of a character
+     * @param {Number} direction: 1 or -1
+     */
+    searchWordBoundary: function(selectionStart, direction) {
+      var index = selectionStart;
+      var _char = this.text.charAt(index);
+      var reNonWord = /[ \n\.,;!\?\-]/;
+
+      while (!reNonWord.test(_char) && index > 0 && index < this.text.length) {
+        index += direction;
+        _char = this.text.charAt(index);
+      }
+      if (reNonWord.test(_char) && _char !== '\n') {
+        index += direction === 1 ? 0 : 1;
+      }
+      return index;
+    },
+
+    /**
      * Selects a word based on the index
      * @param {Number} selectionStart Index of a character
      */
     selectWord: function(selectionStart) {
 
-      function searchWordBoundary(direction) {
-        var index = selectionStart;
-        var _char = this.text.charAt(index);
-        var reNonWord = /[ \n\.,;!\?\-]/;
-
-        while (!reNonWord.test(_char) && index > 0 && index < this.text.length) {
-          index += direction;
-          _char = this.text.charAt(index);
-        }
-        if (reNonWord.test(_char) && _char !== '\n') {
-          index += direction === 1 ? 0 : 1;
-        }
-        return index;
-      }
-
-      var newSelectionStart = searchWordBoundary.call(this, -1) /* search backwards */;
-      var newSelectionEnd = searchWordBoundary.call(this, 1) /* search forward */;
+      var newSelectionStart = this.searchWordBoundary(selectionStart, -1); /* search backwards */
+      var newSelectionEnd = this.searchWordBoundary(selectionStart, 1); /* search forward */
 
       this.setSelectionStart(newSelectionStart);
       this.setSelectionEnd(newSelectionEnd);
@@ -452,17 +457,7 @@
         this.hiddenTextarea.focus();
       }
 
-      this._savedProps = {
-
-        hasControls: this.hasControls,
-        borderColor: this.borderColor,
-        lockMovementX: this.lockMovementX,
-        lockMovementY: this.lockMovementY,
-
-        hoverCursor: this.hoverCursor,
-        defaultCursor: this.canvas.defaultCursor,
-        moveCursor: this.canvas.moveCursor
-      };
+      this._saveProps();
 
       this.hoverCursor = 'text';
       this.canvas.defaultCursor = 'text';
@@ -481,6 +476,36 @@
     },
 
     /**
+     * @private
+     */
+    _saveProps: function() {
+      this._savedProps = {
+        hasControls: this.hasControls,
+        borderColor: this.borderColor,
+        lockMovementX: this.lockMovementX,
+        lockMovementY: this.lockMovementY,
+        hoverCursor: this.hoverCursor,
+        defaultCursor: this.canvas.defaultCursor,
+        moveCursor: this.canvas.moveCursor
+      };
+    },
+
+    /**
+     * @private
+     */
+    _restoreProps: function() {
+      if (this._savedProps) {
+        this.hoverCursor = this._savedProps.overCursor;
+        this.canvas.defaultCursor = this._savedProps.defaultCursor;
+        this.canvas.moveCursor = this._savedProps.moveCursor;
+        this.hasControls = this._savedProps.hasControls;
+        this.borderColor = this._savedProps.borderColor;
+        this.lockMovementX = this._savedProps.lockMovementX;
+        this.lockMovementY = this._savedProps.lockMovementY;
+      }
+    },
+
+    /**
      * Exits from editing state
      * @return {fabric.IText} thisArg
      * @chainable
@@ -494,18 +519,7 @@
       this.hiddenTextarea && this.hiddenTextarea.blur();
 
       this.abortCursorAnimation();
-
-      if (this._savedProps) {
-        this.hoverCursor = this._savedProps.overCursor;
-        this.canvas.defaultCursor = this._savedProps.defaultCursor;
-        this.canvas.moveCursor = this._savedProps.moveCursor;
-
-        this.hasControls = this._savedProps.hasControls;
-        this.borderColor = this._savedProps.borderColor;
-        this.lockMovementX = this._savedProps.lockMovementX;
-        this.lockMovementY = this._savedProps.lockMovementY;
-      }
-
+      this._restoreProps();
       this._currentCursorOpacity = 0;
 
       return this;
