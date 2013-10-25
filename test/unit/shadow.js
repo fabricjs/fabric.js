@@ -135,6 +135,19 @@
     equal(JSON.stringify(object), '{"color":"rgb(0,0,0)","blur":0,"offsetX":0,"offsetY":0}');
   });
 
+  test('toObject without default value', function() {
+    var shadow = new fabric.Shadow();
+    shadow.includeDefaultValues = false;
+
+    equal(JSON.stringify(shadow.toObject()), '{}');
+
+    shadow.color = 'red';
+    equal(JSON.stringify(shadow.toObject()), '{"color":"red"}');
+
+    shadow.offsetX = 15;
+    equal(JSON.stringify(shadow.toObject()), '{"color":"red","offsetX":15}');
+  });
+
   test('toSVG', function() {
     // reset uid
     fabric.Object.__uid = 0;
