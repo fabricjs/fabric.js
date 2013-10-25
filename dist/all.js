@@ -7169,7 +7169,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
         fabric.util.clipContext(this, canvasToDrawOn);
       }
 
-      this._renderBackground();
+      this._renderBackground(canvasToDrawOn);
       this._renderObjects(canvasToDrawOn, activeGroup);
       this._renderActiveGroup(canvasToDrawOn, activeGroup);
 
