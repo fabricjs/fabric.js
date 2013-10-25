@@ -1,4 +1,4 @@
-/* build: `node build.js modules=ALL exclude=gestures minifier=uglifyjs` */
+/* build: `node build.js modules=ALL exclude=gestures,itext minifier=uglifyjs` */
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
 var fabric = fabric || { version: "1.3.7" };
@@ -8992,29 +8992,33 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         activeGroup.set('active', true);
       }
       else {
-        // group does not exist
-        if (this._activeObject) {
-          // only if there's an active object
-          if (target !== this._activeObject) {
-            // and that object is not the actual target
-            var objects = this.getObjects();
-            var isActiveLower = objects.indexOf(this._activeObject) < objects.indexOf(target);
-            var group = new fabric.Group(
-              isActiveLower ? [ target, this._activeObject ] : [ this._activeObject, target ]);
+        this._createActiveGroup(target, e);
+      }
 
-            this.setActiveGroup(group);
-            this._activeObject = null;
-            activeGroup = this.getActiveGroup();
-            this.fire('selection:created', { target: activeGroup, e: e });
-          }
+      if (this._activeGroup) {
+        this._activeGroup.saveCoords();
+      }
+    },
+
+    _createActiveGroup: function(target, e) {
+      // group does not exist
+      if (this._activeObject) {
+        // only if there's an active object
+        if (target !== this._activeObject) {
+          // and that object is not the actual target
+          var objects = this.getObjects();
+          var isActiveLower = objects.indexOf(this._activeObject) < objects.indexOf(target);
+          var group = new fabric.Group(
+            isActiveLower ? [ target, this._activeObject ] : [ this._activeObject, target ]);
+
+          this.setActiveGroup(group);
+          this._activeObject = null;
+          var activeGroup = this.getActiveGroup();
+          this.fire('selection:created', { target: activeGroup, e: e });
         }
-        // activate target object in any case
-        target.set('active', true);
       }
-
-      if (activeGroup) {
-        activeGroup.saveCoords();
-      }
+      // activate target object in any case
+      target.set('active', true);
     },
 
     /**
