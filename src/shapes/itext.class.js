@@ -1607,8 +1607,23 @@
           ? styleDeclaration.stroke.toLive(ctx)
           : styleDeclaration.stroke;
       }
+
       ctx.lineWidth = styleDeclaration.strokeWidth || this.strokeWidth;
 
+      this._applyFontStyles(styleDeclaration);
+
+      if (typeof styleDeclaration.shadow === 'string') {
+        styleDeclaration.shadow = new fabric.Shadow(styleDeclaration.shadow);
+      }
+
+      this._setShadow.call(styleDeclaration, ctx);
+
+      ctx.font = this._getFontDeclaration.call(styleDeclaration);
+
+      return ctx.measureText(_char).width;
+    },
+
+    _applyFontStyles: function(styleDeclaration) {
       if (!styleDeclaration.fontFamily) {
         styleDeclaration.fontFamily = this.fontFamily;
       }
@@ -1621,15 +1636,6 @@
       if (!styleDeclaration.fontStyle) {
         styleDeclaration.fontStyle = this.fontStyle;
       }
-      if (typeof styleDeclaration.shadow === 'string') {
-        styleDeclaration.shadow = new fabric.Shadow(styleDeclaration.shadow);
-      }
-
-      this._setShadow.call(styleDeclaration, ctx);
-
-      ctx.font = this._getFontDeclaration.call(styleDeclaration);
-
-      return ctx.measureText(_char).width;
     },
 
     /**
