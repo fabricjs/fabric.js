@@ -645,9 +645,18 @@
         isLowerCase = true;
       }
 
-      // last 2 items in an array of coordinates are the actualy x/y (except H/V);
-      // collect them
+      var xy = this._getXY(item, isLowerCase, previous);
 
+      var val = parseInt(xy.x, 10);
+      if (!isNaN(val)) aX.push(val);
+
+      val = parseInt(xy.y, 10);
+      if (!isNaN(val)) aY.push(val);
+    },
+
+    _getXY: function(item, isLowerCase, previous) {
+
+      // last 2 items in an array of coordinates are the actualy x/y (except H/V), collect them
       // TODO (kangax): support relative h/v commands
 
       var x = isLowerCase
@@ -662,11 +671,7 @@
           ? previous.y
           : getY(item);
 
-      var val = parseInt(x, 10);
-      if (!isNaN(val)) aX.push(val);
-
-      val = parseInt(y, 10);
-      if (!isNaN(val)) aY.push(val);
+      return { x: x, y: y };
     }
   });
 
