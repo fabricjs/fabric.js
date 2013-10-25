@@ -11648,23 +11648,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
       ctx.save();
 
-      var m = this.transformMatrix;
-      if (m && !this.group) {
-        ctx.setTransform(m[0], m[1], m[2], m[3], m[4], m[5]);
-      }
-
-      if (!noTransform) {
-        this.transform(ctx);
-      }
-
+      this._transform(ctx, noTransform);
       this._setStrokeStyles(ctx);
+      this._setFillStyles(ctx);
 
-      if (this.fill) {
-        ctx.fillStyle = this.fill.toLive
-          ? this.fill.toLive(ctx)
-          : this.fill;
-      }
-
+      var m = this.transformMatrix;
       if (m && this.group) {
         ctx.translate(-this.group.width/2, -this.group.height/2);
         ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
@@ -11683,6 +11671,16 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       ctx.restore();
     },
 
+    _transform: function(ctx, noTransform) {
+      var m = this.transformMatrix;
+      if (m && !this.group) {
+        ctx.setTransform(m[0], m[1], m[2], m[3], m[4], m[5]);
+      }
+      if (!noTransform) {
+        this.transform(ctx);
+      }
+    },
+
     _setStrokeStyles: function(ctx) {
       if (this.stroke) {
         ctx.lineWidth = this.strokeWidth;
@@ -11692,6 +11690,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         ctx.strokeStyle = this.stroke.toLive
           ? this.stroke.toLive(ctx)
           : this.stroke;
+      }
+    },
+
+    _setFillStyles: function(ctx) {
+      if (this.fill) {
+        ctx.fillStyle = this.fill.toLive
+          ? this.fill.toLive(ctx)
+          : this.fill;
       }
     },
 
@@ -15316,15 +15322,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       if (!noTransform) {
         this.transform(ctx);
       }
-      // ctx.globalCompositeOperation = this.fillRule;
-
-      if (this.fill) {
-        ctx.fillStyle = this.fill.toLive
-          ? this.fill.toLive(ctx)
-          : this.fill;
-      }
-
       this._setStrokeStyles(ctx);
+      this._setFillStyles(ctx);
       this._setShadow(ctx);
       this.clipTo && fabric.util.clipContext(this, ctx);
       ctx.beginPath();
@@ -18506,11 +18505,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _setTextStyles: function(ctx) {
-      if (this.fill) {
-        ctx.fillStyle = this.fill.toLive
-            ? this.fill.toLive(ctx)
-            : this.fill;
-      }
+      this._setFillStyles(ctx);
       this._setStrokeStyles(ctx);
       ctx.textBaseline = 'alphabetic';
       if (!this.skipTextAlign) {

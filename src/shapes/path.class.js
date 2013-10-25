@@ -438,15 +438,8 @@
       if (!noTransform) {
         this.transform(ctx);
       }
-      // ctx.globalCompositeOperation = this.fillRule;
-
-      if (this.fill) {
-        ctx.fillStyle = this.fill.toLive
-          ? this.fill.toLive(ctx)
-          : this.fill;
-      }
-
       this._setStrokeStyles(ctx);
+      this._setFillStyles(ctx);
       this._setShadow(ctx);
       this.clipTo && fabric.util.clipContext(this, ctx);
       ctx.beginPath();

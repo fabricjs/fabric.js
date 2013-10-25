@@ -425,11 +425,7 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _setTextStyles: function(ctx) {
-      if (this.fill) {
-        ctx.fillStyle = this.fill.toLive
-            ? this.fill.toLive(ctx)
-            : this.fill;
-      }
+      this._setFillStyles(ctx);
       this._setStrokeStyles(ctx);
       ctx.textBaseline = 'alphabetic';
       if (!this.skipTextAlign) {

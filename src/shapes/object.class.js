@@ -1012,23 +1012,11 @@
 
       ctx.save();
 
-      var m = this.transformMatrix;
-      if (m && !this.group) {
-        ctx.setTransform(m[0], m[1], m[2], m[3], m[4], m[5]);
-      }
-
-      if (!noTransform) {
-        this.transform(ctx);
-      }
-
+      this._transform(ctx, noTransform);
       this._setStrokeStyles(ctx);
+      this._setFillStyles(ctx);
 
-      if (this.fill) {
-        ctx.fillStyle = this.fill.toLive
-          ? this.fill.toLive(ctx)
-          : this.fill;
-      }
-
+      var m = this.transformMatrix;
       if (m && this.group) {
         ctx.translate(-this.group.width/2, -this.group.height/2);
         ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
@@ -1047,6 +1035,16 @@
       ctx.restore();
     },
 
+    _transform: function(ctx, noTransform) {
+      var m = this.transformMatrix;
+      if (m && !this.group) {
+        ctx.setTransform(m[0], m[1], m[2], m[3], m[4], m[5]);
+      }
+      if (!noTransform) {
+        this.transform(ctx);
+      }
+    },
+
     _setStrokeStyles: function(ctx) {
       if (this.stroke) {
         ctx.lineWidth = this.strokeWidth;
@@ -1056,6 +1054,14 @@
         ctx.strokeStyle = this.stroke.toLive
           ? this.stroke.toLive(ctx)
           : this.stroke;
+      }
+    },
+
+    _setFillStyles: function(ctx) {
+      if (this.fill) {
+        ctx.fillStyle = this.fill.toLive
+          ? this.fill.toLive(ctx)
+          : this.fill;
       }
     },
 
