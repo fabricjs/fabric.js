@@ -119,7 +119,7 @@
 
     /**
      * Object containing character styles
-     * (where top-level properties corresponds to line number and 2nd-level properties — to char number in a line)
+     * (where top-level properties corresponds to line number and 2nd-level properties -- to char number in a line)
      * @type Object
      * @default
      */
@@ -1692,49 +1692,56 @@
       var lineWidth = this._getWidthOfLine(ctx, lineIndex, textLines);
       var lineHeight = this._getHeightOfLine(ctx, lineIndex, textLines);
       var lineLeftOffset = this._getLineLeftOffset(lineWidth);
-      var decl, charWidth;
+      var chars = line.split('');
 
       left += lineLeftOffset || 0;
 
-      var chars = line.split('');
-
       ctx.save();
       for (var i = 0, len = chars.length; i < len; i++) {
-
-        if (this.styles && this.styles[lineIndex] && (decl = this.styles[lineIndex][i])) {
-
-          var shouldStroke = decl.stroke || this.stroke;
-          var shouldFill = decl.fill || this.fill;
-
-          ctx.save();
-          charWidth = this._applyCharStylesGetWidth(ctx, chars[i], lineIndex, i, decl);
-
-          if (shouldFill) {
-            ctx.fillText(chars[i], left, top);
-          }
-          if (shouldStroke) {
-            ctx.strokeText(chars[i], left, top);
-          }
-
-          this._renderCharDecoration(ctx, decl, left, top, charWidth, lineHeight);
-          ctx.restore();
-
-          ctx.translate(charWidth, 0);
-        }
-        else {
-          if (method === 'strokeText' && this.stroke) {
-            ctx[method](chars[i], left, top);
-          }
-          if (method === 'fillText' && this.fill) {
-            ctx[method](chars[i], left, top);
-          }
-          charWidth = this._applyCharStylesGetWidth(ctx, chars[i], lineIndex, i);
-          this._renderCharDecoration(ctx, null, left, top, charWidth, lineHeight);
-
-          ctx.translate(ctx.measureText(chars[i]).width, 0);
-        }
+        this._drawChar(method, ctx, lineIndex, i, chars[i], left, top, lineHeight);
       }
       ctx.restore();
+    },
+
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
+    _drawChar: function(method, ctx, lineIndex, i, _char, left, top, lineHeight) {
+      var decl, charWidth;
+
+      if (this.styles && this.styles[lineIndex] && (decl = this.styles[lineIndex][i])) {
+
+        var shouldStroke = decl.stroke || this.stroke;
+        var shouldFill = decl.fill || this.fill;
+
+        ctx.save();
+        charWidth = this._applyCharStylesGetWidth(ctx, _char, lineIndex, i, decl);
+
+        if (shouldFill) {
+          ctx.fillText(_char, left, top);
+        }
+        if (shouldStroke) {
+          ctx.strokeText(_char, left, top);
+        }
+
+        this._renderCharDecoration(ctx, decl, left, top, charWidth, lineHeight);
+        ctx.restore();
+
+        ctx.translate(charWidth, 0);
+      }
+      else {
+        if (method === 'strokeText' && this.stroke) {
+          ctx[method](_char, left, top);
+        }
+        if (method === 'fillText' && this.fill) {
+          ctx[method](_char, left, top);
+        }
+        charWidth = this._applyCharStylesGetWidth(ctx, _char, lineIndex, i);
+        this._renderCharDecoration(ctx, null, left, top, charWidth, lineHeight);
+
+        ctx.translate(ctx.measureText(_char).width, 0);
+      }
     },
 
     /**
