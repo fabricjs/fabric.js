@@ -7428,6 +7428,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      */
     toSVG: function(options, reviver) {
       options || (options = { });
+
       var markup = [];
 
       this._setSVGPreamble(markup, options);
@@ -7435,19 +7436,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
       this._setSVGBackgroundColor(markup);
       this._setSVGBackgroundImage(markup);
       this._setSVGOverlayImage(markup);
-
-      var activeGroup = this.getActiveGroup();
-      if (activeGroup) {
-        this.discardActiveGroup();
-      }
-      for (var i = 0, objects = this.getObjects(), len = objects.length; i < len; i++) {
-        markup.push(objects[i].toSVG(reviver));
-      }
-      if (activeGroup) {
-        this.setActiveGroup(new fabric.Group(activeGroup.getObjects()));
-        activeGroup.forEachObject(function(o) { o.set('active', true) });
-      }
-      markup.push('</svg>');
+      this._setSVGObjects(markup, reviver);
 
       return markup.join('');
     },
@@ -7526,6 +7515,23 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
           '"></image>'
         );
       }
+    },
+
+    _setSVGObjects: function(markup, reviver) {
+      var activeGroup = this.getActiveGroup();
+      if (activeGroup) {
+        this.discardActiveGroup();
+      }
+      for (var i = 0, objects = this.getObjects(), len = objects.length; i < len; i++) {
+        markup.push(objects[i].toSVG(reviver));
+      }
+      if (activeGroup) {
+        this.setActiveGroup(new fabric.Group(activeGroup.getObjects()));
+        activeGroup.forEachObject(function(o) {
+          o.set('active', true);
+        });
+      }
+      markup.push('</svg>');
     },
     /* _TO_SVG_END_ */
 
