@@ -331,13 +331,17 @@
           options[prop] = fabric.util.toFixed(object.height * percents / 100, 2);
         }
       }
-      // normalize rendering point (should be from top/left corner rather than center of the shape)
-      if (prop === 'x1' || prop === 'x2') {
-        options[prop] -= fabric.util.toFixed(object.width / 2, 2);
-      }
-      else if (prop === 'y1' || prop === 'y2') {
-        options[prop] -= fabric.util.toFixed(object.height / 2, 2);
-      }
+      normalize(options, prop, object);
+    }
+  }
+
+  // normalize rendering point (should be from top/left corner rather than center of the shape)
+  function normalize(options, prop, object) {
+    if (prop === 'x1' || prop === 'x2') {
+      options[prop] -= fabric.util.toFixed(object.width / 2, 2);
+    }
+    else if (prop === 'y1' || prop === 'y2') {
+      options[prop] -= fabric.util.toFixed(object.height / 2, 2);
     }
   }
 
@@ -347,13 +351,9 @@
    */
   function _convertValuesToPercentUnits(object, options) {
     for (var prop in options) {
-      // normalize rendering point (should be from center rather than top/left corner of the shape)
-      if (prop === 'x1' || prop === 'x2') {
-        options[prop] += fabric.util.toFixed(object.width / 2, 2);
-      }
-      else if (prop === 'y1' || prop === 'y2') {
-        options[prop] += fabric.util.toFixed(object.height / 2, 2);
-      }
+
+      normalize(options, prop, object);
+
       // convert to percent units
       if (prop === 'x1' || prop === 'x2' || prop === 'r2') {
         options[prop] = fabric.util.toFixed(options[prop] / object.width * 100, 2) + '%';
