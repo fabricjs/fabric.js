@@ -7430,59 +7430,11 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
       options || (options = { });
       var markup = [];
 
-      if (!options.suppressPreamble) {
-        markup.push(
-          '<?xml version="1.0" encoding="', (options.encoding || 'UTF-8'), '" standalone="no" ?>',
-            '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" ',
-              '"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n'
-        );
-      }
-      markup.push(
-          '<svg ',
-            'xmlns="http://www.w3.org/2000/svg" ',
-            'xmlns:xlink="http://www.w3.org/1999/xlink" ',
-            'version="1.1" ',
-            'width="', (options.viewBox ? options.viewBox.width : this.width), '" ',
-            'height="', (options.viewBox ? options.viewBox.height : this.height), '" ',
-            (this.backgroundColor && !this.backgroundColor.source ? 'style="background-color: ' + this.backgroundColor +'" ' : null),
-            (options.viewBox ? 'viewBox="' + options.viewBox.x + ' ' + options.viewBox.y + ' ' + options.viewBox.width + ' ' + options.viewBox.height + '" ' : null),
-            'xml:space="preserve">',
-          '<desc>Created with Fabric.js ', fabric.version, '</desc>',
-          '<defs>', fabric.createSVGFontFacesMarkup(this.getObjects()), fabric.createSVGRefElementsMarkup(this), '</defs>'
-      );
-
-      if (this.backgroundColor && this.backgroundColor.source) {
-        markup.push(
-          '<rect x="0" y="0" ',
-            'width="', (this.backgroundColor.repeat === 'repeat-y' || this.backgroundColor.repeat === 'no-repeat' ? this.backgroundColor.source.width : this.width),
-            '" height="', (this.backgroundColor.repeat === 'repeat-x' || this.backgroundColor.repeat === 'no-repeat' ? this.backgroundColor.source.height : this.height),
-            '" fill="url(#backgroundColorPattern)"',
-          '></rect>'
-        );
-      }
-
-      if (this.backgroundImage) {
-        markup.push(
-          '<image x="0" y="0" ',
-            'width="', (this.backgroundImageStretch ? this.width : this.backgroundImage.width),
-            '" height="', (this.backgroundImageStretch ? this.height : this.backgroundImage.height),
-            '" preserveAspectRatio="', (this.backgroundImageStretch ? 'none' : 'defer'),
-            '" xlink:href="', this.backgroundImage.src,
-            '" style="opacity:', this.backgroundImageOpacity,
-          '"></image>'
-        );
-      }
-
-      if (this.overlayImage) {
-        markup.push(
-          '<image x="', this.overlayImageLeft,
-            '" y="', this.overlayImageTop,
-            '" width="', this.overlayImage.width,
-            '" height="', this.overlayImage.height,
-            '" xlink:href="', this.overlayImage.src,
-          '"></image>'
-        );
-      }
+      this._setSVGPreamble(markup, options);
+      this._setSVGHeader(markup, options);
+      this._setSVGBackgroundColor(markup);
+      this._setSVGBackgroundImage(markup);
+      this._setSVGOverlayImage(markup);
 
       var activeGroup = this.getActiveGroup();
       if (activeGroup) {
@@ -7498,6 +7450,82 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
       markup.push('</svg>');
 
       return markup.join('');
+    },
+
+    _setSVGPreamble: function(markup, options) {
+      if (!options.suppressPreamble) {
+        markup.push(
+          '<?xml version="1.0" encoding="', (options.encoding || 'UTF-8'), '" standalone="no" ?>',
+            '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" ',
+              '"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n'
+        );
+      }
+    },
+
+    _setSVGHeader: function(markup, options) {
+      markup.push(
+        '<svg ',
+          'xmlns="http://www.w3.org/2000/svg" ',
+          'xmlns:xlink="http://www.w3.org/1999/xlink" ',
+          'version="1.1" ',
+          'width="', (options.viewBox ? options.viewBox.width : this.width), '" ',
+          'height="', (options.viewBox ? options.viewBox.height : this.height), '" ',
+          (this.backgroundColor && !this.backgroundColor.source
+            ? 'style="background-color: ' + this.backgroundColor +'" '
+            : null),
+          (options.viewBox
+              ? 'viewBox="' +
+                options.viewBox.x + ' ' +
+                options.viewBox.y + ' ' +
+                options.viewBox.width + ' ' +
+                options.viewBox.height + '" '
+              : null),
+          'xml:space="preserve">',
+        '<desc>Created with Fabric.js ', fabric.version, '</desc>',
+        '<defs>',
+          fabric.createSVGFontFacesMarkup(this.getObjects()),
+          fabric.createSVGRefElementsMarkup(this),
+        '</defs>'
+      );
+    },
+
+    _setSVGBackgroundColor: function(markup) {
+      if (this.backgroundColor && this.backgroundColor.source) {
+        markup.push(
+          '<rect x="0" y="0" ',
+            'width="', (this.backgroundColor.repeat === 'repeat-y' || this.backgroundColor.repeat === 'no-repeat' ? this.backgroundColor.source.width : this.width),
+            '" height="', (this.backgroundColor.repeat === 'repeat-x' || this.backgroundColor.repeat === 'no-repeat' ? this.backgroundColor.source.height : this.height),
+            '" fill="url(#backgroundColorPattern)"',
+          '></rect>'
+        );
+      }
+    },
+
+    _setSVGBackgroundImage: function(markup) {
+      if (this.backgroundImage) {
+        markup.push(
+          '<image x="0" y="0" ',
+            'width="', (this.backgroundImageStretch ? this.width : this.backgroundImage.width),
+            '" height="', (this.backgroundImageStretch ? this.height : this.backgroundImage.height),
+            '" preserveAspectRatio="', (this.backgroundImageStretch ? 'none' : 'defer'),
+            '" xlink:href="', this.backgroundImage.src,
+            '" style="opacity:', this.backgroundImageOpacity,
+          '"></image>'
+        );
+      }
+    },
+
+    _setSVGOverlayImage: function(markup) {
+      if (this.overlayImage) {
+        markup.push(
+          '<image x="', this.overlayImageLeft,
+            '" y="', this.overlayImageTop,
+            '" width="', this.overlayImage.width,
+            '" height="', this.overlayImage.height,
+            '" xlink:href="', this.overlayImage.src,
+          '"></image>'
+        );
+      }
     },
     /* _TO_SVG_END_ */
 
@@ -7647,7 +7675,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
       if (!this.interactive) return this;
 
       removeListener(fabric.window, 'resize', this._onResize);
-      
+
       if (fabric.isTouchSupported) {
         removeListener(this.upperCanvasEl, 'touchstart', this._onMouseDown);
         removeListener(this.upperCanvasEl, 'touchmove', this._onMouseMove);
