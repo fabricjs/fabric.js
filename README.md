@@ -116,7 +116,8 @@ Also see [official 4-part intro series](http://fabricjs.com/articles), [presenta
 
 These are the optional modules that could be specified for inclusion, when building custom version of fabric:
 
-- **text** — Adds support for `fabric.Text`
+- **text** — Adds support for static text (`fabric.Text`)
+- **itext** — Adds support for interactive text (`fabric.IText`)
 - **serialization** — Adds support for `loadFromJSON`, `loadFromDatalessJSON`, and `clone` methods on `fabric.Canvas`
 - **interaction** — Adds support for interactive features of fabric — selecting/transforming objects/groups via mouse/touch devices.
 - **parser** — Adds support for `fabric.parseSVGDocument`, `fabric.loadSVGFromURL`, and `fabric.loadSVGFromString`
