@@ -463,7 +463,7 @@
      * @return {Number} Maximum width of fabric.Text object
      */
     _getTextWidth: function(ctx, textLines) {
-      var maxWidth = ctx.measureText(textLines[0]).width;
+      var maxWidth = ctx.measureText(textLines[0] || '|').width;
 
       for (var i = 1, len = textLines.length; i < len; i++) {
         var currentLineWidth = ctx.measureText(textLines[i]).width;
