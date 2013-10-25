@@ -473,35 +473,19 @@
      * @param {fabric.Object} target
      */
     _handleGroupLogic: function (e, target) {
+
       if (target === this.getActiveGroup()) {
+
         // if it's a group, find target again, this time skipping group
         target = this.findTarget(e, true);
+
         // if even object is not found, bail out
         if (!target || target.isType('group')) {
           return;
         }
       }
-      var activeGroup = this.getActiveGroup();
-      if (activeGroup) {
-        if (activeGroup.contains(target)) {
-          activeGroup.removeWithUpdate(target);
-          this._resetObjectTransform(activeGroup);
-          target.set('active', false);
-
-          if (activeGroup.size() === 1) {
-            // remove group alltogether if after removal it only contains 1 object
-            this.discardActiveGroup();
-            // activate last remaining object
-            this.setActiveObject(activeGroup.item(0));
-            return;
-          }
-        }
-        else {
-          activeGroup.addWithUpdate(target);
-          this._resetObjectTransform(activeGroup);
-        }
-        this.fire('selection:created', { target: activeGroup, e: e });
-        activeGroup.set('active', true);
+      if (this.getActiveGroup()) {
+        this._updateActiveGroup(target, e);
       }
       else {
         this._createActiveGroup(target, e);
@@ -510,6 +494,30 @@
       if (this._activeGroup) {
         this._activeGroup.saveCoords();
       }
+    },
+
+    _updateActiveGroup: function(target, e) {
+      var activeGroup = this.getActiveGroup();
+
+      if (activeGroup.contains(target)) {
+        activeGroup.removeWithUpdate(target);
+        this._resetObjectTransform(activeGroup);
+        target.set('active', false);
+
+        if (activeGroup.size() === 1) {
+          // remove group alltogether if after removal it only contains 1 object
+          this.discardActiveGroup();
+          // activate last remaining object
+          this.setActiveObject(activeGroup.item(0));
+          return;
+        }
+      }
+      else {
+        activeGroup.addWithUpdate(target);
+        this._resetObjectTransform(activeGroup);
+      }
+      this.fire('selection:created', { target: activeGroup, e: e });
+      activeGroup.set('active', true);
     },
 
     _createActiveGroup: function(target, e) {
