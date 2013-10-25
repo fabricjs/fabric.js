@@ -29,7 +29,8 @@ testrunner.run({
       './test/unit/canvas_static.js',
       './test/unit/gradient.js',
       './test/unit/pattern.js',
-      './test/unit/shadow.js'
+      './test/unit/shadow.js',
+      './test/unit/object_interactivity.js'
     ]
 }, function(err, report) {
   if (err) {
