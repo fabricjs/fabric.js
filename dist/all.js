@@ -6477,6 +6477,13 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
     affectStroke: false,
 
     /**
+     * Indicates whether toObject should include default values
+     * @type Boolean
+     * @default
+     */
+    includeDefaultValues: true,
+
+    /**
      * Constructor
      * @param {Object|String} [options] Options object with any of color, blur, offsetX, offsetX properties or string (e.g. "rgba(0,0,0,0.2) 2px 2px 10px, "2px 2px 10px rgba(0,0,0,0.2)")
      * @return {fabric.Shadow} thisArg
@@ -6553,12 +6560,28 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * @return {Object} Object representation of a shadow instance
      */
     toObject: function() {
-      return {
-        color: this.color,
-        blur: this.blur,
-        offsetX: this.offsetX,
-        offsetY: this.offsetY
-      };
+      if (this.includeDefaultValues) {
+        return {
+          color: this.color,
+          blur: this.blur,
+          offsetX: this.offsetX,
+          offsetY: this.offsetY
+        };
+      }
+      var obj = { }, proto = fabric.Shadow.prototype;
+      if (this.color !== proto.color) {
+        obj.color = this.color;
+      }
+      if (this.blur !== proto.blur) {
+        obj.blur = this.blur;
+      }
+      if (this.offsetX !== proto.offsetX) {
+        obj.offsetX = this.offsetX;
+      }
+      if (this.offsetY !== proto.offsetY) {
+        obj.offsetY = this.offsetY;
+      }
+      return obj;
     }
   });
 
@@ -12348,7 +12371,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
     /**
      * Checks if point is inside the object
-     * @param {Object} point
+     * @param {fabric.Point} point Point to check against
      * @return {Boolean} true if point is inside the object
      */
     containsPoint: function(point) {
@@ -12389,8 +12412,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * Helper method to determine how many cross points are between the 4 object edges
      * and the horizontal line determined by a point on canvas
      * @private
-     * @param {Object} point
-     * @param {Object} oCoords Coordinates of the image being evaluated
+     * @param {fabric.Point} point Point to check
+     * @param {Object} oCoords Coordinates of the object being evaluated
      */
     _findCrossPoints: function(point, oCoords) {
       var b1, b2, a1, a2, xi, yi,
@@ -18338,7 +18361,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @return {Number} Maximum width of fabric.Text object
      */
     _getTextWidth: function(ctx, textLines) {
-      var maxWidth = ctx.measureText(textLines[0]).width;
+      var maxWidth = ctx.measureText(textLines[0] || '|').width;
 
       for (var i = 1, len = textLines.length; i < len; i++) {
         var currentLineWidth = ctx.measureText(textLines[i]).width;
