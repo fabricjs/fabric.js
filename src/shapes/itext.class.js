@@ -34,9 +34,10 @@
     *   Select till start/end of line:  cmd + shift + left, cmd + shift + right
     *   Jump to start/end of text:      cmd + up, cmd + down
     *   Select till start/end of text:  cmd + shift + up, cmd + shift + down
-    *   Delete character:               delete
-    *   Delete word:                    alt + delete
-    *   Delete line:                    cmd + delete
+    *   Delete character:               backspace
+    *   Delete word:                    alt + backspace
+    *   Delete line:                    cmd + backspace
+    *   Forward delete:                 delete
     */
   fabric.IText = fabric.util.createClass(fabric.Text, fabric.Observable, {
 
@@ -163,7 +164,7 @@
 
       this.callSuper('initialize', text, options);
 
-      fabric.util.addListener(document, 'keydown', this.onKeyUp.bind(this));
+      fabric.util.addListener(document, 'keydown', this.onKeyDown.bind(this));
       fabric.util.addListener(document, 'keypress', this.onKeyPress.bind(this));
 
       this.initCursorSelectionHandlers();
@@ -544,30 +545,31 @@
      * @chainable
      */
     setSelectionStyles: function(styles) {
-
-      function setStyle(i) {
-        var loc = this.get2DCursorLocation(i);
-
-        if (!this.styles[loc.lineIndex]) {
-          this.styles[loc.lineIndex] = { };
-        }
-        if (!this.styles[loc.lineIndex][loc.charIndex]) {
-          this.styles[loc.lineIndex][loc.charIndex] = { };
-        }
-
-        fabric.util.object.extend(this.styles[loc.lineIndex][loc.charIndex], styles);
-      }
-
       if (this.selectionStart === this.selectionEnd) {
-        setStyle.call(this, this.selectionStart);
+        this._extendStyles(this.selectionStart, styles);
       }
       else {
         for (var i = this.selectionStart; i < this.selectionEnd; i++) {
-          setStyle.call(this, i);
+          this._extendStyles(i, styles);
         }
       }
-
       return this;
+    },
+
+    /**
+     * @private
+     */
+    _extendStyles: function(index, styles) {
+      var loc = this.get2DCursorLocation(index);
+
+      if (!this.styles[loc.lineIndex]) {
+        this.styles[loc.lineIndex] = { };
+      }
+      if (!this.styles[loc.lineIndex][loc.charIndex]) {
+        this.styles[loc.lineIndex][loc.charIndex] = { };
+      }
+
+      fabric.util.object.extend(this.styles[loc.lineIndex][loc.charIndex], styles);
     },
 
     /**
@@ -641,7 +643,7 @@
      * Handles keyup event
      * @param {Event} e Event object
      */
-    onKeyUp: function(e) {
+    onKeyDown: function(e) {
       if (!this.isEditing || e.ctrlKey) return;
 
       if (e.keyCode === 39) {
@@ -657,6 +659,11 @@
         this.moveCursorDown(e);
       }
       else if (e.keyCode === 8) {
+        this.removeChars(e);
+      }
+      else if (e.keyCode === 46) {
+        // forward delete on windows
+        this.moveCursorRight(e);
         this.removeChars(e);
       }
       else if (e.keyCode === 13) {
@@ -812,6 +819,10 @@
       this.initDelayedCursor();
     },
 
+    /**
+     * Moves cursor up with shift
+     * @param {Number} offset
+     */
     moveCursorUpWithShift: function(offset) {
       if (this.selectionStart === this.selectionEnd) {
         this.selectionStart -= offset;
@@ -831,6 +842,10 @@
       this._selectionDirection = 'left';
     },
 
+    /**
+     * Moves cursor up without shift
+     * @param {Number} offset
+     */
     moveCursorUpWithoutShift: function(offset) {
       if (this.selectionStart === this.selectionEnd) {
         this.selectionStart -= offset;
