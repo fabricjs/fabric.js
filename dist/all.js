@@ -9116,48 +9116,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       var constraintPosition = target.translateToOriginPoint(target.getCenterPoint(), t.originX, t.originY);
       var localMouse = target.toLocalPoint(new fabric.Point(x - offset.left, y - offset.top), t.originX, t.originY);
 
-      if (t.originX === 'right') {
-        localMouse.x *= -1;
-      }
-      else if (t.originX === 'center') {
-        localMouse.x *= t.mouseXSign * 2;
-
-        if (localMouse.x < 0) {
-          t.mouseXSign = -t.mouseXSign;
-        }
-      }
-
-      if (t.originY === 'bottom') {
-        localMouse.y *= -1;
-      }
-      else if (t.originY === 'center') {
-        localMouse.y *= t.mouseYSign * 2;
-
-        if (localMouse.y < 0) {
-          t.mouseYSign = -t.mouseYSign;
-        }
-      }
-
-      // adjust the mouse coordinates when dealing with padding
-      if (abs(localMouse.x) > target.padding) {
-        if (localMouse.x < 0 ) {
-          localMouse.x += target.padding;
-        } else {
-          localMouse.x -= target.padding;
-        }
-      } else { // mouse is within the padding, set to 0
-        localMouse.x = 0;
-      }
-
-      if (abs(localMouse.y) > target.padding) {
-        if (localMouse.y < 0 ) {
-          localMouse.y += target.padding;
-        } else {
-          localMouse.y -= target.padding;
-        }
-      } else {
-        localMouse.y = 0;
-      }
+      this._setLocalMouse(localMouse, t);
 
       // Actually scale the object
       var newScaleX = target.scaleX, newScaleY = target.scaleY;
@@ -9208,6 +9167,60 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
       // Make sure the constraints apply
       target.setPositionByOrigin(constraintPosition, t.originX, t.originY);
+    },
+
+    /**
+     * @private
+     */
+    _setLocalMouse: function(localMouse, t) {
+      var target = t.target;
+
+      if (t.originX === 'right') {
+        localMouse.x *= -1;
+      }
+      else if (t.originX === 'center') {
+        localMouse.x *= t.mouseXSign * 2;
+
+        if (localMouse.x < 0) {
+          t.mouseXSign = -t.mouseXSign;
+        }
+      }
+
+      if (t.originY === 'bottom') {
+        localMouse.y *= -1;
+      }
+      else if (t.originY === 'center') {
+        localMouse.y *= t.mouseYSign * 2;
+
+        if (localMouse.y < 0) {
+          t.mouseYSign = -t.mouseYSign;
+        }
+      }
+
+      // adjust the mouse coordinates when dealing with padding
+      if (abs(localMouse.x) > target.padding) {
+        if (localMouse.x < 0) {
+          localMouse.x += target.padding;
+        }
+        else {
+          localMouse.x -= target.padding;
+        }
+      }
+      else { // mouse is within the padding, set to 0
+        localMouse.x = 0;
+      }
+
+      if (abs(localMouse.y) > target.padding) {
+        if (localMouse.y < 0) {
+          localMouse.y += target.padding;
+        }
+        else {
+          localMouse.y -= target.padding;
+        }
+      }
+      else {
+        localMouse.y = 0;
+      }
     },
 
     /**
