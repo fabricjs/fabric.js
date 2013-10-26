@@ -583,54 +583,66 @@
       this._setLocalMouse(localMouse, t);
 
       // Actually scale the object
-      var newScaleX = target.scaleX, newScaleY = target.scaleY;
+      this._setObjectScale(localMouse, t, lockScalingX, lockScalingY, by);
+
+      // Make sure the constraints apply
+      target.setPositionByOrigin(constraintPosition, t.originX, t.originY);
+    },
+
+    /**
+     * @private
+     */
+    _setObjectScale: function(localMouse, t, lockScalingX, lockScalingY, by) {
+      var target = t.target,
+          newScaleX = target.scaleX,
+          newScaleY = target.scaleY;
+
       if (by === 'equally' && !lockScalingX && !lockScalingY) {
         var dist = localMouse.y + localMouse.x;
         var lastDist = (target.height + (target.strokeWidth)) * t.original.scaleY +
                        (target.width + (target.strokeWidth)) * t.original.scaleX;
 
         // We use t.scaleX/Y instead of target.scaleX/Y because the object may have a min scale and we'll loose the proportions
-        newScaleX = t.original.scaleX * dist/lastDist;
-        newScaleY = t.original.scaleY * dist/lastDist;
+        newScaleX = t.original.scaleX * dist / lastDist;
+        newScaleY = t.original.scaleY * dist / lastDist;
 
         target.set('scaleX', newScaleX);
         target.set('scaleY', newScaleY);
       }
       else if (!by) {
-        newScaleX = localMouse.x/(target.width+target.strokeWidth);
-        newScaleY = localMouse.y/(target.height+target.strokeWidth);
+        newScaleX = localMouse.x / (target.width + target.strokeWidth);
+        newScaleY = localMouse.y / (target.height + target.strokeWidth);
 
         lockScalingX || target.set('scaleX', newScaleX);
         lockScalingY || target.set('scaleY', newScaleY);
       }
       else if (by === 'x' && !target.get('lockUniScaling')) {
-        newScaleX = localMouse.x/(target.width + target.strokeWidth);
+        newScaleX = localMouse.x / (target.width + target.strokeWidth);
         lockScalingX || target.set('scaleX', newScaleX);
       }
       else if (by === 'y' && !target.get('lockUniScaling')) {
-        newScaleY = localMouse.y/(target.height + target.strokeWidth);
+        newScaleY = localMouse.y / (target.height + target.strokeWidth);
         lockScalingY || target.set('scaleY', newScaleY);
       }
 
       // Check if we flipped
-      if (newScaleX < 0)
-      {
-        if (t.originX === 'left')
+      if (newScaleX < 0) {
+        if (t.originX === 'left') {
           t.originX = 'right';
-        else if (t.originX === 'right')
+        }
+        else if (t.originX === 'right') {
           t.originX = 'left';
+        }
       }
 
-      if (newScaleY < 0)
-      {
-        if (t.originY === 'top')
+      if (newScaleY < 0) {
+        if (t.originY === 'top') {
           t.originY = 'bottom';
-        else if (t.originY === 'bottom')
+        }
+        else if (t.originY === 'bottom') {
           t.originY = 'top';
+        }
       }
-
-      // Make sure the constraints apply
-      target.setPositionByOrigin(constraintPosition, t.originX, t.originY);
     },
 
     /**
