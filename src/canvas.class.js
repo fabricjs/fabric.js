@@ -771,12 +771,31 @@
     _findSelectedObjects: function (e) {
       if (!this.selection) return;
 
+      var group = this._collectObjects();
+
+      // do not create group for 1 element only
+      if (group.length === 1) {
+        this.setActiveObject(group[0], e);
+      }
+      else if (group.length > 1) {
+        group = new fabric.Group(group.reverse());
+        this.setActiveGroup(group);
+        group.saveCoords();
+        this.fire('selection:created', { target: group });
+        this.renderAll();
+      }
+    },
+
+    /**
+     * @private
+     */
+    _collectObjects: function() {
       var group = [ ],
+          currentObject,
           x1 = this._groupSelector.ex,
           y1 = this._groupSelector.ey,
           x2 = x1 + this._groupSelector.left,
           y2 = y1 + this._groupSelector.top,
-          currentObject,
           selectionX1Y1 = new fabric.Point(min(x1, x2), min(y1, y2)),
           selectionX2Y2 = new fabric.Point(max(x1, x2), max(y1, y2)),
           isClick = x1 === x2 && y1 === y2;
@@ -799,17 +818,7 @@
         }
       }
 
-      // do not create group for 1 element only
-      if (group.length === 1) {
-        this.setActiveObject(group[0], e);
-      }
-      else if (group.length > 1) {
-        group = new fabric.Group(group.reverse());
-        this.setActiveGroup(group);
-        group.saveCoords();
-        this.fire('selection:created', { target: group });
-        this.renderAll();
-      }
+      return group;
     },
 
     /**
