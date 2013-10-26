@@ -18490,12 +18490,11 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _renderViaNative: function(ctx) {
+      var textLines = this.text.split(/\r?\n/);
 
       this.transform(ctx, fabric.isLikelyNode);
 
       this._setTextStyles(ctx);
-
-      var textLines = this.text.split(/\r?\n/);
 
       this.width = this._getTextWidth(ctx, textLines);
       this.height = this._getTextHeight(ctx, textLines);
@@ -18503,11 +18502,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       this.clipTo && fabric.util.clipContext(this, ctx);
 
       this._renderTextBackground(ctx, textLines);
-
-      if (this.textAlign !== 'left' && this.textAlign !== 'justify') {
-        ctx.save();
-        ctx.translate(this.textAlign === 'center' ? (this.width / 2) : this.width, 0);
-      }
+      this._translateForTextAlign(ctx);
 
       ctx.save();
       this._setShadow(ctx);
@@ -18525,6 +18520,13 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 
       this._setBoundaries(ctx, textLines);
       this._totalLineHeight = 0;
+    },
+
+    _translateForTextAlign: function(ctx) {
+      if (this.textAlign !== 'left' && this.textAlign !== 'justify') {
+        ctx.save();
+        ctx.translate(this.textAlign === 'center' ? (this.width / 2) : this.width, 0);
+      }
     },
 
     /**
@@ -19002,9 +19004,73 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @return {Object}
      */
     _getSVGTextAndBg: function(lineTopOffset, textLeftOffset, textLines) {
-      var textSpans = [ ], textBgRects = [ ], i, lineLeftOffset, len, lineTopOffsetMultiplier = 1;
+      var textSpans = [ ],
+          textBgRects = [ ],
+          lineTopOffsetMultiplier = 1;
 
       // bounding-box background
+      this._setSVGBg(textBgRects);
+
+      // text and text-background
+      for (var i = 0, len = textLines.length; i < len; i++) {
+        if (textLines[i] !== '') {
+          this._setSVGTextLineText(textLines[i], i, textSpans, lineTopOffset, lineTopOffsetMultiplier);
+          lineTopOffsetMultiplier = 1;
+        }
+        else {
+          // in some environments (e.g. IE 7 & 8) empty tspans are completely ignored, using a lineTopOffsetMultiplier
+          // prevents empty tspans
+          lineTopOffsetMultiplier++;
+        }
+
+        if (!this.textBackgroundColor || !this._boundaries) continue;
+
+        this._setSVGTextLineBg(textBgRects, i, textLeftOffset, lineTopOffset);
+      }
+
+      return {
+        textSpans: textSpans,
+        textBgRects: textBgRects
+      };
+    },
+
+    _setSVGTextLineText: function(textLine, i, textSpans, lineTopOffset, lineTopOffsetMultiplier) {
+      var lineLeftOffset = (this._boundaries && this._boundaries[i])
+        ? toFixed(this._boundaries[i].left, 2)
+        : 0;
+
+      textSpans.push(
+        '<tspan x="',
+          lineLeftOffset, '" ',
+          (i === 0 || this.useNative ? 'y' : 'dy'), '="',
+          toFixed(this.useNative
+            ? ((lineTopOffset * i) - this.height / 2)
+            : (lineTopOffset * lineTopOffsetMultiplier), 2) , '" ',
+          // doing this on <tspan> elements since setting opacity
+          // on containing <text> one doesn't work in Illustrator
+          this._getFillAttributes(this.fill), '>',
+          fabric.util.string.escapeXml(textLine),
+        '</tspan>'
+      );
+    },
+
+    _setSVGTextLineBg: function(textBgRects, i, textLeftOffset, lineTopOffset) {
+      textBgRects.push(
+        '<rect ',
+          this._getFillAttributes(this.textBackgroundColor),
+          ' x="',
+          toFixed(textLeftOffset + this._boundaries[i].left, 2),
+          '" y="',
+          /* an offset that seems to straighten things out */
+          toFixed((lineTopOffset * i) - this.height / 2, 2),
+          '" width="',
+          toFixed(this._boundaries[i].width, 2),
+          '" height="',
+          toFixed(this._boundaries[i].height, 2),
+        '"></rect>');
+    },
+
+    _setSVGBg: function(textBgRects) {
       if (this.backgroundColor && this._boundaries) {
         textBgRects.push(
           '<rect ',
@@ -19019,49 +19085,6 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
             toFixed(this.height, 2),
           '"></rect>');
       }
-
-      // text and text-background
-      for (i = 0, len = textLines.length; i < len; i++) {
-        if (textLines[i] !== '') {
-          lineLeftOffset = (this._boundaries && this._boundaries[i]) ? toFixed(this._boundaries[i].left, 2) : 0;
-          textSpans.push(
-            '<tspan x="',
-              lineLeftOffset, '" ',
-              (i === 0 || this.useNative ? 'y' : 'dy'), '="',
-              toFixed(this.useNative ? ((lineTopOffset * i) - this.height / 2) : (lineTopOffset * lineTopOffsetMultiplier), 2) , '" ',
-              // doing this on <tspan> elements since setting opacity on containing <text> one doesn't work in Illustrator
-              this._getFillAttributes(this.fill), '>',
-              fabric.util.string.escapeXml(textLines[i]),
-            '</tspan>'
-          );
-          lineTopOffsetMultiplier = 1;
-        }
-        else {
-          // in some environments (e.g. IE 7 & 8) empty tspans are completely ignored, using a lineTopOffsetMultiplier
-          // prevents empty tspans
-          lineTopOffsetMultiplier++;
-        }
-
-        if (!this.textBackgroundColor || !this._boundaries) continue;
-
-        textBgRects.push(
-          '<rect ',
-            this._getFillAttributes(this.textBackgroundColor),
-            ' x="',
-            toFixed(textLeftOffset + this._boundaries[i].left, 2),
-            '" y="',
-            /* an offset that seems to straighten things out */
-            toFixed((lineTopOffset * i) - this.height / 2, 2),
-            '" width="',
-            toFixed(this._boundaries[i].width, 2),
-            '" height="',
-            toFixed(this._boundaries[i].height, 2),
-          '"></rect>');
-      }
-      return {
-        textSpans: textSpans,
-        textBgRects: textBgRects
-      };
     },
 
     /**
