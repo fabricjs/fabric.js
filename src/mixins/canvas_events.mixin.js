@@ -32,15 +32,7 @@
      */
     _initEvents: function () {
 
-      this._onMouseDown = this._onMouseDown.bind(this);
-      this._onMouseMove = this._onMouseMove.bind(this);
-      this._onMouseUp = this._onMouseUp.bind(this);
-      this._onResize = this._onResize.bind(this);
-      this._onGesture = this._onGesture.bind(this);
-      this._onDrag = this._onDrag.bind(this);
-      this._onShake = this._onShake.bind(this);
-      this._onOrientationChange = this._onOrientationChange.bind(this);
-      this._onMouseWheel = this._onMouseWheel.bind(this);
+      this._bindEvents();
 
       addListener(fabric.window, 'resize', this._onResize);
 
@@ -60,6 +52,21 @@
         addListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
         addListener(this.upperCanvasEl, 'mousewheel', this._onMouseWheel);
       }
+    },
+
+    /**
+     * @private
+     */
+    _bindEvents: function() {
+      this._onMouseDown = this._onMouseDown.bind(this);
+      this._onMouseMove = this._onMouseMove.bind(this);
+      this._onMouseUp = this._onMouseUp.bind(this);
+      this._onResize = this._onResize.bind(this);
+      this._onGesture = this._onGesture.bind(this);
+      this._onDrag = this._onDrag.bind(this);
+      this._onShake = this._onShake.bind(this);
+      this._onOrientationChange = this._onOrientationChange.bind(this);
+      this._onMouseWheel = this._onMouseWheel.bind(this);
     },
 
     /**
