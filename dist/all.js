@@ -2531,6 +2531,20 @@ fabric.Collection = {
     return segmentToBezierCache[argsString];
   }
 
+  function normalizePoints(points, options) {
+    var minX = fabric.util.array.min(points, 'x'),
+        minY = fabric.util.array.min(points, 'y');
+
+    minX = minX < 0 ? minX : 0;
+    minY = minX < 0 ? minY : 0;
+
+    for (var i = 0, len = points.length; i < len; i++) {
+      // normalize coordinates, according to containing box (dimensions of which are passed via `options`)
+      points[i].x -= (options.width / 2 + minX) || 0;
+      points[i].y -= (options.height / 2 + minY) || 0;
+    }
+  }
+
   fabric.util.removeFromArray = removeFromArray;
   fabric.util.degreesToRadians = degreesToRadians;
   fabric.util.radiansToDegrees = radiansToDegrees;
@@ -2552,6 +2566,7 @@ fabric.Collection = {
   fabric.util.multiplyTransformMatrices = multiplyTransformMatrices;
   fabric.util.getFunctionBody = getFunctionBody;
   fabric.util.drawArc = drawArc;
+  fabric.util.normalizePoints = normalizePoints;
 
 })(typeof exports !== 'undefined' ? exports : this);
 
@@ -9740,15 +9755,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      */
     _initEvents: function () {
 
-      this._onMouseDown = this._onMouseDown.bind(this);
-      this._onMouseMove = this._onMouseMove.bind(this);
-      this._onMouseUp = this._onMouseUp.bind(this);
-      this._onResize = this._onResize.bind(this);
-      this._onGesture = this._onGesture.bind(this);
-      this._onDrag = this._onDrag.bind(this);
-      this._onShake = this._onShake.bind(this);
-      this._onOrientationChange = this._onOrientationChange.bind(this);
-      this._onMouseWheel = this._onMouseWheel.bind(this);
+      this._bindEvents();
 
       addListener(fabric.window, 'resize', this._onResize);
 
@@ -9768,6 +9775,21 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         addListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
         addListener(this.upperCanvasEl, 'mousewheel', this._onMouseWheel);
       }
+    },
+
+    /**
+     * @private
+     */
+    _bindEvents: function() {
+      this._onMouseDown = this._onMouseDown.bind(this);
+      this._onMouseMove = this._onMouseMove.bind(this);
+      this._onMouseUp = this._onMouseUp.bind(this);
+      this._onResize = this._onResize.bind(this);
+      this._onGesture = this._onGesture.bind(this);
+      this._onDrag = this._onDrag.bind(this);
+      this._onShake = this._onShake.bind(this);
+      this._onOrientationChange = this._onOrientationChange.bind(this);
+      this._onMouseWheel = this._onMouseWheel.bind(this);
     },
 
     /**
@@ -14564,8 +14586,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   "use strict";
 
   var fabric = global.fabric || (global.fabric = { }),
-      toFixed = fabric.util.toFixed,
-      min = fabric.util.array.min;
+      toFixed = fabric.util.toFixed;
 
   if (fabric.Polyline) {
     fabric.warn('fabric.Polyline is already defined');
@@ -14722,18 +14743,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     options || (options = { });
 
     var points = fabric.parsePointsAttribute(element.getAttribute('points')),
-        parsedAttributes = fabric.parseAttributes(element, fabric.Polyline.ATTRIBUTE_NAMES),
-        minX = min(points, 'x'),
-        minY = min(points, 'y');
+        parsedAttributes = fabric.parseAttributes(element, fabric.Polyline.ATTRIBUTE_NAMES);
 
-    minX = minX < 0 ? minX : 0;
-    minY = minX < 0 ? minY : 0;
-
-    for (var i = 0, len = points.length; i < len; i++) {
-      // normalize coordinates, according to containing box (dimensions of which are passed via `options`)
-      points[i].x -= (options.width / 2 + minX) || 0;
-      points[i].y -= (options.height / 2 + minY) || 0;
-    }
+    fabric.util.normalizePoints(points, options);
 
     return new fabric.Polyline(points, fabric.util.object.extend(parsedAttributes, options), true);
   };
@@ -14933,18 +14945,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     options || (options = { });
 
     var points = fabric.parsePointsAttribute(element.getAttribute('points')),
-        parsedAttributes = fabric.parseAttributes(element, fabric.Polygon.ATTRIBUTE_NAMES),
-        minX = min(points, 'x'),
-        minY = min(points, 'y');
+        parsedAttributes = fabric.parseAttributes(element, fabric.Polygon.ATTRIBUTE_NAMES);
 
-    minX = minX < 0 ? minX : 0;
-    minY = minX < 0 ? minY : 0;
-
-    for (var i = 0, len = points.length; i < len; i++) {
-      // normalize coordinates, according to containing box (dimensions of which are passed via `options`)
-      points[i].x -= (options.width / 2 + minX) || 0;
-      points[i].y -= (options.height / 2 + minY) || 0;
-    }
+    fabric.util.normalizePoints(points, options);
 
     return new fabric.Polygon(points, extend(parsedAttributes, options), true);
   };
