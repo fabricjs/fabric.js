@@ -348,7 +348,7 @@
         activeGroup !== target &&
         !e.shiftKey) || (
         target &&
-        (!target.evented || !target.selectable))
+        (!target.evented && !target.selectable))
       );
     },
 
