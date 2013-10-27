@@ -19824,6 +19824,36 @@ fabric.util.object.extend(fabric.Text.prototype, {
     },
 
     /**
+     * @private
+     */
+    _moveLeft: function(e, prop) {
+      if (e.altKey) {
+        this[prop] = this.findLeftWordBoundary(this[prop]);
+      }
+      else if (e.metaKey) {
+        this[prop] = this.findLeftLineBoundary(this[prop]);
+      }
+      else {
+        this[prop]--;
+      }
+    },
+
+    /**
+     * @private
+     */
+    _moveRight: function(e, prop) {
+      if (e.altKey) {
+        this[prop] = this.findRightWordBoundary(this[prop]);
+      }
+      else if (e.metaKey) {
+        this[prop] = this.findRightLineBoundary(this[prop]);
+      }
+      else {
+        this[prop]++;
+      }
+    },
+
+    /**
      * Moves cursor left without keeping selection
      * @param {Event} e
      */
@@ -19833,15 +19863,7 @@ fabric.util.object.extend(fabric.Text.prototype, {
       // only move cursor when there is no selection,
       // otherwise we discard it, and leave cursor on same place
       if (this.selectionEnd === this.selectionStart) {
-        if (e.altKey) {
-          this.selectionStart = this.findLeftWordBoundary(this.selectionStart);
-        }
-        else if (e.metaKey) {
-          this.selectionStart = this.findLeftLineBoundary(this.selectionStart);
-        }
-        else {
-          this.selectionStart--;
-        }
+        this._moveLeft(e, 'selectionStart');
       }
       this.selectionEnd = this.selectionStart;
     },
@@ -19852,27 +19874,11 @@ fabric.util.object.extend(fabric.Text.prototype, {
      */
     moveCursorLeftWithShift: function(e) {
       if (this._selectionDirection === 'right' && this.selectionStart !== this.selectionEnd) {
-        if (e.altKey) {
-          this.selectionEnd = this.findLeftWordBoundary(this.selectionEnd);
-        }
-        else if (e.metaKey) {
-          this.selectionEnd = this.findLeftLineBoundary(this.selectionEnd);
-        }
-        else {
-          this.selectionEnd--;
-        }
+        this._moveLeft(e, 'selectionEnd');
       }
       else {
         this._selectionDirection = 'left';
-        if (e.altKey) {
-          this.selectionStart = this.findLeftWordBoundary(this.selectionStart);
-        }
-        else if (e.metaKey) {
-          this.selectionStart = this.findLeftLineBoundary(this.selectionStart);
-        }
-        else {
-          this.selectionStart--;
-        }
+        this._moveLeft(e, 'selectionStart');
 
         // increase selection by one if it's a newline
         if (this.text.charAt(this.selectionStart) === '\n') {
@@ -19910,27 +19916,11 @@ fabric.util.object.extend(fabric.Text.prototype, {
      */
     moveCursorRightWithShift: function(e) {
       if (this._selectionDirection === 'left' && this.selectionStart !== this.selectionEnd) {
-        if (e.altKey) {
-          this.selectionStart = this.findRightWordBoundary(this.selectionStart);
-        }
-        else if (e.metaKey) {
-          this.selectionStart = this.findRightLineBoundary(this.selectionStart);
-        }
-        else {
-          this.selectionStart++;
-        }
+        this._moveRight(e, 'selectionStart');
       }
       else {
         this._selectionDirection = 'right';
-        if (e.altKey) {
-          this.selectionEnd = this.findRightWordBoundary(this.selectionEnd);
-        }
-        else if (e.metaKey) {
-          this.selectionEnd = this.findRightLineBoundary(this.selectionEnd);
-        }
-        else {
-          this.selectionEnd++;
-        }
+        this._moveRight(e, 'selectionEnd');
 
         // increase selection by one if it's a newline
         if (this.text.charAt(this.selectionEnd - 1) === '\n') {
@@ -19950,15 +19940,7 @@ fabric.util.object.extend(fabric.Text.prototype, {
       this._selectionDirection = 'right';
 
       if (this.selectionStart === this.selectionEnd) {
-        if (e.altKey) {
-          this.selectionStart = this.findRightWordBoundary(this.selectionStart);
-        }
-        else if (e.metaKey) {
-          this.selectionStart = this.findRightLineBoundary(this.selectionStart);
-        }
-        else {
-          this.selectionStart++;
-        }
+        this._moveRight(e, 'selectionStart');
         this.selectionEnd = this.selectionStart;
       }
       else {
