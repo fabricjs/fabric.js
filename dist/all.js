@@ -20291,14 +20291,7 @@ fabric.util.object.extend(fabric.Text.prototype, {
      */
     insertNewlineStyleObject: function(lineIndex, charIndex, isEndOfLine) {
 
-      // shift all line styles by 1 forward
-      var clonedStyles = clone(this.styles);
-      for (var line in this.styles) {
-        var numericLine = parseInt(line, 10);
-        if (numericLine >= lineIndex) {
-          this.styles[numericLine + 1] = clonedStyles[numericLine];
-        }
-      }
+      this.shiftLineStyles(lineIndex, +1);
 
       if (!this.styles[lineIndex + 1]) {
         this.styles[lineIndex + 1] = { };
@@ -20380,6 +20373,22 @@ fabric.util.object.extend(fabric.Text.prototype, {
     },
 
     /**
+     * Shifts line styles up or down
+     * @param {Number} lineIndex Index of a line
+     * @param {Number} offset Can be -1 or +1
+     */
+    shiftLineStyles: function(lineIndex, offset) {
+      // shift all line styles by 1 upward
+      var clonedStyles = clone(this.styles);
+      for (var line in this.styles) {
+        var numericLine = parseInt(line, 10);
+        if (numericLine > lineIndex) {
+          this.styles[numericLine + offset] = clonedStyles[numericLine];
+        }
+      }
+    },
+
+    /**
      * Removes style object
      * @param {Boolean} isBeginningOfLine True if cursor is at the beginning of line
      * @param {Number} [index] Optional index. When not given, current selectionStart is used.
@@ -20405,14 +20414,7 @@ fabric.util.object.extend(fabric.Text.prototype, {
             = this.styles[lineIndex][charIndex];
         }
 
-        // shift all line styles by 1 upward
-        var clonedStyles = clone(this.styles);
-        for (var line in this.styles) {
-          var numericLine = parseInt(line, 10);
-          if (numericLine > lineIndex) {
-            this.styles[numericLine - 1] = clonedStyles[numericLine];
-          }
-        }
+        this.shiftLineStyles(lineIndex, -1);
       }
       else {
         var currentLineStyles = this.styles[lineIndex];
