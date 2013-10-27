@@ -19282,7 +19282,7 @@ fabric.util.object.extend(fabric.Text.prototype, {
 
   var clone = fabric.util.object.clone;
 
-  fabric.ITextBehavior = {
+  fabric.ITextBehavior = { /** @lends fabric.IText.prototype */
 
     /**
      * Initializes all the interactive behavior of IText
@@ -19753,12 +19753,12 @@ fabric.util.object.extend(fabric.Text.prototype, {
      * Find new selection index representing start of current word according to current selection index
      * @param {Number} current selection index
      */
-    findLeftWordBoundary: function(startFrom) {
+    findWordBoundaryLeft: function(startFrom) {
       var offset = 0, index = startFrom - 1;
 
       // remove space before cursor first
-      if ((/\s|\n/).test(this.text.charAt(index))) {
-        while (/\s|\n/.test(this.text.charAt(index))) {
+      if (this._reSpace.test(this.text.charAt(index))) {
+        while (this._reSpace.test(this.text.charAt(index))) {
           offset++;
           index--;
         }
@@ -19775,12 +19775,12 @@ fabric.util.object.extend(fabric.Text.prototype, {
      * Find new selection index representing end of current word according to current selection index
      * @param {Number} current selection index
      */
-    findRightWordBoundary: function(startFrom) {
+    findWordBoundaryRight: function(startFrom) {
       var offset = 0, index = startFrom;
 
       // remove space after cursor first
-      if ((/\s|\n/).test(this.text.charAt(index))) {
-        while (/\s|\n/.test(this.text.charAt(index))) {
+      if (this._reSpace.test(this.text.charAt(index))) {
+        while (this._reSpace.test(this.text.charAt(index))) {
           offset++;
           index++;
         }
@@ -19797,7 +19797,7 @@ fabric.util.object.extend(fabric.Text.prototype, {
      * Find new selection index representing start of current line according to current selection index
      * @param {Number} current selection index
      */
-    findLeftLineBoundary: function(startFrom) {
+    findLineBoundaryLeft: function(startFrom) {
       var offset = 0, index = startFrom - 1;
 
       while (!/\n/.test(this.text.charAt(index)) && index > -1) {
@@ -19812,7 +19812,7 @@ fabric.util.object.extend(fabric.Text.prototype, {
      * Find new selection index representing end of current line according to current selection index
      * @param {Number} current selection index
      */
-    findRightLineBoundary: function(startFrom) {
+    findLineBoundaryRight: function(startFrom) {
       var offset = 0, index = startFrom;
 
       while (!/\n/.test(this.text.charAt(index)) && index < this.text.length) {
@@ -19826,31 +19826,30 @@ fabric.util.object.extend(fabric.Text.prototype, {
     /**
      * @private
      */
-    _moveLeft: function(e, prop) {
+    _move: function(e, prop, direction) {
       if (e.altKey) {
-        this[prop] = this.findLeftWordBoundary(this[prop]);
+        this[prop] = this['findWordBoundary' + direction](this[prop]);
       }
       else if (e.metaKey) {
-        this[prop] = this.findLeftLineBoundary(this[prop]);
+        this[prop] = this['findLineBoundary' + direction](this[prop]);
       }
       else {
-        this[prop]--;
+        this[prop] += (direction === 'Left' ? -1 : 1);
       }
     },
 
     /**
      * @private
      */
+    _moveLeft: function(e, prop) {
+      this._move(e, prop, 'Left');
+    },
+
+    /**
+     * @private
+     */
     _moveRight: function(e, prop) {
-      if (e.altKey) {
-        this[prop] = this.findRightWordBoundary(this[prop]);
-      }
-      else if (e.metaKey) {
-        this[prop] = this.findRightLineBoundary(this[prop]);
-      }
-      else {
-        this[prop]++;
-      }
+      this._move(e, prop, 'Right');
     },
 
     /**
@@ -20031,15 +20030,15 @@ fabric.util.object.extend(fabric.Text.prototype, {
      */
     getSelectionStartFromPointer: function(e) {
 
-      var localPointer = this.getLocalPointer(e);
-      var mouseOffsetX = localPointer.x;
-      var mouseOffsetY = localPointer.y;
-      var textLines = this.text.split(this._reNewline);
-      var prevWidth = 0;
-      var width = 0;
-      var height = 0;
-      var charIndex = 0;
-      var newSelectionStart;
+      var localPointer = this.getLocalPointer(e),
+          mouseOffsetX = localPointer.x,
+          mouseOffsetY = localPointer.y,
+          textLines = this.text.split(this._reNewline),
+          prevWidth = 0,
+          width = 0,
+          height = 0,
+          charIndex = 0,
+          newSelectionStart;
 
       for (var i = 0, len = textLines.length; i < len; i++) {
         height += this._getHeightOfLine(this.ctx, i) * this.scaleY;
@@ -20190,14 +20189,14 @@ fabric.util.object.extend(fabric.Text.prototype, {
 
           if (e.metaKey) {
             // remove all till the start of current line
-            var leftLineBoundary = this.findLeftLineBoundary(this.selectionStart);
+            var leftLineBoundary = this.findLineBoundaryLeft(this.selectionStart);
 
             this._removeCharsFromTo(leftLineBoundary, this.selectionStart);
             this.selectionStart = leftLineBoundary;
           }
           else if (e.altKey) {
             // remove all till the start of current word
-            var leftWordBoundary = this.findLeftWordBoundary(this.selectionStart);
+            var leftWordBoundary = this.findWordBoundaryLeft(this.selectionStart);
 
             this._removeCharsFromTo(leftWordBoundary, this.selectionStart);
             this.selectionStart = leftWordBoundary;
@@ -20570,6 +20569,11 @@ fabric.util.object.extend(fabric.Text.prototype, {
      * @private
      */
     _reNewline: /\r?\n/,
+
+    /**
+     * @private
+     */
+    _reSpace: /\s|\n/,
 
     /**
      * @private
