@@ -3283,22 +3283,25 @@ fabric.util.string = {
     return (typeof event.clientY !== 'unknown' ? event.clientY : 0);
   };
 
+  function _getPointer(event, pageProp, clientProp) {
+    if (event.type !== 'touchend') {
+      return (event.touches && event.touches[0]
+        ? (event.touches[0][pageProp] - (event.touches[0][pageProp] - event.touches[0][clientProp]))
+          || event[clientProp]
+        : event[clientProp]);
+    }
+    return (event.changedTouches && event.changedTouches[0]
+      ? (event.changedTouches[0][pageProp] - (event.changedTouches[0][pageProp] - event.changedTouches[0][clientProp]))
+        || event[clientProp]
+      : event[clientProp]);
+  }
+
   if (fabric.isTouchSupported) {
     pointerX = function(event) {
-      if (event.type !== 'touchend') {
-        return (event.touches && event.touches[0] ?
-          (event.touches[0].pageX - (event.touches[0].pageX - event.touches[0].clientX)) || event.clientX : event.clientX);
-      }
-      return (event.changedTouches && event.changedTouches[0]
-        ? (event.changedTouches[0].pageX - (event.changedTouches[0].pageX - event.changedTouches[0].clientX)) || event.clientX : event.clientX);
+      return _getPointer(event, 'pageX', 'clientX');
     };
     pointerY = function(event) {
-      if (event.type !== 'touchend') {
-        return (event.touches && event.touches[0]
-          ? (event.touches[0].pageY - (event.touches[0].pageY - event.touches[0].clientY)) || event.clientY : event.clientY);
-      }
-      return (event.changedTouches && event.changedTouches[0]
-        ? (event.changedTouches[0].pageY - (event.changedTouches[0].pageY - event.changedTouches[0].clientY)) || event.clientY : event.clientY);
+      return _getPointer(event, 'pageY', 'clientY');
     };
   }
 
