@@ -477,8 +477,8 @@
       var offset = 0, index = startFrom - 1;
 
       // remove space before cursor first
-      if ((/\s|\n/).test(this.text.charAt(index))) {
-        while (/\s|\n/.test(this.text.charAt(index))) {
+      if (this._reSpace.test(this.text.charAt(index))) {
+        while (this._reSpace.test(this.text.charAt(index))) {
           offset++;
           index--;
         }
@@ -499,8 +499,8 @@
       var offset = 0, index = startFrom;
 
       // remove space after cursor first
-      if ((/\s|\n/).test(this.text.charAt(index))) {
-        while (/\s|\n/.test(this.text.charAt(index))) {
+      if (this._reSpace.test(this.text.charAt(index))) {
+        while (this._reSpace.test(this.text.charAt(index))) {
           offset++;
           index++;
         }

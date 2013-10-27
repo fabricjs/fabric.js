@@ -124,6 +124,11 @@
     /**
      * @private
      */
+    _reSpace: /\s|\n/,
+
+    /**
+     * @private
+     */
     _fontSizeFraction: 4,
 
     /**
