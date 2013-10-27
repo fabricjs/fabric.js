@@ -406,28 +406,13 @@
    * @param {Function} [callback] Callback to invoke when an image instance is created
    */
   fabric.Image.fromObject = function(object, callback) {
-    var img = fabric.document.createElement('img'),
-        src = object.src;
-
-    /** @ignore */
-    img.onload = function() {
+    fabric.util.loadImage(object.src, function(img) {
       fabric.Image.prototype._initFilters.call(object, object, function(filters) {
         object.filters = filters || [ ];
-
         var instance = new fabric.Image(img, object);
         callback && callback(instance);
-        img = img.onload = img.onerror = null;
       });
-    };
-
-    /** @ignore */
-    img.onerror = function() {
-      fabric.log('Error loading ' + img.src);
-      callback && callback(null, true);
-      img = img.onload = img.onerror = null;
-    };
-
-    img.src = src;
+    });
   };
 
   /**
