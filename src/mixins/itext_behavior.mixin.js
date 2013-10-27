@@ -868,15 +868,15 @@
      * @private
      */
     _restoreProps: function() {
-      if (this._savedProps) {
-        this.hoverCursor = this._savedProps.overCursor;
-        this.canvas.defaultCursor = this._savedProps.defaultCursor;
-        this.canvas.moveCursor = this._savedProps.moveCursor;
-        this.hasControls = this._savedProps.hasControls;
-        this.borderColor = this._savedProps.borderColor;
-        this.lockMovementX = this._savedProps.lockMovementX;
-        this.lockMovementY = this._savedProps.lockMovementY;
-      }
+      if (!this._savedProps) return;
+
+      this.hoverCursor = this._savedProps.overCursor;
+      this.canvas.defaultCursor = this._savedProps.defaultCursor;
+      this.canvas.moveCursor = this._savedProps.moveCursor;
+      this.hasControls = this._savedProps.hasControls;
+      this.borderColor = this._savedProps.borderColor;
+      this.lockMovementX = this._savedProps.lockMovementX;
+      this.lockMovementY = this._savedProps.lockMovementY;
     },
 
     /**
