@@ -9799,7 +9799,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @param {Event} [self] Inner Event object
      */
     _onGesture: function(e, s) {
-      this.__onTransformGesture(e, s);
+      this.__onTransformGesture && this.__onTransformGesture(e, s);
     },
 
     /**
@@ -9808,7 +9808,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @param {Event} [self] Inner Event object
      */
     _onDrag: function(e, s) {
-      this.__onDrag(e, s);
+      this.__onDrag && this.__onDrag(e, s);
     },
 
     /**
@@ -9817,7 +9817,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @param {Event} [self] Inner Event object
      */
     _onMouseWheel: function(e, s) {
-      this.__onMouseWheel(e, s);
+      this.__onMouseWheel && this.__onMouseWheel(e, s);
     },
 
     /**
@@ -9826,7 +9826,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @param {Event} [self] Inner Event object
      */
     _onOrientationChange: function(e,s) {
-      this.__onOrientationChange(e,s);
+      this.__onOrientationChange && this.__onOrientationChange(e,s);
     },
 
     /**
@@ -9835,7 +9835,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @param {Event} [self] Inner Event object
      */
     _onShake: function(e,s) {
-      this.__onShake(e,s);
+      this.__onShake && this.__onShake(e,s);
     },
 
     /**
@@ -9924,12 +9924,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
           render;
 
       if (this.isDrawingMode && this._isCurrentlyDrawing) {
-        this._isCurrentlyDrawing = false;
-        if (this.clipTo) {
-          this.contextTop.restore();
-        }
-        this.freeDrawingBrush.onMouseUp();
-        this.fire('mouse:up', { e: e });
+        this._onMouseUpInDrawingMode(e);
         return;
       }
 
@@ -10018,6 +10013,32 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       }
       this.freeDrawingBrush.onMouseDown(this.getPointer(e));
       this.fire('mouse:down', { e: e });
+    },
+
+    /**
+     * @private
+     * @param {Event} e Event object fired on mousemove
+     */
+    _onMouseMoveInDrawingMode: function(e) {
+      if (this._isCurrentlyDrawing) {
+        var pointer = this.getPointer(e);
+        this.freeDrawingBrush.onMouseMove(pointer);
+      }
+      this.upperCanvasEl.style.cursor = this.freeDrawingCursor;
+      this.fire('mouse:move', { e: e });
+    },
+
+    /**
+     * @private
+     * @param {Event} e Event object fired on mouseup
+     */
+    _onMouseUpInDrawingMode: function(e) {
+      this._isCurrentlyDrawing = false;
+      if (this.clipTo) {
+        this.contextTop.restore();
+      }
+      this.freeDrawingBrush.onMouseUp();
+      this.fire('mouse:up', { e: e });
     },
 
     /**
@@ -10139,15 +10160,11 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       * @param {Event} e Event object fired on mousemove
       */
     __onMouseMove: function (e) {
+
       var target, pointer;
 
       if (this.isDrawingMode) {
-        if (this._isCurrentlyDrawing) {
-          pointer = this.getPointer(e);
-          this.freeDrawingBrush.onMouseMove(pointer);
-        }
-        this.upperCanvasEl.style.cursor = this.freeDrawingCursor;
-        this.fire('mouse:move', { e: e });
+        this._onMouseMoveInDrawingMode(e);
         return;
       }
 
@@ -10183,80 +10200,89 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       }
       else {
         // object is being transformed (scaled/rotated/moved/etc.)
-        pointer = getPointer(e, this.upperCanvasEl);
-
-        var x = pointer.x,
-            y = pointer.y,
-            reset = false,
-            centerTransform,
-            transform = this._currentTransform;
-
-        target = transform.target;
-        target.isMoving = true;
-
-        if (transform.action === 'scale' || transform.action === 'scaleX' || transform.action === 'scaleY') {
-          centerTransform = this._shouldCenterTransform(e, target);
-
-             // Switch from a normal resize to center-based
-          if ((centerTransform && (transform.originX !== 'center' || transform.originY !== 'center')) ||
-             // Switch from center-based resize to normal one
-             (!centerTransform && transform.originX === 'center' && transform.originY === 'center')
-          ) {
-            this._resetCurrentTransform(e);
-            reset = true;
-          }
-        }
-
-        if (transform.action === 'rotate') {
-          this._rotateObject(x, y);
-
-          this.fire('object:rotating', { target: target, e: e });
-          target.fire('rotating', { e: e });
-        }
-        else if (transform.action === 'scale') {
-          // rotate object only if shift key is not pressed
-          // and if it is not a group we are transforming
-          if ((e.shiftKey || this.uniScaleTransform) && !target.get('lockUniScaling')) {
-            transform.currentAction = 'scale';
-            this._scaleObject(x, y);
-          }
-          else {
-            // Switch from a normal resize to proportional
-            if (!reset && transform.currentAction === 'scale') {
-              this._resetCurrentTransform(e, target);
-            }
-
-            transform.currentAction = 'scaleEqually';
-            this._scaleObject(x, y, 'equally');
-          }
-
-          this.fire('object:scaling', { target: target, e: e });
-          target.fire('scaling', { e: e });
-        }
-        else if (transform.action === 'scaleX') {
-          this._scaleObject(x, y, 'x');
-
-          this.fire('object:scaling', { target: target, e: e});
-          target.fire('scaling', { e: e });
-        }
-        else if (transform.action === 'scaleY') {
-          this._scaleObject(x, y, 'y');
-
-          this.fire('object:scaling', { target: target, e: e});
-          target.fire('scaling', { e: e });
-        }
-        else {
-          this._translateObject(x, y);
-
-          this.fire('object:moving', { target: target, e: e});
-          target.fire('moving', { e: e });
-          this._setCursor(this.moveCursor);
-        }
-
-        this.renderAll();
+        this._transformObject(e);
       }
+
       this.fire('mouse:move', { target: target, e: e });
       target && target.fire('mousemove', { e: e });
+    },
+
+    /**
+     * @private
+     * @param {Event} e Event fired on mousemove
+     */
+    _transformObject: function(e) {
+
+      var pointer = getPointer(e, this.upperCanvasEl),
+          x = pointer.x,
+          y = pointer.y,
+          reset = false,
+          centerTransform,
+          transform = this._currentTransform,
+          target = transform.target;
+
+      target.isMoving = true;
+
+      if (transform.action === 'scale' || transform.action === 'scaleX' || transform.action === 'scaleY') {
+        centerTransform = this._shouldCenterTransform(e, target);
+
+           // Switch from a normal resize to center-based
+        if ((centerTransform && (transform.originX !== 'center' || transform.originY !== 'center')) ||
+           // Switch from center-based resize to normal one
+           (!centerTransform && transform.originX === 'center' && transform.originY === 'center')
+        ) {
+          this._resetCurrentTransform(e);
+          reset = true;
+        }
+      }
+
+      if (transform.action === 'rotate') {
+        this._rotateObject(x, y);
+
+        this.fire('object:rotating', { target: target, e: e });
+        target.fire('rotating', { e: e });
+      }
+      else if (transform.action === 'scale') {
+        // rotate object only if shift key is not pressed
+        // and if it is not a group we are transforming
+        if ((e.shiftKey || this.uniScaleTransform) && !target.get('lockUniScaling')) {
+          transform.currentAction = 'scale';
+          this._scaleObject(x, y);
+        }
+        else {
+          // Switch from a normal resize to proportional
+          if (!reset && transform.currentAction === 'scale') {
+            this._resetCurrentTransform(e, target);
+          }
+
+          transform.currentAction = 'scaleEqually';
+          this._scaleObject(x, y, 'equally');
+        }
+
+        this.fire('object:scaling', { target: target, e: e });
+        target.fire('scaling', { e: e });
+      }
+      else if (transform.action === 'scaleX') {
+        this._scaleObject(x, y, 'x');
+
+        this.fire('object:scaling', { target: target, e: e});
+        target.fire('scaling', { e: e });
+      }
+      else if (transform.action === 'scaleY') {
+        this._scaleObject(x, y, 'y');
+
+        this.fire('object:scaling', { target: target, e: e});
+        target.fire('scaling', { e: e });
+      }
+      else {
+        this._translateObject(x, y);
+
+        this.fire('object:moving', { target: target, e: e});
+        target.fire('moving', { e: e });
+        this._setCursor(this.moveCursor);
+      }
+
+      this.renderAll();
     },
 
     /**
@@ -20148,15 +20174,15 @@ fabric.util.object.extend(fabric.Text.prototype, {
      * @private
      */
     _restoreProps: function() {
-      if (this._savedProps) {
-        this.hoverCursor = this._savedProps.overCursor;
-        this.canvas.defaultCursor = this._savedProps.defaultCursor;
-        this.canvas.moveCursor = this._savedProps.moveCursor;
-        this.hasControls = this._savedProps.hasControls;
-        this.borderColor = this._savedProps.borderColor;
-        this.lockMovementX = this._savedProps.lockMovementX;
-        this.lockMovementY = this._savedProps.lockMovementY;
-      }
+      if (!this._savedProps) return;
+
+      this.hoverCursor = this._savedProps.overCursor;
+      this.canvas.defaultCursor = this._savedProps.defaultCursor;
+      this.canvas.moveCursor = this._savedProps.moveCursor;
+      this.hasControls = this._savedProps.hasControls;
+      this.borderColor = this._savedProps.borderColor;
+      this.lockMovementX = this._savedProps.lockMovementX;
+      this.lockMovementY = this._savedProps.lockMovementY;
     },
 
     /**
@@ -20242,7 +20268,6 @@ fabric.util.object.extend(fabric.Text.prototype, {
       var i = end;
       while (i !== start) {
         i--;
-        //var isBeginningOfLine = this.text.slice(end - 1, end) === '\n';
         this.removeStyleObject(false, i);
       }
 

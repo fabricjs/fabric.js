@@ -962,7 +962,6 @@
       var i = end;
       while (i !== start) {
         i--;
-        //var isBeginningOfLine = this.text.slice(end - 1, end) === '\n';
         this.removeStyleObject(false, i);
       }
 
