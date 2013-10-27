@@ -1590,7 +1590,7 @@
           var lineOffset = this._getLineLeftOffset(this._getWidthOfLine(ctx, lineIndex, textLines)) || 0;
 
           if (lineIndex === origLineIndex) {
-            // only offset the line if we're drawing selection of 2nd, 3rd, etc. line
+            // only offset the line if we're rendering selection of 2nd, 3rd, etc. line
             lineOffset = 0;
           }
 
@@ -1673,12 +1673,17 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      * @param {String} line
      */
-    _drawTextLine: function(method, ctx, line, left, top, lineIndex) {
-      // to "cancel" this.fontSize subtraction in fabric.Text#_drawTextLine
+    _renderTextLine: function(method, ctx, line, left, top, lineIndex) {
+      // to "cancel" this.fontSize subtraction in fabric.Text#_renderTextLine
       top += this.fontSize / 4;
-      this.callSuper('_drawTextLine', method, ctx, line, left, top, lineIndex);
+      this.callSuper('_renderTextLine', method, ctx, line, left, top, lineIndex);
     },
 
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Array} textLines
+     */
     _renderTextDecoration: function(ctx, textLines) {
       if (!this.styles || isEmptyStyles(this.styles)) {
         return this.callSuper('_renderTextDecoration', ctx, textLines);
@@ -1691,14 +1696,14 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      * @param {String} line
      */
-    _drawCharsFast: function(method, ctx, line, left, top) {
+    _renderCharsFast: function(method, ctx, line, left, top) {
       this.skipTextAlign = false;
 
       if (method === 'fillText' && this.fill) {
-        this.callSuper('_drawChars', method, ctx, line, left, top);
+        this.callSuper('_renderChars', method, ctx, line, left, top);
       }
       if (method === 'strokeText' && this.stroke) {
-        this.callSuper('_drawChars', method, ctx, line, left, top);
+        this.callSuper('_renderChars', method, ctx, line, left, top);
       }
     },
 
@@ -1707,10 +1712,10 @@
      * @param {String} method
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    _drawChars: function(method, ctx, line, left, top, lineIndex) {
+    _renderChars: function(method, ctx, line, left, top, lineIndex) {
 
       if (this.styles && isEmptyStyles(this.styles)) {
-        return this._drawCharsFast(method, ctx, line, left, top);
+        return this._renderCharsFast(method, ctx, line, left, top);
       }
 
       this.skipTextAlign = true;
@@ -1733,7 +1738,7 @@
 
       ctx.save();
       for (var i = 0, len = chars.length; i < len; i++) {
-        this._drawChar(method, ctx, lineIndex, i, chars[i], left, top, lineHeight);
+        this._renderChar(method, ctx, lineIndex, i, chars[i], left, top, lineHeight);
       }
       ctx.restore();
     },
@@ -1742,7 +1747,7 @@
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    _drawChar: function(method, ctx, lineIndex, i, _char, left, top, lineHeight) {
+    _renderChar: function(method, ctx, lineIndex, i, _char, left, top, lineHeight) {
       var decl, charWidth;
 
       if (this.styles && this.styles[lineIndex] && (decl = this.styles[lineIndex][i])) {

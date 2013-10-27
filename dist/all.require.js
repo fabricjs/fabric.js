@@ -18608,7 +18608,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @param {Number} left Left position of text
      * @param {Number} top Top position of text
      */
-    _drawChars: function(method, ctx, chars, left, top) {
+    _renderChars: function(method, ctx, chars, left, top) {
       ctx[method](chars, left, top);
     },
 
@@ -18621,13 +18621,13 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @param {Number} top Top position of text
      * @param {Number} lineIndex Index of a line in a text
      */
-    _drawTextLine: function(method, ctx, line, left, top, lineIndex) {
+    _renderTextLine: function(method, ctx, line, left, top, lineIndex) {
       // lift the line by quarter of fontSize
       top -= this.fontSize / 4;
 
       // short-circuit
       if (this.textAlign !== 'justify') {
-        this._drawChars(method, ctx, line, left, top, lineIndex);
+        this._renderChars(method, ctx, line, left, top, lineIndex);
         return;
       }
 
@@ -18644,12 +18644,12 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 
         var leftOffset = 0;
         for (var i = 0, len = words.length; i < len; i++) {
-          this._drawChars(method, ctx, words[i], left + leftOffset, top, lineIndex);
+          this._renderChars(method, ctx, words[i], left + leftOffset, top, lineIndex);
           leftOffset += ctx.measureText(words[i]).width + spaceWidth;
         }
       }
       else {
-        this._drawChars(method, ctx, line, left, top, lineIndex);
+        this._renderChars(method, ctx, line, left, top, lineIndex);
       }
     },
 
@@ -18687,7 +18687,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
         var heightOfLine = this._getHeightOfLine(ctx, i, textLines);
         lineHeights += heightOfLine;
 
-        this._drawTextLine(
+        this._renderTextLine(
           'fillText',
           ctx,
           textLines[i],
@@ -18722,7 +18722,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
         var heightOfLine = this._getHeightOfLine(ctx, i, textLines);
         lineHeights += heightOfLine;
 
-        this._drawTextLine(
+        this._renderTextLine(
           'strokeText',
           ctx,
           textLines[i],
