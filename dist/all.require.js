@@ -2766,25 +2766,9 @@ fabric.Collection = {
    * @return {Any}
    */
   function max(array, byProperty) {
-    if (!array || array.length === 0) return undefined;
-
-    var i = array.length - 1,
-        result = byProperty ? array[i][byProperty] : array[i];
-    if (byProperty) {
-      while (i--) {
-        if (array[i][byProperty] >= result) {
-          result = array[i][byProperty];
-        }
-      }
-    }
-    else {
-      while (i--) {
-        if (array[i] >= result) {
-          result = array[i];
-        }
-      }
-    }
-    return result;
+    return find(array, byProperty, function(value1, value2) {
+      return value1 >= value2;
+    });
   }
 
   /**
@@ -2795,21 +2779,29 @@ fabric.Collection = {
    * @return {Any}
    */
   function min(array, byProperty) {
+    return find(array, byProperty, function(value1, value2) {
+      return value1 < value2;
+    });
+  }
+
+  /**
+   * @private
+   */
+  function find(array, byProperty, condition) {
     if (!array || array.length === 0) return undefined;
 
     var i = array.length - 1,
         result = byProperty ? array[i][byProperty] : array[i];
-
     if (byProperty) {
       while (i--) {
-        if (array[i][byProperty] < result) {
+        if (condition(array[i][byProperty], result)) {
           result = array[i][byProperty];
         }
       }
     }
     else {
       while (i--) {
-        if (array[i] < result) {
+        if (condition(array[i], result)) {
           result = array[i];
         }
       }
