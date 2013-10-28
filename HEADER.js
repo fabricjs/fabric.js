@@ -26,3 +26,10 @@ fabric.isTouchSupported = "ontouchstart" in fabric.document.documentElement;
  * @type boolean
  */
 fabric.isLikelyNode = typeof Buffer !== 'undefined' && typeof window === 'undefined';
+
+fabric.SHARED_ATTRIBUTES = [
+  "transform",
+  "fill", "fill-opacity", "fill-rule",
+  "opacity",
+  "stroke", "stroke-dasharray", "stroke-linecap", "stroke-linejoin", "stroke-miterlimit", "stroke-opacity", "stroke-width"
+];
