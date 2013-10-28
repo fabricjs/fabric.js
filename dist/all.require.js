@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures minifier=uglifyjs` */
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.3.8" };
+var fabric = fabric || { version: "1.3.9" };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -10481,14 +10481,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       this.deactivateAll();
     }
 
+    this.renderAll(true);
+
+    var data = this.__toDataURL(format, quality, cropping);
+
     // restoring width, height for `renderAll` to draw
     // background properly (while context is scaled)
     this.width = origWidth;
     this.height = origHeight;
-
-    this.renderAll(true);
-
-    var data = this.__toDataURL(format, quality, cropping);
 
     ctx.scale(1 / multiplier,  1 / multiplier);
     this.setWidth(origWidth).setHeight(origHeight);
