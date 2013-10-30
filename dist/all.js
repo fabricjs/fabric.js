@@ -3316,14 +3316,10 @@ fabric.util.string = {
   };
 
   function _getPointer(event, pageProp, clientProp) {
-    if (event.type !== 'touchend') {
-      return (event.touches && event.touches[0]
-        ? (event.touches[0][pageProp] - (event.touches[0][pageProp] - event.touches[0][clientProp]))
-          || event[clientProp]
-        : event[clientProp]);
-    }
-    return (event.changedTouches && event.changedTouches[0]
-      ? (event.changedTouches[0][pageProp] - (event.changedTouches[0][pageProp] - event.changedTouches[0][clientProp]))
+    var touchProp = event.type === 'touchend' ? 'changedTouches' : 'touches';
+
+    return (event[touchProp] && event[touchProp][0]
+      ? (event[touchProp][0][pageProp] - (event[touchProp][0][pageProp] - event[touchProp][0][clientProp]))
         || event[clientProp]
       : event[clientProp]);
   }
