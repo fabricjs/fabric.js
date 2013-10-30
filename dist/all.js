@@ -10060,6 +10060,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @param {Event} e Event object fired on mousedown
      */
     __onMouseDown: function (e) {
+
       // accept only left clicks
       var isLeftClick  = 'which' in e ? e.which === 1 : e.button === 1;
       if (!isLeftClick && !fabric.isTouchSupported) return;
@@ -10073,51 +10074,64 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       if (this._currentTransform) return;
 
       var target = this.findTarget(e),
-          pointer = this.getPointer(e),
-          corner,
-          render;
+          pointer = this.getPointer(e);
 
       // save pointer for check in __onMouseUp event
       this._previousPointer = pointer;
 
-      render = this._shouldRender(target, pointer);
+      var shouldRender = this._shouldRender(target, pointer);
 
       if (this._shouldClearSelection(e, target)) {
-        if (this.selection) {
-          this._groupSelector = {
-            ex: pointer.x,
-            ey: pointer.y,
-            top: 0,
-            left: 0
-          };
-        }
-        this.deactivateAllWithDispatch();
-        target && target.selectable && this.setActiveObject(target, e);
+        this._clearSelection(e, target, pointer);
       }
       else if (this._shouldHandleGroupLogic(e, target)) {
         this._handleGroupLogic(e, target);
         target = this.getActiveGroup();
       }
       else {
-        // determine if it's a drag or rotate case
-        this.stateful && target.saveState();
-
-        if ((corner = target._findTargetCorner(e, this._offset))) {
-          this.onBeforeScaleRotate(target);
-        }
-
-        if (target !== this.getActiveGroup() && target !== this.getActiveObject()) {
-          this.deactivateAll();
-          this.setActiveObject(target, e);
-        }
-
+        this._beforeTransform(e, target);
         this._setupCurrentTransform(e, target);
       }
       // we must renderAll so that active image is placed on the top canvas
-      render && this.renderAll();
+      shouldRender && this.renderAll();
 
       this.fire('mouse:down', { target: target, e: e });
       target && target.fire('mousedown', { e: e });
+    },
+
+    /**
+     * @private
+     */
+    _beforeTransform: function(e, target) {
+      var corner;
+
+      this.stateful && target.saveState();
+
+      // determine if it's a drag or rotate case
+      if ((corner = target._findTargetCorner(e, this._offset))) {
+        this.onBeforeScaleRotate(target);
+      }
+
+      if (target !== this.getActiveGroup() && target !== this.getActiveObject()) {
+        this.deactivateAll();
+        this.setActiveObject(target, e);
+      }
+    },
+
+    /**
+     * @private
+     */
+    _clearSelection: function(e, target, pointer) {
+      if (this.selection) {
+        this._groupSelector = {
+          ex: pointer.x,
+          ey: pointer.y,
+          top: 0,
+          left: 0
+        };
+      }
+      this.deactivateAllWithDispatch();
+      target && target.selectable && this.setActiveObject(target, e);
     },
 
     /**
@@ -16290,8 +16304,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @private
      */
     _setObjectPosition: function(object) {
-      var groupLeft = this.get('left'),
-          groupTop = this.get('top'),
+      var groupLeft = this.getLeft(),
+          groupTop = this.getTop(),
           rotated = this._getRotatedLeftTop(object);
 
       object.setAngle(object.getAngle() + this.getAngle());
@@ -16308,11 +16322,11 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     _getRotatedLeftTop: function(object) {
       var groupAngle = this.getAngle() * (Math.PI / 180);
       return {
-        left: (-Math.sin(groupAngle) * object.get('top') * this.get('scaleY') +
-                Math.cos(groupAngle) * object.get('left') * this.get('scaleX')),
+        left: (-Math.sin(groupAngle) * object.getTop() * this.get('scaleY') +
+                Math.cos(groupAngle) * object.getLeft() * this.get('scaleX')),
 
-        top:  (Math.cos(groupAngle) * object.get('top') * this.get('scaleY') +
-               Math.sin(groupAngle) * object.get('left') * this.get('scaleX'))
+        top:  (Math.cos(groupAngle) * object.getTop() * this.get('scaleY') +
+               Math.sin(groupAngle) * object.getLeft() * this.get('scaleX'))
       };
     },
 
