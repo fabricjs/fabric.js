@@ -9939,38 +9939,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       }
 
       if (this._currentTransform) {
-
-        var transform = this._currentTransform;
-
-        target = transform.target;
-        if (target._scaling) {
-          target._scaling = false;
-        }
-
-        target.setCoords();
-
-        // only fire :modified event if target coordinates were changed during mousedown-mouseup
-        if (this.stateful && target.hasStateChanged()) {
-          this.fire('object:modified', { target: target });
-          target.fire('modified');
-        }
-
-        if (this._previousOriginX && this._previousOriginY) {
-
-          var originPoint = target.translateToOriginPoint(
-            target.getCenterPoint(),
-            this._previousOriginX,
-            this._previousOriginY);
-
-          target.originX = this._previousOriginX;
-          target.originY = this._previousOriginY;
-
-          target.left = originPoint.x;
-          target.top = originPoint.y;
-
-          this._previousOriginX = null;
-          this._previousOriginY = null;
-        }
+        this._finalizeCurrentTransform();
+        target = this._currentTransform.target;
       }
       else {
         pointer = this.getPointer(e);
@@ -10009,6 +9979,51 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
       this.fire('mouse:up', { target: target, e: e });
       target && target.fire('mouseup', { e: e });
+    },
+
+    /**
+     * @private
+     */
+    _finalizeCurrentTransform: function() {
+
+      var transform = this._currentTransform;
+      var target = transform.target;
+
+      if (target._scaling) {
+        target._scaling = false;
+      }
+
+      target.setCoords();
+
+      // only fire :modified event if target coordinates were changed during mousedown-mouseup
+      if (this.stateful && target.hasStateChanged()) {
+        this.fire('object:modified', { target: target });
+        target.fire('modified');
+      }
+
+      this._restoreOriginXY(target);
+    },
+
+    /**
+     * @private
+     */
+    _restoreOriginXY: function(target) {
+      if (this._previousOriginX && this._previousOriginY) {
+
+        var originPoint = target.translateToOriginPoint(
+          target.getCenterPoint(),
+          this._previousOriginX,
+          this._previousOriginY);
+
+        target.originX = this._previousOriginX;
+        target.originY = this._previousOriginY;
+
+        target.left = originPoint.x;
+        target.top = originPoint.y;
+
+        this._previousOriginX = null;
+        this._previousOriginY = null;
+      }
     },
 
     /**
@@ -10334,7 +10349,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         else {
           if (corner in cursorOffset) {
             var n = Math.round((target.getAngle() % 360) / 45);
-            if (n<0) {
+            if (n < 0) {
               n += 8; // full circle ahead
             }
             n += cursorOffset[corner];
