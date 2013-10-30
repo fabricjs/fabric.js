@@ -3820,6 +3820,12 @@ fabric.util.string = {
     return { a: a, c: c, p: p, s: s };
   }
 
+  function elastic(opts, t, d) {
+    return opts.a *
+      Math.pow(2, 10 * (t -= 1)) *
+      Math.sin( (t * d - opts.s) * (2 * Math.PI) / opts.p );
+  }
+
   /**
    * Quadratic easing in
    * @memberOf fabric.util.ease
@@ -4013,7 +4019,7 @@ fabric.util.string = {
     if (t===1) return b+c;
     if (!p) p=d*0.3;
     var opts = normalize(a, c, p, s);
-    return -(opts.a*Math.pow(2,10*(t-=1)) * Math.sin( (t*d-opts.s)*(2*Math.PI)/opts.p )) + b;
+    return -elastic(opts, t, d) + b;
   }
 
   /**
@@ -4041,7 +4047,7 @@ fabric.util.string = {
     if (t===2) return b+c;
     if (!p) p=d*(0.3*1.5);
     var opts = normalize(a, c, p, s);
-    if (t < 1) return -0.5*(opts.a*Math.pow(2,10*(t-=1)) * Math.sin( (t*d-opts.s)*(2*Math.PI)/opts.p )) + b;
+    if (t < 1) return -0.5 * elastic(opts, t, d) + b;
     return opts.a*Math.pow(2,-10*(t-=1)) * Math.sin( (t*d-opts.s)*(2*Math.PI)/opts.p )*0.5 + opts.c + b;
   }
 
