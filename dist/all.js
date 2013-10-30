@@ -3252,15 +3252,32 @@ fabric.util.string = {
   function getPointer(event, upperCanvasEl) {
     event || (event = fabric.window.event);
 
-    var element = event.target || (typeof event.srcElement !== 'unknown' ? event.srcElement : null),
-        body = fabric.document.body || {scrollLeft: 0, scrollTop: 0},
+    var element = event.target ||
+                  (typeof event.srcElement !== 'unknown' ? event.srcElement : null);
+
+    var scroll = getScrollLeftTop(element, upperCanvasEl);
+
+    return {
+      x: pointerX(event) + scroll.left,
+      y: pointerY(event) + scroll.top
+    };
+  }
+
+  function getScrollLeftTop(element, upperCanvasEl) {
+
+    var firstFixedAncestor,
+        origElement,
+        left = 0,
+        top = 0,
         docElement = fabric.document.documentElement,
-        orgElement = element,
-        scrollLeft = 0,
-        scrollTop = 0,
-        firstFixedAncestor;
+        body = fabric.document.body || {
+          scrollLeft: 0, scrollTop: 0
+        };
+
+    origElement = element;
 
     while (element && element.parentNode && !firstFixedAncestor) {
+
       element = element.parentNode;
 
       if (element !== fabric.document &&
@@ -3269,25 +3286,22 @@ fabric.util.string = {
       }
 
       if (element !== fabric.document &&
-          orgElement !== upperCanvasEl &&
+          origElement !== upperCanvasEl &&
           fabric.util.getElementStyle(element, 'position') === 'absolute') {
-        scrollLeft = 0;
-        scrollTop = 0;
+        left = 0;
+        top = 0;
       }
       else if (element === fabric.document) {
-        scrollLeft = body.scrollLeft || docElement.scrollLeft || 0;
-        scrollTop = body.scrollTop ||  docElement.scrollTop || 0;
+        left = body.scrollLeft || docElement.scrollLeft || 0;
+        top = body.scrollTop ||  docElement.scrollTop || 0;
       }
       else {
-        scrollLeft += element.scrollLeft || 0;
-        scrollTop += element.scrollTop || 0;
+        left += element.scrollLeft || 0;
+        top += element.scrollTop || 0;
       }
     }
 
-    return {
-      x: pointerX(event) + scrollLeft,
-      y: pointerY(event) + scrollTop
-    };
+    return { left: left, top: top };
   }
 
   var pointerX = function(event) {
@@ -9182,6 +9196,9 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       this._flipObject(transform);
     },
 
+    /**
+     * @private
+     */
     _scaleObjectEqually: function(localMouse, target, transform) {
 
       var dist = localMouse.y + localMouse.x;
