@@ -272,6 +272,7 @@
 
     /**
      * @private
+     * @param {Object} target Object to restore
      */
     _restoreOriginXY: function(target) {
       if (this._previousOriginX && this._previousOriginY) {
@@ -521,25 +522,13 @@
       var pointer = getPointer(e, this.upperCanvasEl),
           x = pointer.x,
           y = pointer.y,
-          reset = false,
-          centerTransform,
           transform = this._currentTransform,
           target = transform.target;
 
+      transform.reset = false,
       target.isMoving = true;
 
-      if (transform.action === 'scale' || transform.action === 'scaleX' || transform.action === 'scaleY') {
-        centerTransform = this._shouldCenterTransform(e, target);
-
-           // Switch from a normal resize to center-based
-        if ((centerTransform && (transform.originX !== 'center' || transform.originY !== 'center')) ||
-           // Switch from center-based resize to normal one
-           (!centerTransform && transform.originX === 'center' && transform.originY === 'center')
-        ) {
-          this._resetCurrentTransform(e);
-          reset = true;
-        }
-      }
+      this._beforeScaleTransform(e, transform);
 
       if (transform.action === 'rotate') {
         this._rotateObject(x, y);
@@ -548,24 +537,7 @@
         target.fire('rotating', { e: e });
       }
       else if (transform.action === 'scale') {
-        // rotate object only if shift key is not pressed
-        // and if it is not a group we are transforming
-        if ((e.shiftKey || this.uniScaleTransform) && !target.get('lockUniScaling')) {
-          transform.currentAction = 'scale';
-          this._scaleObject(x, y);
-        }
-        else {
-          // Switch from a normal resize to proportional
-          if (!reset && transform.currentAction === 'scale') {
-            this._resetCurrentTransform(e, target);
-          }
-
-          transform.currentAction = 'scaleEqually';
-          this._scaleObject(x, y, 'equally');
-        }
-
-        this.fire('object:scaling', { target: target, e: e });
-        target.fire('scaling', { e: e });
+        this._onScale(e, transform, x, y);
       }
       else if (transform.action === 'scaleX') {
         this._scaleObject(x, y, 'x');
@@ -588,6 +560,48 @@
       }
 
       this.renderAll();
+    },
+
+    /**
+     * @private
+     */
+    _beforeScaleTransform: function(e, transform) {
+      if (transform.action === 'scale' || transform.action === 'scaleX' || transform.action === 'scaleY') {
+        var centerTransform = this._shouldCenterTransform(e, transform.target);
+
+           // Switch from a normal resize to center-based
+        if ((centerTransform && (transform.originX !== 'center' || transform.originY !== 'center')) ||
+           // Switch from center-based resize to normal one
+           (!centerTransform && transform.originX === 'center' && transform.originY === 'center')
+        ) {
+          this._resetCurrentTransform(e);
+          transform.reset = true;
+        }
+      }
+    },
+
+    /**
+     * @private
+     */
+    _onScale: function(e, transform, x, y) {
+      // rotate object only if shift key is not pressed
+      // and if it is not a group we are transforming
+      if ((e.shiftKey || this.uniScaleTransform) && !transform.target.get('lockUniScaling')) {
+        transform.currentAction = 'scale';
+        this._scaleObject(x, y);
+      }
+      else {
+        // Switch from a normal resize to proportional
+        if (!transform.reset && transform.currentAction === 'scale') {
+          this._resetCurrentTransform(e, transform.target);
+        }
+
+        transform.currentAction = 'scaleEqually';
+        this._scaleObject(x, y, 'equally');
+      }
+
+      this.fire('object:scaling', { target: transform.target, e: e });
+      transform.target.fire('scaling', { e: e });
     },
 
     /**
