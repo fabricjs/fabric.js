@@ -2,7 +2,7 @@
 
   var clone = fabric.util.object.clone;
 
-  fabric.ITextBehavior = { /** @lends fabric.IText.prototype */
+  fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.prototype */ {
 
     /**
      * Initializes all the interactive behavior of IText
@@ -1162,5 +1162,7 @@
     insertNewline: function() {
       this.insertChar('\n');
     }
-  };
+  });
+
 })();
+

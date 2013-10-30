@@ -231,8 +231,8 @@ var filesToInclude = [
   ifSpecifiedInclude('text', 'src/shapes/text.class.js'),
   ifSpecifiedInclude('cufon', 'src/shapes/text.cufon.js'),
 
-  ifSpecifiedInclude('itext', 'src/mixins/itext_behavior.mixin.js'),
   ifSpecifiedInclude('itext', 'src/shapes/itext.class.js'),
+  ifSpecifiedInclude('itext', 'src/mixins/itext_behavior.mixin.js'),
 
   ifSpecifiedInclude('node', 'src/node.js'),
 

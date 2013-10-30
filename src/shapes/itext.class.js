@@ -3,16 +3,16 @@
   var clone = fabric.util.object.clone;
 
    /**
-    * IText class
+    * IText class (introduced in <b>v1.4</b>)
     * @class fabric.IText
     * @extends fabric.Text
     * @mixes fabric.Observable
-    * @fires #text:changed
+    * @fires text:changed
     * @return {fabric.IText} thisArg
     * @see {@link fabric.IText#initialize} for constructor definition
     *
-    * Supported key combinations:
-    *
+    * <p>Supported key combinations:</p>
+    * <pre>
     *   Move cursor:                    left, right, up, down
     *   Select character:               shift + left, shift + right
     *   Select text vertically:         shift + up, shift + down
@@ -26,8 +26,9 @@
     *   Delete word:                    alt + backspace
     *   Delete line:                    cmd + backspace
     *   Forward delete:                 delete
+    * </pre>
     */
-  fabric.IText = fabric.util.createClass(fabric.Text, fabric.Observable, fabric.ITextBehavior, {
+  fabric.IText = fabric.util.createClass(fabric.Text, fabric.Observable, /** @lends fabric.IText.prototype */ {
 
     /**
      * Type of an object
