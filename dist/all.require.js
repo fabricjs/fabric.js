@@ -16274,19 +16274,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @return {fabric.Group} thisArg
      */
     _restoreObjectState: function(object) {
-      var groupLeft = this.get('left'),
-          groupTop = this.get('top'),
-          groupAngle = this.getAngle() * (Math.PI / 180),
-          rotatedTop = Math.cos(groupAngle) * object.get('top') * this.get('scaleY') + Math.sin(groupAngle) * object.get('left') * this.get('scaleX'),
-          rotatedLeft = -Math.sin(groupAngle) * object.get('top') * this.get('scaleY') + Math.cos(groupAngle) * object.get('left') * this.get('scaleX');
-
-      object.setAngle(object.getAngle() + this.getAngle());
-
-      object.set('left', groupLeft + rotatedLeft);
-      object.set('top', groupTop + rotatedTop);
-
-      object.set('scaleX', object.get('scaleX') * this.get('scaleX'));
-      object.set('scaleY', object.get('scaleY') * this.get('scaleY'));
+      this._setObjectPosition(object);
 
       object.setCoords();
       object.hasControls = object.__origHasControls;
@@ -16296,6 +16284,36 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       delete object.group;
 
       return this;
+    },
+
+    /**
+     * @private
+     */
+    _setObjectPosition: function(object) {
+      var groupLeft = this.get('left'),
+          groupTop = this.get('top'),
+          rotated = this._getRotatedLeftTop(object);
+
+      object.setAngle(object.getAngle() + this.getAngle());
+
+      object.set('left', groupLeft + rotated.left);
+      object.set('top', groupTop + rotated.top);
+      object.set('scaleX', object.get('scaleX') * this.get('scaleX'));
+      object.set('scaleY', object.get('scaleY') * this.get('scaleY'));
+    },
+
+    /**
+     * @private
+     */
+    _getRotatedLeftTop: function(object) {
+      var groupAngle = this.getAngle() * (Math.PI / 180);
+      return {
+        left: (-Math.sin(groupAngle) * object.get('top') * this.get('scaleY') +
+                Math.cos(groupAngle) * object.get('left') * this.get('scaleX')),
+
+        top:  (Math.cos(groupAngle) * object.get('top') * this.get('scaleY') +
+               Math.sin(groupAngle) * object.get('left') * this.get('scaleX'))
+      };
     },
 
     /**
