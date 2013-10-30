@@ -9154,55 +9154,69 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     /**
      * @private
      */
-    _setObjectScale: function(localMouse, t, lockScalingX, lockScalingY, by) {
-      var target = t.target,
-          newScaleX = target.scaleX,
-          newScaleY = target.scaleY;
+    _setObjectScale: function(localMouse, transform, lockScalingX, lockScalingY, by) {
+      var target = transform.target;
+
+      transform.newScaleX = target.scaleX;
+      transform.newScaleY = target.scaleY;
 
       if (by === 'equally' && !lockScalingX && !lockScalingY) {
-        var dist = localMouse.y + localMouse.x;
-        var lastDist = (target.height + (target.strokeWidth)) * t.original.scaleY +
-                       (target.width + (target.strokeWidth)) * t.original.scaleX;
-
-        // We use t.scaleX/Y instead of target.scaleX/Y because the object may have a min scale and we'll loose the proportions
-        newScaleX = t.original.scaleX * dist / lastDist;
-        newScaleY = t.original.scaleY * dist / lastDist;
-
-        target.set('scaleX', newScaleX);
-        target.set('scaleY', newScaleY);
+        this._scaleObjectEqually(localMouse, target, transform);
       }
       else if (!by) {
-        newScaleX = localMouse.x / (target.width + target.strokeWidth);
-        newScaleY = localMouse.y / (target.height + target.strokeWidth);
+        transform.newScaleX = localMouse.x / (target.width + target.strokeWidth);
+        transform.newScaleY = localMouse.y / (target.height + target.strokeWidth);
 
-        lockScalingX || target.set('scaleX', newScaleX);
-        lockScalingY || target.set('scaleY', newScaleY);
+        lockScalingX || target.set('scaleX', transform.newScaleX);
+        lockScalingY || target.set('scaleY', transform.newScaleY);
       }
       else if (by === 'x' && !target.get('lockUniScaling')) {
-        newScaleX = localMouse.x / (target.width + target.strokeWidth);
-        lockScalingX || target.set('scaleX', newScaleX);
+        transform.newScaleX = localMouse.x / (target.width + target.strokeWidth);
+        lockScalingX || target.set('scaleX', transform.newScaleX);
       }
       else if (by === 'y' && !target.get('lockUniScaling')) {
-        newScaleY = localMouse.y / (target.height + target.strokeWidth);
-        lockScalingY || target.set('scaleY', newScaleY);
+        transform.newScaleY = localMouse.y / (target.height + target.strokeWidth);
+        lockScalingY || target.set('scaleY', transform.newScaleY);
       }
 
-      // Check if we flipped
-      if (newScaleX < 0) {
-        if (t.originX === 'left') {
-          t.originX = 'right';
+      this._flipObject(transform);
+    },
+
+    _scaleObjectEqually: function(localMouse, target, transform) {
+
+      var dist = localMouse.y + localMouse.x;
+
+      var lastDist = (target.height + (target.strokeWidth)) * transform.original.scaleY +
+                     (target.width + (target.strokeWidth)) * transform.original.scaleX;
+
+      // We use transform.scaleX/Y instead of target.scaleX/Y
+      // because the object may have a min scale and we'll loose the proportions
+      transform.newScaleX = transform.original.scaleX * dist / lastDist;
+      transform.newScaleY = transform.original.scaleY * dist / lastDist;
+
+      target.set('scaleX', transform.newScaleX);
+      target.set('scaleY', transform.newScaleY);
+    },
+
+    /**
+     * @private
+     */
+    _flipObject: function(transform) {
+      if (transform.newScaleX < 0) {
+        if (transform.originX === 'left') {
+          transform.originX = 'right';
         }
-        else if (t.originX === 'right') {
-          t.originX = 'left';
+        else if (transform.originX === 'right') {
+          transform.originX = 'left';
         }
       }
 
-      if (newScaleY < 0) {
-        if (t.originY === 'top') {
-          t.originY = 'bottom';
+      if (transform.newScaleY < 0) {
+        if (transform.originY === 'top') {
+          transform.originY = 'bottom';
         }
-        else if (t.originY === 'bottom') {
-          t.originY = 'top';
+        else if (transform.originY === 'bottom') {
+          transform.originY = 'top';
         }
       }
     },
