@@ -532,34 +532,35 @@
 
       if (transform.action === 'rotate') {
         this._rotateObject(x, y);
-
-        this.fire('object:rotating', { target: target, e: e });
-        target.fire('rotating', { e: e });
+        this._fire('rotating', target, e);
       }
       else if (transform.action === 'scale') {
         this._onScale(e, transform, x, y);
+        this._fire('scaling', target, e);
       }
       else if (transform.action === 'scaleX') {
         this._scaleObject(x, y, 'x');
-
-        this.fire('object:scaling', { target: target, e: e});
-        target.fire('scaling', { e: e });
+        this._fire('scaling', target, e);
       }
       else if (transform.action === 'scaleY') {
         this._scaleObject(x, y, 'y');
-
-        this.fire('object:scaling', { target: target, e: e});
-        target.fire('scaling', { e: e });
+        this._fire('scaling', target, e);
       }
       else {
         this._translateObject(x, y);
-
-        this.fire('object:moving', { target: target, e: e});
-        target.fire('moving', { e: e });
+        this._fire('moving', target, e);
         this._setCursor(this.moveCursor);
       }
 
       this.renderAll();
+    },
+
+    /**
+     * @private
+     */
+    _fire: function(eventName, target, e) {
+      this.fire('object:' + eventName, { target: target, e: e});
+      target.fire(eventName, { e: e });
     },
 
     /**
@@ -599,9 +600,6 @@
         transform.currentAction = 'scaleEqually';
         this._scaleObject(x, y, 'equally');
       }
-
-      this.fire('object:scaling', { target: transform.target, e: e });
-      transform.target.fire('scaling', { e: e });
     },
 
     /**
