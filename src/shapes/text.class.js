@@ -375,13 +375,7 @@
 
       this._renderTextBackground(ctx, textLines);
       this._translateForTextAlign(ctx);
-
-      ctx.save();
-      this._setShadow(ctx);
-      this._renderTextFill(ctx, textLines);
-      this._renderTextStroke(ctx, textLines);
-      this._removeShadow(ctx);
-      ctx.restore();
+      this._renderText(ctx, textLines);
 
       if (this.textAlign !== 'left' && this.textAlign !== 'justify') {
         ctx.restore();
@@ -394,6 +388,23 @@
       this._totalLineHeight = 0;
     },
 
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
+    _renderText: function(ctx, textLines) {
+      ctx.save();
+      this._setShadow(ctx);
+      this._renderTextFill(ctx, textLines);
+      this._renderTextStroke(ctx, textLines);
+      this._removeShadow(ctx);
+      ctx.restore();
+    },
+
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
     _translateForTextAlign: function(ctx) {
       if (this.textAlign !== 'left' && this.textAlign !== 'justify') {
         ctx.save();
