@@ -3078,6 +3078,8 @@ fabric.util.string = {
 
 (function () {
 
+  var unknown = 'unknown';
+
   /* EVENT HANDLING */
 
   function areHostMethods(object) {
@@ -3253,7 +3255,7 @@ fabric.util.string = {
     event || (event = fabric.window.event);
 
     var element = event.target ||
-                  (typeof event.srcElement !== 'unknown' ? event.srcElement : null);
+                  (typeof event.srcElement !== unknown ? event.srcElement : null);
 
     var scroll = getScrollLeftTop(element, upperCanvasEl);
 
@@ -3308,11 +3310,11 @@ fabric.util.string = {
     // looks like in IE (<9) clientX at certain point (apparently when mouseup fires on VML element)
     // is represented as COM object, with all the consequences, like "unknown" type and error on [[Get]]
     // need to investigate later
-    return (typeof event.clientX !== 'unknown' ? event.clientX : 0);
+    return (typeof event.clientX !== unknown ? event.clientX : 0);
   };
 
   var pointerY = function(event) {
-    return (typeof event.clientY !== 'unknown' ? event.clientY : 0);
+    return (typeof event.clientY !== unknown ? event.clientY : 0);
   };
 
   function _getPointer(event, pageProp, clientProp) {
