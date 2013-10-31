@@ -140,6 +140,20 @@
      allowTouchScrolling: false,
 
     /**
+     * The transformation (in the format of Canvas transform) which focuses the viewport
+     * @type Array
+     * @default
+     */
+    viewportTransform:      [1, 0, 0, 1, 0, 0],
+
+    /**
+     * Color of canvas border
+     * @type String
+     * @default
+     */
+    canvasBorderColor: '',
+
+    /**
      * Callback; invoked right before object is about to be scaled/rotated
      * @param {fabric.Object} target Object that's about to be scaled/rotated
      */
@@ -428,6 +442,68 @@
     },
 
     /**
+     * Returns canvas zoom level
+     * @return {Number}
+     */
+    getZoom: function () {
+      return sqrt(this.viewportTransform[0] * this.viewportTransform[3]);
+    },
+
+    /**
+     * Returns point at center of viewport
+     * @return {fabric.Point} the top left corner of the viewport
+     */
+    getViewportCenter: function () {
+      var wh = fabric.util.transformPoint(
+        new fabric.Point(this.getWidth(), this.getHeight()),
+        this.viewportTransform
+      ),
+          x  = this.viewportTransform[4],
+          y  = this.viewportTransform[5];
+      
+      return new fabric.Point(this.getWidth()/2 + x, this.getHeight()/2 + y);
+    },
+
+    /**
+     * Sets zoom level of this canvas instance
+     * @param {Number} value to set zoom to, less than 1 zooms out
+     * @return {fabric.Canvas} instance
+     * @chainable true
+     */
+    setZoom: function (value) {
+      // TODO: just change the scale, preserve other transformations
+      this.viewportTransform[0] = value;
+      this.viewportTransform[3] = value;
+      return this;
+    },
+
+    /**
+     * Centers viewport of this canvas instance on given point
+     * @param {Numer} x value for center of viewport
+     * @param {Numer} y value for center of viewport
+     * @return {fabric.Canvas} instance
+     * @chainable true
+     */
+    setViewportCenter: function (x, y) {
+      var wh = fabric.util.transformPoint(
+        new fabric.Point(this.getWidth(), this.getHeight()),
+        this.viewportTransform
+      );
+      this.viewportTransform[4] = x - wh.x/2;
+      this.viewportTransform[5] = y - wh.y/2;
+      return this;
+    },
+
+    /**
+     * Centers viewport of this canvas instance
+     * @return {fabric.Canvas} instance
+     * @chainable true
+     */
+    centerViewport: function () {
+      return this.setViewportCenter(this.getWidth()/2, this.getHeight()/2);
+    },
+
+    /**
      * Returns &lt;canvas> element corresponding to this instance
      * @return {HTMLCanvasElement}
      */
@@ -581,6 +657,10 @@
       if (typeof this.backgroundImage === 'object') {
         this._drawBackroundImage(canvasToDrawOn);
       }
+      
+      if (this.canvasBorderColor) {
+        this._drawCanvasBorder(canvasToDrawOn);
+      }
 
       var activeGroup = this.getActiveGroup();
       for (var i = 0, length = this._objects.length; i < length; ++i) {
@@ -634,6 +714,23 @@
       else {
         canvasToDrawOn.drawImage(this.backgroundImage, 0, 0);
       }
+      canvasToDrawOn.restore();
+    },
+
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} canvasToDrawOn Context to render on
+     */
+    _drawCanvasBorder: function(canvasToDrawOn) {
+      var xy = fabric.util.transformPoint(new fabric.Point(0, 0), this.viewportTransform),
+          wh = fabric.util.transformPoint(
+            new fabric.Point(this.getWidth(), this.getHeight()),
+            this.viewportTransform, true
+          );
+      canvasToDrawOn.save();
+      canvasToDrawOn.lineWidth = 1;
+      canvasToDrawOn.strokeStyle = this.canvasBorderColor;
+      canvasToDrawOn.strokeRect(xy.x - 1.5, xy.y - 1.5, wh.x + 2, wh.y + 2);
       canvasToDrawOn.restore();
     },
 

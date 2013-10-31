@@ -6,7 +6,8 @@
       extend = fabric.util.object.extend,
       min = fabric.util.array.min,
       max = fabric.util.array.max,
-      invoke = fabric.util.array.invoke;
+      invoke = fabric.util.array.invoke,
+      degreesToRadians = fabric.util.degreesToRadians;
 
   if (fabric.Group) {
     return;
@@ -215,9 +216,18 @@
       if (!this.visible) return;
 
       ctx.save();
-      this.transform(ctx);
+      var v;
+      if (this.canvas) {
+        v = this.canvas.viewportTransform;
+      }
+      else {
+        v = [1, 0, 0, 1, 0, 0]; // TODO: this isn't a solution
+      }
 
-      var groupScaleFactor = Math.max(this.scaleX, this.scaleY);
+      var sxy = fabric.util.transformPoint(
+        new fabric.Point(this.scaleX, this.scaleY),
+        v, true),
+          groupScaleFactor = Math.max(sxy.x, sxy.y);
 
       this.clipTo && fabric.util.clipContext(this, ctx);
 
@@ -231,22 +241,21 @@
         // do not render if object is not visible
         if (!object.visible) continue;
 
-        object.borderScaleFactor = groupScaleFactor;
         object.hasRotatingPoint = false;
-
         object.render(ctx);
 
-        object.borderScaleFactor = originalScaleFactor;
         object.hasRotatingPoint = originalHasRotatingPoint;
       }
       this.clipTo && ctx.restore();
 
-      if (!noTransform && this.active) {
+      if (this.active && !noTransform) {
+        var center = fabric.util.transformPoint(this.getCenterPoint(), v);
+        ctx.translate(center.x, center.y);
+        ctx.rotate(degreesToRadians(this.angle));
         this.drawBorders(ctx);
         this.drawControls(ctx);
       }
       ctx.restore();
-      this.setCoords();
     },
 
     /**
@@ -394,9 +403,10 @@
     _calcBounds: function() {
       var aX = [],
           aY = [],
-          minX, minY, maxX, maxY, o, width, height,
+          minX, minY, maxX, maxY, o, width, height, minXY, maxXY, ivt, // TODO: cleanup
           i = 0,
-          len = this._objects.length;
+          len = this._objects.length,
+          canvas = this._objects[0].canvas;
 
       for (; i < len; ++i) {
         o = this._objects[i];
@@ -407,19 +417,21 @@
         }
       }
 
-      minX = min(aX);
-      maxX = max(aX);
-      minY = min(aY);
-      maxY = max(aY);
+      minXY = new fabric.Point(min(aX), min(aY));
+      maxXY = new fabric.Point(max(aX), max(aY));
+      // TODO: cleanup
+      ivt = fabric.util.invertTransform(canvas.viewportTransform);
+      this.width = (maxXY.x - minXY.x) || 0;
+      this.height = (maxXY.y - minXY.y) || 0;
 
-      width = (maxX - minX) || 0;
-      height = (maxY - minY) || 0;
+      // TODO: cleanup
+      minXY = fabric.util.transformPoint(minXY, ivt);
+      maxXY = fabric.util.transformPoint(maxXY, ivt);
+      this.width = (maxXY.x - minXY.x) || 0;
+      this.height = (maxXY.y - minXY.y) || 0;
 
-      this.width = width;
-      this.height = height;
-
-      this.left = (minX + width / 2) || 0;
-      this.top = (minY + height / 2) || 0;
+      this.left = (minXY.x + maxXY.x) / 2 || 0;
+      this.top = (minXY.y + maxXY.y) / 2 || 0;
     },
 
     /* _TO_SVG_START_ */

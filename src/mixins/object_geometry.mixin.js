@@ -326,40 +326,40 @@
       var offsetX = Math.cos(_angle + theta) * _hypotenuse,
           offsetY = Math.sin(_angle + theta) * _hypotenuse,
           sinTh = Math.sin(theta),
-          cosTh = Math.cos(theta);
-
-      var coords = this.getCenterPoint();
+          cosTh = Math.cos(theta),
+          coords = this.getCenterPoint(),
+          wh = new fabric.Point(this.currentWidth, this.currentHeight);
       var tl = {
         x: coords.x - offsetX,
         y: coords.y - offsetY
       };
       var tr = {
-        x: tl.x + (this.currentWidth * cosTh),
-        y: tl.y + (this.currentWidth * sinTh)
+        x: tl.x + (wh.x * cosTh),
+        y: tl.y + (wh.x * sinTh)
       };
       var br = {
-        x: tr.x - (this.currentHeight * sinTh),
-        y: tr.y + (this.currentHeight * cosTh)
+        x: tr.x - (wh.y * sinTh),
+        y: tr.y + (wh.y * cosTh)
       };
       var bl = {
-        x: tl.x - (this.currentHeight * sinTh),
-        y: tl.y + (this.currentHeight * cosTh)
+        x: tl.x - (wh.y * sinTh),
+        y: tl.y + (wh.y * cosTh)
       };
       var ml = {
-        x: tl.x - (this.currentHeight/2 * sinTh),
-        y: tl.y + (this.currentHeight/2 * cosTh)
+        x: tl.x - (wh.y/2 * sinTh),
+        y: tl.y + (wh.y/2 * cosTh)
       };
       var mt = {
-        x: tl.x + (this.currentWidth/2 * cosTh),
-        y: tl.y + (this.currentWidth/2 * sinTh)
+        x: tl.x + (wh.x/2 * cosTh),
+        y: tl.y + (wh.x/2 * sinTh)
       };
       var mr = {
-        x: tr.x - (this.currentHeight/2 * sinTh),
-        y: tr.y + (this.currentHeight/2 * cosTh)
+        x: tr.x - (wh.y/2 * sinTh),
+        y: tr.y + (wh.y/2 * cosTh)
       };
       var mb = {
-        x: bl.x + (this.currentWidth/2 * cosTh),
-        y: bl.y + (this.currentWidth/2 * sinTh)
+        x: bl.x + (wh.x/2 * cosTh),
+        y: bl.y + (wh.x/2 * sinTh)
       };
       var mtr = {
         x: mt.x,
@@ -388,6 +388,22 @@
         // rotating point
         mtr: mtr
       };
+
+      var tform;
+      if (typeof this.canvas == 'undefined') {
+        if (this.type == 'group') {
+          tform = this._objects[0].canvas.viewportTransform;
+        }
+        else {
+          tform = [1, 0, 0, 1, 0, 0];
+        }
+      }
+      else {
+        tform = this.canvas.viewportTransform;
+      }
+      for (c in this.oCoords) {
+        this.oCoords[c] = fabric.util.transformPoint(this.oCoords[c], tform);
+      }
 
       // set coordinates of the draggable boxes in the corners used to scale/rotate the image
       this._setCornerCoords && this._setCornerCoords();

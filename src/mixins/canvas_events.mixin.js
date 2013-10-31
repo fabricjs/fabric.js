@@ -402,7 +402,10 @@
       }
       else {
         // object is being transformed (scaled/rotated/moved/etc.)
-        pointer = getPointer(e, this.upperCanvasEl);
+        pointer = fabric.util.transformPoint(
+          getPointer(e, this.upperCanvasEl),
+          fabric.util.invertTransform(this.viewportTransform)
+        );
 
         var x = pointer.x,
             y = pointer.y,

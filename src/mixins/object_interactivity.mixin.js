@@ -266,25 +266,31 @@
           scaleY = 1 / this._constrainScale(this.scaleY);
 
       ctx.lineWidth = 1 / this.borderScaleFactor;
-
-      ctx.scale(scaleX, scaleY);
-
-      var w = this.getWidth(),
-          h = this.getHeight();
+      
+      var wh = fabric.util.transformPoint(new fabric.Point(this.getWidth(), this.getHeight()), this.canvas.viewportTransform, true),
+          sxy = fabric.util.transformPoint(new fabric.Point(scaleX, scaleY), this.canvas.viewportTransform, true),
+          w = wh.x,
+          h = wh.y,
+          sx= sxy.x,
+          sy= sxy.y;
+      if (this.get('group')) {
+      	w = w * this.get('group').scaleX;
+      	h = h * this.get('group').scaleY;
+      }
 
       ctx.strokeRect(
-        ~~(-(w / 2) - padding - strokeWidth / 2 * this.scaleX) - 0.5, // offset needed to make lines look sharper
-        ~~(-(h / 2) - padding - strokeWidth / 2 * this.scaleY) - 0.5,
-        ~~(w + padding2 + strokeWidth * this.scaleX) + 1, // double offset needed to make lines look sharper
-        ~~(h + padding2 + strokeWidth * this.scaleY) + 1
+        ~~(-(w / 2) - padding - strokeWidth / 2 * sx) - 0.5, // offset needed to make lines look sharper
+        ~~(-(h / 2) - padding - strokeWidth / 2 * sy) - 0.5,
+        ~~(w + padding2 + strokeWidth * sx) + 1, // double offset needed to make lines look sharper
+        ~~(h + padding2 + strokeWidth * sy) + 1
       );
 
       if (this.hasRotatingPoint && !this.get('lockRotation') && this.hasControls) {
 
         var rotateHeight = (
           this.flipY
-            ? h + (strokeWidth * this.scaleY) + (padding * 2)
-            : -h - (strokeWidth * this.scaleY) - (padding * 2)
+            ? h + (strokeWidth * sx) + (padding * 2)
+            : -h - (strokeWidth * sy) - (padding * 2)
         ) / 2;
 
         ctx.beginPath();
@@ -300,7 +306,7 @@
 
     /**
      * Draws corners of an object's bounding box.
-     * Requires public properties: width, height, scaleX, scaleY
+     * Requires public properties: width, height
      * Requires public options: cornerSize, padding
      * @param {CanvasRenderingContext2D} ctx Context to draw on
      * @return {fabric.Object} thisArg
@@ -312,99 +318,95 @@
       var size = this.cornerSize,
           size2 = size / 2,
           strokeWidth2 = ~~(this.strokeWidth / 2), // half strokeWidth rounded down
-          left = -(this.width / 2),
-          top = -(this.height / 2),
+          wh = fabric.util.transformPoint(new fabric.Point(this.getWidth(), this.getHeight()), this.canvas.viewportTransform, true),
+          width = wh.x,
+          height = wh.y,
+          left = -(width / 2),
+          top = -(height / 2),
           _left,
           _top,
-          sizeX = size / this.scaleX,
-          sizeY = size / this.scaleY,
-          paddingX = this.padding / this.scaleX,
-          paddingY = this.padding / this.scaleY,
-          scaleOffsetY = size2 / this.scaleY,
-          scaleOffsetX = size2 / this.scaleX,
-          scaleOffsetSizeX = (size2 - size) / this.scaleX,
-          scaleOffsetSizeY = (size2 - size) / this.scaleY,
-          height = this.height,
-          width = this.width,
+          padding = this.padding,
+          scaleOffset = size2,
+          scaleOffsetSize = size2 - size,
           methodName = this.transparentCorners ? 'strokeRect' : 'fillRect',
           transparent = this.transparentCorners,
           isVML = typeof G_vmlCanvasManager !== 'undefined';
 
       ctx.save();
 
-      ctx.lineWidth = 1 / Math.max(this.scaleX, this.scaleY);
+      ctx.lineWidth = 1;
 
       ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
       ctx.strokeStyle = ctx.fillStyle = this.cornerColor;
 
       // top-left
-      _left = left - scaleOffsetX - strokeWidth2 - paddingX;
-      _top = top - scaleOffsetY - strokeWidth2 - paddingY;
+      _left = left - scaleOffset - strokeWidth2 - padding;
+      _top = top - scaleOffset - strokeWidth2 - padding;
 
-      isVML || transparent || ctx.clearRect(_left, _top, sizeX, sizeY);
-      ctx[methodName](_left, _top, sizeX, sizeY);
+      isVML || transparent || ctx.clearRect(_left, _top, size, size);
+      ctx[methodName](_left, _top, size, size);
 
       // top-right
-      _left = left + width - scaleOffsetX + strokeWidth2 + paddingX;
-      _top = top - scaleOffsetY - strokeWidth2 - paddingY;
+      _left = left + width - scaleOffset + strokeWidth2 + padding;
+      _top = top - scaleOffset - strokeWidth2 - padding;
 
-      isVML || transparent || ctx.clearRect(_left, _top, sizeX, sizeY);
-      ctx[methodName](_left, _top, sizeX, sizeY);
+      isVML || transparent || ctx.clearRect(_left, _top, size, size);
+      ctx[methodName](_left, _top, size, size);
 
       // bottom-left
-      _left = left - scaleOffsetX - strokeWidth2 - paddingX;
-      _top = top + height + scaleOffsetSizeY + strokeWidth2 + paddingY;
+      _left = left - scaleOffset - strokeWidth2 - padding;
+      _top = top + height + scaleOffsetSize + strokeWidth2 + padding;
 
-      isVML || transparent || ctx.clearRect(_left, _top, sizeX, sizeY);
-      ctx[methodName](_left, _top, sizeX, sizeY);
+      isVML || transparent || ctx.clearRect(_left, _top, size, size);
+      ctx[methodName](_left, _top, size, size);
 
       // bottom-right
-      _left = left + width + scaleOffsetSizeX + strokeWidth2 + paddingX;
-      _top = top + height + scaleOffsetSizeY + strokeWidth2 + paddingY;
+      _left = left + width + scaleOffsetSize + strokeWidth2 + padding;
+      _top = top + height + scaleOffsetSize + strokeWidth2 + padding;
 
-      isVML || transparent || ctx.clearRect(_left, _top, sizeX, sizeY);
-      ctx[methodName](_left, _top, sizeX, sizeY);
+      isVML || transparent || ctx.clearRect(_left, _top, size, size);
+      ctx[methodName](_left, _top, size, size);
 
       if (!this.get('lockUniScaling')) {
         // middle-top
-        _left = left + width/2 - scaleOffsetX;
-        _top = top - scaleOffsetY - strokeWidth2 - paddingY;
+        _left = left + width/2 - scaleOffset;
+        _top = top - scaleOffset - strokeWidth2 - padding;
 
-        isVML || transparent || ctx.clearRect(_left, _top, sizeX, sizeY);
-        ctx[methodName](_left, _top, sizeX, sizeY);
+        isVML || transparent || ctx.clearRect(_left, _top, size, size);
+        ctx[methodName](_left, _top, size, size);
 
         // middle-bottom
-        _left = left + width/2 - scaleOffsetX;
-        _top = top + height + scaleOffsetSizeY + strokeWidth2 + paddingY;
+        _left = left + width/2 - scaleOffset;
+        _top = top + height + scaleOffsetSize + strokeWidth2 + padding;
 
-        isVML || transparent || ctx.clearRect(_left, _top, sizeX, sizeY);
-        ctx[methodName](_left, _top, sizeX, sizeY);
+        isVML || transparent || ctx.clearRect(_left, _top, size, size);
+        ctx[methodName](_left, _top, size, size);
 
         // middle-right
-        _left = left + width + scaleOffsetSizeX + strokeWidth2 + paddingX;
-        _top = top + height/2 - scaleOffsetY;
+        _left = left + width + scaleOffsetSize + strokeWidth2 + padding;
+        _top = top + height/2 - scaleOffset;
 
-        isVML || transparent || ctx.clearRect(_left, _top, sizeX, sizeY);
-        ctx[methodName](_left, _top, sizeX, sizeY);
+        isVML || transparent || ctx.clearRect(_left, _top, size, size);
+        ctx[methodName](_left, _top, size, size);
 
         // middle-left
-        _left = left - scaleOffsetX - strokeWidth2 - paddingX;
-        _top = top + height/2 - scaleOffsetY;
+        _left = left - scaleOffset - strokeWidth2 - padding;
+        _top = top + height/2 - scaleOffset;
 
-        isVML || transparent || ctx.clearRect(_left, _top, sizeX, sizeY);
-        ctx[methodName](_left, _top, sizeX, sizeY);
+        isVML || transparent || ctx.clearRect(_left, _top, size, size);
+        ctx[methodName](_left, _top, size, size);
       }
 
       // middle-top-rotate
       if (this.hasRotatingPoint) {
 
-        _left = left + width/2 - scaleOffsetX;
+        _left = left + width/2 - scaleOffset;
         _top = this.flipY ?
-          (top + height + (this.rotatingPointOffset / this.scaleY) - sizeY/2 + strokeWidth2 + paddingY)
-          : (top - (this.rotatingPointOffset / this.scaleY) - sizeY/2 - strokeWidth2 - paddingY);
+          (top + height + (this.rotatingPointOffset) - size2 + strokeWidth2 + padding)
+          : (top - (this.rotatingPointOffset) - size2 - strokeWidth2 - padding);
 
-        isVML || transparent || ctx.clearRect(_left, _top, sizeX, sizeY);
-        ctx[methodName](_left, _top, sizeX, sizeY);
+        isVML || transparent || ctx.clearRect(_left, _top, size, size);
+        ctx[methodName](_left, _top, size, size);
       }
 
       ctx.restore();

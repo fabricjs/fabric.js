@@ -1012,11 +1012,24 @@
       ctx.save();
 
       var m = this.transformMatrix;
+      var v;
+      if (this.canvas) {
+        v = this.canvas.viewportTransform;
+      }
+      else {
+        v = [1, 0, 0, 1, 0, 0]; // TODO: this isn't a solution
+      }
+      
+      ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
+
       if (m && !this.group) {
         ctx.setTransform(m[0], m[1], m[2], m[3], m[4], m[5]);
       }
 
       if (!noTransform) {
+        if (this.group) {
+          this.group.transform(ctx);
+        }
         this.transform(ctx);
       }
 
@@ -1046,8 +1059,23 @@
       this._render(ctx, noTransform);
       this.clipTo && ctx.restore();
       this._removeShadow(ctx);
+      ctx.restore();
 
+      ctx.save();
       if (this.active && !noTransform) {
+        var center;
+        if (this.group) {
+          center = fabric.util.transformPoint(this.group.getCenterPoint(), v);
+          ctx.translate(center.x, center.y);
+          ctx.rotate(degreesToRadians(this.group.angle));
+        }
+        center = fabric.util.transformPoint(this.getCenterPoint(), v, null != this.group);
+        if (this.group) {
+          center.x *= this.group.scaleX;
+          center.y *= this.group.scaleY;
+        }
+        ctx.translate(center.x, center.y);
+        ctx.rotate(degreesToRadians(this.angle));
         this.drawBorders(ctx);
         this.drawControls(ctx);
       }

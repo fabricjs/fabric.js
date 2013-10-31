@@ -68,6 +68,16 @@
       ctx.save();
 
       var m = this.transformMatrix;
+      
+      var v;
+      if (this.canvas) {
+        v = this.canvas.viewportTransform;
+      }
+      else {
+        v = [1, 0, 0, 1, 0, 0]; // TODO: this isn't a solution
+      }
+      ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
+      
       if (m) {
         ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
       }
@@ -81,8 +91,14 @@
       }
       this.clipTo && ctx.restore();
       this._removeShadow(ctx);
+      ctx.restore();
 
+      ctx.save();
       if (this.active) {
+        var center;
+        center = fabric.util.transformPoint(this.getCenterPoint(), v);
+        ctx.translate(center.x, center.y);
+        ctx.rotate(fabric.util.degreesToRadians(this.angle));
         this.drawBorders(ctx);
         this.drawControls(ctx);
       }

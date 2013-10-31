@@ -263,7 +263,8 @@
     _normalizePointer: function (object, pointer) {
       var activeGroup = this.getActiveGroup(),
           x = pointer.x,
-          y = pointer.y;
+          y = pointer.y,
+          lt;
 
       var isObjectInGroup = (
         activeGroup &&
@@ -272,8 +273,10 @@
       );
 
       if (isObjectInGroup) {
-        x -= activeGroup.left;
-        y -= activeGroup.top;
+        lt = new fabric.Point(activeGroup.left, activeGroup.top);
+        lt = fabric.util.transformPoint(lt, this.viewportTransform, true);
+        x -= lt.x;
+        y -= lt.y;
       }
       return { x: x, y: y };
     },
@@ -382,7 +385,10 @@
 
       var action = 'drag',
           corner,
-          pointer = getPointer(e, target.canvas.upperCanvasEl);
+          pointer = fabric.util.transformPoint(
+            getPointer(e, this.upperCanvasEl),
+            fabric.util.invertTransform(this.viewportTransform)
+          );
 
       corner = target._findTargetCorner(e, this._offset);
       if (corner) {
@@ -852,6 +858,7 @@
      */
     getPointer: function (e) {
       var pointer = getPointer(e, this.upperCanvasEl);
+
       return {
         x: pointer.x - this._offset.left,
         y: pointer.y - this._offset.top
