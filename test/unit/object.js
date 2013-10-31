@@ -586,6 +586,33 @@
     }
   });
 
+test('toDataURL & reference to canvas', function() {
+  var data =
+    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQA'+
+    'AABkCAYAAABw4pVUAAAA+UlEQVR4nO3RoRHAQBDEsOu/6YR+B2s'+
+    'gIO4Z3919pMwDMCRtHoAhafMADEmbB2BI2jwAQ9LmARiSNg/AkLR5AI'+
+    'akzQMwJG0egCFp8wAMSZsHYEjaPABD0uYBGJI2D8CQtHkAhqTNAzAkbR'+
+    '6AIWnzAAxJmwdgSNo8AEPS5gEYkjYPwJC0eQCGpM0DMCRtHoAhafMADEm'+
+    'bB2BI2jwAQ9LmARiSNg/AkLR5AIakzQMwJG0egCFp8wAMSZsHYEjaPABD0'+
+    'uYBGJI2D8CQtHkAhqTNAzAkbR6AIWnzAAxJmwdgSNo8AEPS5gEYkjYPw'+
+    'JC0eQCGpM0DMCRtHsDjB5K06yueJFXJAAAAAElFTkSuQmCC';
+
+  var cObj = new fabric.Rect({
+    width: 100, height: 100, fill: 'red'
+  });
+  canvas.add(cObj);
+
+  if (!fabric.Canvas.supports('toDataURL')) {
+    alert('toDataURL is not supported by this environment. Some of the tests can not be run.');
+  }
+  else {
+    var objCanvas = cObj.canvas;
+    cObj.toDataURL();
+
+    equal(objCanvas, cObj.canvas);
+  }
+});
+
   test('hasStateChanged', function() {
     var cObj = new fabric.Object();
     ok(typeof cObj.hasStateChanged == 'function');

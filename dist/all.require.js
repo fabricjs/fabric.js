@@ -12062,10 +12062,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       this.set('active', false);
       this.setPositionByOrigin(new fabric.Point(el.width / 2, el.height / 2), 'center', 'center');
 
+      var originalCanvas = this.canvas;
       canvas.add(this);
       var data = canvas.toDataURL(options);
 
       this.set(origParams).setCoords();
+      this.canvas = originalCanvas;
 
       canvas.dispose();
       canvas = null;
