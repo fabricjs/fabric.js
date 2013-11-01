@@ -157,6 +157,8 @@
       this.styles = options.styles || { };
       this.callSuper('initialize', text, options);
       this.initBehavior();
+
+      fabric.IText.instances.push(this);
     },
 
     /**
@@ -899,5 +901,7 @@
   fabric.IText.fromObject = function(object) {
     return new fabric.IText(object.text, clone(object));
   };
+
+  fabric.IText.instances = [ ];
 
 })();

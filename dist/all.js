@@ -19599,6 +19599,8 @@ fabric.util.object.extend(fabric.Text.prototype, {
       this.styles = options.styles || { };
       this.callSuper('initialize', text, options);
       this.initBehavior();
+
+      fabric.IText.instances.push(this);
     },
 
     /**
@@ -20341,6 +20343,8 @@ fabric.util.object.extend(fabric.Text.prototype, {
   fabric.IText.fromObject = function(object) {
     return new fabric.IText(object.text, clone(object));
   };
+
+  fabric.IText.instances = [ ];
 
 })();
 
@@ -21206,14 +21210,13 @@ fabric.util.object.extend(fabric.Text.prototype, {
     enterEditing: function() {
       if (this.isEditing || !this.editable) return;
 
+      fabric.IText.instances.forEach(function(obj) {
+        obj.exitEditing();
+      });
+
       this.isEditing = true;
 
-      if (this.hiddenTextarea) {
-        this.hiddenTextarea.value = this.text;
-        this.hiddenTextarea.selectionStart = this.selectionStart;
-        this.hiddenTextarea.focus();
-      }
-
+      this._updateTextarea();
       this._saveProps();
 
       this.hoverCursor = 'text';
@@ -21230,6 +21233,17 @@ fabric.util.object.extend(fabric.Text.prototype, {
       this.canvas.renderAll();
 
       return this;
+    },
+
+    /**
+     * @private
+     */
+    _updateTextarea: function() {
+      if (!this.hiddenTextarea) return;
+
+      this.hiddenTextarea.value = this.text;
+      this.hiddenTextarea.selectionStart = this.selectionStart;
+      this.hiddenTextarea.focus();
     },
 
     /**

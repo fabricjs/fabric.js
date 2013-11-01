@@ -859,14 +859,13 @@
     enterEditing: function() {
       if (this.isEditing || !this.editable) return;
 
+      fabric.IText.instances.forEach(function(obj) {
+        obj.exitEditing();
+      });
+
       this.isEditing = true;
 
-      if (this.hiddenTextarea) {
-        this.hiddenTextarea.value = this.text;
-        this.hiddenTextarea.selectionStart = this.selectionStart;
-        this.hiddenTextarea.focus();
-      }
-
+      this._updateTextarea();
       this._saveProps();
 
       this.hoverCursor = 'text';
@@ -883,6 +882,17 @@
       this.canvas.renderAll();
 
       return this;
+    },
+
+    /**
+     * @private
+     */
+    _updateTextarea: function() {
+      if (!this.hiddenTextarea) return;
+
+      this.hiddenTextarea.value = this.text;
+      this.hiddenTextarea.selectionStart = this.selectionStart;
+      this.hiddenTextarea.focus();
     },
 
     /**
