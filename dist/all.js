@@ -20578,34 +20578,35 @@ fabric.util.object.extend(fabric.Text.prototype, {
     },
 
     /**
+     * @private
+     */
+    _keysMap: {
+      8:  'removeChars',
+      13: 'insertNewline',
+      37: 'moveCursorLeft',
+      38: 'moveCursorUp',
+      39: 'moveCursorRight',
+      40: 'moveCursorDown'
+    },
+
+    /**
      * Handles keyup event
      * @param {Event} e Event object
      */
     onKeyDown: function(e) {
       if (!this.isEditing || e.ctrlKey) return;
 
-      if (e.keyCode === 39) {
-        this.moveCursorRight(e);
+      if (e.keyCode in this._keysMap) {
+        this[this._keysMap[e.keyCode]](e);
       }
-      else if (e.keyCode === 37) {
-        this.moveCursorLeft(e);
+      else if (e.keyCode === 65 && (e.ctrlKey || e.metaKey)) {
+        this.selectAll();
       }
-      else if (e.keyCode === 38) {
-        this.moveCursorUp(e);
+      else if (e.keyCode === 67 && (e.ctrlKey || e.metaKey)) {
+        this.copy();
       }
-      else if (e.keyCode === 40) {
-        this.moveCursorDown(e);
-      }
-      else if (e.keyCode === 8) {
-        this.removeChars(e);
-      }
-      else if (e.keyCode === 46) {
-        // forward delete on windows
-        this.moveCursorRight(e);
-        this.removeChars(e);
-      }
-      else if (e.keyCode === 13) {
-        this.insertNewline();
+      else if (e.keyCode === 86 && (e.ctrlKey || e.metaKey)) {
+        this.paste();
       }
       else {
         return;
@@ -20618,21 +20619,56 @@ fabric.util.object.extend(fabric.Text.prototype, {
     },
 
     /**
+     * Forward delete
+     */
+    forwardDelete: function(e) {
+      this.moveCursorRight(e);
+      this.removeChars(e);
+    },
+
+    /**
+     * Copies selected text
+     */
+    copy: function() {
+      var selectedText = this.getSelectedText();
+      this.copiedText = selectedText;
+    },
+
+    /**
+     * Pastes text
+     */
+    paste: function() {
+      if (this.copiedText) {
+        this.insertChars(this.copiedText);
+      }
+    },
+
+    /**
+     * Selects entire text
+     */
+    selectAll: function() {
+      this.selectionStart = 0;
+      this.selectionEnd = this.text.length;
+    },
+
+    /**
+     * Returns selected text
+     * @return {String}
+     */
+    getSelectedText: function() {
+      return this.text.slice(this.selectionStart, this.selectionEnd);
+    },
+
+    /**
      * Handles keypress event
      * @param {Event} e Event object
      */
     onKeyPress: function(e) {
-      if (!this.isEditing || e.metaKey || e.ctrlKey ||
-          e.keyCode === 8 ||
-          e.keyCode === 13 ||
-          e.keyCode === 37 ||
-          e.keyCode === 38 ||
-          e.keyCode === 39 ||
-          e.keyCode === 40) {
+      if (!this.isEditing || e.metaKey || e.ctrlKey || e.keyCode === 8 || e.keyCode === 13) {
         return;
       }
 
-      this.insertChar(String.fromCharCode(e.which));
+      this.insertChars(String.fromCharCode(e.which));
 
       e.preventDefault();
       e.stopPropagation();
@@ -21023,7 +21059,7 @@ fabric.util.object.extend(fabric.Text.prototype, {
      * @return {Number}
      */
     getNumNewLinesInSelectedText: function() {
-      var selectedText = this.text.slice(this.selectionStart, this.selectionEnd);
+      var selectedText = this.getSelectedText();
       var numNewLines = 0;
       for (var i = 0, chars = selectedText.split(''), len = chars.length; i < len; i++) {
         if (chars[i] === '\n') {
@@ -21318,24 +21354,24 @@ fabric.util.object.extend(fabric.Text.prototype, {
 
     /**
      * Inserts a character where cursor is (replacing selection if one exists)
-     * @param {String} _char Character to insert
+     * @param {String} _chars Characters to insert
      */
-    insertChar: function(_char) {
+    insertChars: function(_chars) {
       var isEndOfLine = this.text.slice(this.selectionStart, this.selectionStart + 1) === '\n';
 
       this.text = this.text.slice(0, this.selectionStart) +
-                    _char +
+                    _chars +
                   this.text.slice(this.selectionEnd);
 
       if (this.selectionStart === this.selectionEnd) {
-        this.insertStyleObject(_char, isEndOfLine);
+        this.insertStyleObject(_chars, isEndOfLine);
       }
       else if (this.selectionEnd - this.selectionStart > 1) {
         // TODO: replace styles properly
         // console.log('replacing MORE than 1 char');
       }
 
-      this.selectionStart++;
+      this.selectionStart += _chars.length;
       this.selectionEnd = this.selectionStart;
 
       if (this.canvas) {
@@ -21413,10 +21449,10 @@ fabric.util.object.extend(fabric.Text.prototype, {
 
     /**
      * Inserts style object
-     * @param {String} _char Character at the location where style is inserted
+     * @param {String} _chars Characters at the location where style is inserted
      * @param {Boolean} isEndOfLine True if it's end of line
      */
-    insertStyleObject: function(_char, isEndOfLine) {
+    insertStyleObject: function(_chars, isEndOfLine) {
 
       // short-circuit
       if (this.isEmptyStyles()) return;
@@ -21429,10 +21465,11 @@ fabric.util.object.extend(fabric.Text.prototype, {
         this.styles[lineIndex] = { };
       }
 
-      if (_char === '\n') {
+      if (_chars === '\n') {
         this.insertNewlineStyleObject(lineIndex, charIndex, isEndOfLine);
       }
       else {
+        // TODO: support multiple style insertion if _chars.length > 1
         this.insertCharStyleObject(lineIndex, charIndex);
       }
     },
@@ -21507,7 +21544,7 @@ fabric.util.object.extend(fabric.Text.prototype, {
      * Inserts new line
      */
     insertNewline: function() {
-      this.insertChar('\n');
+      this.insertChars('\n');
     }
   });
 
