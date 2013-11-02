@@ -20391,19 +20391,34 @@ fabric.util.object.extend(fabric.Text.prototype, {
      * Initializes "dbclick" event handler
      */
     initDblClickSimulation: function() {
-      var lastClickTime = +new Date();
-      var newClickTime;
-      this.on('mousedown', function(options) {
-        newClickTime = +new Date();
-        if (newClickTime - lastClickTime < 500) {
-          this.fire('dblclick', options);
 
-          var event = options.e;
+      var lastClickTime = +new Date(),
+          newClickTime,
+          lastPointer = { },
+          newPointer;
+
+      this.on('mousedown', function(options) {
+
+        var event = options.e;
+
+        newClickTime = +new Date();
+        newPointer = this.canvas.getPointer(event);
+
+        var isDblClick =
+          newClickTime - lastClickTime < 500 &&
+          lastPointer.x === newPointer.x &&
+          lastPointer.y === newPointer.y;
+
+        if (isDblClick) {
+
+          this.fire('dblclick', options);
 
           event.preventDefault && event.preventDefault();
           event.stopPropagation && event.stopPropagation();
         }
+
         lastClickTime = newClickTime;
+        lastPointer = newPointer;
       });
     },
 
@@ -20573,7 +20588,7 @@ fabric.util.object.extend(fabric.Text.prototype, {
       clearTimeout(this._cursorTimeout2);
 
       this._currentCursorOpacity = 0;
-      this.canvas.renderAll();
+      this.canvas && this.canvas.renderAll();
 
       var _this = this;
       setTimeout(function() {
