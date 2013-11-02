@@ -148,6 +148,11 @@
     _abortCursorAnimation: false,
 
     /**
+     * @private
+     */
+    _charWidthsCache: { },
+
+    /**
      * Constructor
      * @param {String} text Text string
      * @param {Object} [options] Options object
@@ -323,6 +328,7 @@
      */
     getCursorBoundaries: function(ctx, chars, typeOfBoundaries) {
 
+      // console.time('getCursorBoundaries');
       var cursorLocation = this.get2DCursorLocation();
       var lineIndex = cursorLocation.lineIndex;
       var charIndex = cursorLocation.charIndex;
@@ -347,10 +353,16 @@
       lineIndex = 0;
       charIndex = 0;
 
+      // caching
+      var lineWidths = { },
+          lineHeights = { },
+          lineOffsets = { };
+
       for (var i = 0; i < this.selectionStart; i++) {
         if (chars[i] === '\n') {
           leftOffset = 0;
-          topOffset += this._getHeightOfLine(ctx, lineIndex + (typeOfBoundaries === 'cursor' ? 1 : 0));
+          var index = lineIndex + (typeOfBoundaries === 'cursor' ? 1 : 0);
+          topOffset += lineHeights[index] || (lineHeights[index] = this._getHeightOfLine(ctx, index));
 
           lineIndex++;
           charIndex = 0;
@@ -360,9 +372,15 @@
           charIndex++;
         }
 
-        widthOfLine = this._getWidthOfLine(ctx, lineIndex, textLines);
-        lineLeftOffset = this._getLineLeftOffset(widthOfLine);
+        widthOfLine = lineWidths[lineIndex] ||
+                     (lineWidths[lineIndex] = this._getWidthOfLine(ctx, lineIndex, textLines));
+
+        lineLeftOffset = lineOffsets[lineIndex] ||
+                        (lineOffsets[lineIndex] = this._getLineLeftOffset(widthOfLine));
       }
+
+      //console.timeEnd('getCursorBoundaries');
+      lineWidths = lineHeights = lineOffsets = null;
 
       return {
         left: left,
@@ -673,6 +691,20 @@
 
     /**
      * @private
+     */
+    _getCacheProp: function(_char, styleDeclaration) {
+      return _char +
+
+             styleDeclaration.fontFamily +
+             styleDeclaration.fontSize +
+             styleDeclaration.fontWeight +
+             styleDeclaration.fontStyle +
+
+             styleDeclaration.shadow;
+    },
+
+    /**
+     * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      * @param {String} _char
      * @param {Number} lineIndex
@@ -690,6 +722,17 @@
         styleDeclaration = { };
       }
 
+      this._applyFontStyles(styleDeclaration);
+
+      var cacheProp = this._getCacheProp(_char, styleDeclaration);
+      if (this._charWidthsCache[cacheProp]) {
+        return this._charWidthsCache[cacheProp];
+      }
+
+      if (typeof styleDeclaration.shadow === 'string') {
+        styleDeclaration.shadow = new fabric.Shadow(styleDeclaration.shadow);
+      }
+
       var fill = styleDeclaration.fill || this.fill;
       ctx.fillStyle = fill.toLive
         ? fill.toLive(ctx)
@@ -702,18 +745,11 @@
       }
 
       ctx.lineWidth = styleDeclaration.strokeWidth || this.strokeWidth;
-
-      this._applyFontStyles(styleDeclaration);
-
-      if (typeof styleDeclaration.shadow === 'string') {
-        styleDeclaration.shadow = new fabric.Shadow(styleDeclaration.shadow);
-      }
-
+      ctx.font = this._getFontDeclaration.call(styleDeclaration);
       this._setShadow.call(styleDeclaration, ctx);
 
-      ctx.font = this._getFontDeclaration.call(styleDeclaration);
-
-      return ctx.measureText(_char).width;
+      this._charWidthsCache[cacheProp] = ctx.measureText(_char).width;
+      return this._charWidthsCache[cacheProp];
     },
 
     /**
