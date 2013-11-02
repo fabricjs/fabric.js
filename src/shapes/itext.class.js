@@ -718,7 +718,9 @@
       this._applyFontStyles(styleDeclaration);
 
       var cacheProp = this._getCacheProp(_char, styleDeclaration);
-      if (this._charWidthsCache[cacheProp]) {
+
+      // short-circuit if no styles
+      if (this.isEmptyStyles() && this._charWidthsCache[cacheProp]) {
         return this._charWidthsCache[cacheProp];
       }
 
@@ -741,7 +743,9 @@
       ctx.font = this._getFontDeclaration.call(styleDeclaration);
       this._setShadow.call(styleDeclaration, ctx);
 
-      this._charWidthsCache[cacheProp] = ctx.measureText(_char).width;
+      if (!this._charWidthsCache[cacheProp]) {
+        this._charWidthsCache[cacheProp] = ctx.measureText(_char).width;
+      }
       return this._charWidthsCache[cacheProp];
     },
 
