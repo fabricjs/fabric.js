@@ -19590,6 +19590,11 @@ fabric.util.object.extend(fabric.Text.prototype, {
     _abortCursorAnimation: false,
 
     /**
+     * @private
+     */
+    _charWidthsCache: { },
+
+    /**
      * Constructor
      * @param {String} text Text string
      * @param {Object} [options] Options object
@@ -20126,7 +20131,10 @@ fabric.util.object.extend(fabric.Text.prototype, {
       ctx.restore();
     },
 
-    getCacheProp: function(_char, styleDeclaration) {
+    /**
+     * @private
+     */
+    _getCacheProp: function(_char, styleDeclaration) {
       return _char +
 
              styleDeclaration.fontFamily +
@@ -20136,8 +20144,6 @@ fabric.util.object.extend(fabric.Text.prototype, {
 
              styleDeclaration.shadow;
     },
-
-    _charWidthsCache: { },
 
     /**
      * @private
@@ -20160,7 +20166,7 @@ fabric.util.object.extend(fabric.Text.prototype, {
 
       this._applyFontStyles(styleDeclaration);
 
-      var cacheProp = this.getCacheProp(_char, styleDeclaration);
+      var cacheProp = this._getCacheProp(_char, styleDeclaration);
       if (this._charWidthsCache[cacheProp]) {
         return this._charWidthsCache[cacheProp];
       }
