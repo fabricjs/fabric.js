@@ -328,15 +328,16 @@
      */
     getCursorBoundaries: function(ctx, chars, typeOfBoundaries) {
 
-      // console.time('getCursorBoundaries');
-      var cursorLocation = this.get2DCursorLocation();
-      var lineIndex = cursorLocation.lineIndex;
-      var charIndex = cursorLocation.charIndex;
-
-      var textLines = this.text.split(this._reNewline);
-
-      var widthOfLine;
-      var lineLeftOffset;
+      var cursorLocation = this.get2DCursorLocation(),
+          lineIndex = 0,
+          charIndex = 0,
+          textLines = this.text.split(this._reNewline),
+          widthOfLine,
+          lineLeftOffset,
+          // caching
+          lineWidths = { },
+          lineHeights = { },
+          lineOffsets = { };
 
       // left/top are left/top of entire text box
       // leftOffset/topOffset are offset from that left/top point of a text box
@@ -347,16 +348,9 @@
       var topOffset = typeOfBoundaries === 'cursor'
         // selection starts at the very top of the line,
         // whereas cursor starts at the padding created by line height
-        ? (this._getHeightOfLine(ctx, 0) - this.getCurrentCharFontSize(lineIndex, charIndex))
+        ? (this._getHeightOfLine(ctx, 0) -
+          this.getCurrentCharFontSize(cursorLocation.lineIndex, cursorLocation.charIndex))
         : 0;
-
-      lineIndex = 0;
-      charIndex = 0;
-
-      // caching
-      var lineWidths = { },
-          lineHeights = { },
-          lineOffsets = { };
 
       for (var i = 0; i < this.selectionStart; i++) {
         if (chars[i] === '\n') {
@@ -379,7 +373,6 @@
                         (lineOffsets[lineIndex] = this._getLineLeftOffset(widthOfLine));
       }
 
-      //console.timeEnd('getCursorBoundaries');
       lineWidths = lineHeights = lineOffsets = null;
 
       return {
