@@ -174,18 +174,22 @@
    * @param {Function} [reviver] Method for further parsing of object elements, called after each fabric object created.
    */
   function enlivenObjects(objects, callback, namespace, reviver) {
+    objects = objects || [ ];
 
     function onLoaded() {
       if (++numLoadedObjects === numTotalObjects) {
-        if (callback) {
-          callback(enlivenedObjects);
-        }
+        callback && callback(enlivenedObjects);
       }
     }
 
     var enlivenedObjects = [ ],
         numLoadedObjects = 0,
         numTotalObjects = objects.length;
+
+    if (!numTotalObjects) {
+      callback && callback(enlivenedObjects);
+      return;
+    }
 
     objects.forEach(function (o, index) {
       // if sparse array

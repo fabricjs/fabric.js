@@ -416,6 +416,26 @@
     }, 500);
   });
 
+  asyncTest('loadFromJSON with empty fabric.Group', function() {
+    var c1 = new fabric.Canvas('c1'),
+        c2 = new fabric.Canvas('c2'),
+        group = new fabric.Group();
+
+    c1.add(group);
+    ok(!c1.isEmpty(), 'canvas is not empty');
+
+    var json = c1.toJSON();
+    var fired = false;
+    c2.loadFromJSON(json, function() {
+      fired = true;
+    });
+
+    setTimeout(function() {
+      ok(fired, 'Callback should be fired even if empty fabric.Group exists');
+      start();
+    }, 500);
+  });
+
   asyncTest('loadFromJSON with async content', function() {
     var group = new fabric.Group([
       new fabric.Rect({ width: 10, height: 20 }),
