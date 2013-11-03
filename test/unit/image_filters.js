@@ -16,8 +16,8 @@
 
   var REFERENCE_IMG_OBJECT = {
     'type':               'image',
-    'originX':            'center',
-    'originY':            'center',
+    'originX':            'left',
+    'originY':            'top',
     'left':               0,
     'top':                0,
     'width':              IMG_WIDTH, // node-canvas doesn't seem to allow setting width/height on image objects

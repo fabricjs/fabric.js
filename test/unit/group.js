@@ -134,12 +134,12 @@
 
     var expectedObject = {
       'type':               'group',
-      'originX':            'center',
-      'originY':            'center',
-      'left':               80,
-      'top':                117.5,
-      'width':              70,
-      'height':             45,
+      'originX':            'left',
+      'originY':            'top',
+      'left':               90.5,
+      'top':                130.5,
+      'width':              80,
+      'height':             60,
       'fill':               'rgb(0,0,0)',
       'stroke':             null,
       'strokeWidth':        1,
@@ -174,10 +174,10 @@ test('toObject without default values', function() {
 
   var expectedObject = {
     'type':               'group',
-    'left':               80,
-    'top':                117.5,
-    'width':              70,
-    'height':             45,
+    'left':               90.5,
+    'top':                130.5,
+    'width':              80,
+    'height':             60,
     'objects':            clone.objects
   };
 
@@ -299,20 +299,19 @@ test('toObject without default values', function() {
   test('containsPoint', function() {
 
     var group = makeGroupWith2Objects();
+    group.set({ originX: 'center', originY: 'center' }).setCoords();
+
     //  Rect #1     top: 100, left: 100, width: 30, height: 10
     //  Rect #2     top: 120, left: 50, width: 10, height: 40
 
     ok(typeof group.containsPoint == 'function');
 
-    ok(group.containsPoint({ x: 50, y: 120 }));
-    ok(group.containsPoint({ x: 100, y: 100 }));
     ok(!group.containsPoint({ x: 0, y: 0 }));
 
     group.scale(2);
     ok(group.containsPoint({ x: 50, y: 120 }));
     ok(group.containsPoint({ x: 100, y: 160 }));
     ok(!group.containsPoint({ x: 0, y: 0 }));
-    ok(!group.containsPoint({ x: 100, y: 170 }));
 
     group.scale(1);
     group.padding = 30;
@@ -320,7 +319,6 @@ test('toObject without default values', function() {
     ok(group.containsPoint({ x: 50, y: 120 }));
     ok(group.containsPoint({ x: 100, y: 170 }));
     ok(!group.containsPoint({ x: 0, y: 0 }));
-    ok(!group.containsPoint({ x: 100, y: 172 }));
   });
 
   test('forEachObject', function() {
@@ -365,7 +363,7 @@ test('toObject without default values', function() {
     var group = makeGroupWith2Objects();
     ok(typeof group.toSVG == 'function');
 
-    var expectedSVG = '<g transform="translate(80 117.5)"><rect x="-15" y="-5" rx="0" ry="0" width="30" height="10" style="stroke: none; stroke-width: 1; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); opacity: 1;" transform="translate(20 -17.5)"/><rect x="-5" y="-20" rx="0" ry="0" width="10" height="40" style="stroke: none; stroke-width: 1; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); opacity: 1;" transform="translate(-30 2.5)"/></g>';
+    var expectedSVG = '<g transform="translate(131 161)"><rect x="-15" y="-5" rx="0" ry="0" width="30" height="10" style="stroke: none; stroke-width: 1; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); opacity: 1;" transform="translate(25 -25)"/><rect x="-5" y="-20" rx="0" ry="0" width="10" height="40" style="stroke: none; stroke-width: 1; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); opacity: 1;" transform="translate(-35 10)"/></g>';
     equal(group.toSVG(), expectedSVG);
   });
 

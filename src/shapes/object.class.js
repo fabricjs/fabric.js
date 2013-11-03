@@ -308,14 +308,14 @@
      * @type String
      * @default
      */
-    originX:                  'center',
+    originX:                  'left',
 
     /**
      * Vertical origin of transformation of an object (one of "top", "bottom", "center")
      * @type String
      * @default
      */
-    originY:                  'center',
+    originY:                  'top',
 
     /**
      * Top position of an object. Note that by default it's relative to object center. You can change this by setting originY={top/center/bottom}
@@ -447,7 +447,7 @@
      * @type Boolean
      * @default
      */
-    centeredRotation:         false,
+    centeredRotation:         true,
 
     /**
      * Color of object's fill

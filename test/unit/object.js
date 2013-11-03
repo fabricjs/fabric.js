@@ -150,12 +150,12 @@
   });
 
   test('toJSON', function() {
-    var emptyObjectJSON = '{"type":"object","originX":"center","originY":"center","left":0,"top":0,"width":0,"height":0,"fill":"rgb(0,0,0)",'+
+    var emptyObjectJSON = '{"type":"object","originX":"left","originY":"top","left":0,"top":0,"width":0,"height":0,"fill":"rgb(0,0,0)",'+
                           '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,'+
                           '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,'+
                           '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":""}';
 
-    var augmentedJSON = '{"type":"object","originX":"center","originY":"center","left":0,"top":0,"width":122,"height":0,"fill":"rgb(0,0,0)",'+
+    var augmentedJSON = '{"type":"object","originX":"left","originY":"top","left":0,"top":0,"width":122,"height":0,"fill":"rgb(0,0,0)",'+
                         '"stroke":null,"strokeWidth":1,"strokeDashArray":[5,2],"strokeLineCap":"round","strokeLineJoin":"bevil","strokeMiterLimit":5,'+
                         '"scaleX":1.3,"scaleY":1,"angle":0,"flipX":false,"flipY":true,"opacity":0.88,'+
                         '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":""}';
@@ -178,9 +178,9 @@
 
   test('toObject', function() {
     var emptyObjectRepr = {
-      'type':               "object",
-      'originX':            'center',
-      'originY':            'center',
+      'type':               'object',
+      'originX':            'left',
+      'originY':            'top',
       'left':               0,
       'top':                0,
       'width':              0,
@@ -205,9 +205,9 @@
     };
 
     var augmentedObjectRepr = {
-      'type':               "object",
-      'originX':            'center',
-      'originY':            'center',
+      'type':               'object',
+      'originX':            'left',
+      'originY':            'top',
       'left':               10,
       'top':                20,
       'width':              30,
@@ -330,29 +330,29 @@
 
     cObj.setCoords();
     boundingRect = cObj.getBoundingRect();
-    equal(boundingRect.left, 0);
-    equal(boundingRect.top, 0);
+    equal(boundingRect.left, 0.5);
+    equal(boundingRect.top, 0.5);
     equal(boundingRect.width, 0);
     equal(boundingRect.height, 0);
 
     cObj.set('width', 123).setCoords();
     boundingRect = cObj.getBoundingRect();
-    equal(boundingRect.left, -61.5);
-    equal(boundingRect.top, 0);
+    equal(boundingRect.left, 0.5);
+    equal(boundingRect.top, 0.5);
     equal(boundingRect.width, 123);
     equal(boundingRect.height, 0);
 
     cObj.set('height', 167).setCoords();
     boundingRect = cObj.getBoundingRect();
-    equal(boundingRect.left, -61.5);
-    equal(boundingRect.top, -83.5);
+    equal(boundingRect.left, 0.5);
+    equal(boundingRect.top, 0.5);
     equal(boundingRect.width, 123);
     equal(boundingRect.height, 167);
 
     cObj.scale(2).setCoords();
     boundingRect = cObj.getBoundingRect();
-    equal(boundingRect.left, -123);
-    equal(boundingRect.top, -167);
+    equal(boundingRect.left, 1);
+    equal(boundingRect.top, 1);
     equal(boundingRect.width, 246);
     equal(boundingRect.height, 334);
   });
@@ -452,34 +452,34 @@
   });
 
   test('setCoords', function() {
-    var cObj = new fabric.Object({ left: 200, top: 200, width: 100, height: 100 });
+    var cObj = new fabric.Object({ left: 150, top: 150, width: 100, height: 100 });
     ok(typeof cObj.setCoords == 'function');
     equal(cObj.setCoords(), cObj, 'chainable');
 
-    cObj.set('left', 300).set('top', 300);
+    cObj.set('left', 250).set('top', 250);
 
     // coords should still correspond to initial one, even after invoking `set`
-    equal(cObj.oCoords.tl.x, 150);
-    equal(cObj.oCoords.tl.y, 150);
-    equal(cObj.oCoords.tr.x, 250);
-    equal(cObj.oCoords.tr.y, 150);
-    equal(cObj.oCoords.bl.x, 150);
-    equal(cObj.oCoords.bl.y, 250);
-    equal(cObj.oCoords.br.x, 250);
-    equal(cObj.oCoords.br.y, 250);
+    equal(cObj.oCoords.tl.x, 150.5);
+    equal(cObj.oCoords.tl.y, 150.5);
+    equal(cObj.oCoords.tr.x, 250.5);
+    equal(cObj.oCoords.tr.y, 150.5);
+    equal(cObj.oCoords.bl.x, 150.5);
+    equal(cObj.oCoords.bl.y, 250.5);
+    equal(cObj.oCoords.br.x, 250.5);
+    equal(cObj.oCoords.br.y, 250.5);
 
     // recalculate coords
     cObj.setCoords();
 
     // check that coords are now updated
-    equal(cObj.oCoords.tl.x, 250);
-    equal(cObj.oCoords.tl.y, 250);
-    equal(cObj.oCoords.tr.x, 350);
-    equal(cObj.oCoords.tr.y, 250);
-    equal(cObj.oCoords.bl.x, 250);
-    equal(cObj.oCoords.bl.y, 350);
-    equal(cObj.oCoords.br.x, 350);
-    equal(cObj.oCoords.br.y, 350);
+    equal(cObj.oCoords.tl.x, 250.5);
+    equal(cObj.oCoords.tl.y, 250.5);
+    equal(cObj.oCoords.tr.x, 350.5);
+    equal(cObj.oCoords.tr.y, 250.5);
+    equal(cObj.oCoords.bl.x, 250.5);
+    equal(cObj.oCoords.bl.y, 350.5);
+    equal(cObj.oCoords.br.x, 350.5);
+    equal(cObj.oCoords.br.y, 350.5);
   });
 
   test('drawBorders', function() {
@@ -636,7 +636,7 @@ test('toDataURL & reference to canvas', function() {
   });
 
   test('intersectsWithRectangle', function() {
-    var cObj = new fabric.Object({ left: 100, top: 100, width: 100, height: 100 });
+    var cObj = new fabric.Object({ left: 50, top: 50, width: 100, height: 100 });
     cObj.setCoords();
     ok(typeof cObj.intersectsWithRect == 'function');
 
@@ -650,16 +650,16 @@ test('toDataURL & reference to canvas', function() {
   });
 
   test('intersectsWithObject', function() {
-    var cObj = new fabric.Object({ left: 100, top: 100, width: 100, height: 100 });
+    var cObj = new fabric.Object({ left: 50, top: 50, width: 100, height: 100 });
     cObj.setCoords();
     ok(typeof cObj.intersectsWithObject == 'function');
 
-    var cObj2 = new fabric.Object({ left: 50, top: 50, width: 200, height: 200 });
+    var cObj2 = new fabric.Object({ left: -150, top: -150, width: 200, height: 200 });
     cObj2.setCoords();
     ok(cObj.intersectsWithObject(cObj2));
     ok(cObj2.intersectsWithObject(cObj));
 
-    var cObj3 = new fabric.Object({ left: 400, top: 356, width: 13, height: 33 });
+    var cObj3 = new fabric.Object({ left: 392.5, top: 339.5, width: 13, height: 33 });
     cObj3.setCoords();
     ok(!cObj.intersectsWithObject(cObj3));
     ok(!cObj3.intersectsWithObject(cObj));
@@ -1094,8 +1094,8 @@ test('toDataURL & reference to canvas', function() {
   });
 
   test('intersectsWithRect', function() {
-    var object = new fabric.Object({ left: 20, top: 30, width: 40, height: 50, angle: 160 }),
-        point1 = new fabric.Point(0, 0),
+    var object = new fabric.Object({ left: 0, top: 0, width: 40, height: 50, angle: 160 }),
+        point1 = new fabric.Point(-10, -10),
         point2 = new fabric.Point(20, 30),
         point3 = new fabric.Point(10, 15),
         point4 = new fabric.Point(30, 35),
@@ -1118,10 +1118,10 @@ test('toDataURL & reference to canvas', function() {
         object2 = new fabric.Object({ left: 25, top: 35, width: 20, height: 20, angle: 50 }),
         object3 = new fabric.Object({ left: 50, top: 50, width: 20, height: 20, angle: 0 });
 
-    object.setCoords();
-    object1.setCoords();
-    object2.setCoords();
-    object3.setCoords();
+    object.set({ originX: 'center', originY: 'center' }).setCoords();
+    object1.set({ originX: 'center', originY: 'center' }).setCoords();
+    object2.set({ originX: 'center', originY: 'center' }).setCoords();
+    object3.set({ originX: 'center', originY: 'center' }).setCoords();
 
     // object and object1 intersects
     equal(object.intersectsWithObject(object1), true);
@@ -1137,10 +1137,10 @@ test('toDataURL & reference to canvas', function() {
         object2 = new fabric.Object({ left: 20, top: 30, width: 60, height: 30, angle: 10 }),
         object3 = new fabric.Object({ left: 50, top: 50, width: 20, height: 20, angle: 0 });
 
-    object.setCoords();
-    object1.setCoords();
-    object2.setCoords();
-    object3.setCoords();
+    object.set({ originX: 'center', originY: 'center' }).setCoords();
+    object1.set({ originX: 'center', originY: 'center' }).setCoords();
+    object2.set({ originX: 'center', originY: 'center' }).setCoords();
+    object3.set({ originX: 'center', originY: 'center' }).setCoords();
 
     // object1 is fully contained within object
     equal(object1.isContainedWithinObject(object), true);
@@ -1159,7 +1159,7 @@ test('toDataURL & reference to canvas', function() {
         point5 = new fabric.Point(80, 80),
         point6 = new fabric.Point(90, 90);
 
-    object.setCoords();
+    object.set({ originX: 'center', originY: 'center' }).setCoords();
 
     // area is contained in object (no intersection)
     equal(object.isContainedWithinRect(point1, point2), true);
@@ -1178,7 +1178,7 @@ test('toDataURL & reference to canvas', function() {
         point5 = new fabric.Point(80, 80),
         point6 = new fabric.Point(90, 90);
 
-    object.setCoords();
+    object.set({ originX: 'center', originY: 'center' }).setCoords();
 
     // area is contained in object (no intersection)
     equal(object.isContainedWithinRect(point1, point2), true);
@@ -1196,7 +1196,7 @@ test('toDataURL & reference to canvas', function() {
         point4 = new fabric.Point(15, 40),
         point5 = new fabric.Point(30, 15);
 
-    object.setCoords();
+    object.set({ originX: 'center', originY: 'center' }).setCoords();
 
     // point1 is contained in object
     equal(object.containsPoint(point1), true);
@@ -1210,7 +1210,7 @@ test('toDataURL & reference to canvas', function() {
     equal(object.containsPoint(point5), false);
   });
 
-  test('containsPoint width padding', function() {
+  test('containsPoint with padding', function() {
     var object = new fabric.Object({ left: 40, top: 40, width: 40, height: 50, angle: 160, padding: 5 }),
         point1 = new fabric.Point(30, 30),
         point2 = new fabric.Point(10, 20),
@@ -1219,7 +1219,7 @@ test('toDataURL & reference to canvas', function() {
         point5 = new fabric.Point(10, 40),
         point6 = new fabric.Point(30, 5);
 
-    object.setCoords();
+    object.set({ originX: 'center', originY: 'center' }).setCoords();
 
     // point1 is contained in object
     equal(object.containsPoint(point1), true);
