@@ -13172,7 +13172,13 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
 
     /**
-     * Determines which one of the four corners has been clicked
+     * The object interactivity controls.
+     * @private
+     */
+    _controlsVisibility: null,
+
+    /**
+     * Determines which corner has been clicked
      * @private
      * @param {Event} e Event object
      * @param {Object} offset Canvas offset
@@ -13188,6 +13194,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           lines;
 
       for (var i in this.oCoords) {
+
+        if (!this.isControlVisible(i)) {
+          continue;
+        }
 
         if (i === 'mtr' && !this.hasRotatingPoint) {
           continue;
@@ -13445,7 +13455,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         ~~(h + padding2 + strokeWidth * this.scaleY) + 1
       );
 
-      if (this.hasRotatingPoint && !this.get('lockRotation') && this.hasControls) {
+      if (this.hasRotatingPoint && this.isControlVisible('mtr') && !this.get('lockRotation') && this.hasControls) {
 
         var rotateHeight = (
           this.flipY
@@ -13504,65 +13514,80 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       ctx.strokeStyle = ctx.fillStyle = this.cornerColor;
 
       // top-left
-      _left = left - scaleOffsetX - strokeWidth2 - paddingX;
-      _top = top - scaleOffsetY - strokeWidth2 - paddingY;
-
-      isVML || transparent || ctx.clearRect(_left, _top, sizeX, sizeY);
-      ctx[methodName](_left, _top, sizeX, sizeY);
-
-      // top-right
-      _left = left + width - scaleOffsetX + strokeWidth2 + paddingX;
-      _top = top - scaleOffsetY - strokeWidth2 - paddingY;
-
-      isVML || transparent || ctx.clearRect(_left, _top, sizeX, sizeY);
-      ctx[methodName](_left, _top, sizeX, sizeY);
-
-      // bottom-left
-      _left = left - scaleOffsetX - strokeWidth2 - paddingX;
-      _top = top + height + scaleOffsetSizeY + strokeWidth2 + paddingY;
-
-      isVML || transparent || ctx.clearRect(_left, _top, sizeX, sizeY);
-      ctx[methodName](_left, _top, sizeX, sizeY);
-
-      // bottom-right
-      _left = left + width + scaleOffsetSizeX + strokeWidth2 + paddingX;
-      _top = top + height + scaleOffsetSizeY + strokeWidth2 + paddingY;
-
-      isVML || transparent || ctx.clearRect(_left, _top, sizeX, sizeY);
-      ctx[methodName](_left, _top, sizeX, sizeY);
-
-      if (!this.get('lockUniScaling')) {
-        // middle-top
-        _left = left + width/2 - scaleOffsetX;
-        _top = top - scaleOffsetY - strokeWidth2 - paddingY;
-
-        isVML || transparent || ctx.clearRect(_left, _top, sizeX, sizeY);
-        ctx[methodName](_left, _top, sizeX, sizeY);
-
-        // middle-bottom
-        _left = left + width/2 - scaleOffsetX;
-        _top = top + height + scaleOffsetSizeY + strokeWidth2 + paddingY;
-
-        isVML || transparent || ctx.clearRect(_left, _top, sizeX, sizeY);
-        ctx[methodName](_left, _top, sizeX, sizeY);
-
-        // middle-right
-        _left = left + width + scaleOffsetSizeX + strokeWidth2 + paddingX;
-        _top = top + height/2 - scaleOffsetY;
-
-        isVML || transparent || ctx.clearRect(_left, _top, sizeX, sizeY);
-        ctx[methodName](_left, _top, sizeX, sizeY);
-
-        // middle-left
+      if (this.isControlVisible('tl')) {
         _left = left - scaleOffsetX - strokeWidth2 - paddingX;
-        _top = top + height/2 - scaleOffsetY;
+        _top = top - scaleOffsetY - strokeWidth2 - paddingY;
 
         isVML || transparent || ctx.clearRect(_left, _top, sizeX, sizeY);
         ctx[methodName](_left, _top, sizeX, sizeY);
       }
 
+      // top-right
+      if (this.isControlVisible('tr')) {
+        _left = left + width - scaleOffsetX + strokeWidth2 + paddingX;
+        _top = top - scaleOffsetY - strokeWidth2 - paddingY;
+
+        isVML || transparent || ctx.clearRect(_left, _top, sizeX, sizeY);
+        ctx[methodName](_left, _top, sizeX, sizeY);
+      }
+
+      // bottom-left
+      if (this.isControlVisible('bl')) {
+        _left = left - scaleOffsetX - strokeWidth2 - paddingX;
+        _top = top + height + scaleOffsetSizeY + strokeWidth2 + paddingY;
+
+        isVML || transparent || ctx.clearRect(_left, _top, sizeX, sizeY);
+        ctx[methodName](_left, _top, sizeX, sizeY);
+      }
+
+      // bottom-right
+      if (this.isControlVisible('br')) {
+        _left = left + width + scaleOffsetSizeX + strokeWidth2 + paddingX;
+        _top = top + height + scaleOffsetSizeY + strokeWidth2 + paddingY;
+
+        isVML || transparent || ctx.clearRect(_left, _top, sizeX, sizeY);
+        ctx[methodName](_left, _top, sizeX, sizeY);
+      }
+
+      if (!this.get('lockUniScaling')) {
+        // middle-top
+        if (this.isControlVisible('mt')) {
+          _left = left + width/2 - scaleOffsetX;
+          _top = top - scaleOffsetY - strokeWidth2 - paddingY;
+
+          isVML || transparent || ctx.clearRect(_left, _top, sizeX, sizeY);
+          ctx[methodName](_left, _top, sizeX, sizeY);
+        }
+
+        // middle-bottom
+        if (this.isControlVisible('mb')) {
+          _left = left + width/2 - scaleOffsetX;
+          _top = top + height + scaleOffsetSizeY + strokeWidth2 + paddingY;
+
+          isVML || transparent || ctx.clearRect(_left, _top, sizeX, sizeY);
+          ctx[methodName](_left, _top, sizeX, sizeY);
+        }
+
+        // middle-right
+        if (this.isControlVisible('mr')) {
+          _left = left + width + scaleOffsetSizeX + strokeWidth2 + paddingX;
+          _top = top + height/2 - scaleOffsetY;
+
+          isVML || transparent || ctx.clearRect(_left, _top, sizeX, sizeY);
+          ctx[methodName](_left, _top, sizeX, sizeY);
+        }
+        // middle-left
+        if (this.isControlVisible('ml')) {
+          _left = left - scaleOffsetX - strokeWidth2 - paddingX;
+          _top = top + height/2 - scaleOffsetY;
+
+          isVML || transparent || ctx.clearRect(_left, _top, sizeX, sizeY);
+          ctx[methodName](_left, _top, sizeX, sizeY);
+        }
+      }
+
       // middle-top-rotate
-      if (this.hasRotatingPoint) {
+      if (this.hasRotatingPoint && this.isControlVisible('mtr')) {
 
         _left = left + width/2 - scaleOffsetX;
         _top = this.flipY ?
@@ -13576,6 +13601,73 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       ctx.restore();
 
       return this;
+    },
+
+    /**
+     * Returns true if the specified control is visible, false otherwise.
+     * @param {String} controlName The name of the control. Possible values are 'tl', 'tr', 'br', 'bl', 'ml', 'mt', 'mr', 'mb', 'mtr'.
+     * @returns {Boolean} true if the specified control is visible, false otherwise
+     */
+    isControlVisible: function(controlName) {
+      return this._getControlsVisibility()[controlName];
+    },
+
+    /**
+     * Sets the visibility of the specified control.
+     * @param {String} controlName The name of the control. Possible values are 'tl', 'tr', 'br', 'bl', 'ml', 'mt', 'mr', 'mb', 'mtr'.
+     * @param {Boolean} visible true to set the specified control visible, false otherwise
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+    setControlVisible: function(controlName, visible) {
+      this._getControlsVisibility()[controlName] = visible;
+      return this;
+    },
+
+    /**
+     * Sets the visibility state of object controls.
+     * @param {Object} [options] Options object
+     * @param {Boolean} [options.bl] true to enable the bottom-left control, false to disable it
+     * @param {Boolean} [options.br] true to enable the bottom-right control, false to disable it
+     * @param {Boolean} [options.mb] true to enable the middle-bottom control, false to disable it
+     * @param {Boolean} [options.ml] true to enable the middle-left control, false to disable it
+     * @param {Boolean} [options.mr] true to enable the middle-right control, false to disable it
+     * @param {Boolean} [options.mt] true to enable the middle-top control, false to disable it
+     * @param {Boolean} [options.tl] true to enable the top-left control, false to disable it
+     * @param {Boolean} [options.tr] true to enable the top-right control, false to disable it
+     * @param {Boolean} [options.mtr] true to enable the middle-top-rotate control, false to disable it
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+    setControlsVisibility: function(options) {
+      options || (options = { });
+
+      for (var p in options) {
+        this.setControlVisible(p, options[p]);
+      }
+      return this;
+    },
+
+    /**
+     * Returns the instance of the control visibility set for this object.
+     * @private
+     * @returns {Object}
+     */
+    _getControlsVisibility: function() {
+      if (!this._controlsVisibility) {
+        this._controlsVisibility = {
+            tl: true,
+            tr: true,
+            br: true,
+            bl: true,
+            ml: true,
+            mt: true,
+            mr: true,
+            mb: true,
+            mtr: true
+        };
+      }
+      return this._controlsVisibility;
     }
   });
 })();
