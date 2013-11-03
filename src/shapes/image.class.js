@@ -201,6 +201,7 @@
             '" transform="translate(' + (-this.width/2) + ' ' + (-this.height/2) + ')',
             '" width="', this.width,
             '" height="', this.height,
+            '" preserveAspectRatio="none"',
           '"></image>'
       );
 

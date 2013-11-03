@@ -19,7 +19,7 @@
                   ' -3.56, 6.891, -7.481, 8.848], ["c", -4.689, 2.336, -9.084, -0.802, -11.277, -2.868], ["l",'+
                   ' -1.948, 3.104], ["l", -1.628, -1.333], ["l", 3.138, -4.689], ["c", 0.025, 0, 9, 1.932, 9, 1.932], '+
                   '["c", 0.877, -9.979, 2.893, -12.905, 4.942, -15.621], ["C", 17.878, 21.775, 18.713, 17.397, 18.511, '+
-                  '13.99], ["z", null]]}], "background": "#ff5555"}';
+                  '13.99], ["z", null]]}], "background": "#ff5555","overlay": "rgba(0,0,0,0.2)"}';
 
   var PATH_OBJ_JSON = '{"type": "path", "originX": "center", "originY": "center", "left": 268, "top": 266, "width": 51, "height": 49,'+
                       ' "fill": "rgb(0,0,0)", "stroke": null, "strokeWidth": 1, "scaleX": 1, "scaleY": 1, '+
@@ -46,7 +46,7 @@
   var RECT_JSON = '{"objects":[{"type":"rect","originX":"center","originY":"center","left":0,"top":0,"width":10,"height":10,"fill":"rgb(0,0,0)",'+
                   '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,'+
                   '"shadow":null,'+
-                  '"visible":true,"clipTo":null,"backgroundColor":"","rx":0,"ry":0,"x":0,"y":0}],"background":"#ff5555"}';
+                  '"visible":true,"clipTo":null,"backgroundColor":"","rx":0,"ry":0,"x":0,"y":0}],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}';
 
   var el = fabric.document.createElement('canvas');
   el.width = 600; el.height = 600;
@@ -68,7 +68,7 @@
       canvas.clear();
       canvas.setActiveGroup(null);
       canvas.backgroundColor = fabric.Canvas.prototype.backgroundColor;
-      canvas.backgroundImage = '';
+      canvas.overlayColor = fabric.Canvas.prototype.overlayColor;
       canvas.calcOffset();
       upperCanvasEl.style.display = 'none';
     }
@@ -248,17 +248,10 @@
     ok(typeof canvas.toJSON == 'function');
     equal(JSON.stringify(canvas.toJSON()), EMPTY_JSON);
     canvas.backgroundColor = '#ff5555';
-    equal(JSON.stringify(canvas.toJSON()), '{"objects":[],"background":"#ff5555"}', '`background` value should be reflected in json');
+    canvas.overlayColor = 'rgba(0,0,0,0.2)';
+    equal(JSON.stringify(canvas.toJSON()), '{"objects":[],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}', '`background` and `overlayColor` value should be reflected in json');
     canvas.add(makeRect());
     deepEqual(JSON.stringify(canvas.toJSON()), RECT_JSON);
-  });
-
-  test('toDatalessJSON', function() {
-    var path = new fabric.Path('M 100 100 L 300 100 L 200 300 z', {
-      sourcePath: 'http://example.com/'
-    });
-    canvas.add(path);
-    equal(JSON.stringify(canvas.toDatalessJSON()), PATH_DATALESS_JSON);
   });
 
   test('toJSON with active group', function() {
@@ -271,6 +264,14 @@
     var jsonWithActiveGroup = JSON.stringify(canvas);
 
     equal(json, jsonWithActiveGroup);
+  });
+
+  test('toDatalessJSON', function() {
+    var path = new fabric.Path('M 100 100 L 300 100 L 200 300 z', {
+      sourcePath: 'http://example.com/'
+    });
+    canvas.add(path);
+    equal(JSON.stringify(canvas.toDatalessJSON()), PATH_DATALESS_JSON);
   });
 
   test('toObject', function() {
@@ -318,6 +319,7 @@
       ok(!canvas.isEmpty(), 'canvas is not empty');
       equal(obj.type, 'path', 'first object is a path object');
       equal(canvas.backgroundColor, '#ff5555', 'backgroundColor is populated properly');
+      equal(canvas.overlayColor, 'rgba(0,0,0,0.2)', 'overlayColor is populated properly');
 
       equal(obj.get('left'), 268);
       equal(obj.get('top'), 266);
@@ -345,6 +347,7 @@
       ok(!canvas.isEmpty(), 'canvas is not empty');
       equal(obj.type, 'path', 'first object is a path object');
       equal(canvas.backgroundColor, '#ff5555', 'backgroundColor is populated properly');
+      equal(canvas.overlayColor, 'rgba(0,0,0,0.2)', 'overlayColor is populated properly');
 
       equal(obj.get('left'), 268);
       equal(obj.get('top'), 266);
@@ -380,6 +383,7 @@
       ok(!canvas.isEmpty(), 'canvas is not empty');
       equal(obj.type, 'path', 'first object is a path object');
       equal(canvas.backgroundColor, '#ff5555', 'backgroundColor is populated properly');
+      equal(canvas.overlayColor, 'rgba(0,0,0,0.2)', 'overlayColor is populated properly');
 
       equal(obj.get('left'), 268);
       equal(obj.get('top'), 266);
@@ -400,20 +404,19 @@
   });
 
   asyncTest('loadFromJSON with no objects', function() {
-    var c1 = new fabric.Canvas('c1', { backgroundColor: 'green' }),
-        c2 = new fabric.Canvas('c2', { backgroundColor: 'red' });
+    var c1 = new fabric.Canvas('c1', { backgroundColor: 'green', overlayColor: 'yellow' }),
+        c2 = new fabric.Canvas('c2', { backgroundColor: 'red', overlayColor: 'orange' });
 
     var json = c1.toJSON();
     var fired = false;
     c2.loadFromJSON(json, function() {
       fired = true;
-    });
 
-    setTimeout(function() {
       ok(fired, 'Callback should be fired even if no objects');
       equal(c2.backgroundColor, 'green', 'Color should be set properly');
+      equal(c2.overlayColor, 'yellow', 'Color should be set properly');
       start();
-    }, 500);
+    });
   });
 
   asyncTest('loadFromJSON with empty fabric.Group', function() {
@@ -428,12 +431,10 @@
     var fired = false;
     c2.loadFromJSON(json, function() {
       fired = true;
-    });
 
-    setTimeout(function() {
       ok(fired, 'Callback should be fired even if empty fabric.Group exists');
       start();
-    }, 500);
+    });
   });
 
   asyncTest('loadFromJSON with async content', function() {
