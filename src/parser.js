@@ -805,23 +805,31 @@
    * @return {String}
    */
   function createSVGRefElementsMarkup(canvas) {
-    var markup = '';
+    var markup = [ ];
 
-    if (canvas.backgroundColor && canvas.backgroundColor.source) {
-      markup = [
-        '<pattern x="0" y="0" id="backgroundColorPattern" ',
-          'width="', canvas.backgroundColor.source.width,
-          '" height="', canvas.backgroundColor.source.height,
+    _createSVGPattern(markup, canvas, 'backgroundColor');
+    _createSVGPattern(markup, canvas, 'overlayColor');
+
+    return markup.join('');
+  }
+
+  /**
+   * @private
+   */
+  function _createSVGPattern(markup, canvas, property) {
+    if (canvas[property] && canvas[property].toSVG) {
+      markup.push(
+        '<pattern x="0" y="0" id="', property, 'Pattern" ',
+          'width="', canvas[property].source.width,
+          '" height="', canvas[property].source.height,
           '" patternUnits="userSpaceOnUse">',
         '<image x="0" y="0" ',
-        'width="', canvas.backgroundColor.source.width,
-        '" height="', canvas.backgroundColor.source.height,
-        '" xlink:href="', canvas.backgroundColor.source.src,
+        'width="', canvas[property].source.width,
+        '" height="', canvas[property].source.height,
+        '" xlink:href="', canvas[property].source.src,
         '"></image></pattern>'
-      ].join('');
+      );
     }
-
-    return markup;
   }
 
   /**
