@@ -56,6 +56,11 @@
     },
 
     /**
+     * @private
+     */
+    _reNewline: /\r?\n/,
+
+    /**
      * Retrieves object's fontSize
      * @method getFontSize
      * @memberOf fabric.Text.prototype
@@ -362,7 +367,7 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _renderViaNative: function(ctx) {
-      var textLines = this.text.split(/\r?\n/);
+      var textLines = this.text.split(this._reNewline);
 
       this.transform(ctx, fabric.isLikelyNode);
 
@@ -802,7 +807,7 @@
      */
     toSVG: function(reviver) {
       var markup = [ ],
-          textLines = this.text.split(/\r?\n/),
+          textLines = this.text.split(this._reNewline),
           offsets = this._getSVGLeftTopOffsets(textLines),
           textAndBg = this._getSVGTextAndBg(offsets.lineTop, offsets.textLeft, textLines),
           shadowSpans = this._getSVGShadows(offsets.lineTop, textLines);
@@ -810,7 +815,7 @@
       // move top offset by an ascent
       offsets.textTop += (this._fontAscent ? ((this._fontAscent / 5) * this.lineHeight) : 0);
 
-      this._setSVGTextAndBg(markup, textAndBg, shadowSpans, offsets);
+      this._wrapSVGTextAndBg(markup, textAndBg, shadowSpans, offsets);
 
       return reviver ? reviver(markup.join('')) : markup.join('');
     },
@@ -838,7 +843,7 @@
     /**
      * @private
      */
-    _setSVGTextAndBg: function(markup, textAndBg, shadowSpans, offsets) {
+    _wrapSVGTextAndBg: function(markup, textAndBg, shadowSpans, offsets) {
       markup.push(
         '<g transform="', this.getSvgTransform(), '">',
           textAndBg.textBgRects.join(''),

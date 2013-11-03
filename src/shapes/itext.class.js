@@ -120,11 +120,6 @@
     /**
      * @private
      */
-    _reNewline: /\r?\n/,
-
-    /**
-     * @private
-     */
     _reSpace: /\s|\n/,
 
     /**
@@ -919,6 +914,7 @@
       if (this.isEmptyStyles()) {
         return this.callSuper('toSVG', reviver);
       }
+
       // TODO: add support for styled text SVG output
     }
     /* _TO_SVG_END_ */
