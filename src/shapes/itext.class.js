@@ -1,6 +1,7 @@
 (function() {
 
-  var clone = fabric.util.object.clone;
+  var clone = fabric.util.object.clone,
+      toFixed = fabric.util.toFixed;
 
    /**
     * IText class (introduced in <b>v1.4</b>)
@@ -910,12 +911,91 @@
      * Returns SVG representation of an instance
      * @return {String} svg representation of an instance
      */
-    toSVG: function(reviver) {
-      if (this.isEmptyStyles()) {
-        return this.callSuper('toSVG', reviver);
-      }
+    //toSVG: function(reviver) {
+      //if (this.isEmptyStyles()) {
+      //  return this.callSuper('toSVG', reviver);
+      //}
 
       // TODO: add support for styled text SVG output
+    //}
+
+    /**
+     * @private
+     */
+    _setSVGTextLineText: function(textLine, lineIndex, textSpans, lineHeight, lineTopOffsetMultiplier, textBgRects) {
+      if (!this.styles[lineIndex]) {
+        this.callSuper('_setSVGTextLineText',
+          textLine, lineIndex, textSpans, lineHeight, lineTopOffsetMultiplier);
+      }
+      else {
+        this._setSVGTextLineChars(
+          textLine, lineIndex, textSpans, lineHeight, lineTopOffsetMultiplier, textBgRects);
+      }
+    },
+
+    /**
+     * @private
+     */
+    _setSVGTextLineChars: function(textLine, lineIndex, textSpans, lineHeight, lineTopOffsetMultiplier, textBgRects) {
+
+      var yProp = lineIndex === 0 || this.useNative ? 'y' : 'dy';
+      var chars = textLine.split('');
+      var charOffset = 0;
+      var lineLeftOffset = (this._boundaries && this._boundaries[lineIndex])
+                            ? toFixed(this._boundaries[lineIndex].left, 2)
+                            : 0;
+
+      var heightOfLine = this._getHeightOfLine(this.ctx, lineIndex);
+
+      var lineTopOffset = 0;
+      for (var j = 0; j <= lineIndex; j++) {
+        lineTopOffset += this._getHeightOfLine(this.ctx, j);
+      }
+      lineTopOffset -= this.height / 2;
+
+      for (var i = 0, len = chars.length; i < len; i++) {
+        var styleDecl = this.styles[lineIndex][i] || { };
+
+        var fillStyles = this.getSvgStyles.call(fabric.util.object.extend({
+          visible: true,
+          fill: this.fill,
+          stroke: this.stroke,
+          type: 'text'
+        }, styleDecl));
+
+        textSpans.push(
+          '<tspan x="', lineLeftOffset + charOffset, '" ',
+            yProp, '="', lineTopOffset, '" ',
+
+            (styleDecl.fontFamily ? 'font-family="' + styleDecl.fontFamily.replace(/"/g,'\'') + '" ': ''),
+            (styleDecl.fontSize ? 'font-size="' + styleDecl.fontSize + '" ': ''),
+            (styleDecl.fontStyle ? 'font-style="' + styleDecl.fontStyle + '" ': ''),
+            (styleDecl.fontWeight ? 'font-weight="' + styleDecl.fontWeight + '" ': ''),
+            (styleDecl.textDecoration ? 'text-decoration="' + styleDecl.textDecoration + '" ': ''),
+            'style="', fillStyles, '">',
+
+            fabric.util.string.escapeXml(chars[i]),
+          '</tspan>'
+        );
+
+        var charWidth = this._getWidthOfChar(this.ctx, chars[i], lineIndex, i);
+
+        if (styleDecl.textBackgroundColor) {
+          textBgRects.push(
+            '<rect fill="', styleDecl.textBackgroundColor,
+            '" transform="translate(',
+              -this.width / 2, ' ',
+              -this.height + heightOfLine, ')',
+            '" x="', lineLeftOffset + charOffset,
+            '" y="', lineTopOffset + heightOfLine,
+            '" width="', charWidth,
+            '" height="', heightOfLine,
+            '"></rect>'
+          );
+        }
+
+        charOffset += charWidth;
+      }
     }
     /* _TO_SVG_END_ */
   });

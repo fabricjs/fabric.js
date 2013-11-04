@@ -19352,11 +19352,11 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 
     /**
      * @private
-     * @param {Number} lineTopOffset Line top offset
+     * @param {Number} lineHeight
      * @param {Array} textLines Array of all text lines
      * @return {Array}
      */
-    _getSVGShadows: function(lineTopOffset, textLines) {
+    _getSVGShadows: function(lineHeight, textLines) {
       var shadowSpans = [],
           i, len,
           lineTopOffsetMultiplier = 1;
@@ -19373,14 +19373,15 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
             toFixed((lineLeftOffset + lineTopOffsetMultiplier) + this.shadow.offsetX, 2),
             ((i === 0 || this.useNative) ? '" y' : '" dy'), '="',
             toFixed(this.useNative
-              ? ((lineTopOffset * i) - this.height / 2 + this.shadow.offsetY)
-              : (lineTopOffset + (i === 0 ? this.shadow.offsetY : 0)), 2),
+              ? ((lineHeight * i) - this.height / 2 + this.shadow.offsetY)
+              : (lineHeight + (i === 0 ? this.shadow.offsetY : 0)), 2),
             '" ',
             this._getFillAttributes(this.shadow.color), '>',
             fabric.util.string.escapeXml(textLines[i]),
           '</tspan>');
           lineTopOffsetMultiplier = 1;
-        } else {
+        }
+        else {
           // in some environments (e.g. IE 7 & 8) empty tspans are completely ignored, using a lineTopOffsetMultiplier
           // prevents empty tspans
           lineTopOffsetMultiplier++;
@@ -19392,12 +19393,12 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 
     /**
      * @private
-     * @param {Number} lineTopOffset Line top offset
+     * @param {Number} lineHeight
      * @param {Number} textLeftOffset Text left offset
      * @param {Array} textLines Array of all text lines
      * @return {Object}
      */
-    _getSVGTextAndBg: function(lineTopOffset, textLeftOffset, textLines) {
+    _getSVGTextAndBg: function(lineHeight, textLeftOffset, textLines) {
       var textSpans = [ ],
           textBgRects = [ ],
           lineTopOffsetMultiplier = 1;
@@ -19408,7 +19409,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       // text and text-background
       for (var i = 0, len = textLines.length; i < len; i++) {
         if (textLines[i] !== '') {
-          this._setSVGTextLineText(textLines[i], i, textSpans, lineTopOffset, lineTopOffsetMultiplier);
+          this._setSVGTextLineText(textLines[i], i, textSpans, lineHeight, lineTopOffsetMultiplier, textBgRects);
           lineTopOffsetMultiplier = 1;
         }
         else {
@@ -19419,7 +19420,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 
         if (!this.textBackgroundColor || !this._boundaries) continue;
 
-        this._setSVGTextLineBg(textBgRects, i, textLeftOffset, lineTopOffset);
+        this._setSVGTextLineBg(textBgRects, i, textLeftOffset, lineHeight);
       }
 
       return {
@@ -19428,7 +19429,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       };
     },
 
-    _setSVGTextLineText: function(textLine, i, textSpans, lineTopOffset, lineTopOffsetMultiplier) {
+    _setSVGTextLineText: function(textLine, i, textSpans, lineHeight, lineTopOffsetMultiplier) {
       var lineLeftOffset = (this._boundaries && this._boundaries[i])
         ? toFixed(this._boundaries[i].left, 2)
         : 0;
@@ -19438,8 +19439,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
           lineLeftOffset, '" ',
           (i === 0 || this.useNative ? 'y' : 'dy'), '="',
           toFixed(this.useNative
-            ? ((lineTopOffset * i) - this.height / 2)
-            : (lineTopOffset * lineTopOffsetMultiplier), 2) , '" ',
+            ? ((lineHeight * i) - this.height / 2)
+            : (lineHeight * lineTopOffsetMultiplier), 2) , '" ',
           // doing this on <tspan> elements since setting opacity
           // on containing <text> one doesn't work in Illustrator
           this._getFillAttributes(this.fill), '>',
@@ -19448,7 +19449,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       );
     },
 
-    _setSVGTextLineBg: function(textBgRects, i, textLeftOffset, lineTopOffset) {
+    _setSVGTextLineBg: function(textBgRects, i, textLeftOffset, lineHeight) {
       textBgRects.push(
         '<rect ',
           this._getFillAttributes(this.textBackgroundColor),
@@ -19456,7 +19457,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
           toFixed(textLeftOffset + this._boundaries[i].left, 2),
           '" y="',
           /* an offset that seems to straighten things out */
-          toFixed((lineTopOffset * i) - this.height / 2, 2),
+          toFixed((lineHeight * i) - this.height / 2, 2),
           '" width="',
           toFixed(this._boundaries[i].width, 2),
           '" height="',
@@ -19666,7 +19667,8 @@ fabric.util.object.extend(fabric.Text.prototype, {
 
 (function() {
 
-  var clone = fabric.util.object.clone;
+  var clone = fabric.util.object.clone,
+      toFixed = fabric.util.toFixed;
 
    /**
     * IText class (introduced in <b>v1.4</b>)
@@ -20576,12 +20578,88 @@ fabric.util.object.extend(fabric.Text.prototype, {
      * Returns SVG representation of an instance
      * @return {String} svg representation of an instance
      */
-    toSVG: function(reviver) {
-      if (this.isEmptyStyles()) {
-        return this.callSuper('toSVG', reviver);
-      }
+    //toSVG: function(reviver) {
+      //if (this.isEmptyStyles()) {
+      //  return this.callSuper('toSVG', reviver);
+      //}
 
       // TODO: add support for styled text SVG output
+    //}
+
+    /**
+     * @private
+     */
+    _setSVGTextLineText: function(textLine, lineIndex, textSpans, lineHeight, lineTopOffsetMultiplier, textBgRects) {
+      if (!this.styles[lineIndex]) {
+        this.callSuper('_setSVGTextLineText',
+          textLine, lineIndex, textSpans, lineHeight, lineTopOffsetMultiplier);
+      }
+      else {
+        this._setSVGTextLineChars(
+          textLine, lineIndex, textSpans, lineHeight, lineTopOffsetMultiplier, textBgRects);
+      }
+    },
+
+    /**
+     * @private
+     */
+    _setSVGTextLineChars: function(textLine, lineIndex, textSpans, lineHeight, lineTopOffsetMultiplier, textBgRects) {
+
+      var yProp = lineIndex === 0 || this.useNative ? 'y' : 'dy';
+      var chars = textLine.split('');
+      var charOffset = 0;
+      var lineLeftOffset = (this._boundaries && this._boundaries[lineIndex])
+                            ? toFixed(this._boundaries[lineIndex].left, 2)
+                            : 0;
+
+      var heightOfLine = this._getHeightOfLine(this.ctx, lineIndex);
+
+      var lineTopOffset = 0;
+      for (var j = 0; j <= lineIndex; j++) {
+        lineTopOffset += this._getHeightOfLine(this.ctx, j);
+      }
+      lineTopOffset -= this.height / 2;
+
+      console.log('lineTopOffset', lineTopOffset);
+
+      // var offsets = this._getSVGLeftTopOffsets(this.text.split(this._reNewline));
+
+      for (var i = 0, len = chars.length; i < len; i++) {
+        var styleDecl = this.styles[lineIndex][i] || { };
+
+        textSpans.push(
+          '<tspan x="', lineLeftOffset + charOffset, '" ',
+            yProp, '="', lineTopOffset, '" ',
+
+            (styleDecl.fontFamily ? 'font-family="' + styleDecl.fontFamily.replace(/"/g,'\'') + '" ': ''),
+            (styleDecl.fontSize ? 'font-size="' + styleDecl.fontSize + '" ': ''),
+            (styleDecl.fontStyle ? 'font-style="' + styleDecl.fontStyle + '" ': ''),
+            (styleDecl.fontWeight ? 'font-weight="' + styleDecl.fontWeight + '" ': ''),
+            (styleDecl.textDecoration ? 'text-decoration="' + styleDecl.textDecoration + '" ': ''),
+
+            this._getFillAttributes(styleDecl.fill || ''), '>',
+            fabric.util.string.escapeXml(chars[i]),
+          '</tspan>'
+        );
+
+        var charWidth = this._getWidthOfChar(this.ctx, chars[i], lineIndex, i);
+
+        if (styleDecl.textBackgroundColor) {
+          textBgRects.push(
+            '<rect fill="', styleDecl.textBackgroundColor,
+            '" transform="translate(',
+              -this.width / 2, ' ',
+              -this.height / 2, ')',
+            '" x="', lineLeftOffset + charOffset,
+            '" y="', lineTopOffset,
+            '" width="', charWidth,
+            '" height="', heightOfLine,
+            '"></rect>'
+          );
+        }
+
+        charOffset += charWidth;
+      }
     }
     /* _TO_SVG_END_ */
   });

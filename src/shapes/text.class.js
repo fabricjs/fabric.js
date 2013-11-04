@@ -865,11 +865,11 @@
 
     /**
      * @private
-     * @param {Number} lineTopOffset Line top offset
+     * @param {Number} lineHeight
      * @param {Array} textLines Array of all text lines
      * @return {Array}
      */
-    _getSVGShadows: function(lineTopOffset, textLines) {
+    _getSVGShadows: function(lineHeight, textLines) {
       var shadowSpans = [],
           i, len,
           lineTopOffsetMultiplier = 1;
@@ -886,14 +886,15 @@
             toFixed((lineLeftOffset + lineTopOffsetMultiplier) + this.shadow.offsetX, 2),
             ((i === 0 || this.useNative) ? '" y' : '" dy'), '="',
             toFixed(this.useNative
-              ? ((lineTopOffset * i) - this.height / 2 + this.shadow.offsetY)
-              : (lineTopOffset + (i === 0 ? this.shadow.offsetY : 0)), 2),
+              ? ((lineHeight * i) - this.height / 2 + this.shadow.offsetY)
+              : (lineHeight + (i === 0 ? this.shadow.offsetY : 0)), 2),
             '" ',
             this._getFillAttributes(this.shadow.color), '>',
             fabric.util.string.escapeXml(textLines[i]),
           '</tspan>');
           lineTopOffsetMultiplier = 1;
-        } else {
+        }
+        else {
           // in some environments (e.g. IE 7 & 8) empty tspans are completely ignored, using a lineTopOffsetMultiplier
           // prevents empty tspans
           lineTopOffsetMultiplier++;
@@ -905,12 +906,12 @@
 
     /**
      * @private
-     * @param {Number} lineTopOffset Line top offset
+     * @param {Number} lineHeight
      * @param {Number} textLeftOffset Text left offset
      * @param {Array} textLines Array of all text lines
      * @return {Object}
      */
-    _getSVGTextAndBg: function(lineTopOffset, textLeftOffset, textLines) {
+    _getSVGTextAndBg: function(lineHeight, textLeftOffset, textLines) {
       var textSpans = [ ],
           textBgRects = [ ],
           lineTopOffsetMultiplier = 1;
@@ -921,7 +922,7 @@
       // text and text-background
       for (var i = 0, len = textLines.length; i < len; i++) {
         if (textLines[i] !== '') {
-          this._setSVGTextLineText(textLines[i], i, textSpans, lineTopOffset, lineTopOffsetMultiplier);
+          this._setSVGTextLineText(textLines[i], i, textSpans, lineHeight, lineTopOffsetMultiplier, textBgRects);
           lineTopOffsetMultiplier = 1;
         }
         else {
@@ -932,7 +933,7 @@
 
         if (!this.textBackgroundColor || !this._boundaries) continue;
 
-        this._setSVGTextLineBg(textBgRects, i, textLeftOffset, lineTopOffset);
+        this._setSVGTextLineBg(textBgRects, i, textLeftOffset, lineHeight);
       }
 
       return {
@@ -941,7 +942,7 @@
       };
     },
 
-    _setSVGTextLineText: function(textLine, i, textSpans, lineTopOffset, lineTopOffsetMultiplier) {
+    _setSVGTextLineText: function(textLine, i, textSpans, lineHeight, lineTopOffsetMultiplier) {
       var lineLeftOffset = (this._boundaries && this._boundaries[i])
         ? toFixed(this._boundaries[i].left, 2)
         : 0;
@@ -951,8 +952,8 @@
           lineLeftOffset, '" ',
           (i === 0 || this.useNative ? 'y' : 'dy'), '="',
           toFixed(this.useNative
-            ? ((lineTopOffset * i) - this.height / 2)
-            : (lineTopOffset * lineTopOffsetMultiplier), 2) , '" ',
+            ? ((lineHeight * i) - this.height / 2)
+            : (lineHeight * lineTopOffsetMultiplier), 2) , '" ',
           // doing this on <tspan> elements since setting opacity
           // on containing <text> one doesn't work in Illustrator
           this._getFillAttributes(this.fill), '>',
@@ -961,7 +962,7 @@
       );
     },
 
-    _setSVGTextLineBg: function(textBgRects, i, textLeftOffset, lineTopOffset) {
+    _setSVGTextLineBg: function(textBgRects, i, textLeftOffset, lineHeight) {
       textBgRects.push(
         '<rect ',
           this._getFillAttributes(this.textBackgroundColor),
@@ -969,7 +970,7 @@
           toFixed(textLeftOffset + this._boundaries[i].left, 2),
           '" y="',
           /* an offset that seems to straighten things out */
-          toFixed((lineTopOffset * i) - this.height / 2, 2),
+          toFixed((lineHeight * i) - this.height / 2, 2),
           '" width="',
           toFixed(this._boundaries[i].width, 2),
           '" height="',
