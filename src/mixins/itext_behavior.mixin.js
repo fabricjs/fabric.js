@@ -258,6 +258,16 @@
     },
 
     /**
+     * @private
+     */
+    _ctrlKeysMap: {
+      65: 'selectAll',
+      67: 'copy',
+      86: 'paste',
+      88: 'cut'
+    },
+
+    /**
      * Handles keyup event
      * @param {Event} e Event object
      */
@@ -267,14 +277,8 @@
       if (e.keyCode in this._keysMap) {
         this[this._keysMap[e.keyCode]](e);
       }
-      else if (e.keyCode === 65 && (e.ctrlKey || e.metaKey)) {
-        this.selectAll();
-      }
-      else if (e.keyCode === 67 && (e.ctrlKey || e.metaKey)) {
-        this.copy();
-      }
-      else if (e.keyCode === 86 && (e.ctrlKey || e.metaKey)) {
-        this.paste();
+      else if ((e.keyCode in this._ctrlKeysMap) && (e.ctrlKey || e.metaKey)) {
+        this[this._ctrlKeysMap[e.keyCode]](e);
       }
       else {
         return;
@@ -309,6 +313,14 @@
       if (this.copiedText) {
         this.insertChars(this.copiedText);
       }
+    },
+
+    /**
+     * Cuts text
+     */
+    cut: function(e) {
+      this.copy();
+      this.removeChars(e);
     },
 
     /**
