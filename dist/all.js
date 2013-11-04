@@ -4533,43 +4533,58 @@ fabric.util.string = {
    */
   function parseStyleAttribute(element) {
     var oStyle = { },
-        style = element.getAttribute('style'),
-        attr, value;
+        style = element.getAttribute('style');
 
     if (!style) return oStyle;
 
     if (typeof style === 'string') {
-      style.replace(/;$/, '').split(';').forEach(function (chunk) {
-        var pair = chunk.split(':');
-
-        attr = normalizeAttr(pair[0].trim().toLowerCase());
-        value = normalizeValue(attr, pair[1].trim());
-
-        if (attr === 'font') {
-          parseFontDeclaration(value, oStyle);
-        }
-        else {
-          oStyle[attr] = value;
-        }
-      });
+      parseStyleString(style, oStyle);
     }
     else {
-      for (var prop in style) {
-        if (typeof style[prop] === 'undefined') continue;
-
-        attr = normalizeAttr(prop.toLowerCase());
-        value = normalizeValue(attr, style[prop]);
-
-        if (attr === 'font') {
-          parseFontDeclaration(value, oStyle);
-        }
-        else {
-          oStyle[attr] = value;
-        }
-      }
+      parseStyleObject(style, oStyle);
     }
 
     return oStyle;
+  }
+
+  /**
+   * @private
+   */
+  function parseStyleString(style, oStyle) {
+    var attr, value;
+    style.replace(/;$/, '').split(';').forEach(function (chunk) {
+      var pair = chunk.split(':');
+
+      attr = normalizeAttr(pair[0].trim().toLowerCase());
+      value = normalizeValue(attr, pair[1].trim());
+
+      if (attr === 'font') {
+        parseFontDeclaration(value, oStyle);
+      }
+      else {
+        oStyle[attr] = value;
+      }
+    });
+  }
+
+  /**
+   * @private
+   */
+  function parseStyleObject(style, oStyle) {
+    var attr, value;
+    for (var prop in style) {
+      if (typeof style[prop] === 'undefined') continue;
+
+      attr = normalizeAttr(prop.toLowerCase());
+      value = normalizeValue(attr, style[prop]);
+
+      if (attr === 'font') {
+        parseFontDeclaration(value, oStyle);
+      }
+      else {
+        oStyle[attr] = value;
+      }
+    }
   }
 
   function resolveGradients(instances) {
@@ -20620,12 +20635,15 @@ fabric.util.object.extend(fabric.Text.prototype, {
       }
       lineTopOffset -= this.height / 2;
 
-      console.log('lineTopOffset', lineTopOffset);
-
-      // var offsets = this._getSVGLeftTopOffsets(this.text.split(this._reNewline));
-
       for (var i = 0, len = chars.length; i < len; i++) {
         var styleDecl = this.styles[lineIndex][i] || { };
+
+        var fillStyles = this.getSvgStyles.call(fabric.util.object.extend({
+          visible: true,
+          fill: this.fill,
+          stroke: this.stroke,
+          type: 'text'
+        }, styleDecl));
 
         textSpans.push(
           '<tspan x="', lineLeftOffset + charOffset, '" ',
@@ -20636,8 +20654,8 @@ fabric.util.object.extend(fabric.Text.prototype, {
             (styleDecl.fontStyle ? 'font-style="' + styleDecl.fontStyle + '" ': ''),
             (styleDecl.fontWeight ? 'font-weight="' + styleDecl.fontWeight + '" ': ''),
             (styleDecl.textDecoration ? 'text-decoration="' + styleDecl.textDecoration + '" ': ''),
+            'style="', fillStyles, '">',
 
-            this._getFillAttributes(styleDecl.fill || ''), '>',
             fabric.util.string.escapeXml(chars[i]),
           '</tspan>'
         );
@@ -20649,9 +20667,9 @@ fabric.util.object.extend(fabric.Text.prototype, {
             '<rect fill="', styleDecl.textBackgroundColor,
             '" transform="translate(',
               -this.width / 2, ' ',
-              -this.height / 2, ')',
+              -this.height + heightOfLine, ')',
             '" x="', lineLeftOffset + charOffset,
-            '" y="', lineTopOffset,
+            '" y="', lineTopOffset + heightOfLine,
             '" width="', charWidth,
             '" height="', heightOfLine,
             '"></rect>'

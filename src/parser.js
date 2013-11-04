@@ -369,43 +369,58 @@
    */
   function parseStyleAttribute(element) {
     var oStyle = { },
-        style = element.getAttribute('style'),
-        attr, value;
+        style = element.getAttribute('style');
 
     if (!style) return oStyle;
 
     if (typeof style === 'string') {
-      style.replace(/;$/, '').split(';').forEach(function (chunk) {
-        var pair = chunk.split(':');
-
-        attr = normalizeAttr(pair[0].trim().toLowerCase());
-        value = normalizeValue(attr, pair[1].trim());
-
-        if (attr === 'font') {
-          parseFontDeclaration(value, oStyle);
-        }
-        else {
-          oStyle[attr] = value;
-        }
-      });
+      parseStyleString(style, oStyle);
     }
     else {
-      for (var prop in style) {
-        if (typeof style[prop] === 'undefined') continue;
-
-        attr = normalizeAttr(prop.toLowerCase());
-        value = normalizeValue(attr, style[prop]);
-
-        if (attr === 'font') {
-          parseFontDeclaration(value, oStyle);
-        }
-        else {
-          oStyle[attr] = value;
-        }
-      }
+      parseStyleObject(style, oStyle);
     }
 
     return oStyle;
+  }
+
+  /**
+   * @private
+   */
+  function parseStyleString(style, oStyle) {
+    var attr, value;
+    style.replace(/;$/, '').split(';').forEach(function (chunk) {
+      var pair = chunk.split(':');
+
+      attr = normalizeAttr(pair[0].trim().toLowerCase());
+      value = normalizeValue(attr, pair[1].trim());
+
+      if (attr === 'font') {
+        parseFontDeclaration(value, oStyle);
+      }
+      else {
+        oStyle[attr] = value;
+      }
+    });
+  }
+
+  /**
+   * @private
+   */
+  function parseStyleObject(style, oStyle) {
+    var attr, value;
+    for (var prop in style) {
+      if (typeof style[prop] === 'undefined') continue;
+
+      attr = normalizeAttr(prop.toLowerCase());
+      value = normalizeValue(attr, style[prop]);
+
+      if (attr === 'font') {
+        parseFontDeclaration(value, oStyle);
+      }
+      else {
+        oStyle[attr] = value;
+      }
+    }
   }
 
   function resolveGradients(instances) {
