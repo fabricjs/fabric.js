@@ -164,6 +164,7 @@ var filesToInclude = [
   ifSpecifiedInclude('easing', 'src/util/anim_ease.js'),
 
   ifSpecifiedInclude('parser', 'src/parser.js'),
+  ifSpecifiedInclude('parser', 'src/elements_parser.js'),
 
   'src/point.class.js',
   'src/intersection.class.js',

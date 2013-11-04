@@ -449,47 +449,7 @@
    * @param {Function} [reviver] Method for further parsing of SVG elements, called after each fabric object created.
    */
   function parseElements(elements, callback, options, reviver) {
-    var instances = new Array(elements.length), i = elements.length;
-
-    function checkIfDone() {
-      if (--i === 0) {
-        instances = instances.filter(function(el) {
-          return el != null;
-        });
-        resolveGradients(instances);
-        callback(instances);
-      }
-    }
-
-    for (var index = 0, el, len = elements.length; index < len; index++) {
-      el = elements[index];
-      var klass = fabric[capitalize(el.tagName)];
-      if (klass && klass.fromElement) {
-        try {
-          if (klass.async) {
-            klass.fromElement(el, (function(index, el) {
-              return function(obj) {
-                reviver && reviver(el, obj);
-                instances.splice(index, 0, obj);
-                checkIfDone();
-              };
-            })(index, el), options);
-          }
-          else {
-            var obj = klass.fromElement(el, options);
-            reviver && reviver(el, obj);
-            instances.splice(index, 0, obj);
-            checkIfDone();
-          }
-        }
-        catch(err) {
-          fabric.log(err);
-        }
-      }
-      else {
-        checkIfDone();
-      }
-    }
+    fabric.ElementsParser.parse(elements, callback, options, reviver);
   }
 
   /**
@@ -890,7 +850,8 @@
     createSVGFontFacesMarkup:   createSVGFontFacesMarkup,
     createSVGRefElementsMarkup: createSVGRefElementsMarkup,
 
-    getGradientDefs:            getGradientDefs
+    getGradientDefs:            getGradientDefs,
+    resolveGradients:           resolveGradients
   });
 
 })(typeof exports !== 'undefined' ? exports : this);

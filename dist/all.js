@@ -4613,47 +4613,7 @@ fabric.util.string = {
    * @param {Function} [reviver] Method for further parsing of SVG elements, called after each fabric object created.
    */
   function parseElements(elements, callback, options, reviver) {
-    var instances = new Array(elements.length), i = elements.length;
-
-    function checkIfDone() {
-      if (--i === 0) {
-        instances = instances.filter(function(el) {
-          return el != null;
-        });
-        resolveGradients(instances);
-        callback(instances);
-      }
-    }
-
-    for (var index = 0, el, len = elements.length; index < len; index++) {
-      el = elements[index];
-      var klass = fabric[capitalize(el.tagName)];
-      if (klass && klass.fromElement) {
-        try {
-          if (klass.async) {
-            klass.fromElement(el, (function(index, el) {
-              return function(obj) {
-                reviver && reviver(el, obj);
-                instances.splice(index, 0, obj);
-                checkIfDone();
-              };
-            })(index, el), options);
-          }
-          else {
-            var obj = klass.fromElement(el, options);
-            reviver && reviver(el, obj);
-            instances.splice(index, 0, obj);
-            checkIfDone();
-          }
-        }
-        catch(err) {
-          fabric.log(err);
-        }
-      }
-      else {
-        checkIfDone();
-      }
-    }
+    fabric.ElementsParser.parse(elements, callback, options, reviver);
   }
 
   /**
@@ -5054,10 +5014,80 @@ fabric.util.string = {
     createSVGFontFacesMarkup:   createSVGFontFacesMarkup,
     createSVGRefElementsMarkup: createSVGRefElementsMarkup,
 
-    getGradientDefs:            getGradientDefs
+    getGradientDefs:            getGradientDefs,
+    resolveGradients:           resolveGradients
   });
 
 })(typeof exports !== 'undefined' ? exports : this);
+
+
+fabric.ElementsParser = {
+
+  parse: function(elements, callback, options, reviver) {
+
+    this.elements = elements;
+    this.callback = callback;
+    this.options = options;
+    this.reviver = reviver;
+
+    this.instances = new Array(elements.length);
+    this.numElements = elements.length;
+
+    this.createObjects();
+  },
+
+  createObjects: function() {
+    for (var i = 0, len = this.elements.length; i < len; i++) {
+      this.createObject(this.elements[i], i);
+    }
+  },
+
+  createObject: function(el, index) {
+    var klass = fabric[fabric.util.string.capitalize(el.tagName)];
+    if (klass && klass.fromElement) {
+      try {
+        this._createObject(klass, el, index);
+      }
+      catch(err) {
+        fabric.log(err);
+      }
+    }
+    else {
+      this.checkIfDone();
+    }
+  },
+
+  _createObject: function(klass, el, index) {
+    if (klass.async) {
+      klass.fromElement(el, this.createCallback(index, el), this.options);
+    }
+    else {
+      var obj = klass.fromElement(el, this.options);
+      this.reviver && this.reviver(el, obj);
+      this.instances.splice(index, 0, obj);
+      this.checkIfDone();
+    }
+  },
+
+  createCallback: function(index, el) {
+    var _this = this;
+    return function(obj) {
+      _this.reviver && _this.reviver(el, obj);
+      _this.instances.splice(index, 0, obj);
+      _this.checkIfDone();
+    };
+  },
+
+  checkIfDone: function() {
+    if (--this.numElements === 0) {
+      this.instances = this.instances.filter(function(el) {
+        return el != null;
+      });
+      fabric.resolveGradients(this.instances);
+      this.callback(this.instances);
+    }
+  }
+};
 
 
 (function(global) {
