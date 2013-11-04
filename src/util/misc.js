@@ -191,6 +191,11 @@
       return;
     }
 
+		if (0 === objects.length) {
+			('function' === typeof(callback)) && callback({});
+			return;
+		}
+
     objects.forEach(function (o, index) {
       // if sparse array
       if (!o || !o.type) {
