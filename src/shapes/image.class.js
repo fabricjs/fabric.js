@@ -30,6 +30,14 @@
     type: 'image',
 
     /**
+     * crossOrigin value (one of "", "anonymous", "allow-credentials")
+     * @see https://developer.mozilla.org/en-US/docs/HTML/CORS_settings_attributes
+     * @type String
+     * @default
+     */
+    crossOrigin: '',
+
+    /**
      * Constructor
      * @param {HTMLImageElement | String} element Image element
      * @param {Object} [options] Options object
@@ -41,7 +49,8 @@
       this.filters = [ ];
 
       this.callSuper('initialize', options);
-      this._initElement(element);
+
+      this._initElement(element, options);
       this._initConfig(options);
 
       if (options.filters) {
@@ -75,6 +84,18 @@
       if (this.filters.length !== 0) {
         this.applyFilters(callback);
       }
+
+      return this;
+    },
+
+    /**
+     * Sets crossOrigin value (on an instance and corresponding image element)
+     * @return {fabric.Image} thisArg
+     * @chainable
+     */
+    setCrossOrigin: function(value) {
+      this.crossOrigin = value;
+      this._element.crossOrigin = value;
 
       return this;
     },
@@ -178,7 +199,8 @@
         src: this._originalElement.src || this._originalElement._src,
         filters: this.filters.map(function(filterObj) {
           return filterObj && filterObj.toObject();
-        })
+        }),
+        crossOrigin: this.crossOrigin
       });
     },
 
@@ -345,6 +367,7 @@
       options || (options = { });
       this.setOptions(options);
       this._setWidthHeight(options);
+      this._element.crossOrigin = this.crossOrigin;
     },
 
     /**
@@ -413,7 +436,7 @@
         var instance = new fabric.Image(img, object);
         callback && callback(instance);
       });
-    });
+    }, null, object.crossOrigin);
   };
 
   /**
@@ -426,7 +449,7 @@
   fabric.Image.fromURL = function(url, callback, imgOptions) {
     fabric.util.loadImage(url, function(img) {
       callback(new fabric.Image(img, imgOptions));
-    });
+    }, null, imgOptions && imgOptions.crossOrigin);
   };
 
   /* _FROM_SVG_START_ */

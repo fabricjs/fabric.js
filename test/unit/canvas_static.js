@@ -80,7 +80,8 @@
     'visible':            true,
     'backgroundColor':    '',
     'clipTo':             null,
-    'filters':            []
+    'filters':            [],
+    'crossOrigin':        ''
   };
 
   function _createImageElement() {

@@ -142,9 +142,10 @@
     * @memberOf fabric.util
     * @param {String} url URL representing an image
     * @param {Function} callback Callback; invoked with loaded image
-    * @param {Any} context optional Context to invoke callback in
+    * @param {Any} [context] Context to invoke callback in
+    * @param {Object} [crossOrigin] crossOrigin value to set image element to
     */
-  function loadImage(url, callback, context) {
+  function loadImage(url, callback, context, crossOrigin) {
     if (url) {
       var img = fabric.util.createImage();
       /** @ignore */
@@ -155,9 +156,10 @@
       /** @ignore */
       img.onerror = function() {
         fabric.log('Error loading ' + img.src);
-        callback && callback(null, true);
+        callback && callback.call(context, null, true);
         img = img.onload = img.onerror = null;
       };
+      img.crossOrigin = crossOrigin || '';
       img.src = url;
     }
     else {

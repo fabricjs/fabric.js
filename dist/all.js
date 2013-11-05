@@ -2170,9 +2170,10 @@ fabric.Collection = {
     * @memberOf fabric.util
     * @param {String} url URL representing an image
     * @param {Function} callback Callback; invoked with loaded image
-    * @param {Any} context optional Context to invoke callback in
+    * @param {Any} [context] Context to invoke callback in
+    * @param {Object} [crossOrigin] crossOrigin value to set image element to
     */
-  function loadImage(url, callback, context) {
+  function loadImage(url, callback, context, crossOrigin) {
     if (url) {
       var img = fabric.util.createImage();
       /** @ignore */
@@ -2183,9 +2184,10 @@ fabric.Collection = {
       /** @ignore */
       img.onerror = function() {
         fabric.log('Error loading ' + img.src);
-        callback && callback(null, true);
+        callback && callback.call(context, null, true);
         img = img.onload = img.onerror = null;
       };
+      img.crossOrigin = crossOrigin || '';
       img.src = url;
     }
     else {
@@ -16867,6 +16869,14 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     type: 'image',
 
     /**
+     * crossOrigin value (one of "", "anonymous", "allow-credentials")
+     * @see https://developer.mozilla.org/en-US/docs/HTML/CORS_settings_attributes
+     * @type String
+     * @default
+     */
+    crossOrigin: '',
+
+    /**
      * Constructor
      * @param {HTMLImageElement | String} element Image element
      * @param {Object} [options] Options object
@@ -16878,7 +16888,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       this.filters = [ ];
 
       this.callSuper('initialize', options);
-      this._initElement(element);
+
+      this._initElement(element, options);
       this._initConfig(options);
 
       if (options.filters) {
@@ -16912,6 +16923,18 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       if (this.filters.length !== 0) {
         this.applyFilters(callback);
       }
+
+      return this;
+    },
+
+    /**
+     * Sets crossOrigin value (on an instance and corresponding image element)
+     * @return {fabric.Image} thisArg
+     * @chainable
+     */
+    setCrossOrigin: function(value) {
+      this.crossOrigin = value;
+      this._element.crossOrigin = value;
 
       return this;
     },
@@ -17015,7 +17038,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         src: this._originalElement.src || this._originalElement._src,
         filters: this.filters.map(function(filterObj) {
           return filterObj && filterObj.toObject();
-        })
+        }),
+        crossOrigin: this.crossOrigin
       });
     },
 
@@ -17182,6 +17206,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       options || (options = { });
       this.setOptions(options);
       this._setWidthHeight(options);
+      this._element.crossOrigin = this.crossOrigin;
     },
 
     /**
@@ -17250,7 +17275,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         var instance = new fabric.Image(img, object);
         callback && callback(instance);
       });
-    });
+    }, null, object.crossOrigin);
   };
 
   /**
@@ -17263,7 +17288,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   fabric.Image.fromURL = function(url, callback, imgOptions) {
     fabric.util.loadImage(url, function(img) {
       callback(new fabric.Image(img, imgOptions));
-    });
+    }, null, imgOptions && imgOptions.crossOrigin);
   };
 
   /* _FROM_SVG_START_ */
