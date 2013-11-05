@@ -1202,21 +1202,20 @@
 
       removeListener(fabric.window, 'resize', this._onResize);
 
-      if (fabric.isTouchSupported) {
-        removeListener(this.upperCanvasEl, 'touchstart', this._onMouseDown);
-        removeListener(this.upperCanvasEl, 'touchmove', this._onMouseMove);
-        if (typeof Event !== 'undefined' && 'remove' in Event) {
-          Event.remove(this.upperCanvasEl, 'gesture', this._onGesture);
-          Event.remove(this.upperCanvasEl, 'drag', this._onDrag);
-          Event.remove(this.upperCanvasEl, 'orientation', this._onOrientationChange);
-          Event.remove(this.upperCanvasEl, 'shake', this._onShake);
-        }
+      removeListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
+      removeListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
+      removeListener(this.upperCanvasEl, 'mousewheel', this._onMouseWheel);
+
+      removeListener(this.upperCanvasEl, 'touchstart', this._onMouseDown);
+      removeListener(this.upperCanvasEl, 'touchmove', this._onMouseMove);
+
+      if (typeof Event !== 'undefined' && 'remove' in Event) {
+        Event.remove(this.upperCanvasEl, 'gesture', this._onGesture);
+        Event.remove(this.upperCanvasEl, 'drag', this._onDrag);
+        Event.remove(this.upperCanvasEl, 'orientation', this._onOrientationChange);
+        Event.remove(this.upperCanvasEl, 'shake', this._onShake);
       }
-      else {
-        removeListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
-        removeListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
-        removeListener(this.upperCanvasEl, 'mousewheel', this._onMouseWheel);
-      }
+
       return this;
     },
 
