@@ -27,6 +27,9 @@
     *   Delete word:                    alt + backspace
     *   Delete line:                    cmd + backspace
     *   Forward delete:                 delete
+    *   Copy text:                      ctrl/cmd + c
+    *   Paste text:                     ctrl/cmd + v
+    *   Cut text:                       ctrl/cmd + x
     * </pre>
     */
   fabric.IText = fabric.util.createClass(fabric.Text, fabric.Observable, /** @lends fabric.IText.prototype */ {
