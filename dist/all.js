@@ -9266,7 +9266,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
         if (activeGroup.size() === 1) {
           // remove group alltogether if after removal it only contains 1 object
-          this.discardActiveGroup();
+          this.discardActiveGroup(e);
           // activate last remaining object
           this.setActiveObject(activeGroup.item(0));
           return;
@@ -9581,7 +9581,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       }
       else if (group.length > 1) {
         group = new fabric.Group(group.reverse());
-        this.setActiveGroup(group);
+        this.setActiveGroup(group, e);
         group.saveCoords();
         this.fire('selection:created', { target: group });
         this.renderAll();
@@ -9789,6 +9789,18 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     },
 
     /**
+     * @private
+     * @param {Object} object
+     */
+    _setActiveObject: function(object) {
+      if (this._activeObject) {
+        this._activeObject.set('active', false);
+      }
+      this._activeObject = object;
+      object.set('active', true);
+    },
+
+    /**
      * Sets given object as the only active object on canvas
      * @param {fabric.Object} object Object to set as an active one
      * @param {Event} [e] Event (passed along when firing "object:selected")
@@ -9796,14 +9808,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @chainable
      */
     setActiveObject: function (object, e) {
-      if (this._activeObject) {
-        this._activeObject.set('active', false);
-      }
-      this._activeObject = object;
-      object.set('active', true);
-
+      this._setActiveObject(object);
       this.renderAll();
-
       this.fire('object:selected', { target: object, e: e });
       object.fire('selected', { e: e });
       return this;
@@ -9818,16 +9824,37 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     },
 
     /**
-     * Discards currently active object
-     * @return {fabric.Canvas} thisArg
-     * @chainable
+     * @private
      */
-    discardActiveObject: function () {
+    _discardActiveObject: function() {
       if (this._activeObject) {
         this._activeObject.set('active', false);
       }
       this._activeObject = null;
+    },
+
+    /**
+     * Discards currently active object
+     * @return {fabric.Canvas} thisArg
+     * @chainable
+     */
+    discardActiveObject: function (e) {
+      this._discardActiveObject();
+      this.renderAll();
+      this.fire('selection:cleared', { e: e });
       return this;
+    },
+
+    /**
+     * @private
+     * @param {fabric.Group} group
+     */
+    _setActiveGroup: function(group) {
+      this._activeGroup = group;
+      if (group) {
+        group.canvas = this;
+        group.set('active', true);
+      }
     },
 
     /**
@@ -9836,11 +9863,11 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
-    setActiveGroup: function (group) {
-      this._activeGroup = group;
+    setActiveGroup: function (group, e) {
+      this._setActiveGroup(group);
       if (group) {
-        group.canvas = this;
-        group.set('active', true);
+        this.fire('object:selected', { target: group, e: e });
+        group.fire('selected', { e: e });
       }
       return this;
     },
@@ -9854,15 +9881,24 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     },
 
     /**
-     * Removes currently active group
-     * @return {fabric.Canvas} thisArg
+     * @private
      */
-    discardActiveGroup: function () {
+    _discardActiveGroup: function() {
       var g = this.getActiveGroup();
       if (g) {
         g.destroy();
       }
-      return this.setActiveGroup(null);
+      this.setActiveGroup(null);
+    },
+
+    /**
+     * Discards currently active group
+     * @return {fabric.Canvas} thisArg
+     */
+    discardActiveGroup: function (e) {
+      this._discardActiveGroup();
+      this.fire('selection:cleared', { e: e });
+      return this;
     },
 
     /**
@@ -9876,8 +9912,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       for ( ; i < len; i++) {
         allObjects[i].set('active', false);
       }
-      this.discardActiveGroup();
-      this.discardActiveObject();
+      this._discardActiveGroup();
+      this._discardActiveObject();
       return this;
     },
 
@@ -10248,7 +10284,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      */
     _onMouseDownInDrawingMode: function(e) {
       this._isCurrentlyDrawing = true;
-      this.discardActiveObject().renderAll();
+      this.discardActiveObject(e).renderAll();
       if (this.clipTo) {
         fabric.util.clipContext(this, this.contextTop);
       }
@@ -19773,6 +19809,9 @@ fabric.util.object.extend(fabric.Text.prototype, {
     *   Delete word:                    alt + backspace
     *   Delete line:                    cmd + backspace
     *   Forward delete:                 delete
+    *   Copy text:                      ctrl/cmd + c
+    *   Paste text:                     ctrl/cmd + v
+    *   Cut text:                       ctrl/cmd + x
     * </pre>
     */
   fabric.IText = fabric.util.createClass(fabric.Text, fabric.Observable, /** @lends fabric.IText.prototype */ {
