@@ -1,6 +1,6 @@
 (function() {
 
-  /**
+   /**
     * Changes value from one to another within certain period of time, invoking callbacks as value is being changed.
     * @memberOf fabric.util
     * @param {Object} [options] Animation options
