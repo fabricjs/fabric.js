@@ -1,3 +1,7 @@
+<a href="http://fabricjs.challengepost.com/?utm_source=partner&utm_medium=banner&utm_campaign=fabricjs" style="display: block">
+  <img src="https://dl.dropboxusercontent.com/u/822184/fabric-js-promo-widget-github.gif" style="width: auto">
+</a>
+
 ### Fabric
 [![Build Status](https://secure.travis-ci.org/kangax/fabric.js.png?branch=master)](http://travis-ci.org/#!/kangax/fabric.js)
 <a href="https://npmjs.org/package/fabric"><img src="https://badge.fury.io/js/fabric.png"></a>
