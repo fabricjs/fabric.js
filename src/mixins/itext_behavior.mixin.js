@@ -90,6 +90,7 @@
      */
     initMousedownHandler: function() {
       this.on('mousedown', function(options) {
+
         var pointer = this.canvas.getPointer(options.e);
 
         this.__mousedownX = pointer.x;
@@ -111,6 +112,7 @@
      */
     initMousemoveHandler: function() {
       this.on('mousemove', function() {
+
         if (this.__isMousedown && this.isEditing) {
           console.log('mousemove: need to select text');
         }
@@ -151,7 +153,7 @@
         if (!this._hasClearSelectionListener) {
           this.canvas.on('selection:cleared', function(options) {
             // do not exit editing if event fired when clicking on an object again (in editing mode)
-            if (options.e && _this.canvas.findTarget(options.e)) return;
+            if (options.e && _this.canvas.containsPoint(options.e, _this)) return;
             _this.exitEditing();
           });
 

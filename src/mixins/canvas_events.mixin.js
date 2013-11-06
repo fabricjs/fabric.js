@@ -209,6 +209,7 @@
       }
       else {
         pointer = this.getPointer(e);
+        target = this.findTarget(e, true);
       }
 
       render = this._shouldRender(target, pointer);
@@ -369,7 +370,7 @@
         this._handleGroupLogic(e, target);
         target = this.getActiveGroup();
       }
-      else {
+      else if (target && target.selectable) {
         this._beforeTransform(e, target);
         this._setupCurrentTransform(e, target);
       }
@@ -411,7 +412,7 @@
           left: 0
         };
       }
-      this.deactivateAllWithDispatch();
+      this.deactivateAllWithDispatch(e);
       target && target.selectable && this.setActiveObject(target, e);
     },
 

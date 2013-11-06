@@ -9100,14 +9100,15 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       var activeGroup = this.getActiveGroup();
 
       return (
-        !target || (
-        target &&
-        activeGroup &&
-        !activeGroup.contains(target) &&
-        activeGroup !== target &&
-        !e.shiftKey) || (
-        target &&
-        (!target.evented && !target.selectable))
+        !target
+        ||
+        (target &&
+          activeGroup &&
+          !activeGroup.contains(target) &&
+          activeGroup !== target &&
+          !e.shiftKey)
+        ||
+        (target && !target.evented)
       );
     },
 
@@ -9884,14 +9885,14 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * Deactivates all objects and dispatches appropriate events
      * @return {fabric.Canvas} thisArg
      */
-    deactivateAllWithDispatch: function () {
+    deactivateAllWithDispatch: function (e) {
       var activeObject = this.getActiveGroup() || this.getActiveObject();
       if (activeObject) {
-        this.fire('before:selection:cleared', { target: activeObject });
+        this.fire('before:selection:cleared', { target: activeObject, e: e });
       }
       this.deactivateAll();
       if (activeObject) {
-        this.fire('selection:cleared');
+        this.fire('selection:cleared', { e: e });
       }
       return this;
     },
@@ -10157,6 +10158,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       }
       else {
         pointer = this.getPointer(e);
+        target = this.findTarget(e, true);
       }
 
       render = this._shouldRender(target, pointer);
@@ -10317,7 +10319,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         this._handleGroupLogic(e, target);
         target = this.getActiveGroup();
       }
-      else {
+      else if (target && target.selectable) {
         this._beforeTransform(e, target);
         this._setupCurrentTransform(e, target);
       }
@@ -10359,7 +10361,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
           left: 0
         };
       }
-      this.deactivateAllWithDispatch();
+      this.deactivateAllWithDispatch(e);
       target && target.selectable && this.setActiveObject(target, e);
     },
 
@@ -20852,6 +20854,7 @@ fabric.util.object.extend(fabric.Text.prototype, {
      */
     initMousedownHandler: function() {
       this.on('mousedown', function(options) {
+
         var pointer = this.canvas.getPointer(options.e);
 
         this.__mousedownX = pointer.x;
@@ -20873,6 +20876,7 @@ fabric.util.object.extend(fabric.Text.prototype, {
      */
     initMousemoveHandler: function() {
       this.on('mousemove', function() {
+
         if (this.__isMousedown && this.isEditing) {
           console.log('mousemove: need to select text');
         }
@@ -20913,7 +20917,7 @@ fabric.util.object.extend(fabric.Text.prototype, {
         if (!this._hasClearSelectionListener) {
           this.canvas.on('selection:cleared', function(options) {
             // do not exit editing if event fired when clicking on an object again (in editing mode)
-            if (options.e && _this.canvas.findTarget(options.e)) return;
+            if (options.e && _this.canvas.containsPoint(options.e, _this)) return;
             _this.exitEditing();
           });
 

@@ -341,14 +341,15 @@
       var activeGroup = this.getActiveGroup();
 
       return (
-        !target || (
-        target &&
-        activeGroup &&
-        !activeGroup.contains(target) &&
-        activeGroup !== target &&
-        !e.shiftKey) || (
-        target &&
-        (!target.evented && !target.selectable))
+        !target
+        ||
+        (target &&
+          activeGroup &&
+          !activeGroup.contains(target) &&
+          activeGroup !== target &&
+          !e.shiftKey)
+        ||
+        (target && !target.evented)
       );
     },
 
@@ -1125,14 +1126,14 @@
      * Deactivates all objects and dispatches appropriate events
      * @return {fabric.Canvas} thisArg
      */
-    deactivateAllWithDispatch: function () {
+    deactivateAllWithDispatch: function (e) {
       var activeObject = this.getActiveGroup() || this.getActiveObject();
       if (activeObject) {
-        this.fire('before:selection:cleared', { target: activeObject });
+        this.fire('before:selection:cleared', { target: activeObject, e: e });
       }
       this.deactivateAll();
       if (activeObject) {
-        this.fire('selection:cleared');
+        this.fire('selection:cleared', { e: e });
       }
       return this;
     },
