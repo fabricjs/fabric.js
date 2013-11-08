@@ -986,8 +986,7 @@
     canvas.setActiveObject(canvas.item(0));
     canvas.remove(canvas.item(0));
 
-    // TODO: find out why this is failing
-    // equal(isFired, true, 'removing active object should fire "selection:cleared"');
+    equal(isFired, true, 'removing active object should fire "selection:cleared"');
   });
 
   test('clipTo', function() {
