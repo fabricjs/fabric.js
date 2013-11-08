@@ -187,7 +187,7 @@
         }
       }
       else {
-        pointer = this.getPointer(e);
+        pointer = this.getPointer(e, true);
       }
 
       render = this._shouldRender(target, pointer);
@@ -235,7 +235,7 @@
       if (this.clipTo) {
         fabric.util.clipContext(this, this.contextTop);
       }
-      this.freeDrawingBrush.onMouseDown(this.getPointer(e));
+      this.freeDrawingBrush.onMouseDown(this.getPointer(e, true));
       this.fire('mouse:down', { e: e });
     },
 
@@ -261,7 +261,7 @@
       if (this._currentTransform) return;
 
       var target = this.findTarget(e),
-          pointer = this.getPointer(e),
+          pointer = this.getPointer(e, true),
           corner,
           render;
 
@@ -362,8 +362,7 @@
 
       if (this.isDrawingMode) {
         if (this._isCurrentlyDrawing) {
-          pointer = this.getPointer(e);
-          this.freeDrawingBrush.onMouseMove(pointer);
+          this.freeDrawingBrush.onMouseMove(this.getPointer(e, true));
         }
         this.upperCanvasEl.style.cursor = this.freeDrawingCursor;
         this.fire('mouse:move', { e: e });
@@ -374,10 +373,10 @@
 
       // We initially clicked in an empty area, so we draw a box for multiple selection.
       if (groupSelector) {
-        pointer = getPointer(e, this.upperCanvasEl);
+        pointer = this.getPointer(e, true);
 
-        groupSelector.left = pointer.x - this._offset.left - groupSelector.ex;
-        groupSelector.top = pointer.y - this._offset.top - groupSelector.ey;
+        groupSelector.left = pointer.x - groupSelector.ex;
+        groupSelector.top = pointer.y - groupSelector.ey;
         this.renderTop();
       }
       else if (!this._currentTransform) {

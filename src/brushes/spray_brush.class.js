@@ -110,6 +110,8 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
     }
 
     var group = new fabric.Group(rects);
+    group.canvas = this.canvas;
+
     this.canvas.add(group);
     this.canvas.fire('path:created', { path: group });
 
@@ -145,9 +147,13 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
     var ctx = this.canvas.contextTop;
     ctx.fillStyle = this.color;
     ctx.save();
+    var ivt = fabric.util.invertTransform(this.canvas.viewportTransform);
 
     for (var i = 0, len = this.sprayChunkPoints.length; i < len; i++) {
       var point = this.sprayChunkPoints[i];
+      var tpoint = fabric.util.transformPoint({x: point.x, y: point.y}, ivt);
+      point.x = tpoint.x;
+      point.y = tpoint.y;
       if (typeof point.opacity !== 'undefined') {
         ctx.globalAlpha = point.opacity;
       }
@@ -163,6 +169,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
     this.sprayChunkPoints = [ ];
 
     var x, y, width, radius = this.width / 2;
+    var vpt = this.canvas.viewportTransform;
 
     for (var i = 0; i < this.density; i++) {
 
@@ -178,8 +185,10 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
       else {
         width = this.dotWidth;
       }
-
-      var point = { x: x, y: y, width: width };
+      
+      var point = new fabric.Point(x, y);
+      point = fabric.util.transformPoint(point, vpt);
+      point.width = width
 
       if (this.randomOpacity) {
         point.opacity = fabric.util.getRandomInt(0, 100) / 100;

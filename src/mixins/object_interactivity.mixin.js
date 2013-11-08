@@ -15,9 +15,9 @@
     _findTargetCorner: function(e, offset) {
       if (!this.hasControls || !this.active) return false;
 
-      var pointer = getPointer(e, this.canvas.upperCanvasEl),
-          ex = pointer.x - offset.left,
-          ey = pointer.y - offset.top,
+      var pointer = this.canvas.getPointer(e, true),
+          ex = pointer.x,
+          ey = pointer.y,
           xPoints,
           lines;
 
@@ -267,15 +267,16 @@
 
       ctx.lineWidth = 1 / this.borderScaleFactor;
       
-      var wh = fabric.util.transformPoint(new fabric.Point(this.getWidth(), this.getHeight()), this.canvas.viewportTransform, true),
-          sxy = fabric.util.transformPoint(new fabric.Point(scaleX, scaleY), this.canvas.viewportTransform, true),
+      var vpt = this.canvas.viewportTransform,
+          wh = fabric.util.transformPoint(new fabric.Point(this.getWidth(), this.getHeight()), vpt, true),
+          sxy = fabric.util.transformPoint(new fabric.Point(scaleX, scaleY), vpt, true),
           w = wh.x,
           h = wh.y,
           sx= sxy.x,
           sy= sxy.y;
-      if (this.get('group')) {
-      	w = w * this.get('group').scaleX;
-      	h = h * this.get('group').scaleY;
+      if (this.group) {
+      	w = w * this.group.scaleX;
+      	h = h * this.group.scaleY;
       }
 
       ctx.strokeRect(

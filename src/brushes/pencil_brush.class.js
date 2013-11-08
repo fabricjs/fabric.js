@@ -141,6 +141,10 @@
      * @private
      */
     _getSVGPathData: function() {
+      var ivt = fabric.util.invertTransform(this.canvas.viewportTransform);
+      for (var i = 0, len = this._points.length; i < len; i++) {
+        this._points[i] = fabric.util.transformPoint(this._points[i], ivt);
+      }
       this.box = this.getPathBoundingBox(this._points);
       return this.convertPointsToSVGPath(
         this._points, this.box.minx, this.box.maxx, this.box.miny, this.box.maxy);

@@ -306,10 +306,21 @@
 
       var strokeWidth = this.strokeWidth > 1 ? this.strokeWidth : 0,
           padding = this.padding,
-          theta = degreesToRadians(this.angle);
+          theta = degreesToRadians(this.angle),
+          vpt;
+      if (this.canvas) {
+        vpt = this.canvas.viewportTransform;
+      }
+      if (!vpt) { // TODO
+        vpt = [1, 0, 0, 1, 0, 0];
+      };
 
-      this.currentWidth = (this.width + strokeWidth) * this.scaleX + padding * 2;
-      this.currentHeight = (this.height + strokeWidth) * this.scaleY + padding * 2;
+      var f = function (p) {
+        return fabric.util.transformPoint(p, vpt);
+      }
+
+      this.currentWidth = (this.width + strokeWidth) * this.scaleX;
+      this.currentHeight = (this.height + strokeWidth) * this.scaleY;
 
       // If width is negative, make postive. Fixes path selection issue
       if (this.currentWidth < 0) {
@@ -329,42 +340,32 @@
           cosTh = Math.cos(theta),
           coords = this.getCenterPoint(),
           wh = new fabric.Point(this.currentWidth, this.currentHeight);
-      var tl = {
-        x: coords.x - offsetX,
-        y: coords.y - offsetY
-      };
-      var tr = {
-        x: tl.x + (wh.x * cosTh),
-        y: tl.y + (wh.x * sinTh)
-      };
-      var br = {
-        x: tr.x - (wh.y * sinTh),
-        y: tr.y + (wh.y * cosTh)
-      };
-      var bl = {
-        x: tl.x - (wh.y * sinTh),
-        y: tl.y + (wh.y * cosTh)
-      };
-      var ml = {
-        x: tl.x - (wh.y/2 * sinTh),
-        y: tl.y + (wh.y/2 * cosTh)
-      };
-      var mt = {
-        x: tl.x + (wh.x/2 * cosTh),
-        y: tl.y + (wh.x/2 * sinTh)
-      };
-      var mr = {
-        x: tr.x - (wh.y/2 * sinTh),
-        y: tr.y + (wh.y/2 * cosTh)
-      };
-      var mb = {
-        x: bl.x + (wh.x/2 * cosTh),
-        y: bl.y + (wh.x/2 * sinTh)
-      };
-      var mtr = {
-        x: mt.x,
-        y: mt.y
-      };
+      var _tl =   new fabric.Point(coords.x - offsetX, coords.y - offsetY);
+      var _tr =   new fabric.Point(_tl.x + (wh.x * cosTh),   _tl.y + (wh.x * sinTh));
+      var _bl =   new fabric.Point(_tl.x - (wh.y * sinTh),   _tl.y + (wh.y * cosTh));
+      var _mt =   new fabric.Point(_tl.x + (wh.x/2 * cosTh), _tl.y + (wh.x/2 * sinTh));
+      var tl  = f(_tl);
+      var tr  = f(_tr);
+      var br  = f(new fabric.Point(_tr.x - (wh.y * sinTh),   _tr.y + (wh.y * cosTh)));
+      var bl  = f(_bl);
+      var ml  = f(new fabric.Point(_tl.x - (wh.y/2 * sinTh), _tl.y + (wh.y/2 * cosTh)));
+      var mt  = f(_mt);
+      var mr  = f(new fabric.Point(_tr.x - (wh.y/2 * sinTh), _tr.y + (wh.y/2 * cosTh)));
+      var mb  = f(new fabric.Point(_bl.x + (wh.x/2 * cosTh), _bl.y + (wh.x/2 * sinTh)));
+      var mtr = f(new fabric.Point(_mt.x, _mt.y));
+
+      // padding
+      var padX = Math.cos(_angle + theta) * this.padding * Math.sqrt(2),
+          padY = Math.sin(_angle + theta) * this.padding * Math.sqrt(2);
+      tl = tl.add(new fabric.Point(-padX, -padY));
+      tr = tr.add(new fabric.Point(padY, -padX));
+      br = br.add(new fabric.Point(padX, padY));
+      bl = bl.add(new fabric.Point(-padY, padX));
+      ml = ml.add(new fabric.Point((-padX - padY) / 2, (-padY + padX) / 2));
+      mt = mt.add(new fabric.Point((padY - padX) / 2, -(padY + padX) / 2));
+      mr = mr.add(new fabric.Point((padY + padX) / 2, (padY - padX) / 2));
+      mb = mb.add(new fabric.Point((padX - padY) / 2, (padX + padY) / 2));
+      mtr = mtr.add(new fabric.Point((padY - padX) / 2, -(padY + padX) / 2));
 
       // debugging
 
@@ -388,22 +389,6 @@
         // rotating point
         mtr: mtr
       };
-
-      var tform;
-      if (typeof this.canvas == 'undefined') {
-        if (this.type == 'group') {
-          tform = this._objects[0].canvas.viewportTransform;
-        }
-        else {
-          tform = [1, 0, 0, 1, 0, 0];
-        }
-      }
-      else {
-        tform = this.canvas.viewportTransform;
-      }
-      for (c in this.oCoords) {
-        this.oCoords[c] = fabric.util.transformPoint(this.oCoords[c], tform);
-      }
 
       // set coordinates of the draggable boxes in the corners used to scale/rotate the image
       this._setCornerCoords && this._setCornerCoords();

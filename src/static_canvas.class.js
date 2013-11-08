@@ -147,13 +147,6 @@
     viewportTransform:      [1, 0, 0, 1, 0, 0],
 
     /**
-     * Color of canvas border
-     * @type String
-     * @default
-     */
-    canvasBorderColor: '',
-
-    /**
      * Callback; invoked right before object is about to be scaled/rotated
      * @param {fabric.Object} target Object that's about to be scaled/rotated
      */
@@ -474,6 +467,10 @@
       // TODO: just change the scale, preserve other transformations
       this.viewportTransform[0] = value;
       this.viewportTransform[3] = value;
+      this.renderAll();
+      for (var i = 0, len = this._objects.length; i < len; i++) {
+        this._objects[i].setCoords();
+      }
       return this;
     },
 
@@ -491,6 +488,7 @@
       );
       this.viewportTransform[4] = x - wh.x/2;
       this.viewportTransform[5] = y - wh.y/2;
+      this.renderAll();
       return this;
     },
 
@@ -554,8 +552,14 @@
      */
     _onObjectAdded: function(obj) {
       this.stateful && obj.setupState();
-      obj.setCoords();
       obj.canvas = this;
+      obj.setCoords();
+      if (obj._objects) {
+        for (var i = 0, len = obj._objects.length; i < len; i++) {
+          obj._objects[i].canvas = this;
+          obj._objects[i].setCoords();
+        }
+      }
       this.fire('object:added', { target: obj });
       obj.fire('added');
     },
@@ -657,10 +661,6 @@
       if (typeof this.backgroundImage === 'object') {
         this._drawBackroundImage(canvasToDrawOn);
       }
-      
-      if (this.canvasBorderColor) {
-        this._drawCanvasBorder(canvasToDrawOn);
-      }
 
       var activeGroup = this.getActiveGroup();
       for (var i = 0, length = this._objects.length; i < length; ++i) {
@@ -714,23 +714,6 @@
       else {
         canvasToDrawOn.drawImage(this.backgroundImage, 0, 0);
       }
-      canvasToDrawOn.restore();
-    },
-
-    /**
-     * @private
-     * @param {CanvasRenderingContext2D} canvasToDrawOn Context to render on
-     */
-    _drawCanvasBorder: function(canvasToDrawOn) {
-      var xy = fabric.util.transformPoint(new fabric.Point(0, 0), this.viewportTransform),
-          wh = fabric.util.transformPoint(
-            new fabric.Point(this.getWidth(), this.getHeight()),
-            this.viewportTransform, true
-          );
-      canvasToDrawOn.save();
-      canvasToDrawOn.lineWidth = 1;
-      canvasToDrawOn.strokeStyle = this.canvasBorderColor;
-      canvasToDrawOn.strokeRect(xy.x - 1.5, xy.y - 1.5, wh.x + 2, wh.y + 2);
       canvasToDrawOn.restore();
     },
 

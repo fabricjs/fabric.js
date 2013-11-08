@@ -53,6 +53,7 @@
       this._objects = objects || [];
       for (var i = this._objects.length; i--; ) {
         this._objects[i].group = this;
+        this._objects[i].setCoords();
       }
 
       this.originalState = { };
@@ -216,13 +217,7 @@
       if (!this.visible) return;
 
       ctx.save();
-      var v;
-      if (this.canvas) {
-        v = this.canvas.viewportTransform;
-      }
-      else {
-        v = [1, 0, 0, 1, 0, 0]; // TODO: this isn't a solution
-      }
+      var v = this.canvas.viewportTransform;
 
       var sxy = fabric.util.transformPoint(
         new fabric.Point(this.scaleX, this.scaleY),
@@ -403,10 +398,9 @@
     _calcBounds: function() {
       var aX = [],
           aY = [],
-          minX, minY, maxX, maxY, o, width, height, minXY, maxXY, ivt, // TODO: cleanup
+          minX, minY, maxX, maxY, o, width, height, minXY, maxXY,
           i = 0,
-          len = this._objects.length,
-          canvas = this._objects[0].canvas;
+          len = this._objects.length;
 
       for (; i < len; ++i) {
         o = this._objects[i];
@@ -416,20 +410,18 @@
           aY.push(o.oCoords[prop].y);
         }
       }
+      
+      var ivt = fabric.util.invertTransform(canvas.viewportTransform);
 
       minXY = new fabric.Point(min(aX), min(aY));
       maxXY = new fabric.Point(max(aX), max(aY));
-      // TODO: cleanup
-      ivt = fabric.util.invertTransform(canvas.viewportTransform);
-      this.width = (maxXY.x - minXY.x) || 0;
-      this.height = (maxXY.y - minXY.y) || 0;
 
-      // TODO: cleanup
       minXY = fabric.util.transformPoint(minXY, ivt);
       maxXY = fabric.util.transformPoint(maxXY, ivt);
+
       this.width = (maxXY.x - minXY.x) || 0;
       this.height = (maxXY.y - minXY.y) || 0;
-
+      
       this.left = (minXY.x + maxXY.x) / 2 || 0;
       this.top = (minXY.y + maxXY.y) / 2 || 0;
     },

@@ -730,6 +730,9 @@
      * @param {Boolean} fromLeft When true, context is transformed to object's top/left corner. This is used when rendering text on Node
      */
     transform: function(ctx, fromLeft) {
+      if (this.group) {
+        this.group.transform(ctx, fromLeft);
+      }
       ctx.globalAlpha = this.opacity;
 
       var center = fromLeft ? this._getLeftTopCoords() : this.getCenterPoint();
@@ -1027,9 +1030,6 @@
       }
 
       if (!noTransform) {
-        if (this.group) {
-          this.group.transform(ctx);
-        }
         this.transform(ctx);
       }
 

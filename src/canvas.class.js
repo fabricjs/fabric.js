@@ -249,7 +249,7 @@
      * @return {Boolean} true if point is contained within an area of given object
      */
     containsPoint: function (e, target) {
-      var pointer = this.getPointer(e),
+      var pointer = this.getPointer(e, true),
           xy = this._normalizePointer(target, pointer);
 
       // http://www.geog.ubc.ca/courses/klink/gis.notes/ncgia/u32.html
@@ -504,6 +504,7 @@
             var isActiveLower = objects.indexOf(this._activeObject) < objects.indexOf(target);
             var group = new fabric.Group(
               isActiveLower ? [ target, this._activeObject ] : [ this._activeObject, target ]);
+            group.canvas = this;
 
             this.setActiveGroup(group);
             this._activeObject = null;
@@ -783,6 +784,7 @@
       }
       else if (group.length > 1) {
         group = new fabric.Group(group.reverse());
+        group.canvas = this;
         this.setActiveGroup(group);
         group.saveCoords();
         this.fire('selection:created', { target: group });
@@ -799,7 +801,7 @@
       if (this.skipTargetFind) return;
 
       var target,
-          pointer = this.getPointer(e);
+          pointer = this.getPointer(e, true);
 
       if (this.controlsAboveOverlay &&
           this.lastRenderedObjectWithControlsAboveOverlay &&
@@ -839,7 +841,7 @@
         }
       }
       for (var j = 0, len = possibleTargets.length; j < len; j++) {
-        pointer = this.getPointer(e);
+        pointer = this.getPointer(e, true);
         var isTransparent = this.isTargetTransparent(possibleTargets[j], pointer.x, pointer.y);
         if (!isTransparent) {
           target = possibleTargets[j];
@@ -856,8 +858,17 @@
      * @param {Event} e
      * @return {Object} object with "x" and "y" number values
      */
-    getPointer: function (e) {
-      var pointer = getPointer(e, this.upperCanvasEl);
+    getPointer: function (e, ignoreZoom, upperCanvasEl) {
+      if (!upperCanvasEl) {
+        upperCanvasEl = this.upperCanvasEl;
+      }
+      var pointer = getPointer(e, upperCanvasEl);
+      if (!ignoreZoom) {
+        pointer = fabric.util.transformPoint(
+          pointer,
+          fabric.util.invertTransform(this.viewportTransform)
+        );
+      }
 
       return {
         x: pointer.x - this._offset.left,
