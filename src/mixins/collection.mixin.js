@@ -81,6 +81,7 @@ fabric.Collection = {
 
   /**
    * Returns an array of children objects of this instance
+   * Type parameter introduced in 1.3.10
    * @param {String} [type] When specified, only objects of this type are returned
    * @return {Array}
    */
