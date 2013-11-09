@@ -560,6 +560,13 @@
      * @param {fabric.Object} obj Object that was removed
      */
     _onObjectRemoved: function(obj) {
+      // removing active object should fire "selection:cleared" events
+      if (this.getActiveObject() === obj) {
+        this.fire('before:selection:cleared', { target: obj });
+        this._discardActiveObject();
+        this.fire('selection:cleared');
+      }
+
       this.fire('object:removed', { target: obj });
       obj.fire('removed');
     },
@@ -1054,22 +1061,6 @@
       }
     },
     /* _TO_SVG_END_ */
-
-    /**
-     * Removes an object from canvas and returns it
-     * @param {fabric.Object} object Object to remove
-     * @return {fabric.Object} removed object
-     */
-    remove: function (object) {
-      // removing active object should fire "selection:cleared" events
-      if (this.getActiveObject() === object) {
-        this.fire('before:selection:cleared', { target: object });
-        this.discardActiveObject();
-        this.fire('selection:cleared');
-      }
-
-      return fabric.Collection.remove.call(this, object);
-    },
 
     /**
      * Moves an object to the bottom of the stack of drawn objects
