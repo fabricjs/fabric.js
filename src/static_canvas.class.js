@@ -572,14 +572,6 @@
     },
 
     /**
-     * Returns an array of objects this instance has
-     * @return {Array}
-     */
-    getObjects: function () {
-      return this._objects;
-    },
-
-    /**
      * Clears specified context of canvas element
      * @param {CanvasRenderingContext2D} ctx Context to clear
      * @return {fabric.Canvas} thisArg

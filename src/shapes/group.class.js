@@ -105,14 +105,6 @@
     },
 
     /**
-     * Returns an array of all objects in this group
-     * @return {Array} group objects
-     */
-    getObjects: function() {
-      return this._objects;
-    },
-
-    /**
      * Adds an object to a group; Then recalculates group's dimension, position.
      * @param {Object} object
      * @return {fabric.Group} thisArg

@@ -80,6 +80,20 @@ fabric.Collection = {
   },
 
   /**
+   * Returns an array of children objects of this instance
+   * @param {String} [type] When specified, only objects of this type are returned
+   * @return {Array}
+   */
+  getObjects: function(type) {
+    if (typeof type === 'undefined') {
+      return this._objects;
+    }
+    return this._objects.filter(function(o) {
+      return o.type === type;
+    });
+  },
+
+  /**
    * Returns object at specified index
    * @param {Number} index
    * @return {Self} thisArg

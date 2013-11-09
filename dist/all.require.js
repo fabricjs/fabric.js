@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures minifier=uglifyjs` */
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.3.9" };
+var fabric = fabric || { version: "1.3.10" };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -1977,6 +1977,20 @@ fabric.Collection = {
       callback.call(context, objects[i], i, objects);
     }
     return this;
+  },
+
+  /**
+   * Returns an array of children objects of this instance
+   * @param {String} [type] When specified, only objects of this type are returned
+   * @return {Array}
+   */
+  getObjects: function(type) {
+    if (typeof type === 'undefined') {
+      return this._objects;
+    }
+    return this._objects.filter(function(o) {
+      return o.type === type;
+    });
   },
 
   /**
@@ -7285,16 +7299,15 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * @param {fabric.Object} obj Object that was removed
      */
     _onObjectRemoved: function(obj) {
+      // removing active object should fire "selection:cleared" events
+      if (this.getActiveObject() === obj) {
+        this.fire('before:selection:cleared', { target: obj });
+        this._discardActiveObject();
+        this.fire('selection:cleared');
+      }
+
       this.fire('object:removed', { target: obj });
       obj.fire('removed');
-    },
-
-    /**
-     * Returns an array of objects this instance has
-     * @return {Array}
-     */
-    getObjects: function () {
-      return this._objects;
     },
 
     /**
@@ -7779,22 +7792,6 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
       }
     },
     /* _TO_SVG_END_ */
-
-    /**
-     * Removes an object from canvas and returns it
-     * @param {fabric.Object} object Object to remove
-     * @return {fabric.Object} removed object
-     */
-    remove: function (object) {
-      // removing active object should fire "selection:cleared" events
-      if (this.getActiveObject() === object) {
-        this.fire('before:selection:cleared', { target: object });
-        this.discardActiveObject();
-        this.fire('selection:cleared');
-      }
-
-      return fabric.Collection.remove.call(this, object);
-    },
 
     /**
      * Moves an object to the bottom of the stack of drawn objects
@@ -16468,14 +16465,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     toString: function() {
       return '#<fabric.Group: (' + this.complexity() + ')>';
-    },
-
-    /**
-     * Returns an array of all objects in this group
-     * @return {Array} group objects
-     */
-    getObjects: function() {
-      return this._objects;
     },
 
     /**

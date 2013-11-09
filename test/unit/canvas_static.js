@@ -162,6 +162,19 @@
     equal(canvas.getObjects().length, 0, 'should have a 0 length when empty');
   });
 
+  test('getObjects with type', function() {
+
+    var rect = new fabric.Rect({ width: 10, height: 20 });
+    var circle = new fabric.Circle({ radius: 30 });
+
+    canvas.add(rect, circle);
+
+    equal(canvas.getObjects().length, 2, 'should have length=2 initially');
+
+    deepEqual(canvas.getObjects('rect'), [rect], 'should return rect only');
+    deepEqual(canvas.getObjects('circle'), [circle], 'should return circle only');
+  });
+
   test('getElement', function() {
     ok(typeof canvas.getElement == 'function', 'should respond to `getElement` method');
     equal(canvas.getElement(), lowerCanvasEl, 'should return a proper element');
