@@ -68,6 +68,8 @@ fabric.CircleBrush = fabric.util.createClass(fabric.BaseBrush, /** @lends fabric
         radius: point.radius,
         left: point.x,
         top: point.y,
+        originX: 'center',
+        originY: 'center',
         fill: point.fill
       });
 
@@ -75,7 +77,7 @@ fabric.CircleBrush = fabric.util.createClass(fabric.BaseBrush, /** @lends fabric
 
       circles.push(circle);
     }
-    var group = new fabric.Group(circles);
+    var group = new fabric.Group(circles, { originX: 'center', originY: 'center' });
 
     this.canvas.add(group);
     this.canvas.fire('path:created', { path: group });
