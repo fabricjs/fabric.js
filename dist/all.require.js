@@ -9323,8 +9323,11 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
           // and that object is not the actual target
           var objects = this.getObjects();
           var isActiveLower = objects.indexOf(this._activeObject) < objects.indexOf(target);
-          var group = new fabric.Group(
-            isActiveLower ? [ target, this._activeObject ] : [ this._activeObject, target ]);
+          var groupObjects = isActiveLower
+              ? [ target, this._activeObject ]
+              : [ this._activeObject, target ];
+
+          var group = new fabric.Group(groupObjects, { originX: 'center', originY: 'center' });
 
           this.setActiveGroup(group);
           this._activeObject = null;
@@ -9614,7 +9617,10 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         this.setActiveObject(group[0], e);
       }
       else if (group.length > 1) {
-        group = new fabric.Group(group.reverse());
+        group = new fabric.Group(group.reverse(), {
+          originX: 'center',
+          originY: 'center'
+        });
         this.setActiveGroup(group, e);
         group.saveCoords();
         this.fire('selection:created', { target: group });
@@ -21206,27 +21212,28 @@ fabric.util.object.extend(fabric.Text.prototype, {
      * Gets start offset of a selection
      * @return {Number}
      */
-    getDownCursorOffset: function(e) {
+    getDownCursorOffset: function(e, isRight) {
 
-      var textLines = this.text.split(this._reNewline),
+      var selectionProp = isRight ? this.selectionEnd : this.selectionStart,
+          textLines = this.text.split(this._reNewline),
           _char,
           lineLeftOffset,
           foundMatch,
 
-          textBeforeCursor = this.text.slice(0, this.selectionStart),
-          textAfterCursor = this.text.slice(this.selectionStart),
+          textBeforeCursor = this.text.slice(0, selectionProp),
+          textAfterCursor = this.text.slice(selectionProp),
 
           textOnSameLineBeforeCursor = textBeforeCursor.slice(textBeforeCursor.lastIndexOf('\n') + 1),
           textOnSameLineAfterCursor = textAfterCursor.match(/(.*)\n?/)[1],
           textOnNextLine = (textAfterCursor.match(/.*\n(.*)\n?/) || { })[1] || '',
 
-          cursorLocation = this.get2DCursorLocation();
+          cursorLocation = this.get2DCursorLocation(selectionProp);
 
       // if on last line, down cursor goes to end of line
       if (cursorLocation.lineIndex === textLines.length - 1 || e.metaKey) {
 
         // move to the end of a text
-        return this.text.length - this.selectionStart;
+        return this.text.length - selectionProp;
       }
 
       var widthOfSameLineBeforeCursor = this._getWidthOfLine(this.ctx, cursorLocation.lineIndex, textLines);
@@ -21287,7 +21294,7 @@ fabric.util.object.extend(fabric.Text.prototype, {
       this.abortCursorAnimation();
       this._currentCursorOpacity = 1;
 
-      var offset = this.getDownCursorOffset(e);
+      var offset = this.getDownCursorOffset(e, this._selectionDirection === 'right');
 
       if (e.shiftKey) {
         this.moveCursorDownWithShift(offset);
@@ -21321,8 +21328,9 @@ fabric.util.object.extend(fabric.Text.prototype, {
     moveCursorDownWithShift: function(offset) {
 
       if (this._selectionDirection === 'left' && (this.selectionStart !== this.selectionEnd)) {
-        this.selectionStart = this.selectionEnd;
-        this._selectionDirection = 'right';
+        this.selectionStart += offset;
+        this._selectionDirection = 'left';
+        return;
       }
       else {
         this._selectionDirection = 'right';
@@ -21334,16 +21342,17 @@ fabric.util.object.extend(fabric.Text.prototype, {
       }
     },
 
-    getUpCursorOffset: function(e) {
+    getUpCursorOffset: function(e, isRight) {
 
-      var cursorLocation = this.get2DCursorLocation();
+      var selectionProp = isRight ? this.selectionEnd : this.selectionStart,
+          cursorLocation = this.get2DCursorLocation(selectionProp);
 
       // if on first line, up cursor goes to start of line
       if (cursorLocation.lineIndex === 0 || e.metaKey) {
-        return this.selectionStart;
+        return selectionProp;
       }
 
-      var textBeforeCursor = this.text.slice(0, this.selectionStart),
+      var textBeforeCursor = this.text.slice(0, selectionProp),
           textOnSameLineBeforeCursor = textBeforeCursor.slice(textBeforeCursor.lastIndexOf('\n') + 1),
           textOnPreviousLine = (textBeforeCursor.match(/\n?(.*)\n.*$/) || {})[1] || '',
           textLines = this.text.split(this._reNewline),
@@ -21409,7 +21418,7 @@ fabric.util.object.extend(fabric.Text.prototype, {
       this.abortCursorAnimation();
       this._currentCursorOpacity = 1;
 
-      var offset = this.getUpCursorOffset(e);
+      var offset = this.getUpCursorOffset(e, this._selectionDirection === 'right');
 
       if (e.shiftKey) {
         this.moveCursorUpWithShift(offset);
@@ -21426,17 +21435,21 @@ fabric.util.object.extend(fabric.Text.prototype, {
      * @param {Number} offset
      */
     moveCursorUpWithShift: function(offset) {
+
       if (this.selectionStart === this.selectionEnd) {
         this.selectionStart -= offset;
       }
       else {
         if (this._selectionDirection === 'right') {
-          this.selectionEnd = this.selectionStart;
+          this.selectionEnd -= offset;
+          this._selectionDirection = 'right';
+          return;
         }
         else {
           this.selectionStart -= offset;
         }
       }
+
       if (this.selectionStart < 0) {
         this.selectionStart = 0;
       }
