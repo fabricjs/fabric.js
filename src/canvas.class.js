@@ -811,8 +811,7 @@
      * @private
      * @param {Event} e mouse event
      */
-    _findSelectedObjects: function (e) {
-      if (!this.selection) return;
+    _groupSelectedObjects: function (e) {
 
       var group = this._collectObjects();
 

@@ -194,9 +194,7 @@
      * @param {Event} e Event object fired on mouseup
      */
     __onMouseUp: function (e) {
-      var target,
-          pointer,
-          render;
+      var target;
 
       if (this.isDrawingMode && this._isCurrentlyDrawing) {
         this._onMouseUpInDrawingMode(e);
@@ -208,15 +206,41 @@
         target = this._currentTransform.target;
       }
       else {
-        pointer = this.getPointer(e);
         target = this.findTarget(e, true);
       }
 
-      render = this._shouldRender(target, pointer);
+      var shouldRender = this._shouldRender(target, this.getPointer(e));
 
+      this._maybeGroupObjects(e);
+
+      if (target) {
+        target.isMoving = false;
+      }
+
+      shouldRender && this.renderAll();
+
+      this._handleCursorAndEvent(e, target);
+    },
+
+    _handleCursorAndEvent: function(e, target) {
+      this._setCursorFromEvent(e, target);
+
+      // TODO: why are we doing this?
+      var _this = this;
+      setTimeout(function () {
+        _this._setCursorFromEvent(e, target);
+      }, 50);
+
+      this.fire('mouse:up', { target: target, e: e });
+      target && target.fire('mouseup', { e: e });
+    },
+
+    /**
+     * @private
+     */
+    _maybeGroupObjects: function(e) {
       if (this.selection && this._groupSelector) {
-        // group selection was completed, determine its bounds
-        this._findSelectedObjects(e);
+        this._groupSelectedObjects(e);
       }
 
       var activeGroup = this.getActiveGroup();
@@ -229,22 +253,6 @@
       // clear selection and current transformation
       this._groupSelector = null;
       this._currentTransform = null;
-
-      if (target) {
-        target.isMoving = false;
-      }
-
-      render && this.renderAll();
-
-      this._setCursorFromEvent(e, target);
-
-      var _this = this;
-      setTimeout(function () {
-        _this._setCursorFromEvent(e, target);
-      }, 50);
-
-      this.fire('mouse:up', { target: target, e: e });
-      target && target.fire('mouseup', { e: e });
     },
 
     /**
