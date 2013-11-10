@@ -529,8 +529,11 @@
           // and that object is not the actual target
           var objects = this.getObjects();
           var isActiveLower = objects.indexOf(this._activeObject) < objects.indexOf(target);
-          var group = new fabric.Group(
-            isActiveLower ? [ target, this._activeObject ] : [ this._activeObject, target ]);
+          var groupObjects = isActiveLower
+              ? [ target, this._activeObject ]
+              : [ this._activeObject, target ];
+
+          var group = new fabric.Group(groupObjects, { originX: 'center', originY: 'center' });
 
           this.setActiveGroup(group);
           this._activeObject = null;
@@ -820,7 +823,10 @@
         this.setActiveObject(group[0], e);
       }
       else if (group.length > 1) {
-        group = new fabric.Group(group.reverse());
+        group = new fabric.Group(group.reverse(), {
+          originX: 'center',
+          originY: 'center'
+        });
         this.setActiveGroup(group, e);
         group.saveCoords();
         this.fire('selection:created', { target: group });
