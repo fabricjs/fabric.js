@@ -144,7 +144,6 @@ var filesToInclude = [
   ifSpecifiedDependencyInclude('serialization', 'json', 'lib/json2.js'),
   ifSpecifiedInclude('gestures', 'lib/event.js'),
 
-  'src/log.js',
   'src/mixins/observable.mixin.js',
   'src/mixins/collection.mixin.js',
 
@@ -158,6 +157,8 @@ var filesToInclude = [
   'src/util/dom_style.js',
   'src/util/dom_misc.js',
   'src/util/dom_request.js',
+
+  'src/log.js',
 
   ifSpecifiedInclude('animation', 'src/util/animate.js'),
   //'src/util/animate.js',
