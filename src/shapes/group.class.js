@@ -346,12 +346,13 @@
           groupTop = this.getTop(),
           rotated = this._getRotatedLeftTop(object);
 
-      object.setAngle(object.getAngle() + this.getAngle());
-
-      object.set('left', groupLeft + rotated.left);
-      object.set('top', groupTop + rotated.top);
-      object.set('scaleX', object.get('scaleX') * this.get('scaleX'));
-      object.set('scaleY', object.get('scaleY') * this.get('scaleY'));
+      object.set({
+        angle: object.getAngle() + this.getAngle(),
+        left: groupLeft + rotated.left,
+        top: groupTop + rotated.top,
+        scaleX: object.get('scaleX') * this.get('scaleX'),
+        scaleY: object.get('scaleY') * this.get('scaleY')
+      });
     },
 
     /**
