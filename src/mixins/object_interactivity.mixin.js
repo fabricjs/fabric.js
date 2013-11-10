@@ -1,7 +1,8 @@
 (function(){
 
   var getPointer = fabric.util.getPointer,
-      degreesToRadians = fabric.util.degreesToRadians;
+      degreesToRadians = fabric.util.degreesToRadians,
+      isVML = typeof G_vmlCanvasManager !== 'undefined';
 
   fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
 
@@ -324,10 +325,6 @@
           strokeWidth2 = ~~(this.strokeWidth / 2), // half strokeWidth rounded down
           left = -(this.width / 2),
           top = -(this.height / 2),
-          _left,
-          _top,
-          sizeX = size / this.scaleX,
-          sizeY = size / this.scaleY,
           paddingX = this.padding / this.scaleX,
           paddingY = this.padding / this.scaleY,
           scaleOffsetY = size2 / this.scaleY,
@@ -336,9 +333,7 @@
           scaleOffsetSizeY = (size2 - size) / this.scaleY,
           height = this.height,
           width = this.width,
-          methodName = this.transparentCorners ? 'strokeRect' : 'fillRect',
-          transparent = this.transparentCorners,
-          isVML = typeof G_vmlCanvasManager !== 'undefined';
+          methodName = this.transparentCorners ? 'strokeRect' : 'fillRect';
 
       ctx.save();
 
@@ -348,93 +343,73 @@
       ctx.strokeStyle = ctx.fillStyle = this.cornerColor;
 
       // top-left
-      if (this.isControlVisible('tl')) {
-        _left = left - scaleOffsetX - strokeWidth2 - paddingX;
-        _top = top - scaleOffsetY - strokeWidth2 - paddingY;
-
-        isVML || transparent || ctx.clearRect(_left, _top, sizeX, sizeY);
-        ctx[methodName](_left, _top, sizeX, sizeY);
-      }
+      this._drawControl('tl', ctx, methodName,
+        left - scaleOffsetX - strokeWidth2 - paddingX,
+        top - scaleOffsetY - strokeWidth2 - paddingY);
 
       // top-right
-      if (this.isControlVisible('tr')) {
-        _left = left + width - scaleOffsetX + strokeWidth2 + paddingX;
-        _top = top - scaleOffsetY - strokeWidth2 - paddingY;
-
-        isVML || transparent || ctx.clearRect(_left, _top, sizeX, sizeY);
-        ctx[methodName](_left, _top, sizeX, sizeY);
-      }
+      this._drawControl('tr', ctx, methodName,
+        left + width - scaleOffsetX + strokeWidth2 + paddingX,
+        top - scaleOffsetY - strokeWidth2 - paddingY);
 
       // bottom-left
-      if (this.isControlVisible('bl')) {
-        _left = left - scaleOffsetX - strokeWidth2 - paddingX;
-        _top = top + height + scaleOffsetSizeY + strokeWidth2 + paddingY;
-
-        isVML || transparent || ctx.clearRect(_left, _top, sizeX, sizeY);
-        ctx[methodName](_left, _top, sizeX, sizeY);
-      }
+      this._drawControl('tr', ctx, methodName,
+        left - scaleOffsetX - strokeWidth2 - paddingX,
+        top + height + scaleOffsetSizeY + strokeWidth2 + paddingY);
 
       // bottom-right
-      if (this.isControlVisible('br')) {
-        _left = left + width + scaleOffsetSizeX + strokeWidth2 + paddingX;
-        _top = top + height + scaleOffsetSizeY + strokeWidth2 + paddingY;
-
-        isVML || transparent || ctx.clearRect(_left, _top, sizeX, sizeY);
-        ctx[methodName](_left, _top, sizeX, sizeY);
-      }
+      this._drawControl('br', ctx, methodName,
+        left + width + scaleOffsetSizeX + strokeWidth2 + paddingX,
+        top + height + scaleOffsetSizeY + strokeWidth2 + paddingY);
 
       if (!this.get('lockUniScaling')) {
-        // middle-top
-        if (this.isControlVisible('mt')) {
-          _left = left + width/2 - scaleOffsetX;
-          _top = top - scaleOffsetY - strokeWidth2 - paddingY;
 
-          isVML || transparent || ctx.clearRect(_left, _top, sizeX, sizeY);
-          ctx[methodName](_left, _top, sizeX, sizeY);
-        }
+        // middle-top
+        this._drawControl('mt', ctx, methodName,
+          left + width/2 - scaleOffsetX,
+          top - scaleOffsetY - strokeWidth2 - paddingY);
 
         // middle-bottom
-        if (this.isControlVisible('mb')) {
-          _left = left + width/2 - scaleOffsetX;
-          _top = top + height + scaleOffsetSizeY + strokeWidth2 + paddingY;
-
-          isVML || transparent || ctx.clearRect(_left, _top, sizeX, sizeY);
-          ctx[methodName](_left, _top, sizeX, sizeY);
-        }
+        this._drawControl('mb', ctx, methodName,
+          left + width/2 - scaleOffsetX,
+          top + height + scaleOffsetSizeY + strokeWidth2 + paddingY);
 
         // middle-right
-        if (this.isControlVisible('mr')) {
-          _left = left + width + scaleOffsetSizeX + strokeWidth2 + paddingX;
-          _top = top + height/2 - scaleOffsetY;
+        this._drawControl('mb', ctx, methodName,
+          left + width + scaleOffsetSizeX + strokeWidth2 + paddingX,
+          top + height/2 - scaleOffsetY);
 
-          isVML || transparent || ctx.clearRect(_left, _top, sizeX, sizeY);
-          ctx[methodName](_left, _top, sizeX, sizeY);
-        }
         // middle-left
-        if (this.isControlVisible('ml')) {
-          _left = left - scaleOffsetX - strokeWidth2 - paddingX;
-          _top = top + height/2 - scaleOffsetY;
-
-          isVML || transparent || ctx.clearRect(_left, _top, sizeX, sizeY);
-          ctx[methodName](_left, _top, sizeX, sizeY);
-        }
+        this._drawControl('ml', ctx, methodName,
+          left - scaleOffsetX - strokeWidth2 - paddingX,
+          top + height/2 - scaleOffsetY);
       }
 
       // middle-top-rotate
-      if (this.hasRotatingPoint && this.isControlVisible('mtr')) {
-
-        _left = left + width/2 - scaleOffsetX;
-        _top = this.flipY ?
-          (top + height + (this.rotatingPointOffset / this.scaleY) - sizeY/2 + strokeWidth2 + paddingY)
-          : (top - (this.rotatingPointOffset / this.scaleY) - sizeY/2 - strokeWidth2 - paddingY);
-
-        isVML || transparent || ctx.clearRect(_left, _top, sizeX, sizeY);
-        ctx[methodName](_left, _top, sizeX, sizeY);
+      if (this.hasRotatingPoint) {
+        this._drawControl('mtr', ctx, methodName,
+          left + width/2 - scaleOffsetX,
+          this.flipY
+            ? (top + height + (this.rotatingPointOffset / this.scaleY) - this.cornerSize/this.scaleX/2 + strokeWidth2 + paddingY)
+            : (top - (this.rotatingPointOffset / this.scaleY) - this.cornerSize/this.scaleY/2 - strokeWidth2 - paddingY));
       }
 
       ctx.restore();
 
       return this;
+    },
+
+    /**
+     * @private
+     */
+    _drawControl: function(control, ctx, methodName, left, top) {
+      var sizeX = this.cornerSize / this.scaleX,
+          sizeY = this.cornerSize / this.scaleY;
+
+      if (this.isControlVisible(control)) {
+        isVML || this.transparentCorners || ctx.clearRect(left, top, sizeX, sizeY);
+        ctx[methodName](left, top, sizeX, sizeY);
+      }
     },
 
     /**
