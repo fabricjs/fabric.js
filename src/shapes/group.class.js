@@ -434,11 +434,9 @@
     _calcBounds: function() {
       var aX = [],
           aY = [],
-          minX, minY, maxX, maxY, o, width, height,
-          i = 0,
-          len = this._objects.length;
+          o;
 
-      for (; i < len; ++i) {
+      for (var i = 0, len = this._objects.length; i < len; ++i) {
         o = this._objects[i];
         o.setCoords();
         for (var prop in o.oCoords) {
@@ -447,19 +445,26 @@
         }
       }
 
-      minX = min(aX);
-      maxX = max(aX);
-      minY = min(aY);
-      maxY = max(aY);
+      this.set(this._getBounds(aX, aY));
+    },
 
-      width = (maxX - minX) || 0;
-      height = (maxY - minY) || 0;
+    /**
+     * @private
+     */
+    _getBounds: function(aX, aY) {
+      var minX = min(aX),
+          maxX = max(aX),
+          minY = min(aY),
+          maxY = max(aY),
+          width = (maxX - minX) || 0,
+          height = (maxY - minY) || 0;
 
-      this.width = width;
-      this.height = height;
-
-      this.left = (minX + width / 2) || 0;
-      this.top = (minY + height / 2) || 0;
+      return {
+        width: width,
+        height: height,
+        left: (minX + width / 2) || 0,
+        top: (minY + height / 2) || 0
+      };
     },
 
     /* _TO_SVG_START_ */
