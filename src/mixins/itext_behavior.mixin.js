@@ -907,7 +907,11 @@
      */
     getSelectionStartFromPointer: function(e) {
 
-      var localPointer = this.getLocalPointer(e),
+      var pointer = this.canvas.getPointer(e),
+          pClicked = new fabric.Point(pointer.x, pointer.y),
+          pLeftTop = new fabric.Point(this.left, this.top),
+          rotated = fabric.util.rotatePoint(pClicked, pLeftTop, fabric.util.degreesToRadians(-this.angle)),
+          localPointer = this.getLocalPointer(e, rotated),
           mouseOffsetX = localPointer.x,
           mouseOffsetY = localPointer.y,
           textLines = this.text.split(this._reNewline),
