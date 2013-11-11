@@ -892,19 +892,6 @@
     },
 
     /**
-     * Returns coordinates of a pointer relative to an object
-     * @return {Object} Coordinates of a pointer (x, y)
-     */
-    getLocalPointer: function(e) {
-      var pointer = this.canvas.getPointer(e);
-      var objectLeftTop = this.translateToOriginPoint(this.getCenterPoint(), 'left', 'top');
-      return {
-        x: pointer.x - objectLeftTop.x,
-        y: pointer.y - objectLeftTop.y
-      };
-    },
-
-    /**
      * Changes cursor location in a text depending on passed pointer (x/y) object
      * @param {Object} pointer Pointer object with x and y numeric properties
      */
