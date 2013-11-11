@@ -186,6 +186,7 @@ var filesToInclude = [
 
   ifSpecifiedInclude('interaction', 'src/canvas.class.js'),
   ifSpecifiedInclude('interaction', 'src/mixins/canvas_events.mixin.js'),
+  ifSpecifiedInclude('interaction', 'src/mixins/canvas_grouping.mixin.js'),
 
   'src/mixins/canvas_dataurl_exporter.mixin.js',
 

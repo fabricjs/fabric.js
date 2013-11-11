@@ -238,26 +238,6 @@
     /**
      * @private
      */
-    _maybeGroupObjects: function(e) {
-      if (this.selection && this._groupSelector) {
-        this._groupSelectedObjects(e);
-      }
-
-      var activeGroup = this.getActiveGroup();
-      if (activeGroup) {
-        activeGroup.setObjectsCoords();
-        activeGroup.isMoving = false;
-        this._setCursor(this.defaultCursor);
-      }
-
-      // clear selection and current transformation
-      this._groupSelector = null;
-      this._currentTransform = null;
-    },
-
-    /**
-     * @private
-     */
     _finalizeCurrentTransform: function() {
 
       var transform = this._currentTransform;
@@ -374,8 +354,8 @@
       if (this._shouldClearSelection(e, target)) {
         this._clearSelection(e, target, pointer);
       }
-      else if (this._shouldHandleGroupLogic(e, target)) {
-        this._handleGroupLogic(e, target);
+      else if (this._shouldGroup(e, target)) {
+        this._handleGrouping(e, target);
         target = this.getActiveGroup();
       }
       else if (target && target.selectable) {
