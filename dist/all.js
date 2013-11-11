@@ -12658,6 +12658,21 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         this.canvas.moveTo(this, index);
       }
       return this;
+    },
+
+    /**
+     * Returns coordinates of a pointer relative to an object
+     * @param {Event} e Event to operate upon
+     * @param {Object} [pointer] Pointer to operate upon (instead of event)
+     * @return {Object} Coordinates of a pointer (x, y)
+     */
+    getLocalPointer: function(e, pointer) {
+      pointer = pointer || this.canvas.getPointer(e);
+      var objectLeftTop = this.translateToOriginPoint(this.getCenterPoint(), 'left', 'top');
+      return {
+        x: pointer.x - objectLeftTop.x,
+        y: pointer.y - objectLeftTop.y
+      };
     }
   });
 
@@ -21784,19 +21799,6 @@ fabric.util.object.extend(fabric.Text.prototype, {
     },
 
     /**
-     * Returns coordinates of a pointer relative to an object
-     * @return {Object} Coordinates of a pointer (x, y)
-     */
-    getLocalPointer: function(e) {
-      var pointer = this.canvas.getPointer(e);
-      var objectLeftTop = this.translateToOriginPoint(this.getCenterPoint(), 'left', 'top');
-      return {
-        x: pointer.x - objectLeftTop.x,
-        y: pointer.y - objectLeftTop.y
-      };
-    },
-
-    /**
      * Changes cursor location in a text depending on passed pointer (x/y) object
      * @param {Object} pointer Pointer object with x and y numeric properties
      */
@@ -21814,7 +21816,11 @@ fabric.util.object.extend(fabric.Text.prototype, {
      */
     getSelectionStartFromPointer: function(e) {
 
-      var localPointer = this.getLocalPointer(e),
+      var pointer = this.canvas.getPointer(e),
+          pClicked = new fabric.Point(pointer.x, pointer.y),
+          pLeftTop = new fabric.Point(this.left, this.top),
+          rotated = fabric.util.rotatePoint(pClicked, pLeftTop, fabric.util.degreesToRadians(-this.angle)),
+          localPointer = this.getLocalPointer(e, rotated),
           mouseOffsetX = localPointer.x,
           mouseOffsetY = localPointer.y,
           textLines = this.text.split(this._reNewline),
@@ -21823,6 +21829,9 @@ fabric.util.object.extend(fabric.Text.prototype, {
           height = 0,
           charIndex = 0,
           newSelectionStart;
+
+      // this.canvas.getContext().fillRect(pClicked.x, pClicked.y, 5, 5);
+      // this.canvas.getContext().strokeRect(rotated.x, rotated.y, 5, 5);
 
       for (var i = 0, len = textLines.length; i < len; i++) {
         height += this._getHeightOfLine(this.ctx, i) * this.scaleY;
