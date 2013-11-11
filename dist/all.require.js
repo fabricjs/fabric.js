@@ -10352,36 +10352,27 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
       var groupSelector = this._groupSelector;
 
-      // We initially clicked in an empty area, so we draw a box for multiple selection.
+      // We initially clicked in an empty area, so we draw a box for multiple selection
       if (groupSelector) {
         pointer = getPointer(e, this.upperCanvasEl);
 
         groupSelector.left = pointer.x - this._offset.left - groupSelector.ex;
         groupSelector.top = pointer.y - this._offset.top - groupSelector.ey;
+
         this.renderTop();
       }
       else if (!this._currentTransform) {
 
-        // alias style to elimintate unnecessary lookup
-        var style = this.upperCanvasEl.style;
-
-        // Here we are hovering the canvas then we will determine
-        // what part of the pictures we are hovering to change the caret symbol.
-        // We won't do that while dragging or rotating in order to improve the
-        // performance.
         target = this.findTarget(e);
 
         if (!target || target && !target.selectable) {
-          // no target - set default cursor
-          style.cursor = this.defaultCursor;
+          this.upperCanvasEl.style.cursor = this.defaultCursor;
         }
         else {
-          // set proper cursor
           this._setCursorFromEvent(e, target);
         }
       }
       else {
-        // object is being transformed (scaled/rotated/moved/etc.)
         this._transformObject(e);
       }
 
@@ -10396,29 +10387,39 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     _transformObject: function(e) {
 
       var pointer = getPointer(e, this.upperCanvasEl),
-          x = pointer.x,
-          y = pointer.y,
-          transform = this._currentTransform,
-          target = transform.target;
+          transform = this._currentTransform;
 
       transform.reset = false,
-      target.isMoving = true;
+      transform.target.isMoving = true;
 
       this._beforeScaleTransform(e, transform);
+      this._performTransformAction(e, transform, pointer);
 
-      if (transform.action === 'rotate') {
+      this.renderAll();
+    },
+
+    /**
+     * @private
+     */
+    _performTransformAction: function(e, transform, pointer) {
+      var x = pointer.x,
+          y = pointer.y,
+          target = transform.target,
+          action = transform.action;
+
+      if (action === 'rotate') {
         this._rotateObject(x, y);
         this._fire('rotating', target, e);
       }
-      else if (transform.action === 'scale') {
+      else if (action === 'scale') {
         this._onScale(e, transform, x, y);
         this._fire('scaling', target, e);
       }
-      else if (transform.action === 'scaleX') {
+      else if (action === 'scaleX') {
         this._scaleObject(x, y, 'x');
         this._fire('scaling', target, e);
       }
-      else if (transform.action === 'scaleY') {
+      else if (action === 'scaleY') {
         this._scaleObject(x, y, 'y');
         this._fire('scaling', target, e);
       }
@@ -10427,8 +10428,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         this._fire('moving', target, e);
         this._setCursor(this.moveCursor);
       }
-
-      this.renderAll();
     },
 
     /**
@@ -10485,9 +10484,10 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @param {Object} target Object that the mouse is hovering, if so.
      */
     _setCursorFromEvent: function (e, target) {
-      var s = this.upperCanvasEl.style;
+      var style = this.upperCanvasEl.style;
+
       if (!target) {
-        s.cursor = this.defaultCursor;
+        style.cursor = this.defaultCursor;
         return false;
       }
       else {
@@ -10498,29 +10498,38 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
                       && target._findTargetCorner(e, this._offset);
 
         if (!corner) {
-          s.cursor = target.hoverCursor || this.hoverCursor;
+          style.cursor = target.hoverCursor || this.hoverCursor;
         }
         else {
-          if (corner in cursorOffset) {
-            var n = Math.round((target.getAngle() % 360) / 45);
-            if (n < 0) {
-              n += 8; // full circle ahead
-            }
-            n += cursorOffset[corner];
-            // normalize n to be from 0 to 7
-            n %= 8;
-            s.cursor = cursorMap[n];
-          }
-          else if (corner === 'mtr' && target.hasRotatingPoint) {
-            s.cursor = this.rotationCursor;
-          }
-          else {
-            s.cursor = this.defaultCursor;
-            return false;
-          }
+          this._setCornerCursor(corner, target);
         }
       }
       return true;
+    },
+
+    /**
+     * @private
+     */
+    _setCornerCursor: function(corner, target) {
+      var style = this.upperCanvasEl.style;
+
+      if (corner in cursorOffset) {
+        var n = Math.round((target.getAngle() % 360) / 45);
+        if (n < 0) {
+          n += 8; // full circle ahead
+        }
+        n += cursorOffset[corner];
+        // normalize n to be from 0 to 7
+        n %= 8;
+        style.cursor = cursorMap[n];
+      }
+      else if (corner === 'mtr' && target.hasRotatingPoint) {
+        style.cursor = this.rotationCursor;
+      }
+      else {
+        style.cursor = this.defaultCursor;
+        return false;
+      }
     }
   });
 })();
