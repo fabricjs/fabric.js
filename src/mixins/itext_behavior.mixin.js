@@ -26,8 +26,6 @@
      * Initializes hidden textarea (needed to bring up keyboard in iOS)
      */
     initHiddenTextarea: function() {
-      if (!/(iPad|iPhone|iPod)/g.test(navigator.userAgent)) return;
-
       this.hiddenTextarea = fabric.document.createElement('textarea');
 
       this.hiddenTextarea.setAttribute('autocapitalize', 'off');
