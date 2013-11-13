@@ -271,12 +271,12 @@
    * This method is used to draw dashed line around selection area.
    * See <a href="http://stackoverflow.com/questions/4576724/dotted-stroke-in-canvas">dotted stroke in canvas</a>
    *
-   * @param ctx {Canvas} context
-   * @param x {Number} start x coordinate
-   * @param y {Number} start y coordinate
-   * @param x2 {Number} end x coordinate
-   * @param y2 {Number} end y coordinate
-   * @param da {Array} dash array pattern
+   * @param {CanvasRenderingContext2D} ctx context
+   * @param {Number} x  start x coordinate
+   * @param {Number} y start y coordinate
+   * @param {Number} x2 end x coordinate
+   * @param {Number} y2 end y coordinate
+   * @param {Array} da dash array pattern
    */
   function drawDashedLine(ctx, x, y, x2, y2, da) {
     var dx = x2 - x,
@@ -560,6 +560,47 @@
     }
   }
 
+  /**
+   * Returns true if context has transparent pixel at specified location (taking tolerance into account)
+   * @param {CanvasRenderingContext2D} ctx context
+   * @param {Number} x x coordinate
+   * @param {Number} y y coordinate
+   * @param {Number} tolerance Tolerance
+   */
+  function isTransparent(ctx, x, y, tolerance) {
+
+    // If tolerance is > 0 adjust start coords to take into account. If moves off Canvas fix to 0
+    if (tolerance > 0) {
+      if (x > tolerance) {
+        x -= tolerance;
+      }
+      else {
+        x = 0;
+      }
+      if (y > tolerance) {
+        y -= tolerance;
+      }
+      else {
+        y = 0;
+      }
+    }
+
+    var _isTransparent = true;
+    var imageData = ctx.getImageData(
+      x, y, (tolerance * 2) || 1, (tolerance * 2) || 1);
+
+    // Split image data - for tolerance > 1, pixelDataSize = 4;
+    for (var i = 3, l = imageData.data.length; i < l; i += 4) {
+      var temp = imageData.data[i];
+      _isTransparent = temp <= 0;
+      if (_isTransparent === false) break; // Stop if colour found
+    }
+
+    imageData = null;
+
+    return _isTransparent;
+  }
+
   fabric.util.removeFromArray = removeFromArray;
   fabric.util.degreesToRadians = degreesToRadians;
   fabric.util.radiansToDegrees = radiansToDegrees;
@@ -582,5 +623,6 @@
   fabric.util.getFunctionBody = getFunctionBody;
   fabric.util.drawArc = drawArc;
   fabric.util.normalizePoints = normalizePoints;
+  fabric.util.isTransparent = isTransparent;
 
 })(typeof exports !== 'undefined' ? exports : this);

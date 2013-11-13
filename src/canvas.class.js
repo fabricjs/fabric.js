@@ -285,47 +285,20 @@
      * @return {Boolean}
      */
     isTargetTransparent: function (target, x, y) {
-      var cacheContext = this.contextCache;
-
       var hasBorders = target.hasBorders,
           transparentCorners = target.transparentCorners;
 
       target.hasBorders = target.transparentCorners = false;
 
-      this._draw(cacheContext, target);
+      this._draw(this.contextCache, target);
 
       target.hasBorders = hasBorders;
       target.transparentCorners = transparentCorners;
 
-      // If tolerance is > 0 adjust start coords to take into account. If moves off Canvas fix to 0
-      if (this.targetFindTolerance > 0) {
-        if (x > this.targetFindTolerance) {
-          x -= this.targetFindTolerance;
-        }
-        else {
-          x = 0;
-        }
-        if (y > this.targetFindTolerance) {
-          y -= this.targetFindTolerance;
-        }
-        else {
-          y = 0;
-        }
-      }
+      var isTransparent = fabric.util.isTransparent(
+        this.contextCache, x, y, this.targetFindTolerance);
 
-      var isTransparent = true;
-      var imageData = cacheContext.getImageData(
-        x, y, (this.targetFindTolerance * 2) || 1, (this.targetFindTolerance * 2) || 1);
-
-      // Split image data - for tolerance > 1, pixelDataSize = 4;
-      for (var i = 3, l = imageData.data.length; i < l; i += 4) {
-        var temp = imageData.data[i];
-        isTransparent = temp <= 0;
-        if (isTransparent === false) break; //Stop if colour found
-      }
-
-      imageData = null;
-      this.clearContext(cacheContext);
+      this.clearContext(this.contextCache);
 
       return isTransparent;
     },
