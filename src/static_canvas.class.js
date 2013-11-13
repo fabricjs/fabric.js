@@ -1106,33 +1106,42 @@
 
       // if object is not on the bottom of stack
       if (idx !== 0) {
-        var newIdx;
-
-        if (intersecting) {
-          newIdx = idx;
-
-          // traverse down the stack looking for the nearest intersecting object
-          for (var i=idx-1; i>=0; --i) {
-
-            var isIntersecting = object.intersectsWithObject(this._objects[i]) ||
-                                 object.isContainedWithinObject(this._objects[i]) ||
-                                 this._objects[i].isContainedWithinObject(object);
-
-            if (isIntersecting) {
-              newIdx = i;
-              break;
-            }
-          }
-        }
-        else {
-          newIdx = idx-1;
-        }
+        var newIdx = this._findNewLowerIndex(object, idx, intersecting);
 
         removeFromArray(this._objects, object);
         this._objects.splice(newIdx, 0, object);
         this.renderAll && this.renderAll();
       }
       return this;
+    },
+
+    /**
+     * @private
+     */
+    _findNewLowerIndex: function(object, idx, intersecting) {
+      var newIdx;
+
+      if (intersecting) {
+        newIdx = idx;
+
+        // traverse down the stack looking for the nearest intersecting object
+        for (var i=idx-1; i>=0; --i) {
+
+          var isIntersecting = object.intersectsWithObject(this._objects[i]) ||
+                               object.isContainedWithinObject(this._objects[i]) ||
+                               this._objects[i].isContainedWithinObject(object);
+
+          if (isIntersecting) {
+            newIdx = i;
+            break;
+          }
+        }
+      }
+      else {
+        newIdx = idx - 1;
+      }
+
+      return newIdx;
     },
 
     /**
@@ -1147,33 +1156,42 @@
 
       // if object is not on top of stack (last item in an array)
       if (idx !== this._objects.length-1) {
-        var newIdx;
-
-        if (intersecting) {
-          newIdx = idx;
-
-          // traverse up the stack looking for the nearest intersecting object
-          for (var i = idx + 1; i < this._objects.length; ++i) {
-
-            var isIntersecting = object.intersectsWithObject(this._objects[i]) ||
-                                 object.isContainedWithinObject(this._objects[i]) ||
-                                 this._objects[i].isContainedWithinObject(object);
-
-            if (isIntersecting) {
-              newIdx = i;
-              break;
-            }
-          }
-        }
-        else {
-          newIdx = idx+1;
-        }
+        var newIdx = this._findNewUpperIndex(object, idx, intersecting);
 
         removeFromArray(this._objects, object);
         this._objects.splice(newIdx, 0, object);
         this.renderAll && this.renderAll();
       }
       return this;
+    },
+
+    /**
+     * @private
+     */
+    _findNewUpperIndex: function(object, idx, intersecting) {
+      var newIdx;
+
+      if (intersecting) {
+        newIdx = idx;
+
+        // traverse up the stack looking for the nearest intersecting object
+        for (var i = idx + 1; i < this._objects.length; ++i) {
+
+          var isIntersecting = object.intersectsWithObject(this._objects[i]) ||
+                               object.isContainedWithinObject(this._objects[i]) ||
+                               this._objects[i].isContainedWithinObject(object);
+
+          if (isIntersecting) {
+            newIdx = i;
+            break;
+          }
+        }
+      }
+      else {
+        newIdx = idx+1;
+      }
+
+      return newIdx;
     },
 
     /**
