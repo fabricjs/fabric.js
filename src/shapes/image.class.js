@@ -224,7 +224,7 @@
             '" width="', this.width,
             '" height="', this.height,
             '" preserveAspectRatio="none"',
-          '"></image>'
+          '></image>'
       );
 
       if (this.stroke || this.strokeDashArray) {
