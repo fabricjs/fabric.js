@@ -20933,8 +20933,6 @@ fabric.util.object.extend(fabric.Text.prototype, {
      * Initializes hidden textarea (needed to bring up keyboard in iOS)
      */
     initHiddenTextarea: function() {
-      if (!/(iPad|iPhone|iPod)/g.test(navigator.userAgent)) return;
-
       this.hiddenTextarea = fabric.document.createElement('textarea');
 
       this.hiddenTextarea.setAttribute('autocapitalize', 'off');
@@ -21830,9 +21828,6 @@ fabric.util.object.extend(fabric.Text.prototype, {
           charIndex = 0,
           newSelectionStart;
 
-      // this.canvas.getContext().fillRect(pClicked.x, pClicked.y, 5, 5);
-      // this.canvas.getContext().strokeRect(rotated.x, rotated.y, 5, 5);
-
       for (var i = 0, len = textLines.length; i < len; i++) {
         height += this._getHeightOfLine(this.ctx, i) * this.scaleY;
 
@@ -21915,22 +21910,27 @@ fabric.util.object.extend(fabric.Text.prototype, {
       this.isEditing = true;
 
       this._updateTextarea();
-      this._saveProps();
-
-      this.hoverCursor = 'text';
-      this.canvas.defaultCursor = 'text';
-      this.canvas.moveCursor = 'text';
-
-      this.hasControls = false;
-      this.borderColor = this.editingBorderColor;
-      this.selectable = false;
-      this.lockMovementX = true;
-      this.lockMovementY = true;
+      this._saveEditingProps();
+      this._setEditingProps();
 
       this._tick();
       this.canvas.renderAll();
 
       return this;
+    },
+
+    /**
+     * @private
+     */
+    _setEditingProps: function() {
+      this.hoverCursor =
+      this.canvas.defaultCursor =
+      this.canvas.moveCursor = 'text';
+
+      this.borderColor = this.editingBorderColor;
+
+      this.hasControls = this.selectable = false;
+      this.lockMovementX = this.lockMovementY = true;
     },
 
     /**
@@ -21947,7 +21947,7 @@ fabric.util.object.extend(fabric.Text.prototype, {
     /**
      * @private
      */
-    _saveProps: function() {
+    _saveEditingProps: function() {
       this._savedProps = {
         hasControls: this.hasControls,
         borderColor: this.borderColor,
@@ -21962,7 +21962,7 @@ fabric.util.object.extend(fabric.Text.prototype, {
     /**
      * @private
      */
-    _restoreProps: function() {
+    _restoreEditingProps: function() {
       if (!this._savedProps) return;
 
       this.hoverCursor = this._savedProps.overCursor;
@@ -21988,7 +21988,7 @@ fabric.util.object.extend(fabric.Text.prototype, {
       this.hiddenTextarea && this.hiddenTextarea.blur();
 
       this.abortCursorAnimation();
-      this._restoreProps();
+      this._restoreEditingProps();
       this._currentCursorOpacity = 0;
 
       return this;
@@ -21998,33 +21998,8 @@ fabric.util.object.extend(fabric.Text.prototype, {
      * Inserts a character where cursor is (replacing selection if one exists)
      */
     removeChars: function(e) {
-
       if (this.selectionStart === this.selectionEnd) {
-        if (this.selectionStart !== 0) {
-
-          if (e.metaKey) {
-            // remove all till the start of current line
-            var leftLineBoundary = this.findLineBoundaryLeft(this.selectionStart);
-
-            this._removeCharsFromTo(leftLineBoundary, this.selectionStart);
-            this.selectionStart = leftLineBoundary;
-          }
-          else if (e.altKey) {
-            // remove all till the start of current word
-            var leftWordBoundary = this.findWordBoundaryLeft(this.selectionStart);
-
-            this._removeCharsFromTo(leftWordBoundary, this.selectionStart);
-            this.selectionStart = leftWordBoundary;
-          }
-          else {
-            var isBeginningOfLine = this.text.slice(this.selectionStart-1, this.selectionStart) === '\n';
-            this.removeStyleObject(isBeginningOfLine);
-
-            this.selectionStart--;
-            this.text = this.text.slice(0, this.selectionStart) +
-                        this.text.slice(this.selectionStart + 1);
-          }
-        }
+        this._removeCharsNearCursor(e);
       }
       else {
         this._removeCharsFromTo(this.selectionStart, this.selectionEnd);
@@ -22032,13 +22007,7 @@ fabric.util.object.extend(fabric.Text.prototype, {
 
       this.selectionEnd = this.selectionStart;
 
-      // remove any extraneous styles "at the end"
-      var textLines = this.text.split(this._reNewline);
-      for (var prop in this.styles) {
-        if (!textLines[prop]) {
-          delete this.styles[prop];
-        }
-      }
+      this._removeExtraneousStyles();
 
       if (this.canvas) {
         // TODO: double renderAll gets rid of text box shift happenning sometimes
@@ -22048,6 +22017,49 @@ fabric.util.object.extend(fabric.Text.prototype, {
 
       this.setCoords();
       this.fire('text:changed');
+    },
+
+    /**
+     * @private
+     */
+    _removeExtraneousStyles: function() {
+      var textLines = this.text.split(this._reNewline);
+      for (var prop in this.styles) {
+        if (!textLines[prop]) {
+          delete this.styles[prop];
+        }
+      }
+    },
+
+    /**
+     * @private
+     */
+    _removeCharsNearCursor: function(e) {
+      if (this.selectionStart !== 0) {
+
+        if (e.metaKey) {
+          // remove all till the start of current line
+          var leftLineBoundary = this.findLineBoundaryLeft(this.selectionStart);
+
+          this._removeCharsFromTo(leftLineBoundary, this.selectionStart);
+          this.selectionStart = leftLineBoundary;
+        }
+        else if (e.altKey) {
+          // remove all till the start of current word
+          var leftWordBoundary = this.findWordBoundaryLeft(this.selectionStart);
+
+          this._removeCharsFromTo(leftWordBoundary, this.selectionStart);
+          this.selectionStart = leftWordBoundary;
+        }
+        else {
+          var isBeginningOfLine = this.text.slice(this.selectionStart-1, this.selectionStart) === '\n';
+          this.removeStyleObject(isBeginningOfLine);
+
+          this.selectionStart--;
+          this.text = this.text.slice(0, this.selectionStart) +
+                      this.text.slice(this.selectionStart + 1);
+        }
+      }
     },
 
     /**
@@ -22169,9 +22181,9 @@ fabric.util.object.extend(fabric.Text.prototype, {
       // short-circuit
       if (this.isEmptyStyles()) return;
 
-      var cursorLocation = this.get2DCursorLocation();
-      var lineIndex = cursorLocation.lineIndex;
-      var charIndex = cursorLocation.charIndex;
+      var cursorLocation = this.get2DCursorLocation(),
+          lineIndex = cursorLocation.lineIndex,
+          charIndex = cursorLocation.charIndex;
 
       if (!this.styles[lineIndex]) {
         this.styles[lineIndex] = { };
@@ -22209,9 +22221,9 @@ fabric.util.object.extend(fabric.Text.prototype, {
      */
     removeStyleObject: function(isBeginningOfLine, index) {
 
-      var cursorLocation = this.get2DCursorLocation(index);
-      var lineIndex = cursorLocation.lineIndex;
-      var charIndex = cursorLocation.charIndex;
+      var cursorLocation = this.get2DCursorLocation(index),
+          lineIndex = cursorLocation.lineIndex,
+          charIndex = cursorLocation.charIndex;
 
       if (isBeginningOfLine) {
 
