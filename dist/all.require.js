@@ -9296,9 +9296,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     _scaleObject: function (x, y, by) {
       var t = this._currentTransform,
           offset = this._offset,
-          target = t.target;
-
-      var lockScalingX = target.get('lockScalingX'),
+          target = t.target,
+          lockScalingX = target.get('lockScalingX'),
           lockScalingY = target.get('lockScalingY');
 
       if (lockScalingX && lockScalingY) return;
@@ -9858,23 +9857,39 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     drawControls: function(ctx) {
       var activeGroup = this.getActiveGroup();
       if (activeGroup) {
-        ctx.save();
-        fabric.Group.prototype.transform.call(activeGroup, ctx);
-        activeGroup.drawBorders(ctx).drawControls(ctx);
-        ctx.restore();
+        this._drawGroupControls(ctx);
       }
       else {
-        for (var i = 0, len = this._objects.length; i < len; ++i) {
-          if (!this._objects[i] || !this._objects[i].active) continue;
-
-          ctx.save();
-          fabric.Object.prototype.transform.call(this._objects[i], ctx);
-          this._objects[i].drawBorders(ctx).drawControls(ctx);
-          ctx.restore();
-
-          this.lastRenderedObjectWithControlsAboveOverlay = this._objects[i];
-        }
+        this._drawObjectsControls(ctx);
       }
+    },
+
+    /**
+     * @private
+     */
+    _drawGroupControls: function(ctx, activeGroup) {
+      this._drawControls(ctx, activeGroup, 'Group');
+    },
+
+    /**
+     * @private
+     */
+    _drawObjectsControls: function(ctx) {
+      for (var i = 0, len = this._objects.length; i < len; ++i) {
+        if (!this._objects[i] || !this._objects[i].active) continue;
+        this._drawControls(ctx, this._objects[i], 'Object');
+        this.lastRenderedObjectWithControlsAboveOverlay = this._objects[i];
+      }
+    },
+
+    /**
+     * @private
+     */
+    _drawControls: function(ctx, object, klass) {
+      ctx.save();
+      fabric[klass].prototype.transform.call(object, ctx);
+      object.drawBorders(ctx).drawControls(ctx);
+      ctx.restore();
     }
   });
 
