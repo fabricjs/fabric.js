@@ -716,27 +716,30 @@
     findTarget: function (e, skipGroup) {
       if (this.skipTargetFind) return;
 
-      var target,
-          pointer = this.getPointer(e);
-
       if (this._isLastRenderedObject(e)) {
-        target = this.lastRenderedObjectWithControlsAboveOverlay;
-        return target;
+        return this.lastRenderedObjectWithControlsAboveOverlay;
       }
 
       // first check current group (if one exists)
       var activeGroup = this.getActiveGroup();
       if (activeGroup && !skipGroup && this.containsPoint(e, activeGroup)) {
-        target = activeGroup;
-        return target;
+        return activeGroup;
       }
 
-      // then check all of the objects on canvas
+      return this._searchPossibleTargets(e);
+    },
+
+    /**
+     * @private
+     */
+    _searchPossibleTargets: function(e) {
+
       // Cache all targets where their bounding box contains point.
-      var possibleTargets = [];
+      var possibleTargets = [],
+          target,
+          pointer = this.getPointer(e);
 
       for (var i = this._objects.length; i--; ) {
-
         if (this._objects[i] &&
             this._objects[i].visible &&
             this._objects[i].evented &&
@@ -752,6 +755,7 @@
           }
         }
       }
+
       for (var j = 0, len = possibleTargets.length; j < len; j++) {
         pointer = this.getPointer(e);
         var isTransparent = this.isTargetTransparent(possibleTargets[j], pointer.x, pointer.y);
