@@ -79,28 +79,40 @@
      * @private
      */
     _createActiveGroup: function(target, e) {
-      if (this._activeObject) {
-        // only if there's an active object
-        if (target !== this._activeObject) {
-          // and that object is not the actual target
-          var objects = this.getObjects();
-          var isActiveLower = objects.indexOf(this._activeObject) < objects.indexOf(target);
-          var groupObjects = isActiveLower
-              ? [ target, this._activeObject ]
-              : [ this._activeObject, target ];
 
-          var group = new fabric.Group(groupObjects, { originX: 'center', originY: 'center' });
+      if (this._activeObject) {
+
+        if (target !== this._activeObject) {
+          var group = this._createGroup(target);
 
           this.setActiveGroup(group);
           this._activeObject = null;
 
-          var activeGroup = this.getActiveGroup();
-
-          this.fire('selection:created', { target: activeGroup, e: e });
+          this.fire('selection:created', { target: group, e: e });
         }
       }
-      // activate target object in any case
+
       target.set('active', true);
+    },
+
+    /**
+     * @private
+     * @param {Object} target
+     */
+    _createGroup: function(target) {
+
+      var objects = this.getObjects();
+
+      var isActiveLower = objects.indexOf(this._activeObject) < objects.indexOf(target);
+
+      var groupObjects = isActiveLower
+          ? [ this._activeObject, target ]
+          : [ target, this._activeObject ];
+
+      return new fabric.Group(groupObjects, {
+        originX: 'center',
+        originY: 'center'
+      });
     },
 
     /**

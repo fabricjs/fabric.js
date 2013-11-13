@@ -1052,8 +1052,14 @@
       if (this[property] && this[property].source) {
         markup.push(
           '<rect x="', this[property].offsetX, '" y="', this[property].offsetY, '" ',
-            'width="', (this[property].repeat === 'repeat-y' || this[property].repeat === 'no-repeat' ? this[property].source.width : this.width),
-            '" height="', (this[property].repeat === 'repeat-x' || this[property].repeat === 'no-repeat' ? this[property].source.height : this.height),
+            'width="',
+              (this[property].repeat === 'repeat-y' || this[property].repeat === 'no-repeat'
+                ? this[property].source.width
+                : this.width),
+            '" height="',
+              (this[property].repeat === 'repeat-x' || this[property].repeat === 'no-repeat'
+                ? this[property].source.height
+                : this.height),
             '" fill="url(#' + property + 'Pattern)"',
           '></rect>'
         );
