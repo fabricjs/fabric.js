@@ -80,16 +80,14 @@
      */
     _createActiveGroup: function(target, e) {
 
-      if (this._activeObject) {
+      if (this._activeObject && target !== this._activeObject) {
 
-        if (target !== this._activeObject) {
-          var group = this._createGroup(target);
+        var group = this._createGroup(target);
 
-          this.setActiveGroup(group);
-          this._activeObject = null;
+        this.setActiveGroup(group);
+        this._activeObject = null;
 
-          this.fire('selection:created', { target: group, e: e });
-        }
+        this.fire('selection:created', { target: group, e: e });
       }
 
       target.set('active', true);
