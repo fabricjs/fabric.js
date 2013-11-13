@@ -1215,8 +1215,8 @@
         this.styles[lineIndex + 1] = { };
       }
 
-      var currentCharStyle = this.styles[lineIndex][charIndex - 1];
-      var newLineStyles = { };
+      var currentCharStyle = this.styles[lineIndex][charIndex - 1],
+          newLineStyles = { };
 
       // if there's nothing after cursor,
       // we clone current char style onto the next (otherwise empty) line
@@ -1245,8 +1245,8 @@
      */
     insertCharStyleObject: function(lineIndex, charIndex) {
 
-      var currentLineStyles = this.styles[lineIndex];
-      var currentLineStylesCloned = clone(currentLineStyles);
+      var currentLineStyles = this.styles[lineIndex],
+          currentLineStylesCloned = clone(currentLineStyles);
 
       if (charIndex === 0) {
         charIndex = 1;
@@ -1320,9 +1320,9 @@
 
       if (isBeginningOfLine) {
 
-        var textLines = this.text.split(this._reNewline);
-        var textOnPreviousLine = textLines[lineIndex - 1];
-        var newCharIndexOnPrevLine = textOnPreviousLine.length;
+        var textLines = this.text.split(this._reNewline),
+            textOnPreviousLine = textLines[lineIndex - 1],
+            newCharIndexOnPrevLine = textOnPreviousLine.length;
 
         if (!this.styles[lineIndex - 1]) {
           this.styles[lineIndex - 1] = { };
