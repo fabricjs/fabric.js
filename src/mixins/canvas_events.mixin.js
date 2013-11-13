@@ -30,7 +30,7 @@
      * Adds mouse listeners to canvas
      * @private
      */
-    _initEvents: function () {
+    _initEventListeners: function () {
 
       this._bindEvents();
 
@@ -66,6 +66,27 @@
       this._onShake = this._onShake.bind(this);
       this._onOrientationChange = this._onOrientationChange.bind(this);
       this._onMouseWheel = this._onMouseWheel.bind(this);
+    },
+
+    /**
+     * Removes all event listeners
+     */
+    removeListeners: function() {
+      removeListener(fabric.window, 'resize', this._onResize);
+
+      removeListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
+      removeListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
+      removeListener(this.upperCanvasEl, 'mousewheel', this._onMouseWheel);
+
+      removeListener(this.upperCanvasEl, 'touchstart', this._onMouseDown);
+      removeListener(this.upperCanvasEl, 'touchmove', this._onMouseMove);
+
+      if (typeof Event !== 'undefined' && 'remove' in Event) {
+        Event.remove(this.upperCanvasEl, 'gesture', this._onGesture);
+        Event.remove(this.upperCanvasEl, 'drag', this._onDrag);
+        Event.remove(this.upperCanvasEl, 'orientation', this._onOrientationChange);
+        Event.remove(this.upperCanvasEl, 'shake', this._onShake);
+      }
     },
 
     /**

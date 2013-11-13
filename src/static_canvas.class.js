@@ -11,7 +11,6 @@
   var extend = fabric.util.object.extend,
       getElementOffset = fabric.util.getElementOffset,
       removeFromArray = fabric.util.removeFromArray,
-      removeListener = fabric.util.removeListener,
 
       CANVAS_INIT_ERROR = new Error('Could not initialize `canvas` element');
 
@@ -849,20 +848,9 @@
       if (activeGroup) {
         this.discardActiveGroup();
       }
+
       var data = {
-        objects: this.getObjects().map(function (instance) {
-          // TODO (kangax): figure out how to clean this up
-          var originalValue;
-          if (!this.includeDefaultValues) {
-            originalValue = instance.includeDefaultValues;
-            instance.includeDefaultValues = false;
-          }
-          var object = instance[methodName](propertiesToInclude);
-          if (!this.includeDefaultValues) {
-            instance.includeDefaultValues = originalValue;
-          }
-          return object;
-        }, this)
+        objects: this._toObjects(methodName, propertiesToInclude)
       };
 
       extend(data, this.__serializeBgOverlay());
@@ -871,9 +859,37 @@
 
       if (activeGroup) {
         this.setActiveGroup(new fabric.Group(activeGroup.getObjects()));
-        activeGroup.forEachObject(function(o) { o.set('active', true) });
+        activeGroup.forEachObject(function(o) {
+          o.set('active', true);
+        });
       }
       return data;
+    },
+
+    /**
+     *
+     */
+    _toObjects: function(methodName, propertiesToInclude) {
+      return this.getObjects().map(function(instance) {
+        return this._toObject(instance, methodName, propertiesToInclude);
+      }, this);
+    },
+
+    /**
+     * @private
+     */
+    _toObject: function(instance, methodName, propertiesToInclude) {
+      var originalValue;
+
+      if (!this.includeDefaultValues) {
+        originalValue = instance.includeDefaultValues;
+        instance.includeDefaultValues = false;
+      }
+      var object = instance[methodName](propertiesToInclude);
+      if (!this.includeDefaultValues) {
+        instance.includeDefaultValues = originalValue;
+      }
+      return object;
     },
 
     /**
@@ -1174,31 +1190,13 @@
     },
 
     /**
-     * Clears a canvas element and removes all event handlers.
+     * Clears a canvas element and removes all event listeners
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
     dispose: function () {
       this.clear();
-
-      if (!this.interactive) return this;
-
-      removeListener(fabric.window, 'resize', this._onResize);
-
-      removeListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
-      removeListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
-      removeListener(this.upperCanvasEl, 'mousewheel', this._onMouseWheel);
-
-      removeListener(this.upperCanvasEl, 'touchstart', this._onMouseDown);
-      removeListener(this.upperCanvasEl, 'touchmove', this._onMouseMove);
-
-      if (typeof Event !== 'undefined' && 'remove' in Event) {
-        Event.remove(this.upperCanvasEl, 'gesture', this._onGesture);
-        Event.remove(this.upperCanvasEl, 'drag', this._onDrag);
-        Event.remove(this.upperCanvasEl, 'orientation', this._onOrientationChange);
-        Event.remove(this.upperCanvasEl, 'shake', this._onShake);
-      }
-
+      this.interactive && this.removeListeners();
       return this;
     },
 
