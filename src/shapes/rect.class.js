@@ -107,7 +107,7 @@
           y = -this.height / 2,
           w = this.width,
           h = this.height,
-          isInPathGroup = this.group && this.group.type !== 'group';
+          isInPathGroup = this.group && this.group.type === 'path-group';
 
       ctx.beginPath();
       ctx.globalAlpha = isInPathGroup ? (ctx.globalAlpha * this.opacity) : this.opacity;

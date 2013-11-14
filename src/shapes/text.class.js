@@ -346,7 +346,7 @@
      */
     _render: function(ctx) {
 
-      var isInPathGroup = this.group && this.group.type !== 'group';
+      var isInPathGroup = this.group && this.group.type === 'path-group';
       if (isInPathGroup && !this.transformMatrix) {
         ctx.translate(-this.group.width/2 + this.left, -this.group.height / 2 + this.top);
       }

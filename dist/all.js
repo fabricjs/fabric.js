@@ -14263,7 +14263,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     _render: function(ctx) {
       ctx.beginPath();
 
-      var isInPathGroup = this.group && this.group.type !== 'group';
+      var isInPathGroup = this.group && this.group.type === 'path-group';
       if (isInPathGroup && !this.transformMatrix) {
         ctx.translate(-this.group.width/2 + this.left, -this.group.height / 2 + this.top);
       }
@@ -15022,7 +15022,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           y = -this.height / 2,
           w = this.width,
           h = this.height,
-          isInPathGroup = this.group && this.group.type !== 'group';
+          isInPathGroup = this.group && this.group.type === 'path-group';
 
       ctx.beginPath();
       ctx.globalAlpha = isInPathGroup ? (ctx.globalAlpha * this.opacity) : this.opacity;
@@ -17213,7 +17213,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       ctx.save();
       var m = this.transformMatrix;
-      var isInPathGroup = this.group && this.group.type !== 'group';
+      var isInPathGroup = this.group && this.group.type === 'path-group';
 
       // this._resetWidthHeight();
       if (isInPathGroup) {
@@ -19161,7 +19161,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      */
     _render: function(ctx) {
 
-      var isInPathGroup = this.group && this.group.type !== 'group';
+      var isInPathGroup = this.group && this.group.type === 'path-group';
       if (isInPathGroup && !this.transformMatrix) {
         ctx.translate(-this.group.width/2 + this.left, -this.group.height / 2 + this.top);
       }
