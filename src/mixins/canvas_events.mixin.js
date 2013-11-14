@@ -1,14 +1,14 @@
 (function(){
 
   var cursorMap = [
-      'n-resize',
-      'ne-resize',
-      'e-resize',
-      'se-resize',
-      's-resize',
-      'sw-resize',
-      'w-resize',
-      'nw-resize'
+    'n-resize',
+    'ne-resize',
+    'e-resize',
+    'se-resize',
+    's-resize',
+    'sw-resize',
+    'w-resize',
+    'nw-resize'
   ],
   cursorOffset = {
     'mt': 0, // n
@@ -195,15 +195,18 @@
 
       return !!(
         (target && (
-        target.isMoving ||
-        target !== activeObject)) ||
-        (!target && !!activeObject) ||
-        (!target && !activeObject && !this._groupSelector) ||
+          target.isMoving ||
+          target !== activeObject))
+        ||
+        (!target && !!activeObject)
+        ||
+        (!target && !activeObject && !this._groupSelector)
+        ||
         (pointer &&
-        this._previousPointer &&
-        this.selection && (
-        pointer.x !== this._previousPointer.x ||
-        pointer.y !== this._previousPointer.y))
+          this._previousPointer &&
+          this.selection && (
+          pointer.x !== this._previousPointer.x ||
+          pointer.y !== this._previousPointer.y))
       );
     },
 
@@ -370,16 +373,18 @@
       // save pointer for check in __onMouseUp event
       this._previousPointer = pointer;
 
-      var shouldRender = this._shouldRender(target, pointer);
+      var shouldRender = this._shouldRender(target, pointer),
+          shouldGroup = this._shouldGroup(e, target);
 
       if (this._shouldClearSelection(e, target)) {
         this._clearSelection(e, target, pointer);
       }
-      else if (this._shouldGroup(e, target)) {
+      else if (shouldGroup) {
         this._handleGrouping(e, target);
         target = this.getActiveGroup();
       }
-      else if (target && target.selectable) {
+
+      if (target && target.selectable && !shouldGroup) {
         this._beforeTransform(e, target);
         this._setupCurrentTransform(e, target);
       }
@@ -413,7 +418,12 @@
      * @private
      */
     _clearSelection: function(e, target, pointer) {
-      if (this.selection) {
+      this.deactivateAllWithDispatch(e);
+
+      if (target && target.selectable) {
+        this.setActiveObject(target, e);
+      }
+      else if (this.selection) {
         this._groupSelector = {
           ex: pointer.x,
           ey: pointer.y,
@@ -421,8 +431,6 @@
           left: 0
         };
       }
-      this.deactivateAllWithDispatch(e);
-      target && target.selectable && this.setActiveObject(target, e);
     },
 
     /**
@@ -619,7 +627,7 @@
     _setCursorFromEvent: function (e, target) {
       var style = this.upperCanvasEl.style;
 
-      if (!target) {
+      if (!target || !target.selectable) {
         style.cursor = this.defaultCursor;
         return false;
       }
@@ -647,14 +655,7 @@
       var style = this.upperCanvasEl.style;
 
       if (corner in cursorOffset) {
-        var n = Math.round((target.getAngle() % 360) / 45);
-        if (n < 0) {
-          n += 8; // full circle ahead
-        }
-        n += cursorOffset[corner];
-        // normalize n to be from 0 to 7
-        n %= 8;
-        style.cursor = cursorMap[n];
+        style.cursor = this._getRotatedCornerCursor(corner, target);
       }
       else if (corner === 'mtr' && target.hasRotatingPoint) {
         style.cursor = this.rotationCursor;
@@ -663,6 +664,22 @@
         style.cursor = this.defaultCursor;
         return false;
       }
+    },
+
+    /**
+     * @private
+     */
+    _getRotatedCornerCursor: function(corner, target) {
+      var n = Math.round((target.getAngle() % 360) / 45);
+
+      if (n < 0) {
+        n += 8; // full circle ahead
+      }
+      n += cursorOffset[corner];
+      // normalize n to be from 0 to 7
+      n %= 8;
+
+      return cursorMap[n];
     }
   });
 })();

@@ -1031,7 +1031,7 @@
     drawControls: function(ctx) {
       var activeGroup = this.getActiveGroup();
       if (activeGroup) {
-        this._drawGroupControls(ctx);
+        this._drawGroupControls(ctx, activeGroup);
       }
       else {
         this._drawObjectsControls(ctx);
