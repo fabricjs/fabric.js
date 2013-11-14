@@ -236,7 +236,6 @@
         this.drawControls(ctx);
       }
       ctx.restore();
-      this.setCoords();
     },
 
     /**

@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures minifier=uglifyjs` */
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.3.10" };
+var fabric = fabric || { version: "1.3.11" };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -9167,7 +9167,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @param {fabric.Object} target
      */
     _shouldClearSelection: function (e, target) {
-      var activeGroup = this.getActiveGroup();
+      var activeGroup = this.getActiveGroup(),
+          activeObject = this.getActiveObject();
 
       return (
         !target
@@ -9179,6 +9180,11 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
           !e.shiftKey)
         ||
         (target && !target.evented)
+        ||
+        (target &&
+          !target.selectable &&
+          activeObject &&
+          activeObject !== target)
       );
     },
 
@@ -16757,7 +16763,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         this.drawControls(ctx);
       }
       ctx.restore();
-      this.setCoords();
     },
 
     /**
