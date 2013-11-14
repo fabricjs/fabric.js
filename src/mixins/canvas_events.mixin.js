@@ -1,14 +1,14 @@
 (function(){
 
   var cursorMap = [
-      'n-resize',
-      'ne-resize',
-      'e-resize',
-      'se-resize',
-      's-resize',
-      'sw-resize',
-      'w-resize',
-      'nw-resize'
+    'n-resize',
+    'ne-resize',
+    'e-resize',
+    'se-resize',
+    's-resize',
+    'sw-resize',
+    'w-resize',
+    'nw-resize'
   ],
   cursorOffset = {
     'mt': 0, // n
@@ -195,15 +195,18 @@
 
       return !!(
         (target && (
-        target.isMoving ||
-        target !== activeObject)) ||
-        (!target && !!activeObject) ||
-        (!target && !activeObject && !this._groupSelector) ||
+          target.isMoving ||
+          target !== activeObject))
+        ||
+        (!target && !!activeObject)
+        ||
+        (!target && !activeObject && !this._groupSelector)
+        ||
         (pointer &&
-        this._previousPointer &&
-        this.selection && (
-        pointer.x !== this._previousPointer.x ||
-        pointer.y !== this._previousPointer.y))
+          this._previousPointer &&
+          this.selection && (
+          pointer.x !== this._previousPointer.x ||
+          pointer.y !== this._previousPointer.y))
       );
     },
 
@@ -619,7 +622,7 @@
     _setCursorFromEvent: function (e, target) {
       var style = this.upperCanvasEl.style;
 
-      if (!target) {
+      if (!target || !target.selectable) {
         style.cursor = this.defaultCursor;
         return false;
       }
@@ -647,14 +650,7 @@
       var style = this.upperCanvasEl.style;
 
       if (corner in cursorOffset) {
-        var n = Math.round((target.getAngle() % 360) / 45);
-        if (n < 0) {
-          n += 8; // full circle ahead
-        }
-        n += cursorOffset[corner];
-        // normalize n to be from 0 to 7
-        n %= 8;
-        style.cursor = cursorMap[n];
+        style.cursor = this._getRotatedCornerCursor(corner, target);
       }
       else if (corner === 'mtr' && target.hasRotatingPoint) {
         style.cursor = this.rotationCursor;
@@ -663,6 +659,22 @@
         style.cursor = this.defaultCursor;
         return false;
       }
+    }
+
+    /**
+     * @private
+     */
+    _getRotatedCornerCursor: function(corner, target) {
+      var n = Math.round((target.getAngle() % 360) / 45);
+      
+      if (n < 0) {
+        n += 8; // full circle ahead
+      }
+      n += cursorOffset[corner];
+      // normalize n to be from 0 to 7
+      n %= 8;
+
+      return cursorMap[n];
     }
   });
 })();
