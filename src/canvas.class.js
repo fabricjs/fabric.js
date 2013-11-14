@@ -309,7 +309,8 @@
      * @param {fabric.Object} target
      */
     _shouldClearSelection: function (e, target) {
-      var activeGroup = this.getActiveGroup();
+      var activeGroup = this.getActiveGroup(),
+          activeObject = this.getActiveObject();
 
       return (
         !target
@@ -321,6 +322,11 @@
           !e.shiftKey)
         ||
         (target && !target.evented)
+        ||
+        (target &&
+          !target.selectable &&
+          activeObject &&
+          activeObject !== target)
       );
     },
 
