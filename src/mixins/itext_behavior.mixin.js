@@ -18,8 +18,8 @@
      * Initializes key handlers
      */
     initKeyHandlers: function() {
-      fabric.util.addListener(document, 'keydown', this.onKeyDown.bind(this));
-      fabric.util.addListener(document, 'keypress', this.onKeyPress.bind(this));
+      fabric.util.addListener(fabric.document, 'keydown', this.onKeyDown.bind(this));
+      fabric.util.addListener(fabric.document, 'keypress', this.onKeyPress.bind(this));
     },
 
     /**
