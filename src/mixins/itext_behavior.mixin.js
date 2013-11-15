@@ -272,7 +272,7 @@
      * @param {Event} e Event object
      */
     onKeyDown: function(e) {
-      if (!this.isEditing || e.ctrlKey) return;
+      if (!this.isEditing) return;
 
       if (e.keyCode in this._keysMap) {
         this[this._keysMap[e.keyCode]](e);
