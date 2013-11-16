@@ -21057,8 +21057,8 @@ fabric.util.object.extend(fabric.Text.prototype, {
      * Initializes key handlers
      */
     initKeyHandlers: function() {
-      fabric.util.addListener(document, 'keydown', this.onKeyDown.bind(this));
-      fabric.util.addListener(document, 'keypress', this.onKeyPress.bind(this));
+      fabric.util.addListener(fabric.document, 'keydown', this.onKeyDown.bind(this));
+      fabric.util.addListener(fabric.document, 'keypress', this.onKeyPress.bind(this));
     },
 
     /**
@@ -21326,7 +21326,7 @@ fabric.util.object.extend(fabric.Text.prototype, {
      * @param {Event} e Event object
      */
     onKeyDown: function(e) {
-      if (!this.isEditing || e.ctrlKey) return;
+      if (!this.isEditing) return;
 
       if (e.keyCode in this._keysMap) {
         this[this._keysMap[e.keyCode]](e);
