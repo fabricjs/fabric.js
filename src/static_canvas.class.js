@@ -53,7 +53,8 @@
     /**
      * Background image of canvas instance.
      * Should be set via {@link fabric.StaticCanvas#setBackgroundImage}.
-     * <b>Backwards incompatibility note:</b> The "backgroundImageOpacity" and "backgroundImageStretch" properties are deprecated since 1.3.9.
+     * <b>Backwards incompatibility note:</b> The "backgroundImageOpacity"
+     * and "backgroundImageStretch" properties are deprecated since 1.3.9.
      * Use {@link fabric.Image#opacity}, {@link fabric.Image#width} and {@link fabric.Image#height}.
      * @type fabric.Image
      * @default
@@ -72,7 +73,8 @@
     /**
      * Overlay image of canvas instance.
      * Should be set via {@link fabric.StaticCanvas#setOverlayImage}.
-     * <b>Backwards incompatibility note:</b> The "overlayImageLeft" and "overlayImageTop" properties are deprecated since 1.3.9.
+     * <b>Backwards incompatibility note:</b> The "overlayImageLeft"
+     * and "overlayImageTop" properties are deprecated since 1.3.9.
      * Use {@link fabric.Image#left} and {@link fabric.Image#top}.
      * @type fabric.Image
      * @default
@@ -303,7 +305,8 @@
 
     /**
      * @private
-     * @param {String} property Property to set ({@link fabric.StaticCanvas#backgroundImage|backgroundImage} or {@link fabric.StaticCanvas#overlayImage|overlayImage})
+     * @param {String} property Property to set ({@link fabric.StaticCanvas#backgroundImage|backgroundImage}
+     * or {@link fabric.StaticCanvas#overlayImage|overlayImage})
      * @param {(fabric.Image|String)} image fabric.Image instance or URL of an image to set background or overlay to
      * @param {Function} callback Callback to invoke when image is loaded and set as background or overlay
      * @param {Object} [options] Optional options to set for the {@link fabric.Image|image}.
@@ -325,7 +328,8 @@
 
     /**
      * @private
-     * @param {String} property Property to set ({@link fabric.StaticCanvas#backgroundColor|backgroundColor} or {@link fabric.StaticCanvas#overlayColor|overlayColor})
+     * @param {String} property Property to set ({@link fabric.StaticCanvas#backgroundColor|backgroundColor}
+     * or {@link fabric.StaticCanvas#overlayColor|overlayColor})
      * @param {(Object|String)} color Object with pattern information or color value
      * @param {Function} [callback] Callback is invoked when color is set
      */
