@@ -269,7 +269,8 @@
       37: 'moveCursorLeft',
       38: 'moveCursorUp',
       39: 'moveCursorRight',
-      40: 'moveCursorDown'
+      40: 'moveCursorDown',
+      46: 'forwardDelete'
     },
 
     /**
@@ -309,7 +310,9 @@
      * Forward delete
      */
     forwardDelete: function(e) {
-      this.moveCursorRight(e);
+      if (this.selectionStart === this.selectionEnd) {
+        this.moveCursorRight(e);
+      }
       this.removeChars(e);
     },
 

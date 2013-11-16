@@ -21308,7 +21308,8 @@ fabric.util.object.extend(fabric.Text.prototype, {
       37: 'moveCursorLeft',
       38: 'moveCursorUp',
       39: 'moveCursorRight',
-      40: 'moveCursorDown'
+      40: 'moveCursorDown',
+      46: 'forwardDelete'
     },
 
     /**
@@ -21348,7 +21349,9 @@ fabric.util.object.extend(fabric.Text.prototype, {
      * Forward delete
      */
     forwardDelete: function(e) {
-      this.moveCursorRight(e);
+      if (this.selectionStart === this.selectionEnd) {
+        this.moveCursorRight(e);
+      }
       this.removeChars(e);
     },
 
