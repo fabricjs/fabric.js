@@ -401,7 +401,7 @@
       ctx.fillRect(
         boundaries.left + boundaries.leftOffset,
         boundaries.top + boundaries.topOffset,
-        this.cursorWidth,
+        this.cursorWidth / this.scaleX,
         charHeight);
 
       ctx.restore();
