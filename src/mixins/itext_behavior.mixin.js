@@ -101,7 +101,9 @@
 
         if (this.isEditing) {
           this.setCursorByClick(options.e);
+          this.__selectionStartOnMouseDown = this.selectionStart;
         }
+
       });
     },
 
@@ -109,12 +111,30 @@
      * Initializes "mousemove" event handler
      */
     initMousemoveHandler: function() {
-      this.on('mousemove', function() {
+      this.on('mousemove', function(options) {
+        if (!this.__isMousedown || !this.isEditing) return;
 
-        if (this.__isMousedown && this.isEditing) {
-          console.log('mousemove: need to select text');
+        var newSelectionStart = this.getSelectionStartFromPointer(options.e);
+
+        if (newSelectionStart >= this.__selectionStartOnMouseDown) {
+          this.setSelectionStart(this.__selectionStartOnMouseDown);
+          this.setSelectionEnd(newSelectionStart);
+        }
+        else {
+          this.setSelectionStart(newSelectionStart);
+          this.setSelectionEnd(this.__selectionStartOnMouseDown);
         }
       });
+    },
+
+    /**
+     * @private
+     */
+    _isObjectMoved: function(e) {
+      var pointer = this.canvas.getPointer(e);
+
+      return this.__mousedownX !== pointer.x ||
+             this.__mousedownY !== pointer.y;
     },
 
     /**
@@ -124,12 +144,7 @@
       this.on('mouseup', function(options) {
         this.__isMousedown = false;
 
-        var pointer = this.canvas.getPointer(options.e);
-
-        var isObjectMoved = this.__mousedownX !== pointer.x ||
-                            this.__mousedownY !== pointer.y;
-
-        if (isObjectMoved) return;
+        if (this._isObjectMoved(options.e)) return;
 
         if (this.selected) {
           this.enterEditing();
