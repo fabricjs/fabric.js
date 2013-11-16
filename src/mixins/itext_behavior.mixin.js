@@ -949,6 +949,7 @@
           newSelectionStart;
 
       for (var i = 0, len = textLines.length; i < len; i++) {
+
         height += this._getHeightOfLine(this.ctx, i) * this.scaleY;
 
         var widthOfLine = this._getWidthOfLine(this.ctx, i, textLines);
@@ -962,49 +963,38 @@
         }
 
         for (var j = 0, jlen = textLines[i].length; j < jlen; j++) {
+
           var _char = textLines[i][j];
           prevWidth = width;
+
           width += this._getWidthOfChar(this.ctx, _char, i, this.flipX ? jlen - j : j) *
                    this.scaleX;
 
-          // debugging
-          // var objectLeftTop = this.translateToOriginPoint(this.getCenterPoint(), 'left', 'top');
-          // var ctx = this.canvas.upperCanvasEl.getContext('2d');
-
-          if (height > mouseOffsetY && width > mouseOffsetX) {
-
-            // ctx.save();
-            // ctx.strokeRect(objectLeftTop.x, objectLeftTop.y, width, height);
-            // ctx.translate(objectLeftTop.x, objectLeftTop.y);
-            // ctx.fillRect(mouseOffsetX, mouseOffsetY, 10, 10);
-            // ctx.restore();
-
-            var distanceBtwLastCharAndCursor = mouseOffsetX - prevWidth;
-            var distanceBtwNextCharAndCursor = width - mouseOffsetX;
-
-            if (distanceBtwNextCharAndCursor > distanceBtwLastCharAndCursor) {
-              newSelectionStart = charIndex + i;
-              // console.log('leaning left');
-            }
-            else {
-              // console.log('leaning right');
-              newSelectionStart = charIndex + i + 1;
-            }
-
-            // if object is horizontally flipped, mirror cursor location from the end
-            if (this.flipX) {
-              newSelectionStart = jlen - newSelectionStart;
-            }
-
-            if (newSelectionStart > this.text.length) {
-              newSelectionStart = this.text.length;
-            }
-
-            //this.canvas.renderAll();
-            return newSelectionStart;
+          if (height <= mouseOffsetY || width <= mouseOffsetX) {
+            charIndex++;
+            continue;
           }
 
-          charIndex++;
+          var distanceBtwLastCharAndCursor = mouseOffsetX - prevWidth;
+          var distanceBtwNextCharAndCursor = width - mouseOffsetX;
+
+          if (distanceBtwNextCharAndCursor > distanceBtwLastCharAndCursor) {
+            newSelectionStart = charIndex + i;
+          }
+          else {
+            newSelectionStart = charIndex + i + 1;
+          }
+
+          // if object is horizontally flipped, mirror cursor location from the end
+          if (this.flipX) {
+            newSelectionStart = jlen - newSelectionStart;
+          }
+
+          if (newSelectionStart > this.text.length) {
+            newSelectionStart = this.text.length;
+          }
+
+          return newSelectionStart;
         }
       }
 
