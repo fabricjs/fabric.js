@@ -518,8 +518,7 @@
           textOnPreviousLine = (textBeforeCursor.match(/\n?(.*)\n.*$/) || {})[1] || '',
           textLines = this.text.split(this._reNewline),
           _char,
-          lineLeftOffset,
-          foundMatch;
+          lineLeftOffset;
 
       var widthOfSameLineBeforeCursor = this._getWidthOfLine(this.ctx, cursorLocation.lineIndex, textLines);
       lineLeftOffset = this._getLineLeftOffset(widthOfSameLineBeforeCursor);
@@ -532,16 +531,27 @@
         widthOfCharsOnSameLineBeforeCursor += this._getWidthOfChar(this.ctx, _char, lineIndex, i);
       }
 
-      var widthOfPreviousLine = this._getWidthOfLine(this.ctx, cursorLocation.lineIndex - 1, textLines);
-      lineLeftOffset = this._getLineLeftOffset(widthOfPreviousLine);
+      var indexOnPrevLine = this._getIndexOnPrevLine(
+        cursorLocation, textOnPreviousLine, widthOfCharsOnSameLineBeforeCursor, textLines);
+
+      return textOnPreviousLine.length - indexOnPrevLine + textOnSameLineBeforeCursor.length;
+    },
+
+    /**
+     * @private
+     */
+    _getIndexOnPrevLine: function(cursorLocation, textOnPreviousLine, widthOfCharsOnSameLineBeforeCursor, textLines) {
+
+      var lineIndex = cursorLocation.lineIndex - 1;
+      var widthOfPreviousLine = this._getWidthOfLine(this.ctx, lineIndex, textLines);
+      var lineLeftOffset = this._getLineLeftOffset(widthOfPreviousLine);
       var widthOfCharsOnPreviousLine = lineLeftOffset;
       var indexOnPrevLine = 0;
-
-      lineIndex = cursorLocation.lineIndex - 1;
+      var foundMatch;
 
       for (var j = 0, jlen = textOnPreviousLine.length; j < jlen; j++) {
 
-        _char = textOnPreviousLine[j];
+        var _char = textOnPreviousLine[j];
         var widthOfChar = this._getWidthOfChar(this.ctx, _char, lineIndex, j);
 
         widthOfCharsOnPreviousLine += widthOfChar;
@@ -552,7 +562,6 @@
 
           var leftEdge = widthOfCharsOnPreviousLine - widthOfChar;
           var rightEdge = widthOfCharsOnPreviousLine;
-
           var offsetFromLeftEdge = Math.abs(leftEdge - widthOfCharsOnSameLineBeforeCursor);
           var offsetFromRightEdge = Math.abs(rightEdge - widthOfCharsOnSameLineBeforeCursor);
 
@@ -567,7 +576,7 @@
         indexOnPrevLine = textOnPreviousLine.length - 1;
       }
 
-      return textOnPreviousLine.length - indexOnPrevLine + textOnSameLineBeforeCursor.length;
+      return indexOnPrevLine;
     },
 
     /**
