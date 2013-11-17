@@ -937,19 +937,30 @@
     },
 
     /**
+     * @private
+     * @param {Event} e Event object
+     * @param {Object} Object with x/y corresponding to local offset (according to object rotation)
+     */
+    _getLocalRotatedPointer: function(e) {
+      var pointer = this.canvas.getPointer(e),
+
+          pClicked = new fabric.Point(pointer.x, pointer.y),
+          pLeftTop = new fabric.Point(this.left, this.top),
+
+          rotated = fabric.util.rotatePoint(
+            pClicked, pLeftTop, fabric.util.degreesToRadians(-this.angle));
+
+      return this.getLocalPointer(e, rotated);
+    },
+
+    /**
      * Returns index of a character corresponding to where an object was clicked
      * @param {Event} e Event object
      * @return {Number} Index of a character
      */
     getSelectionStartFromPointer: function(e) {
 
-      var pointer = this.canvas.getPointer(e),
-          pClicked = new fabric.Point(pointer.x, pointer.y),
-          pLeftTop = new fabric.Point(this.left, this.top),
-          rotated = fabric.util.rotatePoint(pClicked, pLeftTop, fabric.util.degreesToRadians(-this.angle)),
-          localPointer = this.getLocalPointer(e, rotated),
-          mouseOffsetX = localPointer.x,
-          mouseOffsetY = localPointer.y,
+      var mouseOffset = this._getLocalRotatedPointer(e),
           textLines = this.text.split(this._reNewline),
           prevWidth = 0,
           width = 0,
@@ -979,13 +990,13 @@
           width += this._getWidthOfChar(this.ctx, _char, i, this.flipX ? jlen - j : j) *
                    this.scaleX;
 
-          if (height <= mouseOffsetY || width <= mouseOffsetX) {
+          if (height <= mouseOffset.y || width <= mouseOffset.x) {
             charIndex++;
             continue;
           }
 
-          var distanceBtwLastCharAndCursor = mouseOffsetX - prevWidth;
-          var distanceBtwNextCharAndCursor = width - mouseOffsetX;
+          var distanceBtwLastCharAndCursor = mouseOffset.x - prevWidth;
+          var distanceBtwNextCharAndCursor = width - mouseOffset.x;
 
           if (distanceBtwNextCharAndCursor > distanceBtwLastCharAndCursor) {
             newSelectionStart = charIndex + i;
