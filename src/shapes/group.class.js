@@ -277,9 +277,9 @@
      * @return {fabric.Group} thisArg
      */
     _moveFlippedObject: function(object) {
-      var oldOriginX = object.get('originX');
-      var oldOriginY = object.get('originY');
-      var center = object.getCenterPoint();
+      var oldOriginX = object.get('originX'),
+          oldOriginY = object.get('originY'),
+          center = object.getCenterPoint();
 
       object.set({
         originX: 'center',
