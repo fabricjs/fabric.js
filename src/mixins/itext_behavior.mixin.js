@@ -995,26 +995,8 @@
             continue;
           }
 
-          var distanceBtwLastCharAndCursor = mouseOffset.x - prevWidth;
-          var distanceBtwNextCharAndCursor = width - mouseOffset.x;
-
-          if (distanceBtwNextCharAndCursor > distanceBtwLastCharAndCursor) {
-            newSelectionStart = charIndex + i;
-          }
-          else {
-            newSelectionStart = charIndex + i + 1;
-          }
-
-          // if object is horizontally flipped, mirror cursor location from the end
-          if (this.flipX) {
-            newSelectionStart = jlen - newSelectionStart;
-          }
-
-          if (newSelectionStart > this.text.length) {
-            newSelectionStart = this.text.length;
-          }
-
-          return newSelectionStart;
+          return this._getNewSelectionStartFromOffset(
+            mouseOffset, prevWidth, width, charIndex + i, jlen);
         }
       }
 
@@ -1022,6 +1004,28 @@
       if (typeof newSelectionStart === 'undefined') {
         return this.text.length;
       }
+    },
+
+    /**
+     * @private
+     */
+    _getNewSelectionStartFromOffset: function(mouseOffset, prevWidth, width, index, jlen) {
+
+      var distanceBtwLastCharAndCursor = mouseOffset.x - prevWidth,
+          distanceBtwNextCharAndCursor = width - mouseOffset.x,
+          offset = distanceBtwNextCharAndCursor > distanceBtwLastCharAndCursor ? 0 : 1,
+          newSelectionStart = index + offset;
+
+      // if object is horizontally flipped, mirror cursor location from the end
+      if (this.flipX) {
+        newSelectionStart = jlen - newSelectionStart;
+      }
+
+      if (newSelectionStart > this.text.length) {
+        newSelectionStart = this.text.length;
+      }
+
+      return newSelectionStart;
     },
 
     /**
