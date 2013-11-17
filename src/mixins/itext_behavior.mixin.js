@@ -164,10 +164,17 @@
         }, 100);
 
         if (!this._hasClearSelectionListener) {
+
           this.canvas.on('selection:cleared', function(options) {
             // do not exit editing if event fired when clicking on an object again (in editing mode)
             if (options.e && _this.canvas.containsPoint(options.e, _this)) return;
             _this.exitEditing();
+          });
+
+          this.canvas.on('mouse:up', function() {
+            this.getObjects('i-text').forEach(function(obj) {
+              obj.__isMousedown = false;
+            });
           });
 
           this._hasClearSelectionListener = true;
@@ -1405,6 +1412,4 @@
       this.insertChars('\n');
     }
   });
-
 })();
-
