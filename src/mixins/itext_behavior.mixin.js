@@ -163,22 +163,32 @@
           _this.selected = true;
         }, 100);
 
-        if (!this._hasClearSelectionListener) {
-
-          this.canvas.on('selection:cleared', function(options) {
-            // do not exit editing if event fired when clicking on an object again (in editing mode)
-            if (options.e && _this.canvas.containsPoint(options.e, _this)) return;
-            _this.exitEditing();
-          });
-
-          this.canvas.on('mouse:up', function() {
-            this.getObjects('i-text').forEach(function(obj) {
-              obj.__isMousedown = false;
-            });
-          });
-
-          this._hasClearSelectionListener = true;
+        if (!this._hasCanvasHandlers) {
+          this._initCanvasHandlers();
+          this._hasCanvasHandlers = true;
         }
+      });
+    },
+
+    /**
+     * @private
+     */
+    _initCanvasHandlers: function() {
+      var _this = this;
+
+      this.canvas.on('selection:cleared', function(options) {
+
+        // do not exit editing if event fired
+        // when clicking on an object again (in editing mode)
+        if (options.e && _this.canvas.containsPoint(options.e, _this)) return;
+
+        _this.exitEditing();
+      });
+
+      this.canvas.on('mouse:up', function() {
+        this.getObjects('i-text').forEach(function(obj) {
+          obj.__isMousedown = false;
+        });
       });
     },
 
