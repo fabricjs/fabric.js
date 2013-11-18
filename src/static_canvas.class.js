@@ -871,7 +871,7 @@
     },
 
     /**
-     *
+     * @private
      */
     _toObjects: function(methodName, propertiesToInclude) {
       return this.getObjects().map(function(instance) {
