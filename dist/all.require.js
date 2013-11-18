@@ -22194,6 +22194,7 @@ fabric.util.object.extend(fabric.Text.prototype, {
       this.isEditing = false;
       this.selectable = true;
 
+      this.selectionEnd = this.selectionStart;
       this.hiddenTextarea && this.hiddenTextarea.blur();
 
       this.abortCursorAnimation();
