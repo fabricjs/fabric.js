@@ -20049,6 +20049,14 @@ fabric.util.object.extend(fabric.Text.prototype, {
     *   Paste text:                     ctrl/cmd + v
     *   Cut text:                       ctrl/cmd + x
     * </pre>
+    *
+    * <p>Supported mouse/touch combination</p>
+    * <pre>
+    *   Position cursor:                click/touch
+    *   Create selection:               click/touch & drag
+    *   Create selection:               click & shift + click
+    *   Select word:                    double click
+    * </pre>
     */
   fabric.IText = fabric.util.createClass(fabric.Text, fabric.Observable, /** @lends fabric.IText.prototype */ {
 
@@ -21988,8 +21996,19 @@ fabric.util.object.extend(fabric.Text.prototype, {
     setCursorByClick: function(e) {
       var newSelectionStart = this.getSelectionStartFromPointer(e);
 
-      this.setSelectionStart(newSelectionStart);
-      this.setSelectionEnd(newSelectionStart);
+      if (e.shiftKey) {
+        if (newSelectionStart < this.selectionStart) {
+          this.setSelectionEnd(this.selectionStart);
+          this.setSelectionStart(newSelectionStart);
+        }
+        else {
+          this.setSelectionEnd(newSelectionStart);
+        }
+      }
+      else {
+        this.setSelectionStart(newSelectionStart);
+        this.setSelectionEnd(newSelectionStart);
+      }
     },
 
     /**
