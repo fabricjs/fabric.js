@@ -949,8 +949,19 @@
     setCursorByClick: function(e) {
       var newSelectionStart = this.getSelectionStartFromPointer(e);
 
-      this.setSelectionStart(newSelectionStart);
-      this.setSelectionEnd(newSelectionStart);
+      if (e.shiftKey) {
+        if (newSelectionStart < this.selectionStart) {
+          this.setSelectionEnd(this.selectionStart);
+          this.setSelectionStart(newSelectionStart);
+        }
+        else {
+          this.setSelectionEnd(newSelectionStart);
+        }
+      }
+      else {
+        this.setSelectionStart(newSelectionStart);
+        this.setSelectionEnd(newSelectionStart);
+      }
     },
 
     /**
