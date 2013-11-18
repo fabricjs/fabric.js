@@ -20056,6 +20056,7 @@ fabric.util.object.extend(fabric.Text.prototype, {
     *   Create selection:               click/touch & drag
     *   Create selection:               click & shift + click
     *   Select word:                    double click
+    *   Select line:                    triple click
     * </pre>
     */
   fabric.IText = fabric.util.createClass(fabric.Text, fabric.Observable, /** @lends fabric.IText.prototype */ {
@@ -21057,7 +21058,7 @@ fabric.util.object.extend(fabric.Text.prototype, {
     initBehavior: function() {
       this.initKeyHandlers();
       this.initCursorSelectionHandlers();
-      this.initDblClickSimulation();
+      this.initDoubleClickSimulation();
       this.initHiddenTextarea();
     },
 
@@ -21084,36 +21085,57 @@ fabric.util.object.extend(fabric.Text.prototype, {
     /**
      * Initializes "dbclick" event handler
      */
-    initDblClickSimulation: function() {
+    initDoubleClickSimulation: function() {
 
-      var lastClickTime = +new Date(),
-          newClickTime,
-          lastPointer = { },
-          newPointer;
+      // for double click
+      this.__lastClickTime = +new Date();
 
-      this.on('mousedown', function(options) {
+      // for triple click
+      this.__lastLastClickTime = +new Date();
 
-        var event = options.e;
+      this.lastPointer = { };
 
-        newClickTime = +new Date();
-        newPointer = this.canvas.getPointer(event);
+      this.on('mousedown', this.onMouseDown.bind(this));
+    },
 
-        var isDblClick =
-          newClickTime - lastClickTime < 500 &&
-          lastPointer.x === newPointer.x &&
-          lastPointer.y === newPointer.y;
+    onMouseDown: function(options) {
 
-        if (isDblClick) {
+      this.__newClickTime = +new Date();
+      var newPointer = this.canvas.getPointer(options.e);
 
-          this.fire('dblclick', options);
+      if (this.isTripleClick(newPointer)) {
+        this.fire('tripleclick', options);
+        this._stopEvent(options.e);
+      }
+      else if (this.isDoubleClick(newPointer)) {
+        this.fire('dblclick', options);
+        this._stopEvent(options.e);
+      }
 
-          event.preventDefault && event.preventDefault();
-          event.stopPropagation && event.stopPropagation();
-        }
+      this.__lastLastClickTime = this.__lastClickTime;
+      this.__lastClickTime = this.__newClickTime;
+      this.__lastPointer = newPointer;
+    },
 
-        lastClickTime = newClickTime;
-        lastPointer = newPointer;
-      });
+    isDoubleClick: function(newPointer) {
+      return this.__newClickTime - this.__lastClickTime < 500 &&
+          this.__lastPointer.x === newPointer.x &&
+          this.__lastPointer.y === newPointer.y;
+    },
+
+    isTripleClick: function(newPointer) {
+      return this.__newClickTime - this.__lastClickTime < 500 &&
+          this.__lastClickTime - this.__lastLastClickTime < 500 &&
+          this.__lastPointer.x === newPointer.x &&
+          this.__lastPointer.y === newPointer.y;
+    },
+
+    /**
+     * @private
+     */
+    _stopEvent: function(e) {
+      e.preventDefault && e.preventDefault();
+      e.stopPropagation && e.stopPropagation();
     },
 
     /**
@@ -21124,9 +21146,18 @@ fabric.util.object.extend(fabric.Text.prototype, {
       this.initMousedownHandler();
       this.initMousemoveHandler();
       this.initMouseupHandler();
+      this.initClicks();
+    },
 
+    /**
+     * Initializes double and triple click event handlers
+     */
+    initClicks: function() {
       this.on('dblclick', function(options) {
         this.selectWord(this.getSelectionStartFromPointer(options.e));
+      });
+      this.on('tripleclick', function(options) {
+        this.selectLine(this.getSelectionStartFromPointer(options.e));
       });
     },
 
@@ -21981,9 +22012,20 @@ fabric.util.object.extend(fabric.Text.prototype, {
      * @param {Number} selectionStart Index of a character
      */
     selectWord: function(selectionStart) {
-
       var newSelectionStart = this.searchWordBoundary(selectionStart, -1); /* search backwards */
       var newSelectionEnd = this.searchWordBoundary(selectionStart, 1); /* search forward */
+
+      this.setSelectionStart(newSelectionStart);
+      this.setSelectionEnd(newSelectionEnd);
+    },
+
+    /**
+     * Selects a line based on the index
+     * @param {Number} selectionStart Index of a character
+     */
+    selectLine: function(selectionStart) {
+      var newSelectionStart = this.findLineBoundaryLeft(selectionStart);
+      var newSelectionEnd = this.findLineBoundaryRight(selectionStart);
 
       this.setSelectionStart(newSelectionStart);
       this.setSelectionEnd(newSelectionEnd);

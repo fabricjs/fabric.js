@@ -38,6 +38,7 @@
     *   Create selection:               click/touch & drag
     *   Create selection:               click & shift + click
     *   Select word:                    double click
+    *   Select line:                    triple click
     * </pre>
     */
   fabric.IText = fabric.util.createClass(fabric.Text, fabric.Observable, /** @lends fabric.IText.prototype */ {
