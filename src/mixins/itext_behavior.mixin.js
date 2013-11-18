@@ -1126,6 +1126,7 @@
       this.isEditing = false;
       this.selectable = true;
 
+      this.selectionEnd = this.selectionStart;
       this.hiddenTextarea && this.hiddenTextarea.blur();
 
       this.abortCursorAnimation();
