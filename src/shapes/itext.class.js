@@ -355,6 +355,9 @@
       };
     },
 
+    /**
+     * @private
+     */
     _getCursorBoundariesOffsets: function(chars, typeOfBoundaries, cursorLocation, textLines) {
 
       var lineIndex = 0,
