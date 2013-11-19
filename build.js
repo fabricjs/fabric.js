@@ -237,6 +237,8 @@ var filesToInclude = [
 
   ifSpecifiedInclude('itext', 'src/shapes/itext.class.js'),
   ifSpecifiedInclude('itext', 'src/mixins/itext_behavior.mixin.js'),
+  ifSpecifiedInclude('itext', 'src/mixins/itext_click_behavior.mixin.js'),
+  ifSpecifiedInclude('itext', 'src/mixins/itext_key_behavior.mixin.js'),
 
   ifSpecifiedInclude('node', 'src/node.js'),
 
