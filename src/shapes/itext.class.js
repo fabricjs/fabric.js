@@ -171,6 +171,11 @@
       this.initBehavior();
 
       fabric.IText.instances.push(this);
+
+      // caching
+      this.__lineWidths = { };
+      this.__lineHeights = { };
+      this.__lineOffsets = { };
     },
 
     /**
@@ -360,19 +365,12 @@
      */
     _getCursorBoundariesOffsets: function(chars, typeOfBoundaries, cursorLocation, textLines) {
 
-      var lineIndex = 0,
+      var lineLeftOffset = 0,
+
+          lineIndex = 0,
           charIndex = 0,
 
-          widthOfLine,
-          lineLeftOffset,
-
-          // caching
-          lineWidths = { },
-          lineHeights = { },
-          lineOffsets = { },
-
           leftOffset = 0,
-
           topOffset = typeOfBoundaries === 'cursor'
             // selection starts at the very top of the line,
             // whereas cursor starts at the padding created by line height
@@ -384,8 +382,7 @@
         if (chars[i] === '\n') {
           leftOffset = 0;
           var index = lineIndex + (typeOfBoundaries === 'cursor' ? 1 : 0);
-          topOffset += lineHeights[index] ||
-            (lineHeights[index] = this._getHeightOfLine(this.ctx, index));
+          topOffset += this._getCachedLineHeight(index);
 
           lineIndex++;
           charIndex = 0;
@@ -395,20 +392,51 @@
           charIndex++;
         }
 
-        widthOfLine = lineWidths[lineIndex] ||
-                     (lineWidths[lineIndex] = this._getWidthOfLine(this.ctx, lineIndex, textLines));
-
-        lineLeftOffset = lineOffsets[lineIndex] ||
-                        (lineOffsets[lineIndex] = this._getLineLeftOffset(widthOfLine));
+        lineLeftOffset = this._getCachedLineOffset(lineIndex, textLines);
       }
 
-      lineWidths = lineHeights = lineOffsets = null;
+      this._clearCache();
 
       return {
         top: topOffset,
         left: leftOffset,
-        lineLeft: lineLeftOffset || 0
+        lineLeft: lineLeftOffset
       };
+    },
+
+    /**
+     * @private
+     */
+    _clearCache: function() {
+      this.__lineWidths = { };
+      this.__lineHeights = { };
+      this.__lineOffsets = { };
+    },
+
+    /**
+     * @private
+     */
+    _getCachedLineHeight: function(index) {
+      return this.__lineHeights[index] ||
+        (this.__lineHeights[index] = this._getHeightOfLine(this.ctx, index));
+    },
+
+    /**
+     * @private
+     */
+    _getCachedLineWidth: function(lineIndex, textLines) {
+      return this.__lineWidths[lineIndex] ||
+        (this.__lineWidths[lineIndex] = this._getWidthOfLine(this.ctx, lineIndex, textLines));
+    },
+
+    /**
+     * @private
+     */
+    _getCachedLineOffset: function(lineIndex, textLines) {
+      var widthOfLine = this._getCachedLineWidth(lineIndex, textLines);
+
+      return this.__lineOffsets[lineIndex] ||
+        (this.__lineOffsets[lineIndex] = this._getLineLeftOffset(widthOfLine));
     },
 
     /**
