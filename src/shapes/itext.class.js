@@ -261,27 +261,26 @@
      */
     _render: function(ctx) {
       this.callSuper('_render', ctx);
-      this.isEditing && this.renderCursorOrSelection(ctx);
       this.ctx = ctx;
+      this.isEditing && this.renderCursorOrSelection();
     },
 
     /**
      * Renders cursor or selection (depending on what exists)
-     * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    renderCursorOrSelection: function(ctx) {
+    renderCursorOrSelection: function() {
       if (!this.active) return;
 
       var chars = this.text.split(''),
           boundaries;
 
       if (this.selectionStart === this.selectionEnd) {
-        boundaries = this.getCursorBoundaries(ctx, chars, 'cursor');
-        this.renderCursor(ctx, boundaries);
+        boundaries = this.getCursorBoundaries(chars, 'cursor');
+        this.renderCursor(boundaries);
       }
       else {
-        boundaries = this.getCursorBoundaries(ctx, chars, 'selection');
-        this.renderSelection(ctx, chars, boundaries);
+        boundaries = this.getCursorBoundaries(chars, 'selection');
+        this.renderSelection(chars, boundaries);
       }
     },
 
@@ -330,51 +329,71 @@
 
     /**
      * Returns cursor boundaries (left, top, leftOffset, topOffset)
-     * @param {CanvasRenderingContext2D} ctx Context to render on
      * @param {Array} chars Array of characters
+     * @param {String} typeOfBoundaries
      */
-    getCursorBoundaries: function(ctx, chars, typeOfBoundaries) {
+    getCursorBoundaries: function(chars, typeOfBoundaries) {
 
       var cursorLocation = this.get2DCursorLocation(),
-          lineIndex = 0,
-          charIndex = 0,
+
           textLines = this.text.split(this._reNewline),
+
+          // left/top are left/top of entire text box
+          // leftOffset/topOffset are offset from that left/top point of a text box
+
+          left = Math.round(this._getLeftOffset()),
+          top = -this.height / 2,
+
+          offsets = this._getCursorBoundariesOffsets(
+                      chars, typeOfBoundaries, cursorLocation, textLines);
+
+      return {
+        left: left,
+        top: top,
+        leftOffset: offsets.left + offsets.lineLeft,
+        topOffset: offsets.top
+      };
+    },
+
+    _getCursorBoundariesOffsets: function(chars, typeOfBoundaries, cursorLocation, textLines) {
+
+      var lineIndex = 0,
+          charIndex = 0,
+
           widthOfLine,
           lineLeftOffset,
+
           // caching
           lineWidths = { },
           lineHeights = { },
-          lineOffsets = { };
+          lineOffsets = { },
 
-      // left/top are left/top of entire text box
-      // leftOffset/topOffset are offset from that left/top point of a text box
-      var left = Math.round(this._getLeftOffset());
-      var top = -this.height / 2;
+          leftOffset = 0,
 
-      var leftOffset = 0;
-      var topOffset = typeOfBoundaries === 'cursor'
-        // selection starts at the very top of the line,
-        // whereas cursor starts at the padding created by line height
-        ? (this._getHeightOfLine(ctx, 0) -
-          this.getCurrentCharFontSize(cursorLocation.lineIndex, cursorLocation.charIndex))
-        : 0;
+          topOffset = typeOfBoundaries === 'cursor'
+            // selection starts at the very top of the line,
+            // whereas cursor starts at the padding created by line height
+            ? (this._getHeightOfLine(this.ctx, 0) -
+              this.getCurrentCharFontSize(cursorLocation.lineIndex, cursorLocation.charIndex))
+            : 0;
 
       for (var i = 0; i < this.selectionStart; i++) {
         if (chars[i] === '\n') {
           leftOffset = 0;
           var index = lineIndex + (typeOfBoundaries === 'cursor' ? 1 : 0);
-          topOffset += lineHeights[index] || (lineHeights[index] = this._getHeightOfLine(ctx, index));
+          topOffset += lineHeights[index] ||
+            (lineHeights[index] = this._getHeightOfLine(this.ctx, index));
 
           lineIndex++;
           charIndex = 0;
         }
         else {
-          leftOffset += this._getWidthOfChar(ctx, chars[i], lineIndex, charIndex);
+          leftOffset += this._getWidthOfChar(this.ctx, chars[i], lineIndex, charIndex);
           charIndex++;
         }
 
         widthOfLine = lineWidths[lineIndex] ||
-                     (lineWidths[lineIndex] = this._getWidthOfLine(ctx, lineIndex, textLines));
+                     (lineWidths[lineIndex] = this._getWidthOfLine(this.ctx, lineIndex, textLines));
 
         lineLeftOffset = lineOffsets[lineIndex] ||
                         (lineOffsets[lineIndex] = this._getLineLeftOffset(widthOfLine));
@@ -383,18 +402,19 @@
       lineWidths = lineHeights = lineOffsets = null;
 
       return {
-        left: left,
-        top: top,
-        leftOffset: leftOffset + (lineLeftOffset || 0),
-        topOffset: topOffset
+        top: topOffset,
+        left: leftOffset,
+        lineLeft: lineLeftOffset || 0
       };
     },
 
     /**
      * Renders cursor
-     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Object} boundaries
      */
-    renderCursor: function(ctx, boundaries) {
+    renderCursor: function(boundaries) {
+      var ctx = this.ctx;
+
       ctx.save();
 
       var cursorLocation = this.get2DCursorLocation();
@@ -417,11 +437,12 @@
 
     /**
      * Renders text selection
-     * @param {CanvasRenderingContext2D} ctx Context to render on
      * @param {Array} chars Array of characters
      * @param {Object} boundaries Object with left/top/leftOffset/topOffset
      */
-    renderSelection: function(ctx, chars, boundaries) {
+    renderSelection: function(chars, boundaries) {
+      var ctx = this.ctx;
+
       ctx.save();
 
       ctx.fillStyle = this.selectionColor;
