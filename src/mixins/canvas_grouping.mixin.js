@@ -182,7 +182,7 @@
 
       var activeGroup = this.getActiveGroup();
       if (activeGroup) {
-        activeGroup.setObjectsCoords();
+        activeGroup.setObjectsCoords().setCoords();
         activeGroup.isMoving = false;
         this._setCursor(this.defaultCursor);
       }
