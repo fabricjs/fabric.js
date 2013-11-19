@@ -458,6 +458,21 @@
     },
 
     /**
+     * Sets viewport transform of this canvas instance
+     * @param {Array} vpt the transform in the form of context.transform
+     * @return {fabric.Canvas} instance
+     * @chainable true
+     */
+    setViewportTransform: function (vpt) {
+      this.viewportTransform = vpt
+      this.renderAll();
+      for (var i = 0, len = this._objects.length; i < len; i++) {
+        this._objects[i].setCoords();
+      }
+      return this;
+    },
+
+    /**
      * Sets zoom level of this canvas instance
      * @param {Number} value to set zoom to, less than 1 zooms out
      * @return {fabric.Canvas} instance
@@ -489,6 +504,9 @@
       this.viewportTransform[4] = x - wh.x/2;
       this.viewportTransform[5] = y - wh.y/2;
       this.renderAll();
+      for (var i = 0, len = this._objects.length; i < len; i++) {
+        this._objects[i].setCoords();
+      }
       return this;
     },
 
@@ -553,13 +571,15 @@
     _onObjectAdded: function(obj) {
       this.stateful && obj.setupState();
       obj.canvas = this;
-      obj.setCoords();
       if (obj._objects) {
+        obj._calcBounds();
         for (var i = 0, len = obj._objects.length; i < len; i++) {
           obj._objects[i].canvas = this;
-          obj._objects[i].setCoords();
+          this._onObjectAdded(obj._objects[i]);
         }
+        obj._updateObjectsCoords()
       }
+      obj.setCoords();
       this.fire('object:added', { target: obj });
       obj.fire('added');
     },

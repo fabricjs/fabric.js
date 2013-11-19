@@ -476,16 +476,7 @@
       this._removeShadow(ctx);
       ctx.restore();
 
-      ctx.save();
-      if (!noTransform && this.active) {
-        var center;
-        center = fabric.util.transformPoint(this.getCenterPoint(), v);
-        ctx.translate(center.x, center.y);
-        ctx.rotate(fabric.util.degreesToRadians(this.angle));
-        this.drawBorders(ctx);
-        this.drawControls(ctx);
-      }
-      ctx.restore();
+      this.callSuper('_renderControls', ctx, noTransform);
     },
 
     /**

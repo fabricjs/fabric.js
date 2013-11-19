@@ -50,25 +50,26 @@
     initialize: function(objects, options) {
       options = options || { };
 
+      // NOTE: all the coords calculations need to have a canvas before they make sense
       this._objects = objects || [];
       for (var i = this._objects.length; i--; ) {
         this._objects[i].group = this;
-        this._objects[i].setCoords();
+        //this._objects[i].setCoords();
       }
 
       this.originalState = { };
       this.callSuper('initialize');
 
-      this._calcBounds();
-      this._updateObjectsCoords();
+      //this._calcBounds();
+      //this._updateObjectsCoords();
 
       if (options) {
         extend(this, options);
       }
       this._setOpacityIfSame();
 
-      this.setCoords(true);
-      this.saveCoords();
+      //this.setCoords(true);
+      //this.saveCoords();
     },
 
     /**
@@ -216,12 +217,13 @@
       // do not render if object is not visible
       if (!this.visible) return;
 
-      ctx.save();
       var v = this.canvas.viewportTransform;
-
+      ctx.save();
       var sxy = fabric.util.transformPoint(
         new fabric.Point(this.scaleX, this.scaleY),
-        v, true),
+        v,
+        true
+      ),
           groupScaleFactor = Math.max(sxy.x, sxy.y);
 
       this.clipTo && fabric.util.clipContext(this, ctx);
@@ -243,13 +245,7 @@
       }
       this.clipTo && ctx.restore();
 
-      if (this.active && !noTransform) {
-        var center = fabric.util.transformPoint(this.getCenterPoint(), v);
-        ctx.translate(center.x, center.y);
-        ctx.rotate(degreesToRadians(this.angle));
-        this.drawBorders(ctx);
-        this.drawControls(ctx);
-      }
+      this.callSuper('_renderControls', ctx, noTransform);
       ctx.restore();
     },
 
@@ -411,7 +407,14 @@
         }
       }
       
-      var ivt = fabric.util.invertTransform(canvas.viewportTransform);
+      var ivt;
+      if (this.canvas) {
+        ivt = fabric.util.invertTransform(this.canvas.viewportTransform);
+      }
+      else { // BUG: this always happens when new groups are created
+        ivt = [1, 0, 0, 1, 0, 0];
+        console.log('no canvas');
+      }
 
       minXY = new fabric.Point(min(aX), min(aY));
       maxXY = new fabric.Point(max(aX), max(aY));

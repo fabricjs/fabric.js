@@ -28,11 +28,17 @@ fabric.CircleBrush = fabric.util.createClass(fabric.BaseBrush, /** @lends fabric
     var point = this.addPoint(pointer);
     var ctx = this.canvas.contextTop;
 
+    var v = this.canvas.viewportTransform;
+    ctx.save();
+    ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
+
     ctx.fillStyle = point.fill;
     ctx.beginPath();
     ctx.arc(point.x, point.y, point.radius, 0, Math.PI * 2, false);
     ctx.closePath();
     ctx.fill();
+    
+    ctx.restore();
   },
 
   /**
@@ -65,10 +71,10 @@ fabric.CircleBrush = fabric.util.createClass(fabric.BaseBrush, /** @lends fabric
     for (var i = 0, len = this.points.length; i < len; i++) {
       var point = this.points[i];
       var circle = new fabric.Circle({
-        radius: point.radius,
+        radius: this.points[i].radius,
         left: point.x,
         top: point.y,
-        fill: point.fill
+        fill: this.points[i].fill
       });
 
       this.shadow && circle.setShadow(this.shadow);

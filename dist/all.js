@@ -8977,6 +8977,21 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
     },
 
     /**
+     * Sets viewport transform of this canvas instance
+     * @param {Array} vpt the transform in the form of context.transform
+     * @return {fabric.Canvas} instance
+     * @chainable true
+     */
+    setViewportTransform: function (vpt) {
+      this.viewportTransform = vpt
+      this.renderAll();
+      for (var i = 0, len = this._objects.length; i < len; i++) {
+        this._objects[i].setCoords();
+      }
+      return this;
+    },
+
+    /**
      * Sets zoom level of this canvas instance
      * @param {Number} value to set zoom to, less than 1 zooms out
      * @return {fabric.Canvas} instance
@@ -9008,6 +9023,9 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
       this.viewportTransform[4] = x - wh.x/2;
       this.viewportTransform[5] = y - wh.y/2;
       this.renderAll();
+      for (var i = 0, len = this._objects.length; i < len; i++) {
+        this._objects[i].setCoords();
+      }
       return this;
     },
 
@@ -9072,13 +9090,15 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
     _onObjectAdded: function(obj) {
       this.stateful && obj.setupState();
       obj.canvas = this;
-      obj.setCoords();
       if (obj._objects) {
+        obj._calcBounds();
         for (var i = 0, len = obj._objects.length; i < len; i++) {
           obj._objects[i].canvas = this;
-          obj._objects[i].setCoords();
+          this._onObjectAdded(obj._objects[i]);
         }
+        obj._updateObjectsCoords()
       }
+      obj.setCoords();
       this.fire('object:added', { target: obj });
       obj.fire('added');
     },
@@ -9949,6 +9969,9 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
      */
     _render: function() {
       var ctx  = this.canvas.contextTop;
+      var v = this.canvas.viewportTransform;
+      ctx.save();
+      ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
       ctx.beginPath();
 
       var p1 = this._points[0];
@@ -9978,6 +10001,7 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
       // the bezier control point
       ctx.lineTo(p1.x, p1.y);
       ctx.stroke();
+      ctx.restore();
     },
 
     /**
@@ -9986,10 +10010,6 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
      * @private
      */
     _getSVGPathData: function() {
-      var ivt = fabric.util.invertTransform(this.canvas.viewportTransform);
-      for (var i = 0, len = this._points.length; i < len; i++) {
-        this._points[i] = fabric.util.transformPoint(this._points[i], ivt);
-      }
       this.box = this.getPathBoundingBox(this._points);
       return this.convertPointsToSVGPath(
         this._points, this.box.minx, this.box.maxx, this.box.miny, this.box.maxy);
@@ -10151,11 +10171,17 @@ fabric.CircleBrush = fabric.util.createClass(fabric.BaseBrush, /** @lends fabric
     var point = this.addPoint(pointer);
     var ctx = this.canvas.contextTop;
 
+    var v = this.canvas.viewportTransform;
+    ctx.save();
+    ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
+
     ctx.fillStyle = point.fill;
     ctx.beginPath();
     ctx.arc(point.x, point.y, point.radius, 0, Math.PI * 2, false);
     ctx.closePath();
     ctx.fill();
+    
+    ctx.restore();
   },
 
   /**
@@ -10188,10 +10214,10 @@ fabric.CircleBrush = fabric.util.createClass(fabric.BaseBrush, /** @lends fabric
     for (var i = 0, len = this.points.length; i < len; i++) {
       var point = this.points[i];
       var circle = new fabric.Circle({
-        radius: point.radius,
+        radius: this.points[i].radius,
         left: point.x,
         top: point.y,
-        fill: point.fill
+        fill: this.points[i].fill
       });
 
       this.shadow && circle.setShadow(this.shadow);
@@ -10382,14 +10408,13 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
   render: function() {
     var ctx = this.canvas.contextTop;
     ctx.fillStyle = this.color;
+
+    var v = this.canvas.viewportTransform;
     ctx.save();
-    var ivt = fabric.util.invertTransform(this.canvas.viewportTransform);
+    ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
 
     for (var i = 0, len = this.sprayChunkPoints.length; i < len; i++) {
       var point = this.sprayChunkPoints[i];
-      var tpoint = fabric.util.transformPoint({x: point.x, y: point.y}, ivt);
-      point.x = tpoint.x;
-      point.y = tpoint.y;
       if (typeof point.opacity !== 'undefined') {
         ctx.globalAlpha = point.opacity;
       }
@@ -10405,7 +10430,6 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
     this.sprayChunkPoints = [ ];
 
     var x, y, width, radius = this.width / 2;
-    var vpt = this.canvas.viewportTransform;
 
     for (var i = 0; i < this.density; i++) {
 
@@ -10423,7 +10447,6 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
       }
       
       var point = new fabric.Point(x, y);
-      point = fabric.util.transformPoint(point, vpt);
       point.width = width
 
       if (this.randomOpacity) {
@@ -11001,7 +11024,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
             var isActiveLower = objects.indexOf(this._activeObject) < objects.indexOf(target);
             var group = new fabric.Group(
               isActiveLower ? [ target, this._activeObject ] : [ this._activeObject, target ]);
-            group.canvas = this;
 
             this.setActiveGroup(group);
             this._activeObject = null;
@@ -11281,7 +11303,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       }
       else if (group.length > 1) {
         group = new fabric.Group(group.reverse());
-        group.canvas = this;
         this.setActiveGroup(group);
         group.saveCoords();
         this.fire('selection:created', { target: group });
@@ -11516,6 +11537,9 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       this._activeGroup = group;
       if (group) {
         group.canvas = this;
+        group._calcBounds();
+        group._updateObjectsCoords();
+        group.setCoords();
         group.set('active', true);
       }
       return this;
@@ -11860,7 +11884,9 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       if (this.clipTo) {
         fabric.util.clipContext(this, this.contextTop);
       }
-      this.freeDrawingBrush.onMouseDown(this.getPointer(e, true));
+      var ivt = fabric.util.invertTransform(this.viewportTransform);
+      var pointer = fabric.util.transformPoint(this.getPointer(e, true), ivt);
+      this.freeDrawingBrush.onMouseDown(pointer);
       this.fire('mouse:down', { e: e });
     },
 
@@ -11987,7 +12013,9 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
       if (this.isDrawingMode) {
         if (this._isCurrentlyDrawing) {
-          this.freeDrawingBrush.onMouseMove(this.getPointer(e, true));
+          var ivt = fabric.util.invertTransform(this.viewportTransform);
+          pointer = fabric.util.transformPoint(this.getPointer(e, true), ivt);
+          this.freeDrawingBrush.onMouseMove(pointer);
         }
         this.upperCanvasEl.style.cursor = this.freeDrawingCursor;
         this.fire('mouse:move', { e: e });
@@ -13723,7 +13751,23 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       this.clipTo && ctx.restore();
       this._removeShadow(ctx);
       ctx.restore();
+      
+      this._renderControls(ctx, noTransform);
+    },
 
+    /**
+     * Renders controls and borders for the object
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Boolean} [noTransform] When true, context is not transformed
+     */
+    _renderControls: function(ctx, noTransform) {
+      var v;
+      if (this.canvas) {
+        v = this.canvas.viewportTransform;
+      }
+      else {
+        v = [1, 0, 0, 1, 0, 0]; // TODO: this isn't a solution
+      }
       ctx.save();
       if (this.active && !noTransform) {
         var center;
@@ -15141,8 +15185,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           sx= sxy.x,
           sy= sxy.y;
       if (this.group) {
-      	w = w * this.group.scaleX;
-      	h = h * this.group.scaleY;
+        w = w * this.group.scaleX;
+        h = h * this.group.scaleY;
       }
 
       ctx.strokeRect(
@@ -17388,16 +17432,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       this._removeShadow(ctx);
       ctx.restore();
 
-      ctx.save();
-      if (!noTransform && this.active) {
-        var center;
-        center = fabric.util.transformPoint(this.getCenterPoint(), v);
-        ctx.translate(center.x, center.y);
-        ctx.rotate(fabric.util.degreesToRadians(this.angle));
-        this.drawBorders(ctx);
-        this.drawControls(ctx);
-      }
-      ctx.restore();
+      this.callSuper('_renderControls', ctx, noTransform);
     },
 
     /**
@@ -17752,16 +17787,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       this._removeShadow(ctx);
       ctx.restore();
 
-      ctx.save();
-      if (this.active) {
-        var center;
-        center = fabric.util.transformPoint(this.getCenterPoint(), v);
-        ctx.translate(center.x, center.y);
-        ctx.rotate(fabric.util.degreesToRadians(this.angle));
-        this.drawBorders(ctx);
-        this.drawControls(ctx);
-      }
-      ctx.restore();
+      this.callSuper('_renderControls', ctx);
     },
 
     /**
@@ -17964,25 +17990,26 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     initialize: function(objects, options) {
       options = options || { };
 
+      // NOTE: all the coords calculations need to have a canvas before they make sense
       this._objects = objects || [];
       for (var i = this._objects.length; i--; ) {
         this._objects[i].group = this;
-        this._objects[i].setCoords();
+        //this._objects[i].setCoords();
       }
 
       this.originalState = { };
       this.callSuper('initialize');
 
-      this._calcBounds();
-      this._updateObjectsCoords();
+      //this._calcBounds();
+      //this._updateObjectsCoords();
 
       if (options) {
         extend(this, options);
       }
       this._setOpacityIfSame();
 
-      this.setCoords(true);
-      this.saveCoords();
+      //this.setCoords(true);
+      //this.saveCoords();
     },
 
     /**
@@ -18130,12 +18157,13 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       // do not render if object is not visible
       if (!this.visible) return;
 
-      ctx.save();
       var v = this.canvas.viewportTransform;
-
+      ctx.save();
       var sxy = fabric.util.transformPoint(
         new fabric.Point(this.scaleX, this.scaleY),
-        v, true),
+        v,
+        true
+      ),
           groupScaleFactor = Math.max(sxy.x, sxy.y);
 
       this.clipTo && fabric.util.clipContext(this, ctx);
@@ -18157,13 +18185,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       }
       this.clipTo && ctx.restore();
 
-      if (this.active && !noTransform) {
-        var center = fabric.util.transformPoint(this.getCenterPoint(), v);
-        ctx.translate(center.x, center.y);
-        ctx.rotate(degreesToRadians(this.angle));
-        this.drawBorders(ctx);
-        this.drawControls(ctx);
-      }
+      this.callSuper('_renderControls', ctx, noTransform);
       ctx.restore();
     },
 
@@ -18325,7 +18347,14 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         }
       }
       
-      var ivt = fabric.util.invertTransform(canvas.viewportTransform);
+      var ivt;
+      if (this.canvas) {
+        ivt = fabric.util.invertTransform(this.canvas.viewportTransform);
+      }
+      else { // BUG: this always happens when new groups are created
+        ivt = [1, 0, 0, 1, 0, 0];
+        console.log('no canvas');
+      }
 
       minXY = new fabric.Point(min(aX), min(aY));
       maxXY = new fabric.Point(max(aX), max(aY));
@@ -18555,25 +18584,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       ctx.restore();
       ctx.restore();
 
-      ctx.save();
-      if (this.active && !noTransform) {
-        var center;
-        if (this.group) {
-          center = fabric.util.transformPoint(this.group.getCenterPoint(), v);
-          ctx.translate(center.x, center.y);
-          ctx.rotate(degreesToRadians(this.group.angle));
-        }
-        center = fabric.util.transformPoint(this.getCenterPoint(), v, null != this.group);
-        if (this.group) {
-          center.x *= this.group.scaleX;
-          center.y *= this.group.scaleY;
-        }
-        ctx.translate(center.x, center.y);
-        ctx.rotate(fabric.util.degreesToRadians(this.angle));
-        this.drawBorders(ctx);
-        this.drawControls(ctx);
-      }
-      ctx.restore();
+      this.callSuper('_renderControls', ctx, noTransform);
     },
 
     /**
@@ -20842,16 +20853,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
       this._render(ctx);
       ctx.restore();
-      ctx.save();
-      if (!noTransform && this.active) {
-        var center;
-        center = fabric.util.transformPoint(this.getCenterPoint(), v);
-        ctx.translate(center.x, center.y);
-        ctx.rotate(fabric.util.degreesToRadians(this.angle));
-        this.drawBorders(ctx);
-        this.drawControls(ctx);
-      }
-      ctx.restore();
+
+      this.callSuper('_renderControls', ctx, noTransform);
     },
 
     /**

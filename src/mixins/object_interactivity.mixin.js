@@ -275,8 +275,8 @@
           sx= sxy.x,
           sy= sxy.y;
       if (this.group) {
-      	w = w * this.group.scaleX;
-      	h = h * this.group.scaleY;
+        w = w * this.group.scaleX;
+        h = h * this.group.scaleY;
       }
 
       ctx.strokeRect(

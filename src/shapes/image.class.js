@@ -135,25 +135,7 @@
       ctx.restore();
       ctx.restore();
 
-      ctx.save();
-      if (this.active && !noTransform) {
-        var center;
-        if (this.group) {
-          center = fabric.util.transformPoint(this.group.getCenterPoint(), v);
-          ctx.translate(center.x, center.y);
-          ctx.rotate(degreesToRadians(this.group.angle));
-        }
-        center = fabric.util.transformPoint(this.getCenterPoint(), v, null != this.group);
-        if (this.group) {
-          center.x *= this.group.scaleX;
-          center.y *= this.group.scaleY;
-        }
-        ctx.translate(center.x, center.y);
-        ctx.rotate(fabric.util.degreesToRadians(this.angle));
-        this.drawBorders(ctx);
-        this.drawControls(ctx);
-      }
-      ctx.restore();
+      this.callSuper('_renderControls', ctx, noTransform);
     },
 
     /**

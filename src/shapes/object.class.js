@@ -1060,7 +1060,23 @@
       this.clipTo && ctx.restore();
       this._removeShadow(ctx);
       ctx.restore();
+      
+      this._renderControls(ctx, noTransform);
+    },
 
+    /**
+     * Renders controls and borders for the object
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Boolean} [noTransform] When true, context is not transformed
+     */
+    _renderControls: function(ctx, noTransform) {
+      var v;
+      if (this.canvas) {
+        v = this.canvas.viewportTransform;
+      }
+      else {
+        v = [1, 0, 0, 1, 0, 0]; // TODO: this isn't a solution
+      }
       ctx.save();
       if (this.active && !noTransform) {
         var center;

@@ -8666,13 +8666,6 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
     viewportTransform:      [1, 0, 0, 1, 0, 0],
 
     /**
-     * Color of canvas border
-     * @type String
-     * @default
-     */
-    canvasBorderColor: '',
-
-    /**
      * Callback; invoked right before object is about to be scaled/rotated
      * @param {fabric.Object} target Object that's about to be scaled/rotated
      */
@@ -8993,6 +8986,10 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
       // TODO: just change the scale, preserve other transformations
       this.viewportTransform[0] = value;
       this.viewportTransform[3] = value;
+      this.renderAll();
+      for (var i = 0, len = this._objects.length; i < len; i++) {
+        this._objects[i].setCoords();
+      }
       return this;
     },
 
@@ -9010,6 +9007,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
       );
       this.viewportTransform[4] = x - wh.x/2;
       this.viewportTransform[5] = y - wh.y/2;
+      this.renderAll();
       return this;
     },
 
@@ -9076,7 +9074,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
       obj.canvas = this;
       obj.setCoords();
       if (obj._objects) {
-        for (var i = 0, len = obj._objects; i < len; i++) {
+        for (var i = 0, len = obj._objects.length; i < len; i++) {
           obj._objects[i].canvas = this;
           obj._objects[i].setCoords();
         }
@@ -9182,10 +9180,6 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
       if (typeof this.backgroundImage === 'object') {
         this._drawBackroundImage(canvasToDrawOn);
       }
-      
-      if (this.canvasBorderColor) {
-        this._drawCanvasBorder(canvasToDrawOn);
-      }
 
       var activeGroup = this.getActiveGroup();
       for (var i = 0, length = this._objects.length; i < length; ++i) {
@@ -9239,23 +9233,6 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
       else {
         canvasToDrawOn.drawImage(this.backgroundImage, 0, 0);
       }
-      canvasToDrawOn.restore();
-    },
-
-    /**
-     * @private
-     * @param {CanvasRenderingContext2D} canvasToDrawOn Context to render on
-     */
-    _drawCanvasBorder: function(canvasToDrawOn) {
-      var xy = fabric.util.transformPoint(new fabric.Point(0, 0), this.viewportTransform),
-          wh = fabric.util.transformPoint(
-            new fabric.Point(this.getWidth(), this.getHeight()),
-            this.viewportTransform, true
-          );
-      canvasToDrawOn.save();
-      canvasToDrawOn.lineWidth = 1;
-      canvasToDrawOn.strokeStyle = this.canvasBorderColor;
-      canvasToDrawOn.strokeRect(xy.x - 1.5, xy.y - 1.5, wh.x + 2, wh.y + 2);
       canvasToDrawOn.restore();
     },
 
@@ -10369,6 +10346,8 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
     }
 
     var group = new fabric.Group(rects);
+    group.canvas = this.canvas;
+
     this.canvas.add(group);
     this.canvas.fire('path:created', { path: group });
 
@@ -10404,9 +10383,13 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
     var ctx = this.canvas.contextTop;
     ctx.fillStyle = this.color;
     ctx.save();
+    var ivt = fabric.util.invertTransform(this.canvas.viewportTransform);
 
     for (var i = 0, len = this.sprayChunkPoints.length; i < len; i++) {
       var point = this.sprayChunkPoints[i];
+      var tpoint = fabric.util.transformPoint({x: point.x, y: point.y}, ivt);
+      point.x = tpoint.x;
+      point.y = tpoint.y;
       if (typeof point.opacity !== 'undefined') {
         ctx.globalAlpha = point.opacity;
       }
@@ -10439,7 +10422,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
         width = this.dotWidth;
       }
       
-      var point = fabric.point(x, y);
+      var point = new fabric.Point(x, y);
       point = fabric.util.transformPoint(point, vpt);
       point.width = width
 
@@ -10899,7 +10882,10 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
       var action = 'drag',
           corner,
-          pointer = getPointer(e, target.canvas.UpperCanvasEl);
+          pointer = fabric.util.transformPoint(
+            getPointer(e, this.upperCanvasEl),
+            fabric.util.invertTransform(this.viewportTransform)
+          );
 
       corner = target._findTargetCorner(e, this._offset);
       if (corner) {
@@ -12040,7 +12026,10 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       }
       else {
         // object is being transformed (scaled/rotated/moved/etc.)
-        pointer = this.getPointer(e);
+        pointer = fabric.util.transformPoint(
+          getPointer(e, this.upperCanvasEl),
+          fabric.util.invertTransform(this.viewportTransform)
+        );
 
         var x = pointer.x,
             y = pointer.y,
@@ -13404,6 +13393,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @param {Boolean} fromLeft When true, context is transformed to object's top/left corner. This is used when rendering text on Node
      */
     transform: function(ctx, fromLeft) {
+      if (this.group) {
+        this.group.transform(ctx, fromLeft);
+      }
       ctx.globalAlpha = this.opacity;
 
       var center = fromLeft ? this._getLeftTopCoords() : this.getCenterPoint();
@@ -13701,9 +13693,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       }
 
       if (!noTransform) {
-        if (this.group) {
-          this.group.transform(ctx);
-        }
         this.transform(ctx);
       }
 
@@ -14735,10 +14724,21 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
       var strokeWidth = this.strokeWidth > 1 ? this.strokeWidth : 0,
           padding = this.padding,
-          theta = degreesToRadians(this.angle);
+          theta = degreesToRadians(this.angle),
+          vpt;
+      if (this.canvas) {
+        vpt = this.canvas.viewportTransform;
+      }
+      if (!vpt) { // TODO
+        vpt = [1, 0, 0, 1, 0, 0];
+      };
 
-      this.currentWidth = (this.width + strokeWidth) * this.scaleX + padding * 2;
-      this.currentHeight = (this.height + strokeWidth) * this.scaleY + padding * 2;
+      var f = function (p) {
+        return fabric.util.transformPoint(p, vpt);
+      }
+
+      this.currentWidth = (this.width + strokeWidth) * this.scaleX;
+      this.currentHeight = (this.height + strokeWidth) * this.scaleY;
 
       // If width is negative, make postive. Fixes path selection issue
       if (this.currentWidth < 0) {
@@ -14758,42 +14758,32 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
           cosTh = Math.cos(theta),
           coords = this.getCenterPoint(),
           wh = new fabric.Point(this.currentWidth, this.currentHeight);
-      var tl = {
-        x: coords.x - offsetX,
-        y: coords.y - offsetY
-      };
-      var tr = {
-        x: tl.x + (wh.x * cosTh),
-        y: tl.y + (wh.x * sinTh)
-      };
-      var br = {
-        x: tr.x - (wh.y * sinTh),
-        y: tr.y + (wh.y * cosTh)
-      };
-      var bl = {
-        x: tl.x - (wh.y * sinTh),
-        y: tl.y + (wh.y * cosTh)
-      };
-      var ml = {
-        x: tl.x - (wh.y/2 * sinTh),
-        y: tl.y + (wh.y/2 * cosTh)
-      };
-      var mt = {
-        x: tl.x + (wh.x/2 * cosTh),
-        y: tl.y + (wh.x/2 * sinTh)
-      };
-      var mr = {
-        x: tr.x - (wh.y/2 * sinTh),
-        y: tr.y + (wh.y/2 * cosTh)
-      };
-      var mb = {
-        x: bl.x + (wh.x/2 * cosTh),
-        y: bl.y + (wh.x/2 * sinTh)
-      };
-      var mtr = {
-        x: mt.x,
-        y: mt.y
-      };
+      var _tl =   new fabric.Point(coords.x - offsetX, coords.y - offsetY);
+      var _tr =   new fabric.Point(_tl.x + (wh.x * cosTh),   _tl.y + (wh.x * sinTh));
+      var _bl =   new fabric.Point(_tl.x - (wh.y * sinTh),   _tl.y + (wh.y * cosTh));
+      var _mt =   new fabric.Point(_tl.x + (wh.x/2 * cosTh), _tl.y + (wh.x/2 * sinTh));
+      var tl  = f(_tl);
+      var tr  = f(_tr);
+      var br  = f(new fabric.Point(_tr.x - (wh.y * sinTh),   _tr.y + (wh.y * cosTh)));
+      var bl  = f(_bl);
+      var ml  = f(new fabric.Point(_tl.x - (wh.y/2 * sinTh), _tl.y + (wh.y/2 * cosTh)));
+      var mt  = f(_mt);
+      var mr  = f(new fabric.Point(_tr.x - (wh.y/2 * sinTh), _tr.y + (wh.y/2 * cosTh)));
+      var mb  = f(new fabric.Point(_bl.x + (wh.x/2 * cosTh), _bl.y + (wh.x/2 * sinTh)));
+      var mtr = f(new fabric.Point(_mt.x, _mt.y));
+
+      // padding
+      var padX = Math.cos(_angle + theta) * this.padding * Math.sqrt(2),
+          padY = Math.sin(_angle + theta) * this.padding * Math.sqrt(2);
+      tl = tl.add(new fabric.Point(-padX, -padY));
+      tr = tr.add(new fabric.Point(padY, -padX));
+      br = br.add(new fabric.Point(padX, padY));
+      bl = bl.add(new fabric.Point(-padY, padX));
+      ml = ml.add(new fabric.Point((-padX - padY) / 2, (-padY + padX) / 2));
+      mt = mt.add(new fabric.Point((padY - padX) / 2, -(padY + padX) / 2));
+      mr = mr.add(new fabric.Point((padY + padX) / 2, (padY - padX) / 2));
+      mb = mb.add(new fabric.Point((padX - padY) / 2, (padX + padY) / 2));
+      mtr = mtr.add(new fabric.Point((padY - padX) / 2, -(padY + padX) / 2));
 
       // debugging
 
@@ -14817,17 +14807,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         // rotating point
         mtr: mtr
       };
-
-      var vpt;
-      if (this.canvas) {
-        vpt = this.canvas.viewportTransform;
-      }
-      if (!vpt) { // TODO
-        vpt = [1, 0, 0, 1, 0, 0];
-      }
-      for (c in this.oCoords) {
-        this.oCoords[c] = fabric.util.transformPoint(this.oCoords[c], vpt);
-      }
 
       // set coordinates of the draggable boxes in the corners used to scale/rotate the image
       this._setCornerCoords && this._setCornerCoords();
@@ -14902,9 +14881,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     _findTargetCorner: function(e, offset) {
       if (!this.hasControls || !this.active) return false;
 
-      var pointer = getPointer(e, this.canvas.upperCanvasEl),
-          ex = pointer.x - offset.left,
-          ey = pointer.y - offset.top,
+      var pointer = this.canvas.getPointer(e, true),
+          ex = pointer.x,
+          ey = pointer.y,
           xPoints,
           lines;
 
@@ -15154,22 +15133,16 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       ctx.lineWidth = 1 / this.borderScaleFactor;
       
-      var vpt = this.canvas.viewportTransform;
-      // debugging
-      if (!vpt) {
-        vpt = [1, 0, 0, 1, 0, 0]
-        console.log("No vpt! interactivity", this.canvas, this.get('canvas'), this);
-      }
-      
-      var wh = fabric.util.transformPoint(new fabric.Point(this.getWidth(), this.getHeight()), vpt, true),
+      var vpt = this.canvas.viewportTransform,
+          wh = fabric.util.transformPoint(new fabric.Point(this.getWidth(), this.getHeight()), vpt, true),
           sxy = fabric.util.transformPoint(new fabric.Point(scaleX, scaleY), vpt, true),
           w = wh.x,
           h = wh.y,
           sx= sxy.x,
           sy= sxy.y;
-      if (this.get('group')) {
-      	w = w * this.get('group').scaleX;
-      	h = h * this.get('group').scaleY;
+      if (this.group) {
+      	w = w * this.group.scaleX;
+      	h = h * this.group.scaleY;
       }
 
       ctx.strokeRect(
@@ -17994,6 +17967,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       this._objects = objects || [];
       for (var i = this._objects.length; i--; ) {
         this._objects[i].group = this;
+        this._objects[i].setCoords();
       }
 
       this.originalState = { };
@@ -18338,16 +18312,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     _calcBounds: function() {
       var aX = [],
           aY = [],
-          minX, minY, maxX, maxY, o, width, height, minXY, maxXY, ivt, // TODO: cleanup
+          minX, minY, maxX, maxY, o, width, height, minXY, maxXY,
           i = 0,
-          len = this._objects.length,
-          vpt;
-      if (this.canvas) {
-        vpt = this.canvas.viewportTransform;
-      }
-      if (!vpt) { // TODO: this always happens when new groups are created
-        vpt = [1, 0, 0, 1, 0, 0];
-      }
+          len = this._objects.length;
 
       for (; i < len; ++i) {
         o = this._objects[i];
@@ -18357,19 +18324,18 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           aY.push(o.oCoords[prop].y);
         }
       }
+      
+      var ivt = fabric.util.invertTransform(canvas.viewportTransform) || [1, 0, 0, 1, 0, 0];
 
       minXY = new fabric.Point(min(aX), min(aY));
       maxXY = new fabric.Point(max(aX), max(aY));
 
-      ivt = fabric.util.invertTransform(vpt);
-      this.width = (maxXY.x - minXY.x) || 0;
-      this.height = (maxXY.y - minXY.y) || 0;
-
       minXY = fabric.util.transformPoint(minXY, ivt);
       maxXY = fabric.util.transformPoint(maxXY, ivt);
+
       this.width = (maxXY.x - minXY.x) || 0;
       this.height = (maxXY.y - minXY.y) || 0;
-
+      
       this.left = (minXY.x + maxXY.x) / 2 || 0;
       this.top = (minXY.y + maxXY.y) / 2 || 0;
     },

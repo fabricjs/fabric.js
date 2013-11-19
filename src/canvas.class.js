@@ -504,7 +504,6 @@
             var isActiveLower = objects.indexOf(this._activeObject) < objects.indexOf(target);
             var group = new fabric.Group(
               isActiveLower ? [ target, this._activeObject ] : [ this._activeObject, target ]);
-            group.canvas = this;
 
             this.setActiveGroup(group);
             this._activeObject = null;
@@ -784,7 +783,6 @@
       }
       else if (group.length > 1) {
         group = new fabric.Group(group.reverse());
-        group.canvas = this;
         this.setActiveGroup(group);
         group.saveCoords();
         this.fire('selection:created', { target: group });
@@ -1019,6 +1017,9 @@
       this._activeGroup = group;
       if (group) {
         group.canvas = this;
+        group._calcBounds();
+        group._updateObjectsCoords();
+        group.setCoords();
         group.set('active', true);
       }
       return this;
