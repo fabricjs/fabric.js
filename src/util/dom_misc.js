@@ -141,10 +141,11 @@
    * @return {Object} Object with "left" and "top" properties
    */
   function getElementOffset(element) {
-    var docElem, win,
+    var docElem,
         box = {left: 0, top: 0},
         doc = element && element.ownerDocument,
         offset = {left: 0, top: 0},
+        scrollLeftTop,
         offsetAttributes = {
            'borderLeftWidth': 'left',
            'borderTopWidth':  'top',
@@ -164,14 +165,12 @@
     if ( typeof element.getBoundingClientRect !== "undefined" ) {
       box = element.getBoundingClientRect();
     }
-    if(doc != null && doc === doc.window){
-      win = doc;
-    } else {
-      win = doc.nodeType === 9 && (doc.defaultView || doc.parentWindow);
-    }
+
+    scrollLeftTop = fabric.util.getScrollLeftTop(element, null);
+
     return {
-      left: box.left + (win.pageXOffset || docElem.scrollLeft) - (docElem.clientLeft || 0) + offset.left,
-      top: box.top + (win.pageYOffset || docElem.scrollTop) - (docElem.clientTop || 0)  + offset.top
+      left: box.left + scrollLeftTop.left - (docElem.clientLeft || 0) + offset.left,
+      top: box.top + scrollLeftTop.top - (docElem.clientTop || 0)  + offset.top
     };
   }
 
