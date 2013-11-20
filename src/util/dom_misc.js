@@ -145,6 +145,7 @@
         box = {left: 0, top: 0},
         doc = element && element.ownerDocument,
         offset = {left: 0, top: 0},
+        scrollLeftTopResult,
         offsetAttributes = {
            'borderLeftWidth': 'left',
            'borderTopWidth':  'top',
@@ -169,9 +170,12 @@
     } else {
       win = doc.nodeType === 9 && (doc.defaultView || doc.parentWindow);
     }
+
+    scrollLeftTopResult = fabric.util.getScrollLeftTop(element, null);
+
     return {
-      left: box.left + (win.pageXOffset || docElem.scrollLeft) - (docElem.clientLeft || 0) + offset.left,
-      top: box.top + (win.pageYOffset || docElem.scrollTop) - (docElem.clientTop || 0)  + offset.top
+      left: box.left + (win.pageXOffset || docElem.scrollLeft) - (docElem.clientLeft || 0) + offset.left + scrollLeftTopResult.left,
+      top: box.top + (win.pageYOffset || docElem.scrollTop) - (docElem.clientTop || 0)  + offset.top + scrollLeftTopResult.top
     };
   }
 
