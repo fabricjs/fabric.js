@@ -15752,7 +15752,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           tempControlX,
           tempControlY,
           l = -((this.width / 2) + this.pathOffset.x),
-          t = -((this.height / 2) + this.pathOffset.y);
+          t = -((this.height / 2) + this.pathOffset.y),
+          methodName;
 
       for (var i = 0, len = this.path.length; i < len; ++i) {
 
@@ -15796,14 +15797,20 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
             x += current[1];
             y += current[2];
             // draw a line if previous command was moveTo as well (otherwise, it will have no effect)
-            ctx[(previous && (previous[0] === 'm' || previous[0] === 'M')) ? 'lineTo' : 'moveTo'](x + l, y + t);
+            methodName = (previous && (previous[0] === 'm' || previous[0] === 'M'))
+              ? 'lineTo'
+              : 'moveTo';
+            ctx[methodName](x + l, y + t);
             break;
 
           case 'M': // moveTo, absolute
             x = current[1];
             y = current[2];
             // draw a line if previous command was moveTo as well (otherwise, it will have no effect)
-            ctx[(previous && (previous[0] === 'm' || previous[0] === 'M')) ? 'lineTo' : 'moveTo'](x + l, y + t);
+            methodName = (previous && (previous[0] === 'm' || previous[0] === 'M'))
+              ? 'lineTo'
+              : 'moveTo';
+            ctx[methodName](x + l, y + t);
             break;
 
           case 'c': // bezierCurveTo, relative
@@ -15857,7 +15864,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
               tempY + t
             );
             // set control point to 2nd one of this command
-            // "... the first control point is assumed to be the reflection of the second control point on the previous command relative to the current point."
+            // "... the first control point is assumed to be
+            // the reflection of the second control point on
+            // the previous command relative to the current point."
             controlX = x + current[1];
             controlY = y + current[2];
 
@@ -15883,7 +15892,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
             y = tempY;
 
             // set control point to 2nd one of this command
-            // "... the first control point is assumed to be the reflection of the second control point on the previous command relative to the current point."
+            // "... the first control point is assumed to be
+            // the reflection of the second control point on
+            // the previous command relative to the current point."
             controlX = current[1];
             controlY = current[2];
 
@@ -20466,14 +20477,13 @@ fabric.util.object.extend(fabric.Text.prototype, {
 
       ctx.save();
 
-      var cursorLocation = this.get2DCursorLocation();
-      var lineIndex = cursorLocation.lineIndex;
-      var charIndex = cursorLocation.charIndex;
+      var cursorLocation = this.get2DCursorLocation(),
+          lineIndex = cursorLocation.lineIndex,
+          charIndex = cursorLocation.charIndex,
+          charHeight = this.getCurrentCharFontSize(lineIndex, charIndex);
 
       ctx.fillStyle = this.getCurrentCharColor(lineIndex, charIndex);
       ctx.globalAlpha = this._currentCursorOpacity;
-
-      var charHeight = this.getCurrentCharFontSize(lineIndex, charIndex);
 
       ctx.fillRect(
         boundaries.left + boundaries.leftOffset,
@@ -20496,11 +20506,11 @@ fabric.util.object.extend(fabric.Text.prototype, {
 
       ctx.fillStyle = this.selectionColor;
 
-      var cursorLocation = this.get2DCursorLocation();
-      var lineIndex = cursorLocation.lineIndex;
-      var charIndex = cursorLocation.charIndex;
-      var textLines = this.text.split(this._reNewline);
-      var origLineIndex = lineIndex;
+      var cursorLocation = this.get2DCursorLocation(),
+          lineIndex = cursorLocation.lineIndex,
+          charIndex = cursorLocation.charIndex,
+          textLines = this.text.split(this._reNewline),
+          origLineIndex = lineIndex;
 
       for (var i = this.selectionStart; i < this.selectionEnd; i++) {
 
@@ -20512,8 +20522,8 @@ fabric.util.object.extend(fabric.Text.prototype, {
         }
         else if (i !== this.text.length) {
 
-          var charWidth = this._getWidthOfChar(ctx, chars[i], lineIndex, charIndex);
-          var lineOffset = this._getLineLeftOffset(this._getWidthOfLine(ctx, lineIndex, textLines)) || 0;
+          var charWidth = this._getWidthOfChar(ctx, chars[i], lineIndex, charIndex),
+              lineOffset = this._getLineLeftOffset(this._getWidthOfLine(ctx, lineIndex, textLines)) || 0;
 
           if (lineIndex === origLineIndex) {
             // only offset the line if we're rendering selection of 2nd, 3rd, etc. line
@@ -20554,11 +20564,11 @@ fabric.util.object.extend(fabric.Text.prototype, {
           : 0;
 
       // set proper line offset
-      var textLines = this.text.split(this._reNewline);
-      var lineWidth = this._getWidthOfLine(ctx, lineIndex, textLines);
-      var lineHeight = this._getHeightOfLine(ctx, lineIndex, textLines);
-      var lineLeftOffset = this._getLineLeftOffset(lineWidth);
-      var chars = line.split('');
+      var textLines = this.text.split(this._reNewline),
+          lineWidth = this._getWidthOfLine(ctx, lineIndex, textLines),
+          lineHeight = this._getHeightOfLine(ctx, lineIndex, textLines),
+          lineLeftOffset = this._getLineLeftOffset(lineWidth),
+          chars = line.split('');
 
       left += lineLeftOffset || 0;
 
@@ -20595,8 +20605,8 @@ fabric.util.object.extend(fabric.Text.prototype, {
 
       if (this.styles && this.styles[lineIndex] && (decl = this.styles[lineIndex][i])) {
 
-        var shouldStroke = decl.stroke || this.stroke;
-        var shouldFill = decl.fill || this.fill;
+        var shouldStroke = decl.stroke || this.stroke,
+            shouldFill = decl.fill || this.fill;
 
         ctx.save();
         charWidth = this._applyCharStylesGetWidth(ctx, _char, lineIndex, i, decl);
@@ -20639,7 +20649,6 @@ fabric.util.object.extend(fabric.Text.prototype, {
       if (!textDecoration) return;
 
       if (textDecoration.indexOf('underline') > -1) {
-
         this._renderCharDecorationAtOffset(
           ctx,
           left,
@@ -20713,8 +20722,8 @@ fabric.util.object.extend(fabric.Text.prototype, {
         ctx.fillStyle = this.textBackgroundColor;
       }
 
-      var lineHeights = 0;
-      var fractionOfFontSize = this.fontSize / this._fontSizeFraction;
+      var lineHeights = 0,
+          fractionOfFontSize = this.fontSize / this._fontSizeFraction;
 
       for (var i = 0, len = textLines.length; i < len; i++) {
 
@@ -20724,8 +20733,8 @@ fabric.util.object.extend(fabric.Text.prototype, {
           continue;
         }
 
-        var lineWidth = this._getWidthOfLine(ctx, i, textLines);
-        var lineLeftOffset = this._getLineLeftOffset(lineWidth);
+        var lineWidth = this._getWidthOfLine(ctx, i, textLines),
+            lineLeftOffset = this._getLineLeftOffset(lineWidth);
 
         if (this.textBackgroundColor) {
           ctx.fillStyle = this.textBackgroundColor;
