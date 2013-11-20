@@ -91,6 +91,47 @@
     wrapper.appendChild(element);
     return wrapper;
   }
+  
+  function getScrollLeftTop(element, upperCanvasEl) {
+
+    var firstFixedAncestor,
+        origElement,
+        left = 0,
+        top = 0,
+        docElement = fabric.document.documentElement,
+        body = fabric.document.body || {
+          scrollLeft: 0, scrollTop: 0
+        };
+
+    origElement = element;
+
+    while (element && element.parentNode && !firstFixedAncestor) {
+
+      element = element.parentNode;
+
+      if (element !== fabric.document &&
+          fabric.util.getElementStyle(element, 'position') === 'fixed') {
+        firstFixedAncestor = element;
+      }
+
+      if (element !== fabric.document &&
+          origElement !== upperCanvasEl &&
+          fabric.util.getElementStyle(element, 'position') === 'absolute') {
+        left = 0;
+        top = 0;
+      }
+      else if (element === fabric.document) {
+        left = body.scrollLeft || docElement.scrollLeft || 0;
+        top = body.scrollTop ||  docElement.scrollTop || 0;
+      }
+      else {
+        left += element.scrollLeft || 0;
+        top += element.scrollTop || 0;
+      }
+    }
+
+    return { left: left, top: top };
+  }
 
   /**
    * Returns offset for a given element
@@ -104,6 +145,7 @@
         box = {left: 0, top: 0},
         doc = element && element.ownerDocument,
         offset = {left: 0, top: 0},
+        scrollLeftTopResult,
         offsetAttributes = {
            'borderLeftWidth': 'left',
            'borderTopWidth':  'top',
@@ -128,9 +170,12 @@
     } else {
       win = doc.nodeType === 9 && (doc.defaultView || doc.parentWindow);
     }
+
+    scrollLeftTopResult = fabric.util.getScrollLeftTop(element, null);
+
     return {
-      left: box.left + (win.pageXOffset || docElem.scrollLeft) - (docElem.clientLeft || 0) + offset.left,
-      top: box.top + (win.pageYOffset || docElem.scrollTop) - (docElem.clientTop || 0)  + offset.top
+      left: box.left + (win.pageXOffset || docElem.scrollLeft) - (docElem.clientLeft || 0) + offset.left + scrollLeftTopResult.left,
+      top: box.top + (win.pageYOffset || docElem.scrollTop) - (docElem.clientTop || 0)  + offset.top + scrollLeftTopResult.top
     };
   }
 
@@ -249,6 +294,7 @@
   fabric.util.makeElement = makeElement;
   fabric.util.addClass = addClass;
   fabric.util.wrapElement = wrapElement;
+  fabric.util.getScrollLeftTop = getScrollLeftTop;
   fabric.util.getElementOffset = getElementOffset;
   fabric.util.getElementStyle = getElementStyle;
 

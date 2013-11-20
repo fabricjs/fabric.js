@@ -179,53 +179,12 @@
     var element = event.target ||
                   (typeof event.srcElement !== unknown ? event.srcElement : null);
 
-    var scroll = getScrollLeftTop(element, upperCanvasEl);
+    var scroll = fabric.util.getScrollLeftTop(element, upperCanvasEl);
 
     return {
       x: pointerX(event) + scroll.left,
       y: pointerY(event) + scroll.top
     };
-  }
-
-  function getScrollLeftTop(element, upperCanvasEl) {
-
-    var firstFixedAncestor,
-        origElement,
-        left = 0,
-        top = 0,
-        docElement = fabric.document.documentElement,
-        body = fabric.document.body || {
-          scrollLeft: 0, scrollTop: 0
-        };
-
-    origElement = element;
-
-    while (element && element.parentNode && !firstFixedAncestor) {
-
-      element = element.parentNode;
-
-      if (element !== fabric.document &&
-          fabric.util.getElementStyle(element, 'position') === 'fixed') {
-        firstFixedAncestor = element;
-      }
-
-      if (element !== fabric.document &&
-          origElement !== upperCanvasEl &&
-          fabric.util.getElementStyle(element, 'position') === 'absolute') {
-        left = 0;
-        top = 0;
-      }
-      else if (element === fabric.document) {
-        left = body.scrollLeft || docElement.scrollLeft || 0;
-        top = body.scrollTop ||  docElement.scrollTop || 0;
-      }
-      else {
-        left += element.scrollLeft || 0;
-        top += element.scrollTop || 0;
-      }
-    }
-
-    return { left: left, top: top };
   }
 
   var pointerX = function(event) {
