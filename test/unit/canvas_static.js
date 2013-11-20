@@ -98,7 +98,7 @@
   }
 
   function createImageObject(callback) {
-    return _createImageObject(IMG_WIDTH, IMG_HEIGHT, callback)
+    return _createImageObject(IMG_WIDTH, IMG_HEIGHT, callback);
   }
 
   function setSrc(img, src, callback) {
@@ -341,7 +341,7 @@
     var rect = makeRect({ left: 102, top: 202 });
     canvas.add(rect);
     equal(canvas.centerObjectH(rect), canvas, 'should be chainable');
-    equal(rect.get('left'), lowerCanvasEl.width / 2, 'object\'s "left" property should correspond to canvas element\'s center');
+    equal(rect.getCenterPoint().x, lowerCanvasEl.width / 2, 'object\'s "left" property should correspond to canvas element\'s center');
   });
 
   test('centerObjectV', function() {
@@ -349,7 +349,7 @@
     var rect = makeRect({ left: 102, top: 202 });
     canvas.add(rect);
     equal(canvas.centerObjectV(rect), canvas, 'should be chainable');
-    equal(rect.get('top'), lowerCanvasEl.height / 2, 'object\'s "top" property should correspond to canvas element\'s center');
+    equal(rect.getCenterPoint().y, lowerCanvasEl.height / 2, 'object\'s "top" property should correspond to canvas element\'s center');
   });
 
   test('centerObject', function() {
@@ -358,13 +358,13 @@
     canvas.add(rect);
     equal(canvas.centerObject(rect), canvas, 'should be chainable');
 
-    equal(rect.get('top'), lowerCanvasEl.height / 2, 'object\'s "top" property should correspond to canvas element\'s center');
-    equal(rect.get('left'), lowerCanvasEl.height / 2, 'object\'s "left" property should correspond to canvas element\'s center');
+    equal(rect.getCenterPoint().y, lowerCanvasEl.height / 2, 'object\'s "top" property should correspond to canvas element\'s center');
+    equal(rect.getCenterPoint().x, lowerCanvasEl.height / 2, 'object\'s "left" property should correspond to canvas element\'s center');
   });
 
   test('straightenObject', function() {
     ok(typeof canvas.straightenObject == 'function');
-    var rect = makeRect({ angle: 10 })
+    var rect = makeRect({ angle: 10 });
     canvas.add(rect);
     equal(canvas.straightenObject(rect), canvas, 'should be chainable');
     equal(rect.getAngle(), 0, 'angle should be coerced to 0 (from 10)');
@@ -658,7 +658,7 @@
 
       equal('text', canvas.item(0).type);
       equal(150, canvas.item(0).left);
-      equal(200, canvas.item(0).top)
+      equal(200, canvas.item(0).top);
       equal('NAME HERE', canvas.item(0).text);
 
       start();
