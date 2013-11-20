@@ -333,7 +333,8 @@
           scaleOffsetSizeY = (size2 - size) / this.scaleY,
           height = this.height,
           width = this.width,
-          methodName = this.transparentCorners ? 'strokeRect' : 'fillRect';
+          methodName = this.transparentCorners ? 'strokeRect' : 'fillRect',
+          renderMiddleHandles = !this.lockScalingX && !this.lockScalingY;
 
       ctx.save();
 
@@ -342,48 +343,55 @@
       ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
       ctx.strokeStyle = ctx.fillStyle = this.cornerColor;
 
-      // top-left
-      this._drawControl('tl', ctx, methodName,
+      if(renderMiddleHandles) {
+       // top-left
+       this._drawControl('tl', ctx, methodName,
         left - scaleOffsetX - strokeWidth2 - paddingX,
         top - scaleOffsetY - strokeWidth2 - paddingY);
 
-      // top-right
-      this._drawControl('tr', ctx, methodName,
+       // top-right
+       this._drawControl('tr', ctx, methodName,
         left + width - scaleOffsetX + strokeWidth2 + paddingX,
         top - scaleOffsetY - strokeWidth2 - paddingY);
 
-      // bottom-left
-      this._drawControl('tr', ctx, methodName,
+       // bottom-left
+       this._drawControl('tr', ctx, methodName,
         left - scaleOffsetX - strokeWidth2 - paddingX,
         top + height + scaleOffsetSizeY + strokeWidth2 + paddingY);
 
-      // bottom-right
-      this._drawControl('br', ctx, methodName,
+       // bottom-right
+       this._drawControl('br', ctx, methodName,
         left + width + scaleOffsetSizeX + strokeWidth2 + paddingX,
         top + height + scaleOffsetSizeY + strokeWidth2 + paddingY);
+      }
 
-      if (!this.get('lockUniScaling')) {
+      if (!this.lockUniScaling) {
 
+       if (!this.lockScalingY) {
         // middle-top
         this._drawControl('mt', ctx, methodName,
-          left + width/2 - scaleOffsetX,
-          top - scaleOffsetY - strokeWidth2 - paddingY);
+         left + width/2 - scaleOffsetX,
+         top - scaleOffsetY - strokeWidth2 - paddingY);
 
         // middle-bottom
         this._drawControl('mb', ctx, methodName,
-          left + width/2 - scaleOffsetX,
-          top + height + scaleOffsetSizeY + strokeWidth2 + paddingY);
+         left + width/2 - scaleOffsetX,
+         top + height + scaleOffsetSizeY + strokeWidth2 + paddingY);
+       }
 
+       if (!this.lockScalingX) {
         // middle-right
-        this._drawControl('mb', ctx, methodName,
-          left + width + scaleOffsetSizeX + strokeWidth2 + paddingX,
-          top + height/2 - scaleOffsetY);
+        this._drawControl('mr', ctx, methodName,
+         left + width + scaleOffsetSizeX + strokeWidth2 + paddingX,
+         top + height/2 - scaleOffsetY);
 
         // middle-left
         this._drawControl('ml', ctx, methodName,
-          left - scaleOffsetX - strokeWidth2 - paddingX,
-          top + height/2 - scaleOffsetY);
-      }
+         left - scaleOffsetX - strokeWidth2 - paddingX,
+         top + height/2 - scaleOffsetY);
+        }
+
+       }
 
       // middle-top-rotate
       if (this.hasRotatingPoint) {
