@@ -783,11 +783,11 @@
     /**
      * Centers object horizontally.
      * You might need to call `setCoords` on an object after centering, to update controls area.
-     * @param {fabric.Object} object Object to center
+     * @param {fabric.Object} object Object to center horizontally
      * @return {fabric.Canvas} thisArg
      */
     centerObjectH: function (object) {
-      object.set('left', this.getCenter().left);
+      this._centerObject(object, new fabric.Point(this.getCenter().left, object.getCenterPoint().y));
       this.renderAll();
       return this;
     },
@@ -795,12 +795,12 @@
     /**
      * Centers object vertically.
      * You might need to call `setCoords` on an object after centering, to update controls area.
-     * @param {fabric.Object} object Object to center
+     * @param {fabric.Object} object Object to center vertically
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
     centerObjectV: function (object) {
-      object.set('top', this.getCenter().top);
+      this._centerObject(object, new fabric.Point(object.getCenterPoint().x, this.getCenter().top));
       this.renderAll();
       return this;
     },
@@ -808,12 +808,28 @@
     /**
      * Centers object vertically and horizontally.
      * You might need to call `setCoords` on an object after centering, to update controls area.
-     * @param {fabric.Object} object Object to center
+     * @param {fabric.Object} object Object to center vertically and horizontally
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
-    centerObject: function (object) {
-      return this.centerObjectH(object).centerObjectV(object);
+    centerObject: function(object) {
+      var center = this.getCenter();
+
+      this._centerObject(object, new fabric.Point(center.left, center.top));
+      this.renderAll();
+      return this;
+    },
+
+    /**
+     * @private
+     * @param {fabric.Object} object Object to center
+     * @param {fabric.Point} center Center point
+     * @return {fabric.Canvas} thisArg
+     * @chainable
+     */
+    _centerObject: function(object, center) {
+      object.setPositionByOrigin(center, 'center', 'center');
+      return this;
     },
 
     /**

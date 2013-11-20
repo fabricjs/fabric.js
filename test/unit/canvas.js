@@ -207,7 +207,7 @@
     var rect = makeRect({ left: 102, top: 202 });
     canvas.add(rect);
     equal(canvas.centerObjectH(rect), canvas, 'should be chainable');
-    equal(rect.get('left'), upperCanvasEl.width / 2, 'object\'s "left" property should correspond to canvas element\'s center');
+    equal(rect.getCenterPoint().x, upperCanvasEl.width / 2, 'object\'s "left" property should correspond to canvas element\'s center');
   });
 
   test('centerObjectV', function() {
@@ -215,7 +215,7 @@
     var rect = makeRect({ left: 102, top: 202 });
     canvas.add(rect);
     equal(canvas.centerObjectV(rect), canvas, 'should be chainable');
-    equal(rect.get('top'), upperCanvasEl.height / 2, 'object\'s "top" property should correspond to canvas element\'s center');
+    equal(rect.getCenterPoint().y, upperCanvasEl.height / 2, 'object\'s "top" property should correspond to canvas element\'s center');
   });
 
   test('centerObject', function() {
@@ -224,8 +224,8 @@
     canvas.add(rect);
     equal(canvas.centerObject(rect), canvas, 'should be chainable');
 
-    equal(rect.get('top'), upperCanvasEl.height / 2, 'object\'s "top" property should correspond to canvas element\'s center');
-    equal(rect.get('left'), upperCanvasEl.height / 2, 'object\'s "left" property should correspond to canvas element\'s center');
+    equal(rect.getCenterPoint().y, upperCanvasEl.height / 2, 'object\'s "top" property should correspond to canvas element\'s center');
+    equal(rect.getCenterPoint().x, upperCanvasEl.width / 2, 'object\'s "left" property should correspond to canvas element\'s center');
   });
 
   test('straightenObject', function() {
