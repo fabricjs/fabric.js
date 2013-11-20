@@ -405,10 +405,22 @@
      * @private
      */
     _removeCharsFromTo: function(start, end) {
+
       var i = end;
       while (i !== start) {
+
+        var prevIndex = this.get2DCursorLocation(i).charIndex;
         i--;
-        this.removeStyleObject(false, i);
+        var index = this.get2DCursorLocation(i).charIndex;
+        var isNewline = index > prevIndex;
+
+        if (isNewline) {
+          this.removeStyleObject(isNewline, i + 1);
+        }
+        else {
+          this.removeStyleObject(this.get2DCursorLocation(i).charIndex === 0, i);
+        }
+
       }
 
       this.text = this.text.slice(0, start) +
