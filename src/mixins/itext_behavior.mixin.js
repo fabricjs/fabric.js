@@ -310,6 +310,8 @@
       this._tick();
       this.canvas.renderAll();
 
+      this.fire('editing:entered');
+
       return this;
     },
 
@@ -385,6 +387,8 @@
       this.abortCursorAnimation();
       this._restoreEditingProps();
       this._currentCursorOpacity = 0;
+
+      this.fire('editing:exited');
 
       return this;
     },

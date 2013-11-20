@@ -7,7 +7,11 @@
     * @class fabric.IText
     * @extends fabric.Text
     * @mixes fabric.Observable
+    *
     * @fires text:changed
+    * @fires editing:entered
+    * @fires editing:exited
+    *
     * @return {fabric.IText} thisArg
     * @see {@link fabric.IText#initialize} for constructor definition
     *

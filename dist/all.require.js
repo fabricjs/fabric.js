@@ -3339,53 +3339,12 @@ fabric.util.string = {
     var element = event.target ||
                   (typeof event.srcElement !== unknown ? event.srcElement : null);
 
-    var scroll = getScrollLeftTop(element, upperCanvasEl);
+    var scroll = fabric.util.getScrollLeftTop(element, upperCanvasEl);
 
     return {
       x: pointerX(event) + scroll.left,
       y: pointerY(event) + scroll.top
     };
-  }
-
-  function getScrollLeftTop(element, upperCanvasEl) {
-
-    var firstFixedAncestor,
-        origElement,
-        left = 0,
-        top = 0,
-        docElement = fabric.document.documentElement,
-        body = fabric.document.body || {
-          scrollLeft: 0, scrollTop: 0
-        };
-
-    origElement = element;
-
-    while (element && element.parentNode && !firstFixedAncestor) {
-
-      element = element.parentNode;
-
-      if (element !== fabric.document &&
-          fabric.util.getElementStyle(element, 'position') === 'fixed') {
-        firstFixedAncestor = element;
-      }
-
-      if (element !== fabric.document &&
-          origElement !== upperCanvasEl &&
-          fabric.util.getElementStyle(element, 'position') === 'absolute') {
-        left = 0;
-        top = 0;
-      }
-      else if (element === fabric.document) {
-        left = body.scrollLeft || docElement.scrollLeft || 0;
-        top = body.scrollTop ||  docElement.scrollTop || 0;
-      }
-      else {
-        left += element.scrollLeft || 0;
-        top += element.scrollTop || 0;
-      }
-    }
-
-    return { left: left, top: top };
   }
 
   var pointerX = function(event) {
@@ -3589,6 +3548,47 @@ fabric.util.string = {
     wrapper.appendChild(element);
     return wrapper;
   }
+  
+  function getScrollLeftTop(element, upperCanvasEl) {
+
+    var firstFixedAncestor,
+        origElement,
+        left = 0,
+        top = 0,
+        docElement = fabric.document.documentElement,
+        body = fabric.document.body || {
+          scrollLeft: 0, scrollTop: 0
+        };
+
+    origElement = element;
+
+    while (element && element.parentNode && !firstFixedAncestor) {
+
+      element = element.parentNode;
+
+      if (element !== fabric.document &&
+          fabric.util.getElementStyle(element, 'position') === 'fixed') {
+        firstFixedAncestor = element;
+      }
+
+      if (element !== fabric.document &&
+          origElement !== upperCanvasEl &&
+          fabric.util.getElementStyle(element, 'position') === 'absolute') {
+        left = 0;
+        top = 0;
+      }
+      else if (element === fabric.document) {
+        left = body.scrollLeft || docElement.scrollLeft || 0;
+        top = body.scrollTop ||  docElement.scrollTop || 0;
+      }
+      else {
+        left += element.scrollLeft || 0;
+        top += element.scrollTop || 0;
+      }
+    }
+
+    return { left: left, top: top };
+  }
 
   /**
    * Returns offset for a given element
@@ -3598,10 +3598,11 @@ fabric.util.string = {
    * @return {Object} Object with "left" and "top" properties
    */
   function getElementOffset(element) {
-    var docElem, win,
+    var docElem,
         box = {left: 0, top: 0},
         doc = element && element.ownerDocument,
         offset = {left: 0, top: 0},
+        scrollLeftTop,
         offsetAttributes = {
            'borderLeftWidth': 'left',
            'borderTopWidth':  'top',
@@ -3621,14 +3622,12 @@ fabric.util.string = {
     if ( typeof element.getBoundingClientRect !== "undefined" ) {
       box = element.getBoundingClientRect();
     }
-    if(doc != null && doc === doc.window){
-      win = doc;
-    } else {
-      win = doc.nodeType === 9 && (doc.defaultView || doc.parentWindow);
-    }
+
+    scrollLeftTop = fabric.util.getScrollLeftTop(element, null);
+
     return {
-      left: box.left + (win.pageXOffset || docElem.scrollLeft) - (docElem.clientLeft || 0) + offset.left,
-      top: box.top + (win.pageYOffset || docElem.scrollTop) - (docElem.clientTop || 0)  + offset.top
+      left: box.left + scrollLeftTop.left - (docElem.clientLeft || 0) + offset.left,
+      top: box.top + scrollLeftTop.top - (docElem.clientTop || 0)  + offset.top
     };
   }
 
@@ -3747,6 +3746,7 @@ fabric.util.string = {
   fabric.util.makeElement = makeElement;
   fabric.util.addClass = addClass;
   fabric.util.wrapElement = wrapElement;
+  fabric.util.getScrollLeftTop = getScrollLeftTop;
   fabric.util.getElementOffset = getElementOffset;
   fabric.util.getElementStyle = getElementStyle;
 
@@ -12857,20 +12857,22 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @return {fabric.Point}
      */
     translateToCenterPoint: function(point, originX, originY) {
-      var cx = point.x, cy = point.y;
+      var cx = point.x,
+          cy = point.y,
+          strokeWidth = this.stroke ? this.strokeWidth : 0;
 
-      if ( originX === "left" ) {
-        cx = point.x + ( this.getWidth() + (this.strokeWidth*this.scaleX) )/ 2;
+      if (originX === "left") {
+        cx = point.x + (this.getWidth() + strokeWidth * this.scaleX) / 2;
       }
-      else if ( originX === "right" ) {
-        cx = point.x - ( this.getWidth() + (this.strokeWidth*this.scaleX) ) / 2;
+      else if (originX === "right") {
+        cx = point.x - (this.getWidth() + strokeWidth * this.scaleX) / 2;
       }
 
-      if ( originY === "top" ) {
-        cy = point.y +( this.getHeight() + (this.strokeWidth*this.scaleY) ) / 2;
+      if (originY === "top") {
+        cy = point.y + (this.getHeight() + strokeWidth * this.scaleY) / 2;
       }
-      else if ( originY === "bottom" ) {
-        cy = point.y - ( this.getHeight() + (this.strokeWidth*this.scaleY) )  / 2;
+      else if (originY === "bottom") {
+        cy = point.y - (this.getHeight() + strokeWidth * this.scaleY) / 2;
       }
 
       // Apply the reverse rotation to the point (it's already scaled properly)
@@ -12885,20 +12887,22 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @return {fabric.Point}
      */
     translateToOriginPoint: function(center, originX, originY) {
-      var x = center.x, y = center.y;
+      var x = center.x,
+          y = center.y,
+          strokeWidth = this.stroke ? this.strokeWidth : 0;
 
       // Get the point coordinates
-      if ( originX === "left" ) {
-        x = center.x - ( this.getWidth() + (this.strokeWidth*this.scaleX) ) / 2;
+      if (originX === "left") {
+        x = center.x - (this.getWidth() + strokeWidth * this.scaleX) / 2;
       }
-      else if ( originX === "right" ) {
-        x = center.x + ( this.getWidth() + (this.strokeWidth*this.scaleX) ) / 2;
+      else if (originX === "right") {
+        x = center.x + (this.getWidth() + strokeWidth * this.scaleX) / 2;
       }
-      if ( originY === "top" ) {
-        y = center.y - ( this.getHeight() + (this.strokeWidth*this.scaleY) )/ 2;
+      if (originY === "top") {
+        y = center.y - (this.getHeight() + strokeWidth * this.scaleY) / 2;
       }
-      else if ( originY === "bottom" ) {
-        y = center.y + ( this.getHeight() + (this.strokeWidth*this.scaleY) )/ 2;
+      else if (originY === "bottom") {
+        y = center.y + (this.getHeight() + strokeWidth * this.scaleY) / 2;
       }
 
       // Apply the rotation to the point (it's already scaled properly)
@@ -12936,29 +12940,32 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
     /**
      * Returns the point in local coordinates
-     * @param {fabric.Point} The point relative to the global coordinate system
+     * @param {fabric.Point} point The point relative to the global coordinate system
+     * @param {String} originX Horizontal origin: 'left', 'center' or 'right'
+     * @param {String} originY Vertical origin: 'top', 'center' or 'bottom'
      * @return {fabric.Point}
      */
     toLocalPoint: function(point, originX, originY) {
-      var center = this.getCenterPoint();
+      var center = this.getCenterPoint(),
+          strokeWidth = this.stroke ? this.strokeWidth : 0,
+          x, y;
 
-      var x, y;
-      if (originX !== undefined && originY !== undefined) {
-        if ( originX === "left" ) {
-          x = center.x - (this.getWidth() + this.strokeWidth*this.scaleX) / 2;
+      if (originX && originY) {
+        if (originX === "left") {
+          x = center.x - (this.getWidth() + strokeWidth * this.scaleX) / 2;
         }
-        else if ( originX === "right" ) {
-          x = center.x + (this.getWidth() + this.strokeWidth*this.scaleX)/ 2;
+        else if (originX === "right") {
+          x = center.x + (this.getWidth() + strokeWidth * this.scaleX) / 2;
         }
         else {
           x = center.x;
         }
 
-        if ( originY === "top" ) {
-          y = center.y - (this.getHeight() + this.strokeWidth*this.scaleY) / 2;
+        if (originY === "top") {
+          y = center.y - (this.getHeight() + strokeWidth * this.scaleY) / 2;
         }
-        else if ( originY === "bottom" ) {
-          y = center.y + (this.getHeight() + this.strokeWidth*this.scaleY)/ 2;
+        else if (originY === "bottom") {
+          y = center.y + (this.getHeight() + strokeWidth * this.scaleY) / 2;
         }
         else {
           y = center.y;
@@ -12998,7 +13005,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     },
 
     /**
-     * @param {String} to One of left, center, right
+     * @param {String} to One of 'left', 'center', 'right'
      */
     adjustPosition: function(to) {
       var angle = degreesToRadians(this.angle);
@@ -20046,7 +20053,11 @@ fabric.util.object.extend(fabric.Text.prototype, {
     * @class fabric.IText
     * @extends fabric.Text
     * @mixes fabric.Observable
+    *
     * @fires text:changed
+    * @fires editing:entered
+    * @fires editing:exited
+    *
     * @return {fabric.IText} thisArg
     * @see {@link fabric.IText#initialize} for constructor definition
     *
@@ -21335,6 +21346,8 @@ fabric.util.object.extend(fabric.Text.prototype, {
       this._tick();
       this.canvas.renderAll();
 
+      this.fire('editing:entered');
+
       return this;
     },
 
@@ -21411,6 +21424,8 @@ fabric.util.object.extend(fabric.Text.prototype, {
       this._restoreEditingProps();
       this._currentCursorOpacity = 0;
 
+      this.fire('editing:exited');
+
       return this;
     },
 
@@ -21430,10 +21445,22 @@ fabric.util.object.extend(fabric.Text.prototype, {
      * @private
      */
     _removeCharsFromTo: function(start, end) {
+
       var i = end;
       while (i !== start) {
+
+        var prevIndex = this.get2DCursorLocation(i).charIndex;
         i--;
-        this.removeStyleObject(false, i);
+        var index = this.get2DCursorLocation(i).charIndex;
+        var isNewline = index > prevIndex;
+
+        if (isNewline) {
+          this.removeStyleObject(isNewline, i + 1);
+        }
+        else {
+          this.removeStyleObject(this.get2DCursorLocation(i).charIndex === 0, i);
+        }
+
       }
 
       this.text = this.text.slice(0, start) +
