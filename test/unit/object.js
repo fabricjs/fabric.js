@@ -330,29 +330,29 @@
 
     cObj.setCoords();
     boundingRect = cObj.getBoundingRect();
-    equal(boundingRect.left, 0.5);
-    equal(boundingRect.top, 0.5);
+    equal(boundingRect.left, 0);
+    equal(boundingRect.top, 0);
     equal(boundingRect.width, 0);
     equal(boundingRect.height, 0);
 
     cObj.set('width', 123).setCoords();
     boundingRect = cObj.getBoundingRect();
-    equal(boundingRect.left, 0.5);
-    equal(boundingRect.top, 0.5);
+    equal(boundingRect.left, 0);
+    equal(boundingRect.top, 0);
     equal(boundingRect.width, 123);
     equal(boundingRect.height, 0);
 
     cObj.set('height', 167).setCoords();
     boundingRect = cObj.getBoundingRect();
-    equal(boundingRect.left, 0.5);
-    equal(boundingRect.top, 0.5);
+    equal(boundingRect.left, 0);
+    equal(boundingRect.top, 0);
     equal(boundingRect.width, 123);
     equal(boundingRect.height, 167);
 
     cObj.scale(2).setCoords();
     boundingRect = cObj.getBoundingRect();
-    equal(boundingRect.left, 1);
-    equal(boundingRect.top, 1);
+    equal(boundingRect.left, 0);
+    equal(boundingRect.top, 0);
     equal(boundingRect.width, 246);
     equal(boundingRect.height, 334);
   });
@@ -459,27 +459,27 @@
     cObj.set('left', 250).set('top', 250);
 
     // coords should still correspond to initial one, even after invoking `set`
-    equal(cObj.oCoords.tl.x, 150.5);
-    equal(cObj.oCoords.tl.y, 150.5);
-    equal(cObj.oCoords.tr.x, 250.5);
-    equal(cObj.oCoords.tr.y, 150.5);
-    equal(cObj.oCoords.bl.x, 150.5);
-    equal(cObj.oCoords.bl.y, 250.5);
-    equal(cObj.oCoords.br.x, 250.5);
-    equal(cObj.oCoords.br.y, 250.5);
+    equal(cObj.oCoords.tl.x, 150);
+    equal(cObj.oCoords.tl.y, 150);
+    equal(cObj.oCoords.tr.x, 250);
+    equal(cObj.oCoords.tr.y, 150);
+    equal(cObj.oCoords.bl.x, 150);
+    equal(cObj.oCoords.bl.y, 250);
+    equal(cObj.oCoords.br.x, 250);
+    equal(cObj.oCoords.br.y, 250);
 
     // recalculate coords
     cObj.setCoords();
 
     // check that coords are now updated
-    equal(cObj.oCoords.tl.x, 250.5);
-    equal(cObj.oCoords.tl.y, 250.5);
-    equal(cObj.oCoords.tr.x, 350.5);
-    equal(cObj.oCoords.tr.y, 250.5);
-    equal(cObj.oCoords.bl.x, 250.5);
-    equal(cObj.oCoords.bl.y, 350.5);
-    equal(cObj.oCoords.br.x, 350.5);
-    equal(cObj.oCoords.br.y, 350.5);
+    equal(cObj.oCoords.tl.x, 250);
+    equal(cObj.oCoords.tl.y, 250);
+    equal(cObj.oCoords.tr.x, 350);
+    equal(cObj.oCoords.tr.y, 250);
+    equal(cObj.oCoords.bl.x, 250);
+    equal(cObj.oCoords.bl.y, 350);
+    equal(cObj.oCoords.br.x, 350);
+    equal(cObj.oCoords.br.y, 350);
   });
 
   test('drawBorders', function() {
