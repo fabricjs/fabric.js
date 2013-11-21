@@ -99,54 +99,12 @@
   }
 
   /**
-   * Returns an object of attributes' name/value, given element and an array of attribute names;
-   * Parses parent "g" nodes recursively upwards.
-   * @static
-   * @memberOf fabric
-   * @param {DOMElement} element Element to parse
-   * @param {Array} attributes Array of attributes to parse
-   * @return {Object} object containing parsed attributes' names/values
-   */
-  function parseAttributes(element, attributes) {
-
-    if (!element) {
-      return;
-    }
-
-    var value,
-        parentAttributes = { };
-
-    // if there's a parent container (`g` node), parse its attributes recursively upwards
-    if (element.parentNode && /^g$/i.test(element.parentNode.nodeName)) {
-      parentAttributes = fabric.parseAttributes(element.parentNode, attributes);
-    }
-
-    var ownAttributes = attributes.reduce(function(memo, attr) {
-      value = element.getAttribute(attr);
-      if (value) {
-        attr = normalizeAttr(attr);
-        value = normalizeValue(attr, value, parentAttributes);
-
-        memo[attr] = value;
-      }
-      return memo;
-    }, { });
-
-    // add values parsed from style, which take precedence over attributes
-    // (see: http://www.w3.org/TR/SVG/styling.html#UsingPresentationAttributes)
-
-    ownAttributes = extend(ownAttributes,
-      extend(getGlobalStylesForElement(element), fabric.parseStyleAttribute(element)));
-    return _setStrokeFillOpacity(extend(parentAttributes, ownAttributes));
-  }
-
-  /**
    * Parses "transform" attribute, returning an array of values
    * @static
    * @function
    * @memberOf fabric
-   * @param attributeValue {String} string containing attribute value
-   * @return {Array} array of 6 elements representing transformation matrix
+   * @param {String} attributeValue String containing attribute value
+   * @return {Array} Array of 6 elements representing transformation matrix
    */
   fabric.parseTransformAttribute = (function() {
     function rotateMatrix(matrix, args) {
@@ -294,49 +252,6 @@
     };
   })();
 
-  /**
-   * Parses "points" attribute, returning an array of values
-   * @static
-   * @memberOf fabric
-   * @param points {String} points attribute string
-   * @return {Array} array of points
-   */
-  function parsePointsAttribute(points) {
-
-    // points attribute is required and must not be empty
-    if (!points) return null;
-
-    points = points.trim();
-    var asPairs = points.indexOf(',') > -1;
-
-    points = points.split(/\s+/);
-    var parsedPoints = [ ], i, len;
-
-    // points could look like "10,20 30,40" or "10 20 30 40"
-    if (asPairs) {
-      i = 0;
-      len = points.length;
-      for (; i < len; i++) {
-        var pair = points[i].split(',');
-        parsedPoints.push({ x: parseFloat(pair[0]), y: parseFloat(pair[1]) });
-      }
-    }
-    else {
-      i = 0;
-      len = points.length;
-      for (; i < len; i+=2) {
-        parsedPoints.push({ x: parseFloat(points[i]), y: parseFloat(points[i+1]) });
-      }
-    }
-
-    // odd number of points is an error
-    if (parsedPoints.length % 2 !== 0) {
-      // return null;
-    }
-
-    return parsedPoints;
-  }
-
   function parseFontDeclaration(value, oStyle) {
 
     // TODO: support non-px font size
@@ -367,29 +282,6 @@
     if (lineHeight) {
       oStyle.lineHeight = lineHeight === 'normal' ? 1 : lineHeight;
     }
-  }
-
-  /**
-   * Parses "style" attribute, retuning an object with values
-   * @static
-   * @memberOf fabric
-   * @param {SVGElement} element Element to parse
-   * @return {Object} Objects with values parsed from style attribute of an element
-   */
-  function parseStyleAttribute(element) {
-    var oStyle = { },
-        style = element.getAttribute('style');
-
-    if (!style) return oStyle;
-
-    if (typeof style === 'string') {
-      parseStyleString(style, oStyle);
-    }
-    else {
-      parseStyleObject(style, oStyle);
-    }
-
-    return oStyle;
   }
 
   /**
@@ -430,81 +322,6 @@
         oStyle[attr] = value;
       }
     }
-  }
-
-  function resolveGradients(instances) {
-    for (var i = instances.length; i--; ) {
-      var instanceFillValue = instances[i].get('fill');
-
-      if (/^url\(/.test(instanceFillValue)) {
-
-        var gradientId = instanceFillValue.slice(5, instanceFillValue.length - 1);
-
-        if (fabric.gradientDefs[gradientId]) {
-          instances[i].set('fill',
-            fabric.Gradient.fromElement(fabric.gradientDefs[gradientId], instances[i]));
-        }
-      }
-    }
-  }
-
-  /**
-   * Transforms an array of svg elements to corresponding fabric.* instances
-   * @static
-   * @memberOf fabric
-   * @param {Array} elements Array of elements to parse
-   * @param {Function} callback Being passed an array of fabric instances (transformed from SVG elements)
-   * @param {Object} [options] Options object
-   * @param {Function} [reviver] Method for further parsing of SVG elements, called after each fabric object created.
-   */
-  function parseElements(elements, callback, options, reviver) {
-    fabric.ElementsParser.parse(elements, callback, options, reviver);
-  }
-
-  /**
-   * Returns CSS rules for a given SVG document
-   * @static
-   * @function
-   * @memberOf fabric
-   * @param {SVGDocument} doc SVG document to parse
-   * @return {Object} CSS rules of this document
-   */
-  function getCSSRules(doc) {
-    var styles = doc.getElementsByTagName('style'),
-        allRules = { },
-        rules;
-
-    // very crude parsing of style contents
-    for (var i = 0, len = styles.length; i < len; i++) {
-      var styleContents = styles[0].textContent;
-
-      // remove comments
-      styleContents = styleContents.replace(/\/\*[\s\S]*?\*\//g, '');
-
-      rules = styleContents.match(/[^{]*\{[\s\S]*?\}/g);
-      rules = rules.map(function(rule) { return rule.trim(); });
-
-      rules.forEach(function(rule) {
-        var match = rule.match(/([\s\S]*?)\s*\{([^}]*)\}/);
-        rule = match[1];
-        var declaration = match[2].trim(),
-            propertyValuePairs = declaration.replace(/;$/, '').split(/\s*;\s*/);
-
-        if (!allRules[rule]) {
-          allRules[rule] = { };
-        }
-
-        for (var i = 0, len = propertyValuePairs.length; i < len; i++) {
-          var pair = propertyValuePairs[i].split(/\s*:\s*/),
-              property = pair[0],
-              value = pair[1];
-
-          allRules[rule][property] = value;
-        }
-      });
-    }
-
-    return allRules;
   }
 
   /**
@@ -617,7 +434,7 @@
       };
 
       fabric.gradientDefs = fabric.getGradientDefs(doc);
-      fabric.cssRules = getCSSRules(doc);
+      fabric.cssRules = fabric.getCSSRules(doc);
 
       // Precedence of rules:   style > class > attribute
 
@@ -661,53 +478,6 @@
      }
    };
 
-   /**
-    * Takes url corresponding to an SVG document, and parses it into a set of fabric objects. Note that SVG is fetched via XMLHttpRequest, so it needs to conform to SOP (Same Origin Policy)
-    * @memberof fabric
-    * @param {String} url
-    * @param {Function} callback
-    * @param {Function} [reviver] Method for further parsing of SVG elements, called after each fabric object created.
-    */
-   function loadSVGFromURL(url, callback, reviver) {
-
-     url = url.replace(/^\n\s*/, '').trim();
-
-     svgCache.has(url, function (hasUrl) {
-       if (hasUrl) {
-         svgCache.get(url, function (value) {
-           var enlivedRecord = _enlivenCachedObject(value);
-           callback(enlivedRecord.objects, enlivedRecord.options);
-         });
-       }
-       else {
-         new fabric.util.request(url, {
-           method: 'get',
-           onComplete: onComplete
-         });
-       }
-     });
-
-     function onComplete(r) {
-
-       var xml = r.responseXML;
-       if (!xml.documentElement && fabric.window.ActiveXObject && r.responseText) {
-         xml = new ActiveXObject('Microsoft.XMLDOM');
-         xml.async = 'false';
-         //IE chokes on DOCTYPE
-         xml.loadXML(r.responseText.replace(/<!DOCTYPE[\s\S]*?(\[[\s\S]*\])*?>/i,''));
-       }
-       if (!xml.documentElement) return;
-
-       fabric.parseSVGDocument(xml.documentElement, function (results, options) {
-         svgCache.set(url, {
-           objects: fabric.util.array.invoke(results, 'toObject'),
-           options: options
-         });
-         callback(results, options);
-       }, reviver);
-     }
-   }
-
   /**
    * @private
    */
@@ -721,80 +491,6 @@
    });
 
    return ({ objects: objects, options: options });
-  }
-
-  /**
-    * Takes string corresponding to an SVG document, and parses it into a set of fabric objects
-    * @memberof fabric
-    * @param {String} string
-    * @param {Function} callback
-    * @param {Function} [reviver] Method for further parsing of SVG elements, called after each fabric object created.
-    */
-  function loadSVGFromString(string, callback, reviver) {
-    string = string.trim();
-    var doc;
-    if (typeof DOMParser !== 'undefined') {
-      var parser = new DOMParser();
-      if (parser && parser.parseFromString) {
-        doc = parser.parseFromString(string, 'text/xml');
-      }
-    }
-    else if (fabric.window.ActiveXObject) {
-      doc = new ActiveXObject('Microsoft.XMLDOM');
-      doc.async = 'false';
-      //IE chokes on DOCTYPE
-      doc.loadXML(string.replace(/<!DOCTYPE[\s\S]*?(\[[\s\S]*\])*?>/i,''));
-    }
-
-    fabric.parseSVGDocument(doc.documentElement, function (results, options) {
-      callback(results, options);
-    }, reviver);
-  }
-
-  /**
-   * Creates markup containing SVG font faces
-   * @param {Array} objects Array of fabric objects
-   * @return {String}
-   */
-  function createSVGFontFacesMarkup(objects) {
-    var markup = '';
-
-    for (var i = 0, len = objects.length; i < len; i++) {
-      if (objects[i].type !== 'text' || !objects[i].path) continue;
-
-      markup += [
-        '@font-face {',
-          'font-family: ', objects[i].fontFamily, '; ',
-          'src: url(\'', objects[i].path, '\')',
-        '}'
-      ].join('');
-    }
-
-    if (markup) {
-      markup = [
-        '<style type="text/css">',
-          '<![CDATA[',
-            markup,
-          ']]>',
-        '</style>'
-      ].join('');
-    }
-
-    return markup;
-  }
-
-  /**
-   * Creates markup containing SVG referenced elements like patterns, gradients etc.
-   * @param {fabric.Canvas} canvas instance of fabric.Canvas
-   * @return {String}
-   */
-  function createSVGRefElementsMarkup(canvas) {
-    var markup = [ ];
-
-    _createSVGPattern(markup, canvas, 'backgroundColor');
-    _createSVGPattern(markup, canvas, 'overlayColor');
-
-    return markup.join('');
   }
 
   /**
@@ -816,51 +512,343 @@
     }
   }
 
-  /**
-   * Parses an SVG document, returning all of the gradient declarations found in it
-   * @static
-   * @function
-   * @memberOf fabric
-   * @param {SVGDocument} doc SVG document to parse
-   * @return {Object} Gradient definitions; key corresponds to element id, value -- to gradient definition element
-   */
-  function getGradientDefs(doc) {
-    var linearGradientEls = doc.getElementsByTagName('linearGradient'),
-        radialGradientEls = doc.getElementsByTagName('radialGradient'),
-        el, i,
-        gradientDefs = { };
-
-    i = linearGradientEls.length;
-    for (; i--; ) {
-      el = linearGradientEls[i];
-      gradientDefs[el.getAttribute('id')] = el;
-    }
-
-    i = radialGradientEls.length;
-    for (; i--; ) {
-      el = radialGradientEls[i];
-      gradientDefs[el.getAttribute('id')] = el;
-    }
-
-    return gradientDefs;
-  }
-
   extend(fabric, {
 
-    parseAttributes:            parseAttributes,
-    parseElements:              parseElements,
-    parseStyleAttribute:        parseStyleAttribute,
-    parsePointsAttribute:       parsePointsAttribute,
-    getCSSRules:                getCSSRules,
+    /**
+     * Initializes gradients on instances, according to gradients parsed from a document
+     * @param {Array} instances
+     */
+    resolveGradients: function(instances) {
+      for (var i = instances.length; i--; ) {
+        var instanceFillValue = instances[i].get('fill');
 
-    loadSVGFromURL:             loadSVGFromURL,
-    loadSVGFromString:          loadSVGFromString,
+        if (!(/^url\(/).test(instanceFillValue)) continue;
 
-    createSVGFontFacesMarkup:   createSVGFontFacesMarkup,
-    createSVGRefElementsMarkup: createSVGRefElementsMarkup,
+        var gradientId = instanceFillValue.slice(5, instanceFillValue.length - 1);
 
-    getGradientDefs:            getGradientDefs,
-    resolveGradients:           resolveGradients
+        if (fabric.gradientDefs[gradientId]) {
+          instances[i].set('fill',
+            fabric.Gradient.fromElement(fabric.gradientDefs[gradientId], instances[i]));
+        }
+      }
+    },
+
+    /**
+     * Parses an SVG document, returning all of the gradient declarations found in it
+     * @static
+     * @function
+     * @memberOf fabric
+     * @param {SVGDocument} doc SVG document to parse
+     * @return {Object} Gradient definitions; key corresponds to element id, value -- to gradient definition element
+     */
+    getGradientDefs: function(doc) {
+      var linearGradientEls = doc.getElementsByTagName('linearGradient'),
+          radialGradientEls = doc.getElementsByTagName('radialGradient'),
+          el, i,
+          gradientDefs = { };
+
+      i = linearGradientEls.length;
+      for (; i--; ) {
+        el = linearGradientEls[i];
+        gradientDefs[el.getAttribute('id')] = el;
+      }
+
+      i = radialGradientEls.length;
+      for (; i--; ) {
+        el = radialGradientEls[i];
+        gradientDefs[el.getAttribute('id')] = el;
+      }
+
+      return gradientDefs;
+    },
+
+    /**
+     * Returns an object of attributes' name/value, given element and an array of attribute names;
+     * Parses parent "g" nodes recursively upwards.
+     * @static
+     * @memberOf fabric
+     * @param {DOMElement} element Element to parse
+     * @param {Array} attributes Array of attributes to parse
+     * @return {Object} object containing parsed attributes' names/values
+     */
+    parseAttributes: function(element, attributes) {
+
+      if (!element) {
+        return;
+      }
+
+      var value,
+          parentAttributes = { };
+
+      // if there's a parent container (`g` node), parse its attributes recursively upwards
+      if (element.parentNode && /^g$/i.test(element.parentNode.nodeName)) {
+        parentAttributes = fabric.parseAttributes(element.parentNode, attributes);
+      }
+
+      var ownAttributes = attributes.reduce(function(memo, attr) {
+        value = element.getAttribute(attr);
+        if (value) {
+          attr = normalizeAttr(attr);
+          value = normalizeValue(attr, value, parentAttributes);
+
+          memo[attr] = value;
+        }
+        return memo;
+      }, { });
+
+      // add values parsed from style, which take precedence over attributes
+      // (see: http://www.w3.org/TR/SVG/styling.html#UsingPresentationAttributes)
+      ownAttributes = extend(ownAttributes,
+        extend(getGlobalStylesForElement(element), fabric.parseStyleAttribute(element)));
+
+      return _setStrokeFillOpacity(extend(parentAttributes, ownAttributes));
+    },
+
+    /**
+     * Transforms an array of svg elements to corresponding fabric.* instances
+     * @static
+     * @memberOf fabric
+     * @param {Array} elements Array of elements to parse
+     * @param {Function} callback Being passed an array of fabric instances (transformed from SVG elements)
+     * @param {Object} [options] Options object
+     * @param {Function} [reviver] Method for further parsing of SVG elements, called after each fabric object created.
+     */
+    parseElements: function(elements, callback, options, reviver) {
+      fabric.ElementsParser.parse(elements, callback, options, reviver);
+    },
+
+    /**
+     * Parses "style" attribute, retuning an object with values
+     * @static
+     * @memberOf fabric
+     * @param {SVGElement} element Element to parse
+     * @return {Object} Objects with values parsed from style attribute of an element
+     */
+    parseStyleAttribute: function(element) {
+      var oStyle = { },
+          style = element.getAttribute('style');
+
+      if (!style) return oStyle;
+
+      if (typeof style === 'string') {
+        parseStyleString(style, oStyle);
+      }
+      else {
+        parseStyleObject(style, oStyle);
+      }
+
+      return oStyle;
+    },
+
+    /**
+     * Parses "points" attribute, returning an array of values
+     * @static
+     * @memberOf fabric
+     * @param points {String} points attribute string
+     * @return {Array} array of points
+     */
+    parsePointsAttribute: function(points) {
+
+      // points attribute is required and must not be empty
+      if (!points) return null;
+
+      points = points.trim();
+      var asPairs = points.indexOf(',') > -1;
+
+      points = points.split(/\s+/);
+      var parsedPoints = [ ], i, len;
+
+      // points could look like "10,20 30,40" or "10 20 30 40"
+      if (asPairs) {
+        i = 0;
+        len = points.length;
+        for (; i < len; i++) {
+          var pair = points[i].split(',');
+          parsedPoints.push({ x: parseFloat(pair[0]), y: parseFloat(pair[1]) });
+        }
+      }
+      else {
+        i = 0;
+        len = points.length;
+        for (; i < len; i+=2) {
+          parsedPoints.push({ x: parseFloat(points[i]), y: parseFloat(points[i+1]) });
+        }
+      }
+
+      // odd number of points is an error
+      if (parsedPoints.length % 2 !== 0) {
+        // return null;
+      }
+
+      return parsedPoints;
+    },
+
+    /**
+     * Returns CSS rules for a given SVG document
+     * @static
+     * @function
+     * @memberOf fabric
+     * @param {SVGDocument} doc SVG document to parse
+     * @return {Object} CSS rules of this document
+     */
+    getCSSRules: function(doc) {
+      var styles = doc.getElementsByTagName('style'),
+          allRules = { },
+          rules;
+
+      // very crude parsing of style contents
+      for (var i = 0, len = styles.length; i < len; i++) {
+        var styleContents = styles[0].textContent;
+
+        // remove comments
+        styleContents = styleContents.replace(/\/\*[\s\S]*?\*\//g, '');
+
+        rules = styleContents.match(/[^{]*\{[\s\S]*?\}/g);
+        rules = rules.map(function(rule) { return rule.trim(); });
+
+        rules.forEach(function(rule) {
+          var match = rule.match(/([\s\S]*?)\s*\{([^}]*)\}/);
+          rule = match[1];
+          var declaration = match[2].trim(),
+              propertyValuePairs = declaration.replace(/;$/, '').split(/\s*;\s*/);
+
+          if (!allRules[rule]) {
+            allRules[rule] = { };
+          }
+
+          for (var i = 0, len = propertyValuePairs.length; i < len; i++) {
+            var pair = propertyValuePairs[i].split(/\s*:\s*/),
+                property = pair[0],
+                value = pair[1];
+
+            allRules[rule][property] = value;
+          }
+        });
+      }
+
+      return allRules;
+    },
+
+    /**
+     * Takes url corresponding to an SVG document, and parses it into a set of fabric objects. Note that SVG is fetched via XMLHttpRequest, so it needs to conform to SOP (Same Origin Policy)
+     * @memberof fabric
+     * @param {String} url
+     * @param {Function} callback
+     * @param {Function} [reviver] Method for further parsing of SVG elements, called after each fabric object created.
+     */
+    loadSVGFromURL: function(url, callback, reviver) {
+
+      url = url.replace(/^\n\s*/, '').trim();
+
+      svgCache.has(url, function (hasUrl) {
+        if (hasUrl) {
+          svgCache.get(url, function (value) {
+            var enlivedRecord = _enlivenCachedObject(value);
+            callback(enlivedRecord.objects, enlivedRecord.options);
+          });
+        }
+        else {
+          new fabric.util.request(url, {
+            method: 'get',
+            onComplete: onComplete
+          });
+        }
+      });
+
+      function onComplete(r) {
+
+        var xml = r.responseXML;
+        if (!xml.documentElement && fabric.window.ActiveXObject && r.responseText) {
+          xml = new ActiveXObject('Microsoft.XMLDOM');
+          xml.async = 'false';
+          //IE chokes on DOCTYPE
+          xml.loadXML(r.responseText.replace(/<!DOCTYPE[\s\S]*?(\[[\s\S]*\])*?>/i,''));
+        }
+        if (!xml.documentElement) return;
+
+        fabric.parseSVGDocument(xml.documentElement, function (results, options) {
+          svgCache.set(url, {
+            objects: fabric.util.array.invoke(results, 'toObject'),
+            options: options
+          });
+          callback(results, options);
+        }, reviver);
+      }
+    },
+
+    /**
+     * Takes string corresponding to an SVG document, and parses it into a set of fabric objects
+     * @memberof fabric
+     * @param {String} string
+     * @param {Function} callback
+     * @param {Function} [reviver] Method for further parsing of SVG elements, called after each fabric object created.
+     */
+    loadSVGFromString: function(string, callback, reviver) {
+      string = string.trim();
+      var doc;
+      if (typeof DOMParser !== 'undefined') {
+        var parser = new DOMParser();
+        if (parser && parser.parseFromString) {
+          doc = parser.parseFromString(string, 'text/xml');
+        }
+      }
+      else if (fabric.window.ActiveXObject) {
+        doc = new ActiveXObject('Microsoft.XMLDOM');
+        doc.async = 'false';
+        //IE chokes on DOCTYPE
+        doc.loadXML(string.replace(/<!DOCTYPE[\s\S]*?(\[[\s\S]*\])*?>/i,''));
+      }
+
+      fabric.parseSVGDocument(doc.documentElement, function (results, options) {
+        callback(results, options);
+      }, reviver);
+    },
+
+    /**
+     * Creates markup containing SVG font faces
+     * @param {Array} objects Array of fabric objects
+     * @return {String}
+     */
+    createSVGFontFacesMarkup: function(objects) {
+      var markup = '';
+
+      for (var i = 0, len = objects.length; i < len; i++) {
+        if (objects[i].type !== 'text' || !objects[i].path) continue;
+
+        markup += [
+          '@font-face {',
+            'font-family: ', objects[i].fontFamily, '; ',
+            'src: url(\'', objects[i].path, '\')',
+          '}'
+        ].join('');
+      }
+
+      if (markup) {
+        markup = [
+          '<style type="text/css">',
+            '<![CDATA[',
+              markup,
+            ']]>',
+          '</style>'
+        ].join('');
+      }
+
+      return markup;
+    },
+
+    /**
+     * Creates markup containing SVG referenced elements like patterns, gradients etc.
+     * @param {fabric.Canvas} canvas instance of fabric.Canvas
+     * @return {String}
+     */
+    createSVGRefElementsMarkup: function(canvas) {
+      var markup = [ ];
+
+      _createSVGPattern(markup, canvas, 'backgroundColor');
+      _createSVGPattern(markup, canvas, 'overlayColor');
+
+      return markup.join('');
+    }
   });
 
 })(typeof exports !== 'undefined' ? exports : this);
