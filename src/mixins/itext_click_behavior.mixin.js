@@ -98,7 +98,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         this.setCursorByClick(options.e);
         this.__selectionStartOnMouseDown = this.selectionStart;
       }
-
+      else {
+        this.exitEditingOnOthers();
+      }
     });
   },
 

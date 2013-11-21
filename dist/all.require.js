@@ -7604,11 +7604,11 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
     /**
      * Centers object horizontally.
      * You might need to call `setCoords` on an object after centering, to update controls area.
-     * @param {fabric.Object} object Object to center
+     * @param {fabric.Object} object Object to center horizontally
      * @return {fabric.Canvas} thisArg
      */
     centerObjectH: function (object) {
-      object.set('left', this.getCenter().left);
+      this._centerObject(object, new fabric.Point(this.getCenter().left, object.getCenterPoint().y));
       this.renderAll();
       return this;
     },
@@ -7616,12 +7616,12 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
     /**
      * Centers object vertically.
      * You might need to call `setCoords` on an object after centering, to update controls area.
-     * @param {fabric.Object} object Object to center
+     * @param {fabric.Object} object Object to center vertically
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
     centerObjectV: function (object) {
-      object.set('top', this.getCenter().top);
+      this._centerObject(object, new fabric.Point(object.getCenterPoint().x, this.getCenter().top));
       this.renderAll();
       return this;
     },
@@ -7629,12 +7629,28 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
     /**
      * Centers object vertically and horizontally.
      * You might need to call `setCoords` on an object after centering, to update controls area.
-     * @param {fabric.Object} object Object to center
+     * @param {fabric.Object} object Object to center vertically and horizontally
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
-    centerObject: function (object) {
-      return this.centerObjectH(object).centerObjectV(object);
+    centerObject: function(object) {
+      var center = this.getCenter();
+
+      this._centerObject(object, new fabric.Point(center.left, center.top));
+      this.renderAll();
+      return this;
+    },
+
+    /**
+     * @private
+     * @param {fabric.Object} object Object to center
+     * @param {fabric.Point} center Center point
+     * @return {fabric.Canvas} thisArg
+     * @chainable
+     */
+    _centerObject: function(object, center) {
+      object.setPositionByOrigin(center, 'center', 'center');
+      return this;
     },
 
     /**
@@ -12616,7 +12632,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @chainable
      */
     center: function () {
-      return this.centerH().centerV();
+      this.canvas.centerObject(this);
+      return this;
     },
 
     /**
@@ -13445,6 +13462,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     return [ translatePart, anglePart, scalePart, flipXPart, flipYPart ].join('');
   },
 
+  /**
+   * @private
+   */
   _createBaseSVGMarkup: function() {
     var markup = [ ];
 
@@ -21341,10 +21361,7 @@ fabric.util.object.extend(fabric.Text.prototype, {
     enterEditing: function() {
       if (this.isEditing || !this.editable) return;
 
-      fabric.IText.instances.forEach(function(obj) {
-        if (obj === this) return;
-        obj.exitEditing();
-      }, this);
+      this.exitEditingOnOthers();
 
       this.isEditing = true;
 
@@ -21358,6 +21375,13 @@ fabric.util.object.extend(fabric.Text.prototype, {
       this.fire('editing:entered');
 
       return this;
+    },
+
+    exitEditingOnOthers: function() {
+      fabric.IText.instances.forEach(function(obj) {
+        if (obj === this) return;
+        obj.exitEditing();
+      }, this);
     },
 
     /**
@@ -21774,7 +21798,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         this.setCursorByClick(options.e);
         this.__selectionStartOnMouseDown = this.selectionStart;
       }
-
+      else {
+        this.exitEditingOnOthers();
+      }
     });
   },
 

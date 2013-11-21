@@ -296,10 +296,7 @@
     enterEditing: function() {
       if (this.isEditing || !this.editable) return;
 
-      fabric.IText.instances.forEach(function(obj) {
-        if (obj === this) return;
-        obj.exitEditing();
-      }, this);
+      this.exitEditingOnOthers();
 
       this.isEditing = true;
 
@@ -313,6 +310,13 @@
       this.fire('editing:entered');
 
       return this;
+    },
+
+    exitEditingOnOthers: function() {
+      fabric.IText.instances.forEach(function(obj) {
+        if (obj === this) return;
+        obj.exitEditing();
+      }, this);
     },
 
     /**
