@@ -74,6 +74,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     return [ translatePart, anglePart, scalePart, flipXPart, flipYPart ].join('');
   },
 
+  /**
+   * @private
+   */
   _createBaseSVGMarkup: function() {
     var markup = [ ];
 
