@@ -24,6 +24,13 @@
     equal(oColor.toHsl(), 'hsl(262,80%,12%)');
   });
 
+  test('empty args', function() {
+    var oColor = new fabric.Color();
+    ok(oColor);
+    ok(oColor instanceof fabric.Color);
+    equal(oColor.toHex(), '000000');
+  });
+
   test('getSource', function() {
     var oColor = new fabric.Color('ffffff');
     ok(typeof oColor.getSource == 'function');

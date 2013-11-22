@@ -76,6 +76,16 @@
     deepEqual(fabric.util.degreesToRadians(), NaN);
   });
 
+  test('fabric.util.radiansToDegrees', function(){
+    ok(typeof fabric.util.radiansToDegrees == 'function');
+
+    equal(fabric.util.radiansToDegrees(0), 0);
+    equal(fabric.util.radiansToDegrees(Math.PI / 2), 90);
+    equal(fabric.util.radiansToDegrees(Math.PI), 180);
+
+    deepEqual(fabric.util.radiansToDegrees(), NaN);
+  });
+
   test('fabric.util.getRandomInt', function() {
     ok(typeof fabric.util.getRandomInt == 'function');
 

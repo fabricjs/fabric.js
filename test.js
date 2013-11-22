@@ -30,7 +30,8 @@ testrunner.run({
       './test/unit/gradient.js',
       './test/unit/pattern.js',
       './test/unit/shadow.js',
-      './test/unit/object_interactivity.js'
+      './test/unit/object_interactivity.js',
+      './test/unit/itext.js'
     ]
 }, function(err, report) {
   if (err) {
