@@ -299,13 +299,27 @@
   //   // TODO:
   // });
 
-  // test('findWordBoundaryLeft', function() {
-  //   // TODO:
-  // });
+  test('findWordBoundaryLeft', function() {
+    var iText = new fabric.IText('test foo bar-baz\nqux');
 
-  // test('findWordBoundaryRight', function() {
-  //   // TODO:
-  // });
+    equal(typeof iText.findWordBoundaryLeft, 'function');
+
+    equal(iText.findWordBoundaryLeft(3), 0); // 'tes|t'
+    equal(iText.findWordBoundaryLeft(20), 17); // 'qux|'
+    equal(iText.findWordBoundaryLeft(6), 5); // 'f|oo'
+    equal(iText.findWordBoundaryLeft(11), 9); // 'ba|r-baz'
+  });
+
+  test('findWordBoundaryRight', function() {
+    var iText = new fabric.IText('test foo bar-baz\nqux');
+
+    equal(typeof iText.findWordBoundaryRight, 'function');
+
+    equal(iText.findWordBoundaryRight(3), 4); // 'tes|t'
+    equal(iText.findWordBoundaryRight(17), 20); // '|qux'
+    equal(iText.findWordBoundaryRight(6), 8); // 'f|oo'
+    equal(iText.findWordBoundaryRight(11), 16); // 'ba|r-baz'
+  });
 
   test('findLineBoundaryLeft', function() {
     var iText = new fabric.IText('test foo bar-baz\nqux');
