@@ -442,6 +442,7 @@
 
     if (IMG_URL.indexOf('/home/travis') === 0) {
       // image can not be accessed on travis so we're returning early
+      expect(0);
       start();
       return;
     }
