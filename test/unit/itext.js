@@ -265,9 +265,19 @@
     equal(iText.selectionEnd, 8);
   });
 
-  // test('selectLine', function() {
-  //   // TODO:
-  // });
+  test('selectLine', function() {
+    var iText = new fabric.IText('test foo bar-baz\nqux');
+
+    equal(typeof iText.selectLine, 'function');
+
+    iText.selectLine(6);
+    equal(iText.selectionStart, 0); // |test foo bar-baz|
+    equal(iText.selectionEnd, 16);
+
+    iText.selectLine(18);
+    equal(iText.selectionStart, 17); // |qux|
+    equal(iText.selectionEnd, 20);
+  });
 
   // test('getSelectionStyles', function() {
   //   // TODO:
@@ -297,16 +307,35 @@
   //   // TODO:
   // });
 
-  // test('findLineBoundaryLeft', function() {
-  //   // TODO:
-  // });
+  test('findLineBoundaryLeft', function() {
+    var iText = new fabric.IText('test foo bar-baz\nqux');
 
-  // test('findLineBoundaryRight', function() {
-  //   // TODO:
-  // });
+    equal(typeof iText.findLineBoundaryLeft, 'function');
 
-  // test('getNumNewLinesInSelectedText', function() {
-  //   // TODO:
-  // });
+    equal(iText.findLineBoundaryLeft(3), 0); // 'tes|t'
+    equal(iText.findLineBoundaryLeft(20), 17); // 'qux|'
+  });
+
+  test('findLineBoundaryRight', function() {
+    var iText = new fabric.IText('test foo bar-baz\nqux');
+
+    equal(typeof iText.findLineBoundaryRight, 'function');
+
+    equal(iText.findLineBoundaryRight(3), 16); // 'tes|t'
+    equal(iText.findLineBoundaryRight(17), 20); // '|qux'
+  });
+
+  test('getNumNewLinesInSelectedText', function() {
+    var iText = new fabric.IText('test foo bar-baz\nqux');
+
+    equal(typeof iText.getNumNewLinesInSelectedText, 'function');
+
+    equal(iText.getNumNewLinesInSelectedText(), 0);
+
+    iText.selectionStart = 0;
+    iText.selectionEnd = 20;
+
+    equal(iText.getNumNewLinesInSelectedText(), 1);
+  });
 
 })();
