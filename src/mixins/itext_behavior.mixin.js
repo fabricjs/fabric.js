@@ -157,7 +157,8 @@
 
     /**
      * Find new selection index representing start of current word according to current selection index
-     * @param {Number} current selection index
+     * @param {Number} startFrom Surrent selection index
+     * @return {Number} New selection index
      */
     findWordBoundaryLeft: function(startFrom) {
       var offset = 0, index = startFrom - 1;
@@ -179,7 +180,8 @@
 
     /**
      * Find new selection index representing end of current word according to current selection index
-     * @param {Number} current selection index
+     * @param {Number} startFrom Current selection index
+     * @return {Number} New selection index
      */
     findWordBoundaryRight: function(startFrom) {
       var offset = 0, index = startFrom;
@@ -231,7 +233,7 @@
 
     /**
      * Returns number of newlines in selected text
-     * @return {Number}
+     * @return {Number} Number of newlines in selected text
      */
     getNumNewLinesInSelectedText: function() {
       var selectedText = this.getSelectedText();
@@ -305,7 +307,7 @@
       this._setEditingProps();
 
       this._tick();
-      this.canvas.renderAll();
+      this.canvas && this.canvas.renderAll();
 
       this.fire('editing:entered');
 
@@ -323,9 +325,11 @@
      * @private
      */
     _setEditingProps: function() {
-      this.hoverCursor =
-      this.canvas.defaultCursor =
-      this.canvas.moveCursor = 'text';
+      this.hoverCursor = 'text';
+
+      if (this.canvas) {
+        this.canvas.defaultCursor = this.canvas.moveCursor = 'text';
+      }
 
       this.borderColor = this.editingBorderColor;
 
@@ -354,8 +358,8 @@
         lockMovementX: this.lockMovementX,
         lockMovementY: this.lockMovementY,
         hoverCursor: this.hoverCursor,
-        defaultCursor: this.canvas.defaultCursor,
-        moveCursor: this.canvas.moveCursor
+        defaultCursor: this.canvas && this.canvas.defaultCursor,
+        moveCursor: this.canvas && this.canvas.moveCursor
       };
     },
 
@@ -366,12 +370,15 @@
       if (!this._savedProps) return;
 
       this.hoverCursor = this._savedProps.overCursor;
-      this.canvas.defaultCursor = this._savedProps.defaultCursor;
-      this.canvas.moveCursor = this._savedProps.moveCursor;
       this.hasControls = this._savedProps.hasControls;
       this.borderColor = this._savedProps.borderColor;
       this.lockMovementX = this._savedProps.lockMovementX;
       this.lockMovementY = this._savedProps.lockMovementY;
+
+      if (this.canvas) {
+        this.canvas.defaultCursor = this._savedProps.defaultCursor;
+        this.canvas.moveCursor = this._savedProps.moveCursor;
+      }
     },
 
     /**

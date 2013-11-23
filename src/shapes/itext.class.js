@@ -284,11 +284,11 @@
           boundaries;
 
       if (this.selectionStart === this.selectionEnd) {
-        boundaries = this.getCursorBoundaries(chars, 'cursor');
+        boundaries = this._getCursorBoundaries(chars, 'cursor');
         this.renderCursor(boundaries);
       }
       else {
-        boundaries = this.getCursorBoundaries(chars, 'selection');
+        boundaries = this._getCursorBoundaries(chars, 'selection');
         this.renderSelection(chars, boundaries);
       }
     },
@@ -338,10 +338,11 @@
 
     /**
      * Returns cursor boundaries (left, top, leftOffset, topOffset)
+     * @private
      * @param {Array} chars Array of characters
      * @param {String} typeOfBoundaries
      */
-    getCursorBoundaries: function(chars, typeOfBoundaries) {
+    _getCursorBoundaries: function(chars, typeOfBoundaries) {
 
       var cursorLocation = this.get2DCursorLocation(),
 
