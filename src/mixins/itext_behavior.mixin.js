@@ -454,11 +454,11 @@
                   this.text.slice(this.selectionEnd);
 
       if (this.selectionStart === this.selectionEnd) {
-        this.insertStyleObject(_chars, isEndOfLine);
+        this.insertStyleObjects(_chars, isEndOfLine, this.copiedStyles);
       }
       else if (this.selectionEnd - this.selectionStart > 1) {
         // TODO: replace styles properly
-        // console.log('replacing MORE than 1 char');
+        console.log('replacing MORE than 1 char');
       }
 
       this.selectionStart += _chars.length;
@@ -515,13 +515,14 @@
      * Inserts style object for a given line/char index
      * @param {Number} lineIndex Index of a line
      * @param {Number} charIndex Index of a char
+     * @param {Object} [style] Style object to insert, if given
      */
-    insertCharStyleObject: function(lineIndex, charIndex) {
+    insertCharStyleObject: function(lineIndex, charIndex, style) {
 
       var currentLineStyles = this.styles[lineIndex],
           currentLineStylesCloned = clone(currentLineStyles);
 
-      if (charIndex === 0) {
+      if (charIndex === 0 && !style) {
         charIndex = 1;
       }
 
@@ -534,15 +535,18 @@
           //delete currentLineStyles[index];
         }
       }
-      this.styles[lineIndex][charIndex] = clone(currentLineStyles[charIndex - 1]);
+
+      this.styles[lineIndex][charIndex] =
+        style || clone(currentLineStyles[charIndex - 1]);
     },
 
     /**
-     * Inserts style object
+     * Inserts style object(s)
      * @param {String} _chars Characters at the location where style is inserted
      * @param {Boolean} isEndOfLine True if it's end of line
+     * @param {Array} [styles] Styles to insert
      */
-    insertStyleObject: function(_chars, isEndOfLine) {
+    insertStyleObjects: function(_chars, isEndOfLine, styles) {
 
       // short-circuit
       if (this.isEmptyStyles()) return;
@@ -559,8 +563,27 @@
         this.insertNewlineStyleObject(lineIndex, charIndex, isEndOfLine);
       }
       else {
-        // TODO: support multiple style insertion if _chars.length > 1
-        this.insertCharStyleObject(lineIndex, charIndex);
+        if (styles) {
+          this._insertStyles(styles);
+        }
+        else {
+          // TODO: support multiple style insertion if _chars.length > 1
+          this.insertCharStyleObject(lineIndex, charIndex);
+        }
+      }
+    },
+
+    /**
+     * @private
+     */
+    _insertStyles: function(styles) {
+      for (var i = 0, len = styles.length; i < len; i++) {
+
+        var cursorLocation = this.get2DCursorLocation(this.selectionStart + i),
+            lineIndex = cursorLocation.lineIndex,
+            charIndex = cursorLocation.charIndex;
+
+        this.insertCharStyleObject(lineIndex, charIndex, styles[i]);
       }
     },
 

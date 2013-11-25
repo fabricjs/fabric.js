@@ -18484,13 +18484,25 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 
     /**
      * Gets style of a current selection/cursor (at the start position)
-     * @return {Object} styles Style object at a cursor position
+     * @param {Number} [startIndex] Start index to get styles at
+     * @param {Number} [endIndex] End index to get styles at
+     * @return {Object} styles Style object at a specified (or current) index
      */
-    getSelectionStyles: function() {
-      var loc = this.get2DCursorLocation();
+    getSelectionStyles: function(startIndex, endIndex) {
+
+      if (arguments.length === 2) {
+        var styles = [ ];
+        for (var i = startIndex; i < endIndex; i++) {
+          styles.push(this.getSelectionStyles(i));
+        }
+        return styles;
+      }
+
+      var loc = this.get2DCursorLocation(startIndex);
       if (this.styles[loc.lineIndex]) {
         return this.styles[loc.lineIndex][loc.charIndex] || { };
       }
+
       return { };
     },
 
@@ -19709,11 +19721,11 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
                   this.text.slice(this.selectionEnd);
 
       if (this.selectionStart === this.selectionEnd) {
-        this.insertStyleObject(_chars, isEndOfLine);
+        this.insertStyleObjects(_chars, isEndOfLine, this.copiedStyles);
       }
       else if (this.selectionEnd - this.selectionStart > 1) {
         // TODO: replace styles properly
-        // console.log('replacing MORE than 1 char');
+        console.log('replacing MORE than 1 char');
       }
 
       this.selectionStart += _chars.length;
@@ -19770,13 +19782,14 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * Inserts style object for a given line/char index
      * @param {Number} lineIndex Index of a line
      * @param {Number} charIndex Index of a char
+     * @param {Object} [style] Style object to insert, if given
      */
-    insertCharStyleObject: function(lineIndex, charIndex) {
+    insertCharStyleObject: function(lineIndex, charIndex, style) {
 
       var currentLineStyles = this.styles[lineIndex],
           currentLineStylesCloned = clone(currentLineStyles);
 
-      if (charIndex === 0) {
+      if (charIndex === 0 && !style) {
         charIndex = 1;
       }
 
@@ -19789,15 +19802,18 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
           //delete currentLineStyles[index];
         }
       }
-      this.styles[lineIndex][charIndex] = clone(currentLineStyles[charIndex - 1]);
+
+      this.styles[lineIndex][charIndex] =
+        style || clone(currentLineStyles[charIndex - 1]);
     },
 
     /**
-     * Inserts style object
+     * Inserts style object(s)
      * @param {String} _chars Characters at the location where style is inserted
      * @param {Boolean} isEndOfLine True if it's end of line
+     * @param {Array} [styles] Styles to insert
      */
-    insertStyleObject: function(_chars, isEndOfLine) {
+    insertStyleObjects: function(_chars, isEndOfLine, styles) {
 
       // short-circuit
       if (this.isEmptyStyles()) return;
@@ -19814,8 +19830,27 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
         this.insertNewlineStyleObject(lineIndex, charIndex, isEndOfLine);
       }
       else {
-        // TODO: support multiple style insertion if _chars.length > 1
-        this.insertCharStyleObject(lineIndex, charIndex);
+        if (styles) {
+          this._insertStyles(styles);
+        }
+        else {
+          // TODO: support multiple style insertion if _chars.length > 1
+          this.insertCharStyleObject(lineIndex, charIndex);
+        }
+      }
+    },
+
+    /**
+     * @private
+     */
+    _insertStyles: function(styles) {
+      for (var i = 0, len = styles.length; i < len; i++) {
+
+        var cursorLocation = this.get2DCursorLocation(this.selectionStart + i),
+            lineIndex = cursorLocation.lineIndex,
+            charIndex = cursorLocation.charIndex;
+
+        this.insertCharStyleObject(lineIndex, charIndex, styles[i]);
       }
     },
 
@@ -20246,6 +20281,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   copy: function() {
     var selectedText = this.getSelectedText();
     this.copiedText = selectedText;
+    this.copiedStyles = this.getSelectionStyles(
+                          this.selectionStart,
+                          this.selectionEnd);
   },
 
   /**

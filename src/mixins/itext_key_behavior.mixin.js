@@ -82,6 +82,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   copy: function() {
     var selectedText = this.getSelectedText();
     this.copiedText = selectedText;
+    this.copiedStyles = this.getSelectionStyles(
+                          this.selectionStart,
+                          this.selectionEnd);
   },
 
   /**

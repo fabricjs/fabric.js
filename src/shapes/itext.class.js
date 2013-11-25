@@ -220,13 +220,25 @@
 
     /**
      * Gets style of a current selection/cursor (at the start position)
-     * @return {Object} styles Style object at a cursor position
+     * @param {Number} [startIndex] Start index to get styles at
+     * @param {Number} [endIndex] End index to get styles at
+     * @return {Object} styles Style object at a specified (or current) index
      */
-    getSelectionStyles: function() {
-      var loc = this.get2DCursorLocation();
+    getSelectionStyles: function(startIndex, endIndex) {
+
+      if (arguments.length === 2) {
+        var styles = [ ];
+        for (var i = startIndex; i < endIndex; i++) {
+          styles.push(this.getSelectionStyles(i));
+        }
+        return styles;
+      }
+
+      var loc = this.get2DCursorLocation(startIndex);
       if (this.styles[loc.lineIndex]) {
         return this.styles[loc.lineIndex][loc.charIndex] || { };
       }
+
       return { };
     },
 
