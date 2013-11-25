@@ -415,8 +415,7 @@
 
     deepEqual(iText.getSelectionStyles(0, 2), [
       { textDecoration: 'underline' },
-      { },
-      { textDecoration: 'overline' }
+      { }
     ]);
   });
 
