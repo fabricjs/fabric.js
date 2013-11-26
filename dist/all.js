@@ -18853,7 +18853,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _renderChar: function(method, ctx, lineIndex, i, _char, left, top, lineHeight) {
-      var decl, charWidth;
+      var decl, charWidth, charHeight;
 
       if (this.styles && this.styles[lineIndex] && (decl = this.styles[lineIndex][i])) {
 
@@ -18862,6 +18862,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 
         ctx.save();
         charWidth = this._applyCharStylesGetWidth(ctx, _char, lineIndex, i, decl);
+        charHeight = this._getHeightOfChar(ctx, _char, lineIndex, i);
 
         if (shouldFill) {
           ctx.fillText(_char, left, top);
@@ -18870,7 +18871,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
           ctx.strokeText(_char, left, top);
         }
 
-        this._renderCharDecoration(ctx, decl, left, top, charWidth, lineHeight);
+        this._renderCharDecoration(ctx, decl, left, top, charWidth, lineHeight, charHeight);
         ctx.restore();
 
         ctx.translate(charWidth, 0);
@@ -18893,10 +18894,13 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    _renderCharDecoration: function(ctx, styleDeclaration, left, top, charWidth, lineHeight) {
+    _renderCharDecoration: function(ctx, styleDeclaration, left, top, charWidth, lineHeight, charHeight) {
+
       var textDecoration = styleDeclaration
         ? (styleDeclaration.textDecoration || this.textDecoration)
         : this.textDecoration;
+
+      var fontSize = (styleDeclaration ? styleDeclaration.fontSize : null) || this.fontSize;
 
       if (!textDecoration) return;
 
@@ -18906,7 +18910,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
           left,
           top + (this.fontSize / this._fontSizeFraction),
           charWidth,
-          0
+          0,
+          this.fontSize / 20
         );
       }
       if (textDecoration.indexOf('line-through') > -1) {
@@ -18915,7 +18920,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
           left,
           top + (this.fontSize / this._fontSizeFraction),
           charWidth,
-          (lineHeight / this._fontSizeFraction)
+          charHeight / 2,
+          fontSize / 20
         );
       }
       if (textDecoration.indexOf('overline') > -1) {
@@ -18924,7 +18930,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
           left,
           top,
           charWidth,
-          lineHeight - (this.fontSize / this._fontSizeFraction)
+          lineHeight - (this.fontSize / this._fontSizeFraction),
+          this.fontSize / 20
         );
       }
     },
@@ -18933,8 +18940,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    _renderCharDecorationAtOffset: function(ctx, left, top, charWidth, offset) {
-      ctx.fillRect(left, top - offset, charWidth, 1);
+    _renderCharDecorationAtOffset: function(ctx, left, top, charWidth, offset, thickness) {
+      ctx.fillRect(left, top - offset, charWidth, thickness);
     },
 
     /**
