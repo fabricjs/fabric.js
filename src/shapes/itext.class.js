@@ -131,7 +131,19 @@
      */
     styles: null,
 
-    skipFillStrokeCheck: true,
+    /**
+     * Indicates whether internal text char widths can be cached
+     * @type Boolean
+     * @default
+     */
+    caching: true,
+
+    /**
+     * @private
+     * @type Boolean
+     * @default
+     */
+    _skipFillStrokeCheck: true,
 
     /**
      * @private
@@ -786,7 +798,9 @@
      * @param {Object} [decl]
      */
     _applyCharStylesGetWidth: function(ctx, _char, lineIndex, charIndex, decl) {
-      var styleDeclaration = decl || (this.styles[lineIndex] && this.styles[lineIndex][charIndex]);
+      var styleDeclaration = decl ||
+                            (this.styles[lineIndex] &&
+                             this.styles[lineIndex][charIndex]);
 
       if (styleDeclaration) {
         // cloning so that original style object is not polluted with following font declarations
@@ -801,7 +815,7 @@
       var cacheProp = this._getCacheProp(_char, styleDeclaration);
 
       // short-circuit if no styles
-      if (this.isEmptyStyles() && this._charWidthsCache[cacheProp]) {
+      if (this.isEmptyStyles() && this._charWidthsCache[cacheProp] && this.caching) {
         return this._charWidthsCache[cacheProp];
       }
 
@@ -824,9 +838,14 @@
       ctx.font = this._getFontDeclaration.call(styleDeclaration);
       this._setShadow.call(styleDeclaration, ctx);
 
+      if (!this.caching) {
+        return ctx.measureText(_char).width;
+      }
+
       if (!this._charWidthsCache[cacheProp]) {
         this._charWidthsCache[cacheProp] = ctx.measureText(_char).width;
       }
+
       return this._charWidthsCache[cacheProp];
     },
 
