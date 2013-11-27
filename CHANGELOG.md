@@ -1,4 +1,6 @@
-**1.4.0**
+**Edge**
+
+**Version 1.4.0**
 
 - [BACK_INCOMPAT] JSON and Cufon are no longer included in default build
 
