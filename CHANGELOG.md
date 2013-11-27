@@ -1,4 +1,6 @@
-**Edge**
+**1.4.0**
+
+- [BACK_INCOMPAT] JSON and Cufon are no longer included in default build
 
 - [BACK_INCOMPAT] Change default objects' originX/originY to left/top
 
