@@ -52,6 +52,10 @@
           obj.__isMousedown = false;
         });
       });
+
+      this.canvas.on('object:selected', function() {
+        fabric.IText.prototype.exitEditingOnOthers.call(this);
+      });
     },
 
     /**

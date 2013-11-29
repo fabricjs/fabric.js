@@ -19345,6 +19345,10 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
           obj.__isMousedown = false;
         });
       });
+
+      this.canvas.on('object:selected', function() {
+        fabric.IText.prototype.exitEditingOnOthers.call(this);
+      });
     },
 
     /**
@@ -20055,9 +20059,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       if (this.isEditing) {
         this.setCursorByClick(options.e);
         this.__selectionStartOnMouseDown = this.selectionStart;
-      }
-      else {
-        this.exitEditingOnOthers();
       }
     });
   },
