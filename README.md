@@ -4,11 +4,8 @@
 
 ### Fabric
 [![Build Status](https://secure.travis-ci.org/kangax/fabric.js.png?branch=master)](http://travis-ci.org/#!/kangax/fabric.js)
-
 [![Code Climate](https://codeclimate.com/repos/526a0ed089af7e6cf2001389/badges/d1c922dd1511ffa8a72f/gpa.png)](https://codeclimate.com/repos/526a0ed089af7e6cf2001389/feed)
-
 [![Coverage Status](https://coveralls.io/repos/kangax/fabric.js/badge.png?branch=master)](https://coveralls.io/r/kangax/fabric.js?branch=master)
-
 <a href="https://npmjs.org/package/fabric"><img src="https://badge.fury.io/js/fabric.png"></a>
 
 **Fabric.js** is a framework that makes it easy to work with HTML5 canvas element. It is an **interactive object model** on top of canvas element. It is also an **SVG-to-canvas parser**.
