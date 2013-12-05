@@ -165,6 +165,11 @@ For example:
 
     canvas.add(rect);
 
+### Helping Fabric
+
+- [Fabric on Bountysource](https://www.bountysource.com/trackers/23217-fabric-js)
+- [Fabric on CodeTriage](http://www.codetriage.com/kangax/fabric.js)
+
 ### Staying in touch
 
 Follow [@fabric.js](http://twitter.com/fabricjs) or [@kangax](http://twitter.com/kangax) on twitter.
