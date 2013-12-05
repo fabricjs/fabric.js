@@ -10,6 +10,14 @@
    * @class fabric.Image.filters.GradientTransparency
    * @memberOf fabric.Image.filters
    * @extends fabric.Image.filters.BaseFilter
+   * @see {@link fabric.Image.filters.GradientTransparency#initialize} for constructor definition
+   * @see {@link http://fabricjs.com/image-filters/|ImageFilters demo}
+   * @example
+   * var filter = new fabric.Image.filters.GradientTransparency({
+   *   threshold: 200
+   * });
+   * object.filters.push(filter);
+   * object.applyFilters(canvas.renderAll.bind(canvas));
    */
   fabric.Image.filters.GradientTransparency = fabric.util.createClass(fabric.Image.filters.BaseFilter, /** @lends fabric.Image.filters.GradientTransparency.prototype */ {
 
@@ -22,7 +30,7 @@
 
     /**
      * Constructor
-     * @memberOf fabric.Image.filters.GradientTransparency
+     * @memberOf fabric.Image.filters.GradientTransparency.prototype
      * @param {Object} [options] Options object
      * @param {Number} [options.threshold=100] Threshold value
      */

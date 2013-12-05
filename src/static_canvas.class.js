@@ -11,7 +11,6 @@
   var extend = fabric.util.object.extend,
       getElementOffset = fabric.util.getElementOffset,
       removeFromArray = fabric.util.removeFromArray,
-      removeListener = fabric.util.removeListener,
 
       CANVAS_INIT_ERROR = new Error('Could not initialize `canvas` element');
 
@@ -21,6 +20,7 @@
    * @mixes fabric.Collection
    * @mixes fabric.Observable
    * @see {@link http://fabricjs.com/static_canvas/|StaticCanvas demo}
+   * @see {@link fabric.StaticCanvas#initialize} for constructor definition
    * @fires before:render
    * @fires after:render
    * @fires canvas:cleared
@@ -43,56 +43,43 @@
     },
 
     /**
-     * Background color of canvas instance
-     * @type String
+     * Background color of canvas instance.
+     * Should be set via {@link fabric.StaticCanvas#setBackgroundColor}.
+     * @type {(String|fabric.Pattern)}
      * @default
      */
     backgroundColor: '',
 
     /**
-     * Background image of canvas instance
-     * Should be set via {@link fabric.StaticCanvas#setBackgroundImage}
-     * @type String
+     * Background image of canvas instance.
+     * Should be set via {@link fabric.StaticCanvas#setBackgroundImage}.
+     * <b>Backwards incompatibility note:</b> The "backgroundImageOpacity"
+     * and "backgroundImageStretch" properties are deprecated since 1.3.9.
+     * Use {@link fabric.Image#opacity}, {@link fabric.Image#width} and {@link fabric.Image#height}.
+     * @type fabric.Image
      * @default
      */
-    backgroundImage: '',
+    backgroundImage: null,
 
     /**
-     * Opacity of the background image of the canvas instance
-     * @type Float
+     * Overlay color of canvas instance.
+     * Should be set via {@link fabric.StaticCanvas#setOverlayColor}
+     * @since 1.3.9
+     * @type {(String|fabric.Pattern)}
      * @default
      */
-    backgroundImageOpacity: 1,
+    overlayColor: '',
 
     /**
-     * Indicates whether the background image should be stretched to fit the
-     * dimensions of the canvas instance.
-     * @type Boolean
+     * Overlay image of canvas instance.
+     * Should be set via {@link fabric.StaticCanvas#setOverlayImage}.
+     * <b>Backwards incompatibility note:</b> The "overlayImageLeft"
+     * and "overlayImageTop" properties are deprecated since 1.3.9.
+     * Use {@link fabric.Image#left} and {@link fabric.Image#top}.
+     * @type fabric.Image
      * @default
      */
-    backgroundImageStretch: true,
-
-    /**
-     * Overlay image of canvas instance
-     * Should be set via {@link fabric.StaticCanvas#setOverlayImage}
-     * @type String
-     * @default
-     */
-    overlayImage: '',
-
-    /**
-     * Left offset of overlay image (if present)
-     * @type Number
-     * @default
-     */
-    overlayImageLeft: 0,
-
-    /**
-     * Top offset of overlay image (if present)
-     * @type Number
-     * @default
-     */
-    overlayImageTop: 0,
+    overlayImage: null,
 
     /**
      * Indicates whether toObject/toDatalessObject should include default values
@@ -174,6 +161,9 @@
       if (options.backgroundColor) {
         this.setBackgroundColor(options.backgroundColor, this.renderAll.bind(this));
       }
+      if (options.overlayColor) {
+        this.setOverlayColor(options.overlayColor, this.renderAll.bind(this));
+      }
       this.calcOffset();
     },
 
@@ -190,74 +180,115 @@
 
     /**
      * Sets {@link fabric.StaticCanvas#overlayImage|overlay image} for this canvas
-     * @param {String} url url of an image to set overlay to
+     * @param {(fabric.Image|String)} image fabric.Image instance or URL of an image to set overlay to
      * @param {Function} callback callback to invoke when image is loaded and set as an overlay
-     * @param {Object} [options] Optional options to set for the overlay image
-     * @param {Number} [options.overlayImageLeft] {@link fabric.StaticCanvas#overlayImageLeft|Left offset} of overlay image
-     * @param {Number} [options.overlayImageTop] {@link fabric.StaticCanvas#overlayImageTop|Top offset} of overlay image
+     * @param {Object} [options] Optional options to set for the {@link fabric.Image|overlay image}.
      * @return {fabric.Canvas} thisArg
      * @chainable
      * @see {@link http://jsfiddle.net/fabricjs/MnzHT/|jsFiddle demo}
-     * @example <caption>Normal overlayImage</caption>
-     * canvas.setOverlayImage('http://fabricjs.com/assets/jail_cell_bars.png', canvas.renderAll.bind(canvas));
-     * @example <caption>Displaced overlayImage (left and top != 0)</caption>
+     * @example <caption>Normal overlayImage with left/top = 0</caption>
      * canvas.setOverlayImage('http://fabricjs.com/assets/jail_cell_bars.png', canvas.renderAll.bind(canvas), {
-     *   overlayImageLeft: 100,
-     *   overlayImageTop: 100
+     *   // Needed to position overlayImage at 0/0
+     *   originX: 'left',
+     *   originY: 'top'
+     * });
+     * @example <caption>overlayImage with different properties</caption>
+     * canvas.setOverlayImage('http://fabricjs.com/assets/jail_cell_bars.png', canvas.renderAll.bind(canvas), {
+     *   opacity: 0.5,
+     *   angle: 45,
+     *   left: 400,
+     *   top: 400,
+     *   originX: 'left',
+     *   originY: 'top'
+     * });
+     * @example <caption>Stretched overlayImage #1 - width/height correspond to canvas width/height</caption>
+     * fabric.Image.fromURL('http://fabricjs.com/assets/jail_cell_bars.png', function(img) {
+     *    img.set({width: canvas.width, height: canvas.height, originX: 'left', originY: 'top'});
+     *    canvas.setOverlayImage(img, canvas.renderAll.bind(canvas));
+     * });
+     * @example <caption>Stretched overlayImage #2 - width/height correspond to canvas width/height</caption>
+     * canvas.setOverlayImage('http://fabricjs.com/assets/jail_cell_bars.png', canvas.renderAll.bind(canvas), {
+     *   width: canvas.width,
+     *   height: canvas.height,
+     *   // Needed to position overlayImage at 0/0
+     *   originX: 'left',
+     *   originY: 'top'
      * });
      */
-    setOverlayImage: function (url, callback, options) { // TODO (kangax): test callback
-      fabric.util.loadImage(url, function(img) {
-        this.overlayImage = img;
-        if (options && ('overlayImageLeft' in options)) {
-          this.overlayImageLeft = options.overlayImageLeft;
-        }
-        if (options && ('overlayImageTop' in options)) {
-          this.overlayImageTop = options.overlayImageTop;
-        }
-        callback && callback();
-      }, this);
-
-      return this;
+    setOverlayImage: function (image, callback, options) {
+      return this.__setBgOverlayImage('overlayImage', image, callback, options);
     },
 
     /**
      * Sets {@link fabric.StaticCanvas#backgroundImage|background image} for this canvas
-     * @param {String} url URL of an image to set background to
-     * @param {Function} callback callback to invoke when image is loaded and set as background
-     * @param {Object} [options] Optional options to set for the background image
-     * @param {Float} [options.backgroundImageOpacity] {@link fabric.StaticCanvas#backgroundImageOpacity|Opacity} of the background image of the canvas instance
-     * @param {Boolean} [options.backgroundImageStretch] Indicates whether the background image should be {@link fabric.StaticCanvas#backgroundImageStretch|strechted} to fit the canvas
+     * @param {(fabric.Image|String)} image fabric.Image instance or URL of an image to set background to
+     * @param {Function} callback Callback to invoke when image is loaded and set as background
+     * @param {Object} [options] Optional options to set for the {@link fabric.Image|background image}.
      * @return {fabric.Canvas} thisArg
      * @chainable
      * @see {@link http://jsfiddle.net/fabricjs/YH9yD/|jsFiddle demo}
-     * @example <caption>Normal backgroundImage</caption>
-     * canvas.setBackgroundImage('http://fabricjs.com/assets/jail_cell_bars.png', canvas.renderAll.bind(canvas));
-     * @example <caption>Stretched backgroundImage with opacity</caption>
-     * canvas.setBackgroundImage('http://fabricjs.com/assets/jail_cell_bars.png', canvas.renderAll.bind(canvas), {
-     *   backgroundImageOpacity: 0.5,
-     *   backgroundImageStretch: true
+     * @example <caption>Normal backgroundImage with left/top = 0</caption>
+     * canvas.setBackgroundImage('http://fabricjs.com/assets/honey_im_subtle.png', canvas.renderAll.bind(canvas), {
+     *   // Needed to position backgroundImage at 0/0
+     *   originX: 'left',
+     *   originY: 'top'
+     * });
+     * @example <caption>backgroundImage with different properties</caption>
+     * canvas.setBackgroundImage('http://fabricjs.com/assets/honey_im_subtle.png', canvas.renderAll.bind(canvas), {
+     *   opacity: 0.5,
+     *   angle: 45,
+     *   left: 400,
+     *   top: 400,
+     *   originX: 'left',
+     *   originY: 'top'
+     * });
+     * @example <caption>Stretched backgroundImage #1 - width/height correspond to canvas width/height</caption>
+     * fabric.Image.fromURL('http://fabricjs.com/assets/honey_im_subtle.png', function(img) {
+     *    img.set({width: canvas.width, height: canvas.height, originX: 'left', originY: 'top'});
+     *    canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
+     * });
+     * @example <caption>Stretched backgroundImage #2 - width/height correspond to canvas width/height</caption>
+     * canvas.setBackgroundImage('http://fabricjs.com/assets/honey_im_subtle.png', canvas.renderAll.bind(canvas), {
+     *   width: canvas.width,
+     *   height: canvas.height,
+     *   // Needed to position backgroundImage at 0/0
+     *   originX: 'left',
+     *   originY: 'top'
      * });
      */
-    setBackgroundImage: function (url, callback, options) {
-      fabric.util.loadImage(url, function(img) {
-        this.backgroundImage = img;
-        if (options && ('backgroundImageOpacity' in options)) {
-          this.backgroundImageOpacity = options.backgroundImageOpacity;
-        }
-        if (options && ('backgroundImageStretch' in options)) {
-          this.backgroundImageStretch = options.backgroundImageStretch;
-        }
-        callback && callback();
-      }, this);
+    setBackgroundImage: function (image, callback, options) {
+      return this.__setBgOverlayImage('backgroundImage', image, callback, options);
+    },
 
-      return this;
+    /**
+     * Sets {@link fabric.StaticCanvas#overlayColor|background color} for this canvas
+     * @param {(String|fabric.Pattern)} overlayColor Color or pattern to set background color to
+     * @param {Function} callback Callback to invoke when background color is set
+     * @return {fabric.Canvas} thisArg
+     * @chainable
+     * @see {@link http://jsfiddle.net/fabricjs/pB55h/|jsFiddle demo}
+     * @example <caption>Normal overlayColor - color value</caption>
+     * canvas.setOverlayColor('rgba(255, 73, 64, 0.6)', canvas.renderAll.bind(canvas));
+     * @example <caption>fabric.Pattern used as overlayColor</caption>
+     * canvas.setOverlayColor({
+     *   source: 'http://fabricjs.com/assets/escheresque_ste.png'
+     * }, canvas.renderAll.bind(canvas));
+     * @example <caption>fabric.Pattern used as overlayColor with repeat and offset</caption>
+     * canvas.setOverlayColor({
+     *   source: 'http://fabricjs.com/assets/escheresque_ste.png',
+     *   repeat: 'repeat',
+     *   offsetX: 200,
+     *   offsetY: 100
+     * }, canvas.renderAll.bind(canvas));
+     */
+    setOverlayColor: function(overlayColor, callback) {
+      return this.__setBgOverlayColor('overlayColor', overlayColor, callback);
     },
 
     /**
      * Sets {@link fabric.StaticCanvas#backgroundColor|background color} for this canvas
-     * @param {String|fabric.Pattern} backgroundColor Color or pattern to set background color to
-     * @param {Function} callback callback to invoke when background color is set
+     * @param {(String|fabric.Pattern)} backgroundColor Color or pattern to set background color to
+     * @param {Function} callback Callback to invoke when background color is set
      * @return {fabric.Canvas} thisArg
      * @chainable
      * @see {@link http://jsfiddle.net/fabricjs/hXzvk/|jsFiddle demo}
@@ -267,20 +298,63 @@
      * canvas.setBackgroundColor({
      *   source: 'http://fabricjs.com/assets/escheresque_ste.png'
      * }, canvas.renderAll.bind(canvas));
+     * @example <caption>fabric.Pattern used as backgroundColor with repeat and offset</caption>
+     * canvas.setBackgroundColor({
+     *   source: 'http://fabricjs.com/assets/escheresque_ste.png',
+     *   repeat: 'repeat',
+     *   offsetX: 200,
+     *   offsetY: 100
+     * }, canvas.renderAll.bind(canvas));
      */
     setBackgroundColor: function(backgroundColor, callback) {
-      if (backgroundColor.source) {
+      return this.__setBgOverlayColor('backgroundColor', backgroundColor, callback);
+    },
+
+    /**
+     * @private
+     * @param {String} property Property to set ({@link fabric.StaticCanvas#backgroundImage|backgroundImage}
+     * or {@link fabric.StaticCanvas#overlayImage|overlayImage})
+     * @param {(fabric.Image|String)} image fabric.Image instance or URL of an image to set background or overlay to
+     * @param {Function} callback Callback to invoke when image is loaded and set as background or overlay
+     * @param {Object} [options] Optional options to set for the {@link fabric.Image|image}.
+     */
+    __setBgOverlayImage: function(property, image, callback, options) {
+      if (typeof image === 'string') {
+        fabric.util.loadImage(image, function(img) {
+          this[property] = new fabric.Image(img, options);
+          callback && callback();
+        }, this);
+      }
+      else {
+        this[property] = image;
+        callback && callback();
+      }
+
+      return this;
+    },
+
+    /**
+     * @private
+     * @param {String} property Property to set ({@link fabric.StaticCanvas#backgroundColor|backgroundColor}
+     * or {@link fabric.StaticCanvas#overlayColor|overlayColor})
+     * @param {(Object|String)} color Object with pattern information or color value
+     * @param {Function} [callback] Callback is invoked when color is set
+     */
+    __setBgOverlayColor: function(property, color, callback) {
+      if (color.source) {
         var _this = this;
-        fabric.util.loadImage(backgroundColor.source, function(img) {
-          _this.backgroundColor = new fabric.Pattern({
+        fabric.util.loadImage(color.source, function(img) {
+          _this[property] = new fabric.Pattern({
             source: img,
-            repeat: backgroundColor.repeat
+            repeat: color.repeat,
+            offsetX: color.offsetX,
+            offsetY: color.offsetY
           });
           callback && callback();
         });
       }
       else {
-        this.backgroundColor = backgroundColor;
+        this[property] = color;
         callback && callback();
       }
 
@@ -589,16 +663,15 @@
      * @param {fabric.Object} obj Object that was removed
      */
     _onObjectRemoved: function(obj) {
+      // removing active object should fire "selection:cleared" events
+      if (this.getActiveObject() === obj) {
+        this.fire('before:selection:cleared', { target: obj });
+        this._discardActiveObject();
+        this.fire('selection:cleared');
+      }
+
       this.fire('object:removed', { target: obj });
       obj.fire('removed');
-    },
-
-    /**
-     * Returns an array of objects this instance has
-     * @return {Array}
-     */
-    getObjects: function () {
-      return this._objects;
     },
 
     /**
@@ -651,6 +724,7 @@
     renderAll: function (allOnTop) {
 
       var canvasToDrawOn = this[(allOnTop === true && this.interactive) ? 'contextTop' : 'contextContainer'];
+      var activeGroup = this.getActiveGroup();
 
       if (this.contextTop && this.selection && !this._groupSelector) {
         this.clearContext(this.contextTop);
@@ -666,50 +740,15 @@
         fabric.util.clipContext(this, canvasToDrawOn);
       }
 
-      if (this.backgroundColor) {
-        canvasToDrawOn.fillStyle = this.backgroundColor.toLive
-          ? this.backgroundColor.toLive(canvasToDrawOn)
-          : this.backgroundColor;
-
-        canvasToDrawOn.fillRect(
-          this.backgroundColor.offsetX || 0,
-          this.backgroundColor.offsetY || 0,
-          this.width,
-          this.height);
-      }
-
-      if (typeof this.backgroundImage === 'object') {
-        this._drawBackroundImage(canvasToDrawOn);
-      }
-
-      var activeGroup = this.getActiveGroup();
-      for (var i = 0, length = this._objects.length; i < length; ++i) {
-        if (!activeGroup ||
-            (activeGroup && this._objects[i] && !activeGroup.contains(this._objects[i]))) {
-          this._draw(canvasToDrawOn, this._objects[i]);
-        }
-      }
-
-      // delegate rendering to group selection (if one exists)
-      if (activeGroup) {
-        //Store objects in group preserving order, then replace
-        var sortedObjects = [];
-        this.forEachObject(function (object) {
-            if (activeGroup.contains(object)) {
-                sortedObjects.push(object);
-            }
-        });
-        activeGroup._set('objects', sortedObjects);
-        this._draw(canvasToDrawOn, activeGroup);
-      }
+      this._renderBackground(canvasToDrawOn);
+      this._renderObjects(canvasToDrawOn, activeGroup);
+      this._renderActiveGroup(canvasToDrawOn, activeGroup);
 
       if (this.clipTo) {
         canvasToDrawOn.restore();
       }
 
-      if (this.overlayImage) {
-        canvasToDrawOn.drawImage(this.overlayImage, this.overlayImageLeft, this.overlayImageTop);
-      }
+      this._renderOverlay(canvasToDrawOn);
 
       if (this.controlsAboveOverlay && this.interactive) {
         this.drawControls(canvasToDrawOn);
@@ -722,19 +761,80 @@
 
     /**
      * @private
-     * @param {CanvasRenderingContext2D} canvasToDrawOn Context to render on
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {fabric.Group} activeGroup
      */
-    _drawBackroundImage: function(canvasToDrawOn) {
-      canvasToDrawOn.save();
-      canvasToDrawOn.globalAlpha = this.backgroundImageOpacity;
+    _renderObjects: function(ctx, activeGroup) {
+      for (var i = 0, length = this._objects.length; i < length; ++i) {
+        if (!activeGroup ||
+            (activeGroup && this._objects[i] && !activeGroup.contains(this._objects[i]))) {
+          this._draw(ctx, this._objects[i]);
+        }
+      }
+    },
 
-      if (this.backgroundImageStretch) {
-        canvasToDrawOn.drawImage(this.backgroundImage, 0, 0, this.width, this.height);
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {fabric.Group} activeGroup
+     */
+    _renderActiveGroup: function(ctx, activeGroup) {
+
+      // delegate rendering to group selection (if one exists)
+      if (activeGroup) {
+
+        //Store objects in group preserving order, then replace
+        var sortedObjects = [];
+        this.forEachObject(function (object) {
+          if (activeGroup.contains(object)) {
+            sortedObjects.push(object);
+          }
+        });
+        activeGroup._set('objects', sortedObjects);
+        this._draw(ctx, activeGroup);
       }
-      else {
-        canvasToDrawOn.drawImage(this.backgroundImage, 0, 0);
+    },
+
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
+    _renderBackground: function(ctx) {
+      if (this.backgroundColor) {
+        ctx.fillStyle = this.backgroundColor.toLive
+          ? this.backgroundColor.toLive(ctx)
+          : this.backgroundColor;
+
+        ctx.fillRect(
+          this.backgroundColor.offsetX || 0,
+          this.backgroundColor.offsetY || 0,
+          this.width,
+          this.height);
       }
-      canvasToDrawOn.restore();
+      if (this.backgroundImage) {
+        this.backgroundImage.render(ctx);
+      }
+    },
+
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
+    _renderOverlay: function(ctx) {
+      if (this.overlayColor) {
+        ctx.fillStyle = this.overlayColor.toLive
+          ? this.overlayColor.toLive(ctx)
+          : this.overlayColor;
+
+        ctx.fillRect(
+          this.overlayColor.offsetX || 0,
+          this.overlayColor.offsetY || 0,
+          this.width,
+          this.height);
+      }
+      if (this.overlayImage) {
+        this.overlayImage.render(ctx);
+      }
     },
 
     /**
@@ -783,11 +883,11 @@
     /**
      * Centers object horizontally.
      * You might need to call `setCoords` on an object after centering, to update controls area.
-     * @param {fabric.Object} object Object to center
+     * @param {fabric.Object} object Object to center horizontally
      * @return {fabric.Canvas} thisArg
      */
     centerObjectH: function (object) {
-      object.set('left', this.getCenter().left);
+      this._centerObject(object, new fabric.Point(this.getCenter().left, object.getCenterPoint().y));
       this.renderAll();
       return this;
     },
@@ -795,12 +895,12 @@
     /**
      * Centers object vertically.
      * You might need to call `setCoords` on an object after centering, to update controls area.
-     * @param {fabric.Object} object Object to center
+     * @param {fabric.Object} object Object to center vertically
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
     centerObjectV: function (object) {
-      object.set('top', this.getCenter().top);
+      this._centerObject(object, new fabric.Point(object.getCenterPoint().x, this.getCenter().top));
       this.renderAll();
       return this;
     },
@@ -808,12 +908,28 @@
     /**
      * Centers object vertically and horizontally.
      * You might need to call `setCoords` on an object after centering, to update controls area.
-     * @param {fabric.Object} object Object to center
+     * @param {fabric.Object} object Object to center vertically and horizontally
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
-    centerObject: function (object) {
-      return this.centerObjectH(object).centerObjectV(object);
+    centerObject: function(object) {
+      var center = this.getCenter();
+
+      this._centerObject(object, new fabric.Point(center.left, center.top));
+      this.renderAll();
+      return this;
+    },
+
+    /**
+     * @private
+     * @param {fabric.Object} object Object to center
+     * @param {fabric.Point} center Center point
+     * @return {fabric.Canvas} thisArg
+     * @chainable
+     */
+    _centerObject: function(object, center) {
+      object.setPositionByOrigin(center, 'center', 'center');
+      return this;
     },
 
     /**
@@ -852,39 +968,72 @@
       if (activeGroup) {
         this.discardActiveGroup();
       }
+
       var data = {
-        objects: this.getObjects().map(function (instance) {
-          // TODO (kangax): figure out how to clean this up
-          var originalValue;
-          if (!this.includeDefaultValues) {
-            originalValue = instance.includeDefaultValues;
-            instance.includeDefaultValues = false;
-          }
-          var object = instance[methodName](propertiesToInclude);
-          if (!this.includeDefaultValues) {
-            instance.includeDefaultValues = originalValue;
-          }
-          return object;
-        }, this),
-        background: (this.backgroundColor && this.backgroundColor.toObject)
-                      ? this.backgroundColor.toObject()
-                      : this.backgroundColor
+        objects: this._toObjects(methodName, propertiesToInclude)
       };
-      if (this.backgroundImage) {
-        data.backgroundImage = this.backgroundImage.src;
-        data.backgroundImageOpacity = this.backgroundImageOpacity;
-        data.backgroundImageStretch = this.backgroundImageStretch;
-      }
-      if (this.overlayImage) {
-        data.overlayImage = this.overlayImage.src;
-        data.overlayImageLeft = this.overlayImageLeft;
-        data.overlayImageTop = this.overlayImageTop;
-      }
+
+      extend(data, this.__serializeBgOverlay());
+
       fabric.util.populateWithProperties(this, data, propertiesToInclude);
+
       if (activeGroup) {
         this.setActiveGroup(new fabric.Group(activeGroup.getObjects()));
-        activeGroup.forEachObject(function(o) { o.set('active', true) });
+        activeGroup.forEachObject(function(o) {
+          o.set('active', true);
+        });
       }
+      return data;
+    },
+
+    /**
+     * @private
+     */
+    _toObjects: function(methodName, propertiesToInclude) {
+      return this.getObjects().map(function(instance) {
+        return this._toObject(instance, methodName, propertiesToInclude);
+      }, this);
+    },
+
+    /**
+     * @private
+     */
+    _toObject: function(instance, methodName, propertiesToInclude) {
+      var originalValue;
+
+      if (!this.includeDefaultValues) {
+        originalValue = instance.includeDefaultValues;
+        instance.includeDefaultValues = false;
+      }
+      var object = instance[methodName](propertiesToInclude);
+      if (!this.includeDefaultValues) {
+        instance.includeDefaultValues = originalValue;
+      }
+      return object;
+    },
+
+    /**
+     * @private
+     */
+    __serializeBgOverlay: function() {
+      var data = {
+        background: (this.backgroundColor && this.backgroundColor.toObject)
+          ? this.backgroundColor.toObject()
+          : this.backgroundColor
+      };
+
+      if (this.overlayColor) {
+        data.overlay = this.overlayColor.toObject
+          ? this.overlayColor.toObject()
+          : this.overlayColor;
+      }
+      if (this.backgroundImage) {
+        data.backgroundImage = this.backgroundImage.toObject();
+      }
+      if (this.overlayImage) {
+        data.overlayImage = this.overlayImage.toObject();
+      }
+
       return data;
     },
 
@@ -926,8 +1075,29 @@
      */
     toSVG: function(options, reviver) {
       options || (options = { });
+
       var markup = [];
 
+      this._setSVGPreamble(markup, options);
+      this._setSVGHeader(markup, options);
+
+      this._setSVGBgOverlayColor(markup, 'backgroundColor');
+      this._setSVGBgOverlayImage(markup, 'backgroundImage');
+
+      this._setSVGObjects(markup, reviver);
+
+      this._setSVGBgOverlayColor(markup, 'overlayColor');
+      this._setSVGBgOverlayImage(markup, 'overlayImage');
+
+      markup.push('</svg>');
+
+      return markup.join('');
+    },
+
+    /**
+     * @private
+     */
+    _setSVGPreamble: function(markup, options) {
       if (!options.suppressPreamble) {
         markup.push(
           '<?xml version="1.0" encoding="', (options.encoding || 'UTF-8'), '" standalone="no" ?>',
@@ -935,53 +1105,42 @@
               '"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n'
         );
       }
+    },
+
+    /**
+     * @private
+     */
+    _setSVGHeader: function(markup, options) {
       markup.push(
-          '<svg ',
-            'xmlns="http://www.w3.org/2000/svg" ',
-            'xmlns:xlink="http://www.w3.org/1999/xlink" ',
-            'version="1.1" ',
-            'width="', (options.viewBox ? options.viewBox.width : this.width), '" ',
-            'height="', (options.viewBox ? options.viewBox.height : this.height), '" ',
-            (this.backgroundColor && !this.backgroundColor.source ? 'style="background-color: ' + this.backgroundColor +'" ' : null),
-            (options.viewBox ? 'viewBox="' + options.viewBox.x + ' ' + options.viewBox.y + ' ' + options.viewBox.width + ' ' + options.viewBox.height + '" ' : null),
-            'xml:space="preserve">',
-          '<desc>Created with Fabric.js ', fabric.version, '</desc>',
-          '<defs>', fabric.createSVGFontFacesMarkup(this.getObjects()), fabric.createSVGRefElementsMarkup(this), '</defs>'
+        '<svg ',
+          'xmlns="http://www.w3.org/2000/svg" ',
+          'xmlns:xlink="http://www.w3.org/1999/xlink" ',
+          'version="1.1" ',
+          'width="', (options.viewBox ? options.viewBox.width : this.width), '" ',
+          'height="', (options.viewBox ? options.viewBox.height : this.height), '" ',
+          (this.backgroundColor && !this.backgroundColor.toLive
+            ? 'style="background-color: ' + this.backgroundColor +'" '
+            : null),
+          (options.viewBox
+              ? 'viewBox="' +
+                options.viewBox.x + ' ' +
+                options.viewBox.y + ' ' +
+                options.viewBox.width + ' ' +
+                options.viewBox.height + '" '
+              : null),
+          'xml:space="preserve">',
+        '<desc>Created with Fabric.js ', fabric.version, '</desc>',
+        '<defs>',
+          fabric.createSVGFontFacesMarkup(this.getObjects()),
+          fabric.createSVGRefElementsMarkup(this),
+        '</defs>'
       );
+    },
 
-      if (this.backgroundColor && this.backgroundColor.source) {
-        markup.push(
-          '<rect x="0" y="0" ',
-            'width="', (this.backgroundColor.repeat === 'repeat-y' || this.backgroundColor.repeat === 'no-repeat' ? this.backgroundColor.source.width : this.width),
-            '" height="', (this.backgroundColor.repeat === 'repeat-x' || this.backgroundColor.repeat === 'no-repeat' ? this.backgroundColor.source.height : this.height),
-            '" fill="url(#backgroundColorPattern)"',
-          '></rect>'
-        );
-      }
-
-      if (this.backgroundImage) {
-        markup.push(
-          '<image x="0" y="0" ',
-            'width="', (this.backgroundImageStretch ? this.width : this.backgroundImage.width),
-            '" height="', (this.backgroundImageStretch ? this.height : this.backgroundImage.height),
-            '" preserveAspectRatio="', (this.backgroundImageStretch ? 'none' : 'defer'),
-            '" xlink:href="', this.backgroundImage.src,
-            '" style="opacity:', this.backgroundImageOpacity,
-          '"></image>'
-        );
-      }
-
-      if (this.overlayImage) {
-        markup.push(
-          '<image x="', this.overlayImageLeft,
-            '" y="', this.overlayImageTop,
-            '" width="', this.overlayImage.width,
-            '" height="', this.overlayImage.height,
-            '" xlink:href="', this.overlayImage.src,
-          '"></image>'
-        );
-      }
-
+    /**
+     * @private
+     */
+    _setSVGObjects: function(markup, reviver) {
       var activeGroup = this.getActiveGroup();
       if (activeGroup) {
         this.discardActiveGroup();
@@ -991,29 +1150,51 @@
       }
       if (activeGroup) {
         this.setActiveGroup(new fabric.Group(activeGroup.getObjects()));
-        activeGroup.forEachObject(function(o) { o.set('active', true) });
+        activeGroup.forEachObject(function(o) {
+          o.set('active', true);
+        });
       }
-      markup.push('</svg>');
-
-      return markup.join('');
     },
-    /* _TO_SVG_END_ */
 
     /**
-     * Removes an object from canvas and returns it
-     * @param {fabric.Object} object Object to remove
-     * @return {fabric.Object} removed object
+     * @private
      */
-    remove: function (object) {
-      // removing active object should fire "selection:cleared" events
-      if (this.getActiveObject() === object) {
-        this.fire('before:selection:cleared', { target: object });
-        this.discardActiveObject();
-        this.fire('selection:cleared');
+    _setSVGBgOverlayImage: function(markup, property) {
+      if (this[property] && this[property].toSVG) {
+        markup.push(this[property].toSVG());
       }
-
-      return fabric.Collection.remove.call(this, object);
     },
+
+    /**
+     * @private
+     */
+    _setSVGBgOverlayColor: function(markup, property) {
+      if (this[property] && this[property].source) {
+        markup.push(
+          '<rect x="', this[property].offsetX, '" y="', this[property].offsetY, '" ',
+            'width="',
+              (this[property].repeat === 'repeat-y' || this[property].repeat === 'no-repeat'
+                ? this[property].source.width
+                : this.width),
+            '" height="',
+              (this[property].repeat === 'repeat-x' || this[property].repeat === 'no-repeat'
+                ? this[property].source.height
+                : this.height),
+            '" fill="url(#' + property + 'Pattern)"',
+          '></rect>'
+        );
+      }
+      else if (this[property] && property === 'overlayColor') {
+        markup.push(
+          '<rect x="0" y="0" ',
+            'width="', this.width,
+            '" height="', this.height,
+            '" fill="', this[property], '"',
+          '></rect>'
+        );
+      }
+    },
+    /* _TO_SVG_END_ */
 
     /**
      * Moves an object to the bottom of the stack of drawn objects
@@ -1051,33 +1232,42 @@
 
       // if object is not on the bottom of stack
       if (idx !== 0) {
-        var newIdx;
-
-        if (intersecting) {
-          newIdx = idx;
-
-          // traverse down the stack looking for the nearest intersecting object
-          for (var i=idx-1; i>=0; --i) {
-
-            var isIntersecting = object.intersectsWithObject(this._objects[i]) ||
-                                 object.isContainedWithinObject(this._objects[i]) ||
-                                 this._objects[i].isContainedWithinObject(object);
-
-            if (isIntersecting) {
-              newIdx = i;
-              break;
-            }
-          }
-        }
-        else {
-          newIdx = idx-1;
-        }
+        var newIdx = this._findNewLowerIndex(object, idx, intersecting);
 
         removeFromArray(this._objects, object);
         this._objects.splice(newIdx, 0, object);
         this.renderAll && this.renderAll();
       }
       return this;
+    },
+
+    /**
+     * @private
+     */
+    _findNewLowerIndex: function(object, idx, intersecting) {
+      var newIdx;
+
+      if (intersecting) {
+        newIdx = idx;
+
+        // traverse down the stack looking for the nearest intersecting object
+        for (var i=idx-1; i>=0; --i) {
+
+          var isIntersecting = object.intersectsWithObject(this._objects[i]) ||
+                               object.isContainedWithinObject(this._objects[i]) ||
+                               this._objects[i].isContainedWithinObject(object);
+
+          if (isIntersecting) {
+            newIdx = i;
+            break;
+          }
+        }
+      }
+      else {
+        newIdx = idx - 1;
+      }
+
+      return newIdx;
     },
 
     /**
@@ -1092,33 +1282,42 @@
 
       // if object is not on top of stack (last item in an array)
       if (idx !== this._objects.length-1) {
-        var newIdx;
-
-        if (intersecting) {
-          newIdx = idx;
-
-          // traverse up the stack looking for the nearest intersecting object
-          for (var i = idx + 1; i < this._objects.length; ++i) {
-
-            var isIntersecting = object.intersectsWithObject(this._objects[i]) ||
-                                 object.isContainedWithinObject(this._objects[i]) ||
-                                 this._objects[i].isContainedWithinObject(object);
-
-            if (isIntersecting) {
-              newIdx = i;
-              break;
-            }
-          }
-        }
-        else {
-          newIdx = idx+1;
-        }
+        var newIdx = this._findNewUpperIndex(object, idx, intersecting);
 
         removeFromArray(this._objects, object);
         this._objects.splice(newIdx, 0, object);
         this.renderAll && this.renderAll();
       }
       return this;
+    },
+
+    /**
+     * @private
+     */
+    _findNewUpperIndex: function(object, idx, intersecting) {
+      var newIdx;
+
+      if (intersecting) {
+        newIdx = idx;
+
+        // traverse up the stack looking for the nearest intersecting object
+        for (var i = idx + 1; i < this._objects.length; ++i) {
+
+          var isIntersecting = object.intersectsWithObject(this._objects[i]) ||
+                               object.isContainedWithinObject(this._objects[i]) ||
+                               this._objects[i].isContainedWithinObject(object);
+
+          if (isIntersecting) {
+            newIdx = i;
+            break;
+          }
+        }
+      }
+      else {
+        newIdx = idx+1;
+      }
+
+      return newIdx;
     },
 
     /**
@@ -1135,27 +1334,13 @@
     },
 
     /**
-     * Clears a canvas element and removes all event handlers.
+     * Clears a canvas element and removes all event listeners
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
     dispose: function () {
       this.clear();
-
-      if (!this.interactive) return this;
-
-      if (fabric.isTouchSupported) {
-        removeListener(this.upperCanvasEl, 'touchstart', this._onMouseDown);
-        removeListener(this.upperCanvasEl, 'touchmove', this._onMouseMove);
-        if (typeof Event !== 'undefined' && 'remove' in Event) {
-          Event.remove(this.upperCanvasEl, 'gesture', this._onGesture);
-        }
-      }
-      else {
-        removeListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
-        removeListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
-        removeListener(fabric.window, 'resize', this._onResize);
-      }
+      this.interactive && this.removeListeners();
       return this;
     },
 

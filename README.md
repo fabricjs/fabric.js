@@ -1,5 +1,12 @@
+<a href="http://fabricjs.challengepost.com/?utm_source=partner&utm_medium=banner&utm_campaign=fabricjs" style="display: block">
+  <img src="https://dl.dropboxusercontent.com/u/822184/fabric-js-promo-widget-github.gif" style="width: auto">
+</a>
+
 ### Fabric
 [![Build Status](https://secure.travis-ci.org/kangax/fabric.js.png?branch=master)](http://travis-ci.org/#!/kangax/fabric.js)
+
+[![Code Climate](https://codeclimate.com/repos/526a0ed089af7e6cf2001389/badges/d1c922dd1511ffa8a72f/gpa.png)](https://codeclimate.com/repos/526a0ed089af7e6cf2001389/feed)
+
 <a href="https://npmjs.org/package/fabric"><img src="https://badge.fury.io/js/fabric.png"></a>
 
 **Fabric.js** is a framework that makes it easy to work with HTML5 canvas element. It is an **interactive object model** on top of canvas element. It is also an **SVG-to-canvas parser**.
@@ -12,14 +19,14 @@ Using Fabric.js, you can create and populate objects on canvas; objects like sim
 
 ### Goals
 
-- Unit tested (2000+ tests at the moment)
+- Unit tested (2300+ tests at the moment)
 - Modular (~60 small ["classes", modules, mixins](http://fabricjs.com/docs/))
 - Cross-browser
 - [Fast](https://github.com/kangax/fabric.js/wiki/Focus-on-speed)
 - Encapsulated in one object
 - No browser sniffing for critical functionality
 - Runs under ES5 strict mode
-- Runs on a server under [Node.js](http://nodejs.org/) (0.6, 0.8, 0.10)
+- Runs on a server under [Node.js](http://nodejs.org/) (0.6, 0.8, 0.10) (see [Node.js limitations](https://github.com/kangax/fabric.js/wiki/Fabric-limitations-in-node.js))
 
 ### Supported browsers
 
@@ -55,14 +62,14 @@ Fabric.js started as a foundation for design editor on [printio.ru](http://print
 
         $ node build.js
 
-    - Or build a custom distribution file, by passing (comma separated) module names to be included.
+    2.1 Or build a custom distribution file, by passing (comma separated) module names to be included.
 
-            $ node build.js modules=text,serialization,parser
-            // or
-            $ node build.js modules=text
-            // or
-            $ node build.js modules=parser,text
-            // etc.
+          $ node build.js modules=text,serialization,parser
+          // or
+          $ node build.js modules=text
+          // or
+          $ node build.js modules=parser,text
+          // etc.
 
       By default (when none of the modules are specified) only basic functionality is included.
       See the list of modules below for more information on each one of them.
@@ -70,11 +77,15 @@ Fabric.js started as a foundation for design editor on [printio.ru](http://print
 
       To get minimal distribution with interactivity, make sure to include corresponding module:
 
-            $ node build.js modules=interaction
+          $ node build.js modules=interaction
 
-    - You can also include all modules like so:
+    2.2 You can also include all modules like so:
 
-            $ node build.js modules=ALL
+          $ node build.js modules=ALL
+
+    2.3 You can exclude a few modules like so:
+
+          $ node build.js modules=ALL exclude=gestures,image_filters
 
 3. Create a minified distribution file
 
@@ -86,7 +97,15 @@ Fabric.js started as a foundation for design editor on [printio.ru](http://print
 
 4. Enable AMD support via require.js (requires uglify)
 
-        $ node build.js requirejs modules=... 
+        $ node build.js requirejs modules=...
+
+5. Create source map file for better productive debugging (requires uglify or google closure compiler).<br>More information about [source maps](http://www.html5rocks.com/en/tutorials/developertools/sourcemaps/).
+
+        $ node build.js sourcemap modules=...
+
+    If you use google closure compiler you have to add `sourceMappingURL` manually at the end of the minified file all.min.js (see issue https://code.google.com/p/closure-compiler/issues/detail?id=941).
+
+        //# sourceMappingURL=all.min.js.map
 
 ### Demos
 
@@ -104,7 +123,8 @@ Also see [official 4-part intro series](http://fabricjs.com/articles), [presenta
 
 These are the optional modules that could be specified for inclusion, when building custom version of fabric:
 
-- **text** — Adds support for `fabric.Text`
+- **text** — Adds support for static text (`fabric.Text`)
+- **itext** — Adds support for interactive text (`fabric.IText`)
 - **serialization** — Adds support for `loadFromJSON`, `loadFromDatalessJSON`, and `clone` methods on `fabric.Canvas`
 - **interaction** — Adds support for interactive features of fabric — selecting/transforming objects/groups via mouse/touch devices.
 - **parser** — Adds support for `fabric.parseSVGDocument`, `fabric.loadSVGFromURL`, and `fabric.loadSVGFromString`
@@ -122,6 +142,7 @@ Additional flags for build script are:
 - **no-strict** — Strips "use strict" directives from source
 - **no-svg-export** — Removes svg exporting functionality
 - **no-es5-compat** - Removes ES5 compat methods (Array.prototype.*, String.prototype.*, Function.prototype.*)
+- **sourcemap** - Generates a sourceMap file and adds the `sourceMappingURL` (only if uglifyjs is used) to `dist/all.min.js`
 
 For example:
 

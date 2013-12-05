@@ -12,20 +12,22 @@
      * @return {fabric.Point}
      */
     translateToCenterPoint: function(point, originX, originY) {
-      var cx = point.x, cy = point.y;
+      var cx = point.x,
+          cy = point.y,
+          strokeWidth = this.stroke ? this.strokeWidth : 0;
 
-      if ( originX === "left" ) {
-        cx = point.x + ( this.getWidth() + (this.strokeWidth*this.scaleX) )/ 2;
+      if (originX === "left") {
+        cx = point.x + (this.getWidth() + strokeWidth * this.scaleX) / 2;
       }
-      else if ( originX === "right" ) {
-        cx = point.x - ( this.getWidth() + (this.strokeWidth*this.scaleX) ) / 2;
+      else if (originX === "right") {
+        cx = point.x - (this.getWidth() + strokeWidth * this.scaleX) / 2;
       }
 
-      if ( originY === "top" ) {
-        cy = point.y +( this.getHeight() + (this.strokeWidth*this.scaleY) ) / 2;
+      if (originY === "top") {
+        cy = point.y + (this.getHeight() + strokeWidth * this.scaleY) / 2;
       }
-      else if ( originY === "bottom" ) {
-        cy = point.y - ( this.getHeight() + (this.strokeWidth*this.scaleY) )  / 2;
+      else if (originY === "bottom") {
+        cy = point.y - (this.getHeight() + strokeWidth * this.scaleY) / 2;
       }
 
       // Apply the reverse rotation to the point (it's already scaled properly)
@@ -40,20 +42,22 @@
      * @return {fabric.Point}
      */
     translateToOriginPoint: function(center, originX, originY) {
-      var x = center.x, y = center.y;
+      var x = center.x,
+          y = center.y,
+          strokeWidth = this.stroke ? this.strokeWidth : 0;
 
       // Get the point coordinates
-      if ( originX === "left" ) {
-        x = center.x - ( this.getWidth() + (this.strokeWidth*this.scaleX) ) / 2;
+      if (originX === "left") {
+        x = center.x - (this.getWidth() + strokeWidth * this.scaleX) / 2;
       }
-      else if ( originX === "right" ) {
-        x = center.x + ( this.getWidth() + (this.strokeWidth*this.scaleX) ) / 2;
+      else if (originX === "right") {
+        x = center.x + (this.getWidth() + strokeWidth * this.scaleX) / 2;
       }
-      if ( originY === "top" ) {
-        y = center.y - ( this.getHeight() + (this.strokeWidth*this.scaleY) )/ 2;
+      if (originY === "top") {
+        y = center.y - (this.getHeight() + strokeWidth * this.scaleY) / 2;
       }
-      else if ( originY === "bottom" ) {
-        y = center.y + ( this.getHeight() + (this.strokeWidth*this.scaleY) )/ 2;
+      else if (originY === "bottom") {
+        y = center.y + (this.getHeight() + strokeWidth * this.scaleY) / 2;
       }
 
       // Apply the rotation to the point (it's already scaled properly)
@@ -91,29 +95,32 @@
 
     /**
      * Returns the point in local coordinates
-     * @param {fabric.Point} The point relative to the global coordinate system
+     * @param {fabric.Point} point The point relative to the global coordinate system
+     * @param {String} originX Horizontal origin: 'left', 'center' or 'right'
+     * @param {String} originY Vertical origin: 'top', 'center' or 'bottom'
      * @return {fabric.Point}
      */
     toLocalPoint: function(point, originX, originY) {
-      var center = this.getCenterPoint();
+      var center = this.getCenterPoint(),
+          strokeWidth = this.stroke ? this.strokeWidth : 0,
+          x, y;
 
-      var x, y;
-      if (originX !== undefined && originY !== undefined) {
-        if ( originX === "left" ) {
-          x = center.x - (this.getWidth() + this.strokeWidth*this.scaleX) / 2;
+      if (originX && originY) {
+        if (originX === "left") {
+          x = center.x - (this.getWidth() + strokeWidth * this.scaleX) / 2;
         }
-        else if ( originX === "right" ) {
-          x = center.x + (this.getWidth() + this.strokeWidth*this.scaleX)/ 2;
+        else if (originX === "right") {
+          x = center.x + (this.getWidth() + strokeWidth * this.scaleX) / 2;
         }
         else {
           x = center.x;
         }
 
-        if ( originY === "top" ) {
-          y = center.y - (this.getHeight() + this.strokeWidth*this.scaleY) / 2;
+        if (originY === "top") {
+          y = center.y - (this.getHeight() + strokeWidth * this.scaleY) / 2;
         }
-        else if ( originY === "bottom" ) {
-          y = center.y + (this.getHeight() + this.strokeWidth*this.scaleY)/ 2;
+        else if (originY === "bottom") {
+          y = center.y + (this.getHeight() + strokeWidth * this.scaleY) / 2;
         }
         else {
           y = center.y;
@@ -153,7 +160,7 @@
     },
 
     /**
-     * @param {String} to One of left, center, right
+     * @param {String} to One of 'left', 'center', 'right'
      */
     adjustPosition: function(to) {
       var angle = degreesToRadians(this.angle);

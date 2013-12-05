@@ -15,6 +15,7 @@
    * Circle class
    * @class fabric.Circle
    * @extends fabric.Object
+   * @see {@link fabric.Circle#initialize} for constructor definition
    */
   fabric.Circle = fabric.util.createClass(fabric.Object, /** @lends fabric.Circle.prototype */ {
 

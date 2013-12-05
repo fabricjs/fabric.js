@@ -97,6 +97,8 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
           height: sprayChunk[j].width,
           left: sprayChunk[j].x + 1,
           top: sprayChunk[j].y + 1,
+          originX: 'center',
+          originY: 'center',
           fill: this.color
         });
 
@@ -109,7 +111,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
       rects = this._getOptimizedRects(rects);
     }
 
-    var group = new fabric.Group(rects);
+    var group = new fabric.Group(rects, { originX: 'center', originY: 'center' });
     group.canvas = this.canvas;
 
     this.canvas.add(group);

@@ -14,34 +14,37 @@
     */
   function animate(options) {
 
-    options || (options = { });
+    requestAnimFrame(function(timestamp) {
+      options || (options = { });
 
-    var start = +new Date(),
-      duration = options.duration || 500,
-      finish = start + duration, time,
-      onChange = options.onChange || function() { },
-      abort = options.abort || function() { return false; },
-      easing = options.easing || function(t, b, c, d) {return -c * Math.cos(t/d * (Math.PI/2)) + c + b;},
-      startValue = 'startValue' in options ? options.startValue : 0,
-      endValue = 'endValue' in options ? options.endValue : 100,
-      byValue = options.byValue || endValue - startValue;
+      var start = timestamp || +new Date(),
+          duration = options.duration || 500,
+          finish = start + duration, time,
+          onChange = options.onChange || function() { },
+          abort = options.abort || function() { return false; },
+          easing = options.easing || function(t, b, c, d) {return -c * Math.cos(t/d * (Math.PI/2)) + c + b;},
+          startValue = 'startValue' in options ? options.startValue : 0,
+          endValue = 'endValue' in options ? options.endValue : 100,
+          byValue = options.byValue || endValue - startValue;
 
-    options.onStart && options.onStart();
+      options.onStart && options.onStart();
 
-    (function tick() {
-      time = +new Date();
-      var currentTime = time > finish ? duration : (time - start);
-      if (abort()) {
-        options.onComplete && options.onComplete();
-        return;
-      }
-      onChange(easing(currentTime, startValue, byValue, duration));
-      if (time > finish) {
-        options.onComplete && options.onComplete();
-        return;
-      }
-      requestAnimFrame(tick);
-    })();
+      (function tick(ticktime) {
+        time = ticktime || +new Date();
+        var currentTime = time > finish ? duration : (time - start);
+        if (abort()) {
+          options.onComplete && options.onComplete();
+          return;
+        }
+        onChange(easing(currentTime, startValue, byValue, duration));
+        if (time > finish) {
+          options.onComplete && options.onComplete();
+          return;
+        }
+        requestAnimFrame(tick);
+      })(start);
+    });
+
   }
 
   var _requestAnimFrame = fabric.window.requestAnimationFrame       ||
@@ -54,6 +57,7 @@
                           };
   /**
     * requestAnimationFrame polyfill based on http://paulirish.com/2011/requestanimationframe-for-smart-animating/
+    * In order to get a precise start time, `requestAnimFrame` should be called as an entry into the method
     * @memberOf fabric.util
     * @param {Function} callback Callback to invoke
     * @param {DOMElement} element optional Element to associate with animation

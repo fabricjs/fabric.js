@@ -17,6 +17,7 @@
    * Root object class from which all 2d shape classes inherit from
    * @class fabric.Object
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-1/#objects}
+   * @see {@link fabric.Object#initialize} for constructor definition
    *
    * @fires added
    * @fires removed
@@ -307,14 +308,14 @@
      * @type String
      * @default
      */
-    originX:                  'center',
+    originX:                  'left',
 
     /**
      * Vertical origin of transformation of an object (one of "top", "bottom", "center")
      * @type String
      * @default
      */
-    originY:                  'center',
+    originY:                  'top',
 
     /**
      * Top position of an object. Note that by default it's relative to object center. You can change this by setting originY={top/center/bottom}
@@ -446,7 +447,7 @@
      * @type Boolean
      * @default
      */
-    centeredRotation:         false,
+    centeredRotation:         true,
 
     /**
      * Color of object's fill
@@ -799,95 +800,6 @@
       return this.toObject(propertiesToInclude);
     },
 
-    /* _TO_SVG_START_ */
-    /**
-     * Returns styles-string for svg-export
-     * @return {String}
-     */
-    getSvgStyles: function() {
-
-      var fill = this.fill
-        ? (this.fill.toLive ? 'url(#SVGID_' + this.fill.id + ')' : this.fill)
-        : 'none';
-
-      var stroke = this.stroke
-        ? (this.stroke.toLive ? 'url(#SVGID_' + this.stroke.id + ')' : this.stroke)
-        : 'none';
-
-      var strokeWidth = this.strokeWidth ? this.strokeWidth : '0';
-      var strokeDashArray = this.strokeDashArray ? this.strokeDashArray.join(' ') : '';
-      var strokeLineCap = this.strokeLineCap ? this.strokeLineCap : 'butt';
-      var strokeLineJoin = this.strokeLineJoin ? this.strokeLineJoin : 'miter';
-      var strokeMiterLimit = this.strokeMiterLimit ? this.strokeMiterLimit : '4';
-      var opacity = typeof this.opacity !== 'undefined' ? this.opacity : '1';
-
-      var visibility = this.visible ? '' : " visibility: hidden;";
-      var filter = this.shadow && this.type !== 'text' ? 'filter: url(#SVGID_' + this.shadow.id + ');' : '';
-
-      return [
-        "stroke: ", stroke, "; ",
-        "stroke-width: ", strokeWidth, "; ",
-        "stroke-dasharray: ", strokeDashArray, "; ",
-        "stroke-linecap: ", strokeLineCap, "; ",
-        "stroke-linejoin: ", strokeLineJoin, "; ",
-        "stroke-miterlimit: ", strokeMiterLimit, "; ",
-        "fill: ", fill, "; ",
-        "opacity: ", opacity, ";",
-        filter,
-        visibility
-      ].join('');
-    },
-
-    /**
-     * Returns transform-string for svg-export
-     * @return {String}
-     */
-    getSvgTransform: function() {
-      var angle = this.getAngle();
-      var center = this.getCenterPoint();
-
-      var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
-
-      var translatePart = "translate(" +
-                            toFixed(center.x, NUM_FRACTION_DIGITS) +
-                            " " +
-                            toFixed(center.y, NUM_FRACTION_DIGITS) +
-                          ")";
-
-      var anglePart = angle !== 0
-        ? (" rotate(" + toFixed(angle, NUM_FRACTION_DIGITS) + ")")
-        : '';
-
-      var scalePart = (this.scaleX === 1 && this.scaleY === 1)
-        ? '' :
-        (" scale(" +
-          toFixed(this.scaleX, NUM_FRACTION_DIGITS) +
-          " " +
-          toFixed(this.scaleY, NUM_FRACTION_DIGITS) +
-        ")");
-
-      var flipXPart = this.flipX ? "matrix(-1 0 0 1 0 0) " : "";
-      var flipYPart = this.flipY ? "matrix(1 0 0 -1 0 0)" : "";
-
-      return [ translatePart, anglePart, scalePart, flipXPart, flipYPart ].join('');
-    },
-
-    _createBaseSVGMarkup: function() {
-      var markup = [ ];
-
-      if (this.fill && this.fill.toLive) {
-        markup.push(this.fill.toSVG(this, false));
-      }
-      if (this.stroke && this.stroke.toLive) {
-        markup.push(this.stroke.toSVG(this, false));
-      }
-      if (this.shadow) {
-        markup.push(this.shadow.toSVG(this));
-      }
-      return markup;
-    },
-    /* _TO_SVG_END_ */
-
     /**
      * @private
      * @param {Object} object
@@ -1014,6 +926,27 @@
 
       ctx.save();
 
+      this._transform(ctx, noTransform);
+      this._setStrokeStyles(ctx);
+      this._setFillStyles(ctx);
+
+      var m = this.transformMatrix;
+      if (m && this.group) {
+        ctx.translate(-this.group.width/2, -this.group.height/2);
+        ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
+      }
+
+      this._setShadow(ctx);
+      this.clipTo && fabric.util.clipContext(this, ctx);
+      this._render(ctx, noTransform);
+      this.clipTo && ctx.restore();
+      this._removeShadow(ctx);
+      ctx.restore();
+      
+      this._renderControls(ctx, noTransform);
+    },
+
+    _transform: function(ctx, noTransform) {
       var m = this.transformMatrix;
       var v;
       if (this.canvas) {
@@ -1028,11 +961,12 @@
       if (m && !this.group) {
         ctx.setTransform(m[0], m[1], m[2], m[3], m[4], m[5]);
       }
-
       if (!noTransform) {
         this.transform(ctx);
       }
+    },
 
+    _setStrokeStyles: function(ctx) {
       if (this.stroke) {
         ctx.lineWidth = this.strokeWidth;
         ctx.lineCap = this.strokeLineCap;
@@ -1042,26 +976,14 @@
           ? this.stroke.toLive(ctx)
           : this.stroke;
       }
+    },
 
+    _setFillStyles: function(ctx) {
       if (this.fill) {
         ctx.fillStyle = this.fill.toLive
           ? this.fill.toLive(ctx)
           : this.fill;
       }
-
-      if (m && this.group) {
-        ctx.translate(-this.group.width/2, -this.group.height/2);
-        ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
-      }
-
-      this._setShadow(ctx);
-      this.clipTo && fabric.util.clipContext(this, ctx);
-      this._render(ctx, noTransform);
-      this.clipTo && ctx.restore();
-      this._removeShadow(ctx);
-      ctx.restore();
-      
-      this._renderControls(ctx, noTransform);
     },
 
     /**
@@ -1242,10 +1164,12 @@
       this.set('active', false);
       this.setPositionByOrigin(new fabric.Point(el.width / 2, el.height / 2), 'center', 'center');
 
+      var originalCanvas = this.canvas;
       canvas.add(this);
       var data = canvas.toDataURL(options);
 
       this.set(origParams).setCoords();
+      this.canvas = originalCanvas;
 
       canvas.dispose();
       canvas = null;
@@ -1442,7 +1366,8 @@
      * @chainable
      */
     center: function () {
-      return this.centerH().centerV();
+      this.canvas.centerObject(this);
+      return this;
     },
 
     /**
@@ -1455,81 +1380,18 @@
     },
 
     /**
-     * Moves an object to the bottom of the stack of drawn objects
-     * @return {fabric.Object} thisArg
-     * @chainable
+     * Returns coordinates of a pointer relative to an object
+     * @param {Event} e Event to operate upon
+     * @param {Object} [pointer] Pointer to operate upon (instead of event)
+     * @return {Object} Coordinates of a pointer (x, y)
      */
-    sendToBack: function() {
-      if (this.group) {
-        fabric.StaticCanvas.prototype.sendToBack.call(this.group, this);
-      }
-      else {
-        this.canvas.sendToBack(this);
-      }
-      return this;
-    },
-
-    /**
-     * Moves an object to the top of the stack of drawn objects
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-    bringToFront: function() {
-      if (this.group) {
-        fabric.StaticCanvas.prototype.bringToFront.call(this.group, this);
-      }
-      else {
-        this.canvas.bringToFront(this);
-      }
-      return this;
-    },
-
-    /**
-     * Moves an object down in stack of drawn objects
-     * @param {Boolean} [intersecting] If `true`, send object behind next lower intersecting object
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-    sendBackwards: function(intersecting) {
-      if (this.group) {
-        fabric.StaticCanvas.prototype.sendBackwards.call(this.group, this, intersecting);
-      }
-      else {
-        this.canvas.sendBackwards(this, intersecting);
-      }
-      return this;
-    },
-
-    /**
-     * Moves an object up in stack of drawn objects
-     * @param {Boolean} [intersecting] If `true`, send object in front of next upper intersecting object
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-    bringForward: function(intersecting) {
-      if (this.group) {
-        fabric.StaticCanvas.prototype.bringForward.call(this.group, this, intersecting);
-      }
-      else {
-        this.canvas.bringForward(this, intersecting);
-      }
-      return this;
-    },
-
-    /**
-     * Moves an object to specified level in stack of drawn objects
-     * @param {Number} index New position of object
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-    moveTo: function(index) {
-      if (this.group) {
-        fabric.StaticCanvas.prototype.moveTo.call(this.group, this, index);
-      }
-      else {
-        this.canvas.moveTo(this, index);
-      }
-      return this;
+    getLocalPointer: function(e, pointer) {
+      pointer = pointer || this.canvas.getPointer(e);
+      var objectLeftTop = this.translateToOriginPoint(this.getCenterPoint(), 'left', 'top');
+      return {
+        x: pointer.x - objectLeftTop.x,
+        y: pointer.y - objectLeftTop.y
+      };
     }
   });
 

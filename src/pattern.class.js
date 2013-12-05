@@ -3,6 +3,7 @@
  * @class fabric.Pattern
  * @see {@link http://fabricjs.com/patterns/|Pattern demo}
  * @see {@link http://fabricjs.com/dynamic-patterns/|DynamicPattern demo}
+ * @see {@link fabric.Pattern#initialize} for constructor definition
  */
 fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ {
 
@@ -133,6 +134,11 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
    */
   toLive: function(ctx) {
     var source = typeof this.source === 'function' ? this.source() : this.source;
+    // if an image
+    if (typeof source.src !== 'undefined') {
+      if (!source.complete) return '';
+      if (source.naturalWidth === 0 || source.naturalHeight === 0) return '';
+    }
     return ctx.createPattern(source, this.repeat);
   }
 });

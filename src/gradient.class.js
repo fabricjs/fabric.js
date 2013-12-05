@@ -47,12 +47,33 @@
       opacity: isNaN(parseFloat(opacity)) ? 1 : parseFloat(opacity)
     };
   }
+
+  function getLinearCoords(el) {
+    return {
+      x1: el.getAttribute('x1') || 0,
+      y1: el.getAttribute('y1') || 0,
+      x2: el.getAttribute('x2') || '100%',
+      y2: el.getAttribute('y2') || 0
+    };
+  }
+
+  function getRadialCoords(el) {
+    return {
+      x1: el.getAttribute('fx') || el.getAttribute('cx') || '50%',
+      y1: el.getAttribute('fy') || el.getAttribute('cy') || '50%',
+      r1: 0,
+      x2: el.getAttribute('cx') || '50%',
+      y2: el.getAttribute('cy') || '50%',
+      r2: el.getAttribute('r') || '50%'
+    };
+  }
   /* _FROM_SVG_END_ */
 
   /**
    * Gradient class
    * @class fabric.Gradient
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-2/#gradients}
+   * @see {@link fabric.Gradient#initialize} for constructor definition
    */
   fabric.Gradient = fabric.util.createClass(/** @lends fabric.Gradient.prototype */ {
 
@@ -269,22 +290,10 @@
           coords = { };
 
       if (type === 'linear') {
-        coords = {
-          x1: el.getAttribute('x1') || 0,
-          y1: el.getAttribute('y1') || 0,
-          x2: el.getAttribute('x2') || '100%',
-          y2: el.getAttribute('y2') || 0
-        };
+        coords = getLinearCoords(el);
       }
       else if (type === 'radial') {
-        coords = {
-          x1: el.getAttribute('fx') || el.getAttribute('cx') || '50%',
-          y1: el.getAttribute('fy') || el.getAttribute('cy') || '50%',
-          r1: 0,
-          x2: el.getAttribute('cx') || '50%',
-          y2: el.getAttribute('cy') || '50%',
-          r2: el.getAttribute('r') || '50%'
-        };
+        coords = getRadialCoords(el);
       }
 
       for (var i = colorStopEls.length; i--; ) {
@@ -330,13 +339,17 @@
           options[prop] = fabric.util.toFixed(object.height * percents / 100, 2);
         }
       }
-      // normalize rendering point (should be from top/left corner rather than center of the shape)
-      if (prop === 'x1' || prop === 'x2') {
-        options[prop] -= fabric.util.toFixed(object.width / 2, 2);
-      }
-      else if (prop === 'y1' || prop === 'y2') {
-        options[prop] -= fabric.util.toFixed(object.height / 2, 2);
-      }
+      normalize(options, prop, object);
+    }
+  }
+
+  // normalize rendering point (should be from top/left corner rather than center of the shape)
+  function normalize(options, prop, object) {
+    if (prop === 'x1' || prop === 'x2') {
+      options[prop] -= fabric.util.toFixed(object.width / 2, 2);
+    }
+    else if (prop === 'y1' || prop === 'y2') {
+      options[prop] -= fabric.util.toFixed(object.height / 2, 2);
     }
   }
 
@@ -346,13 +359,9 @@
    */
   function _convertValuesToPercentUnits(object, options) {
     for (var prop in options) {
-      // normalize rendering point (should be from center rather than top/left corner of the shape)
-      if (prop === 'x1' || prop === 'x2') {
-        options[prop] += fabric.util.toFixed(object.width / 2, 2);
-      }
-      else if (prop === 'y1' || prop === 'y2') {
-        options[prop] += fabric.util.toFixed(object.height / 2, 2);
-      }
+
+      normalize(options, prop, object);
+
       // convert to percent units
       if (prop === 'x1' || prop === 'x2' || prop === 'r2') {
         options[prop] = fabric.util.toFixed(options[prop] / object.width * 100, 2) + '%';

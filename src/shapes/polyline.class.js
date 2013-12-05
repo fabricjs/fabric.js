@@ -3,8 +3,7 @@
   "use strict";
 
   var fabric = global.fabric || (global.fabric = { }),
-      toFixed = fabric.util.toFixed,
-      min = fabric.util.array.min;
+      toFixed = fabric.util.toFixed;
 
   if (fabric.Polyline) {
     fabric.warn('fabric.Polyline is already defined');
@@ -15,6 +14,7 @@
    * Polyline class
    * @class fabric.Polyline
    * @extends fabric.Object
+   * @see {@link fabric.Polyline#initialize} for constructor definition
    */
   fabric.Polyline = fabric.util.createClass(fabric.Object, /** @lends fabric.Polyline.prototype */ {
 
@@ -27,10 +27,23 @@
 
     /**
      * Constructor
-     * @param {Array} points Array of points
+     * @param {Array} points Array of points (where each point is an object with x and y)
      * @param {Object} [options] Options object
      * @param {Boolean} [skipOffset] Whether points offsetting should be skipped
      * @return {fabric.Polyline} thisArg
+     * @example
+     * var poly = new fabric.Polyline([
+     *     { x: 10, y: 10 },
+     *     { x: 50, y: 30 },
+     *     { x: 40, y: 70 },
+     *     { x: 60, y: 50 },
+     *     { x: 100, y: 150 },
+     *     { x: 40, y: 100 }
+     *   ], {
+     *   stroke: 'red',
+     *   left: 100,
+     *   top: 100
+     * });
      */
     initialize: function(points, options, skipOffset) {
       options = options || { };
@@ -147,18 +160,9 @@
     options || (options = { });
 
     var points = fabric.parsePointsAttribute(element.getAttribute('points')),
-        parsedAttributes = fabric.parseAttributes(element, fabric.Polyline.ATTRIBUTE_NAMES),
-        minX = min(points, 'x'),
-        minY = min(points, 'y');
+        parsedAttributes = fabric.parseAttributes(element, fabric.Polyline.ATTRIBUTE_NAMES);
 
-    minX = minX < 0 ? minX : 0;
-    minY = minX < 0 ? minY : 0;
-
-    for (var i = 0, len = points.length; i < len; i++) {
-      // normalize coordinates, according to containing box (dimensions of which are passed via `options`)
-      points[i].x -= (options.width / 2 + minX) || 0;
-      points[i].y -= (options.height / 2 + minY) || 0;
-    }
+    fabric.util.normalizePoints(points, options);
 
     return new fabric.Polyline(points, fabric.util.object.extend(parsedAttributes, options), true);
   };

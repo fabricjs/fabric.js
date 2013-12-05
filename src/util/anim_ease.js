@@ -1,37 +1,15 @@
 (function() {
 
-  /**
-   * Quadratic easing in
-   * @memberOf fabric.util.ease
-   */
-  function easeInQuad(t, b, c, d) {
-    return c*(t/=d)*t + b;
+  function normalize(a, c, p, s) {
+    if (a < Math.abs(c)) { a=c; s=p/4; }
+    else s = p/(2*Math.PI) * Math.asin (c/a);
+    return { a: a, c: c, p: p, s: s };
   }
 
-  /**
-   * Quadratic easing out
-   * @memberOf fabric.util.ease
-   */
-  function easeOutQuad(t, b, c, d) {
-    return -c *(t/=d)*(t-2) + b;
-  }
-
-  /**
-   * Quadratic easing in and out
-   * @memberOf fabric.util.ease
-   */
-  function easeInOutQuad(t, b, c, d) {
-    t /= (d/2);
-    if (t < 1) return c/2*t*t + b;
-    return -c/2 * ((--t)*(t-2) - 1) + b;
-  }
-
-  /**
-   * Cubic easing in
-   * @memberOf fabric.util.ease
-   */
-  function easeInCubic(t, b, c, d) {
-    return c*(t/=d)*t*t + b;
+  function elastic(opts, t, d) {
+    return opts.a *
+      Math.pow(2, 10 * (t -= 1)) *
+      Math.sin( (t * d - opts.s) * (2 * Math.PI) / opts.p );
   }
 
   /**
@@ -192,9 +170,8 @@
     t /= d;
     if (t===1) return b+c;
     if (!p) p=d*0.3;
-    if (a < Math.abs(c)) { a=c; s=p/4; }
-    else s = p/(2*Math.PI) * Math.asin (c/a);
-    return -(a*Math.pow(2,10*(t-=1)) * Math.sin( (t*d-s)*(2*Math.PI)/p )) + b;
+    var opts = normalize(a, c, p, s);
+    return -elastic(opts, t, d) + b;
   }
 
   /**
@@ -207,9 +184,8 @@
     t /= d;
     if (t===1) return b+c;
     if (!p) p=d*0.3;
-    if (a < Math.abs(c)) { a=c; s=p/4; }
-    else s = p/(2*Math.PI) * Math.asin (c/a);
-    return a*Math.pow(2,-10*t) * Math.sin( (t*d-s)*(2*Math.PI)/p ) + c + b;
+    var opts = normalize(a, c, p, s);
+    return opts.a*Math.pow(2,-10*t) * Math.sin( (t*d-opts.s)*(2*Math.PI)/opts.p ) + opts.c + b;
   }
 
   /**
@@ -222,10 +198,9 @@
     t /= d/2;
     if (t===2) return b+c;
     if (!p) p=d*(0.3*1.5);
-    if (a < Math.abs(c)) { a=c; s=p/4; }
-    else s = p/(2*Math.PI) * Math.asin (c/a);
-    if (t < 1) return -0.5*(a*Math.pow(2,10*(t-=1)) * Math.sin( (t*d-s)*(2*Math.PI)/p )) + b;
-    return a*Math.pow(2,-10*(t-=1)) * Math.sin( (t*d-s)*(2*Math.PI)/p )*0.5 + c + b;
+    var opts = normalize(a, c, p, s);
+    if (t < 1) return -0.5 * elastic(opts, t, d) + b;
+    return opts.a*Math.pow(2,-10*(t-=1)) * Math.sin( (t*d-opts.s)*(2*Math.PI)/opts.p )*0.5 + opts.c + b;
   }
 
   /**
@@ -296,10 +271,41 @@
    * @namespace fabric.util.ease
    */
   fabric.util.ease = {
-    easeInQuad: easeInQuad,
-    easeOutQuad: easeOutQuad,
-    easeInOutQuad: easeInOutQuad,
-    easeInCubic: easeInCubic,
+
+    /**
+     * Quadratic easing in
+     * @memberOf fabric.util.ease
+     */
+    easeInQuad: function(t, b, c, d) {
+      return c*(t/=d)*t + b;
+    },
+
+    /**
+     * Quadratic easing out
+     * @memberOf fabric.util.ease
+     */
+    easeOutQuad: function(t, b, c, d) {
+      return -c *(t/=d)*(t-2) + b;
+    },
+
+    /**
+     * Quadratic easing in and out
+     * @memberOf fabric.util.ease
+     */
+    easeInOutQuad: function(t, b, c, d) {
+      t /= (d/2);
+      if (t < 1) return c/2*t*t + b;
+      return -c/2 * ((--t)*(t-2) - 1) + b;
+    },
+
+    /**
+     * Cubic easing in
+     * @memberOf fabric.util.ease
+     */
+    easeInCubic: function(t, b, c, d) {
+      return c*(t/=d)*t*t + b;
+    },
+
     easeOutCubic: easeOutCubic,
     easeInOutCubic: easeInOutCubic,
     easeInQuart: easeInQuart,

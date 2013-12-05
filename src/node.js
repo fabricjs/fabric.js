@@ -87,6 +87,9 @@
     else if (url) {
       request(url, 'binary', createImageAndCallBack);
     }
+    else {
+      callback && callback.call(context, url);
+    }
   };
 
   fabric.loadSVGFromURL = function(url, callback, reviver) {

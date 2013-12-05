@@ -2,8 +2,8 @@
 
   var REFERENCE_PATH_GROUP_OBJECT = {
     'type':               'path-group',
-    'originX':            'center',
-    'originY':            'center',
+    'originX':            'left',
+    'originY':            'top',
     'left':               0,
     'top':                0,
     'width':              0,

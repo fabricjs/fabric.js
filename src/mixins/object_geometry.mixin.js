@@ -90,7 +90,7 @@
 
     /**
      * Checks if point is inside the object
-     * @param {Object} point
+     * @param {fabric.Point} point Point to check against
      * @return {Boolean} true if point is inside the object
      */
     containsPoint: function(point) {
@@ -131,8 +131,8 @@
      * Helper method to determine how many cross points are between the 4 object edges
      * and the horizontal line determined by a point on canvas
      * @private
-     * @param {Object} point
-     * @param {Object} oCoords Coordinates of the image being evaluated
+     * @param {fabric.Point} point Point to check
+     * @param {Object} oCoords Coordinates of the object being evaluated
      */
     _findCrossPoints: function(point, oCoords) {
       var b1, b2, a1, a2, xi, yi,

@@ -76,6 +76,16 @@
     deepEqual(fabric.util.degreesToRadians(), NaN);
   });
 
+  test('fabric.util.radiansToDegrees', function(){
+    ok(typeof fabric.util.radiansToDegrees == 'function');
+
+    equal(fabric.util.radiansToDegrees(0), 0);
+    equal(fabric.util.radiansToDegrees(Math.PI / 2), 90);
+    equal(fabric.util.radiansToDegrees(Math.PI), 180);
+
+    deepEqual(fabric.util.radiansToDegrees(), NaN);
+  });
+
   test('fabric.util.getRandomInt', function() {
     ok(typeof fabric.util.getRandomInt == 'function');
 
@@ -427,6 +437,26 @@
     }, 2000);
   });
 
+  asyncTest('fabric.util.loadImage with no args', function() {
+    var callbackInvoked = false;
+
+    if (IMG_URL.indexOf('/home/travis') === 0) {
+      // image can not be accessed on travis so we're returning early
+      expect(0);
+      start();
+      return;
+    }
+
+    fabric.util.loadImage('', function() {
+      callbackInvoked = true;
+    });
+
+    setTimeout(function() {
+      ok(callbackInvoked, 'callback should be invoked');
+      start();
+    }, 1000);
+  });
+
   var SVG_WITH_1_ELEMENT = '<?xml version="1.0"?>\
     <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\
     <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">\
@@ -643,8 +673,18 @@
     equal(dan + '', 'My name is Dan Trink and my skills are HTML, CSS, Javascript');
   });
 
-  // test('fabric.util.setStyle', function() {
-  // });
+  // element doesn't seem to have style on node
+  if (!fabric.isLikelyNode) {
+    test('fabric.util.setStyle', function() {
+
+      ok(typeof fabric.util.setStyle === 'function');
+
+      var el = fabric.document.createElement('div');
+
+      fabric.util.setStyle(el, 'color:red');
+      equal(el.style.color, 'red');
+    });
+  }
 
   // test('fabric.util.request', function() {
   // });
@@ -657,6 +697,19 @@
 
   // test('fabric.util.removeListener', function() {
   // });
+
+  test('fabric.util.drawDashedLine', function() {
+    ok(typeof fabric.util.drawDashedLine === 'function');
+
+    var el = fabric.document.createElement('canvas');
+    var canvas = fabric.isLikelyNode
+      ? fabric.createCanvasForNode()
+      : new fabric.Canvas(el);
+
+    var ctx = canvas.getContext('2d');
+
+    fabric.util.drawDashedLine(ctx, 0, 0, 100, 100, [5, 5]);
+  });
 
   test('fabric.util.array.invoke', function() {
     ok(typeof fabric.util.array.invoke === 'function');

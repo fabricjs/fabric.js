@@ -18,6 +18,7 @@
    * @class fabric.Image
    * @extends fabric.Object
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-1/#images}
+   * @see {@link fabric.Image#initialize} for constructor definition
    */
   fabric.Image = fabric.util.createClass(fabric.Object, /** @lends fabric.Image.prototype */ {
 
@@ -27,6 +28,14 @@
      * @default
      */
     type: 'image',
+
+    /**
+     * crossOrigin value (one of "", "anonymous", "allow-credentials")
+     * @see https://developer.mozilla.org/en-US/docs/HTML/CORS_settings_attributes
+     * @type String
+     * @default
+     */
+    crossOrigin: '',
 
     /**
      * Constructor
@@ -40,7 +49,8 @@
       this.filters = [ ];
 
       this.callSuper('initialize', options);
-      this._initElement(element);
+
+      this._initElement(element, options);
       this._initConfig(options);
 
       if (options.filters) {
@@ -79,6 +89,18 @@
     },
 
     /**
+     * Sets crossOrigin value (on an instance and corresponding image element)
+     * @return {fabric.Image} thisArg
+     * @chainable
+     */
+    setCrossOrigin: function(value) {
+      this.crossOrigin = value;
+      this._element.crossOrigin = value;
+
+      return this;
+    },
+
+    /**
      * Returns original size of an image
      * @return {Object} Object with "width" and "height" properties
      */
@@ -108,7 +130,7 @@
       else {
         v = [1, 0, 0, 1, 0, 0]; // TODO: this isn't a solution
       }
-      var isInPathGroup = this.group && this.group.type !== 'group';
+      var isInPathGroup = this.group && this.group.type === 'path-group';
 
       ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
 
@@ -144,14 +166,7 @@
      */
     _stroke: function(ctx) {
       ctx.save();
-      ctx.lineWidth = this.strokeWidth;
-      ctx.lineCap = this.strokeLineCap;
-      ctx.lineJoin = this.strokeLineJoin;
-      ctx.miterLimit = this.strokeMiterLimit;
-      ctx.strokeStyle = this.stroke.toLive
-        ? this.stroke.toLive(ctx)
-        : this.stroke;
-
+      this._setStrokeStyles(ctx);
       ctx.beginPath();
       ctx.strokeRect(-this.width / 2, -this.height / 2, this.width, this.height);
       ctx.closePath();
@@ -169,13 +184,7 @@
          h = this.height;
 
       ctx.save();
-      ctx.lineWidth = this.strokeWidth;
-      ctx.lineCap = this.strokeLineCap;
-      ctx.lineJoin = this.strokeLineJoin;
-      ctx.miterLimit = this.strokeMiterLimit;
-      ctx.strokeStyle = this.stroke.toLive
-        ? this.stroke.toLive(ctx)
-        : this.stroke;
+      this._setStrokeStyles(ctx);
 
       ctx.beginPath();
       fabric.util.drawDashedLine(ctx, x, y, x+w, y, this.strokeDashArray);
@@ -196,7 +205,8 @@
         src: this._originalElement.src || this._originalElement._src,
         filters: this.filters.map(function(filterObj) {
           return filterObj && filterObj.toObject();
-        })
+        }),
+        crossOrigin: this.crossOrigin
       });
     },
 
@@ -219,7 +229,8 @@
             '" transform="translate(' + (-this.width/2) + ' ' + (-this.height/2) + ')',
             '" width="', this.width,
             '" height="', this.height,
-          '"></image>'
+            '" preserveAspectRatio="none"',
+          '></image>'
       );
 
       if (this.stroke || this.strokeDashArray) {
@@ -362,6 +373,7 @@
       options || (options = { });
       this.setOptions(options);
       this._setWidthHeight(options);
+      this._element.crossOrigin = this.crossOrigin;
     },
 
     /**
@@ -424,28 +436,13 @@
    * @param {Function} [callback] Callback to invoke when an image instance is created
    */
   fabric.Image.fromObject = function(object, callback) {
-    var img = fabric.document.createElement('img'),
-        src = object.src;
-
-    /** @ignore */
-    img.onload = function() {
+    fabric.util.loadImage(object.src, function(img) {
       fabric.Image.prototype._initFilters.call(object, object, function(filters) {
         object.filters = filters || [ ];
-
         var instance = new fabric.Image(img, object);
         callback && callback(instance);
-        img = img.onload = img.onerror = null;
       });
-    };
-
-    /** @ignore */
-    img.onerror = function() {
-      fabric.log('Error loading ' + img.src);
-      callback && callback(null, true);
-      img = img.onload = img.onerror = null;
-    };
-
-    img.src = src;
+    }, null, object.crossOrigin);
   };
 
   /**
@@ -458,7 +455,7 @@
   fabric.Image.fromURL = function(url, callback, imgOptions) {
     fabric.util.loadImage(url, function(img) {
       callback(new fabric.Image(img, imgOptions));
-    });
+    }, null, imgOptions && imgOptions.crossOrigin);
   };
 
   /* _FROM_SVG_START_ */

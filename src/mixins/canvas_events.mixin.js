@@ -1,14 +1,14 @@
 (function(){
 
   var cursorMap = [
-      'n-resize',
-      'ne-resize',
-      'e-resize',
-      'se-resize',
-      's-resize',
-      'sw-resize',
-      'w-resize',
-      'nw-resize'
+    'n-resize',
+    'ne-resize',
+    'e-resize',
+    'se-resize',
+    's-resize',
+    'sw-resize',
+    'w-resize',
+    'nw-resize'
   ],
   cursorOffset = {
     'mt': 0, // n
@@ -30,32 +30,108 @@
      * Adds mouse listeners to canvas
      * @private
      */
-    _initEvents: function () {
-      var _this = this;
+    _initEventListeners: function () {
 
+      this._bindEvents();
+
+      addListener(fabric.window, 'resize', this._onResize);
+
+      // mouse events
+      addListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
+      addListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
+      addListener(this.upperCanvasEl, 'mousewheel', this._onMouseWheel);
+
+      // touch events
+      addListener(this.upperCanvasEl, 'touchstart', this._onMouseDown);
+      addListener(this.upperCanvasEl, 'touchmove', this._onMouseMove);
+
+      if (typeof Event !== 'undefined' && 'add' in Event) {
+        Event.add(this.upperCanvasEl, 'gesture', this._onGesture);
+        Event.add(this.upperCanvasEl, 'drag', this._onDrag);
+        Event.add(this.upperCanvasEl, 'orientation', this._onOrientationChange);
+        Event.add(this.upperCanvasEl, 'shake', this._onShake);
+      }
+    },
+
+    /**
+     * @private
+     */
+    _bindEvents: function() {
       this._onMouseDown = this._onMouseDown.bind(this);
       this._onMouseMove = this._onMouseMove.bind(this);
       this._onMouseUp = this._onMouseUp.bind(this);
       this._onResize = this._onResize.bind(this);
+      this._onGesture = this._onGesture.bind(this);
+      this._onDrag = this._onDrag.bind(this);
+      this._onShake = this._onShake.bind(this);
+      this._onOrientationChange = this._onOrientationChange.bind(this);
+      this._onMouseWheel = this._onMouseWheel.bind(this);
+    },
 
-      this._onGesture = function(e, s) {
-        _this.__onTransformGesture(e, s);
-      };
+    /**
+     * Removes all event listeners
+     */
+    removeListeners: function() {
+      removeListener(fabric.window, 'resize', this._onResize);
 
-      addListener(fabric.window, 'resize', this._onResize);
+      removeListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
+      removeListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
+      removeListener(this.upperCanvasEl, 'mousewheel', this._onMouseWheel);
 
-      if (fabric.isTouchSupported) {
-        addListener(this.upperCanvasEl, 'touchstart', this._onMouseDown);
-        addListener(this.upperCanvasEl, 'touchmove', this._onMouseMove);
+      removeListener(this.upperCanvasEl, 'touchstart', this._onMouseDown);
+      removeListener(this.upperCanvasEl, 'touchmove', this._onMouseMove);
 
-        if (typeof Event !== 'undefined' && 'add' in Event) {
-          Event.add(this.upperCanvasEl, 'gesture', this._onGesture);
-        }
+      if (typeof Event !== 'undefined' && 'remove' in Event) {
+        Event.remove(this.upperCanvasEl, 'gesture', this._onGesture);
+        Event.remove(this.upperCanvasEl, 'drag', this._onDrag);
+        Event.remove(this.upperCanvasEl, 'orientation', this._onOrientationChange);
+        Event.remove(this.upperCanvasEl, 'shake', this._onShake);
       }
-      else {
-        addListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
-        addListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
-      }
+    },
+
+    /**
+     * @private
+     * @param {Event} [e] Event object fired on Event.js gesture
+     * @param {Event} [self] Inner Event object
+     */
+    _onGesture: function(e, s) {
+      this.__onTransformGesture && this.__onTransformGesture(e, s);
+    },
+
+    /**
+     * @private
+     * @param {Event} [e] Event object fired on Event.js drag
+     * @param {Event} [self] Inner Event object
+     */
+    _onDrag: function(e, s) {
+      this.__onDrag && this.__onDrag(e, s);
+    },
+
+    /**
+     * @private
+     * @param {Event} [e] Event object fired on Event.js wheel event
+     * @param {Event} [self] Inner Event object
+     */
+    _onMouseWheel: function(e, s) {
+      this.__onMouseWheel && this.__onMouseWheel(e, s);
+    },
+
+    /**
+     * @private
+     * @param {Event} [e] Event object fired on Event.js orientation change
+     * @param {Event} [self] Inner Event object
+     */
+    _onOrientationChange: function(e,s) {
+      this.__onOrientationChange && this.__onOrientationChange(e,s);
+    },
+
+    /**
+     * @private
+     * @param {Event} [e] Event object fired on Event.js shake
+     * @param {Event} [self] Inner Event object
+     */
+    _onShake: function(e,s) {
+      this.__onShake && this.__onShake(e,s);
     },
 
     /**
@@ -65,14 +141,14 @@
     _onMouseDown: function (e) {
       this.__onMouseDown(e);
 
-      !fabric.isTouchSupported && addListener(fabric.document, 'mouseup', this._onMouseUp);
-      fabric.isTouchSupported && addListener(fabric.document, 'touchend', this._onMouseUp);
+      addListener(fabric.document, 'mouseup', this._onMouseUp);
+      addListener(fabric.document, 'touchend', this._onMouseUp);
 
-      !fabric.isTouchSupported && addListener(fabric.document, 'mousemove', this._onMouseMove);
-      fabric.isTouchSupported && addListener(fabric.document, 'touchmove', this._onMouseMove);
+      addListener(fabric.document, 'mousemove', this._onMouseMove);
+      addListener(fabric.document, 'touchmove', this._onMouseMove);
 
-      !fabric.isTouchSupported && removeListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
-      fabric.isTouchSupported && removeListener(this.upperCanvasEl, 'touchmove', this._onMouseMove);
+      removeListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
+      removeListener(this.upperCanvasEl, 'touchmove', this._onMouseMove);
     },
 
     /**
@@ -82,14 +158,14 @@
     _onMouseUp: function (e) {
       this.__onMouseUp(e);
 
-      !fabric.isTouchSupported && removeListener(fabric.document, 'mouseup', this._onMouseUp);
-      fabric.isTouchSupported && removeListener(fabric.document, 'touchend', this._onMouseUp);
+      removeListener(fabric.document, 'mouseup', this._onMouseUp);
+      removeListener(fabric.document, 'touchend', this._onMouseUp);
 
-      !fabric.isTouchSupported && removeListener(fabric.document, 'mousemove', this._onMouseMove);
-      fabric.isTouchSupported && removeListener(fabric.document, 'touchmove', this._onMouseMove);
+      removeListener(fabric.document, 'mousemove', this._onMouseMove);
+      removeListener(fabric.document, 'touchmove', this._onMouseMove);
 
-      !fabric.isTouchSupported && addListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
-      fabric.isTouchSupported && addListener(this.upperCanvasEl, 'touchmove', this._onMouseMove);
+      addListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
+      addListener(this.upperCanvasEl, 'touchmove', this._onMouseMove);
     },
 
     /**
@@ -117,16 +193,20 @@
     _shouldRender: function(target, pointer) {
       var activeObject = this.getActiveGroup() || this.getActiveObject();
 
-      return (
+      return !!(
         (target && (
-        target.isMoving ||
-        target !== activeObject)) ||
-        (!target && activeObject) ||
+          target.isMoving ||
+          target !== activeObject))
+        ||
+        (!target && !!activeObject)
+        ||
+        (!target && !activeObject && !this._groupSelector)
+        ||
         (pointer &&
-        this._previousPointer &&
-        this.selection && (
-        pointer.x !== this._previousPointer.x ||
-        pointer.y !== this._previousPointer.y))
+          this._previousPointer &&
+          this.selection && (
+          pointer.x !== this._previousPointer.x ||
+          pointer.y !== this._previousPointer.y))
       );
     },
 
@@ -138,84 +218,38 @@
      * @param {Event} e Event object fired on mouseup
      */
     __onMouseUp: function (e) {
-      var target,
-          pointer,
-          render;
+      var target;
 
       if (this.isDrawingMode && this._isCurrentlyDrawing) {
-        this._isCurrentlyDrawing = false;
-        if (this.clipTo) {
-          this.contextTop.restore();
-        }
-        this.freeDrawingBrush.onMouseUp();
-        this.fire('mouse:up', { e: e });
+        this._onMouseUpInDrawingMode(e);
         return;
       }
 
       if (this._currentTransform) {
-
-        var transform = this._currentTransform;
-
-        target = transform.target;
-        if (target._scaling) {
-          target._scaling = false;
-        }
-
-        target.setCoords();
-
-        // only fire :modified event if target coordinates were changed during mousedown-mouseup
-        if (this.stateful && target.hasStateChanged()) {
-          this.fire('object:modified', { target: target });
-          target.fire('modified');
-        }
-
-        if (this._previousOriginX && this._previousOriginY) {
-
-          var originPoint = target.translateToOriginPoint(
-            target.getCenterPoint(),
-            this._previousOriginX,
-            this._previousOriginY);
-
-          target.originX = this._previousOriginX;
-          target.originY = this._previousOriginY;
-
-          target.left = originPoint.x;
-          target.top = originPoint.y;
-
-          this._previousOriginX = null;
-          this._previousOriginY = null;
-        }
+        this._finalizeCurrentTransform();
+        target = this._currentTransform.target;
       }
       else {
-        pointer = this.getPointer(e, true);
+        target = this.findTarget(e, true);
       }
 
-      render = this._shouldRender(target, pointer);
+      var shouldRender = this._shouldRender(target, this.getPointer(e));
 
-      if (this.selection && this._groupSelector) {
-        // group selection was completed, determine its bounds
-        this._findSelectedObjects(e);
-      }
-
-      var activeGroup = this.getActiveGroup();
-      if (activeGroup) {
-        activeGroup.setObjectsCoords();
-        activeGroup.isMoving = false;
-        this._setCursor(this.defaultCursor);
-      }
-
-      // clear selection and current transformation
-      this._groupSelector = null;
-      this._currentTransform = null;
+      this._maybeGroupObjects(e);
 
       if (target) {
         target.isMoving = false;
       }
 
-      render && this.renderAll();
+      shouldRender && this.renderAll();
 
+      this._handleCursorAndEvent(e, target);
+    },
+
+    _handleCursorAndEvent: function(e, target) {
       this._setCursorFromEvent(e, target);
 
+      // TODO: why are we doing this?
       var _this = this;
       setTimeout(function () {
         _this._setCursorFromEvent(e, target);
@@ -227,11 +261,57 @@
 
     /**
      * @private
+     */
+    _finalizeCurrentTransform: function() {
+
+      var transform = this._currentTransform;
+      var target = transform.target;
+
+      if (target._scaling) {
+        target._scaling = false;
+      }
+
+      target.setCoords();
+
+      // only fire :modified event if target coordinates were changed during mousedown-mouseup
+      if (this.stateful && target.hasStateChanged()) {
+        this.fire('object:modified', { target: target });
+        target.fire('modified');
+      }
+
+      this._restoreOriginXY(target);
+    },
+
+    /**
+     * @private
+     * @param {Object} target Object to restore
+     */
+    _restoreOriginXY: function(target) {
+      if (this._previousOriginX && this._previousOriginY) {
+
+        var originPoint = target.translateToOriginPoint(
+          target.getCenterPoint(),
+          this._previousOriginX,
+          this._previousOriginY);
+
+        target.originX = this._previousOriginX;
+        target.originY = this._previousOriginY;
+
+        target.left = originPoint.x;
+        target.top = originPoint.y;
+
+        this._previousOriginX = null;
+        this._previousOriginY = null;
+      }
+    },
+
+    /**
+     * @private
      * @param {Event} e Event object fired on mousedown
      */
     _onMouseDownInDrawingMode: function(e) {
       this._isCurrentlyDrawing = true;
-      this.discardActiveObject().renderAll();
+      this.discardActiveObject(e).renderAll();
       if (this.clipTo) {
         fabric.util.clipContext(this, this.contextTop);
       }
@@ -239,6 +319,33 @@
       var pointer = fabric.util.transformPoint(this.getPointer(e, true), ivt);
       this.freeDrawingBrush.onMouseDown(pointer);
       this.fire('mouse:down', { e: e });
+    },
+
+    /**
+     * @private
+     * @param {Event} e Event object fired on mousemove
+     */
+    _onMouseMoveInDrawingMode: function(e) {
+      if (this._isCurrentlyDrawing) {
+        var ivt = fabric.util.invertTransform(this.viewportTransform);
+        pointer = fabric.util.transformPoint(this.getPointer(e, true), ivt);
+        this.freeDrawingBrush.onMouseMove(pointer);
+      }
+      this.upperCanvasEl.style.cursor = this.freeDrawingCursor;
+      this.fire('mouse:move', { e: e });
+    },
+
+    /**
+     * @private
+     * @param {Event} e Event object fired on mouseup
+     */
+    _onMouseUpInDrawingMode: function(e) {
+      this._isCurrentlyDrawing = false;
+      if (this.clipTo) {
+        this.contextTop.restore();
+      }
+      this.freeDrawingBrush.onMouseUp();
+      this.fire('mouse:up', { e: e });
     },
 
     /**
@@ -250,6 +357,7 @@
      * @param {Event} e Event object fired on mousedown
      */
     __onMouseDown: function (e) {
+
       // accept only left clicks
       var isLeftClick  = 'which' in e ? e.which === 1 : e.button === 1;
       if (!isLeftClick && !fabric.isTouchSupported) return;
@@ -263,51 +371,69 @@
       if (this._currentTransform) return;
 
       var target = this.findTarget(e),
-          pointer = this.getPointer(e, true),
-          corner,
-          render;
+          pointer = this.getPointer(e, true);
 
       // save pointer for check in __onMouseUp event
       this._previousPointer = pointer;
 
-      render = this._shouldRender(target, pointer);
+      var shouldRender = this._shouldRender(target, pointer),
+          shouldGroup = this._shouldGroup(e, target);
 
       if (this._shouldClearSelection(e, target)) {
-        if (this.selection) {
-          this._groupSelector = {
-            ex: pointer.x,
-            ey: pointer.y,
-            top: 0,
-            left: 0
-          };
-        }
-        this.deactivateAllWithDispatch();
-        target && target.selectable && this.setActiveObject(target, e);
+        this._clearSelection(e, target, pointer);
       }
-      else if (this._shouldHandleGroupLogic(e, target)) {
-        this._handleGroupLogic(e, target);
+      else if (shouldGroup) {
+        this._handleGrouping(e, target);
         target = this.getActiveGroup();
       }
-      else {
-        // determine if it's a drag or rotate case
-        this.stateful && target.saveState();
 
-        if ((corner = target._findTargetCorner(e, this._offset))) {
-          this.onBeforeScaleRotate(target);
-        }
-
-        if (target !== this.getActiveGroup() && target !== this.getActiveObject()) {
-          this.deactivateAll();
-          this.setActiveObject(target, e);
-        }
-
+      if (target && target.selectable && !shouldGroup) {
+        this._beforeTransform(e, target);
         this._setupCurrentTransform(e, target);
       }
       // we must renderAll so that active image is placed on the top canvas
-      render && this.renderAll();
+      shouldRender && this.renderAll();
 
       this.fire('mouse:down', { target: target, e: e });
       target && target.fire('mousedown', { e: e });
+    },
+
+    /**
+     * @private
+     */
+    _beforeTransform: function(e, target) {
+      var corner;
+
+      this.stateful && target.saveState();
+
+      // determine if it's a drag or rotate case
+      if ((corner = target._findTargetCorner(e, this._offset))) {
+        this.onBeforeScaleRotate(target);
+      }
+
+      if (target !== this.getActiveGroup() && target !== this.getActiveObject()) {
+        this.deactivateAll();
+        this.setActiveObject(target, e);
+      }
+    },
+
+    /**
+     * @private
+     */
+    _clearSelection: function(e, target, pointer) {
+      this.deactivateAllWithDispatch(e);
+
+      if (target && target.selectable) {
+        this.setActiveObject(target, e);
+      }
+      else if (this.selection) {
+        this._groupSelector = {
+          ex: pointer.x,
+          ey: pointer.y,
+          top: 0,
+          left: 0
+        };
+      }
     },
 
     /**
@@ -360,128 +486,142 @@
       * @param {Event} e Event object fired on mousemove
       */
     __onMouseMove: function (e) {
+
       var target, pointer;
 
       if (this.isDrawingMode) {
-        if (this._isCurrentlyDrawing) {
-          var ivt = fabric.util.invertTransform(this.viewportTransform);
-          pointer = fabric.util.transformPoint(this.getPointer(e, true), ivt);
-          this.freeDrawingBrush.onMouseMove(pointer);
-        }
-        this.upperCanvasEl.style.cursor = this.freeDrawingCursor;
-        this.fire('mouse:move', { e: e });
+        this._onMouseMoveInDrawingMode(e);
         return;
       }
 
       var groupSelector = this._groupSelector;
 
-      // We initially clicked in an empty area, so we draw a box for multiple selection.
+      // We initially clicked in an empty area, so we draw a box for multiple selection
       if (groupSelector) {
         pointer = this.getPointer(e, true);
 
-        groupSelector.left = pointer.x - groupSelector.ex;
-        groupSelector.top = pointer.y - groupSelector.ey;
+        groupSelector.left = pointer.x - this._offset.left - groupSelector.ex;
+        groupSelector.top = pointer.y - this._offset.top - groupSelector.ey;
+
         this.renderTop();
       }
       else if (!this._currentTransform) {
 
-        // alias style to elimintate unnecessary lookup
-        var style = this.upperCanvasEl.style;
-
-        // Here we are hovering the canvas then we will determine
-        // what part of the pictures we are hovering to change the caret symbol.
-        // We won't do that while dragging or rotating in order to improve the
-        // performance.
         target = this.findTarget(e);
 
         if (!target || target && !target.selectable) {
-          // no target - set default cursor
-          style.cursor = this.defaultCursor;
+          this.upperCanvasEl.style.cursor = this.defaultCursor;
         }
         else {
-          // set proper cursor
           this._setCursorFromEvent(e, target);
         }
       }
       else {
-        // object is being transformed (scaled/rotated/moved/etc.)
-        pointer = fabric.util.transformPoint(
-          getPointer(e, this.upperCanvasEl),
-          fabric.util.invertTransform(this.viewportTransform)
-        );
-
-        var x = pointer.x,
-            y = pointer.y,
-            reset = false,
-            centerTransform,
-            transform = this._currentTransform;
-
-        target = transform.target;
-        target.isMoving = true;
-
-        if (transform.action === 'scale' || transform.action === 'scaleX' || transform.action === 'scaleY') {
-          centerTransform = this._shouldCenterTransform(e, target);
-
-             // Switch from a normal resize to center-based
-          if ((centerTransform && (transform.originX !== 'center' || transform.originY !== 'center')) ||
-             // Switch from center-based resize to normal one
-             (!centerTransform && transform.originX === 'center' && transform.originY === 'center')
-          ) {
-            this._resetCurrentTransform(e);
-            reset = true;
-          }
-        }
-
-        if (transform.action === 'rotate') {
-          this._rotateObject(x, y);
-
-          this.fire('object:rotating', { target: target, e: e });
-          target.fire('rotating', { e: e });
-        }
-        else if (transform.action === 'scale') {
-          // rotate object only if shift key is not pressed
-          // and if it is not a group we are transforming
-          if ((e.shiftKey || this.uniScaleTransform) && !target.get('lockUniScaling')) {
-            transform.currentAction = 'scale';
-            this._scaleObject(x, y);
-          }
-          else {
-            // Switch from a normal resize to proportional
-            if (!reset && transform.currentAction === 'scale') {
-              this._resetCurrentTransform(e, target);
-            }
-
-            transform.currentAction = 'scaleEqually';
-            this._scaleObject(x, y, 'equally');
-          }
-
-          this.fire('object:scaling', { target: target, e: e });
-          target.fire('scaling', { e: e });
-        }
-        else if (transform.action === 'scaleX') {
-          this._scaleObject(x, y, 'x');
-
-          this.fire('object:scaling', { target: target, e: e});
-          target.fire('scaling', { e: e });
-        }
-        else if (transform.action === 'scaleY') {
-          this._scaleObject(x, y, 'y');
-
-          this.fire('object:scaling', { target: target, e: e});
-          target.fire('scaling', { e: e });
-        }
-        else {
-          this._translateObject(x, y);
-
-          this.fire('object:moving', { target: target, e: e});
-          target.fire('moving', { e: e });
-          this._setCursor(this.moveCursor);
-        }
-
-        this.renderAll();
+        this._transformObject(e);
       }
+
       this.fire('mouse:move', { target: target, e: e });
       target && target.fire('mousemove', { e: e });
+    },
+
+    /**
+     * @private
+     * @param {Event} e Event fired on mousemove
+     */
+    _transformObject: function(e) {
+
+      var pointer = fabric.util.transformPoint(
+            getPointer(e, this.upperCanvasEl),
+            fabric.util.invertTransform(this.viewportTransform)
+          ),
+          transform = this._currentTransform;
+
+      transform.reset = false,
+      transform.target.isMoving = true;
+
+      this._beforeScaleTransform(e, transform);
+      this._performTransformAction(e, transform, pointer);
+
+      this.renderAll();
+    },
+
+    /**
+     * @private
+     */
+    _performTransformAction: function(e, transform, pointer) {
+      var x = pointer.x,
+          y = pointer.y,
+          target = transform.target,
+          action = transform.action;
+
+      if (action === 'rotate') {
+        this._rotateObject(x, y);
+        this._fire('rotating', target, e);
+      }
+      else if (action === 'scale') {
+        this._onScale(e, transform, x, y);
+        this._fire('scaling', target, e);
+      }
+      else if (action === 'scaleX') {
+        this._scaleObject(x, y, 'x');
+        this._fire('scaling', target, e);
+      }
+      else if (action === 'scaleY') {
+        this._scaleObject(x, y, 'y');
+        this._fire('scaling', target, e);
+      }
+      else {
+        this._translateObject(x, y);
+        this._fire('moving', target, e);
+        this._setCursor(this.moveCursor);
+      }
+    },
+
+    /**
+     * @private
+     */
+    _fire: function(eventName, target, e) {
+      this.fire('object:' + eventName, { target: target, e: e});
+      target.fire(eventName, { e: e });
+    },
+
+    /**
+     * @private
+     */
+    _beforeScaleTransform: function(e, transform) {
+      if (transform.action === 'scale' || transform.action === 'scaleX' || transform.action === 'scaleY') {
+        var centerTransform = this._shouldCenterTransform(e, transform.target);
+
+           // Switch from a normal resize to center-based
+        if ((centerTransform && (transform.originX !== 'center' || transform.originY !== 'center')) ||
+           // Switch from center-based resize to normal one
+           (!centerTransform && transform.originX === 'center' && transform.originY === 'center')
+        ) {
+          this._resetCurrentTransform(e);
+          transform.reset = true;
+        }
+      }
+    },
+
+    /**
+     * @private
+     */
+    _onScale: function(e, transform, x, y) {
+      // rotate object only if shift key is not pressed
+      // and if it is not a group we are transforming
+      if ((e.shiftKey || this.uniScaleTransform) && !transform.target.get('lockUniScaling')) {
+        transform.currentAction = 'scale';
+        this._scaleObject(x, y);
+      }
+      else {
+        // Switch from a normal resize to proportional
+        if (!transform.reset && transform.currentAction === 'scale') {
+          this._resetCurrentTransform(e, transform.target);
+        }
+
+        transform.currentAction = 'scaleEqually';
+        this._scaleObject(x, y, 'equally');
+      }
     },
 
     /**
@@ -491,9 +631,10 @@
      * @param {Object} target Object that the mouse is hovering, if so.
      */
     _setCursorFromEvent: function (e, target) {
-      var s = this.upperCanvasEl.style;
-      if (!target) {
-        s.cursor = this.defaultCursor;
+      var style = this.upperCanvasEl.style;
+
+      if (!target || !target.selectable) {
+        style.cursor = this.defaultCursor;
         return false;
       }
       else {
@@ -504,29 +645,47 @@
                       && target._findTargetCorner(e, this._offset);
 
         if (!corner) {
-          s.cursor = target.hoverCursor || this.hoverCursor;
+          style.cursor = target.hoverCursor || this.hoverCursor;
         }
         else {
-          if (corner in cursorOffset) {
-            var n = Math.round((target.getAngle() % 360) / 45);
-            if (n<0) {
-              n += 8; // full circle ahead
-            }
-            n += cursorOffset[corner];
-            // normalize n to be from 0 to 7
-            n %= 8;
-            s.cursor = cursorMap[n];
-          }
-          else if (corner === 'mtr' && target.hasRotatingPoint) {
-            s.cursor = this.rotationCursor;
-          }
-          else {
-            s.cursor = this.defaultCursor;
-            return false;
-          }
+          this._setCornerCursor(corner, target);
         }
       }
       return true;
+    },
+
+    /**
+     * @private
+     */
+    _setCornerCursor: function(corner, target) {
+      var style = this.upperCanvasEl.style;
+
+      if (corner in cursorOffset) {
+        style.cursor = this._getRotatedCornerCursor(corner, target);
+      }
+      else if (corner === 'mtr' && target.hasRotatingPoint) {
+        style.cursor = this.rotationCursor;
+      }
+      else {
+        style.cursor = this.defaultCursor;
+        return false;
+      }
+    },
+
+    /**
+     * @private
+     */
+    _getRotatedCornerCursor: function(corner, target) {
+      var n = Math.round((target.getAngle() % 360) / 45);
+
+      if (n < 0) {
+        n += 8; // full circle ahead
+      }
+      n += cursorOffset[corner];
+      // normalize n to be from 0 to 7
+      n %= 8;
+
+      return cursorMap[n];
     }
   });
 })();

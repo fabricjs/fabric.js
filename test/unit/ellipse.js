@@ -23,8 +23,8 @@
     var ellipse = new fabric.Ellipse();
     var defaultProperties = {
       'type':               'ellipse',
-      'originX':            'center',
-      'originY':            'center',
+      'originX':            'left',
+      'originY':            'top',
       'left':               0,
       'top':                0,
       'width':              0,

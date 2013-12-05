@@ -11,6 +11,7 @@
    * @class fabric.Image.filters.Mask
    * @memberOf fabric.Image.filters
    * @extends fabric.Image.filters.BaseFilter
+   * @see {@link fabric.Image.filters.Mask#initialize} for constructor definition
    */
   fabric.Image.filters.Mask = fabric.util.createClass(fabric.Image.filters.BaseFilter, /** @lends fabric.Image.filters.Mask.prototype */ {
 
@@ -85,25 +86,10 @@
    * @param {Function} [callback] Callback to invoke when a mask filter instance is created
    */
   fabric.Image.filters.Mask.fromObject = function(object, callback) {
-    var img = fabric.document.createElement('img'),
-        src = object.mask.src;
-
-    /** @ignore */
-    img.onload = function() {
+    fabric.util.loadImage(object.mask.src, function(img) {
       object.mask = new fabric.Image(img, object.mask);
-
       callback && callback(new fabric.Image.filters.Mask(object));
-      img = img.onload = img.onerror = null;
-    };
-
-    /** @ignore */
-    img.onerror = function() {
-      fabric.log('Error loading ' + img.src);
-      callback && callback(null, true);
-      img = img.onload = img.onerror = null;
-    };
-
-    img.src = src;
+    });
   };
 
   /**

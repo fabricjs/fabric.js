@@ -2,8 +2,8 @@
 
   var REFERENCE_PATH_OBJECT = {
     'type':               'path',
-    'originX':            'center',
-    'originY':            'center',
+    'originX':            'left',
+    'originY':            'top',
     'left':               200,
     'top':                200,
     'width':              200,

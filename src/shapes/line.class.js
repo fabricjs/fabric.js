@@ -16,6 +16,7 @@
    * Line class
    * @class fabric.Line
    * @extends fabric.Object
+   * @see {@link fabric.Line#initialize} for constructor definition
    */
   fabric.Line = fabric.util.createClass(fabric.Object, /** @lends fabric.Line.prototype */ {
 
@@ -83,7 +84,7 @@
     _render: function(ctx) {
       ctx.beginPath();
 
-      var isInPathGroup = this.group && this.group.type !== 'group';
+      var isInPathGroup = this.group && this.group.type === 'path-group';
       if (isInPathGroup && !this.transformMatrix) {
         ctx.translate(-this.group.width/2 + this.left, -this.group.height / 2 + this.top);
       }

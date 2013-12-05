@@ -46,7 +46,8 @@
   }
 
   /**
-   * Stops event observing for a particular event handler
+   * Stops event observing for a particular event handler. Calling this method
+   * without arguments removes all handlers for all events
    * @deprecated `stopObserving` deprecated since 0.8.34 (use `off` instead)
    * @memberOf fabric.Observable
    * @alias off
@@ -58,8 +59,12 @@
   function stopObserving(eventName, handler) {
     if (!this.__eventListeners) return;
 
+    // remove all key/value pairs (event name -> event handler)
+    if (arguments.length === 0) {
+      this.__eventListeners = { };
+    }
     // one object with key/value pairs was passed
-    if (arguments.length === 1 && typeof arguments[0] === 'object') {
+    else if (arguments.length === 1 && typeof arguments[0] === 'object') {
       for (var prop in eventName) {
         _removeEventListener.call(this, prop, eventName[prop]);
       }

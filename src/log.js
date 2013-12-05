@@ -11,14 +11,11 @@ fabric.log = function() { };
 fabric.warn = function() { };
 
 if (typeof console !== 'undefined') {
-  if (typeof console.log !== 'undefined' && console.log.apply) {
-    fabric.log = function() {
-      return console.log.apply(console, arguments);
-    };
-  }
-  if (typeof console.warn !== 'undefined' && console.warn.apply) {
-    fabric.warn = function() {
-      return console.warn.apply(console, arguments);
-    };
-  }
+  ['log', 'warn'].forEach(function(methodName) {
+    if (typeof console[methodName] !== 'undefined' && console[methodName].apply) {
+      fabric[methodName] = function() {
+        return console[methodName].apply(console, arguments);
+      };
+    }
+  });
 }

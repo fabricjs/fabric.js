@@ -51,6 +51,7 @@
    * @class fabric.Path
    * @extends fabric.Object
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-1/#path_and_pathgroup}
+   * @see {@link fabric.Path#initialize} for constructor definition
    */
   fabric.Path = fabric.util.createClass(fabric.Object, /** @lends fabric.Path.prototype */ {
 
@@ -154,7 +155,8 @@
           tempControlX,
           tempControlY,
           l = -((this.width / 2) + this.pathOffset.x),
-          t = -((this.height / 2) + this.pathOffset.y);
+          t = -((this.height / 2) + this.pathOffset.y),
+          methodName;
 
       for (var i = 0, len = this.path.length; i < len; ++i) {
 
@@ -198,14 +200,20 @@
             x += current[1];
             y += current[2];
             // draw a line if previous command was moveTo as well (otherwise, it will have no effect)
-            ctx[(previous && (previous[0] === 'm' || previous[0] === 'M')) ? 'lineTo' : 'moveTo'](x + l, y + t);
+            methodName = (previous && (previous[0] === 'm' || previous[0] === 'M'))
+              ? 'lineTo'
+              : 'moveTo';
+            ctx[methodName](x + l, y + t);
             break;
 
           case 'M': // moveTo, absolute
             x = current[1];
             y = current[2];
             // draw a line if previous command was moveTo as well (otherwise, it will have no effect)
-            ctx[(previous && (previous[0] === 'm' || previous[0] === 'M')) ? 'lineTo' : 'moveTo'](x + l, y + t);
+            methodName = (previous && (previous[0] === 'm' || previous[0] === 'M'))
+              ? 'lineTo'
+              : 'moveTo';
+            ctx[methodName](x + l, y + t);
             break;
 
           case 'c': // bezierCurveTo, relative
@@ -259,7 +267,9 @@
               tempY + t
             );
             // set control point to 2nd one of this command
-            // "... the first control point is assumed to be the reflection of the second control point on the previous command relative to the current point."
+            // "... the first control point is assumed to be
+            // the reflection of the second control point on
+            // the previous command relative to the current point."
             controlX = x + current[1];
             controlY = y + current[2];
 
@@ -285,7 +295,9 @@
             y = tempY;
 
             // set control point to 2nd one of this command
-            // "... the first control point is assumed to be the reflection of the second control point on the previous command relative to the current point."
+            // "... the first control point is assumed to be
+            // the reflection of the second control point on
+            // the previous command relative to the current point."
             controlX = current[1];
             controlY = current[2];
 
@@ -447,24 +459,8 @@
       if (!noTransform) {
         this.transform(ctx);
       }
-      // ctx.globalCompositeOperation = this.fillRule;
-
-      if (this.fill) {
-        ctx.fillStyle = this.fill.toLive
-          ? this.fill.toLive(ctx)
-          : this.fill;
-      }
-
-      if (this.stroke) {
-        ctx.lineWidth = this.strokeWidth;
-        ctx.lineCap = this.strokeLineCap;
-        ctx.lineJoin = this.strokeLineJoin;
-        ctx.miterLimit = this.strokeMiterLimit;
-        ctx.strokeStyle = this.stroke.toLive
-          ? this.stroke.toLive(ctx)
-          : this.stroke;
-      }
-
+      this._setStrokeStyles(ctx);
+      this._setFillStyles(ctx);
       this._setShadow(ctx);
       this.clipTo && fabric.util.clipContext(this, ctx);
       ctx.beginPath();
@@ -612,49 +608,10 @@
     _parseDimensions: function() {
       var aX = [],
           aY = [],
-          previousX,
-          previousY,
-          isLowerCase = false,
-          x,
-          y;
+          previous = { };
 
       this.path.forEach(function(item, i) {
-        if (item[0] !== 'H') {
-          previousX = (i === 0) ? getX(item) : getX(this.path[i-1]);
-        }
-        if (item[0] !== 'V') {
-          previousY = (i === 0) ? getY(item) : getY(this.path[i-1]);
-        }
-
-        // lowercased letter denotes relative position;
-        // transform to absolute
-        if (item[0] === item[0].toLowerCase()) {
-          isLowerCase = true;
-        }
-
-        // last 2 items in an array of coordinates are the actualy x/y (except H/V);
-        // collect them
-
-        // TODO (kangax): support relative h/v commands
-
-        x = isLowerCase
-          ? previousX + getX(item)
-          : item[0] === 'V'
-            ? previousX
-            : getX(item);
-
-        y = isLowerCase
-          ? previousY + getY(item)
-          : item[0] === 'H'
-            ? previousY
-            : getY(item);
-
-        var val = parseInt(x, 10);
-        if (!isNaN(val)) aX.push(val);
-
-        val = parseInt(y, 10);
-        if (!isNaN(val)) aY.push(val);
-
+        this._getCoordsFromCommand(item, i, aX, aY, previous);
       }, this);
 
       var minX = min(aX),
@@ -672,6 +629,51 @@
       };
 
       return o;
+    },
+
+    _getCoordsFromCommand: function(item, i, aX, aY, previous) {
+      var isLowerCase = false;
+
+      if (item[0] !== 'H') {
+        previous.x = (i === 0) ? getX(item) : getX(this.path[i - 1]);
+      }
+      if (item[0] !== 'V') {
+        previous.y = (i === 0) ? getY(item) : getY(this.path[i - 1]);
+      }
+
+      // lowercased letter denotes relative position;
+      // transform to absolute
+      if (item[0] === item[0].toLowerCase()) {
+        isLowerCase = true;
+      }
+
+      var xy = this._getXY(item, isLowerCase, previous);
+
+      var val = parseInt(xy.x, 10);
+      if (!isNaN(val)) aX.push(val);
+
+      val = parseInt(xy.y, 10);
+      if (!isNaN(val)) aY.push(val);
+    },
+
+    _getXY: function(item, isLowerCase, previous) {
+
+      // last 2 items in an array of coordinates are the actualy x/y (except H/V), collect them
+      // TODO (kangax): support relative h/v commands
+
+      var x = isLowerCase
+        ? previous.x + getX(item)
+        : item[0] === 'V'
+          ? previous.x
+          : getX(item);
+
+      var y = isLowerCase
+        ? previous.y + getY(item)
+        : item[0] === 'H'
+          ? previous.y
+          : getY(item);
+
+      return { x: x, y: y };
     }
   });
 

@@ -2,8 +2,8 @@
 
   var REFERENCE_RECT = {
     'type':               'rect',
-    'originX':            'center',
-    'originY':            'center',
+    'originX':            'left',
+    'originY':            'top',
     'left':               0,
     'top':                0,
     'width':              0,
@@ -135,7 +135,7 @@
     var rect = new fabric.Rect({ width: 100, height: 100, rx: 20, ry: 30 });
     var svg = rect.toSVG();
 
-    equal(svg, '<rect x="-50" y="-50" rx="20" ry="30" width="100" height="100" style="stroke: none; stroke-width: 1; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); opacity: 1;" transform="translate(0 0)"/>');
+    equal(svg, '<rect x="-50" y="-50" rx="20" ry="30" width="100" height="100" style="stroke: none; stroke-width: 1; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); opacity: 1;" transform="translate(50 50)"/>');
   });
 
   test('toObject without default values', function() {

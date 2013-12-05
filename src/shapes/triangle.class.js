@@ -14,6 +14,7 @@
    * @class fabric.Triangle
    * @extends fabric.Object
    * @return {fabric.Triangle} thisArg
+   * @see {@link fabric.Triangle#initialize} for constructor definition
    */
   fabric.Triangle = fabric.util.createClass(fabric.Object, /** @lends fabric.Triangle.prototype */ {
 

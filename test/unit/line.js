@@ -2,8 +2,8 @@
 
   var LINE_OBJECT = {
     'type':               'line',
-    'originX':            'center',
-    'originY':            'center',
+    'originX':            'left',
+    'originY':            'top',
     'left':               12,
     'top':                13,
     'width':              2,
