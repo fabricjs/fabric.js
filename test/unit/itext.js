@@ -332,7 +332,7 @@
     equal(iText.getNumNewLinesInSelectedText(), 1);
   });
 
-  test('getSelectionStyles', function() {
+  test('getSelectionStyles with no arguments', function() {
     var iText = new fabric.IText('test foo bar-baz\nqux', {
       styles: {
         0: {
@@ -370,6 +370,53 @@
     deepEqual(iText.getSelectionStyles(), {
       fill: 'red'
     });
+  });
+
+  test('getSelectionStyles with 1 arg', function() {
+
+    var iText = new fabric.IText('test foo bar-baz\nqux', {
+      styles: {
+        0: {
+          0: { textDecoration: 'underline' },
+          2: { textDecoration: 'overline' },
+          4: { textBackgroundColor: '#ffc' }
+        },
+        1: {
+          0: { fill: 'red' },
+          1: { fill: 'green' },
+          2: { fill: 'blue' }
+        }
+      }
+    });
+
+    iText.selectionStart = 17;
+    iText.selectionStart = 17;
+
+    deepEqual(iText.getSelectionStyles(2), {
+      textDecoration: 'overline'
+    });
+  });
+
+  test('getSelectionStyles with 2 args', function() {
+    var iText = new fabric.IText('test foo bar-baz\nqux', {
+      styles: {
+        0: {
+          0: { textDecoration: 'underline' },
+          2: { textDecoration: 'overline' },
+          4: { textBackgroundColor: '#ffc' }
+        },
+        1: {
+          0: { fill: 'red' },
+          1: { fill: 'green' },
+          2: { fill: 'blue' }
+        }
+      }
+    });
+
+    deepEqual(iText.getSelectionStyles(0, 2), [
+      { textDecoration: 'underline' },
+      { }
+    ]);
   });
 
   test('setSelectionStyles', function() {

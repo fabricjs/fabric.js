@@ -5,7 +5,7 @@
 >>>>>>> f84ac95f75347b051e52321b790b8aa936d7076f
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.3.12" };
+var fabric = fabric || { version: "1.4.0" };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -480,8 +480,8 @@ fabric.Collection = {
       // https://github.com/kangax/fabric.js/commit/d0abb90f1cd5c5ef9d2a94d3fb21a22330da3e0a#commitcomment-4513767
       // see https://code.google.com/p/chromium/issues/detail?id=315152
       //     https://bugzilla.mozilla.org/show_bug.cgi?id=935069
-      if (url.indexOf('data') !== 0) {
-        img.crossOrigin = crossOrigin || '';
+      if (url.indexOf('data') !== 0 && typeof crossOrigin !== 'undefined') {
+        img.crossOrigin = crossOrigin;
       }
 
       img.src = url;
@@ -20872,8 +20872,12 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @param {Array} textLines Array of all text lines
      */
     _renderTextFill: function(ctx, textLines) {
+<<<<<<< HEAD
       if (!this.fill && !this.skipFillStrokeCheck) return;
 >>>>>>> f84ac95f75347b051e52321b790b8aa936d7076f
+=======
+      if (!this.fill && !this._skipFillStrokeCheck) return;
+>>>>>>> 8ca6806f3287a8351433961c32de79e3eeafcefb
 
       this._boundaries = [ ];
       var lineHeights = 0;
@@ -20899,7 +20903,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @param {Array} textLines Array of all text lines
      */
     _renderTextStroke: function(ctx, textLines) {
-      if (!this.stroke && !this.skipFillStrokeCheck) return;
+      if (!this.stroke && !this._skipFillStrokeCheck) return;
 
       var lineHeights = 0;
 
@@ -21679,8 +21683,24 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      */
     styles: null,
 
+<<<<<<< HEAD
     skipFillStrokeCheck: true,
 >>>>>>> f84ac95f75347b051e52321b790b8aa936d7076f
+=======
+    /**
+     * Indicates whether internal text char widths can be cached
+     * @type Boolean
+     * @default
+     */
+    caching: true,
+
+    /**
+     * @private
+     * @type Boolean
+     * @default
+     */
+    _skipFillStrokeCheck: true,
+>>>>>>> 8ca6806f3287a8351433961c32de79e3eeafcefb
 
     /**
      * @private
@@ -21769,13 +21789,25 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 
     /**
      * Gets style of a current selection/cursor (at the start position)
-     * @return {Object} styles Style object at a cursor position
+     * @param {Number} [startIndex] Start index to get styles at
+     * @param {Number} [endIndex] End index to get styles at
+     * @return {Object} styles Style object at a specified (or current) index
      */
-    getSelectionStyles: function() {
-      var loc = this.get2DCursorLocation();
+    getSelectionStyles: function(startIndex, endIndex) {
+
+      if (arguments.length === 2) {
+        var styles = [ ];
+        for (var i = startIndex; i < endIndex; i++) {
+          styles.push(this.getSelectionStyles(i));
+        }
+        return styles;
+      }
+
+      var loc = this.get2DCursorLocation(startIndex);
       if (this.styles[loc.lineIndex]) {
         return this.styles[loc.lineIndex][loc.charIndex] || { };
       }
+
       return { };
     },
 
@@ -22126,7 +22158,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _renderChar: function(method, ctx, lineIndex, i, _char, left, top, lineHeight) {
-      var decl, charWidth;
+      var decl, charWidth, charHeight;
 
       if (this.styles && this.styles[lineIndex] && (decl = this.styles[lineIndex][i])) {
 
@@ -22135,6 +22167,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 
         ctx.save();
         charWidth = this._applyCharStylesGetWidth(ctx, _char, lineIndex, i, decl);
+        charHeight = this._getHeightOfChar(ctx, _char, lineIndex, i);
 
         if (shouldFill) {
           ctx.fillText(_char, left, top);
@@ -22143,7 +22176,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
           ctx.strokeText(_char, left, top);
         }
 
-        this._renderCharDecoration(ctx, decl, left, top, charWidth, lineHeight);
+        this._renderCharDecoration(ctx, decl, left, top, charWidth, lineHeight, charHeight);
         ctx.restore();
 
         ctx.translate(charWidth, 0);
@@ -22166,10 +22199,13 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    _renderCharDecoration: function(ctx, styleDeclaration, left, top, charWidth, lineHeight) {
+    _renderCharDecoration: function(ctx, styleDeclaration, left, top, charWidth, lineHeight, charHeight) {
+
       var textDecoration = styleDeclaration
         ? (styleDeclaration.textDecoration || this.textDecoration)
         : this.textDecoration;
+
+      var fontSize = (styleDeclaration ? styleDeclaration.fontSize : null) || this.fontSize;
 
       if (!textDecoration) return;
 
@@ -22179,7 +22215,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
           left,
           top + (this.fontSize / this._fontSizeFraction),
           charWidth,
-          0
+          0,
+          this.fontSize / 20
         );
       }
       if (textDecoration.indexOf('line-through') > -1) {
@@ -22188,7 +22225,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
           left,
           top + (this.fontSize / this._fontSizeFraction),
           charWidth,
-          (lineHeight / this._fontSizeFraction)
+          charHeight / 2,
+          fontSize / 20
         );
       }
       if (textDecoration.indexOf('overline') > -1) {
@@ -22197,7 +22235,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
           left,
           top,
           charWidth,
-          lineHeight - (this.fontSize / this._fontSizeFraction)
+          lineHeight - (this.fontSize / this._fontSizeFraction),
+          this.fontSize / 20
         );
       }
     },
@@ -22206,8 +22245,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    _renderCharDecorationAtOffset: function(ctx, left, top, charWidth, offset) {
-      ctx.fillRect(left, top - offset, charWidth, 1);
+    _renderCharDecorationAtOffset: function(ctx, left, top, charWidth, offset, thickness) {
+      ctx.fillRect(left, top - offset, charWidth, thickness);
     },
 
     /**
@@ -22316,7 +22355,9 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @param {Object} [decl]
      */
     _applyCharStylesGetWidth: function(ctx, _char, lineIndex, charIndex, decl) {
-      var styleDeclaration = decl || (this.styles[lineIndex] && this.styles[lineIndex][charIndex]);
+      var styleDeclaration = decl ||
+                            (this.styles[lineIndex] &&
+                             this.styles[lineIndex][charIndex]);
 
       if (styleDeclaration) {
         // cloning so that original style object is not polluted with following font declarations
@@ -22331,7 +22372,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       var cacheProp = this._getCacheProp(_char, styleDeclaration);
 
       // short-circuit if no styles
-      if (this.isEmptyStyles() && this._charWidthsCache[cacheProp]) {
+      if (this.isEmptyStyles() && this._charWidthsCache[cacheProp] && this.caching) {
         return this._charWidthsCache[cacheProp];
       }
 
@@ -22354,9 +22395,14 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       ctx.font = this._getFontDeclaration.call(styleDeclaration);
       this._setShadow.call(styleDeclaration, ctx);
 
+      if (!this.caching) {
+        return ctx.measureText(_char).width;
+      }
+
       if (!this._charWidthsCache[cacheProp]) {
         this._charWidthsCache[cacheProp] = ctx.measureText(_char).width;
       }
+
       return this._charWidthsCache[cacheProp];
     },
 
@@ -22591,6 +22637,10 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
         this.getObjects('i-text').forEach(function(obj) {
           obj.__isMousedown = false;
         });
+      });
+
+      this.canvas.on('object:selected', function() {
+        fabric.IText.prototype.exitEditingOnOthers.call(this);
       });
     },
 
@@ -22994,11 +23044,11 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
                   this.text.slice(this.selectionEnd);
 
       if (this.selectionStart === this.selectionEnd) {
-        this.insertStyleObject(_chars, isEndOfLine);
+        this.insertStyleObjects(_chars, isEndOfLine, this.copiedStyles);
       }
       else if (this.selectionEnd - this.selectionStart > 1) {
         // TODO: replace styles properly
-        // console.log('replacing MORE than 1 char');
+        console.log('replacing MORE than 1 char');
       }
 
       this.selectionStart += _chars.length;
@@ -23055,13 +23105,14 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * Inserts style object for a given line/char index
      * @param {Number} lineIndex Index of a line
      * @param {Number} charIndex Index of a char
+     * @param {Object} [style] Style object to insert, if given
      */
-    insertCharStyleObject: function(lineIndex, charIndex) {
+    insertCharStyleObject: function(lineIndex, charIndex, style) {
 
       var currentLineStyles = this.styles[lineIndex],
           currentLineStylesCloned = clone(currentLineStyles);
 
-      if (charIndex === 0) {
+      if (charIndex === 0 && !style) {
         charIndex = 1;
       }
 
@@ -23074,15 +23125,18 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
           //delete currentLineStyles[index];
         }
       }
-      this.styles[lineIndex][charIndex] = clone(currentLineStyles[charIndex - 1]);
+
+      this.styles[lineIndex][charIndex] =
+        style || clone(currentLineStyles[charIndex - 1]);
     },
 
     /**
-     * Inserts style object
+     * Inserts style object(s)
      * @param {String} _chars Characters at the location where style is inserted
      * @param {Boolean} isEndOfLine True if it's end of line
+     * @param {Array} [styles] Styles to insert
      */
-    insertStyleObject: function(_chars, isEndOfLine) {
+    insertStyleObjects: function(_chars, isEndOfLine, styles) {
 
       // short-circuit
       if (this.isEmptyStyles()) return;
@@ -23099,8 +23153,27 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
         this.insertNewlineStyleObject(lineIndex, charIndex, isEndOfLine);
       }
       else {
-        // TODO: support multiple style insertion if _chars.length > 1
-        this.insertCharStyleObject(lineIndex, charIndex);
+        if (styles) {
+          this._insertStyles(styles);
+        }
+        else {
+          // TODO: support multiple style insertion if _chars.length > 1
+          this.insertCharStyleObject(lineIndex, charIndex);
+        }
+      }
+    },
+
+    /**
+     * @private
+     */
+    _insertStyles: function(styles) {
+      for (var i = 0, len = styles.length; i < len; i++) {
+
+        var cursorLocation = this.get2DCursorLocation(this.selectionStart + i),
+            lineIndex = cursorLocation.lineIndex,
+            charIndex = cursorLocation.charIndex;
+
+        this.insertCharStyleObject(lineIndex, charIndex, styles[i]);
       }
     },
 
@@ -23279,9 +23352,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       if (this.isEditing) {
         this.setCursorByClick(options.e);
         this.__selectionStartOnMouseDown = this.selectionStart;
-      }
-      else {
-        this.exitEditingOnOthers();
       }
     });
   },
@@ -23531,6 +23601,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   copy: function() {
     var selectedText = this.getSelectedText();
     this.copiedText = selectedText;
+    this.copiedStyles = this.getSelectionStyles(
+                          this.selectionStart,
+                          this.selectionEnd);
   },
 
   /**
