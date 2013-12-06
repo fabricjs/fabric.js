@@ -1,4 +1,4 @@
-<a href="http://fabricjs.challengepost.com/?utm_source=partner&utm_medium=banner&utm_campaign=fabricjs" style="display: block">
+<a href="http://fabricjs.challengepost.com/?utm_source=partner&utm_medium=banner&utm_campaign=fabricjs" style="display:block">
   <img src="https://dl.dropboxusercontent.com/u/822184/fabric-js-promo-widget-github.gif" style="width: auto">
 </a>
 
