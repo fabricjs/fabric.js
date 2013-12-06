@@ -51,7 +51,6 @@
       }
 
       this.setOptions(options);
-      this.setCoords();
 
       if (options.sourcePath) {
         this.setSourcePath(options.sourcePath);
@@ -70,13 +69,7 @@
 
       var m = this.transformMatrix;
       
-      var v;
-      if (this.canvas) {
-        v = this.canvas.viewportTransform;
-      }
-      else {
-        v = [1, 0, 0, 1, 0, 0]; // TODO: this isn't a solution
-      }
+      var v = this.canvas.viewportTransform;
       ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
       
       if (m) {

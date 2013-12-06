@@ -500,8 +500,8 @@
       if (groupSelector) {
         pointer = this.getPointer(e, true);
 
-        groupSelector.left = pointer.x - this._offset.left - groupSelector.ex;
-        groupSelector.top = pointer.y - this._offset.top - groupSelector.ey;
+        groupSelector.left = pointer.x - groupSelector.ex;
+        groupSelector.top = pointer.y - groupSelector.ey;
 
         this.renderTop();
       }

@@ -124,12 +124,8 @@
       ctx.save();
       var m = this.transformMatrix;
       var v;
-      if (this.canvas) {
-        v = this.canvas.viewportTransform;
-      }
-      else {
-        v = [1, 0, 0, 1, 0, 0]; // TODO: this isn't a solution
-      }
+      v = this.canvas.viewportTransform;
+      
       var isInPathGroup = this.group && this.group.type === 'path-group';
 
       ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);

@@ -51,26 +51,18 @@
     initialize: function(objects, options) {
       options = options || { };
 
-      // NOTE: all the coords calculations need to have a canvas before they make sense
       this._objects = objects || [];
       for (var i = this._objects.length; i--; ) {
         this._objects[i].group = this;
-        //this._objects[i].setCoords();
       }
 
       this.originalState = { };
       this.callSuper('initialize');
 
-      //this._calcBounds();
-      //this._updateObjectsCoords();
-
       if (options) {
         extend(this, options);
       }
       this._setOpacityIfSame();
-
-      //this.setCoords(true);
-      //this.saveCoords();
     },
 
     /**
@@ -247,19 +239,16 @@
         true
       );
       
-      var originalScaleFactor = object.borderScaleFactor,
-          originalHasRotatingPoint = object.hasRotatingPoint,
+      var originalHasRotatingPoint = object.hasRotatingPoint,
           groupScaleFactor = Math.max(sxy.x, sxy.y);
 
       // do not render if object is not visible
       if (!object.visible) return;
 
-      object.borderScaleFactor = groupScaleFactor;
       object.hasRotatingPoint = false;
 
       object.render(ctx);
 
-      object.borderScaleFactor = originalScaleFactor;
       object.hasRotatingPoint = originalHasRotatingPoint;
     },
 
@@ -458,10 +447,6 @@
       var ivt;
       if (this.canvas) {
         ivt = fabric.util.invertTransform(this.canvas.viewportTransform);
-      }
-      else { // BUG: this always happens when new groups are created
-        ivt = [1, 0, 0, 1, 0, 0];
-        console.log('no canvas');
       }
       var minXY = fabric.util.transformPoint(new fabric.Point(min(aX), min(aY)), ivt),
           maxXY = fabric.util.transformPoint(new fabric.Point(max(aX), max(aY)), ivt);

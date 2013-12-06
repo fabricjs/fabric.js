@@ -308,12 +308,8 @@
           padding = this.padding,
           theta = degreesToRadians(this.angle),
           vpt;
-      if (this.canvas) {
-        vpt = this.canvas.viewportTransform;
-      }
-      if (!vpt) { // TODO
-        vpt = [1, 0, 0, 1, 0, 0];
-      };
+      // TODO: ideally we should never setCoords an object which lacks a canvas
+      vpt = this.canvas ? this.canvas.viewportTransform : [1, 0, 0, 1, 0, 0];
 
       var f = function (p) {
         return fabric.util.transformPoint(p, vpt);

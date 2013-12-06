@@ -12485,8 +12485,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       if (groupSelector) {
         pointer = this.getPointer(e, true);
 
-        groupSelector.left = pointer.x - this._offset.left - groupSelector.ex;
-        groupSelector.top = pointer.y - this._offset.top - groupSelector.ey;
+        groupSelector.left = pointer.x - groupSelector.ex;
+        groupSelector.top = pointer.y - groupSelector.ey;
 
         this.renderTop();
       }
@@ -14365,13 +14365,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
     _transform: function(ctx, noTransform) {
       var m = this.transformMatrix;
-      var v;
-      if (this.canvas) {
-        v = this.canvas.viewportTransform;
-      }
-      else {
-        v = [1, 0, 0, 1, 0, 0]; // TODO: this isn't a solution
-      }
+      var v = this.canvas.viewportTransform;
       
       ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
 
@@ -14409,13 +14403,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @param {Boolean} [noTransform] When true, context is not transformed
      */
     _renderControls: function(ctx, noTransform) {
-      var v;
-      if (this.canvas) {
-        v = this.canvas.viewportTransform;
-      }
-      else {
-        v = [1, 0, 0, 1, 0, 0]; // TODO: this isn't a solution
-      }
+      var v = this.canvas.viewportTransform;
+
       ctx.save();
       if (this.active && !noTransform) {
         var center;
@@ -15365,12 +15354,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
           padding = this.padding,
           theta = degreesToRadians(this.angle),
           vpt;
-      if (this.canvas) {
-        vpt = this.canvas.viewportTransform;
-      }
-      if (!vpt) { // TODO
-        vpt = [1, 0, 0, 1, 0, 0];
-      };
+      // TODO: ideally we should never setCoords an object which lacks a canvas
+      vpt = this.canvas ? this.canvas.viewportTransform : [1, 0, 0, 1, 0, 0];
 
       var f = function (p) {
         return fabric.util.transformPoint(p, vpt);
@@ -18245,13 +18230,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       ctx.save();
       var m = this.transformMatrix;
 
-      var v;
-      if (this.canvas) {
-        v = this.canvas.viewportTransform;
-      }
-      else {
-        v = [1, 0, 0, 1, 0, 0]; // TODO: this isn't a solution
-      }
+      var v = this.canvas.viewportTransform;
       ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
 
       if (m) {
@@ -18592,7 +18571,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       }
 
       this.setOptions(options);
-      this.setCoords();
 
       if (options.sourcePath) {
         this.setSourcePath(options.sourcePath);
@@ -18611,13 +18589,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       var m = this.transformMatrix;
       
-      var v;
-      if (this.canvas) {
-        v = this.canvas.viewportTransform;
-      }
-      else {
-        v = [1, 0, 0, 1, 0, 0]; // TODO: this isn't a solution
-      }
+      var v = this.canvas.viewportTransform;
       ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
       
       if (m) {
@@ -18839,26 +18811,18 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     initialize: function(objects, options) {
       options = options || { };
 
-      // NOTE: all the coords calculations need to have a canvas before they make sense
       this._objects = objects || [];
       for (var i = this._objects.length; i--; ) {
         this._objects[i].group = this;
-        //this._objects[i].setCoords();
       }
 
       this.originalState = { };
       this.callSuper('initialize');
 
-      //this._calcBounds();
-      //this._updateObjectsCoords();
-
       if (options) {
         extend(this, options);
       }
       this._setOpacityIfSame();
-
-      //this.setCoords(true);
-      //this.saveCoords();
     },
 
     /**
@@ -19035,19 +18999,16 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         true
       );
       
-      var originalScaleFactor = object.borderScaleFactor,
-          originalHasRotatingPoint = object.hasRotatingPoint,
+      var originalHasRotatingPoint = object.hasRotatingPoint,
           groupScaleFactor = Math.max(sxy.x, sxy.y);
 
       // do not render if object is not visible
       if (!object.visible) return;
 
-      object.borderScaleFactor = groupScaleFactor;
       object.hasRotatingPoint = false;
 
       object.render(ctx);
 
-      object.borderScaleFactor = originalScaleFactor;
       object.hasRotatingPoint = originalHasRotatingPoint;
     },
 
@@ -19246,10 +19207,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       var ivt;
       if (this.canvas) {
         ivt = fabric.util.invertTransform(this.canvas.viewportTransform);
-      }
-      else { // BUG: this always happens when new groups are created
-        ivt = [1, 0, 0, 1, 0, 0];
-        console.log('no canvas');
       }
       var minXY = fabric.util.transformPoint(new fabric.Point(min(aX), min(aY)), ivt),
           maxXY = fabric.util.transformPoint(new fabric.Point(max(aX), max(aY)), ivt);
@@ -19466,12 +19423,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       ctx.save();
       var m = this.transformMatrix;
       var v;
-      if (this.canvas) {
-        v = this.canvas.viewportTransform;
-      }
-      else {
-        v = [1, 0, 0, 1, 0, 0]; // TODO: this isn't a solution
-      }
+      v = this.canvas.viewportTransform;
+      
       var isInPathGroup = this.group && this.group.type === 'path-group';
 
       ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
@@ -21399,7 +21352,6 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       this.setOptions(options);
       this.__skipDimension = false;
       this._initDimensions();
-      this.setCoords();
     },
 
     /**
@@ -21847,13 +21799,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       if (!this.visible) return;
 
       ctx.save();
-      var v;
-      if (this.canvas) {
-        v = this.canvas.viewportTransform;
-      }
-      else {
-        v = [1, 0, 0, 1, 0, 0]; // TODO: this isn't a solution
-      }
+      var v = this.canvas.viewportTransform;
       ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
       this._render(ctx);
       ctx.restore();
