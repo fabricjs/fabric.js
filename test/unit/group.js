@@ -52,17 +52,35 @@
     ok(typeof group.getObjects == 'function');
     ok(Object.prototype.toString.call(group.getObjects()) == '[object Array]', 'should be an array');
     equal(group.getObjects().length, 2, 'should have 2 items');
-    deepEqual([ rect1, rect2 ], group.getObjects(), 'should return deepEqual objects as those passed to constructor');
+    deepEqual(group.getObjects(), [ rect1, rect2 ], 'should return deepEqual objects as those passed to constructor');
+  });
+
+  test('getObjects with type', function() {
+    var rect = new fabric.Rect({ width: 10, height: 20 }),
+        circle = new fabric.Circle({ radius: 30 });
+
+    var group = new fabric.Group([ rect, circle ]);
+
+    equal(group.size(), 2, 'should have length=2 initially');
+
+    deepEqual(group.getObjects('rect'), [rect], 'should return rect only');
+    deepEqual(group.getObjects('circle'), [circle], 'should return circle only');
   });
 
   test('add', function() {
     var group = makeGroupWith2Objects();
-    var rect = new fabric.Rect();
+    var rect1 = new fabric.Rect(),
+        rect2 = new fabric.Rect(),
+        rect3 = new fabric.Rect();
 
     ok(typeof group.add == 'function');
-    equal(group.add(rect), group, 'should be chainable');
-    equal(group.getObjects()[group.getObjects().length-1], rect, 'last object should be newly added one');
+    equal(group.add(rect1), group, 'should be chainable');
+    strictEqual(group.item(group.size()-1), rect1, 'last object should be newly added one');
     equal(group.getObjects().length, 3, 'there should be 3 objects');
+
+    group.add(rect2, rect3);
+    strictEqual(group.item(group.size()-1), rect3, 'last object should be last added one');
+    equal(group.size(), 5, 'there should be 5 objects');
   });
 
   test('remove', function() {
@@ -72,8 +90,11 @@
         group = new fabric.Group([ rect1, rect2, rect3 ]);
 
     ok(typeof group.remove == 'function');
-    equal(group.remove(rect2), rect2, 'should return removed object');
-    deepEqual([rect1, rect3], group.getObjects(), 'should remove object properly');
+    equal(group.remove(rect2), group, 'should be chainable');
+    deepEqual(group.getObjects(), [rect1, rect3], 'should remove object properly');
+
+    group.remove(rect1, rect3);
+    equal(group.isEmpty(), true, 'group should be empty');
   });
 
   test('size', function() {
@@ -452,7 +473,7 @@ test('toObject without default values', function() {
     equal(group.item(1), rect1);
     group.insertAt(rect2, 2);
     equal(group.item(2), rect2);
-    equal(group, group.insertAt(rect1, 2), 'should be chainable');
+    equal(group.insertAt(rect1, 2), group, 'should be chainable');
   });
 
   // asyncTest('cloning group with image', function() {

@@ -190,18 +190,25 @@
 
   test('calcOffset', function() {
     ok(typeof canvas.calcOffset == 'function', 'should respond to `calcOffset`');
-    equal(canvas, canvas.calcOffset());
+    equal(canvas.calcOffset(), canvas, 'should be chainable');
   });
 
   test('add', function() {
-    var rect = makeRect();
+    var rect1 = makeRect(),
+        rect2 = makeRect(),
+        rect3 = makeRect(),
+        rect4 = makeRect();
 
     ok(typeof canvas.add == 'function');
-    ok(canvas === canvas.add(rect), 'should be chainable');
-    equal(canvas.item(0), rect);
+    equal(canvas.add(rect1), canvas, 'should be chainable');
+    strictEqual(canvas.item(0), rect1);
 
-    canvas.add(makeRect(), makeRect(), makeRect());
+    canvas.add(rect2, rect3, rect4);
     equal(canvas.getObjects().length, 4, 'should support multiple arguments');
+
+    strictEqual(canvas.item(1), rect2);
+    strictEqual(canvas.item(2), rect3);
+    strictEqual(canvas.item(3), rect4);
   });
 
   test('add renderOnAddRemove disabled', function() {
@@ -218,7 +225,7 @@
 
     canvas.on('after:render', countRenderAll);
 
-    ok(canvas === canvas.add(rect), 'should be chainable');
+    equal(canvas.add(rect), canvas, 'should be chainable');
     equal(renderAllCount, 0);
 
     equal(canvas.item(0), rect);
@@ -234,6 +241,32 @@
     canvas.renderOnAddRemove = originalRenderOnAddition;
   });
 
+  test('object:added', function() {
+    var objectsAdded = [];
+
+    canvas.on('object:added', function(e) {
+      objectsAdded.push(e.target);
+    });
+
+    var rect = new fabric.Rect({ width: 10, height: 20 });
+    canvas.add(rect);
+
+    deepEqual(objectsAdded[0], rect);
+
+    var circle1 = new fabric.Circle(),
+        circle2 = new fabric.Circle();
+
+    canvas.add(circle1, circle2);
+
+    strictEqual(objectsAdded[1], circle1);
+    strictEqual(objectsAdded[2], circle2);
+
+    var circle3 = new fabric.Circle();
+    canvas.insertAt(circle3, 2);
+
+    strictEqual(objectsAdded[3], circle3);
+  });
+
   test('insertAt', function() {
     var rect1 = makeRect(),
         rect2 = makeRect();
@@ -244,10 +277,10 @@
 
     var rect = makeRect();
     canvas.insertAt(rect, 1);
-    equal(canvas.item(1), rect);
+    strictEqual(canvas.item(1), rect);
     canvas.insertAt(rect, 2);
-    equal(canvas.item(2), rect);
-    equal(canvas, canvas.insertAt(rect, 2), 'should be chainable');
+    strictEqual(canvas.item(2), rect);
+    equal(canvas.insertAt(rect, 2), canvas, 'should be chainable');
   });
 
   test('insertAt renderOnAddRemove disabled', function() {
@@ -273,7 +306,7 @@
     canvas.insertAt(rect, 1);
     equal(renderAllCount, 0);
 
-    equal(canvas.item(1), rect);
+    strictEqual(canvas.item(1), rect);
     canvas.insertAt(rect, 2);
     equal(renderAllCount, 0);
 
@@ -284,15 +317,90 @@
     canvas.renderOnAddRemove = originalRenderOnAddition;
   });
 
+  test('remove', function() {
+    var rect1 = makeRect(),
+        rect2 = makeRect(),
+        rect3 = makeRect(),
+        rect4 = makeRect();
+
+    canvas.add(rect1, rect2, rect3, rect4);
+
+    ok(typeof canvas.remove == 'function');
+    equal(canvas.remove(rect1), canvas, 'should be chainable');
+    strictEqual(canvas.item(0), rect2, 'should be second object');
+
+    canvas.remove(rect2, rect3);
+    strictEqual(canvas.item(0), rect4);
+
+    canvas.remove(rect4);
+    equal(canvas.isEmpty(), true, 'canvas should be empty');
+  });
+
+  test('remove renderOnAddRemove disabled', function() {
+    var rect1 = makeRect(),
+        rect2 = makeRect(),
+        originalRenderOnAddition,
+        renderAllCount = 0;
+
+    function countRenderAll() {
+      renderAllCount++;
+    }
+
+    originalRenderOnAddition = canvas.renderOnAddRemove;
+    canvas.renderOnAddRemove = false;
+
+    canvas.on('after:render', countRenderAll);
+
+    canvas.add(rect1, rect2);
+    equal(renderAllCount, 0);
+
+    equal(canvas.remove(rect1), canvas, 'should be chainable');
+    equal(renderAllCount, 0);
+    strictEqual(canvas.item(0), rect2, 'only second object should be left');
+
+    canvas.renderAll();
+    equal(renderAllCount, 1);
+
+    canvas.off('after:render', countRenderAll);
+    canvas.renderOnAddRemove = originalRenderOnAddition;
+  });
+
+  test('object:removed', function() {
+    var objectsRemoved = [];
+
+    canvas.on('object:removed', function(e) {
+      objectsRemoved.push(e.target);
+    });
+
+    var rect = new fabric.Rect({ width: 10, height: 20 }),
+        circle1 = new fabric.Circle(),
+        circle2 = new fabric.Circle();
+
+    canvas.add(rect, circle1, circle2);
+
+    strictEqual(canvas.item(0), rect);
+    strictEqual(canvas.item(1), circle1);
+    strictEqual(canvas.item(2), circle2);
+
+    canvas.remove(rect);
+    strictEqual(objectsRemoved[0], rect);
+
+    canvas.remove(circle1, circle2);
+    strictEqual(objectsRemoved[1], circle1);
+    strictEqual(objectsRemoved[2], circle2);
+
+    equal(canvas.isEmpty(), true, 'canvas should be empty');
+  });
+
   test('clearContext', function() {
     ok(typeof canvas.clearContext == 'function');
-    equal(canvas, canvas.clearContext(canvas.contextContainer), 'chainable');
+    equal(canvas.clearContext(canvas.contextContainer), canvas, 'should be chainable');
   });
 
   test('clear', function() {
     ok(typeof canvas.clear == 'function');
 
-    equal(canvas, canvas.clear());
+    equal(canvas.clear(), canvas, 'should be chainable');
     equal(canvas.getObjects().length, 0);
   });
 
@@ -665,44 +773,6 @@
     });
   });
 
-  test('remove', function() {
-    ok(typeof canvas.remove == 'function');
-    var rect1 = makeRect(),
-        rect2 = makeRect();
-    canvas.add(rect1, rect2);
-    equal(canvas.remove(rect1), rect1, 'should return removed object');
-    equal(canvas.item(0), rect2, 'only second object should be left');
-  });
-
-  test('remove renderOnAddRemove disabled', function() {
-    var rect1 = makeRect(),
-        rect2 = makeRect(),
-        originalRenderOnAddition,
-        renderAllCount = 0;
-
-    function countRenderAll() {
-      renderAllCount++;
-    }
-
-    originalRenderOnAddition = canvas.renderOnAddRemove;
-    canvas.renderOnAddRemove = false;
-
-    canvas.on('after:render', countRenderAll);
-
-    canvas.add(rect1, rect2);
-    equal(renderAllCount, 0);
-
-    equal(canvas.remove(rect1), rect1, 'should return removed object');
-    equal(renderAllCount, 0);
-    equal(canvas.item(0), rect2, 'only second object should be left');
-
-    canvas.renderAll();
-    equal(renderAllCount, 1);
-
-    canvas.off('after:render', countRenderAll);
-    canvas.renderOnAddRemove = originalRenderOnAddition;
-  });
-
   test('sendToBack', function() {
     ok(typeof canvas.sendToBack == 'function');
 
@@ -940,35 +1010,16 @@
   test('getSetWidth', function() {
     ok(typeof canvas.getWidth == 'function');
     equal(canvas.getWidth(), 600);
-    equal(canvas.setWidth(444), canvas, 'chainable');
+    equal(canvas.setWidth(444), canvas, 'should be chainable');
     equal(canvas.getWidth(), 444);
   });
 
   test('getSetHeight', function() {
     ok(typeof canvas.getHeight == 'function');
     equal(canvas.getHeight(), 600);
-    equal(canvas.setHeight(765), canvas, 'chainable');
+    equal(canvas.setHeight(765), canvas, 'should be chainable');
     equal(canvas.getHeight(), 765);
   });
-
-  // asyncTest('resizeImageToFit', function() {
-  //   ok(typeof canvas._resizeImageToFit == 'function');
-
-  //   var imgEl = fabric.util.makeElement('img', { src: '../fixtures/very_large_image.jpg' }),
-  //       ORIGINAL_WIDTH = 3888,
-  //       ORIGINAL_HEIGHT = 2592;
-
-  //   setTimeout(function() {
-  //     equal(imgEl.width, ORIGINAL_WIDTH);
-  //     equal(imgEl.height, ORIGINAL_HEIGHT);
-
-  //     canvas._resizeImageToFit(imgEl);
-
-  //     ok(imgEl.width < ORIGINAL_WIDTH);
-
-  //     start();
-  //   }, 2000);
-  // });
 
   asyncTest('fxRemove', function() {
     ok(typeof canvas.fxRemove == 'function');
@@ -982,7 +1033,7 @@
     }
 
     ok(canvas.item(0) === rect);
-    ok(canvas.fxRemove(rect, { onComplete: onComplete }) === canvas, 'should be chainable');
+    equal(canvas.fxRemove(rect, { onComplete: onComplete }), canvas, 'should be chainable');
 
     setTimeout(function() {
       equal(canvas.item(0), undefined);
@@ -1016,31 +1067,5 @@
   //     start();
   //   }, 1000);
   // });
-
-  test('object:added', function() {
-
-    var objectsAdded = [];
-    canvas.on('object:added', function(e) {
-      objectsAdded.push(e.target);
-    });
-
-    var rect = new fabric.Rect({ width: 10, height: 20 });
-    canvas.add(rect);
-
-    deepEqual(objectsAdded[0], rect);
-
-    var circle1 = new fabric.Circle(),
-        circle2 = new fabric.Circle();
-
-    canvas.add(circle1, circle2);
-
-    deepEqual(objectsAdded[1], circle1);
-    deepEqual(objectsAdded[2], circle2);
-
-    var circle3 = new fabric.Circle();
-    canvas.insertAt(circle3, 2);
-
-    deepEqual(objectsAdded[3], circle3);
-  });
 
 })();

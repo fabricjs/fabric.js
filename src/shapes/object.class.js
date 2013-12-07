@@ -1332,7 +1332,8 @@
      * @chainable
      */
     remove: function() {
-      return this.canvas.remove(this);
+      this.canvas.remove(this);
+      return this;
     },
 
     /**
