@@ -100,18 +100,25 @@
 
   test('calcOffset', function() {
     ok(typeof canvas.calcOffset == 'function', 'should respond to `calcOffset`');
-    equal(canvas, canvas.calcOffset());
+    equal(canvas.calcOffset(), canvas, 'should be chainable');
   });
 
   test('add', function() {
-    var rect = makeRect();
+    var rect1 = makeRect(),
+        rect2 = makeRect(),
+        rect3 = makeRect(),
+        rect4 = makeRect();
 
     ok(typeof canvas.add == 'function');
-    ok(canvas === canvas.add(rect), 'should be chainable');
-    equal(canvas.item(0), rect);
+    equal(canvas.add(rect1), canvas, 'should be chainable');
+    strictEqual(canvas.item(0), rect1);
 
-    canvas.add(makeRect(), makeRect(), makeRect());
+    canvas.add(rect2, rect3, rect4);
     equal(canvas.getObjects().length, 4, 'should support multiple arguments');
+
+    strictEqual(canvas.item(1), rect2);
+    strictEqual(canvas.item(2), rect3);
+    strictEqual(canvas.item(3), rect4);
   });
 
   test('insertAt', function() {
@@ -124,10 +131,61 @@
 
     var rect = makeRect();
     canvas.insertAt(rect, 1);
-    equal(canvas.item(1), rect);
+    strictEqual(canvas.item(1), rect);
     canvas.insertAt(rect, 2);
-    equal(canvas.item(2), rect);
-    equal(canvas, canvas.insertAt(rect, 2), 'should be chainable');
+    strictEqual(canvas.item(2), rect);
+    equal(canvas.insertAt(rect, 2), canvas, 'should be chainable');
+  });
+
+  test('remove', function() {
+    var rect1 = makeRect(),
+        rect2 = makeRect(),
+        rect3 = makeRect(),
+        rect4 = makeRect();
+
+    canvas.add(rect1, rect2, rect3, rect4);
+
+    ok(typeof canvas.remove == 'function');
+    equal(canvas.remove(rect1), canvas, 'should be chainable');
+    strictEqual(canvas.item(0), rect2, 'should be second object');
+
+    canvas.remove(rect2, rect3);
+    strictEqual(canvas.item(0), rect4);
+
+    canvas.remove(rect4);
+    equal(canvas.isEmpty(), true, 'canvas should be empty');
+  });
+
+  test('before:selection:cleared', function() {
+    var isFired = false;
+    canvas.on('before:selection:cleared', function() { isFired = true });
+
+    canvas.add(new fabric.Rect());
+    canvas.remove(canvas.item(0));
+
+    equal(isFired, false, 'removing inactive object shouldnt fire "before:selection:cleared"');
+
+    canvas.add(new fabric.Rect());
+    canvas.setActiveObject(canvas.item(0));
+    canvas.remove(canvas.item(0));
+
+    equal(isFired, true, 'removing active object should fire "before:selection:cleared"');
+  });
+
+  test('selection:cleared', function() {
+    var isFired = false;
+    canvas.on('selection:cleared', function() { isFired = true });
+
+    canvas.add(new fabric.Rect());
+    canvas.remove(canvas.item(0));
+
+    equal(isFired, false, 'removing inactive object shouldnt fire "selection:cleared"');
+
+    canvas.add(new fabric.Rect());
+    canvas.setActiveObject(canvas.item(0));
+    canvas.remove(canvas.item(0));
+
+    equal(isFired, true, 'removing active object should fire "selection:cleared"');
   });
 
   test('getContext', function() {
@@ -136,13 +194,13 @@
 
   test('clearContext', function() {
     ok(typeof canvas.clearContext == 'function');
-    equal(canvas, canvas.clearContext(canvas.getContext()), 'chainable');
+    equal(canvas.clearContext(canvas.getContext()), canvas, 'should be chainable');
   });
 
   test('clear', function() {
     ok(typeof canvas.clear == 'function');
 
-    equal(canvas, canvas.clear());
+    equal(canvas.clear(), canvas, 'should be chainable');
     equal(canvas.getObjects().length, 0);
   });
 
@@ -501,14 +559,6 @@
   //   }, 1000);
   // });
 
-  test('remove', function() {
-    ok(typeof canvas.remove == 'function');
-    var rect1 = makeRect(),
-        rect2 = makeRect();
-    canvas.add(rect1, rect2);
-    equal(canvas.remove(rect1), rect1, 'should return removed object');
-    equal(canvas.item(0), rect2, 'only second object should be left');
-  });
 
   test('sendToBack', function() {
     ok(typeof canvas.sendToBack == 'function');
@@ -680,7 +730,7 @@
       makeRect({ left: 20, top: 20 })
     ]);
 
-    equal(canvas.setActiveGroup(group), canvas, 'chainable');
+    equal(canvas.setActiveGroup(group), canvas, 'should be chainable');
     equal(canvas.getActiveGroup(), group);
   });
 
@@ -704,7 +754,7 @@
     ok(typeof canvas.discardActiveGroup == 'function');
     var group = new fabric.Group([makeRect(), makeRect()]);
     canvas.setActiveGroup(group);
-    equal(canvas.discardActiveGroup(), canvas, 'chainable');
+    equal(canvas.discardActiveGroup(), canvas, 'should be chainable');
     equal(canvas.getActiveGroup(), null, 'removing active group sets it to null');
   });
 
@@ -867,14 +917,14 @@
     ok(typeof canvas.getWidth == 'function');
 
     equal(canvas.getWidth(), 600);
-    equal(canvas.setWidth(444), canvas, 'chainable');
+    equal(canvas.setWidth(444), canvas, 'should be chainable');
     equal(canvas.getWidth(), 444);
   });
 
   test('getSetHeight', function() {
     ok(typeof canvas.getHeight == 'function');
     equal(canvas.getHeight(), 600);
-    equal(canvas.setHeight(765), canvas, 'chainable');
+    equal(canvas.setHeight(765), canvas, 'should be chainable');
     equal(canvas.getHeight(), 765);
   });
 
@@ -905,25 +955,6 @@
     rect.set('left', 175).set('top', 175).setCoords();
     ok(canvas.containsPoint(eventStub, rect), 'on rect at (200, 200) should be within area (175, 175, 225, 225)');
   });
-
-  // asyncTest('resizeImageToFit', function() {
-  //   ok(typeof canvas._resizeImageToFit == 'function');
-
-  //   var imgEl = fabric.util.makeElement('img', { src: '../fixtures/very_large_image.jpg' }),
-  //       ORIGINAL_WIDTH = 3888,
-  //       ORIGINAL_HEIGHT = 2592;
-
-  //   setTimeout(function() {
-  //     equal(imgEl.width, ORIGINAL_WIDTH);
-  //     equal(imgEl.height, ORIGINAL_HEIGHT);
-
-  //     canvas._resizeImageToFit(imgEl);
-
-  //     ok(imgEl.width < ORIGINAL_WIDTH);
-
-  //     start();
-  //   }, 2000);
-  // });
 
   asyncTest('fxRemove', function() {
     ok(typeof canvas.fxRemove == 'function');
@@ -972,22 +1003,6 @@
   //     start();
   //   }, 1000);
   // });
-
-  test('selection:cleared', function() {
-    var isFired = false;
-    canvas.on('selection:cleared', function() { isFired = true });
-
-    canvas.add(new fabric.Rect());
-    canvas.remove(canvas.item(0));
-
-    equal(isFired, false, 'removing inactive object shouldnt fire "selection:cleared"');
-
-    canvas.add(new fabric.Rect());
-    canvas.setActiveObject(canvas.item(0));
-    canvas.remove(canvas.item(0));
-
-    equal(isFired, true, 'removing active object should fire "selection:cleared"');
-  });
 
   test('clipTo', function() {
     canvas.clipTo = function(ctx) {
