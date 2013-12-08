@@ -732,7 +732,24 @@
         return activeGroup;
       }
 
-      return this._searchPossibleTargets(e);
+      var target = this._searchPossibleTargets(e);
+      if (target) {
+        if (this._hoveredTarget !== target) {
+          this.fire('object:over', { target: target });
+          target.fire('mouseover');
+          if (this._hoveredTarget) {
+            this.fire('object:out', { target: this._hoveredTarget });
+            this._hoveredTarget.fire('mouseout');
+          }
+          this._hoveredTarget = target;
+        }
+      }
+      else if (this._hoveredTarget) {
+        this.fire('object:out', { target: this._hoveredTarget });
+        this._hoveredTarget.fire('mouseout');
+        this._hoveredTarget = null;
+      }
+      return target;
     },
 
     /**
