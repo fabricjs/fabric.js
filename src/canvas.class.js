@@ -29,6 +29,8 @@
    * @fires mouse:down
    * @fires mouse:move
    * @fires mouse:up
+   * @fires mouse:over
+   * @fires mouse:out
    *
    */
   fabric.Canvas = fabric.util.createClass(fabric.StaticCanvas, /** @lends fabric.Canvas.prototype */ {
@@ -733,23 +735,30 @@
       }
 
       var target = this._searchPossibleTargets(e);
+      this._fireOverOutEvents(target);
+      return target;
+    },
+
+    /**
+     * @private
+     */
+    _fireOverOutEvents: function(target) {
       if (target) {
         if (this._hoveredTarget !== target) {
-          this.fire('object:over', { target: target });
+          this.fire('mouse:over', { target: target });
           target.fire('mouseover');
           if (this._hoveredTarget) {
-            this.fire('object:out', { target: this._hoveredTarget });
+            this.fire('mouse:out', { target: this._hoveredTarget });
             this._hoveredTarget.fire('mouseout');
           }
           this._hoveredTarget = target;
         }
       }
       else if (this._hoveredTarget) {
-        this.fire('object:out', { target: this._hoveredTarget });
+        this.fire('mouse:out', { target: this._hoveredTarget });
         this._hoveredTarget.fire('mouseout');
         this._hoveredTarget = null;
       }
-      return target;
     },
 
     /**

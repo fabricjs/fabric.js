@@ -170,12 +170,12 @@ fabric.Collection = {
   /**
    * Adds objects to collection, then renders canvas (if `renderOnAddRemove` is not `false`)
    * Objects should be instances of (or inherit from) fabric.Object
-   * @param [...] Zero or more fabric instances
+   * @param {...fabric.Object} object Zero or more fabric instances
    * @return {Self} thisArg
    */
   add: function () {
     this._objects.push.apply(this._objects, arguments);
-    for (var i = arguments.length; i--; ) {
+    for (var i = 0, length = arguments.length; i < length; i++) {
       this._onObjectAdded(arguments[i]);
     }
     this.renderOnAddRemove && this.renderAll();
@@ -189,6 +189,7 @@ fabric.Collection = {
    * @param {Number} index Index to insert object at
    * @param {Boolean} nonSplicing When `true`, no splicing (shifting) of objects occurs
    * @return {Self} thisArg
+   * @chainable
    */
   insertAt: function (object, index, nonSplicing) {
     var objects = this.getObjects();
@@ -204,22 +205,27 @@ fabric.Collection = {
   },
 
   /**
-   * Removes an object from a collection, then renders canvas (if `renderOnAddRemove` is not `false`)
-   * @param {Object} object Object to remove
+   * Removes objects from a collection, then renders canvas (if `renderOnAddRemove` is not `false`)
+   * @param {...fabric.Object} object Zero or more fabric instances
    * @return {Self} thisArg
+   * @chainable
    */
-  remove: function(object) {
+  remove: function() {
     var objects = this.getObjects(),
-        index = objects.indexOf(object);
+        index;
 
-    // only call onObjectRemoved if an object was actually removed
-    if (index !== -1) {
-      objects.splice(index, 1);
-      this._onObjectRemoved(object);
+    for (var i = 0, length = arguments.length; i < length; i++) {
+      index = objects.indexOf(arguments[i]);
+
+      // only call onObjectRemoved if an object was actually removed
+      if (index !== -1) {
+        objects.splice(index, 1);
+        this._onObjectRemoved(arguments[i]);
+      }
     }
 
     this.renderOnAddRemove && this.renderAll();
-    return object;
+    return this;
   },
 
   /**
@@ -7196,6 +7202,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
    * @fires mouse:down
    * @fires mouse:move
    * @fires mouse:up
+   * @fires mouse:over
+   * @fires mouse:out
    *
    */
   fabric.Canvas = fabric.util.createClass(fabric.StaticCanvas, /** @lends fabric.Canvas.prototype */ {
@@ -7899,7 +7907,31 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         return activeGroup;
       }
 
-      return this._searchPossibleTargets(e);
+      var target = this._searchPossibleTargets(e);
+      this._fireOverOutEvents(target);
+      return target;
+    },
+
+    /**
+     * @private
+     */
+    _fireOverOutEvents: function(target) {
+      if (target) {
+        if (this._hoveredTarget !== target) {
+          this.fire('mouse:over', { target: target });
+          target.fire('mouseover');
+          if (this._hoveredTarget) {
+            this.fire('mouse:out', { target: this._hoveredTarget });
+            this._hoveredTarget.fire('mouseout');
+          }
+          this._hoveredTarget = target;
+        }
+      }
+      else if (this._hoveredTarget) {
+        this.fire('mouse:out', { target: this._hoveredTarget });
+        this._hoveredTarget.fire('mouseout');
+        this._hoveredTarget = null;
+      }
     },
 
     /**
@@ -10910,7 +10942,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @chainable
      */
     remove: function() {
-      return this.canvas.remove(this);
+      this.canvas.remove(this);
+      return this;
     },
 
     /**
