@@ -33,6 +33,7 @@
     *   Copy text:                      ctrl/cmd + c
     *   Paste text:                     ctrl/cmd + v
     *   Cut text:                       ctrl/cmd + x
+    *   Select entire text:             ctrl/cmd + a
     * </pre>
     *
     * <p>Supported mouse/touch combination</p>
