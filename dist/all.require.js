@@ -10221,6 +10221,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
     /**
      * Function that determines clipping of an object (context is passed as a first argument)
+     * Note that context origin is at the object's center point (not left/top corner)
      * @type Function
      */
     clipTo:                   null,

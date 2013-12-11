@@ -2,6 +2,10 @@
 
 - [BACK_INCOMPAT] `fabric.Collection#remove` doesn't return removed object -> returns `this` (chainable)
 
+- Add "mouse:over" and "mouse:out" canvas events (and corresponding "mouseover", "mouseout" object events)
+
+- Fix "transformMatrix" not affecting fabric.Text
+
 **Version 1.4.0**
 
 - [BACK_INCOMPAT] JSON and Cufon are no longer included in default build
