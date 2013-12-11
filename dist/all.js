@@ -1,3 +1,37 @@
+/*
+
+1.4.0_A_hybra version:
+
+added remove object control box : 
+	-modified method drawControls, added drawing for remove object control ("mtd") at half way from rotate control
+	-modified method _drawControl, added drawing for remove object control ("mtd") at half way from rotate control (white X on red background)
+	-modified method _getControlsVisibility adding "mtd" control
+	-modified method _getActionFromCorner added "mtd" control 
+	-modified method _setCornerCursor added "mtd" control
+	-added fabric.Canvas property pointerCursor = "pointer" for remove "mtd" control
+	-modified method _findTargetCorner added "mtd" control
+	-modified comment for method isControlVisible added "mtd" control
+	-modified method _setCornerCoords added "mtd" control
+	-modified method setCoords added "mtd" control
+	-modified comment for method setControlVisible added "mtd" control
+	-modified fabric.Object class added hasRemovalPoint property
+	
+	You can test with this fiddle: http://jsfiddle.net/aCraM/
+	
+	To remove an object or a group select it, then click the new control point 
+	(white X on red background) right under the rotation control point) and drag in any direction.
+	
+	Removal control point visibility is dependant from rotation control point visibility. 
+	The control is created half way between rotation control point and the object box.
+	A new object property exists,  hasRemovalPoint , to set removal control point visibility (if hasRotatingPoint is true).
+	The removal control point responds to all other style properties, like cornerSize and cornerSize, 
+	but never becomes transparent or changes color (overrides transparentCorners and cornerColor).
+	Event 'object:removed' is normally fired for every object that is removed (single or grouped).
+	Mouse cursor becomes a pointing hand when hovering the object/group removal control point.
+	
+*/
+
+
 /* build: `node build.js modules=ALL exclude=gestures,cufon,json minifier=uglifyjs` */
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
@@ -7327,6 +7361,13 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     rotationCursor:         'crosshair',
 
     /**
+     * Cursor value used for rotation point
+     * @type String
+     * @default
+     */
+    pointerCursor:         'pointer',
+	
+    /**
      * Default element class that's given to wrapper (div) element of canvas
      * @type String
      * @default
@@ -7564,8 +7605,10 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
             ? 'scaleY'
             : corner === 'mtr'
               ? 'rotate'
-              : 'scale';
+              : corner === 'mtd'
+				? 'remove' : 'scale';
       }
+	  
       return action;
     },
 
@@ -8843,6 +8886,15 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         this._rotateObject(x, y);
         this._fire('rotating', target, e);
       }
+      else if (action === 'remove') {
+	
+		  if(this.getActiveGroup()){
+		  this.getActiveGroup().forEachObject(function(o){ o.remove(); });
+		  this.discardActiveGroup().renderAll();
+		} else {
+		  this.remove(this.getActiveObject());
+		}
+      }	  
       else if (action === 'scale') {
         this._onScale(e, transform, x, y);
         this._fire('scaling', target, e);
@@ -8950,6 +9002,9 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       }
       else if (corner === 'mtr' && target.hasRotatingPoint) {
         style.cursor = this.rotationCursor;
+      }
+      else if (corner === 'mtd' && target.hasRotatingPoint && target.hasRemovalPoint) {
+        style.cursor = this.pointerCursor;
       }
       else {
         style.cursor = this.defaultCursor;
@@ -10205,6 +10260,15 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      */
     rotatingPointOffset:      40,
 
+	
+    /**
+     * When set to `false`, object's controlling removal point will not be visible or selectable (also depends from hasRotatingPoint)
+     * @type Boolean
+     * @default
+     */
+    hasRemovalPoint:         true,
+	
+	
     /**
      * When set to `true`, objects are "found" on canvas on per-pixel basis rather than according to bounding box
      * @type Boolean
@@ -11573,7 +11637,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         x: mt.x,
         y: mt.y
       };
-
+      var mtd = {
+        x: mt.x,
+        y: mt.y
+      };
       // debugging
 
       // setTimeout(function() {
@@ -11594,7 +11661,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         // middle
         ml: ml, mt: mt, mr: mr, mb: mb,
         // rotating point
-        mtr: mtr
+        mtr: mtr,
+        // remove point
+        mtd: mtd
       };
 
       // set coordinates of the draggable boxes in the corners used to scale/rotate the image
@@ -11871,7 +11940,11 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         if (i === 'mtr' && !this.hasRotatingPoint) {
           continue;
         }
-
+		
+        if (i === 'mtd' && (!this.hasRotatingPoint || !this.hasRemovalPoint)) {
+          continue;
+        }
+		
         if (this.get('lockUniScaling') && (i === 'mt' || i === 'mr' || i === 'mb' || i === 'ml')) {
           continue;
         }
@@ -12086,7 +12159,28 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           y: coords.mtr.y + cosHalfOffset - (cosTh * this.rotatingPointOffset)
         }
       };
-    },
+
+      coords.mtd.corner = {
+        tl: {
+          x: coords.mtd.x - sinHalfOffset + (sinTh * (this.rotatingPointOffset/2)),
+          y: coords.mtd.y - cosHalfOffset - (cosTh * (this.rotatingPointOffset/2))
+        },
+        tr: {
+          x: coords.mtd.x + cosHalfOffset + (sinTh * (this.rotatingPointOffset/2)),
+          y: coords.mtd.y - sinHalfOffset - (cosTh * (this.rotatingPointOffset/2))
+        },
+        bl: {
+          x: coords.mtd.x - cosHalfOffset + (sinTh * (this.rotatingPointOffset/2)),
+          y: coords.mtd.y + sinHalfOffset - (cosTh * (this.rotatingPointOffset/2))
+        },
+        br: {
+          x: coords.mtd.x + sinHalfOffset + (sinTh * (this.rotatingPointOffset/2)),
+          y: coords.mtd.y + cosHalfOffset - (cosTh * (this.rotatingPointOffset/2))
+        }
+      };
+
+
+	  },
     /**
      * Draws borders of an object's bounding box.
      * Requires public properties: width, height
@@ -12226,7 +12320,18 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           this.flipY
             ? (top + height + (this.rotatingPointOffset / this.scaleY) - this.cornerSize/this.scaleX/2 + strokeWidth2 + paddingY)
             : (top - (this.rotatingPointOffset / this.scaleY) - this.cornerSize/this.scaleY/2 - strokeWidth2 - paddingY));
-      }
+
+			if (this.hasRemovalPoint)
+			{		
+			// middle-top-delete (remove), dependent from visibility of the rotating 
+			this._drawControl('mtd', ctx, methodName,
+			  left + width/2 - scaleOffsetX,
+			  this.flipY
+				? (top + height + ((this.rotatingPointOffset/2) / this.scaleY) - this.cornerSize/this.scaleX/2 + strokeWidth2 + paddingY)
+				: (top - ((this.rotatingPointOffset/2) / this.scaleY) - this.cornerSize/this.scaleY/2 - strokeWidth2 - paddingY));
+			}
+
+		}
 
       ctx.restore();
 
@@ -12243,12 +12348,30 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       if (this.isControlVisible(control)) {
         isVML || this.transparentCorners || ctx.clearRect(left, top, sizeX, sizeY);
         ctx[methodName](left, top, sizeX, sizeY);
+		if(control=='mtd')
+		{
+			ctx.beginPath();
+			ctx.rect(left, top, sizeX, sizeY);
+			ctx.fillStyle = '#ff0000';
+			ctx.fill();		
+			ctx.closePath();	
+			ctx.beginPath();
+			ctx.moveTo(left,top);
+			ctx.lineTo(left+sizeX,top+sizeY);
+			ctx.moveTo(left+sizeX,top);
+			ctx.lineTo(left,top+sizeY);
+			ctx.lineWidth = 2 / Math.max(this.scaleX, this.scaleY);
+			ctx.strokeStyle = '#ffffff';
+			ctx.stroke();
+			ctx.closePath();
+			
+		}
       }
     },
 
     /**
      * Returns true if the specified control is visible, false otherwise.
-     * @param {String} controlName The name of the control. Possible values are 'tl', 'tr', 'br', 'bl', 'ml', 'mt', 'mr', 'mb', 'mtr'.
+     * @param {String} controlName The name of the control. Possible values are 'tl', 'tr', 'br', 'bl', 'ml', 'mt', 'mr', 'mb', 'mtr','mtd'.
      * @returns {Boolean} true if the specified control is visible, false otherwise
      */
     isControlVisible: function(controlName) {
@@ -12257,7 +12380,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
     /**
      * Sets the visibility of the specified control.
-     * @param {String} controlName The name of the control. Possible values are 'tl', 'tr', 'br', 'bl', 'ml', 'mt', 'mr', 'mb', 'mtr'.
+     * @param {String} controlName The name of the control. Possible values are 'tl', 'tr', 'br', 'bl', 'ml', 'mt', 'mr', 'mb', 'mtr','mtd'.
      * @param {Boolean} visible true to set the specified control visible, false otherwise
      * @return {fabric.Object} thisArg
      * @chainable
@@ -12307,7 +12430,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
             mt: true,
             mr: true,
             mb: true,
-            mtr: true
+            mtr: true,
+            mtd: true
         };
       }
       return this._controlsVisibility;
@@ -12443,12 +12567,12 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-2/#animation}
    * @chainable
    *
-   * As object â€” multiple properties
+   * As object — multiple properties
    *
    * object.animate({ left: ..., top: ... });
    * object.animate({ left: ..., top: ... }, { duration: ... });
    *
-   * As string â€” one property
+   * As string — one property
    *
    * object.animate('left', ...);
    * object.animate('left', { duration: ... });
@@ -21178,4 +21302,3 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   }
 
 })();
-
