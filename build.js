@@ -4,7 +4,6 @@ var fs = require('fs'),
 var buildArgs = process.argv.slice(2),
     buildArgsAsObject = { },
     rootPath = process.cwd(),
-    distributionPath = 'dist/';
 
 buildArgs.forEach(function(arg) {
   var key = arg.split('=')[0],
@@ -16,6 +15,7 @@ buildArgs.forEach(function(arg) {
 var modulesToInclude = buildArgsAsObject.modules ? buildArgsAsObject.modules.split(',') : [ ];
 var modulesToExclude = buildArgsAsObject.exclude ? buildArgsAsObject.exclude.split(',') : [ ];
 
+var distributionPath = buildArgsAsObject.dest || 'dist/'
 var minifier = buildArgsAsObject.minifier || 'uglifyjs';
 var mininfierCmd;
 
