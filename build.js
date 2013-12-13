@@ -15,7 +15,7 @@ buildArgs.forEach(function(arg) {
 var modulesToInclude = buildArgsAsObject.modules ? buildArgsAsObject.modules.split(',') : [ ];
 var modulesToExclude = buildArgsAsObject.exclude ? buildArgsAsObject.exclude.split(',') : [ ];
 
-var distributionPath = buildArgsAsObject.dest || 'dist/'
+var distributionPath = buildArgsAsObject.dest || 'dist/';
 var minifier = buildArgsAsObject.minifier || 'uglifyjs';
 var mininfierCmd;
 
