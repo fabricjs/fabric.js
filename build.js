@@ -3,7 +3,7 @@ var fs = require('fs'),
 
 var buildArgs = process.argv.slice(2),
     buildArgsAsObject = { },
-    rootPath = process.cwd(),
+    rootPath = process.cwd();
 
 buildArgs.forEach(function(arg) {
   var key = arg.split('=')[0],
