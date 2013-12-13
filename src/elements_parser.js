@@ -15,9 +15,9 @@ fabric.ElementsParser = {
 
   createObjects: function() {
     for (var i = 0, len = this.elements.length; i < len; i++) {
-      (function(that, fabric, i) {
-          fabric.window.setTimeout(function() { that.createObject(that.elements[i], i); }, 0);
-      })(this, fabric, i);
+      (function(that, i) {
+          setTimeout(function() { that.createObject(that.elements[i], i); }, 0);
+      })(this, i);
     }
   },
 
