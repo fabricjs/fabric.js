@@ -43,17 +43,17 @@ if (sourceMap) {
     console.log('[notice]: sourceMap support requires uglifyjs or google closure compiler as minifier; changed minifier to uglifyjs.');
     minifier = 'uglifyjs';
   }
-  sourceMapFlags = minifier === 'uglifyjs' ? ' --source-map all.min.js.map' : ' --create_source_map all.min.js.map --source_map_format=V3';
+  sourceMapFlags = minifier === 'uglifyjs' ? ' --source-map fabric.min.js.map' : ' --create_source_map fabric.min.js.map --source_map_format=V3';
 }
 
 if (minifier === 'yui') {
-  mininfierCmd = 'java -jar ' + rootPath + '/lib/yuicompressor-2.4.6.jar all.js -o all.min.js';
+  mininfierCmd = 'java -jar ' + rootPath + '/lib/yuicompressor-2.4.6.jar fabric.js -o fabric.min.js';
 }
 else if (minifier === 'closure') {
-  mininfierCmd = 'java -jar ' + rootPath + '/lib/google_closure_compiler.jar --js all.js --js_output_file all.min.js' + sourceMapFlags;
+  mininfierCmd = 'java -jar ' + rootPath + '/lib/google_closure_compiler.jar --js fabric.js --js_output_file fabric.min.js' + sourceMapFlags;
 }
 else if (minifier === 'uglifyjs') {
-  mininfierCmd = 'uglifyjs ' + amdUglifyFlags  + ' --output all.min.js all.js' + sourceMapFlags;
+  mininfierCmd = 'uglifyjs ' + amdUglifyFlags  + ' --output fabric.min.js fabric.js' + sourceMapFlags;
 }
 
 var buildSh = 'build-sh' in buildArgsAsObject;
@@ -285,7 +285,7 @@ else {
   process.chdir(distributionPath);
 
   appendFileContents(filesToInclude, function() {
-    fs.writeFile('all.js', distFileContents, function (err) {
+    fs.writeFile('fabric.js', distFileContents, function (err) {
       if (err) {
         console.log(err);
         throw err;
@@ -293,13 +293,13 @@ else {
 
       // add js wrapping in AMD closure for requirejs if necessary
       if (amdLib !== false) {
-        exec('uglifyjs all.js ' + amdUglifyFlags + ' -b --output all.js');
+        exec('uglifyjs fabric.js ' + amdUglifyFlags + ' -b --output fabric.js');
       }
 
       if (amdLib !== false) {
-        console.log('Built distribution to ' + distributionPath + 'all.js (' + amdLib + '-compatible)');
+        console.log('Built distribution to ' + distributionPath + 'fabric.js (' + amdLib + '-compatible)');
       } else {
-        console.log('Built distribution to ' + distributionPath + 'all.js');
+        console.log('Built distribution to ' + distributionPath + 'fabric.js');
       }
 
       exec(mininfierCmd, function (error, output) {
@@ -307,18 +307,18 @@ else {
           console.error('Minification failed using', minifier, 'with', mininfierCmd);
           process.exit(1);
         }
-        console.log('Minified using', minifier, 'to ' + distributionPath + 'all.min.js');
+        console.log('Minified using', minifier, 'to ' + distributionPath + 'fabric.min.js');
 
         if (sourceMapFlags) {
-          console.log('Built sourceMap to ' + distributionPath + 'all.min.js.map');
+          console.log('Built sourceMap to ' + distributionPath + 'fabric.min.js.map');
         }
 
-        exec('gzip -c all.min.js > all.min.js.gz', function (error, output) {
-          console.log('Gzipped to ' + distributionPath + 'all.min.js.gz');
+        exec('gzip -c fabric.min.js > fabric.min.js.gz', function (error, output) {
+          console.log('Gzipped to ' + distributionPath + 'fabric.min.js.gz');
         });
       });
 
-      // Always build requirejs AMD module in all.require.js
+      // Always build requirejs AMD module in fabric.require.js
       // add necessary requirejs footer code to filesToInclude if we haven't before
       if (amdLib === false) {
         amdLib = "requirejs";
@@ -326,13 +326,13 @@ else {
       }
 
       appendFileContents(filesToInclude, function() {
-        fs.writeFile('all.require.js', distFileContents, function (err) {
+        fs.writeFile('fabric.require.js', distFileContents, function (err) {
           if (err) {
             console.log(err);
             throw err;
           }
-          exec('uglifyjs all.require.js ' + amdUglifyFlags + ' -b --output all.require.js');
-          console.log('Built distribution to ' + distributionPath + 'all.require.js (requirejs-compatible)');
+          exec('uglifyjs fabric.require.js ' + amdUglifyFlags + ' -b --output fabric.require.js');
+          console.log('Built distribution to ' + distributionPath + 'fabric.require.js (requirejs-compatible)');
         });
       });
 

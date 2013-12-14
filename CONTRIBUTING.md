@@ -34,7 +34,7 @@ If you are sure that it's a bug in Fabric.js or a suggestion, open a new [issue]
 perfect, but even a simple script demonstrating the error would suffice. You could use [this jsfiddle template](http://jsfiddle.net/fabricjs/Da7SP/) as a
 starting point.
 
-- **Fabric.js version:** Make sure to specify which version of Fabric.js you are using. The version can be found in [all.js file](https://github.com/kangax/fabric.js/blob/master/dist/all.js#L5) or just by executing `fabric.version` in the browser console.
+- **Fabric.js version:** Make sure to specify which version of Fabric.js you are using. The version can be found in [fabric.js file](https://github.com/kangax/fabric.js/blob/master/dist/fabric.js#L5) or just by executing `fabric.version` in the browser console.
 
 ## Pull requests
 

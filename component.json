@@ -8,6 +8,6 @@
   "development": {},
   "license": "MIT",
   "scripts": [
-    "./dist/all.js"
+    "./dist/fabric.js"
   ]
 }

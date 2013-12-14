@@ -26,5 +26,5 @@
     "plato": "0.6.x"
   },
   "engines": { "node": ">=0.4.0 && <1.0.0" },
-  "main": "./dist/all.js"
+  "main": "./dist/fabric.js"
 }
