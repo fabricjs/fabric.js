@@ -622,7 +622,9 @@
 
         var textLines = this.text.split(this._reNewline),
             textOnPreviousLine = textLines[lineIndex - 1],
-            newCharIndexOnPrevLine = textOnPreviousLine.length;
+            newCharIndexOnPrevLine = textOnPreviousLine
+              ? textOnPreviousLine.length
+              : 0;
 
         if (!this.styles[lineIndex - 1]) {
           this.styles[lineIndex - 1] = { };
