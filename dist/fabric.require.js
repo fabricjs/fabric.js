@@ -19306,6 +19306,25 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     },
 
     /**
+     * @private
+     */
+    _renderTextBoxBackground: function(ctx) {
+      if (!this.backgroundColor) return;
+
+      ctx.save();
+      ctx.fillStyle = this.backgroundColor;
+
+      ctx.fillRect(
+        this._getLeftOffset(),
+        this._getTopOffset() + (this.fontSize / this._fontSizeFraction),
+        this.width,
+        this.height
+      );
+
+      ctx.restore();
+    },
+
+    /**
      * Returns object representation of an instance
      * @methd toObject
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
