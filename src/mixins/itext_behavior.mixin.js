@@ -54,7 +54,7 @@
       });
 
       this.canvas.on('object:selected', function() {
-        fabric.IText.prototype.exitEditingOnOthers.call(this);
+        fabric.IText.prototype.exitEditingOnOthers.call(_this);
       });
     },
 

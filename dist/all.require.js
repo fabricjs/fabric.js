@@ -18335,6 +18335,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     *   Copy text:                      ctrl/cmd + c
     *   Paste text:                     ctrl/cmd + v
     *   Cut text:                       ctrl/cmd + x
+    *   Select entire text:             ctrl/cmd + a
     * </pre>
     *
     * <p>Supported mouse/touch combination</p>
@@ -19385,7 +19386,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       });
 
       this.canvas.on('object:selected', function() {
-        fabric.IText.prototype.exitEditingOnOthers.call(this);
+        fabric.IText.prototype.exitEditingOnOthers.call(_this);
       });
     },
 
