@@ -476,6 +476,8 @@
   asyncTest('fabric.util.groupSVGElements', function() {
     ok(typeof fabric.util.groupSVGElements == 'function');
 
+    stop();
+
     var group1, group2;
     fabric.loadSVGFromString(SVG_WITH_1_ELEMENT, function(objects, options) {
       group1 = fabric.util.groupSVGElements(objects, options);
