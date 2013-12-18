@@ -4,7 +4,11 @@
 
 - Add "mouse:over" and "mouse:out" canvas events (and corresponding "mouseover", "mouseout" object events)
 
-- Fix "transformMatrix" not affecting fabric.Text
+- Fix paths parsing when number has negative exponent
+- Fix background offset in iText
+- Fix style object deletion in iText
+- Fix typo in `_initCanvasHandlers`
+- Fix `transformMatrix` not affecting fabric.Text
 
 **Version 1.4.0**
 
