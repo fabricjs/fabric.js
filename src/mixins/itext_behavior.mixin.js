@@ -314,6 +314,7 @@
       this.canvas && this.canvas.renderAll();
 
       this.fire('editing:entered');
+      this.canvas && this.canvas.fire('text:editing:entered', { target: this });
 
       return this;
     },
@@ -404,6 +405,7 @@
       this._currentCursorOpacity = 0;
 
       this.fire('editing:exited');
+      this.canvas && this.canvas.fire('text:editing:exited', { target: this });
 
       return this;
     },
@@ -475,7 +477,8 @@
       }
 
       this.setCoords();
-      this.fire('text:changed');
+      this.fire('changed');
+      this.canvas && this.canvas.fire('text:changed', { target: this });
     },
 
     /**

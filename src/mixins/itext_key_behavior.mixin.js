@@ -572,7 +572,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     }
 
     this.setCoords();
-    this.fire('text:changed');
+    this.fire('changed');
+    this.canvas && this.canvas.fire('text:changed', { target: this });
   },
 
   /**

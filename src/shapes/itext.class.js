@@ -8,9 +8,9 @@
     * @extends fabric.Text
     * @mixes fabric.Observable
     *
-    * @fires text:changed
-    * @fires editing:entered
-    * @fires editing:exited
+    * @fires changed ("text:changed" when observing canvas)
+    * @fires editing:entered ("text:editing:entered" when observing canvas)
+    * @fires editing:exited ("text:editing:exited" when observing canvas)
     *
     * @return {fabric.IText} thisArg
     * @see {@link fabric.IText#initialize} for constructor definition
@@ -963,10 +963,9 @@
 
       textLines = textLines || this.text.split(this._reNewline);
 
-      var maxHeight = this._getHeightOfChar(ctx, textLines[lineIndex][0], lineIndex, 0);
-
-      var line = textLines[lineIndex];
-      var chars = line.split('');
+      var maxHeight = this._getHeightOfChar(ctx, textLines[lineIndex][0], lineIndex, 0),
+          line = textLines[lineIndex],
+          chars = line.split('');
 
       for (var i = 1, len = chars.length; i < len; i++) {
         var currentCharHeight = this._getHeightOfChar(ctx, chars[i], lineIndex, i);
