@@ -14505,7 +14505,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           coords = [ ],
           currentPath,
           parsed,
-          re = /(-?\.\d+)|(-?\d+(\.\d+)?)/g,
+          re = /([-+]?\d+(?:\.\d+)?(?:e[-+]?\d+)?)/g,
           match,
           coordsStr;
 
@@ -18314,9 +18314,9 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     * @extends fabric.Text
     * @mixes fabric.Observable
     *
-    * @fires text:changed
-    * @fires editing:entered
-    * @fires editing:exited
+    * @fires changed ("text:changed" when observing canvas)
+    * @fires editing:entered ("text:editing:entered" when observing canvas)
+    * @fires editing:exited ("text:editing:exited" when observing canvas)
     *
     * @return {fabric.IText} thisArg
     * @see {@link fabric.IText#initialize} for constructor definition
@@ -19269,10 +19269,9 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 
       textLines = textLines || this.text.split(this._reNewline);
 
-      var maxHeight = this._getHeightOfChar(ctx, textLines[lineIndex][0], lineIndex, 0);
-
-      var line = textLines[lineIndex];
-      var chars = line.split('');
+      var maxHeight = this._getHeightOfChar(ctx, textLines[lineIndex][0], lineIndex, 0),
+          line = textLines[lineIndex],
+          chars = line.split('');
 
       for (var i = 1, len = chars.length; i < len; i++) {
         var currentCharHeight = this._getHeightOfChar(ctx, chars[i], lineIndex, i);
@@ -19307,6 +19306,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 
     /**
      * @private
+     * This method is overwritten to account for different top offset
      */
     _renderTextBoxBackground: function(ctx) {
       if (!this.backgroundColor) return;
@@ -19669,6 +19669,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       this.canvas && this.canvas.renderAll();
 
       this.fire('editing:entered');
+      this.canvas && this.canvas.fire('text:editing:entered', { target: this });
 
       return this;
     },
@@ -19759,6 +19760,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       this._currentCursorOpacity = 0;
 
       this.fire('editing:exited');
+      this.canvas && this.canvas.fire('text:editing:exited', { target: this });
 
       return this;
     },
@@ -19830,7 +19832,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       }
 
       this.setCoords();
-      this.fire('text:changed');
+      this.fire('changed');
+      this.canvas && this.canvas.fire('text:changed', { target: this });
     },
 
     /**
@@ -20862,7 +20865,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     }
 
     this.setCoords();
-    this.fire('text:changed');
+    this.fire('changed');
+    this.canvas && this.canvas.fire('text:changed', { target: this });
   },
 
   /**
