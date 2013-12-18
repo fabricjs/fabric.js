@@ -556,7 +556,7 @@
           coords = [ ],
           currentPath,
           parsed,
-          re = /(-?\.\d+)|(-?\d+(\.\d+)?)/g,
+          re = /([-+]?\d+(?:\.\d+)?(?:e[-+]?\d+)?)/g,
           match,
           coordsStr;
 
