@@ -4,6 +4,7 @@
 
 - Add "mouse:over" and "mouse:out" canvas events (and corresponding "mouseover", "mouseout" object events)
 
+- Fix double callback in loadFromJSON when there's no objects
 - Fix paths parsing when number has negative exponent
 - Fix background offset in iText
 - Fix style object deletion in iText
