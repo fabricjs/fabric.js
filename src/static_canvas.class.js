@@ -759,9 +759,7 @@
         activeGroup.render(ctx);
       }
 
-      if (this.overlayImage) {
-        ctx.drawImage(this.overlayImage, this.overlayImageLeft, this.overlayImageTop);
-      }
+      this._renderOverlay(ctx);
 
       this.fire('after:render');
 
