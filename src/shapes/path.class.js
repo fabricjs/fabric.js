@@ -484,7 +484,7 @@
      */
     toObject: function(propertiesToInclude) {
       var o = extend(this.callSuper('toObject', propertiesToInclude), {
-        path: this.path,
+        path: this.path.map(function(item) { return item.slice() }),
         pathOffset: this.pathOffset
       });
       if (this.sourcePath) {
