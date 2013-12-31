@@ -14075,7 +14075,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           this.left = this.width / 2;
         }
       }
-      this.pathOffset = this.pathOffset || this._calculatePathOffset(origLeft, origTop); //Save top-left coords as offset
+      this.pathOffset = this.pathOffset ||
+                        // Save top-left coords as offset
+                        this._calculatePathOffset(origLeft, origTop);
     },
 
     /**
@@ -14434,7 +14436,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     toObject: function(propertiesToInclude) {
       var o = extend(this.callSuper('toObject', propertiesToInclude), {
-        path: this.path,
+        path: this.path.map(function(item) { return item.slice() }),
         pathOffset: this.pathOffset
       });
       if (this.sourcePath) {

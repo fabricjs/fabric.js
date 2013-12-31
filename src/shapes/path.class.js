@@ -125,7 +125,9 @@
           this.left = this.width / 2;
         }
       }
-      this.pathOffset = this.pathOffset || this._calculatePathOffset(origLeft, origTop); //Save top-left coords as offset
+      this.pathOffset = this.pathOffset ||
+                        // Save top-left coords as offset
+                        this._calculatePathOffset(origLeft, origTop);
     },
 
     /**
