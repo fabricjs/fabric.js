@@ -19833,7 +19833,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       }
       else if (this.selectionEnd - this.selectionStart > 1) {
         // TODO: replace styles properly
-        console.log('replacing MORE than 1 char');
+        // console.log('replacing MORE than 1 char');
       }
 
       this.selectionStart += _chars.length;
