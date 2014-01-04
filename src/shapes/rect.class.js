@@ -101,13 +101,21 @@
      * @param ctx {CanvasRenderingContext2D} context to render on
      */
     _render: function(ctx) {
+
+      // optimize 1x1 case (used in spray brush)
+      if (this.width === 1 && this.height === 1) {
+        ctx.fillRect(0, 0, 1, 1);
+        return;
+      }
+
       var rx = this.rx || 0,
           ry = this.ry || 0,
-          x = -this.width / 2,
-          y = -this.height / 2,
           w = this.width,
           h = this.height,
-          isInPathGroup = this.group && this.group.type === 'path-group';
+          x = -w / 2,
+          y = -h / 2,
+          isInPathGroup = this.group && this.group.type === 'path-group',
+          isRounded = rx !== 0 || ry !== 0;
 
       ctx.beginPath();
       ctx.globalAlpha = isInPathGroup ? (ctx.globalAlpha * this.opacity) : this.opacity;
@@ -123,17 +131,20 @@
           -this.group.height / 2 + this.height / 2 + this.y);
       }
 
-      var isRounded = rx !== 0 || ry !== 0;
+      ctx.moveTo(x + rx, y);
 
-      ctx.moveTo(x+rx, y);
-      ctx.lineTo(x+w-rx, y);
-      isRounded && ctx.quadraticCurveTo(x+w, y, x+w, y+ry, x+w, y+ry);
-      ctx.lineTo(x+w, y+h-ry);
-      isRounded && ctx.quadraticCurveTo(x+w,y+h,x+w-rx,y+h,x+w-rx,y+h);
-      ctx.lineTo(x+rx,y+h);
-      isRounded && ctx.quadraticCurveTo(x,y+h,x,y+h-ry,x,y+h-ry);
-      ctx.lineTo(x,y+ry);
-      isRounded && ctx.quadraticCurveTo(x,y,x+rx,y,x+rx,y);
+      ctx.lineTo(x + w - rx, y);
+      isRounded && ctx.quadraticCurveTo(x + w, y, x + w, y + ry, x + w, y + ry);
+
+      ctx.lineTo(x + w, y + h - ry);
+      isRounded && ctx.quadraticCurveTo(x + w, y + h, x + w - rx, y + h, x + w - rx, y + h);
+
+      ctx.lineTo(x + rx, y + h);
+      isRounded && ctx.quadraticCurveTo(x, y + h, x, y + h - ry, x, y + h - ry);
+
+      ctx.lineTo(x, y + ry);
+      isRounded && ctx.quadraticCurveTo(x, y, x + rx, y, x + rx, y);
+
       ctx.closePath();
 
       this._renderFill(ctx);
