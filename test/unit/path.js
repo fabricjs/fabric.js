@@ -204,4 +204,17 @@
       start();
     });
   });
+
+  asyncTest('compressed path commands with e^x', function() {
+    var el = getPathElement('M56.224e2 84.12E-2c-.047.132-.138.221-.322.215.046-.131.137-.221.322-.215m-.050 -20.100z');
+    fabric.Path.fromElement(el, function(obj) {
+
+      deepEqual(obj.path[0], ['M', 5622.4, 0.8412]);
+      deepEqual(obj.path[1], ['c', -0.047, 0.132, -0.138, 0.221, -0.322, 0.215]);
+      deepEqual(obj.path[2], ['c', 0.046, -0.131, 0.137, -0.221, 0.322, -0.215]);
+      deepEqual(obj.path[3], ['m', -0.05, -20.100]);
+      deepEqual(obj.path[4], ['z']);
+      start();
+    });
+  });
 })();
