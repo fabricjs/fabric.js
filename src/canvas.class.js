@@ -1107,6 +1107,14 @@
   }
 
   /**
+   * Indicates if canvas handlers are initialized for fabric.IText objects
+   * @static
+   * @memberof fabric.Canvas
+   * @type Boolean
+   */
+  fabric.Canvas._hasITextHandlers = false;
+
+  /**
    * @class fabric.Element
    * @alias fabric.Canvas
    * @deprecated Use {@link fabric.Canvas} instead.

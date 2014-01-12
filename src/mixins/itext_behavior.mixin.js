@@ -25,9 +25,9 @@
           _this.selected = true;
         }, 100);
 
-        if (!this._hasCanvasHandlers) {
+        if (this.canvas && !fabric.Canvas._hasITextHandlers) {
           this._initCanvasHandlers();
-          this._hasCanvasHandlers = true;
+          fabric.Canvas._hasITextHandlers = true;
         }
       });
     },
@@ -36,25 +36,18 @@
      * @private
      */
     _initCanvasHandlers: function() {
-      var _this = this;
-
-      this.canvas.on('selection:cleared', function(options) {
-
-        // do not exit editing if event fired
-        // when clicking on an object again (in editing mode)
-        if (options.e && _this.canvas.containsPoint(options.e, _this)) return;
-
-        _this.exitEditing();
+      this.canvas.on('selection:cleared', function() {
+        fabric.IText.prototype.exitEditingOnOthers.call();
       });
 
       this.canvas.on('mouse:up', function() {
-        this.getObjects('i-text').forEach(function(obj) {
+        fabric.IText.instances.forEach(function(obj) {
           obj.__isMousedown = false;
         });
       });
 
-      this.canvas.on('object:selected', function() {
-        fabric.IText.prototype.exitEditingOnOthers.call(_this);
+      this.canvas.on('object:selected', function(options) {
+        fabric.IText.prototype.exitEditingOnOthers.call(options.target);
       });
     },
 
