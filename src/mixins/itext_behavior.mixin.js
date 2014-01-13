@@ -107,8 +107,16 @@
     /**
      * Initializes delayed cursor
      */
-    initDelayedCursor: function() {
+    initDelayedCursor: function(restart) {
       var _this = this;
+      
+        if(restart){
+                this._abortCursorAnimation = true;
+                clearTimeout(this._cursorTimeout1);
+                this._currentCursorOpacity = 1;
+                this.canvas && this.canvas.renderAll();
+            }
+      
       if (this._cursorTimeout2) {
         clearTimeout(this._cursorTimeout2);
       }
