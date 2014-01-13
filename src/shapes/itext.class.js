@@ -484,7 +484,7 @@
           charHeight = this.getCurrentCharFontSize(lineIndex, charIndex);
 
       ctx.fillStyle = this.getCurrentCharColor(lineIndex, charIndex);
-      ctx.globalAlpha = this._currentCursorOpacity;
+      ctx.globalAlpha = (this.__isMousedown) ? 1 : this._currentCursorOpacity;
 
       ctx.fillRect(
         boundaries.left + boundaries.leftOffset,
