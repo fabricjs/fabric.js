@@ -300,12 +300,14 @@
      * @return {fabric.IText} thisArg
      * @chainable
      */
-    enterEditing: function() {
+    enterEditing: function(options) {
       if (this.isEditing || !this.editable) return;
 
       this.exitEditingOnOthers();
 
       this.isEditing = true;
+      
+      this.setCursorByClick(options.e);
 
       this._updateTextarea();
       this._saveEditingProps();
