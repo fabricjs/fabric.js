@@ -94,10 +94,15 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       if (this.hiddenTextarea && this.canvas) {
         this.canvas.wrapperEl.appendChild(this.hiddenTextarea);
       }
+      
+      if (this.selected){
+        this.setCursorByClick(options.e);
+        this.enterEditing();
+      }
 
       if (this.isEditing) {
-        this.setCursorByClick(options.e);
         this.__selectionStartOnMouseDown = this.selectionStart;
+        this.initDelayedCursor(true);
       }
     });
   },
@@ -138,14 +143,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   initMouseupHandler: function(options) {
     this.on('mouseup', function(options) {
       this.__isMousedown = false;
-
       if (this._isObjectMoved(options.e)) return;
-
-      if (this.selected) {
-        this.setCursorByClick(options.e);
-        this.enterEditing();
-        this.initDelayedCursor(true);
-      }
     });
   },
 
