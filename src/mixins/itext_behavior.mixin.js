@@ -306,8 +306,6 @@
 
       this.isEditing = true;
       
-      this.setCursorByClick(options.e);
-
       this._updateTextarea();
       this._saveEditingProps();
       this._setEditingProps();
