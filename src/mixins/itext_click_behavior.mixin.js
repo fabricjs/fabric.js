@@ -32,12 +32,13 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     this.__lastLastClickTime = this.__lastClickTime;
     this.__lastClickTime = this.__newClickTime;
     this.__lastPointer = newPointer;
+    this.__lastEditing = this.isEditing;
   },
 
   isDoubleClick: function(newPointer) {
     return this.__newClickTime - this.__lastClickTime < 500 &&
         this.__lastPointer.x === newPointer.x &&
-        this.__lastPointer.y === newPointer.y;
+        this.__lastPointer.y === newPointer.y && this.__lastEditing;
   },
 
   isTripleClick: function(newPointer) {
