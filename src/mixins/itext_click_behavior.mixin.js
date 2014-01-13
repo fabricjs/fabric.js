@@ -234,9 +234,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       }
       
        if(mouseOffset.y < height){
-                return this._getNewSelectionStartFromOffset(
-                    mouseOffset, prevWidth, width, charIndex + i, jlen, j);
-            }
+          return this._getNewSelectionStartFromOffset(
+            mouseOffset, prevWidth, width, charIndex + i, jlen, j);
+       }
     }
 
     // clicked somewhere after all chars, so set at the end
@@ -265,8 +265,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     }
     
     if(j == jlen){
-            newSelectionStart--;
-        }
+      newSelectionStart--;
+    }
 
     return newSelectionStart;
   }
