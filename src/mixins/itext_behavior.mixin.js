@@ -280,6 +280,7 @@
 
       this.setSelectionStart(newSelectionStart);
       this.setSelectionEnd(newSelectionEnd);
+      this.initDelayedCursor(true);
     },
 
     /**
@@ -292,6 +293,7 @@
 
       this.setSelectionStart(newSelectionStart);
       this.setSelectionEnd(newSelectionEnd);
+      this.initDelayedCursor(true);
     },
 
     /**
