@@ -135,14 +135,14 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   /**
    * Initializes "mouseup" event handler
    */
-  initMouseupHandler: function() {
+  initMouseupHandler: function(options) {
     this.on('mouseup', function(options) {
       this.__isMousedown = false;
 
       if (this._isObjectMoved(options.e)) return;
 
       if (this.selected) {
-        this.enterEditing();
+        this.enterEditing(options);
         this.initDelayedCursor(true);
       }
     });
