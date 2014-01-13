@@ -109,6 +109,7 @@
      */
     initDelayedCursor: function(restart) {
       var _this = this;
+      var delay = (restart) ? 0 : this.cursorDelay;
       
       if (restart){
         this._abortCursorAnimation = true;
@@ -122,7 +123,7 @@
       this._cursorTimeout2 = setTimeout(function() {
         _this._abortCursorAnimation = false;
         _this._tick();
-      }, this.cursorDelay);
+      }, delay);
     },
 
     /**
