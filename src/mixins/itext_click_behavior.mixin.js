@@ -231,6 +231,11 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         return this._getNewSelectionStartFromOffset(
           mouseOffset, prevWidth, width, charIndex + i, jlen);
       }
+      
+       if(mouseOffset.y < height){
+                return this._getNewSelectionStartFromOffset(
+                    mouseOffset, prevWidth, width, charIndex + i, jlen, j);
+            }
     }
 
     // clicked somewhere after all chars, so set at the end
@@ -242,7 +247,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   /**
    * @private
    */
-  _getNewSelectionStartFromOffset: function(mouseOffset, prevWidth, width, index, jlen) {
+  _getNewSelectionStartFromOffset: function(mouseOffset, prevWidth, width, index, jlen, j) {
 
     var distanceBtwLastCharAndCursor = mouseOffset.x - prevWidth,
         distanceBtwNextCharAndCursor = width - mouseOffset.x,
@@ -257,6 +262,10 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (newSelectionStart > this.text.length) {
       newSelectionStart = this.text.length;
     }
+    
+    if(j == jlen){
+            newSelectionStart--;
+        }
 
     return newSelectionStart;
   }
