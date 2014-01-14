@@ -110,7 +110,7 @@
     initDelayedCursor: function(restart) {
       var _this = this;
       var delay = restart ? 0 : this.cursorDelay;
-      
+
       if (restart) {
         this._abortCursorAnimation = true;
         clearTimeout(this._cursorTimeout1);
@@ -302,13 +302,13 @@
      * @return {fabric.IText} thisArg
      * @chainable
      */
-    enterEditing: function(options) {
+    enterEditing: function() {
       if (this.isEditing || !this.editable) return;
 
       this.exitEditingOnOthers();
 
       this.isEditing = true;
-      
+
       this._updateTextarea();
       this._saveEditingProps();
       this._setEditingProps();

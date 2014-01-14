@@ -482,7 +482,7 @@
           lineIndex = cursorLocation.lineIndex,
           charIndex = cursorLocation.charIndex,
           charHeight = this.getCurrentCharFontSize(lineIndex, charIndex),
-          leftOffset = (lineIndex == 0 && charIndex == 0)
+          leftOffset = (lineIndex === 0 && charIndex === 0)
                     ? this._getCachedLineOffset(lineIndex, this.text.split(this._reNewline))
                     : boundaries.leftOffset;
 

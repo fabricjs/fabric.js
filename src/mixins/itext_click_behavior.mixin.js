@@ -94,7 +94,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       if (this.hiddenTextarea && this.canvas) {
         this.canvas.wrapperEl.appendChild(this.hiddenTextarea);
       }
-      
+
       if (this.selected) {
         this.setCursorByClick(options.e);
       }
@@ -139,11 +139,11 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   /**
    * Initializes "mouseup" event handler
    */
-  initMouseupHandler: function(options) {
+  initMouseupHandler: function() {
     this.on('mouseup', function(options) {
       this.__isMousedown = false;
       if (this._isObjectMoved(options.e)) return;
-      
+
       if (this.selected) {
         this.enterEditing();
         this.initDelayedCursor(true);
@@ -235,7 +235,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         return this._getNewSelectionStartFromOffset(
           mouseOffset, prevWidth, width, charIndex + i, jlen);
       }
-      
+
        if (mouseOffset.y < height) {
           return this._getNewSelectionStartFromOffset(
             mouseOffset, prevWidth, width, charIndex + i, jlen, j);
@@ -266,8 +266,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (newSelectionStart > this.text.length) {
       newSelectionStart = this.text.length;
     }
-    
-    if (j == jlen) {
+
+    if (j === jlen) {
       newSelectionStart--;
     }
 
