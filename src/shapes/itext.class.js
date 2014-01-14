@@ -538,8 +538,8 @@
           charIndex += textLines[i].length;
         }
         else if (i === endLine) {
-          for (var j = 0, len = end.charIndex; j < len; j++) {
-            boxWidth += this._getWidthOfChar(ctx, textLines[i][j], i, charIndex);
+          for (var j2 = 0, j2len = end.charIndex; j2 < j2len; j2++) {
+            boxWidth += this._getWidthOfChar(ctx, textLines[i][j2], i, charIndex);
             charIndex++;
           }
         }

@@ -18841,39 +18841,47 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 
       ctx.fillStyle = this.selectionColor;
 
-      var cursorLocation = this.get2DCursorLocation(),
-          lineIndex = cursorLocation.lineIndex,
-          charIndex = cursorLocation.charIndex,
+      var start = this.get2DCursorLocation(this.selectionStart),
+          end = this.get2DCursorLocation(this.selectionEnd),
+          startLine = start.lineIndex,
+          endLine = end.lineIndex,
           textLines = this.text.split(this._reNewline),
-          origLineIndex = lineIndex;
+          charIndex = start.charIndex - textLines[0].length;
 
-      for (var i = this.selectionStart; i < this.selectionEnd; i++) {
+      for (var i = startLine; i <= endLine; i++) {
+        var lineOffset = this._getCachedLineOffset(i, textLines) || 0,
+            lineHeight = this._getCachedLineHeight(i),
+            boxWidth = 0;
 
-        if (chars[i] === '\n') {
-          boundaries.leftOffset = 0;
-          boundaries.topOffset += this._getHeightOfLine(ctx, lineIndex);
-          lineIndex++;
-          charIndex = 0;
-        }
-        else if (i !== this.text.length) {
-
-          var charWidth = this._getWidthOfChar(ctx, chars[i], lineIndex, charIndex),
-              lineOffset = this._getLineLeftOffset(this._getWidthOfLine(ctx, lineIndex, textLines)) || 0;
-
-          if (lineIndex === origLineIndex) {
-            // only offset the line if we're rendering selection of 2nd, 3rd, etc. line
-            lineOffset = 0;
+        if (i === startLine) {
+          for (var j = 0, len = textLines[i].length; j < len; j++) {
+            if (j >= start.charIndex && (i !== endLine || j < end.charIndex)) {
+              boxWidth += this._getWidthOfChar(ctx, textLines[i][j], i, charIndex);
+            }
+            if (j < start.charIndex) {
+              lineOffset += this._getWidthOfChar(ctx, textLines[i][j], i, charIndex);
+            }
+            charIndex++;
           }
-
-          ctx.fillRect(
-            boundaries.left + boundaries.leftOffset + lineOffset,
-            boundaries.top + boundaries.topOffset,
-            charWidth,
-            this._getHeightOfLine(ctx, lineIndex));
-
-          boundaries.leftOffset += charWidth;
-          charIndex++;
         }
+        else if (i > startLine && i < endLine) {
+          boxWidth += this._getCachedLineWidth(i, textLines) || 5;
+          charIndex += textLines[i].length;
+        }
+        else if (i === endLine) {
+          for (var j2 = 0, j2len = end.charIndex; j2 < j2len; j2++) {
+            boxWidth += this._getWidthOfChar(ctx, textLines[i][j2], i, charIndex);
+            charIndex++;
+          }
+        }
+
+        ctx.fillRect(
+          boundaries.left + lineOffset,
+          boundaries.top + boundaries.topOffset,
+          boxWidth,
+          lineHeight);
+
+          boundaries.topOffset += lineHeight;
       }
       ctx.restore();
     },
