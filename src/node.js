@@ -136,9 +136,10 @@
    * Only available when running fabric on node.js
    * @param width Canvas width
    * @param height Canvas height
+   * @param {Object} options to pass to FabricCanvas.
    * @return {Object} wrapped canvas instance
    */
-  fabric.createCanvasForNode = function(width, height) {
+  fabric.createCanvasForNode = function(width, height, options) {
 
     var canvasEl = fabric.document.createElement('canvas'),
         nodeCanvas = new Canvas(width || 600, height || 600);
@@ -150,7 +151,7 @@
     canvasEl.height = nodeCanvas.height;
 
     var FabricCanvas = fabric.Canvas || fabric.StaticCanvas;
-    var fabricCanvas = new FabricCanvas(canvasEl);
+    var fabricCanvas = new FabricCanvas(canvasEl, options);
     fabricCanvas.contextContainer = nodeCanvas.getContext('2d');
     fabricCanvas.nodeCanvas = nodeCanvas;
     fabricCanvas.Font = Canvas.Font;
