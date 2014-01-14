@@ -212,7 +212,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       var widthOfLine = this._getWidthOfLine(this.ctx, i, textLines);
       var lineLeftOffset = this._getLineLeftOffset(widthOfLine);
 
-      width = lineLeftOffset;
+      width = lineLeftOffset * this.scaleX;
 
       if (this.flipX) {
         // when oject is horizontally flipped we reverse chars
