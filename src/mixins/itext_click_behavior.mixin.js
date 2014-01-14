@@ -32,12 +32,13 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     this.__lastLastClickTime = this.__lastClickTime;
     this.__lastClickTime = this.__newClickTime;
     this.__lastPointer = newPointer;
+    this.__lastIsEditing = this.isEditing;
   },
 
   isDoubleClick: function(newPointer) {
     return this.__newClickTime - this.__lastClickTime < 500 &&
         this.__lastPointer.x === newPointer.x &&
-        this.__lastPointer.y === newPointer.y;
+        this.__lastPointer.y === newPointer.y && this.__lastIsEditing;
   },
 
   isTripleClick: function(newPointer) {
@@ -93,10 +94,14 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       if (this.hiddenTextarea && this.canvas) {
         this.canvas.wrapperEl.appendChild(this.hiddenTextarea);
       }
+      
+      if (this.selected) {
+        this.setCursorByClick(options.e);
+      }
 
       if (this.isEditing) {
-        this.setCursorByClick(options.e);
         this.__selectionStartOnMouseDown = this.selectionStart;
+        this.initDelayedCursor(true);
       }
     });
   },
@@ -134,14 +139,14 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   /**
    * Initializes "mouseup" event handler
    */
-  initMouseupHandler: function() {
+  initMouseupHandler: function(options) {
     this.on('mouseup', function(options) {
       this.__isMousedown = false;
-
       if (this._isObjectMoved(options.e)) return;
-
+      
       if (this.selected) {
         this.enterEditing();
+        this.initDelayedCursor(true);
       }
     });
   },
@@ -207,7 +212,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       var widthOfLine = this._getWidthOfLine(this.ctx, i, textLines);
       var lineLeftOffset = this._getLineLeftOffset(widthOfLine);
 
-      width = lineLeftOffset;
+      width = lineLeftOffset * this.scaleX;
 
       if (this.flipX) {
         // when oject is horizontally flipped we reverse chars
@@ -230,6 +235,11 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         return this._getNewSelectionStartFromOffset(
           mouseOffset, prevWidth, width, charIndex + i, jlen);
       }
+      
+       if (mouseOffset.y < height) {
+          return this._getNewSelectionStartFromOffset(
+            mouseOffset, prevWidth, width, charIndex + i, jlen, j);
+       }
     }
 
     // clicked somewhere after all chars, so set at the end
@@ -241,7 +251,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   /**
    * @private
    */
-  _getNewSelectionStartFromOffset: function(mouseOffset, prevWidth, width, index, jlen) {
+  _getNewSelectionStartFromOffset: function(mouseOffset, prevWidth, width, index, jlen, j) {
 
     var distanceBtwLastCharAndCursor = mouseOffset.x - prevWidth,
         distanceBtwNextCharAndCursor = width - mouseOffset.x,
@@ -255,6 +265,10 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
     if (newSelectionStart > this.text.length) {
       newSelectionStart = this.text.length;
+    }
+    
+    if (j == jlen) {
+      newSelectionStart--;
     }
 
     return newSelectionStart;

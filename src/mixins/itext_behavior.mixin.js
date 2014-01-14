@@ -107,15 +107,23 @@
     /**
      * Initializes delayed cursor
      */
-    initDelayedCursor: function() {
+    initDelayedCursor: function(restart) {
       var _this = this;
+      var delay = restart ? 0 : this.cursorDelay;
+      
+      if (restart) {
+        this._abortCursorAnimation = true;
+        clearTimeout(this._cursorTimeout1);
+        this._currentCursorOpacity = 1;
+        this.canvas && this.canvas.renderAll();
+      }
       if (this._cursorTimeout2) {
         clearTimeout(this._cursorTimeout2);
       }
       this._cursorTimeout2 = setTimeout(function() {
         _this._abortCursorAnimation = false;
         _this._tick();
-      }, this.cursorDelay);
+      }, delay);
     },
 
     /**
@@ -249,7 +257,7 @@
      * @param {Number} direction: 1 or -1
      */
     searchWordBoundary: function(selectionStart, direction) {
-      var index = selectionStart;
+      var index = this._reSpace.test(this.text.charAt(selectionStart)) ? selectionStart-1 : selectionStart;
       var _char = this.text.charAt(index);
       var reNonWord = /[ \n\.,;!\?\-]/;
 
@@ -273,6 +281,7 @@
 
       this.setSelectionStart(newSelectionStart);
       this.setSelectionEnd(newSelectionEnd);
+      this.initDelayedCursor(true);
     },
 
     /**
@@ -285,6 +294,7 @@
 
       this.setSelectionStart(newSelectionStart);
       this.setSelectionEnd(newSelectionEnd);
+      this.initDelayedCursor(true);
     },
 
     /**
@@ -292,13 +302,13 @@
      * @return {fabric.IText} thisArg
      * @chainable
      */
-    enterEditing: function() {
+    enterEditing: function(options) {
       if (this.isEditing || !this.editable) return;
 
       this.exitEditingOnOthers();
 
       this.isEditing = true;
-
+      
       this._updateTextarea();
       this._saveEditingProps();
       this._setEditingProps();
