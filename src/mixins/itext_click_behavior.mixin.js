@@ -95,7 +95,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         this.canvas.wrapperEl.appendChild(this.hiddenTextarea);
       }
       
-      if (this.selected){
+      if (this.selected) {
         this.setCursorByClick(options.e);
       }
 
@@ -144,7 +144,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this.__isMousedown = false;
       if (this._isObjectMoved(options.e)) return;
       
-      if(this.selected){
+      if (this.selected) {
         this.enterEditing();
         this.initDelayedCursor(true);
       }
@@ -236,7 +236,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
           mouseOffset, prevWidth, width, charIndex + i, jlen);
       }
       
-       if(mouseOffset.y < height){
+       if (mouseOffset.y < height) {
           return this._getNewSelectionStartFromOffset(
             mouseOffset, prevWidth, width, charIndex + i, jlen, j);
        }
@@ -267,7 +267,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       newSelectionStart = this.text.length;
     }
     
-    if(j == jlen){
+    if (j == jlen) {
       newSelectionStart--;
     }
 
