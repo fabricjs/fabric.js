@@ -1,8 +1,8 @@
 language: node_js
 node_js:
-  - 0.6
-  - 0.8
-  - 0.10
+  - "0.6"
+  - "0.8"
+  - "0.10"
 script: 'npm run-script build && npm test'
 before_install:
  - sudo apt-get update -qq
