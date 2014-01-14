@@ -3,7 +3,9 @@
 - [BACK_INCOMPAT] `fabric.Collection#remove` doesn't return removed object -> returns `this` (chainable)
 
 - Add "mouse:over" and "mouse:out" canvas events (and corresponding "mouseover", "mouseout" object events)
+- Add support for passing options to `fabric.createCanvasForNode`
 
+- Various iText fixes and performance improvements
 - Fix `overlayImage` / `overlayColor` during selection mode
 - Fix double callback in loadFromJSON when there's no objects
 - Fix paths parsing when number has negative exponent
