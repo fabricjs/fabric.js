@@ -109,9 +109,9 @@
      */
     initDelayedCursor: function(restart) {
       var _this = this;
-      var delay = (restart) ? 0 : this.cursorDelay;
+      var delay = restart ? 0 : this.cursorDelay;
       
-      if (restart){
+      if (restart) {
         this._abortCursorAnimation = true;
         clearTimeout(this._cursorTimeout1);
         this._currentCursorOpacity = 1;
@@ -257,7 +257,7 @@
      * @param {Number} direction: 1 or -1
      */
     searchWordBoundary: function(selectionStart, direction) {
-      var index = (this._reSpace.test(this.text.charAt(selectionStart))) ? selectionStart-1 : selectionStart;
+      var index = this._reSpace.test(this.text.charAt(selectionStart)) ? selectionStart-1 : selectionStart;
       var _char = this.text.charAt(index);
       var reNonWord = /[ \n\.,;!\?\-]/;
 
