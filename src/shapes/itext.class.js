@@ -510,46 +510,46 @@
 
       ctx.fillStyle = this.selectionColor;
 
-       var start = this.get2DCursorLocation(this.selectionStart),
-                end = this.get2DCursorLocation(this.selectionEnd),
-                textLines = this.text.split(this._reNewline),
-                charIndex = start.charIndex - textLines[0].length;
+      var start = this.get2DCursorLocation(this.selectionStart),
+          end = this.get2DCursorLocation(this.selectionEnd),
+          textLines = this.text.split(this._reNewline),
+          charIndex = start.charIndex - textLines[0].length;
 
-            for(var i = start.lineIndex; i <= end.lineIndex; i++){
-              var lineOffset = this._getCachedLineOffset(i, textLines) || 0,
-                  lineHeight = this._getCachedLineHeight(i),
-                  boxWidth = 0;
+      for(var i = start.lineIndex, lineCount = end.lineIndex; i <= lineCount; i++){
+        var lineOffset = this._getCachedLineOffset(i, textLines) || 0,
+            lineHeight = this._getCachedLineHeight(i),
+            boxWidth = 0;
 
-                  if (i == start.lineIndex) {
-                    for (var j = 0, len = textLines[i].length; j < len; j++) {
-                      if (j >= start.charIndex && (i !== end.lineIndex || j < end.charIndex)) {
-                        boxWidth += this._getWidthOfChar(ctx, textLines[i][j], i, charIndex);
-                      }
-                      if (j < start.charIndex) {
-                        lineOffset += this._getWidthOfChar(ctx, textLines[i][j], i, charIndex);
-                      }
-                      charIndex++;
-                    }
-                  }
-                  else if (i > start.lineIndex && i < end.lineIndex) {
-                    boxWidth += this._getCachedLineWidth(i, textLines) || 5;
-                    charIndex += textLines[i].length;
-                  }
-                  else if (i == end.lineIndex) {
-                    for (var j = 0, len = end.charIndex; j < len; j++) {
-                      boxWidth += this._getWidthOfChar(ctx, textLines[i][j], i, charIndex);
-                      charIndex++;
-                    }
-                  }
-
-                ctx.fillRect(
-                    boundaries.left + lineOffset,
-                    boundaries.top + boundaries.topOffset,
-                    boxWidth,
-                    lineHeight);
-
-                    boundaries.topOffset += lineHeight;
+        if (i == start.lineIndex) {
+          for (var j = 0, len = textLines[i].length; j < len; j++) {
+            if (j >= start.charIndex && (i !== end.lineIndex || j < end.charIndex)) {
+              boxWidth += this._getWidthOfChar(ctx, textLines[i][j], i, charIndex);
             }
+            if (j < start.charIndex) {
+              lineOffset += this._getWidthOfChar(ctx, textLines[i][j], i, charIndex);
+            }
+            charIndex++;
+          }
+        }
+        else if (i > start.lineIndex && i < end.lineIndex) {
+          boxWidth += this._getCachedLineWidth(i, textLines) || 5;
+          charIndex += textLines[i].length;
+        }
+        else if (i == end.lineIndex) {
+          for (var j = 0, len = end.charIndex; j < len; j++) {
+            boxWidth += this._getWidthOfChar(ctx, textLines[i][j], i, charIndex);
+            charIndex++;
+          }
+        }
+
+        ctx.fillRect(
+          boundaries.left + lineOffset,
+          boundaries.top + boundaries.topOffset,
+          boxWidth,
+          lineHeight);
+
+          boundaries.topOffset += lineHeight;
+      }
       ctx.restore();
     },
 
