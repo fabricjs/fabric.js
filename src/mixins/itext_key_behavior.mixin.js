@@ -572,6 +572,11 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     }
 
     this.setCoords();
+    
+    if (this.cursorColor === 'auto') {
+      this.createColorCanvas();
+    }
+      
     this.fire('changed');
     this.canvas && this.canvas.fire('text:changed', { target: this });
   },
