@@ -312,6 +312,10 @@
       this._updateTextarea();
       this._saveEditingProps();
       this._setEditingProps();
+      
+      if (this.cursorColor === 'auto') {
+        this.createColorCanvas();
+      }
 
       this._tick();
       this.canvas && this.canvas.renderAll();
@@ -480,6 +484,11 @@
       }
 
       this.setCoords();
+      
+      if (this.cursorColor === 'auto') {
+        this.createColorCanvas();
+      }
+      
       this.fire('changed');
       this.canvas && this.canvas.fire('text:changed', { target: this });
     },
