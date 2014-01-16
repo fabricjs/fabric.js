@@ -136,10 +136,8 @@
       clearTimeout(this._cursorTimeout2);
 
       this._currentCursorOpacity = 0;
+      this.canvas && this.canvas.renderAll();
       
-      if (!noredraw) {
-        this.canvas && this.canvas.renderAll();
-      }
 
       var _this = this;
       setTimeout(function() {
@@ -403,7 +401,7 @@
      * @return {fabric.IText} thisArg
      * @chainable
      */
-    exitEditing: function(noredraw) {
+    exitEditing: function() {
 
       this.selected = false;
       this.isEditing = false;
@@ -412,7 +410,7 @@
       this.selectionEnd = this.selectionStart;
       this.hiddenTextarea && this.hiddenTextarea.blur();
 
-      this.abortCursorAnimation(noredraw);
+      this.abortCursorAnimation();
       this._restoreEditingProps();
       this._currentCursorOpacity = 0;
 
