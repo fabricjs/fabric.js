@@ -14400,7 +14400,13 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       var isInPathGroup = this.group && this.group.type === 'path-group';
       if (isInPathGroup && !this.transformMatrix) {
-        ctx.translate(-this.group.width/2 + this.left, -this.group.height / 2 + this.top);
+        // !!! maciej-filip-sz: not sure why this broke after fixing coords,
+        //                      not sure why this works,
+        //                      based on experimental observations
+        ctx.translate(
+          this.left - (0.5 * (this.group.width - this.width)),
+          this.top - (0.5 * (this.group.height - this.height))
+        );
       }
 
       if (!this.strokeDashArray || this.strokeDashArray && supportsLineDash) {

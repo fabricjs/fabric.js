@@ -7128,7 +7128,7 @@ fabric.util.object.extend(fabric.Object.prototype, {
             ctx.beginPath();
             var isInPathGroup = this.group && this.group.type === "path-group";
             if (isInPathGroup && !this.transformMatrix) {
-                ctx.translate(-this.group.width / 2 + this.left, -this.group.height / 2 + this.top);
+                ctx.translate(this.left - .5 * (this.group.width - this.width), this.top - .5 * (this.group.height - this.height));
             }
             if (!this.strokeDashArray || this.strokeDashArray && supportsLineDash) {
                 var xMult = this.x1 <= this.x2 ? -1 : 1;
