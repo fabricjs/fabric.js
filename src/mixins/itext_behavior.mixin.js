@@ -330,7 +330,7 @@
 
     exitEditingOnOthers: function() {
       fabric.IText.instances.forEach(function(obj) {
-        obj.editable = false;
+        obj.selected = false;
         if (obj.isEditing) {
           obj.exitEditing();
         }
