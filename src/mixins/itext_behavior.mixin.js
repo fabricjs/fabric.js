@@ -129,14 +129,17 @@
     /**
      * Aborts cursor animation and clears all timeouts
      */
-    abortCursorAnimation: function() {
+    abortCursorAnimation: function(noredraw) {
       this._abortCursorAnimation = true;
 
       clearTimeout(this._cursorTimeout1);
       clearTimeout(this._cursorTimeout2);
 
       this._currentCursorOpacity = 0;
-      this.canvas && this.canvas.renderAll();
+      
+      if (!noredraw) {
+        this.canvas && this.canvas.renderAll();
+      }
 
       var _this = this;
       setTimeout(function() {
@@ -331,7 +334,7 @@
     exitEditingOnOthers: function() {
       fabric.IText.instances.forEach(function(obj) {
         if (obj === this) return;
-        obj.exitEditing();
+        obj.exitEditing(true);
       }, this);
     },
 
@@ -400,7 +403,7 @@
      * @return {fabric.IText} thisArg
      * @chainable
      */
-    exitEditing: function() {
+    exitEditing: function(noredraw) {
 
       this.selected = false;
       this.isEditing = false;
@@ -409,7 +412,7 @@
       this.selectionEnd = this.selectionStart;
       this.hiddenTextarea && this.hiddenTextarea.blur();
 
-      this.abortCursorAnimation();
+      this.abortCursorAnimation(noredraw);
       this._restoreEditingProps();
       this._currentCursorOpacity = 0;
 
