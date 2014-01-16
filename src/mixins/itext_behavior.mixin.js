@@ -129,7 +129,7 @@
     /**
      * Aborts cursor animation and clears all timeouts
      */
-    abortCursorAnimation: function(noredraw) {
+    abortCursorAnimation: function() {
       this._abortCursorAnimation = true;
 
       clearTimeout(this._cursorTimeout1);
@@ -333,8 +333,8 @@
 
     exitEditingOnOthers: function() {
       fabric.IText.instances.forEach(function(obj) {
-        if (obj === this) return;
-        obj.exitEditing(true);
+        if (obj === this || !obj.isEditing) return;
+        obj.exitEditing();
       }, this);
     },
 
