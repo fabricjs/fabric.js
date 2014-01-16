@@ -408,7 +408,8 @@
       this.selectable = true;
 
       this.selectionEnd = this.selectionStart;
-      this.hiddenTextarea && this.canvas.wrapperEl.removeChild(this.hiddenTextarea);
+      this.hiddenTextarea && this.canvas && this.canvas.wrapperEl.removeChild(this.hiddenTextarea);
+      this.hiddenTextarea = null;
 
       this.abortCursorAnimation();
       this._restoreEditingProps();
