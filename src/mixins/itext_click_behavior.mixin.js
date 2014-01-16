@@ -144,10 +144,11 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this.__isMousedown = false;
       if (this._isObjectMoved(options.e)) return;
       
-      if (this.selected) {
+      if (this.editable) {
         this.enterEditing();
         this.initDelayedCursor(true);
       }
+      this.editable = true;
     });
   },
 
