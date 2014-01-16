@@ -137,6 +137,7 @@
 
       this._currentCursorOpacity = 0;
       this.canvas && this.canvas.renderAll();
+      
 
       var _this = this;
       setTimeout(function() {
@@ -150,6 +151,8 @@
     selectAll: function() {
       this.selectionStart = 0;
       this.selectionEnd = this.text.length;
+      this.fire('selected');
+      this.canvas && this.canvas.fire('text:selected', { target: this });
     },
 
     /**
@@ -312,6 +315,10 @@
       this._updateTextarea();
       this._saveEditingProps();
       this._setEditingProps();
+      
+      if (this.cursorColor === 'auto') {
+        this.createColorCanvas();
+      }
 
       this._tick();
       this.canvas && this.canvas.renderAll();
@@ -324,7 +331,8 @@
 
     exitEditingOnOthers: function() {
       fabric.IText.instances.forEach(function(obj) {
-        if (obj === this) return;
+        obj.editable = false;
+        if (obj === this || !obj.isEditing) return;
         obj.exitEditing();
       }, this);
     },
@@ -480,6 +488,11 @@
       }
 
       this.setCoords();
+      
+      if (this.cursorColor === 'auto') {
+        this.createColorCanvas();
+      }
+      
       this.fire('changed');
       this.canvas && this.canvas.fire('text:changed', { target: this });
     },
