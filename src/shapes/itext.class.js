@@ -367,7 +367,9 @@
         fill : style && style.fill || this.fill,
         textBackgroundColor : style && style.textBackgroundColor || this.textBackgroundColor,
         textDecoration : style && style.textDecoration || this.textDecoration,
-        fontFamily : style && style.fontFamily || this.fontFamily
+        fontFamily : style && style.fontFamily || this.fontFamily,
+        strokeWidth : style && style.strokeWidth || this.strokeWidth,
+        stroke : style && style.stroke || this.stroke
       };
     },
 
@@ -672,7 +674,9 @@
               prevStyle.fontSize !== thisStyle.fontSize ||
               prevStyle.textBackgroundColor !== thisStyle.textBackgroundColor ||
               prevStyle.textDecoration !== thisStyle.textDecoration ||
-              prevStyle.fontFamily !== thisStyle.fontFamily
+              prevStyle.fontFamily !== thisStyle.fontFamily,
+              prevStyle.strokeWidth !== thisStyle.strokeWidth,
+              prevStyle.stroke !== thisStyle.stroke
       );
     },
     
