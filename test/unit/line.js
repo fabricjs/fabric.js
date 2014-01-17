@@ -373,6 +373,19 @@
         top: 76,
       }
     },
+    { description: '0 left and 0 top options override points',
+      givenLineArgs: {
+        points: [12, 34, 56, 78],
+        options: {
+          left: 0,
+          top: 0,
+        }
+      },
+      expectedCoords: {
+        left: 0,
+        top: 0,
+      }
+    },
     { description: 'equal x2 and y2 for left-top origin when x1 and y1 are largest and line not offset',
       givenLineArgs: {
         points: [100, 200, 30, 40],

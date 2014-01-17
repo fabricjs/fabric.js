@@ -60,8 +60,8 @@
       this.set('width', Math.abs(this.x2 - this.x1) || 1);
       this.set('height', Math.abs(this.y2 - this.y1) || 1);
 
-      this.set('left', options.left || this._getLeftToOriginX());
-      this.set('top', options.top || this._getTopToOriginY());
+      this.set('left', ('left' in options) ? options.left : this._getLeftToOriginX());
+      this.set('top', ('top' in options) ? options.top : this._getTopToOriginY());
     },
 
     /**
