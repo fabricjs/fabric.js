@@ -607,8 +607,7 @@
           end = this.get2DCursorLocation(this.selectionEnd),
           startLine = start.lineIndex,
           endLine = end.lineIndex,
-          textLines = this.text.split(this._reNewline),
-          charIndex = start.charIndex - textLines[0].length;
+          textLines = this.text.split(this._reNewline);
 
       for (var i = startLine; i <= endLine; i++) {
         var lineOffset = this._getCachedLineOffset(i, textLines) || 0,
@@ -618,22 +617,19 @@
         if (i === startLine) {
           for (var j = 0, len = textLines[i].length; j < len; j++) {
             if (j >= start.charIndex && (i !== endLine || j < end.charIndex)) {
-              boxWidth += this._getWidthOfChar(ctx, textLines[i][j], i, charIndex);
+              boxWidth += this._getWidthOfChar(ctx, textLines[i][j], i, j);
             }
             if (j < start.charIndex) {
-              lineOffset += this._getWidthOfChar(ctx, textLines[i][j], i, charIndex);
+              lineOffset += this._getWidthOfChar(ctx, textLines[i][j], i, j);
             }
-            charIndex++;
           }
         }
         else if (i > startLine && i < endLine) {
           boxWidth += this._getCachedLineWidth(i, textLines) || 5;
-          charIndex += textLines[i].length;
         }
         else if (i === endLine) {
           for (var j = 0, len = end.charIndex; j < len; j++) {
-            boxWidth += this._getWidthOfChar(ctx, textLines[i][j], i, charIndex);
-            charIndex++;
+            boxWidth += this._getWidthOfChar(ctx, textLines[i][j], i, j);
           }
         }
 
