@@ -352,6 +352,24 @@
         charIndex: linesBeforeCursor[linesBeforeCursor.length - 1].length
       };
     },
+    
+    /**
+     * Returns complete style of char at the current cursor
+     * @param {Number} lineIndex Line index
+     * @param {Number} charIndex Char index
+     * @return {Object} Character style
+     */
+    getCurrentCharStyle: function(lineIndex, charIndex) {
+      var style = this.styles[lineIndex] && this.styles[lineIndex][charIndex === 0 ? 0 : (charIndex - 1)];
+
+      return {
+        fontSize : style && style.fontSize || this.fontSize,
+        fill : style && style.fill || this.fill,
+        textBackgroundColor : style && style.textBackgroundColor || this.textBackgroundColor,
+        textDecoration : style && style.textDecoration || this.textDecoration,
+        fontFamily : style && style.fontFamily || this.fontFamily
+      };
+    },
 
     /**
      * Returns fontSize of char at the current cursor
@@ -643,7 +661,21 @@
       }
       ctx.restore();
     },
-
+    
+    /**
+     * @private
+     * @param {String} prevStyle - Previous Style
+     * @param {String} thisStyle - Current style
+     */
+    _hasStyleChanged: function(prevStyle, thisStyle) {
+      return (prevStyle.fill !== thisStyle.fill ||
+              prevStyle.fontSize !== thisStyle.fontSize ||
+              prevStyle.textBackgroundColor !== thisStyle.textBackgroundColor ||
+              prevStyle.textDecoration !== thisStyle.textDecoration ||
+              prevStyle.fontFamily !== thisStyle.fontFamily
+      );
+    },
+    
     /**
      * @private
      * @param {String} method
@@ -669,14 +701,26 @@
           lineWidth = this._getWidthOfLine(ctx, lineIndex, textLines),
           lineHeight = this._getHeightOfLine(ctx, lineIndex, textLines),
           lineLeftOffset = this._getLineLeftOffset(lineWidth),
-          chars = line.split('');
+          chars = line.split(''),
+          prevStyle = null,
+          renderChars = '';
 
       left += lineLeftOffset || 0;
 
       ctx.save();
-      for (var i = 0, len = chars.length; i < len; i++) {
-        this._renderChar(method, ctx, lineIndex, i, chars[i], left, top, lineHeight);
+     
+      for (var i = 0, len = chars.length; i <= len; i++) {
+        prevStyle = prevStyle || this.getCurrentCharStyle(lineIndex, i);
+        var thisStyle = this.getCurrentCharStyle(lineIndex, i+1);
+
+        if (this._hasStyleChanged(prevStyle, thisStyle) || i == len) {
+          this._renderChar(method, ctx, lineIndex, i-1, renderChars, left, top, lineHeight);
+          renderChars = '';
+          prevStyle = thisStyle;
+        }
+        renderChars += chars[i];
       }
+      
       ctx.restore();
     },
 
