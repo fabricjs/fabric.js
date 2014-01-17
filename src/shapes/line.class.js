@@ -71,7 +71,7 @@
      */
     _set: function(key, value) {
       this[key] = value;
-      if (key in coordProps) {
+      if (typeof coordProps[key] !== 'undefined') {
         this._setWidthHeight();
       }
       return this;
