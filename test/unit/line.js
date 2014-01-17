@@ -578,4 +578,192 @@
       equal(line._getTopToOriginY(), c_.expectedTop);
     });
   });
+
+  var getCenterToCenterXCases = [
+    { description: 'for center origin, is the distance to the left edge of group',
+      given: {
+        left: 0,
+        originX: 'center',
+        group: { width: 10 }
+      },
+      expectedCenter: (-0.5 * 10),
+    },
+    { description: 'includes negative offset for center origin',
+      given: {
+        left: 0-11,
+        originX: 'center',
+        group: { width: 20 }
+      },
+      expectedCenter: (-0.5 * 20) - 11,
+    },
+    { description: 'includes positive offset for center origin',
+      given: {
+        left: 0+7,
+        originX: 'center',
+        group: { width: 30 }
+      },
+      expectedCenter: (-0.5 * 30) + 7,
+    },
+    { description: 'for left origin, is the distance to the left edge of group, offset by half-line-width to the right',
+      givenWidth: 17,
+      given: {
+        left: 0,
+        originX: 'left',
+        group: { width: 12 }
+      },
+      expectedCenter: (-0.5 * 12) + (0.5 * 17),
+    },
+    { description: 'includes negative offset for left origin',
+      givenWidth: 17,
+      given: {
+        left: 0-13,
+        originX: 'left',
+        group: { width: 22 }
+      },
+      expectedCenter: (-0.5 * 22) + (0.5 * 17) - 13,
+    },
+    { description: 'includes positive offset for left origin',
+      givenWidth: 17,
+      given: {
+        left: 0+19,
+        originX: 'left',
+        group: { width: 32 }
+      },
+      expectedCenter: (-0.5 * 32) + (0.5 * 17) + 19,
+    },
+    { description: 'for right origin, is the distance to the left edge of group, offset by half-line-width to the left',
+      givenWidth: 17,
+      given: {
+        left: 0,
+        originX: 'right',
+        group: { width: 13 }
+      },
+      expectedCenter: (-0.5 * 13) - (0.5 * 17),
+    },
+    { description: 'includes negative offset for right origin',
+      givenWidth: 17,
+      given: {
+        left: 0-15,
+        originX: 'right',
+        group: { width: 23 }
+      },
+      expectedCenter: (-0.5 * 23) - (0.5 * 17) - 15,
+    },
+    { description: 'includes positive offset for right origin',
+      givenWidth: 17,
+      given: {
+        left: 0+21,
+        originX: 'right',
+        group: { width: 33 }
+      },
+      expectedCenter: (-0.5 * 33) - (0.5 * 17) + 21,
+    },
+  ];
+
+  getCenterToCenterXCases.forEach(function (c_) {
+    test('Line._getCenterToCenterX ' + c_.description, function () {
+      var line = new fabric.Line(
+        [0, 0, c_.givenWidth, 0]
+      );
+      for (var prop in c_.given) {
+        line.set(prop, c_.given[prop])
+      }
+
+      equal(line._getCenterToCenterX(), c_.expectedCenter);
+    });
+  });
+
+  var getCenterToCenterYCases = [
+    { description: 'for center origin, is the distance to the top edge of group',
+      given: {
+        top: 0,
+        originY: 'center',
+        group: { height: 10 }
+      },
+      expectedCenter: (-0.5 * 10),
+    },
+    { description: 'includes negative offset for center origin',
+      given: {
+        top: 0-11,
+        originY: 'center',
+        group: { height: 20 }
+      },
+      expectedCenter: (-0.5 * 20) - 11,
+    },
+    { description: 'includes positive offset for center origin',
+      given: {
+        top: 0+7,
+        originY: 'center',
+        group: { height: 30 }
+      },
+      expectedCenter: (-0.5 * 30) + 7,
+    },
+    { description: 'for top origin, is the distance to the top edge of group, offset by half-line-height to the bottom',
+      givenHeight: 17,
+      given: {
+        top: 0,
+        originY: 'top',
+        group: { height: 12 }
+      },
+      expectedCenter: (-0.5 * 12) + (0.5 * 17),
+    },
+    { description: 'includes negative offset for top origin',
+      givenHeight: 17,
+      given: {
+        top: 0-13,
+        originY: 'top',
+        group: { height: 22 }
+      },
+      expectedCenter: (-0.5 * 22) + (0.5 * 17) - 13,
+    },
+    { description: 'includes positive offset for top origin',
+      givenHeight: 17,
+      given: {
+        top: 0+19,
+        originY: 'top',
+        group: { height: 32 }
+      },
+      expectedCenter: (-0.5 * 32) + (0.5 * 17) + 19,
+    },
+    { description: 'for bottom origin, is the distance to the top edge of group, offset by half-line-height to the top',
+      givenHeight: 17,
+      given: {
+        top: 0,
+        originY: 'bottom',
+        group: { height: 13 }
+      },
+      expectedCenter: (-0.5 * 13) - (0.5 * 17),
+    },
+    { description: 'includes negative offset for bottom origin',
+      givenHeight: 17,
+      given: {
+        top: 0-15,
+        originY: 'bottom',
+        group: { height: 23 }
+      },
+      expectedCenter: (-0.5 * 23) - (0.5 * 17) - 15,
+    },
+    { description: 'includes positive offset for bottom origin',
+      givenHeight: 17,
+      given: {
+        top: 0+21,
+        originY: 'bottom',
+        group: { height: 33 }
+      },
+      expectedCenter: (-0.5 * 33) - (0.5 * 17) + 21,
+    },
+  ];
+
+  getCenterToCenterYCases.forEach(function (c_) {
+    test('Line._getCenterToCenterY ' + c_.description, function () {
+      var line = new fabric.Line(
+        [0, 0, 0, c_.givenHeight]
+      );
+      for (var prop in c_.given) {
+        line.set(prop, c_.given[prop])
+      }
+
+      equal(line._getCenterToCenterY(), c_.expectedCenter);
+    });
+  });
 })();

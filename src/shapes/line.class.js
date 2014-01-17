@@ -102,6 +102,40 @@
 
     /**
      * @private
+     * @return {Number} centerToCenterX Distance from center of path group to horizontal center of Line.
+     */
+    _getCenterToCenterX: makeCenterToCenterGetter(
+      { // property names
+        origin: 'originX',
+        coordinate: 'left',
+        dimension: 'width',
+      },
+      { // possible values of origin
+        nearest: 'left',
+        center: 'center',
+        farthest: 'right',
+      }
+    ),
+
+    /**
+     * @private
+     * @return {Number} centerToOriginY Distance from center of path group to vertical center of Line.
+     */
+    _getCenterToCenterY: makeCenterToCenterGetter(
+      { // property names
+        origin: 'originY',
+        coordinate: 'top',
+        dimension: 'height',
+      },
+      { // possible values of origin
+        nearest: 'top',
+        center: 'center',
+        farthest: 'bottom',
+      }
+    ),
+
+    /**
+     * @private
      * @param {String} key
      * @param {Any} value
      */
@@ -122,12 +156,9 @@
 
       var isInPathGroup = this.group && this.group.type === 'path-group';
       if (isInPathGroup && !this.transformMatrix) {
-        // !!! maciej-filip-sz: not sure why this broke after fixing coords,
-        //                      not sure why this works,
-        //                      based on experimental observations
         ctx.translate(
-          this.left - (0.5 * (this.group.width - this.width)),
-          this.top - (0.5 * (this.group.height - this.height))
+          this._getCenterToCenterX(),
+          this._getCenterToCenterY()
         );
       }
 
@@ -285,6 +316,29 @@
       }
     };
 
+  }
+
+  /**
+   * Produces a function that calculates distance from path group center to center of Line dimension.
+   */
+  function makeCenterToCenterGetter(propertyNames, originValues) {
+    var origin = propertyNames.origin,
+        coordinate = propertyNames.coordinate,
+        dimension = propertyNames.dimension,
+        nearest = originValues.nearest,
+        center = originValues.center,
+        farthest = originValues.farthest;
+
+    return function() {
+      switch (this[origin]) {
+        case nearest:
+          return this[coordinate] - (0.5 * this.group[dimension]) + (0.5 * this[dimension]);
+        case center:
+          return this[coordinate] - (0.5 * this.group[dimension]);
+        case farthest:
+          return this[coordinate] - (0.5 * this.group[dimension]) - (0.5 * this[dimension]);
+      }
+    };
   }
 
 })(typeof exports !== 'undefined' ? exports : this);
