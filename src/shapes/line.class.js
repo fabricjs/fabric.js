@@ -57,11 +57,16 @@
     _setWidthHeight: function(options) {
       options || (options = { });
 
-      this.set('width', Math.abs(this.x2 - this.x1) || 1);
-      this.set('height', Math.abs(this.y2 - this.y1) || 1);
+      this.width = Math.abs(this.x2 - this.x1) || 1;
+      this.height = Math.abs(this.y2 - this.y1) || 1;
 
-      this.set('left', 'left' in options ? options.left : (Math.min(this.x1, this.x2) + this.width / 2));
-      this.set('top', 'top' in options ? options.top : (Math.min(this.y1, this.y2) + this.height / 2));
+      this.left = 'left' in options
+        ? options.left
+        : (Math.min(this.x1, this.x2) + this.width / 2);
+
+      this.top = 'top' in options
+        ? options.top
+        : (Math.min(this.y1, this.y2) + this.height / 2);
     },
 
     /**
