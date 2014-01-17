@@ -117,7 +117,7 @@
       // (by copying fillStyle to strokeStyle, since line is stroked, not filled)
       var origStrokeStyle = ctx.strokeStyle;
       ctx.strokeStyle = this.stroke || ctx.fillStyle;
-      this._renderStroke(ctx);
+      this.stroke && this._renderStroke(ctx);
       ctx.strokeStyle = origStrokeStyle;
     },
 

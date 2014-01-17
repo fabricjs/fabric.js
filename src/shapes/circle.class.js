@@ -99,7 +99,7 @@
       ctx.closePath();
 
       this._renderFill(ctx);
-      this._renderStroke(ctx);
+      this.stroke && this._renderStroke(ctx);
     },
 
     /**
