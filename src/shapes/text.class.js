@@ -585,7 +585,7 @@
      * @param {Array} textLines Array of all text lines
      */
     _renderTextStroke: function(ctx, textLines) {
-      if (!this.stroke && !this._skipFillStrokeCheck) return;
+      if (!this.stroke && this._skipFillStrokeCheck) return;
 
       var lineHeights = 0;
 
