@@ -25,9 +25,9 @@
           _this.selected = true;
         }, 100);
 
-        if (this.canvas && !fabric.Canvas._hasITextHandlers) {
+        if (this.canvas && !this.canvas._hasITextHandlers) {
           this._initCanvasHandlers();
-          fabric.Canvas._hasITextHandlers = true;
+          this.canvas._hasITextHandlers = true;
         }
       });
     },
