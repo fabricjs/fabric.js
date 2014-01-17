@@ -674,8 +674,8 @@
               prevStyle.fontSize !== thisStyle.fontSize ||
               prevStyle.textBackgroundColor !== thisStyle.textBackgroundColor ||
               prevStyle.textDecoration !== thisStyle.textDecoration ||
-              prevStyle.fontFamily !== thisStyle.fontFamily,
-              prevStyle.strokeWidth !== thisStyle.strokeWidth,
+              prevStyle.fontFamily !== thisStyle.fontFamily ||
+              prevStyle.strokeWidth !== thisStyle.strokeWidth ||
               prevStyle.stroke !== thisStyle.stroke
       );
     },
