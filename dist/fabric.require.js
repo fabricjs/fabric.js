@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures,cufon,json minifier=uglifyjs` */
 /*! Fabric.js Copyright 2008-2013, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.4.2" };
+var fabric = fabric || { version: "1.4.3" };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -12585,6 +12585,12 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @default
      */
     type: 'line',
+
+    x1: 0,
+    y1: 0,
+
+    x2: 0,
+    y2: 0,
 
     /**
      * Constructor
