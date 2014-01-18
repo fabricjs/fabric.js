@@ -353,7 +353,6 @@
 
       this.hiddenTextarea.value = this.text;
       this.hiddenTextarea.selectionStart = this.selectionStart;
-      this.hiddenTextarea.focus();
     },
 
     /**

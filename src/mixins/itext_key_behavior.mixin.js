@@ -6,6 +6,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   initKeyHandlers: function() {
     fabric.util.addListener(fabric.document, 'keydown', this.onKeyDown.bind(this));
     fabric.util.addListener(fabric.document, 'keypress', this.onKeyPress.bind(this));
+    fabric.util.addListener(fabric.document, 'click', this.onClick.bind(this));
   },
 
   /**
@@ -41,6 +42,11 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     67: 'copy',
     86: 'paste',
     88: 'cut'
+  },
+
+  onClick: function() {
+    // No need to trigger click event here, focus is enough to have the keyboard appear on Android
+    this.hiddenTextarea.focus();
   },
 
   /**
