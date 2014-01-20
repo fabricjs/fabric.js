@@ -324,8 +324,10 @@
 
     exitEditingOnOthers: function() {
       fabric.IText.instances.forEach(function(obj) {
-        if (obj === this) return;
-        obj.exitEditing();
+        obj.selected = false;
+        if (obj.isEditing) {
+          obj.exitEditing();
+        }
       }, this);
     },
 
