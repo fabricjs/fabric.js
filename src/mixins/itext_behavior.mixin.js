@@ -150,7 +150,6 @@
     selectAll: function() {
       this.selectionStart = 0;
       this.selectionEnd = this.text.length;
-      this.fire('selected');
       this.canvas && this.canvas.fire('text:selected', { target: this });
     },
 
