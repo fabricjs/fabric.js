@@ -290,16 +290,6 @@
     },
 
     /**
-     * @private
-     * @param {CanvasRenderingContext2D} ctx Context to render on
-     */
-    _render: function(ctx) {
-      this.callSuper('_render', ctx);
-      this.ctx = ctx;
-      this.isEditing && this.renderCursorOrSelection();
-    },
-
-    /**
      * Renders cursor or selection (depending on what exists)
      */
     renderCursorOrSelection: function() {
