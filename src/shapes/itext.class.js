@@ -219,7 +219,6 @@
      */
     setSelectionStart: function(index) {
       if (this.selectionStart !== index) {
-        this.fire('selected');
         this.canvas && this.canvas.fire('text:selected', { target: this });
       }
       this.selectionStart = index;
@@ -232,7 +231,6 @@
      */
     setSelectionEnd: function(index) {
       if (this.selectionEnd !== index) {
-        this.fire('selected');
         this.canvas && this.canvas.fire('text:selected', { target: this });
       }
       this.selectionEnd = index;
