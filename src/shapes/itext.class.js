@@ -466,9 +466,9 @@
     createColorCanvas: function() {
 
       if (!this.cursorColorCanvas) {
-        this.cursorColorCanvas = document.createElement('canvas');
+        this.cursorColorCanvas = fabric.util.createCanvasElement();
         this.cursorColorCtx = this.cursorColorCanvas.getContext('2d');
-        this.cursorCanvas = document.createElement('canvas');
+        this.cursorCanvas = fabric.util.createCanvasElement();
         this.cursorCtx = this.cursorCanvas.getContext('2d');
       }
 
