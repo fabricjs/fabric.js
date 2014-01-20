@@ -533,13 +533,10 @@
      * @param {Object} boundaries
      */
     renderCursor: function(boundaries) {
-      if(!this.contextSelection) return;
-      var ctx = this.contextSelection;
+      var ctx = this.ctx;
 
       ctx.save();
       
-      this.transform(ctx);
-
       var cursorLocation = this.get2DCursorLocation(),
           lineIndex = cursorLocation.lineIndex,
           charIndex = cursorLocation.charIndex,
@@ -572,13 +569,11 @@
      * @param {Object} boundaries Object with left/top/leftOffset/topOffset
      */
     renderSelection: function(chars, boundaries) {
-      if(!this.contextSelection) return;
-      var ctx = this.contextSelection;
+      var ctx = this.ctx;
 
       ctx.save();
 
       ctx.fillStyle = this.selectionColor;
-      this.transform(ctx);
 
       var start = this.get2DCursorLocation(this.selectionStart),
           end = this.get2DCursorLocation(this.selectionEnd),
