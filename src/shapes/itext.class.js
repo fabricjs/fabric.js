@@ -288,6 +288,16 @@
 
       fabric.util.object.extend(this.styles[loc.lineIndex][loc.charIndex], styles);
     },
+    
+    /**
+    * @private
+    * @param {CanvasRenderingContext2D} ctx Context to render on
+    */
+    _render: function(ctx) {
+      this.callSuper('_render', ctx);
+      this.ctx = ctx;
+      this.isEditing && this.renderCursorOrSelection();
+    },
 
     /**
      * Renders cursor or selection (depending on what exists)
@@ -464,12 +474,9 @@
      * @param {Object} boundaries
      */
     renderCursor: function(boundaries) {
-      if(!this.contextSelection) return;
-      var ctx = this.contextSelection;
+      var ctx = this.ctx;
 
       ctx.save();
-      
-      this.transform(ctx);
 
       var cursorLocation = this.get2DCursorLocation(),
           lineIndex = cursorLocation.lineIndex,
@@ -497,13 +504,11 @@
      * @param {Object} boundaries Object with left/top/leftOffset/topOffset
      */
     renderSelection: function(chars, boundaries) {
-      if(!this.contextSelection) return;
-      var ctx = this.contextSelection;
+      var ctx = this.ctx;
 
       ctx.save();
 
       ctx.fillStyle = this.selectionColor;
-      this.transform(ctx);
 
       var start = this.get2DCursorLocation(this.selectionStart),
           end = this.get2DCursorLocation(this.selectionEnd),
