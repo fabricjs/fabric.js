@@ -898,7 +898,7 @@
       if (this._charWidthsCache[cacheProp] && this.caching) {
         return this._charWidthsCache[cacheProp];
       }
-      else {
+      else if(ctx){
         ctx.save();
         var width = this._applyCharStylesGetWidth(ctx, _char, lineIndex, charIndex);
         ctx.restore();
