@@ -115,7 +115,7 @@
         this._abortCursorAnimation = true;
         clearTimeout(this._cursorTimeout1);
         this._currentCursorOpacity = 1;
-        this.canvas && this.canvas.renderAll();
+        this.canvas && this.renderCursorOrSelection();
       }
       if (this._cursorTimeout2) {
         clearTimeout(this._cursorTimeout2);
@@ -136,7 +136,7 @@
       clearTimeout(this._cursorTimeout2);
 
       this._currentCursorOpacity = 0;
-      this.canvas && this.canvas.renderAll();
+      this.canvas && this.renderCursorOrSelection();
 
       var _this = this;
       setTimeout(function() {
@@ -312,6 +312,7 @@
       this._updateTextarea();
       this._saveEditingProps();
       this._setEditingProps();
+      this._createSelectionCanvas();
 
       this._tick();
       this.canvas && this.canvas.renderAll();
@@ -327,6 +328,18 @@
         if (obj === this) return;
         obj.exitEditing();
       }, this);
+    },
+    
+    /**
+     * @private
+     */
+    _createSelectionCanvas: function () {
+      this.selectionCanvas = this.canvas._createCanvasElement();
+      fabric.util.addClass(this.selectionCanvas, 'cursor-canvas');
+      this.canvas.wrapperEl.insertBefore(this.selectionCanvas, this.canvas.upperCanvasEl);
+      this.canvas._copyCanvasStyle(this.canvas.lowerCanvasEl, this.selectionCanvas);
+      this.canvas._applyCanvasStyle(this.selectionCanvas);
+      this.contextSelection = this.selectionCanvas.getContext('2d');
     },
 
     /**
@@ -405,6 +418,10 @@
       this.abortCursorAnimation();
       this._restoreEditingProps();
       this._currentCursorOpacity = 0;
+      
+      this.selectionCanvas && this.canvas && this.selectionCanvas.parentNode.removeChild(this.selectionCanvas);
+      this.selectionCanvas = null;
+      this.contextSelection = null;
 
       this.fire('editing:exited');
       this.canvas && this.canvas.fire('text:editing:exited', { target: this });
@@ -479,6 +496,7 @@
       }
 
       this.setCoords();
+      this.initDelayedCursor(true);
       this.fire('changed');
       this.canvas && this.canvas.fire('text:changed', { target: this });
     },
