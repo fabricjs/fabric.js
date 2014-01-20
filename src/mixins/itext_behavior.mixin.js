@@ -11,7 +11,6 @@
       this.initKeyHandlers();
       this.initCursorSelectionHandlers();
       this.initDoubleClickSimulation();
-      this.initHiddenTextarea();
     },
 
     /**
@@ -308,7 +307,8 @@
       this.exitEditingOnOthers();
 
       this.isEditing = true;
-
+      
+      this.initHiddenTextarea();
       this._updateTextarea();
       this._saveEditingProps();
       this._setEditingProps();
@@ -400,7 +400,8 @@
       this.selectable = true;
 
       this.selectionEnd = this.selectionStart;
-      this.hiddenTextarea && this.hiddenTextarea.blur();
+      this.hiddenTextarea && this.canvas && this.hiddenTextarea.parentNode.removeChild(this.hiddenTextarea);
+      this.hiddenTextarea = null;
 
       this.abortCursorAnimation();
       this._restoreEditingProps();
