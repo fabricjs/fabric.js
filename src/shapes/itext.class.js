@@ -879,16 +879,31 @@
         styleDeclaration.fontStyle = this.fontStyle;
       }
     },
+    
+    _getStyleDeclaration: function(lineIndex, charIndex) {
+            return (this.styles[lineIndex] && this.styles[lineIndex][charIndex])
+              ? clone(this.styles[lineIndex][charIndex]) 
+              : { };
+    },
 
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _getWidthOfChar: function(ctx, _char, lineIndex, charIndex) {
-      ctx.save();
-      var width = this._applyCharStylesGetWidth(ctx, _char, lineIndex, charIndex);
-      ctx.restore();
-      return width;
+      var styleDeclaration = this._getStyleDeclaration(lineIndex, charIndex);
+      this._applyFontStyles(styleDeclaration);
+      var cacheProp = this._getCacheProp(_char, styleDeclaration);
+
+      if (this._charWidthsCache[cacheProp] && this.caching) {
+        return this._charWidthsCache[cacheProp];
+      }
+      else {
+        ctx.save();
+        var width = this._applyCharStylesGetWidth(ctx, _char, lineIndex, charIndex);
+        ctx.restore();
+        return width;
+      }
     },
 
     /**
