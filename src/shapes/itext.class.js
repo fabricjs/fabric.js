@@ -105,11 +105,21 @@
 
     /**
      * Color of default cursor (when not overwritten by character style)
+     * (a value of 'auto' will initialize automatic cursor coloring based on the pixel colors behind the cursor)
      * @type String
      * @default
      */
     cursorColor: '#333',
 
+    /**
+     * Optional external canvas/image to be used as automatic colored cursors source data
+     * (only active when cursorColor is set to 'auto')
+     * (this is useful if the user is overlaying a fabric canvas on top of an image/canvas and would like the cursor color to reflect this)
+     * @type Canvas element or Image object
+     * @default
+     */
+    cursorColorDataEl: null,
+    
     /**
      * Delay between cursor blink (in ms)
      * @type Number
