@@ -458,6 +458,75 @@
       return this.__lineOffsets[lineIndex] ||
         (this.__lineOffsets[lineIndex] = this._getLineLeftOffset(widthOfLine));
     },
+    
+    /**
+     * Creates/Updates In memory canvas for automatically colored cursor
+     */
+    
+    createColorCanvas: function() {
+
+      if (!this.cursorColorCanvas) {
+        this.cursorColorCanvas = document.createElement('canvas');
+        this.cursorColorCtx = this.cursorColorCanvas.getContext('2d');
+        this.cursorCanvas = document.createElement('canvas');
+        this.cursorCtx = this.cursorCanvas.getContext('2d');
+      }
+
+      var colorEl = this.cursorColorDataEl ? this.cursorColorDataEl : this.canvas.lowerCanvasEl,
+          colCanv = this.cursorColorCanvas,
+          colCtx = this.cursorColorCtx,
+          angle = -this.angle,
+          w = this.canvas.getWidth(),
+          h = this.canvas.getHeight(),
+          c = this.getCenterPoint();
+
+      colCanv.width = w;
+      colCanv.height = h;
+
+      colCtx.translate(c.x, c.y);
+      colCtx.rotate(angle * (Math.PI / 180));
+      colCtx.translate(-c.x, -c.y);
+      colCtx.drawImage(colorEl, 0, 0, colorEl.width, colorEl.height, 0, 0, w, h);
+
+      if (this.cursorColorDataEl) {
+        colCtx.drawImage(this.canvas.lowerCanvasEl, 0, 0);
+      }
+    },
+    
+    /**
+     * Renders Automatically colored cursor
+     * @param {Object} boundaries
+     * @param {int} offset
+     * @param {int} charHeight
+     */
+    renderAutoCursor: function(boundaries, offset, charHeight) {
+      var ctx = this.ctx,
+          c = this.getCenterPoint(),
+          cw = this.cursorWidth,
+          ch = Math.round(charHeight * this.scaleY),
+          x = c.x - (this.getWidth()/2) + (boundaries.leftOffset * this.scaleX),
+          y = c.y - (this.getHeight()/2) + (boundaries.topOffset * this.scaleY),
+          imgd =  this.cursorColorCtx.getImageData(x, y, cw, ch),
+          dd = imgd.data;
+
+      this.cursorCanvas.width = cw;
+      this.cursorCanvas.height = ch;
+
+      for (var i = 0, len = dd.length; i < len; i += 4) {
+        dd[i] = 255 - dd[i];
+        dd[i + 1] = 255 - dd[i + 1];
+        dd[i + 2] = 255 - dd[i + 2];
+        dd[i + 3] = 255;
+      }
+
+      this.cursorCtx.putImageData(imgd, 0, 0);
+
+      ctx.drawImage(this.cursorCanvas,
+        boundaries.left + offset,
+        boundaries.top + boundaries.topOffset,
+        cw / this.scaleX,
+        charHeight);
+    },
 
     /**
      * Renders cursor
@@ -479,14 +548,20 @@
                     ? this._getCachedLineOffset(lineIndex, this.text.split(this._reNewline))
                     : boundaries.leftOffset;
 
-      ctx.fillStyle = this.getCurrentCharColor(lineIndex, charIndex);
       ctx.globalAlpha = this.__isMousedown ? 1 : this._currentCursorOpacity;
+      
+      if (this.cursorColor == 'auto') {
+         this.renderAutoCursor(boundaries, leftOffset,  charHeight);
+       }
+       else {
+         ctx.fillStyle = this.getCurrentCharColor(lineIndex, charIndex);
 
-      ctx.fillRect(
-        boundaries.left + leftOffset,
-        boundaries.top + boundaries.topOffset,
-        this.cursorWidth / this.scaleX,
-        charHeight);
+         ctx.fillRect(
+           boundaries.left + leftOffset,
+           boundaries.top + boundaries.topOffset,
+           this.cursorWidth / this.scaleX,
+           charHeight);
+       }
 
       ctx.restore();
     },
