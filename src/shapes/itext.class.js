@@ -290,16 +290,6 @@
     },
 
     /**
-     * @private
-     * @param {CanvasRenderingContext2D} ctx Context to render on
-     */
-    _render: function(ctx) {
-      this.callSuper('_render', ctx);
-      this.ctx = ctx;
-      this.isEditing && this.renderCursorOrSelection();
-    },
-
-    /**
      * Renders cursor or selection (depending on what exists)
      */
     renderCursorOrSelection: function() {
@@ -474,9 +464,12 @@
      * @param {Object} boundaries
      */
     renderCursor: function(boundaries) {
-      var ctx = this.ctx;
+      if(!this.contextSelection) return;
+      var ctx = this.contextSelection;
 
       ctx.save();
+      
+      this.transform(ctx);
 
       var cursorLocation = this.get2DCursorLocation(),
           lineIndex = cursorLocation.lineIndex,
@@ -504,11 +497,14 @@
      * @param {Object} boundaries Object with left/top/leftOffset/topOffset
      */
     renderSelection: function(chars, boundaries) {
-      var ctx = this.ctx;
+      if(!this.contextSelection) return;
+      var ctx = this.contextSelection;
 
       ctx.save();
 
       ctx.fillStyle = this.selectionColor;
+      
+      this.transform(ctx);
 
       var start = this.get2DCursorLocation(this.selectionStart),
           end = this.get2DCursorLocation(this.selectionEnd),
