@@ -288,6 +288,16 @@
 
       fabric.util.object.extend(this.styles[loc.lineIndex][loc.charIndex], styles);
     },
+    
+    /**
+    * @private
+    * @param {CanvasRenderingContext2D} ctx Context to render on
+    */
+    _render: function(ctx) {
+      this.callSuper('_render', ctx);
+      this.ctx = ctx;
+      this.isEditing && this.renderCursorOrSelection();
+    },
 
     /**
      * Renders cursor or selection (depending on what exists)
@@ -528,16 +538,6 @@
         charHeight);
     },
     
-    /**
-    * @private
-    * @param {CanvasRenderingContext2D} ctx Context to render on
-    */
-    _render: function(ctx) {
-      this.callSuper('_render', ctx);
-      this.ctx = ctx;
-      this.isEditing && this.renderCursorOrSelection();
-    },
-
     /**
      * Renders cursor
      * @param {Object} boundaries
