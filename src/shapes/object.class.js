@@ -884,6 +884,24 @@
       }
 
       this[key] = value;
+      
+      if (this.canvas && this.canvas.turbo) {
+        if (key !== 'left' &&
+            key !== 'top' &&
+            key !== 'scaleX' &&
+            key !== 'scaleY' &&
+            key !== 'width' &&
+            key !== 'height' &&
+            key !== 'angle' ||
+            !this.active){
+
+            if (this.canvas._isCacheable(this)) {
+              this.width = this.getWidth();
+              this.height = this.getHeight();
+            }
+            this.updateCache();
+         }
+      }
 
       return this;
     },
