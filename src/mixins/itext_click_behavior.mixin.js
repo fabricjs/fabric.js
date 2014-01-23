@@ -148,6 +148,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         this.enterEditing();
         this.initDelayedCursor(true);
       }
+      this.selected = true;
     });
   },
 
