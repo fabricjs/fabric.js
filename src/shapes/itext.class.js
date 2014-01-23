@@ -219,7 +219,7 @@
      */
     setSelectionStart: function(index) {
       if (this.selectionStart !== index) {
-        this.canvas && this.canvas.fire('text:selected', { target: this });
+        this.canvas && this.canvas.fire('text:selection:changed', { target: this });
       }
       this.selectionStart = index;
       this.hiddenTextarea && (this.hiddenTextarea.selectionStart = index);
@@ -231,7 +231,7 @@
      */
     setSelectionEnd: function(index) {
       if (this.selectionEnd !== index) {
-        this.canvas && this.canvas.fire('text:selected', { target: this });
+        this.canvas && this.canvas.fire('text:selection:changed', { target: this });
       }
       this.selectionEnd = index;
       this.hiddenTextarea && (this.hiddenTextarea.selectionEnd = index);
