@@ -84,10 +84,6 @@
       if (this.filters.length !== 0) {
         this.applyFilters(callback);
       }
-      
-      if (this.canvas && this.canvas.turbo) {
-        this.updateCache();
-      }
 
       return this;
     },
