@@ -485,6 +485,8 @@
     __onMouseMove: function (e) {
 
       var target, pointer;
+      
+      this.scrollOffset = fabric.util.getScrollLeftTop(e.target, this.upperCanvasEl);
 
       if (this.isDrawingMode) {
         this._onMouseMoveInDrawingMode(e);
