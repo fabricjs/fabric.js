@@ -149,6 +149,7 @@
     selectAll: function() {
       this.selectionStart = 0;
       this.selectionEnd = this.text.length;
+      this.canvas && this.canvas.fire('text:selection:changed', { target: this });
     },
 
     /**

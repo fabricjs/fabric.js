@@ -218,6 +218,9 @@
      * @param {Number} index Index to set selection start to
      */
     setSelectionStart: function(index) {
+      if (this.selectionStart !== index) {
+        this.canvas && this.canvas.fire('text:selection:changed', { target: this });
+      }
       this.selectionStart = index;
       this.hiddenTextarea && (this.hiddenTextarea.selectionStart = index);
     },
@@ -227,6 +230,9 @@
      * @param {Number} index Index to set selection end to
      */
     setSelectionEnd: function(index) {
+      if (this.selectionEnd !== index) {
+        this.canvas && this.canvas.fire('text:selection:changed', { target: this });
+      }
       this.selectionEnd = index;
       this.hiddenTextarea && (this.hiddenTextarea.selectionEnd = index);
     },
