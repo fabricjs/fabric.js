@@ -1834,7 +1834,7 @@ fabric.util.string = {
     wrapper.appendChild(element);
     return wrapper;
   }
-  
+
   function getScrollLeftTop(element, upperCanvasEl) {
 
     var firstFixedAncestor,
@@ -1934,7 +1934,9 @@ fabric.util.string = {
     }
     else {
       var value = element.style[attr];
-      if (!value && element.currentStyle) value = element.currentStyle[attr];
+      if (!value && element.currentStyle) {
+        value = element.currentStyle[attr];
+      }
       return value;
     }
   }
@@ -18618,6 +18620,9 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @param {Number} index Index to set selection start to
      */
     setSelectionStart: function(index) {
+      if (this.selectionStart !== index) {
+        this.canvas && this.canvas.fire('text:selection:changed', { target: this });
+      }
       this.selectionStart = index;
       this.hiddenTextarea && (this.hiddenTextarea.selectionStart = index);
     },
@@ -18627,6 +18632,9 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @param {Number} index Index to set selection end to
      */
     setSelectionEnd: function(index) {
+      if (this.selectionEnd !== index) {
+        this.canvas && this.canvas.fire('text:selection:changed', { target: this });
+      }
       this.selectionEnd = index;
       this.hiddenTextarea && (this.hiddenTextarea.selectionEnd = index);
     },
@@ -18914,8 +18922,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
           end = this.get2DCursorLocation(this.selectionEnd),
           startLine = start.lineIndex,
           endLine = end.lineIndex,
-          textLines = this.text.split(this._reNewline),
-          charIndex = start.charIndex - textLines[0].length;
+          textLines = this.text.split(this._reNewline);
 
       for (var i = startLine; i <= endLine; i++) {
         var lineOffset = this._getCachedLineOffset(i, textLines) || 0,
@@ -18925,22 +18932,19 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
         if (i === startLine) {
           for (var j = 0, len = textLines[i].length; j < len; j++) {
             if (j >= start.charIndex && (i !== endLine || j < end.charIndex)) {
-              boxWidth += this._getWidthOfChar(ctx, textLines[i][j], i, charIndex);
+              boxWidth += this._getWidthOfChar(ctx, textLines[i][j], i, j);
             }
             if (j < start.charIndex) {
-              lineOffset += this._getWidthOfChar(ctx, textLines[i][j], i, charIndex);
+              lineOffset += this._getWidthOfChar(ctx, textLines[i][j], i, j);
             }
-            charIndex++;
           }
         }
         else if (i > startLine && i < endLine) {
           boxWidth += this._getCachedLineWidth(i, textLines) || 5;
-          charIndex += textLines[i].length;
         }
         else if (i === endLine) {
           for (var j2 = 0, j2len = end.charIndex; j2 < j2len; j2++) {
-            boxWidth += this._getWidthOfChar(ctx, textLines[i][j2], i, charIndex);
-            charIndex++;
+            boxWidth += this._getWidthOfChar(ctx, textLines[i][j2], i, j2);
           }
         }
 
@@ -19477,7 +19481,6 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       this.initKeyHandlers();
       this.initCursorSelectionHandlers();
       this.initDoubleClickSimulation();
-      this.initHiddenTextarea();
     },
 
     /**
@@ -19616,6 +19619,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     selectAll: function() {
       this.selectionStart = 0;
       this.selectionEnd = this.text.length;
+      this.canvas && this.canvas.fire('text:selection:changed', { target: this });
     },
 
     /**
@@ -19774,7 +19778,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       this.exitEditingOnOthers();
 
       this.isEditing = true;
-
+      
+      this.initHiddenTextarea();
       this._updateTextarea();
       this._saveEditingProps();
       this._setEditingProps();
@@ -19790,8 +19795,10 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 
     exitEditingOnOthers: function() {
       fabric.IText.instances.forEach(function(obj) {
-        if (obj === this) return;
-        obj.exitEditing();
+        obj.selected = false;
+        if (obj.isEditing) {
+          obj.exitEditing();
+        }
       }, this);
     },
 
@@ -19866,7 +19873,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       this.selectable = true;
 
       this.selectionEnd = this.selectionStart;
-      this.hiddenTextarea && this.hiddenTextarea.blur();
+      this.hiddenTextarea && this.canvas && this.hiddenTextarea.parentNode.removeChild(this.hiddenTextarea);
+      this.hiddenTextarea = null;
 
       this.abortCursorAnimation();
       this._restoreEditingProps();
@@ -20290,6 +20298,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         this.enterEditing();
         this.initDelayedCursor(true);
       }
+      this.selected = true;
     });
   },
 
