@@ -10458,6 +10458,15 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     },
 
     /**
+     * @private
+     */
+    _setObject: function(obj) {
+      for (var prop in obj) {
+        this._set(prop, obj[prop]);
+      }
+    },
+
+    /**
      * Sets property to a given value. When changing position/dimension -related properties (left, top, scale, angle, etc.) `set` does not update position of object's borders/controls. If you need to update those, call `setCoords()`.
      * @param {String|Object} key Property name or object (if object, iterate over the object properties)
      * @param {Object|Function} value Property value (if function, the value is passed into it and its return value is used as a new one)
@@ -10466,9 +10475,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      */
     set: function(key, value) {
       if (typeof key === 'object') {
-        for (var prop in key) {
-          this._set(prop, key[prop]);
-        }
+        this._setObject(key);
       }
       else {
         if (typeof value === 'function' && key !== 'clipTo') {
@@ -12586,10 +12593,32 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     type: 'line',
 
+    /**
+     * x value or first line edge
+     * @type Number
+     * @default
+     */
     x1: 0,
+
+    /**
+     * y value or first line edge
+     * @type Number
+     * @default
+     */
     y1: 0,
 
+    /**
+     * x value or second line edge
+     * @type Number
+     * @default
+     */
     x2: 0,
+
+    /**
+     * y value or second line edge
+     * @type Number
+     * @default
+     */
     y2: 0,
 
     /**
@@ -12820,6 +12849,13 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @default
      */
     type: 'circle',
+
+    /**
+     * Radius of this circle
+     * @type Number
+     * @default
+     */
+    radius: 0,
 
     /**
      * Constructor
@@ -13624,6 +13660,13 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     type: 'polyline',
 
     /**
+     * Points array
+     * @type Array
+     * @default
+     */
+    points: null,
+
+    /**
      * Constructor
      * @param {Array} points Array of points (where each point is an object with x and y)
      * @param {Object} [options] Options object
@@ -13810,6 +13853,13 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @default
      */
     type: 'polygon',
+
+    /**
+     * Points array
+     * @type Array
+     * @default
+     */
+    points: null,
 
     /**
      * Constructor
@@ -14045,6 +14095,13 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @default
      */
     type: 'path',
+
+    /**
+     * Array of path points
+     * @type Array
+     * @default
+     */
+    path: null,
 
     /**
      * Constructor
