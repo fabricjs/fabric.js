@@ -27,6 +27,13 @@
     type: 'circle',
 
     /**
+     * Radius of this circle
+     * @type Number
+     * @default
+     */
+    radius: 0,
+
+    /**
      * Constructor
      * @param {Object} [options] Options object
      * @return {fabric.Circle} thisArg

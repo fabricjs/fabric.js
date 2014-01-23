@@ -63,6 +63,13 @@
     type: 'path',
 
     /**
+     * Array of path points
+     * @type Array
+     * @default
+     */
+    path: null,
+
+    /**
      * Constructor
      * @param {Array|String} path Path data (sequence of coordinates and corresponding "command" tokens)
      * @param {Object} [options] Options object

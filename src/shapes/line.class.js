@@ -27,10 +27,32 @@
      */
     type: 'line',
 
+    /**
+     * x value or first line edge
+     * @type Number
+     * @default
+     */
     x1: 0,
+
+    /**
+     * y value or first line edge
+     * @type Number
+     * @default
+     */
     y1: 0,
 
+    /**
+     * x value or second line edge
+     * @type Number
+     * @default
+     */
     x2: 0,
+
+    /**
+     * y value or second line edge
+     * @type Number
+     * @default
+     */
     y2: 0,
 
     /**

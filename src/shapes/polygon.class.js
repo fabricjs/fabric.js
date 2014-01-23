@@ -29,6 +29,13 @@
     type: 'polygon',
 
     /**
+     * Points array
+     * @type Array
+     * @default
+     */
+    points: null,
+
+    /**
      * Constructor
      * @param {Array} points Array of points
      * @param {Object} [options] Options object

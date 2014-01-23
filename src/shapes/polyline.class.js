@@ -26,6 +26,13 @@
     type: 'polyline',
 
     /**
+     * Points array
+     * @type Array
+     * @default
+     */
+    points: null,
+
+    /**
      * Constructor
      * @param {Array} points Array of points (where each point is an object with x and y)
      * @param {Object} [options] Options object

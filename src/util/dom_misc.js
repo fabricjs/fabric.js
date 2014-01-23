@@ -91,7 +91,7 @@
     wrapper.appendChild(element);
     return wrapper;
   }
-  
+
   function getScrollLeftTop(element, upperCanvasEl) {
 
     var firstFixedAncestor,
@@ -191,7 +191,9 @@
     }
     else {
       var value = element.style[attr];
-      if (!value && element.currentStyle) value = element.currentStyle[attr];
+      if (!value && element.currentStyle) {
+        value = element.currentStyle[attr];
+      }
       return value;
     }
   }
