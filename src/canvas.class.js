@@ -760,6 +760,26 @@
         this._hoveredTarget = null;
       }
     },
+    
+    /**
+    * @private
+    */
+    _checkTarget: function(e, obj, pointer) {
+      if (obj &&
+          obj.visible &&
+          obj.evented &&
+          this.containsPoint(e, obj)){
+        if ((this.perPixelTargetFind || obj.perPixelTargetFind) && !obj.isEditing) {
+          var isTransparent = this.isTargetTransparent(obj, pointer.x, pointer.y);
+          if (!isTransparent) {
+            return true;
+          }
+        }
+        else {
+          return true;
+        }
+      }
+    },
 
     /**
      * @private
@@ -767,52 +787,20 @@
     _searchPossibleTargets: function(e) {
 
       // Cache all targets where their bounding box contains point.
-      var possibleTargets = [],
-          target,
+      var target,
           pointer = this.getPointer(e);
           
-          
-      // Check active object first and short-circuit if possible    
-      if (this._activeObject &&
-          this._activeObject.visible &&
-          this._activeObject.evented &&
-          this.containsPoint(e, this._activeObject)){
-        if ((this.perPixelTargetFind || this._activeObject.perPixelTargetFind) && !this._activeObject.isEditing) {
-          var isTransparent = this.isTargetTransparent(this._activeObject, pointer.x, pointer.y);
-            if (!isTransparent) {
-              return this.relatedTarget;
-            }
-        }
-        else {
-          return this._activeObject;
-        }
+      if (this._activeObject && this._checkTarget(e, this._activeObject, pointer)) {
+        this.relatedTarget = this._activeObject;
+        return this._activeObject;
       }
 
-      for (var i = this._objects.length; i--; ) {
-        if (this._objects[i] &&
-            this._objects[i].visible &&
-            this._objects[i].evented &&
-            this.containsPoint(e, this._objects[i])) {
-
-          if (this.perPixelTargetFind || this._objects[i].perPixelTargetFind) {
-            possibleTargets[possibleTargets.length] = this._objects[i];
-          }
-          else {
-            target = this._objects[i];
-            this.relatedTarget = target;
-            break;
-          }
-        }
-      }
-
-      for (var j = 0, len = possibleTargets.length; j < len; j++) {
-        pointer = this.getPointer(e);
-        var isTransparent = this.isTargetTransparent(possibleTargets[j], pointer.x, pointer.y);
-        if (!isTransparent) {
-          target = possibleTargets[j];
-          this.relatedTarget = target;
-          break;
-        }
+      for (var i = 0, len = this._objects.length; i < len; i++) {
+         if (this._checkTarget(e, this._objects[i], pointer)){
+           this.relatedTarget = this._objects[i];
+           target = this._objects[i];
+           break;
+         }
       }
 
       return target;
