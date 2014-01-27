@@ -294,11 +294,11 @@
 
       fabric.util.object.extend(this.styles[loc.lineIndex][loc.charIndex], styles);
     },
-
+    
     /**
-     * @private
-     * @param {CanvasRenderingContext2D} ctx Context to render on
-     */
+    * @private
+    * @param {CanvasRenderingContext2D} ctx Context to render on
+    */
     _render: function(ctx) {
       this.callSuper('_render', ctx);
       this.ctx = ctx;
