@@ -38,7 +38,8 @@
           continue;
         }
 
-        if (this.get('lockUniScaling') && (i === 'mt' || i === 'mr' || i === 'mb' || i === 'ml')) {
+        if (this.get('lockUniScaling') &&
+           (i === 'mt' || i === 'mr' || i === 'mb' || i === 'ml')) {
           continue;
         }
 

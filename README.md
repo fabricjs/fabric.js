@@ -110,6 +110,8 @@ Fabric.js started as a foundation for design editor on [printio.ru](http://print
 - [Kitchensink demo](http://fabricjs.com/kitchensink/)
 - [Benchmarks](http://fabricjs.com/benchmarks/)
 
+[Who's using Fabric?](http://trends.builtwith.com/javascript/FabricJS)
+
 ### Documentation
 
 Documentation is always available at [http://fabricjs.com/docs/](http://fabricjs.com/docs/).
@@ -202,7 +204,7 @@ Get help in Fabric's IRC channel — irc://irc.freenode.net/#fabric.js
 
 ### MIT License
 
-Copyright (c) 2008-2013 Printio (Juriy Zaytsev, Maxim Chernyak)
+Copyright (c) 2008-2014 Printio (Juriy Zaytsev, Maxim Chernyak)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

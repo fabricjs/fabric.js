@@ -1835,6 +1835,13 @@ fabric.util.string = {
     return wrapper;
   }
 
+  /**
+   * Returns element scroll offsets
+   * @memberOf fabric.util
+   * @param {HTMLElement} element Element to operate on
+   * @param {HTMLElement} upperCanvasEl Upper canvas element
+   * @return {Object} Object with left/top values
+   */
   function getScrollLeftTop(element, upperCanvasEl) {
 
     var firstFixedAncestor,
@@ -1890,10 +1897,10 @@ fabric.util.string = {
         offset = {left: 0, top: 0},
         scrollLeftTop,
         offsetAttributes = {
-           'borderLeftWidth': 'left',
-           'borderTopWidth':  'top',
-           'paddingLeft':     'left',
-           'paddingTop':      'top'
+          'borderLeftWidth': 'left',
+          'borderTopWidth':  'top',
+          'paddingLeft':     'left',
+          'paddingTop':      'top'
         };
 
     if (!doc){
@@ -11898,7 +11905,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           continue;
         }
 
-        if (this.get('lockUniScaling') && (i === 'mt' || i === 'mr' || i === 'mb' || i === 'ml')) {
+        if (this.get('lockUniScaling') &&
+           (i === 'mt' || i === 'mr' || i === 'mb' || i === 'ml')) {
           continue;
         }
 
