@@ -1046,9 +1046,30 @@
       if (activeGroup) {
         this.discardActiveGroup();
       }
+      
+      if (this.clipTo && this.clipTo.type) {
+    	  markup.push('<clipPath ',
+    	  	'id="canvas-clipMask">');
+    	  markup.push(this.clipTo.toSVG(reviver));
+    	  markup.push('</clipPath> ');
+      }
+      
+      markup.push(
+      	'<g ',
+      	'id="canvas" ',
+      	'style="display:inline" ');
+      
+      if (this.clipTo && this.clipTo.type) {
+    	  markup.push('clip-path="url(#canvas-clipMask)" ');
+      }
+      markup.push('>' );
+      
       for (var i = 0, objects = this.getObjects(), len = objects.length; i < len; i++) {
         markup.push(objects[i].toSVG(reviver));
       }
+      
+      markup.push(
+      	'</g>');
       if (activeGroup) {
         this.setActiveGroup(new fabric.Group(activeGroup.getObjects()));
         activeGroup.forEachObject(function(o) {

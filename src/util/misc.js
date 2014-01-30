@@ -374,10 +374,17 @@
      * @param {CanvasRenderingContext2D} ctx Context to clip
      */
     clipContext: function(receiver, ctx) {
-      ctx.save();
-      ctx.beginPath();
-      receiver.clipTo(ctx);
-      ctx.clip();
+    	if (receiver.clipTo.type){
+    		ctx.save();
+    		ctx.beginPath();
+    		receiver.clipTo.render(ctx, false);
+    		ctx.clip();
+    	} else {
+	      ctx.save();
+	      ctx.beginPath();
+	      receiver.clipTo(ctx);
+	      ctx.clip();
+    	}
     },
 
     /**
