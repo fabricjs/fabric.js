@@ -96,7 +96,7 @@
     url = url.replace(/^\n\s*/, '').replace(/\?.*$/, '').trim();
     if (url.indexOf('http') !== 0) {
       request_fs(url, function(body) {
-        fabric.loadSVGFromString(body, callback, reviver);
+        fabric.loadSVGFromString(body.toString(), callback, reviver);
       });
     }
     else {
