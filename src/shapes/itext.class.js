@@ -929,11 +929,16 @@
         styleDeclaration.fontStyle = this.fontStyle;
       }
     },
-    
+
+    /**
+     * @private
+     * @param {Number} lineIndex
+     * @param {Number} charIndex
+     */
     _getStyleDeclaration: function(lineIndex, charIndex) {
-            return (this.styles[lineIndex] && this.styles[lineIndex][charIndex])
-              ? clone(this.styles[lineIndex][charIndex]) 
-              : { };
+      return (this.styles[lineIndex] && this.styles[lineIndex][charIndex])
+        ? clone(this.styles[lineIndex][charIndex])
+        : { };
     },
 
     /**
