@@ -7956,6 +7956,26 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         this._hoveredTarget = null;
       }
     },
+    
+    /**
+    * @private
+    */
+    _checkTarget: function(e, obj, pointer) {
+      if (obj &&
+          obj.visible &&
+          obj.evented &&
+          this.containsPoint(e, obj)){
+        if ((this.perPixelTargetFind || obj.perPixelTargetFind) && !obj.isEditing) {
+          var isTransparent = this.isTargetTransparent(obj, pointer.x, pointer.y);
+          if (!isTransparent) {
+            return true;
+          }
+        }
+        else {
+          return true;
+        }
+      }
+    },
 
     /**
      * @private
@@ -7963,35 +7983,22 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     _searchPossibleTargets: function(e) {
 
       // Cache all targets where their bounding box contains point.
-      var possibleTargets = [],
-          target,
+      var target,
           pointer = this.getPointer(e);
-
-      for (var i = this._objects.length; i--; ) {
-        if (this._objects[i] &&
-            this._objects[i].visible &&
-            this._objects[i].evented &&
-            this.containsPoint(e, this._objects[i])) {
-
-          if (this.perPixelTargetFind || this._objects[i].perPixelTargetFind) {
-            possibleTargets[possibleTargets.length] = this._objects[i];
-          }
-          else {
-            target = this._objects[i];
-            this.relatedTarget = target;
-            break;
-          }
-        }
+          
+      if (this._activeObject && this._checkTarget(e, this._activeObject, pointer)) {
+        this.relatedTarget = this._activeObject;
+        return this._activeObject;
       }
 
-      for (var j = 0, len = possibleTargets.length; j < len; j++) {
-        pointer = this.getPointer(e);
-        var isTransparent = this.isTargetTransparent(possibleTargets[j], pointer.x, pointer.y);
-        if (!isTransparent) {
-          target = possibleTargets[j];
-          this.relatedTarget = target;
-          break;
-        }
+      var i = this._objects.length;
+      
+      while(i--) {
+         if (this._checkTarget(e, this._objects[i], pointer)){
+           this.relatedTarget = this._objects[i];
+           target = this._objects[i];
+           break;
+         }
       }
 
       return target;
@@ -10525,7 +10532,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       }
 
       this[key] = value;
-
+      
       return this;
     },
 
@@ -18706,9 +18713,9 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     },
 
     /**
-     * @private
-     * @param {CanvasRenderingContext2D} ctx Context to render on
-     */
+    * @private
+    * @param {CanvasRenderingContext2D} ctx Context to render on
+    */
     _render: function(ctx) {
       this.callSuper('_render', ctx);
       this.ctx = ctx;
@@ -18748,6 +18755,26 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       return {
         lineIndex: linesBeforeCursor.length - 1,
         charIndex: linesBeforeCursor[linesBeforeCursor.length - 1].length
+      };
+    },
+
+    /**
+     * Returns complete style of char at the current cursor
+     * @param {Number} lineIndex Line index
+     * @param {Number} charIndex Char index
+    * @return {Object} Character style
+     */
+    getCurrentCharStyle: function(lineIndex, charIndex) {
+      var style = this.styles[lineIndex] && this.styles[lineIndex][charIndex === 0 ? 0 : (charIndex - 1)];
+
+      return {
+        fontSize : style && style.fontSize || this.fontSize,
+        fill : style && style.fill || this.fill,
+        textBackgroundColor : style && style.textBackgroundColor || this.textBackgroundColor,
+        textDecoration : style && style.textDecoration || this.textDecoration,
+        fontFamily : style && style.fontFamily || this.fontFamily,
+        stroke : style && style.stroke || this.stroke,
+        strokeWidth : style && style.strokeWidth || this.strokeWidth
       };
     },
 
@@ -18992,14 +19019,26 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
           lineWidth = this._getWidthOfLine(ctx, lineIndex, textLines),
           lineHeight = this._getHeightOfLine(ctx, lineIndex, textLines),
           lineLeftOffset = this._getLineLeftOffset(lineWidth),
-          chars = line.split('');
+          chars = line.split(''),
+          prevStyle,
+          charsToRender = '';
 
       left += lineLeftOffset || 0;
 
       ctx.save();
-      for (var i = 0, len = chars.length; i < len; i++) {
-        this._renderChar(method, ctx, lineIndex, i, chars[i], left, top, lineHeight);
+
+      for (var i = 0, len = chars.length; i <= len; i++) {
+        prevStyle = prevStyle || this.getCurrentCharStyle(lineIndex, i);
+        var thisStyle = this.getCurrentCharStyle(lineIndex, i+1);
+
+        if (this._hasStyleChanged(prevStyle, thisStyle) || i === len) {
+          this._renderChar(method, ctx, lineIndex, i-1, charsToRender, left, top, lineHeight);
+          charsToRender = '';
+          prevStyle = thisStyle;
+        }
+        charsToRender += chars[i];
       }
+
       ctx.restore();
     },
 
@@ -19060,6 +19099,22 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 
         ctx.translate(ctx.measureText(_char).width, 0);
       }
+    },
+
+    /**
+     * @private
+     * @param {Object} prevStyle
+     * @param {Object} thisStyle
+     */
+    _hasStyleChanged: function(prevStyle, thisStyle) {
+      return (prevStyle.fill !== thisStyle.fill ||
+              prevStyle.fontSize !== thisStyle.fontSize ||
+              prevStyle.textBackgroundColor !== thisStyle.textBackgroundColor ||
+              prevStyle.textDecoration !== thisStyle.textDecoration ||
+              prevStyle.fontFamily !== thisStyle.fontFamily ||
+              prevStyle.stroke !== thisStyle.stroke ||
+              prevStyle.strokeWidth !== thisStyle.strokeWidth
+      );
     },
 
     /**

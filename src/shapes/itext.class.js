@@ -294,7 +294,7 @@
 
       fabric.util.object.extend(this.styles[loc.lineIndex][loc.charIndex], styles);
     },
-    
+
     /**
     * @private
     * @param {CanvasRenderingContext2D} ctx Context to render on
@@ -340,7 +340,7 @@
         charIndex: linesBeforeCursor[linesBeforeCursor.length - 1].length
       };
     },
-    
+
     /**
      * Returns complete style of char at the current cursor
      * @param {Number} lineIndex Line index
@@ -603,25 +603,25 @@
           lineHeight = this._getHeightOfLine(ctx, lineIndex, textLines),
           lineLeftOffset = this._getLineLeftOffset(lineWidth),
           chars = line.split(''),
-          prevStyle = null,
-          renderChars = '';
+          prevStyle,
+          charsToRender = '';
 
       left += lineLeftOffset || 0;
 
       ctx.save();
-      
+
       for (var i = 0, len = chars.length; i <= len; i++) {
         prevStyle = prevStyle || this.getCurrentCharStyle(lineIndex, i);
         var thisStyle = this.getCurrentCharStyle(lineIndex, i+1);
- 
-        if (this._hasStyleChanged(prevStyle, thisStyle) || i == len) {
-          this._renderChar(method, ctx, lineIndex, i-1, renderChars, left, top, lineHeight);
-          renderChars = '';
+
+        if (this._hasStyleChanged(prevStyle, thisStyle) || i === len) {
+          this._renderChar(method, ctx, lineIndex, i-1, charsToRender, left, top, lineHeight);
+          charsToRender = '';
           prevStyle = thisStyle;
         }
-        renderChars += chars[i];
+        charsToRender += chars[i];
       }
-      
+
       ctx.restore();
     },
 
@@ -683,7 +683,7 @@
         ctx.translate(ctx.measureText(_char).width, 0);
       }
     },
-    
+
     /**
      * @private
      * @param {Object} prevStyle
