@@ -1,19 +1,18 @@
-fabric.ElementsParser = {
+fabric.ElementsParser = function(elements, callback, options, reviver) {
+  this.elements = elements;
+  this.callback = callback;
+  this.options = options;
+  this.reviver = reviver;
 
-  parse: function(elements, callback, options, reviver) {
+  this.parse = function() {
 
-    this.elements = elements;
-    this.callback = callback;
-    this.options = options;
-    this.reviver = reviver;
-
-    this.instances = new Array(elements.length);
-    this.numElements = elements.length;
+    this.instances = new Array(this.elements.length);
+    this.numElements = this.elements.length;
 
     this.createObjects();
   },
 
-  createObjects: function() {
+  this.createObjects = function() {
     for (var i = 0, len = this.elements.length; i < len; i++) {
       (function(_this, i) {
         setTimeout(function() {
@@ -23,7 +22,7 @@ fabric.ElementsParser = {
     }
   },
 
-  createObject: function(el, index) {
+  this.createObject = function(el, index) {
     var klass = fabric[fabric.util.string.capitalize(el.tagName)];
     if (klass && klass.fromElement) {
       try {
@@ -38,7 +37,7 @@ fabric.ElementsParser = {
     }
   },
 
-  _createObject: function(klass, el, index) {
+  this._createObject = function(klass, el, index) {
     if (klass.async) {
       klass.fromElement(el, this.createCallback(index, el), this.options);
     }
@@ -50,7 +49,7 @@ fabric.ElementsParser = {
     }
   },
 
-  createCallback: function(index, el) {
+  this.createCallback = function(index, el) {
     var _this = this;
     return function(obj) {
       _this.reviver && _this.reviver(el, obj);
@@ -59,7 +58,7 @@ fabric.ElementsParser = {
     };
   },
 
-  checkIfDone: function() {
+  this.checkIfDone = function() {
     if (--this.numElements === 0) {
       this.instances = this.instances.filter(function(el) {
         return el != null;
