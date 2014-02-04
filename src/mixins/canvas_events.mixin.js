@@ -324,6 +324,9 @@
      * @param {Event} e Event object fired on mousemove
      */
     _onMouseMoveInDrawingMode: function(e) {
+      if (fabric.isTouchSupported && e.type == 'mousemove') {
+        return;
+      }
       if (this._isCurrentlyDrawing) {
         var pointer = this.getPointer(e);
         this.freeDrawingBrush.onMouseMove(pointer);
