@@ -66,5 +66,5 @@ fabric.ElementsParser = function(elements, callback, options, reviver) {
       fabric.resolveGradients(this.instances);
       this.callback(this.instances);
     }
-  }
+  };
 };
