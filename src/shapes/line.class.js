@@ -148,39 +148,6 @@
 
     /**
      * @private
-     * @return {Number} centerToCenterX Distance from center of path group to horizontal center of Line.
-     */
-    _getCenterToCenterX: makeCenterToCenterGetter(
-      { // property names
-        origin: 'originX',
-        coordinate: 'left',
-        dimension: 'width',
-      },
-      { // possible non-center values of origin
-        nearest: 'left',
-        farthest: 'right',
-      }
-    ),
-
-    /**
-     * @private
-     * @return {Number} centerToOriginY Distance from center of path group to vertical center of Line.
-     */
-    _getCenterToCenterY: makeCenterToCenterGetter(
-      { // property names
-        origin: 'originY',
-        coordinate: 'top',
-        dimension: 'height',
-      },
-      { // possible non-center values of origin
-        nearest: 'top',
-        farthest: 'bottom',
-      }
-    ),
-
-
-    /**
-     * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
@@ -188,9 +155,14 @@
 
       var isInPathGroup = this.group && this.group.type === 'path-group';
       if (isInPathGroup && !this.transformMatrix) {
+        //  Line coords are distances from left-top of canvas to origin of line.
+        //
+        //  To render line in a path-group, we need to translate them to
+        //  distances from center of path-group to center of line.
+        var cp = this.getCenterPoint();
         ctx.translate(
-          this._getCenterToCenterX(),
-          this._getCenterToCenterY()
+          -this.group.width/2 + cp.x,
+          -this.group.height / 2 + cp.y
         );
       }
 
@@ -348,37 +320,6 @@
       }
     };
 
-  }
-
-  /**
-   * Produces a function that calculates distance from path group center to center of Line dimension.
-   *
-   */
-  function makeCenterToCenterGetter(propertyNames, originValues) {
-    var origin = propertyNames.origin,
-        coordinate = propertyNames.coordinate,
-        dimension = propertyNames.dimension,
-        nearest = originValues.nearest,
-        farthest = originValues.farthest;
-
-    return function() {
-      /*
-       *  Line coords are distances from left-top of canvas to origin of line.
-       *
-       *  To render line in a path-group, we need to translate them to distances
-       *  from center of path-group to center of line.
-       */
-      var toPathGroupEdge = (-0.5 * this.group.get(dimension))
-      var toLineCenter = 0; // assume center
-
-      if (this.get(origin) === nearest) {
-        toLineCenter = +0.5 * this.get(dimension);
-      } else if (this.get(origin) === farthest) {
-        toLineCenter = -0.5 * this.get(dimension);
-      } // else center, don't change the initial value
-
-      return toPathGroupEdge + this.get(coordinate) + toLineCenter;
-    };
   }
 
 })(typeof exports !== 'undefined' ? exports : this);
