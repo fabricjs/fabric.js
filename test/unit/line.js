@@ -677,8 +677,11 @@
         [0, 0, c_.givenWidth, 0]
       );
       for (var prop in c_.given) {
-        line.set(prop, c_.given[prop])
+        line.set(prop, c_.given[prop]);
       }
+      line.group.get = function (prop) {
+        return this[prop];
+      };
 
       equal(line._getCenterToCenterX(), c_.expectedCenter);
     });
@@ -771,8 +774,11 @@
         [0, 0, 0, c_.givenHeight]
       );
       for (var prop in c_.given) {
-        line.set(prop, c_.given[prop])
+        line.set(prop, c_.given[prop]);
       }
+      line.group.get = function (prop) {
+        return this[prop];
+      };
 
       equal(line._getCenterToCenterY(), c_.expectedCenter);
     });

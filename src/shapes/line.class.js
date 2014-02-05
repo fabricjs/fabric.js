@@ -156,9 +156,8 @@
         coordinate: 'left',
         dimension: 'width',
       },
-      { // possible values of origin
+      { // possible non-center values of origin
         nearest: 'left',
-        center: 'center',
         farthest: 'right',
       }
     ),
@@ -173,9 +172,8 @@
         coordinate: 'top',
         dimension: 'height',
       },
-      { // possible values of origin
+      { // possible non-center values of origin
         nearest: 'top',
-        center: 'center',
         farthest: 'bottom',
       }
     ),
@@ -355,33 +353,31 @@
   /**
    * Produces a function that calculates distance from path group center to center of Line dimension.
    *
-   *  The context starts off at center-center of path-group, while line coords
-   *  are relative to left-top of canvas. Additionally, rendering assumes contex
-   *  will start at center-center of line.
-   *  To get coords of line's center-center relative to center-center of
-   *  path-group we subtract the distance from center of PG to it's edge. 
-   *  To get the center of line, we add the distance from it's origin to it's
-   *  center.
-   * 
    */
   function makeCenterToCenterGetter(propertyNames, originValues) {
     var origin = propertyNames.origin,
         coordinate = propertyNames.coordinate,
         dimension = propertyNames.dimension,
         nearest = originValues.nearest,
-        center = originValues.center,
         farthest = originValues.farthest;
 
     return function() {
-      pathGroupCenterToEdge = (-0.5 * this.group.get(dimension))
-      switch (this.get(origin)) {
-        case nearest:
-          return pathGroupCenterToEdge + this.get(coordinate) + (0.5 * this.get(dimension));
-        case center:
-          return pathGroupCenterToEdge + this.get(coordinate);
-        case farthest:
-          return pathGroupCenterToEdge + this.get(coordinate) - (0.5 * this.get(dimension));
-      }
+      /*
+       *  Line coords are distances from left-top of canvas to origin of line.
+       *
+       *  To render line in a path-group, we need to translate them to distances
+       *  from center of path-group to center of line.
+       */
+      var toPathGroupEdge = (-0.5 * this.group.get(dimension))
+      var toLineCenter = 0; // assume center
+
+      if (this.get(origin) === nearest) {
+        toLineCenter = +0.5 * this.get(dimension);
+      } else if (this.get(origin) === farthest) {
+        toLineCenter = -0.5 * this.get(dimension);
+      } // else center, don't change the initial value
+
+      return toPathGroupEdge + this.get(coordinate) + toLineCenter;
     };
   }
 
