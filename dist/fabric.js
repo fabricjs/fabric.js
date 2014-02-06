@@ -12673,11 +12673,11 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       this.left = 'left' in options
         ? options.left
-        : (Math.min(this.x1, this.x2) + this.width / 2);
+        : this._getLeftToOriginX();
 
       this.top = 'top' in options
         ? options.top
-        : (Math.min(this.y1, this.y2) + this.height / 2);
+        : this._getTopToOriginY();
     },
 
     /**
@@ -12695,6 +12695,42 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
     /**
      * @private
+     * @return {Number} leftToOriginX Distance from left edge of canvas to originX of Line.
+     */
+    _getLeftToOriginX: makeEdgeToOriginGetter(
+      { // property names
+        origin: 'originX',
+        axis1: 'x1',
+        axis2: 'x2',
+        dimension: 'width',
+      },
+      { // possible values of origin
+        nearest: 'left',
+        center: 'center',
+        farthest: 'right',
+      }
+    ),
+
+    /**
+     * @private
+     * @return {Number} topToOriginY Distance from top edge of canvas to originY of Line.
+     */
+    _getTopToOriginY: makeEdgeToOriginGetter(
+      { // property names
+        origin: 'originY',
+        axis1: 'y1',
+        axis2: 'y2',
+        dimension: 'height',
+      },
+      { // possible values of origin
+        nearest: 'top',
+        center: 'center',
+        farthest: 'bottom',
+      }
+    ),
+
+    /**
+     * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
@@ -12702,7 +12738,15 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       var isInPathGroup = this.group && this.group.type === 'path-group';
       if (isInPathGroup && !this.transformMatrix) {
-        ctx.translate(-this.group.width/2 + this.left, -this.group.height / 2 + this.top);
+        //  Line coords are distances from left-top of canvas to origin of line.
+        //
+        //  To render line in a path-group, we need to translate them to
+        //  distances from center of path-group to center of line.
+        var cp = this.getCenterPoint();
+        ctx.translate(
+          -this.group.width/2 + cp.x,
+          -this.group.height / 2 + cp.y
+        );
       }
 
       if (!this.strokeDashArray || this.strokeDashArray && supportsLineDash) {
@@ -12835,6 +12879,31 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     var points = [object.x1, object.y1, object.x2, object.y2];
     return new fabric.Line(points, object);
   };
+
+  /**
+   * Produces a function that calculates distance from canvas edge to Line origin.
+   */
+  function makeEdgeToOriginGetter(propertyNames, originValues) {
+    var origin = propertyNames.origin,
+        axis1 = propertyNames.axis1,
+        axis2 = propertyNames.axis2,
+        dimension = propertyNames.dimension,
+        nearest = originValues.nearest,
+        center = originValues.center,
+        farthest = originValues.farthest;
+
+    return function() {
+      switch (this.get(origin)) {
+      case nearest:
+        return Math.min(this.get(axis1), this.get(axis2));
+      case center:
+        return Math.min(this.get(axis1), this.get(axis2)) + (0.5 * this.get(dimension));
+      case farthest:
+        return Math.max(this.get(axis1), this.get(axis2));
+      }
+    };
+
+  }
 
 })(typeof exports !== 'undefined' ? exports : this);
 
@@ -20558,7 +20627,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
   onClick: function() {
     // No need to trigger click event here, focus is enough to have the keyboard appear on Android
-    this.hiddenTextarea.focus();
+    this.hiddenTextarea && this.hiddenTextarea.focus();
   },
 
   /**
@@ -21341,7 +21410,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     url = url.replace(/^\n\s*/, '').replace(/\?.*$/, '').trim();
     if (url.indexOf('http') !== 0) {
       request_fs(url, function(body) {
-        fabric.loadSVGFromString(body, callback, reviver);
+        fabric.loadSVGFromString(body.toString(), callback, reviver);
       });
     }
     else {
