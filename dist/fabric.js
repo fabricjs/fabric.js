@@ -21453,10 +21453,10 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @param {Object} options to pass to FabricCanvas.
    * @return {Object} wrapped canvas instance
    */
-  fabric.createCanvasForNode = function(width, height, options) {
-
+  fabric.createCanvasForNode = function(width, height, options,nodeCanvasOptions) {
+    nodeCanvasOptions=nodeCanvasOptions||options;
     var canvasEl = fabric.document.createElement('canvas'),
-        nodeCanvas = new Canvas(width || 600, height || 600);
+        nodeCanvas = new Canvas(width || 600, height || 600, nodeCanvasOptions);
 
     // jsdom doesn't create style on canvas element, so here be temp. workaround
     canvasEl.style = { };
