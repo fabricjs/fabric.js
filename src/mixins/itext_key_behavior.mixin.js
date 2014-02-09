@@ -229,7 +229,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this.moveCursorDownWithoutShift(offset);
     }
 
-    this.initDelayedCursor();
+    this.initDelayedCursor(true);
   },
 
   /**
@@ -362,7 +362,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this.moveCursorUpWithoutShift(offset);
     }
 
-    this.initDelayedCursor();
+    this.initDelayedCursor(true);
   },
 
   /**
@@ -425,7 +425,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this.moveCursorLeftWithoutShift(e);
     }
 
-    this.initDelayedCursor();
+    this.initDelayedCursor(true);
   },
 
   /**
@@ -578,6 +578,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     }
 
     this.setCoords();
+    this.initDelayedCursor(true);
     this.fire('changed');
     this.canvas && this.canvas.fire('text:changed', { target: this });
   },
