@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "canvas": "1.0.x",
-    "jsdom": "0.8.x",
+    "jsdom": "0.10.x",
     "xmldom": "0.1.x"
   },
   "devDependencies": {
