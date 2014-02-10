@@ -1,9 +1,9 @@
 {
   "name": "fabric.js",
   "version": "1.4.3",
-  "homepage": "https://github.com/kangax/fabric.js",
+  "homepage": "http://fabricjs.com",
   "authors": [
-    "kangax"
+    "kangax", "Kienz"
   ],
   "description": "Object model for HTML5 canvas, and SVG-to-canvas parser. Backed by jsdom and node-canvas.",
   "main": "./dist/all.min.js",
