@@ -15564,12 +15564,12 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           height = (maxY - minY) || 0;
 
       var obj =  {
-        left: (minX + width / 2) || 0,
-        top: (minY + height / 2) || 0
+        width: width,
+        height: height
       };
       if (!onlyWidthHeight) {
-        obj.width = width;
-        obj.height = height;
+        obj.left = (minX + width / 2) || 0;
+        obj.top = (minY + height / 2) || 0;
       }
       return obj;
     },
