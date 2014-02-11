@@ -15535,7 +15535,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     /**
      * @private
      */
-    _calcBounds: function() {
+    _calcBounds: function(onlyWidthHeight) {
       var aX = [],
           aY = [],
           o;
@@ -15549,13 +15549,13 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         }
       }
 
-      this.set(this._getBounds(aX, aY));
+      this.set(this._getBounds(aX, aY, onlyWidthHeight));
     },
 
     /**
      * @private
      */
-    _getBounds: function(aX, aY) {
+    _getBounds: function(aX, aY, onlyWidthHeight) {
       var minX = min(aX),
           maxX = max(aX),
           minY = min(aY),
@@ -15563,12 +15563,15 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           width = (maxX - minX) || 0,
           height = (maxY - minY) || 0;
 
-      return {
-        width: width,
-        height: height,
+      var obj =  {
         left: (minX + width / 2) || 0,
         top: (minY + height / 2) || 0
       };
+      if (!onlyWidthHeight) {
+        obj.width = width;
+        obj.height = height;
+      }
+      return obj;
     },
 
     /* _TO_SVG_START_ */
