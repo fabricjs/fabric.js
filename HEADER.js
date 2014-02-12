@@ -24,6 +24,12 @@ else {
 fabric.isTouchSupported = "ontouchstart" in fabric.document.documentElement;
 
 /**
+ * True when running in IOS
+ * @type boolean
+ */
+fabric.isIOS = ((/iphone|ipad/gi).test(navigator.appVersion));
+
+/**
  * True when in environment that's probably Node.js
  * @type boolean
  */

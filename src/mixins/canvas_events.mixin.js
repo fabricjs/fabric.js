@@ -37,9 +37,11 @@
       addListener(fabric.window, 'resize', this._onResize);
 
       // mouse events
-      addListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
-      addListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
-      addListener(this.upperCanvasEl, 'mousewheel', this._onMouseWheel);
+      if (!fabric.isIOS) {
+        addListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
+        addListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
+        addListener(this.upperCanvasEl, 'mousewheel', this._onMouseWheel);
+      }
 
       // touch events
       addListener(this.upperCanvasEl, 'touchstart', this._onMouseDown);
@@ -141,12 +143,14 @@
     _onMouseDown: function (e) {
       this.__onMouseDown(e);
 
-      addListener(fabric.document, 'mouseup', this._onMouseUp);
+      if (!fabric.isIOS) {
+        addListener(fabric.document, 'mouseup', this._onMouseUp);
+        addListener(fabric.document, 'mousemove', this._onMouseMove);
+      }
+      
       addListener(fabric.document, 'touchend', this._onMouseUp);
-
-      addListener(fabric.document, 'mousemove', this._onMouseMove);
       addListener(fabric.document, 'touchmove', this._onMouseMove);
-
+      
       removeListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
       removeListener(this.upperCanvasEl, 'touchmove', this._onMouseMove);
     },
@@ -164,7 +168,9 @@
       removeListener(fabric.document, 'mousemove', this._onMouseMove);
       removeListener(fabric.document, 'touchmove', this._onMouseMove);
 
-      addListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
+      if (!fabric.isIOS) {
+        addListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
+      }
       addListener(this.upperCanvasEl, 'touchmove', this._onMouseMove);
     },
 
