@@ -20,7 +20,7 @@ fabric.ElementsParser.prototype.createObjects = function() {
       }, 0);
     })(this, i);
   }
-},
+};
 
 fabric.ElementsParser.prototype.createObject = function(el, index) {
   var klass = fabric[fabric.util.string.capitalize(el.tagName)];
