@@ -188,21 +188,20 @@
   * @param {String} attr Style attribute to get for element
   * @return {String} Style attribute value of the given element.
   */
-  function getElementStyle(element, attr) {
-    if (!element.style) {
-      element.style = { };
-    }
-
-    if (fabric.document.defaultView && fabric.document.defaultView.getComputedStyle) {
+  var getElementStyle;
+  if (fabric.document.defaultView && fabric.document.defaultView.getComputedStyle) {
+    getElementStyle = function(element, attr) {
       return fabric.document.defaultView.getComputedStyle(element, null)[attr];
-    }
-    else {
+    };
+  }
+  else {
+    getElementStyle = function(element, attr) {
       var value = element.style[attr];
       if (!value && element.currentStyle) {
         value = element.currentStyle[attr];
       }
       return value;
-    }
+    };
   }
 
   (function () {
