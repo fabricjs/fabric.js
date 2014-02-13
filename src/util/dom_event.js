@@ -179,7 +179,14 @@
     var element = event.target ||
                   (typeof event.srcElement !== unknown ? event.srcElement : null);
 
-    var scroll = fabric.util.getScrollLeftTop(element, upperCanvasEl);
+    var scroll = (fabric.Canvas && 
+                  fabric.Canvas.activeInstance && 
+                  fabric.Canvas.activeInstance.scrollOffset) ?
+                  fabric.Canvas.activeInstance.scrollOffset : 
+                  {
+                    left : 0,
+                    top : 0
+                  };
 
     return {
       x: pointerX(event) + scroll.left,
