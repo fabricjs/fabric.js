@@ -416,14 +416,14 @@
         
         //Length of line bigger then limit?
         if (ctx.measureText(line).width>this.maxWidth) {
-          var newLines=new Array();
+          var newLines=[];
           var words = line.split(/\s+/);
           
           while(words.length>0){
-            var curLine=new Array();
+            var curLine=[];
             var widthBelowLimit=true;
             while(widthBelowLimit && words.length>0){
-              curLine.push(words.shift())
+              curLine.push(words.shift());
               widthBelowLimit=ctx.measureText(curLine.join(" ")).width<this.maxWidth;
             }
             
