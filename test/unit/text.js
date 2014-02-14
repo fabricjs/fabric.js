@@ -41,7 +41,8 @@
     'path':                null,
     'backgroundColor':     '',
     'textBackgroundColor': '',
-    'useNative':           true
+    'useNative':           true,
+    'maxWidth':            false
   };
 
   var TEXT_SVG = '<g transform="translate(10 26)"><text font-family="Times New Roman" font-size="40" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); opacity: 1;" transform="translate(-10 39)"><tspan x="0" y="-26" fill="rgb(0,0,0)">x</tspan></text></g>';

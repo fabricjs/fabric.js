@@ -304,6 +304,13 @@
      * @default
      */
     shadow:               null,
+    
+    /**
+     * Limit of line width
+     * @type Number
+     * @default
+     */
+    maxWidth: false,
 
     /**
      * Constructor
@@ -346,7 +353,6 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
-
       var isInPathGroup = this.group && this.group.type === 'path-group';
       if (isInPathGroup && !this.transformMatrix) {
         ctx.translate(-this.group.width/2 + this.left, -this.group.height / 2 + this.top);
@@ -354,7 +360,7 @@
       else if (isInPathGroup && this.transformMatrix) {
         ctx.translate(-this.group.width/2, -this.group.height/2);
       }
-
+      
       if (typeof Cufon === 'undefined' || this.useNative === true) {
         this._renderViaNative(ctx);
       }
@@ -368,8 +374,10 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _renderViaNative: function(ctx) {
-      var textLines = this.text.split(this._reNewline);
-
+      var textLines = this._textLines = this.text.split(this._reNewline);
+      
+      this.maxWidth && this._breakLines(ctx);
+      
       this.transform(ctx, fabric.isLikelyNode);
 
       this._setTextStyles(ctx);
@@ -393,7 +401,50 @@
       this._setBoundaries(ctx, textLines);
       this._totalLineHeight = 0;
     },
-
+    
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Array} textLines Array of text lines
+     */
+    _breakLines: function(ctx){
+      var textLines = this._textLines;
+      var i=0;
+      var changes=0;
+      while(i<textLines.length){
+        var line=textLines[i];
+        
+        //Length of line bigger then limit?
+        if (ctx.measureText(line).width>this.maxWidth) {
+          var newLines=[];
+          var words = line.split(/\s+/);
+          
+          while(words.length>0){
+            var curLine=[];
+            var widthBelowLimit=true;
+            while(widthBelowLimit && words.length>0){
+              curLine.push(words.shift());
+              widthBelowLimit=ctx.measureText(curLine.join(" ")).width<this.maxWidth;
+            }
+            
+            if (!widthBelowLimit && curLine.length>1)
+              //Move one word to the queue(words array)
+              words.unshift(curLine.pop());
+            
+            newLines.push(curLine.join(" "));
+          }
+          //Add argument for splice
+          newLines.unshift(i,1);
+          i+=newLines.length-3;
+          
+          textLines.splice.apply(textLines,newLines);
+          changes++;
+        }
+        i++;
+      }
+      if (changes>0) 
+        this.text=textLines.join("\n");
+    },
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
@@ -796,7 +847,8 @@
         textAlign:            this.textAlign,
         path:                 this.path,
         textBackgroundColor:  this.textBackgroundColor,
-        useNative:            this.useNative
+        useNative:            this.useNative,
+        maxWidth:             this.maxWidth
       });
       if (!this.includeDefaultValues) {
         this._removeDefaultValues(object);
@@ -812,7 +864,7 @@
      */
     toSVG: function(reviver) {
       var markup = [ ],
-          textLines = this.text.split(this._reNewline),
+          textLines = this._textLines || this.text.split(this._reNewline),
           offsets = this._getSVGLeftTopOffsets(textLines),
           textAndBg = this._getSVGTextAndBg(offsets.lineTop, offsets.textLeft, textLines),
           shadowSpans = this._getSVGShadows(offsets.lineTop, textLines);
