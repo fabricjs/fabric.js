@@ -811,8 +811,8 @@
     getPointer: function (e) {
       var pointer = getPointer(e, this.upperCanvasEl);
       var cssScale = {
-        width: this.upperCanvasEl.width / this.upperCanvasEl.offsetWidth,
-        height: this.upperCanvasEl.height / this.upperCanvasEl.offsetHeight,
+        width: this.upperCanvasEl.width / this.upperCanvasEl.getBoundingClientRect().width,
+        height: this.upperCanvasEl.height / this.upperCanvasEl.getBoundingClientRect().height,
       }
       return {
         x: (pointer.x - this._offset.left) * cssScale.width,
