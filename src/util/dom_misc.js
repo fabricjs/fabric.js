@@ -12,21 +12,21 @@
     return typeof id === 'string' ? fabric.document.getElementById(id) : id;
   }
 
-  /**
-   * Converts an array-like object (e.g. arguments or NodeList) to an array
-   * @memberOf fabric.util
-   * @param {Object} arrayLike
-   * @return {Array}
-   */
-  var toArray = function(arrayLike) {
-    return _slice.call(arrayLike, 0);
-  };
+  var sliceCanConvertNodelists,
+      /**
+       * Converts an array-like object (e.g. arguments or NodeList) to an array
+       * @memberOf fabric.util
+       * @param {Object} arrayLike
+       * @return {Array}
+       */
+      toArray = function(arrayLike) {
+        return _slice.call(arrayLike, 0);
+      };
 
-  var sliceCanConvertNodelists;
   try {
     sliceCanConvertNodelists = toArray(fabric.document.childNodes) instanceof Array;
   }
-  catch(err) { }
+  catch (err) { }
 
   if (!sliceCanConvertNodelists) {
     toArray = function(arrayLike) {
@@ -149,19 +149,19 @@
    */
   function getElementOffset(element) {
     var docElem,
-        box = {left: 0, top: 0},
         doc = element && element.ownerDocument,
-        offset = {left: 0, top: 0},
+        box = { left: 0, top: 0 },
+        offset = { left: 0, top: 0 },
         scrollLeftTop,
         offsetAttributes = {
-          'borderLeftWidth': 'left',
-          'borderTopWidth':  'top',
-          'paddingLeft':     'left',
-          'paddingTop':      'top'
+          borderLeftWidth: 'left',
+          borderTopWidth:  'top',
+          paddingLeft:     'left',
+          paddingTop:      'top'
         };
 
-    if (!doc){
-      return {left: 0, top: 0};
+    if (!doc) {
+      return { left: 0, top: 0 };
     }
 
     for (var attr in offsetAttributes) {
@@ -169,7 +169,7 @@
     }
 
     docElem = doc.documentElement;
-    if ( typeof element.getBoundingClientRect !== "undefined" ) {
+    if ( typeof element.getBoundingClientRect !== 'undefined' ) {
       box = element.getBoundingClientRect();
     }
 
@@ -205,17 +205,16 @@
   }
 
   (function () {
-    var style = fabric.document.documentElement.style;
-
-    var selectProp = 'userSelect' in style
-      ? 'userSelect'
-      : 'MozUserSelect' in style
-        ? 'MozUserSelect'
-        : 'WebkitUserSelect' in style
-          ? 'WebkitUserSelect'
-          : 'KhtmlUserSelect' in style
-            ? 'KhtmlUserSelect'
-            : '';
+    var style = fabric.document.documentElement.style,
+        selectProp = 'userSelect' in style
+          ? 'userSelect'
+          : 'MozUserSelect' in style
+            ? 'MozUserSelect'
+            : 'WebkitUserSelect' in style
+              ? 'WebkitUserSelect'
+              : 'KhtmlUserSelect' in style
+                ? 'KhtmlUserSelect'
+                : '';
 
     /**
      * Makes element unselectable
@@ -268,7 +267,7 @@
      * @param {Function} callback Callback to execute when script is finished loading
      */
     function getScript(url, callback) {
-      var headEl = fabric.document.getElementsByTagName("head")[0],
+      var headEl = fabric.document.getElementsByTagName('head')[0],
           scriptEl = fabric.document.createElement('script'),
           loading = true;
 

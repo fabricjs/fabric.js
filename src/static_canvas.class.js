@@ -1,6 +1,6 @@
 (function () {
 
-  "use strict";
+  'use strict';
 
   if (fabric.StaticCanvas) {
     fabric.warn('fabric.StaticCanvas is already defined.');
@@ -124,7 +124,7 @@
      * @type Boolean
      * @default
      */
-     allowTouchScrolling: false,
+    allowTouchScrolling: false,
 
     /**
      * Callback; invoked right before object is about to be scaled/rotated
@@ -626,8 +626,8 @@
      */
     renderAll: function (allOnTop) {
 
-      var canvasToDrawOn = this[(allOnTop === true && this.interactive) ? 'contextTop' : 'contextContainer'];
-      var activeGroup = this.getActiveGroup();
+      var canvasToDrawOn = this[(allOnTop === true && this.interactive) ? 'contextTop' : 'contextContainer'],
+          activeGroup = this.getActiveGroup();
 
       if (this.contextTop && this.selection && !this._groupSelector) {
         this.clearContext(this.contextTop);
@@ -1032,7 +1032,7 @@
           'width="', (options.viewBox ? options.viewBox.width : this.width), '" ',
           'height="', (options.viewBox ? options.viewBox.height : this.height), '" ',
           (this.backgroundColor && !this.backgroundColor.toLive
-            ? 'style="background-color: ' + this.backgroundColor +'" '
+            ? 'style="background-color: ' + this.backgroundColor + '" '
             : null),
           (options.viewBox
               ? 'viewBox="' +
@@ -1164,7 +1164,7 @@
         newIdx = idx;
 
         // traverse down the stack looking for the nearest intersecting object
-        for (var i=idx-1; i>=0; --i) {
+        for (var i = idx - 1; i >= 0; --i) {
 
           var isIntersecting = object.intersectsWithObject(this._objects[i]) ||
                                object.isContainedWithinObject(this._objects[i]) ||
@@ -1194,7 +1194,7 @@
       var idx = this._objects.indexOf(object);
 
       // if object is not on top of stack (last item in an array)
-      if (idx !== this._objects.length-1) {
+      if (idx !== this._objects.length - 1) {
         var newIdx = this._findNewUpperIndex(object, idx, intersecting);
 
         removeFromArray(this._objects, object);
@@ -1227,7 +1227,7 @@
         }
       }
       else {
-        newIdx = idx+1;
+        newIdx = idx + 1;
       }
 
       return newIdx;
@@ -1262,7 +1262,7 @@
      * @return {String} string representation of an instance
      */
     toString: function () {
-      return '#<fabric.Canvas (' + this.complexity() + '): '+
+      return '#<fabric.Canvas (' + this.complexity() + '): ' +
                '{ objects: ' + this.getObjects().length + ' }>';
     }
   });

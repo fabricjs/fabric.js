@@ -1,6 +1,6 @@
 (function(global) {
 
-  "use strict";
+  'use strict';
 
   var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend;
@@ -156,16 +156,16 @@
      * @param ctx {CanvasRenderingContext2D} context to render on
      */
     _renderDashedStroke: function(ctx) {
-     var x = -this.width/2,
-         y = -this.height/2,
-         w = this.width,
-         h = this.height;
+      var x = -this.width/2,
+          y = -this.height/2,
+          w = this.width,
+          h = this.height;
 
       ctx.beginPath();
-      fabric.util.drawDashedLine(ctx, x, y, x+w, y, this.strokeDashArray);
-      fabric.util.drawDashedLine(ctx, x+w, y, x+w, y+h, this.strokeDashArray);
-      fabric.util.drawDashedLine(ctx, x+w, y+h, x, y+h, this.strokeDashArray);
-      fabric.util.drawDashedLine(ctx, x, y+h, x, y, this.strokeDashArray);
+      fabric.util.drawDashedLine(ctx, x, y, x + w, y, this.strokeDashArray);
+      fabric.util.drawDashedLine(ctx, x + w, y, x + w, y + h, this.strokeDashArray);
+      fabric.util.drawDashedLine(ctx, x + w, y + h, x, y + h, this.strokeDashArray);
+      fabric.util.drawDashedLine(ctx, x, y + h, x, y, this.strokeDashArray);
       ctx.closePath();
     },
 
@@ -219,8 +219,7 @@
           '" width="', this.width, '" height="', this.height,
           '" style="', this.getSvgStyles(),
           '" transform="', this.getSvgTransform(),
-        '"/>'
-      );
+        '"/>');
 
       return reviver ? reviver(markup.join('')) : markup.join('');
     },

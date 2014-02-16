@@ -6,7 +6,6 @@
  */
 fabric.Image.filters = fabric.Image.filters || { };
 
-
 /**
  * Root filter class from which all filter classes inherit from
  * @class fabric.Image.filters.BaseFilter

@@ -1,50 +1,50 @@
 (function() {
 
-  var slice = Array.prototype.slice, emptyFunction = function() { };
+  var slice = Array.prototype.slice, emptyFunction = function() { },
 
-  var IS_DONTENUM_BUGGY = (function(){
-    for (var p in { toString: 1 }) {
-      if (p === 'toString') return false;
-    }
-    return true;
-  })();
+      IS_DONTENUM_BUGGY = (function(){
+        for (var p in { toString: 1 }) {
+          if (p === 'toString') return false;
+        }
+        return true;
+      })(),
 
-  /** @ignore */
-  var addMethods = function(klass, source, parent) {
-    for (var property in source) {
+      /** @ignore */
+      addMethods = function(klass, source, parent) {
+        for (var property in source) {
 
-      if (property in klass.prototype &&
-          typeof klass.prototype[property] === 'function' &&
-          (source[property] + '').indexOf('callSuper') > -1) {
+          if (property in klass.prototype &&
+              typeof klass.prototype[property] === 'function' &&
+              (source[property] + '').indexOf('callSuper') > -1) {
 
-        klass.prototype[property] = (function(property) {
-          return function() {
+            klass.prototype[property] = (function(property) {
+              return function() {
 
-            var superclass = this.constructor.superclass;
-            this.constructor.superclass = parent;
-            var returnValue = source[property].apply(this, arguments);
-            this.constructor.superclass = superclass;
+                var superclass = this.constructor.superclass;
+                this.constructor.superclass = parent;
+                var returnValue = source[property].apply(this, arguments);
+                this.constructor.superclass = superclass;
 
-            if (property !== 'initialize') {
-              return returnValue;
+                if (property !== 'initialize') {
+                  return returnValue;
+                }
+              };
+            })(property);
+          }
+          else {
+            klass.prototype[property] = source[property];
+          }
+
+          if (IS_DONTENUM_BUGGY) {
+            if (source.toString !== Object.prototype.toString) {
+              klass.prototype.toString = source.toString;
             }
-          };
-        })(property);
-      }
-      else {
-        klass.prototype[property] = source[property];
-      }
-
-      if (IS_DONTENUM_BUGGY) {
-        if (source.toString !== Object.prototype.toString) {
-          klass.prototype.toString = source.toString;
+            if (source.valueOf !== Object.prototype.valueOf) {
+              klass.prototype.valueOf = source.valueOf;
+            }
+          }
         }
-        if (source.valueOf !== Object.prototype.valueOf) {
-          klass.prototype.valueOf = source.valueOf;
-        }
-      }
-    }
-  };
+      };
 
   function Subclass() { }
 

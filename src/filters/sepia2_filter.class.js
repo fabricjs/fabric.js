@@ -1,6 +1,6 @@
 (function(global) {
 
-  "use strict";
+  'use strict';
 
   var fabric  = global.fabric || (global.fabric = { });
 

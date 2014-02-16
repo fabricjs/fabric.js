@@ -16,17 +16,17 @@
           cy = point.y,
           strokeWidth = this.stroke ? this.strokeWidth : 0;
 
-      if (originX === "left") {
+      if (originX === 'left') {
         cx = point.x + (this.getWidth() + strokeWidth * this.scaleX) / 2;
       }
-      else if (originX === "right") {
+      else if (originX === 'right') {
         cx = point.x - (this.getWidth() + strokeWidth * this.scaleX) / 2;
       }
 
-      if (originY === "top") {
+      if (originY === 'top') {
         cy = point.y + (this.getHeight() + strokeWidth * this.scaleY) / 2;
       }
-      else if (originY === "bottom") {
+      else if (originY === 'bottom') {
         cy = point.y - (this.getHeight() + strokeWidth * this.scaleY) / 2;
       }
 
@@ -47,16 +47,16 @@
           strokeWidth = this.stroke ? this.strokeWidth : 0;
 
       // Get the point coordinates
-      if (originX === "left") {
+      if (originX === 'left') {
         x = center.x - (this.getWidth() + strokeWidth * this.scaleX) / 2;
       }
-      else if (originX === "right") {
+      else if (originX === 'right') {
         x = center.x + (this.getWidth() + strokeWidth * this.scaleX) / 2;
       }
-      if (originY === "top") {
+      if (originY === 'top') {
         y = center.y - (this.getHeight() + strokeWidth * this.scaleY) / 2;
       }
-      else if (originY === "bottom") {
+      else if (originY === 'bottom') {
         y = center.y + (this.getHeight() + strokeWidth * this.scaleY) / 2;
       }
 
@@ -106,20 +106,20 @@
           x, y;
 
       if (originX && originY) {
-        if (originX === "left") {
+        if (originX === 'left') {
           x = center.x - (this.getWidth() + strokeWidth * this.scaleX) / 2;
         }
-        else if (originX === "right") {
+        else if (originX === 'right') {
           x = center.x + (this.getWidth() + strokeWidth * this.scaleX) / 2;
         }
         else {
           x = center.x;
         }
 
-        if (originY === "top") {
+        if (originY === 'top') {
           y = center.y - (this.getHeight() + strokeWidth * this.scaleY) / 2;
         }
-        else if (originY === "bottom") {
+        else if (originY === 'bottom') {
           y = center.y + (this.getHeight() + strokeWidth * this.scaleY) / 2;
         }
         else {
@@ -152,8 +152,8 @@
      * @return {void}
      */
     setPositionByOrigin: function(pos, originX, originY) {
-      var center = this.translateToCenterPoint(pos, originX, originY);
-      var position = this.translateToOriginPoint(center, this.originX, this.originY);
+      var center = this.translateToCenterPoint(pos, originX, originY),
+          position = this.translateToOriginPoint(center, this.originX, this.originY);
 
       this.set('left', position.x);
       this.set('top', position.y);
@@ -163,13 +163,13 @@
      * @param {String} to One of 'left', 'center', 'right'
      */
     adjustPosition: function(to) {
-      var angle = degreesToRadians(this.angle);
-      var hypotHalf = this.getWidth() / 2;
-      var xHalf = Math.cos(angle) * hypotHalf;
-      var yHalf = Math.sin(angle) * hypotHalf;
-      var hypotFull = this.getWidth();
-      var xFull = Math.cos(angle) * hypotFull;
-      var yFull = Math.sin(angle) * hypotFull;
+      var angle = degreesToRadians(this.angle),
+          hypotHalf = this.getWidth() / 2,
+          xHalf = Math.cos(angle) * hypotHalf,
+          yHalf = Math.sin(angle) * hypotHalf,
+          hypotFull = this.getWidth(),
+          xFull = Math.cos(angle) * hypotFull,
+          yFull = Math.sin(angle) * hypotFull;
 
       if (this.originX === 'center' && to === 'left' ||
           this.originX === 'right' && to === 'center') {

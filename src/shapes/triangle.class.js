@@ -1,6 +1,6 @@
 (function(global) {
 
-  "use strict";
+  'use strict';
 
   var fabric = global.fabric || (global.fabric = { });
 
@@ -81,13 +81,13 @@
     toSVG: function(reviver) {
       var markup = this._createBaseSVGMarkup(),
           widthBy2 = this.width / 2,
-          heightBy2 = this.height / 2;
-
-      var points = [
-        -widthBy2 + " " + heightBy2,
-        "0 " + -heightBy2,
-        widthBy2 + " " + heightBy2
-      ].join(",");
+          heightBy2 = this.height / 2,
+          points = [
+            -widthBy2 + ' ' + heightBy2,
+            '0 ' + -heightBy2,
+            widthBy2 + ' ' + heightBy2
+          ]
+          .join(',');
 
       markup.push(
         '<polygon ',

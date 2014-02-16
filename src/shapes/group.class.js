@@ -1,6 +1,6 @@
 (function(global){
 
-  "use strict";
+  'use strict';
 
   var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
@@ -416,11 +416,10 @@
      */
     _setOpacityIfSame: function() {
       var objects = this.getObjects(),
-          firstValue = objects[0] ? objects[0].get('opacity') : 1;
-
-      var isSameOpacity = objects.every(function(o) {
-        return o.get('opacity') === firstValue;
-      });
+          firstValue = objects[0] ? objects[0].get('opacity') : 1,
+          isSameOpacity = objects.every(function(o) {
+            return o.get('opacity') === firstValue;
+          });
 
       if (isSameOpacity) {
         this.opacity = firstValue;
@@ -456,12 +455,12 @@
           minY = min(aY),
           maxY = max(aY),
           width = (maxX - minX) || 0,
-          height = (maxY - minY) || 0;
+          height = (maxY - minY) || 0,
+          obj =  {
+            width: width,
+            height: height
+          };
 
-      var obj =  {
-        width: width,
-        height: height
-      };
       if (!onlyWidthHeight) {
         obj.left = (minX + width / 2) || 0;
         obj.top = (minY + height / 2) || 0;

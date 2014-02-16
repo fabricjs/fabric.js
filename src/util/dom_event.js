@@ -13,15 +13,16 @@
     }
     return true;
   }
-  var getUniqueId = (function () {
-    var uid = 0;
-    return function (element) {
-      return element.__uniqueID || (element.__uniqueID = 'uniqueID__' + uid++);
-    };
-  })();
 
   /** @ignore */
-  var getElement, setElement;
+  var getElement,
+      setElement,
+      getUniqueId = (function () {
+        var uid = 0;
+        return function (element) {
+          return element.__uniqueID || (element.__uniqueID = 'uniqueID__' + uid++);
+        };
+      })();
 
   (function () {
     var elements = { };
@@ -177,9 +178,9 @@
     event || (event = fabric.window.event);
 
     var element = event.target ||
-                  (typeof event.srcElement !== unknown ? event.srcElement : null);
+                  (typeof event.srcElement !== unknown ? event.srcElement : null),
 
-    var scroll = fabric.util.getScrollLeftTop(element, upperCanvasEl);
+        scroll = fabric.util.getScrollLeftTop(element, upperCanvasEl);
 
     return {
       x: pointerX(event) + scroll.left,
@@ -192,9 +193,9 @@
     // is represented as COM object, with all the consequences, like "unknown" type and error on [[Get]]
     // need to investigate later
     return (typeof event.clientX !== unknown ? event.clientX : 0);
-  };
+  },
 
-  var pointerY = function(event) {
+  pointerY = function(event) {
     return (typeof event.clientY !== unknown ? event.clientY : 0);
   };
 

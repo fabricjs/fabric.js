@@ -29,7 +29,7 @@ fabric.ElementsParser = {
       try {
         this._createObject(klass, el, index);
       }
-      catch(err) {
+      catch (err) {
         fabric.log(err);
       }
     }

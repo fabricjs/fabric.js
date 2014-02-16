@@ -22,13 +22,12 @@
           tl = new fabric.Point(oCoords.tl.x, oCoords.tl.y),
           tr = new fabric.Point(oCoords.tr.x, oCoords.tr.y),
           bl = new fabric.Point(oCoords.bl.x, oCoords.bl.y),
-          br = new fabric.Point(oCoords.br.x, oCoords.br.y);
-
-      var intersection = fabric.Intersection.intersectPolygonRectangle(
-        [tl, tr, br, bl],
-        pointTL,
-        pointBR
-      );
+          br = new fabric.Point(oCoords.br.x, oCoords.br.y),
+          intersection = fabric.Intersection.intersectPolygonRectangle(
+            [tl, tr, br, bl],
+            pointTL,
+            pointBR
+          );
       return intersection.status === 'Intersection';
     },
 
@@ -48,12 +47,11 @@
         };
       }
       var thisCoords = getCoords(this.oCoords),
-          otherCoords = getCoords(other.oCoords);
-
-      var intersection = fabric.Intersection.intersectPolygonPolygon(
-        [thisCoords.tl, thisCoords.tr, thisCoords.br, thisCoords.bl],
-        [otherCoords.tl, otherCoords.tr, otherCoords.br, otherCoords.bl]
-      );
+          otherCoords = getCoords(other.oCoords),
+          intersection = fabric.Intersection.intersectPolygonPolygon(
+            [thisCoords.tl, thisCoords.tr, thisCoords.br, thisCoords.bl],
+            [otherCoords.tl, otherCoords.tr, otherCoords.br, otherCoords.bl]
+          );
 
       return intersection.status === 'Intersection';
     },
@@ -158,7 +156,7 @@
         else {
           b1 = 0;
           b2 = (iLine.d.y - iLine.o.y) / (iLine.d.x - iLine.o.x);
-          a1 = point.y- b1 * point.x;
+          a1 = point.y - b1 * point.x;
           a2 = iLine.o.y - b2 * iLine.o.x;
 
           xi = - (a1 - a2) / (b1 - b2);
@@ -201,15 +199,15 @@
     getBoundingRect: function() {
       this.oCoords || this.setCoords();
 
-      var xCoords = [this.oCoords.tl.x, this.oCoords.tr.x, this.oCoords.br.x, this.oCoords.bl.x];
-      var minX = fabric.util.array.min(xCoords);
-      var maxX = fabric.util.array.max(xCoords);
-      var width = Math.abs(minX - maxX);
+      var xCoords = [this.oCoords.tl.x, this.oCoords.tr.x, this.oCoords.br.x, this.oCoords.bl.x],
+          minX = fabric.util.array.min(xCoords),
+          maxX = fabric.util.array.max(xCoords),
+          width = Math.abs(minX - maxX),
 
-      var yCoords = [this.oCoords.tl.y, this.oCoords.tr.y, this.oCoords.br.y, this.oCoords.bl.y];
-      var minY = fabric.util.array.min(yCoords);
-      var maxY = fabric.util.array.max(yCoords);
-      var height = Math.abs(minY - maxY);
+          yCoords = [this.oCoords.tl.y, this.oCoords.tr.y, this.oCoords.br.y, this.oCoords.bl.y],
+          minY = fabric.util.array.min(yCoords),
+          maxY = fabric.util.array.max(yCoords),
+          height = Math.abs(minY - maxY);
 
       return {
         left: minX,
@@ -243,12 +241,13 @@
      */
     _constrainScale: function(value) {
       if (Math.abs(value) < this.minScaleLimit) {
-        if (value < 0)
+        if (value < 0) {
           return -this.minScaleLimit;
-        else
+        }
+        else {
           return this.minScaleLimit;
+        }
       }
-
       return value;
     },
 
@@ -317,54 +316,55 @@
       }
 
       var _hypotenuse = Math.sqrt(
-        Math.pow(this.currentWidth / 2, 2) +
-        Math.pow(this.currentHeight / 2, 2));
+            Math.pow(this.currentWidth / 2, 2) +
+            Math.pow(this.currentHeight / 2, 2)),
 
-      var _angle = Math.atan(isFinite(this.currentHeight / this.currentWidth) ? this.currentHeight / this.currentWidth : 0);
+          _angle = Math.atan(isFinite(this.currentHeight / this.currentWidth) ? this.currentHeight / this.currentWidth : 0),
 
-      // offset added for rotate and scale actions
-      var offsetX = Math.cos(_angle + theta) * _hypotenuse,
+          // offset added for rotate and scale actions
+          offsetX = Math.cos(_angle + theta) * _hypotenuse,
           offsetY = Math.sin(_angle + theta) * _hypotenuse,
           sinTh = Math.sin(theta),
-          cosTh = Math.cos(theta);
+          cosTh = Math.cos(theta),
 
-      var coords = this.getCenterPoint();
-      var tl = {
-        x: coords.x - offsetX,
-        y: coords.y - offsetY
-      };
-      var tr = {
-        x: tl.x + (this.currentWidth * cosTh),
-        y: tl.y + (this.currentWidth * sinTh)
-      };
-      var br = {
-        x: tr.x - (this.currentHeight * sinTh),
-        y: tr.y + (this.currentHeight * cosTh)
-      };
-      var bl = {
-        x: tl.x - (this.currentHeight * sinTh),
-        y: tl.y + (this.currentHeight * cosTh)
-      };
-      var ml = {
-        x: tl.x - (this.currentHeight/2 * sinTh),
-        y: tl.y + (this.currentHeight/2 * cosTh)
-      };
-      var mt = {
-        x: tl.x + (this.currentWidth/2 * cosTh),
-        y: tl.y + (this.currentWidth/2 * sinTh)
-      };
-      var mr = {
-        x: tr.x - (this.currentHeight/2 * sinTh),
-        y: tr.y + (this.currentHeight/2 * cosTh)
-      };
-      var mb = {
-        x: bl.x + (this.currentWidth/2 * cosTh),
-        y: bl.y + (this.currentWidth/2 * sinTh)
-      };
-      var mtr = {
-        x: mt.x,
-        y: mt.y
-      };
+          coords = this.getCenterPoint(),
+
+          tl = {
+            x: coords.x - offsetX,
+            y: coords.y - offsetY
+          },
+          tr = {
+            x: tl.x + (this.currentWidth * cosTh),
+            y: tl.y + (this.currentWidth * sinTh)
+          },
+          br = {
+            x: tr.x - (this.currentHeight * sinTh),
+            y: tr.y + (this.currentHeight * cosTh)
+          },
+          bl = {
+            x: tl.x - (this.currentHeight * sinTh),
+            y: tl.y + (this.currentHeight * cosTh)
+          },
+          ml = {
+            x: tl.x - (this.currentHeight/2 * sinTh),
+            y: tl.y + (this.currentHeight/2 * cosTh)
+          },
+          mt = {
+            x: tl.x + (this.currentWidth/2 * cosTh),
+            y: tl.y + (this.currentWidth/2 * sinTh)
+          },
+          mr = {
+            x: tr.x - (this.currentHeight/2 * sinTh),
+            y: tr.y + (this.currentHeight/2 * cosTh)
+          },
+          mb = {
+            x: bl.x + (this.currentWidth/2 * cosTh),
+            y: bl.y + (this.currentWidth/2 * sinTh)
+          },
+          mtr = {
+            x: mt.x,
+            y: mt.y
+          };
 
       // debugging
 

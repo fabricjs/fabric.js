@@ -25,7 +25,7 @@
         this._scaleObjectBy(self.scale);
       }
 
-      this.fire('touch:gesture', {target: target, e: e, self: self});
+      this.fire('touch:gesture', { target: target, e: e, self: self });
     },
 
     /**
@@ -35,7 +35,7 @@
      * @param self Event proxy object by Event.js
      */
     __onDrag: function(e, self) {
-      this.fire('touch:drag', {e: e, self: self});
+      this.fire('touch:drag', { e: e, self: self });
     },
 
     /**
@@ -45,7 +45,7 @@
      * @param self Event proxy object by Event.js
      */
     __onOrientationChange: function(e, self) {
-      this.fire('touch:orientation', {e: e, self: self});
+      this.fire('touch:orientation', { e: e, self: self });
     },
 
     /**
@@ -55,7 +55,7 @@
      * @param self Event proxy object by Event.js
      */
     __onShake: function(e, self) {
-      this.fire('touch:shake', {e: e, self: self});
+      this.fire('touch:shake', { e: e, self: self });
     },
 
     /**
@@ -66,10 +66,9 @@
      */
     _scaleObjectBy: function(s, by) {
       var t = this._currentTransform,
-        target = t.target;
-
-      var lockScalingX = target.get('lockScalingX'),
-        lockScalingY = target.get('lockScalingY');
+          target = t.target,
+          lockScalingX = target.get('lockScalingX'),
+          lockScalingY = target.get('lockScalingY');
 
       if (lockScalingX && lockScalingY) return;
 

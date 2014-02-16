@@ -106,27 +106,27 @@
       var ctx  = this.canvas.contextTop;
       ctx.beginPath();
 
-      var p1 = this._points[0];
-      var p2 = this._points[1];
+      var p1 = this._points[0],
+          p2 = this._points[1];
 
       //if we only have 2 points in the path and they are the same
       //it means that the user only clicked the canvas without moving the mouse
       //then we should be drawing a dot. A path isn't drawn between two identical dots
       //that's why we set them apart a bit
       if (this._points.length === 2 && p1.x === p2.x && p1.y === p2.y) {
-          p1.x -= 0.5;
-          p2.x += 0.5;
+        p1.x -= 0.5;
+        p2.x += 0.5;
       }
       ctx.moveTo(p1.x, p1.y);
 
       for (var i = 1, len = this._points.length; i < len; i++) {
-        // we pick the point between pi+1 & pi+2 as the
+        // we pick the point between pi + 1 & pi + 2 as the
         // end point and p1 as our control point.
         var midPoint = p1.midPointFrom(p2);
         ctx.quadraticCurveTo(p1.x, p1.y, midPoint.x, midPoint.y);
 
         p1 = this._points[i];
-        p2 = this._points[i+1];
+        p2 = this._points[i + 1];
       }
       // Draw last line as a straight line while
       // we wait for the next point to be able to calculate
@@ -151,7 +151,7 @@
       * @param {Array} points
       * @return {Object} object with minx, miny, maxx, maxy
       */
-     getPathBoundingBox: function(points) {
+    getPathBoundingBox: function(points) {
       var xBounds = [],
           yBounds = [],
           p1 = points[0],
@@ -167,19 +167,19 @@
         yBounds.push(midPoint.y);
 
         p1 = points[i];
-        p2 = points[i+1];
+        p2 = points[i + 1];
         startPoint = midPoint;
-     } // end for
+      }
 
-     xBounds.push(p1.x);
-     yBounds.push(p1.y);
+      xBounds.push(p1.x);
+      yBounds.push(p1.y);
 
-     return {
-       minx: utilMin(xBounds),
-       miny: utilMin(yBounds),
-       maxx: utilMax(xBounds),
-       maxy: utilMax(yBounds)
-     };
+      return {
+        minx: utilMin(xBounds),
+        miny: utilMin(yBounds),
+        maxx: utilMax(xBounds),
+        maxy: utilMax(yBounds)
+      };
     },
 
     /**
@@ -188,9 +188,9 @@
      * @return {String} SVG path
      */
     convertPointsToSVGPath: function(points, minX, maxX, minY) {
-      var path = [];
-      var p1 = new fabric.Point(points[0].x - minX, points[0].y - minY);
-      var p2 = new fabric.Point(points[1].x - minX, points[1].y - minY);
+      var path = [],
+          p1 = new fabric.Point(points[0].x - minX, points[0].y - minY),
+          p2 = new fabric.Point(points[1].x - minX, points[1].y - minY);
 
       path.push('M ', points[0].x - minX, ' ', points[0].y - minY, ' ');
       for (var i = 1, len = points.length; i < len; i++) {
@@ -200,8 +200,8 @@
         // start point is p(i-1) value.
         path.push('Q ', p1.x, ' ', p1.y, ' ', midPoint.x, ' ', midPoint.y, ' ');
         p1 = new fabric.Point(points[i].x - minX, points[i].y - minY);
-        if ((i+1) < points.length) {
-          p2 = new fabric.Point(points[i+1].x - minX, points[i+1].y - minY);
+        if ((i + 1) < points.length) {
+          p2 = new fabric.Point(points[i + 1].x - minX, points[i + 1].y - minY);
         }
       }
       path.push('L ', p1.x, ' ', p1.y, ' ');
@@ -240,7 +240,7 @@
       ctx.closePath();
 
       var pathData = this._getSVGPathData().join('');
-      if (pathData === "M 0 0 Q 0 0 0 0 L 0 0") {
+      if (pathData === 'M 0 0 Q 0 0 0 0 L 0 0') {
         // do not create 0 width/height paths, as they are
         // rendered inconsistently across browsers
         // Firefox 4, for example, renders a dot,
@@ -250,8 +250,8 @@
       }
 
       // set path origin coordinates based on our bounding box
-      var originLeft = this.box.minx  + (this.box.maxx - this.box.minx) /2;
-      var originTop = this.box.miny  + (this.box.maxy - this.box.miny) /2;
+      var originLeft = this.box.minx  + (this.box.maxx - this.box.minx) / 2,
+          originTop = this.box.miny  + (this.box.maxy - this.box.miny) / 2;
 
       this.canvas.contextTop.arc(originLeft, originTop, 3, 0, Math.PI * 2, false);
 

@@ -62,9 +62,9 @@
     * @param {Function} callback Callback to invoke
     * @param {DOMElement} element optional Element to associate with animation
     */
-  var requestAnimFrame = function() {
+  function requestAnimFrame() {
     return _requestAnimFrame.apply(fabric.window, arguments);
-  };
+  }
 
   fabric.util.animate = animate;
   fabric.util.requestAnimFrame = requestAnimFrame;

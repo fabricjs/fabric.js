@@ -1,6 +1,6 @@
 (function(global) {
 
-  "use strict";
+  'use strict';
 
   var fabric  = global.fabric || (global.fabric = { }),
       piBy2   = Math.PI * 2,

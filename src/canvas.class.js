@@ -205,10 +205,10 @@
       var t = this._currentTransform;
 
       t.target.set({
-        'scaleX': t.original.scaleX,
-        'scaleY': t.original.scaleY,
-        'left': t.original.left,
-        'top': t.original.top
+        scaleX: t.original.scaleX,
+        scaleY: t.original.scaleY,
+        left: t.original.left,
+        top: t.original.top
       });
 
       if (this._shouldCenterTransform(e, t.target)) {
@@ -264,13 +264,11 @@
     _normalizePointer: function (object, pointer) {
       var activeGroup = this.getActiveGroup(),
           x = pointer.x,
-          y = pointer.y;
-
-      var isObjectInGroup = (
-        activeGroup &&
-        object.type !== 'group' &&
-        activeGroup.contains(object)
-      );
+          y = pointer.y,
+          isObjectInGroup = (
+            activeGroup &&
+            object.type !== 'group' &&
+            activeGroup.contains(object));
 
       if (isObjectInGroup) {
         x -= activeGroup.left;
@@ -475,8 +473,8 @@
       if (lockScalingX && lockScalingY) return;
 
       // Get the constraint point
-      var constraintPosition = target.translateToOriginPoint(target.getCenterPoint(), t.originX, t.originY);
-      var localMouse = target.toLocalPoint(new fabric.Point(x - offset.left, y - offset.top), t.originX, t.originY);
+      var constraintPosition = target.translateToOriginPoint(target.getCenterPoint(), t.originX, t.originY),
+          localMouse = target.toLocalPoint(new fabric.Point(x - offset.left, y - offset.top), t.originX, t.originY);
 
       this._setLocalMouse(localMouse, t);
 
@@ -523,9 +521,8 @@
      */
     _scaleObjectEqually: function(localMouse, target, transform) {
 
-      var dist = localMouse.y + localMouse.x;
-
-      var lastDist = (target.height + (target.strokeWidth)) * transform.original.scaleY +
+      var dist = localMouse.y + localMouse.x,
+          lastDist = (target.height + (target.strokeWidth)) * transform.original.scaleY +
                      (target.width + (target.strokeWidth)) * transform.original.scaleX;
 
       // We use transform.scaleX/Y instead of target.scaleX/Y
@@ -681,15 +678,15 @@
       // selection border
       if (this.selectionDashArray.length > 1) {
 
-        var px = groupSelector.ex + STROKE_OFFSET - ((left > 0) ? 0: aleft);
-        var py = groupSelector.ey + STROKE_OFFSET - ((top > 0) ? 0: atop);
+        var px = groupSelector.ex + STROKE_OFFSET - ((left > 0) ? 0: aleft),
+            py = groupSelector.ey + STROKE_OFFSET - ((top > 0) ? 0: atop);
 
         ctx.beginPath();
 
-        fabric.util.drawDashedLine(ctx, px, py, px+aleft, py, this.selectionDashArray);
-        fabric.util.drawDashedLine(ctx, px, py+atop-1, px+aleft, py+atop-1, this.selectionDashArray);
-        fabric.util.drawDashedLine(ctx, px, py, px, py+atop, this.selectionDashArray);
-        fabric.util.drawDashedLine(ctx, px+aleft-1, py, px+aleft-1, py+atop, this.selectionDashArray);
+        fabric.util.drawDashedLine(ctx, px, py, px + aleft, py, this.selectionDashArray);
+        fabric.util.drawDashedLine(ctx, px, py + atop - 1, px + aleft, py + atop - 1, this.selectionDashArray);
+        fabric.util.drawDashedLine(ctx, px, py, px, py + atop, this.selectionDashArray);
+        fabric.util.drawDashedLine(ctx, px + aleft - 1, py, px + aleft - 1, py + atop, this.selectionDashArray);
 
         ctx.closePath();
         ctx.stroke();
@@ -760,7 +757,7 @@
         this._hoveredTarget = null;
       }
     },
-    
+
     /**
     * @private
     */
@@ -789,20 +786,20 @@
       // Cache all targets where their bounding box contains point.
       var target,
           pointer = this.getPointer(e);
-          
+
       if (this._activeObject && this._checkTarget(e, this._activeObject, pointer)) {
         this.relatedTarget = this._activeObject;
         return this._activeObject;
       }
 
       var i = this._objects.length;
-      
-      while(i--) {
-         if (this._checkTarget(e, this._objects[i], pointer)){
-           this.relatedTarget = this._objects[i];
-           target = this._objects[i];
-           break;
-         }
+
+      while (i--) {
+        if (this._checkTarget(e, this._objects[i], pointer)){
+          this.relatedTarget = this._objects[i];
+          target = this._objects[i];
+          break;
+        }
       }
 
       return target;

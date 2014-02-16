@@ -1,6 +1,6 @@
 (function(global) {
 
-  "use strict";
+  'use strict';
 
   var extend = fabric.util.object.extend;
 
@@ -181,10 +181,10 @@
       this._setStrokeStyles(ctx);
 
       ctx.beginPath();
-      fabric.util.drawDashedLine(ctx, x, y, x+w, y, this.strokeDashArray);
-      fabric.util.drawDashedLine(ctx, x+w, y, x+w, y+h, this.strokeDashArray);
-      fabric.util.drawDashedLine(ctx, x+w, y+h, x, y+h, this.strokeDashArray);
-      fabric.util.drawDashedLine(ctx, x, y+h, x, y, this.strokeDashArray);
+      fabric.util.drawDashedLine(ctx, x, y, x + w, y, this.strokeDashArray);
+      fabric.util.drawDashedLine(ctx, x + w, y, x + w, y + h, this.strokeDashArray);
+      fabric.util.drawDashedLine(ctx, x + w, y + h, x, y + h, this.strokeDashArray);
+      fabric.util.drawDashedLine(ctx, x, y + h, x, y, this.strokeDashArray);
       ctx.closePath();
       ctx.restore();
     },
@@ -415,7 +415,7 @@
    * @type String
    * @default
    */
-  fabric.Image.CSS_CANVAS = "canvas-img";
+  fabric.Image.CSS_CANVAS = 'canvas-img';
 
   /**
    * Alias for getSrc

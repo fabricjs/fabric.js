@@ -12,7 +12,7 @@
     if (style) {
       var keyValuePairs = style.split(/\s*;\s*/);
 
-      if (keyValuePairs[keyValuePairs.length-1] === '') {
+      if (keyValuePairs[keyValuePairs.length - 1] === '') {
         keyValuePairs.pop();
       }
 
@@ -115,7 +115,11 @@
     addColorStop: function(colorStop) {
       for (var position in colorStop) {
         var color = new fabric.Color(colorStop[position]);
-        this.colorStops.push({offset: position, color: color.toRgb(), opacity: color.getAlpha()});
+        this.colorStops.push({
+          offset: position,
+          color: color.toRgb(),
+          opacity: color.getAlpha()
+        });
       }
       return this;
     },

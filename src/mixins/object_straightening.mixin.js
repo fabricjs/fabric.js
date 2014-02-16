@@ -7,9 +7,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   _getAngleValueForStraighten: function() {
     var angle = this.getAngle() % 360;
     if (angle > 0) {
-      return Math.round((angle-1)/90) * 90;
+      return Math.round((angle - 1) / 90) * 90;
     }
-    return Math.round(angle/90) * 90;
+    return Math.round(angle / 90) * 90;
   },
 
   /**

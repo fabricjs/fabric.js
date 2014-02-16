@@ -1,10 +1,10 @@
 (function(global) {
 
-  "use strict";
+  'use strict';
 
   var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
-      coordProps = { 'x1': 1, 'x2': 1, 'y1': 1, 'y2': 1 },
+      coordProps = { x1: 1, x2: 1, y1: 1, y2: 1 },
       supportsLineDash = fabric.StaticCanvas.supports('setLineDash');
 
   if (fabric.Line) {
@@ -170,8 +170,8 @@
 
         // move from center (of virtual box) to its left/top corner
         // we can't assume x1, y1 is top left and x2, y2 is bottom right
-        var xMult = this.x1 <= this.x2 ? -1 : 1;
-        var yMult = this.y1 <= this.y2 ? -1 : 1;
+        var xMult = this.x1 <= this.x2 ? -1 : 1,
+            yMult = this.y1 <= this.y2 ? -1 : 1;
 
         ctx.moveTo(
           this.width === 1 ? 0 : (xMult * this.width / 2),
@@ -274,13 +274,13 @@
    * @return {fabric.Line} instance of fabric.Line
    */
   fabric.Line.fromElement = function(element, options) {
-    var parsedAttributes = fabric.parseAttributes(element, fabric.Line.ATTRIBUTE_NAMES);
-    var points = [
-      parsedAttributes.x1 || 0,
-      parsedAttributes.y1 || 0,
-      parsedAttributes.x2 || 0,
-      parsedAttributes.y2 || 0
-    ];
+    var parsedAttributes = fabric.parseAttributes(element, fabric.Line.ATTRIBUTE_NAMES),
+        points = [
+          parsedAttributes.x1 || 0,
+          parsedAttributes.y1 || 0,
+          parsedAttributes.x2 || 0,
+          parsedAttributes.y2 || 0
+        ];
     return new fabric.Line(points, extend(parsedAttributes, options));
   };
   /* _FROM_SVG_END_ */

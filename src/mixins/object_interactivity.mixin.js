@@ -59,7 +59,7 @@
         // canvas.contextTop.fillRect(lines.rightline.d.x, lines.rightline.d.y, 2, 2);
         // canvas.contextTop.fillRect(lines.rightline.o.x, lines.rightline.o.y, 2, 2);
 
-        xPoints = this._findCrossPoints({x: ex, y: ey}, lines);
+        xPoints = this._findCrossPoints({ x: ex, y: ey }, lines);
         if (xPoints !== 0 && xPoints % 2 === 1) {
           this.__corner = i;
           return i;
@@ -466,15 +466,15 @@
     _getControlsVisibility: function() {
       if (!this._controlsVisibility) {
         this._controlsVisibility = {
-            tl: true,
-            tr: true,
-            br: true,
-            bl: true,
-            ml: true,
-            mt: true,
-            mr: true,
-            mb: true,
-            mtr: true
+          tl: true,
+          tr: true,
+          br: true,
+          bl: true,
+          ml: true,
+          mt: true,
+          mr: true,
+          mb: true,
+          mtr: true
         };
       }
       return this._controlsVisibility;

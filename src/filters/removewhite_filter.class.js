@@ -1,6 +1,6 @@
 (function(global) {
 
-  "use strict";
+  'use strict';
 
   var fabric  = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend;
@@ -58,17 +58,17 @@
 
       for (var i = 0, len = data.length; i < len; i += 4) {
         r = data[i];
-        g = data[i+1];
-        b = data[i+2];
+        g = data[i + 1];
+        b = data[i + 2];
 
         if (r > limit &&
             g > limit &&
             b > limit &&
-            abs(r-g) < distance &&
-            abs(r-b) < distance &&
-            abs(g-b) < distance
+            abs(r - g) < distance &&
+            abs(r - b) < distance &&
+            abs(g - b) < distance
         ) {
-          data[i+3] = 1;
+          data[i + 3] = 1;
         }
       }
 

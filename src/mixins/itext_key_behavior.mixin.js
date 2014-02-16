@@ -155,8 +155,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     var widthOfSameLineBeforeCursor = this._getWidthOfLine(this.ctx, cursorLocation.lineIndex, textLines);
     lineLeftOffset = this._getLineLeftOffset(widthOfSameLineBeforeCursor);
 
-    var widthOfCharsOnSameLineBeforeCursor = lineLeftOffset;
-    var lineIndex = cursorLocation.lineIndex;
+    var widthOfCharsOnSameLineBeforeCursor = lineLeftOffset,
+        lineIndex = cursorLocation.lineIndex;
 
     for (var i = 0, len = textOnSameLineBeforeCursor.length; i < len; i++) {
       _char = textOnSameLineBeforeCursor[i];
@@ -174,17 +174,17 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    */
   _getIndexOnNextLine: function(cursorLocation, textOnNextLine, widthOfCharsOnSameLineBeforeCursor, textLines) {
 
-    var lineIndex = cursorLocation.lineIndex + 1;
-    var widthOfNextLine = this._getWidthOfLine(this.ctx, lineIndex, textLines);
-    var lineLeftOffset = this._getLineLeftOffset(widthOfNextLine);
-    var widthOfCharsOnNextLine = lineLeftOffset;
-    var indexOnNextLine = 0;
-    var foundMatch;
+    var lineIndex = cursorLocation.lineIndex + 1,
+        widthOfNextLine = this._getWidthOfLine(this.ctx, lineIndex, textLines),
+        lineLeftOffset = this._getLineLeftOffset(widthOfNextLine),
+        widthOfCharsOnNextLine = lineLeftOffset,
+        indexOnNextLine = 0,
+        foundMatch;
 
     for (var j = 0, jlen = textOnNextLine.length; j < jlen; j++) {
 
-      var _char = textOnNextLine[j];
-      var widthOfChar = this._getWidthOfChar(this.ctx, _char, lineIndex, j);
+      var _char = textOnNextLine[j],
+          widthOfChar = this._getWidthOfChar(this.ctx, _char, lineIndex, j);
 
       widthOfCharsOnNextLine += widthOfChar;
 
@@ -192,10 +192,10 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
         foundMatch = true;
 
-        var leftEdge = widthOfCharsOnNextLine - widthOfChar;
-        var rightEdge = widthOfCharsOnNextLine;
-        var offsetFromLeftEdge = Math.abs(leftEdge - widthOfCharsOnSameLineBeforeCursor);
-        var offsetFromRightEdge = Math.abs(rightEdge - widthOfCharsOnSameLineBeforeCursor);
+        var leftEdge = widthOfCharsOnNextLine - widthOfChar,
+            rightEdge = widthOfCharsOnNextLine,
+            offsetFromLeftEdge = Math.abs(leftEdge - widthOfCharsOnSameLineBeforeCursor),
+            offsetFromRightEdge = Math.abs(rightEdge - widthOfCharsOnSameLineBeforeCursor);
 
         indexOnNextLine = offsetFromRightEdge < offsetFromLeftEdge ? j + 1 : j;
 
@@ -283,13 +283,10 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         textOnPreviousLine = (textBeforeCursor.match(/\n?(.*)\n.*$/) || {})[1] || '',
         textLines = this.text.split(this._reNewline),
         _char,
-        lineLeftOffset;
-
-    var widthOfSameLineBeforeCursor = this._getWidthOfLine(this.ctx, cursorLocation.lineIndex, textLines);
-    lineLeftOffset = this._getLineLeftOffset(widthOfSameLineBeforeCursor);
-
-    var widthOfCharsOnSameLineBeforeCursor = lineLeftOffset;
-    var lineIndex = cursorLocation.lineIndex;
+        widthOfSameLineBeforeCursor = this._getWidthOfLine(this.ctx, cursorLocation.lineIndex, textLines),
+        lineLeftOffset = this._getLineLeftOffset(widthOfSameLineBeforeCursor),
+        widthOfCharsOnSameLineBeforeCursor = lineLeftOffset,
+        lineIndex = cursorLocation.lineIndex;
 
     for (var i = 0, len = textOnSameLineBeforeCursor.length; i < len; i++) {
       _char = textOnSameLineBeforeCursor[i];
@@ -307,17 +304,17 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    */
   _getIndexOnPrevLine: function(cursorLocation, textOnPreviousLine, widthOfCharsOnSameLineBeforeCursor, textLines) {
 
-    var lineIndex = cursorLocation.lineIndex - 1;
-    var widthOfPreviousLine = this._getWidthOfLine(this.ctx, lineIndex, textLines);
-    var lineLeftOffset = this._getLineLeftOffset(widthOfPreviousLine);
-    var widthOfCharsOnPreviousLine = lineLeftOffset;
-    var indexOnPrevLine = 0;
-    var foundMatch;
+    var lineIndex = cursorLocation.lineIndex - 1,
+        widthOfPreviousLine = this._getWidthOfLine(this.ctx, lineIndex, textLines),
+        lineLeftOffset = this._getLineLeftOffset(widthOfPreviousLine),
+        widthOfCharsOnPreviousLine = lineLeftOffset,
+        indexOnPrevLine = 0,
+        foundMatch;
 
     for (var j = 0, jlen = textOnPreviousLine.length; j < jlen; j++) {
 
-      var _char = textOnPreviousLine[j];
-      var widthOfChar = this._getWidthOfChar(this.ctx, _char, lineIndex, j);
+      var _char = textOnPreviousLine[j],
+          widthOfChar = this._getWidthOfChar(this.ctx, _char, lineIndex, j);
 
       widthOfCharsOnPreviousLine += widthOfChar;
 
@@ -325,10 +322,10 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
         foundMatch = true;
 
-        var leftEdge = widthOfCharsOnPreviousLine - widthOfChar;
-        var rightEdge = widthOfCharsOnPreviousLine;
-        var offsetFromLeftEdge = Math.abs(leftEdge - widthOfCharsOnSameLineBeforeCursor);
-        var offsetFromRightEdge = Math.abs(rightEdge - widthOfCharsOnSameLineBeforeCursor);
+        var leftEdge = widthOfCharsOnPreviousLine - widthOfChar,
+            rightEdge = widthOfCharsOnPreviousLine,
+            offsetFromLeftEdge = Math.abs(leftEdge - widthOfCharsOnSameLineBeforeCursor),
+            offsetFromRightEdge = Math.abs(rightEdge - widthOfCharsOnSameLineBeforeCursor);
 
         indexOnPrevLine = offsetFromRightEdge < offsetFromLeftEdge ? j : (j - 1);
 

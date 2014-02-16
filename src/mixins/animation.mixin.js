@@ -142,7 +142,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       for (prop in arguments[0]) {
         propsToAnimate.push(prop);
       }
-      for (var i = 0, len = propsToAnimate.length; i<len; i++) {
+      for (var i = 0, len = propsToAnimate.length; i < len; i++) {
         prop = propsToAnimate[i];
         skipCallbacks = i !== len - 1;
         this._animate(prop, arguments[0][prop], arguments[1], skipCallbacks);
@@ -162,7 +162,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @param {Boolean} [skipCallbacks] When true, callbacks like onchange and oncomplete are not invoked
    */
   _animate: function(property, to, options, skipCallbacks) {
-    var obj = this, propPair;
+    var _this = this, propPair;
 
     to = to.toString();
 
@@ -199,14 +199,14 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       easing: options.easing,
       duration: options.duration,
       abort: options.abort && function() {
-        return options.abort.call(obj);
+        return options.abort.call(_this);
       },
       onChange: function(value) {
         if (propPair) {
-          obj[propPair[0]][propPair[1]] = value;
+          _this[propPair[0]][propPair[1]] = value;
         }
         else {
-          obj.set(property, value);
+          _this.set(property, value);
         }
         if (skipCallbacks) return;
         options.onChange && options.onChange();
@@ -214,7 +214,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       onComplete: function() {
         if (skipCallbacks) return;
 
-        obj.setCoords();
+        _this.setCoords();
         options.onComplete && options.onComplete();
       }
     });

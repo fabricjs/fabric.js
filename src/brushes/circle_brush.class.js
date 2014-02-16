@@ -25,8 +25,8 @@ fabric.CircleBrush = fabric.util.createClass(fabric.BaseBrush, /** @lends fabric
   * @param {Object} pointer
   */
   drawDot: function(pointer) {
-    var point = this.addPoint(pointer);
-    var ctx = this.canvas.contextTop;
+    var point = this.addPoint(pointer),
+        ctx = this.canvas.contextTop;
 
     ctx.fillStyle = point.fill;
     ctx.beginPath();
@@ -63,15 +63,15 @@ fabric.CircleBrush = fabric.util.createClass(fabric.BaseBrush, /** @lends fabric
     var circles = [ ];
 
     for (var i = 0, len = this.points.length; i < len; i++) {
-      var point = this.points[i];
-      var circle = new fabric.Circle({
-        radius: point.radius,
-        left: point.x,
-        top: point.y,
-        originX: 'center',
-        originY: 'center',
-        fill: point.fill
-      });
+      var point = this.points[i],
+          circle = new fabric.Circle({
+            radius: point.radius,
+            left: point.x,
+            top: point.y,
+            originX: 'center',
+            originY: 'center',
+            fill: point.fill
+          });
 
       this.shadow && circle.setShadow(this.shadow);
 
@@ -93,12 +93,12 @@ fabric.CircleBrush = fabric.util.createClass(fabric.BaseBrush, /** @lends fabric
    * @return {fabric.Point} Just added pointer point
    */
   addPoint: function(pointer) {
-    var pointerPoint = new fabric.Point(pointer.x, pointer.y);
+    var pointerPoint = new fabric.Point(pointer.x, pointer.y),
 
-    var circleRadius = fabric.util.getRandomInt(
-                        Math.max(0, this.width - 20), this.width + 20) / 2;
+        circleRadius = fabric.util.getRandomInt(
+                        Math.max(0, this.width - 20), this.width + 20) / 2,
 
-    var circleColor = new fabric.Color(this.color)
+        circleColor = new fabric.Color(this.color)
                         .setAlpha(fabric.util.getRandomInt(0, 100) / 100)
                         .toRgba();
 

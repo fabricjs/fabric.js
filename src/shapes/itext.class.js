@@ -332,8 +332,8 @@
       if (typeof selectionStart === 'undefined') {
         selectionStart = this.selectionStart;
       }
-      var textBeforeCursor = this.text.slice(0, selectionStart);
-      var linesBeforeCursor = textBeforeCursor.split(this._reNewline);
+      var textBeforeCursor = this.text.slice(0, selectionStart),
+          linesBeforeCursor = textBeforeCursor.split(this._reNewline);
 
       return {
         lineIndex: linesBeforeCursor.length - 1,
@@ -351,13 +351,13 @@
       var style = this.styles[lineIndex] && this.styles[lineIndex][charIndex === 0 ? 0 : (charIndex - 1)];
 
       return {
-        fontSize : style && style.fontSize || this.fontSize,
-        fill : style && style.fill || this.fill,
-        textBackgroundColor : style && style.textBackgroundColor || this.textBackgroundColor,
-        textDecoration : style && style.textDecoration || this.textDecoration,
-        fontFamily : style && style.fontFamily || this.fontFamily,
-        stroke : style && style.stroke || this.stroke,
-        strokeWidth : style && style.strokeWidth || this.strokeWidth
+        fontSize: style && style.fontSize || this.fontSize,
+        fill: style && style.fill || this.fill,
+        textBackgroundColor: style && style.textBackgroundColor || this.textBackgroundColor,
+        textDecoration: style && style.textDecoration || this.textDecoration,
+        fontFamily: style && style.fontFamily || this.fontFamily,
+        stroke: style && style.stroke || this.stroke,
+        strokeWidth: style && style.strokeWidth || this.strokeWidth
       };
     },
 
@@ -572,7 +572,7 @@
           boxWidth,
           lineHeight);
 
-          boundaries.topOffset += lineHeight;
+        boundaries.topOffset += lineHeight;
       }
       ctx.restore();
     },
@@ -612,10 +612,10 @@
 
       for (var i = 0, len = chars.length; i <= len; i++) {
         prevStyle = prevStyle || this.getCurrentCharStyle(lineIndex, i);
-        var thisStyle = this.getCurrentCharStyle(lineIndex, i+1);
+        var thisStyle = this.getCurrentCharStyle(lineIndex, i + 1);
 
         if (this._hasStyleChanged(prevStyle, thisStyle) || i === len) {
-          this._renderChar(method, ctx, lineIndex, i-1, charsToRender, left, top, lineHeight);
+          this._renderChar(method, ctx, lineIndex, i - 1, charsToRender, left, top, lineHeight);
           charsToRender = '';
           prevStyle = thisStyle;
         }
@@ -707,10 +707,10 @@
     _renderCharDecoration: function(ctx, styleDeclaration, left, top, charWidth, lineHeight, charHeight) {
 
       var textDecoration = styleDeclaration
-        ? (styleDeclaration.textDecoration || this.textDecoration)
-        : this.textDecoration;
+            ? (styleDeclaration.textDecoration || this.textDecoration)
+            : this.textDecoration,
 
-      var fontSize = (styleDeclaration ? styleDeclaration.fontSize : null) || this.fontSize;
+          fontSize = (styleDeclaration ? styleDeclaration.fontSize : null) || this.fontSize;
 
       if (!textDecoration) return;
 
@@ -953,7 +953,7 @@
       if (this._charWidthsCache[cacheProp] && this.caching) {
         return this._charWidthsCache[cacheProp];
       }
-      else if(ctx){
+      else if (ctx) {
         ctx.save();
         var width = this._applyCharStylesGetWidth(ctx, _char, lineIndex, charIndex);
         ctx.restore();

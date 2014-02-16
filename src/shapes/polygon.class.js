@@ -1,6 +1,6 @@
 (function(global) {
 
-  "use strict";
+  'use strict';
 
   var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
@@ -145,7 +145,7 @@
       ctx.beginPath();
       for (var i = 0, len = this.points.length; i < len; i++) {
         p1 = this.points[i];
-        p2 = this.points[i+1] || this.points[0];
+        p2 = this.points[i + 1] || this.points[0];
         fabric.util.drawDashedLine(ctx, p1.x, p1.y, p2.x, p2.y, this.strokeDashArray);
       }
       ctx.closePath();

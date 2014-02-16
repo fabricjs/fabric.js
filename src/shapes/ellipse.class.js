@@ -1,6 +1,6 @@
 (function(global){
 
-  "use strict";
+  'use strict';
 
   var fabric = global.fabric || (global.fabric = { }),
       piBy2   = Math.PI * 2,
@@ -151,9 +151,9 @@
   fabric.Ellipse.fromElement = function(element, options) {
     options || (options = { });
 
-    var parsedAttributes = fabric.parseAttributes(element, fabric.Ellipse.ATTRIBUTE_NAMES);
-    var cx = parsedAttributes.left;
-    var cy = parsedAttributes.top;
+    var parsedAttributes = fabric.parseAttributes(element, fabric.Ellipse.ATTRIBUTE_NAMES),
+        cx = parsedAttributes.left,
+        cy = parsedAttributes.top;
 
     if ('left' in parsedAttributes) {
       parsedAttributes.left -= (options.width / 2) || 0;
