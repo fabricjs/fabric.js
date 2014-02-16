@@ -24,7 +24,8 @@
     "jshint": "2.4.x",
     "uglify-js": "2.4.x",
     "execSync": "0.0.x",
-    "plato": "0.6.x"
+    "plato": "0.6.x",
+    "jscs": "1.2.x"
   },
   "engines": { "node": ">=0.4.0 && <1.0.0" },
   "main": "./dist/fabric.js"
