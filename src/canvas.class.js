@@ -810,9 +810,16 @@
      */
     getPointer: function (e) {
       var pointer = getPointer(e, this.upperCanvasEl);
-      var cssScale = {
-        width: this.upperCanvasEl.width / this.upperCanvasEl.getBoundingClientRect().width,
-        height: this.upperCanvasEl.height / this.upperCanvasEl.getBoundingClientRect().height,
+      var bounds = this.upperCanvasEl.getBoundingClientRect();
+      var cssScale;
+      if (bounds.width === 0 || bounds.height === 0) {
+        // If bounds are not available (i.e. not visible), do not apply scale.
+        cssScale = {width: 1, height: 1};
+      } else {
+        cssScale = {
+          width: this.upperCanvasEl.width / bounds.width,
+          height: this.upperCanvasEl.height / bounds.height,
+        };
       }
       return {
         x: (pointer.x - this._offset.left) * cssScale.width,
