@@ -99,7 +99,7 @@
         a10 = sinTh * rx,
         a11 = cosTh * ry,
         thHalf = 0.5 * (th1 - th0),
-        t = (8/3) * Math.sin(thHalf * 0.5) *
+        t = (8 / 3) * Math.sin(thHalf * 0.5) *
             Math.sin(thHalf * 0.5) / Math.sin(thHalf),
 
         x1 = cx + Math.cos(th0) - t * Math.sin(th0),

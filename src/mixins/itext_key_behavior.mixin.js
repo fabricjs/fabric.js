@@ -600,7 +600,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         this.selectionStart = leftWordBoundary;
       }
       else {
-        var isBeginningOfLine = this.text.slice(this.selectionStart-1, this.selectionStart) === '\n';
+        var isBeginningOfLine = this.text.slice(this.selectionStart - 1, this.selectionStart) === '\n';
         this.removeStyleObject(isBeginningOfLine);
 
         this.selectionStart--;

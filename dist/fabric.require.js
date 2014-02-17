@@ -915,7 +915,7 @@ fabric.Collection = {
         a10 = sinTh * rx,
         a11 = cosTh * ry,
         thHalf = 0.5 * (th1 - th0),
-        t = (8/3) * Math.sin(thHalf * 0.5) *
+        t = (8 / 3) * Math.sin(thHalf * 0.5) *
             Math.sin(thHalf * 0.5) / Math.sin(thHalf),
 
         x1 = cx + Math.cos(th0) - t * Math.sin(th0),
@@ -1878,8 +1878,8 @@ fabric.Collection = {
         top = 0;
       }
       else if (element === fabric.document) {
-        left = body.scrollLeft || docElement.scrollLeft || 0;
-        top = body.scrollTop ||  docElement.scrollTop || 0;
+        left += body.scrollLeft || docElement.scrollLeft || 0;
+        top += body.scrollTop ||  docElement.scrollTop || 0;
       }
       else {
         left += element.scrollLeft || 0;
@@ -2173,7 +2173,7 @@ if (typeof console !== 'undefined') {
           finish = start + duration, time,
           onChange = options.onChange || function() { },
           abort = options.abort || function() { return false; },
-          easing = options.easing || function(t, b, c, d) {return -c * Math.cos(t/d * (Math.PI/2)) + c + b;},
+          easing = options.easing || function(t, b, c, d) {return -c * Math.cos(t / d * (Math.PI / 2)) + c + b;},
           startValue = 'startValue' in options ? options.startValue : 0,
           endValue = 'endValue' in options ? options.endValue : 100,
           byValue = options.byValue || endValue - startValue;
@@ -8601,8 +8601,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      */
     _finalizeCurrentTransform: function() {
 
-      var transform = this._currentTransform;
-      var target = transform.target;
+      var transform = this._currentTransform,
+          target = transform.target;
 
       if (target._scaling) {
         target._scaling = false;
@@ -8912,7 +8912,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @private
      */
     _fire: function(eventName, target, e) {
-      this.fire('object:' + eventName, { target: target, e: e});
+      this.fire('object:' + eventName, { target: target, e: e });
       target.fire(eventName, { e: e });
     },
 
@@ -8969,9 +8969,9 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         return false;
       }
       else {
-        var activeGroup = this.getActiveGroup();
-        // only show proper corner when group selection is not active
-        var corner = target._findTargetCorner
+        var activeGroup = this.getActiveGroup(),
+            // only show proper corner when group selection is not active
+            corner = target._findTargetCorner
                       && (!activeGroup || !activeGroup.contains(target))
                       && target._findTargetCorner(e, this._offset);
 
@@ -13604,8 +13604,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @param ctx {CanvasRenderingContext2D} context to render on
      */
     _renderDashedStroke: function(ctx) {
-      var x = -this.width/2,
-          y = -this.height/2,
+      var x = -this.width / 2,
+          y = -this.height / 2,
           w = this.width,
           h = this.height;
 
@@ -15790,8 +15790,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       if (!this.visible) return;
 
       ctx.save();
-      var m = this.transformMatrix;
-      var isInPathGroup = this.group && this.group.type === 'path-group';
+
+      var m = this.transformMatrix,
+          isInPathGroup = this.group && this.group.type === 'path-group';
 
       // this._resetWidthHeight();
       if (isInPathGroup) {
@@ -19901,7 +19902,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @param {Number} direction: 1 or -1
      */
     searchWordBoundary: function(selectionStart, direction) {
-      var index = this._reSpace.test(this.text.charAt(selectionStart)) ? selectionStart-1 : selectionStart,
+      var index = this._reSpace.test(this.text.charAt(selectionStart)) ? selectionStart - 1 : selectionStart,
           _char = this.text.charAt(index),
           reNonWord = /[ \n\.,;!\?\-]/;
 
@@ -21204,7 +21205,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         this.selectionStart = leftWordBoundary;
       }
       else {
-        var isBeginningOfLine = this.text.slice(this.selectionStart-1, this.selectionStart) === '\n';
+        var isBeginningOfLine = this.text.slice(this.selectionStart - 1, this.selectionStart) === '\n';
         this.removeStyleObject(isBeginningOfLine);
 
         this.selectionStart--;

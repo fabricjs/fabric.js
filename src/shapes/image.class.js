@@ -122,8 +122,9 @@
       if (!this.visible) return;
 
       ctx.save();
-      var m = this.transformMatrix;
-      var isInPathGroup = this.group && this.group.type === 'path-group';
+
+      var m = this.transformMatrix,
+          isInPathGroup = this.group && this.group.type === 'path-group';
 
       // this._resetWidthHeight();
       if (isInPathGroup) {

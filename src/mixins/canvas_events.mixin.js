@@ -264,8 +264,8 @@
      */
     _finalizeCurrentTransform: function() {
 
-      var transform = this._currentTransform;
-      var target = transform.target;
+      var transform = this._currentTransform,
+          target = transform.target;
 
       if (target._scaling) {
         target._scaling = false;
@@ -575,7 +575,7 @@
      * @private
      */
     _fire: function(eventName, target, e) {
-      this.fire('object:' + eventName, { target: target, e: e});
+      this.fire('object:' + eventName, { target: target, e: e });
       target.fire(eventName, { e: e });
     },
 
@@ -632,9 +632,9 @@
         return false;
       }
       else {
-        var activeGroup = this.getActiveGroup();
-        // only show proper corner when group selection is not active
-        var corner = target._findTargetCorner
+        var activeGroup = this.getActiveGroup(),
+            // only show proper corner when group selection is not active
+            corner = target._findTargetCorner
                       && (!activeGroup || !activeGroup.contains(target))
                       && target._findTargetCorner(e, this._offset);
 

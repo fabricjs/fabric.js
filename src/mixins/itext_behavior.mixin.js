@@ -258,7 +258,7 @@
      * @param {Number} direction: 1 or -1
      */
     searchWordBoundary: function(selectionStart, direction) {
-      var index = this._reSpace.test(this.text.charAt(selectionStart)) ? selectionStart-1 : selectionStart,
+      var index = this._reSpace.test(this.text.charAt(selectionStart)) ? selectionStart - 1 : selectionStart,
           _char = this.text.charAt(index),
           reNonWord = /[ \n\.,;!\?\-]/;
 

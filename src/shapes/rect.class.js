@@ -156,8 +156,8 @@
      * @param ctx {CanvasRenderingContext2D} context to render on
      */
     _renderDashedStroke: function(ctx) {
-      var x = -this.width/2,
-          y = -this.height/2,
+      var x = -this.width / 2,
+          y = -this.height / 2,
           w = this.width,
           h = this.height;
 
