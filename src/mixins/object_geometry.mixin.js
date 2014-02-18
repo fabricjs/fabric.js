@@ -79,10 +79,10 @@
       var boundingRect = this.getBoundingRect();
 
       return (
-        boundingRect.left > pointTL.x &&
-        boundingRect.left + boundingRect.width < pointBR.x &&
-        boundingRect.top > pointTL.y &&
-        boundingRect.top + boundingRect.height < pointBR.y
+        boundingRect.left >= pointTL.x &&
+        boundingRect.left + boundingRect.width <= pointBR.x &&
+        boundingRect.top >= pointTL.y &&
+        boundingRect.top + boundingRect.height <= pointBR.y
       );
     },
 
