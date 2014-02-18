@@ -255,7 +255,7 @@
 
       // http://www.geog.ubc.ca/courses/klink/gis.notes/ncgia/u32.html
       // http://idav.ucdavis.edu/~okreylos/TAship/Spring2000/PointInPolygon.html
-      return (target.containsPoint(xy) || target._findTargetCorner(e, this._offset));
+      return (target.containsPoint(xy) || target._findTargetCorner(pointer));
     },
 
     /**
@@ -402,8 +402,8 @@
     _setupCurrentTransform: function (e, target) {
       if (!target) return;
 
-      var corner = target._findTargetCorner(e, this._offset),
-          pointer = getPointer(e, target.canvas.upperCanvasEl),
+      var pointer = this.getPointer(e),
+          corner = target._findTargetCorner(pointer),
           action = this._getActionFromCorner(target, corner),
           origin = this._getOriginFromCorner(target, corner);
 
@@ -465,7 +465,6 @@
      */
     _scaleObject: function (x, y, by) {
       var t = this._currentTransform,
-          offset = this._offset,
           target = t.target,
           lockScalingX = target.get('lockScalingX'),
           lockScalingY = target.get('lockScalingY');
@@ -474,7 +473,7 @@
 
       // Get the constraint point
       var constraintPosition = target.translateToOriginPoint(target.getCenterPoint(), t.originX, t.originY),
-          localMouse = target.toLocalPoint(new fabric.Point(x - offset.left, y - offset.top), t.originX, t.originY);
+          localMouse = target.toLocalPoint(new fabric.Point(x, y), t.originX, t.originY);
 
       this._setLocalMouse(localMouse, t);
 
@@ -619,13 +618,12 @@
      */
     _rotateObject: function (x, y) {
 
-      var t = this._currentTransform,
-          o = this._offset;
+      var t = this._currentTransform;
 
       if (t.target.get('lockRotation')) return;
 
-      var lastAngle = atan2(t.ey - t.top - o.top, t.ex - t.left - o.left),
-          curAngle = atan2(y - t.top - o.top, x - t.left - o.left),
+      var lastAngle = atan2(t.ey - t.top, t.ex - t.left),
+          curAngle = atan2(y - t.top, x - t.left),
           angle = radiansToDegrees(curAngle - lastAngle + t.theta);
 
       // normalize angle to positive value
@@ -710,7 +708,7 @@
         this.lastRenderedObjectWithControlsAboveOverlay &&
         this.lastRenderedObjectWithControlsAboveOverlay.visible &&
         this.containsPoint(e, this.lastRenderedObjectWithControlsAboveOverlay) &&
-        this.lastRenderedObjectWithControlsAboveOverlay._findTargetCorner(e, this._offset));
+        this.lastRenderedObjectWithControlsAboveOverlay._findTargetCorner(this.getPointer(e)));
     },
 
     /**
@@ -812,9 +810,20 @@
      */
     getPointer: function (e) {
       var pointer = getPointer(e, this.upperCanvasEl);
+      var bounds = this.upperCanvasEl.getBoundingClientRect();
+      var cssScale;
+      if (bounds.width === 0 || bounds.height === 0) {
+        // If bounds are not available (i.e. not visible), do not apply scale.
+        cssScale = {width: 1, height: 1};
+      } else {
+        cssScale = {
+          width: this.upperCanvasEl.width / bounds.width,
+          height: this.upperCanvasEl.height / bounds.height,
+        };
+      }
       return {
-        x: pointer.x - this._offset.left,
-        y: pointer.y - this._offset.top
+        x: (pointer.x - this._offset.left) * cssScale.width,
+        y: (pointer.y - this._offset.top) * cssScale.height
       };
     },
 
