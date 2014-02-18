@@ -809,13 +809,15 @@
      * @return {Object} object with "x" and "y" number values
      */
     getPointer: function (e) {
-      var pointer = getPointer(e, this.upperCanvasEl);
-      var bounds = this.upperCanvasEl.getBoundingClientRect();
-      var cssScale;
+      var pointer = getPointer(e, this.upperCanvasEl),
+          bounds = this.upperCanvasEl.getBoundingClientRect(),
+          cssScale;
+
       if (bounds.width === 0 || bounds.height === 0) {
         // If bounds are not available (i.e. not visible), do not apply scale.
-        cssScale = {width: 1, height: 1};
-      } else {
+        cssScale = { width: 1, height: 1 };
+      }
+      else {
         cssScale = {
           width: this.upperCanvasEl.width / bounds.width,
           height: this.upperCanvasEl.height / bounds.height,

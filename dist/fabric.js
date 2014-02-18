@@ -3181,7 +3181,7 @@ if (typeof console !== 'undefined') {
      * @param {Function} [reviver] Method for further parsing of SVG elements, called after each fabric object created.
      */
     parseElements: function(elements, callback, options, reviver) {
-      fabric.ElementsParser.parse(elements, callback, options, reviver);
+      new fabric.ElementsParser(elements, callback, options, reviver).parse();
     },
 
     /**
@@ -3427,75 +3427,73 @@ if (typeof console !== 'undefined') {
 })(typeof exports !== 'undefined' ? exports : this);
 
 
-fabric.ElementsParser = {
+fabric.ElementsParser = function(elements, callback, options, reviver) {
+  this.elements = elements;
+  this.callback = callback;
+  this.options = options;
+  this.reviver = reviver;
+};
 
-  parse: function(elements, callback, options, reviver) {
+fabric.ElementsParser.prototype.parse = function() {
+  this.instances = new Array(this.elements.length);
+  this.numElements = this.elements.length;
 
-    this.elements = elements;
-    this.callback = callback;
-    this.options = options;
-    this.reviver = reviver;
+  this.createObjects();
+};
 
-    this.instances = new Array(elements.length);
-    this.numElements = elements.length;
+fabric.ElementsParser.prototype.createObjects = function() {
+  for (var i = 0, len = this.elements.length; i < len; i++) {
+    (function(_this, i) {
+      setTimeout(function() {
+        _this.createObject(_this.elements[i], i);
+      }, 0);
+    })(this, i);
+  }
+};
 
-    this.createObjects();
-  },
-
-  createObjects: function() {
-    for (var i = 0, len = this.elements.length; i < len; i++) {
-      (function(_this, i) {
-        setTimeout(function() {
-          _this.createObject(_this.elements[i], i);
-        }, 0);
-      })(this, i);
+fabric.ElementsParser.prototype.createObject = function(el, index) {
+  var klass = fabric[fabric.util.string.capitalize(el.tagName)];
+  if (klass && klass.fromElement) {
+    try {
+      this._createObject(klass, el, index);
     }
-  },
+    catch (err) {
+      fabric.log(err);
+    }
+  }
+  else {
+    this.checkIfDone();
+  }
+};
 
-  createObject: function(el, index) {
-    var klass = fabric[fabric.util.string.capitalize(el.tagName)];
-    if (klass && klass.fromElement) {
-      try {
-        this._createObject(klass, el, index);
-      }
-      catch (err) {
-        fabric.log(err);
-      }
-    }
-    else {
-      this.checkIfDone();
-    }
-  },
+fabric.ElementsParser.prototype._createObject = function(klass, el, index) {
+  if (klass.async) {
+    klass.fromElement(el, this.createCallback(index, el), this.options);
+  }
+  else {
+    var obj = klass.fromElement(el, this.options);
+    this.reviver && this.reviver(el, obj);
+    this.instances.splice(index, 0, obj);
+    this.checkIfDone();
+  }
+};
 
-  _createObject: function(klass, el, index) {
-    if (klass.async) {
-      klass.fromElement(el, this.createCallback(index, el), this.options);
-    }
-    else {
-      var obj = klass.fromElement(el, this.options);
-      this.reviver && this.reviver(el, obj);
-      this.instances.splice(index, 0, obj);
-      this.checkIfDone();
-    }
-  },
+fabric.ElementsParser.prototype.createCallback = function(index, el) {
+  var _this = this;
+  return function(obj) {
+    _this.reviver && _this.reviver(el, obj);
+    _this.instances.splice(index, 0, obj);
+    _this.checkIfDone();
+  };
+};
 
-  createCallback: function(index, el) {
-    var _this = this;
-    return function(obj) {
-      _this.reviver && _this.reviver(el, obj);
-      _this.instances.splice(index, 0, obj);
-      _this.checkIfDone();
-    };
-  },
-
-  checkIfDone: function() {
-    if (--this.numElements === 0) {
-      this.instances = this.instances.filter(function(el) {
-        return el != null;
-      });
-      fabric.resolveGradients(this.instances);
-      this.callback(this.instances);
-    }
+fabric.ElementsParser.prototype.checkIfDone = function() {
+  if (--this.numElements === 0) {
+    this.instances = this.instances.filter(function(el) {
+      return el != null;
+    });
+    fabric.resolveGradients(this.instances);
+    this.callback(this.instances);
   }
 };
 
@@ -7470,7 +7468,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
       // http://www.geog.ubc.ca/courses/klink/gis.notes/ncgia/u32.html
       // http://idav.ucdavis.edu/~okreylos/TAship/Spring2000/PointInPolygon.html
-      return (target.containsPoint(xy) || target._findTargetCorner(e, this._offset));
+      return (target.containsPoint(xy) || target._findTargetCorner(pointer));
     },
 
     /**
@@ -7617,8 +7615,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     _setupCurrentTransform: function (e, target) {
       if (!target) return;
 
-      var corner = target._findTargetCorner(e, this._offset),
-          pointer = getPointer(e, target.canvas.upperCanvasEl),
+      var pointer = this.getPointer(e),
+          corner = target._findTargetCorner(pointer),
           action = this._getActionFromCorner(target, corner),
           origin = this._getOriginFromCorner(target, corner);
 
@@ -7680,7 +7678,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      */
     _scaleObject: function (x, y, by) {
       var t = this._currentTransform,
-          offset = this._offset,
           target = t.target,
           lockScalingX = target.get('lockScalingX'),
           lockScalingY = target.get('lockScalingY');
@@ -7689,7 +7686,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
       // Get the constraint point
       var constraintPosition = target.translateToOriginPoint(target.getCenterPoint(), t.originX, t.originY),
-          localMouse = target.toLocalPoint(new fabric.Point(x - offset.left, y - offset.top), t.originX, t.originY);
+          localMouse = target.toLocalPoint(new fabric.Point(x, y), t.originX, t.originY);
 
       this._setLocalMouse(localMouse, t);
 
@@ -7834,13 +7831,12 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      */
     _rotateObject: function (x, y) {
 
-      var t = this._currentTransform,
-          o = this._offset;
+      var t = this._currentTransform;
 
       if (t.target.get('lockRotation')) return;
 
-      var lastAngle = atan2(t.ey - t.top - o.top, t.ex - t.left - o.left),
-          curAngle = atan2(y - t.top - o.top, x - t.left - o.left),
+      var lastAngle = atan2(t.ey - t.top, t.ex - t.left),
+          curAngle = atan2(y - t.top, x - t.left),
           angle = radiansToDegrees(curAngle - lastAngle + t.theta);
 
       // normalize angle to positive value
@@ -7925,7 +7921,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         this.lastRenderedObjectWithControlsAboveOverlay &&
         this.lastRenderedObjectWithControlsAboveOverlay.visible &&
         this.containsPoint(e, this.lastRenderedObjectWithControlsAboveOverlay) &&
-        this.lastRenderedObjectWithControlsAboveOverlay._findTargetCorner(e, this._offset));
+        this.lastRenderedObjectWithControlsAboveOverlay._findTargetCorner(this.getPointer(e)));
     },
 
     /**
@@ -8026,10 +8022,23 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @return {Object} object with "x" and "y" number values
      */
     getPointer: function (e) {
-      var pointer = getPointer(e, this.upperCanvasEl);
+      var pointer = getPointer(e, this.upperCanvasEl),
+          bounds = this.upperCanvasEl.getBoundingClientRect(),
+          cssScale;
+
+      if (bounds.width === 0 || bounds.height === 0) {
+        // If bounds are not available (i.e. not visible), do not apply scale.
+        cssScale = { width: 1, height: 1 };
+      }
+      else {
+        cssScale = {
+          width: this.upperCanvasEl.width / bounds.width,
+          height: this.upperCanvasEl.height / bounds.height,
+        };
+      }
       return {
-        x: pointer.x - this._offset.left,
-        y: pointer.y - this._offset.top
+        x: (pointer.x - this._offset.left) * cssScale.width,
+        y: (pointer.y - this._offset.top) * cssScale.height
       };
     },
 
@@ -8358,8 +8367,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     tl: 7 // nw
   },
   addListener = fabric.util.addListener,
-  removeListener = fabric.util.removeListener,
-  getPointer = fabric.util.getPointer;
+  removeListener = fabric.util.removeListener;
 
   fabric.util.object.extend(fabric.Canvas.prototype, /** @lends fabric.Canvas.prototype */ {
 
@@ -8741,7 +8749,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       this.stateful && target.saveState();
 
       // determine if it's a drag or rotate case
-      if ((corner = target._findTargetCorner(e, this._offset))) {
+      if ((corner = target._findTargetCorner(this.getPointer(e)))) {
         this.onBeforeScaleRotate(target);
       }
 
@@ -8832,10 +8840,10 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
       // We initially clicked in an empty area, so we draw a box for multiple selection
       if (groupSelector) {
-        pointer = getPointer(e, this.upperCanvasEl);
+        pointer = this.getPointer(e);
 
-        groupSelector.left = pointer.x - this._offset.left - groupSelector.ex;
-        groupSelector.top = pointer.y - this._offset.top - groupSelector.ey;
+        groupSelector.left = pointer.x - groupSelector.ex;
+        groupSelector.top = pointer.y - groupSelector.ey;
 
         this.renderTop();
       }
@@ -8864,7 +8872,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      */
     _transformObject: function(e) {
 
-      var pointer = getPointer(e, this.upperCanvasEl),
+      var pointer = this.getPointer(e),
           transform = this._currentTransform;
 
       transform.reset = false,
@@ -8973,7 +8981,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
             // only show proper corner when group selection is not active
             corner = target._findTargetCorner
                       && (!activeGroup || !activeGroup.contains(target))
-                      && target._findTargetCorner(e, this._offset);
+                      && target._findTargetCorner(this.getPointer(e));
 
         if (!corner) {
           style.cursor = target.hoverCursor || this.hoverCursor;
@@ -11894,8 +11902,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
 (function(){
 
-  var getPointer = fabric.util.getPointer,
-      degreesToRadians = fabric.util.degreesToRadians,
+  var degreesToRadians = fabric.util.degreesToRadians,
       isVML = typeof G_vmlCanvasManager !== 'undefined';
 
   fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
@@ -11909,16 +11916,14 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     /**
      * Determines which corner has been clicked
      * @private
-     * @param {Event} e Event object
-     * @param {Object} offset Canvas offset
+     * @param {Object} pointer The pointer indicating the mouse position
      * @return {String|Boolean} corner code (tl, tr, bl, br, etc.), or false if nothing is found
      */
-    _findTargetCorner: function(e, offset) {
+    _findTargetCorner: function(pointer) {
       if (!this.hasControls || !this.active) return false;
 
-      var pointer = getPointer(e, this.canvas.upperCanvasEl),
-          ex = pointer.x - offset.left,
-          ey = pointer.y - offset.top,
+      var ex = pointer.x,
+          ey = pointer.y,
           xPoints,
           lines;
 
