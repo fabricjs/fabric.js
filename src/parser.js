@@ -614,7 +614,7 @@
      * @param {Function} [reviver] Method for further parsing of SVG elements, called after each fabric object created.
      */
     parseElements: function(elements, callback, options, reviver) {
-      fabric.ElementsParser.parse(elements, callback, options, reviver);
+      new fabric.ElementsParser(elements, callback, options, reviver).parse();
     },
 
     /**
