@@ -4,7 +4,7 @@
     return;
   }
 
-  var DOMParser = new require('xmldom').DOMParser,
+  var DOMParser = require('xmldom').DOMParser,
       URL = require('url'),
       HTTP = require('http'),
       HTTPS = require('https'),
