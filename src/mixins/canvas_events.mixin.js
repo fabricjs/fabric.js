@@ -1,16 +1,6 @@
 (function(){
 
-  var cursorMap = [
-    'n-resize',
-    'ne-resize',
-    'e-resize',
-    'se-resize',
-    's-resize',
-    'sw-resize',
-    'w-resize',
-    'nw-resize'
-  ],
-  cursorOffset = {
+  var cursorOffset = {
     mt: 0, // n
     tr: 1, // ne
     mr: 2, // e
@@ -24,6 +14,21 @@
   removeListener = fabric.util.removeListener;
 
   fabric.util.object.extend(fabric.Canvas.prototype, /** @lends fabric.Canvas.prototype */ {
+
+    /**
+     * Map of cursor style values for each of the object controls
+     * @private
+     */
+    cursorMap: [
+      'n-resize',
+      'ne-resize',
+      'e-resize',
+      'se-resize',
+      's-resize',
+      'sw-resize',
+      'w-resize',
+      'nw-resize'
+    ],
 
     /**
      * Adds mouse listeners to canvas
@@ -678,7 +683,7 @@
       // normalize n to be from 0 to 7
       n %= 8;
 
-      return cursorMap[n];
+      return this.cursorMap[n];
     }
   });
 })();
