@@ -8346,17 +8346,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
 (function(){
 
-  var cursorMap = [
-    'n-resize',
-    'ne-resize',
-    'e-resize',
-    'se-resize',
-    's-resize',
-    'sw-resize',
-    'w-resize',
-    'nw-resize'
-  ],
-  cursorOffset = {
+  var cursorOffset = {
     mt: 0, // n
     tr: 1, // ne
     mr: 2, // e
@@ -8370,6 +8360,21 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
   removeListener = fabric.util.removeListener;
 
   fabric.util.object.extend(fabric.Canvas.prototype, /** @lends fabric.Canvas.prototype */ {
+
+    /**
+     * Map of cursor style values for each of the object controls
+     * @private
+     */
+    cursorMap: [
+      'n-resize',
+      'ne-resize',
+      'e-resize',
+      'se-resize',
+      's-resize',
+      'sw-resize',
+      'w-resize',
+      'nw-resize'
+    ],
 
     /**
      * Adds mouse listeners to canvas
@@ -9024,7 +9029,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       // normalize n to be from 0 to 7
       n %= 8;
 
-      return cursorMap[n];
+      return this.cursorMap[n];
     }
   });
 })();
@@ -19685,7 +19690,6 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * Initializes all the interactive behavior of IText
      */
     initBehavior: function() {
-      this.initKeyHandlers();
       this.initCursorSelectionHandlers();
       this.initDoubleClickSimulation();
     },
@@ -20639,15 +20643,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.prototype */ {
 
   /**
-   * Initializes key handlers
-   */
-  initKeyHandlers: function() {
-    fabric.util.addListener(fabric.document, 'keydown', this.onKeyDown.bind(this));
-    fabric.util.addListener(fabric.document, 'keypress', this.onKeyPress.bind(this));
-    fabric.util.addListener(fabric.document, 'click', this.onClick.bind(this));
-  },
-
-  /**
    * Initializes hidden textarea (needed to bring up keyboard in iOS)
    */
   initHiddenTextarea: function() {
@@ -20657,6 +20652,14 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     this.hiddenTextarea.style.cssText = 'position: absolute; top: 0; left: -9999px';
 
     fabric.document.body.appendChild(this.hiddenTextarea);
+
+    fabric.util.addListener(this.hiddenTextarea, 'keydown', this.onKeyDown.bind(this));
+    fabric.util.addListener(this.hiddenTextarea, 'keypress', this.onKeyPress.bind(this));
+
+    if (!this._clickHandlerInitialized && this.canvas) {
+      fabric.util.addListener(this.canvas.upperCanvasEl, 'click', this.onClick.bind(this));
+      this._clickHandlerInitialized = true;
+    }
   },
 
   /**
