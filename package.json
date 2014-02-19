@@ -4,12 +4,29 @@
   "homepage": "http://fabricjs.com/",
   "version": "1.4.4",
   "author": "Juriy Zaytsev <kangax@gmail.com>",
-  "keywords": ["canvas", "graphic", "graphics", "SVG", "node-canvas", "parser", "HTML5", "object model"],
-  "repository": "git://github.com/kangax/fabric.js",
-  "licenses": [{
-    "type": "MIT",
-    "url": "http://github.com/kangax/fabric.js/raw/master/LICENSE"
-  }],
+  "keywords": [
+    "canvas",
+    "graphic",
+    "graphics",
+    "SVG",
+    "node-canvas",
+    "parser",
+    "HTML5",
+    "object model"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kangax/fabric.js"
+  },
+  "bugs": {
+    "url": "https://github.com/kangax/fabric.js/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/kangax/fabric.js/raw/master/LICENSE"
+    }
+  ],
   "scripts": {
     "build": "node build.js modules=ALL exclude=json,cufon,gestures",
     "test": "node test.js && jshint src"
@@ -20,12 +37,14 @@
     "xmldom": "0.1.x"
   },
   "devDependencies": {
-    "qunit": "0.5.x",
-    "jshint": "2.4.x",
-    "uglify-js": "2.4.x",
+    "execSync": "0.0.x",
     "jscs": "1.2.x",
-    "execSync": "0.0.x"
+    "jshint": "2.4.x",
+    "qunit": "0.5.x",
+    "uglify-js": "2.4.x"
   },
-  "engines": { "node": ">=0.4.0 && <1.0.0" },
+  "engines": {
+    "node": ">=0.4.0 && <1.0.0"
+  },
   "main": "./dist/fabric.js"
 }
