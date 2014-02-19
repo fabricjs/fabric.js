@@ -17,8 +17,5 @@
     "HTML5",
     "object model"
   ],
-  "license": "MIT",
-  "scripts": [
-    "./dist/fabric.js"
-  ]
+  "license": "MIT"
 }
