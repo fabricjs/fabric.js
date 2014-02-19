@@ -4,9 +4,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * Initializes key handlers
    */
   initKeyHandlers: function() {
-    fabric.util.addListener(fabric.document, 'keydown', this.onKeyDown.bind(this));
-    fabric.util.addListener(fabric.document, 'keypress', this.onKeyPress.bind(this));
-    fabric.util.addListener(fabric.document, 'click', this.onClick.bind(this));
+    // moved all handlers to initHiddenTextarea
   },
 
   /**
@@ -19,6 +17,15 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     this.hiddenTextarea.style.cssText = 'position: absolute; top: 0; left: -9999px';
 
     fabric.document.body.appendChild(this.hiddenTextarea);
+      
+        
+    fabric.util.addListener(this.hiddenTextarea, 'keydown', this.onKeyDown.bind(this));
+    fabric.util.addListener(this.hiddenTextarea, 'keypress', this.onKeyPress.bind(this));
+        
+    if (!this.returnToTextareaHandler) {
+      this.returnToTextareaHandler = true;
+      fabric.util.addListener(this.canvas.upperCanvasEl, 'click', this.onClick.bind(this));
+    }      
   },
 
   /**
