@@ -8,7 +8,6 @@
      * Initializes all the interactive behavior of IText
      */
     initBehavior: function() {
-      this.initKeyHandlers();
       this.initCursorSelectionHandlers();
       this.initDoubleClickSimulation();
     },
