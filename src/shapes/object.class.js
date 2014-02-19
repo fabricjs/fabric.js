@@ -930,6 +930,7 @@
       if (this.width === 0 || this.height === 0 || !this.visible) return;
 
       ctx.save();
+
       //setup fill rule for current object
       this._setupFillRule(ctx);
 
@@ -948,14 +949,14 @@
       this._render(ctx, noTransform);
       this.clipTo && ctx.restore();
       this._removeShadow(ctx);
-      
-      this._restorFillRule(ctx);
+
+      this._restoreFillRule(ctx);
 
       if (this.active && !noTransform) {
         this.drawBorders(ctx);
         this.drawControls(ctx);
       }
-      
+
       ctx.restore();
     },
 
@@ -1369,26 +1370,27 @@
         y: pointer.y - objectLeftTop.y
       };
     },
-    
+
     /**
      * Sets canvas globalCompositeOperation for specific object
      * custom composition operation for the particular object can be specifed using fillRule property
      * @param {CanvasRenderingContext2D} ctx Rendering canvas context
      */
     _setupFillRule: function (ctx) {
-        if (this.fillRule) {
-          this._prevFillRule = ctx.globalCompositeOperation;
-          ctx.globalCompositeOperation = this.fillRule;
-        }
+      if (this.fillRule) {
+        this._prevFillRule = ctx.globalCompositeOperation;
+        ctx.globalCompositeOperation = this.fillRule;
+      }
     },
+
     /**
      * Restores previously saved canvas globalCompositeOperation after obeject rendering
      * @param {CanvasRenderingContext2D} ctx Rendering canvas context
      */
-    _restorFillRule: function (ctx) {
-        if (this.fillRule && this._prevFillRule) {
-          ctx.globalCompositeOperation = this._prevFillRule;
-        }
+    _restoreFillRule: function (ctx) {
+      if (this.fillRule && this._prevFillRule) {
+        ctx.globalCompositeOperation = this._prevFillRule;
+      }
     }
   });
 
