@@ -104,6 +104,14 @@ Fabric.js started as a foundation for design editor on [printio.ru](http://print
 
         //# sourceMappingURL=fabric.min.js.map
 
+6. Lint source code (prerequisite: `npm -g install jshint`)
+
+        $ jshint src
+
+7. Ensure code guidelines are met (prerequisite: `npm -g install jscs`)
+
+        $ jscs src
+
 ### Demos
 
 - [Demos](http://fabricjs.com/demos/)
