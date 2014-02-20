@@ -2161,7 +2161,7 @@ if (typeof console !== 'undefined') {
     * @param {Number} [options.endValue=100] Ending value
     * @param {Number} [options.byValue=100] Value to modify the property by
     * @param {Function} [options.easing] Easing function
-    * @param {Number} [options.duration=500] Duration of change
+    * @param {Number} [options.duration=500] Duration of change (in ms)
     */
   function animate(options) {
 
