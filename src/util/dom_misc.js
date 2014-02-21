@@ -128,8 +128,8 @@
         top = 0;
       }
       else if (element === fabric.document) {
-        left += body.scrollLeft || docElement.scrollLeft || 0;
-        top += body.scrollTop ||  docElement.scrollTop || 0;
+        left = body.scrollLeft || docElement.scrollLeft || 0;
+        top = body.scrollTop ||  docElement.scrollTop || 0;
       }
       else {
         left += element.scrollLeft || 0;
