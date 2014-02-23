@@ -6,7 +6,7 @@ Index: excanvas.js
      o2.arcScaleX_    = o1.arcScaleX_;
      o2.arcScaleY_    = o1.arcScaleY_;
      o2.lineScale_    = o1.lineScale_;
-+	o2.rotation_	 = o1.rotation_; // used for images
++    o2.rotation_     = o1.rotation_; // used for images
    }
  
    var colorData = {
@@ -14,7 +14,7 @@ Index: excanvas.js
      this.arcScaleX_ = 1;
      this.arcScaleY_ = 1;
      this.lineScale_ = 1;
-+	this.rotation_ = 0;
++    this.rotation_ = 0;
    }
  
    var contextPrototype = CanvasRenderingContext2D_.prototype;
@@ -26,10 +26,10 @@ Index: excanvas.js
 +  contextPrototype.drawImage = function(image) {
      var dx, dy, dw, dh, sx, sy, sw, sh;
 -
-+	
++
 +    // to fix new Image() we check the existance of runtimeStyle
 +    var rts = image.runtimeStyle.width;
-+	
++
      // to find the original width we overide the width and height
 -    var oldRuntimeWidth = image.runtimeStyle.width;
 -    var oldRuntimeHeight = image.runtimeStyle.height;
@@ -38,25 +38,25 @@ Index: excanvas.js
 +    if(rts) {
 +      var oldRuntimeWidth = image.runtimeStyle.width;
 +      var oldRuntimeHeight = image.runtimeStyle.height;
-+      		
++
 +      image.runtimeStyle.width = 'auto';
-+      image.runtimeStyle.height = 'auto';	  
++      image.runtimeStyle.height = 'auto';
 +    }
  
      // get the original size
      var w = image.width;
      var h = image.height;
 -
-+	
++
      // and remove overides
 -    image.runtimeStyle.width = oldRuntimeWidth;
 -    image.runtimeStyle.height = oldRuntimeHeight;
 -
 +    if(rts) {
 +      image.runtimeStyle.width = oldRuntimeWidth;
-+      image.runtimeStyle.height = oldRuntimeHeight;		
++      image.runtimeStyle.height = oldRuntimeHeight;
 +    }
-+	
++
      if (arguments.length == 3) {
        dx = arguments[1];
        dy = arguments[2];
@@ -64,9 +64,9 @@ Index: excanvas.js
  
      var W = 10;
      var H = 10;
-+	
++
 +    var scaleX = scaleY = 1;
-+	
++
 +    // FIX: divs give better quality then vml image and also fixes transparent PNG's
 +    vmlStr.push(' <div style="position:absolute;');
  
@@ -94,21 +94,21 @@ Index: excanvas.js
 -                  'Dy=', mr(d.y / Z), '');
 +      // Scaling images using width & height instead of Transform Matrix
 +      // because of quality loss
-+      var c = mc(this.rotation_);	
++      var c = mc(this.rotation_);
 +      var s = ms(this.rotation_);
-+      
++
 +      // Inverse rotation matrix
 +      var irm = [
-+        [c,  -s, 0],
-+        [s, c, 0],
++        [c, -s, 0],
++        [s,  c, 0],
 +        [0,  0, 1]
-+      ];	
-+	
++      ];
++
 +      // Get unrotated matrix to get only scaling values
-+      var urm = matrixMultiply(irm, this.m_);	  
++      var urm = matrixMultiply(irm, this.m_);
 +      scaleX = urm[0][0];
 +      scaleY = urm[1][1];
-+    
++
 +      // Apply only rotation and translation to Matrix
 +      filter.push('M11=', c, ',',
 +                  'M12=', -s, ',',
@@ -149,25 +149,25 @@ Index: excanvas.js
 +                  ' filter:progid:DxImageTransform.Microsoft.Matrix(Dx=',
 +                  -sx * dw / sw * scaleX, ',Dy=', -sy * dh / sh * scaleY, ');">');
 +    }
-+    
-+      
++
++
 +    // Apply scales to width and height
 +    vmlStr.push('<div style="width:', Math.round(scaleX * w * dw / sw), 'px;',
 +                ' height:', Math.round(scaleY * h * dh / sh), 'px;',
 +                ' filter:');
-+   
++
 +    // If there is a globalAlpha, apply it to image
 +    if(this.globalAlpha < 1) {
 +      vmlStr.push(' progid:DXImageTransform.Microsoft.Alpha(opacity=' + (this.globalAlpha * 100) + ')');
 +    }
-+    
++
 +    vmlStr.push(' progid:DXImageTransform.Microsoft.AlphaImageLoader(src=', image.src, ',sizingMethod=scale)">');
-+    
-+    // Close the crop div if necessary            
++
++    // Close the crop div if necessary
 +    if (sx || sy) vmlStr.push('</div>');
-+    
++
 +    vmlStr.push('</div></div>');
-+    
++
 +    this.element_.insertAdjacentHTML('beforeEnd', vmlStr.join(''));
    };
  
@@ -176,8 +176,8 @@ Index: excanvas.js
      var c = mc(aRot);
      var s = ms(aRot);
  
-+	this.rotation_ += aRot;
-+	
++    this.rotation_ += aRot;
++
      var m1 = [
        [c,  s, 0],
        [-s, c, 0],
@@ -188,7 +188,7 @@ Index: excanvas.js
 -    this.textMeasureEl_.style.font = this.font;
 +    // FIX: Apply current font style to textMeasureEl to get correct size
 +    var fontStyle = getComputedStyle(processFontStyle(this.font), this.element_),
-+    	fontStyleString = buildStyle(fontStyle);	
++       fontStyleString = buildStyle(fontStyle);
 +    this.textMeasureEl_.style.font = fontStyleString;
 +
      // Don't use innerHTML or innerText because they allow markup/whitespace.
