@@ -32,7 +32,7 @@
     "test": "node test.js && jshint src"
   },
   "dependencies": {
-    "canvas": "1.0.x",
+    "canvas": "1.1.x",
     "jsdom": "0.10.x",
     "xmldom": "0.1.x"
   },
