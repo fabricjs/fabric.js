@@ -8033,7 +8033,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       else {
         cssScale = {
           width: this.upperCanvasEl.width / bounds.width,
-          height: this.upperCanvasEl.height / bounds.height,
+          height: this.upperCanvasEl.height / bounds.height
         };
       }
       return {
@@ -12760,12 +12760,12 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         origin: 'originX',
         axis1: 'x1',
         axis2: 'x2',
-        dimension: 'width',
+        dimension: 'width'
       },
       { // possible values of origin
         nearest: 'left',
         center: 'center',
-        farthest: 'right',
+        farthest: 'right'
       }
     ),
 
@@ -12778,12 +12778,12 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         origin: 'originY',
         axis1: 'y1',
         axis2: 'y2',
-        dimension: 'height',
+        dimension: 'height'
       },
       { // possible values of origin
         nearest: 'top',
         center: 'center',
-        farthest: 'bottom',
+        farthest: 'bottom'
       }
     ),
 
