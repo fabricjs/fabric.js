@@ -820,7 +820,7 @@
       else {
         cssScale = {
           width: this.upperCanvasEl.width / bounds.width,
-          height: this.upperCanvasEl.height / bounds.height,
+          height: this.upperCanvasEl.height / bounds.height
         };
       }
       return {

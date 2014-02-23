@@ -119,12 +119,12 @@
         origin: 'originX',
         axis1: 'x1',
         axis2: 'x2',
-        dimension: 'width',
+        dimension: 'width'
       },
       { // possible values of origin
         nearest: 'left',
         center: 'center',
-        farthest: 'right',
+        farthest: 'right'
       }
     ),
 
@@ -137,12 +137,12 @@
         origin: 'originY',
         axis1: 'y1',
         axis2: 'y2',
-        dimension: 'height',
+        dimension: 'height'
       },
       { // possible values of origin
         nearest: 'top',
         center: 'center',
-        farthest: 'bottom',
+        farthest: 'bottom'
       }
     ),
 
