@@ -10,7 +10,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     // for triple click
     this.__lastLastClickTime = +new Date();
 
-    this.lastPointer = { };
+    this.__lastPointer = { };
 
     this.on('mousedown', this.onMouseDown.bind(this));
   },
