@@ -38,6 +38,7 @@
     'backgroundColor':      '',
     'textBackgroundColor':  '',
     'useNative':            true,
+    'maxWidth':            false,
     styles:                 { }
   };
 
