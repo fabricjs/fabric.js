@@ -39,7 +39,7 @@
     "uglify-js": "2.4.x"
   },
   "engines": {
-    "node": ">=0.4.0 && <1.0.0"
+    "node": ">=0.4.0"
   },
   "main": "./dist/fabric.js"
 }
