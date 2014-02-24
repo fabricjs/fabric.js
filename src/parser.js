@@ -292,14 +292,16 @@
     style.replace(/;$/, '').split(';').forEach(function (chunk) {
       var pair = chunk.split(':');
 
-      attr = normalizeAttr(pair[0].trim().toLowerCase());
-      value = normalizeValue(attr, pair[1].trim());
-
-      if (attr === 'font') {
-        parseFontDeclaration(value, oStyle);
-      }
-      else {
-        oStyle[attr] = value;
+      if (pair.length == 2) {
+            attr = normalizeAttr(pair[0].trim().toLowerCase());
+            value = normalizeValue(attr, pair[1].trim());
+      
+            if (attr === 'font') {
+              parseFontDeclaration(value, oStyle);
+            }
+            else {
+              oStyle[attr] = value;
+            }
       }
     });
   }
