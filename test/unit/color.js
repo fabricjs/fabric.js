@@ -204,6 +204,17 @@
     equal(oColor.getAlpha(), 0.5, 'alpha should be set properly');
   });
 
+  test('fromRgba (percentage values with decimals)', function() {
+    var originalRgba = 'rgba( 100.00%, 100.00%, 100.00% , 0.5 )';
+    oColor = fabric.Color.fromRgba(originalRgba);
+    ok(oColor);
+    ok(oColor instanceof fabric.Color);
+    equal(oColor.toRgba(), 'rgba(255,255,255,0.5)');
+    equal(oColor.toHex(), 'FFFFFF');
+    equal(oColor.getAlpha(), 0.5, 'alpha should be set properly');
+  });
+
+
   test('fromHsl', function() {
     ok(typeof fabric.Color.fromHsl == 'function');
     var originalHsl = 'hsl(262,80%,12%)';
