@@ -628,7 +628,9 @@
       var oStyle = { },
           style = element.getAttribute('style');
 
-      if (!style) return oStyle;
+      if (!style) {
+        return oStyle;
+      }
 
       if (typeof style === 'string') {
         parseStyleString(style, oStyle);

@@ -215,7 +215,7 @@
    * @private
    */
   function find(array, byProperty, condition) {
-    if (!array || array.length === 0) return undefined;
+    if (!array || array.length === 0) return;
 
     var i = array.length - 1,
         result = byProperty ? array[i][byProperty] : array[i];

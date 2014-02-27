@@ -651,10 +651,14 @@
           val;
 
       val = parseInt(xy.x, 10);
-      if (!isNaN(val)) aX.push(val);
+      if (!isNaN(val)) {
+        aX.push(val);
+      }
 
       val = parseInt(xy.y, 10);
-      if (!isNaN(val)) aY.push(val);
+      if (!isNaN(val)) {
+        aY.push(val);
+      }
     },
 
     _getXY: function(item, isLowerCase, previous) {

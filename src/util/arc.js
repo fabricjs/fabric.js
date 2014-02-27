@@ -21,10 +21,14 @@
 
         sfactorSq = 1 / d - 0.25;
 
-    if (sfactorSq < 0) sfactorSq = 0;
+    if (sfactorSq < 0) {
+      sfactorSq = 0;
+    }
 
     var sfactor = Math.sqrt(sfactorSq);
-    if (sweep === large) sfactor = -sfactor;
+    if (sweep === large) {
+      sfactor = -sfactor;
+    }
 
     var xc = 0.5 * (coords.x0 + coords.x1) - sfactor * (coords.y1 - coords.y0),
         yc = 0.5 * (coords.y0 + coords.y1) + sfactor * (coords.x1 - coords.x0),
