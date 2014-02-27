@@ -436,7 +436,9 @@ fabric.Collection = {
      * @return {Object} Object for given namespace (default fabric)
      */
     resolveNamespace: function(namespace) {
-      if (!namespace) return fabric;
+      if (!namespace) {
+        return fabric;
+      }
 
       var parts = namespace.split('.'),
           len = parts.length,
@@ -837,10 +839,14 @@ fabric.Collection = {
 
         sfactorSq = 1 / d - 0.25;
 
-    if (sfactorSq < 0) sfactorSq = 0;
+    if (sfactorSq < 0) {
+      sfactorSq = 0;
+    }
 
     var sfactor = Math.sqrt(sfactorSq);
-    if (sweep === large) sfactor = -sfactor;
+    if (sweep === large) {
+      sfactor = -sfactor;
+    }
 
     var xc = 0.5 * (coords.x0 + coords.x1) - sfactor * (coords.y1 - coords.y0),
         yc = 0.5 * (coords.y0 + coords.y1) + sfactor * (coords.x1 - coords.x0),
@@ -1176,7 +1182,7 @@ fabric.Collection = {
    * @private
    */
   function find(array, byProperty, condition) {
-    if (!array || array.length === 0) return undefined;
+    if (!array || array.length === 0) return;
 
     var i = array.length - 1,
         result = byProperty ? array[i][byProperty] : array[i];
@@ -2226,8 +2232,13 @@ if (typeof console !== 'undefined') {
 (function() {
 
   function normalize(a, c, p, s) {
-    if (a < Math.abs(c)) { a = c; s = p / 4; }
-    else s = p / (2 * Math.PI) * Math.asin(c / a);
+    if (a < Math.abs(c)) {
+      a = c;
+      s = p / 4;
+    }
+    else {
+      s = p / (2 * Math.PI) * Math.asin(c / a);
+    }
     return { a: a, c: c, p: p, s: s };
   }
 
@@ -2251,7 +2262,9 @@ if (typeof console !== 'undefined') {
    */
   function easeInOutCubic(t, b, c, d) {
     t /= d/2;
-    if (t < 1) return c / 2 * t * t * t + b;
+    if (t < 1) {
+      return c / 2 * t * t * t + b;
+    }
     return c / 2 * ((t -= 2) * t * t + 2) + b;
   }
 
@@ -2277,7 +2290,9 @@ if (typeof console !== 'undefined') {
    */
   function easeInOutQuart(t, b, c, d) {
     t /= d / 2;
-    if (t < 1) return c / 2 * t * t * t * t + b;
+    if (t < 1) {
+      return c / 2 * t * t * t * t + b;
+    }
     return -c / 2 * ((t -= 2) * t * t * t - 2) + b;
   }
 
@@ -2303,7 +2318,9 @@ if (typeof console !== 'undefined') {
    */
   function easeInOutQuint(t, b, c, d) {
     t /= d / 2;
-    if (t < 1) return c / 2 * t * t * t * t * t + b;
+    if (t < 1) {
+      return c / 2 * t * t * t * t * t + b;
+    }
     return c / 2 * ((t -= 2) * t * t * t * t + 2) + b;
   }
 
@@ -2352,10 +2369,16 @@ if (typeof console !== 'undefined') {
    * @memberOf fabric.util.ease
    */
   function easeInOutExpo(t, b, c, d) {
-    if (t === 0) return b;
-    if (t === d) return b + c;
+    if (t === 0) {
+      return b;
+    }
+    if (t === d) {
+      return b + c;
+    }
     t /= d / 2;
-    if (t < 1) return c / 2 * Math.pow(2, 10 * (t - 1)) + b;
+    if (t < 1) {
+      return c / 2 * Math.pow(2, 10 * (t - 1)) + b;
+    }
     return c / 2 * (-Math.pow(2, -10 * --t) + 2) + b;
   }
 
@@ -2381,7 +2404,9 @@ if (typeof console !== 'undefined') {
    */
   function easeInOutCirc(t, b, c, d) {
     t /= d / 2;
-    if (t < 1) return -c / 2 * (Math.sqrt(1 - t * t) - 1) + b;
+    if (t < 1) {
+      return -c / 2 * (Math.sqrt(1 - t * t) - 1) + b;
+    }
     return c / 2 * (Math.sqrt(1 - (t -= 2) * t) + 1) + b;
   }
 
@@ -2391,10 +2416,16 @@ if (typeof console !== 'undefined') {
    */
   function easeInElastic(t, b, c, d) {
     var s = 1.70158, p = 0, a = c;
-    if (t === 0) return b;
+    if (t === 0) {
+      return b;
+    }
     t /= d;
-    if (t === 1) return b + c;
-    if (!p) p = d * 0.3;
+    if (t === 1) {
+      return b + c;
+    }
+    if (!p) {
+      p = d * 0.3;
+    }
     var opts = normalize(a, c, p, s);
     return -elastic(opts, t, d) + b;
   }
@@ -2405,10 +2436,16 @@ if (typeof console !== 'undefined') {
    */
   function easeOutElastic(t, b, c, d) {
     var s = 1.70158, p = 0, a = c;
-    if (t === 0) return b;
+    if (t === 0) {
+      return b;
+    }
     t /= d;
-    if (t === 1) return b + c;
-    if (!p) p = d * 0.3;
+    if (t === 1) {
+      return b + c;
+    }
+    if (!p) {
+      p = d * 0.3;
+    }
     var opts = normalize(a, c, p, s);
     return opts.a * Math.pow(2, -10 * t) * Math.sin((t * d - opts.s) * (2 * Math.PI) / opts.p ) + opts.c + b;
   }
@@ -2419,12 +2456,20 @@ if (typeof console !== 'undefined') {
    */
   function easeInOutElastic(t, b, c, d) {
     var s = 1.70158, p = 0, a = c;
-    if (t === 0) return b;
+    if (t === 0) {
+      return b;
+    }
     t /= d / 2;
-    if (t === 2) return b + c;
-    if (!p) p = d * (0.3 * 1.5);
+    if (t === 2) {
+      return b + c;
+    }
+    if (!p) {
+      p = d * (0.3 * 1.5);
+    }
     var opts = normalize(a, c, p, s);
-    if (t < 1) return -0.5 * elastic(opts, t, d) + b;
+    if (t < 1) {
+      return -0.5 * elastic(opts, t, d) + b;
+    }
     return opts.a * Math.pow(2, -10 * (t -= 1)) * Math.sin((t * d - opts.s) * (2 * Math.PI) / opts.p ) * 0.5 + opts.c + b;
   }
 
@@ -2433,7 +2478,9 @@ if (typeof console !== 'undefined') {
    * @memberOf fabric.util.ease
    */
   function easeInBack(t, b, c, d, s) {
-    if (s === undefined) s = 1.70158;
+    if (s === undefined) {
+      s = 1.70158;
+    }
     return c * (t /= d) * t * ((s + 1) * t - s) + b;
   }
 
@@ -2442,7 +2489,9 @@ if (typeof console !== 'undefined') {
    * @memberOf fabric.util.ease
    */
   function easeOutBack(t, b, c, d, s) {
-    if (s === undefined) s = 1.70158;
+    if (s === undefined) {
+      s = 1.70158;
+    }
     return c * ((t = t / d - 1) * t * ((s + 1) * t + s) + 1) + b;
   }
 
@@ -2451,9 +2500,13 @@ if (typeof console !== 'undefined') {
    * @memberOf fabric.util.ease
    */
   function easeInOutBack(t, b, c, d, s) {
-    if (s === undefined) s = 1.70158;
+    if (s === undefined) {
+      s = 1.70158;
+    }
     t /= d / 2;
-    if (t < 1) return c / 2 * (t * t * (((s *= (1.525)) + 1) * t - s)) + b;
+    if (t < 1) {
+      return c / 2 * (t * t * (((s *= (1.525)) + 1) * t - s)) + b;
+    }
     return c / 2 * ((t -= 2) * t * (((s *= (1.525)) + 1) * t + s) + 2) + b;
   }
 
@@ -2489,8 +2542,10 @@ if (typeof console !== 'undefined') {
    * @memberOf fabric.util.ease
    */
   function easeInOutBounce(t, b, c, d) {
-    if (t < d / 2) return easeInBounce (t * 2, 0, c, d) * 0.5 + b;
-    return easeOutBounce (t * 2 - d, 0, c, d) * 0.5 + c * 0.5 + b;
+    if (t < d / 2) {
+      return easeInBounce (t * 2, 0, c, d) * 0.5 + b;
+    }
+    return easeOutBounce(t * 2 - d, 0, c, d) * 0.5 + c * 0.5 + b;
   }
 
   /**
@@ -2522,7 +2577,9 @@ if (typeof console !== 'undefined') {
      */
     easeInOutQuad: function(t, b, c, d) {
       t /= (d / 2);
-      if (t < 1) return c / 2 * t * t + b;
+      if (t < 1) {
+        return c / 2 * t * t + b;
+      }
       return -c / 2 * ((--t) * (t - 2) - 1) + b;
     },
 
@@ -3195,7 +3252,9 @@ if (typeof console !== 'undefined') {
       var oStyle = { },
           style = element.getAttribute('style');
 
-      if (!style) return oStyle;
+      if (!style) {
+        return oStyle;
+      }
 
       if (typeof style === 'string') {
         parseStyleString(style, oStyle);
@@ -4209,7 +4268,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
    * @field
    * @memberOf fabric.Color
    */
-  fabric.Color.reRGBa = /^rgba?\(\s*(\d{1,3}\%?)\s*,\s*(\d{1,3}\%?)\s*,\s*(\d{1,3}\%?)\s*(?:\s*,\s*(\d+(?:\.\d+)?)\s*)?\)$/;
+  fabric.Color.reRGBa = /^rgba?\(\s*(\d{1,3}(?:\.\d+)?\%?)\s*,\s*(\d{1,3}(?:\.\d+)?\%?)\s*,\s*(\d{1,3}(?:\.\d+)?\%?)\s*(?:\s*,\s*(\d+(?:\.\d+)?)\s*)?\)$/;
 
   /**
    * Regex matching color in HSL or HSLA formats (ex: hsl(200, 80%, 10%), hsla(300, 50%, 80%, 0.5), hsla( 300 , 50% , 80% , 0.5 ))
@@ -4262,11 +4321,21 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
    * @return {Number}
    */
   function hue2rgb(p, q, t){
-    if (t < 0) t += 1;
-    if (t > 1) t -= 1;
-    if (t < 1/6) return p + (q - p) * 6 * t;
-    if (t < 1/2) return q;
-    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+    if (t < 0) {
+      t += 1;
+    }
+    if (t > 1) {
+      t -= 1;
+    }
+    if (t < 1/6) {
+      return p + (q - p) * 6 * t;
+    }
+    if (t < 1/2) {
+      return q;
+    }
+    if (t < 2/3) {
+      return p + (q - p) * (2/3 - t) * 6;
+    }
     return p;
   }
 
@@ -4937,11 +5006,18 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
    * @return {CanvasPattern}
    */
   toLive: function(ctx) {
-    var source = typeof this.source === 'function' ? this.source() : this.source;
+    var source = typeof this.source === 'function'
+      ? this.source()
+      : this.source;
+
     // if an image
     if (typeof source.src !== 'undefined') {
-      if (!source.complete) return '';
-      if (source.naturalWidth === 0 || source.naturalHeight === 0) return '';
+      if (!source.complete) {
+        return '';
+      }
+      if (source.naturalWidth === 0 || source.naturalHeight === 0) {
+        return '';
+      }
     }
     return ctx.createPattern(source, this.repeat);
   }
@@ -6018,6 +6094,11 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
           o.set('active', true);
         });
       }
+
+      if (this._currentTransform) {
+        this._currentTransform.target = this.getActiveGroup();
+      }
+
       return data;
     },
 
@@ -14828,10 +14909,14 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           val;
 
       val = parseInt(xy.x, 10);
-      if (!isNaN(val)) aX.push(val);
+      if (!isNaN(val)) {
+        aX.push(val);
+      }
 
       val = parseInt(xy.y, 10);
-      if (!isNaN(val)) aY.push(val);
+      if (!isNaN(val)) {
+        aY.push(val);
+      }
     },
 
     _getXY: function(item, isLowerCase, previous) {
@@ -20373,7 +20458,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     // for triple click
     this.__lastLastClickTime = +new Date();
 
-    this.lastPointer = { };
+    this.__lastPointer = { };
 
     this.on('mousedown', this.onMouseDown.bind(this));
   },
