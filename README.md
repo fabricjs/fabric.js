@@ -1,19 +1,16 @@
 ### Fabric
-<p>
-  [![Build Status](https://secure.travis-ci.org/kangax/fabric.js.png?branch=master)](http://travis-ci.org/#!/kangax/fabric.js)
-  [![Code Climate](https://codeclimate.com/repos/526a0ed089af7e6cf2001389/badges/d1c922dd1511ffa8a72f/gpa.png)](https://codeclimate.com/repos/526a0ed089af7e6cf2001389/feed)
-  [![Coverage Status](https://coveralls.io/repos/kangax/fabric.js/badge.png?branch=master)](https://coveralls.io/r/kangax/fabric.js?branch=master)
-</p>
 
-<p>
-  [![NPM version](https://badge.fury.io/js/fabric.png)](http://badge.fury.io/js/fabric)
-  [![Bower version](https://badge.fury.io/bo/fabric.png)](http://badge.fury.io/bo/fabric)
-</p>
+[![Build Status](https://secure.travis-ci.org/kangax/fabric.js.png?branch=master)](http://travis-ci.org/#!/kangax/fabric.js)
+[![Code Climate](https://codeclimate.com/repos/526a0ed089af7e6cf2001389/badges/d1c922dd1511ffa8a72f/gpa.png)](https://codeclimate.com/repos/526a0ed089af7e6cf2001389/feed)
+[![Coverage Status](https://coveralls.io/repos/kangax/fabric.js/badge.png?branch=master)](https://coveralls.io/r/kangax/fabric.js?branch=master)
 
-<p>
-  [![Dependency Status](https://david-dm.org/kangax/fabric.js.png?theme=shields.io)](https://david-dm.org/kangax/fabric.js)
-  [![devDependency Status](https://david-dm.org/kangax/fabric.js/dev-status.png?theme=shields.io)](https://david-dm.org/kangax/fabric.js#info=devDependencies)
-</p>
+
+[![NPM version](https://badge.fury.io/js/fabric.png)](http://badge.fury.io/js/fabric)
+[![Bower version](https://badge.fury.io/bo/fabric.png)](http://badge.fury.io/bo/fabric)
+
+
+[![Dependency Status](https://david-dm.org/kangax/fabric.js.png?theme=shields.io)](https://david-dm.org/kangax/fabric.js)
+[![devDependency Status](https://david-dm.org/kangax/fabric.js/dev-status.png?theme=shields.io)](https://david-dm.org/kangax/fabric.js#info=devDependencies)
 
 
 **Fabric.js** is a framework that makes it easy to work with HTML5 canvas element. It is an **interactive object model** on top of canvas element. It is also an **SVG-to-canvas parser**.
