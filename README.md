@@ -201,6 +201,8 @@ See [Fabric questions on Stackoverflow](stackoverflow.com/questions/tagged/fabri
 Fabric snippets on [jsfiddle](http://jsfiddle.net/user/fabricjs/fiddles/)
 or [codepen.io](http://codepen.io/tag/fabricjs).
 
+Fabric on [LibKnot](http://libknot.ohmztech.com/).
+
 Get help in Fabric's IRC channel — irc://irc.freenode.net/#fabric.js
 
 ### Credits
