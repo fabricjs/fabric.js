@@ -252,7 +252,7 @@
      * @return {String} Source of an image
      */
     getSrc: function() {
-      if(this.getElement()){
+      if (this.getElement()){
         return this.getElement().src || this.getElement()._src;
       }
     },
@@ -283,7 +283,7 @@
      */
     applyFilters: function(callback) {
 
-      if(!this._originalElement){
+      if (!this._originalElement){
         return;
       }
 
@@ -374,7 +374,7 @@
       options || (options = { });
       this.setOptions(options);
       this._setWidthHeight(options);
-      if(this._element){
+      if (this._element){
         this._element.crossOrigin = this.crossOrigin;
       }
     },
@@ -402,11 +402,15 @@
     _setWidthHeight: function(options) {
       this.width = 'width' in options
         ? options.width
-        : (this.getElement() ? this.getElement().width || 0 : 0);
+        : (this.getElement()
+            ? this.getElement().width || 0
+            : 0);
 
       this.height = 'height' in options
         ? options.height
-        : (this.getElement() ? this.getElement().height || 0 : 0);
+        : (this.getElement()
+            ? this.getElement().height || 0
+            : 0);
     },
 
     /**
