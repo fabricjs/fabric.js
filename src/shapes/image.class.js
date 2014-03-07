@@ -252,7 +252,9 @@
      * @return {String} Source of an image
      */
     getSrc: function() {
-      return this.getElement().src || this.getElement()._src;
+      if(this.getElement()){
+        return this.getElement().src || this.getElement()._src;
+      }
     },
 
     /**
@@ -280,6 +282,10 @@
      * @chainable
      */
     applyFilters: function(callback) {
+
+      if(!this._originalElement){
+        return;
+      }
 
       if (this.filters.length === 0) {
         this._element = this._originalElement;
@@ -330,13 +336,13 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
-      ctx.drawImage(
-        this._element,
-        -this.width / 2,
-        -this.height / 2,
-        this.width,
-        this.height
-      );
+        this._element && ctx.drawImage(
+                           this._element,
+                           -this.width / 2,
+                           -this.height / 2,
+                           this.width,
+                           this.height
+                         );
     },
 
     /**
@@ -368,7 +374,9 @@
       options || (options = { });
       this.setOptions(options);
       this._setWidthHeight(options);
-      this._element.crossOrigin = this.crossOrigin;
+      if(this._element){
+        this._element.crossOrigin = this.crossOrigin;
+      }
     },
 
     /**
@@ -394,11 +402,11 @@
     _setWidthHeight: function(options) {
       this.width = 'width' in options
         ? options.width
-        : (this.getElement().width || 0);
+        : (this.getElement() ? this.getElement().width || 0 : 0);
 
       this.height = 'height' in options
         ? options.height
-        : (this.getElement().height || 0);
+        : (this.getElement() ? this.getElement().height || 0 : 0);
     },
 
     /**
