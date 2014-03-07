@@ -138,7 +138,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
       : this.source;
 
     // if the image failed to load, return, and allow rest to continue loading
-    if (!source){
+    if (!source) {
       return '';
     }
 
