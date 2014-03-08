@@ -33,10 +33,11 @@
   },
   "devDependencies": {
     "execSync": "0.0.x",
+    "uglify-js": "2.4.x",
     "jscs": "1.2.x",
     "jshint": "2.4.x",
     "qunit": "0.5.x",
-    "uglify-js": "2.4.x"
+    "istanbul": "0.2.6"
   },
   "engines": {
     "node": ">=0.4.0 && <1.0.0"
