@@ -198,13 +198,10 @@
       }
   }
   
-  var pathToAbsolute = cacher(function (pathArray)
+  var pathToAbsolute = function (pathArray)
   {
-    //var pth = paths(pathArray); // Timo: commented to prevent multiple caching
-                                  // for some reason only FF proceed correctly
-                                  // when not cached using cacher() around
-                                  // this function.
-    //if (pth.abs) return pathClone(pth.abs)
+    var pth = paths(pathArray);
+    if (pth.abs) return pathClone(pth.abs)
     if (!R.is(pathArray, array) || !R.is(pathArray && pathArray[0], array)) 
       pathArray = R.parsePathString(pathArray)
     if (!pathArray || !pathArray.length) return [["M", 0, 0]];
@@ -297,9 +294,9 @@
       }
     }
     res.toString = R._path2string;
-    //pth.abs = pathClone(res);
+    pth.abs = pathClone(res);
     return res;
-  });
+  };
 
   function cacher(f, scope, postprocessor)
   {
@@ -334,7 +331,7 @@
     var _13 = 1 / 3, _23 = 2 / 3;
     return [_13 * x1 + _23 * ax, _13 * y1 + _23 * ay, _13 * x2 + _23 * ax, _13 * y2 + _23 * ay, x2, y2]
   },
-  a2c = cacher(function (x1, y1, rx, ry, angle, large_arc_flag, sweep_flag, x2, y2, recursive)
+  a2c = function (x1, y1, rx, ry, angle, large_arc_flag, sweep_flag, x2, y2, recursive)
   {
     var _120 = PI * 120 / 180, rad = PI / 180 * (+angle || 0), res = [], xy,
     rotate = cacher(function (x, y, rad)
@@ -419,7 +416,7 @@
         newres[i] = i % 2 ? rotate(res[i - 1], res[i], rad).y : rotate(res[i], res[i + 1], rad).x
       return newres
     }
-  });
+  };
 
   var path2curve = cacher(function (path, path2)
   {

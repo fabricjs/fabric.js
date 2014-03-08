@@ -127,9 +127,13 @@
           tempY,
           tempControlX,
           tempControlY,
-          l = -((this.width / 2) + this.pathOffset.x),
-          t = -((this.height / 2) + this.pathOffset.y);
-
+          l = -this.width / 2,
+          t = -this.height / 2,
+          subStartX = 0,
+          subStartY = 0,
+          k,
+          klen;
+          
       for (var i = 0, len = this.path.length; i < len; ++i)
       {
         current = this.path[i];
@@ -172,12 +176,16 @@
             x += current[1];
             y += current[2];
             ctx['moveTo'](x + l, y + t);
+            subStartX = x;
+            subStartY = y;
             break;
 
           case 'M': // moveTo, absolute
             x = current[1];
             y = current[2];
             ctx['moveTo'](x + l, y + t);
+            subStartX = x;
+            subStartY = y;
             break;
 
           case 'c': // bezierCurveTo, relative
@@ -280,7 +288,6 @@
             // the previous command relative to the current point."
             controlX = current[1];
             controlY = current[2];
-
             break;
 
           case 'q': // quadraticCurveTo, relative
@@ -391,16 +398,16 @@
 
           case 'a':
             var segs = fabric.util.arc2cubics(x + l, y + t, current[1], current[2], current[3], current[4], current[5], current[6] + x + l, current[7] + y + t);
-            for (var i = 0, ilen = segs.length; i < segs.length; i += 6)
-              ctx.bezierCurveTo.apply(ctx, segs.slice(i, i + 6));
+            for (k = 0, klen = segs.length; k < segs.length; k += 6)
+              ctx.bezierCurveTo.apply(ctx, segs.slice(k, k + 6));
             x += current[6];
             y += current[7];
             break;
 
           case 'A':
             var segs = fabric.util.arc2cubics(x + l, y + t, current[1], current[2], current[3], current[4], current[5], current[6] + l, current[7] + t);
-            for (var i = 0, ilen = segs.length; i < segs.length; i += 6)
-              ctx.bezierCurveTo.apply(ctx, segs.slice(i, i + 6));
+            for (k = 0, klen = segs.length; k < segs.length; k += 6)
+              ctx.bezierCurveTo.apply(ctx, segs.slice(k, k + 6));
             x = current[6];
             y = current[7];
             break;
@@ -409,10 +416,8 @@
           case 'z':
           case 'Z':
             ctx.closePath();
-            if(previous[0]=='M' || previous[0]=='m')
-            {
-              ctx.lineTo(x + l + 0.001, y + t + 0.001);
-            }
+            x = subStartX; // to set current point where it should go
+            y = subStartY; // ie to the start of the subpath (where is M/m command).
             break;
         }
         previous = current;
