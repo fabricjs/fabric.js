@@ -1,0 +1,196 @@
+Index: excanvas.js
+===================================================================
+--- excanvas.js	(revision 63)
++++ excanvas.js	(working copy)
+@@ -255,6 +255,7 @@
+     o2.arcScaleX_    = o1.arcScaleX_;
+     o2.arcScaleY_    = o1.arcScaleY_;
+     o2.lineScale_    = o1.lineScale_;
++	o2.rotation_	 = o1.rotation_; // used for images
+   }
+ 
+   var colorData = {
+@@ -599,6 +600,7 @@
+     this.arcScaleX_ = 1;
+     this.arcScaleY_ = 1;
+     this.lineScale_ = 1;
++	this.rotation_ = 0;
+   }
+ 
+   var contextPrototype = CanvasRenderingContext2D_.prototype;
+@@ -763,23 +765,31 @@
+     return gradient;
+   };
+ 
+-  contextPrototype.drawImage = function(image, var_args) {
++  contextPrototype.drawImage = function(image) {
+     var dx, dy, dw, dh, sx, sy, sw, sh;
+-
++	
++    // to fix new Image() we check the existance of runtimeStyle
++    var rts = image.runtimeStyle.width;
++	
+     // to find the original width we overide the width and height
+-    var oldRuntimeWidth = image.runtimeStyle.width;
+-    var oldRuntimeHeight = image.runtimeStyle.height;
+-    image.runtimeStyle.width = 'auto';
+-    image.runtimeStyle.height = 'auto';
++    if(rts) {
++      var oldRuntimeWidth = image.runtimeStyle.width;
++      var oldRuntimeHeight = image.runtimeStyle.height;
++      		
++      image.runtimeStyle.width = 'auto';
++      image.runtimeStyle.height = 'auto';	  
++    }
+ 
+     // get the original size
+     var w = image.width;
+     var h = image.height;
+-
++	
+     // and remove overides
+-    image.runtimeStyle.width = oldRuntimeWidth;
+-    image.runtimeStyle.height = oldRuntimeHeight;
+-
++    if(rts) {
++      image.runtimeStyle.width = oldRuntimeWidth;
++      image.runtimeStyle.height = oldRuntimeHeight;		
++    }
++	
+     if (arguments.length == 3) {
+       dx = arguments[1];
+       dy = arguments[2];
+@@ -816,29 +826,44 @@
+ 
+     var W = 10;
+     var H = 10;
++	
++    var scaleX = scaleY = 1;
++	
++    // FIX: divs give better quality then vml image and also fixes transparent PNG's
++    vmlStr.push(' <div style="position:absolute;');
+ 
+-    // For some reason that I've now forgotten, using divs didn't work
+-    vmlStr.push(' <g_vml_:group',
+-                ' coordsize="', Z * W, ',', Z * H, '"',
+-                ' coordorigin="0,0"' ,
+-                ' style="width:', W, 'px;height:', H, 'px;position:absolute;');
+-
+     // If filters are necessary (rotation exists), create them
+     // filters are bog-slow, so only create them if abbsolutely necessary
+     // The following check doesn't account for skews (which don't exist
+     // in the canvas spec (yet) anyway.
+-
+     if (this.m_[0][0] != 1 || this.m_[0][1] ||
+         this.m_[1][1] != 1 || this.m_[1][0]) {
+       var filter = [];
+ 
+-      // Note the 12/21 reversal
+-      filter.push('M11=', this.m_[0][0], ',',
+-                  'M12=', this.m_[1][0], ',',
+-                  'M21=', this.m_[0][1], ',',
+-                  'M22=', this.m_[1][1], ',',
+-                  'Dx=', mr(d.x / Z), ',',
+-                  'Dy=', mr(d.y / Z), '');
++      // Scaling images using width & height instead of Transform Matrix
++      // because of quality loss
++      var c = mc(this.rotation_);	
++      var s = ms(this.rotation_);
++      
++      // Inverse rotation matrix
++      var irm = [
++        [c,  -s, 0],
++        [s, c, 0],
++        [0,  0, 1]
++      ];	
++	
++      // Get unrotated matrix to get only scaling values
++      var urm = matrixMultiply(irm, this.m_);	  
++      scaleX = urm[0][0];
++      scaleY = urm[1][1];
++    
++      // Apply only rotation and translation to Matrix
++      filter.push('M11=', c, ',',
++                  'M12=', -s, ',',
++                  'M21=', s, ',',
++                  'M22=', c, ',',
++                  'Dx=', d.x / Z, ',',
++                  'Dy=', d.y / Z);
+ 
+       // Bounding box calculation (need to minimize displayed area so that
+       // filters don't waste time on unused pixels.
+@@ -853,23 +878,40 @@
+       vmlStr.push('padding:0 ', mr(max.x / Z), 'px ', mr(max.y / Z),
+                   'px 0;filter:progid:DXImageTransform.Microsoft.Matrix(',
+                   filter.join(''), ", sizingmethod='clip');");
+-
+     } else {
+       vmlStr.push('top:', mr(d.y / Z), 'px;left:', mr(d.x / Z), 'px;');
+     }
+ 
+-    vmlStr.push(' ">' ,
+-                '<g_vml_:image src="', image.src, '"',
+-                ' style="width:', Z * dw, 'px;',
+-                ' height:', Z * dh, 'px"',
+-                ' cropleft="', sx / w, '"',
+-                ' croptop="', sy / h, '"',
+-                ' cropright="', (w - sx - sw) / w, '"',
+-                ' cropbottom="', (h - sy - sh) / h, '"',
+-                ' />',
+-                '</g_vml_:group>');
++    vmlStr.push(' ">');
+ 
+-    this.element_.insertAdjacentHTML('BeforeEnd', vmlStr.join(''));
++    // Draw a special cropping div if needed
++    if (sx || sy) {
++      // Apply scales to width and height
++      vmlStr.push('<div style="overflow: hidden; width:', Math.ceil((dw + sx * dw / sw) * scaleX), 'px;',
++                  ' height:', Math.ceil((dh + sy * dh / sh) * scaleY), 'px;',
++                  ' filter:progid:DxImageTransform.Microsoft.Matrix(Dx=',
++                  -sx * dw / sw * scaleX, ',Dy=', -sy * dh / sh * scaleY, ');">');
++    }
++    
++      
++    // Apply scales to width and height
++    vmlStr.push('<div style="width:', Math.round(scaleX * w * dw / sw), 'px;',
++                ' height:', Math.round(scaleY * h * dh / sh), 'px;',
++                ' filter:');
++   
++    // If there is a globalAlpha, apply it to image
++    if(this.globalAlpha < 1) {
++      vmlStr.push(' progid:DXImageTransform.Microsoft.Alpha(opacity=' + (this.globalAlpha * 100) + ')');
++    }
++    
++    vmlStr.push(' progid:DXImageTransform.Microsoft.AlphaImageLoader(src=', image.src, ',sizingMethod=scale)">');
++    
++    // Close the crop div if necessary            
++    if (sx || sy) vmlStr.push('</div>');
++    
++    vmlStr.push('</div></div>');
++    
++    this.element_.insertAdjacentHTML('beforeEnd', vmlStr.join(''));
+   };
+ 
+   contextPrototype.stroke = function(aFill) {
+@@ -1155,6 +1197,8 @@
+     var c = mc(aRot);
+     var s = ms(aRot);
+ 
++	this.rotation_ += aRot;
++	
+     var m1 = [
+       [c,  s, 0],
+       [-s, c, 0],
+@@ -1308,7 +1352,11 @@
+     }
+     var doc = this.element_.ownerDocument;
+     this.textMeasureEl_.innerHTML = '';
+-    this.textMeasureEl_.style.font = this.font;
++    // FIX: Apply current font style to textMeasureEl to get correct size
++    var fontStyle = getComputedStyle(processFontStyle(this.font), this.element_),
++    	fontStyleString = buildStyle(fontStyle);	
++    this.textMeasureEl_.style.font = fontStyleString;
++
+     // Don't use innerHTML or innerText because they allow markup/whitespace.
+     this.textMeasureEl_.appendChild(doc.createTextNode(text));
+     return {width: this.textMeasureEl_.offsetWidth};
