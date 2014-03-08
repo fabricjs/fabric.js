@@ -4,6 +4,8 @@ testrunner.options.log.summary = true;
 testrunner.options.log.tests = false;
 testrunner.options.log.assertions = false;
 
+testrunner.options.coverage = true;
+
 testrunner.run({
     deps: "./test/fixtures/test_script.js",
     code: "./dist/fabric.js",
