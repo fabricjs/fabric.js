@@ -4368,150 +4368,775 @@ fabric.Collection = {
 
 (function() {
 
-  var arcToSegmentsCache = { },
-      segmentToBezierCache = { },
-      _join = Array.prototype.join,
-      argsString;
+  // -------------------------------
+  // Raphael code starts
+  // -------------------------------
 
-  // Generous contribution by Raph Levien, from libsvg-0.1.0.tar.gz
-  function arcToSegments(x, y, rx, ry, large, sweep, rotateX, ox, oy) {
+  // Parts of Raphaël 2.1.0 (MIT licence: http://raphaeljs.com/license.html)
+  // Contains eg. bugfixed path2curve() function
 
-    argsString = _join.call(arguments);
-
-    if (arcToSegmentsCache[argsString]) {
-      return arcToSegmentsCache[argsString];
-    }
-
-    var coords = getXYCoords(rotateX, rx, ry, ox, oy, x, y),
-
-        d = (coords.x1 - coords.x0) * (coords.x1 - coords.x0) +
-            (coords.y1 - coords.y0) * (coords.y1 - coords.y0),
-
-        sfactorSq = 1 / d - 0.25;
-
-    if (sfactorSq < 0) {
-      sfactorSq = 0;
-    }
-
-    var sfactor = Math.sqrt(sfactorSq);
-    if (sweep === large) {
-      sfactor = -sfactor;
-    }
-
-    var xc = 0.5 * (coords.x0 + coords.x1) - sfactor * (coords.y1 - coords.y0),
-        yc = 0.5 * (coords.y0 + coords.y1) + sfactor * (coords.x1 - coords.x0),
-        th0 = Math.atan2(coords.y0 - yc, coords.x0 - xc),
-        th1 = Math.atan2(coords.y1 - yc, coords.x1 - xc),
-        thArc = th1 - th0;
-
-    if (thArc < 0 && sweep === 1) {
-      thArc += 2 * Math.PI;
-    }
-    else if (thArc > 0 && sweep === 0) {
-      thArc -= 2 * Math.PI;
-    }
-
-    var segments = Math.ceil(Math.abs(thArc / (Math.PI * 0.5 + 0.001))),
-        result = [];
-
-    for (var i = 0; i < segments; i++) {
-      var th2 = th0 + i * thArc / segments,
-          th3 = th0 + (i + 1) * thArc / segments;
-
-      result[i] = [xc, yc, th2, th3, rx, ry, coords.sinTh, coords.cosTh];
-    }
-
-    arcToSegmentsCache[argsString] = result;
-    return result;
-  }
-
-  function getXYCoords(rotateX, rx, ry, ox, oy, x, y) {
-
-    var th = rotateX * (Math.PI / 180),
-        sinTh = Math.sin(th),
-        cosTh = Math.cos(th);
-
-    rx = Math.abs(rx);
-    ry = Math.abs(ry);
-
-    var px = cosTh * (ox - x) * 0.5 + sinTh * (oy - y) * 0.5,
-        py = cosTh * (oy - y) * 0.5 - sinTh * (ox - x) * 0.5,
-        pl = (px * px) / (rx * rx) + (py * py) / (ry * ry);
-
-    if (pl > 1) {
-      pl = Math.sqrt(pl);
-      rx *= pl;
-      ry *= pl;
-    }
-
-    var a00 = cosTh / rx,
-        a01 = sinTh / rx,
-        a10 = (-sinTh) / ry,
-        a11 = (cosTh) / ry;
-
-    return {
-      x0: a00 * ox + a01 * oy,
-      y0: a10 * ox + a11 * oy,
-      x1: a00 * x + a01 * y,
-      y1: a10 * x + a11 * y,
-      sinTh: sinTh,
-      cosTh: cosTh
-    };
-  }
-
-  function segmentToBezier(cx, cy, th0, th1, rx, ry, sinTh, cosTh) {
-    argsString = _join.call(arguments);
-
-    if (segmentToBezierCache[argsString]) {
-      return segmentToBezierCache[argsString];
-    }
-
-    var a00 = cosTh * rx,
-        a01 = -sinTh * ry,
-        a10 = sinTh * rx,
-        a11 = cosTh * ry,
-        thHalf = 0.5 * (th1 - th0),
-        t = (8 / 3) * Math.sin(thHalf * 0.5) *
-            Math.sin(thHalf * 0.5) / Math.sin(thHalf),
-
-        x1 = cx + Math.cos(th0) - t * Math.sin(th0),
-        y1 = cy + Math.sin(th0) + t * Math.cos(th0),
-        x3 = cx + Math.cos(th1),
-        y3 = cy + Math.sin(th1),
-        x2 = x3 + t * Math.sin(th1),
-        y2 = y3 - t * Math.cos(th1);
-
-    segmentToBezierCache[argsString] = [
-      a00 * x1 + a01 * y1,      a10 * x1 + a11 * y1,
-      a00 * x2 + a01 * y2,      a10 * x2 + a11 * y2,
-      a00 * x3 + a01 * y3,      a10 * x3 + a11 * y3
-    ];
-
-    return segmentToBezierCache[argsString];
-  }
-
-  /**
-   * Draws arc
-   * @param {CanvasRenderingContext2D} ctx
-   * @param {Number} x
-   * @param {Number} y
-   * @param {Array} coords
-   */
-  fabric.util.drawArc = function(ctx, x, y, coords) {
-    var rx = coords[0],
-        ry = coords[1],
-        rot = coords[2],
-        large = coords[3],
-        sweep = coords[4],
-        ex = coords[5],
-        ey = coords[6],
-        segs = arcToSegments(ex, ey, rx, ry, large, sweep, rot, x, y);
-
-    for (var i = 0; i < segs.length; i++) {
-      var bez = segmentToBezier.apply(this, segs[i]);
-      ctx.bezierCurveTo.apply(ctx, bez);
-    }
+  var R = {};
+  var has = "hasOwnProperty";
+  var Str = String;
+  var array = "array";
+  var isnan = {
+    "NaN": 1,
+    "Infinity": 1,
+    "-Infinity": 1
   };
+  var lowerCase = Str.prototype.toLowerCase;
+  var upperCase = Str.prototype.toUpperCase;
+  var objectToString = Object.prototype.toString;
+  var concat = "concat";
+  var split = "split";
+  var apply = "apply";
+  var math = Math,
+    mmax = math.max,
+    mmin = math.min,
+    abs = math.abs,
+    pow = math.pow,
+    PI = math.PI,
+    round = math.round,
+    toFloat = parseFloat,
+    toInt = parseInt;
+  var p2s = /,?([achlmqrstvxz]),?/gi;
+  var pathCommand = /([achlmrqstvz])[\x09\x0a\x0b\x0c\x0d\x20\xa0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000\u2028\u2029,]*((-?\d*\.?\d*(?:e[\-+]?\d+)?[\x09\x0a\x0b\x0c\x0d\x20\xa0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000\u2028\u2029]*,?[\x09\x0a\x0b\x0c\x0d\x20\xa0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000\u2028\u2029]*)+)/ig;
+  var pathValues = /(-?\d*\.?\d*(?:e[\-+]?\d+)?)[\x09\x0a\x0b\x0c\x0d\x20\xa0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000\u2028\u2029]*,?[\x09\x0a\x0b\x0c\x0d\x20\xa0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000\u2028\u2029]*/ig;
+  R.is = function (o, type)
+  {
+    type = lowerCase.call(type);
+    if (type == "finite")
+    {
+      return !isnan[has](+o);
+    }
+    if (type == "array")
+    {
+      return o instanceof Array;
+    }
+    return type == "null" && o === null || type == typeof o && o !== null || type == "object" && o === Object(o) || type == "array" && Array.isArray && Array.isArray(o) || objectToString.call(o).slice(8, -1).toLowerCase() == type
+  };
+
+  function clone(obj)
+  {
+    if (Object(obj) !== obj)
+    {
+      return obj;
+    }
+    var res = new obj.constructor;
+    for (var key in obj)
+    {
+      if (obj[has](key))
+      {
+        res[key] = clone(obj[key]);
+      }
+    }
+    return res;
+  }
+  R._path2string = function ()
+  {
+    return this.join(",").replace(p2s, "$1");
+  };
+
+  function repush(array, item)
+  {
+    for (var i = 0, ii = array.length; i < ii; i++)
+      if (array[i] === item)
+      {
+        return array.push(array.splice(i, 1)[0]);
+      }
+  }
+  var pathClone = function (pathArray)
+  {
+    var res = clone(pathArray);
+    res.toString = R._path2string;
+    return res;
+  };
+  var paths = function (ps)
+  {
+    var p = paths.ps = paths.ps || {};
+    if (p[ps]) p[ps].sleep = 100;
+    else p[ps] = {sleep: 100};
+    setTimeout(function ()
+    {
+      for (var key in p)
+      {
+        if (p[has](key) && key != ps)
+        {
+          p[key].sleep--;
+          !p[key].sleep && delete p[key];
+        }
+      }
+    });
+    return p[ps];
+  };
+
+  function catmullRom2bezier(crp, z)
+  {
+    var d = [];
+    for (var i = 0, iLen = crp.length; iLen - 2 * !z > i; i += 2)
+    {
+      var p = [{x: +crp[i - 2], y: +crp[i - 1]},
+        {x: +crp[i], y: +crp[i + 1]},
+        {x: +crp[i + 2],y: +crp[i + 3]},
+        {x: +crp[i + 4], y: +crp[i + 5]}];
+      if (z)
+      {
+        if (!i)
+        {
+          p[0] = {x: +crp[iLen - 2], y: +crp[iLen - 1]};
+        }
+        else
+        {
+          if (iLen - 4 == i)
+          {
+            p[3] = {x: +crp[0], y: +crp[1]};
+          }
+          else
+          {
+            if (iLen - 2 == i)
+            {
+              p[2] = {x: +crp[0], y: +crp[1]};
+              p[3] = {x: +crp[2], y: +crp[3]};
+            }
+          }
+        }
+      }
+      else
+      {
+        if (iLen - 4 == i)
+        {
+          p[3] = p[2];
+        }
+        else
+        {
+          if (!i)
+          {
+            p[0] = {x: +crp[i], y: +crp[i + 1]};
+          }
+        }
+      }
+      d.push(["C", (-p[0].x + 6 * p[1].x + p[2].x) / 6, (-p[0].y + 6 * p[1].y + p[2].y) / 6, (p[1].x + 6 * p[2].x - p[3].x) / 6, (p[1].y + 6 * p[2].y - p[3].y) / 6, p[2].x, p[2].y])
+    }
+    return d
+  };
+  var parsePathString = R.parsePathString = function (pathString)
+  {
+    if (!pathString) return null;
+    var pth = paths(pathString);
+    if (pth.arr) return pathClone(pth.arr)
+    var paramCounts = { a: 7, c: 6, h: 1, l: 2, m: 2, r: 4, q: 4, s: 4, t: 2, v: 1, z: 0}, data = [];
+    if (R.is(pathString, array) && R.is(pathString[0], array)) data = pathClone(pathString);
+    if (!data.length)
+    {
+      Str(pathString).replace(pathCommand, function (a, b, c)
+      {
+        var params = [], name = b.toLowerCase();
+        c.replace(pathValues, function (a, b)
+        {
+          b && params.push(+b);
+        });
+        if (name == "m" && params.length > 2)
+        {
+          data.push([b][concat](params.splice(0, 2)));
+          name = "l";
+          b = b == "m" ? "l" : "L"
+        }
+        if (name == "r") data.push([b][concat](params))
+        else
+        {
+          while (params.length >= paramCounts[name])
+          {
+            data.push([b][concat](params.splice(0, paramCounts[name])));
+            if (!paramCounts[name]) break;
+          }
+        }
+      })
+    }
+    data.toString = R._path2string;
+    pth.arr = pathClone(data);
+    return data;
+  };
+
+  function repush(array, item)
+  {
+    for (var i = 0, ii = array.length; i < ii; i++)
+      if (array[i] === item)
+      {
+        return array.push(array.splice(i, 1)[0]);
+      }
+  }
+  
+  var pathToAbsolute = cacher(function (pathArray)
+  {
+    //var pth = paths(pathArray); // Timo: commented to prevent multiple caching
+                                  // for some reason only FF proceed correctly
+                                  // when not cached using cacher() around
+                                  // this function.
+    //if (pth.abs) return pathClone(pth.abs)
+    if (!R.is(pathArray, array) || !R.is(pathArray && pathArray[0], array)) 
+      pathArray = R.parsePathString(pathArray)
+    if (!pathArray || !pathArray.length) return [["M", 0, 0]];
+    var res = [], x = 0, y = 0, mx = 0, my = 0, start = 0;
+    if (pathArray[0][0] == "M")
+    {
+      x = +pathArray[0][1];
+      y = +pathArray[0][2];
+      mx = x;
+      my = y;
+      start++;
+      res[0] = ["M", x, y];
+    }
+    var crz = pathArray.length == 3 && pathArray[0][0] == "M" && pathArray[1][0].toUpperCase() == "R" && pathArray[2][0].toUpperCase() == "Z";
+    for (var r, pa, i = start, ii = pathArray.length; i < ii; i++)
+    {
+      res.push(r = []);
+      pa = pathArray[i];
+      if (pa[0] != upperCase.call(pa[0]))
+      {
+        r[0] = upperCase.call(pa[0]);
+        switch (r[0])
+        {
+        case "A":
+          r[1] = pa[1];
+          r[2] = pa[2];
+          r[3] = pa[3];
+          r[4] = pa[4];
+          r[5] = pa[5];
+          r[6] = +(pa[6] + x);
+          r[7] = +(pa[7] + y);
+          break;
+        case "V":
+          r[1] = +pa[1] + y;
+          break;
+        case "H":
+          r[1] = +pa[1] + x;
+          break;
+        case "R":
+          var dots = [x, y][concat](pa.slice(1));
+          for (var j = 2, jj = dots.length; j < jj; j++)
+          {
+            dots[j] = +dots[j] + x;
+            dots[++j] = +dots[j] + y
+          }
+          res.pop();
+          res = res[concat](catmullRom2bezier(dots, crz));
+          break;
+        case "M":
+          mx = +pa[1] + x;
+          my = +pa[2] + y;
+        default:
+          for (j = 1, jj = pa.length; j < jj; j++)
+            r[j] = +pa[j] + (j % 2 ? x : y)
+        }
+      }
+      else
+      {
+        if (pa[0] == "R")
+        {
+          dots = [x, y][concat](pa.slice(1));
+          res.pop();
+          res = res[concat](catmullRom2bezier(dots, crz));
+          r = ["R"][concat](pa.slice(-2));
+        }
+        else
+        {
+          for (var k = 0, kk = pa.length; k < kk; k++)
+            r[k] = pa[k]
+        }
+      }
+      switch (r[0])
+      {
+      case "Z":
+        x = mx;
+        y = my;
+        break;
+      case "H":
+        x = r[1];
+        break;
+      case "V":
+        y = r[1];
+        break;
+      case "M":
+        mx = r[r.length - 2];
+        my = r[r.length - 1];
+      default:
+        x = r[r.length - 2];
+        y = r[r.length - 1];
+      }
+    }
+    res.toString = R._path2string;
+    //pth.abs = pathClone(res);
+    return res;
+  });
+
+  function cacher(f, scope, postprocessor)
+  {
+    function newf()
+    {
+      var arg = Array.prototype.slice.call(arguments, 0),
+        args = arg.join("\u2400"),
+        cache = newf.cache = newf.cache || {}, count = newf.count = newf.count || [];
+      if (cache.hasOwnProperty(args))
+      {
+        for (var i = 0, ii = count.length; i < ii; i++)
+          if (count[i] === args)
+          {
+            count.push(count.splice(i, 1)[0]);
+          }
+        return postprocessor ? postprocessor(cache[args]) : cache[args];
+      }
+      count.length >= 1E3 && delete cache[count.shift()];
+      count.push(args);
+      cache[args] = f.apply(scope, arg);
+      return postprocessor ? postprocessor(cache[args]) : cache[args];
+    }
+    return newf;
+  }
+
+  var l2c = function (x1, y1, x2, y2)
+  {
+    return [x1, y1, x2, y2, x2, y2];
+  },
+  q2c = function (x1, y1, ax, ay, x2, y2)
+  {
+    var _13 = 1 / 3, _23 = 2 / 3;
+    return [_13 * x1 + _23 * ax, _13 * y1 + _23 * ay, _13 * x2 + _23 * ax, _13 * y2 + _23 * ay, x2, y2]
+  },
+  a2c = cacher(function (x1, y1, rx, ry, angle, large_arc_flag, sweep_flag, x2, y2, recursive)
+  {
+    var _120 = PI * 120 / 180, rad = PI / 180 * (+angle || 0), res = [], xy,
+    rotate = cacher(function (x, y, rad)
+    {
+      var X = x * Math.cos(rad) - y * Math.sin(rad),
+          Y = x * Math.sin(rad) + y * Math.cos(rad);
+      return {x: X, y: Y};
+    });
+    if (!recursive)
+    {
+      xy = rotate(x1, y1, -rad);
+      x1 = xy.x;
+      y1 = xy.y;
+      xy = rotate(x2, y2, -rad);
+      x2 = xy.x;
+      y2 = xy.y;
+      var cos = Math.cos(PI / 180 * angle), sin = Math.sin(PI / 180 * angle),
+          x = (x1 - x2) / 2, y = (y1 - y2) / 2;
+      var h = x * x / (rx * rx) + y * y / (ry * ry);
+      if (h > 1)
+      {
+        h = Math.sqrt(h);
+        rx = h * rx;
+        ry = h * ry;
+      }
+      var rx2 = rx * rx,
+          ry2 = ry * ry,
+          k = (large_arc_flag == sweep_flag ? -1 : 1) * Math.sqrt(Math.abs((rx2 * ry2 - rx2 * y * y - ry2 * x * x) / (rx2 * y * y + ry2 * x * x))),
+          cx = k * rx * y / ry + (x1 + x2) / 2,
+          cy = k * -ry * x / rx + (y1 + y2) / 2,
+          f1 = Math.asin(((y1 - cy) / ry).toFixed(9)),
+          f2 = Math.asin(((y2 - cy) / ry).toFixed(9));
+      f1 = x1 < cx ? PI - f1 : f1;
+      f2 = x2 < cx ? PI - f2 : f2;
+      f1 < 0 && (f1 = PI * 2 + f1);
+      f2 < 0 && (f2 = PI * 2 + f2);
+      if (sweep_flag && f1 > f2)
+      {
+        f1 = f1 - PI * 2;
+      }
+      if (!sweep_flag && f2 > f1)
+      {
+        f2 = f2 - PI * 2;
+      }
+    }
+    else
+    {
+      f1 = recursive[0];
+      f2 = recursive[1];
+      cx = recursive[2];
+      cy = recursive[3];
+    }
+    var df = f2 - f1;
+    if (Math.abs(df) > _120)
+    {
+      var f2old = f2, x2old = x2, y2old = y2;
+      f2 = f1 + _120 * (sweep_flag && f2 > f1 ? 1 : -1);
+      x2 = cx + rx * Math.cos(f2);
+      y2 = cy + ry * Math.sin(f2);
+      res = a2c(x2, y2, rx, ry, angle, 0, sweep_flag, x2old, y2old, [f2, f2old, cx, cy])
+    }
+    df = f2 - f1;
+    var c1 = Math.cos(f1),
+        s1 = Math.sin(f1),
+        c2 = Math.cos(f2),
+        s2 = Math.sin(f2),
+        t = Math.tan(df / 4),
+        hx = 4 / 3 * rx * t,
+        hy = 4 / 3 * ry * t,
+        m1 = [x1, y1],
+        m2 = [x1 + hx * s1, y1 - hy * c1],
+        m3 = [x2 + hx * s2, y2 - hy * c2],
+        m4 = [x2, y2];
+    m2[0] = 2 * m1[0] - m2[0];
+    m2[1] = 2 * m1[1] - m2[1];
+    if (recursive) return [m2, m3, m4].concat(res);
+    else
+    {
+      res = [m2, m3, m4].concat(res).join().split(",");
+      var newres = [];
+      for (var i = 0, ii = res.length; i < ii; i++)
+        newres[i] = i % 2 ? rotate(res[i - 1], res[i], rad).y : rotate(res[i], res[i + 1], rad).x
+      return newres
+    }
+  });
+
+  var path2curve = cacher(function (path, path2)
+  {
+    var pth = !path2 && paths(path);
+    if (!path2 && pth.curve) return pathClone(pth.curve)
+    var p = pathToAbsolute(path),
+      p2 = path2 && pathToAbsolute(path2),
+      attrs = {x: 0, y: 0, bx: 0, by: 0, X: 0, Y: 0, qx: null, qy: null},
+      attrs2 = {x: 0, y: 0, bx: 0, by: 0, X: 0, Y: 0, qx: null, qy: null},
+      processPath = function (path, d, pcom)
+      {
+        var nx, ny;
+        if (!path)
+        {
+          return ["C", d.x, d.y, d.x, d.y, d.x, d.y];
+        }!(path[0] in {T: 1, Q: 1}) && (d.qx = d.qy = null);
+        switch (path[0])
+        {
+        case "M":
+          d.X = path[1];
+          d.Y = path[2];
+          break;
+        case "A":
+          path = ["C"][concat](a2c[apply](0, [d.x, d.y][concat](path.slice(1))));
+          break;
+        case "S":
+          if (pcom == "C" || pcom == "S")
+          {
+            nx = d.x * 2 - d.bx;
+            ny = d.y * 2 - d.by;
+          }
+          else
+          {
+            nx = d.x;
+            ny = d.y;
+          }
+          path = ["C", nx, ny][concat](path.slice(1));
+          break;
+        case "T":
+          if (pcom == "Q" || pcom == "T")
+          {
+            d.qx = d.x * 2 - d.qx;
+            d.qy = d.y * 2 - d.qy;
+          }
+          else
+          {
+            d.qx = d.x;
+            d.qy = d.y;
+          }
+          path = ["C"][concat](q2c(d.x, d.y, d.qx, d.qy, path[1], path[2]));
+          break;
+        case "Q":
+          d.qx = path[1];
+          d.qy = path[2];
+          path = ["C"][concat](q2c(d.x, d.y, path[1], path[2], path[3], path[4]));
+          break;
+        case "L":
+          path = ["C"][concat](l2c(d.x, d.y, path[1], path[2]));
+          break;
+        case "H":
+          path = ["C"][concat](l2c(d.x, d.y, path[1], d.y));
+          break;
+        case "V":
+          path = ["C"][concat](l2c(d.x, d.y, d.x, path[1]));
+          break;
+        case "Z":
+          path = ["C"][concat](l2c(d.x, d.y, d.X, d.Y));
+          break
+        }
+        return path
+      },
+      fixArc = function (pp, i)
+      {
+        if (pp[i].length > 7)
+        {
+          pp[i].shift();
+          var pi = pp[i];
+          while (pi.length)
+          {
+            pcoms1[i] = "A";
+            p2 && (pcoms2[i] = "A");
+            pp.splice(i++, 0, ["C"][concat](pi.splice(0, 6)));
+          }
+          pp.splice(i, 1);
+          ii = mmax(p.length, p2 && p2.length || 0);
+        }
+      },
+      fixM = function (path1, path2, a1, a2, i)
+      {
+        if (path1 && path2 && path1[i][0] == "M" && path2[i][0] != "M")
+        {
+          path2.splice(i, 0, ["M", a2.x, a2.y]);
+          a1.bx = 0;
+          a1.by = 0;
+          a1.x = path1[i][1];
+          a1.y = path1[i][2];
+          ii = mmax(p.length, p2 && p2.length || 0);
+        }
+      },
+      pcoms1 = [], pcoms2 = [], pfirst = "", pcom = "";
+    for (var i = 0, ii = mmax(p.length, p2 && p2.length || 0); i < ii; i++)
+    {
+      p[i] && (pfirst = p[i][0]);
+      if (pfirst != "C")
+      {
+        pcoms1[i] = pfirst;
+        i && (pcom = pcoms1[i - 1]);
+      }
+      p[i] = processPath(p[i], attrs, pcom);
+      if (pcoms1[i] != "A" && pfirst == "C") pcoms1[i] = "C";
+      fixArc(p, i);
+      if (p2)
+      {
+        p2[i] && (pfirst = p2[i][0]);
+        if (pfirst != "C")
+        {
+          pcoms2[i] = pfirst;
+          i && (pcom = pcoms2[i - 1]);
+        }
+        p2[i] = processPath(p2[i], attrs2, pcom);
+        if (pcoms2[i] != "A" && pfirst == "C") pcoms2[i] = "C"
+        fixArc(p2, i);
+      }
+      fixM(p, p2, attrs, attrs2, i);
+      fixM(p2, p, attrs2, attrs, i);
+      var seg = p[i], seg2 = p2 && p2[i], seglen = seg.length, seg2len = p2 && seg2.length;
+      attrs.x = seg[seglen - 2];
+      attrs.y = seg[seglen - 1];
+      attrs.bx = toFloat(seg[seglen - 4]) || attrs.x;
+      attrs.by = toFloat(seg[seglen - 3]) || attrs.y;
+      attrs2.bx = p2 && (toFloat(seg2[seg2len - 4]) || attrs2.x);
+      attrs2.by = p2 && (toFloat(seg2[seg2len - 3]) || attrs2.y);
+      attrs2.x = p2 && seg2[seg2len - 2];
+      attrs2.y = p2 && seg2[seg2len - 1];
+    }
+    if (!p2) pth.curve = pathClone(p);
+    return p2 ? [p, p2] : p
+  }, null, pathClone);
+
+  // -----------------------------
+  // Raphael code ends
+  // -----------------------------
+
+  var pow = Math.pow,
+  sqrt = Math.sqrt,
+  min = Math.min,
+  max = Math.max;
+  abs = Math.abs;
+  
+  // Returns bounding box of cubic bezier curve.
+  // Source: http://blog.hackers-cafe.net/2009/06/how-to-calculate-bezier-curves-bounding.html
+  // Original version: NISHIO Hirokazu
+  // Modifications: Timo
+  function getBoundsOfCurve (x0, y0, x1, y1, x2, y2, x3, y3)
+  {
+    var tvalues = [], bounds = [new Array(6), new Array(6)],
+        a,b,c,t,t1,t2,b2ac,sqrtb2ac;
+    for (var i = 0; i < 2; ++i)
+    {
+      if (i==0)
+      {
+        b = 6 * x0 - 12 * x1 + 6 * x2;
+        a = -3 * x0 + 9 * x1 - 9 * x2 + 3 * x3;
+        c = 3 * x1 - 3 * x0;
+      }
+      else
+      {
+        b = 6 * y0 - 12 * y1 + 6 * y2;
+        a = -3 * y0 + 9 * y1 - 9 * y2 + 3 * y3;
+        c = 3 * y1 - 3 * y0;
+      }
+      if (abs(a) < 1e-12)
+      {
+        if (abs(b) < 1e-12) continue;
+        t = -c / b;
+        if (0 < t && t < 1) tvalues.push(t);
+        continue;
+      }
+      b2ac = b*b - 4 * c * a;
+      sqrtb2ac = sqrt(b2ac);
+      if (b2ac < 0) continue;
+      t1 = (-b + sqrtb2ac) / (2 * a);
+      if (0 < t1 && t1 < 1) tvalues.push(t1);
+      t2 = (-b - sqrtb2ac) / (2 * a);
+      if (0 < t2 && t2 < 1) tvalues.push(t2);
+    }
+    
+    var x, y, j = tvalues.length, jlen = j, mt;
+    while(j--)
+    {
+      t = tvalues[j]; 
+      mt = 1-t;
+      bounds[0][j] = (mt*mt*mt*x0) + (3*mt*mt*t*x1) + (3*mt*t*t*x2) + (t*t*t*x3);
+      bounds[1][j] = (mt*mt*mt*y0) + (3*mt*mt*t*y1) + (3*mt*t*t*y2) + (t*t*t*y3);
+    }
+
+    bounds[0][jlen] = x0;
+    bounds[1][jlen] = y0;
+    bounds[0][jlen+1] = x3;
+    bounds[1][jlen+1] = y3;
+    bounds[0].length = bounds[1].length = jlen+2;
+    
+    return {
+      left: min.apply(null, bounds[0]),
+      top: min.apply(null, bounds[1]),
+      right: max.apply(null, bounds[0]),
+      bottom: max.apply(null, bounds[1])
+    };
+  };
+
+  // Returns bounding box of path.
+  // path can be array or string
+  var getBoundsOfPath = function(path)
+  {
+    var curve = path2curve(path);
+    
+    // Calculate the Initial Bounding Box of all curves using start 
+    // and end points that are surely on curve.
+    // This box is needed to exclude paths that are already inside Initial
+    // Bounding Box from bounding box calculations.
+    var xbounds = [], ybounds = [], curr, prev, prevlen;
+    for (var i = 0; i < curve.length; i++)
+    {
+      curr = curve[i];
+      if (curr[0] == "C")
+      {
+        if(i==0)
+        {
+          xbounds.push(0);
+          ybounds.push(0);
+        }
+        else
+        {
+          prev = curve[i-1];
+          prevlen = prev.length;
+          xbounds.push(prev[prevlen-2]);
+          ybounds.push(prev[prevlen-1]);
+        }
+        xbounds.push(curr[5]);
+        ybounds.push(curr[6]);
+      }
+    }
+    var minx = min.apply(Number.MAX_VALUE, xbounds),
+        miny = min.apply(Number.MAX_VALUE, ybounds),
+        maxx = max.apply(Number.MIN_VALUE, xbounds),
+        maxy = max.apply(Number.MIN_VALUE, ybounds);
+
+    var bounds, s, startX, startY, isC = false;
+    for (i = 0, ilen = curve.length; i < ilen; i++)
+    {
+      var s = curve[i];
+      if (s[0] == 'M')
+      {
+        if (typeof(curve[i+1]) != "undefined" && curve[i+1][0] == "C")
+        {
+          startX = s[1];
+          startY = s[2];
+          if (startX < minx) minx = startX;
+          if (startX > maxx) maxx = startX;
+          if (startY < miny) miny = startY;
+          if (startY > maxy) maxy = startY;
+        }
+      }
+      else if (s[0] == 'C')
+      {
+        isC = true;
+        // Exclude curves that are outside Initial Bounding Box
+        if (startX < minx || startX > maxx ||
+            startY < miny || startY > maxy ||
+            s[1] < minx || s[1] > maxx ||
+            s[2] < miny || s[2] > maxy ||
+            s[3] < minx || s[3] > maxx ||
+            s[4] < miny || s[4] > maxy ||
+            s[5] < minx || s[5] > maxx ||
+            s[6] < miny || s[6] > maxy)
+        {
+          bounds = getBoundsOfCurve(startX, startY, s[1], s[2], s[3], s[4], s[5], s[6]);
+          if (bounds.left < minx) minx = bounds.left;
+          if (bounds.right > maxx) maxx = bounds.right;
+          if (bounds.top < miny) miny = bounds.top;
+          if (bounds.bottom > maxy) maxy = bounds.bottom;
+        }
+        startX = s[5];
+        startY = s[6];
+      }
+    }
+    if (!isC) minx = maxx = miny = maxy = 0;
+    return {
+      left: minx,
+      top: miny,
+      right: maxx,
+      bottom: maxy,
+      width: maxx - minx,
+      height: maxy - miny
+    };
+  };
+
+// Modifies path coordinates by subracting x, y of them.
+function normalizePathCoords (obj, x, y)
+{
+  var path = obj.path;
+  var path = pathToAbsolute(path);
+  for (var i = 0; i < path.length; i++)
+  {
+    curr = path[i];
+    switch (curr[0])
+    {
+      case 'M':
+      case 'L':
+      case 'T':
+        curr[1] -= x;
+        curr[2] -= y;
+        break;
+      case 'H':
+        curr[1] -= x;
+        break;
+      case 'V':
+        curr[1] -= y;
+        break;
+      case 'C':
+        curr[1] -= x;
+        curr[3] -= x;
+        curr[5] -= x;
+        curr[2] -= y;
+        curr[4] -= y;
+        curr[6] -= y;
+        break;
+      case 'S':
+      case 'Q':
+        curr[1] -= x;
+        curr[3] -= x;
+        curr[2] -= y;
+        curr[4] -= y;
+        break;
+      case 'A':
+        curr[6] -= x;
+        curr[7] -= y;
+        break;
+    }
+  }
+  obj.path = path;
+}
+
+// Export functions
+fabric.util.getBoundsOfPath = getBoundsOfPath;
+fabric.util.normalizePathCoords = normalizePathCoords;
+fabric.util.arc2cubics = a2c;
+fabric.util.path2curve = path2curve;
+fabric.util.parsePathString = parsePathString;
 })();
 
 
@@ -18026,44 +18651,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @param {Object} [options] Options object
      */
     _initializePath: function (options) {
-      var isWidthSet = 'width' in options && options.width != null,
-          isHeightSet = 'height' in options && options.width != null,
-          isLeftSet = 'left' in options,
-          isTopSet = 'top' in options,
-          origLeft = isLeftSet ? this.left : 0,
-          origTop = isTopSet ? this.top : 0;
-
-      if (!isWidthSet || !isHeightSet) {
-        extend(this, this._parseDimensions());
-        if (isWidthSet) {
-          this.width = options.width;
-        }
-        if (isHeightSet) {
-          this.height = options.height;
-        }
-      }
-      else { //Set center location relative to given height/width if not specified
-        if (!isTopSet) {
-          this.top = this.height / 2;
-        }
-        if (!isLeftSet) {
-          this.left = this.width / 2;
-        }
-      }
-      this.pathOffset = this.pathOffset ||
-                        // Save top-left coords as offset
-                        this._calculatePathOffset(origLeft, origTop);
-    },
-
-    /**
-     * @private
-     * @param {Boolean} positionSet When false, path offset is returned otherwise 0
-     */
-    _calculatePathOffset: function (origLeft, origTop) {
-      return {
-        x: this.left - origLeft - (this.width / 2),
-        y: this.top - origTop - (this.height / 2)
-      };
+      extend(this, this._parseDimensions(options));
+      this.pathOffset = {x:0, y:0};
+      return;
     },
 
     /**
@@ -18082,13 +18672,12 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           tempControlX,
           tempControlY,
           l = -((this.width / 2) + this.pathOffset.x),
-          t = -((this.height / 2) + this.pathOffset.y),
-          methodName;
+          t = -((this.height / 2) + this.pathOffset.y);
 
-      for (var i = 0, len = this.path.length; i < len; ++i) {
-
+      for (var i = 0, len = this.path.length; i < len; ++i)
+      {
         current = this.path[i];
-
+        
         switch (current[0]) { // first letter
 
           case 'l': // lineto, relative
@@ -18126,21 +18715,13 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           case 'm': // moveTo, relative
             x += current[1];
             y += current[2];
-            // draw a line if previous command was moveTo as well (otherwise, it will have no effect)
-            methodName = (previous && (previous[0] === 'm' || previous[0] === 'M'))
-              ? 'lineTo'
-              : 'moveTo';
-            ctx[methodName](x + l, y + t);
+            ctx['moveTo'](x + l, y + t);
             break;
 
           case 'M': // moveTo, absolute
             x = current[1];
             y = current[2];
-            // draw a line if previous command was moveTo as well (otherwise, it will have no effect)
-            methodName = (previous && (previous[0] === 'm' || previous[0] === 'M'))
-              ? 'lineTo'
-              : 'moveTo';
-            ctx[methodName](x + l, y + t);
+            ctx['moveTo'](x + l, y + t);
             break;
 
           case 'c': // bezierCurveTo, relative
@@ -18182,9 +18763,16 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
             tempY = y + current[4];
 
             // calculate reflection of previous control points
-            controlX = controlX ? (2 * x - controlX) : x;
-            controlY = controlY ? (2 * y - controlY) : y;
-
+            if (previous[0] == 'C' || previous[0] == 'c' || previous[0] == 'S' || previous[0] == 's')
+            { 
+              controlX = 2 * x - controlX;
+              controlY = 2 * y - controlY;
+            }
+						else
+						{
+              controlX = x;
+              controlY = y;
+						}
             ctx.bezierCurveTo(
               controlX + l,
               controlY + t,
@@ -18207,9 +18795,18 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           case 'S': // shorthand cubic bezierCurveTo, absolute
             tempX = current[3];
             tempY = current[4];
+
             // calculate reflection of previous control points
-            controlX = 2 * x - controlX;
-            controlY = 2 * y - controlY;
+            if (previous[0] == 'C' || previous[0] == 'c' || previous[0] == 'S' || previous[0] == 's')
+            { 
+              controlX = 2 * x - controlX;
+              controlY = 2 * y - controlY;
+            }
+            else 
+            {
+              controlX = x;
+              controlY = y;
+            }
             ctx.bezierCurveTo(
               controlX + l,
               controlY + t,
@@ -18270,21 +18867,21 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
             tempX = x + current[1];
             tempY = y + current[2];
 
-            if (previous[0].match(/[QqTt]/) === null) {
-              // If there is no previous command or if the previous command was not a Q, q, T or t,
-              // assume the control point is coincident with the current point
-              controlX = x;
-              controlY = y;
-            }
-            else if (previous[0] === 't') {
+            if (previous[0] === 't') {
               // calculate reflection of previous control points for t
               controlX = 2 * x - tempControlX;
               controlY = 2 * y - tempControlY;
             }
-            else if (previous[0] === 'q') {
+            else if (previous[0] === 'q' || previous[0] === 'Q' || previous[0] === 'T') {
               // calculate reflection of previous control points for q
               controlX = 2 * x - controlX;
               controlY = 2 * y - controlY;
+            }
+            else {
+              // If there is no previous command or if the previous command was not a Q, q, T or t,
+              // assume the control point is coincident with the current point
+              controlX = x;
+              controlY = y;
             }
 
             tempControlX = controlX;
@@ -18307,8 +18904,24 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
             tempY = current[2];
 
             // calculate reflection of previous control points
-            controlX = 2 * x - controlX;
-            controlY = 2 * y - controlY;
+            if (previous[0] === 't') {
+              controlX = 2 * x - tempControlX;
+              controlY = 2 * y - tempControlY;
+            }
+            else if (previous[0] == 'Q' || previous[0] == 'q' || previous[0] == 'T')
+            {
+              controlX = 2 * x - controlX;
+              controlY = 2 * y - controlY;
+            }
+            else
+            {
+              controlX = x;
+              controlY = y;
+            }
+
+            tempControlX = controlX;
+            tempControlY = controlY;
+
             ctx.quadraticCurveTo(
               controlX + l,
               controlY + t,
@@ -18317,47 +18930,39 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
             );
             x = tempX;
             y = tempY;
+
             break;
 
           case 'a':
-            // TODO: optimize this
-            drawArc(ctx, x + l, y + t, [
-              current[1],
-              current[2],
-              current[3],
-              current[4],
-              current[5],
-              current[6] + x + l,
-              current[7] + y + t
-            ]);
+            var segs = fabric.util.arc2cubics(x + l, y + t, current[1], current[2], current[3], current[4], current[5], current[6] + x + l, current[7] + y + t);
+            for (var i = 0, ilen = segs.length; i < segs.length; i += 6)
+              ctx.bezierCurveTo.apply(ctx, segs.slice(i, i + 6));
             x += current[6];
             y += current[7];
             break;
 
           case 'A':
-            // TODO: optimize this
-            drawArc(ctx, x + l, y + t, [
-              current[1],
-              current[2],
-              current[3],
-              current[4],
-              current[5],
-              current[6] + l,
-              current[7] + t
-            ]);
+            var segs = fabric.util.arc2cubics(x + l, y + t, current[1], current[2], current[3], current[4], current[5], current[6] + l, current[7] + t);
+            for (var i = 0, ilen = segs.length; i < segs.length; i += 6)
+              ctx.bezierCurveTo.apply(ctx, segs.slice(i, i + 6));
             x = current[6];
             y = current[7];
             break;
 
+
           case 'z':
           case 'Z':
             ctx.closePath();
+            if(previous[0]=='M' || previous[0]=='m')
+            {
+              ctx.lineTo(x + l + 0.001, y + t + 0.001);
+            }
             break;
         }
         previous = current;
       }
     },
-
+    
     /**
      * Renders path on a specified context
      * @param {CanvasRenderingContext2D} ctx context to render path on
@@ -18477,127 +19082,26 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     /**
      * @private
      */
-    _parsePath: function() {
-      var result = [ ],
-          coords = [ ],
-          currentPath,
-          parsed,
-          re = /([-+]?((\d+\.\d+)|((\d+)|(\.\d+)))(?:e[-+]?\d+)?)/ig,
-          match,
-          coordsStr;
-
-      for (var i = 0, coordsParsed, len = this.path.length; i < len; i++) {
-        currentPath = this.path[i];
-
-        coordsStr = currentPath.slice(1).trim();
-        coords.length = 0;
-
-        while ((match = re.exec(coordsStr))) {
-          coords.push(match[0]);
-        }
-
-        coordsParsed = [ currentPath.charAt(0) ];
-
-        for (var j = 0, jlen = coords.length; j < jlen; j++) {
-          parsed = parseFloat(coords[j]);
-          if (!isNaN(parsed)) {
-            coordsParsed.push(parsed);
-          }
-        }
-
-        var command = coordsParsed[0].toLowerCase(),
-            commandLength = commandLengths[command];
-
-        if (coordsParsed.length - 1 > commandLength) {
-          for (var k = 1, klen = coordsParsed.length; k < klen; k += commandLength) {
-            result.push([ coordsParsed[0] ].concat(coordsParsed.slice(k, k + commandLength)));
-          }
-        }
-        else {
-          result.push(coordsParsed);
-        }
-      }
-
-      return result;
-    },
+     _parsePath: function() {
+       return fabric.util.parsePathString(this.path);
+     },
 
     /**
      * @private
      */
-    _parseDimensions: function() {
-      var aX = [],
-          aY = [],
-          previous = { };
+     _parseDimensions: function(options) {
+      var bounds = fabric.util.getBoundsOfPath(this.path);
+      fabric.util.normalizePathCoords(this, bounds.left, bounds.top);
 
-      this.path.forEach(function(item, i) {
-        this._getCoordsFromCommand(item, i, aX, aY, previous);
-      }, this);
-
-      var minX = min(aX),
-          minY = min(aY),
-          maxX = max(aX),
-          maxY = max(aY),
-          deltaX = maxX - minX,
-          deltaY = maxY - minY,
-
-          o = {
-            left: this.left + (minX + deltaX / 2),
-            top: this.top + (minY + deltaY / 2),
-            width: deltaX,
-            height: deltaY
-          };
-
-      return o;
-    },
-
-    _getCoordsFromCommand: function(item, i, aX, aY, previous) {
-      var isLowerCase = false;
-
-      if (item[0] !== 'H') {
-        previous.x = (i === 0) ? getX(item) : getX(this.path[i - 1]);
-      }
-      if (item[0] !== 'V') {
-        previous.y = (i === 0) ? getY(item) : getY(this.path[i - 1]);
-      }
-
-      // lowercased letter denotes relative position;
-      // transform to absolute
-      if (item[0] === item[0].toLowerCase()) {
-        isLowerCase = true;
-      }
-
-      var xy = this._getXY(item, isLowerCase, previous),
-          val;
-
-      val = parseInt(xy.x, 10);
-      if (!isNaN(val)) {
-        aX.push(val);
-      }
-
-      val = parseInt(xy.y, 10);
-      if (!isNaN(val)) {
-        aY.push(val);
-      }
-    },
-
-    _getXY: function(item, isLowerCase, previous) {
-
-      // last 2 items in an array of coordinates are the actualy x/y (except H/V), collect them
-      // TODO (kangax): support relative h/v commands
-
-      var x = isLowerCase
-        ? previous.x + getX(item)
-        : item[0] === 'V'
-          ? previous.x
-          : getX(item),
-
-          y = isLowerCase
-            ? previous.y + getY(item)
-            : item[0] === 'H'
-              ? previous.y
-              : getY(item);
-
-      return { x: x, y: y };
+      if(!('left' in options)) this.left = bounds.left - (this.strokeWidth * this.scaleX) / 2;
+      if(!('top' in options)) this.top = bounds.top - (this.strokeWidth * this.scaleY) / 2;
+      
+      return {
+        left: this.left,
+        top: this.top,
+        width: bounds.width,
+        height: bounds.height
+      };
     }
   });
 
