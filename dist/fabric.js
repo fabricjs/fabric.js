@@ -1824,7 +1824,7 @@ fabric.Collection = {
    * @param {String} className Class to add to an element
    */
   function addClass(element, className) {
-    if ((' ' + element.className + ' ').indexOf(' ' + className + ' ') === -1) {
+    if (element && (' ' + element.className + ' ').indexOf(' ' + className + ' ') === -1) {
       element.className += (element.className ? ' ' : '') + className;
     }
   }
@@ -5009,6 +5009,11 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
     var source = typeof this.source === 'function'
       ? this.source()
       : this.source;
+
+    // if the image failed to load, return, and allow rest to continue loading
+    if (!source) {
+      return '';
+    }
 
     // if an image
     if (typeof source.src !== 'undefined') {
@@ -16043,7 +16048,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @return {String} Source of an image
      */
     getSrc: function() {
-      return this.getElement().src || this.getElement()._src;
+      if (this.getElement()) {
+        return this.getElement().src || this.getElement()._src;
+      }
     },
 
     /**
@@ -16071,6 +16078,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @chainable
      */
     applyFilters: function(callback) {
+
+      if (!this._originalElement) {
+        return;
+      }
 
       if (this.filters.length === 0) {
         this._element = this._originalElement;
@@ -16121,13 +16132,13 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
-      ctx.drawImage(
-        this._element,
-        -this.width / 2,
-        -this.height / 2,
-        this.width,
-        this.height
-      );
+        this._element && ctx.drawImage(
+                           this._element,
+                           -this.width / 2,
+                           -this.height / 2,
+                           this.width,
+                           this.height
+                         );
     },
 
     /**
@@ -16159,7 +16170,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       options || (options = { });
       this.setOptions(options);
       this._setWidthHeight(options);
-      this._element.crossOrigin = this.crossOrigin;
+      if (this._element) {
+        this._element.crossOrigin = this.crossOrigin;
+      }
     },
 
     /**
@@ -16185,11 +16198,15 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     _setWidthHeight: function(options) {
       this.width = 'width' in options
         ? options.width
-        : (this.getElement().width || 0);
+        : (this.getElement()
+            ? this.getElement().width || 0
+            : 0);
 
       this.height = 'height' in options
         ? options.height
-        : (this.getElement().height || 0);
+        : (this.getElement()
+            ? this.getElement().height || 0
+            : 0);
     },
 
     /**
