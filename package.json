@@ -36,7 +36,7 @@
     "uglify-js": "2.4.x",
     "jscs": "1.2.x",
     "jshint": "2.4.x",
-    "qunit": "0.5.x",
+    "qunit": "0.6.x",
     "istanbul": "0.2.6"
   },
   "engines": {
