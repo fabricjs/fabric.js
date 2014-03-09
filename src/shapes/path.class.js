@@ -74,7 +74,6 @@
      */
     _initializePath: function (options) {
       extend(this, this._parseDimensions(options));
-      this.pathOffset = {x:0, y:0};
       return;
     },
 
