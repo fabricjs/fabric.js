@@ -37,15 +37,15 @@
   R.is = function (o, type)
   {
     type = lowerCase.call(type);
-    if (type == "finite")
+    if (type === "finite")
     {
       return !isnan[has](+o);
     }
-    if (type == "array")
+    if (type === "array")
     {
       return o instanceof Array;
     }
-    return type == "null" && o === null || type == typeof o && o !== null || type == "object" && o === Object(o) || type == "array" && Array.isArray && Array.isArray(o) || objectToString.call(o).slice(8, -1).toLowerCase() == type
+    return type === "null" && o === null || type === typeof o && o !== null || type === "object" && o === Object(o) || type === "array" && Array.isArray && Array.isArray(o) || objectToString.call(o).slice(8, -1).toLowerCase() === type;
   };
 
   function clone(obj)
@@ -92,7 +92,7 @@
     {
       for (var key in p)
       {
-        if (p[has](key) && key != ps)
+        if (p[has](key) && key !== ps)
         {
           p[key].sleep--;
           !p[key].sleep && delete p[key];
@@ -119,13 +119,13 @@
         }
         else
         {
-          if (iLen - 4 == i)
+          if (iLen - 4 === i)
           {
             p[3] = {x: +crp[0], y: +crp[1]};
           }
           else
           {
-            if (iLen - 2 == i)
+            if (iLen - 2 === i)
             {
               p[2] = {x: +crp[0], y: +crp[1]};
               p[3] = {x: +crp[2], y: +crp[3]};
@@ -135,7 +135,7 @@
       }
       else
       {
-        if (iLen - 4 == i)
+        if (iLen - 4 === i)
         {
           p[3] = p[2];
         }
@@ -147,15 +147,15 @@
           }
         }
       }
-      d.push(["C", (-p[0].x + 6 * p[1].x + p[2].x) / 6, (-p[0].y + 6 * p[1].y + p[2].y) / 6, (p[1].x + 6 * p[2].x - p[3].x) / 6, (p[1].y + 6 * p[2].y - p[3].y) / 6, p[2].x, p[2].y])
+      d.push(["C", (-p[0].x + 6 * p[1].x + p[2].x) / 6, (-p[0].y + 6 * p[1].y + p[2].y) / 6, (p[1].x + 6 * p[2].x - p[3].x) / 6, (p[1].y + 6 * p[2].y - p[3].y) / 6, p[2].x, p[2].y]);
     }
-    return d
-  };
+    return d;
+  }
   var parsePathString = R.parsePathString = function (pathString)
   {
     if (!pathString) return null;
     var pth = paths(pathString);
-    if (pth.arr) return pathClone(pth.arr)
+    if (pth.arr) return pathClone(pth.arr);
     var paramCounts = { a: 7, c: 6, h: 1, l: 2, m: 2, r: 4, q: 4, s: 4, t: 2, v: 1, z: 0}, data = [];
     if (R.is(pathString, array) && R.is(pathString[0], array)) data = pathClone(pathString);
     if (!data.length)
@@ -167,13 +167,13 @@
         {
           b && params.push(+b);
         });
-        if (name == "m" && params.length > 2)
+        if (name === "m" && params.length > 2)
         {
           data.push([b][concat](params.splice(0, 2)));
           name = "l";
-          b = b == "m" ? "l" : "L"
+          b = b === "m" ? "l" : "L";
         }
-        if (name == "r") data.push([b][concat](params))
+        if (name === "r") data.push([b][concat](params));
         else
         {
           while (params.length >= paramCounts[name])
@@ -182,31 +182,31 @@
             if (!paramCounts[name]) break;
           }
         }
-      })
+      });
     }
     data.toString = R._path2string;
     pth.arr = pathClone(data);
     return data;
   };
 
-  function repush(array, item)
-  {
-    for (var i = 0, ii = array.length; i < ii; i++)
-      if (array[i] === item)
-      {
-        return array.push(array.splice(i, 1)[0]);
-      }
-  }
+  
+  
+    
+      
+      
+      
+      
+  
   
   var pathToAbsolute = function (pathArray)
   {
     var pth = paths(pathArray);
-    if (pth.abs) return pathClone(pth.abs)
+    if (pth.abs) return pathClone(pth.abs);
     if (!R.is(pathArray, array) || !R.is(pathArray && pathArray[0], array)) 
-      pathArray = R.parsePathString(pathArray)
+      pathArray = R.parsePathString(pathArray);
     if (!pathArray || !pathArray.length) return [["M", 0, 0]];
     var res = [], x = 0, y = 0, mx = 0, my = 0, start = 0;
-    if (pathArray[0][0] == "M")
+    if (pathArray[0][0] === "M")
     {
       x = +pathArray[0][1];
       y = +pathArray[0][2];
@@ -215,12 +215,12 @@
       start++;
       res[0] = ["M", x, y];
     }
-    var crz = pathArray.length == 3 && pathArray[0][0] == "M" && pathArray[1][0].toUpperCase() == "R" && pathArray[2][0].toUpperCase() == "Z";
+    var crz = pathArray.length === 3 && pathArray[0][0] === "M" && pathArray[1][0].toUpperCase() === "R" && pathArray[2][0].toUpperCase() === "Z";
     for (var r, pa, i = start, ii = pathArray.length; i < ii; i++)
     {
       res.push(r = []);
       pa = pathArray[i];
-      if (pa[0] != upperCase.call(pa[0]))
+      if (pa[0] !== upperCase.call(pa[0]))
       {
         r[0] = upperCase.call(pa[0]);
         switch (r[0])
@@ -245,7 +245,7 @@
           for (var j = 2, jj = dots.length; j < jj; j++)
           {
             dots[j] = +dots[j] + x;
-            dots[++j] = +dots[j] + y
+            dots[++j] = +dots[j] + y;
           }
           res.pop();
           res = res[concat](catmullRom2bezier(dots, crz));
@@ -260,9 +260,9 @@
       }
       else
       {
-        if (pa[0] == "R")
+        if (pa[0] === "R")
         {
-          dots = [x, y][concat](pa.slice(1));
+          var dots = [x, y][concat](pa.slice(1));
           res.pop();
           res = res[concat](catmullRom2bezier(dots, crz));
           r = ["R"][concat](pa.slice(-2));
@@ -270,7 +270,7 @@
         else
         {
           for (var k = 0, kk = pa.length; k < kk; k++)
-            r[k] = pa[k]
+            r[k] = pa[k];
         }
       }
       switch (r[0])
@@ -288,6 +288,7 @@
       case "M":
         mx = r[r.length - 2];
         my = r[r.length - 1];
+        break;
       default:
         x = r[r.length - 2];
         y = r[r.length - 1];
@@ -329,7 +330,7 @@
   q2c = function (x1, y1, ax, ay, x2, y2)
   {
     var _13 = 1 / 3, _23 = 2 / 3;
-    return [_13 * x1 + _23 * ax, _13 * y1 + _23 * ay, _13 * x2 + _23 * ax, _13 * y2 + _23 * ay, x2, y2]
+    return [_13 * x1 + _23 * ax, _13 * y1 + _23 * ay, _13 * x2 + _23 * ax, _13 * y2 + _23 * ay, x2, y2];
   },
   a2c = function (x1, y1, rx, ry, angle, large_arc_flag, sweep_flag, x2, y2, recursive)
   {
@@ -379,10 +380,10 @@
     }
     else
     {
-      f1 = recursive[0];
-      f2 = recursive[1];
-      cx = recursive[2];
-      cy = recursive[3];
+      var f1 = recursive[0];
+      var f2 = recursive[1];
+      var cx = recursive[2];
+      var cy = recursive[3];
     }
     var df = f2 - f1;
     if (Math.abs(df) > _120)

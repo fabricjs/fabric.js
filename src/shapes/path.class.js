@@ -3,46 +3,12 @@
   'use strict';
 
   var fabric = global.fabric || (global.fabric = { }),
-      min = fabric.util.array.min,
-      max = fabric.util.array.max,
       extend = fabric.util.object.extend,
-      _toString = Object.prototype.toString,
-      drawArc = fabric.util.drawArc,
-      commandLengths = {
-        m: 2,
-        l: 2,
-        h: 1,
-        v: 1,
-        c: 6,
-        s: 4,
-        q: 4,
-        t: 2,
-        a: 7
-      };
+      _toString = Object.prototype.toString;
 
   if (fabric.Path) {
     fabric.warn('fabric.Path is already defined');
     return;
-  }
-
-  /**
-   * @private
-   */
-  function getX(item) {
-    if (item[0] === 'H') {
-      return item[1];
-    }
-    return item[item.length - 2];
-  }
-
-  /**
-   * @private
-   */
-  function getY(item) {
-    if (item[0] === 'V') {
-      return item[1];
-    }
-    return item[item.length - 1];
   }
 
   /**
@@ -132,7 +98,8 @@
           subStartX = 0,
           subStartY = 0,
           k,
-          klen;
+          klen,
+          segs;
           
       for (var i = 0, len = this.path.length; i < len; ++i)
       {
@@ -227,7 +194,7 @@
             tempY = y + current[4];
 
             // calculate reflection of previous control points
-            if (previous[0] == 'C' || previous[0] == 'c' || previous[0] == 'S' || previous[0] == 's')
+            if (previous[0] === 'C' || previous[0] === 'c' || previous[0] === 'S' || previous[0] === 's')
             { 
               controlX = 2 * x - controlX;
               controlY = 2 * y - controlY;
@@ -261,7 +228,7 @@
             tempY = current[4];
 
             // calculate reflection of previous control points
-            if (previous[0] == 'C' || previous[0] == 'c' || previous[0] == 'S' || previous[0] == 's')
+            if (previous[0] === 'C' || previous[0] === 'c' || previous[0] === 'S' || previous[0] === 's')
             { 
               controlX = 2 * x - controlX;
               controlY = 2 * y - controlY;
@@ -371,7 +338,7 @@
               controlX = 2 * x - tempControlX;
               controlY = 2 * y - tempControlY;
             }
-            else if (previous[0] == 'Q' || previous[0] == 'q' || previous[0] == 'T')
+            else if (previous[0] === 'Q' || previous[0] === 'q' || previous[0] === 'T')
             {
               controlX = 2 * x - controlX;
               controlY = 2 * y - controlY;
@@ -397,7 +364,7 @@
             break;
 
           case 'a':
-            var segs = fabric.util.arc2cubics(x + l, y + t, current[1], current[2], current[3], current[4], current[5], current[6] + x + l, current[7] + y + t);
+            segs = fabric.util.arc2cubics(x + l, y + t, current[1], current[2], current[3], current[4], current[5], current[6] + x + l, current[7] + y + t);
             for (k = 0, klen = segs.length; k < segs.length; k += 6)
               ctx.bezierCurveTo.apply(ctx, segs.slice(k, k + 6));
             x += current[6];
@@ -405,7 +372,7 @@
             break;
 
           case 'A':
-            var segs = fabric.util.arc2cubics(x + l, y + t, current[1], current[2], current[3], current[4], current[5], current[6] + l, current[7] + t);
+            segs = fabric.util.arc2cubics(x + l, y + t, current[1], current[2], current[3], current[4], current[5], current[6] + l, current[7] + t);
             for (k = 0, klen = segs.length; k < segs.length; k += 6)
               ctx.bezierCurveTo.apply(ctx, segs.slice(k, k + 6));
             x = current[6];
