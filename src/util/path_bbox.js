@@ -215,6 +215,7 @@
       start++;
       res[0] = ["M", x, y];
     }
+    var dots;
     var crz = pathArray.length === 3 && pathArray[0][0] === "M" && pathArray[1][0].toUpperCase() === "R" && pathArray[2][0].toUpperCase() === "Z";
     for (var r, pa, i = start, ii = pathArray.length; i < ii; i++)
     {
@@ -241,7 +242,7 @@
           r[1] = +pa[1] + x;
           break;
         case "R":
-          var dots = [x, y][concat](pa.slice(1));
+          dots = [x, y][concat](pa.slice(1));
           for (var j = 2, jj = dots.length; j < jj; j++)
           {
             dots[j] = +dots[j] + x;
@@ -253,16 +254,17 @@
         case "M":
           mx = +pa[1] + x;
           my = +pa[2] + y;
+          break;
         default:
           for (j = 1, jj = pa.length; j < jj; j++)
-            r[j] = +pa[j] + (j % 2 ? x : y)
+            r[j] = +pa[j] + (j % 2 ? x : y);
         }
       }
       else
       {
         if (pa[0] === "R")
         {
-          var dots = [x, y][concat](pa.slice(1));
+          dots = [x, y][concat](pa.slice(1));
           res.pop();
           res = res[concat](catmullRom2bezier(dots, crz));
           r = ["R"][concat](pa.slice(-2));
@@ -341,6 +343,7 @@
           Y = x * Math.sin(rad) + y * Math.cos(rad);
       return {x: X, y: Y};
     });
+    var cx, cy, f1, f2;
     if (!recursive)
     {
       xy = rotate(x1, y1, -rad);
@@ -360,10 +363,10 @@
       }
       var rx2 = rx * rx,
           ry2 = ry * ry,
-          k = (large_arc_flag == sweep_flag ? -1 : 1) * Math.sqrt(Math.abs((rx2 * ry2 - rx2 * y * y - ry2 * x * x) / (rx2 * y * y + ry2 * x * x))),
-          cx = k * rx * y / ry + (x1 + x2) / 2,
-          cy = k * -ry * x / rx + (y1 + y2) / 2,
-          f1 = Math.asin(((y1 - cy) / ry).toFixed(9)),
+          k = (large_arc_flag === sweep_flag ? -1 : 1) * Math.sqrt(Math.abs((rx2 * ry2 - rx2 * y * y - ry2 * x * x) / (rx2 * y * y + ry2 * x * x)));
+          cx = k * rx * y / ry + (x1 + x2) / 2;
+          cy = k * -ry * x / rx + (y1 + y2) / 2;
+          f1 = Math.asin(((y1 - cy) / ry).toFixed(9));
           f2 = Math.asin(((y2 - cy) / ry).toFixed(9));
       f1 = x1 < cx ? PI - f1 : f1;
       f2 = x2 < cx ? PI - f2 : f2;
@@ -380,10 +383,10 @@
     }
     else
     {
-      var f1 = recursive[0];
-      var f2 = recursive[1];
-      var cx = recursive[2];
-      var cy = recursive[3];
+      f1 = recursive[0];
+      f2 = recursive[1];
+      cx = recursive[2];
+      cy = recursive[3];
     }
     var df = f2 - f1;
     if (Math.abs(df) > _120)
@@ -392,7 +395,7 @@
       f2 = f1 + _120 * (sweep_flag && f2 > f1 ? 1 : -1);
       x2 = cx + rx * Math.cos(f2);
       y2 = cy + ry * Math.sin(f2);
-      res = a2c(x2, y2, rx, ry, angle, 0, sweep_flag, x2old, y2old, [f2, f2old, cx, cy])
+      res = a2c(x2, y2, rx, ry, angle, 0, sweep_flag, x2old, y2old, [f2, f2old, cx, cy]);
     }
     df = f2 - f1;
     var c1 = Math.cos(f1),
@@ -414,15 +417,15 @@
       res = [m2, m3, m4].concat(res).join().split(",");
       var newres = [];
       for (var i = 0, ii = res.length; i < ii; i++)
-        newres[i] = i % 2 ? rotate(res[i - 1], res[i], rad).y : rotate(res[i], res[i + 1], rad).x
-      return newres
+        newres[i] = i % 2 ? rotate(res[i - 1], res[i], rad).y : rotate(res[i], res[i + 1], rad).x;
+      return newres;
     }
   };
 
   var path2curve = cacher(function (path, path2)
   {
     var pth = !path2 && paths(path);
-    if (!path2 && pth.curve) return pathClone(pth.curve)
+    if (!path2 && pth.curve) return pathClone(pth.curve);
     var p = pathToAbsolute(path),
       p2 = path2 && pathToAbsolute(path2),
       attrs = {x: 0, y: 0, bx: 0, by: 0, X: 0, Y: 0, qx: null, qy: null},
@@ -444,7 +447,7 @@
           path = ["C"][concat](a2c[apply](0, [d.x, d.y][concat](path.slice(1))));
           break;
         case "S":
-          if (pcom == "C" || pcom == "S")
+          if (pcom === "C" || pcom === "S")
           {
             nx = d.x * 2 - d.bx;
             ny = d.y * 2 - d.by;
@@ -457,7 +460,7 @@
           path = ["C", nx, ny][concat](path.slice(1));
           break;
         case "T":
-          if (pcom == "Q" || pcom == "T")
+          if (pcom === "Q" || pcom === "T")
           {
             d.qx = d.x * 2 - d.qx;
             d.qy = d.y * 2 - d.qy;
@@ -485,9 +488,9 @@
           break;
         case "Z":
           path = ["C"][concat](l2c(d.x, d.y, d.X, d.Y));
-          break
+          break;
         }
-        return path
+        return path;
       },
       fixArc = function (pp, i)
       {
@@ -507,7 +510,7 @@
       },
       fixM = function (path1, path2, a1, a2, i)
       {
-        if (path1 && path2 && path1[i][0] == "M" && path2[i][0] != "M")
+        if (path1 && path2 && path1[i][0] === "M" && path2[i][0] !== "M")
         {
           path2.splice(i, 0, ["M", a2.x, a2.y]);
           a1.bx = 0;
@@ -521,24 +524,24 @@
     for (var i = 0, ii = mmax(p.length, p2 && p2.length || 0); i < ii; i++)
     {
       p[i] && (pfirst = p[i][0]);
-      if (pfirst != "C")
+      if (pfirst !== "C")
       {
         pcoms1[i] = pfirst;
         i && (pcom = pcoms1[i - 1]);
       }
       p[i] = processPath(p[i], attrs, pcom);
-      if (pcoms1[i] != "A" && pfirst == "C") pcoms1[i] = "C";
+      if (pcoms1[i] !== "A" && pfirst === "C") pcoms1[i] = "C";
       fixArc(p, i);
       if (p2)
       {
         p2[i] && (pfirst = p2[i][0]);
-        if (pfirst != "C")
+        if (pfirst !== "C")
         {
           pcoms2[i] = pfirst;
           i && (pcom = pcoms2[i - 1]);
         }
         p2[i] = processPath(p2[i], attrs2, pcom);
-        if (pcoms2[i] != "A" && pfirst == "C") pcoms2[i] = "C"
+        if (pcoms2[i] !== "A" && pfirst === "C") pcoms2[i] = "C"
         fixArc(p2, i);
       }
       fixM(p, p2, attrs, attrs2, i);
@@ -554,7 +557,7 @@
       attrs2.y = p2 && seg2[seg2len - 1];
     }
     if (!p2) pth.curve = pathClone(p);
-    return p2 ? [p, p2] : p
+    return p2 ? [p, p2] : p;
   }, null, pathClone);
 
   // -----------------------------
