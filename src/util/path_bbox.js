@@ -1,4 +1,5 @@
-(function() {
+(function ()
+{
 
   // -------------------------------
   // Raphael code starts
@@ -20,17 +21,17 @@
   var upperCase = Str.prototype.toUpperCase;
   var objectToString = Object.prototype.toString;
   var concat = "concat";
-  var split = "split";
+
   var apply = "apply";
   var math = Math,
     mmax = math.max,
-    mmin = math.min,
+
     abs = math.abs,
     pow = math.pow,
     PI = math.PI,
-    round = math.round,
-    toFloat = parseFloat,
-    toInt = parseInt;
+
+    toFloat = parseFloat;
+
   var p2s = /,?([achlmqrstvxz]),?/gi;
   var pathCommand = /([achlmrqstvz])[\x09\x0a\x0b\x0c\x0d\x20\xa0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000\u2028\u2029,]*((-?\d*\.?\d*(?:e[\-+]?\d+)?[\x09\x0a\x0b\x0c\x0d\x20\xa0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000\u2028\u2029]*,?[\x09\x0a\x0b\x0c\x0d\x20\xa0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000\u2028\u2029]*)+)/ig;
   var pathValues = /(-?\d*\.?\d*(?:e[\-+]?\d+)?)[\x09\x0a\x0b\x0c\x0d\x20\xa0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000\u2028\u2029]*,?[\x09\x0a\x0b\x0c\x0d\x20\xa0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000\u2028\u2029]*/ig;
@@ -69,14 +70,9 @@
     return this.join(",").replace(p2s, "$1");
   };
 
-  function repush(array, item)
-  {
-    for (var i = 0, ii = array.length; i < ii; i++)
-      if (array[i] === item)
-      {
-        return array.push(array.splice(i, 1)[0]);
-      }
-  }
+
+
+
   var pathClone = function (pathArray)
   {
     var res = clone(pathArray);
@@ -85,9 +81,12 @@
   };
   var paths = function (ps)
   {
-    var p = paths.ps = paths.ps || {};
+    var p = paths.ps = paths.ps ||
+    {};
     if (p[ps]) p[ps].sleep = 100;
-    else p[ps] = {sleep: 100};
+    else p[ps] = {
+      sleep: 100
+    };
     setTimeout(function ()
     {
       for (var key in p)
@@ -107,28 +106,53 @@
     var d = [];
     for (var i = 0, iLen = crp.length; iLen - 2 * !z > i; i += 2)
     {
-      var p = [{x: +crp[i - 2], y: +crp[i - 1]},
-        {x: +crp[i], y: +crp[i + 1]},
-        {x: +crp[i + 2],y: +crp[i + 3]},
-        {x: +crp[i + 4], y: +crp[i + 5]}];
+      var p = [
+        {
+          x: +crp[i - 2],
+          y: +crp[i - 1]
+        },
+        {
+          x: +crp[i],
+          y: +crp[i + 1]
+        },
+        {
+          x: +crp[i + 2],
+          y: +crp[i + 3]
+        },
+        {
+          x: +crp[i + 4],
+          y: +crp[i + 5]
+        }];
       if (z)
       {
         if (!i)
         {
-          p[0] = {x: +crp[iLen - 2], y: +crp[iLen - 1]};
+          p[0] = {
+            x: +crp[iLen - 2],
+            y: +crp[iLen - 1]
+          };
         }
         else
         {
           if (iLen - 4 === i)
           {
-            p[3] = {x: +crp[0], y: +crp[1]};
+            p[3] = {
+              x: +crp[0],
+              y: +crp[1]
+            };
           }
           else
           {
             if (iLen - 2 === i)
             {
-              p[2] = {x: +crp[0], y: +crp[1]};
-              p[3] = {x: +crp[2], y: +crp[3]};
+              p[2] = {
+                x: +crp[0],
+                y: +crp[1]
+              };
+              p[3] = {
+                x: +crp[2],
+                y: +crp[3]
+              };
             }
           }
         }
@@ -143,7 +167,10 @@
         {
           if (!i)
           {
-            p[0] = {x: +crp[i], y: +crp[i + 1]};
+            p[0] = {
+              x: +crp[i],
+              y: +crp[i + 1]
+            };
           }
         }
       }
@@ -156,13 +183,26 @@
     if (!pathString) return null;
     var pth = paths(pathString);
     if (pth.arr) return pathClone(pth.arr);
-    var paramCounts = { a: 7, c: 6, h: 1, l: 2, m: 2, r: 4, q: 4, s: 4, t: 2, v: 1, z: 0}, data = [];
+    var paramCounts = {
+      a: 7,
+      c: 6,
+      h: 1,
+      l: 2,
+      m: 2,
+      r: 4,
+      q: 4,
+      s: 4,
+      t: 2,
+      v: 1,
+      z: 0
+    }, data = [];
     if (R.is(pathString, array) && R.is(pathString[0], array)) data = pathClone(pathString);
     if (!data.length)
     {
       Str(pathString).replace(pathCommand, function (a, b, c)
       {
-        var params = [], name = b.toLowerCase();
+        var params = [],
+          name = b.toLowerCase();
         c.replace(pathValues, function (a, b)
         {
           b && params.push(+b);
@@ -189,23 +229,22 @@
     return data;
   };
 
-  
-  
-    
-      
-      
-      
-      
-  
-  
+
+
+
   var pathToAbsolute = function (pathArray)
   {
     var pth = paths(pathArray);
     if (pth.abs) return pathClone(pth.abs);
-    if (!R.is(pathArray, array) || !R.is(pathArray && pathArray[0], array)) 
+    if (!R.is(pathArray, array) || !R.is(pathArray && pathArray[0], array))
       pathArray = R.parsePathString(pathArray);
     if (!pathArray || !pathArray.length) return [["M", 0, 0]];
-    var res = [], x = 0, y = 0, mx = 0, my = 0, start = 0;
+    var res = [],
+      x = 0,
+      y = 0,
+      mx = 0,
+      my = 0,
+      start = 0;
     if (pathArray[0][0] === "M")
     {
       x = +pathArray[0][1];
@@ -307,7 +346,8 @@
     {
       var arg = Array.prototype.slice.call(arguments, 0),
         args = arg.join("\u2400"),
-        cache = newf.cache = newf.cache || {}, count = newf.count = newf.count || [];
+        cache = newf.cache = newf.cache ||
+        {}, count = newf.count = newf.count || [];
       if (cache.hasOwnProperty(args))
       {
         for (var i = 0, ii = count.length; i < ii; i++)
@@ -329,76 +369,86 @@
   {
     return [x1, y1, x2, y2, x2, y2];
   },
-  q2c = function (x1, y1, ax, ay, x2, y2)
-  {
-    var _13 = 1 / 3, _23 = 2 / 3;
-    return [_13 * x1 + _23 * ax, _13 * y1 + _23 * ay, _13 * x2 + _23 * ax, _13 * y2 + _23 * ay, x2, y2];
-  },
-  a2c = function (x1, y1, rx, ry, angle, large_arc_flag, sweep_flag, x2, y2, recursive)
-  {
-    var _120 = PI * 120 / 180, rad = PI / 180 * (+angle || 0), res = [], xy,
-    rotate = cacher(function (x, y, rad)
+    q2c = function (x1, y1, ax, ay, x2, y2)
     {
-      var X = x * Math.cos(rad) - y * Math.sin(rad),
-          Y = x * Math.sin(rad) + y * Math.cos(rad);
-      return {x: X, y: Y};
-    });
-    var cx, cy, f1, f2;
-    if (!recursive)
+      var _13 = 1 / 3,
+        _23 = 2 / 3;
+      return [_13 * x1 + _23 * ax, _13 * y1 + _23 * ay, _13 * x2 + _23 * ax, _13 * y2 + _23 * ay, x2, y2];
+    },
+    a2c = function (x1, y1, rx, ry, angle, large_arc_flag, sweep_flag, x2, y2, recursive)
     {
-      xy = rotate(x1, y1, -rad);
-      x1 = xy.x;
-      y1 = xy.y;
-      xy = rotate(x2, y2, -rad);
-      x2 = xy.x;
-      y2 = xy.y;
-      var cos = Math.cos(PI / 180 * angle), sin = Math.sin(PI / 180 * angle),
-          x = (x1 - x2) / 2, y = (y1 - y2) / 2;
-      var h = x * x / (rx * rx) + y * y / (ry * ry);
-      if (h > 1)
+      var _120 = PI * 120 / 180,
+        rad = PI / 180 * (+angle || 0),
+        res = [],
+        xy,
+        rotate = cacher(function (x, y, rad)
+        {
+          var X = x * Math.cos(rad) - y * Math.sin(rad),
+            Y = x * Math.sin(rad) + y * Math.cos(rad);
+          return {
+            x: X,
+            y: Y
+          };
+        });
+      var cx, cy, f1, f2;
+      if (!recursive)
       {
-        h = Math.sqrt(h);
-        rx = h * rx;
-        ry = h * ry;
-      }
-      var rx2 = rx * rx,
+        xy = rotate(x1, y1, -rad);
+        x1 = xy.x;
+        y1 = xy.y;
+        xy = rotate(x2, y2, -rad);
+        x2 = xy.x;
+        y2 = xy.y;
+
+        var x = (x1 - x2) / 2,
+          y = (y1 - y2) / 2;
+        var h = x * x / (rx * rx) + y * y / (ry * ry);
+        if (h > 1)
+        {
+          h = Math.sqrt(h);
+          rx = h * rx;
+          ry = h * ry;
+        }
+        var rx2 = rx * rx,
           ry2 = ry * ry,
           k = (large_arc_flag === sweep_flag ? -1 : 1) * Math.sqrt(Math.abs((rx2 * ry2 - rx2 * y * y - ry2 * x * x) / (rx2 * y * y + ry2 * x * x)));
-          cx = k * rx * y / ry + (x1 + x2) / 2;
-          cy = k * -ry * x / rx + (y1 + y2) / 2;
-          f1 = Math.asin(((y1 - cy) / ry).toFixed(9));
-          f2 = Math.asin(((y2 - cy) / ry).toFixed(9));
-      f1 = x1 < cx ? PI - f1 : f1;
-      f2 = x2 < cx ? PI - f2 : f2;
-      f1 < 0 && (f1 = PI * 2 + f1);
-      f2 < 0 && (f2 = PI * 2 + f2);
-      if (sweep_flag && f1 > f2)
-      {
-        f1 = f1 - PI * 2;
+        cx = k * rx * y / ry + (x1 + x2) / 2;
+        cy = k * -ry * x / rx + (y1 + y2) / 2;
+        f1 = Math.asin(((y1 - cy) / ry).toFixed(9));
+        f2 = Math.asin(((y2 - cy) / ry).toFixed(9));
+        f1 = x1 < cx ? PI - f1 : f1;
+        f2 = x2 < cx ? PI - f2 : f2;
+        f1 < 0 && (f1 = PI * 2 + f1);
+        f2 < 0 && (f2 = PI * 2 + f2);
+        if (sweep_flag && f1 > f2)
+        {
+          f1 = f1 - PI * 2;
+        }
+        if (!sweep_flag && f2 > f1)
+        {
+          f2 = f2 - PI * 2;
+        }
       }
-      if (!sweep_flag && f2 > f1)
+      else
       {
-        f2 = f2 - PI * 2;
+        f1 = recursive[0];
+        f2 = recursive[1];
+        cx = recursive[2];
+        cy = recursive[3];
       }
-    }
-    else
-    {
-      f1 = recursive[0];
-      f2 = recursive[1];
-      cx = recursive[2];
-      cy = recursive[3];
-    }
-    var df = f2 - f1;
-    if (Math.abs(df) > _120)
-    {
-      var f2old = f2, x2old = x2, y2old = y2;
-      f2 = f1 + _120 * (sweep_flag && f2 > f1 ? 1 : -1);
-      x2 = cx + rx * Math.cos(f2);
-      y2 = cy + ry * Math.sin(f2);
-      res = a2c(x2, y2, rx, ry, angle, 0, sweep_flag, x2old, y2old, [f2, f2old, cx, cy]);
-    }
-    df = f2 - f1;
-    var c1 = Math.cos(f1),
+      var df = f2 - f1;
+      if (Math.abs(df) > _120)
+      {
+        var f2old = f2,
+          x2old = x2,
+          y2old = y2;
+        f2 = f1 + _120 * (sweep_flag && f2 > f1 ? 1 : -1);
+        x2 = cx + rx * Math.cos(f2);
+        y2 = cy + ry * Math.sin(f2);
+        res = a2c(x2, y2, rx, ry, angle, 0, sweep_flag, x2old, y2old, [f2, f2old, cx, cy]);
+      }
+      df = f2 - f1;
+      var c1 = Math.cos(f1),
         s1 = Math.sin(f1),
         c2 = Math.cos(f2),
         s2 = Math.sin(f2),
@@ -409,18 +459,18 @@
         m2 = [x1 + hx * s1, y1 - hy * c1],
         m3 = [x2 + hx * s2, y2 - hy * c2],
         m4 = [x2, y2];
-    m2[0] = 2 * m1[0] - m2[0];
-    m2[1] = 2 * m1[1] - m2[1];
-    if (recursive) return [m2, m3, m4].concat(res);
-    else
-    {
-      res = [m2, m3, m4].concat(res).join().split(",");
-      var newres = [];
-      for (var i = 0, ii = res.length; i < ii; i++)
-        newres[i] = i % 2 ? rotate(res[i - 1], res[i], rad).y : rotate(res[i], res[i + 1], rad).x;
-      return newres;
-    }
-  };
+      m2[0] = 2 * m1[0] - m2[0];
+      m2[1] = 2 * m1[1] - m2[1];
+      if (recursive) return [m2, m3, m4].concat(res);
+      else
+      {
+        res = [m2, m3, m4].concat(res).join().split(",");
+        var newres = [];
+        for (var i = 0, ii = res.length; i < ii; i++)
+          newres[i] = i % 2 ? rotate(res[i - 1], res[i], rad).y : rotate(res[i], res[i + 1], rad).x;
+        return newres;
+      }
+    };
 
   var path2curve = cacher(function (path, path2)
   {
@@ -428,15 +478,37 @@
     if (!path2 && pth.curve) return pathClone(pth.curve);
     var p = pathToAbsolute(path),
       p2 = path2 && pathToAbsolute(path2),
-      attrs = {x: 0, y: 0, bx: 0, by: 0, X: 0, Y: 0, qx: null, qy: null},
-      attrs2 = {x: 0, y: 0, bx: 0, by: 0, X: 0, Y: 0, qx: null, qy: null},
+      attrs = {
+        x: 0,
+        y: 0,
+        bx: 0,
+        by: 0,
+        X: 0,
+        Y: 0,
+        qx: null,
+        qy: null
+      },
+      attrs2 = {
+        x: 0,
+        y: 0,
+        bx: 0,
+        by: 0,
+        X: 0,
+        Y: 0,
+        qx: null,
+        qy: null
+      },
       processPath = function (path, d, pcom)
       {
         var nx, ny;
         if (!path)
         {
           return ["C", d.x, d.y, d.x, d.y, d.x, d.y];
-        }!(path[0] in {T: 1, Q: 1}) && (d.qx = d.qy = null);
+        }!(path[0] in
+        {
+          T: 1,
+          Q: 1
+        }) && (d.qx = d.qy = null);
         switch (path[0])
         {
         case "M":
@@ -520,7 +592,10 @@
           ii = mmax(p.length, p2 && p2.length || 0);
         }
       },
-      pcoms1 = [], pcoms2 = [], pfirst = "", pcom = "";
+      pcoms1 = [],
+      pcoms2 = [],
+      pfirst = "",
+      pcom = "";
     for (var i = 0, ii = mmax(p.length, p2 && p2.length || 0); i < ii; i++)
     {
       p[i] && (pfirst = p[i][0]);
@@ -541,12 +616,15 @@
           i && (pcom = pcoms2[i - 1]);
         }
         p2[i] = processPath(p2[i], attrs2, pcom);
-        if (pcoms2[i] !== "A" && pfirst === "C") pcoms2[i] = "C"
+        if (pcoms2[i] !== "A" && pfirst === "C") pcoms2[i] = "C";
         fixArc(p2, i);
       }
       fixM(p, p2, attrs, attrs2, i);
       fixM(p2, p, attrs2, attrs, i);
-      var seg = p[i], seg2 = p2 && p2[i], seglen = seg.length, seg2len = p2 && seg2.length;
+      var seg = p[i],
+        seg2 = p2 && p2[i],
+        seglen = seg.length,
+        seg2len = p2 && seg2.length;
       attrs.x = seg[seglen - 2];
       attrs.y = seg[seglen - 1];
       attrs.bx = toFloat(seg[seglen - 4]) || attrs.x;
@@ -564,23 +642,24 @@
   // Raphael code ends
   // -----------------------------
 
-  var pow = Math.pow,
-  sqrt = Math.sqrt,
-  min = Math.min,
-  max = Math.max;
+
+  var sqrt = Math.sqrt,
+    min = Math.min,
+    max = Math.max;
   abs = Math.abs;
-  
+
   // Returns bounding box of cubic bezier curve.
   // Source: http://blog.hackers-cafe.net/2009/06/how-to-calculate-bezier-curves-bounding.html
   // Original version: NISHIO Hirokazu
   // Modifications: Timo
-  function getBoundsOfCurve (x0, y0, x1, y1, x2, y2, x3, y3)
+  function getBoundsOfCurve(x0, y0, x1, y1, x2, y2, x3, y3)
   {
-    var tvalues = [], bounds = [new Array(6), new Array(6)],
-        a,b,c,t,t1,t2,b2ac,sqrtb2ac;
+    var tvalues = [],
+      bounds = [new Array(6), new Array(6)],
+      a, b, c, t, t1, t2, b2ac, sqrtb2ac;
     for (var i = 0; i < 2; ++i)
     {
-      if (i==0)
+      if (i === 0)
       {
         b = 6 * x0 - 12 * x1 + 6 * x2;
         a = -3 * x0 + 9 * x1 - 9 * x2 + 3 * x3;
@@ -599,7 +678,7 @@
         if (0 < t && t < 1) tvalues.push(t);
         continue;
       }
-      b2ac = b*b - 4 * c * a;
+      b2ac = b * b - 4 * c * a;
       sqrtb2ac = sqrt(b2ac);
       if (b2ac < 0) continue;
       t1 = (-b + sqrtb2ac) / (2 * a);
@@ -607,74 +686,79 @@
       t2 = (-b - sqrtb2ac) / (2 * a);
       if (0 < t2 && t2 < 1) tvalues.push(t2);
     }
-    
-    var x, y, j = tvalues.length, jlen = j, mt;
-    while(j--)
+
+    var j = tvalues.length,
+      jlen = j,
+      mt;
+    while (j--)
     {
-      t = tvalues[j]; 
-      mt = 1-t;
-      bounds[0][j] = (mt*mt*mt*x0) + (3*mt*mt*t*x1) + (3*mt*t*t*x2) + (t*t*t*x3);
-      bounds[1][j] = (mt*mt*mt*y0) + (3*mt*mt*t*y1) + (3*mt*t*t*y2) + (t*t*t*y3);
+      t = tvalues[j];
+      mt = 1 - t;
+      bounds[0][j] = (mt * mt * mt * x0) + (3 * mt * mt * t * x1) + (3 * mt * t * t * x2) + (t * t * t * x3);
+      bounds[1][j] = (mt * mt * mt * y0) + (3 * mt * mt * t * y1) + (3 * mt * t * t * y2) + (t * t * t * y3);
     }
 
     bounds[0][jlen] = x0;
     bounds[1][jlen] = y0;
-    bounds[0][jlen+1] = x3;
-    bounds[1][jlen+1] = y3;
-    bounds[0].length = bounds[1].length = jlen+2;
-    
+    bounds[0][jlen + 1] = x3;
+    bounds[1][jlen + 1] = y3;
+    bounds[0].length = bounds[1].length = jlen + 2;
+
     return {
       left: min.apply(null, bounds[0]),
       top: min.apply(null, bounds[1]),
       right: max.apply(null, bounds[0]),
       bottom: max.apply(null, bounds[1])
     };
-  };
+  }
 
   // Returns bounding box of path.
   // path can be array or string
-  var getBoundsOfPath = function(path)
+  var getBoundsOfPath = function (path)
   {
     var curve = path2curve(path);
-    
+
     // Calculate the Initial Bounding Box of all curves using start 
     // and end points that are surely on curve.
     // This box is needed to exclude paths that are already inside Initial
     // Bounding Box from bounding box calculations.
-    var xbounds = [], ybounds = [], curr, prev, prevlen;
+    var xbounds = [],
+      ybounds = [],
+      curr, prev, prevlen;
     for (var i = 0; i < curve.length; i++)
     {
       curr = curve[i];
-      if (curr[0] == "C")
+      if (curr[0] === "C")
       {
-        if(i==0)
+        if (i === 0)
         {
           xbounds.push(0);
           ybounds.push(0);
         }
         else
         {
-          prev = curve[i-1];
+          prev = curve[i - 1];
           prevlen = prev.length;
-          xbounds.push(prev[prevlen-2]);
-          ybounds.push(prev[prevlen-1]);
+          xbounds.push(prev[prevlen - 2]);
+          ybounds.push(prev[prevlen - 1]);
         }
         xbounds.push(curr[5]);
         ybounds.push(curr[6]);
       }
     }
     var minx = min.apply(Number.MAX_VALUE, xbounds),
-        miny = min.apply(Number.MAX_VALUE, ybounds),
-        maxx = max.apply(Number.MIN_VALUE, xbounds),
-        maxy = max.apply(Number.MIN_VALUE, ybounds);
+      miny = min.apply(Number.MAX_VALUE, ybounds),
+      maxx = max.apply(Number.MIN_VALUE, xbounds),
+      maxy = max.apply(Number.MIN_VALUE, ybounds);
 
-    var bounds, s, startX, startY, isC = false;
+    var bounds, s, startX, startY, isC = false,
+      ilen;
     for (i = 0, ilen = curve.length; i < ilen; i++)
     {
-      var s = curve[i];
-      if (s[0] == 'M')
+      s = curve[i];
+      if (s[0] === 'M')
       {
-        if (typeof(curve[i+1]) != "undefined" && curve[i+1][0] == "C")
+        if (typeof (curve[i + 1]) !== "undefined" && curve[i + 1][0] === "C")
         {
           startX = s[1];
           startY = s[2];
@@ -684,18 +768,18 @@
           if (startY > maxy) maxy = startY;
         }
       }
-      else if (s[0] == 'C')
+      else if (s[0] === 'C')
       {
         isC = true;
         // Exclude curves that are outside Initial Bounding Box
         if (startX < minx || startX > maxx ||
-            startY < miny || startY > maxy ||
-            s[1] < minx || s[1] > maxx ||
-            s[2] < miny || s[2] > maxy ||
-            s[3] < minx || s[3] > maxx ||
-            s[4] < miny || s[4] > maxy ||
-            s[5] < minx || s[5] > maxx ||
-            s[6] < miny || s[6] > maxy)
+          startY < miny || startY > maxy ||
+          s[1] < minx || s[1] > maxx ||
+          s[2] < miny || s[2] > maxy ||
+          s[3] < minx || s[3] > maxx ||
+          s[4] < miny || s[4] > maxy ||
+          s[5] < minx || s[5] > maxx ||
+          s[6] < miny || s[6] > maxy)
         {
           bounds = getBoundsOfCurve(startX, startY, s[1], s[2], s[3], s[4], s[5], s[6]);
           if (bounds.left < minx) minx = bounds.left;
@@ -718,16 +802,17 @@
     };
   };
 
-// Modifies path coordinates by subracting x, y of them.
-function normalizePathCoords (obj, x, y)
-{
-  var path = obj.path;
-  var path = pathToAbsolute(path);
-  for (var i = 0; i < path.length; i++)
+  // Modifies path coordinates by subracting x, y of them.
+  function normalizePathCoords(obj, x, y)
   {
-    curr = path[i];
-    switch (curr[0])
+    var path = obj.path,
+      curr;
+    path = pathToAbsolute(path);
+    for (var i = 0; i < path.length; i++)
     {
+      curr = path[i];
+      switch (curr[0])
+      {
       case 'M':
       case 'L':
       case 'T':
@@ -759,15 +844,15 @@ function normalizePathCoords (obj, x, y)
         curr[6] -= x;
         curr[7] -= y;
         break;
+      }
     }
+    obj.path = path;
   }
-  obj.path = path;
-}
 
-// Export functions
-fabric.util.getBoundsOfPath = getBoundsOfPath;
-fabric.util.normalizePathCoords = normalizePathCoords;
-fabric.util.arc2cubics = a2c;
-fabric.util.path2curve = path2curve;
-fabric.util.parsePathString = parsePathString;
+  // Export functions
+  fabric.util.getBoundsOfPath = getBoundsOfPath;
+  fabric.util.normalizePathCoords = normalizePathCoords;
+  fabric.util.arc2cubics = a2c;
+  fabric.util.path2curve = path2curve;
+  fabric.util.parsePathString = parsePathString;
 })();
