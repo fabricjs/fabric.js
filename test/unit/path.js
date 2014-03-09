@@ -131,11 +131,11 @@
   asyncTest('toDatalessObject', function() {
     makePathObject(function(path) {
       ok(typeof path.toDatalessObject == 'function');
-      deepEqual(path.toDatalessObject(), REFERENCE_PATH_OBJECT);
+      deepEqual(path.toDatalessObject(), EXPECTED_PATH_OBJECT);
 
       var src = 'http://example.com/';
       path.setSourcePath(src);
-      deepEqual(path.toDatalessObject(), fabric.util.object.extend(fabric.util.object.clone(REFERENCE_PATH_OBJECT), {
+      deepEqual(path.toDatalessObject(), fabric.util.object.extend(fabric.util.object.clone(EXPECTED_PATH_OBJECT), {
         path: src
       }));
       start();
@@ -151,9 +151,9 @@
 
   asyncTest('fromObject', function() {
     ok(typeof fabric.Path.fromObject == 'function');
-    fabric.Path.fromObject(REFERENCE_PATH_OBJECT, function(path) {
+    fabric.Path.fromObject(EXPECTED_PATH_OBJECT, function(path) {
       ok(path instanceof fabric.Path);
-      deepEqual(path.toObject(), REFERENCE_PATH_OBJECT);
+      deepEqual(path.toObject(), EXPECTED_PATH_OBJECT);
       start();
     });
   });
@@ -179,7 +179,7 @@
     fabric.Path.fromElement(elPath, function(path) {
       ok(path instanceof fabric.Path);
 
-      deepEqual(path.toObject(), fabric.util.object.extend(REFERENCE_PATH_OBJECT, {
+      deepEqual(path.toObject(), fabric.util.object.extend(EXPECTED_PATH_OBJECT, {
         strokeDashArray:  [5, 2],
         strokeLineCap:    'round',
         strokeLineJoin:   'bevil',
