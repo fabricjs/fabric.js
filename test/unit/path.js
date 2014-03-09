@@ -121,7 +121,7 @@
       originalPath.clone(function(clonedPath) {
 
         clonedPath.path[0][1] = 200;
-        equal(originalPath.path[0][1], 100);
+        equal(originalPath.path[0][1], 0);
 
         start();
       });
