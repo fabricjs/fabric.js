@@ -49,11 +49,11 @@
     'flipX':              false,
     'flipY':              false,
     'opacity':            1,
-    'path':               [ [ 'M', 0, 0 ], [ 'L', 200, 0 ], [ 'L', 100, 200 ], [ 'Z' ] ],
     'shadow':             null,
     'visible':            true,
     'backgroundColor':    '',
-    'clipTo':             null
+    'clipTo':             null,
+    'path':               [ [ 'M', 0, 0 ], [ 'L', 200, 0 ], [ 'L', 100, 200 ], [ 'Z' ] ],
   };
 
   function getPathElement(path) {
