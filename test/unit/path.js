@@ -111,7 +111,7 @@
   asyncTest('toObject', function() {
     makePathObject(function(path) {
       ok(typeof path.toObject == 'function');
-      deepEqual(path.toObject(), REFERENCE_PATH_OBJECT);
+      deepEqual(path.toObject(), EXPECTED_PATH_OBJECT);
       start();
     });
   });
