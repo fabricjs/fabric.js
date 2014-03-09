@@ -28,6 +28,34 @@
     'clipTo':             null
   };
 
+  var EXPECTED_PATH_OBJECT = {
+    'type':               'path',
+    'originX':            'left',
+    'originY':            'top',
+    'left':               99.5,
+    'top':                99.5,
+    'width':              200,
+    'height':             200,
+    'fill':               'red',
+    'stroke':             'blue',
+    'strokeWidth':        1,
+    'strokeDashArray':    null,
+    'strokeLineCap':      'butt',
+    'strokeLineJoin':     'miter',
+    'strokeMiterLimit':   10,
+    'scaleX':             1,
+    'scaleY':             1,
+    'angle':              0,
+    'flipX':              false,
+    'flipY':              false,
+    'opacity':            1,
+    'path':               [ [ 'M', 0, 0 ], [ 'L', 200, 0 ], [ 'L', 100, 200 ], [ 'Z' ] ],
+    'shadow':             null,
+    'visible':            true,
+    'backgroundColor':    '',
+    'clipTo':             null
+  };
+
   function getPathElement(path) {
     var el = fabric.document.createElement('path');
     el.setAttribute('d', path);
