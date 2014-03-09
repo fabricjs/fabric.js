@@ -1,6 +1,5 @@
 (function ()
 {
-
   // -------------------------------
   // Raphael code starts
   // -------------------------------
@@ -24,17 +23,13 @@
 
   var apply = "apply";
   var math = Math,
-    mmax = math.max,
-
-    abs = math.abs,
-    pow = math.pow,
-    PI = math.PI,
-
-    toFloat = parseFloat;
+      mmax = math.max,
+      abs = math.abs,
+      PI = math.PI,
+      toFloat = parseFloat;
 
   var p2s = /,?([achlmqrstvxz]),?/gi;
-  var pathCommand = /([achlmrqstvz])[\x09\x0a\x0b\x0c\x0d\x20\xa0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000\u2028\u2029,]*((-?\d*\.?\d*(?:e[\-+]?\d+)?[\x09\x0a\x0b\x0c\x0d\x20\xa0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000\u2028\u2029]*,?[\x09\x0a\x0b\x0c\x0d\x20\xa0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000\u2028\u2029]*)+)/ig;
-  var pathValues = /(-?\d*\.?\d*(?:e[\-+]?\d+)?)[\x09\x0a\x0b\x0c\x0d\x20\xa0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000\u2028\u2029]*,?[\x09\x0a\x0b\x0c\x0d\x20\xa0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000\u2028\u2029]*/ig;
+  
   R.is = function (o, type)
   {
     type = lowerCase.call(type);
@@ -55,7 +50,7 @@
     {
       return obj;
     }
-    var res = new obj.constructor;
+    var res = new obj.constructor();
     for (var key in obj)
     {
       if (obj[has](key))
@@ -65,13 +60,11 @@
     }
     return res;
   }
+  
   R._path2string = function ()
   {
     return this.join(",").replace(p2s, "$1");
   };
-
-
-
 
   var pathClone = function (pathArray)
   {
@@ -178,59 +171,61 @@
     }
     return d;
   }
+  
+  // parsePathString is from Fabric.js, not Raphael, as Raphael seems to miss support
+  // for scientific notation
+  var commandLengths = { m: 2, l: 2, h: 1, v: 1, c: 6, s: 4, q: 4, t: 2, a: 7, r: 4};
+  var re = /([-+]?((\d+\.\d+)|((\d+)|(\.\d+)))(?:e[-+]?\d+)?)/ig;
+  
   var parsePathString = R.parsePathString = function (pathString)
   {
-    if (!pathString) return null;
-    var pth = paths(pathString);
-    if (pth.arr) return pathClone(pth.arr);
-    var paramCounts = {
-      a: 7,
-      c: 6,
-      h: 1,
-      l: 2,
-      m: 2,
-      r: 4,
-      q: 4,
-      s: 4,
-      t: 2,
-      v: 1,
-      z: 0
-    }, data = [];
-    if (R.is(pathString, array) && R.is(pathString[0], array)) data = pathClone(pathString);
-    if (!data.length)
-    {
-      Str(pathString).replace(pathCommand, function (a, b, c)
-      {
-        var params = [],
-          name = b.toLowerCase();
-        c.replace(pathValues, function (a, b)
-        {
-          b && params.push(+b);
-        });
-        if (name === "m" && params.length > 2)
-        {
-          data.push([b][concat](params.splice(0, 2)));
-          name = "l";
-          b = b === "m" ? "l" : "L";
+      if (!pathString) return null;
+      var pth = paths(pathString);
+      if (pth.arr) return pathClone(pth.arr);
+    
+      var result = [ ],
+          coords = [ ],
+          currentPath,
+          parsed,
+          match,
+          coordsStr;
+
+      for (var i = 0, coordsParsed, len = pathString.length; i < len; i++) {
+        currentPath = pathString[i];
+
+        coordsStr = currentPath.slice(1).trim();
+        coords.length = 0;
+
+        while ((match = re.exec(coordsStr))) {
+          coords.push(match[0]);
         }
-        if (name === "r") data.push([b][concat](params));
-        else
-        {
-          while (params.length >= paramCounts[name])
-          {
-            data.push([b][concat](params.splice(0, paramCounts[name])));
-            if (!paramCounts[name]) break;
+
+        coordsParsed = [ currentPath.charAt(0) ];
+
+        for (var j = 0, jlen = coords.length; j < jlen; j++) {
+          parsed = parseFloat(coords[j]);
+          if (!isNaN(parsed)) {
+            coordsParsed.push(parsed);
           }
         }
-      });
-    }
-    data.toString = R._path2string;
-    pth.arr = pathClone(data);
-    return data;
-  };
 
+        var command = coordsParsed[0].toLowerCase(),
+            commandLength = commandLengths[command];
 
+        if (coordsParsed.length - 1 > commandLength) {
+          for (var k = 1, klen = coordsParsed.length; k < klen; k += commandLength) {
+            result.push([ coordsParsed[0] ].concat(coordsParsed.slice(k, k + commandLength)));
+          }
+        }
+        else {
+          result.push(coordsParsed);
+        }
+      }
 
+      result.toString = R._path2string;
+      pth.arr = pathClone(result);
+      return result;
+    };
 
   var pathToAbsolute = function (pathArray)
   {
@@ -293,6 +288,8 @@
         case "M":
           mx = +pa[1] + x;
           my = +pa[2] + y;
+          for (j = 1, jj = pa.length; j < jj; j++)
+            r[j] = +pa[j] + (j % 2 ? x : y);
           break;
         default:
           for (j = 1, jj = pa.length; j < jj; j++)
@@ -329,6 +326,9 @@
       case "M":
         mx = r[r.length - 2];
         my = r[r.length - 1];
+
+        x = r[r.length - 2];
+        y = r[r.length - 1];
         break;
       default:
         x = r[r.length - 2];
