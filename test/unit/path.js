@@ -51,8 +51,8 @@
     'opacity':            1,
     'shadow':             null,
     'visible':            true,
-    'backgroundColor':    '',
     'clipTo':             null,
+    'backgroundColor':    '',
     'path':               [ [ 'M', 0, 0 ], [ 'L', 200, 0 ], [ 'L', 100, 200 ], [ 'Z' ] ],
   };
 
