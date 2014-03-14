@@ -121,7 +121,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
         ctx = this.contextTop || this.contextContainer;
 
-    this.setWidth(scaledWidth).setHeight(scaledHeight);
+    if (multiplier > 1) {
+      this.setWidth(scaledWidth).setHeight(scaledHeight);
+    }
     ctx.scale(multiplier, multiplier);
 
     if (cropping.left) {
@@ -133,8 +135,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     if (cropping.width) {
       cropping.width *= multiplier;
     }
+    else if (multiplier < 1) {
+      cropping.width = scaledWidth;
+    }
     if (cropping.height) {
       cropping.height *= multiplier;
+    }
+    else if (multiplier < 1) {
+      cropping.height = scaledHeight;
     }
 
     if (activeGroup) {
