@@ -46,6 +46,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       ? JSON.parse(json)
       : json;
 
+    if (typeof serialized.objects === 'undefined' || !(serialized.objects instanceof Array)) {
+      throw Error('JSON should contain an objects array');
+    }
+
     this.clear();
 
     var _this = this;
