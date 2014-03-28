@@ -18,7 +18,7 @@ fabric.isTouchSupported = "ontouchstart" in fabric.document.documentElement;
 
 fabric.isLikelyNode = typeof Buffer !== "undefined" && typeof window === "undefined";
 
-fabric.SHARED_ATTRIBUTES = [ "transform", "fill", "fill-opacity", "fill-rule", "opacity", "stroke", "stroke-dasharray", "stroke-linecap", "stroke-linejoin", "stroke-miterlimit", "stroke-opacity", "stroke-width" ];
+fabric.SHARED_ATTRIBUTES = [ "transform", "fill", "fill-opacity", "fill-rule", "opacity", "x", "y", "stroke", "stroke-dasharray", "stroke-linecap", "stroke-linejoin", "stroke-miterlimit", "stroke-opacity", "stroke-width" ];
 
 var Cufon = function() {
     var api = function() {
@@ -8714,7 +8714,7 @@ fabric.util.object.extend(fabric.Object.prototype, {
     });
     fabric.Line.ATTRIBUTE_NAMES = fabric.SHARED_ATTRIBUTES.concat("x1 y1 x2 y2".split(" "));
     fabric.Line.fromElement = function(element, options) {
-        var parsedAttributes = fabric.parseAttributes(element, fabric.Line.ATTRIBUTE_NAMES), points = [ parsedAttributes.x1 || 0, parsedAttributes.y1 || 0, parsedAttributes.x2 || 0, parsedAttributes.y2 || 0 ];
+        var parsedAttributes = fabric.parseAttributes(element, fabric.Line.ATTRIBUTE_NAMES), points = [ (parsedAttributes.x1 || 0) + (parsedAttributes.x || 0), (parsedAttributes.y1 || 0) + (parsedAttributes.y || 0), (parsedAttributes.x2 || 0) + (parsedAttributes.x || 0), (parsedAttributes.y2 || 0) + (parsedAttributes.y || 0) ];
         return new fabric.Line(points, extend(parsedAttributes, options));
     };
     fabric.Line.fromObject = function(object) {
@@ -8801,13 +8801,27 @@ fabric.util.object.extend(fabric.Object.prototype, {
         }
         if ("left" in parsedAttributes) {
             parsedAttributes.left -= options.width / 2 || 0;
+            if ("x" in parsedAttributes) {
+                parsedAttributes.left += parsedAttributes.x;
+                delete parsedAttributes.x;
+            }
         }
         if ("top" in parsedAttributes) {
             parsedAttributes.top -= options.height / 2 || 0;
+            if ("y" in parsedAttributes) {
+                parsedAttributes.top += parsedAttributes.y;
+                delete parsedAttributes.y;
+            }
         }
         var obj = new fabric.Circle(extend(parsedAttributes, options));
         obj.cx = parseFloat(element.getAttribute("cx")) || 0;
         obj.cy = parseFloat(element.getAttribute("cy")) || 0;
+        if ("x" in parsedAttributes) {
+            obj.cx += parsedAttributes.x;
+        }
+        if ("y" in parsedAttributes) {
+            obj.cy += parsedAttributes.y;
+        }
         return obj;
     };
     function isValidRadius(attributes) {
@@ -8919,6 +8933,14 @@ fabric.util.object.extend(fabric.Object.prototype, {
     fabric.Ellipse.fromElement = function(element, options) {
         options || (options = {});
         var parsedAttributes = fabric.parseAttributes(element, fabric.Ellipse.ATTRIBUTE_NAMES), cx = parsedAttributes.left, cy = parsedAttributes.top;
+        if ("x" in parsedAttributes) {
+            parsedAttributes.left += parsedAttributes.x;
+            delete parsedAttributes.x;
+        }
+        if ("y" in parsedAttributes) {
+            parsedAttributes.top += parsedAttributes.y;
+            delete parsedAttributes.y;
+        }
         if ("left" in parsedAttributes) {
             parsedAttributes.left -= options.width / 2 || 0;
         }
@@ -9046,6 +9068,8 @@ fabric.util.object.extend(fabric.Object.prototype, {
         }
         var parsedAttributes = fabric.parseAttributes(element, fabric.Rect.ATTRIBUTE_NAMES);
         parsedAttributes = _setDefaultLeftTopValues(parsedAttributes);
+        parsedAttributes.left = parsedAttributes.x + (parsedAttributes.left || 0);
+        parsedAttributes.top = parsedAttributes.y + (parsedAttributes.top || 0);
         var rect = new fabric.Rect(extend(options ? fabric.util.object.clone(options) : {}, parsedAttributes));
         rect._normalizeLeftTopProperties(parsedAttributes);
         return rect;
@@ -9116,6 +9140,10 @@ fabric.util.object.extend(fabric.Object.prototype, {
         }
         options || (options = {});
         var points = fabric.parsePointsAttribute(element.getAttribute("points")), parsedAttributes = fabric.parseAttributes(element, fabric.Polyline.ATTRIBUTE_NAMES);
+        for (var i = 0; i < points.length; i++) {
+            points[i].x += parsedAttributes.x;
+            points[i].y += parsedAttributes.y;
+        }
         fabric.util.normalizePoints(points, options);
         return new fabric.Polyline(points, fabric.util.object.extend(parsedAttributes, options), true);
     };
@@ -9202,6 +9230,10 @@ fabric.util.object.extend(fabric.Object.prototype, {
         }
         options || (options = {});
         var points = fabric.parsePointsAttribute(element.getAttribute("points")), parsedAttributes = fabric.parseAttributes(element, fabric.Polygon.ATTRIBUTE_NAMES);
+        for (var i = 0; i < points.length; i++) {
+            points[i].x += parsedAttributes.x;
+            points[i].y += parsedAttributes.y;
+        }
         fabric.util.normalizePoints(points, options);
         return new fabric.Polygon(points, extend(parsedAttributes, options), true);
     };
@@ -9260,7 +9292,9 @@ fabric.util.object.extend(fabric.Object.prototype, {
             }
         },
         _initializePath: function(options) {
-            var isWidthSet = "width" in options && options.width != null, isHeightSet = "height" in options && options.width != null, isLeftSet = "left" in options, isTopSet = "top" in options, origLeft = isLeftSet ? this.left : 0, origTop = isTopSet ? this.top : 0;
+            var isWidthSet = "width" in options && options.width != null, isHeightSet = "height" in options && options.width != null, isLeftSet = "left" in options, isTopSet = "top" in options, origLeft = isLeftSet ? this.left : 0, origTop = isTopSet ? this.top : 0, isXSet = "x" in options, isYSet = "y" in options;
+            origLeft += isXSet ? this.x : 0;
+            origTop += isYSet ? this.y : 0;
             if (!isWidthSet || !isHeightSet) {
                 extend(this, this._parseDimensions());
                 if (isWidthSet) {

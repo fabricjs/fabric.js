@@ -167,8 +167,8 @@
     options || (options = { });
 
     var points = fabric.parsePointsAttribute(element.getAttribute('points')),
-        parsedAttributes = fabric.parseAttributes(element, fabric.Polyline.ATTRIBUTE_NAMES);
-        
+    parsedAttributes = fabric.parseAttributes(element, fabric.Polyline.ATTRIBUTE_NAMES);
+
     for(var i=0;i<points.length;i++){
       points[i].x += parsedAttributes.x;
       points[i].y += parsedAttributes.y;

@@ -38,7 +38,7 @@ fabric.isLikelyNode = typeof Buffer !== 'undefined' &&
 fabric.SHARED_ATTRIBUTES = [
   "transform",
   "fill", "fill-opacity", "fill-rule",
-  "opacity","x","y"
+  "opacity", "x", "y",
   "stroke", "stroke-dasharray", "stroke-linecap",
   "stroke-linejoin", "stroke-miterlimit",
   "stroke-opacity", "stroke-width"

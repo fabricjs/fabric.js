@@ -39,7 +39,7 @@ fabric.isLikelyNode = typeof Buffer !== 'undefined' &&
 fabric.SHARED_ATTRIBUTES = [
   "transform",
   "fill", "fill-opacity", "fill-rule",
-  "opacity",
+  "opacity", "x", "y",
   "stroke", "stroke-dasharray", "stroke-linecap",
   "stroke-linejoin", "stroke-miterlimit",
   "stroke-opacity", "stroke-width"
@@ -6754,7 +6754,7 @@ if (typeof console !== 'undefined') {
       var value,
           parentAttributes = { };
 
-      // if there's a parent container (`g` or `svg `node), parse its attributes recursively upwards
+      // if there's a parent container (`g` node), parse its attributes recursively upwards
       if (element.parentNode && /^(svg|g)$/i.test(element.parentNode.nodeName)) {
           parentAttributes = fabric.parseAttributes(element.parentNode, attributes);
           if(element.parentNode.tagName == 'svg'){
@@ -6766,7 +6766,7 @@ if (typeof console !== 'undefined') {
             delete parentAttributes.top;
           }
       }
-
+      // console.log(parentAttributes);
       var ownAttributes = attributes.reduce(function(memo, attr) {
         value = element.getAttribute(attr);
         if (value) {
@@ -16689,10 +16689,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   fabric.Line.fromElement = function(element, options) {
     var parsedAttributes = fabric.parseAttributes(element, fabric.Line.ATTRIBUTE_NAMES),
         points = [
-          parsedAttributes.x1 || 0,
-          parsedAttributes.y1 || 0,
-          parsedAttributes.x2 || 0,
-          parsedAttributes.y2 || 0
+          (parsedAttributes.x1 || 0) + (parsedAttributes.x || 0),
+          (parsedAttributes.y1 || 0) + (parsedAttributes.y || 0),
+          (parsedAttributes.x2 || 0) + (parsedAttributes.x || 0),
+          (parsedAttributes.y2 || 0) + (parsedAttributes.y || 0)
         ];
     return new fabric.Line(points, extend(parsedAttributes, options));
   };
@@ -16903,21 +16903,36 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    */
   fabric.Circle.fromElement = function(element, options) {
     options || (options = { });
+
     var parsedAttributes = fabric.parseAttributes(element, fabric.Circle.ATTRIBUTE_NAMES);
     if (!isValidRadius(parsedAttributes)) {
       throw new Error('value of `r` attribute is required and can not be negative');
     }
     if ('left' in parsedAttributes) {
       parsedAttributes.left -= (options.width / 2) || 0;
+      if ('x' in parsedAttributes) {
+        parsedAttributes.left += parsedAttributes.x;
+        delete parsedAttributes.x;
+      }
     }
     if ('top' in parsedAttributes) {
       parsedAttributes.top -= (options.height / 2) || 0;
+      if ('y' in parsedAttributes) {
+        parsedAttributes.top += parsedAttributes.y;
+        delete parsedAttributes.y;
+      }
     }
-    var obj = new fabric.Circle(extend(parsedAttributes, options));
 
+    var obj = new fabric.Circle(extend(parsedAttributes, options));
     obj.cx = parseFloat(element.getAttribute('cx')) || 0;
     obj.cy = parseFloat(element.getAttribute('cy')) || 0;
 
+    if ('x' in parsedAttributes) {
+      obj.cx += parsedAttributes.x;
+    }
+    if ('y' in parsedAttributes) {
+      obj.cy += parsedAttributes.y;
+    }
     return obj;
   };
 
@@ -17226,11 +17241,20 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         cx = parsedAttributes.left,
         cy = parsedAttributes.top;
 
+    if ('x' in parsedAttributes) {
+        parsedAttributes.left += parsedAttributes.x;
+        delete parsedAttributes.x;
+    }
+    if ('y' in parsedAttributes) {
+      parsedAttributes.top += parsedAttributes.y;
+      delete parsedAttributes.y;
+    }
     if ('left' in parsedAttributes) {
       parsedAttributes.left -= (options.width / 2) || 0;
     }
     if ('top' in parsedAttributes) {
       parsedAttributes.top -= (options.height / 2) || 0;
+      
     }
 
     var ellipse = new fabric.Ellipse(extend(parsedAttributes, options));
@@ -17525,7 +17549,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
     var parsedAttributes = fabric.parseAttributes(element, fabric.Rect.ATTRIBUTE_NAMES);
     parsedAttributes = _setDefaultLeftTopValues(parsedAttributes);
-
+    parsedAttributes.left = parsedAttributes.x + (parsedAttributes.left || 0);
+    parsedAttributes.top = parsedAttributes.y + (parsedAttributes.top || 0);
     var rect = new fabric.Rect(extend((options ? fabric.util.object.clone(options) : { }), parsedAttributes));
     rect._normalizeLeftTopProperties(parsedAttributes);
 
@@ -17716,8 +17741,12 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     options || (options = { });
 
     var points = fabric.parsePointsAttribute(element.getAttribute('points')),
-        parsedAttributes = fabric.parseAttributes(element, fabric.Polyline.ATTRIBUTE_NAMES);
+    parsedAttributes = fabric.parseAttributes(element, fabric.Polyline.ATTRIBUTE_NAMES);
 
+    for(var i=0;i<points.length;i++){
+      points[i].x += parsedAttributes.x;
+      points[i].y += parsedAttributes.y;
+    }
     fabric.util.normalizePoints(points, options);
 
     return new fabric.Polyline(points, fabric.util.object.extend(parsedAttributes, options), true);
@@ -17926,9 +17955,11 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
     var points = fabric.parsePointsAttribute(element.getAttribute('points')),
         parsedAttributes = fabric.parseAttributes(element, fabric.Polygon.ATTRIBUTE_NAMES);
-
+    for(var i=0;i<points.length;i++){
+      points[i].x += parsedAttributes.x;
+      points[i].y += parsedAttributes.y;
+    }
     fabric.util.normalizePoints(points, options);
-
     return new fabric.Polygon(points, extend(parsedAttributes, options), true);
   };
   /* _FROM_SVG_END_ */
@@ -18025,7 +18056,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     initialize: function(path, options) {
       options = options || { };
-
       this.setOptions(options);
 
       if (!path) {
@@ -18061,8 +18091,13 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           isLeftSet = 'left' in options,
           isTopSet = 'top' in options,
           origLeft = isLeftSet ? this.left : 0,
-          origTop = isTopSet ? this.top : 0;
-
+          origTop = isTopSet ? this.top : 0,
+          isXSet = 'x' in options,
+          isYSet = 'y' in options;
+      
+      origLeft += isXSet ? this.x : 0;
+      origTop += isYSet ? this.y : 0;
+      
       if (!isWidthSet || !isHeightSet) {
         extend(this, this._parseDimensions());
         if (isWidthSet) {
@@ -22311,7 +22346,6 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       left: text.getLeft() + text.getWidth() / 2,
       top: text.getTop() - text.getHeight() / 2
     });
-
     return text;
   };
   /* _FROM_SVG_END_ */
