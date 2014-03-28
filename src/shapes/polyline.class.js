@@ -168,7 +168,11 @@
 
     var points = fabric.parsePointsAttribute(element.getAttribute('points')),
         parsedAttributes = fabric.parseAttributes(element, fabric.Polyline.ATTRIBUTE_NAMES);
-
+        
+    for(var i=0;i<points.length;i++){
+      points[i].x += parsedAttributes.x;
+      points[i].y += parsedAttributes.y;
+    }
     fabric.util.normalizePoints(points, options);
 
     return new fabric.Polyline(points, fabric.util.object.extend(parsedAttributes, options), true);
