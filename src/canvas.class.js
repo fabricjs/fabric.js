@@ -943,7 +943,7 @@
       this._setActiveObject(object);
       this.renderAll();
       this.fire('object:selected', { target: object, e: e });
-      object.fire('selected', { e: e });
+      object.fire('selected', { target: object._objects, e: e });
       return this;
     },
 
