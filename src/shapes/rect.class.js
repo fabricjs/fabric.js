@@ -267,7 +267,8 @@
 
     var parsedAttributes = fabric.parseAttributes(element, fabric.Rect.ATTRIBUTE_NAMES);
     parsedAttributes = _setDefaultLeftTopValues(parsedAttributes);
-
+    parsedAttributes.left = parsedAttributes.x + (parsedAttributes.left || 0);
+    parsedAttributes.top = parsedAttributes.y + (parsedAttributes.top || 0);
     var rect = new fabric.Rect(extend((options ? fabric.util.object.clone(options) : { }), parsedAttributes));
     rect._normalizeLeftTopProperties(parsedAttributes);
 

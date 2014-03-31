@@ -163,21 +163,36 @@
    */
   fabric.Circle.fromElement = function(element, options) {
     options || (options = { });
+
     var parsedAttributes = fabric.parseAttributes(element, fabric.Circle.ATTRIBUTE_NAMES);
     if (!isValidRadius(parsedAttributes)) {
       throw new Error('value of `r` attribute is required and can not be negative');
     }
     if ('left' in parsedAttributes) {
       parsedAttributes.left -= (options.width / 2) || 0;
+      if ('x' in parsedAttributes) {
+        parsedAttributes.left += parsedAttributes.x;
+        delete parsedAttributes.x;
+      }
     }
     if ('top' in parsedAttributes) {
       parsedAttributes.top -= (options.height / 2) || 0;
+      if ('y' in parsedAttributes) {
+        parsedAttributes.top += parsedAttributes.y;
+        delete parsedAttributes.y;
+      }
     }
-    var obj = new fabric.Circle(extend(parsedAttributes, options));
 
+    var obj = new fabric.Circle(extend(parsedAttributes, options));
     obj.cx = parseFloat(element.getAttribute('cx')) || 0;
     obj.cy = parseFloat(element.getAttribute('cy')) || 0;
 
+    if ('x' in parsedAttributes) {
+      obj.cx += parsedAttributes.x;
+    }
+    if ('y' in parsedAttributes) {
+      obj.cy += parsedAttributes.y;
+    }
     return obj;
   };
 
