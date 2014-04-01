@@ -39,7 +39,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    */
   _ctrlKeysMap: {
     65: 'selectAll',
-    67: 'copy',
     86: 'paste',
     88: 'cut'
   },
@@ -91,17 +90,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   },
 
   /**
-   * Copies selected text
-   */
-  copy: function() {
-    var selectedText = this.getSelectedText();
-    this.copiedText = selectedText;
-    this.copiedStyles = this.getSelectionStyles(
-                          this.selectionStart,
-                          this.selectionEnd);
-  },
-
-  /**
    * Pastes text
    */
   paste: function() {
@@ -114,7 +102,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * Cuts text
    */
   cut: function(e) {
-    this.copy();
     this.removeChars(e);
   },
 
