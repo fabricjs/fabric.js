@@ -11,6 +11,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
     fabric.document.body.appendChild(this.hiddenTextarea);
 
+    fabric.util.addListener(this.hiddenTextarea, 'paste', this.onPaste.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'keydown', this.onKeyDown.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'keypress', this.onKeyPress.bind(this));
 
@@ -43,6 +44,15 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     88: 'cut'
   },
 
+  /**
+   * Handles paste event
+   * @param {Event} e Event object
+   */
+  onPaste: function(e) {
+    // Solution for lastest Safari, Chrome, Opera, FF. TODO: test in IE
+    this.insertChars(e.clipboardData.getData('text'));
+  },
+
   onClick: function() {
     // No need to trigger click event here, focus is enough to have the keyboard appear on Android
     this.hiddenTextarea && this.hiddenTextarea.focus();
@@ -65,7 +75,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       return;
     }
 
-    e.preventDefault();
     e.stopPropagation();
 
     this.canvas && this.canvas.renderAll();
@@ -120,7 +129,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
     this.insertChars(String.fromCharCode(e.which));
 
-    e.preventDefault();
     e.stopPropagation();
   },
 
