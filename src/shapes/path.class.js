@@ -3,46 +3,12 @@
   'use strict';
 
   var fabric = global.fabric || (global.fabric = { }),
-      min = fabric.util.array.min,
-      max = fabric.util.array.max,
       extend = fabric.util.object.extend,
-      _toString = Object.prototype.toString,
-      drawArc = fabric.util.drawArc,
-      commandLengths = {
-        m: 2,
-        l: 2,
-        h: 1,
-        v: 1,
-        c: 6,
-        s: 4,
-        q: 4,
-        t: 2,
-        a: 7
-      };
+      _toString = Object.prototype.toString;
 
   if (fabric.Path) {
     fabric.warn('fabric.Path is already defined');
     return;
-  }
-
-  /**
-   * @private
-   */
-  function getX(item) {
-    if (item[0] === 'H') {
-      return item[1];
-    }
-    return item[item.length - 2];
-  }
-
-  /**
-   * @private
-   */
-  function getY(item) {
-    if (item[0] === 'V') {
-      return item[1];
-    }
-    return item[item.length - 1];
   }
 
   /**
@@ -107,44 +73,8 @@
      * @param {Object} [options] Options object
      */
     _initializePath: function (options) {
-      var isWidthSet = 'width' in options && options.width != null,
-          isHeightSet = 'height' in options && options.width != null,
-          isLeftSet = 'left' in options,
-          isTopSet = 'top' in options,
-          origLeft = isLeftSet ? this.left : 0,
-          origTop = isTopSet ? this.top : 0;
-
-      if (!isWidthSet || !isHeightSet) {
-        extend(this, this._parseDimensions());
-        if (isWidthSet) {
-          this.width = options.width;
-        }
-        if (isHeightSet) {
-          this.height = options.height;
-        }
-      }
-      else { //Set center location relative to given height/width if not specified
-        if (!isTopSet) {
-          this.top = this.height / 2;
-        }
-        if (!isLeftSet) {
-          this.left = this.width / 2;
-        }
-      }
-      this.pathOffset = this.pathOffset ||
-                        // Save top-left coords as offset
-                        this._calculatePathOffset(origLeft, origTop);
-    },
-
-    /**
-     * @private
-     * @param {Boolean} positionSet When false, path offset is returned otherwise 0
-     */
-    _calculatePathOffset: function (origLeft, origTop) {
-      return {
-        x: this.left - origLeft - (this.width / 2),
-        y: this.top - origTop - (this.height / 2)
-      };
+      extend(this, this._parseDimensions(options));
+      return;
     },
 
     /**
@@ -162,14 +92,18 @@
           tempY,
           tempControlX,
           tempControlY,
-          l = -((this.width / 2) + this.pathOffset.x),
-          t = -((this.height / 2) + this.pathOffset.y),
-          methodName;
-
-      for (var i = 0, len = this.path.length; i < len; ++i) {
-
+          l = -this.width / 2,
+          t = -this.height / 2,
+          subStartX = 0,
+          subStartY = 0,
+          k,
+          klen,
+          segs;
+          
+      for (var i = 0, len = this.path.length; i < len; ++i)
+      {
         current = this.path[i];
-
+        
         switch (current[0]) { // first letter
 
           case 'l': // lineto, relative
@@ -207,21 +141,17 @@
           case 'm': // moveTo, relative
             x += current[1];
             y += current[2];
-            // draw a line if previous command was moveTo as well (otherwise, it will have no effect)
-            methodName = (previous && (previous[0] === 'm' || previous[0] === 'M'))
-              ? 'lineTo'
-              : 'moveTo';
-            ctx[methodName](x + l, y + t);
+            ctx['moveTo'](x + l, y + t);
+            subStartX = x;
+            subStartY = y;
             break;
 
           case 'M': // moveTo, absolute
             x = current[1];
             y = current[2];
-            // draw a line if previous command was moveTo as well (otherwise, it will have no effect)
-            methodName = (previous && (previous[0] === 'm' || previous[0] === 'M'))
-              ? 'lineTo'
-              : 'moveTo';
-            ctx[methodName](x + l, y + t);
+            ctx['moveTo'](x + l, y + t);
+            subStartX = x;
+            subStartY = y;
             break;
 
           case 'c': // bezierCurveTo, relative
@@ -263,9 +193,16 @@
             tempY = y + current[4];
 
             // calculate reflection of previous control points
-            controlX = controlX ? (2 * x - controlX) : x;
-            controlY = controlY ? (2 * y - controlY) : y;
-
+            if (previous[0] === 'C' || previous[0] === 'c' || previous[0] === 'S' || previous[0] === 's')
+            { 
+              controlX = 2 * x - controlX;
+              controlY = 2 * y - controlY;
+            }
+						else
+						{
+              controlX = x;
+              controlY = y;
+						}
             ctx.bezierCurveTo(
               controlX + l,
               controlY + t,
@@ -288,9 +225,18 @@
           case 'S': // shorthand cubic bezierCurveTo, absolute
             tempX = current[3];
             tempY = current[4];
+
             // calculate reflection of previous control points
-            controlX = 2 * x - controlX;
-            controlY = 2 * y - controlY;
+            if (previous[0] === 'C' || previous[0] === 'c' || previous[0] === 'S' || previous[0] === 's')
+            { 
+              controlX = 2 * x - controlX;
+              controlY = 2 * y - controlY;
+            }
+            else 
+            {
+              controlX = x;
+              controlY = y;
+            }
             ctx.bezierCurveTo(
               controlX + l,
               controlY + t,
@@ -308,7 +254,6 @@
             // the previous command relative to the current point."
             controlX = current[1];
             controlY = current[2];
-
             break;
 
           case 'q': // quadraticCurveTo, relative
@@ -351,21 +296,21 @@
             tempX = x + current[1];
             tempY = y + current[2];
 
-            if (previous[0].match(/[QqTt]/) === null) {
-              // If there is no previous command or if the previous command was not a Q, q, T or t,
-              // assume the control point is coincident with the current point
-              controlX = x;
-              controlY = y;
-            }
-            else if (previous[0] === 't') {
+            if (previous[0] === 't') {
               // calculate reflection of previous control points for t
               controlX = 2 * x - tempControlX;
               controlY = 2 * y - tempControlY;
             }
-            else if (previous[0] === 'q') {
+            else if (previous[0] === 'q' || previous[0] === 'Q' || previous[0] === 'T') {
               // calculate reflection of previous control points for q
               controlX = 2 * x - controlX;
               controlY = 2 * y - controlY;
+            }
+            else {
+              // If there is no previous command or if the previous command was not a Q, q, T or t,
+              // assume the control point is coincident with the current point
+              controlX = x;
+              controlY = y;
             }
 
             tempControlX = controlX;
@@ -388,8 +333,24 @@
             tempY = current[2];
 
             // calculate reflection of previous control points
-            controlX = 2 * x - controlX;
-            controlY = 2 * y - controlY;
+            if (previous[0] === 't') {
+              controlX = 2 * x - tempControlX;
+              controlY = 2 * y - tempControlY;
+            }
+            else if (previous[0] === 'Q' || previous[0] === 'q' || previous[0] === 'T')
+            {
+              controlX = 2 * x - controlX;
+              controlY = 2 * y - controlY;
+            }
+            else
+            {
+              controlX = x;
+              controlY = y;
+            }
+
+            tempControlX = controlX;
+            tempControlY = controlY;
+
             ctx.quadraticCurveTo(
               controlX + l,
               controlY + t,
@@ -398,47 +359,37 @@
             );
             x = tempX;
             y = tempY;
+
             break;
 
           case 'a':
-            // TODO: optimize this
-            drawArc(ctx, x + l, y + t, [
-              current[1],
-              current[2],
-              current[3],
-              current[4],
-              current[5],
-              current[6] + x + l,
-              current[7] + y + t
-            ]);
+            segs = fabric.util.arc2cubics(x + l, y + t, current[1], current[2], current[3], current[4], current[5], current[6] + x + l, current[7] + y + t);
+            for (k = 0, klen = segs.length; k < segs.length; k += 6)
+              ctx.bezierCurveTo.apply(ctx, segs.slice(k, k + 6));
             x += current[6];
             y += current[7];
             break;
 
           case 'A':
-            // TODO: optimize this
-            drawArc(ctx, x + l, y + t, [
-              current[1],
-              current[2],
-              current[3],
-              current[4],
-              current[5],
-              current[6] + l,
-              current[7] + t
-            ]);
+            segs = fabric.util.arc2cubics(x + l, y + t, current[1], current[2], current[3], current[4], current[5], current[6] + l, current[7] + t);
+            for (k = 0, klen = segs.length; k < segs.length; k += 6)
+              ctx.bezierCurveTo.apply(ctx, segs.slice(k, k + 6));
             x = current[6];
             y = current[7];
             break;
 
+
           case 'z':
           case 'Z':
             ctx.closePath();
+            x = subStartX; // to set current point where it should go
+            y = subStartY; // ie to the start of the subpath (where is M/m command).
             break;
         }
         previous = current;
       }
     },
-
+    
     /**
      * Renders path on a specified context
      * @param {CanvasRenderingContext2D} ctx context to render path on
@@ -558,127 +509,26 @@
     /**
      * @private
      */
-    _parsePath: function() {
-      var result = [ ],
-          coords = [ ],
-          currentPath,
-          parsed,
-          re = /([-+]?((\d+\.\d+)|((\d+)|(\.\d+)))(?:e[-+]?\d+)?)/ig,
-          match,
-          coordsStr;
-
-      for (var i = 0, coordsParsed, len = this.path.length; i < len; i++) {
-        currentPath = this.path[i];
-
-        coordsStr = currentPath.slice(1).trim();
-        coords.length = 0;
-
-        while ((match = re.exec(coordsStr))) {
-          coords.push(match[0]);
-        }
-
-        coordsParsed = [ currentPath.charAt(0) ];
-
-        for (var j = 0, jlen = coords.length; j < jlen; j++) {
-          parsed = parseFloat(coords[j]);
-          if (!isNaN(parsed)) {
-            coordsParsed.push(parsed);
-          }
-        }
-
-        var command = coordsParsed[0].toLowerCase(),
-            commandLength = commandLengths[command];
-
-        if (coordsParsed.length - 1 > commandLength) {
-          for (var k = 1, klen = coordsParsed.length; k < klen; k += commandLength) {
-            result.push([ coordsParsed[0] ].concat(coordsParsed.slice(k, k + commandLength)));
-          }
-        }
-        else {
-          result.push(coordsParsed);
-        }
-      }
-
-      return result;
-    },
+     _parsePath: function() {
+       return fabric.util.parsePathString(this.path);
+     },
 
     /**
      * @private
      */
-    _parseDimensions: function() {
-      var aX = [],
-          aY = [],
-          previous = { };
+     _parseDimensions: function(options) {
+      var bounds = fabric.util.getBoundsOfPath(this.path);
+      fabric.util.normalizePathCoords(this, bounds.left, bounds.top);
 
-      this.path.forEach(function(item, i) {
-        this._getCoordsFromCommand(item, i, aX, aY, previous);
-      }, this);
-
-      var minX = min(aX),
-          minY = min(aY),
-          maxX = max(aX),
-          maxY = max(aY),
-          deltaX = maxX - minX,
-          deltaY = maxY - minY,
-
-          o = {
-            left: this.left + (minX + deltaX / 2),
-            top: this.top + (minY + deltaY / 2),
-            width: deltaX,
-            height: deltaY
-          };
-
-      return o;
-    },
-
-    _getCoordsFromCommand: function(item, i, aX, aY, previous) {
-      var isLowerCase = false;
-
-      if (item[0] !== 'H') {
-        previous.x = (i === 0) ? getX(item) : getX(this.path[i - 1]);
-      }
-      if (item[0] !== 'V') {
-        previous.y = (i === 0) ? getY(item) : getY(this.path[i - 1]);
-      }
-
-      // lowercased letter denotes relative position;
-      // transform to absolute
-      if (item[0] === item[0].toLowerCase()) {
-        isLowerCase = true;
-      }
-
-      var xy = this._getXY(item, isLowerCase, previous),
-          val;
-
-      val = parseInt(xy.x, 10);
-      if (!isNaN(val)) {
-        aX.push(val);
-      }
-
-      val = parseInt(xy.y, 10);
-      if (!isNaN(val)) {
-        aY.push(val);
-      }
-    },
-
-    _getXY: function(item, isLowerCase, previous) {
-
-      // last 2 items in an array of coordinates are the actualy x/y (except H/V), collect them
-      // TODO (kangax): support relative h/v commands
-
-      var x = isLowerCase
-        ? previous.x + getX(item)
-        : item[0] === 'V'
-          ? previous.x
-          : getX(item),
-
-          y = isLowerCase
-            ? previous.y + getY(item)
-            : item[0] === 'H'
-              ? previous.y
-              : getY(item);
-
-      return { x: x, y: y };
+      if(!('left' in options)) this.left = bounds.left - (this.strokeWidth * this.scaleX) / 2;
+      if(!('top' in options)) this.top = bounds.top - (this.strokeWidth * this.scaleY) / 2;
+      
+      return {
+        left: this.left,
+        top: this.top,
+        width: bounds.width,
+        height: bounds.height
+      };
     }
   });
 
