@@ -895,11 +895,12 @@
         activeGroup.forEachObject(function(o) {
           o.set('active', true);
         });
+
+        if (this._currentTransform) {
+          this._currentTransform.target = this.getActiveGroup();
+        }
       }
 
-      if (this._currentTransform) {
-        this._currentTransform.target = this.getActiveGroup();
-      }
 
       return data;
     },
