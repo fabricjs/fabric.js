@@ -373,7 +373,7 @@
           top + height + scaleOffsetSizeY + strokeWidth2 + paddingY);
 
         // middle-right
-        this._drawControl('mb', ctx, methodName,
+        this._drawControl('mr', ctx, methodName,
           left + width + scaleOffsetSizeX + strokeWidth2 + paddingX,
           top + height/2 - scaleOffsetY);
 
