@@ -6098,11 +6098,12 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
         activeGroup.forEachObject(function(o) {
           o.set('active', true);
         });
+
+        if (this._currentTransform) {
+          this._currentTransform.target = this.getActiveGroup();
+        }
       }
 
-      if (this._currentTransform) {
-        this._currentTransform.target = this.getActiveGroup();
-      }
 
       return data;
     },
@@ -8612,8 +8613,9 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       if (e.type === 'touchend') {
         // Wait 400ms before rebinding mousedown to prevent double triggers
         // from touch devices
+        var _this = this;
         setTimeout(function() {
-          addListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
+          addListener(_this.upperCanvasEl, 'mousedown', _this._onMouseDown);
         }, 400);
       }
     },
