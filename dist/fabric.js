@@ -37,6 +37,7 @@ fabric.isLikelyNode = typeof Buffer !== 'undefined' &&
  * @type array
  */
 fabric.SHARED_ATTRIBUTES = [
+  "display",
   "transform",
   "fill", "fill-opacity", "fill-rule",
   "opacity",
@@ -2644,6 +2645,7 @@ if (typeof console !== 'undefined') {
         r:                    'radius',
         cy:                   'top',
         y:                    'top',
+        display:              'visible',
         transform:            'transformMatrix',
         'fill-opacity':       'fillOpacity',
         'fill-rule':          'fillRule',
@@ -2692,6 +2694,13 @@ if (typeof console !== 'undefined') {
       }
       else {
         value = fabric.parseTransformAttribute(value);
+      }
+    }
+    else if (attr === 'visible') {
+      value = value === 'none' ? false : true;
+      // display=none on parent element always takes precedence over child element
+      if (parentAttributes.visible === false) {
+        value = false;
       }
     }
 

@@ -20,6 +20,7 @@
         r:                    'radius',
         cy:                   'top',
         y:                    'top',
+        display:              'visible',
         transform:            'transformMatrix',
         'fill-opacity':       'fillOpacity',
         'fill-rule':          'fillRule',
@@ -68,6 +69,13 @@
       }
       else {
         value = fabric.parseTransformAttribute(value);
+      }
+    }
+    else if (attr === 'visible') {
+      value = value === 'none' ? false : true;
+      // display=none on parent element always takes precedence over child element
+      if (parentAttributes.visible === false) {
+        value = false;
       }
     }
 
