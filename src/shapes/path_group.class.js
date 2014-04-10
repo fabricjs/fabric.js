@@ -51,6 +51,14 @@
       }
 
       this.setOptions(options);
+
+      if (options.widthAttr) {
+        this.scaleX = options.widthAttr / options.width;
+      }
+      if (options.heightAttr) {
+        this.scaleY = options.heightAttr / options.height;
+      }
+
       this.setCoords();
 
       if (options.sourcePath) {

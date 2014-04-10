@@ -3034,27 +3034,37 @@ if (typeof console !== 'undefined') {
       if (!elements || (elements && !elements.length)) return;
 
       var viewBoxAttr = doc.getAttribute('viewBox'),
-          widthAttr = doc.getAttribute('width'),
-          heightAttr = doc.getAttribute('height'),
+          widthAttr = parseFloat(doc.getAttribute('width')),
+          heightAttr = parseFloat(doc.getAttribute('height')),
           width = null,
           height = null,
+          viewBoxWidth,
+          viewBoxHeight,
           minX,
           minY;
 
       if (viewBoxAttr && (viewBoxAttr = viewBoxAttr.match(reViewBoxAttrValue))) {
-        minX = parseInt(viewBoxAttr[1], 10);
-        minY = parseInt(viewBoxAttr[2], 10);
-        width = parseInt(viewBoxAttr[3], 10);
-        height = parseInt(viewBoxAttr[4], 10);
+        minX = parseFloat(viewBoxAttr[1]);
+        minY = parseFloat(viewBoxAttr[2]);
+        viewBoxWidth = parseFloat(viewBoxAttr[3]);
+        viewBoxHeight = parseFloat(viewBoxAttr[4]);
       }
 
-      // values of width/height attributes overwrite those extracted from viewbox attribute
-      width = widthAttr ? parseFloat(widthAttr) : width;
-      height = heightAttr ? parseFloat(heightAttr) : height;
+      if (viewBoxWidth && widthAttr && viewBoxWidth !== widthAttr) {
+        width = viewBoxWidth;
+        height = viewBoxHeight;
+      }
+      else {
+        // values of width/height attributes overwrite those extracted from viewbox attribute
+        width = widthAttr ? widthAttr : viewBoxWidth;
+        height = heightAttr ? heightAttr : viewBoxHeight;
+      }
 
       var options = {
         width: width,
-        height: height
+        height: height,
+        widthAttr: widthAttr,
+        heightAttr: heightAttr
       };
 
       fabric.gradientDefs = fabric.getGradientDefs(doc);
@@ -15083,6 +15093,14 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       }
 
       this.setOptions(options);
+
+      if (options.widthAttr) {
+        this.scaleX = options.widthAttr / options.width;
+      }
+      if (options.heightAttr) {
+        this.scaleY = options.heightAttr / options.height;
+      }
+
       this.setCoords();
 
       if (options.sourcePath) {
