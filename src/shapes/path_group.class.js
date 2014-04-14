@@ -182,9 +182,9 @@
      * @return {Boolean} true if all paths are of the same color (`fill`)
      */
     isSameColor: function() {
-      var firstPathFill = this.getObjects()[0].get('fill');
+      var firstPathFill = (this.getObjects()[0].get('fill') || '').toLowerCase();
       return this.getObjects().every(function(path) {
-        return path.get('fill') === firstPathFill;
+        return (path.get('fill') || '').toLowerCase() === firstPathFill;
       });
     },
 
