@@ -1027,7 +1027,12 @@
           -this.width / 2 + this.fill.offsetX || 0,
           -this.height / 2 + this.fill.offsetY || 0);
       }
-      ctx.fill();
+      if (this.fillRule === 'destination-over') {
+        ctx.fill('evenodd');
+      }
+      else {
+        ctx.fill();
+      }
       if (this.fill.toLive) {
         ctx.restore();
       }
