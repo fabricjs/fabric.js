@@ -151,8 +151,11 @@
     // text.width = 20;
 
     var expectedObject = fabric.util.object.extend(fabric.util.object.clone(REFERENCE_TEXT_OBJECT), {
-      left: 10,
-      top: -26
+      left: 4,
+      top: -10.4,
+      width: 8,
+      height: 20.8,
+      fontSize: 16
     });
 
     deepEqual(text.toObject(), expectedObject);

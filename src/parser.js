@@ -21,6 +21,7 @@
         cy:                   'top',
         y:                    'top',
         display:              'visible',
+        visibility:           'visible',
         transform:            'transformMatrix',
         'fill-opacity':       'fillOpacity',
         'fill-rule':          'fillRule',
@@ -72,7 +73,7 @@
       }
     }
     else if (attr === 'visible') {
-      value = value === 'none' ? false : true;
+      value = (value === 'none' || value === 'hidden') ? false : true;
       // display=none on parent element always takes precedence over child element
       if (parentAttributes.visible === false) {
         value = false;
