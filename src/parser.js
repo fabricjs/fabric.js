@@ -35,7 +35,8 @@
         'stroke-miterlimit':  'strokeMiterLimit',
         'stroke-opacity':     'strokeOpacity',
         'stroke-width':       'strokeWidth',
-        'text-decoration':    'textDecoration'
+        'text-decoration':    'textDecoration',
+        'text-anchor':        'originX'
       },
 
       colorAttributes = {
@@ -78,6 +79,9 @@
       if (parentAttributes.visible === false) {
         value = false;
       }
+    }
+    else if (attr === 'originX' /* text-anchor */) {
+      value = value === 'start' ? 'left' : value === 'end' ? 'right' : 'center';
     }
 
     isArray = Object.prototype.toString.call(value) === '[object Array]';
