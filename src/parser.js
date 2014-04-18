@@ -284,7 +284,7 @@
       oStyle.fontStyle = fontStyle;
     }
     if (fontWeight) {
-      oStyle.fontSize = isNaN(parseFloat(fontWeight)) ? fontWeight : parseFloat(fontWeight);
+      oStyle.fontWeight = isNaN(parseFloat(fontWeight)) ? fontWeight : parseFloat(fontWeight);
     }
     if (fontSize) {
       oStyle.fontSize = parseFloat(fontSize);
