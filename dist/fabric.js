@@ -2660,7 +2660,8 @@ if (typeof console !== 'undefined') {
         'stroke-miterlimit':  'strokeMiterLimit',
         'stroke-opacity':     'strokeOpacity',
         'stroke-width':       'strokeWidth',
-        'text-decoration':    'textDecoration'
+        'text-decoration':    'textDecoration',
+        'text-anchor':        'originX'
       },
 
       colorAttributes = {
@@ -2703,6 +2704,9 @@ if (typeof console !== 'undefined') {
       if (parentAttributes.visible === false) {
         value = false;
       }
+    }
+    else if (attr === 'originX' /* text-anchor */) {
+      value = value === 'start' ? 'left' : value === 'end' ? 'right' : 'center';
     }
 
     isArray = Object.prototype.toString.call(value) === '[object Array]';
@@ -2905,7 +2909,7 @@ if (typeof console !== 'undefined') {
       oStyle.fontStyle = fontStyle;
     }
     if (fontWeight) {
-      oStyle.fontSize = isNaN(parseFloat(fontWeight)) ? fontWeight : parseFloat(fontWeight);
+      oStyle.fontWeight = isNaN(parseFloat(fontWeight)) ? fontWeight : parseFloat(fontWeight);
     }
     if (fontSize) {
       oStyle.fontSize = parseFloat(fontSize);
@@ -18652,7 +18656,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
    * @see: http://www.w3.org/TR/SVG/text.html#TextElement
    */
   fabric.Text.ATTRIBUTE_NAMES = fabric.SHARED_ATTRIBUTES.concat(
-    'x y dx dy font-family font-style font-weight font-size text-decoration'.split(' '));
+    'x y dx dy font-family font-style font-weight font-size text-decoration text-anchor'.split(' '));
 
   /**
    * Default SVG font size
