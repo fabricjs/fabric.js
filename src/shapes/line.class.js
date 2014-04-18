@@ -276,10 +276,10 @@
   fabric.Line.fromElement = function(element, options) {
     var parsedAttributes = fabric.parseAttributes(element, fabric.Line.ATTRIBUTE_NAMES),
         points = [
-          parsedAttributes.x1 || 0,
-          parsedAttributes.y1 || 0,
-          parsedAttributes.x2 || 0,
-          parsedAttributes.y2 || 0
+          (parsedAttributes.x1 || 0) + (parsedAttributes.x || 0),
+          (parsedAttributes.y1 || 0) + (parsedAttributes.y || 0),
+          (parsedAttributes.x2 || 0) + (parsedAttributes.x || 0),
+          (parsedAttributes.y2 || 0) + (parsedAttributes.y || 0)
         ];
     return new fabric.Line(points, extend(parsedAttributes, options));
   };

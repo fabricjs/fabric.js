@@ -1100,7 +1100,6 @@
       left: text.getLeft() + text.getWidth() / 2,
       top: text.getTop() - text.getHeight() / 2
     });
-
     return text;
   };
   /* _FROM_SVG_END_ */

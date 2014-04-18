@@ -604,10 +604,18 @@
           parentAttributes = { };
 
       // if there's a parent container (`g` node), parse its attributes recursively upwards
-      if (element.parentNode && /^g$/i.test(element.parentNode.nodeName)) {
-        parentAttributes = fabric.parseAttributes(element.parentNode, attributes);
+      if (element.parentNode && /^(svg|g)$/i.test(element.parentNode.nodeName)) {
+          parentAttributes = fabric.parseAttributes(element.parentNode, attributes);
+          if(element.parentNode.tagName == 'svg'){
+            var isLeftSet = 'left' in parentAttributes,
+            isTopSet = 'top' in parentAttributes;
+            parentAttributes.x = isLeftSet ? parentAttributes.left : 0;
+            parentAttributes.y = isTopSet ? parentAttributes.top : 0;
+            delete parentAttributes.left;
+            delete parentAttributes.top;
+          }
       }
-
+      // console.log(parentAttributes);
       var ownAttributes = attributes.reduce(function(memo, attr) {
         value = element.getAttribute(attr);
         if (value) {

@@ -39,7 +39,7 @@ fabric.SHARED_ATTRIBUTES = [
   "display",
   "transform",
   "fill", "fill-opacity", "fill-rule",
-  "opacity",
+  "opacity", "x", "y",
   "stroke", "stroke-dasharray", "stroke-linecap",
   "stroke-linejoin", "stroke-miterlimit",
   "stroke-opacity", "stroke-width"

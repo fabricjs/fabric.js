@@ -76,7 +76,6 @@
      */
     initialize: function(path, options) {
       options = options || { };
-
       this.setOptions(options);
 
       if (!path) {
@@ -112,8 +111,13 @@
           isLeftSet = 'left' in options,
           isTopSet = 'top' in options,
           origLeft = isLeftSet ? this.left : 0,
-          origTop = isTopSet ? this.top : 0;
-
+          origTop = isTopSet ? this.top : 0,
+          isXSet = 'x' in options,
+          isYSet = 'y' in options;
+      
+      origLeft += isXSet ? this.x : 0;
+      origTop += isYSet ? this.y : 0;
+      
       if (!isWidthSet || !isHeightSet) {
         extend(this, this._parseDimensions());
         if (isWidthSet) {
