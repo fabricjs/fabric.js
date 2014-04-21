@@ -161,8 +161,9 @@
       equal(objRepr.crossOrigin, '', 'toObject should return proper crossOrigin value');
 
       var elImage2 = _createImageElement();
+	  elImage2.crossOrigin = 'anonymous';
       image.setElement(elImage2);
-      equal(elImage2.crossOrigin, '', 'setElement should set proper crossOrigin on an img element');
+      equal(elImage2.crossOrigin, 'anonymous', 'setElement should set proper crossOrigin on an img element');
 
       // fromObject doesn't work on Node :/
       if (fabric.isLikelyNode) {
