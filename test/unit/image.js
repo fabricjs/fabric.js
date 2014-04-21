@@ -170,6 +170,7 @@
         start();
         return;
       }
+	  
       fabric.Image.fromObject(objRepr, function(img) {
         equal(img.crossOrigin, '');
         start();
