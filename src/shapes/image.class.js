@@ -374,7 +374,7 @@
       options || (options = { });
       this.setOptions(options);
       this._setWidthHeight(options);
-      if (this._element) {
+      if (this._element && this.crossOrigin) {
         this._element.crossOrigin = this.crossOrigin;
       }
     },
