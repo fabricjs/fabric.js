@@ -8109,11 +8109,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       var target,
           pointer = this.getPointer(e);
 
-      if (this._activeObject && this._checkTarget(e, this._activeObject, pointer)) {
-        this.relatedTarget = this._activeObject;
-        return this._activeObject;
-      }
-
       var i = this._objects.length;
 
       while (i--) {
@@ -16231,7 +16226,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       options || (options = { });
       this.setOptions(options);
       this._setWidthHeight(options);
-      if (this._element) {
+      if (this._element && this.crossOrigin) {
         this._element.crossOrigin = this.crossOrigin;
       }
     },
