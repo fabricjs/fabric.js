@@ -378,7 +378,7 @@
         // \d doesn't quite cut it (as we need to match an actual float number)
 
         // matches, e.g.: +14.56e-12, etc.
-        reNum = '(?:[-+]?\\d+(?:\\.\\d+)?(?:e[-+]?\\d+)?)',
+        reNum = '(?:[-+]?(?:\\d+|\\d*\\.\\d+)(?:e[-+]?\\d+)?)',
 
         reViewBoxAttrValue = new RegExp(
           '^' +
