@@ -174,6 +174,22 @@
     });
   });
 
+  asyncTest('numbers with leading decimal point', function() {
+    ok(typeof fabric.Path.fromElement == 'function');
+    var elPath = fabric.document.createElement('path');
+
+    elPath.setAttribute('d', 'M 100 100 L 300 100 L 200 300 z');
+    elPath.setAttribute('transform', 'scale(.2)');
+
+    fabric.Path.fromElement(elPath, function(path) {
+      ok(path instanceof fabric.Path);
+
+      deepEqual(path.toObject().transformMatrix, [0.2, 0, 0, 0.2, 0, 0]);
+
+      start();
+    });
+  });
+
   asyncTest('multiple sequences in path commands', function() {
     var el = getPathElement('M100 100 l 200 200 300 300 400 -50 z');
     fabric.Path.fromElement(el, function(obj) {
