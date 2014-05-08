@@ -115,7 +115,8 @@
           x = -w / 2,
           y = -h / 2,
           isInPathGroup = this.group && this.group.type === 'path-group',
-          isRounded = rx !== 0 || ry !== 0;
+          isRounded = rx !== 0 || ry !== 0,
+          k = 1 - 0.5522847498 /* "magic number" for bezier approximations of arcs (http://itc.ktu.lt/itc354/Riskus354.pdf) */;
 
       ctx.beginPath();
       ctx.globalAlpha = isInPathGroup ? (ctx.globalAlpha * this.opacity) : this.opacity;
@@ -134,16 +135,16 @@
       ctx.moveTo(x + rx, y);
 
       ctx.lineTo(x + w - rx, y);
-      isRounded && ctx.quadraticCurveTo(x + w, y, x + w, y + ry, x + w, y + ry);
+      isRounded && ctx.bezierCurveTo(x + w - k * rx, y, x + w, y + k * ry, x + w, y + ry);
 
       ctx.lineTo(x + w, y + h - ry);
-      isRounded && ctx.quadraticCurveTo(x + w, y + h, x + w - rx, y + h, x + w - rx, y + h);
+      isRounded && ctx.bezierCurveTo(x + w, y + h - k * ry, x + w - k * rx, y + h, x + w - rx, y + h);
 
       ctx.lineTo(x + rx, y + h);
-      isRounded && ctx.quadraticCurveTo(x, y + h, x, y + h - ry, x, y + h - ry);
+      isRounded && ctx.bezierCurveTo(x + k * rx, y + h, x, y + h - k * ry, x, y + h - ry);
 
       ctx.lineTo(x, y + ry);
-      isRounded && ctx.quadraticCurveTo(x, y, x + rx, y, x + rx, y);
+      isRounded && ctx.bezierCurveTo(x, y + k * ry, x + k * rx, y, x + rx, y);
 
       ctx.closePath();
 
