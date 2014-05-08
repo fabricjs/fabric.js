@@ -108,8 +108,8 @@
         return;
       }
 
-      var rx = Math.min(this.rx || 0, this.width / 2),
-          ry = Math.min(this.ry || 0, this.height / 2),
+      var rx = this.rx ? Math.min(this.rx, this.width / 2) : 0,
+          ry = this.ry ? Math.min(this.ry, this.height / 2) : 0,
           w = this.width,
           h = this.height,
           x = -w / 2,
