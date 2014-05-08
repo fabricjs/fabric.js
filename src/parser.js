@@ -163,7 +163,7 @@
         ],
 
         // == begin transform regexp
-        number = '(?:[-+]?\\d+(?:\\.\\d+)?(?:e[-+]?\\d+)?)',
+        number = '(?:[-+]?(?:\\d+|\\d*\\.\\d+)(?:e[-+]?\\d+)?)',
 
         commaWsp = '(?:\\s+,?\\s*|,\\s*)',
 
@@ -379,7 +379,7 @@
         // \d doesn't quite cut it (as we need to match an actual float number)
 
         // matches, e.g.: +14.56e-12, etc.
-        reNum = '(?:[-+]?\\d+(?:\\.\\d+)?(?:e[-+]?\\d+)?)',
+        reNum = '(?:[-+]?(?:\\d+|\\d*\\.\\d+)(?:e[-+]?\\d+)?)',
 
         reViewBoxAttrValue = new RegExp(
           '^' +
