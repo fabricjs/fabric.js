@@ -160,9 +160,10 @@
         transformMatrix:  [2, 0, 0, 2, 0, 0]
       }));
 
-      var ANGLE = 90;
+      var ANGLE_DEG = 90;
+      var ANGLE = ANGLE_DEG * Math.PI / 180;
 
-      elPath.setAttribute('transform', 'rotate(' + ANGLE + ')');
+      elPath.setAttribute('transform', 'rotate(' + ANGLE_DEG + ')');
       fabric.Path.fromElement(elPath, function(path) {
 
         deepEqual(
