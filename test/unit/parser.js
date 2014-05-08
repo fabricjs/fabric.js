@@ -230,8 +230,9 @@
     var parsedValue = fabric.parseTransformAttribute(element.getAttribute('transform'));
     deepEqual(parsedValue, [1,0,0,1,-10,-20]);
 
-    var ANGLE = 90;
-    element.setAttribute('transform', 'rotate(' + ANGLE + ')');
+    var ANGLE_DEG = 90;
+    var ANGLE = ANGLE_DEG * Math.PI / 180;
+    element.setAttribute('transform', 'rotate(' + ANGLE_DEG + ')');
     var parsedValue = fabric.parseTransformAttribute(element.getAttribute('transform'));
     deepEqual(parsedValue, [Math.cos(ANGLE), Math.sin(ANGLE), -Math.sin(ANGLE), Math.cos(ANGLE), 0, 0]);
 
