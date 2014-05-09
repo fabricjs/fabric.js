@@ -1088,6 +1088,10 @@
       options.fontSize = fabric.Text.DEFAULT_SVG_FONT_SIZE;
     }
 
+    if (!options.originX) {
+      options.originX = 'center';
+    }
+
     var text = new fabric.Text(element.textContent, options);
 
     /*
