@@ -2788,7 +2788,7 @@ if (typeof console !== 'undefined') {
         ],
 
         // == begin transform regexp
-        number = '(?:[-+]?\\d+(?:\\.\\d+)?(?:e[-+]?\\d+)?)',
+        number = '(?:[-+]?(?:\\d+|\\d*\\.\\d+)(?:e[-+]?\\d+)?)',
 
         commaWsp = '(?:\\s+,?\\s*|,\\s*)',
 
@@ -2859,6 +2859,7 @@ if (typeof console !== 'undefined') {
             translateMatrix(matrix, args);
             break;
           case 'rotate':
+            args[0] = fabric.util.degreesToRadians(args[0]);
             rotateMatrix(matrix, args);
             break;
           case 'scale':
@@ -3003,7 +3004,7 @@ if (typeof console !== 'undefined') {
         // \d doesn't quite cut it (as we need to match an actual float number)
 
         // matches, e.g.: +14.56e-12, etc.
-        reNum = '(?:[-+]?\\d+(?:\\.\\d+)?(?:e[-+]?\\d+)?)',
+        reNum = '(?:[-+]?(?:\\d+|\\d*\\.\\d+)(?:e[-+]?\\d+)?)',
 
         reViewBoxAttrValue = new RegExp(
           '^' +
@@ -13733,14 +13734,15 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         return;
       }
 
-      var rx = this.rx || 0,
-          ry = this.ry || 0,
+      var rx = this.rx ? Math.min(this.rx, this.width / 2) : 0,
+          ry = this.ry ? Math.min(this.ry, this.height / 2) : 0,
           w = this.width,
           h = this.height,
           x = -w / 2,
           y = -h / 2,
           isInPathGroup = this.group && this.group.type === 'path-group',
-          isRounded = rx !== 0 || ry !== 0;
+          isRounded = rx !== 0 || ry !== 0,
+          k = 1 - 0.5522847498 /* "magic number" for bezier approximations of arcs (http://itc.ktu.lt/itc354/Riskus354.pdf) */;
 
       ctx.beginPath();
       ctx.globalAlpha = isInPathGroup ? (ctx.globalAlpha * this.opacity) : this.opacity;
@@ -13759,16 +13761,16 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       ctx.moveTo(x + rx, y);
 
       ctx.lineTo(x + w - rx, y);
-      isRounded && ctx.quadraticCurveTo(x + w, y, x + w, y + ry, x + w, y + ry);
+      isRounded && ctx.bezierCurveTo(x + w - k * rx, y, x + w, y + k * ry, x + w, y + ry);
 
       ctx.lineTo(x + w, y + h - ry);
-      isRounded && ctx.quadraticCurveTo(x + w, y + h, x + w - rx, y + h, x + w - rx, y + h);
+      isRounded && ctx.bezierCurveTo(x + w, y + h - k * ry, x + w - k * rx, y + h, x + w - rx, y + h);
 
       ctx.lineTo(x + rx, y + h);
-      isRounded && ctx.quadraticCurveTo(x, y + h, x, y + h - ry, x, y + h - ry);
+      isRounded && ctx.bezierCurveTo(x + k * rx, y + h, x, y + h - k * ry, x, y + h - ry);
 
       ctx.lineTo(x, y + ry);
-      isRounded && ctx.quadraticCurveTo(x, y, x + rx, y, x + rx, y);
+      isRounded && ctx.bezierCurveTo(x, y + k * ry, x + k * rx, y, x + rx, y);
 
       ctx.closePath();
 
@@ -18692,6 +18694,10 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     }
     if (!('fontSize' in options)) {
       options.fontSize = fabric.Text.DEFAULT_SVG_FONT_SIZE;
+    }
+
+    if (!options.originX) {
+      options.originX = 'center';
     }
 
     var text = new fabric.Text(element.textContent, options);
