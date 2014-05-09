@@ -4079,6 +4079,11 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
         color = Color.colorNameMap[color];
       }
 
+      if (color === 'transparent') {
+        this.setSource([255,255,255,0]);
+        return;
+      }
+
       source = Color.sourceFromHex(color);
 
       if (!source) {
@@ -15980,13 +15985,16 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       // this._resetWidthHeight();
       if (isInPathGroup) {
-        ctx.translate(-this.group.width/2 + this.width/2, -this.group.height/2 + this.height/2);
+        ctx.translate(-this.group.width/2, -this.group.height/2);
       }
       if (m) {
         ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
       }
       if (!noTransform) {
         this.transform(ctx);
+      }
+      if (isInPathGroup) {
+        ctx.translate(this.width/2, this.height/2);
       }
 
       ctx.save();
