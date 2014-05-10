@@ -43,6 +43,11 @@
         color = Color.colorNameMap[color];
       }
 
+      if (color === 'transparent') {
+        this.setSource([255,255,255,0]);
+        return;
+      }
+
       source = Color.sourceFromHex(color);
 
       if (!source) {

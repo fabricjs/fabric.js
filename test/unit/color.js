@@ -324,4 +324,8 @@
     oColor.overlayWith(new fabric.Color('rgb(0,0,0)'));
     equal(oColor.toRgb(), 'rgb(128,128,128)');
   });
+
+  test('transparent', function() {
+    deepEqual(new fabric.Color('transparent').getSource(), [255,255,255,0]);
+  });
 })();
