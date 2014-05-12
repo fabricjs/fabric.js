@@ -155,7 +155,8 @@
       top: -10.4,
       width: 8,
       height: 20.8,
-      fontSize: 16
+      fontSize: 16,
+      originX: 'center'
     });
 
     deepEqual(text.toObject(), expectedObject);
@@ -206,7 +207,8 @@
       fontStyle:        'italic',
       fontWeight:       'bold',
       fontSize:         123,
-      textDecoration:   'underline'
+      textDecoration:   'underline',
+      originX:          'center'
     });
 
     deepEqual(textWithAttrs.toObject(), expectedObject);
