@@ -32,11 +32,11 @@
      * Constructor
      * @memberOf fabric.Image.filters.Noise.prototype
      * @param {Object} [options] Options object
-     * @param {Number} [options.noise=100] Noise value
+     * @param {Number} [options.noise=0] Noise value
      */
     initialize: function(options) {
       options = options || { };
-      this.noise = options.noise || 100;
+      this.noise = options.noise || 0;
     },
 
     /**
