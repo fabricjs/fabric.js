@@ -1310,11 +1310,33 @@
     /**
      * Sets "color" of an instance (alias of `set('fill', &hellip;)`)
      * @param {String} color Color value
-     * @return {fabric.Text} thisArg
+     * @return {fabric.Object} thisArg
      * @chainable
      */
     setColor: function(color) {
       this.set('fill', color);
+      return this;
+    },
+
+    /**
+     * Sets "angle" of an instance
+     * @param {Number} angle Angle value
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+    setAngle: function(angle) {
+      var shouldCenterOrigin = (this.originX !== 'center' || this.originY !== 'center') && this.centeredRotation;
+
+      if (shouldCenterOrigin) {
+        this._setOriginToCenter();
+      }
+
+      this.set('angle', angle);
+
+      if (shouldCenterOrigin) {
+        this._resetOrigin();
+      }
+
       return this;
     },
 
