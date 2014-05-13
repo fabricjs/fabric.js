@@ -129,7 +129,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
   _enlivenObjects: function (objects, callback, reviver) {
     var _this = this;
 
-    if (objects.length === 0) {
+    if (!objects || objects.length === 0) {
       callback && callback();
       return;
     }
