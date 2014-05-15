@@ -323,8 +323,6 @@
       ctx.mozImageSmoothingEnabled    = this.imageSmoothingEnabled;
       ctx.msImageSmoothingEnabled     = this.imageSmoothingEnabled;
       ctx.oImageSmoothingEnabled      = this.imageSmoothingEnabled;
-
-      return this;
     },
 
     /**
