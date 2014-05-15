@@ -405,7 +405,7 @@
       var startTime = new Date(),
           descendants = fabric.util.toArray(doc.getElementsByTagName('*'));
 
-      if (descendants.length === 0) {
+      if (descendants.length === 0 && fabric.isLikelyNode) {
         // we're likely in node, where "o3-xml" library fails to gEBTN("*")
         // https://github.com/ajaxorg/node-o3-xml/issues/21
         descendants = doc.selectNodes('//*[name(.)!="svg"]');
@@ -421,7 +421,10 @@
               !hasAncestorWithNodeName(el, /^(?:pattern|defs)$/); // http://www.w3.org/TR/SVG/struct.html#DefsElement
       });
 
-      if (!elements || (elements && !elements.length)) return;
+      if (!elements || (elements && !elements.length)) {
+        callback && callback([], {});
+        return;
+      }
 
       var viewBoxAttr = doc.getAttribute('viewBox'),
           widthAttr = parseFloat(doc.getAttribute('width')),
