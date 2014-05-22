@@ -8,6 +8,7 @@
      * Initializes all the interactive behavior of IText
      */
     initBehavior: function() {
+      this.initAddedHandler();
       this.initCursorSelectionHandlers();
       this.initDoubleClickSimulation();
     },
@@ -22,10 +23,17 @@
         setTimeout(function() {
           _this.selected = true;
         }, 100);
+      });
+    },
 
+    /**
+     * Initializes "added" event handler
+     */
+    initAddedHandler: function() {
+      this.on('added', function() {
         if (this.canvas && !this.canvas._hasITextHandlers) {
-          this._initCanvasHandlers();
           this.canvas._hasITextHandlers = true;
+          this._initCanvasHandlers();
         }
       });
     },
