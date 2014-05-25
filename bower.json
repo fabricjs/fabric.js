@@ -11,7 +11,12 @@
     "lib",
     "src",
     "test",
-    ".*"
+    "build_all",
+    "build.js",
+    "build.sh",
+    "create_build_script.js",
+    "test.js",
+    "HEADER.js"
   ],
   "keywords": [
     "canvas",
