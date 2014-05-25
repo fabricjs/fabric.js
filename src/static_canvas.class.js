@@ -127,6 +127,13 @@
     allowTouchScrolling: false,
 
     /**
+     * Indicates whether this canvas will use image smoothing, this is on by default in browsers
+     * @type Boolean
+     * @default
+     */
+    imageSmoothingEnabled: true,
+
+    /**
      * Callback; invoked right before object is about to be scaled/rotated
      * @param {fabric.Object} target Object that's about to be scaled/rotated
      */
@@ -144,6 +151,7 @@
 
       this._createLowerCanvas(el);
       this._initOptions(options);
+      this._setImageSmoothing();
 
       if (options.overlayImage) {
         this.setOverlayImage(options.overlayImage, this.renderAll.bind(this));
@@ -301,6 +309,20 @@
      */
     setBackgroundColor: function(backgroundColor, callback) {
       return this.__setBgOverlayColor('backgroundColor', backgroundColor, callback);
+    },
+
+    /**
+     * @private
+     * @see {@link http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#dom-context-2d-imagesmoothingenabled|WhatWG Canvas Standard}
+     */
+    _setImageSmoothing: function(){
+      var ctx = this.getContext();
+
+      ctx.imageSmoothingEnabled       = this.imageSmoothingEnabled;
+      ctx.webkitImageSmoothingEnabled = this.imageSmoothingEnabled;
+      ctx.mozImageSmoothingEnabled    = this.imageSmoothingEnabled;
+      ctx.msImageSmoothingEnabled     = this.imageSmoothingEnabled;
+      ctx.oImageSmoothingEnabled      = this.imageSmoothingEnabled;
     },
 
     /**
@@ -895,11 +917,12 @@
         activeGroup.forEachObject(function(o) {
           o.set('active', true);
         });
+
+        if (this._currentTransform) {
+          this._currentTransform.target = this.getActiveGroup();
+        }
       }
 
-      if (this._currentTransform) {
-        this._currentTransform.target = this.getActiveGroup();
-      }
 
       return data;
     },

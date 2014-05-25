@@ -128,13 +128,16 @@
 
       // this._resetWidthHeight();
       if (isInPathGroup) {
-        ctx.translate(-this.group.width/2 + this.width/2, -this.group.height/2 + this.height/2);
+        ctx.translate(-this.group.width/2, -this.group.height/2);
       }
       if (m) {
         ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
       }
       if (!noTransform) {
         this.transform(ctx);
+      }
+      if (isInPathGroup) {
+        ctx.translate(this.width/2, this.height/2);
       }
 
       ctx.save();
@@ -374,7 +377,7 @@
       options || (options = { });
       this.setOptions(options);
       this._setWidthHeight(options);
-      if (this._element) {
+      if (this._element && this.crossOrigin) {
         this._element.crossOrigin = this.crossOrigin;
       }
     },

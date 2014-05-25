@@ -200,6 +200,45 @@
 
     /**
      * @private
+     * Sets the origin/position of the object to it's center point
+     * @return {void}
+     */
+    _setOriginToCenter: function() {
+      this._originalOriginX = this.originX;
+      this._originalOriginY = this.originY;
+
+      var center = this.getCenterPoint();
+
+      this.originX = 'center';
+      this.originY = 'center';
+
+      this.left = center.x;
+      this.top = center.y;
+    },
+
+    /**
+     * @private
+     * Resets the origin/position of the object to it's original origin
+     * @return {void}
+     */
+    _resetOrigin: function() {
+      var originPoint = this.translateToOriginPoint(
+        this.getCenterPoint(),
+        this._originalOriginX,
+        this._originalOriginY);
+
+      this.originX = this._originalOriginX;
+      this.originY = this._originalOriginY;
+
+      this.left = originPoint.x;
+      this.top = originPoint.y;
+
+      this._originalOriginX = null;
+      this._originalOriginY = null;
+    },
+
+    /**
+     * @private
      */
     _getLeftTopCoords: function() {
       return this.translateToOriginPoint(this.getCenterPoint(), 'left', 'center');

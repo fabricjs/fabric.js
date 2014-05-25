@@ -785,11 +785,6 @@
       var target,
           pointer = this.getPointer(e);
 
-      if (this._activeObject && this._checkTarget(e, this._activeObject, pointer)) {
-        this.relatedTarget = this._activeObject;
-        return this._activeObject;
-      }
-
       var i = this._objects.length;
 
       while (i--) {

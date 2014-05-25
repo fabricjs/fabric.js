@@ -20,6 +20,8 @@
         r:                    'radius',
         cy:                   'top',
         y:                    'top',
+        display:              'visible',
+        visibility:           'visible',
         transform:            'transformMatrix',
         'fill-opacity':       'fillOpacity',
         'fill-rule':          'fillRule',
@@ -33,7 +35,8 @@
         'stroke-miterlimit':  'strokeMiterLimit',
         'stroke-opacity':     'strokeOpacity',
         'stroke-width':       'strokeWidth',
-        'text-decoration':    'textDecoration'
+        'text-decoration':    'textDecoration',
+        'text-anchor':        'originX'
       },
 
       colorAttributes = {
@@ -69,6 +72,16 @@
       else {
         value = fabric.parseTransformAttribute(value);
       }
+    }
+    else if (attr === 'visible') {
+      value = (value === 'none' || value === 'hidden') ? false : true;
+      // display=none on parent element always takes precedence over child element
+      if (parentAttributes.visible === false) {
+        value = false;
+      }
+    }
+    else if (attr === 'originX' /* text-anchor */) {
+      value = value === 'start' ? 'left' : value === 'end' ? 'right' : 'center';
     }
 
     isArray = Object.prototype.toString.call(value) === '[object Array]';
@@ -150,7 +163,7 @@
         ],
 
         // == begin transform regexp
-        number = '(?:[-+]?\\d+(?:\\.\\d+)?(?:e[-+]?\\d+)?)',
+        number = '(?:[-+]?(?:\\d+|\\d*\\.\\d+)(?:e[-+]?\\d+)?)',
 
         commaWsp = '(?:\\s+,?\\s*|,\\s*)',
 
@@ -221,6 +234,7 @@
             translateMatrix(matrix, args);
             break;
           case 'rotate':
+            args[0] = fabric.util.degreesToRadians(args[0]);
             rotateMatrix(matrix, args);
             break;
           case 'scale':
@@ -271,7 +285,7 @@
       oStyle.fontStyle = fontStyle;
     }
     if (fontWeight) {
-      oStyle.fontSize = isNaN(parseFloat(fontWeight)) ? fontWeight : parseFloat(fontWeight);
+      oStyle.fontWeight = isNaN(parseFloat(fontWeight)) ? fontWeight : parseFloat(fontWeight);
     }
     if (fontSize) {
       oStyle.fontSize = parseFloat(fontSize);
@@ -365,7 +379,7 @@
         // \d doesn't quite cut it (as we need to match an actual float number)
 
         // matches, e.g.: +14.56e-12, etc.
-        reNum = '(?:[-+]?\\d+(?:\\.\\d+)?(?:e[-+]?\\d+)?)',
+        reNum = '(?:[-+]?(?:\\d+|\\d*\\.\\d+)(?:e[-+]?\\d+)?)',
 
         reViewBoxAttrValue = new RegExp(
           '^' +
@@ -391,7 +405,7 @@
       var startTime = new Date(),
           descendants = fabric.util.toArray(doc.getElementsByTagName('*'));
 
-      if (descendants.length === 0) {
+      if (descendants.length === 0 && fabric.isLikelyNode) {
         // we're likely in node, where "o3-xml" library fails to gEBTN("*")
         // https://github.com/ajaxorg/node-o3-xml/issues/21
         descendants = doc.selectNodes('//*[name(.)!="svg"]');
@@ -407,30 +421,43 @@
               !hasAncestorWithNodeName(el, /^(?:pattern|defs)$/); // http://www.w3.org/TR/SVG/struct.html#DefsElement
       });
 
-      if (!elements || (elements && !elements.length)) return;
+      if (!elements || (elements && !elements.length)) {
+        callback && callback([], {});
+        return;
+      }
 
       var viewBoxAttr = doc.getAttribute('viewBox'),
-          widthAttr = doc.getAttribute('width'),
-          heightAttr = doc.getAttribute('height'),
+          widthAttr = parseFloat(doc.getAttribute('width')),
+          heightAttr = parseFloat(doc.getAttribute('height')),
           width = null,
           height = null,
+          viewBoxWidth,
+          viewBoxHeight,
           minX,
           minY;
 
       if (viewBoxAttr && (viewBoxAttr = viewBoxAttr.match(reViewBoxAttrValue))) {
-        minX = parseInt(viewBoxAttr[1], 10);
-        minY = parseInt(viewBoxAttr[2], 10);
-        width = parseInt(viewBoxAttr[3], 10);
-        height = parseInt(viewBoxAttr[4], 10);
+        minX = parseFloat(viewBoxAttr[1]);
+        minY = parseFloat(viewBoxAttr[2]);
+        viewBoxWidth = parseFloat(viewBoxAttr[3]);
+        viewBoxHeight = parseFloat(viewBoxAttr[4]);
       }
 
-      // values of width/height attributes overwrite those extracted from viewbox attribute
-      width = widthAttr ? parseFloat(widthAttr) : width;
-      height = heightAttr ? parseFloat(heightAttr) : height;
+      if (viewBoxWidth && widthAttr && viewBoxWidth !== widthAttr) {
+        width = viewBoxWidth;
+        height = viewBoxHeight;
+      }
+      else {
+        // values of width/height attributes overwrite those extracted from viewbox attribute
+        width = widthAttr ? widthAttr : viewBoxWidth;
+        height = heightAttr ? heightAttr : viewBoxHeight;
+      }
 
       var options = {
         width: width,
-        height: height
+        height: height,
+        widthAttr: widthAttr,
+        heightAttr: heightAttr
       };
 
       fabric.gradientDefs = fabric.getGradientDefs(doc);

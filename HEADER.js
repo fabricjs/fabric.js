@@ -1,6 +1,6 @@
 /*! Fabric.js Copyright 2008-2014, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.4.4" };
+var fabric = fabric || { version: "1.4.5" };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -36,6 +36,7 @@ fabric.isLikelyNode = typeof Buffer !== 'undefined' &&
  * @type array
  */
 fabric.SHARED_ATTRIBUTES = [
+  "display",
   "transform",
   "fill", "fill-opacity", "fill-rule",
   "opacity",

@@ -11,9 +11,11 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
     fabric.document.body.appendChild(this.hiddenTextarea);
 
-    fabric.util.addListener(this.hiddenTextarea, 'paste', this.onPaste.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'keydown', this.onKeyDown.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'keypress', this.onKeyPress.bind(this));
+    fabric.util.addListener(this.hiddenTextarea, 'copy', this.copy.bind(this));
+    fabric.util.addListener(this.hiddenTextarea, 'paste', this.paste.bind(this));
+
 
     if (!this._clickHandlerInitialized && this.canvas) {
       fabric.util.addListener(this.canvas.upperCanvasEl, 'click', this.onClick.bind(this));
@@ -39,17 +41,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    */
   _ctrlKeysMap: {
     65: 'selectAll',
-    86: 'paste',
     88: 'cut'
-  },
-
-  /**
-   * Handles paste event
-   * @param {Event} e Event object
-   */
-  onPaste: function(e) {
-    // Solution for lastest Safari, Chrome, Opera, FF. TODO: test in IE
-    this.insertChars(e.clipboardData.getData('text'));
   },
 
   onClick: function() {
@@ -90,11 +82,26 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   },
 
   /**
+   * Copies selected text
+   */
+  copy: function(ev) {
+    var selectedText = this.getSelectedText();
+    ev.clipboardData.setData('text', selectedText);
+
+    this.copiedText = selectedText;
+    this.copiedStyles = this.getSelectionStyles(
+                          this.selectionStart,
+                          this.selectionEnd);
+  },
+
+  /**
    * Pastes text
    */
-  paste: function() {
-    if (this.copiedText) {
-      this.insertChars(this.copiedText);
+  paste: function(ev) {
+    var copiedText = ev.clipboardData.getData('text');
+    
+    if (copiedText) {
+      this.insertChars(copiedText);
     }
   },
 
@@ -102,6 +109,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * Cuts text
    */
   cut: function(e) {
+    this.copy();
     this.removeChars(e);
   },
 

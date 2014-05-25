@@ -160,9 +160,10 @@
         transformMatrix:  [2, 0, 0, 2, 0, 0]
       }));
 
-      var ANGLE = 90;
+      var ANGLE_DEG = 90;
+      var ANGLE = ANGLE_DEG * Math.PI / 180;
 
-      elPath.setAttribute('transform', 'rotate(' + ANGLE + ')');
+      elPath.setAttribute('transform', 'rotate(' + ANGLE_DEG + ')');
       fabric.Path.fromElement(elPath, function(path) {
 
         deepEqual(
@@ -171,6 +172,22 @@
         );
         start();
       });
+    });
+  });
+
+  asyncTest('numbers with leading decimal point', function() {
+    ok(typeof fabric.Path.fromElement == 'function');
+    var elPath = fabric.document.createElement('path');
+
+    elPath.setAttribute('d', 'M 100 100 L 300 100 L 200 300 z');
+    elPath.setAttribute('transform', 'scale(.2)');
+
+    fabric.Path.fromElement(elPath, function(path) {
+      ok(path instanceof fabric.Path);
+
+      deepEqual(path.toObject().transformMatrix, [0.2, 0, 0, 0.2, 0, 0]);
+
+      start();
     });
   });
 

@@ -180,8 +180,9 @@
       if (e.type === 'touchend') {
         // Wait 400ms before rebinding mousedown to prevent double triggers
         // from touch devices
+        var _this = this;
         setTimeout(function() {
-          addListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
+          addListener(_this.upperCanvasEl, 'mousedown', _this._onMouseDown);
         }, 400);
       }
     },

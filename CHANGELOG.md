@@ -13,6 +13,9 @@
 - Fix style object deletion in iText
 - Fix typo in `_initCanvasHandlers`
 - Fix `transformMatrix` not affecting fabric.Text
+- Fix `setAngle` for different originX/originY (!= 'center')
+- Change default/init noise/brightness value for `fabric.Image.filters.Noise` and `fabric.Image.filters.Brightness` from 100 to 0
+- Add `fabric.Canvas#imageSmoothingEnabled`
 
 **Version 1.4.0**
 

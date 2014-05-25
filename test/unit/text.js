@@ -151,8 +151,12 @@
     // text.width = 20;
 
     var expectedObject = fabric.util.object.extend(fabric.util.object.clone(REFERENCE_TEXT_OBJECT), {
-      left: 10,
-      top: -26
+      left: 4,
+      top: -10.4,
+      width: 8,
+      height: 20.8,
+      fontSize: 16,
+      originX: 'center'
     });
 
     deepEqual(text.toObject(), expectedObject);
@@ -203,7 +207,8 @@
       fontStyle:        'italic',
       fontWeight:       'bold',
       fontSize:         123,
-      textDecoration:   'underline'
+      textDecoration:   'underline',
+      originX:          'center'
     });
 
     deepEqual(textWithAttrs.toObject(), expectedObject);

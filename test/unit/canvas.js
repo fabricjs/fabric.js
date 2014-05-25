@@ -477,6 +477,25 @@
     });
   });
 
+  asyncTest('loadFromJSON without "objects" property', function() {
+    var c1 = new fabric.Canvas('c1', { backgroundColor: 'green', overlayColor: 'yellow' }),
+        c2 = new fabric.Canvas('c2', { backgroundColor: 'red', overlayColor: 'orange' });
+
+    var json = c1.toJSON();
+    var fired = false;
+
+    delete json.objects;
+
+    c2.loadFromJSON(json, function() {
+      fired = true;
+
+      ok(fired, 'Callback should be fired even if no "objects" property exists');
+      equal(c2.backgroundColor, 'green', 'Color should be set properly');
+      equal(c2.overlayColor, 'yellow', 'Color should be set properly');
+      start();
+    });
+  });
+
   asyncTest('loadFromJSON with empty fabric.Group', function() {
     var c1 = new fabric.Canvas('c1'),
         c2 = new fabric.Canvas('c2'),
