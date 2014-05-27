@@ -596,6 +596,13 @@
     rotatingPointOffset:      40,
 
     /**
+     * When set to `true`, the rotating point will be on the bottom of the object (when enabled via `hasRotatingPoint`). The default is false, which places the rotating point on the top.
+     * @type Boolean
+     * @default
+     */
+    rotatingPointOnBottom:    false,
+
+    /**
      * When set to `true`, objects are "found" on canvas on per-pixel basis rather than according to bounding box
      * @type Boolean
      * @default
