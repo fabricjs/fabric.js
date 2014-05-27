@@ -361,12 +361,12 @@
             x: bl.x + (this.currentWidth/2 * cosTh),
             y: bl.y + (this.currentWidth/2 * sinTh)
           },
-      var mtr = this.rotatingPointOnBottom ?
-      {
-        x: mb.x,
-        y: mb.y
-      } :
-      {
+          mtr = this.rotatingPointOnBottom ?
+          {
+            x: mb.x,
+            y: mb.y
+          } :
+          {
             x: mt.x,
             y: mt.y
           };
