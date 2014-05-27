@@ -370,7 +370,8 @@
     _renderViaNative: function(ctx) {
       var textLines = this.text.split(this._reNewline);
 
-      this.transform(ctx, fabric.isLikelyNode);
+      // fromLeft should not be used for node with originX center because there is a text displacement issue.
+      this.transform(ctx, (this.originX !== 'center' && fabric.isLikelyNode));
 
       this._setTextStyles(ctx);
 
@@ -539,7 +540,8 @@
      * @return {Number} Left offset
      */
     _getLeftOffset: function() {
-      if (fabric.isLikelyNode) {
+      // Node should not be treated special if originX is center. This is to avoid text displacement issue with originX center.
+      if (this.originX !== 'center' && fabric.isLikelyNode) {
         return 0;
       }
       return -this.width / 2;

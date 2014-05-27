@@ -80,6 +80,8 @@
           sinTh = Math.sin(theta),
           cosTh = Math.cos(theta);
 
+      var mtrMultiplier = (this.flipY) ? 1 : -1;
+
       coords.tl.corner = {
         tl: {
           x: coords.tl.x - sinHalfOffset,
@@ -234,20 +236,20 @@
 
       coords.mtr.corner = {
         tl: {
-          x: coords.mtr.x - sinHalfOffset + (sinTh * this.rotatingPointOffset),
-          y: coords.mtr.y - cosHalfOffset - (cosTh * this.rotatingPointOffset)
+          x: coords.mtr.x - sinHalfOffset * mtrMultiplier + (sinTh * this.rotatingPointOffset) * mtrMultiplier,
+          y: coords.mtr.y - cosHalfOffset * mtrMultiplier - (cosTh * this.rotatingPointOffset) * mtrMultiplier
         },
         tr: {
-          x: coords.mtr.x + cosHalfOffset + (sinTh * this.rotatingPointOffset),
-          y: coords.mtr.y - sinHalfOffset - (cosTh * this.rotatingPointOffset)
+          x: coords.mtr.x + cosHalfOffset * mtrMultiplier + (sinTh * this.rotatingPointOffset) * mtrMultiplier,
+          y: coords.mtr.y - sinHalfOffset * mtrMultiplier - (cosTh * this.rotatingPointOffset) * mtrMultiplier
         },
         bl: {
-          x: coords.mtr.x - cosHalfOffset + (sinTh * this.rotatingPointOffset),
-          y: coords.mtr.y + sinHalfOffset - (cosTh * this.rotatingPointOffset)
+          x: coords.mtr.x - cosHalfOffset * mtrMultiplier + (sinTh * this.rotatingPointOffset) * mtrMultiplier,
+          y: coords.mtr.y + sinHalfOffset * mtrMultiplier - (cosTh * this.rotatingPointOffset) * mtrMultiplier
         },
         br: {
-          x: coords.mtr.x + sinHalfOffset + (sinTh * this.rotatingPointOffset),
-          y: coords.mtr.y + cosHalfOffset - (cosTh * this.rotatingPointOffset)
+          x: coords.mtr.x + sinHalfOffset * mtrMultiplier + (sinTh * this.rotatingPointOffset) * mtrMultiplier,
+          y: coords.mtr.y + cosHalfOffset * mtrMultiplier - (cosTh * this.rotatingPointOffset) * mtrMultiplier
         }
       };
     },
@@ -265,6 +267,8 @@
       var padding = this.padding,
           padding2 = padding * 2,
           strokeWidth = ~~(this.strokeWidth / 2) * 2; // Round down to even number
+
+      var rotatingPointPositionMultiplier = this.rotatingPointOnBottom ? -1 : 1;
 
       ctx.save();
 
@@ -294,11 +298,11 @@
           this.flipY
             ? h + (strokeWidth * this.scaleY) + (padding * 2)
             : -h - (strokeWidth * this.scaleY) - (padding * 2)
-        ) / 2;
+          ) / 2 * rotatingPointPositionMultiplier;
 
         ctx.beginPath();
         ctx.moveTo(0, rotateHeight);
-        ctx.lineTo(0, rotateHeight + (this.flipY ? this.rotatingPointOffset : -this.rotatingPointOffset));
+        ctx.lineTo(0, rotateHeight + (this.flipY ? this.rotatingPointOffset : -this.rotatingPointOffset) * rotatingPointPositionMultiplier);
         ctx.closePath();
         ctx.stroke();
       }
@@ -386,8 +390,8 @@
       // middle-top-rotate
       if (this.hasRotatingPoint) {
         this._drawControl('mtr', ctx, methodName,
-          left + width/2 - scaleOffsetX,
-          this.flipY
+            left + width/2 - scaleOffsetX,
+          ((this.rotatingPointOnBottom && !this.flipY) || (this.flipY && !this.rotatingPointOnBottom))
             ? (top + height + (this.rotatingPointOffset / this.scaleY) - this.cornerSize/this.scaleX/2 + strokeWidth2 + paddingY)
             : (top - (this.rotatingPointOffset / this.scaleY) - this.cornerSize/this.scaleY/2 - strokeWidth2 - paddingY));
       }
