@@ -210,6 +210,20 @@
     });
   });
 
+  asyncTest('multiple M/m coordinates converted to L/l', function() {
+    var el = getPathElement('M100 100 200 200 150 50 m 300 300 400 -50 50 100');
+    fabric.Path.fromElement(el, function(obj) {
+
+      deepEqual(obj.path[0], ['M', 100, 100]);
+      deepEqual(obj.path[1], ['L', 200, 200]);
+      deepEqual(obj.path[2], ['L', 150, 50]);
+      deepEqual(obj.path[3], ['m', 300, 300]);
+      deepEqual(obj.path[4], ['l', 400, -50]);
+      deepEqual(obj.path[5], ['l', 50, 100]);
+      start();
+    });
+  });
+
   asyncTest('compressed path commands', function() {
     var el = getPathElement('M56.224 84.12c-.047.132-.138.221-.322.215.046-.131.137-.221.322-.215z');
     fabric.Path.fromElement(el, function(obj) {
