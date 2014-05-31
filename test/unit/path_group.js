@@ -66,7 +66,7 @@
   function getPathGroupObject(callback) {
     getPathObjects(function(objects) {
       callback(new fabric.PathGroup(objects));
-    })
+    });
   }
 
   QUnit.module('fabric.PathGroup');
@@ -178,6 +178,12 @@
 
       pathGroup.getObjects()[0].set('fill', 'black');
       equal(pathGroup.isSameColor(), false);
+
+      // case
+      pathGroup.getObjects()[0].set('fill', '#ff5555');
+      pathGroup.getObjects()[1].set('fill', '#FF5555');
+      equal(pathGroup.isSameColor(), true);
+
       start();
     });
   });

@@ -900,6 +900,18 @@ test('toDataURL & reference to canvas', function() {
     equal(canvas.getObjects().length, 0);
   });
 
+  test('object:removed', function() {
+    var object = new fabric.Object();
+    var removedEventFired = false;
+
+    canvas.add(object);
+
+    object.on('removed', function(){ removedEventFired = true; });
+    object.remove();
+
+    ok(removedEventFired);
+  });
+
   test('center', function() {
     var object = new fabric.Object();
 

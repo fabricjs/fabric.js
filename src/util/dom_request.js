@@ -6,9 +6,9 @@
 
   var makeXHR = (function() {
     var factories = [
-      function() { return new ActiveXObject("Microsoft.XMLHTTP"); },
-      function() { return new ActiveXObject("Msxml2.XMLHTTP"); },
-      function() { return new ActiveXObject("Msxml2.XMLHTTP.3.0"); },
+      function() { return new ActiveXObject('Microsoft.XMLHTTP'); },
+      function() { return new ActiveXObject('Msxml2.XMLHTTP'); },
+      function() { return new ActiveXObject('Msxml2.XMLHTTP.3.0'); },
       function() { return new XMLHttpRequest(); }
     ];
     for (var i = factories.length; i--; ) {

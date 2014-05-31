@@ -1,4 +1,0 @@
-node_modules
-.DS_Store
-before_commit
-dist/fabric.js

@@ -1,6 +1,6 @@
 (function(global) {
 
-  "use strict";
+  'use strict';
 
   var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
@@ -427,8 +427,8 @@
 
       for (var i = 0, len = textLines.length; i < len; i++) {
 
-        var lineWidth = this._getLineWidth(ctx, textLines[i]);
-        var lineLeftOffset = this._getLineLeftOffset(lineWidth);
+        var lineWidth = this._getLineWidth(ctx, textLines[i]),
+            lineLeftOffset = this._getLineLeftOffset(lineWidth);
 
         this._boundaries.push({
           height: this.fontSize * this.lineHeight,
@@ -511,18 +511,18 @@
         return;
       }
 
-      var lineWidth = ctx.measureText(line).width;
-      var totalWidth = this.width;
+      var lineWidth = ctx.measureText(line).width,
+          totalWidth = this.width;
 
       if (totalWidth > lineWidth) {
         // stretch the line
-        var words = line.split(/\s+/);
-        var wordsWidth = ctx.measureText(line.replace(/\s+/g, '')).width;
-        var widthDiff = totalWidth - wordsWidth;
-        var numSpaces = words.length - 1;
-        var spaceWidth = widthDiff / numSpaces;
+        var words = line.split(/\s+/),
+            wordsWidth = ctx.measureText(line.replace(/\s+/g, '')).width,
+            widthDiff = totalWidth - wordsWidth,
+            numSpaces = words.length - 1,
+            spaceWidth = widthDiff / numSpaces,
+            leftOffset = 0;
 
-        var leftOffset = 0;
         for (var i = 0, len = words.length; i < len; i++) {
           this._renderChars(method, ctx, words[i], left + leftOffset, top, lineIndex);
           leftOffset += ctx.measureText(words[i]).width + spaceWidth;
@@ -664,8 +664,8 @@
 
         if (textLines[i] !== '') {
 
-          var lineWidth = this._getLineWidth(ctx, textLines[i]);
-          var lineLeftOffset = this._getLineLeftOffset(lineWidth);
+          var lineWidth = this._getLineWidth(ctx, textLines[i]),
+              lineLeftOffset = this._getLineLeftOffset(lineWidth);
 
           ctx.fillRect(
             this._getLeftOffset() + lineLeftOffset,
@@ -714,15 +714,15 @@
       if (!this.textDecoration) return;
 
       // var halfOfVerticalBox = this.originY === 'top' ? 0 : this._getTextHeight(ctx, textLines) / 2;
-      var halfOfVerticalBox = this._getTextHeight(ctx, textLines) / 2;
-      var _this = this;
+      var halfOfVerticalBox = this._getTextHeight(ctx, textLines) / 2,
+          _this = this;
 
       /** @ignore */
       function renderLinesAtOffset(offset) {
         for (var i = 0, len = textLines.length; i < len; i++) {
 
-          var lineWidth = _this._getLineWidth(ctx, textLines[i]);
-          var lineLeftOffset = _this._getLineLeftOffset(lineWidth);
+          var lineWidth = _this._getLineWidth(ctx, textLines[i]),
+              lineLeftOffset = _this._getLineLeftOffset(lineWidth);
 
           ctx.fillRect(
             _this._getLeftOffset() + lineLeftOffset,
@@ -766,8 +766,13 @@
       if (!this.visible) return;
 
       ctx.save();
-      var v = this.canvas.viewportTransform;
+      var v = this.getViewportTransform();
       ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
+
+      var m = this.transformMatrix;
+      if (m && (!this.group || this.group.type === 'path-group')) {
+        ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
+      }
       this._render(ctx);
       ctx.restore();
 
@@ -953,7 +958,7 @@
           (i === 0 || this.useNative ? 'y' : 'dy'), '="',
           toFixed(this.useNative
             ? ((lineHeight * i) - this.height / 2)
-            : (lineHeight * lineTopOffsetMultiplier), 2) , '" ',
+            : (lineHeight * lineTopOffsetMultiplier), 2), '" ',
           // doing this on <tspan> elements since setting opacity
           // on containing <text> one doesn't work in Illustrator
           this._getFillAttributes(this.fill), '>',
@@ -1048,7 +1053,14 @@
    * @see: http://www.w3.org/TR/SVG/text.html#TextElement
    */
   fabric.Text.ATTRIBUTE_NAMES = fabric.SHARED_ATTRIBUTES.concat(
-    'x y font-family font-style font-weight font-size text-decoration'.split(' '));
+    'x y dx dy font-family font-style font-weight font-size text-decoration text-anchor'.split(' '));
+
+  /**
+   * Default SVG font size
+   * @static
+   * @memberOf fabric.Text
+   */
+  fabric.Text.DEFAULT_SVG_FONT_SIZE = 16;
 
   /**
    * Returns fabric.Text instance from an SVG element (<b>not yet implemented</b>)
@@ -1065,6 +1077,20 @@
 
     var parsedAttributes = fabric.parseAttributes(element, fabric.Text.ATTRIBUTE_NAMES);
     options = fabric.util.object.extend((options ? fabric.util.object.clone(options) : { }), parsedAttributes);
+
+    if ('dx' in parsedAttributes) {
+      options.left += parsedAttributes.dx;
+    }
+    if ('dy' in parsedAttributes) {
+      options.top += parsedAttributes.dy;
+    }
+    if (!('fontSize' in options)) {
+      options.fontSize = fabric.Text.DEFAULT_SVG_FONT_SIZE;
+    }
+
+    if (!options.originX) {
+      options.originX = 'center';
+    }
 
     var text = new fabric.Text(element.textContent, options);
 

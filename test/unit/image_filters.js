@@ -92,7 +92,7 @@
     var filter = new fabric.Image.filters.Brightness();
 
     equal(filter.type, 'Brightness');
-    equal(filter.brightness, 100);
+    equal(filter.brightness, 0);
 
     var filter2 = new fabric.Image.filters.Brightness({brightness: 30});
     equal(filter2.brightness, 30);
@@ -108,6 +108,11 @@
     ok(typeof filter.toObject == 'function');
 
     var object = filter.toObject();
+    equal(JSON.stringify(object), '{"type":"Brightness","brightness":0}');
+
+    filter.brightness = 100;
+
+    object = filter.toObject();
     equal(JSON.stringify(object), '{"type":"Brightness","brightness":100}');
   });
 
@@ -116,6 +121,11 @@
     ok(typeof filter.toJSON == 'function');
 
     var json = filter.toJSON();
+    equal(JSON.stringify(json), '{"type":"Brightness","brightness":0}');
+
+    filter.brightness = 100;
+
+    json = filter.toJSON();
     equal(JSON.stringify(json), '{"type":"Brightness","brightness":100}');
   });
 
@@ -330,7 +340,7 @@
     var filter = new fabric.Image.filters.Noise();
 
     equal(filter.type, 'Noise');
-    equal(filter.noise, 100);
+    equal(filter.noise, 0);
 
     var filter2 = new fabric.Image.filters.Noise({noise: 200});
     equal(filter2.noise, 200);
@@ -346,6 +356,11 @@
     ok(typeof filter.toObject == 'function');
 
     var object = filter.toObject();
+    equal(JSON.stringify(object), '{"type":"Noise","noise":0}');
+
+    filter.noise = 100;
+
+    object = filter.toObject();
     equal(JSON.stringify(object), '{"type":"Noise","noise":100}');
   });
 
@@ -354,6 +369,11 @@
     ok(typeof filter.toJSON == 'function');
 
     var json = filter.toJSON();
+    equal(JSON.stringify(json), '{"type":"Noise","noise":0}');
+
+    filter.noise = 100;
+
+    json = filter.toJSON();
     equal(JSON.stringify(json), '{"type":"Noise","noise":100}');
   });
 

@@ -1,6 +1,6 @@
 (function(global) {
 
-  "use strict";
+  'use strict';
 
   /* Adaptation of work of Kevin Lindsey (kevin@kevlindev.com) */
 
@@ -250,7 +250,7 @@
      * @return {String}
      */
     toString: function () {
-      return this.x + "," + this.y;
+      return this.x + ',' + this.y;
     },
 
     /**

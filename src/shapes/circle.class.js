@@ -1,6 +1,6 @@
 (function(global) {
 
-  "use strict";
+  'use strict';
 
   var fabric  = global.fabric || (global.fabric = { }),
       piBy2   = Math.PI * 2,
@@ -25,6 +25,13 @@
      * @default
      */
     type: 'circle',
+
+    /**
+     * Radius of this circle
+     * @type Number
+     * @default
+     */
+    radius: 0,
 
     /**
      * Constructor
@@ -99,7 +106,7 @@
       ctx.closePath();
 
       this._renderFill(ctx);
-      this._renderStroke(ctx);
+      this.stroke && this._renderStroke(ctx);
     },
 
     /**

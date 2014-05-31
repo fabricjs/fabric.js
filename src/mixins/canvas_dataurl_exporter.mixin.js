@@ -59,8 +59,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
     this.renderAll(true);
 
-    var canvasEl = this.upperCanvasEl || this.lowerCanvasEl;
-    var croppedCanvasEl = this.__getCroppedCanvas(canvasEl, cropping);
+    var canvasEl = this.upperCanvasEl || this.lowerCanvasEl,
+        croppedCanvasEl = this.__getCroppedCanvas(canvasEl, cropping);
 
     // to avoid common confusion https://github.com/kangax/fabric.js/issues/806
     if (format === 'jpg') {
@@ -87,9 +87,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
   __getCroppedCanvas: function(canvasEl, cropping) {
 
     var croppedCanvasEl,
-        croppedCtx;
-
-    var shouldCrop = 'left' in cropping ||
+        croppedCtx,
+        shouldCrop = 'left' in cropping ||
                      'top' in cropping ||
                      'width' in cropping ||
                      'height' in cropping;
@@ -122,7 +121,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
         ctx = this.contextTop || this.contextContainer;
 
-    this.setWidth(scaledWidth).setHeight(scaledHeight);
+    if (multiplier > 1) {
+      this.setWidth(scaledWidth).setHeight(scaledHeight);
+    }
     ctx.scale(multiplier, multiplier);
 
     if (cropping.left) {
@@ -134,8 +135,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     if (cropping.width) {
       cropping.width *= multiplier;
     }
+    else if (multiplier < 1) {
+      cropping.width = scaledWidth;
+    }
     if (cropping.height) {
       cropping.height *= multiplier;
+    }
+    else if (multiplier < 1) {
+      cropping.height = scaledHeight;
     }
 
     if (activeGroup) {

@@ -1,6 +1,6 @@
 (function(global) {
 
-  "use strict";
+  'use strict';
 
   var fabric  = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend;
@@ -57,9 +57,9 @@
           index = (i * 4) * jLen + (j * 4);
 
           r = data[index];
-          g = data[index+1];
-          b = data[index+2];
-          a = data[index+3];
+          g = data[index + 1];
+          b = data[index + 2];
+          a = data[index + 3];
 
           /*
            blocksize: 4

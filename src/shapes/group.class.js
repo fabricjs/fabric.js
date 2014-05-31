@@ -1,6 +1,6 @@
 (function(global){
 
-  "use strict";
+  'use strict';
 
   var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
@@ -232,7 +232,7 @@
      * @private
      */
     _renderObject: function(object, ctx) {
-      var v = this.canvas.viewportTransform,
+      var v = this.getViewportTransform(),
           sxy = fabric.util.transformPoint(
         new fabric.Point(this.scaleX, this.scaleY),
         v,
@@ -409,11 +409,10 @@
      */
     _setOpacityIfSame: function() {
       var objects = this.getObjects(),
-          firstValue = objects[0] ? objects[0].get('opacity') : 1;
-
-      var isSameOpacity = objects.every(function(o) {
-        return o.get('opacity') === firstValue;
-      });
+          firstValue = objects[0] ? objects[0].get('opacity') : 1,
+          isSameOpacity = objects.every(function(o) {
+            return o.get('opacity') === firstValue;
+          });
 
       if (isSameOpacity) {
         this.opacity = firstValue;
@@ -423,7 +422,7 @@
     /**
      * @private
      */
-    _calcBounds: function() {
+    _calcBounds: function(onlyWidthHeight) {
       var aX = [],
           aY = [],
           o;
@@ -437,26 +436,29 @@
         }
       }
 
-      this.set(this._getBounds(aX, aY));
+      this.set(this._getBounds(aX, aY, onlyWidthHeight));
     },
 
     /**
      * @private
      */
-    _getBounds: function(aX, aY) {
+    _getBounds: function(aX, aY, onlyWidthHeight) {
       var ivt;
       if (this.canvas) {
-        ivt = fabric.util.invertTransform(this.canvas.viewportTransform);
+        ivt = fabric.util.invertTransform(this.getViewportTransform());
       }
       var minXY = fabric.util.transformPoint(new fabric.Point(min(aX), min(aY)), ivt),
-          maxXY = fabric.util.transformPoint(new fabric.Point(max(aX), max(aY)), ivt);
+          maxXY = fabric.util.transformPoint(new fabric.Point(max(aX), max(aY)), ivt),
+          obj = {
+            width: (maxXY.x - minXY.x) || 0,
+            height: (maxXY.y - minXY.y) || 0
+          };
 
-      return {
-        width: (maxXY.x - minXY.x) || 0,
-        height: (maxXY.y - minXY.y) || 0,
-        left: (minXY.x + maxXY.x) / 2 || 0,
-        top: (minXY.y + maxXY.y) / 2 || 0,
-      };
+      if (!onlyWidthHeight) {
+        obj.left = (minXY.x + maxXY.x) / 2 || 0;
+        obj.top = (minXY.y + maxXY.y) / 2 || 0;
+      }
+      return obj;
     },
 
     /* _TO_SVG_START_ */

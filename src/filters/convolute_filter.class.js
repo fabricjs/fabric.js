@@ -1,6 +1,6 @@
 (function(global) {
 
-  "use strict";
+  'use strict';
 
   var fabric  = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend;
@@ -66,9 +66,11 @@
       options = options || { };
 
       this.opaque = options.opaque;
-      this.matrix = options.matrix || [ 0, 0, 0,
+      this.matrix = options.matrix || [
+        0, 0, 0,
         0, 1, 0,
-        0, 0, 0 ];
+        0, 0, 0
+      ];
 
       var canvasEl = fabric.util.createCanvasElement();
       this.tmpCtx = canvasEl.getContext('2d');
@@ -95,49 +97,49 @@
           halfSide = Math.floor(side/2),
           src = pixels.data,
           sw = pixels.width,
-          sh = pixels.height;
+          sh = pixels.height,
 
-      // pad output by the convolution matrix
-      var w = sw;
-      var h = sh;
-      var output = this._createImageData(w, h);
+          // pad output by the convolution matrix
+          w = sw,
+          h = sh,
+          output = this._createImageData(w, h),
 
-      var dst = output.data;
+          dst = output.data,
 
-      // go through the destination image pixels
-      var alphaFac = this.opaque ? 1 : 0;
+          // go through the destination image pixels
+          alphaFac = this.opaque ? 1 : 0;
 
-      for (var y=0; y<h; y++) {
-        for (var x=0; x<w; x++) {
-          var sy = y;
-          var sx = x;
-          var dstOff = (y*w+x)*4;
-          // calculate the weighed sum of the source image pixels that
-          // fall under the convolution matrix
-          var r=0, g=0, b=0, a=0;
+      for (var y = 0; y < h; y++) {
+        for (var x = 0; x < w; x++) {
+          var sy = y,
+              sx = x,
+              dstOff = (y * w + x) * 4,
+              // calculate the weighed sum of the source image pixels that
+              // fall under the convolution matrix
+              r = 0, g = 0, b = 0, a = 0;
 
-          for (var cy=0; cy<side; cy++) {
-            for (var cx=0; cx<side; cx++) {
+          for (var cy = 0; cy < side; cy++) {
+            for (var cx = 0; cx < side; cx++) {
 
-              var scy = sy + cy - halfSide;
-              var scx = sx + cx - halfSide;
+              var scy = sy + cy - halfSide,
+                  scx = sx + cx - halfSide;
 
               /* jshint maxdepth:5 */
               if (scy < 0 || scy > sh || scx < 0 || scx > sw) continue;
 
-              var srcOff = (scy*sw+scx)*4;
-              var wt = weights[cy*side+cx];
+              var srcOff = (scy * sw + scx) * 4,
+                  wt = weights[cy * side + cx];
 
               r += src[srcOff] * wt;
-              g += src[srcOff+1] * wt;
-              b += src[srcOff+2] * wt;
-              a += src[srcOff+3] * wt;
+              g += src[srcOff + 1] * wt;
+              b += src[srcOff + 2] * wt;
+              a += src[srcOff + 3] * wt;
             }
           }
           dst[dstOff] = r;
-          dst[dstOff+1] = g;
-          dst[dstOff+2] = b;
-          dst[dstOff+3] = a + alphaFac*(255-a);
+          dst[dstOff + 1] = g;
+          dst[dstOff + 2] = b;
+          dst[dstOff + 3] = a + alphaFac * (255 - a);
         }
       }
 
@@ -163,7 +165,7 @@
    * @return {fabric.Image.filters.Convolute} Instance of fabric.Image.filters.Convolute
    */
   fabric.Image.filters.Convolute.fromObject = function(object) {
-      return new fabric.Image.filters.Convolute(object);
+    return new fabric.Image.filters.Convolute(object);
   };
 
 })(typeof exports !== 'undefined' ? exports : this);

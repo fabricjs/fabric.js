@@ -1,12 +1,15 @@
-<a href="http://fabricjs.challengepost.com/?utm_source=partner&utm_medium=banner&utm_campaign=fabricjs" style="display: block">
-  <img src="https://dl.dropboxusercontent.com/u/822184/fabric-js-promo-widget-github.gif" style="width: auto">
-</a>
-
 ### Fabric
+
 [![Build Status](https://secure.travis-ci.org/kangax/fabric.js.png?branch=master)](http://travis-ci.org/#!/kangax/fabric.js)
 [![Code Climate](https://codeclimate.com/repos/526a0ed089af7e6cf2001389/badges/d1c922dd1511ffa8a72f/gpa.png)](https://codeclimate.com/repos/526a0ed089af7e6cf2001389/feed)
 [![Coverage Status](https://coveralls.io/repos/kangax/fabric.js/badge.png?branch=master)](https://coveralls.io/r/kangax/fabric.js?branch=master)
-<a href="https://npmjs.org/package/fabric"><img src="https://badge.fury.io/js/fabric.png"></a>
+[![NPM version](https://badge.fury.io/js/fabric.png)](http://badge.fury.io/js/fabric)
+[![Bower version](https://badge.fury.io/bo/fabric.png)](http://badge.fury.io/bo/fabric)
+
+
+[![Dependency Status](https://david-dm.org/kangax/fabric.js.png?theme=shields.io)](https://david-dm.org/kangax/fabric.js)
+[![devDependency Status](https://david-dm.org/kangax/fabric.js/dev-status.png?theme=shields.io)](https://david-dm.org/kangax/fabric.js#info=devDependencies)
+
 
 **Fabric.js** is a framework that makes it easy to work with HTML5 canvas element. It is an **interactive object model** on top of canvas element. It is also an **SVG-to-canvas parser**.
 
@@ -18,7 +21,7 @@ Using Fabric.js, you can create and populate objects on canvas; objects like sim
 
 ### Goals
 
-- Unit tested (2300+ tests at the moment)
+- Unit tested (2400+ tests at the moment)
 - Modular (~60 small ["classes", modules, mixins](http://fabricjs.com/docs/))
 - Cross-browser
 - [Fast](https://github.com/kangax/fabric.js/wiki/Focus-on-speed)
@@ -104,13 +107,23 @@ Fabric.js started as a foundation for design editor on [printio.ru](http://print
 
     If you use google closure compiler you have to add `sourceMappingURL` manually at the end of the minified file all.min.js (see issue https://code.google.com/p/closure-compiler/issues/detail?id=941).
 
-        //# sourceMappingURL=all.min.js.map
+        //# sourceMappingURL=fabric.min.js.map
+
+6. Lint source code (prerequisite: `npm -g install jshint`)
+
+        $ jshint src
+
+7. Ensure code guidelines are met (prerequisite: `npm -g install jscs`)
+
+        $ jscs src
 
 ### Demos
 
 - [Demos](http://fabricjs.com/demos/)
 - [Kitchensink demo](http://fabricjs.com/kitchensink/)
 - [Benchmarks](http://fabricjs.com/benchmarks/)
+
+[Who's using Fabric?](http://trends.builtwith.com/javascript/FabricJS)
 
 ### Documentation
 
@@ -137,11 +150,11 @@ These are the optional modules that could be specified for inclusion, when build
 
 Additional flags for build script are:
 
-- **requirejs** — Makes fabric requirejs AMD-compatible in `dist/all.js`. *Note:* an unminified, requirejs-compatible version is always created in `dist/all.require.js`
+- **requirejs** — Makes fabric requirejs AMD-compatible in `dist/fabric.js`. *Note:* an unminified, requirejs-compatible version is always created in `dist/fabric.require.js`
 - **no-strict** — Strips "use strict" directives from source
 - **no-svg-export** — Removes svg exporting functionality
 - **no-es5-compat** - Removes ES5 compat methods (Array.prototype.*, String.prototype.*, Function.prototype.*)
-- **sourcemap** - Generates a sourceMap file and adds the `sourceMappingURL` (only if uglifyjs is used) to `dist/all.min.js`
+- **sourcemap** - Generates a sourceMap file and adds the `sourceMappingURL` (only if uglifyjs is used) to `dist/fabric.min.js`
 
 For example:
 
@@ -151,19 +164,36 @@ For example:
 
 #### Adding red rectangle to canvas
 
+```html
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
     <canvas id="canvas" width="300" height="300"></canvas>
-    ...
-    var canvas = new fabric.Canvas('canvas');
 
-    var rect = new fabric.Rect({
-      top: 100,
-      left: 100,
-      width: 60,
-      height: 70,
-      fill: 'red'
-    });
+    <script src="lib/fabric.js"></script>
+    <script>
+        var canvas = new fabric.Canvas('canvas');
 
-    canvas.add(rect);
+        var rect = new fabric.Rect({
+            top : 100,
+            left : 100,
+            width : 60,
+            height : 70,
+            fill : 'red'
+        });
+
+        canvas.add(rect);
+    </script>
+</body>
+</html>
+```
+
+### Helping Fabric
+
+- [Fabric on Bountysource](https://www.bountysource.com/trackers/23217-fabric-js)
+- [Fabric on CodeTriage](http://www.codetriage.com/kangax/fabric.js)
 
 ### Staying in touch
 
@@ -174,6 +204,8 @@ Questions, suggestions — [fabric.js on Google Groups](http://groups.google.com
 See [Fabric questions on Stackoverflow](stackoverflow.com/questions/tagged/fabricjs),
 Fabric snippets on [jsfiddle](http://jsfiddle.net/user/fabricjs/fiddles/)
 or [codepen.io](http://codepen.io/tag/fabricjs).
+
+Fabric on [LibKnot](http://libknot.ohmztech.com/).
 
 Get help in Fabric's IRC channel — irc://irc.freenode.net/#fabric.js
 
@@ -187,7 +219,7 @@ Get help in Fabric's IRC channel — irc://irc.freenode.net/#fabric.js
 
 ### MIT License
 
-Copyright (c) 2008-2013 Printio (Juriy Zaytsev, Maxim Chernyak)
+Copyright (c) 2008-2014 Printio (Juriy Zaytsev, Maxim Chernyak)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -203,3 +235,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/kangax/fabric.js/trend.png)](https://bitdeli.com/free "Bitdeli Badge")

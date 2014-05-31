@@ -89,6 +89,18 @@
     });
   });
 
+  asyncTest('path array not shared when cloned', function() {
+    makePathObject(function(originalPath) {
+      originalPath.clone(function(clonedPath) {
+
+        clonedPath.path[0][1] = 200;
+        equal(originalPath.path[0][1], 100);
+
+        start();
+      });
+    });
+  });
+
   asyncTest('toDatalessObject', function() {
     makePathObject(function(path) {
       ok(typeof path.toDatalessObject == 'function');
@@ -148,9 +160,10 @@
         transformMatrix:  [2, 0, 0, 2, 0, 0]
       }));
 
-      var ANGLE = 90;
+      var ANGLE_DEG = 90;
+      var ANGLE = ANGLE_DEG * Math.PI / 180;
 
-      elPath.setAttribute('transform', 'rotate(' + ANGLE + ')');
+      elPath.setAttribute('transform', 'rotate(' + ANGLE_DEG + ')');
       fabric.Path.fromElement(elPath, function(path) {
 
         deepEqual(
@@ -159,6 +172,22 @@
         );
         start();
       });
+    });
+  });
+
+  asyncTest('numbers with leading decimal point', function() {
+    ok(typeof fabric.Path.fromElement == 'function');
+    var elPath = fabric.document.createElement('path');
+
+    elPath.setAttribute('d', 'M 100 100 L 300 100 L 200 300 z');
+    elPath.setAttribute('transform', 'scale(.2)');
+
+    fabric.Path.fromElement(elPath, function(path) {
+      ok(path instanceof fabric.Path);
+
+      deepEqual(path.toObject().transformMatrix, [0.2, 0, 0, 0.2, 0, 0]);
+
+      start();
     });
   });
 
@@ -189,6 +218,19 @@
       deepEqual(obj.path[1], ['c', -0.047, 0.132, -0.138, 0.221, -0.322, 0.215]);
       deepEqual(obj.path[2], ['c', 0.046, -0.131, 0.137, -0.221, 0.322, -0.215]);
       deepEqual(obj.path[3], ['z']);
+      start();
+    });
+  });
+
+  asyncTest('compressed path commands with e^x', function() {
+    var el = getPathElement('M56.224e2 84.12E-2c-.047.132-.138.221-.322.215.046-.131.137-.221.322-.215m-.050 -20.100z');
+    fabric.Path.fromElement(el, function(obj) {
+
+      deepEqual(obj.path[0], ['M', 5622.4, 0.8412]);
+      deepEqual(obj.path[1], ['c', -0.047, 0.132, -0.138, 0.221, -0.322, 0.215]);
+      deepEqual(obj.path[2], ['c', 0.046, -0.131, 0.137, -0.221, 0.322, -0.215]);
+      deepEqual(obj.path[3], ['m', -0.05, -20.100]);
+      deepEqual(obj.path[4], ['z']);
       start();
     });
   });

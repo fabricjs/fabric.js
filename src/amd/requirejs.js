@@ -6,6 +6,6 @@ window.fabric = fabric;
 var exports = exports || {};
 exports.fabric = fabric;
 
-if (typeof define === "function" && define.amd) {
+if (typeof define === 'function' && define.amd) {
   define([], function() { return fabric });
 }

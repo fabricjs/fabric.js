@@ -8,32 +8,32 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   getSvgStyles: function() {
 
     var fill = this.fill
-      ? (this.fill.toLive ? 'url(#SVGID_' + this.fill.id + ')' : this.fill)
-      : 'none';
+          ? (this.fill.toLive ? 'url(#SVGID_' + this.fill.id + ')' : this.fill)
+          : 'none',
 
-    var stroke = this.stroke
-      ? (this.stroke.toLive ? 'url(#SVGID_' + this.stroke.id + ')' : this.stroke)
-      : 'none';
+        stroke = this.stroke
+          ? (this.stroke.toLive ? 'url(#SVGID_' + this.stroke.id + ')' : this.stroke)
+          : 'none',
 
-    var strokeWidth = this.strokeWidth ? this.strokeWidth : '0';
-    var strokeDashArray = this.strokeDashArray ? this.strokeDashArray.join(' ') : '';
-    var strokeLineCap = this.strokeLineCap ? this.strokeLineCap : 'butt';
-    var strokeLineJoin = this.strokeLineJoin ? this.strokeLineJoin : 'miter';
-    var strokeMiterLimit = this.strokeMiterLimit ? this.strokeMiterLimit : '4';
-    var opacity = typeof this.opacity !== 'undefined' ? this.opacity : '1';
+        strokeWidth = this.strokeWidth ? this.strokeWidth : '0',
+        strokeDashArray = this.strokeDashArray ? this.strokeDashArray.join(' ') : '',
+        strokeLineCap = this.strokeLineCap ? this.strokeLineCap : 'butt',
+        strokeLineJoin = this.strokeLineJoin ? this.strokeLineJoin : 'miter',
+        strokeMiterLimit = this.strokeMiterLimit ? this.strokeMiterLimit : '4',
+        opacity = typeof this.opacity !== 'undefined' ? this.opacity : '1',
 
-    var visibility = this.visible ? '' : " visibility: hidden;";
-    var filter = this.shadow && this.type !== 'text' ? 'filter: url(#SVGID_' + this.shadow.id + ');' : '';
+        visibility = this.visible ? '' : ' visibility: hidden;',
+        filter = this.shadow && this.type !== 'text' ? 'filter: url(#SVGID_' + this.shadow.id + ');' : '';
 
     return [
-      "stroke: ", stroke, "; ",
-      "stroke-width: ", strokeWidth, "; ",
-      "stroke-dasharray: ", strokeDashArray, "; ",
-      "stroke-linecap: ", strokeLineCap, "; ",
-      "stroke-linejoin: ", strokeLineJoin, "; ",
-      "stroke-miterlimit: ", strokeMiterLimit, "; ",
-      "fill: ", fill, "; ",
-      "opacity: ", opacity, ";",
+      'stroke: ', stroke, '; ',
+      'stroke-width: ', strokeWidth, '; ',
+      'stroke-dasharray: ', strokeDashArray, '; ',
+      'stroke-linecap: ', strokeLineCap, '; ',
+      'stroke-linejoin: ', strokeLineJoin, '; ',
+      'stroke-miterlimit: ', strokeMiterLimit, '; ',
+      'fill: ', fill, '; ',
+      'opacity: ', opacity, ';',
       filter,
       visibility
     ].join('');
@@ -44,34 +44,37 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @return {String}
    */
   getSvgTransform: function() {
-    var toFixed = fabric.util.toFixed;
-    var angle = this.getAngle();
-    var center = this.getCenterPoint();
+    var toFixed = fabric.util.toFixed,
+        angle = this.getAngle(),
+        center = this.getCenterPoint(),
 
-    var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
+        NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
 
-    var translatePart = "translate(" +
+        translatePart = 'translate(' +
                           toFixed(center.x, NUM_FRACTION_DIGITS) +
-                          " " +
+                          ' ' +
                           toFixed(center.y, NUM_FRACTION_DIGITS) +
-                        ")";
+                        ')',
 
-    var anglePart = angle !== 0
-      ? (" rotate(" + toFixed(angle, NUM_FRACTION_DIGITS) + ")")
-      : '';
+        anglePart = angle !== 0
+          ? (' rotate(' + toFixed(angle, NUM_FRACTION_DIGITS) + ')')
+          : '',
 
-    var scalePart = (this.scaleX === 1 && this.scaleY === 1)
-      ? '' :
-      (" scale(" +
-        toFixed(this.scaleX, NUM_FRACTION_DIGITS) +
-        " " +
-        toFixed(this.scaleY, NUM_FRACTION_DIGITS) +
-      ")");
+        scalePart = (this.scaleX === 1 && this.scaleY === 1)
+          ? '' :
+          (' scale(' +
+            toFixed(this.scaleX, NUM_FRACTION_DIGITS) +
+            ' ' +
+            toFixed(this.scaleY, NUM_FRACTION_DIGITS) +
+          ')'),
 
-    var flipXPart = this.flipX ? "matrix(-1 0 0 1 0 0) " : "";
-    var flipYPart = this.flipY ? "matrix(1 0 0 -1 0 0)" : "";
+        flipXPart = this.flipX ? 'matrix(-1 0 0 1 0 0) ' : '',
 
-    return [ translatePart, anglePart, scalePart, flipXPart, flipYPart ].join('');
+        flipYPart = this.flipY ? 'matrix(1 0 0 -1 0 0)' : '';
+
+    return [
+      translatePart, anglePart, scalePart, flipXPart, flipYPart
+    ].join('');
   },
 
   /**

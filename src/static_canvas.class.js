@@ -1,6 +1,6 @@
 (function () {
 
-  "use strict";
+  'use strict';
 
   if (fabric.StaticCanvas) {
     fabric.warn('fabric.StaticCanvas is already defined.');
@@ -124,7 +124,14 @@
      * @type Boolean
      * @default
      */
-     allowTouchScrolling: false,
+    allowTouchScrolling: false,
+
+    /**
+     * Indicates whether this canvas will use image smoothing, this is on by default in browsers
+     * @type Boolean
+     * @default
+     */
+    imageSmoothingEnabled: true,
 
     /**
      * The transformation (in the format of Canvas transform) which focuses the viewport
@@ -151,6 +158,7 @@
 
       this._createLowerCanvas(el);
       this._initOptions(options);
+      this._setImageSmoothing();
 
       if (options.overlayImage) {
         this.setOverlayImage(options.overlayImage, this.renderAll.bind(this));
@@ -312,6 +320,20 @@
 
     /**
      * @private
+     * @see {@link http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#dom-context-2d-imagesmoothingenabled|WhatWG Canvas Standard}
+     */
+    _setImageSmoothing: function(){
+      var ctx = this.getContext();
+
+      ctx.imageSmoothingEnabled       = this.imageSmoothingEnabled;
+      ctx.webkitImageSmoothingEnabled = this.imageSmoothingEnabled;
+      ctx.mozImageSmoothingEnabled    = this.imageSmoothingEnabled;
+      ctx.msImageSmoothingEnabled     = this.imageSmoothingEnabled;
+      ctx.oImageSmoothingEnabled      = this.imageSmoothingEnabled;
+    },
+
+    /**
+     * @private
      * @param {String} property Property to set ({@link fabric.StaticCanvas#backgroundImage|backgroundImage}
      * or {@link fabric.StaticCanvas#overlayImage|overlayImage})
      * @param {(fabric.Image|String)} image fabric.Image instance or URL of an image to set background or overlay to
@@ -397,10 +419,13 @@
         this[prop] = options[prop];
       }
 
-      this.width = parseInt(this.lowerCanvasEl.width, 10) || 0;
-      this.height = parseInt(this.lowerCanvasEl.height, 10) || 0;
+      this.width = this.width || parseInt(this.lowerCanvasEl.width, 10) || 0;
+      this.height = this.height || parseInt(this.lowerCanvasEl.height, 10) || 0;
 
       if (!this.lowerCanvasEl.style) return;
+
+      this.lowerCanvasEl.width = this.width;
+      this.lowerCanvasEl.height = this.height;
 
       this.lowerCanvasEl.style.width = this.width + 'px';
       this.lowerCanvasEl.style.height = this.height + 'px';
@@ -723,8 +748,8 @@
      */
     renderAll: function (allOnTop) {
 
-      var canvasToDrawOn = this[(allOnTop === true && this.interactive) ? 'contextTop' : 'contextContainer'];
-      var activeGroup = this.getActiveGroup();
+      var canvasToDrawOn = this[(allOnTop === true && this.interactive) ? 'contextTop' : 'contextContainer'],
+          activeGroup = this.getActiveGroup();
 
       if (this.contextTop && this.selection && !this._groupSelector) {
         this.clearContext(this.contextTop);
@@ -765,10 +790,19 @@
      * @param {fabric.Group} activeGroup
      */
     _renderObjects: function(ctx, activeGroup) {
-      for (var i = 0, length = this._objects.length; i < length; ++i) {
-        if (!activeGroup ||
-            (activeGroup && this._objects[i] && !activeGroup.contains(this._objects[i]))) {
+      var i, length;
+
+      // fast path
+      if (!activeGroup) {
+        for (i = 0, length = this._objects.length; i < length; ++i) {
           this._draw(ctx, this._objects[i]);
+        }
+      }
+      else {
+        for (i = 0, length = this._objects.length; i < length; ++i) {
+          if (this._objects[i] && !activeGroup.contains(this._objects[i])) {
+            this._draw(ctx, this._objects[i]);
+          }
         }
       }
     },
@@ -859,9 +893,7 @@
         activeGroup.render(ctx);
       }
 
-      if (this.overlayImage) {
-        ctx.drawImage(this.overlayImage, this.overlayImageLeft, this.overlayImageTop);
-      }
+      this._renderOverlay(ctx);
 
       this.fire('after:render');
 
@@ -978,11 +1010,20 @@
       fabric.util.populateWithProperties(this, data, propertiesToInclude);
 
       if (activeGroup) {
-        this.setActiveGroup(new fabric.Group(activeGroup.getObjects()));
+        this.setActiveGroup(new fabric.Group(activeGroup.getObjects(), {
+          originX: 'center',
+          originY: 'center'
+        }));
         activeGroup.forEachObject(function(o) {
           o.set('active', true);
         });
+
+        if (this._currentTransform) {
+          this._currentTransform.target = this.getActiveGroup();
+        }
       }
+
+
       return data;
     },
 
@@ -1119,7 +1160,7 @@
           'width="', (options.viewBox ? options.viewBox.width : this.width), '" ',
           'height="', (options.viewBox ? options.viewBox.height : this.height), '" ',
           (this.backgroundColor && !this.backgroundColor.toLive
-            ? 'style="background-color: ' + this.backgroundColor +'" '
+            ? 'style="background-color: ' + this.backgroundColor + '" '
             : null),
           (options.viewBox
               ? 'viewBox="' +
@@ -1251,7 +1292,7 @@
         newIdx = idx;
 
         // traverse down the stack looking for the nearest intersecting object
-        for (var i=idx-1; i>=0; --i) {
+        for (var i = idx - 1; i >= 0; --i) {
 
           var isIntersecting = object.intersectsWithObject(this._objects[i]) ||
                                object.isContainedWithinObject(this._objects[i]) ||
@@ -1281,7 +1322,7 @@
       var idx = this._objects.indexOf(object);
 
       // if object is not on top of stack (last item in an array)
-      if (idx !== this._objects.length-1) {
+      if (idx !== this._objects.length - 1) {
         var newIdx = this._findNewUpperIndex(object, idx, intersecting);
 
         removeFromArray(this._objects, object);
@@ -1314,7 +1355,7 @@
         }
       }
       else {
-        newIdx = idx+1;
+        newIdx = idx + 1;
       }
 
       return newIdx;
@@ -1349,7 +1390,7 @@
      * @return {String} string representation of an instance
      */
     toString: function () {
-      return '#<fabric.Canvas (' + this.complexity() + '): '+
+      return '#<fabric.Canvas (' + this.complexity() + '): ' +
                '{ objects: ' + this.getObjects().length + ' }>';
     }
   });

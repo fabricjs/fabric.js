@@ -162,7 +162,9 @@
      * @return {Object} Object for given namespace (default fabric)
      */
     resolveNamespace: function(namespace) {
-      if (!namespace) return fabric;
+      if (!namespace) {
+        return fabric;
+      }
 
       var parts = namespace.split('.'),
           len = parts.length,
@@ -324,7 +326,7 @@
     drawDashedLine: function(ctx, x, y, x2, y2, da) {
       var dx = x2 - x,
           dy = y2 - y,
-          len = sqrt(dx*dx + dy*dy),
+          len = sqrt(dx * dx + dy * dy),
           rot = atan2(dy, dx),
           dc = da.length,
           di = 0,
@@ -432,22 +434,23 @@
       var a = [
         [matrixA[0], matrixA[2], matrixA[4]],
         [matrixA[1], matrixA[3], matrixA[5]],
-        [0         , 0         , 1         ]
-      ];
+        [0,          0,          1         ]
+      ],
 
-      var b = [
+      b = [
         [matrixB[0], matrixB[2], matrixB[4]],
         [matrixB[1], matrixB[3], matrixB[5]],
-        [0         , 0         , 1         ]
-      ];
+        [0,          0,          1         ]
+      ],
 
-      var result = [];
-      for (var r=0; r<3; r++) {
+      result = [];
+
+      for (var r = 0; r < 3; r++) {
         result[r] = [];
-        for (var c=0; c<3; c++) {
+        for (var c = 0; c < 3; c++) {
           var sum = 0;
-          for (var k=0; k<3; k++) {
-            sum += a[r][k]*b[k][c];
+          for (var k = 0; k < 3; k++) {
+            sum += a[r][k] * b[k][c];
           }
 
           result[r][c] = sum;
@@ -520,9 +523,8 @@
         }
       }
 
-      var _isTransparent = true;
-      var imageData = ctx.getImageData(
-        x, y, (tolerance * 2) || 1, (tolerance * 2) || 1);
+      var _isTransparent = true,
+          imageData = ctx.getImageData(x, y, (tolerance * 2) || 1, (tolerance * 2) || 1);
 
       // Split image data - for tolerance > 1, pixelDataSize = 4;
       for (var i = 3, l = imageData.data.length; i < l; i += 4) {

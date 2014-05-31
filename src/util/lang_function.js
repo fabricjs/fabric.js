@@ -14,16 +14,16 @@
      * @return {Function}
      */
     Function.prototype.bind = function(thisArg) {
-      var fn = this, args = slice.call(arguments, 1), bound;
+      var _this = this, args = slice.call(arguments, 1), bound;
       if (args.length) {
         bound = function() {
-          return apply.call(fn, this instanceof Dummy ? this : thisArg, args.concat(slice.call(arguments)));
+          return apply.call(_this, this instanceof Dummy ? this : thisArg, args.concat(slice.call(arguments)));
         };
       }
       else {
         /** @ignore */
         bound = function() {
-          return apply.call(fn, this instanceof Dummy ? this : thisArg, arguments);
+          return apply.call(_this, this instanceof Dummy ? this : thisArg, arguments);
         };
       }
       Dummy.prototype = this.prototype;

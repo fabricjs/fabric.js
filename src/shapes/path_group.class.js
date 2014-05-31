@@ -1,6 +1,6 @@
 (function(global) {
 
-  "use strict";
+  'use strict';
 
   var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
@@ -52,6 +52,15 @@
 
       this.setOptions(options);
 
+      if (options.widthAttr) {
+        this.scaleX = options.widthAttr / options.width;
+      }
+      if (options.heightAttr) {
+        this.scaleY = options.heightAttr / options.height;
+      }
+
+      this.setCoords();
+
       if (options.sourcePath) {
         this.setSourcePath(options.sourcePath);
       }
@@ -69,7 +78,7 @@
 
       var m = this.transformMatrix;
       
-      var v = this.canvas.viewportTransform;
+      var v = this.getViewportTransform();
       ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
       
       if (m) {
@@ -143,13 +152,13 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var objects = this.getObjects();
-      var markup = [
-        '<g ',
-          'style="', this.getSvgStyles(), '" ',
-          'transform="', this.getSvgTransform(), '" ',
-        '>'
-      ];
+      var objects = this.getObjects(),
+          markup = [
+            '<g ',
+              'style="', this.getSvgStyles(), '" ',
+              'transform="', this.getSvgTransform(), '" ',
+            '>'
+          ];
 
       for (var i = 0, len = objects.length; i < len; i++) {
         markup.push(objects[i].toSVG(reviver));
@@ -174,9 +183,9 @@
      * @return {Boolean} true if all paths are of the same color (`fill`)
      */
     isSameColor: function() {
-      var firstPathFill = this.getObjects()[0].get('fill');
+      var firstPathFill = (this.getObjects()[0].get('fill') || '').toLowerCase();
       return this.getObjects().every(function(path) {
-        return path.get('fill') === firstPathFill;
+        return (path.get('fill') || '').toLowerCase() === firstPathFill;
       });
     },
 

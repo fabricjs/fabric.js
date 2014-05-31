@@ -1,10 +1,10 @@
 (function(global) {
 
-  "use strict";
+  'use strict';
 
   var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
-      coordProps = { 'x1': 1, 'x2': 1, 'y1': 1, 'y2': 1 },
+      coordProps = { x1: 1, x2: 1, y1: 1, y2: 1 },
       supportsLineDash = fabric.StaticCanvas.supports('setLineDash');
 
   if (fabric.Line) {
@@ -26,6 +26,34 @@
      * @default
      */
     type: 'line',
+
+    /**
+     * x value or first line edge
+     * @type Number
+     * @default
+     */
+    x1: 0,
+
+    /**
+     * y value or first line edge
+     * @type Number
+     * @default
+     */
+    y1: 0,
+
+    /**
+     * x value or second line edge
+     * @type Number
+     * @default
+     */
+    x2: 0,
+
+    /**
+     * y value or second line edge
+     * @type Number
+     * @default
+     */
+    y2: 0,
 
     /**
      * Constructor
@@ -57,11 +85,16 @@
     _setWidthHeight: function(options) {
       options || (options = { });
 
-      this.set('width', Math.abs(this.x2 - this.x1) || 1);
-      this.set('height', Math.abs(this.y2 - this.y1) || 1);
+      this.width = Math.abs(this.x2 - this.x1) || 1;
+      this.height = Math.abs(this.y2 - this.y1) || 1;
 
-      this.set('left', 'left' in options ? options.left : (Math.min(this.x1, this.x2) + this.width / 2));
-      this.set('top', 'top' in options ? options.top : (Math.min(this.y1, this.y2) + this.height / 2));
+      this.left = 'left' in options
+        ? options.left
+        : this._getLeftToOriginX();
+
+      this.top = 'top' in options
+        ? options.top
+        : this._getTopToOriginY();
     },
 
     /**
@@ -71,11 +104,47 @@
      */
     _set: function(key, value) {
       this[key] = value;
-      if (key in coordProps) {
+      if (typeof coordProps[key] !== 'undefined') {
         this._setWidthHeight();
       }
       return this;
     },
+
+    /**
+     * @private
+     * @return {Number} leftToOriginX Distance from left edge of canvas to originX of Line.
+     */
+    _getLeftToOriginX: makeEdgeToOriginGetter(
+      { // property names
+        origin: 'originX',
+        axis1: 'x1',
+        axis2: 'x2',
+        dimension: 'width'
+      },
+      { // possible values of origin
+        nearest: 'left',
+        center: 'center',
+        farthest: 'right'
+      }
+    ),
+
+    /**
+     * @private
+     * @return {Number} topToOriginY Distance from top edge of canvas to originY of Line.
+     */
+    _getTopToOriginY: makeEdgeToOriginGetter(
+      { // property names
+        origin: 'originY',
+        axis1: 'y1',
+        axis2: 'y2',
+        dimension: 'height'
+      },
+      { // possible values of origin
+        nearest: 'top',
+        center: 'center',
+        farthest: 'bottom'
+      }
+    ),
 
     /**
      * @private
@@ -86,15 +155,23 @@
 
       var isInPathGroup = this.group && this.group.type === 'path-group';
       if (isInPathGroup && !this.transformMatrix) {
-        ctx.translate(-this.group.width/2 + this.left, -this.group.height / 2 + this.top);
+        //  Line coords are distances from left-top of canvas to origin of line.
+        //
+        //  To render line in a path-group, we need to translate them to
+        //  distances from center of path-group to center of line.
+        var cp = this.getCenterPoint();
+        ctx.translate(
+          -this.group.width/2 + cp.x,
+          -this.group.height / 2 + cp.y
+        );
       }
 
       if (!this.strokeDashArray || this.strokeDashArray && supportsLineDash) {
 
         // move from center (of virtual box) to its left/top corner
         // we can't assume x1, y1 is top left and x2, y2 is bottom right
-        var xMult = this.x1 <= this.x2 ? -1 : 1;
-        var yMult = this.y1 <= this.y2 ? -1 : 1;
+        var xMult = this.x1 <= this.x2 ? -1 : 1,
+            yMult = this.y1 <= this.y2 ? -1 : 1;
 
         ctx.moveTo(
           this.width === 1 ? 0 : (xMult * this.width / 2),
@@ -112,7 +189,7 @@
       // (by copying fillStyle to strokeStyle, since line is stroked, not filled)
       var origStrokeStyle = ctx.strokeStyle;
       ctx.strokeStyle = this.stroke || ctx.fillStyle;
-      this._renderStroke(ctx);
+      this.stroke && this._renderStroke(ctx);
       ctx.strokeStyle = origStrokeStyle;
     },
 
@@ -197,13 +274,13 @@
    * @return {fabric.Line} instance of fabric.Line
    */
   fabric.Line.fromElement = function(element, options) {
-    var parsedAttributes = fabric.parseAttributes(element, fabric.Line.ATTRIBUTE_NAMES);
-    var points = [
-      parsedAttributes.x1 || 0,
-      parsedAttributes.y1 || 0,
-      parsedAttributes.x2 || 0,
-      parsedAttributes.y2 || 0
-    ];
+    var parsedAttributes = fabric.parseAttributes(element, fabric.Line.ATTRIBUTE_NAMES),
+        points = [
+          parsedAttributes.x1 || 0,
+          parsedAttributes.y1 || 0,
+          parsedAttributes.x2 || 0,
+          parsedAttributes.y2 || 0
+        ];
     return new fabric.Line(points, extend(parsedAttributes, options));
   };
   /* _FROM_SVG_END_ */
@@ -219,5 +296,30 @@
     var points = [object.x1, object.y1, object.x2, object.y2];
     return new fabric.Line(points, object);
   };
+
+  /**
+   * Produces a function that calculates distance from canvas edge to Line origin.
+   */
+  function makeEdgeToOriginGetter(propertyNames, originValues) {
+    var origin = propertyNames.origin,
+        axis1 = propertyNames.axis1,
+        axis2 = propertyNames.axis2,
+        dimension = propertyNames.dimension,
+        nearest = originValues.nearest,
+        center = originValues.center,
+        farthest = originValues.farthest;
+
+    return function() {
+      switch (this.get(origin)) {
+      case nearest:
+        return Math.min(this.get(axis1), this.get(axis2));
+      case center:
+        return Math.min(this.get(axis1), this.get(axis2)) + (0.5 * this.get(dimension));
+      case farthest:
+        return Math.max(this.get(axis1), this.get(axis2));
+      }
+    };
+
+  }
 
 })(typeof exports !== 'undefined' ? exports : this);

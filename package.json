@@ -1,30 +1,46 @@
 {
   "name": "fabric",
   "description": "Object model for HTML5 canvas, and SVG-to-canvas parser. Backed by jsdom and node-canvas.",
-  "version": "1.4.0",
+  "homepage": "http://fabricjs.com/",
+  "version": "1.4.6",
   "author": "Juriy Zaytsev <kangax@gmail.com>",
-  "keywords": ["canvas", "graphic", "graphics", "SVG", "node-canvas", "parser", "HTML5", "object model"],
-  "repository": "git://github.com/kangax/fabric.js",
-  "licenses": [{
-    "type": "MIT",
-    "url": "http://github.com/kangax/fabric.js/raw/master/LICENSE"
-  }],
+  "keywords": [
+    "canvas",
+    "graphic",
+    "graphics",
+    "SVG",
+    "node-canvas",
+    "parser",
+    "HTML5",
+    "object model"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kangax/fabric.js"
+  },
+  "bugs": {
+    "url": "https://github.com/kangax/fabric.js/issues"
+  },
+  "license": "MIT",
   "scripts": {
     "build": "node build.js modules=ALL exclude=json,cufon,gestures",
     "test": "node test.js && jshint src"
   },
   "dependencies": {
     "canvas": "1.0.x",
-    "jsdom": "0.7.x",
+    "jsdom": "0.10.x",
     "xmldom": "0.1.x"
   },
   "devDependencies": {
-    "qunit": "0.5.x",
-    "jshint": "2.3.x",
-    "uglify-js": "2.4.x",
     "execSync": "0.0.x",
-    "plato": "0.6.x"
+    "uglify-js": "2.4.x",
+    "jscs": "1.4.x",
+    "jshint": "2.5.x",
+    "qunit": "0.6.x",
+    "istanbul": "0.2.6"
   },
-  "engines": { "node": ">=0.4.0 && <1.0.0" },
-  "main": "./dist/all.js"
+  "engines": {
+    "node": ">=0.4.0 && <1.0.0"
+  },
+  "main": "./dist/fabric.js"
 }

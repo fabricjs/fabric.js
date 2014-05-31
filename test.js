@@ -4,9 +4,11 @@ testrunner.options.log.summary = true;
 testrunner.options.log.tests = false;
 testrunner.options.log.assertions = false;
 
+testrunner.options.coverage = true;
+
 testrunner.run({
     deps: "./test/fixtures/test_script.js",
-    code: "./dist/all.js",
+    code: "./dist/fabric.js",
     tests: [
       './test/unit/rect.js',
       './test/unit/ellipse.js',

@@ -1,25 +1,24 @@
 (function(global) {
 
-  var commandLengths = {
-    m: 2,
-    l: 2,
-    h: 1,
-    v: 1,
-    c: 6,
-    s: 4,
-    q: 4,
-    t: 2,
-    a: 7
-  };
-
-  "use strict";
+  'use strict';
 
   var fabric = global.fabric || (global.fabric = { }),
       min = fabric.util.array.min,
       max = fabric.util.array.max,
       extend = fabric.util.object.extend,
       _toString = Object.prototype.toString,
-      drawArc = fabric.util.drawArc;
+      drawArc = fabric.util.drawArc,
+      commandLengths = {
+        m: 2,
+        l: 2,
+        h: 1,
+        v: 1,
+        c: 6,
+        s: 4,
+        q: 4,
+        t: 2,
+        a: 7
+      };
 
   if (fabric.Path) {
     fabric.warn('fabric.Path is already defined');
@@ -61,6 +60,13 @@
      * @default
      */
     type: 'path',
+
+    /**
+     * Array of path points
+     * @type Array
+     * @default
+     */
+    path: null,
 
     /**
      * Constructor
@@ -125,7 +131,9 @@
           this.left = this.width / 2;
         }
       }
-      this.pathOffset = this.pathOffset || this._calculatePathOffset(origLeft, origTop); //Save top-left coords as offset
+      this.pathOffset = this.pathOffset ||
+                        // Save top-left coords as offset
+                        this._calculatePathOffset(origLeft, origTop);
     },
 
     /**
@@ -281,8 +289,8 @@
             tempX = current[3];
             tempY = current[4];
             // calculate reflection of previous control points
-            controlX = 2*x - controlX;
-            controlY = 2*y - controlY;
+            controlX = 2 * x - controlX;
+            controlY = 2 * y - controlY;
             ctx.bezierCurveTo(
               controlX + l,
               controlY + t,
@@ -342,7 +350,6 @@
             // transform to absolute x,y
             tempX = x + current[1];
             tempY = y + current[2];
-
 
             if (previous[0].match(/[QqTt]/) === null) {
               // If there is no previous command or if the previous command was not a Q, q, T or t,
@@ -444,7 +451,7 @@
       ctx.save();
       var m = this.transformMatrix;
 
-      var v = this.canvas.viewportTransform;
+      var v = this.getViewportTransform();
       ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
 
       if (m) {
@@ -485,7 +492,7 @@
      */
     toObject: function(propertiesToInclude) {
       var o = extend(this.callSuper('toObject', propertiesToInclude), {
-        path: this.path,
+        path: this.path.map(function(item) { return item.slice() }),
         pathOffset: this.pathOffset
       });
       if (this.sourcePath) {
@@ -557,7 +564,7 @@
           coords = [ ],
           currentPath,
           parsed,
-          re = /(-?\.\d+)|(-?\d+(\.\d+)?)/g,
+          re = /([-+]?((\d+\.\d+)|((\d+)|(\.\d+)))(?:e[-+]?\d+)?)/ig,
           match,
           coordsStr;
 
@@ -613,14 +620,14 @@
           maxX = max(aX),
           maxY = max(aY),
           deltaX = maxX - minX,
-          deltaY = maxY - minY;
+          deltaY = maxY - minY,
 
-      var o = {
-        left: this.left + (minX + deltaX / 2),
-        top: this.top + (minY + deltaY / 2),
-        width: deltaX,
-        height: deltaY
-      };
+          o = {
+            left: this.left + (minX + deltaX / 2),
+            top: this.top + (minY + deltaY / 2),
+            width: deltaX,
+            height: deltaY
+          };
 
       return o;
     },
@@ -641,13 +648,18 @@
         isLowerCase = true;
       }
 
-      var xy = this._getXY(item, isLowerCase, previous);
+      var xy = this._getXY(item, isLowerCase, previous),
+          val;
 
-      var val = parseInt(xy.x, 10);
-      if (!isNaN(val)) aX.push(val);
+      val = parseInt(xy.x, 10);
+      if (!isNaN(val)) {
+        aX.push(val);
+      }
 
       val = parseInt(xy.y, 10);
-      if (!isNaN(val)) aY.push(val);
+      if (!isNaN(val)) {
+        aY.push(val);
+      }
     },
 
     _getXY: function(item, isLowerCase, previous) {
@@ -659,13 +671,13 @@
         ? previous.x + getX(item)
         : item[0] === 'V'
           ? previous.x
-          : getX(item);
+          : getX(item),
 
-      var y = isLowerCase
-        ? previous.y + getY(item)
-        : item[0] === 'H'
-          ? previous.y
-          : getY(item);
+          y = isLowerCase
+            ? previous.y + getY(item)
+            : item[0] === 'H'
+              ? previous.y
+              : getY(item);
 
       return { x: x, y: y };
     }
@@ -681,9 +693,9 @@
   fabric.Path.fromObject = function(object, callback) {
     if (typeof object.path === 'string') {
       fabric.loadSVGFromURL(object.path, function (elements) {
-        var path = elements[0];
+        var path = elements[0],
+            pathUrl = object.path;
 
-        var pathUrl = object.path;
         delete object.path;
 
         fabric.util.object.extend(path, object);

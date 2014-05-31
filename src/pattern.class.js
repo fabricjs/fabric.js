@@ -101,10 +101,10 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
    * @return {String} SVG representation of a pattern
    */
   toSVG: function(object) {
-    var patternSource = typeof this.source === 'function' ? this.source() : this.source;
-    var patternWidth = patternSource.width / object.getWidth();
-    var patternHeight = patternSource.height / object.getHeight();
-    var patternImgSrc = '';
+    var patternSource = typeof this.source === 'function' ? this.source() : this.source,
+        patternWidth = patternSource.width / object.getWidth(),
+        patternHeight = patternSource.height / object.getHeight(),
+        patternImgSrc = '';
 
     if (patternSource.src) {
       patternImgSrc = patternSource.src;
@@ -133,11 +133,23 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
    * @return {CanvasPattern}
    */
   toLive: function(ctx) {
-    var source = typeof this.source === 'function' ? this.source() : this.source;
+    var source = typeof this.source === 'function'
+      ? this.source()
+      : this.source;
+
+    // if the image failed to load, return, and allow rest to continue loading
+    if (!source) {
+      return '';
+    }
+
     // if an image
     if (typeof source.src !== 'undefined') {
-      if (!source.complete) return '';
-      if (source.naturalWidth === 0 || source.naturalHeight === 0) return '';
+      if (!source.complete) {
+        return '';
+      }
+      if (source.naturalWidth === 0 || source.naturalHeight === 0) {
+        return '';
+      }
     }
     return ctx.createPattern(source, this.repeat);
   }

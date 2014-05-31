@@ -1,6 +1,6 @@
 (function(global) {
 
-  "use strict";
+  'use strict';
 
   var fabric = global.fabric || (global.fabric = { });
 
@@ -41,6 +41,11 @@
 
       if (color in Color.colorNameMap) {
         color = Color.colorNameMap[color];
+      }
+
+      if (color === 'transparent') {
+        this.setSource([255,255,255,0]);
+        return;
       }
 
       source = Color.sourceFromHex(color);
@@ -161,15 +166,15 @@
      * @return {String} ex: FF5555
      */
     toHex: function() {
-      var source = this.getSource();
+      var source = this.getSource(), r, g, b;
 
-      var r = source[0].toString(16);
+      r = source[0].toString(16);
       r = (r.length === 1) ? ('0' + r) : r;
 
-      var g = source[1].toString(16);
+      g = source[1].toString(16);
       g = (g.length === 1) ? ('0' + g) : g;
 
-      var b = source[2].toString(16);
+      b = source[2].toString(16);
       b = (b.length === 1) ? ('0' + b) : b;
 
       return r.toUpperCase() + g.toUpperCase() + b.toUpperCase();
@@ -256,7 +261,7 @@
    * @field
    * @memberOf fabric.Color
    */
-  fabric.Color.reRGBa = /^rgba?\(\s*(\d{1,3}\%?)\s*,\s*(\d{1,3}\%?)\s*,\s*(\d{1,3}\%?)\s*(?:\s*,\s*(\d+(?:\.\d+)?)\s*)?\)$/;
+  fabric.Color.reRGBa = /^rgba?\(\s*(\d{1,3}(?:\.\d+)?\%?)\s*,\s*(\d{1,3}(?:\.\d+)?\%?)\s*,\s*(\d{1,3}(?:\.\d+)?\%?)\s*(?:\s*,\s*(\d+(?:\.\d+)?)\s*)?\)$/;
 
   /**
    * Regex matching color in HSL or HSLA formats (ex: hsl(200, 80%, 10%), hsla(300, 50%, 80%, 0.5), hsla( 300 , 50% , 80% , 0.5 ))
@@ -282,23 +287,23 @@
    * @see: http://www.w3.org/TR/CSS2/syndata.html#color-units
    */
   fabric.Color.colorNameMap = {
-    'aqua':    '#00FFFF',
-    'black':   '#000000',
-    'blue':    '#0000FF',
-    'fuchsia': '#FF00FF',
-    'gray':    '#808080',
-    'green':   '#008000',
-    'lime':    '#00FF00',
-    'maroon':  '#800000',
-    'navy':    '#000080',
-    'olive':   '#808000',
-    'orange':  '#FFA500',
-    'purple':  '#800080',
-    'red':     '#FF0000',
-    'silver':  '#C0C0C0',
-    'teal':    '#008080',
-    'white':   '#FFFFFF',
-    'yellow':  '#FFFF00'
+    aqua:    '#00FFFF',
+    black:   '#000000',
+    blue:    '#0000FF',
+    fuchsia: '#FF00FF',
+    gray:    '#808080',
+    green:   '#008000',
+    lime:    '#00FF00',
+    maroon:  '#800000',
+    navy:    '#000080',
+    olive:   '#808000',
+    orange:  '#FFA500',
+    purple:  '#800080',
+    red:     '#FF0000',
+    silver:  '#C0C0C0',
+    teal:    '#008080',
+    white:   '#FFFFFF',
+    yellow:  '#FFFF00'
   };
 
   /**
@@ -309,11 +314,21 @@
    * @return {Number}
    */
   function hue2rgb(p, q, t){
-    if (t < 0) t += 1;
-    if (t > 1) t -= 1;
-    if (t < 1/6) return p + (q - p) * 6 * t;
-    if (t < 1/2) return q;
-    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+    if (t < 0) {
+      t += 1;
+    }
+    if (t > 1) {
+      t -= 1;
+    }
+    if (t < 1/6) {
+      return p + (q - p) * 6 * t;
+    }
+    if (t < 1/2) {
+      return q;
+    }
+    if (t < 2/3) {
+      return p + (q - p) * (2/3 - t) * 6;
+    }
     return p;
   }
 
@@ -390,8 +405,8 @@
       r = g = b = l;
     }
     else {
-      var q = l <= 0.5 ? l * (s + 1) : l + s - l * s;
-      var p = l * 2 - q;
+      var q = l <= 0.5 ? l * (s + 1) : l + s - l * s,
+          p = l * 2 - q;
 
       r = hue2rgb(p, q, h + 1/3);
       g = hue2rgb(p, q, h);
