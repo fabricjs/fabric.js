@@ -11849,7 +11849,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
       // Cache all targets where their bounding box contains point.
       var target,
-          pointer = this.getPointer(e);
+          pointer = this.getPointer(e, true);
 
       var i = this._objects.length;
 
@@ -15720,9 +15720,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       var strokeWidth = this.strokeWidth > 1 ? this.strokeWidth : 0,
           padding = this.padding,
           theta = degreesToRadians(this.angle),
-          vpt;
-      // TODO: ideally we should never setCoords an object which lacks a canvas
-      vpt = this.getViewportTransform();
+          vpt = this.getViewportTransform();
 
       var f = function (p) {
         return fabric.util.transformPoint(p, vpt);
@@ -18306,6 +18304,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         q: 4,
         t: 2,
         a: 7
+      },
+      repeatedCommands = {
+        m: 'l',
+        M: 'L'
       };
 
   if (fabric.Path) {
@@ -18875,12 +18877,14 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           }
         }
 
-        var command = coordsParsed[0].toLowerCase(),
-            commandLength = commandLengths[command];
+        var command = coordsParsed[0],
+            commandLength = commandLengths[command.toLowerCase()],
+            repeatedCommand = repeatedCommands[command] || command;
 
         if (coordsParsed.length - 1 > commandLength) {
           for (var k = 1, klen = coordsParsed.length; k < klen; k += commandLength) {
-            result.push([ coordsParsed[0] ].concat(coordsParsed.slice(k, k + commandLength)));
+            result.push([ command ].concat(coordsParsed.slice(k, k + commandLength)));
+            command = repeatedCommand;
           }
         }
         else {
@@ -24730,6 +24734,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     this.__lastClickTime = this.__newClickTime;
     this.__lastPointer = newPointer;
     this.__lastIsEditing = this.isEditing;
+    this.__lastSelected = this.selected;
   },
 
   isDoubleClick: function(newPointer) {
@@ -24841,7 +24846,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this.__isMousedown = false;
       if (this._isObjectMoved(options.e)) return;
 
-      if (this.selected) {
+      if (this.__lastSelected) {
         this.enterEditing();
         this.initDelayedCursor(true);
       }
