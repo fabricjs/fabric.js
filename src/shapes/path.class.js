@@ -18,6 +18,10 @@
         q: 4,
         t: 2,
         a: 7
+      },
+      repeatedCommands = {
+        m: 'l',
+        M: 'L'
       };
 
   if (fabric.Path) {
@@ -586,12 +590,14 @@
           }
         }
 
-        var command = coordsParsed[0].toLowerCase(),
-            commandLength = commandLengths[command];
+        var command = coordsParsed[0],
+            commandLength = commandLengths[command.toLowerCase()],
+            repeatedCommand = repeatedCommands[command] || command;
 
         if (coordsParsed.length - 1 > commandLength) {
           for (var k = 1, klen = coordsParsed.length; k < klen; k += commandLength) {
-            result.push([ coordsParsed[0] ].concat(coordsParsed.slice(k, k + commandLength)));
+            result.push([ command ].concat(coordsParsed.slice(k, k + commandLength)));
+            command = repeatedCommand;
           }
         }
         else {
