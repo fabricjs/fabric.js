@@ -187,7 +187,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
       }
       
       var point = new fabric.Point(x, y);
-      point.width = width
+      point.width = width;
 
       if (this.randomOpacity) {
         point.opacity = fabric.util.getRandomInt(0, 100) / 100;

@@ -346,8 +346,8 @@
      */
     _onMouseMoveInDrawingMode: function(e) {
       if (this._isCurrentlyDrawing) {
-        var ivt = fabric.util.invertTransform(this.viewportTransform);
-        pointer = fabric.util.transformPoint(this.getPointer(e, true), ivt);
+        var ivt = fabric.util.invertTransform(this.viewportTransform),
+            pointer = fabric.util.transformPoint(this.getPointer(e, true), ivt);
         this.freeDrawingBrush.onMouseMove(pointer);
       }
       this.upperCanvasEl.style.cursor = this.freeDrawingCursor;
@@ -548,11 +548,7 @@
      * @param {Event} e Event fired on mousemove
      */
     _transformObject: function(e) {
-      var pointer = fabric.util.transformPoint(
-            fabric.util.getPointer(e, this.upperCanvasEl),
-            fabric.util.invertTransform(this.viewportTransform)
-          ),
-          pointer = this.getPointer(e),
+      var pointer = this.getPointer(e),
           transform = this._currentTransform;
 
       transform.reset = false,

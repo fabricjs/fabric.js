@@ -117,7 +117,7 @@
       var o = fabric.util.transformPoint({x: t[4], y: t[5]}, r);
       r[4] = -o.x;
       r[5] = -o.y;
-      return r
+      return r;
     },
 
     /**

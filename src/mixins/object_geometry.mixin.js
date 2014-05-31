@@ -304,13 +304,12 @@
     setCoords: function() {
 
       var strokeWidth = this.strokeWidth > 1 ? this.strokeWidth : 0,
-          padding = this.padding,
           theta = degreesToRadians(this.angle),
           vpt = this.getViewportTransform();
 
       var f = function (p) {
         return fabric.util.transformPoint(p, vpt);
-      }
+      };
 
       this.currentWidth = (this.width + strokeWidth) * this.scaleX;
       this.currentHeight = (this.height + strokeWidth) * this.scaleY;
@@ -332,20 +331,20 @@
           sinTh = Math.sin(theta),
           cosTh = Math.cos(theta),
           coords = this.getCenterPoint(),
-          wh = new fabric.Point(this.currentWidth, this.currentHeight);
-      var _tl =   new fabric.Point(coords.x - offsetX, coords.y - offsetY);
-      var _tr =   new fabric.Point(_tl.x + (wh.x * cosTh),   _tl.y + (wh.x * sinTh));
-      var _bl =   new fabric.Point(_tl.x - (wh.y * sinTh),   _tl.y + (wh.y * cosTh));
-      var _mt =   new fabric.Point(_tl.x + (wh.x/2 * cosTh), _tl.y + (wh.x/2 * sinTh));
-      var tl  = f(_tl);
-      var tr  = f(_tr);
-      var br  = f(new fabric.Point(_tr.x - (wh.y * sinTh),   _tr.y + (wh.y * cosTh)));
-      var bl  = f(_bl);
-      var ml  = f(new fabric.Point(_tl.x - (wh.y/2 * sinTh), _tl.y + (wh.y/2 * cosTh)));
-      var mt  = f(_mt);
-      var mr  = f(new fabric.Point(_tr.x - (wh.y/2 * sinTh), _tr.y + (wh.y/2 * cosTh)));
-      var mb  = f(new fabric.Point(_bl.x + (wh.x/2 * cosTh), _bl.y + (wh.x/2 * sinTh)));
-      var mtr = f(new fabric.Point(_mt.x, _mt.y));
+          wh = new fabric.Point(this.currentWidth, this.currentHeight),
+          _tl =   new fabric.Point(coords.x - offsetX, coords.y - offsetY),
+          _tr =   new fabric.Point(_tl.x + (wh.x * cosTh),   _tl.y + (wh.x * sinTh)),
+          _bl =   new fabric.Point(_tl.x - (wh.y * sinTh),   _tl.y + (wh.y * cosTh)),
+          _mt =   new fabric.Point(_tl.x + (wh.x/2 * cosTh), _tl.y + (wh.x/2 * sinTh)),
+          tl  = f(_tl),
+          tr  = f(_tr),
+          br  = f(new fabric.Point(_tr.x - (wh.y * sinTh),   _tr.y + (wh.y * cosTh))),
+          bl  = f(_bl),
+          ml  = f(new fabric.Point(_tl.x - (wh.y/2 * sinTh), _tl.y + (wh.y/2 * cosTh))),
+          mt  = f(_mt),
+          mr  = f(new fabric.Point(_tr.x - (wh.y/2 * sinTh), _tr.y + (wh.y/2 * cosTh))),
+          mb  = f(new fabric.Point(_bl.x + (wh.x/2 * cosTh), _bl.y + (wh.x/2 * sinTh))),
+          mtr = f(new fabric.Point(_mt.x, _mt.y));
 
       // padding
       var padX = Math.cos(_angle + theta) * this.padding * Math.sqrt(2),

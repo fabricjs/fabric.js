@@ -538,7 +538,7 @@
      * @return {Number}
      */
     getZoom: function () {
-      return sqrt(this.viewportTransform[0] * this.viewportTransform[3]);
+      return Math.sqrt(this.viewportTransform[0] * this.viewportTransform[3]);
     },
 
     /**
@@ -553,7 +553,7 @@
           x  = this.viewportTransform[4],
           y  = this.viewportTransform[5];
       
-      return new fabric.Point(this.getWidth()/2 + x, this.getHeight()/2 + y);
+      return new fabric.Point(wh.x + x, wh.y + y);
     },
 
     /**
@@ -563,7 +563,7 @@
      * @chainable true
      */
     setViewportTransform: function (vpt) {
-      this.viewportTransform = vpt
+      this.viewportTransform = vpt;
       this.renderAll();
       for (var i = 0, len = this._objects.length; i < len; i++) {
         this._objects[i].setCoords();
@@ -676,7 +676,7 @@
           obj._objects[i].canvas = this;
           this._onObjectAdded(obj._objects[i]);
         }
-        obj._updateObjectsCoords()
+        obj._updateObjectsCoords();
       }
       obj.setCoords();
       this.fire('object:added', { target: obj });

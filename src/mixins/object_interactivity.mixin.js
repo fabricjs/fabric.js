@@ -333,8 +333,6 @@
           height = wh.y,
           left = -(width / 2),
           top = -(height / 2),
-          _left,
-          _top,
           padding = this.padding,
           scaleOffset = size2,
           scaleOffsetSize = size2 - size,
