@@ -86,7 +86,11 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    */
   copy: function(ev) {
     var selectedText = this.getSelectedText();
-    ev.clipboardData.setData('text', selectedText);
+    
+    // Check for backward compatibility with old browsers
+    if (ev.clipboardData) {
+      ev.clipboardData.setData('text', selectedText);
+    }
 
     this.copiedText = selectedText;
     this.copiedStyles = this.getSelectionStyles(
@@ -98,7 +102,14 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * Pastes text
    */
   paste: function(ev) {
-    var copiedText = ev.clipboardData.getData('text');
+    var copiedText = null;
+    
+    // Check for backward compatibility with old browsers
+    if (ev.clipboardData) {
+      copiedText = ev.clipboardData.getData('text');
+    } else {
+      copiedText = this.copiedText;
+    }
     
     if (copiedText) {
       this.insertChars(copiedText);
