@@ -3981,7 +3981,7 @@ fabric.Collection = {
       var o = fabric.util.transformPoint({x: t[4], y: t[5]}, r);
       r[4] = -o.x;
       r[5] = -o.y;
-      return r
+      return r;
     },
 
     /**
@@ -9363,7 +9363,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * @return {Number}
      */
     getZoom: function () {
-      return sqrt(this.viewportTransform[0] * this.viewportTransform[3]);
+      return Math.sqrt(this.viewportTransform[0] * this.viewportTransform[3]);
     },
 
     /**
@@ -9378,7 +9378,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
           x  = this.viewportTransform[4],
           y  = this.viewportTransform[5];
       
-      return new fabric.Point(this.getWidth()/2 + x, this.getHeight()/2 + y);
+      return new fabric.Point(wh.x + x, wh.y + y);
     },
 
     /**
@@ -9388,7 +9388,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * @chainable true
      */
     setViewportTransform: function (vpt) {
-      this.viewportTransform = vpt
+      this.viewportTransform = vpt;
       this.renderAll();
       for (var i = 0, len = this._objects.length; i < len; i++) {
         this._objects[i].setCoords();
@@ -9501,7 +9501,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
           obj._objects[i].canvas = this;
           this._onObjectAdded(obj._objects[i]);
         }
-        obj._updateObjectsCoords()
+        obj._updateObjectsCoords();
       }
       obj.setCoords();
       this.fire('object:added', { target: obj });
@@ -10501,7 +10501,7 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
      */
     _render: function() {
       var ctx  = this.canvas.contextTop;
-      var v = this.getViewportTransform();
+      var v = this.canvas.viewportTransform;
       ctx.save();
       ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
       ctx.beginPath();
@@ -10708,7 +10708,7 @@ fabric.CircleBrush = fabric.util.createClass(fabric.BaseBrush, /** @lends fabric
     var point = this.addPoint(pointer),
         ctx = this.canvas.contextTop;
 
-    var v = this.getViewportTransform();
+    var v = this.canvas.viewportTransform;
     ctx.save();
     ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
 
@@ -10950,7 +10950,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
     var ctx = this.canvas.contextTop;
     ctx.fillStyle = this.color;
 
-    var v = this.getViewportTransform();
+    var v = this.canvas.viewportTransform;
     ctx.save();
     ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
 
@@ -10988,7 +10988,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
       }
       
       var point = new fabric.Point(x, y);
-      point.width = width
+      point.width = width;
 
       if (this.randomOpacity) {
         point.opacity = fabric.util.getRandomInt(0, 100) / 100;
@@ -11790,11 +11790,13 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       // first check current group (if one exists)
       var activeGroup = this.getActiveGroup();
       if (activeGroup && !skipGroup && this.containsPoint(e, activeGroup)) {
+        console.log('AG', activeGroup);
         return activeGroup;
       }
 
       var target = this._searchPossibleTargets(e);
       this._fireOverOutEvents(target);
+
       return target;
     },
 
@@ -12177,7 +12179,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     _drawControls: function(ctx, object, klass) {
       ctx.save();
       fabric[klass].prototype.transform.call(object, ctx);
-      object.drawBorders(ctx).drawControls(ctx);
+      //object.drawBorders(ctx).drawControls(ctx);
+      object._renderControls(ctx);
       ctx.restore();
     }
   });
@@ -12553,8 +12556,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      */
     _onMouseMoveInDrawingMode: function(e) {
       if (this._isCurrentlyDrawing) {
-        var ivt = fabric.util.invertTransform(this.viewportTransform);
-        pointer = fabric.util.transformPoint(this.getPointer(e, true), ivt);
+        var ivt = fabric.util.invertTransform(this.viewportTransform),
+            pointer = fabric.util.transformPoint(this.getPointer(e, true), ivt);
         this.freeDrawingBrush.onMouseMove(pointer);
       }
       this.upperCanvasEl.style.cursor = this.freeDrawingCursor;
@@ -12755,11 +12758,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @param {Event} e Event fired on mousemove
      */
     _transformObject: function(e) {
-      var pointer = fabric.util.transformPoint(
-            fabric.util.getPointer(e, this.upperCanvasEl),
-            fabric.util.invertTransform(this.viewportTransform)
-          ),
-          pointer = this.getPointer(e),
+      var pointer = this.getPointer(e),
           transform = this._currentTransform;
 
       transform.reset = false,
@@ -14593,7 +14592,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @return {Boolean} flipY value // TODO
      */
     getViewportTransform: function() {
-      if (this.canvas && this.getViewportTransform())
+      if (this.canvas && this.canvas.viewportTransform)
         return this.canvas.viewportTransform;
       return [1, 0, 0, 1, 0, 0];
     },
@@ -15716,15 +15715,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     setCoords: function() {
 
       var strokeWidth = this.strokeWidth > 1 ? this.strokeWidth : 0,
-          padding = this.padding,
           theta = degreesToRadians(this.angle),
-          vpt;
-      // TODO: ideally we should never setCoords an object which lacks a canvas
-      vpt = this.getViewportTransform();
+          vpt = this.getViewportTransform();
 
       var f = function (p) {
         return fabric.util.transformPoint(p, vpt);
-      }
+      };
 
       this.currentWidth = (this.width + strokeWidth) * this.scaleX;
       this.currentHeight = (this.height + strokeWidth) * this.scaleY;
@@ -15746,20 +15742,20 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
           sinTh = Math.sin(theta),
           cosTh = Math.cos(theta),
           coords = this.getCenterPoint(),
-          wh = new fabric.Point(this.currentWidth, this.currentHeight);
-      var _tl =   new fabric.Point(coords.x - offsetX, coords.y - offsetY);
-      var _tr =   new fabric.Point(_tl.x + (wh.x * cosTh),   _tl.y + (wh.x * sinTh));
-      var _bl =   new fabric.Point(_tl.x - (wh.y * sinTh),   _tl.y + (wh.y * cosTh));
-      var _mt =   new fabric.Point(_tl.x + (wh.x/2 * cosTh), _tl.y + (wh.x/2 * sinTh));
-      var tl  = f(_tl);
-      var tr  = f(_tr);
-      var br  = f(new fabric.Point(_tr.x - (wh.y * sinTh),   _tr.y + (wh.y * cosTh)));
-      var bl  = f(_bl);
-      var ml  = f(new fabric.Point(_tl.x - (wh.y/2 * sinTh), _tl.y + (wh.y/2 * cosTh)));
-      var mt  = f(_mt);
-      var mr  = f(new fabric.Point(_tr.x - (wh.y/2 * sinTh), _tr.y + (wh.y/2 * cosTh)));
-      var mb  = f(new fabric.Point(_bl.x + (wh.x/2 * cosTh), _bl.y + (wh.x/2 * sinTh)));
-      var mtr = f(new fabric.Point(_mt.x, _mt.y));
+          wh = new fabric.Point(this.currentWidth, this.currentHeight),
+          _tl =   new fabric.Point(coords.x - offsetX, coords.y - offsetY),
+          _tr =   new fabric.Point(_tl.x + (wh.x * cosTh),   _tl.y + (wh.x * sinTh)),
+          _bl =   new fabric.Point(_tl.x - (wh.y * sinTh),   _tl.y + (wh.y * cosTh)),
+          _mt =   new fabric.Point(_tl.x + (wh.x/2 * cosTh), _tl.y + (wh.x/2 * sinTh)),
+          tl  = f(_tl),
+          tr  = f(_tr),
+          br  = f(new fabric.Point(_tr.x - (wh.y * sinTh),   _tr.y + (wh.y * cosTh))),
+          bl  = f(_bl),
+          ml  = f(new fabric.Point(_tl.x - (wh.y/2 * sinTh), _tl.y + (wh.y/2 * cosTh))),
+          mt  = f(_mt),
+          mr  = f(new fabric.Point(_tr.x - (wh.y/2 * sinTh), _tr.y + (wh.y/2 * cosTh))),
+          mb  = f(new fabric.Point(_bl.x + (wh.x/2 * cosTh), _bl.y + (wh.x/2 * sinTh))),
+          mtr = f(new fabric.Point(_mt.x, _mt.y));
 
       // padding
       var padX = Math.cos(_angle + theta) * this.padding * Math.sqrt(2),
@@ -16370,8 +16366,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           height = wh.y,
           left = -(width / 2),
           top = -(height / 2),
-          _left,
-          _top,
           padding = this.padding,
           scaleOffset = size2,
           scaleOffsetSize = size2 - size,
@@ -18304,6 +18298,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         q: 4,
         t: 2,
         a: 7
+      },
+      repeatedCommands = {
+        m: 'l',
+        M: 'L'
       };
 
   if (fabric.Path) {
@@ -18873,12 +18871,14 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           }
         }
 
-        var command = coordsParsed[0].toLowerCase(),
-            commandLength = commandLengths[command];
+        var command = coordsParsed[0],
+            commandLength = commandLengths[command.toLowerCase()],
+            repeatedCommand = repeatedCommands[command] || command;
 
         if (coordsParsed.length - 1 > commandLength) {
           for (var k = 1, klen = coordsParsed.length; k < klen; k += commandLength) {
-            result.push([ coordsParsed[0] ].concat(coordsParsed.slice(k, k + commandLength)));
+            result.push([ command ].concat(coordsParsed.slice(k, k + commandLength)));
+            command = repeatedCommand;
           }
         }
         else {
@@ -24728,6 +24728,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     this.__lastClickTime = this.__newClickTime;
     this.__lastPointer = newPointer;
     this.__lastIsEditing = this.isEditing;
+    this.__lastSelected = this.selected;
   },
 
   isDoubleClick: function(newPointer) {
@@ -24839,7 +24840,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this.__isMousedown = false;
       if (this._isObjectMoved(options.e)) return;
 
-      if (this.selected) {
+      if (this.__lastSelected) {
         this.enterEditing();
         this.initDelayedCursor(true);
       }

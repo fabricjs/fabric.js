@@ -729,7 +729,6 @@
       // first check current group (if one exists)
       var activeGroup = this.getActiveGroup();
       if (activeGroup && !skipGroup && this.containsPoint(e, activeGroup)) {
-        console.log('AG', activeGroup);
         return activeGroup;
       }
 
@@ -1118,7 +1117,8 @@
     _drawControls: function(ctx, object, klass) {
       ctx.save();
       fabric[klass].prototype.transform.call(object, ctx);
-      object.drawBorders(ctx).drawControls(ctx);
+      //object.drawBorders(ctx).drawControls(ctx);
+      object._renderControls(ctx);
       ctx.restore();
     }
   });
