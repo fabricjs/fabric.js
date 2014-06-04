@@ -83,13 +83,15 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
   /**
    * Copies selected text
+   * @param {Event} e Event object
    */
-  copy: function(ev) {
-    var selectedText = this.getSelectedText();
+  copy: function(e) {
+    var selectedText = this.getSelectedText(),
+        clipboardData = this._getClipboardData(e);
     
     // Check for backward compatibility with old browsers
-    if (ev.clipboardData) {
-      ev.clipboardData.setData('text', selectedText);
+    if (clipboardData) {
+      clipboardData.setData('text', selectedText);
     }
 
     this.copiedText = selectedText;
@@ -100,13 +102,15 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
   /**
    * Pastes text
+   * @param {Event} e Event object
    */
-  paste: function(ev) {
-    var copiedText = null;
+  paste: function(e) {
+    var copiedText = null,
+        clipboardData = this._getClipboardData(e);
     
     // Check for backward compatibility with old browsers
-    if (ev.clipboardData) {
-      copiedText = ev.clipboardData.getData('text');
+    if (clipboardData) {
+      copiedText = clipboardData.getData('text');
     } else {
       copiedText = this.copiedText;
     }
@@ -118,10 +122,23 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
   /**
    * Cuts text
+   * @param {Event} e Event object
    */
   cut: function(e) {
+    if (this.selectionStart === this.selectionEnd) {
+      return;
+    }
+
     this.copy();
     this.removeChars(e);
+  },
+
+  /**
+   * @private
+   * @param {Event} e Event object
+   */
+  _getClipboardData: function(e) {
+    return e && (e.clipboardData || fabric.window.clipboardData);
   },
 
   /**
