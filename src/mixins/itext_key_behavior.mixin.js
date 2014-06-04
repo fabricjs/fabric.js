@@ -13,6 +13,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
     fabric.util.addListener(this.hiddenTextarea, 'keydown', this.onKeyDown.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'keypress', this.onKeyPress.bind(this));
+    fabric.util.addListener(this.hiddenTextarea, 'copy', this.copy.bind(this));
+    fabric.util.addListener(this.hiddenTextarea, 'paste', this.paste.bind(this));
+
 
     if (!this._clickHandlerInitialized && this.canvas) {
       fabric.util.addListener(this.canvas.upperCanvasEl, 'click', this.onClick.bind(this));
@@ -38,8 +41,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    */
   _ctrlKeysMap: {
     65: 'selectAll',
-    67: 'copy',
-    86: 'paste',
     88: 'cut'
   },
 
@@ -65,7 +66,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       return;
     }
 
-    e.preventDefault();
     e.stopPropagation();
 
     this.canvas && this.canvas.renderAll();
@@ -84,8 +84,14 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   /**
    * Copies selected text
    */
-  copy: function() {
+  copy: function(ev) {
     var selectedText = this.getSelectedText();
+    
+    // Check for backward compatibility with old browsers
+    if (ev.clipboardData) {
+      ev.clipboardData.setData('text', selectedText);
+    }
+
     this.copiedText = selectedText;
     this.copiedStyles = this.getSelectionStyles(
                           this.selectionStart,
@@ -95,9 +101,18 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   /**
    * Pastes text
    */
-  paste: function() {
-    if (this.copiedText) {
-      this.insertChars(this.copiedText);
+  paste: function(ev) {
+    var copiedText = null;
+    
+    // Check for backward compatibility with old browsers
+    if (ev.clipboardData) {
+      copiedText = ev.clipboardData.getData('text');
+    } else {
+      copiedText = this.copiedText;
+    }
+    
+    if (copiedText) {
+      this.insertChars(copiedText);
     }
   },
 
@@ -120,7 +135,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
     this.insertChars(String.fromCharCode(e.which));
 
-    e.preventDefault();
     e.stopPropagation();
   },
 
