@@ -167,8 +167,7 @@
           tempControlX,
           tempControlY,
           l = -((this.width / 2) + this.pathOffset.x),
-          t = -((this.height / 2) + this.pathOffset.y),
-          methodName;
+          t = -((this.height / 2) + this.pathOffset.y);
 
       for (var i = 0, len = this.path.length; i < len; ++i) {
 
@@ -211,21 +210,13 @@
           case 'm': // moveTo, relative
             x += current[1];
             y += current[2];
-            // draw a line if previous command was moveTo as well (otherwise, it will have no effect)
-            methodName = (previous && (previous[0] === 'm' || previous[0] === 'M'))
-              ? 'lineTo'
-              : 'moveTo';
-            ctx[methodName](x + l, y + t);
+            ctx.moveTo(x + l, y + t);
             break;
 
           case 'M': // moveTo, absolute
             x = current[1];
             y = current[2];
-            // draw a line if previous command was moveTo as well (otherwise, it will have no effect)
-            methodName = (previous && (previous[0] === 'm' || previous[0] === 'M'))
-              ? 'lineTo'
-              : 'moveTo';
-            ctx[methodName](x + l, y + t);
+            ctx.moveTo(x + l, y + t);
             break;
 
           case 'c': // bezierCurveTo, relative
