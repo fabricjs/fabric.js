@@ -224,23 +224,26 @@
 
       this.clipTo && ctx.restore();
 
-      this.callSuper('_renderControls', ctx, noTransform);
       ctx.restore();
+    },
+
+    /**
+     * Renders controls and borders for the object
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Boolean} [noTransform] When true, context is not transformed
+     */
+    _renderControls: function(ctx, noTransform) {
+      this.callSuper('_renderControls', ctx, noTransform);
+      for (var i = 0, len = this._objects.length; i < len; i++) {
+        this._objects[i]._renderControls(ctx);
+      }
     },
 
     /**
      * @private
      */
     _renderObject: function(object, ctx) {
-      var v = this.getViewportTransform(),
-          sxy = fabric.util.transformPoint(
-        new fabric.Point(this.scaleX, this.scaleY),
-        v,
-        true
-      );
-      
-      var originalHasRotatingPoint = object.hasRotatingPoint,
-          groupScaleFactor = Math.max(sxy.x, sxy.y);
+      var originalHasRotatingPoint = object.hasRotatingPoint;
 
       // do not render if object is not visible
       if (!object.visible) return;

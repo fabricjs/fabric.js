@@ -967,15 +967,10 @@
       this._restoreFillRule(ctx);
 
       ctx.restore();
-      
-      this._renderControls(ctx, noTransform);
     },
 
     _transform: function(ctx, noTransform) {
       var m = this.transformMatrix;
-      var v = this.getViewportTransform();
-      
-      ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
 
       if (m && !this.group) {
         ctx.setTransform(m[0], m[1], m[2], m[3], m[4], m[5]);

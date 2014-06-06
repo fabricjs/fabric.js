@@ -766,17 +766,12 @@
       if (!this.visible) return;
 
       ctx.save();
-      var v = this.getViewportTransform();
-      ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
-
       var m = this.transformMatrix;
       if (m && (!this.group || this.group.type === 'path-group')) {
         ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
       }
       this._render(ctx);
       ctx.restore();
-
-      this.callSuper('_renderControls', ctx, noTransform);
     },
 
     /**

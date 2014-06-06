@@ -9475,17 +9475,13 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      */
     _draw: function (ctx, object) {
       if (!object) return;
-
-      if (this.controlsAboveOverlay) {
-        var hasBorders = object.hasBorders, hasControls = object.hasControls;
-        object.hasBorders = object.hasControls = false;
-        object.render(ctx);
-        object.hasBorders = hasBorders;
-        object.hasControls = hasControls;
-      }
-      else {
-        object.render(ctx);
-      }
+ 
+      ctx.save();
+      var v = this.viewportTransform;
+      ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
+      object.render(ctx);
+      ctx.restore();
+      if (!this.controlsAboveOverlay) object._renderControls(ctx);
     },
 
     /**
@@ -9572,7 +9568,6 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * @chainable
      */
     renderAll: function (allOnTop) {
-
       var canvasToDrawOn = this[(allOnTop === true && this.interactive) ? 'contextTop' : 'contextContainer'],
           activeGroup = this.getActiveGroup();
 
@@ -12158,7 +12153,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @private
      */
     _drawGroupControls: function(ctx, activeGroup) {
-      this._drawControls(ctx, activeGroup, 'Group');
+      activeGroup._renderControls(ctx);
     },
 
     /**
@@ -12167,20 +12162,9 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     _drawObjectsControls: function(ctx) {
       for (var i = 0, len = this._objects.length; i < len; ++i) {
         if (!this._objects[i] || !this._objects[i].active) continue;
-        this._drawControls(ctx, this._objects[i], 'Object');
+        this._objects[i]._renderControls(ctx);
         this.lastRenderedObjectWithControlsAboveOverlay = this._objects[i];
       }
-    },
-
-    /**
-     * @private
-     */
-    _drawControls: function(ctx, object, klass) {
-      ctx.save();
-      fabric[klass].prototype.transform.call(object, ctx);
-      //object.drawBorders(ctx).drawControls(ctx);
-      object._renderControls(ctx);
-      ctx.restore();
     }
   });
 
@@ -14628,15 +14612,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       this._restoreFillRule(ctx);
 
       ctx.restore();
-      
-      this._renderControls(ctx, noTransform);
     },
 
     _transform: function(ctx, noTransform) {
       var m = this.transformMatrix;
-      var v = this.getViewportTransform();
-      
-      ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
 
       if (m && !this.group) {
         ctx.setTransform(m[0], m[1], m[2], m[3], m[4], m[5]);
@@ -18734,9 +18713,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       ctx.save();
       var m = this.transformMatrix;
 
-      var v = this.getViewportTransform();
-      ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
-
       if (m) {
         ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
       }
@@ -18755,8 +18731,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       this.clipTo && ctx.restore();
       this._removeShadow(ctx);
       ctx.restore();
-
-      this.callSuper('_renderControls', ctx, noTransform);
     },
 
     /**
@@ -19109,13 +19083,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       var m = this.transformMatrix;
       
-      var v = this.getViewportTransform();
-      ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
-      
       if (m) {
         ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
       }
-
       this.transform(ctx);
 
       this._setShadow(ctx);
@@ -19126,8 +19096,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       this.clipTo && ctx.restore();
       this._removeShadow(ctx);
       ctx.restore();
-
-      this.callSuper('_renderControls', ctx);
     },
 
     /**
@@ -19504,23 +19472,26 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       this.clipTo && ctx.restore();
 
-      this.callSuper('_renderControls', ctx, noTransform);
       ctx.restore();
+    },
+
+    /**
+     * Renders controls and borders for the object
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Boolean} [noTransform] When true, context is not transformed
+     */
+    _renderControls: function(ctx, noTransform) {
+      this.callSuper('_renderControls', ctx, noTransform)
+      for (var i = 0, len = this._objects.length; i < len; i++) {
+        this._objects[i]._renderControls(ctx);
+      }
     },
 
     /**
      * @private
      */
     _renderObject: function(object, ctx) {
-      var v = this.getViewportTransform(),
-          sxy = fabric.util.transformPoint(
-        new fabric.Point(this.scaleX, this.scaleY),
-        v,
-        true
-      );
-      
-      var originalHasRotatingPoint = object.hasRotatingPoint,
-          groupScaleFactor = Math.max(sxy.x, sxy.y);
+      var originalHasRotatingPoint = object.hasRotatingPoint;
 
       // do not render if object is not visible
       if (!object.visible) return;
@@ -19944,10 +19915,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       ctx.save();
       var m = this.transformMatrix,
-          v = this.getViewportTransform(),
           isInPathGroup = this.group && this.group.type === 'path-group';
-
-      ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
 
       // this._resetWidthHeight();
       if (isInPathGroup) {
@@ -19963,7 +19931,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         ctx.translate(this.width/2, this.height/2);
       }
 
-      ctx.save();
       this._setShadow(ctx);
       this.clipTo && fabric.util.clipContext(this, ctx);
       this._render(ctx);
@@ -19973,9 +19940,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       this._renderStroke(ctx);
       this.clipTo && ctx.restore();
       ctx.restore();
-      ctx.restore();
-
-      this.callSuper('_renderControls', ctx, noTransform);
     },
 
     /**
@@ -22429,17 +22393,12 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       if (!this.visible) return;
 
       ctx.save();
-      var v = this.getViewportTransform();
-      ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
-
       var m = this.transformMatrix;
       if (m && (!this.group || this.group.type === 'path-group')) {
         ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
       }
       this._render(ctx);
       ctx.restore();
-
-      this.callSuper('_renderControls', ctx, noTransform);
     },
 
     /**

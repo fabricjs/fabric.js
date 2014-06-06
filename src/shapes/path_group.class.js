@@ -78,13 +78,9 @@
 
       var m = this.transformMatrix;
       
-      var v = this.getViewportTransform();
-      ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
-      
       if (m) {
         ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
       }
-
       this.transform(ctx);
 
       this._setShadow(ctx);
@@ -95,8 +91,6 @@
       this.clipTo && ctx.restore();
       this._removeShadow(ctx);
       ctx.restore();
-
-      this.callSuper('_renderControls', ctx);
     },
 
     /**

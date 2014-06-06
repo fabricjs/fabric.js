@@ -123,10 +123,7 @@
 
       ctx.save();
       var m = this.transformMatrix,
-          v = this.getViewportTransform(),
           isInPathGroup = this.group && this.group.type === 'path-group';
-
-      ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
 
       // this._resetWidthHeight();
       if (isInPathGroup) {
@@ -142,7 +139,6 @@
         ctx.translate(this.width/2, this.height/2);
       }
 
-      ctx.save();
       this._setShadow(ctx);
       this.clipTo && fabric.util.clipContext(this, ctx);
       this._render(ctx);
@@ -152,9 +148,6 @@
       this._renderStroke(ctx);
       this.clipTo && ctx.restore();
       ctx.restore();
-      ctx.restore();
-
-      this.callSuper('_renderControls', ctx, noTransform);
     },
 
     /**
