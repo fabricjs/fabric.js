@@ -9368,7 +9368,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
 
     /**
      * Returns point at center of viewport
-     * @return {fabric.Point} the top left corner of the viewport
+     * @return {fabric.Point} the center of the viewport
      */
     getViewportCenter: function () {
       var wh = fabric.util.transformPoint(
@@ -9378,7 +9378,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
           x  = this.viewportTransform[4],
           y  = this.viewportTransform[5];
       
-      return new fabric.Point(wh.x + x, wh.y + y);
+      return new fabric.Point(wh.x/2 + x, wh.y/2 + y);
     },
 
     /**
@@ -9397,50 +9397,69 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
     },
 
     /**
+     * Sets zoom level of this canvas instance, zoom centered around point
+     * @param {fabric.Point} point to zoom with respect to
+     * @param {Number} value to set zoom to, less than 1 zooms out
+     * @return {fabric.Canvas} instance
+     * @chainable true
+     */
+    zoomToPoint: function (point, value) {
+      // TODO: just change the scale, preserve other transformations
+      var before = fabric.util.transformPoint(point, this.viewportTransform);
+      this.viewportTransform[0] = value;
+      this.viewportTransform[3] = value;
+      var after = fabric.util.transformPoint(point, this.viewportTransform);
+      this.viewportTransform[4] += before.x - after.x;
+      this.viewportTransform[5] += before.y - after.y;
+      this.renderAll();
+      for (var i = 0, len = this._objects.length; i < len; i++) {
+        this._objects[i].setCoords();
+      }
+      return this;
+    },
+
+    /**
      * Sets zoom level of this canvas instance
      * @param {Number} value to set zoom to, less than 1 zooms out
      * @return {fabric.Canvas} instance
      * @chainable true
      */
     setZoom: function (value) {
-      // TODO: just change the scale, preserve other transformations
-      this.viewportTransform[0] = value;
-      this.viewportTransform[3] = value;
-      this.renderAll();
-      for (var i = 0, len = this._objects.length; i < len; i++) {
-        this._objects[i].setCoords();
-      }
+      this.zoomToPoint(new fabric.Point(0, 0), value);
       return this;
     },
 
     /**
-     * Centers viewport of this canvas instance on given point
-     * @param {Numer} x value for center of viewport
-     * @param {Numer} y value for center of viewport
+     * Pan viewport so as to place point at top left corner of canvas
+     * @param {fabric.Point} point to move to
      * @return {fabric.Canvas} instance
      * @chainable true
      */
-    setViewportCenter: function (x, y) {
+    absolutePan: function (point) {
       var wh = fabric.util.transformPoint(
         new fabric.Point(this.getWidth(), this.getHeight()),
         this.viewportTransform
       );
-      this.viewportTransform[4] = x - wh.x/2;
-      this.viewportTransform[5] = y - wh.y/2;
+      this.viewportTransform[4] = -point.x;
+      this.viewportTransform[5] = -point.y;
       this.renderAll();
       for (var i = 0, len = this._objects.length; i < len; i++) {
         this._objects[i].setCoords();
       }
-      return this;
+      return this
     },
 
     /**
-     * Centers viewport of this canvas instance
+     * Pans viewpoint relatively
+     * @param {fabric.Point} point (position vector) to move by
      * @return {fabric.Canvas} instance
      * @chainable true
      */
-    centerViewport: function () {
-      return this.setViewportCenter(this.getWidth()/2, this.getHeight()/2);
+    relativePan: function (point) {
+      return this.absolutePan(new fabric.Point(
+        -point.x - this.viewportTransform[4],
+        -point.y - this.viewportTransform[5]
+      ));
     },
 
     /**
@@ -10701,9 +10720,8 @@ fabric.CircleBrush = fabric.util.createClass(fabric.BaseBrush, /** @lends fabric
   */
   drawDot: function(pointer) {
     var point = this.addPoint(pointer),
-        ctx = this.canvas.contextTop;
-
-    var v = this.canvas.viewportTransform;
+        ctx = this.canvas.contextTop,
+        v = this.canvas.viewportTransform;
     ctx.save();
     ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
 
@@ -10712,7 +10730,7 @@ fabric.CircleBrush = fabric.util.createClass(fabric.BaseBrush, /** @lends fabric
     ctx.arc(point.x, point.y, point.radius, 0, Math.PI * 2, false);
     ctx.closePath();
     ctx.fill();
-    
+
     ctx.restore();
   },
 
@@ -19481,7 +19499,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @param {Boolean} [noTransform] When true, context is not transformed
      */
     _renderControls: function(ctx, noTransform) {
-      this.callSuper('_renderControls', ctx, noTransform)
+      this.callSuper('_renderControls', ctx, noTransform);
       for (var i = 0, len = this._objects.length; i < len; i++) {
         this._objects[i]._renderControls(ctx);
       }
