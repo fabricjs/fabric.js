@@ -14562,6 +14562,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     _render: function(ctx) {
       var current, // current instruction
           previous = null,
+          subpathStartX = 0,
+          subpathStartY = 0,
           x = 0, // current x
           y = 0, // current y
           controlX = 0, // current control point x
@@ -14614,12 +14616,16 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           case 'm': // moveTo, relative
             x += current[1];
             y += current[2];
+            subpathStartX = x;
+            subpathStartY = y;
             ctx.moveTo(x + l, y + t);
             break;
 
           case 'M': // moveTo, absolute
             x = current[1];
             y = current[2];
+            subpathStartX = x;
+            subpathStartY = y;
             ctx.moveTo(x + l, y + t);
             break;
 
@@ -14831,6 +14837,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
           case 'z':
           case 'Z':
+            x = subpathStartX;
+            y = subpathStartY;
             ctx.closePath();
             break;
         }
