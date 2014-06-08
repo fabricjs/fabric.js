@@ -10847,7 +10847,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      */
     _renderFill: function(ctx) {
       if (!this.fill) return;
-
+      ctx.globalAlpha=this.opacity;
       if (this.fill.toLive) {
         ctx.save();
         ctx.translate(
