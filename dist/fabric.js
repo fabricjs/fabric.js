@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures,cufon,json minifier=uglifyjs` */
 /*! Fabric.js Copyright 2008-2014, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.4.7" };
+var fabric = fabric || { version: "1.4.6" };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -3058,8 +3058,8 @@ if (typeof console !== 'undefined') {
           height = null,
           viewBoxWidth,
           viewBoxHeight,
-          minX,
-          minY;
+          minX=0,
+          minY=0;
 
       if (viewBoxAttr && (viewBoxAttr = viewBoxAttr.match(reViewBoxAttrValue))) {
         minX = parseFloat(viewBoxAttr[1]);
@@ -3082,7 +3082,9 @@ if (typeof console !== 'undefined') {
         width: width,
         height: height,
         widthAttr: widthAttr,
-        heightAttr: heightAttr
+        heightAttr: heightAttr,
+        minX: minX,
+        minY: minY
       };
 
       fabric.gradientDefs = fabric.getGradientDefs(doc);
@@ -10847,7 +10849,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      */
     _renderFill: function(ctx) {
       if (!this.fill) return;
-      ctx.globalAlpha=this.opacity;
+	  ctx.globalAlpha=this.opacity;
       if (this.fill.toLive) {
         ctx.save();
         ctx.translate(
@@ -13362,10 +13364,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       throw new Error('value of `r` attribute is required and can not be negative');
     }
     if ('left' in parsedAttributes) {
-      parsedAttributes.left -= (options.width / 2) || 0;
+      parsedAttributes.left -= (options.width / 2) + options.minX || 0;
     }
     if ('top' in parsedAttributes) {
-      parsedAttributes.top -= (options.height / 2) || 0;
+      parsedAttributes.top -= (options.height / 2) + options.minY || 0;
     }
     var obj = new fabric.Circle(extend(parsedAttributes, options));
 
@@ -14519,8 +14521,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           isHeightSet = 'height' in options && options.width != null,
           isLeftSet = 'left' in options,
           isTopSet = 'top' in options,
-          origLeft = isLeftSet ? this.left : 0,
-          origTop = isTopSet ? this.top : 0;
+          origLeft = isLeftSet ? this.left - options.minX : 0 - options.minX,
+          origTop = isTopSet ? this.top - options.minY : 0 - options.minY;
 
       if (!isWidthSet || !isHeightSet) {
         extend(this, this._parseDimensions());
