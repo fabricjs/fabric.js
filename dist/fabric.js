@@ -15980,7 +15980,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @default
      */
     type: 'image',
-	im_loading: false,
     /**
      * crossOrigin value (one of "", "anonymous", "allow-credentials")
      * @see https://developer.mozilla.org/en-US/docs/HTML/CORS_settings_attributes
@@ -16440,9 +16439,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     var parsedAttributes = fabric.parseAttributes(element, fabric.Image.ATTRIBUTE_NAMES);
     fabric.Image.fromURL(parsedAttributes['xlink:href'], callback,
       extend((options ? fabric.util.object.clone(options) : { }), parsedAttributes));
-    //while(this.im_loading) {
-		// do nothing...
-	//}
+
   };
   /* _FROM_SVG_END_ */
 
