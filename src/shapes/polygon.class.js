@@ -56,21 +56,21 @@
     _calcDimensions: function(skipOffset) {
 
       var points = this.points,
-          minX = min(points, 'x'),
-          minY = min(points, 'y'),
-          maxX = max(points, 'x'),
-          maxY = max(points, 'y');
+          m_minX = min(points, 'x'),
+          m_minY = min(points, 'y'),
+          m_maxX = max(points, 'x'),
+          m_maxY = max(points, 'y');
 
-      this.width = (maxX - minX) || 1;
-      this.height = (maxY - minY) || 1;
+      this.width = (m_maxX - m_minX) || 1;
+      this.height = (m_maxY - m_minY) || 1;
 
-      this.minX = minX;
-      this.minY = minY;
+      this.m_minX = m_minX;
+      this.m_minY = m_minY;
 
       if (skipOffset) return;
 
-      var halfWidth = this.width / 2 + this.minX,
-          halfHeight = this.height / 2 + this.minY;
+      var halfWidth = this.width / 2 + this.m_minX,
+          halfHeight = this.height / 2 + this.m_minY;
 
       // change points to offset polygon into a bounding box
       this.points.forEach(function(p) {
@@ -123,6 +123,7 @@
     _render: function(ctx) {
       var point;
       ctx.beginPath();
+      ctx.globalAlpha = this.group ? (ctx.globalAlpha * this.opacity) : this.opacity;
       ctx.moveTo(this.points[0].x, this.points[0].y);
       for (var i = 0, len = this.points.length; i < len; i++) {
         point = this.points[i];
