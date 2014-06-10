@@ -82,11 +82,6 @@
       options = options || { };
 
       this.setOptions(options);
-	  /*if(this.transformMatrix) {
-	  	this.transformMatrix=fabric.util.multiplyTransformMatrices(this.svg_matrix,this.transformMatrix);
-	  } else {
-	  	this.transformMatrix=this.svg_matrix;
-	  }*/
       if (!path) {
         throw new Error('`path` argument is required');
       }
