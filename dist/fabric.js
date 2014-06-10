@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures,cufon,json minifier=uglifyjs` */
 /*! Fabric.js Copyright 2008-2014, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.4.6" };
+var fabric = fabric || { version: "1.4.7" };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -3058,8 +3058,8 @@ if (typeof console !== 'undefined') {
           height = null,
           viewBoxWidth,
           viewBoxHeight,
-          minX=0,
-          minY=0;
+          minX,
+          minY;
 
       if (viewBoxAttr && (viewBoxAttr = viewBoxAttr.match(reViewBoxAttrValue))) {
         minX = parseFloat(viewBoxAttr[1]);
@@ -3082,9 +3082,7 @@ if (typeof console !== 'undefined') {
         width: width,
         height: height,
         widthAttr: widthAttr,
-        heightAttr: heightAttr,
-        minX: minX,
-        minY: minY
+        heightAttr: heightAttr
       };
 
       fabric.gradientDefs = fabric.getGradientDefs(doc);
@@ -10849,7 +10847,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      */
     _renderFill: function(ctx) {
       if (!this.fill) return;
-	  ctx.globalAlpha=this.opacity;
+
       if (this.fill.toLive) {
         ctx.save();
         ctx.translate(
@@ -13364,10 +13362,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       throw new Error('value of `r` attribute is required and can not be negative');
     }
     if ('left' in parsedAttributes) {
-      parsedAttributes.left -= (options.width / 2) + options.minX || 0;
+      parsedAttributes.left -= (options.width / 2) || 0;
     }
     if ('top' in parsedAttributes) {
-      parsedAttributes.top -= (options.height / 2) + options.minY || 0;
+      parsedAttributes.top -= (options.height / 2) || 0;
     }
     var obj = new fabric.Circle(extend(parsedAttributes, options));
 
@@ -13567,6 +13565,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @default
      */
     ry:   0,
+
     /**
      * Constructor
      * @param {Object} [options] Options object
@@ -13579,6 +13578,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       this.set('rx', options.rx || 0);
       this.set('ry', options.ry || 0);
+
       this.set('width', this.get('rx') * 2);
       this.set('height', this.get('ry') * 2);
     },
@@ -13639,7 +13639,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       if (this.transformMatrix && this.group) {
         ctx.translate(this.cx, this.cy);
       }
-      ctx.transform(1, 0, 0, this.ry/this.rx,0,0);
+      ctx.transform(1, 0, 0, this.ry/this.rx, 0, 0);
       ctx.arc(noTransform ? this.left : 0, noTransform ? this.top : 0, this.rx, 0, piBy2, false);
       ctx.restore();
 
@@ -13676,11 +13676,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   fabric.Ellipse.fromElement = function(element, options) {
     options || (options = { });
 
-    var parsedAttributes = fabric.parseAttributes(element, fabric.Ellipse.ATTRIBUTE_NAMES);
-    parsedAttributes.left-= options.minX;
-    parsedAttributes.top -= options.minY;
-    var cx = parsedAttributes.left;
-    var cy = parsedAttributes.top;
+    var parsedAttributes = fabric.parseAttributes(element, fabric.Ellipse.ATTRIBUTE_NAMES),
+        cx = parsedAttributes.left,
+        cy = parsedAttributes.top;
 
     if ('left' in parsedAttributes) {
       parsedAttributes.left -= (options.width / 2) || 0;
@@ -13688,12 +13686,12 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     if ('top' in parsedAttributes) {
       parsedAttributes.top -= (options.height / 2) || 0;
     }
+
     var ellipse = new fabric.Ellipse(extend(parsedAttributes, options));
 
     ellipse.cx = cx || 0;
     ellipse.cy = cy || 0;
-	//alert('cy:'+ellipse.cy + ' '+'cx:'+ellipse.cx + ' '+'rx:'+ellipse.rx + ' '+'ry:'+ellipse.ry + ' '+'left:'+ellipse.left + ' '+'top:'+ellipse.top + ' '+'height:'+ellipse.height );
-	
+
     return ellipse;
   };
   /* _FROM_SVG_END_ */
@@ -14521,8 +14519,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           isHeightSet = 'height' in options && options.width != null,
           isLeftSet = 'left' in options,
           isTopSet = 'top' in options,
-          origLeft = isLeftSet ? this.left - options.minX : 0 - options.minX,
-          origTop = isTopSet ? this.top - options.minY : 0 - options.minY;
+          origLeft = isLeftSet ? this.left : 0,
+          origTop = isTopSet ? this.top : 0;
 
       if (!isWidthSet || !isHeightSet) {
         extend(this, this._parseDimensions());
@@ -15980,6 +15978,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @default
      */
     type: 'image',
+
     /**
      * crossOrigin value (one of "", "anonymous", "allow-credentials")
      * @see https://developer.mozilla.org/en-US/docs/HTML/CORS_settings_attributes
@@ -15987,6 +15986,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @default
      */
     crossOrigin: '',
+
     /**
      * Constructor
      * @param {HTMLImageElement | String} element Image element
@@ -15994,7 +15994,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @return {fabric.Image} thisArg
      */
     initialize: function(element, options) {
-
       options || (options = { });
 
       this.filters = [ ];
@@ -16003,7 +16002,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       this._initElement(element, options);
       this._initConfig(options);
-	  this.m_options=options;
+
       if (options.filters) {
         this.filters = options.filters;
         this.applyFilters();
@@ -16289,11 +16288,11 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    _render: function(ctx,options) {
+    _render: function(ctx) {
         this._element && ctx.drawImage(
                            this._element,
-                           -this.width / 2 - this.m_options.minX,
-                           -this.height / 2 - this.m_options.minY,
+                           -this.width / 2,
+                           -this.height / 2,
                            this.width,
                            this.height
                          );
@@ -16415,7 +16414,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    */
   fabric.Image.fromURL = function(url, callback, imgOptions) {
     fabric.util.loadImage(url, function(img) {
-      callback(new fabric.Image(img, imgOptions))
+      callback(new fabric.Image(img, imgOptions));
     }, null, imgOptions && imgOptions.crossOrigin);
   };
 
@@ -16437,9 +16436,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    */
   fabric.Image.fromElement = function(element, callback, options) {
     var parsedAttributes = fabric.parseAttributes(element, fabric.Image.ATTRIBUTE_NAMES);
+
     fabric.Image.fromURL(parsedAttributes['xlink:href'], callback,
       extend((options ? fabric.util.object.clone(options) : { }), parsedAttributes));
-
   };
   /* _FROM_SVG_END_ */
 
@@ -21977,4 +21976,3 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   }
 
 })();
-
