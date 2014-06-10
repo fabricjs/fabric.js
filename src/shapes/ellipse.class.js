@@ -56,11 +56,6 @@
 
       this.set('width', this.get('rx') * 2);
       this.set('height', this.get('ry') * 2);
-      /*if(this.transformMatrix) {
-	  	this.transformMatrix=fabric.util.multiplyTransformMatrices(options.svg_matrix,this.transformMatrix);
-	  } else {
-	  	this.transformMatrix=options.svg_matrix;
-	  }*/
     },
 
     /**
