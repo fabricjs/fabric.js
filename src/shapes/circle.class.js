@@ -101,10 +101,6 @@
       ctx.beginPath();
       // multiply by currently set alpha (the one that was set by path group where this object is contained, for example)
       ctx.globalAlpha = this.group ? (ctx.globalAlpha * this.opacity) : this.opacity;
-      //var m = this.svg_matrix;
-      /*if (m) {
-        ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
-      }*/ 
       ctx.arc(noTransform ? this.left : 0, noTransform ? this.top : 0, this.radius, 0, piBy2, false);
       ctx.closePath();
 
