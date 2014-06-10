@@ -82,11 +82,15 @@
       options = options || { };
 
       this.setOptions(options);
-
+	  /*if(this.transformMatrix) {
+	  	this.transformMatrix=fabric.util.multiplyTransformMatrices(this.svg_matrix,this.transformMatrix);
+	  } else {
+	  	this.transformMatrix=this.svg_matrix;
+	  }*/
       if (!path) {
         throw new Error('`path` argument is required');
       }
-
+      
       var fromArray = _toString.call(path) === '[object Array]';
 
       this.path = fromArray
@@ -115,8 +119,8 @@
           isHeightSet = 'height' in options && options.width != null,
           isLeftSet = 'left' in options,
           isTopSet = 'top' in options,
-          origLeft = isLeftSet ? this.left : 0,
-          origTop = isTopSet ? this.top : 0;
+          origLeft = ( isLeftSet ? this.left : 0) - options.minX,
+          origTop = (isTopSet ? this.top : 0) - options.minY;
 
       if (!isWidthSet || !isHeightSet) {
         extend(this, this._parseDimensions());
@@ -456,6 +460,10 @@
       if (m) {
         ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
       }
+      /*var m = this.svg_matrix;
+      if (m) {
+        ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
+      } */     
       if (!noTransform) {
         this.transform(ctx);
       }
@@ -464,7 +472,7 @@
       this._setShadow(ctx);
       this.clipTo && fabric.util.clipContext(this, ctx);
       ctx.beginPath();
-
+      ctx.globalAlpha = this.group ? (ctx.globalAlpha * this.opacity) : this.opacity;
       this._render(ctx);
       this._renderFill(ctx);
       this._renderStroke(ctx);
