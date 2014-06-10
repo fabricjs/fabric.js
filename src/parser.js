@@ -70,7 +70,6 @@
           parentAttributes.transformMatrix, fabric.parseTransformAttribute(value));
       }
       else {
-      	//TODO valutare se inserire qui la doppia matrice derivata dalla viewbox
         value = fabric.parseTransformAttribute(value);
       }
     }
@@ -436,16 +435,16 @@
           viewBoxHeight,
           minX=0,
           minY=0,
-          scale_matrix=[1,0,0,1,0,0],
-          trans_matrix=[1,0,0,1,0,0];
+          ScaleMatrix=[1,0,0,1,0,0],
+          TraslMatrix=[1,0,0,1,0,0];
 
       if (viewBoxAttr && (viewBoxAttr = viewBoxAttr.match(reViewBoxAttrValue))) {
         minX = parseFloat(viewBoxAttr[1]);
         minY = parseFloat(viewBoxAttr[2]);
         viewBoxWidth = parseFloat(viewBoxAttr[3]);
         viewBoxHeight = parseFloat(viewBoxAttr[4]);
-        trans_matrix[4] = -minX;
-        trans_matrix[5] = -minY;
+        TraslMatrix[4] = -minX;
+        TraslMatrix[5] = -minY;
       }
 
       if (viewBoxWidth && widthAttr && viewBoxWidth !== widthAttr) {
@@ -458,8 +457,8 @@
       }
       
       if(viewBoxWidth && widthAttr){
-	     scale_matrix[0]=widthAttr/viewBoxWidth;
-	     scale_matrix[3]=heightAttr/viewBoxHeight;
+	     ScaleMatrix[0]=widthAttr/viewBoxWidth;
+	     ScaleMatrix[3]=heightAttr/viewBoxHeight;
 	  } 
 	  
       var options = {
@@ -469,7 +468,7 @@
         heightAttr: heightAttr,
         minX: minX,
         minY: minY,
-        svg_matrix: fabric.util.multiplyTransformMatrices(scale_matrix,trans_matrix)
+        SvgMatrix: fabric.util.multiplyTransformMatrices(ScaleMatrix,TraslMatrix)
       };
 
       fabric.gradientDefs = fabric.getGradientDefs(doc);
