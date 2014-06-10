@@ -119,8 +119,7 @@
       if (this.transformMatrix && this.group) {
         ctx.translate(this.cx, this.cy);
       }
-      //this final this.rx fix something and doesn't break anything i can see.
-      ctx.transform(1, 0, 0, this.ry/this.rx, 0, this.rx);
+      ctx.transform(1, 0, 0, this.ry/this.rx, 0, 0);
       ctx.arc(noTransform ? this.left : 0, noTransform ? this.top : 0, this.rx, 0, piBy2, false);
       ctx.restore();
 
