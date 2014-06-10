@@ -467,8 +467,8 @@
         height: height,
         widthAttr: widthAttr,
         heightAttr: heightAttr,
-        minX: 0,
-        minY: 0,
+        minX: minX,
+        minY: minY,
         svg_matrix: fabric.util.multiplyTransformMatrices(scale_matrix,trans_matrix)
       };
 
