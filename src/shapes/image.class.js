@@ -52,11 +52,6 @@
 
       this._initElement(element, options);
       this._initConfig(options);
-	  /*if(this.transformMatrix) {
-	  	this.transformMatrix=fabric.util.multiplyTransformMatrices(options.svg_matrix,this.transformMatrix);
-	  } else {
-	  	this.transformMatrix=options.svg_matrix;
-	  }*/
       if (options.filters) {
         this.filters = options.filters;
         this.applyFilters();
