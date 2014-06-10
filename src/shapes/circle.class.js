@@ -40,7 +40,11 @@
      */
     initialize: function(options) {
       options = options || { };
-
+	  if(this.transformMatrix) {
+	  	this.transformMatrix=fabric.util.multiplyTransformMatrices(options.svg_matrix,this.transformMatrix);
+	  } else {
+	  	this.transformMatrix=options.svg_matrix;
+	  }
       this.set('radius', options.radius || 0);
       this.callSuper('initialize', options);
     },
@@ -168,10 +172,10 @@
       throw new Error('value of `r` attribute is required and can not be negative');
     }
     if ('left' in parsedAttributes) {
-      parsedAttributes.left -= (options.width / 2) || 0;
+      parsedAttributes.left -= (options.width / 2 + options.minX ) || 0;
     }
     if ('top' in parsedAttributes) {
-      parsedAttributes.top -= (options.height / 2) || 0;
+      parsedAttributes.top -= (options.height / 2 + options.minY )|| 0;
     }
     var obj = new fabric.Circle(extend(parsedAttributes, options));
 
