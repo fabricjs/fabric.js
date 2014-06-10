@@ -40,7 +40,6 @@
      */
     initialize: function(options) {
       options = options || { };
-      this.svg_matrix=options.svg_matrix;
       this.set('radius', options.radius || 0);
       this.callSuper('initialize', options);
     },
