@@ -52,7 +52,11 @@
 
       this._initElement(element, options);
       this._initConfig(options);
-
+	  /*if(this.transformMatrix) {
+	  	this.transformMatrix=fabric.util.multiplyTransformMatrices(options.svg_matrix,this.transformMatrix);
+	  } else {
+	  	this.transformMatrix=options.svg_matrix;
+	  }*/
       if (options.filters) {
         this.filters = options.filters;
         this.applyFilters();
@@ -341,8 +345,8 @@
     _render: function(ctx) {
         this._element && ctx.drawImage(
                            this._element,
-                           -this.width / 2,
-                           -this.height / 2,
+                           -this.width / 2 - this.minX,
+                           -this.height / 2 - this.minY,
                            this.width,
                            this.height
                          );
