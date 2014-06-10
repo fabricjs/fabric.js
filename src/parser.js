@@ -456,10 +456,10 @@
         height = heightAttr ? heightAttr : viewBoxHeight;
       }
       
-      if(viewBoxWidth && widthAttr){
-	     ScaleMatrix[0]=widthAttr/viewBoxWidth;
-	     ScaleMatrix[3]=heightAttr/viewBoxHeight;
-	  } 
+      if(viewBoxWidth && widthAttr) {
+        ScaleMatrix[0]=widthAttr/viewBoxWidth;
+        ScaleMatrix[3]=heightAttr/viewBoxHeight;
+      } 
 	  
       var options = {
         width: width,
