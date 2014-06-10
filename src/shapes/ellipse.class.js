@@ -56,6 +56,11 @@
 
       this.set('width', this.get('rx') * 2);
       this.set('height', this.get('ry') * 2);
+      /*if(this.transformMatrix) {
+	  	this.transformMatrix=fabric.util.multiplyTransformMatrices(options.svg_matrix,this.transformMatrix);
+	  } else {
+	  	this.transformMatrix=options.svg_matrix;
+	  }*/
     },
 
     /**
@@ -156,10 +161,10 @@
         cy = parsedAttributes.top;
 
     if ('left' in parsedAttributes) {
-      parsedAttributes.left -= (options.width / 2) || 0;
+      parsedAttributes.left -= (options.width / 2 + options.minX )|| 0;
     }
     if ('top' in parsedAttributes) {
-      parsedAttributes.top -= (options.height / 2) || 0;
+      parsedAttributes.top -= (options.height / 2 + options.minY) || 0;
     }
 
     var ellipse = new fabric.Ellipse(extend(parsedAttributes, options));
