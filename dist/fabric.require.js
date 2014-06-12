@@ -5503,7 +5503,7 @@ fabric.Pattern = fabric.util.createClass({
                 ctx.fillRect(this.backgroundColor.offsetX || 0, this.backgroundColor.offsetY || 0, this.width, this.height);
             }
             if (this.backgroundImage) {
-                this.backgroundImage.render(ctx);
+                this._draw(ctx, this.backgroundImage);
             }
         },
         _renderOverlay: function(ctx) {
@@ -5512,7 +5512,7 @@ fabric.Pattern = fabric.util.createClass({
                 ctx.fillRect(this.overlayColor.offsetX || 0, this.overlayColor.offsetY || 0, this.width, this.height);
             }
             if (this.overlayImage) {
-                this.overlayImage.render(ctx);
+                this._draw(ctx, this.overlayImage);
             }
         },
         renderTop: function() {
