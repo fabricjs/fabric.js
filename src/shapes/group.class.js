@@ -63,6 +63,7 @@
         extend(this, options);
       }
       this._setOpacityIfSame();
+      //this.setCoords();
       this.saveCoords();
     },
 
