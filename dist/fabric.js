@@ -19314,6 +19314,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         extend(this, options);
       }
       this._setOpacityIfSame();
+      //this.setCoords();
       this.saveCoords();
     },
 
