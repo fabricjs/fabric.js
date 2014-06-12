@@ -9367,21 +9367,6 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
     },
 
     /**
-     * Returns point at center of viewport
-     * @return {fabric.Point} the center of the viewport
-     */
-    getViewportCenter: function () {
-      var wh = fabric.util.transformPoint(
-        new fabric.Point(this.getWidth(), this.getHeight()),
-        this.viewportTransform
-      ),
-          x  = this.viewportTransform[4],
-          y  = this.viewportTransform[5];
-      
-      return new fabric.Point(wh.x/2 + x, wh.y/2 + y);
-    },
-
-    /**
      * Sets viewport transform of this canvas instance
      * @param {Array} vpt the transform in the form of context.transform
      * @return {fabric.Canvas} instance
@@ -19329,6 +19314,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         extend(this, options);
       }
       this._setOpacityIfSame();
+      this.saveCoords();
     },
 
     /**
