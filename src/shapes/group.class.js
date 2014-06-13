@@ -63,7 +63,9 @@
         extend(this, options);
       }
       this._setOpacityIfSame();
-      //this.setCoords();
+      this._calcBounds();
+      this._updateObjectsCoords();
+      this.setCoords();
       this.saveCoords();
     },
 
@@ -448,11 +450,8 @@
      * @private
      */
     _getBounds: function(aX, aY, onlyWidthHeight) {
-      var ivt;
-      if (this.canvas) {
-        ivt = fabric.util.invertTransform(this.getViewportTransform());
-      }
-      var minXY = fabric.util.transformPoint(new fabric.Point(min(aX), min(aY)), ivt),
+      var ivt = fabric.util.invertTransform(this.getViewportTransform()),
+          minXY = fabric.util.transformPoint(new fabric.Point(min(aX), min(aY)), ivt),
           maxXY = fabric.util.transformPoint(new fabric.Point(max(aX), max(aY)), ivt),
           obj = {
             width: (maxXY.x - minXY.x) || 0,

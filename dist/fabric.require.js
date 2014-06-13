@@ -9899,6 +9899,9 @@ fabric.util.object.extend(fabric.Object.prototype, {
                 extend(this, options);
             }
             this._setOpacityIfSame();
+            this._calcBounds();
+            this._updateObjectsCoords();
+            this.setCoords();
             this.saveCoords();
         },
         _updateObjectsCoords: function() {
@@ -10099,11 +10102,7 @@ fabric.util.object.extend(fabric.Object.prototype, {
             this.set(this._getBounds(aX, aY, onlyWidthHeight));
         },
         _getBounds: function(aX, aY, onlyWidthHeight) {
-            var ivt;
-            if (this.canvas) {
-                ivt = fabric.util.invertTransform(this.getViewportTransform());
-            }
-            var minXY = fabric.util.transformPoint(new fabric.Point(min(aX), min(aY)), ivt), maxXY = fabric.util.transformPoint(new fabric.Point(max(aX), max(aY)), ivt), obj = {
+            var ivt = fabric.util.invertTransform(this.getViewportTransform()), minXY = fabric.util.transformPoint(new fabric.Point(min(aX), min(aY)), ivt), maxXY = fabric.util.transformPoint(new fabric.Point(max(aX), max(aY)), ivt), obj = {
                 width: maxXY.x - minXY.x || 0,
                 height: maxXY.y - minXY.y || 0
             };
