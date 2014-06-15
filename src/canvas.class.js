@@ -808,6 +808,8 @@
           bounds = this.upperCanvasEl.getBoundingClientRect(),
           cssScale;
 
+      this.calcOffset();
+
       if (bounds.width === 0 || bounds.height === 0) {
         // If bounds are not available (i.e. not visible), do not apply scale.
         cssScale = { width: 1, height: 1 };

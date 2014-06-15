@@ -526,6 +526,25 @@
       return this;
     },
 
+    setVisualDimensions: function (width, height) {
+      this.lowerCanvasEl.style.width = width;
+      this.lowerCanvasEl.style.height = height;
+
+      if (this.upperCanvasEl) {
+        this.upperCanvasEl.style.width = width;
+        this.upperCanvasEl.style.height = height;
+      }
+
+      if (this.wrapperEl) {
+        this.wrapperEl.style.width = width;
+        this.wrapperEl.style.height = height;
+      }
+
+      this.calcOffset();
+
+      return this;
+    },
+
     /**
      * Returns &lt;canvas> element corresponding to this instance
      * @return {HTMLCanvasElement}
