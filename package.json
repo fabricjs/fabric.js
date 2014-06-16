@@ -37,7 +37,7 @@
     "jscs": "1.4.x",
     "jshint": "2.5.x",
     "qunit": "0.6.x",
-    "istanbul": "0.2.6"
+    "istanbul": "0.2.x"
   },
   "engines": {
     "node": ">=0.4.0 && <1.0.0"
