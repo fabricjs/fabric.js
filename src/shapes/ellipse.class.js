@@ -118,7 +118,7 @@
       ctx.arc(noTransform ? this.left : 0, noTransform ? this.top*this.rx/this.ry : 0, this.rx, 0, piBy2, false);
       this._renderFill(ctx);
       this._renderStroke(ctx);
-       ctx.restore();
+      ctx.restore();
     },
 
     /**
@@ -151,20 +151,20 @@
     options || (options = { });
 
     var parsedAttributes = fabric.parseAttributes(element, fabric.Ellipse.ATTRIBUTE_NAMES),
-       cx = parsedAttributes.left || 0,
-       cy = parsedAttributes.top || 0;
+	cx = parsedAttributes.left || 0,
+	cy = parsedAttributes.top || 0;
 
-      if (!('left' in parsedAttributes)) {
-    	   parsedAttributes.left=0;
-      }
-      parsedAttributes.left -= (options.width / 2) || 0;
+	if (!('left' in parsedAttributes)) {
+	  parsedAttributes.left=0;
+	}
+	parsedAttributes.left -= (options.width / 2) || 0;
     
-      if (!('top' in parsedAttributes)) {
-    	   parsedAttributes.top=0;
-      }
-	    parsedAttributes.top -= (options.height / 2) || 0;
+	if (!('top' in parsedAttributes)) {
+	  parsedAttributes.top=0;
+	}
+	parsedAttributes.top -= (options.height / 2) || 0;
 
-      return ellipse;
+	return ellipse;
   };
   /* _FROM_SVG_END_ */
 
