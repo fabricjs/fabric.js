@@ -115,7 +115,7 @@
         ctx.translate(this.cx, this.cy);
       }
       ctx.transform(1, 0, 0, this.ry/this.rx, 0, 0);
-      ctx.arc(noTransform ? this.left : 0, noTransform ? this.top : 0, this.rx, 0, piBy2, false);
+      ctx.arc(noTransform ? this.left : 0, noTransform ? this.top*this.rx/this.ry : 0, this.rx, 0, piBy2, false);
       this._renderFill(ctx);
       this._renderStroke(ctx);
        ctx.restore();
@@ -151,22 +151,20 @@
     options || (options = { });
 
     var parsedAttributes = fabric.parseAttributes(element, fabric.Ellipse.ATTRIBUTE_NAMES),
-        cx = parsedAttributes.left,
-        cy = parsedAttributes.top;
+       cx = parsedAttributes.left || 0,
+       cy = parsedAttributes.top || 0;
 
-    if ('left' in parsedAttributes) {
+      if (!('left' in parsedAttributes)) {
+    	   parsedAttributes.left=0;
+      }
       parsedAttributes.left -= (options.width / 2) || 0;
-    }
-    if ('top' in parsedAttributes) {
-      parsedAttributes.top -= (options.height / 2) || 0;
-    }
+    
+      if (!('top' in parsedAttributes)) {
+    	   parsedAttributes.top=0;
+      }
+	    parsedAttributes.top -= (options.height / 2) || 0;
 
-    var ellipse = new fabric.Ellipse(extend(parsedAttributes, options));
-
-    ellipse.cx = cx || 0;
-    ellipse.cy = cy || 0;
-
-    return ellipse;
+      return ellipse;
   };
   /* _FROM_SVG_END_ */
 
