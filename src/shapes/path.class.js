@@ -464,7 +464,7 @@
       this._setShadow(ctx);
       this.clipTo && fabric.util.clipContext(this, ctx);
       ctx.beginPath();
-
+      ctx.globalAlpha = this.group ? (ctx.globalAlpha * this.opacity) : this.opacity;
       this._render(ctx);
       this._renderFill(ctx);
       this._renderStroke(ctx);
