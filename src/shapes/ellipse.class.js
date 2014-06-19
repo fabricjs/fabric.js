@@ -155,12 +155,12 @@
 	cy = parsedAttributes.top || 0;
 
 	if (!('left' in parsedAttributes)) {
-	  parsedAttributes.left=0;
+	  parsedAttributes.left = 0;
 	}
 	parsedAttributes.left -= (options.width / 2) || 0;
     
 	if (!('top' in parsedAttributes)) {
-	  parsedAttributes.top=0;
+	  parsedAttributes.top = 0;
 	}
 	parsedAttributes.top -= (options.height / 2) || 0;
 
