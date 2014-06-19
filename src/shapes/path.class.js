@@ -132,7 +132,7 @@
           this.top = this.height / 2;
         }
         if (!isLeftSet) {
-          this.left =  this.width / 2;
+          this.left = this.width / 2;
         }
       }
       this.pathOffset = this.pathOffset ||
@@ -146,8 +146,8 @@
      */
     _calculatePathOffset: function (origLeft, origTop) {
       return {
-        x: this.left - origLeft - this.width / 2,
-        y: this.top - origTop - this.height / 2
+        x: this.left - origLeft - (this.width / 2),
+        y: this.top - origTop - (this.height / 2)
       };
     },
 
