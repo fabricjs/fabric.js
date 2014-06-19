@@ -153,15 +153,19 @@
     var parsedAttributes = fabric.parseAttributes(element, fabric.Ellipse.ATTRIBUTE_NAMES),
         cx = parsedAttributes.left,
         cy = parsedAttributes.top;
+    
     if ('left' in parsedAttributes) {
       parsedAttributes.left -= (options.width / 2) || 0;
     }
     if ('top' in parsedAttributes) {
       parsedAttributes.top -= (options.height / 2) || 0;
     }
+    
     var ellipse = new fabric.Ellipse(extend(parsedAttributes, options));
+    
     ellipse.cx = cx || 0;
     ellipse.cy = cy || 0;
+    
     return ellipse;
   };
   /* _FROM_SVG_END_ */
