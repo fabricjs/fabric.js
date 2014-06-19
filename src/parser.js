@@ -433,31 +433,42 @@
           height = null,
           viewBoxWidth,
           viewBoxHeight,
-          minX,
-          minY;
+          minX=0,
+          minY=0,
+          ScaleMatrix=[1,0,0,1,0,0],
+          TraslMatrix=[1,0,0,1,0,0];
 
       if (viewBoxAttr && (viewBoxAttr = viewBoxAttr.match(reViewBoxAttrValue))) {
         minX = parseFloat(viewBoxAttr[1]);
         minY = parseFloat(viewBoxAttr[2]);
         viewBoxWidth = parseFloat(viewBoxAttr[3]);
         viewBoxHeight = parseFloat(viewBoxAttr[4]);
+        TraslMatrix[4] = -minX;
+        TraslMatrix[5] = -minY;
       }
 
       if (viewBoxWidth && widthAttr && viewBoxWidth !== widthAttr) {
         width = viewBoxWidth;
         height = viewBoxHeight;
-      }
-      else {
+      } else {
         // values of width/height attributes overwrite those extracted from viewbox attribute
         width = widthAttr ? widthAttr : viewBoxWidth;
         height = heightAttr ? heightAttr : viewBoxHeight;
       }
-
+      
+      if(viewBoxWidth && widthAttr) {
+        ScaleMatrix[0]=widthAttr/viewBoxWidth;
+        ScaleMatrix[3]=heightAttr/viewBoxHeight;
+      } 
+	  
       var options = {
         width: width,
         height: height,
         widthAttr: widthAttr,
-        heightAttr: heightAttr
+        heightAttr: heightAttr,
+        minX: minX,
+        minY: minY,
+        SvgMatrix: fabric.util.multiplyTransformMatrices(ScaleMatrix,TraslMatrix)
       };
 
       fabric.gradientDefs = fabric.getGradientDefs(doc);

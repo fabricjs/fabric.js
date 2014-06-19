@@ -156,10 +156,10 @@
         cy = parsedAttributes.top;
 
     if ('left' in parsedAttributes) {
-      parsedAttributes.left -= (options.width / 2) || 0;
+      parsedAttributes.left -= (options.width / 2 + options.minX )|| 0;
     }
     if ('top' in parsedAttributes) {
-      parsedAttributes.top -= (options.height / 2) || 0;
+      parsedAttributes.top -= (options.height / 2 + options.minY) || 0;
     }
 
     var ellipse = new fabric.Ellipse(extend(parsedAttributes, options));
