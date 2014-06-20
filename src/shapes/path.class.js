@@ -454,8 +454,8 @@
       if (!this.visible) return;
 
       ctx.save();
-      if(noTransform) {
-        ctx.translate(this.left,this.top);
+      if (noTransform) {
+        ctx.translate(this.left, this.top);
       }
       var m = this.transformMatrix;
       if (m) {
