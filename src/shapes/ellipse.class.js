@@ -153,7 +153,6 @@
     var parsedAttributes = fabric.parseAttributes(element, fabric.Ellipse.ATTRIBUTE_NAMES),
         cx = parsedAttributes.left,
         cy = parsedAttributes.top;
-    
     if ('left' in parsedAttributes) {
       parsedAttributes.left -= (options.width / 2) || 0;
     }
