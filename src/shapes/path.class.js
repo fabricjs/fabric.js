@@ -135,7 +135,7 @@
         if (!isLeftSet) {
           this.left = 0;
         }
-        this.left = this.width / 2
+        this.left -= this.width / 2;
       }
       this.pathOffset = this.pathOffset ||
                         // Save top-left coords as offset
