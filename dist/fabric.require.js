@@ -13297,6 +13297,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       // multiply by currently set alpha (the one that was set by path group where this object is contained, for example)
       ctx.globalAlpha = this.group ? (ctx.globalAlpha * this.opacity) : this.opacity;
       ctx.arc(noTransform ? this.left : 0, noTransform ? this.top : 0, this.radius, 0, piBy2, false);
+      ctx.closePath();
+
       this._renderFill(ctx);
       this.stroke && this._renderStroke(ctx);
     },
@@ -13359,17 +13361,11 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     if (!isValidRadius(parsedAttributes)) {
       throw new Error('value of `r` attribute is required and can not be negative');
     }
-
-
-    if (!('left' in parsedAttributes)) {
-      parsedAttributes.left = 0;
+    if ('left' in parsedAttributes) {
+      parsedAttributes.left -= (options.width / 2) || 0;
     }
-    if (!('top' in parsedAttributes)) {
-      parsedAttributes.top = 0;
-    }
-    if (!('transformMatrix' in parsedAttributes)) {
-      parsedAttributes.left -= (options.width / 2);
-      parsedAttributes.top -= (options.height / 2);
+    if ('top' in parsedAttributes) {
+      parsedAttributes.top -= (options.height / 2) || 0;
     }
     var obj = new fabric.Circle(extend(parsedAttributes, options));
 
@@ -13640,11 +13636,14 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       ctx.beginPath();
       ctx.save();
       ctx.globalAlpha = this.group ? (ctx.globalAlpha * this.opacity) : this.opacity;
+      if (this.transformMatrix && this.group) {
+        ctx.translate(this.cx, this.cy);
+      }
       ctx.transform(1, 0, 0, this.ry/this.rx, 0, 0);
-      ctx.arc(noTransform ? this.left : 0, noTransform ? this.top * this.rx/this.ry : 0, this.rx, 0, piBy2, false);
+      ctx.arc(noTransform ? this.left : 0, noTransform ? this.top : 0, this.rx, 0, piBy2, false);
       this._renderFill(ctx);
       this._renderStroke(ctx);
-      ctx.restore();
+       ctx.restore();
     },
 
     /**
@@ -13676,22 +13675,21 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   fabric.Ellipse.fromElement = function(element, options) {
     options || (options = { });
 
-    var parsedAttributes = fabric.parseAttributes(element, fabric.Ellipse.ATTRIBUTE_NAMES);
+    var parsedAttributes = fabric.parseAttributes(element, fabric.Ellipse.ATTRIBUTE_NAMES),
+        cx = parsedAttributes.left,
+        cy = parsedAttributes.top;
 
-    if (!('left' in parsedAttributes)) {
-      parsedAttributes.left = 0;
+    if ('left' in parsedAttributes) {
+      parsedAttributes.left -= (options.width / 2) || 0;
     }
-    if (!('top' in parsedAttributes)) {
-      parsedAttributes.top = 0;
+    if ('top' in parsedAttributes) {
+      parsedAttributes.top -= (options.height / 2) || 0;
     }
-    if (!('transformMatrix' in parsedAttributes)) {
-      parsedAttributes.left -= (options.width / 2);
-      parsedAttributes.top -= (options.height / 2);
-    }
+
     var ellipse = new fabric.Ellipse(extend(parsedAttributes, options));
 
-    ellipse.cx = parseFloat(element.getAttribute('cx')) || 0;
-    ellipse.cy = parseFloat(element.getAttribute('cy')) || 0;
+    ellipse.cx = cx || 0;
+    ellipse.cy = cy || 0;
 
     return ellipse;
   };
