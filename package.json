@@ -33,13 +33,13 @@
   },
   "dependencies": {
     "canvas": "1.1.x",
-    "jsdom": "0.10.x",
+    "jsdom": "0.11.x",
     "xmldom": "0.1.x"
   },
   "devDependencies": {
     "execSync": "0.0.x",
     "uglify-js": "2.4.x",
-    "jscs": "1.4.x",
+    "jscs": "1.5.x",
     "jshint": "2.5.x",
     "qunit": "0.6.x",
     "istanbul": "0.2.x"
