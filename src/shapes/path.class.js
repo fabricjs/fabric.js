@@ -129,13 +129,11 @@
       }
       else { //Set center location relative to given height/width if not specified
         if (!isTopSet) {
-          this.top = 0;
+          this.top = this.height / 2;
         }
-        this.top -= this.height / 2;
         if (!isLeftSet) {
-          this.left = 0;
+          this.left = this.width / 2;
         }
-        this.left -= this.width / 2;
       }
       this.pathOffset = this.pathOffset ||
                         // Save top-left coords as offset
@@ -148,8 +146,8 @@
      */
     _calculatePathOffset: function (origLeft, origTop) {
       return {
-        x: this.left - origLeft,
-        y: this.top - origTop
+        x: this.left - origLeft - (this.width / 2),
+        y: this.top - origTop - (this.height / 2)
       };
     },
 
@@ -454,9 +452,6 @@
       if (!this.visible) return;
 
       ctx.save();
-      if (noTransform) {
-        ctx.translate(this.left, this.top);
-      }
       var m = this.transformMatrix;
       if (m) {
         ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
