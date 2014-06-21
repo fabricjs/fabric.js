@@ -406,8 +406,8 @@
           case 'a':
             // TODO: optimize this
             drawArc(ctx, x + l, y + t, [
-              current[1]*2,
-              current[2]*2,
+              current[1],
+              current[2],
               current[3],
               current[4],
               current[5],
@@ -421,8 +421,8 @@
           case 'A':
             // TODO: optimize this
             drawArc(ctx, x + l, y + t, [
-              current[1]*2,
-              current[2]*2,
+              current[1],
+              current[2],
               current[3],
               current[4],
               current[5],
