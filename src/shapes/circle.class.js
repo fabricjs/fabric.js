@@ -103,8 +103,6 @@
       // multiply by currently set alpha (the one that was set by path group where this object is contained, for example)
       ctx.globalAlpha = this.group ? (ctx.globalAlpha * this.opacity) : this.opacity;
       ctx.arc(noTransform ? this.left : 0, noTransform ? this.top : 0, this.radius, 0, piBy2, false);
-      ctx.closePath();
-
       this._renderFill(ctx);
       this.stroke && this._renderStroke(ctx);
     },
@@ -167,12 +165,18 @@
     if (!isValidRadius(parsedAttributes)) {
       throw new Error('value of `r` attribute is required and can not be negative');
     }
-    if ('left' in parsedAttributes) {
-      parsedAttributes.left -= (options.width / 2) || 0;
+    
+    
+    if (!('left' in parsedAttributes)) {
+    	parsedAttributes.left = 0;
     }
-    if ('top' in parsedAttributes) {
-      parsedAttributes.top -= (options.height / 2) || 0;
+    if (!('top' in parsedAttributes)) {
+    	parsedAttributes.top = 0
     }
+    if (!('transformMatrix' in parsedAttributes)) {
+      parsedAttributes.left -= (options.width / 2);
+      parsedAttributes.top -= (options.height / 2);	
+    }    
     var obj = new fabric.Circle(extend(parsedAttributes, options));
 
     obj.cx = parseFloat(element.getAttribute('cx')) || 0;
