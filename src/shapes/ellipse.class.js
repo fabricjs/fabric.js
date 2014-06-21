@@ -115,7 +115,7 @@
       ctx.arc(noTransform ? this.left : 0, noTransform ? this.top * this.rx/this.ry : 0, this.rx, 0, piBy2, false);
       this._renderFill(ctx);
       this._renderStroke(ctx);
-       ctx.restore();
+      ctx.restore();
     },
 
     /**
