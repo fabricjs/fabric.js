@@ -861,7 +861,7 @@ fabric.Collection = {
     else if (thArc > 0 && sweep === 0) {
       thArc -= 2 * Math.PI;
     }
-
+    
     var segments = Math.ceil(Math.abs(thArc / (Math.PI * 0.5 + 0.001))),
         result = [];
 
@@ -885,10 +885,10 @@ fabric.Collection = {
     rx = Math.abs(rx);
     ry = Math.abs(ry);
 
-    var px = cosTh * (ox - x) * 0.5 + sinTh * (oy - y) * 0.5,
-        py = cosTh * (oy - y) * 0.5 - sinTh * (ox - x) * 0.5,
+    var px = cosTh * (ox - x) + sinTh * (oy - y),
+        py = cosTh * (oy - y) - sinTh * (ox - x),
         pl = (px * px) / (rx * rx) + (py * py) / (ry * ry);
-
+		pl *= 0.25;
     if (pl > 1) {
       pl = Math.sqrt(pl);
       rx *= pl;
@@ -917,20 +917,25 @@ fabric.Collection = {
       return segmentToBezierCache[argsString];
     }
 
+    var sinTh0 = Math.sin(th0),
+        cosTh0 = Math.cos(th0),
+		sinTh1 = Math.sin(th1),
+		cosTh1 = Math.cos(th1);
+    
     var a00 = cosTh * rx,
         a01 = -sinTh * ry,
         a10 = sinTh * rx,
         a11 = cosTh * ry,
-        thHalf = 0.5 * (th1 - th0),
-        t = (8 / 3) * Math.sin(thHalf * 0.5) *
-            Math.sin(thHalf * 0.5) / Math.sin(thHalf),
+        thHalf = 0.25 * (th1 - th0),
+        t = (8 / 3) * Math.sin(thHalf) *
+            Math.sin(thHalf) / Math.sin(thHalf * 2),
 
-        x1 = cx + Math.cos(th0) - t * Math.sin(th0),
-        y1 = cy + Math.sin(th0) + t * Math.cos(th0),
-        x3 = cx + Math.cos(th1),
-        y3 = cy + Math.sin(th1),
-        x2 = x3 + t * Math.sin(th1),
-        y2 = y3 - t * Math.cos(th1);
+        x1 = cx + cosTh0 - t * sinTh0,
+        y1 = cy + sinTh0 + t * cosTh0,
+        x3 = cx + cosTh1,
+        y3 = cy + sinTh1,
+        x2 = x3 + t * sinTh1,
+        y2 = y3 - t * cosTh1;
 
     segmentToBezierCache[argsString] = [
       a00 * x1 + a01 * y1,      a10 * x1 + a11 * y1,
@@ -957,7 +962,6 @@ fabric.Collection = {
         ex = coords[5],
         ey = coords[6],
         segs = arcToSegments(ex, ey, rx, ry, large, sweep, rot, x, y);
-
     for (var i = 0; i < segs.length; i++) {
       var bez = segmentToBezier.apply(this, segs[i]);
       ctx.bezierCurveTo.apply(ctx, bez);
@@ -2701,7 +2705,7 @@ if (typeof console !== 'undefined') {
     else if (attr === 'visible') {
       value = (value === 'none' || value === 'hidden') ? false : true;
       // display=none on parent element always takes precedence over child element
-      if (parentAttributes.visible === false) {
+      if (parentAttributes && parentAttributes.visible === false) {
         value = false;
       }
     }
@@ -13297,8 +13301,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       // multiply by currently set alpha (the one that was set by path group where this object is contained, for example)
       ctx.globalAlpha = this.group ? (ctx.globalAlpha * this.opacity) : this.opacity;
       ctx.arc(noTransform ? this.left : 0, noTransform ? this.top : 0, this.radius, 0, piBy2, false);
-      ctx.closePath();
-
       this._renderFill(ctx);
       this.stroke && this._renderStroke(ctx);
     },
@@ -13361,12 +13363,18 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     if (!isValidRadius(parsedAttributes)) {
       throw new Error('value of `r` attribute is required and can not be negative');
     }
-    if ('left' in parsedAttributes) {
-      parsedAttributes.left -= (options.width / 2) || 0;
+    
+    
+    if (!('left' in parsedAttributes)) {
+    	parsedAttributes.left = 0;
     }
-    if ('top' in parsedAttributes) {
-      parsedAttributes.top -= (options.height / 2) || 0;
+    if (!('top' in parsedAttributes)) {
+    	parsedAttributes.top = 0
     }
+    if (!('transformMatrix' in parsedAttributes)) {
+      parsedAttributes.left -= (options.width / 2);
+      parsedAttributes.top -= (options.height / 2);	
+    }    
     var obj = new fabric.Circle(extend(parsedAttributes, options));
 
     obj.cx = parseFloat(element.getAttribute('cx')) || 0;
@@ -13636,15 +13644,11 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       ctx.beginPath();
       ctx.save();
       ctx.globalAlpha = this.group ? (ctx.globalAlpha * this.opacity) : this.opacity;
-      if (this.transformMatrix && this.group) {
-        ctx.translate(this.cx, this.cy);
-      }
       ctx.transform(1, 0, 0, this.ry/this.rx, 0, 0);
-      ctx.arc(noTransform ? this.left : 0, noTransform ? this.top : 0, this.rx, 0, piBy2, false);
-      ctx.restore();
-
+      ctx.arc(noTransform ? this.left : 0, noTransform ? this.top * this.rx/this.ry : 0, this.rx, 0, piBy2, false);
       this._renderFill(ctx);
       this._renderStroke(ctx);
+      ctx.restore();
     },
 
     /**
@@ -13676,21 +13680,22 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   fabric.Ellipse.fromElement = function(element, options) {
     options || (options = { });
 
-    var parsedAttributes = fabric.parseAttributes(element, fabric.Ellipse.ATTRIBUTE_NAMES),
-        cx = parsedAttributes.left,
-        cy = parsedAttributes.top;
+    var parsedAttributes = fabric.parseAttributes(element, fabric.Ellipse.ATTRIBUTE_NAMES);
 
-    if ('left' in parsedAttributes) {
-      parsedAttributes.left -= (options.width / 2) || 0;
+    if (!('left' in parsedAttributes)) {
+      parsedAttributes.left = 0;
     }
-    if ('top' in parsedAttributes) {
-      parsedAttributes.top -= (options.height / 2) || 0;
+    if (!('top' in parsedAttributes)) {
+      parsedAttributes.top = 0;
     }
-
+    if (!('transformMatrix' in parsedAttributes)) {
+      parsedAttributes.left -= (options.width / 2);
+      parsedAttributes.top -= (options.height / 2);
+    }
     var ellipse = new fabric.Ellipse(extend(parsedAttributes, options));
 
-    ellipse.cx = cx || 0;
-    ellipse.cy = cy || 0;
+    ellipse.cx = parseFloat(element.getAttribute('cx')) || 0;
+    ellipse.cy = parseFloat(element.getAttribute('cy')) || 0;
 
     return ellipse;
   };
@@ -14319,6 +14324,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     _render: function(ctx) {
       var point;
       ctx.beginPath();
+      ctx.globalAlpha = this.group ? (ctx.globalAlpha * this.opacity) : this.opacity;
       ctx.moveTo(this.points[0].x, this.points[0].y);
       for (var i = 0, len = this.points.length; i < len; i++) {
         point = this.points[i];
@@ -14868,7 +14874,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       this._setShadow(ctx);
       this.clipTo && fabric.util.clipContext(this, ctx);
       ctx.beginPath();
-
+      ctx.globalAlpha = this.group ? (ctx.globalAlpha * this.opacity) : this.opacity;
       this._render(ctx);
       this._renderFill(ctx);
       this._renderStroke(ctx);
