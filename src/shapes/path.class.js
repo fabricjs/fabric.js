@@ -146,8 +146,8 @@
      */
     _calculatePathOffset: function (origLeft, origTop) {
       return {
-        x: -this.width / 2 + origLeft,
-        y: -this.height / 2 + origTop
+        x: -this.width / 2 - origLeft,
+        y: -this.height / 2 - origTop
       };
     },
 
