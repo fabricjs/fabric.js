@@ -129,10 +129,10 @@
       }
       else { //Set center location relative to given height/width if not specified
         if (!isTopSet) {
-          this.top = this.height / 2;
+          this.top = 0;
         }
         if (!isLeftSet) {
-          this.left = this.width / 2;
+          this.left = 0;
         }
       }
       this.pathOffset = this.pathOffset ||
@@ -146,8 +146,8 @@
      */
     _calculatePathOffset: function (origLeft, origTop) {
       return {
-        x: this.left - origLeft - (this.width / 2),
-        y: this.top - origTop - (this.height / 2)
+        x: (-this.width / 2) - origLeft,
+        y: (-this.height / 2) - origTop
       };
     },
 
@@ -155,7 +155,7 @@
      * @private
      * @param {CanvasRenderingContext2D} ctx context to render path on
      */
-    _render: function(ctx) {
+    _render: function(ctx, noTransform) {
       var current, // current instruction
           previous = null,
           subpathStartX = 0,
@@ -170,7 +170,10 @@
           tempControlY,
           l = -((this.width / 2) + this.pathOffset.x),
           t = -((this.height / 2) + this.pathOffset.y);
-
+      if(!noTransform){
+        l -= this.width / 2;
+        t -= this.height / 2;
+      }
       for (var i = 0, len = this.path.length; i < len; ++i) {
 
         current = this.path[i];
@@ -450,8 +453,10 @@
     render: function(ctx, noTransform) {
       // do not render if object is not visible
       if (!this.visible) return;
-
       ctx.save();
+      if(noTransform) {
+        ctx.translate(-this.width/2, -this.height/2);	
+      }
       var m = this.transformMatrix;
       if (m) {
         ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
@@ -465,12 +470,11 @@
       this.clipTo && fabric.util.clipContext(this, ctx);
       ctx.beginPath();
       ctx.globalAlpha = this.group ? (ctx.globalAlpha * this.opacity) : this.opacity;
-      this._render(ctx);
+      this._render(ctx,noTransform);
       this._renderFill(ctx);
       this._renderStroke(ctx);
       this.clipTo && ctx.restore();
       this._removeShadow(ctx);
-
       if (!noTransform && this.active) {
         this.drawBorders(ctx);
         this.drawControls(ctx);
