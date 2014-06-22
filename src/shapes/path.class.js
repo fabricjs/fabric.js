@@ -110,7 +110,7 @@
      * @private
      * @param {Object} [options] Options object
      */
-    _initializePath: function (options,noTransform) {
+    _initializePath: function (options) {
       var isWidthSet = 'width' in options && options.width != null,
           isHeightSet = 'height' in options && options.width != null,
           isLeftSet = 'left' in options,
@@ -146,8 +146,8 @@
      */
     _calculatePathOffset: function (origLeft, origTop) {
       return {
-        x: -this.width / 2 - origLeft,
-        y: -this.height / 2 - origTop
+        x: (-this.width / 2) - origLeft,
+        y: (-this.height / 2) - origTop
       };
     },
 
@@ -155,7 +155,7 @@
      * @private
      * @param {CanvasRenderingContext2D} ctx context to render path on
      */
-    _render: function(ctx,noTransform) {
+    _render: function(ctx, noTransform) {
       var current, // current instruction
           previous = null,
           subpathStartX = 0,
@@ -171,9 +171,9 @@
           l = -((this.width / 2) + this.pathOffset.x),
           t = -((this.height / 2) + this.pathOffset.y);
       if(!noTransform){
-	  	l -= this.width / 2;
-	  	t -= this.height / 2;
-	  }
+      	l -= this.width / 2;
+        t -= this.height / 2;
+      }
       for (var i = 0, len = this.path.length; i < len; ++i) {
 
         current = this.path[i];
@@ -455,8 +455,8 @@
       if (!this.visible) return;
       ctx.save();
       if(noTransform) {
-	  	ctx.translate(-this.width/2, -this.height/2);	
-	  }
+      	ctx.translate(-this.width/2, -this.height/2);	
+      }
       var m = this.transformMatrix;
       if (m) {
         ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
