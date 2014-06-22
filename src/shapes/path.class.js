@@ -110,7 +110,7 @@
      * @private
      * @param {Object} [options] Options object
      */
-    _initializePath: function (options,noTransform) {
+    _initializePath: function (options) {
       var isWidthSet = 'width' in options && options.width != null,
           isHeightSet = 'height' in options && options.width != null,
           isLeftSet = 'left' in options,
