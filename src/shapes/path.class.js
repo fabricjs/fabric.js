@@ -455,7 +455,7 @@
       if (!this.visible) return;
       ctx.save();
       if(noTransform) {
-      	ctx.translate(-this.width/2, -this.height/2);	
+        ctx.translate(-this.width/2, -this.height/2);	
       }
       var m = this.transformMatrix;
       if (m) {
