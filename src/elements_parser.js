@@ -23,7 +23,26 @@ fabric.ElementsParser.prototype.createObjects = function() {
 };
 
 fabric.ElementsParser.prototype.createObject = function(el, index) {
-  var klass = fabric[fabric.util.string.capitalize(el.tagName)];
+  var elTagName=fabric.util.string.capitalize(el.tagName);
+
+  if(elTagName=='Use'){
+    var xlink=el.getAttribute('xlink:href').substr(1);
+    var x=el.getAttribute('x') || 0;
+    var y=el.getAttribute('y') || 0;
+    if(fabric.defDefs[xlink]){
+      el2=fabric.defDefs[xlink];
+	  elTagName=fabric.util.string.capitalize(el2.tagName);
+	  for (var i=0, attrs=el2.attributes, l=attrs.length; i<l; i++){
+	  	attr = attrs.item(i);
+        el.setAttribute(attr.nodeName,attr.nodeValue);
+      }
+      var currentTrans = el.getAttribute("transform");
+      el.setAttribute("transform", (currentTrans ? currentTrans : " ") +" translate(" + x + ", " + y + ")");
+      el.removeAttribute("x");
+      el.removeAttribute("y");
+	}
+  }
+  var klass = fabric[elTagName];
   if (klass && klass.fromElement) {
     try {
       this._createObject(klass, el, index);
