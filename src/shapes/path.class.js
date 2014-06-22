@@ -171,7 +171,7 @@
           l = -((this.width / 2) + this.pathOffset.x),
           t = -((this.height / 2) + this.pathOffset.y);
       if(!noTransform){
-      	l -= this.width / 2;
+        l -= this.width / 2;
         t -= this.height / 2;
       }
       for (var i = 0, len = this.path.length; i < len; ++i) {
