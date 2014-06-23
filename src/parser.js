@@ -404,26 +404,26 @@
     return function(doc, callback, reviver) {
       if (!doc) return;
       var startTime = new Date();
-	  var nodelist = doc.getElementsByTagName('*')
-	  for (var i = 0; i < nodelist.length; i++) {
-  		var el = nodelist[i];
+      var nodelist = doc.getElementsByTagName('*')
+      for (var i = 0; i < nodelist.length; i++) {
+      	var el = nodelist[i];
         if (el.tagName.toLowerCase() == 'use') {
-		  var xlink = el.getAttribute('xlink:href').substr(1);
+	  var xlink = el.getAttribute('xlink:href').substr(1);
     	  var x = el.getAttribute('x') || 0;
     	  var y = el.getAttribute('y') || 0;
     	  var el2 = doc.getElementById(xlink).cloneNode(true);
     	  var currentTrans = el.getAttribute("transform");
-    	  for (var j = 0, attrs = el.attributes, l = attrs.length; j < l; j++){
-	  	    var attr = attrs.item(j);
-	  	    if(attr.nodeName != 'x' && attr.nodeName != 'y' && attr.nodeName != 'xlink:href' ) {
-			  el2.setAttribute(attr.nodeName,attr.nodeValue);	
-			}
+    	  for (var j = 0, attrs = el.attributes, l = attrs.length; j < l; j++) {
+	    var attr = attrs.item(j);
+	    if(attr.nodeName != 'x' && attr.nodeName != 'y' && attr.nodeName != 'xlink:href') {
+	      el2.setAttribute(attr.nodeName,attr.nodeValue);
+	    }
           }
-          el2.setAttribute("transform", (currentTrans ? currentTrans : " ") +" translate(" + x + ", " + y + ")");
+          el2.setAttribute("transform", (currentTrans ? currentTrans : " ") + " translate(" + x + ", " + y + ")");
     	  var pNode=el.parentNode;
     	  pNode.replaceChild(el2,el);
-		}
-	  }
+    	}
+      }
       
       var descendants = fabric.util.toArray(doc.getElementsByTagName('*'));
 
@@ -661,8 +661,8 @@
      * @param {Object} [options] Options object
      * @param {Function} [reviver] Method for further parsing of SVG elements, called after each fabric object created.
      */
-    parseElements: function(elements, callback, options, reviver, doc) {
-      new fabric.ElementsParser(elements, callback, options, reviver, doc).parse();
+    parseElements: function(elements, callback, options, reviver) {
+      new fabric.ElementsParser(elements, callback, options, reviver).parse();
     },
 
     /**
