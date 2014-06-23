@@ -412,16 +412,21 @@
     	  var x = el.getAttribute('x') || 0;
     	  var y = el.getAttribute('y') || 0;
     	  var el2 = doc.getElementById(xlink).cloneNode(true);
-    	  var currentTrans = el.getAttribute("transform");
+    	  var currentTrans = (el.getAttribute('transform') || '') + ' translate(' + x + ', ' + y + ')';
     	  for (var j = 0, attrs = el.attributes, l = attrs.length; j < l; j++) {
 	    var attr = attrs.item(j);
 	    if(attr.nodeName != 'x' && attr.nodeName != 'y' && attr.nodeName != 'xlink:href') {
-	      el2.setAttribute(attr.nodeName,attr.nodeValue);
+	      if(attr.nodeName == 'transform') {
+                currentTrans = currentTrans + ' ' + attr.nodeValue;
+	      } else {
+                el2.setAttribute(attr.nodeName, attr.nodeValue);
+              }
 	    }
           }
-          el2.setAttribute("transform", (currentTrans ? currentTrans : " ") + " translate(" + x + ", " + y + ")");
+          el2.setAttribute('transform', currentTrans);
+          el2.removeAttribute('id');
     	  var pNode=el.parentNode;
-    	  pNode.replaceChild(el2,el);
+    	  pNode.replaceChild(el2, el);
     	}
       }
       
