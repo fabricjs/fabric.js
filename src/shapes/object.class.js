@@ -1304,7 +1304,7 @@
      * canvas.renderAll();
      */
     setShadow: function(options) {
-      return this.set('shadow', new fabric.Shadow(options));
+      return this.set('shadow', options ? new fabric.Shadow(options) : null);
     },
 
     /**
