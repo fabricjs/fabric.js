@@ -4,7 +4,9 @@
 
       IS_DONTENUM_BUGGY = (function(){
         for (var p in { toString: 1 }) {
-          if (p === 'toString') return false;
+          if (p === 'toString') {
+            return false;
+          }
         }
         return true;
       })(),

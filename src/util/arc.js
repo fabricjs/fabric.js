@@ -42,7 +42,7 @@
     else if (thArc > 0 && sweep === 0) {
       thArc -= 2 * Math.PI;
     }
-    
+
     var segments = Math.ceil(Math.abs(thArc / (Math.PI * 0.5 + 0.001))),
         result = [];
 
@@ -69,7 +69,9 @@
     var px = cosTh * (ox - x) + sinTh * (oy - y),
         py = cosTh * (oy - y) - sinTh * (ox - x),
         pl = (px * px) / (rx * rx) + (py * py) / (ry * ry);
-		pl *= 0.25;
+
+    pl *= 0.25;
+
     if (pl > 1) {
       pl = Math.sqrt(pl);
       rx *= pl;
@@ -100,14 +102,15 @@
 
     var sinTh0 = Math.sin(th0),
         cosTh0 = Math.cos(th0),
-		sinTh1 = Math.sin(th1),
-		cosTh1 = Math.cos(th1);
-    
-    var a00 = cosTh * rx,
+        sinTh1 = Math.sin(th1),
+        cosTh1 = Math.cos(th1),
+
+        a00 = cosTh * rx,
         a01 = -sinTh * ry,
         a10 = sinTh * rx,
         a11 = cosTh * ry,
         thHalf = 0.25 * (th1 - th0),
+
         t = (8 / 3) * Math.sin(thHalf) *
             Math.sin(thHalf) / Math.sin(thHalf * 2),
 
