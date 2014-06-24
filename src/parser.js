@@ -403,9 +403,34 @@
 
     return function(doc, callback, reviver) {
       if (!doc) return;
-
-      var startTime = new Date(),
-          descendants = fabric.util.toArray(doc.getElementsByTagName('*'));
+      var startTime = new Date();
+      var nodelist = doc.getElementsByTagName('*')
+      for (var i = 0; i < nodelist.length; i++) {
+      	var el = nodelist[i];
+        if (el.tagName.toLowerCase() == 'use') {
+	  var xlink = el.getAttribute('xlink:href').substr(1);
+    	  var x = el.getAttribute('x') || 0;
+    	  var y = el.getAttribute('y') || 0;
+    	  var el2 = doc.getElementById(xlink).cloneNode(true);
+    	  var currentTrans = (el.getAttribute('transform') || '') + ' translate(' + x + ', ' + y + ')';
+    	  for (var j = 0, attrs = el.attributes, l = attrs.length; j < l; j++) {
+	    var attr = attrs.item(j);
+	    if(attr.nodeName != 'x' && attr.nodeName != 'y' && attr.nodeName != 'xlink:href') {
+	      if(attr.nodeName == 'transform') {
+                currentTrans = currentTrans + ' ' + attr.nodeValue;
+	      } else {
+                el2.setAttribute(attr.nodeName, attr.nodeValue);
+              }
+	    }
+          }
+          el2.setAttribute('transform', currentTrans);
+          el2.removeAttribute('id');
+    	  var pNode=el.parentNode;
+    	  pNode.replaceChild(el2, el);
+    	}
+      }
+      
+      var descendants = fabric.util.toArray(doc.getElementsByTagName('*'));
 
       if (descendants.length === 0 && fabric.isLikelyNode) {
         // we're likely in node, where "o3-xml" library fails to gEBTN("*")
@@ -422,7 +447,7 @@
         return reAllowedSVGTagNames.test(el.tagName) &&
               !hasAncestorWithNodeName(el, /^(?:pattern|defs)$/); // http://www.w3.org/TR/SVG/struct.html#DefsElement
       });
-
+	
       if (!elements || (elements && !elements.length)) {
         callback && callback([], {});
         return;
@@ -464,7 +489,6 @@
 
       fabric.gradientDefs = fabric.getGradientDefs(doc);
       fabric.cssRules = fabric.getCSSRules(doc);
-
       // Precedence of rules:   style > class > attribute
 
       fabric.parseElements(elements, function(instances) {
@@ -776,7 +800,6 @@
     loadSVGFromURL: function(url, callback, reviver) {
 
       url = url.replace(/^\n\s*/, '').trim();
-
       svgCache.has(url, function (hasUrl) {
         if (hasUrl) {
           svgCache.get(url, function (value) {
