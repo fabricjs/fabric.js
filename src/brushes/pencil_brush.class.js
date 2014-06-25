@@ -144,7 +144,7 @@
       this.box = this.getPathBoundingBox(this._points);
       return this.convertPointsToSVGPath(
         this._points, this.box.minx, this.box.maxx, this.box.miny, this.box.maxy);
-     },
+    },
 
      /**
       * Returns bounding box of a path based on given points

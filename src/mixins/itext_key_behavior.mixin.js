@@ -16,7 +16,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     fabric.util.addListener(this.hiddenTextarea, 'copy', this.copy.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'paste', this.paste.bind(this));
 
-
     if (!this._clickHandlerInitialized && this.canvas) {
       fabric.util.addListener(this.canvas.upperCanvasEl, 'click', this.onClick.bind(this));
       this._clickHandlerInitialized = true;
@@ -88,7 +87,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   copy: function(e) {
     var selectedText = this.getSelectedText(),
         clipboardData = this._getClipboardData(e);
-    
+
     // Check for backward compatibility with old browsers
     if (clipboardData) {
       clipboardData.setData('text', selectedText);
@@ -107,14 +106,14 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   paste: function(e) {
     var copiedText = null,
         clipboardData = this._getClipboardData(e);
-    
+
     // Check for backward compatibility with old browsers
     if (clipboardData) {
       copiedText = clipboardData.getData('text');
     } else {
       copiedText = this.copiedText;
     }
-    
+
     if (copiedText) {
       this.insertChars(copiedText);
     }

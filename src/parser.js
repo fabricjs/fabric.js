@@ -354,14 +354,43 @@
 
       if (ruleMatchesElement) {
         for (var property in fabric.cssRules[rule]) {
-          var attr = normalizeAttr(property);
-          var value = normalizeValue(attr, fabric.cssRules[rule][property]);
+          var attr = normalizeAttr(property),
+              value = normalizeValue(attr, fabric.cssRules[rule][property]);
           styles[attr] = value;
         }
       }
     }
 
     return styles;
+  }
+  
+  /**
+   * @private
+   */
+  function parseUseDirectives(doc) {
+    var nodelist = doc.querySelectorAll("use");
+    for (var i = 0; i < nodelist.length; i++) {
+      var el = nodelist[i];
+      var xlink = el.getAttribute('xlink:href').substr(1);
+      var x = el.getAttribute('x') || 0;
+      var y = el.getAttribute('y') || 0;
+      var el2 = doc.getElementById(xlink).cloneNode(true);
+      var currentTrans = (el.getAttribute('transform') || '') + ' translate(' + x + ', ' + y + ')';
+      for (var j = 0, attrs = el.attributes, l = attrs.length; j < l; j++) {
+        var attr = attrs.item(j);
+        if (attr.nodeName !== 'x' && attr.nodeName !== 'y' && attr.nodeName !== 'xlink:href') {
+          if (attr.nodeName === 'transform') {
+            currentTrans = currentTrans + ' ' + attr.nodeValue;
+          } else {
+            el2.setAttribute(attr.nodeName, attr.nodeValue);
+          }
+        }
+      }
+      el2.setAttribute('transform', currentTrans);
+      el2.removeAttribute('id');
+      var pNode=el.parentNode;
+      pNode.replaceChild(el2, el);
+    }
   }
 
   /**
@@ -403,9 +432,11 @@
 
     return function(doc, callback, reviver) {
       if (!doc) return;
-
-      var startTime = new Date(),
-          descendants = fabric.util.toArray(doc.getElementsByTagName('*'));
+      var startTime = new Date();
+      
+      parseUseDirectives(doc);
+      
+      var descendants = fabric.util.toArray(doc.getElementsByTagName('*'));
 
       if (descendants.length === 0 && fabric.isLikelyNode) {
         // we're likely in node, where "o3-xml" library fails to gEBTN("*")
@@ -464,7 +495,6 @@
 
       fabric.gradientDefs = fabric.getGradientDefs(doc);
       fabric.cssRules = fabric.getCSSRules(doc);
-
       // Precedence of rules:   style > class > attribute
 
       fabric.parseElements(elements, function(instances) {
@@ -480,46 +510,46 @@
     * Used for caching SVG documents (loaded via `fabric.Canvas#loadSVGFromURL`)
     * @namespace
     */
-   var svgCache = {
+  var svgCache = {
 
-     /**
-      * @param {String} name
-      * @param {Function} callback
-      */
-     has: function (name, callback) {
-       callback(false);
-     },
+    /**
+    * @param {String} name
+    * @param {Function} callback
+    */
+    has: function (name, callback) {
+      callback(false);
+    },
 
-     /**
-      * @param {String} url
-      * @param {Function} callback
-      */
-     get: function () {
-       /* NOOP */
-     },
+    /**
+    * @param {String} url
+    * @param {Function} callback
+    */
+    get: function () {
+      /* NOOP */
+    },
 
-     /**
-      * @param {String} url
-      * @param {Object} object
-      */
-     set: function () {
-       /* NOOP */
-     }
-   };
+    /**
+     * @param {String} url
+     * @param {Object} object
+     */
+    set: function () {
+      /* NOOP */
+    }
+  };
 
   /**
    * @private
    */
   function _enlivenCachedObject(cachedObject) {
 
-   var objects = cachedObject.objects,
-       options = cachedObject.options;
+    var objects = cachedObject.objects,
+        options = cachedObject.options;
 
-   objects = objects.map(function (o) {
-     return fabric[capitalize(o.type)].fromObject(o);
-   });
+    objects = objects.map(function (o) {
+      return fabric[capitalize(o.type)].fromObject(o);
+    });
 
-   return ({ objects: objects, options: options });
+    return ({ objects: objects, options: options });
   }
 
   /**
@@ -776,7 +806,6 @@
     loadSVGFromURL: function(url, callback, reviver) {
 
       url = url.replace(/^\n\s*/, '').trim();
-
       svgCache.has(url, function (hasUrl) {
         if (hasUrl) {
           svgCache.get(url, function (value) {

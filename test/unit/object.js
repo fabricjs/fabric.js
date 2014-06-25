@@ -1075,6 +1075,11 @@ test('toDataURL & reference to canvas', function() {
     equal(object.shadow.blur, 10);
     equal(object.shadow.offsetX, 5);
     equal(object.shadow.offsetY, 15);
+    
+    equal(object.setShadow(null), object, 'should be chainable');
+    ok(!(object.shadow instanceof fabric.Shadow));
+    equal(object.shadow, null);
+    
   });
 
   test('set shadow', function() {

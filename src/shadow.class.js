@@ -64,6 +64,7 @@
      * @return {fabric.Shadow} thisArg
      */
     initialize: function(options) {
+
       if (typeof options === 'string') {
         options = this._parseShadow(options);
       }

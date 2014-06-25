@@ -18,7 +18,9 @@
      * @return {String|Boolean} corner code (tl, tr, bl, br, etc.), or false if nothing is found
      */
     _findTargetCorner: function(pointer) {
-      if (!this.hasControls || !this.active) return false;
+      if (!this.hasControls || !this.active) {
+        return false;
+      }
 
       var ex = pointer.x,
           ey = pointer.y,

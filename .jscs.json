@@ -7,8 +7,6 @@
     "requireParenthesesAroundIIFE": true,
     "requireSpacesInsideObjectBrackets": "all",
     "requireCommaBeforeLineBreak": true,
-    "requireRightStickedOperators": ["!"],
-    "requireLeftStickedOperators": [","],
     "requireCamelCaseOrUpperCaseIdentifiers": true,
     "requireKeywordsOnNewLine": ["else"],
     "requireLineFeedAtFileEnd": true,
