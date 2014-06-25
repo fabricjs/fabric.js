@@ -363,35 +363,35 @@
 
     return styles;
   }
-
+  
+  /**
+   * @private
+   */
   function parseUseDirectives(doc) {
-    var nodelist = doc.getElementsByTagName('*');
+    var nodelist = doc.querySelectorAll("use");
     for (var i = 0; i < nodelist.length; i++) {
       var el = nodelist[i];
-      if (el.tagName.toLowerCase() === 'use') {
-        var xlink = el.getAttribute('xlink:href').substr(1);
-        var x = el.getAttribute('x') || 0;
-        var y = el.getAttribute('y') || 0;
-        var el2 = doc.getElementById(xlink).cloneNode(true);
-        var currentTrans = (el.getAttribute('transform') || '') + ' translate(' + x + ', ' + y + ')';
-        for (var j = 0, attrs = el.attributes, l = attrs.length; j < l; j++) {
-          var attr = attrs.item(j);
-          if (attr.nodeName !== 'x' && attr.nodeName !== 'y' && attr.nodeName !== 'xlink:href') {
-            if (attr.nodeName === 'transform') {
-              currentTrans = currentTrans + ' ' + attr.nodeValue;
-            } else {
-              el2.setAttribute(attr.nodeName, attr.nodeValue);
-            }
+      var xlink = el.getAttribute('xlink:href').substr(1);
+      var x = el.getAttribute('x') || 0;
+      var y = el.getAttribute('y') || 0;
+      var el2 = doc.getElementById(xlink).cloneNode(true);
+      var currentTrans = (el.getAttribute('transform') || '') + ' translate(' + x + ', ' + y + ')';
+      for (var j = 0, attrs = el.attributes, l = attrs.length; j < l; j++) {
+        var attr = attrs.item(j);
+        if (attr.nodeName !== 'x' && attr.nodeName !== 'y' && attr.nodeName !== 'xlink:href') {
+          if (attr.nodeName === 'transform') {
+            currentTrans = currentTrans + ' ' + attr.nodeValue;
+          } else {
+            el2.setAttribute(attr.nodeName, attr.nodeValue);
           }
         }
-        el2.setAttribute('transform', currentTrans);
-        el2.removeAttribute('id');
-        var pNode=el.parentNode;
-        pNode.replaceChild(el2, el);
       }
+      el2.setAttribute('transform', currentTrans);
+      el2.removeAttribute('id');
+      var pNode=el.parentNode;
+      pNode.replaceChild(el2, el);
     }
   }
-  
 
   /**
    * Parses an SVG document, converts it to an array of corresponding fabric.* instances and passes them to a callback
