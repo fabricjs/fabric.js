@@ -451,27 +451,25 @@
           viewBoxWidth,
           viewBoxHeight,
           scaleX = 1,
-          scaleY = 1,
-          vbMatrix = null;
+          scaleY = 1;
 
       if (viewBoxAttr && (viewBoxAttr = viewBoxAttr.match(reViewBoxAttrValue))) {
         var minX = parseFloat(viewBoxAttr[1]);
         var minY = parseFloat(viewBoxAttr[2]);
         viewBoxWidth = parseFloat(viewBoxAttr[3]);
         viewBoxHeight = parseFloat(viewBoxAttr[4]);
-        if (widthAttr) {
+        if (widthAttr && widthAttr != viewBoxWidth ) {
           scaleX = widthAttr / viewBoxWidth;
         }
-        if (heightAttr) {
+        if (heightAttr && heightAttr != viewBoxHeight) {
           scaleY = heightAttr / viewBoxHeight;
         }
-        vbMatrix = [scaleX, 0, 0, scaleY, -minX*scaleX, -minY*scaleY];
+        if (scaleX !== 1 || scaleY !== 1 || minX !== 0 || minY !== 0) {
+          var vbMatrix = [scaleX, 0, 0, scaleY, -minX * scaleX, -minY * scaleY];
+          addSvgTransform(doc, vbMatrix);
+        }
       }
-      
-      if (vbMatrix !== null) {
-        addSvgTransform(doc, vbMatrix);
-      }
-      
+
       var descendants = fabric.util.toArray(doc.getElementsByTagName('*'));
 
       if (descendants.length === 0 && fabric.isLikelyNode) {
