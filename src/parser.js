@@ -354,8 +354,8 @@
 
       if (ruleMatchesElement) {
         for (var property in fabric.cssRules[rule]) {
-          var attr = normalizeAttr(property),
-              value = normalizeValue(attr, fabric.cssRules[rule][property]);
+          var attr = normalizeAttr(property);
+          var value = normalizeValue(attr, fabric.cssRules[rule][property]);
           styles[attr] = value;
         }
       }
@@ -363,27 +363,25 @@
 
     return styles;
   }
-  
-  /**
-   * @private
-   */
+
   function parseUseDirectives(doc) {
-    var nodelist = doc.querySelectorAll("use");
+    var nodelist = doc.querySelectorAll("use"),
+        el = null, xlink = '', x = 0, y = 0, el2 = null,
+        currentTrans = '';
     for (var i = 0; i < nodelist.length; i++) {
-      var el = nodelist[i];
-      var xlink = el.getAttribute('xlink:href').substr(1);
-      var x = el.getAttribute('x') || 0;
-      var y = el.getAttribute('y') || 0;
-      var el2 = doc.getElementById(xlink).cloneNode(true);
-      var currentTrans = (el.getAttribute('transform') || '') + ' translate(' + x + ', ' + y + ')';
+      el = nodelist[i];
+      xlink = el.getAttribute('xlink:href').substr(1);
+      x = el.getAttribute('x') || 0;
+      y = el.getAttribute('y') || 0;
+      el2 = doc.getElementById(xlink).cloneNode(true);
+      currentTrans = (el.getAttribute('transform') || '') + ' translate(' + x + ', ' + y + ')';
       for (var j = 0, attrs = el.attributes, l = attrs.length; j < l; j++) {
         var attr = attrs.item(j);
-        if (attr.nodeName !== 'x' && attr.nodeName !== 'y' && attr.nodeName !== 'xlink:href') {
-          if (attr.nodeName === 'transform') {
-            currentTrans = currentTrans + ' ' + attr.nodeValue;
-          } else {
-            el2.setAttribute(attr.nodeName, attr.nodeValue);
-          }
+        if (attr.nodeName === 'x' || attr.nodeName === 'y' || attr.nodeName === 'xlink:href') continue;
+        if (attr.nodeName === 'transform') {
+          currentTrans = currentTrans + ' ' + attr.nodeValue;
+        } else {
+          el2.setAttribute(attr.nodeName, attr.nodeValue);
         }
       }
       el2.setAttribute('transform', currentTrans);
@@ -391,6 +389,17 @@
       var pNode=el.parentNode;
       pNode.replaceChild(el2, el);
     }
+  }
+  
+  function addSvgTransform(doc, matrix) {
+    var el = document.createElement('g'),
+        nodelist = doc.childNodes;
+    while (doc.firstChild != null) {
+      var node = doc.firstChild;
+      el.appendChild(node);
+    }
+    el.setAttribute('transform','matrix(' + matrix[0] + ' ' + matrix[1] + ' ' + matrix[2] + ' ' + matrix[3] + ' ' + matrix[4] + ' ' + matrix[5] + ')');
+    doc.appendChild(el);
   }
 
   /**
@@ -436,6 +445,33 @@
       
       parseUseDirectives(doc);
       
+      var viewBoxAttr = doc.getAttribute('viewBox'),
+          widthAttr = parseFloat(doc.getAttribute('width')),
+          heightAttr = parseFloat(doc.getAttribute('height')),
+          viewBoxWidth,
+          viewBoxHeight,
+          scaleX = 1,
+          scaleY = 1,
+          vbMatrix = null;
+
+      if (viewBoxAttr && (viewBoxAttr = viewBoxAttr.match(reViewBoxAttrValue))) {
+        var minX = parseFloat(viewBoxAttr[1]);
+        var minY = parseFloat(viewBoxAttr[2]);
+        viewBoxWidth = parseFloat(viewBoxAttr[3]);
+        viewBoxHeight = parseFloat(viewBoxAttr[4]);
+        if (widthAttr) {
+          scaleX = widthAttr / viewBoxWidth;
+        }
+        if (heightAttr) {
+          scaleY = heightAttr / viewBoxHeight;
+        }
+        vbMatrix = [scaleX, 0, 0, scaleY, -minX*scaleX, -minY*scaleY];
+      }
+      
+      if (vbMatrix !== null) {
+        addSvgTransform(doc, vbMatrix);
+      }
+      
       var descendants = fabric.util.toArray(doc.getElementsByTagName('*'));
 
       if (descendants.length === 0 && fabric.isLikelyNode) {
@@ -458,37 +494,10 @@
         callback && callback([], {});
         return;
       }
-
-      var viewBoxAttr = doc.getAttribute('viewBox'),
-          widthAttr = parseFloat(doc.getAttribute('width')),
-          heightAttr = parseFloat(doc.getAttribute('height')),
-          width = null,
-          height = null,
-          viewBoxWidth,
-          viewBoxHeight,
-          minX,
-          minY;
-
-      if (viewBoxAttr && (viewBoxAttr = viewBoxAttr.match(reViewBoxAttrValue))) {
-        minX = parseFloat(viewBoxAttr[1]);
-        minY = parseFloat(viewBoxAttr[2]);
-        viewBoxWidth = parseFloat(viewBoxAttr[3]);
-        viewBoxHeight = parseFloat(viewBoxAttr[4]);
-      }
-
-      if (viewBoxWidth && widthAttr && viewBoxWidth !== widthAttr) {
-        width = viewBoxWidth;
-        height = viewBoxHeight;
-      }
-      else {
-        // values of width/height attributes overwrite those extracted from viewbox attribute
-        width = widthAttr ? widthAttr : viewBoxWidth;
-        height = heightAttr ? heightAttr : viewBoxHeight;
-      }
-
+      							  
       var options = {
-        width: width,
-        height: height,
+        width: widthAttr ? widthAttr : viewBoxWidth,
+        height: heightAttr ? heightAttr : viewBoxHeight,
         widthAttr: widthAttr,
         heightAttr: heightAttr
       };
@@ -510,46 +519,46 @@
     * Used for caching SVG documents (loaded via `fabric.Canvas#loadSVGFromURL`)
     * @namespace
     */
-  var svgCache = {
+   var svgCache = {
 
-    /**
-    * @param {String} name
-    * @param {Function} callback
-    */
-    has: function (name, callback) {
-      callback(false);
-    },
+     /**
+      * @param {String} name
+      * @param {Function} callback
+      */
+     has: function (name, callback) {
+       callback(false);
+     },
 
-    /**
-    * @param {String} url
-    * @param {Function} callback
-    */
-    get: function () {
-      /* NOOP */
-    },
+     /**
+      * @param {String} url
+      * @param {Function} callback
+      */
+     get: function () {
+       /* NOOP */
+     },
 
-    /**
-     * @param {String} url
-     * @param {Object} object
-     */
-    set: function () {
-      /* NOOP */
-    }
-  };
+     /**
+      * @param {String} url
+      * @param {Object} object
+      */
+     set: function () {
+       /* NOOP */
+     }
+   };
 
   /**
    * @private
    */
   function _enlivenCachedObject(cachedObject) {
 
-    var objects = cachedObject.objects,
-        options = cachedObject.options;
+   var objects = cachedObject.objects,
+       options = cachedObject.options;
 
-    objects = objects.map(function (o) {
-      return fabric[capitalize(o.type)].fromObject(o);
-    });
+   objects = objects.map(function (o) {
+     return fabric[capitalize(o.type)].fromObject(o);
+   });
 
-    return ({ objects: objects, options: options });
+   return ({ objects: objects, options: options });
   }
 
   /**
