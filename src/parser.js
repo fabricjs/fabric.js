@@ -354,8 +354,8 @@
 
       if (ruleMatchesElement) {
         for (var property in fabric.cssRules[rule]) {
-          var attr = normalizeAttr(property);
-          var value = normalizeValue(attr, fabric.cssRules[rule][property]);
+          var attr = normalizeAttr(property),
+              value = normalizeValue(attr, fabric.cssRules[rule][property]);
           styles[attr] = value;
         }
       }
@@ -364,6 +364,9 @@
     return styles;
   }
 
+  /**
+   * @private
+   */
   function parseUseDirectives(doc) {
     var nodelist = doc.querySelectorAll("use"),
         el = null, xlink = '', x = 0, y = 0, el2 = null,
@@ -464,6 +467,9 @@
         if (heightAttr && heightAttr != viewBoxHeight) {
           scaleY = heightAttr / viewBoxHeight;
         }
+        // default is to preserve aspect ratio
+        // preserveAspectRatio attribute to be implemented
+        scaleY = scaleX = (scaleX > scaleY ? scaleY : scaleX);
         if (scaleX !== 1 || scaleY !== 1 || minX !== 0 || minY !== 0) {
           var vbMatrix = [scaleX, 0, 0, scaleY, -minX * scaleX, -minY * scaleY];
           addSvgTransform(doc, vbMatrix);
@@ -517,46 +523,46 @@
     * Used for caching SVG documents (loaded via `fabric.Canvas#loadSVGFromURL`)
     * @namespace
     */
-   var svgCache = {
+  var svgCache = {
 
-     /**
-      * @param {String} name
-      * @param {Function} callback
-      */
-     has: function (name, callback) {
-       callback(false);
-     },
+    /**
+    * @param {String} name
+    * @param {Function} callback
+    */
+    has: function (name, callback) {
+      callback(false);
+    },
 
-     /**
-      * @param {String} url
-      * @param {Function} callback
-      */
-     get: function () {
-       /* NOOP */
-     },
+    /**
+    * @param {String} url
+    * @param {Function} callback
+    */
+    get: function () {
+     /* NOOP */
+    },
 
-     /**
-      * @param {String} url
-      * @param {Object} object
-      */
-     set: function () {
-       /* NOOP */
-     }
-   };
+    /**
+    * @param {String} url
+    * @param {Object} object
+    */
+    set: function () {
+     /* NOOP */
+    }
+  };
 
   /**
    * @private
    */
   function _enlivenCachedObject(cachedObject) {
 
-   var objects = cachedObject.objects,
-       options = cachedObject.options;
+    var objects = cachedObject.objects,
+        options = cachedObject.options;
 
-   objects = objects.map(function (o) {
-     return fabric[capitalize(o.type)].fromObject(o);
-   });
+    objects = objects.map(function (o) {
+      return fabric[capitalize(o.type)].fromObject(o);
+    });
 
-   return ({ objects: objects, options: options });
+    return ({ objects: objects, options: options });
   }
 
   /**
