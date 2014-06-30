@@ -533,15 +533,15 @@
       callback(false);
     },
 
-     /**
-     * @param {String} url
-     * @param {Function} callback
-     */
+    /**
+    * @param {String} url
+    * @param {Function} callback
+    */
     get: function () {
       /* NOOP */
     },
 
-     /**
+    /**
      * @param {String} url
      * @param {Object} object
      */
