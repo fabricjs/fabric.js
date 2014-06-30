@@ -169,7 +169,9 @@
     var points = fabric.parsePointsAttribute(element.getAttribute('points')),
         parsedAttributes = fabric.parseAttributes(element, fabric.Polyline.ATTRIBUTE_NAMES);
 
-    fabric.util.normalizePoints(points, options);
+    if (!('transformMatrix' in parsedAttributes)) {
+      fabric.util.normalizePoints(points, options);
+    }
 
     return new fabric.Polyline(points, fabric.util.object.extend(parsedAttributes, options), true);
   };
