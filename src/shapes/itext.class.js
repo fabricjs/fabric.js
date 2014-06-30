@@ -356,6 +356,8 @@
         textBackgroundColor: style && style.textBackgroundColor || this.textBackgroundColor,
         textDecoration: style && style.textDecoration || this.textDecoration,
         fontFamily: style && style.fontFamily || this.fontFamily,
+        fontWeight: style && style.fontWeight || this.fontWeight,
+        fontStyle: style && style.fontStyle || this.fontStyle,
         stroke: style && style.stroke || this.stroke,
         strokeWidth: style && style.strokeWidth || this.strokeWidth
       };
@@ -695,6 +697,8 @@
               prevStyle.textBackgroundColor !== thisStyle.textBackgroundColor ||
               prevStyle.textDecoration !== thisStyle.textDecoration ||
               prevStyle.fontFamily !== thisStyle.fontFamily ||
+              prevStyle.fontWeight !== thisStyle.fontWeight ||
+              prevStyle.fontStyle !== thisStyle.fontStyle ||
               prevStyle.stroke !== thisStyle.stroke ||
               prevStyle.strokeWidth !== thisStyle.strokeWidth
       );
