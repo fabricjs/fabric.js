@@ -154,7 +154,7 @@
       ctx.beginPath();
 
       var isInPathGroup = this.group && this.group.type === 'path-group';
-      if (isInPathGroup && !this.transformMatrix) {
+      if (isInPathGroup) {
         //  Line coords are distances from left-top of canvas to origin of line.
         //
         //  To render line in a path-group, we need to translate them to
