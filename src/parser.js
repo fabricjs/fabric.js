@@ -493,8 +493,8 @@
         heightAttr: heightAttr
       };
 
-      fabric.gradientDefs = fabric.getGradientDefs(doc);
-      fabric.cssRules = fabric.getCSSRules(doc);
+      fabric.gradientDefs = extend(fabric.getGradientDefs(doc), fabric.gradientDefs);
+      fabric.cssRules = extend(fabric.getCSSRules(doc), fabric.cssRules);
       // Precedence of rules:   style > class > attribute
 
       fabric.parseElements(elements, function(instances) {
