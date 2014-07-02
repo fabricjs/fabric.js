@@ -56,7 +56,7 @@
       options = options || { };
       this.set('points', points);
       this.callSuper('initialize', options);
-      this._calcDimensions(skipOffset);
+      if (!skipOffset) this._calcDimensions();
     },
 
     /**
@@ -64,7 +64,7 @@
      * @param {Boolean} [skipOffset] Whether points offsetting should be skipped
      */
     _calcDimensions: function(skipOffset) {
-      return fabric.Polygon.prototype._calcDimensions.call(this, skipOffset);
+      return fabric.Polygon.prototype._calcDimensions.call(this);
     },
 
     /**
