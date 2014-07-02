@@ -46,7 +46,8 @@
       options = options || { };
       this.points = points;
       this.callSuper('initialize', options);
-      this._calcDimensions(skipOffset);
+      //if i come ftom svg parsing i don't have to calc any dimension
+      if (!skipOffset) this._calcDimensions(skipOffset);
     },
 
     /**
@@ -66,8 +67,6 @@
 
       this.minX = minX;
       this.minY = minY;
-
-      if (skipOffset) return;
 
       var halfWidth = this.width / 2 + this.minX,
           halfHeight = this.height / 2 + this.minY;
