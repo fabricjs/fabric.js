@@ -47,14 +47,14 @@
       this.points = points;
       this.callSuper('initialize', options);
       //if i come ftom svg parsing i don't have to calc any dimension
-      if (!skipOffset) this._calcDimensions(skipOffset);
+      if (!skipOffset) this._calcDimensions();
     },
 
     /**
      * @private
      * @param {Boolean} [skipOffset] Whether points offsetting should be skipped
      */
-    _calcDimensions: function(skipOffset) {
+    _calcDimensions: function() {
 
       var points = this.points,
           minX = min(points, 'x'),
