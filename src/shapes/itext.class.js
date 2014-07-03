@@ -9,6 +9,7 @@
     * @mixes fabric.Observable
     *
     * @fires changed ("text:changed" when observing canvas)
+    * @fires selection:changed ("text:selection:changed" when observing canvas)
     * @fires editing:entered ("text:editing:entered" when observing canvas)
     * @fires editing:exited ("text:editing:exited" when observing canvas)
     *
@@ -219,6 +220,7 @@
      */
     setSelectionStart: function(index) {
       if (this.selectionStart !== index) {
+        this.fire('selection:changed');
         this.canvas && this.canvas.fire('text:selection:changed', { target: this });
       }
       this.selectionStart = index;
@@ -231,6 +233,7 @@
      */
     setSelectionEnd: function(index) {
       if (this.selectionEnd !== index) {
+        this.fire('selection:changed');
         this.canvas && this.canvas.fire('text:selection:changed', { target: this });
       }
       this.selectionEnd = index;
