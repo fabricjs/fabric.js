@@ -238,10 +238,10 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
           mouseOffset, prevWidth, width, charIndex + i, jlen);
       }
 
-       if (mouseOffset.y < height) {
-          return this._getNewSelectionStartFromOffset(
-            mouseOffset, prevWidth, width, charIndex + i, jlen, j);
-       }
+      if (mouseOffset.y < height) {
+        return this._getNewSelectionStartFromOffset(
+          mouseOffset, prevWidth, width, charIndex + i, jlen, j);
+      }
     }
 
     // clicked somewhere after all chars, so set at the end

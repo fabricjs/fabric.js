@@ -9,7 +9,9 @@
         t, i, len = methodNames.length;
     for (i = 0; i < len; i++) {
       t = typeof object[methodNames[i]];
-      if (!(/^(?:function|object|unknown)$/).test(t)) return false;
+      if (!(/^(?:function|object|unknown)$/).test(t)) {
+        return false;
+      }
     }
     return true;
   }

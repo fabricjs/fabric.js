@@ -59,10 +59,9 @@
       source = new fabric.Color(this.color).getSource();
 
       for (i = 0; i < iLen; i+=4) {
-        data[i] *= source[0]/255;
-        data[i + 1] *= source[1]/255;
-        data[i + 2] *= source[2]/255;
-        
+        data[i] *= source[0] / 255;
+        data[i + 1] *= source[1] / 255;
+        data[i + 2] *= source[2] / 255;
       }
 
       context.putImageData(imageData, 0, 0);

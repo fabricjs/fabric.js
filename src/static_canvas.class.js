@@ -336,7 +336,7 @@
      * @private
      * @param {String} property Property to set ({@link fabric.StaticCanvas#backgroundImage|backgroundImage}
      * or {@link fabric.StaticCanvas#overlayImage|overlayImage})
-     * @param {(fabric.Image|String)} image fabric.Image instance or URL of an image to set background or overlay to
+     * @param {(fabric.Image|String|null)} image fabric.Image instance, URL of an image or null to set background or overlay to
      * @param {Function} callback Callback to invoke when image is loaded and set as background or overlay
      * @param {Object} [options] Optional options to set for the {@link fabric.Image|image}.
      */
@@ -359,11 +359,11 @@
      * @private
      * @param {String} property Property to set ({@link fabric.StaticCanvas#backgroundColor|backgroundColor}
      * or {@link fabric.StaticCanvas#overlayColor|overlayColor})
-     * @param {(Object|String)} color Object with pattern information or color value
+     * @param {(Object|String|null)} color Object with pattern information, color value or null
      * @param {Function} [callback] Callback is invoked when color is set
      */
     __setBgOverlayColor: function(property, color, callback) {
-      if (color.source) {
+      if (color && color.source) {
         var _this = this;
         fabric.util.loadImage(color.source, function(img) {
           _this[property] = new fabric.Pattern({
@@ -1021,7 +1021,6 @@
           this._currentTransform.target = this.getActiveGroup();
         }
       }
-
 
       return data;
     },

@@ -108,7 +108,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
         fabric.util.string.escapeXml(_char),
       '</tspan>'
-      ].join('');
+    ].join('');
   }
 });
 /* _TO_SVG_END_ */

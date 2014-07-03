@@ -66,9 +66,11 @@
     rx = Math.abs(rx);
     ry = Math.abs(ry);
 
-    var px = cosTh * (ox - x) * 0.5 + sinTh * (oy - y) * 0.5,
-        py = cosTh * (oy - y) * 0.5 - sinTh * (ox - x) * 0.5,
+    var px = cosTh * (ox - x) + sinTh * (oy - y),
+        py = cosTh * (oy - y) - sinTh * (ox - x),
         pl = (px * px) / (rx * rx) + (py * py) / (ry * ry);
+
+    pl *= 0.25;
 
     if (pl > 1) {
       pl = Math.sqrt(pl);
@@ -98,20 +100,26 @@
       return segmentToBezierCache[argsString];
     }
 
-    var a00 = cosTh * rx,
+    var sinTh0 = Math.sin(th0),
+        cosTh0 = Math.cos(th0),
+        sinTh1 = Math.sin(th1),
+        cosTh1 = Math.cos(th1),
+
+        a00 = cosTh * rx,
         a01 = -sinTh * ry,
         a10 = sinTh * rx,
         a11 = cosTh * ry,
-        thHalf = 0.5 * (th1 - th0),
-        t = (8 / 3) * Math.sin(thHalf * 0.5) *
-            Math.sin(thHalf * 0.5) / Math.sin(thHalf),
+        thHalf = 0.25 * (th1 - th0),
 
-        x1 = cx + Math.cos(th0) - t * Math.sin(th0),
-        y1 = cy + Math.sin(th0) + t * Math.cos(th0),
-        x3 = cx + Math.cos(th1),
-        y3 = cy + Math.sin(th1),
-        x2 = x3 + t * Math.sin(th1),
-        y2 = y3 - t * Math.cos(th1);
+        t = (8 / 3) * Math.sin(thHalf) *
+            Math.sin(thHalf) / Math.sin(thHalf * 2),
+
+        x1 = cx + cosTh0 - t * sinTh0,
+        y1 = cy + sinTh0 + t * cosTh0,
+        x3 = cx + cosTh1,
+        y3 = cy + sinTh1,
+        x2 = x3 + t * sinTh1,
+        y2 = y3 - t * cosTh1;
 
     segmentToBezierCache[argsString] = [
       a00 * x1 + a01 * y1,      a10 * x1 + a11 * y1,
@@ -138,7 +146,6 @@
         ex = coords[5],
         ey = coords[6],
         segs = arcToSegments(ex, ey, rx, ry, large, sweep, rot, x, y);
-
     for (var i = 0; i < segs.length; i++) {
       var bez = segmentToBezier.apply(this, segs[i]);
       ctx.bezierCurveTo.apply(ctx, bez);

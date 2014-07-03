@@ -787,9 +787,8 @@
 
       // Cache all targets where their bounding box contains point.
       var target,
-          pointer = this.getPointer(e, true);
-
-      var i = this._objects.length;
+          pointer = this.getPointer(e, true),
+          i = this._objects.length;
 
       while (i--) {
         if (this._checkTarget(e, this._objects[i], pointer)){
