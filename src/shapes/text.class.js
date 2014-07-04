@@ -319,7 +319,6 @@
       this.setOptions(options);
       this.__skipDimension = false;
       this._initDimensions();
-      this.setCoords();
     },
 
     /**
@@ -772,10 +771,6 @@
         ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
       }
       this._render(ctx);
-      if (!noTransform && this.active) {
-        this.drawBorders(ctx);
-        this.drawControls(ctx);
-      }
       ctx.restore();
     },
 

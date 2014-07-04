@@ -82,6 +82,45 @@
     },
 
     /**
+     * Apply transform t to point p
+     * @static
+     * @memberOf fabric.util
+     * @param  {fabric.Point} p The point to transform
+     * @param  {Array} t The transform
+     * @param  {Boolean} [ignoreOffset] Indicates that the offset should not be applied
+     * @return {fabric.Point} The transformed point
+     */
+    transformPoint: function(p, t, ignoreOffset) {
+      if (ignoreOffset) {
+        return new fabric.Point(
+          t[0] * p.x + t[1] * p.y,
+          t[2] * p.x + t[3] * p.y
+        );
+      }
+      return new fabric.Point(
+        t[0] * p.x + t[1] * p.y + t[4],
+        t[2] * p.x + t[3] * p.y + t[5]
+      );
+    },
+  
+    /**
+     * Invert transformation t
+     * @static
+     * @memberOf fabric.util
+     * @param  {Array} t The transform
+     * @return {Array} The inverted transform
+     */
+    invertTransform: function(t) {
+      var r = t.slice(),
+          a = 1 / (t[0] * t[3] - t[1] * t[2]);
+      r = [a * t[3], -a * t[1], -a * t[2], a * t[0], 0, 0];
+      var o = fabric.util.transformPoint({x: t[4], y: t[5]}, r);
+      r[4] = -o.x;
+      r[5] = -o.y;
+      return r;
+    },
+
+    /**
      * A wrapper around Number#toFixed, which contrary to native method returns number, not string.
      * @static
      * @memberOf fabric.util

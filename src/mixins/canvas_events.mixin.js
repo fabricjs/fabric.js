@@ -334,7 +334,9 @@
       if (this.clipTo) {
         fabric.util.clipContext(this, this.contextTop);
       }
-      this.freeDrawingBrush.onMouseDown(this.getPointer(e));
+      var ivt = fabric.util.invertTransform(this.viewportTransform);
+      var pointer = fabric.util.transformPoint(this.getPointer(e, true), ivt);
+      this.freeDrawingBrush.onMouseDown(pointer);
       this.fire('mouse:down', { e: e });
     },
 
@@ -344,7 +346,8 @@
      */
     _onMouseMoveInDrawingMode: function(e) {
       if (this._isCurrentlyDrawing) {
-        var pointer = this.getPointer(e);
+        var ivt = fabric.util.invertTransform(this.viewportTransform),
+            pointer = fabric.util.transformPoint(this.getPointer(e, true), ivt);
         this.freeDrawingBrush.onMouseMove(pointer);
       }
       this.upperCanvasEl.style.cursor = this.freeDrawingCursor;
@@ -387,7 +390,7 @@
       if (this._currentTransform) return;
 
       var target = this.findTarget(e),
-          pointer = this.getPointer(e);
+          pointer = this.getPointer(e, true);
 
       // save pointer for check in __onMouseUp event
       this._previousPointer = pointer;
@@ -514,7 +517,7 @@
 
       // We initially clicked in an empty area, so we draw a box for multiple selection
       if (groupSelector) {
-        pointer = this.getPointer(e);
+        pointer = this.getPointer(e, true);
 
         groupSelector.left = pointer.x - groupSelector.ex;
         groupSelector.top = pointer.y - groupSelector.ey;
@@ -545,7 +548,6 @@
      * @param {Event} e Event fired on mousemove
      */
     _transformObject: function(e) {
-
       var pointer = this.getPointer(e),
           transform = this._currentTransform;
 
@@ -655,7 +657,7 @@
             // only show proper corner when group selection is not active
             corner = target._findTargetCorner
                       && (!activeGroup || !activeGroup.contains(target))
-                      && target._findTargetCorner(this.getPointer(e));
+                      && target._findTargetCorner(this.getPointer(e, true));
 
         if (!corner) {
           style.cursor = target.hoverCursor || this.hoverCursor;

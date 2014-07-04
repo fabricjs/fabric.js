@@ -6,7 +6,8 @@
       extend = fabric.util.object.extend,
       min = fabric.util.array.min,
       max = fabric.util.array.max,
-      invoke = fabric.util.array.invoke;
+      invoke = fabric.util.array.invoke,
+      degreesToRadians = fabric.util.degreesToRadians;
 
   if (fabric.Group) {
     return;
@@ -58,16 +59,14 @@
       this.originalState = { };
       this.callSuper('initialize');
 
+      this._setOpacityIfSame();
       this._calcBounds();
       this._updateObjectsCoords();
-
+      this.setCoords();
+      this.saveCoords();
       if (options) {
         extend(this, options);
       }
-      this._setOpacityIfSame();
-
-      this.setCoords(true);
-      this.saveCoords();
     },
 
     /**
@@ -220,8 +219,6 @@
       if (!this.visible) return;
 
       ctx.save();
-      this.transform(ctx);
-
       this.clipTo && fabric.util.clipContext(this, ctx);
 
       // the array is now sorted in order of highest first, so start from end
@@ -231,31 +228,34 @@
 
       this.clipTo && ctx.restore();
 
-      if (!noTransform && this.active) {
-        this.drawBorders(ctx);
-        this.drawControls(ctx);
-      }
       ctx.restore();
+    },
+
+    /**
+     * Renders controls and borders for the object
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Boolean} [noTransform] When true, context is not transformed
+     */
+    _renderControls: function(ctx, noTransform) {
+      this.callSuper('_renderControls', ctx, noTransform);
+      for (var i = 0, len = this._objects.length; i < len; i++) {
+        this._objects[i]._renderControls(ctx);
+      }
     },
 
     /**
      * @private
      */
     _renderObject: function(object, ctx) {
-
-      var originalScaleFactor = object.borderScaleFactor,
-          originalHasRotatingPoint = object.hasRotatingPoint,
-          groupScaleFactor = Math.max(this.scaleX, this.scaleY);
+      var originalHasRotatingPoint = object.hasRotatingPoint;
 
       // do not render if object is not visible
       if (!object.visible) return;
 
-      object.borderScaleFactor = groupScaleFactor;
       object.hasRotatingPoint = false;
 
       object.render(ctx);
 
-      object.borderScaleFactor = originalScaleFactor;
       object.hasRotatingPoint = originalHasRotatingPoint;
     },
 
@@ -450,20 +450,17 @@
      * @private
      */
     _getBounds: function(aX, aY, onlyWidthHeight) {
-      var minX = min(aX),
-          maxX = max(aX),
-          minY = min(aY),
-          maxY = max(aY),
-          width = (maxX - minX) || 0,
-          height = (maxY - minY) || 0,
-          obj =  {
-            width: width,
-            height: height
+      var ivt = fabric.util.invertTransform(this.getViewportTransform()),
+          minXY = fabric.util.transformPoint(new fabric.Point(min(aX), min(aY)), ivt),
+          maxXY = fabric.util.transformPoint(new fabric.Point(max(aX), max(aY)), ivt),
+          obj = {
+            width: (maxXY.x - minXY.x) || 0,
+            height: (maxXY.y - minXY.y) || 0
           };
 
       if (!onlyWidthHeight) {
-        obj.left = (minX + width / 2) || 0;
-        obj.top = (minY + height / 2) || 0;
+        obj.left = (minXY.x + maxXY.x) / 2 || 0;
+        obj.top = (minXY.y + maxXY.y) / 2 || 0;
       }
       return obj;
     },

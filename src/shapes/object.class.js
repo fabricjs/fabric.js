@@ -732,6 +732,9 @@
      * @param {Boolean} fromLeft When true, context is transformed to object's top/left corner. This is used when rendering text on Node
      */
     transform: function(ctx, fromLeft) {
+      if (this.group) {
+        this.group.transform(ctx, fromLeft);
+      }
       ctx.globalAlpha = this.opacity;
 
       var center = fromLeft ? this._getLeftTopCoords() : this.getCenterPoint();
@@ -921,6 +924,18 @@
     },
 
     /**
+     * Retrieves viewportTransform from Object's canvas if possible
+     * @method getViewportTransform
+     * @memberOf fabric.Object.prototype
+     * @return {Boolean} flipY value // TODO
+     */
+    getViewportTransform: function() {
+      if (this.canvas && this.canvas.viewportTransform)
+        return this.canvas.viewportTransform;
+      return [1, 0, 0, 1, 0, 0];
+    },
+
+    /**
      * Renders an object on a specified context
      * @param {CanvasRenderingContext2D} ctx Context to render on
      * @param {Boolean} [noTransform] When true, context is not transformed
@@ -949,19 +964,14 @@
       this._render(ctx, noTransform);
       this.clipTo && ctx.restore();
       this._removeShadow(ctx);
-
       this._restoreFillRule(ctx);
-
-      if (this.active && !noTransform) {
-        this.drawBorders(ctx);
-        this.drawControls(ctx);
-      }
 
       ctx.restore();
     },
 
     _transform: function(ctx, noTransform) {
       var m = this.transformMatrix;
+
       if (m && !this.group) {
         ctx.setTransform(m[0], m[1], m[2], m[3], m[4], m[5]);
       }
@@ -988,6 +998,35 @@
           ? this.fill.toLive(ctx)
           : this.fill;
       }
+    },
+
+    /**
+     * Renders controls and borders for the object
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Boolean} [noTransform] When true, context is not transformed
+     */
+    _renderControls: function(ctx, noTransform) {
+      var v = this.getViewportTransform();
+
+      ctx.save();
+      if (this.active && !noTransform) {
+        var center;
+        if (this.group) {
+          center = fabric.util.transformPoint(this.group.getCenterPoint(), v);
+          ctx.translate(center.x, center.y);
+          ctx.rotate(degreesToRadians(this.group.angle));
+        }
+        center = fabric.util.transformPoint(this.getCenterPoint(), v, null != this.group);
+        if (this.group) {
+          center.x *= this.group.scaleX;
+          center.y *= this.group.scaleY;
+        }
+        ctx.translate(center.x, center.y);
+        ctx.rotate(degreesToRadians(this.angle));
+        this.drawBorders(ctx);
+        this.drawControls(ctx);
+      }
+      ctx.restore();
     },
 
     /**
