@@ -670,14 +670,14 @@
     _onObjectAdded: function(obj) {
       this.stateful && obj.setupState();
       obj.canvas = this;
-      if (obj._objects) {
-        obj._calcBounds();
-        for (var i = 0, len = obj._objects.length; i < len; i++) {
-          obj._objects[i].canvas = this;
-          this._onObjectAdded(obj._objects[i]);
-        }
-        obj._updateObjectsCoords();
-      }
+      //if (obj._objects) {
+      //  obj._calcBounds();
+      //  for (var i = 0, len = obj._objects.length; i < len; i++) {
+      //    obj._objects[i].canvas = this;
+      //    this._onObjectAdded(obj._objects[i]);
+      //  }
+      //  obj._updateObjectsCoords();
+      //}
       obj.setCoords();
       this.fire('object:added', { target: obj });
       obj.fire('added');
