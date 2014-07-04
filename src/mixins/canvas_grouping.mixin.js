@@ -107,7 +107,8 @@
 
       return new fabric.Group(groupObjects, {
         originX: 'center',
-        originY: 'center'
+        originY: 'center',
+        canvas: this
       });
     },
 
@@ -126,7 +127,8 @@
       else if (group.length > 1) {
         group = new fabric.Group(group.reverse(), {
           originX: 'center',
-          originY: 'center'
+          originY: 'center',
+          canvas: this
         });
         this.setActiveGroup(group, e);
         group.saveCoords();

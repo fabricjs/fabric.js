@@ -995,9 +995,6 @@
       this._activeGroup = group;
       if (group) {
         group.canvas = this;
-        group._calcBounds();
-        group._updateObjectsCoords();
-        group.setCoords();
         group.set('active', true);
       }
     },
