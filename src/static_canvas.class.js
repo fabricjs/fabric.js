@@ -596,17 +596,13 @@
      * @chainable true
      */
     absolutePan: function (point) {
-      var wh = fabric.util.transformPoint(
-        new fabric.Point(this.getWidth(), this.getHeight()),
-        this.viewportTransform
-      );
       this.viewportTransform[4] = -point.x;
       this.viewportTransform[5] = -point.y;
       this.renderAll();
       for (var i = 0, len = this._objects.length; i < len; i++) {
         this._objects[i].setCoords();
       }
-      return this
+      return this;
     },
 
     /**

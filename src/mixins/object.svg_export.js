@@ -46,10 +46,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   getSvgTransform: function() {
     var toFixed = fabric.util.toFixed,
         angle = this.getAngle(),
-        center = this.getCenterPoint(),
-        vpt = this.getViewportTransform();
-
-        center = fabric.util.transformPoint(center, vpt);
+        vpt = this.getViewportTransform(),
+        center = fabric.util.transformPoint(this.getCenterPoint(), vpt),
 
         NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
 
