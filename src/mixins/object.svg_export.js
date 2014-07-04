@@ -47,6 +47,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     var toFixed = fabric.util.toFixed,
         angle = this.getAngle(),
         center = this.getCenterPoint(),
+        vpt = this.getViewportTransform();
+
+        center = fabric.util.transformPoint(center, vpt);
 
         NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
 
@@ -63,9 +66,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         scalePart = (this.scaleX === 1 && this.scaleY === 1)
           ? '' :
           (' scale(' +
-            toFixed(this.scaleX, NUM_FRACTION_DIGITS) +
+            toFixed(this.scaleX * vpt[0], NUM_FRACTION_DIGITS) +
             ' ' +
-            toFixed(this.scaleY, NUM_FRACTION_DIGITS) +
+            toFixed(this.scaleY * vpt[3], NUM_FRACTION_DIGITS) +
           ')'),
 
         flipXPart = this.flipX ? 'matrix(-1 0 0 1 0 0) ' : '',
