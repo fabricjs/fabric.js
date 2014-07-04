@@ -59,14 +59,14 @@
       this.originalState = { };
       this.callSuper('initialize');
 
-      if (options) {
-        extend(this, options);
-      }
       this._setOpacityIfSame();
       this._calcBounds();
       this._updateObjectsCoords();
       this.setCoords();
       this.saveCoords();
+      if (options) {
+        extend(this, options);
+      }
     },
 
     /**
