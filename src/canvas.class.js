@@ -994,7 +994,6 @@
     _setActiveGroup: function(group) {
       this._activeGroup = group;
       if (group) {
-        group.canvas = this;
         group.set('active', true);
       }
     },

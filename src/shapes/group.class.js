@@ -59,14 +59,16 @@
       this.originalState = { };
       this.callSuper('initialize');
 
-      this._setOpacityIfSame();
       this._calcBounds();
       this._updateObjectsCoords();
-      this.setCoords();
-      this.saveCoords();
+
       if (options) {
         extend(this, options);
       }
+      this._setOpacityIfSame();
+
+      this.setCoords();
+      this.saveCoords();
     },
 
     /**
@@ -113,8 +115,10 @@
      */
     addWithUpdate: function(object) {
       this._restoreObjectsState();
-      this._objects.push(object);
-      object.group = this;
+      if (object) {
+          this._objects.push(object);
+          object.group = this;
+      }
       // since _restoreObjectsState set objects inactive
       this.forEachObject(this._setObjectActive, this);
       this._calcBounds();

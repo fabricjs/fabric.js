@@ -83,6 +83,7 @@
       if (this._activeObject && target !== this._activeObject) {
 
         var group = this._createGroup(target);
+        group.addWithUpdate();
 
         this.setActiveGroup(group);
         this._activeObject = null;
@@ -130,6 +131,7 @@
           originY: 'center',
           canvas: this
         });
+        group.addWithUpdate();
         this.setActiveGroup(group, e);
         group.saveCoords();
         this.fire('selection:created', { target: group });
