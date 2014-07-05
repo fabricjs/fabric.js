@@ -6,8 +6,7 @@
       extend = fabric.util.object.extend,
       min = fabric.util.array.min,
       max = fabric.util.array.max,
-      invoke = fabric.util.array.invoke,
-      degreesToRadians = fabric.util.degreesToRadians;
+      invoke = fabric.util.array.invoke;
 
   if (fabric.Group) {
     return;
@@ -216,9 +215,8 @@
     /**
      * Renders instance on a given context
      * @param {CanvasRenderingContext2D} ctx context to render instance on
-     * @param {Boolean} [noTransform] When true, context is not transformed
      */
-    render: function(ctx, noTransform) {
+    render: function(ctx) {
       // do not render if object is not visible
       if (!this.visible) return;
 
