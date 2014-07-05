@@ -565,7 +565,8 @@
      */
     zoomToPoint: function (point, value) {
       // TODO: just change the scale, preserve other transformations
-      var before = fabric.util.transformPoint(point, this.viewportTransform);
+      var before = point;
+      point = fabric.util.transformPoint(point, fabric.util.invertTransform(this.viewportTransform));
       this.viewportTransform[0] = value;
       this.viewportTransform[3] = value;
       var after = fabric.util.transformPoint(point, this.viewportTransform);
