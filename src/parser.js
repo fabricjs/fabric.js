@@ -354,7 +354,7 @@
                              (new RegExp('^' + nodeName).test(rule));
 
       if (className !== null && !ruleMatchesElement) {
-	      classArr = className.split(' ');
+        classArr = className.split(' ');
         for (var j = 0; j < classArr.length; j++) {
           ruleMatchesElement = ruleMatchesElement || (classArr[j] && new RegExp('^\\.' + classArr[j]).test(rule));
         }	  	
