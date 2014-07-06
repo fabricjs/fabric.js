@@ -172,7 +172,7 @@
       parsedAttributes.left = 0;
     }
     if (!('top' in parsedAttributes)) {
-      parsedAttributes.top = 0
+      parsedAttributes.top = 0;
     }
     if (!('transformMatrix' in parsedAttributes)) {
       parsedAttributes.left -= (options.width / 2);

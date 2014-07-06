@@ -104,6 +104,9 @@
      */
     _render: function() {
       var ctx  = this.canvas.contextTop;
+      var v = this.canvas.viewportTransform;
+      ctx.save();
+      ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
       ctx.beginPath();
 
       var p1 = this._points[0],
@@ -133,6 +136,7 @@
       // the bezier control point
       ctx.lineTo(p1.x, p1.y);
       ctx.stroke();
+      ctx.restore();
     },
 
     /**

@@ -83,6 +83,7 @@
       if (this._activeObject && target !== this._activeObject) {
 
         var group = this._createGroup(target);
+        group.addWithUpdate();
 
         this.setActiveGroup(group);
         this._activeObject = null;
@@ -107,7 +108,8 @@
 
       return new fabric.Group(groupObjects, {
         originX: 'center',
-        originY: 'center'
+        originY: 'center',
+        canvas: this
       });
     },
 
@@ -126,8 +128,10 @@
       else if (group.length > 1) {
         group = new fabric.Group(group.reverse(), {
           originX: 'center',
-          originY: 'center'
+          originY: 'center',
+          canvas: this
         });
+        group.addWithUpdate();
         this.setActiveGroup(group, e);
         group.saveCoords();
         this.fire('selection:created', { target: group });
