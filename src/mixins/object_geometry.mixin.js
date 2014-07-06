@@ -304,11 +304,15 @@
     setCoords: function() {
 
       var strokeWidth = this.strokeWidth > 1 ? this.strokeWidth : 0,
-          padding = this.padding,
-          theta = degreesToRadians(this.angle);
+          theta = degreesToRadians(this.angle),
+          vpt = this.getViewportTransform();
 
-      this.currentWidth = (this.width + strokeWidth) * this.scaleX + padding * 2;
-      this.currentHeight = (this.height + strokeWidth) * this.scaleY + padding * 2;
+      var f = function (p) {
+        return fabric.util.transformPoint(p, vpt);
+      };
+
+      this.currentWidth = (this.width + strokeWidth) * this.scaleX;
+      this.currentHeight = (this.height + strokeWidth) * this.scaleY;
 
       // If width is negative, make postive. Fixes path selection issue
       if (this.currentWidth < 0) {
@@ -326,45 +330,34 @@
           offsetY = Math.sin(_angle + theta) * _hypotenuse,
           sinTh = Math.sin(theta),
           cosTh = Math.cos(theta),
-
           coords = this.getCenterPoint(),
+          wh = new fabric.Point(this.currentWidth, this.currentHeight),
+          _tl =   new fabric.Point(coords.x - offsetX, coords.y - offsetY),
+          _tr =   new fabric.Point(_tl.x + (wh.x * cosTh),   _tl.y + (wh.x * sinTh)),
+          _bl =   new fabric.Point(_tl.x - (wh.y * sinTh),   _tl.y + (wh.y * cosTh)),
+          _mt =   new fabric.Point(_tl.x + (wh.x/2 * cosTh), _tl.y + (wh.x/2 * sinTh)),
+          tl  = f(_tl),
+          tr  = f(_tr),
+          br  = f(new fabric.Point(_tr.x - (wh.y * sinTh),   _tr.y + (wh.y * cosTh))),
+          bl  = f(_bl),
+          ml  = f(new fabric.Point(_tl.x - (wh.y/2 * sinTh), _tl.y + (wh.y/2 * cosTh))),
+          mt  = f(_mt),
+          mr  = f(new fabric.Point(_tr.x - (wh.y/2 * sinTh), _tr.y + (wh.y/2 * cosTh))),
+          mb  = f(new fabric.Point(_bl.x + (wh.x/2 * cosTh), _bl.y + (wh.x/2 * sinTh))),
+          mtr = f(new fabric.Point(_mt.x, _mt.y));
 
-          tl = {
-            x: coords.x - offsetX,
-            y: coords.y - offsetY
-          },
-          tr = {
-            x: tl.x + (this.currentWidth * cosTh),
-            y: tl.y + (this.currentWidth * sinTh)
-          },
-          br = {
-            x: tr.x - (this.currentHeight * sinTh),
-            y: tr.y + (this.currentHeight * cosTh)
-          },
-          bl = {
-            x: tl.x - (this.currentHeight * sinTh),
-            y: tl.y + (this.currentHeight * cosTh)
-          },
-          ml = {
-            x: tl.x - (this.currentHeight/2 * sinTh),
-            y: tl.y + (this.currentHeight/2 * cosTh)
-          },
-          mt = {
-            x: tl.x + (this.currentWidth/2 * cosTh),
-            y: tl.y + (this.currentWidth/2 * sinTh)
-          },
-          mr = {
-            x: tr.x - (this.currentHeight/2 * sinTh),
-            y: tr.y + (this.currentHeight/2 * cosTh)
-          },
-          mb = {
-            x: bl.x + (this.currentWidth/2 * cosTh),
-            y: bl.y + (this.currentWidth/2 * sinTh)
-          },
-          mtr = {
-            x: mt.x,
-            y: mt.y
-          };
+      // padding
+      var padX = Math.cos(_angle + theta) * this.padding * Math.sqrt(2),
+          padY = Math.sin(_angle + theta) * this.padding * Math.sqrt(2);
+      tl = tl.add(new fabric.Point(-padX, -padY));
+      tr = tr.add(new fabric.Point(padY, -padX));
+      br = br.add(new fabric.Point(padX, padY));
+      bl = bl.add(new fabric.Point(-padY, padX));
+      ml = ml.add(new fabric.Point((-padX - padY) / 2, (-padY + padX) / 2));
+      mt = mt.add(new fabric.Point((padY - padX) / 2, -(padY + padX) / 2));
+      mr = mr.add(new fabric.Point((padY + padX) / 2, (padY - padX) / 2));
+      mb = mb.add(new fabric.Point((padX - padY) / 2, (padX + padY) / 2));
+      mtr = mtr.add(new fabric.Point((padY - padX) / 2, -(padY + padX) / 2));
 
       // debugging
 

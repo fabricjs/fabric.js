@@ -122,7 +122,6 @@
       if (!this.visible) return;
 
       ctx.save();
-
       var m = this.transformMatrix,
           isInPathGroup = this.group && this.group.type === 'path-group';
 
@@ -140,7 +139,6 @@
         ctx.translate(this.width/2, this.height/2);
       }
 
-      ctx.save();
       this._setShadow(ctx);
       this.clipTo && fabric.util.clipContext(this, ctx);
       this._render(ctx);
@@ -149,12 +147,6 @@
       }
       this._renderStroke(ctx);
       this.clipTo && ctx.restore();
-      ctx.restore();
-
-      if (this.active && !noTransform) {
-        this.drawBorders(ctx);
-        this.drawControls(ctx);
-      }
       ctx.restore();
     },
 

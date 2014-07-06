@@ -46,7 +46,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   getSvgTransform: function() {
     var toFixed = fabric.util.toFixed,
         angle = this.getAngle(),
-        center = this.getCenterPoint(),
+        vpt = this.getViewportTransform(),
+        center = fabric.util.transformPoint(this.getCenterPoint(), vpt),
 
         NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
 
@@ -60,12 +61,12 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           ? (' rotate(' + toFixed(angle, NUM_FRACTION_DIGITS) + ')')
           : '',
 
-        scalePart = (this.scaleX === 1 && this.scaleY === 1)
+        scalePart = (this.scaleX === 1 && this.scaleY === 1 && vpt[0] === 1 && vpt[3] === 1)
           ? '' :
           (' scale(' +
-            toFixed(this.scaleX, NUM_FRACTION_DIGITS) +
+            toFixed(this.scaleX * vpt[0], NUM_FRACTION_DIGITS) +
             ' ' +
-            toFixed(this.scaleY, NUM_FRACTION_DIGITS) +
+            toFixed(this.scaleY * vpt[3], NUM_FRACTION_DIGITS) +
           ')'),
 
         flipXPart = this.flipX ? 'matrix(-1 0 0 1 0 0) ' : '',

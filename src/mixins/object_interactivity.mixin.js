@@ -277,25 +277,32 @@
           scaleY = 1 / this._constrainScale(this.scaleY);
 
       ctx.lineWidth = 1 / this.borderScaleFactor;
-
-      ctx.scale(scaleX, scaleY);
-
-      var w = this.getWidth(),
-          h = this.getHeight();
+      
+      var vpt = this.getViewportTransform(),
+          wh = fabric.util.transformPoint(new fabric.Point(this.getWidth(), this.getHeight()), vpt, true),
+          sxy = fabric.util.transformPoint(new fabric.Point(scaleX, scaleY), vpt, true),
+          w = wh.x,
+          h = wh.y,
+          sx= sxy.x,
+          sy= sxy.y;
+      if (this.group) {
+        w = w * this.group.scaleX;
+        h = h * this.group.scaleY;
+      }
 
       ctx.strokeRect(
-        ~~(-(w / 2) - padding - strokeWidth / 2 * this.scaleX) - 0.5, // offset needed to make lines look sharper
-        ~~(-(h / 2) - padding - strokeWidth / 2 * this.scaleY) - 0.5,
-        ~~(w + padding2 + strokeWidth * this.scaleX) + 1, // double offset needed to make lines look sharper
-        ~~(h + padding2 + strokeWidth * this.scaleY) + 1
+        ~~(-(w / 2) - padding - strokeWidth / 2 * sx) - 0.5, // offset needed to make lines look sharper
+        ~~(-(h / 2) - padding - strokeWidth / 2 * sy) - 0.5,
+        ~~(w + padding2 + strokeWidth * sx) + 1, // double offset needed to make lines look sharper
+        ~~(h + padding2 + strokeWidth * sy) + 1
       );
 
       if (this.hasRotatingPoint && this.isControlVisible('mtr') && !this.get('lockRotation') && this.hasControls) {
 
         var rotateHeight = (
           this.flipY
-            ? h + (strokeWidth * this.scaleY) + (padding * 2)
-            : -h - (strokeWidth * this.scaleY) - (padding * 2)
+            ? h + (strokeWidth * sx) + (padding * 2)
+            : -h - (strokeWidth * sy) - (padding * 2)
         ) / 2;
 
         ctx.beginPath();
@@ -311,7 +318,7 @@
 
     /**
      * Draws corners of an object's bounding box.
-     * Requires public properties: width, height, scaleX, scaleY
+     * Requires public properties: width, height
      * Requires public options: cornerSize, padding
      * @param {CanvasRenderingContext2D} ctx Context to draw on
      * @return {fabric.Object} thisArg
@@ -323,75 +330,73 @@
       var size = this.cornerSize,
           size2 = size / 2,
           strokeWidth2 = ~~(this.strokeWidth / 2), // half strokeWidth rounded down
-          left = -(this.width / 2),
-          top = -(this.height / 2),
-          paddingX = this.padding / this.scaleX,
-          paddingY = this.padding / this.scaleY,
-          scaleOffsetY = size2 / this.scaleY,
-          scaleOffsetX = size2 / this.scaleX,
-          scaleOffsetSizeX = (size2 - size) / this.scaleX,
-          scaleOffsetSizeY = (size2 - size) / this.scaleY,
-          height = this.height,
-          width = this.width,
+          wh = fabric.util.transformPoint(new fabric.Point(this.getWidth(), this.getHeight()), this.getViewportTransform(), true),
+          width = wh.x,
+          height = wh.y,
+          left = -(width / 2),
+          top = -(height / 2),
+          padding = this.padding,
+          scaleOffset = size2,
+          scaleOffsetSize = size2 - size,
           methodName = this.transparentCorners ? 'strokeRect' : 'fillRect';
 
       ctx.save();
 
-      ctx.lineWidth = 1 / Math.max(this.scaleX, this.scaleY);
+      ctx.lineWidth = 1;
 
       ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
       ctx.strokeStyle = ctx.fillStyle = this.cornerColor;
 
       // top-left
       this._drawControl('tl', ctx, methodName,
-        left - scaleOffsetX - strokeWidth2 - paddingX,
-        top - scaleOffsetY - strokeWidth2 - paddingY);
+        left - scaleOffset - strokeWidth2 - padding,
+        top - scaleOffset - strokeWidth2 - padding);
 
       // top-right
       this._drawControl('tr', ctx, methodName,
-        left + width - scaleOffsetX + strokeWidth2 + paddingX,
-        top - scaleOffsetY - strokeWidth2 - paddingY);
+        left + width - scaleOffset + strokeWidth2 + padding,
+        top - scaleOffset - strokeWidth2 - padding);
 
       // bottom-left
       this._drawControl('bl', ctx, methodName,
-        left - scaleOffsetX - strokeWidth2 - paddingX,
-        top + height + scaleOffsetSizeY + strokeWidth2 + paddingY);
+        left - scaleOffset - strokeWidth2 - padding,
+        top + height + scaleOffsetSize + strokeWidth2 + padding);
 
       // bottom-right
       this._drawControl('br', ctx, methodName,
-        left + width + scaleOffsetSizeX + strokeWidth2 + paddingX,
-        top + height + scaleOffsetSizeY + strokeWidth2 + paddingY);
+        left + width + scaleOffsetSize + strokeWidth2 + padding,
+        top + height + scaleOffsetSize + strokeWidth2 + padding);
 
       if (!this.get('lockUniScaling')) {
 
         // middle-top
         this._drawControl('mt', ctx, methodName,
-          left + width/2 - scaleOffsetX,
-          top - scaleOffsetY - strokeWidth2 - paddingY);
+          left + width/2 - scaleOffset,
+          top - scaleOffset - strokeWidth2 - padding);
 
         // middle-bottom
         this._drawControl('mb', ctx, methodName,
-          left + width/2 - scaleOffsetX,
-          top + height + scaleOffsetSizeY + strokeWidth2 + paddingY);
+          left + width/2 - scaleOffset,
+          top + height + scaleOffsetSize + strokeWidth2 + padding);
 
         // middle-right
         this._drawControl('mr', ctx, methodName,
-          left + width + scaleOffsetSizeX + strokeWidth2 + paddingX,
-          top + height/2 - scaleOffsetY);
+          left + width + scaleOffsetSize + strokeWidth2 + padding,
+          top + height/2 - scaleOffset);
 
         // middle-left
         this._drawControl('ml', ctx, methodName,
-          left - scaleOffsetX - strokeWidth2 - paddingX,
-          top + height/2 - scaleOffsetY);
+          left - scaleOffset - strokeWidth2 - padding,
+          top + height/2 - scaleOffset);
       }
 
       // middle-top-rotate
       if (this.hasRotatingPoint) {
         this._drawControl('mtr', ctx, methodName,
-          left + width/2 - scaleOffsetX,
+          left + width/2 - scaleOffset,
           this.flipY
-            ? (top + height + (this.rotatingPointOffset / this.scaleY) - this.cornerSize/this.scaleX/2 + strokeWidth2 + paddingY)
-            : (top - (this.rotatingPointOffset / this.scaleY) - this.cornerSize/this.scaleY/2 - strokeWidth2 - paddingY));
+            ? (top + height + this.rotatingPointOffset - this.cornerSize/2 + strokeWidth2 + padding)
+            : (top - this.rotatingPointOffset - this.cornerSize/2 - strokeWidth2 - padding));
       }
 
       ctx.restore();
@@ -403,12 +408,11 @@
      * @private
      */
     _drawControl: function(control, ctx, methodName, left, top) {
-      var sizeX = this.cornerSize / this.scaleX,
-          sizeY = this.cornerSize / this.scaleY;
+      var size = this.cornerSize;
 
       if (this.isControlVisible(control)) {
-        isVML || this.transparentCorners || ctx.clearRect(left, top, sizeX, sizeY);
-        ctx[methodName](left, top, sizeX, sizeY);
+        isVML || this.transparentCorners || ctx.clearRect(left, top, size, size);
+        ctx[methodName](left, top, size, size);
       }
     },
 

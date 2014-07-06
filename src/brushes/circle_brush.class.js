@@ -26,13 +26,18 @@ fabric.CircleBrush = fabric.util.createClass(fabric.BaseBrush, /** @lends fabric
   */
   drawDot: function(pointer) {
     var point = this.addPoint(pointer),
-        ctx = this.canvas.contextTop;
+        ctx = this.canvas.contextTop,
+        v = this.canvas.viewportTransform;
+    ctx.save();
+    ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
 
     ctx.fillStyle = point.fill;
     ctx.beginPath();
     ctx.arc(point.x, point.y, point.radius, 0, Math.PI * 2, false);
     ctx.closePath();
     ctx.fill();
+
+    ctx.restore();
   },
 
   /**
@@ -78,6 +83,7 @@ fabric.CircleBrush = fabric.util.createClass(fabric.BaseBrush, /** @lends fabric
       circles.push(circle);
     }
     var group = new fabric.Group(circles, { originX: 'center', originY: 'center' });
+    group.canvas = this.canvas;
 
     this.canvas.add(group);
     this.canvas.fire('path:created', { path: group });

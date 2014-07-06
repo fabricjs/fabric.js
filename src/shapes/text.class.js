@@ -319,7 +319,6 @@
       this.setOptions(options);
       this.__skipDimension = false;
       this._initDimensions();
-      this.setCoords();
     },
 
     /**
@@ -760,9 +759,8 @@
     /**
      * Renders text instance on a specified context
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Boolean} [noTransform] When true, context is not transformed
      */
-    render: function(ctx, noTransform) {
+    render: function(ctx) {
       // do not render if object is not visible
       if (!this.visible) return;
 
@@ -772,10 +770,6 @@
         ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
       }
       this._render(ctx);
-      if (!noTransform && this.active) {
-        this.drawBorders(ctx);
-        this.drawControls(ctx);
-      }
       ctx.restore();
     },
 
