@@ -349,10 +349,8 @@
         classArr, ruleMatchesElement;
 
     for (var rule in fabric.cssRules) {
-      ruleMatchesElement = false;
-      ruleMatchesElement = ruleMatchesElement || (id && new RegExp('^#' + id).test(rule)) ||
+      ruleMatchesElement = (id && new RegExp('^#' + id).test(rule)) ||
                              (new RegExp('^' + nodeName).test(rule));
-
       if (className !== null && !ruleMatchesElement) {
         classArr = className.split(' ');
         for (var j = 0; j < classArr.length; j++) {
@@ -360,7 +358,7 @@
         }	  	
       }      
 
-      if (ruleMatchesElement) {      	
+      if (ruleMatchesElement) {
         for (var property in fabric.cssRules[rule]) {
           var attr = normalizeAttr(property);
           var value = normalizeValue(attr, fabric.cssRules[rule][property]);
