@@ -334,8 +334,8 @@
       if (this.clipTo) {
         fabric.util.clipContext(this, this.contextTop);
       }
-      var ivt = fabric.util.invertTransform(this.viewportTransform);
-      var pointer = fabric.util.transformPoint(this.getPointer(e, true), ivt);
+      var ivt = fabric.util.invertTransform(this.viewportTransform),
+          pointer = fabric.util.transformPoint(this.getPointer(e, true), ivt);
       this.freeDrawingBrush.onMouseDown(pointer);
       this.fire('mouse:down', { e: e });
     },
@@ -350,7 +350,7 @@
             pointer = fabric.util.transformPoint(this.getPointer(e, true), ivt);
         this.freeDrawingBrush.onMouseMove(pointer);
       }
-      this.upperCanvasEl.style.cursor = this.freeDrawingCursor;
+      this.setCursor(this.freeDrawingCursor);
       this.fire('mouse:move', { e: e });
     },
 
@@ -379,7 +379,9 @@
 
       // accept only left clicks
       var isLeftClick  = 'which' in e ? e.which === 1 : e.button === 1;
-      if (!isLeftClick && !fabric.isTouchSupported) return;
+      if (!isLeftClick && !fabric.isTouchSupported) {
+        return;
+      }
 
       if (this.isDrawingMode) {
         this._onMouseDownInDrawingMode(e);
@@ -387,7 +389,9 @@
       }
 
       // ignore if some object is being transformed at this moment
-      if (this._currentTransform) return;
+      if (this._currentTransform) {
+        return;
+      }
 
       var target = this.findTarget(e),
           pointer = this.getPointer(e, true);
@@ -529,7 +533,7 @@
         target = this.findTarget(e);
 
         if (!target || target && !target.selectable) {
-          this.upperCanvasEl.style.cursor = this.defaultCursor;
+          this.setCursor(this.defaultCursor);
         }
         else {
           this._setCursorFromEvent(e, target);
@@ -588,7 +592,7 @@
       else {
         this._translateObject(x, y);
         this._fire('moving', target, e);
-        this._setCursor(this.moveCursor);
+        this.setCursor(this.moveCursor);
       }
     },
 
