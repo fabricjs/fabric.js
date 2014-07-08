@@ -379,9 +379,7 @@
 
       // accept only left clicks
       var isLeftClick  = 'which' in e ? e.which === 1 : e.button === 1;
-      if (!isLeftClick && !fabric.isTouchSupported) {
-        return;
-      }
+      if (!isLeftClick && !fabric.isTouchSupported) return;
 
       if (this.isDrawingMode) {
         this._onMouseDownInDrawingMode(e);
@@ -389,9 +387,7 @@
       }
 
       // ignore if some object is being transformed at this moment
-      if (this._currentTransform) {
-        return;
-      }
+      if (this._currentTransform) return;
 
       var target = this.findTarget(e),
           pointer = this.getPointer(e, true);
@@ -650,10 +646,8 @@
      * @param {Object} target Object that the mouse is hovering, if so.
      */
     _setCursorFromEvent: function (e, target) {
-      var style = this.upperCanvasEl.style;
-
       if (!target || !target.selectable) {
-        style.cursor = this.defaultCursor;
+        this.setCursor(this.defaultCursor);
         return false;
       }
       else {
@@ -664,7 +658,7 @@
                       && target._findTargetCorner(this.getPointer(e, true));
 
         if (!corner) {
-          style.cursor = target.hoverCursor || this.hoverCursor;
+          this.setCursor(target.hoverCursor || this.hoverCursor);
         }
         else {
           this._setCornerCursor(corner, target);
@@ -677,16 +671,14 @@
      * @private
      */
     _setCornerCursor: function(corner, target) {
-      var style = this.upperCanvasEl.style;
-
       if (corner in cursorOffset) {
-        style.cursor = this._getRotatedCornerCursor(corner, target);
+        this.setCursor(this._getRotatedCornerCursor(corner, target));
       }
       else if (corner === 'mtr' && target.hasRotatingPoint) {
-        style.cursor = this.rotationCursor;
+        this.setCursor(this.rotationCursor);
       }
       else {
-        style.cursor = this.defaultCursor;
+        this.setCursor(this.defaultCursor);
         return false;
       }
     },
