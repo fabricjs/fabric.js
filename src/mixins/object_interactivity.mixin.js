@@ -1,7 +1,7 @@
 (function(){
 
   var degreesToRadians = fabric.util.degreesToRadians,
-      isVML = typeof G_vmlCanvasManager !== 'undefined';
+      isVML = function() { return typeof G_vmlCanvasManager !== 'undefined'; };
 
   fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
 
@@ -411,7 +411,7 @@
       var size = this.cornerSize;
 
       if (this.isControlVisible(control)) {
-        isVML || this.transparentCorners || ctx.clearRect(left, top, size, size);
+        isVML() || this.transparentCorners || ctx.clearRect(left, top, size, size);
         ctx[methodName](left, top, size, size);
       }
     },

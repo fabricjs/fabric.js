@@ -334,8 +334,8 @@
       if (this.clipTo) {
         fabric.util.clipContext(this, this.contextTop);
       }
-      var ivt = fabric.util.invertTransform(this.viewportTransform);
-      var pointer = fabric.util.transformPoint(this.getPointer(e, true), ivt);
+      var ivt = fabric.util.invertTransform(this.viewportTransform),
+          pointer = fabric.util.transformPoint(this.getPointer(e, true), ivt);
       this.freeDrawingBrush.onMouseDown(pointer);
       this.fire('mouse:down', { e: e });
     },
@@ -350,7 +350,7 @@
             pointer = fabric.util.transformPoint(this.getPointer(e, true), ivt);
         this.freeDrawingBrush.onMouseMove(pointer);
       }
-      this.upperCanvasEl.style.cursor = this.freeDrawingCursor;
+      this.setCursor(this.freeDrawingCursor);
       this.fire('mouse:move', { e: e });
     },
 
@@ -529,7 +529,7 @@
         target = this.findTarget(e);
 
         if (!target || target && !target.selectable) {
-          this.upperCanvasEl.style.cursor = this.defaultCursor;
+          this.setCursor(this.defaultCursor);
         }
         else {
           this._setCursorFromEvent(e, target);
@@ -588,7 +588,7 @@
       else {
         this._translateObject(x, y);
         this._fire('moving', target, e);
-        this._setCursor(this.moveCursor);
+        this.setCursor(this.moveCursor);
       }
     },
 
@@ -646,10 +646,8 @@
      * @param {Object} target Object that the mouse is hovering, if so.
      */
     _setCursorFromEvent: function (e, target) {
-      var style = this.upperCanvasEl.style;
-
       if (!target || !target.selectable) {
-        style.cursor = this.defaultCursor;
+        this.setCursor(this.defaultCursor);
         return false;
       }
       else {
@@ -660,7 +658,7 @@
                       && target._findTargetCorner(this.getPointer(e, true));
 
         if (!corner) {
-          style.cursor = target.hoverCursor || this.hoverCursor;
+          this.setCursor(target.hoverCursor || this.hoverCursor);
         }
         else {
           this._setCornerCursor(corner, target);
@@ -673,16 +671,14 @@
      * @private
      */
     _setCornerCursor: function(corner, target) {
-      var style = this.upperCanvasEl.style;
-
       if (corner in cursorOffset) {
-        style.cursor = this._getRotatedCornerCursor(corner, target);
+        this.setCursor(this._getRotatedCornerCursor(corner, target));
       }
       else if (corner === 'mtr' && target.hasRotatingPoint) {
-        style.cursor = this.rotationCursor;
+        this.setCursor(this.rotationCursor);
       }
       else {
-        style.cursor = this.defaultCursor;
+        this.setCursor(this.defaultCursor);
         return false;
       }
     },

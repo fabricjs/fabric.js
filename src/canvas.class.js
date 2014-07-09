@@ -616,8 +616,8 @@
     /**
      * Rotates object by invoking its rotate method
      * @private
-     * @param x {Number} pointer's x coordinate
-     * @param y {Number} pointer's y coordinate
+     * @param {Number} x pointer's x coordinate
+     * @param {Number} y pointer's y coordinate
      */
     _rotateObject: function (x, y) {
 
@@ -638,9 +638,11 @@
     },
 
     /**
-     * @private
+     * Set the cursor type of the canvas element
+     * @param {String} value Cursor type of the canvas element.
+     * @see http://www.w3.org/TR/css3-ui/#cursor
      */
-    _setCursor: function (value) {
+    setCursor: function (value) {
       this.upperCanvasEl.style.cursor = value;
     },
 
