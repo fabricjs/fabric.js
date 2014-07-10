@@ -345,25 +345,30 @@
     var nodeName = element.nodeName,
         className = element.getAttribute('class'),
         id = element.getAttribute('id'),
-        styles = { };
+        styles = { },
+        classArr, ruleMatchesElement;
 
     for (var rule in fabric.cssRules) {
-      var ruleMatchesElement = (className && new RegExp('^\\.' + className).test(rule)) ||
-                               (id && new RegExp('^#' + id).test(rule)) ||
-                               (new RegExp('^' + nodeName).test(rule));
+      ruleMatchesElement = (id && new RegExp('^#' + id).test(rule)) ||
+                             (new RegExp('^' + nodeName).test(rule));
+      if (className !== null && !ruleMatchesElement) {
+        classArr = className.split(' ');
+        for (var j = 0; j < classArr.length; j++) {
+          ruleMatchesElement = ruleMatchesElement || (classArr[j] && new RegExp('^\\.' + classArr[j]).test(rule));
+        }	  	
+      }      
 
       if (ruleMatchesElement) {
         for (var property in fabric.cssRules[rule]) {
-          var attr = normalizeAttr(property),
-              value = normalizeValue(attr, fabric.cssRules[rule][property]);
+          var attr = normalizeAttr(property);
+          var value = normalizeValue(attr, fabric.cssRules[rule][property]);
           styles[attr] = value;
         }
       }
     }
-
     return styles;
   }
-  
+
   /**
    * @private
    */
@@ -493,8 +498,8 @@
         heightAttr: heightAttr
       };
 
-      fabric.gradientDefs = fabric.getGradientDefs(doc);
-      fabric.cssRules = fabric.getCSSRules(doc);
+      fabric.gradientDefs = extend(fabric.getGradientDefs(doc), fabric.gradientDefs);
+      fabric.cssRules = extend(fabric.getCSSRules(doc), fabric.cssRules);
       // Precedence of rules:   style > class > attribute
 
       fabric.parseElements(elements, function(instances) {
