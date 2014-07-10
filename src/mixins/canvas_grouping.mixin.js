@@ -186,7 +186,7 @@
       if (activeGroup) {
         activeGroup.setObjectsCoords().setCoords();
         activeGroup.isMoving = false;
-        this._setCursor(this.defaultCursor);
+        this.setCursor(this.defaultCursor);
       }
 
       // clear selection and current transformation
