@@ -363,27 +363,28 @@
 
     return styles;
   }
-  
+
   /**
    * @private
    */
   function parseUseDirectives(doc) {
-    var nodelist = doc.querySelectorAll("use");
+    var nodelist = doc.querySelectorAll("use"),
+        el = null, xlink = '', x = 0, y = 0, el2 = null,
+        currentTrans = '';
     for (var i = 0; i < nodelist.length; i++) {
-      var el = nodelist[i];
-      var xlink = el.getAttribute('xlink:href').substr(1);
-      var x = el.getAttribute('x') || 0;
-      var y = el.getAttribute('y') || 0;
-      var el2 = doc.getElementById(xlink).cloneNode(true);
-      var currentTrans = (el.getAttribute('transform') || '') + ' translate(' + x + ', ' + y + ')';
+      el = nodelist[i];
+      xlink = el.getAttribute('xlink:href').substr(1);
+      x = el.getAttribute('x') || 0;
+      y = el.getAttribute('y') || 0;
+      el2 = doc.getElementById(xlink).cloneNode(true);
+      currentTrans = (el.getAttribute('transform') || '') + ' translate(' + x + ', ' + y + ')';
       for (var j = 0, attrs = el.attributes, l = attrs.length; j < l; j++) {
         var attr = attrs.item(j);
-        if (attr.nodeName !== 'x' && attr.nodeName !== 'y' && attr.nodeName !== 'xlink:href') {
-          if (attr.nodeName === 'transform') {
-            currentTrans = currentTrans + ' ' + attr.nodeValue;
-          } else {
-            el2.setAttribute(attr.nodeName, attr.nodeValue);
-          }
+        if (attr.nodeName === 'x' || attr.nodeName === 'y' || attr.nodeName === 'xlink:href') continue;
+        if (attr.nodeName === 'transform') {
+          currentTrans = currentTrans + ' ' + attr.nodeValue;
+        } else {
+          el2.setAttribute(attr.nodeName, attr.nodeValue);
         }
       }
       el2.setAttribute('transform', currentTrans);
@@ -391,6 +392,17 @@
       var pNode=el.parentNode;
       pNode.replaceChild(el2, el);
     }
+  }
+  
+  function addSvgTransform(doc, matrix) {
+    var el = document.createElement('g'),
+        nodelist = doc.childNodes;
+    while (doc.firstChild != null) {
+      var node = doc.firstChild;
+      el.appendChild(node);
+    }
+    el.setAttribute('transform','matrix(' + matrix[0] + ' ' + matrix[1] + ' ' + matrix[2] + ' ' + matrix[3] + ' ' + matrix[4] + ' ' + matrix[5] + ')');
+    doc.appendChild(el);
   }
 
   /**
@@ -436,6 +448,34 @@
       
       parseUseDirectives(doc);
       
+      var viewBoxAttr = doc.getAttribute('viewBox'),
+          widthAttr = parseFloat(doc.getAttribute('width')),
+          heightAttr = parseFloat(doc.getAttribute('height')),
+          viewBoxWidth,
+          viewBoxHeight,
+          scaleX = 1,
+          scaleY = 1;
+
+      if (viewBoxAttr && (viewBoxAttr = viewBoxAttr.match(reViewBoxAttrValue))) {
+        var minX = parseFloat(viewBoxAttr[1]);
+        var minY = parseFloat(viewBoxAttr[2]);
+        viewBoxWidth = parseFloat(viewBoxAttr[3]);
+        viewBoxHeight = parseFloat(viewBoxAttr[4]);
+        if (widthAttr && widthAttr != viewBoxWidth ) {
+          scaleX = widthAttr / viewBoxWidth;
+        }
+        if (heightAttr && heightAttr != viewBoxHeight) {
+          scaleY = heightAttr / viewBoxHeight;
+        }
+        // default is to preserve aspect ratio
+        // preserveAspectRatio attribute to be implemented
+        scaleY = scaleX = (scaleX > scaleY ? scaleY : scaleX);
+        if (scaleX !== 1 || scaleY !== 1 || minX !== 0 || minY !== 0) {
+          var vbMatrix = [scaleX, 0, 0, scaleY, -minX * scaleX, -minY * scaleY];
+          addSvgTransform(doc, vbMatrix);
+        }
+      }
+
       var descendants = fabric.util.toArray(doc.getElementsByTagName('*'));
 
       if (descendants.length === 0 && fabric.isLikelyNode) {
@@ -458,37 +498,10 @@
         callback && callback([], {});
         return;
       }
-
-      var viewBoxAttr = doc.getAttribute('viewBox'),
-          widthAttr = parseFloat(doc.getAttribute('width')),
-          heightAttr = parseFloat(doc.getAttribute('height')),
-          width = null,
-          height = null,
-          viewBoxWidth,
-          viewBoxHeight,
-          minX,
-          minY;
-
-      if (viewBoxAttr && (viewBoxAttr = viewBoxAttr.match(reViewBoxAttrValue))) {
-        minX = parseFloat(viewBoxAttr[1]);
-        minY = parseFloat(viewBoxAttr[2]);
-        viewBoxWidth = parseFloat(viewBoxAttr[3]);
-        viewBoxHeight = parseFloat(viewBoxAttr[4]);
-      }
-
-      if (viewBoxWidth && widthAttr && viewBoxWidth !== widthAttr) {
-        width = viewBoxWidth;
-        height = viewBoxHeight;
-      }
-      else {
-        // values of width/height attributes overwrite those extracted from viewbox attribute
-        width = widthAttr ? widthAttr : viewBoxWidth;
-        height = heightAttr ? heightAttr : viewBoxHeight;
-      }
-
+      							  
       var options = {
-        width: width,
-        height: height,
+        width: widthAttr ? widthAttr : viewBoxWidth,
+        height: heightAttr ? heightAttr : viewBoxHeight,
         widthAttr: widthAttr,
         heightAttr: heightAttr
       };
