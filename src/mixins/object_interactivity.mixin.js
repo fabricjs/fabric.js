@@ -279,10 +279,16 @@
       ctx.lineWidth = 1 / this.borderScaleFactor;
 
       var w = this.getWidth(),
-          h = this.getHeight();
-      if (this.type === "line" && this.strokeLineCap !== "round" && this.strokeLineCap !== "square") {
-        if (this.width === 1) w += this.strokeWidth / scaleX;
-        if (this.height === 1) h += this.strokeWidth / scaleY;
+          h = this.getHeight(),
+          capped = this.strokeLineCap === "round" || this.strokeLineCap === "square";
+      if (this.type === "line" && (this.width === 1 || this.height === 1)) {
+        if (this.width === 1) {
+          w = this.strokeWidth / scaleX;
+          if (capped) h += this.strokeWidth / scaleY;
+        } else {
+          h = this.strokeWidth / scaleY;
+          if (capped) w += this.strokeWidth / scaleX;
+        }
       }
       else {
         w += this.strokeWidth / scaleX;

@@ -311,10 +311,16 @@
         return fabric.util.transformPoint(p, vpt);
       };
       var w = this.width,
-          h = this.height;
-      if (this.type === "line" && this.strokeLineCap !== "round" && this.strokeLineCap !== "square") {
-        if (this.width === 1) w += strokeWidth;
-        if (this.height === 1) h += strokeWidth;
+          h = this.height,
+          capped = this.strokeLineCap === "round" || this.strokeLineCap === "square";
+      if (this.type === "line" && (this.width === 1 || this.height === 1)) {
+        if (this.width === 1) {
+          w = strokeWidth;
+          if (capped) h += strokeWidth;
+        } else {
+          h = strokeWidth;
+          if (capped) w += strokeWidth;
+        }
       }
       else {
         w += strokeWidth;
