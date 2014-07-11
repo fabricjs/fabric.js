@@ -312,18 +312,20 @@
       };
       var w = this.width,
           h = this.height,
-          capped = this.strokeLineCap === "round" || this.strokeLineCap === "square";
-      if (this.type === "line" && (this.width === 1 || this.height === 1)) {
-        if (this.width === 1) {
-          w = strokeWidth;
-          if (capped) h += strokeWidth;
-        } else {
-          h = strokeWidth;
-          if (capped) w += strokeWidth;
-        }
+          capped = this.strokeLineCap === "round" || this.strokeLineCap === "square",
+          vLine = this.type === "line" && this.width === 1,
+          hLine = this.type === "line" && this.height === 1,
+          strokeW = (capped && hLine) || this.type !== "line",
+          strokeH = (capped && vLine) || this.type !== "line";
+      if (vLine) {
+        w = strokeWidth;
+      } else if (hLine) {
+        h = strokeWidth;
       }
-      else {
+      if (strokeW) {
         w += strokeWidth;
+      }
+      if (strokeH) {
         h += strokeWidth;
       }
       this.currentWidth = w * this.scaleX;
