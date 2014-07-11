@@ -342,7 +342,26 @@
       var size = this.cornerSize,
           size2 = size / 2,
           vpt = this.getViewportTransform(),
-          wh = fabric.util.transformPoint(new fabric.Point(this.currentWidth, this.currentHeight), vpt, true),
+          strokeWidth = this.strokeWidth > 1 ? this.strokeWidth : 0,
+          w = this.width,
+          h = this.height,
+          capped = this.strokeLineCap === "round" || this.strokeLineCap === "square";
+      if (this.type === "line" && (this.width === 1 || this.height === 1)) {
+        if (this.width === 1) {
+          w = strokeWidth;
+          if (capped) h += strokeWidth;
+        } else {
+          h = strokeWidth;
+          if (capped) w += strokeWidth;
+        }
+      }
+      else {
+        w += strokeWidth;
+        h += strokeWidth;
+      }
+      w *= this.scaleX;
+      h *= this.scaleY;
+      var wh = fabric.util.transformPoint(new fabric.Point(w, h), vpt, true),
           width = wh.x,
           height = wh.y,
           left = -(width / 2),
