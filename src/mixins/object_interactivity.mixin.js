@@ -278,9 +278,17 @@
 
       ctx.lineWidth = 1 / this.borderScaleFactor;
 
-      var w = this.getWidth() + this.strokeWidth / scaleX,
-          h = this.getHeight() + this.strokeWidth / scaleY,
-          wh = fabric.util.transformPoint(new fabric.Point(w, h), vpt, true),
+      var w = this.getWidth(),
+          h = this.getHeight();
+      if (this.type === "line" && this.strokeLineCap !== "round" && this.strokeLineCap !== "square") {
+        if (this.width === 1) w += this.strokeWidth / scaleX;
+        if (this.height === 1) h += this.strokeWidth / scaleY;
+      }
+      else {
+        w += this.strokeWidth / scaleX;
+        h += this.strokeWidth / scaleY;
+      }
+      var wh = fabric.util.transformPoint(new fabric.Point(w, h), vpt, true),
           width = wh.x,
           height = wh.y;
       if (this.group) {
@@ -328,9 +336,7 @@
       var size = this.cornerSize,
           size2 = size / 2,
           vpt = this.getViewportTransform(),
-          w = (this.width + this.strokeWidth) * this.scaleX,
-          h = (this.height + this.strokeWidth) * this.scaleY,
-          wh = fabric.util.transformPoint(new fabric.Point(w, h), vpt, true),
+          wh = fabric.util.transformPoint(new fabric.Point(this.currentWidth, this.currentHeight), vpt, true),
           width = wh.x,
           height = wh.y,
           left = -(width / 2),
