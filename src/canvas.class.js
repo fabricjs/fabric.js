@@ -816,6 +816,8 @@
           bounds = upperCanvasEl.getBoundingClientRect(),
           cssScale;
 
+      this.calcOffset();
+
       pointer.x = pointer.x - this._offset.left;
       pointer.y = pointer.y - this._offset.top;
       if (!ignoreZoom) {
@@ -835,6 +837,7 @@
           height: upperCanvasEl.height / bounds.height
         };
       }
+
       return {
         x: pointer.x * cssScale.width,
         y: pointer.y * cssScale.height
