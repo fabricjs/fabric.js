@@ -716,6 +716,11 @@
       points = points.trim();
       var asPairs = points.indexOf(',') > -1;
 
+      // remove possible whitespace around commas
+      if (asPairs) {
+        points = points.replace(/\s*,\s*/g, ',')
+      }
+      
       points = points.split(/\s+/);
       var parsedPoints = [ ], i, len;
 
