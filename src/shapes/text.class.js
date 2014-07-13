@@ -1095,10 +1095,10 @@
     */
     
     var offX = 0;
-    if(text.originX == 'left') {
+    if (text.originX == 'left') {
       offX = text.getWidth() / 2;
     }
-    if(text.originX == 'right') {
+    if (text.originX == 'right') {
       offX = -text.getWidth() / 2;
     }
     text.set({
