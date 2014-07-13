@@ -750,14 +750,17 @@
      * Renders text instance on a specified context
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    render: function(ctx) {
+    render: function(ctx, noTransform) {
       // do not render if object is not visible
       if (!this.visible) return;
 
       ctx.save();
+      
+      this._transform(ctx, noTransform);
+      
       var m = this.transformMatrix;
       var isInPathGroup = this.group && this.group.type === 'path-group'; 
-      if (this.group) {
+      if (isInPathGroup) {
         ctx.translate(-this.group.width/2, -this.group.height/2);
       }
       if (m) {
