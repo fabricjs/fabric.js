@@ -757,17 +757,15 @@
       ctx.save();
       var m = this.transformMatrix;
       var isInPathGroup = this.group && this.group.type === 'path-group'; 
-      if (!m) {
-        this.left -= this.width / 2;
-        this.top -= this.height / 2
-	  }
-      if (m && this.group) {
+      if (this.group) {
         ctx.translate(-this.group.width/2, -this.group.height/2);
+      }
+      if (m) {
         ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
       }
       if (isInPathGroup) {
         ctx.translate(this.left, this.top);
-      }      
+      }   
       this._render(ctx);
       ctx.restore();
     },
@@ -1070,7 +1068,7 @@
 
     var parsedAttributes = fabric.parseAttributes(element, fabric.Text.ATTRIBUTE_NAMES);
     options = fabric.util.object.extend((options ? fabric.util.object.clone(options) : { }), parsedAttributes);
-
+        
     if ('dx' in parsedAttributes) {
       options.left += parsedAttributes.dx;
     }
@@ -1083,7 +1081,7 @@
     }
 
     if (!options.originX) {
-      options.originX = 'center';
+      options.originX = 'left';
     }
 
     var text = new fabric.Text(element.textContent, options);
