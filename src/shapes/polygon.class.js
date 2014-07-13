@@ -46,7 +46,7 @@
       options = options || { };
       this.points = points;
       this.callSuper('initialize', options);
-      if (!skipOffset) this._calcDimensions(skipOffset);
+      if (!skipOffset) this._calcDimensions();
     },
 
     /**
