@@ -63,7 +63,7 @@
      * @private
      * @param {Boolean} [skipOffset] Whether points offsetting should be skipped
      */
-    _calcDimensions: function(skipOffset) {
+    _calcDimensions: function() {
       return fabric.Polygon.prototype._calcDimensions.call(this);
     },
 
