@@ -1068,7 +1068,7 @@
 
     var parsedAttributes = fabric.parseAttributes(element, fabric.Text.ATTRIBUTE_NAMES);
     options = fabric.util.object.extend((options ? fabric.util.object.clone(options) : { }), parsedAttributes);
-        
+
     if ('dx' in parsedAttributes) {
       options.left += parsedAttributes.dx;
     }
