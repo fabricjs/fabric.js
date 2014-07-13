@@ -46,8 +46,7 @@
       options = options || { };
       this.points = points;
       this.callSuper('initialize', options);
-      //if i come ftom svg parsing i don't have to calc any dimension
-      if (!skipOffset) this._calcDimensions();
+      if (!skipOffset) this._calcDimensions(skipOffset);
     },
 
     /**
