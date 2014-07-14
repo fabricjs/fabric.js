@@ -196,7 +196,7 @@
     ok(fabric.parsePointsAttribute);
 
     var element = fabric.document.createElement('polygon');
-    element.setAttribute('points', '10,12           20,22,  -0.52,0.001 2.3e2,2.3e-2, 10,-1     ');
+    element.setAttribute('points', '10,  12           20 ,22,  -0.52,0.001 2.3e2,2.3e-2, 10,-1     ');
 
     var actualPoints = fabric.parsePointsAttribute(element.getAttribute('points'));
 

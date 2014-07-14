@@ -713,33 +713,19 @@
       // points attribute is required and must not be empty
       if (!points) return null;
 
-      points = points.trim();
-      var asPairs = points.indexOf(',') > -1;
+      // replace commas with whitespace and remove bookending whitespace
+      points = points.replace(/,/g, ' ').trim();
 
       points = points.split(/\s+/);
       var parsedPoints = [ ], i, len;
 
-      // points could look like "10,20 30,40" or "10 20 30 40"
-      if (asPairs) {
-        i = 0;
-        len = points.length;
-        for (; i < len; i++) {
-          var pair = points[i].split(',');
-          parsedPoints.push({
-            x: parseFloat(pair[0]),
-            y: parseFloat(pair[1])
-          });
-        }
-      }
-      else {
-        i = 0;
-        len = points.length;
-        for (; i < len; i+=2) {
-          parsedPoints.push({
-            x: parseFloat(points[i]),
-            y: parseFloat(points[i + 1])
-          });
-        }
+      i = 0;
+      len = points.length;
+      for (; i < len; i+=2) {
+        parsedPoints.push({
+          x: parseFloat(points[i]),
+          y: parseFloat(points[i + 1])
+        });
       }
 
       // odd number of points is an error
