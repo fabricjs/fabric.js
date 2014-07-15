@@ -3388,33 +3388,19 @@ if (typeof console !== 'undefined') {
       // points attribute is required and must not be empty
       if (!points) return null;
 
-      points = points.trim();
-      var asPairs = points.indexOf(',') > -1;
+      // replace commas with whitespace and remove bookending whitespace
+      points = points.replace(/,/g, ' ').trim();
 
       points = points.split(/\s+/);
       var parsedPoints = [ ], i, len;
 
-      // points could look like "10,20 30,40" or "10 20 30 40"
-      if (asPairs) {
-        i = 0;
-        len = points.length;
-        for (; i < len; i++) {
-          var pair = points[i].split(',');
-          parsedPoints.push({
-            x: parseFloat(pair[0]),
-            y: parseFloat(pair[1])
-          });
-        }
-      }
-      else {
-        i = 0;
-        len = points.length;
-        for (; i < len; i+=2) {
-          parsedPoints.push({
-            x: parseFloat(points[i]),
-            y: parseFloat(points[i + 1])
-          });
-        }
+      i = 0;
+      len = points.length;
+      for (; i < len; i+=2) {
+        parsedPoints.push({
+          x: parseFloat(points[i]),
+          y: parseFloat(points[i + 1])
+        });
       }
 
       // odd number of points is an error
@@ -11713,8 +11699,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     },
 
     /**
-     * @private
      * Sets the origin/position of the object to it's center point
+     * @private
      * @return {void}
      */
     _setOriginToCenter: function() {
@@ -11731,8 +11717,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     },
 
     /**
-     * @private
      * Resets the origin/position of the object to it's original origin
+     * @private
      * @return {void}
      */
     _resetOrigin: function() {
@@ -12074,9 +12060,26 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       var f = function (p) {
         return fabric.util.transformPoint(p, vpt);
       };
-
-      this.currentWidth = (this.width + strokeWidth) * this.scaleX;
-      this.currentHeight = (this.height + strokeWidth) * this.scaleY;
+      var w = this.width,
+          h = this.height,
+          capped = this.strokeLineCap === "round" || this.strokeLineCap === "square",
+          vLine = this.type === "line" && this.width === 1,
+          hLine = this.type === "line" && this.height === 1,
+          strokeW = (capped && hLine) || this.type !== "line",
+          strokeH = (capped && vLine) || this.type !== "line";
+      if (vLine) {
+        w = strokeWidth;
+      } else if (hLine) {
+        h = strokeWidth;
+      }
+      if (strokeW) {
+        w += strokeWidth;
+      }
+      if (strokeH) {
+        h += strokeWidth;
+      }
+      this.currentWidth = w * this.scaleX;
+      this.currentHeight = h * this.scaleY;
 
       // If width is negative, make postive. Fixes path selection issue
       if (this.currentWidth < 0) {
@@ -12653,7 +12656,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       var padding = this.padding,
           padding2 = padding * 2,
-          strokeWidth = ~~(this.strokeWidth / 2) * 2; // Round down to even number
+          vpt = this.getViewportTransform();
 
       ctx.save();
 
@@ -12664,32 +12667,47 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           scaleY = 1 / this._constrainScale(this.scaleY);
 
       ctx.lineWidth = 1 / this.borderScaleFactor;
-      
-      var vpt = this.getViewportTransform(),
-          wh = fabric.util.transformPoint(new fabric.Point(this.getWidth(), this.getHeight()), vpt, true),
-          sxy = fabric.util.transformPoint(new fabric.Point(scaleX, scaleY), vpt, true),
-          w = wh.x,
-          h = wh.y,
-          sx= sxy.x,
-          sy= sxy.y;
+
+      var w = this.getWidth(),
+          h = this.getHeight(),
+          strokeWidth = this.strokeWidth > 1 ? this.strokeWidth : 0,
+          capped = this.strokeLineCap === "round" || this.strokeLineCap === "square",
+          vLine = this.type === "line" && this.width === 1,
+          hLine = this.type === "line" && this.height === 1,
+          strokeW = (capped && hLine) || this.type !== "line",
+          strokeH = (capped && vLine) || this.type !== "line";
+      if (vLine) {
+        w = strokeWidth / scaleX;
+      } else if (hLine) {
+        h = strokeWidth / scaleY;
+      }
+      if (strokeW) {
+        w += strokeWidth / scaleX;
+      }
+      if (strokeH) {
+        h += strokeWidth / scaleY;
+      }
+      var wh = fabric.util.transformPoint(new fabric.Point(w, h), vpt, true),
+          width = wh.x,
+          height = wh.y;
       if (this.group) {
-        w = w * this.group.scaleX;
-        h = h * this.group.scaleY;
+        width = width * this.group.scaleX;
+        height = height * this.group.scaleY;
       }
 
       ctx.strokeRect(
-        ~~(-(w / 2) - padding - strokeWidth / 2 * sx) - 0.5, // offset needed to make lines look sharper
-        ~~(-(h / 2) - padding - strokeWidth / 2 * sy) - 0.5,
-        ~~(w + padding2 + strokeWidth * sx) + 1, // double offset needed to make lines look sharper
-        ~~(h + padding2 + strokeWidth * sy) + 1
+        ~~(-(width / 2) - padding) - 0.5, // offset needed to make lines look sharper
+        ~~(-(height / 2) - padding) - 0.5,
+        ~~(width + padding2) + 1, // double offset needed to make lines look sharper
+        ~~(height + padding2) + 1
       );
 
       if (this.hasRotatingPoint && this.isControlVisible('mtr') && !this.get('lockRotation') && this.hasControls) {
 
         var rotateHeight = (
           this.flipY
-            ? h + (strokeWidth * sx) + (padding * 2)
-            : -h - (strokeWidth * sy) - (padding * 2)
+            ? height + (padding * 2)
+            : -height - (padding * 2)
         ) / 2;
 
         ctx.beginPath();
@@ -12716,8 +12734,30 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       var size = this.cornerSize,
           size2 = size / 2,
-          strokeWidth2 = ~~(this.strokeWidth / 2), // half strokeWidth rounded down
-          wh = fabric.util.transformPoint(new fabric.Point(this.getWidth(), this.getHeight()), this.getViewportTransform(), true),
+          vpt = this.getViewportTransform(),
+          strokeWidth = this.strokeWidth > 1 ? this.strokeWidth : 0,
+          w = this.width,
+          h = this.height,
+          capped = this.strokeLineCap === "round" || this.strokeLineCap === "square",
+          vLine = this.type === "line" && this.width === 1,
+          hLine = this.type === "line" && this.height === 1,
+          strokeW = (capped && hLine) || this.type !== "line",
+          strokeH = (capped && vLine) || this.type !== "line";
+      if (vLine) {
+        w = strokeWidth;
+      } else if (hLine) {
+        h = strokeWidth;
+      }
+      if (strokeW) {
+        w += strokeWidth;
+      }
+      if (strokeH) {
+        h += strokeWidth;
+      }
+      w *= this.scaleX;
+      h *= this.scaleY;
+ 
+      var wh = fabric.util.transformPoint(new fabric.Point(w, h), vpt, true),
           width = wh.x,
           height = wh.y,
           left = -(width / 2),
@@ -12736,44 +12776,44 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       // top-left
       this._drawControl('tl', ctx, methodName,
-        left - scaleOffset - strokeWidth2 - padding,
-        top - scaleOffset - strokeWidth2 - padding);
+        left - scaleOffset - padding,
+        top - scaleOffset - padding);
 
       // top-right
       this._drawControl('tr', ctx, methodName,
-        left + width - scaleOffset + strokeWidth2 + padding,
-        top - scaleOffset - strokeWidth2 - padding);
+        left + width - scaleOffset + padding,
+        top - scaleOffset - padding);
 
       // bottom-left
       this._drawControl('bl', ctx, methodName,
-        left - scaleOffset - strokeWidth2 - padding,
-        top + height + scaleOffsetSize + strokeWidth2 + padding);
+        left - scaleOffset - padding,
+        top + height + scaleOffsetSize + padding);
 
       // bottom-right
       this._drawControl('br', ctx, methodName,
-        left + width + scaleOffsetSize + strokeWidth2 + padding,
-        top + height + scaleOffsetSize + strokeWidth2 + padding);
+        left + width + scaleOffsetSize + padding,
+        top + height + scaleOffsetSize + padding);
 
       if (!this.get('lockUniScaling')) {
 
         // middle-top
         this._drawControl('mt', ctx, methodName,
           left + width/2 - scaleOffset,
-          top - scaleOffset - strokeWidth2 - padding);
+          top - scaleOffset - padding);
 
         // middle-bottom
         this._drawControl('mb', ctx, methodName,
           left + width/2 - scaleOffset,
-          top + height + scaleOffsetSize + strokeWidth2 + padding);
+          top + height + scaleOffsetSize + padding);
 
         // middle-right
         this._drawControl('mr', ctx, methodName,
-          left + width + scaleOffsetSize + strokeWidth2 + padding,
+          left + width + scaleOffsetSize + padding,
           top + height/2 - scaleOffset);
 
         // middle-left
         this._drawControl('ml', ctx, methodName,
-          left - scaleOffset - strokeWidth2 - padding,
+          left - scaleOffset - padding,
           top + height/2 - scaleOffset);
       }
 
@@ -12782,8 +12822,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         this._drawControl('mtr', ctx, methodName,
           left + width/2 - scaleOffset,
           this.flipY
-            ? (top + height + this.rotatingPointOffset - this.cornerSize/2 + strokeWidth2 + padding)
-            : (top - this.rotatingPointOffset - this.cornerSize/2 - strokeWidth2 - padding));
+            ? (top + height + this.rotatingPointOffset - this.cornerSize/2 + padding)
+            : (top - this.rotatingPointOffset - this.cornerSize/2 - padding));
       }
 
       ctx.restore();
@@ -13872,13 +13912,13 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     _render: function(ctx, noTransform) {
       ctx.beginPath();
-      ctx.save();
       ctx.globalAlpha = this.group ? (ctx.globalAlpha * this.opacity) : this.opacity;
+      ctx.save();
       ctx.transform(1, 0, 0, this.ry/this.rx, 0, 0);
       ctx.arc(noTransform ? this.left : 0, noTransform ? this.top * this.rx/this.ry : 0, this.rx, 0, piBy2, false);
+      ctx.restore();
       this._renderFill(ctx);
       this._renderStroke(ctx);
-      ctx.restore();
     },
 
     /**
@@ -19135,15 +19175,16 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
   var clone = fabric.util.object.clone;
 
    /**
-    * IText class (introduced in <b>v1.4</b>)
+    * IText class (introduced in <b>v1.4</b>) Events are also fired with "text:"
+    * prefix when observing canvas.
     * @class fabric.IText
     * @extends fabric.Text
     * @mixes fabric.Observable
     *
-    * @fires changed ("text:changed" when observing canvas)
-    * @fires selection:changed ("text:selection:changed" when observing canvas)
-    * @fires editing:entered ("text:editing:entered" when observing canvas)
-    * @fires editing:exited ("text:editing:exited" when observing canvas)
+    * @fires changed
+    * @fires selection:changed
+    * @fires editing:entered
+    * @fires editing:exited
     *
     * @return {fabric.IText} thisArg
     * @see {@link fabric.IText#initialize} for constructor definition
