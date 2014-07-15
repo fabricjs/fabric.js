@@ -20260,8 +20260,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     },
 
     /**
-     * @private
      * This method is overwritten to account for different top offset
+     * @private
      */
     _renderTextBoxBackground: function(ctx) {
       if (!this.backgroundColor) return;
@@ -20281,7 +20281,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 
     /**
      * Returns object representation of an instance
-     * @methd toObject
+     * @method toObject
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} object representation of an instance
      */
