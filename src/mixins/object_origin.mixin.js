@@ -199,8 +199,8 @@
     },
 
     /**
-     * @private
      * Sets the origin/position of the object to it's center point
+     * @private
      * @return {void}
      */
     _setOriginToCenter: function() {
@@ -217,8 +217,8 @@
     },
 
     /**
-     * @private
      * Resets the origin/position of the object to it's original origin
+     * @private
      * @return {void}
      */
     _resetOrigin: function() {
