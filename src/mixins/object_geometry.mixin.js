@@ -310,9 +310,26 @@
       var f = function (p) {
         return fabric.util.transformPoint(p, vpt);
       };
-
-      this.currentWidth = (this.width + strokeWidth) * this.scaleX;
-      this.currentHeight = (this.height + strokeWidth) * this.scaleY;
+      var w = this.width,
+          h = this.height,
+          capped = this.strokeLineCap === "round" || this.strokeLineCap === "square",
+          vLine = this.type === "line" && this.width === 1,
+          hLine = this.type === "line" && this.height === 1,
+          strokeW = (capped && hLine) || this.type !== "line",
+          strokeH = (capped && vLine) || this.type !== "line";
+      if (vLine) {
+        w = strokeWidth;
+      } else if (hLine) {
+        h = strokeWidth;
+      }
+      if (strokeW) {
+        w += strokeWidth;
+      }
+      if (strokeH) {
+        h += strokeWidth;
+      }
+      this.currentWidth = w * this.scaleX;
+      this.currentHeight = h * this.scaleY;
 
       // If width is negative, make postive. Fixes path selection issue
       if (this.currentWidth < 0) {

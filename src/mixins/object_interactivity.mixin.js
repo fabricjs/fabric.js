@@ -278,9 +278,26 @@
 
       ctx.lineWidth = 1 / this.borderScaleFactor;
 
-      var w = this.getWidth() + this.strokeWidth / scaleX,
-          h = this.getHeight() + this.strokeWidth / scaleY,
-          wh = fabric.util.transformPoint(new fabric.Point(w, h), vpt, true),
+      var w = this.getWidth(),
+          h = this.getHeight(),
+          strokeWidth = this.strokeWidth > 1 ? this.strokeWidth : 0,
+          capped = this.strokeLineCap === "round" || this.strokeLineCap === "square",
+          vLine = this.type === "line" && this.width === 1,
+          hLine = this.type === "line" && this.height === 1,
+          strokeW = (capped && hLine) || this.type !== "line",
+          strokeH = (capped && vLine) || this.type !== "line";
+      if (vLine) {
+        w = strokeWidth / scaleX;
+      } else if (hLine) {
+        h = strokeWidth / scaleY;
+      }
+      if (strokeW) {
+        w += strokeWidth / scaleX;
+      }
+      if (strokeH) {
+        h += strokeWidth / scaleY;
+      }
+      var wh = fabric.util.transformPoint(new fabric.Point(w, h), vpt, true),
           width = wh.x,
           height = wh.y;
       if (this.group) {
@@ -328,9 +345,29 @@
       var size = this.cornerSize,
           size2 = size / 2,
           vpt = this.getViewportTransform(),
-          w = (this.width + this.strokeWidth) * this.scaleX,
-          h = (this.height + this.strokeWidth) * this.scaleY,
-          wh = fabric.util.transformPoint(new fabric.Point(w, h), vpt, true),
+          strokeWidth = this.strokeWidth > 1 ? this.strokeWidth : 0,
+          w = this.width,
+          h = this.height,
+          capped = this.strokeLineCap === "round" || this.strokeLineCap === "square",
+          vLine = this.type === "line" && this.width === 1,
+          hLine = this.type === "line" && this.height === 1,
+          strokeW = (capped && hLine) || this.type !== "line",
+          strokeH = (capped && vLine) || this.type !== "line";
+      if (vLine) {
+        w = strokeWidth;
+      } else if (hLine) {
+        h = strokeWidth;
+      }
+      if (strokeW) {
+        w += strokeWidth;
+      }
+      if (strokeH) {
+        h += strokeWidth;
+      }
+      w *= this.scaleX;
+      h *= this.scaleY;
+ 
+      var wh = fabric.util.transformPoint(new fabric.Point(w, h), vpt, true),
           width = wh.x,
           height = wh.y,
           left = -(width / 2),
