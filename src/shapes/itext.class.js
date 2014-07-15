@@ -3,15 +3,16 @@
   var clone = fabric.util.object.clone;
 
    /**
-    * IText class (introduced in <b>v1.4</b>)
+    * IText class (introduced in <b>v1.4</b>) Events are also fired with "text:"
+    * prefix when observing canvas.
     * @class fabric.IText
     * @extends fabric.Text
     * @mixes fabric.Observable
     *
-    * @fires changed ("text:changed" when observing canvas)
-    * @fires selection:changed ("text:selection:changed" when observing canvas)
-    * @fires editing:entered ("text:editing:entered" when observing canvas)
-    * @fires editing:exited ("text:editing:exited" when observing canvas)
+    * @fires changed
+    * @fires selection:changed
+    * @fires editing:entered
+    * @fires editing:exited
     *
     * @return {fabric.IText} thisArg
     * @see {@link fabric.IText#initialize} for constructor definition
