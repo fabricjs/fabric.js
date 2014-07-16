@@ -64,9 +64,9 @@
      * Rotates `point` around `origin` with `radians`
      * @static
      * @memberOf fabric.util
-     * @param {fabric.Point} The point to rotate
-     * @param {fabric.Point} The origin of the rotation
-     * @param {Number} The radians of the angle for the rotation
+     * @param {fabric.Point} point The point to rotate
+     * @param {fabric.Point} origin The origin of the rotation
+     * @param {Number} radians The radians of the angle for the rotation
      * @return {fabric.Point} The new rotated point
      */
     rotatePoint: function(point, origin, radians) {
@@ -102,19 +102,19 @@
         t[2] * p.x + t[3] * p.y + t[5]
       );
     },
-  
+
     /**
      * Invert transformation t
      * @static
      * @memberOf fabric.util
-     * @param  {Array} t The transform
+     * @param {Array} t The transform
      * @return {Array} The inverted transform
      */
     invertTransform: function(t) {
       var r = t.slice(),
           a = 1 / (t[0] * t[3] - t[1] * t[2]);
       r = [a * t[3], -a * t[1], -a * t[2], a * t[0], 0, 0];
-      var o = fabric.util.transformPoint({x: t[4], y: t[5]}, r);
+      var o = fabric.util.transformPoint({ x: t[4], y: t[5] }, r);
       r[4] = -o.x;
       r[5] = -o.y;
       return r;
@@ -223,7 +223,7 @@
      * @memberOf fabric.util
      * @param {Array} objects Objects to enliven
      * @param {Function} callback Callback to invoke when all objects are created
-     * @param {Function} [reviver] Method for further parsing of object elements,
+     * @param {Function} Method for further parsing of object elements,
      * called after each fabric object created.
      */
     enlivenObjects: function(objects, callback, namespace, reviver) {

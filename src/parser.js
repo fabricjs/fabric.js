@@ -363,7 +363,7 @@
 
     return styles;
   }
-  
+
   /**
    * @private
    */
@@ -433,9 +433,9 @@
     return function(doc, callback, reviver) {
       if (!doc) return;
       var startTime = new Date();
-      
+
       parseUseDirectives(doc);
-      
+
       var descendants = fabric.util.toArray(doc.getElementsByTagName('*'));
 
       if (descendants.length === 0 && fabric.isLikelyNode) {

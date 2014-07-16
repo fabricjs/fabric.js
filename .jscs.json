@@ -31,5 +31,11 @@
     "validateQuoteMarks": "'",
     "validateIndentation": 2,
 
-    "safeContextKeyword": "_this"
+    "safeContextKeyword": "_this",
+
+    "validateJSDoc": {
+      "checkParamNames": true,
+      "checkRedundantParams": true,
+      "requireParamTypes": true
+    }
 }

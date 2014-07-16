@@ -366,7 +366,7 @@
       }
       w *= this.scaleX;
       h *= this.scaleY;
- 
+
       var wh = fabric.util.transformPoint(new fabric.Point(w, h), vpt, true),
           width = wh.x,
           height = wh.y,
