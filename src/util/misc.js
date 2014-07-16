@@ -4,6 +4,7 @@
       atan2 = Math.atan2,
       PiBy180 = Math.PI / 180;
 
+  fabric.DPI = 96;
   /**
    * @namespace fabric.util
    */
