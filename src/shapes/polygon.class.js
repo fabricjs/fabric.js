@@ -46,14 +46,14 @@
       options = options || { };
       this.points = points;
       this.callSuper('initialize', options);
-      this._calcDimensions(skipOffset);
+      if (!skipOffset) this._calcDimensions();
     },
 
     /**
      * @private
      * @param {Boolean} [skipOffset] Whether points offsetting should be skipped
      */
-    _calcDimensions: function(skipOffset) {
+    _calcDimensions: function() {
 
       var points = this.points,
           minX = min(points, 'x'),
@@ -187,7 +187,9 @@
     var points = fabric.parsePointsAttribute(element.getAttribute('points')),
         parsedAttributes = fabric.parseAttributes(element, fabric.Polygon.ATTRIBUTE_NAMES);
 
-    fabric.util.normalizePoints(points, options);
+    if (!('transformMatrix' in parsedAttributes)) {
+      fabric.util.normalizePoints(points, options);
+    }
 
     return new fabric.Polygon(points, extend(parsedAttributes, options), true);
   };
