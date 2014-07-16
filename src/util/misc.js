@@ -132,6 +132,31 @@
       return parseFloat(Number(number).toFixed(fractionDigits));
     },
 
+    parseUnit: function(value) {
+      var DPI = 96;
+      var unit = /\D{0,2}$/.exec(value);
+      var number = parseFloat(value.slice(0,-unit[0].length));
+      switch(unit[0]){
+        case 'mm':
+	  	    return number * DPI / 25.4;
+          break;
+        case 'cm':
+          return number * DPI / 2.54;
+          break;
+        case 'in':
+          return number * DPI;
+          break;
+        case 'pt':
+          return number * DPI / 72; // or * 4 / 3
+          break;
+        case 'pc':
+          return number * DPI / 72 * 12; // or * 16 
+          break;
+        default:
+          return number;
+      }
+    },
+
     /**
      * Function which always returns `false`.
      * @static
