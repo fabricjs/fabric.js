@@ -12,6 +12,7 @@
       capitalize = fabric.util.string.capitalize,
       clone = fabric.util.object.clone,
       toFixed = fabric.util.toFixed,
+      parseUnit = fabric.util.parseUnit,
       multiplyTransformMatrices = fabric.util.multiplyTransformMatrices,
 
       attributesMap = {
@@ -53,7 +54,7 @@
   }
 
   function normalizeValue(attr, value, parentAttributes) {
-    var isArray;
+    var isArray = Object.prototype.toString.call(value) === '[object Array]';
 
     if ((attr === 'fill' || attr === 'stroke') && value === 'none') {
       value = '';
@@ -82,9 +83,9 @@
     }
     else if (attr === 'originX' /* text-anchor */) {
       value = value === 'start' ? 'left' : value === 'end' ? 'right' : 'center';
+    } else {
+      var parsed = isArray ? value.map(parseUnit) : parseUnit(value);
     }
-
-    isArray = Object.prototype.toString.call(value) === '[object Array]';
 
     // TODO: need to normalize em, %, pt, etc. to px (!)
     var parsed = isArray ? value.map(parseFloat) : parseFloat(value);
