@@ -129,10 +129,10 @@
       }
       else { //Set center location relative to given height/width if not specified
         if (!isTopSet) {
-          this.top = 0;
+          this.top = this.height / 2;
         }
         if (!isLeftSet) {
-          this.left = 0;
+          this.left = this.width / 2;
         }
       }
       this.pathOffset = this.pathOffset ||
@@ -146,8 +146,8 @@
      */
     _calculatePathOffset: function (origLeft, origTop) {
       return {
-        x: (-this.width / 2) - origLeft,
-        y: (-this.height / 2) - origTop
+        x: this.left - origLeft - (this.width / 2),
+        y: this.top - origTop - (this.height / 2)
       };
     },
 
@@ -171,9 +171,9 @@
           l = -((this.width / 2) + this.pathOffset.x),
           t = -((this.height / 2) + this.pathOffset.y);
 
-      if(!noTransform){
-        l -= this.width / 2;
-        t -= this.height / 2;
+      if(noTransform){
+        l += this.width / 2;
+        t += this.height / 2;
       }
 
       for (var i = 0, len = this.path.length; i < len; ++i) {
