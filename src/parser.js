@@ -84,11 +84,9 @@
     else if (attr === 'originX' /* text-anchor */) {
       value = value === 'start' ? 'left' : value === 'end' ? 'right' : 'center';
     } else {
+      // TODO: need to normalize em, %, pt, etc. to px (!)
       var parsed = isArray ? value.map(parseUnit) : parseUnit(value);
     }
-
-    // TODO: need to normalize em, %, pt, etc. to px (!)
-    var parsed = isArray ? value.map(parseFloat) : parseFloat(value);
 
     return (!isArray && isNaN(parsed) ? value : parsed);
   }
