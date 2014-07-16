@@ -932,12 +932,12 @@
     });
   });
 
-  test('getSetWidth', function() {
+ test('getSetWidth', function() {
     ok(typeof canvas.getWidth == 'function');
-
     equal(canvas.getWidth(), 600);
     equal(canvas.setWidth(444), canvas, 'should be chainable');
     equal(canvas.getWidth(), 444);
+    equal(canvas.lowerCanvasEl.style.width, 444 + 'px');
   });
 
   test('getSetHeight', function() {
@@ -945,6 +945,47 @@
     equal(canvas.getHeight(), 600);
     equal(canvas.setHeight(765), canvas, 'should be chainable');
     equal(canvas.getHeight(), 765);
+    equal(canvas.lowerCanvasEl.style.height, 765 + 'px');
+  });
+
+  test('setWidth css only', function() {
+    canvas.setWidth(123);
+    canvas.setWidth('100%', { cssOnly: true });
+
+    equal(canvas.lowerCanvasEl.style.width, '100%', 'Should be as the css only value');
+    equal(canvas.upperCanvasEl.style.width, '100%', 'Should be as the css only value');
+    equal(canvas.wrapperEl.style.width, '100%', 'Should be as the css only value');
+    equal(canvas.getWidth(), 123, 'Should be as the none css only value');
+  });
+
+  test('setHeight css only', function() {
+    canvas.setHeight(123);
+    canvas.setHeight('100%', { cssOnly: true });
+
+    equal(canvas.lowerCanvasEl.style.height, '100%', 'Should be as the css only value');
+    equal(canvas.upperCanvasEl.style.height, '100%', 'Should be as the css only value');
+    equal(canvas.wrapperEl.style.height, '100%', 'Should be as the css only value');
+    equal(canvas.getWidth(), 123, 'Should be as the none css only value');
+  });
+
+  test('setWidth backstore only', function() {
+    canvas.setWidth(123);
+    canvas.setWidth(500, { backstoreOnly: true });
+
+    equal(canvas.lowerCanvasEl.style.width, 123 + 'px', 'Should be as none backstore only value + "px"');
+    equal(canvas.upperCanvasEl.style.width, 123 + 'px', 'Should be as none backstore only value + "px"');
+    equal(canvas.wrapperEl.style.width, 123 + 'px', 'Should be as none backstore only value + "px"');
+    equal(canvas.getWidth(), 500, 'Should be as the backstore only value');
+  });
+
+  test('setHeight backstore only', function() {
+    canvas.setHeight(123);
+    canvas.setHeight(500, { backstoreOnly: true });
+
+    equal(canvas.lowerCanvasEl.style.height, 123 + 'px', 'Should be as none backstore only value + "px"');
+    equal(canvas.upperCanvasEl.style.height, 123 + 'px', 'Should be as none backstore only value + "px"');
+    equal(canvas.wrapperEl.style.height, 123 + 'px', 'Should be as none backstore only value + "px"');
+    equal(canvas.getHeight(), 500, 'Should be as the backstore only value');
   });
 
   test('containsPoint', function() {
