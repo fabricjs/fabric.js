@@ -133,24 +133,23 @@
     },
 
     parseUnit: function(value) {
-      var DPI = 96;
-      var unit = /\D{0,2}$/.exec(value);
-      var number = parseFloat(value.slice(0,-unit[0].length));
-      switch(unit[0]){
+      var unit = /\D{0,2}$/.exec(value),
+          number = parseFloat(value.slice(0,-unit[0].length));
+      switch (unit[0]) {
         case 'mm':
-	  	    return number * DPI / 25.4;
+          return number * fabric.DPI / 25.4;
           break;
         case 'cm':
-          return number * DPI / 2.54;
+          return number * fabric.DPI / 2.54;
           break;
         case 'in':
-          return number * DPI;
+          return number * fabric.DPI;
           break;
         case 'pt':
-          return number * DPI / 72; // or * 4 / 3
+          return number * fabric.DPI / 72; // or * 4 / 3
           break;
         case 'pc':
-          return number * DPI / 72 * 12; // or * 16 
+          return number * fabric.DPI / 72 * 12; // or * 16 
           break;
         default:
           return number;
