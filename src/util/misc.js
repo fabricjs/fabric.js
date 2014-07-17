@@ -4,7 +4,6 @@
       atan2 = Math.atan2,
       PiBy180 = Math.PI / 180;
 
-  fabric.DPI = 96;
   /**
    * @namespace fabric.util
    */
@@ -133,9 +132,15 @@
       return parseFloat(Number(number).toFixed(fractionDigits));
     },
 
+    /**
+     * Converts from attribute value to pixel value if applicable.
+     * Returns converted pixels or original value not converted.
+     * @param {Number | String} number to operate on
+     * @return {Number | String}
+     */
     parseUnit: function(value) {
       var unit = /\D{0,2}$/.exec(value),
-          number = parseFloat(value.slice(0, unit.index));
+          number = parseFloat(value);
       switch (unit[0]) {
         case 'mm':
           return number * fabric.DPI / 25.4;
