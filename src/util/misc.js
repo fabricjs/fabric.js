@@ -124,7 +124,7 @@
      * A wrapper around Number#toFixed, which contrary to native method returns number, not string.
      * @static
      * @memberOf fabric.util
-     * @param {Number | String} number number to operate on
+     * @param {Number|String} number number to operate on
      * @param {Number} fractionDigits number of fraction digits to "leave"
      * @return {Number}
      */
@@ -135,8 +135,8 @@
     /**
      * Converts from attribute value to pixel value if applicable.
      * Returns converted pixels or original value not converted.
-     * @param {Number | String} number to operate on
-     * @return {Number | String}
+     * @param {Number|String} value number to operate on
+     * @return {Number|String}
      */
     parseUnit: function(value) {
       var unit = /\D{0,2}$/.exec(value),
