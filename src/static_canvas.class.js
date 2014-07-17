@@ -138,11 +138,10 @@
      * @type Array
      * @default
      */
-    viewportTransform:      [1, 0, 0, 1, 0, 0],
+    viewportTransform: [1, 0, 0, 1, 0, 0],
 
     /**
      * Callback; invoked right before object is about to be scaled/rotated
-     * @param {fabric.Object} target Object that's about to be scaled/rotated
      */
     onBeforeScaleRotate: function () {
       /* NOOP */
@@ -429,6 +428,8 @@
 
       this.lowerCanvasEl.style.width = this.width + 'px';
       this.lowerCanvasEl.style.height = this.height + 'px';
+
+      this.viewportTransform = this.viewportTransform.slice();
     },
 
     /**
@@ -471,8 +472,8 @@
      * @return {fabric.Canvas} instance
      * @chainable true
      */
-    setWidth: function (value) {
-      return this._setDimension('width', value);
+    setWidth: function (width) {
+      return this._setDimension('width', width);
     },
 
     /**
@@ -481,8 +482,8 @@
      * @return {fabric.Canvas} instance
      * @chainable true
      */
-    setHeight: function (value) {
-      return this._setDimension('height', value);
+    setHeight: function (height) {
+      return this._setDimension('height', height);
     },
 
     /**
@@ -1399,7 +1400,7 @@
      * Provides a way to check support of some of the canvas methods
      * (either those of HTMLCanvasElement itself, or rendering context)
      *
-     * @param methodName {String} Method to check support for;
+     * @param {String} methodName Method to check support for;
      *                            Could be one of "getImageData", "toDataURL", "toDataURLWithQuality" or "setLineDash"
      * @return {Boolean | null} `true` if method is supported (or at least exists),
      *                          `null` if canvas element or context can not be initialized
