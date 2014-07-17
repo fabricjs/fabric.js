@@ -132,7 +132,8 @@
   var el = fabric.document.createElement('canvas');
   el.width = 600; el.height = 600;
 
-  var canvas = this.canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.StaticCanvas(el);
+  var canvas = this.canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.StaticCanvas(el),
+      canvas2 = this.canvas2 = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.StaticCanvas(el);
   fabric.Canvas = Canvas;
 
   var lowerCanvasEl = canvas.lowerCanvasEl;
@@ -153,7 +154,18 @@
 
   test('initialProperties', function() {
     ok('backgroundColor' in canvas);
+    ok('overlayColor' in canvas);
+    ok('backgroundImage' in canvas);
+    ok('overlayImage' in canvas);
+    ok('clipTo' in canvas);
+
     equal(canvas.includeDefaultValues, true);
+    equal(canvas.stateful, true);
+    equal(canvas.renderOnAddRemove, true);
+    equal(canvas.controlsAboveOverlay, false);
+    equal(canvas.imageSmoothingEnabled, true);
+
+    notStrictEqual(canvas.viewportTransform, canvas2.viewportTransform);
   });
 
   test('getObjects', function() {
