@@ -429,7 +429,7 @@
       this.lowerCanvasEl.style.width = this.width + 'px';
       this.lowerCanvasEl.style.height = this.height + 'px';
 
-      this.viewportTransform = this.viewportTransform.map(function(item) { return item; });
+      this.viewportTransform = this.viewportTransform.slice();
     },
 
     /**
