@@ -635,7 +635,9 @@
      * @private
      * @param {String} method
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {String} line
+     * @param {String} line Content of the line
+     * @param {Number} left Left coordinate
+     * @param {Number} top Top coordinate
      */
     _renderCharsFast: function(method, ctx, line, left, top) {
       this.skipTextAlign = false;
@@ -650,7 +652,14 @@
 
     /**
      * @private
+     * @param {String} method
      * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Number} lineIndex
+     * @param {Number} i
+     * @param {String} _char
+     * @param {Number} left Left coordinate
+     * @param {Number} top Top coordinate
+     * @param {Number} lineHeight Height of the line
      */
     _renderChar: function(method, ctx, lineIndex, i, _char, left, top, lineHeight) {
       var decl, charWidth, charHeight;
@@ -1069,6 +1078,7 @@
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Array} textLines Array of all text lines
      */
     _getTextHeight: function(ctx, textLines) {
       var height = 0;
@@ -1080,7 +1090,6 @@
 
     /**
      * @private
-     * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _getTopOffset: function() {
       var topOffset = fabric.Text.prototype._getTopOffset.call(this);

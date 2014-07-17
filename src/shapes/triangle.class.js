@@ -41,7 +41,7 @@
 
     /**
      * @private
-     * @param ctx {CanvasRenderingContext2D} Context to render on
+     * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
       var widthBy2 = this.width / 2,
@@ -59,7 +59,7 @@
 
     /**
      * @private
-     * @param ctx {CanvasRenderingContext2D} Context to render on
+     * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _renderDashedStroke: function(ctx) {
       var widthBy2 = this.width / 2,
@@ -114,7 +114,7 @@
    * Returns fabric.Triangle instance from an object representation
    * @static
    * @memberOf fabric.Triangle
-   * @param object {Object} object to create an instance from
+   * @param {Object} object Object to create an instance from
    * @return {Object} instance of Canvas.Triangle
    */
   fabric.Triangle.fromObject = function(object) {

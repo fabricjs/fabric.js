@@ -96,7 +96,8 @@
 
     /**
      * @private
-     * @param ctx {CanvasRenderingContext2D} context to render on
+     * @param {CanvasRenderingContext2D} ctx context to render on
+     * @param {Boolean} [noTransform] When true, context is not transformed
      */
     _render: function(ctx, noTransform) {
       ctx.beginPath();

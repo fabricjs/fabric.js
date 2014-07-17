@@ -1125,7 +1125,7 @@
 
     /**
      * Creates an instance of fabric.Image out of an object
-     * @param callback {Function} callback, invoked with an instance as a first argument
+     * @param {Function} callback callback, invoked with an instance as a first argument
      * @return {fabric.Object} thisArg
      */
     cloneAsImage: function(callback) {
@@ -1195,7 +1195,7 @@
 
     /**
      * Returns true if specified type is identical to the type of an instance
-     * @param type {String} type Type to check against
+     * @param {String} type Type to check against
      * @return {Boolean}
      */
     isType: function(type) {
