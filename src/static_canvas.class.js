@@ -886,6 +886,11 @@
 
       return this;
     },
+    previewFilter: function previewFilter() {
+      this.isApplyFilter = true;
+      this.renderAll();
+      this.isApplyFilter = false;
+    },
 
     /**
      * Method to render only the top canvas.
