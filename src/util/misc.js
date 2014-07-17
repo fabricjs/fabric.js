@@ -135,7 +135,7 @@
 
     parseUnit: function(value) {
       var unit = /\D{0,2}$/.exec(value),
-          number = parseFloat(value.slice(0, -unit[0].length));
+          number = parseFloat(value.slice(0, unit.index));
       switch (unit[0]) {
         case 'mm':
           return number * fabric.DPI / 25.4;
