@@ -124,12 +124,42 @@
      * A wrapper around Number#toFixed, which contrary to native method returns number, not string.
      * @static
      * @memberOf fabric.util
-     * @param {Number | String} number number to operate on
+     * @param {Number|String} number number to operate on
      * @param {Number} fractionDigits number of fraction digits to "leave"
      * @return {Number}
      */
     toFixed: function(number, fractionDigits) {
       return parseFloat(Number(number).toFixed(fractionDigits));
+    },
+
+    /**
+     * Converts from attribute value to pixel value if applicable.
+     * Returns converted pixels or original value not converted.
+     * @param {Number|String} value number to operate on
+     * @return {Number|String}
+     */
+    parseUnit: function(value) {
+      var unit = /\D{0,2}$/.exec(value),
+          number = parseFloat(value);
+      switch (unit[0]) {
+        case 'mm':
+          return number * fabric.DPI / 25.4;
+          break;
+        case 'cm':
+          return number * fabric.DPI / 2.54;
+          break;
+        case 'in':
+          return number * fabric.DPI;
+          break;
+        case 'pt':
+          return number * fabric.DPI / 72; // or * 4 / 3
+          break;
+        case 'pc':
+          return number * fabric.DPI / 72 * 12; // or * 16 
+          break;
+        default:
+          return number;
+      }
     },
 
     /**

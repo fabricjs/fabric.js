@@ -44,3 +44,8 @@ fabric.SHARED_ATTRIBUTES = [
   "stroke-linejoin", "stroke-miterlimit",
   "stroke-opacity", "stroke-width"
 ];
+
+/**
+ * Pixel per Inch as a default value set to 96. Can be changed for more realistic conversion.
+ */
+fabric.DPI = 96;
