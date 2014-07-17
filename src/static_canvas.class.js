@@ -141,6 +141,13 @@
     viewportTransform: [1, 0, 0, 1, 0, 0],
 
     /**
+     * flag to indicate whether to render canvas filters for performance concern
+     * @type Boolean
+     * @default
+     */
+    isApplyFilter: false,
+
+    /**
      * Callback; invoked right before object is about to be scaled/rotated
      */
     onBeforeScaleRotate: function () {
@@ -763,6 +770,7 @@
       }
 
       this._renderOverlay(canvasToDrawOn);
+      this._applyFilters();
 
       if (this.controlsAboveOverlay && this.interactive) {
         this.drawControls(canvasToDrawOn);
@@ -858,6 +866,25 @@
       if (this.overlayImage) {
         this._draw(ctx, this.overlayImage);
       }
+    },
+
+    /**
+    * Applies filters assigned to this canvas (from "filters" array)
+    * @mthod applyFilters
+    * @return {fabric.StaticCanvas} thisArg
+    * @chainable
+    */
+    _applyFilters: function() {
+      var canvasEl = this.lowerCanvasEl,
+          _this = this;
+
+      if (this.isApplyFilter && this.filters) {
+          this.filters.forEach(function (filter) {
+              filter && filter.applyTo(canvasEl);
+          });
+      }
+
+      return this;
     },
 
     /**
@@ -995,6 +1022,7 @@
       };
 
       extend(data, this.__serializeBgOverlay());
+      extend(data, this.__serializefilters());
 
       fabric.util.populateWithProperties(this, data, propertiesToInclude);
 
@@ -1063,6 +1091,15 @@
         data.overlayImage = this.overlayImage.toObject();
       }
 
+      return data;
+    },
+
+    __serializefilters: function() {
+      var data = {
+          filters: this.filters.map(function(filterObj) {
+              return filterObj && filterObj.toObject();
+          })
+      };
       return data;
     },
 
