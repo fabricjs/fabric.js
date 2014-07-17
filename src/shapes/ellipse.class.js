@@ -94,8 +94,8 @@
 
     /**
      * Renders this instance on a given context
-     * @param ctx {CanvasRenderingContext2D} context to render on
-     * @param noTransform {Boolean} context is not transformed when set to true
+     * @param {CanvasRenderingContext2D} ctx context to render on
+     * @param {Boolean} [noTransform] When true, context is not transformed
      */
     render: function(ctx, noTransform) {
       // do not use `get` for perf. reasons
@@ -105,7 +105,8 @@
 
     /**
      * @private
-     * @param ctx {CanvasRenderingContext2D} context to render on
+     * @param {CanvasRenderingContext2D} ctx context to render on
+     * @param {Boolean} [noTransform] When true, context is not transformed
      */
     _render: function(ctx, noTransform) {
       ctx.beginPath();

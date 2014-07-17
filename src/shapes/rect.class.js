@@ -98,7 +98,7 @@
 
     /**
      * @private
-     * @param ctx {CanvasRenderingContext2D} context to render on
+     * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
 
@@ -154,7 +154,7 @@
 
     /**
      * @private
-     * @param ctx {CanvasRenderingContext2D} context to render on
+     * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _renderDashedStroke: function(ctx) {
       var x = -this.width / 2,
@@ -280,7 +280,7 @@
    * Returns {@link fabric.Rect} instance from an object representation
    * @static
    * @memberOf fabric.Rect
-   * @param object {Object} object to create an instance from
+   * @param {Object} object Object to create an instance from
    * @return {Object} instance of fabric.Rect
    */
   fabric.Rect.fromObject = function(object) {

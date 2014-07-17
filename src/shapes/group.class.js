@@ -523,7 +523,7 @@
    * @static
    * @memberOf fabric.Group
    * @param {Object} object Object to create a group from
-   * @param {Object} [options] Options object
+   * @param {Function} [callback] Callback to invoke when an group instance is created
    * @return {fabric.Group} An instance of fabric.Group
    */
   fabric.Group.fromObject = function(object, callback) {

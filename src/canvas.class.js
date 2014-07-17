@@ -444,8 +444,8 @@
     /**
      * Translates object by "setting" its left/top
      * @private
-     * @param x {Number} pointer's x coordinate
-     * @param y {Number} pointer's y coordinate
+     * @param {Number} x pointer's x coordinate
+     * @param {Number} y pointer's y coordinate
      */
     _translateObject: function (x, y) {
       var target = this._currentTransform.target;
@@ -461,9 +461,9 @@
     /**
      * Scales object by invoking its scaleX/scaleY methods
      * @private
-     * @param x {Number} pointer's x coordinate
-     * @param y {Number} pointer's y coordinate
-     * @param by {String} Either 'x' or 'y' - specifies dimension constraint by which to scale an object.
+     * @param {Number} x pointer's x coordinate
+     * @param {Number} y pointer's y coordinate
+     * @param {String} by Either 'x' or 'y' - specifies dimension constraint by which to scale an object.
      *                    When not provided, an object is scaled by both dimensions equally
      */
     _scaleObject: function (x, y, by) {
@@ -843,7 +843,6 @@
 
     /**
      * @private
-     * @param {HTMLElement|String} canvasEl Canvas element
      * @throws {CANVAS_INIT_ERROR} If canvas can not be initialized
      */
     _createUpperCanvas: function () {
@@ -871,8 +870,6 @@
 
     /**
      * @private
-     * @param {Number} width
-     * @param {Number} height
      */
     _initWrapperElement: function () {
       this.wrapperEl = fabric.util.wrapElement(this.lowerCanvasEl, 'div', {
@@ -888,7 +885,7 @@
 
     /**
      * @private
-     * @param {Element} element
+     * @param {HTMLElement} element canvas element to apply styles on
      */
     _applyCanvasStyle: function (element) {
       var width = this.getWidth() || element.width,

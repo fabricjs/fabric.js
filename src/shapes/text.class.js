@@ -484,7 +484,7 @@
      * @private
      * @param {String} method Method name ("fillText" or "strokeText")
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {String} line Chars to render
+     * @param {String} chars Chars to render
      * @param {Number} left Left position of text
      * @param {Number} top Top position of text
      */
@@ -1107,7 +1107,7 @@
    * Returns fabric.Text instance from an object representation
    * @static
    * @memberOf fabric.Text
-   * @param object {Object} object Object to create an instance from
+   * @param {Object} object Object to create an instance from
    * @return {fabric.Text} Instance of fabric.Text
    */
   fabric.Text.fromObject = function(object) {

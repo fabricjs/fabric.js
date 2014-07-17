@@ -179,7 +179,7 @@
    * Returns fabric.Polyline instance from an object representation
    * @static
    * @memberOf fabric.Polyline
-   * @param object {Object} object Object to create an instance from
+   * @param {Object} object Object to create an instance from
    * @return {fabric.Polyline} Instance of fabric.Polyline
    */
   fabric.Polyline.fromObject = function(object) {
