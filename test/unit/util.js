@@ -482,7 +482,7 @@
     });
 
     setTimeout(function() {
-      ok(group1 instanceof fabric.Polygon);
+      ok(group1 instanceof fabric.pathGroup);
       start();
     }, 2000);
   });
