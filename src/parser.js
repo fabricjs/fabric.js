@@ -403,8 +403,7 @@
    * Add a <g> element that envelop all SCG elements and makes the viewbox transformMatrix descend on all elements
    */
   function addSvgTransform(doc, matrix) {
-    var el = document.createElement('g'),
-        nodelist = doc.childNodes;
+    var el = document.createElement('g');
     while (doc.firstChild != null) {
       var node = doc.firstChild;
       el.appendChild(node);
