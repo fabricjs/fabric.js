@@ -122,6 +122,9 @@
       if (!this.visible) return;
 
       ctx.save();
+      //setup fill rule for current object
+      this._setupFillRule(ctx);
+      
       var m = this.transformMatrix,
           isInPathGroup = this.group && this.group.type === 'path-group';
 
@@ -147,8 +150,21 @@
       }
       this._renderStroke(ctx);
       this.clipTo && ctx.restore();
+      this._restoreFillRule(ctx);
       ctx.restore();
     },
+    _setupFillRule: function (ctx) {
+      if (this.fillRule) {
+          this._prevFillRule = ctx.globalCompositeOperation;
+          ctx.globalCompositeOperation = this.fillRule;
+      }
+    },
+
+    _restoreFillRule: function (ctx) {
+      if (this.fillRule && this._prevFillRule) {
+          ctx.globalCompositeOperation = this._prevFillRule;
+      }
+    },    
 
     /**
      * @private
