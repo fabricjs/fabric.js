@@ -44,7 +44,7 @@ fabric.ElementsParser.prototype._createObject = function(klass, el, index) {
   else {
     var obj = klass.fromElement(el, this.options);
     this.reviver && this.reviver(el, obj);
-    this.instances.splice(index, 0, obj);
+    this.instances[index] = obj;
     this.checkIfDone();
   }
 };
@@ -53,7 +53,7 @@ fabric.ElementsParser.prototype.createCallback = function(index, el) {
   var _this = this;
   return function(obj) {
     _this.reviver && _this.reviver(el, obj);
-    _this.instances.splice(index, 0, obj);
+    _this.instances[index] = obj;
     _this.checkIfDone();
   };
 };
