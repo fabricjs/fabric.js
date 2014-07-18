@@ -6,7 +6,7 @@
     return new fabric.Text('x');
   }
 
-  var CHAR_WIDTH = 19;
+  var CHAR_WIDTH = 20;
 
   var REFERENCE_TEXT_OBJECT = {
     'type':                'text',
