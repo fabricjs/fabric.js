@@ -253,7 +253,7 @@
 
     /**
      * Scales an object (equally by x and y)
-     * @param value {Number} scale factor
+     * @param {Number} value Scale factor
      * @return {fabric.Object} thisArg
      * @chainable
      */
@@ -274,7 +274,7 @@
 
     /**
      * Scales an object to a given width, with respect to bounding box (scaling by x/y equally)
-     * @param value {Number} new width value
+     * @param {Number} value New width value
      * @return {fabric.Object} thisArg
      * @chainable
      */
@@ -286,7 +286,7 @@
 
     /**
      * Scales an object to a given height, with respect to bounding box (scaling by x/y equally)
-     * @param value {Number} new height value
+     * @param {Number} value New height value
      * @return {fabric.Object} thisArg
      * @chainable
      */
@@ -302,24 +302,24 @@
      * @chainable
      */
     setCoords: function() {
-
       var strokeWidth = this.strokeWidth > 1 ? this.strokeWidth : 0,
           theta = degreesToRadians(this.angle),
-          vpt = this.getViewportTransform();
-
-      var f = function (p) {
-        return fabric.util.transformPoint(p, vpt);
-      };
-      var w = this.width,
+          vpt = this.getViewportTransform(),
+          f = function (p) {
+            return fabric.util.transformPoint(p, vpt);
+          },
+          w = this.width,
           h = this.height,
-          capped = this.strokeLineCap === "round" || this.strokeLineCap === "square",
-          vLine = this.type === "line" && this.width === 1,
-          hLine = this.type === "line" && this.height === 1,
-          strokeW = (capped && hLine) || this.type !== "line",
-          strokeH = (capped && vLine) || this.type !== "line";
+          capped = this.strokeLineCap === 'round' || this.strokeLineCap === 'square',
+          vLine = this.type === 'line' && this.width === 1,
+          hLine = this.type === 'line' && this.height === 1,
+          strokeW = (capped && hLine) || this.type !== 'line',
+          strokeH = (capped && vLine) || this.type !== 'line';
+
       if (vLine) {
         w = strokeWidth;
-      } else if (hLine) {
+      }
+      else if (hLine) {
         h = strokeWidth;
       }
       if (strokeW) {
@@ -361,11 +361,12 @@
           mt  = f(_mt),
           mr  = f(new fabric.Point(_tr.x - (wh.y/2 * sinTh), _tr.y + (wh.y/2 * cosTh))),
           mb  = f(new fabric.Point(_bl.x + (wh.x/2 * cosTh), _bl.y + (wh.x/2 * sinTh))),
-          mtr = f(new fabric.Point(_mt.x, _mt.y));
+          mtr = f(new fabric.Point(_mt.x, _mt.y)),
 
-      // padding
-      var padX = Math.cos(_angle + theta) * this.padding * Math.sqrt(2),
+          // padding
+          padX = Math.cos(_angle + theta) * this.padding * Math.sqrt(2),
           padY = Math.sin(_angle + theta) * this.padding * Math.sqrt(2);
+
       tl = tl.add(new fabric.Point(-padX, -padY));
       tr = tr.add(new fabric.Point(padY, -padX));
       br = br.add(new fabric.Point(padX, padY));

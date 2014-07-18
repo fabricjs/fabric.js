@@ -123,6 +123,10 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
     this.canvas.renderAll();
   },
 
+    /**
+     * @private
+     * @param {Array} rects
+     */
   _getOptimizedRects: function(rects) {
 
     // avoid creating duplicate rects at the same coordinates
@@ -185,7 +189,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
       else {
         width = this.dotWidth;
       }
-      
+
       var point = new fabric.Point(x, y);
       point.width = width;
 

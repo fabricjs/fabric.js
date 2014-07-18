@@ -12,6 +12,7 @@
       capitalize = fabric.util.string.capitalize,
       clone = fabric.util.object.clone,
       toFixed = fabric.util.toFixed,
+      parseUnit = fabric.util.parseUnit,
       multiplyTransformMatrices = fabric.util.multiplyTransformMatrices,
 
       attributesMap = {
@@ -53,7 +54,8 @@
   }
 
   function normalizeValue(attr, value, parentAttributes) {
-    var isArray;
+    var isArray = Object.prototype.toString.call(value) === '[object Array]',
+        parsed;
 
     if ((attr === 'fill' || attr === 'stroke') && value === 'none') {
       value = '';
@@ -62,7 +64,9 @@
       value = (value === 'evenodd') ? 'destination-over' : value;
     }
     else if (attr === 'strokeDashArray') {
-      value = value.replace(/,/g, ' ').split(/\s+/);
+      value = value.replace(/,/g, ' ').split(/\s+/).map(function(n) {
+        return parseInt(n);
+      });
     }
     else if (attr === 'transformMatrix') {
       if (parentAttributes && parentAttributes.transformMatrix) {
@@ -83,11 +87,9 @@
     else if (attr === 'originX' /* text-anchor */) {
       value = value === 'start' ? 'left' : value === 'end' ? 'right' : 'center';
     }
-
-    isArray = Object.prototype.toString.call(value) === '[object Array]';
-
-    // TODO: need to normalize em, %, pt, etc. to px (!)
-    var parsed = isArray ? value.map(parseFloat) : parseFloat(value);
+    else {
+      parsed = isArray ? value.map(parseUnit) : parseUnit(value);
+    }
 
     return (!isArray && isNaN(parsed) ? value : parsed);
   }
@@ -368,28 +370,32 @@
    * @private
    */
   function parseUseDirectives(doc) {
-    var nodelist = doc.querySelectorAll("use");
-    for (var i = 0; i < nodelist.length; i++) {
-      var el = nodelist[i];
-      var xlink = el.getAttribute('xlink:href').substr(1);
-      var x = el.getAttribute('x') || 0;
-      var y = el.getAttribute('y') || 0;
-      var el2 = doc.getElementById(xlink).cloneNode(true);
-      var currentTrans = (el.getAttribute('transform') || '') + ' translate(' + x + ', ' + y + ')';
+    var nodelist = doc.getElementsByTagName('use');
+    for (var i = 0, len = nodelist.length; i < len; i++) {
+      var el = nodelist[i],
+          xlink = el.getAttribute('xlink:href').substr(1),
+          x = el.getAttribute('x') || 0,
+          y = el.getAttribute('y') || 0,
+          el2 = doc.getElementById(xlink).cloneNode(true),
+          currentTrans = (el.getAttribute('transform') || '') + ' translate(' + x + ', ' + y + ')',
+          parentNode;
+
       for (var j = 0, attrs = el.attributes, l = attrs.length; j < l; j++) {
         var attr = attrs.item(j);
-        if (attr.nodeName !== 'x' && attr.nodeName !== 'y' && attr.nodeName !== 'xlink:href') {
-          if (attr.nodeName === 'transform') {
-            currentTrans = currentTrans + ' ' + attr.nodeValue;
-          } else {
-            el2.setAttribute(attr.nodeName, attr.nodeValue);
-          }
+        if (attr.nodeName === 'x' || attr.nodeName === 'y' || attr.nodeName === 'xlink:href') continue;
+
+        if (attr.nodeName === 'transform') {
+          currentTrans = currentTrans + ' ' + attr.nodeValue;
+        }
+        else {
+          el2.setAttribute(attr.nodeName, attr.nodeValue);
         }
       }
+
       el2.setAttribute('transform', currentTrans);
       el2.removeAttribute('id');
-      var pNode=el.parentNode;
-      pNode.replaceChild(el2, el);
+      parentNode = el.parentNode;
+      parentNode.replaceChild(el2, el);
     }
   }
 
@@ -520,18 +526,10 @@
       callback(false);
     },
 
-    /**
-    * @param {String} url
-    * @param {Function} callback
-    */
     get: function () {
       /* NOOP */
     },
 
-    /**
-     * @param {String} url
-     * @param {Object} object
-     */
     set: function () {
       /* NOOP */
     }
@@ -705,7 +703,7 @@
      * Parses "points" attribute, returning an array of values
      * @static
      * @memberOf fabric
-     * @param points {String} points attribute string
+     * @param {String} points points attribute string
      * @return {Array} array of points
      */
     parsePointsAttribute: function(points) {

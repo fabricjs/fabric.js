@@ -197,7 +197,7 @@
    * Returns fabric.Polygon instance from an object representation
    * @static
    * @memberOf fabric.Polygon
-   * @param object {Object} object Object to create an instance from
+   * @param {Object} object Object to create an instance from
    * @return {fabric.Polygon} Instance of fabric.Polygon
    */
   fabric.Polygon.fromObject = function(object) {

@@ -142,7 +142,8 @@
 
     /**
      * @private
-     * @param {Boolean} positionSet When false, path offset is returned otherwise 0
+     * @param {Number} origLeft Original left position
+     * @param {Number} origTop  Original top position
      */
     _calculatePathOffset: function (origLeft, origTop) {
       return {

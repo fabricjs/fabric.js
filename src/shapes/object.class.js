@@ -682,6 +682,7 @@
 
     /**
      * @private
+     * @param {Object} [options] Options object
      */
     _initGradient: function(options) {
       if (options.fill && options.fill.colorStops && !(options.fill instanceof fabric.Gradient)) {
@@ -691,6 +692,7 @@
 
     /**
      * @private
+     * @param {Object} [options] Options object
      */
     _initPattern: function(options) {
       if (options.fill && options.fill.source && !(options.fill instanceof fabric.Pattern)) {
@@ -703,6 +705,7 @@
 
     /**
      * @private
+     * @param {Object} [options] Options object
      */
     _initClipping: function(options) {
       if (!options.clipTo || typeof options.clipTo !== 'string') return;
@@ -752,7 +755,6 @@
      * @return {Object} Object representation of an instance
      */
     toObject: function(propertiesToInclude) {
-
       var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
 
           object = {
@@ -1006,17 +1008,17 @@
      * @param {Boolean} [noTransform] When true, context is not transformed
      */
     _renderControls: function(ctx, noTransform) {
-      var v = this.getViewportTransform();
+      var vpt = this.getViewportTransform();
 
       ctx.save();
       if (this.active && !noTransform) {
         var center;
         if (this.group) {
-          center = fabric.util.transformPoint(this.group.getCenterPoint(), v);
+          center = fabric.util.transformPoint(this.group.getCenterPoint(), vpt);
           ctx.translate(center.x, center.y);
           ctx.rotate(degreesToRadians(this.group.angle));
         }
-        center = fabric.util.transformPoint(this.getCenterPoint(), v, null != this.group);
+        center = fabric.util.transformPoint(this.getCenterPoint(), vpt, null != this.group);
         if (this.group) {
           center.x *= this.group.scaleX;
           center.y *= this.group.scaleY;
@@ -1125,7 +1127,7 @@
 
     /**
      * Creates an instance of fabric.Image out of an object
-     * @param callback {Function} callback, invoked with an instance as a first argument
+     * @param {Function} callback callback, invoked with an instance as a first argument
      * @return {fabric.Object} thisArg
      */
     cloneAsImage: function(callback) {
@@ -1195,7 +1197,7 @@
 
     /**
      * Returns true if specified type is identical to the type of an instance
-     * @param type {String} type Type to check against
+     * @param {String} type Type to check against
      * @return {Boolean}
      */
     isType: function(type) {
