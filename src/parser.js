@@ -54,7 +54,8 @@
   }
 
   function normalizeValue(attr, value, parentAttributes) {
-    var isArray = Object.prototype.toString.call(value) === '[object Array]';
+    var isArray = Object.prototype.toString.call(value) === '[object Array]',
+        parsed;
 
     if ((attr === 'fill' || attr === 'stroke') && value === 'none') {
       value = '';
@@ -63,7 +64,9 @@
       value = (value === 'evenodd') ? 'destination-over' : value;
     }
     else if (attr === 'strokeDashArray') {
-      value = value.replace(/,/g, ' ').split(/\s+/);
+      value = value.replace(/,/g, ' ').split(/\s+/).map(function(n) {
+        return parseInt(n);
+      });
     }
     else if (attr === 'transformMatrix') {
       if (parentAttributes && parentAttributes.transformMatrix) {
@@ -83,9 +86,9 @@
     }
     else if (attr === 'originX' /* text-anchor */) {
       value = value === 'start' ? 'left' : value === 'end' ? 'right' : 'center';
-    } else {
-      // TODO: need to normalize em, %, etc. to px (!)
-      var parsed = isArray ? value.map(parseUnit) : parseUnit(value);
+    }
+    else {
+      parsed = isArray ? value.map(parseUnit) : parseUnit(value);
     }
 
     return (!isArray && isNaN(parsed) ? value : parsed);
@@ -367,7 +370,7 @@
    * @private
    */
   function parseUseDirectives(doc) {
-    var nodelist = doc.querySelectorAll('use');
+    var nodelist = doc.getElementsByTagName('use');
     for (var i = 0, len = nodelist.length; i < len; i++) {
       var el = nodelist[i],
           xlink = el.getAttribute('xlink:href').substr(1),

@@ -126,10 +126,11 @@
     var element = fabric.document.createElement('path');
     element.setAttribute('style', 'left:10px;top:22.3em;width:103.45pt;height:20%;');
 
+    // TODO: looks like this still fails with % and em values
     var expectedObject = {
       'left':   10,
       'top':    22.3,
-      'width':  103.45,
+      'width':  137.93333333333334,
       'height': 20
     };
     deepEqual(fabric.parseStyleAttribute(element), expectedObject);

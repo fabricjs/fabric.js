@@ -176,8 +176,8 @@
       parsedAttributes.top = 0;
     }
     if (!('transformMatrix' in parsedAttributes)) {
-      parsedAttributes.left -= (options.width / 2);
-      parsedAttributes.top -= (options.height / 2);
+      parsedAttributes.left -= options.width ? (options.width / 2) : 0;
+      parsedAttributes.top -= options.height ? (options.height / 2) : 0;
     }
 
     var obj = new fabric.Circle(extend(parsedAttributes, options));
