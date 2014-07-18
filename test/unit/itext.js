@@ -8,7 +8,7 @@
     'originY':              'top',
     'left':                 0,
     'top':                  0,
-    'width':                19,
+    'width':                20,
     'height':               52,
     'fill':                 'rgb(0,0,0)',
     'stroke':               null,
