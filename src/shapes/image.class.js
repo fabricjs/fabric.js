@@ -479,9 +479,14 @@
    */
   fabric.Image.fromElement = function(element, callback, options) {
     var parsedAttributes = fabric.parseAttributes(element, fabric.Image.ATTRIBUTE_NAMES);
-
-    fabric.Image.fromURL(parsedAttributes['xlink:href'], callback,
-      extend((options ? fabric.util.object.clone(options) : { }), parsedAttributes));
+    if (callback) {
+      fabric.Image.fromURL(parsedAttributes['xlink:href'], callback,
+        extend((options ? fabric.util.object.clone(options) : { }), parsedAttributes));
+    } else {
+      var img = fabric.util.createImage();
+      img.src = parsedAttributes['xlink:href'];
+      return new fabric.Image(img,extend((options ? fabric.util.object.clone(options) : { }), parsedAttributes));
+    }
   };
   /* _FROM_SVG_END_ */
 
