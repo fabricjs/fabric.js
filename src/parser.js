@@ -460,19 +460,18 @@
           widthAttr = parseFloat(doc.getAttribute('width')),
           heightAttr = parseFloat(doc.getAttribute('height')),
           viewBoxWidth,
-          viewBoxHeight,
-          scaleX = 1,
-          scaleY = 1;
+          viewBoxHeight;
 
       if (viewBoxAttr && (viewBoxAttr = viewBoxAttr.match(reViewBoxAttrValue))) {
-        var minX = parseFloat(viewBoxAttr[1]);
-        var minY = parseFloat(viewBoxAttr[2]);
+        var minX = parseFloat(viewBoxAttr[1]),
+            minY = parseFloat(viewBoxAttr[2]),
+            scaleX = 1, scaleY = 1;
         viewBoxWidth = parseFloat(viewBoxAttr[3]);
         viewBoxHeight = parseFloat(viewBoxAttr[4]);
-        if (widthAttr && widthAttr != viewBoxWidth ) {
+        if (widthAttr && widthAttr !== viewBoxWidth ) {
           scaleX = widthAttr / viewBoxWidth;
         }
-        if (heightAttr && heightAttr != viewBoxHeight) {
+        if (heightAttr && heightAttr !== viewBoxHeight) {
           scaleY = heightAttr / viewBoxHeight;
         }
         // default is to preserve aspect ratio
@@ -505,33 +504,6 @@
       if (!elements || (elements && !elements.length)) {
         callback && callback([], {});
         return;
-      }
-
-      var viewBoxAttr = doc.getAttribute('viewBox'),
-          widthAttr = parseFloat(doc.getAttribute('width')),
-          heightAttr = parseFloat(doc.getAttribute('height')),
-          width = null,
-          height = null,
-          viewBoxWidth,
-          viewBoxHeight,
-          minX,
-          minY;
-
-      if (viewBoxAttr && (viewBoxAttr = viewBoxAttr.match(reViewBoxAttrValue))) {
-        minX = parseFloat(viewBoxAttr[1]);
-        minY = parseFloat(viewBoxAttr[2]);
-        viewBoxWidth = parseFloat(viewBoxAttr[3]);
-        viewBoxHeight = parseFloat(viewBoxAttr[4]);
-      }
-
-      if (viewBoxWidth && widthAttr && viewBoxWidth !== widthAttr) {
-        width = viewBoxWidth;
-        height = viewBoxHeight;
-      }
-      else {
-        // values of width/height attributes overwrite those extracted from viewbox attribute
-        width = widthAttr ? widthAttr : viewBoxWidth;
-        height = heightAttr ? heightAttr : viewBoxHeight;
       }
 
       var options = {
