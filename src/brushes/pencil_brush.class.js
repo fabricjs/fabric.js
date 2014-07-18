@@ -52,7 +52,8 @@
     },
 
     /**
-     * @param {Object} pointer
+     * @private
+     * @param {Object} pointer Actual mouse position related to the canvas.
      */
     _prepareForDrawing: function(pointer) {
 
@@ -66,18 +67,15 @@
 
     /**
      * @private
-     * @param {fabric.Point} point
+     * @param {fabric.Point} point Point to be added to points array
      */
     _addPoint: function(point) {
       this._points.push(point);
     },
 
     /**
-     * Clear points array and set contextTop canvas
-     * style.
-     *
+     * Clear points array and set contextTop canvas style.
      * @private
-     *
      */
     _reset: function() {
       this._points.length = 0;
@@ -88,9 +86,7 @@
 
     /**
      * @private
-     *
-     * @param point {pointer} (fabric.util.pointer) actual mouse position
-     *   related to the canvas.
+     * @param {Object} pointer Actual mouse position related to the canvas.
      */
     _captureDrawingPath: function(pointer) {
       var pointerPoint = new fabric.Point(pointer.x, pointer.y);
@@ -99,18 +95,17 @@
 
     /**
      * Draw a smooth path on the topCanvas using quadraticCurveTo
-     *
      * @private
      */
     _render: function() {
-      var ctx  = this.canvas.contextTop;
-      var v = this.canvas.viewportTransform;
+      var ctx  = this.canvas.contextTop,
+          v = this.canvas.viewportTransform,
+          p1 = this._points[0],
+          p2 = this._points[1];
+
       ctx.save();
       ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
       ctx.beginPath();
-
-      var p1 = this._points[0],
-          p2 = this._points[1];
 
       //if we only have 2 points in the path and they are the same
       //it means that the user only clicked the canvas without moving the mouse
@@ -141,19 +136,18 @@
 
     /**
      * Return an SVG path based on our captured points and their bounding box
-     *
      * @private
      */
     _getSVGPathData: function() {
       this.box = this.getPathBoundingBox(this._points);
       return this.convertPointsToSVGPath(
-        this._points, this.box.minx, this.box.maxx, this.box.miny, this.box.maxy);
+        this._points, this.box.minX, this.box.minY);
     },
 
      /**
       * Returns bounding box of a path based on given points
-      * @param {Array} points
-      * @return {Object} object with minx, miny, maxx, maxy
+      * @param {Array} points Array of points
+      * @return {Object} Object with minX, minY, maxX, maxY
       */
     getPathBoundingBox: function(points) {
       var xBounds = [],
@@ -179,19 +173,21 @@
       yBounds.push(p1.y);
 
       return {
-        minx: utilMin(xBounds),
-        miny: utilMin(yBounds),
-        maxx: utilMax(xBounds),
-        maxy: utilMax(yBounds)
+        minX: utilMin(xBounds),
+        minY: utilMin(yBounds),
+        maxX: utilMax(xBounds),
+        maxY: utilMax(yBounds)
       };
     },
 
     /**
      * Converts points to SVG path
      * @param {Array} points Array of points
+     * @param {Number} minX
+     * @param {Number} minY
      * @return {String} SVG path
      */
-    convertPointsToSVGPath: function(points, minX, maxX, minY) {
+    convertPointsToSVGPath: function(points, minX, minY) {
       var path = [],
           p1 = new fabric.Point(points[0].x - minX, points[0].y - minY),
           p2 = new fabric.Point(points[1].x - minX, points[1].y - minY);
@@ -215,7 +211,7 @@
     /**
      * Creates fabric.Path object to add on canvas
      * @param {String} pathData Path data
-     * @return {fabric.Path} path to add on canvas
+     * @return {fabric.Path} Path to add on canvas
      */
     createPath: function(pathData) {
       var path = new fabric.Path(pathData);
@@ -237,7 +233,6 @@
      * On mouseup after drawing the path on contextTop canvas
      * we use the points captured to create an new fabric path object
      * and add it to the fabric canvas.
-     *
      */
     _finalizeAndAddPath: function() {
       var ctx = this.canvas.contextTop;

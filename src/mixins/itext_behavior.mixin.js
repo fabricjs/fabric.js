@@ -216,7 +216,8 @@
 
     /**
      * Find new selection index representing start of current line according to current selection index
-     * @param {Number} current selection index
+     * @param {Number} startFrom Current selection index
+     * @return {Number} New selection index
      */
     findLineBoundaryLeft: function(startFrom) {
       var offset = 0, index = startFrom - 1;
@@ -231,7 +232,8 @@
 
     /**
      * Find new selection index representing end of current line according to current selection index
-     * @param {Number} current selection index
+     * @param {Number} startFrom Current selection index
+     * @return {Number} New selection index
      */
     findLineBoundaryRight: function(startFrom) {
       var offset = 0, index = startFrom;
@@ -264,6 +266,7 @@
      * Finds index corresponding to beginning or end of a word
      * @param {Number} selectionStart Index of a character
      * @param {Number} direction: 1 or -1
+     * @return {Number} Index of the beginning or end of a word
      */
     searchWordBoundary: function(selectionStart, direction) {
       var index = this._reSpace.test(this.text.charAt(selectionStart)) ? selectionStart - 1 : selectionStart,

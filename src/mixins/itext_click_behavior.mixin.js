@@ -155,7 +155,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
   /**
    * Changes cursor location in a text depending on passed pointer (x/y) object
-   * @param {Object} pointer Pointer object with x and y numeric properties
+   * @param {Event} e Event object
    */
   setCursorByClick: function(e) {
     var newSelectionStart = this.getSelectionStartFromPointer(e);
@@ -178,7 +178,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   /**
    * @private
    * @param {Event} e Event object
-   * @param {Object} Object with x/y corresponding to local offset (according to object rotation)
+   * @return {Object} Coordinates of a pointer (x, y)
    */
   _getLocalRotatedPointer: function(e) {
     var pointer = this.canvas.getPointer(e),
@@ -198,7 +198,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @return {Number} Index of a character
    */
   getSelectionStartFromPointer: function(e) {
-
     var mouseOffset = this._getLocalRotatedPointer(e),
         textLines = this.text.split(this._reNewline),
         prevWidth = 0,
