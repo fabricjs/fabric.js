@@ -346,14 +346,6 @@
      */
     _render: function(ctx) {
 
-      var isInPathGroup = this.group && this.group.type === 'path-group';
-      if (isInPathGroup && !this.transformMatrix) {
-        ctx.translate(-this.group.width/2 + this.left, -this.group.height / 2 + this.top);
-      }
-      else if (isInPathGroup && this.transformMatrix) {
-        ctx.translate(-this.group.width/2, -this.group.height/2);
-      }
-
       if (typeof Cufon === 'undefined' || this.useNative === true) {
         this._renderViaNative(ctx);
       }
@@ -368,8 +360,6 @@
      */
     _renderViaNative: function(ctx) {
       var textLines = this.text.split(this._reNewline);
-
-      this.transform(ctx, fabric.isLikelyNode);
 
       this._setTextStyles(ctx);
 
@@ -584,7 +574,7 @@
      * @param {Array} textLines Array of all text lines
      */
     _renderTextStroke: function(ctx, textLines) {
-      if (!this.stroke && !this._skipFillStrokeCheck) return;
+      if ((!this.stroke || this.strokeWidth == 0) && !this._skipFillStrokeCheck) return;
 
       var lineHeights = 0;
 
@@ -760,14 +750,23 @@
      * Renders text instance on a specified context
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    render: function(ctx) {
+    render: function(ctx, noTransform) {
       // do not render if object is not visible
       if (!this.visible) return;
 
       ctx.save();
+      this._transform(ctx, noTransform);
+
       var m = this.transformMatrix;
-      if (m && (!this.group || this.group.type === 'path-group')) {
+      var isInPathGroup = this.group && this.group.type === 'path-group';
+      if (isInPathGroup) {
+        ctx.translate(-this.group.width/2, -this.group.height/2);
+      }
+      if (m) {
         ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
+      }
+      if (isInPathGroup) {
+        ctx.translate(this.left, this.top);
       }
       this._render(ctx);
       ctx.restore();
@@ -1084,6 +1083,7 @@
 
     if (!options.originX) {
       options.originX = 'center';
+      options.originX = 'left';
     }
 
     var text = new fabric.Text(element.textContent, options);
@@ -1093,9 +1093,15 @@
         x/y attributes in SVG correspond to the bottom-left corner of text bounding box
         top/left properties in Fabric correspond to center point of text bounding box
     */
-
+    var offX = 0;
+    if (text.originX == 'left') {
+      offX = text.getWidth() / 2;
+    }
+    if (text.originX == 'right') {
+      offX = -text.getWidth() / 2;
+    }
     text.set({
-      left: text.getLeft() + text.getWidth() / 2,
+      left: text.getLeft() + offX,
       top: text.getTop() - text.getHeight() / 2
     });
 
