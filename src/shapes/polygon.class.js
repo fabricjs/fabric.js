@@ -46,14 +46,14 @@
       options = options || { };
       this.points = points;
       this.callSuper('initialize', options);
-      if (!skipOffset) this._calcDimensions(skipOffset);
+      this._calcDimensions(skipOffset);
     },
 
     /**
      * @private
      * @param {Boolean} [skipOffset] Whether points offsetting should be skipped
      */
-    _calcDimensions: function() {
+    _calcDimensions: function(skipOffset) {
 
       var points = this.points,
           minX = min(points, 'x'),
@@ -66,6 +66,8 @@
 
       this.minX = minX;
       this.minY = minY;
+
+      if (skipOffset) return;
 
       var halfWidth = this.width / 2 + this.minX,
           halfHeight = this.height / 2 + this.minY;
