@@ -1082,7 +1082,6 @@
     }
 
     if (!options.originX) {
-      options.originX = 'center';
       options.originX = 'left';
     }
 
