@@ -1087,7 +1087,7 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _renderStroke: function(ctx) {
-      if (!this.stroke) return;
+      if (!this.stroke || this.strokeWidth === 0) return;
 
       ctx.save();
       if (this.strokeDashArray) {
