@@ -50,7 +50,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
     var _this = this;
     this._enlivenObjects(serialized.objects, function () {
-      _this._setBgOverlay(serialized, callback);
+        if (serialized.filters && serialized.filters.length) {
+            fabric.util.enlivenObjects(serialized.filters, function (enlivenedObjects) {
+                _this.filters = enlivenedObjects;
+                _this._setBgOverlay(serialized, callback);
+            }, 'fabric.Image.filters');
+        } else {
+            _this._setBgOverlay(serialized, callback);
+        }
     }, reviver);
 
     return this;
