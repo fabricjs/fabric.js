@@ -144,19 +144,19 @@
       switch (unit[0]) {
         case 'mm':
           return number * fabric.DPI / 25.4;
-          break;
+
         case 'cm':
           return number * fabric.DPI / 2.54;
-          break;
+
         case 'in':
           return number * fabric.DPI;
-          break;
+
         case 'pt':
           return number * fabric.DPI / 72; // or * 4 / 3
-          break;
+
         case 'pc':
-          return number * fabric.DPI / 72 * 12; // or * 16 
-          break;
+          return number * fabric.DPI / 72 * 12; // or * 16
+
         default:
           return number;
       }
@@ -253,7 +253,8 @@
      * @memberOf fabric.util
      * @param {Array} objects Objects to enliven
      * @param {Function} callback Callback to invoke when all objects are created
-     * @param {Function} Method for further parsing of object elements,
+     * @param {String} namespace Namespace to get klass "Class" object from
+     * @param {Function} reviver Method for further parsing of object elements,
      * called after each fabric object created.
      */
     enlivenObjects: function(objects, callback, namespace, reviver) {
