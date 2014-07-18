@@ -39,14 +39,14 @@ fabric.ElementsParser.prototype.createObject = function(el, index) {
 
 fabric.ElementsParser.prototype._createObject = function(klass, el, index) {
   if (klass.async) {
-    klass.fromElement(el, this.createCallback(index, el), this.options);
+    var obj = klass.fromElement(el, null, this.options);
   }
   else {
     var obj = klass.fromElement(el, this.options);
-    this.reviver && this.reviver(el, obj);
-    this.instances.splice(index, 0, obj);
-    this.checkIfDone();
   }
+  this.reviver && this.reviver(el, obj);
+  this.instances.splice(index, 0, obj);
+  this.checkIfDone();
 };
 
 fabric.ElementsParser.prototype.createCallback = function(index, el) {
