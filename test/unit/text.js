@@ -158,7 +158,7 @@
       width: 8,
       height: 20.8,
       fontSize: 16,
-      originX: 'center'
+      originX: 'left'
     });
 
     deepEqual(text.toObject(), expectedObject);
@@ -184,6 +184,7 @@
     elTextWithAttrs.setAttribute('font-weight', 'bold');
     elTextWithAttrs.setAttribute('font-size', '123');
     elTextWithAttrs.setAttribute('text-decoration', 'underline');
+    elTextWithAttrs.setAttribute('text-anchor', 'middle');
 
     var textWithAttrs = fabric.Text.fromElement(elTextWithAttrs);
     // temp workaround for text objects not obtaining width under node
