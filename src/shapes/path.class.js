@@ -728,7 +728,11 @@
    */
   fabric.Path.fromElement = function(element, callback, options) {
     var parsedAttributes = fabric.parseAttributes(element, fabric.Path.ATTRIBUTE_NAMES);
-    callback && callback(new fabric.Path(parsedAttributes.d, extend(parsedAttributes, options)));
+    if (callback) {
+      callback(new fabric.Path(parsedAttributes.d, extend(parsedAttributes, options)));
+    } else {
+      return new fabric.Path(parsedAttributes.d, extend(parsedAttributes, options));
+    }
   };
   /* _FROM_SVG_END_ */
 
