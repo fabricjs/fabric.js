@@ -574,7 +574,7 @@
      * @param {Array} textLines Array of all text lines
      */
     _renderTextStroke: function(ctx, textLines) {
-      if ((!this.stroke || this.strokeWidth == 0) && !this._skipFillStrokeCheck) return;
+      if ((!this.stroke || this.strokeWidth === 0) && !this._skipFillStrokeCheck) return;
 
       var lineHeights = 0;
 
@@ -1093,10 +1093,10 @@
         top/left properties in Fabric correspond to center point of text bounding box
     */
     var offX = 0;
-    if (text.originX == 'left') {
+    if (text.originX === 'left') {
       offX = text.getWidth() / 2;
     }
-    if (text.originX == 'right') {
+    if (text.originX === 'right') {
       offX = -text.getWidth() / 2;
     }
     text.set({
