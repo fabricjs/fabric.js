@@ -400,6 +400,20 @@
   }
 
   /**
+   * Add a <g> element that envelop all SCG elements and makes the viewbox transformMatrix descend on all elements
+   */
+  function addSvgTransform(doc, matrix) {
+    var el = document.createElement('g'),
+        nodelist = doc.childNodes;
+    while (doc.firstChild != null) {
+      var node = doc.firstChild;
+      el.appendChild(node);
+    }
+    el.setAttribute('transform','matrix(' + matrix[0] + ' ' + matrix[1] + ' ' + matrix[2] + ' ' + matrix[3] + ' ' + matrix[4] + ' ' + matrix[5] + ')');
+    doc.appendChild(el);
+  }
+
+  /**
    * Parses an SVG document, converts it to an array of corresponding fabric.* instances and passes them to a callback
    * @static
    * @function
@@ -441,6 +455,34 @@
       var startTime = new Date();
 
       parseUseDirectives(doc);
+
+      var viewBoxAttr = doc.getAttribute('viewBox'),
+          widthAttr = parseFloat(doc.getAttribute('width')),
+          heightAttr = parseFloat(doc.getAttribute('height')),
+          viewBoxWidth,
+          viewBoxHeight,
+          scaleX = 1,
+          scaleY = 1;
+
+      if (viewBoxAttr && (viewBoxAttr = viewBoxAttr.match(reViewBoxAttrValue))) {
+        var minX = parseFloat(viewBoxAttr[1]);
+        var minY = parseFloat(viewBoxAttr[2]);
+        viewBoxWidth = parseFloat(viewBoxAttr[3]);
+        viewBoxHeight = parseFloat(viewBoxAttr[4]);
+        if (widthAttr && widthAttr != viewBoxWidth ) {
+          scaleX = widthAttr / viewBoxWidth;
+        }
+        if (heightAttr && heightAttr != viewBoxHeight) {
+          scaleY = heightAttr / viewBoxHeight;
+        }
+        // default is to preserve aspect ratio
+        // preserveAspectRatio attribute to be implemented
+        scaleY = scaleX = (scaleX > scaleY ? scaleY : scaleX);
+        if (scaleX !== 1 || scaleY !== 1 || minX !== 0 || minY !== 0) {
+          var vbMatrix = [scaleX, 0, 0, scaleY, -minX * scaleX, -minY * scaleY];
+          addSvgTransform(doc, vbMatrix);
+        }
+      }
 
       var descendants = fabric.util.toArray(doc.getElementsByTagName('*'));
 
@@ -493,14 +535,14 @@
       }
 
       var options = {
-        width: width,
-        height: height,
+        width: widthAttr ? widthAttr : viewBoxWidth,
+        height: heightAttr ? heightAttr : viewBoxHeight,
         widthAttr: widthAttr,
         heightAttr: heightAttr
       };
 
-      fabric.gradientDefs = fabric.getGradientDefs(doc);
-      fabric.cssRules = fabric.getCSSRules(doc);
+      fabric.gradientDefs = extend(fabric.getGradientDefs(doc), fabric.gradientDefs);
+      fabric.cssRules = extend(fabric.getCSSRules(doc), fabric.cssRules);
       // Precedence of rules:   style > class > attribute
 
       fabric.parseElements(elements, function(instances) {
