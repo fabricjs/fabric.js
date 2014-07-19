@@ -403,6 +403,12 @@
    * Add a <g> element that envelop all SCG elements and makes the viewbox transformMatrix descend on all elements
    */
   function addSvgTransform(doc, matrix) {
+    matrix[3] = matrix[0] = (matrix[0] > matrix[3] ? matrix[3] : matrix[0]);
+    if (!(matrix[0] !== 1 || matrix[3] !== 1 || matrix[4] !== 0 || matrix[5] !== 0)) return;
+    // default is to preserve aspect ratio
+    // preserveAspectRatio attribute to be implemented
+    matrix[4] *= matrix[0];
+    matrix[5] *= matrix[3];
     var el = document.createElement('g');
     while (doc.firstChild != null) {
       var node = doc.firstChild;
@@ -473,13 +479,7 @@
         if (heightAttr && heightAttr !== viewBoxHeight) {
           scaleY = heightAttr / viewBoxHeight;
         }
-        // default is to preserve aspect ratio
-        // preserveAspectRatio attribute to be implemented
-        scaleY = scaleX = (scaleX > scaleY ? scaleY : scaleX);
-        if (scaleX !== 1 || scaleY !== 1 || minX !== 0 || minY !== 0) {
-          var vbMatrix = [scaleX, 0, 0, scaleY, -minX * scaleX, -minY * scaleY];
-          addSvgTransform(doc, vbMatrix);
-        }
+        addSvgTransform(doc, [scaleX, 0, 0, scaleY, -minX, -minY]);
       }
 
       var descendants = fabric.util.toArray(doc.getElementsByTagName('*'));
