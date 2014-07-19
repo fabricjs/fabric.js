@@ -400,6 +400,25 @@
   }
 
   /**
+   * Add a <g> element that envelop all SCG elements and makes the viewbox transformMatrix descend on all elements
+   */
+  function addSvgTransform(doc, matrix) {
+    matrix[3] = matrix[0] = (matrix[0] > matrix[3] ? matrix[3] : matrix[0]);
+    if (!(matrix[0] !== 1 || matrix[3] !== 1 || matrix[4] !== 0 || matrix[5] !== 0)) return;
+    // default is to preserve aspect ratio
+    // preserveAspectRatio attribute to be implemented
+    matrix[4] *= matrix[0];
+    matrix[5] *= matrix[3];
+    var el = document.createElement('g');
+    while (doc.firstChild != null) {
+      var node = doc.firstChild;
+      el.appendChild(node);
+    }
+    el.setAttribute('transform','matrix(' + matrix[0] + ' ' + matrix[1] + ' ' + matrix[2] + ' ' + matrix[3] + ' ' + matrix[4] + ' ' + matrix[5] + ')');
+    doc.appendChild(el);
+  }
+
+  /**
    * Parses an SVG document, converts it to an array of corresponding fabric.* instances and passes them to a callback
    * @static
    * @function
@@ -442,6 +461,27 @@
 
       parseUseDirectives(doc);
 
+      var viewBoxAttr = doc.getAttribute('viewBox'),
+          widthAttr = parseFloat(doc.getAttribute('width')),
+          heightAttr = parseFloat(doc.getAttribute('height')),
+          viewBoxWidth,
+          viewBoxHeight;
+
+      if (viewBoxAttr && (viewBoxAttr = viewBoxAttr.match(reViewBoxAttrValue))) {
+        var minX = parseFloat(viewBoxAttr[1]),
+            minY = parseFloat(viewBoxAttr[2]),
+            scaleX = 1, scaleY = 1;
+        viewBoxWidth = parseFloat(viewBoxAttr[3]);
+        viewBoxHeight = parseFloat(viewBoxAttr[4]);
+        if (widthAttr && widthAttr !== viewBoxWidth ) {
+          scaleX = widthAttr / viewBoxWidth;
+        }
+        if (heightAttr && heightAttr !== viewBoxHeight) {
+          scaleY = heightAttr / viewBoxHeight;
+        }
+        addSvgTransform(doc, [scaleX, 0, 0, scaleY, -minX, -minY]);
+      }
+
       var descendants = fabric.util.toArray(doc.getElementsByTagName('*'));
 
       if (descendants.length === 0 && fabric.isLikelyNode) {
@@ -465,42 +505,15 @@
         return;
       }
 
-      var viewBoxAttr = doc.getAttribute('viewBox'),
-          widthAttr = parseFloat(doc.getAttribute('width')),
-          heightAttr = parseFloat(doc.getAttribute('height')),
-          width = null,
-          height = null,
-          viewBoxWidth,
-          viewBoxHeight,
-          minX,
-          minY;
-
-      if (viewBoxAttr && (viewBoxAttr = viewBoxAttr.match(reViewBoxAttrValue))) {
-        minX = parseFloat(viewBoxAttr[1]);
-        minY = parseFloat(viewBoxAttr[2]);
-        viewBoxWidth = parseFloat(viewBoxAttr[3]);
-        viewBoxHeight = parseFloat(viewBoxAttr[4]);
-      }
-
-      if (viewBoxWidth && widthAttr && viewBoxWidth !== widthAttr) {
-        width = viewBoxWidth;
-        height = viewBoxHeight;
-      }
-      else {
-        // values of width/height attributes overwrite those extracted from viewbox attribute
-        width = widthAttr ? widthAttr : viewBoxWidth;
-        height = heightAttr ? heightAttr : viewBoxHeight;
-      }
-
       var options = {
-        width: width,
-        height: height,
+        width: widthAttr ? widthAttr : viewBoxWidth,
+        height: heightAttr ? heightAttr : viewBoxHeight,
         widthAttr: widthAttr,
         heightAttr: heightAttr
       };
 
-      fabric.gradientDefs = fabric.getGradientDefs(doc);
-      fabric.cssRules = fabric.getCSSRules(doc);
+      fabric.gradientDefs = extend(fabric.getGradientDefs(doc), fabric.gradientDefs);
+      fabric.cssRules = extend(fabric.getCSSRules(doc), fabric.cssRules);
       // Precedence of rules:   style > class > attribute
 
       fabric.parseElements(elements, function(instances) {

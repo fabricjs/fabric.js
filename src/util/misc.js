@@ -311,12 +311,7 @@
     groupSVGElements: function(elements, options, path) {
       var object;
 
-      if (elements.length > 1) {
-        object = new fabric.PathGroup(elements, options);
-      }
-      else {
-        object = elements[0];
-      }
+      object = new fabric.PathGroup(elements, options);
 
       if (typeof path !== 'undefined') {
         object.setSourcePath(path);
