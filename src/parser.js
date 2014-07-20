@@ -407,8 +407,6 @@
     if (!(matrix[0] !== 1 || matrix[3] !== 1 || matrix[4] !== 0 || matrix[5] !== 0)) return;
     // default is to preserve aspect ratio
     // preserveAspectRatio attribute to be implemented
-    matrix[4] *= matrix[0];
-    matrix[5] *= matrix[3];
     var el = document.createElement('g');
     while (doc.firstChild != null) {
       var node = doc.firstChild;
