@@ -630,12 +630,7 @@ fabric.Collection = {
     groupSVGElements: function(elements, options, path) {
       var object;
 
-      if (elements.length > 1) {
-        object = new fabric.PathGroup(elements, options);
-      }
-      else {
-        object = elements[0];
-      }
+      object = new fabric.PathGroup(elements, options);
 
       if (typeof path !== 'undefined') {
         object.setSourcePath(path);
@@ -3112,6 +3107,25 @@ if (typeof console !== 'undefined') {
   }
 
   /**
+   * Add a <g> element that envelop all SCG elements and makes the viewbox transformMatrix descend on all elements
+   */
+  function addSvgTransform(doc, matrix) {
+    matrix[3] = matrix[0] = (matrix[0] > matrix[3] ? matrix[3] : matrix[0]);
+    if (!(matrix[0] !== 1 || matrix[3] !== 1 || matrix[4] !== 0 || matrix[5] !== 0)) return;
+    // default is to preserve aspect ratio
+    // preserveAspectRatio attribute to be implemented
+    matrix[4] *= matrix[0];
+    matrix[5] *= matrix[3];
+    var el = document.createElement('g');
+    while (doc.firstChild != null) {
+      var node = doc.firstChild;
+      el.appendChild(node);
+    }
+    el.setAttribute('transform','matrix(' + matrix[0] + ' ' + matrix[1] + ' ' + matrix[2] + ' ' + matrix[3] + ' ' + matrix[4] + ' ' + matrix[5] + ')');
+    doc.appendChild(el);
+  }
+
+  /**
    * Parses an SVG document, converts it to an array of corresponding fabric.* instances and passes them to a callback
    * @static
    * @function
@@ -3154,6 +3168,27 @@ if (typeof console !== 'undefined') {
 
       parseUseDirectives(doc);
 
+      var viewBoxAttr = doc.getAttribute('viewBox'),
+          widthAttr = parseFloat(doc.getAttribute('width')),
+          heightAttr = parseFloat(doc.getAttribute('height')),
+          viewBoxWidth,
+          viewBoxHeight;
+
+      if (viewBoxAttr && (viewBoxAttr = viewBoxAttr.match(reViewBoxAttrValue))) {
+        var minX = parseFloat(viewBoxAttr[1]),
+            minY = parseFloat(viewBoxAttr[2]),
+            scaleX = 1, scaleY = 1;
+        viewBoxWidth = parseFloat(viewBoxAttr[3]);
+        viewBoxHeight = parseFloat(viewBoxAttr[4]);
+        if (widthAttr && widthAttr !== viewBoxWidth ) {
+          scaleX = widthAttr / viewBoxWidth;
+        }
+        if (heightAttr && heightAttr !== viewBoxHeight) {
+          scaleY = heightAttr / viewBoxHeight;
+        }
+        addSvgTransform(doc, [scaleX, 0, 0, scaleY, -minX, -minY]);
+      }
+
       var descendants = fabric.util.toArray(doc.getElementsByTagName('*'));
 
       if (descendants.length === 0 && fabric.isLikelyNode) {
@@ -3177,42 +3212,15 @@ if (typeof console !== 'undefined') {
         return;
       }
 
-      var viewBoxAttr = doc.getAttribute('viewBox'),
-          widthAttr = parseFloat(doc.getAttribute('width')),
-          heightAttr = parseFloat(doc.getAttribute('height')),
-          width = null,
-          height = null,
-          viewBoxWidth,
-          viewBoxHeight,
-          minX,
-          minY;
-
-      if (viewBoxAttr && (viewBoxAttr = viewBoxAttr.match(reViewBoxAttrValue))) {
-        minX = parseFloat(viewBoxAttr[1]);
-        minY = parseFloat(viewBoxAttr[2]);
-        viewBoxWidth = parseFloat(viewBoxAttr[3]);
-        viewBoxHeight = parseFloat(viewBoxAttr[4]);
-      }
-
-      if (viewBoxWidth && widthAttr && viewBoxWidth !== widthAttr) {
-        width = viewBoxWidth;
-        height = viewBoxHeight;
-      }
-      else {
-        // values of width/height attributes overwrite those extracted from viewbox attribute
-        width = widthAttr ? widthAttr : viewBoxWidth;
-        height = heightAttr ? heightAttr : viewBoxHeight;
-      }
-
       var options = {
-        width: width,
-        height: height,
+        width: widthAttr ? widthAttr : viewBoxWidth,
+        height: heightAttr ? heightAttr : viewBoxHeight,
         widthAttr: widthAttr,
         heightAttr: heightAttr
       };
 
-      fabric.gradientDefs = fabric.getGradientDefs(doc);
-      fabric.cssRules = fabric.getCSSRules(doc);
+      fabric.gradientDefs = extend(fabric.getGradientDefs(doc), fabric.gradientDefs);
+      fabric.cssRules = extend(fabric.getCSSRules(doc), fabric.cssRules);
       // Precedence of rules:   style > class > attribute
 
       fabric.parseElements(elements, function(instances) {
@@ -3662,7 +3670,7 @@ fabric.ElementsParser.prototype._createObject = function(klass, el, index) {
   else {
     var obj = klass.fromElement(el, this.options);
     this.reviver && this.reviver(el, obj);
-    this.instances.splice(index, 0, obj);
+    this.instances[index] = obj;
     this.checkIfDone();
   }
 };
@@ -3671,7 +3679,7 @@ fabric.ElementsParser.prototype.createCallback = function(index, el) {
   var _this = this;
   return function(obj) {
     _this.reviver && _this.reviver(el, obj);
-    _this.instances.splice(index, 0, obj);
+    _this.instances[index] = obj;
     _this.checkIfDone();
   };
 };
@@ -11125,7 +11133,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _renderStroke: function(ctx) {
-      if (!this.stroke) return;
+      if (!this.stroke || this.strokeWidth === 0) return;
 
       ctx.save();
       if (this.strokeDashArray) {
@@ -13331,16 +13339,17 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       ctx.beginPath();
 
       var isInPathGroup = this.group && this.group.type === 'path-group';
-      if (isInPathGroup && !this.transformMatrix) {
+      if (isInPathGroup) {
         //  Line coords are distances from left-top of canvas to origin of line.
         //
         //  To render line in a path-group, we need to translate them to
         //  distances from center of path-group to center of line.
         var cp = this.getCenterPoint();
         ctx.translate(
-          -this.group.width/2 + cp.x,
-          -this.group.height / 2 + cp.y
+          cp.x,
+          cp.y
         );
+        if (!this.transformMatrix) ctx.translate(-this.group.width / 2, -this.group.height / 2);
       }
 
       if (!this.strokeDashArray || this.strokeDashArray && supportsLineDash) {
@@ -14488,8 +14497,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     var points = fabric.parsePointsAttribute(element.getAttribute('points')),
         parsedAttributes = fabric.parseAttributes(element, fabric.Polyline.ATTRIBUTE_NAMES);
 
-    fabric.util.normalizePoints(points, options);
-
+    if (!('transformMatrix' in parsedAttributes)) {
+      fabric.util.normalizePoints(points, options);
+    }
     return new fabric.Polyline(points, fabric.util.object.extend(parsedAttributes, options), true);
   };
   /* _FROM_SVG_END_ */
@@ -14698,8 +14708,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     var points = fabric.parsePointsAttribute(element.getAttribute('points')),
         parsedAttributes = fabric.parseAttributes(element, fabric.Polygon.ATTRIBUTE_NAMES);
 
-    fabric.util.normalizePoints(points, options);
-
+    if (!('transformMatrix' in parsedAttributes)) {
+      fabric.util.normalizePoints(points, options);
+    }
     return new fabric.Polygon(points, extend(parsedAttributes, options), true);
   };
   /* _FROM_SVG_END_ */
@@ -14876,7 +14887,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @private
      * @param {CanvasRenderingContext2D} ctx context to render path on
      */
-    _render: function(ctx) {
+    _render: function(ctx, noTransform) {
       var current, // current instruction
           previous = null,
           subpathStartX = 0,
@@ -14891,6 +14902,11 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           tempControlY,
           l = -((this.width / 2) + this.pathOffset.x),
           t = -((this.height / 2) + this.pathOffset.y);
+
+      if (noTransform) {
+        l += this.width / 2;
+        t += this.height / 2;
+      }
 
       for (var i = 0, len = this.path.length; i < len; ++i) {
 
@@ -15173,6 +15189,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       if (!this.visible) return;
 
       ctx.save();
+      if (noTransform) {
+        ctx.translate(-this.width/2, -this.height/2);	
+      }      
       var m = this.transformMatrix;
 
       if (m) {
@@ -15187,7 +15206,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       this.clipTo && fabric.util.clipContext(this, ctx);
       ctx.beginPath();
       ctx.globalAlpha = this.group ? (ctx.globalAlpha * this.opacity) : this.opacity;
-      this._render(ctx);
+      this._render(ctx, noTransform);
       this._renderFill(ctx);
       this._renderStroke(ctx);
       this.clipTo && ctx.restore();
@@ -18438,14 +18457,6 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      */
     _render: function(ctx) {
 
-      var isInPathGroup = this.group && this.group.type === 'path-group';
-      if (isInPathGroup && !this.transformMatrix) {
-        ctx.translate(-this.group.width/2 + this.left, -this.group.height / 2 + this.top);
-      }
-      else if (isInPathGroup && this.transformMatrix) {
-        ctx.translate(-this.group.width/2, -this.group.height/2);
-      }
-
       if (typeof Cufon === 'undefined' || this.useNative === true) {
         this._renderViaNative(ctx);
       }
@@ -18460,8 +18471,6 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      */
     _renderViaNative: function(ctx) {
       var textLines = this.text.split(this._reNewline);
-
-      this.transform(ctx, fabric.isLikelyNode);
 
       this._setTextStyles(ctx);
 
@@ -18676,7 +18685,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @param {Array} textLines Array of all text lines
      */
     _renderTextStroke: function(ctx, textLines) {
-      if (!this.stroke && !this._skipFillStrokeCheck) return;
+      if ((!this.stroke || this.strokeWidth === 0) && !this._skipFillStrokeCheck) return;
 
       var lineHeights = 0;
 
@@ -18852,14 +18861,23 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * Renders text instance on a specified context
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    render: function(ctx) {
+    render: function(ctx, noTransform) {
       // do not render if object is not visible
       if (!this.visible) return;
 
       ctx.save();
+      this._transform(ctx, noTransform);
+
       var m = this.transformMatrix;
-      if (m && (!this.group || this.group.type === 'path-group')) {
+      var isInPathGroup = this.group && this.group.type === 'path-group';
+      if (isInPathGroup) {
+        ctx.translate(-this.group.width/2, -this.group.height/2);
+      }
+      if (m) {
         ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
+      }
+      if (isInPathGroup) {
+        ctx.translate(this.left, this.top);
       }
       this._render(ctx);
       ctx.restore();
@@ -19175,7 +19193,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     }
 
     if (!options.originX) {
-      options.originX = 'center';
+      options.originX = 'left';
     }
 
     var text = new fabric.Text(element.textContent, options);
@@ -19185,9 +19203,15 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
         x/y attributes in SVG correspond to the bottom-left corner of text bounding box
         top/left properties in Fabric correspond to center point of text bounding box
     */
-
+    var offX = 0;
+    if (text.originX === 'left') {
+      offX = text.getWidth() / 2;
+    }
+    if (text.originX === 'right') {
+      offX = -text.getWidth() / 2;
+    }
     text.set({
-      left: text.getLeft() + text.getWidth() / 2,
+      left: text.getLeft() + offX,
       top: text.getTop() - text.getHeight() / 2
     });
 
