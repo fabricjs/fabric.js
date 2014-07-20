@@ -649,7 +649,7 @@
           parentAttributes = { };
 
       // if there's a parent container (`g` node), parse its attributes recursively upwards
-      if (element.parentNode && /^g$/i.test(element.parentNode.nodeName)) {
+      if (element.parentNode && /^[g|a]$/i.test(element.parentNode.nodeName)) {
         parentAttributes = fabric.parseAttributes(element.parentNode, attributes);
       }
 
