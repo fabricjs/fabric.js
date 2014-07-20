@@ -371,8 +371,8 @@
    */
   function parseUseDirectives(doc) {
     var nodelist = doc.getElementsByTagName('use');
-    for (var i = 0, len = nodelist.length; i < len; i++) {
-      var el = nodelist[i],
+    while (nodelist.length) {
+      var el = nodelist[0],
           xlink = el.getAttribute('xlink:href').substr(1),
           x = el.getAttribute('x') || 0,
           y = el.getAttribute('y') || 0,
