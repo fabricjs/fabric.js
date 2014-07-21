@@ -794,7 +794,7 @@
       for (var l = 0; l < styles.length; l++) {
         var doc2 = document.implementation.createHTMLDocument(""),
           styleElement = document.createElement("style");
-        styleElement.textContent = styles[l].textContent;
+        styleElement.textContent = styles[l].textContent || styles.context.nodeTypedValue;
         doc2.body.appendChild(styleElement);
         for (var i = 0; i < styleElement.sheet.cssRules.length; i++) {
           var ruleObj = { }, rule = styleElement.sheet.cssRules[i];
