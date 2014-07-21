@@ -378,7 +378,7 @@
       element = element.parentNode;
       parentMatching = selectorMatch(element, word);
     }
-    return (words.length === 0)
+    return (words.length === 0);
   }
   /**
    * @private
@@ -389,16 +389,16 @@
         id = element.getAttribute('id'), myRe;
     // i check if a selector matches slicing away part from it.
     // if i get empty string i should match
-    myRe = new RegExp("^" + nodeName, "i");
+    myRe = new RegExp('^' + nodeName, 'i');
     word = word.replace(myRe,'');
     if (id && word.length) {
-      myRe = new RegExp("#" + id + "(?![a-zA-Z\-]+)", "i");
+      myRe = new RegExp('#' + id + "(?![a-zA-Z\\-]+)", 'i');
       word = word.replace(myRe,'');
     }
     if (classNames && word.length) {
       classNames = classNames.split(' ');
       for (var i = classNames.length; i--;) {
-        myRe = new RegExp("\." + classNames[i] + "(?![a-zA-Z\-]+)", "i");
+        myRe = new RegExp("\\." + classNames[i] + "(?![a-zA-Z\\-]+)", "i");
         word = word.replace(myRe,'');
       }
     }
