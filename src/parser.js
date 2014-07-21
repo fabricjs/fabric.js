@@ -790,20 +790,23 @@
      */
     getCSSRules: function(doc) {
       var styles = doc.getElementsByTagName('style'),
-          allRules = { }, doc2 = document.implementation.createHTMLDocument(""),
+          allRules = { };
+      for (var l = 0; l < styles.length; l++) {
+        var doc2 = document.implementation.createHTMLDocument(""),
           styleElement = document.createElement("style");
-      styleElement.textContent = styles[0].textContent;
-      doc2.body.appendChild(styleElement);
-      for (var i=0; i < styleElement.sheet.cssRules.length; i++) {
-        var ruleObj = { }, rule = styleElement.sheet.cssRules[i];
-        for ( var j = 0; j < rule.style.length; j++) {
-          var property = normalizeAttr(rule.style[j]),
-              value = normalizeValue(property,rule.style.getPropertyValue(rule.style[j]));
-          ruleObj[property] = value;
+        styleElement.textContent = styles[l].textContent;
+        doc2.body.appendChild(styleElement);
+        for (var i = 0; i < styleElement.sheet.cssRules.length; i++) {
+          var ruleObj = { }, rule = styleElement.sheet.cssRules[i];
+          for ( var j = 0; j < rule.style.length; j++) {
+            var property = normalizeAttr(rule.style[j]),
+                value = normalizeValue(property,rule.style.getPropertyValue(rule.style[j]));
+            ruleObj[property] = value;
+          }
+          rule.selectorText.split(',').forEach(function(selector) {
+            allRules[selector] = ruleObj;
+          });
         }
-        rule.selectorText.split(',').forEach(function(selector) {
-          allRules[selector] = ruleObj;
-        });
       }
       return allRules;
     },
