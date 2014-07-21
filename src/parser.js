@@ -107,8 +107,6 @@
 
       var color = new fabric.Color(attributes[attr]);
       attributes[attr] = color.setAlpha(toFixed(color.getAlpha() * attributes[colorAttributes[attr]], 2)).toRgba();
-
-      delete attributes[colorAttributes[attr]];
     }
     return attributes;
   }
@@ -344,26 +342,65 @@
    * @private
    */
   function getGlobalStylesForElement(element) {
-    var nodeName = element.nodeName,
-        className = element.getAttribute('class'),
-        id = element.getAttribute('id'),
-        styles = { };
-
+    var styles = { };
+    
     for (var rule in fabric.cssRules) {
-      var ruleMatchesElement = (className && new RegExp('^\\.' + className).test(rule)) ||
-                               (id && new RegExp('^#' + id).test(rule)) ||
-                               (new RegExp('^' + nodeName).test(rule));
-
-      if (ruleMatchesElement) {
+      if (doesItReallyMatch(element, rule.split(' '))) {
         for (var property in fabric.cssRules[rule]) {
-          var attr = normalizeAttr(property),
-              value = normalizeValue(attr, fabric.cssRules[rule][property]);
-          styles[attr] = value;
+          styles[property] = fabric.cssRules[rule][property];
         }
       }
     }
-
     return styles;
+  }
+
+  /**
+   * @private
+   */
+  function doesItReallyMatch(element, words) {
+    var firstMatching, parentMatching = true, word;
+    //take last word and cut pieces i have.
+    word = words.pop();
+    firstMatching = selectorMatch(element, word);
+    if (firstMatching && words.length) {
+      // still something to do with parents
+      parentMatching = doesSomeParentMatch(element, words);
+    }
+    return firstMatching && parentMatching && (words.length === 0);
+  }
+
+  function doesSomeParentMatch(element, words) {
+    var word, parentMatching = true;
+    while (element.parentNode && element.parentNode.nodeType === 1 && words.length) {
+      if (parentMatching) word = words.pop();
+      element = element.parentNode;
+      parentMatching = selectorMatch(element, word);
+    }
+    return (words.length === 0)
+  }
+  /**
+   * @private
+   */
+  function selectorMatch(element, word) {
+    var nodeName = element.nodeName,
+        classNames = element.getAttribute('class'),
+        id = element.getAttribute('id'), myRe;
+    // i check if a selector matches slicing away part from it.
+    // if i get empty string i should match
+    myRe = new RegExp("^" + nodeName, "i");
+    word = word.replace(myRe,'');
+    if (id && word.length) {
+      myRe = new RegExp("#" + id + "(?![a-zA-Z\-]+)", "i");
+      word = word.replace(myRe,'');
+    }
+    if (classNames && word.length) {
+      classNames = classNames.split(' ');
+      for (var i = classNames.length; i--;) {
+        myRe = new RegExp("\." + classNames[i] + "(?![a-zA-Z\-]+)", "i");
+        word = word.replace(myRe,'');
+      }
+    }
+    return (word.length === 0);
   }
 
   /**
@@ -477,7 +514,7 @@
         if (heightAttr && heightAttr !== viewBoxHeight) {
           scaleY = heightAttr / viewBoxHeight;
         }
-        addSvgTransform(doc, [scaleX, 0, 0, scaleY, -minX, -minY]);
+        addSvgTransform(doc, [scaleX, 0, 0, scaleY, -minX * scaleX, -minY * scaleY]);
       }
 
       var descendants = fabric.util.toArray(doc.getElementsByTagName('*'));
@@ -510,8 +547,8 @@
         heightAttr: heightAttr
       };
 
-      fabric.gradientDefs = extend(fabric.getGradientDefs(doc), fabric.gradientDefs);
-      fabric.cssRules = extend(fabric.getCSSRules(doc), fabric.cssRules);
+      fabric.gradientDefs = fabric.getGradientDefs(doc);
+      fabric.cssRules = fabric.getCSSRules(doc);
       // Precedence of rules:   style > class > attribute
 
       fabric.parseElements(elements, function(instances) {
@@ -648,7 +685,7 @@
       var value,
           parentAttributes = { };
 
-      // if there's a parent container (`g` node), parse its attributes recursively upwards
+      // if there's a parent container (`g` or `a` node), parse its attributes recursively upwards
       if (element.parentNode && /^[g|a]$/i.test(element.parentNode.nodeName)) {
         parentAttributes = fabric.parseAttributes(element.parentNode, attributes);
       }
@@ -663,12 +700,10 @@
         }
         return memo;
       }, { });
-
       // add values parsed from style, which take precedence over attributes
       // (see: http://www.w3.org/TR/SVG/styling.html#UsingPresentationAttributes)
       ownAttributes = extend(ownAttributes,
         extend(getGlobalStylesForElement(element), fabric.parseStyleAttribute(element)));
-
       return _setStrokeFillOpacity(extend(parentAttributes, ownAttributes));
     },
 
@@ -755,39 +790,21 @@
      */
     getCSSRules: function(doc) {
       var styles = doc.getElementsByTagName('style'),
-          allRules = { },
-          rules;
-
-      // very crude parsing of style contents
-      for (var i = 0, len = styles.length; i < len; i++) {
-        var styleContents = styles[0].textContent;
-
-        // remove comments
-        styleContents = styleContents.replace(/\/\*[\s\S]*?\*\//g, '');
-
-        rules = styleContents.match(/[^{]*\{[\s\S]*?\}/g);
-        rules = rules.map(function(rule) { return rule.trim(); });
-
-        rules.forEach(function(rule) {
-          var match = rule.match(/([\s\S]*?)\s*\{([^}]*)\}/);
-          rule = match[1];
-          var declaration = match[2].trim(),
-              propertyValuePairs = declaration.replace(/;$/, '').split(/\s*;\s*/);
-
-          if (!allRules[rule]) {
-            allRules[rule] = { };
-          }
-
-          for (var i = 0, len = propertyValuePairs.length; i < len; i++) {
-            var pair = propertyValuePairs[i].split(/\s*:\s*/),
-                property = pair[0],
-                value = pair[1];
-
-            allRules[rule][property] = value;
-          }
+          allRules = { }, doc2 = document.implementation.createHTMLDocument(""),
+          styleElement = document.createElement("style");
+      styleElement.textContent = styles[0].textContent;
+      doc2.body.appendChild(styleElement);
+      for (var i=0; i < styleElement.sheet.cssRules.length; i++) {
+        var ruleObj = { }, rule = styleElement.sheet.cssRules[i];
+        for ( var j = 0; j < rule.style.length; j++) {
+          var property = normalizeAttr(rule.style[j]),
+              value = normalizeValue(property,rule.style.getPropertyValue(rule.style[j]));
+          ruleObj[property] = value;
+        }
+        rule.selectorText.split(',').forEach(function(selector) {
+          allRules[selector] = ruleObj;
         });
       }
-
       return allRules;
     },
 
