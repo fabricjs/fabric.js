@@ -347,7 +347,7 @@
     var styles = { };
     
     for (var rule in fabric.cssRules) {
-      if (doesItReallyMatch(element, rule.split(' '))) {
+      if (elementMatchRule(element, rule.split(' '))) {
         for (var property in fabric.cssRules[rule]) {
           styles[property] = fabric.cssRules[rule][property];
         }
@@ -359,50 +359,49 @@
   /**
    * @private
    */
-  function doesItReallyMatch(element, words) {
-    var firstMatching, parentMatching = true, word;
-    //take last word and cut pieces i have.
-    word = words.pop();
-    firstMatching = selectorMatch(element, word);
-    if (firstMatching && words.length) {
+  function elementMatchRule(element, selectors) {
+    var firstMatching, parentMatching = true;
+    //start from rightmost selector.
+    firstMatching = selectorMatch(element, selectors.pop());
+    if (firstMatching && selectors.length) {
       // still something to do with parents
-      parentMatching = doesSomeParentMatch(element, words);
+      parentMatching = doesSomeParentMatch(element, selectors);
     }
-    return firstMatching && parentMatching && (words.length === 0);
+    return firstMatching && parentMatching && (selectors.length === 0);
   }
 
-  function doesSomeParentMatch(element, words) {
-    var word, parentMatching = true;
-    while (element.parentNode && element.parentNode.nodeType === 1 && words.length) {
-      if (parentMatching) word = words.pop();
+  function doesSomeParentMatch(element, selectors) {
+    var selector, parentMatching = true;
+    while (element.parentNode && element.parentNode.nodeType === 1 && selectors.length) {
+      if (parentMatching) {selector = selectors.pop();}
       element = element.parentNode;
-      parentMatching = selectorMatch(element, word);
+      parentMatching = selectorMatch(element, selector);
     }
-    return (words.length === 0);
+    return selectors.length === 0;
   }
   /**
    * @private
    */
-  function selectorMatch(element, word) {
+  function selectorMatch(element, selector) {
     var nodeName = element.nodeName,
         classNames = element.getAttribute('class'),
-        id = element.getAttribute('id'), myRe;
+        id = element.getAttribute('id'), matcher;
     // i check if a selector matches slicing away part from it.
     // if i get empty string i should match
-    myRe = new RegExp('^' + nodeName, 'i');
-    word = word.replace(myRe,'');
-    if (id && word.length) {
-      myRe = new RegExp('#' + id + "(?![a-zA-Z\\-]+)", 'i');
-      word = word.replace(myRe,'');
+    matcher = new RegExp('^' + nodeName, 'i');
+    selector = selector.replace(matcher, '');
+    if (id && selector.length) {
+      matcher = new RegExp('#' + id + "(?![a-zA-Z\\-]+)", 'i');
+      selector = selector.replace(matcher, '');
     }
-    if (classNames && word.length) {
+    if (classNames && selector.length) {
       classNames = classNames.split(' ');
       for (var i = classNames.length; i--;) {
-        myRe = new RegExp("\\." + classNames[i] + "(?![a-zA-Z\\-]+)", "i");
-        word = word.replace(myRe,'');
+        matcher = new RegExp("\\." + classNames[i] + "(?![a-zA-Z\\-]+)", "i");
+        selector = selector.replace(matcher, '');
       }
     }
-    return (word.length === 0);
+    return selector.length === 0;
   }
 
   /**
