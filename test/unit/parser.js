@@ -188,7 +188,9 @@
 
     var expectedObject = {
       'fill': 'rgba(100,200,50,0.2)',
-      'stroke': 'rgba(0,128,0,0.5)'
+      'stroke': 'rgba(0,128,0,0.5)',
+      'fillOpacity': '0.2',
+      'strokeOpacity': '0.5'
     };
     deepEqual(fabric.parseAttributes(element, fabric.Path.ATTRIBUTE_NAMES), expectedObject);
   });
