@@ -371,8 +371,8 @@
    */
   function parseUseDirectives(doc) {
     var nodelist = doc.getElementsByTagName('use');
-    for (var i = 0, len = nodelist.length; i < len; i++) {
-      var el = nodelist[i],
+    while (nodelist.length) {
+      var el = nodelist[0],
           xlink = el.getAttribute('xlink:href').substr(1),
           x = el.getAttribute('x') || 0,
           y = el.getAttribute('y') || 0,
@@ -407,8 +407,6 @@
     if (!(matrix[0] !== 1 || matrix[3] !== 1 || matrix[4] !== 0 || matrix[5] !== 0)) return;
     // default is to preserve aspect ratio
     // preserveAspectRatio attribute to be implemented
-    matrix[4] *= matrix[0];
-    matrix[5] *= matrix[3];
     var el = document.createElement('g');
     while (doc.firstChild != null) {
       var node = doc.firstChild;
@@ -651,7 +649,7 @@
           parentAttributes = { };
 
       // if there's a parent container (`g` node), parse its attributes recursively upwards
-      if (element.parentNode && /^g$/i.test(element.parentNode.nodeName)) {
+      if (element.parentNode && /^[g|a]$/i.test(element.parentNode.nodeName)) {
         parentAttributes = fabric.parseAttributes(element.parentNode, attributes);
       }
 
