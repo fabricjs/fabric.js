@@ -347,7 +347,7 @@
     var styles = { };
     
     for (var rule in fabric.cssRules) {
-      if (elementMatchRule(element, rule.split(' '))) {
+      if (elementMatchesRule(element, rule.split(' '))) {
         for (var property in fabric.cssRules[rule]) {
           styles[property] = fabric.cssRules[rule][property];
         }
