@@ -359,10 +359,10 @@
   /**
    * @private
    */
-  function elementMatchRule(element, selectors) {
+  function elementMatchesRule(element, selectors) {
     var firstMatching, parentMatching = true;
     //start from rightmost selector.
-    firstMatching = selectorMatch(element, selectors.pop());
+    firstMatching = selectorMatches(element, selectors.pop());
     if (firstMatching && selectors.length) {
       // still something to do with parents
       parentMatching = doesSomeParentMatch(element, selectors);
@@ -373,16 +373,18 @@
   function doesSomeParentMatch(element, selectors) {
     var selector, parentMatching = true;
     while (element.parentNode && element.parentNode.nodeType === 1 && selectors.length) {
-      if (parentMatching) {selector = selectors.pop();}
+      if (parentMatching) {
+        selector = selectors.pop();
+      }
       element = element.parentNode;
-      parentMatching = selectorMatch(element, selector);
+      parentMatching = selectorMatches(element, selector);
     }
     return selectors.length === 0;
   }
   /**
    * @private
    */
-  function selectorMatch(element, selector) {
+  function selectorMatches(element, selector) {
     var nodeName = element.nodeName,
         classNames = element.getAttribute('class'),
         id = element.getAttribute('id'), matcher;
@@ -391,13 +393,13 @@
     matcher = new RegExp('^' + nodeName, 'i');
     selector = selector.replace(matcher, '');
     if (id && selector.length) {
-      matcher = new RegExp('#' + id + "(?![a-zA-Z\\-]+)", 'i');
+      matcher = new RegExp('#' + id + '(?![a-zA-Z\\-]+)', 'i');
       selector = selector.replace(matcher, '');
     }
     if (classNames && selector.length) {
       classNames = classNames.split(' ');
       for (var i = classNames.length; i--;) {
-        matcher = new RegExp("\\." + classNames[i] + "(?![a-zA-Z\\-]+)", "i");
+        matcher = new RegExp('\\.' + classNames[i] + '(?![a-zA-Z\\-]+)', 'i');
         selector = selector.replace(matcher, '');
       }
     }
@@ -793,15 +795,15 @@
       var styles = doc.getElementsByTagName('style'),
           allRules = { };
       for (var l = 0; l < styles.length; l++) {
-        var doc2 = document.implementation.createHTMLDocument(""),
-          styleElement = document.createElement("style");
+        var doc2 = document.implementation.createHTMLDocument(''),
+          styleElement = document.createElement('style');
         styleElement.textContent = styles[l].textContent || styles.context.nodeTypedValue;
         doc2.body.appendChild(styleElement);
         for (var i = 0; i < styleElement.sheet.cssRules.length; i++) {
           var ruleObj = { }, rule = styleElement.sheet.cssRules[i];
           for ( var j = 0; j < rule.style.length; j++) {
             var property = normalizeAttr(rule.style[j]),
-                value = normalizeValue(property,rule.style.getPropertyValue(rule.style[j]));
+                value = normalizeValue(property, rule.style.getPropertyValue(rule.style[j]));
             ruleObj[property] = value;
           }
           rule.selectorText.split(',').forEach(function(selector) {
