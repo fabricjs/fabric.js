@@ -123,9 +123,7 @@
 
       ctx.save();
       var m = this.transformMatrix,
-          isInPathGroup = this.group && this.group.type === 'path-group';
-
-      // this._resetWidthHeight();
+      isInPathGroup = this.group && this.group.type === 'path-group';
       if (isInPathGroup) {
         ctx.translate(-this.group.width/2, -this.group.height/2);
       }
@@ -136,7 +134,7 @@
         this.transform(ctx);
       }
       if (isInPathGroup) {
-        ctx.translate(this.width/2, this.height/2);
+        ctx.translate(this.width/2 + this.left, this.height/2  + this.top);
       }
 
       this._setShadow(ctx);
@@ -207,20 +205,24 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var markup = [];
-
+      var markup = [], x = -this.width / 2, y = -this.height / 2;
+      if (this.group) {
+	  	x = this.left;
+	  	y = this.top;
+	  }
       markup.push(
-        '<g transform="', this.getSvgTransform(), '">',
+        '<g transform="', (this.group ? '' : this.getSvgTransform()), '">\n',
           '<image xlink:href="', this.getSvgSrc(),
+            '" x="', x, '" y="', y,
             '" style="', this.getSvgStyles(),
             // we're essentially moving origin of transformation from top/left corner to the center of the shape
             // by wrapping it in container <g> element with actual transformation, then offsetting object to the top/left
             // so that object's center aligns with container's left/top
-            '" transform="translate(' + (-this.width/2) + ' ' + (-this.height/2) + ')',
+            '" transform="', this.getSvgTransformMatrix(),
             '" width="', this.width,
             '" height="', this.height,
             '" preserveAspectRatio="none"',
-          '></image>'
+          '></image>\n'
       );
 
       if (this.stroke || this.strokeDashArray) {
@@ -231,12 +233,12 @@
             'x="', (-1 * this.width / 2), '" y="', (-1 * this.height / 2),
             '" width="', this.width, '" height="', this.height,
             '" style="', this.getSvgStyles(),
-          '"/>'
+          '"/>\n'
         );
         this.fill = origFill;
       }
 
-      markup.push('</g>');
+      markup.push('</g>\n');
 
       return reviver ? reviver(markup.join('')) : markup.join('');
     },
@@ -248,7 +250,7 @@
      */
     getSrc: function() {
       if (this.getElement()) {
-        return this.getElement().src || this.getElement()._src;
+        return (this.getElement().src || this.getElement()._src).match(/.{1,80}/g).join('\n');
       }
     },
 
@@ -322,7 +324,6 @@
         };
         replacement.src = canvasEl.toDataURL('image/png');
       }
-
       return this;
     },
 
