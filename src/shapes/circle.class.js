@@ -32,18 +32,17 @@
      * @default
      */
     radius: 0,
-
     /**
      * Constructor
      * @param {Object} [options] Options object
      * @return {fabric.Circle} thisArg
      */
-    initialize: function(options) {
+    /*initialize: function(options) {
       options = options || { };
 
       this.set('radius', options.radius || 0);
       this.callSuper('initialize', options);
-    },
+    },*/
 
     /**
      * @private
@@ -83,7 +82,7 @@
 
       markup.push(
         '<circle ',
-          'cx="' + this.get('cx') + '" cy="' + this.get('cy') + '" ',
+          'cx="', (this.group ? this.left : 0),'" cy="', (this.group ? this.top : 0),'" ',
           'r="', this.radius,
           '" style="', this.getSvgStyles(),
           '" transform="', (this.group ? '' : this.getSvgTransform()),
@@ -101,7 +100,6 @@
      * @param {Boolean} [noTransform] When true, context is not transformed
      */
     _render: function(ctx, noTransform) {
-      
       ctx.beginPath();
       ctx.arc(noTransform ? this.left : 0, noTransform ? this.top : 0, this.radius, 0, piBy2, false);
       this._renderFill(ctx);
@@ -168,20 +166,11 @@
     if (!isValidRadius(parsedAttributes)) {
       throw new Error('value of `r` attribute is required and can not be negative');
     }
+    
+    parsedAttributes.left = parsedAttributes.left || 0;
+    parsedAttributes.top = parsedAttributes.top || 0;
 
-    if (!('left' in parsedAttributes)) {
-      parsedAttributes.left = 0;
-    }
-    if (!('top' in parsedAttributes)) {
-      parsedAttributes.top = 0;
-    }
-
-    var obj = new fabric.Circle(extend(parsedAttributes, options));
-
-    obj.cx = parseFloat(element.getAttribute('cx')) || 0;
-    obj.cy = parseFloat(element.getAttribute('cy')) || 0;
-
-    return obj;
+    return new fabric.Circle(extend(parsedAttributes, options));
   };
 
   /**
