@@ -32,6 +32,17 @@
      * @default
      */
     radius: 0,
+    /**
+     * Constructor
+     * @param {Object} [options] Options object
+     * @return {fabric.Circle} thisArg
+     */
+    initialize: function(options) {
+      options = options || { };
+
+      this.set('radius', options.radius || 0);
+      this.callSuper('initialize', options);
+    },
 
     /**
      * @private
@@ -71,7 +82,7 @@
 
       markup.push(
         '<circle ',
-          'cx="', (this.group ? this.left : 0),'" cy="', (this.group ? this.top : 0),'" ',
+          'cx="', (this.group ? this.left : 0),'" cy="', (this.group ? this.top : 0), '" ',
           'r="', this.radius,
           '" style="', this.getSvgStyles(),
           '" transform="', (this.group ? '' : this.getSvgTransform()),
