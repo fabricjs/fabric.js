@@ -79,6 +79,18 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   },
 
   /**
+   * Returns transform-string for svg-export from the transform matrix of single elements
+   * @return {String}
+   */
+  getSvgTransformMatrix: function() {
+    return [
+      (this.group ? 'translate(' + (-this.group.width / 2) + ' ' + (-this.group.height/2) + ')' : ''),
+      (this.transformMatrix ? ' matrix(' + this.transformMatrix.join(' ') + ')' : '')
+    ].join('');
+  },
+
+
+  /**
    * @private
    */
   _createBaseSVGMarkup: function() {
