@@ -50,10 +50,7 @@
       options = options || { };
 
       this.callSuper('initialize', options);
-
-      this.set('rx', options.rx || 0);
-      this.set('ry', options.ry || 0);
-
+      
       this.set('width', this.get('rx') * 2);
       this.set('height', this.get('ry') * 2);
     },
@@ -81,7 +78,7 @@
 
       markup.push(
         '<ellipse ',
-          'cx="' + this.get('cx') + '" cy="' + this.get('cy') + '" ',
+          'cx="', (this.group ? this.left : 0), '" cy="', (this.group ? this.top : 0), '" ',
           'rx="', this.get('rx'),
           '" ry="', this.get('ry'),
           '" style="', this.getSvgStyles(),
@@ -140,18 +137,10 @@
 
     var parsedAttributes = fabric.parseAttributes(element, fabric.Ellipse.ATTRIBUTE_NAMES);
 
-    if (!('left' in parsedAttributes)) {
-      parsedAttributes.left = 0;
-    }
-    if (!('top' in parsedAttributes)) {
-      parsedAttributes.top = 0;
-    }
-    var ellipse = new fabric.Ellipse(extend(parsedAttributes, options));
-
-    ellipse.cx = parseFloat(element.getAttribute('cx')) || 0;
-    ellipse.cy = parseFloat(element.getAttribute('cy')) || 0;
-
-    return ellipse;
+    parsedAttributes.left = parsedAttributes.left || 0;
+    parsedAttributes.top = parsedAttributes.top || 0;
+    
+    return new fabric.Ellipse(extend(parsedAttributes, options));
   };
   /* _FROM_SVG_END_ */
 
