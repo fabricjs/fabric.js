@@ -81,27 +81,18 @@
 
       markup.push(
         '<ellipse ',
+          'cx="' + this.get('cx') + '" cy="' + this.get('cy') + '" ',
           'rx="', this.get('rx'),
           '" ry="', this.get('ry'),
           '" style="', this.getSvgStyles(),
-          '" transform="', this.getSvgTransform(),
-        '"/>'
+          '" transform="', (this.group ? '' : this.getSvgTransform()),
+          this.getSvgTransformMatrix(),
+        '"/>\n'
       );
 
       return reviver ? reviver(markup.join('')) : markup.join('');
     },
     /* _TO_SVG_END_ */
-
-    /**
-     * Renders this instance on a given context
-     * @param {CanvasRenderingContext2D} ctx context to render on
-     * @param {Boolean} [noTransform] When true, context is not transformed
-     */
-    render: function(ctx, noTransform) {
-      // do not use `get` for perf. reasons
-      if (this.rx === 0 || this.ry === 0) return;
-      return this.callSuper('render', ctx, noTransform);
-    },
 
     /**
      * @private
@@ -110,7 +101,6 @@
      */
     _render: function(ctx, noTransform) {
       ctx.beginPath();
-      ctx.globalAlpha = this.group ? (ctx.globalAlpha * this.opacity) : this.opacity;
       ctx.save();
       ctx.transform(1, 0, 0, this.ry/this.rx, 0, 0);
       ctx.arc(noTransform ? this.left : 0, noTransform ? this.top * this.rx/this.ry : 0, this.rx, 0, piBy2, false);
@@ -155,10 +145,6 @@
     }
     if (!('top' in parsedAttributes)) {
       parsedAttributes.top = 0;
-    }
-    if (!('transformMatrix' in parsedAttributes)) {
-      parsedAttributes.left -= options.width ? (options.width / 2) : 0;
-      parsedAttributes.top -= options.height ? (options.height / 2) : 0;
     }
     var ellipse = new fabric.Ellipse(extend(parsedAttributes, options));
 
