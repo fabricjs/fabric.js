@@ -10,7 +10,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     var fill = this.fill
           ? (this.fill.toLive ? 'url(#SVGID_' + this.fill.id + ')' : this.fill)
           : 'none',
-
+        fillRule = (this.fillRule === 'destination-over' ? 'evenodd' : this.fillRule),
         stroke = this.stroke
           ? (this.stroke.toLive ? 'url(#SVGID_' + this.stroke.id + ')' : this.stroke)
           : 'none',
@@ -33,6 +33,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       'stroke-linejoin: ', strokeLineJoin, '; ',
       'stroke-miterlimit: ', strokeMiterLimit, '; ',
       'fill: ', fill, '; ',
+      'fill-rule: ', fillRule, '; ',
       'opacity: ', opacity, ';',
       filter,
       visibility
