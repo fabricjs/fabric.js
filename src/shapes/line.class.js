@@ -229,8 +229,10 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var markup = this._createBaseSVGMarkup();
-
+      var markup = this._createBaseSVGMarkup(), origX = this.originX,
+      origY = this.originY;
+      this.originX = 'center';
+      this.originY = 'center';
       markup.push(
         '<line ',
           'x1="', this.get('x1'),
@@ -242,7 +244,8 @@
           this.getSvgTransformMatrix(),
         '"/>\n'
       );
-
+      this.originX = origX;
+      this.originY = origY;
       return reviver ? reviver(markup.join('')) : markup.join('');
     },
     /* _TO_SVG_END_ */
