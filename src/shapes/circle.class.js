@@ -83,11 +83,12 @@
 
       markup.push(
         '<circle ',
-          'cx="0" cy="0" ',
+          'cx="' + this.get('cx') + '" cy="' + this.get('cy') + '" ',
           'r="', this.radius,
           '" style="', this.getSvgStyles(),
-          '" transform="', this.getSvgTransform(),
-        '"/>'
+          '" transform="', (this.group ? '' : this.getSvgTransform()),
+          ' ', this.getSvgTransformMatrix(),
+        '"/>\n'
       );
 
       return reviver ? reviver(markup.join('')) : markup.join('');
@@ -100,9 +101,8 @@
      * @param {Boolean} [noTransform] When true, context is not transformed
      */
     _render: function(ctx, noTransform) {
+      
       ctx.beginPath();
-      // multiply by currently set alpha (the one that was set by path group where this object is contained, for example)
-      ctx.globalAlpha = this.group ? (ctx.globalAlpha * this.opacity) : this.opacity;
       ctx.arc(noTransform ? this.left : 0, noTransform ? this.top : 0, this.radius, 0, piBy2, false);
       this._renderFill(ctx);
       this.stroke && this._renderStroke(ctx);
@@ -174,10 +174,6 @@
     }
     if (!('top' in parsedAttributes)) {
       parsedAttributes.top = 0;
-    }
-    if (!('transformMatrix' in parsedAttributes)) {
-      parsedAttributes.left -= options.width ? (options.width / 2) : 0;
-      parsedAttributes.top -= options.height ? (options.height / 2) : 0;
     }
 
     var obj = new fabric.Circle(extend(parsedAttributes, options));
