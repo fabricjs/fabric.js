@@ -32,17 +32,6 @@
      * @default
      */
     radius: 0,
-    /**
-     * Constructor
-     * @param {Object} [options] Options object
-     * @return {fabric.Circle} thisArg
-     */
-    /*initialize: function(options) {
-      options = options || { };
-
-      this.set('radius', options.radius || 0);
-      this.callSuper('initialize', options);
-    },*/
 
     /**
      * @private
