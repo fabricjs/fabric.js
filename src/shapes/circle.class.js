@@ -105,7 +105,7 @@
       ctx.beginPath();
       ctx.arc(noTransform ? this.left : 0, noTransform ? this.top : 0, this.radius, 0, piBy2, false);
       this._renderFill(ctx);
-      this.stroke && this._renderStroke(ctx);
+      this._renderStroke(ctx);
     },
 
     /**
