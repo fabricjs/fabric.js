@@ -50,7 +50,7 @@
       options = options || { };
 
       this.callSuper('initialize', options);
-      
+
       this.set('width', this.get('rx') * 2);
       this.set('height', this.get('ry') * 2);
     },
@@ -74,15 +74,18 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var markup = this._createBaseSVGMarkup();
-
+      var markup = this._createBaseSVGMarkup(), x = 0, y = 0;
+      if (this.group) {
+        x = this.left;
+        y = this.top;
+	    }
       markup.push(
         '<ellipse ',
-          'cx="', (this.group ? this.left : 0), '" cy="', (this.group ? this.top : 0), '" ',
+          'cx="' + x + '" cy="' + y + '" ',
           'rx="', this.get('rx'),
           '" ry="', this.get('ry'),
           '" style="', this.getSvgStyles(),
-          '" transform="', (this.group ? '' : this.getSvgTransform()),
+          '" transform="', this.getSvgTransform()),
           this.getSvgTransformMatrix(),
         '"/>\n'
       );
@@ -140,7 +143,12 @@
     parsedAttributes.left = parsedAttributes.left || 0;
     parsedAttributes.top = parsedAttributes.top || 0;
     
-    return new fabric.Ellipse(extend(parsedAttributes, options));
+    var ellipse = new fabric.Ellipse(extend(parsedAttributes, options));
+
+    ellipse.cx = parseFloat(element.getAttribute('cx')) || 0;
+    ellipse.cy = parseFloat(element.getAttribute('cy')) || 0;
+
+    return ellipse;
   };
   /* _FROM_SVG_END_ */
 
