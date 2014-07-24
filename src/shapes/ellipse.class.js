@@ -85,7 +85,7 @@
           'rx="', this.get('rx'),
           '" ry="', this.get('ry'),
           '" style="', this.getSvgStyles(),
-          '" transform="', this.getSvgTransform()),
+          '" transform="', this.getSvgTransform(),
           this.getSvgTransformMatrix(),
         '"/>\n'
       );
