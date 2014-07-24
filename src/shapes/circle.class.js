@@ -32,6 +32,7 @@
      * @default
      */
     radius: 0,
+
     /**
      * Constructor
      * @param {Object} [options] Options object
@@ -78,14 +79,18 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var markup = this._createBaseSVGMarkup();
-
+      var markup = this._createBaseSVGMarkup() , x = 0, y = 0;
+      if (this.group) {
+	  	x = this.left;
+	  	y = this.top;
+	  }
+	  
       markup.push(
         '<circle ',
-          'cx="', (this.group ? this.left : 0),'" cy="', (this.group ? this.top : 0), '" ',
+          'cx="' + x + '" cy="' + y + '" ',
           'r="', this.radius,
           '" style="', this.getSvgStyles(),
-          '" transform="', (this.group ? '' : this.getSvgTransform()),
+          '" transform="', this.getSvgTransform(),
           ' ', this.getSvgTransformMatrix(),
         '"/>\n'
       );
@@ -100,6 +105,7 @@
      * @param {Boolean} [noTransform] When true, context is not transformed
      */
     _render: function(ctx, noTransform) {
+      
       ctx.beginPath();
       ctx.arc(noTransform ? this.left : 0, noTransform ? this.top : 0, this.radius, 0, piBy2, false);
       this._renderFill(ctx);
@@ -166,11 +172,16 @@
     if (!isValidRadius(parsedAttributes)) {
       throw new Error('value of `r` attribute is required and can not be negative');
     }
-    
+
     parsedAttributes.left = parsedAttributes.left || 0;
     parsedAttributes.top = parsedAttributes.top || 0;
 
-    return new fabric.Circle(extend(parsedAttributes, options));
+    var obj = new fabric.Circle(extend(parsedAttributes, options));
+
+    obj.cx = parseFloat(element.getAttribute('cx')) || 0;
+    obj.cy = parseFloat(element.getAttribute('cy')) || 0;
+
+    return obj;
   };
 
   /**
