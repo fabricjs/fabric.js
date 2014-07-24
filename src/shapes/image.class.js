@@ -122,9 +122,9 @@
       if (!this.visible) return;
 
       ctx.save();
-      var m = this.transformMatrix,
-      isInPathGroup = this.group && this.group.type === 'path-group';
-      if (isInPathGroup) {
+      var m = this.transformMatrix;
+      //isInPathGroup = this.group && this.group.type === 'path-group';
+      if (noTransform) {
         ctx.translate(-this.group.width/2, -this.group.height/2);
       }
       if (m) {
@@ -133,7 +133,7 @@
       if (!noTransform) {
         this.transform(ctx);
       }
-      if (isInPathGroup) {
+      if (noTransform) {
         ctx.translate(this.width/2 + this.left, this.height/2  + this.top);
       }
 
