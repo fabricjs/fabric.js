@@ -147,7 +147,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @param {Event} e Event object
    */
   onKeyPress: function(e) {
-    if (!this.isEditing || e.metaKey || e.ctrlKey || e.keyCode === 8 || e.keyCode === 13) {
+    if (!this.isEditing || e.metaKey || e.ctrlKey || e.keyCode in this._keysMap) {
       return;
     }
 
