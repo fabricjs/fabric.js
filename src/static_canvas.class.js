@@ -1129,9 +1129,9 @@
     _setSVGPreamble: function(markup, options) {
       if (!options.suppressPreamble) {
         markup.push(
-          '<?xml version="1.0" encoding="', (options.encoding || 'UTF-8'), '" standalone="no" ?>\n',
+          '<?xml version="1.0" encoding="', (options.encoding || 'UTF-8'), '" standalone="no" ?>',
             '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" ',
-              '"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n'
+              '"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">'
         );
       }
     },
@@ -1157,12 +1157,12 @@
                 options.viewBox.width + ' ' +
                 options.viewBox.height + '" '
               : null),
-          'xml:space="preserve">\n',
-        '<desc>Created with Fabric.js ', fabric.version, '</desc>\n',
+          'xml:space="preserve">',
+        '<desc>Created with Fabric.js ', fabric.version, '</desc>',
         '<defs>',
           fabric.createSVGFontFacesMarkup(this.getObjects()),
           fabric.createSVGRefElementsMarkup(this),
-        '</defs>\n'
+        '</defs>'
       );
     },
 
@@ -1210,7 +1210,7 @@
                 ? this[property].source.height
                 : this.height),
             '" fill="url(#' + property + 'Pattern)"',
-          '></rect>\n'
+          '></rect>'
         );
       }
       else if (this[property] && property === 'overlayColor') {
@@ -1219,7 +1219,7 @@
             'width="', this.width,
             '" height="', this.height,
             '" fill="', this[property], '"',
-          '></rect>\n'
+          '></rect>'
         );
       }
     },
