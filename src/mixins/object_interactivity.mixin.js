@@ -315,7 +315,7 @@
 
       if (this.hasRotatingPoint && this.isControlVisible('mtr') && !this.get('lockRotation') && this.hasControls) {
 
-        var rotateHeight = ( -height - (padding * 2)) / 2
+        var rotateHeight = ( -height - (padding * 2)) / 2;
 
         ctx.beginPath();
         ctx.moveTo(0, rotateHeight);
