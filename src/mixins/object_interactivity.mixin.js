@@ -315,15 +315,11 @@
 
       if (this.hasRotatingPoint && this.isControlVisible('mtr') && !this.get('lockRotation') && this.hasControls) {
 
-        var rotateHeight = (
-          this.flipY
-            ? height + (padding * 2)
-            : -height - (padding * 2)
-        ) / 2;
+        var rotateHeight = ( -height - (padding * 2)) / 2
 
         ctx.beginPath();
         ctx.moveTo(0, rotateHeight);
-        ctx.lineTo(0, rotateHeight + (this.flipY ? this.rotatingPointOffset : -this.rotatingPointOffset));
+        ctx.lineTo(0, rotateHeight - this.rotatingPointOffset);
         ctx.closePath();
         ctx.stroke();
       }
@@ -434,9 +430,7 @@
       if (this.hasRotatingPoint) {
         this._drawControl('mtr', ctx, methodName,
           left + width/2 - scaleOffset,
-          this.flipY
-            ? (top + height + this.rotatingPointOffset - this.cornerSize/2 + padding)
-            : (top - this.rotatingPointOffset - this.cornerSize/2 - padding));
+          top - this.rotatingPointOffset - this.cornerSize/2 - padding);
       }
 
       ctx.restore();
