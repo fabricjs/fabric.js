@@ -268,7 +268,7 @@
 
         if (value < 0) {
             this.flipX = !this.flipX;
-            this.flipY = !this.flipgit checkout masterY;
+            this.flipY = !this.flipY;
             value *= -1;
         }
 
