@@ -355,5 +355,48 @@
         'opacity should be parsed correctly from "opacity" attribute of ' + tagNames[i] + ' element');
     }
   });
+  
+  test('getCssRule', function() {
+
+    ok(fabric.getCSSRules);
+
+    var doc = fabric.document,
+        styleElement = doc.createElement('style');
+        styleElement.textContent = 'g polygon.cls, rect {fill:#FF0000; stroke:#000000;stroke-width:0.25px;}\
+        polygon.cls {fill:none;stroke:#0000FF;}',
+        doc.body.appendChild(styleElement);
+
+    var expectedObject = {
+      'g polygon.cls': {
+        'fill': '#FF0000',
+        'stroke': '#000000',
+        'strokeWidth': 0.25
+      },
+      'rect': {
+        'fill': '#FF0000',
+        'stroke': '#000000',
+        'strokeWidth': 0.25
+      },
+      'polygon.cls': {
+        'fill' : '',
+        'stroke': '#0000FF'
+      }
+    }
+
+    fabric.cssRules = fabric.getCSSRules(doc);
+    deepEqual(fabric.cssRules, expectedObject);
+    
+    var elPolygon = fabric.document.createElement('polygon'),
+        expectedStyle = {
+          'fill' : '',
+          'stroke': '#0000FF'
+        };
+
+    elPolygon.setAttribute('points', '10,12 20,22');
+    elPolygon.setAttribute('class', 'cls');
+
+    var style = fabric.parseAttributes(elPolygon, [ ]);
+    deepEqual(style, expectedStyle);
+  });
 
 })();
