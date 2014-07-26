@@ -268,10 +268,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       newSelectionStart = this.text.length;
     }
 
-    if (j === jlen) {
-      newSelectionStart--;
-    }
-
     return newSelectionStart;
   }
 });
