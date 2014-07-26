@@ -354,4 +354,33 @@
     }
   });
 
+  test('getCssRule', function() {
+    
+    ok(fabric.getCssRule);
+    
+    var doc2 = document.implementation.createHTMLDocument(''),
+        styleElement = document.createElement('style');
+        styleElement.textContent = '<style type="text/css">\
+          g polygon.cls, rect {fill:#FF0000; stroke:#000000;stroke-width:0.25px;}\
+        </style>',
+        doc2.body.appendChild(styleElement); 
+    
+    var expectedObject = {
+      'g polygon.cls': {
+        fill:        '#FF0000',
+        stroke:      '#000000',
+        strokeWidth: '0.25'
+      },
+      'rect': {
+        fill:        '#FF0000',
+        stroke:      '#000000',
+        strokeWidth: '0.25px'
+      }
+    }
+    
+    var cssRules = fabric.getCssRule(doc2);
+    deepEqual(cssRules, expectedObject);
+    
+  });
+
 })();
