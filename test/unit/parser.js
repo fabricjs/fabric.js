@@ -356,7 +356,7 @@
 
   test('getCssRule', function() {
     
-    ok(fabric.getCssRule);
+    ok(fabric.getCSSRules);
     
     var doc = fabric.document,
         styleElement = doc.createElement('style');
@@ -378,7 +378,7 @@
       }
     }
     
-    var cssRules = fabric.getCssRule(doc);
+    var cssRules = fabric.getCSSRules(doc);
     deepEqual(cssRules, expectedObject);
     
   });
