@@ -359,7 +359,7 @@
     ok(fabric.getGlobalStylesForElement);
     
     var elPolygon = fabric.document.createElement('polygon'),
-        cssRules  = {
+        fabric.cssRules  = {
           'polygon.cls': {
             fill:        '#FF0000',
             stroke:      '#000000',
@@ -380,7 +380,7 @@
     elPolygon.setAttribute('points', '10,12 20,22');
     elPolygon.setAttribute('class', 'cls');
 
-    var style = fabric.getGlobalStylesForElement(elPolygon, cssRules);
+    var style = fabric.getGlobalStylesForElement(elPolygon);
     deepEqual(style, expectedStyle);
   });
 
