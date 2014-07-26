@@ -354,33 +354,34 @@
     }
   });
 
-  test('getCssRule', function() {
+  test('getGlobalStylesForElement', function() {
     
-    ok(fabric.getCSSRules);
+    ok(fabric.getGlobalStylesForElement);
     
-    var doc = fabric.document,
-        styleElement = doc.createElement('style');
-        styleElement.textContent = '<style type="text/css">\
-          g polygon.cls, rect {fill:#FF0000; stroke:#000000;stroke-width:0.25px;}\
-        </style>',
-        doc.body.appendChild(styleElement); 
-    
-    var expectedObject = {
-      'g polygon.cls': {
-        fill:        '#FF0000',
-        stroke:      '#000000',
-        strokeWidth: '0.25'
-      },
-      'rect': {
-        fill:        '#FF0000',
-        stroke:      '#000000',
-        strokeWidth: '0.25px'
-      }
-    }
-    
-    var cssRules = fabric.getCSSRules(doc);
-    deepEqual(cssRules, expectedObject);
-    
+    var elPolygon = fabric.document.createElement('polygon'),
+        cssRules  = {
+          'polygon.cls': {
+            fill:        '#FF0000',
+            stroke:      '#000000',
+            strokeWidth: '0.25'
+          },
+          'rect': {
+            fill:        '#00FF00',
+            stroke:      '#000000',
+            strokeWidth: '0.50px'
+          }
+        },
+        expectedStyle = {
+          fill:        '#FF0000',
+          stroke:      '#000000',
+          strokeWidth: '0.25'
+        };
+
+    elPolygon.setAttribute('points', '10,12 20,22');
+    elPolygon.setAttribute('class', 'cls');
+
+    var style = fabric.getGlobalStylesForElement(elPolygon, cssRules);
+    deepEqual(style, expectedStyle);
   });
 
 })();
