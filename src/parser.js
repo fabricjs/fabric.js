@@ -344,26 +344,65 @@
    * @private
    */
   function getGlobalStylesForElement(element) {
-    var nodeName = element.nodeName,
-        className = element.getAttribute('class'),
-        id = element.getAttribute('id'),
-        styles = { };
-
+    var styles = { };
+    
     for (var rule in fabric.cssRules) {
-      var ruleMatchesElement = (className && new RegExp('^\\.' + className).test(rule)) ||
-                               (id && new RegExp('^#' + id).test(rule)) ||
-                               (new RegExp('^' + nodeName).test(rule));
-
-      if (ruleMatchesElement) {
+      if (elementMatchesRule(element, rule.split(' '))) {
         for (var property in fabric.cssRules[rule]) {
-          var attr = normalizeAttr(property),
-              value = normalizeValue(attr, fabric.cssRules[rule][property]);
-          styles[attr] = value;
+          styles[property] = fabric.cssRules[rule][property];
         }
       }
     }
-
     return styles;
+  }
+
+  /**
+   * @private
+   */
+  function elementMatchesRule(element, selectors) {
+    var firstMatching, parentMatching = true;
+    //start from rightmost selector.
+    firstMatching = selectorMatches(element, selectors.pop());
+    if (firstMatching && selectors.length) {
+      parentMatching = doesSomeParentMatch(element, selectors);
+    }
+    return firstMatching && parentMatching && (selectors.length === 0);
+  }
+
+  function doesSomeParentMatch(element, selectors) {
+    var selector, parentMatching = true;
+    while (element.parentNode && element.parentNode.nodeType === 1 && selectors.length) {
+      if (parentMatching) {
+        selector = selectors.pop();
+      }
+      element = element.parentNode;
+      parentMatching = selectorMatches(element, selector);
+    }
+    return selectors.length === 0;
+  }
+  /**
+   * @private
+   */
+  function selectorMatches(element, selector) {
+    var nodeName = element.nodeName,
+        classNames = element.getAttribute('class'),
+        id = element.getAttribute('id'), matcher;
+    // i check if a selector matches slicing away part from it.
+    // if i get empty string i should match
+    matcher = new RegExp('^' + nodeName, 'i');
+    selector = selector.replace(matcher, '');
+    if (id && selector.length) {
+      matcher = new RegExp('#' + id + '(?![a-zA-Z\\-]+)', 'i');
+      selector = selector.replace(matcher, '');
+    }
+    if (classNames && selector.length) {
+      classNames = classNames.split(' ');
+      for (var i = classNames.length; i--;) {
+        matcher = new RegExp('\\.' + classNames[i] + '(?![a-zA-Z\\-]+)', 'i');
+        selector = selector.replace(matcher, '');
+      }
+    }
+    return selector.length === 0;
   }
 
   /**
@@ -477,7 +516,7 @@
         if (heightAttr && heightAttr !== viewBoxHeight) {
           scaleY = heightAttr / viewBoxHeight;
         }
-        addSvgTransform(doc, [scaleX, 0, 0, scaleY, -minX, -minY]);
+        addSvgTransform(doc, [scaleX, 0, 0, scaleY, -minX * scaleX, -minY * scaleY]);
       }
 
       var descendants = fabric.util.toArray(doc.getElementsByTagName('*'));
@@ -648,7 +687,7 @@
       var value,
           parentAttributes = { };
 
-      // if there's a parent container (`g` node), parse its attributes recursively upwards
+      // if there's a parent container (`g` or `a` node), parse its attributes recursively upwards
       if (element.parentNode && /^[g|a]$/i.test(element.parentNode.nodeName)) {
         parentAttributes = fabric.parseAttributes(element.parentNode, attributes);
       }
@@ -755,39 +794,24 @@
      */
     getCSSRules: function(doc) {
       var styles = doc.getElementsByTagName('style'),
-          allRules = { },
-          rules;
-
-      // very crude parsing of style contents
-      for (var i = 0, len = styles.length; i < len; i++) {
-        var styleContents = styles[0].textContent;
-
-        // remove comments
-        styleContents = styleContents.replace(/\/\*[\s\S]*?\*\//g, '');
-
-        rules = styleContents.match(/[^{]*\{[\s\S]*?\}/g);
-        rules = rules.map(function(rule) { return rule.trim(); });
-
-        rules.forEach(function(rule) {
-          var match = rule.match(/([\s\S]*?)\s*\{([^}]*)\}/);
-          rule = match[1];
-          var declaration = match[2].trim(),
-              propertyValuePairs = declaration.replace(/;$/, '').split(/\s*;\s*/);
-
-          if (!allRules[rule]) {
-            allRules[rule] = { };
+          allRules = { };
+      for (var l = 0; l < styles.length; l++) {
+        var doc2 = document.implementation.createHTMLDocument(''),
+          styleElement = document.createElement('style');
+        styleElement.textContent = styles[l].textContent || styles.context.nodeTypedValue;
+        doc2.body.appendChild(styleElement);
+        for (var i = 0; i < styleElement.sheet.cssRules.length; i++) {
+          var ruleObj = { }, rule = styleElement.sheet.cssRules[i];
+          for ( var j = 0; j < rule.style.length; j++) {
+            var property = normalizeAttr(rule.style[j]),
+                value = normalizeValue(property, rule.style.getPropertyValue(rule.style[j]));
+            ruleObj[property] = value;
           }
-
-          for (var i = 0, len = propertyValuePairs.length; i < len; i++) {
-            var pair = propertyValuePairs[i].split(/\s*:\s*/),
-                property = pair[0],
-                value = pair[1];
-
-            allRules[rule][property] = value;
-          }
-        });
+          rule.selectorText.split(',').forEach(function(selector) {
+            allRules[selector] = ruleObj;
+          });
+        }
       }
-
       return allRules;
     },
 
