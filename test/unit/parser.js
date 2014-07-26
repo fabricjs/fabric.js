@@ -378,7 +378,7 @@
       }
     }
     
-    var cssRules = fabric.getCssRule(doc2);
+    var cssRules = fabric.getCssRule(doc);
     deepEqual(cssRules, expectedObject);
     
   });
