@@ -1210,7 +1210,7 @@
                 ? this[property].source.height
                 : this.height),
             '" fill="url(#' + property + 'Pattern)"',
-          '></rect>\n'
+          '></rect>'
         );
       }
       else if (this[property] && property === 'overlayColor') {
@@ -1219,7 +1219,7 @@
             'width="', this.width,
             '" height="', this.height,
             '" fill="', this[property], '"',
-          '></rect>\n'
+          '></rect>'
         );
       }
     },
