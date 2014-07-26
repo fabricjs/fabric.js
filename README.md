@@ -119,6 +119,21 @@ Fabric.js started as a foundation for design editor on [printio.ru](http://print
 
         $ jscs src
 
+<h3 id="fabric-building">Testing</h3>
+
+1. [Install Node.js](https://github.com/joyent/node/wiki/Installation)
+
+2. [Install NPM, if necessary](https://github.com/npm/npm#super-easy-install)
+
+3. Install NPM packages
+
+        $ npm install
+
+4. Run test suite
+
+        $ npm test
+
+
 ### Demos
 
 - [Demos](http://fabricjs.com/demos/)
