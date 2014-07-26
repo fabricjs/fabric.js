@@ -2814,8 +2814,6 @@ if (typeof console !== 'undefined') {
 
       var color = new fabric.Color(attributes[attr]);
       attributes[attr] = color.setAlpha(toFixed(color.getAlpha() * attributes[colorAttributes[attr]], 2)).toRgba();
-
-      delete attributes[colorAttributes[attr]];
     }
     return attributes;
   }
@@ -3051,26 +3049,65 @@ if (typeof console !== 'undefined') {
    * @private
    */
   function getGlobalStylesForElement(element) {
-    var nodeName = element.nodeName,
-        className = element.getAttribute('class'),
-        id = element.getAttribute('id'),
-        styles = { };
-
+    var styles = { };
+    
     for (var rule in fabric.cssRules) {
-      var ruleMatchesElement = (className && new RegExp('^\\.' + className).test(rule)) ||
-                               (id && new RegExp('^#' + id).test(rule)) ||
-                               (new RegExp('^' + nodeName).test(rule));
-
-      if (ruleMatchesElement) {
+      if (elementMatchesRule(element, rule.split(' '))) {
         for (var property in fabric.cssRules[rule]) {
-          var attr = normalizeAttr(property),
-              value = normalizeValue(attr, fabric.cssRules[rule][property]);
-          styles[attr] = value;
+          styles[property] = fabric.cssRules[rule][property];
         }
       }
     }
-
     return styles;
+  }
+
+  /**
+   * @private
+   */
+  function elementMatchesRule(element, selectors) {
+    var firstMatching, parentMatching = true;
+    //start from rightmost selector.
+    firstMatching = selectorMatches(element, selectors.pop());
+    if (firstMatching && selectors.length) {
+      parentMatching = doesSomeParentMatch(element, selectors);
+    }
+    return firstMatching && parentMatching && (selectors.length === 0);
+  }
+
+  function doesSomeParentMatch(element, selectors) {
+    var selector, parentMatching = true;
+    while (element.parentNode && element.parentNode.nodeType === 1 && selectors.length) {
+      if (parentMatching) {
+        selector = selectors.pop();
+      }
+      element = element.parentNode;
+      parentMatching = selectorMatches(element, selector);
+    }
+    return selectors.length === 0;
+  }
+  /**
+   * @private
+   */
+  function selectorMatches(element, selector) {
+    var nodeName = element.nodeName,
+        classNames = element.getAttribute('class'),
+        id = element.getAttribute('id'), matcher;
+    // i check if a selector matches slicing away part from it.
+    // if i get empty string i should match
+    matcher = new RegExp('^' + nodeName, 'i');
+    selector = selector.replace(matcher, '');
+    if (id && selector.length) {
+      matcher = new RegExp('#' + id + '(?![a-zA-Z\\-]+)', 'i');
+      selector = selector.replace(matcher, '');
+    }
+    if (classNames && selector.length) {
+      classNames = classNames.split(' ');
+      for (var i = classNames.length; i--;) {
+        matcher = new RegExp('\\.' + classNames[i] + '(?![a-zA-Z\\-]+)', 'i');
+        selector = selector.replace(matcher, '');
+      }
+    }
+    return selector.length === 0;
   }
 
   /**
@@ -3462,8 +3499,7 @@ if (typeof console !== 'undefined') {
      */
     getCSSRules: function(doc) {
       var styles = doc.getElementsByTagName('style'),
-          allRules = { },
-          rules;
+          allRules = { }, rules;
 
       // very crude parsing of style contents
       for (var i = 0, len = styles.length; i < len; i++) {
@@ -3476,25 +3512,23 @@ if (typeof console !== 'undefined') {
         rules = rules.map(function(rule) { return rule.trim(); });
 
         rules.forEach(function(rule) {
-          var match = rule.match(/([\s\S]*?)\s*\{([^}]*)\}/);
-          rule = match[1];
-          var declaration = match[2].trim(),
-              propertyValuePairs = declaration.replace(/;$/, '').split(/\s*;\s*/);
 
-          if (!allRules[rule]) {
-            allRules[rule] = { };
-          }
+          var match = rule.match(/([\s\S]*?)\s*\{([^}]*)\}/),
+          ruleObj = { }, declaration = match[2].trim(),
+          propertyValuePairs = declaration.replace(/;$/, '').split(/\s*;\s*/);
 
           for (var i = 0, len = propertyValuePairs.length; i < len; i++) {
             var pair = propertyValuePairs[i].split(/\s*:\s*/),
-                property = pair[0],
-                value = pair[1];
-
-            allRules[rule][property] = value;
+                property = normalizeAttr(pair[0]),
+                value = normalizeValue(property,pair[1],pair[0]);
+            ruleObj[property] = value;
           }
+          rule = match[1];
+          rule.split(',').forEach(function(_rule) {
+            allRules[_rule.trim()] = fabric.util.object.clone(ruleObj);
+          });
         });
       }
-
       return allRules;
     },
 
@@ -7154,8 +7188,8 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
       }
 
       // set path origin coordinates based on our bounding box
-      var originLeft = this.box.minx  + (this.box.maxx - this.box.minx) / 2,
-          originTop = this.box.miny  + (this.box.maxy - this.box.miny) / 2;
+      var originLeft = this.box.minX  + (this.box.maxX - this.box.minX) / 2,
+          originTop = this.box.minY  + (this.box.maxY - this.box.minY) / 2;
 
       this.canvas.contextTop.arc(originLeft, originTop, 3, 0, Math.PI * 2, false);
 
@@ -12746,15 +12780,11 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       if (this.hasRotatingPoint && this.isControlVisible('mtr') && !this.get('lockRotation') && this.hasControls) {
 
-        var rotateHeight = (
-          this.flipY
-            ? height + (padding * 2)
-            : -height - (padding * 2)
-        ) / 2;
+        var rotateHeight = ( -height - (padding * 2)) / 2;
 
         ctx.beginPath();
         ctx.moveTo(0, rotateHeight);
-        ctx.lineTo(0, rotateHeight + (this.flipY ? this.rotatingPointOffset : -this.rotatingPointOffset));
+        ctx.lineTo(0, rotateHeight - this.rotatingPointOffset);
         ctx.closePath();
         ctx.stroke();
       }
@@ -12865,9 +12895,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       if (this.hasRotatingPoint) {
         this._drawControl('mtr', ctx, methodName,
           left + width/2 - scaleOffset,
-          this.flipY
-            ? (top + height + this.rotatingPointOffset - this.cornerSize/2 + padding)
-            : (top - this.rotatingPointOffset - this.cornerSize/2 - padding));
+          top - this.rotatingPointOffset - this.cornerSize/2 - padding);
       }
 
       ctx.restore();
@@ -13552,8 +13580,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     initialize: function(options) {
       options = options || { };
 
-      this.set('radius', options.radius || 0);
       this.callSuper('initialize', options);
+      this.set('radius', options.radius || 0);
     },
 
     /**
@@ -18499,8 +18527,10 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     _renderText: function(ctx, textLines) {
       ctx.save();
       this._setShadow(ctx);
+      this._setupFillRule(ctx);
       this._renderTextFill(ctx, textLines);
       this._renderTextStroke(ctx, textLines);
+      this._restoreFillRule(ctx);
       this._removeShadow(ctx);
       ctx.restore();
     },
@@ -21507,7 +21537,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @param {Event} e Event object
    */
   onKeyPress: function(e) {
-    if (!this.isEditing || e.metaKey || e.ctrlKey || e.keyCode === 8 || e.keyCode === 13) {
+    if (!this.isEditing || e.metaKey || e.ctrlKey || e.keyCode in this._keysMap) {
       return;
     }
 
