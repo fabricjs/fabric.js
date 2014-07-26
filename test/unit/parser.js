@@ -359,23 +359,25 @@
     ok(fabric.getGlobalStylesForElement);
     
     var elPolygon = fabric.document.createElement('polygon'),
-        fabric.cssRules  = {
-          'polygon.cls': {
-            fill:        '#FF0000',
-            stroke:      '#000000',
-            strokeWidth: '0.25'
-          },
-          'rect': {
-            fill:        '#00FF00',
-            stroke:      '#000000',
-            strokeWidth: '0.50px'
-          }
-        },
         expectedStyle = {
           fill:        '#FF0000',
           stroke:      '#000000',
           strokeWidth: '0.25'
         };
+
+    fabric.cssRules  = {
+      'polygon.cls': {
+        fill:        '#FF0000',
+        stroke:      '#000000',
+        strokeWidth: '0.25'
+      },
+      'rect': {
+        fill:        '#00FF00',
+        stroke:      '#000000',
+        strokeWidth: '0.50px'
+      }
+    };
+
 
     elPolygon.setAttribute('points', '10,12 20,22');
     elPolygon.setAttribute('class', 'cls');
