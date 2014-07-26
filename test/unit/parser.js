@@ -358,8 +358,8 @@
     
     ok(fabric.getCssRule);
     
-    var doc2 = document.implementation.createHTMLDocument(''),
-        styleElement = document.createElement('style');
+    var doc2 = fabric.document.implementation.createHTMLDocument(''),
+        styleElement = fabric.document.createElement('style');
         styleElement.textContent = '<style type="text/css">\
           g polygon.cls, rect {fill:#FF0000; stroke:#000000;stroke-width:0.25px;}\
         </style>',
