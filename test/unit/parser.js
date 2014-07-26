@@ -383,9 +383,8 @@
       }
     }
 
-    var _cssRules = fabric.getCSSRules(doc);
-    deepEqual(_cssRules, expectedObject);
-    fabric.cssRules = _cssRules;
+    fabric.cssRules = fabric.getCSSRules(doc);
+    deepEqual(fabric.cssRules, expectedObject);
     
     var elPolygon = fabric.document.createElement('polygon'),
         expectedStyle = {
