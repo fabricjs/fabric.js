@@ -444,10 +444,9 @@
     if (!(matrix[0] !== 1 || matrix[3] !== 1 || matrix[4] !== 0 || matrix[5] !== 0)) return;
     // default is to preserve aspect ratio
     // preserveAspectRatio attribute to be implemented
-    var el = document.createElement('g');
+    var el = doc.ownerDocument.createElement('g');
     while (doc.firstChild != null) {
-      var node = doc.firstChild;
-      el.appendChild(node);
+      el.appendChild(doc.firstChild);
     }
     el.setAttribute('transform','matrix(' + matrix[0] + ' ' + matrix[1] + ' ' + matrix[2] + ' ' + matrix[3] + ' ' + matrix[4] + ' ' + matrix[5] + ')');
     doc.appendChild(el);
@@ -547,8 +546,8 @@
         heightAttr: heightAttr
       };
 
-      fabric.gradientDefs = extend(fabric.getGradientDefs(doc), fabric.gradientDefs);
-      fabric.cssRules = extend(fabric.getCSSRules(doc), fabric.cssRules);
+      fabric.gradientDefs = fabric.getGradientDefs(doc);
+      fabric.cssRules = fabric.getCSSRules(doc);
       // Precedence of rules:   style > class > attribute
 
       fabric.parseElements(elements, function(instances) {
