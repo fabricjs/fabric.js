@@ -1499,8 +1499,8 @@ fabric.Collection = {
   /**
    * Helper for creation of "classes".
    * @memberOf fabric.util
-   * @param {Function} [parent] optional "Class" to inherit from
-   * @param {Object} [properties] Properties shared by all instances of this class
+   * @param parent optional "Class" to inherit from
+   * @param properties Properties shared by all instances of this class
    *                  (be careful modifying objects defined here as this would affect all instances)
    */
   function createClass() {
@@ -2814,6 +2814,8 @@ if (typeof console !== 'undefined') {
 
       var color = new fabric.Color(attributes[attr]);
       attributes[attr] = color.setAlpha(toFixed(color.getAlpha() * attributes[colorAttributes[attr]], 2)).toRgba();
+
+      delete attributes[colorAttributes[attr]];
     }
     return attributes;
   }
@@ -3049,65 +3051,26 @@ if (typeof console !== 'undefined') {
    * @private
    */
   function getGlobalStylesForElement(element) {
-    var styles = { };
-    
+    var nodeName = element.nodeName,
+        className = element.getAttribute('class'),
+        id = element.getAttribute('id'),
+        styles = { };
+
     for (var rule in fabric.cssRules) {
-      if (elementMatchesRule(element, rule.split(' '))) {
+      var ruleMatchesElement = (className && new RegExp('^\\.' + className).test(rule)) ||
+                               (id && new RegExp('^#' + id).test(rule)) ||
+                               (new RegExp('^' + nodeName).test(rule));
+
+      if (ruleMatchesElement) {
         for (var property in fabric.cssRules[rule]) {
-          styles[property] = fabric.cssRules[rule][property];
+          var attr = normalizeAttr(property),
+              value = normalizeValue(attr, fabric.cssRules[rule][property]);
+          styles[attr] = value;
         }
       }
     }
+
     return styles;
-  }
-
-  /**
-   * @private
-   */
-  function elementMatchesRule(element, selectors) {
-    var firstMatching, parentMatching = true;
-    //start from rightmost selector.
-    firstMatching = selectorMatches(element, selectors.pop());
-    if (firstMatching && selectors.length) {
-      parentMatching = doesSomeParentMatch(element, selectors);
-    }
-    return firstMatching && parentMatching && (selectors.length === 0);
-  }
-
-  function doesSomeParentMatch(element, selectors) {
-    var selector, parentMatching = true;
-    while (element.parentNode && element.parentNode.nodeType === 1 && selectors.length) {
-      if (parentMatching) {
-        selector = selectors.pop();
-      }
-      element = element.parentNode;
-      parentMatching = selectorMatches(element, selector);
-    }
-    return selectors.length === 0;
-  }
-  /**
-   * @private
-   */
-  function selectorMatches(element, selector) {
-    var nodeName = element.nodeName,
-        classNames = element.getAttribute('class'),
-        id = element.getAttribute('id'), matcher;
-    // i check if a selector matches slicing away part from it.
-    // if i get empty string i should match
-    matcher = new RegExp('^' + nodeName, 'i');
-    selector = selector.replace(matcher, '');
-    if (id && selector.length) {
-      matcher = new RegExp('#' + id + '(?![a-zA-Z\\-]+)', 'i');
-      selector = selector.replace(matcher, '');
-    }
-    if (classNames && selector.length) {
-      classNames = classNames.split(' ');
-      for (var i = classNames.length; i--;) {
-        matcher = new RegExp('\\.' + classNames[i] + '(?![a-zA-Z\\-]+)', 'i');
-        selector = selector.replace(matcher, '');
-      }
-    }
-    return selector.length === 0;
   }
 
   /**
@@ -3499,7 +3462,8 @@ if (typeof console !== 'undefined') {
      */
     getCSSRules: function(doc) {
       var styles = doc.getElementsByTagName('style'),
-          allRules = { }, rules;
+          allRules = { },
+          rules;
 
       // very crude parsing of style contents
       for (var i = 0, len = styles.length; i < len; i++) {
@@ -3512,23 +3476,25 @@ if (typeof console !== 'undefined') {
         rules = rules.map(function(rule) { return rule.trim(); });
 
         rules.forEach(function(rule) {
+          var match = rule.match(/([\s\S]*?)\s*\{([^}]*)\}/);
+          rule = match[1];
+          var declaration = match[2].trim(),
+              propertyValuePairs = declaration.replace(/;$/, '').split(/\s*;\s*/);
 
-          var match = rule.match(/([\s\S]*?)\s*\{([^}]*)\}/),
-          ruleObj = { }, declaration = match[2].trim(),
-          propertyValuePairs = declaration.replace(/;$/, '').split(/\s*;\s*/);
+          if (!allRules[rule]) {
+            allRules[rule] = { };
+          }
 
           for (var i = 0, len = propertyValuePairs.length; i < len; i++) {
             var pair = propertyValuePairs[i].split(/\s*:\s*/),
-                property = normalizeAttr(pair[0]),
-                value = normalizeValue(property,pair[1],pair[0]);
-            ruleObj[property] = value;
+                property = pair[0],
+                value = pair[1];
+
+            allRules[rule][property] = value;
           }
-          rule = match[1];
-          rule.split(',').forEach(function(_rule) {
-            allRules[_rule.trim()] = fabric.util.object.clone(ruleObj);
-          });
         });
       }
+
       return allRules;
     },
 
@@ -7188,8 +7154,8 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
       }
 
       // set path origin coordinates based on our bounding box
-      var originLeft = this.box.minX  + (this.box.maxX - this.box.minX) / 2,
-          originTop = this.box.minY  + (this.box.maxY - this.box.minY) / 2;
+      var originLeft = this.box.minx  + (this.box.maxx - this.box.minx) / 2,
+          originTop = this.box.miny  + (this.box.maxy - this.box.miny) / 2;
 
       this.canvas.contextTop.arc(originLeft, originTop, 3, 0, Math.PI * 2, false);
 
@@ -7959,22 +7925,21 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @private
      */
     _getOriginFromCorner: function(target, corner) {
-      var origin = {
-        x: target.originX,
-        y: target.originY
-      };
+	    //fixme DRU corner roattion
+      var origin = { x: target.originX, y: target.originY },
+      cornerRotating = (fabric.Object.prototype.hasCornerRotatingPoint ? fabric.Object.prototype.cornerRotating : null);
 
-      if (corner === 'ml' || corner === 'tl' || corner === 'bl') {
+      if ((corner === 'ml' || corner === 'tl' || corner === 'bl') && corner !== cornerRotating) {
         origin.x = 'right';
       }
-      else if (corner === 'mr' || corner === 'tr' || corner === 'br') {
+      else if ((corner === 'mr' || corner === 'tr' || corner === 'br') && corner !== cornerRotating) {
         origin.x = 'left';
       }
 
-      if (corner === 'tl' || corner === 'mt' || corner === 'tr') {
+      if ((corner === 'tl' || corner === 'mt' || corner === 'tr') && corner !== cornerRotating) {
         origin.y = 'bottom';
       }
-      else if (corner === 'bl' || corner === 'mb' || corner === 'br') {
+      else if ((corner === 'bl' || corner === 'mb' || corner === 'br') && corner !== cornerRotating) {
         origin.y = 'top';
       }
 
@@ -7985,13 +7950,14 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @private
      */
     _getActionFromCorner: function(target, corner) {
-      var action = 'drag';
+	  //fixme DRU corner rotation
+      var action = 'drag',
+	      cornerRotating = (fabric.Object.prototype.hasCornerRotatingPoint ? fabric.Object.prototype.cornerRotating : null);
       if (corner) {
-        action = (corner === 'ml' || corner === 'mr')
-          ? 'scaleX'
-          : (corner === 'mt' || corner === 'mb')
+        action = ((corner === 'ml' || corner === 'mr') && cornerRotating !== corner) ? 'scaleX'
+          : (corner === 'mt' || corner === 'mb') && corner !== cornerRotating
             ? 'scaleY'
-            : corner === 'mtr'
+            : corner === 'mtr' || corner === cornerRotating
               ? 'rotate'
               : 'scale';
       }
@@ -9403,11 +9369,16 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @private
      */
     _setCornerCursor: function(corner, target) {
-      if (corner in cursorOffset) {
-        this.setCursor(this._getRotatedCornerCursor(corner, target));
+	    //fixme DRU rotate corner Cusrsor was implemented
+	    var globalObjectProperies = fabric.Object.prototype,
+		    cornerRotating = (globalObjectProperies.hasCornerRotatingPoint ? fabric.Object.prototype.cornerRotating : '') ;
+
+	  if (corner in cursorOffset && (corner !== cornerRotating)) {
+	      this.setCursor(this._getRotatedCornerCursor(corner, target));
       }
-      else if (corner === 'mtr' && target.hasRotatingPoint) {
-        this.setCursor(this.rotationCursor);
+      else if ((corner === 'mtr' && target.hasRotatingPoint) || (corner === cornerRotating)) {
+
+		  this.setCursor(this.rotationCursor);
       }
       else {
         this.setCursor(this.defaultCursor);
@@ -10665,6 +10636,34 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @default
      */
     hasRotatingPoint:         true,
+
+    /**
+    * When set to `false`, object's controlling Corner rotating point will not be visible or selectable
+    * @type Boolean
+    * @default
+    */
+    hasCornerRotatingPoint:         false,
+
+	/**
+	* Corner Roation Size, its controlling size of Corner which do rotation of object element
+	* @type Number
+	* @default
+	*/
+	cornerRotationSize:                  12,
+
+    /**
+    * Offset for object's controlling rotating point (when enabled via `hasCornerRotatingPoint`)
+    * @type Number
+    * @default
+    */
+    cornerRotatingPointOffset:      4,
+
+    /**
+    * Corrner Name which is controlling rotation
+    * @type String
+    * @default
+    */
+	cornerRotating: 'tr',
 
     /**
      * Offset for object's controlling rotating point (when enabled via `hasRotatingPoint`)
@@ -12490,7 +12489,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       var ex = pointer.x,
           ey = pointer.y,
           xPoints,
-          lines;
+          lines,
+	      cornerRotating = ( this.hasCornerRotatingPoint ? this.cornerRotating : null);
 
       for (var i in this.oCoords) {
 
@@ -12498,7 +12498,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           continue;
         }
 
-        if (i === 'mtr' && !this.hasRotatingPoint) {
+		//fixme was added skeep corrner cordonate for corner rotation
+	    if ((i === 'mtr' && !this.hasRotatingPoint) || (i === cornerRotating && !this.hasCornerRotatingPoint)) {
           continue;
         }
 
@@ -12541,163 +12542,41 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       var coords = this.oCoords,
           theta = degreesToRadians(this.angle),
           newTheta = degreesToRadians(45 - this.angle),
-          cornerHypotenuse = Math.sqrt(2 * Math.pow(this.cornerSize, 2)) / 2,
+          cornerHypotenuse = (Math.sqrt(2 * Math.pow(this.cornerSize, 2)) / 2),
           cosHalfOffset = cornerHypotenuse * Math.cos(newTheta),
           sinHalfOffset = cornerHypotenuse * Math.sin(newTheta),
           sinTh = Math.sin(theta),
           cosTh = Math.cos(theta);
 
-      coords.tl.corner = {
-        tl: {
-          x: coords.tl.x - sinHalfOffset,
-          y: coords.tl.y - cosHalfOffset
-        },
-        tr: {
-          x: coords.tl.x + cosHalfOffset,
-          y: coords.tl.y - sinHalfOffset
-        },
-        bl: {
-          x: coords.tl.x - cosHalfOffset,
-          y: coords.tl.y + sinHalfOffset
-        },
-        br: {
-          x: coords.tl.x + sinHalfOffset,
-          y: coords.tl.y + cosHalfOffset
-        }
-      };
+	  //fixme corner coords and corner Rotation
+	  var corners = ['tl', 'tr', 'bl', 'br', 'ml', 'mt', 'mr', 'mb'];
 
-      coords.tr.corner = {
-        tl: {
-          x: coords.tr.x - sinHalfOffset,
-          y: coords.tr.y - cosHalfOffset
-        },
-        tr: {
-          x: coords.tr.x + cosHalfOffset,
-          y: coords.tr.y - sinHalfOffset
-        },
-        br: {
-          x: coords.tr.x + sinHalfOffset,
-          y: coords.tr.y + cosHalfOffset
-        },
-        bl: {
-          x: coords.tr.x - cosHalfOffset,
-          y: coords.tr.y + sinHalfOffset
-        }
-      };
+	    for(var i in corners) {
+		    var cornerRotatingPointOffset = 1;
 
-      coords.bl.corner = {
-        tl: {
-          x: coords.bl.x - sinHalfOffset,
-          y: coords.bl.y - cosHalfOffset
-        },
-        bl: {
-          x: coords.bl.x - cosHalfOffset,
-          y: coords.bl.y + sinHalfOffset
-        },
-        br: {
-          x: coords.bl.x + sinHalfOffset,
-          y: coords.bl.y + cosHalfOffset
-        },
-        tr: {
-          x: coords.bl.x + cosHalfOffset,
-          y: coords.bl.y - sinHalfOffset
-        }
-      };
+		    if ( coords[this.cornerRotating] !== 'undefined' && this.hasCornerRotatingPoint) {
+				cornerRotatingPointOffset = (this.cornerRotatingPointOffset / 2);
+			}
 
-      coords.br.corner = {
-        tr: {
-          x: coords.br.x + cosHalfOffset,
-          y: coords.br.y - sinHalfOffset
-        },
-        bl: {
-          x: coords.br.x - cosHalfOffset,
-          y: coords.br.y + sinHalfOffset
-        },
-        br: {
-          x: coords.br.x + sinHalfOffset,
-          y: coords.br.y + cosHalfOffset
-        },
-        tl: {
-          x: coords.br.x - sinHalfOffset,
-          y: coords.br.y - cosHalfOffset
-        }
-      };
-
-      coords.ml.corner = {
-        tl: {
-          x: coords.ml.x - sinHalfOffset,
-          y: coords.ml.y - cosHalfOffset
-        },
-        tr: {
-          x: coords.ml.x + cosHalfOffset,
-          y: coords.ml.y - sinHalfOffset
-        },
-        bl: {
-          x: coords.ml.x - cosHalfOffset,
-          y: coords.ml.y + sinHalfOffset
-        },
-        br: {
-          x: coords.ml.x + sinHalfOffset,
-          y: coords.ml.y + cosHalfOffset
-        }
-      };
-
-      coords.mt.corner = {
-        tl: {
-          x: coords.mt.x - sinHalfOffset,
-          y: coords.mt.y - cosHalfOffset
-        },
-        tr: {
-          x: coords.mt.x + cosHalfOffset,
-          y: coords.mt.y - sinHalfOffset
-        },
-        bl: {
-          x: coords.mt.x - cosHalfOffset,
-          y: coords.mt.y + sinHalfOffset
-        },
-        br: {
-          x: coords.mt.x + sinHalfOffset,
-          y: coords.mt.y + cosHalfOffset
-        }
-      };
-
-      coords.mr.corner = {
-        tl: {
-          x: coords.mr.x - sinHalfOffset,
-          y: coords.mr.y - cosHalfOffset
-        },
-        tr: {
-          x: coords.mr.x + cosHalfOffset,
-          y: coords.mr.y - sinHalfOffset
-        },
-        bl: {
-          x: coords.mr.x - cosHalfOffset,
-          y: coords.mr.y + sinHalfOffset
-        },
-        br: {
-          x: coords.mr.x + sinHalfOffset,
-          y: coords.mr.y + cosHalfOffset
-        }
-      };
-
-      coords.mb.corner = {
-        tl: {
-          x: coords.mb.x - sinHalfOffset,
-          y: coords.mb.y - cosHalfOffset
-        },
-        tr: {
-          x: coords.mb.x + cosHalfOffset,
-          y: coords.mb.y - sinHalfOffset
-        },
-        bl: {
-          x: coords.mb.x - cosHalfOffset,
-          y: coords.mb.y + sinHalfOffset
-        },
-        br: {
-          x: coords.mb.x + sinHalfOffset,
-          y: coords.mb.y + cosHalfOffset
-        }
-      };
+		    coords[corners[i]].corner = {
+			    tl: {
+				    x: coords[corners[i]].x - (sinHalfOffset * cornerRotatingPointOffset),
+				    y: coords[corners[i]].y - (cosHalfOffset * cornerRotatingPointOffset)
+			    },
+			    tr: {
+				    x: coords[corners[i]].x + (cosHalfOffset * cornerRotatingPointOffset),
+				    y: coords[corners[i]].y - (sinHalfOffset * cornerRotatingPointOffset)
+			    },
+			    bl: {
+				    x: coords[corners[i]].x - (cosHalfOffset * cornerRotatingPointOffset),
+				    y: coords[corners[i]].y + (sinHalfOffset * cornerRotatingPointOffset)
+			    },
+			    br: {
+				    x: coords[corners[i]].x + (sinHalfOffset * cornerRotatingPointOffset),
+				    y: coords[corners[i]].y + (cosHalfOffset * cornerRotatingPointOffset)
+			    }
+		    }
+	    }
 
       coords.mtr.corner = {
         tl: {
@@ -12780,11 +12659,15 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       if (this.hasRotatingPoint && this.isControlVisible('mtr') && !this.get('lockRotation') && this.hasControls) {
 
-        var rotateHeight = ( -height - (padding * 2)) / 2;
+        var rotateHeight = (
+          this.flipY
+            ? height + (padding * 2)
+            : -height - (padding * 2)
+        ) / 2;
 
         ctx.beginPath();
         ctx.moveTo(0, rotateHeight);
-        ctx.lineTo(0, rotateHeight - this.rotatingPointOffset);
+        ctx.lineTo(0, rotateHeight + (this.flipY ? this.rotatingPointOffset : -this.rotatingPointOffset));
         ctx.closePath();
         ctx.stroke();
       }
@@ -12848,61 +12731,101 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
       ctx.strokeStyle = ctx.fillStyle = this.cornerColor;
 
-      // top-left
-      this._drawControl('tl', ctx, methodName,
-        left - scaleOffset - padding,
-        top - scaleOffset - padding);
+	  var corrnerCoords = {
+		  tl: {
+			  left: left - scaleOffset - padding,
+			  top: top - scaleOffset - padding
+		  },
+		  tr: {
+			  left: left + width - scaleOffset + padding,
+			  top: top - scaleOffset - padding
+		  },
+		  bl: {
+			  left: left - scaleOffset - padding,
+			  top: top + height + scaleOffsetSize + padding
+		  },
+		  br: {
+			  left: left + width + scaleOffsetSize + padding,
+			  top: top + height + scaleOffsetSize + padding
+		  },
+		  mt: {
+			  left: left + width/2 - scaleOffset,
+			  top: top - scaleOffset - padding
+		  },
+		  mb: {
+			  left: left + width/2 - scaleOffset,
+			  top: top + height + scaleOffsetSize + padding
+		  },
+		  mr: {
+			  left: left + width + scaleOffsetSize + padding,
+			  top: top + height/2 - scaleOffset
+		  },
+		  ml: {
+			  left: left - scaleOffset - padding,
+			  top: top + height/2 - scaleOffset
+		  }
+	  };
 
-      // top-right
-      this._drawControl('tr', ctx, methodName,
-        left + width - scaleOffset + padding,
-        top - scaleOffset - padding);
+	    //fixme was impemented draw corrner rotation
+	    var corners = ['tl', 'tr', 'bl', 'br', 'ml', 'mt', 'mr', 'mb'],
+		    lockUniScalingCorners = ['mt', 'mb', 'mr', 'ml'];
 
-      // bottom-left
-      this._drawControl('bl', ctx, methodName,
-        left - scaleOffset - padding,
-        top + height + scaleOffsetSize + padding);
+	    for (var i in corners) {
+		    if ( this.cornerRotating === corners[i] && this.hasCornerRotatingPoint) {
 
-      // bottom-right
-      this._drawControl('br', ctx, methodName,
-        left + width + scaleOffsetSize + padding,
-        top + height + scaleOffsetSize + padding);
+			    this._drawRotationControl(this.cornerRotating, ctx,
+				    corrnerCoords[corners[i]].left + this.cornerRotatingPointOffset,
+				    corrnerCoords[corners[i]].top + this.cornerRotatingPointOffset);
 
-      if (!this.get('lockUniScaling')) {
+		    } //Define top-left [tl], top-right [tr], bottom-left [bl], bottom-right [br], middle-top [mt], middle-bottom [mb], middle-right [mr], middle-left [ml]
+		    else if( (lockUniScalingCorners[i] !== corners[i]) ||
+			    (!this.get('lockUniScaling') && lockUniScalingCorners[i] === corners[i]) ) {
 
-        // middle-top
-        this._drawControl('mt', ctx, methodName,
-          left + width/2 - scaleOffset,
-          top - scaleOffset - padding);
+			    this._drawControl(corners[i], ctx, methodName, corrnerCoords[corners[i]].left, corrnerCoords[corners[i]].top);
 
-        // middle-bottom
-        this._drawControl('mb', ctx, methodName,
-          left + width/2 - scaleOffset,
-          top + height + scaleOffsetSize + padding);
-
-        // middle-right
-        this._drawControl('mr', ctx, methodName,
-          left + width + scaleOffsetSize + padding,
-          top + height/2 - scaleOffset);
-
-        // middle-left
-        this._drawControl('ml', ctx, methodName,
-          left - scaleOffset - padding,
-          top + height/2 - scaleOffset);
-      }
+		    }
+	    }
 
       // middle-top-rotate
       if (this.hasRotatingPoint) {
-        this._drawControl('mtr', ctx, methodName,
-          left + width/2 - scaleOffset,
-          top - this.rotatingPointOffset - this.cornerSize/2 - padding);
+	      var mtrLeft = left + width/2 - scaleOffset;
+	      var mtrY = this.flipY
+		      ? (top + height + this.rotatingPointOffset - this.cornerSize/2 + padding)
+		      : (top - this.rotatingPointOffset - this.cornerSize/2 - padding);
+
+        this._drawControl('mtr', ctx, methodName, mtrLeft, mtrY);
       }
 
       ctx.restore();
 
       return this;
     },
+	_drawRotationControl: function(control, ctx, left, top){
+		var size = this.cornerRotationSize;
 
+		if (this.isControlVisible(control)) {
+			var controlArcAngles = {
+				tr: {start: 3.3*Math.PI, end: 0.2*Math.PI},
+				tl: {start: 2.6*Math.PI, end: 1.7*Math.PI},
+				bl: {start: 0.3*Math.PI, end: 1.3*Math.PI},
+				br: {start: 3.8*Math.PI, end: 0.7*Math.PI},
+				ml: {start: 2.7*Math.PI, end: 1.3*Math.PI},
+				mt: {start: 1.2*Math.PI, end: 1.8*Math.PI},
+				mb: {start: 2.2*Math.PI, end: 0.8*Math.PI},
+				mr: {start: 1.7*Math.PI, end: 2.3*Math.PI}
+			};
+			//Draw Rotation circle
+			ctx.beginPath();
+			ctx.arc(left, top, size, 0, Math.PI * 2, false);
+			ctx.closePath();
+			ctx.fill();
+
+			//Draw Rotation Arc
+			ctx.beginPath();
+			ctx.arc(left, top, size + 5, controlArcAngles[control].start, controlArcAngles[control].end);
+			ctx.stroke();
+		}
+	},
     /**
      * @private
      */
@@ -13580,8 +13503,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     initialize: function(options) {
       options = options || { };
 
-      this.callSuper('initialize', options);
       this.set('radius', options.radius || 0);
+      this.callSuper('initialize', options);
     },
 
     /**
@@ -18527,10 +18450,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     _renderText: function(ctx, textLines) {
       ctx.save();
       this._setShadow(ctx);
-      this._setupFillRule(ctx);
       this._renderTextFill(ctx, textLines);
       this._renderTextStroke(ctx, textLines);
-      this._restoreFillRule(ctx);
       this._removeShadow(ctx);
       ctx.restore();
     },
@@ -21537,7 +21458,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @param {Event} e Event object
    */
   onKeyPress: function(e) {
-    if (!this.isEditing || e.metaKey || e.ctrlKey || e.keyCode in this._keysMap) {
+    if (!this.isEditing || e.metaKey || e.ctrlKey || e.keyCode === 8 || e.keyCode === 13) {
       return;
     }
 
@@ -22288,10 +22209,10 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
   /**
    * Only available when running fabric on node.js
-   * @param {Number} width Canvas width
-   * @param {Number} height Canvas height
-   * @param {Object} [options] Options to pass to FabricCanvas.
-   * @param {Object} [nodeCanvasOptions] Options to pass to NodeCanvas.
+   * @param width Canvas width
+   * @param height Canvas height
+   * @param {Object} options to pass to FabricCanvas.
+   * @param {Object} options to pass to NodeCanvas.
    * @return {Object} wrapped canvas instance
    */
   fabric.createCanvasForNode = function(width, height, options, nodeCanvasOptions) {
