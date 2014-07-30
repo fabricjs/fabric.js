@@ -234,6 +234,7 @@ var filesToInclude = [
   ifSpecifiedInclude('image_filters', 'src/filters/sepia2_filter.class.js'),
   ifSpecifiedInclude('image_filters', 'src/filters/tint_filter.class.js'),
   ifSpecifiedInclude('image_filters', 'src/filters/multiply_filter.class.js'),
+  ifSpecifiedInclude('image_filters', 'src/filters/blend_filter.class.js'),
 
   ifSpecifiedInclude('text', 'src/shapes/text.class.js'),
   ifSpecifiedInclude('cufon', 'src/shapes/text.cufon.js'),
