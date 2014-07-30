@@ -36,16 +36,18 @@
 
     applyTo: function(canvasEl) {
       var context = canvasEl.getContext('2d'),
-      imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
-      data = imageData.data,
-      tr, tg, tb, r, g, b, source, 
-      isImage = false;
+          imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
+          data = imageData.data,
+          tr, tg, tb, 
+          r, g, b, 
+          source, 
+          isImage = false;
 
       if(this.image){
         // Blend images
         isImage = true;
 
-        var _el = document.createElement('canvas');
+        var _el = fabric.util.createCanvasElement();
         _el.width = this.image.width;
         _el.height = this.image.height;
 
