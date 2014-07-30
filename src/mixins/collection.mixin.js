@@ -143,5 +143,82 @@ fabric.Collection = {
       memo += current.complexity ? current.complexity() : 0;
       return memo;
     }, 0);
+  },
+
+  /**
+   * Returns all objects in the collection that intersect a given rectangle
+   * @param  {Object} rectCoords Rectangle coordinates to check against
+   * @return {Array} An array of fabric.Object
+   */
+  getObjectsInsideRect: function(rectCoords) {
+    return this._objects.filter(function(obj){
+      return fabric.util.doCoordinatesIntersect(rectCoords, obj.getCoords());
+    });
+  },
+
+  /**
+   * Gets the index within `this._objects` for the given object
+   * @param  {fabric.Object} obj The object to find
+   * @return {Number} The index of the object
+   */
+  indexForObject: function(obj) {
+    return this._objects.indexOf(obj);
+  },
+
+  /**
+   * For a given rectangle, specified by its coordinates, returns
+   * an array of objects within the collection that can be linked to the rectangle
+   * by a chain of intersecting objects. Used to determine which objects should
+   * be redrawn after a rectangle is cleared in performanceMode.
+   *
+   * An object will only pass the test if its index within the collection is
+   * higher than the object we're testing against. This is because if object A
+   * is above object B and object A has changed, redrawing only object A is the 
+   * correct behaviour. However if object B is above object A in the same case, 
+   * both need to be redrawn.
+   *
+   * @todo  Explain this better!
+   * @param  {Object} rectCoords Rectangle coordinates to check against
+   * @param  {Object} excludeObjs Objects that can be skipped
+   * @return {Array} An array of fabric.Object
+   */
+  iterativelyGetObjectsInsideRect: function(rectCoords, excludeObjs) {
+
+    // Pretend we already have an object
+    var dummyObject = {
+      getCoords: function() {
+        return rectCoords;
+      }
+    };
+
+    var intersectingObjects = [],
+        allObjs = this._objects.filter(function(el) {
+          return el.visible && excludeObjs.indexOf(el) === -1;
+        }),
+        foundStack = [dummyObject],
+        foundObj,
+        i,
+        objToTest,
+        remainingObjsToTest;
+
+    while (foundStack.length > 0) {
+      foundObj = foundStack.shift();
+      intersectingObjects.push(foundObj);
+      remainingObjsToTest = [];
+      for (i = 0; i < allObjs.length; i++) {
+        objToTest = allObjs[i];
+        if ((fabric.util.doCoordinatesIntersect(foundObj.getCoords(), objToTest.getCoords()) &&
+          this.indexForObject(objToTest) > this.indexForObject(foundObj))) {
+          foundStack.push(objToTest);
+        } else {
+          remainingObjsToTest.push(objToTest);
+        }
+      }
+      allObjs = remainingObjsToTest;
+    }
+
+    intersectingObjects.shift(); // Remove the dummy object
+
+    return intersectingObjects;
   }
 };

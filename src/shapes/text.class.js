@@ -753,6 +753,8 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     render: function(ctx, noTransform) {
+      // Mark as the object as not dirty, even if not visible
+      this.dirty = false; 
       // do not render if object is not visible
       if (!this.visible) return;
 

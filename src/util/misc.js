@@ -563,6 +563,20 @@
       imageData = null;
 
       return _isTransparent;
+    },
+
+    /**
+     * Checks if 2 rectangles intersect by their coordinates
+     * @param  {Object} coords1 Rectangle 1's coordinates
+     * @param  {Object} coords2 Rectangle 2's coordinates
+     * @return {Boolean} 
+     */
+    doCoordinatesIntersect: function(coords1, coords2) {
+      if (coords1.x2 < coords2.x1) return false;
+      if (coords1.x1 > coords2.x2) return false;
+      if (coords1.y2 < coords2.y1) return false;
+      if (coords1.y1 > coords2.y2) return false;
+      return true;
     }
   };
 

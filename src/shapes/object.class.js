@@ -659,6 +659,13 @@
     lockUniScaling:           false,
 
     /**
+     * When `true`, object is considered dirty and needs to be redrawn
+     * @type {Boolean}
+     * @default
+     */
+    dirty:                    true,
+
+    /**
      * List of properties to consider when checking if state
      * of an object is changed (fabric.Object#hasStateChanged)
      * as well as for history (undo/redo) purposes
@@ -848,6 +855,7 @@
 
     /**
      * Sets property to a given value. When changing position/dimension -related properties (left, top, scale, angle, etc.) `set` does not update position of object's borders/controls. If you need to update those, call `setCoords()`.
+     * If the value being set is different to the existing value for this key, the object should be considered dirty
      * @param {String|Object} key Property name or object (if object, iterate over the object properties)
      * @param {Object|Function} value Property value (if function, the value is passed into it and its return value is used as a new one)
      * @return {fabric.Object} thisArg
@@ -858,6 +866,10 @@
         this._setObject(key);
       }
       else {
+        if(this[key] !== value){
+          this.submitBoundsAsDirtyRect();
+          this.dirty = true;
+        }
         if (typeof value === 'function' && key !== 'clipTo') {
           this._set(key, value(this.get(key)));
         }
@@ -943,6 +955,8 @@
      * @param {Boolean} [noTransform] When true, context is not transformed
      */
     render: function(ctx, noTransform) {
+      // Mark as the object as not dirty, even if not visible
+      this.dirty = false; 
       // do not render if width/height are zeros or object is not visible
       if (this.width === 0 || this.height === 0 || !this.visible) return;
 
@@ -1436,6 +1450,63 @@
       return {
         x: pointer.x - objectLeftTop.x,
         y: pointer.y - objectLeftTop.y
+      };
+    },
+
+    /**
+     * Submits the object's bounding rectangle to the containing canvas to be 
+     * marked as a dirty rectangle
+     * @chainable
+     */
+    submitBoundsAsDirtyRect: function() {
+      if(typeof this.canvas !== 'undefined') {
+        var coords = this.getCoords();
+        this.canvas.addDirtyRect(coords);
+      }
+      return this;
+    },
+
+    /**
+     * Returns the absolute coordinates of the bounding rectangle for the object 
+     * in the format of a JS object: {x1,y1,x2,y2}
+     * @return {Object}
+     */
+    getCoords: function() {
+      var x1, x2, y1, y2;
+
+      // OriginX
+      if(this.originX === 'left'){
+        x1 = this.left || 0;
+        x2 = (this.left || 0) + ((this.width + 1) * this.scaleX);
+      }
+      if(this.originX === 'right'){
+        x1 = (this.left || 0) - (((this.width + 1) * this.scaleX));
+        x2 = (this.left || 0);
+      }
+      if(this.originX === 'center'){
+        x1 = (this.left || 0) - (((this.width + 1) * this.scaleX) / 2 );
+        x2 = (this.left || 0) + (((this.width + 1) * this.scaleX) / 2 );
+      }
+
+      // OriginY
+      if(this.originY === 'top'){
+        y1 = this.top   || 0;
+        y2 = (this.top  || 0) + ((this.height + 1) * this.scaleY);
+      }
+      if(this.originY === 'center'){
+        y1 = (this.top  || 0) - (((this.height + 1) * this.scaleY) / 2);
+        y2 = (this.top  || 0) + (((this.height + 1) * this.scaleY) / 2);
+      }
+      if(this.originY === 'bottom'){
+        y1 = (this.top  || 0) - ((this.height + 1) * this.scaleY);
+        y2 = (this.top  || 0);
+      }
+
+      return {
+        x1: x1, 
+        y1: y1, 
+        x2: x2, 
+        y2: y2
       };
     },
 

@@ -77,6 +77,12 @@
      * @chainable
      */
     setElement: function(element, callback) {
+
+      if(element !== this._element){
+        this.dirty = true;
+        this.submitBoundsAsDirtyRect();
+      }
+      
       this._element = element;
       this._originalElement = element;
       this._initConfig();
@@ -118,6 +124,8 @@
      * @param {Boolean} [noTransform] When true, context is not transformed
      */
     render: function(ctx, noTransform) {
+      // Mark as the object as not dirty, even if not visible
+      this.dirty = false;
       // do not render if object is not visible
       if (!this.visible) return;
 
