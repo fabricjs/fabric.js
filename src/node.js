@@ -172,8 +172,8 @@
   };
 
   var origSetWidth = fabric.StaticCanvas.prototype.setWidth;
-  fabric.StaticCanvas.prototype.setWidth = function(width) {
-    origSetWidth.call(this, width);
+  fabric.StaticCanvas.prototype.setWidth = function(width, options) {
+    origSetWidth.call(this, width, options);
     this.nodeCanvas.width = width;
     return this;
   };
@@ -182,8 +182,8 @@
   }
 
   var origSetHeight = fabric.StaticCanvas.prototype.setHeight;
-  fabric.StaticCanvas.prototype.setHeight = function(height) {
-    origSetHeight.call(this, height);
+  fabric.StaticCanvas.prototype.setHeight = function(height, options) {
+    origSetHeight.call(this, height, options);
     this.nodeCanvas.height = height;
     return this;
   };
