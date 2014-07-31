@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures,cufon,json minifier=uglifyjs` */
 /*! Fabric.js Copyright 2008-2014, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.4.9" };
+var fabric = fabric || { version: "1.4.10" };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -3151,10 +3151,9 @@ if (typeof console !== 'undefined') {
     if (!(matrix[0] !== 1 || matrix[3] !== 1 || matrix[4] !== 0 || matrix[5] !== 0)) return;
     // default is to preserve aspect ratio
     // preserveAspectRatio attribute to be implemented
-    var el = document.createElement('g');
+    var el = doc.ownerDocument.createElement('g');
     while (doc.firstChild != null) {
-      var node = doc.firstChild;
-      el.appendChild(node);
+      el.appendChild(doc.firstChild);
     }
     el.setAttribute('transform','matrix(' + matrix[0] + ' ' + matrix[1] + ' ' + matrix[2] + ' ' + matrix[3] + ' ' + matrix[4] + ' ' + matrix[5] + ')');
     doc.appendChild(el);
@@ -3254,8 +3253,8 @@ if (typeof console !== 'undefined') {
         heightAttr: heightAttr
       };
 
-      fabric.gradientDefs = extend(fabric.getGradientDefs(doc), fabric.gradientDefs);
-      fabric.cssRules = extend(fabric.getCSSRules(doc), fabric.cssRules);
+      fabric.gradientDefs = fabric.getGradientDefs(doc);
+      fabric.cssRules = fabric.getCSSRules(doc);
       // Precedence of rules:   style > class > attribute
 
       fabric.parseElements(elements, function(instances) {
@@ -5847,36 +5846,65 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
 
     /**
      * Sets width of this canvas instance
-     * @param {Number} width value to set width to
+     * @param {Number|String} width value to set width to
+     * @param {Object}        [options]                     Options object
+     * @param {Boolean}       [options.backstoreOnly=false] Set the given dimensions only as canvas backstore dimensions
+     * @param {Boolean}       [options.cssOnly=false]       Set the given dimensions only as css dimensions
      * @return {fabric.Canvas} instance
      * @chainable true
      */
-    setWidth: function (width) {
-      return this._setDimension('width', width);
+    setWidth: function (value, options) {
+      return this.setDimensions({ width: value }, options);
     },
 
     /**
      * Sets height of this canvas instance
-     * @param {Number} height value to set height to
+     * @param {Number|String} height value to set height to
+     * @param {Object}        [options]                     Options object
+     * @param {Boolean}       [options.backstoreOnly=false] Set the given dimensions only as canvas backstore dimensions
+     * @param {Boolean}       [options.cssOnly=false]       Set the given dimensions only as css dimensions
      * @return {fabric.Canvas} instance
      * @chainable true
      */
-    setHeight: function (height) {
-      return this._setDimension('height', height);
+    setHeight: function (value, options) {
+      return this.setDimensions({ height: value }, options);
     },
 
     /**
-     * Sets dimensions (width, height) of this canvas instance
-     * @param {Object} dimensions Object with width/height properties
-     * @param {Number} [dimensions.width] Width of canvas element
-     * @param {Number} [dimensions.height] Height of canvas element
+     * Sets dimensions (width, height) of this canvas instance. when options.cssOnly flag active you should also supply the unit of measure (px/%/em)
+     * @param {Object}        dimensions                    Object with width/height properties
+     * @param {Number|String} [dimensions.width]            Width of canvas element
+     * @param {Number|String} [dimensions.height]           Height of canvas element
+     * @param {Object}        [options]                     Options object
+     * @param {Boolean}       [options.backstoreOnly=false] Set the given dimensions only as canvas backstore dimensions
+     * @param {Boolean}       [options.cssOnly=false]       Set the given dimensions only as css dimensions
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
-    setDimensions: function(dimensions) {
+    setDimensions: function (dimensions, options) {
+      var cssValue;
+
+      options = options || {};
+
       for (var prop in dimensions) {
-        this._setDimension(prop, dimensions[prop]);
+        cssValue = dimensions[prop];
+
+        if (!options.cssOnly) {
+          this._setBackstoreDimension(prop, dimensions[prop]);
+          cssValue += 'px';
+        }
+
+        if (!options.backstoreOnly) {
+          this._setCssDimension(prop, cssValue);
+        }
       }
+
+      if (!options.cssOnly) {
+        this.renderAll();
+      }
+
+      this.calcOffset();
+
       return this;
     },
 
@@ -5888,27 +5916,40 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * @return {fabric.Canvas} instance
      * @chainable true
      */
-    _setDimension: function (prop, value) {
+    _setBackstoreDimension: function (prop, value) {
       this.lowerCanvasEl[prop] = value;
-      this.lowerCanvasEl.style[prop] = value + 'px';
 
       if (this.upperCanvasEl) {
         this.upperCanvasEl[prop] = value;
-        this.upperCanvasEl.style[prop] = value + 'px';
       }
 
       if (this.cacheCanvasEl) {
         this.cacheCanvasEl[prop] = value;
       }
 
-      if (this.wrapperEl) {
-        this.wrapperEl.style[prop] = value + 'px';
-      }
-
       this[prop] = value;
 
-      this.calcOffset();
-      this.renderAll();
+      return this;
+    },
+
+    /**
+     * Helper for setting css width/height
+     * @private
+     * @param {String} prop property (width|height)
+     * @param {String} value value to set property to
+     * @return {fabric.Canvas} instance
+     * @chainable true
+     */
+    _setCssDimension: function (prop, value) {
+      this.lowerCanvasEl.style[prop] = value;
+
+      if (this.upperCanvasEl) {
+        this.upperCanvasEl.style[prop] = value;
+      }
+
+      if (this.wrapperEl) {
+        this.wrapperEl.style[prop] = value;
+      }
 
       return this;
     },
@@ -8417,6 +8458,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
           bounds = upperCanvasEl.getBoundingClientRect(),
           cssScale;
 
+      this.calcOffset();
+
       pointer.x = pointer.x - this._offset.left;
       pointer.y = pointer.y - this._offset.top;
       if (!ignoreZoom) {
@@ -8436,6 +8479,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
           height: upperCanvasEl.height / bounds.height
         };
       }
+
       return {
         x: pointer.x * cssScale.width,
         y: pointer.y * cssScale.height
@@ -18135,6 +18179,118 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 })(typeof exports !== 'undefined' ? exports : this);
 
 
+(function(global){
+  'use strict';
+
+  var fabric = global.fabric;
+
+  /**
+   * Color Blend filter class
+   * @class fabric.Image.filter.Blend
+   * @memberOf fabric.Image.filters
+   * @extends fabric.Image.filters.BaseFilter
+   * @example
+   * var filter = new fabric.Image.filters.Blend({
+   *  color: '#000',
+   *  mode: 'multiply'
+   * });
+   *
+   * var filter = new fabric.Image.filters.Blend({
+   *  image: fabricImageObject,
+   *  mode: 'multiply',
+   *  alpha: 0.5
+   * });
+
+   * object.filters.push(filter);
+   * object.applyFilters(canvas.renderAll.bind(canvas));
+   */
+  fabric.Image.filters.Blend = fabric.util.createClass({
+    type: 'Blend',
+
+    initialize: function(options){
+      options = options || {};
+      this.color = options.color || '#000';
+      this.image = options.image || false;
+      this.mode = options.mode || 'multiply';
+      this.alpha = options.alpha || 1;
+    },
+
+    applyTo: function(canvasEl) {
+      var context = canvasEl.getContext('2d'),
+          imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
+          data = imageData.data,
+          tr, tg, tb, 
+          r, g, b, 
+          source, 
+          isImage = false;
+
+      if(this.image){
+        // Blend images
+        isImage = true;
+
+        var _el = fabric.util.createCanvasElement();
+        _el.width = this.image.width;
+        _el.height = this.image.height;
+
+        var _tmp_canvas = new fabric.StaticCanvas(_el);
+        _tmp_canvas.add(this.image);
+        var context2 =  _tmp_canvas.getContext('2d');
+        source = context2.getImageData(0, 0, _tmp_canvas.width, _tmp_canvas.height).data;
+      } else {
+        // Blend color 
+        source = new fabric.Color(this.color).getSource();
+
+        tr = source[0] * this.alpha;
+        tg = source[1] * this.alpha;
+        tb = source[2] * this.alpha;
+      }
+
+      for (var i = 0, len = data.length; i < len; i += 4) {
+
+        r = data[i];
+        g = data[i + 1];
+        b = data[i + 2];
+
+        if(isImage){
+          tr = source[i] * this.alpha;
+          tg = source[i + 1] * this.alpha;
+          tb = source[i + 2] * this.alpha;
+        }
+
+        switch(this.mode){
+          case 'multiply':
+            data[i] = r * tr / 255;
+            data[i + 1] = g * tg / 255;
+            data[i + 2] = b * tb / 255;
+            break;
+          case 'screen':
+            data[i] = 1 - (1-r) * (1-tr);
+            data[i + 1] = 1 - (1-g) * (1-tg);
+            data[i + 2] = 1 - (1-b) * (1-tb);
+            break;
+          case 'add':
+            data[i] = Math.min(255, r + tr);
+            data[i + 1] = Math.min(255, g + tg);
+            data[i + 2] = Math.min(255, b + tb);
+            break;
+          case 'diff':
+            data[i] = Math.abs(r - tr);
+            data[i + 1] = Math.abs(g - tg);
+            data[i + 2] = Math.abs(b - tb);
+            break;
+        }
+      }
+
+      context.putImageData(imageData, 0, 0);
+    }
+  });
+
+  fabric.Image.filters.Blend.fromObject = function(object) {
+    return new fabric.Image.filters.Blend(object);
+  };
+})(typeof exports !== 'undefined' ? exports : this);
+
+
 (function(global) {
 
   'use strict';
@@ -21350,7 +21506,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
       if (mouseOffset.y < height) {
         return this._getNewSelectionStartFromOffset(
-          mouseOffset, prevWidth, width, charIndex + i, jlen, j);
+          mouseOffset, prevWidth, width, charIndex + i, jlen);
       }
     }
 
@@ -21363,7 +21519,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   /**
    * @private
    */
-  _getNewSelectionStartFromOffset: function(mouseOffset, prevWidth, width, index, jlen, j) {
+  _getNewSelectionStartFromOffset: function(mouseOffset, prevWidth, width, index, jlen) {
 
     var distanceBtwLastCharAndCursor = mouseOffset.x - prevWidth,
         distanceBtwNextCharAndCursor = width - mouseOffset.x,
@@ -21377,10 +21533,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
     if (newSelectionStart > this.text.length) {
       newSelectionStart = this.text.length;
-    }
-
-    if (j === jlen) {
-      newSelectionStart--;
     }
 
     return newSelectionStart;
@@ -22326,8 +22478,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   };
 
   var origSetWidth = fabric.StaticCanvas.prototype.setWidth;
-  fabric.StaticCanvas.prototype.setWidth = function(width) {
-    origSetWidth.call(this, width);
+  fabric.StaticCanvas.prototype.setWidth = function(width, options) {
+    origSetWidth.call(this, width, options);
     this.nodeCanvas.width = width;
     return this;
   };
@@ -22336,8 +22488,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   }
 
   var origSetHeight = fabric.StaticCanvas.prototype.setHeight;
-  fabric.StaticCanvas.prototype.setHeight = function(height) {
-    origSetHeight.call(this, height);
+  fabric.StaticCanvas.prototype.setHeight = function(height, options) {
+    origSetHeight.call(this, height, options);
     this.nodeCanvas.height = height;
     return this;
   };
