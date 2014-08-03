@@ -849,8 +849,8 @@
             : (this.height/2) - (textLines.length * this.fontSize) - this._totalLineHeight;
 
       return {
-        textLeft: textLeft,
-        textTop: textTop,
+        textLeft: textLeft + (this.group ? this.left : 0),
+        textTop: textTop + (this.group ? this.top : 0),
         lineTop: lineTop
       };
     },
@@ -860,7 +860,7 @@
      */
     _wrapSVGTextAndBg: function(markup, textAndBg, shadowSpans, offsets) {
       markup.push(
-        '<g transform="', this.getSvgTransform(), '">',
+        '<g transform="', this.getSvgTransform(), this.getSvgTransformMatrix(), '">\n',
           textAndBg.textBgRects.join(''),
           '<text ',
             (this.fontFamily ? 'font-family="' + this.fontFamily.replace(/"/g,'\'') + '" ': ''),
@@ -873,8 +873,8 @@
             'transform="translate(', toFixed(offsets.textLeft, 2), ' ', toFixed(offsets.textTop, 2), ')">',
             shadowSpans.join(''),
             textAndBg.textSpans.join(''),
-          '</text>',
-        '</g>'
+          '</text>\n',
+        '</g>\n'
       );
     },
 
@@ -992,7 +992,7 @@
           toFixed(this._boundaries[i].width, 2),
           '" height="',
           toFixed(this._boundaries[i].height, 2),
-        '"></rect>');
+        '"></rect>\n');
     },
 
     _setSVGBg: function(textBgRects) {
