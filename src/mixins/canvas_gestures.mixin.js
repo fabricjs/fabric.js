@@ -70,7 +70,9 @@
           lockScalingX = target.get('lockScalingX'),
           lockScalingY = target.get('lockScalingY');
 
-      if (lockScalingX && lockScalingY) return;
+      if (lockScalingX && lockScalingY) {
+        return;
+      }
 
       target._scaling = true;
 
@@ -97,7 +99,9 @@
     _rotateObjectByAngle: function(curAngle) {
       var t = this._currentTransform;
 
-      if (t.target.get('lockRotation')) return;
+      if (t.target.get('lockRotation')) {
+        return;
+      }
       t.target.angle = radiansToDegrees(degreesToRadians(curAngle) + t.theta);
     }
   });

@@ -125,7 +125,9 @@
                   scx = sx + cx - halfSide;
 
               /* jshint maxdepth:5 */
-              if (scy < 0 || scy > sh || scx < 0 || scx > sw) continue;
+              if (scy < 0 || scy > sh || scx < 0 || scx > sw) {
+                continue;
+              }
 
               var srcOff = (scy * sw + scx) * 4,
                   wt = weights[cy * side + cx];

@@ -164,7 +164,9 @@
           cp.x,
           cp.y
         );
-        if (!this.transformMatrix) ctx.translate(-this.group.width / 2, -this.group.height / 2);
+        if (!this.transformMatrix) {
+          ctx.translate(-this.group.width / 2, -this.group.height / 2);
+        }
       }
 
       if (!this.strokeDashArray || this.strokeDashArray && supportsLineDash) {

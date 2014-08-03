@@ -94,7 +94,9 @@
         // one of commands (m,M,l,L,q,Q,c,C,etc.) followed by non-command characters (i.e. command values)
         : path.match && path.match(/[mzlhvcsqta][^mzlhvcsqta]*/gi);
 
-      if (!this.path) return;
+      if (!this.path) {
+        return;
+      }
 
       if (!fromArray) {
         this.path = this._parsePath();
@@ -455,12 +457,14 @@
      */
     render: function(ctx, noTransform) {
       // do not render if object is not visible
-      if (!this.visible) return;
+      if (!this.visible) {
+        return;
+      }
 
       ctx.save();
       if (noTransform) {
-        ctx.translate(-this.width/2, -this.height/2);	
-      }      
+        ctx.translate(-this.width/2, -this.height/2);
+      }
       var m = this.transformMatrix;
 
       if (m) {
@@ -541,6 +545,7 @@
       var path = chunks.join(' ');
 
       markup.push(
+        //jscs:disable validateIndentation
         '<g transform="', (this.group ? '' : this.getSvgTransform()), '">',
           '<path ',
             'd="', path,
@@ -549,6 +554,7 @@
             '" stroke-linecap="round" ',
           '/>',
         '</g>'
+        //jscs:enable validateIndentation
       );
 
       return reviver ? reviver(markup.join('')) : markup.join('');

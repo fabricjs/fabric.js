@@ -99,7 +99,9 @@
      */
     render: function(ctx, noTransform) {
       // do not use `get` for perf. reasons
-      if (this.rx === 0 || this.ry === 0) return;
+      if (this.rx === 0 || this.ry === 0) {
+        return;
+      }
       return this.callSuper('render', ctx, noTransform);
     },
 

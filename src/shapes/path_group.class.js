@@ -72,7 +72,9 @@
      */
     render: function(ctx) {
       // do not render if object is not visible
-      if (!this.visible) return;
+      if (!this.visible) {
+        return;
+      }
 
       ctx.save();
 
@@ -148,10 +150,12 @@
     toSVG: function(reviver) {
       var objects = this.getObjects(),
           markup = [
+            //jscs:disable validateIndentation
             '<g ',
               'style="', this.getSvgStyles(), '" ',
               'transform="', this.getSvgTransform(), '" ',
             '>'
+            //jscs:enable validateIndentation
           ];
 
       for (var i = 0, len = objects.length; i < len; i++) {

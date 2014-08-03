@@ -339,7 +339,9 @@
      * @param {fabric.Object} target
      */
     _shouldCenterTransform: function (e, target) {
-      if (!target) return;
+      if (!target) {
+        return;
+      }
 
       var t = this._currentTransform,
           centerTransform;
@@ -403,7 +405,9 @@
      * @param {fabric.Object} target
      */
     _setupCurrentTransform: function (e, target) {
-      if (!target) return;
+      if (!target) {
+        return;
+      }
 
       var pointer = this.getPointer(e),
           corner = target._findTargetCorner(this.getPointer(e, true)),
@@ -472,7 +476,9 @@
           lockScalingX = target.get('lockScalingX'),
           lockScalingY = target.get('lockScalingY');
 
-      if (lockScalingX && lockScalingY) return;
+      if (lockScalingX && lockScalingY) {
+        return;
+      }
 
       // Get the constraint point
       var constraintPosition = target.translateToOriginPoint(target.getCenterPoint(), t.originX, t.originY),
@@ -623,7 +629,9 @@
 
       var t = this._currentTransform;
 
-      if (t.target.get('lockRotation')) return;
+      if (t.target.get('lockRotation')) {
+        return;
+      }
 
       var lastAngle = atan2(t.ey - t.top, t.ex - t.left),
           curAngle = atan2(y - t.top, x - t.left),
@@ -722,7 +730,9 @@
      * @param {Boolean} skipGroup when true, group is skipped and only objects are traversed through
      */
     findTarget: function (e, skipGroup) {
-      if (this.skipTargetFind) return;
+      if (this.skipTargetFind) {
+        return;
+      }
 
       if (this._isLastRenderedObject(e)) {
         return this.lastRenderedObjectWithControlsAboveOverlay;
@@ -1102,7 +1112,9 @@
      */
     _drawObjectsControls: function(ctx) {
       for (var i = 0, len = this._objects.length; i < len; ++i) {
-        if (!this._objects[i] || !this._objects[i].active) continue;
+        if (!this._objects[i] || !this._objects[i].active) {
+          continue;
+        }
         this._objects[i]._renderControls(ctx);
         this.lastRenderedObjectWithControlsAboveOverlay = this._objects[i];
       }

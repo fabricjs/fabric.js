@@ -1,7 +1,9 @@
 (function(){
 
   var degreesToRadians = fabric.util.degreesToRadians,
+      //jscs:disable requireCamelCaseOrUpperCaseIdentifiers
       isVML = function() { return typeof G_vmlCanvasManager !== 'undefined'; };
+      //jscs:enable requireCamelCaseOrUpperCaseIdentifiers
 
   fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
 
@@ -262,7 +264,9 @@
      * @chainable
      */
     drawBorders: function(ctx) {
-      if (!this.hasBorders) return this;
+      if (!this.hasBorders) {
+        return this;
+      }
 
       var padding = this.padding,
           padding2 = padding * 2,
@@ -337,7 +341,9 @@
      * @chainable
      */
     drawControls: function(ctx) {
-      if (!this.hasControls) return this;
+      if (!this.hasControls) {
+        return this;
+      }
 
       var size = this.cornerSize,
           size2 = size / 2,

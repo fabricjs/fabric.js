@@ -421,7 +421,9 @@
       this.width = this.width || parseInt(this.lowerCanvasEl.width, 10) || 0;
       this.height = this.height || parseInt(this.lowerCanvasEl.height, 10) || 0;
 
-      if (!this.lowerCanvasEl.style) return;
+      if (!this.lowerCanvasEl.style) {
+        return;
+      }
 
       this.lowerCanvasEl.width = this.width;
       this.lowerCanvasEl.height = this.height;
@@ -468,7 +470,7 @@
 
     /**
      * Sets width of this canvas instance
-     * @param {Number|String} width value to set width to
+     * @param {Number|String} value                         Value to set width to
      * @param {Object}        [options]                     Options object
      * @param {Boolean}       [options.backstoreOnly=false] Set the given dimensions only as canvas backstore dimensions
      * @param {Boolean}       [options.cssOnly=false]       Set the given dimensions only as css dimensions
@@ -481,7 +483,7 @@
 
     /**
      * Sets height of this canvas instance
-     * @param {Number|String} height value to set height to
+     * @param {Number|String} value                         Value to set height to
      * @param {Object}        [options]                     Options object
      * @param {Boolean}       [options.backstoreOnly=false] Set the given dimensions only as canvas backstore dimensions
      * @param {Boolean}       [options.cssOnly=false]       Set the given dimensions only as css dimensions
@@ -693,14 +695,18 @@
      * @private
      */
     _draw: function (ctx, object) {
-      if (!object) return;
+      if (!object) {
+        return;
+      }
 
       ctx.save();
       var v = this.viewportTransform;
       ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
       object.render(ctx);
       ctx.restore();
-      if (!this.controlsAboveOverlay) object._renderControls(ctx);
+      if (!this.controlsAboveOverlay) {
+        object._renderControls(ctx);
+      }
     },
 
     /**

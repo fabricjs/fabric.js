@@ -41,7 +41,9 @@
      * @param {Object} canvasEl Canvas element to apply filter to
      */
     applyTo: function(canvasEl) {
-      if (!this.mask) return;
+      if (!this.mask) {
+        return;
+      }
 
       var context = canvasEl.getContext('2d'),
           imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),

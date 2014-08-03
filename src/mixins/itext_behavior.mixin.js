@@ -61,10 +61,11 @@
      * @private
      */
     _tick: function() {
+      if (this._abortCursorAnimation) {
+        return;
+      }
 
       var _this = this;
-
-      if (this._abortCursorAnimation) return;
 
       this.animate('_currentCursorOpacity', 1, {
 
@@ -88,7 +89,9 @@
      * @private
      */
     _onTickComplete: function() {
-      if (this._abortCursorAnimation) return;
+      if (this._abortCursorAnimation) {
+        return;
+      }
 
       var _this = this;
       if (this._cursorTimeout1) {
@@ -315,7 +318,9 @@
      * @chainable
      */
     enterEditing: function() {
-      if (this.isEditing || !this.editable) return;
+      if (this.isEditing || !this.editable) {
+        return;
+      }
 
       this.exitEditingOnOthers();
 
@@ -364,7 +369,9 @@
      * @private
      */
     _updateTextarea: function() {
-      if (!this.hiddenTextarea) return;
+      if (!this.hiddenTextarea) {
+        return;
+      }
 
       this.hiddenTextarea.value = this.text;
       this.hiddenTextarea.selectionStart = this.selectionStart;
@@ -389,7 +396,9 @@
      * @private
      */
     _restoreEditingProps: function() {
-      if (!this._savedProps) return;
+      if (!this._savedProps) {
+        return;
+      }
 
       this.hoverCursor = this._savedProps.overCursor;
       this.hasControls = this._savedProps.hasControls;
@@ -575,7 +584,9 @@
     insertStyleObjects: function(_chars, isEndOfLine, styles) {
 
       // short-circuit
-      if (this.isEmptyStyles()) return;
+      if (this.isEmptyStyles()) {
+        return;
+      }
 
       var cursorLocation = this.get2DCursorLocation(),
           lineIndex = cursorLocation.lineIndex,

@@ -379,7 +379,9 @@
 
       // accept only left clicks
       var isLeftClick  = 'which' in e ? e.which === 1 : e.button === 1;
-      if (!isLeftClick && !fabric.isTouchSupported) return;
+      if (!isLeftClick && !fabric.isTouchSupported) {
+        return;
+      }
 
       if (this.isDrawingMode) {
         this._onMouseDownInDrawingMode(e);
@@ -387,7 +389,9 @@
       }
 
       // ignore if some object is being transformed at this moment
-      if (this._currentTransform) return;
+      if (this._currentTransform) {
+        return;
+      }
 
       var target = this.findTarget(e),
           pointer = this.getPointer(e, true);

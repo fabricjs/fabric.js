@@ -115,8 +115,8 @@
     addWithUpdate: function(object) {
       this._restoreObjectsState();
       if (object) {
-          this._objects.push(object);
-          object.group = this;
+        this._objects.push(object);
+        object.group = this;
       }
       // since _restoreObjectsState set objects inactive
       this.forEachObject(this._setObjectActive, this);
@@ -218,7 +218,9 @@
      */
     render: function(ctx) {
       // do not render if object is not visible
-      if (!this.visible) return;
+      if (!this.visible) {
+        return;
+      }
 
       ctx.save();
       this.clipTo && fabric.util.clipContext(this, ctx);
@@ -252,7 +254,9 @@
       var originalHasRotatingPoint = object.hasRotatingPoint;
 
       // do not render if object is not visible
-      if (!object.visible) return;
+      if (!object.visible) {
+        return;
+      }
 
       object.hasRotatingPoint = false;
 
@@ -475,9 +479,11 @@
      */
     toSVG: function(reviver) {
       var markup = [
+        //jscs:disable validateIndentation
         '<g ',
           'transform="', this.getSvgTransform(),
         '">'
+        //jscs:enable validateIndentation
       ];
 
       for (var i = 0, len = this._objects.length; i < len; i++) {

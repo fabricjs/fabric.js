@@ -67,7 +67,9 @@
       this.minX = minX;
       this.minY = minY;
 
-      if (skipOffset) return;
+      if (skipOffset) {
+        return;
+      }
 
       var halfWidth = this.width / 2 + this.minX,
           halfHeight = this.height / 2 + this.minY;

@@ -38,12 +38,12 @@
       var context = canvasEl.getContext('2d'),
           imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
           data = imageData.data,
-          tr, tg, tb, 
-          r, g, b, 
-          source, 
+          tr, tg, tb,
+          r, g, b,
+          source,
           isImage = false;
 
-      if(this.image){
+      if (this.image) {
         // Blend images
         isImage = true;
 
@@ -51,12 +51,13 @@
         _el.width = this.image.width;
         _el.height = this.image.height;
 
-        var _tmp_canvas = new fabric.StaticCanvas(_el);
-        _tmp_canvas.add(this.image);
-        var context2 =  _tmp_canvas.getContext('2d');
-        source = context2.getImageData(0, 0, _tmp_canvas.width, _tmp_canvas.height).data;
-      } else {
-        // Blend color 
+        var tmpCanvas = new fabric.StaticCanvas(_el);
+        tmpCanvas.add(this.image);
+        var context2 =  tmpCanvas.getContext('2d');
+        source = context2.getImageData(0, 0, tmpCanvas.width, tmpCanvas.height).data;
+      }
+      else {
+        // Blend color
         source = new fabric.Color(this.color).getSource();
 
         tr = source[0] * this.alpha;
@@ -70,22 +71,22 @@
         g = data[i + 1];
         b = data[i + 2];
 
-        if(isImage){
+        if (isImage) {
           tr = source[i] * this.alpha;
           tg = source[i + 1] * this.alpha;
           tb = source[i + 2] * this.alpha;
         }
 
-        switch(this.mode){
+        switch (this.mode) {
           case 'multiply':
             data[i] = r * tr / 255;
             data[i + 1] = g * tg / 255;
             data[i + 2] = b * tb / 255;
             break;
           case 'screen':
-            data[i] = 1 - (1-r) * (1-tr);
-            data[i + 1] = 1 - (1-g) * (1-tg);
-            data[i + 2] = 1 - (1-b) * (1-tb);
+            data[i] = 1 - (1 - r) * (1 - tr);
+            data[i + 1] = 1 - (1 - g) * (1 - tg);
+            data[i + 2] = 1 - (1 - b) * (1 - tb);
             break;
           case 'add':
             data[i] = Math.min(255, r + tr);

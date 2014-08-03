@@ -39,7 +39,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * });
    */
   loadFromJSON: function (json, callback, reviver) {
-    if (!json) return;
+    if (!json) {
+      return;
+    }
 
     // serialize if it wasn't already
     var serialized = (typeof json === 'string')

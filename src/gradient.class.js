@@ -165,6 +165,7 @@
 
       if (this.type === 'linear') {
         markup = [
+          //jscs:disable validateIndentation
           '<linearGradient ',
             'id="SVGID_', this.id,
             '" gradientUnits="', this.gradientUnits,
@@ -173,10 +174,12 @@
             '" x2="', coords.x2,
             '" y2="', coords.y2,
           '">'
+          //jscs:enable validateIndentation
         ];
       }
       else if (this.type === 'radial') {
         markup = [
+          //jscs:disable validateIndentation
           '<radialGradient ',
             'id="SVGID_', this.id,
             '" gradientUnits="', this.gradientUnits,
@@ -186,16 +189,19 @@
             '" fx="', coords.x1,
             '" fy="', coords.y1,
           '">'
+          //jscs:enable validateIndentation
         ];
       }
 
       for (var i = 0; i < this.colorStops.length; i++) {
         markup.push(
+          //jscs:disable validateIndentation
           '<stop ',
             'offset="', (this.colorStops[i].offset * 100) + '%',
             '" style="stop-color:', this.colorStops[i].color,
             (this.colorStops[i].opacity ? ';stop-opacity: ' + this.colorStops[i].opacity : ';'),
           '"/>'
+          //jscs:enable validateIndentation
         );
       }
 
@@ -213,7 +219,9 @@
     toLive: function(ctx) {
       var gradient;
 
-      if (!this.type) return;
+      if (!this.type) {
+        return;
+      }
 
       if (this.type === 'linear') {
         gradient = ctx.createLinearGradient(

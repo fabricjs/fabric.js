@@ -119,8 +119,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
   /**
    * Animates object's properties
-   * @param {String|Object} property to animate (if string) or properties to animate (if object)
-   * @param {Number|Object} value to animate property to (if string was given first) or options object
+   * @param {String|Object} property Property to animate (if string) or properties to animate (if object)
+   * @param {Number|Object} value Value to animate property to (if string was given first) or options object
    * @return {fabric.Object} thisArg
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-2/#animation}
    * @chainable
@@ -208,11 +208,15 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         else {
           _this.set(property, value);
         }
-        if (skipCallbacks) return;
+        if (skipCallbacks) {
+          return;
+        }
         options.onChange && options.onChange();
       },
       onComplete: function() {
-        if (skipCallbacks) return;
+        if (skipCallbacks) {
+          return;
+        }
 
         _this.setCoords();
         options.onComplete && options.onComplete();
