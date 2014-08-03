@@ -1081,15 +1081,12 @@
           -this.width / 2 + this.fill.offsetX || 0,
           -this.height / 2 + this.fill.offsetY || 0);
       }
-      //ctx.save();
-      //ctx.transform(3.321, -0.6998, 0.4077, 1.9347, 3400,0);
       if (this.fillRule === 'destination-over') {
         ctx.fill('evenodd');
       }
       else {
         ctx.fill();
       }
-      //ctx.restore();
       if (this.fill.toLive) {
         ctx.restore();
       }
