@@ -79,9 +79,9 @@
     toSVG: function(reviver) {
       var markup = this._createBaseSVGMarkup(), x = 0, y = 0;
       if (this.group) {
-	  	x = this.left + this.rx;
-	  	y = this.top + this.ry;
-	  }
+	x = this.left + this.rx;
+	y = this.top + this.ry;
+      }
       markup.push(
         '<ellipse ',
           'cx="', x, '" cy="', y, '" ',
