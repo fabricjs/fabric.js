@@ -113,46 +113,6 @@
     },
 
     /**
-     * Renders image on a specified context
-     * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Boolean} [noTransform] When true, context is not transformed
-     */
-/*    render: function(ctx, noTransform) {
-      // do not render if object is not visible
-      if (!this.visible) {
-        return;
-      }
-
-      ctx.save();
-      var m = this.transformMatrix,
-          isInPathGroup = this.group && this.group.type === 'path-group';
-
-      // this._resetWidthHeight();
-      if (isInPathGroup) {
-        ctx.translate(-this.group.width/2, -this.group.height/2);
-      }
-      if (m) {
-        ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
-      }
-      if (!noTransform) {
-        this.transform(ctx);
-      }
-      if (isInPathGroup) {
-        ctx.translate(this.width/2, this.height/2);
-      }
-
-      this._setShadow(ctx);
-      this.clipTo && fabric.util.clipContext(this, ctx);
-      this._render(ctx);
-      if (this.shadow && !this.shadow.affectStroke) {
-        this._removeShadow(ctx);
-      }
-      this._renderStroke(ctx);
-      this.clipTo && ctx.restore();
-      ctx.restore();
-    },*/
-
-    /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
