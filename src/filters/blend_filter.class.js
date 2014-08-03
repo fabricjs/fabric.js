@@ -93,9 +93,29 @@
             data[i + 2] = Math.min(255, b + tb);
             break;
           case 'diff':
+          case 'difference':
             data[i] = Math.abs(r - tr);
             data[i + 1] = Math.abs(g - tg);
             data[i + 2] = Math.abs(b - tb);
+            break;
+          case 'subtract':
+            var _r = r-tr;
+            var _g = g-tg;
+            var _b = b-tb;
+
+            data[i] = (_r < 0) ? 0 : _r;
+            data[i + 1] = (_g < 0) ? 0 : _g;
+            data[i + 2] = (_b < 0) ? 0 : _b;
+            break;
+          case 'darken':
+            data[i] = Math.min(r, tr);
+            data[i + 1] = Math.min(g, tg);
+            data[i + 2] = Math.min(b, tb);
+            break;
+          case 'lighten':
+            data[i] = Math.max(r, tr);
+            data[i + 1] = Math.max(g, tg);
+            data[i + 2] = Math.max(b, tb);
             break;
         }
       }
