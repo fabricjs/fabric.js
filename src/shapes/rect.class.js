@@ -50,17 +50,6 @@
      */
     ry:   0,
 
-    /**
-     * @type Number
-     * @default
-     */
-    x: 0,
-
-    /**
-     * @type Number
-     * @default
-     */
-    y: 0,
 
     /**
      * Used to specify dash pattern for stroke on this object
@@ -79,8 +68,6 @@
       this.callSuper('initialize', options);
       this._initRxRy();
 
-      this.x = options.x || 0;
-      this.y = options.y || 0;
     },
 
     /**
@@ -169,9 +156,7 @@
     toObject: function(propertiesToInclude) {
       var object = extend(this.callSuper('toObject', propertiesToInclude), {
         rx: this.get('rx') || 0,
-        ry: this.get('ry') || 0,
-        x: this.get('x'),
-        y: this.get('y')
+        ry: this.get('ry') || 0
       });
       if (!this.includeDefaultValues) {
         this._removeDefaultValues(object);
