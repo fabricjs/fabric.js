@@ -27,8 +27,6 @@
     'clipTo':             null,
     'rx':                 0,
     'ry':                 0,
-    'x':                  0,
-    'y':                  0
   };
 
   QUnit.module('fabric.Rect');
@@ -99,8 +97,8 @@
     ok(rectWithAttrs instanceof fabric.Rect);
 
     var expectedObject = fabric.util.object.extend(REFERENCE_RECT, {
-      left:             121,
-      top:              186.5,
+      left:             10,
+      top:              20,
       width:            222,
       height:           333,
       fill:             'rgb(255,255,255)',
@@ -112,9 +110,7 @@
       strokeLineJoin:   'bevil',
       strokeMiterLimit: 5,
       rx:               11,
-      ry:               12,
-      x:                10,
-      y:                20
+      ry:               12
     });
     deepEqual(rectWithAttrs.toObject(), expectedObject);
   });
