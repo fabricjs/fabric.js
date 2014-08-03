@@ -527,7 +527,7 @@
         if (heightAttr && heightAttr !== viewBoxHeight) {
           scaleY = heightAttr / viewBoxHeight;
         }
-        addSvgTransform(doc, [scaleX, 0, 0, scaleY, -minX, -minY]);
+        addSvgTransform(doc, [scaleX, 0, 0, scaleY, scaleX * -minX, scaleY * -minY]);
       }
 
       var descendants = fabric.util.toArray(doc.getElementsByTagName('*'));
