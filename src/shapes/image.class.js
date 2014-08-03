@@ -117,7 +117,7 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      * @param {Boolean} [noTransform] When true, context is not transformed
      */
-    render: function(ctx, noTransform) {
+/*    render: function(ctx, noTransform) {
       // do not render if object is not visible
       if (!this.visible) {
         return;
@@ -150,7 +150,7 @@
       this._renderStroke(ctx);
       this.clipTo && ctx.restore();
       ctx.restore();
-    },
+    },*/
 
     /**
      * @private
@@ -209,20 +209,24 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var markup = [];
-
+      var markup = [], x = -this.width / 2, y = -this.height / 2;
+      if (this.group) {
+	  	x = this.left;
+	  	y = this.top;
+	  }
       markup.push(
-        '<g transform="', this.getSvgTransform(), '">',
+        '<g transform="', (this.group ? '' : this.getSvgTransform()), '">\n',
           '<image xlink:href="', this.getSvgSrc(),
+            '" x="', x, '" y="', y,
             '" style="', this.getSvgStyles(),
             // we're essentially moving origin of transformation from top/left corner to the center of the shape
             // by wrapping it in container <g> element with actual transformation, then offsetting object to the top/left
             // so that object's center aligns with container's left/top
-            '" transform="translate(' + (-this.width/2) + ' ' + (-this.height/2) + ')',
+            '" transform="', this.getSvgTransformMatrix(),
             '" width="', this.width,
             '" height="', this.height,
             '" preserveAspectRatio="none"',
-          '></image>'
+          '></image>\n'
       );
 
       if (this.stroke || this.strokeDashArray) {
@@ -233,12 +237,12 @@
             'x="', (-1 * this.width / 2), '" y="', (-1 * this.height / 2),
             '" width="', this.width, '" height="', this.height,
             '" style="', this.getSvgStyles(),
-          '"/>'
+          '"/>\n'
         );
         this.fill = origFill;
       }
 
-      markup.push('</g>');
+      markup.push('</g>\n');
 
       return reviver ? reviver(markup.join('')) : markup.join('');
     },
@@ -332,12 +336,12 @@
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    _render: function(ctx) {
+    _render: function(ctx, noTransform) {
       this._element &&
       ctx.drawImage(
         this._element,
-        -this.width / 2,
-        -this.height / 2,
+        noTransform ? this.left : -this.width/2,
+        noTransform ? this.top : -this.height/2,
         this.width,
         this.height
       );
