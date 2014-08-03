@@ -79,15 +79,19 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var markup = this._createBaseSVGMarkup();
-
+      var markup = this._createBaseSVGMarkup(), x = 0, y = 0;
+      if (this.group) {
+	  	  x = this.left + this.radius;
+	  	  y = this.top + this.radius;
+	    }
       markup.push(
         '<circle ',
-          'cx="0" cy="0" ',
+          'cx="' + x + '" cy="' + y + '" ',
           'r="', this.radius,
           '" style="', this.getSvgStyles(),
           '" transform="', this.getSvgTransform(),
-        '"/>'
+          ' ', this.getSvgTransformMatrix(),
+        '"/>\n'
       );
 
       return reviver ? reviver(markup.join('')) : markup.join('');
@@ -101,11 +105,9 @@
      */
     _render: function(ctx, noTransform) {
       ctx.beginPath();
-      // multiply by currently set alpha (the one that was set by path group where this object is contained, for example)
-      ctx.globalAlpha = this.group ? (ctx.globalAlpha * this.opacity) : this.opacity;
-      ctx.arc(noTransform ? this.left : 0, noTransform ? this.top : 0, this.radius, 0, piBy2, false);
+      ctx.arc(noTransform ? this.left + this.radius : 0, noTransform ? this.top + this.radius : 0, this.radius, 0, piBy2, false);
       this._renderFill(ctx);
-      this.stroke && this._renderStroke(ctx);
+      this._renderStroke(ctx);
     },
 
     /**
@@ -169,22 +171,13 @@
       throw new Error('value of `r` attribute is required and can not be negative');
     }
 
-    if (!('left' in parsedAttributes)) {
-      parsedAttributes.left = 0;
-    }
-    if (!('top' in parsedAttributes)) {
-      parsedAttributes.top = 0;
-    }
-    if (!('transformMatrix' in parsedAttributes)) {
-      parsedAttributes.left -= options.width ? (options.width / 2) : 0;
-      parsedAttributes.top -= options.height ? (options.height / 2) : 0;
-    }
+    parsedAttributes.left = parsedAttributes.left || 0;
+    parsedAttributes.top = parsedAttributes.top || 0;
 
     var obj = new fabric.Circle(extend(parsedAttributes, options));
 
-    obj.cx = parseFloat(element.getAttribute('cx')) || 0;
-    obj.cy = parseFloat(element.getAttribute('cy')) || 0;
-
+    obj.left -= obj.radius;
+    obj.top -= obj.radius;
     return obj;
   };
 
