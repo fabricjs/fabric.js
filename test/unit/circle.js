@@ -152,8 +152,8 @@
     ok(oCircle instanceof fabric.Circle);
 
     equal(oCircle.get('radius'), radius);
-    equal(oCircle.get('left'), left);
-    equal(oCircle.get('top'), top);
+    equal(oCircle.get('left'), left - radius);
+    equal(oCircle.get('top'), top - radius);
     equal(oCircle.get('fill'), fill);
     equal(oCircle.get('opacity'), opacity);
     equal(oCircle.get('strokeWidth'), strokeWidth);
