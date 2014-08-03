@@ -149,12 +149,12 @@
      */
     toSVG: function(reviver) {
       var objects = this.getObjects(),
-          translatePart = 'translate(' + (this.left) + ' ' + (this.top) + ')',
+          translatePart = 'translate(' + this.left + ' ' + this.top + ')',
           markup = [
             //jscs:disable validateIndentation
             '<g ',
               'style="', this.getSvgStyles(), '" ',
-              'transform="',translatePart, this.getSvgTransform(), '" ',
+              'transform="', translatePart, this.getSvgTransform(), '" ',
             '>\n'
             //jscs:enable validateIndentation
           ];
