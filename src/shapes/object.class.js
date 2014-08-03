@@ -960,12 +960,14 @@
       this._setStrokeStyles(ctx);
       this._setFillStyles(ctx);
 
-      var m = this.transformMatrix;
-      if (m && this.group) {
+      if (this.group && this.group.type == 'path-group') {
         ctx.translate(-this.group.width/2, -this.group.height/2);
-        ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
+        var m = this.transformMatrix;
+        if (m) {
+          ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);          
+        }
       }
-
+      ctx.globalAlpha = this.group ? (ctx.globalAlpha * this.opacity) : this.opacity;
       this._setShadow(ctx);
       this.clipTo && fabric.util.clipContext(this, ctx);
       this._render(ctx, noTransform);
@@ -974,7 +976,7 @@
       this._restoreFillRule(ctx);
 
       ctx.restore();
-    },
+    },   
 
     _transform: function(ctx, noTransform) {
       var m = this.transformMatrix;
@@ -1079,12 +1081,15 @@
           -this.width / 2 + this.fill.offsetX || 0,
           -this.height / 2 + this.fill.offsetY || 0);
       }
+      //ctx.save();
+      //ctx.transform(3.321, -0.6998, 0.4077, 1.9347, 3400,0);
       if (this.fillRule === 'destination-over') {
         ctx.fill('evenodd');
       }
       else {
         ctx.fill();
       }
+      //ctx.restore();
       if (this.fill.toLive) {
         ctx.restore();
       }
