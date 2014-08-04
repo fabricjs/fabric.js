@@ -171,9 +171,9 @@
     toSVG: function(reviver) {
       var markup = [], x = -this.width / 2, y = -this.height / 2;
       if (this.group) {
-	  	x = this.left;
-	  	y = this.top;
-	  }
+        x = this.left;
+        y = this.top;
+      }
       markup.push(
         '<g transform="', (this.group ? '' : this.getSvgTransform()), '">\n',
           '<image xlink:href="', this.getSvgSrc(),
