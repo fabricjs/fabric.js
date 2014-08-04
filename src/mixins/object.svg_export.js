@@ -45,7 +45,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @return {String}
    */
   getSvgTransform: function() {
-  	if (this.group) return '';
+    if (this.group) return '';
     var toFixed = fabric.util.toFixed,
         angle = this.getAngle(),
         vpt = this.getViewportTransform(),
@@ -85,9 +85,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @return {String}
    */
   getSvgTransformMatrix: function() {
-    return [
-      (this.transformMatrix ? ' matrix(' + this.transformMatrix.join(' ') + ')' : '')
-    ].join('');
+    return this.transformMatrix ? ' matrix(' + this.transformMatrix.join(' ') + ')' : ''
   },
 
   /**
