@@ -960,12 +960,14 @@
       this._setStrokeStyles(ctx);
       this._setFillStyles(ctx);
 
-      var m = this.transformMatrix;
-      if (m && this.group) {
+      if (this.group && this.group.type === 'path-group') {
         ctx.translate(-this.group.width/2, -this.group.height/2);
-        ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
+        var m = this.transformMatrix;
+        if (m) {
+          ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);          
+        }
       }
-
+      ctx.globalAlpha = this.group ? (ctx.globalAlpha * this.opacity) : this.opacity;
       this._setShadow(ctx);
       this.clipTo && fabric.util.clipContext(this, ctx);
       this._render(ctx, noTransform);

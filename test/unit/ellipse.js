@@ -111,8 +111,8 @@
 
     equal(oEllipse.get('rx'), rx);
     equal(oEllipse.get('ry'), ry);
-    equal(oEllipse.get('left'), left);
-    equal(oEllipse.get('top'), top);
+    equal(oEllipse.get('left'), left - rx);
+    equal(oEllipse.get('top'), top - ry);
     equal(oEllipse.get('fill'), fill);
     equal(oEllipse.get('opacity'), opacity);
     equal(oEllipse.get('strokeWidth'), strokeWidth);

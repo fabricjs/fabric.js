@@ -111,7 +111,8 @@
           'points="', points.join(''),
           '" style="', this.getSvgStyles(),
           '" transform="', this.getSvgTransform(),
-        '"/>'
+          ' ', this.getSvgTransformMatrix(),
+        '"/>\n'
       );
 
       return reviver ? reviver(markup.join('')) : markup.join('');
@@ -125,7 +126,6 @@
     _render: function(ctx) {
       var point;
       ctx.beginPath();
-      ctx.globalAlpha = this.group ? (ctx.globalAlpha * this.opacity) : this.opacity;
       ctx.moveTo(this.points[0].x, this.points[0].y);
       for (var i = 0, len = this.points.length; i < len; i++) {
         point = this.points[i];
@@ -184,14 +184,16 @@
     if (!element) {
       return null;
     }
+
     options || (options = { });
 
     var points = fabric.parsePointsAttribute(element.getAttribute('points')),
         parsedAttributes = fabric.parseAttributes(element, fabric.Polygon.ATTRIBUTE_NAMES);
 
-    if (!('transformMatrix' in parsedAttributes)) {
-      fabric.util.normalizePoints(points, options);
+    if (!points) {
+      throw new Error('Cannot define a polygon without points.');
     }
+
     return new fabric.Polygon(points, extend(parsedAttributes, options), true);
   };
   /* _FROM_SVG_END_ */
