@@ -976,7 +976,7 @@
       this._restoreFillRule(ctx);
 
       ctx.restore();
-    },   
+    },
 
     _transform: function(ctx, noTransform) {
       var m = this.transformMatrix;
