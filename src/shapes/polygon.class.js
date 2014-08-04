@@ -189,6 +189,10 @@
     var points = fabric.parsePointsAttribute(element.getAttribute('points')),
         parsedAttributes = fabric.parseAttributes(element, fabric.Polygon.ATTRIBUTE_NAMES);
 
+    if (points === null) {
+      return null;
+    }
+
     if (!('transformMatrix' in parsedAttributes)) {
       fabric.util.normalizePoints(points, options);
     }
