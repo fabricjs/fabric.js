@@ -230,8 +230,10 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var markup = this._createBaseSVGMarkup();
-
+      var markup = this._createBaseSVGMarkup(), addTranslate = '';
+      if (!this.group) {
+        addTranslate = 'translate(' + (-this.width/2) + ', ' + (-this.height/2) + ') ';
+      }
       markup.push(
         '<line ',
           'x1="', this.get('x1'),
@@ -239,7 +241,7 @@
           '" x2="', this.get('x2'),
           '" y2="', this.get('y2'),
           '" style="', this.getSvgStyles(),
-          '" transform="', this.getSvgTransform(),
+          '" transform="', this.getSvgTransform(), addTranslate,
           this.getSvgTransformMatrix(),
         '"/>\n'
       );
