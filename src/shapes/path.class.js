@@ -545,12 +545,14 @@
       var path = chunks.join(' ');
 
       markup.push(
+        //jscs:disable validateIndentation  
         '<path ',
           'd="', path,
           '" style="', this.getSvgStyles(),
           '" transform="', this.getSvgTransform(),
           this.getSvgTransformMatrix(), '" stroke-linecap="round" ',
         '/>\n'
+        //jscs:enable validateIndentation
       );
 
       return reviver ? reviver(markup.join('')) : markup.join('');
