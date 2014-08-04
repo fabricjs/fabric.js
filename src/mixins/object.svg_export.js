@@ -85,7 +85,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @return {String}
    */
   getSvgTransformMatrix: function() {
-    return this.transformMatrix ? ' matrix(' + this.transformMatrix.join(' ') + ')' : ''
+    return this.transformMatrix ? ' matrix(' + this.transformMatrix.join(' ') + ')' : '';
   },
 
   /**
