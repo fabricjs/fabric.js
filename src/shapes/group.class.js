@@ -482,7 +482,7 @@
         //jscs:disable validateIndentation
         '<g ',
           'transform="', this.getSvgTransform(),
-        '">'
+        '">\n'
         //jscs:enable validateIndentation
       ];
 
@@ -490,7 +490,7 @@
         markup.push(this._objects[i].toSVG(reviver));
       }
 
-      markup.push('</g>');
+      markup.push('</g>\n');
 
       return reviver ? reviver(markup.join('')) : markup.join('');
     },
