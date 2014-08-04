@@ -128,14 +128,12 @@
 
     var elPolygonWithoutPoints = fabric.document.createElement('polygon');
 
-    var error;
-    try {
-      fabric.Polygon.fromElement(elPolygonWithoutPoints);
-    }
-    catch(err) {
-      error = err;
-    }
-    ok(error, 'missing points attribute should result in error');
+    equal(fabric.Polygon.fromElement(elPolygonWithoutPoints), null);
+
+    var elPolygonWithEmptyPoints = fabric.document.createElement('polygon');
+    elPolygonWithEmptyPoints.setAttribute('points', '');
+
+    equal(fabric.Polygon.fromElement(elPolygonWithEmptyPoints), null);
 
     equal(fabric.Polygon.fromElement(), null);
   });
