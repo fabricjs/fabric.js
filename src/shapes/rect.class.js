@@ -209,15 +209,6 @@
   fabric.Rect.ATTRIBUTE_NAMES = fabric.SHARED_ATTRIBUTES.concat('x y rx ry width height'.split(' '));
 
   /**
-   * @private
-   */
-  function _setDefaultLeftTopValues(attributes) {
-    attributes.left = attributes.left || 0;
-    attributes.top  = attributes.top  || 0;
-    return attributes;
-  }
-
-  /**
    * Returns {@link fabric.Rect} instance from an SVG element
    * @static
    * @memberOf fabric.Rect
