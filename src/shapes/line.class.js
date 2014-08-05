@@ -150,11 +150,10 @@
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    _render: function(ctx) {
+    _render: function(ctx, noTransform) {
       ctx.beginPath();
 
-      var isInPathGroup = this.group && this.group.type === 'path-group';
-      if (isInPathGroup) {
+      if (noTransform) {
         //  Line coords are distances from left-top of canvas to origin of line.
         //
         //  To render line in a path-group, we need to translate them to
@@ -164,9 +163,6 @@
           cp.x,
           cp.y
         );
-        if (!this.transformMatrix) {
-          ctx.translate(-this.group.width / 2, -this.group.height / 2);
-        }
       }
 
       if (!this.strokeDashArray || this.strokeDashArray && supportsLineDash) {
@@ -234,8 +230,10 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var markup = this._createBaseSVGMarkup();
-
+      var markup = this._createBaseSVGMarkup(), addTranslate = '';
+      if (!this.group) {
+        addTranslate = 'translate(' + (-this.width/2) + ', ' + (-this.height/2) + ') ';
+      }
       markup.push(
         '<line ',
           'x1="', this.get('x1'),
@@ -243,7 +241,9 @@
           '" x2="', this.get('x2'),
           '" y2="', this.get('y2'),
           '" style="', this.getSvgStyles(),
-        '"/>'
+          '" transform="', this.getSvgTransform(), addTranslate,
+          this.getSvgTransformMatrix(),
+        '"/>\n'
       );
 
       return reviver ? reviver(markup.join('')) : markup.join('');
