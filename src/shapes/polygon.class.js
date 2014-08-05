@@ -190,8 +190,8 @@
     var points = fabric.parsePointsAttribute(element.getAttribute('points')),
         parsedAttributes = fabric.parseAttributes(element, fabric.Polygon.ATTRIBUTE_NAMES);
 
-    if (!points) {
-      throw new Error('Cannot define a polygon without points.');
+    if (points === null) {
+      return null;
     }
 
     return new fabric.Polygon(points, extend(parsedAttributes, options), true);
