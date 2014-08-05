@@ -122,5 +122,7 @@
     elPolylineWithEmptyPoints.setAttribute('points', '');
 
     equal(fabric.Polyline.fromElement(elPolylineWithEmptyPoints), null);
+
+    equal(fabric.Polyline.fromElement(), null);    
   });
 })();
