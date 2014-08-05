@@ -50,17 +50,6 @@
      */
     ry:   0,
 
-    /**
-     * @type Number
-     * @default
-     */
-    x: 0,
-
-    /**
-     * @type Number
-     * @default
-     */
-    y: 0,
 
     /**
      * Used to specify dash pattern for stroke on this object
@@ -79,8 +68,6 @@
       this.callSuper('initialize', options);
       this._initRxRy();
 
-      this.x = options.x || 0;
-      this.y = options.y || 0;
     },
 
     /**
@@ -100,7 +87,7 @@
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    _render: function(ctx) {
+    _render: function(ctx, noTransform) {
 
       // optimize 1x1 case (used in spray brush)
       if (this.width === 1 && this.height === 1) {
@@ -112,24 +99,15 @@
           ry = this.ry ? Math.min(this.ry, this.height / 2) : 0,
           w = this.width,
           h = this.height,
-          x = -w / 2,
-          y = -h / 2,
-          isInPathGroup = this.group && this.group.type === 'path-group',
+          x = noTransform ? this.left : 0,
+          y = noTransform ? this.top : 0,
           isRounded = rx !== 0 || ry !== 0,
           k = 1 - 0.5522847498 /* "magic number" for bezier approximations of arcs (http://itc.ktu.lt/itc354/Riskus354.pdf) */;
 
       ctx.beginPath();
-      ctx.globalAlpha = isInPathGroup ? (ctx.globalAlpha * this.opacity) : this.opacity;
 
-      if (this.transformMatrix && isInPathGroup) {
-        ctx.translate(
-          this.width / 2 + this.x,
-          this.height / 2 + this.y);
-      }
-      if (!this.transformMatrix && isInPathGroup) {
-        ctx.translate(
-          -this.group.width / 2 + this.width / 2 + this.x,
-          -this.group.height / 2 + this.height / 2 + this.y);
+      if (!noTransform) {
+        ctx.translate(-this.width / 2, -this.height / 2);
       }
 
       ctx.moveTo(x + rx, y);
@@ -171,22 +149,6 @@
     },
 
     /**
-     * Since coordinate system differs from that of SVG
-     * @private
-     */
-    _normalizeLeftTopProperties: function(parsedAttributes) {
-      if ('left' in parsedAttributes) {
-        this.set('left', parsedAttributes.left + this.getWidth() / 2);
-      }
-      this.set('x', parsedAttributes.left || 0);
-      if ('top' in parsedAttributes) {
-        this.set('top', parsedAttributes.top + this.getHeight() / 2);
-      }
-      this.set('y', parsedAttributes.top || 0);
-      return this;
-    },
-
-    /**
      * Returns object representation of an instance
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} object representation of an instance
@@ -194,9 +156,7 @@
     toObject: function(propertiesToInclude) {
       var object = extend(this.callSuper('toObject', propertiesToInclude), {
         rx: this.get('rx') || 0,
-        ry: this.get('ry') || 0,
-        x: this.get('x'),
-        y: this.get('y')
+        ry: this.get('ry') || 0
       });
       if (!this.includeDefaultValues) {
         this._removeDefaultValues(object);
@@ -211,16 +171,20 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var markup = this._createBaseSVGMarkup();
-
+      var markup = this._createBaseSVGMarkup(), x = this.left, y = this.top;
+      if (!this.group) {
+        x = -this.width / 2;
+        y = -this.height / 2;
+	    }
       markup.push(
         '<rect ',
-          'x="', (-1 * this.width / 2), '" y="', (-1 * this.height / 2),
+          'x="', x, '" y="', y,
           '" rx="', this.get('rx'), '" ry="', this.get('ry'),
           '" width="', this.width, '" height="', this.height,
           '" style="', this.getSvgStyles(),
           '" transform="', this.getSvgTransform(),
-        '"/>');
+          this.getSvgTransformMatrix(),
+        '"/>\n');
 
       return reviver ? reviver(markup.join('')) : markup.join('');
     },
@@ -245,15 +209,6 @@
   fabric.Rect.ATTRIBUTE_NAMES = fabric.SHARED_ATTRIBUTES.concat('x y rx ry width height'.split(' '));
 
   /**
-   * @private
-   */
-  function _setDefaultLeftTopValues(attributes) {
-    attributes.left = attributes.left || 0;
-    attributes.top  = attributes.top  || 0;
-    return attributes;
-  }
-
-  /**
    * Returns {@link fabric.Rect} instance from an SVG element
    * @static
    * @memberOf fabric.Rect
@@ -265,14 +220,14 @@
     if (!element) {
       return null;
     }
-
+    options = options || { };
+    
     var parsedAttributes = fabric.parseAttributes(element, fabric.Rect.ATTRIBUTE_NAMES);
-    parsedAttributes = _setDefaultLeftTopValues(parsedAttributes);
-
-    var rect = new fabric.Rect(extend((options ? fabric.util.object.clone(options) : { }), parsedAttributes));
-    rect._normalizeLeftTopProperties(parsedAttributes);
-
-    return rect;
+    
+    parsedAttributes.left = parsedAttributes.left || 0;
+    parsedAttributes.top  = parsedAttributes.top  || 0;
+    
+    return new fabric.Rect(extend((options ? fabric.util.object.clone(options) : { }), parsedAttributes));
   };
   /* _FROM_SVG_END_ */
 
