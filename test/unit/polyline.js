@@ -116,16 +116,13 @@
     deepEqual(polylineWithAttrs.get('transformMatrix'), [ 2, 0, 0, 2, -10, -20 ]);
 
     var elPolylineWithoutPoints = fabric.document.createElement('polyline');
+    equal(fabric.Polyline.fromElement(elPolylineWithoutPoints), null);
 
-    var error;
-    try {
-      fabric.Polyline.fromElement(elPolylineWithoutPoints);
-    }
-    catch(err) {
-      error = err;
-    }
+    var elPolylineWithEmptyPoints = fabric.document.createElement('polyline');
+    elPolylineWithEmptyPoints.setAttribute('points', '');
 
-    ok(typeof error !== 'undefined', 'missing points attribute should result in error');
-    equal(fabric.Polyline.fromElement(), null);
+    equal(fabric.Polyline.fromElement(elPolylineWithEmptyPoints), null);
+
+    equal(fabric.Polyline.fromElement(), null);    
   });
 })();
