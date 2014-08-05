@@ -169,9 +169,11 @@
 
     var points = fabric.parsePointsAttribute(element.getAttribute('points')),
         parsedAttributes = fabric.parseAttributes(element, fabric.Polyline.ATTRIBUTE_NAMES);
-    if (!points) {
-      throw new Error('Cannot define a polyline without points.');
+
+    if (points === null) {
+      return null;
     }
+    
     return new fabric.Polyline(points, fabric.util.object.extend(parsedAttributes, options), true);
   };
   /* _FROM_SVG_END_ */
