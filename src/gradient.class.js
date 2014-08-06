@@ -105,6 +105,9 @@
       this.coords = coords;
       this.gradientUnits = options.gradientUnits || 'objectBoundingBox';
       this.colorStops = options.colorStops.slice();
+      if (options.gradientTransform) {
+        this.gradientTransform = options.gradientTransform;
+      }
     },
 
     /**
@@ -298,6 +301,7 @@
       var colorStopEls = el.getElementsByTagName('stop'),
           type = (el.nodeName === 'linearGradient' ? 'linear' : 'radial'),
           gradientUnits = el.getAttribute('gradientUnits') || 'objectBoundingBox',
+          gradientTransform = el.getAttribute('gradientTransform'),
           colorStops = [],
           coords = { };
 
@@ -314,12 +318,18 @@
 
       _convertPercentUnitsToValues(instance, coords);
 
-      return new fabric.Gradient({
+      var gradient = new fabric.Gradient({
         type: type,
         coords: coords,
         gradientUnits: gradientUnits,
         colorStops: colorStops
       });
+
+      if (gradientTransform) {
+        gradient.gradientTransform = fabric.parseTransformAttribute(gradientTransform);
+      }
+
+      return gradient;
     },
     /* _FROM_SVG_END_ */
 
