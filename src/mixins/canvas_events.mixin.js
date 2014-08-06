@@ -440,6 +440,11 @@
       if (target && target.selectable && !shouldGroup) {
         this._beforeTransform(e, target);
         this._setupCurrentTransform(e, target);
+        // activate object after transform setup to make sure that corners detection is valid
+        if (target !== this.getActiveGroup() && target !== this.getActiveObject()) {
+          this.deactivateAll();
+          this.setActiveObject(target, e);
+        }
       }
       // we must renderAll so that active image is placed on the top canvas
       shouldRender && this.renderAll();
@@ -457,11 +462,6 @@
       // determine if it's a drag or rotate case
       if (target._findTargetCorner(this.getPointer(e))) {
         this.onBeforeScaleRotate(target);
-      }
-
-      if (target !== this.getActiveGroup() && target !== this.getActiveObject()) {
-        this.deactivateAll();
-        this.setActiveObject(target, e);
       }
     },
 
