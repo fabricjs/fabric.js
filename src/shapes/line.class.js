@@ -232,7 +232,9 @@
     toSVG: function(reviver) {
       var markup = this._createBaseSVGMarkup(), addTranslate = '';
       if (!this.group) {
-        addTranslate = 'translate(' + (-this.width/2) + ', ' + (-this.height/2) + ') ';
+        var x = this.width / 2 + (this.x1 > this.x2 ? this.x2 : this.x1),
+            y = this.height / 2 + (this.y1 > this.y2 ? this.y2 : this.y1);
+        addTranslate = 'translate(' + (-x) + ', ' + (-y) + ') ';
       }
       markup.push(
         '<line ',
