@@ -175,14 +175,13 @@
         y = this.top;
       }
       markup.push(
-        '<g transform="', this.getSvgTransform(), '">\n',
+        '<g transform="', this.getSvgTransform(), this.getSvgTransformMatrix(), '">\n',
           '<image xlink:href="', this.getSvgSrc(),
             '" x="', x, '" y="', y,
             '" style="', this.getSvgStyles(),
             // we're essentially moving origin of transformation from top/left corner to the center of the shape
             // by wrapping it in container <g> element with actual transformation, then offsetting object to the top/left
             // so that object's center aligns with container's left/top
-            '" transform="', this.getSvgTransformMatrix(),
             '" width="', this.width,
             '" height="', this.height,
             '" preserveAspectRatio="none"',
@@ -194,7 +193,7 @@
         this.fill = null;
         markup.push(
           '<rect ',
-            'x="', (-1 * this.width / 2), '" y="', (-1 * this.height / 2),
+            'x="', x, '" y="', y,
             '" width="', this.width, '" height="', this.height,
             '" style="', this.getSvgStyles(),
           '"/>\n'
@@ -305,6 +304,7 @@
         this.width,
         this.height
       );
+      this._renderStroke(ctx);
     },
 
     /**
