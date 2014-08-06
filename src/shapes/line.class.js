@@ -232,16 +232,16 @@
     toSVG: function(reviver) {
       var markup = this._createBaseSVGMarkup(), addTranslate = '';
       if (!this.group) {
-        var x = this.width / 2 + (this.x1 > this.x2 ? this.x2 : this.x1),
-            y = this.height / 2 + (this.y1 > this.y2 ? this.y2 : this.y1);
-        addTranslate = 'translate(' + (-x) + ', ' + (-y) + ') ';
+        var x = - this.width / 2 - (this.x1 > this.x2 ? this.x2 : this.x1),
+            y = - this.height / 2 - (this.y1 > this.y2 ? this.y2 : this.y1);
+        addTranslate = 'translate(' + x + ', ' + y + ') ';
       }
       markup.push(
         '<line ',
-          'x1="', this.get('x1'),
-          '" y1="', this.get('y1'),
-          '" x2="', this.get('x2'),
-          '" y2="', this.get('y2'),
+          'x1="', this.x1,
+          '" y1="', this.y1,
+          '" x2="', this.x2,
+          '" y2="', this.y2,
           '" style="', this.getSvgStyles(),
           '" transform="', this.getSvgTransform(), addTranslate,
           this.getSvgTransformMatrix(),
