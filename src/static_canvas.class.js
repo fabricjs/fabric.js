@@ -141,6 +141,19 @@
     viewportTransform: [1, 0, 0, 1, 0, 0],
 
     /**
+     * Indicates whether this canvas should attempt to perform dirty checking when rendering
+     * @type {Boolean}
+     * @default
+     */
+    performanceMode: false, 
+
+    /**
+     * An array of rectangles marked dirty; to be cleared on next render
+     * @type {Array}
+     */
+    dirtyRects: [], 
+
+    /**
      * Callback; invoked right before object is about to be scaled/rotated
      */
     onBeforeScaleRotate: function () {
@@ -788,12 +801,17 @@
       var canvasToDrawOn = this[(allOnTop === true && this.interactive) ? 'contextTop' : 'contextContainer'],
           activeGroup = this.getActiveGroup();
 
-      if (this.contextTop && this.selection && !this._groupSelector) {
-        this.clearContext(this.contextTop);
-      }
+      if(this.performanceMode){
+        this._clearDirtyRects();
+      } else {
+        // We clear everything
+        if (this.contextTop && this.selection && !this._groupSelector) {
+          this.clearContext(this.contextTop);
+        }
 
-      if (!allOnTop) {
-        this.clearContext(canvasToDrawOn);
+        if (!allOnTop) {
+          this.clearContext(canvasToDrawOn);
+        }
       }
 
       this.fire('before:render');
@@ -803,7 +821,13 @@
       }
 
       this._renderBackground(canvasToDrawOn);
-      this._renderObjects(canvasToDrawOn, activeGroup);
+
+      if(this.performanceMode){
+        this._renderDirtyObjects(canvasToDrawOn);  
+      } else {
+        this._renderObjects(canvasToDrawOn, activeGroup);
+      }
+      
       this._renderActiveGroup(canvasToDrawOn, activeGroup);
 
       if (this.clipTo) {
@@ -819,6 +843,33 @@
       this.fire('after:render');
 
       return this;
+    },
+
+    /**
+     * @private
+     */
+    _clearDirtyRects: function() {
+      var additonalObjectsToRender = [];
+
+      for(var i = 0; i < this.dirtyRects.length; i++){
+        var rect = this.dirtyRects[i];
+
+        // Find any overlapping objects 
+        additonalObjectsToRender = additonalObjectsToRender.concat(
+          this.iterativelyGetObjectsInsideRect(
+            rect, 
+            additonalObjectsToRender
+          )
+        );
+
+        this.getContext().clearRect(rect.x1, rect.y1, rect.x2 - rect.x1, rect.y2 - rect.y1);
+      }
+
+      for(var j = 0; j < additonalObjectsToRender.length; j++){
+        additonalObjectsToRender[j].dirty = true;
+      }
+
+      this.dirtyRects = [];
     },
 
     /**
@@ -840,6 +891,19 @@
           if (this._objects[i] && !activeGroup.contains(this._objects[i])) {
             this._draw(ctx, this._objects[i]);
           }
+        }
+      }
+    },
+
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {fabric.Group} activeGroup
+     */
+    _renderDirtyObjects: function(ctx) {
+      for (var i = 0, length = this._objects.length; i < length; ++i) {
+        if(this._objects[i] && this._objects[i].dirty){
+          this._draw(ctx, this._objects[i]);
         }
       }
     },
@@ -1428,6 +1492,16 @@
     toString: function () {
       return '#<fabric.Canvas (' + this.complexity() + '): ' +
                '{ objects: ' + this.getObjects().length + ' }>';
+    },
+
+    /**
+     * Adds a rectangle to `this.dirtyRects`
+     * @param {Object} Coordinates of the rectangle  
+     * @chainable
+     */
+    addDirtyRect: function(rectCoords) {
+      this.dirtyRects.push(rectCoords);
+      return this;
     }
   });
 
