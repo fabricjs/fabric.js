@@ -510,8 +510,8 @@
       parseUseDirectives(doc);
 
       var viewBoxAttr = doc.getAttribute('viewBox'),
-          widthAttr = parseFloat(doc.getAttribute('width')),
-          heightAttr = parseFloat(doc.getAttribute('height')),
+          widthAttr = parseUnit(doc.getAttribute('width')),
+          heightAttr = parseUnit(doc.getAttribute('height')),
           viewBoxWidth,
           viewBoxHeight;
 
