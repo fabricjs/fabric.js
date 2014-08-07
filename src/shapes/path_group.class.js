@@ -149,19 +149,20 @@
      */
     toSVG: function(reviver) {
       var objects = this.getObjects(),
+          translatePart = 'translate(' + this.left + ' ' + this.top + ')',
           markup = [
             //jscs:disable validateIndentation
             '<g ',
               'style="', this.getSvgStyles(), '" ',
-              'transform="', this.getSvgTransform(), '" ',
-            '>'
+              'transform="', translatePart, this.getSvgTransform(), '" ',
+            '>\n'
             //jscs:enable validateIndentation
           ];
 
       for (var i = 0, len = objects.length; i < len; i++) {
         markup.push(objects[i].toSVG(reviver));
       }
-      markup.push('</g>');
+      markup.push('</g>\n');
 
       return reviver ? reviver(markup.join('')) : markup.join('');
     },
