@@ -510,8 +510,8 @@
       parseUseDirectives(doc);
 
       var viewBoxAttr = doc.getAttribute('viewBox'),
-          widthAttr = parseFloat(doc.getAttribute('width')),
-          heightAttr = parseFloat(doc.getAttribute('height')),
+          widthAttr = parseUnit(doc.getAttribute('width')),
+          heightAttr = parseUnit(doc.getAttribute('height')),
           viewBoxWidth,
           viewBoxHeight;
 
@@ -700,8 +700,8 @@
       var value,
           parentAttributes = { };
 
-      // if there's a parent container (`g` node), parse its attributes recursively upwards
-      if (element.parentNode && /^[g|a]$/i.test(element.parentNode.nodeName)) {
+      // if there's a parent container (`g` or `a` or `symbol` node), parse its attributes recursively upwards
+      if (element.parentNode && /^symbol|[g|a]$/i.test(element.parentNode.nodeName)) {
         parentAttributes = fabric.parseAttributes(element.parentNode, attributes);
       }
 
