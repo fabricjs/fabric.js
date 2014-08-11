@@ -22,7 +22,7 @@
     var px = -cosTh * toX - sinTh * toY,
         py = -cosTh * toY + sinTh * toX,
         rx2 = rx * rx, ry2 = ry * ry, py2 = py * py, px2 = px * px,
-        pl = rx2 * ry2 * 0.25 - rx2 * py2 - ry2 * px2,
+        pl = 4 * rx2 * ry2 - rx2 * py2 - ry2 * px2,
         root = 0.0;
 
     if (pl < 0.0) {
@@ -30,7 +30,7 @@
       rx *= s;
       ry *= s;
     } else {
-      root = (large === sweep ? -0.125 : 0.125) *
+      root = (large === sweep ? -0.5 : 0.5) *
               Math.sqrt( pl /(rx2 * py2 + ry2 * px2));
     }
 
