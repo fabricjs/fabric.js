@@ -2,134 +2,105 @@
 
   var arcToSegmentsCache = { },
       segmentToBezierCache = { },
-      _join = Array.prototype.join,
-      argsString;
+      _join = Array.prototype.join;
 
-  // Generous contribution by Raph Levien, from libsvg-0.1.0.tar.gz
-  function arcToSegments(x, y, rx, ry, large, sweep, rotateX, ox, oy) {
-
-    argsString = _join.call(arguments);
-
+  // copy pasted and adapted from mozilla codebase by andrea bogazzi.
+  function arcToSegments(toX, toY, rx, ry, large, sweep, rotateX) {
+    var argsString = _join.call(arguments);
     if (arcToSegmentsCache[argsString]) {
       return arcToSegmentsCache[argsString];
     }
-
-    var coords = getXYCoords(rotateX, rx, ry, ox, oy, x, y),
-
-        d = (coords.x1 - coords.x0) * (coords.x1 - coords.x0) +
-            (coords.y1 - coords.y0) * (coords.y1 - coords.y0),
-
-        sfactorSq = 1 / d - 0.25;
-
-    if (sfactorSq < 0) {
-      sfactorSq = 0;
-    }
-
-    var sfactor = Math.sqrt(sfactorSq);
-    if (sweep === large) {
-      sfactor = -sfactor;
-    }
-
-    var xc = 0.5 * (coords.x0 + coords.x1) - sfactor * (coords.y1 - coords.y0),
-        yc = 0.5 * (coords.y0 + coords.y1) + sfactor * (coords.x1 - coords.x0),
-        th0 = Math.atan2(coords.y0 - yc, coords.x0 - xc),
-        th1 = Math.atan2(coords.y1 - yc, coords.x1 - xc),
-        thArc = th1 - th0;
-
-    if (thArc < 0 && sweep === 1) {
-      thArc += 2 * Math.PI;
-    }
-    else if (thArc > 0 && sweep === 0) {
-      thArc -= 2 * Math.PI;
-    }
-
-    var segments = Math.ceil(Math.abs(thArc / (Math.PI * 0.5 + 0.001))),
-        result = [];
-
-    for (var i = 0; i < segments; i++) {
-      var th2 = th0 + i * thArc / segments,
-          th3 = th0 + (i + 1) * thArc / segments;
-
-      result[i] = [xc, yc, th2, th3, rx, ry, coords.sinTh, coords.cosTh];
-    }
-
-    arcToSegmentsCache[argsString] = result;
-    return result;
-  }
-
-  function getXYCoords(rotateX, rx, ry, ox, oy, x, y) {
-
-    var th = rotateX * (Math.PI / 180),
+    
+    var PI = Math.PI, th = rotateX * (PI / 180),
         sinTh = Math.sin(th),
-        cosTh = Math.cos(th);
+        cosTh = Math.cos(th),
+        fromX = 0, fromY = 0;
 
     rx = Math.abs(rx);
     ry = Math.abs(ry);
 
-    var px = cosTh * (ox - x) + sinTh * (oy - y),
-        py = cosTh * (oy - y) - sinTh * (ox - x),
-        pl = (px * px) / (rx * rx) + (py * py) / (ry * ry);
+    var px = -cosTh * toX - sinTh * toY,
+        py = -cosTh * toY + sinTh * toX,
+        rx2 = rx * rx, ry2 = ry * ry, py2 = py * py, px2 = px * px,
+        pl = rx2 * ry2 * 0.25 - rx2 * py2 - ry2 * px2,
+        root = 0.0;
 
-    pl *= 0.25;
-
-    if (pl > 1) {
-      pl = Math.sqrt(pl);
-      rx *= pl;
-      ry *= pl;
+    if (pl < 0.0) {
+      var s = Math.sqrt(1.0 - 0.25 * pl/(rx2 * ry2));
+      rx *= s;
+      ry *= s;
+    } else {
+      root = (large === sweep ? -0.125 : 0.125) *
+              Math.sqrt( pl /(rx2 * py2 + ry2 * px2));
     }
 
-    var a00 = cosTh / rx,
-        a01 = sinTh / rx,
-        a10 = (-sinTh) / ry,
-        a11 = (cosTh) / ry;
+    var cx = root * rx * py / ry,
+        cy = -root * ry * px / rx,
+        cx1 = cosTh * cx - sinTh * cy + toX / 2,
+        cy1 = sinTh * cx + cosTh * cy + toY / 2,
+        mTheta = calcVectorAngle(1.0, 0.0, (px - cx) / rx, (py - cy) / ry),
+        dtheta = calcVectorAngle((px - cx) / rx, (py - cy) / ry, (-px -cx) / rx, (-py -cy) / ry);
 
-    return {
-      x0: a00 * ox + a01 * oy,
-      y0: a10 * ox + a11 * oy,
-      x1: a00 * x + a01 * y,
-      y1: a10 * x + a11 * y,
-      sinTh: sinTh,
-      cosTh: cosTh
-    };
+    if (sweep === 0 && dtheta > 0) {
+      dtheta -= 2 * PI;
+    } else if (sweep === 1 && dtheta < 0) {
+      dtheta += 2 * PI;
+    }
+
+    // Convert into cubic bezier segments <= 90deg
+    var segments = Math.ceil(Math.abs(dtheta / (PI * 0.5))),
+        result = [], mDelta = dtheta / segments,
+        mT = 8 / 3 * Math.sin(mDelta / 4) * Math.sin(mDelta / 4) / Math.sin(mDelta / 2);
+
+    for (var i = 0; i < segments; i++) {
+      var th2 = mTheta + i * mDelta,
+          th3 = mTheta + (i + 1) * mDelta;
+      result[i] = segmentToBezier(th2, th3, cosTh, sinTh, rx, ry, cx1, cy1, mT, fromX, fromY);
+      fromX = result[i][4];
+      fromY = result[i][5];
+    }
+    arcToSegmentsCache[argsString] = result;
+    return result;
   }
 
-  function segmentToBezier(cx, cy, th0, th1, rx, ry, sinTh, cosTh) {
-    argsString = _join.call(arguments);
-
-    if (segmentToBezierCache[argsString]) {
-      return segmentToBezierCache[argsString];
+  function segmentToBezier(th2, th3, cosTh, sinTh, rx, ry, cx1, cy1, mT, fromX, fromY) {
+    var argsString2 = _join.call(arguments);
+    if (segmentToBezierCache[argsString2]) {
+      return segmentToBezierCache[argsString2];
     }
+    
+    var costh2 = Math.cos(th2),
+        sinth2 = Math.sin(th2),
+        costh3 = Math.cos(th3),
+        sinth3 = Math.sin(th3),
+        toX = cosTh * rx * costh3 - sinTh * ry * sinth3 + cx1,
+        toY = sinTh * rx * costh3 + cosTh * ry * sinth3 + cy1,
+        cp1X = fromX + mT * ( - cosTh * rx * sinth2 - sinTh * ry * costh2),
+        cp1Y = fromY + mT * ( - sinTh * rx * sinth2 + cosTh * ry * costh2),
+        cp2X = toX + mT * ( cosTh * rx * sinth3 + sinTh * ry *costh3),
+        cp2Y = toY + mT * ( sinTh * rx * sinth3 - cosTh * ry *costh3);
 
-    var sinTh0 = Math.sin(th0),
-        cosTh0 = Math.cos(th0),
-        sinTh1 = Math.sin(th1),
-        cosTh1 = Math.cos(th1),
-
-        a00 = cosTh * rx,
-        a01 = -sinTh * ry,
-        a10 = sinTh * rx,
-        a11 = cosTh * ry,
-        thHalf = 0.25 * (th1 - th0),
-
-        t = (8 / 3) * Math.sin(thHalf) *
-            Math.sin(thHalf) / Math.sin(thHalf * 2),
-
-        x1 = cx + cosTh0 - t * sinTh0,
-        y1 = cy + sinTh0 + t * cosTh0,
-        x3 = cx + cosTh1,
-        y3 = cy + sinTh1,
-        x2 = x3 + t * sinTh1,
-        y2 = y3 - t * cosTh1;
-
-    segmentToBezierCache[argsString] = [
-      a00 * x1 + a01 * y1,      a10 * x1 + a11 * y1,
-      a00 * x2 + a01 * y2,      a10 * x2 + a11 * y2,
-      a00 * x3 + a01 * y3,      a10 * x3 + a11 * y3
+    segmentToBezierCache[argsString2] = [
+      cp1X, cp1Y,
+      cp2X, cp2Y,
+      toX, toY
     ];
-
-    return segmentToBezierCache[argsString];
+    return segmentToBezierCache[argsString2];
   }
 
+  /*
+  * Private
+  */
+  function calcVectorAngle(ux, uy, vx, vy) {
+    var ta = Math.atan2(uy, ux),
+        tb = Math.atan2(vy, vx);
+    if (tb >= ta) {
+      return tb - ta;
+    } else {
+      return 2 * Math.PI - (ta - tb);
+    }
+  }
+  
   /**
    * Draws arc
    * @param {CanvasRenderingContext2D} ctx
@@ -137,18 +108,24 @@
    * @param {Number} y
    * @param {Array} coords
    */
-  fabric.util.drawArc = function(ctx, x, y, coords) {
+  fabric.util.drawArc = function(ctx, fx, fy, coords) {
     var rx = coords[0],
         ry = coords[1],
         rot = coords[2],
         large = coords[3],
         sweep = coords[4],
-        ex = coords[5],
-        ey = coords[6],
-        segs = arcToSegments(ex, ey, rx, ry, large, sweep, rot, x, y);
-    for (var i = 0; i < segs.length; i++) {
-      var bez = segmentToBezier.apply(this, segs[i]);
-      ctx.bezierCurveTo.apply(ctx, bez);
+        tx = coords[5],
+        ty = coords[6],
+        segs = [[ ], [ ], [ ], [ ]],
+        segs_norm = arcToSegments(tx - fx, ty - fy, rx, ry, large, sweep, rot);
+    for (var i = 0; i < segs_norm.length; i++) {
+      segs[i][0] = segs_norm[i][0] + fx;
+      segs[i][1] = segs_norm[i][1] + fy;
+      segs[i][2] = segs_norm[i][2] + fx;
+      segs[i][3] = segs_norm[i][3] + fy;
+      segs[i][4] = segs_norm[i][4] + fx;
+      segs[i][5] = segs_norm[i][5] + fy; 
+      ctx.bezierCurveTo.apply(ctx, segs[i]);
     }
   };
 })();
