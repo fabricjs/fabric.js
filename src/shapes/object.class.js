@@ -659,7 +659,7 @@
     lockUniScaling:           false,
 
     /**
-     * When `true`, object cannot be flipping by scaling into negative values
+     * When `true`, object cannot be flipped by scaling into negative values
      * @type Boolean
      * @default
      */
