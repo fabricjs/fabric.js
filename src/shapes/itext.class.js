@@ -806,9 +806,7 @@
      * @param {Array} textLines Array of all text lines
      */
     _renderTextLinesBackground: function(ctx, textLines) {
-      if (!this.textBackgroundColor && !this.styles) {
-        return;
-      }
+      if (!this.textBackgroundColor && !this.styles) return;
 
       ctx.save();
 
@@ -822,11 +820,12 @@
       for (var i = 0, len = textLines.length; i < len; i++) {
 
         var heightOfLine = this._getHeightOfLine(ctx, i, textLines);
+				//var heightOfLine = this._getHeightOfCharAt(ctx, 0, 2, textLines);
         if (textLines[i] === '') {
           lineHeights += heightOfLine;
           continue;
         }
-
+				lineHeights += heightOfLine;
         var lineWidth = this._getWidthOfLine(ctx, i, textLines),
             lineLeftOffset = this._getLineLeftOffset(lineWidth);
 
@@ -850,14 +849,14 @@
 
               ctx.fillRect(
                 this._getLeftOffset() + lineLeftOffset + this._getWidthOfCharsAt(ctx, i, j, textLines),
-                this._getTopOffset() + lineHeights + fractionOfFontSize,
+                this._getTopOffset() + lineHeights + fractionOfFontSize - this._getHeightOfChar(ctx, _char, i, j, textLines),
                 this._getWidthOfChar(ctx, _char, i, j, textLines) + 1,
-                heightOfLine
+                this._getHeightOfChar(ctx, _char, i, j, textLines) + 1
               );
             }
           }
         }
-        lineHeights += heightOfLine;
+        
       }
       ctx.restore();
     },
