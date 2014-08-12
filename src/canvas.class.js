@@ -504,11 +504,11 @@
       transform.newScaleY = localMouse.y / (target.height + target.strokeWidth);
 
       if (lockScalingFlip && transform.newScaleX <= 0 && transform.newScaleX < target.scaleX) {
-      	forbidScalingX = true;
+        forbidScalingX = true;
       }
 
       if (lockScalingFlip && transform.newScaleY <= 0 && transform.newScaleY < target.scaleY) {
-      	forbidScalingY = true;
+        forbidScalingY = true;
       }
 
       if (by === 'equally' && !lockScalingX && !lockScalingY) {
