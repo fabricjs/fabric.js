@@ -659,6 +659,13 @@
     lockUniScaling:           false,
 
     /**
+     * When `true`, object cannot be flipped by scaling into negative values
+     * @type Boolean
+     * @default
+     */
+
+    lockScalingFlip:          false,
+    /**
      * List of properties to consider when checking if state
      * of an object is changed (fabric.Object#hasStateChanged)
      * as well as for history (undo/redo) purposes
