@@ -3337,27 +3337,6 @@ if (typeof console !== 'undefined') {
   extend(fabric, {
 
     /**
-     * Initializes gradients on instances, according to gradients parsed from a document
-     * @param {Array} instances
-     */
-    resolveGradients: function(instances) {
-      for (var i = instances.length; i--; ) {
-        var instanceFillValue = instances[i].get('fill');
-
-        if (!(/^url\(/).test(instanceFillValue)) {
-          continue;
-        }
-
-        var gradientId = instanceFillValue.slice(5, instanceFillValue.length - 1);
-
-        if (fabric.gradientDefs[gradientId]) {
-          instances[i].set('fill',
-            fabric.Gradient.fromElement(fabric.gradientDefs[gradientId], instances[i]));
-        }
-      }
-    },
-
-    /**
      * Parses an SVG document, returning all of the gradient declarations found in it
      * @static
      * @function
@@ -3723,6 +3702,7 @@ fabric.ElementsParser.prototype._createObject = function(klass, el, index) {
   }
   else {
     var obj = klass.fromElement(el, this.options);
+    this.resolveGradient(obj);
     this.reviver && this.reviver(el, obj);
     this.instances[index] = obj;
     this.checkIfDone();
@@ -3732,10 +3712,24 @@ fabric.ElementsParser.prototype._createObject = function(klass, el, index) {
 fabric.ElementsParser.prototype.createCallback = function(index, el) {
   var _this = this;
   return function(obj) {
+    _this.resolveGradient(obj);
     _this.reviver && _this.reviver(el, obj);
     _this.instances[index] = obj;
     _this.checkIfDone();
   };
+};
+
+fabric.ElementsParser.prototype.resolveGradient = function(obj) {
+  
+    var instanceFillValue = obj.get('fill');
+    if (!(/^url\(/).test(instanceFillValue)) {
+      return;
+    }
+    var gradientId = instanceFillValue.slice(5, instanceFillValue.length - 1);
+    if (fabric.gradientDefs[gradientId]) {
+      obj.set('fill',
+        fabric.Gradient.fromElement(fabric.gradientDefs[gradientId], obj));
+    }
 };
 
 fabric.ElementsParser.prototype.checkIfDone = function() {
@@ -3743,7 +3737,6 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
     this.instances = this.instances.filter(function(el) {
       return el != null;
     });
-    fabric.resolveGradients(this.instances);
     this.callback(this.instances);
   }
 };
@@ -8167,7 +8160,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       var t = this._currentTransform,
           target = t.target,
           lockScalingX = target.get('lockScalingX'),
-          lockScalingY = target.get('lockScalingY');
+          lockScalingY = target.get('lockScalingY'),
+          lockScalingFlip = target.get('lockScalingFlip');
 
       if (lockScalingX && lockScalingY) {
         return;
@@ -8180,7 +8174,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       this._setLocalMouse(localMouse, t);
 
       // Actually scale the object
-      this._setObjectScale(localMouse, t, lockScalingX, lockScalingY, by);
+      this._setObjectScale(localMouse, t, lockScalingX, lockScalingY, by, lockScalingFlip);
 
       // Make sure the constraints apply
       target.setPositionByOrigin(constraintPosition, t.originX, t.originY);
@@ -8189,32 +8183,36 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     /**
      * @private
      */
-    _setObjectScale: function(localMouse, transform, lockScalingX, lockScalingY, by) {
-      var target = transform.target;
+    _setObjectScale: function(localMouse, transform, lockScalingX, lockScalingY, by, lockScalingFlip) {
+      var target = transform.target, forbidScalingX = false, forbidScalingY = false;
 
-      transform.newScaleX = target.scaleX;
-      transform.newScaleY = target.scaleY;
+      transform.newScaleX = localMouse.x / (target.width + target.strokeWidth);
+      transform.newScaleY = localMouse.y / (target.height + target.strokeWidth);
+
+      if (lockScalingFlip && transform.newScaleX <= 0 && transform.newScaleX < target.scaleX) {
+        forbidScalingX = true;
+      }
+
+      if (lockScalingFlip && transform.newScaleY <= 0 && transform.newScaleY < target.scaleY) {
+        forbidScalingY = true;
+      }
 
       if (by === 'equally' && !lockScalingX && !lockScalingY) {
-        this._scaleObjectEqually(localMouse, target, transform);
+        forbidScalingX || forbidScalingY || this._scaleObjectEqually(localMouse, target, transform);
       }
       else if (!by) {
-        transform.newScaleX = localMouse.x / (target.width + target.strokeWidth);
-        transform.newScaleY = localMouse.y / (target.height + target.strokeWidth);
-
-        lockScalingX || target.set('scaleX', transform.newScaleX);
-        lockScalingY || target.set('scaleY', transform.newScaleY);
+        forbidScalingX || lockScalingX || target.set('scaleX', transform.newScaleX);
+        forbidScalingY || lockScalingY || target.set('scaleY', transform.newScaleY);
       }
       else if (by === 'x' && !target.get('lockUniScaling')) {
-        transform.newScaleX = localMouse.x / (target.width + target.strokeWidth);
-        lockScalingX || target.set('scaleX', transform.newScaleX);
+        forbidScalingX || lockScalingX || target.set('scaleX', transform.newScaleX);
       }
       else if (by === 'y' && !target.get('lockUniScaling')) {
-        transform.newScaleY = localMouse.y / (target.height + target.strokeWidth);
-        lockScalingY || target.set('scaleY', transform.newScaleY);
+        forbidScalingY || lockScalingY || target.set('scaleY', transform.newScaleY);
       }
 
-      this._flipObject(transform);
+      forbidScalingX || forbidScalingY || this._flipObject(transform);
+
     },
 
     /**
@@ -10853,6 +10851,13 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      */
     lockUniScaling:           false,
 
+    /**
+     * When `true`, object cannot be flipped by scaling into negative values
+     * @type Boolean
+     * @default
+     */
+
+    lockScalingFlip:          false,
     /**
      * List of properties to consider when checking if state
      * of an object is changed (fabric.Object#hasStateChanged)
