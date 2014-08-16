@@ -666,7 +666,7 @@
         gradientDefs[id] = el;
       }
 
-      for (id in postProcess) {
+      for (id in idsToXlinkMap) {
         var el2 = gradientDefs[idsToXlinkMap[id]].cloneNode(true);
         el = gradientDefs[id];
         while (el2.firstChild) {
