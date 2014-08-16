@@ -162,8 +162,8 @@
 
     // TODO: need to double check these values
 
-    equal(gradient.coords.x1, 0);
-    equal(gradient.coords.y1, 0);
+    equal(gradient.coords.x1, 50);
+    equal(gradient.coords.y1, 50);
 
     //equal(gradient.coords.x2, 100);
     //equal(gradient.coords.y2, 100);
@@ -200,8 +200,8 @@
 
     // TODO: need to double check these values
 
-    equal(gradient.coords.x1, 0);
-    equal(gradient.coords.y1, 0);
+    equal(gradient.coords.x1, 50);
+    equal(gradient.coords.y1, 50);
 
     //equal(gradient.coords.x2, 100);
     //equal(gradient.coords.y2, 100);
@@ -236,8 +236,8 @@
 
     // TODO: need to double check these values
 
-    equal(gradient.coords.x1, 0);
-    equal(gradient.coords.y1, 0);
+    equal(gradient.coords.x1, 50);
+    equal(gradient.coords.y1, 50);
 
     //equal(gradient.coords.x2, 100);
     //equal(gradient.coords.y2, 100);
@@ -288,8 +288,8 @@
 
     // TODO: need to double check these values
 
-    equal(gradient.coords.x1, 0);
-    equal(gradient.coords.y1, 0);
+    equal(gradient.coords.x1, 50);
+    equal(gradient.coords.y1, 50);
 
     //equal(gradient.coords.x2, 100);
     //equal(gradient.coords.y2, 100);
@@ -348,8 +348,8 @@
 
     // TODO: need to double check these values
 
-    equal(gradient.coords.x1, 0);
-    equal(gradient.coords.y1, 0);
+    equal(gradient.coords.x1, 50);
+    equal(gradient.coords.y1, 50);
 
     //equal(gradient.coords.x2, 100);
     //equal(gradient.coords.y2, 100);
