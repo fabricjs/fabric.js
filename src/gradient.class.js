@@ -76,6 +76,19 @@
    * @see {@link fabric.Gradient#initialize} for constructor definition
    */
   fabric.Gradient = fabric.util.createClass(/** @lends fabric.Gradient.prototype */ {
+    /*
+     * Stores the original position of the gradient when we convert from % to fixed values, for objectBoundingBox case.
+     * @type Number
+     * @default 0
+     */
+    origX: 0,
+
+    /*
+     * Stores the original position of the gradient when we convert from % to fixed values, for objectBoundingBox case.
+     * @type Number
+     * @default 0
+     */
+    origY: 0,
 
     /**
      * Constructor
@@ -108,6 +121,8 @@
       if (options.gradientTransform) {
         this.gradientTransform = options.gradientTransform;
       }
+      this.origX = options.left;
+      this.orgiY = options.top;
     },
 
     /**
@@ -149,7 +164,7 @@
      */
     toSVG: function(object, normalize) {
       var coords = fabric.util.object.clone(this.coords),
-          markup;
+          markup, commonAttributes;
 
       // colorStops must be sorted ascending
       this.colorStops.sort(function(a, b) {
@@ -165,18 +180,21 @@
       else if (this.gradientUnits === 'objectBoundingBox') {
         _convertValuesToPercentUnits(object, coords);
       }
-
+      commonAttributes = 'id="SVGID_' + this.id + 
+                     '" gradientUnits="' + this.gradientUnits + '"';
+      if (this.gradientTransform) {
+        commonAttributes += ' gradientTransform="matrix(' + this.gradientTransform.join(' ') + ')" '; 
+      }
       if (this.type === 'linear') {
         markup = [
           //jscs:disable validateIndentation
           '<linearGradient ',
-            'id="SVGID_', this.id,
-            '" gradientUnits="', this.gradientUnits,
-            '" x1="', coords.x1,
+            commonAttributes,
+            ' x1="', coords.x1,
             '" y1="', coords.y1,
             '" x2="', coords.x2,
             '" y2="', coords.y2,
-          '">'
+          '">\n'
           //jscs:enable validateIndentation
         ];
       }
@@ -184,14 +202,13 @@
         markup = [
           //jscs:disable validateIndentation
           '<radialGradient ',
-            'id="SVGID_', this.id,
-            '" gradientUnits="', this.gradientUnits,
-            '" cx="', coords.x2,
+            commonAttributes,
+            ' cx="', coords.x2,
             '" cy="', coords.y2,
             '" r="', coords.r2,
             '" fx="', coords.x1,
             '" fy="', coords.y1,
-          '">'
+          '">\n'
           //jscs:enable validateIndentation
         ];
       }
@@ -202,13 +219,13 @@
           '<stop ',
             'offset="', (this.colorStops[i].offset * 100) + '%',
             '" style="stop-color:', this.colorStops[i].color,
-            (this.colorStops[i].opacity ? ';stop-opacity: ' + this.colorStops[i].opacity : ';'),
-          '"/>'
+            (this.colorStops[i].opacity != null ? ';stop-opacity: ' + this.colorStops[i].opacity : ';'),
+          '"/>\n'
           //jscs:enable validateIndentation
         );
       }
 
-      markup.push((this.type === 'linear' ? '</linearGradient>' : '</radialGradient>'));
+      markup.push((this.type === 'linear' ? '</linearGradient>\n' : '</radialGradient>\n'));
 
       return markup.join('');
     },
@@ -355,23 +372,12 @@
       if (typeof options[prop] === 'string' && /^\d+%$/.test(options[prop])) {
         var percents = parseFloat(options[prop], 10);
         if (prop === 'x1' || prop === 'x2' || prop === 'r2') {
-          options[prop] = fabric.util.toFixed(object.width * percents / 100, 2);
+          options[prop] = fabric.util.toFixed(object.width * percents / 100, 2)  + object.left;
         }
         else if (prop === 'y1' || prop === 'y2') {
-          options[prop] = fabric.util.toFixed(object.height * percents / 100, 2);
+          options[prop] = fabric.util.toFixed(object.height * percents / 100, 2) + object.top;
         }
       }
-      normalize(options, prop, object);
-    }
-  }
-
-  // normalize rendering point (should be from top/left corner rather than center of the shape)
-  function normalize(options, prop, object) {
-    if (prop === 'x1' || prop === 'x2') {
-      options[prop] -= fabric.util.toFixed(object.width / 2, 2);
-    }
-    else if (prop === 'y1' || prop === 'y2') {
-      options[prop] -= fabric.util.toFixed(object.height / 2, 2);
     }
   }
 
@@ -381,15 +387,12 @@
    */
   function _convertValuesToPercentUnits(object, options) {
     for (var prop in options) {
-
-      normalize(options, prop, object);
-
-      // convert to percent units
+      //convert to percent units
       if (prop === 'x1' || prop === 'x2' || prop === 'r2') {
-        options[prop] = fabric.util.toFixed(options[prop] / object.width * 100, 2) + '%';
+        options[prop] = fabric.util.toFixed((options[prop] - object.origX) / object.width * 100, 2) + '%';
       }
       else if (prop === 'y1' || prop === 'y2') {
-        options[prop] = fabric.util.toFixed(options[prop] / object.height * 100, 2) + '%';
+        options[prop] = fabric.util.toFixed((options[prop] - object.origY) / object.height * 100, 2) + '%';
       }
     }
   }
