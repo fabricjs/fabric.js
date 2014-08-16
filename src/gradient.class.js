@@ -76,10 +76,20 @@
    * @see {@link fabric.Gradient#initialize} for constructor definition
    */
   fabric.Gradient = fabric.util.createClass(/** @lends fabric.Gradient.prototype */ {
-
+    /*
+     * Stores the original position of the gradient when we convert from % to fixed values,
+     * On objectBoundingBox case. We could you object.left and top, but those are  subject
+     * to change, and we need the original value when exporting back to SVG.
+     */
     origX: 0,
 
+    /*
+     * Stores the original position of the gradient when we convert from % to fixed values,
+     * On objectBoundingBox case. We could you object.left and top, but those are  subject
+     * to change, and we need the original value when exporting back to SVG.
+     */
     origY: 0,
+
     /**
      * Constructor
      * @param {Object} [options] Options object with type, coords, gradientUnits and colorStops
@@ -154,7 +164,7 @@
      */
     toSVG: function(object, normalize) {
       var coords = fabric.util.object.clone(this.coords),
-          markup, commonMarkup;
+          markup, commonAttributes;
 
       // colorStops must be sorted ascending
       this.colorStops.sort(function(a, b) {
@@ -170,16 +180,16 @@
       else if (this.gradientUnits === 'objectBoundingBox') {
         _convertValuesToPercentUnits(object, coords);
       }
-      commonMarkup = 'id="SVGID_' + this.id + 
+      commonAttributes = 'id="SVGID_' + this.id + 
                      '" gradientUnits="' + this.gradientUnits + '"';
       if (this.gradientTransform) {
-        commonMarkup += ' gradientTransform="matrix(' + this.gradientTransform.join(' ') + ')" '; 
+        commonAttributes += ' gradientTransform="matrix(' + this.gradientTransform.join(' ') + ')" '; 
       }
       if (this.type === 'linear') {
         markup = [
           //jscs:disable validateIndentation
           '<linearGradient ',
-            commonMarkup,
+            commonAttributes,
             ' x1="', coords.x1,
             '" y1="', coords.y1,
             '" x2="', coords.x2,
@@ -192,7 +202,7 @@
         markup = [
           //jscs:disable validateIndentation
           '<radialGradient ',
-            commonMarkup,
+            commonAttributes,
             ' cx="', coords.x2,
             '" cy="', coords.y2,
             '" r="', coords.r2,
