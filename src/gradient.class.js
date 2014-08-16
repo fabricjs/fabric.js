@@ -77,16 +77,16 @@
    */
   fabric.Gradient = fabric.util.createClass(/** @lends fabric.Gradient.prototype */ {
     /*
-     * Stores the original position of the gradient when we convert from % to fixed values,
-     * On objectBoundingBox case. We could you object.left and top, but those are  subject
-     * to change, and we need the original value when exporting back to SVG.
+     * Stores the original position of the gradient when we convert from % to fixed values, for objectBoundingBox case.
+     * @type Number
+     * @default 0
      */
     origX: 0,
 
     /*
-     * Stores the original position of the gradient when we convert from % to fixed values,
-     * On objectBoundingBox case. We could you object.left and top, but those are  subject
-     * to change, and we need the original value when exporting back to SVG.
+     * Stores the original position of the gradient when we convert from % to fixed values, for objectBoundingBox case.
+     * @type Number
+     * @default 0
      */
     origY: 0,
 
