@@ -1082,21 +1082,23 @@
         return;
       }
 
+      ctx.save();
       if (this.fill.toLive) {
-        ctx.save();
         ctx.translate(
           -this.width / 2 + this.fill.offsetX || 0,
           -this.height / 2 + this.fill.offsetY || 0);
       }
+      if (this.fill.gradientTransform) {
+        var g = this.fill.gradientTransform;
+        ctx.transform(g[0], g[1], g[2], g[3], g[4], g[5]);
+      }   
       if (this.fillRule === 'destination-over') {
         ctx.fill('evenodd');
       }
       else {
         ctx.fill();
       }
-      if (this.fill.toLive) {
-        ctx.restore();
-      }
+      ctx.restore();
       if (this.shadow && !this.shadow.affectStroke) {
         this._removeShadow(ctx);
       }
@@ -1128,6 +1130,10 @@
         ctx.stroke();
       }
       else {
+        if (this.stroke.gradientTransform) {
+          var g = this.stroke.gradientTransform;
+          ctx.transform(g[0], g[1], g[2], g[3], g[4], g[5]);
+        }        
         this._stroke ? this._stroke(ctx) : ctx.stroke();
       }
       this._removeShadow(ctx);
