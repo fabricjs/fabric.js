@@ -971,7 +971,7 @@
         ctx.translate(-this.group.width/2, -this.group.height/2);
         var m = this.transformMatrix;
         if (m) {
-          ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);          
+          ctx.transform.apply(ctx, m);
         }
       }
       ctx.globalAlpha = this.group ? (ctx.globalAlpha * this.opacity) : this.opacity;
@@ -989,7 +989,7 @@
       var m = this.transformMatrix;
 
       if (m && !this.group) {
-        ctx.setTransform(m[0], m[1], m[2], m[3], m[4], m[5]);
+        ctx.setTransform.apply(ctx, m);
       }
       if (!noTransform) {
         this.transform(ctx);
@@ -1090,7 +1090,7 @@
       }
       if (this.fill.gradientTransform) {
         var g = this.fill.gradientTransform;
-        ctx.transform(g[0], g[1], g[2], g[3], g[4], g[5]);
+        ctx.transform.apply(ctx, g);
       }   
       if (this.fillRule === 'destination-over') {
         ctx.fill('evenodd');
@@ -1132,7 +1132,7 @@
       else {
         if (this.stroke.gradientTransform) {
           var g = this.stroke.gradientTransform;
-          ctx.transform(g[0], g[1], g[2], g[3], g[4], g[5]);
+          ctx.transform.apply(ctx, g);
         }        
         this._stroke ? this._stroke(ctx) : ctx.stroke();
       }
