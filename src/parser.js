@@ -644,32 +644,32 @@
       var linearGradientEls = doc.getElementsByTagName('linearGradient'),
           radialGradientEls = doc.getElementsByTagName('radialGradient'),
           el, i, j = 0, id, xlink, elList = [ ],
-          gradientDefs = { }, postProcess = { };
+          gradientDefs = { }, idsToXlinkMap = { };
 
-      elList.lenght = linearGradientEls.length + radialGradientEls.length;
+      elList.length = linearGradientEls.length + radialGradientEls.length;
       i = linearGradientEls.length;
-      for (; i--; ) {
+      while (i--) {
         elList[j++] = linearGradientEls[i];
       }
       i = radialGradientEls.length;
-      for (; i--; ) {
+      while (i--) {
         elList[j++] = radialGradientEls[i];
       }
 
-      for (; j--; ) {
+      while (j--) {
         el = elList[j];
         xlink = el.getAttribute('xlink:href');
         id = el.getAttribute('id');
         if (xlink) {
-          postProcess[id] = xlink.substr(1);
+          idsToXlinkMap[id] = xlink.substr(1);
         }
         gradientDefs[id] = el;
       }
 
       for (id in postProcess) {
-        var el2 = gradientDefs[postProcess[id]].cloneNode(true);
+        var el2 = gradientDefs[idsToXlinkMap[id]].cloneNode(true);
         el = gradientDefs[id];
-        while (el2.firstChild != null) {
+        while (el2.firstChild) {
           el.appendChild(el2.firstChild);
         }
       }
