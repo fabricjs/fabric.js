@@ -4,7 +4,7 @@
   function getColorStop(el) {
     var style = el.getAttribute('style'),
         offset = el.getAttribute('offset'),
-        color, opacity;
+        color, colorAlpha, opacity;
 
     // convert percents to absolute values
     offset = parseFloat(offset) / (/%$/.test(offset) ? 100 : 1);
@@ -38,13 +38,15 @@
       opacity = el.getAttribute('stop-opacity');
     }
 
-    // convert rgba color to rgb color - alpha value has no affect in svg
-    color = new fabric.Color(color).toRgb();
+    color = new fabric.Color(color);
+    colorAlpha = color.getAlpha();
+    opacity = isNaN(parseFloat(opacity)) ? 1 : parseFloat(opacity);
+    opacity *= colorAlpha;
 
     return {
       offset: offset,
-      color: color,
-      opacity: isNaN(parseFloat(opacity)) ? 1 : parseFloat(opacity)
+      color: color.toRgb(),
+      opacity: opacity
     };
   }
 
@@ -121,8 +123,8 @@
       if (options.gradientTransform) {
         this.gradientTransform = options.gradientTransform;
       }
-      this.origX = options.left;
-      this.orgiY = options.top;
+      this.origX = options.left || this.origX;
+      this.origY = options.top || this.origY;
     },
 
     /**
@@ -389,10 +391,10 @@
     for (var prop in options) {
       //convert to percent units
       if (prop === 'x1' || prop === 'x2' || prop === 'r2') {
-        options[prop] = fabric.util.toFixed((options[prop] - object.origX) / object.width * 100, 2) + '%';
+        options[prop] = fabric.util.toFixed((options[prop] - object.fill.origX) / object.width * 100, 2) + '%';
       }
       else if (prop === 'y1' || prop === 'y2') {
-        options[prop] = fabric.util.toFixed((options[prop] - object.origY) / object.height * 100, 2) + '%';
+        options[prop] = fabric.util.toFixed((options[prop] - object.fill.origY) / object.height * 100, 2) + '%';
       }
     }
   }
