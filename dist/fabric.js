@@ -8066,24 +8066,22 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @private
      */
     _getOriginFromCorner: function(target, corner) {
-      var origin = {
-        x: target.originX,
-        y: target.originY
-      };
+	    var origin = { x: target.originX, y: target.originY },
+		    cornerRotating = (fabric.Object.prototype.hasCornerRotatingPoint ? fabric.Object.prototype.cornerRotating : null);
 
-      if (corner === 'ml' || corner === 'tl' || corner === 'bl') {
-        origin.x = 'right';
-      }
-      else if (corner === 'mr' || corner === 'tr' || corner === 'br') {
-        origin.x = 'left';
-      }
+	    if ((corner === 'ml' || corner === 'tl' || corner === 'bl') && corner !== cornerRotating) {
+		    origin.x = 'right';
+	    }
+	    else if ((corner === 'mr' || corner === 'tr' || corner === 'br') && corner !== cornerRotating) {
+		    origin.x = 'left';
+	    }
 
-      if (corner === 'tl' || corner === 'mt' || corner === 'tr') {
-        origin.y = 'bottom';
-      }
-      else if (corner === 'bl' || corner === 'mb' || corner === 'br') {
-        origin.y = 'top';
-      }
+	    if ((corner === 'tl' || corner === 'mt' || corner === 'tr') && corner !== cornerRotating) {
+		    origin.y = 'bottom';
+	    }
+	    else if ((corner === 'bl' || corner === 'mb' || corner === 'br') && corner !== cornerRotating) {
+		    origin.y = 'top';
+	    }
 
       return origin;
     },
@@ -8092,16 +8090,16 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @private
      */
     _getActionFromCorner: function(target, corner) {
-      var action = 'drag';
-      if (corner) {
-        action = (corner === 'ml' || corner === 'mr')
-          ? 'scaleX'
-          : (corner === 'mt' || corner === 'mb')
-            ? 'scaleY'
-            : corner === 'mtr'
-              ? 'rotate'
-              : 'scale';
-      }
+	    var action = 'drag',
+		    cornerRotating = (fabric.Object.prototype.hasCornerRotatingPoint ? fabric.Object.prototype.cornerRotating : null);
+	    if (corner) {
+		    action = ((corner === 'ml' || corner === 'mr') && cornerRotating !== corner) ? 'scaleX'
+			    : (corner === 'mt' || corner === 'mb') && corner !== cornerRotating
+			    ? 'scaleY'
+			    : corner === 'mtr' || corner === cornerRotating
+			    ? 'rotate'
+			    : 'scale';
+	    }
       return action;
     },
 
@@ -9532,16 +9530,20 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @private
      */
     _setCornerCursor: function(corner, target) {
-      if (corner in cursorOffset) {
-        this.setCursor(this._getRotatedCornerCursor(corner, target));
-      }
-      else if (corner === 'mtr' && target.hasRotatingPoint) {
-        this.setCursor(this.rotationCursor);
-      }
-      else {
-        this.setCursor(this.defaultCursor);
-        return false;
-      }
+	    var globalObjectProperies = fabric.Object.prototype,
+		    cornerRotating = (globalObjectProperies.hasCornerRotatingPoint ? fabric.Object.prototype.cornerRotating : '') ;
+
+	    if (corner in cursorOffset && (corner !== cornerRotating)) {
+		    this.setCursor(this._getRotatedCornerCursor(corner, target));
+	    }
+	    else if ((corner === 'mtr' && target.hasRotatingPoint) || (corner === cornerRotating)) {
+
+		    this.setCursor(this.rotationCursor);
+	    }
+	    else {
+		    this.setCursor(this.defaultCursor);
+		    return false;
+	    }
     },
 
     /**
@@ -10800,6 +10802,34 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @default
      */
     hasRotatingPoint:         true,
+
+    /**
+    * When set to `false`, object's controlling Corner rotating point will not be visible or selectable
+    * @type Boolean
+    * @default
+    */
+    hasCornerRotatingPoint:         false,
+
+	/**
+	* Corner Roation Size, its controlling size of Corner which do rotation of object element
+	* @type Number
+	* @default
+	*/
+	cornerRotationSize:                  12,
+
+    /**
+    * Offset for object's controlling rotating point (when enabled via `hasCornerRotatingPoint`)
+    * @type Number
+    * @default
+    */
+    cornerRotatingPointOffset:      4,
+
+    /**
+    * Corrner Name which is controlling rotation
+    * @type String
+    * @default
+    */
+	cornerRotating: 'tr',
 
     /**
      * Offset for object's controlling rotating point (when enabled via `hasRotatingPoint`)
@@ -12665,7 +12695,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       var ex = pointer.x,
           ey = pointer.y,
           xPoints,
-          lines;
+          lines,
+	      cornerRotating = ( this.hasCornerRotatingPoint ? this.cornerRotating : null);
 
       for (var i in this.oCoords) {
 
@@ -12673,9 +12704,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           continue;
         }
 
-        if (i === 'mtr' && !this.hasRotatingPoint) {
-          continue;
-        }
+		if ((i === 'mtr' && !this.hasRotatingPoint) || (i === cornerRotating && !this.hasCornerRotatingPoint)) {
+		  continue;
+		}
 
         if (this.get('lockUniScaling') &&
            (i === 'mt' || i === 'mr' || i === 'mb' || i === 'ml')) {
@@ -12720,159 +12751,35 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           cosHalfOffset = cornerHypotenuse * Math.cos(newTheta),
           sinHalfOffset = cornerHypotenuse * Math.sin(newTheta),
           sinTh = Math.sin(theta),
-          cosTh = Math.cos(theta);
+          cosTh = Math.cos(theta),
+	      corners = ['tl', 'tr', 'bl', 'br', 'ml', 'mt', 'mr', 'mb'];
 
-      coords.tl.corner = {
-        tl: {
-          x: coords.tl.x - sinHalfOffset,
-          y: coords.tl.y - cosHalfOffset
-        },
-        tr: {
-          x: coords.tl.x + cosHalfOffset,
-          y: coords.tl.y - sinHalfOffset
-        },
-        bl: {
-          x: coords.tl.x - cosHalfOffset,
-          y: coords.tl.y + sinHalfOffset
-        },
-        br: {
-          x: coords.tl.x + sinHalfOffset,
-          y: coords.tl.y + cosHalfOffset
-        }
-      };
+	    for(var i in corners) {
+		    var cornerRotatingPointOffset = 1;
 
-      coords.tr.corner = {
-        tl: {
-          x: coords.tr.x - sinHalfOffset,
-          y: coords.tr.y - cosHalfOffset
-        },
-        tr: {
-          x: coords.tr.x + cosHalfOffset,
-          y: coords.tr.y - sinHalfOffset
-        },
-        br: {
-          x: coords.tr.x + sinHalfOffset,
-          y: coords.tr.y + cosHalfOffset
-        },
-        bl: {
-          x: coords.tr.x - cosHalfOffset,
-          y: coords.tr.y + sinHalfOffset
-        }
-      };
+		    if ( coords[this.cornerRotating] !== 'undefined' && this.hasCornerRotatingPoint) {
+			    cornerRotatingPointOffset = (this.cornerRotatingPointOffset / 2);
+		    }
 
-      coords.bl.corner = {
-        tl: {
-          x: coords.bl.x - sinHalfOffset,
-          y: coords.bl.y - cosHalfOffset
-        },
-        bl: {
-          x: coords.bl.x - cosHalfOffset,
-          y: coords.bl.y + sinHalfOffset
-        },
-        br: {
-          x: coords.bl.x + sinHalfOffset,
-          y: coords.bl.y + cosHalfOffset
-        },
-        tr: {
-          x: coords.bl.x + cosHalfOffset,
-          y: coords.bl.y - sinHalfOffset
-        }
-      };
-
-      coords.br.corner = {
-        tr: {
-          x: coords.br.x + cosHalfOffset,
-          y: coords.br.y - sinHalfOffset
-        },
-        bl: {
-          x: coords.br.x - cosHalfOffset,
-          y: coords.br.y + sinHalfOffset
-        },
-        br: {
-          x: coords.br.x + sinHalfOffset,
-          y: coords.br.y + cosHalfOffset
-        },
-        tl: {
-          x: coords.br.x - sinHalfOffset,
-          y: coords.br.y - cosHalfOffset
-        }
-      };
-
-      coords.ml.corner = {
-        tl: {
-          x: coords.ml.x - sinHalfOffset,
-          y: coords.ml.y - cosHalfOffset
-        },
-        tr: {
-          x: coords.ml.x + cosHalfOffset,
-          y: coords.ml.y - sinHalfOffset
-        },
-        bl: {
-          x: coords.ml.x - cosHalfOffset,
-          y: coords.ml.y + sinHalfOffset
-        },
-        br: {
-          x: coords.ml.x + sinHalfOffset,
-          y: coords.ml.y + cosHalfOffset
-        }
-      };
-
-      coords.mt.corner = {
-        tl: {
-          x: coords.mt.x - sinHalfOffset,
-          y: coords.mt.y - cosHalfOffset
-        },
-        tr: {
-          x: coords.mt.x + cosHalfOffset,
-          y: coords.mt.y - sinHalfOffset
-        },
-        bl: {
-          x: coords.mt.x - cosHalfOffset,
-          y: coords.mt.y + sinHalfOffset
-        },
-        br: {
-          x: coords.mt.x + sinHalfOffset,
-          y: coords.mt.y + cosHalfOffset
-        }
-      };
-
-      coords.mr.corner = {
-        tl: {
-          x: coords.mr.x - sinHalfOffset,
-          y: coords.mr.y - cosHalfOffset
-        },
-        tr: {
-          x: coords.mr.x + cosHalfOffset,
-          y: coords.mr.y - sinHalfOffset
-        },
-        bl: {
-          x: coords.mr.x - cosHalfOffset,
-          y: coords.mr.y + sinHalfOffset
-        },
-        br: {
-          x: coords.mr.x + sinHalfOffset,
-          y: coords.mr.y + cosHalfOffset
-        }
-      };
-
-      coords.mb.corner = {
-        tl: {
-          x: coords.mb.x - sinHalfOffset,
-          y: coords.mb.y - cosHalfOffset
-        },
-        tr: {
-          x: coords.mb.x + cosHalfOffset,
-          y: coords.mb.y - sinHalfOffset
-        },
-        bl: {
-          x: coords.mb.x - cosHalfOffset,
-          y: coords.mb.y + sinHalfOffset
-        },
-        br: {
-          x: coords.mb.x + sinHalfOffset,
-          y: coords.mb.y + cosHalfOffset
-        }
-      };
+		    coords[corners[i]].corner = {
+			    tl: {
+				    x: coords[corners[i]].x - (sinHalfOffset * cornerRotatingPointOffset),
+				    y: coords[corners[i]].y - (cosHalfOffset * cornerRotatingPointOffset)
+			    },
+			    tr: {
+				    x: coords[corners[i]].x + (cosHalfOffset * cornerRotatingPointOffset),
+				    y: coords[corners[i]].y - (sinHalfOffset * cornerRotatingPointOffset)
+			    },
+			    bl: {
+				    x: coords[corners[i]].x - (cosHalfOffset * cornerRotatingPointOffset),
+				    y: coords[corners[i]].y + (sinHalfOffset * cornerRotatingPointOffset)
+			    },
+			    br: {
+				    x: coords[corners[i]].x + (sinHalfOffset * cornerRotatingPointOffset),
+				    y: coords[corners[i]].y + (cosHalfOffset * cornerRotatingPointOffset)
+			    }
+		    }
+	    }
 
       coords.mtr.corner = {
         tl: {
@@ -13027,61 +12934,104 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
       ctx.strokeStyle = ctx.fillStyle = this.cornerColor;
 
-      // top-left
-      this._drawControl('tl', ctx, methodName,
-        left - scaleOffset - padding,
-        top - scaleOffset - padding);
+	    var corrnerCoords = {
+			    tl: {
+				    left: left - scaleOffset - padding,
+				    top: top - scaleOffset - padding
+			    },
+			    tr: {
+				    left: left + width - scaleOffset + padding,
+				    top: top - scaleOffset - padding
+			    },
+			    bl: {
+				    left: left - scaleOffset - padding,
+				    top: top + height + scaleOffsetSize + padding
+			    },
+			    br: {
+				    left: left + width + scaleOffsetSize + padding,
+				    top: top + height + scaleOffsetSize + padding
+			    },
+			    mt: {
+				    left: left + width/2 - scaleOffset,
+				    top: top - scaleOffset - padding
+			    },
+			    mb: {
+				    left: left + width/2 - scaleOffset,
+				    top: top + height + scaleOffsetSize + padding
+			    },
+			    mr: {
+				    left: left + width + scaleOffsetSize + padding,
+				    top: top + height/2 - scaleOffset
+			    },
+			    ml: {
+				    left: left - scaleOffset - padding,
+				    top: top + height/2 - scaleOffset
+			    }
+		    },
+		    corners = ['tl', 'tr', 'bl', 'br', 'ml', 'mt', 'mr', 'mb'],
+		    lockUniScalingCorners = ['mt', 'mb', 'mr', 'ml'];
 
-      // top-right
-      this._drawControl('tr', ctx, methodName,
-        left + width - scaleOffset + padding,
-        top - scaleOffset - padding);
+	    for (var i in corners) {
+		    if ( this.cornerRotating === corners[i] && this.hasCornerRotatingPoint) {
 
-      // bottom-left
-      this._drawControl('bl', ctx, methodName,
-        left - scaleOffset - padding,
-        top + height + scaleOffsetSize + padding);
+			    this._drawRotationControl(this.cornerRotating, ctx,
+				    corrnerCoords[corners[i]].left + this.cornerRotatingPointOffset,
+				    corrnerCoords[corners[i]].top + this.cornerRotatingPointOffset);
 
-      // bottom-right
-      this._drawControl('br', ctx, methodName,
-        left + width + scaleOffsetSize + padding,
-        top + height + scaleOffsetSize + padding);
+		    } //Define top-left [tl], top-right [tr], bottom-left [bl], bottom-right [br], middle-top [mt], middle-bottom [mb], middle-right [mr], middle-left [ml]
+		    else if( (lockUniScalingCorners[i] !== corners[i]) ||
+			    (!this.get('lockUniScaling') && lockUniScalingCorners[i] === corners[i]) ) {
 
-      if (!this.get('lockUniScaling')) {
+			    this._drawControl(corners[i], ctx, methodName, corrnerCoords[corners[i]].left, corrnerCoords[corners[i]].top);
 
-        // middle-top
-        this._drawControl('mt', ctx, methodName,
-          left + width/2 - scaleOffset,
-          top - scaleOffset - padding);
+		    }
+	    }
 
-        // middle-bottom
-        this._drawControl('mb', ctx, methodName,
-          left + width/2 - scaleOffset,
-          top + height + scaleOffsetSize + padding);
+	    // middle-top-rotate
+	    if (this.hasRotatingPoint) {
+		    var mtrLeft = left + width/2 - scaleOffset,
+			    mtrY = this.flipY
+				    ? (top + height + this.rotatingPointOffset - this.cornerSize/2 + padding)
+				    : (top - this.rotatingPointOffset - this.cornerSize/2 - padding);
 
-        // middle-right
-        this._drawControl('mr', ctx, methodName,
-          left + width + scaleOffsetSize + padding,
-          top + height/2 - scaleOffset);
-
-        // middle-left
-        this._drawControl('ml', ctx, methodName,
-          left - scaleOffset - padding,
-          top + height/2 - scaleOffset);
-      }
-
-      // middle-top-rotate
-      if (this.hasRotatingPoint) {
-        this._drawControl('mtr', ctx, methodName,
-          left + width/2 - scaleOffset,
-          top - this.rotatingPointOffset - this.cornerSize/2 - padding);
-      }
+		    this._drawControl('mtr', ctx, methodName, mtrLeft, mtrY);
+	    }
 
       ctx.restore();
 
       return this;
     },
 
+	  /**
+	   * Draw Rotation Controll
+	   * @private
+	   */
+	_drawRotationControl: function(control, ctx, left, top){
+		var size = this.cornerRotationSize;
+
+		if (this.isControlVisible(control)) {
+			var controlArcAngles = {
+				tr: {start: 3.3*Math.PI, end: 0.2*Math.PI},
+				tl: {start: 2.6*Math.PI, end: 1.7*Math.PI},
+				bl: {start: 0.3*Math.PI, end: 1.3*Math.PI},
+				br: {start: 3.8*Math.PI, end: 0.7*Math.PI},
+				ml: {start: 2.7*Math.PI, end: 1.3*Math.PI},
+				mt: {start: 1.2*Math.PI, end: 1.8*Math.PI},
+				mb: {start: 2.2*Math.PI, end: 0.8*Math.PI},
+				mr: {start: 1.7*Math.PI, end: 2.3*Math.PI}
+			};
+			//Draw Rotation circle
+			ctx.beginPath();
+			ctx.arc(left, top, size, 0, Math.PI * 2, false);
+			ctx.closePath();
+			ctx.fill();
+
+			//Draw Rotation Arc
+			ctx.beginPath();
+			ctx.arc(left, top, size + 5, controlArcAngles[control].start, controlArcAngles[control].end);
+			ctx.stroke();
+		}
+	},
     /**
      * @private
      */
