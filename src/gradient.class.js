@@ -372,14 +372,20 @@
    */
   function _convertPercentUnitsToValues(object, options) {
     for (var prop in options) {
-      if (typeof options[prop] === 'string' && /^\d+%$/.test(options[prop])) {
+      if (typeof options[prop] === 'string'  && /^\d+%$/.test(options[prop])) {
         var percents = parseFloat(options[prop], 10);
         if (prop === 'x1' || prop === 'x2' || prop === 'r2') {
-          options[prop] = fabric.util.toFixed(object.width * percents / 100, 2)  + object.left;
+          options[prop] = fabric.util.toFixed(object.width * percents / 100, 2);
         }
         else if (prop === 'y1' || prop === 'y2') {
-          options[prop] = fabric.util.toFixed(object.height * percents / 100, 2) + object.top;
+          options[prop] = fabric.util.toFixed(object.height * percents / 100, 2);
         }
+      }
+      if (prop === 'x1' || prop === 'x2' || prop === 'r2') {
+          options[prop] = parseFloat(options[prop]) + parseFloat(object.left);
+      }
+      else if (prop === 'y1' || prop === 'y2') {
+          options[prop] = parseFloat(options[prop]) + parseFloat(object.top);
       }
     }
   }
