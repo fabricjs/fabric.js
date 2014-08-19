@@ -4,7 +4,7 @@
   function getColorStop(el) {
     var style = el.getAttribute('style'),
         offset = el.getAttribute('offset'),
-        color, opacity;
+        color, colorAlpha, opacity;
 
     // convert percents to absolute values
     offset = parseFloat(offset) / (/%$/.test(offset) ? 100 : 1);
@@ -38,13 +38,16 @@
       opacity = el.getAttribute('stop-opacity');
     }
 
-    // convert rgba color to rgb color - alpha value has no affect in svg
-    color = new fabric.Color(color).toRgb();
+    color = new fabric.Color(color);
+    colorAlpha = color.getAlpha();
+    color = color.toRgb();
+    opacity = isNaN(parseFloat(opacity)) ? 1 : parseFloat(opacity);
+    opacity *= colorAlpha;
 
     return {
       offset: offset,
       color: color,
-      opacity: isNaN(parseFloat(opacity)) ? 1 : parseFloat(opacity)
+      opacity: opacity
     };
   }
 
@@ -76,10 +79,20 @@
    * @see {@link fabric.Gradient#initialize} for constructor definition
    */
   fabric.Gradient = fabric.util.createClass(/** @lends fabric.Gradient.prototype */ {
-
+    /*
+     * Stores the original position of the gradient when we convert from % to fixed values, for objectBoundingBox case.
+     * @type Number
+     * @default 0
+     */
     origX: 0,
 
+    /*
+     * Stores the original position of the gradient when we convert from % to fixed values, for objectBoundingBox case.
+     * @type Number
+     * @default 0
+     */
     origY: 0,
+
     /**
      * Constructor
      * @param {Object} [options] Options object with type, coords, gradientUnits and colorStops
@@ -111,8 +124,8 @@
       if (options.gradientTransform) {
         this.gradientTransform = options.gradientTransform;
       }
-      this.origX = options.left;
-      this.orgiY = options.top;
+      this.origX = options.left || this.origX;
+      this.origY = options.top || this.origY;
     },
 
     /**
@@ -154,7 +167,7 @@
      */
     toSVG: function(object, normalize) {
       var coords = fabric.util.object.clone(this.coords),
-          markup, commonMarkup;
+          markup, commonAttributes;
 
       // colorStops must be sorted ascending
       this.colorStops.sort(function(a, b) {
@@ -170,16 +183,16 @@
       else if (this.gradientUnits === 'objectBoundingBox') {
         _convertValuesToPercentUnits(object, coords);
       }
-      commonMarkup = 'id="SVGID_' + this.id + 
+      commonAttributes = 'id="SVGID_' + this.id + 
                      '" gradientUnits="' + this.gradientUnits + '"';
       if (this.gradientTransform) {
-        commonMarkup += ' gradientTransform="matrix(' + this.gradientTransform.join(' ') + ')" '; 
+        commonAttributes += ' gradientTransform="matrix(' + this.gradientTransform.join(' ') + ')" '; 
       }
       if (this.type === 'linear') {
         markup = [
           //jscs:disable validateIndentation
           '<linearGradient ',
-            commonMarkup,
+            commonAttributes,
             ' x1="', coords.x1,
             '" y1="', coords.y1,
             '" x2="', coords.x2,
@@ -192,7 +205,7 @@
         markup = [
           //jscs:disable validateIndentation
           '<radialGradient ',
-            commonMarkup,
+            commonAttributes,
             ' cx="', coords.x2,
             '" cy="', coords.y2,
             '" r="', coords.r2,
@@ -206,7 +219,7 @@
       for (var i = 0; i < this.colorStops.length; i++) {
         markup.push(
           //jscs:disable validateIndentation
-          '<stop ',
+          '\t<stop ',
             'offset="', (this.colorStops[i].offset * 100) + '%',
             '" style="stop-color:', this.colorStops[i].color,
             (this.colorStops[i].opacity != null ? ';stop-opacity: ' + this.colorStops[i].opacity : ';'),
@@ -359,14 +372,20 @@
    */
   function _convertPercentUnitsToValues(object, options) {
     for (var prop in options) {
-      if (typeof options[prop] === 'string' && /^\d+%$/.test(options[prop])) {
+      if (typeof options[prop] === 'string'  && /^\d+%$/.test(options[prop])) {
         var percents = parseFloat(options[prop], 10);
         if (prop === 'x1' || prop === 'x2' || prop === 'r2') {
-          options[prop] = fabric.util.toFixed(object.width * percents / 100, 2)  + object.left;
+          options[prop] = fabric.util.toFixed(object.width * percents / 100, 2);
         }
         else if (prop === 'y1' || prop === 'y2') {
-          options[prop] = fabric.util.toFixed(object.height * percents / 100, 2) + object.top;
+          options[prop] = fabric.util.toFixed(object.height * percents / 100, 2);
         }
+      }
+      if (prop === 'x1' || prop === 'x2' || prop === 'r2') {
+          options[prop] = parseFloat(options[prop]) + parseFloat(object.left);
+      }
+      else if (prop === 'y1' || prop === 'y2') {
+          options[prop] = parseFloat(options[prop]) + parseFloat(object.top);
       }
     }
   }
@@ -379,10 +398,10 @@
     for (var prop in options) {
       //convert to percent units
       if (prop === 'x1' || prop === 'x2' || prop === 'r2') {
-        options[prop] = fabric.util.toFixed((options[prop] - object.origX) / object.width * 100, 2) + '%';
+        options[prop] = fabric.util.toFixed((options[prop] - object.fill.origX) / object.width * 100, 2) + '%';
       }
       else if (prop === 'y1' || prop === 'y2') {
-        options[prop] = fabric.util.toFixed((options[prop] - object.origY) / object.height * 100, 2) + '%';
+        options[prop] = fabric.util.toFixed((options[prop] - object.fill.origY) / object.height * 100, 2) + '%';
       }
     }
   }
