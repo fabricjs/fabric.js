@@ -40,13 +40,12 @@
 
     color = new fabric.Color(color);
     colorAlpha = color.getAlpha();
-    color = color.toRgb();
     opacity = isNaN(parseFloat(opacity)) ? 1 : parseFloat(opacity);
     opacity *= colorAlpha;
 
     return {
       offset: offset,
-      color: color,
+      color: color.toRgb(),
       opacity: opacity
     };
   }
