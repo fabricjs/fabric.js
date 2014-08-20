@@ -6,7 +6,9 @@
    * @param {Function} handler
    */
   function _removeEventListener(eventName, handler) {
-    if (!this.__eventListeners[eventName]) return;
+    if (!this.__eventListeners[eventName]) {
+      return;
+    }
 
     if (handler) {
       fabric.util.removeFromArray(this.__eventListeners[eventName], handler);
@@ -57,7 +59,9 @@
    * @chainable
    */
   function stopObserving(eventName, handler) {
-    if (!this.__eventListeners) return;
+    if (!this.__eventListeners) {
+      return;
+    }
 
     // remove all key/value pairs (event name -> event handler)
     if (arguments.length === 0) {
@@ -86,10 +90,15 @@
    * @chainable
    */
   function fire(eventName, options) {
-    if (!this.__eventListeners) return;
+    if (!this.__eventListeners) {
+      return;
+    }
 
     var listenersForEvent = this.__eventListeners[eventName];
-    if (!listenersForEvent) return;
+    if (!listenersForEvent) {
+      return;
+    }
+
     for (var i = 0, len = listenersForEvent.length; i < len; i++) {
       // avoiding try/catch for perf. reasons
       listenersForEvent[i].call(this, options || { });

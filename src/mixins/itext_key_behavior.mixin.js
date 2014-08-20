@@ -53,7 +53,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @param {Event} e Event object
    */
   onKeyDown: function(e) {
-    if (!this.isEditing) return;
+    if (!this.isEditing) {
+      return;
+    }
 
     if (e.keyCode in this._keysMap) {
       this[this._keysMap[e.keyCode]](e);
@@ -442,7 +444,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @param {Event} e Event object
    */
   moveCursorLeft: function(e) {
-    if (this.selectionStart === 0 && this.selectionEnd === 0) return;
+    if (this.selectionStart === 0 && this.selectionEnd === 0) {
+      return;
+    }
 
     this.abortCursorAnimation();
     this._currentCursorOpacity = 1;
@@ -528,7 +532,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @param {Event} e Event object
    */
   moveCursorRight: function(e) {
-    if (this.selectionStart >= this.text.length && this.selectionEnd >= this.text.length) return;
+    if (this.selectionStart >= this.text.length && this.selectionEnd >= this.text.length) {
+      return;
+    }
 
     this.abortCursorAnimation();
     this._currentCursorOpacity = 1;

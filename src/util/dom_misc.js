@@ -276,7 +276,9 @@
         if (loading) {
           if (typeof this.readyState === 'string' &&
               this.readyState !== 'loaded' &&
-              this.readyState !== 'complete') return;
+              this.readyState !== 'complete') {
+            return;
+          }
           loading = false;
           callback(e || fabric.window.event);
           scriptEl = scriptEl.onload = scriptEl.onreadystatechange = null;

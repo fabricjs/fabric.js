@@ -339,7 +339,9 @@
      * @param {fabric.Object} target
      */
     _shouldCenterTransform: function (e, target) {
-      if (!target) return;
+      if (!target) {
+        return;
+      }
 
       var t = this._currentTransform,
           centerTransform;
@@ -403,7 +405,9 @@
      * @param {fabric.Object} target
      */
     _setupCurrentTransform: function (e, target) {
-      if (!target) return;
+      if (!target) {
+        return;
+      }
 
       var pointer = this.getPointer(e),
           corner = target._findTargetCorner(this.getPointer(e, true)),
@@ -470,9 +474,12 @@
       var t = this._currentTransform,
           target = t.target,
           lockScalingX = target.get('lockScalingX'),
-          lockScalingY = target.get('lockScalingY');
+          lockScalingY = target.get('lockScalingY'),
+          lockScalingFlip = target.get('lockScalingFlip');
 
-      if (lockScalingX && lockScalingY) return;
+      if (lockScalingX && lockScalingY) {
+        return;
+      }
 
       // Get the constraint point
       var constraintPosition = target.translateToOriginPoint(target.getCenterPoint(), t.originX, t.originY),
@@ -481,7 +488,7 @@
       this._setLocalMouse(localMouse, t);
 
       // Actually scale the object
-      this._setObjectScale(localMouse, t, lockScalingX, lockScalingY, by);
+      this._setObjectScale(localMouse, t, lockScalingX, lockScalingY, by, lockScalingFlip);
 
       // Make sure the constraints apply
       target.setPositionByOrigin(constraintPosition, t.originX, t.originY);
@@ -490,32 +497,36 @@
     /**
      * @private
      */
-    _setObjectScale: function(localMouse, transform, lockScalingX, lockScalingY, by) {
-      var target = transform.target;
+    _setObjectScale: function(localMouse, transform, lockScalingX, lockScalingY, by, lockScalingFlip) {
+      var target = transform.target, forbidScalingX = false, forbidScalingY = false;
 
-      transform.newScaleX = target.scaleX;
-      transform.newScaleY = target.scaleY;
+      transform.newScaleX = localMouse.x / (target.width + target.strokeWidth);
+      transform.newScaleY = localMouse.y / (target.height + target.strokeWidth);
+
+      if (lockScalingFlip && transform.newScaleX <= 0 && transform.newScaleX < target.scaleX) {
+        forbidScalingX = true;
+      }
+
+      if (lockScalingFlip && transform.newScaleY <= 0 && transform.newScaleY < target.scaleY) {
+        forbidScalingY = true;
+      }
 
       if (by === 'equally' && !lockScalingX && !lockScalingY) {
-        this._scaleObjectEqually(localMouse, target, transform);
+        forbidScalingX || forbidScalingY || this._scaleObjectEqually(localMouse, target, transform);
       }
       else if (!by) {
-        transform.newScaleX = localMouse.x / (target.width + target.strokeWidth);
-        transform.newScaleY = localMouse.y / (target.height + target.strokeWidth);
-
-        lockScalingX || target.set('scaleX', transform.newScaleX);
-        lockScalingY || target.set('scaleY', transform.newScaleY);
+        forbidScalingX || lockScalingX || target.set('scaleX', transform.newScaleX);
+        forbidScalingY || lockScalingY || target.set('scaleY', transform.newScaleY);
       }
       else if (by === 'x' && !target.get('lockUniScaling')) {
-        transform.newScaleX = localMouse.x / (target.width + target.strokeWidth);
-        lockScalingX || target.set('scaleX', transform.newScaleX);
+        forbidScalingX || lockScalingX || target.set('scaleX', transform.newScaleX);
       }
       else if (by === 'y' && !target.get('lockUniScaling')) {
-        transform.newScaleY = localMouse.y / (target.height + target.strokeWidth);
-        lockScalingY || target.set('scaleY', transform.newScaleY);
+        forbidScalingY || lockScalingY || target.set('scaleY', transform.newScaleY);
       }
 
-      this._flipObject(transform);
+      forbidScalingX || forbidScalingY || this._flipObject(transform);
+
     },
 
     /**
@@ -623,7 +634,9 @@
 
       var t = this._currentTransform;
 
-      if (t.target.get('lockRotation')) return;
+      if (t.target.get('lockRotation')) {
+        return;
+      }
 
       var lastAngle = atan2(t.ey - t.top, t.ex - t.left),
           curAngle = atan2(y - t.top, x - t.left),
@@ -722,7 +735,9 @@
      * @param {Boolean} skipGroup when true, group is skipped and only objects are traversed through
      */
     findTarget: function (e, skipGroup) {
-      if (this.skipTargetFind) return;
+      if (this.skipTargetFind) {
+        return;
+      }
 
       if (this._isLastRenderedObject(e)) {
         return this.lastRenderedObjectWithControlsAboveOverlay;
@@ -1102,7 +1117,9 @@
      */
     _drawObjectsControls: function(ctx) {
       for (var i = 0, len = this._objects.length; i < len; ++i) {
-        if (!this._objects[i] || !this._objects[i].active) continue;
+        if (!this._objects[i] || !this._objects[i].active) {
+          continue;
+        }
         this._objects[i]._renderControls(ctx);
         this.lastRenderedObjectWithControlsAboveOverlay = this._objects[i];
       }

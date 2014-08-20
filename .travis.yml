@@ -1,6 +1,6 @@
 language: node_js
 node_js:
-  - "0.10"
+  - "0.10.29"
 script: 'npm run-script build && npm test'
 before_install:
  - sudo apt-get update -qq

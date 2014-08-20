@@ -326,7 +326,9 @@
      * @private
      */
     _initDimensions: function() {
-      if (this.__skipDimension) return;
+      if (this.__skipDimension) {
+        return;
+      }
       var canvasEl = fabric.util.createCanvasElement();
       this._render(canvasEl.getContext('2d'));
     },
@@ -550,7 +552,9 @@
      * @param {Array} textLines Array of all text lines
      */
     _renderTextFill: function(ctx, textLines) {
-      if (!this.fill && !this._skipFillStrokeCheck) return;
+      if (!this.fill && !this._skipFillStrokeCheck) {
+        return;
+      }
 
       this._boundaries = [ ];
       var lineHeights = 0;
@@ -576,7 +580,9 @@
      * @param {Array} textLines Array of all text lines
      */
     _renderTextStroke: function(ctx, textLines) {
-      if ((!this.stroke || this.strokeWidth === 0) && !this._skipFillStrokeCheck) return;
+      if ((!this.stroke || this.strokeWidth === 0) && !this._skipFillStrokeCheck) {
+        return;
+      }
 
       var lineHeights = 0;
 
@@ -626,7 +632,9 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _renderTextBoxBackground: function(ctx) {
-      if (!this.backgroundColor) return;
+      if (!this.backgroundColor) {
+        return;
+      }
 
       ctx.save();
       ctx.fillStyle = this.backgroundColor;
@@ -647,7 +655,9 @@
      * @param {Array} textLines Array of all text lines
      */
     _renderTextLinesBackground: function(ctx, textLines) {
-      if (!this.textBackgroundColor) return;
+      if (!this.textBackgroundColor) {
+        return;
+      }
 
       ctx.save();
       ctx.fillStyle = this.textBackgroundColor;
@@ -703,7 +713,9 @@
      * @param {Array} textLines Array of all text lines
      */
     _renderTextDecoration: function(ctx, textLines) {
-      if (!this.textDecoration) return;
+      if (!this.textDecoration) {
+        return;
+      }
 
       // var halfOfVerticalBox = this.originY === 'top' ? 0 : this._getTextHeight(ctx, textLines) / 2;
       var halfOfVerticalBox = this._getTextHeight(ctx, textLines) / 2,
@@ -754,13 +766,16 @@
      */
     render: function(ctx, noTransform) {
       // do not render if object is not visible
-      if (!this.visible) return;
+      if (!this.visible) {
+        return;
+      }
 
       ctx.save();
       this._transform(ctx, noTransform);
 
-      var m = this.transformMatrix;
-      var isInPathGroup = this.group && this.group.type === 'path-group';
+      var m = this.transformMatrix,
+          isInPathGroup = this.group && this.group.type === 'path-group';
+
       if (isInPathGroup) {
         ctx.translate(-this.group.width/2, -this.group.height/2);
       }
@@ -834,8 +849,8 @@
             : (this.height/2) - (textLines.length * this.fontSize) - this._totalLineHeight;
 
       return {
-        textLeft: textLeft,
-        textTop: textTop,
+        textLeft: textLeft + (this.group ? this.left : 0),
+        textTop: textTop + (this.group ? this.top : 0),
         lineTop: lineTop
       };
     },
@@ -845,7 +860,7 @@
      */
     _wrapSVGTextAndBg: function(markup, textAndBg, shadowSpans, offsets) {
       markup.push(
-        '<g transform="', this.getSvgTransform(), '">',
+        '<g transform="', this.getSvgTransform(), this.getSvgTransformMatrix(), '">\n',
           textAndBg.textBgRects.join(''),
           '<text ',
             (this.fontFamily ? 'font-family="' + this.fontFamily.replace(/"/g,'\'') + '" ': ''),
@@ -858,8 +873,8 @@
             'transform="translate(', toFixed(offsets.textLeft, 2), ' ', toFixed(offsets.textTop, 2), ')">',
             shadowSpans.join(''),
             textAndBg.textSpans.join(''),
-          '</text>',
-        '</g>'
+          '</text>\n',
+        '</g>\n'
       );
     },
 
@@ -931,7 +946,9 @@
           lineTopOffsetMultiplier++;
         }
 
-        if (!this.textBackgroundColor || !this._boundaries) continue;
+        if (!this.textBackgroundColor || !this._boundaries) {
+          continue;
+        }
 
         this._setSVGTextLineBg(textBgRects, i, textLeftOffset, lineHeight);
       }
@@ -975,7 +992,7 @@
           toFixed(this._boundaries[i].width, 2),
           '" height="',
           toFixed(this._boundaries[i].height, 2),
-        '"></rect>');
+        '"></rect>\n');
     },
 
     _setSVGBg: function(textBgRects) {
@@ -1087,14 +1104,14 @@
       options.originX = 'left';
     }
 
-    var text = new fabric.Text(element.textContent, options);
+    var text = new fabric.Text(element.textContent, options),
+        /*
+          Adjust positioning:
+            x/y attributes in SVG correspond to the bottom-left corner of text bounding box
+            top/left properties in Fabric correspond to center point of text bounding box
+        */
+        offX = 0;
 
-    /*
-      Adjust positioning:
-        x/y attributes in SVG correspond to the bottom-left corner of text bounding box
-        top/left properties in Fabric correspond to center point of text bounding box
-    */
-    var offX = 0;
     if (text.originX === 'left') {
       offX = text.getWidth() / 2;
     }

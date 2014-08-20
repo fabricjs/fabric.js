@@ -659,6 +659,13 @@
     lockUniScaling:           false,
 
     /**
+     * When `true`, object cannot be flipped by scaling into negative values
+     * @type Boolean
+     * @default
+     */
+
+    lockScalingFlip:          false,
+    /**
      * List of properties to consider when checking if state
      * of an object is changed (fabric.Object#hasStateChanged)
      * as well as for history (undo/redo) purposes
@@ -708,7 +715,9 @@
      * @param {Object} [options] Options object
      */
     _initClipping: function(options) {
-      if (!options.clipTo || typeof options.clipTo !== 'string') return;
+      if (!options.clipTo || typeof options.clipTo !== 'string') {
+        return;
+      }
 
       var functionBody = fabric.util.getFunctionBody(options.clipTo);
       if (typeof functionBody !== 'undefined') {
@@ -932,8 +941,9 @@
      * @return {Boolean} flipY value // TODO
      */
     getViewportTransform: function() {
-      if (this.canvas && this.canvas.viewportTransform)
+      if (this.canvas && this.canvas.viewportTransform) {
         return this.canvas.viewportTransform;
+      }
       return [1, 0, 0, 1, 0, 0];
     },
 
@@ -944,7 +954,9 @@
      */
     render: function(ctx, noTransform) {
       // do not render if width/height are zeros or object is not visible
-      if (this.width === 0 || this.height === 0 || !this.visible) return;
+      if (this.width === 0 || this.height === 0 || !this.visible) {
+        return;
+      }
 
       ctx.save();
 
@@ -955,12 +967,14 @@
       this._setStrokeStyles(ctx);
       this._setFillStyles(ctx);
 
-      var m = this.transformMatrix;
-      if (m && this.group) {
+      if (this.group && this.group.type === 'path-group') {
         ctx.translate(-this.group.width/2, -this.group.height/2);
-        ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
+        var m = this.transformMatrix;
+        if (m) {
+          ctx.transform.apply(ctx, m);
+        }
       }
-
+      ctx.globalAlpha = this.group ? (ctx.globalAlpha * this.opacity) : this.opacity;
       this._setShadow(ctx);
       this.clipTo && fabric.util.clipContext(this, ctx);
       this._render(ctx, noTransform);
@@ -975,7 +989,7 @@
       var m = this.transformMatrix;
 
       if (m && !this.group) {
-        ctx.setTransform(m[0], m[1], m[2], m[3], m[4], m[5]);
+        ctx.setTransform.apply(ctx, m);
       }
       if (!noTransform) {
         this.transform(ctx);
@@ -1036,7 +1050,9 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _setShadow: function(ctx) {
-      if (!this.shadow) return;
+      if (!this.shadow) {
+        return;
+      }
 
       ctx.shadowColor = this.shadow.color;
       ctx.shadowBlur = this.shadow.blur;
@@ -1049,7 +1065,9 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _removeShadow: function(ctx) {
-      if (!this.shadow) return;
+      if (!this.shadow) {
+        return;
+      }
 
       ctx.shadowColor = '';
       ctx.shadowBlur = ctx.shadowOffsetX = ctx.shadowOffsetY = 0;
@@ -1060,23 +1078,27 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _renderFill: function(ctx) {
-      if (!this.fill) return;
+      if (!this.fill) {
+        return;
+      }
 
+      ctx.save();
       if (this.fill.toLive) {
-        ctx.save();
         ctx.translate(
           -this.width / 2 + this.fill.offsetX || 0,
           -this.height / 2 + this.fill.offsetY || 0);
       }
+      if (this.fill.gradientTransform) {
+        var g = this.fill.gradientTransform;
+        ctx.transform.apply(ctx, g);
+      }   
       if (this.fillRule === 'destination-over') {
         ctx.fill('evenodd');
       }
       else {
         ctx.fill();
       }
-      if (this.fill.toLive) {
-        ctx.restore();
-      }
+      ctx.restore();
       if (this.shadow && !this.shadow.affectStroke) {
         this._removeShadow(ctx);
       }
@@ -1087,7 +1109,9 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _renderStroke: function(ctx) {
-      if (!this.stroke || this.strokeWidth === 0) return;
+      if (!this.stroke || this.strokeWidth === 0) {
+        return;
+      }
 
       ctx.save();
       if (this.strokeDashArray) {
@@ -1106,6 +1130,10 @@
         ctx.stroke();
       }
       else {
+        if (this.stroke.gradientTransform) {
+          var g = this.stroke.gradientTransform;
+          ctx.transform.apply(ctx, g);
+        }        
         this._stroke ? this._stroke(ctx) : ctx.stroke();
       }
       this._removeShadow(ctx);

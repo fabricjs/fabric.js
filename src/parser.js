@@ -101,9 +101,13 @@
   function _setStrokeFillOpacity(attributes) {
     for (var attr in colorAttributes) {
 
-      if (!attributes[attr] || typeof attributes[colorAttributes[attr]] === 'undefined') continue;
+      if (!attributes[attr] || typeof attributes[colorAttributes[attr]] === 'undefined') {
+        continue;
+      }
 
-      if (attributes[attr].indexOf('url(') === 0) continue;
+      if (attributes[attr].indexOf('url(') === 0) {
+        continue;
+      }
 
       var color = new fabric.Color(attributes[attr]);
       attributes[attr] = color.setAlpha(toFixed(color.getAlpha() * attributes[colorAttributes[attr]], 2)).toRgba();
@@ -271,7 +275,9 @@
     // TODO: support non-px font size
     var match = value.match(/(normal|italic)?\s*(normal|small-caps)?\s*(normal|bold|bolder|lighter|100|200|300|400|500|600|700|800|900)?\s*(\d+)px(?:\/(normal|[\d\.]+))?\s+(.*)/);
 
-    if (!match) return;
+    if (!match) {
+      return;
+    }
 
     var fontStyle = match[1],
         // font variant is not used
@@ -324,7 +330,9 @@
   function parseStyleObject(style, oStyle) {
     var attr, value;
     for (var prop in style) {
-      if (typeof style[prop] === 'undefined') continue;
+      if (typeof style[prop] === 'undefined') {
+        continue;
+      }
 
       attr = normalizeAttr(prop.toLowerCase());
       value = normalizeValue(attr, style[prop]);
@@ -343,7 +351,7 @@
    */
   function getGlobalStylesForElement(element) {
     var styles = { };
-    
+
     for (var rule in fabric.cssRules) {
       if (elementMatchesRule(element, rule.split(' '))) {
         for (var property in fabric.cssRules[rule]) {
@@ -419,7 +427,9 @@
 
       for (var j = 0, attrs = el.attributes, l = attrs.length; j < l; j++) {
         var attr = attrs.item(j);
-        if (attr.nodeName === 'x' || attr.nodeName === 'y' || attr.nodeName === 'xlink:href') continue;
+        if (attr.nodeName === 'x' || attr.nodeName === 'y' || attr.nodeName === 'xlink:href') {
+          continue;
+        }
 
         if (attr.nodeName === 'transform') {
           currentTrans = currentTrans + ' ' + attr.nodeValue;
@@ -441,7 +451,9 @@
    */
   function addSvgTransform(doc, matrix) {
     matrix[3] = matrix[0] = (matrix[0] > matrix[3] ? matrix[3] : matrix[0]);
-    if (!(matrix[0] !== 1 || matrix[3] !== 1 || matrix[4] !== 0 || matrix[5] !== 0)) return;
+    if (!(matrix[0] !== 1 || matrix[3] !== 1 || matrix[4] !== 0 || matrix[5] !== 0)) {
+      return;
+    }
     // default is to preserve aspect ratio
     // preserveAspectRatio attribute to be implemented
     var el = doc.ownerDocument.createElement('g');
@@ -490,14 +502,16 @@
     }
 
     return function(doc, callback, reviver) {
-      if (!doc) return;
+      if (!doc) {
+        return;
+      }
       var startTime = new Date();
 
       parseUseDirectives(doc);
 
       var viewBoxAttr = doc.getAttribute('viewBox'),
-          widthAttr = parseFloat(doc.getAttribute('width')),
-          heightAttr = parseFloat(doc.getAttribute('height')),
+          widthAttr = parseUnit(doc.getAttribute('width')),
+          heightAttr = parseUnit(doc.getAttribute('height')),
           viewBoxWidth,
           viewBoxHeight;
 
@@ -513,7 +527,7 @@
         if (heightAttr && heightAttr !== viewBoxHeight) {
           scaleY = heightAttr / viewBoxHeight;
         }
-        addSvgTransform(doc, [scaleX, 0, 0, scaleY, -minX, -minY]);
+        addSvgTransform(doc, [scaleX, 0, 0, scaleY, scaleX * -minX, scaleY * -minY]);
       }
 
       var descendants = fabric.util.toArray(doc.getElementsByTagName('*'));
@@ -619,25 +633,6 @@
   extend(fabric, {
 
     /**
-     * Initializes gradients on instances, according to gradients parsed from a document
-     * @param {Array} instances
-     */
-    resolveGradients: function(instances) {
-      for (var i = instances.length; i--; ) {
-        var instanceFillValue = instances[i].get('fill');
-
-        if (!(/^url\(/).test(instanceFillValue)) continue;
-
-        var gradientId = instanceFillValue.slice(5, instanceFillValue.length - 1);
-
-        if (fabric.gradientDefs[gradientId]) {
-          instances[i].set('fill',
-            fabric.Gradient.fromElement(fabric.gradientDefs[gradientId], instances[i]));
-        }
-      }
-    },
-
-    /**
      * Parses an SVG document, returning all of the gradient declarations found in it
      * @static
      * @function
@@ -648,21 +643,36 @@
     getGradientDefs: function(doc) {
       var linearGradientEls = doc.getElementsByTagName('linearGradient'),
           radialGradientEls = doc.getElementsByTagName('radialGradient'),
-          el, i,
-          gradientDefs = { };
+          el, i, j = 0, id, xlink, elList = [ ],
+          gradientDefs = { }, idsToXlinkMap = { };
 
+      elList.length = linearGradientEls.length + radialGradientEls.length;
       i = linearGradientEls.length;
-      for (; i--; ) {
-        el = linearGradientEls[i];
-        gradientDefs[el.getAttribute('id')] = el;
+      while (i--) {
+        elList[j++] = linearGradientEls[i];
       }
-
       i = radialGradientEls.length;
-      for (; i--; ) {
-        el = radialGradientEls[i];
-        gradientDefs[el.getAttribute('id')] = el;
+      while (i--) {
+        elList[j++] = radialGradientEls[i];
       }
 
+      while (j--) {
+        el = elList[j];
+        xlink = el.getAttribute('xlink:href');
+        id = el.getAttribute('id');
+        if (xlink) {
+          idsToXlinkMap[id] = xlink.substr(1);
+        }
+        gradientDefs[id] = el;
+      }
+
+      for (id in idsToXlinkMap) {
+        var el2 = gradientDefs[idsToXlinkMap[id]].cloneNode(true);
+        el = gradientDefs[id];
+        while (el2.firstChild) {
+          el.appendChild(el2.firstChild);
+        }
+      }
       return gradientDefs;
     },
 
@@ -684,8 +694,8 @@
       var value,
           parentAttributes = { };
 
-      // if there's a parent container (`g` node), parse its attributes recursively upwards
-      if (element.parentNode && /^[g|a]$/i.test(element.parentNode.nodeName)) {
+      // if there's a parent container (`g` or `a` or `symbol` node), parse its attributes recursively upwards
+      if (element.parentNode && /^symbol|[g|a]$/i.test(element.parentNode.nodeName)) {
         parentAttributes = fabric.parseAttributes(element.parentNode, attributes);
       }
 
@@ -756,7 +766,9 @@
     parsePointsAttribute: function(points) {
 
       // points attribute is required and must not be empty
-      if (!points) return null;
+      if (!points) {
+        return null;
+      }
 
       // replace commas with whitespace and remove bookending whitespace
       points = points.replace(/,/g, ' ').trim();
@@ -858,7 +870,9 @@
           //IE chokes on DOCTYPE
           xml.loadXML(r.responseText.replace(/<!DOCTYPE[\s\S]*?(\[[\s\S]*\])*?>/i,''));
         }
-        if (!xml || !xml.documentElement) return;
+        if (!xml || !xml.documentElement) {
+          return;
+        }
 
         fabric.parseSVGDocument(xml.documentElement, function (results, options) {
           svgCache.set(url, {
@@ -907,23 +921,29 @@
       var markup = '';
 
       for (var i = 0, len = objects.length; i < len; i++) {
-        if (objects[i].type !== 'text' || !objects[i].path) continue;
+        if (objects[i].type !== 'text' || !objects[i].path) {
+          continue;
+        }
 
         markup += [
+          //jscs:disable validateIndentation
           '@font-face {',
             'font-family: ', objects[i].fontFamily, '; ',
             'src: url(\'', objects[i].path, '\')',
           '}'
+          //jscs:enable validateIndentation
         ].join('');
       }
 
       if (markup) {
         markup = [
+          //jscs:disable validateIndentation
           '<style type="text/css">',
             '<![CDATA[',
               markup,
             ']]>',
           '</style>'
+          //jscs:enable validateIndentation
         ].join('');
       }
 

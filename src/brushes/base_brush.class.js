@@ -71,7 +71,9 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
    * @private
    */
   _setShadow: function() {
-    if (!this.shadow) return;
+    if (!this.shadow) {
+      return;
+    }
 
     var ctx = this.canvas.contextTop;
 

@@ -387,9 +387,11 @@
      */
     createCanvasElement: function(canvasEl) {
       canvasEl || (canvasEl = fabric.document.createElement('canvas'));
+      //jscs:disable requireCamelCaseOrUpperCaseIdentifiers
       if (!canvasEl.getContext && typeof G_vmlCanvasManager !== 'undefined') {
         G_vmlCanvasManager.initElement(canvasEl);
       }
+      //jscs:enable requireCamelCaseOrUpperCaseIdentifiers
       return canvasEl;
     },
 
@@ -504,26 +506,6 @@
     },
 
     /**
-     * Normalizes polygon/polyline points according to their dimensions
-     * @param {Array} points
-     * @param {Object} options
-     */
-    normalizePoints: function(points, options) {
-      var minX = fabric.util.array.min(points, 'x'),
-          minY = fabric.util.array.min(points, 'y');
-
-      minX = minX < 0 ? minX : 0;
-      minY = minX < 0 ? minY : 0;
-
-      for (var i = 0, len = points.length; i < len; i++) {
-        // normalize coordinates, according to containing box
-        // (dimensions of which are passed via `options`)
-        points[i].x -= (options.width / 2 + minX) || 0;
-        points[i].y -= (options.height / 2 + minY) || 0;
-      }
-    },
-
-    /**
      * Returns true if context has transparent pixel
      * at specified location (taking tolerance into account)
      * @param {CanvasRenderingContext2D} ctx context
@@ -557,7 +539,9 @@
       for (var i = 3, l = imageData.data.length; i < l; i += 4) {
         var temp = imageData.data[i];
         _isTransparent = temp <= 0;
-        if (_isTransparent === false) break; // Stop if colour found
+        if (_isTransparent === false) {
+          break; // Stop if colour found
+        }
       }
 
       imageData = null;

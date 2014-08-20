@@ -394,7 +394,9 @@
    */
   fabric.Color.sourceFromHsl = function(color) {
     var match = color.match(Color.reHSLa);
-    if (!match) return;
+    if (!match) {
+      return;
+    }
 
     var h = (((parseFloat(match[1]) % 360) + 360) % 360) / 360,
         s = parseFloat(match[2]) / (/%$/.test(match[2]) ? 100 : 1),

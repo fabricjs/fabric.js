@@ -112,7 +112,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    */
   initMousemoveHandler: function() {
     this.on('mousemove', function(options) {
-      if (!this.__isMousedown || !this.isEditing) return;
+      if (!this.__isMousedown || !this.isEditing) {
+        return;
+      }
 
       var newSelectionStart = this.getSelectionStartFromPointer(options.e);
 
@@ -143,7 +145,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   initMouseupHandler: function() {
     this.on('mouseup', function(options) {
       this.__isMousedown = false;
-      if (this._isObjectMoved(options.e)) return;
+      if (this._isObjectMoved(options.e)) {
+        return;
+      }
 
       if (this.__lastSelected) {
         this.enterEditing();

@@ -59,9 +59,11 @@ fabric.util.object.extend(fabric.Text.prototype, {
     // Cufon doesn't play nice with textDecoration=underline if element doesn't have a parent
     container.appendChild(el);
 
+    //jscs:disable requireCamelCaseOrUpperCaseIdentifiers
     if (typeof G_vmlCanvasManager === 'undefined') {
       el.innerHTML = this.text;
     }
+    //jscs:enable requireCamelCaseOrUpperCaseIdentifiers
     else {
       // IE 7 & 8 drop newlines and white space on text nodes
       // see: http://web.student.tuwien.ac.at/~e0226430/innerHtmlQuirk.html
