@@ -191,7 +191,8 @@
   var getElementStyle;
   if (fabric.document.defaultView && fabric.document.defaultView.getComputedStyle) {
     getElementStyle = function(element, attr) {
-      return fabric.document.defaultView.getComputedStyle(element, null)[attr];
+      var style = fabric.document.defaultView.getComputedStyle(element, null) || {};
+      return style[attr];
     };
   }
   else {
