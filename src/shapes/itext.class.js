@@ -413,7 +413,7 @@
           // leftOffset/topOffset are offset from that left/top point of a text box
 
           left = Math.round(this._getLeftOffset()),
-          top = -this.height / 2,
+          top = this._getTopOffset(),
 
           offsets = this._getCursorBoundariesOffsets(
                       chars, typeOfBoundaries, cursorLocation, textLines);
