@@ -57,7 +57,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       return;
     }
 
-    if (e.keyCode in this._keysMap && e.charCode === 0) {
+    if (e.keyCode in this._keysMap) {
       this[this._keysMap[e.keyCode]](e);
     }
     else if ((e.keyCode in this._ctrlKeysMap) && (e.ctrlKey || e.metaKey)) {
@@ -67,7 +67,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       return;
     }
 
-    e.stopPropagation();
+    e.stopImmediatePropagation();
+    e.preventDefault();
 
     this.canvas && this.canvas.renderAll();
   },
@@ -149,7 +150,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @param {Event} e Event object
    */
   onKeyPress: function(e) {
-    if (!this.isEditing || e.metaKey || e.ctrlKey || ( e.keyCode in this._keysMap && e.charCode === 0 )) {
+    if (!this.isEditing || e.metaKey || e.ctrlKey) {
       return;
     }
 
