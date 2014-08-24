@@ -1050,13 +1050,13 @@
      * @param {Number} lineIndex
      */
     _getWidthOfSpace: function (ctx, lineIndex) {
-      var lines = this.text.split(this._reNewline);
-      var line = lines[lineIndex];
-      var words = line.split(/\s+/);
-      var wordsWidth = this._getWidthOfWords(ctx, line, lineIndex);
-      var widthDiff = this.width - wordsWidth;
-      var numSpaces = words.length - 1;
-      var width = widthDiff / numSpaces;
+      var lines = this.text.split(this._reNewline),
+          line = lines[lineIndex],
+          words = line.split(/\s+/),
+          wordsWidth = this._getWidthOfWords(ctx, line, lineIndex),
+          widthDiff = this.width - wordsWidth,
+          numSpaces = words.length - 1,
+          width = widthDiff / numSpaces;
 
       return width;
     },
@@ -1076,7 +1076,7 @@
         if (!_char.match(/\s/)) {
           width += this._getWidthOfChar(ctx, _char, lineIndex, charIndex);
         }
-      };
+      }
 
       return width;
     },
