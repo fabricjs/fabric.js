@@ -971,6 +971,10 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _getWidthOfChar: function(ctx, _char, lineIndex, charIndex) {
+      if (this.textAlign === 'justify' && /\s/.test(_char)) {
+        return this._getWidthOfSpace(ctx, lineIndex);
+      }
+
       var styleDeclaration = this._getStyleDeclaration(lineIndex, charIndex);
       this._applyFontStyles(styleDeclaration);
       var cacheProp = this._getCacheProp(_char, styleDeclaration);
@@ -1038,6 +1042,43 @@
       //   return this.callSuper('_getLineWidth', ctx, textLines[lineIndex]);
       // }
       return this._getWidthOfCharsAt(ctx, lineIndex, textLines[lineIndex].length, textLines);
+    },
+
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Number} lineIndex
+     */
+    _getWidthOfSpace: function (ctx, lineIndex) {
+      var lines = this.text.split(this._reNewline),
+          line = lines[lineIndex],
+          words = line.split(/\s+/),
+          wordsWidth = this._getWidthOfWords(ctx, line, lineIndex),
+          widthDiff = this.width - wordsWidth,
+          numSpaces = words.length - 1,
+          width = widthDiff / numSpaces;
+
+      return width;
+    },
+
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Number} line
+     * @param {Number} lineIndex
+     */
+    _getWidthOfWords: function (ctx, line, lineIndex) {
+      var width = 0;
+
+      for (var charIndex = 0; charIndex < line.length; charIndex++) {
+        var _char = line[charIndex];
+
+        if (!_char.match(/\s/)) {
+          width += this._getWidthOfChar(ctx, _char, lineIndex, charIndex);
+        }
+      }
+
+      return width;
     },
 
     /**
