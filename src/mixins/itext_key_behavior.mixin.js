@@ -159,7 +159,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (!this.isEditing || e.metaKey || e.ctrlKey) {
       return;
     }
-    if (e.which != 0) {
+    if (e.which !== 0) {
       this.insertChars(String.fromCharCode(e.which));
     }
     e.stopPropagation();
