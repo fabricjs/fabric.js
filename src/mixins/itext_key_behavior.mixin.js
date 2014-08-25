@@ -286,22 +286,30 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   },
 
   /**
+   * private
+   */
+  swapSelectionPoints: function() {
+    var swapSel = this.selectionEnd;
+    this.selectionEnd = this.selectionStart;
+    this.selectionStart = swapSel;
+  }
+
+  /**
    * Moves cursor down while keeping selection
    * @param {Number} offset
    */
   moveCursorDownWithShift: function(offset) {
-    if (this._selectionDirection === 'left' && (this.selectionStart !== this.selectionEnd)) {
-      this.selectionStart += offset;
-      this._selectionDirection = 'left';
-      return;
-    }
-    else {
+    if (this.selectionEnd === this.selectionStart) {
       this._selectionDirection = 'right';
-      this.selectionEnd += offset;
-
-      if (this.selectionEnd > this.text.length) {
-        this.selectionEnd = this.text.length;
-      }
+    }
+    var prop = this._selectionDirection === 'right' ? 'selectionEnd' : 'selectionStart';
+    this[prop] += offset;
+    if (this.selectionEnd < this.selectionStart  && this._selectionDirection === 'left') {
+      this.swapSelectionPoints();
+      this._selectionDirection = 'right';
+    }
+    if (this.selectionEnd > this.text.length) {
+      this.selectionEnd = this.text.length;
     }
   },
 
@@ -406,26 +414,18 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @param {Number} offset
    */
   moveCursorUpWithShift: function(offset) {
-
-    if (this.selectionStart === this.selectionEnd) {
-      this.selectionStart -= offset;
+    if (this.selectionEnd === this.selectionStart) {
+      this._selectionDirection = 'left';
     }
-    else {
-      if (this._selectionDirection === 'right') {
-        this.selectionEnd -= offset;
-        this._selectionDirection = 'right';
-        return;
-      }
-      else {
-        this.selectionStart -= offset;
-      }
+    var prop = this._selectionDirection === 'right' ? 'selectionEnd' : 'selectionStart';
+    this[prop] -= offset;
+    if (this.selectionEnd < this.selectionStart && this._selectionDirection === 'right') {
+      this.swapSelectionPoints();
+      this._selectionDirection = 'left';
     }
-
     if (this.selectionStart < 0) {
       this.selectionStart = 0;
     }
-
-    this._selectionDirection = 'left';
   },
 
   /**
