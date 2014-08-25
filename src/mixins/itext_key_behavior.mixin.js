@@ -292,7 +292,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     var swapSel = this.selectionEnd;
     this.selectionEnd = this.selectionStart;
     this.selectionStart = swapSel;
-  }
+  },
 
   /**
    * Moves cursor down while keeping selection
