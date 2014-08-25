@@ -27,7 +27,13 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    */
   _keysMap: {
     8:  'removeChars',
+    9:  'exitEditing',
+    27: 'exitEditing',
     13: 'insertNewline',
+    33: 'moveCursorUp',
+    34: 'moveCursorDown',
+    35: 'moveCursorRight',
+    36: 'moveCursorLeft',
     37: 'moveCursorLeft',
     38: 'moveCursorUp',
     39: 'moveCursorRight',
@@ -67,7 +73,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       return;
     }
 
-    e.stopPropagation();
+    e.stopImmediatePropagation();
+    e.preventDefault();
 
     this.canvas && this.canvas.renderAll();
   },
@@ -149,12 +156,12 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @param {Event} e Event object
    */
   onKeyPress: function(e) {
-    if (!this.isEditing || e.metaKey || e.ctrlKey || e.keyCode in this._keysMap) {
+    if (!this.isEditing || e.metaKey || e.ctrlKey) {
       return;
     }
-
-    this.insertChars(String.fromCharCode(e.which));
-
+    if (e.which != 0) {
+      this.insertChars(String.fromCharCode(e.which));
+    }
     e.stopPropagation();
   },
 
@@ -180,7 +187,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         cursorLocation = this.get2DCursorLocation(selectionProp);
 
     // if on last line, down cursor goes to end of line
-    if (cursorLocation.lineIndex === textLines.length - 1 || e.metaKey) {
+    if (cursorLocation.lineIndex === textLines.length - 1 || e.metaKey || e.keyCode === 34) {
 
       // move to the end of a text
       return this.text.length - selectionProp;
@@ -306,9 +313,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   getUpCursorOffset: function(e, isRight) {
     var selectionProp = isRight ? this.selectionEnd : this.selectionStart,
         cursorLocation = this.get2DCursorLocation(selectionProp);
-
     // if on first line, up cursor goes to start of line
-    if (cursorLocation.lineIndex === 0 || e.metaKey) {
+    if (cursorLocation.lineIndex === 0 || e.metaKey || e.keyCode === 33) {
       return selectionProp;
     }
 
@@ -385,7 +391,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     this._currentCursorOpacity = 1;
 
     var offset = this.getUpCursorOffset(e, this._selectionDirection === 'right');
-
     if (e.shiftKey) {
       this.moveCursorUpWithShift(offset);
     }
@@ -468,7 +473,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (e.altKey) {
       this[prop] = this['findWordBoundary' + direction](this[prop]);
     }
-    else if (e.metaKey) {
+    else if (e.metaKey || e.keyCode === 35 ||  e.keyCode === 36 ) {
       this[prop] = this['findLineBoundary' + direction](this[prop]);
     }
     else {
