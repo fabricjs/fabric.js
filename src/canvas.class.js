@@ -44,6 +44,9 @@
     initialize: function(el, options) {
       options || (options = { });
 
+      // use the ownerdocument of the canvas in case its inside an iframe
+      fabric.document = el.ownerDocument;
+      
       this._initStatic(el, options);
       this._initInteractive();
       this._createCacheCanvas();
