@@ -12,9 +12,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     fabric.document.body.appendChild(this.hiddenTextarea);
 
     fabric.util.addListener(this.hiddenTextarea, 'keydown', this.onKeyDown.bind(this));
-    fabric.util.addListener(this.hiddenTextarea, 'keypress', this.onKeyPress.bind(this));
-    fabric.util.addListener(this.hiddenTextarea, 'copy', this.copy.bind(this));
-    fabric.util.addListener(this.hiddenTextarea, 'paste', this.paste.bind(this));
+    fabric.util.addListener(this.hiddenTextarea, 'input', this.onInput.bind(this));
 
     if (!this._clickHandlerInitialized && this.canvas) {
       fabric.util.addListener(this.canvas.upperCanvasEl, 'click', this.onClick.bind(this));
@@ -26,13 +24,10 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @private
    */
   _keysMap: {
-    8:  'removeChars',
-    13: 'insertNewline',
     37: 'moveCursorLeft',
     38: 'moveCursorUp',
     39: 'moveCursorRight',
-    40: 'moveCursorDown',
-    46: 'forwardDelete'
+    40: 'moveCursorDown'
   },
 
   /**
@@ -40,12 +35,39 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    */
   _ctrlKeysMap: {
     65: 'selectAll',
-    88: 'cut'
+    // TODO: LINE LEFT AND LINE RIGHT
+    // 37: 'moveCursorLineLeft',
+    // 39: 'moveCursorLineRight'
   },
 
   onClick: function() {
     // No need to trigger click event here, focus is enough to have the keyboard appear on Android
     this.hiddenTextarea && this.hiddenTextarea.focus();
+  },
+
+  _doGetCaretPosition: function (textArea) {
+    var caretPos = 0;
+    // IE Support
+    if (document.selection) {
+      textArea.focus();
+      var sel = document.selection.createRange();
+
+      sel.moveStart('character', -textArea.value.length);
+
+      caretPos = sel.text.length;
+    }
+    // Firefox support
+    else if (textArea.selectionStart || textArea.selectionStart == '0')
+      caretPos = textArea.selectionStart;
+    return caretPos;
+  },
+
+  onInput: function (e) {
+    var cp = this._doGetCaretPosition(this.hiddenTextarea);
+    this.text = '';
+    this.insertChars(e.srcElement.value);
+    this.setSelectionStart(cp);
+    this.setSelectionEnd(cp);
   },
 
   /**
