@@ -62,8 +62,8 @@
       this.width = (maxX - minX) || 1;
       this.height = (maxY - minY) || 1;
 
-      this.left = this.width / 2 + minX,
-      this.top = this.height / 2 + minY;
+      this.left = minX,
+      this.top = minY;
     },
 
     /**
@@ -71,11 +71,13 @@
      */
     _applyPointOffset: function() {
       // change points to offset polygon into a bounding box
+      // executed one time
+      this.left += this.width / 2;
+      this.top += this.height / 2;
       this.points.forEach(function(p) {
         p.x -= this.left;
         p.y -= this.top;
       }, this);
-      console.debug('done');
     },
 
     /**
