@@ -509,7 +509,7 @@
 
       parseUseDirectives(doc);
       /* http://www.w3.org/TR/SVG/struct.html#SVGElementWidthAttribute
-      *  as per specs, width and height attributes are to be considered
+      *  as per spec, width and height attributes are to be considered
       *  100% if no value is specified.
       */
       var viewBoxAttr = doc.getAttribute('viewBox'),
