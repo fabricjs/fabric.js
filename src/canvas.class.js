@@ -1067,7 +1067,7 @@
       var allObjects = this.getObjects(),
           i = 0,
           len = allObjects.length;
-      for ( ; i < len; i++) {
+      for (i ; i < len; i++) {
         allObjects[i].set('active', false);
       }
       this._discardActiveGroup();
