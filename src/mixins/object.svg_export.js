@@ -48,7 +48,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     if (this.group) return '';
     var toFixed = fabric.util.toFixed,
         angle = this.getAngle(),
-        vpt = this.getViewportTransform(),
+        vpt = !this.canvas || this.canvas.svgViewportTransformation ? this.getViewportTransform() : [1, 0, 0, 1, 0, 0],
         center = fabric.util.transformPoint(this.getCenterPoint(), vpt),
 
         NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
