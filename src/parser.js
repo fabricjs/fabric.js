@@ -508,10 +508,13 @@
       var startTime = new Date();
 
       parseUseDirectives(doc);
-
+      /* http://www.w3.org/TR/SVG/struct.html#SVGElementWidthAttribute
+      *  as per spec, width and height attributes are to be considered
+      *  100% if no value is specified.
+      */
       var viewBoxAttr = doc.getAttribute('viewBox'),
-          widthAttr = parseUnit(doc.getAttribute('width')),
-          heightAttr = parseUnit(doc.getAttribute('height')),
+          widthAttr = parseUnit(doc.getAttribute('width') || '100%'),
+          heightAttr = parseUnit(doc.getAttribute('height') || '100%'),
           viewBoxWidth,
           viewBoxHeight;
 
