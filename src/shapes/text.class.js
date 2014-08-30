@@ -849,8 +849,8 @@
             : (this.height/2) - (textLines.length * this.fontSize) - this._totalLineHeight;
 
       return {
-        textLeft: textLeft + (this.group ? this.left : 0),
-        textTop: textTop + (this.group ? this.top : 0),
+        textLeft: textLeft + (this.group && this.group.type === 'path-group' ? this.left : 0),
+        textTop: textTop + (this.group && this.group.type === 'path-group' ? this.top : 0),
         lineTop: lineTop
       };
     },
