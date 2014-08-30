@@ -545,7 +545,7 @@
       var path = chunks.join(' ');
 
       markup.push(
-        //jscs:disable validateIndentation  
+        //jscs:disable validateIndentation
         '<path ',
           'd="', path,
           '" style="', this.getSvgStyles(),

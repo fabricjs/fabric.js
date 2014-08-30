@@ -182,10 +182,10 @@
       else if (this.gradientUnits === 'objectBoundingBox') {
         _convertValuesToPercentUnits(object, coords);
       }
-      commonAttributes = 'id="SVGID_' + this.id + 
+      commonAttributes = 'id="SVGID_' + this.id +
                      '" gradientUnits="' + this.gradientUnits + '"';
       if (this.gradientTransform) {
-        commonAttributes += ' gradientTransform="matrix(' + this.gradientTransform.join(' ') + ')" '; 
+        commonAttributes += ' gradientTransform="matrix(' + this.gradientTransform.join(' ') + ')" ';
       }
       if (this.type === 'linear') {
         markup = [

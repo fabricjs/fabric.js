@@ -173,7 +173,7 @@
     if (points === null) {
       return null;
     }
-    
+
     return new fabric.Polyline(points, fabric.util.object.extend(parsedAttributes, options), true);
   };
   /* _FROM_SVG_END_ */

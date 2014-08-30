@@ -50,7 +50,6 @@
      */
     ry:   0,
 
-
     /**
      * Used to specify dash pattern for stroke on this object
      * @type Array
@@ -175,7 +174,7 @@
       if (!this.group) {
         x = -this.width / 2;
         y = -this.height / 2;
-	    }
+      }
       markup.push(
         '<rect ',
           'x="', x, '" y="', y,
@@ -221,12 +220,12 @@
       return null;
     }
     options = options || { };
-    
+
     var parsedAttributes = fabric.parseAttributes(element, fabric.Rect.ATTRIBUTE_NAMES);
-    
+
     parsedAttributes.left = parsedAttributes.left || 0;
     parsedAttributes.top  = parsedAttributes.top  || 0;
-    
+
     return new fabric.Rect(extend((options ? fabric.util.object.clone(options) : { }), parsedAttributes));
   };
   /* _FROM_SVG_END_ */

@@ -6,7 +6,7 @@
 
   /* Adapted from http://dxr.mozilla.org/mozilla-central/source/content/svg/content/src/nsSVGPathDataParser.cpp
    * by Andrea Bogazzi code is under MPL. if you don't have a copy of the license you can take it here
-   * http://mozilla.org/MPL/2.0/ 
+   * http://mozilla.org/MPL/2.0/
    */
   function arcToSegments(toX, toY, rx, ry, large, sweep, rotateX) {
     var argsString = _join.call(arguments);
@@ -32,7 +32,8 @@
       var s = Math.sqrt(1 - 0.25 * pl/(rx2 * ry2));
       rx *= s;
       ry *= s;
-    } else {
+    }
+    else {
       root = (large === sweep ? -0.5 : 0.5) *
               Math.sqrt( pl /(rx2 * py2 + ry2 * px2));
     }
@@ -42,11 +43,12 @@
         cx1 = cosTh * cx - sinTh * cy + toX / 2,
         cy1 = sinTh * cx + cosTh * cy + toY / 2,
         mTheta = calcVectorAngle(1, 0, (px - cx) / rx, (py - cy) / ry),
-        dtheta = calcVectorAngle((px - cx) / rx, (py - cy) / ry, (-px -cx) / rx, (-py -cy) / ry);
+        dtheta = calcVectorAngle((px - cx) / rx, (py - cy) / ry, (-px - cx) / rx, (-py - cy) / ry);
 
     if (sweep === 0 && dtheta > 0) {
       dtheta -= 2 * PI;
-    } else if (sweep === 1 && dtheta < 0) {
+    }
+    else if (sweep === 1 && dtheta < 0) {
       dtheta += 2 * PI;
     }
 
@@ -72,7 +74,7 @@
     if (segmentToBezierCache[argsString2]) {
       return segmentToBezierCache[argsString2];
     }
-    
+
     var costh2 = Math.cos(th2),
         sinth2 = Math.sin(th2),
         costh3 = Math.cos(th3),
@@ -100,7 +102,8 @@
         tb = Math.atan2(vy, vx);
     if (tb >= ta) {
       return tb - ta;
-    } else {
+    }
+    else {
       return 2 * Math.PI - (ta - tb);
     }
   }
@@ -108,8 +111,8 @@
   /**
    * Draws arc
    * @param {CanvasRenderingContext2D} ctx
-   * @param {Number} x
-   * @param {Number} y
+   * @param {Number} fx
+   * @param {Number} fy
    * @param {Array} coords
    */
   fabric.util.drawArc = function(ctx, fx, fy, coords) {
@@ -121,14 +124,15 @@
         tx = coords[5],
         ty = coords[6],
         segs = [[ ], [ ], [ ], [ ]],
-        segs_norm = arcToSegments(tx - fx, ty - fy, rx, ry, large, sweep, rot);
-    for (var i = 0; i < segs_norm.length; i++) {
-      segs[i][0] = segs_norm[i][0] + fx;
-      segs[i][1] = segs_norm[i][1] + fy;
-      segs[i][2] = segs_norm[i][2] + fx;
-      segs[i][3] = segs_norm[i][3] + fy;
-      segs[i][4] = segs_norm[i][4] + fx;
-      segs[i][5] = segs_norm[i][5] + fy; 
+        segsNorm = arcToSegments(tx - fx, ty - fy, rx, ry, large, sweep, rot);
+
+    for (var i = 0, len = segsNorm.length; i < len; i++) {
+      segs[i][0] = segsNorm[i][0] + fx;
+      segs[i][1] = segsNorm[i][1] + fy;
+      segs[i][2] = segsNorm[i][2] + fx;
+      segs[i][3] = segsNorm[i][3] + fy;
+      segs[i][4] = segsNorm[i][4] + fx;
+      segs[i][5] = segsNorm[i][5] + fy;
       ctx.bezierCurveTo.apply(ctx, segs[i]);
     }
   };
