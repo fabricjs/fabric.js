@@ -1201,7 +1201,8 @@
       if (options.viewBox) {
         width = options.viewBox.width;
         height = options.viewBox.height;
-      } else {
+      }
+      else {
         width = this.width;
         height = this.height;
         if (!this.svgViewportTransformation) {
