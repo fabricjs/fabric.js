@@ -889,7 +889,7 @@ fabric.Collection = {
 
   /* Adapted from http://dxr.mozilla.org/mozilla-central/source/content/svg/content/src/nsSVGPathDataParser.cpp
    * by Andrea Bogazzi code is under MPL. if you don't have a copy of the license you can take it here
-   * http://mozilla.org/MPL/2.0/ 
+   * http://mozilla.org/MPL/2.0/
    */
   function arcToSegments(toX, toY, rx, ry, large, sweep, rotateX) {
     var argsString = _join.call(arguments);
@@ -915,7 +915,8 @@ fabric.Collection = {
       var s = Math.sqrt(1 - 0.25 * pl/(rx2 * ry2));
       rx *= s;
       ry *= s;
-    } else {
+    }
+    else {
       root = (large === sweep ? -0.5 : 0.5) *
               Math.sqrt( pl /(rx2 * py2 + ry2 * px2));
     }
@@ -925,11 +926,12 @@ fabric.Collection = {
         cx1 = cosTh * cx - sinTh * cy + toX / 2,
         cy1 = sinTh * cx + cosTh * cy + toY / 2,
         mTheta = calcVectorAngle(1, 0, (px - cx) / rx, (py - cy) / ry),
-        dtheta = calcVectorAngle((px - cx) / rx, (py - cy) / ry, (-px -cx) / rx, (-py -cy) / ry);
+        dtheta = calcVectorAngle((px - cx) / rx, (py - cy) / ry, (-px - cx) / rx, (-py - cy) / ry);
 
     if (sweep === 0 && dtheta > 0) {
       dtheta -= 2 * PI;
-    } else if (sweep === 1 && dtheta < 0) {
+    }
+    else if (sweep === 1 && dtheta < 0) {
       dtheta += 2 * PI;
     }
 
@@ -955,7 +957,7 @@ fabric.Collection = {
     if (segmentToBezierCache[argsString2]) {
       return segmentToBezierCache[argsString2];
     }
-    
+
     var costh2 = Math.cos(th2),
         sinth2 = Math.sin(th2),
         costh3 = Math.cos(th3),
@@ -983,7 +985,8 @@ fabric.Collection = {
         tb = Math.atan2(vy, vx);
     if (tb >= ta) {
       return tb - ta;
-    } else {
+    }
+    else {
       return 2 * Math.PI - (ta - tb);
     }
   }
@@ -991,8 +994,8 @@ fabric.Collection = {
   /**
    * Draws arc
    * @param {CanvasRenderingContext2D} ctx
-   * @param {Number} x
-   * @param {Number} y
+   * @param {Number} fx
+   * @param {Number} fy
    * @param {Array} coords
    */
   fabric.util.drawArc = function(ctx, fx, fy, coords) {
@@ -1004,14 +1007,15 @@ fabric.Collection = {
         tx = coords[5],
         ty = coords[6],
         segs = [[ ], [ ], [ ], [ ]],
-        segs_norm = arcToSegments(tx - fx, ty - fy, rx, ry, large, sweep, rot);
-    for (var i = 0; i < segs_norm.length; i++) {
-      segs[i][0] = segs_norm[i][0] + fx;
-      segs[i][1] = segs_norm[i][1] + fy;
-      segs[i][2] = segs_norm[i][2] + fx;
-      segs[i][3] = segs_norm[i][3] + fy;
-      segs[i][4] = segs_norm[i][4] + fx;
-      segs[i][5] = segs_norm[i][5] + fy; 
+        segsNorm = arcToSegments(tx - fx, ty - fy, rx, ry, large, sweep, rot);
+
+    for (var i = 0, len = segsNorm.length; i < len; i++) {
+      segs[i][0] = segsNorm[i][0] + fx;
+      segs[i][1] = segsNorm[i][1] + fy;
+      segs[i][2] = segsNorm[i][2] + fx;
+      segs[i][3] = segsNorm[i][3] + fy;
+      segs[i][4] = segsNorm[i][4] + fx;
+      segs[i][5] = segsNorm[i][5] + fy;
       ctx.bezierCurveTo.apply(ctx, segs[i]);
     }
   };
@@ -3193,10 +3197,13 @@ if (typeof console !== 'undefined') {
       var startTime = new Date();
 
       parseUseDirectives(doc);
-
+      /* http://www.w3.org/TR/SVG/struct.html#SVGElementWidthAttribute
+      *  as per spec, width and height attributes are to be considered
+      *  100% if no value is specified.
+      */
       var viewBoxAttr = doc.getAttribute('viewBox'),
-          widthAttr = parseUnit(doc.getAttribute('width')),
-          heightAttr = parseUnit(doc.getAttribute('height')),
+          widthAttr = parseUnit(doc.getAttribute('width') || '100%'),
+          heightAttr = parseUnit(doc.getAttribute('height') || '100%'),
           viewBoxWidth,
           viewBoxHeight;
 
@@ -3699,7 +3706,7 @@ fabric.ElementsParser.prototype._createObject = function(klass, el, index) {
   else {
     var obj = klass.fromElement(el, this.options);
     this.resolveGradient(obj, 'fill');
-    this.resolveGradient(obj, 'stroke');    
+    this.resolveGradient(obj, 'stroke');
     this.reviver && this.reviver(el, obj);
     this.instances[index] = obj;
     this.checkIfDone();
@@ -3710,7 +3717,7 @@ fabric.ElementsParser.prototype.createCallback = function(index, el) {
   var _this = this;
   return function(obj) {
     _this.resolveGradient(obj, 'fill');
-    _this.resolveGradient(obj, 'stroke');    
+    _this.resolveGradient(obj, 'stroke');
     _this.reviver && _this.reviver(el, obj);
     _this.instances[index] = obj;
     _this.checkIfDone();
@@ -3718,16 +3725,16 @@ fabric.ElementsParser.prototype.createCallback = function(index, el) {
 };
 
 fabric.ElementsParser.prototype.resolveGradient = function(obj, property) {
-  
-    var instanceFillValue = obj.get(property);
-    if (!(/^url\(/).test(instanceFillValue)) {
-      return;
-    }
-    var gradientId = instanceFillValue.slice(5, instanceFillValue.length - 1);
-    if (fabric.gradientDefs[gradientId]) {
-      obj.set(property,
-        fabric.Gradient.fromElement(fabric.gradientDefs[gradientId], obj));
-    }
+
+  var instanceFillValue = obj.get(property);
+  if (!(/^url\(/).test(instanceFillValue)) {
+    return;
+  }
+  var gradientId = instanceFillValue.slice(5, instanceFillValue.length - 1);
+  if (fabric.gradientDefs[gradientId]) {
+    obj.set(property,
+      fabric.Gradient.fromElement(fabric.gradientDefs[gradientId], obj));
+  }
 };
 
 fabric.ElementsParser.prototype.checkIfDone = function() {
@@ -4863,10 +4870,10 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
       else if (this.gradientUnits === 'objectBoundingBox') {
         _convertValuesToPercentUnits(object, coords);
       }
-      commonAttributes = 'id="SVGID_' + this.id + 
+      commonAttributes = 'id="SVGID_' + this.id +
                      '" gradientUnits="' + this.gradientUnits + '"';
       if (this.gradientTransform) {
-        commonAttributes += ' gradientTransform="matrix(' + this.gradientTransform.join(' ') + ')" '; 
+        commonAttributes += ' gradientTransform="matrix(' + this.gradientTransform.join(' ') + ')" ';
       }
       if (this.type === 'linear') {
         markup = [
@@ -6533,6 +6540,14 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
 
     /* _TO_SVG_START_ */
     /**
+     * When true, getSvgTransform() will apply the StaticCanvas.viewportTransform to the SVG transformation. When true,
+     * a zoomed canvas will then produce zoomed SVG output.
+     * @type Boolean
+     * @default
+     */
+    svgViewportTransformation: true,
+
+    /**
      * Returns SVG representation of canvas
      * @function
      * @param {Object} [options] Options object for SVG output
@@ -6605,13 +6620,29 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * @private
      */
     _setSVGHeader: function(markup, options) {
+      var width, height, vpt;
+
+      if (options.viewBox) {
+        width = options.viewBox.width;
+        height = options.viewBox.height;
+      }
+      else {
+        width = this.width;
+        height = this.height;
+        if (!this.svgViewportTransformation) {
+          vpt = this.viewportTransform;
+          width /= vpt[0];
+          height /= vpt[3];
+        }
+      }
+
       markup.push(
         '<svg ',
           'xmlns="http://www.w3.org/2000/svg" ',
           'xmlns:xlink="http://www.w3.org/1999/xlink" ',
           'version="1.1" ',
-          'width="', (options.viewBox ? options.viewBox.width : this.width), '" ',
-          'height="', (options.viewBox ? options.viewBox.height : this.height), '" ',
+          'width="', width, '" ',
+          'height="', height, '" ',
           (this.backgroundColor && !this.backgroundColor.toLive
             ? 'style="background-color: ' + this.backgroundColor + '" '
             : null),
@@ -11287,7 +11318,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       if (this.fill.gradientTransform) {
         var g = this.fill.gradientTransform;
         ctx.transform.apply(ctx, g);
-      }   
+      }
       if (this.fillRule === 'destination-over') {
         ctx.fill('evenodd');
       }
@@ -11329,7 +11360,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         if (this.stroke.gradientTransform) {
           var g = this.stroke.gradientTransform;
           ctx.transform.apply(ctx, g);
-        }        
+        }
         this._stroke ? this._stroke(ctx) : ctx.stroke();
       }
       this._removeShadow(ctx);
@@ -12508,10 +12539,12 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @return {String}
    */
   getSvgTransform: function() {
-    if (this.group) return '';
+    if (this.group) {
+      return '';
+    }
     var toFixed = fabric.util.toFixed,
         angle = this.getAngle(),
-        vpt = this.getViewportTransform(),
+        vpt = !this.canvas || this.canvas.svgViewportTransformation ? this.getViewportTransform() : [1, 0, 0, 1, 0, 0],
         center = fabric.util.transformPoint(this.getCenterPoint(), vpt),
 
         NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
@@ -12533,9 +12566,13 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
             ' ' +
             toFixed(this.scaleY * vpt[3], NUM_FRACTION_DIGITS) +
           ')'),
+
         addTranslateX = this.type === 'path-group' ? this.width * vpt[0] : 0,
+
         flipXPart = this.flipX ? ' matrix(-1 0 0 1 ' + addTranslateX + ' 0) ' : '',
+
         addTranslateY = this.type === 'path-group' ? this.height * vpt[3] : 0,
+
         flipYPart = this.flipY ? ' matrix(1 0 0 -1 0 ' + addTranslateY + ')' : '';
 
     return [
@@ -13790,8 +13827,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     toSVG: function(reviver) {
       var markup = this._createBaseSVGMarkup(), x = 0, y = 0;
       if (this.group) {
-	x = this.left + this.radius;
-	y = this.top + this.radius;
+        x = this.left + this.radius;
+        y = this.top + this.radius;
       }
       markup.push(
         '<circle ',
@@ -14119,8 +14156,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     toSVG: function(reviver) {
       var markup = this._createBaseSVGMarkup(), x = 0, y = 0;
       if (this.group) {
-	x = this.left + this.rx;
-	y = this.top + this.ry;
+        x = this.left + this.rx;
+        y = this.top + this.ry;
       }
       markup.push(
         '<ellipse ',
@@ -14185,7 +14222,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
     parsedAttributes.left = parsedAttributes.left || 0;
     parsedAttributes.top = parsedAttributes.top || 0;
-    
+
     var ellipse = new fabric.Ellipse(extend(parsedAttributes, options));
 
     ellipse.top -= ellipse.ry;
@@ -14259,7 +14296,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @default
      */
     ry:   0,
-
 
     /**
      * Used to specify dash pattern for stroke on this object
@@ -14385,7 +14421,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       if (!this.group) {
         x = -this.width / 2;
         y = -this.height / 2;
-	    }
+      }
       markup.push(
         '<rect ',
           'x="', x, '" y="', y,
@@ -14431,12 +14467,12 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       return null;
     }
     options = options || { };
-    
+
     var parsedAttributes = fabric.parseAttributes(element, fabric.Rect.ATTRIBUTE_NAMES);
-    
+
     parsedAttributes.left = parsedAttributes.left || 0;
     parsedAttributes.top  = parsedAttributes.top  || 0;
-    
+
     return new fabric.Rect(extend((options ? fabric.util.object.clone(options) : { }), parsedAttributes));
   };
   /* _FROM_SVG_END_ */
@@ -14630,7 +14666,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     if (points === null) {
       return null;
     }
-    
+
     return new fabric.Polyline(points, fabric.util.object.extend(parsedAttributes, options), true);
   };
   /* _FROM_SVG_END_ */
@@ -15411,7 +15447,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       var path = chunks.join(' ');
 
       markup.push(
-        //jscs:disable validateIndentation  
+        //jscs:disable validateIndentation
         '<path ',
           'd="', path,
           '" style="', this.getSvgStyles(),
@@ -18331,9 +18367,9 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
             data[i + 2] = Math.abs(b - tb);
             break;
           case 'subtract':
-            var _r = r-tr;
-            var _g = g-tg;
-            var _b = b-tb;
+            var _r = r - tr,
+                _g = g - tg,
+                _b = b - tb;
 
             data[i] = (_r < 0) ? 0 : _r;
             data[i + 1] = (_g < 0) ? 0 : _g;
@@ -19922,7 +19958,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
           // leftOffset/topOffset are offset from that left/top point of a text box
 
           left = Math.round(this._getLeftOffset()),
-          top = -this.height / 2,
+          top = this._getTopOffset(),
 
           offsets = this._getCursorBoundariesOffsets(
                       chars, typeOfBoundaries, cursorLocation, textLines);
@@ -20480,6 +20516,10 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _getWidthOfChar: function(ctx, _char, lineIndex, charIndex) {
+      if (this.textAlign === 'justify' && /\s/.test(_char)) {
+        return this._getWidthOfSpace(ctx, lineIndex);
+      }
+
       var styleDeclaration = this._getStyleDeclaration(lineIndex, charIndex);
       this._applyFontStyles(styleDeclaration);
       var cacheProp = this._getCacheProp(_char, styleDeclaration);
@@ -20547,6 +20587,43 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       //   return this.callSuper('_getLineWidth', ctx, textLines[lineIndex]);
       // }
       return this._getWidthOfCharsAt(ctx, lineIndex, textLines[lineIndex].length, textLines);
+    },
+
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Number} lineIndex
+     */
+    _getWidthOfSpace: function (ctx, lineIndex) {
+      var lines = this.text.split(this._reNewline),
+          line = lines[lineIndex],
+          words = line.split(/\s+/),
+          wordsWidth = this._getWidthOfWords(ctx, line, lineIndex),
+          widthDiff = this.width - wordsWidth,
+          numSpaces = words.length - 1,
+          width = widthDiff / numSpaces;
+
+      return width;
+    },
+
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Number} line
+     * @param {Number} lineIndex
+     */
+    _getWidthOfWords: function (ctx, line, lineIndex) {
+      var width = 0;
+
+      for (var charIndex = 0; charIndex < line.length; charIndex++) {
+        var _char = line[charIndex];
+
+        if (!_char.match(/\s/)) {
+          width += this._getWidthOfChar(ctx, _char, lineIndex, charIndex);
+        }
+      }
+
+      return width;
     },
 
     /**
@@ -21712,7 +21789,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       return;
     }
 
-    if (e.keyCode in this._keysMap && e.charCode === 0) {
+    if (e.keyCode in this._keysMap) {
       this[this._keysMap[e.keyCode]](e);
     }
     else if ((e.keyCode in this._ctrlKeysMap) && (e.ctrlKey || e.metaKey)) {
@@ -21722,7 +21799,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       return;
     }
 
-    e.stopPropagation();
+    e.stopImmediatePropagation();
+    e.preventDefault();
 
     this.canvas && this.canvas.renderAll();
   },
@@ -21804,7 +21882,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @param {Event} e Event object
    */
   onKeyPress: function(e) {
-    if (!this.isEditing || e.metaKey || e.ctrlKey || ( e.keyCode in this._keysMap && e.charCode === 0 )) {
+    if (!this.isEditing || e.metaKey || e.ctrlKey) {
       return;
     }
 
