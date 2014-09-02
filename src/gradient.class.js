@@ -8,7 +8,7 @@
 
     // convert percents to absolute values
     offset = parseFloat(offset) / (/%$/.test(offset) ? 100 : 1);
-    offset = offset < 0 ? 0 : offset > 1 ? 1 : offset; 
+    offset = offset < 0 ? 0 : offset > 1 ? 1 : offset;
     if (style) {
       var keyValuePairs = style.split(/\s*;\s*/);
 
@@ -84,14 +84,14 @@
      * @type Number
      * @default 0
      */
-    offsetX : 0,
+    offsetX: 0,
 
     /**
      * Vertical offset for aligning gradients coming from SVG when outside pathgroups
      * @type Number
      * @default 0
      */
-    offsetY : 0,
+    offsetY: 0,
 
     /**
      * Constructor
@@ -172,7 +172,7 @@
       this.colorStops.sort(function(a, b) {
         return a.offset - b.offset;
       });
-      
+
       if (!(object.group && object.group.type === 'path-group')) {
         for (var prop in coords) {
           if (prop === 'x1' || prop === 'x2' || prop === 'r2') {
@@ -183,11 +183,11 @@
           }
         }
       }
-      
-      commonAttributes = 'id="SVGID_' + this.id + 
+
+      commonAttributes = 'id="SVGID_' + this.id +
                      '" gradientUnits="userSpaceOnUse"';
       if (this.gradientTransform) {
-        commonAttributes += ' gradientTransform="matrix(' + this.gradientTransform.join(' ') + ')" '; 
+        commonAttributes += ' gradientTransform="matrix(' + this.gradientTransform.join(' ') + ')" ';
       }
       if (this.type === 'linear') {
         markup = [
@@ -337,7 +337,7 @@
         colorStops.push(getColorStop(colorStopEls[i]));
       }
 
-      ellipseMatrix = _convertPercentUnitsToValues(instance, coords, gradientUnits);     
+      ellipseMatrix = _convertPercentUnitsToValues(instance, coords, gradientUnits);
 
       var gradient = new fabric.Gradient({
         type: type,
@@ -390,14 +390,14 @@
       }
       options[prop] = propValue * multFactor + addFactor;
     }
-    if (object.type === 'ellipse' && options['r2'] !== null && gradientUnits === 'objectBoundingBox' && object.rx !== object.ry) {
+    if (object.type === 'ellipse' && options.r2 !== null && gradientUnits === 'objectBoundingBox' && object.rx !== object.ry) {
       var scaleFactor = object.ry/object.rx;
       ellipseMatrix = ' scale(1, ' + scaleFactor + ')';
-      if (options['y1']) {
-        options['y1'] /= scaleFactor;
+      if (options.y1) {
+        options.y1 /= scaleFactor;
       }
-      if (options['y2']) {
-        options['y2'] /= scaleFactor;
+      if (options.y2) {
+        options.y2 /= scaleFactor;
       }
     }
     return ellipseMatrix;
