@@ -377,11 +377,12 @@
       propValue = parseFloat(options[prop], 10);
       if (typeof options[prop] === 'string' && /^\d+%$/.test(options[prop])) {
         multFactor = 0.01;
-      } else {
+      }
+      else {
         multFactor = 1;
       }
       if (prop === 'x1' || prop === 'x2' || prop === 'r2') {
-        multFactor *= gradientUnits === 'objectBoundingBox' ? object.width : 1; 
+        multFactor *= gradientUnits === 'objectBoundingBox' ? object.width : 1;
         addFactor = gradientUnits === 'objectBoundingBox' ? object.left || 0 : 0;
       }
       else if (prop === 'y1' || prop === 'y2') {
