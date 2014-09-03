@@ -11,8 +11,8 @@
     'type':               'polyline',
     'originX':            'left',
     'originY':            'top',
-    'left':               0,
-    'top':                0,
+    'left':               10,
+    'top':                12,
     'width':              10,
     'height':             10,
     'fill':               'rgb(0,0,0)',
@@ -46,7 +46,7 @@
     ok(polyline instanceof fabric.Object);
 
     equal(polyline.type, 'polyline');
-    deepEqual(polyline.get('points'), [ { x: -5, y: -5 }, { x: 5, y: 5 } ]);
+    deepEqual(polyline.get('points'), [ { x: 10, y: 12 }, { x: 20, y: 22 } ]);
   });
 
   test('complexity', function() {
@@ -110,7 +110,9 @@
       'strokeLineJoin': 'bevil',
       'strokeMiterLimit': 5,
       'opacity': 0.34,
-      'points': expectedPoints
+      'points': expectedPoints,
+      'left': 10,
+      'top': 10
     }));
 
     deepEqual(polylineWithAttrs.get('transformMatrix'), [ 2, 0, 0, 2, -10, -20 ]);

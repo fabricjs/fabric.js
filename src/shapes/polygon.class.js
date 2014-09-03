@@ -39,21 +39,19 @@
      * Constructor
      * @param {Array} points Array of points
      * @param {Object} [options] Options object
-     * @param {Boolean} [skipOffset] Whether points offsetting should be skipped
      * @return {fabric.Polygon} thisArg
      */
-    initialize: function(points, options, skipOffset) {
+    initialize: function(points, options) {
       options = options || { };
       this.points = points;
       this.callSuper('initialize', options);
-      this._calcDimensions(skipOffset);
+      this._calcDimensions();
     },
 
     /**
      * @private
-     * @param {Boolean} [skipOffset] Whether points offsetting should be skipped
      */
-    _calcDimensions: function(skipOffset) {
+    _calcDimensions: function() {
 
       var points = this.points,
           minX = min(points, 'x'),
@@ -64,20 +62,19 @@
       this.width = (maxX - minX) || 1;
       this.height = (maxY - minY) || 1;
 
-      this.minX = minX;
-      this.minY = minY;
+      this.left = minX,
+      this.top = minY;
+    },
 
-      if (skipOffset) {
-        return;
-      }
-
-      var halfWidth = this.width / 2 + this.minX,
-          halfHeight = this.height / 2 + this.minY;
-
+    /**
+     * @private
+     */
+    _applyPointOffset: function() {
       // change points to offset polygon into a bounding box
+      // executed one time
       this.points.forEach(function(p) {
-        p.x -= halfWidth;
-        p.y -= halfHeight;
+        p.x -= (this.left + this.width / 2);
+        p.y -= (this.top + this.height / 2);
       }, this);
     },
 
@@ -126,6 +123,14 @@
     _render: function(ctx) {
       var point;
       ctx.beginPath();
+
+      if (this._applyPointOffset) {
+        if (!(this.group && this.group.type === 'path-group')) {
+          this._applyPointOffset();
+        }
+        this._applyPointOffset = null;
+      }
+
       ctx.moveTo(this.points[0].x, this.points[0].y);
       for (var i = 0, len = this.points.length; i < len; i++) {
         point = this.points[i];
@@ -194,7 +199,7 @@
       return null;
     }
 
-    return new fabric.Polygon(points, extend(parsedAttributes, options), true);
+    return new fabric.Polygon(points, extend(parsedAttributes, options));
   };
   /* _FROM_SVG_END_ */
 

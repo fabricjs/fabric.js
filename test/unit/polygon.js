@@ -11,8 +11,8 @@
     'type':               'polygon',
     'originX':            'left',
     'originY':            'top',
-    'left':               0,
-    'top':                0,
+    'left':               10,
+    'top':                12,
     'width':              10,
     'height':             10,
     'fill':               'rgb(0,0,0)',
@@ -46,7 +46,7 @@
     ok(polygon instanceof fabric.Object);
 
     equal(polygon.type, 'polygon');
-    deepEqual(polygon.get('points'), [ { x: -5, y: -5 }, { x: 5, y: 5 } ]);
+    deepEqual(polygon.get('points'), [ { x: 10, y: 12 }, { x: 20, y: 22 } ]);
   });
 
   test('complexity', function() {
@@ -121,7 +121,9 @@
       'strokeLineJoin':   'bevil',
       'strokeMiterLimit': 5,
       'opacity':          0.34,
-      'points':           expectedPoints
+      'points':           expectedPoints,
+      'top':              10,
+      'left':             10
     }));
 
     deepEqual(polygonWithAttrs.get('transformMatrix'), [ 2, 0, 0, 2, -10, -20 ]);
