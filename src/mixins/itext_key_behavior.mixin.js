@@ -28,6 +28,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   _keysMap: {
     8:  'removeChars',
     13: 'insertNewline',
+    35: 'moveCursorToEnd',
+    36: 'moveCursorToHome',    
     37: 'moveCursorLeft',
     38: 'moveCursorUp',
     39: 'moveCursorRight',
@@ -590,6 +592,85 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       }
       this.selectionStart = this.selectionEnd;
     }
+  },
+  
+    /**
+   * Moves cursor home (to index 0)
+   * @param {Event} e Event object
+   */
+  moveCursorToHome: function (e) {
+    if (this.selectionStart == 0 && this.selectionEnd == 0) {
+      return;
+    }
+
+    this.abortCursorAnimation();
+    this._currentCursorOpacity = 1;
+
+    if (e.shiftKey) {
+      this.moveCursorToHomeWithShift(e);
+    }
+    else {
+      this.moveCursorToHomeWithoutShift(e);
+    }
+
+    this.initDelayedCursor();
+  },
+
+  /**
+   * Moves cursor home while keeping selection
+   * @param {Event} e Event object
+   */
+  moveCursorToHomeWithShift: function(e) {
+    this._selectionDirection = 'left';
+    this.selectionEnd = this.selectionStart;
+    this.selectionStart = 0;
+  },
+
+  /**
+   * Moves cursor home without keeping selection
+   * @param {Event} e Event object
+   */
+  moveCursorToHomeWithoutShift: function (e) {
+      this.selectionEnd = this.selectionStart = 0;
+  },
+
+  /**
+   * Moves cursor end (index this.text.length)
+   * @param {Event} e Event object
+   */
+  moveCursorToEnd: function (e) {
+    if (this.selectionStart == this.text.length && this.selectionEnd == this.text.length) {
+      return;
+    }
+
+    this.abortCursorAnimation();
+    this._currentCursorOpacity = 1;
+
+    if (e.shiftKey) {
+      this.moveCursorToEndWithShift(e);
+    }
+    else {
+      this.moveCursorToEndWithoutShift(e);
+    }
+
+    this.initDelayedCursor();    
+  },
+
+  /**
+   * Moves cursor end while keeping selection
+   * @param {Event} e Event object
+   */
+  moveCursorToEndWithShift: function(e) {
+    this._selectionDirection = 'right';
+    this.selectionEnd = this.text.length;
+  },
+
+  /**
+   * Moves cursor end without keeping selection
+   * @param {Event} e Event object
+   */
+  moveCursorToEndWithoutShift: function (e) {
+    this.selectionStart = this.selectionEnd = this.text.length;
   },
 
   /**
