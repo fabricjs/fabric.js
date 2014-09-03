@@ -52,19 +52,25 @@
      *   top: 100
      * });
      */
-    initialize: function(points, options, skipOffset) {
+    initialize: function(points, options) {
       options = options || { };
       this.set('points', points);
       this.callSuper('initialize', options);
-      this._calcDimensions(skipOffset);
+      this._calcDimensions();
     },
 
     /**
      * @private
-     * @param {Boolean} [skipOffset] Whether points offsetting should be skipped
      */
-    _calcDimensions: function(skipOffset) {
-      return fabric.Polygon.prototype._calcDimensions.call(this, skipOffset);
+    _calcDimensions: function() {
+      return fabric.Polygon.prototype._calcDimensions.call(this);
+    },
+
+    /**
+     * @private
+     */
+    _applyPointOffset: function() {
+      return fabric.Polygon.prototype._applyPointOffset.call(this);
     },
 
     /**
@@ -110,6 +116,14 @@
     _render: function(ctx) {
       var point;
       ctx.beginPath();
+
+      if (this._applyPointOffset) {
+        if (!(this.group && this.group.type === 'path-group')) {
+          this._applyPointOffset();
+        }
+        this._applyPointOffset = null;
+      }
+
       ctx.moveTo(this.points[0].x, this.points[0].y);
       for (var i = 0, len = this.points.length; i < len; i++) {
         point = this.points[i];
@@ -174,7 +188,7 @@
       return null;
     }
 
-    return new fabric.Polyline(points, fabric.util.object.extend(parsedAttributes, options), true);
+    return new fabric.Polyline(points, fabric.util.object.extend(parsedAttributes, options));
   };
   /* _FROM_SVG_END_ */
 
