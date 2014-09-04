@@ -9,10 +9,10 @@
 
   // aliases for faster resolution
   var extend = fabric.util.object.extend,
-      getElementOffset = fabric.util.getElementOffset,
-      removeFromArray = fabric.util.removeFromArray,
+    getElementOffset = fabric.util.getElementOffset,
+    removeFromArray = fabric.util.removeFromArray,
 
-      CANVAS_INIT_ERROR = new Error('Could not initialize `canvas` element');
+    CANVAS_INIT_ERROR = new Error('Could not initialize `canvas` element');
 
   /**
    * Static canvas class
@@ -87,6 +87,13 @@
      * @default
      */
     includeDefaultValues: true,
+
+    /**
+     * Indicates whether objects should remain in current stack position when selected. When false objects are brought to top and rendered as part of the selection group
+     * @type Boolean
+     * @default
+     */
+    preserveObjectStacking: false,
 
     /**
      * Indicates whether objects' state should be saved
@@ -702,11 +709,20 @@
       ctx.save();
       var v = this.viewportTransform;
       ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
-      object.render(ctx);
+      if (this._shouldRenderObject(object)) {
+        object.render(ctx);
+      }
       ctx.restore();
       if (!this.controlsAboveOverlay) {
         object._renderControls(ctx);
       }
+    },
+
+    _shouldRenderObject: function(object) {
+      if (!object) {
+        return false;
+      }
+      return (object !== this.getActiveGroup() || !this.preserveObjectStacking)
     },
 
     /**
@@ -786,7 +802,7 @@
      */
     renderAll: function (allOnTop) {
       var canvasToDrawOn = this[(allOnTop === true && this.interactive) ? 'contextTop' : 'contextContainer'],
-          activeGroup = this.getActiveGroup();
+        activeGroup = this.getActiveGroup();
 
       if (this.contextTop && this.selection && !this._groupSelector) {
         this.clearContext(this.contextTop);
@@ -830,7 +846,7 @@
       var i, length;
 
       // fast path
-      if (!activeGroup) {
+      if (!activeGroup || this.preserveObjectStacking) {
         for (i = 0, length = this._objects.length; i < length; ++i) {
           this._draw(ctx, this._objects[i]);
         }
@@ -1186,8 +1202,8 @@
       if (!options.suppressPreamble) {
         markup.push(
           '<?xml version="1.0" encoding="', (options.encoding || 'UTF-8'), '" standalone="no" ?>',
-            '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" ',
-              '"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n'
+          '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" ',
+          '"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n'
         );
       }
     },
@@ -1214,26 +1230,26 @@
 
       markup.push(
         '<svg ',
-          'xmlns="http://www.w3.org/2000/svg" ',
-          'xmlns:xlink="http://www.w3.org/1999/xlink" ',
-          'version="1.1" ',
-          'width="', width, '" ',
-          'height="', height, '" ',
-          (this.backgroundColor && !this.backgroundColor.toLive
-            ? 'style="background-color: ' + this.backgroundColor + '" '
-            : null),
-          (options.viewBox
-              ? 'viewBox="' +
-                options.viewBox.x + ' ' +
-                options.viewBox.y + ' ' +
-                options.viewBox.width + ' ' +
-                options.viewBox.height + '" '
-              : null),
-          'xml:space="preserve">',
+        'xmlns="http://www.w3.org/2000/svg" ',
+        'xmlns:xlink="http://www.w3.org/1999/xlink" ',
+        'version="1.1" ',
+        'width="', width, '" ',
+        'height="', height, '" ',
+        (this.backgroundColor && !this.backgroundColor.toLive
+          ? 'style="background-color: ' + this.backgroundColor + '" '
+          : null),
+        (options.viewBox
+          ? 'viewBox="' +
+          options.viewBox.x + ' ' +
+          options.viewBox.y + ' ' +
+          options.viewBox.width + ' ' +
+          options.viewBox.height + '" '
+          : null),
+        'xml:space="preserve">',
         '<desc>Created with Fabric.js ', fabric.version, '</desc>',
         '<defs>',
-          fabric.createSVGFontFacesMarkup(this.getObjects()),
-          fabric.createSVGRefElementsMarkup(this),
+        fabric.createSVGFontFacesMarkup(this.getObjects()),
+        fabric.createSVGRefElementsMarkup(this),
         '</defs>'
       );
     },
@@ -1273,24 +1289,24 @@
       if (this[property] && this[property].source) {
         markup.push(
           '<rect x="', this[property].offsetX, '" y="', this[property].offsetY, '" ',
-            'width="',
-              (this[property].repeat === 'repeat-y' || this[property].repeat === 'no-repeat'
-                ? this[property].source.width
-                : this.width),
-            '" height="',
-              (this[property].repeat === 'repeat-x' || this[property].repeat === 'no-repeat'
-                ? this[property].source.height
-                : this.height),
-            '" fill="url(#' + property + 'Pattern)"',
+          'width="',
+          (this[property].repeat === 'repeat-y' || this[property].repeat === 'no-repeat'
+            ? this[property].source.width
+            : this.width),
+          '" height="',
+          (this[property].repeat === 'repeat-x' || this[property].repeat === 'no-repeat'
+            ? this[property].source.height
+            : this.height),
+          '" fill="url(#' + property + 'Pattern)"',
           '></rect>'
         );
       }
       else if (this[property] && property === 'overlayColor') {
         markup.push(
           '<rect x="0" y="0" ',
-            'width="', this.width,
-            '" height="', this.height,
-            '" fill="', this[property], '"',
+          'width="', this.width,
+          '" height="', this.height,
+          '" fill="', this[property], '"',
           '></rect>'
         );
       }
@@ -1355,8 +1371,8 @@
         for (var i = idx - 1; i >= 0; --i) {
 
           var isIntersecting = object.intersectsWithObject(this._objects[i]) ||
-                               object.isContainedWithinObject(this._objects[i]) ||
-                               this._objects[i].isContainedWithinObject(object);
+            object.isContainedWithinObject(this._objects[i]) ||
+            this._objects[i].isContainedWithinObject(object);
 
           if (isIntersecting) {
             newIdx = i;
@@ -1405,8 +1421,8 @@
         for (var i = idx + 1; i < this._objects.length; ++i) {
 
           var isIntersecting = object.intersectsWithObject(this._objects[i]) ||
-                               object.isContainedWithinObject(this._objects[i]) ||
-                               this._objects[i].isContainedWithinObject(object);
+            object.isContainedWithinObject(this._objects[i]) ||
+            this._objects[i].isContainedWithinObject(object);
 
           if (isIntersecting) {
             newIdx = i;
@@ -1451,7 +1467,7 @@
      */
     toString: function () {
       return '#<fabric.Canvas (' + this.complexity() + '): ' +
-               '{ objects: ' + this.getObjects().length + ' }>';
+        '{ objects: ' + this.getObjects().length + ' }>';
     }
   });
 
