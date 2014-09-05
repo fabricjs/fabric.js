@@ -1,4 +1,4 @@
-/* build: `node build.js modules=ALL minifier=yui` */
+/* build: `node build.js modules=ALL minifier=uglifyjs` */
 /*! Fabric.js Copyright 2008-2014, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
 var fabric = fabric || { version: "1.4.11" };
@@ -12484,6 +12484,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       addListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
       addListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
       addListener(this.upperCanvasEl, 'mousewheel', this._onMouseWheel);
+      addListener(this.upperCanvasEl, 'dblclick', this._onDblClick);
 
       // touch events
       addListener(this.upperCanvasEl, 'touchstart', this._onMouseDown);
@@ -12504,6 +12505,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       this._onMouseDown = this._onMouseDown.bind(this);
       this._onMouseMove = this._onMouseMove.bind(this);
       this._onMouseUp = this._onMouseUp.bind(this);
+      this._onDblClick = this._onDblClick.bind(this);
       this._onResize = this._onResize.bind(this);
       this._onGesture = this._onGesture.bind(this);
       this._onDrag = this._onDrag.bind(this);
@@ -12521,6 +12523,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       removeListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
       removeListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
       removeListener(this.upperCanvasEl, 'mousewheel', this._onMouseWheel);
+      removeListener(this.upperCanvasEl, 'dblclick', this._onDblClick);
 
       removeListener(this.upperCanvasEl, 'touchstart', this._onMouseDown);
       removeListener(this.upperCanvasEl, 'touchmove', this._onMouseMove);
@@ -12599,6 +12602,14 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         addListener(fabric.document, 'mouseup', this._onMouseUp);
         addListener(fabric.document, 'mousemove', this._onMouseMove);
       }
+    },
+
+    /**
+     * @private
+     * @param {Event} e Event object fired on double click
+     */
+    _onDblClick: function (e) {
+      this.__onDblClick(e);
     },
 
     /**
@@ -12859,6 +12870,18 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
       this.fire('mouse:down', { target: target, e: e });
       target && target.fire('mousedown', { e: e });
+    },
+
+    /**
+     * Method that defines the actions when mouse button is double clicked on canvas.
+     * @private
+     * @param {Event} e Event object fired on mousedown
+     */
+    __onDblClick: function (e) {
+      var target = this.findTarget(e);
+
+      this.fire('dblclick', { target: target, e: e });
+      target && target.fire('dblclick', { e: e });
     },
 
     /**
