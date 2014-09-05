@@ -60,10 +60,10 @@
       this.points = points;
       this.callSuper('initialize', options);
       this._calcDimensions();
-      if (!options.top) {
+      if (!('top' in options)) {
         this.top = this.minY;
       }
-      if (!options.left) {
+      if (!('left' in options)) {
         this.left = this.minX;
       }
     },
