@@ -79,8 +79,8 @@
     toSVG: function(reviver) {
       var markup = this._createBaseSVGMarkup(), x = 0, y = 0;
       if (this.group) {
-	x = this.left + this.rx;
-	y = this.top + this.ry;
+        x = this.left + this.rx;
+        y = this.top + this.ry;
       }
       markup.push(
         '<ellipse ',
@@ -145,7 +145,7 @@
 
     parsedAttributes.left = parsedAttributes.left || 0;
     parsedAttributes.top = parsedAttributes.top || 0;
-    
+
     var ellipse = new fabric.Ellipse(extend(parsedAttributes, options));
 
     ellipse.top -= ellipse.ry;

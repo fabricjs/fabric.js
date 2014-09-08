@@ -81,8 +81,8 @@
     toSVG: function(reviver) {
       var markup = this._createBaseSVGMarkup(), x = 0, y = 0;
       if (this.group) {
-	x = this.left + this.radius;
-	y = this.top + this.radius;
+        x = this.left + this.radius;
+        y = this.top + this.radius;
       }
       markup.push(
         '<circle ',

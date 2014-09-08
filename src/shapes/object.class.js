@@ -1091,7 +1091,7 @@
       if (this.fill.gradientTransform) {
         var g = this.fill.gradientTransform;
         ctx.transform.apply(ctx, g);
-      }   
+      }
       if (this.fillRule === 'destination-over') {
         ctx.fill('evenodd');
       }
@@ -1133,7 +1133,7 @@
         if (this.stroke.gradientTransform) {
           var g = this.stroke.gradientTransform;
           ctx.transform.apply(ctx, g);
-        }        
+        }
         this._stroke ? this._stroke(ctx) : ctx.stroke();
       }
       this._removeShadow(ctx);
