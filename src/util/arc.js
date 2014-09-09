@@ -14,7 +14,7 @@
       return arcToSegmentsCache[argsString];
     }
 
-    var PI = Math.PI, th = rotateX * (PI / 180),
+    var PI = Math.PI, th = rotateX * PI / 180,
         sinTh = Math.sin(th),
         cosTh = Math.cos(th),
         fromX = 0, fromY = 0;
@@ -22,26 +22,26 @@
     rx = Math.abs(rx);
     ry = Math.abs(ry);
 
-    var px = -cosTh * toX - sinTh * toY,
-        py = -cosTh * toY + sinTh * toX,
+    var px = -cosTh * toX * 0.5 - sinTh * toY * 0.5,
+        py = -cosTh * toY * 0.5 + sinTh * toX * 0.5,
         rx2 = rx * rx, ry2 = ry * ry, py2 = py * py, px2 = px * px,
-        pl = 4 * rx2 * ry2 - rx2 * py2 - ry2 * px2,
+        pl = rx2 * ry2 - rx2 * py2 - ry2 * px2,
         root = 0;
 
     if (pl < 0) {
-      var s = Math.sqrt(1 - 0.25 * pl/(rx2 * ry2));
+      var s = Math.sqrt(1 - pl/(rx2 * ry2));
       rx *= s;
       ry *= s;
     }
     else {
-      root = (large === sweep ? -0.5 : 0.5) *
+      root = (large === sweep ? -1.0 : 1.0) *
               Math.sqrt( pl /(rx2 * py2 + ry2 * px2));
     }
 
     var cx = root * rx * py / ry,
         cy = -root * ry * px / rx,
-        cx1 = cosTh * cx - sinTh * cy + toX / 2,
-        cy1 = sinTh * cx + cosTh * cy + toY / 2,
+        cx1 = cosTh * cx - sinTh * cy + toX * 0.5,
+        cy1 = sinTh * cx + cosTh * cy + toY * 0.5,
         mTheta = calcVectorAngle(1, 0, (px - cx) / rx, (py - cy) / ry),
         dtheta = calcVectorAngle((px - cx) / rx, (py - cy) / ry, (-px - cx) / rx, (-py - cy) / ry);
 
@@ -53,7 +53,7 @@
     }
 
     // Convert into cubic bezier segments <= 90deg
-    var segments = Math.ceil(Math.abs(dtheta / (PI * 0.5))),
+    var segments = Math.ceil(Math.abs(dtheta / PI * 2)),
         result = [], mDelta = dtheta / segments,
         mT = 8 / 3 * Math.sin(mDelta / 4) * Math.sin(mDelta / 4) / Math.sin(mDelta / 2),
         th3 = mTheta + mDelta;
@@ -62,7 +62,7 @@
       result[i] = segmentToBezier(mTheta, th3, cosTh, sinTh, rx, ry, cx1, cy1, mT, fromX, fromY);
       fromX = result[i][4];
       fromY = result[i][5];
-      mTheta += mDelta;
+      mTheta = th3;
       th3 += mDelta;
     }
     arcToSegmentsCache[argsString] = result;
