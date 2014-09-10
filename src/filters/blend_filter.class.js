@@ -1,8 +1,7 @@
 (function(global){
   'use strict';
 
-  var fabric = global.fabric,
-      extend = fabric.util.object.extend;
+  var fabric = global.fabric;
 
   /**
    * Color Blend filter class
