@@ -636,6 +636,7 @@
     },
 
     /**
+     * Defer character rendering back to fabric.Text
      * @private
      * @param {String} method
      * @param {CanvasRenderingContext2D} ctx Context to render on
@@ -645,11 +646,10 @@
      */
     _renderCharsFast: function(method, ctx, line, left, top) {
       this.skipTextAlign = false;
-
       if (method === 'fillText' && this.fill) {
         this.callSuper('_renderChars', method, ctx, line, left, top);
       }
-      if (method === 'strokeText' && this.stroke) {
+      if (method === 'strokeText' && this.stroke && !(this.strokeWidth == null) && this.strokeWidth > 0) {
         this.callSuper('_renderChars', method, ctx, line, left, top);
       }
     },
@@ -790,12 +790,13 @@
     },
 
     /**
+     * Defer text decoration rendering to fabric.Text in the case that there are not styles or that the text is on the fabric.Path at fabric.Text#textPath
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      * @param {Array} textLines
      */
     _renderTextDecoration: function(ctx, textLines) {
-      if (this.isEmptyStyles()) {
+      if (this.isEmptyStyles() || this.textPath) {
         return this.callSuper('_renderTextDecoration', ctx, textLines);
       }
     },
