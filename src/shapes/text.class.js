@@ -1604,17 +1604,23 @@
      */
     toObject: function(propertiesToInclude) {
       var object = extend(this.callSuper('toObject', propertiesToInclude), {
-        text:                 this.text,
-        fontSize:             this.fontSize,
-        fontWeight:           this.fontWeight,
-        fontFamily:           this.fontFamily,
-        fontStyle:            this.fontStyle,
-        lineHeight:           this.lineHeight,
-        textDecoration:       this.textDecoration,
-        textAlign:            this.textAlign,
-        path:                 this.path,
-        textBackgroundColor:  this.textBackgroundColor,
-        useNative:            this.useNative
+        text:                        this.text,
+        fontSize:                    this.fontSize,
+        fontWeight:                  this.fontWeight,
+        fontFamily:                  this.fontFamily,
+        fontStyle:                   this.fontStyle,
+        lineHeight:                  this.lineHeight,
+        textDecoration:              this.textDecoration,
+        textAlign:                   this.textAlign,
+        path:                        this.path,
+        textBackgroundColor:         this.textBackgroundColor,
+        useNative:                   this.useNative,
+        textPath:                    this.textPath,
+        textPathDistanceOffset:      this.textPathDistanceOffset,
+        wantObservePathRotation:     this.wantObservePathRotation,
+        wantTextPathWithLessOverlap: this.wantTextPathWithLessOverlap,
+        wantTextPathResidue:         this.wantTextPathResidue,
+        wantApproximationDetail:     this.wantApproximationDetail,
       });
       if (!this.includeDefaultValues) {
         this._removeDefaultValues(object);
