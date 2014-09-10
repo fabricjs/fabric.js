@@ -1,7 +1,8 @@
 (function(global){
   'use strict';
 
-  var fabric = global.fabric;
+  var fabric = global.fabric,
+      extend = fabric.util.object.extend;
 
   /**
    * Color Blend filter class
@@ -122,6 +123,19 @@
       }
 
       context.putImageData(imageData, 0, 0);
+    },
+
+    /**
+     * Returns object representation of an instance
+     * @return {Object} Object representation of an instance
+     */
+    toObject: function() {
+      return {
+        color: this.color,
+        image: this.image,
+        mode: this.mode,
+        alpha: this.alpha
+      }
     }
   });
 
