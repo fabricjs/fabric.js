@@ -36,6 +36,20 @@
     points: null,
 
     /**
+     * Minimum X from points values, necessary to offset points
+     * @type Number
+     * @default
+     */
+    minX: 0,
+
+    /**
+     * Minimum Y from points values, necessary to offset points
+     * @type Number
+     * @default
+     */
+    minY: 0,
+
+    /**
      * Constructor
      * @param {Array} points Array of points
      * @param {Object} [options] Options object
@@ -46,6 +60,12 @@
       this.points = points;
       this.callSuper('initialize', options);
       this._calcDimensions();
+      if (!('top' in options)) {
+        this.top = this.minY;
+      }
+      if (!('left' in options)) {
+        this.left = this.minX;
+      }
     },
 
     /**
@@ -62,8 +82,8 @@
       this.width = (maxX - minX) || 1;
       this.height = (maxY - minY) || 1;
 
-      this.left = minX,
-      this.top = minY;
+      this.minX = minX,
+      this.minY = minY;
     },
 
     /**
@@ -73,8 +93,8 @@
       // change points to offset polygon into a bounding box
       // executed one time
       this.points.forEach(function(p) {
-        p.x -= (this.left + this.width / 2);
-        p.y -= (this.top + this.height / 2);
+        p.x -= (this.minX + this.width / 2);
+        p.y -= (this.minY + this.height / 2);
       }, this);
     },
 
