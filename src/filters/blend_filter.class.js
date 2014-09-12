@@ -122,6 +122,19 @@
       }
 
       context.putImageData(imageData, 0, 0);
+    },
+
+    /**
+     * Returns object representation of an instance
+     * @return {Object} Object representation of an instance
+     */
+    toObject: function() {
+      return {
+        color: this.color,
+        image: this.image,
+        mode: this.mode,
+        alpha: this.alpha
+      };
     }
   });
 
