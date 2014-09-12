@@ -134,7 +134,7 @@
         image: this.image,
         mode: this.mode,
         alpha: this.alpha
-      }
+      };
     }
   });
 
