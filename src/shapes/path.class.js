@@ -543,7 +543,7 @@
         chunks.push(this.path[i].join(' '));
       }
       var path = chunks.join(' ');
-      if (!(this.group && this.group.type == 'path-group')) {
+      if (!(this.group && this.group.type === 'path-group')) {
         addTransform = 'translate(' + (-this.width / 2) + ', ' + (-this.height / 2) + ')';
       }
       markup.push(
