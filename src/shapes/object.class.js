@@ -1091,7 +1091,7 @@
         ctx.translate(
           -this.width / 2 + this.fill.offsetX || 0,
           -this.height / 2 + this.fill.offsetY || 0);
-      }      
+      }
       if (this.fillRule === 'destination-over') {
         ctx.fill('evenodd');
       }
