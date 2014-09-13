@@ -959,7 +959,7 @@
           // Track if had line or not.
           hadLine = (command === "lineTo") ? true : false;
         }
-        ctx.strokeStyle = (lineIndex % 2) ? "red" : ctx.strokeStyle;
+        ctx.strokeStyle = ctx.strokeStyle;
         ctx.stroke();
         ctx.closePath();
         ctx.restore();
