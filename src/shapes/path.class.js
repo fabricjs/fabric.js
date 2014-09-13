@@ -537,19 +537,21 @@
      */
     toSVG: function(reviver) {
       var chunks = [],
-          markup = this._createBaseSVGMarkup();
+          markup = this._createBaseSVGMarkup(), addTransform = '';
 
       for (var i = 0, len = this.path.length; i < len; i++) {
         chunks.push(this.path[i].join(' '));
       }
       var path = chunks.join(' ');
-
+      if (!(this.group && this.group.type == 'path-group')) {
+        addTransform = 'translate(' + (-this.width / 2) + ', ' + (-this.height / 2) + ')';
+      }
       markup.push(
         //jscs:disable validateIndentation
         '<path ',
           'd="', path,
           '" style="', this.getSvgStyles(),
-          '" transform="', this.getSvgTransform(),
+          '" transform="', this.getSvgTransform(), addTransform,
           this.getSvgTransformMatrix(), '" stroke-linecap="round" ',
         '/>\n'
         //jscs:enable validateIndentation
