@@ -1088,20 +1088,25 @@
     _drawTextResidueIfNecessary: function(method, ctx, line, left, top, lineIndex) {
       if (this.wantTextPathResidue && this.textPath) {
         // Has the residue already been drawn?
-        var isFirstPass = (this._boundaries[lineIndex].residueHasBeenDrawn == null || !this._boundaries[lineIndex].residueHasBeenDrawn) ? true : false;
+        var residueTracker = this._boundaries[lineIndex].residueHasBeenDrawn,
+            residueTrackerIsUndefined = (residueTracker == null) ? true : false,
+            residueBoxNeedsToBeDrawn = (lineIndex == 0 && (residueTrackerIsUndefined || !residueTracker["bounding-box"])) ? true : false,
+            isFirstPass = (residueTrackerIsUndefined || residueTracker[method] == null || !residueTracker[method]) ? true : false;
         if (isFirstPass) {
           var textPath = this.textPath;
           var globalAlpha = ctx.globalAlpha;
           this.textPath = null;
           ctx.fillStyle = "#000000";
+          ctx.strokeStyle = "#000000";
           ctx.globalAlpha = 0.05;
           var crutchY = (this.type == "i-text") ? 0 : this.fontSize / 4;
           this._renderTextLine(method, ctx, line, left, top + crutchY, lineIndex);
           this.textPath = textPath;
           ctx.fillStyle = this.fill;
+          ctx.strokeStyle = this.stroke;
           ctx.globalAlpha = globalAlpha;
           // Draw dashed box.
-          if (lineIndex == 0) {
+          if (residueBoxNeedsToBeDrawn) {
             // Copy data out.
             var previousBorderColor = this.borderColor;
             var hasBorders = this.hasBorders;
@@ -1127,8 +1132,12 @@
             this.borderOpacityWhenMoving = borderOpacityWhenMoving;
             this.isMoving = isMoving;
           }
-          //
-          this._boundaries[lineIndex].residueHasBeenDrawn = true;
+          // Track this result.
+          if (residueTrackerIsUndefined) {
+            this._boundaries[lineIndex].residueHasBeenDrawn = {};
+          }
+          this._boundaries[lineIndex].residueHasBeenDrawn[method] = true;
+          this._boundaries[lineIndex].residueHasBeenDrawn["bounding-box"] = true;
         }
       }
     },
@@ -1377,8 +1386,13 @@
         if (!fillTextButNoFillDefinition && !strokeTextButNoStrokeDefinition) {
           // Horizontally reposition result of context drawing in case of center and right.
           var adjustmentToContextDrawing = (this.textAlign === "center") ? -halfWidth : 0;
-          // Determine where the local left offset is.
-          var left = (this.textAlign !== "center" && this.textAlign !== "right") ? -halfWidth : halfWidth;
+          // Determine where the local left offset is. TODO: Figure out why textPathDistanceOffset requires different left values.
+          var left;
+          if (this.textPathDistanceOffset == null || this.type !== "i-text") {
+            left = (this.textAlign !== "center" && this.textAlign !== "right") ? -halfWidth : halfWidth;
+          } else {
+            left = (this.textAlign === "center") ? 0 : -halfWidth;
+          }
           ctx.translate(adjustmentToContextDrawing, 0);
           // Render the character, sliding the height by the top value. WARN: Do not call this._renderChars in place of ctx[method], since an override can exist that does non-essential transforms.
           ctx[method](letter, left, top);
@@ -1504,7 +1518,7 @@
         styleDeclaration.shadow = new fabric.Shadow(styleDeclaration.shadow);
       }
       var fill = styleDeclaration.fill || this.fill;
-      ctx.fillStyle = fill.toLive
+      ctx.fillStyle = (fill == null) ? fill : fill.toLive
         ? fill.toLive(ctx)
         : fill;
       var validStrokeWidthExists = (!(styleDeclaration.strokeWidth == null) && styleDeclaration.strokeWidth > 0) ? true : false;
@@ -1603,7 +1617,11 @@
      * @return {Object} Object representation of an instance
      */
     toObject: function(propertiesToInclude) {
-      var object = extend(this.callSuper('toObject', propertiesToInclude), {
+      // Point to the correct superclass method for cases where this.constructor.superclass does not point to fabric.Object (i.e. fabric.IText).
+      var fn = fabric.Object.prototype["toObject"];
+      fn = fn.bind(this);
+      // Create the object with just the wanted data.
+      var object = extend(fn(propertiesToInclude), {
         text:                        this.text,
         fontSize:                    this.fontSize,
         fontWeight:                  this.fontWeight,
@@ -1622,6 +1640,7 @@
         wantTextPathResidue:         this.wantTextPathResidue,
         wantApproximationDetail:     this.wantApproximationDetail,
       });
+      // Remove default values if requested.
       if (!this.includeDefaultValues) {
         this._removeDefaultValues(object);
       }
@@ -1949,7 +1968,12 @@
    * @return {fabric.Text} Instance of fabric.Text
    */
   fabric.Text.fromObject = function(object) {
-    return new fabric.Text(object.text, clone(object));
+    var clonedObject = clone(object);
+    // Pre-fabricate the fabric.Path that might be in the incoming data.
+    if (clonedObject && !(clonedObject.textPath == null)) { 
+      clonedObject.textPath = new fabric.Path(clonedObject.textPath.path, clonedObject.textPath);
+    }
+    return new fabric.Text(object.text, clonedObject);
   };
 
   fabric.util.createAccessors(fabric.Text);

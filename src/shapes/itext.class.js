@@ -889,51 +889,39 @@
       var styleDeclaration = decl ||
                             (this.styles[lineIndex] &&
                              this.styles[lineIndex][charIndex]);
-
+      // If there's a style declaration, clone it so that the original style object is not polluted with following font declarations. Otherwise, prepare a blank dictionary.
       if (styleDeclaration) {
-        // cloning so that original style object is not polluted with following font declarations
         styleDeclaration = clone(styleDeclaration);
-      }
-      else {
+      } else {
         styleDeclaration = { };
       }
-
       this._applyFontStyles(styleDeclaration);
-
       var cacheProp = this._getCacheProp(_char, styleDeclaration);
-
-      // short-circuit if no styles
+      // Short-circuit if there are no styles.
       if (this.isEmptyStyles() && this._charWidthsCache[cacheProp] && this.caching) {
         return this._charWidthsCache[cacheProp];
       }
-
       if (typeof styleDeclaration.shadow === 'string') {
         styleDeclaration.shadow = new fabric.Shadow(styleDeclaration.shadow);
       }
-
       var fill = styleDeclaration.fill || this.fill;
-      ctx.fillStyle = fill.toLive
+      ctx.fillStyle = (fill == null) ? fill : fill.toLive
         ? fill.toLive(ctx)
         : fill;
-
       if (styleDeclaration.stroke) {
         ctx.strokeStyle = (styleDeclaration.stroke && styleDeclaration.stroke.toLive)
           ? styleDeclaration.stroke.toLive(ctx)
           : styleDeclaration.stroke;
       }
-
       ctx.lineWidth = styleDeclaration.strokeWidth || this.strokeWidth;
       ctx.font = this._getFontDeclaration.call(styleDeclaration);
       this._setShadow.call(styleDeclaration, ctx);
-
       if (!this.caching) {
         return ctx.measureText(_char).width;
       }
-
       if (!this._charWidthsCache[cacheProp]) {
         this._charWidthsCache[cacheProp] = ctx.measureText(_char).width;
       }
-
       return this._charWidthsCache[cacheProp];
     },
 
@@ -1189,7 +1177,12 @@
    * @return {fabric.IText} instance of fabric.IText
    */
   fabric.IText.fromObject = function(object) {
-    return new fabric.IText(object.text, clone(object));
+    var clonedObject = clone(object);
+    // Pre-fabricate the fabric.Path that might be in the incoming data.
+    if (clonedObject && !(clonedObject.textPath == null)) { 
+      clonedObject.textPath = new fabric.Path(clonedObject.textPath.path, clonedObject.textPath);
+    }
+    return new fabric.IText(object.text, clonedObject);
   };
 
   /**
