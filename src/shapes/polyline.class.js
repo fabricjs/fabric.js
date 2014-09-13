@@ -2,8 +2,7 @@
 
   'use strict';
 
-  var fabric = global.fabric || (global.fabric = { }),
-      toFixed = fabric.util.toFixed;
+  var fabric = global.fabric || (global.fabric = { });
 
   if (fabric.Polyline) {
     fabric.warn('fabric.Polyline is already defined');
