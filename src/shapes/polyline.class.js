@@ -100,23 +100,7 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var points = [],
-          markup = this._createBaseSVGMarkup();
-
-      for (var i = 0, len = this.points.length; i < len; i++) {
-        points.push(toFixed(this.points[i].x, 2), ',', toFixed(this.points[i].y, 2), ' ');
-      }
-
-      markup.push(
-        '<polyline ',
-          'points="', points.join(''),
-          '" style="', this.getSvgStyles(),
-          '" transform="', this.getSvgTransform(),
-          ' ', this.getSvgTransformMatrix(),
-        '"/>\n'
-      );
-
-      return reviver ? reviver(markup.join('')) : markup.join('');
+      return fabric.Polygon.prototype.toSVG.call(this, reviver);
     },
     /* _TO_SVG_END_ */
 
@@ -125,22 +109,7 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
-      var point;
-      ctx.beginPath();
-
-      if (this._applyPointOffset) {
-        if (!(this.group && this.group.type === 'path-group')) {
-          this._applyPointOffset();
-        }
-        this._applyPointOffset = null;
-      }
-
-      ctx.moveTo(this.points[0].x, this.points[0].y);
-      for (var i = 0, len = this.points.length; i < len; i++) {
-        point = this.points[i];
-        ctx.lineTo(point.x, point.y);
-      }
-
+      fabric.Polygon.prototype.commonRender.call(this, ctx);
       this._renderFill(ctx);
       this._renderStroke(ctx);
     },
