@@ -1003,7 +1003,7 @@
         ctx.lineJoin = this.strokeLineJoin;
         ctx.miterLimit = this.strokeMiterLimit;
         ctx.strokeStyle = this.stroke.toLive
-          ? this.stroke.toLive(ctx)
+          ? this.stroke.toLive(ctx, this)
           : this.stroke;
       }
     },
@@ -1011,7 +1011,7 @@
     _setFillStyles: function(ctx) {
       if (this.fill) {
         ctx.fillStyle = this.fill.toLive
-          ? this.fill.toLive(ctx)
+          ? this.fill.toLive(ctx, this)
           : this.fill;
       }
     },
@@ -1083,14 +1083,14 @@
       }
 
       ctx.save();
+      if (this.fill.gradientTransform) {
+        var g = this.fill.gradientTransform;
+        ctx.transform.apply(ctx, g);
+      }
       if (this.fill.toLive) {
         ctx.translate(
           -this.width / 2 + this.fill.offsetX || 0,
           -this.height / 2 + this.fill.offsetY || 0);
-      }
-      if (this.fill.gradientTransform) {
-        var g = this.fill.gradientTransform;
-        ctx.transform.apply(ctx, g);
       }
       if (this.fillRule === 'destination-over') {
         ctx.fill('evenodd');

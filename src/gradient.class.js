@@ -240,20 +240,31 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      * @return {CanvasGradient}
      */
-    toLive: function(ctx) {
-      var gradient;
+    toLive: function(ctx, object) {
+      var gradient, coords = fabric.util.object.clone(this.coords);
 
       if (!this.type) {
         return;
       }
 
+      if (object.group && object.group.type === 'path-group') {
+        for (var prop in coords) {
+          if (prop === 'x1' || prop === 'x2') {
+            coords[prop] += -this.offsetX + object.width / 2;
+          }
+          else if (prop === 'y1' || prop === 'y2') {
+            coords[prop] += -this.offsetY + object.height / 2;
+          }
+        }
+      }
+
       if (this.type === 'linear') {
         gradient = ctx.createLinearGradient(
-          this.coords.x1, this.coords.y1, this.coords.x2, this.coords.y2);
+          coords.x1, coords.y1, coords.x2, coords.y2);
       }
       else if (this.type === 'radial') {
         gradient = ctx.createRadialGradient(
-          this.coords.x1, this.coords.y1, this.coords.r1, this.coords.x2, this.coords.y2, this.coords.r2);
+          coords.x1, coords.y1, coords.r1, coords.x2, coords.y2, coords.r2);
       }
 
       for (var i = 0, len = this.colorStops.length; i < len; i++) {
