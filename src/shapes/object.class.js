@@ -747,8 +747,6 @@
       if (this.group) {
         this.group.transform(ctx, fromLeft);
       }
-      ctx.globalAlpha = this.opacity;
-
       var center = fromLeft ? this._getLeftTopCoords() : this.getCenterPoint();
       ctx.translate(center.x, center.y);
       ctx.rotate(degreesToRadians(this.angle));
@@ -962,38 +960,26 @@
 
       //setup fill rule for current object
       this._setupFillRule(ctx);
-
-      this._transform(ctx, noTransform);
       this._setStrokeStyles(ctx);
       this._setFillStyles(ctx);
-
+      if (!noTransform) {
+        this.transform(ctx);
+      }
       if (this.group && this.group.type === 'path-group') {
         ctx.translate(-this.group.width/2, -this.group.height/2);
-        var m = this.transformMatrix;
-        if (m) {
-          ctx.transform.apply(ctx, m);
-        }
       }
-      ctx.globalAlpha = this.group ? (ctx.globalAlpha * this.opacity) : this.opacity;
+      var m = this.transformMatrix;
+      if (m) {
+        ctx.transform.apply(ctx, m);
+      }
+      this._setOpacity(ctx);
       this._setShadow(ctx);
       this.clipTo && fabric.util.clipContext(this, ctx);
       this._render(ctx, noTransform);
       this.clipTo && ctx.restore();
       this._removeShadow(ctx);
       this._restoreFillRule(ctx);
-
       ctx.restore();
-    },
-
-    _transform: function(ctx, noTransform) {
-      var m = this.transformMatrix;
-
-      if (m && !this.group) {
-        ctx.setTransform.apply(ctx, m);
-      }
-      if (!noTransform) {
-        this.transform(ctx);
-      }
     },
 
     _setStrokeStyles: function(ctx) {
@@ -1043,6 +1029,17 @@
         this.drawControls(ctx);
       }
       ctx.restore();
+    },
+
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
+    _setOpacity: function(ctx) {
+      if (this.group) {
+        this.group._setOpacity(ctx);
+      }
+      ctx.globalAlpha *= this.opacity;
     },
 
     /**
@@ -1473,10 +1470,10 @@
      * @param {CanvasRenderingContext2D} ctx Rendering canvas context
      */
     _setupFillRule: function (ctx) {
-      if (this.fillRule) {
+      /*if (this.fillRule && this.fillRule != 'destination-over') {
         this._prevFillRule = ctx.globalCompositeOperation;
         ctx.globalCompositeOperation = this.fillRule;
-      }
+      }*/
     },
 
     /**
@@ -1484,9 +1481,9 @@
      * @param {CanvasRenderingContext2D} ctx Rendering canvas context
      */
     _restoreFillRule: function (ctx) {
-      if (this.fillRule && this._prevFillRule) {
+      /*if (this.fillRule && this._prevFillRule) {
         ctx.globalCompositeOperation = this._prevFillRule;
-      }
+      }*/
     }
   });
 
