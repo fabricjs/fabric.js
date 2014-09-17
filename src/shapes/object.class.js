@@ -747,8 +747,6 @@
       if (this.group) {
         this.group.transform(ctx, fromLeft);
       }
-      ctx.globalAlpha = this.opacity;
-
       var center = fromLeft ? this._getLeftTopCoords() : this.getCenterPoint();
       ctx.translate(center.x, center.y);
       ctx.rotate(degreesToRadians(this.angle));
@@ -969,12 +967,11 @@
 
       if (this.group && this.group.type === 'path-group') {
         ctx.translate(-this.group.width/2, -this.group.height/2);
-        var m = this.transformMatrix;
-        if (m) {
-          ctx.transform.apply(ctx, m);
+        if (this.transformMatrix) {
+          ctx.transform.apply(ctx, this.transformMatrix);
         }
       }
-      ctx.globalAlpha = this.group ? (ctx.globalAlpha * this.opacity) : this.opacity;
+      this._setOpacity(ctx);
       this._setShadow(ctx);
       this.clipTo && fabric.util.clipContext(this, ctx);
       this._render(ctx, noTransform);
@@ -994,6 +991,16 @@
       if (!noTransform) {
         this.transform(ctx);
       }
+    },
+
+    /* @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
+    _setOpacity: function(ctx) {
+      if (this.group) {
+        this.group._setOpacity(ctx);
+      }
+      ctx.globalAlpha *= this.opacity;
     },
 
     _setStrokeStyles: function(ctx) {
