@@ -192,11 +192,11 @@
       return boundsOfCurveCache[argsString];
     }
     
-    var pow = Math.pow, sqrt = Math.sqrt,
+    var sqrt = Math.sqrt,
         min = Math.min, max = Math.max,
         abs = Math.abs, tvalues = [ ],
-        bounds = [[ ], [ ]], points = [ ],
-        a,b,c,t,t1,t2,b2ac,sqrtb2ac;
+        bounds = [[ ], [ ]],
+        a, b, c, t, t1, t2, b2ac, sqrtb2ac;
 
     for (var i = 0; i < 2; ++i) {
       if (i === 0) {
@@ -221,10 +221,10 @@
         continue;
       }
       b2ac = b * b - 4 * c * a;
-      sqrtb2ac = sqrt(b2ac);
       if (b2ac < 0) {
         continue;
       }
+      sqrtb2ac = sqrt(b2ac);
       t1 = (-b + sqrtb2ac) / (2 * a);
       if (0 < t1 && t1 < 1) {
         tvalues.push(t1);
@@ -236,7 +236,7 @@
     }
 
     var x, y, j = tvalues.length, jlen = j, mt;
-    while(j--) {
+    while (j--) {
       t = tvalues[j];
       mt = 1 - t;
       x = (mt * mt * mt * x0) + (3 * mt * mt * t * x1) + (3 * mt * t * t * x2) + (t * t * t * x3);
@@ -246,8 +246,6 @@
       bounds[1][j] = y;
     }
 
-    tvalues[jlen] = 0;
-    tvalues[jlen + 1] = 1;
     bounds[0][jlen] = x0;
     bounds[1][jlen] = y0;
     bounds[0][jlen + 1] = x3;
@@ -264,7 +262,7 @@
     ];  
     boundsOfCurveCache[argsString] = result;
     return result;
-  };
+  }
   
   fabric.util.getBoundsOfCurve = getBoundsOfCurve;
 
