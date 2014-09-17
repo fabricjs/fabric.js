@@ -86,7 +86,7 @@
     toObject: function(propertiesToInclude) {
       return extend(this.callSuper('toObject', propertiesToInclude), {
         radius: this.get('radius'),
-        startAnlge: this.startAngle,
+        startAngle: this.startAngle,
         endAngle: this.endAngle
       });
     },
