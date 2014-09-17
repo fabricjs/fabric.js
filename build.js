@@ -144,6 +144,7 @@ var filesToInclude = [
   ifSpecifiedDependencyInclude('serialization', 'json', 'lib/json2.js'),
   ifSpecifiedInclude('gestures', 'lib/event.js'),
 
+  'src/mixins/accessors.mixin.js',
   'src/mixins/observable.mixin.js',
   'src/mixins/collection.mixin.js',
 
