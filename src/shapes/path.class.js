@@ -117,7 +117,7 @@
      * @private
      * @param {CanvasRenderingContext2D} ctx context to render path on
      */
-    _render: function(ctx, noTransform) {
+    _render: function(ctx) {
       var current, // current instruction
           previous = null,
           subpathStartX = 0,
