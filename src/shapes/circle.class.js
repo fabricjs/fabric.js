@@ -40,13 +40,12 @@
      */
     startAngle: 0,
 
-
     /**
      * End angle of the circle
      * @type Number
      * @default 2Pi
      */
-     endAngle: pi * 2,
+    endAngle: pi * 2,
 
     /**
      * Constructor
@@ -115,7 +114,8 @@
             ' ', this.getSvgTransformMatrix(),
           '"/>\n'
         );
-      } else {
+      }
+      else {
         var startX = Math.cos(this.startAngle) * this.radius,
             startY = Math.sin(this.startAngle) * this.radius,
             endX = Math.cos(this.endAngle) * this.radius,
