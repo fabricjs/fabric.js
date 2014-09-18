@@ -137,9 +137,9 @@
         l = 0;
         t = 0;
       }
-      
+
       ctx.beginPath();
-      
+
       for (var i = 0, len = this.path.length; i < len; ++i) {
 
         current = this.path[i];
