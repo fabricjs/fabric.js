@@ -138,7 +138,7 @@
   };
 
   /**
-   * Calculate bounding box of a elliptic arc 
+   * Calculate bounding box of a elliptic-arc
    * arc is represented by f starting point,
    * rx, ry rays of ellipses, rot rotation of axe,
    * large and sweep flags and t end point
@@ -172,7 +172,7 @@
   };
 
   /**
-   * Calculate bounding box of a bezier curve 
+   * Calculate bounding box of a beziercurve
    * curve is represented by p0 starting point,
    * p1,p2 control points, p3 end point
    * @param {Number} x0
@@ -214,13 +214,9 @@
 
   /*
    * Private
-   */  
+   */
   function getInnerPointsOfCurve(x0, y0, x1, y1, x2, y2, x3, y3) {
-  	/*var argsString = _join.call(arguments);
-    if (boundsOfCurveCache[argsString]) {
-      return boundsOfCurveCache[argsString];
-    }*/
-    
+
     var sqrt = Math.sqrt,
         abs = Math.abs, tvalues = [ ],
         bounds = [[ ], [ ]],
@@ -266,10 +262,9 @@
       bounds[0][j] = (mt * mt * mt * x0) + (3 * mt * mt * t * x1) + (3 * mt * t * t * x2) + (t * t * t * x3);
       bounds[1][j] = (mt * mt * mt * y0) + (3 * mt * mt * t * y1) + (3 * mt * t * t * y2) + (t * t * t * y3);
     }
-    //boundsOfCurveCache[argsString] = bounds;
     return bounds;
   }
-  
+
   fabric.util.getBoundsOfCurve = getBoundsOfCurve;
 
 })();
