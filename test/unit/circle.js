@@ -103,7 +103,9 @@
       'visible':            true,
       'backgroundColor':    '',
       'clipTo':             null,
-      'radius':             0
+      'radius':             0,
+      'startAngle':         0,
+      'endAngle':           2 * Math.PI
     };
     ok(typeof circle.toObject == 'function');
     deepEqual(circle.toObject(), defaultProperties);
