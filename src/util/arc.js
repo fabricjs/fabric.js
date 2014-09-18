@@ -217,10 +217,10 @@
    * Private
    */  
   function getInnerPointsOfCurve(x0, y0, x1, y1, x2, y2, x3, y3) {
-  	var argsString = _join.call(arguments);
+  	/*var argsString = _join.call(arguments);
     if (boundsOfCurveCache[argsString]) {
       return boundsOfCurveCache[argsString];
-    }
+    }*/
     
     var sqrt = Math.sqrt,
         abs = Math.abs, tvalues = [ ],
@@ -276,7 +276,7 @@
       bounds[1][j] = y;
     }
 
-    boundsOfCurveCache[argsString] = bounds;
+    //boundsOfCurveCache[argsString] = bounds;
     return bounds;
   }
   
