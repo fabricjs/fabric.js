@@ -2,6 +2,7 @@
 
   var arcToSegmentsCache = { },
       segmentToBezierCache = { },
+      boundsOfCurveCache = { }
       _join = Array.prototype.join;
 
   /* Adapted from http://dxr.mozilla.org/mozilla-central/source/content/svg/content/src/nsSVGPathDataParser.cpp
@@ -139,17 +140,14 @@
 
   /**
    * Calculate bounding box of a elliptic-arc
-   * arc is represented by f starting point,
-   * rx, ry rays of ellipses, rot rotation of axe,
-   * large and sweep flags and t end point
-   * @param {Number} fx
+   * @param {Number} fx start point of arc
    * @param {Number} fy
-   * @param {Number} rx
-   * @param {Number} ry
-   * @param {Number} rot
-   * @param {Number} large
-   * @param {Number} sweep
-   * @param {Number} tx
+   * @param {Number} rx horizontal radius
+   * @param {Number} ry vertical radius
+   * @param {Number} rot angle of horizontal axe
+   * @param {Number} large 1 or 0, whatever the arc is the big or the small on the 2 points 
+   * @param {Number} sweep 1 or 0, 1 clockwise or counterclockwise direction
+   * @param {Number} tx end point of arc
    * @param {Number} ty
    */
   fabric.util.getBoundsOfArc = function(fx, fy, rx, ry, rot, large, sweep, tx, ty) {
@@ -173,56 +171,31 @@
 
   /**
    * Calculate bounding box of a beziercurve
-   * curve is represented by p0 starting point,
-   * p1,p2 control points, p3 end point
-   * @param {Number} x0
+   * @param {Number} x0 starting point
    * @param {Number} y0
-   * @param {Number} x1
+   * @param {Number} x1 first control point
    * @param {Number} y1
-   * @param {Number} x2
+   * @param {Number} x2 secondo control point
    * @param {Number} y2
-   * @param {Number} x3
+   * @param {Number} x3 end of beizer
    * @param {Number} y3
    */
   // taken from http://jsbin.com/ivomiq/56/edit  no credits available for that.
   function getBoundsOfCurve(x0, y0, x1, y1, x2, y2, x3, y3) {
-
-    var bounds = getInnerPointsOfCurve(x0, y0, x1, y1, x2, y2, x3, y3),
-        j = bounds[0].length, min = Math.min, max = Math.max;
-
-    bounds[0][j] = x0;
-    bounds[1][j] = y0;
-    bounds[0][j + 1] = x3;
-    bounds[1][j + 1] = y3;
-    /*while (j--) {
-      bounds[0][j] += x0;
-      bounds[1][j] += y0;
-    }*/
-
-    var result = [
-      {
-        x: min.apply(null, bounds[0]),
-        y: min.apply(null, bounds[1])
-      },
-      {
-        x: max.apply(null, bounds[0]),
-        y: max.apply(null, bounds[1])
-      }
-    ];
-    return result;
-  }
-
-  /*
-   * Private
-   */
-  function getInnerPointsOfCurve(x0, y0, x1, y1, x2, y2, x3, y3) {
-
-    var sqrt = Math.sqrt,
+    var argsString = _join.call(arguments);
+    if (boundsOfCurveCache[argsString]) {
+      return boundsOfCurveCache[argsString];
+    }
+    
+    var pow = Math.pow, sqrt = Math.sqrt,
+        min = Math.min, max = Math.max,
         abs = Math.abs, tvalues = [ ],
-        bounds = [[ ], [ ]],
-        a = -3 * x0 + 9 * x1 - 9 * x2 + 3 * x3,
-        b = 6 * x0 - 12 * x1 + 6 * x2,
-        c = 3 * x1 - 3 * x0, t, t1, t2, b2ac, sqrtb2ac;
+        bounds = [[ ], [ ]], points = [ ],
+        a, b, c, t, t1, t2, b2ac, sqrtb2ac;
+
+    b = 6 * x0 - 12 * x1 + 6 * x2;
+    a = -3 * x0 + 9 * x1 - 9 * x2 + 3 * x3;
+    c = 3 * x1 - 3 * x0;
 
     for (var i = 0; i < 2; ++i) {
       if (i > 0) {
@@ -255,15 +228,35 @@
         tvalues.push(t2);
       }
     }
-    var j = tvalues.length, mt;
-    while (j--) {
+
+    var x, y, j = tvalues.length, jlen = j, mt;
+    while(j--) {
       t = tvalues[j];
       mt = 1 - t;
-      bounds[0][j] = (mt * mt * mt * x0) + (3 * mt * mt * t * x1) + (3 * mt * t * t * x2) + (t * t * t * x3);
-      bounds[1][j] = (mt * mt * mt * y0) + (3 * mt * mt * t * y1) + (3 * mt * t * t * y2) + (t * t * t * y3);
+      x = (mt * mt * mt * x0) + (3 * mt * mt * t * x1) + (3 * mt * t * t * x2) + (t * t * t * x3);
+      bounds[0][j] = x;
+
+      y = (mt * mt * mt * y0) + (3 * mt * mt * t * y1) + (3 * mt * t * t * y2) + (t * t * t * y3);
+      bounds[1][j] = y;
     }
-    return bounds;
-  }
+
+    bounds[0][jlen] = x0;
+    bounds[1][jlen] = y0;
+    bounds[0][jlen + 1] = x3;
+    bounds[1][jlen + 1] = y3;
+    var result = [
+      {
+        x: min.apply(null, bounds[0]),
+        y: min.apply(null, bounds[1])
+      },
+      {
+        x: max.apply(null, bounds[0]),
+        y: max.apply(null, bounds[1])
+      }
+    ];  
+    boundsOfCurveCache[argsString] = result;
+    return result;
+  };
 
   fabric.util.getBoundsOfCurve = getBoundsOfCurve;
 
