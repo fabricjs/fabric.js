@@ -2,7 +2,7 @@
 
   var arcToSegmentsCache = { },
       segmentToBezierCache = { },
-      boundsOfCurveCache = { }
+      boundsOfCurveCache = { },
       _join = Array.prototype.join;
 
   /* Adapted from http://dxr.mozilla.org/mozilla-central/source/content/svg/content/src/nsSVGPathDataParser.cpp
@@ -187,10 +187,10 @@
       return boundsOfCurveCache[argsString];
     }
     
-    var pow = Math.pow, sqrt = Math.sqrt,
+    var sqrt = Math.sqrt,
         min = Math.min, max = Math.max,
         abs = Math.abs, tvalues = [ ],
-        bounds = [[ ], [ ]], points = [ ],
+        bounds = [[ ], [ ]],
         a, b, c, t, t1, t2, b2ac, sqrtb2ac;
 
     b = 6 * x0 - 12 * x1 + 6 * x2;
@@ -256,7 +256,7 @@
     ];  
     boundsOfCurveCache[argsString] = result;
     return result;
-  };
+  }
 
   fabric.util.getBoundsOfCurve = getBoundsOfCurve;
 
