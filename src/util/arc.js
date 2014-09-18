@@ -2,7 +2,6 @@
 
   var arcToSegmentsCache = { },
       segmentToBezierCache = { },
-      boundsOfCurveCache = { },
       _join = Array.prototype.join;
 
   /* Adapted from http://dxr.mozilla.org/mozilla-central/source/content/svg/content/src/nsSVGPathDataParser.cpp
@@ -225,15 +224,12 @@
     var sqrt = Math.sqrt,
         abs = Math.abs, tvalues = [ ],
         bounds = [[ ], [ ]],
-        a, b, c, t, t1, t2, b2ac, sqrtb2ac;
+        a = -3 * x0 + 9 * x1 - 9 * x2 + 3 * x3,
+        b = 6 * x0 - 12 * x1 + 6 * x2,
+        c = 3 * x1 - 3 * x0, t, t1, t2, b2ac, sqrtb2ac;
 
     for (var i = 0; i < 2; ++i) {
-      if (i === 0) {
-        b = 6 * x0 - 12 * x1 + 6 * x2;
-        a = -3 * x0 + 9 * x1 - 9 * x2 + 3 * x3;
-        c = 3 * x1 - 3 * x0;
-      }
-      else {
+      if (i > 0) {
         b = 6 * y0 - 12 * y1 + 6 * y2;
         a = -3 * y0 + 9 * y1 - 9 * y2 + 3 * y3;
         c = 3 * y1 - 3 * y0;
