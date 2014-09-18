@@ -312,6 +312,12 @@
     textPath: null,
 
     /**
+     * Distance along the fabric.Path in fabric.Text#textPath that the text should start at
+     * @type fabric.Path
+     */
+    textPathDistanceOffset: null,
+
+    /**
      * If fabric.Text#textPath exists, should letters rotate along the path or not
      * @type Boolean
      */
@@ -397,7 +403,7 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _renderViaNative: function(ctx) {
-      var textLines = this.text.split(this._reNewline);
+      var textLines = this._getTextLines();
 
       this._setTextStyles(ctx);
 
@@ -1655,17 +1661,92 @@
      */
     toSVG: function(reviver) {
       var markup = [ ],
-          textLines = this.text.split(this._reNewline),
+          textLines = this._getTextLines(),
           offsets = this._getSVGLeftTopOffsets(textLines),
           textAndBg = this._getSVGTextAndBg(offsets.lineTop, offsets.textLeft, textLines),
           shadowSpans = this._getSVGShadows(offsets.lineTop, textLines);
-
-      // move top offset by an ascent
+      // Move top offset by font ascent in case of Cufon.
       offsets.textTop += (this._fontAscent ? ((this._fontAscent / 5) * this.lineHeight) : 0);
-
+      // Adds a group element with a single child text object.
       this._wrapSVGTextAndBg(markup, textAndBg, shadowSpans, offsets);
-
       return reviver ? reviver(markup.join('')) : markup.join('');
+    },
+
+    /**
+     * Returns styles-string for svg-export (considers i-text).
+     * @return {String}
+     */
+    getSvgStyles: function() {
+      var fill = this.fill
+            ? (this.fill.toLive ? 'url(#SVGID_' + this.fill.id + ')' : this.fill)
+            : 'none',
+          fillRule = (this.fillRule === 'destination-over' ? 'evenodd' : this.fillRule),
+          stroke = this.stroke
+            ? (this.stroke.toLive ? 'url(#SVGID_' + this.stroke.id + ')' : this.stroke)
+            : 'none',
+          strokeWidth = this.strokeWidth ? this.strokeWidth : '0',
+          strokeDashArray = this.strokeDashArray ? this.strokeDashArray.join(' ') : '',
+          strokeLineCap = this.strokeLineCap ? this.strokeLineCap : 'butt',
+          strokeLineJoin = this.strokeLineJoin ? this.strokeLineJoin : 'miter',
+          strokeMiterLimit = this.strokeMiterLimit ? this.strokeMiterLimit : '4',
+          opacity = typeof this.opacity !== 'undefined' ? this.opacity : '1',
+          visibility = this.visible ? '' : ' visibility: hidden;',
+          filter = this.shadow && this.type !== 'text' && this.type !== 'i-text' ? 'filter: url(#SVGID_' + this.shadow.id + ');' : '';
+      return [
+        'stroke: ', stroke, '; ',
+        'stroke-width: ', strokeWidth, '; ',
+        'stroke-dasharray: ', strokeDashArray, '; ',
+        'stroke-linecap: ', strokeLineCap, '; ',
+        'stroke-linejoin: ', strokeLineJoin, '; ',
+        'stroke-miterlimit: ', strokeMiterLimit, '; ',
+        'fill: ', fill, '; ',
+        'fill-rule: ', fillRule, '; ',
+        'opacity: ', opacity, ';',
+        filter,
+        visibility
+      ].join('');
+    },
+
+    /**
+     * Returns transform-string for svg-export (considers existence of fabric.Text#textPath).
+     * @return {String}
+     */
+    getSvgTransform: function() {
+      if (this.group) return '';
+      
+      var hasTextPath = (!(this.textPath == null)) ? true : false,
+          toFixed = fabric.util.toFixed,
+          angle = this.getAngle(),
+          vpt = this.getViewportTransform(),
+          center = fabric.util.transformPoint(this.getCenterPoint(), vpt),
+
+          NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
+          // Do not provide a translation if the object has a text path or if the object is a fabric.PathGroup.
+          translatePart = (hasTextPath || this.type === 'path-group') ? '' : 'translate(' +
+                            toFixed(center.x, NUM_FRACTION_DIGITS) +
+                            ' ' +
+                            toFixed(center.y, NUM_FRACTION_DIGITS) +
+                          ')',
+
+          anglePart = angle !== 0
+            ? (' rotate(' + toFixed(angle, NUM_FRACTION_DIGITS) + ')')
+            : '',
+
+          scalePart = (this.scaleX === 1 && this.scaleY === 1 && vpt[0] === 1 && vpt[3] === 1)
+            ? '' :
+            (' scale(' +
+              toFixed(this.scaleX * vpt[0], NUM_FRACTION_DIGITS) +
+              ' ' +
+              toFixed(this.scaleY * vpt[3], NUM_FRACTION_DIGITS) +
+            ')'),
+          addTranslateX = this.type === 'path-group' ? this.width * vpt[0] : 0,
+          flipXPart = this.flipX ? ' matrix(-1 0 0 1 ' + addTranslateX + ' 0) ' : '',
+          addTranslateY = this.type === 'path-group' ? this.height * vpt[3] : 0,
+          flipYPart = this.flipY ? ' matrix(1 0 0 -1 0 ' + addTranslateY + ')' : '';
+
+      return [
+        translatePart, anglePart, scalePart, flipXPart, flipYPart
+      ].join('');
     },
 
     /**
@@ -1689,11 +1770,29 @@
     },
 
     /**
+     * Create a group element with a single child text element to represent the fabric.Text-like object.
      * @private
      */
     _wrapSVGTextAndBg: function(markup, textAndBg, shadowSpans, offsets) {
+      // If this object has a text path to which it should adhere, define the path.
+      var textPathId;
+      if (!(this.textPath == null)) {
+        textPathId = (this.textPath.id) ? this.textPath.id : "text-path";
+        markup.push(
+          '<defs>\n',
+            '<path id="' + textPathId + '" d="' + this.textPath.getSVGData() + '" />\n',
+          '</defs>\n'
+        );
+      }
+      var hasTextPathId = (!(textPathId == null)) ? true : false,
+          svgTransformValue = [this.getSvgTransform(), this.getSvgTransformMatrix()].join(''),
+          svgTransformAttribute = (svgTransformValue !== '') ? ' transform="' + svgTransformValue + '"' : '',
+          textLeft = (!hasTextPathId) ? offsets.textLeft : 0,
+          textPathStartOffsetPercent = (!hasTextPathId || this.textPathDistanceOffset == null) ? 0 : (100 * this.textPathDistanceOffset / this.textPath.pathLength()) || 0;
+      // Push the group element with a single child text element.
       markup.push(
-        '<g transform="', this.getSvgTransform(), this.getSvgTransformMatrix(), '">\n',
+        // Rewrite svg transform to ignore y when path is available.
+        '<g', svgTransformAttribute, '>\n',
           textAndBg.textBgRects.join(''),
           '<text ',
             (this.fontFamily ? 'font-family="' + this.fontFamily.replace(/"/g,'\'') + '" ': ''),
@@ -1703,53 +1802,78 @@
             (this.textDecoration ? 'text-decoration="' + this.textDecoration + '" ': ''),
             'style="', this.getSvgStyles(), '" ',
             /* svg starts from left/bottom corner so we normalize height */
-            'transform="translate(', toFixed(offsets.textLeft, 2), ' ', toFixed(offsets.textTop, 2), ')">',
-            shadowSpans.join(''),
-            textAndBg.textSpans.join(''),
+            // Rewrite text x transform to negate the group x transform when path available.
+            'transform="translate(', fabric.util.toFixed(textLeft, 2), ' ', fabric.util.toFixed(offsets.textTop, 2), ')">\n',
+            (hasTextPathId) ? '<textPath xlink:href="#' + textPathId + '" startOffset="' + textPathStartOffsetPercent + '%">\n' : '',
+              // Add shadow tspans.
+              shadowSpans.join(''),
+              // Add text and background tspans.
+              textAndBg.textSpans.join(''),
+            (hasTextPathId) ? '</textPath>\n' : '',
           '</text>\n',
         '</g>\n'
       );
     },
 
     /**
+     * Get an copy of the text with an offset and a reduced fill-opacity to act as a shadow.
      * @private
      * @param {Number} lineHeight
      * @param {Array} textLines Array of all text lines
      * @return {Array}
      */
     _getSVGShadows: function(lineHeight, textLines) {
+      // In IE 7 & 8, empty tspans are completely ignored. Using a lineTopOffsetMultiplier prevents empty tspans.
       var shadowSpans = [],
           i, len,
           lineTopOffsetMultiplier = 1;
-
+      // Skip this step if there isn't a shadow specified or the object hasn't been rendered.
       if (!this.shadow || !this._boundaries) {
         return shadowSpans;
       }
-
+      // Iterate the text lines, pushing a tspan with a reduced fill-opacity to act as a makeshift shadow.
       for (i = 0, len = textLines.length; i < len; i++) {
         if (textLines[i] !== '') {
-          var lineLeftOffset = (this._boundaries && this._boundaries[i]) ? this._boundaries[i].left : 0;
-          shadowSpans.push(
-            '<tspan x="',
-            toFixed((lineLeftOffset + lineTopOffsetMultiplier) + this.shadow.offsetX, 2),
-            ((i === 0 || this.useNative) ? '" y' : '" dy'), '="',
-            toFixed(this.useNative
-              ? ((lineHeight * i) - this.height / 2 + this.shadow.offsetY)
-              : (lineHeight + (i === 0 ? this.shadow.offsetY : 0)), 2),
-            '" ',
-            this._getFillAttributes(this.shadow.color), '>',
-            fabric.util.string.escapeXml(textLines[i]),
-          '</tspan>');
+          this._setSVGTextLineShadow(textLines[i], i, shadowSpans, lineHeight, lineTopOffsetMultiplier);
           lineTopOffsetMultiplier = 1;
         }
         else {
-          // in some environments (e.g. IE 7 & 8) empty tspans are completely ignored, using a lineTopOffsetMultiplier
-          // prevents empty tspans
           lineTopOffsetMultiplier++;
         }
       }
-
       return shadowSpans;
+    },
+
+    /**
+     * Push the tspan element(s) that will represent the shadow for the text line.
+     * @private
+     * @param {String} textLine Line of text to render.
+     * @param {Number} lineIndex Line number being rendered.
+     * @param {Array} shadowSpans Array to push the tspan elements into.
+     * @param {Number} lineHeight Height of line being rendered.
+     * @param {Number} lineTopOffsetMultiplier Misnamed adjustment to keep tspan considered non-trivial.
+     */
+    _setSVGTextLineShadow: function(textLine, lineIndex, shadowSpans, lineHeight, lineTopOffsetMultiplier) {
+      var lineLeftOffset = (this._boundaries && this._boundaries[lineIndex]) ? (this._boundaries[lineIndex].left - lineTopOffsetMultiplier) : 0,
+          xValue = (lineLeftOffset + lineTopOffsetMultiplier) + this.shadow.offsetX,
+          yOrDeltaYAttributeName = ((lineIndex === 0 || this.useNative) ? 'y' : 'dy'),
+          yOrDeltaYValue = this.useNative
+          ? ((lineHeight * lineIndex) - this.height / 2 + this.shadow.offsetY)
+          : (lineHeight + (lineIndex === 0 ? this.shadow.offsetY : 0)),
+          shadowFillColor = (this.shadow.color && typeof this.shadow.color === 'string') ? new fabric.Color(this.shadow.color) : '';
+      // Push the tspan element.
+      shadowSpans.push(
+        '<tspan',
+          // x="x-value"
+          ' ', 'x="', fabric.util.toFixed(xValue, 2), '"',
+          // y="y-value" (or) dy="dy-value"
+          ' ', yOrDeltaYAttributeName, '="', fabric.util.toFixed(yOrDeltaYValue, 2), '"',
+          // Attributes, may include: stroke-opacity, fill-opacity, opacity, and fill.
+          ' ', 'stroke-opacity="' + shadowFillColor.getAlpha() + '"', ' ', this._getFillAttributes(this.shadow.color), '>',
+          // Escaped text for given line.
+          fabric.util.string.escapeXml(textLine),
+        '</tspan>'
+      );
     },
 
     /**
@@ -1846,9 +1970,7 @@
     },
 
     /**
-     * Adobe Illustrator (at least CS5) is unable to render rgba()-based fill values
-     * we work around it by "moving" alpha channel into opacity attribute and setting fill's alpha to 1
-     *
+     * Adobe Illustrator (at least CS5) is unable to render rgba()-based fill values. Work around this by "moving" alpha channel into an "opacity" attribute and setting the "fill" attribute to a solid "rgb" (as opposed to "rgba") color. Firefox expects this value to be in the "fill-opacity" attribute
      * @private
      * @param {Any} value
      * @return {String}
@@ -1858,7 +1980,7 @@
       if (!fillColor || !fillColor.getSource() || fillColor.getAlpha() === 1) {
         return 'fill="' + value + '"';
       }
-      return 'opacity="' + fillColor.getAlpha() + '" fill="' + fillColor.setAlpha(1).toRgb() + '"';
+      return 'fill-opacity="' + fillColor.getAlpha() + '" opacity="' + fillColor.getAlpha() + '" fill="' + fillColor.setAlpha(1).toRgb() + '"';
     },
     /* _TO_SVG_END_ */
 
