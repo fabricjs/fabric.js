@@ -187,27 +187,56 @@
    */
   // taken from http://jsbin.com/ivomiq/56/edit  no credits available for that.
   function getBoundsOfCurve(x0, y0, x1, y1, x2, y2, x3, y3) {
-    var argsString = _join.call(arguments);
+
+    var bounds = getInnerPointsOfCurve(x1 - x0, y1 - y0, x2 - x0, y2 - y0, x3 - x0, y3 - y0),
+        j = bounds[0].length, min = Math.min, max = Math.max;
+
+    bounds[0][j] = x0;
+    bounds[1][j] = y0;
+    bounds[0][j + 1] = x3;
+    bounds[1][j + 1] = y3;
+    while (j--) {
+      bounds[0][j] += x0;
+      bounds[1][j] += y0;
+    }
+
+    var result = [
+      {
+        x: min.apply(null, bounds[0]),
+        y: min.apply(null, bounds[1])
+      },
+      {
+        x: max.apply(null, bounds[0]),
+        y: max.apply(null, bounds[1])
+      }
+    ];
+    return result;
+  }
+
+  /*
+   * Private
+   */  
+  function getInnerPointsOfCurve(x1, y1, x2, y2, x3, y3) {
+  	var argsString = _join.call(arguments);
     if (boundsOfCurveCache[argsString]) {
       return boundsOfCurveCache[argsString];
     }
     
     var sqrt = Math.sqrt,
-        min = Math.min, max = Math.max,
         abs = Math.abs, tvalues = [ ],
         bounds = [[ ], [ ]],
         a, b, c, t, t1, t2, b2ac, sqrtb2ac;
 
     for (var i = 0; i < 2; ++i) {
       if (i === 0) {
-        b = 6 * x0 - 12 * x1 + 6 * x2;
-        a = -3 * x0 + 9 * x1 - 9 * x2 + 3 * x3;
-        c = 3 * x1 - 3 * x0;
+        b = - 12 * x1 + 6 * x2;
+        a = 9 * x1 - 9 * x2 + 3 * x3;
+        c = 3 * x1;
       }
       else {
-        b = 6 * y0 - 12 * y1 + 6 * y2;
-        a = -3 * y0 + 9 * y1 - 9 * y2 + 3 * y3;
-        c = 3 * y1 - 3 * y0;
+        b = - 12 * y1 + 6 * y2;
+        a = 9 * y1 - 9 * y2 + 3 * y3;
+        c = 3 * y1;
       }
 
       if (abs(a) < 1e-12) {
@@ -235,33 +264,20 @@
       }
     }
 
-    var x, y, j = tvalues.length, jlen = j, mt;
+    var x, y, j = tvalues.length, mt;
     while (j--) {
       t = tvalues[j];
       mt = 1 - t;
-      x = (mt * mt * mt * x0) + (3 * mt * mt * t * x1) + (3 * mt * t * t * x2) + (t * t * t * x3);
+
+      x = 3 * mt * mt * t * x1 + 3 * mt * t * t * x2 + t * t * t * x3;
       bounds[0][j] = x;
 
-      y = (mt * mt * mt * y0) + (3 * mt * mt * t * y1) + (3 * mt * t * t * y2) + (t * t * t * y3);
+      y = 3 * mt * mt * t * y1 + 3 * mt * t * t * y2 + t * t * t * y3;
       bounds[1][j] = y;
     }
 
-    bounds[0][jlen] = x0;
-    bounds[1][jlen] = y0;
-    bounds[0][jlen + 1] = x3;
-    bounds[1][jlen + 1] = y3;
-    var result = [
-      {
-        x: min.apply(null, bounds[0]),
-        y: min.apply(null, bounds[1])
-      },
-      {
-        x: max.apply(null, bounds[0]),
-        y: max.apply(null, bounds[1])
-      }
-    ];  
-    boundsOfCurveCache[argsString] = result;
-    return result;
+    boundsOfCurveCache[argsString] = bounds;
+    return bounds;
   }
   
   fabric.util.getBoundsOfCurve = getBoundsOfCurve;
