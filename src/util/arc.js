@@ -259,19 +259,13 @@
         tvalues.push(t2);
       }
     }
-
-    var x, y, j = tvalues.length, mt;
+    var j = tvalues.length, mt;
     while (j--) {
       t = tvalues[j];
       mt = 1 - t;
-
-      x = (mt * mt * mt * x0) + (3 * mt * mt * t * x1) + (3 * mt * t * t * x2) + (t * t * t * x3);
-      bounds[0][j] = x;
-
-      y = (mt * mt * mt * y0) + (3 * mt * mt * t * y1) + (3 * mt * t * t * y2) + (t * t * t * y3);
-      bounds[1][j] = y;
+      bounds[0][j] = (mt * mt * mt * x0) + (3 * mt * mt * t * x1) + (3 * mt * t * t * x2) + (t * t * t * x3);
+      bounds[1][j] = (mt * mt * mt * y0) + (3 * mt * mt * t * y1) + (3 * mt * t * t * y2) + (t * t * t * y3);
     }
-
     //boundsOfCurveCache[argsString] = bounds;
     return bounds;
   }
