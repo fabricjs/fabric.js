@@ -145,7 +145,7 @@
    * @param {Number} rx horizontal radius
    * @param {Number} ry vertical radius
    * @param {Number} rot angle of horizontal axe
-   * @param {Number} large 1 or 0, whatever the arc is the big or the small on the 2 points 
+   * @param {Number} large 1 or 0, whatever the arc is the big or the small on the 2 points
    * @param {Number} sweep 1 or 0, 1 clockwise or counterclockwise direction
    * @param {Number} tx end point of arc
    * @param {Number} ty
@@ -186,7 +186,7 @@
     if (boundsOfCurveCache[argsString]) {
       return boundsOfCurveCache[argsString];
     }
-    
+
     var sqrt = Math.sqrt,
         min = Math.min, max = Math.max,
         abs = Math.abs, tvalues = [ ],
@@ -230,7 +230,7 @@
     }
 
     var x, y, j = tvalues.length, jlen = j, mt;
-    while(j--) {
+    while (j--) {
       t = tvalues[j];
       mt = 1 - t;
       x = (mt * mt * mt * x0) + (3 * mt * mt * t * x1) + (3 * mt * t * t * x2) + (t * t * t * x3);
@@ -253,7 +253,7 @@
         x: max.apply(null, bounds[0]),
         y: max.apply(null, bounds[1])
       }
-    ];  
+    ];
     boundsOfCurveCache[argsString] = result;
     return result;
   }
