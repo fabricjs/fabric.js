@@ -38,10 +38,10 @@
                       '["c", 0.877, -9.979, 2.893, -12.905, 4.942, -15.621], ["C", 17.878, 21.775, 18.713, 17.397, 18.511, '+
                       '13.99], ["z", null]]}';
 
-  var PATH_DATALESS_JSON = '{"objects":[{"type":"path","originX":"left","originY":"top","left":200,"top":200,"width":200,"height":200,"fill":"rgb(0,0,0)",'+
+  var PATH_DATALESS_JSON = '{"objects":[{"type":"path","originX":"left","originY":"top","left":100,"top":100,"width":200,"height":200,"fill":"rgb(0,0,0)",'+
                            '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,'+
                            '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,'+
-                           '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","path":"http://example.com/","pathOffset":{"x":100,"y":100}}],"background":""}';
+                           '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","path":"http://example.com/","pathOffset":{"x":200,"y":200}}],"background":""}';
 
   var RECT_JSON = '{"objects":[{"type":"rect","originX":"left","originY":"top","left":0,"top":0,"width":10,"height":10,"fill":"rgb(0,0,0)",'+
                   '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,'+
@@ -381,8 +381,8 @@
 
       equal(obj.get('left'), 268);
       equal(obj.get('top'), 266);
-      equal(obj.get('width'), 51);
-      equal(obj.get('height'), 49);
+      equal(obj.get('width'), 49.803999999999995);
+      equal(obj.get('height'), 48.027);
       equal(obj.get('fill'), 'rgb(0,0,0)');
       equal(obj.get('stroke'), null);
       equal(obj.get('strokeWidth'), 1);
@@ -409,8 +409,8 @@
 
       equal(obj.get('left'), 268);
       equal(obj.get('top'), 266);
-      equal(obj.get('width'), 51);
-      equal(obj.get('height'), 49);
+      equal(obj.get('width'), 49.803999999999995);
+      equal(obj.get('height'), 48.027);
       equal(obj.get('fill'), 'rgb(0,0,0)');
       equal(obj.get('stroke'), null);
       equal(obj.get('strokeWidth'), 1);
@@ -445,8 +445,8 @@
 
       equal(obj.get('left'), 268);
       equal(obj.get('top'), 266);
-      equal(obj.get('width'), 51);
-      equal(obj.get('height'), 49);
+      equal(obj.get('width'), 49.803999999999995);
+      equal(obj.get('height'), 48.027);
       equal(obj.get('fill'), 'rgb(0,0,0)');
       equal(obj.get('stroke'), null);
       equal(obj.get('strokeWidth'), 1);
