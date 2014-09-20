@@ -44,9 +44,9 @@
         stroke: 'strokeOpacity',
         fill:   'fillOpacity'
       };
-      
-      fabric.cssRules = { };
-      fabric.gradientDefs = { };
+
+  fabric.cssRules = { };
+  fabric.gradientDefs = { };
 
   function normalizeAttr(attr) {
     // transform attribute names
@@ -509,7 +509,7 @@
       }
       var startTime = new Date(),
           svgUid =  fabric.Object.__uid++;
-          
+
       parseUseDirectives(doc);
       /* http://www.w3.org/TR/SVG/struct.html#SVGElementWidthAttribute
       *  as per spec, width and height attributes are to be considered
@@ -699,7 +699,7 @@
 
       var value,
           parentAttributes = { };
-      
+
       if (typeof svgUid === 'undefined') {
         svgUid = element.getAttribute('svgUid');
       }
