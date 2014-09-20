@@ -385,7 +385,7 @@
     }
 
     fabric.cssRules[svgUid] = fabric.getCSSRules(doc);
-    deepEqual(fabric.cssRules, expectedObject);
+    deepEqual(fabric.cssRules[svgUid], expectedObject);
     
     var elPolygon = fabric.document.createElement('polygon'),
         expectedStyle = {
