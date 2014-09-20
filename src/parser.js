@@ -563,7 +563,8 @@
         width: widthAttr ? widthAttr : viewBoxWidth,
         height: heightAttr ? heightAttr : viewBoxHeight,
         widthAttr: widthAttr,
-        heightAttr: heightAttr
+        heightAttr: heightAttr,
+        svgUid: svgUid
       };
 
       fabric.gradientDefs[svgUid] = fabric.getGradientDefs(doc);
@@ -575,7 +576,7 @@
         if (callback) {
           callback(instances, options);
         }
-      }, clone(options), reviver, svgUid);
+      }, clone(options), reviver);
     };
   })();
 
@@ -736,8 +737,8 @@
      * @param {Object} [options] Options object
      * @param {Function} [reviver] Method for further parsing of SVG elements, called after each fabric object created.
      */
-    parseElements: function(elements, callback, options, reviver, svgUid) {
-      new fabric.ElementsParser(elements, callback, options, reviver, svgUid).parse();
+    parseElements: function(elements, callback, options, reviver) {
+      new fabric.ElementsParser(elements, callback, options, reviver).parse();
     },
 
     /**
