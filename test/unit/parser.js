@@ -364,7 +364,8 @@
         styleElement = doc.createElement('style');
         styleElement.textContent = 'g polygon.cls, rect {fill:#FF0000; stroke:#000000;stroke-width:0.25px;}\
         polygon.cls {fill:none;stroke:#0000FF;}',
-        doc.body.appendChild(styleElement);
+        doc.body.appendChild(styleElement),
+        svgUid =  fabric.Object.__uid++;
 
     var expectedObject = {
       'g polygon.cls': {
@@ -383,7 +384,7 @@
       }
     }
 
-    fabric.cssRules = fabric.getCSSRules(doc);
+    fabric.cssRules[svgUid] = fabric.getCSSRules(doc);
     deepEqual(fabric.cssRules, expectedObject);
     
     var elPolygon = fabric.document.createElement('polygon'),
@@ -394,6 +395,7 @@
 
     elPolygon.setAttribute('points', '10,12 20,22');
     elPolygon.setAttribute('class', 'cls');
+    elPolygon.setAttribute('svgUid', svgUid);
 
     var style = fabric.parseAttributes(elPolygon, [ ]);
     deepEqual(style, expectedStyle);
