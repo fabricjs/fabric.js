@@ -365,7 +365,7 @@
         styleElement.textContent = 'g polygon.cls, rect {fill:#FF0000; stroke:#000000;stroke-width:0.25px;}\
         polygon.cls {fill:none;stroke:#0000FF;}',
         doc.body.appendChild(styleElement),
-        svgUid =  fabric.Object.__uid++;
+        svgUid =  'uniqueId';
 
     var expectedObject = {
       'g polygon.cls': {
