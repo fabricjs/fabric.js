@@ -1,9 +1,9 @@
-fabric.ElementsParser = function(elements, callback, options, reviver, svgUid) {
+fabric.ElementsParser = function(elements, callback, options, reviver) {
   this.elements = elements;
   this.callback = callback;
   this.options = options;
   this.reviver = reviver;
-  this.svgUid = svgUid;
+  this.svgUid = options.svgUid;
 };
 
 fabric.ElementsParser.prototype.parse = function() {
