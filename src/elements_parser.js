@@ -3,7 +3,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver) {
   this.callback = callback;
   this.options = options;
   this.reviver = reviver;
-  this.svgUid = options.svgUid;
+  this.svgUid = options.svgUid || 0;
 };
 
 fabric.ElementsParser.prototype.parse = function() {
