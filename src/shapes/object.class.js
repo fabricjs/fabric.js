@@ -461,7 +461,14 @@
      * @type String
      * @default
      */
-    fillRule:                 'source-over',
+    fillRule:                 'nonzero',
+
+    /**
+     * Composite rule used for canvas globalCompositeOperation
+     * @type String
+     * @default
+     */
+    compositeRule:            'source-over',
 
     /**
      * Background color of an object. Only works with text objects at the moment.
@@ -674,7 +681,7 @@
     stateProperties:  (
       'top left width height scaleX scaleY flipX flipY originX originY transformMatrix ' +
       'stroke strokeWidth strokeDashArray strokeLineCap strokeLineJoin strokeMiterLimit ' +
-      'angle opacity fill fillRule shadow clipTo visible backgroundColor'
+      'angle opacity fill fillRule compositeRule shadow clipTo visible backgroundColor'
     ).split(' '),
 
     /**
@@ -788,7 +795,9 @@
             shadow:             (this.shadow && this.shadow.toObject) ? this.shadow.toObject() : this.shadow,
             visible:            this.visible,
             clipTo:             this.clipTo && String(this.clipTo),
-            backgroundColor:    this.backgroundColor
+            backgroundColor:    this.backgroundColor,
+            fillRule:           this.fillRule,
+            compositeRule:      this.compositeRule
           };
 
       if (!this.includeDefaultValues) {
@@ -959,7 +968,7 @@
       ctx.save();
 
       //setup fill rule for current object
-      this._setupFillRule(ctx);
+      this._setupCompositeRule(ctx);
 
       this._transform(ctx, noTransform);
       this._setStrokeStyles(ctx);
@@ -977,7 +986,7 @@
       this._render(ctx, noTransform);
       this.clipTo && ctx.restore();
       this._removeShadow(ctx);
-      this._restoreFillRule(ctx);
+      this._restoreCompositeRule(ctx);
 
       ctx.restore();
     },
@@ -1099,7 +1108,7 @@
           -this.width / 2 + this.fill.offsetX || 0,
           -this.height / 2 + this.fill.offsetY || 0);
       }
-      if (this.fillRule === 'destination-over') {
+      if (this.fillRule === 'evenodd') {
         ctx.fill('evenodd');
       }
       else {
@@ -1476,13 +1485,13 @@
 
     /**
      * Sets canvas globalCompositeOperation for specific object
-     * custom composition operation for the particular object can be specifed using fillRule property
+     * custom composition operation for the particular object can be specifed using compositeRule property
      * @param {CanvasRenderingContext2D} ctx Rendering canvas context
      */
-    _setupFillRule: function (ctx) {
-      if (this.fillRule) {
-        this._prevFillRule = ctx.globalCompositeOperation;
-        ctx.globalCompositeOperation = this.fillRule;
+    _setupCompositeRule: function (ctx) {
+      if (this.compositeRule) {
+        this._prevCompositeRule = ctx.globalCompositeOperation;
+        ctx.globalCompositeOperation = this.compositeRule;
       }
     },
 
@@ -1490,9 +1499,9 @@
      * Restores previously saved canvas globalCompositeOperation after obeject rendering
      * @param {CanvasRenderingContext2D} ctx Rendering canvas context
      */
-    _restoreFillRule: function (ctx) {
-      if (this.fillRule && this._prevFillRule) {
-        ctx.globalCompositeOperation = this._prevFillRule;
+    _restoreCompositeRule: function (ctx) {
+      if (this.compositeRule && this._prevCompositeRule) {
+        ctx.globalCompositeOperation = this._prevCompositeRule;
       }
     }
   });
