@@ -106,7 +106,13 @@
       ctx.beginPath();
       ctx.save();
       ctx.transform(1, 0, 0, this.ry/this.rx, 0, 0);
-      ctx.arc(noTransform ? this.left + this.rx : 0, noTransform ? (this.top + this.ry) * this.rx/this.ry : 0, this.rx, 0, piBy2, false);
+      ctx.arc(
+        noTransform ? this.left + this.rx : 0,
+        noTransform ? (this.top + this.ry) * this.rx/this.ry : 0,
+        this.rx,
+        0,
+        piBy2,
+        false);
       ctx.restore();
       this._renderFill(ctx);
       this._renderStroke(ctx);

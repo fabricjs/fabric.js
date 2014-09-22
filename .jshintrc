@@ -34,9 +34,7 @@
   "unused":     true,
 
   "maxdepth":       4,
-  "maxstatements":  45
-
+  "maxstatements":  45,
   // "maxparams":      4,
-  // "maxcomplexity":  7,
-  // "maxlen":         120
+  // "maxcomplexity":  7
 }

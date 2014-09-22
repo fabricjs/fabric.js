@@ -44,7 +44,7 @@
       }
 
       if (color === 'transparent') {
-        this.setSource([255,255,255,0]);
+        this.setSource([255, 255, 255, 0]);
         return;
       }
 

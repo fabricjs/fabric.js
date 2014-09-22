@@ -462,7 +462,14 @@
     while (doc.firstChild != null) {
       el.appendChild(doc.firstChild);
     }
-    el.setAttribute('transform','matrix(' + matrix[0] + ' ' + matrix[1] + ' ' + matrix[2] + ' ' + matrix[3] + ' ' + matrix[4] + ' ' + matrix[5] + ')');
+    el.setAttribute('transform',
+      'matrix(' + matrix[0] + ' ' +
+                  matrix[1] + ' ' +
+                  matrix[2] + ' ' +
+                  matrix[3] + ' ' +
+                  matrix[4] + ' ' +
+                  matrix[5] + ')');
+
     doc.appendChild(el);
   }
 
@@ -834,7 +841,7 @@
           for (var i = 0, len = propertyValuePairs.length; i < len; i++) {
             var pair = propertyValuePairs[i].split(/\s*:\s*/),
                 property = normalizeAttr(pair[0]),
-                value = normalizeValue(property,pair[1],pair[0]);
+                value = normalizeValue(property, pair[1], pair[0]);
             ruleObj[property] = value;
           }
           rule = match[1];
@@ -878,7 +885,7 @@
           xml = new ActiveXObject('Microsoft.XMLDOM');
           xml.async = 'false';
           //IE chokes on DOCTYPE
-          xml.loadXML(r.responseText.replace(/<!DOCTYPE[\s\S]*?(\[[\s\S]*\])*?>/i,''));
+          xml.loadXML(r.responseText.replace(/<!DOCTYPE[\s\S]*?(\[[\s\S]*\])*?>/i, ''));
         }
         if (!xml || !xml.documentElement) {
           return;
@@ -913,8 +920,8 @@
       else if (fabric.window.ActiveXObject) {
         doc = new ActiveXObject('Microsoft.XMLDOM');
         doc.async = 'false';
-        //IE chokes on DOCTYPE
-        doc.loadXML(string.replace(/<!DOCTYPE[\s\S]*?(\[[\s\S]*\])*?>/i,''));
+        // IE chokes on DOCTYPE
+        doc.loadXML(string.replace(/<!DOCTYPE[\s\S]*?(\[[\s\S]*\])*?>/i, ''));
       }
 
       fabric.parseSVGDocument(doc.documentElement, function (results, options) {
