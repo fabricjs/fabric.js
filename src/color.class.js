@@ -313,7 +313,7 @@
    * @param {Number} t
    * @return {Number}
    */
-  function hue2rgb(p, q, t){
+  function hue2rgb(p, q, t) {
     if (t < 0) {
       t += 1;
     }

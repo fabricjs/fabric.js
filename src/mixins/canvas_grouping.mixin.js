@@ -1,4 +1,4 @@
-(function(){
+(function() {
 
   var min = Math.min,
       max = Math.max;

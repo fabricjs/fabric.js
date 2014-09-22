@@ -13,7 +13,9 @@
     "requireCapitalizedConstructors": true,
     "requireDotNotation": true,
     "requireMultipleVarDecl": true,
-
+    "requireSpacesInFunction": {
+      "beforeOpeningCurlyBrace": true
+    },
 
     "disallowEmptyBlocks": true,
     "disallowQuotedKeysInObjects": "allButReserved",

@@ -1,4 +1,4 @@
-(function(){
+(function() {
 
   var cursorOffset = {
     mt: 0, // n
