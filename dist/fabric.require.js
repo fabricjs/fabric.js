@@ -8715,7 +8715,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       }
       else {
         boundsWidth = bounds.width;
-        boundsHeight= bounds.height;
+        boundsHeight = bounds.height;
       }
 
       this.calcOffset();

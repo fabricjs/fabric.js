@@ -847,7 +847,7 @@
       }
       else {
         boundsWidth = bounds.width;
-        boundsHeight= bounds.height;
+        boundsHeight = bounds.height;
       }
 
       this.calcOffset();
