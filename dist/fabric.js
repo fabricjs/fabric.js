@@ -1028,7 +1028,7 @@ fabric.Collection = {
    * @param {Number} rx horizontal radius
    * @param {Number} ry vertical radius
    * @param {Number} rot angle of horizontal axe
-   * @param {Number} large 1 or 0, whatever the arc is the big or the small on the 2 points 
+   * @param {Number} large 1 or 0, whatever the arc is the big or the small on the 2 points
    * @param {Number} sweep 1 or 0, 1 clockwise or counterclockwise direction
    * @param {Number} tx end point of arc
    * @param {Number} ty
@@ -1069,7 +1069,7 @@ fabric.Collection = {
     if (boundsOfCurveCache[argsString]) {
       return boundsOfCurveCache[argsString];
     }
-    
+
     var sqrt = Math.sqrt,
         min = Math.min, max = Math.max,
         abs = Math.abs, tvalues = [ ],
@@ -1113,7 +1113,7 @@ fabric.Collection = {
     }
 
     var x, y, j = tvalues.length, jlen = j, mt;
-    while(j--) {
+    while (j--) {
       t = tvalues[j];
       mt = 1 - t;
       x = (mt * mt * mt * x0) + (3 * mt * mt * t * x1) + (3 * mt * t * t * x2) + (t * t * t * x3);
@@ -1136,7 +1136,7 @@ fabric.Collection = {
         x: max.apply(null, bounds[0]),
         y: max.apply(null, bounds[1])
       }
-    ];  
+    ];
     boundsOfCurveCache[argsString] = result;
     return result;
   }
@@ -2859,6 +2859,9 @@ if (typeof console !== 'undefined') {
         fill:   'fillOpacity'
       };
 
+  fabric.cssRules = { };
+  fabric.gradientDefs = { };
+
   function normalizeAttr(attr) {
     // transform attribute names
     if (attr in attributesMap) {
@@ -3163,13 +3166,12 @@ if (typeof console !== 'undefined') {
   /**
    * @private
    */
-  function getGlobalStylesForElement(element) {
+  function getGlobalStylesForElement(element, svgUid) {
     var styles = { };
-
-    for (var rule in fabric.cssRules) {
+    for (var rule in fabric.cssRules[svgUid]) {
       if (elementMatchesRule(element, rule.split(' '))) {
-        for (var property in fabric.cssRules[rule]) {
-          styles[property] = fabric.cssRules[rule][property];
+        for (var property in fabric.cssRules[svgUid][rule]) {
+          styles[property] = fabric.cssRules[svgUid][rule][property];
         }
       }
     }
@@ -3319,7 +3321,8 @@ if (typeof console !== 'undefined') {
       if (!doc) {
         return;
       }
-      var startTime = new Date();
+      var startTime = new Date(),
+          svgUid =  fabric.Object.__uid++;
 
       parseUseDirectives(doc);
       /* http://www.w3.org/TR/SVG/struct.html#SVGElementWidthAttribute
@@ -3374,11 +3377,12 @@ if (typeof console !== 'undefined') {
         width: widthAttr ? widthAttr : viewBoxWidth,
         height: heightAttr ? heightAttr : viewBoxHeight,
         widthAttr: widthAttr,
-        heightAttr: heightAttr
+        heightAttr: heightAttr,
+        svgUid: svgUid
       };
 
-      fabric.gradientDefs = fabric.getGradientDefs(doc);
-      fabric.cssRules = fabric.getCSSRules(doc);
+      fabric.gradientDefs[svgUid] = fabric.getGradientDefs(doc);
+      fabric.cssRules[svgUid] = fabric.getCSSRules(doc);
       // Precedence of rules:   style > class > attribute
 
       fabric.parseElements(elements, function(instances) {
@@ -3502,7 +3506,7 @@ if (typeof console !== 'undefined') {
      * @param {Array} attributes Array of attributes to parse
      * @return {Object} object containing parsed attributes' names/values
      */
-    parseAttributes: function(element, attributes) {
+    parseAttributes: function(element, attributes, svgUid) {
 
       if (!element) {
         return;
@@ -3511,9 +3515,12 @@ if (typeof console !== 'undefined') {
       var value,
           parentAttributes = { };
 
+      if (typeof svgUid === 'undefined') {
+        svgUid = element.getAttribute('svgUid');
+      }
       // if there's a parent container (`g` or `a` or `symbol` node), parse its attributes recursively upwards
       if (element.parentNode && /^symbol|[g|a]$/i.test(element.parentNode.nodeName)) {
-        parentAttributes = fabric.parseAttributes(element.parentNode, attributes);
+        parentAttributes = fabric.parseAttributes(element.parentNode, attributes, svgUid);
       }
 
       var ownAttributes = attributes.reduce(function(memo, attr) {
@@ -3530,7 +3537,7 @@ if (typeof console !== 'undefined') {
       // add values parsed from style, which take precedence over attributes
       // (see: http://www.w3.org/TR/SVG/styling.html#UsingPresentationAttributes)
       ownAttributes = extend(ownAttributes,
-        extend(getGlobalStylesForElement(element), fabric.parseStyleAttribute(element)));
+        extend(getGlobalStylesForElement(element, svgUid), fabric.parseStyleAttribute(element)));
 
       return _setStrokeFillOpacity(extend(parentAttributes, ownAttributes));
     },
@@ -3790,6 +3797,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver) {
   this.callback = callback;
   this.options = options;
   this.reviver = reviver;
+  this.svgUid = (options && options.svgUid) || 0;
 };
 
 fabric.ElementsParser.prototype.parse = function() {
@@ -3801,6 +3809,7 @@ fabric.ElementsParser.prototype.parse = function() {
 
 fabric.ElementsParser.prototype.createObjects = function() {
   for (var i = 0, len = this.elements.length; i < len; i++) {
+    this.elements[i].setAttribute('svgUid', this.svgUid);
     (function(_this, i) {
       setTimeout(function() {
         _this.createObject(_this.elements[i], i);
@@ -3856,9 +3865,9 @@ fabric.ElementsParser.prototype.resolveGradient = function(obj, property) {
     return;
   }
   var gradientId = instanceFillValue.slice(5, instanceFillValue.length - 1);
-  if (fabric.gradientDefs[gradientId]) {
+  if (fabric.gradientDefs[this.svgUid][gradientId]) {
     obj.set(property,
-      fabric.Gradient.fromElement(fabric.gradientDefs[gradientId], obj));
+      fabric.Gradient.fromElement(fabric.gradientDefs[this.svgUid][gradientId], obj));
   }
 };
 
@@ -8688,7 +8697,26 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       }
       var pointer = getPointer(e, upperCanvasEl),
           bounds = upperCanvasEl.getBoundingClientRect(),
+          boundsWidth, boundsHeight,
           cssScale;
+      if (!bounds.width || !bounds.height) {
+        if ('top' in bounds && 'bottom' in bounds) {
+          boundsHeight = Math.abs( bounds.top - bounds.bottom );
+        }
+        else {
+          boundsHeight = 0;
+        }
+        if ('right' in bounds && 'left' in bounds) {
+          boundsWidth = Math.abs( bounds.right - bounds.left );
+        }
+        else {
+          boundsWidth = 0;
+        }
+      }
+      else {
+        boundsWidth = bounds.width;
+        boundsHeight= bounds.height;
+      }
 
       this.calcOffset();
 
@@ -8701,14 +8729,14 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         );
       }
 
-      if (bounds.width === 0 || bounds.height === 0) {
+      if (boundsWidth === 0 || boundsHeight === 0) {
         // If bounds are not available (i.e. not visible), do not apply scale.
         cssScale = { width: 1, height: 1 };
       }
       else {
         cssScale = {
-          width: upperCanvasEl.width / bounds.width,
-          height: upperCanvasEl.height / bounds.height
+          width: upperCanvasEl.width / boundsWidth,
+          height: upperCanvasEl.height / boundsHeight
         };
       }
 
