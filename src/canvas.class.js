@@ -831,6 +831,21 @@
           bounds = upperCanvasEl.getBoundingClientRect(),
           cssScale;
 
+      if (!bounds.width || !bounds.height) {
+        if ('top' in bounds && 'bottom' in bounds) {
+          bounds.height = bounds.top - bounds.bottom;
+        }
+        else {
+          bounds.height = 0;
+        }
+        if ('right' in bounds && 'left' in bounds) {
+          bounds.width = bounds.right - bounds.left;
+        }
+        else {
+          bounds.width = 0;
+        }
+      }
+
       this.calcOffset();
 
       pointer.x = pointer.x - this._offset.left;
