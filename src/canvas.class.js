@@ -829,20 +829,16 @@
       }
       var pointer = getPointer(e, upperCanvasEl),
           bounds = upperCanvasEl.getBoundingClientRect(),
+          boundsWidth = bounds.width || 0,
+          boundsHeight = bounds.height || 0,
           cssScale;
 
-      if (!bounds.width || !bounds.height) {
+      if (!boundsWidth || !boundsHeight ) {
         if ('top' in bounds && 'bottom' in bounds) {
-          bounds.height = bounds.top - bounds.bottom;
-        }
-        else {
-          bounds.height = 0;
+          boundsHeight = Math.abs( bounds.top - bounds.bottom );
         }
         if ('right' in bounds && 'left' in bounds) {
-          bounds.width = bounds.right - bounds.left;
-        }
-        else {
-          bounds.width = 0;
+          boundsWidth = Math.abs( bounds.right - bounds.left );
         }
       }
 
@@ -857,14 +853,14 @@
         );
       }
 
-      if (bounds.width === 0 || bounds.height === 0) {
+      if (boundsWidth === 0 || boundsHeight === 0) {
         // If bounds are not available (i.e. not visible), do not apply scale.
         cssScale = { width: 1, height: 1 };
       }
       else {
         cssScale = {
-          width: upperCanvasEl.width / bounds.width,
-          height: upperCanvasEl.height / bounds.height
+          width: upperCanvasEl.width / boundsWidth,
+          height: upperCanvasEl.height / boundsHeight
         };
       }
 
