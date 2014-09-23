@@ -392,10 +392,10 @@
     _renderText: function(ctx, textLines) {
       ctx.save();
       this._setShadow(ctx);
-      this._setupFillRule(ctx);
+      this._setupCompositeOperation(ctx);
       this._renderTextFill(ctx, textLines);
       this._renderTextStroke(ctx, textLines);
-      this._restoreFillRule(ctx);
+      this._restoreCompositeOperation(ctx);
       this._removeShadow(ctx);
       ctx.restore();
     },
