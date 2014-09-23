@@ -829,10 +829,10 @@
       }
       var pointer = getPointer(e, upperCanvasEl),
           bounds = upperCanvasEl.getBoundingClientRect(),
-          boundsWidth = bounds.width || 0, 
-          boundsHeight = bounds.height || 0, 
+          boundsWidth = bounds.width || 0,
+          boundsHeight = bounds.height || 0,
           cssScale;
-      
+
       if (!boundsWidth || !boundsHeight ) {
         if ('top' in bounds && 'bottom' in bounds) {
           boundsHeight = Math.abs( bounds.top - bounds.bottom );
@@ -869,7 +869,7 @@
         y: pointer.y * cssScale.height
       };
     },
-    
+
     /**
      * @private
      * @throws {CANVAS_INIT_ERROR} If canvas can not be initialized
