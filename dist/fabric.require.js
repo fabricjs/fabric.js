@@ -8697,25 +8697,17 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       }
       var pointer = getPointer(e, upperCanvasEl),
           bounds = upperCanvasEl.getBoundingClientRect(),
-          boundsWidth, boundsHeight,
+          boundsWidth = bounds.width || 0, 
+          boundsHeight = bounds.height || 0, 
           cssScale;
-      if (!bounds.width || !bounds.height) {
+      
+      if (!boundsWidth || !boundsHeight ) {
         if ('top' in bounds && 'bottom' in bounds) {
           boundsHeight = Math.abs( bounds.top - bounds.bottom );
-        }
-        else {
-          boundsHeight = 0;
         }
         if ('right' in bounds && 'left' in bounds) {
           boundsWidth = Math.abs( bounds.right - bounds.left );
         }
-        else {
-          boundsWidth = 0;
-        }
-      }
-      else {
-        boundsWidth = bounds.width;
-        boundsHeight = bounds.height;
       }
 
       this.calcOffset();
