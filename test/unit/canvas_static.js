@@ -28,17 +28,17 @@
   var PATH_DATALESS_JSON = '{"objects":[{"type":"path","originX":"left","originY":"top","left":100,"top":100,"width":200,"height":200,"fill":"rgb(0,0,0)",'+
                            '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,'+
                            '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,'+
-                           '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","path":"http://example.com/","pathOffset":{"x":200,"y":200}}],"background":""}';
+                           '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","path":"http://example.com/","pathOffset":{"x":200,"y":200}}],"background":""}';
 
   var RECT_JSON = '{"objects":[{"type":"rect","originX":"left","originY":"top","left":0,"top":0,"width":10,"height":10,"fill":"rgb(0,0,0)",'+
                   '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,'+
                   '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,'+
-                  '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","rx":0,"ry":0}],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}';
+                  '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","rx":0,"ry":0}],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}';
 
   var RECT_JSON_WITH_PADDING = '{"objects":[{"type":"rect","originX":"left","originY":"top","left":0,"top":0,"width":10,"height":20,"fill":"rgb(0,0,0)",'+
                                '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,'+
                                '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,'+
-                               '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","padding":123,"foo":"bar","rx":0,"ry":0}],"background":""}';
+                               '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","padding":123,"foo":"bar","rx":0,"ry":0}],"background":""}';
 
   function getAbsolutePath(path) {
     var isAbsolute = /^https?:/.test(path);
@@ -55,33 +55,35 @@
       IMG_HEIGHT  = 110;
 
   var REFERENCE_IMG_OBJECT = {
-    'type':               'image',
-    'originX':            'left',
-    'originY':            'top',
-    'left':               0,
-    'top':                0,
-    'width':              IMG_WIDTH, // node-canvas doesn't seem to allow setting width/height on image objects
-    'height':             IMG_HEIGHT, // or does it now?
-    'fill':               'rgb(0,0,0)',
-    'stroke':             null,
-    'strokeWidth':        1,
-    'strokeDashArray':    null,
-    'strokeLineCap':      'butt',
-    'strokeLineJoin':     'miter',
-    'strokeMiterLimit':   10,
-    'scaleX':             1,
-    'scaleY':             1,
-    'angle':              0,
-    'flipX':              false,
-    'flipY':              false,
-    'opacity':            1,
-    'src':                fabric.isLikelyNode ? undefined : IMG_SRC,
-    'shadow':             null,
-    'visible':            true,
-    'backgroundColor':    '',
-    'clipTo':             null,
-    'filters':            [],
-    'crossOrigin':        ''
+    'type':                    'image',
+    'originX':                 'left',
+    'originY':                 'top',
+    'left':                     0,
+    'top':                      0,
+    'width':                    IMG_WIDTH, // node-canvas doesn't seem to allow setting width/height on image objects
+    'height':                   IMG_HEIGHT, // or does it now?
+    'fill':                     'rgb(0,0,0)',
+    'stroke':                   null,
+    'strokeWidth':              1,
+    'strokeDashArray':          null,
+    'strokeLineCap':            'butt',
+    'strokeLineJoin':           'miter',
+    'strokeMiterLimit':         10,
+    'scaleX':                   1,
+    'scaleY':                   1,
+    'angle':                    0,
+    'flipX':                    false,
+    'flipY':                    false,
+    'opacity':                  1,
+    'src':                      fabric.isLikelyNode ? undefined : IMG_SRC,
+    'shadow':                   null,
+    'visible':                  true,
+    'backgroundColor':          '',
+    'clipTo':                   null,
+    'filters':                  [],
+    'crossOrigin':              '',
+    'fillRule':                 'nonzero',
+    'globalCompositeOperation': 'source-over'
   };
 
   function _createImageElement() {

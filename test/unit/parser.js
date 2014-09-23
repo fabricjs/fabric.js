@@ -51,7 +51,7 @@
     var element = fabric.document.createElement('path');
     element.setAttribute('fill-rule', 'evenodd');
 
-    deepEqual(fabric.parseAttributes(element, ['fill-rule']), { fillRule: 'destination-over' });
+    deepEqual(fabric.parseAttributes(element, ['fill-rule']), { fillRule: 'evenodd' });
   });
 
   test('parseAttributesFillRuleWithoutTransformation', function() {
