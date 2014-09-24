@@ -467,11 +467,11 @@
         var supportsWidthOfLine = (this._getWidthOfLine == null) ? false : true;
 
         // Iterate the lines of text, setting the boundaries of width, height, and left offset.
-        for (var lineIndex = 0, len = textLines.length; lineIndex < len; lineIndex++) {
-          var lineWidth = (supportsWidthOfLine) ? this._getWidthOfLine(ctx, lineIndex, textLines) : this._getLineWidth(ctx, textLines[lineIndex]);
+        for (var currentLineIndex = 0, lengthOfTextLine = textLines.length; currentLineIndex < lengthOfTextLine; currentLineIndex++) {
+          var lineWidth = (supportsWidthOfLine) ? this._getWidthOfLine(ctx, currentLineIndex, textLines) : this._getLineWidth(ctx, textLines[currentLineIndex]);
           var lineLeftOffset = this._getLineLeftOffset(lineWidth);
           this._boundaries.push({
-            height: this._getHeightOfLine(ctx, lineIndex, textLines),
+            height: this._getHeightOfLine(ctx, currentLineIndex, textLines),
             width: lineWidth,
             left: lineLeftOffset
           });
@@ -793,7 +793,7 @@
      */
     _getOrderOfWidestLines: function(ctx, textLines) {
       // Ordering by line width is required by the text on path feature, which requires knowing the individual line boundaries.
-      if (this._boundaries.length == 0) {
+      if (this._boundaries.length === 0) {
         textLines = (textLines == null) ? textLines : this._getTextLines();
         this._setBoundaries(ctx, textLines);
       }
@@ -837,7 +837,7 @@
       var width = 0;
 
       // Maximum line width is required by the text on path feature, which requires knowing the individual line boundaries.
-      if (this._boundaries.length == 0) {
+      if (this._boundaries.length === 0) {
         textLines = (textLines == null) ? textLines : this._getTextLines();
         this._setBoundaries(ctx, textLines);
       }
@@ -957,7 +957,9 @@
               point = letterEntry.point, // Get center point of drawing.
               perpendicularAngle = point.angleOfTangentInRadians + Math.PI / 2, // Get perpendicular angle. Default (at a 0 degree tangent) is 90 degrees. TODO: Interpolation for less harsh visual result.
               thisVerticalAdjustment = (this.type === "i-text") ? verticalAdjustment + this.fontSize / 4 : verticalAdjustment,
-              distanceToMove = 0;
+              distanceToMove = 0,
+              // Prepare to track delta value to edge point.
+              deltaToEdgePoint;
 
           if (decoration === "underline") {
             // Try to shift the line down.
@@ -978,19 +980,19 @@
             var deltaToStartPoint = new fabric.Point(-point.halfWidth * Math.cos(point.angleOfTangentInRadians), -point.halfWidth * Math.sin(point.angleOfTangentInRadians));
             ctx.moveTo(deltaToPoint.x + point.x + deltaToStartPoint.x, deltaToPoint.y + point.y + deltaToStartPoint.y);
             ctx[command](deltaToPoint.x + point.x, deltaToPoint.y + point.y);
-          } else if (charIndex == (lineLength - 1)) {
+          } else if (charIndex === (lineLength - 1)) {
             // If this point is the very last point, it's necessary to draw a segment from the center to the right edge.
             var deltaToEndPoint = new fabric.Point(point.halfWidth * Math.cos(point.angleOfTangentInRadians), point.halfWidth * Math.sin(point.angleOfTangentInRadians));
             ctx[command](deltaToPoint.x + point.x + deltaToEndPoint.x, deltaToPoint.y + point.y + deltaToEndPoint.y);
             } else if (command === "moveTo") {
             // In case of skipped text decoration at the character level, slide to the right edge.
-            var deltaToEdgePoint = new fabric.Point(point.halfWidth * Math.cos(point.angleOfTangentInRadians), point.halfWidth * Math.sin(point.angleOfTangentInRadians));
+            deltaToEdgePoint = new fabric.Point(point.halfWidth * Math.cos(point.angleOfTangentInRadians), point.halfWidth * Math.sin(point.angleOfTangentInRadians));
             ctx[command](deltaToPoint.x + point.x + deltaToEdgePoint.x, deltaToPoint.y + point.y + deltaToEdgePoint.y);
           } else {
             // Point is along an existing line.
             ctx[command](deltaToPoint.x + point.x, deltaToPoint.y + point.y);
             // To help deal with skips, make a segment to the edge as well.
-            var deltaToEdgePoint = new fabric.Point(point.halfWidth * Math.cos(point.angleOfTangentInRadians), point.halfWidth * Math.sin(point.angleOfTangentInRadians));
+            deltaToEdgePoint = new fabric.Point(point.halfWidth * Math.cos(point.angleOfTangentInRadians), point.halfWidth * Math.sin(point.angleOfTangentInRadians));
             ctx[command](deltaToPoint.x + point.x + deltaToEdgePoint.x, deltaToPoint.y + point.y + deltaToEdgePoint.y);
           }
           // Track if had line or not.
@@ -1027,21 +1029,27 @@
       // Order the lines by widest first. This is a step required by the text-on-path feature in order to support right, center, and justify alignments.
       var order = (!this.textPath) ? textLines.map(function (line) { return textLines.indexOf(line); }) : this._getOrderOfWidestLines(ctx, textLines),
           copyOfOrder = order.slice(0), // To be forward compatible with fabric.IText, it's important to go the long route, even though fabric.Text doesn't require it.
-          lineHeights = [];
+          lineHeights = [],
+          // Prepare to track index in stacks.
+          currentIndex;
 
       // Initially, obtain a list of all line heights without rendering (required to determine vertical offset for widest lines first, which may not be positionally first).
       while (copyOfOrder.length > 0) {
-        var currentIndex = copyOfOrder.shift(),
-            lineHeight = this._getHeightOfLine(ctx, currentIndex, textLines);
+        // Obtain current index.
+        currentIndex = copyOfOrder.shift();
+
+        // Obtain the line height of just the current line.
+        var lineHeight = this._getHeightOfLine(ctx, currentIndex, textLines);
 
         lineHeights[currentIndex] = lineHeight;
       }
       // Render the lines in order of width.
       while (order.length > 0) {
         // Obtain current index.
-        var currentIndex = order.shift(),
-            // Sum the observed line heights up to (and including) the current index.
-            summedLineHeight = lineHeights.slice(0, currentIndex + 1).reduce(function(a, b) { return a + b; }, 0);
+        currentIndex = order.shift();
+
+        // Sum the observed line heights up to (and including) the current index.
+        var summedLineHeight = lineHeights.slice(0, currentIndex + 1).reduce(function(a, b) { return a + b; }, 0);
 
         this._renderTextLine(
           method,
@@ -1138,14 +1146,14 @@
         // Has the residue already been drawn?
         var residueTracker = this._boundaries[lineIndex].residueHasBeenDrawn,
             residueTrackerIsUndefined = (residueTracker == null) ? true : false,
-            residueBoxNeedsToBeDrawn = (lineIndex == 0 && (residueTrackerIsUndefined || !residueTracker["bounding-box"])) ? true : false,
+            residueBoxNeedsToBeDrawn = (lineIndex === 0 && (residueTrackerIsUndefined || !residueTracker["bounding-box"])) ? true : false,
             isFirstPass = (residueTrackerIsUndefined || residueTracker[method] == null || !residueTracker[method]) ? true : false;
 
         // If this is the first pass, at least draw the residue of the text.
         if (isFirstPass) {
           var textPath = this.textPath,
               globalAlpha = ctx.globalAlpha,
-              crutchY = (this.type == "i-text") ? 0 : this.fontSize / 4;
+              crutchY = (this.type === "i-text") ? 0 : this.fontSize / 4;
 
           this.textPath = null;
           ctx.fillStyle = "#000000";
@@ -1258,7 +1266,7 @@
           sharedCount += 1;
         }
       }
-      return (sharedCount == 1) ? true : false;
+      return (sharedCount === 1) ? true : false;
     },
 
     /**
@@ -1303,9 +1311,11 @@
 
       // Placement passes. An intersection test is done between the current minor bounding box and the previous letter's minor bounding box. The iteration has the ability to run until either the two boxes no longer intersect or the pass limit has been exceeded. Currently, this is a guess and check feature.
       while (pointIsNotAcceptable) {
+        // Get the point along the path.
+        var thisPoint = this.textPath.getPointAtLength(thisDistancePlusHalfWidth, true);
+
         // Get the angle of the tangent in degrees.
-        var angleOfTangentInDegrees = this._getAngleOfTangentAtDistanceInDegrees(thisDistancePlusHalfWidth),
-            thisPoint = this.textPath.getPointAtLength(thisDistancePlusHalfWidth, true);
+        angleOfTangentInDegrees = this._getAngleOfTangentAtDistanceInDegrees(thisDistancePlusHalfWidth);
 
         // If there isn't a new point or if the new point is the same as the last one (in the case of hitting the end of a path), the point is acceptable.
         if (point == null || !point.eq(thisPoint)) {
@@ -1326,33 +1336,32 @@
         halfDistanceToConsume = distanceToConsume / 2;
         
         // Overlapping at convex spots along a line is by design, but this can be mathematically altered if requested.
-        if (wantLessTextPathOverlapFeature && pointIsNotAcceptable && pass < extraPassLimit)
-        {
+        if (wantLessTextPathOverlapFeature && pointIsNotAcceptable && pass < extraPassLimit) {
           // Get bounding box of the letter (as opposed to of the letter in the total observed line height).
           var thisMinorBoundingBox = this._getMinorBoundingBoxAroundPoint(point, top, halfWidth, halfHeightOfLetter, angleOfTangentInDegrees, reverseMode),
               // Do an initial check to see if the bounding boxes are arranged end to end (in which case, objects are adjacent to each other already).
-              pointsShareOnlyOneEdge = this._pointsShareOnlyOneEdge(thisMinorBoundingBox, lastMinorBoundingBox);
+              pointsShareOnlyOneEdge = this._pointsShareOnlyOneEdge(thisMinorBoundingBox, lastMinorBoundingBox),
+              // Prepare to track intersections.
+              intersectionTest;
 
           // Update the bounding box.
           point.boundingBox = thisMinorBoundingBox;
           // If the two bounding boxes don't share only one edge, see if they intersect.
           if (!pointsShareOnlyOneEdge) {
             // Test if this bounding box and the bounding box of the previous character intersect. TODO: Look farther back for better result.
-            var intersectionTest = fabric.Intersection.intersectPolygonPolygon(thisMinorBoundingBox, lastMinorBoundingBox);
+            intersectionTest = fabric.Intersection.intersectPolygonPolygon(thisMinorBoundingBox, lastMinorBoundingBox);
+          }
 
-            // If intersects, get minimum distance to prevent intersection.
-            if (intersectionTest.status == "Intersection" && intersectionTest.points.length >= 2) {
-              // Get the average of the distance consumed by the two intersecting objects.
-              var averageDistanceConsumedByTwoBoundingBoxes = (lastDistanceToConsume + distanceToConsume) / 2,
-                  // Rather than attempt to figure out where on the line actually will provide an appropriate, non-overlapping placement, just shove the character over more and more (up to five-seconds of the largest distance to consume at a time).
-                  clearDistance = averageDistanceConsumedByTwoBoundingBoxes / Math.max(2.5, (10 - pass));
+          // If intersects, get minimum distance to prevent intersection.
+          if (intersectionTest != null && intersectionTest.status === "Intersection" && intersectionTest.points.length >= 2) {
+            // Get the average of the distance consumed by the two intersecting objects.
+            var averageDistanceConsumedByTwoBoundingBoxes = (lastDistanceToConsume + distanceToConsume) / 2,
+                // Rather than attempt to figure out where on the line actually will provide an appropriate, non-overlapping placement, just shove the character over more and more (up to five-seconds of the largest distance to consume at a time).
+                clearDistance = averageDistanceConsumedByTwoBoundingBoxes / Math.max(2.5, (10 - pass));
 
-              // If the distance is greater than zero, find the point at the new clear distance in the next iteration.
-              if (clearDistance != null && clearDistance > 0) {
-                thisDistancePlusHalfWidth += (!reverseMode) ? clearDistance : -clearDistance;
-              } else {
-                pointIsNotAcceptable = false;
-              }
+            // If the distance is greater than zero, find the point at the new clear distance in the next iteration.
+            if (clearDistance != null && clearDistance > 0) {
+              thisDistancePlusHalfWidth += (!reverseMode) ? clearDistance : -clearDistance;
             } else {
               pointIsNotAcceptable = false;
             }
@@ -1417,9 +1426,8 @@
      * @param {Number} halfNonTransformedHeight Half of the height the letter exists in.
      * @param {Number} summedLineHeight The inclusive sum of previous line heights.
      * @param {object} style A dictionary of style choices relevant to the context.
-     * @param {Boolean} approximating If true, turn off computationally-intensive features. Otherwise, render to the best of the algorithm's ability.
      */
-    _renderLetterAtPoint: function(method, ctx, letter, point, top, lineIndex, halfNonTransformedHeight, summedLineHeight, style, approximating) {
+    _renderLetterAtPoint: function(method, ctx, letter, point, top, lineIndex, halfNonTransformedHeight, summedLineHeight, style) {
       // If the center point of the letter's bounding box exists, render the letter and the bounding box (if requested) around it.
       if (point) {
         // Pull out convenience variables to reference halves of the rectangle's dimensions.
@@ -1440,7 +1448,7 @@
         if (isFirstPass && (style.textBackgroundColor || style.backgroundColor)) {
           ctx.save();
           // Determine whether a full bounding box or a minor bounding box will be drawn.
-          var halfBoundingBoxHeight = (this.type == "i-text") ? halfHeightOfLetter + halfHeightOfLetter / 4: halfHeightOfLetter,
+          var halfBoundingBoxHeight = (this.type === "i-text") ? halfHeightOfLetter + halfHeightOfLetter / 4: halfHeightOfLetter,
               verticalOffset = summedLineHeight - halfNonTransformedHeight - halfBoundingBoxHeight;
 
           if (style.backgroundColor) {
@@ -1501,13 +1509,15 @@
           crutchX = (this.textAlign === "left" || this.textAlign === "justify") ? 0 : (this.textAlign === "center") ? (-this.width / 2) : -this.width,
           // Prepare to determine the starting distance along the observed path.
           startingDistance,
-          reverseMode = false;
+          reverseMode = false,
+          // Prepare to adjust the starting distance in case of certain alignments.
+          maximumConsumedDistance;
 
       if (this.textAlign === "center") {
-        var maximumConsumedDistance = this._getMaximumConsumedDistance() || this._getMaximumLineWidth(ctx);
+        maximumConsumedDistance = this._getMaximumConsumedDistance() || this._getMaximumLineWidth(ctx);
         startingDistance = (maximumConsumedDistance - this._boundaries[lineIndex].width) / 2;
       } else if (this.textAlign === "right") {
-        var maximumConsumedDistance = this._getMaximumConsumedDistance();
+        maximumConsumedDistance = this._getMaximumConsumedDistance();
         if (maximumConsumedDistance == null) {
           startingDistance = 0;
         } else {
@@ -1632,7 +1642,7 @@
      */
     _renderTextLineOnTextPath: function(method, ctx, line, left, top, lineIndex, spaceWidth) {
       // In the middle of approximating, turn off non-essential features.
-      var approximating = (!this.textPath.wantApproximationDetail || this.textPath.wantApproximationDetail == 0) ? false : true,
+      var approximating = (!this.textPath.wantApproximationDetail || this.textPath.wantApproximationDetail === 0) ? false : true,
           // Figure out if the letter locations need to be calculated.
           isNotCalculated = (this._boundaries[lineIndex].letters == null) ? true : false;
 
@@ -1648,14 +1658,8 @@
           // Obtain the height of the untransformed bounding box that the unpathed text would have created.
           nonTransformedHeightOfAllLines = this._getObservedTotalLineHeight(ctx),
           halfNonTransformedHeight = nonTransformedHeightOfAllLines / 2,
-          // Get the center of the object.
-          centerOfTextObject = this.getCenterPoint(),
-          // Get the center of what's being observed.
-          centerOfPathObject = this.textPath.getCenterPoint(),
-          // Get vertical delta.
-          distanceFromPathCenterY = centerOfPathObject.y - centerOfTextObject.y,
           // Subtract out the top offset (and other offsets) to get just the summed line height. fabric.IText already does away with the 4th fontSize lift that occurs in fabric.Text.
-          summedLineHeight = (this.type == "i-text") ? top - this._getTopOffset() : top - this._getTopOffset() + this.fontSize / 4,
+          summedLineHeight = (this.type === "i-text") ? top - this._getTopOffset() : top - this._getTopOffset() + this.fontSize / 4,
           // Object supports character styles.
           supportsSpecificStyles = (this.getCurrentCharStyle == null) ? false : true;
 

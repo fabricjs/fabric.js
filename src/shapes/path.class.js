@@ -887,7 +887,7 @@
       // Iterate the approximated points, turning them into SVG:PATH data commands.
       for (var i = 0, len = approximatedPoints.length; i < len; i++) {
         // Pick move-to (absolute) if first command; otherwise, pick line-to (absolute).
-        var command = (i == 0) ? "M" : "L",
+        var command = (i === 0) ? "M" : "L",
             point = approximatedPoints[i];
 
         approximatedPath.push([command, point.x, point.y]);
@@ -948,7 +948,7 @@
      * @return {Boolean} If same length and same items, true. Otherwise, false.
      */
     __arrayEqualsCurrentPathArray: function(that) {
-      var sameLength = (that.length == this.path.length) ? true : false,
+      var sameLength = (that.length === this.path.length) ? true : false,
           sameItems = (that.every(this.__itemEqualsItemInArray, this)) ? true : false;
 
       return (sameLength && sameItems) ? true : false;
@@ -963,7 +963,7 @@
      * @return {Boolean} If both items are equivalent, true. Otherwise, false.
      */
     __itemEqualsItemInArray: function(arrayItem, index, thatArray) {
-      return arrayItem === this.path[index];
+      return arrayItem === thatArray[index];
     },
 
     /**
@@ -1000,7 +1000,7 @@
           this._cachedSVGPathElement = this._getSVGPathElement();
         } else {
           var currentSVGData = this.getSVGData();
-          if (this._cachedSVGPathElement.getAttribute("d") != currentSVGData) {
+          if (this._cachedSVGPathElement.getAttribute("d") !== currentSVGData) {
             this._cachedSVGPathElement.setAttribute("d", currentSVGData);
           }
         }
@@ -1031,7 +1031,7 @@
             offset = new fabric.Point(0, 0);
 
         if (adjustForCanvas) {
-          var zeroPoint = (distance == 0) ? svgPoint : svgPath.getPointAtLength(0);
+          var zeroPoint = (distance === 0) ? svgPoint : svgPath.getPointAtLength(0);
           offset.setXY(this.left - zeroPoint.x, this.top - zeroPoint.y);
         }
         // Abstract the point with the distance it represents along the line.
@@ -1138,7 +1138,7 @@
             runningBestMatchDistance = thisDistance;
           }
           // If the distance is 0, this is the correct point.
-          if (thisDistance == 0) {
+          if (thisDistance === 0) {
             return runningBestMatch;
           }
         }

@@ -18,6 +18,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         lineLeftOffset = this._getSVGLineLeftOffset(lineIndex),
         lineTopOffset = this._getSVGLineTopOffset(lineIndex),
         heightOfLine = this._getHeightOfLine(this.ctx, lineIndex);
+
     // Iterate the characters in the line, pushing tspan elements as necessary.
     for (var i = 0, len = chars.length; i < len; i++) {
       var styleDecl = (this.styles[lineIndex]) ? this.styles[lineIndex][i] || { } : {};
@@ -43,17 +44,14 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @param {String} textLine Line of text to render.
    * @param {Number} lineIndex Line number being rendered.
    * @param {Array} shadowSpans Array to push the tspan elements into.
-   * @param {Number} lineHeight Height of line being rendered.
-   * @param {Number} lineTopOffsetMultiplier Misnamed adjustment to keep tspan considered non-trivial.
    */
-  _setSVGTextLineShadow: function(textLine, lineIndex, shadowSpans, lineHeight, lineTopOffsetMultiplier) {
+  _setSVGTextLineShadow: function(textLine, lineIndex, shadowSpans) {
     // Call something like set text lines with an explicit override for stroke-opacity and fill-opacity.
     var yProp = lineIndex === 0 || this.useNative ? 'y' : 'dy',
         chars = textLine.split(''),
         charOffset = 0,
         lineLeftOffset = this._getSVGLineLeftOffset(lineIndex),
-        lineTopOffset = this._getSVGLineTopOffset(lineIndex),
-        heightOfLine = this._getHeightOfLine(this.ctx, lineIndex);
+        lineTopOffset = this._getSVGLineTopOffset(lineIndex);
 
     // Iterate the characters in the line, pushing tspan elements as necessary.
     for (var i = 0, len = chars.length; i < len; i++) {
