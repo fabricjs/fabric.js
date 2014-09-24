@@ -78,7 +78,7 @@
      */
     toSVG: function(reviver) {
       var markup = this._createBaseSVGMarkup(), x = 0, y = 0;
-      if (this.group) {
+      if (this.group && this.group.type === 'path-group') {
         x = this.left + this.rx;
         y = this.top + this.ry;
       }
