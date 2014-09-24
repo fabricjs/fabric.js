@@ -149,16 +149,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     var fillStyles = this.getSvgStyles.call(combinedStyleDecl);
     return [
       //jscs:disable validateIndentation
-<<<<<<< Upstream, based on upstream/master
-      '<tspan x="', lineLeftOffset + charOffset, '" ',
-        yProp, '="', lineTopOffset, '" ',
-
-        (styleDecl.fontFamily ? 'font-family="' + styleDecl.fontFamily.replace(/"/g, '\'') + '" ': ''),
-        (styleDecl.fontSize ? 'font-size="' + styleDecl.fontSize + '" ': ''),
-        (styleDecl.fontStyle ? 'font-style="' + styleDecl.fontStyle + '" ': ''),
-        (styleDecl.fontWeight ? 'font-weight="' + styleDecl.fontWeight + '" ': ''),
-        (styleDecl.textDecoration ? 'text-decoration="' + styleDecl.textDecoration + '" ': ''),
-=======
       '<tspan',
         ' ', 'x="', lineLeftOffset + charOffset, '"',
         ' ', yProp, '="', lineTopOffset, '"',
@@ -170,7 +160,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         (combinedStyleDecl.textDecoration ? 'text-decoration="' + combinedStyleDecl.textDecoration + '" ': ''),
         ((combinedStyleDecl.fillOpacity != null) ? 'fill-opacity="' + combinedStyleDecl.fillOpacity + '" ' : ''),
         ((combinedStyleDecl.strokeOpacity != null) ? 'stroke-opacity="' + combinedStyleDecl.strokeOpacity + '" ' : ''),
->>>>>>> 5871ef9 Ability to curve fabric.Text-like's around a fabric.Path for Issue #729.
         'style="', fillStyles, '">',
         fabric.util.string.escapeXml(_char),
       '</tspan>'

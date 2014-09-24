@@ -119,13 +119,8 @@
      * @param {Boolean} [noTransform] When true, context is not transformed
      * @param {Array} path array of points
      */
-<<<<<<< Upstream, based on upstream/master
-    _render: function(ctx) {
-=======
     _render: function(ctx, noTransform, path) {
->>>>>>> 5871ef9 Ability to curve fabric.Text-like's around a fabric.Path for Issue #729.
       var current, // current instruction
-<<<<<<< Upstream, based on upstream/master
           previous = null,
           subpathStartX = 0,
           subpathStartY = 0,
@@ -139,46 +134,15 @@
           tempControlY,
           l = -this.pathOffset.x,
           t = -this.pathOffset.y;
-=======
-        previous = null,
-        subpathStartX = 0,
-        subpathStartY = 0,
-        x = 0, // current x
-        y = 0, // current y
-        controlX = 0, // current control point x
-        controlY = 0, // current control point y
-        tempX,
-        tempY,
-        tempControlX,
-        tempControlY,
-        l = -((this.width / 2) + this.pathOffset.x),
-        t = -((this.height / 2) + this.pathOffset.y);
->>>>>>> 5871ef9 Ability to curve fabric.Text-like's around a fabric.Path for Issue #729.
 
-<<<<<<< Upstream, based on upstream/master
       if (this.group && this.group.type === 'path-group') {
         l = 0;
         t = 0;
-=======
-      // Handle directive not to transform the context.
-      if (noTransform) {
-        l += this.width / 2;
-        t += this.height / 2;
->>>>>>> 5871ef9 Ability to curve fabric.Text-like's around a fabric.Path for Issue #729.
       }
-<<<<<<< Upstream, based on upstream/master
-
       ctx.beginPath();
-
-      for (var i = 0, len = this.path.length; i < len; ++i) {
-
-        current = this.path[i];
-
-=======
       // Iterate over the path commands, issuing context commands as necessary.
       for (var i = 0, len = path.length; i < len; ++i) {
         current = path[i];
->>>>>>> 5871ef9 Ability to curve fabric.Text-like's around a fabric.Path for Issue #729.
         switch (current[0]) { // first letter
           // Line-To, relative.
           case 'l': 
@@ -433,32 +397,16 @@
      * @param {Boolean} [noTransform] When true, context is not transformed
      */
     render: function(ctx, noTransform) {
-<<<<<<< Upstream, based on upstream/master
-      // do not render if width/height are zeros or object is not visible
+      // Do not render if either of the dimensions are zero or the object is not visible.
       if (this.width === 0 || this.height === 0 || !this.visible) {
-=======
-      // Do not render if object is not visible.
-      if (!this.visible) {
->>>>>>> 5871ef9 Ability to curve fabric.Text-like's around a fabric.Path for Issue #729.
         return;
       }
       ctx.save();
-<<<<<<< Upstream, based on upstream/master
-
-=======
-      if (noTransform) {
-        ctx.translate(-this.width / 2, -this.height / 2);
-      }
-      var m = this.transformMatrix;
-      if (m) {
-        ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
-      }
->>>>>>> 5871ef9 Ability to curve fabric.Text-like's around a fabric.Path for Issue #729.
       if (!noTransform) {
         this.transform(ctx);
       }
       if (this.group && this.group.type === 'path-group') {
-        ctx.translate(-this.group.width/2, -this.group.height/2);
+        ctx.translate(-this.group.width / 2, -this.group.height / 2);
       }
       if (this.transformMatrix) {
         ctx.transform.apply(ctx, this.transformMatrix);
@@ -468,18 +416,12 @@
       this._setShadow(ctx);
       this.clipTo && fabric.util.clipContext(this, ctx);
       ctx.globalAlpha = this.group ? (ctx.globalAlpha * this.opacity) : this.opacity;
-<<<<<<< Upstream, based on upstream/master
-      this._render(ctx, noTransform);
-=======
       // If no approximation is requested, render the path normally. Otherwise, approximate it to the number of points specified in wantApproximationDetail.
       if (!this.wantApproximationDetail) {
         this._render(ctx, noTransform, this.path);
       } else {
         this._render(ctx, noTransform, this._getApproximatedPath());
       }
-      this._renderFill(ctx);
-      this._renderStroke(ctx);
->>>>>>> 5871ef9 Ability to curve fabric.Text-like's around a fabric.Path for Issue #729.
       this.clipTo && ctx.restore();
       this._removeShadow(ctx);
       ctx.restore();
@@ -535,12 +477,14 @@
      */
     toSVG: function(reviver) {
       var chunks = [],
-          markup = this._createBaseSVGMarkup(), addTransform = '';
+          markup = this._createBaseSVGMarkup(),
+          addTransform = '';
 
       for (var i = 0, len = this.path.length; i < len; i++) {
         chunks.push(this.path[i].join(' '));
       }
       var path = chunks.join(' ');
+
       if (!(this.group && this.group.type === 'path-group')) {
         addTransform = 'translate(' + (-this.pathOffset.x) + ', ' + (-this.pathOffset.y) + ')';
       }
@@ -620,7 +564,6 @@
      * @private
      */
     _parseDimensions: function() {
-
       var aX = [],
           aY = [],
           current, // current instruction
@@ -924,58 +867,6 @@
           };
 
       return o;
-<<<<<<< Upstream, based on upstream/master
-=======
-    },
-
-    _getCoordsFromCommand: function(item, i, aX, aY, previous) {
-      var isLowerCase = false;
-
-      if (item[0] !== 'H') {
-        previous.x = (i === 0) ? getX(item) : getX(this.path[i - 1]);
-      }
-      if (item[0] !== 'V') {
-        previous.y = (i === 0) ? getY(item) : getY(this.path[i - 1]);
-      }
-
-      // lowercased letter denotes relative position;
-      // transform to absolute
-      if (item[0] === item[0].toLowerCase()) {
-        isLowerCase = true;
-      }
-
-      var xy = this._getXY(item, isLowerCase, previous),
-          val;
-
-      val = parseInt(xy.x, 10);
-      if (!isNaN(val)) {
-        aX.push(val);
-      }
-
-      val = parseInt(xy.y, 10);
-      if (!isNaN(val)) {
-        aY.push(val);
-      }
-    },
-
-    _getXY: function(item, isLowerCase, previous) {
-
-      // last 2 items in an array of coordinates are the actualy x/y (except H/V), collect them
-      // TODO (kangax): support relative h/v commands
-
-      var x = isLowerCase
-        ? previous.x + getX(item)
-        : item[0] === 'V'
-          ? previous.x
-          : getX(item),
-
-          y = isLowerCase
-            ? previous.y + getY(item)
-            : item[0] === 'H'
-              ? previous.y
-              : getY(item);
-
-      return { x: x, y: y };
     },
 
     /**
@@ -1286,7 +1177,6 @@
       }
       // Return nothing.
       return null;
->>>>>>> 5871ef9 Ability to curve fabric.Text-like's around a fabric.Path for Issue #729.
     }
   });
 
