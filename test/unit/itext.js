@@ -3,44 +3,50 @@
   QUnit.module('fabric.IText');
 
   var ITEXT_OBJECT = {
-    'type':                     'text',
-    'originX':                  'left',
-    'originY':                  'top',
-    'left':                     0,
-    'top':                      0,
-    'width':                    20,
-    'height':                   52,
-    'fill':                     'rgb(0,0,0)',
-    'stroke':                   null,
-    'strokeWidth':              1,
-    'strokeDashArray':          null,
-    'strokeLineCap':            'butt',
-    'strokeLineJoin':           'miter',
-    'strokeMiterLimit':         10,
-    'scaleX':                   1,
-    'scaleY':                   1,
-    'angle':                    0,
-    'flipX':                    false,
-    'flipY':                    false,
-    'opacity':                  1,
-    'shadow':                   null,
-    'visible':                  true,
-    'clipTo':                   null,
-    'text':                     'x',
-    'fontSize':                 40,
-    'fontWeight':               'normal',
-    'fontFamily':               'Times New Roman',
-    'fontStyle':                '',
-    'lineHeight':               1.3,
-    'textDecoration':           '',
-    'textAlign':                'left',
-    'path':                     null,
-    'backgroundColor':          '',
-    'textBackgroundColor':      '',
-    'useNative':                true,
-    'fillRule':                 'nonzero',
-    'globalCompositeOperation': 'source-over',    
-    styles:                     { }
+    'type':                        'text',
+    'originX':                     'left',
+    'originY':                     'top',
+    'left':                        0,
+    'top':                         0,
+    'width':                       20,
+    'height':                      52,
+    'fill':                        'rgb(0,0,0)',
+    'stroke':                      null,
+    'strokeWidth':                 1,
+    'strokeDashArray':             null,
+    'strokeLineCap':               'butt',
+    'strokeLineJoin':              'miter',
+    'strokeMiterLimit':            10,
+    'scaleX':                      1,
+    'scaleY':                      1,
+    'angle':                       0,
+    'flipX':                       false,
+    'flipY':                       false,
+    'opacity':                     1,
+    'shadow':                      null,
+    'visible':                     true,
+    'clipTo':                      null,
+    'text':                        'x',
+    'fontSize':                    40,
+    'fontWeight':                  'normal',
+    'fontFamily':                  'Times New Roman',
+    'fontStyle':                   '',
+    'lineHeight':                  1.3,
+    'textDecoration':              '',
+    'textAlign':                   'left',
+    'path':                        null,
+    'backgroundColor':             '',
+    'textBackgroundColor':         '',
+    'textPath':                    null,
+    'textPathDistanceOffset':      null,
+    'wantObservePathRotation':     true,
+    'wantTextPathWithLessOverlap': false,
+    'wantTextPathResidue':         true,
+    'wantApproximationDetail':     0,
+    'useNative':                   true,
+    'fillRule':                    'nonzero',
+    'globalCompositeOperation':    'source-over',
+    styles:                        { }
   };
 
   test('constructor', function() {
@@ -509,7 +515,13 @@
 
     // because translate values differ
     if (!fabric.isLikelyNode) {
-      equal(iText.toSVG(), '<g transform="translate(124.38 52)"><text font-family="Times New Roman" font-size="40" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); opacity: 1;" transform="translate(-124.38 39)"><tspan x="0" y="0" style="stroke: none; stroke-width: 0; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: #112233; opacity: 1;">t</tspan><tspan x="11.11328125" y="0" style="stroke: none; stroke-width: 0; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); opacity: 1;">e</tspan><tspan x="28.8671875" y="0" style="stroke: #223344; stroke-width: 0; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); opacity: 1;">s</tspan><tspan x="44.43359375" y="0" style="stroke: none; stroke-width: 0; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); opacity: 1;">t</tspan><tspan x="55.546875" y="0" style="stroke: none; stroke-width: 0; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); opacity: 1;"> </tspan><tspan x="65.546875" y="0" style="stroke: none; stroke-width: 0; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); opacity: 1;">f</tspan><tspan x="78.8671875" y="0" style="stroke: none; stroke-width: 0; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); opacity: 1;">o</tspan><tspan x="98.8671875" y="0" style="stroke: none; stroke-width: 0; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); opacity: 1;">o</tspan><tspan x="118.8671875" y="0" style="stroke: none; stroke-width: 0; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); opacity: 1;"> </tspan><tspan x="128.8671875" y="0" style="stroke: none; stroke-width: 0; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); opacity: 1;">b</tspan><tspan x="148.8671875" y="0" style="stroke: none; stroke-width: 0; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); opacity: 1;">a</tspan><tspan x="166.62109375" y="0" style="stroke: none; stroke-width: 0; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); opacity: 1;">r</tspan><tspan x="179.94140625" y="0" style="stroke: none; stroke-width: 0; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); opacity: 1;">-</tspan><tspan x="193.26171875" y="0" style="stroke: none; stroke-width: 0; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); opacity: 1;">b</tspan><tspan x="213.26171875" y="0" style="stroke: none; stroke-width: 0; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); opacity: 1;">a</tspan><tspan x="231.015625" y="0" style="stroke: none; stroke-width: 0; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); opacity: 1;">z</tspan><tspan x="0" y="0" fill="rgb(0,0,0)">qux</tspan></text></g>');
+      // Store a regex that matches arbitrary whitespace (i.e. outside of tags).
+      var matchArbitraryWhitespace = /(\s+(?=<(?!\/tspan))|\s+$)/g,
+          uniformXmlOfSVG = iText.toSVG().replace(matchArbitraryWhitespace, ""),
+          testSVG = '<g transform="translate(124.38 52)"><text font-family="Times New Roman" font-size="40" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); opacity: 1;" transform="translate(-124.38 39)"><tspan x="0" y="0" style="stroke: none; stroke-width: 0; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: #112233; opacity: 1;">t</tspan><tspan x="11.11328125" y="0" style="stroke: none; stroke-width: 0; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); opacity: 1;">e</tspan><tspan x="28.8671875" y="0" style="stroke: #223344; stroke-width: 0; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); opacity: 1;">s</tspan><tspan x="44.43359375" y="0" style="stroke: none; stroke-width: 0; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); opacity: 1;">t</tspan><tspan x="55.546875" y="0" style="stroke: none; stroke-width: 0; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); opacity: 1;"> </tspan><tspan x="65.546875" y="0" style="stroke: none; stroke-width: 0; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); opacity: 1;">f</tspan><tspan x="78.8671875" y="0" style="stroke: none; stroke-width: 0; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); opacity: 1;">o</tspan><tspan x="98.8671875" y="0" style="stroke: none; stroke-width: 0; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); opacity: 1;">o</tspan><tspan x="118.8671875" y="0" style="stroke: none; stroke-width: 0; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); opacity: 1;"> </tspan><tspan x="128.8671875" y="0" style="stroke: none; stroke-width: 0; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); opacity: 1;">b</tspan><tspan x="148.8671875" y="0" style="stroke: none; stroke-width: 0; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); opacity: 1;">a</tspan><tspan x="166.62109375" y="0" style="stroke: none; stroke-width: 0; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); opacity: 1;">r</tspan><tspan x="179.94140625" y="0" style="stroke: none; stroke-width: 0; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); opacity: 1;">-</tspan><tspan x="193.26171875" y="0" style="stroke: none; stroke-width: 0; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); opacity: 1;">b</tspan><tspan x="213.26171875" y="0" style="stroke: none; stroke-width: 0; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); opacity: 1;">a</tspan><tspan x="231.015625" y="0" style="stroke: none; stroke-width: 0; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); opacity: 1;">z</tspan><tspan x="0" y="0" fill="rgb(0,0,0)">qux</tspan></text></g>',
+          uniformXmlOfTestSVG = testSVG.replace(matchArbitraryWhitespace, "");
+
+      equal(uniformXmlOfSVG, uniformXmlOfTestSVG);
     }
 
     // TODO: more SVG tests here?

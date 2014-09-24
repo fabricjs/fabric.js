@@ -228,6 +228,27 @@
     },
 
     /**
+     * Returns the angle in degrees between this point and another one
+     * @param {fabric.Point} that
+     * @return {Number}
+     */
+    degreesBetween: function(that) {
+      return fabric.util.radiansToDegrees(this.radiansBetween(that));
+    },
+
+    /**
+     * Returns the angle in radians between this point and another one
+     * @param {fabric.Point} that
+     * @return {Number}
+     */
+    radiansBetween: function(that) {
+      var p1 = this,
+          p2 = that;
+      // Angle in radians.
+      return Math.atan2(p2.y - p1.y, p2.x - p1.x);
+    },
+
+    /**
      * Returns a new point which is the min of this and another one
      * @param {fabric.Point} that
      * @return {fabric.Point}
