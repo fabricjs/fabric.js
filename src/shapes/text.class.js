@@ -306,6 +306,48 @@
     shadow:               null,
 
     /**
+     * fabric.Path that the text observes
+     * @type fabric.Path
+     */
+    textPath: null,
+
+    /**
+     * Distance along the fabric.Path in fabric.Text#textPath that the text should start at
+     * @type fabric.Path
+     */
+    textPathDistanceOffset: null,
+
+    /**
+     * If fabric.Text#textPath exists, should letters rotate along the path or not
+     * @type Boolean
+     */
+    wantObservePathRotation: true,
+
+    /**
+     * If fabric.Text#textPath exists, should letters be subject to collision detection to help ensure legibility or not
+     * @type Boolean
+     */
+    wantTextPathWithLessOverlap: false,
+
+    /**
+     * If fabric.Text#textPath exists, should a faded, untransformed version of fabric.Text#text be rendered or not
+     * @type Boolean
+     */
+    wantTextPathResidue: true,
+
+    /**
+     * If fabric.Text#textPath exists and non-zero, the fabric.Path in fabric.Text#textPath will be approximated to this number of points; otherwise, path will be drawn as-is
+     * @type Number
+     */
+    wantApproximationDetail: 0,
+
+    /**
+     * If true, do not destroy the fabric.Text#_boundaries object; otherwise, perform all boundary calculations every time
+     * @type Boolean
+     */
+    isFrozen: false,
+
+    /**
      * Constructor
      * @param {String} text Text string
      * @param {Object} [options] Options object
@@ -361,7 +403,7 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _renderViaNative: function(ctx) {
-      var textLines = this.text.split(this._reNewline);
+      var textLines = this._getTextLines();
 
       this._setTextStyles(ctx);
 
@@ -417,18 +459,30 @@
      * @param {Array} textLines Array of all text lines
      */
     _setBoundaries: function(ctx, textLines) {
-      this._boundaries = [ ];
+      // Only set the boundaries if necessary.
+      if (this.isFrozen == null || this.isFrozen === false) {
+        // Reset boundaries.
+        this._boundaries = [];
+        // If fabric.Text-like object supports the ability to get the width of a line, use that instead of the ctx[method] fabric.Text#_getLineWidth defers to.
+        var supportsWidthOfLine = (this._getWidthOfLine == null) ? false : true;
 
-      for (var i = 0, len = textLines.length; i < len; i++) {
-
-        var lineWidth = this._getLineWidth(ctx, textLines[i]),
-            lineLeftOffset = this._getLineLeftOffset(lineWidth);
-
-        this._boundaries.push({
-          height: this.fontSize * this.lineHeight,
-          width: lineWidth,
-          left: lineLeftOffset
-        });
+        // Iterate the lines of text, setting the boundaries of width, height, and left offset.
+        for (var lineIndex = 0, len = textLines.length; lineIndex < len; lineIndex++) {
+          var lineWidth = (supportsWidthOfLine) ? this._getWidthOfLine(ctx, lineIndex, textLines) : this._getLineWidth(ctx, textLines[lineIndex]);
+          var lineLeftOffset = this._getLineLeftOffset(lineWidth);
+          this._boundaries.push({
+            height: this._getHeightOfLine(ctx, lineIndex, textLines),
+            width: lineWidth,
+            left: lineLeftOffset
+          });
+        }
+      } else {
+        // If boundaries are already set, reset the flag to draw the residue.
+        if (this.wantTextPathResidue && this._boundaries) {
+          for (var lineIndex = 0, len = this._boundaries.length; lineIndex < len; lineIndex++) {
+            this._boundaries[lineIndex].residueHasBeenDrawn = null;
+          }
+        }
       }
     },
 
@@ -487,43 +541,81 @@
     },
 
     /**
+     * Render an unjustified line of the text in fabric.Text#text by the requested context method
      * @private
      * @param {String} method Method name ("fillText" or "strokeText")
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {String} line Text to render
-     * @param {Number} left Left position of text
-     * @param {Number} top Top position of text
-     * @param {Number} lineIndex Index of a line in a text
+     * @param {String} line Text to calculate.
+     * @param {Number} left Left position of text.
+     * @param {Number} top Top position of text.
+     * @param {Number} lineIndex Index of the line in the text.
      */
-    _renderTextLine: function(method, ctx, line, left, top, lineIndex) {
-      // lift the line by quarter of fontSize
-      top -= this.fontSize / 4;
-
-      // short-circuit
-      if (this.textAlign !== 'justify') {
+    _renderUnjustifiedTextLine: function(method, ctx, line, left, top, lineIndex) {
+      // If observing a path, go letter by letter through the line, render the character, and advance by the previous distance. Otherwise, render the characters normally.
+      if (this.textPath) {
+        this._renderTextLineOnTextPath(method, ctx, line, left, top, lineIndex);
+      } else {
         this._renderChars(method, ctx, line, left, top, lineIndex);
-        return;
       }
+    },
 
-      var lineWidth = ctx.measureText(line).width,
-          totalWidth = this.width;
+    /**
+     * Render a justified line of the text in fabric.Text#text by the requested context method
+     * @private
+     * @param {String} method Method name ("fillText" or "strokeText")
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {String} line Text to calculate.
+     * @param {Number} left Left position of text.
+     * @param {Number} top Top position of text.
+     * @param {Number} lineIndex Index of the line in the text.
+     * @param {Number} totalWidth Width to fill; depends on existence of spaces to act as expandable targets.
+     */
+    _renderJustifiedTextLine: function(method, ctx, line, left, top, lineIndex, totalWidth) {
+      // Stretch the line by altering the width of individual spaces (note: requires having spaces).
+      var words = line.split(/\s+/),
+          wordsWidth = ctx.measureText(line.replace(/\s+/g, '')).width,
+          widthDiff = totalWidth - wordsWidth,
+          numSpaces = words.length - 1,
+          spaceWidth = widthDiff / numSpaces,
+          leftOffset = 0;
 
-      if (totalWidth > lineWidth) {
-        // stretch the line
-        var words = line.split(/\s+/),
-            wordsWidth = ctx.measureText(line.replace(/\s+/g, '')).width,
-            widthDiff = totalWidth - wordsWidth,
-            numSpaces = words.length - 1,
-            spaceWidth = widthDiff / numSpaces,
-            leftOffset = 0;
-
+      // If observing a path, go letter by letter through the line, render the character, and advance by the previous distance, optionally overriding the distance to be spaceWidth for spaces. Otherwise, render the line word by word, skipping over spaces by spaceWidth.
+      if (this.textPath) {
+        this._renderTextLineOnTextPath(method, ctx, line, left, top, lineIndex, spaceWidth);
+      } else {
         for (var i = 0, len = words.length; i < len; i++) {
           this._renderChars(method, ctx, words[i], left + leftOffset, top, lineIndex);
           leftOffset += ctx.measureText(words[i]).width + spaceWidth;
         }
       }
-      else {
-        this._renderChars(method, ctx, line, left, top, lineIndex);
+    },
+
+    /**
+     * Generically render a line of the text in fabric.Text#text by the requested context method
+     * @private
+     * @param {String} method Method name ("fillText" or "strokeText")
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {String} line Text to calculate.
+     * @param {Number} left Left position of text.
+     * @param {Number} top Top position of text.
+     * @param {Number} lineIndex Index of the line in the text.
+     */
+    _renderTextLine: function(method, ctx, line, left, top, lineIndex) {
+      // Lift the line by a quarter of the fontSize.
+      top -= this.fontSize / 4;
+      // If the text isn't justified, render it without any additional tests.
+      if (this.textAlign !== 'justify') {
+        this._renderUnjustifiedTextLine(method, ctx, line, left, top, lineIndex);
+      } else {
+        // Otherwise, perform an initial justification test. If true, figure out how large spaces should actually be. Otherwise, render normally.
+        var lineWidth = ctx.measureText(line).width, totalWidth = this.width;
+
+        // If the total width is larger than this line's width, render this line with the justified algorithm.
+        if (totalWidth > lineWidth) {
+          this._renderJustifiedTextLine(method, ctx, line, left, top, lineIndex, totalWidth);
+        } else {
+          this._renderUnjustifiedTextLine(method, ctx, line, left, top, lineIndex);
+        }
       }
     },
 
@@ -555,23 +647,10 @@
       if (!this.fill && !this._skipFillStrokeCheck) {
         return;
       }
-
-      this._boundaries = [ ];
-      var lineHeights = 0;
-
-      for (var i = 0, len = textLines.length; i < len; i++) {
-        var heightOfLine = this._getHeightOfLine(ctx, i, textLines);
-        lineHeights += heightOfLine;
-
-        this._renderTextLine(
-          'fillText',
-          ctx,
-          textLines[i],
-          this._getLeftOffset(),
-          this._getTopOffset() + lineHeights,
-          i
-        );
+      if (this._boundaries == null || this.isFrozen == null || this.isFrozen === false) {
+        this._boundaries = [];
       }
+      this._renderTextLines("fillText", ctx, textLines);
     },
 
     /**
@@ -580,12 +659,9 @@
      * @param {Array} textLines Array of all text lines
      */
     _renderTextStroke: function(ctx, textLines) {
-      if ((!this.stroke || this.strokeWidth === 0) && !this._skipFillStrokeCheck) {
+      if ((this.stroke == null || this.strokeWidth === 0) && !this._skipFillStrokeCheck) {
         return;
       }
-
-      var lineHeights = 0;
-
       ctx.save();
       if (this.strokeDashArray) {
         // Spec requires the concatenation of two copies the dash list when the number of elements is odd
@@ -594,21 +670,11 @@
         }
         supportsLineDash && ctx.setLineDash(this.strokeDashArray);
       }
-
       ctx.beginPath();
-      for (var i = 0, len = textLines.length; i < len; i++) {
-        var heightOfLine = this._getHeightOfLine(ctx, i, textLines);
-        lineHeights += heightOfLine;
-
-        this._renderTextLine(
-          'strokeText',
-          ctx,
-          textLines[i],
-          this._getLeftOffset(),
-          this._getTopOffset() + lineHeights,
-          i
-        );
+      if (this._boundaries == null) {
+        this._boundaries = [];
       }
+      this._renderTextLines("strokeText", ctx, textLines);
       ctx.closePath();
       ctx.restore();
     },
@@ -623,8 +689,11 @@
      * @param {Array} textLines Array of all text lines
      */
     _renderTextBackground: function(ctx, textLines) {
-      this._renderTextBoxBackground(ctx);
-      this._renderTextLinesBackground(ctx, textLines);
+      // If no text path, draw normally. Otherwise, depend on fill or stroke pass.
+      if (this.textPath == null) {
+        this._renderTextBoxBackground(ctx);
+        this._renderTextLinesBackground(ctx, textLines);
+      }
     },
 
     /**
@@ -681,6 +750,15 @@
     },
 
     /**
+     * Gets the text lines this fabric.Text object represents (in array format)
+     * @private
+     * @return {Array} Array of text lines, split at new lines.
+     */
+    _getTextLines: function() {
+      return this.text.split(this._reNewline);
+    },
+
+    /**
      * @private
      * @param {Number} lineWidth Width of text line
      * @return {Number} Line left offset
@@ -708,6 +786,100 @@
     },
 
     /**
+     * Get the lines in order of widest to least wide
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Array} textLines Array of all text lines
+     */
+    _getOrderOfWidestLines: function(ctx, textLines) {
+      // Ordering by line width is required by the text on path feature, which requires knowing the individual line boundaries.
+      if (this._boundaries.length == 0) {
+        textLines = (textLines == null) ? textLines : this._getTextLines();
+        this._setBoundaries(ctx, textLines);
+      }
+
+      // Prepare a place to store the ordered indices. Also, get a copy of the boundaries.
+      var order = [],
+          objectsToOrderByWidth = this._boundaries.slice(0);
+
+      // Do the sort by longest width (using a stack).
+      while (objectsToOrderByWidth.length > 0) {
+        // Compare current to everything that's left.
+        var current = objectsToOrderByWidth.shift(),
+            foundWiderLine = false;
+
+        // Iterate the boundaries of the remaining text lines, checking for wider lines.
+        for (var i = 0, len = objectsToOrderByWidth.length; i < len && !foundWiderLine; i++) {
+          var comparison = objectsToOrderByWidth[i];
+          // If the comparison object is wider than the current object, no further testing is needed for this pass.
+          if (comparison.width > current.width) {
+            // Put the current object back on the stack.
+            objectsToOrderByWidth.push(current);
+            // Break out.
+            foundWiderLine = true;
+          }
+        }
+        if (!foundWiderLine) {
+          order.push(this._boundaries.indexOf(current));
+        }
+      }
+      return order;
+    },
+
+    /**
+     * Gets the maximum line width for the text this fabric.Text object represents
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Array} textLines Array of all text lines
+     * @return {Number} Width of the longest text line.
+     */
+    _getMaximumLineWidth: function(ctx, textLines) {
+      var width = 0;
+
+      // Maximum line width is required by the text on path feature, which requires knowing the individual line boundaries.
+      if (this._boundaries.length == 0) {
+        textLines = (textLines == null) ? textLines : this._getTextLines();
+        this._setBoundaries(ctx, textLines);
+      }
+      for (var i = 0, len = this._boundaries.length; i < len; i++) {
+        width = (this._boundaries[i].width > width) ? this._boundaries[i].width : width;
+      }
+      return width;
+    },
+
+    /**
+     * Gets the line height without explicitly specifying the text lines this fabric.Text object represents
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @return {Number} Height of the text.
+     */
+    _getObservedTotalLineHeight: function(ctx) {
+      var textLines = this._getTextLines();
+
+      return this._getTextHeight(ctx, textLines);
+    },
+
+    /**
+     * Fills a rectangle as a proxy for the text-decoration
+     * @private
+     */
+    _renderLinesAtOffset: function(ctx, textLines, halfOfVerticalBox, offset) {
+      for (var i = 0, len = textLines.length; i < len; i++) {
+        var lineWidth = this._getLineWidth(ctx, textLines[i]),
+            lineLeftOffset = this._getLineLeftOffset(lineWidth);
+
+        // Fill rectangle at: x, floor(offset + expectedLineHeight).
+        ctx.fillRect(
+          this._getLeftOffset() + lineLeftOffset,
+          ~~((offset + (i * this._getHeightOfLine(ctx, i, textLines))) - halfOfVerticalBox),
+          lineWidth,
+          1
+        );
+      }
+    },
+
+    /**
+     * Renders decorations ("underline", "line-through", "overline") found in fabric.Text#textDecoration
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      * @param {Array} textLines Array of all text lines
@@ -717,33 +889,117 @@
         return;
       }
 
-      // var halfOfVerticalBox = this.originY === 'top' ? 0 : this._getTextHeight(ctx, textLines) / 2;
-      var halfOfVerticalBox = this._getTextHeight(ctx, textLines) / 2,
-          _this = this;
+      // Determine which text decorations are requested.
+      var doUnderline = (this.textDecoration.indexOf("underline") > -1) ? true : false,
+          doLineThrough = (this.textDecoration.indexOf("line-through") > -1) ? true : false,
+          doOverline = (this.textDecoration.indexOf("overline") > -1) ? true : false;
 
-      /** @ignore */
-      function renderLinesAtOffset(offset) {
-        for (var i = 0, len = textLines.length; i < len; i++) {
+      // If there is no text path, draw the lines normally. Otherwise, plot the line and draw it.
+      if (this.textPath == null) {
+        var halfOfVerticalBox = this._getTextHeight(ctx, textLines) / 2;
 
-          var lineWidth = _this._getLineWidth(ctx, textLines[i]),
-              lineLeftOffset = _this._getLineLeftOffset(lineWidth);
+        if (doUnderline) {
+          this._renderLinesAtOffset(ctx, textLines, halfOfVerticalBox, this.fontSize * this.lineHeight);
+        }
+        if (doLineThrough) {
+          this._renderLinesAtOffset(ctx, textLines, halfOfVerticalBox, this.fontSize * this.lineHeight - this.fontSize / 2);
+        }
+        if (doOverline) {
+          this._renderLinesAtOffset(ctx, textLines, halfOfVerticalBox, this.fontSize * this.lineHeight - this.fontSize);
+        }
+      } else {
+        // Check if interface supports specific character styles.
+        var supportsSpecificStyles = (this.getCurrentCharStyle == null) ? false : true;
 
-          ctx.fillRect(
-            _this._getLeftOffset() + lineLeftOffset,
-            ~~((offset + (i * _this._getHeightOfLine(ctx, i, textLines))) - halfOfVerticalBox),
-            lineWidth,
-            1);
+        if (doUnderline || supportsSpecificStyles) {
+          this._renderTextDecorationOnTextPath(ctx, "underline");
+        }
+        if (doLineThrough || supportsSpecificStyles) {
+          this._renderTextDecorationOnTextPath(ctx, "line-through");
+        }
+        if (doOverline || supportsSpecificStyles) {
+          this._renderTextDecorationOnTextPath(ctx, "overline");
         }
       }
+    },
 
-      if (this.textDecoration.indexOf('underline') > -1) {
-        renderLinesAtOffset(this.fontSize * this.lineHeight);
-      }
-      if (this.textDecoration.indexOf('line-through') > -1) {
-        renderLinesAtOffset(this.fontSize * this.lineHeight - this.fontSize / 2);
-      }
-      if (this.textDecoration.indexOf('overline') > -1) {
-        renderLinesAtOffset(this.fontSize * this.lineHeight - this.fontSize);
+    /**
+     * Renders decorations ("underline", "line-through", "overline") found in fabric.Text#textDecoration specifically for text on the fabric.Path located in fabric.Text#textPath
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {String} decoration Specific decoration; valid values: "underline", "line-through", and "overline".
+     */
+    _renderTextDecorationOnTextPath: function(ctx, decoration) {
+      // Create top offset. Also, check if the interface supports specific character styles. Also, deal with horizontal translation from text alignment.
+      var runningLineHeight = 0,
+          supportsSpecificStyles = (this.getCurrentCharStyle == null) ? false : true,
+          crutchX = (this.textAlign === "left" || this.textAlign === "justify") ? 0 : (this.textAlign === "center") ? (this.width / 2) : this.width;
+
+      // Iterate though the lines of text, rendering the decoration as necessary.
+      for (var lineIndex = 0, len = this._boundaries.length; lineIndex < len; lineIndex++) {
+        // Obtain the dimensional data about this line. Also, track whether or not a line was drawn in the previous iteration.
+        var lineBoundary = this._boundaries[lineIndex],
+            verticalAdjustment = this._getTopOffset() + runningLineHeight + lineBoundary.height / 2,
+            hadLine = false;
+
+        // Increase the running line height by the current line's height.
+        runningLineHeight += lineBoundary.height;
+        // Push settings.
+        ctx.save();
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = this.fill || this.stroke || "black";
+        ctx.beginPath();
+        for (var charIndex = 0, lineLength = lineBoundary.letters.length; charIndex < lineLength; charIndex++) {
+          // Get character style. Character indices in line styles are one-index rather than zero-index.
+          var style = (!supportsSpecificStyles) ? this : this.getCurrentCharStyle(lineIndex, charIndex + 1),
+              command = (style.textDecoration && style.textDecoration.indexOf(decoration) > -1) ? "lineTo" : "moveTo",
+              letterEntry = lineBoundary.letters[charIndex], // Get letter entry.
+              point = letterEntry.point, // Get center point of drawing.
+              perpendicularAngle = point.angleOfTangentInRadians + Math.PI / 2, // Get perpendicular angle. Default (at a 0 degree tangent) is 90 degrees. TODO: Interpolation for less harsh visual result.
+              thisVerticalAdjustment = (this.type === "i-text") ? verticalAdjustment + this.fontSize / 4 : verticalAdjustment,
+              distanceToMove = 0;
+
+          if (decoration === "underline") {
+            // Try to shift the line down.
+            distanceToMove = thisVerticalAdjustment + point.halfHeightOfLetter;
+          } else if (decoration === "overline") {
+            // Try to shift the line up.
+            distanceToMove = -1 * (-thisVerticalAdjustment + point.halfHeightOfLetter);
+          } else {
+            distanceToMove = thisVerticalAdjustment;
+          }
+
+          // Get delta to point (slides up or down).
+          var deltaToPoint = new fabric.Point(crutchX + distanceToMove * Math.cos(perpendicularAngle), distanceToMove * Math.sin(perpendicularAngle));
+
+          // Perform the line drawing.
+          if (!hadLine && command === "lineTo") {
+            // If this point happens after no line (like at the start of the process), it's necessary to draw a segment from the left edge to the center.
+            var deltaToStartPoint = new fabric.Point(-point.halfWidth * Math.cos(point.angleOfTangentInRadians), -point.halfWidth * Math.sin(point.angleOfTangentInRadians));
+            ctx.moveTo(deltaToPoint.x + point.x + deltaToStartPoint.x, deltaToPoint.y + point.y + deltaToStartPoint.y);
+            ctx[command](deltaToPoint.x + point.x, deltaToPoint.y + point.y);
+          } else if (charIndex == (lineLength - 1)) {
+            // If this point is the very last point, it's necessary to draw a segment from the center to the right edge.
+            var deltaToEndPoint = new fabric.Point(point.halfWidth * Math.cos(point.angleOfTangentInRadians), point.halfWidth * Math.sin(point.angleOfTangentInRadians));
+            ctx[command](deltaToPoint.x + point.x + deltaToEndPoint.x, deltaToPoint.y + point.y + deltaToEndPoint.y);
+            } else if (command === "moveTo") {
+            // In case of skipped text decoration at the character level, slide to the right edge.
+            var deltaToEdgePoint = new fabric.Point(point.halfWidth * Math.cos(point.angleOfTangentInRadians), point.halfWidth * Math.sin(point.angleOfTangentInRadians));
+            ctx[command](deltaToPoint.x + point.x + deltaToEdgePoint.x, deltaToPoint.y + point.y + deltaToEdgePoint.y);
+          } else {
+            // Point is along an existing line.
+            ctx[command](deltaToPoint.x + point.x, deltaToPoint.y + point.y);
+            // To help deal with skips, make a segment to the edge as well.
+            var deltaToEdgePoint = new fabric.Point(point.halfWidth * Math.cos(point.angleOfTangentInRadians), point.halfWidth * Math.sin(point.angleOfTangentInRadians));
+            ctx[command](deltaToPoint.x + point.x + deltaToEdgePoint.x, deltaToPoint.y + point.y + deltaToEdgePoint.y);
+          }
+          // Track if had line or not.
+          hadLine = (command === "lineTo") ? true : false;
+        }
+        ctx.strokeStyle = ctx.strokeStyle;
+        ctx.stroke();
+        ctx.closePath();
+        ctx.restore();
       }
     },
 
@@ -758,6 +1014,664 @@
         this.fontSize + 'px',
         (fabric.isLikelyNode ? ('"' + this.fontFamily + '"') : this.fontFamily)
       ].join(' ');
+    },
+
+    /**
+     * Render an array of text lines in the requested way, ordered by widest line first
+     * @private
+     * @param {String} method Context method to call ("fillText", "strokeText", etc)
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Array} textLines Array of all text lines
+     */
+    _renderTextLines: function(method, ctx, textLines) {
+      // Order the lines by widest first. This is a step required by the text-on-path feature in order to support right, center, and justify alignments.
+      var order = (!this.textPath) ? textLines.map(function (line) { return textLines.indexOf(line); }) : this._getOrderOfWidestLines(ctx, textLines),
+          copyOfOrder = order.slice(0), // To be forward compatible with fabric.IText, it's important to go the long route, even though fabric.Text doesn't require it.
+          lineHeights = [];
+
+      // Initially, obtain a list of all line heights without rendering (required to determine vertical offset for widest lines first, which may not be positionally first).
+      while (copyOfOrder.length > 0) {
+        var currentIndex = copyOfOrder.shift(),
+            lineHeight = this._getHeightOfLine(ctx, currentIndex, textLines);
+
+        lineHeights[currentIndex] = lineHeight;
+      }
+      // Render the lines in order of width.
+      while (order.length > 0) {
+        // Obtain current index.
+        var currentIndex = order.shift(),
+            // Sum the observed line heights up to (and including) the current index.
+            summedLineHeight = lineHeights.slice(0, currentIndex + 1).reduce(function(a, b) { return a + b; }, 0);
+
+        this._renderTextLine(
+          method,
+          ctx,
+          textLines[currentIndex],
+          this._getLeftOffset(),
+          this._getTopOffset() + summedLineHeight,
+          currentIndex
+        );
+      }
+    },
+
+    /**
+     * Gets the angle of the tangent near the specified distance
+     * @private
+     * @param {Number} distance Distance along the fabric.Path object stored in fabric.Text#textPath
+     */
+    _getAngleOfTangentAtDistanceInDegrees: function(distance) {
+      // Track the angle of the tangent.
+      var angle = 0;
+
+      if (this.textPath) {
+        // Get two distances to represent the tangent. Also, get two points to represent the tangent.
+        var leftDistance = distance - 0.00075,
+            rightDistance = distance + 0.00075,
+            leftPoint = this.textPath.getPointAtLength(leftDistance),
+            rightPoint = this.textPath.getPointAtLength(rightDistance);
+
+        // Calculate angle of the tangent.
+        angle = leftPoint.degreesBetween(rightPoint);
+      }
+      // Send the angle back.
+      return angle;
+    },
+
+    /**
+     * Gets the distance along the path traced by fabric.Text#textPath required to show an object of size: (widthOfCharacter, halfNonTransformedHeight) @ angleInDegrees
+     * @private
+     * @param {Number} angleInDegrees Angle in degrees; clamped to first quadrant of unit-circle.
+     * @param {Number} halfNonTransformedHeight Height of the object.
+     * @param {Number} widthOfCharacter Width of the object.
+     * @return {Number} Suggested parametric distance along the fabric.Text#textPath to consume for the object.
+     */
+    _getDistanceConsumptionGivenAngleInDegrees: function(angleInDegrees, halfNonTransformedHeight, widthOfCharacter) {
+      // First, circularly clamp the angle to be from 0 to 90 degrees.  
+      var rotationInFirstQuadrantOfUnitCircle = Math.abs(angleInDegrees) % 90,
+          // Calculate the percentage of height and width this suggests (100% height at 90, 100% width at 0, 50% of both at 45).
+          percentOfHeight = rotationInFirstQuadrantOfUnitCircle / 90,
+          // Complement the percent to represent width.
+          percentOfWidth = 1 - percentOfHeight,
+          // Calculate the distance to be consumed in total.
+          requiredDistance = percentOfHeight * halfNonTransformedHeight + percentOfWidth * widthOfCharacter;
+
+      // Send it back.
+      return requiredDistance;
+    },
+
+    /**
+     * Gets the maximum distance consumption along the path in fabric.Text#textPath for the text this fabric.Text object represents
+     * @private
+     * @return {Number} Distance consumption required by the text in fabric.Text#text.
+     */
+    _getMaximumConsumedDistance: function() {
+      if (this._boundaries.length > 0) {
+        // Track the distance to be consumed.
+        var distance;
+
+        for (var i = 0, len = this._boundaries.length; i < len; i++) {
+          var current = this._boundaries[i];
+
+          if (current.consumedDistance != null) {
+            if (distance == null || current.consumedDistance > distance) {
+              distance = current.consumedDistance;
+            }
+          }
+        }
+        return distance;
+      }
+      return undefined;
+    },
+
+    /**
+     * Render a version of the text in fabric.Text#text untransformed by the fabric.Path in fabric.Text#textPath; style of text is intentionally faded out
+     * @private
+     * @param {String} method Method name ("fillText" or "strokeText")
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {String} line Text to render
+     * @param {Number} left Left position of text
+     * @param {Number} top Top position of text
+     * @param {Number} lineIndex Index of a line in a text
+     */
+    _drawTextResidueIfNecessary: function(method, ctx, line, left, top, lineIndex) {
+      if (this.wantTextPathResidue && this.textPath) {
+        // Has the residue already been drawn?
+        var residueTracker = this._boundaries[lineIndex].residueHasBeenDrawn,
+            residueTrackerIsUndefined = (residueTracker == null) ? true : false,
+            residueBoxNeedsToBeDrawn = (lineIndex == 0 && (residueTrackerIsUndefined || !residueTracker["bounding-box"])) ? true : false,
+            isFirstPass = (residueTrackerIsUndefined || residueTracker[method] == null || !residueTracker[method]) ? true : false;
+
+        // If this is the first pass, at least draw the residue of the text.
+        if (isFirstPass) {
+          var textPath = this.textPath,
+              globalAlpha = ctx.globalAlpha,
+              crutchY = (this.type == "i-text") ? 0 : this.fontSize / 4;
+
+          this.textPath = null;
+          ctx.fillStyle = "#000000";
+          ctx.strokeStyle = "#000000";
+          ctx.globalAlpha = 0.05;
+          this._renderTextLine(method, ctx, line, left, top + crutchY, lineIndex);
+          this.textPath = textPath;
+          ctx.fillStyle = this.fill;
+          ctx.strokeStyle = this.stroke;
+          ctx.globalAlpha = globalAlpha;
+          // Draw dashed box.
+          if (residueBoxNeedsToBeDrawn) {
+            // Copy data out.
+            var previousBorderColor = this.borderColor,
+                hasBorders = this.hasBorders,
+                hasRotatingPoint = this.hasRotatingPoint,
+                isMoving = this.isMoving,
+                borderOpacityWhenMoving = this.borderOpacityWhenMoving,
+                // If the canvas matrix has been translated (center or right alignments), get the amount to slide the drawing back into place.
+                crutchX = (this.textAlign === "left" || this.textAlign === "justify") ? 0 : (this.textAlign === "center") ? (-this.width / 2) : -this.width; 
+
+            // Replace it.
+            this.borderColor = "#000000";
+            this.hasBorders = true;
+            this.hasRotatingPoint = false;
+            this.borderOpacityWhenMoving = 0.1;
+            this.isMoving = true;
+            
+            // Draw dashed, low-opacity rectangle.
+            ctx.save();
+            ctx.setLineDash([2, 3]);
+            ctx.translate(crutchX, 0);
+            this.drawBorders(ctx);
+            ctx.restore();
+
+            // Copy data back in.
+            this.borderColor = previousBorderColor;
+            this.hasBorders = hasBorders;
+            this.hasRotatingPoint = hasRotatingPoint;
+            this.borderOpacityWhenMoving = borderOpacityWhenMoving;
+            this.isMoving = isMoving;
+          }
+          // Track this result.
+          if (residueTrackerIsUndefined) {
+            this._boundaries[lineIndex].residueHasBeenDrawn = {};
+          }
+          this._boundaries[lineIndex].residueHasBeenDrawn[method] = true;
+          this._boundaries[lineIndex].residueHasBeenDrawn["bounding-box"] = true;
+        }
+      }
+    },
+
+    /**
+     * Get a 4-point bounding box polygon that represents a box of size (2 * halfWidthOfLetter, 2 * halfHeightOfLetter) @ angleInDegrees
+     * @private
+     * @param {fabric.Point} point Represents center point of drawing.
+     * @param {Number} top Offset used to provide additional vertical placement for the center point.
+     * @param {Number} halfWidthOfLetter Half the width of the object.
+     * @param {Number} halfHeightOfLetter Half the height of the object.
+     * @param {Number} angleInDegrees Angle in degrees to transform the original bounding box points by.
+     * @param {Boolean} reverseMode If the mode is reversed (in the case of fabric.Text#textAlign "right"), make it so that the edges logically match up with the indices of all the other cases (i.e. not "right").
+     * @return {Array} An array of fabric.Point objects that represent the polygon.
+     */
+    _getMinorBoundingBoxAroundPoint: function(point, top, halfWidthOfLetter, halfHeightOfLetter, angleInDegrees, reverseMode) {
+      if (reverseMode == null) {
+        reverseMode = false;
+      }
+
+      // Get lines. X represents the leading edge, which is the right edge in non-right-aligned cases, and the left edge otherwise.
+      var x = (!reverseMode) ? point.x - halfWidthOfLetter : point.x + halfWidthOfLetter,
+          x2 = (!reverseMode) ? point.x + halfWidthOfLetter : point.x - halfWidthOfLetter,
+          // Get the points that represent an unrotated box around just the letter.
+          thisUntransformedUpperLeadingPoint = new fabric.Point(x, point.y + top - halfHeightOfLetter),
+          thisUntransformedLowerLeadingPoint = new fabric.Point(x, point.y + top + halfHeightOfLetter),
+          thisUntransformedLowerTrailingPoint = new fabric.Point(x2, point.y + top + halfHeightOfLetter),
+          thisUntransformedUpperTrailingPoint = new fabric.Point(x2, point.y + top - halfHeightOfLetter),
+          // Rotate point around center.
+          radians = fabric.util.degreesToRadians(angleInDegrees),
+          thisMinorBoundingBox = [
+            fabric.util.rotatePoint(thisUntransformedUpperLeadingPoint, point, radians),
+            fabric.util.rotatePoint(thisUntransformedLowerLeadingPoint, point, radians),
+            fabric.util.rotatePoint(thisUntransformedLowerTrailingPoint, point, radians),
+            fabric.util.rotatePoint(thisUntransformedUpperTrailingPoint, point, radians)
+          ];
+
+      return thisMinorBoundingBox;
+    },
+
+    /**
+     * Determine if two (4-point) bounding boxes share one and only one edge
+     * @private
+     * @param {Array} boundingBox Represents a reference bounding box.
+     * @param {Array} otherBoundingBox Represents a comparison bounding box.
+     * @return {Boolean} If the two bounding boxes only share one edge, then true. Otherwise, false.
+     */
+    _pointsShareOnlyOneEdge: function(boundingBox, otherBoundingBox) {
+      var sharedCount = 0;
+
+      for (var c = 0, len = boundingBox.length; c < len; c++) {
+        var firstIndex = c % len,
+            secondIndex = (c + 1) % len,
+            firstNotIndex = (c + 3) % len,
+            secondNotIndex = (c + 2) % len,
+            p1 = boundingBox[firstIndex],
+            p2 = boundingBox[secondIndex],
+            pNot1 = otherBoundingBox[firstNotIndex],
+            pNot2 = otherBoundingBox[secondNotIndex];
+
+        if (p1.eq(pNot1) && p2.eq(pNot2)) {
+          sharedCount += 1;
+        }
+      }
+      return (sharedCount == 1) ? true : false;
+    },
+
+    /**
+     * Gets an acceptable center point for an object along the fabric.Path in fabric.Text#textPath
+     * @private
+     * @param {Number} runningDistance Distance along the path to start calculations.
+     * @param {Number} widthOfCharacter Width of the object.
+     * @param {Number} halfWidth Half of the width of the object (calculated elsewhere).
+     * @param {Number} halfHeightOfLetter Half the height of the object.
+     * @param {Number} halfNonTransformedHeight Half the height the object is contained in (ex. total line height).
+     * @param {Number} top Vertical offset of line.
+     * @param {fabric.Point} previousPoint Previous center point.
+     * @param {Boolean} reverseMode If false, calculations move from left to right. Otherwise, calculations move from right to left.
+     * @param {Boolean} wantLessTextPathOverlapFeature If false, consume the very least distance required by the object. Otherwise, perform collision detection on the generated bounding boxes (looks one bounding box backwards) to place discontinuities along the path function in order to more intuitively place objects along the path.
+     * @return {fabric.Point} Acceptable center point on path of fabric.Text#textPath to draw object.
+     */
+    _getAcceptablePoint: function(runningDistance, widthOfCharacter, halfWidth, halfHeightOfLetter, halfNonTransformedHeight, top, previousPoint, reverseMode, wantLessTextPathOverlapFeature) {
+      // Represents where the object would be placed if the line were completely horizontal. Use to find a tangent.
+      var initialDistancePlusHalfWidth = (!reverseMode) ? runningDistance + halfWidth : runningDistance - halfWidth,
+          // Prepare a place to store the angle of the tangent (may be reset to avoid rotation at request).
+          angleOfTangentInDegrees,
+          // Prepare a place to store the consumable distance.
+          distanceToConsume,
+          halfDistanceToConsume,
+          // Prepare a place to store the point.
+          point,
+          // Track iteration.
+          pass = 0,
+          extraPassLimit = 10,
+          pointIsNotAcceptable = true,
+          // Value that drives the iteration: distance + half width of character.
+          thisDistancePlusHalfWidth = initialDistancePlusHalfWidth,
+          // If the less overlap feature is requested, provide the necessary information.
+          lastDistanceToConsume,
+          lastMinorBoundingBox;
+
+      // Provide links to the previous data if necessary for placement.
+      if (wantLessTextPathOverlapFeature) {
+        lastMinorBoundingBox = previousPoint.boundingBox;
+        lastDistanceToConsume = previousPoint.distanceToConsume;
+      }
+
+      // Placement passes. An intersection test is done between the current minor bounding box and the previous letter's minor bounding box. The iteration has the ability to run until either the two boxes no longer intersect or the pass limit has been exceeded. Currently, this is a guess and check feature.
+      while (pointIsNotAcceptable) {
+        // Get the angle of the tangent in degrees.
+        var angleOfTangentInDegrees = this._getAngleOfTangentAtDistanceInDegrees(thisDistancePlusHalfWidth),
+            thisPoint = this.textPath.getPointAtLength(thisDistancePlusHalfWidth, true);
+
+        // If there isn't a new point or if the new point is the same as the last one (in the case of hitting the end of a path), the point is acceptable.
+        if (point == null || !point.eq(thisPoint)) {
+          point = thisPoint;
+        } else {
+          pointIsNotAcceptable = false;
+        }
+
+        // If this object does not observe rotation, the width of the glyph will not accurately represent the consumed distance, so obtain something indicative of what will actually be used. Otherwise, just use the width.
+        if (!this.wantObservePathRotation) {
+          // Get distance on line that will be consumed by this glyph.
+          distanceToConsume = this._getDistanceConsumptionGivenAngleInDegrees(angleOfTangentInDegrees, halfNonTransformedHeight, widthOfCharacter);
+          // Reset angle.
+          angleOfTangentInDegrees = 0;
+        } else {
+          distanceToConsume = widthOfCharacter;
+        }
+        halfDistanceToConsume = distanceToConsume / 2;
+        
+        // Overlapping at convex spots along a line is by design, but this can be mathematically altered if requested.
+        if (wantLessTextPathOverlapFeature && pointIsNotAcceptable && pass < extraPassLimit)
+        {
+          // Get bounding box of the letter (as opposed to of the letter in the total observed line height).
+          var thisMinorBoundingBox = this._getMinorBoundingBoxAroundPoint(point, top, halfWidth, halfHeightOfLetter, angleOfTangentInDegrees, reverseMode),
+              // Do an initial check to see if the bounding boxes are arranged end to end (in which case, objects are adjacent to each other already).
+              pointsShareOnlyOneEdge = this._pointsShareOnlyOneEdge(thisMinorBoundingBox, lastMinorBoundingBox);
+
+          // Update the bounding box.
+          point.boundingBox = thisMinorBoundingBox;
+          // If the two bounding boxes don't share only one edge, see if they intersect.
+          if (!pointsShareOnlyOneEdge) {
+            // Test if this bounding box and the bounding box of the previous character intersect. TODO: Look farther back for better result.
+            var intersectionTest = fabric.Intersection.intersectPolygonPolygon(thisMinorBoundingBox, lastMinorBoundingBox);
+
+            // If intersects, get minimum distance to prevent intersection.
+            if (intersectionTest.status == "Intersection" && intersectionTest.points.length >= 2) {
+              // Get the average of the distance consumed by the two intersecting objects.
+              var averageDistanceConsumedByTwoBoundingBoxes = (lastDistanceToConsume + distanceToConsume) / 2,
+                  // Rather than attempt to figure out where on the line actually will provide an appropriate, non-overlapping placement, just shove the character over more and more (up to five-seconds of the largest distance to consume at a time).
+                  clearDistance = averageDistanceConsumedByTwoBoundingBoxes / Math.max(2.5, (10 - pass));
+
+              // If the distance is greater than zero, find the point at the new clear distance in the next iteration.
+              if (clearDistance != null && clearDistance > 0) {
+                thisDistancePlusHalfWidth += (!reverseMode) ? clearDistance : -clearDistance;
+              } else {
+                pointIsNotAcceptable = false;
+              }
+            } else {
+              pointIsNotAcceptable = false;
+            }
+          } else {
+            pointIsNotAcceptable = false;
+          }
+          pass += 1;
+        } else {
+          pointIsNotAcceptable = false;
+        }
+      }
+      // Stick information important to the rendering method (and, by proxy, the freezing process).
+      if (point != null) {
+        point.distanceToConsume = distanceToConsume;
+        point.runningDistanceAfter = (!reverseMode) ? thisDistancePlusHalfWidth + halfDistanceToConsume : thisDistancePlusHalfWidth - halfDistanceToConsume;
+        point.angleOfTangentInRadians = fabric.util.degreesToRadians(angleOfTangentInDegrees);
+        point.halfWidth = halfWidth;
+        point.halfHeightOfLetter = halfHeightOfLetter;
+        point.widthOfCharacter = widthOfCharacter;
+        if (point.boundingBox == null) {
+          point.boundingBox = this._getMinorBoundingBoxAroundPoint(point, top, halfWidth, halfHeightOfLetter, angleOfTangentInDegrees, reverseMode);
+        }
+      }
+      // Return the point (along with its metadata).
+      return point;
+    },
+
+    /**
+     * Generate and render a bounding box of size (2 * halfWidth, 2 * halfBoundingBoxHeight), adjusted by verticalOffset
+     * @private
+     * @param {String} method Method name ("fillText" or "strokeText")
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Number} halfWidth Half width of the object.
+     * @param {Number} halfBoundingBoxHeight Half height of the object.
+     * @param {Number} verticalOffset Top position of text.
+     */
+    _renderBoundingBox: function(method, ctx, halfWidth, halfBoundingBoxHeight, verticalOffset) {
+      // Shift the drawing up as necessary. Default draws horizontally along the vertical center of the text object.
+      ctx.translate(0, verticalOffset);
+      // Draw expected boundary.
+      ctx.beginPath();
+      ctx.moveTo(-halfWidth, -halfBoundingBoxHeight);
+      ctx.lineTo(halfWidth, -halfBoundingBoxHeight);
+      ctx.lineTo(halfWidth, halfBoundingBoxHeight);
+      ctx.lineTo(-halfWidth, halfBoundingBoxHeight);
+      ctx.lineTo(-halfWidth, -halfBoundingBoxHeight);
+      ctx[method](); //stroke();
+      ctx.closePath();
+      // Reverse the vertical shift.
+      ctx.translate(0, -verticalOffset);
+    },
+
+    /**
+     * Render a letter of the text in fabric.Text#text by the requested context method
+     * @private
+     * @param {String} method Method name ("fillText" or "strokeText")
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {String} letter Text to render.
+     * @param {fabric.Point} point Center point to render text at.
+     * @param {Number} top Top position of text.
+     * @param {Number} lineIndex Index of the line the text is in.
+     * @param {Number} halfNonTransformedHeight Half of the height the letter exists in.
+     * @param {Number} summedLineHeight The inclusive sum of previous line heights.
+     * @param {object} style A dictionary of style choices relevant to the context.
+     * @param {Boolean} approximating If true, turn off computationally-intensive features. Otherwise, render to the best of the algorithm's ability.
+     */
+    _renderLetterAtPoint: function(method, ctx, letter, point, top, lineIndex, halfNonTransformedHeight, summedLineHeight, style, approximating) {
+      // If the center point of the letter's bounding box exists, render the letter and the bounding box (if requested) around it.
+      if (point) {
+        // Pull out convenience variables to reference halves of the rectangle's dimensions.
+        var halfWidth = point.halfWidth,
+            halfHeightOfLetter = point.halfHeightOfLetter,
+            // Do background passes beneath letters. Depends on render order being: fillText -> strokeText.
+            isFirstPass = (method === "fillText" || (method === "strokeText" && style.fill == null)) ? true : false;
+
+        // Push the current drawing matrix.
+        ctx.save();
+        // Set all the style settings.
+        this._pushStyleToContext(ctx, style);
+        // Reposition origin such that the drawing will occur around a horizontally sliding center point.
+        ctx.translate(point.x, point.y);
+        // Centrally rotate the future drawing by the angle of the tangent.
+        ctx.rotate(point.angleOfTangentInRadians);
+        // Render minor bounding box (in case of background colors).
+        if (isFirstPass && (style.textBackgroundColor || style.backgroundColor)) {
+          ctx.save();
+          // Determine whether a full bounding box or a minor bounding box will be drawn.
+          var halfBoundingBoxHeight = (this.type == "i-text") ? halfHeightOfLetter + halfHeightOfLetter / 4: halfHeightOfLetter,
+              verticalOffset = summedLineHeight - halfNonTransformedHeight - halfBoundingBoxHeight;
+
+          if (style.backgroundColor) {
+            ctx.fillStyle = style.backgroundColor;
+            this._renderBoundingBox("fill", ctx, halfWidth, halfBoundingBoxHeight, verticalOffset);
+          }
+          if (style.textBackgroundColor) {
+            ctx.fillStyle = style.textBackgroundColor;
+            this._renderBoundingBox("fill", ctx, halfWidth, halfBoundingBoxHeight, verticalOffset);
+          }
+          ctx.restore();
+        }
+
+        // Refuse to render individual characters if necessary.
+        var fillTextButNoFillDefinition = (method === "fillText" && style.fill == null) ? true : false,
+            strokeTextButNoStrokeDefinition = (method === "strokeText" && (style.stroke == null || style.strokeWidth === 0)) ? true : false;
+
+        if (!fillTextButNoFillDefinition && !strokeTextButNoStrokeDefinition) {
+          // Horizontally reposition result of context drawing in case of center and right.
+          var adjustmentToContextDrawing = (this.textAlign === "center") ? -halfWidth : 0,
+              // Determine where the local left offset is. TODO: Figure out why textPathDistanceOffset requires different left values.
+              left = 0;
+
+          if (this.textPathDistanceOffset == null || this.type !== "i-text") {
+            left = (this.textAlign !== "center" && this.textAlign !== "right") ? -halfWidth : halfWidth;
+          } else {
+            left = (this.textAlign === "center") ? 0 : -halfWidth;
+          }
+          ctx.translate(adjustmentToContextDrawing, 0);
+          // Render the character, sliding the height by the top value. WARN: Do not call this._renderChars in place of ctx[method], since an override can exist that does non-essential transforms.
+          ctx[method](letter, left, top);
+          ctx.translate(-adjustmentToContextDrawing, 0);
+        }
+        // Pop the drawing matrix used to get the letter drawn off the stack.
+        ctx.restore();
+      }
+    },
+
+    /**
+     * Render a letter of the text in fabric.Text#text by the requested context method
+     * @private
+     * @param {String} method Method name ("fillText" or "strokeText")
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {String} line Text to calculate.
+     * @param {Number} left Left position of text.
+     * @param {Number} top Top position of text.
+     * @param {Number} lineIndex Index of the line in the text.
+     * @param {Boolean} approximating If true, turn off computationally-intensive features. Otherwise, render to the best of the algorithm's ability.
+     * @param {Boolean} spaceWidth If defined, width of space to use in place of measured width (specifically, for purposes of justification).
+     */
+    _calculateTextLineOnTextPath: function(method, ctx, line, left, top, lineIndex, approximating, spaceWidth) {
+      // w/h: function(ctx, lineIndex, charIndex, lines)
+      var hasSpecificWidth = (this._getWidthOfCharAt == null) ? false : true,
+          hasSpecificHeight = (this._getHeightOfCharAt == null) ? false : true,
+          // For justification purposes, define the width of a space.
+          overrideSpaceWidth = (spaceWidth == null) ? false : true,
+          // If the canvas matrix has been translated (center or right alignments), get the amount to slide the drawing back into place.
+          crutchX = (this.textAlign === "left" || this.textAlign === "justify") ? 0 : (this.textAlign === "center") ? (-this.width / 2) : -this.width,
+          // Prepare to determine the starting distance along the observed path.
+          startingDistance,
+          reverseMode = false;
+
+      if (this.textAlign === "center") {
+        var maximumConsumedDistance = this._getMaximumConsumedDistance() || this._getMaximumLineWidth(ctx);
+        startingDistance = (maximumConsumedDistance - this._boundaries[lineIndex].width) / 2;
+      } else if (this.textAlign === "right") {
+        var maximumConsumedDistance = this._getMaximumConsumedDistance();
+        if (maximumConsumedDistance == null) {
+          startingDistance = 0;
+        } else {
+          startingDistance = maximumConsumedDistance;
+          reverseMode = true;
+          // Reverse the text order.
+          line = line.split("").reverse().join("");
+        }
+      } else {
+        startingDistance = 0;
+      }
+
+      // Obtain single line height.
+      var heightOfLetter = this._getHeightOfLine(ctx, lineIndex, this._getTextLines()),
+          halfHeightOfLetter = heightOfLetter / 2,
+          // Obtain the height of the untransformed bounding box that the unpathed text would have created.
+          nonTransformedHeightOfAllLines = this._getObservedTotalLineHeight(ctx),
+          halfNonTransformedHeight = nonTransformedHeightOfAllLines / 2,
+          // Obtain the width of the untransformed bounding box that the unpathed text would have created.
+          nonTransformedMaximumLineWidth = this._getMaximumLineWidth(ctx),
+          halfNonTransformedMaximumLineWidth = nonTransformedMaximumLineWidth / 2,
+          // Get the center of the object.
+          centerOfTextObject = this.getCenterPoint(),
+          // Get the center of what's being observed.
+          centerOfPathObject = this.textPath.getCenterPoint(),
+          // Find out how far away the two objects are from each other (to relatively offset the text object as a whole).
+          distanceFromPathCenterX = centerOfPathObject.x - centerOfTextObject.x, distanceFromPathCenterY = centerOfPathObject.y - centerOfTextObject.y,
+          // -(Center - Width / 2 + Horizontal Distance from Observation), -(Center - Height / 2 + Vertical Distance from Observation); equivalent to -this.left, -this.top if both objects are centered on each other, but left/top values may change during rotation (and can't be reliably used).
+          drawingOffsetX = crutchX + -(centerOfTextObject.x - halfNonTransformedMaximumLineWidth + distanceFromPathCenterX), drawingOffsetY = -(centerOfTextObject.y - halfNonTransformedHeight + distanceFromPathCenterY),
+          // Track the distance along the line. For a horizontal line (unpathed text), this would increment by the width of the character.
+          runningDistance = (this.textPathDistanceOffset != null) ? this.textPathDistanceOffset + startingDistance : startingDistance,
+          // For the feature wantLessTextPathOverlapFeature, track a lot of the information about the point at which the previous letter was drawn at.
+          lastPoint;
+
+      // Prepare a place to cache the points (basically required by fabric.IText needing to constantly draw because of the animated caret line). 
+      this._boundaries[lineIndex].letters = [];
+      // Iterate the line character by character.
+      for (var charIndex = 0, len = line.length; charIndex < len; charIndex++) {
+        // Letter, space, etc.
+        var letter = line[charIndex],
+            // If in reverse mode, complement the character index by length.
+            actualCharIndex = (!reverseMode) ? charIndex : (len - charIndex) - 1,
+            // Track to see if the letter is whitespace.
+            letterIsWhitespaceDuringSpaceOverride = (overrideSpaceWidth && /\s/.test(letter)) ? true : false,
+            // Prepare to get the width of the character.  Used for distance consumption if not observing rotation.
+            widthOfCharacter;
+
+        // Get the size (width only). TODO: Should probably be cached, especially while multiple styles are not supported.
+        if (!hasSpecificWidth || !hasSpecificHeight) {
+          widthOfCharacter = (letterIsWhitespaceDuringSpaceOverride) ? spaceWidth : ctx.measureText(letter).width;
+        } else {
+          widthOfCharacter = (letterIsWhitespaceDuringSpaceOverride) ? spaceWidth : this._getWidthOfCharAt(ctx, lineIndex, actualCharIndex);
+          heightOfLetter = this._getHeightOfCharAt(ctx, lineIndex, actualCharIndex);
+          halfHeightOfLetter = heightOfLetter / 2;
+        }
+
+        // Halve the width. Used for centering.
+        var halfWidth = widthOfCharacter / 2,
+            // Determine whether this letter should be subjected to the less overlap feature or not.
+            wantLessTextPathOverlapFeature = (!approximating && this.wantTextPathWithLessOverlap && lastPoint && !letterIsWhitespaceDuringSpaceOverride) ? true : false,
+            // Get an acceptable center-point.
+            point = this._getAcceptablePoint(runningDistance, widthOfCharacter, halfWidth, halfHeightOfLetter, halfNonTransformedHeight, top, lastPoint, reverseMode, wantLessTextPathOverlapFeature);
+
+        // If the center point of the letter's bounding box exists, render the letter and the bounding box (if requested) around it.
+        if (point) {
+          // Track the forward motion along the line.
+          runningDistance = point.runningDistanceAfter;
+          // Adjust the point so that it represents the center of the horizontally sliding bounding box.
+          point.setXY(drawingOffsetX + point.x + left, drawingOffsetY + point.y - halfNonTransformedHeight);
+          // Cache the calculation. If frozen, this will be available on the next render request, and it should be much faster to just draw letters at points.
+          this._boundaries[lineIndex].letters[actualCharIndex] = {
+            letter: letter,
+            point: point
+          };
+        }
+        // Track last point.
+        lastPoint = point;
+      }
+      // For purposes of alignment, store the consumed distance.
+      this._boundaries[lineIndex].consumedDistance = runningDistance;
+    },
+
+    /**
+     * Pushes style declaration's attributes into the context
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {object} styleDeclaration Dictionary containing style directives relevant to the context.
+     */
+    _pushStyleToContext: function(ctx, styleDeclaration) {
+      if (typeof styleDeclaration.shadow === 'string') {
+        styleDeclaration.shadow = new fabric.Shadow(styleDeclaration.shadow);
+      }
+      // Obtain fill color.
+      var fill = styleDeclaration.fill || this.fill,
+          // Determine if stroke width is valid.
+          validStrokeWidthExists = (styleDeclaration.strokeWidth != null && styleDeclaration.strokeWidth > 0) ? true : false;
+
+      ctx.fillStyle = (fill == null) ? fill : fill.toLive
+        ? fill.toLive(ctx)
+        : fill;
+      // If there is a stroke definition and either a valid stroke width was given or the stroke width is not defined, then stroke.
+      if (styleDeclaration.stroke && (validStrokeWidthExists || styleDeclaration.strokeWidth == null)) {
+        ctx.strokeStyle = (styleDeclaration.stroke && styleDeclaration.stroke.toLive)
+          ? styleDeclaration.stroke.toLive(ctx)
+          : styleDeclaration.stroke;
+      }
+      ctx.lineWidth = styleDeclaration.strokeWidth || this.strokeWidth;
+      ctx.font = this._getFontDeclaration.call(styleDeclaration);
+      this._setShadow.call(styleDeclaration, ctx);
+    },
+
+    /**
+     * Render a line of the text in fabric.Text#text by the requested context method
+     * @private
+     * @param {String} method Method name ("fillText" or "strokeText")
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {String} line Text to calculate.
+     * @param {Number} left Left position of text.
+     * @param {Number} top Top position of text.
+     * @param {Number} lineIndex Index of the line in the text.
+     * @param {Boolean} spaceWidth If defined, width of space to use in place of measured width (specifically, for purposes of justification).
+     */
+    _renderTextLineOnTextPath: function(method, ctx, line, left, top, lineIndex, spaceWidth) {
+      // In the middle of approximating, turn off non-essential features.
+      var approximating = (!this.textPath.wantApproximationDetail || this.textPath.wantApproximationDetail == 0) ? false : true,
+          // Figure out if the letter locations need to be calculated.
+          isNotCalculated = (this._boundaries[lineIndex].letters == null) ? true : false;
+
+      // If the letter locations need to be calculated, calculate where the letters should be drawn.
+      if (isNotCalculated) {
+        this._calculateTextLineOnTextPath(method, ctx, line, left, top, lineIndex, approximating, spaceWidth);
+      }
+      // If requested, draw the text how it would have been.
+      this._drawTextResidueIfNecessary(method, ctx, line, left, top, lineIndex);
+
+      // Get calculated line metadata.
+      var thisLineMetaData = this._boundaries[lineIndex],
+          // Obtain the height of the untransformed bounding box that the unpathed text would have created.
+          nonTransformedHeightOfAllLines = this._getObservedTotalLineHeight(ctx),
+          halfNonTransformedHeight = nonTransformedHeightOfAllLines / 2,
+          // Get the center of the object.
+          centerOfTextObject = this.getCenterPoint(),
+          // Get the center of what's being observed.
+          centerOfPathObject = this.textPath.getCenterPoint(),
+          // Get vertical delta.
+          distanceFromPathCenterY = centerOfPathObject.y - centerOfTextObject.y,
+          // Subtract out the top offset (and other offsets) to get just the summed line height. fabric.IText already does away with the 4th fontSize lift that occurs in fabric.Text.
+          summedLineHeight = (this.type == "i-text") ? top - this._getTopOffset() : top - this._getTopOffset() + this.fontSize / 4,
+          // Object supports character styles.
+          supportsSpecificStyles = (this.getCurrentCharStyle == null) ? false : true;
+
+      for (var charIndex = 0, len = thisLineMetaData.letters.length; charIndex < len; charIndex++) {
+        // Obtain letter metadata.
+        var letterEntry = thisLineMetaData.letters[charIndex],
+            // Get character style. Character indices in line styles are one-index rather than zero-index.
+            style = (!supportsSpecificStyles) ? this : this.getCurrentCharStyle(lineIndex, charIndex + 1);
+
+        // For fabric.IText, push the background color onto the style.
+        if (!style.backgroundColor) {
+          style.backgroundColor = this.backgroundColor;
+        }
+        // Draw it.
+        this._renderLetterAtPoint(method, ctx, letterEntry.letter, letterEntry.point, top, lineIndex, halfNonTransformedHeight, summedLineHeight, style, approximating);
+      }
     },
 
     /**
@@ -795,19 +1709,34 @@
      * @return {Object} Object representation of an instance
      */
     toObject: function(propertiesToInclude) {
-      var object = extend(this.callSuper('toObject', propertiesToInclude), {
-        text:                 this.text,
-        fontSize:             this.fontSize,
-        fontWeight:           this.fontWeight,
-        fontFamily:           this.fontFamily,
-        fontStyle:            this.fontStyle,
-        lineHeight:           this.lineHeight,
-        textDecoration:       this.textDecoration,
-        textAlign:            this.textAlign,
-        path:                 this.path,
-        textBackgroundColor:  this.textBackgroundColor,
-        useNative:            this.useNative
+      // Point to the correct superclass method for cases where this.constructor.superclass does not point to fabric.Object (i.e. fabric.IText).
+      var fn = fabric.Object.prototype["toObject"];
+
+      // Bind the variable to this object, so that it can be used like the actual toObject in the prototype.
+      fn = fn.bind(this);
+
+      // Create the object with just the wanted data.
+      var object = extend(fn(propertiesToInclude), {
+        text:                        this.text,
+        fontSize:                    this.fontSize,
+        fontWeight:                  this.fontWeight,
+        fontFamily:                  this.fontFamily,
+        fontStyle:                   this.fontStyle,
+        lineHeight:                  this.lineHeight,
+        textDecoration:              this.textDecoration,
+        textAlign:                   this.textAlign,
+        path:                        this.path,
+        textBackgroundColor:         this.textBackgroundColor,
+        useNative:                   this.useNative,
+        textPath:                    this.textPath,
+        textPathDistanceOffset:      this.textPathDistanceOffset,
+        wantObservePathRotation:     this.wantObservePathRotation,
+        wantTextPathWithLessOverlap: this.wantTextPathWithLessOverlap,
+        wantTextPathResidue:         this.wantTextPathResidue,
+        wantApproximationDetail:     this.wantApproximationDetail,
       });
+
+      // Remove default values if requested.
       if (!this.includeDefaultValues) {
         this._removeDefaultValues(object);
       }
@@ -822,17 +1751,94 @@
      */
     toSVG: function(reviver) {
       var markup = [ ],
-          textLines = this.text.split(this._reNewline),
+          textLines = this._getTextLines(),
           offsets = this._getSVGLeftTopOffsets(textLines),
           textAndBg = this._getSVGTextAndBg(offsets.lineTop, offsets.textLeft, textLines),
           shadowSpans = this._getSVGShadows(offsets.lineTop, textLines);
 
-      // move top offset by an ascent
+      // Move top offset by font ascent in case of Cufon.
       offsets.textTop += (this._fontAscent ? ((this._fontAscent / 5) * this.lineHeight) : 0);
-
+      // Adds a group element with a single child text object.
       this._wrapSVGTextAndBg(markup, textAndBg, shadowSpans, offsets);
-
       return reviver ? reviver(markup.join('')) : markup.join('');
+    },
+
+    /**
+     * Returns styles-string for svg-export (considers i-text).
+     * @return {String}
+     */
+    getSvgStyles: function() {
+      var fill = this.fill
+            ? (this.fill.toLive ? 'url(#SVGID_' + this.fill.id + ')' : this.fill)
+            : 'none',
+          fillRule = (this.fillRule === 'destination-over' ? 'evenodd' : this.fillRule),
+          stroke = this.stroke
+            ? (this.stroke.toLive ? 'url(#SVGID_' + this.stroke.id + ')' : this.stroke)
+            : 'none',
+          strokeWidth = this.strokeWidth ? this.strokeWidth : '0',
+          strokeDashArray = this.strokeDashArray ? this.strokeDashArray.join(' ') : '',
+          strokeLineCap = this.strokeLineCap ? this.strokeLineCap : 'butt',
+          strokeLineJoin = this.strokeLineJoin ? this.strokeLineJoin : 'miter',
+          strokeMiterLimit = this.strokeMiterLimit ? this.strokeMiterLimit : '4',
+          opacity = typeof this.opacity !== 'undefined' ? this.opacity : '1',
+          visibility = this.visible ? '' : ' visibility: hidden;',
+          filter = this.shadow && this.type !== 'text' && this.type !== 'i-text' ? 'filter: url(#SVGID_' + this.shadow.id + ');' : '';
+
+      return [
+        'stroke: ', stroke, '; ',
+        'stroke-width: ', strokeWidth, '; ',
+        'stroke-dasharray: ', strokeDashArray, '; ',
+        'stroke-linecap: ', strokeLineCap, '; ',
+        'stroke-linejoin: ', strokeLineJoin, '; ',
+        'stroke-miterlimit: ', strokeMiterLimit, '; ',
+        'fill: ', fill, '; ',
+        'fill-rule: ', fillRule, '; ',
+        'opacity: ', opacity, ';',
+        filter,
+        visibility
+      ].join('');
+    },
+
+    /**
+     * Returns transform-string for svg-export (considers existence of fabric.Text#textPath).
+     * @return {String}
+     */
+    getSvgTransform: function() {
+      if (this.group) return '';
+      
+      var hasTextPath = (this.textPath != null) ? true : false,
+          toFixed = fabric.util.toFixed,
+          angle = this.getAngle(),
+          vpt = this.getViewportTransform(),
+          center = fabric.util.transformPoint(this.getCenterPoint(), vpt),
+
+          NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
+          // Do not provide a translation if the object has a text path or if the object is a fabric.PathGroup.
+          translatePart = (hasTextPath || this.type === 'path-group') ? '' : 'translate(' +
+                            toFixed(center.x, NUM_FRACTION_DIGITS) +
+                            ' ' +
+                            toFixed(center.y, NUM_FRACTION_DIGITS) +
+                          ')',
+
+          anglePart = angle !== 0
+            ? (' rotate(' + toFixed(angle, NUM_FRACTION_DIGITS) + ')')
+            : '',
+
+          scalePart = (this.scaleX === 1 && this.scaleY === 1 && vpt[0] === 1 && vpt[3] === 1)
+            ? '' :
+            (' scale(' +
+              toFixed(this.scaleX * vpt[0], NUM_FRACTION_DIGITS) +
+              ' ' +
+              toFixed(this.scaleY * vpt[3], NUM_FRACTION_DIGITS) +
+            ')'),
+          addTranslateX = this.type === 'path-group' ? this.width * vpt[0] : 0,
+          flipXPart = this.flipX ? ' matrix(-1 0 0 1 ' + addTranslateX + ' 0) ' : '',
+          addTranslateY = this.type === 'path-group' ? this.height * vpt[3] : 0,
+          flipYPart = this.flipY ? ' matrix(1 0 0 -1 0 ' + addTranslateY + ')' : '';
+
+      return [
+        translatePart, anglePart, scalePart, flipXPart, flipYPart
+      ].join('');
     },
 
     /**
@@ -842,11 +1848,10 @@
       var lineTop = this.useNative
             ? this.fontSize * this.lineHeight
             : (-this._fontAscent - ((this._fontAscent / 5) * this.lineHeight)),
-
-          textLeft = -(this.width/2),
+          textLeft = -(this.width / 2),
           textTop = this.useNative
             ? this.fontSize - 1
-            : (this.height/2) - (textLines.length * this.fontSize) - this._totalLineHeight;
+            : (this.height / 2) - (textLines.length * this.fontSize) - this._totalLineHeight;
 
       return {
         textLeft: textLeft + (this.group && this.group.type === 'path-group' ? this.left : 0),
@@ -856,11 +1861,33 @@
     },
 
     /**
+     * Create a group element with a single child text element to represent the fabric.Text-like object.
      * @private
      */
     _wrapSVGTextAndBg: function(markup, textAndBg, shadowSpans, offsets) {
+      // If this object has a text path to which it should adhere, define the path.
+      var textPathId;
+
+      if (this.textPath != null) {
+        textPathId = (this.textPath.id) ? this.textPath.id : "text-path";
+        markup.push(
+          '<defs>\n',
+            '<path id="' + textPathId + '" d="' + this.textPath.getSVGData() + '" />\n',
+          '</defs>\n'
+        );
+      }
+
+      // Determine transforms based on existence of text path (that will supply transforms in place of this object).
+      var hasTextPathId = (textPathId != null) ? true : false,
+          svgTransformValue = [this.getSvgTransform(), this.getSvgTransformMatrix()].join(''),
+          svgTransformAttribute = (svgTransformValue !== '') ? ' transform="' + svgTransformValue + '"' : '',
+          textLeft = (!hasTextPathId) ? offsets.textLeft : 0,
+          textPathStartOffsetPercent = (!hasTextPathId || this.textPathDistanceOffset == null) ? 0 : (100 * this.textPathDistanceOffset / this.textPath.pathLength()) || 0;
+
+      // Push the group element with a single child text element.
       markup.push(
-        '<g transform="', this.getSvgTransform(), this.getSvgTransformMatrix(), '">\n',
+        // Rewrite svg transform to ignore y when path is available.
+        '<g', svgTransformAttribute, '>\n',
           textAndBg.textBgRects.join(''),
           '<text ',
             (this.fontFamily ? 'font-family="' + this.fontFamily.replace(/"/g, '\'') + '" ': ''),
@@ -870,53 +1897,80 @@
             (this.textDecoration ? 'text-decoration="' + this.textDecoration + '" ': ''),
             'style="', this.getSvgStyles(), '" ',
             /* svg starts from left/bottom corner so we normalize height */
-            'transform="translate(', toFixed(offsets.textLeft, 2), ' ', toFixed(offsets.textTop, 2), ')">',
-            shadowSpans.join(''),
-            textAndBg.textSpans.join(''),
+            // Rewrite text x transform to negate the group x transform when path available.
+            'transform="translate(', fabric.util.toFixed(textLeft, 2), ' ', fabric.util.toFixed(offsets.textTop, 2), ')">\n',
+            (hasTextPathId) ? '<textPath xlink:href="#' + textPathId + '" startOffset="' + textPathStartOffsetPercent + '%">\n' : '',
+              // Add shadow tspans.
+              shadowSpans.join(''),
+              // Add text and background tspans.
+              textAndBg.textSpans.join(''),
+            (hasTextPathId) ? '</textPath>\n' : '',
           '</text>\n',
         '</g>\n'
       );
     },
 
     /**
+     * Get an copy of the text with an offset and a reduced fill-opacity to act as a shadow.
      * @private
      * @param {Number} lineHeight
      * @param {Array} textLines Array of all text lines
      * @return {Array}
      */
     _getSVGShadows: function(lineHeight, textLines) {
+      // In IE 7 & 8, empty tspans are completely ignored. Using a lineTopOffsetMultiplier prevents empty tspans.
       var shadowSpans = [],
           i, len,
           lineTopOffsetMultiplier = 1;
 
+      // Skip this step if there isn't a shadow specified or the object hasn't been rendered.
       if (!this.shadow || !this._boundaries) {
         return shadowSpans;
       }
-
+      // Iterate the text lines, pushing a tspan with a reduced fill-opacity to act as a makeshift shadow.
       for (i = 0, len = textLines.length; i < len; i++) {
         if (textLines[i] !== '') {
-          var lineLeftOffset = (this._boundaries && this._boundaries[i]) ? this._boundaries[i].left : 0;
-          shadowSpans.push(
-            '<tspan x="',
-            toFixed((lineLeftOffset + lineTopOffsetMultiplier) + this.shadow.offsetX, 2),
-            ((i === 0 || this.useNative) ? '" y' : '" dy'), '="',
-            toFixed(this.useNative
-              ? ((lineHeight * i) - this.height / 2 + this.shadow.offsetY)
-              : (lineHeight + (i === 0 ? this.shadow.offsetY : 0)), 2),
-            '" ',
-            this._getFillAttributes(this.shadow.color), '>',
-            fabric.util.string.escapeXml(textLines[i]),
-          '</tspan>');
+          this._setSVGTextLineShadow(textLines[i], i, shadowSpans, lineHeight, lineTopOffsetMultiplier);
           lineTopOffsetMultiplier = 1;
         }
         else {
-          // in some environments (e.g. IE 7 & 8) empty tspans are completely ignored, using a lineTopOffsetMultiplier
-          // prevents empty tspans
           lineTopOffsetMultiplier++;
         }
       }
-
       return shadowSpans;
+    },
+
+    /**
+     * Push the tspan element(s) that will represent the shadow for the text line.
+     * @private
+     * @param {String} textLine Line of text to render.
+     * @param {Number} lineIndex Line number being rendered.
+     * @param {Array} shadowSpans Array to push the tspan elements into.
+     * @param {Number} lineHeight Height of line being rendered.
+     * @param {Number} lineTopOffsetMultiplier Misnamed adjustment to keep tspan considered non-trivial.
+     */
+    _setSVGTextLineShadow: function(textLine, lineIndex, shadowSpans, lineHeight, lineTopOffsetMultiplier) {
+      var lineLeftOffset = (this._boundaries && this._boundaries[lineIndex]) ? (this._boundaries[lineIndex].left - lineTopOffsetMultiplier) : 0,
+          xValue = (lineLeftOffset + lineTopOffsetMultiplier) + this.shadow.offsetX,
+          yOrDeltaYAttributeName = ((lineIndex === 0 || this.useNative) ? 'y' : 'dy'),
+          yOrDeltaYValue = this.useNative
+            ? ((lineHeight * lineIndex) - this.height / 2 + this.shadow.offsetY)
+            : (lineHeight + (lineIndex === 0 ? this.shadow.offsetY : 0)),
+          shadowFillColor = (this.shadow.color && typeof this.shadow.color === 'string') ? new fabric.Color(this.shadow.color) : '';
+
+      // Push the tspan element.
+      shadowSpans.push(
+        '<tspan',
+          // x="x-value"
+          ' ', 'x="', fabric.util.toFixed(xValue, 2), '"',
+          // y="y-value" (or) dy="dy-value"
+          ' ', yOrDeltaYAttributeName, '="', fabric.util.toFixed(yOrDeltaYValue, 2), '"',
+          // Attributes, may include: stroke-opacity, fill-opacity, opacity, and fill.
+          ' ', 'stroke-opacity="' + shadowFillColor.getAlpha() + '"', ' ', this._getFillAttributes(this.shadow.color), '>',
+          // Escaped text for given line.
+          fabric.util.string.escapeXml(textLine),
+        '</tspan>'
+      );
     },
 
     /**
@@ -1013,19 +2067,19 @@
     },
 
     /**
-     * Adobe Illustrator (at least CS5) is unable to render rgba()-based fill values
-     * we work around it by "moving" alpha channel into opacity attribute and setting fill's alpha to 1
-     *
+     * Adobe Illustrator (at least CS5) is unable to render rgba()-based fill values. Work around this by "moving" alpha channel into an "opacity" attribute and setting the "fill" attribute to a solid "rgb" (as opposed to "rgba") color. Firefox expects this value to be in the "fill-opacity" attribute
      * @private
      * @param {Any} value
      * @return {String}
      */
     _getFillAttributes: function(value) {
+      // Transform color in string form to fabric.Color object.
       var fillColor = (value && typeof value === 'string') ? new fabric.Color(value) : '';
+
       if (!fillColor || !fillColor.getSource() || fillColor.getAlpha() === 1) {
         return 'fill="' + value + '"';
       }
-      return 'opacity="' + fillColor.getAlpha() + '" fill="' + fillColor.setAlpha(1).toRgb() + '"';
+      return 'fill-opacity="' + fillColor.getAlpha() + '" opacity="' + fillColor.getAlpha() + '" fill="' + fillColor.setAlpha(1).toRgb() + '"';
     },
     /* _TO_SVG_END_ */
 
@@ -1135,7 +2189,14 @@
    * @return {fabric.Text} Instance of fabric.Text
    */
   fabric.Text.fromObject = function(object) {
-    return new fabric.Text(object.text, clone(object));
+    // Obtain a copy of the object with intent to make non-binding changes.
+    var clonedObject = clone(object);
+
+    // Pre-fabricate the fabric.Path that might be in the incoming data.
+    if (clonedObject && clonedObject.textPath != null) { 
+      clonedObject.textPath = new fabric.Path(clonedObject.textPath.path, clonedObject.textPath);
+    }
+    return new fabric.Text(object.text, clonedObject);
   };
 
   fabric.util.createAccessors(fabric.Text);
