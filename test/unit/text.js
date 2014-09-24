@@ -9,43 +9,49 @@
   var CHAR_WIDTH = 20;
 
   var REFERENCE_TEXT_OBJECT = {
-    'type':                      'text',
-    'originX':                   'left',
-    'originY':                   'top',
-    'left':                      0,
-    'top':                       0,
-    'width':                     CHAR_WIDTH,
-    'height':                    52,
-    'fill':                      'rgb(0,0,0)',
-    'stroke':                    null,
-    'strokeWidth':               1,
-    'strokeDashArray':           null,
-    'strokeLineCap':             'butt',
-    'strokeLineJoin':            'miter',
-    'strokeMiterLimit':          10,
-    'scaleX':                    1,
-    'scaleY':                    1,
-    'angle':                     0,
-    'flipX':                     false,
-    'flipY':                     false,
-    'opacity':                   1,
-    'shadow':                    null,
-    'visible':                   true,
-    'clipTo':                    null,
-    'backgroundColor':           '',
-    'text':                      'x',
-    'fontSize':                  40,
-    'fontWeight':                'normal',
-    'fontFamily':                'Times New Roman',
-    'fontStyle':                 '',
-    'lineHeight':                1.3,
-    'textDecoration':            '',
-    'textAlign':                 'left',
-    'path':                      null,
-    'textBackgroundColor':       '',
-    'useNative':                 true,
-    'fillRule':                 'nonzero',
-    'globalCompositeOperation': 'source-over'
+    'type':                        'text',
+    'originX':                     'left',
+    'originY':                     'top',
+    'left':                        0,
+    'top':                         0,
+    'width':                       CHAR_WIDTH,
+    'height':                      52,
+    'fill':                        'rgb(0,0,0)',
+    'stroke':                      null,
+    'strokeWidth':                 1,
+    'strokeDashArray':             null,
+    'strokeLineCap':               'butt',
+    'strokeLineJoin':              'miter',
+    'strokeMiterLimit':            10,
+    'scaleX':                      1,
+    'scaleY':                      1,
+    'angle':                       0,
+    'flipX':                       false,
+    'flipY':                       false,
+    'opacity':                     1,
+    'shadow':                      null,
+    'visible':                     true,
+    'clipTo':                      null,
+    'backgroundColor':             '',
+    'text':                        'x',
+    'fontSize':                    40,
+    'fontWeight':                  'normal',
+    'fontFamily':                  'Times New Roman',
+    'fontStyle':                   '',
+    'lineHeight':                  1.3,
+    'textDecoration':              '',
+    'textAlign':                   'left',
+    'path':                        null,
+    'textBackgroundColor':         '',
+    'textPath':                    null,
+    'textPathDistanceOffset':      null,
+    'wantObservePathRotation':     true,
+    'wantTextPathWithLessOverlap': false,
+    'wantTextPathResidue':         true,
+    'wantApproximationDetail':     0,
+    'useNative':                   true,
+    'fillRule':                    'nonzero',
+    'globalCompositeOperation':    'source-over'
   };
 
   var TEXT_SVG = '<g transform="translate(10 26)">\n<text font-family="Times New Roman" font-size="40" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" transform="translate(-10 39)"><tspan x="0" y="-26" fill="rgb(0,0,0)">x</tspan></text>\n</g>\n';
@@ -248,13 +254,21 @@
     // temp workaround for text objects not obtaining width under node
     text.width = CHAR_WIDTH;
 
-    equal(text.toSVG(), TEXT_SVG);
+    // Store a regex that matches arbitrary whitespace (i.e. outside of tags).
+    var matchArbitraryWhitespace = /(\s+(?=<(?!\/tspan))|\s+$)/g,
+        uniformXmlOfSVG = text.toSVG().replace(matchArbitraryWhitespace, ""),
+        uniformXmlOfTestSVG = TEXT_SVG.replace(matchArbitraryWhitespace, "");
+
+    equal(uniformXmlOfSVG, uniformXmlOfTestSVG);
 
     text.setFontFamily('"Arial Black", Arial');
     // temp workaround for text objects not obtaining width under node
     text.width = CHAR_WIDTH;
 
-    equal(text.toSVG(), TEXT_SVG.replace('font-family="Times New Roman"', 'font-family="\'Arial Black\', Arial"'));
+    // Make the uniform XML of the SVG again (contains new font family definition).
+    uniformXmlOfSVG = text.toSVG().replace(matchArbitraryWhitespace, "");
+
+    equal(uniformXmlOfSVG, uniformXmlOfTestSVG.replace('font-family="Times New Roman"', 'font-family="\'Arial Black\', Arial"'));
   });
 
 })();
