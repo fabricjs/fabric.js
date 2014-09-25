@@ -52,7 +52,7 @@ fabric.SHARED_ATTRIBUTES = [
 fabric.DPI = 96;
 
 
-(function(){
+(function() {
 
   /**
    * @private
@@ -1028,7 +1028,7 @@ fabric.Collection = {
    * @param {Number} rx horizontal radius
    * @param {Number} ry vertical radius
    * @param {Number} rot angle of horizontal axe
-   * @param {Number} large 1 or 0, whatever the arc is the big or the small on the 2 points 
+   * @param {Number} large 1 or 0, whatever the arc is the big or the small on the 2 points
    * @param {Number} sweep 1 or 0, 1 clockwise or counterclockwise direction
    * @param {Number} tx end point of arc
    * @param {Number} ty
@@ -1069,7 +1069,7 @@ fabric.Collection = {
     if (boundsOfCurveCache[argsString]) {
       return boundsOfCurveCache[argsString];
     }
-    
+
     var sqrt = Math.sqrt,
         min = Math.min, max = Math.max,
         abs = Math.abs, tvalues = [ ],
@@ -1113,7 +1113,7 @@ fabric.Collection = {
     }
 
     var x, y, j = tvalues.length, jlen = j, mt;
-    while(j--) {
+    while (j--) {
       t = tvalues[j];
       mt = 1 - t;
       x = (mt * mt * mt * x0) + (3 * mt * mt * t * x1) + (3 * mt * t * t * x2) + (t * t * t * x3);
@@ -1136,7 +1136,7 @@ fabric.Collection = {
         x: max.apply(null, bounds[0]),
         y: max.apply(null, bounds[1])
       }
-    ];  
+    ];
     boundsOfCurveCache[argsString] = result;
     return result;
   }
@@ -1398,7 +1398,7 @@ fabric.Collection = {
 })();
 
 
-(function(){
+(function() {
 
   /**
    * Copies all enumerable properties of one object to another
@@ -1545,7 +1545,7 @@ fabric.Collection = {
 
   var slice = Array.prototype.slice, emptyFunction = function() { },
 
-      IS_DONTENUM_BUGGY = (function(){
+      IS_DONTENUM_BUGGY = (function() {
         for (var p in { toString: 1 }) {
           if (p === 'toString') {
             return false;
@@ -2249,7 +2249,7 @@ fabric.Collection = {
 })();
 
 
-(function(){
+(function() {
 
   function addParamToUrl(url, param) {
     return url + (/\?/.test(url) ? '&' : '?') + param;
@@ -2660,7 +2660,8 @@ if (typeof console !== 'undefined') {
     if (t < 1) {
       return -0.5 * elastic(opts, t, d) + b;
     }
-    return opts.a * Math.pow(2, -10 * (t -= 1)) * Math.sin((t * d - opts.s) * (2 * Math.PI) / opts.p ) * 0.5 + opts.c + b;
+    return opts.a * Math.pow(2, -10 * (t -= 1)) *
+      Math.sin((t * d - opts.s) * (2 * Math.PI) / opts.p ) * 0.5 + opts.c + b;
   }
 
   /**
@@ -2859,6 +2860,9 @@ if (typeof console !== 'undefined') {
         fill:   'fillOpacity'
       };
 
+  fabric.cssRules = { };
+  fabric.gradientDefs = { };
+
   function normalizeAttr(attr) {
     // transform attribute names
     if (attr in attributesMap) {
@@ -2873,9 +2877,6 @@ if (typeof console !== 'undefined') {
 
     if ((attr === 'fill' || attr === 'stroke') && value === 'none') {
       value = '';
-    }
-    else if (attr === 'fillRule') {
-      value = (value === 'evenodd') ? 'destination-over' : value;
     }
     else if (attr === 'strokeDashArray') {
       value = value.replace(/,/g, ' ').split(/\s+/).map(function(n) {
@@ -3163,13 +3164,12 @@ if (typeof console !== 'undefined') {
   /**
    * @private
    */
-  function getGlobalStylesForElement(element) {
+  function getGlobalStylesForElement(element, svgUid) {
     var styles = { };
-
-    for (var rule in fabric.cssRules) {
+    for (var rule in fabric.cssRules[svgUid]) {
       if (elementMatchesRule(element, rule.split(' '))) {
-        for (var property in fabric.cssRules[rule]) {
-          styles[property] = fabric.cssRules[rule][property];
+        for (var property in fabric.cssRules[svgUid][rule]) {
+          styles[property] = fabric.cssRules[svgUid][rule][property];
         }
       }
     }
@@ -3274,7 +3274,14 @@ if (typeof console !== 'undefined') {
     while (doc.firstChild != null) {
       el.appendChild(doc.firstChild);
     }
-    el.setAttribute('transform','matrix(' + matrix[0] + ' ' + matrix[1] + ' ' + matrix[2] + ' ' + matrix[3] + ' ' + matrix[4] + ' ' + matrix[5] + ')');
+    el.setAttribute('transform',
+      'matrix(' + matrix[0] + ' ' +
+                  matrix[1] + ' ' +
+                  matrix[2] + ' ' +
+                  matrix[3] + ' ' +
+                  matrix[4] + ' ' +
+                  matrix[5] + ')');
+
     doc.appendChild(el);
   }
 
@@ -3319,7 +3326,8 @@ if (typeof console !== 'undefined') {
       if (!doc) {
         return;
       }
-      var startTime = new Date();
+      var startTime = new Date(),
+          svgUid =  fabric.Object.__uid++;
 
       parseUseDirectives(doc);
       /* http://www.w3.org/TR/SVG/struct.html#SVGElementWidthAttribute
@@ -3374,11 +3382,12 @@ if (typeof console !== 'undefined') {
         width: widthAttr ? widthAttr : viewBoxWidth,
         height: heightAttr ? heightAttr : viewBoxHeight,
         widthAttr: widthAttr,
-        heightAttr: heightAttr
+        heightAttr: heightAttr,
+        svgUid: svgUid
       };
 
-      fabric.gradientDefs = fabric.getGradientDefs(doc);
-      fabric.cssRules = fabric.getCSSRules(doc);
+      fabric.gradientDefs[svgUid] = fabric.getGradientDefs(doc);
+      fabric.cssRules[svgUid] = fabric.getCSSRules(doc);
       // Precedence of rules:   style > class > attribute
 
       fabric.parseElements(elements, function(instances) {
@@ -3502,7 +3511,7 @@ if (typeof console !== 'undefined') {
      * @param {Array} attributes Array of attributes to parse
      * @return {Object} object containing parsed attributes' names/values
      */
-    parseAttributes: function(element, attributes) {
+    parseAttributes: function(element, attributes, svgUid) {
 
       if (!element) {
         return;
@@ -3511,9 +3520,12 @@ if (typeof console !== 'undefined') {
       var value,
           parentAttributes = { };
 
+      if (typeof svgUid === 'undefined') {
+        svgUid = element.getAttribute('svgUid');
+      }
       // if there's a parent container (`g` or `a` or `symbol` node), parse its attributes recursively upwards
       if (element.parentNode && /^symbol|[g|a]$/i.test(element.parentNode.nodeName)) {
-        parentAttributes = fabric.parseAttributes(element.parentNode, attributes);
+        parentAttributes = fabric.parseAttributes(element.parentNode, attributes, svgUid);
       }
 
       var ownAttributes = attributes.reduce(function(memo, attr) {
@@ -3530,7 +3542,7 @@ if (typeof console !== 'undefined') {
       // add values parsed from style, which take precedence over attributes
       // (see: http://www.w3.org/TR/SVG/styling.html#UsingPresentationAttributes)
       ownAttributes = extend(ownAttributes,
-        extend(getGlobalStylesForElement(element), fabric.parseStyleAttribute(element)));
+        extend(getGlobalStylesForElement(element, svgUid), fabric.parseStyleAttribute(element)));
 
       return _setStrokeFillOpacity(extend(parentAttributes, ownAttributes));
     },
@@ -3641,7 +3653,7 @@ if (typeof console !== 'undefined') {
           for (var i = 0, len = propertyValuePairs.length; i < len; i++) {
             var pair = propertyValuePairs[i].split(/\s*:\s*/),
                 property = normalizeAttr(pair[0]),
-                value = normalizeValue(property,pair[1],pair[0]);
+                value = normalizeValue(property, pair[1], pair[0]);
             ruleObj[property] = value;
           }
           rule = match[1];
@@ -3685,7 +3697,7 @@ if (typeof console !== 'undefined') {
           xml = new ActiveXObject('Microsoft.XMLDOM');
           xml.async = 'false';
           //IE chokes on DOCTYPE
-          xml.loadXML(r.responseText.replace(/<!DOCTYPE[\s\S]*?(\[[\s\S]*\])*?>/i,''));
+          xml.loadXML(r.responseText.replace(/<!DOCTYPE[\s\S]*?(\[[\s\S]*\])*?>/i, ''));
         }
         if (!xml || !xml.documentElement) {
           return;
@@ -3720,8 +3732,8 @@ if (typeof console !== 'undefined') {
       else if (fabric.window.ActiveXObject) {
         doc = new ActiveXObject('Microsoft.XMLDOM');
         doc.async = 'false';
-        //IE chokes on DOCTYPE
-        doc.loadXML(string.replace(/<!DOCTYPE[\s\S]*?(\[[\s\S]*\])*?>/i,''));
+        // IE chokes on DOCTYPE
+        doc.loadXML(string.replace(/<!DOCTYPE[\s\S]*?(\[[\s\S]*\])*?>/i, ''));
       }
 
       fabric.parseSVGDocument(doc.documentElement, function (results, options) {
@@ -3790,6 +3802,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver) {
   this.callback = callback;
   this.options = options;
   this.reviver = reviver;
+  this.svgUid = (options && options.svgUid) || 0;
 };
 
 fabric.ElementsParser.prototype.parse = function() {
@@ -3801,6 +3814,7 @@ fabric.ElementsParser.prototype.parse = function() {
 
 fabric.ElementsParser.prototype.createObjects = function() {
   for (var i = 0, len = this.elements.length; i < len; i++) {
+    this.elements[i].setAttribute('svgUid', this.svgUid);
     (function(_this, i) {
       setTimeout(function() {
         _this.createObject(_this.elements[i], i);
@@ -3856,9 +3870,9 @@ fabric.ElementsParser.prototype.resolveGradient = function(obj, property) {
     return;
   }
   var gradientId = instanceFillValue.slice(5, instanceFillValue.length - 1);
-  if (fabric.gradientDefs[gradientId]) {
+  if (fabric.gradientDefs[this.svgUid][gradientId]) {
     obj.set(property,
-      fabric.Gradient.fromElement(fabric.gradientDefs[gradientId], obj));
+      fabric.Gradient.fromElement(fabric.gradientDefs[this.svgUid][gradientId], obj));
   }
 };
 
@@ -4251,7 +4265,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
    * @param {Array} points
    * @return {fabric.Intersection}
    */
-  fabric.Intersection.intersectLinePolygon = function(a1,a2,points){
+  fabric.Intersection.intersectLinePolygon = function(a1, a2, points) {
     var result = new Intersection(),
         length = points.length;
 
@@ -4371,7 +4385,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
       }
 
       if (color === 'transparent') {
-        this.setSource([255,255,255,0]);
+        this.setSource([255, 255, 255, 0]);
         return;
       }
 
@@ -4640,7 +4654,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
    * @param {Number} t
    * @return {Number}
    */
-  function hue2rgb(p, q, t){
+  function hue2rgb(p, q, t) {
     if (t < 0) {
       t += 1;
     }
@@ -5215,7 +5229,11 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
       }
       options[prop] = propValue * multFactor + addFactor;
     }
-    if (object.type === 'ellipse' && options.r2 !== null && gradientUnits === 'objectBoundingBox' && object.rx !== object.ry) {
+    if (object.type === 'ellipse' &&
+        options.r2 !== null &&
+        gradientUnits === 'objectBoundingBox' &&
+        object.rx !== object.ry) {
+
       var scaleFactor = object.ry/object.rx;
       ellipseMatrix = ' scale(1, ' + scaleFactor + ')';
       if (options.y1) {
@@ -5884,7 +5902,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * @private
      * @see {@link http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#dom-context-2d-imagesmoothingenabled|WhatWG Canvas Standard}
      */
-    _setImageSmoothing: function(){
+    _setImageSmoothing: function() {
       var ctx = this.getContext();
 
       ctx.imageSmoothingEnabled       = this.imageSmoothingEnabled;
@@ -8688,7 +8706,18 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       }
       var pointer = getPointer(e, upperCanvasEl),
           bounds = upperCanvasEl.getBoundingClientRect(),
+          boundsWidth = bounds.width || 0,
+          boundsHeight = bounds.height || 0,
           cssScale;
+
+      if (!boundsWidth || !boundsHeight ) {
+        if ('top' in bounds && 'bottom' in bounds) {
+          boundsHeight = Math.abs( bounds.top - bounds.bottom );
+        }
+        if ('right' in bounds && 'left' in bounds) {
+          boundsWidth = Math.abs( bounds.right - bounds.left );
+        }
+      }
 
       this.calcOffset();
 
@@ -8701,14 +8730,14 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         );
       }
 
-      if (bounds.width === 0 || bounds.height === 0) {
+      if (boundsWidth === 0 || boundsHeight === 0) {
         // If bounds are not available (i.e. not visible), do not apply scale.
         cssScale = { width: 1, height: 1 };
       }
       else {
         cssScale = {
-          width: upperCanvasEl.width / bounds.width,
-          height: upperCanvasEl.height / bounds.height
+          width: upperCanvasEl.width / boundsWidth,
+          height: upperCanvasEl.height / boundsHeight
         };
       }
 
@@ -9008,7 +9037,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 })();
 
 
-(function(){
+(function() {
 
   var cursorOffset = {
     mt: 0, // n
@@ -9135,8 +9164,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @param {Event} [e] Event object fired on Event.js orientation change
      * @param {Event} [self] Inner Event object
      */
-    _onOrientationChange: function(e,self) {
-      this.__onOrientationChange && this.__onOrientationChange(e,self);
+    _onOrientationChange: function(e, self) {
+      this.__onOrientationChange && this.__onOrientationChange(e, self);
     },
 
     /**
@@ -9145,7 +9174,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @param {Event} [self] Inner Event object
      */
     _onShake: function(e, self) {
-      this.__onShake && this.__onShake(e,self);
+      this.__onShake && this.__onShake(e, self);
     },
 
     /**
@@ -9716,7 +9745,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 })();
 
 
-(function(){
+(function() {
 
   var min = Math.min,
       max = Math.max;
@@ -10824,10 +10853,19 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
     /**
      * Fill rule used to fill an object
+     * accepted values are nonzero, evenodd
+     * <b>Backwards incompatibility note:</b> This property was used for setting globalCompositeOperation until v1.4.12 (use `fabric.Object#globalCompositeOperation` instead)
      * @type String
      * @default
      */
-    fillRule:                 'source-over',
+    fillRule:                 'nonzero',
+
+    /**
+     * Composite rule used for canvas globalCompositeOperation
+     * @type String
+     * @default
+     */
+    globalCompositeOperation: 'source-over',
 
     /**
      * Background color of an object. Only works with text objects at the moment.
@@ -11040,7 +11078,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     stateProperties:  (
       'top left width height scaleX scaleY flipX flipY originX originY transformMatrix ' +
       'stroke strokeWidth strokeDashArray strokeLineCap strokeLineJoin strokeMiterLimit ' +
-      'angle opacity fill fillRule shadow clipTo visible backgroundColor'
+      'angle opacity fill fillRule globalCompositeOperation shadow clipTo visible backgroundColor'
     ).split(' '),
 
     /**
@@ -11131,30 +11169,32 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
 
           object = {
-            type:               this.type,
-            originX:            this.originX,
-            originY:            this.originY,
-            left:               toFixed(this.left, NUM_FRACTION_DIGITS),
-            top:                toFixed(this.top, NUM_FRACTION_DIGITS),
-            width:              toFixed(this.width, NUM_FRACTION_DIGITS),
-            height:             toFixed(this.height, NUM_FRACTION_DIGITS),
-            fill:               (this.fill && this.fill.toObject) ? this.fill.toObject() : this.fill,
-            stroke:             (this.stroke && this.stroke.toObject) ? this.stroke.toObject() : this.stroke,
-            strokeWidth:        toFixed(this.strokeWidth, NUM_FRACTION_DIGITS),
-            strokeDashArray:    this.strokeDashArray,
-            strokeLineCap:      this.strokeLineCap,
-            strokeLineJoin:     this.strokeLineJoin,
-            strokeMiterLimit:   toFixed(this.strokeMiterLimit, NUM_FRACTION_DIGITS),
-            scaleX:             toFixed(this.scaleX, NUM_FRACTION_DIGITS),
-            scaleY:             toFixed(this.scaleY, NUM_FRACTION_DIGITS),
-            angle:              toFixed(this.getAngle(), NUM_FRACTION_DIGITS),
-            flipX:              this.flipX,
-            flipY:              this.flipY,
-            opacity:            toFixed(this.opacity, NUM_FRACTION_DIGITS),
-            shadow:             (this.shadow && this.shadow.toObject) ? this.shadow.toObject() : this.shadow,
-            visible:            this.visible,
-            clipTo:             this.clipTo && String(this.clipTo),
-            backgroundColor:    this.backgroundColor
+            type:                     this.type,
+            originX:                  this.originX,
+            originY:                  this.originY,
+            left:                     toFixed(this.left, NUM_FRACTION_DIGITS),
+            top:                      toFixed(this.top, NUM_FRACTION_DIGITS),
+            width:                    toFixed(this.width, NUM_FRACTION_DIGITS),
+            height:                   toFixed(this.height, NUM_FRACTION_DIGITS),
+            fill:                     (this.fill && this.fill.toObject) ? this.fill.toObject() : this.fill,
+            stroke:                   (this.stroke && this.stroke.toObject) ? this.stroke.toObject() : this.stroke,
+            strokeWidth:              toFixed(this.strokeWidth, NUM_FRACTION_DIGITS),
+            strokeDashArray:          this.strokeDashArray,
+            strokeLineCap:            this.strokeLineCap,
+            strokeLineJoin:           this.strokeLineJoin,
+            strokeMiterLimit:         toFixed(this.strokeMiterLimit, NUM_FRACTION_DIGITS),
+            scaleX:                   toFixed(this.scaleX, NUM_FRACTION_DIGITS),
+            scaleY:                   toFixed(this.scaleY, NUM_FRACTION_DIGITS),
+            angle:                    toFixed(this.getAngle(), NUM_FRACTION_DIGITS),
+            flipX:                    this.flipX,
+            flipY:                    this.flipY,
+            opacity:                  toFixed(this.opacity, NUM_FRACTION_DIGITS),
+            shadow:                   (this.shadow && this.shadow.toObject) ? this.shadow.toObject() : this.shadow,
+            visible:                  this.visible,
+            clipTo:                   this.clipTo && String(this.clipTo),
+            backgroundColor:          this.backgroundColor,
+            fillRule:                 this.fillRule,
+            globalCompositeOperation: this.globalCompositeOperation
           };
 
       if (!this.includeDefaultValues) {
@@ -11325,7 +11365,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       ctx.save();
 
       //setup fill rule for current object
-      this._setupFillRule(ctx);
+      this._setupCompositeOperation(ctx);
 
       this._transform(ctx, noTransform);
       this._setStrokeStyles(ctx);
@@ -11343,7 +11383,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       this._render(ctx, noTransform);
       this.clipTo && ctx.restore();
       this._removeShadow(ctx);
-      this._restoreFillRule(ctx);
+      this._restoreCompositeOperation(ctx);
 
       ctx.restore();
     },
@@ -11465,7 +11505,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
           -this.width / 2 + this.fill.offsetX || 0,
           -this.height / 2 + this.fill.offsetY || 0);
       }
-      if (this.fillRule === 'destination-over') {
+      if (this.fillRule === 'evenodd') {
         ctx.fill('evenodd');
       }
       else {
@@ -11842,13 +11882,13 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
     /**
      * Sets canvas globalCompositeOperation for specific object
-     * custom composition operation for the particular object can be specifed using fillRule property
+     * custom composition operation for the particular object can be specifed using globalCompositeOperation property
      * @param {CanvasRenderingContext2D} ctx Rendering canvas context
      */
-    _setupFillRule: function (ctx) {
-      if (this.fillRule) {
-        this._prevFillRule = ctx.globalCompositeOperation;
-        ctx.globalCompositeOperation = this.fillRule;
+    _setupCompositeOperation: function (ctx) {
+      if (this.globalCompositeOperation) {
+        this._prevGlobalCompositeOperation = ctx.globalCompositeOperation;
+        ctx.globalCompositeOperation = this.globalCompositeOperation;
       }
     },
 
@@ -11856,9 +11896,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * Restores previously saved canvas globalCompositeOperation after obeject rendering
      * @param {CanvasRenderingContext2D} ctx Rendering canvas context
      */
-    _restoreFillRule: function (ctx) {
-      if (this.fillRule && this._prevFillRule) {
-        ctx.globalCompositeOperation = this._prevFillRule;
+    _restoreCompositeOperation: function (ctx) {
+      if (this.globalCompositeOperation && this._prevGlobalCompositeOperation) {
+        ctx.globalCompositeOperation = this._prevGlobalCompositeOperation;
       }
     }
   });
@@ -12487,7 +12527,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
             Math.pow(this.currentWidth / 2, 2) +
             Math.pow(this.currentHeight / 2, 2)),
 
-          _angle = Math.atan(isFinite(this.currentHeight / this.currentWidth) ? this.currentHeight / this.currentWidth : 0),
+          _angle = Math.atan(
+            isFinite(this.currentHeight / this.currentWidth)
+              ? this.currentHeight / this.currentWidth
+              : 0),
 
           // offset added for rotate and scale actions
           offsetX = Math.cos(_angle + theta) * _hypotenuse,
@@ -12650,7 +12693,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     var fill = this.fill
           ? (this.fill.toLive ? 'url(#SVGID_' + this.fill.id + ')' : this.fill)
           : 'none',
-        fillRule = (this.fillRule === 'destination-over' ? 'evenodd' : this.fillRule),
+        fillRule = this.fillRule,
         stroke = this.stroke
           ? (this.stroke.toLive ? 'url(#SVGID_' + this.stroke.id + ')' : this.stroke)
           : 'none',
@@ -12685,7 +12728,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @return {String}
    */
   getSvgTransform: function() {
-    if (this.group) {
+    if (this.group && this.group.type === 'path-group') {
       return '';
     }
     var toFixed = fabric.util.toFixed,
@@ -12802,7 +12845,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 });
 
 
-(function(){
+(function() {
 
   var degreesToRadians = fabric.util.degreesToRadians,
       //jscs:disable requireCamelCaseOrUpperCaseIdentifiers
@@ -13791,7 +13834,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     toSVG: function(reviver) {
       var markup = this._createBaseSVGMarkup(), addTranslate = '';
-      if (!this.group) {
+      if (!(this.group && this.group.type === 'path-group')) {
         var x = - this.width / 2 - (this.x1 > this.x2 ? this.x2 : this.x1),
             y = - this.height / 2 - (this.y1 > this.y2 ? this.y2 : this.y1);
         addTranslate = 'translate(' + x + ', ' + y + ') ';
@@ -14036,7 +14079,11 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     _render: function(ctx, noTransform) {
       ctx.beginPath();
-      ctx.arc(noTransform ? this.left + this.radius : 0, noTransform ? this.top + this.radius : 0, this.radius, this.startAngle, this.endAngle, false);
+      ctx.arc(noTransform ? this.left + this.radius : 0,
+              noTransform ? this.top + this.radius : 0,
+              this.radius,
+              this.startAngle,
+              this.endAngle, false);
       this._renderFill(ctx);
       this._renderStroke(ctx);
     },
@@ -14260,7 +14307,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 })(typeof exports !== 'undefined' ? exports : this);
 
 
-(function(global){
+(function(global) {
 
   'use strict';
 
@@ -14340,7 +14387,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     toSVG: function(reviver) {
       var markup = this._createBaseSVGMarkup(), x = 0, y = 0;
-      if (this.group) {
+      if (this.group && this.group.type === 'path-group') {
         x = this.left + this.rx;
         y = this.top + this.ry;
       }
@@ -14368,7 +14415,13 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       ctx.beginPath();
       ctx.save();
       ctx.transform(1, 0, 0, this.ry/this.rx, 0, 0);
-      ctx.arc(noTransform ? this.left + this.rx : 0, noTransform ? (this.top + this.ry) * this.rx/this.ry : 0, this.rx, 0, piBy2, false);
+      ctx.arc(
+        noTransform ? this.left + this.rx : 0,
+        noTransform ? (this.top + this.ry) * this.rx/this.ry : 0,
+        this.rx,
+        0,
+        piBy2,
+        false);
       ctx.restore();
       this._renderFill(ctx);
       this._renderStroke(ctx);
@@ -14599,7 +14652,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     toSVG: function(reviver) {
       var markup = this._createBaseSVGMarkup(), x = this.left, y = this.top;
-      if (!this.group) {
+      if (!(this.group && this.group.type === 'path-group')) {
         x = -this.width / 2;
         y = -this.height / 2;
       }
@@ -16299,7 +16352,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 })(typeof exports !== 'undefined' ? exports : this);
 
 
-(function(global){
+(function(global) {
 
   'use strict';
 
@@ -17024,7 +17077,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     toSVG: function(reviver) {
       var markup = [], x = -this.width / 2, y = -this.height / 2;
-      if (this.group) {
+      if (this.group && this.group.type === 'path-group') {
         x = this.left;
         y = this.top;
       }
@@ -18657,7 +18710,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 })(typeof exports !== 'undefined' ? exports : this);
 
 
-(function(global){
+(function(global) {
   'use strict';
 
   var fabric = global.fabric;
@@ -18685,7 +18738,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
   fabric.Image.filters.Blend = fabric.util.createClass({
     type: 'Blend',
 
-    initialize: function(options){
+    initialize: function(options) {
       options = options || {};
       this.color = options.color || '#000';
       this.image = options.image || false;
@@ -19197,10 +19250,10 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     _renderText: function(ctx, textLines) {
       ctx.save();
       this._setShadow(ctx);
-      this._setupFillRule(ctx);
+      this._setupCompositeOperation(ctx);
       this._renderTextFill(ctx, textLines);
       this._renderTextStroke(ctx, textLines);
-      this._restoreFillRule(ctx);
+      this._restoreCompositeOperation(ctx);
       this._removeShadow(ctx);
       ctx.restore();
     },
@@ -19668,7 +19721,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
         '<g transform="', this.getSvgTransform(), this.getSvgTransformMatrix(), '">\n',
           textAndBg.textBgRects.join(''),
           '<text ',
-            (this.fontFamily ? 'font-family="' + this.fontFamily.replace(/"/g,'\'') + '" ': ''),
+            (this.fontFamily ? 'font-family="' + this.fontFamily.replace(/"/g, '\'') + '" ': ''),
             (this.fontSize ? 'font-size="' + this.fontSize + '" ': ''),
             (this.fontStyle ? 'font-style="' + this.fontStyle + '" ': ''),
             (this.fontWeight ? 'font-weight="' + this.fontWeight + '" ': ''),
@@ -22898,7 +22951,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       '<tspan x="', lineLeftOffset + charOffset, '" ',
         yProp, '="', lineTopOffset, '" ',
 
-        (styleDecl.fontFamily ? 'font-family="' + styleDecl.fontFamily.replace(/"/g,'\'') + '" ': ''),
+        (styleDecl.fontFamily ? 'font-family="' + styleDecl.fontFamily.replace(/"/g, '\'') + '" ': ''),
         (styleDecl.fontSize ? 'font-size="' + styleDecl.fontSize + '" ': ''),
         (styleDecl.fontStyle ? 'font-style="' + styleDecl.fontStyle + '" ': ''),
         (styleDecl.fontWeight ? 'font-weight="' + styleDecl.fontWeight + '" ': ''),
@@ -22972,7 +23025,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   }
 
   /** @private */
-  function requestFs(path, callback){
+  function requestFs(path, callback) {
     var fs = require('fs');
     fs.readFile(path, function (err, data) {
       if (err) {
