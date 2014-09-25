@@ -170,7 +170,7 @@
      */
     toSVG: function(reviver) {
       var markup = [], x = -this.width / 2, y = -this.height / 2;
-      if (this.group) {
+      if (this.group && this.group.type === 'path-group') {
         x = this.left;
         y = this.top;
       }

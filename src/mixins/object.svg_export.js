@@ -45,7 +45,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @return {String}
    */
   getSvgTransform: function() {
-    if (this.group) {
+    if (this.group && this.group.type === 'path-group') {
       return '';
     }
     var toFixed = fabric.util.toFixed,

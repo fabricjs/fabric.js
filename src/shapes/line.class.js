@@ -231,7 +231,7 @@
      */
     toSVG: function(reviver) {
       var markup = this._createBaseSVGMarkup(), addTranslate = '';
-      if (!this.group) {
+      if (!(this.group && this.group.type === 'path-group')) {
         var x = - this.width / 2 - (this.x1 > this.x2 ? this.x2 : this.x1),
             y = - this.height / 2 - (this.y1 > this.y2 ? this.y2 : this.y1);
         addTranslate = 'translate(' + x + ', ' + y + ') ';
