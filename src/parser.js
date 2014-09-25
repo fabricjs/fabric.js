@@ -65,7 +65,7 @@
     }
     else if (attr === 'strokeDashArray') {
       value = value.replace(/,/g, ' ').split(/\s+/).map(function(n) {
-        return parseInt(n);
+        return parseFloat(n);
       });
     }
     else if (attr === 'transformMatrix') {
