@@ -423,6 +423,11 @@
     equal(canvas, canvas.renderAll());
   });
 
+  test('preserveObjectStacking', function() {
+    ok(typeof canvas.preserveObjectStacking == 'boolean');
+    ok(!canvas.preserveObjectStacking);
+  });
+
   test('renderTop', function() {
     ok(typeof canvas.renderTop == 'function');
     equal(canvas, canvas.renderTop());

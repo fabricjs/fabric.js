@@ -134,6 +134,13 @@
     imageSmoothingEnabled: true,
 
     /**
+     * Indicates whether objects should remain in current stack position when selected. When false objects are brought to top and rendered as part of the selection group
+     * @type Boolean
+     * @default
+     */
+    preserveObjectStacking: false,
+
+    /**
      * The transformation (in the format of Canvas transform) which focuses the viewport
      * @type Array
      * @default
@@ -702,11 +709,20 @@
       ctx.save();
       var v = this.viewportTransform;
       ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
-      object.render(ctx);
+      if (this._shouldRenderObject(object)) {
+        object.render(ctx);
+      }
       ctx.restore();
       if (!this.controlsAboveOverlay) {
         object._renderControls(ctx);
       }
+    },
+
+    _shouldRenderObject: function(object) {
+      if (!object) {
+        return false;
+      }
+      return (object !== this.getActiveGroup() || !this.preserveObjectStacking);
     },
 
     /**
@@ -830,7 +846,7 @@
       var i, length;
 
       // fast path
-      if (!activeGroup) {
+      if (!activeGroup || this.preserveObjectStacking) {
         for (i = 0, length = this._objects.length; i < length; ++i) {
           this._draw(ctx, this._objects[i]);
         }
