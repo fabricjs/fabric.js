@@ -383,7 +383,7 @@
         'fill' : '',
         'stroke': '#0000FF'
       }
-    }
+    };
 
     fabric.cssRules[svgUid] = fabric.getCSSRules(doc);
     deepEqual(fabric.cssRules[svgUid], expectedObject);
@@ -400,6 +400,12 @@
 
     var style = fabric.parseAttributes(elPolygon, [ ]);
     deepEqual(style, expectedStyle);
+    
+    styleElement.textContent = '\t\n';
+    expectedStyle = { }
+    svgUid =  'uniqueId2';
+    fabric.cssRules[svgUid] = fabric.getCSSRules(doc);
+    deepEqual(fabric.cssRules[svgUid], expectedStyle);
   });
 
 })();
