@@ -771,16 +771,17 @@
       }
 
       ctx.save();
-      this._transform(ctx, noTransform);
+      if (!noTransform) {
+        this.transform(ctx);
+      }
 
-      var m = this.transformMatrix,
-          isInPathGroup = this.group && this.group.type === 'path-group';
+      var isInPathGroup = this.group && this.group.type === 'path-group';
 
       if (isInPathGroup) {
         ctx.translate(-this.group.width/2, -this.group.height/2);
       }
-      if (m) {
-        ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
+      if (this.transformMatrix) {
+        ctx.transform.apply(ctx, this.transformMatrix);
       }
       if (isInPathGroup) {
         ctx.translate(this.left, this.top);

@@ -148,10 +148,11 @@
 
   test('parseStyleAttribute with value normalization', function() {
     var element = fabric.document.createElement('path');
-    element.setAttribute('style', 'fill:none');
+    element.setAttribute('style', 'fill:none;  stroke-dasharray: 2 0.4;');
 
     var expectedObject = {
-      'fill': ''
+      'fill': '',
+      'strokeDashArray': [2, 0.4]
     };
     deepEqual(fabric.parseStyleAttribute(element), expectedObject);
   });

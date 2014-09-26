@@ -420,29 +420,32 @@
      */
     render: function(ctx, noTransform) {
       // do not render if width/height are zeros or object is not visible
-      if (this.width === 0 || this.height === 0 || !this.visible) {
+      if (!this.visible) {
         return;
       }
 
       ctx.save();
 
+      this._setupCompositeOperation(ctx);
       if (!noTransform) {
         this.transform(ctx);
       }
+      this._setStrokeStyles(ctx);
+      this._setFillStyles(ctx);
       if (this.group && this.group.type === 'path-group') {
-        ctx.translate(-this.group.width/2, -this.group.height/2);
+        ctx.translate(-this.group.width / 2, -this.group.height / 2);
       }
       if (this.transformMatrix) {
         ctx.transform.apply(ctx, this.transformMatrix);
       }
-      this._setStrokeStyles(ctx);
-      this._setFillStyles(ctx);
+      this._setOpacity(ctx);
       this._setShadow(ctx);
       this.clipTo && fabric.util.clipContext(this, ctx);
-      ctx.globalAlpha = this.group ? (ctx.globalAlpha * this.opacity) : this.opacity;
       this._render(ctx, noTransform);
       this.clipTo && ctx.restore();
       this._removeShadow(ctx);
+      this._restoreCompositeOperation(ctx);
+
       ctx.restore();
     },
 

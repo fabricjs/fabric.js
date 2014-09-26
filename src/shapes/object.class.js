@@ -971,16 +971,16 @@
 
       //setup fill rule for current object
       this._setupCompositeOperation(ctx);
-
-      this._transform(ctx, noTransform);
+      if (!noTransform) {
+        this.transform(ctx);
+      }
       this._setStrokeStyles(ctx);
       this._setFillStyles(ctx);
-
       if (this.group && this.group.type === 'path-group') {
         ctx.translate(-this.group.width/2, -this.group.height/2);
-        if (this.transformMatrix) {
-          ctx.transform.apply(ctx, this.transformMatrix);
-        }
+      }
+      if (this.transformMatrix) {
+        ctx.transform.apply(ctx, this.transformMatrix);
       }
       this._setOpacity(ctx);
       this._setShadow(ctx);
@@ -991,17 +991,6 @@
       this._restoreCompositeOperation(ctx);
 
       ctx.restore();
-    },
-
-    _transform: function(ctx, noTransform) {
-      var m = this.transformMatrix;
-
-      if (m && !this.group) {
-        ctx.setTransform.apply(ctx, m);
-      }
-      if (!noTransform) {
-        this.transform(ctx);
-      }
     },
 
     /* @private
@@ -1137,7 +1126,6 @@
         if (1 & this.strokeDashArray.length) {
           this.strokeDashArray.push.apply(this.strokeDashArray, this.strokeDashArray);
         }
-
         if (supportsLineDash) {
           ctx.setLineDash(this.strokeDashArray);
           this._stroke && this._stroke(ctx);
