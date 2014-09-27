@@ -329,16 +329,16 @@
                 ? Math.min.apply(null, scales) : Math.max.apply(null, scales);
         width = this._element.width * scale;
         height = this._element.height * scale;
-        if (this.alignX === "Mid") {
+        if (this.alignX === 'Mid') {
           marginX = (this.width - width) / 2;
         }
-        if (this.alignX === "Max") {
+        if (this.alignX === 'Max') {
           marginX = this.width - width;
         }
-        if (this.alignY === "Mid") {
+        if (this.alignY === 'Mid') {
           marginY = (this.height - height) / 2;
         }
-        if (this.alignY === "Max") {
+        if (this.alignY === 'Max') {
           marginY = this.height - height;
         }
       }
@@ -479,7 +479,8 @@
    * @static
    * @see {@link http://www.w3.org/TR/SVG/struct.html#ImageElement}
    */
-  fabric.Image.ATTRIBUTE_NAMES = fabric.SHARED_ATTRIBUTES.concat('x y width height preserveAspectRatio xlink:href'.split(' '));
+  fabric.Image.ATTRIBUTE_NAMES = 
+    fabric.SHARED_ATTRIBUTES.concat('x y width height preserveAspectRatio xlink:href'.split(' '));
 
   /**
    * Returns {@link fabric.Image} instance from an SVG element
@@ -492,7 +493,7 @@
   fabric.Image.fromElement = function(element, callback, options) {
     var parsedAttributes = fabric.parseAttributes(element, fabric.Image.ATTRIBUTE_NAMES),
         align = 'xMidYMid', meetOrSlice = 'meet', alignX, alignY, aspectRatioAttrs;
-        
+
     if (parsedAttributes.preserveAspectRatio) {
       aspectRatioAttrs = parsedAttributes.preserveAspectRatio.split(' ');
     }
@@ -502,13 +503,14 @@
       if (meetOrSlice !== 'meet' && meetOrSlice !== 'slice') {
         align = meetOrSlice;
         meetOrSlice = 'meet';
-      } else if (aspectRatioAttrs.length) {
+      }
+      else if (aspectRatioAttrs.length) {
         align = aspectRatioAttrs.pop();
       }
     }
     //divide align in alignX and alignY
-    alignX = align !== 'none' ? align.slice(1,4) : 'none';
-    alignY = align !== 'none' ? align.slice(5,8) : 'none';
+    alignX = align !== 'none' ? align.slice(1, 4) : 'none';
+    alignY = align !== 'none' ? align.slice(5, 8) : 'none';
     parsedAttributes.alignX = alignX;
     parsedAttributes.alignY = alignY;
     parsedAttributes.meetOrSlice = meetOrSlice;
