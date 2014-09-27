@@ -320,7 +320,7 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx, noTransform) {
-      var x, y, width = this.width, height = this.height, scales, scale,
+      var width = this.width, height = this.height, scales, scale,
           marginX = 0, marginY = 0;
 
       if (this.align !== 'none') {
