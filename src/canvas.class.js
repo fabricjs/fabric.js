@@ -525,7 +525,7 @@
         forbidScalingY || lockScalingY || target.set('scaleY', transform.newScaleY);
       }
 
-      forbidScalingX || forbidScalingY || this._flipObject(transform);
+      forbidScalingX || forbidScalingY || this._flipObject(transform, by);
 
     },
 
@@ -550,8 +550,8 @@
     /**
      * @private
      */
-    _flipObject: function(transform) {
-      if (transform.newScaleX < 0) {
+    _flipObject: function(transform, by) {
+      if (transform.newScaleX < 0 && by !== 'y') {
         if (transform.originX === 'left') {
           transform.originX = 'right';
         }
@@ -560,7 +560,7 @@
         }
       }
 
-      if (transform.newScaleY < 0) {
+      if (transform.newScaleY < 0 && by !== 'x') {
         if (transform.originY === 'top') {
           transform.originY = 'bottom';
         }
