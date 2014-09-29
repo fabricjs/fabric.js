@@ -347,7 +347,7 @@
 
       if (this.meetOrSlice === 'slice') {
         ctx.beginPath();
-        context.rect(x, y, width, height);
+        ctx.rect(x, y, width, height);
         ctx.clip();
       }
 
