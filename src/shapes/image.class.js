@@ -320,10 +320,10 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx, noTransform) {
-      var width = this.width, height = this.height, scales, scale,
+      var x, y, width = this.width, height = this.height, scales, scale,
           marginX = 0, marginY = 0;
 
-      if (this.align !== 'none') {
+      if (this.alignX !== 'none' || this.alignY !== 'none') {
         scales = [this.width / this._element.width, this.height / this._element.height];
         scale = this.meetOrSlice === 'meet'
                 ? Math.min.apply(null, scales) : Math.max.apply(null, scales);
@@ -342,14 +342,17 @@
           marginY = this.height - height;
         }
       }
+      x = (noTransform ? this.left : -this.width / 2) + marginX;
+      y = (noTransform ? this.top : -this.height / 2) + marginY;
+
+      if (this.meetOrSlice === 'slice') {
+        ctx.beginPath();
+        context.rect(x, y, width, height);
+        ctx.clip();
+      }
+
       this._element &&
-      ctx.drawImage(
-        this._element,
-        (noTransform ? this.left : -this.width / 2) + marginX,
-        (noTransform ? this.top : -this.height / 2) + marginY,
-        width,
-        height
-      );
+      ctx.drawImage(this._element, x, y, width, height);
       this._renderStroke(ctx);
     },
 
