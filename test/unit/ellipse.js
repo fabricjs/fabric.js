@@ -60,10 +60,18 @@
       left: 100,
       top: 200,
       rx: 15,
-      ry: 25
+      ry: 25,
+      width: 30,
+      height: 50
     });
 
     deepEqual(ellipse.toObject(), augmentedProperties);
+
+    ellipse.set('rx', 30);
+    deepEqual(ellipse.width, ellipse.rx * 2);
+
+    ellipse.set('scaleX', 2);
+    deepEqual(ellipse.getRx(), ellipse.rx * ellipse.scaleX);
   });
 
   test('render', function() {
