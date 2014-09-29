@@ -91,7 +91,7 @@
      * Returns Vertical radius of an object (according to how an object is scaled)
      * @return {Number}
      */
-    getRY: function() {
+    getRy: function() {
       return this.get('ry') * this.get('scaleY');
     },
 
