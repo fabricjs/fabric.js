@@ -342,17 +342,17 @@
           marginY = this.height - height;
         }
       }
-      x = (noTransform ? this.left : -this.width / 2) + marginX;
-      y = (noTransform ? this.top : -this.height / 2) + marginY;
+      x = (noTransform ? this.left : -this.width / 2);
+      y = (noTransform ? this.top : -this.height / 2);
 
       if (this.meetOrSlice === 'slice') {
         ctx.beginPath();
-        ctx.rect(x, y, width, height);
+        ctx.rect(x, y, this.width, this.height);
         ctx.clip();
       }
 
       this._element &&
-      ctx.drawImage(this._element, x, y, width, height);
+      ctx.drawImage(this._element, x + marginX, y + marginY, width, height);
       this._renderStroke(ctx);
     },
 
@@ -482,7 +482,7 @@
    * @static
    * @see {@link http://www.w3.org/TR/SVG/struct.html#ImageElement}
    */
-  fabric.Image.ATTRIBUTE_NAMES =
+  fabric.Image.ATTRIBUTE_NAMES = 
     fabric.SHARED_ATTRIBUTES.concat('x y width height preserveAspectRatio xlink:href'.split(' '));
 
   /**
