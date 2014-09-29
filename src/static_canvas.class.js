@@ -749,6 +749,12 @@
         this.fire('selection:cleared');
       }
 
+      // Object cannot be changed if deleted
+      if ( typeof obj.moving !== "undefined" ) {
+        clearTimeout( obj.moving );
+        delete obj.moving;
+      }
+
       this.fire('object:removed', { target: obj });
       obj.fire('removed');
     },
