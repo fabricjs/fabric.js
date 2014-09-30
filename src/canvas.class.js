@@ -476,6 +476,7 @@
           lockScalingX = target.get('lockScalingX'),
           lockScalingY = target.get('lockScalingY'),
           lockScalingFlip = target.get('lockScalingFlip');
+          minSize = target.get('minSize');
 
       if (lockScalingX && lockScalingY) {
         return;
@@ -488,7 +489,7 @@
       this._setLocalMouse(localMouse, t);
 
       // Actually scale the object
-      this._setObjectScale(localMouse, t, lockScalingX, lockScalingY, by, lockScalingFlip);
+      this._setObjectScale(localMouse, t, lockScalingX, lockScalingY, by, lockScalingFlip, minSize);
 
       // Make sure the constraints apply
       target.setPositionByOrigin(constraintPosition, t.originX, t.originY);
@@ -497,7 +498,7 @@
     /**
      * @private
      */
-    _setObjectScale: function(localMouse, transform, lockScalingX, lockScalingY, by, lockScalingFlip) {
+    _setObjectScale: function(localMouse, transform, lockScalingX, lockScalingY, by, lockScalingFlip, minSize) {
       var target = transform.target, forbidScalingX = false, forbidScalingY = false;
 
       transform.newScaleX = localMouse.x / (target.width + target.strokeWidth);
@@ -509,6 +510,16 @@
 
       if (lockScalingFlip && transform.newScaleY <= 0 && transform.newScaleY < target.scaleY) {
         forbidScalingY = true;
+      }
+
+      if (minSize && target.width * transform.newScaleX <= minSize && transform.newScaleX < target.scaleX) {
+        transform.newScaleX = minSize / target.width;
+        transform.forceNewScale = true
+      }
+
+      if (minSize && target.height * transform.newScaleY <= minSize && transform.newScaleY < target.scaleY) {
+        transform.newScaleY = minSize / target.height;
+        transform.forceNewScale = true
       }
 
       if (by === 'equally' && !lockScalingX && !lockScalingY) {
@@ -533,16 +544,20 @@
      * @private
      */
     _scaleObjectEqually: function(localMouse, target, transform) {
+      
+      if (transform.forceNewScale) {
+        transform.newScaleX = Math.max(transform.newScaleX, transform.newScaleY)
+        transform.newScaleY = transform.newScaleX
+      } else {
+        var dist = localMouse.y + localMouse.x,
+            lastDist = (target.height + (target.strokeWidth)) * transform.original.scaleY +
+                       (target.width + (target.strokeWidth)) * transform.original.scaleX;
 
-      var dist = localMouse.y + localMouse.x,
-          lastDist = (target.height + (target.strokeWidth)) * transform.original.scaleY +
-                     (target.width + (target.strokeWidth)) * transform.original.scaleX;
-
-      // We use transform.scaleX/Y instead of target.scaleX/Y
-      // because the object may have a min scale and we'll loose the proportions
-      transform.newScaleX = transform.original.scaleX * dist / lastDist;
-      transform.newScaleY = transform.original.scaleY * dist / lastDist;
-
+        // We use transform.scaleX/Y instead of target.scaleX/Y
+        // because the object may have a min scale and we'll loose the proportions
+        transform.newScaleX = transform.original.scaleX * dist / lastDist;
+        transform.newScaleY = transform.original.scaleY * dist / lastDist;
+      }
       target.set('scaleX', transform.newScaleX);
       target.set('scaleY', transform.newScaleY);
     },
