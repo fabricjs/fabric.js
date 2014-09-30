@@ -225,10 +225,10 @@
     calcLinePoints: function() {
       var xMult = this.x1 <= this.x2 ? -1 : 1,
           yMult = this.y1 <= this.y2 ? -1 : 1,
-      x1 = (xMult * this.width / 2),
-      y1 = (yMult * this.height / 2),
-      x2 = (xMult * -1 * this.width / 2),
-      y2 = (yMult * -1 * this.height / 2);
+          x1 = (xMult * this.width / 2),
+          y1 = (yMult * this.height / 2),
+          x2 = (xMult * -1 * this.width / 2),
+          y2 = (yMult * -1 * this.height / 2);
 
       return {
         x1: x1,
