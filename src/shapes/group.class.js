@@ -64,7 +64,6 @@
       if (options) {
         extend(this, options);
       }
-      this._setOpacityIfSame();
 
       this.setCoords();
       this.saveCoords();
@@ -415,21 +414,6 @@
         object.setCoords();
       });
       return this;
-    },
-
-    /**
-     * @private
-     */
-    _setOpacityIfSame: function() {
-      var objects = this.getObjects(),
-          firstValue = objects[0] ? objects[0].get('opacity') : 1,
-          isSameOpacity = objects.every(function(o) {
-            return o.get('opacity') === firstValue;
-          });
-
-      if (isSameOpacity) {
-        this.opacity = firstValue;
-      }
     },
 
     /**
