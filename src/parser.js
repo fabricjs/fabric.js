@@ -142,11 +142,11 @@
     }
 
     function skewXMatrix(matrix, args) {
-      matrix[2] = args[0];
+      matrix[2] = Math.tan(fabric.util.degreesToRadians(args[0]));
     }
 
     function skewYMatrix(matrix, args) {
-      matrix[1] = args[0];
+      matrix[1] = Math.tan(fabric.util.degreesToRadians(args[0]));
     }
 
     function translateMatrix(matrix, args) {
