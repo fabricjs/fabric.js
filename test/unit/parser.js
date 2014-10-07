@@ -250,11 +250,11 @@
 
     element.setAttribute('transform', 'skewX(2)');
     var parsedValue = fabric.parseTransformAttribute(element.getAttribute('transform'));
-    deepEqual(parsedValue, [1,0,2,1,0,0]);
+    deepEqual(parsedValue, [1,0,0.03492076949174773,1,0,0]);
 
     element.setAttribute('transform', 'skewY(234.111)');
     var parsedValue = fabric.parseTransformAttribute(element.getAttribute('transform'));
-    deepEqual(parsedValue, [1,234.111,0,1,0,0]);
+    deepEqual(parsedValue, [1,1.3820043381762832,0,1,0,0]);
 
     element.setAttribute('transform', 'matrix(1,2,3,4,5,6)');
     var parsedValue = fabric.parseTransformAttribute(element.getAttribute('transform'));
@@ -266,7 +266,7 @@
 
     element.setAttribute('transform', 'scale(2 13) translate(5,15) skewX(11.22)');
     var parsedValue = fabric.parseTransformAttribute(element.getAttribute('transform'));
-    deepEqual(parsedValue, [2,0,22.44,13,10,195]);
+    deepEqual(parsedValue, [2,0,0.3967362169237356,13,10,195]);
 
   });
 
