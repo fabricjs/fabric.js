@@ -116,12 +116,12 @@
 
       element = element.parentNode;
 
-      if (element !== fabric.document &&
+      if (element.nodeType === 1 &&
           fabric.util.getElementStyle(element, 'position') === 'fixed') {
         firstFixedAncestor = element;
       }
 
-      if (element !== fabric.document &&
+      if (element.nodeType === 1 &&
           origElement !== upperCanvasEl &&
           fabric.util.getElementStyle(element, 'position') === 'absolute') {
         left = 0;
