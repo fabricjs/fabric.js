@@ -1,8 +1,5 @@
 (function() {
 
-  var utilMin = fabric.util.array.min,
-      utilMax = fabric.util.array.max;
-
   /**
    * PencilBrush class
    * @class fabric.PencilBrush
