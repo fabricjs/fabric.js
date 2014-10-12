@@ -572,6 +572,9 @@
           i
         );
       }
+      if (this.shadow && !this.shadow.affectStroke) {
+        this._removeShadow(ctx);
+      }
     },
 
     /**
