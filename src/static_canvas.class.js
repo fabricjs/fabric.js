@@ -120,6 +120,13 @@
     controlsAboveOverlay: false,
 
     /**
+     * Indicates whether the background is clipped by the clipTo function
+     * @type Boolean
+     * @default
+     */
+    clipBackground: true,
+
+    /**
      * Indicates whether the browser can be scrolled when using a touchscreen and dragging on the canvas
      * @type Boolean
      * @default
@@ -814,11 +821,18 @@
 
       this.fire('before:render');
 
+      if (!this.clipBackground) {
+        this._renderBackground(canvasToDrawOn);
+      }
+
       if (this.clipTo) {
         fabric.util.clipContext(this, canvasToDrawOn);
       }
 
-      this._renderBackground(canvasToDrawOn);
+      if (this.clipBackground) {
+        this._renderBackground(canvasToDrawOn);
+      }
+
       this._renderObjects(canvasToDrawOn, activeGroup);
       this._renderActiveGroup(canvasToDrawOn, activeGroup);
 
