@@ -4,3 +4,4 @@
 /npm-debug.log
 before_commit
 /coverage/
+.idea/
