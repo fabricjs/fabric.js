@@ -647,9 +647,13 @@
      */
     _rotateObject: function (x, y) {
 
-      var t = this._currentTransform;
+      var t = this._currentTransform,
+          target = t.target,
+          step = target.get('rotationStep'),
+          stickAt = target.get('rotationStickAt'),
+          stickTolerance = target.get('rotationStickTolerance');
 
-      if (t.target.get('lockRotation')) {
+      if (target.get('lockRotation')) {
         return;
       }
 
@@ -662,7 +666,20 @@
         angle = 360 + angle;
       }
 
-      t.target.angle = angle;
+      // allow only values that divide without reminder by step
+      if (step && (angle % step <= step || (angle + step) % step <= step)) {
+        angle = Math.round(angle / step) * step;
+      }
+
+      // stick to angles that divide without reminder by stickAt value
+      if (stickAt &&
+        (target.angle < angle && angle % stickAt < stickTolerance) || 
+        (target.angle > angle && (angle + stickTolerance - 1) % stickAt < stickTolerance)) {
+
+        angle = Math.round(angle / stickAt) * stickAt;
+      }
+
+      target.angle = angle;
     },
 
     /**
