@@ -387,7 +387,13 @@
       ctx.lineWidth = 1;
 
       ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
-      ctx.strokeStyle = ctx.fillStyle = this.cornerColor;
+      ctx.strokeStyle = this.cornerColor
+      if (typeof this.cornerFillColor !== 'undefined') {
+        ctx.fillStyle = this.cornerFillColor
+        methodName = 'strokeRect';
+      } else {
+        ctx.fillStyle = this.cornerColor;
+      }
 
       // top-left
       this._drawControl('tl', ctx, methodName,
@@ -434,7 +440,7 @@
 
       // middle-top-rotate
       if (this.hasRotatingPoint) {
-        this._drawControl('mtr', ctx, methodName,
+        this._drawCircleControl('mtr', ctx,
           left + width/2 - scaleOffset,
           top - this.rotatingPointOffset - this.cornerSize/2 - padding);
       }
@@ -444,6 +450,17 @@
       return this;
     },
 
+    _drawCircleControl: function(control, ctx, left, top) {
+      var radius = this.cornerSize/2;
+      if (this.isControlVisible(control)) {
+        ctx.save();
+        ctx.fillStyle = this.cornerColor;
+        ctx.arc(left+radius, top+radius, radius, 0, Math.PI*2);
+        ctx.fill();
+        ctx.restore();
+      }
+    },
+
     /**
      * @private
      */
@@ -451,7 +468,11 @@
       var size = this.cornerSize;
 
       if (this.isControlVisible(control)) {
-        isVML() || this.transparentCorners || ctx.clearRect(left, top, size, size);
+        isVML() || this.transparentCorners || typeof this.cornerFillColor !== 'undefined'
+        || ctx.clearRect(left, top, size, size);
+        if (this.cornerFillColor && !this.transparentCorners) {
+          ctx.fillRect(left, top, size, size);
+        }
         ctx[methodName](left, top, size, size);
       }
     },

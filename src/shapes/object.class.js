@@ -430,6 +430,14 @@
     cornerColor:              'rgba(102,153,255,0.5)',
 
     /**
+     * Color of controlling corners fill color of an object (when it's active)
+     * Only valid when transparentCorners is false if unspecified defaults to cornerColor
+     * @type String
+     * @default
+     */
+    cornerFillColor:              undefined,
+
+    /**
      * When true, this object will use center point as the origin of transformation
      * when being scaled via the controls.
      * <b>Backwards incompatibility note:</b> This property replaces "centerTransform" (Boolean).
