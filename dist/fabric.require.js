@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures,cufon,json minifier=uglifyjs` */
 /*! Fabric.js Copyright 2008-2014, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.4.11" };
+var fabric = fabric || { version: "1.4.12" };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -2059,12 +2059,12 @@ fabric.Collection = {
 
       element = element.parentNode;
 
-      if (element !== fabric.document &&
+      if (element.nodeType === 1 &&
           fabric.util.getElementStyle(element, 'position') === 'fixed') {
         firstFixedAncestor = element;
       }
 
-      if (element !== fabric.document &&
+      if (element.nodeType === 1 &&
           origElement !== upperCanvasEl &&
           fabric.util.getElementStyle(element, 'position') === 'absolute') {
         left = 0;
@@ -2957,11 +2957,11 @@ if (typeof console !== 'undefined') {
     }
 
     function skewXMatrix(matrix, args) {
-      matrix[2] = args[0];
+      matrix[2] = Math.tan(fabric.util.degreesToRadians(args[0]));
     }
 
     function skewYMatrix(matrix, args) {
-      matrix[1] = args[0];
+      matrix[1] = Math.tan(fabric.util.degreesToRadians(args[0]));
     }
 
     function translateMatrix(matrix, args) {
@@ -7233,9 +7233,6 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
 
 (function() {
 
-  var utilMin = fabric.util.array.min,
-      utilMax = fabric.util.array.max;
-
   /**
    * PencilBrush class
    * @class fabric.PencilBrush
@@ -7368,73 +7365,27 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
     },
 
     /**
-     * Return an SVG path based on our captured points and their bounding box
-     * @private
-     */
-    _getSVGPathData: function() {
-      this.box = this.getPathBoundingBox(this._points);
-      return this.convertPointsToSVGPath(
-        this._points, this.box.minX, this.box.minY);
-    },
-
-     /**
-      * Returns bounding box of a path based on given points
-      * @param {Array} points Array of points
-      * @return {Object} Object with minX, minY, maxX, maxY
-      */
-    getPathBoundingBox: function(points) {
-      var xBounds = [],
-          yBounds = [],
-          p1 = points[0],
-          p2 = points[1],
-          startPoint = p1;
-
-      for (var i = 1, len = points.length; i < len; i++) {
-        var midPoint = p1.midPointFrom(p2);
-        // with startPoint, p1 as control point, midpoint as end point
-        xBounds.push(startPoint.x);
-        xBounds.push(midPoint.x);
-        yBounds.push(startPoint.y);
-        yBounds.push(midPoint.y);
-
-        p1 = points[i];
-        p2 = points[i + 1];
-        startPoint = midPoint;
-      }
-
-      xBounds.push(p1.x);
-      yBounds.push(p1.y);
-
-      return {
-        minX: utilMin(xBounds),
-        minY: utilMin(yBounds),
-        maxX: utilMax(xBounds),
-        maxY: utilMax(yBounds)
-      };
-    },
-
-    /**
      * Converts points to SVG path
      * @param {Array} points Array of points
      * @param {Number} minX
      * @param {Number} minY
      * @return {String} SVG path
      */
-    convertPointsToSVGPath: function(points, minX, minY) {
+    convertPointsToSVGPath: function(points) {
       var path = [],
-          p1 = new fabric.Point(points[0].x - minX, points[0].y - minY),
-          p2 = new fabric.Point(points[1].x - minX, points[1].y - minY);
+          p1 = new fabric.Point(points[0].x, points[0].y),
+          p2 = new fabric.Point(points[1].x, points[1].y);
 
-      path.push('M ', points[0].x - minX, ' ', points[0].y - minY, ' ');
+      path.push('M ', points[0].x, ' ', points[0].y, ' ');
       for (var i = 1, len = points.length; i < len; i++) {
         var midPoint = p1.midPointFrom(p2);
         // p1 is our bezier control point
         // midpoint is our endpoint
         // start point is p(i-1) value.
         path.push('Q ', p1.x, ' ', p1.y, ' ', midPoint.x, ' ', midPoint.y, ' ');
-        p1 = new fabric.Point(points[i].x - minX, points[i].y - minY);
+        p1 = new fabric.Point(points[i].x, points[i].y);
         if ((i + 1) < points.length) {
-          p2 = new fabric.Point(points[i + 1].x - minX, points[i + 1].y - minY);
+          p2 = new fabric.Point(points[i + 1].x, points[i + 1].y);
         }
       }
       path.push('L ', p1.x, ' ', p1.y, ' ');
@@ -7471,7 +7422,7 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
       var ctx = this.canvas.contextTop;
       ctx.closePath();
 
-      var pathData = this._getSVGPathData().join('');
+      var pathData = this.convertPointsToSVGPath(this._points).join('');
       if (pathData === 'M 0 0 Q 0 0 0 0 L 0 0') {
         // do not create 0 width/height paths, as they are
         // rendered inconsistently across browsers
@@ -7481,19 +7432,7 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
         return;
       }
 
-      // set path origin coordinates based on our bounding box
-      var originLeft = this.box.minX  + (this.box.maxX - this.box.minX) / 2,
-          originTop = this.box.minY  + (this.box.maxY - this.box.minY) / 2;
-
-      this.canvas.contextTop.arc(originLeft, originTop, 3, 0, Math.PI * 2, false);
-
       var path = this.createPath(pathData);
-      path.set({
-        left: originLeft,
-        top: originTop,
-        originX: 'center',
-        originY: 'center'
-      });
 
       this.canvas.add(path);
       path.setCoords();
@@ -8420,7 +8359,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         forbidScalingY || lockScalingY || target.set('scaleY', transform.newScaleY);
       }
 
-      forbidScalingX || forbidScalingY || this._flipObject(transform);
+      forbidScalingX || forbidScalingY || this._flipObject(transform, by);
 
     },
 
@@ -8445,8 +8384,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     /**
      * @private
      */
-    _flipObject: function(transform) {
-      if (transform.newScaleX < 0) {
+    _flipObject: function(transform, by) {
+      if (transform.newScaleX < 0 && by !== 'y') {
         if (transform.originX === 'left') {
           transform.originX = 'right';
         }
@@ -8455,7 +8394,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         }
       }
 
-      if (transform.newScaleY < 0) {
+      if (transform.newScaleY < 0 && by !== 'x') {
         if (transform.originY === 'top') {
           transform.originY = 'bottom';
         }
@@ -13712,7 +13651,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @param {Any} value
      */
     _set: function(key, value) {
-      this[key] = value;
+      this.callSuper('_set', key, value);
       if (typeof coordProps[key] !== 'undefined') {
         this._setWidthHeight();
       }
@@ -13824,12 +13763,27 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
-      return extend(this.callSuper('toObject', propertiesToInclude), {
-        x1: this.get('x1'),
-        y1: this.get('y1'),
-        x2: this.get('x2'),
-        y2: this.get('y2')
-      });
+      return extend(this.callSuper('toObject', propertiesToInclude), this.calcLinePoints());
+    },
+
+    /**
+     * @private
+     * Recalculate line points from width and height.
+     */
+    calcLinePoints: function() {
+      var xMult = this.x1 <= this.x2 ? -1 : 1,
+          yMult = this.y1 <= this.y2 ? -1 : 1,
+          x1 = (xMult * this.width / 2),
+          y1 = (yMult * this.height / 2),
+          x2 = (xMult * -1 * this.width / 2),
+          y2 = (yMult * -1 * this.height / 2);
+
+      return {
+        x1: x1,
+        x2: x2,
+        y1: y1,
+        y2: y2
+      };
     },
 
     /* _TO_SVG_START_ */
@@ -13839,20 +13793,20 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var markup = this._createBaseSVGMarkup(), addTranslate = '';
+      var markup = this._createBaseSVGMarkup(),
+          p = { x1: this.x1, x2: this.x2, y1: this.y1, y2: this.y2 };
+
       if (!(this.group && this.group.type === 'path-group')) {
-        var x = - this.width / 2 - (this.x1 > this.x2 ? this.x2 : this.x1),
-            y = - this.height / 2 - (this.y1 > this.y2 ? this.y2 : this.y1);
-        addTranslate = 'translate(' + x + ', ' + y + ') ';
+        p = this.calcLinePoints();
       }
       markup.push(
         '<line ',
-          'x1="', this.x1,
-          '" y1="', this.y1,
-          '" x2="', this.x2,
-          '" y2="', this.y2,
+          'x1="', p.x1,
+          '" y1="', p.y1,
+          '" x2="', p.x2,
+          '" y2="', p.y2,
           '" style="', this.getSvgStyles(),
-          '" transform="', this.getSvgTransform(), addTranslate,
+          '" transform="', this.getSvgTransform(),
           this.getSvgTransformMatrix(),
         '"/>\n'
       );
@@ -14406,7 +14360,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * Returns Vertical radius of an object (according to how an object is scaled)
      * @return {Number}
      */
-    getRY: function() {
+    getRy: function() {
       return this.get('ry') * this.get('scaleY');
     },
 
@@ -16464,7 +16418,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       if (options) {
         extend(this, options);
       }
-      this._setOpacityIfSame();
 
       this.setCoords();
       this.saveCoords();
@@ -16815,21 +16768,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         object.setCoords();
       });
       return this;
-    },
-
-    /**
-     * @private
-     */
-    _setOpacityIfSame: function() {
-      var objects = this.getObjects(),
-          firstValue = objects[0] ? objects[0].get('opacity') : 1,
-          isSameOpacity = objects.every(function(o) {
-            return o.get('opacity') === firstValue;
-          });
-
-      if (isSameOpacity) {
-        this.opacity = firstValue;
-      }
     },
 
     /**
@@ -19475,6 +19413,9 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
           this._getTopOffset() + lineHeights,
           i
         );
+      }
+      if (this.shadow && !this.shadow.affectStroke) {
+        this._removeShadow(ctx);
       }
     },
 
