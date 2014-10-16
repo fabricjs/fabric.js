@@ -83,7 +83,10 @@
     'filters':                  [],
     'crossOrigin':              '',
     'fillRule':                 'nonzero',
-    'globalCompositeOperation': 'source-over'
+    'globalCompositeOperation': 'source-over',
+    'alignX':                   'none',
+    'alignY':                   'none',
+    'meetOrSlice':              'meet'
   };
 
   function _createImageElement() {
