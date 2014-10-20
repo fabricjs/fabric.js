@@ -391,6 +391,7 @@
      */
     _renderText: function(ctx, textLines) {
       ctx.save();
+      this._setOpacity(ctx);
       this._setShadow(ctx);
       this._setupCompositeOperation(ctx);
       this._renderTextFill(ctx, textLines);
