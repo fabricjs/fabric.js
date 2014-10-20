@@ -58,12 +58,20 @@
       this.originalState = { };
       this.callSuper('initialize');
 
-      if (options) {
-        extend(this, options);
+      if (options.originX) {
+        this.originX = options.originX;
+      }
+
+      if (options.originY) {
+        this.originY = options.originY;
       }
 
       this._calcBounds();
       this._updateObjectsCoords();
+
+      if (options) {
+        extend(this, options);
+      }
 
       this.setCoords();
       this.saveCoords();
