@@ -157,8 +157,8 @@
       'type':                     'group',
       'originX':                  'left',
       'originY':                  'top',
-      'left':                     90,
-      'top':                      130,
+      'left':                     50,
+      'top':                      100,
       'width':                    80,
       'height':                   60,
       'fill':                     'rgb(0,0,0)',
@@ -197,8 +197,8 @@ test('toObject without default values', function() {
 
   var expectedObject = {
     'type':               'group',
-    'left':               90,
-    'top':                130,
+    'left':               50,
+    'top':                100,
     'width':              80,
     'height':             60,
     'objects':            clone.objects
