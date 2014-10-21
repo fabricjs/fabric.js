@@ -56,7 +56,7 @@
     return attr;
   }
 
-  function normalizeValue(attr, value, parentAttributes) {
+  function normalizeValue(attr, value, parentAttributes, fontSize) {
     var isArray = Object.prototype.toString.call(value) === '[object Array]',
         parsed;
 
@@ -88,7 +88,7 @@
       value = value === 'start' ? 'left' : value === 'end' ? 'right' : 'center';
     }
     else {
-      parsed = isArray ? value.map(parseUnit) : parseUnit(value);
+      parsed = isArray ? value.map(parseUnit) : parseUnit(value, fontSize);
     }
 
     return (!isArray && isNaN(parsed) ? value : parsed);
@@ -167,7 +167,7 @@
         ],
 
         // == begin transform regexp
-        number = '(?:[-+]?(?:\\d+|\\d*\\.\\d+)(?:e[-+]?\\d+)?)',
+        number = fabric.reNum,
 
         commaWsp = '(?:\\s+,?\\s*|,\\s*)',
 
@@ -270,40 +270,6 @@
     };
   })();
 
-  function parseFontDeclaration(value, oStyle) {
-
-    // TODO: support non-px font size
-    var match = value.match(/(normal|italic)?\s*(normal|small-caps)?\s*(normal|bold|bolder|lighter|100|200|300|400|500|600|700|800|900)?\s*(\d+)px(?:\/(normal|[\d\.]+))?\s+(.*)/);
-
-    if (!match) {
-      return;
-    }
-
-    var fontStyle = match[1],
-        // font variant is not used
-        // fontVariant = match[2],
-        fontWeight = match[3],
-        fontSize = match[4],
-        lineHeight = match[5],
-        fontFamily = match[6];
-
-    if (fontStyle) {
-      oStyle.fontStyle = fontStyle;
-    }
-    if (fontWeight) {
-      oStyle.fontWeight = isNaN(parseFloat(fontWeight)) ? fontWeight : parseFloat(fontWeight);
-    }
-    if (fontSize) {
-      oStyle.fontSize = parseFloat(fontSize);
-    }
-    if (fontFamily) {
-      oStyle.fontFamily = fontFamily;
-    }
-    if (lineHeight) {
-      oStyle.lineHeight = lineHeight === 'normal' ? 1 : lineHeight;
-    }
-  }
-
   /**
    * @private
    */
@@ -315,12 +281,7 @@
       attr = normalizeAttr(pair[0].trim().toLowerCase());
       value = normalizeValue(attr, pair[1].trim());
 
-      if (attr === 'font') {
-        parseFontDeclaration(value, oStyle);
-      }
-      else {
-        oStyle[attr] = value;
-      }
+      oStyle[attr] = value;
     });
   }
 
@@ -337,12 +298,7 @@
       attr = normalizeAttr(prop.toLowerCase());
       value = normalizeValue(attr, style[prop]);
 
-      if (attr === 'font') {
-        parseFontDeclaration(value, oStyle);
-      }
-      else {
-        oStyle[attr] = value;
-      }
+      oStyle[attr] = value;
     }
   }
 
@@ -431,7 +387,7 @@
         }
 
         if (attr.nodeName === 'transform') {
-          currentTrans = currentTrans + ' ' + attr.nodeValue;
+          currentTrans = attr.nodeValue + ' ' + currentTrans;
         }
         else {
           el2.setAttribute(attr.nodeName, attr.nodeValue);
@@ -453,14 +409,12 @@
 
     // http://www.w3.org/TR/SVG/coords.html#ViewBoxAttribute
     // matches, e.g.: +14.56e-12, etc.
-    var reNum = '(?:[-+]?(?:\\d+|\\d*\\.\\d+)(?:e[-+]?\\d+)?)',
-
-        reViewBoxAttrValue = new RegExp(
+    var reViewBoxAttrValue = new RegExp(
           '^' +
-          '\\s*(' + reNum + '+)\\s*,?' +
-          '\\s*(' + reNum + '+)\\s*,?' +
-          '\\s*(' + reNum + '+)\\s*,?' +
-          '\\s*(' + reNum + '+)\\s*' +
+          '\\s*(' + fabric.reNum + '+)\\s*,?' +
+          '\\s*(' + fabric.reNum + '+)\\s*,?' +
+          '\\s*(' + fabric.reNum + '+)\\s*,?' +
+          '\\s*(' + fabric.reNum + '+)\\s*' +
           '$'
         ),
         viewBoxAttr = element.getAttribute('viewBox'),
@@ -588,7 +542,6 @@
       fabric.gradientDefs[svgUid] = fabric.getGradientDefs(doc);
       fabric.cssRules[svgUid] = fabric.getCSSRules(doc);
       // Precedence of rules:   style > class > attribute
-
       fabric.parseElements(elements, function(instances) {
         fabric.documentParsingTime = new Date() - startTime;
         if (callback) {
@@ -656,6 +609,48 @@
   }
 
   extend(fabric, {
+    /**
+     * Parses a short font declaration, building adding its properties to a style object
+     * @static
+     * @function
+     * @memberOf fabric
+     * @param {String} value font declaration
+     * @param {Object} oStyle definition
+     */
+    parseFontDeclaration: function(value, oStyle) {
+      var fontDeclaration = '(normal|italic)?\\s*(normal|small-caps)?\\s*'
+                            + '(normal|bold|bolder|lighter|100|200|300|400|500|600|700|800|900)?\\s*('
+                            + fabric.reNum
+                            + '(?:px|cm|mm|em|pt|pc|in)*)(?:\\/(normal|' + fabric.reNum + '))?\\s+(.*)',
+          match = value.match(fontDeclaration);
+
+      if (!match) {
+        return;
+      }
+      var fontStyle = match[1],
+          // font variant is not used
+          // fontVariant = match[2],
+          fontWeight = match[3],
+          fontSize = match[4],
+          lineHeight = match[5],
+          fontFamily = match[6];
+
+      if (fontStyle) {
+        oStyle.fontStyle = fontStyle;
+      }
+      if (fontWeight) {
+        oStyle.fontWeight = isNaN(parseFloat(fontWeight)) ? fontWeight : parseFloat(fontWeight);
+      }
+      if (fontSize) {
+        oStyle.fontSize = parseUnit(fontSize);
+      }
+      if (fontFamily) {
+        oStyle.fontFamily = fontFamily;
+      }
+      if (lineHeight) {
+        oStyle.lineHeight = lineHeight === 'normal' ? 1 : lineHeight;
+      }
+    },
 
     /**
      * Parses an SVG document, returning all of the gradient declarations found in it
@@ -717,7 +712,8 @@
       }
 
       var value,
-          parentAttributes = { };
+          parentAttributes = { },
+          fontSize;
 
       if (typeof svgUid === 'undefined') {
         svgUid = element.getAttribute('svgUid');
@@ -726,12 +722,14 @@
       if (element.parentNode && /^symbol|[g|a]$/i.test(element.parentNode.nodeName)) {
         parentAttributes = fabric.parseAttributes(element.parentNode, attributes, svgUid);
       }
+      fontSize = (parentAttributes && parentAttributes.fontSize ) ||
+                 element.getAttribute('font-size') || fabric.Text.DEFAULT_SVG_FONT_SIZE;
 
       var ownAttributes = attributes.reduce(function(memo, attr) {
         value = element.getAttribute(attr);
         if (value) {
           attr = normalizeAttr(attr);
-          value = normalizeValue(attr, value, parentAttributes);
+          value = normalizeValue(attr, value, parentAttributes, fontSize);
 
           memo[attr] = value;
         }
@@ -742,7 +740,9 @@
       // (see: http://www.w3.org/TR/SVG/styling.html#UsingPresentationAttributes)
       ownAttributes = extend(ownAttributes,
         extend(getGlobalStylesForElement(element, svgUid), fabric.parseStyleAttribute(element)));
-
+      if (ownAttributes.font) {
+        fabric.parseFontDeclaration(ownAttributes.font, ownAttributes);
+      }
       return _setStrokeFillOpacity(extend(parentAttributes, ownAttributes));
     },
 
@@ -859,7 +859,11 @@
           }
           rule = match[1];
           rule.split(',').forEach(function(_rule) {
-            allRules[_rule.trim()] = fabric.util.object.clone(ruleObj);
+            _rule = _rule.replace(/^svg/i, '').trim();
+            if (_rule === '') {
+              return;
+            }
+            allRules[_rule] = fabric.util.object.clone(ruleObj);
           });
         });
       }
