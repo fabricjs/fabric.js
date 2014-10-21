@@ -649,7 +649,7 @@
         angle = 360 + angle;
       }
 
-      t.target.angle = angle;
+      t.target.angle = angle % 360;
     },
 
     /**
