@@ -258,7 +258,7 @@
     /**
      * Sets source of an image
      * @param {String} src Source string (URL)
-     * @param {Function} [callback] Callback is invoked when image have been loaded (and all filters have been applied)
+     * @param {Function} [callback] Callback is invoked when image has been loaded (and all filters have been applied)
      * @param {Object} [options] Options object
      * @return {fabric.Image} thisArg
      * @chainable
