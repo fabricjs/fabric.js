@@ -421,7 +421,7 @@
           x = el.getAttribute('x') || 0,
           y = el.getAttribute('y') || 0,
           el2 = doc.getElementById(xlink).cloneNode(true),
-          currentTrans = (el.getAttribute('transform') || '') + ' translate(' + x + ', ' + y + ')',
+          currentTrans = (el2.getAttribute('transform') || '') + ' translate(' + x + ', ' + y + ')',
           parentNode;
 
       for (var j = 0, attrs = el.attributes, l = attrs.length; j < l; j++) {
@@ -439,6 +439,7 @@
       }
 
       el2.setAttribute('transform', currentTrans);
+      el2.setAttribute('instantiated_by_use', '1');
       el2.removeAttribute('id');
       parentNode = el.parentNode;
       parentNode.replaceChild(el2, el);
@@ -446,28 +447,69 @@
   }
 
   /**
-   * Add a <g> element that envelop all SCG elements and makes the viewbox transformMatrix descend on all elements
+   * Add a <g> element that envelop all child elements and makes the viewbox transformMatrix descend on all elements
    */
-  function addSvgTransform(doc, matrix) {
-    matrix[3] = matrix[0] = (matrix[0] > matrix[3] ? matrix[3] : matrix[0]);
-    if (!(matrix[0] !== 1 || matrix[3] !== 1 || matrix[4] !== 0 || matrix[5] !== 0)) {
+  function addVBTransform(element, widthAttr, heightAttr) {
+
+    // http://www.w3.org/TR/SVG/coords.html#ViewBoxAttribute
+    // matches, e.g.: +14.56e-12, etc.
+    var reNum = '(?:[-+]?(?:\\d+|\\d*\\.\\d+)(?:e[-+]?\\d+)?)',
+
+        reViewBoxAttrValue = new RegExp(
+          '^' +
+          '\\s*(' + reNum + '+)\\s*,?' +
+          '\\s*(' + reNum + '+)\\s*,?' +
+          '\\s*(' + reNum + '+)\\s*,?' +
+          '\\s*(' + reNum + '+)\\s*' +
+          '$'
+        ),
+        viewBoxAttr = element.getAttribute('viewBox'),
+        scaleX = 1, scaleY = 1, minX = 0, minY = 0,
+        viewBoxWidth, viewBoxHeight, matrix, el;
+
+    if (viewBoxAttr && (viewBoxAttr = viewBoxAttr.match(reViewBoxAttrValue))) {
+      minX = -parseFloat(viewBoxAttr[1]),
+      minY = -parseFloat(viewBoxAttr[2]),
+      viewBoxWidth = parseFloat(viewBoxAttr[3]),
+      viewBoxHeight = parseFloat(viewBoxAttr[4]);
+    }
+    else {
       return;
     }
+    if (widthAttr && widthAttr !== viewBoxWidth) {
+      scaleX = widthAttr / viewBoxWidth;
+    }
+    if (heightAttr && heightAttr !== viewBoxHeight) {
+      scaleY = heightAttr / viewBoxHeight;
+    }
+
     // default is to preserve aspect ratio
     // preserveAspectRatio attribute to be implemented
-    var el = doc.ownerDocument.createElement('g');
-    while (doc.firstChild != null) {
-      el.appendChild(doc.firstChild);
-    }
-    el.setAttribute('transform',
-      'matrix(' + matrix[0] + ' ' +
-                  matrix[1] + ' ' +
-                  matrix[2] + ' ' +
-                  matrix[3] + ' ' +
-                  matrix[4] + ' ' +
-                  matrix[5] + ')');
+    scaleY = scaleX = (scaleX > scaleY ? scaleY : scaleX);
 
-    doc.appendChild(el);
+    if (!(scaleX !== 1 || scaleY !== 1 || minX !== 0 || minY !== 0)) {
+      return;
+    }
+    matrix = 'matrix(' + scaleX +
+                  ' 0' +
+                  ' 0 ' +
+                  scaleY + ' ' +
+                  (minX * scaleX) + ' ' +
+                  (minY * scaleY) + ')';
+
+    if (element.tagName === 'svg') {
+      el = element.ownerDocument.createElement('g');
+      while (element.firstChild != null) {
+        el.appendChild(element.firstChild);
+      }
+      element.appendChild(el);
+    }
+    else {
+      el = element;
+      matrix += el.getAttribute('transform');
+    }
+
+    el.setAttribute('transform', matrix);
   }
 
   /**
@@ -482,25 +524,11 @@
   fabric.parseSVGDocument = (function() {
 
     var reAllowedSVGTagNames = /^(path|circle|polygon|polyline|ellipse|rect|line|image|text)$/,
-
-        // http://www.w3.org/TR/SVG/coords.html#ViewBoxAttribute
-        // \d doesn't quite cut it (as we need to match an actual float number)
-
-        // matches, e.g.: +14.56e-12, etc.
-        reNum = '(?:[-+]?(?:\\d+|\\d*\\.\\d+)(?:e[-+]?\\d+)?)',
-
-        reViewBoxAttrValue = new RegExp(
-          '^' +
-          '\\s*(' + reNum + '+)\\s*,?' +
-          '\\s*(' + reNum + '+)\\s*,?' +
-          '\\s*(' + reNum + '+)\\s*,?' +
-          '\\s*(' + reNum + '+)\\s*' +
-          '$'
-        );
+        reViewBoxTagNames = /^(symbol|image|marker|pattern|view)$/;
 
     function hasAncestorWithNodeName(element, nodeName) {
       while (element && (element = element.parentNode)) {
-        if (nodeName.test(element.nodeName)) {
+        if (nodeName.test(element.nodeName) && !element.getAttribute('instantiated_by_use')) {
           return true;
         }
       }
@@ -511,34 +539,19 @@
       if (!doc) {
         return;
       }
-      var startTime = new Date(),
-          svgUid =  fabric.Object.__uid++;
 
       parseUseDirectives(doc);
+
+      var startTime = new Date(),
+          svgUid =  fabric.Object.__uid++,
       /* http://www.w3.org/TR/SVG/struct.html#SVGElementWidthAttribute
       *  as per spec, width and height attributes are to be considered
       *  100% if no value is specified.
       */
-      var viewBoxAttr = doc.getAttribute('viewBox'),
           widthAttr = parseUnit(doc.getAttribute('width') || '100%'),
-          heightAttr = parseUnit(doc.getAttribute('height') || '100%'),
-          viewBoxWidth,
-          viewBoxHeight;
+          heightAttr = parseUnit(doc.getAttribute('height') || '100%');
 
-      if (viewBoxAttr && (viewBoxAttr = viewBoxAttr.match(reViewBoxAttrValue))) {
-        var minX = parseFloat(viewBoxAttr[1]),
-            minY = parseFloat(viewBoxAttr[2]),
-            scaleX = 1, scaleY = 1;
-        viewBoxWidth = parseFloat(viewBoxAttr[3]);
-        viewBoxHeight = parseFloat(viewBoxAttr[4]);
-        if (widthAttr && widthAttr !== viewBoxWidth ) {
-          scaleX = widthAttr / viewBoxWidth;
-        }
-        if (heightAttr && heightAttr !== viewBoxHeight) {
-          scaleY = heightAttr / viewBoxHeight;
-        }
-        addSvgTransform(doc, [scaleX, 0, 0, scaleY, scaleX * -minX, scaleY * -minY]);
-      }
+      addVBTransform(doc, widthAttr, heightAttr);
 
       var descendants = fabric.util.toArray(doc.getElementsByTagName('*'));
 
@@ -554,8 +567,9 @@
       }
 
       var elements = descendants.filter(function(el) {
+        reViewBoxTagNames.test(el.tagName) && addVBTransform(el, 0, 0);
         return reAllowedSVGTagNames.test(el.tagName) &&
-              !hasAncestorWithNodeName(el, /^(?:pattern|defs)$/); // http://www.w3.org/TR/SVG/struct.html#DefsElement
+              !hasAncestorWithNodeName(el, /^(?:pattern|defs|symbol)$/); // http://www.w3.org/TR/SVG/struct.html#DefsElement
       });
 
       if (!elements || (elements && !elements.length)) {
@@ -564,8 +578,8 @@
       }
 
       var options = {
-        width: widthAttr ? widthAttr : viewBoxWidth,
-        height: heightAttr ? heightAttr : viewBoxHeight,
+        width: widthAttr,
+        height: heightAttr,
         widthAttr: widthAttr,
         heightAttr: heightAttr,
         svgUid: svgUid
