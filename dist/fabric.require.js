@@ -17,6 +17,8 @@ else {
 
   if (fabric.document.createWindow) {
     fabric.window = fabric.document.createWindow();
+  } else {
+    fabric.window = fabric.document.parentWindow;
   }
 }
 
@@ -7458,12 +7460,15 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
      * @return {fabric.Path} Path to add on canvas
      */
     createPath: function(pathData) {
-      var path = new fabric.Path(pathData);
-      path.fill = null;
-      path.stroke = this.color;
-      path.strokeWidth = this.width;
-      path.strokeLineCap = this.strokeLineCap;
-      path.strokeLineJoin = this.strokeLineJoin;
+      var path = new fabric.Path(pathData, {
+                   fill: null,
+                   stroke: this.color,
+                   strokeWidth: this.width,
+                   strokeLineCap: this.strokeLineCap,
+                   strokeLineJoin: this.strokeLineJoin,
+                   originX: 'center',
+                   originY: 'center'
+                 });
 
       if (this.shadow) {
         this.shadow.affectStroke = true;
@@ -9112,6 +9117,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         Event.add(this.upperCanvasEl, 'drag', this._onDrag);
         Event.add(this.upperCanvasEl, 'orientation', this._onOrientationChange);
         Event.add(this.upperCanvasEl, 'shake', this._onShake);
+        Event.add(this.upperCanvasEl, 'longpress', this._onLongPress);
       }
     },
 
@@ -9126,6 +9132,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       this._onGesture = this._onGesture.bind(this);
       this._onDrag = this._onDrag.bind(this);
       this._onShake = this._onShake.bind(this);
+      this._onLongPress = this._onLongPress.bind(this);
       this._onOrientationChange = this._onOrientationChange.bind(this);
       this._onMouseWheel = this._onMouseWheel.bind(this);
     },
@@ -9148,6 +9155,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         Event.remove(this.upperCanvasEl, 'drag', this._onDrag);
         Event.remove(this.upperCanvasEl, 'orientation', this._onOrientationChange);
         Event.remove(this.upperCanvasEl, 'shake', this._onShake);
+        Event.remove(this.upperCanvasEl, 'longpress', this._onLongPress);
       }
     },
 
@@ -9194,6 +9202,14 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      */
     _onShake: function(e, self) {
       this.__onShake && this.__onShake(e, self);
+    },
+    /**
+     * @private
+     * @param {Event} [e] Event object fired on Event.js shake
+     * @param {Event} [self] Inner Event object
+     */
+    _onLongPress: function(e, self) {
+      this.__onLongPress && this.__onLongPress(e, self);
     },
 
     /**
@@ -9572,6 +9588,9 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
       if (this.isDrawingMode) {
         this._onMouseMoveInDrawingMode(e);
+        return;
+      }
+      if (typeof e.touches !== 'undefined' && e.touches.length > 1) {
         return;
       }
 
@@ -11471,7 +11490,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         return;
       }
 
-      var mult = this.canvas._currentMultiplier || 1;
+      var mult = (this.canvas && this.canvas._currentMultiplier) || 1;
 
       ctx.shadowColor = this.shadow.color;
       ctx.shadowBlur = this.shadow.blur * mult * (this.scaleX + this.scaleY) / 2;
@@ -15313,8 +15332,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       this.minY = calcDim.top;
       this.width = calcDim.width;
       this.height = calcDim.height;
-      this.top = this.top || this.minY;
-      this.left = this.left || this.minX;
+      calcDim.left += this.originX === 'center' ? this.width / 2 : this.originX === 'right' ? this.width : 0;
+      calcDim.top += this.originY === 'center' ? this.height / 2 : this.originY === 'bottom' ? this.height : 0;
+      this.top = this.top || calcDim.top;
+      this.left = this.left || calcDim.left;
       this.pathOffset = this.pathOffset || {
         x: this.minX + this.width / 2,
         y: this.minY + this.height / 2
@@ -17259,7 +17280,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
     /**
      * Applies filters assigned to this image (from "filters" array)
-     * @mthod applyFilters
+     * @method applyFilters
      * @param {Function} callback Callback is invoked when all filters have been applied and new image is generated
      * @return {fabric.Image} thisArg
      * @chainable
@@ -19572,9 +19593,6 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @return {Number} Left offset
      */
     _getLeftOffset: function() {
-      if (fabric.isLikelyNode) {
-        return 0;
-      }
       return -this.width / 2;
     },
 
@@ -19889,7 +19907,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 
           textLeft = -(this.width/2),
           textTop = this.useNative
-            ? this.fontSize - 1
+            ? (this.fontSize * this.lineHeight - 0.25 * this.fontSize) // to lift by 1  / 4 of font height.
             : (this.height/2) - (textLines.length * this.fontSize) - this._totalLineHeight;
 
       return {
@@ -20134,6 +20152,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     var parsedAttributes = fabric.parseAttributes(element, fabric.Text.ATTRIBUTE_NAMES);
     options = fabric.util.object.extend((options ? fabric.util.object.clone(options) : { }), parsedAttributes);
 
+    options.top = options.top || 0;
+    options.left = options.left || 0;
     if ('dx' in parsedAttributes) {
       options.left += parsedAttributes.dx;
     }
@@ -20147,7 +20167,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     if (!options.originX) {
       options.originX = 'left';
     }
-
+    options.top += options.fontSize / 4;
     var text = new fabric.Text(element.textContent, options),
         /*
           Adjust positioning:
@@ -22659,6 +22679,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this.selectionStart = this.text.length;
     }
     this.selectionEnd = this.selectionStart;
+
+    this.fire('selection:changed');
+    this.canvas && this.canvas.fire('text:selection:changed', { target: this });
   },
 
   /**
@@ -22687,6 +22710,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (this.selectionEnd > this.text.length) {
       this.selectionEnd = this.text.length;
     }
+
+    this.fire('selection:changed');
+    this.canvas && this.canvas.fire('text:selection:changed', { target: this });
   },
 
   /**
@@ -22802,6 +22828,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (this.selectionStart < 0) {
       this.selectionStart = 0;
     }
+
+    this.fire('selection:changed');
+    this.canvas && this.canvas.fire('text:selection:changed', { target: this });
   },
 
   /**
@@ -22818,6 +22847,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     this.selectionEnd = this.selectionStart;
 
     this._selectionDirection = 'left';
+
+    this.fire('selection:changed');
+    this.canvas && this.canvas.fire('text:selection:changed', { target: this });
   },
 
   /**
@@ -22884,6 +22916,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this._moveLeft(e, 'selectionStart');
     }
     this.selectionEnd = this.selectionStart;
+
+    this.fire('selection:changed');
+    this.canvas && this.canvas.fire('text:selection:changed', { target: this });
   },
 
   /**
@@ -22906,6 +22941,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         this.selectionStart = 0;
       }
     }
+
+    this.fire('selection:changed');
+    this.canvas && this.canvas.fire('text:selection:changed', { target: this });
   },
 
   /**
@@ -22950,6 +22988,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         this.selectionEnd = this.text.length;
       }
     }
+
+    this.fire('selection:changed');
+    this.canvas && this.canvas.fire('text:selection:changed', { target: this });
   },
 
   /**
@@ -22970,6 +23011,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       }
       this.selectionStart = this.selectionEnd;
     }
+
+    this.fire('selection:changed');
+    this.canvas && this.canvas.fire('text:selection:changed', { target: this });
   },
 
   /**

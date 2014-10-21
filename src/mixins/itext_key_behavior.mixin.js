@@ -7,8 +7,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     this.hiddenTextarea = fabric.document.createElement('textarea');
 
     this.hiddenTextarea.setAttribute('autocapitalize', 'off');
-    this.hiddenTextarea.style.cssText = 'position: absolute; top: 0; left: -9999px';
-
+    this.hiddenTextarea.style.cssText = 'position: fixed; bottom: 20px; left: 0px; opacity: 0;'
+                                        + ' width: 0px; height: 0px; z-index: -999;';
     fabric.document.body.appendChild(this.hiddenTextarea);
 
     fabric.util.addListener(this.hiddenTextarea, 'keydown', this.onKeyDown.bind(this));
@@ -283,6 +283,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this.selectionStart = this.text.length;
     }
     this.selectionEnd = this.selectionStart;
+
+    this.fire('selection:changed');
+    this.canvas && this.canvas.fire('text:selection:changed', { target: this });
   },
 
   /**
@@ -311,6 +314,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (this.selectionEnd > this.text.length) {
       this.selectionEnd = this.text.length;
     }
+
+    this.fire('selection:changed');
+    this.canvas && this.canvas.fire('text:selection:changed', { target: this });
   },
 
   /**
@@ -426,6 +432,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (this.selectionStart < 0) {
       this.selectionStart = 0;
     }
+
+    this.fire('selection:changed');
+    this.canvas && this.canvas.fire('text:selection:changed', { target: this });
   },
 
   /**
@@ -442,6 +451,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     this.selectionEnd = this.selectionStart;
 
     this._selectionDirection = 'left';
+
+    this.fire('selection:changed');
+    this.canvas && this.canvas.fire('text:selection:changed', { target: this });
   },
 
   /**
@@ -508,6 +520,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this._moveLeft(e, 'selectionStart');
     }
     this.selectionEnd = this.selectionStart;
+
+    this.fire('selection:changed');
+    this.canvas && this.canvas.fire('text:selection:changed', { target: this });
   },
 
   /**
@@ -530,6 +545,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         this.selectionStart = 0;
       }
     }
+
+    this.fire('selection:changed');
+    this.canvas && this.canvas.fire('text:selection:changed', { target: this });
   },
 
   /**
@@ -574,6 +592,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         this.selectionEnd = this.text.length;
       }
     }
+
+    this.fire('selection:changed');
+    this.canvas && this.canvas.fire('text:selection:changed', { target: this });
   },
 
   /**
@@ -594,6 +615,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       }
       this.selectionStart = this.selectionEnd;
     }
+
+    this.fire('selection:changed');
+    this.canvas && this.canvas.fire('text:selection:changed', { target: this });
   },
 
   /**

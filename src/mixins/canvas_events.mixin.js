@@ -54,6 +54,7 @@
         Event.add(this.upperCanvasEl, 'drag', this._onDrag);
         Event.add(this.upperCanvasEl, 'orientation', this._onOrientationChange);
         Event.add(this.upperCanvasEl, 'shake', this._onShake);
+        Event.add(this.upperCanvasEl, 'longpress', this._onLongPress);
       }
     },
 
@@ -68,6 +69,7 @@
       this._onGesture = this._onGesture.bind(this);
       this._onDrag = this._onDrag.bind(this);
       this._onShake = this._onShake.bind(this);
+      this._onLongPress = this._onLongPress.bind(this);
       this._onOrientationChange = this._onOrientationChange.bind(this);
       this._onMouseWheel = this._onMouseWheel.bind(this);
     },
@@ -90,6 +92,7 @@
         Event.remove(this.upperCanvasEl, 'drag', this._onDrag);
         Event.remove(this.upperCanvasEl, 'orientation', this._onOrientationChange);
         Event.remove(this.upperCanvasEl, 'shake', this._onShake);
+        Event.remove(this.upperCanvasEl, 'longpress', this._onLongPress);
       }
     },
 
@@ -136,6 +139,14 @@
      */
     _onShake: function(e, self) {
       this.__onShake && this.__onShake(e, self);
+    },
+    /**
+     * @private
+     * @param {Event} [e] Event object fired on Event.js shake
+     * @param {Event} [self] Inner Event object
+     */
+    _onLongPress: function(e, self) {
+      this.__onLongPress && this.__onLongPress(e, self);
     },
 
     /**
@@ -338,6 +349,11 @@
           pointer = fabric.util.transformPoint(this.getPointer(e, true), ivt);
       this.freeDrawingBrush.onMouseDown(pointer);
       this.fire('mouse:down', { e: e });
+
+      var target = this.findTarget(e);
+      if (typeof target !== 'undefined') {
+        target.fire('mousedown', { e: e, target: target });
+      }
     },
 
     /**
@@ -352,6 +368,11 @@
       }
       this.setCursor(this.freeDrawingCursor);
       this.fire('mouse:move', { e: e });
+
+      var target = this.findTarget(e);
+      if (typeof target !== 'undefined') {
+        target.fire('mousemove', { e: e, target: target });
+      }
     },
 
     /**
@@ -365,6 +386,11 @@
       }
       this.freeDrawingBrush.onMouseUp();
       this.fire('mouse:up', { e: e });
+
+      var target = this.findTarget(e);
+      if (typeof target !== 'undefined') {
+        target.fire('mouseup', { e: e, target: target });
+      }
     },
 
     /**
@@ -514,6 +540,9 @@
 
       if (this.isDrawingMode) {
         this._onMouseMoveInDrawingMode(e);
+        return;
+      }
+      if (typeof e.touches !== 'undefined' && e.touches.length > 1) {
         return;
       }
 
