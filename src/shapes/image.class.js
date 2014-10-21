@@ -100,16 +100,20 @@
      * You might need to call `canvas.renderAll` and `object.setCoords` after replacing, to render new image and update controls area.
      * @param {HTMLImageElement} element
      * @param {Function} [callback] Callback is invoked when all filters have been applied and new image is generated
+     * @param {Object} [options] Options object
      * @return {fabric.Image} thisArg
      * @chainable
      */
-    setElement: function(element, callback) {
+    setElement: function(element, callback, options) {
       this._element = element;
       this._originalElement = element;
-      this._initConfig();
+      this._initConfig(options);
 
       if (this.filters.length !== 0) {
         this.applyFilters(callback);
+      }
+      else if (callback) {
+        callback();
       }
 
       return this;
@@ -252,6 +256,20 @@
     },
 
     /**
+     * Sets source of an image
+     * @param {String} src Source string (URL)
+     * @param {Function} [callback] Callback is invoked when image has been loaded (and all filters have been applied)
+     * @param {Object} [options] Options object
+     * @return {fabric.Image} thisArg
+     * @chainable
+     */
+    setSrc: function(src, callback, options) {
+      fabric.util.loadImage(src, function(img) {
+        return this.setElement(img, callback, options);
+      }, this, options && options.crossOrigin);
+    },
+
+    /**
      * Returns string representation of an instance
      * @return {String} String representation of an instance
      */
@@ -276,7 +294,6 @@
      * @chainable
      */
     applyFilters: function(callback) {
-
       if (!this._originalElement) {
         return;
       }
