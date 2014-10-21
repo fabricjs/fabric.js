@@ -157,8 +157,8 @@
       'type':                     'group',
       'originX':                  'left',
       'originY':                  'top',
-      'left':                     90,
-      'top':                      130,
+      'left':                     50,
+      'top':                      100,
       'width':                    80,
       'height':                   60,
       'fill':                     'rgb(0,0,0)',
@@ -197,8 +197,8 @@ test('toObject without default values', function() {
 
   var expectedObject = {
     'type':               'group',
-    'left':               90,
-    'top':                130,
+    'left':               50,
+    'top':                100,
     'width':              80,
     'height':             60,
     'objects':            clone.objects
@@ -340,7 +340,7 @@ test('toObject without default values', function() {
     group.padding = 30;
     group.setCoords();
     ok(group.containsPoint({ x: 50, y: 120 }));
-    ok(group.containsPoint({ x: 100, y: 170 }));
+    ok(!group.containsPoint({ x: 100, y: 170 }));
     ok(!group.containsPoint({ x: 0, y: 0 }));
   });
 
@@ -386,7 +386,7 @@ test('toObject without default values', function() {
     var group = makeGroupWith2Objects();
     ok(typeof group.toSVG == 'function');
 
-    var expectedSVG = '<g transform="translate(130 160)">\n<rect x="-15" y="-5" rx="0" ry="0" width="30" height="10" style="stroke: none; stroke-width: 1; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" transform="translate(25 -25)"/>\n<rect x="-5" y="-20" rx="0" ry="0" width="10" height="40" style="stroke: none; stroke-width: 1; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" transform="translate(-35 10)"/>\n</g>\n';
+    var expectedSVG = '<g transform="translate(90 130)">\n<rect x="-15" y="-5" rx="0" ry="0" width="30" height="10" style="stroke: none; stroke-width: 1; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" transform="translate(25 -25)"/>\n<rect x="-5" y="-20" rx="0" ry="0" width="10" height="40" style="stroke: none; stroke-width: 1; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" transform="translate(-35 10)"/>\n</g>\n';
     equal(group.toSVG(), expectedSVG);
   });
 
