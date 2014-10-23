@@ -1166,8 +1166,13 @@
 
       ctx.restore();
     },
-    _getTextLines: function(str) {
-      return (typeof str === 'undefined' ? this.text : str).split(this._reNewline);
+    /**
+     * Splits current text on newlines and returns the array of 'lines' in the IText.
+     * @param {CanvasRenderingContext2D} ctx This is used by the Textbox child class.
+     * @returns {Array} Array of lines in this IText.
+     */
+    _getTextLines: function(ctx) {
+      return this.text.split(this._reNewline);
     },
 
     /**
