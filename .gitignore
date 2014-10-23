@@ -4,9 +4,3 @@
 /npm-debug.log
 before_commit
 /coverage/
-/nbproject/private/
-nbproject/project.xml
-
-nbproject/project.properties
-
-nbproject/project.properties
