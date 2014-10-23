@@ -51,7 +51,7 @@
     var element = fabric.document.createElement('path');
     element.setAttribute('fill-rule', 'evenodd');
 
-    deepEqual(fabric.parseAttributes(element, ['fill-rule']), { fillRule: 'destination-over' });
+    deepEqual(fabric.parseAttributes(element, ['fill-rule']), { fillRule: 'evenodd' });
   });
 
   test('parseAttributesFillRuleWithoutTransformation', function() {
@@ -148,10 +148,11 @@
 
   test('parseStyleAttribute with value normalization', function() {
     var element = fabric.document.createElement('path');
-    element.setAttribute('style', 'fill:none');
+    element.setAttribute('style', 'fill:none;  stroke-dasharray: 2 0.4;');
 
     var expectedObject = {
-      'fill': ''
+      'fill': '',
+      'strokeDashArray': [2, 0.4]
     };
     deepEqual(fabric.parseStyleAttribute(element), expectedObject);
   });
@@ -249,11 +250,11 @@
 
     element.setAttribute('transform', 'skewX(2)');
     var parsedValue = fabric.parseTransformAttribute(element.getAttribute('transform'));
-    deepEqual(parsedValue, [1,0,2,1,0,0]);
+    deepEqual(parsedValue, [1,0,0.03492076949174773,1,0,0]);
 
     element.setAttribute('transform', 'skewY(234.111)');
     var parsedValue = fabric.parseTransformAttribute(element.getAttribute('transform'));
-    deepEqual(parsedValue, [1,234.111,0,1,0,0]);
+    deepEqual(parsedValue, [1,1.3820043381762832,0,1,0,0]);
 
     element.setAttribute('transform', 'matrix(1,2,3,4,5,6)');
     var parsedValue = fabric.parseTransformAttribute(element.getAttribute('transform'));
@@ -265,7 +266,7 @@
 
     element.setAttribute('transform', 'scale(2 13) translate(5,15) skewX(11.22)');
     var parsedValue = fabric.parseTransformAttribute(element.getAttribute('transform'));
-    deepEqual(parsedValue, [2,0,22.44,13,10,195]);
+    deepEqual(parsedValue, [2,0,0.3967362169237356,13,10,195]);
 
   });
 
@@ -364,7 +365,8 @@
         styleElement = doc.createElement('style');
         styleElement.textContent = 'g polygon.cls, rect {fill:#FF0000; stroke:#000000;stroke-width:0.25px;}\
         polygon.cls {fill:none;stroke:#0000FF;}',
-        doc.body.appendChild(styleElement);
+        doc.body.appendChild(styleElement),
+        svgUid =  'uniqueId';
 
     var expectedObject = {
       'g polygon.cls': {
@@ -381,10 +383,10 @@
         'fill' : '',
         'stroke': '#0000FF'
       }
-    }
+    };
 
-    fabric.cssRules = fabric.getCSSRules(doc);
-    deepEqual(fabric.cssRules, expectedObject);
+    fabric.cssRules[svgUid] = fabric.getCSSRules(doc);
+    deepEqual(fabric.cssRules[svgUid], expectedObject);
     
     var elPolygon = fabric.document.createElement('polygon'),
         expectedStyle = {
@@ -394,9 +396,16 @@
 
     elPolygon.setAttribute('points', '10,12 20,22');
     elPolygon.setAttribute('class', 'cls');
+    elPolygon.setAttribute('svgUid', svgUid);
 
     var style = fabric.parseAttributes(elPolygon, [ ]);
     deepEqual(style, expectedStyle);
+    
+    styleElement.textContent = '\t\n';
+    expectedStyle = { }
+    svgUid =  'uniqueId2';
+    fabric.cssRules[svgUid] = fabric.getCSSRules(doc);
+    deepEqual(fabric.cssRules[svgUid], expectedStyle);
   });
 
 })();

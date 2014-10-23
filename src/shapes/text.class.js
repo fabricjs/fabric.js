@@ -391,11 +391,12 @@
      */
     _renderText: function(ctx, textLines) {
       ctx.save();
+      this._setOpacity(ctx);
       this._setShadow(ctx);
-      this._setupFillRule(ctx);
+      this._setupCompositeOperation(ctx);
       this._renderTextFill(ctx, textLines);
       this._renderTextStroke(ctx, textLines);
-      this._restoreFillRule(ctx);
+      this._restoreCompositeOperation(ctx);
       this._removeShadow(ctx);
       ctx.restore();
     },
@@ -571,6 +572,9 @@
           this._getTopOffset() + lineHeights,
           i
         );
+      }
+      if (this.shadow && !this.shadow.affectStroke) {
+        this._removeShadow(ctx);
       }
     },
 
@@ -771,16 +775,17 @@
       }
 
       ctx.save();
-      this._transform(ctx, noTransform);
+      if (!noTransform) {
+        this.transform(ctx);
+      }
 
-      var m = this.transformMatrix,
-          isInPathGroup = this.group && this.group.type === 'path-group';
+      var isInPathGroup = this.group && this.group.type === 'path-group';
 
       if (isInPathGroup) {
         ctx.translate(-this.group.width/2, -this.group.height/2);
       }
-      if (m) {
-        ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
+      if (this.transformMatrix) {
+        ctx.transform.apply(ctx, this.transformMatrix);
       }
       if (isInPathGroup) {
         ctx.translate(this.left, this.top);
@@ -863,7 +868,7 @@
         '<g transform="', this.getSvgTransform(), this.getSvgTransformMatrix(), '">\n',
           textAndBg.textBgRects.join(''),
           '<text ',
-            (this.fontFamily ? 'font-family="' + this.fontFamily.replace(/"/g,'\'') + '" ': ''),
+            (this.fontFamily ? 'font-family="' + this.fontFamily.replace(/"/g, '\'') + '" ': ''),
             (this.fontSize ? 'font-size="' + this.fontSize + '" ': ''),
             (this.fontStyle ? 'font-style="' + this.fontStyle + '" ': ''),
             (this.fontWeight ? 'font-weight="' + this.fontWeight + '" ': ''),
