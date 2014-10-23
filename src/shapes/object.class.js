@@ -914,6 +914,16 @@
     },
 
     /**
+     * This callback function is called by the parent group of an object every
+     * time a non-delegated property changes on the group. It is passed the key
+     * and value as parameters. Not adding in this function's signature to avoid
+     * Travis build error about unused variables.
+     */
+    setOnGroup: function() {
+      // implemented by sub-classes, as needed.
+    },
+
+    /**
      * Toggles specified property from `true` to `false` or from `false` to `true`
      * @param {String} property Property to toggle
      * @return {fabric.Object} thisArg

@@ -63,7 +63,7 @@
      * @default
      */
     meetOrSlice: 'meet',
-
+    
     /**
      * private
      * contains last value of scaleX to detect
@@ -388,12 +388,12 @@
         elementToDraw = this._element;
       }
       elementToDraw && ctx.drawImage(elementToDraw,
-                                     x + imageMargins.marginX,
-                                     y + imageMargins.marginY,
-                                     imageMargins.width,
-                                     imageMargins.height
-                                    );
-
+                    x + imageMargins.marginX,
+                    y + imageMargins.marginY,
+                    imageMargins.width,
+                    imageMargins.height
+                   );
+           
       this._renderStroke(ctx);
     },
 
@@ -403,7 +403,7 @@
     _needsResize: function() {
       return (this.scaleX !== this._lastScaleX || this.scaleY !== this._lastScaleY);
     },
-
+    
     /**
      * @private
      */

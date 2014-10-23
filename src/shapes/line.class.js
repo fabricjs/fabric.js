@@ -159,8 +159,8 @@
         //  distances from center of path-group to center of line.
         var cp = this.getCenterPoint();
         ctx.translate(
-          cp.x - this.strokeWidth / 2,
-          cp.y - this.strokeWidth / 2
+          cp.x,
+          cp.y
         );
       }
 

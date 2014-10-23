@@ -328,7 +328,7 @@
         ctx = fabric.util.createCanvasElement().getContext('2d');
         this._setTextStyles(ctx);
       }
-      this._textLines = this.text.split(this._reNewline);
+      this._textLines = this._splitTextIntoLines();
       this._clearCache();
       var currentTextAlign = this.textAlign;
       this.textAlign = 'left';
@@ -464,7 +464,7 @@
         var words = line.split(/\s+/),
             wordsWidth = this._getWidthOfWords(ctx, line, lineIndex),
             widthDiff = totalWidth - wordsWidth,
-            numSpaces = words.length - 1,
+            numSpaces = words.length - 2,
             spaceWidth = widthDiff / numSpaces,
             leftOffset = 0;
 
@@ -781,6 +781,14 @@
       }
       this._render(ctx);
       ctx.restore();
+    },
+
+    /**
+     * Returns the text as an array of lines.
+     * @returns {Array} Lines in the text
+     */
+    _splitTextIntoLines: function() {
+      return this.text.split(this._reNewline);
     },
 
     /**

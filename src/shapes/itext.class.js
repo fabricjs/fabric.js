@@ -59,7 +59,7 @@
 
     /**
      * Index where text selection starts (or where cursor is when there is no selection)
-     * @type Nubmer
+     * @type Number
      * @default
      */
     selectionStart: 0,
@@ -1083,7 +1083,6 @@
 
       ctx.restore();
     },
-
     /**
      * Returns object representation of an instance
      * @method toObject
