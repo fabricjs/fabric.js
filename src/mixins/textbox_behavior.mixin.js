@@ -1,0 +1,19 @@
+(function() {
+
+  /**
+   * Override _setObjectScale and add Textbox specific resizing behavior. Resizing
+   * a Textbox doesn't scale text, it only changes width and makes text wrap automatically.
+   */
+  var setObjectScaleOverridden = fabric.Canvas.prototype._setObjectScale;
+  fabric.Canvas.prototype._setObjectScale = function(localMouse, transform, lockScalingX, lockScalingY, by, lockScalingFlip) {
+
+    var t = transform.target;
+    if (t.type === 'textbox') {
+      t.set('width', t.width * ((localMouse.x / transform.scaleX) / (t.width + t.strokeWidth)));
+    }
+    else {
+      setObjectScaleOverridden.call(fabric.Canvas.prototype, localMouse, transform, lockScalingX, lockScalingY, by, lockScalingFlip);
+    }
+  };
+
+})();

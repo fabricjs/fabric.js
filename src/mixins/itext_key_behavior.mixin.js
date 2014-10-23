@@ -173,18 +173,14 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    */
   getDownCursorOffset: function(e, isRight) {
     var selectionProp = isRight ? this.selectionEnd : this.selectionStart,
-        textLines = this.text.split(this._reNewline),
+        textLines = this._getTextLines(),
         _char,
         lineLeftOffset,
-
-        textBeforeCursor = this.text.slice(0, selectionProp),
-        textAfterCursor = this.text.slice(selectionProp),
-
-        textOnSameLineBeforeCursor = textBeforeCursor.slice(textBeforeCursor.lastIndexOf('\n') + 1),
-        textOnSameLineAfterCursor = textAfterCursor.match(/(.*)\n?/)[1],
-        textOnNextLine = (textAfterCursor.match(/.*\n(.*)\n?/) || { })[1] || '',
-
-        cursorLocation = this.get2DCursorLocation(selectionProp);
+        cursorLocation = this.get2DCursorLocation(selectionProp),
+        
+        textOnSameLineBeforeCursor = textLines[cursorLocation.lineIndex].slice(0, cursorLocation.charIndex),
+        textOnSameLineAfterCursor = textLines[cursorLocation.lineIndex].slice(cursorLocation.charIndex),
+        textOnNextLine = cursorLocation.lineIndex === textLines.length - 1 ? '' : textLines[cursorLocation.lineIndex+1];
 
     // if on last line, down cursor goes to end of line
     if (cursorLocation.lineIndex === textLines.length - 1 || e.metaKey || e.keyCode === 34) {
@@ -326,10 +322,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       return selectionProp;
     }
 
-    var textBeforeCursor = this.text.slice(0, selectionProp),
-        textOnSameLineBeforeCursor = textBeforeCursor.slice(textBeforeCursor.lastIndexOf('\n') + 1),
-        textOnPreviousLine = (textBeforeCursor.match(/\n?(.*)\n.*$/) || {})[1] || '',
-        textLines = this.text.split(this._reNewline),
+    var textLines = this._getTextLines(),
+        textOnSameLineBeforeCursor = textLines[cursorLocation.lineIndex].slice(0, cursorLocation.charIndex),
+        textOnPreviousLine = cursorLocation.lineIndex === 0 ? '' : textLines[cursorLocation.lineIndex - 1],
         _char,
         widthOfSameLineBeforeCursor = this._getWidthOfLine(this.ctx, cursorLocation.lineIndex, textLines),
         lineLeftOffset = this._getLineLeftOffset(widthOfSameLineBeforeCursor),
