@@ -1167,15 +1167,6 @@
       ctx.restore();
     },
     /**
-     * Splits current text on newlines and returns the array of 'lines' in the IText.
-     * @param {CanvasRenderingContext2D} ctx This is used by the Textbox child class.
-     * @returns {Array} Array of lines in this IText.
-     */
-    _getTextLines: function(ctx) {
-      return this.text.split(this._reNewline);
-    },
-
-    /**
      * Returns object representation of an instance
      * @method toObject
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output

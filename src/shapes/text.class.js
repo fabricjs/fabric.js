@@ -361,7 +361,7 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _renderViaNative: function(ctx) {
-      var textLines = this.text.split(this._reNewline);
+      var textLines = this._getTextLines();
 
       this._setTextStyles(ctx);
 
@@ -710,7 +710,13 @@
         ? this.width
         : ctx.measureText(line).width;
     },
-
+    /**
+     * Splits current text on newlines and returns the array of 'lines' in the IText.
+     * @returns {Array} Array of lines in this IText.
+     */
+    _getTextLines: function() {
+      return this.text.split(this._reNewline);
+    },
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
@@ -827,7 +833,7 @@
      */
     toSVG: function(reviver) {
       var markup = [ ],
-          textLines = this.text.split(this._reNewline),
+          textLines = this._getTextLines(),
           offsets = this._getSVGLeftTopOffsets(textLines),
           textAndBg = this._getSVGTextAndBg(offsets.lineTop, offsets.textLeft, textLines),
           shadowSpans = this._getSVGShadows(offsets.lineTop, textLines);
