@@ -18,7 +18,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     if (this.fillRule !== 'nonzero') {
       fillRule = 'fill-rule: ' + this.fillRule + '; ';
     }
-    if (this.strokeWidth && this.strokeWidth !== 0) {
+    if (typeof this.strokeWidth !== 'undefined') {
       strokeWidth = 'stroke-width: ' + this.strokeWidth + '; ';
     }
     if (this.strokeDashArray) {
