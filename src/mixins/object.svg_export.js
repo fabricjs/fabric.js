@@ -6,38 +6,44 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @return {String}
    */
   getSvgStyles: function() {
+    var fill = 'fill: none; ', stroke = '', fillRule = '', strokeWidth = '', strokeDashArray = '', strokeLineCap = '',
+        strokeLineJoin = '', strokeMiterLimit = '', opacity = '', visibility = '', filter = '';
 
-    var fill = this.fill
-          ? (this.fill.toLive ? 'url(#SVGID_' + this.fill.id + ')' : this.fill)
-          : 'none',
-        fillRule = this.fillRule,
-        stroke = this.stroke
-          ? (this.stroke.toLive ? 'url(#SVGID_' + this.stroke.id + ')' : this.stroke)
-          : 'none',
-
-        strokeWidth = this.strokeWidth ? this.strokeWidth : '0',
-        strokeDashArray = this.strokeDashArray ? this.strokeDashArray.join(' ') : '',
-        strokeLineCap = this.strokeLineCap ? this.strokeLineCap : 'butt',
-        strokeLineJoin = this.strokeLineJoin ? this.strokeLineJoin : 'miter',
-        strokeMiterLimit = this.strokeMiterLimit ? this.strokeMiterLimit : '4',
-        opacity = typeof this.opacity !== 'undefined' ? this.opacity : '1',
-
-        visibility = this.visible ? '' : ' visibility: hidden;',
-        filter = this.shadow && this.type !== 'text' ? 'filter: url(#SVGID_' + this.shadow.id + ');' : '';
-
-    return [
-      'stroke: ', stroke, '; ',
-      'stroke-width: ', strokeWidth, '; ',
-      'stroke-dasharray: ', strokeDashArray, '; ',
-      'stroke-linecap: ', strokeLineCap, '; ',
-      'stroke-linejoin: ', strokeLineJoin, '; ',
-      'stroke-miterlimit: ', strokeMiterLimit, '; ',
-      'fill: ', fill, '; ',
-      'fill-rule: ', fillRule, '; ',
-      'opacity: ', opacity, ';',
-      filter,
-      visibility
-    ].join('');
+    if (this.fill && this.fill !== '') {
+      fill = 'fill: ' + (this.fill.toLive ? 'url(#SVGID_' + this.fill.id + ')' : this.fill) + '; ';
+    }
+    if (this.stroke) {
+      stroke = 'stroke: ' + (this.stroke.toLive ? 'url(#SVGID_' + this.stroke.id + ')' : this.stroke) + '; ';
+    }
+    if (this.fillRule !== 'nonzero') {
+      fillRule = 'fill-rule: ' + this.fillRule + '; ';
+    }
+    if (this.strokeWidth && this.strokeWidth !== 0) {
+      strokeWidth = 'stroke-width: ' + this.strokeWidth + '; ';
+    }
+    if (this.strokeDashArray) {
+      strokeDashArray = 'stroke-dasharray: ' + this.strokeDashArray.join(' ') + '; ';
+    }
+    if (this.strokeLineCap && this.strokeLineCap !== 'butt') {
+      strokeLineCap = 'stroke-linecap: ' + this.strokeLineCap + '; ';
+    }
+    if (this.strokeLineJoin && this.strokeLineJoin !== 'miter') {
+      strokeLineJoin = 'stroke-linejoin: ' + this.strokeLineJoin + '; ';
+    }
+    if (this.strokeMiterLimit && this.strokeMiterLimit !== '4') {
+      strokeMiterLimit = 'stroke-miterlimit: ' + this.strokeMiterLimit + '; ';
+    }
+    if (typeof this.opacity !== 'undefined' && this.opacity !== 1) {
+      opacity = 'opacity: ' + this.opacity + '; ';
+    }
+    if (!(this.visible)) {
+      visibility = 'visibility: hidden; ';
+    }
+    if (this.shadow && this.type !== 'text') {
+      filter = 'filter: url(#SVGID_' + this.shadow.id + '); ';
+    }
+    return [fill, fillRule, stroke, strokeWidth, strokeDashArray, strokeLineCap,
+            strokeLineJoin, strokeMiterLimit, opacity, visibility, filter].join('');
   },
 
   /**
