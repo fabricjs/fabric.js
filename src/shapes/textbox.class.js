@@ -93,6 +93,8 @@
 
                 /*
                  * If the textbox's width is less than the widest letter.
+                 * TODO: Performance improvement - catch the width of W whenever
+                 * fontSize changes.
                  */
                 if(maxWidth <= ctx.measureText('W').width) {
                   return text.split('');
