@@ -29,15 +29,29 @@
         */
        minWidth : 20,
        /**
-        * Constructor. lockScalingY is forced to true.
+        * Constructor. Some scaling related property values are forced. Visibility
+        * of controls is also fixed; only the rotation and width controls are 
+        * made available.
         * @param {String} text Text string
         * @param {Object} [options] Options object
         * @return {fabric.Textbox} thisArg
         */
        initialize: function(text, options) {
          this.callSuper('initialize', text, options);
+         this.set('lockUniScaling', false);
          this.set('lockScalingY', true);
          this.set('hasBorders', true || options.hasBorders);
+         this.setControlsVisibility({
+              tl: false,
+              tr: false,
+              br: false,
+              bl: false,
+              ml: true,
+              mt: false,
+              mr: true,
+              mb: false,
+              mtr: true
+          });
        },
        /**
         * Wraps text using the 'width' property of Textbox. First this function
@@ -77,6 +91,13 @@
           else {
             while (words.length > 0) {
 
+                /*
+                 * If the textbox's width is less than the widest letter.
+                 */
+                if(maxWidth <= ctx.measureText('W').width) {
+                  return text.split('');
+                }
+                
                 /*
                  * This handles a word that is longer than the width of the
                  * text area.
