@@ -21,6 +21,13 @@
         * @default
         */
        type: 'textbox',
+       
+       /**
+        * Minimum width of textbox, in pixels.
+        * @type Number
+        * @default
+        */
+       minWidth : 20,
        /**
         * Constructor. lockScalingY is forced to true.
         * @param {String} text Text string
@@ -58,12 +65,12 @@
         * @returns {Array} Array of line(s) into which the given text is wrapped
         * to.
         */
-       _wrapLine: function(ctx, text) {
+       _wrapLine: function(ctx, text) {         
          var maxWidth = this.width;
          var words = text.split(' '),
                   lines = [],
                   line = "";
-
+          
           if (ctx.measureText(text).width < maxWidth) {
               lines.push(text);
           }
@@ -237,6 +244,17 @@
             left: leftOffset,
             lineLeft: lineLeftOffset
           };
+       },
+       /**
+        * Returns object representation of an instance
+        * @method toObject
+        * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+        * @return {Object} object representation of an instance
+        */
+       toObject: function(propertiesToInclude) {
+         return fabric.util.object.extend(this.callSuper('toObject', propertiesToInclude), {
+           minWidth: this.minWidth
+         });
        }
      });
      /**

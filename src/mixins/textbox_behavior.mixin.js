@@ -9,7 +9,10 @@
 
     var t = transform.target;
     if (t.type === 'textbox') {
-      t.set('width', t.width * ((localMouse.x / transform.scaleX) / (t.width + t.strokeWidth)));
+      var w = t.width * ((localMouse.x / transform.scaleX) / (t.width + t.strokeWidth));
+      if(w >= t.minWidth) {
+        t.set('width', w);
+      }
     }
     else {
       setObjectScaleOverridden.call(fabric.Canvas.prototype, localMouse, transform, lockScalingX, lockScalingY, by, lockScalingFlip);
