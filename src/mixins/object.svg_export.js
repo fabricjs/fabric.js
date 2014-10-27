@@ -6,6 +6,11 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @return {String}
    */
   getSvgStyles: function() {
+
+    function isDefault(prop, defaultValue) {
+      return typeof this[prop] !== 'undefined' && this[prop] === defaultValue;
+    }
+    
     var fill = 'fill: none; ', stroke = '', fillRule = '', strokeWidth = '', strokeDashArray = '', strokeLineCap = '',
         strokeLineJoin = '', strokeMiterLimit = '', opacity = '', visibility = '', filter = '';
 
