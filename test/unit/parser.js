@@ -125,15 +125,15 @@
 
     var element = fabric.document.createElement('path');
     element.setAttribute('style', 'left:10px;top:22.3em;width:103.45pt;height:20%;');
-
-    // TODO: looks like this still fails with % and em values
+    var styleObj = fabric.parseStyleAttribute(element);
+    // TODO: looks like this still fails with % values
     var expectedObject = {
       'left':   10,
-      'top':    22.3,
+      'top':    356.8,
       'width':  137.93333333333334,
       'height': 20
     };
-    deepEqual(fabric.parseStyleAttribute(element), expectedObject);
+    deepEqual(styleObj, expectedObject);
   });
 
   test('parseStyleAttribute with one pair', function() {
@@ -160,13 +160,33 @@
   test('parseStyleAttribute with short font declaration', function() {
     var element = fabric.document.createElement('path');
     element.setAttribute('style', 'font: italic 12px Arial,Helvetica,sans-serif');
-
+    var styleObj = fabric.parseStyleAttribute(element);
+    if (styleObj.font) {
+      fabric.parseFontDeclaration(styleObj.font, styleObj);
+    }
     var expectedObject = {
+      'font': 'italic 12px Arial,Helvetica,sans-serif',
       'fontSize': 12,
       'fontStyle': 'italic',
       'fontFamily': 'Arial,Helvetica,sans-serif'
     };
-    deepEqual(fabric.parseStyleAttribute(element), expectedObject);
+    
+    deepEqual(styleObj, expectedObject);
+
+    //testing different unit
+    element.setAttribute('style', 'font: italic 1.5em Arial,Helvetica,sans-serif');
+    var styleObj = fabric.parseStyleAttribute(element);
+    if (styleObj.font) {
+      fabric.parseFontDeclaration(styleObj.font, styleObj);
+    }
+    var expectedObject = {
+      'font': 'italic 1.5em Arial,Helvetica,sans-serif',
+      'fontSize': 24,
+      'fontStyle': 'italic',
+      'fontFamily': 'Arial,Helvetica,sans-serif'
+    };
+    
+    deepEqual(styleObj, expectedObject);
   });
 
   test('parseAttributes (style to have higher priority than attribute)', function() {
