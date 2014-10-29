@@ -128,7 +128,7 @@
       }
       // since _restoreObjectsState set objects inactive
       this.forEachObject(this._setObjectActive, this);
-      this._calcBounds();
+      this._calcBounds(true);
       this._updateObjectsCoords();
       return this;
     },
