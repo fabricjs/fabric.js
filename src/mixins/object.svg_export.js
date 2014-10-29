@@ -14,34 +14,34 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     var fill = 'fill: none; ', stroke = '', fillRule = '', strokeWidth = '', strokeDashArray = '', strokeLineCap = '',
         strokeLineJoin = '', strokeMiterLimit = '', opacity = '', visibility = '', filter = '';
 
-    if (this.fill && this.fill !== '') {
+    if (!isDefault('fill', '')) {
       fill = 'fill: ' + (this.fill.toLive ? 'url(#SVGID_' + this.fill.id + ')' : this.fill) + '; ';
     }
-    if (this.stroke) {
+    if (!isDefault('stroke', '')) {
       stroke = 'stroke: ' + (this.stroke.toLive ? 'url(#SVGID_' + this.stroke.id + ')' : this.stroke) + '; ';
     }
-    if (this.fillRule !== 'nonzero') {
+    if (!isDefault('fillRule', 'nonzero')) {
       fillRule = 'fill-rule: ' + this.fillRule + '; ';
     }
-    if (typeof this.strokeWidth !== 'undefined') {
+    if (!isDefault('strokeWidth', '1')) {
       strokeWidth = 'stroke-width: ' + this.strokeWidth + '; ';
     }
-    if (this.strokeDashArray) {
+    if (!isDefault('strokeDashArray', '')) {
       strokeDashArray = 'stroke-dasharray: ' + this.strokeDashArray.join(' ') + '; ';
     }
-    if (this.strokeLineCap && this.strokeLineCap !== 'butt') {
+    if (!isDefault('strokeLineCap', 'butt')) {
       strokeLineCap = 'stroke-linecap: ' + this.strokeLineCap + '; ';
     }
-    if (this.strokeLineJoin && this.strokeLineJoin !== 'miter') {
+    if (!isDefault('strokeLineJoin', 'miter')) {
       strokeLineJoin = 'stroke-linejoin: ' + this.strokeLineJoin + '; ';
     }
-    if (this.strokeMiterLimit && this.strokeMiterLimit !== '4') {
+    if (!isDefault('strokeMiterLimit', '4')) {
       strokeMiterLimit = 'stroke-miterlimit: ' + this.strokeMiterLimit + '; ';
     }
-    if (typeof this.opacity !== 'undefined' && this.opacity !== 1) {
+    if (!isDefault('opacity', '1')) {
       opacity = 'opacity: ' + this.opacity + '; ';
     }
-    if (!(this.visible)) {
+    if (!isDefault('visible', true)) {
       visibility = 'visibility: hidden; ';
     }
     if (this.shadow && this.type !== 'text') {
