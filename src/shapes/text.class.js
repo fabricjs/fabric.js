@@ -514,7 +514,7 @@
         var words = line.split(/\s+/),
             wordsWidth = ctx.measureText(line.replace(/\s+/g, '')).width,
             widthDiff = totalWidth - wordsWidth,
-            numSpaces = words.length - 1,
+            numSpaces = words.length - 2,
             spaceWidth = widthDiff / numSpaces,
             leftOffset = 0;
 
