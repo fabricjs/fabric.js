@@ -120,7 +120,7 @@
      * @return {fabric.Group} thisArg
      * @chainable
      */
-    addWithUpdate: function(object) {
+    addWithUpdate: function(object, onlyWidthHeight) {
       this._restoreObjectsState();
       if (object) {
         this._objects.push(object);
@@ -128,7 +128,7 @@
       }
       // since _restoreObjectsState set objects inactive
       this.forEachObject(this._setObjectActive, this);
-      this._calcBounds(true);
+      this._calcBounds(onlyWidthHeight);
       this._updateObjectsCoords();
       return this;
     },
@@ -147,7 +147,7 @@
      * @return {fabric.Group} thisArg
      * @chainable
      */
-    removeWithUpdate: function(object) {
+    removeWithUpdate: function(object, onlyWidthHeight) {
       this._moveFlippedObject(object);
       this._restoreObjectsState();
 
@@ -155,7 +155,7 @@
       this.forEachObject(this._setObjectActive, this);
 
       this.remove(object);
-      this._calcBounds();
+      this._calcBounds(onlyWidthHeight);
       this._updateObjectsCoords();
 
       return this;
