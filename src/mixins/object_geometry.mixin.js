@@ -323,10 +323,10 @@
         h = strokeWidth;
       }
       if (strokeW) {
-        w += strokeWidth;
+        w += w > 0 ? strokeWidth : -strokeWidth;
       }
       if (strokeH) {
-        h += strokeWidth;
+        h += h > 0 ? strokeWidth : -strokeWidth;
       }
       this.currentWidth = w * this.scaleX;
       this.currentHeight = h * this.scaleY;
