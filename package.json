@@ -34,15 +34,15 @@
   },
   "dependencies": {
     "canvas": "1.1.x",
-    "jsdom": "0.11.x",
+    "jsdom": "1.1.x",
     "xmldom": "0.1.x"
   },
   "devDependencies": {
-    "execSync": "0.0.x",
+    "execSync": "1.0.x",
     "uglify-js": "2.4.x",
-    "jscs": "1.6.x",
+    "jscs": "1.7.x",
     "jshint": "2.5.x",
-    "qunit": "0.7.2",
+    "qunit": "0.7.x",
     "istanbul": "0.3.x"
   },
   "engines": {
