@@ -14,7 +14,9 @@ else {
   fabric.document = require("jsdom")
     .jsdom("<!DOCTYPE html><html><head></head><body></body></html>");
 
-  fabric.window = fabric.document.createWindow();
+  if (fabric.document.createWindow) {
+    fabric.window = fabric.document.createWindow();
+  }
 }
 
 /**
@@ -29,7 +31,6 @@ fabric.isTouchSupported = "ontouchstart" in fabric.document.documentElement;
  */
 fabric.isLikelyNode = typeof Buffer !== 'undefined' &&
                       typeof window === 'undefined';
-
 
 /**
  * Attributes parsed from all SVG elements
