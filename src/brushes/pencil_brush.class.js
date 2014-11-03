@@ -172,7 +172,7 @@
                    strokeLineCap: this.strokeLineCap,
                    strokeLineJoin: this.strokeLineJoin,
                    originX: 'center',
-                   originY: 'center'                   
+                   originY: 'center'
                  });
 
       if (this.shadow) {
