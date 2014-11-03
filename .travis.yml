@@ -1,6 +1,6 @@
 language: node_js
 node_js:
-  - "0.10.29"
+  - "0.10.33"
 script: 'npm run-script build && npm test && jscs src'
 before_install:
  - sudo apt-get update -qq
