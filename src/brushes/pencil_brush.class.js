@@ -171,7 +171,8 @@
       path.strokeWidth = this.width;
       path.strokeLineCap = this.strokeLineCap;
       path.strokeLineJoin = this.strokeLineJoin;
-
+      path.left -= this.width/2;
+      path.top -= this.width/2;
       if (this.shadow) {
         this.shadow.affectStroke = true;
         path.setShadow(this.shadow);
