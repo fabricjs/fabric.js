@@ -3,3 +3,4 @@
 /npm-debug.log
 before_commit
 /coverage/
+/nbproject/private/
