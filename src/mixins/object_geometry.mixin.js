@@ -323,10 +323,10 @@
         h = strokeWidth;
       }
       if (strokeW) {
-        w += w > 0 ? strokeWidth : -strokeWidth;
+        w += strokeWidth;
       }
       if (strokeH) {
-        h += h > 0 ? strokeWidth : -strokeWidth;
+        h += strokeWidth;
       }
       this.currentWidth = w * this.scaleX;
       this.currentHeight = h * this.scaleY;
@@ -340,10 +340,7 @@
             Math.pow(this.currentWidth / 2, 2) +
             Math.pow(this.currentHeight / 2, 2)),
 
-          _angle = Math.atan(
-            isFinite(this.currentHeight / this.currentWidth)
-              ? this.currentHeight / this.currentWidth
-              : 0),
+          _angle = Math.atan(isFinite(this.currentHeight / this.currentWidth) ? this.currentHeight / this.currentWidth : 0),
 
           // offset added for rotate and scale actions
           offsetX = Math.cos(_angle + theta) * _hypotenuse,

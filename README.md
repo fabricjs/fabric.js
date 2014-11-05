@@ -47,15 +47,6 @@ Using Fabric.js, you can create and populate objects on canvas; objects like sim
 
 See [Fabric limitations in Old IE](https://github.com/kangax/fabric.js/wiki/Fabric-limitations-in-oldIE).
 
-Note: to properly make old IE work, you will need to add [html5shiv](https://github.com/aFarkas/html5shiv) as a conditional comment in your HEAD, particularly `html5shiv-printshiv.js` to allow for children elements:
-
-```
-<!--[if lt IE 9]>
-    <script src="path/to/your/html5shiv-printshiv.js"></script>
-<![endif]-->
-```
-Remember to add [Explorer Canvas](http://code.google.com/p/explorercanvas/) as well.
-
 You can [run automated unit tests](http://fabricjs.com/test/unit/) right in the browser.
 
 ### History

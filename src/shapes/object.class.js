@@ -458,19 +458,10 @@
 
     /**
      * Fill rule used to fill an object
-     * accepted values are nonzero, evenodd
-     * <b>Backwards incompatibility note:</b> This property was used for setting globalCompositeOperation until v1.4.12 (use `fabric.Object#globalCompositeOperation` instead)
      * @type String
      * @default
      */
-    fillRule:                 'nonzero',
-
-    /**
-     * Composite rule used for canvas globalCompositeOperation
-     * @type String
-     * @default
-     */
-    globalCompositeOperation: 'source-over',
+    fillRule:                 'source-over',
 
     /**
      * Background color of an object. Only works with text objects at the moment.
@@ -683,7 +674,7 @@
     stateProperties:  (
       'top left width height scaleX scaleY flipX flipY originX originY transformMatrix ' +
       'stroke strokeWidth strokeDashArray strokeLineCap strokeLineJoin strokeMiterLimit ' +
-      'angle opacity fill fillRule globalCompositeOperation shadow clipTo visible backgroundColor'
+      'angle opacity fill fillRule shadow clipTo visible backgroundColor'
     ).split(' '),
 
     /**
@@ -756,6 +747,8 @@
       if (this.group) {
         this.group.transform(ctx, fromLeft);
       }
+      ctx.globalAlpha = this.opacity;
+
       var center = fromLeft ? this._getLeftTopCoords() : this.getCenterPoint();
       ctx.translate(center.x, center.y);
       ctx.rotate(degreesToRadians(this.angle));
@@ -774,32 +767,30 @@
       var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
 
           object = {
-            type:                     this.type,
-            originX:                  this.originX,
-            originY:                  this.originY,
-            left:                     toFixed(this.left, NUM_FRACTION_DIGITS),
-            top:                      toFixed(this.top, NUM_FRACTION_DIGITS),
-            width:                    toFixed(this.width, NUM_FRACTION_DIGITS),
-            height:                   toFixed(this.height, NUM_FRACTION_DIGITS),
-            fill:                     (this.fill && this.fill.toObject) ? this.fill.toObject() : this.fill,
-            stroke:                   (this.stroke && this.stroke.toObject) ? this.stroke.toObject() : this.stroke,
-            strokeWidth:              toFixed(this.strokeWidth, NUM_FRACTION_DIGITS),
-            strokeDashArray:          this.strokeDashArray,
-            strokeLineCap:            this.strokeLineCap,
-            strokeLineJoin:           this.strokeLineJoin,
-            strokeMiterLimit:         toFixed(this.strokeMiterLimit, NUM_FRACTION_DIGITS),
-            scaleX:                   toFixed(this.scaleX, NUM_FRACTION_DIGITS),
-            scaleY:                   toFixed(this.scaleY, NUM_FRACTION_DIGITS),
-            angle:                    toFixed(this.getAngle(), NUM_FRACTION_DIGITS),
-            flipX:                    this.flipX,
-            flipY:                    this.flipY,
-            opacity:                  toFixed(this.opacity, NUM_FRACTION_DIGITS),
-            shadow:                   (this.shadow && this.shadow.toObject) ? this.shadow.toObject() : this.shadow,
-            visible:                  this.visible,
-            clipTo:                   this.clipTo && String(this.clipTo),
-            backgroundColor:          this.backgroundColor,
-            fillRule:                 this.fillRule,
-            globalCompositeOperation: this.globalCompositeOperation
+            type:               this.type,
+            originX:            this.originX,
+            originY:            this.originY,
+            left:               toFixed(this.left, NUM_FRACTION_DIGITS),
+            top:                toFixed(this.top, NUM_FRACTION_DIGITS),
+            width:              toFixed(this.width, NUM_FRACTION_DIGITS),
+            height:             toFixed(this.height, NUM_FRACTION_DIGITS),
+            fill:               (this.fill && this.fill.toObject) ? this.fill.toObject() : this.fill,
+            stroke:             (this.stroke && this.stroke.toObject) ? this.stroke.toObject() : this.stroke,
+            strokeWidth:        toFixed(this.strokeWidth, NUM_FRACTION_DIGITS),
+            strokeDashArray:    this.strokeDashArray,
+            strokeLineCap:      this.strokeLineCap,
+            strokeLineJoin:     this.strokeLineJoin,
+            strokeMiterLimit:   toFixed(this.strokeMiterLimit, NUM_FRACTION_DIGITS),
+            scaleX:             toFixed(this.scaleX, NUM_FRACTION_DIGITS),
+            scaleY:             toFixed(this.scaleY, NUM_FRACTION_DIGITS),
+            angle:              toFixed(this.getAngle(), NUM_FRACTION_DIGITS),
+            flipX:              this.flipX,
+            flipY:              this.flipY,
+            opacity:            toFixed(this.opacity, NUM_FRACTION_DIGITS),
+            shadow:             (this.shadow && this.shadow.toObject) ? this.shadow.toObject() : this.shadow,
+            visible:            this.visible,
+            clipTo:             this.clipTo && String(this.clipTo),
+            backgroundColor:    this.backgroundColor
           };
 
       if (!this.includeDefaultValues) {
@@ -970,37 +961,39 @@
       ctx.save();
 
       //setup fill rule for current object
-      this._setupCompositeOperation(ctx);
-      if (!noTransform) {
-        this.transform(ctx);
-      }
+      this._setupFillRule(ctx);
+
+      this._transform(ctx, noTransform);
       this._setStrokeStyles(ctx);
       this._setFillStyles(ctx);
+
       if (this.group && this.group.type === 'path-group') {
         ctx.translate(-this.group.width/2, -this.group.height/2);
+        var m = this.transformMatrix;
+        if (m) {
+          ctx.transform.apply(ctx, m);
+        }
       }
-      if (this.transformMatrix) {
-        ctx.transform.apply(ctx, this.transformMatrix);
-      }
-      this._setOpacity(ctx);
+      ctx.globalAlpha = this.group ? (ctx.globalAlpha * this.opacity) : this.opacity;
       this._setShadow(ctx);
       this.clipTo && fabric.util.clipContext(this, ctx);
       this._render(ctx, noTransform);
       this.clipTo && ctx.restore();
       this._removeShadow(ctx);
-      this._restoreCompositeOperation(ctx);
+      this._restoreFillRule(ctx);
 
       ctx.restore();
     },
 
-    /* @private
-     * @param {CanvasRenderingContext2D} ctx Context to render on
-     */
-    _setOpacity: function(ctx) {
-      if (this.group) {
-        this.group._setOpacity(ctx);
+    _transform: function(ctx, noTransform) {
+      var m = this.transformMatrix;
+
+      if (m && !this.group) {
+        ctx.setTransform.apply(ctx, m);
       }
-      ctx.globalAlpha *= this.opacity;
+      if (!noTransform) {
+        this.transform(ctx);
+      }
     },
 
     _setStrokeStyles: function(ctx) {
@@ -1099,7 +1092,7 @@
           -this.width / 2 + this.fill.offsetX || 0,
           -this.height / 2 + this.fill.offsetY || 0);
       }
-      if (this.fillRule === 'evenodd') {
+      if (this.fillRule === 'destination-over') {
         ctx.fill('evenodd');
       }
       else {
@@ -1126,6 +1119,7 @@
         if (1 & this.strokeDashArray.length) {
           this.strokeDashArray.push.apply(this.strokeDashArray, this.strokeDashArray);
         }
+
         if (supportsLineDash) {
           ctx.setLineDash(this.strokeDashArray);
           this._stroke && this._stroke(ctx);
@@ -1475,13 +1469,13 @@
 
     /**
      * Sets canvas globalCompositeOperation for specific object
-     * custom composition operation for the particular object can be specifed using globalCompositeOperation property
+     * custom composition operation for the particular object can be specifed using fillRule property
      * @param {CanvasRenderingContext2D} ctx Rendering canvas context
      */
-    _setupCompositeOperation: function (ctx) {
-      if (this.globalCompositeOperation) {
-        this._prevGlobalCompositeOperation = ctx.globalCompositeOperation;
-        ctx.globalCompositeOperation = this.globalCompositeOperation;
+    _setupFillRule: function (ctx) {
+      if (this.fillRule) {
+        this._prevFillRule = ctx.globalCompositeOperation;
+        ctx.globalCompositeOperation = this.fillRule;
       }
     },
 
@@ -1489,9 +1483,9 @@
      * Restores previously saved canvas globalCompositeOperation after obeject rendering
      * @param {CanvasRenderingContext2D} ctx Rendering canvas context
      */
-    _restoreCompositeOperation: function (ctx) {
-      if (this.globalCompositeOperation && this._prevGlobalCompositeOperation) {
-        ctx.globalCompositeOperation = this._prevGlobalCompositeOperation;
+    _restoreFillRule: function (ctx) {
+      if (this.fillRule && this._prevFillRule) {
+        ctx.globalCompositeOperation = this._prevFillRule;
       }
     }
   });

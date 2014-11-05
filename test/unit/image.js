@@ -15,38 +15,33 @@
       IMG_HEIGHT  = 110;
 
   var REFERENCE_IMG_OBJECT = {
-    'type':                     'image',
-    'originX':                  'left',
-    'originY':                  'top',
-    'left':                     0,
-    'top':                      0,
-    'width':                    IMG_WIDTH, // node-canvas doesn't seem to allow setting width/height on image objects
-    'height':                   IMG_HEIGHT, // or does it now?
-    'fill':                     'rgb(0,0,0)',
-    'stroke':                   null,
-    'strokeWidth':              1,
-    'strokeDashArray':          null,
-    'strokeLineCap':            'butt',
-    'strokeLineJoin':           'miter',
-    'strokeMiterLimit':         10,
-    'scaleX':                   1,
-    'scaleY':                   1,
-    'angle':                    0,
-    'flipX':                    false,
-    'flipY':                    false,
-    'opacity':                  1,
-    'src':                      fabric.isLikelyNode ? undefined : IMG_SRC,
-    'shadow':                   null,
-    'visible':                  true,
-    'backgroundColor':          '',
-    'clipTo':                   null,
-    'filters':                  [],
-    'crossOrigin':              '',
-    'fillRule':                 'nonzero',
-    'globalCompositeOperation': 'source-over',
-    'alignX':                   'none',
-    'alignY':                   'none',
-    'meetOrSlice':              'meet'
+    'type':               'image',
+    'originX':            'left',
+    'originY':            'top',
+    'left':               0,
+    'top':                0,
+    'width':              IMG_WIDTH, // node-canvas doesn't seem to allow setting width/height on image objects
+    'height':             IMG_HEIGHT, // or does it now?
+    'fill':               'rgb(0,0,0)',
+    'stroke':             null,
+    'strokeWidth':        1,
+    'strokeDashArray':    null,
+    'strokeLineCap':      'butt',
+    'strokeLineJoin':     'miter',
+    'strokeMiterLimit':   10,
+    'scaleX':             1,
+    'scaleY':             1,
+    'angle':              0,
+    'flipX':              false,
+    'flipY':              false,
+    'opacity':            1,
+    'src':                fabric.isLikelyNode ? undefined : IMG_SRC,
+    'shadow':             null,
+    'visible':            true,
+    'backgroundColor':    '',
+    'clipTo':             null,
+    'filters':            [],
+    'crossOrigin':        ''
   };
 
   function _createImageElement() {

@@ -30,6 +30,26 @@
   }
 
   /**
+   * @private
+   */
+  function getX(item) {
+    if (item[0] === 'H') {
+      return item[1];
+    }
+    return item[item.length - 2];
+  }
+
+  /**
+   * @private
+   */
+  function getY(item) {
+    if (item[0] === 'V') {
+      return item[1];
+    }
+    return item[item.length - 1];
+  }
+
+  /**
    * Path class
    * @class fabric.Path
    * @extends fabric.Object
@@ -51,20 +71,6 @@
      * @default
      */
     path: null,
-
-    /**
-     * Minimum X from points values, necessary to offset points
-     * @type Number
-     * @default
-     */
-    minX: 0,
-
-    /**
-     * Minimum Y from points values, necessary to offset points
-     * @type Number
-     * @default
-     */
-    minY: 0,
 
     /**
      * Constructor
@@ -95,18 +101,7 @@
       if (!fromArray) {
         this.path = this._parsePath();
       }
-
-      var calcDim = this._parseDimensions();
-      this.minX = calcDim.left;
-      this.minY = calcDim.top;
-      this.width = calcDim.width;
-      this.height = calcDim.height;
-      this.top = this.top || this.minY;
-      this.left = this.left || this.minX;
-      this.pathOffset = this.pathOffset || {
-        x: this.minX + this.width / 2,
-        y: this.minY + this.height / 2
-      };
+      this._initializePath(options);
 
       if (options.sourcePath) {
         this.setSourcePath(options.sourcePath);
@@ -115,9 +110,55 @@
 
     /**
      * @private
+     * @param {Object} [options] Options object
+     */
+    _initializePath: function (options) {
+      var isWidthSet = 'width' in options && options.width != null,
+          isHeightSet = 'height' in options && options.width != null,
+          isLeftSet = 'left' in options,
+          isTopSet = 'top' in options,
+          origLeft = isLeftSet ? this.left : 0,
+          origTop = isTopSet ? this.top : 0;
+
+      if (!isWidthSet || !isHeightSet) {
+        extend(this, this._parseDimensions());
+        if (isWidthSet) {
+          this.width = options.width;
+        }
+        if (isHeightSet) {
+          this.height = options.height;
+        }
+      }
+      else { //Set center location relative to given height/width if not specified
+        if (!isTopSet) {
+          this.top = this.height / 2;
+        }
+        if (!isLeftSet) {
+          this.left = this.width / 2;
+        }
+      }
+      this.pathOffset = this.pathOffset ||
+                        // Save top-left coords as offset
+                        this._calculatePathOffset(origLeft, origTop);
+    },
+
+    /**
+     * @private
+     * @param {Number} origLeft Original left position
+     * @param {Number} origTop  Original top position
+     */
+    _calculatePathOffset: function (origLeft, origTop) {
+      return {
+        x: this.left - origLeft - (this.width / 2),
+        y: this.top - origTop - (this.height / 2)
+      };
+    },
+
+    /**
+     * @private
      * @param {CanvasRenderingContext2D} ctx context to render path on
      */
-    _render: function(ctx) {
+    _render: function(ctx, noTransform) {
       var current, // current instruction
           previous = null,
           subpathStartX = 0,
@@ -130,15 +171,13 @@
           tempY,
           tempControlX,
           tempControlY,
-          l = -this.pathOffset.x,
-          t = -this.pathOffset.y;
+          l = -((this.width / 2) + this.pathOffset.x),
+          t = -((this.height / 2) + this.pathOffset.y);
 
-      if (this.group && this.group.type === 'path-group') {
-        l = 0;
-        t = 0;
+      if (noTransform) {
+        l += this.width / 2;
+        t += this.height / 2;
       }
-
-      ctx.beginPath();
 
       for (var i = 0, len = this.path.length; i < len; ++i) {
 
@@ -409,8 +448,6 @@
         }
         previous = current;
       }
-      this._renderFill(ctx);
-      this._renderStroke(ctx);
     },
 
     /**
@@ -419,33 +456,34 @@
      * @param {Boolean} [noTransform] When true, context is not transformed
      */
     render: function(ctx, noTransform) {
-      // do not render if width/height are zeros or object is not visible
+      // do not render if object is not visible
       if (!this.visible) {
         return;
       }
 
       ctx.save();
+      if (noTransform) {
+        ctx.translate(-this.width/2, -this.height/2);
+      }
+      var m = this.transformMatrix;
 
-      this._setupCompositeOperation(ctx);
+      if (m) {
+        ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
+      }
       if (!noTransform) {
         this.transform(ctx);
       }
       this._setStrokeStyles(ctx);
       this._setFillStyles(ctx);
-      if (this.group && this.group.type === 'path-group') {
-        ctx.translate(-this.group.width / 2, -this.group.height / 2);
-      }
-      if (this.transformMatrix) {
-        ctx.transform.apply(ctx, this.transformMatrix);
-      }
-      this._setOpacity(ctx);
       this._setShadow(ctx);
       this.clipTo && fabric.util.clipContext(this, ctx);
+      ctx.beginPath();
+      ctx.globalAlpha = this.group ? (ctx.globalAlpha * this.opacity) : this.opacity;
       this._render(ctx, noTransform);
+      this._renderFill(ctx);
+      this._renderStroke(ctx);
       this.clipTo && ctx.restore();
       this._removeShadow(ctx);
-      this._restoreCompositeOperation(ctx);
-
       ctx.restore();
     },
 
@@ -506,7 +544,7 @@
       }
       var path = chunks.join(' ');
       if (!(this.group && this.group.type === 'path-group')) {
-        addTransform = 'translate(' + (-this.pathOffset.x) + ', ' + (-this.pathOffset.y) + ')';
+        addTransform = 'translate(' + (-this.width / 2) + ', ' + (-this.height / 2) + ')';
       }
       markup.push(
         //jscs:disable validateIndentation
@@ -584,294 +622,13 @@
      * @private
      */
     _parseDimensions: function() {
-
       var aX = [],
           aY = [],
-          current, // current instruction
-          previous = null,
-          subpathStartX = 0,
-          subpathStartY = 0,
-          x = 0, // current x
-          y = 0, // current y
-          controlX = 0, // current control point x
-          controlY = 0, // current control point y
-          tempX,
-          tempY,
-          tempControlX,
-          tempControlY,
-          bounds;
+          previous = { };
 
-      for (var i = 0, len = this.path.length; i < len; ++i) {
-
-        current = this.path[i];
-
-        switch (current[0]) { // first letter
-
-          case 'l': // lineto, relative
-            x += current[1];
-            y += current[2];
-            bounds = [ ];
-            break;
-
-          case 'L': // lineto, absolute
-            x = current[1];
-            y = current[2];
-            bounds = [ ];
-            break;
-
-          case 'h': // horizontal lineto, relative
-            x += current[1];
-            bounds = [ ];
-            break;
-
-          case 'H': // horizontal lineto, absolute
-            x = current[1];
-            bounds = [ ];
-            break;
-
-          case 'v': // vertical lineto, relative
-            y += current[1];
-            bounds = [ ];
-            break;
-
-          case 'V': // verical lineto, absolute
-            y = current[1];
-            bounds = [ ];
-            break;
-
-          case 'm': // moveTo, relative
-            x += current[1];
-            y += current[2];
-            subpathStartX = x;
-            subpathStartY = y;
-            bounds = [ ];
-            break;
-
-          case 'M': // moveTo, absolute
-            x = current[1];
-            y = current[2];
-            subpathStartX = x;
-            subpathStartY = y;
-            bounds = [ ];
-            break;
-
-          case 'c': // bezierCurveTo, relative
-            tempX = x + current[5];
-            tempY = y + current[6];
-            controlX = x + current[3];
-            controlY = y + current[4];
-            bounds = fabric.util.getBoundsOfCurve(x, y,
-              x + current[1], // x1
-              y + current[2], // y1
-              controlX, // x2
-              controlY, // y2
-              tempX,
-              tempY
-            );
-            x = tempX;
-            y = tempY;
-            break;
-
-          case 'C': // bezierCurveTo, absolute
-            x = current[5];
-            y = current[6];
-            controlX = current[3];
-            controlY = current[4];
-            bounds = fabric.util.getBoundsOfCurve(x, y,
-              current[1],
-              current[2],
-              controlX,
-              controlY,
-              x,
-              y
-            );
-            break;
-
-          case 's': // shorthand cubic bezierCurveTo, relative
-
-            // transform to absolute x,y
-            tempX = x + current[3];
-            tempY = y + current[4];
-
-            // calculate reflection of previous control points
-            controlX = controlX ? (2 * x - controlX) : x;
-            controlY = controlY ? (2 * y - controlY) : y;
-
-            bounds = fabric.util.getBoundsOfCurve(x, y,
-              controlX,
-              controlY,
-              x + current[1],
-              y + current[2],
-              tempX,
-              tempY
-            );
-            // set control point to 2nd one of this command
-            // "... the first control point is assumed to be
-            // the reflection of the second control point on
-            // the previous command relative to the current point."
-            controlX = x + current[1];
-            controlY = y + current[2];
-            x = tempX;
-            y = tempY;
-            break;
-
-          case 'S': // shorthand cubic bezierCurveTo, absolute
-            tempX = current[3];
-            tempY = current[4];
-            // calculate reflection of previous control points
-            controlX = 2 * x - controlX;
-            controlY = 2 * y - controlY;
-            bounds = fabric.util.getBoundsOfCurve(x, y,
-              controlX,
-              controlY,
-              current[1],
-              current[2],
-              tempX,
-              tempY
-            );
-            x = tempX;
-            y = tempY;
-            // set control point to 2nd one of this command
-            // "... the first control point is assumed to be
-            // the reflection of the second control point on
-            // the previous command relative to the current point."
-            controlX = current[1];
-            controlY = current[2];
-            break;
-
-          case 'q': // quadraticCurveTo, relative
-            // transform to absolute x,y
-            tempX = x + current[3];
-            tempY = y + current[4];
-            controlX = x + current[1];
-            controlY = y + current[2];
-            bounds = fabric.util.getBoundsOfCurve(x, y,
-              controlX,
-              controlY,
-              controlX,
-              controlY,
-              tempX,
-              tempY
-            );
-            x = tempX;
-            y = tempY;
-            break;
-
-          case 'Q': // quadraticCurveTo, absolute
-            controlX = current[1];
-            controlY = current[2];
-            bounds = fabric.util.getBoundsOfCurve(x, y,
-              controlX,
-              controlY,
-              controlX,
-              controlY,
-              current[3],
-              current[4]
-            );
-            x = current[3];
-            y = current[4];
-            break;
-
-          case 't': // shorthand quadraticCurveTo, relative
-            // transform to absolute x,y
-            tempX = x + current[1];
-            tempY = y + current[2];
-            if (previous[0].match(/[QqTt]/) === null) {
-              // If there is no previous command or if the previous command was not a Q, q, T or t,
-              // assume the control point is coincident with the current point
-              controlX = x;
-              controlY = y;
-            }
-            else if (previous[0] === 't') {
-              // calculate reflection of previous control points for t
-              controlX = 2 * x - tempControlX;
-              controlY = 2 * y - tempControlY;
-            }
-            else if (previous[0] === 'q') {
-              // calculate reflection of previous control points for q
-              controlX = 2 * x - controlX;
-              controlY = 2 * y - controlY;
-            }
-
-            tempControlX = controlX;
-            tempControlY = controlY;
-
-            bounds = fabric.util.getBoundsOfCurve(x, y,
-              controlX,
-              controlY,
-              controlX,
-              controlY,
-              tempX,
-              tempY
-            );
-            x = tempX;
-            y = tempY;
-            controlX = x + current[1];
-            controlY = y + current[2];
-            break;
-
-          case 'T':
-            tempX = current[1];
-            tempY = current[2];
-            // calculate reflection of previous control points
-            controlX = 2 * x - controlX;
-            controlY = 2 * y - controlY;
-            bounds = fabric.util.getBoundsOfCurve(x, y,
-              controlX,
-              controlY,
-              controlX,
-              controlY,
-              tempX,
-              tempY
-            );
-            x = tempX;
-            y = tempY;
-            break;
-
-          case 'a':
-            // TODO: optimize this
-            bounds = fabric.util.getBoundsOfArc(x, y,
-              current[1],
-              current[2],
-              current[3],
-              current[4],
-              current[5],
-              current[6] + x,
-              current[7] + y
-            );
-            x += current[6];
-            y += current[7];
-            break;
-
-          case 'A':
-            // TODO: optimize this
-            bounds = fabric.util.getBoundsOfArc(x, y,
-              current[1],
-              current[2],
-              current[3],
-              current[4],
-              current[5],
-              current[6],
-              current[7]
-            );
-            x = current[6];
-            y = current[7];
-            break;
-
-          case 'z':
-          case 'Z':
-            x = subpathStartX;
-            y = subpathStartY;
-            break;
-        }
-        previous = current;
-        bounds.forEach(function (point) {
-          aX.push(point.x);
-          aY.push(point.y);
-        });
-        aX.push(x);
-        aY.push(y);
-      }
+      this.path.forEach(function(item, i) {
+        this._getCoordsFromCommand(item, i, aX, aY, previous);
+      }, this);
 
       var minX = min(aX),
           minY = min(aY),
@@ -881,13 +638,63 @@
           deltaY = maxY - minY,
 
           o = {
-            left: minX,
-            top: minY,
+            left: this.left + (minX + deltaX / 2),
+            top: this.top + (minY + deltaY / 2),
             width: deltaX,
             height: deltaY
           };
 
       return o;
+    },
+
+    _getCoordsFromCommand: function(item, i, aX, aY, previous) {
+      var isLowerCase = false;
+
+      if (item[0] !== 'H') {
+        previous.x = (i === 0) ? getX(item) : getX(this.path[i - 1]);
+      }
+      if (item[0] !== 'V') {
+        previous.y = (i === 0) ? getY(item) : getY(this.path[i - 1]);
+      }
+
+      // lowercased letter denotes relative position;
+      // transform to absolute
+      if (item[0] === item[0].toLowerCase()) {
+        isLowerCase = true;
+      }
+
+      var xy = this._getXY(item, isLowerCase, previous),
+          val;
+
+      val = parseInt(xy.x, 10);
+      if (!isNaN(val)) {
+        aX.push(val);
+      }
+
+      val = parseInt(xy.y, 10);
+      if (!isNaN(val)) {
+        aY.push(val);
+      }
+    },
+
+    _getXY: function(item, isLowerCase, previous) {
+
+      // last 2 items in an array of coordinates are the actualy x/y (except H/V), collect them
+      // TODO (kangax): support relative h/v commands
+
+      var x = isLowerCase
+        ? previous.x + getX(item)
+        : item[0] === 'V'
+          ? previous.x
+          : getX(item),
+
+          y = isLowerCase
+            ? previous.y + getY(item)
+            : item[0] === 'H'
+              ? previous.y
+              : getY(item);
+
+      return { x: x, y: y };
     }
   });
 

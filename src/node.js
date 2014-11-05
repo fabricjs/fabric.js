@@ -56,7 +56,7 @@
   }
 
   /** @private */
-  function requestFs(path, callback) {
+  function requestFs(path, callback){
     var fs = require('fs');
     fs.readFile(path, function (err, data) {
       if (err) {

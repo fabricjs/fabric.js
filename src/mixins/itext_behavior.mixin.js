@@ -441,7 +441,7 @@
      * @private
      */
     _removeExtraneousStyles: function() {
-      var textLines = this._getTextLines();
+      var textLines = this.text.split(this._reNewline);
       for (var prop in this.styles) {
         if (!textLines[prop]) {
           delete this.styles[prop];
@@ -553,7 +553,7 @@
      * @param {Object} [style] Style object to insert, if given
      */
     insertCharStyleObject: function(lineIndex, charIndex, style) {
-      
+
       var currentLineStyles = this.styles[lineIndex],
           currentLineStylesCloned = clone(currentLineStyles);
 
@@ -653,7 +653,7 @@
 
       if (isBeginningOfLine) {
 
-        var textLines = this._getTextLines(),
+        var textLines = this.text.split(this._reNewline),
             textOnPreviousLine = textLines[lineIndex - 1],
             newCharIndexOnPrevLine = textOnPreviousLine
               ? textOnPreviousLine.length

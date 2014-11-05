@@ -58,7 +58,7 @@
 
     /**
      * Index where text selection starts (or where cursor is when there is no selection)
-     * @type Number
+     * @type Nubmer
      * @default
      */
     selectionStart: 0,
@@ -342,7 +342,7 @@
       }
       var textBeforeCursor = this.text.slice(0, selectionStart),
           linesBeforeCursor = textBeforeCursor.split(this._reNewline);
-          
+
       return {
         lineIndex: linesBeforeCursor.length - 1,
         charIndex: linesBeforeCursor[linesBeforeCursor.length - 1].length
@@ -407,7 +407,7 @@
 
       var cursorLocation = this.get2DCursorLocation(),
 
-          textLines = this._getTextLines(),
+          textLines = this.text.split(this._reNewline),
 
           // left/top are left/top of entire text box
           // leftOffset/topOffset are offset from that left/top point of a text box
@@ -417,7 +417,7 @@
 
           offsets = this._getCursorBoundariesOffsets(
                       chars, typeOfBoundaries, cursorLocation, textLines);
-      
+
       return {
         left: left,
         top: top,
@@ -450,8 +450,8 @@
           var index = lineIndex + (typeOfBoundaries === 'cursor' ? 1 : 0);
           topOffset += this._getCachedLineHeight(index);
 
-            lineIndex++;
-            charIndex = 0;
+          lineIndex++;
+          charIndex = 0;
         }
         else {
           leftOffset += this._getWidthOfChar(this.ctx, chars[i], lineIndex, charIndex);
@@ -460,7 +460,7 @@
 
         lineLeftOffset = this._getCachedLineOffset(lineIndex, textLines);
       }
-      
+
       this._clearCache();
 
       return {
@@ -519,7 +519,7 @@
           charIndex = cursorLocation.charIndex,
           charHeight = this.getCurrentCharFontSize(lineIndex, charIndex),
           leftOffset = (lineIndex === 0 && charIndex === 0)
-                    ? this._getCachedLineOffset(lineIndex, this._getTextLines())
+                    ? this._getCachedLineOffset(lineIndex, this.text.split(this._reNewline))
                     : boundaries.leftOffset;
 
       ctx.fillStyle = this.getCurrentCharColor(lineIndex, charIndex);
@@ -550,7 +550,7 @@
           end = this.get2DCursorLocation(this.selectionEnd),
           startLine = start.lineIndex,
           endLine = end.lineIndex,
-          textLines = this._getTextLines();
+          textLines = this.text.split(this._reNewline);
 
       for (var i = startLine; i <= endLine; i++) {
         var lineOffset = this._getCachedLineOffset(i, textLines) || 0,
@@ -608,7 +608,7 @@
           : 0;
 
       // set proper line offset
-      var textLines = this._getTextLines(ctx),
+      var textLines = this.text.split(this._reNewline),
           lineWidth = this._getWidthOfLine(ctx, lineIndex, textLines),
           lineHeight = this._getHeightOfLine(ctx, lineIndex, textLines),
           lineLeftOffset = this._getLineLeftOffset(lineWidth),
@@ -1006,7 +1006,7 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _getWidthOfCharAt: function(ctx, lineIndex, charIndex, lines) {
-      lines = lines || this._getTextLines(ctx);
+      lines = lines || this.text.split(this._reNewline);
       var _char = lines[lineIndex].split('')[charIndex];
       return this._getWidthOfChar(ctx, _char, lineIndex, charIndex);
     },
@@ -1050,12 +1050,12 @@
      * @param {Number} lineIndex
      */
     _getWidthOfSpace: function (ctx, lineIndex) {
-      var lines = this._getTextLines(ctx),
+      var lines = this.text.split(this._reNewline),
           line = lines[lineIndex],
           words = line.split(/\s+/),
           wordsWidth = this._getWidthOfWords(ctx, line, lineIndex),
           widthDiff = this.width - wordsWidth,
-          numSpaces = words.length - 2,
+          numSpaces = words.length - 1,
           width = widthDiff / numSpaces;
 
       return width;
@@ -1108,8 +1108,8 @@
      */
     _getHeightOfLine: function(ctx, lineIndex, textLines) {
 
-      textLines = textLines || this._getTextLines(ctx);
-      
+      textLines = textLines || this.text.split(this._reNewline);
+
       var maxHeight = this._getHeightOfChar(ctx, textLines[lineIndex][0], lineIndex, 0),
           line = textLines[lineIndex],
           chars = line.split('');
@@ -1166,6 +1166,7 @@
 
       ctx.restore();
     },
+
     /**
      * Returns object representation of an instance
      * @method toObject

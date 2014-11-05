@@ -45,9 +45,6 @@
         fill:   'fillOpacity'
       };
 
-  fabric.cssRules = { };
-  fabric.gradientDefs = { };
-
   function normalizeAttr(attr) {
     // transform attribute names
     if (attr in attributesMap) {
@@ -56,16 +53,19 @@
     return attr;
   }
 
-  function normalizeValue(attr, value, parentAttributes, fontSize) {
+  function normalizeValue(attr, value, parentAttributes) {
     var isArray = Object.prototype.toString.call(value) === '[object Array]',
         parsed;
 
     if ((attr === 'fill' || attr === 'stroke') && value === 'none') {
       value = '';
     }
+    else if (attr === 'fillRule') {
+      value = (value === 'evenodd') ? 'destination-over' : value;
+    }
     else if (attr === 'strokeDashArray') {
       value = value.replace(/,/g, ' ').split(/\s+/).map(function(n) {
-        return parseFloat(n);
+        return parseInt(n);
       });
     }
     else if (attr === 'transformMatrix') {
@@ -88,7 +88,7 @@
       value = value === 'start' ? 'left' : value === 'end' ? 'right' : 'center';
     }
     else {
-      parsed = isArray ? value.map(parseUnit) : parseUnit(value, fontSize);
+      parsed = isArray ? value.map(parseUnit) : parseUnit(value);
     }
 
     return (!isArray && isNaN(parsed) ? value : parsed);
@@ -142,11 +142,11 @@
     }
 
     function skewXMatrix(matrix, args) {
-      matrix[2] = Math.tan(fabric.util.degreesToRadians(args[0]));
+      matrix[2] = args[0];
     }
 
     function skewYMatrix(matrix, args) {
-      matrix[1] = Math.tan(fabric.util.degreesToRadians(args[0]));
+      matrix[1] = args[0];
     }
 
     function translateMatrix(matrix, args) {
@@ -167,7 +167,7 @@
         ],
 
         // == begin transform regexp
-        number = fabric.reNum,
+        number = '(?:[-+]?(?:\\d+|\\d*\\.\\d+)(?:e[-+]?\\d+)?)',
 
         commaWsp = '(?:\\s+,?\\s*|,\\s*)',
 
@@ -270,6 +270,40 @@
     };
   })();
 
+  function parseFontDeclaration(value, oStyle) {
+
+    // TODO: support non-px font size
+    var match = value.match(/(normal|italic)?\s*(normal|small-caps)?\s*(normal|bold|bolder|lighter|100|200|300|400|500|600|700|800|900)?\s*(\d+)px(?:\/(normal|[\d\.]+))?\s+(.*)/);
+
+    if (!match) {
+      return;
+    }
+
+    var fontStyle = match[1],
+        // font variant is not used
+        // fontVariant = match[2],
+        fontWeight = match[3],
+        fontSize = match[4],
+        lineHeight = match[5],
+        fontFamily = match[6];
+
+    if (fontStyle) {
+      oStyle.fontStyle = fontStyle;
+    }
+    if (fontWeight) {
+      oStyle.fontWeight = isNaN(parseFloat(fontWeight)) ? fontWeight : parseFloat(fontWeight);
+    }
+    if (fontSize) {
+      oStyle.fontSize = parseFloat(fontSize);
+    }
+    if (fontFamily) {
+      oStyle.fontFamily = fontFamily;
+    }
+    if (lineHeight) {
+      oStyle.lineHeight = lineHeight === 'normal' ? 1 : lineHeight;
+    }
+  }
+
   /**
    * @private
    */
@@ -281,7 +315,12 @@
       attr = normalizeAttr(pair[0].trim().toLowerCase());
       value = normalizeValue(attr, pair[1].trim());
 
-      oStyle[attr] = value;
+      if (attr === 'font') {
+        parseFontDeclaration(value, oStyle);
+      }
+      else {
+        oStyle[attr] = value;
+      }
     });
   }
 
@@ -298,19 +337,25 @@
       attr = normalizeAttr(prop.toLowerCase());
       value = normalizeValue(attr, style[prop]);
 
-      oStyle[attr] = value;
+      if (attr === 'font') {
+        parseFontDeclaration(value, oStyle);
+      }
+      else {
+        oStyle[attr] = value;
+      }
     }
   }
 
   /**
    * @private
    */
-  function getGlobalStylesForElement(element, svgUid) {
+  function getGlobalStylesForElement(element) {
     var styles = { };
-    for (var rule in fabric.cssRules[svgUid]) {
+
+    for (var rule in fabric.cssRules) {
       if (elementMatchesRule(element, rule.split(' '))) {
-        for (var property in fabric.cssRules[svgUid][rule]) {
-          styles[property] = fabric.cssRules[svgUid][rule][property];
+        for (var property in fabric.cssRules[rule]) {
+          styles[property] = fabric.cssRules[rule][property];
         }
       }
     }
@@ -377,7 +422,7 @@
           x = el.getAttribute('x') || 0,
           y = el.getAttribute('y') || 0,
           el2 = doc.getElementById(xlink).cloneNode(true),
-          currentTrans = (el2.getAttribute('transform') || '') + ' translate(' + x + ', ' + y + ')',
+          currentTrans = (el.getAttribute('transform') || '') + ' translate(' + x + ', ' + y + ')',
           parentNode;
 
       for (var j = 0, attrs = el.attributes, l = attrs.length; j < l; j++) {
@@ -387,7 +432,7 @@
         }
 
         if (attr.nodeName === 'transform') {
-          currentTrans = attr.nodeValue + ' ' + currentTrans;
+          currentTrans = currentTrans + ' ' + attr.nodeValue;
         }
         else {
           el2.setAttribute(attr.nodeName, attr.nodeValue);
@@ -395,7 +440,6 @@
       }
 
       el2.setAttribute('transform', currentTrans);
-      el2.setAttribute('instantiated_by_use', '1');
       el2.removeAttribute('id');
       parentNode = el.parentNode;
       parentNode.replaceChild(el2, el);
@@ -403,67 +447,21 @@
   }
 
   /**
-   * Add a <g> element that envelop all child elements and makes the viewbox transformMatrix descend on all elements
+   * Add a <g> element that envelop all SCG elements and makes the viewbox transformMatrix descend on all elements
    */
-  function addVBTransform(element, widthAttr, heightAttr) {
-
-    // http://www.w3.org/TR/SVG/coords.html#ViewBoxAttribute
-    // matches, e.g.: +14.56e-12, etc.
-    var reViewBoxAttrValue = new RegExp(
-          '^' +
-          '\\s*(' + fabric.reNum + '+)\\s*,?' +
-          '\\s*(' + fabric.reNum + '+)\\s*,?' +
-          '\\s*(' + fabric.reNum + '+)\\s*,?' +
-          '\\s*(' + fabric.reNum + '+)\\s*' +
-          '$'
-        ),
-        viewBoxAttr = element.getAttribute('viewBox'),
-        scaleX = 1, scaleY = 1, minX = 0, minY = 0,
-        viewBoxWidth, viewBoxHeight, matrix, el;
-
-    if (viewBoxAttr && (viewBoxAttr = viewBoxAttr.match(reViewBoxAttrValue))) {
-      minX = -parseFloat(viewBoxAttr[1]),
-      minY = -parseFloat(viewBoxAttr[2]),
-      viewBoxWidth = parseFloat(viewBoxAttr[3]),
-      viewBoxHeight = parseFloat(viewBoxAttr[4]);
-    }
-    else {
+  function addSvgTransform(doc, matrix) {
+    matrix[3] = matrix[0] = (matrix[0] > matrix[3] ? matrix[3] : matrix[0]);
+    if (!(matrix[0] !== 1 || matrix[3] !== 1 || matrix[4] !== 0 || matrix[5] !== 0)) {
       return;
     }
-    if (widthAttr && widthAttr !== viewBoxWidth) {
-      scaleX = widthAttr / viewBoxWidth;
-    }
-    if (heightAttr && heightAttr !== viewBoxHeight) {
-      scaleY = heightAttr / viewBoxHeight;
-    }
-
     // default is to preserve aspect ratio
     // preserveAspectRatio attribute to be implemented
-    scaleY = scaleX = (scaleX > scaleY ? scaleY : scaleX);
-
-    if (!(scaleX !== 1 || scaleY !== 1 || minX !== 0 || minY !== 0)) {
-      return;
+    var el = doc.ownerDocument.createElement('g');
+    while (doc.firstChild != null) {
+      el.appendChild(doc.firstChild);
     }
-    matrix = 'matrix(' + scaleX +
-                  ' 0' +
-                  ' 0 ' +
-                  scaleY + ' ' +
-                  (minX * scaleX) + ' ' +
-                  (minY * scaleY) + ')';
-
-    if (element.tagName === 'svg') {
-      el = element.ownerDocument.createElement('g');
-      while (element.firstChild != null) {
-        el.appendChild(element.firstChild);
-      }
-      element.appendChild(el);
-    }
-    else {
-      el = element;
-      matrix += el.getAttribute('transform');
-    }
-
-    el.setAttribute('transform', matrix);
+    el.setAttribute('transform','matrix(' + matrix[0] + ' ' + matrix[1] + ' ' + matrix[2] + ' ' + matrix[3] + ' ' + matrix[4] + ' ' + matrix[5] + ')');
+    doc.appendChild(el);
   }
 
   /**
@@ -478,11 +476,25 @@
   fabric.parseSVGDocument = (function() {
 
     var reAllowedSVGTagNames = /^(path|circle|polygon|polyline|ellipse|rect|line|image|text)$/,
-        reViewBoxTagNames = /^(symbol|image|marker|pattern|view)$/;
+
+        // http://www.w3.org/TR/SVG/coords.html#ViewBoxAttribute
+        // \d doesn't quite cut it (as we need to match an actual float number)
+
+        // matches, e.g.: +14.56e-12, etc.
+        reNum = '(?:[-+]?(?:\\d+|\\d*\\.\\d+)(?:e[-+]?\\d+)?)',
+
+        reViewBoxAttrValue = new RegExp(
+          '^' +
+          '\\s*(' + reNum + '+)\\s*,?' +
+          '\\s*(' + reNum + '+)\\s*,?' +
+          '\\s*(' + reNum + '+)\\s*,?' +
+          '\\s*(' + reNum + '+)\\s*' +
+          '$'
+        );
 
     function hasAncestorWithNodeName(element, nodeName) {
       while (element && (element = element.parentNode)) {
-        if (nodeName.test(element.nodeName) && !element.getAttribute('instantiated_by_use')) {
+        if (nodeName.test(element.nodeName)) {
           return true;
         }
       }
@@ -493,19 +505,33 @@
       if (!doc) {
         return;
       }
+      var startTime = new Date();
 
       parseUseDirectives(doc);
-
-      var startTime = new Date(),
-          svgUid =  fabric.Object.__uid++,
       /* http://www.w3.org/TR/SVG/struct.html#SVGElementWidthAttribute
       *  as per spec, width and height attributes are to be considered
       *  100% if no value is specified.
       */
+      var viewBoxAttr = doc.getAttribute('viewBox'),
           widthAttr = parseUnit(doc.getAttribute('width') || '100%'),
-          heightAttr = parseUnit(doc.getAttribute('height') || '100%');
+          heightAttr = parseUnit(doc.getAttribute('height') || '100%'),
+          viewBoxWidth,
+          viewBoxHeight;
 
-      addVBTransform(doc, widthAttr, heightAttr);
+      if (viewBoxAttr && (viewBoxAttr = viewBoxAttr.match(reViewBoxAttrValue))) {
+        var minX = parseFloat(viewBoxAttr[1]),
+            minY = parseFloat(viewBoxAttr[2]),
+            scaleX = 1, scaleY = 1;
+        viewBoxWidth = parseFloat(viewBoxAttr[3]);
+        viewBoxHeight = parseFloat(viewBoxAttr[4]);
+        if (widthAttr && widthAttr !== viewBoxWidth ) {
+          scaleX = widthAttr / viewBoxWidth;
+        }
+        if (heightAttr && heightAttr !== viewBoxHeight) {
+          scaleY = heightAttr / viewBoxHeight;
+        }
+        addSvgTransform(doc, [scaleX, 0, 0, scaleY, scaleX * -minX, scaleY * -minY]);
+      }
 
       var descendants = fabric.util.toArray(doc.getElementsByTagName('*'));
 
@@ -521,9 +547,8 @@
       }
 
       var elements = descendants.filter(function(el) {
-        reViewBoxTagNames.test(el.tagName) && addVBTransform(el, 0, 0);
         return reAllowedSVGTagNames.test(el.tagName) &&
-              !hasAncestorWithNodeName(el, /^(?:pattern|defs|symbol)$/); // http://www.w3.org/TR/SVG/struct.html#DefsElement
+              !hasAncestorWithNodeName(el, /^(?:pattern|defs)$/); // http://www.w3.org/TR/SVG/struct.html#DefsElement
       });
 
       if (!elements || (elements && !elements.length)) {
@@ -532,16 +557,16 @@
       }
 
       var options = {
-        width: widthAttr,
-        height: heightAttr,
+        width: widthAttr ? widthAttr : viewBoxWidth,
+        height: heightAttr ? heightAttr : viewBoxHeight,
         widthAttr: widthAttr,
-        heightAttr: heightAttr,
-        svgUid: svgUid
+        heightAttr: heightAttr
       };
 
-      fabric.gradientDefs[svgUid] = fabric.getGradientDefs(doc);
-      fabric.cssRules[svgUid] = fabric.getCSSRules(doc);
+      fabric.gradientDefs = fabric.getGradientDefs(doc);
+      fabric.cssRules = fabric.getCSSRules(doc);
       // Precedence of rules:   style > class > attribute
+
       fabric.parseElements(elements, function(instances) {
         fabric.documentParsingTime = new Date() - startTime;
         if (callback) {
@@ -609,48 +634,6 @@
   }
 
   extend(fabric, {
-    /**
-     * Parses a short font declaration, building adding its properties to a style object
-     * @static
-     * @function
-     * @memberOf fabric
-     * @param {String} value font declaration
-     * @param {Object} oStyle definition
-     */
-    parseFontDeclaration: function(value, oStyle) {
-      var fontDeclaration = '(normal|italic)?\\s*(normal|small-caps)?\\s*'
-                            + '(normal|bold|bolder|lighter|100|200|300|400|500|600|700|800|900)?\\s*('
-                            + fabric.reNum
-                            + '(?:px|cm|mm|em|pt|pc|in)*)(?:\\/(normal|' + fabric.reNum + '))?\\s+(.*)',
-          match = value.match(fontDeclaration);
-
-      if (!match) {
-        return;
-      }
-      var fontStyle = match[1],
-          // font variant is not used
-          // fontVariant = match[2],
-          fontWeight = match[3],
-          fontSize = match[4],
-          lineHeight = match[5],
-          fontFamily = match[6];
-
-      if (fontStyle) {
-        oStyle.fontStyle = fontStyle;
-      }
-      if (fontWeight) {
-        oStyle.fontWeight = isNaN(parseFloat(fontWeight)) ? fontWeight : parseFloat(fontWeight);
-      }
-      if (fontSize) {
-        oStyle.fontSize = parseUnit(fontSize);
-      }
-      if (fontFamily) {
-        oStyle.fontFamily = fontFamily;
-      }
-      if (lineHeight) {
-        oStyle.lineHeight = lineHeight === 'normal' ? 1 : lineHeight;
-      }
-    },
 
     /**
      * Parses an SVG document, returning all of the gradient declarations found in it
@@ -705,31 +688,25 @@
      * @param {Array} attributes Array of attributes to parse
      * @return {Object} object containing parsed attributes' names/values
      */
-    parseAttributes: function(element, attributes, svgUid) {
+    parseAttributes: function(element, attributes) {
 
       if (!element) {
         return;
       }
 
       var value,
-          parentAttributes = { },
-          fontSize;
+          parentAttributes = { };
 
-      if (typeof svgUid === 'undefined') {
-        svgUid = element.getAttribute('svgUid');
-      }
       // if there's a parent container (`g` or `a` or `symbol` node), parse its attributes recursively upwards
       if (element.parentNode && /^symbol|[g|a]$/i.test(element.parentNode.nodeName)) {
-        parentAttributes = fabric.parseAttributes(element.parentNode, attributes, svgUid);
+        parentAttributes = fabric.parseAttributes(element.parentNode, attributes);
       }
-      fontSize = (parentAttributes && parentAttributes.fontSize ) ||
-                 element.getAttribute('font-size') || fabric.Text.DEFAULT_SVG_FONT_SIZE;
 
       var ownAttributes = attributes.reduce(function(memo, attr) {
         value = element.getAttribute(attr);
         if (value) {
           attr = normalizeAttr(attr);
-          value = normalizeValue(attr, value, parentAttributes, fontSize);
+          value = normalizeValue(attr, value, parentAttributes);
 
           memo[attr] = value;
         }
@@ -739,10 +716,8 @@
       // add values parsed from style, which take precedence over attributes
       // (see: http://www.w3.org/TR/SVG/styling.html#UsingPresentationAttributes)
       ownAttributes = extend(ownAttributes,
-        extend(getGlobalStylesForElement(element, svgUid), fabric.parseStyleAttribute(element)));
-      if (ownAttributes.font) {
-        fabric.parseFontDeclaration(ownAttributes.font, ownAttributes);
-      }
+        extend(getGlobalStylesForElement(element), fabric.parseStyleAttribute(element)));
+
       return _setStrokeFillOpacity(extend(parentAttributes, ownAttributes));
     },
 
@@ -835,13 +810,11 @@
 
       // very crude parsing of style contents
       for (var i = 0, len = styles.length; i < len; i++) {
-        var styleContents = styles[i].textContent;
+        var styleContents = styles[0].textContent;
 
         // remove comments
         styleContents = styleContents.replace(/\/\*[\s\S]*?\*\//g, '');
-        if (styleContents.trim() === '') {
-          continue;
-        }
+
         rules = styleContents.match(/[^{]*\{[\s\S]*?\}/g);
         rules = rules.map(function(rule) { return rule.trim(); });
 
@@ -854,16 +827,12 @@
           for (var i = 0, len = propertyValuePairs.length; i < len; i++) {
             var pair = propertyValuePairs[i].split(/\s*:\s*/),
                 property = normalizeAttr(pair[0]),
-                value = normalizeValue(property, pair[1], pair[0]);
+                value = normalizeValue(property,pair[1],pair[0]);
             ruleObj[property] = value;
           }
           rule = match[1];
           rule.split(',').forEach(function(_rule) {
-            _rule = _rule.replace(/^svg/i, '').trim();
-            if (_rule === '') {
-              return;
-            }
-            allRules[_rule] = fabric.util.object.clone(ruleObj);
+            allRules[_rule.trim()] = fabric.util.object.clone(ruleObj);
           });
         });
       }
@@ -902,7 +871,7 @@
           xml = new ActiveXObject('Microsoft.XMLDOM');
           xml.async = 'false';
           //IE chokes on DOCTYPE
-          xml.loadXML(r.responseText.replace(/<!DOCTYPE[\s\S]*?(\[[\s\S]*\])*?>/i, ''));
+          xml.loadXML(r.responseText.replace(/<!DOCTYPE[\s\S]*?(\[[\s\S]*\])*?>/i,''));
         }
         if (!xml || !xml.documentElement) {
           return;
@@ -937,8 +906,8 @@
       else if (fabric.window.ActiveXObject) {
         doc = new ActiveXObject('Microsoft.XMLDOM');
         doc.async = 'false';
-        // IE chokes on DOCTYPE
-        doc.loadXML(string.replace(/<!DOCTYPE[\s\S]*?(\[[\s\S]*\])*?>/i, ''));
+        //IE chokes on DOCTYPE
+        doc.loadXML(string.replace(/<!DOCTYPE[\s\S]*?(\[[\s\S]*\])*?>/i,''));
       }
 
       fabric.parseSVGDocument(doc.documentElement, function (results, options) {

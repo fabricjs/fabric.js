@@ -38,33 +38,6 @@
     crossOrigin: '',
 
     /**
-     * AlignX value, part of preserveAspectRatio (one of "none", "mid", "min", "max")
-     * @see http://www.w3.org/TR/SVG/coords.html#PreserveAspectRatioAttribute
-     * This parameter defines how the picture is aligned to its viewport when image element width differs from image width.
-     * @type String
-     * @default
-     */
-    alignX: 'none',
-
-    /**
-     * AlignY value, part of preserveAspectRatio (one of "none", "mid", "min", "max")
-     * @see http://www.w3.org/TR/SVG/coords.html#PreserveAspectRatioAttribute
-     * This parameter defines how the picture is aligned to its viewport when image element height differs from image height.
-     * @type String
-     * @default
-     */
-    alignY: 'none',
-
-    /**
-     * meetOrSlice value, part of preserveAspectRatio  (one of "meet", "slice").
-     * if meet the image is always fully visibile, if slice the viewport is always filled with image.
-     * @see http://www.w3.org/TR/SVG/coords.html#PreserveAspectRatioAttribute
-     * @type String
-     * @default
-     */
-    meetOrSlice: 'meet',
-
-    /**
      * Constructor
      * @param {HTMLImageElement | String} element Image element
      * @param {Object} [options] Options object
@@ -100,20 +73,16 @@
      * You might need to call `canvas.renderAll` and `object.setCoords` after replacing, to render new image and update controls area.
      * @param {HTMLImageElement} element
      * @param {Function} [callback] Callback is invoked when all filters have been applied and new image is generated
-     * @param {Object} [options] Options object
      * @return {fabric.Image} thisArg
      * @chainable
      */
-    setElement: function(element, callback, options) {
+    setElement: function(element, callback) {
       this._element = element;
       this._originalElement = element;
-      this._initConfig(options);
+      this._initConfig();
 
       if (this.filters.length !== 0) {
         this.applyFilters(callback);
-      }
-      else if (callback) {
-        callback();
       }
 
       return this;
@@ -189,10 +158,7 @@
         filters: this.filters.map(function(filterObj) {
           return filterObj && filterObj.toObject();
         }),
-        crossOrigin: this.crossOrigin,
-        alignX: this.alignX,
-        alignY: this.alignY,
-        meetOrSlice: this.meetOrSlice
+        crossOrigin: this.crossOrigin
       });
     },
 
@@ -203,14 +169,10 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var markup = [], x = -this.width / 2, y = -this.height / 2,
-          preserveAspectRatio = 'none';
-      if (this.group && this.group.type === 'path-group') {
+      var markup = [], x = -this.width / 2, y = -this.height / 2;
+      if (this.group) {
         x = this.left;
         y = this.top;
-      }
-      if (this.alignX !== 'none' && this.alignY !== 'none') {
-        preserveAspectRatio = 'x' + this.alignX + 'Y' + this.alignY + ' ' + this.meetOrSlice;
       }
       markup.push(
         '<g transform="', this.getSvgTransform(), this.getSvgTransformMatrix(), '">\n',
@@ -222,7 +184,7 @@
             // so that object's center aligns with container's left/top
             '" width="', this.width,
             '" height="', this.height,
-            '" preserveAspectRatio="', preserveAspectRatio, '"',
+            '" preserveAspectRatio="none"',
           '></image>\n'
       );
 
@@ -256,20 +218,6 @@
     },
 
     /**
-     * Sets source of an image
-     * @param {String} src Source string (URL)
-     * @param {Function} [callback] Callback is invoked when image has been loaded (and all filters have been applied)
-     * @param {Object} [options] Options object
-     * @return {fabric.Image} thisArg
-     * @chainable
-     */
-    setSrc: function(src, callback, options) {
-      fabric.util.loadImage(src, function(img) {
-        return this.setElement(img, callback, options);
-      }, this, options && options.crossOrigin);
-    },
-
-    /**
      * Returns string representation of an instance
      * @return {String} String representation of an instance
      */
@@ -294,6 +242,7 @@
      * @chainable
      */
     applyFilters: function(callback) {
+
       if (!this._originalElement) {
         return;
       }
@@ -347,59 +296,15 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx, noTransform) {
-      var x, y, imageMargins = this._findMargins();
-
-      x = (noTransform ? this.left : -this.width / 2);
-      y = (noTransform ? this.top : -this.height / 2);
-
-      if (this.meetOrSlice === 'slice') {
-        ctx.beginPath();
-        ctx.rect(x, y, this.width, this.height);
-        ctx.clip();
-      }
-
       this._element &&
-      ctx.drawImage(this._element,
-                    x + imageMargins.marginX,
-                    y + imageMargins.marginY,
-                    imageMargins.width,
-                    imageMargins.height
-                   );
+      ctx.drawImage(
+        this._element,
+        noTransform ? this.left : -this.width/2,
+        noTransform ? this.top : -this.height/2,
+        this.width,
+        this.height
+      );
       this._renderStroke(ctx);
-    },
-
-    /**
-     * @private
-     */
-    _findMargins: function() {
-      var width = this.width, height = this.height, scales,
-          scale, marginX = 0, marginY = 0;
-
-      if (this.alignX !== 'none' || this.alignY !== 'none') {
-        scales = [this.width / this._element.width, this.height / this._element.height];
-        scale = this.meetOrSlice === 'meet'
-                ? Math.min.apply(null, scales) : Math.max.apply(null, scales);
-        width = this._element.width * scale;
-        height = this._element.height * scale;
-        if (this.alignX === 'Mid') {
-          marginX = (this.width - width) / 2;
-        }
-        if (this.alignX === 'Max') {
-          marginX = this.width - width;
-        }
-        if (this.alignY === 'Mid') {
-          marginY = (this.height - height) / 2;
-        }
-        if (this.alignY === 'Max') {
-          marginY = this.height - height;
-        }
-      }
-      return {
-        width:  width,
-        height: height,
-        marginX: marginX,
-        marginY: marginY
-      };
     },
 
     /**
@@ -528,8 +433,7 @@
    * @static
    * @see {@link http://www.w3.org/TR/SVG/struct.html#ImageElement}
    */
-  fabric.Image.ATTRIBUTE_NAMES =
-    fabric.SHARED_ATTRIBUTES.concat('x y width height preserveAspectRatio xlink:href'.split(' '));
+  fabric.Image.ATTRIBUTE_NAMES = fabric.SHARED_ATTRIBUTES.concat('x y width height xlink:href'.split(' '));
 
   /**
    * Returns {@link fabric.Image} instance from an SVG element
@@ -540,29 +444,8 @@
    * @return {fabric.Image} Instance of fabric.Image
    */
   fabric.Image.fromElement = function(element, callback, options) {
-    var parsedAttributes = fabric.parseAttributes(element, fabric.Image.ATTRIBUTE_NAMES),
-        align = 'xMidYMid', meetOrSlice = 'meet', alignX, alignY, aspectRatioAttrs;
+    var parsedAttributes = fabric.parseAttributes(element, fabric.Image.ATTRIBUTE_NAMES);
 
-    if (parsedAttributes.preserveAspectRatio) {
-      aspectRatioAttrs = parsedAttributes.preserveAspectRatio.split(' ');
-    }
-
-    if (aspectRatioAttrs && aspectRatioAttrs.length) {
-      meetOrSlice = aspectRatioAttrs.pop();
-      if (meetOrSlice !== 'meet' && meetOrSlice !== 'slice') {
-        align = meetOrSlice;
-        meetOrSlice = 'meet';
-      }
-      else if (aspectRatioAttrs.length) {
-        align = aspectRatioAttrs.pop();
-      }
-    }
-    //divide align in alignX and alignY
-    alignX = align !== 'none' ? align.slice(1, 4) : 'none';
-    alignY = align !== 'none' ? align.slice(5, 8) : 'none';
-    parsedAttributes.alignX = alignX;
-    parsedAttributes.alignY = alignY;
-    parsedAttributes.meetOrSlice = meetOrSlice;
     fabric.Image.fromURL(parsedAttributes['xlink:href'], callback,
       extend((options ? fabric.util.object.clone(options) : { }), parsedAttributes));
   };

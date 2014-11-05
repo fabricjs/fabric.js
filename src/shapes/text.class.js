@@ -361,7 +361,7 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _renderViaNative: function(ctx) {
-      var textLines = this._getTextLines();
+      var textLines = this.text.split(this._reNewline);
 
       this._setTextStyles(ctx);
 
@@ -391,12 +391,11 @@
      */
     _renderText: function(ctx, textLines) {
       ctx.save();
-      this._setOpacity(ctx);
       this._setShadow(ctx);
-      this._setupCompositeOperation(ctx);
+      this._setupFillRule(ctx);
       this._renderTextFill(ctx, textLines);
       this._renderTextStroke(ctx, textLines);
-      this._restoreCompositeOperation(ctx);
+      this._restoreFillRule(ctx);
       this._removeShadow(ctx);
       ctx.restore();
     },
@@ -514,7 +513,7 @@
         var words = line.split(/\s+/),
             wordsWidth = ctx.measureText(line.replace(/\s+/g, '')).width,
             widthDiff = totalWidth - wordsWidth,
-            numSpaces = words.length - 2,
+            numSpaces = words.length - 1,
             spaceWidth = widthDiff / numSpaces,
             leftOffset = 0;
 
@@ -572,9 +571,6 @@
           this._getTopOffset() + lineHeights,
           i
         );
-      }
-      if (this.shadow && !this.shadow.affectStroke) {
-        this._removeShadow(ctx);
       }
     },
 
@@ -710,13 +706,7 @@
         ? this.width
         : ctx.measureText(line).width;
     },
-    /**
-     * Splits current text on newlines and returns the array of 'lines' in the IText.
-     * @returns {Array} Array of lines in this IText.
-     */
-    _getTextLines: function() {
-      return this.text.split(this._reNewline);
-    },
+
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
@@ -781,17 +771,16 @@
       }
 
       ctx.save();
-      if (!noTransform) {
-        this.transform(ctx);
-      }
+      this._transform(ctx, noTransform);
 
-      var isInPathGroup = this.group && this.group.type === 'path-group';
+      var m = this.transformMatrix,
+          isInPathGroup = this.group && this.group.type === 'path-group';
 
       if (isInPathGroup) {
         ctx.translate(-this.group.width/2, -this.group.height/2);
       }
-      if (this.transformMatrix) {
-        ctx.transform.apply(ctx, this.transformMatrix);
+      if (m) {
+        ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
       }
       if (isInPathGroup) {
         ctx.translate(this.left, this.top);
@@ -833,7 +822,7 @@
      */
     toSVG: function(reviver) {
       var markup = [ ],
-          textLines = this._getTextLines(),
+          textLines = this.text.split(this._reNewline),
           offsets = this._getSVGLeftTopOffsets(textLines),
           textAndBg = this._getSVGTextAndBg(offsets.lineTop, offsets.textLeft, textLines),
           shadowSpans = this._getSVGShadows(offsets.lineTop, textLines);
@@ -874,7 +863,7 @@
         '<g transform="', this.getSvgTransform(), this.getSvgTransformMatrix(), '">\n',
           textAndBg.textBgRects.join(''),
           '<text ',
-            (this.fontFamily ? 'font-family="' + this.fontFamily.replace(/"/g, '\'') + '" ': ''),
+            (this.fontFamily ? 'font-family="' + this.fontFamily.replace(/"/g,'\'') + '" ': ''),
             (this.fontSize ? 'font-size="' + this.fontSize + '" ': ''),
             (this.fontStyle ? 'font-style="' + this.fontStyle + '" ': ''),
             (this.fontWeight ? 'font-weight="' + this.fontWeight + '" ': ''),

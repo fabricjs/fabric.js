@@ -195,6 +195,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
     return this.getLocalPointer(e, rotated);
   },
+
   /**
    * Returns index of a character corresponding to where an object was clicked
    * @param {Event} e Event object
@@ -202,13 +203,13 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    */
   getSelectionStartFromPointer: function(e) {
     var mouseOffset = this._getLocalRotatedPointer(e),
-        textLines = this._getTextLines(),
+        textLines = this.text.split(this._reNewline),
         prevWidth = 0,
         width = 0,
         height = 0,
         charIndex = 0,
         newSelectionStart;
-    
+
     for (var i = 0, len = textLines.length; i < len; i++) {
 
       height += this._getHeightOfLine(this.ctx, i) * this.scaleY;
@@ -237,12 +238,12 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         }
 
         return this._getNewSelectionStartFromOffset(
-          mouseOffset, prevWidth, width, charIndex/* + i*/, jlen);
+          mouseOffset, prevWidth, width, charIndex + i, jlen);
       }
 
       if (mouseOffset.y < height) {
         return this._getNewSelectionStartFromOffset(
-          mouseOffset, prevWidth, width, charIndex/* + i*/, jlen);
+          mouseOffset, prevWidth, width, charIndex + i, jlen);
       }
     }
 

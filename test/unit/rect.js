@@ -1,34 +1,32 @@
 (function() {
 
   var REFERENCE_RECT = {
-    'type':                     'rect',
-    'originX':                  'left',
-    'originY':                  'top',
-    'left':                     0,
-    'top':                      0,
-    'width':                    0,
-    'height':                   0,
-    'fill':                     'rgb(0,0,0)',
-    'stroke':                   null,
-    'strokeWidth':              1,
-    'strokeDashArray':          null,
-    'strokeLineCap':            'butt',
-    'strokeLineJoin':           'miter',
-    'strokeMiterLimit':         10,
-    'scaleX':                   1,
-    'scaleY':                   1,
-    'angle':                    0,
-    'flipX':                    false,
-    'flipY':                    false,
-    'opacity':                  1,
-    'shadow':                   null,
-    'visible':                  true,
-    'backgroundColor':          '',
-    'clipTo':                   null,
-    'fillRule':                 'nonzero',
-    'globalCompositeOperation': 'source-over',
-    'rx':                       0,
-    'ry':                       0,
+    'type':               'rect',
+    'originX':            'left',
+    'originY':            'top',
+    'left':               0,
+    'top':                0,
+    'width':              0,
+    'height':             0,
+    'fill':               'rgb(0,0,0)',
+    'stroke':             null,
+    'strokeWidth':        1,
+    'strokeDashArray':    null,
+    'strokeLineCap':      'butt',
+    'strokeLineJoin':     'miter',
+    'strokeMiterLimit':   10,
+    'scaleX':             1,
+    'scaleY':             1,
+    'angle':              0,
+    'flipX':              false,
+    'flipY':              false,
+    'opacity':            1,
+    'shadow':             null,
+    'visible':            true,
+    'backgroundColor':    '',
+    'clipTo':             null,
+    'rx':                 0,
+    'ry':                 0,
   };
 
   QUnit.module('fabric.Rect');
@@ -133,7 +131,7 @@
     var rect = new fabric.Rect({ width: 100, height: 100, rx: 20, ry: 30 });
     var svg = rect.toSVG();
 
-    equal(svg, '<rect x="-50" y="-50" rx="20" ry="30" width="100" height="100" style="stroke: none; stroke-width: 1; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" transform="translate(50 50)"/>\n');
+    equal(svg, '<rect x="-50" y="-50" rx="20" ry="30" width="100" height="100" style="stroke: none; stroke-width: 1; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: source-over; opacity: 1;" transform="translate(50 50)"/>\n');
   });
 
   test('toObject without default values', function() {

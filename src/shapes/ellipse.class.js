@@ -1,4 +1,4 @@
-(function(global) {
+(function(global){
 
   'use strict';
 
@@ -53,46 +53,9 @@
 
       this.set('rx', options.rx || 0);
       this.set('ry', options.ry || 0);
-    },
 
-    /**
-     * @private
-     * @param {String} key
-     * @param {Any} value
-     * @return {fabric.Ellipse} thisArg
-     */
-    _set: function(key, value) {
-      this.callSuper('_set', key, value);
-      switch (key) {
-
-        case 'rx':
-          this.rx = value;
-          this.set('width', value * 2);
-          break;
-
-        case 'ry':
-          this.ry = value;
-          this.set('height', value * 2);
-          break;
-
-      }
-      return this;
-    },
-
-    /**
-     * Returns horizontal radius of an object (according to how an object is scaled)
-     * @return {Number}
-     */
-    getRx: function() {
-      return this.get('rx') * this.get('scaleX');
-    },
-
-    /**
-     * Returns Vertical radius of an object (according to how an object is scaled)
-     * @return {Number}
-     */
-    getRy: function() {
-      return this.get('ry') * this.get('scaleY');
+      this.set('width', this.get('rx') * 2);
+      this.set('height', this.get('ry') * 2);
     },
 
     /**
@@ -115,7 +78,7 @@
      */
     toSVG: function(reviver) {
       var markup = this._createBaseSVGMarkup(), x = 0, y = 0;
-      if (this.group && this.group.type === 'path-group') {
+      if (this.group) {
         x = this.left + this.rx;
         y = this.top + this.ry;
       }
@@ -143,13 +106,7 @@
       ctx.beginPath();
       ctx.save();
       ctx.transform(1, 0, 0, this.ry/this.rx, 0, 0);
-      ctx.arc(
-        noTransform ? this.left + this.rx : 0,
-        noTransform ? (this.top + this.ry) * this.rx/this.ry : 0,
-        this.rx,
-        0,
-        piBy2,
-        false);
+      ctx.arc(noTransform ? this.left + this.rx : 0, noTransform ? (this.top + this.ry) * this.rx/this.ry : 0, this.rx, 0, piBy2, false);
       ctx.restore();
       this._renderFill(ctx);
       this._renderStroke(ctx);

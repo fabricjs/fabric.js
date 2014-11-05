@@ -51,7 +51,7 @@
     var element = fabric.document.createElement('path');
     element.setAttribute('fill-rule', 'evenodd');
 
-    deepEqual(fabric.parseAttributes(element, ['fill-rule']), { fillRule: 'evenodd' });
+    deepEqual(fabric.parseAttributes(element, ['fill-rule']), { fillRule: 'destination-over' });
   });
 
   test('parseAttributesFillRuleWithoutTransformation', function() {
@@ -125,15 +125,15 @@
 
     var element = fabric.document.createElement('path');
     element.setAttribute('style', 'left:10px;top:22.3em;width:103.45pt;height:20%;');
-    var styleObj = fabric.parseStyleAttribute(element);
-    // TODO: looks like this still fails with % values
+
+    // TODO: looks like this still fails with % and em values
     var expectedObject = {
       'left':   10,
-      'top':    356.8,
+      'top':    22.3,
       'width':  137.93333333333334,
       'height': 20
     };
-    deepEqual(styleObj, expectedObject);
+    deepEqual(fabric.parseStyleAttribute(element), expectedObject);
   });
 
   test('parseStyleAttribute with one pair', function() {
@@ -148,11 +148,10 @@
 
   test('parseStyleAttribute with value normalization', function() {
     var element = fabric.document.createElement('path');
-    element.setAttribute('style', 'fill:none;  stroke-dasharray: 2 0.4;');
+    element.setAttribute('style', 'fill:none');
 
     var expectedObject = {
-      'fill': '',
-      'strokeDashArray': [2, 0.4]
+      'fill': ''
     };
     deepEqual(fabric.parseStyleAttribute(element), expectedObject);
   });
@@ -160,33 +159,13 @@
   test('parseStyleAttribute with short font declaration', function() {
     var element = fabric.document.createElement('path');
     element.setAttribute('style', 'font: italic 12px Arial,Helvetica,sans-serif');
-    var styleObj = fabric.parseStyleAttribute(element);
-    if (styleObj.font) {
-      fabric.parseFontDeclaration(styleObj.font, styleObj);
-    }
+
     var expectedObject = {
-      'font': 'italic 12px Arial,Helvetica,sans-serif',
       'fontSize': 12,
       'fontStyle': 'italic',
       'fontFamily': 'Arial,Helvetica,sans-serif'
     };
-    
-    deepEqual(styleObj, expectedObject);
-
-    //testing different unit
-    element.setAttribute('style', 'font: italic 1.5em Arial,Helvetica,sans-serif');
-    var styleObj = fabric.parseStyleAttribute(element);
-    if (styleObj.font) {
-      fabric.parseFontDeclaration(styleObj.font, styleObj);
-    }
-    var expectedObject = {
-      'font': 'italic 1.5em Arial,Helvetica,sans-serif',
-      'fontSize': 24,
-      'fontStyle': 'italic',
-      'fontFamily': 'Arial,Helvetica,sans-serif'
-    };
-    
-    deepEqual(styleObj, expectedObject);
+    deepEqual(fabric.parseStyleAttribute(element), expectedObject);
   });
 
   test('parseAttributes (style to have higher priority than attribute)', function() {
@@ -270,11 +249,11 @@
 
     element.setAttribute('transform', 'skewX(2)');
     var parsedValue = fabric.parseTransformAttribute(element.getAttribute('transform'));
-    deepEqual(parsedValue, [1,0,0.03492076949174773,1,0,0]);
+    deepEqual(parsedValue, [1,0,2,1,0,0]);
 
     element.setAttribute('transform', 'skewY(234.111)');
     var parsedValue = fabric.parseTransformAttribute(element.getAttribute('transform'));
-    deepEqual(parsedValue, [1,1.3820043381762832,0,1,0,0]);
+    deepEqual(parsedValue, [1,234.111,0,1,0,0]);
 
     element.setAttribute('transform', 'matrix(1,2,3,4,5,6)');
     var parsedValue = fabric.parseTransformAttribute(element.getAttribute('transform'));
@@ -286,7 +265,7 @@
 
     element.setAttribute('transform', 'scale(2 13) translate(5,15) skewX(11.22)');
     var parsedValue = fabric.parseTransformAttribute(element.getAttribute('transform'));
-    deepEqual(parsedValue, [2,0,0.3967362169237356,13,10,195]);
+    deepEqual(parsedValue, [2,0,22.44,13,10,195]);
 
   });
 
@@ -385,8 +364,7 @@
         styleElement = doc.createElement('style');
         styleElement.textContent = 'g polygon.cls, rect {fill:#FF0000; stroke:#000000;stroke-width:0.25px;}\
         polygon.cls {fill:none;stroke:#0000FF;}',
-        doc.body.appendChild(styleElement),
-        svgUid =  'uniqueId';
+        doc.body.appendChild(styleElement);
 
     var expectedObject = {
       'g polygon.cls': {
@@ -403,10 +381,10 @@
         'fill' : '',
         'stroke': '#0000FF'
       }
-    };
+    }
 
-    fabric.cssRules[svgUid] = fabric.getCSSRules(doc);
-    deepEqual(fabric.cssRules[svgUid], expectedObject);
+    fabric.cssRules = fabric.getCSSRules(doc);
+    deepEqual(fabric.cssRules, expectedObject);
     
     var elPolygon = fabric.document.createElement('polygon'),
         expectedStyle = {
@@ -416,16 +394,9 @@
 
     elPolygon.setAttribute('points', '10,12 20,22');
     elPolygon.setAttribute('class', 'cls');
-    elPolygon.setAttribute('svgUid', svgUid);
 
     var style = fabric.parseAttributes(elPolygon, [ ]);
     deepEqual(style, expectedStyle);
-    
-    styleElement.textContent = '\t\n';
-    expectedStyle = { }
-    svgUid =  'uniqueId2';
-    fabric.cssRules[svgUid] = fabric.getCSSRules(doc);
-    deepEqual(fabric.cssRules[svgUid], expectedStyle);
   });
 
 })();

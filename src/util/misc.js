@@ -138,12 +138,10 @@
      * @param {Number|String} value number to operate on
      * @return {Number|String}
      */
-    parseUnit: function(value, fontSize) {
+    parseUnit: function(value) {
       var unit = /\D{0,2}$/.exec(value),
           number = parseFloat(value);
-      if (!fontSize) {
-        fontSize = fabric.Text.DEFAULT_SVG_FONT_SIZE;
-      }
+
       switch (unit[0]) {
         case 'mm':
           return number * fabric.DPI / 25.4;
@@ -159,9 +157,6 @@
 
         case 'pc':
           return number * fabric.DPI / 72 * 12; // or * 16
-
-        case 'em':
-          return number * fontSize;
 
         default:
           return number;
