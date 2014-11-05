@@ -153,12 +153,12 @@
     var emptyObjectJSON = '{"type":"object","originX":"left","originY":"top","left":0,"top":0,"width":0,"height":0,"fill":"rgb(0,0,0)",'+
                           '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,'+
                           '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,'+
-                          '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over"}';
+                          '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":""}';
 
     var augmentedJSON = '{"type":"object","originX":"left","originY":"top","left":0,"top":0,"width":122,"height":0,"fill":"rgb(0,0,0)",'+
                         '"stroke":null,"strokeWidth":1,"strokeDashArray":[5,2],"strokeLineCap":"round","strokeLineJoin":"bevil","strokeMiterLimit":5,'+
                         '"scaleX":1.3,"scaleY":1,"angle":0,"flipX":false,"flipY":true,"opacity":0.88,'+
-                        '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over"}';
+                        '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":""}';
 
     var cObj = new fabric.Object();
     ok(typeof cObj.toJSON == 'function');
@@ -178,61 +178,57 @@
 
   test('toObject', function() {
     var emptyObjectRepr = {
-      'type':                     'object',
-      'originX':                  'left',
-      'originY':                  'top',
-      'left':                     0,
-      'top':                      0,
-      'width':                    0,
-      'height':                   0,
-      'fill':                     'rgb(0,0,0)',
-      'stroke':                   null,
-      'strokeWidth':              1,
-      'strokeDashArray':          null,
-      'strokeLineCap':            'butt',
-      'strokeLineJoin':           'miter',
-      'strokeMiterLimit':         10,
-      'scaleX':                   1,
-      'scaleY':                   1,
-      'angle':                    0,
-      'flipX':                    false,
-      'flipY':                    false,
-      'opacity':                  1,
-      'shadow':                   null,
-      'visible':                  true,
-      'backgroundColor':          '',
-      'clipTo':                   null,
-      'fillRule':                 'nonzero',
-      'globalCompositeOperation': 'source-over'
+      'type':               'object',
+      'originX':            'left',
+      'originY':            'top',
+      'left':               0,
+      'top':                0,
+      'width':              0,
+      'height':             0,
+      'fill':               'rgb(0,0,0)',
+      'stroke':             null,
+      'strokeWidth':        1,
+      'strokeDashArray':    null,
+      'strokeLineCap':      'butt',
+      'strokeLineJoin':     'miter',
+      'strokeMiterLimit':   10,
+      'scaleX':             1,
+      'scaleY':             1,
+      'angle':              0,
+      'flipX':              false,
+      'flipY':              false,
+      'opacity':            1,
+      'shadow':             null,
+      'visible':            true,
+      'backgroundColor':    '',
+      'clipTo':             null
     };
 
     var augmentedObjectRepr = {
-      'type':                     'object',
-      'originX':                  'left',
-      'originY':                  'top',
-      'left':                     10,
-      'top':                      20,
-      'width':                    30,
-      'height':                   40,
-      'fill':                     'rgb(0,0,0)',
-      'stroke':                   null,
-      'strokeWidth':              1,
-      'strokeDashArray':          [5, 2],
-      'strokeLineCap':            'round',
-      'strokeLineJoin':           'bevil',
-      'strokeMiterLimit':         5,
-      'scaleX':                   1,
-      'scaleY':                   1,
-      'angle':                    0,
-      'flipX':                    true,
-      'flipY':                    false,
-      'opacity':                  0.13,
-      'shadow':                   null,
-      'visible':                  true,
-      'backgroundColor':          '',
-      'clipTo':                   null,
-      'fillRule':                 'nonzero',
-      'globalCompositeOperation': 'source-over'
+      'type':               'object',
+      'originX':            'left',
+      'originY':            'top',
+      'left':               10,
+      'top':                20,
+      'width':              30,
+      'height':             40,
+      'fill':               'rgb(0,0,0)',
+      'stroke':             null,
+      'strokeWidth':        1,
+      'strokeDashArray':    [5, 2],
+      'strokeLineCap':      'round',
+      'strokeLineJoin':     'bevil',
+      'strokeMiterLimit':   5,
+      'scaleX':             1,
+      'scaleY':             1,
+      'angle':              0,
+      'flipX':              true,
+      'flipY':              false,
+      'opacity':            0.13,
+      'shadow':             null,
+      'visible':            true,
+      'backgroundColor':    '',
+      'clipTo':             null
     };
 
     var cObj = new fabric.Object();

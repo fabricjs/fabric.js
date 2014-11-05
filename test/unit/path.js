@@ -1,34 +1,32 @@
 (function() {
 
   var REFERENCE_PATH_OBJECT = {
-    'type':                     'path',
-    'originX':                  'left',
-    'originY':                  'top',
-    'left':                     100,
-    'top':                      100,
-    'width':                    200,
-    'height':                   200,
-    'fill':                     'red',
-    'stroke':                   'blue',
-    'strokeWidth':              1,
-    'strokeDashArray':          null,
-    'strokeLineCap':            'butt',
-    'strokeLineJoin':           'miter',
-    'strokeMiterLimit':         10,
-    'scaleX':                   1,
-    'scaleY':                   1,
-    'angle':                    0,
-    'flipX':                    false,
-    'flipY':                    false,
-    'opacity':                  1,
-    'path':                     [['M', 100, 100], ['L', 300, 100], ['L', 200, 300], ['z']],
-    'pathOffset':               { x: 200, y: 200 },
-    'shadow':                   null,
-    'visible':                  true,
-    'backgroundColor':          '',
-    'clipTo':                   null,
-    'fillRule':                 'nonzero',
-    'globalCompositeOperation': 'source-over'
+    'type':               'path',
+    'originX':            'left',
+    'originY':            'top',
+    'left':               200,
+    'top':                200,
+    'width':              200,
+    'height':             200,
+    'fill':               'red',
+    'stroke':             'blue',
+    'strokeWidth':        1,
+    'strokeDashArray':    null,
+    'strokeLineCap':      'butt',
+    'strokeLineJoin':     'miter',
+    'strokeMiterLimit':   10,
+    'scaleX':             1,
+    'scaleY':             1,
+    'angle':              0,
+    'flipX':              false,
+    'flipY':              false,
+    'opacity':            1,
+    'path':               [['M', 100, 100], ['L', 300, 100], ['L', 200, 300], ['z']],
+    'pathOffset':         { x: 100, y: 100 },
+    'shadow':             null,
+    'visible':            true,
+    'backgroundColor':    '',
+    'clipTo':             null
   };
 
   function getPathElement(path) {
@@ -78,7 +76,7 @@
   asyncTest('toString', function() {
     makePathObject(function(path) {
       ok(typeof path.toString == 'function');
-      equal(path.toString(), '#<fabric.Path (4): { "top": 100, "left": 100 }>');
+      equal(path.toString(), '#<fabric.Path (4): { "top": 200, "left": 200 }>');
       start();
     });
   });

@@ -1,4 +1,4 @@
-(function() {
+(function(){
 
   var min = Math.min,
       max = Math.max;
@@ -107,6 +107,8 @@
             : [ target, this._activeObject ];
 
       return new fabric.Group(groupObjects, {
+        originX: 'center',
+        originY: 'center',
         canvas: this
       });
     },
@@ -125,6 +127,8 @@
       }
       else if (group.length > 1) {
         group = new fabric.Group(group.reverse(), {
+          originX: 'center',
+          originY: 'center',
           canvas: this
         });
         group.addWithUpdate();

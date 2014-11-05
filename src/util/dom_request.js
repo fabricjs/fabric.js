@@ -1,4 +1,4 @@
-(function() {
+(function(){
 
   function addParamToUrl(url, param) {
     return url + (/\?/.test(url) ? '&' : '?') + param;

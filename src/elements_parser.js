@@ -3,7 +3,6 @@ fabric.ElementsParser = function(elements, callback, options, reviver) {
   this.callback = callback;
   this.options = options;
   this.reviver = reviver;
-  this.svgUid = (options && options.svgUid) || 0;
 };
 
 fabric.ElementsParser.prototype.parse = function() {
@@ -15,7 +14,6 @@ fabric.ElementsParser.prototype.parse = function() {
 
 fabric.ElementsParser.prototype.createObjects = function() {
   for (var i = 0, len = this.elements.length; i < len; i++) {
-    this.elements[i].setAttribute('svgUid', this.svgUid);
     (function(_this, i) {
       setTimeout(function() {
         _this.createObject(_this.elements[i], i);
@@ -71,9 +69,9 @@ fabric.ElementsParser.prototype.resolveGradient = function(obj, property) {
     return;
   }
   var gradientId = instanceFillValue.slice(5, instanceFillValue.length - 1);
-  if (fabric.gradientDefs[this.svgUid][gradientId]) {
+  if (fabric.gradientDefs[gradientId]) {
     obj.set(property,
-      fabric.Gradient.fromElement(fabric.gradientDefs[this.svgUid][gradientId], obj));
+      fabric.Gradient.fromElement(fabric.gradientDefs[gradientId], obj));
   }
 };
 

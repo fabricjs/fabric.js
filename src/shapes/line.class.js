@@ -103,7 +103,7 @@
      * @param {Any} value
      */
     _set: function(key, value) {
-      this.callSuper('_set', key, value);
+      this[key] = value;
       if (typeof coordProps[key] !== 'undefined') {
         this._setWidthHeight();
       }
@@ -215,27 +215,12 @@
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
-      return extend(this.callSuper('toObject', propertiesToInclude), this.calcLinePoints());
-    },
-
-    /**
-     * @private
-     * Recalculate line points from width and height.
-     */
-    calcLinePoints: function() {
-      var xMult = this.x1 <= this.x2 ? -1 : 1,
-          yMult = this.y1 <= this.y2 ? -1 : 1,
-          x1 = (xMult * this.width / 2),
-          y1 = (yMult * this.height / 2),
-          x2 = (xMult * -1 * this.width / 2),
-          y2 = (yMult * -1 * this.height / 2);
-
-      return {
-        x1: x1,
-        x2: x2,
-        y1: y1,
-        y2: y2
-      };
+      return extend(this.callSuper('toObject', propertiesToInclude), {
+        x1: this.get('x1'),
+        y1: this.get('y1'),
+        x2: this.get('x2'),
+        y2: this.get('y2')
+      });
     },
 
     /* _TO_SVG_START_ */
@@ -245,20 +230,20 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var markup = this._createBaseSVGMarkup(),
-          p = { x1: this.x1, x2: this.x2, y1: this.y1, y2: this.y2 };
-
-      if (!(this.group && this.group.type === 'path-group')) {
-        p = this.calcLinePoints();
+      var markup = this._createBaseSVGMarkup(), addTranslate = '';
+      if (!this.group) {
+        var x = - this.width / 2 - (this.x1 > this.x2 ? this.x2 : this.x1),
+            y = - this.height / 2 - (this.y1 > this.y2 ? this.y2 : this.y1);
+        addTranslate = 'translate(' + x + ', ' + y + ') ';
       }
       markup.push(
         '<line ',
-          'x1="', p.x1,
-          '" y1="', p.y1,
-          '" x2="', p.x2,
-          '" y2="', p.y2,
+          'x1="', this.x1,
+          '" y1="', this.y1,
+          '" x2="', this.x2,
+          '" y2="', this.y2,
           '" style="', this.getSvgStyles(),
-          '" transform="', this.getSvgTransform(),
+          '" transform="', this.getSvgTransform(), addTranslate,
           this.getSvgTransformMatrix(),
         '"/>\n'
       );

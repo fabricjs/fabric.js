@@ -2,7 +2,7 @@
 
   var slice = Array.prototype.slice, emptyFunction = function() { },
 
-      IS_DONTENUM_BUGGY = (function() {
+      IS_DONTENUM_BUGGY = (function(){
         for (var p in { toString: 1 }) {
           if (p === 'toString') {
             return false;

@@ -1,4 +1,4 @@
-(function() {
+(function(){
 
   /**
    * Copies all enumerable properties of one object to another

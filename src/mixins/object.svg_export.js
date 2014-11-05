@@ -10,7 +10,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     var fill = this.fill
           ? (this.fill.toLive ? 'url(#SVGID_' + this.fill.id + ')' : this.fill)
           : 'none',
-        fillRule = this.fillRule,
+        fillRule = (this.fillRule === 'destination-over' ? 'evenodd' : this.fillRule),
         stroke = this.stroke
           ? (this.stroke.toLive ? 'url(#SVGID_' + this.stroke.id + ')' : this.stroke)
           : 'none',
@@ -45,7 +45,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @return {String}
    */
   getSvgTransform: function() {
-    if (this.group && this.group.type === 'path-group') {
+    if (this.group) {
       return '';
     }
     var toFixed = fabric.util.toFixed,

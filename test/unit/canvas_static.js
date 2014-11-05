@@ -25,20 +25,20 @@
                   '["c", 0.877, -9.979, 2.893, -12.905, 4.942, -15.621], ["C", 17.878, 21.775, 18.713, 17.397, 18.511, '+
                   '13.99], ["z", null]]}], "background": "#ff5555", "overlay":"rgba(0,0,0,0.2)"}';
 
-  var PATH_DATALESS_JSON = '{"objects":[{"type":"path","originX":"left","originY":"top","left":100,"top":100,"width":200,"height":200,"fill":"rgb(0,0,0)",'+
+  var PATH_DATALESS_JSON = '{"objects":[{"type":"path","originX":"left","originY":"top","left":200,"top":200,"width":200,"height":200,"fill":"rgb(0,0,0)",'+
                            '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,'+
                            '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,'+
-                           '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","path":"http://example.com/","pathOffset":{"x":200,"y":200}}],"background":""}';
+                           '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","path":"http://example.com/","pathOffset":{"x":100,"y":100}}],"background":""}';
 
   var RECT_JSON = '{"objects":[{"type":"rect","originX":"left","originY":"top","left":0,"top":0,"width":10,"height":10,"fill":"rgb(0,0,0)",'+
                   '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,'+
                   '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,'+
-                  '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","rx":0,"ry":0}],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}';
+                  '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","rx":0,"ry":0}],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}';
 
   var RECT_JSON_WITH_PADDING = '{"objects":[{"type":"rect","originX":"left","originY":"top","left":0,"top":0,"width":10,"height":20,"fill":"rgb(0,0,0)",'+
                                '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,'+
                                '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,'+
-                               '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","padding":123,"foo":"bar","rx":0,"ry":0}],"background":""}';
+                               '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","padding":123,"foo":"bar","rx":0,"ry":0}],"background":""}';
 
   function getAbsolutePath(path) {
     var isAbsolute = /^https?:/.test(path);
@@ -55,38 +55,33 @@
       IMG_HEIGHT  = 110;
 
   var REFERENCE_IMG_OBJECT = {
-    'type':                    'image',
-    'originX':                 'left',
-    'originY':                 'top',
-    'left':                     0,
-    'top':                      0,
-    'width':                    IMG_WIDTH, // node-canvas doesn't seem to allow setting width/height on image objects
-    'height':                   IMG_HEIGHT, // or does it now?
-    'fill':                     'rgb(0,0,0)',
-    'stroke':                   null,
-    'strokeWidth':              1,
-    'strokeDashArray':          null,
-    'strokeLineCap':            'butt',
-    'strokeLineJoin':           'miter',
-    'strokeMiterLimit':         10,
-    'scaleX':                   1,
-    'scaleY':                   1,
-    'angle':                    0,
-    'flipX':                    false,
-    'flipY':                    false,
-    'opacity':                  1,
-    'src':                      fabric.isLikelyNode ? undefined : IMG_SRC,
-    'shadow':                   null,
-    'visible':                  true,
-    'backgroundColor':          '',
-    'clipTo':                   null,
-    'filters':                  [],
-    'crossOrigin':              '',
-    'fillRule':                 'nonzero',
-    'globalCompositeOperation': 'source-over',
-    'alignX':                   'none',
-    'alignY':                   'none',
-    'meetOrSlice':              'meet'
+    'type':               'image',
+    'originX':            'left',
+    'originY':            'top',
+    'left':               0,
+    'top':                0,
+    'width':              IMG_WIDTH, // node-canvas doesn't seem to allow setting width/height on image objects
+    'height':             IMG_HEIGHT, // or does it now?
+    'fill':               'rgb(0,0,0)',
+    'stroke':             null,
+    'strokeWidth':        1,
+    'strokeDashArray':    null,
+    'strokeLineCap':      'butt',
+    'strokeLineJoin':     'miter',
+    'strokeMiterLimit':   10,
+    'scaleX':             1,
+    'scaleY':             1,
+    'angle':              0,
+    'flipX':              false,
+    'flipY':              false,
+    'opacity':            1,
+    'src':                fabric.isLikelyNode ? undefined : IMG_SRC,
+    'shadow':             null,
+    'visible':            true,
+    'backgroundColor':    '',
+    'clipTo':             null,
+    'filters':            [],
+    'crossOrigin':        ''
   };
 
   function _createImageElement() {
@@ -426,11 +421,6 @@
     equal(canvas, canvas.renderAll());
   });
 
-  test('preserveObjectStacking', function() {
-    ok(typeof canvas.preserveObjectStacking == 'boolean');
-    ok(!canvas.preserveObjectStacking);
-  });
-
   test('renderTop', function() {
     ok(typeof canvas.renderTop == 'function');
     equal(canvas, canvas.renderTop());
@@ -713,8 +703,8 @@
 
       equal(obj.get('left'), 268);
       equal(obj.get('top'), 266);
-      equal(obj.get('width'), 49.803999999999995);
-      equal(obj.get('height'), 48.027);
+      equal(obj.get('width'), 51);
+      equal(obj.get('height'), 49);
       equal(obj.get('fill'), 'rgb(0,0,0)');
       equal(obj.get('stroke'), null);
       equal(obj.get('strokeWidth'), 1);
@@ -742,8 +732,8 @@
 
       equal(obj.get('left'), 268);
       equal(obj.get('top'), 266);
-      equal(obj.get('width'), 49.803999999999995);
-      equal(obj.get('height'), 48.027);
+      equal(obj.get('width'), 51);
+      equal(obj.get('height'), 49);
       equal(obj.get('fill'), 'rgb(0,0,0)');
       equal(obj.get('stroke'), null);
       equal(obj.get('strokeWidth'), 1);

@@ -498,11 +498,10 @@
      * @private
      */
     _setObjectScale: function(localMouse, transform, lockScalingX, lockScalingY, by, lockScalingFlip) {
-      var target = transform.target, forbidScalingX = false, forbidScalingY = false,
-          strokeWidth = target.stroke ? target.strokeWidth : 0;
+      var target = transform.target, forbidScalingX = false, forbidScalingY = false;
 
-      transform.newScaleX = localMouse.x / (target.width + strokeWidth / 2);
-      transform.newScaleY = localMouse.y / (target.height + strokeWidth / 2);
+      transform.newScaleX = localMouse.x / (target.width + target.strokeWidth);
+      transform.newScaleY = localMouse.y / (target.height + target.strokeWidth);
 
       if (lockScalingFlip && transform.newScaleX <= 0 && transform.newScaleX < target.scaleX) {
         forbidScalingX = true;
@@ -526,7 +525,7 @@
         forbidScalingY || lockScalingY || target.set('scaleY', transform.newScaleY);
       }
 
-      forbidScalingX || forbidScalingY || this._flipObject(transform, by);
+      forbidScalingX || forbidScalingY || this._flipObject(transform);
 
     },
 
@@ -536,9 +535,8 @@
     _scaleObjectEqually: function(localMouse, target, transform) {
 
       var dist = localMouse.y + localMouse.x,
-          strokeWidth = target.stroke ? target.strokeWidth : 0,
-          lastDist = (target.height + (strokeWidth / 2)) * transform.original.scaleY +
-                     (target.width + (strokeWidth / 2)) * transform.original.scaleX;
+          lastDist = (target.height + (target.strokeWidth)) * transform.original.scaleY +
+                     (target.width + (target.strokeWidth)) * transform.original.scaleX;
 
       // We use transform.scaleX/Y instead of target.scaleX/Y
       // because the object may have a min scale and we'll loose the proportions
@@ -552,8 +550,8 @@
     /**
      * @private
      */
-    _flipObject: function(transform, by) {
-      if (transform.newScaleX < 0 && by !== 'y') {
+    _flipObject: function(transform) {
+      if (transform.newScaleX < 0) {
         if (transform.originX === 'left') {
           transform.originX = 'right';
         }
@@ -562,7 +560,7 @@
         }
       }
 
-      if (transform.newScaleY < 0 && by !== 'x') {
+      if (transform.newScaleY < 0) {
         if (transform.originY === 'top') {
           transform.originY = 'bottom';
         }
@@ -649,7 +647,7 @@
         angle = 360 + angle;
       }
 
-      t.target.angle = angle % 360;
+      t.target.angle = angle;
     },
 
     /**
@@ -831,18 +829,7 @@
       }
       var pointer = getPointer(e, upperCanvasEl),
           bounds = upperCanvasEl.getBoundingClientRect(),
-          boundsWidth = bounds.width || 0,
-          boundsHeight = bounds.height || 0,
           cssScale;
-
-      if (!boundsWidth || !boundsHeight ) {
-        if ('top' in bounds && 'bottom' in bounds) {
-          boundsHeight = Math.abs( bounds.top - bounds.bottom );
-        }
-        if ('right' in bounds && 'left' in bounds) {
-          boundsWidth = Math.abs( bounds.right - bounds.left );
-        }
-      }
 
       this.calcOffset();
 
@@ -855,14 +842,14 @@
         );
       }
 
-      if (boundsWidth === 0 || boundsHeight === 0) {
+      if (bounds.width === 0 || bounds.height === 0) {
         // If bounds are not available (i.e. not visible), do not apply scale.
         cssScale = { width: 1, height: 1 };
       }
       else {
         cssScale = {
-          width: upperCanvasEl.width / boundsWidth,
-          height: upperCanvasEl.height / boundsHeight
+          width: upperCanvasEl.width / bounds.width,
+          height: upperCanvasEl.height / bounds.height
         };
       }
 

@@ -86,7 +86,7 @@
    * @param {Array} points
    * @return {fabric.Intersection}
    */
-  fabric.Intersection.intersectLinePolygon = function(a1, a2, points) {
+  fabric.Intersection.intersectLinePolygon = function(a1,a2,points){
     var result = new Intersection(),
         length = points.length;
 

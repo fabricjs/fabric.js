@@ -134,13 +134,6 @@
     imageSmoothingEnabled: true,
 
     /**
-     * Indicates whether objects should remain in current stack position when selected. When false objects are brought to top and rendered as part of the selection group
-     * @type Boolean
-     * @default
-     */
-    preserveObjectStacking: false,
-
-    /**
      * The transformation (in the format of Canvas transform) which focuses the viewport
      * @type Array
      * @default
@@ -228,16 +221,6 @@
      *   originX: 'left',
      *   originY: 'top'
      * });
-     * @example <caption>overlayImage loaded from cross-origin</caption>
-     * canvas.setOverlayImage('http://fabricjs.com/assets/jail_cell_bars.png', canvas.renderAll.bind(canvas), {
-     *   opacity: 0.5,
-     *   angle: 45,
-     *   left: 400,
-     *   top: 400,
-     *   originX: 'left',
-     *   originY: 'top',
-     *   crossOrigin: 'anonymous'
-     * });
      */
     setOverlayImage: function (image, callback, options) {
       return this.__setBgOverlayImage('overlayImage', image, callback, options);
@@ -278,16 +261,6 @@
      *   // Needed to position backgroundImage at 0/0
      *   originX: 'left',
      *   originY: 'top'
-     * });
-     * @example <caption>backgroundImage loaded from cross-origin</caption>
-     * canvas.setBackgroundImage('http://fabricjs.com/assets/honey_im_subtle.png', canvas.renderAll.bind(canvas), {
-     *   opacity: 0.5,
-     *   angle: 45,
-     *   left: 400,
-     *   top: 400,
-     *   originX: 'left',
-     *   originY: 'top',
-     *   crossOrigin: 'anonymous'
      * });
      */
     setBackgroundImage: function (image, callback, options) {
@@ -348,7 +321,7 @@
      * @private
      * @see {@link http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#dom-context-2d-imagesmoothingenabled|WhatWG Canvas Standard}
      */
-    _setImageSmoothing: function() {
+    _setImageSmoothing: function(){
       var ctx = this.getContext();
 
       ctx.imageSmoothingEnabled       = this.imageSmoothingEnabled;
@@ -371,7 +344,7 @@
         fabric.util.loadImage(image, function(img) {
           this[property] = new fabric.Image(img, options);
           callback && callback();
-        }, this, options && options.crossOrigin);
+        }, this);
       }
       else {
         this[property] = image;
@@ -729,20 +702,11 @@
       ctx.save();
       var v = this.viewportTransform;
       ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
-      if (this._shouldRenderObject(object)) {
-        object.render(ctx);
-      }
+      object.render(ctx);
       ctx.restore();
       if (!this.controlsAboveOverlay) {
         object._renderControls(ctx);
       }
-    },
-
-    _shouldRenderObject: function(object) {
-      if (!object) {
-        return false;
-      }
-      return (object !== this.getActiveGroup() || !this.preserveObjectStacking);
     },
 
     /**
@@ -866,7 +830,7 @@
       var i, length;
 
       // fast path
-      if (!activeGroup || this.preserveObjectStacking) {
+      if (!activeGroup) {
         for (i = 0, length = this._objects.length; i < length; ++i) {
           this._draw(ctx, this._objects[i]);
         }

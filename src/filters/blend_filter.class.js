@@ -1,4 +1,4 @@
-(function(global) {
+(function(global){
   'use strict';
 
   var fabric = global.fabric;
@@ -26,7 +26,7 @@
   fabric.Image.filters.Blend = fabric.util.createClass({
     type: 'Blend',
 
-    initialize: function(options) {
+    initialize: function(options){
       options = options || {};
       this.color = options.color || '#000';
       this.image = options.image || false;

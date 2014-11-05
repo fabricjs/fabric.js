@@ -239,8 +239,7 @@
     if (t < 1) {
       return -0.5 * elastic(opts, t, d) + b;
     }
-    return opts.a * Math.pow(2, -10 * (t -= 1)) *
-      Math.sin((t * d - opts.s) * (2 * Math.PI) / opts.p ) * 0.5 + opts.c + b;
+    return opts.a * Math.pow(2, -10 * (t -= 1)) * Math.sin((t * d - opts.s) * (2 * Math.PI) / opts.p ) * 0.5 + opts.c + b;
   }
 
   /**

@@ -116,12 +116,12 @@
 
       element = element.parentNode;
 
-      if (element.nodeType === 1 &&
+      if (element !== fabric.document &&
           fabric.util.getElementStyle(element, 'position') === 'fixed') {
         firstFixedAncestor = element;
       }
 
-      if (element.nodeType === 1 &&
+      if (element !== fabric.document &&
           origElement !== upperCanvasEl &&
           fabric.util.getElementStyle(element, 'position') === 'absolute') {
         left = 0;
@@ -191,8 +191,7 @@
   var getElementStyle;
   if (fabric.document.defaultView && fabric.document.defaultView.getComputedStyle) {
     getElementStyle = function(element, attr) {
-      var style = fabric.document.defaultView.getComputedStyle(element, null);
-      return style ? style[attr] : undefined;
+      return fabric.document.defaultView.getComputedStyle(element, null)[attr];
     };
   }
   else {

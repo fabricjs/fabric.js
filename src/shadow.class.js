@@ -110,31 +110,23 @@
      * @return {String} SVG representation of a shadow
      */
     toSVG: function(object) {
-      var mode = 'SourceAlpha', fBoxX = 40, fBoxY = 40;
+      var mode = 'SourceAlpha';
 
       if (object && (object.fill === this.color || object.stroke === this.color)) {
         mode = 'SourceGraphic';
       }
 
-      if (object.width && object.height) {
-        //http://www.w3.org/TR/SVG/filters.html#FilterEffectsRegion
-        // we add some extra space to filter box to contain the blur ( 20 )
-        fBoxX = Math.abs(this.offsetX / object.getWidth()) * 100 + 20;
-        fBoxY = Math.abs(this.offsetY / object.getHeight()) * 100 + 20;
-      }
-
       return (
-        '<filter id="SVGID_' + this.id + '" y="-' + fBoxY + '%" height="' + (100 + 2 * fBoxY) + '%" ' +
-          'x="-' + fBoxX + '%" width="' + (100 + 2 * fBoxX) + '%" ' + '>\n' +
-          '\t<feGaussianBlur in="' + mode + '" stdDeviation="' +
+        '<filter id="SVGID_' + this.id + '" y="-40%" height="180%">' +
+          '<feGaussianBlur in="' + mode + '" stdDeviation="' +
             (this.blur ? this.blur / 3 : 0) +
-          '"></feGaussianBlur>\n' +
-          '\t<feOffset dx="' + this.offsetX + '" dy="' + this.offsetY + '"></feOffset>\n' +
-          '\t<feMerge>\n' +
-            '\t\t<feMergeNode></feMergeNode>\n' +
-            '\t\t<feMergeNode in="SourceGraphic"></feMergeNode>\n' +
-          '\t</feMerge>\n' +
-        '</filter>\n');
+          '"></feGaussianBlur>' +
+          '<feOffset dx="' + this.offsetX + '" dy="' + this.offsetY + '"></feOffset>' +
+          '<feMerge>' +
+            '<feMergeNode></feMergeNode>' +
+            '<feMergeNode in="SourceGraphic"></feMergeNode>' +
+          '</feMerge>' +
+        '</filter>');
     },
     /* _TO_SVG_END_ */
 

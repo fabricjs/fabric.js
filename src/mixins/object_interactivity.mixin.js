@@ -1,4 +1,4 @@
-(function() {
+(function(){
 
   var degreesToRadians = fabric.util.degreesToRadians,
       //jscs:disable requireCamelCaseOrUpperCaseIdentifiers

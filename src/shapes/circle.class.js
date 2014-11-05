@@ -2,8 +2,8 @@
 
   'use strict';
 
-  var fabric = global.fabric || (global.fabric = { }),
-      pi = Math.PI,
+  var fabric  = global.fabric || (global.fabric = { }),
+      piBy2   = Math.PI * 2,
       extend = fabric.util.object.extend;
 
   if (fabric.Circle) {
@@ -34,20 +34,6 @@
     radius: 0,
 
     /**
-     * Start angle of the circle, moving clockwise
-     * @type Number
-     * @default 0
-     */
-    startAngle: 0,
-
-    /**
-     * End angle of the circle
-     * @type Number
-     * @default 2Pi
-     */
-    endAngle: pi * 2,
-
-    /**
      * Constructor
      * @param {Object} [options] Options object
      * @return {fabric.Circle} thisArg
@@ -57,8 +43,6 @@
 
       this.callSuper('initialize', options);
       this.set('radius', options.radius || 0);
-      this.startAngle = options.startAngle || this.startAngle;
-      this.endAngle = options.endAngle || this.endAngle;
     },
 
     /**
@@ -84,9 +68,7 @@
      */
     toObject: function(propertiesToInclude) {
       return extend(this.callSuper('toObject', propertiesToInclude), {
-        radius: this.get('radius'),
-        startAngle: this.startAngle,
-        endAngle: this.endAngle
+        radius: this.get('radius')
       });
     },
 
@@ -97,41 +79,20 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var markup = this._createBaseSVGMarkup(), x = 0, y = 0,
-      angle = (this.endAngle - this.startAngle) % ( 2 * pi);
-
-      if (angle === 0) {
-        if (this.group && this.group.type === 'path-group') {
-          x = this.left + this.radius;
-          y = this.top + this.radius;
-        }
-        markup.push(
-          '<circle ',
-            'cx="' + x + '" cy="' + y + '" ',
-            'r="', this.radius,
-            '" style="', this.getSvgStyles(),
-            '" transform="', this.getSvgTransform(),
-            ' ', this.getSvgTransformMatrix(),
-          '"/>\n'
-        );
+      var markup = this._createBaseSVGMarkup(), x = 0, y = 0;
+      if (this.group) {
+        x = this.left + this.radius;
+        y = this.top + this.radius;
       }
-      else {
-        var startX = Math.cos(this.startAngle) * this.radius,
-            startY = Math.sin(this.startAngle) * this.radius,
-            endX = Math.cos(this.endAngle) * this.radius,
-            endY = Math.sin(this.endAngle) * this.radius,
-            largeFlag = angle > pi ? '1' : '0';
-
-        markup.push(
-          '<path d="M ' + startX + ' ' + startY,
-          ' A ' + this.radius + ' ' + this.radius,
-          ' 0 ', + largeFlag + ' 1', ' ' + endX + ' ' + endY,
+      markup.push(
+        '<circle ',
+          'cx="' + x + '" cy="' + y + '" ',
+          'r="', this.radius,
           '" style="', this.getSvgStyles(),
           '" transform="', this.getSvgTransform(),
           ' ', this.getSvgTransformMatrix(),
-          '"/>\n'
-        );
-      }
+        '"/>\n'
+      );
 
       return reviver ? reviver(markup.join('')) : markup.join('');
     },
@@ -144,11 +105,7 @@
      */
     _render: function(ctx, noTransform) {
       ctx.beginPath();
-      ctx.arc(noTransform ? this.left + this.radius : 0,
-              noTransform ? this.top + this.radius : 0,
-              this.radius,
-              this.startAngle,
-              this.endAngle, false);
+      ctx.arc(noTransform ? this.left + this.radius : 0, noTransform ? this.top + this.radius : 0, this.radius, 0, piBy2, false);
       this._renderFill(ctx);
       this._renderStroke(ctx);
     },

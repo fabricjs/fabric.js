@@ -2,7 +2,7 @@
     "requireCurlyBraces": [ "if", "else", "for", "while", "do", "switch", "return", "try", "catch"],
     "requireSpaceAfterKeywords": ["if", "else", "for", "while", "do", "switch", "return", "try", "catch"],
     "requireSpaceBeforeBinaryOperators": ["+", "-", "*", "=", "==", "===", "!=", "!=="],
-    "requireSpaceAfterBinaryOperators": ["+", "-", "*", "=", "==", "===", "!=", "!==", ","],
+    "requireSpaceAfterBinaryOperators": ["+", "-", "*", "=", "==", "===", "!=", "!=="],
 
     "requireParenthesesAroundIIFE": true,
     "requireSpacesInsideObjectBrackets": "all",
@@ -13,9 +13,6 @@
     "requireCapitalizedConstructors": true,
     "requireDotNotation": true,
     "requireMultipleVarDecl": true,
-    "requireSpacesInFunction": {
-      "beforeOpeningCurlyBrace": true
-    },
 
     "disallowEmptyBlocks": true,
     "disallowQuotedKeysInObjects": "allButReserved",
@@ -39,7 +36,5 @@
     "validateJSDoc": {
       "checkParamNames": true,
       "requireParamTypes": true
-    },
-
-    "maximumLineLength": { "value": 120, "allowComments": true, "allowRegex": true }
+    }
 }
