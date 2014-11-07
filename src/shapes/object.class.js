@@ -1061,7 +1061,7 @@
         return;
       }
 
-      var mult = this.canvas._currentMultiplier || 1;
+      var mult = (this.canvas && this.canvas._currentMultiplier) || 1;
 
       ctx.shadowColor = this.shadow.color;
       ctx.shadowBlur = this.shadow.blur * mult * (this.scaleX + this.scaleY) / 2;
