@@ -526,7 +526,7 @@
       if (this.isDrawingMode) {
         this._onMouseMoveInDrawingMode(e);
         return;
-      }      
+      }
       if (typeof e.touches !== 'undefined' && e.touches.length > 1) {
         return;
       }

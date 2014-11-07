@@ -16,7 +16,6 @@
     /**
      * Method that defines actions when an Event.js gesture is detected on an object. Currently only supports
      * 2 finger gestures.
-     * 
      * @param {Event} e Event object by Event.js
      * @param {Event} self Event proxy object by Event.js
      */
@@ -50,7 +49,7 @@
 
       var self = this.__gesturesParams.self,
               t = this._currentTransform;
-      
+
       t.action = 'scale';
       t.originX = t.originY = 'center';
       this._setOriginToCenter(t.target);
@@ -101,8 +100,8 @@
     /**
      * Method that defines actions when an Event.js longpress event is detected.
      *
-     * @param e Event object by Event.js
-     * @param self Event proxy object by Event.js
+     * @param {Event} e Event object by Event.js
+     * @param {Event} self Event proxy object by Event.js
      */
     __onLongPress: function(e, self) {
       this.fire('touch:longpress', {
@@ -149,8 +148,9 @@
     _rotateObjectByAngle: function(curAngle) {
       var t = this._currentTransform;
 
-      if (t.target.get('lockRotation'))
+      if (t.target.get('lockRotation')) {
         return;
+      }
       t.target.angle = radiansToDegrees(degreesToRadians(curAngle) + t.theta);
     }
   });
