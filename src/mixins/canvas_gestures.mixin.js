@@ -1,5 +1,5 @@
 /**
- * Adds support for multi-touch gestures using the Event.js library. 
+ * Adds support for multi-touch gestures using the Event.js library.
  * Fires the following custom events:
  * - touch:gesture
  * - touch:drag
@@ -16,9 +16,9 @@
     /**
      * Method that defines actions when an Event.js gesture is detected on an object. Currently only supports
      * 2 finger gestures.
-     *
-     * @param e Event object by Event.js
-     * @param self Event proxy object by Event.js
+     * 
+     * @param {Event} e Event object by Event.js
+     * @param {Event} self Event proxy object by Event.js
      */
     __onTransformGesture: function(e, self) {
 
@@ -29,15 +29,17 @@
       var target = this.findTarget(e);
       if ('undefined' !== typeof target) {
         this.__gesturesParams = {
-          'e': e,
-          'self': self,
-          'target': target
+          e: e,
+          self: self,
+          target: target
         };
 
         this.__gesturesRenderer();
       }
 
-      this.fire('touch:gesture', {target: target, e: e, self: self});
+      this.fire('touch:gesture', {
+        target: target, e: e, self: self
+      });
     },
     __gesturesParams: null,
     __gesturesRenderer: function() {
@@ -46,9 +48,9 @@
         return;
       }
 
-      var self = this.__gesturesParams.self;
-
-      var t = this._currentTransform;
+      var self = this.__gesturesParams.self,
+              t = this._currentTransform;
+      
       t.action = 'scale';
       t.originX = t.originY = 'center';
       this._setOriginToCenter(t.target);
@@ -66,29 +68,35 @@
     /**
      * Method that defines actions when an Event.js drag is detected.
      *
-     * @param e Event object by Event.js
-     * @param self Event proxy object by Event.js
+     * @param {Event} e Event object by Event.js
+     * @param {Event} self Event proxy object by Event.js
      */
     __onDrag: function(e, self) {
-      this.fire('touch:drag', {e: e, self: self});
+      this.fire('touch:drag', {
+        e: e, self: self
+      });
     },
     /**
      * Method that defines actions when an Event.js orientation event is detected.
      *
-     * @param e Event object by Event.js
-     * @param self Event proxy object by Event.js
+     * @param {Event} e Event object by Event.js
+     * @param {Event} self Event proxy object by Event.js
      */
     __onOrientationChange: function(e, self) {
-      this.fire('touch:orientation', {e: e, self: self});
+      this.fire('touch:orientation', {
+        e: e, self: self
+      });
     },
     /**
      * Method that defines actions when an Event.js shake event is detected.
      *
-     * @param e Event object by Event.js
-     * @param self Event proxy object by Event.js
+     * @param {Event} e Event object by Event.js
+     * @param {Event} self Event proxy object by Event.js
      */
     __onShake: function(e, self) {
-      this.fire('touch:shake', {e: e, self: self});
+      this.fire('touch:shake', {
+        e: e, self: self
+      });
     },
     /**
      * Method that defines actions when an Event.js longpress event is detected.
@@ -97,12 +105,14 @@
      * @param self Event proxy object by Event.js
      */
     __onLongPress: function(e, self) {
-      this.fire('touch:longpress', {e: e, self: self});
+      this.fire('touch:longpress', {
+        e: e, self: self
+      });
     },
     /**
      * Scales an object by a factor
-     * @param s {Number} The scale factor to apply to the current scale level
-     * @param by {String} Either 'x' or 'y' - specifies dimension constraint by which to scale an object.
+     * @param {Number} s The scale factor to apply to the current scale level
+     * @param {String} by Either 'x' or 'y' - specifies dimension constraint by which to scale an object.
      *                    When not provided, an object is scaled by both dimensions equally
      */
     _scaleObjectBy: function(s, by) {
@@ -111,8 +121,9 @@
               lockScalingX = target.get('lockScalingX'),
               lockScalingY = target.get('lockScalingY');
 
-      if (lockScalingX && lockScalingY)
+      if (lockScalingX && lockScalingY) {
         return;
+      }
 
       target._scaling = true;
 
@@ -133,7 +144,7 @@
     },
     /**
      * Rotates object by an angle
-     * @param curAngle {Number} the angle of rotation in degrees
+     * @param {Number} curAngle The angle of rotation in degrees
      */
     _rotateObjectByAngle: function(curAngle) {
       var t = this._currentTransform;

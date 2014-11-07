@@ -1,4 +1,4 @@
-(function(){
+(function() {
 
   var cursorOffset = {
     mt: 0, // n
@@ -128,8 +128,8 @@
      * @param {Event} [e] Event object fired on Event.js orientation change
      * @param {Event} [self] Inner Event object
      */
-    _onOrientationChange: function(e,self) {
-      this.__onOrientationChange && this.__onOrientationChange(e,self);
+    _onOrientationChange: function(e, self) {
+      this.__onOrientationChange && this.__onOrientationChange(e, self);
     },
 
     /**
@@ -138,16 +138,15 @@
      * @param {Event} [self] Inner Event object
      */
     _onShake: function(e, self) {
-      this.__onShake && this.__onShake(e,self);
+      this.__onShake && this.__onShake(e, self);
     },
-    
     /**
      * @private
      * @param {Event} [e] Event object fired on Event.js shake
      * @param {Event} [self] Inner Event object
      */
     _onLongPress: function(e, self) {
-        this.__onLongPress && this.__onLongPress(e,self);
+      this.__onLongPress && this.__onLongPress(e, self);
     },
 
     /**
@@ -527,8 +526,7 @@
       if (this.isDrawingMode) {
         this._onMouseMoveInDrawingMode(e);
         return;
-      }
-      
+      }      
       if (typeof e.touches !== 'undefined' && e.touches.length > 1) {
         return;
       }
