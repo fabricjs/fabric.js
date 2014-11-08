@@ -21,13 +21,9 @@
      */
     __onTransformGesture: function(e, self) {
 
-         var target = this.findTarget(e);
-         if ('undefined' !== typeof target) {
-           this.__gesturesParams = {
-             'e': e,
-             'self': self,
-             'target': target
-           };
+      if (this.isDrawingMode || !e.touches || e.touches.length !== 2 || 'gesture' !== self.gesture) {
+        return;
+      }
 
       var target = this.findTarget(e);
       if ('undefined' !== typeof target) {
@@ -124,14 +120,11 @@
               lockScalingX = target.get('lockScalingX'),
               lockScalingY = target.get('lockScalingY');
 
-//            console.log('__gesturesRenderer', new Date().getTime(), this._currentTransform, e, target);
+      if (lockScalingX && lockScalingY) {
+        return;
+      }
 
-         var t = this._currentTransform;
-         t.action = 'scale';
-//            if(this._shouldCenterTransform(e, target)) {
-         t.originX = t.originY = 'center';
-         this._setOriginToCenter(t.target);
-//            }
+      target._scaling = true;
 
       var constraintPosition = target.translateToOriginPoint(target.getCenterPoint(), t.originX, t.originY);
 
@@ -155,86 +148,10 @@
     _rotateObjectByAngle: function(curAngle) {
       var t = this._currentTransform;
 
-         this.renderAll();
-         t.action = 'drag';
-
-         //this.__gesturesParams = null;
-       },
-       /**
-        * Method that defines actions when an Event.js drag is detected.
-        *
-        * @param e Event object by Event.js
-        * @param self Event proxy object by Event.js
-        */
-       __onDrag: function(e, self) {
-         this.fire('touch:drag', {e: e, self: self});
-       },
-       /**
-        * Method that defines actions when an Event.js orientation event is detected.
-        *
-        * @param e Event object by Event.js
-        * @param self Event proxy object by Event.js
-        */
-       __onOrientationChange: function(e, self) {
-         this.fire('touch:orientation', {e: e, self: self});
-       },
-       /**
-        * Method that defines actions when an Event.js shake event is detected.
-        *
-        * @param e Event object by Event.js
-        * @param self Event proxy object by Event.js
-        */
-       __onShake: function(e, self) {
-         this.fire('touch:shake', {e: e, self: self});
-       },
-       /**
-        * Scales an object by a factor
-        * @param s {Number} The scale factor to apply to the current scale level
-        * @param by {String} Either 'x' or 'y' - specifies dimension constraint by which to scale an object.
-        *                    When not provided, an object is scaled by both dimensions equally
-        */
-       _scaleObjectBy: function(s, by) {
-         var t = this._currentTransform,
-                 target = t.target,
-                 lockScalingX = target.get('lockScalingX'),
-                 lockScalingY = target.get('lockScalingY');
-
-         if (lockScalingX && lockScalingY)
-           return;
-
-         target._scaling = true;
-
-         var constraintPosition = target.translateToOriginPoint(target.getCenterPoint(), t.originX, t.originY);
-
-         if (!by) {
-           t.newScaleX = t.scaleX * s;
-           t.newScaleY = t.scaleY * s;
-           if (!lockScalingX) {
-             target.set('scaleX', t.scaleX * s);
-           }
-           if (!lockScalingY) {
-             target.set('scaleY', t.scaleY * s);
-           }
-         }
-//            else if (by === 'x' && !target.get('lockUniScaling')) {
-//                lockScalingX || target.set('scaleX', t.scaleX * s);
-//            }
-//            else if (by === 'y' && !target.get('lockUniScaling')) {
-//                lockScalingY || target.set('scaleY', t.scaleY * s);
-//            }
-
-         target.setPositionByOrigin(constraintPosition, t.originX, t.originY);
-       },
-       /**
-        * Rotates object by an angle
-        * @param curAngle {Number} the angle of rotation in degrees
-        */
-       _rotateObjectByAngle: function(curAngle) {
-         var t = this._currentTransform;
-
-         if (t.target.get('lockRotation'))
-           return;
-         t.target.angle = radiansToDegrees(degreesToRadians(curAngle) + t.theta);
-       }
-     });
-   })();
+      if (t.target.get('lockRotation')) {
+        return;
+      }
+      t.target.angle = radiansToDegrees(degreesToRadians(curAngle) + t.theta);
+    }
+  });
+})();
