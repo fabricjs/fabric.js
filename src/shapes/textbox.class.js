@@ -110,7 +110,7 @@
                words[0] = tmp.slice(0, -1);
                if (words.length > 1) {
                  words[1] = tmp.slice(-1) + words[1];
-               } 
+               }
                else {
                  words.push(tmp.slice(-1));
                }
@@ -118,7 +118,7 @@
 
              if (Math.ceil(ctx.measureText(line + words[0]).width) < maxWidth) {
                line += words.shift() + ' ';
-             } 
+             }
              else {
                lines.push(line);
                line = '';
@@ -238,14 +238,14 @@
          var lineIndex = 0,
                  linesBeforeCursor = [],
                  allLines = this._getTextLines(), temp = selectionStart;
-         
+
          while (temp >= 0) {
            if (lineIndex > allLines.length - 1) {
              break;
            }
            temp -= allLines[lineIndex].length;
            if (temp < 0) {
-             linesBeforeCursor[linesBeforeCursor.length] = allLines[lineIndex].slice(0, 
+             linesBeforeCursor[linesBeforeCursor.length] = allLines[lineIndex].slice(0,
              temp + allLines[lineIndex].length);
            }
            else {

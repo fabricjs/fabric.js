@@ -16,7 +16,7 @@
       }
     }
     else {
-      setObjectScaleOverridden.call(fabric.Canvas.prototype, localMouse, transform, 
+      setObjectScaleOverridden.call(fabric.Canvas.prototype, localMouse, transform,
         lockScalingX, lockScalingY, by, lockScalingFlip);
     }
   };
