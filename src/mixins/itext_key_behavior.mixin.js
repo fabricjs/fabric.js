@@ -180,7 +180,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
         textOnSameLineBeforeCursor = textLines[cursorLocation.lineIndex].slice(0, cursorLocation.charIndex),
         textOnSameLineAfterCursor = textLines[cursorLocation.lineIndex].slice(cursorLocation.charIndex),
-        textOnNextLine = cursorLocation.lineIndex === textLines.length - 1 ? '' : textLines[cursorLocation.lineIndex + 1];
+        textOnNextLine = cursorLocation.lineIndex === textLines.length - 1 ? '' :
+          textLines[cursorLocation.lineIndex + 1];
 
     // if on last line, down cursor goes to end of line
     if (cursorLocation.lineIndex === textLines.length - 1 || e.metaKey || e.keyCode === 34) {
