@@ -165,12 +165,15 @@
      * @return {fabric.Path} Path to add on canvas
      */
     createPath: function(pathData) {
-      var path = new fabric.Path(pathData);
-      path.fill = null;
-      path.stroke = this.color;
-      path.strokeWidth = this.width;
-      path.strokeLineCap = this.strokeLineCap;
-      path.strokeLineJoin = this.strokeLineJoin;
+      var path = new fabric.Path(pathData, {
+                   fill: null,
+                   stroke: this.color,
+                   strokeWidth: this.width,
+                   strokeLineCap: this.strokeLineCap,
+                   strokeLineJoin: this.strokeLineJoin,
+                   originX: 'center',
+                   originY: 'center'
+                 });
 
       if (this.shadow) {
         this.shadow.affectStroke = true;

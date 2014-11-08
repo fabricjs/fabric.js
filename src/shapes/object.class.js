@@ -1061,10 +1061,12 @@
         return;
       }
 
+      var mult = (this.canvas && this.canvas._currentMultiplier) || 1;
+
       ctx.shadowColor = this.shadow.color;
-      ctx.shadowBlur = this.shadow.blur;
-      ctx.shadowOffsetX = this.shadow.offsetX;
-      ctx.shadowOffsetY = this.shadow.offsetY;
+      ctx.shadowBlur = this.shadow.blur * mult * (this.scaleX + this.scaleY) / 2;
+      ctx.shadowOffsetX = this.shadow.offsetX * mult * this.scaleX;
+      ctx.shadowOffsetY = this.shadow.offsetY * mult * this.scaleY;
     },
 
     /**

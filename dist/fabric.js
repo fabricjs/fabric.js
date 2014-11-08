@@ -15,7 +15,11 @@ else {
   fabric.document = require("jsdom")
     .jsdom("<!DOCTYPE html><html><head></head><body></body></html>");
 
-  fabric.window = fabric.document.createWindow();
+  if (fabric.document.createWindow) {
+    fabric.window = fabric.document.createWindow();
+  } else {
+    fabric.window = fabric.document.parentWindow;
+  }
 }
 
 /**
@@ -30,7 +34,6 @@ fabric.isTouchSupported = "ontouchstart" in fabric.document.documentElement;
  */
 fabric.isLikelyNode = typeof Buffer !== 'undefined' &&
                       typeof window === 'undefined';
-
 
 /**
  * Attributes parsed from all SVG elements
@@ -50,6 +53,7 @@ fabric.SHARED_ATTRIBUTES = [
  * Pixel per Inch as a default value set to 96. Can be changed for more realistic conversion.
  */
 fabric.DPI = 96;
+fabric.reNum = '(?:[-+]?(?:\\d+|\\d*\\.\\d+)(?:e[-+]?\\d+)?)';
 
 
 (function() {
@@ -466,10 +470,12 @@ fabric.Collection = {
      * @param {Number|String} value number to operate on
      * @return {Number|String}
      */
-    parseUnit: function(value) {
+    parseUnit: function(value, fontSize) {
       var unit = /\D{0,2}$/.exec(value),
           number = parseFloat(value);
-
+      if (!fontSize) {
+        fontSize = fabric.Text.DEFAULT_SVG_FONT_SIZE;
+      }
       switch (unit[0]) {
         case 'mm':
           return number * fabric.DPI / 25.4;
@@ -485,6 +491,9 @@ fabric.Collection = {
 
         case 'pc':
           return number * fabric.DPI / 72 * 12; // or * 16
+
+        case 'em':
+          return number * fontSize;
 
         default:
           return number;
@@ -2871,7 +2880,7 @@ if (typeof console !== 'undefined') {
     return attr;
   }
 
-  function normalizeValue(attr, value, parentAttributes) {
+  function normalizeValue(attr, value, parentAttributes, fontSize) {
     var isArray = Object.prototype.toString.call(value) === '[object Array]',
         parsed;
 
@@ -2903,7 +2912,7 @@ if (typeof console !== 'undefined') {
       value = value === 'start' ? 'left' : value === 'end' ? 'right' : 'center';
     }
     else {
-      parsed = isArray ? value.map(parseUnit) : parseUnit(value);
+      parsed = isArray ? value.map(parseUnit) : parseUnit(value, fontSize);
     }
 
     return (!isArray && isNaN(parsed) ? value : parsed);
@@ -2982,7 +2991,7 @@ if (typeof console !== 'undefined') {
         ],
 
         // == begin transform regexp
-        number = '(?:[-+]?(?:\\d+|\\d*\\.\\d+)(?:e[-+]?\\d+)?)',
+        number = fabric.reNum,
 
         commaWsp = '(?:\\s+,?\\s*|,\\s*)',
 
@@ -3085,40 +3094,6 @@ if (typeof console !== 'undefined') {
     };
   })();
 
-  function parseFontDeclaration(value, oStyle) {
-
-    // TODO: support non-px font size
-    var match = value.match(/(normal|italic)?\s*(normal|small-caps)?\s*(normal|bold|bolder|lighter|100|200|300|400|500|600|700|800|900)?\s*(\d+)px(?:\/(normal|[\d\.]+))?\s+(.*)/);
-
-    if (!match) {
-      return;
-    }
-
-    var fontStyle = match[1],
-        // font variant is not used
-        // fontVariant = match[2],
-        fontWeight = match[3],
-        fontSize = match[4],
-        lineHeight = match[5],
-        fontFamily = match[6];
-
-    if (fontStyle) {
-      oStyle.fontStyle = fontStyle;
-    }
-    if (fontWeight) {
-      oStyle.fontWeight = isNaN(parseFloat(fontWeight)) ? fontWeight : parseFloat(fontWeight);
-    }
-    if (fontSize) {
-      oStyle.fontSize = parseFloat(fontSize);
-    }
-    if (fontFamily) {
-      oStyle.fontFamily = fontFamily;
-    }
-    if (lineHeight) {
-      oStyle.lineHeight = lineHeight === 'normal' ? 1 : lineHeight;
-    }
-  }
-
   /**
    * @private
    */
@@ -3130,12 +3105,7 @@ if (typeof console !== 'undefined') {
       attr = normalizeAttr(pair[0].trim().toLowerCase());
       value = normalizeValue(attr, pair[1].trim());
 
-      if (attr === 'font') {
-        parseFontDeclaration(value, oStyle);
-      }
-      else {
-        oStyle[attr] = value;
-      }
+      oStyle[attr] = value;
     });
   }
 
@@ -3152,12 +3122,7 @@ if (typeof console !== 'undefined') {
       attr = normalizeAttr(prop.toLowerCase());
       value = normalizeValue(attr, style[prop]);
 
-      if (attr === 'font') {
-        parseFontDeclaration(value, oStyle);
-      }
-      else {
-        oStyle[attr] = value;
-      }
+      oStyle[attr] = value;
     }
   }
 
@@ -3236,7 +3201,7 @@ if (typeof console !== 'undefined') {
           x = el.getAttribute('x') || 0,
           y = el.getAttribute('y') || 0,
           el2 = doc.getElementById(xlink).cloneNode(true),
-          currentTrans = (el.getAttribute('transform') || '') + ' translate(' + x + ', ' + y + ')',
+          currentTrans = (el2.getAttribute('transform') || '') + ' translate(' + x + ', ' + y + ')',
           parentNode;
 
       for (var j = 0, attrs = el.attributes, l = attrs.length; j < l; j++) {
@@ -3246,7 +3211,7 @@ if (typeof console !== 'undefined') {
         }
 
         if (attr.nodeName === 'transform') {
-          currentTrans = currentTrans + ' ' + attr.nodeValue;
+          currentTrans = attr.nodeValue + ' ' + currentTrans;
         }
         else {
           el2.setAttribute(attr.nodeName, attr.nodeValue);
@@ -3254,6 +3219,7 @@ if (typeof console !== 'undefined') {
       }
 
       el2.setAttribute('transform', currentTrans);
+      el2.setAttribute('instantiated_by_use', '1');
       el2.removeAttribute('id');
       parentNode = el.parentNode;
       parentNode.replaceChild(el2, el);
@@ -3261,28 +3227,67 @@ if (typeof console !== 'undefined') {
   }
 
   /**
-   * Add a <g> element that envelop all SCG elements and makes the viewbox transformMatrix descend on all elements
+   * Add a <g> element that envelop all child elements and makes the viewbox transformMatrix descend on all elements
    */
-  function addSvgTransform(doc, matrix) {
-    matrix[3] = matrix[0] = (matrix[0] > matrix[3] ? matrix[3] : matrix[0]);
-    if (!(matrix[0] !== 1 || matrix[3] !== 1 || matrix[4] !== 0 || matrix[5] !== 0)) {
+  function addVBTransform(element, widthAttr, heightAttr) {
+
+    // http://www.w3.org/TR/SVG/coords.html#ViewBoxAttribute
+    // matches, e.g.: +14.56e-12, etc.
+    var reViewBoxAttrValue = new RegExp(
+          '^' +
+          '\\s*(' + fabric.reNum + '+)\\s*,?' +
+          '\\s*(' + fabric.reNum + '+)\\s*,?' +
+          '\\s*(' + fabric.reNum + '+)\\s*,?' +
+          '\\s*(' + fabric.reNum + '+)\\s*' +
+          '$'
+        ),
+        viewBoxAttr = element.getAttribute('viewBox'),
+        scaleX = 1, scaleY = 1, minX = 0, minY = 0,
+        viewBoxWidth, viewBoxHeight, matrix, el;
+
+    if (viewBoxAttr && (viewBoxAttr = viewBoxAttr.match(reViewBoxAttrValue))) {
+      minX = -parseFloat(viewBoxAttr[1]),
+      minY = -parseFloat(viewBoxAttr[2]),
+      viewBoxWidth = parseFloat(viewBoxAttr[3]),
+      viewBoxHeight = parseFloat(viewBoxAttr[4]);
+    }
+    else {
       return;
     }
+    if (widthAttr && widthAttr !== viewBoxWidth) {
+      scaleX = widthAttr / viewBoxWidth;
+    }
+    if (heightAttr && heightAttr !== viewBoxHeight) {
+      scaleY = heightAttr / viewBoxHeight;
+    }
+
     // default is to preserve aspect ratio
     // preserveAspectRatio attribute to be implemented
-    var el = doc.ownerDocument.createElement('g');
-    while (doc.firstChild != null) {
-      el.appendChild(doc.firstChild);
-    }
-    el.setAttribute('transform',
-      'matrix(' + matrix[0] + ' ' +
-                  matrix[1] + ' ' +
-                  matrix[2] + ' ' +
-                  matrix[3] + ' ' +
-                  matrix[4] + ' ' +
-                  matrix[5] + ')');
+    scaleY = scaleX = (scaleX > scaleY ? scaleY : scaleX);
 
-    doc.appendChild(el);
+    if (!(scaleX !== 1 || scaleY !== 1 || minX !== 0 || minY !== 0)) {
+      return;
+    }
+    matrix = 'matrix(' + scaleX +
+                  ' 0' +
+                  ' 0 ' +
+                  scaleY + ' ' +
+                  (minX * scaleX) + ' ' +
+                  (minY * scaleY) + ')';
+
+    if (element.tagName === 'svg') {
+      el = element.ownerDocument.createElement('g');
+      while (element.firstChild != null) {
+        el.appendChild(element.firstChild);
+      }
+      element.appendChild(el);
+    }
+    else {
+      el = element;
+      matrix += el.getAttribute('transform');
+    }
+
+    el.setAttribute('transform', matrix);
   }
 
   /**
@@ -3297,25 +3302,11 @@ if (typeof console !== 'undefined') {
   fabric.parseSVGDocument = (function() {
 
     var reAllowedSVGTagNames = /^(path|circle|polygon|polyline|ellipse|rect|line|image|text)$/,
-
-        // http://www.w3.org/TR/SVG/coords.html#ViewBoxAttribute
-        // \d doesn't quite cut it (as we need to match an actual float number)
-
-        // matches, e.g.: +14.56e-12, etc.
-        reNum = '(?:[-+]?(?:\\d+|\\d*\\.\\d+)(?:e[-+]?\\d+)?)',
-
-        reViewBoxAttrValue = new RegExp(
-          '^' +
-          '\\s*(' + reNum + '+)\\s*,?' +
-          '\\s*(' + reNum + '+)\\s*,?' +
-          '\\s*(' + reNum + '+)\\s*,?' +
-          '\\s*(' + reNum + '+)\\s*' +
-          '$'
-        );
+        reViewBoxTagNames = /^(symbol|image|marker|pattern|view)$/;
 
     function hasAncestorWithNodeName(element, nodeName) {
       while (element && (element = element.parentNode)) {
-        if (nodeName.test(element.nodeName)) {
+        if (nodeName.test(element.nodeName) && !element.getAttribute('instantiated_by_use')) {
           return true;
         }
       }
@@ -3326,34 +3317,19 @@ if (typeof console !== 'undefined') {
       if (!doc) {
         return;
       }
-      var startTime = new Date(),
-          svgUid =  fabric.Object.__uid++;
 
       parseUseDirectives(doc);
+
+      var startTime = new Date(),
+          svgUid =  fabric.Object.__uid++,
       /* http://www.w3.org/TR/SVG/struct.html#SVGElementWidthAttribute
       *  as per spec, width and height attributes are to be considered
       *  100% if no value is specified.
       */
-      var viewBoxAttr = doc.getAttribute('viewBox'),
           widthAttr = parseUnit(doc.getAttribute('width') || '100%'),
-          heightAttr = parseUnit(doc.getAttribute('height') || '100%'),
-          viewBoxWidth,
-          viewBoxHeight;
+          heightAttr = parseUnit(doc.getAttribute('height') || '100%');
 
-      if (viewBoxAttr && (viewBoxAttr = viewBoxAttr.match(reViewBoxAttrValue))) {
-        var minX = parseFloat(viewBoxAttr[1]),
-            minY = parseFloat(viewBoxAttr[2]),
-            scaleX = 1, scaleY = 1;
-        viewBoxWidth = parseFloat(viewBoxAttr[3]);
-        viewBoxHeight = parseFloat(viewBoxAttr[4]);
-        if (widthAttr && widthAttr !== viewBoxWidth ) {
-          scaleX = widthAttr / viewBoxWidth;
-        }
-        if (heightAttr && heightAttr !== viewBoxHeight) {
-          scaleY = heightAttr / viewBoxHeight;
-        }
-        addSvgTransform(doc, [scaleX, 0, 0, scaleY, scaleX * -minX, scaleY * -minY]);
-      }
+      addVBTransform(doc, widthAttr, heightAttr);
 
       var descendants = fabric.util.toArray(doc.getElementsByTagName('*'));
 
@@ -3369,8 +3345,9 @@ if (typeof console !== 'undefined') {
       }
 
       var elements = descendants.filter(function(el) {
+        reViewBoxTagNames.test(el.tagName) && addVBTransform(el, 0, 0);
         return reAllowedSVGTagNames.test(el.tagName) &&
-              !hasAncestorWithNodeName(el, /^(?:pattern|defs)$/); // http://www.w3.org/TR/SVG/struct.html#DefsElement
+              !hasAncestorWithNodeName(el, /^(?:pattern|defs|symbol)$/); // http://www.w3.org/TR/SVG/struct.html#DefsElement
       });
 
       if (!elements || (elements && !elements.length)) {
@@ -3379,8 +3356,8 @@ if (typeof console !== 'undefined') {
       }
 
       var options = {
-        width: widthAttr ? widthAttr : viewBoxWidth,
-        height: heightAttr ? heightAttr : viewBoxHeight,
+        width: widthAttr,
+        height: heightAttr,
         widthAttr: widthAttr,
         heightAttr: heightAttr,
         svgUid: svgUid
@@ -3389,7 +3366,6 @@ if (typeof console !== 'undefined') {
       fabric.gradientDefs[svgUid] = fabric.getGradientDefs(doc);
       fabric.cssRules[svgUid] = fabric.getCSSRules(doc);
       // Precedence of rules:   style > class > attribute
-
       fabric.parseElements(elements, function(instances) {
         fabric.documentParsingTime = new Date() - startTime;
         if (callback) {
@@ -3457,6 +3433,48 @@ if (typeof console !== 'undefined') {
   }
 
   extend(fabric, {
+    /**
+     * Parses a short font declaration, building adding its properties to a style object
+     * @static
+     * @function
+     * @memberOf fabric
+     * @param {String} value font declaration
+     * @param {Object} oStyle definition
+     */
+    parseFontDeclaration: function(value, oStyle) {
+      var fontDeclaration = '(normal|italic)?\\s*(normal|small-caps)?\\s*'
+                            + '(normal|bold|bolder|lighter|100|200|300|400|500|600|700|800|900)?\\s*('
+                            + fabric.reNum
+                            + '(?:px|cm|mm|em|pt|pc|in)*)(?:\\/(normal|' + fabric.reNum + '))?\\s+(.*)',
+          match = value.match(fontDeclaration);
+
+      if (!match) {
+        return;
+      }
+      var fontStyle = match[1],
+          // font variant is not used
+          // fontVariant = match[2],
+          fontWeight = match[3],
+          fontSize = match[4],
+          lineHeight = match[5],
+          fontFamily = match[6];
+
+      if (fontStyle) {
+        oStyle.fontStyle = fontStyle;
+      }
+      if (fontWeight) {
+        oStyle.fontWeight = isNaN(parseFloat(fontWeight)) ? fontWeight : parseFloat(fontWeight);
+      }
+      if (fontSize) {
+        oStyle.fontSize = parseUnit(fontSize);
+      }
+      if (fontFamily) {
+        oStyle.fontFamily = fontFamily;
+      }
+      if (lineHeight) {
+        oStyle.lineHeight = lineHeight === 'normal' ? 1 : lineHeight;
+      }
+    },
 
     /**
      * Parses an SVG document, returning all of the gradient declarations found in it
@@ -3518,7 +3536,8 @@ if (typeof console !== 'undefined') {
       }
 
       var value,
-          parentAttributes = { };
+          parentAttributes = { },
+          fontSize;
 
       if (typeof svgUid === 'undefined') {
         svgUid = element.getAttribute('svgUid');
@@ -3527,12 +3546,14 @@ if (typeof console !== 'undefined') {
       if (element.parentNode && /^symbol|[g|a]$/i.test(element.parentNode.nodeName)) {
         parentAttributes = fabric.parseAttributes(element.parentNode, attributes, svgUid);
       }
+      fontSize = (parentAttributes && parentAttributes.fontSize ) ||
+                 element.getAttribute('font-size') || fabric.Text.DEFAULT_SVG_FONT_SIZE;
 
       var ownAttributes = attributes.reduce(function(memo, attr) {
         value = element.getAttribute(attr);
         if (value) {
           attr = normalizeAttr(attr);
-          value = normalizeValue(attr, value, parentAttributes);
+          value = normalizeValue(attr, value, parentAttributes, fontSize);
 
           memo[attr] = value;
         }
@@ -3543,7 +3564,9 @@ if (typeof console !== 'undefined') {
       // (see: http://www.w3.org/TR/SVG/styling.html#UsingPresentationAttributes)
       ownAttributes = extend(ownAttributes,
         extend(getGlobalStylesForElement(element, svgUid), fabric.parseStyleAttribute(element)));
-
+      if (ownAttributes.font) {
+        fabric.parseFontDeclaration(ownAttributes.font, ownAttributes);
+      }
       return _setStrokeFillOpacity(extend(parentAttributes, ownAttributes));
     },
 
@@ -3660,7 +3683,11 @@ if (typeof console !== 'undefined') {
           }
           rule = match[1];
           rule.split(',').forEach(function(_rule) {
-            allRules[_rule.trim()] = fabric.util.object.clone(ruleObj);
+            _rule = _rule.replace(/^svg/i, '').trim();
+            if (_rule === '') {
+              return;
+            }
+            allRules[_rule] = fabric.util.object.clone(ruleObj);
           });
         });
       }
@@ -5356,8 +5383,15 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
     var patternSource = typeof this.source === 'function' ? this.source() : this.source,
         patternWidth = patternSource.width / object.getWidth(),
         patternHeight = patternSource.height / object.getHeight(),
+        patternOffsetX = this.offsetX / object.getWidth(),
+        patternOffsetY = this.offsetY / object.getHeight(),
         patternImgSrc = '';
-
+    if (this.repeat === 'repeat-x' || this.repeat === 'no-repeat') {
+      patternHeight = 1;
+    }
+    if (this.repeat === 'repeat-y' || this.repeat === 'no-repeat') {
+      patternWidth = 1;
+    }
     if (patternSource.src) {
       patternImgSrc = patternSource.src;
     }
@@ -5366,16 +5400,16 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
     }
 
     return '<pattern id="SVGID_' + this.id +
-                  '" x="' + this.offsetX +
-                  '" y="' + this.offsetY +
+                  '" x="' + patternOffsetX +
+                  '" y="' + patternOffsetY +
                   '" width="' + patternWidth +
-                  '" height="' + patternHeight + '">' +
+                  '" height="' + patternHeight + '">\n' +
              '<image x="0" y="0"' +
                     ' width="' + patternSource.width +
                     '" height="' + patternSource.height +
                     '" xlink:href="' + patternImgSrc +
-             '"></image>' +
-           '</pattern>';
+             '"></image>\n' +
+           '</pattern>\n';
   },
   /* _TO_SVG_END_ */
 
@@ -5520,23 +5554,31 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      * @return {String} SVG representation of a shadow
      */
     toSVG: function(object) {
-      var mode = 'SourceAlpha';
+      var mode = 'SourceAlpha', fBoxX = 40, fBoxY = 40;
 
       if (object && (object.fill === this.color || object.stroke === this.color)) {
         mode = 'SourceGraphic';
       }
 
+      if (object.width && object.height) {
+        //http://www.w3.org/TR/SVG/filters.html#FilterEffectsRegion
+        // we add some extra space to filter box to contain the blur ( 20 )
+        fBoxX = Math.abs(this.offsetX / object.getWidth()) * 100 + 20;
+        fBoxY = Math.abs(this.offsetY / object.getHeight()) * 100 + 20;
+      }
+
       return (
-        '<filter id="SVGID_' + this.id + '" y="-40%" height="180%">' +
-          '<feGaussianBlur in="' + mode + '" stdDeviation="' +
+        '<filter id="SVGID_' + this.id + '" y="-' + fBoxY + '%" height="' + (100 + 2 * fBoxY) + '%" ' +
+          'x="-' + fBoxX + '%" width="' + (100 + 2 * fBoxX) + '%" ' + '>\n' +
+          '\t<feGaussianBlur in="' + mode + '" stdDeviation="' +
             (this.blur ? this.blur / 3 : 0) +
-          '"></feGaussianBlur>' +
-          '<feOffset dx="' + this.offsetX + '" dy="' + this.offsetY + '"></feOffset>' +
-          '<feMerge>' +
-            '<feMergeNode></feMergeNode>' +
-            '<feMergeNode in="SourceGraphic"></feMergeNode>' +
-          '</feMerge>' +
-        '</filter>');
+          '"></feGaussianBlur>\n' +
+          '\t<feOffset dx="' + this.offsetX + '" dy="' + this.offsetY + '"></feOffset>\n' +
+          '\t<feMerge>\n' +
+            '\t\t<feMergeNode></feMergeNode>\n' +
+            '\t\t<feMergeNode in="SourceGraphic"></feMergeNode>\n' +
+          '\t</feMerge>\n' +
+        '</filter>\n');
     },
     /* _TO_SVG_END_ */
 
@@ -7398,12 +7440,15 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
      * @return {fabric.Path} Path to add on canvas
      */
     createPath: function(pathData) {
-      var path = new fabric.Path(pathData);
-      path.fill = null;
-      path.stroke = this.color;
-      path.strokeWidth = this.width;
-      path.strokeLineCap = this.strokeLineCap;
-      path.strokeLineJoin = this.strokeLineJoin;
+      var path = new fabric.Path(pathData, {
+                   fill: null,
+                   stroke: this.color,
+                   strokeWidth: this.width,
+                   strokeLineCap: this.strokeLineCap,
+                   strokeLineJoin: this.strokeLineJoin,
+                   originX: 'center',
+                   originY: 'center'
+                 });
 
       if (this.shadow) {
         this.shadow.affectStroke = true;
@@ -9050,6 +9095,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         Event.add(this.upperCanvasEl, 'drag', this._onDrag);
         Event.add(this.upperCanvasEl, 'orientation', this._onOrientationChange);
         Event.add(this.upperCanvasEl, 'shake', this._onShake);
+        Event.add(this.upperCanvasEl, 'longpress', this._onLongPress);
       }
     },
 
@@ -9064,6 +9110,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       this._onGesture = this._onGesture.bind(this);
       this._onDrag = this._onDrag.bind(this);
       this._onShake = this._onShake.bind(this);
+      this._onLongPress = this._onLongPress.bind(this);
       this._onOrientationChange = this._onOrientationChange.bind(this);
       this._onMouseWheel = this._onMouseWheel.bind(this);
     },
@@ -9086,6 +9133,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         Event.remove(this.upperCanvasEl, 'drag', this._onDrag);
         Event.remove(this.upperCanvasEl, 'orientation', this._onOrientationChange);
         Event.remove(this.upperCanvasEl, 'shake', this._onShake);
+        Event.remove(this.upperCanvasEl, 'longpress', this._onLongPress);
       }
     },
 
@@ -9132,6 +9180,14 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      */
     _onShake: function(e, self) {
       this.__onShake && this.__onShake(e, self);
+    },
+    /**
+     * @private
+     * @param {Event} [e] Event object fired on Event.js shake
+     * @param {Event} [self] Inner Event object
+     */
+    _onLongPress: function(e, self) {
+      this.__onLongPress && this.__onLongPress(e, self);
     },
 
     /**
@@ -9510,6 +9566,9 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
       if (this.isDrawingMode) {
         this._onMouseMoveInDrawingMode(e);
+        return;
+      }
+      if (typeof e.touches !== 'undefined' && e.touches.length > 1) {
         return;
       }
 
@@ -11413,10 +11472,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         return;
       }
 
+      var mult = (this.canvas && this.canvas._currentMultiplier) || 1;
+
       ctx.shadowColor = this.shadow.color;
-      ctx.shadowBlur = this.shadow.blur;
-      ctx.shadowOffsetX = this.shadow.offsetX;
-      ctx.shadowOffsetY = this.shadow.offsetY;
+      ctx.shadowBlur = this.shadow.blur * mult * (this.scaleX + this.scaleY) / 2;
+      ctx.shadowOffsetX = this.shadow.offsetX * mult * this.scaleX;
+      ctx.shadowOffsetY = this.shadow.offsetY * mult * this.scaleY;
     },
 
     /**
@@ -12455,10 +12516,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         h = strokeWidth;
       }
       if (strokeW) {
-        w += strokeWidth;
+        w += w > 0 ? strokeWidth : -strokeWidth;
       }
       if (strokeH) {
-        h += strokeWidth;
+        h += h > 0 ? strokeWidth : -strokeWidth;
       }
       this.currentWidth = w * this.scaleX;
       this.currentHeight = h * this.scaleY;
@@ -15253,8 +15314,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       this.minY = calcDim.top;
       this.width = calcDim.width;
       this.height = calcDim.height;
-      this.top = this.top || this.minY;
-      this.left = this.left || this.minX;
+      calcDim.left += this.originX === 'center' ? this.width / 2 : this.originX === 'right' ? this.width : 0;
+      calcDim.top += this.originY === 'center' ? this.height / 2 : this.originY === 'bottom' ? this.height : 0;
+      this.top = this.top || calcDim.top;
+      this.left = this.left || calcDim.left;
       this.pathOffset = this.pathOffset || {
         x: this.minX + this.width / 2,
         y: this.minY + this.height / 2
@@ -17127,7 +17190,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
     /**
      * Applies filters assigned to this image (from "filters" array)
-     * @mthod applyFilters
+     * @method applyFilters
      * @param {Function} callback Callback is invoked when all filters have been applied and new image is generated
      * @return {fabric.Image} thisArg
      * @chainable
@@ -17324,7 +17387,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @static
    * @see {@link http://www.w3.org/TR/SVG/struct.html#ImageElement}
    */
-  fabric.Image.ATTRIBUTE_NAMES = fabric.SHARED_ATTRIBUTES.concat('x y width height xlink:href'.split(' '));
+  fabric.Image.ATTRIBUTE_NAMES =
+    fabric.SHARED_ATTRIBUTES.concat('x y width height preserveAspectRatio xlink:href'.split(' '));
 
   /**
    * Returns {@link fabric.Image} instance from an SVG element
@@ -17335,8 +17399,29 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @return {fabric.Image} Instance of fabric.Image
    */
   fabric.Image.fromElement = function(element, callback, options) {
-    var parsedAttributes = fabric.parseAttributes(element, fabric.Image.ATTRIBUTE_NAMES);
+    var parsedAttributes = fabric.parseAttributes(element, fabric.Image.ATTRIBUTE_NAMES),
+        align = 'xMidYMid', meetOrSlice = 'meet', alignX, alignY, aspectRatioAttrs;
 
+    if (parsedAttributes.preserveAspectRatio) {
+      aspectRatioAttrs = parsedAttributes.preserveAspectRatio.split(' ');
+    }
+
+    if (aspectRatioAttrs && aspectRatioAttrs.length) {
+      meetOrSlice = aspectRatioAttrs.pop();
+      if (meetOrSlice !== 'meet' && meetOrSlice !== 'slice') {
+        align = meetOrSlice;
+        meetOrSlice = 'meet';
+      }
+      else if (aspectRatioAttrs.length) {
+        align = aspectRatioAttrs.pop();
+      }
+    }
+    //divide align in alignX and alignY
+    alignX = align !== 'none' ? align.slice(1, 4) : 'none';
+    alignY = align !== 'none' ? align.slice(5, 8) : 'none';
+    parsedAttributes.alignX = alignX;
+    parsedAttributes.alignY = alignY;
+    parsedAttributes.meetOrSlice = meetOrSlice;
     fabric.Image.fromURL(parsedAttributes['xlink:href'], callback,
       extend((options ? fabric.util.object.clone(options) : { }), parsedAttributes));
   };
@@ -19374,9 +19459,6 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @return {Number} Left offset
      */
     _getLeftOffset: function() {
-      if (fabric.isLikelyNode) {
-        return 0;
-      }
       return -this.width / 2;
     },
 
@@ -19691,7 +19773,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 
           textLeft = -(this.width/2),
           textTop = this.useNative
-            ? this.fontSize - 1
+            ? (this.fontSize * this.lineHeight - 0.25 * this.fontSize) // to lift by 1  / 4 of font height.
             : (this.height/2) - (textLines.length * this.fontSize) - this._totalLineHeight;
 
       return {
@@ -19936,6 +20018,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     var parsedAttributes = fabric.parseAttributes(element, fabric.Text.ATTRIBUTE_NAMES);
     options = fabric.util.object.extend((options ? fabric.util.object.clone(options) : { }), parsedAttributes);
 
+    options.top = options.top || 0;
+    options.left = options.left || 0;
     if ('dx' in parsedAttributes) {
       options.left += parsedAttributes.dx;
     }
@@ -19949,7 +20033,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     if (!options.originX) {
       options.originX = 'left';
     }
-
+    options.top += options.fontSize / 4;
     var text = new fabric.Text(element.textContent, options),
         /*
           Adjust positioning:
