@@ -258,18 +258,27 @@
      * @chainable
      */
     scale: function(value) {
-      value = this._constrainScale(value);
+        value = this._constrainScale(value);
 
-      if (value < 0) {
-        this.flipX = !this.flipX;
-        this.flipY = !this.flipY;
-        value *= -1;
-      }
+        var shouldCenterOrigin = (this.originX !== 'center' || this.originY !== 'center') && this.centeredScaling;
 
-      this.scaleX = value;
-      this.scaleY = value;
-      this.setCoords();
-      return this;
+        if (shouldCenterOrigin) {
+            this._setOriginToCenter();
+        }
+
+        if (value < 0) {
+            this.flipX = !this.flipX;
+            this.flipY = !this.flipY;
+            value *= -1;
+        }
+
+        this.scaleX = value;
+        this.scaleY = value;
+        this.setCoords();
+        if (shouldCenterOrigin) {
+            this._resetOrigin();
+        }
+        return this;
     },
 
     /**
