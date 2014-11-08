@@ -5,7 +5,7 @@
    * a Textbox doesn't scale text, it only changes width and makes text wrap automatically.
    */
   var setObjectScaleOverridden = fabric.Canvas.prototype._setObjectScale;
-  fabric.Canvas.prototype._setObjectScale = function(localMouse, transform, 
+  fabric.Canvas.prototype._setObjectScale = function(localMouse, transform,
     lockScalingX, lockScalingY, by, lockScalingFlip) {
 
     var t = transform.target;
