@@ -472,8 +472,8 @@
 
       }
 
-      this.text = this.text.slice(0, start) +
-                  this.text.slice(end);
+      this.set('text', this.text.slice(0, start) +
+                  this.text.slice(end));
     },
 
     /**
@@ -483,9 +483,9 @@
     insertChars: function(_chars) {
       var isEndOfLine = this.text.slice(this.selectionStart, this.selectionStart + 1) === '\n';
 
-      this.text = this.text.slice(0, this.selectionStart) +
+      this.set('text', this.text.slice(0, this.selectionStart) +
                     _chars +
-                  this.text.slice(this.selectionEnd);
+                  this.text.slice(this.selectionEnd));
 
       if (this.selectionStart === this.selectionEnd) {
         this.insertStyleObjects(_chars, isEndOfLine, this.copiedStyles);

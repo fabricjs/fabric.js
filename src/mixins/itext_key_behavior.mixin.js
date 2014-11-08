@@ -644,8 +644,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         this.removeStyleObject(isBeginningOfLine);
 
         this.selectionStart--;
-        this.text = this.text.slice(0, this.selectionStart) +
-                    this.text.slice(this.selectionStart + 1);
+        this.set('text', this.text.slice(0, this.selectionStart) +
+                    this.text.slice(this.selectionStart + 1));
       }
     }
   }

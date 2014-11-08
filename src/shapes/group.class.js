@@ -197,8 +197,9 @@
      * @private
      */
     _set: function(key, value) {
+      var i;
       if (key in this.delegatedProperties) {
-        var i = this._objects.length;
+        i = this._objects.length;
         this[key] = value;
         while (i--) {
           this._objects[i].set(key, value);
@@ -212,11 +213,11 @@
          * instead. Size of text in a Textbox must be controlled by fontSize.
          */
         if(key === 'scaleX') {
-          var i = this._objects.length, o;
+          i = this._objects.length;
           while (i--) {
-            o = this._objects[i];
+            var o = this._objects[i];
             if(o.type === 'textbox') {
-              o.set(key, 1/value);
+              o.set(key, Math.abs(1/value));
               o.set('width', (o.get('width') * value) / (typeof o.__oldScaleX === 'undefined' ? 1 : o.__oldScaleX));
               o.__oldScaleX = value;
             }
