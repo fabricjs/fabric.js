@@ -342,7 +342,7 @@
       }
       var textBeforeCursor = this.text.slice(0, selectionStart),
           linesBeforeCursor = textBeforeCursor.split(this._reNewline);
-          
+
       return {
         lineIndex: linesBeforeCursor.length - 1,
         charIndex: linesBeforeCursor[linesBeforeCursor.length - 1].length
@@ -417,7 +417,7 @@
 
           offsets = this._getCursorBoundariesOffsets(
                       chars, typeOfBoundaries, cursorLocation, textLines);
-      
+
       return {
         left: left,
         top: top,
@@ -450,8 +450,8 @@
           var index = lineIndex + (typeOfBoundaries === 'cursor' ? 1 : 0);
           topOffset += this._getCachedLineHeight(index);
 
-            lineIndex++;
-            charIndex = 0;
+          lineIndex++;
+          charIndex = 0;
         }
         else {
           leftOffset += this._getWidthOfChar(this.ctx, chars[i], lineIndex, charIndex);
@@ -460,7 +460,7 @@
 
         lineLeftOffset = this._getCachedLineOffset(lineIndex, textLines);
       }
-      
+
       this._clearCache();
 
       return {
@@ -1109,7 +1109,7 @@
     _getHeightOfLine: function(ctx, lineIndex, textLines) {
 
       textLines = textLines || this._getTextLines(ctx);
-      
+
       var maxHeight = this._getHeightOfChar(ctx, textLines[lineIndex][0], lineIndex, 0),
           line = textLines[lineIndex],
           chars = line.split('');
@@ -1121,7 +1121,7 @@
         }
       }
 
-        return maxHeight * this.lineHeight;
+      return maxHeight * this.lineHeight;
     },
 
     /**

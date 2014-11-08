@@ -6,11 +6,9 @@
       * and wraps lines automatically. Textboxes have their Y scaling locked, the
       * user can only change width. Height is adjusted automatically based on the
       * wrapping of lines.
-      * 
       * @class fabric.Textbox
       * @extends fabric.IText
       * @mixes fabric.Observable
-      * 
       * @return {fabric.Textbox} thisArg
       * @see {@link fabric.Textbox#initialize} for constructor definition
       */
@@ -34,7 +32,7 @@
        __cachedLines: null,
        /**
         * Constructor. Some scaling related property values are forced. Visibility
-        * of controls is also fixed; only the rotation and width controls are 
+        * of controls is also fixed; only the rotation and width controls are
         * made available.
         * @param {String} text Text string
         * @param {Object} [options] Options object
@@ -68,10 +66,9 @@
         * @returns {Array} Array of lines
         */
        _wrapText: function(ctx, text) {
-         var lines = text.split(this._reNewline);
-         var wrapped = [];
+         var lines = text.split(this._reNewline), wrapped = [], i;
 
-         for (var i = 0; i < lines.length; i++) {
+         for (i = 0; i < lines.length; i++) {
            wrapped = wrapped.concat(this._wrapLine(ctx, lines[i] + '\n'));
          }
 
@@ -85,10 +82,9 @@
         * to.
         */
        _wrapLine: function(ctx, text) {
-         var maxWidth = this.width;
-         var words = text.split(' '),
+         var maxWidth = this.width, words = text.split(' '),
                  lines = [],
-                 line = "";
+                 line = '';
 
          if (ctx.measureText(text).width < maxWidth) {
            lines.push(text);
@@ -114,16 +110,18 @@
                words[0] = tmp.slice(0, -1);
                if (words.length > 1) {
                  words[1] = tmp.slice(-1) + words[1];
-               } else {
+               } 
+               else {
                  words.push(tmp.slice(-1));
                }
              }
 
              if (Math.ceil(ctx.measureText(line + words[0]).width) < maxWidth) {
-               line += words.shift() + " ";
-             } else {
+               line += words.shift() + ' ';
+             } 
+             else {
                lines.push(line);
-               line = "";
+               line = '';
              }
              if (words.length === 0) {
                lines.push(line.substring(0, line.length - 1));
@@ -159,7 +157,7 @@
          return l;
        },
        /**
-        * Sets specified property to a specified value. Overrides super class' 
+        * Sets specified property to a specified value. Overrides super class'
         * function and invalidates the cache if certain properties are set.
         * @param {String} key
         * @param {Any} value
@@ -190,7 +188,7 @@
          return this.__cachedLines;
        },
        /**
-        * Overrides the superclass version of this function. The only change is 
+        * Overrides the superclass version of this function. The only change is
         * that this function does not change the width of the Textbox. That is
         * done manually by the user.
         * @param {CanvasRenderingContext2D} ctx Context to render on
@@ -231,24 +229,24 @@
            selectionStart = this.selectionStart;
          }
 
-         var lineIndex = 0,
-                 linesBeforeCursor = [],
-                 allLines = this._getTextLines();
-
          /*
-          * We use this to populate linesBeforeCursor instead of simply splitting
-          * textBeforeCursor with newlines to handle the case of the 
-          * selectionStart value being on a word that, because of its length, 
+          * We use `temp` to populate linesBeforeCursor instead of simply splitting
+          * textBeforeCursor with newlines to handle the case of the
+          * selectionStart value being on a word that, because of its length,
           * needs to be wrapped to the next line.
           */
-         var temp = selectionStart;
+         var lineIndex = 0,
+                 linesBeforeCursor = [],
+                 allLines = this._getTextLines(), temp = selectionStart;
+         
          while (temp >= 0) {
            if (lineIndex > allLines.length - 1) {
              break;
            }
            temp -= allLines[lineIndex].length;
            if (temp < 0) {
-             linesBeforeCursor[linesBeforeCursor.length] = allLines[lineIndex].slice(0, temp + allLines[lineIndex].length);
+             linesBeforeCursor[linesBeforeCursor.length] = allLines[lineIndex].slice(0, 
+             temp + allLines[lineIndex].length);
            }
            else {
              linesBeforeCursor[linesBeforeCursor.length] = allLines[lineIndex];
@@ -288,9 +286,7 @@
                  // whereas cursor starts at the padding created by line height
                  ? (this._getHeightOfLine(this.ctx, 0) -
                          this.getCurrentCharFontSize(cursorLocation.lineIndex, cursorLocation.charIndex))
-                 : 0;
-
-         var lineChars = textLines[cursorLocation.lineIndex].split('');
+                 : 0, lineChars = textLines[cursorLocation.lineIndex].split('');
 
          for (var i = 0; i < cursorLocation.charIndex; i++) {
            leftOffset += this._getWidthOfChar(this.ctx, lineChars[i], cursorLocation.lineIndex, i);
