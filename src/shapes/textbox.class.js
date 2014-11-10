@@ -55,6 +55,9 @@
            mb: false,
            mtr: true
          });
+         
+         // add width to this list of props that effect line wrapping.
+         this._dimensionAffectingProps.width = true;
        },
        /**
         * Wraps text using the 'width' property of Textbox. First this function
@@ -165,7 +168,6 @@
         * @chainable
         */
        _set: function(key, value) {
-
          if (key in this._dimensionAffectingProps) {
            this._cacheTextLines(null);
          }
@@ -284,7 +286,7 @@
                  topOffset = typeOfBoundaries === 'cursor'
                  // selection starts at the very top of the line,
                  // whereas cursor starts at the padding created by line height
-                 ? (this._getHeightOfLine(this.ctx, 0) -
+                ? ((cursorLocation.lineIndex !== 0 ? this.callSuper('_getHeightOfLine', this.ctx, 0) : this._getHeightOfLine(this.ctx, 0)) -
                          this.getCurrentCharFontSize(cursorLocation.lineIndex, cursorLocation.charIndex))
                  : 0, lineChars = textLines[cursorLocation.lineIndex].split('');
 
