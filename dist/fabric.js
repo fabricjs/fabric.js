@@ -5853,6 +5853,16 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      *   originX: 'left',
      *   originY: 'top'
      * });
+     * @example <caption>overlayImage loaded from cross-origin</caption>
+     * canvas.setOverlayImage('http://fabricjs.com/assets/jail_cell_bars.png', canvas.renderAll.bind(canvas), {
+     *   opacity: 0.5,
+     *   angle: 45,
+     *   left: 400,
+     *   top: 400,
+     *   originX: 'left',
+     *   originY: 'top',
+     *   crossOrigin: 'anonymous'
+     * });
      */
     setOverlayImage: function (image, callback, options) {
       return this.__setBgOverlayImage('overlayImage', image, callback, options);
@@ -5893,6 +5903,16 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
      *   // Needed to position backgroundImage at 0/0
      *   originX: 'left',
      *   originY: 'top'
+     * });
+     * @example <caption>backgroundImage loaded from cross-origin</caption>
+     * canvas.setBackgroundImage('http://fabricjs.com/assets/honey_im_subtle.png', canvas.renderAll.bind(canvas), {
+     *   opacity: 0.5,
+     *   angle: 45,
+     *   left: 400,
+     *   top: 400,
+     *   originX: 'left',
+     *   originY: 'top',
+     *   crossOrigin: 'anonymous'
      * });
      */
     setBackgroundImage: function (image, callback, options) {
@@ -5976,7 +5996,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
         fabric.util.loadImage(image, function(img) {
           this[property] = new fabric.Image(img, options);
           callback && callback();
-        }, this);
+        }, this, options && options.crossOrigin);
       }
       else {
         this[property] = image;
@@ -8377,10 +8397,11 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @private
      */
     _setObjectScale: function(localMouse, transform, lockScalingX, lockScalingY, by, lockScalingFlip) {
-      var target = transform.target, forbidScalingX = false, forbidScalingY = false;
+      var target = transform.target, forbidScalingX = false, forbidScalingY = false,
+          strokeWidth = target.stroke ? target.strokeWidth : 0;
 
-      transform.newScaleX = localMouse.x / (target.width + target.strokeWidth);
-      transform.newScaleY = localMouse.y / (target.height + target.strokeWidth);
+      transform.newScaleX = localMouse.x / (target.width + strokeWidth / 2);
+      transform.newScaleY = localMouse.y / (target.height + strokeWidth / 2);
 
       if (lockScalingFlip && transform.newScaleX <= 0 && transform.newScaleX < target.scaleX) {
         forbidScalingX = true;
@@ -8414,8 +8435,9 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     _scaleObjectEqually: function(localMouse, target, transform) {
 
       var dist = localMouse.y + localMouse.x,
-          lastDist = (target.height + (target.strokeWidth)) * transform.original.scaleY +
-                     (target.width + (target.strokeWidth)) * transform.original.scaleX;
+          strokeWidth = target.stroke ? target.strokeWidth : 0,
+          lastDist = (target.height + (strokeWidth / 2)) * transform.original.scaleY +
+                     (target.width + (strokeWidth / 2)) * transform.original.scaleX;
 
       // We use transform.scaleX/Y instead of target.scaleX/Y
       // because the object may have a min scale and we'll loose the proportions
@@ -8526,7 +8548,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         angle = 360 + angle;
       }
 
-      t.target.angle = angle;
+      t.target.angle = angle % 360;
     },
 
     /**
@@ -9095,6 +9117,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         Event.add(this.upperCanvasEl, 'drag', this._onDrag);
         Event.add(this.upperCanvasEl, 'orientation', this._onOrientationChange);
         Event.add(this.upperCanvasEl, 'shake', this._onShake);
+        Event.add(this.upperCanvasEl, 'longpress', this._onLongPress);
       }
     },
 
@@ -9109,6 +9132,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       this._onGesture = this._onGesture.bind(this);
       this._onDrag = this._onDrag.bind(this);
       this._onShake = this._onShake.bind(this);
+      this._onLongPress = this._onLongPress.bind(this);
       this._onOrientationChange = this._onOrientationChange.bind(this);
       this._onMouseWheel = this._onMouseWheel.bind(this);
     },
@@ -9131,6 +9155,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         Event.remove(this.upperCanvasEl, 'drag', this._onDrag);
         Event.remove(this.upperCanvasEl, 'orientation', this._onOrientationChange);
         Event.remove(this.upperCanvasEl, 'shake', this._onShake);
+        Event.remove(this.upperCanvasEl, 'longpress', this._onLongPress);
       }
     },
 
@@ -9177,6 +9202,14 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      */
     _onShake: function(e, self) {
       this.__onShake && this.__onShake(e, self);
+    },
+    /**
+     * @private
+     * @param {Event} [e] Event object fired on Event.js shake
+     * @param {Event} [self] Inner Event object
+     */
+    _onLongPress: function(e, self) {
+      this.__onLongPress && this.__onLongPress(e, self);
     },
 
     /**
@@ -9557,6 +9590,9 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         this._onMouseMoveInDrawingMode(e);
         return;
       }
+      if (typeof e.touches !== 'undefined' && e.touches.length > 1) {
+        return;
+      }
 
       var groupSelector = this._groupSelector;
 
@@ -9856,8 +9892,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
             : [ target, this._activeObject ];
 
       return new fabric.Group(groupObjects, {
-        originX: 'center',
-        originY: 'center',
         canvas: this
       });
     },
@@ -9876,8 +9910,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       }
       else if (group.length > 1) {
         group = new fabric.Group(group.reverse(), {
-          originX: 'center',
-          originY: 'center',
           canvas: this
         });
         group.addWithUpdate();
@@ -16461,6 +16493,14 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       this.originalState = { };
       this.callSuper('initialize');
 
+      if (options.originX) {
+        this.originX = options.originX;
+      }
+
+      if (options.originY) {
+        this.originY = options.originY;
+      }
+
       this._calcBounds();
       this._updateObjectsCoords();
 
@@ -16484,13 +16524,14 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     _updateObjectCoords: function(object) {
       var objectLeft = object.getLeft(),
-          objectTop = object.getTop();
+          objectTop = object.getTop(),
+          center = this.getCenterPoint();
 
       object.set({
         originalLeft: objectLeft,
         originalTop: objectTop,
-        left: objectLeft - this.left,
-        top: objectTop - this.top
+        left: objectLeft - center.x,
+        top: objectTop - center.y
       });
 
       object.setCoords();
@@ -16749,14 +16790,13 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @private
      */
     _setObjectPosition: function(object) {
-      var groupLeft = this.getLeft(),
-          groupTop = this.getTop(),
+      var center = this.getCenterPoint(),
           rotated = this._getRotatedLeftTop(object);
 
       object.set({
         angle: object.getAngle() + this.getAngle(),
-        left: groupLeft + rotated.left,
-        top: groupTop + rotated.top,
+        left: center.x + rotated.left,
+        top: center.y + rotated.top,
         scaleX: object.get('scaleX') * this.get('scaleX'),
         scaleY: object.get('scaleY') * this.get('scaleY')
       });
@@ -16852,8 +16892,20 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           };
 
       if (!onlyWidthHeight) {
-        obj.left = (minXY.x + maxXY.x) / 2 || 0;
-        obj.top = (minXY.y + maxXY.y) / 2 || 0;
+        obj.left = minXY.x || 0;
+        obj.top = minXY.y || 0;
+        if (this.originX === 'center') {
+          obj.left += obj.width / 2;
+        }
+        if (this.originX === 'right') {
+          obj.left += obj.width;
+        }
+        if (this.originY === 'center') {
+          obj.top += obj.height / 2;
+        }
+        if (this.originY === 'bottom') {
+          obj.top += obj.height;
+        }
       }
       return obj;
     },
@@ -16978,6 +17030,33 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     crossOrigin: '',
 
     /**
+     * AlignX value, part of preserveAspectRatio (one of "none", "mid", "min", "max")
+     * @see http://www.w3.org/TR/SVG/coords.html#PreserveAspectRatioAttribute
+     * This parameter defines how the picture is aligned to its viewport when image element width differs from image width.
+     * @type String
+     * @default
+     */
+    alignX: 'none',
+
+    /**
+     * AlignY value, part of preserveAspectRatio (one of "none", "mid", "min", "max")
+     * @see http://www.w3.org/TR/SVG/coords.html#PreserveAspectRatioAttribute
+     * This parameter defines how the picture is aligned to its viewport when image element height differs from image height.
+     * @type String
+     * @default
+     */
+    alignY: 'none',
+
+    /**
+     * meetOrSlice value, part of preserveAspectRatio  (one of "meet", "slice").
+     * if meet the image is always fully visibile, if slice the viewport is always filled with image.
+     * @see http://www.w3.org/TR/SVG/coords.html#PreserveAspectRatioAttribute
+     * @type String
+     * @default
+     */
+    meetOrSlice: 'meet',
+
+    /**
      * Constructor
      * @param {HTMLImageElement | String} element Image element
      * @param {Object} [options] Options object
@@ -17013,16 +17092,20 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * You might need to call `canvas.renderAll` and `object.setCoords` after replacing, to render new image and update controls area.
      * @param {HTMLImageElement} element
      * @param {Function} [callback] Callback is invoked when all filters have been applied and new image is generated
+     * @param {Object} [options] Options object
      * @return {fabric.Image} thisArg
      * @chainable
      */
-    setElement: function(element, callback) {
+    setElement: function(element, callback, options) {
       this._element = element;
       this._originalElement = element;
-      this._initConfig();
+      this._initConfig(options);
 
       if (this.filters.length !== 0) {
         this.applyFilters(callback);
+      }
+      else if (callback) {
+        callback();
       }
 
       return this;
@@ -17098,7 +17181,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         filters: this.filters.map(function(filterObj) {
           return filterObj && filterObj.toObject();
         }),
-        crossOrigin: this.crossOrigin
+        crossOrigin: this.crossOrigin,
+        alignX: this.alignX,
+        alignY: this.alignY,
+        meetOrSlice: this.meetOrSlice
       });
     },
 
@@ -17109,10 +17195,14 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var markup = [], x = -this.width / 2, y = -this.height / 2;
+      var markup = [], x = -this.width / 2, y = -this.height / 2,
+          preserveAspectRatio = 'none';
       if (this.group && this.group.type === 'path-group') {
         x = this.left;
         y = this.top;
+      }
+      if (this.alignX !== 'none' && this.alignY !== 'none') {
+        preserveAspectRatio = 'x' + this.alignX + 'Y' + this.alignY + ' ' + this.meetOrSlice;
       }
       markup.push(
         '<g transform="', this.getSvgTransform(), this.getSvgTransformMatrix(), '">\n',
@@ -17124,7 +17214,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
             // so that object's center aligns with container's left/top
             '" width="', this.width,
             '" height="', this.height,
-            '" preserveAspectRatio="none"',
+            '" preserveAspectRatio="', preserveAspectRatio, '"',
           '></image>\n'
       );
 
@@ -17158,6 +17248,20 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     },
 
     /**
+     * Sets source of an image
+     * @param {String} src Source string (URL)
+     * @param {Function} [callback] Callback is invoked when image has been loaded (and all filters have been applied)
+     * @param {Object} [options] Options object
+     * @return {fabric.Image} thisArg
+     * @chainable
+     */
+    setSrc: function(src, callback, options) {
+      fabric.util.loadImage(src, function(img) {
+        return this.setElement(img, callback, options);
+      }, this, options && options.crossOrigin);
+    },
+
+    /**
      * Returns string representation of an instance
      * @return {String} String representation of an instance
      */
@@ -17176,13 +17280,12 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
     /**
      * Applies filters assigned to this image (from "filters" array)
-     * @mthod applyFilters
+     * @method applyFilters
      * @param {Function} callback Callback is invoked when all filters have been applied and new image is generated
      * @return {fabric.Image} thisArg
      * @chainable
      */
     applyFilters: function(callback) {
-
       if (!this._originalElement) {
         return;
       }
@@ -17236,15 +17339,59 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx, noTransform) {
+      var x, y, imageMargins = this._findMargins();
+
+      x = (noTransform ? this.left : -this.width / 2);
+      y = (noTransform ? this.top : -this.height / 2);
+
+      if (this.meetOrSlice === 'slice') {
+        ctx.beginPath();
+        ctx.rect(x, y, this.width, this.height);
+        ctx.clip();
+      }
+
       this._element &&
-      ctx.drawImage(
-        this._element,
-        noTransform ? this.left : -this.width/2,
-        noTransform ? this.top : -this.height/2,
-        this.width,
-        this.height
-      );
+      ctx.drawImage(this._element,
+                    x + imageMargins.marginX,
+                    y + imageMargins.marginY,
+                    imageMargins.width,
+                    imageMargins.height
+                   );
       this._renderStroke(ctx);
+    },
+
+    /**
+     * @private
+     */
+    _findMargins: function() {
+      var width = this.width, height = this.height, scales,
+          scale, marginX = 0, marginY = 0;
+
+      if (this.alignX !== 'none' || this.alignY !== 'none') {
+        scales = [this.width / this._element.width, this.height / this._element.height];
+        scale = this.meetOrSlice === 'meet'
+                ? Math.min.apply(null, scales) : Math.max.apply(null, scales);
+        width = this._element.width * scale;
+        height = this._element.height * scale;
+        if (this.alignX === 'Mid') {
+          marginX = (this.width - width) / 2;
+        }
+        if (this.alignX === 'Max') {
+          marginX = this.width - width;
+        }
+        if (this.alignY === 'Mid') {
+          marginY = (this.height - height) / 2;
+        }
+        if (this.alignY === 'Max') {
+          marginY = this.height - height;
+        }
+      }
+      return {
+        width:  width,
+        height: height,
+        marginX: marginX,
+        marginY: marginY
+      };
     },
 
     /**
@@ -19304,6 +19451,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      */
     _renderText: function(ctx, textLines) {
       ctx.save();
+      this._setOpacity(ctx);
       this._setShadow(ctx);
       this._setupCompositeOperation(ctx);
       this._renderTextFill(ctx, textLines);
