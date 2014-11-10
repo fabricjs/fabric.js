@@ -9095,7 +9095,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         Event.add(this.upperCanvasEl, 'drag', this._onDrag);
         Event.add(this.upperCanvasEl, 'orientation', this._onOrientationChange);
         Event.add(this.upperCanvasEl, 'shake', this._onShake);
-        Event.add(this.upperCanvasEl, 'longpress', this._onLongPress);
       }
     },
 
@@ -9110,7 +9109,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       this._onGesture = this._onGesture.bind(this);
       this._onDrag = this._onDrag.bind(this);
       this._onShake = this._onShake.bind(this);
-      this._onLongPress = this._onLongPress.bind(this);
       this._onOrientationChange = this._onOrientationChange.bind(this);
       this._onMouseWheel = this._onMouseWheel.bind(this);
     },
@@ -9133,7 +9131,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         Event.remove(this.upperCanvasEl, 'drag', this._onDrag);
         Event.remove(this.upperCanvasEl, 'orientation', this._onOrientationChange);
         Event.remove(this.upperCanvasEl, 'shake', this._onShake);
-        Event.remove(this.upperCanvasEl, 'longpress', this._onLongPress);
       }
     },
 
@@ -9180,14 +9177,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      */
     _onShake: function(e, self) {
       this.__onShake && this.__onShake(e, self);
-    },
-    /**
-     * @private
-     * @param {Event} [e] Event object fired on Event.js shake
-     * @param {Event} [self] Inner Event object
-     */
-    _onLongPress: function(e, self) {
-      this.__onLongPress && this.__onLongPress(e, self);
     },
 
     /**
@@ -9566,9 +9555,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
       if (this.isDrawingMode) {
         this._onMouseMoveInDrawingMode(e);
-        return;
-      }
-      if (typeof e.touches !== 'undefined' && e.touches.length > 1) {
         return;
       }
 
@@ -17190,7 +17176,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
     /**
      * Applies filters assigned to this image (from "filters" array)
-     * @method applyFilters
+     * @mthod applyFilters
      * @param {Function} callback Callback is invoked when all filters have been applied and new image is generated
      * @return {fabric.Image} thisArg
      * @chainable
