@@ -64,6 +64,8 @@
         this.originY = options.originY;
       }
 
+      this._refreshControlsVisibility();
+
       this._calcBounds();
       this._updateObjectsCoords();
 
@@ -73,6 +75,27 @@
 
       this.setCoords();
       this.saveCoords();
+    },
+    /**
+     * Sets controls of this group to the Textbox's special configuration if
+     * one is present in the group. Deletes _controlsVisibility otherwise, so that
+     * it gets initialized to default value at runtime.
+     */
+    _refreshControlsVisibility: function() {
+      if(fabric.Textbox) {
+        var i, visibilitySet = false;
+        for (i = this._objects.length; i--; ) {
+          if(this._objects[i] instanceof fabric.Textbox) {
+            this.setControlsVisibility(fabric.Textbox.getTextboxControlVisibility());
+            visibilitySet = true;
+            break;
+          }
+        }
+
+        if(!visibilitySet) {
+          delete this._controlsVisibility;
+        }
+      }
     },
     /**
      * @private
@@ -157,6 +180,7 @@
      */
     _onObjectAdded: function(object) {
       object.group = this;
+      this._refreshControlsVisibility();
     },
     /**
      * @private
@@ -164,6 +188,7 @@
     _onObjectRemoved: function(object) {
       delete object.group;
       object.set('active', false);
+      this._refreshControlsVisibility();
     },
     /**
      * Properties that are delegated to group objects when reading/writing
@@ -200,11 +225,11 @@
          * Reverse the group's scaling on Textboxs and change their width
          * instead. Size of text in a Textbox must be controlled by fontSize.
          */
-        if (key === 'scaleX') {
+        if (fabric.Textbox && key === 'scaleX') {
           i = this._objects.length;
           while (i--) {
             var o = this._objects[i];
-            if (o.type === 'textbox') {
+            if (o instanceof fabric.Textbox) {
               o.set(key, Math.abs(1 / value));
               o.set('width', (o.get('width') * value) / (typeof o.__oldScaleX === 'undefined' ? 1 : o.__oldScaleX));
               o.__oldScaleX = value;

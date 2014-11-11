@@ -44,17 +44,7 @@
          this.set('lockScalingY', true);
          this.set('lockScalingFlip', true);
          this.set('hasBorders', true || options.hasBorders);
-         this.setControlsVisibility({
-           tl: false,
-           tr: false,
-           br: false,
-           bl: false,
-           ml: true,
-           mt: false,
-           mr: true,
-           mb: false,
-           mtr: true
-         });
+         this.setControlsVisibility(fabric.Textbox.getTextboxControlVisibility());
 
          // add width to this list of props that effect line wrapping.
          this._dimensionAffectingProps.width = true;
@@ -248,7 +238,7 @@
            temp -= allLines[lineIndex].length;
            if (temp < 0) {
              linesBeforeCursor[linesBeforeCursor.length] = allLines[lineIndex].slice(0,
-             temp + allLines[lineIndex].length);
+                     temp + allLines[lineIndex].length);
            }
            else {
              linesBeforeCursor[linesBeforeCursor.length] = allLines[lineIndex];
@@ -286,9 +276,9 @@
                  topOffset = typeOfBoundaries === 'cursor'
                  // selection starts at the very top of the line,
                  // whereas cursor starts at the padding created by line height
-                ? ((cursorLocation.lineIndex !== 0 ? this.callSuper('_getHeightOfLine', this.ctx, 0)
-                : this._getHeightOfLine(this.ctx, 0)) -
-                this.getCurrentCharFontSize(cursorLocation.lineIndex, cursorLocation.charIndex))
+                 ? ((cursorLocation.lineIndex !== 0 ? this.callSuper('_getHeightOfLine', this.ctx, 0)
+                         : this._getHeightOfLine(this.ctx, 0)) -
+                         this.getCurrentCharFontSize(cursorLocation.lineIndex, cursorLocation.charIndex))
                  : 0, lineChars = textLines[cursorLocation.lineIndex].split('');
 
          for (var i = 0; i < cursorLocation.charIndex; i++) {
@@ -347,6 +337,23 @@
       */
      fabric.Textbox.fromObject = function(object) {
        return new fabric.Textbox(object.text, clone(object));
+     };
+     /**
+      * Returns the default controls visibility required for Textboxes.
+      * @returns {Object}
+      */
+     fabric.Textbox.getTextboxControlVisibility = function() {
+       return {
+         tl: false,
+         tr: false,
+         br: false,
+         bl: false,
+         ml: true,
+         mt: false,
+         mr: true,
+         mb: false,
+         mtr: true
+       };
      };
      /**
       * Contains all fabric.Textbox objects that have been created
