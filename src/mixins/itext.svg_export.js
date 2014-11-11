@@ -6,8 +6,12 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    */
   _setSVGTextLineText: function(textLine, lineIndex, textSpans, lineHeight, lineTopOffsetMultiplier, textBgRects) {
     if (!this.styles[lineIndex]) {
-      this.callSuper('_setSVGTextLineText',
-        textLine, lineIndex, textSpans, lineHeight, lineTopOffsetMultiplier);
+      /*
+       * Directly call function of parent class instead of callSuper because it
+       * has a bug which causes an infinite loop for subclasses of IText.
+       */
+      fabric.Text.prototype._setSVGTextLineText.call(this,
+              textLine, lineIndex, textSpans, lineHeight, lineTopOffsetMultiplier);
     }
     else {
       this._setSVGTextLineChars(
