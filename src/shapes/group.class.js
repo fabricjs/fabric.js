@@ -82,17 +82,17 @@
      * it gets initialized to default value at runtime.
      */
     _refreshControlsVisibility: function() {
-      if(fabric.Textbox) {
+      if (fabric.Textbox) {
         var i, visibilitySet = false;
         for (i = this._objects.length; i--; ) {
-          if(this._objects[i] instanceof fabric.Textbox) {
+          if (this._objects[i] instanceof fabric.Textbox) {
             this.setControlsVisibility(fabric.Textbox.getTextboxControlVisibility());
             visibilitySet = true;
             break;
           }
         }
 
-        if(!visibilitySet) {
+        if (!visibilitySet) {
           delete this._controlsVisibility;
         }
       }
