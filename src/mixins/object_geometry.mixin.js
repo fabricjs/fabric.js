@@ -92,6 +92,16 @@
      * @return {Boolean} true if point is inside the object
      */
     containsPoint: function(point) {
+      //eventBounds is an option object that defines where selecting an object works
+      //if you have a mask covering part of an object, it forces clicks to be on the object
+      //in order to interact witht the object.
+      var coords = typeof this.eventBounds !== 'undefined' ? {
+        tl:  {x: this.eventBounds.x, y: this.eventBounds.y},
+        tr:  {x: this.eventBounds.x + this.eventBounds.width, y: this.eventBounds.y},
+        bl:  {x: this.eventBounds.x, y:this.eventBounds.y + this.eventBounds.height},
+        br:  {x: this.eventBounds.x + this.eventBounds.width, y:this.eventBounds.y + this.eventBounds.height}
+      }: this.oCoords;
+      
       var lines = this._getImageLines(this.oCoords),
           xPoints = this._findCrossPoints(point, lines);
 
