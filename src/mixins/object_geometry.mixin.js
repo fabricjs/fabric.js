@@ -102,7 +102,7 @@
         br:  {x: this.eventBounds.x + this.eventBounds.width, y:this.eventBounds.y + this.eventBounds.height}
       }: this.oCoords;
       
-      var lines = this._getImageLines(this.oCoords),
+      var lines = this._getImageLines(coords),
           xPoints = this._findCrossPoints(point, lines);
 
       // if xPoints is odd then point is inside the object
