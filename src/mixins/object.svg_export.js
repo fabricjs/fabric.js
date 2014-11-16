@@ -12,16 +12,16 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   getSvgStyles: function() {
 
     var fill = 'fill: none; ', stroke = '', fillRule = '', strokeWidth = '', strokeDashArray = '', strokeLineCap = '',
-        strokeLineJoin = '', strokeMiterLimit = '', opacity = '', visibility = '', filter = '', style;
+        strokeLineJoin = '', strokeMiterLimit = '', opacity = '', visibility = '', filter = '';
 
     if (!isDefault('fill', '')) {
       if (this.fill) {
-        fill = 'fill: ' + (this.fill && this.fill.toLive ? 'url(#SVGID_' + this.fill.id + ')' : this.fill) + '; ';
+        fill = 'fill: ' + (this.fill.toLive ? 'url(#SVGID_' + this.fill.id + ')' : this.fill) + '; ';
       }
     }
     if (!isDefault('stroke', '')) {
       if (this.stroke) {
-        stroke = 'stroke: ' + (this.stroke && this.stroke.toLive ? 'url(#SVGID_' + this.stroke.id + ')' : this.stroke) + '; ';
+        stroke = 'stroke: ' + (this.stroke.toLive ? 'url(#SVGID_' + this.stroke.id + ')' : this.stroke) + '; ';
       }
     }
     if (!isDefault('fillRule', 'nonzero')) {
@@ -51,10 +51,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     if (this.shadow && this.type !== 'text') {
       filter = 'filter: url(#SVGID_' + this.shadow.id + '); ';
     }
-    style = [fill, fillRule, stroke, strokeWidth, strokeDashArray, strokeLineCap,
-            strokeLineJoin, strokeMiterLimit, opacity, visibility, filter];
-    style = style.join();
-    return style;
+    return [fill, fillRule, stroke, strokeWidth, strokeDashArray, strokeLineCap,
+            strokeLineJoin, strokeMiterLimit, opacity, visibility, filter].join('');
   },
 
   /**
