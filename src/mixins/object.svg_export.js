@@ -12,7 +12,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   getSvgStyles: function() {
 
     var fill = 'fill: none; ', stroke = '', fillRule = '', strokeWidth = '', strokeDashArray = '', strokeLineCap = '',
-        strokeLineJoin = '', strokeMiterLimit = '', opacity = '', visibility = '', filter = '';
+        strokeLineJoin = '', strokeMiterLimit = '', opacity = '', visibility = '', filter = '', style;
 
     if (!isDefault('fill', '')) {
       if (this.fill) {
@@ -51,8 +51,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     if (this.shadow && this.type !== 'text') {
       filter = 'filter: url(#SVGID_' + this.shadow.id + '); ';
     }
-    return [fill, fillRule, stroke, strokeWidth, strokeDashArray, strokeLineCap,
-            strokeLineJoin, strokeMiterLimit, opacity, visibility, filter].join('');
+    style = [fill, fillRule, stroke, strokeWidth, strokeDashArray, strokeLineCap,
+            strokeLineJoin, strokeMiterLimit, opacity, visibility, filter];
+    style = style.join();
+    return style;
   },
 
   /**
