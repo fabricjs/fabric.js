@@ -15,10 +15,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         strokeLineJoin = '', strokeMiterLimit = '', opacity = '', visibility = '', filter = '';
 
     if (!isDefault('fill', '')) {
-      fill = 'fill: ' + (this.fill.toLive ? 'url(#SVGID_' + this.fill.id + ')' : this.fill) + '; ';
+      fill = 'fill: ' + (this.fill && this.fill.toLive ? 'url(#SVGID_' + this.fill.id + ')' : this.fill) + '; ';
     }
     if (!isDefault('stroke', '')) {
-      stroke = 'stroke: ' + (this.stroke.toLive ? 'url(#SVGID_' + this.stroke.id + ')' : this.stroke) + '; ';
+      stroke = 'stroke: ' + (this.stroke && this.stroke.toLive ? 'url(#SVGID_' + this.stroke.id + ')' : this.stroke) + '; ';
     }
     if (!isDefault('fillRule', 'nonzero')) {
       fillRule = 'fill-rule: ' + this.fillRule + '; ';
