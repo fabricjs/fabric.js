@@ -82,7 +82,7 @@
      * it gets initialized to default value at runtime.
      */
     _refreshControlsVisibility: function() {
-      if (typeof fabric.Textbox === 'undefined') { 
+      if (typeof fabric.Textbox === 'undefined') {
         return;
       }
       for (var i = this._objects.length; i--; ) {

@@ -12,7 +12,7 @@
    */
   fabric.IText.prototype._getNewSelectionStartFromOffset = function(mouseOffset,
   prevWidth, width, index, lineIndex, jlen) {
-    if(this instanceof fabric.Textbox) {
+    if (this instanceof fabric.Textbox) {
       lineIndex = 0;
     }
     return getNewSelectionStartFromOffsetOverriden.call(this, mouseOffset,
