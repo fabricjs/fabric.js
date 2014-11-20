@@ -163,7 +163,6 @@
          if (key in this._dimensionAffectingProps) {
            this._cacheTextLines(null);
          }
-         
          this.callSuper('_set', key, value);
 
        },
