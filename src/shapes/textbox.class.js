@@ -40,10 +40,12 @@
         */
        initialize: function(text, options) {
          this.callSuper('initialize', text, options);
-         this.set('lockUniScaling', false);
-         this.set('lockScalingY', true);
-         this.set('lockScalingFlip', true);
-         this.set('hasBorders', true || options.hasBorders);
+         this.set({
+           lockUniScaling: false,
+           lockScalingY: true,
+           lockScalingFlip: true,
+           hasBorders: true || options.hasBorders
+         });
          this.setControlsVisibility(fabric.Textbox.getTextboxControlVisibility());
 
          // add width to this list of props that effect line wrapping.
@@ -133,9 +135,9 @@
         */
        _getTextLines: function(ctx, refreshCache) {
 
-         var l = this._getCachedTextLines();
-         if (l !== null && refreshCache !== true) {
-           return l;
+         var lines = this._getCachedTextLines();
+         if (lines !== null && refreshCache !== true) {
+           return lines;
          }
 
          ctx = (ctx || this.ctx);
@@ -143,11 +145,11 @@
          ctx.save();
          this._setTextStyles(ctx);
 
-         l = this._wrapText(ctx, this.text);
+         lines = this._wrapText(ctx, this.text);
 
          ctx.restore();
-         this._cacheTextLines(l);
-         return l;
+         this._cacheTextLines(lines);
+         return lines;
        },
        /**
         * Sets specified property to a specified value. Overrides super class'
@@ -161,7 +163,7 @@
          if (key in this._dimensionAffectingProps) {
            this._cacheTextLines(null);
          }
-
+         
          this.callSuper('_set', key, value);
 
        },

@@ -3,10 +3,10 @@
   'use strict';
 
   var fabric = global.fabric || (global.fabric = {}),
-          extend = fabric.util.object.extend,
-          min = fabric.util.array.min,
-          max = fabric.util.array.max,
-          invoke = fabric.util.array.invoke;
+      extend = fabric.util.object.extend,
+      min = fabric.util.array.min,
+      max = fabric.util.array.max,
+      invoke = fabric.util.array.invoke;
 
   if (fabric.Group) {
     return;
@@ -82,18 +82,13 @@
      * it gets initialized to default value at runtime.
      */
     _refreshControlsVisibility: function() {
-      if (fabric.Textbox) {
-        var i, visibilitySet = false;
-        for (i = this._objects.length; i--; ) {
-          if (this._objects[i] instanceof fabric.Textbox) {
-            this.setControlsVisibility(fabric.Textbox.getTextboxControlVisibility());
-            visibilitySet = true;
-            break;
-          }
-        }
-
-        if (!visibilitySet) {
-          delete this._controlsVisibility;
+      if (typeof fabric.Textbox === 'undefined') { 
+        return;
+      }
+      for (var i = this._objects.length; i--; ) {
+        if (this._objects[i] instanceof fabric.Textbox) {
+          this.setControlsVisibility(fabric.Textbox.getTextboxControlVisibility());
+          return;
         }
       }
     },
@@ -108,8 +103,8 @@
      */
     _updateObjectCoords: function(object) {
       var objectLeft = object.getLeft(),
-              objectTop = object.getTop(),
-              center = this.getCenterPoint();
+          objectTop = object.getTop(),
+          center = this.getCenterPoint();
 
       object.set({
         originalLeft: objectLeft,
@@ -195,16 +190,16 @@
      * @param {Object} delegatedProperties
      */
     delegatedProperties: {
-      fill: true,
-      opacity: true,
-      fontFamily: true,
-      fontWeight: true,
-      fontSize: true,
-      fontStyle: true,
-      lineHeight: true,
-      textDecoration: true,
-      textAlign: true,
-      backgroundColor: true
+      fill:             true,
+      opacity:          true,
+      fontFamily:       true,
+      fontWeight:       true,
+      fontSize:         true,
+      fontStyle:        true,
+      lineHeight:       true,
+      textDecoration:   true,
+      textAlign:        true,
+      backgroundColor:  true
     },
     /**
      * @private
@@ -462,12 +457,12 @@
      */
     _getBounds: function(aX, aY, onlyWidthHeight) {
       var ivt = fabric.util.invertTransform(this.getViewportTransform()),
-              minXY = fabric.util.transformPoint(new fabric.Point(min(aX), min(aY)), ivt),
-              maxXY = fabric.util.transformPoint(new fabric.Point(max(aX), max(aY)), ivt),
-              obj = {
-                width: (maxXY.x - minXY.x) || 0,
-                height: (maxXY.y - minXY.y) || 0
-              };
+          minXY = fabric.util.transformPoint(new fabric.Point(min(aX), min(aY)), ivt),
+          maxXY = fabric.util.transformPoint(new fabric.Point(max(aX), max(aY)), ivt),
+          obj = {
+            width: (maxXY.x - minXY.x) || 0,
+            height: (maxXY.y - minXY.y) || 0
+          };
 
       if (!onlyWidthHeight) {
         obj.left = minXY.x || 0;
@@ -499,7 +494,7 @@
         '<g ',
         'transform="', this.getSvgTransform(),
         '">\n'
-                //jscs:enable validateIndentation
+        //jscs:enable validateIndentation
       ];
 
       for (var i = 0, len = this._objects.length; i < len; i++) {
