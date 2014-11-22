@@ -156,11 +156,6 @@
     /**
      * @private
      */
-    _fontSizeFraction: 4,
-
-    /**
-     * @private
-     */
     _currentCursorOpacity: 0,
 
     /**
@@ -837,7 +832,7 @@
             this._getLeftOffset() + lineLeftOffset,
             this._getTopOffset() + lineHeights + fractionOfFontSize,
             lineWidth,
-            heightOfLine
+            this.fontSize
           );
         }
         if (this.styles[i]) {
@@ -852,7 +847,7 @@
                 this._getLeftOffset() + lineLeftOffset + this._getWidthOfCharsAt(ctx, i, j, textLines),
                 this._getTopOffset() + lineHeights + fractionOfFontSize,
                 this._getWidthOfChar(ctx, _char, i, j, textLines) + 1,
-                heightOfLine
+                this.fontSize
               );
             }
           }
@@ -1120,8 +1115,10 @@
           maxHeight = currentCharHeight;
         }
       }
-
-      return maxHeight * this.lineHeight;
+      if (lineIndex > 0) {
+        return maxHeight * this.lineHeight;
+      }
+      return maxHeight;
     },
 
     /**
