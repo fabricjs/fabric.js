@@ -1112,7 +1112,7 @@
     if (!options.originX) {
       options.originX = 'left';
     }
-    options.top += options.fontSize / this._fontSizeFraction: 4,;
+    options.top += options.fontSize / this._fontSizeFraction;
     var text = new fabric.Text(element.textContent, options),
         /*
           Adjust positioning:
