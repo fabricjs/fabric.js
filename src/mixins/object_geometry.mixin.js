@@ -302,7 +302,7 @@
      * @chainable
      */
     setCoords: function() {
-      var strokeWidth = this.strokeWidth > 1 ? this.strokeWidth : 0,
+      var strokeWidth = this.strokeWidth,
           theta = degreesToRadians(this.angle),
           vpt = this.getViewportTransform(),
           f = function (p) {
@@ -311,10 +311,11 @@
           w = this.width,
           h = this.height,
           capped = this.strokeLineCap === 'round' || this.strokeLineCap === 'square',
-          vLine = this.type === 'line' && this.width === 1,
-          hLine = this.type === 'line' && this.height === 1,
-          strokeW = (capped && hLine) || this.type !== 'line',
-          strokeH = (capped && vLine) || this.type !== 'line';
+          vLine = this.type === 'line' && this.width === 0,
+          hLine = this.type === 'line' && this.height === 0,
+          sLine = vLine || hLine,
+          strokeW = (capped && hLine) || !sLine,
+          strokeH = (capped && vLine) || !sLine;
 
       if (vLine) {
         w = strokeWidth;

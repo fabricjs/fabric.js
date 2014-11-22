@@ -85,8 +85,8 @@
     _setWidthHeight: function(options) {
       options || (options = { });
 
-      this.width = Math.abs(this.x2 - this.x1) || 1;
-      this.height = Math.abs(this.y2 - this.y1) || 1;
+      this.width = Math.abs(this.x2 - this.x1);
+      this.height = Math.abs(this.y2 - this.y1);
 
       this.left = 'left' in options
         ? options.left
@@ -155,30 +155,21 @@
 
       if (noTransform) {
         //  Line coords are distances from left-top of canvas to origin of line.
-        //
         //  To render line in a path-group, we need to translate them to
         //  distances from center of path-group to center of line.
         var cp = this.getCenterPoint();
         ctx.translate(
-          cp.x,
-          cp.y
+          cp.x - this.strokeWidth / 2,
+          cp.y - this.strokeWidth / 2
         );
       }
 
       if (!this.strokeDashArray || this.strokeDashArray && supportsLineDash) {
-
         // move from center (of virtual box) to its left/top corner
         // we can't assume x1, y1 is top left and x2, y2 is bottom right
-        var xMult = this.x1 <= this.x2 ? -1 : 1,
-            yMult = this.y1 <= this.y2 ? -1 : 1;
-
-        ctx.moveTo(
-          this.width === 1 ? 0 : (xMult * this.width / 2),
-          this.height === 1 ? 0 : (yMult * this.height / 2));
-
-        ctx.lineTo(
-          this.width === 1 ? 0 : (xMult * -1 * this.width / 2),
-          this.height === 1 ? 0 : (yMult * -1 * this.height / 2));
+        var p = this.calcLinePoints();
+        ctx.moveTo(p.x1, p.y1);
+        ctx.lineTo(p.x2, p.y2);
       }
 
       ctx.lineWidth = this.strokeWidth;
@@ -197,14 +188,10 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _renderDashedStroke: function(ctx) {
-      var
-        xMult = this.x1 <= this.x2 ? -1 : 1,
-        yMult = this.y1 <= this.y2 ? -1 : 1,
-        x = this.width === 1 ? 0 : xMult * this.width / 2,
-        y = this.height === 1 ? 0 : yMult * this.height / 2;
+      var p = this.calcLinePoints();
 
       ctx.beginPath();
-      fabric.util.drawDashedLine(ctx, x, y, -x, -y, this.strokeDashArray);
+      fabric.util.drawDashedLine(ctx, p.x1, p.y1, p.x2, p.y2, this.strokeDashArray);
       ctx.closePath();
     },
 
@@ -225,10 +212,10 @@
     calcLinePoints: function() {
       var xMult = this.x1 <= this.x2 ? -1 : 1,
           yMult = this.y1 <= this.y2 ? -1 : 1,
-          x1 = (xMult * this.width / 2),
-          y1 = (yMult * this.height / 2),
-          x2 = (xMult * -1 * this.width / 2),
-          y2 = (yMult * -1 * this.height / 2);
+          x1 = (xMult * this.width * 0.5),
+          y1 = (yMult * this.height * 0.5),
+          x2 = (xMult * this.width * -0.5),
+          y2 = (yMult * this.height * -0.5);
 
       return {
         x1: x1,

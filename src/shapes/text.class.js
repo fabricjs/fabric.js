@@ -533,9 +533,6 @@
      * @return {Number} Left offset
      */
     _getLeftOffset: function() {
-      if (fabric.isLikelyNode) {
-        return 0;
-      }
       return -this.width / 2;
     },
 
@@ -850,7 +847,7 @@
 
           textLeft = -(this.width/2),
           textTop = this.useNative
-            ? this.fontSize - 1
+            ? (this.fontSize * this.lineHeight - 0.25 * this.fontSize) // to lift by 1  / 4 of font height.
             : (this.height/2) - (textLines.length * this.fontSize) - this._totalLineHeight;
 
       return {
@@ -1095,6 +1092,8 @@
     var parsedAttributes = fabric.parseAttributes(element, fabric.Text.ATTRIBUTE_NAMES);
     options = fabric.util.object.extend((options ? fabric.util.object.clone(options) : { }), parsedAttributes);
 
+    options.top = options.top || 0;
+    options.left = options.left || 0;
     if ('dx' in parsedAttributes) {
       options.left += parsedAttributes.dx;
     }
@@ -1108,7 +1107,7 @@
     if (!options.originX) {
       options.originX = 'left';
     }
-
+    options.top += options.fontSize / 4;
     var text = new fabric.Text(element.textContent, options),
         /*
           Adjust positioning:
