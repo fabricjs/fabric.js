@@ -1112,7 +1112,6 @@
     if (!options.originX) {
       options.originX = 'left';
     }
-    options.top += options.fontSize / this._fontSizeFraction;
     var text = new fabric.Text(element.textContent, options),
         /*
           Adjust positioning:
@@ -1129,7 +1128,7 @@
     }
     text.set({
       left: text.getLeft() + offX,
-      top: text.getTop() - text.getHeight() / 2
+      top: text.getTop() - text.getHeight() / 2 + text.fontSize / text._fontSizeFraction;
     });
 
     return text;
