@@ -1128,7 +1128,7 @@
     }
     text.set({
       left: text.getLeft() + offX,
-      top: text.getTop() - text.getHeight() / 2 + text.fontSize / text._fontSizeFraction;
+      top: text.getTop() - text.getHeight() / 2 + text.fontSize / text._fontSizeFraction
     });
 
     return text;
