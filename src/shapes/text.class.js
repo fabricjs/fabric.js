@@ -306,6 +306,11 @@
     shadow:               null,
 
     /**
+     * @private
+     */
+    _fontSizeFraction: 4,
+
+    /**
      * Constructor
      * @param {String} text Text string
      * @param {Object} [options] Options object
