@@ -832,7 +832,7 @@
             this._getLeftOffset() + lineLeftOffset,
             this._getTopOffset() + lineHeights + fractionOfFontSize + heightOfLine - this.fontSize,
             lineWidth,
-            this.fontSize
+            heightOfLine / this.lineHeight
           );
         }
         if (this.styles[i]) {
@@ -847,7 +847,7 @@
                 this._getLeftOffset() + lineLeftOffset + this._getWidthOfCharsAt(ctx, i, j, textLines),
                 this._getTopOffset() + lineHeights + fractionOfFontSize + heightOfLine - this.fontSize,
                 this._getWidthOfChar(ctx, _char, i, j, textLines) + 1,
-                this.fontSize
+                heightOfLine / this.lineHeight
               );
             }
           }
