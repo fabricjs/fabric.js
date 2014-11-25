@@ -9,7 +9,15 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     this.hiddenTextarea.setAttribute('autocapitalize', 'off');
     this.hiddenTextarea.style.cssText = 'position: absolute; top: 0; left: -9999px';
 
-    fabric.document.body.appendChild(this.hiddenTextarea);
+    if (this.canvas && this.canvas.wrapperEl) {
+      // Prefer putting the hidden text area within the canvas wrapper element,
+      // to avoid the scroll position jumping when editing text on a tall document.
+      // This preference is also enacted when selecting text via clicks.
+      this.canvas.wrapperEl.appendChild(this.hiddenTextarea);
+    }
+    else {
+      fabric.document.body.appendChild(this.hiddenTextarea);
+    }
 
     fabric.util.addListener(this.hiddenTextarea, 'keydown', this.onKeyDown.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'keypress', this.onKeyPress.bind(this));
