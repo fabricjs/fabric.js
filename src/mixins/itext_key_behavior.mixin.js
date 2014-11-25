@@ -14,7 +14,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       // to avoid the scroll position jumping when editing text on a tall document.
       // This preference is also enacted when selecting text via clicks.
       this.canvas.wrapperEl.appendChild(this.hiddenTextarea);
-    } else {
+    }
+    else {
       fabric.document.body.appendChild(this.hiddenTextarea);
     }
 
