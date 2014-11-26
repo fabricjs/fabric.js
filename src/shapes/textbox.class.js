@@ -140,7 +140,7 @@
            return lines;
          }
 
-         ctx = (ctx || this.ctx);
+         ctx = ctx || this.ctx;
 
          ctx.save();
          this._setTextStyles(ctx);

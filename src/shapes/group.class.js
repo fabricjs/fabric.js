@@ -77,20 +77,11 @@
       this.saveCoords();
     },
     /**
-     * Sets controls of this group to the Textbox's special configuration if
-     * one is present in the group. Deletes _controlsVisibility otherwise, so that
-     * it gets initialized to default value at runtime.
+     * To be implemented by other shape classes as needed. This is to allow a 
+     * shape to impose its own rules for control visibility on the group if it is
+     * part of one.
      */
     _refreshControlsVisibility: function() {
-      if (typeof fabric.Textbox === 'undefined') {
-        return;
-      }
-      for (var i = this._objects.length; i--; ) {
-        if (this._objects[i] instanceof fabric.Textbox) {
-          this.setControlsVisibility(fabric.Textbox.getTextboxControlVisibility());
-          return;
-        }
-      }
     },
     /**
      * @private
