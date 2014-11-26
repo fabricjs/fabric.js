@@ -77,7 +77,7 @@
       this.saveCoords();
     },
     /**
-     * To be implemented by other shape classes as needed. This is to allow a 
+     * To be implemented by other shape classes as needed. This is to allow a
      * shape to impose its own rules for control visibility on the group if it is
      * part of one.
      */
