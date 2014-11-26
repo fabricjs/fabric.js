@@ -15,7 +15,8 @@
     if (this instanceof fabric.Textbox) {
       lineIndex = 0;
     }
-    return getNewSelectionStartFromOffsetOverriden.call(this, mouseOffset,
-    prevWidth, width, index, lineIndex, jlen);
+    return getNewSelectionStartFromOffsetOverriden
+            .call(this, mouseOffset,
+            prevWidth, width, index, lineIndex, jlen);
   };
 })();
