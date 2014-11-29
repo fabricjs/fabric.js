@@ -381,7 +381,7 @@
       if (this.isMoving === false && this.resizeFilters.length && this._needsResize()) {
         this._lastScaleX = this.scaleX;
         this._lastScaleY = this.scaleY;
-        elementToDraw = this.applyFilters(null, this.resizeFilters, this._filteredEl || this._originalElement, false);
+        elementToDraw = this.applyFilters(null, this.resizeFilters, this._filteredEl || this._originalElement, true);
       }
       else {
         elementToDraw = this._element;
