@@ -4,27 +4,26 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   /**
    * @private
    */
-  _setSVGTextLineText: function(textLine, lineIndex, textSpans, lineHeight, lineTopOffsetMultiplier, textBgRects) {
+  _setSVGTextLineText: function(lineIndex, textSpans, height, textLeftOffset, textTopOffset, textBgRects) {
     if (!this.styles[lineIndex]) {
       this.callSuper('_setSVGTextLineText',
-        textLine, lineIndex, textSpans, lineHeight, lineTopOffsetMultiplier);
+        lineIndex, textSpans, height, textLeftOffset, textTopOffset);
     }
     else {
       this._setSVGTextLineChars(
-        textLine, lineIndex, textSpans, lineHeight, lineTopOffsetMultiplier, textBgRects);
+        lineIndex, textSpans, height, textLeftOffset, textBgRects);
     }
   },
 
   /**
    * @private
    */
-  _setSVGTextLineChars: function(textLine, lineIndex, textSpans, lineHeight, lineTopOffsetMultiplier, textBgRects) {
+  _setSVGTextLineChars: function(lineIndex, textSpans, height, textLeftOffset, textBgRects) {
 
-    var yProp = lineIndex === 0 || this.useNative ? 'y' : 'dy',
-        chars = textLine.split(''),
+    var chars = this._textLines[lineIndex].split(''),
         charOffset = 0,
-        lineLeftOffset = this._getSVGLineLeftOffset(lineIndex),
-        lineTopOffset = this._getSVGLineTopOffset(lineIndex),
+        lineLeftOffset = this._getSVGLineLeftOffset(lineIndex) - this.width / 2,
+        lineOffset = this._getSVGLineTopOffset(lineIndex),
         heightOfLine = this._getHeightOfLine(this.ctx, lineIndex);
 
     for (var i = 0, len = chars.length; i < len; i++) {
@@ -32,14 +31,14 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
       textSpans.push(
         this._createTextCharSpan(
-          chars[i], styleDecl, lineLeftOffset, lineTopOffset, yProp, charOffset));
+          chars[i], styleDecl, lineLeftOffset, lineOffset.lineTop + lineOffset.offset, charOffset));
 
       var charWidth = this._getWidthOfChar(this.ctx, chars[i], lineIndex, i);
 
       if (styleDecl.textBackgroundColor) {
         textBgRects.push(
           this._createTextCharBg(
-            styleDecl, lineLeftOffset, lineTopOffset, heightOfLine, charWidth, charOffset));
+            styleDecl, lineLeftOffset, lineOffset.lineTop, heightOfLine, charWidth, charOffset));
       }
 
       charOffset += charWidth;
@@ -50,20 +49,22 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @private
    */
   _getSVGLineLeftOffset: function(lineIndex) {
-    return (this._boundaries && this._boundaries[lineIndex])
-      ? fabric.util.toFixed(this._boundaries[lineIndex].left, 2)
-      : 0;
+    return fabric.util.toFixed(this._getLineLeftOffset(this.__lineWidths[lineIndex]), 2);
   },
 
   /**
    * @private
    */
   _getSVGLineTopOffset: function(lineIndex) {
-    var lineTopOffset = 0;
-    for (var j = 0; j <= lineIndex; j++) {
+    var lineTopOffset = 0, lastHeight = 0;
+    for (var j = 0; j < lineIndex; j++) {
       lineTopOffset += this._getHeightOfLine(this.ctx, j);
     }
-    return lineTopOffset - this.height / 2;
+    lastHeight = this._getHeightOfLine(this.ctx, j);
+    return {
+      lineTop: lineTopOffset,
+      offset: (this._fontSizeMult - this._fontSizeFraction) * lastHeight / (this.lineHeight * this._fontSizeMult)
+    };
   },
 
   /**
@@ -73,13 +74,10 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     return [
       //jscs:disable validateIndentation
       '<rect fill="', styleDecl.textBackgroundColor,
-      '" transform="translate(',
-        -this.width / 2, ' ',
-        -this.height + heightOfLine, ')',
       '" x="', lineLeftOffset + charOffset,
-      '" y="', lineTopOffset + heightOfLine,
+      '" y="', lineTopOffset - this.height/2,
       '" width="', charWidth,
-      '" height="', heightOfLine,
+      '" height="', heightOfLine / this.lineHeight,
       '"></rect>'
       //jscs:enable validateIndentation
     ].join('');
@@ -88,7 +86,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   /**
    * @private
    */
-  _createTextCharSpan: function(_char, styleDecl, lineLeftOffset, lineTopOffset, yProp, charOffset) {
+  _createTextCharSpan: function(_char, styleDecl, lineLeftOffset, lineTopOffset, charOffset) {
 
     var fillStyles = this.getSvgStyles.call(fabric.util.object.extend({
       visible: true,
@@ -99,16 +97,14 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
     return [
       //jscs:disable validateIndentation
-      '<tspan x="', lineLeftOffset + charOffset, '" ',
-        yProp, '="', lineTopOffset, '" ',
-
+      '<tspan x="', lineLeftOffset + charOffset, '" y="',
+        lineTopOffset - this.height/2, '" ',
         (styleDecl.fontFamily ? 'font-family="' + styleDecl.fontFamily.replace(/"/g, '\'') + '" ': ''),
         (styleDecl.fontSize ? 'font-size="' + styleDecl.fontSize + '" ': ''),
         (styleDecl.fontStyle ? 'font-style="' + styleDecl.fontStyle + '" ': ''),
         (styleDecl.fontWeight ? 'font-weight="' + styleDecl.fontWeight + '" ': ''),
         (styleDecl.textDecoration ? 'text-decoration="' + styleDecl.textDecoration + '" ': ''),
         'style="', fillStyles, '">',
-
         fabric.util.string.escapeXml(_char),
       '</tspan>'
       //jscs:enable validateIndentation

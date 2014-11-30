@@ -241,19 +241,30 @@
      * @return {CanvasGradient}
      */
     toLive: function(ctx, object) {
-      var gradient, coords = fabric.util.object.clone(this.coords);
+      var gradient, prop, coords = fabric.util.object.clone(this.coords);
 
       if (!this.type) {
         return;
       }
 
       if (object.group && object.group.type === 'path-group') {
-        for (var prop in coords) {
+        for (prop in coords) {
           if (prop === 'x1' || prop === 'x2') {
             coords[prop] += -this.offsetX + object.width / 2;
           }
           else if (prop === 'y1' || prop === 'y2') {
             coords[prop] += -this.offsetY + object.height / 2;
+          }
+        }
+      }
+
+      if (object.type === 'text') {
+        for (prop in coords) {
+          if (prop === 'x1' || prop === 'x2') {
+            coords[prop] -= object.width / 2;
+          }
+          else if (prop === 'y1' || prop === 'y2') {
+            coords[prop] -= object.height / 2;
           }
         }
       }
