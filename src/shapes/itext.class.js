@@ -156,11 +156,6 @@
     /**
      * @private
      */
-    _fontSizeFraction: 4,
-
-    /**
-     * @private
-     */
     _currentCursorOpacity: 0,
 
     /**
@@ -578,7 +573,7 @@
 
         ctx.fillRect(
           boundaries.left + lineOffset,
-          boundaries.top + boundaries.topOffset,
+          boundaries.top + boundaries.topOffset + this.fontSize / this._fontSizeFraction,
           boxWidth,
           lineHeight);
 
@@ -835,9 +830,9 @@
 
           ctx.fillRect(
             this._getLeftOffset() + lineLeftOffset,
-            this._getTopOffset() + lineHeights + fractionOfFontSize,
+            this._getTopOffset() + lineHeights + fractionOfFontSize + heightOfLine - this.fontSize,
             lineWidth,
-            heightOfLine
+            heightOfLine / this.lineHeight
           );
         }
         if (this.styles[i]) {
@@ -850,9 +845,9 @@
 
               ctx.fillRect(
                 this._getLeftOffset() + lineLeftOffset + this._getWidthOfCharsAt(ctx, i, j, textLines),
-                this._getTopOffset() + lineHeights + fractionOfFontSize,
+                this._getTopOffset() + lineHeights + fractionOfFontSize + heightOfLine - this.fontSize,
                 this._getWidthOfChar(ctx, _char, i, j, textLines) + 1,
-                heightOfLine
+                heightOfLine / this.lineHeight
               );
             }
           }
@@ -1120,8 +1115,10 @@
           maxHeight = currentCharHeight;
         }
       }
-
-      return maxHeight * this.lineHeight;
+      if (lineIndex > 0) {
+        return maxHeight * this.lineHeight;
+      }
+      return maxHeight;
     },
 
     /**

@@ -306,6 +306,11 @@
     shadow:               null,
 
     /**
+     * @private
+     */
+    _fontSizeFraction: 4,
+
+    /**
      * Constructor
      * @param {String} text Text string
      * @param {Object} [options] Options object
@@ -498,7 +503,7 @@
      */
     _renderTextLine: function(method, ctx, line, left, top, lineIndex) {
       // lift the line by quarter of fontSize
-      top -= this.fontSize / 4;
+      top -= this.fontSize / this._fontSizeFraction;
 
       // short-circuit
       if (this.textAlign !== 'justify') {
@@ -847,7 +852,7 @@
 
           textLeft = -(this.width/2),
           textTop = this.useNative
-            ? (this.fontSize * this.lineHeight - 0.25 * this.fontSize) // to lift by 1  / 4 of font height.
+            ? (this.fontSize * this.lineHeight - this.fontSize / this._fontSizeFraction) // to lift by 1  / Fraction of font height.
             : (this.height/2) - (textLines.length * this.fontSize) - this._totalLineHeight;
 
       return {
@@ -1107,7 +1112,6 @@
     if (!options.originX) {
       options.originX = 'left';
     }
-    options.top += options.fontSize / 4;
     var text = new fabric.Text(element.textContent, options),
         /*
           Adjust positioning:
@@ -1124,7 +1128,7 @@
     }
     text.set({
       left: text.getLeft() + offX,
-      top: text.getTop() - text.getHeight() / 2
+      top: text.getTop() - text.getHeight() / 2 + text.fontSize / text._fontSizeFraction
     });
 
     return text;
