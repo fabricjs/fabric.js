@@ -141,6 +141,13 @@
     preserveObjectStacking: false,
 
     /**
+     * Indicates whether the backGroundImage get clipped or not by clip context.
+     * @type Boolean
+     * @default
+     */
+    clipBackground: true,
+
+    /**
      * The transformation (in the format of Canvas transform) which focuses the viewport
      * @type Array
      * @default
@@ -834,11 +841,15 @@
 
       this.fire('before:render');
 
+      if (!this.clipBackground) {
+        this._renderBackground(canvasToDrawOn);
+      }
       if (this.clipTo) {
         fabric.util.clipContext(this, canvasToDrawOn);
       }
-
-      this._renderBackground(canvasToDrawOn);
+      if (this.clipBackground) {
+        this._renderBackground(canvasToDrawOn);
+      }
       this._renderObjects(canvasToDrawOn, activeGroup);
       this._renderActiveGroup(canvasToDrawOn, activeGroup);
 
