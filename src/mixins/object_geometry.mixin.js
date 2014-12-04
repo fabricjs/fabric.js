@@ -302,35 +302,13 @@
      * @chainable
      */
     setCoords: function() {
-      var strokeWidth = this.strokeWidth,
-          theta = degreesToRadians(this.angle),
+      var theta = degreesToRadians(this.angle),
           vpt = this.getViewportTransform(),
           f = function (p) {
             return fabric.util.transformPoint(p, vpt);
           },
-          w = this.width, currentWidth,
-          h = this.height, currentHeight,
-          capped = this.strokeLineCap === 'round' || this.strokeLineCap === 'square',
-          vLine = this.type === 'line' && this.width === 0,
-          hLine = this.type === 'line' && this.height === 0,
-          sLine = vLine || hLine,
-          strokeW = (capped && hLine) || !sLine,
-          strokeH = (capped && vLine) || !sLine;
-
-      if (vLine) {
-        w = strokeWidth;
-      }
-      else if (hLine) {
-        h = strokeWidth;
-      }
-      if (strokeW) {
-        w += w > 0 ? strokeWidth : -strokeWidth;
-      }
-      if (strokeH) {
-        h += h > 0 ? strokeWidth : -strokeWidth;
-      }
-      currentWidth = w * this.scaleX + 2 * this.padding;
-      currentHeight = h * this.scaleY + 2 * this.padding;
+          p = this._calculateCurrentDimensions(false),
+          currentWidth = p.x, currentHeight = p.y;
 
       // If width is negative, make postive. Fixes path selection issue
       if (currentWidth < 0) {
@@ -355,31 +333,29 @@
           wh = new fabric.Point(currentWidth, currentHeight),
           _tl =   new fabric.Point(coords.x - offsetX, coords.y - offsetY),
           _tr =   new fabric.Point(_tl.x + (wh.x * cosTh),   _tl.y + (wh.x * sinTh)),
-          _bl =   new fabric.Point(_tl.x - (wh.y * sinTh),   _tl.y + (wh.y * cosTh)),
-          _mt =   new fabric.Point(_tl.x + (wh.x/2 * cosTh), _tl.y + (wh.x/2 * sinTh)),
+          bl =  f(new fabric.Point(_tl.x - (wh.y * sinTh),   _tl.y + (wh.y * cosTh))),
+          br  = f(new fabric.Point(_tr.x - (wh.y * sinTh),   _tr.y + (wh.y * cosTh))),
           tl  = f(_tl),
           tr  = f(_tr),
-          br  = f(new fabric.Point(_tr.x - (wh.y * sinTh),   _tr.y + (wh.y * cosTh))),
-          bl  = f(_bl),
-          ml  = f(new fabric.Point(_tl.x - (wh.y/2 * sinTh), _tl.y + (wh.y/2 * cosTh))),
-          mt  = f(_mt),
-          mr  = f(new fabric.Point(_tr.x - (wh.y/2 * sinTh), _tr.y + (wh.y/2 * cosTh))),
-          mb  = f(new fabric.Point(_bl.x + (wh.x/2 * cosTh), _bl.y + (wh.x/2 * sinTh))),
-          mtr = f(new fabric.Point(_mt.x, _mt.y));
-
+          ml  = new fabric.Point((tl.x + bl.x)/2, (tl.y + bl.y)/2),
+          mt  = new fabric.Point((tr.x + tl.x)/2, (tr.y + tl.y)/2),
+          mr  = new fabric.Point((br.x + tr.x)/2, (br.y + tr.y)/2),
+          mb  = new fabric.Point((br.x + bl.x)/2, (br.y + bl.y)/2),
+          mtr = new fabric.Point(mt.x + sinTh * this.rotatingPointOffset, mt.y - cosTh * this.rotatingPointOffset);
       // debugging
 
-      // setTimeout(function() {
-      //   canvas.contextTop.fillStyle = 'green';
-      //   canvas.contextTop.fillRect(mb.x, mb.y, 3, 3);
-      //   canvas.contextTop.fillRect(bl.x, bl.y, 3, 3);
-      //   canvas.contextTop.fillRect(br.x, br.y, 3, 3);
-      //   canvas.contextTop.fillRect(tl.x, tl.y, 3, 3);
-      //   canvas.contextTop.fillRect(tr.x, tr.y, 3, 3);
-      //   canvas.contextTop.fillRect(ml.x, ml.y, 3, 3);
-      //   canvas.contextTop.fillRect(mr.x, mr.y, 3, 3);
-      //   canvas.contextTop.fillRect(mt.x, mt.y, 3, 3);
-      // }, 50);
+      /* setTimeout(function() {
+         canvas.contextTop.fillStyle = 'green';
+         canvas.contextTop.fillRect(mb.x, mb.y, 3, 3);
+         canvas.contextTop.fillRect(bl.x, bl.y, 3, 3);
+         canvas.contextTop.fillRect(br.x, br.y, 3, 3);
+         canvas.contextTop.fillRect(tl.x, tl.y, 3, 3);
+         canvas.contextTop.fillRect(tr.x, tr.y, 3, 3);
+         canvas.contextTop.fillRect(ml.x, ml.y, 3, 3);
+         canvas.contextTop.fillRect(mr.x, mr.y, 3, 3);
+         canvas.contextTop.fillRect(mt.x, mt.y, 3, 3);
+         canvas.contextTop.fillRect(mtr.x, mtr.y, 3, 3);
+       }, 50); */
 
       this.oCoords = {
         // corners

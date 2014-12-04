@@ -430,12 +430,14 @@
     _calcBounds: function(onlyWidthHeight) {
       var aX = [],
           aY = [],
-          o;
+          o, prop,
+          props = ['tr', 'br', 'bl', 'tl'];
 
       for (var i = 0, len = this._objects.length; i < len; ++i) {
         o = this._objects[i];
         o.setCoords();
-        for (var prop in o.oCoords) {
+        for (var j = 0; j < props.length; j++) {
+          prop = props[j];
           aX.push(o.oCoords[prop].x);
           aY.push(o.oCoords[prop].y);
         }
