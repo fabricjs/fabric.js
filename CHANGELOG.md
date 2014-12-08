@@ -1,5 +1,5 @@
 **Edge**
-
+- Add "clipBackground" a canvas option to render the background before the canvas clip context.
 - [BACK_INCOMPAT] `fabric.Collection#remove` doesn't return removed object -> returns `this` (chainable)
 
 - Add "mouse:over" and "mouse:out" canvas events (and corresponding "mouseover", "mouseout" object events)
