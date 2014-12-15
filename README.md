@@ -7,7 +7,7 @@
 <!-- build/coverage status, climate -->
 
 [![Build Status](https://secure.travis-ci.org/kangax/fabric.js.png?branch=master)](http://travis-ci.org/#!/kangax/fabric.js)
-[![Code Climate](https://codeclimate.com/repos/526a0ed089af7e6cf2001389/badges/d1c922dd1511ffa8a72f/gpa.png)](https://codeclimate.com/repos/526a0ed089af7e6cf2001389/feed)
+[![Code Climate](https://d3s6mut3hikguw.cloudfront.net/github/kangax/fabric.js/badges/gpa.svg)](https://codeclimate.com/github/kangax/fabric.js)
 [![Coverage Status](https://coveralls.io/repos/kangax/fabric.js/badge.png?branch=master)](https://coveralls.io/r/kangax/fabric.js?branch=master)
 
 <!-- npm, bower versions, downloads -->
