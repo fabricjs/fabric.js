@@ -21,6 +21,26 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
   type: 'BaseFilter',
 
   /**
+   * Constructor
+   * @param {Object} [options] Options object
+   */
+  initialize: function(options) {
+    if (options) {
+      this.setOptions(options);
+    }
+  },
+
+  /**
+   * Sets filter's properties from options
+   * @param {Object} [options] Options object
+   */
+  setOptions: function(options) {
+    for (var prop in options) {
+      this[prop] = options[prop];
+    }
+  },
+
+  /**
    * Returns object representation of an instance
    * @return {Object} Object representation of an instance
    */

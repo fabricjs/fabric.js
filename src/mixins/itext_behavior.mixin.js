@@ -582,11 +582,7 @@
      * @param {Array} [styles] Styles to insert
      */
     insertStyleObjects: function(_chars, isEndOfLine, styles) {
-
-      // short-circuit
-      if (this.isEmptyStyles()) {
-        return;
-      }
+      // removed shortcircuit over isEmptyStyles
 
       var cursorLocation = this.get2DCursorLocation(),
           lineIndex = cursorLocation.lineIndex,

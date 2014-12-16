@@ -69,9 +69,7 @@
       this._calcBounds();
       this._updateObjectsCoords();
 
-      if (options) {
-        extend(this, options);
-      }
+      this.callSuper('initialize', options);
 
       this.setCoords();
       this.saveCoords();
@@ -198,31 +196,12 @@
     _set: function(key, value) {
       var i;
       if (key in this.delegatedProperties) {
-        i = this._objects.length;
-        this[key] = value;
+        var i = this._objects.length;
         while (i--) {
           this._objects[i].set(key, value);
         }
       }
-      else {
-        this[key] = value;
-
-        /*
-         * Reverse the group's scaling on Textboxs and change their width
-         * instead. Size of text in a Textbox must be controlled by fontSize.
-         */
-        if (fabric.Textbox && key === 'scaleX') {
-          i = this._objects.length;
-          while (i--) {
-            var o = this._objects[i];
-            if (o instanceof fabric.Textbox) {
-              o.set(key, Math.abs(1 / value));
-              o.set('width', (o.get('width') * value) / (typeof o.__oldScaleX === 'undefined' ? 1 : o.__oldScaleX));
-              o.__oldScaleX = value;
-            }
-          }
-        }
-      }
+      this.callSuper('_set', key, value);
     },
     /**
      * Returns object representation of an instance

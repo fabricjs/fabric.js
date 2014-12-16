@@ -305,6 +305,7 @@
 
     /**
      * Horizontal origin of transformation of an object (one of "left", "right", "center")
+     * See http://jsfiddle.net/1ow02gea/40/ on how originX/originY affect objects in groups
      * @type String
      * @default
      */
@@ -312,6 +313,7 @@
 
     /**
      * Vertical origin of transformation of an object (one of "top", "bottom", "center")
+     * See http://jsfiddle.net/1ow02gea/40/ on how originX/originY affect objects in groups
      * @type String
      * @default
      */
@@ -963,7 +965,7 @@
      */
     render: function(ctx, noTransform) {
       // do not render if width/height are zeros or object is not visible
-      if (this.width === 0 || this.height === 0 || !this.visible) {
+      if ((this.width === 0 && this.height === 0) || !this.visible) {
         return;
       }
 
@@ -1198,7 +1200,7 @@
       el.height = boundingRect.height;
 
       fabric.util.wrapElement(el, 'div');
-      var canvas = new fabric.Canvas(el);
+      var canvas = new fabric.StaticCanvas(el);
 
       // to avoid common confusion https://github.com/kangax/fabric.js/issues/806
       if (options.format === 'jpg') {

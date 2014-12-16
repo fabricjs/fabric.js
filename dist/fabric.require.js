@@ -1,7 +1,7 @@
 /* build: `node build.js modules=animation,interaction,gestures,image_filters,text,itext,textbox,shadow minifier=uglifyjs` */
 /*! Fabric.js Copyright 2008-2014, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.4.12" };
+var fabric = fabric || { version: "1.4.13" };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -2344,8 +2344,12 @@ fabric.log = function() { };
 fabric.warn = function() { };
 
 if (typeof console !== 'undefined') {
+
   ['log', 'warn'].forEach(function(methodName) {
-    if (typeof console[methodName] !== 'undefined' && console[methodName].apply) {
+
+    if (typeof console[methodName] !== 'undefined' &&
+        typeof console[methodName].apply === 'function') {
+
       fabric[methodName] = function() {
         return console[methodName].apply(console, arguments);
       };
@@ -4173,7 +4177,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
     /**
      * Sets x/y of this point
      * @param {Number} x
-     * @return {Number} y
+     * @param {Number} y
      */
     setXY: function (x, y) {
       this.x = x;
@@ -9412,6 +9416,11 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
           pointer = fabric.util.transformPoint(this.getPointer(e, true), ivt);
       this.freeDrawingBrush.onMouseDown(pointer);
       this.fire('mouse:down', { e: e });
+
+      var target = this.findTarget(e);
+      if (typeof target !== 'undefined') {
+        target.fire('mousedown', { e: e, target: target });
+      }
     },
 
     /**
@@ -9426,6 +9435,11 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       }
       this.setCursor(this.freeDrawingCursor);
       this.fire('mouse:move', { e: e });
+
+      var target = this.findTarget(e);
+      if (typeof target !== 'undefined') {
+        target.fire('mousemove', { e: e, target: target });
+      }
     },
 
     /**
@@ -9439,6 +9453,11 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       }
       this.freeDrawingBrush.onMouseUp();
       this.fire('mouse:up', { e: e });
+
+      var target = this.findTarget(e);
+      if (typeof target !== 'undefined') {
+        target.fire('mouseup', { e: e, target: target });
+      }
     },
 
     /**
@@ -10687,6 +10706,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
     /**
      * Horizontal origin of transformation of an object (one of "left", "right", "center")
+     * See http://jsfiddle.net/1ow02gea/40/ on how originX/originY affect objects in groups
      * @type String
      * @default
      */
@@ -10694,6 +10714,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
     /**
      * Vertical origin of transformation of an object (one of "top", "bottom", "center")
+     * See http://jsfiddle.net/1ow02gea/40/ on how originX/originY affect objects in groups
      * @type String
      * @default
      */
@@ -11345,7 +11366,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      */
     render: function(ctx, noTransform) {
       // do not render if width/height are zeros or object is not visible
-      if (this.width === 0 || this.height === 0 || !this.visible) {
+      if ((this.width === 0 && this.height === 0) || !this.visible) {
         return;
       }
 
@@ -12462,23 +12483,25 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
     /**
      * Sets corner position coordinates based on current angle, width and height
+     * See https://github.com/kangax/fabric.js/wiki/When-to-call-setCoords
      * @return {fabric.Object} thisArg
      * @chainable
      */
     setCoords: function() {
-      var strokeWidth = this.strokeWidth > 1 ? this.strokeWidth : 0,
+      var strokeWidth = this.strokeWidth,
           theta = degreesToRadians(this.angle),
           vpt = this.getViewportTransform(),
           f = function (p) {
             return fabric.util.transformPoint(p, vpt);
           },
-          w = this.width,
-          h = this.height,
+          w = this.width, currentWidth,
+          h = this.height, currentHeight,
           capped = this.strokeLineCap === 'round' || this.strokeLineCap === 'square',
-          vLine = this.type === 'line' && this.width === 1,
-          hLine = this.type === 'line' && this.height === 1,
-          strokeW = (capped && hLine) || this.type !== 'line',
-          strokeH = (capped && vLine) || this.type !== 'line';
+          vLine = this.type === 'line' && this.width === 0,
+          hLine = this.type === 'line' && this.height === 0,
+          sLine = vLine || hLine,
+          strokeW = (capped && hLine) || !sLine,
+          strokeH = (capped && vLine) || !sLine;
 
       if (vLine) {
         w = strokeWidth;
@@ -12492,21 +12515,21 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       if (strokeH) {
         h += h > 0 ? strokeWidth : -strokeWidth;
       }
-      this.currentWidth = w * this.scaleX;
-      this.currentHeight = h * this.scaleY;
+      currentWidth = w * this.scaleX + 2 * this.padding;
+      currentHeight = h * this.scaleY + 2 * this.padding;
 
       // If width is negative, make postive. Fixes path selection issue
-      if (this.currentWidth < 0) {
-        this.currentWidth = Math.abs(this.currentWidth);
+      if (currentWidth < 0) {
+        currentWidth = Math.abs(currentWidth);
       }
 
       var _hypotenuse = Math.sqrt(
-            Math.pow(this.currentWidth / 2, 2) +
-            Math.pow(this.currentHeight / 2, 2)),
+            Math.pow(currentWidth / 2, 2) +
+            Math.pow(currentHeight / 2, 2)),
 
           _angle = Math.atan(
-            isFinite(this.currentHeight / this.currentWidth)
-              ? this.currentHeight / this.currentWidth
+            isFinite(currentHeight / currentWidth)
+              ? currentHeight / currentWidth
               : 0),
 
           // offset added for rotate and scale actions
@@ -12515,7 +12538,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
           sinTh = Math.sin(theta),
           cosTh = Math.cos(theta),
           coords = this.getCenterPoint(),
-          wh = new fabric.Point(this.currentWidth, this.currentHeight),
+          wh = new fabric.Point(currentWidth, currentHeight),
           _tl =   new fabric.Point(coords.x - offsetX, coords.y - offsetY),
           _tr =   new fabric.Point(_tl.x + (wh.x * cosTh),   _tl.y + (wh.x * sinTh)),
           _bl =   new fabric.Point(_tl.x - (wh.y * sinTh),   _tl.y + (wh.y * cosTh)),
@@ -12528,21 +12551,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
           mt  = f(_mt),
           mr  = f(new fabric.Point(_tr.x - (wh.y/2 * sinTh), _tr.y + (wh.y/2 * cosTh))),
           mb  = f(new fabric.Point(_bl.x + (wh.x/2 * cosTh), _bl.y + (wh.x/2 * sinTh))),
-          mtr = f(new fabric.Point(_mt.x, _mt.y)),
-
-          // padding
-          padX = Math.cos(_angle + theta) * this.padding * Math.sqrt(2),
-          padY = Math.sin(_angle + theta) * this.padding * Math.sqrt(2);
-
-      tl = tl.add(new fabric.Point(-padX, -padY));
-      tr = tr.add(new fabric.Point(padY, -padX));
-      br = br.add(new fabric.Point(padX, padY));
-      bl = bl.add(new fabric.Point(-padY, padX));
-      ml = ml.add(new fabric.Point((-padX - padY) / 2, (-padY + padX) / 2));
-      mt = mt.add(new fabric.Point((padY - padX) / 2, -(padY + padX) / 2));
-      mr = mr.add(new fabric.Point((padY + padX) / 2, (padY - padX) / 2));
-      mb = mb.add(new fabric.Point((padX - padY) / 2, (padX + padY) / 2));
-      mtr = mtr.add(new fabric.Point((padY - padX) / 2, -(padY + padX) / 2));
+          mtr = f(new fabric.Point(_mt.x, _mt.y));
 
       // debugging
 
@@ -13108,12 +13117,14 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       var w = this.getWidth(),
           h = this.getHeight(),
-          strokeWidth = this.strokeWidth > 1 ? this.strokeWidth : 0,
+          strokeWidth = this.strokeWidth,
           capped = this.strokeLineCap === 'round' || this.strokeLineCap === 'square',
-          vLine = this.type === 'line' && this.width === 1,
-          hLine = this.type === 'line' && this.height === 1,
-          strokeW = (capped && hLine) || this.type !== 'line',
-          strokeH = (capped && vLine) || this.type !== 'line';
+          vLine = this.type === 'line' && this.width === 0,
+          hLine = this.type === 'line' && this.height === 0,
+          sLine = vLine || hLine,
+          strokeW = (capped && hLine) || !sLine,
+          strokeH = (capped && vLine) || !sLine;
+
       if (vLine) {
         w = strokeWidth / scaleX;
       }
@@ -13172,14 +13183,15 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       var size = this.cornerSize,
           size2 = size / 2,
           vpt = this.getViewportTransform(),
-          strokeWidth = this.strokeWidth > 1 ? this.strokeWidth : 0,
+          strokeWidth = this.strokeWidth,
           w = this.width,
           h = this.height,
           capped = this.strokeLineCap === 'round' || this.strokeLineCap === 'square',
-          vLine = this.type === 'line' && this.width === 1,
-          hLine = this.type === 'line' && this.height === 1,
-          strokeW = (capped && hLine) || this.type !== 'line',
-          strokeH = (capped && vLine) || this.type !== 'line';
+          vLine = this.type === 'line' && this.width === 0,
+          hLine = this.type === 'line' && this.height === 0,
+          sLine = vLine || hLine,
+          strokeW = (capped && hLine) || !sLine,
+          strokeH = (capped && vLine) || !sLine;
 
       if (vLine) {
         w = strokeWidth;
@@ -13665,8 +13677,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     _setWidthHeight: function(options) {
       options || (options = { });
 
-      this.width = Math.abs(this.x2 - this.x1) || 1;
-      this.height = Math.abs(this.y2 - this.y1) || 1;
+      this.width = Math.abs(this.x2 - this.x1);
+      this.height = Math.abs(this.y2 - this.y1);
 
       this.left = 'left' in options
         ? options.left
@@ -13735,30 +13747,21 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       if (noTransform) {
         //  Line coords are distances from left-top of canvas to origin of line.
-        //
         //  To render line in a path-group, we need to translate them to
         //  distances from center of path-group to center of line.
         var cp = this.getCenterPoint();
         ctx.translate(
-          cp.x,
-          cp.y
+          cp.x - this.strokeWidth / 2,
+          cp.y - this.strokeWidth / 2
         );
       }
 
       if (!this.strokeDashArray || this.strokeDashArray && supportsLineDash) {
-
         // move from center (of virtual box) to its left/top corner
         // we can't assume x1, y1 is top left and x2, y2 is bottom right
-        var xMult = this.x1 <= this.x2 ? -1 : 1,
-            yMult = this.y1 <= this.y2 ? -1 : 1;
-
-        ctx.moveTo(
-          this.width === 1 ? 0 : (xMult * this.width / 2),
-          this.height === 1 ? 0 : (yMult * this.height / 2));
-
-        ctx.lineTo(
-          this.width === 1 ? 0 : (xMult * -1 * this.width / 2),
-          this.height === 1 ? 0 : (yMult * -1 * this.height / 2));
+        var p = this.calcLinePoints();
+        ctx.moveTo(p.x1, p.y1);
+        ctx.lineTo(p.x2, p.y2);
       }
 
       ctx.lineWidth = this.strokeWidth;
@@ -13777,14 +13780,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _renderDashedStroke: function(ctx) {
-      var
-        xMult = this.x1 <= this.x2 ? -1 : 1,
-        yMult = this.y1 <= this.y2 ? -1 : 1,
-        x = this.width === 1 ? 0 : xMult * this.width / 2,
-        y = this.height === 1 ? 0 : yMult * this.height / 2;
+      var p = this.calcLinePoints();
 
       ctx.beginPath();
-      fabric.util.drawDashedLine(ctx, x, y, -x, -y, this.strokeDashArray);
+      fabric.util.drawDashedLine(ctx, p.x1, p.y1, p.x2, p.y2, this.strokeDashArray);
       ctx.closePath();
     },
 
@@ -13805,10 +13804,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     calcLinePoints: function() {
       var xMult = this.x1 <= this.x2 ? -1 : 1,
           yMult = this.y1 <= this.y2 ? -1 : 1,
-          x1 = (xMult * this.width / 2),
-          y1 = (yMult * this.height / 2),
-          x2 = (xMult * -1 * this.width / 2),
-          y2 = (yMult * -1 * this.height / 2);
+          x1 = (xMult * this.width * 0.5),
+          y1 = (yMult * this.height * 0.5),
+          x2 = (xMult * this.width * -0.5),
+          y2 = (yMult * this.height * -0.5);
 
       return {
         x1: x1,
@@ -16240,9 +16239,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       this._calcBounds();
       this._updateObjectsCoords();
 
-      if (options) {
-        extend(this, options);
-      }
+      this.callSuper('initialize', options);
 
       this.setCoords();
       this.saveCoords();
@@ -16370,14 +16367,11 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     _set: function(key, value) {
       if (key in this.delegatedProperties) {
         var i = this._objects.length;
-        this[key] = value;
         while (i--) {
           this._objects[i].set(key, value);
         }
       }
-      else {
-        this[key] = value;
-      }
+      this.callSuper('_set', key, value);
     },
 
     /**
@@ -16793,6 +16787,22 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     meetOrSlice: 'meet',
 
     /**
+     * private
+     * contains last value of scaleX to detect
+     * if the Image got resized after the last Render
+     * @type Number
+     */
+    _lastScaleX: 1,
+
+    /**
+     * private
+     * contains last value of scaleY to detect
+     * if the Image got resized after the last Render
+     * @type Number
+     */
+    _lastScaleY: 1,
+
+    /**
      * Constructor
      * @param {HTMLImageElement | String} element Image element
      * @param {Object} [options] Options object
@@ -16802,7 +16812,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       options || (options = { });
 
       this.filters = [ ];
-
+      this.resizeFilters = [ ];
       this.callSuper('initialize', options);
 
       this._initElement(element, options);
@@ -17021,61 +17031,65 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @return {fabric.Image} thisArg
      * @chainable
      */
-    applyFilters: function(callback) {
-      if (!this._originalElement) {
+    applyFilters: function(callback, filters, imgElement, forResizing) {
+
+      filters = filters || this.filters;
+      imgElement = imgElement || this._originalElement;
+
+      if (!imgElement) {
         return;
       }
 
-      if (this.filters.length === 0) {
-        this._element = this._originalElement;
-        callback && callback();
-        return;
-      }
-
-      var imgEl = this._originalElement,
+      var imgEl = imgElement,
           canvasEl = fabric.util.createCanvasElement(),
           replacement = fabric.util.createImage(),
           _this = this;
 
       canvasEl.width = imgEl.width;
       canvasEl.height = imgEl.height;
-
       canvasEl.getContext('2d').drawImage(imgEl, 0, 0, imgEl.width, imgEl.height);
 
-      this.filters.forEach(function(filter) {
-        filter && filter.applyTo(canvasEl);
+      if (filters.length === 0) {
+        this._element = imgElement;
+        callback && callback();
+        return canvasEl;
+      }
+      filters.forEach(function(filter) {
+        filter && filter.applyTo(canvasEl, filter.scaleX || _this.scaleX, filter.scaleY || _this.scaleY);
+        if (!forResizing && filter.type === 'Resize') {
+          _this.width *= filter.scaleX;
+          _this.height *= filter.scaleY;
+        }
       });
 
-       /** @ignore */
-
-      replacement.width = imgEl.width;
-      replacement.height = imgEl.height;
+      /** @ignore */
+      replacement.width = canvasEl.width;
+      replacement.height = canvasEl.height;
 
       if (fabric.isLikelyNode) {
         replacement.src = canvasEl.toBuffer(undefined, fabric.Image.pngCompression);
-
         // onload doesn't fire in some node versions, so we invoke callback manually
         _this._element = replacement;
+        !forResizing && (_this._filteredEl = replacement);
         callback && callback();
       }
       else {
         replacement.onload = function() {
           _this._element = replacement;
+          !forResizing && (_this._filteredEl = replacement);
           callback && callback();
           replacement.onload = canvasEl = imgEl = null;
         };
         replacement.src = canvasEl.toDataURL('image/png');
       }
-
-      return this;
+      return canvasEl;
     },
-
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx, noTransform) {
-      var x, y, imageMargins = this._findMargins();
+      var x, y, imageMargins = this._findMargins(), elementToDraw;
 
       x = (noTransform ? this.left : -this.width / 2);
       y = (noTransform ? this.top : -this.height / 2);
@@ -17086,14 +17100,28 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         ctx.clip();
       }
 
-      this._element &&
-      ctx.drawImage(this._element,
-                    x + imageMargins.marginX,
-                    y + imageMargins.marginY,
-                    imageMargins.width,
-                    imageMargins.height
-                   );
+      if (this.isMoving === false && this.resizeFilters.length && this._needsResize()) {
+        this._lastScaleX = this.scaleX;
+        this._lastScaleY = this.scaleY;
+        elementToDraw = this.applyFilters(null, this.resizeFilters, this._filteredEl || this._originalElement, true);
+      }
+      else {
+        elementToDraw = this._element;
+      }
+      elementToDraw && ctx.drawImage(elementToDraw,
+                                     x + imageMargins.marginX,
+                                     y + imageMargins.marginY,
+                                     imageMargins.width,
+                                     imageMargins.height
+                                    );
+
       this._renderStroke(ctx);
+    },
+    /**
+     * @private, needed to check if image needs resize
+     */
+    _needsResize: function() {
+      return (this.scaleX !== this._lastScaleX || this.scaleY !== this._lastScaleY);
     },
 
     /**
@@ -17336,6 +17364,26 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
    * @default
    */
   type: 'BaseFilter',
+
+  /**
+   * Constructor
+   * @param {Object} [options] Options object
+   */
+  initialize: function(options) {
+    if (options) {
+      this.setOptions(options);
+    }
+  },
+
+  /**
+   * Sets filter's properties from options
+   * @param {Object} [options] Options object
+   */
+  setOptions: function(options) {
+    for (var prop in options) {
+      this[prop] = options[prop];
+    }
+  },
 
   /**
    * Returns object representation of an instance
@@ -18701,6 +18749,316 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
   fabric.Image.filters.Blend.fromObject = function(object) {
     return new fabric.Image.filters.Blend(object);
   };
+})(typeof exports !== 'undefined' ? exports : this);
+
+
+(function(global) {
+
+  'use strict';
+
+  var fabric  = global.fabric || (global.fabric = { }), pow = Math.pow, floor = Math.floor,
+      sqrt = Math.sqrt, abs = Math.abs, max = Math.max, round = Math.round, sin = Math.sin,
+      ceil = Math.ceil;
+
+  /**
+   * Resize image filter class
+   * @class fabric.Image.filters.Resize
+   * @memberOf fabric.Image.filters
+   * @extends fabric.Image.filters.BaseFilter
+   * @see {@link http://fabricjs.com/image-filters/|ImageFilters demo}
+   * @example
+   * var filter = new fabric.Image.filters.Resize();
+   * object.filters.push(filter);
+   * object.applyFilters(canvas.renderAll.bind(canvas));
+   */
+  fabric.Image.filters.Resize = fabric.util.createClass(fabric.Image.filters.BaseFilter, /** @lends fabric.Image.filters.Resize.prototype */ {
+
+    /**
+     * Filter type
+     * @param {String} type
+     * @default
+     */
+    type: 'Resize',
+
+    /**
+     * Resize type
+     * @param {String} resizeType
+     * @default
+     */
+    resizeType: 'hermite',
+
+    /**
+     * Scale factor for resizing, x axis
+     * @param {Number} scaleX
+     * @default
+     */
+    scaleX: 0,
+
+    /**
+     * Scale factor for resizing, y axis
+     * @param {Number} scaleY
+     * @default
+     */
+    scaleY: 0,
+
+    /**
+     * LanczosLobes parameter for lanczos filter
+     * @param {Number} lanczosLobes
+     * @default
+     */
+    lanczosLobes: 3,
+
+    /**
+     * Applies filter to canvas element
+     * @memberOf fabric.Image.filters.Resize.prototype
+     * @param {Object} canvasEl Canvas element to apply filter to
+     */
+    applyTo: function(canvasEl, scaleX, scaleY) {
+
+      this.rcpScaleX = 1 / scaleX;
+      this.rcpScaleY = 1 / scaleY;
+
+      var oW = canvasEl.width, oH = canvasEl.height,
+          dW = round(oW * scaleX), dH = round(oH * scaleY),
+          imageData;
+
+      if (this.resizeType === 'sliceHack') {
+        imageData = this.sliceByTwo(canvasEl, oW, oH, dW, dH);
+      }
+      if (this.resizeType === 'hermite') {
+        imageData = this.hermiteFastResize(canvasEl, oW, oH, dW, dH);
+      }
+      if (this.resizeType === 'bilinear') {
+        imageData = this.bilinearFiltering(canvasEl, oW, oH, dW, dH);
+      }
+      if (this.resizeType === 'lanczos') {
+        imageData = this.lanczosResize(canvasEl, oW, oH, dW, dH);
+      }
+      canvasEl.width = dW;
+      canvasEl.height = dH;
+      canvasEl.getContext('2d').putImageData(imageData, 0, 0);
+    },
+
+    sliceByTwo: function(canvasEl, width, height, newWidth, newHeight) {
+      var context = canvasEl.getContext('2d'), imageData,
+          multW = 0.5, multH = 0.5, signW = 1, signH = 1,
+          doneW = false, doneH = false, stepW = width, stepH = height,
+          tmpCanvas = fabric.util.createCanvasElement(),
+          tmpCtx = tmpCanvas.getContext('2d');
+      newWidth = floor(newWidth);
+      newHeight = floor(newHeight);
+      tmpCanvas.width = max(newWidth, width);
+      tmpCanvas.height = max(newHeight, height);
+
+      if (newWidth > width) {
+        multW = 2;
+        signW = -1;
+      }
+      if (newHeight > height) {
+        multH = 2;
+        signH = -1;
+      }
+      imageData = context.getImageData(0, 0, width, height);
+      canvasEl.width = max(newWidth, width);
+      canvasEl.height = max(newHeight, height);
+      context.putImageData(imageData, 0, 0);
+
+      while (!doneW || !doneH) {
+        width = stepW;
+        height = stepH;
+        if (newWidth * signW < floor(stepW * multW * signW)) {
+          stepW = floor(stepW * multW);
+        }
+        else {
+          stepW = newWidth;
+          doneW = true;
+        }
+        if (newHeight * signH < floor(stepH * multH * signH)) {
+          stepH = floor(stepH * multH);
+        }
+        else {
+          stepH = newHeight;
+          doneH = true;
+        }
+        imageData = context.getImageData(0, 0, width, height);
+        tmpCtx.putImageData(imageData, 0, 0);
+        context.clearRect(0, 0, stepW, stepH);
+        context.drawImage(tmpCanvas, 0, 0, width, height, 0, 0, stepW, stepH);
+      }
+      return context.getImageData(0, 0, newWidth, newHeight);
+    },
+
+    lanczosResize: function(canvasEl, oW, oH, dW, dH) {
+
+      function lanczosCreate(lobes) {
+        return function(x) {
+          if (x > lobes) {
+            return 0;
+          }
+          x *= Math.PI;
+          if (abs(x) < 1e-16) {
+            return 1;
+          }
+          var xx = x / lobes;
+          return sin(x) * sin(xx) / x / xx;
+        };
+      }
+
+      function process(u) {
+        var v, i, weight, idx, a, red, green,
+            blue, alpha, fX, fY;
+        center.x = (u + 0.5) * ratioX;
+        icenter.x = floor(center.x);
+        for (v = 0; v < dH; v++) {
+          center.y = (v + 0.5) * ratioY;
+          icenter.y = floor(center.y);
+          a = 0, red = 0, green = 0, blue = 0, alpha = 0;
+          for (i = icenter.x - range2X; i <= icenter.x + range2X; i++) {
+            if (i < 0 || i >= oW) {
+              continue;
+            }
+            fX = floor(1000 * abs(i - center.x));
+            if (!cacheLanc[fX]) {
+              cacheLanc[fX] = { };
+            }
+            for (var j = icenter.y - range2Y; j <= icenter.y + range2Y; j++) {
+              if (j < 0 || j >= oH) {
+                continue;
+              }
+              fY = floor(1000 * abs(j - center.y));
+              if (!cacheLanc[fX][fY]) {
+                cacheLanc[fX][fY] = lanczos(sqrt(pow(fX * rcpRatioX, 2) + pow(fY * rcpRatioY, 2)) / 1000);
+              }
+              weight = cacheLanc[fX][fY];
+              if (weight > 0) {
+                idx = (j * oW + i) * 4;
+                a += weight;
+                red += weight * srcData[idx];
+                green += weight * srcData[idx + 1];
+                blue += weight * srcData[idx + 2];
+                alpha += weight * srcData[idx + 3];
+              }
+            }
+          }
+          idx = (v * dW + u) * 4;
+          destData[idx] = red / a;
+          destData[idx + 1] = green / a;
+          destData[idx + 2] = blue / a;
+          destData[idx + 3] = alpha / a;
+        }
+
+        if (++u < dW) {
+          return process(u);
+        }
+        else {
+          return destImg;
+        }
+      }
+
+      var context = canvasEl.getContext('2d'),
+          srcImg = context.getImageData(0, 0, oW, oH),
+          destImg = context.getImageData(0, 0, dW, dH),
+          srcData = srcImg.data, destData = destImg.data,
+          lanczos = lanczosCreate(this.lanczosLobes),
+          ratioX = this.rcpScaleX, ratioY = this.rcpScaleY,
+          rcpRatioX = 2 / this.rcpScaleX, rcpRatioY = 2 / this.rcpScaleY,
+          range2X = ceil(ratioX * this.lanczosLobes / 2),
+          range2Y = ceil(ratioY * this.lanczosLobes / 2),
+          cacheLanc = { }, center = { }, icenter = { };
+
+      return process(0);
+    },
+
+    bilinearFiltering: function(canvasEl, w, h, w2, h2) {
+      var a, b, c, d, x, y, i, j, xDiff, yDiff, chnl,
+          color, offset = 0, origPix, ratioX = this.rcpScaleX,
+          ratioY = this.rcpScaleY, context = canvasEl.getContext('2d'),
+          w4 = 4 * (w - 1), img = context.getImageData(0, 0, w, h),
+          pixels = img.data, destImage = context.getImageData(0, 0, w2, h2),
+          destPixels = destImage.data;
+      for (i = 0; i < h2; i++) {
+        for (j = 0; j < w2; j++) {
+          x = floor(ratioX * j);
+          y = floor(ratioY * i);
+          xDiff = ratioX * j - x;
+          yDiff = ratioY * i - y;
+          origPix = 4 * (y * w + x);
+
+          for (chnl = 0; chnl < 4; chnl++) {
+            a = pixels[origPix + chnl];
+            b = pixels[origPix + 4 + chnl];
+            c = pixels[origPix + w4 + chnl];
+            d = pixels[origPix + w4 + 4 + chnl];
+            color = a * (1 - xDiff) * (1 - yDiff) + b * xDiff * (1 - yDiff) +
+                    c * yDiff * (1 - xDiff) + d * xDiff * yDiff;
+            destPixels[offset++] = color;
+          }
+        }
+      }
+      return destImage;
+    },
+
+    hermiteFastResize: function(canvasEl, oW, oH, dW, dH) {
+      var ratioW = this.rcpScaleX, ratioH = this.rcpScaleY,
+          ratioWHalf = ceil(ratioW / 2),
+          ratioHHalf = ceil(ratioH / 2),
+          context = canvasEl.getContext('2d'),
+          img = context.getImageData(0, 0, oW, oH), data = img.data,
+          img2 = context.getImageData(0, 0, dW, dH), data2 = img2.data;
+      for (var j = 0; j < dH; j++) {
+        for (var i = 0; i < dW; i++) {
+          var x2 = (i + j * dW) * 4, weight = 0, weights = 0, weightsAlpha = 0,
+              gxR = 0, gxG = 0, gxB = 0, gxA = 0, centerY = (j + 0.5) * ratioH;
+          for (var yy = floor(j * ratioH); yy < (j + 1) * ratioH; yy++) {
+            var dy = abs(centerY - (yy + 0.5)) / ratioHHalf,
+                centerX = (i + 0.5) * ratioW, w0 = dy * dy;
+            for (var xx = floor(i * ratioW); xx < (i + 1) * ratioW; xx++) {
+              var dx = abs(centerX - (xx + 0.5)) / ratioWHalf,
+                  w = sqrt(w0 + dx * dx);
+              /*jshint maxdepth:5 */
+              if (w > 1 && w < -1) {
+                continue;
+              }
+              //hermite filter
+              weight = 2 * w * w * w - 3 * w * w + 1;
+              if (weight > 0) {
+                dx = 4 * (xx + yy * oW);
+                //alpha
+                gxA += weight * data[dx + 3];
+                weightsAlpha += weight;
+                //colors
+                /*jshint maxdepth:6 */
+                if (data[dx + 3] < 255) {
+                  weight = weight * data[dx + 3] / 250;
+                }
+                /*jshint maxdepth:5 */
+                gxR += weight * data[dx];
+                gxG += weight * data[dx + 1];
+                gxB += weight * data[dx + 2];
+                weights += weight;
+              }
+              /*jshint maxdepth:4 */
+            }
+          }
+          data2[x2] = gxR / weights;
+          data2[x2 + 1] = gxG / weights;
+          data2[x2 + 2] = gxB / weights;
+          data2[x2 + 3] = gxA / weightsAlpha;
+        }
+      }
+      return img2;
+    }
+  });
+
+  /**
+   * Returns filter instance from an object representation
+   * @static
+   * @return {fabric.Image.filters.Resize} Instance of fabric.Image.filters.Resize
+   */
+  fabric.Image.filters.Resize.fromObject = function() {
+    return new fabric.Image.filters.Resize();
+  };
+
 })(typeof exports !== 'undefined' ? exports : this);
 
 
@@ -21649,11 +22007,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @param {Array} [styles] Styles to insert
      */
     insertStyleObjects: function(_chars, isEndOfLine, styles) {
-
-      // short-circuit
-      if (this.isEmptyStyles()) {
-        return;
-      }
+      // removed shortcircuit over isEmptyStyles
 
       var cursorLocation = this.get2DCursorLocation(),
           lineIndex = cursorLocation.lineIndex,
@@ -22056,8 +22410,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     this.hiddenTextarea = fabric.document.createElement('textarea');
 
     this.hiddenTextarea.setAttribute('autocapitalize', 'off');
-    this.hiddenTextarea.style.cssText = 'position: absolute; top: 0; left: -9999px';
-
+    this.hiddenTextarea.style.cssText = 'position: fixed; bottom: 20px; left: 0px; opacity: 0;'
+                                        + ' width: 0px; height: 0px; z-index: -999;';
     fabric.document.body.appendChild(this.hiddenTextarea);
 
     fabric.util.addListener(this.hiddenTextarea, 'keydown', this.onKeyDown.bind(this));
@@ -22328,6 +22682,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this.selectionStart = this.text.length;
     }
     this.selectionEnd = this.selectionStart;
+
+    this.fire('selection:changed');
+    this.canvas && this.canvas.fire('text:selection:changed', { target: this });
   },
 
   /**
@@ -22356,6 +22713,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (this.selectionEnd > this.text.length) {
       this.selectionEnd = this.text.length;
     }
+
+    this.fire('selection:changed');
+    this.canvas && this.canvas.fire('text:selection:changed', { target: this });
   },
 
   /**
@@ -22470,6 +22830,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (this.selectionStart < 0) {
       this.selectionStart = 0;
     }
+
+    this.fire('selection:changed');
+    this.canvas && this.canvas.fire('text:selection:changed', { target: this });
   },
 
   /**
@@ -22486,6 +22849,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     this.selectionEnd = this.selectionStart;
 
     this._selectionDirection = 'left';
+
+    this.fire('selection:changed');
+    this.canvas && this.canvas.fire('text:selection:changed', { target: this });
   },
 
   /**
@@ -22552,6 +22918,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this._moveLeft(e, 'selectionStart');
     }
     this.selectionEnd = this.selectionStart;
+
+    this.fire('selection:changed');
+    this.canvas && this.canvas.fire('text:selection:changed', { target: this });
   },
 
   /**
@@ -22574,6 +22943,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         this.selectionStart = 0;
       }
     }
+
+    this.fire('selection:changed');
+    this.canvas && this.canvas.fire('text:selection:changed', { target: this });
   },
 
   /**
@@ -22618,6 +22990,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         this.selectionEnd = this.text.length;
       }
     }
+
+    this.fire('selection:changed');
+    this.canvas && this.canvas.fire('text:selection:changed', { target: this });
   },
 
   /**
@@ -22638,6 +23013,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       }
       this.selectionStart = this.selectionEnd;
     }
+
+    this.fire('selection:changed');
+    this.canvas && this.canvas.fire('text:selection:changed', { target: this });
   },
 
   /**
