@@ -194,11 +194,16 @@
      * @private
      */
     _set: function(key, value) {
-      var i;
+      var i = this._objects.length;;
       if (key in this.delegatedProperties) {
-        var i = this._objects.length;
         while (i--) {
           this._objects[i].set(key, value);
+        }
+      }
+      else {
+        this[key] = value;
+        while (i--) {
+          this._objects[i].setOnGroup(key, value);
         }
       }
       this.callSuper('_set', key, value);
