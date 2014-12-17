@@ -917,7 +917,7 @@
 
       return this;
     },
-    
+
     /**
      * This callback function is called by the parent group of an object every
      * time a non-delegated property changes on the group. It is passed the key
