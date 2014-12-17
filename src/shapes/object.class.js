@@ -922,11 +922,11 @@
     
     /**
      * This callback function is called by the parent group of an object every
-     * time a non-delegated property changes on the group.
-     * @param {String} key
-     * @param {Any} value
+     * time a non-delegated property changes on the group. It is passed the key
+     * and value as parameters. Not adding in this function's signature to avoid
+     * Travis build error about unused variables.
      */
-    setOnGroup: function(key, value) {
+    setOnGroup: function() {
       // implemented by sub-classes, as needed.
     },
 
