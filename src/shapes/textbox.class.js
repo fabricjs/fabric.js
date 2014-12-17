@@ -167,6 +167,23 @@
 
        },
        /**
+        * When part of a group, we don't want the Textbox's scale to increase if
+        * the group's increases. That's why we reduce the scale of the Textbox by
+        * the amount that the group's increases. This is to maintain the effective
+        * scale of the Textbox at 1, so that font-size values make sense. Otherwise
+        * the same font-size value would result in different actual size depending
+        * on the value of the scale.
+        * @param {String} key
+        * @param {Any} value
+        */
+       setOnGroup: function(key, value) {
+         if (key === 'scaleX') {
+           this.set(key, Math.abs(1 / value));
+           this.set('width', (this.get('width') * value) / (typeof this.__oldScaleX === 'undefined' ? 1 : this.__oldScaleX));
+           this.__oldScaleX = value;
+         }
+       },
+       /**
         * Save text wrapping in cache. Pass null to this function to invalidate cache.
         * @param {Array} l
         */
