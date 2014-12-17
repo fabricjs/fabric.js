@@ -181,7 +181,7 @@
            this.set(key, Math.abs(1 / value));
            this.set('width', (this.get('width') * value) / (typeof this.__oldScaleX === 'undefined' ? 1 : this.__oldScaleX));
            this.__oldScaleX = value;
-        }
+         }
        },
        /**
         * Save text wrapping in cache. Pass null to this function to invalidate cache.
