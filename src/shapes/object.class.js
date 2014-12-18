@@ -801,7 +801,17 @@
             clipTo:                   this.clipTo && String(this.clipTo),
             backgroundColor:          this.backgroundColor,
             fillRule:                 this.fillRule,
-            globalCompositeOperation: this.globalCompositeOperation
+            globalCompositeOperation: this.globalCompositeOperation,
+            hasControls:              this.hasControls,
+            hasBorders:               this.hasBorders,
+            hasRotatingPoint:         this.hasRotatingPoint,
+            lockMovementX:            this.lockMovementX,
+            lockMovementY:            this.lockMovementY,
+            lockRotation:             this.lockRotation,
+            lockScalingX:             this.lockScalingX,
+            lockScalingY:             this.lockScalingY,
+            lockUniScaling:           this.lockUniScaling,
+            lockScalingFlip:          this.lockScalingFlip
           };
 
       if (!this.includeDefaultValues) {
