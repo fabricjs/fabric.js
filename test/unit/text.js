@@ -219,12 +219,22 @@
     deepEqual(textWithAttrs.toObject(), expectedObject);
   });
 
+  asyncTest('fabric.Text.clone', function() {
+    var text = createTextObject();
+    var returnedClone = text.clone(function(clone) {
+      setTimeout(function() {
+        deepEqual(returnedClone, clone);
+        start();
+      }, 0);
+    });
+  });
+
   test('empty fromElement', function() {
     ok(fabric.Text.fromElement() === null);
   });
 
   test('dimensions after text change', function() {
-    var text = new fabric.Text('x');
+    var text = createTextObject();
     equal(text.width, CHAR_WIDTH);
 
     text.setText('xx');
@@ -232,7 +242,7 @@
   });
 
   test('setting fontFamily', function() {
-    var text = new fabric.Text('x');
+    var text = createTextObject();
     text.path = 'foobar.js';
 
     text.set('fontFamily', 'foobar');
@@ -243,7 +253,7 @@
   });
 
   test('toSVG', function() {
-    var text = new fabric.Text('x');
+    var text = createTextObject();
 
     // temp workaround for text objects not obtaining width under node
     text.width = CHAR_WIDTH;

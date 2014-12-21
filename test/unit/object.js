@@ -547,21 +547,27 @@ test('getBoundingRectWithStroke', function() {
     equal(cObj.drawControls(dummyContext), cObj, 'chainable');
   });
 
-  test('clone', function() {
+  asyncTest('clone', function() {
     var cObj = new fabric.Object({ left: 123, top: 456, opacity: 0.66 });
     ok(typeof cObj.clone == 'function');
-    var clone = cObj.clone();
 
-    equal(clone.get('left'), 123);
-    equal(clone.get('top'), 456);
-    equal(clone.get('opacity'), 0.66);
+    var returnedClone = cObj.clone(function(clone) {
+      setTimeout(function() {
+        equal(returnedClone.get('left'), clone.get('left'));
 
-    // augmenting clone properties should not affect original instance
-    clone.set('left', 12).set('scaleX', 2.5).setAngle(33);
+        equal(clone.get('left'), 123);
+        equal(clone.get('top'), 456);
+        equal(clone.get('opacity'), 0.66);
 
-    equal(cObj.get('left'), 123);
-    equal(cObj.get('scaleX'), 1);
-    equal(cObj.getAngle(), 0);
+        // augmenting clone properties should not affect original instance
+        clone.set('left', 12).set('scaleX', 2.5).setAngle(33);
+
+        equal(cObj.get('left'), 123);
+        equal(cObj.get('scaleX'), 1);
+        equal(cObj.getAngle(), 0);
+        start();
+      }, 0);
+    });
   });
 
   asyncTest('cloneAsImage', function() {
@@ -1113,11 +1119,11 @@ test('toDataURL & reference to canvas', function() {
     equal(object.shadow.blur, 10);
     equal(object.shadow.offsetX, 5);
     equal(object.shadow.offsetY, 15);
-    
+
     equal(object.setShadow(null), object, 'should be chainable');
     ok(!(object.shadow instanceof fabric.Shadow));
     equal(object.shadow, null);
-    
+
   });
 
   test('set shadow', function() {
