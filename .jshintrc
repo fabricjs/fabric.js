@@ -3,7 +3,7 @@
     "ActiveXObject":      true,
     "Cufon":              true,
     "define":             true,
-    "Event":              true,
+    "eventjs":            true,
     "exports":            true,
     "fabric":             true,
     "G_vmlCanvasManager": true
