@@ -1160,6 +1160,7 @@
       if (this.constructor.fromObject) {
         return this.constructor.fromObject(this.toObject(propertiesToInclude), callback);
       }
+      callback && callback(new fabric.Object(this.toObject(propertiesToInclude)));
       return new fabric.Object(this.toObject(propertiesToInclude));
     },
 
