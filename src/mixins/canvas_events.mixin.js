@@ -31,6 +31,12 @@
     ],
 
     /**
+     * Delay between 2 modifications to trigger 'object:changed'.
+     * Usefull when sending modifications over the network.
+     */
+    changeEventDelay: 800,
+
+    /**
      * Adds mouse listeners to canvas
      * @private
      */
@@ -623,6 +629,18 @@
         this._fire('moving', target, e);
         this.setCursor(this.moveCursor);
       }
+
+      // Add a timer to detect changes
+      if ( typeof target.moving !== "undefined" ) {
+          clearTimeout( target.moving );
+          delete target.moving;
+      }
+
+      var me = this;
+      target.moving = setTimeout(function() {
+          me._fire( 'changed', target, e );
+      }, this.changeEventDelay );
+
     },
 
     /**
