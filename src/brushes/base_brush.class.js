@@ -43,6 +43,13 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
   strokeLineJoin:   'round',
 
   /**
+   * Line Dash Array.
+   * @type Array
+   * @default
+   */
+  lineDashArray:   [0,0],
+
+  /**
    * Sets shadow of an object
    * @param {Object|String} [options] Options object or string (e.g. "2px 2px 10px rgba(0,0,0,0.2)")
    * @return {fabric.Object} thisArg
@@ -64,6 +71,7 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
     ctx.lineWidth = this.width;
     ctx.lineCap = this.strokeLineCap;
     ctx.lineJoin = this.strokeLineJoin;
+    ctx.setLineDash(this.lineDashArray);
   },
 
   /**
