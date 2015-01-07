@@ -373,9 +373,17 @@
             tempX = current[1];
             tempY = current[2];
 
-            // calculate reflection of previous control points
-            controlX = 2 * x - controlX;
-            controlY = 2 * y - controlY;
+            if (previous[0].match(/[QqTt]/) === null) {
+              // If there is no previous command or if the previous command was not a Q, q, T or t,
+              // assume the control point is coincident with the current point
+              controlX = x;
+              controlY = y;
+            }
+            else {
+              // calculate reflection of previous control point
+              controlX = 2 * x - controlX;
+              controlY = 2 * y - controlY;
+            }
             ctx.quadraticCurveTo(
               controlX + l,
               controlY + t,
