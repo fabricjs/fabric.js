@@ -234,9 +234,16 @@
             tempX = x + current[3];
             tempY = y + current[4];
 
-            // calculate reflection of previous control points
-            controlX = controlX ? (2 * x - controlX) : x;
-            controlY = controlY ? (2 * y - controlY) : y;
+            if (previous[0].match(/[CcSs]/) === null) {
+              // If there is no previous command or if the previous command was not a C, c, S, or s,
+              // the control point is coincident with the current point
+              controlX = x;
+              controlY = y;
+            } else {
+              // calculate reflection of previous control points
+              controlX = 2 * x - controlX;
+              controlY = 2 * y - controlY;
+            }
 
             ctx.bezierCurveTo(
               controlX + l,
@@ -260,9 +267,16 @@
           case 'S': // shorthand cubic bezierCurveTo, absolute
             tempX = current[3];
             tempY = current[4];
-            // calculate reflection of previous control points
-            controlX = 2 * x - controlX;
-            controlY = 2 * y - controlY;
+            if (previous[0].match(/[CcSs]/) === null) {
+              // If there is no previous command or if the previous command was not a C, c, S, or s,
+              // the control point is coincident with the current point
+              controlX = x;
+              controlY = y;
+            } else {
+              // calculate reflection of previous control points
+              controlX = 2 * x - controlX;
+              controlY = 2 * y - controlY;
+            }
             ctx.bezierCurveTo(
               controlX + l,
               controlY + t,
