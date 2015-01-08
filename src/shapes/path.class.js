@@ -237,7 +237,8 @@
               // the control point is coincident with the current point
               controlX = x;
               controlY = y;
-            } else {
+            }
+            else {
               // calculate reflection of previous control points
               controlX = 2 * x - controlX;
               controlY = 2 * y - controlY;
@@ -270,7 +271,8 @@
               // the control point is coincident with the current point
               controlX = x;
               controlY = y;
-            } else {
+            }
+            else {
               // calculate reflection of previous control points
               controlX = 2 * x - controlX;
               controlY = 2 * y - controlY;
