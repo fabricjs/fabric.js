@@ -6,20 +6,20 @@
 
 <!-- build/coverage status, climate -->
 
-[![Build Status](https://secure.travis-ci.org/kangax/fabric.js.png?branch=master)](http://travis-ci.org/#!/kangax/fabric.js)
+[![Build Status](https://secure.travis-ci.org/kangax/fabric.js.svg?branch=master)](http://travis-ci.org/#!/kangax/fabric.js)
 [![Code Climate](https://d3s6mut3hikguw.cloudfront.net/github/kangax/fabric.js/badges/gpa.svg)](https://codeclimate.com/github/kangax/fabric.js)
 [![Coverage Status](https://coveralls.io/repos/kangax/fabric.js/badge.png?branch=master)](https://coveralls.io/r/kangax/fabric.js?branch=master)
 
 <!-- npm, bower versions, downloads -->
 
-[![Bower version](https://badge.fury.io/bo/fabric.png)](http://badge.fury.io/bo/fabric)
-[![NPM version](https://badge.fury.io/js/fabric.png)](http://badge.fury.io/js/fabric)
+[![Bower version](https://badge.fury.io/bo/fabric.svg)](http://badge.fury.io/bo/fabric)
+[![NPM version](https://badge.fury.io/js/fabric.svg)](http://badge.fury.io/js/fabric)
 [![Downloads per month](https://img.shields.io/npm/dm/localeval.svg)](https://www.npmjs.org/package/fabric)
 
 <!-- deps status -->
 
-[![Dependency Status](https://david-dm.org/kangax/fabric.js.png?theme=shields.io)](https://david-dm.org/kangax/fabric.js)
-[![devDependency Status](https://david-dm.org/kangax/fabric.js/dev-status.png?theme=shields.io)](https://david-dm.org/kangax/fabric.js#info=devDependencies)
+[![Dependency Status](https://david-dm.org/kangax/fabric.js.svg?theme=shields.io)](https://david-dm.org/kangax/fabric.js)
+[![devDependency Status](https://david-dm.org/kangax/fabric.js/dev-status.svg?theme=shields.io)](https://david-dm.org/kangax/fabric.js#info=devDependencies)
 
 <!-- bounties, tips -->
 
