@@ -40,7 +40,7 @@
   "devDependencies": {
     "execSync": "1.0.x",
     "uglify-js": "2.4.x",
-    "jscs": "1.7.x",
+    "jscs": "1.9.x",
     "jshint": "2.5.x",
     "qunit": "0.7.2",
     "istanbul": "0.3.x"

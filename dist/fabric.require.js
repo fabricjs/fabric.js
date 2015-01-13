@@ -1,5 +1,5 @@
 /* build: `node build.js modules=ALL exclude=gestures,cufon,json minifier=uglifyjs` */
-/*! Fabric.js Copyright 2008-2014, Printio (Juriy Zaytsev, Maxim Chernyak) */
+/*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
 var fabric = fabric || { version: "1.4.13" };
 if (typeof exports !== 'undefined') {
@@ -9,6 +9,8 @@ if (typeof exports !== 'undefined') {
 if (typeof document !== 'undefined' && typeof window !== 'undefined') {
   fabric.document = document;
   fabric.window = window;
+  // ensure globality even if entire library were function wrapped (as in Meteor.js packaging system)
+  window.fabric = fabric;
 }
 else {
   // assume we're running under node.js when document/window are not present
@@ -9116,12 +9118,12 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       addListener(this.upperCanvasEl, 'touchstart', this._onMouseDown);
       addListener(this.upperCanvasEl, 'touchmove', this._onMouseMove);
 
-      if (typeof Event !== 'undefined' && 'add' in Event) {
-        Event.add(this.upperCanvasEl, 'gesture', this._onGesture);
-        Event.add(this.upperCanvasEl, 'drag', this._onDrag);
-        Event.add(this.upperCanvasEl, 'orientation', this._onOrientationChange);
-        Event.add(this.upperCanvasEl, 'shake', this._onShake);
-        Event.add(this.upperCanvasEl, 'longpress', this._onLongPress);
+      if (typeof eventjs !== 'undefined' && 'add' in eventjs) {
+        eventjs.add(this.upperCanvasEl, 'gesture', this._onGesture);
+        eventjs.add(this.upperCanvasEl, 'drag', this._onDrag);
+        eventjs.add(this.upperCanvasEl, 'orientation', this._onOrientationChange);
+        eventjs.add(this.upperCanvasEl, 'shake', this._onShake);
+        eventjs.add(this.upperCanvasEl, 'longpress', this._onLongPress);
       }
     },
 
@@ -9154,12 +9156,12 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       removeListener(this.upperCanvasEl, 'touchstart', this._onMouseDown);
       removeListener(this.upperCanvasEl, 'touchmove', this._onMouseMove);
 
-      if (typeof Event !== 'undefined' && 'remove' in Event) {
-        Event.remove(this.upperCanvasEl, 'gesture', this._onGesture);
-        Event.remove(this.upperCanvasEl, 'drag', this._onDrag);
-        Event.remove(this.upperCanvasEl, 'orientation', this._onOrientationChange);
-        Event.remove(this.upperCanvasEl, 'shake', this._onShake);
-        Event.remove(this.upperCanvasEl, 'longpress', this._onLongPress);
+      if (typeof eventjs !== 'undefined' && 'remove' in eventjs) {
+        eventjs.remove(this.upperCanvasEl, 'gesture', this._onGesture);
+        eventjs.remove(this.upperCanvasEl, 'drag', this._onDrag);
+        eventjs.remove(this.upperCanvasEl, 'orientation', this._onOrientationChange);
+        eventjs.remove(this.upperCanvasEl, 'shake', this._onShake);
+        eventjs.remove(this.upperCanvasEl, 'longpress', this._onLongPress);
       }
     },
 
@@ -11648,7 +11650,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       el.height = boundingRect.height;
 
       fabric.util.wrapElement(el, 'div');
-      var canvas = new fabric.Canvas(el);
+      var canvas = new fabric.StaticCanvas(el);
 
       // to avoid common confusion https://github.com/kangax/fabric.js/issues/806
       if (options.format === 'jpg') {
@@ -15360,8 +15362,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           controlY = 0, // current control point y
           tempX,
           tempY,
-          tempControlX,
-          tempControlY,
           l = -this.pathOffset.x,
           t = -this.pathOffset.y;
 
@@ -15464,9 +15464,17 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
             tempX = x + current[3];
             tempY = y + current[4];
 
-            // calculate reflection of previous control points
-            controlX = controlX ? (2 * x - controlX) : x;
-            controlY = controlY ? (2 * y - controlY) : y;
+            if (previous[0].match(/[CcSs]/) === null) {
+              // If there is no previous command or if the previous command was not a C, c, S, or s,
+              // the control point is coincident with the current point
+              controlX = x;
+              controlY = y;
+            }
+            else {
+              // calculate reflection of previous control points
+              controlX = 2 * x - controlX;
+              controlY = 2 * y - controlY;
+            }
 
             ctx.bezierCurveTo(
               controlX + l,
@@ -15490,9 +15498,17 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           case 'S': // shorthand cubic bezierCurveTo, absolute
             tempX = current[3];
             tempY = current[4];
-            // calculate reflection of previous control points
-            controlX = 2 * x - controlX;
-            controlY = 2 * y - controlY;
+            if (previous[0].match(/[CcSs]/) === null) {
+              // If there is no previous command or if the previous command was not a C, c, S, or s,
+              // the control point is coincident with the current point
+              controlX = x;
+              controlY = y;
+            }
+            else {
+              // calculate reflection of previous control points
+              controlX = 2 * x - controlX;
+              controlY = 2 * y - controlY;
+            }
             ctx.bezierCurveTo(
               controlX + l,
               controlY + t,
@@ -15559,19 +15575,11 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
               controlX = x;
               controlY = y;
             }
-            else if (previous[0] === 't') {
-              // calculate reflection of previous control points for t
-              controlX = 2 * x - tempControlX;
-              controlY = 2 * y - tempControlY;
-            }
-            else if (previous[0] === 'q') {
-              // calculate reflection of previous control points for q
+            else {
+              // calculate reflection of previous control point
               controlX = 2 * x - controlX;
               controlY = 2 * y - controlY;
             }
-
-            tempControlX = controlX;
-            tempControlY = controlY;
 
             ctx.quadraticCurveTo(
               controlX + l,
@@ -15581,17 +15589,24 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
             );
             x = tempX;
             y = tempY;
-            controlX = x + current[1];
-            controlY = y + current[2];
+
             break;
 
           case 'T':
             tempX = current[1];
             tempY = current[2];
 
-            // calculate reflection of previous control points
-            controlX = 2 * x - controlX;
-            controlY = 2 * y - controlY;
+            if (previous[0].match(/[QqTt]/) === null) {
+              // If there is no previous command or if the previous command was not a Q, q, T or t,
+              // assume the control point is coincident with the current point
+              controlX = x;
+              controlY = y;
+            }
+            else {
+              // calculate reflection of previous control point
+              controlX = 2 * x - controlX;
+              controlY = 2 * y - controlY;
+            }
             ctx.quadraticCurveTo(
               controlX + l,
               controlY + t,
@@ -15829,8 +15844,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           controlY = 0, // current control point y
           tempX,
           tempY,
-          tempControlX,
-          tempControlY,
           bounds;
 
       for (var i = 0, len = this.path.length; i < len; ++i) {
@@ -15925,9 +15938,17 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
             tempX = x + current[3];
             tempY = y + current[4];
 
-            // calculate reflection of previous control points
-            controlX = controlX ? (2 * x - controlX) : x;
-            controlY = controlY ? (2 * y - controlY) : y;
+            if (previous[0].match(/[CcSs]/) === null) {
+              // If there is no previous command or if the previous command was not a C, c, S, or s,
+              // the control point is coincident with the current point
+              controlX = x;
+              controlY = y;
+            }
+            else {
+              // calculate reflection of previous control points
+              controlX = 2 * x - controlX;
+              controlY = 2 * y - controlY;
+            }
 
             bounds = fabric.util.getBoundsOfCurve(x, y,
               controlX,
@@ -15950,9 +15971,17 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           case 'S': // shorthand cubic bezierCurveTo, absolute
             tempX = current[3];
             tempY = current[4];
-            // calculate reflection of previous control points
-            controlX = 2 * x - controlX;
-            controlY = 2 * y - controlY;
+            if (previous[0].match(/[CcSs]/) === null) {
+              // If there is no previous command or if the previous command was not a C, c, S, or s,
+              // the control point is coincident with the current point
+              controlX = x;
+              controlY = y;
+            }
+            else {
+              // calculate reflection of previous control points
+              controlX = 2 * x - controlX;
+              controlY = 2 * y - controlY;
+            }
             bounds = fabric.util.getBoundsOfCurve(x, y,
               controlX,
               controlY,
@@ -16014,19 +16043,11 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
               controlX = x;
               controlY = y;
             }
-            else if (previous[0] === 't') {
-              // calculate reflection of previous control points for t
-              controlX = 2 * x - tempControlX;
-              controlY = 2 * y - tempControlY;
-            }
-            else if (previous[0] === 'q') {
-              // calculate reflection of previous control points for q
+            else {
+              // calculate reflection of previous control point
               controlX = 2 * x - controlX;
               controlY = 2 * y - controlY;
             }
-
-            tempControlX = controlX;
-            tempControlY = controlY;
 
             bounds = fabric.util.getBoundsOfCurve(x, y,
               controlX,
@@ -16038,16 +16059,24 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
             );
             x = tempX;
             y = tempY;
-            controlX = x + current[1];
-            controlY = y + current[2];
+
             break;
 
           case 'T':
             tempX = current[1];
             tempY = current[2];
-            // calculate reflection of previous control points
-            controlX = 2 * x - controlX;
-            controlY = 2 * y - controlY;
+
+            if (previous[0].match(/[QqTt]/) === null) {
+              // If there is no previous command or if the previous command was not a Q, q, T or t,
+              // assume the control point is coincident with the current point
+              controlX = x;
+              controlY = y;
+            }
+            else {
+              // calculate reflection of previous control point
+              controlX = 2 * x - controlX;
+              controlY = 2 * y - controlY;
+            }
             bounds = fabric.util.getBoundsOfCurve(x, y,
               controlX,
               controlY,
