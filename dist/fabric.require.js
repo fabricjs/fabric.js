@@ -10747,7 +10747,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      */
 
     /**
-     * Type of an object (rect, circle, path, etc.)
+     * Type of an object (rect, circle, path, etc.).
+     * Note that this property is meant to be read-only and not meant to be modified.
+     * If you modify, certain parts of Fabric (such as JSON loading) won't work correctly.
      * @type String
      * @default
      */
