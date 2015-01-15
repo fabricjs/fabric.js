@@ -1055,7 +1055,7 @@
           words = line.split(/\s+/),
           wordsWidth = this._getWidthOfWords(ctx, line, lineIndex),
           widthDiff = this.width - wordsWidth,
-          numSpaces = words.length - 1,
+          numSpaces = words.length - 2,
           width = widthDiff / numSpaces;
 
       return width;
