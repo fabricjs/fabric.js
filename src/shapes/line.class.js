@@ -206,8 +206,8 @@
     },
 
     /**
+     * Recalculates line points given width and height
      * @private
-     * Recalculate line points from width and height.
      */
     calcLinePoints: function() {
       var xMult = this.x1 <= this.x2 ? -1 : 1,
