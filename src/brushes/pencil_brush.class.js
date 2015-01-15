@@ -171,7 +171,7 @@
                    strokeWidth: this.width,
                    strokeLineCap: this.strokeLineCap,
                    strokeLineJoin: this.strokeLineJoin,
-                   strokeDashArray: this.lineDashArray,
+                   strokeDashArray: this.strokeDashArray,
                    originX: 'center',
                    originY: 'center'
                  });
