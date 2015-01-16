@@ -16,12 +16,16 @@
 [![NPM version](https://badge.fury.io/js/fabric.svg)](http://badge.fury.io/js/fabric)
 [![Downloads per month](https://img.shields.io/npm/dm/localeval.svg)](https://www.npmjs.org/package/fabric)
 
+<!-- deps status -->
 
 [![Dependency Status](https://david-dm.org/kangax/fabric.js.svg?theme=shields.io)](https://david-dm.org/kangax/fabric.js)
 [![devDependency Status](https://david-dm.org/kangax/fabric.js/dev-status.svg?theme=shields.io)](https://david-dm.org/kangax/fabric.js#info=devDependencies)
 
-[![Bountysource](https://api.bountysource.com/badge/tracker?tracker_id=23217)](https://www.bountysource.com/trackers/23217-fabric-js?utm_source=23217&utm_medium=shield&utm_campaign=TRACKER_BADGE)
+<!-- bounties, tips -->
 
+[![Bountysource](https://api.bountysource.com/badge/tracker?tracker_id=23217)](https://www.bountysource.com/trackers/23217-fabric-js?utm_source=23217&utm_medium=shield&utm_campaign=TRACKER_BADGE)
+[![Tips](https://img.shields.io/gratipay/kangax.svg)](https://gratipay.com/kangax/)
+[![Flattr this git repo](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=kangax&url=http://github.com/kangax/fabric.js&title=Fabric.js&language=&tags=github&category=software)
 
 **Fabric.js** is a framework that makes it easy to work with HTML5 canvas element. It is an **interactive object model** on top of canvas element. It is also an **SVG-to-canvas parser**.
 
