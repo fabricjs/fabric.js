@@ -55,7 +55,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
         NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
 
-        translatePart = this.type === 'path-group' ? '' : 'translate(' +
+        translatePart = this.type === 'path-group' ? '' : ' translate(' +
                           toFixed(center.x, NUM_FRACTION_DIGITS) +
                           ' ' +
                           toFixed(center.y, NUM_FRACTION_DIGITS) +
@@ -91,7 +91,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @return {String}
    */
   getSvgTransformMatrix: function() {
-    return this.transformMatrix ? ' matrix(' + this.transformMatrix.join(' ') + ')' : '';
+    return this.transformMatrix ? ' matrix(' + this.transformMatrix.join(' ') + ') ' : '';
   },
 
   /**
