@@ -22,7 +22,7 @@
     }
 
     // assign request handler based on protocol
-    var reqHandler = (oURL.protocol.indexOf('https:') ) ? HTTPS : HTTP,
+    var reqHandler = (oURL.protocol.indexOf('https:') === 0 ) ? HTTPS : HTTP,
         req = reqHandler.request({
           hostname: oURL.hostname,
           port: oURL.port,
