@@ -69,9 +69,7 @@
       this._calcBounds();
       this._updateObjectsCoords();
 
-      if (options) {
-        extend(this, options);
-      }
+      this.callSuper('initialize', options);
 
       this.setCoords();
       this.saveCoords();
