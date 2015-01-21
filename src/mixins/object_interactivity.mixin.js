@@ -284,14 +284,12 @@
 
       var w = this.getWidth(),
           h = this.getHeight(),
-          strokeWidth = this.strokeWidth,
+          strokeWidth = this.strokeWidth > 1 ? this.strokeWidth : 0,
           capped = this.strokeLineCap === 'round' || this.strokeLineCap === 'square',
-          vLine = this.type === 'line' && this.width === 0,
-          hLine = this.type === 'line' && this.height === 0,
-          sLine = vLine || hLine,
-          strokeW = (capped && hLine) || !sLine,
-          strokeH = (capped && vLine) || !sLine;
-
+          vLine = this.type === 'line' && this.width === 1,
+          hLine = this.type === 'line' && this.height === 1,
+          strokeW = (capped && hLine) || this.type !== 'line',
+          strokeH = (capped && vLine) || this.type !== 'line';
       if (vLine) {
         w = strokeWidth / scaleX;
       }
@@ -350,15 +348,14 @@
       var size = this.cornerSize,
           size2 = size / 2,
           vpt = this.getViewportTransform(),
-          strokeWidth = this.strokeWidth,
+          strokeWidth = this.strokeWidth > 1 ? this.strokeWidth : 0,
           w = this.width,
           h = this.height,
           capped = this.strokeLineCap === 'round' || this.strokeLineCap === 'square',
-          vLine = this.type === 'line' && this.width === 0,
-          hLine = this.type === 'line' && this.height === 0,
-          sLine = vLine || hLine,
-          strokeW = (capped && hLine) || !sLine,
-          strokeH = (capped && vLine) || !sLine;
+          vLine = this.type === 'line' && this.width === 1,
+          hLine = this.type === 'line' && this.height === 1,
+          strokeW = (capped && hLine) || this.type !== 'line',
+          strokeH = (capped && vLine) || this.type !== 'line';
 
       if (vLine) {
         w = strokeWidth;

@@ -235,7 +235,6 @@ var filesToInclude = [
   ifSpecifiedInclude('image_filters', 'src/filters/tint_filter.class.js'),
   ifSpecifiedInclude('image_filters', 'src/filters/multiply_filter.class.js'),
   ifSpecifiedInclude('image_filters', 'src/filters/blend_filter.class.js'),
-  ifSpecifiedInclude('image_filters', 'src/filters/resize_filter.class.js'),  
 
   ifSpecifiedInclude('text', 'src/shapes/text.class.js'),
   ifSpecifiedInclude('cufon', 'src/shapes/text.cufon.js'),
@@ -245,6 +244,11 @@ var filesToInclude = [
   ifSpecifiedInclude('itext', 'src/mixins/itext_click_behavior.mixin.js'),
   ifSpecifiedInclude('itext', 'src/mixins/itext_key_behavior.mixin.js'),
   ifSpecifiedInclude('itext', 'src/mixins/itext.svg_export.js'),
+  
+  ifSpecifiedInclude('textbox', 'src/shapes/textbox.class.js'),
+  ifSpecifiedInclude('textbox', 'src/mixins/textbox_behavior.mixin.js'),
+  ifSpecifiedInclude('textbox', 'src/mixins/textbox_click_behavior.mixin.js'),
+  ifSpecifiedInclude('textbox', 'src/mixins/textbox_key_behavior.mixin.js'),
 
   ifSpecifiedInclude('node', 'src/node.js'),
 

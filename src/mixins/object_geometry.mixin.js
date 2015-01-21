@@ -298,25 +298,23 @@
 
     /**
      * Sets corner position coordinates based on current angle, width and height
-     * See https://github.com/kangax/fabric.js/wiki/When-to-call-setCoords
      * @return {fabric.Object} thisArg
      * @chainable
      */
     setCoords: function() {
-      var strokeWidth = this.strokeWidth,
+      var strokeWidth = this.strokeWidth > 1 ? this.strokeWidth : 0,
           theta = degreesToRadians(this.angle),
           vpt = this.getViewportTransform(),
           f = function (p) {
             return fabric.util.transformPoint(p, vpt);
           },
-          w = this.width, currentWidth,
-          h = this.height, currentHeight,
+          w = this.width,
+          h = this.height,
           capped = this.strokeLineCap === 'round' || this.strokeLineCap === 'square',
-          vLine = this.type === 'line' && this.width === 0,
-          hLine = this.type === 'line' && this.height === 0,
-          sLine = vLine || hLine,
-          strokeW = (capped && hLine) || !sLine,
-          strokeH = (capped && vLine) || !sLine;
+          vLine = this.type === 'line' && this.width === 1,
+          hLine = this.type === 'line' && this.height === 1,
+          strokeW = (capped && hLine) || this.type !== 'line',
+          strokeH = (capped && vLine) || this.type !== 'line';
 
       if (vLine) {
         w = strokeWidth;
@@ -330,21 +328,21 @@
       if (strokeH) {
         h += h > 0 ? strokeWidth : -strokeWidth;
       }
-      currentWidth = w * this.scaleX + 2 * this.padding;
-      currentHeight = h * this.scaleY + 2 * this.padding;
+      this.currentWidth = w * this.scaleX;
+      this.currentHeight = h * this.scaleY;
 
       // If width is negative, make postive. Fixes path selection issue
-      if (currentWidth < 0) {
-        currentWidth = Math.abs(currentWidth);
+      if (this.currentWidth < 0) {
+        this.currentWidth = Math.abs(this.currentWidth);
       }
 
       var _hypotenuse = Math.sqrt(
-            Math.pow(currentWidth / 2, 2) +
-            Math.pow(currentHeight / 2, 2)),
+            Math.pow(this.currentWidth / 2, 2) +
+            Math.pow(this.currentHeight / 2, 2)),
 
           _angle = Math.atan(
-            isFinite(currentHeight / currentWidth)
-              ? currentHeight / currentWidth
+            isFinite(this.currentHeight / this.currentWidth)
+              ? this.currentHeight / this.currentWidth
               : 0),
 
           // offset added for rotate and scale actions
@@ -353,7 +351,7 @@
           sinTh = Math.sin(theta),
           cosTh = Math.cos(theta),
           coords = this.getCenterPoint(),
-          wh = new fabric.Point(currentWidth, currentHeight),
+          wh = new fabric.Point(this.currentWidth, this.currentHeight),
           _tl =   new fabric.Point(coords.x - offsetX, coords.y - offsetY),
           _tr =   new fabric.Point(_tl.x + (wh.x * cosTh),   _tl.y + (wh.x * sinTh)),
           _bl =   new fabric.Point(_tl.x - (wh.y * sinTh),   _tl.y + (wh.y * cosTh)),
@@ -366,7 +364,21 @@
           mt  = f(_mt),
           mr  = f(new fabric.Point(_tr.x - (wh.y/2 * sinTh), _tr.y + (wh.y/2 * cosTh))),
           mb  = f(new fabric.Point(_bl.x + (wh.x/2 * cosTh), _bl.y + (wh.x/2 * sinTh))),
-          mtr = f(new fabric.Point(_mt.x, _mt.y));
+          mtr = f(new fabric.Point(_mt.x, _mt.y)),
+
+          // padding
+          padX = Math.cos(_angle + theta) * this.padding * Math.sqrt(2),
+          padY = Math.sin(_angle + theta) * this.padding * Math.sqrt(2);
+
+      tl = tl.add(new fabric.Point(-padX, -padY));
+      tr = tr.add(new fabric.Point(padY, -padX));
+      br = br.add(new fabric.Point(padX, padY));
+      bl = bl.add(new fabric.Point(-padY, padX));
+      ml = ml.add(new fabric.Point((-padX - padY) / 2, (-padY + padX) / 2));
+      mt = mt.add(new fabric.Point((padY - padX) / 2, -(padY + padX) / 2));
+      mr = mr.add(new fabric.Point((padY + padX) / 2, (padY - padX) / 2));
+      mb = mb.add(new fabric.Point((padX - padY) / 2, (padX + padY) / 2));
+      mtr = mtr.add(new fabric.Point((padY - padX) / 2, -(padY + padX) / 2));
 
       // debugging
 

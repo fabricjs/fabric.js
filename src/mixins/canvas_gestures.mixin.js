@@ -111,10 +111,8 @@
     /**
      * Scales an object by a factor
      * @param {Number} s The scale factor to apply to the current scale level
-     * @param {String} by Either 'x' or 'y' - specifies dimension constraint by which to scale an object.
-     *                    When not provided, an object is scaled by both dimensions equally
      */
-    _scaleObjectBy: function(s, by) {
+    _scaleObjectBy: function(s) {
       var t = this._currentTransform,
               target = t.target,
               lockScalingX = target.get('lockScalingX'),
@@ -126,18 +124,12 @@
 
       target._scaling = true;
 
-      var constraintPosition = target.translateToOriginPoint(target.getCenterPoint(), t.originX, t.originY);
+      var constraintPosition = target.translateToOriginPoint(target.getCenterPoint(), t.originX, t.originY),
+        halfStrokeWidth = target.stroke ? target.strokeWidth / 2 : 0;
 
-      if (!by) {
-        t.newScaleX = t.scaleX * s;
-        t.newScaleY = t.scaleY * s;
-        if (!lockScalingX) {
-          target.set('scaleX', t.scaleX * s);
-        }
-        if (!lockScalingY) {
-          target.set('scaleY', t.scaleY * s);
-        }
-      }
+      this._setObjectScale(new fabric.Point((t.scaleX * s * (target.width + halfStrokeWidth)),
+        (t.scaleY * s * (target.height + halfStrokeWidth))),
+        t, lockScalingX, lockScalingY, null, target.get('lockScalingFlip'));
 
       target.setPositionByOrigin(constraintPosition, t.originX, t.originY);
     },

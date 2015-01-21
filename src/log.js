@@ -11,12 +11,8 @@ fabric.log = function() { };
 fabric.warn = function() { };
 
 if (typeof console !== 'undefined') {
-
   ['log', 'warn'].forEach(function(methodName) {
-
-    if (typeof console[methodName] !== 'undefined' &&
-        typeof console[methodName].apply === 'function') {
-
+    if (typeof console[methodName] !== 'undefined' && console[methodName].apply) {
       fabric[methodName] = function() {
         return console[methodName].apply(console, arguments);
       };

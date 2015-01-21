@@ -441,7 +441,7 @@
      * @private
      */
     _removeExtraneousStyles: function() {
-      var textLines = this.text.split(this._reNewline);
+      var textLines = this._getTextLines();
       for (var prop in this.styles) {
         if (!textLines[prop]) {
           delete this.styles[prop];
@@ -472,8 +472,8 @@
 
       }
 
-      this.text = this.text.slice(0, start) +
-                  this.text.slice(end);
+      this.set('text', this.text.slice(0, start) +
+                  this.text.slice(end));
     },
 
     /**
@@ -483,9 +483,9 @@
     insertChars: function(_chars) {
       var isEndOfLine = this.text.slice(this.selectionStart, this.selectionStart + 1) === '\n';
 
-      this.text = this.text.slice(0, this.selectionStart) +
+      this.set('text', this.text.slice(0, this.selectionStart) +
                     _chars +
-                  this.text.slice(this.selectionEnd);
+                  this.text.slice(this.selectionEnd));
 
       if (this.selectionStart === this.selectionEnd) {
         this.insertStyleObjects(_chars, isEndOfLine, this.copiedStyles);
@@ -582,7 +582,11 @@
      * @param {Array} [styles] Styles to insert
      */
     insertStyleObjects: function(_chars, isEndOfLine, styles) {
-      // removed shortcircuit over isEmptyStyles
+
+      // short-circuit
+      if (this.isEmptyStyles()) {
+        return;
+      }
 
       var cursorLocation = this.get2DCursorLocation(),
           lineIndex = cursorLocation.lineIndex,
@@ -649,7 +653,7 @@
 
       if (isBeginningOfLine) {
 
-        var textLines = this.text.split(this._reNewline),
+        var textLines = this._getTextLines(),
             textOnPreviousLine = textLines[lineIndex - 1],
             newCharIndexOnPrevLine = textOnPreviousLine
               ? textOnPreviousLine.length

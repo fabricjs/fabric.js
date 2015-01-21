@@ -307,7 +307,6 @@
 
     /**
      * Horizontal origin of transformation of an object (one of "left", "right", "center")
-     * See http://jsfiddle.net/1ow02gea/40/ on how originX/originY affect objects in groups
      * @type String
      * @default
      */
@@ -315,7 +314,6 @@
 
     /**
      * Vertical origin of transformation of an object (one of "top", "bottom", "center")
-     * See http://jsfiddle.net/1ow02gea/40/ on how originX/originY affect objects in groups
      * @type String
      * @default
      */
@@ -923,6 +921,16 @@
     },
 
     /**
+     * This callback function is called by the parent group of an object every
+     * time a non-delegated property changes on the group. It is passed the key
+     * and value as parameters. Not adding in this function's signature to avoid
+     * Travis build error about unused variables.
+     */
+    setOnGroup: function() {
+      // implemented by sub-classes, as needed.
+    },
+
+    /**
      * Toggles specified property from `true` to `false` or from `false` to `true`
      * @param {String} property Property to toggle
      * @return {fabric.Object} thisArg
@@ -967,7 +975,7 @@
      */
     render: function(ctx, noTransform) {
       // do not render if width/height are zeros or object is not visible
-      if ((this.width === 0 && this.height === 0) || !this.visible) {
+      if (this.width === 0 || this.height === 0 || !this.visible) {
         return;
       }
 
@@ -1202,7 +1210,7 @@
       el.height = boundingRect.height;
 
       fabric.util.wrapElement(el, 'div');
-      var canvas = new fabric.StaticCanvas(el);
+      var canvas = new fabric.Canvas(el);
 
       // to avoid common confusion https://github.com/kangax/fabric.js/issues/806
       if (options.format === 'jpg') {

@@ -256,7 +256,7 @@
     /**
      * Sets x/y of this point
      * @param {Number} x
-     * @param {Number} y
+     * @return {Number} y
      */
     setXY: function (x, y) {
       this.x = x;

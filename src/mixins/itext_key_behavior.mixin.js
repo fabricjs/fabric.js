@@ -7,8 +7,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     this.hiddenTextarea = fabric.document.createElement('textarea');
 
     this.hiddenTextarea.setAttribute('autocapitalize', 'off');
-    this.hiddenTextarea.style.cssText = 'position: fixed; bottom: 20px; left: 0px; opacity: 0;'
-                                        + ' width: 0px; height: 0px; z-index: -999;';
+    this.hiddenTextarea.style.cssText = 'position: absolute; top: 0; left: -9999px';
+
     fabric.document.body.appendChild(this.hiddenTextarea);
 
     fabric.util.addListener(this.hiddenTextarea, 'keydown', this.onKeyDown.bind(this));
@@ -173,18 +173,15 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    */
   getDownCursorOffset: function(e, isRight) {
     var selectionProp = isRight ? this.selectionEnd : this.selectionStart,
-        textLines = this.text.split(this._reNewline),
+        textLines = this._getTextLines(),
         _char,
         lineLeftOffset,
+        cursorLocation = this.get2DCursorLocation(selectionProp),
 
-        textBeforeCursor = this.text.slice(0, selectionProp),
-        textAfterCursor = this.text.slice(selectionProp),
-
-        textOnSameLineBeforeCursor = textBeforeCursor.slice(textBeforeCursor.lastIndexOf('\n') + 1),
-        textOnSameLineAfterCursor = textAfterCursor.match(/(.*)\n?/)[1],
-        textOnNextLine = (textAfterCursor.match(/.*\n(.*)\n?/) || { })[1] || '',
-
-        cursorLocation = this.get2DCursorLocation(selectionProp);
+        textOnSameLineBeforeCursor = textLines[cursorLocation.lineIndex].slice(0, cursorLocation.charIndex),
+        textOnSameLineAfterCursor = textLines[cursorLocation.lineIndex].slice(cursorLocation.charIndex),
+        textOnNextLine = cursorLocation.lineIndex === textLines.length - 1 ? '' :
+          textLines[cursorLocation.lineIndex + 1];
 
     // if on last line, down cursor goes to end of line
     if (cursorLocation.lineIndex === textLines.length - 1 || e.metaKey || e.keyCode === 34) {
@@ -332,10 +329,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       return selectionProp;
     }
 
-    var textBeforeCursor = this.text.slice(0, selectionProp),
-        textOnSameLineBeforeCursor = textBeforeCursor.slice(textBeforeCursor.lastIndexOf('\n') + 1),
-        textOnPreviousLine = (textBeforeCursor.match(/\n?(.*)\n.*$/) || {})[1] || '',
-        textLines = this.text.split(this._reNewline),
+    var textLines = this._getTextLines(),
+        textOnSameLineBeforeCursor = textLines[cursorLocation.lineIndex].slice(0, cursorLocation.charIndex),
+        textOnPreviousLine = cursorLocation.lineIndex === 0 ? '' : textLines[cursorLocation.lineIndex - 1],
         _char,
         widthOfSameLineBeforeCursor = this._getWidthOfLine(this.ctx, cursorLocation.lineIndex, textLines),
         lineLeftOffset = this._getLineLeftOffset(widthOfSameLineBeforeCursor),
@@ -673,8 +669,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         this.removeStyleObject(isBeginningOfLine);
 
         this.selectionStart--;
-        this.text = this.text.slice(0, this.selectionStart) +
-                    this.text.slice(this.selectionStart + 1);
+        this.set('text', this.text.slice(0, this.selectionStart) +
+                    this.text.slice(this.selectionStart + 1));
       }
     }
   }
