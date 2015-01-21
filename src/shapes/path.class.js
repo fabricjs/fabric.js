@@ -521,7 +521,7 @@
       }
       var path = chunks.join(' ');
       if (!(this.group && this.group.type === 'path-group')) {
-        addTransform = 'translate(' + (-this.pathOffset.x) + ', ' + (-this.pathOffset.y) + ')';
+        addTransform = ' translate(' + (-this.pathOffset.x) + ', ' + (-this.pathOffset.y) + ') ';
       }
       markup.push(
         //jscs:disable validateIndentation

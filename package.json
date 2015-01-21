@@ -30,7 +30,7 @@
   "license": "MIT",
   "scripts": {
     "build": "node build.js modules=ALL exclude=json,cufon,gestures",
-    "test": "node test.js && iojs test.js && jshint src"
+    "test": "node test.js && jshint src"
   },
   "dependencies": {
     "canvas": "1.1.x",
@@ -40,7 +40,7 @@
   "devDependencies": {
     "execSync": "1.0.x",
     "uglify-js": "2.4.x",
-    "jscs": "1.9.x",
+    "jscs": "1.7.x",
     "jshint": "2.5.x",
     "qunit": "0.7.2",
     "istanbul": "0.3.x"
