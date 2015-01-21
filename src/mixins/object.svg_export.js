@@ -1,4 +1,8 @@
 /* _TO_SVG_START_ */
+function isDefault(prop, defaultValue) {
+  return typeof this[prop] !== 'undefined' && this[prop] === defaultValue;
+}
+
 fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
 
   /**
@@ -7,37 +11,48 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    */
   getSvgStyles: function() {
 
-    var fill = this.fill
-          ? (this.fill.toLive ? 'url(#SVGID_' + this.fill.id + ')' : this.fill)
-          : 'none',
-        fillRule = this.fillRule,
-        stroke = this.stroke
-          ? (this.stroke.toLive ? 'url(#SVGID_' + this.stroke.id + ')' : this.stroke)
-          : 'none',
+    var fill = 'fill: none; ', stroke = '', fillRule = '', strokeWidth = '', strokeDashArray = '', strokeLineCap = '',
+        strokeLineJoin = '', strokeMiterLimit = '', opacity = '', visibility = '', filter = '';
 
-        strokeWidth = this.strokeWidth ? this.strokeWidth : '0',
-        strokeDashArray = this.strokeDashArray ? this.strokeDashArray.join(' ') : '',
-        strokeLineCap = this.strokeLineCap ? this.strokeLineCap : 'butt',
-        strokeLineJoin = this.strokeLineJoin ? this.strokeLineJoin : 'miter',
-        strokeMiterLimit = this.strokeMiterLimit ? this.strokeMiterLimit : '4',
-        opacity = typeof this.opacity !== 'undefined' ? this.opacity : '1',
-
-        visibility = this.visible ? '' : ' visibility: hidden;',
-        filter = this.shadow && this.type !== 'text' ? 'filter: url(#SVGID_' + this.shadow.id + ');' : '';
-
-    return [
-      'stroke: ', stroke, '; ',
-      'stroke-width: ', strokeWidth, '; ',
-      'stroke-dasharray: ', strokeDashArray, '; ',
-      'stroke-linecap: ', strokeLineCap, '; ',
-      'stroke-linejoin: ', strokeLineJoin, '; ',
-      'stroke-miterlimit: ', strokeMiterLimit, '; ',
-      'fill: ', fill, '; ',
-      'fill-rule: ', fillRule, '; ',
-      'opacity: ', opacity, ';',
-      filter,
-      visibility
-    ].join('');
+    if (!isDefault('fill', '')) {
+      if (this.fill) {
+        fill = 'fill: ' + (this.fill.toLive ? 'url(#SVGID_' + this.fill.id + ')' : this.fill) + '; ';
+      }
+    }
+    if (!isDefault('stroke', '')) {
+      if (this.stroke) {
+        stroke = 'stroke: ' + (this.stroke.toLive ? 'url(#SVGID_' + this.stroke.id + ')' : this.stroke) + '; ';
+      }
+    }
+    if (!isDefault('fillRule', 'nonzero')) {
+      fillRule = 'fill-rule: ' + this.fillRule + '; ';
+    }
+    if (!isDefault('strokeWidth', '1')) {
+      strokeWidth = 'stroke-width: ' + this.strokeWidth + '; ';
+    }
+    if (!isDefault('strokeDashArray', '')) {
+      strokeDashArray = 'stroke-dasharray: ' + this.strokeDashArray.join(' ') + '; ';
+    }
+    if (!isDefault('strokeLineCap', 'butt')) {
+      strokeLineCap = 'stroke-linecap: ' + this.strokeLineCap + '; ';
+    }
+    if (!isDefault('strokeLineJoin', 'miter')) {
+      strokeLineJoin = 'stroke-linejoin: ' + this.strokeLineJoin + '; ';
+    }
+    if (!isDefault('strokeMiterLimit', '4')) {
+      strokeMiterLimit = 'stroke-miterlimit: ' + this.strokeMiterLimit + '; ';
+    }
+    if (!isDefault('opacity', '1')) {
+      opacity = 'opacity: ' + this.opacity + '; ';
+    }
+    if (!isDefault('visible', true)) {
+      visibility = 'visibility: hidden; ';
+    }
+    if (this.shadow && this.type !== 'text') {
+      filter = 'filter: url(#SVGID_' + this.shadow.id + '); ';
+    }
+    return [fill, fillRule, stroke, strokeWidth, strokeDashArray, strokeLineCap,
+            strokeLineJoin, strokeMiterLimit, opacity, visibility, filter].join('');
   },
 
   /**
