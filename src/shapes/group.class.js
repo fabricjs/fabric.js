@@ -194,7 +194,7 @@
      * @private
      */
     _set: function(key, value) {
-      var i = this._objects.length;;
+      var i = this._objects.length;
       if (key in this.delegatedProperties) {
         while (i--) {
           this._objects[i].set(key, value);
