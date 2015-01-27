@@ -24,10 +24,10 @@
     *   Select text vertically:         shift + up, shift + down
     *   Move cursor by word:            alt + left, alt + right
     *   Select words:                   shift + alt + left, shift + alt + right
-    *   Move cursor to line start/end:  cmd + left, cmd + right
-    *   Select till start/end of line:  cmd + shift + left, cmd + shift + right
+    *   Move cursor to line start/end:  cmd + left, cmd + right or home, end
+    *   Select till start/end of line:  cmd + shift + left, cmd + shift + right or shift + home, shift + end
     *   Jump to start/end of text:      cmd + up, cmd + down
-    *   Select till start/end of text:  cmd + shift + up, cmd + shift + down
+    *   Select till start/end of text:  cmd + shift + up, cmd + shift + down or shift + pgUp, shift + pgDown
     *   Delete character:               backspace
     *   Delete word:                    alt + backspace
     *   Delete line:                    cmd + backspace
@@ -36,6 +36,7 @@
     *   Paste text:                     ctrl/cmd + v
     *   Cut text:                       ctrl/cmd + x
     *   Select entire text:             ctrl/cmd + a
+    *   Quit editing                    tab or esc
     * </pre>
     *
     * <p>Supported mouse/touch combination</p>
@@ -146,17 +147,12 @@
      * @type Boolean
      * @default
      */
-    _skipFillStrokeCheck: true,
+    _skipFillStrokeCheck: false,
 
     /**
      * @private
      */
     _reSpace: /\s|\n/,
-
-    /**
-     * @private
-     */
-    _fontSizeFraction: 4,
 
     /**
      * @private
@@ -191,10 +187,14 @@
 
       fabric.IText.instances.push(this);
 
-      // caching
-      this.__lineWidths = { };
-      this.__lineHeights = { };
-      this.__lineOffsets = { };
+    },
+
+    /**
+     * @private
+     */
+    _clearCache: function() {
+      this.callSuper('_clearCache');
+      this.__maxFontHeights = [ ];
     },
 
     /**
@@ -222,12 +222,13 @@
      * @param {Number} index Index to set selection start to
      */
     setSelectionStart: function(index) {
+      index = Math.max(index, 0);
       if (this.selectionStart !== index) {
         this.fire('selection:changed');
         this.canvas && this.canvas.fire('text:selection:changed', { target: this });
+        this.selectionStart = index;
       }
-      this.selectionStart = index;
-      this.hiddenTextarea && (this.hiddenTextarea.selectionStart = index);
+      this._updateTextarea();
     },
 
     /**
@@ -235,12 +236,13 @@
      * @param {Number} index Index to set selection end to
      */
     setSelectionEnd: function(index) {
+      index = Math.min(index, this.text.length);
       if (this.selectionEnd !== index) {
         this.fire('selection:changed');
         this.canvas && this.canvas.fire('text:selection:changed', { target: this });
+        this.selectionEnd = index;
       }
-      this.selectionEnd = index;
-      this.hiddenTextarea && (this.hiddenTextarea.selectionEnd = index);
+      this._updateTextarea();
     },
 
     /**
@@ -405,18 +407,14 @@
      */
     _getCursorBoundaries: function(chars, typeOfBoundaries) {
 
-      var cursorLocation = this.get2DCursorLocation(),
-
-          textLines = this.text.split(this._reNewline),
-
           // left/top are left/top of entire text box
           // leftOffset/topOffset are offset from that left/top point of a text box
 
-          left = Math.round(this._getLeftOffset()),
+      var left = Math.round(this._getLeftOffset()),
           top = this._getTopOffset(),
 
           offsets = this._getCursorBoundariesOffsets(
-                      chars, typeOfBoundaries, cursorLocation, textLines);
+                      chars, typeOfBoundaries);
 
       return {
         left: left,
@@ -429,26 +427,19 @@
     /**
      * @private
      */
-    _getCursorBoundariesOffsets: function(chars, typeOfBoundaries, cursorLocation, textLines) {
+    _getCursorBoundariesOffsets: function(chars, typeOfBoundaries) {
 
       var lineLeftOffset = 0,
 
           lineIndex = 0,
           charIndex = 0,
-
-          leftOffset = 0,
-          topOffset = typeOfBoundaries === 'cursor'
-            // selection starts at the very top of the line,
-            // whereas cursor starts at the padding created by line height
-            ? (this._getHeightOfLine(this.ctx, 0) -
-              this.getCurrentCharFontSize(cursorLocation.lineIndex, cursorLocation.charIndex))
-            : 0;
+          topOffset = 0,
+          leftOffset = 0;
 
       for (var i = 0; i < this.selectionStart; i++) {
         if (chars[i] === '\n') {
           leftOffset = 0;
-          var index = lineIndex + (typeOfBoundaries === 'cursor' ? 1 : 0);
-          topOffset += this._getCachedLineHeight(index);
+          topOffset += this._getHeightOfLine(this.ctx, lineIndex);
 
           lineIndex++;
           charIndex = 0;
@@ -458,10 +449,12 @@
           charIndex++;
         }
 
-        lineLeftOffset = this._getCachedLineOffset(lineIndex, textLines);
+        lineLeftOffset = this._getCachedLineOffset(lineIndex);
       }
-
-      this._clearCache();
+      if (typeOfBoundaries === 'cursor') {
+        topOffset += (1 - this._fontSizeFraction) * this._getHeightOfLine(this.ctx, lineIndex) / this.lineHeight
+          - this.getCurrentCharFontSize(lineIndex, charIndex) * (1 - this._fontSizeFraction);
+      }
 
       return {
         top: topOffset,
@@ -473,33 +466,8 @@
     /**
      * @private
      */
-    _clearCache: function() {
-      this.__lineWidths = { };
-      this.__lineHeights = { };
-      this.__lineOffsets = { };
-    },
-
-    /**
-     * @private
-     */
-    _getCachedLineHeight: function(index) {
-      return this.__lineHeights[index] ||
-        (this.__lineHeights[index] = this._getHeightOfLine(this.ctx, index));
-    },
-
-    /**
-     * @private
-     */
-    _getCachedLineWidth: function(lineIndex, textLines) {
-      return this.__lineWidths[lineIndex] ||
-        (this.__lineWidths[lineIndex] = this._getWidthOfLine(this.ctx, lineIndex, textLines));
-    },
-
-    /**
-     * @private
-     */
-    _getCachedLineOffset: function(lineIndex, textLines) {
-      var widthOfLine = this._getCachedLineWidth(lineIndex, textLines);
+    _getCachedLineOffset: function(lineIndex) {
+      var widthOfLine = this._getLineWidth(this.ctx, lineIndex);
 
       return this.__lineOffsets[lineIndex] ||
         (this.__lineOffsets[lineIndex] = this._getLineLeftOffset(widthOfLine));
@@ -549,30 +517,29 @@
       var start = this.get2DCursorLocation(this.selectionStart),
           end = this.get2DCursorLocation(this.selectionEnd),
           startLine = start.lineIndex,
-          endLine = end.lineIndex,
-          textLines = this.text.split(this._reNewline);
+          endLine = end.lineIndex;
 
       for (var i = startLine; i <= endLine; i++) {
-        var lineOffset = this._getCachedLineOffset(i, textLines) || 0,
-            lineHeight = this._getCachedLineHeight(i),
-            boxWidth = 0;
+        var lineOffset = this._getCachedLineOffset(i) || 0,
+            lineHeight = this._getHeightOfLine(this.ctx, i),
+            boxWidth = 0, line = this._textLines[i];
 
         if (i === startLine) {
-          for (var j = 0, len = textLines[i].length; j < len; j++) {
+          for (var j = 0, len = line.length; j < len; j++) {
             if (j >= start.charIndex && (i !== endLine || j < end.charIndex)) {
-              boxWidth += this._getWidthOfChar(ctx, textLines[i][j], i, j);
+              boxWidth += this._getWidthOfChar(ctx, line[j], i, j);
             }
             if (j < start.charIndex) {
-              lineOffset += this._getWidthOfChar(ctx, textLines[i][j], i, j);
+              lineOffset += this._getWidthOfChar(ctx, line[j], i, j);
             }
           }
         }
         else if (i > startLine && i < endLine) {
-          boxWidth += this._getCachedLineWidth(i, textLines) || 5;
+          boxWidth += this._getLineWidth(ctx, i) || 5;
         }
         else if (i === endLine) {
           for (var j2 = 0, j2len = end.charIndex; j2 < j2len; j2++) {
-            boxWidth += this._getWidthOfChar(ctx, textLines[i][j2], i, j2);
+            boxWidth += this._getWidthOfChar(ctx, line[j2], i, j2);
           }
         }
 
@@ -608,10 +575,8 @@
           : 0;
 
       // set proper line offset
-      var textLines = this.text.split(this._reNewline),
-          lineWidth = this._getWidthOfLine(ctx, lineIndex, textLines),
-          lineHeight = this._getHeightOfLine(ctx, lineIndex, textLines),
-          lineLeftOffset = this._getLineLeftOffset(lineWidth),
+      var lineHeight = this._getHeightOfLine(ctx, lineIndex),
+          lineLeftOffset = this._getCachedLineOffset(lineIndex),
           chars = line.split(''),
           prevStyle,
           charsToRender = '';
@@ -619,7 +584,7 @@
       left += lineLeftOffset || 0;
 
       ctx.save();
-
+      top -= lineHeight / this.lineHeight * this._fontSizeFraction;
       for (var i = 0, len = chars.length; i <= len; i++) {
         prevStyle = prevStyle || this.getCurrentCharStyle(lineIndex, i);
         var thisStyle = this.getCurrentCharStyle(lineIndex, i + 1);
@@ -649,7 +614,7 @@
       if (method === 'fillText' && this.fill) {
         this.callSuper('_renderChars', method, ctx, line, left, top);
       }
-      if (method === 'strokeText' && this.stroke) {
+      if (method === 'strokeText' && ((this.stroke && this.strokeWidth > 0) || this.skipFillStrokeCheck)) {
         this.callSuper('_renderChars', method, ctx, line, left, top);
       }
     },
@@ -666,7 +631,8 @@
      * @param {Number} lineHeight Height of the line
      */
     _renderChar: function(method, ctx, lineIndex, i, _char, left, top, lineHeight) {
-      var decl, charWidth, charHeight;
+      var decl, charWidth, charHeight,
+          offset = this._fontSizeFraction * lineHeight / this.lineHeight;
 
       if (this.styles && this.styles[lineIndex] && (decl = this.styles[lineIndex][i])) {
 
@@ -684,7 +650,7 @@
           ctx.strokeText(_char, left, top);
         }
 
-        this._renderCharDecoration(ctx, decl, left, top, charWidth, lineHeight, charHeight);
+        this._renderCharDecoration(ctx, decl, left, top, offset, charWidth, charHeight);
         ctx.restore();
 
         ctx.translate(charWidth, 0);
@@ -697,7 +663,7 @@
           ctx[method](_char, left, top);
         }
         charWidth = this._applyCharStylesGetWidth(ctx, _char, lineIndex, i);
-        this._renderCharDecoration(ctx, null, left, top, charWidth, lineHeight);
+        this._renderCharDecoration(ctx, null, left, top, offset, charWidth, this.fontSize);
 
         ctx.translate(ctx.measureText(_char).width, 0);
       }
@@ -725,56 +691,40 @@
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    _renderCharDecoration: function(ctx, styleDeclaration, left, top, charWidth, lineHeight, charHeight) {
+    _renderCharDecoration: function(ctx, styleDeclaration, left, top, offset, charWidth, charHeight) {
 
       var textDecoration = styleDeclaration
             ? (styleDeclaration.textDecoration || this.textDecoration)
-            : this.textDecoration,
-
-          fontSize = (styleDeclaration ? styleDeclaration.fontSize : null) || this.fontSize;
+            : this.textDecoration;
 
       if (!textDecoration) {
         return;
       }
 
       if (textDecoration.indexOf('underline') > -1) {
-        this._renderCharDecorationAtOffset(
-          ctx,
+        ctx.fillRect(
           left,
-          top + (this.fontSize / this._fontSizeFraction),
-          charWidth,
-          0,
-          this.fontSize / 20
+          top + charHeight / 10,
+          charWidth ,
+          charHeight / 15
         );
       }
       if (textDecoration.indexOf('line-through') > -1) {
-        this._renderCharDecorationAtOffset(
-          ctx,
+        ctx.fillRect(
           left,
-          top + (this.fontSize / this._fontSizeFraction),
+          top - charHeight * (this._fontSizeFraction + this._fontSizeMult - 1) + charHeight / 15,
           charWidth,
-          charHeight / 2,
-          fontSize / 20
+          charHeight / 15
         );
       }
       if (textDecoration.indexOf('overline') > -1) {
-        this._renderCharDecorationAtOffset(
-          ctx,
+        ctx.fillRect(
           left,
-          top,
+          top - (this._fontSizeMult - this._fontSizeFraction) * charHeight,
           charWidth,
-          lineHeight - (this.fontSize / this._fontSizeFraction),
-          this.fontSize / 20
+          charHeight / 15
         );
       }
-    },
-
-    /**
-     * @private
-     * @param {CanvasRenderingContext2D} ctx Context to render on
-     */
-    _renderCharDecorationAtOffset: function(ctx, left, top, charWidth, offset, thickness) {
-      ctx.fillRect(left, top - offset, charWidth, thickness);
     },
 
     /**
@@ -785,27 +735,26 @@
      */
     _renderTextLine: function(method, ctx, line, left, top, lineIndex) {
       // to "cancel" this.fontSize subtraction in fabric.Text#_renderTextLine
-      top += this.fontSize / 4;
+      // the adding 0.03 is just to align text with itext by overlap test
+      top += this.fontSize * (this._fontSizeFraction + 0.03);
       this.callSuper('_renderTextLine', method, ctx, line, left, top, lineIndex);
     },
 
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Array} textLines
      */
-    _renderTextDecoration: function(ctx, textLines) {
+    _renderTextDecoration: function(ctx) {
       if (this.isEmptyStyles()) {
-        return this.callSuper('_renderTextDecoration', ctx, textLines);
+        return this.callSuper('_renderTextDecoration', ctx);
       }
     },
 
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Array} textLines Array of all text lines
      */
-    _renderTextLinesBackground: function(ctx, textLines) {
+    _renderTextLinesBackground: function(ctx) {
       if (!this.textBackgroundColor && !this.styles) {
         return;
       }
@@ -816,43 +765,42 @@
         ctx.fillStyle = this.textBackgroundColor;
       }
 
-      var lineHeights = 0,
-          fractionOfFontSize = this.fontSize / this._fontSizeFraction;
+      var lineHeights = 0;
 
-      for (var i = 0, len = textLines.length; i < len; i++) {
+      for (var i = 0, len = this._textLines.length; i < len; i++) {
 
-        var heightOfLine = this._getHeightOfLine(ctx, i, textLines);
-        if (textLines[i] === '') {
+        var heightOfLine = this._getHeightOfLine(ctx, i);
+        if (this._textLines[i] === '') {
           lineHeights += heightOfLine;
           continue;
         }
 
-        var lineWidth = this._getWidthOfLine(ctx, i, textLines),
-            lineLeftOffset = this._getLineLeftOffset(lineWidth);
+        var lineWidth = this._getLineWidth(ctx, i),
+            lineLeftOffset = this._getCachedLineOffset(i);
 
         if (this.textBackgroundColor) {
           ctx.fillStyle = this.textBackgroundColor;
 
           ctx.fillRect(
             this._getLeftOffset() + lineLeftOffset,
-            this._getTopOffset() + lineHeights + fractionOfFontSize,
+            this._getTopOffset() + lineHeights,
             lineWidth,
-            heightOfLine
+            heightOfLine / this.lineHeight
           );
         }
         if (this.styles[i]) {
-          for (var j = 0, jlen = textLines[i].length; j < jlen; j++) {
+          for (var j = 0, jlen = this._textLines[i].length; j < jlen; j++) {
             if (this.styles[i] && this.styles[i][j] && this.styles[i][j].textBackgroundColor) {
 
-              var _char = textLines[i][j];
+              var _char = this._textLines[i][j];
 
               ctx.fillStyle = this.styles[i][j].textBackgroundColor;
 
               ctx.fillRect(
-                this._getLeftOffset() + lineLeftOffset + this._getWidthOfCharsAt(ctx, i, j, textLines),
-                this._getTopOffset() + lineHeights + fractionOfFontSize,
-                this._getWidthOfChar(ctx, _char, i, j, textLines) + 1,
-                heightOfLine
+                this._getLeftOffset() + lineLeftOffset + this._getWidthOfCharsAt(ctx, i, j),
+                this._getTopOffset() + lineHeights,
+                this._getWidthOfChar(ctx, _char, i, j) + 1,
+                heightOfLine / this.lineHeight
               );
             }
           }
@@ -867,12 +815,10 @@
      */
     _getCacheProp: function(_char, styleDeclaration) {
       return _char +
-
              styleDeclaration.fontFamily +
              styleDeclaration.fontSize +
              styleDeclaration.fontWeight +
              styleDeclaration.fontStyle +
-
              styleDeclaration.shadow;
     },
 
@@ -1005,9 +951,8 @@
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    _getWidthOfCharAt: function(ctx, lineIndex, charIndex, lines) {
-      lines = lines || this.text.split(this._reNewline);
-      var _char = lines[lineIndex].split('')[charIndex];
+    _getWidthOfCharAt: function(ctx, lineIndex, charIndex) {
+      var _char = this._textLines[lineIndex].split('')[charIndex];
       return this._getWidthOfChar(ctx, _char, lineIndex, charIndex);
     },
 
@@ -1015,9 +960,8 @@
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    _getHeightOfCharAt: function(ctx, lineIndex, charIndex, lines) {
-      lines = lines || this.text.split(this._reNewline);
-      var _char = lines[lineIndex].split('')[charIndex];
+    _getHeightOfCharAt: function(ctx, lineIndex, charIndex) {
+      var _char = this._textLines[lineIndex].split('')[charIndex];
       return this._getHeightOfChar(ctx, _char, lineIndex, charIndex);
     },
 
@@ -1025,10 +969,10 @@
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    _getWidthOfCharsAt: function(ctx, lineIndex, charIndex, lines) {
+    _getWidthOfCharsAt: function(ctx, lineIndex, charIndex) {
       var width = 0;
       for (var i = 0; i < charIndex; i++) {
-        width += this._getWidthOfCharAt(ctx, lineIndex, i, lines);
+        width += this._getWidthOfCharAt(ctx, lineIndex, i);
       }
       return width;
     },
@@ -1037,11 +981,12 @@
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    _getWidthOfLine: function(ctx, lineIndex, textLines) {
-      // if (!this.styles[lineIndex]) {
-      //   return this.callSuper('_getLineWidth', ctx, textLines[lineIndex]);
-      // }
-      return this._getWidthOfCharsAt(ctx, lineIndex, textLines[lineIndex].length, textLines);
+    _getLineWidth: function(ctx, lineIndex) {
+      if (this.__lineWidths[lineIndex]) {
+        return this.__lineWidths[lineIndex];
+      }
+      this.__lineWidths[lineIndex] = this._getWidthOfCharsAt(ctx, lineIndex, this._textLines[lineIndex].length);
+      return this.__lineWidths[lineIndex];
     },
 
     /**
@@ -1085,33 +1030,13 @@
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    _getTextWidth: function(ctx, textLines) {
-
-      if (this.isEmptyStyles()) {
-        return this.callSuper('_getTextWidth', ctx, textLines);
+    _getHeightOfLine: function(ctx, lineIndex) {
+      if (this.__lineHeights[lineIndex]) {
+        return this.__lineHeights[lineIndex];
       }
 
-      var maxWidth = this._getWidthOfLine(ctx, 0, textLines);
-
-      for (var i = 1, len = textLines.length; i < len; i++) {
-        var currentLineWidth = this._getWidthOfLine(ctx, i, textLines);
-        if (currentLineWidth > maxWidth) {
-          maxWidth = currentLineWidth;
-        }
-      }
-      return maxWidth;
-    },
-
-    /**
-     * @private
-     * @param {CanvasRenderingContext2D} ctx Context to render on
-     */
-    _getHeightOfLine: function(ctx, lineIndex, textLines) {
-
-      textLines = textLines || this.text.split(this._reNewline);
-
-      var maxHeight = this._getHeightOfChar(ctx, textLines[lineIndex][0], lineIndex, 0),
-          line = textLines[lineIndex],
+      var line = this._textLines[lineIndex],
+          maxHeight = this._getHeightOfChar(ctx, line[0], lineIndex, 0),
           chars = line.split('');
 
       for (var i = 1, len = chars.length; i < len; i++) {
@@ -1120,29 +1045,21 @@
           maxHeight = currentCharHeight;
         }
       }
-
-      return maxHeight * this.lineHeight;
+      this.__maxFontHeights[lineIndex] = maxHeight;
+      this.__lineHeights[lineIndex] = maxHeight * this.lineHeight * this._fontSizeMult;
+      return this.__lineHeights[lineIndex];
     },
 
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Array} textLines Array of all text lines
      */
-    _getTextHeight: function(ctx, textLines) {
+    _getTextHeight: function(ctx) {
       var height = 0;
-      for (var i = 0, len = textLines.length; i < len; i++) {
-        height += this._getHeightOfLine(ctx, i, textLines);
+      for (var i = 0, len = this._textLines.length; i < len; i++) {
+        height += this._getHeightOfLine(ctx, i);
       }
       return height;
-    },
-
-    /**
-     * @private
-     */
-    _getTopOffset: function() {
-      var topOffset = fabric.Text.prototype._getTopOffset.call(this);
-      return topOffset - (this.fontSize / this._fontSizeFraction);
     },
 
     /**
@@ -1159,7 +1076,7 @@
 
       ctx.fillRect(
         this._getLeftOffset(),
-        this._getTopOffset() + (this.fontSize / this._fontSizeFraction),
+        this._getTopOffset(),
         this.width,
         this.height
       );

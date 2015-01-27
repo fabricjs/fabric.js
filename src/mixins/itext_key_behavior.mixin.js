@@ -62,7 +62,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (!this.isEditing) {
       return;
     }
-
     if (e.keyCode in this._keysMap) {
       this[this._keysMap[e.keyCode]](e);
     }
@@ -72,10 +71,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     else {
       return;
     }
-
     e.stopImmediatePropagation();
     e.preventDefault();
-
     this.canvas && this.canvas.renderAll();
   },
 
@@ -125,7 +122,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     }
 
     if (copiedText) {
-      this.insertChars(copiedText);
+      this.insertChars(copiedText, true);
     }
   },
 
@@ -173,10 +170,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    */
   getDownCursorOffset: function(e, isRight) {
     var selectionProp = isRight ? this.selectionEnd : this.selectionStart,
-        textLines = this.text.split(this._reNewline),
-        _char,
-        lineLeftOffset,
-
+        _char, lineLeftOffset,
         textBeforeCursor = this.text.slice(0, selectionProp),
         textAfterCursor = this.text.slice(selectionProp),
 
@@ -187,13 +181,13 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         cursorLocation = this.get2DCursorLocation(selectionProp);
 
     // if on last line, down cursor goes to end of line
-    if (cursorLocation.lineIndex === textLines.length - 1 || e.metaKey || e.keyCode === 34) {
+    if (cursorLocation.lineIndex === this._textLines.length - 1 || e.metaKey || e.keyCode === 34) {
 
       // move to the end of a text
       return this.text.length - selectionProp;
     }
 
-    var widthOfSameLineBeforeCursor = this._getWidthOfLine(this.ctx, cursorLocation.lineIndex, textLines);
+    var widthOfSameLineBeforeCursor = this._getLineWidth(this.ctx, cursorLocation.lineIndex);
     lineLeftOffset = this._getLineLeftOffset(widthOfSameLineBeforeCursor);
 
     var widthOfCharsOnSameLineBeforeCursor = lineLeftOffset,
@@ -205,7 +199,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     }
 
     var indexOnNextLine = this._getIndexOnNextLine(
-      cursorLocation, textOnNextLine, widthOfCharsOnSameLineBeforeCursor, textLines);
+      cursorLocation, textOnNextLine, widthOfCharsOnSameLineBeforeCursor);
 
     return textOnSameLineAfterCursor.length + 1 + indexOnNextLine;
   },
@@ -213,9 +207,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   /**
    * @private
    */
-  _getIndexOnNextLine: function(cursorLocation, textOnNextLine, widthOfCharsOnSameLineBeforeCursor, textLines) {
+  _getIndexOnNextLine: function(cursorLocation, textOnNextLine, widthOfCharsOnSameLineBeforeCursor) {
     var lineIndex = cursorLocation.lineIndex + 1,
-        widthOfNextLine = this._getWidthOfLine(this.ctx, lineIndex, textLines),
+        widthOfNextLine = this._getLineWidth(this.ctx, lineIndex),
         lineLeftOffset = this._getLineLeftOffset(widthOfNextLine),
         widthOfCharsOnNextLine = lineLeftOffset,
         indexOnNextLine = 0,
@@ -277,15 +271,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    */
   moveCursorDownWithoutShift: function(offset) {
     this._selectionDirection = 'right';
-    this.selectionStart += offset;
-
-    if (this.selectionStart > this.text.length) {
-      this.selectionStart = this.text.length;
-    }
-    this.selectionEnd = this.selectionStart;
-
-    this.fire('selection:changed');
-    this.canvas && this.canvas.fire('text:selection:changed', { target: this });
+    this.setSelectionStart(this.selectionStart + offset);
+    this.setSelectionEnd(this.selectionStart);
   },
 
   /**
@@ -293,8 +280,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    */
   swapSelectionPoints: function() {
     var swapSel = this.selectionEnd;
-    this.selectionEnd = this.selectionStart;
-    this.selectionStart = swapSel;
+    this.setSelectionEnd(this.selectionStart);
+    this.setSelectionStart(swapSel);
   },
 
   /**
@@ -305,18 +292,19 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (this.selectionEnd === this.selectionStart) {
       this._selectionDirection = 'right';
     }
-    var prop = this._selectionDirection === 'right' ? 'selectionEnd' : 'selectionStart';
-    this[prop] += offset;
+    if (this._selectionDirection === 'right') {
+      this.setSelectionEnd(this.selectionEnd + offset);
+    }
+    else {
+      this.setSelectionStart(this.selectionStart + offset);
+    }
     if (this.selectionEnd < this.selectionStart  && this._selectionDirection === 'left') {
       this.swapSelectionPoints();
       this._selectionDirection = 'right';
     }
     if (this.selectionEnd > this.text.length) {
-      this.selectionEnd = this.text.length;
+      this.setSelectionEnd(this.text.length);
     }
-
-    this.fire('selection:changed');
-    this.canvas && this.canvas.fire('text:selection:changed', { target: this });
   },
 
   /**
@@ -335,9 +323,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     var textBeforeCursor = this.text.slice(0, selectionProp),
         textOnSameLineBeforeCursor = textBeforeCursor.slice(textBeforeCursor.lastIndexOf('\n') + 1),
         textOnPreviousLine = (textBeforeCursor.match(/\n?(.*)\n.*$/) || {})[1] || '',
-        textLines = this.text.split(this._reNewline),
         _char,
-        widthOfSameLineBeforeCursor = this._getWidthOfLine(this.ctx, cursorLocation.lineIndex, textLines),
+        widthOfSameLineBeforeCursor = this._getLineWidth(this.ctx, cursorLocation.lineIndex),
         lineLeftOffset = this._getLineLeftOffset(widthOfSameLineBeforeCursor),
         widthOfCharsOnSameLineBeforeCursor = lineLeftOffset,
         lineIndex = cursorLocation.lineIndex;
@@ -348,7 +335,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     }
 
     var indexOnPrevLine = this._getIndexOnPrevLine(
-      cursorLocation, textOnPreviousLine, widthOfCharsOnSameLineBeforeCursor, textLines);
+      cursorLocation, textOnPreviousLine, widthOfCharsOnSameLineBeforeCursor);
 
     return textOnPreviousLine.length - indexOnPrevLine + textOnSameLineBeforeCursor.length;
   },
@@ -356,10 +343,10 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   /**
    * @private
    */
-  _getIndexOnPrevLine: function(cursorLocation, textOnPreviousLine, widthOfCharsOnSameLineBeforeCursor, textLines) {
+  _getIndexOnPrevLine: function(cursorLocation, textOnPreviousLine, widthOfCharsOnSameLineBeforeCursor) {
 
     var lineIndex = cursorLocation.lineIndex - 1,
-        widthOfPreviousLine = this._getWidthOfLine(this.ctx, lineIndex, textLines),
+        widthOfPreviousLine = this._getLineWidth(this.ctx, lineIndex),
         lineLeftOffset = this._getLineLeftOffset(widthOfPreviousLine),
         widthOfCharsOnPreviousLine = lineLeftOffset,
         indexOnPrevLine = 0,
@@ -423,18 +410,16 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (this.selectionEnd === this.selectionStart) {
       this._selectionDirection = 'left';
     }
-    var prop = this._selectionDirection === 'right' ? 'selectionEnd' : 'selectionStart';
-    this[prop] -= offset;
+    if (this._selectionDirection === 'right') {
+      this.setSelectionEnd(this.selectionEnd - offset);
+    }
+    else {
+      this.setSelectionStart(this.selectionStart - offset);
+    }
     if (this.selectionEnd < this.selectionStart && this._selectionDirection === 'right') {
       this.swapSelectionPoints();
       this._selectionDirection = 'left';
     }
-    if (this.selectionStart < 0) {
-      this.selectionStart = 0;
-    }
-
-    this.fire('selection:changed');
-    this.canvas && this.canvas.fire('text:selection:changed', { target: this });
   },
 
   /**
@@ -443,17 +428,11 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    */
   moveCursorUpWithoutShift: function(offset) {
     if (this.selectionStart === this.selectionEnd) {
-      this.selectionStart -= offset;
+      this.setSelectionStart(this.selectionStart - offset);
     }
-    if (this.selectionStart < 0) {
-      this.selectionStart = 0;
-    }
-    this.selectionEnd = this.selectionStart;
+    this.setSelectionEnd(this.selectionStart);
 
     this._selectionDirection = 'left';
-
-    this.fire('selection:changed');
-    this.canvas && this.canvas.fire('text:selection:changed', { target: this });
   },
 
   /**
@@ -482,14 +461,15 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @private
    */
   _move: function(e, prop, direction) {
+    var propMethod = (prop === 'selectionStart' ? 'setSelectionStart' : 'setSelectionEnd');
     if (e.altKey) {
-      this[prop] = this['findWordBoundary' + direction](this[prop]);
+      this[propMethod](this['findWordBoundary' + direction](this[prop]));
     }
     else if (e.metaKey || e.keyCode === 35 ||  e.keyCode === 36 ) {
-      this[prop] = this['findLineBoundary' + direction](this[prop]);
+      this[propMethod](this['findLineBoundary' + direction](this[prop]));
     }
     else {
-      this[prop] += (direction === 'Left' ? -1 : 1);
+      this[propMethod](this[prop] + (direction === 'Left' ? -1 : 1));
     }
   },
 
@@ -519,10 +499,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (this.selectionEnd === this.selectionStart) {
       this._moveLeft(e, 'selectionStart');
     }
-    this.selectionEnd = this.selectionStart;
-
-    this.fire('selection:changed');
-    this.canvas && this.canvas.fire('text:selection:changed', { target: this });
+    this.setSelectionEnd(this.selectionStart);
   },
 
   /**
@@ -539,15 +516,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
       // increase selection by one if it's a newline
       if (this.text.charAt(this.selectionStart) === '\n') {
-        this.selectionStart--;
-      }
-      if (this.selectionStart < 0) {
-        this.selectionStart = 0;
+        this.setSelectionStart(this.selectionStart - 1);
       }
     }
-
-    this.fire('selection:changed');
-    this.canvas && this.canvas.fire('text:selection:changed', { target: this });
   },
 
   /**
@@ -586,15 +557,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
       // increase selection by one if it's a newline
       if (this.text.charAt(this.selectionEnd - 1) === '\n') {
-        this.selectionEnd++;
-      }
-      if (this.selectionEnd > this.text.length) {
-        this.selectionEnd = this.text.length;
+        this.setSelectionEnd(this.selectionEnd + 1);
       }
     }
-
-    this.fire('selection:changed');
-    this.canvas && this.canvas.fire('text:selection:changed', { target: this });
   },
 
   /**
@@ -606,22 +571,16 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
     if (this.selectionStart === this.selectionEnd) {
       this._moveRight(e, 'selectionStart');
-      this.selectionEnd = this.selectionStart;
+      this.setSelectionEnd(this.selectionStart);
     }
     else {
-      this.selectionEnd += this.getNumNewLinesInSelectedText();
-      if (this.selectionEnd > this.text.length) {
-        this.selectionEnd = this.text.length;
-      }
-      this.selectionStart = this.selectionEnd;
+      this.setSelectionEnd(this.selectionEnd + this.getNumNewLinesInSelectedText());
+      this.setSelectionStart(this.selectionEnd);
     }
-
-    this.fire('selection:changed');
-    this.canvas && this.canvas.fire('text:selection:changed', { target: this });
   },
 
   /**
-   * Inserts a character where cursor is (replacing selection if one exists)
+   * Removes characters selected by selection
    * @param {Event} e Event object
    */
   removeChars: function(e) {
@@ -632,15 +591,12 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this._removeCharsFromTo(this.selectionStart, this.selectionEnd);
     }
 
-    this.selectionEnd = this.selectionStart;
+    this.setSelectionEnd(this.selectionStart);
 
     this._removeExtraneousStyles();
 
-    if (this.canvas) {
-      // TODO: double renderAll gets rid of text box shift happenning sometimes
-      // need to find out what exactly causes it and fix it
-      this.canvas.renderAll().renderAll();
-    }
+    this._clearCache();
+    this.canvas && this.canvas.renderAll();
 
     this.setCoords();
     this.fire('changed');
@@ -659,20 +615,19 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         var leftLineBoundary = this.findLineBoundaryLeft(this.selectionStart);
 
         this._removeCharsFromTo(leftLineBoundary, this.selectionStart);
-        this.selectionStart = leftLineBoundary;
+        this.setSelectionStart(leftLineBoundary);
       }
       else if (e.altKey) {
         // remove all till the start of current word
         var leftWordBoundary = this.findWordBoundaryLeft(this.selectionStart);
 
         this._removeCharsFromTo(leftWordBoundary, this.selectionStart);
-        this.selectionStart = leftWordBoundary;
+        this.setSelectionStart(leftWordBoundary);
       }
       else {
         var isBeginningOfLine = this.text.slice(this.selectionStart - 1, this.selectionStart) === '\n';
         this.removeStyleObject(isBeginningOfLine);
-
-        this.selectionStart--;
+        this.setSelectionStart(this.selectionStart - 1);
         this.text = this.text.slice(0, this.selectionStart) +
                     this.text.slice(this.selectionStart + 1);
       }
