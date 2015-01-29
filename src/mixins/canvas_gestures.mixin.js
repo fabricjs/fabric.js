@@ -48,17 +48,18 @@
       }
 
       var self = this.__gesturesParams.self,
-              t = this._currentTransform;
+              t = this._currentTransform,
+              e = this.__gesturesParams.e;
 
       t.action = 'scale';
       t.originX = t.originY = 'center';
       this._setOriginToCenter(t.target);
 
-      this._scaleObjectBy(self.scale);
+      this._scaleObjectBy(self.scale, e);
 
       if (self.rotation !== 0) {
         t.action = 'rotate';
-        this._rotateObjectByAngle(self.rotation);
+        this._rotateObjectByAngle(self.rotation, e);
       }
 
       this.renderAll();
@@ -111,8 +112,9 @@
     /**
      * Scales an object by a factor
      * @param {Number} s The scale factor to apply to the current scale level
+     * @param {Event} e Event object by Event.js
      */
-    _scaleObjectBy: function(s) {
+    _scaleObjectBy: function(s, e) {
       var t = this._currentTransform,
               target = t.target,
               lockScalingX = target.get('lockScalingX'),
@@ -132,18 +134,22 @@
         t, lockScalingX, lockScalingY, null, target.get('lockScalingFlip'));
 
       target.setPositionByOrigin(constraintPosition, t.originX, t.originY);
+      
+      this._fire('scaling', target, e);
     },
     /**
      * Rotates object by an angle
      * @param {Number} curAngle The angle of rotation in degrees
+     * @param {Event} e Event object by Event.js
      */
-    _rotateObjectByAngle: function(curAngle) {
+    _rotateObjectByAngle: function(curAngle, e) {
       var t = this._currentTransform;
 
       if (t.target.get('lockRotation')) {
         return;
       }
       t.target.angle = radiansToDegrees(degreesToRadians(curAngle) + t.theta);
+      this._fire('rotating', t.target, e);
     }
   });
 })();
