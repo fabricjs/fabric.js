@@ -71,9 +71,10 @@
 
     var elRect = fabric.document.createElement('rect');
     var rect = fabric.Rect.fromElement(elRect);
-
+    var expectedObject = fabric.util.object.extend({ }, REFERENCE_RECT);
+    expectedObject.visible = false;
     ok(rect instanceof fabric.Rect);
-    deepEqual(rect.toObject(), REFERENCE_RECT);
+    deepEqual(rect.toObject(), expectedObject);
   });
 
   test('fabric.Rect.fromElement with custom attributes', function() {

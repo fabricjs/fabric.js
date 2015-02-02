@@ -108,7 +108,9 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
-      fabric.Polygon.prototype.commonRender.call(this, ctx);
+      if(!fabric.Polygon.prototype.commonRender.call(this, ctx)) {
+        return;
+      }
       this._renderFill(ctx);
       this._renderStroke(ctx);
     },
@@ -162,10 +164,6 @@
 
     var points = fabric.parsePointsAttribute(element.getAttribute('points')),
         parsedAttributes = fabric.parseAttributes(element, fabric.Polyline.ATTRIBUTE_NAMES);
-
-    if (points === null) {
-      return null;
-    }
 
     return new fabric.Polyline(points, fabric.util.object.extend(parsedAttributes, options));
   };
