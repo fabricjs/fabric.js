@@ -141,7 +141,7 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
-      if(!this.commonRender(ctx)) {
+      if (!this.commonRender(ctx)) {
         return;
       }
       this._renderFill(ctx);
