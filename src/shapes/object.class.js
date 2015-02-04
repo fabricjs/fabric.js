@@ -1065,12 +1065,13 @@
         return;
       }
 
-      var mult = (this.canvas && this.canvas._currentMultiplier) || 1;
+      var multX = (this.canvas && this.canvas.this.viewportTransform[0]) || 1,
+          multY = (this.canvas && this.canvas.this.viewportTransform[3]) || 1;
 
       ctx.shadowColor = this.shadow.color;
       ctx.shadowBlur = this.shadow.blur * mult * (this.scaleX + this.scaleY) / 2;
-      ctx.shadowOffsetX = this.shadow.offsetX * mult * this.scaleX;
-      ctx.shadowOffsetY = this.shadow.offsetY * mult * this.scaleY;
+      ctx.shadowOffsetX = this.shadow.offsetX * multX * this.scaleX;
+      ctx.shadowOffsetY = this.shadow.offsetY * multY * this.scaleY;
     },
 
     /**
