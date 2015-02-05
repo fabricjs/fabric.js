@@ -840,7 +840,6 @@
 
       this._renderBackground(canvasToDrawOn);
       this._renderObjects(canvasToDrawOn, activeGroup);
-      this._renderActiveGroup(canvasToDrawOn, activeGroup);
 
       if (this.clipTo) {
         canvasToDrawOn.restore();
@@ -875,6 +874,8 @@
         for (i = 0, length = this._objects.length; i < length; ++i) {
           if (this._objects[i] && !activeGroup.contains(this._objects[i])) {
             this._draw(ctx, this._objects[i]);
+          } else {
+            this._renderActiveGroup(ctx, activeGroup);
           }
         }
       }
