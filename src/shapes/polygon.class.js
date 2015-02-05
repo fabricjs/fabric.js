@@ -57,7 +57,7 @@
      */
     initialize: function(points, options) {
       options = options || { };
-      this.points = points;
+      this.points = points || [ ];
       this.callSuper('initialize', options);
       this._calcDimensions();
       if (!('top' in options)) {
@@ -79,11 +79,11 @@
           maxX = max(points, 'x'),
           maxY = max(points, 'y');
 
-      this.width = (maxX - minX) || 1;
-      this.height = (maxY - minY) || 1;
+      this.width = (maxX - minX) || 0;
+      this.height = (maxY - minY) || 0;
 
-      this.minX = minX,
-      this.minY = minY;
+      this.minX = minX || 0,
+      this.minY = minY || 0;
     },
 
     /**
@@ -141,7 +141,9 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
-      this.commonRender(ctx);
+      if (!this.commonRender(ctx)) {
+        return;
+      }
       this._renderFill(ctx);
       if (this.stroke || this.strokeDashArray) {
         ctx.closePath();
@@ -154,7 +156,14 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     commonRender: function(ctx) {
-      var point;
+      var point, len = this.points.length;
+
+      if (!len || isNaN(this.points[len - 1].y)) {
+        // do not draw if no points or odd points
+        // NaN comes from parseFloat of a empty string in parser
+        return false;
+      }
+
       ctx.beginPath();
 
       if (this._applyPointOffset) {
@@ -165,10 +174,11 @@
       }
 
       ctx.moveTo(this.points[0].x, this.points[0].y);
-      for (var i = 0, len = this.points.length; i < len; i++) {
+      for (var i = 0; i < len; i++) {
         point = this.points[i];
         ctx.lineTo(point.x, point.y);
       }
+      return true;
     },
 
     /**
@@ -215,10 +225,6 @@
 
     var points = fabric.parsePointsAttribute(element.getAttribute('points')),
         parsedAttributes = fabric.parseAttributes(element, fabric.Polygon.ATTRIBUTE_NAMES);
-
-    if (points === null) {
-      return null;
-    }
 
     return new fabric.Polygon(points, extend(parsedAttributes, options));
   };
