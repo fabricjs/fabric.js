@@ -402,23 +402,27 @@
     }
   }
 
+  // http://www.w3.org/TR/SVG/coords.html#ViewBoxAttribute
+  // matches, e.g.: +14.56e-12, etc.
+  var reViewBoxAttrValue = new RegExp(
+    '^' +
+    '\\s*(' + fabric.reNum + '+)\\s*,?' +
+    '\\s*(' + fabric.reNum + '+)\\s*,?' +
+    '\\s*(' + fabric.reNum + '+)\\s*,?' +
+    '\\s*(' + fabric.reNum + '+)\\s*' +
+    '$'
+  );
+
   /**
    * Add a <g> element that envelop all child elements and makes the viewbox transformMatrix descend on all elements
    */
   function addVBTransform(element, widthAttr, heightAttr) {
 
-    // http://www.w3.org/TR/SVG/coords.html#ViewBoxAttribute
-    // matches, e.g.: +14.56e-12, etc.
-    var reViewBoxAttrValue = new RegExp(
-          '^' +
-          '\\s*(' + fabric.reNum + '+)\\s*,?' +
-          '\\s*(' + fabric.reNum + '+)\\s*,?' +
-          '\\s*(' + fabric.reNum + '+)\\s*,?' +
-          '\\s*(' + fabric.reNum + '+)\\s*' +
-          '$'
-        ),
-        viewBoxAttr = element.getAttribute('viewBox'),
-        scaleX = 1, scaleY = 1, minX = 0, minY = 0,
+    var viewBoxAttr = element.getAttribute('viewBox'),
+        scaleX = 1,
+        scaleY = 1,
+        minX = 0,
+        minY = 0,
         viewBoxWidth, viewBoxHeight, matrix, el;
 
     if (viewBoxAttr && (viewBoxAttr = viewBoxAttr.match(reViewBoxAttrValue))) {
@@ -608,6 +612,12 @@
     }
   }
 
+  var reFontDeclaration = new RegExp(
+    '(normal|italic)?\\s*(normal|small-caps)?\\s*' +
+    '(normal|bold|bolder|lighter|100|200|300|400|500|600|700|800|900)?\\s*(' +
+      fabric.reNum +
+    '(?:px|cm|mm|em|pt|pc|in)*)(?:\\/(normal|' + fabric.reNum + '))?\\s+(.*)');
+
   extend(fabric, {
     /**
      * Parses a short font declaration, building adding its properties to a style object
@@ -618,11 +628,7 @@
      * @param {Object} oStyle definition
      */
     parseFontDeclaration: function(value, oStyle) {
-      var fontDeclaration = '(normal|italic)?\\s*(normal|small-caps)?\\s*'
-                            + '(normal|bold|bolder|lighter|100|200|300|400|500|600|700|800|900)?\\s*('
-                            + fabric.reNum
-                            + '(?:px|cm|mm|em|pt|pc|in)*)(?:\\/(normal|' + fabric.reNum + '))?\\s+(.*)',
-          match = value.match(fontDeclaration);
+      var match = value.match(reFontDeclaration);
 
       if (!match) {
         return;
