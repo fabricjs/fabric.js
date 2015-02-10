@@ -222,7 +222,13 @@
      * @return {Number} width value
      */
     getWidth: function() {
-      return this.width * this.scaleX;
+      if ((this.type == 'rect' || this.type == 'triangle' || this.type == 'text' || this.type == 'line') &&
+      (this.transformMatrix[1] != 0 || this.transformMatrix[2] != 0)){
+        return this.width * this.scaleX + Math.abs(this.height * this.transformMatrix[2])*this.scaleX;
+        }
+      else {
+        return this.width * this.scaleX;
+        }
     },
 
     /**
@@ -230,7 +236,13 @@
      * @return {Number} height value
      */
     getHeight: function() {
-      return this.height * this.scaleY;
+      if ((this.type == 'rect' || this.type == 'triangle' || this.type == 'text' || this.type == 'line') &&
+      (this.transformMatrix[1] != 0 || this.transformMatrix[2] != 0)){
+        return this.height * this.scaleY + Math.abs(this.width * this.transformMatrix[1])*this.scaleY;
+        }
+      else {
+        return this.height * this.scaleY;
+        }
     },
 
     /**

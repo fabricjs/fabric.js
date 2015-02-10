@@ -501,8 +501,16 @@
       var target = transform.target, forbidScalingX = false, forbidScalingY = false,
           strokeWidth = target.stroke ? target.strokeWidth : 0;
 
-      transform.newScaleX = localMouse.x / (target.width + strokeWidth / 2);
-      transform.newScaleY = localMouse.y / (target.height + strokeWidth / 2);
+      if (target.type == 'rect' || target.type == 'triangle' || target.type == 'text' || target.type == 'line'){
+        transform.newScaleX = localMouse.x / 
+          ((target.width + Math.abs(target.height*target.transformMatrix[2]))+ strokeWidth / 2);
+        transform.newScaleY = localMouse.y / 
+          ((target.height + Math.abs(target.width*target.transformMatrix[1])) + strokeWidth / 2);
+        }
+      else {
+        transform.newScaleX = localMouse.x / (target.width + strokeWidth / 2);
+        transform.newScaleY = localMouse.y / (target.height + strokeWidth / 2);
+        }
 
       if (lockScalingFlip && transform.newScaleX <= 0 && transform.newScaleX < target.scaleX) {
         forbidScalingX = true;
@@ -513,7 +521,13 @@
       }
 
       if (by === 'equally' && !lockScalingX && !lockScalingY) {
-        forbidScalingX || forbidScalingY || this._scaleObjectEqually(localMouse, target, transform);
+        if (target.type == 'rect' || target.type == 'triangle' || target.type == 'text' || target.type == 'line'){
+          forbidScalingX || forbidScalingY || 
+          target.set('scaleX', transform.newScaleX),target.set('scaleY', transform.newScaleY);
+          }
+        else {    
+          forbidScalingX || forbidScalingY || this._scaleObjectEqually(localMouse, target, transform);
+          }
       }
       else if (!by) {
         forbidScalingX || lockScalingX || target.set('scaleX', transform.newScaleX);
