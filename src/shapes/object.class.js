@@ -1065,8 +1065,8 @@
         return;
       }
 
-      var multX = (this.canvas && this.canvas.this.viewportTransform[0]) || 1,
-          multY = (this.canvas && this.canvas.this.viewportTransform[3]) || 1;
+      var multX = (this.canvas && this.canvas.viewportTransform[0]) || 1,
+          multY = (this.canvas && this.canvas.viewportTransform[3]) || 1;
 
       ctx.shadowColor = this.shadow.color;
       ctx.shadowBlur = this.shadow.blur * (multX + multY) * (this.scaleX + this.scaleY) / 4;
