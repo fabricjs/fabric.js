@@ -61,10 +61,13 @@
      * @private
      */
     _tick: function() {
-      if (this._abortCursorAnimation) {
-        return;
-      }
 
+      var tickState = {
+        isAborted: false,
+        abort: function(){
+          this.isAborted = true;
+        },
+      };
       var _this = this;
 
       this.animate('_currentCursorOpacity', 1, {
@@ -72,7 +75,8 @@
         duration: this.cursorDuration,
 
         onComplete: function() {
-          _this._onTickComplete();
+          if (!tickState.isAborted)
+            _this._onTickComplete();
         },
 
         onChange: function() {
@@ -80,20 +84,25 @@
         },
 
         abort: function() {
-          return _this._abortCursorAnimation;
+          return tickState.isAborted;
         }
       });
+
+      this._currentTickState = tickState;
     },
 
     /**
      * @private
      */
     _onTickComplete: function() {
-      if (this._abortCursorAnimation) {
-        return;
-      }
 
       var _this = this;
+      var tickState = {
+        isAborted: false,
+        abort: function(){
+          this.isAborted = true;
+        },
+      };
       if (this._cursorTimeout1) {
         clearTimeout(this._cursorTimeout1);
       }
@@ -101,16 +110,19 @@
         _this.animate('_currentCursorOpacity', 0, {
           duration: this.cursorDuration / 2,
           onComplete: function() {
-            _this._tick();
+            if (!tickState.isAborted)
+              _this._tick();
           },
           onChange: function() {
             _this.canvas && _this.canvas.renderAll();
           },
           abort: function() {
-            return _this._abortCursorAnimation;
+            return tickState.isAborted;
           }
         });
       }, 100);
+
+      this._currentTickCompleteState = tickState;
     },
 
     /**
@@ -121,7 +133,8 @@
           delay = restart ? 0 : this.cursorDelay;
 
       if (restart) {
-        this._abortCursorAnimation = true;
+        this._currentTickState && this._currentTickState.abort();
+        this._currentTickCompleteState && this._currentTickCompleteState.abort();
         clearTimeout(this._cursorTimeout1);
         this._currentCursorOpacity = 1;
         this.canvas && this.canvas.renderAll();
@@ -130,7 +143,6 @@
         clearTimeout(this._cursorTimeout2);
       }
       this._cursorTimeout2 = setTimeout(function() {
-        _this._abortCursorAnimation = false;
         _this._tick();
       }, delay);
     },
@@ -139,18 +151,14 @@
      * Aborts cursor animation and clears all timeouts
      */
     abortCursorAnimation: function() {
-      this._abortCursorAnimation = true;
+      this._currentTickState && this._currentTickState.abort();
+      this._currentTickCompleteState && this._currentTickCompleteState.abort();
 
       clearTimeout(this._cursorTimeout1);
       clearTimeout(this._cursorTimeout2);
 
       this._currentCursorOpacity = 0;
       this.canvas && this.canvas.renderAll();
-
-      var _this = this;
-      setTimeout(function() {
-        _this._abortCursorAnimation = false;
-      }, 10);
     },
 
     /**
