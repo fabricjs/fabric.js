@@ -62,21 +62,22 @@
      */
     _tick: function() {
 
-      var tickState = {
+      var tickState, _this = this;
+      tickState = {
         isAborted: false,
-        abort: function(){
+        abort: function() {
           this.isAborted = true;
         },
       };
-      var _this = this;
 
       this.animate('_currentCursorOpacity', 1, {
 
         duration: this.cursorDuration,
 
         onComplete: function() {
-          if (!tickState.isAborted)
+          if (!tickState.isAborted) {
             _this._onTickComplete();
+          }
         },
 
         onChange: function() {
@@ -96,10 +97,10 @@
      */
     _onTickComplete: function() {
 
-      var _this = this;
-      var tickState = {
+      var tickState, _this = this;
+      tickState = {
         isAborted: false,
-        abort: function(){
+        abort: function() {
           this.isAborted = true;
         },
       };
@@ -110,8 +111,9 @@
         _this.animate('_currentCursorOpacity', 0, {
           duration: this.cursorDuration / 2,
           onComplete: function() {
-            if (!tickState.isAborted)
+            if (!tickState.isAborted) {
               _this._tick();
+            }
           },
           onChange: function() {
             _this.canvas && _this.canvas.renderAll();
