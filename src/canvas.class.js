@@ -182,6 +182,13 @@
     skipTargetFind:         false,
 
     /**
+     * rotate snapping
+     * @type number
+     * @default
+     */
+    snapRotation:           0,
+
+    /**
      * @private
      */
     _initInteractive: function() {
@@ -627,6 +634,30 @@
     },
 
     /**
+     * get rotate angle from radian to degrees
+     * @private
+     * @param {Number}
+     * @return {Number}
+     */
+    _getAngleFromRadian : function(radian){
+      var angle = radiansToDegrees(radian) % 360;
+      if(angle < 360)angle += 360;
+
+      // rotate snap
+      if(this.snapRotation){
+        var div = angle / 90 | 0
+          , mod = angle - div * 90;
+        if(mod < this.snapRotation){
+          angle = 90 * div;
+        }else if(mod > 90 - this.snapRotation){
+          angle = 90 * (div + 1);
+        }
+      }
+
+      return angle;
+    },
+
+    /**
      * Rotates object by invoking its rotate method
      * @private
      * @param {Number} x pointer's x coordinate
@@ -641,15 +672,9 @@
       }
 
       var lastAngle = atan2(t.ey - t.top, t.ex - t.left),
-          curAngle = atan2(y - t.top, x - t.left),
-          angle = radiansToDegrees(curAngle - lastAngle + t.theta);
+          curAngle = atan2(y - t.top, x - t.left);
 
-      // normalize angle to positive value
-      if (angle < 0) {
-        angle = 360 + angle;
-      }
-
-      t.target.angle = angle % 360;
+      t.target.angle = this._getAngleFromRadian(curAngle - lastAngle + t.theta);
     },
 
     /**
