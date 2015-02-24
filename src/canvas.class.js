@@ -635,7 +635,9 @@
 
     /**
      * get rotate angle from radian to degrees
-     * @type number
+     * @private
+     * @param {Number}
+     * @return {Number}
      */
     _getAngleFromRadian : function(radian){
       var angle = radiansToDegrees(radian) % 360;
