@@ -458,7 +458,7 @@
         return;
       }
 
-      var lineWidth = this._getLineWidth(ctx, i),
+      var lineWidth = this._getLineWidth(ctx, lineIndex),
           totalWidth = this.width;
 
       if (totalWidth > lineWidth) {
