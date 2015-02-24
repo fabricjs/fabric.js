@@ -71,7 +71,9 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
     ctx.lineWidth = this.width;
     ctx.lineCap = this.strokeLineCap;
     ctx.lineJoin = this.strokeLineJoin;
-    ctx.setLineDash(this.strokeDashArray);
+    if (this.strokeDashArray) {
+      ctx.setLineDash(this.strokeDashArray);
+    }
   },
 
   /**
