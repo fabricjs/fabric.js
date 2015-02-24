@@ -9,8 +9,7 @@
  */
 (function() {
 
-  var degreesToRadians = fabric.util.degreesToRadians,
-          radiansToDegrees = fabric.util.radiansToDegrees;
+  var degreesToRadians = fabric.util.degreesToRadians;
 
   fabric.util.object.extend(fabric.Canvas.prototype, /** @lends fabric.Canvas.prototype */ {
     /**
@@ -151,7 +150,7 @@
       if (t.target.get('lockRotation')) {
         return;
       }
-      t.target.angle = radiansToDegrees(degreesToRadians(curAngle) + t.theta);
+      t.target.angle = this._getAngleFromRadian(degreesToRadians(curAngle) + t.theta);
     }
   });
 })();
