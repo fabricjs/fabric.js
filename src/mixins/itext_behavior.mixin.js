@@ -335,7 +335,6 @@
       this.isEditing = true;
 
       this.initHiddenTextarea();
-      this.hiddenTextarea.focus();
       this._updateTextarea();
       this._saveEditingProps();
       this._setEditingProps();
