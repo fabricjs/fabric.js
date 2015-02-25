@@ -3,6 +3,9 @@
  * @class fabric.BaseBrush
  * @see {@link http://fabricjs.com/freedrawing/|Freedrawing demo}
  */
+
+  var supportsLineDash = fabric.StaticCanvas.supports('setLineDash');
+
 fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype */ {
 
   /**
@@ -71,7 +74,7 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
     ctx.lineWidth = this.width;
     ctx.lineCap = this.strokeLineCap;
     ctx.lineJoin = this.strokeLineJoin;
-    if (this.strokeDashArray) {
+    if (this.strokeDashArray && supportsLineDash) {
       ctx.setLineDash(this.strokeDashArray);
     }
   },
