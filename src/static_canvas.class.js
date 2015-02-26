@@ -1278,18 +1278,17 @@
      * @private
      */
     _setSVGObjects: function(markup, reviver) {
-      var activeGroup = this.getActiveGroup();
-      if (activeGroup) {
-        this.discardActiveGroup();
-      }
+      var selectionGroup = this.getActiveGroup();
       for (var i = 0, objects = this.getObjects(), len = objects.length; i < len; i++) {
-        markup.push(objects[i].toSVG(reviver));
-      }
-      if (activeGroup) {
-        this.setActiveGroup(new fabric.Group(activeGroup.getObjects()));
-        activeGroup.forEachObject(function(o) {
-          o.set('active', true);
-        });
+        if (selectionGroup && objects[i].group === selectionGroup) {
+          //If the object is in a selection group, simulate what would happen to that
+          //object when the group is deselected
+          var objectClone = objects[i].clone();
+          selectionGroup.realizeTransform(objectClone);
+          markup.push(objectClone.toSVG(reviver));
+        } else {
+          markup.push(objects[i].toSVG(reviver));
+        }
       }
     },
 
