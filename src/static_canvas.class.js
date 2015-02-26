@@ -1277,7 +1277,8 @@
           var objectClone = objects[i].clone();
           selectionGroup.realizeTransform(objectClone);
           markup.push(objectClone.toSVG(reviver));
-        } else {
+        }
+        else {
           markup.push(objects[i].toSVG(reviver));
         }
       }
