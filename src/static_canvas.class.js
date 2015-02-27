@@ -1104,9 +1104,8 @@
       //be transformed appropriately
       //i.e. it should be serialised as it would appear if the selection group
       //were to be destroyed.
-      var originalProperties = this._realizeGroupTransformOnObject(instance);
-
-      var object = instance[methodName](propertiesToInclude);
+      var originalProperties = this._realizeGroupTransformOnObject(instance),
+          object = instance[methodName](propertiesToInclude);
       if (!this.includeDefaultValues) {
         instance.includeDefaultValues = originalValue;
       }
@@ -1133,7 +1132,8 @@
         });
         this.getActiveGroup().realizeTransform(instance);
         return originalValues;
-      } else {
+      }
+      else {
         return null;
       }
     },
