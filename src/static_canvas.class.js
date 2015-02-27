@@ -1112,7 +1112,7 @@
       }
 
       //Undo the damage we did by changing all of its properties
-      this._unwindGroupTransformOnObject(instance, originalProperties)
+      this._unwindGroupTransformOnObject(instance, originalProperties);
 
       return object;
     },
@@ -1305,7 +1305,6 @@
      * @private
      */
     _setSVGObjects: function(markup, reviver) {
-      var selectionGroup = this.getActiveGroup();
       for (var i = 0, objects = this.getObjects(), len = objects.length; i < len; i++) {
         var instance = objects[i],
             //If the object is in a selection group, simulate what would happen to that
