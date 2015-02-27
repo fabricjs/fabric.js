@@ -1,106 +1,109 @@
-/**
- * BaseBrush class
- * @class fabric.BaseBrush
- * @see {@link http://fabricjs.com/freedrawing/|Freedrawing demo}
- */
-fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype */ {
-
+(function() {
+  var supportsLineDash = fabric.StaticCanvas.supports('setLineDash');
   /**
-   * Color of a brush
-   * @type String
-   * @default
+   * BaseBrush class
+   * @class fabric.BaseBrush
+   * @see {@link http://fabricjs.com/freedrawing/|Freedrawing demo}
    */
-  color:            'rgb(0, 0, 0)',
+  fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype */ {
 
-  /**
-   * Width of a brush
-   * @type Number
-   * @default
-   */
-  width:            1,
+    /**
+     * Color of a brush
+     * @type String
+     * @default
+     */
+    color:            'rgb(0, 0, 0)',
 
-  /**
-   * Shadow object representing shadow of this shape.
-   * <b>Backwards incompatibility note:</b> This property replaces "shadowColor" (String), "shadowOffsetX" (Number),
-   * "shadowOffsetY" (Number) and "shadowBlur" (Number) since v1.2.12
-   * @type fabric.Shadow
-   * @default
-   */
-  shadow:          null,
+    /**
+     * Width of a brush
+     * @type Number
+     * @default
+     */
+    width:            1,
 
-  /**
-   * Line endings style of a brush (one of "butt", "round", "square")
-   * @type String
-   * @default
-   */
-  strokeLineCap:    'round',
+    /**
+     * Shadow object representing shadow of this shape.
+     * <b>Backwards incompatibility note:</b> This property replaces "shadowColor" (String), "shadowOffsetX" (Number),
+     * "shadowOffsetY" (Number) and "shadowBlur" (Number) since v1.2.12
+     * @type fabric.Shadow
+     * @default
+     */
+    shadow:          null,
 
-  /**
-   * Corner style of a brush (one of "bevil", "round", "miter")
-   * @type String
-   * @default
-   */
-  strokeLineJoin:   'round',
+    /**
+     * Line endings style of a brush (one of "butt", "round", "square")
+     * @type String
+     * @default
+     */
+    strokeLineCap:    'round',
 
-  /**
-   * Stroke Dash Array.
-   * @type Array
-   * @default
-   */
-  strokeDashArray:   null,
+    /**
+     * Corner style of a brush (one of "bevil", "round", "miter")
+     * @type String
+     * @default
+     */
+    strokeLineJoin:   'round',
 
-  /**
-   * Sets shadow of an object
-   * @param {Object|String} [options] Options object or string (e.g. "2px 2px 10px rgba(0,0,0,0.2)")
-   * @return {fabric.Object} thisArg
-   * @chainable
-   */
-  setShadow: function(options) {
-    this.shadow = new fabric.Shadow(options);
-    return this;
-  },
+    /**
+     * Stroke Dash Array.
+     * @type Array
+     * @default
+     */
+    strokeDashArray:   null,
 
-  /**
-   * Sets brush styles
-   * @private
-   */
-  _setBrushStyles: function() {
-    var ctx = this.canvas.contextTop;
+    /**
+     * Sets shadow of an object
+     * @param {Object|String} [options] Options object or string (e.g. "2px 2px 10px rgba(0,0,0,0.2)")
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+    setShadow: function(options) {
+      this.shadow = new fabric.Shadow(options);
+      return this;
+    },
 
-    ctx.strokeStyle = this.color;
-    ctx.lineWidth = this.width;
-    ctx.lineCap = this.strokeLineCap;
-    ctx.lineJoin = this.strokeLineJoin;
-    if (this.strokeDashArray) {
-      ctx.setLineDash(this.strokeDashArray);
+    /**
+     * Sets brush styles
+     * @private
+     */
+    _setBrushStyles: function() {
+      var ctx = this.canvas.contextTop;
+
+      ctx.strokeStyle = this.color;
+      ctx.lineWidth = this.width;
+      ctx.lineCap = this.strokeLineCap;
+      ctx.lineJoin = this.strokeLineJoin;
+      if (this.strokeDashArray && supportsLineDash) {
+        ctx.setLineDash(this.strokeDashArray);
+      }
+    },
+
+    /**
+     * Sets brush shadow styles
+     * @private
+     */
+    _setShadow: function() {
+      if (!this.shadow) {
+        return;
+      }
+
+      var ctx = this.canvas.contextTop;
+
+      ctx.shadowColor = this.shadow.color;
+      ctx.shadowBlur = this.shadow.blur;
+      ctx.shadowOffsetX = this.shadow.offsetX;
+      ctx.shadowOffsetY = this.shadow.offsetY;
+    },
+
+    /**
+     * Removes brush shadow styles
+     * @private
+     */
+    _resetShadow: function() {
+      var ctx = this.canvas.contextTop;
+
+      ctx.shadowColor = '';
+      ctx.shadowBlur = ctx.shadowOffsetX = ctx.shadowOffsetY = 0;
     }
-  },
-
-  /**
-   * Sets brush shadow styles
-   * @private
-   */
-  _setShadow: function() {
-    if (!this.shadow) {
-      return;
-    }
-
-    var ctx = this.canvas.contextTop;
-
-    ctx.shadowColor = this.shadow.color;
-    ctx.shadowBlur = this.shadow.blur;
-    ctx.shadowOffsetX = this.shadow.offsetX;
-    ctx.shadowOffsetY = this.shadow.offsetY;
-  },
-
-  /**
-   * Removes brush shadow styles
-   * @private
-   */
-  _resetShadow: function() {
-    var ctx = this.canvas.contextTop;
-
-    ctx.shadowColor = '';
-    ctx.shadowBlur = ctx.shadowOffsetX = ctx.shadowOffsetY = 0;
-  }
-});
+  });
+})();
