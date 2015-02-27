@@ -9,7 +9,7 @@
     lockScalingX, lockScalingY, by, lockScalingFlip) {
 
     var t = transform.target;
-    if (t instanceof fabric.Textbox) {
+    if (t instanceof fabric.Textbox && transform.action === 'scaleX') {
       var w = t.width * ((localMouse.x / transform.scaleX) / (t.width + t.strokeWidth));
       if (w >= t.minWidth) {
         t.set('width', w);
