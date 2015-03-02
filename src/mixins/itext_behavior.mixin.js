@@ -342,27 +342,30 @@
 
       this._tick();
       this.fire('editing:entered');
-      if (this.canvas) {
-        var _this = this;
-        this.canvas.renderAll();
-        this.canvas.fire('text:editing:entered', { target: this });
-        this.canvas.on('mouse:move',  function(options) {
 
-          if (!_this.__isMousedown || !_this.isEditing) {
-            return;
-          }
-
-          var newSelectionStart = _this.getSelectionStartFromPointer(options.e);
-          if (newSelectionStart >= _this.__selectionStartOnMouseDown) {
-            _this.setSelectionStart(_this.__selectionStartOnMouseDown);
-            _this.setSelectionEnd(newSelectionStart);
-          }
-          else {
-            _this.setSelectionStart(newSelectionStart);
-            _this.setSelectionEnd(_this.__selectionStartOnMouseDown);
-          }
-        });
+      if (!this.canvas) {
+        return this;
       }
+
+      var _this = this;
+      this.canvas.renderAll();
+      this.canvas.fire('text:editing:entered', { target: this });
+      this.canvas.on('mouse:move',  function(options) {
+
+        if (!_this.__isMousedown || !_this.isEditing) {
+          return;
+        }
+
+        var newSelectionStart = _this.getSelectionStartFromPointer(options.e);
+        if (newSelectionStart >= _this.__selectionStartOnMouseDown) {
+          _this.setSelectionStart(_this.__selectionStartOnMouseDown);
+          _this.setSelectionEnd(newSelectionStart);
+        }
+        else {
+          _this.setSelectionStart(newSelectionStart);
+          _this.setSelectionEnd(_this.__selectionStartOnMouseDown);
+        }
+      });
 
       return this;
     },
