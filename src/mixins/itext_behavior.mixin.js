@@ -347,11 +347,27 @@
         return this;
       }
 
-      var _this = this;
       this.canvas.renderAll();
       this.canvas.fire('text:editing:entered', { target: this });
-      this.canvas.on('mouse:move',  function(options) {
+      this.initMouseMoveHandler();
+      return this;
+    },
 
+    exitEditingOnOthers: function() {
+      fabric.IText.instances.forEach(function(obj) {
+        obj.selected = false;
+        if (obj.isEditing) {
+          obj.exitEditing();
+        }
+      }, this);
+    },
+
+    /**
+    * Initializes "mousemove" event handler
+    */
+    initMouseMoveHandler: function() {
+      var _this = this;
+      this.canvas.on('mouse:move',  function(options) {
         if (!_this.__isMousedown || !_this.isEditing) {
           return;
         }
@@ -366,17 +382,6 @@
           _this.setSelectionEnd(_this.__selectionStartOnMouseDown);
         }
       });
-
-      return this;
-    },
-
-    exitEditingOnOthers: function() {
-      fabric.IText.instances.forEach(function(obj) {
-        obj.selected = false;
-        if (obj.isEditing) {
-          obj.exitEditing();
-        }
-      }, this);
     },
 
     /**
