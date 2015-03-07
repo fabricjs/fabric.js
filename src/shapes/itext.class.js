@@ -860,12 +860,12 @@
 
       var fill = styleDeclaration.fill || this.fill;
       ctx.fillStyle = fill.toLive
-        ? fill.toLive(ctx)
+        ? fill.toLive(ctx, this)
         : fill;
 
       if (styleDeclaration.stroke) {
         ctx.strokeStyle = (styleDeclaration.stroke && styleDeclaration.stroke.toLive)
-          ? styleDeclaration.stroke.toLive(ctx)
+          ? styleDeclaration.stroke.toLive(ctx, this)
           : styleDeclaration.stroke;
       }
 

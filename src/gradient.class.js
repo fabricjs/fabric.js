@@ -258,7 +258,7 @@
         }
       }
 
-      if (object.type === 'text') {
+      if (object.type === 'text' || object.type === 'i-text') {
         for (prop in coords) {
           if (prop === 'x1' || prop === 'x2') {
             coords[prop] -= object.width / 2;
