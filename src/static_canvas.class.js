@@ -161,6 +161,7 @@
      */
     _initStatic: function(el, options) {
       this._objects = [];
+      this._objectsMap = {};
 
       this._createLowerCanvas(el);
       this._initOptions(options);
@@ -713,6 +714,20 @@
      */
     getActiveGroup: function() {
       return null;
+    },
+
+    /**
+     * @param {fabric.Object} object Object that has been renamed
+     * @param {String} oldName name of the object before renaming
+     * @return {fabric.Group}
+     */
+    objectRenamed: function(object, oldName) {
+      if (oldName && oldName !== object.name && this._objectsMap.hasOwnProperty(oldName)) {
+        delete this._objectsMap[oldName];
+      }
+      if (object.name) {
+        this._objectsMap[object.name] = object;
+      }
     },
 
     /**

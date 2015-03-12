@@ -155,6 +155,7 @@
 
     var expectedObject = {
       'type':                     'group',
+      'name':                     null,
       'originX':                  'left',
       'originY':                  'top',
       'left':                     50,
@@ -197,6 +198,7 @@ test('toObject without default values', function() {
 
   var expectedObject = {
     'type':               'group',
+    'name':               null,
     'left':               50,
     'top':                100,
     'width':              80,

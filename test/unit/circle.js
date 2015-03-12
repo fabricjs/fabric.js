@@ -80,6 +80,7 @@
     var circle = new fabric.Circle();
     var defaultProperties = {
       'type':                     'circle',
+      'name':                     null,
       'originX':                  'left',
       'originY':                  'top',
       'left':                     0,

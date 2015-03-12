@@ -9,6 +9,7 @@
 
   var REFERENCE_OBJECT = {
     'type':                     'polyline',
+    'name':                     null,
     'originX':                  'left',
     'originY':                  'top',
     'left':                     10,
@@ -138,6 +139,6 @@
 
     deepEqual(polylineWithAttrs.get('transformMatrix'), [ 2, 0, 0, 2, -10, -20 ]);
 
-    equal(fabric.Polyline.fromElement(), null);    
+    equal(fabric.Polyline.fromElement(), null);
   });
 })();

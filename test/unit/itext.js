@@ -4,6 +4,7 @@
 
   var ITEXT_OBJECT = {
     'type':                     'text',
+    'name':                     null,
     'originX':                  'left',
     'originY':                  'top',
     'left':                     0,
@@ -37,7 +38,7 @@
     'backgroundColor':          '',
     'textBackgroundColor':      '',
     'fillRule':                 'nonzero',
-    'globalCompositeOperation': 'source-over',    
+    'globalCompositeOperation': 'source-over',
     styles:                     { }
   };
 

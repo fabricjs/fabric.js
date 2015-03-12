@@ -10,6 +10,7 @@
 
   var REFERENCE_TEXT_OBJECT = {
     'type':                      'text',
+    'name':                      null,
     'originX':                   'left',
     'originY':                   'top',
     'left':                      0,

@@ -2,6 +2,7 @@
 
   var LINE_OBJECT = {
     'type':                     'line',
+    'name':                     null,
     'originX':                  'left',
     'originY':                  'top',
     'left':                     11,

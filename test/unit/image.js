@@ -16,6 +16,7 @@
 
   var REFERENCE_IMG_OBJECT = {
     'type':                     'image',
+    'name':                     null,
     'originX':                  'left',
     'originY':                  'top',
     'left':                     0,
@@ -175,7 +176,7 @@
         start();
         return;
       }
-	  
+
       fabric.Image.fromObject(objRepr, function(img) {
         equal(img.crossOrigin, '');
         start();

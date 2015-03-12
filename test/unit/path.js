@@ -2,6 +2,7 @@
 
   var REFERENCE_PATH_OBJECT = {
     'type':                     'path',
+    'name':                     null,
     'originX':                  'left',
     'originY':                  'top',
     'left':                     100,

@@ -2,6 +2,7 @@
 
   var REFERENCE_PATH_GROUP_OBJECT = {
     'type':                     'path-group',
+    'name':                     null,
     'originX':                  'left',
     'originY':                  'top',
     'left':                     0,
@@ -26,7 +27,7 @@
     'clipTo':                   null,
     'backgroundColor':          '',
     'fillRule':                 'nonzero',
-    'globalCompositeOperation': 'source-over',    
+    'globalCompositeOperation': 'source-over',
     'paths':                    getPathObjects()
   };
 
@@ -231,7 +232,7 @@
       start();
     });
   });
-  
+
   asyncTest('toSVG', function() {
     ok(fabric.PathGroup);
     getPathGroupObject(function(pathGroup) {

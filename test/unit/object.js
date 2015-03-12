@@ -150,12 +150,12 @@
   });
 
   test('toJSON', function() {
-    var emptyObjectJSON = '{"type":"object","originX":"left","originY":"top","left":0,"top":0,"width":0,"height":0,"fill":"rgb(0,0,0)",'+
+    var emptyObjectJSON = '{"type":"object","name":null,"originX":"left","originY":"top","left":0,"top":0,"width":0,"height":0,"fill":"rgb(0,0,0)",'+
                           '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,'+
                           '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,'+
                           '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over"}';
 
-    var augmentedJSON = '{"type":"object","originX":"left","originY":"top","left":0,"top":0,"width":122,"height":0,"fill":"rgb(0,0,0)",'+
+    var augmentedJSON = '{"type":"object","name":null,"originX":"left","originY":"top","left":0,"top":0,"width":122,"height":0,"fill":"rgb(0,0,0)",'+
                         '"stroke":null,"strokeWidth":1,"strokeDashArray":[5,2],"strokeLineCap":"round","strokeLineJoin":"bevil","strokeMiterLimit":5,'+
                         '"scaleX":1.3,"scaleY":1,"angle":0,"flipX":false,"flipY":true,"opacity":0.88,'+
                         '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over"}';
@@ -179,6 +179,7 @@
   test('toObject', function() {
     var emptyObjectRepr = {
       'type':                     'object',
+      'name':                     null,
       'originX':                  'left',
       'originY':                  'top',
       'left':                     0,
@@ -208,6 +209,7 @@
 
     var augmentedObjectRepr = {
       'type':                     'object',
+      'name':                     null,
       'originX':                  'left',
       'originY':                  'top',
       'left':                     10,
@@ -275,10 +277,11 @@
 
   test('toObject without default values', function() {
 
-    var emptyObjectRepr = { type: 'object' };
+    var emptyObjectRepr = { type: 'object', name: null };
 
     var augmentedObjectRepr = {
       type: 'object',
+      name: 'id_123',
       left: 10,
       top: 20,
       width: 30,
@@ -295,7 +298,8 @@
     cObj.includeDefaultValues = false;
     deepEqual(emptyObjectRepr, cObj.toObject());
 
-    cObj.set('left', 10)
+    cObj.set('name', 'id_123')
+        .set('left', 10)
         .set('top', 20)
         .set('width', 30)
         .set('height', 40)
@@ -1113,11 +1117,11 @@ test('toDataURL & reference to canvas', function() {
     equal(object.shadow.blur, 10);
     equal(object.shadow.offsetX, 5);
     equal(object.shadow.offsetY, 15);
-    
+
     equal(object.setShadow(null), object, 'should be chainable');
     ok(!(object.shadow instanceof fabric.Shadow));
     equal(object.shadow, null);
-    
+
   });
 
   test('set shadow', function() {
