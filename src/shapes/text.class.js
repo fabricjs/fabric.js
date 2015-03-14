@@ -346,9 +346,6 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
-
-      this.clipTo && fabric.util.clipContext(this, ctx);
-
       this._renderTextBackground(ctx);
       this._translateForTextAlign(ctx);
       this._renderText(ctx);
@@ -358,7 +355,7 @@
       }
 
       this._renderTextDecoration(ctx);
-      this.clipTo && ctx.restore();
+      fabric.util.clipContext(this.clipTo, ctx);
     },
 
     /**

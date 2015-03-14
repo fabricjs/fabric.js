@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <script src="../dist/fabric.js"></script>
+    <title></title>
+</head>
+<body>
+  <canvas id="c" width="500" height="500"></canvas>
+  <script>
+    var canvas = new fabric.Canvas('c');
+    canvas.backgroundColor = 'gray';
+    canvas.controlsAboveOverlay = true;
+
+    fabric.Image.fromURL('http://fabricjs.com/assets/pug_small.jpg', function(img) {
+      img.scale(0.5).set({
+        left: 100,
+        top: 100,
+        clipTo: function (ctx) {
+          ctx.arc(0, 0, 180, 0, Math.PI * 2, true);
+        }
+      });
+    var circle = new fabric.Circle({radius: 190, fill: 'red'});
+    canvas.add(circle);
+        canvas.add(img).setActiveObject(img);
+    });
+
+
+    // canvas.clipTo = function(ctx) {
+    //   circle.render(ctx);
+    // }
+  </script>
+</body>
+</html>
+
