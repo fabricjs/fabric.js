@@ -445,14 +445,17 @@
     /**
      * @static
      * @memberOf fabric.util
-     * @param {fabric.Object} receiver Object implementing `clipTo` method
+     * @param {Function} clipTo Function implementing the clipping
      * @param {CanvasRenderingContext2D} ctx Context to clip
      */
-    clipContext: function(receiver, ctx) {
-      ctx.save();
-      ctx.beginPath();
-      receiver.clipTo(ctx);
-      ctx.clip();
+    clipContext: function(clipTo, ctx) {
+      if (clipTo && typeof clipTo === 'function') {
+        ctx.save();
+        ctx.beginPath();
+        ctx.globalCompositeOperation = 'destination-in';
+        clipTo(ctx);
+        ctx.restore();
+      }
     },
 
     /**

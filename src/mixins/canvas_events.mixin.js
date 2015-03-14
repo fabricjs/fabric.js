@@ -342,9 +342,7 @@
     _onMouseDownInDrawingMode: function(e) {
       this._isCurrentlyDrawing = true;
       this.discardActiveObject(e).renderAll();
-      if (this.clipTo) {
-        fabric.util.clipContext(this, this.contextTop);
-      }
+
       var ivt = fabric.util.invertTransform(this.viewportTransform),
           pointer = fabric.util.transformPoint(this.getPointer(e, true), ivt);
       this.freeDrawingBrush.onMouseDown(pointer);
@@ -366,6 +364,7 @@
             pointer = fabric.util.transformPoint(this.getPointer(e, true), ivt);
         this.freeDrawingBrush.onMouseMove(pointer);
       }
+      fabric.util.clipContext(this.clipTo || this.clipAllTo, this.contextTop);
       this.setCursor(this.freeDrawingCursor);
       this.fire('mouse:move', { e: e });
 
@@ -381,9 +380,6 @@
      */
     _onMouseUpInDrawingMode: function(e) {
       this._isCurrentlyDrawing = false;
-      if (this.clipTo) {
-        this.contextTop.restore();
-      }
       this.freeDrawingBrush.onMouseUp();
       this.fire('mouse:up', { e: e });
 

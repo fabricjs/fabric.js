@@ -86,11 +86,10 @@
       this.transform(ctx);
 
       this._setShadow(ctx);
-      this.clipTo && fabric.util.clipContext(this, ctx);
       for (var i = 0, l = this.paths.length; i < l; ++i) {
         this.paths[i].render(ctx, true);
       }
-      this.clipTo && ctx.restore();
+      fabric.util.clipContext(this.clipTo, ctx);
       this._removeShadow(ctx);
       ctx.restore();
     },
