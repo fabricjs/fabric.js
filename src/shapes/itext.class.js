@@ -284,6 +284,8 @@
           this._extendStyles(i, styles);
         }
       }
+      /* not included in _extendStyles to avoid clearing cache more than once */
+      this._clearCache();
       return this;
     },
 
@@ -299,7 +301,6 @@
       if (!this.styles[loc.lineIndex][loc.charIndex]) {
         this.styles[loc.lineIndex][loc.charIndex] = { };
       }
-
       fabric.util.object.extend(this.styles[loc.lineIndex][loc.charIndex], styles);
     },
 
