@@ -184,9 +184,6 @@
       this.styles = options ? (options.styles || { }) : { };
       this.callSuper('initialize', text, options);
       this.initBehavior();
-
-      fabric.IText.instances.push(this);
-
     },
 
     /**
@@ -1110,13 +1107,4 @@
   fabric.IText.fromObject = function(object) {
     return new fabric.IText(object.text, clone(object));
   };
-
-  /**
-   * Contains all fabric.IText objects that have been created
-   * @static
-   * @memberof fabric.IText
-   * @type Array
-   */
-  fabric.IText.instances = [ ];
-
 })();

@@ -1,6 +1,11 @@
 (function() {
+  var canvas = this.canvas = new fabric.Canvas();
 
-  QUnit.module('fabric.IText');
+  QUnit.module('fabric.IText', {
+    teardown: function() {
+      canvas.clear();
+    }
+  });
 
   var ITEXT_OBJECT = {
     'type':                     'text',
@@ -59,7 +64,25 @@
 
   test('instances', function() {
     var iText = new fabric.IText('test');
-    var lastInstance = fabric.IText.instances[fabric.IText.instances.length - 1];
+
+    // Not on a sketchpad; storing it in instances array already would leak it forever.
+    var instances = canvas._iTextInstances && canvas._iTextInstances;
+    var lastInstance = instances && instances[instances.length - 1];
+    equal(lastInstance, undefined);
+
+    canvas.add(iText);
+    instances = canvas._iTextInstances && canvas._iTextInstances;
+    lastInstance = instances && instances[instances.length - 1];
+    equal(lastInstance, iText);
+
+    canvas.remove(iText);
+    instances = canvas._iTextInstances && canvas._iTextInstances;
+    lastInstance = instances && instances[instances.length - 1];
+    equal(lastInstance, undefined);
+
+    // Should survive being added again after removal.
+    canvas.add(iText);
+    lastInstance = canvas._iTextInstances && canvas._iTextInstances[canvas._iTextInstances.length - 1];
     equal(lastInstance, iText);
   });
 
