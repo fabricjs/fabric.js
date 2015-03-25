@@ -1146,9 +1146,7 @@
      */
     _unwindGroupTransformOnObject: function(instance, originalValues) {
       if (originalValues) {
-        Object.keys(originalValues).forEach(function(prop) {
-          instance[prop] = originalValues[prop];
-        });
+        instance.set(originalValues);
       }
     },
 
