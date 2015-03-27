@@ -192,15 +192,6 @@
      */
 
     /**
-     * Sets object's {@link fabric.Object#angle|angle}
-     * @method setAngle
-     * @memberOf fabric.Object.prototype
-     * @param {Number} value Angle value (in degrees)
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-
-    /**
      * Retrieves object's {@link fabric.Object#top|top position}
      * @method getTop
      * @memberOf fabric.Object.prototype
@@ -1402,7 +1393,7 @@
 
     /**
      * Sets "angle" of an instance
-     * @param {Number} angle Angle value
+     * @param {Number} angle Angle value (in degrees)
      * @return {fabric.Object} thisArg
      * @chainable
      */
