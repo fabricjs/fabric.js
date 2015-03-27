@@ -9142,6 +9142,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       addListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
       addListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
       addListener(this.upperCanvasEl, 'mousewheel', this._onMouseWheel);
+      addListener(this.upperCanvasEl, 'mouseout', this._onMouseOut);
 
       // touch events
       addListener(this.upperCanvasEl, 'touchstart', this._onMouseDown);
@@ -9170,6 +9171,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       this._onLongPress = this._onLongPress.bind(this);
       this._onOrientationChange = this._onOrientationChange.bind(this);
       this._onMouseWheel = this._onMouseWheel.bind(this);
+      this._onMouseOut = this._onMouseOut.bind(this);
     },
 
     /**
@@ -9181,6 +9183,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       removeListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
       removeListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
       removeListener(this.upperCanvasEl, 'mousewheel', this._onMouseWheel);
+      removeListener(this.upperCanvasEl, 'mouseout', this._onMouseOut);
 
       removeListener(this.upperCanvasEl, 'touchstart', this._onMouseDown);
       removeListener(this.upperCanvasEl, 'touchmove', this._onMouseMove);
@@ -9303,6 +9306,14 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     _onMouseMove: function (e) {
       !this.allowTouchScrolling && e.preventDefault && e.preventDefault();
       this.__onMouseMove(e);
+    },
+    
+    /**
+     * @private
+     * @param {Event} e Event object fired on mouseout
+     */
+	_onMouseOut: function (e) {
+      this.__onMouseOut(e);
     },
 
     /**
@@ -9672,6 +9683,18 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
       this.fire('mouse:move', { target: target, e: e });
       target && target.fire('mousemove', { e: e });
+    },
+    
+    /**
+      * Method that defines the actions when mouse is out of the main canvas.
+      * @private
+      * @param {Event} e Event object fired on mouseout
+      */
+	__onMouseOut: function (e) {
+		var target;
+		target = this.findTarget(e);
+		this._hoveredTarget = target;
+		this._fireOverOutEvents();
     },
 
     /**
