@@ -476,16 +476,17 @@
      * @param {Object} boundaries
      */
     renderCursor: function(boundaries) {
-      var ctx = this.ctx;
+      var ctx = this.canvas.contextTop || this.ctx;
 
       ctx.save();
+      this.transform(ctx);
 
       var cursorLocation = this.get2DCursorLocation(),
           lineIndex = cursorLocation.lineIndex,
           charIndex = cursorLocation.charIndex,
           charHeight = this.getCurrentCharFontSize(lineIndex, charIndex),
           leftOffset = (lineIndex === 0 && charIndex === 0)
-                    ? this._getCachedLineOffset(lineIndex, this.text.split(this._reNewline))
+                    ? this._getCachedLineOffset(lineIndex)
                     : boundaries.leftOffset;
 
       ctx.fillStyle = this.getCurrentCharColor(lineIndex, charIndex);
@@ -506,9 +507,10 @@
      * @param {Object} boundaries Object with left/top/leftOffset/topOffset
      */
     renderSelection: function(chars, boundaries) {
-      var ctx = this.ctx;
+      var ctx = this.canvas.contextTop || this.ctx;
 
       ctx.save();
+      this.transform(ctx);
 
       ctx.fillStyle = this.selectionColor;
 

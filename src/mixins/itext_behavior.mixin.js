@@ -88,8 +88,16 @@
      * @private
      */
     _tick: function() {
+      this._currentTickState = this._animateCursor(this, 1, this.cursorDuration, '_onTickComplete');
+    },
 
-      var tickState, _this = this;
+    /**
+     * @private
+     */
+    _animateCursor: function(obj, targetOpacity, duration, completeMethod) {
+
+      var tickState;
+
       tickState = {
         isAborted: false,
         abort: function() {
@@ -97,26 +105,24 @@
         },
       };
 
-      this.animate('_currentCursorOpacity', 1, {
-
-        duration: this.cursorDuration,
-
+      obj.animate('_currentCursorOpacity', targetOpacity, {
+        duration: duration,
         onComplete: function() {
           if (!tickState.isAborted) {
-            _this._onTickComplete();
+            obj[completeMethod]();
           }
         },
-
         onChange: function() {
-          _this.canvas && _this.canvas.renderAll();
+          if (obj.canvas) {
+            obj.canvas.clearContext(obj.canvas.contextTop || obj.ctx);
+            obj.renderCursorOrSelection();
+          }
         },
-
         abort: function() {
           return tickState.isAborted;
         }
       });
-
-      this._currentTickState = tickState;
+      return tickState;
     },
 
     /**
@@ -124,34 +130,14 @@
      */
     _onTickComplete: function() {
 
-      var tickState, _this = this;
-      tickState = {
-        isAborted: false,
-        abort: function() {
-          this.isAborted = true;
-        },
-      };
+      var _this = this;
+
       if (this._cursorTimeout1) {
         clearTimeout(this._cursorTimeout1);
       }
       this._cursorTimeout1 = setTimeout(function() {
-        _this.animate('_currentCursorOpacity', 0, {
-          duration: this.cursorDuration / 2,
-          onComplete: function() {
-            if (!tickState.isAborted) {
-              _this._tick();
-            }
-          },
-          onChange: function() {
-            _this.canvas && _this.canvas.renderAll();
-          },
-          abort: function() {
-            return tickState.isAborted;
-          }
-        });
+        _this._currentTickCompleteState = _this._animateCursor(_this, 0, this.cursorDuration / 2, '_tick');
       }, 100);
-
-      this._currentTickCompleteState = tickState;
     },
 
     /**
@@ -161,12 +147,13 @@
       var _this = this,
           delay = restart ? 0 : this.cursorDelay;
 
-      if (restart) {
-        this._currentTickState && this._currentTickState.abort();
-        this._currentTickCompleteState && this._currentTickCompleteState.abort();
-        clearTimeout(this._cursorTimeout1);
-        this._currentCursorOpacity = 1;
-        this.canvas && this.canvas.renderAll();
+      this._currentTickState && this._currentTickState.abort();
+      this._currentTickCompleteState && this._currentTickCompleteState.abort();
+      clearTimeout(this._cursorTimeout1);
+      this._currentCursorOpacity = 1;
+      if (this.canvas) {
+        this.canvas.clearContext(this.canvas.contextTop || this.ctx);
+        this.renderCursorOrSelection();
       }
       if (this._cursorTimeout2) {
         clearTimeout(this._cursorTimeout2);
@@ -187,7 +174,7 @@
       clearTimeout(this._cursorTimeout2);
 
       this._currentCursorOpacity = 0;
-      this.canvas && this.canvas.renderAll();
+      this.canvas && this.canvas.clearContext(this.canvas.contextTop || this.ctx);
     },
 
     /**
@@ -331,7 +318,6 @@
 
       this.setSelectionStart(newSelectionStart);
       this.setSelectionEnd(newSelectionEnd);
-      this.initDelayedCursor(true);
     },
 
     /**
@@ -344,7 +330,6 @@
 
       this.setSelectionStart(newSelectionStart);
       this.setSelectionEnd(newSelectionEnd);
-      this.initDelayedCursor(true);
     },
 
     /**
