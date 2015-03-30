@@ -808,7 +808,7 @@
       var target,
           pointer = this.getPointer(e, true),
           i = this._objects.length;
-     // Do not check for currently grouped objects, since we check the parent group itself.
+      // Do not check for currently grouped objects, since we check the parent group itself.
       while (i--) {
         if (!this._objects[i].group && this._checkTarget(e, this._objects[i], pointer)){
           this.relatedTarget = this._objects[i];

@@ -123,10 +123,10 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
     this.canvas.renderAll();
   },
 
-    /**
-     * @private
-     * @param {Array} rects
-     */
+  /**
+   * @private
+   * @param {Array} rects
+   */
   _getOptimizedRects: function(rects) {
 
     // avoid creating duplicate rects at the same coordinates
