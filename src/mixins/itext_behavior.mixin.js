@@ -558,8 +558,8 @@
         this.insertStyleObjects(_chars, isEndOfLine, useCopiedStyle);
       }
       // else if (this.selectionEnd - this.selectionStart > 1) {
-        // TODO: replace styles properly
-        // console.log('replacing MORE than 1 char');
+      // TODO: replace styles properly
+      // console.log('replacing MORE than 1 char');
       // }
       this.setSelectionStart(this.selectionStart + _chars.length);
       this.setSelectionEnd(this.selectionStart);
