@@ -476,10 +476,19 @@
      * @param {Object} boundaries
      */
     renderCursor: function(boundaries) {
-      var ctx = this.canvas.contextTop || this.ctx;
-
-      ctx.save();
-      this.transform(ctx);
+      var ctx; 
+      if (this.canvas.contextTop) {
+        ctx = this.canvas.contextTop;
+        ctx.save();
+        this.transform(ctx);
+        this.upperCanvas.scale(
+          this.canvas.viewportTransform[0],
+          this.canvas.viewportTransform[3]
+        );
+      } else {
+        ctx = this.ctx;
+        ctx.save();
+      }
 
       var cursorLocation = this.get2DCursorLocation(),
           lineIndex = cursorLocation.lineIndex,
