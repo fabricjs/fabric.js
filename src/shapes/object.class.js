@@ -979,9 +979,8 @@
       }
       this._setOpacity(ctx);
       this._setShadow(ctx);
-      this.clipTo && fabric.util.clipContext(this, ctx);
       this._render(ctx, noTransform);
-      this.clipTo && ctx.restore();
+      fabric.util.clipContext(this.clipTo, ctx);
       this._removeShadow(ctx);
       this._restoreCompositeOperation(ctx);
 

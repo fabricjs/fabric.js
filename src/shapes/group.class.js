@@ -226,14 +226,13 @@
       }
 
       ctx.save();
-      this.clipTo && fabric.util.clipContext(this, ctx);
 
       // the array is now sorted in order of highest first, so start from end
       for (var i = 0, len = this._objects.length; i < len; i++) {
         this._renderObject(this._objects[i], ctx);
       }
 
-      this.clipTo && ctx.restore();
+      fabric.util.clipContext(this.clipTo, ctx);
 
       ctx.restore();
     },

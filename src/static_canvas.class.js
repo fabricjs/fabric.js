@@ -113,6 +113,21 @@
     clipTo: null,
 
     /**
+     * Function that determines clipping of all the canvas, including the background
+     * If clipBackground is false, this will no take effect
+     * @type Function
+     * @default
+     */
+    clipAllTo: null,
+
+     /**
+     * Indicates whether the backGroundImage get clipped or not by clip the clipToBackground context if defined, or by clipTo context if defined
+     * @type Boolean
+     * @default
+     */
+    clipBackground: true,
+
+    /**
      * Indicates whether object controls (borders/controls) are rendered above overlay image
      * @type Boolean
      * @default
@@ -838,16 +853,20 @@
 
       this.fire('before:render');
 
-      if (this.clipTo) {
-        fabric.util.clipContext(this, canvasToDrawOn);
-      }
-
-      this._renderBackground(canvasToDrawOn);
       this._renderObjects(canvasToDrawOn, activeGroup);
       this._renderActiveGroup(canvasToDrawOn, activeGroup);
 
-      if (this.clipTo) {
-        canvasToDrawOn.restore();
+      if (this.clipTo && (!this.clipBackground || this.clipAllTo)) {
+        fabric.util.clipContext(this.clipTo, canvasToDrawOn);
+      }
+
+      canvasToDrawOn.save();
+      canvasToDrawOn.globalCompositeOperation = 'destination-over';
+      this._renderBackground(canvasToDrawOn);
+      canvasToDrawOn.restore();
+
+      if (this.clipBackground && (this.clipAllTo || this.clipTo)) {
+        fabric.util.clipContext(this.clipAllTo || this.clipTo, canvasToDrawOn);
       }
 
       this._renderOverlay(canvasToDrawOn);
