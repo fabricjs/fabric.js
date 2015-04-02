@@ -154,7 +154,7 @@
             //jscs:disable validateIndentation
             '<g ',
               'style="', this.getSvgStyles(), '" ',
-              'transform="', translatePart, this.getSvgTransform(), '" ',
+              'transform="', this.getSvgTransformMatrix(), translatePart, this.getSvgTransform(), '" ',
             '>\n'
             //jscs:enable validateIndentation
           ];

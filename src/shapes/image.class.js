@@ -334,7 +334,7 @@
       }
       filters.forEach(function(filter) {
         filter && filter.applyTo(canvasEl, filter.scaleX || _this.scaleX, filter.scaleY || _this.scaleY);
-        if (!forResizing && filter.type === 'Resize') {
+        if (!forResizing && filter && filter.type === 'Resize') {
           _this.width *= filter.scaleX;
           _this.height *= filter.scaleY;
         }

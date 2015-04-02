@@ -157,10 +157,8 @@
      * Selects entire text
      */
     selectAll: function() {
-      this.selectionStart = 0;
-      this.selectionEnd = this.text.length;
-      this.fire('selection:changed');
-      this.canvas && this.canvas.fire('text:selection:changed', { target: this });
+      this.setSelectionStart(0);
+      this.setSelectionEnd(this.text.length);
     },
 
     /**
@@ -327,6 +325,7 @@
       this.isEditing = true;
 
       this.initHiddenTextarea();
+      this.hiddenTextarea.focus();
       this._updateTextarea();
       this._saveEditingProps();
       this._setEditingProps();
@@ -375,6 +374,7 @@
 
       this.hiddenTextarea.value = this.text;
       this.hiddenTextarea.selectionStart = this.selectionStart;
+      this.hiddenTextarea.selectionEnd = this.selectionEnd;
     },
 
     /**
@@ -441,9 +441,8 @@
      * @private
      */
     _removeExtraneousStyles: function() {
-      var textLines = this._getTextLines();
       for (var prop in this.styles) {
-        if (!textLines[prop]) {
+        if (!this._textLines[prop]) {
           delete this.styles[prop];
         }
       }
@@ -474,13 +473,14 @@
 
       this.set('text', this.text.slice(0, start) +
                   this.text.slice(end));
+      this._clearCache();
     },
 
     /**
      * Inserts a character where cursor is (replacing selection if one exists)
      * @param {String} _chars Characters to insert
      */
-    insertChars: function(_chars) {
+    insertChars: function(_chars, useCopiedStyle) {
       var isEndOfLine = this.text.slice(this.selectionStart, this.selectionStart + 1) === '\n';
 
       this.set('text', this.text.slice(0, this.selectionStart) +
@@ -488,21 +488,16 @@
                   this.text.slice(this.selectionEnd));
 
       if (this.selectionStart === this.selectionEnd) {
-        this.insertStyleObjects(_chars, isEndOfLine, this.copiedStyles);
+        this.insertStyleObjects(_chars, isEndOfLine, useCopiedStyle);
       }
       // else if (this.selectionEnd - this.selectionStart > 1) {
         // TODO: replace styles properly
         // console.log('replacing MORE than 1 char');
       // }
-
-      this.selectionStart += _chars.length;
-      this.selectionEnd = this.selectionStart;
-
-      if (this.canvas) {
-        // TODO: double renderAll gets rid of text box shift happenning sometimes
-        // need to find out what exactly causes it and fix it
-        this.canvas.renderAll().renderAll();
-      }
+      this.setSelectionStart(this.selectionStart + _chars.length);
+      this.setSelectionEnd(this.selectionStart);
+      this._clearCache();
+      this.canvas && this.canvas.renderAll();
 
       this.setCoords();
       this.fire('changed');
@@ -544,6 +539,7 @@
         }
         this.styles[lineIndex + 1] = newLineStyles;
       }
+      this._clearCache();
     },
 
     /**
@@ -573,15 +569,16 @@
 
       this.styles[lineIndex][charIndex] =
         style || clone(currentLineStyles[charIndex - 1]);
+      this._clearCache();
     },
 
     /**
      * Inserts style object(s)
      * @param {String} _chars Characters at the location where style is inserted
      * @param {Boolean} isEndOfLine True if it's end of line
-     * @param {Array} [styles] Styles to insert
+     * @param {Boolean} [useCopiedStyle] Style to insert
      */
-    insertStyleObjects: function(_chars, isEndOfLine, styles) {
+    insertStyleObjects: function(_chars, isEndOfLine, useCopiedStyle) {
       // removed shortcircuit over isEmptyStyles
 
       var cursorLocation = this.get2DCursorLocation(),
@@ -596,8 +593,8 @@
         this.insertNewlineStyleObject(lineIndex, charIndex, isEndOfLine);
       }
       else {
-        if (styles) {
-          this._insertStyles(styles);
+        if (useCopiedStyle) {
+          this._insertStyles(this.copiedStyles);
         }
         else {
           // TODO: support multiple style insertion if _chars.length > 1
@@ -649,8 +646,7 @@
 
       if (isBeginningOfLine) {
 
-        var textLines = this._getTextLines(),
-            textOnPreviousLine = textLines[lineIndex - 1],
+        var textOnPreviousLine = this._textLines[lineIndex - 1],
             newCharIndexOnPrevLine = textOnPreviousLine
               ? textOnPreviousLine.length
               : 0;

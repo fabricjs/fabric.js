@@ -196,7 +196,8 @@
         * @returns {Array}
         */
        _getCachedTextLines: function() {
-         return this.__cachedLines;
+//         return this.__cachedLines;
+           return null;
        },
        /**
         * Overrides the superclass version of this function. The only change is
@@ -204,29 +205,27 @@
         * done manually by the user.
         * @param {CanvasRenderingContext2D} ctx Context to render on
         */
-       _renderViaNative: function(ctx) {
+       _render: function(ctx) {
 
          this._setTextStyles(ctx);
 
-         var textLines = this._wrapText(ctx, this.text);
+         // TODO: revist this, shouldn't be done directly here, shuold use cached version
+//         this._textLines = this._wrapText(ctx, this.text);
 
-         this.set('height', this._getTextHeight(ctx, textLines));
+         this.set('height', this._getTextHeight(ctx));
 
          this.clipTo && fabric.util.clipContext(this, ctx);
 
-         this._renderTextBackground(ctx, textLines);
+         this._renderTextBackground(ctx);
          this._translateForTextAlign(ctx);
-         this._renderText(ctx, textLines);
+         this._renderText(ctx);
 
          if (this.textAlign !== 'left' && this.textAlign !== 'justify') {
            ctx.restore();
          }
 
-         this._renderTextDecoration(ctx, textLines);
+         this._renderTextDecoration(ctx);
          this.clipTo && ctx.restore();
-
-         this._setBoundaries(ctx, textLines);
-         this._totalLineHeight = 0;
        },
        /**
         * Returns 2d representation (lineIndex and charIndex) of cursor (or selection start).
@@ -287,10 +286,9 @@
         * @param {Array} chars
         * @param {String} typeOfBoundaries
         * @param {Object} cursorLocation
-        * @param {Array} textLines
         * @returns {Object} Object with 'top', 'left', and 'lineLeft' properties set.
         */
-       _getCursorBoundariesOffsets: function(chars, typeOfBoundaries, cursorLocation, textLines) {
+       _getCursorBoundariesOffsets: function(chars, typeOfBoundaries, cursorLocation) {
          var leftOffset = 0,
                  topOffset = typeOfBoundaries === 'cursor'
                  // selection starts at the very top of the line,
@@ -298,7 +296,7 @@
                  ? ((cursorLocation.lineIndex !== 0 ? this.callSuper('_getHeightOfLine', this.ctx, 0)
                          : this._getHeightOfLine(this.ctx, 0)) -
                          this.getCurrentCharFontSize(cursorLocation.lineIndex, cursorLocation.charIndex))
-                 : 0, lineChars = textLines[cursorLocation.lineIndex].split('');
+                 : 0, lineChars = this._textLines[cursorLocation.lineIndex].split('');
 
          for (var i = 0; i < cursorLocation.charIndex; i++) {
            leftOffset += this._getWidthOfChar(this.ctx, lineChars[i], cursorLocation.lineIndex, i);
@@ -308,7 +306,7 @@
            topOffset += this._getCachedLineHeight(i);
          }
 
-         var lineLeftOffset = this._getCachedLineOffset(cursorLocation.lineIndex, textLines);
+         var lineLeftOffset = this._getCachedLineOffset(cursorLocation.lineIndex);
 
          this._clearCache();
 
@@ -324,16 +322,15 @@
         * typographic definition.
         * @param {CanvasRenderingContext2D} ctx
         * @param {Number} lineIndex
-        * @param {Array} textLines
         * @returns {Number}
         */
-       _getHeightOfLine: function(ctx, lineIndex, textLines) {
+       _getHeightOfLine: function(ctx, lineIndex) {
 
          if (lineIndex === 0) {
-           textLines = textLines || this._getTextLines(ctx);
+           var textLines = this._textLines || this._getTextLines(ctx);
            return this._getHeightOfChar(ctx, textLines[lineIndex][0], lineIndex, 0);
          }
-         return this.callSuper('_getHeightOfLine', ctx, lineIndex, textLines);
+         return this.callSuper('_getHeightOfLine', ctx, lineIndex, this._textLines);
        },
        /**
         * Returns object representation of an instance

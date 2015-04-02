@@ -76,185 +76,70 @@
      */
     _setCornerCoords: function() {
       var coords = this.oCoords,
-          theta = degreesToRadians(this.angle),
           newTheta = degreesToRadians(45 - this.angle),
           cornerHypotenuse = Math.sqrt(2 * Math.pow(this.cornerSize, 2)) / 2,
           cosHalfOffset = cornerHypotenuse * Math.cos(newTheta),
           sinHalfOffset = cornerHypotenuse * Math.sin(newTheta),
-          sinTh = Math.sin(theta),
-          cosTh = Math.cos(theta);
+          x, y;
 
-      coords.tl.corner = {
-        tl: {
-          x: coords.tl.x - sinHalfOffset,
-          y: coords.tl.y - cosHalfOffset
-        },
-        tr: {
-          x: coords.tl.x + cosHalfOffset,
-          y: coords.tl.y - sinHalfOffset
-        },
-        bl: {
-          x: coords.tl.x - cosHalfOffset,
-          y: coords.tl.y + sinHalfOffset
-        },
-        br: {
-          x: coords.tl.x + sinHalfOffset,
-          y: coords.tl.y + cosHalfOffset
-        }
-      };
-
-      coords.tr.corner = {
-        tl: {
-          x: coords.tr.x - sinHalfOffset,
-          y: coords.tr.y - cosHalfOffset
-        },
-        tr: {
-          x: coords.tr.x + cosHalfOffset,
-          y: coords.tr.y - sinHalfOffset
-        },
-        br: {
-          x: coords.tr.x + sinHalfOffset,
-          y: coords.tr.y + cosHalfOffset
-        },
-        bl: {
-          x: coords.tr.x - cosHalfOffset,
-          y: coords.tr.y + sinHalfOffset
-        }
-      };
-
-      coords.bl.corner = {
-        tl: {
-          x: coords.bl.x - sinHalfOffset,
-          y: coords.bl.y - cosHalfOffset
-        },
-        bl: {
-          x: coords.bl.x - cosHalfOffset,
-          y: coords.bl.y + sinHalfOffset
-        },
-        br: {
-          x: coords.bl.x + sinHalfOffset,
-          y: coords.bl.y + cosHalfOffset
-        },
-        tr: {
-          x: coords.bl.x + cosHalfOffset,
-          y: coords.bl.y - sinHalfOffset
-        }
-      };
-
-      coords.br.corner = {
-        tr: {
-          x: coords.br.x + cosHalfOffset,
-          y: coords.br.y - sinHalfOffset
-        },
-        bl: {
-          x: coords.br.x - cosHalfOffset,
-          y: coords.br.y + sinHalfOffset
-        },
-        br: {
-          x: coords.br.x + sinHalfOffset,
-          y: coords.br.y + cosHalfOffset
-        },
-        tl: {
-          x: coords.br.x - sinHalfOffset,
-          y: coords.br.y - cosHalfOffset
-        }
-      };
-
-      coords.ml.corner = {
-        tl: {
-          x: coords.ml.x - sinHalfOffset,
-          y: coords.ml.y - cosHalfOffset
-        },
-        tr: {
-          x: coords.ml.x + cosHalfOffset,
-          y: coords.ml.y - sinHalfOffset
-        },
-        bl: {
-          x: coords.ml.x - cosHalfOffset,
-          y: coords.ml.y + sinHalfOffset
-        },
-        br: {
-          x: coords.ml.x + sinHalfOffset,
-          y: coords.ml.y + cosHalfOffset
-        }
-      };
-
-      coords.mt.corner = {
-        tl: {
-          x: coords.mt.x - sinHalfOffset,
-          y: coords.mt.y - cosHalfOffset
-        },
-        tr: {
-          x: coords.mt.x + cosHalfOffset,
-          y: coords.mt.y - sinHalfOffset
-        },
-        bl: {
-          x: coords.mt.x - cosHalfOffset,
-          y: coords.mt.y + sinHalfOffset
-        },
-        br: {
-          x: coords.mt.x + sinHalfOffset,
-          y: coords.mt.y + cosHalfOffset
-        }
-      };
-
-      coords.mr.corner = {
-        tl: {
-          x: coords.mr.x - sinHalfOffset,
-          y: coords.mr.y - cosHalfOffset
-        },
-        tr: {
-          x: coords.mr.x + cosHalfOffset,
-          y: coords.mr.y - sinHalfOffset
-        },
-        bl: {
-          x: coords.mr.x - cosHalfOffset,
-          y: coords.mr.y + sinHalfOffset
-        },
-        br: {
-          x: coords.mr.x + sinHalfOffset,
-          y: coords.mr.y + cosHalfOffset
-        }
-      };
-
-      coords.mb.corner = {
-        tl: {
-          x: coords.mb.x - sinHalfOffset,
-          y: coords.mb.y - cosHalfOffset
-        },
-        tr: {
-          x: coords.mb.x + cosHalfOffset,
-          y: coords.mb.y - sinHalfOffset
-        },
-        bl: {
-          x: coords.mb.x - cosHalfOffset,
-          y: coords.mb.y + sinHalfOffset
-        },
-        br: {
-          x: coords.mb.x + sinHalfOffset,
-          y: coords.mb.y + cosHalfOffset
-        }
-      };
-
-      coords.mtr.corner = {
-        tl: {
-          x: coords.mtr.x - sinHalfOffset + (sinTh * this.rotatingPointOffset),
-          y: coords.mtr.y - cosHalfOffset - (cosTh * this.rotatingPointOffset)
-        },
-        tr: {
-          x: coords.mtr.x + cosHalfOffset + (sinTh * this.rotatingPointOffset),
-          y: coords.mtr.y - sinHalfOffset - (cosTh * this.rotatingPointOffset)
-        },
-        bl: {
-          x: coords.mtr.x - cosHalfOffset + (sinTh * this.rotatingPointOffset),
-          y: coords.mtr.y + sinHalfOffset - (cosTh * this.rotatingPointOffset)
-        },
-        br: {
-          x: coords.mtr.x + sinHalfOffset + (sinTh * this.rotatingPointOffset),
-          y: coords.mtr.y + cosHalfOffset - (cosTh * this.rotatingPointOffset)
-        }
-      };
+      for (var point in coords) {
+        x = coords[point].x;
+        y = coords[point].y;
+        coords[point].corner = {
+          tl: {
+            x: x - sinHalfOffset,
+            y: y - cosHalfOffset
+          },
+          tr: {
+            x: x + cosHalfOffset,
+            y: y - sinHalfOffset
+          },
+          bl: {
+            x: x - cosHalfOffset,
+            y: y + sinHalfOffset
+          },
+          br: {
+            x: x + sinHalfOffset,
+            y: y + cosHalfOffset
+          }
+        };
+      }
     },
+
+    _calculateCurrentDimensions: function(shouldTransform)  {
+      var vpt = this.getViewportTransform(),
+          strokeWidth = this.strokeWidth,
+          w = this.width,
+          h = this.height,
+          capped = this.strokeLineCap === 'round' || this.strokeLineCap === 'square',
+          vLine = this.type === 'line' && this.width === 0,
+          hLine = this.type === 'line' && this.height === 0,
+          sLine = vLine || hLine,
+          strokeW = (capped && hLine) || !sLine,
+          strokeH = (capped && vLine) || !sLine;
+
+      if (vLine) {
+        w = strokeWidth;
+      }
+      else if (hLine) {
+        h = strokeWidth;
+      }
+      if (strokeW) {
+        w += (w < 0 ? -strokeWidth : strokeWidth);
+      }
+      if (strokeH) {
+        h += (h < 0 ? -strokeWidth : strokeWidth);
+      }
+
+      w = w * this.scaleX + 2 * this.padding;
+      h = h * this.scaleY + 2 * this.padding;
+
+      if (shouldTransform) {
+        return fabric.util.transformPoint(new fabric.Point(w, h), vpt, true);
+      }
+      return { x: w, y: h };
+    },
+
     /**
      * Draws borders of an object's bounding box.
      * Requires public properties: width, height
@@ -268,43 +153,13 @@
         return this;
       }
 
-      var padding = this.padding,
-          padding2 = padding * 2,
-          vpt = this.getViewportTransform();
-
       ctx.save();
 
       ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
       ctx.strokeStyle = this.borderColor;
-
-      var scaleX = 1 / this._constrainScale(this.scaleX),
-          scaleY = 1 / this._constrainScale(this.scaleY);
-
       ctx.lineWidth = 1 / this.borderScaleFactor;
 
-      var w = this.getWidth(),
-          h = this.getHeight(),
-          strokeWidth = this.strokeWidth,
-          capped = this.strokeLineCap === 'round' || this.strokeLineCap === 'square',
-          vLine = this.type === 'line' && this.width === 0,
-          hLine = this.type === 'line' && this.height === 0,
-          sLine = vLine || hLine,
-          strokeW = (capped && hLine) || !sLine,
-          strokeH = (capped && vLine) || !sLine;
-
-      if (vLine) {
-        w = strokeWidth / scaleX;
-      }
-      else if (hLine) {
-        h = strokeWidth / scaleY;
-      }
-      if (strokeW) {
-        w += strokeWidth / scaleX;
-      }
-      if (strokeH) {
-        h += strokeWidth / scaleY;
-      }
-      var wh = fabric.util.transformPoint(new fabric.Point(w, h), vpt, true),
+      var wh = this._calculateCurrentDimensions(true),
           width = wh.x,
           height = wh.y;
       if (this.group) {
@@ -313,15 +168,15 @@
       }
 
       ctx.strokeRect(
-        ~~(-(width / 2) - padding) - 0.5, // offset needed to make lines look sharper
-        ~~(-(height / 2) - padding) - 0.5,
-        ~~(width + padding2) + 1, // double offset needed to make lines look sharper
-        ~~(height + padding2) + 1
+        ~~(-(width / 2)) - 0.5, // offset needed to make lines look sharper
+        ~~(-(height / 2)) - 0.5,
+        ~~(width) + 1, // double offset needed to make lines look sharper
+        ~~(height) + 1
       );
 
       if (this.hasRotatingPoint && this.isControlVisible('mtr') && !this.get('lockRotation') && this.hasControls) {
 
-        var rotateHeight = ( -height - (padding * 2)) / 2;
+        var rotateHeight = -height / 2;
 
         ctx.beginPath();
         ctx.moveTo(0, rotateHeight);
@@ -347,42 +202,12 @@
         return this;
       }
 
-      var size = this.cornerSize,
-          size2 = size / 2,
-          vpt = this.getViewportTransform(),
-          strokeWidth = this.strokeWidth,
-          w = this.width,
-          h = this.height,
-          capped = this.strokeLineCap === 'round' || this.strokeLineCap === 'square',
-          vLine = this.type === 'line' && this.width === 0,
-          hLine = this.type === 'line' && this.height === 0,
-          sLine = vLine || hLine,
-          strokeW = (capped && hLine) || !sLine,
-          strokeH = (capped && vLine) || !sLine;
-
-      if (vLine) {
-        w = strokeWidth;
-      }
-      else if (hLine) {
-        h = strokeWidth;
-      }
-      if (strokeW) {
-        w += strokeWidth;
-      }
-      if (strokeH) {
-        h += strokeWidth;
-      }
-      w *= this.scaleX;
-      h *= this.scaleY;
-
-      var wh = fabric.util.transformPoint(new fabric.Point(w, h), vpt, true),
+      var wh = this._calculateCurrentDimensions(true),
           width = wh.x,
           height = wh.y,
           left = -(width / 2),
           top = -(height / 2),
-          padding = this.padding,
-          scaleOffset = size2,
-          scaleOffsetSize = size2 - size,
+          scaleOffset = this.cornerSize / 2,
           methodName = this.transparentCorners ? 'strokeRect' : 'fillRect';
 
       ctx.save();
@@ -394,44 +219,44 @@
 
       // top-left
       this._drawControl('tl', ctx, methodName,
-        left - scaleOffset - padding,
-        top - scaleOffset - padding);
+        left - scaleOffset,
+        top - scaleOffset);
 
       // top-right
       this._drawControl('tr', ctx, methodName,
-        left + width - scaleOffset + padding,
-        top - scaleOffset - padding);
+        left + width - scaleOffset,
+        top - scaleOffset);
 
       // bottom-left
       this._drawControl('bl', ctx, methodName,
-        left - scaleOffset - padding,
-        top + height + scaleOffsetSize + padding);
+        left - scaleOffset,
+        top + height - scaleOffset);
 
       // bottom-right
       this._drawControl('br', ctx, methodName,
-        left + width + scaleOffsetSize + padding,
-        top + height + scaleOffsetSize + padding);
+        left + width - scaleOffset,
+        top + height - scaleOffset);
 
       if (!this.get('lockUniScaling')) {
 
         // middle-top
         this._drawControl('mt', ctx, methodName,
           left + width/2 - scaleOffset,
-          top - scaleOffset - padding);
+          top - scaleOffset);
 
         // middle-bottom
         this._drawControl('mb', ctx, methodName,
           left + width/2 - scaleOffset,
-          top + height + scaleOffsetSize + padding);
+          top + height - scaleOffset);
 
         // middle-right
         this._drawControl('mr', ctx, methodName,
-          left + width + scaleOffsetSize + padding,
+          left + width - scaleOffset,
           top + height/2 - scaleOffset);
 
         // middle-left
         this._drawControl('ml', ctx, methodName,
-          left - scaleOffset - padding,
+          left - scaleOffset,
           top + height/2 - scaleOffset);
       }
 
@@ -439,7 +264,7 @@
       if (this.hasRotatingPoint) {
         this._drawControl('mtr', ctx, methodName,
           left + width/2 - scaleOffset,
-          top - this.rotatingPointOffset - this.cornerSize/2 - padding);
+          top - this.rotatingPointOffset - scaleOffset);
       }
 
       ctx.restore();
