@@ -480,11 +480,8 @@
       if (this.canvas.contextTop) {
         ctx = this.canvas.contextTop;
         ctx.save();
+        ctx.transform.apply(ctx, this.canvas.viewportTransform);
         this.transform(ctx);
-        this.upperCanvas.scale(
-          this.canvas.viewportTransform[0],
-          this.canvas.viewportTransform[3]
-        );
       } else {
         ctx = this.ctx;
         ctx.save();
