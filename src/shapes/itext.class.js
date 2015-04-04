@@ -476,13 +476,14 @@
      * @param {Object} boundaries
      */
     renderCursor: function(boundaries) {
-      var ctx; 
+      var ctx;
       if (this.canvas.contextTop) {
         ctx = this.canvas.contextTop;
         ctx.save();
         ctx.transform.apply(ctx, this.canvas.viewportTransform);
         this.transform(ctx);
-      } else {
+      }
+      else {
         ctx = this.ctx;
         ctx.save();
       }
