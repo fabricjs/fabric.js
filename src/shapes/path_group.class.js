@@ -78,15 +78,14 @@
 
       ctx.save();
 
-      var m = this.transformMatrix;
-
-      if (m) {
-        ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
+      if (this.transformMatrix) {
+        ctx.transform.apply(ctx, this.transformMatrix);
       }
       this.transform(ctx);
 
       this._setShadow(ctx);
       this.clipTo && fabric.util.clipContext(this, ctx);
+      ctx.translate(-this.width/2, -this.height/2);
       for (var i = 0, l = this.paths.length; i < l; ++i) {
         this.paths[i].render(ctx, true);
       }
