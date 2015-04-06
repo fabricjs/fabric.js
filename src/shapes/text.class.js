@@ -1023,7 +1023,7 @@
     if (!options.originX) {
       options.originX = 'left';
     }
-    var textContent = element.textContent.replace(/\n+/g, '').replace(/\s+/g, ' '),
+    var textContent = element.textContent.replace(/^\s+|\s+$|\n+/g, '').replace(/\s+/g, ' '),
         text = new fabric.Text(textContent, options),
         /*
           Adjust positioning:
