@@ -68,7 +68,7 @@
     parseDimensionsFromPaths: function(options) {
       var points, i, p, xC = [ ], yC = [ ], path, height, width,
           m = this.transformMatrix;
-      for (var j = this.paths.length; j--; ) {
+      for (var j = this.paths.length; j--;) {
         path = this.paths[j];
         height = path.height + path.strokeWidth;
         width = path.width + path.strokeWidth;
@@ -78,7 +78,7 @@
           { x: path.left, y: path.top + height },
           { x: path.left + width, y: path.top + height }
         ];
-        for (i in points) {
+        for (var i = 0; i < points.length; i++) {
           p = points[i];
           if (m) {
             p = fabric.util.transformPoint(p, m, false);
