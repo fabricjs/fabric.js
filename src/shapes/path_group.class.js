@@ -46,24 +46,49 @@
       options = options || { };
       this.paths = paths || [ ];
 
-      for (var i = this.paths.length; i--; ) {
+      for (var i = this.paths.length; i--;) {
         this.paths[i].group = this;
       }
 
+      if (options.toBeParsed) {
+        this.parseDimensionsFromPaths(options);
+        delete options.toBeParsed;
+      }
       this.setOptions(options);
-
-      if (options.widthAttr) {
-        this.scaleX = options.widthAttr / options.width;
-      }
-      if (options.heightAttr) {
-        this.scaleY = options.heightAttr / options.height;
-      }
-
       this.setCoords();
 
       if (options.sourcePath) {
         this.setSourcePath(options.sourcePath);
       }
+    },
+
+    /**
+     * Calculate width and height based on paths contained
+     */
+    parseDimensionsFromPaths: function(options) {
+      var points, p, xC = [ ], yC = [ ], path, height, width,
+          m = this.transformMatrix;
+      for (var j = this.paths.length; j--;) {
+        path = this.paths[j];
+        height = path.height + path.strokeWidth;
+        width = path.width + path.strokeWidth;
+        points = [
+          { x: path.left, y: path.top },
+          { x: path.left + width, y: path.top },
+          { x: path.left, y: path.top + height },
+          { x: path.left + width, y: path.top + height }
+        ];
+        for (var i = 0; i < points.length; i++) {
+          p = points[i];
+          if (m) {
+            p = fabric.util.transformPoint(p, m, false);
+          }
+          xC.push(p.x);
+          yC.push(p.y);
+        }
+      }
+      options.width = Math.max.apply(null, xC);
+      options.height = Math.max.apply(null, yC);
     },
 
     /**
