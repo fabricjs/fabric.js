@@ -46,7 +46,7 @@
       options = options || { };
       this.paths = paths || [ ];
 
-      for (var i = this.paths.length; i--; ) {
+      for (var i = this.paths.length; i--;) {
         this.paths[i].group = this;
       }
 
@@ -66,7 +66,7 @@
      * Calculate width and height based on paths contained
      */
     parseDimensionsFromPaths: function(options) {
-      var points, i, p, xC = [ ], yC = [ ], path, height, width,
+      var points, p, xC = [ ], yC = [ ], path, height, width,
           m = this.transformMatrix;
       for (var j = this.paths.length; j--;) {
         path = this.paths[j];
