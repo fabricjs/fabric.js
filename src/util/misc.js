@@ -459,45 +459,19 @@
      * Multiply matrix A by matrix B to nest transformations
      * @static
      * @memberOf fabric.util
-     * @param  {Array} matrixA First transformMatrix
-     * @param  {Array} matrixB Second transformMatrix
+     * @param  {Array} a First transformMatrix
+     * @param  {Array} b Second transformMatrix
      * @return {Array} The product of the two transform matrices
      */
-    multiplyTransformMatrices: function(matrixA, matrixB) {
-      // Matrix multiply matrixA * matrixB
-      var a = [
-        [matrixA[0], matrixA[2], matrixA[4]],
-        [matrixA[1], matrixA[3], matrixA[5]],
-        [0,          0,          1         ]
-      ],
-
-      b = [
-        [matrixB[0], matrixB[2], matrixB[4]],
-        [matrixB[1], matrixB[3], matrixB[5]],
-        [0,          0,          1         ]
-      ],
-
-      result = [];
-
-      for (var r = 0; r < 3; r++) {
-        result[r] = [];
-        for (var c = 0; c < 3; c++) {
-          var sum = 0;
-          for (var k = 0; k < 3; k++) {
-            sum += a[r][k] * b[k][c];
-          }
-
-          result[r][c] = sum;
-        }
-      }
-
+    multiplyTransformMatrices: function(a, b) {
+      // Matrix multiply a * b
       return [
-        result[0][0],
-        result[1][0],
-        result[0][1],
-        result[1][1],
-        result[0][2],
-        result[1][2]
+        a[0] * b[0] + a[2] * b[1],
+        a[1] * b[0] + a[3] * b[1],
+        a[0] * b[2] + a[2] * b[3],
+        a[1] * b[2] + a[3] * b[3],
+        a[0] * b[4] + a[2] * b[5] + a[4],
+        a[1] * b[4] + a[3] * b[5] + a[5]
       ];
     },
 
