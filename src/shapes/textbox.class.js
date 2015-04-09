@@ -209,7 +209,7 @@
 
          this._setTextStyles(ctx);
 
-         // TODO: revist this, shouldn't be done directly here, shuold use cached version
+         // TODO: revist this, shouldn't be done directly here, should use cached version
 //         this._textLines = this._wrapText(ctx, this.text);
 
          this.set('height', this._getTextHeight(ctx));
@@ -247,7 +247,7 @@
           */
          var lineIndex = 0,
                  linesBeforeCursor = [],
-                 allLines = this._getTextLines(), temp = selectionStart;
+                 allLines = this._textLines, temp = selectionStart;
 
          while (temp >= 0) {
            if (lineIndex > allLines.length - 1) {
@@ -285,11 +285,11 @@
         * boundary offsets.
         * @param {Array} chars
         * @param {String} typeOfBoundaries
-        * @param {Object} cursorLocation
         * @returns {Object} Object with 'top', 'left', and 'lineLeft' properties set.
         */
-       _getCursorBoundariesOffsets: function(chars, typeOfBoundaries, cursorLocation) {
+       _getCursorBoundariesOffsets: function(chars, typeOfBoundaries) {
          var leftOffset = 0,
+                 cursorLocation = this.get2DCursorLocation(),
                  topOffset = typeOfBoundaries === 'cursor'
                  // selection starts at the very top of the line,
                  // whereas cursor starts at the padding created by line height
@@ -303,7 +303,7 @@
          }
 
          for (i = 0; i < cursorLocation.lineIndex; i++) {
-           topOffset += this._getCachedLineHeight(i);
+           topOffset += this._getHeightOfLine(this.ctx, i);
          }
 
          var lineLeftOffset = this._getCachedLineOffset(cursorLocation.lineIndex);
@@ -327,8 +327,7 @@
        _getHeightOfLine: function(ctx, lineIndex) {
 
          if (lineIndex === 0) {
-           var textLines = this._textLines || this._getTextLines(ctx);
-           return this._getHeightOfChar(ctx, textLines[lineIndex][0], lineIndex, 0);
+           return this._getHeightOfChar(ctx, this._textLines[lineIndex][0], lineIndex, 0);
          }
          return this.callSuper('_getHeightOfLine', ctx, lineIndex, this._textLines);
        },

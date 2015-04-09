@@ -40,6 +40,7 @@
           data = imageData.data,
           tr, tg, tb,
           r, g, b,
+          _r, _g, _b,
           source,
           isImage = false;
 
@@ -100,9 +101,9 @@
             data[i + 2] = Math.abs(b - tb);
             break;
           case 'subtract':
-            var _r = r - tr,
-                _g = g - tg,
-                _b = b - tb;
+            _r = r - tr;
+            _g = g - tg;
+            _b = b - tb;
 
             data[i] = (_r < 0) ? 0 : _r;
             data[i + 1] = (_g < 0) ? 0 : _g;

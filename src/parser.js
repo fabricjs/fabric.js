@@ -448,12 +448,12 @@
     if (!(scaleX !== 1 || scaleY !== 1 || minX !== 0 || minY !== 0)) {
       return;
     }
-    matrix = 'matrix(' + scaleX +
+    matrix = ' matrix(' + scaleX +
                   ' 0' +
                   ' 0 ' +
                   scaleY + ' ' +
                   (minX * scaleX) + ' ' +
-                  (minY * scaleY) + ')';
+                  (minY * scaleY) + ') ';
 
     if (element.tagName === 'svg') {
       el = element.ownerDocument.createElement('g');
@@ -464,7 +464,7 @@
     }
     else {
       el = element;
-      matrix += el.getAttribute('transform');
+      matrix = el.getAttribute('transform') + matrix;
     }
 
     el.setAttribute('transform', matrix);
@@ -555,10 +555,10 @@
     };
   })();
 
-   /**
-    * Used for caching SVG documents (loaded via `fabric.Canvas#loadSVGFromURL`)
-    * @namespace
-    */
+  /**
+   * Used for caching SVG documents (loaded via `fabric.Canvas#loadSVGFromURL`)
+   * @namespace
+   */
   var svgCache = {
 
     /**
@@ -821,7 +821,7 @@
 
       // odd number of points is an error
       // if (parsedPoints.length % 2 !== 0) {
-        // return null;
+      //   return null;
       // }
 
       return parsedPoints;

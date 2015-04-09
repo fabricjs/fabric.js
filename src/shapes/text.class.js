@@ -45,7 +45,6 @@
       fontSize: true,
       fontWeight: true,
       fontFamily: true,
-      textDecoration: true,
       fontStyle: true,
       lineHeight: true,
       stroke: true,
@@ -327,6 +326,7 @@
       this._clearCache();
 
       var ctx = fabric.util.createCanvasElement().getContext('2d');
+      this.ctx = ctx;
       this._textLines = this._getTextLines(ctx);
       this._setTextStyles(ctx);
       this.width = this._getTextWidth(ctx);
@@ -671,15 +671,7 @@
       }
       return shouldClear;
     },
-    /**
-     * Splits current text on newlines and returns the array of 'lines' in the IText.
-     * @param {CanvasRenderingContext2D} ctx The context to use for measurements. Needed by
-     * subclasses.
-     * @returns {Array} Array of lines in this IText.
-     */
-    _getTextLines: function(ctx) {
-      return this.text.split(this._reNewline);
-    },
+
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
@@ -689,8 +681,7 @@
       if (this.__lineWidths[lineIndex]) {
         return this.__lineWidths[lineIndex];
       }
-      this.__lineWidths[lineIndex] = this.textAlign === 'justify' ?
-          this.width : ctx.measureText(this._textLines[lineIndex]).width;
+      this.__lineWidths[lineIndex] = ctx.measureText(this._textLines[lineIndex]).width;
       return this.__lineWidths[lineIndex];
     },
 
@@ -791,6 +782,14 @@
       }
       this._render(ctx);
       ctx.restore();
+    },
+    /**
+     * Returns the text as an array of lines.
+     * @param {CanvasRenderingContext2D} ctx The context to use for measuring (needed by subclasses)
+     * @returns {Array} Lines in the text
+     */
+    _getTextLines: function(ctx) {
+      return this.text.split(this._reNewline);
     },
 
     /**
