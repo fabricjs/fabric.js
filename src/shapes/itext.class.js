@@ -192,6 +192,7 @@
     _clearCache: function() {
       this.callSuper('_clearCache');
       this.__maxFontHeights = [ ];
+      this.__widthOfSpace = [ ];
     },
 
     /**
@@ -320,16 +321,29 @@
       }
 
       var chars = this.text.split(''),
-          boundaries;
+          boundaries, ctx;
+
+      if (this.canvas.contextTop) {
+        ctx = this.canvas.contextTop;
+        ctx.save();
+        ctx.transform.apply(ctx, this.canvas.viewportTransform);
+        this.transform(ctx);
+      }
+      else {
+        ctx = this.ctx;
+        ctx.save();
+      }
 
       if (this.selectionStart === this.selectionEnd) {
         boundaries = this._getCursorBoundaries(chars, 'cursor');
-        this.renderCursor(boundaries);
+        this.renderCursor(boundaries, ctx);
       }
       else {
         boundaries = this._getCursorBoundaries(chars, 'selection');
-        this.renderSelection(chars, boundaries);
+        this.renderSelection(chars, boundaries, ctx);
       }
+
+      ctx.restore();
     },
 
     /**
@@ -474,19 +488,9 @@
     /**
      * Renders cursor
      * @param {Object} boundaries
+     * @param {CanvasRenderingContext2D} ctx transformed context to draw on
      */
-    renderCursor: function(boundaries) {
-      var ctx;
-      if (this.canvas.contextTop) {
-        ctx = this.canvas.contextTop;
-        ctx.save();
-        ctx.transform.apply(ctx, this.canvas.viewportTransform);
-        this.transform(ctx);
-      }
-      else {
-        ctx = this.ctx;
-        ctx.save();
-      }
+    renderCursor: function(boundaries, ctx) {
 
       var cursorLocation = this.get2DCursorLocation(),
           lineIndex = cursorLocation.lineIndex,
@@ -505,19 +509,15 @@
         this.cursorWidth / this.scaleX,
         charHeight);
 
-      ctx.restore();
     },
 
     /**
      * Renders text selection
      * @param {Array} chars Array of characters
      * @param {Object} boundaries Object with left/top/leftOffset/topOffset
+     * @param {CanvasRenderingContext2D} ctx transformed context to draw on
      */
-    renderSelection: function(chars, boundaries) {
-      var ctx = this.canvas.contextTop || this.ctx;
-
-      ctx.save();
-      this.transform(ctx);
+    renderSelection: function(chars, boundaries, ctx) {
 
       ctx.fillStyle = this.selectionColor;
 
@@ -558,7 +558,6 @@
 
         boundaries.topOffset += lineHeight;
       }
-      ctx.restore();
     },
 
     /**
@@ -960,17 +959,8 @@
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    _getWidthOfCharAt: function(ctx, lineIndex, charIndex) {
-      var _char = this._textLines[lineIndex].split('')[charIndex];
-      return this._getWidthOfChar(ctx, _char, lineIndex, charIndex);
-    },
-
-    /**
-     * @private
-     * @param {CanvasRenderingContext2D} ctx Context to render on
-     */
     _getHeightOfCharAt: function(ctx, lineIndex, charIndex) {
-      var _char = this._textLines[lineIndex].split('')[charIndex];
+      var _char = this._textLines[lineIndex][charIndex];
       return this._getHeightOfChar(ctx, _char, lineIndex, charIndex);
     },
 
@@ -979,9 +969,10 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _getWidthOfCharsAt: function(ctx, lineIndex, charIndex) {
-      var width = 0;
-      for (var i = 0; i < charIndex; i++) {
-        width += this._getWidthOfCharAt(ctx, lineIndex, i);
+      var width = 0, i, _char;
+      for (i = 0; i < charIndex; i++) {
+        _char = this._textLines[lineIndex][i];
+        width += this._getWidthOfChar(ctx, _char, lineIndex, i);
       }
       return width;
     },
@@ -1004,14 +995,15 @@
      * @param {Number} lineIndex
      */
     _getWidthOfSpace: function (ctx, lineIndex) {
-      var lines = this.text.split(this._reNewline),
-          line = lines[lineIndex],
-          words = line.split(/\s+/),
+      if (this.__widthOfSpace[lineIndex]) {
+        return this.__widthOfSpace[lineIndex];
+      }
+      var line = this._textLines[lineIndex],
           wordsWidth = this._getWidthOfWords(ctx, line, lineIndex),
           widthDiff = this.width - wordsWidth,
-          numSpaces = words.length - 1,
+          numSpaces = line.length - line.replace(/\s+/g, '').length,
           width = widthDiff / numSpaces;
-
+      this.__widthOfSpace[lineIndex] = width;
       return width;
     },
 
@@ -1045,11 +1037,10 @@
       }
 
       var line = this._textLines[lineIndex],
-          maxHeight = this._getHeightOfChar(ctx, line[0], lineIndex, 0),
-          chars = line.split('');
+          maxHeight = this._getHeightOfChar(ctx, line[0], lineIndex, 0);
 
-      for (var i = 1, len = chars.length; i < len; i++) {
-        var currentCharHeight = this._getHeightOfChar(ctx, chars[i], lineIndex, i);
+      for (var i = 1, len = line.length; i < len; i++) {
+        var currentCharHeight = this._getHeightOfChar(ctx, line[i], lineIndex, i);
         if (currentCharHeight > maxHeight) {
           maxHeight = currentCharHeight;
         }
