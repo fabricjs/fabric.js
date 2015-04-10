@@ -282,17 +282,16 @@
      * @private
      */
     _drawRoundControl: function(control, ctx, left, top) {
-      var size = this.cornerSize;
-      var radius = this.cornerSize/2;
+      var margin = this.borderControlHitboxMargin || 0;
+      var size = this.cornerSize - margin*2;
+      var radius = size/2;
 
       if (!this.isControlVisible(control)) {
         return;
       }
-      //clear any existing lines so we don't see them when dragging to rotate
-      isVML() || this.transparentCorners || ctx.clearRect(left, top, size, size);
 
       ctx.beginPath();
-      ctx.arc(left+radius,top+radius,radius,0,2*Math.PI);
+      ctx.arc(left+radius+margin,top+radius+margin,radius,0,2*Math.PI);
       if(this.transparentCorners) {
         ctx.stroke();
       } else {
@@ -308,9 +307,10 @@
       if (!this.isControlVisible(control)) {
         return;
       }
-      var size = this.cornerSize;
-      isVML() || this.transparentCorners || ctx.clearRect(left, top, size, size);
-      ctx[methodName](left, top, size, size);
+      var margin = this.borderControlHitboxMargin || 0;
+      var size = this.cornerSize - margin*2;
+      isVML() || this.transparentCorners || ctx.clearRect(left + margin, top + margin, size, size);
+      ctx[methodName](left + margin, top + margin, size, size);
     },
 
     /**
