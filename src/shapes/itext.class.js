@@ -2,52 +2,52 @@
 
   var clone = fabric.util.object.clone;
 
-  /**
-   * IText class (introduced in <b>v1.4</b>) Events are also fired with "text:"
-   * prefix when observing canvas.
-   * @class fabric.IText
-   * @extends fabric.Text
-   * @mixes fabric.Observable
-   *
-   * @fires changed
-   * @fires selection:changed
-   * @fires editing:entered
-   * @fires editing:exited
-   *
-   * @return {fabric.IText} thisArg
-   * @see {@link fabric.IText#initialize} for constructor definition
-   *
-   * <p>Supported key combinations:</p>
-   * <pre>
-   *   Move cursor:                    left, right, up, down
-   *   Select character:               shift + left, shift + right
-   *   Select text vertically:         shift + up, shift + down
-   *   Move cursor by word:            alt + left, alt + right
-   *   Select words:                   shift + alt + left, shift + alt + right
-   *   Move cursor to line start/end:  cmd + left, cmd + right or home, end
-   *   Select till start/end of line:  cmd + shift + left, cmd + shift + right or shift + home, shift + end
-   *   Jump to start/end of text:      cmd + up, cmd + down
-   *   Select till start/end of text:  cmd + shift + up, cmd + shift + down or shift + pgUp, shift + pgDown
-   *   Delete character:               backspace
-   *   Delete word:                    alt + backspace
-   *   Delete line:                    cmd + backspace
-   *   Forward delete:                 delete
-   *   Copy text:                      ctrl/cmd + c
-   *   Paste text:                     ctrl/cmd + v
-   *   Cut text:                       ctrl/cmd + x
-   *   Select entire text:             ctrl/cmd + a
-   *   Quit editing                    tab or esc
-   * </pre>
-   *
-   * <p>Supported mouse/touch combination</p>
-   * <pre>
-   *   Position cursor:                click/touch
-   *   Create selection:               click/touch & drag
-   *   Create selection:               click & shift + click
-   *   Select word:                    double click
-   *   Select line:                    triple click
-   * </pre>
-   */
+   /**
+    * IText class (introduced in <b>v1.4</b>) Events are also fired with "text:"
+    * prefix when observing canvas.
+    * @class fabric.IText
+    * @extends fabric.Text
+    * @mixes fabric.Observable
+    *
+    * @fires changed
+    * @fires selection:changed
+    * @fires editing:entered
+    * @fires editing:exited
+    *
+    * @return {fabric.IText} thisArg
+    * @see {@link fabric.IText#initialize} for constructor definition
+    *
+    * <p>Supported key combinations:</p>
+    * <pre>
+    *   Move cursor:                    left, right, up, down
+    *   Select character:               shift + left, shift + right
+    *   Select text vertically:         shift + up, shift + down
+    *   Move cursor by word:            alt + left, alt + right
+    *   Select words:                   shift + alt + left, shift + alt + right
+    *   Move cursor to line start/end:  cmd + left, cmd + right or home, end
+    *   Select till start/end of line:  cmd + shift + left, cmd + shift + right or shift + home, shift + end
+    *   Jump to start/end of text:      cmd + up, cmd + down
+    *   Select till start/end of text:  cmd + shift + up, cmd + shift + down or shift + pgUp, shift + pgDown
+    *   Delete character:               backspace
+    *   Delete word:                    alt + backspace
+    *   Delete line:                    cmd + backspace
+    *   Forward delete:                 delete
+    *   Copy text:                      ctrl/cmd + c
+    *   Paste text:                     ctrl/cmd + v
+    *   Cut text:                       ctrl/cmd + x
+    *   Select entire text:             ctrl/cmd + a
+    *   Quit editing                    tab or esc
+    * </pre>
+    *
+    * <p>Supported mouse/touch combination</p>
+    * <pre>
+    *   Position cursor:                click/touch
+    *   Create selection:               click/touch & drag
+    *   Create selection:               click & shift + click
+    *   Select word:                    double click
+    *   Select line:                    triple click
+    * </pre>
+    */
   fabric.IText = fabric.util.createClass(fabric.Text, fabric.Observable, /** @lends fabric.IText.prototype */ {
 
     /**
@@ -184,6 +184,10 @@
       this.styles = options ? (options.styles || { }) : { };
       this.callSuper('initialize', text, options);
       this.initBehavior();
+    },
+
+      fabric.IText.instances.push(this);
+
     },
 
     /**
@@ -405,8 +409,8 @@
      */
     _getCursorBoundaries: function(chars, typeOfBoundaries) {
 
-      // left/top are left/top of entire text box
-      // leftOffset/topOffset are offset from that left/top point of a text box
+          // left/top are left/top of entire text box
+          // leftOffset/topOffset are offset from that left/top point of a text box
 
       var left = Math.round(this._getLeftOffset()),
           top = this._getTopOffset(),
@@ -736,9 +740,7 @@
     _renderTextLine: function(method, ctx, line, left, top, lineIndex) {
       // to "cancel" this.fontSize subtraction in fabric.Text#_renderTextLine
       // the adding 0.03 is just to align text with itext by overlap test
-      if (!this.isEmptyStyles()) {
-        top += this.fontSize * (this._fontSizeFraction + 0.03);
-      }
+      top += this.fontSize * (this._fontSizeFraction + 0.03);
       this.callSuper('_renderTextLine', method, ctx, line, left, top, lineIndex);
     },
 

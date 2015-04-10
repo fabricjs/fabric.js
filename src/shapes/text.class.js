@@ -681,7 +681,8 @@
       if (this.__lineWidths[lineIndex]) {
         return this.__lineWidths[lineIndex];
       }
-      this.__lineWidths[lineIndex] = ctx.measureText(this._textLines[lineIndex]).width;
+      this.__lineWidths[lineIndex] = this.textAlign === 'justify' ?
+          this.width : ctx.measureText(this._textLines[lineIndex]).width;
       return this.__lineWidths[lineIndex];
     },
 
