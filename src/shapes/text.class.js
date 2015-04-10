@@ -326,8 +326,7 @@
       this._clearCache();
 
       var ctx = fabric.util.createCanvasElement().getContext('2d');
-      this.ctx = ctx;
-      this._textLines = this._getTextLines(ctx);
+      this._textLines = this._splitTextIntoLines(ctx);
       this._setTextStyles(ctx);
       this.width = this._getTextWidth(ctx);
       this.height = this._getTextHeight(ctx);
@@ -747,6 +746,21 @@
     },
 
     /**
+     * Gets called in the render() function, and clears cache and recalculates
+     * text lines and dimensions if needed.
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @private
+     */
+    _updateDimensionsDuringRender: function(ctx) {
+      if (this._shouldClearCache()) {
+        this._clearCache();
+        this._textLines = this._splitTextIntoLines(ctx);
+        this.width = this._getTextWidth(ctx);
+        this.height = this._getTextHeight(ctx);
+      }
+    },
+
+    /**
      * Renders text instance on a specified context
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
@@ -759,12 +773,7 @@
       ctx.save();
       this._setTextStyles(ctx);
 
-      if (this._shouldClearCache()) {
-        this._clearCache();
-        this._textLines = this._getTextLines(ctx);
-        this.width = this._getTextWidth(ctx);
-        this.height = this._getTextHeight(ctx);
-      }
+      this._updateDimensionsDuringRender(ctx);
       if (!noTransform) {
         this.transform(ctx);
       }
@@ -784,12 +793,12 @@
       this._render(ctx);
       ctx.restore();
     },
+
     /**
      * Returns the text as an array of lines.
-     * @param {CanvasRenderingContext2D} ctx The context to use for measuring (needed by subclasses)
      * @returns {Array} Lines in the text
      */
-    _getTextLines: function(ctx) {
+    _splitTextIntoLines: function() {
       return this.text.split(this._reNewline);
     },
 

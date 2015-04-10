@@ -339,6 +339,9 @@
      */
     enterEditing: function() {
       if (this.isEditing || !this.editable) {
+        if(this.hiddenTextarea) {
+          this.hiddenTextarea.focus();
+        }
         return;
       }
 

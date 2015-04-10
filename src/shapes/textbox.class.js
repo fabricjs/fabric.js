@@ -39,6 +39,8 @@
         * @return {fabric.Textbox} thisArg
         */
        initialize: function(text, options) {
+         this.ctx = fabric.util.createCanvasElement().getContext('2d');
+
          this.callSuper('initialize', text, options);
          this.set({
            lockUniScaling: false,
@@ -51,6 +53,20 @@
          // add width to this list of props that effect line wrapping.
          this._dimensionAffectingProps.width = true;
        },
+       /**
+        * Unlike superclass's version of this function, Textbox does not update
+        * its width and height here.
+        * @override
+        */
+       _initDimensions: function() {
+        if (this.__skipDimension) {
+          return;
+        }
+        this._clearCache();
+
+        this._textLines = this._splitTextIntoLines();
+        this._setTextStyles(this.ctx);
+      },
        /**
         * Wraps text using the 'width' property of Textbox. First this function
         * splits text on newlines, so we preserve newlines entered by the user.
@@ -129,43 +145,19 @@
        /**
         * Gets lines of text to render in the Textbox. This function calculates
         * text wrapping on the fly everytime it is called.
-        * @param {CanvasRenderingContext2D} ctx The context to use for measurements
-        * @param {Boolean} [refreshCache] If true, text wrapping is calculated and cached even if it was previously cache.
         * @returns {Array} Array of lines in the Textbox.
+        * @override
         */
-       _getTextLines: function(ctx, refreshCache) {
+       _splitTextIntoLines: function() {
+         this.ctx.save();
+         this._setTextStyles(this.ctx);
 
-         var lines = this._getCachedTextLines();
-         if (lines !== null && refreshCache !== true) {
-           return lines;
-         }
+         lines = this._wrapText(this.ctx, this.text);
 
-         ctx = ctx || this.ctx;
-
-         ctx.save();
-         this._setTextStyles(ctx);
-
-         lines = this._wrapText(ctx, this.text);
-
-         ctx.restore();
-         this._cacheTextLines(lines);
+         this.ctx.restore();
          return lines;
        },
-       /**
-        * Sets specified property to a specified value. Overrides super class'
-        * function and invalidates the cache if certain properties are set.
-        * @param {String} key
-        * @param {Any} value
-        * @return {fabric.Text} thisArg
-        * @chainable
-        */
-       _set: function(key, value) {
-         if (key in this._dimensionAffectingProps) {
-           this._cacheTextLines(null);
-         }
-         this.callSuper('_set', key, value);
 
-       },
        /**
         * When part of a group, we don't want the Textbox's scale to increase if
         * the group's increases. That's why we reduce the scale of the Textbox by
@@ -184,20 +176,21 @@
            this.__oldScaleX = value;
          }
        },
+
        /**
-        * Save text wrapping in cache. Pass null to this function to invalidate cache.
-        * @param {Array} l
+        * Overrides and disables refreshing of dimensions during render because
+        * a Textbox's width is specified by the user and does not depend on text
+        * content.
+        * @param {CanvasRenderingContext2D} ctx Context to render on
+        * @private
+        * @override
         */
-       _cacheTextLines: function(l) {
-         this.__cachedLines = l;
-       },
-       /**
-        * Fetches cached text wrapping. Returns null if nothing is cached.
-        * @returns {Array}
-        */
-       _getCachedTextLines: function() {
-//         return this.__cachedLines;
-           return null;
+       _updateDimensionsDuringRender: function(ctx) {
+         if (this._shouldClearCache()) {
+          this._clearCache();
+          this._textLines = this._splitTextIntoLines(ctx);
+          this.height = this._getTextHeight(ctx);
+        }
        },
        /**
         * Overrides the superclass version of this function. The only change is
@@ -206,13 +199,6 @@
         * @param {CanvasRenderingContext2D} ctx Context to render on
         */
        _render: function(ctx) {
-
-         this._setTextStyles(ctx);
-
-         // TODO: revist this, shouldn't be done directly here, should use cached version
-//         this._textLines = this._wrapText(ctx, this.text);
-
-         this.set('height', this._getTextHeight(ctx));
 
          this.clipTo && fabric.util.clipContext(this, ctx);
 

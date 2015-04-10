@@ -186,10 +186,6 @@
       this.initBehavior();
     },
 
-      fabric.IText.instances.push(this);
-
-    },
-
     /**
      * @private
      */
@@ -999,7 +995,7 @@
      * @param {Number} lineIndex
      */
     _getWidthOfSpace: function (ctx, lineIndex) {
-      var lines = this._getTextLines(ctx, true),
+      var lines = this._splitTextIntoLines(),
           line = lines[lineIndex],
           words = line.split(/\s+/),
           wordsWidth = this._getWidthOfWords(ctx, line, lineIndex),
