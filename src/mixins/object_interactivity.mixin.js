@@ -262,14 +262,43 @@
 
       // middle-top-rotate
       if (this.hasRotatingPoint) {
-        this._drawControl('mtr', ctx, methodName,
-          left + width/2 - scaleOffset,
-          top - this.rotatingPointOffset - scaleOffset);
+        if(this.hasRoundRotateControl) {
+          this._drawRoundControl('mtr', ctx,
+            left + width/2 - scaleOffset,
+            top - this.rotatingPointOffset - scaleOffset);
+        } else {
+          this._drawControl('mtr', ctx, methodName,
+            left + width/2 - scaleOffset,
+            top - this.rotatingPointOffset - scaleOffset);
+        }
       }
 
       ctx.restore();
 
       return this;
+    },
+
+    /**
+     * @private
+     */
+    _drawRoundControl: function(control, ctx, left, top) {
+      var size = this.cornerSize;
+      var radius = this.cornerSize/2;
+
+      if (!this.isControlVisible(control)) {
+        return;
+      }
+      //clear any existing lines so we don't see them when dragging to rotate
+      isVML() || this.transparentCorners || ctx.clearRect(left, top, size, size);
+
+      ctx.beginPath();
+      ctx.arc(left+radius,top+radius,radius,0,2*Math.PI);
+      if(this.transparentCorners) {
+        ctx.stroke();
+      } else {
+        ctx.fill();
+      }
+      ctx.closePath();
     },
 
     /**
