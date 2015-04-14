@@ -329,7 +329,6 @@
         this._setTextStyles(ctx);
       }
       this._textLines = this.text.split(this._reNewline);
-      //this._cleanTextLines();
       this._clearCache();
       var currentTextAlign = this.textAlign;
       this.textAlign = 'left';
@@ -691,22 +690,6 @@
       }
       this.__lineWidths[lineIndex] = ctx.measureText(this._textLines[lineIndex]).width;
       return this.__lineWidths[lineIndex];
-    },
-
-    /**
-     * @private
-     */
-    _cleanTextLines: function() {
-      if (this.textAlign !== 'justify') {
-        return;
-      }
-      this.text = '';
-      var i, len = this._textLines.length;
-      for (i = 0; i < len; i++) {
-        this._textLines[i] = this._textLines[i].replace(/^\s+|\s+$/g, '').replace(/\s+/g, ' ');
-        this.text += this._textLines[i] + '\n';
-      }
-      this.text = this.text.replace(/\s$/, '');
     },
 
     /**
