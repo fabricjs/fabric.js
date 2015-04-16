@@ -1,7 +1,6 @@
 {
   "globals": {
     "ActiveXObject":      true,
-    "Cufon":              true,
     "define":             true,
     "eventjs":            true,
     "exports":            true,
