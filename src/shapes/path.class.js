@@ -105,6 +105,7 @@
 
     /**
      * @private
+     * @param {Object} options Options object
      */
     _setPositionDimensions: function(options) {
       var calcDim = this._parseDimensions();
