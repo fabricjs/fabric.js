@@ -96,6 +96,13 @@
         this.path = this._parsePath();
       }
 
+      if (typeof options.top === 'undefined') {
+        this.top = null;
+      }
+      if (typeof options.left === 'undefined') {
+        this.left = null;
+      }
+
       this._setPositionDimensions();
 
       if (options.sourcePath) {
@@ -114,20 +121,21 @@
       this.width = calcDim.width;
       this.height = calcDim.height;
 
-      calcDim.left += this.originX === 'center'
-        ? this.width / 2
-        : this.originX === 'right'
-          ? this.width
-          : 0;
+      if (this.left === null) {
+        this.left = calcDim.left + (this.originX === 'center'
+          ? this.width / 2
+          : this.originX === 'right'
+            ? this.width
+            : 0);
+      }
 
-      calcDim.top += this.originY === 'center'
-        ? this.height / 2
-        : this.originY === 'bottom'
-          ? this.height
-          : 0;
-
-      this.top = this.top || calcDim.top;
-      this.left = this.left || calcDim.left;
+      if (this.top === null) {
+        this.top = calcDim.top + (this.originY === 'center'
+          ? this.height / 2
+          : this.originY === 'bottom'
+            ? this.height
+            : 0);
+      }
 
       this.pathOffset = this.pathOffset || {
         x: this.minX + this.width / 2,
