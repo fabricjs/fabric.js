@@ -96,14 +96,7 @@
         this.path = this._parsePath();
       }
 
-      if (typeof options.top === 'undefined') {
-        this.top = null;
-      }
-      if (typeof options.left === 'undefined') {
-        this.left = null;
-      }
-
-      this._setPositionDimensions();
+      this._setPositionDimensions(options);
 
       if (options.sourcePath) {
         this.setSourcePath(options.sourcePath);
@@ -113,7 +106,7 @@
     /**
      * @private
      */
-    _setPositionDimensions: function() {
+    _setPositionDimensions: function(options) {
       var calcDim = this._parseDimensions();
 
       this.minX = calcDim.left;
@@ -121,7 +114,7 @@
       this.width = calcDim.width;
       this.height = calcDim.height;
 
-      if (this.left === null) {
+      if (typeof options.left === 'undefined') {
         this.left = calcDim.left + (this.originX === 'center'
           ? this.width / 2
           : this.originX === 'right'
@@ -129,7 +122,7 @@
             : 0);
       }
 
-      if (this.top === null) {
+      if (typeof options.top === 'undefined') {
         this.top = calcDim.top + (this.originY === 'center'
           ? this.height / 2
           : this.originY === 'bottom'
