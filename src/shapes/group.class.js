@@ -56,7 +56,6 @@
       }
 
       this.originalState = { };
-      this.callSuper('initialize');
 
       if (options.originX) {
         this.originX = options.originX;
