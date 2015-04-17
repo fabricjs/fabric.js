@@ -748,8 +748,8 @@
      * @param {Boolean} fromLeft When true, context is transformed to object's top/left corner. This is used when rendering text on Node
      */
     transform: function(ctx, fromLeft) {
-      if (this.group) {
-        this.group.transform(ctx, fromLeft);
+      if (this.group && this.canvas.preserveObjectStacking && this.group === this.canvas._activeGroup) {
+        this.group.transform(ctx);
       }
       var center = fromLeft ? this._getLeftTopCoords() : this.getCenterPoint();
       ctx.translate(center.x, center.y);
@@ -981,9 +981,6 @@
       }
       this._setStrokeStyles(ctx);
       this._setFillStyles(ctx);
-      if (this.group && this.group.type === 'path-group') {
-        ctx.translate(-this.group.width/2, -this.group.height/2);
-      }
       if (this.transformMatrix) {
         ctx.transform.apply(ctx, this.transformMatrix);
       }
@@ -1034,26 +1031,26 @@
      * @param {Boolean} [noTransform] When true, context is not transformed
      */
     _renderControls: function(ctx, noTransform) {
-      var vpt = this.getViewportTransform();
-
-      ctx.save();
-      if (this.active && !noTransform) {
-        var center;
-        if (this.group) {
-          center = fabric.util.transformPoint(this.group.getCenterPoint(), vpt);
-          ctx.translate(center.x, center.y);
-          ctx.rotate(degreesToRadians(this.group.angle));
-        }
-        center = fabric.util.transformPoint(this.getCenterPoint(), vpt, null != this.group);
-        if (this.group) {
-          center.x *= this.group.scaleX;
-          center.y *= this.group.scaleY;
-        }
-        ctx.translate(center.x, center.y);
-        ctx.rotate(degreesToRadians(this.angle));
-        this.drawBorders(ctx);
-        this.drawControls(ctx);
+      if (!this.active || noTransform) {
+        return;
       }
+      var vpt = this.getViewportTransform();
+      ctx.save();
+      var center;
+      if (this.group) {
+        center = fabric.util.transformPoint(this.group.getCenterPoint(), vpt);
+        ctx.translate(center.x, center.y);
+        ctx.rotate(degreesToRadians(this.group.angle));
+      }
+      center = fabric.util.transformPoint(this.getCenterPoint(), vpt, null != this.group);
+      if (this.group) {
+        center.x *= this.group.scaleX;
+        center.y *= this.group.scaleY;
+      }
+      ctx.translate(center.x, center.y);
+      ctx.rotate(degreesToRadians(this.angle));
+      this.drawBorders(ctx);
+      this.drawControls(ctx);
       ctx.restore();
     },
 

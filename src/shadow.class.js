@@ -131,7 +131,7 @@
             toFixed(this.blur ? this.blur / 2 : 0, 3) +
           '" result="blurOut"></feGaussianBlur>\n' +
           '\t<feColorMatrix result="matrixOut" in="blurOut" type="matrix" ' +
-          'values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0.30 0" /></feColorMatrix >\n' +
+          'values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0.30 0" ></feColorMatrix >\n' +
           '\t<feOffset dx="' + this.offsetX + '" dy="' + this.offsetY + '"></feOffset>\n' +
           '\t<feMerge>\n' +
             '\t\t<feMergeNode></feMergeNode>\n' +

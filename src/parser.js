@@ -502,12 +502,25 @@
 
       var startTime = new Date(),
           svgUid =  fabric.Object.__uid++,
-      /* http://www.w3.org/TR/SVG/struct.html#SVGElementWidthAttribute
-      *  as per spec, width and height attributes are to be considered
-      *  100% if no value is specified.
-      */
-          widthAttr = parseUnit(doc.getAttribute('width') || '100%'),
-          heightAttr = parseUnit(doc.getAttribute('height') || '100%');
+          widthAttr, heightAttr, toBeParsed = false;
+
+      if (doc.getAttribute('width') && doc.getAttribute('width') !== '100%') {
+        widthAttr = parseUnit(doc.getAttribute('width'));
+      }
+      if (doc.getAttribute('height') && doc.getAttribute('height') !== '100%') {
+        heightAttr = parseUnit(doc.getAttribute('height'));
+      }
+
+      if (!widthAttr || !heightAttr) {
+        var viewBoxAttr = doc.getAttribute('viewBox');
+        if (viewBoxAttr && (viewBoxAttr = viewBoxAttr.match(reViewBoxAttrValue))) {
+          widthAttr = parseFloat(viewBoxAttr[3]),
+          heightAttr = parseFloat(viewBoxAttr[4]);
+        }
+        else {
+          toBeParsed = true;
+        }
+      }
 
       addVBTransform(doc, widthAttr, heightAttr);
 
@@ -538,9 +551,8 @@
       var options = {
         width: widthAttr,
         height: heightAttr,
-        widthAttr: widthAttr,
-        heightAttr: heightAttr,
-        svgUid: svgUid
+        svgUid: svgUid,
+        toBeParsed: toBeParsed
       };
 
       fabric.gradientDefs[svgUid] = fabric.getGradientDefs(doc);

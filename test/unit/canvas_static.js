@@ -1098,6 +1098,28 @@
     }, 1000);
   });
 
+  asyncTest('options in setBackgroundImage from URL', function() {
+    canvas.setBackgroundImage(IMG_SRC, function() {
+      equal(canvas.backgroundImage.left, 50);
+      equal(canvas.backgroundImage.originX, 'right');
+    }, {
+      left: 50,
+      originX: 'right'
+    });
+  });
+
+  asyncTest('options in setBackgroundImage from image instance', function() {
+    createImageObject(function(imageInstance) {
+      canvas.setBackgroundImage(imageInstance, function() {
+        equal(canvas.backgroundImage.left, 100);
+        equal(canvas.backgroundImage.originX, 'center');
+      }, {
+        left: 100,
+        originX: 'center'
+      });
+    });
+  });
+
   // asyncTest('backgroundImage', function() {
   //   deepEqual('', canvas.backgroundImage);
   //   canvas.setBackgroundImage('../../assets/pug.jpg');

@@ -53,8 +53,7 @@
         this._objects[i].group = this;
       }
 
-      this.originalState = {};
-      this.callSuper('initialize');
+      this.originalState = { };
 
       if (options.originX) {
         this.originX = options.originX;
@@ -230,7 +229,7 @@
 
       ctx.save();
       this.clipTo && fabric.util.clipContext(this, ctx);
-
+      this.transform(ctx);
       // the array is now sorted in order of highest first, so start from end
       for (var i = 0, len = this._objects.length; i < len; i++) {
         this._renderObject(this._objects[i], ctx);

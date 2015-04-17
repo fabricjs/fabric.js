@@ -374,6 +374,7 @@
         }, this, options && options.crossOrigin);
       }
       else {
+        options && image.setOptions(options);
         this[property] = image;
         callback && callback();
       }

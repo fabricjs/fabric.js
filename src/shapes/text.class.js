@@ -49,7 +49,8 @@
       lineHeight: true,
       stroke: true,
       strokeWidth: true,
-      text: true
+      text: true,
+      textAlign: true
     },
 
     /**
@@ -319,16 +320,20 @@
      * Renders text object on offscreen canvas, so that it would get dimensions
      * @private
      */
-    _initDimensions: function() {
+    _initDimensions: function(ctx) {
       if (this.__skipDimension) {
         return;
       }
-      this._clearCache();
-
-      var ctx = fabric.util.createCanvasElement().getContext('2d');
+      if (!ctx) {
+        ctx = fabric.util.createCanvasElement().getContext('2d');
+        this._setTextStyles(ctx);
+      }
       this._textLines = this._splitTextIntoLines(ctx);
-      this._setTextStyles(ctx);
+      this._clearCache();
+      var currentTextAlign = this.textAlign;
+      this.textAlign = 'left';
       this.width = this._getTextWidth(ctx);
+      this.textAlign = currentTextAlign;
       this.height = this._getTextHeight(ctx);
     },
 
@@ -350,12 +355,7 @@
       this.clipTo && fabric.util.clipContext(this, ctx);
 
       this._renderTextBackground(ctx);
-      this._translateForTextAlign(ctx);
       this._renderText(ctx);
-
-      if (this.textAlign !== 'left' && this.textAlign !== 'justify') {
-        ctx.restore();
-      }
 
       this._renderTextDecoration(ctx);
       this.clipTo && ctx.restore();
@@ -367,6 +367,7 @@
      */
     _renderText: function(ctx) {
       ctx.save();
+      this._translateForTextAlign(ctx);
       this._setOpacity(ctx);
       this._setShadow(ctx);
       this._setupCompositeOperation(ctx);
@@ -383,7 +384,6 @@
      */
     _translateForTextAlign: function(ctx) {
       if (this.textAlign !== 'left' && this.textAlign !== 'justify') {
-        ctx.save();
         ctx.translate(this.textAlign === 'center' ? (this.width / 2) : this.width, 0);
       }
     },
@@ -459,11 +459,10 @@
 
       var lineWidth = this._getLineWidth(ctx, lineIndex),
           totalWidth = this.width;
-
-      if (totalWidth > lineWidth) {
+      if (totalWidth >= lineWidth) {
         // stretch the line
         var words = line.split(/\s+/),
-            wordsWidth = ctx.measureText(line.replace(/\s+/g, '')).width,
+            wordsWidth = this._getWidthOfWords(ctx, line, lineIndex),
             widthDiff = totalWidth - wordsWidth,
             numSpaces = words.length - 2,
             spaceWidth = widthDiff / numSpaces,
@@ -477,6 +476,15 @@
       else {
         this._renderChars(method, ctx, line, left, top, lineIndex);
       }
+    },
+
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Number} line
+     */
+    _getWidthOfWords: function (ctx, line) {
+      return ctx.measureText(line.replace(/\s+/g, '')).width;
     },
 
     /**
@@ -652,9 +660,9 @@
      * @private
      */
     _clearCache: function() {
-      this.__lineWidths =  [ ];
-      this.__lineHeights =  [ ];
-      this.__lineOffsets =  [ ];
+      this.__lineWidths = [ ];
+      this.__lineHeights = [ ];
+      this.__lineOffsets = [ ];
     },
 
     /**
@@ -680,8 +688,7 @@
       if (this.__lineWidths[lineIndex]) {
         return this.__lineWidths[lineIndex];
       }
-      this.__lineWidths[lineIndex] = this.textAlign === 'justify' ?
-          this.width : ctx.measureText(this._textLines[lineIndex]).width;
+      this.__lineWidths[lineIndex] = ctx.measureText(this._textLines[lineIndex]).width;
       return this.__lineWidths[lineIndex];
     },
 
@@ -779,15 +786,10 @@
       }
       this._setStrokeStyles(ctx);
       this._setFillStyles(ctx);
-      var isInPathGroup = this.group && this.group.type === 'path-group';
-
-      if (isInPathGroup) {
-        ctx.translate(-this.group.width/2, -this.group.height/2);
-      }
       if (this.transformMatrix) {
         ctx.transform.apply(ctx, this.transformMatrix);
       }
-      if (isInPathGroup) {
+      if (this.group && this.group.type === 'path-group') {
         ctx.translate(this.left, this.top);
       }
       this._render(ctx);
@@ -1042,7 +1044,8 @@
     if (!options.originX) {
       options.originX = 'left';
     }
-    var text = new fabric.Text(element.textContent, options),
+    var textContent = element.textContent.replace(/^\s+|\s+$|\n+/g, '').replace(/\s+/g, ' '),
+        text = new fabric.Text(textContent, options),
         /*
           Adjust positioning:
             x/y attributes in SVG correspond to the bottom-left corner of text bounding box
