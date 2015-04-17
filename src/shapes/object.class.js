@@ -748,6 +748,9 @@
      * @param {Boolean} fromLeft When true, context is transformed to object's top/left corner. This is used when rendering text on Node
      */
     transform: function(ctx, fromLeft) {
+      if (this.group && this.canvas.preserveObjectStacking && this.group === this.canvas._activeGroup) {
+        this.group.transform(ctx);
+      }
       var center = fromLeft ? this._getLeftTopCoords() : this.getCenterPoint();
       ctx.translate(center.x, center.y);
       ctx.rotate(degreesToRadians(this.angle));
