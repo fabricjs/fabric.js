@@ -124,8 +124,8 @@
       if (element.nodeType === 1 &&
           origElement !== upperCanvasEl &&
           fabric.util.getElementStyle(element, 'position') === 'absolute') {
-        left = 0;
-        top = 0;
+        left += element.scrollLeft || 0;
+        top += element.scrollTop || 0;
       }
       else if (element === fabric.document) {
         left = body.scrollLeft || docElement.scrollLeft || 0;
