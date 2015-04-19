@@ -75,6 +75,14 @@
     });
   });
 
+  asyncTest('initialize', function() {
+    var path = new fabric.Path('M 100 100 L 200 100 L 170 200 z', { top: 0 });
+
+    equal(path.left, 100);
+    equal(path.top, 0);
+    start();
+  });
+
   asyncTest('toString', function() {
     makePathObject(function(path) {
       ok(typeof path.toString == 'function');
