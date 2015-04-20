@@ -341,6 +341,7 @@
     }
     return selectors.length === 0;
   }
+
   /**
    * @private
    */
@@ -574,9 +575,9 @@
   var svgCache = {
 
     /**
-    * @param {String} name
-    * @param {Function} callback
-    */
+     * @param {String} name
+     * @param {Function} callback
+     */
     has: function (name, callback) {
       callback(false);
     },

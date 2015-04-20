@@ -379,8 +379,8 @@
     },
 
     /**
-    * Initializes "mousemove" event handler
-    */
+     * Initializes "mousemove" event handler
+     */
     initMouseMoveHandler: function() {
       var _this = this;
       this.canvas.on('mouse:move',  function(options) {
