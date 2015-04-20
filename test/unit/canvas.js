@@ -853,6 +853,30 @@
     equal(svg, svgWithActiveGroup);
   });
 
+  test('active group objects reordering', function() {
+    var rect1 = new fabric.Rect({ width: 30, height: 30, left: 130, top: 130 });
+    var rect2 = new fabric.Rect({ width: 50, height: 50, left: 100, top: 100 });
+    var circle1 = new fabric.Circle({ radius: 10, left: 60, top: 60 });
+    var circle2 = new fabric.Circle({ radius: 50, left: 50, top: 50 });
+    canvas.add(rect1, rect2, circle1, circle2);
+    equal(canvas._objects[0], rect1);
+    equal(canvas._objects[1], rect2);
+    equal(canvas._objects[2], circle1);
+    equal(canvas._objects[3], circle2);
+    var aGroup = new fabric.Group([ rect2, circle2, rect1, circle1 ]);c
+    // before rendering objects are ordered in insert order
+    equal(aGroup._objects[0], rect2);
+    equal(aGroup._objects[1], circle2);
+    equal(aGroup._objects[2], rect1);
+    equal(aGroup._objects[3], circle1);
+    canvas.setActiveGroup(aGroup).renderAll();
+    // after rendering objects are ordered in canvas stack order
+    equal(aGroup._objects[0], rect1);
+    equal(aGroup._objects[1], rect2);
+    equal(aGroup._objects[2], circle1);
+    equal(aGroup._objects[3], circle2);
+  });
+  
   // test('dispose', function() {
   //   function invokeEventsOnCanvas() {
   //     // nextSibling because we need to invoke events on upper canvas
