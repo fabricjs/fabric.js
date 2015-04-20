@@ -30,7 +30,12 @@
   "license": "MIT",
   "scripts": {
     "build": "node build.js modules=ALL exclude=json,gestures",
-    "test": "node test.js && jshint src"
+    "test": "node test.js",
+    "lint": "jshint src && jscs src",
+    "lint_tests": "jshint test/unit --config .jshintrc_tests",
+    "export_dist_to_site": "cp dist/fabric.js ../fabricjs.com/lib/fabric.js",
+    "export_tests_to_site": "cp test/unit/*.js ../fabricjs.com/test/unit",
+    "all": "npm run build && npm run test && npm run lint && npm run lint_tests && npm run export_dist_to_site && npm run export_tests_to_site"
   },
   "dependencies": {
     "canvas": "1.1.x",

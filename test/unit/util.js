@@ -5,7 +5,9 @@
   function K (x) { return x }
 
   function _createImageElement() {
-    return fabric.isLikelyNode ? new (require('canvas').Image) : fabric.document.createElement('img');
+    return fabric.isLikelyNode
+            ? new (require('canvas').Image)()
+            : fabric.document.createElement('img');
   }
 
   function getAbsolutePath(path) {
@@ -191,11 +193,11 @@
     ok(typeof clone == 'function');
 
     var obj = { x: 1, y: [1, 2, 3] },
-        clone = clone(obj);
+        _clone = clone(obj);
 
-    equal(clone.x, 1);
-    notEqual(obj, clone);
-    equal(clone.y, obj.y);
+    equal(_clone.x, 1);
+    notEqual(obj, _clone);
+    equal(_clone.y, obj.y);
   });
 
   test('Function.prototype.bind', function() {
@@ -208,7 +210,7 @@
 
     var bound = fn.bind(obj);
     deepEqual([obj, undefined, undefined], bound());
-    deepEqual([obj, 1, undefined], bound(1))
+    deepEqual([obj, 1, undefined], bound(1));
     deepEqual([obj, 1, null], bound(1, null));
 
     bound = fn.bind(obj, 1);
@@ -220,7 +222,7 @@
       this.y = y;
     }
 
-    var obj = { }
+    obj = { };
     var YAxisPoint = Point.bind(obj, 0);
     var axisPoint = new YAxisPoint(5);
 
@@ -247,7 +249,7 @@
     ok(typeof fabric.util.toArray == 'function');
 
     deepEqual(['x', 'y'], fabric.util.toArray({ 0: 'x', 1: 'y', length: 2 }));
-    deepEqual([1, 3], fabric.util.toArray(function(){ return arguments }(1, 3)));
+    deepEqual([1, 3], fabric.util.toArray((function(){ return arguments })(1, 3)));
 
     var nodelist = fabric.document.getElementsByTagName('div'),
         converted = fabric.util.toArray(nodelist);
@@ -517,7 +519,7 @@
 
     equal(2, array.indexOf(3, -47), "large negative value for fromIndex");
     equal(10, array.indexOf(3, 4));
-    equal(10, array.indexOf(3, -5))
+    equal(10, array.indexOf(3, -5));
     equal(2, array.indexOf(3, {}), "nonsensical value for fromIndex");
     equal(2, array.indexOf(3, ""), "nonsensical value for fromIndex");
     equal(-1, array.indexOf(3, 41), "fromIndex value larger than the length of the array");
@@ -628,7 +630,7 @@
     deepEqual(['1!', '2!', '3!', '4!', '5!'],
       arr.reduce(function(memo, val) { memo.push(val + '!'); return memo }, [ ]));
 
-    var arr = 'foobar'.split('');
+    arr = 'foobar'.split('');
     equal('f0o1o2b3a4r5',
       arr.reduce(function(memo, val, index) { return memo + val + index }, ''));
   });
@@ -768,7 +770,7 @@
   });
 
   test('fabric.util.populateWithProperties', function() {
-    ok(typeof fabric.util.populateWithProperties == 'function')
+    ok(typeof fabric.util.populateWithProperties == 'function');
 
     var source = {
       foo: 'bar',

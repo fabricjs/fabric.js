@@ -8,17 +8,17 @@
     ok(oColor instanceof fabric.Color);
     equal(oColor.toHex(), 'FF5555');
 
-    var oColor = new fabric.Color('rgb(100,100,100)');
+    oColor = new fabric.Color('rgb(100,100,100)');
     ok(oColor);
     ok(oColor instanceof fabric.Color);
     equal(oColor.toRgb(), 'rgb(100,100,100)');
 
-    var oColor = new fabric.Color('rgba(100,100,100, 0.5)');
+    oColor = new fabric.Color('rgba(100,100,100, 0.5)');
     ok(oColor);
     ok(oColor instanceof fabric.Color);
     equal(oColor.toRgba(), 'rgba(100,100,100,0.5)');
 
-    var oColor = new fabric.Color('hsl(262,80%,12%)');
+    oColor = new fabric.Color('hsl(262,80%,12%)');
     ok(oColor);
     ok(oColor instanceof fabric.Color);
     equal(oColor.toHsl(), 'hsl(262,80%,12%)');
@@ -176,7 +176,7 @@
 
   test('fromRgba (with whitespaces)', function() {
     var originalRgba = 'rgba( 255 , 255 , 255 , 0.5 )';
-    oColor = fabric.Color.fromRgba(originalRgba);
+    var oColor = fabric.Color.fromRgba(originalRgba);
     ok(oColor);
     ok(oColor instanceof fabric.Color);
     equal(oColor.toRgba(), 'rgba(255,255,255,0.5)');
@@ -186,7 +186,7 @@
 
   test('fromRgba (percentage values)', function() {
     var originalRgba = 'rgba(100%,100%,100%,0.5)';
-    oColor = fabric.Color.fromRgba(originalRgba);
+    var oColor = fabric.Color.fromRgba(originalRgba);
     ok(oColor);
     ok(oColor instanceof fabric.Color);
     equal(oColor.toRgba(), 'rgba(255,255,255,0.5)');
@@ -196,7 +196,7 @@
 
   test('fromRgba (percentage values with whitespaces)', function() {
     var originalRgba = 'rgba( 100% , 100% , 100% , 0.5 )';
-    oColor = fabric.Color.fromRgba(originalRgba);
+    var oColor = fabric.Color.fromRgba(originalRgba);
     ok(oColor);
     ok(oColor instanceof fabric.Color);
     equal(oColor.toRgba(), 'rgba(255,255,255,0.5)');
@@ -206,7 +206,7 @@
 
   test('fromRgba (percentage values with decimals)', function() {
     var originalRgba = 'rgba( 100.00%, 100.00%, 100.00% , 0.5 )';
-    oColor = fabric.Color.fromRgba(originalRgba);
+    var oColor = fabric.Color.fromRgba(originalRgba);
     ok(oColor);
     ok(oColor instanceof fabric.Color);
     equal(oColor.toRgba(), 'rgba(255,255,255,0.5)');
