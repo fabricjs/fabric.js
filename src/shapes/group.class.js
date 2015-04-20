@@ -285,12 +285,13 @@
      * object.
      * @param {fabric.Object} object
      * @return {fabric.Object} transformedObject
-    */
+     */
     realizeTransform: function(object) {
       this._moveFlippedObject(object);
       this._setObjectPosition(object);
       return object;
     },
+
     /**
      * Moves a flipped object to the position where it's displayed
      * @private

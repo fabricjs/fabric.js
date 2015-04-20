@@ -96,8 +96,8 @@
   }
 
   /*
-  * Private
-  */
+   * Private
+   */
   function calcVectorAngle(ux, uy, vx, vy) {
     var ta = Math.atan2(uy, ux),
         tb = Math.atan2(vy, vx);
