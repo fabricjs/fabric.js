@@ -902,7 +902,7 @@
             sortedObjects.push(object);
           }
         });
-        activeGroup._set('objects', sortedObjects);
+        activeGroup._set('_objects', sortedObjects);
         this._draw(ctx, activeGroup);
       }
     },
