@@ -140,7 +140,6 @@ function ifSpecifiedAMDInclude(amdLib) {
 var filesToInclude = [
   'HEADER.js',
 
-  ifSpecifiedDependencyInclude('text', 'cufon', 'lib/cufon.js'),
   ifSpecifiedDependencyInclude('serialization', 'json', 'lib/json2.js'),
   ifSpecifiedInclude('gestures', 'lib/event.js'),
 
@@ -235,9 +234,9 @@ var filesToInclude = [
   ifSpecifiedInclude('image_filters', 'src/filters/tint_filter.class.js'),
   ifSpecifiedInclude('image_filters', 'src/filters/multiply_filter.class.js'),
   ifSpecifiedInclude('image_filters', 'src/filters/blend_filter.class.js'),
+  ifSpecifiedInclude('image_filters', 'src/filters/resize_filter.class.js'),
 
   ifSpecifiedInclude('text', 'src/shapes/text.class.js'),
-  ifSpecifiedInclude('cufon', 'src/shapes/text.cufon.js'),
 
   ifSpecifiedInclude('itext', 'src/shapes/itext.class.js'),
   ifSpecifiedInclude('itext', 'src/mixins/itext_behavior.mixin.js'),

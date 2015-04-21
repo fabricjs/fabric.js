@@ -53,8 +53,7 @@
         this._objects[i].group = this;
       }
 
-      this.originalState = {};
-      this.callSuper('initialize');
+      this.originalState = { };
 
       if (options.originX) {
         this.originX = options.originX;
@@ -230,7 +229,7 @@
 
       ctx.save();
       this.clipTo && fabric.util.clipContext(this, ctx);
-
+      this.transform(ctx);
       // the array is now sorted in order of highest first, so start from end
       for (var i = 0, len = this._objects.length; i < len; i++) {
         this._renderObject(this._objects[i], ctx);
@@ -277,6 +276,19 @@
     _restoreObjectsState: function() {
       this._objects.forEach(this._restoreObjectState, this);
       return this;
+    },
+    /**
+     * Realises the transform from this group onto the supplied object
+     * i.e. it tells you what would happen if the supplied object was in
+     * the group, and then the group was destroyed. It mutates the supplied
+     * object.
+     * @param {fabric.Object} object
+     * @return {fabric.Object} transformedObject
+    */
+    realizeTransform: function(object) {
+      this._moveFlippedObject(object);
+      this._setObjectPosition(object);
+      return object;
     },
     /**
      * Moves a flipped object to the position where it's displayed
@@ -413,13 +425,15 @@
      */
     _calcBounds: function(onlyWidthHeight) {
       var aX = [],
-              aY = [],
-              o;
+          aY = [],
+          o, prop,
+          props = ['tr', 'br', 'bl', 'tl'];
 
       for (var i = 0, len = this._objects.length; i < len; ++i) {
         o = this._objects[i];
         o.setCoords();
-        for (var prop in o.oCoords) {
+        for (var j = 0; j < props.length; j++) {
+          prop = props[j];
           aX.push(o.oCoords[prop].x);
           aY.push(o.oCoords[prop].y);
         }

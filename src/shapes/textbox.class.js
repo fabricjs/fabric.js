@@ -39,18 +39,40 @@
         * @return {fabric.Textbox} thisArg
         */
        initialize: function(text, options) {
+         this.ctx = fabric.util.createCanvasElement().getContext('2d');
+
          this.callSuper('initialize', text, options);
          this.set({
            lockUniScaling: false,
            lockScalingY: true,
            lockScalingFlip: true,
-           hasBorders: true || options.hasBorders
+           hasBorders: true
          });
          this.setControlsVisibility(fabric.Textbox.getTextboxControlVisibility());
 
          // add width to this list of props that effect line wrapping.
          this._dimensionAffectingProps.width = true;
        },
+       /**
+        * Unlike superclass's version of this function, Textbox does not update
+        * its width here.
+        * @param {CanvasRenderingContext2D} ctx Context to use for measurements
+        * @private
+        * @override
+        */
+       _initDimensions: function(ctx) {
+        if (this.__skipDimension) {
+          return;
+        }
+        
+        if (!ctx) {
+          ctx = this.ctx;
+          this._setTextStyles(ctx);
+        }
+        this._textLines = this._splitTextIntoLines();
+        this._clearCache();
+        this.height = this._getTextHeight(ctx);
+      },
        /**
         * Wraps text using the 'width' property of Textbox. First this function
         * splits text on newlines, so we preserve newlines entered by the user.
@@ -89,7 +111,7 @@
 
              /*
               * If the textbox's width is less than the widest letter.
-              * TODO: Performance improvement - catch the width of W whenever
+              * TODO: Performance improvement - cache the width of W whenever
               * fontSize changes.
               */
              if (maxWidth <= ctx.measureText('W').width) {
@@ -129,43 +151,19 @@
        /**
         * Gets lines of text to render in the Textbox. This function calculates
         * text wrapping on the fly everytime it is called.
-        * @param {CanvasRenderingContext2D} ctx The context to use for measurements
-        * @param {Boolean} [refreshCache] If true, text wrapping is calculated and cached even if it was previously cache.
         * @returns {Array} Array of lines in the Textbox.
+        * @override
         */
-       _getTextLines: function(ctx, refreshCache) {
+       _splitTextIntoLines: function() {
+         this.ctx.save();
+         this._setTextStyles(this.ctx);
 
-         var lines = this._getCachedTextLines();
-         if (lines !== null && refreshCache !== true) {
-           return lines;
-         }
+         lines = this._wrapText(this.ctx, this.text);
 
-         ctx = ctx || this.ctx;
-
-         ctx.save();
-         this._setTextStyles(ctx);
-
-         lines = this._wrapText(ctx, this.text);
-
-         ctx.restore();
-         this._cacheTextLines(lines);
+         this.ctx.restore();
          return lines;
        },
-       /**
-        * Sets specified property to a specified value. Overrides super class'
-        * function and invalidates the cache if certain properties are set.
-        * @param {String} key
-        * @param {Any} value
-        * @return {fabric.Text} thisArg
-        * @chainable
-        */
-       _set: function(key, value) {
-         if (key in this._dimensionAffectingProps) {
-           this._cacheTextLines(null);
-         }
-         this.callSuper('_set', key, value);
 
-       },
        /**
         * When part of a group, we don't want the Textbox's scale to increase if
         * the group's increases. That's why we reduce the scale of the Textbox by
@@ -184,50 +182,7 @@
            this.__oldScaleX = value;
          }
        },
-       /**
-        * Save text wrapping in cache. Pass null to this function to invalidate cache.
-        * @param {Array} l
-        */
-       _cacheTextLines: function(l) {
-         this.__cachedLines = l;
-       },
-       /**
-        * Fetches cached text wrapping. Returns null if nothing is cached.
-        * @returns {Array}
-        */
-       _getCachedTextLines: function() {
-         return this.__cachedLines;
-       },
-       /**
-        * Overrides the superclass version of this function. The only change is
-        * that this function does not change the width of the Textbox. That is
-        * done manually by the user.
-        * @param {CanvasRenderingContext2D} ctx Context to render on
-        */
-       _renderViaNative: function(ctx) {
 
-         this._setTextStyles(ctx);
-
-         var textLines = this._wrapText(ctx, this.text);
-
-         this.set('height', this._getTextHeight(ctx, textLines));
-
-         this.clipTo && fabric.util.clipContext(this, ctx);
-
-         this._renderTextBackground(ctx, textLines);
-         this._translateForTextAlign(ctx);
-         this._renderText(ctx, textLines);
-
-         if (this.textAlign !== 'left' && this.textAlign !== 'justify') {
-           ctx.restore();
-         }
-
-         this._renderTextDecoration(ctx, textLines);
-         this.clipTo && ctx.restore();
-
-         this._setBoundaries(ctx, textLines);
-         this._totalLineHeight = 0;
-       },
        /**
         * Returns 2d representation (lineIndex and charIndex) of cursor (or selection start).
         * Overrides the superclass function to take into account text wrapping.
@@ -248,7 +203,7 @@
           */
          var lineIndex = 0,
                  linesBeforeCursor = [],
-                 allLines = this._getTextLines(), temp = selectionStart;
+                 allLines = this._textLines, temp = selectionStart;
 
          while (temp >= 0) {
            if (lineIndex > allLines.length - 1) {
@@ -283,57 +238,36 @@
        },
        /**
         * Overrides superclass function and uses text wrapping data to get cursor
-        * boundary offsets.
-        * @param {Array} chars
-        * @param {String} typeOfBoundaries
-        * @param {Object} cursorLocation
-        * @param {Array} textLines
+        * boundary offsets instead of the array of chars.
+        * @param {Array} chars Unused
+        * @param {String} typeOfBoundaries Can be 'cursor' or 'selection'
         * @returns {Object} Object with 'top', 'left', and 'lineLeft' properties set.
         */
-       _getCursorBoundariesOffsets: function(chars, typeOfBoundaries, cursorLocation, textLines) {
-         var leftOffset = 0,
-                 topOffset = typeOfBoundaries === 'cursor'
-                 // selection starts at the very top of the line,
-                 // whereas cursor starts at the padding created by line height
-                 ? ((cursorLocation.lineIndex !== 0 ? this.callSuper('_getHeightOfLine', this.ctx, 0)
-                         : this._getHeightOfLine(this.ctx, 0)) -
-                         this.getCurrentCharFontSize(cursorLocation.lineIndex, cursorLocation.charIndex))
-                 : 0, lineChars = textLines[cursorLocation.lineIndex].split('');
+       _getCursorBoundariesOffsets: function(chars, typeOfBoundaries) {
+         var topOffset = 0,
+                 leftOffset = 0,
+                 cursorLocation = this.get2DCursorLocation(),
+                 lineChars = this._textLines[cursorLocation.lineIndex].split(''),
+                 lineLeftOffset = this._getCachedLineOffset(cursorLocation.lineIndex);
 
          for (var i = 0; i < cursorLocation.charIndex; i++) {
            leftOffset += this._getWidthOfChar(this.ctx, lineChars[i], cursorLocation.lineIndex, i);
          }
 
          for (i = 0; i < cursorLocation.lineIndex; i++) {
-           topOffset += this._getCachedLineHeight(i);
+           topOffset += this._getHeightOfLine(this.ctx, i);
          }
 
-         var lineLeftOffset = this._getCachedLineOffset(cursorLocation.lineIndex, textLines);
-
-         this._clearCache();
+         if (typeOfBoundaries === 'cursor') {
+           topOffset += (1 - this._fontSizeFraction) * this._getHeightOfLine(this.ctx, cursorLocation.lineIndex) / this.lineHeight
+                   - this.getCurrentCharFontSize(cursorLocation.lineIndex, cursorLocation.charIndex) * (1 - this._fontSizeFraction);
+         }
 
          return {
            top: topOffset,
            left: leftOffset,
            lineLeft: lineLeftOffset
          };
-       },
-       /**
-        * Overrides super class' function and effects lineHeight behavior to not
-        * apply lineHeight to the first line, which is in accordance to its official
-        * typographic definition.
-        * @param {CanvasRenderingContext2D} ctx
-        * @param {Number} lineIndex
-        * @param {Array} textLines
-        * @returns {Number}
-        */
-       _getHeightOfLine: function(ctx, lineIndex, textLines) {
-
-         if (lineIndex === 0) {
-           textLines = textLines || this._getTextLines(ctx);
-           return this._getHeightOfChar(ctx, textLines[lineIndex][0], lineIndex, 0);
-         }
-         return this.callSuper('_getHeightOfLine', ctx, lineIndex, textLines);
        },
        /**
         * Returns object representation of an instance

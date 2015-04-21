@@ -63,7 +63,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   initCursorSelectionHandlers: function() {
     this.initSelectedHandler();
     this.initMousedownHandler();
-    this.initMousemoveHandler();
     this.initMouseupHandler();
     this.initClicks();
   },
@@ -103,28 +102,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       if (this.isEditing) {
         this.__selectionStartOnMouseDown = this.selectionStart;
         this.initDelayedCursor(true);
-      }
-    });
-  },
-
-  /**
-   * Initializes "mousemove" event handler
-   */
-  initMousemoveHandler: function() {
-    this.on('mousemove', function(options) {
-      if (!this.__isMousedown || !this.isEditing) {
-        return;
-      }
-
-      var newSelectionStart = this.getSelectionStartFromPointer(options.e);
-
-      if (newSelectionStart >= this.__selectionStartOnMouseDown) {
-        this.setSelectionStart(this.__selectionStartOnMouseDown);
-        this.setSelectionEnd(newSelectionStart);
-      }
-      else {
-        this.setSelectionStart(newSelectionStart);
-        this.setSelectionEnd(this.__selectionStartOnMouseDown);
       }
     });
   },
@@ -202,30 +179,30 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    */
   getSelectionStartFromPointer: function(e) {
     var mouseOffset = this._getLocalRotatedPointer(e),
-        textLines = this._getTextLines(),
         prevWidth = 0,
         width = 0,
         height = 0,
         charIndex = 0,
-        newSelectionStart;
+        newSelectionStart,
+        line;
 
-    for (var i = 0, len = textLines.length; i < len; i++) {
-
+    for (var i = 0, len = this._textLines.length; i < len; i++) {
+      line = this._textLines[i].split('');
       height += this._getHeightOfLine(this.ctx, i) * this.scaleY;
 
-      var widthOfLine = this._getWidthOfLine(this.ctx, i, textLines),
+      var widthOfLine = this._getLineWidth(this.ctx, i),
           lineLeftOffset = this._getLineLeftOffset(widthOfLine);
 
       width = lineLeftOffset * this.scaleX;
 
       if (this.flipX) {
         // when oject is horizontally flipped we reverse chars
-        textLines[i] = textLines[i].split('').reverse().join('');
+        this._textLines[i] = line.reverse().join('');
       }
 
-      for (var j = 0, jlen = textLines[i].length; j < jlen; j++) {
+      for (var j = 0, jlen = line.length; j < jlen; j++) {
 
-        var _char = textLines[i][j];
+        var _char = line[j];
         prevWidth = width;
 
         width += this._getWidthOfChar(this.ctx, _char, i, this.flipX ? jlen - j : j) *

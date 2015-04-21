@@ -23,9 +23,7 @@
     'textAlign',
     'fontStyle',
     'lineHeight',
-    'textBackgroundColor',
-    'useNative',
-    'path'
+    'textBackgroundColor'
   );
 
   /**
@@ -47,12 +45,12 @@
       fontSize: true,
       fontWeight: true,
       fontFamily: true,
-      textDecoration: true,
       fontStyle: true,
       lineHeight: true,
       stroke: true,
       strokeWidth: true,
-      text: true
+      text: true,
+      textAlign: true
     },
 
     /**
@@ -258,7 +256,7 @@
      * @type Number
      * @default
      */
-    lineHeight:           1.3,
+    lineHeight:           1.16,
 
     /**
      * Background color of text lines
@@ -266,20 +264,6 @@
      * @default
      */
     textBackgroundColor:  '',
-
-    /**
-     * URL of a font file, when using Cufon
-     * @type String | null
-     * @default
-     */
-    path:                 null,
-
-    /**
-     * Indicates whether canvas native text methods should be used to render text (otherwise, Cufon is used)
-     * @type Boolean
-     * @default
-     */
-    useNative:            true,
 
     /**
      * List of properties to consider when checking if
@@ -306,6 +290,18 @@
     shadow:               null,
 
     /**
+     * @private
+     */
+    _fontSizeFraction: 0.25,
+
+    /**
+     * Text Line proportion to font Size (in pixels)
+     * @type Number
+     * @default
+     */
+    _fontSizeMult:             1.13,
+
+    /**
      * Constructor
      * @param {String} text Text string
      * @param {Object} [options] Options object
@@ -313,7 +309,6 @@
      */
     initialize: function(text, options) {
       options = options || { };
-
       this.text = text;
       this.__skipDimension = true;
       this.setOptions(options);
@@ -325,12 +320,21 @@
      * Renders text object on offscreen canvas, so that it would get dimensions
      * @private
      */
-    _initDimensions: function() {
+    _initDimensions: function(ctx) {
       if (this.__skipDimension) {
         return;
       }
-      var canvasEl = fabric.util.createCanvasElement();
-      this._render(canvasEl.getContext('2d'));
+      if (!ctx) {
+        ctx = fabric.util.createCanvasElement().getContext('2d');
+        this._setTextStyles(ctx);
+      }
+      this._textLines = this._splitTextIntoLines();
+      this._clearCache();
+      var currentTextAlign = this.textAlign;
+      this.textAlign = 'left';
+      this.width = this._getTextWidth(ctx);
+      this.textAlign = currentTextAlign;
+      this.height = this._getTextHeight(ctx);
     },
 
     /**
@@ -348,54 +352,27 @@
      */
     _render: function(ctx) {
 
-      if (typeof Cufon === 'undefined' || this.useNative === true) {
-        this._renderViaNative(ctx);
-      }
-      else {
-        this._renderViaCufon(ctx);
-      }
-    },
-
-    /**
-     * @private
-     * @param {CanvasRenderingContext2D} ctx Context to render on
-     */
-    _renderViaNative: function(ctx) {
-      var textLines = this._getTextLines();
-
-      this._setTextStyles(ctx);
-
-      this.width = this._getTextWidth(ctx, textLines);
-      this.height = this._getTextHeight(ctx, textLines);
-
       this.clipTo && fabric.util.clipContext(this, ctx);
 
-      this._renderTextBackground(ctx, textLines);
-      this._translateForTextAlign(ctx);
-      this._renderText(ctx, textLines);
+      this._renderTextBackground(ctx);
+      this._renderText(ctx);
 
-      if (this.textAlign !== 'left' && this.textAlign !== 'justify') {
-        ctx.restore();
-      }
-
-      this._renderTextDecoration(ctx, textLines);
+      this._renderTextDecoration(ctx);
       this.clipTo && ctx.restore();
-
-      this._setBoundaries(ctx, textLines);
-      this._totalLineHeight = 0;
     },
 
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    _renderText: function(ctx, textLines) {
+    _renderText: function(ctx) {
       ctx.save();
+      this._translateForTextAlign(ctx);
       this._setOpacity(ctx);
       this._setShadow(ctx);
       this._setupCompositeOperation(ctx);
-      this._renderTextFill(ctx, textLines);
-      this._renderTextStroke(ctx, textLines);
+      this._renderTextFill(ctx);
+      this._renderTextStroke(ctx);
       this._restoreCompositeOperation(ctx);
       this._removeShadow(ctx);
       ctx.restore();
@@ -407,29 +384,7 @@
      */
     _translateForTextAlign: function(ctx) {
       if (this.textAlign !== 'left' && this.textAlign !== 'justify') {
-        ctx.save();
         ctx.translate(this.textAlign === 'center' ? (this.width / 2) : this.width, 0);
-      }
-    },
-
-    /**
-     * @private
-     * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Array} textLines Array of all text lines
-     */
-    _setBoundaries: function(ctx, textLines) {
-      this._boundaries = [ ];
-
-      for (var i = 0, len = textLines.length; i < len; i++) {
-
-        var lineWidth = this._getLineWidth(ctx, textLines[i]),
-            lineLeftOffset = this._getLineLeftOffset(lineWidth);
-
-        this._boundaries.push({
-          height: this.fontSize * this.lineHeight,
-          width: lineWidth,
-          left: lineLeftOffset
-        });
       }
     },
 
@@ -438,8 +393,6 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _setTextStyles: function(ctx) {
-      this._setFillStyles(ctx);
-      this._setStrokeStyles(ctx);
       ctx.textBaseline = 'alphabetic';
       if (!this.skipTextAlign) {
         ctx.textAlign = this.textAlign;
@@ -450,24 +403,22 @@
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Array} textLines Array of all text lines
      * @return {Number} Height of fabric.Text object
      */
-    _getTextHeight: function(ctx, textLines) {
-      return this.fontSize * textLines.length * this.lineHeight;
+    _getTextHeight: function() {
+      return this._textLines.length * this._getHeightOfLine();
     },
 
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Array} textLines Array of all text lines
      * @return {Number} Maximum width of fabric.Text object
      */
-    _getTextWidth: function(ctx, textLines) {
-      var maxWidth = ctx.measureText(textLines[0] || '|').width;
+    _getTextWidth: function(ctx) {
+      var maxWidth = this._getLineWidth(ctx, 0);
 
-      for (var i = 1, len = textLines.length; i < len; i++) {
-        var currentLineWidth = ctx.measureText(textLines[i]).width;
+      for (var i = 1, len = this._textLines.length; i < len; i++) {
+        var currentLineWidth = this._getLineWidth(ctx, i);
         if (currentLineWidth > maxWidth) {
           maxWidth = currentLineWidth;
         }
@@ -498,7 +449,7 @@
      */
     _renderTextLine: function(method, ctx, line, left, top, lineIndex) {
       // lift the line by quarter of fontSize
-      top -= this.fontSize / 4;
+      top -= this.fontSize * this._fontSizeFraction;
 
       // short-circuit
       if (this.textAlign !== 'justify') {
@@ -506,13 +457,12 @@
         return;
       }
 
-      var lineWidth = ctx.measureText(line).width,
+      var lineWidth = this._getLineWidth(ctx, lineIndex),
           totalWidth = this.width;
-
-      if (totalWidth > lineWidth) {
+      if (totalWidth >= lineWidth) {
         // stretch the line
         var words = line.split(/\s+/),
-            wordsWidth = ctx.measureText(line.replace(/\s+/g, '')).width,
+            wordsWidth = this._getWidthOfWords(ctx, line, lineIndex),
             widthDiff = totalWidth - wordsWidth,
             numSpaces = words.length - 2,
             spaceWidth = widthDiff / numSpaces,
@@ -526,6 +476,15 @@
       else {
         this._renderChars(method, ctx, line, left, top, lineIndex);
       }
+    },
+
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Number} line
+     */
+    _getWidthOfWords: function (ctx, line) {
+      return ctx.measureText(line.replace(/\s+/g, '')).width;
     },
 
     /**
@@ -547,28 +506,27 @@
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Array} textLines Array of all text lines
      */
-    _renderTextFill: function(ctx, textLines) {
+    _renderTextFill: function(ctx) {
       if (!this.fill && !this._skipFillStrokeCheck) {
         return;
       }
 
-      this._boundaries = [ ];
       var lineHeights = 0;
 
-      for (var i = 0, len = textLines.length; i < len; i++) {
-        var heightOfLine = this._getHeightOfLine(ctx, i, textLines);
-        lineHeights += heightOfLine;
+      for (var i = 0, len = this._textLines.length; i < len; i++) {
+        var heightOfLine = this._getHeightOfLine(ctx, i),
+            maxHeight = heightOfLine / this.lineHeight;
 
         this._renderTextLine(
           'fillText',
           ctx,
-          textLines[i],
+          this._textLines[i],
           this._getLeftOffset(),
-          this._getTopOffset() + lineHeights,
+          this._getTopOffset() + lineHeights + maxHeight,
           i
         );
+        lineHeights += heightOfLine;
       }
       if (this.shadow && !this.shadow.affectStroke) {
         this._removeShadow(ctx);
@@ -578,9 +536,8 @@
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Array} textLines Array of all text lines
      */
-    _renderTextStroke: function(ctx, textLines) {
+    _renderTextStroke: function(ctx) {
       if ((!this.stroke || this.strokeWidth === 0) && !this._skipFillStrokeCheck) {
         return;
       }
@@ -588,6 +545,7 @@
       var lineHeights = 0;
 
       ctx.save();
+
       if (this.strokeDashArray) {
         // Spec requires the concatenation of two copies the dash list when the number of elements is odd
         if (1 & this.strokeDashArray.length) {
@@ -597,25 +555,26 @@
       }
 
       ctx.beginPath();
-      for (var i = 0, len = textLines.length; i < len; i++) {
-        var heightOfLine = this._getHeightOfLine(ctx, i, textLines);
-        lineHeights += heightOfLine;
+      for (var i = 0, len = this._textLines.length; i < len; i++) {
+        var heightOfLine = this._getHeightOfLine(ctx, i),
+            maxHeight = heightOfLine / this.lineHeight;
 
         this._renderTextLine(
           'strokeText',
           ctx,
-          textLines[i],
+          this._textLines[i],
           this._getLeftOffset(),
-          this._getTopOffset() + lineHeights,
+          this._getTopOffset() + lineHeights + maxHeight,
           i
         );
+        lineHeights += heightOfLine;
       }
       ctx.closePath();
       ctx.restore();
     },
 
     _getHeightOfLine: function() {
-      return this.fontSize * this.lineHeight;
+      return this.fontSize * this._fontSizeMult * this.lineHeight;
     },
 
     /**
@@ -623,9 +582,9 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      * @param {Array} textLines Array of all text lines
      */
-    _renderTextBackground: function(ctx, textLines) {
+    _renderTextBackground: function(ctx) {
       this._renderTextBoxBackground(ctx);
-      this._renderTextLinesBackground(ctx, textLines);
+      this._renderTextLinesBackground(ctx);
     },
 
     /**
@@ -653,9 +612,9 @@
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Array} textLines Array of all text lines
      */
-    _renderTextLinesBackground: function(ctx, textLines) {
+    _renderTextLinesBackground: function(ctx) {
+      var lineTopOffset = 0, heightOfLine = this._getHeightOfLine();
       if (!this.textBackgroundColor) {
         return;
       }
@@ -663,20 +622,21 @@
       ctx.save();
       ctx.fillStyle = this.textBackgroundColor;
 
-      for (var i = 0, len = textLines.length; i < len; i++) {
+      for (var i = 0, len = this._textLines.length; i < len; i++) {
 
-        if (textLines[i] !== '') {
+        if (this._textLines[i] !== '') {
 
-          var lineWidth = this._getLineWidth(ctx, textLines[i]),
+          var lineWidth = this._getLineWidth(ctx, i),
               lineLeftOffset = this._getLineLeftOffset(lineWidth);
 
           ctx.fillRect(
             this._getLeftOffset() + lineLeftOffset,
-            this._getTopOffset() + (i * this.fontSize * this.lineHeight),
+            this._getTopOffset() + lineTopOffset,
             lineWidth,
-            this.fontSize * this.lineHeight
+            this.fontSize * this._fontSizeMult
           );
         }
+        lineTopOffset += heightOfLine;
       }
       ctx.restore();
     },
@@ -698,59 +658,84 @@
 
     /**
      * @private
-     * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {String} line Text line
-     * @return {Number} Line width
      */
-    _getLineWidth: function(ctx, line) {
-      return this.textAlign === 'justify'
-        ? this.width
-        : ctx.measureText(line).width;
+    _clearCache: function() {
+      this.__lineWidths = [ ];
+      this.__lineHeights = [ ];
+      this.__lineOffsets = [ ];
     },
+
     /**
-     * Splits current text on newlines and returns the array of 'lines' in the IText.
-     * @returns {Array} Array of lines in this IText.
+     * @private
      */
-    _getTextLines: function() {
-      return this.text.split(this._reNewline);
+    _shouldClearCache: function() {
+      var shouldClear = false;
+      for (var prop in this._dimensionAffectingProps) {
+        if (this['__' + prop] !== this[prop]) {
+          this['__' + prop] = this[prop];
+          shouldClear = true;
+        }
+      }
+      return shouldClear;
     },
+
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Array} textLines Array of all text lines
+     * @return {Number} Line width
      */
-    _renderTextDecoration: function(ctx, textLines) {
+    _getLineWidth: function(ctx, lineIndex) {
+      if (this.__lineWidths[lineIndex]) {
+        return this.__lineWidths[lineIndex];
+      }
+      this.__lineWidths[lineIndex] = ctx.measureText(this._textLines[lineIndex]).width;
+      return this.__lineWidths[lineIndex];
+    },
+
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
+    _renderTextDecoration: function(ctx) {
       if (!this.textDecoration) {
         return;
       }
 
-      // var halfOfVerticalBox = this.originY === 'top' ? 0 : this._getTextHeight(ctx, textLines) / 2;
-      var halfOfVerticalBox = this._getTextHeight(ctx, textLines) / 2,
-          _this = this;
+      var halfOfVerticalBox = this.height / 2,
+          _this = this, offsets = [];
 
       /** @ignore */
-      function renderLinesAtOffset(offset) {
-        for (var i = 0, len = textLines.length; i < len; i++) {
+      function renderLinesAtOffset(offsets) {
+        var i, lineHeight = 0, len, j, oLen;
+        for (i = 0, len = _this._textLines.length; i < len; i++) {
 
-          var lineWidth = _this._getLineWidth(ctx, textLines[i]),
-              lineLeftOffset = _this._getLineLeftOffset(lineWidth);
+          var lineWidth = _this._getLineWidth(ctx, i),
+              lineLeftOffset = _this._getLineLeftOffset(lineWidth),
+              heightOfLine = _this._getHeightOfLine(ctx, i);
 
-          ctx.fillRect(
-            _this._getLeftOffset() + lineLeftOffset,
-            ~~((offset + (i * _this._getHeightOfLine(ctx, i, textLines))) - halfOfVerticalBox),
-            lineWidth,
-            1);
+          for (j = 0, oLen = offsets.length; j < oLen; j++) {
+            ctx.fillRect(
+              _this._getLeftOffset() + lineLeftOffset,
+              lineHeight + (_this._fontSizeMult - 1 + offsets[j] ) * _this.fontSize - halfOfVerticalBox,
+              lineWidth,
+              _this.fontSize / 15);
+          }
+          lineHeight += heightOfLine;
         }
       }
 
       if (this.textDecoration.indexOf('underline') > -1) {
-        renderLinesAtOffset(this.fontSize * this.lineHeight);
+        offsets.push(0.85); // 1 - 3/16
       }
       if (this.textDecoration.indexOf('line-through') > -1) {
-        renderLinesAtOffset(this.fontSize * this.lineHeight - this.fontSize / 2);
+        offsets.push(0.43);
       }
       if (this.textDecoration.indexOf('overline') > -1) {
-        renderLinesAtOffset(this.fontSize * this.lineHeight - this.fontSize);
+        offsets.push(-0.12);
+      }
+
+      if (offsets.length > 0) {
+        renderLinesAtOffset(offsets);
       }
     },
 
@@ -778,23 +763,32 @@
       }
 
       ctx.save();
+      this._setTextStyles(ctx);
+
+      if (this._shouldClearCache()) {
+        this._initDimensions(ctx);
+      }
       if (!noTransform) {
         this.transform(ctx);
       }
-
-      var isInPathGroup = this.group && this.group.type === 'path-group';
-
-      if (isInPathGroup) {
-        ctx.translate(-this.group.width/2, -this.group.height/2);
-      }
+      this._setStrokeStyles(ctx);
+      this._setFillStyles(ctx);
       if (this.transformMatrix) {
         ctx.transform.apply(ctx, this.transformMatrix);
       }
-      if (isInPathGroup) {
+      if (this.group && this.group.type === 'path-group') {
         ctx.translate(this.left, this.top);
       }
       this._render(ctx);
       ctx.restore();
+    },
+
+    /**
+     * Returns the text as an array of lines.
+     * @returns {Array} Lines in the text
+     */
+    _splitTextIntoLines: function() {
+      return this.text.split(this._reNewline);
     },
 
     /**
@@ -812,9 +806,7 @@
         lineHeight:           this.lineHeight,
         textDecoration:       this.textDecoration,
         textAlign:            this.textAlign,
-        path:                 this.path,
-        textBackgroundColor:  this.textBackgroundColor,
-        useNative:            this.useNative
+        textBackgroundColor:  this.textBackgroundColor
       });
       if (!this.includeDefaultValues) {
         this._removeDefaultValues(object);
@@ -829,16 +821,10 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var markup = [ ],
-          textLines = this._getTextLines(),
-          offsets = this._getSVGLeftTopOffsets(textLines),
-          textAndBg = this._getSVGTextAndBg(offsets.lineTop, offsets.textLeft, textLines),
-          shadowSpans = this._getSVGShadows(offsets.lineTop, textLines);
-
-      // move top offset by an ascent
-      offsets.textTop += (this._fontAscent ? ((this._fontAscent / 5) * this.lineHeight) : 0);
-
-      this._wrapSVGTextAndBg(markup, textAndBg, shadowSpans, offsets);
+      var markup = this._createBaseSVGMarkup(),
+          offsets = this._getSVGLeftTopOffsets(this.ctx),
+          textAndBg = this._getSVGTextAndBg(offsets.textTop, offsets.textLeft);
+      this._wrapSVGTextAndBg(markup, textAndBg);
 
       return reviver ? reviver(markup.join('')) : markup.join('');
     },
@@ -846,19 +832,14 @@
     /**
      * @private
      */
-    _getSVGLeftTopOffsets: function(textLines) {
-      var lineTop = this.useNative
-            ? this.fontSize * this.lineHeight
-            : (-this._fontAscent - ((this._fontAscent / 5) * this.lineHeight)),
-
-          textLeft = -(this.width/2),
-          textTop = this.useNative
-            ? (this.fontSize * this.lineHeight - 0.25 * this.fontSize) // to lift by 1  / 4 of font height.
-            : (this.height/2) - (textLines.length * this.fontSize) - this._totalLineHeight;
+    _getSVGLeftTopOffsets: function(ctx) {
+      var lineTop = this._getHeightOfLine(ctx, 0),
+          textLeft = -this.width / 2,
+          textTop = 0;
 
       return {
         textLeft: textLeft + (this.group && this.group.type === 'path-group' ? this.left : 0),
-        textTop: textTop + (this.group && this.group.type === 'path-group' ? this.top : 0),
+        textTop: textTop + (this.group && this.group.type === 'path-group' ? -this.top : 0),
         lineTop: lineTop
       };
     },
@@ -866,99 +847,43 @@
     /**
      * @private
      */
-    _wrapSVGTextAndBg: function(markup, textAndBg, shadowSpans, offsets) {
+    _wrapSVGTextAndBg: function(markup, textAndBg) {
       markup.push(
-        '<g transform="', this.getSvgTransform(), this.getSvgTransformMatrix(), '">\n',
+        '\t<g transform="', this.getSvgTransform(), this.getSvgTransformMatrix(), '">\n',
           textAndBg.textBgRects.join(''),
-          '<text ',
+          '\t\t<text ',
             (this.fontFamily ? 'font-family="' + this.fontFamily.replace(/"/g, '\'') + '" ': ''),
             (this.fontSize ? 'font-size="' + this.fontSize + '" ': ''),
             (this.fontStyle ? 'font-style="' + this.fontStyle + '" ': ''),
             (this.fontWeight ? 'font-weight="' + this.fontWeight + '" ': ''),
             (this.textDecoration ? 'text-decoration="' + this.textDecoration + '" ': ''),
-            'style="', this.getSvgStyles(), '" ',
-            /* svg starts from left/bottom corner so we normalize height */
-            'transform="translate(', toFixed(offsets.textLeft, 2), ' ', toFixed(offsets.textTop, 2), ')">',
-            shadowSpans.join(''),
+            'style="', this.getSvgStyles(), '" >',
             textAndBg.textSpans.join(''),
           '</text>\n',
-        '</g>\n'
+        '\t</g>\n'
       );
     },
 
     /**
      * @private
-     * @param {Number} lineHeight
-     * @param {Array} textLines Array of all text lines
-     * @return {Array}
-     */
-    _getSVGShadows: function(lineHeight, textLines) {
-      var shadowSpans = [],
-          i, len,
-          lineTopOffsetMultiplier = 1;
-
-      if (!this.shadow || !this._boundaries) {
-        return shadowSpans;
-      }
-
-      for (i = 0, len = textLines.length; i < len; i++) {
-        if (textLines[i] !== '') {
-          var lineLeftOffset = (this._boundaries && this._boundaries[i]) ? this._boundaries[i].left : 0;
-          shadowSpans.push(
-            '<tspan x="',
-            toFixed((lineLeftOffset + lineTopOffsetMultiplier) + this.shadow.offsetX, 2),
-            ((i === 0 || this.useNative) ? '" y' : '" dy'), '="',
-            toFixed(this.useNative
-              ? ((lineHeight * i) - this.height / 2 + this.shadow.offsetY)
-              : (lineHeight + (i === 0 ? this.shadow.offsetY : 0)), 2),
-            '" ',
-            this._getFillAttributes(this.shadow.color), '>',
-            fabric.util.string.escapeXml(textLines[i]),
-          '</tspan>');
-          lineTopOffsetMultiplier = 1;
-        }
-        else {
-          // in some environments (e.g. IE 7 & 8) empty tspans are completely ignored, using a lineTopOffsetMultiplier
-          // prevents empty tspans
-          lineTopOffsetMultiplier++;
-        }
-      }
-
-      return shadowSpans;
-    },
-
-    /**
-     * @private
-     * @param {Number} lineHeight
+     * @param {Number} textTopOffset Text top offset
      * @param {Number} textLeftOffset Text left offset
-     * @param {Array} textLines Array of all text lines
      * @return {Object}
      */
-    _getSVGTextAndBg: function(lineHeight, textLeftOffset, textLines) {
+    _getSVGTextAndBg: function(textTopOffset, textLeftOffset) {
       var textSpans = [ ],
           textBgRects = [ ],
-          lineTopOffsetMultiplier = 1;
-
+          height = 0;
       // bounding-box background
       this._setSVGBg(textBgRects);
 
       // text and text-background
-      for (var i = 0, len = textLines.length; i < len; i++) {
-        if (textLines[i] !== '') {
-          this._setSVGTextLineText(textLines[i], i, textSpans, lineHeight, lineTopOffsetMultiplier, textBgRects);
-          lineTopOffsetMultiplier = 1;
+      for (var i = 0, len = this._textLines.length; i < len; i++) {
+        if (this.textBackgroundColor) {
+          this._setSVGTextLineBg(textBgRects, i, textLeftOffset, textTopOffset, height);
         }
-        else {
-          // in some environments (e.g. IE 7 & 8) empty tspans are completely ignored, using a lineTopOffsetMultiplier
-          // prevents empty tspans
-          lineTopOffsetMultiplier++;
-        }
-
-        if (!this.textBackgroundColor || !this._boundaries) {
-          continue;
-        }
-
-        this._setSVGTextLineBg(textBgRects, i, textLeftOffset, lineHeight);
+        this._setSVGTextLineText(i, textSpans, height, textLeftOffset, textTopOffset, textBgRects);
+        height += this._getHeightOfLine(this.ctx, i);
       }
 
       return {
@@ -967,56 +892,52 @@
       };
     },
 
-    _setSVGTextLineText: function(textLine, i, textSpans, lineHeight, lineTopOffsetMultiplier) {
-      var lineLeftOffset = (this._boundaries && this._boundaries[i])
-        ? toFixed(this._boundaries[i].left, 2)
-        : 0;
-
+    _setSVGTextLineText: function(i, textSpans, height, textLeftOffset, textTopOffset) {
+      var yPos = this.fontSize * (this._fontSizeMult - this._fontSizeFraction)
+        - textTopOffset + height - this.height / 2;
       textSpans.push(
         '<tspan x="',
-          lineLeftOffset, '" ',
-          (i === 0 || this.useNative ? 'y' : 'dy'), '="',
-          toFixed(this.useNative
-            ? ((lineHeight * i) - this.height / 2)
-            : (lineHeight * lineTopOffsetMultiplier), 2), '" ',
+          toFixed(textLeftOffset + this._getLineLeftOffset(this.__lineWidths[i]), 4), '" ',
+          'y="',
+          toFixed(yPos, 4),
+          '" ',
           // doing this on <tspan> elements since setting opacity
           // on containing <text> one doesn't work in Illustrator
           this._getFillAttributes(this.fill), '>',
-          fabric.util.string.escapeXml(textLine),
+          fabric.util.string.escapeXml(this._textLines[i]),
         '</tspan>'
       );
     },
 
-    _setSVGTextLineBg: function(textBgRects, i, textLeftOffset, lineHeight) {
+    _setSVGTextLineBg: function(textBgRects, i, textLeftOffset, textTopOffset, height) {
       textBgRects.push(
-        '<rect ',
+        '\t\t<rect ',
           this._getFillAttributes(this.textBackgroundColor),
           ' x="',
-          toFixed(textLeftOffset + this._boundaries[i].left, 2),
+          toFixed(textLeftOffset + this._getLineLeftOffset(this.__lineWidths[i]), 4),
           '" y="',
-          /* an offset that seems to straighten things out */
-          toFixed((lineHeight * i) - this.height / 2, 2),
+          toFixed(height - this.height / 2, 4),
           '" width="',
-          toFixed(this._boundaries[i].width, 2),
+          toFixed(this.__lineWidths[i], 4),
           '" height="',
-          toFixed(this._boundaries[i].height, 2),
+          toFixed(this._getHeightOfLine(this.ctx, i) / this.lineHeight, 4),
         '"></rect>\n');
     },
 
     _setSVGBg: function(textBgRects) {
-      if (this.backgroundColor && this._boundaries) {
+      if (this.backgroundColor) {
         textBgRects.push(
-          '<rect ',
+          '\t\t<rect ',
             this._getFillAttributes(this.backgroundColor),
             ' x="',
-            toFixed(-this.width / 2, 2),
+            toFixed(-this.width / 2, 4),
             '" y="',
-            toFixed(-this.height / 2, 2),
+            toFixed(-this.height / 2, 4),
             '" width="',
-            toFixed(this.width, 2),
+            toFixed(this.width, 4),
             '" height="',
-            toFixed(this.height, 2),
-          '"></rect>');
+            toFixed(this.height, 4),
+          '"></rect>\n');
       }
     },
 
@@ -1045,9 +966,6 @@
      * @chainable
      */
     _set: function(key, value) {
-      if (key === 'fontFamily' && this.path) {
-        this.path = this.path.replace(/(.*?)([^\/]*)(\.font\.js)/, '$1' + value + '$3');
-      }
       this.callSuper('_set', key, value);
 
       if (key in this._dimensionAffectingProps) {
@@ -1113,8 +1031,8 @@
     if (!options.originX) {
       options.originX = 'left';
     }
-    options.top += options.fontSize / 4;
-    var text = new fabric.Text(element.textContent, options),
+    var textContent = element.textContent.replace(/^\s+|\s+$|\n+/g, '').replace(/\s+/g, ' '),
+        text = new fabric.Text(textContent, options),
         /*
           Adjust positioning:
             x/y attributes in SVG correspond to the bottom-left corner of text bounding box
@@ -1130,7 +1048,7 @@
     }
     text.set({
       left: text.getLeft() + offX,
-      top: text.getTop() - text.getHeight() / 2
+      top: text.getTop() - text.getHeight() / 2 + text.fontSize * (0.18 + text._fontSizeFraction) /* 0.3 is the old lineHeight */
     });
 
     return text;

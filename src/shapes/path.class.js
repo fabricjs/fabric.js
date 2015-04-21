@@ -96,23 +96,45 @@
         this.path = this._parsePath();
       }
 
-      var calcDim = this._parseDimensions();
-      this.minX = calcDim.left;
-      this.minY = calcDim.top;
-      this.width = calcDim.width;
-      this.height = calcDim.height;
-      calcDim.left += this.originX === 'center' ? this.width / 2 : this.originX === 'right' ? this.width : 0;
-      calcDim.top += this.originY === 'center' ? this.height / 2 : this.originY === 'bottom' ? this.height : 0;
-      this.top = this.top || calcDim.top;
-      this.left = this.left || calcDim.left;
-      this.pathOffset = this.pathOffset || {
-        x: this.minX + this.width / 2,
-        y: this.minY + this.height / 2
-      };
+      this._setPositionDimensions(options);
 
       if (options.sourcePath) {
         this.setSourcePath(options.sourcePath);
       }
+    },
+
+    /**
+     * @private
+     * @param {Object} options Options object
+     */
+    _setPositionDimensions: function(options) {
+      var calcDim = this._parseDimensions();
+
+      this.minX = calcDim.left;
+      this.minY = calcDim.top;
+      this.width = calcDim.width;
+      this.height = calcDim.height;
+
+      if (typeof options.left === 'undefined') {
+        this.left = calcDim.left + (this.originX === 'center'
+          ? this.width / 2
+          : this.originX === 'right'
+            ? this.width
+            : 0);
+      }
+
+      if (typeof options.top === 'undefined') {
+        this.top = calcDim.top + (this.originY === 'center'
+          ? this.height / 2
+          : this.originY === 'bottom'
+            ? this.height
+            : 0);
+      }
+
+      this.pathOffset = this.pathOffset || {
+        x: this.minX + this.width / 2,
+        y: this.minY + this.height / 2
+      };
     },
 
     /**
@@ -426,42 +448,6 @@
       }
       this._renderFill(ctx);
       this._renderStroke(ctx);
-    },
-
-    /**
-     * Renders path on a specified context
-     * @param {CanvasRenderingContext2D} ctx context to render path on
-     * @param {Boolean} [noTransform] When true, context is not transformed
-     */
-    render: function(ctx, noTransform) {
-      // do not render if width/height are zeros or object is not visible
-      if (!this.visible) {
-        return;
-      }
-
-      ctx.save();
-
-      this._setupCompositeOperation(ctx);
-      if (!noTransform) {
-        this.transform(ctx);
-      }
-      this._setStrokeStyles(ctx);
-      this._setFillStyles(ctx);
-      if (this.group && this.group.type === 'path-group') {
-        ctx.translate(-this.group.width / 2, -this.group.height / 2);
-      }
-      if (this.transformMatrix) {
-        ctx.transform.apply(ctx, this.transformMatrix);
-      }
-      this._setOpacity(ctx);
-      this._setShadow(ctx);
-      this.clipTo && fabric.util.clipContext(this, ctx);
-      this._render(ctx, noTransform);
-      this.clipTo && ctx.restore();
-      this._removeShadow(ctx);
-      this._restoreCompositeOperation(ctx);
-
-      ctx.restore();
     },
 
     /**

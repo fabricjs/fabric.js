@@ -228,7 +228,7 @@
    * @private
    */
   function isValidRadius(attributes) {
-    return (('radius' in attributes) && (attributes.radius > 0));
+    return (('radius' in attributes) && (attributes.radius >= 0));
   }
   /* _FROM_SVG_END_ */
 
