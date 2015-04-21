@@ -743,13 +743,23 @@
     },
 
     /**
+     * Get the canvas reference of the object
+     */
+    getCanvas: function() {
+      return this.group ? this.group.getCanvas() : this.canvas;
+    },
+
+    /**
      * Transforms context when rendering an object
      * @param {CanvasRenderingContext2D} ctx Context
      * @param {Boolean} fromLeft When true, context is transformed to object's top/left corner. This is used when rendering text on Node
      */
     transform: function(ctx, fromLeft) {
-      if (this.group && this.canvas.preserveObjectStacking && this.group === this.canvas._activeGroup) {
-        this.group.transform(ctx);
+      if (this.group) {
+        var canvas = this.getCanvas();
+        if (canvas.preserveObjectStacking && this.group === canvas._activeGroup) {
+          this.group.transform(ctx);
+        }
       }
       var center = fromLeft ? this._getLeftTopCoords() : this.getCenterPoint();
       ctx.translate(center.x, center.y);
