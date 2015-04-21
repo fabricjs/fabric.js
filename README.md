@@ -241,7 +241,7 @@ Follow [@fabric.js](http://twitter.com/fabricjs) or [@kangax](http://twitter.com
 
 Questions, suggestions — [fabric.js on Google Groups](http://groups.google.com/group/fabricjs).
 
-See [Fabric questions on Stackoverflow](stackoverflow.com/questions/tagged/fabricjs),
+See [Fabric questions on Stackoverflow](http://stackoverflow.com/questions/tagged/fabricjs),
 Fabric snippets on [jsfiddle](http://jsfiddle.net/user/fabricjs/fiddles/)
 or [codepen.io](http://codepen.io/tag/fabricjs).
 

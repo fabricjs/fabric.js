@@ -328,7 +328,7 @@
         ctx = fabric.util.createCanvasElement().getContext('2d');
         this._setTextStyles(ctx);
       }
-      this._textLines = this._splitTextIntoLines(ctx);
+      this._textLines = this._splitTextIntoLines();
       this._clearCache();
       var currentTextAlign = this.textAlign;
       this.textAlign = 'left';
@@ -753,21 +753,6 @@
     },
 
     /**
-     * Gets called in the render() function, and clears cache and recalculates
-     * text lines and dimensions if needed.
-     * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @private
-     */
-    _updateDimensionsDuringRender: function(ctx) {
-      if (this._shouldClearCache()) {
-        this._clearCache();
-        this._textLines = this._splitTextIntoLines(ctx);
-        this.width = this._getTextWidth(ctx);
-        this.height = this._getTextHeight(ctx);
-      }
-    },
-
-    /**
      * Renders text instance on a specified context
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
@@ -780,7 +765,9 @@
       ctx.save();
       this._setTextStyles(ctx);
 
-      this._updateDimensionsDuringRender(ctx);
+      if (this._shouldClearCache()) {
+        this._initDimensions(ctx);
+      }
       if (!noTransform) {
         this.transform(ctx);
       }

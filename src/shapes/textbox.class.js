@@ -46,7 +46,7 @@
            lockUniScaling: false,
            lockScalingY: true,
            lockScalingFlip: true,
-           hasBorders: true || options.hasBorders
+           hasBorders: true
          });
          this.setControlsVisibility(fabric.Textbox.getTextboxControlVisibility());
 
@@ -55,17 +55,23 @@
        },
        /**
         * Unlike superclass's version of this function, Textbox does not update
-        * its width and height here.
+        * its width here.
+        * @param {CanvasRenderingContext2D} ctx Context to use for measurements
+        * @private
         * @override
         */
-       _initDimensions: function() {
+       _initDimensions: function(ctx) {
         if (this.__skipDimension) {
           return;
         }
-        this._clearCache();
-
+        
+        if (!ctx) {
+          ctx = this.ctx;
+          this._setTextStyles(ctx);
+        }
         this._textLines = this._splitTextIntoLines();
-        this._setTextStyles(this.ctx);
+        this._clearCache();
+        this.height = this._getTextHeight(ctx);
       },
        /**
         * Wraps text using the 'width' property of Textbox. First this function
@@ -105,7 +111,7 @@
 
              /*
               * If the textbox's width is less than the widest letter.
-              * TODO: Performance improvement - catch the width of W whenever
+              * TODO: Performance improvement - cache the width of W whenever
               * fontSize changes.
               */
              if (maxWidth <= ctx.measureText('W').width) {
@@ -178,42 +184,6 @@
        },
 
        /**
-        * Overrides and disables refreshing of dimensions during render because
-        * a Textbox's width is specified by the user and does not depend on text
-        * content.
-        * @param {CanvasRenderingContext2D} ctx Context to render on
-        * @private
-        * @override
-        */
-       _updateDimensionsDuringRender: function(ctx) {
-         if (this._shouldClearCache()) {
-          this._clearCache();
-          this._textLines = this._splitTextIntoLines(ctx);
-          this.height = this._getTextHeight(ctx);
-        }
-       },
-       /**
-        * Overrides the superclass version of this function. The only change is
-        * that this function does not change the width of the Textbox. That is
-        * done manually by the user.
-        * @param {CanvasRenderingContext2D} ctx Context to render on
-        */
-       _render: function(ctx) {
-
-         this.clipTo && fabric.util.clipContext(this, ctx);
-
-         this._renderTextBackground(ctx);
-         this._translateForTextAlign(ctx);
-         this._renderText(ctx);
-
-         if (this.textAlign !== 'left' && this.textAlign !== 'justify') {
-           ctx.restore();
-         }
-
-         this._renderTextDecoration(ctx);
-         this.clipTo && ctx.restore();
-       },
-       /**
         * Returns 2d representation (lineIndex and charIndex) of cursor (or selection start).
         * Overrides the superclass function to take into account text wrapping.
         * @param {Number} selectionStart Optional index. When not given, current selectionStart is used.
@@ -268,21 +238,17 @@
        },
        /**
         * Overrides superclass function and uses text wrapping data to get cursor
-        * boundary offsets.
-        * @param {Array} chars
-        * @param {String} typeOfBoundaries
+        * boundary offsets instead of the array of chars.
+        * @param {Array} chars Unused
+        * @param {String} typeOfBoundaries Can be 'cursor' or 'selection'
         * @returns {Object} Object with 'top', 'left', and 'lineLeft' properties set.
         */
        _getCursorBoundariesOffsets: function(chars, typeOfBoundaries) {
-         var leftOffset = 0,
+         var topOffset = 0,
+                 leftOffset = 0,
                  cursorLocation = this.get2DCursorLocation(),
-                 topOffset = typeOfBoundaries === 'cursor'
-                 // selection starts at the very top of the line,
-                 // whereas cursor starts at the padding created by line height
-                 ? ((cursorLocation.lineIndex !== 0 ? this.callSuper('_getHeightOfLine', this.ctx, 0)
-                         : this._getHeightOfLine(this.ctx, 0)) -
-                         this.getCurrentCharFontSize(cursorLocation.lineIndex, cursorLocation.charIndex))
-                 : 0, lineChars = this._textLines[cursorLocation.lineIndex].split('');
+                 lineChars = this._textLines[cursorLocation.lineIndex].split(''),
+                 lineLeftOffset = this._getCachedLineOffset(cursorLocation.lineIndex);
 
          for (var i = 0; i < cursorLocation.charIndex; i++) {
            leftOffset += this._getWidthOfChar(this.ctx, lineChars[i], cursorLocation.lineIndex, i);
@@ -292,30 +258,16 @@
            topOffset += this._getHeightOfLine(this.ctx, i);
          }
 
-         var lineLeftOffset = this._getCachedLineOffset(cursorLocation.lineIndex);
-
-         this._clearCache();
+         if (typeOfBoundaries === 'cursor') {
+           topOffset += (1 - this._fontSizeFraction) * this._getHeightOfLine(this.ctx, cursorLocation.lineIndex) / this.lineHeight
+                   - this.getCurrentCharFontSize(cursorLocation.lineIndex, cursorLocation.charIndex) * (1 - this._fontSizeFraction);
+         }
 
          return {
            top: topOffset,
            left: leftOffset,
            lineLeft: lineLeftOffset
          };
-       },
-       /**
-        * Overrides super class' function and effects lineHeight behavior to not
-        * apply lineHeight to the first line, which is in accordance to its official
-        * typographic definition.
-        * @param {CanvasRenderingContext2D} ctx
-        * @param {Number} lineIndex
-        * @returns {Number}
-        */
-       _getHeightOfLine: function(ctx, lineIndex) {
-
-         if (lineIndex === 0) {
-           return this._getHeightOfChar(ctx, this._textLines[lineIndex][0], lineIndex, 0);
-         }
-         return this.callSuper('_getHeightOfLine', ctx, lineIndex, this._textLines);
        },
        /**
         * Returns object representation of an instance
