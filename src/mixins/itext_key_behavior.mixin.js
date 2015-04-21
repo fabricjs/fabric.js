@@ -19,10 +19,16 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         if (this.isEditing && this.canvas.getActiveObject() === this) {
           //The text's bounding rectangle, IN CANVAS SPACE (not fabric logical coordinates)
           var rect = this.getBoundingRect();
-          this.hiddenTextarea.style.top = rect.top + 'px';
-          this.hiddenTextarea.style.left = rect.left + 'px';
-          this.hiddenTextarea.style.width = rect.width + 'px';
-          this.hiddenTextarea.style.height = rect.height + 'px';
+
+          // Compute the scale transform between fabric coords and DOM coords
+          var canvasRect = this.canvas.lowerCanvasEl.getBoundingClientRect();
+          var xScale = canvasRect.width / this.canvas.width;
+          var yScale = canvasRect.height / this.canvas.height;
+
+          this.hiddenTextarea.style.top = rect.top * xScale + 'px';
+          this.hiddenTextarea.style.left = rect.left * yScale + 'px';
+          this.hiddenTextarea.style.width = rect.width * xScale + 'px';
+          this.hiddenTextarea.style.height = rect.height * yScale + 'px';
         }
       }.bind(this);
 
