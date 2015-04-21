@@ -902,7 +902,8 @@
             sortedObjects.push(object);
           }
         });
-        activeGroup._set('_objects', sortedObjects);
+        // forEachObject reverses the object, so we reverse again
+        activeGroup._set('_objects', , sortedObjects.reverse());
         this._draw(ctx, activeGroup);
       }
     },
