@@ -1143,7 +1143,7 @@
       }
     },
 
-    /*
+    /**
      * Restores the changed properties of instance
      * @private
      * @param {fabric.Object} [instance] the object to un-transform (gets mutated)
