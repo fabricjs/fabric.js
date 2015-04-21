@@ -21,9 +21,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
           var rect = this.getBoundingRect();
 
           // Compute the scale transform between fabric coords and DOM coords
-          var canvasRect = this.canvas.lowerCanvasEl.getBoundingClientRect();
-          var xScale = canvasRect.width / this.canvas.width;
-          var yScale = canvasRect.height / this.canvas.height;
+          var canvasRect = this.canvas.lowerCanvasEl.getBoundingClientRect(),
+            xScale = canvasRect.width / this.canvas.width,
+            yScale = canvasRect.height / this.canvas.height;
 
           this.hiddenTextarea.style.top = rect.top * xScale + 'px';
           this.hiddenTextarea.style.left = rect.left * yScale + 'px';
