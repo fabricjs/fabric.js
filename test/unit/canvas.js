@@ -863,7 +863,7 @@
     equal(canvas._objects[1], rect2);
     equal(canvas._objects[2], circle1);
     equal(canvas._objects[3], circle2);
-    var aGroup = new fabric.Group([ rect2, circle2, rect1, circle1 ]);c
+    var aGroup = new fabric.Group([ rect2, circle2, rect1, circle1 ]);
     // before rendering objects are ordered in insert order
     equal(aGroup._objects[0], rect2);
     equal(aGroup._objects[1], circle2);
