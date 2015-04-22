@@ -721,36 +721,6 @@
     },
 
     /**
-     * Given a context, renders an object on that context
-     * @param {CanvasRenderingContext2D} ctx Context to render object on
-     * @param {fabric.Object} object Object to render
-     * @private
-     */
-    _draw: function (ctx, object) {
-      if (!object) {
-        return;
-      }
-
-      ctx.save();
-      var v = this.viewportTransform;
-      ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
-      if (this._shouldRenderObject(object)) {
-        object.render(ctx);
-      }
-      ctx.restore();
-      if (!this.controlsAboveOverlay) {
-        object._renderControls(ctx);
-      }
-    },
-
-    _shouldRenderObject: function(object) {
-      if (!object) {
-        return false;
-      }
-      return (object !== this.getActiveGroup() || !this.preserveObjectStacking);
-    },
-
-    /**
      * @private
      * @param {fabric.Object} obj Object that was added
      */
@@ -827,7 +797,7 @@
      */
     renderAll: function (allOnTop) {
       var canvasToDrawOn = this[(allOnTop === true && this.interactive) ? 'contextTop' : 'contextContainer'],
-          activeGroup = this.getActiveGroup();
+          activeGroup = this.getActiveGroup(), objsToRender = [ ];
 
       if (this.contextTop && this.selection && !this._groupSelector) {
         this.clearContext(this.contextTop);
@@ -843,16 +813,33 @@
         fabric.util.clipContext(this, canvasToDrawOn);
       }
 
+      if (activeGroup && !this.preserveObjectStacking) {
+        this.forEachObject(function (object) {
+          if (!activeGroup.contains(object)) {
+            objsToRender.push(object);
+          }
+        });
+      }
+      else {
+        objsToRender = this._objects;
+      }
+
+      canvasToDrawOn.setTransform.apply(canvasToDrawOn, this.viewportTransform);
       this._renderBackground(canvasToDrawOn);
-      this._renderObjects(canvasToDrawOn, activeGroup);
-      this._renderActiveGroup(canvasToDrawOn, activeGroup);
+      this._renderObjects(canvasToDrawOn, objsToRender);
+      !this.preserveObjectStacking && this._renderObjects(canvasToDrawOn, [activeGroup]);
+      canvasToDrawOn.setTransform.apply(canvasToDrawOn, [1, 0, 0, 1, 0, 0]);
+      if (!this.controlsAboveOverlay && this.interactive) {
+        this.drawControls(canvasToDrawOn);
+      }
 
       if (this.clipTo) {
         canvasToDrawOn.restore();
       }
 
+      canvasToDrawOn.setTransform.apply(canvasToDrawOn, this.viewportTransform);
       this._renderOverlay(canvasToDrawOn);
-
+      canvasToDrawOn.setTransform.apply(canvasToDrawOn, [1, 0, 0, 1, 0, 0]);
       if (this.controlsAboveOverlay && this.interactive) {
         this.drawControls(canvasToDrawOn);
       }
@@ -861,49 +848,15 @@
 
       return this;
     },
-
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {fabric.Group} activeGroup
+     * @param {Array} objects to render
      */
-    _renderObjects: function(ctx, activeGroup) {
+    _renderObjects: function(ctx, objects) {
       var i, length;
-
-      // fast path
-      if (!activeGroup || this.preserveObjectStacking) {
-        for (i = 0, length = this._objects.length; i < length; ++i) {
-          this._draw(ctx, this._objects[i]);
-        }
-      }
-      else {
-        for (i = 0, length = this._objects.length; i < length; ++i) {
-          if (this._objects[i] && !activeGroup.contains(this._objects[i])) {
-            this._draw(ctx, this._objects[i]);
-          }
-        }
-      }
-    },
-
-    /**
-     * @private
-     * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {fabric.Group} activeGroup
-     */
-    _renderActiveGroup: function(ctx, activeGroup) {
-
-      // delegate rendering to group selection (if one exists)
-      if (activeGroup) {
-
-        //Store objects in group preserving order, then replace
-        var sortedObjects = [];
-        this.forEachObject(function (object) {
-          if (activeGroup.contains(object)) {
-            sortedObjects.push(object);
-          }
-        });
-        activeGroup._set('objects', sortedObjects);
-        this._draw(ctx, activeGroup);
+      for (i = 0, length = objects.length; i < length; ++i) {
+        objects[i] && objects[i].render(ctx);
       }
     },
 
@@ -924,7 +877,7 @@
           this.height);
       }
       if (this.backgroundImage) {
-        this._draw(ctx, this.backgroundImage);
+        this.backgroundImage.render(ctx);
       }
     },
 
@@ -945,7 +898,7 @@
           this.height);
       }
       if (this.overlayImage) {
-        this._draw(ctx, this.overlayImage);
+        this.overlayImage.render(ctx);
       }
     },
 

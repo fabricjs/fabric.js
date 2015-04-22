@@ -293,8 +293,8 @@
 
       target.hasBorders = target.transparentCorners = false;
 
-      this._draw(this.contextCache, target);
-
+      target.render(this.contextCache);
+      target._renderControls(this.contextCache);
       target.hasBorders = hasBorders;
       target.transparentCorners = transparentCorners;
 
@@ -1111,18 +1111,11 @@
     drawControls: function(ctx) {
       var activeGroup = this.getActiveGroup();
       if (activeGroup) {
-        this._drawGroupControls(ctx, activeGroup);
+        activeGroup._renderControls(ctx);
       }
       else {
         this._drawObjectsControls(ctx);
       }
-    },
-
-    /**
-     * @private
-     */
-    _drawGroupControls: function(ctx, activeGroup) {
-      activeGroup._renderControls(ctx);
     },
 
     /**
