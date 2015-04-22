@@ -18,10 +18,10 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       var updateHiddenTextareaPosition = function () {
         if (this.isEditing && this.canvas.getActiveObject() === this) {
           //The text's bounding rectangle, IN CANVAS SPACE (not fabric logical coordinates)
-          var rect = this.getBoundingRect();
+          var rect = this.getBoundingRect(),
 
           // Compute the scale transform between fabric coords and DOM coords
-          var canvasRect = this.canvas.lowerCanvasEl.getBoundingClientRect(),
+            canvasRect = this.canvas.lowerCanvasEl.getBoundingClientRect(),
             xScale = canvasRect.width / this.canvas.width,
             yScale = canvasRect.height / this.canvas.height;
 
