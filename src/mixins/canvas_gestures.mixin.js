@@ -134,7 +134,7 @@
         t, lockScalingX, lockScalingY, null, target.get('lockScalingFlip'));
 
       target.setPositionByOrigin(constraintPosition, t.originX, t.originY);
-      
+
       this._fire('scaling', target, e);
     },
     /**
