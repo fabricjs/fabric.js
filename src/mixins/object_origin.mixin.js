@@ -241,7 +241,7 @@
      * @private
      */
     _getLeftTopCoords: function() {
-      return this.translateToOriginPoint(this.getCenterPoint(), 'left', 'center');
+      return this.translateToOriginPoint(this.getCenterPoint(), 'left', 'top');
     }
   });
 
