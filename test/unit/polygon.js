@@ -9,6 +9,7 @@
 
   var REFERENCE_OBJECT = {
     'type':                     'polygon',
+    'name':                     null,
     'originX':                  'left',
     'originY':                  'top',
     'left':                     10,

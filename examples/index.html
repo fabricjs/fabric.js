@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <script src="../dist/fabric.js"></script>
+    <title></title>
+</head>
+<body>
+  <canvas height="800" width="600" id="c" style="border:1px solid #ccc"></canvas>
+  <script>
+
+        var canvas = new fabric.Canvas('c');
+        canvas.clipBackground = true;
+        canvas.controlsAboveOverlay = true;
+        canvas.isDrawingMode = true;
+
+        canvas.setBackgroundColor('green')
+
+        var element = new fabric.Rect({name: 'test', fill: false, left: 100, top: 100, width: 200, height: 200});
+        // var element = new fabric.Circle({radius: 190, fill: false, originX: 'center', originY: 'center', left: (canvas.width/2), top: (canvas.height/2) });
+        // canvas.add(element);
+        // element.globalCompositeOperation = 'destination-in'
+
+        canvas.clipTo = function(ctx) {
+          element.render(ctx);
+        }
+
+        var element3 = new fabric.Rect({fill: false, left: 50, top: 50, width: 400, height: 400});
+        canvas.clipAllTo = function(ctx) {
+          element3.render(ctx);
+        }
+
+        var element2 = new fabric.Rect({fill: 'blue', left: 200, top: 200, width: 200, height: 200});
+        // element2.clipTo = function(ctx) {
+        //   ctx.arc(0, 0, 100, 0, Math.PI * 2, true);
+        // }
+        canvas.add(element2);
+
+        canvas.renderAll();
+
+  </script>
+</body>
+</html>

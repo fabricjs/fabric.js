@@ -297,6 +297,14 @@
     type:                     'object',
 
     /**
+     * Unique name of the object
+     * This property will allow to recover an object by name
+     * @type String
+     * @default
+     */
+    name:                     null,
+
+    /**
      * Horizontal origin of transformation of an object (one of "left", "right", "center")
      * See http://jsfiddle.net/1ow02gea/40/ on how originX/originY affect objects in groups
      * @type String
@@ -692,6 +700,27 @@
     },
 
     /**
+     * Retrieves object's {@link fabric.Object#name|name}
+     * @return {String} name value
+     */
+    getName: function() {
+      return this.name;
+    },
+
+    /**
+     * Sets object's {@link fabric.Object#name|name}
+     * @param {String} newName New name for the object
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+    setName: function(newName) {
+      var oldName = this.name;
+      this.name = newName;
+      this.canvas && this.canvas.objectRenamed(this, oldName);
+      return this;
+    },
+
+    /**
      * @private
      * @param {Object} [options] Options object
      */
@@ -770,6 +799,7 @@
 
           object = {
             type:                     this.type,
+            name:                     this.name,
             originX:                  this.originX,
             originY:                  this.originY,
             left:                     toFixed(this.left, NUM_FRACTION_DIGITS),

@@ -10,9 +10,14 @@ fabric.Collection = {
    * @return {Self} thisArg
    */
   add: function () {
+    var obj;
     this._objects.push.apply(this._objects, arguments);
     for (var i = 0, length = arguments.length; i < length; i++) {
-      this._onObjectAdded(arguments[i]);
+      obj = arguments[i];
+      this._onObjectAdded(obj);
+      if (obj.name) {
+        this._objectsMap[obj.name] = obj;
+      }
     }
     this.renderOnAddRemove && this.renderAll();
     return this;
@@ -35,6 +40,9 @@ fabric.Collection = {
     else {
       objects.splice(index, 0, object);
     }
+    if (object.name) {
+      this._objectsMap[object.name] = object;
+    }
     this._onObjectAdded(object);
     this.renderOnAddRemove && this.renderAll();
     return this;
@@ -48,14 +56,18 @@ fabric.Collection = {
    */
   remove: function() {
     var objects = this.getObjects(),
-        index;
+        index, obj;
 
     for (var i = 0, length = arguments.length; i < length; i++) {
-      index = objects.indexOf(arguments[i]);
+      obj = arguments[i];
+      index = objects.indexOf(obj);
 
       // only call onObjectRemoved if an object was actually removed
       if (index !== -1) {
         objects.splice(index, 1);
+        if (obj.name && this._objectsMap.hasOwnProperty(obj.name)) {
+          delete this._objectsMap[obj.name];
+        }
         this._onObjectRemoved(arguments[i]);
       }
     }
@@ -101,12 +113,17 @@ fabric.Collection = {
   },
 
   /**
-   * Returns object at specified index
-   * @param {Number} index
+   * Returns object at specified index or by name
+   * @param {Number|String} identifier Id or name of the object
    * @return {Self} thisArg
    */
-  item: function (index) {
-    return this.getObjects()[index];
+  item: function (identifier) {
+    if (typeof identifier === 'number') {
+      return this.getObjects()[identifier];
+    }
+    else {
+      return this._objectsMap[identifier];
+    }
   },
 
   /**

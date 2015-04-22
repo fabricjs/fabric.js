@@ -16,6 +16,7 @@
 
   var REFERENCE_IMG_OBJECT = {
     'type':               'image',
+    'name':               null,
     'originX':            'left',
     'originY':            'top',
     'left':               0,
