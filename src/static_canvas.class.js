@@ -738,9 +738,6 @@
         object.render(ctx);
       }
       ctx.restore();
-      if (!this.controlsAboveOverlay) {
-        object._renderControls(ctx);
-      }
     },
 
     _shouldRenderObject: function(object) {
@@ -825,9 +822,8 @@
      * @return {fabric.Canvas} instance
      * @chainable
      */
-    renderAll: function (allOnTop) {
-      var canvasToDrawOn = this[(allOnTop === true && this.interactive) ? 'contextTop' : 'contextContainer'],
-          activeGroup = this.getActiveGroup();
+    renderAll: function(allOnTop) {
+      var canvasToDrawOn = this[(allOnTop === true && this.interactive) ? 'contextTop' : 'contextContainer'];
 
       if (this.contextTop && this.selection && !this._groupSelector) {
         this.clearContext(this.contextTop);
@@ -844,11 +840,14 @@
       }
 
       this._renderBackground(canvasToDrawOn);
-      this._renderObjects(canvasToDrawOn, activeGroup);
-      this._renderActiveGroup(canvasToDrawOn, activeGroup);
+      this._renderObjects(canvasToDrawOn);
 
       if (this.clipTo) {
         canvasToDrawOn.restore();
+      }
+
+      if (!this.controlsAboveOverlay && this.interactive) {
+        this.drawControls(canvasToDrawOn);
       }
 
       this._renderOverlay(canvasToDrawOn);
@@ -870,18 +869,8 @@
     _renderObjects: function(ctx, activeGroup) {
       var i, length;
 
-      // fast path
-      if (!activeGroup || this.preserveObjectStacking) {
-        for (i = 0, length = this._objects.length; i < length; ++i) {
-          this._draw(ctx, this._objects[i]);
-        }
-      }
-      else {
-        for (i = 0, length = this._objects.length; i < length; ++i) {
-          if (this._objects[i] && !activeGroup.contains(this._objects[i])) {
-            this._draw(ctx, this._objects[i]);
-          }
-        }
+      for (i = 0, length = this._objects.length; i < length; ++i) {
+        this._draw(ctx, this._objects[i]);
       }
     },
 
