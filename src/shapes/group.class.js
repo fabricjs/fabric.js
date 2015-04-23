@@ -202,7 +202,6 @@
         }
       }
       else {
-        this[key] = value;
         while (i--) {
           this._objects[i].setOnGroup(key, value);
         }
