@@ -2,9 +2,9 @@
 
   var canvas = this.canvas = new fabric.Canvas();
 
-  function _createImageElement() {
-    return fabric.isLikelyNode ? new (require('canvas').Image) : fabric.document.createElement('img');
-  }
+  // function _createImageElement() {
+  //   return fabric.isLikelyNode ? new (require('canvas').Image)() : fabric.document.createElement('img');
+  // }
 
   function makeGroupWith2Objects() {
     var rect1 = new fabric.Rect({ top: 100, left: 100, width: 30, height: 10, strokeWidth: 0 }),
