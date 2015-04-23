@@ -53,7 +53,7 @@ else if (minifier === 'closure') {
   mininfierCmd = 'java -jar ' + rootPath + '/lib/google_closure_compiler.jar --js fabric.js --js_output_file fabric.min.js' + sourceMapFlags;
 }
 else if (minifier === 'uglifyjs') {
-  mininfierCmd = 'uglifyjs ' + amdUglifyFlags + ' --output fabric.min.js fabric.js' + sourceMapFlags;
+  mininfierCmd = 'uglifyjs ' + amdUglifyFlags + ' --compress --mangle --output fabric.min.js fabric.js' + sourceMapFlags;
 }
 
 var buildSh = 'build-sh' in buildArgsAsObject;
