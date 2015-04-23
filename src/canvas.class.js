@@ -752,7 +752,7 @@
       }
 
       var target = this._searchPossibleTargets(e);
-      this._fireOverOutEvents(e, target);
+      this._fireOverOutEvents(target, e);
 
       return target;
     },
@@ -760,7 +760,7 @@
     /**
      * @private
      */
-    _fireOverOutEvents: function(e, target) {
+    _fireOverOutEvents: function(target, e) {
       if (target) {
         if (this._hoveredTarget !== target) {
           this.fire('mouse:over', { target: target, e: e });
