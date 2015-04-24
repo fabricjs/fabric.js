@@ -1,3 +1,6 @@
+var toFixed = fabric.util.toFixed,
+    NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
+
 /* _TO_SVG_START_ */
 fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.prototype */ {
 
@@ -74,10 +77,10 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     return [
       //jscs:disable validateIndentation
       '<rect fill="', styleDecl.textBackgroundColor,
-      '" x="', lineLeftOffset + charOffset,
-      '" y="', lineTopOffset - this.height/2,
-      '" width="', charWidth,
-      '" height="', heightOfLine / this.lineHeight,
+      '" x="', toFixed(lineLeftOffset + charOffset, NUM_FRACTION_DIGITS),
+      '" y="', toFixed(lineTopOffset - this.height/2, NUM_FRACTION_DIGITS),
+      '" width="', toFixed(charWidth, NUM_FRACTION_DIGITS),
+      '" height="', toFixed(heightOfLine / this.lineHeight, NUM_FRACTION_DIGITS),
       '"></rect>'
       //jscs:enable validateIndentation
     ].join('');
