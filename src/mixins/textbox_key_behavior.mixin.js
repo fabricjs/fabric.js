@@ -7,7 +7,7 @@ fabric.util.object.extend(fabric.Textbox.prototype, /** @lends fabric.Textbox.pr
     * @returns {Number}
     */
    getDownCursorOffset: function(e, isRight) {
-     return this.callSuper('getDownCursorOffset', e, isRight) - 1;
+     return fabric.Textbox.superclass.prototype.getDownCursorOffset.call(this, e, isRight) - 1;
    },
    /**
     * Overrides superclass function and adjusts cursor offset value because
@@ -17,6 +17,6 @@ fabric.util.object.extend(fabric.Textbox.prototype, /** @lends fabric.Textbox.pr
     * @returns {Number}
     */
    getUpCursorOffset: function(e, isRight) {
-     return this.callSuper('getUpCursorOffset', e, isRight) - 1;
+     return fabric.Textbox.superclass.prototype.getUpCursorOffset.call(this, e, isRight) - 1;
    }
 });
