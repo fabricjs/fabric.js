@@ -42,7 +42,7 @@
     'backgroundColor':          '',
     'textBackgroundColor':      '',
     'fillRule':                 'nonzero',
-    'globalCompositeOperation': 'source-over',    
+    'globalCompositeOperation': 'source-over',
     styles:                     { }
   };
 
@@ -144,7 +144,7 @@
 
     // 'tes|t'
     iText.selectionStart = iText.selectionEnd = 3;
-    var loc = iText.get2DCursorLocation();
+    loc = iText.get2DCursorLocation();
 
     equal(loc.lineIndex, 0);
     equal(loc.charIndex, 3);
@@ -152,7 +152,7 @@
     // test
     // fo|o
     iText.selectionStart = iText.selectionEnd = 7;
-    var loc = iText.get2DCursorLocation();
+    loc = iText.get2DCursorLocation();
 
     equal(loc.lineIndex, 1);
     equal(loc.charIndex, 2);
@@ -161,7 +161,7 @@
     // foo
     // barba|z
     iText.selectionStart = iText.selectionEnd = 14;
-    var loc = iText.get2DCursorLocation();
+    loc = iText.get2DCursorLocation();
 
     equal(loc.lineIndex, 2);
     equal(loc.charIndex, 5);
@@ -171,7 +171,7 @@
     var iText = new fabric.IText('test');
     ok(iText.isEmptyStyles());
 
-    var iText = new fabric.IText('test', {
+    iText = new fabric.IText('test', {
       styles: {
         0: {
           0: { }
@@ -183,7 +183,7 @@
     });
     ok(iText.isEmptyStyles());
 
-    var iText = new fabric.IText('test', {
+    iText = new fabric.IText('test', {
       styles: {
         0: {
           0: { }

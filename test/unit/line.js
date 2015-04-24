@@ -145,12 +145,7 @@
   });
 
   test('stroke-width in a style', function() {
-    var lineEl = fabric.document.createElement('line'),
-        x1 = 0,
-        y1 = 0,
-        x2 = 10,
-        y2 = 10;
-
+    var lineEl = fabric.document.createElement('line');
     lineEl.setAttribute('style', 'stroke-width:4');
 
     var oLine = fabric.Line.fromElement(lineEl);

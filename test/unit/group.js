@@ -2,9 +2,9 @@
 
   var canvas = this.canvas = new fabric.Canvas();
 
-  function _createImageElement() {
-    return fabric.isLikelyNode ? new (require('canvas').Image) : fabric.document.createElement('img');
-  }
+  // function _createImageElement() {
+  //   return fabric.isLikelyNode ? new (require('canvas').Image)() : fabric.document.createElement('img');
+  // }
 
   function makeGroupWith2Objects() {
     var rect1 = new fabric.Rect({ top: 100, left: 100, width: 30, height: 10, strokeWidth: 0 }),
@@ -479,6 +479,25 @@ test('toObject without default values', function() {
     equal(group.insertAt(rect1, 2), group, 'should be chainable');
   });
 
+  test('canvas property propagation', function() {
+    var g1 = makeGroupWith4Objects(),
+        g2 = makeGroupWith4Objects(),
+        rect1 = new fabric.Rect(),
+        rect2 = new fabric.Rect(),
+        group1 = new fabric.Group([g1]);
+
+    group1.add(g2);
+    group1.insertAt(rect1, 0);
+    g2.insertAt(rect2, 0);
+
+    canvas.add(group1);
+    equal(g2.canvas, canvas);
+    equal(g2._objects[3].canvas, canvas);
+    equal(g1.canvas, canvas);
+    equal(g1._objects[3].canvas, canvas);
+    equal(rect2.canvas, canvas);
+    equal(rect1.canvas, canvas);
+  });
   // asyncTest('cloning group with image', function() {
   //   var rect = new fabric.Rect({ top: 100, left: 100, width: 30, height: 10 }),
   //       img = new fabric.Image(_createImageElement()),

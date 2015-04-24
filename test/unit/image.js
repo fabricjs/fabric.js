@@ -50,7 +50,7 @@
   };
 
   function _createImageElement() {
-    return fabric.isLikelyNode ? new (require('canvas').Image) : fabric.document.createElement('img');
+    return fabric.isLikelyNode ? new (require('canvas').Image)() : fabric.document.createElement('img');
   }
 
   function _createImageObject(width, height, callback) {
@@ -63,12 +63,12 @@
   }
 
   function createImageObject(callback) {
-    return _createImageObject(IMG_WIDTH, IMG_HEIGHT, callback)
+    return _createImageObject(IMG_WIDTH, IMG_HEIGHT, callback);
   }
 
-  function createSmallImageObject(callback) {
-    return _createImageObject(IMG_WIDTH / 2, IMG_HEIGHT / 2, callback);
-  }
+  // function createSmallImageObject(callback) {
+  //   return _createImageObject(IMG_WIDTH / 2, IMG_HEIGHT / 2, callback);
+  // }
 
   function setSrc(img, src, callback) {
     if (fabric.isLikelyNode) {
@@ -159,14 +159,14 @@
 
       var elImage = _createImageElement();
       elImage.crossOrigin = 'anonymous';
-      var image = new fabric.Image(elImage);
+      image = new fabric.Image(elImage);
       equal(image.crossOrigin, '', 'crossOrigin value on an instance takes precedence');
 
       var objRepr = image.toObject();
       equal(objRepr.crossOrigin, '', 'toObject should return proper crossOrigin value');
 
       var elImage2 = _createImageElement();
-	  elImage2.crossOrigin = 'anonymous';
+      elImage2.crossOrigin = 'anonymous';
       image.setElement(elImage2);
       equal(elImage2.crossOrigin, 'anonymous', 'setElement should set proper crossOrigin on an img element');
 
@@ -175,7 +175,7 @@
         start();
         return;
       }
-	  
+
       fabric.Image.fromObject(objRepr, function(img) {
         equal(img.crossOrigin, '');
         start();
