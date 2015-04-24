@@ -763,12 +763,12 @@
     _fireOverOutEvents: function(target, e) {
       if (target) {
         if (this._hoveredTarget !== target) {
-          this.fire('mouse:over', { target: target, e: e });
-          target.fire('mouseover');
           if (this._hoveredTarget) {
             this.fire('mouse:out', { target: this._hoveredTarget, e: e });
             this._hoveredTarget.fire('mouseout');
           }
+          this.fire('mouse:over', { target: target, e: e });
+          target.fire('mouseover');
           this._hoveredTarget = target;
         }
       }
