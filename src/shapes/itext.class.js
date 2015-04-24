@@ -354,12 +354,19 @@
       if (typeof selectionStart === 'undefined') {
         selectionStart = this.selectionStart;
       }
-      var textBeforeCursor = this.text.slice(0, selectionStart),
-          linesBeforeCursor = textBeforeCursor.split(this._reNewline);
-
+      var len = textLines.length;
+      for (var i = 0; i < len; i++) {
+          if (selectionStart <= textLines[i].length) {
+             return {
+               lineIndex: i,
+               charIndex: selectionStart
+             };
+          }
+          selectionStart -= textLines[i].length + 1;
+      }
       return {
-        lineIndex: linesBeforeCursor.length - 1,
-        charIndex: linesBeforeCursor[linesBeforeCursor.length - 1].length
+        lineIndex: i - 1,
+        charIndex: textLines[i].length < selectionStart ? textLines[i].length : selectionStart
       };
     },
 
@@ -583,7 +590,6 @@
       // set proper line offset
       var lineHeight = this._getHeightOfLine(ctx, lineIndex),
           lineLeftOffset = this._getCachedLineOffset(lineIndex),
-          chars = line.split(''),
           prevStyle,
           charsToRender = '';
 
@@ -591,7 +597,7 @@
 
       ctx.save();
       top -= lineHeight / this.lineHeight * this._fontSizeFraction;
-      for (var i = 0, len = chars.length; i <= len; i++) {
+      for (var i = 0, len = line.length; i <= len; i++) {
         prevStyle = prevStyle || this.getCurrentCharStyle(lineIndex, i);
         var thisStyle = this.getCurrentCharStyle(lineIndex, i + 1);
 
@@ -600,7 +606,7 @@
           charsToRender = '';
           prevStyle = thisStyle;
         }
-        charsToRender += chars[i];
+        charsToRender += line[i];
       }
 
       ctx.restore();
