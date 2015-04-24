@@ -170,28 +170,23 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    */
   getDownCursorOffset: function(e, isRight) {
     var selectionProp = isRight ? this.selectionEnd : this.selectionStart,
-        _char, lineLeftOffset,
-        textBeforeCursor = this.text.slice(0, selectionProp),
-        textAfterCursor = this.text.slice(selectionProp),
-
-        textOnSameLineBeforeCursor = textBeforeCursor.slice(textBeforeCursor.lastIndexOf('\n') + 1),
-        textOnSameLineAfterCursor = textAfterCursor.match(/(.*)\n?/)[1],
-        textOnNextLine = (textAfterCursor.match(/.*\n(.*)\n?/) || { })[1] || '',
-
-        cursorLocation = this.get2DCursorLocation(selectionProp);
+        cursorLocation = this.get2DCursorLocation(selectionProp),
+        _char, lineLeftOffset, lineIndex = cursorLocation.lineIndex
+        textOnSameLineBeforeCursor = this.textLines[lineIndex].slice(0, cursorLocation.charIndex),
+        textOnSameLineAfterCursor = this.textLines[lineIndex].slice(cursorLocation.charIndex + 1),
+        textOnNextLine = this.textLines[lineIndex + 1] || '';
 
     // if on last line, down cursor goes to end of line
-    if (cursorLocation.lineIndex === this._textLines.length - 1 || e.metaKey || e.keyCode === 34) {
+    if (lineIndex === this._textLines.length - 1 || e.metaKey || e.keyCode === 34) {
 
       // move to the end of a text
       return this.text.length - selectionProp;
     }
 
-    var widthOfSameLineBeforeCursor = this._getLineWidth(this.ctx, cursorLocation.lineIndex);
+    var widthOfSameLineBeforeCursor = this._getLineWidth(this.ctx, lineIndex);
     lineLeftOffset = this._getLineLeftOffset(widthOfSameLineBeforeCursor);
 
-    var widthOfCharsOnSameLineBeforeCursor = lineLeftOffset,
-        lineIndex = cursorLocation.lineIndex;
+    var widthOfCharsOnSameLineBeforeCursor = lineLeftOffset;
 
     for (var i = 0, len = textOnSameLineBeforeCursor.length; i < len; i++) {
       _char = textOnSameLineBeforeCursor[i];
@@ -314,20 +309,19 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    */
   getUpCursorOffset: function(e, isRight) {
     var selectionProp = isRight ? this.selectionEnd : this.selectionStart,
-        cursorLocation = this.get2DCursorLocation(selectionProp);
+        cursorLocation = this.get2DCursorLocation(selectionProp),
+        lineIndex = cursorLocation.lineIndex;
     // if on first line, up cursor goes to start of line
-    if (cursorLocation.lineIndex === 0 || e.metaKey || e.keyCode === 33) {
+    if (lineIndex === 0 || e.metaKey || e.keyCode === 33) {
       return selectionProp;
     }
 
-    var textBeforeCursor = this.text.slice(0, selectionProp),
-        textOnSameLineBeforeCursor = textBeforeCursor.slice(textBeforeCursor.lastIndexOf('\n') + 1),
-        textOnPreviousLine = (textBeforeCursor.match(/\n?(.*)\n.*$/) || {})[1] || '',
+    var textOnSameLineBeforeCursor = this.textLines[lineIndex].slice(0, cursorLocation.charIndex),
+        textOnPreviousLine = this.textLines[lineIndex - 1] || '',
         _char,
         widthOfSameLineBeforeCursor = this._getLineWidth(this.ctx, cursorLocation.lineIndex),
         lineLeftOffset = this._getLineLeftOffset(widthOfSameLineBeforeCursor),
-        widthOfCharsOnSameLineBeforeCursor = lineLeftOffset,
-        lineIndex = cursorLocation.lineIndex;
+        widthOfCharsOnSameLineBeforeCursor = lineLeftOffset;
 
     for (var i = 0, len = textOnSameLineBeforeCursor.length; i < len; i++) {
       _char = textOnSameLineBeforeCursor[i];
