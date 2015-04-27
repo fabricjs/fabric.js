@@ -124,15 +124,21 @@
       else if (hLine) {
         h = strokeWidth;
       }
+
+      var wStrokeMult = this.transformStrokeAndFill ? this.scaleX : 1,
+        hStrokeMult = this.transformStrokeAndFill ? this.scaleY : 1,
+        boxStrokeWidth = 0,
+        boxStrokeHeight = 0;
+
       if (strokeW) {
-        w += (w < 0 ? -strokeWidth : strokeWidth);
+        boxStrokeWidth = (w < 0 ? -strokeWidth : strokeWidth) * wStrokeMult;
       }
       if (strokeH) {
-        h += (h < 0 ? -strokeWidth : strokeWidth);
+        boxStrokeHeight = (h < 0 ? -strokeWidth : strokeWidth) * hStrokeMult;
       }
 
-      w = w * this.scaleX + 2 * this.padding;
-      h = h * this.scaleY + 2 * this.padding;
+      w = w * this.scaleX + boxStrokeWidth + 2 * this.padding;
+      h = h * this.scaleY + boxStrokeHeight + 2 * this.padding;
 
       if (shouldTransform) {
         return fabric.util.transformPoint(new fabric.Point(w, h), vpt, true);
@@ -262,9 +268,15 @@
 
       // middle-top-rotate
       if (this.hasRotatingPoint) {
-        this._drawControl('mtr', ctx, methodName,
-          left + width/2 - scaleOffset,
-          top - this.rotatingPointOffset - scaleOffset);
+        if(this.hasRoundRotateControl) {
+          this._drawRoundControl('mtr', ctx,
+            left + width/2 - scaleOffset,
+            top - this.rotatingPointOffset - scaleOffset);
+        } else {
+          this._drawControl('mtr', ctx, methodName,
+            left + width/2 - scaleOffset,
+            top - this.rotatingPointOffset - scaleOffset);
+        }
       }
 
       ctx.restore();
@@ -275,13 +287,36 @@
     /**
      * @private
      */
+    _drawRoundControl: function(control, ctx, left, top) {
+      var margin = this.borderControlHitboxMargin || 0;
+      var size = this.cornerSize - margin*2;
+      var radius = size/2;
+
+      if (!this.isControlVisible(control)) {
+        return;
+      }
+
+      ctx.beginPath();
+      ctx.arc(left+radius+margin,top+radius+margin,radius,0,2*Math.PI);
+      if(this.transparentCorners) {
+        ctx.stroke();
+      } else {
+        ctx.fill();
+      }
+      ctx.closePath();
+    },
+
+    /**
+     * @private
+     */
     _drawControl: function(control, ctx, methodName, left, top) {
       if (!this.isControlVisible(control)) {
         return;
       }
-      var size = this.cornerSize;
-      isVML() || this.transparentCorners || ctx.clearRect(left, top, size, size);
-      ctx[methodName](left, top, size, size);
+      var margin = this.borderControlHitboxMargin || 0;
+      var size = this.cornerSize - margin*2;
+      isVML() || this.transparentCorners || ctx.clearRect(left + margin, top + margin, size, size);
+      ctx[methodName](left + margin, top + margin, size, size);
     },
 
     /**

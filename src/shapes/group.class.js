@@ -2,7 +2,7 @@
 
   'use strict';
 
-  var fabric = global.fabric || (global.fabric = { }),
+  var fabric = global.fabric || (global.fabric = {}),
       extend = fabric.util.object.extend,
       min = fabric.util.array.min,
       max = fabric.util.array.max,
@@ -16,11 +16,11 @@
   // to enable locking behavior on group
   // when one of its objects has lock-related properties set
   var _lockProperties = {
-    lockMovementX:  true,
-    lockMovementY:  true,
-    lockRotation:   true,
-    lockScalingX:   true,
-    lockScalingY:   true,
+    lockMovementX: true,
+    lockMovementY: true,
+    lockRotation: true,
+    lockScalingX: true,
+    lockScalingY: true,
     lockUniScaling: true
   };
 
@@ -33,14 +33,12 @@
    * @see {@link fabric.Group#initialize} for constructor definition
    */
   fabric.Group = fabric.util.createClass(fabric.Object, fabric.Collection, /** @lends fabric.Group.prototype */ {
-
     /**
      * Type of an object
      * @type String
      * @default
      */
     type: 'group',
-
     /**
      * Constructor
      * @param {Object} objects Group objects
@@ -48,7 +46,7 @@
      * @return {Object} thisArg
      */
     initialize: function(objects, options) {
-      options = options || { };
+      options = options || {};
 
       this._objects = objects || [];
       for (var i = this._objects.length; i--; ) {
@@ -65,6 +63,8 @@
         this.originY = options.originY;
       }
 
+      this._refreshControlsVisibility();
+
       this._calcBounds();
       this._updateObjectsCoords();
 
@@ -73,14 +73,19 @@
       this.setCoords();
       this.saveCoords();
     },
-
+    /**
+     * To be implemented by other shape classes as needed. This is to allow a
+     * shape to impose its own rules for control visibility on the group if it is
+     * part of one.
+     */
+    _refreshControlsVisibility: function() {
+    },
     /**
      * @private
      */
     _updateObjectsCoords: function() {
       this.forEachObject(this._updateObjectCoords, this);
     },
-
     /**
      * @private
      */
@@ -102,7 +107,6 @@
       object.__origHasControls = object.hasControls;
       object.hasControls = false;
     },
-
     /**
      * Returns string represenation of a group
      * @return {String}
@@ -110,7 +114,6 @@
     toString: function() {
       return '#<fabric.Group: (' + this.complexity() + ')>';
     },
-
     /**
      * Adds an object to a group; Then recalculates group's dimension, position.
      * @param {Object} object
@@ -130,7 +133,6 @@
       this._updateObjectsCoords();
       return this;
     },
-
     /**
      * @private
      */
@@ -138,7 +140,6 @@
       object.set('active', true);
       object.group = this;
     },
-
     /**
      * Removes an object from a group; Then recalculates group's dimension, position.
      * @param {Object} object
@@ -158,23 +159,22 @@
 
       return this;
     },
-
     /**
      * @private
      */
     _onObjectAdded: function(object) {
       object.group = this;
       object._set('canvas', this.canvas);
+      this._refreshControlsVisibility();
     },
-
     /**
      * @private
      */
     _onObjectRemoved: function(object) {
       delete object.group;
       object.set('active', false);
+      this._refreshControlsVisibility();
     },
-
     /**
      * Properties that are delegated to group objects when reading/writing
      * @param {Object} delegatedProperties
@@ -191,20 +191,23 @@
       textAlign:        true,
       backgroundColor:  true
     },
-
     /**
      * @private
      */
     _set: function(key, value) {
+      var i = this._objects.length;
       if (key in this.delegatedProperties || key === 'canvas') {
-        var i = this._objects.length;
         while (i--) {
           this._objects[i].set(key, value);
         }
       }
+      else {
+        while (i--) {
+          this._objects[i].setOnGroup(key, value);
+        }
+      }
       this.callSuper('_set', key, value);
     },
-
     /**
      * Returns object representation of an instance
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
@@ -215,7 +218,6 @@
         objects: invoke(this._objects, 'toObject', propertiesToInclude)
       });
     },
-
     /**
      * Renders instance on a given context
      * @param {CanvasRenderingContext2D} ctx context to render instance on
@@ -238,7 +240,6 @@
 
       ctx.restore();
     },
-
     /**
      * Renders controls and borders for the object
      * @param {CanvasRenderingContext2D} ctx Context to render on
@@ -250,7 +251,6 @@
         this._objects[i]._renderControls(ctx);
       }
     },
-
     /**
      * @private
      */
@@ -265,7 +265,6 @@
       object.render(ctx);
       object.hasRotatingPoint = originalHasRotatingPoint;
     },
-
     /**
      * Retores original state of each of group objects (original state is that which was before group was created).
      * @private
@@ -276,7 +275,6 @@
       this._objects.forEach(this._restoreObjectState, this);
       return this;
     },
-
     /**
      * Realises the transform from this group onto the supplied object
      * i.e. it tells you what would happen if the supplied object was in
@@ -284,13 +282,12 @@
      * object.
      * @param {fabric.Object} object
      * @return {fabric.Object} transformedObject
-     */
+    */
     realizeTransform: function(object) {
       this._moveFlippedObject(object);
       this._setObjectPosition(object);
       return object;
     },
-
     /**
      * Moves a flipped object to the position where it's displayed
      * @private
@@ -299,8 +296,8 @@
      */
     _moveFlippedObject: function(object) {
       var oldOriginX = object.get('originX'),
-          oldOriginY = object.get('originY'),
-          center = object.getCenterPoint();
+              oldOriginY = object.get('originY'),
+              center = object.getCenterPoint();
 
       object.set({
         originX: 'center',
@@ -322,7 +319,6 @@
 
       return this;
     },
-
     /**
      * @private
      */
@@ -338,7 +334,6 @@
         object.setAngle(-object.getAngle());
       }
     },
-
     /**
      * Restores original state of a specified object in group
      * @private
@@ -357,13 +352,12 @@
 
       return this;
     },
-
     /**
      * @private
      */
     _setObjectPosition: function(object) {
       var center = this.getCenterPoint(),
-          rotated = this._getRotatedLeftTop(object);
+              rotated = this._getRotatedLeftTop(object);
 
       object.set({
         angle: object.getAngle() + this.getAngle(),
@@ -373,7 +367,6 @@
         scaleY: object.get('scaleY') * this.get('scaleY')
       });
     },
-
     /**
      * @private
      */
@@ -382,12 +375,10 @@
       return {
         left: (-Math.sin(groupAngle) * object.getTop() * this.get('scaleY') +
                 Math.cos(groupAngle) * object.getLeft() * this.get('scaleX')),
-
-        top:  (Math.cos(groupAngle) * object.getTop() * this.get('scaleY') +
-               Math.sin(groupAngle) * object.getLeft() * this.get('scaleX'))
+        top: (Math.cos(groupAngle) * object.getTop() * this.get('scaleY') +
+                Math.sin(groupAngle) * object.getLeft() * this.get('scaleX'))
       };
     },
-
     /**
      * Destroys a group (restoring state of its objects)
      * @return {fabric.Group} thisArg
@@ -397,7 +388,6 @@
       this._objects.forEach(this._moveFlippedObject, this);
       return this._restoreObjectsState();
     },
-
     /**
      * Saves coordinates of this instance (to be used together with `hasMoved`)
      * @saveCoords
@@ -409,16 +399,14 @@
       this._originalTop = this.get('top');
       return this;
     },
-
     /**
      * Checks whether this group was moved (since `saveCoords` was called last)
      * @return {Boolean} true if an object was moved (since fabric.Group#saveCoords was called)
      */
     hasMoved: function() {
       return this._originalLeft !== this.get('left') ||
-             this._originalTop !== this.get('top');
+              this._originalTop !== this.get('top');
     },
-
     /**
      * Sets coordinates of all group objects
      * @return {fabric.Group} thisArg
@@ -430,7 +418,6 @@
       });
       return this;
     },
-
     /**
      * @private
      */
@@ -452,7 +439,6 @@
 
       this.set(this._getBounds(aX, aY, onlyWidthHeight));
     },
-
     /**
      * @private
      */
@@ -483,7 +469,6 @@
       }
       return obj;
     },
-
     /* _TO_SVG_START_ */
     /**
      * Returns svg representation of an instance
@@ -494,7 +479,7 @@
       var markup = [
         //jscs:disable validateIndentation
         '<g ',
-          'transform="', this.getSvgTransform(),
+        'transform="', this.getSvgTransform(),
         '">\n'
         //jscs:enable validateIndentation
       ];

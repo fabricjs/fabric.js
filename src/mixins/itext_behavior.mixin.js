@@ -339,6 +339,9 @@
      */
     enterEditing: function() {
       if (this.isEditing || !this.editable) {
+        if(this.hiddenTextarea) {
+          this.hiddenTextarea.focus();
+        }
         return;
       }
 
@@ -523,8 +526,8 @@
 
       }
 
-      this.text = this.text.slice(0, start) +
-                  this.text.slice(end);
+      this.set('text', this.text.slice(0, start) +
+                  this.text.slice(end));
       this._clearCache();
     },
 
@@ -535,9 +538,9 @@
     insertChars: function(_chars, useCopiedStyle) {
       var isEndOfLine = this.text.slice(this.selectionStart, this.selectionStart + 1) === '\n';
 
-      this.text = this.text.slice(0, this.selectionStart) +
+      this.set('text', this.text.slice(0, this.selectionStart) +
                     _chars +
-                  this.text.slice(this.selectionEnd);
+                  this.text.slice(this.selectionEnd));
 
       if (this.selectionStart === this.selectionEnd) {
         this.insertStyleObjects(_chars, isEndOfLine, useCopiedStyle);

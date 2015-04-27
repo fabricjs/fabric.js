@@ -125,12 +125,12 @@
     equal(oLine.get('y2'), 0, 'missing attributes count as 0 values');
   });
 
-  test('straight lines may have 0 width or heigth', function() {
+  test('straight lines should be displayed', function() {
     var line1 = new fabric.Line([10,10,100,10]),
         line2 = new fabric.Line([10,10,10,100]);
 
-    equal(line1.get('height'), 0);
-    equal(line2.get('width'), 0);
+    equal(line1.get('height'), 1);
+    equal(line2.get('width'), 1);
   });
 
   test('changing x/y coords should update width/height', function() {

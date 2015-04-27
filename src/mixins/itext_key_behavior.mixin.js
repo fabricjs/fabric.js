@@ -7,9 +7,42 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     this.hiddenTextarea = fabric.document.createElement('textarea');
 
     this.hiddenTextarea.setAttribute('autocapitalize', 'off');
-    this.hiddenTextarea.style.cssText = 'position: fixed; bottom: 20px; left: 0px; opacity: 0;'
-                                        + ' width: 0px; height: 0px; z-index: -999;';
-    fabric.document.body.appendChild(this.hiddenTextarea);
+    this.hiddenTextarea.style.cssText = 'position: absolute; opacity: 0; font-size: 0pt;' +
+                                        'color: transparent; z-index: -999;';
+    //If at all possible, show the textarea within the canvas wrapper where it can exist
+    //at the same height as the iText display. This prevents iOS from scrolling to whatever
+    //height the textarea is at when you type.
+    if (this.canvas && this.canvas.wrapperEl) {
+      this.canvas.wrapperEl.appendChild(this.hiddenTextarea);
+
+      var updateHiddenTextareaPosition = function () {
+        if (this.isEditing && this.canvas.getActiveObject() === this) {
+          //The text's bounding rectangle, IN CANVAS SPACE (not fabric logical coordinates)
+          var rect = this.getBoundingRect();
+
+          // Compute the scale transform between fabric coords and DOM coords
+          var canvasRect = this.canvas.lowerCanvasEl.getBoundingClientRect();
+          var xScale = canvasRect.width / this.canvas.width;
+          var yScale = canvasRect.height / this.canvas.height;
+
+          this.hiddenTextarea.style.top = rect.top * xScale + 'px';
+          this.hiddenTextarea.style.left = rect.left * yScale + 'px';
+          this.hiddenTextarea.style.width = rect.width * xScale + 'px';
+          this.hiddenTextarea.style.height = rect.height * yScale + 'px';
+        }
+      }.bind(this);
+
+      this.on('event:scaling', updateHiddenTextareaPosition);
+      this.on('event:moving', updateHiddenTextareaPosition);
+      this.on('editing:exited', function() {
+        this.off('event:scaling', updateHiddenTextareaPosition);
+        this.off('event:moving', updateHiddenTextareaPosition);
+      }.bind(this));
+      updateHiddenTextareaPosition();
+    }
+    else {
+      fabric.document.body.appendChild(this.hiddenTextarea);
+    }
 
     fabric.util.addListener(this.hiddenTextarea, 'keydown', this.onKeyDown.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'keypress', this.onKeyPress.bind(this));
@@ -170,15 +203,14 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    */
   getDownCursorOffset: function(e, isRight) {
     var selectionProp = isRight ? this.selectionEnd : this.selectionStart,
-        _char, lineLeftOffset,
-        textBeforeCursor = this.text.slice(0, selectionProp),
-        textAfterCursor = this.text.slice(selectionProp),
+        _char,
+        lineLeftOffset,
+        cursorLocation = this.get2DCursorLocation(selectionProp),
 
-        textOnSameLineBeforeCursor = textBeforeCursor.slice(textBeforeCursor.lastIndexOf('\n') + 1),
-        textOnSameLineAfterCursor = textAfterCursor.match(/(.*)\n?/)[1],
-        textOnNextLine = (textAfterCursor.match(/.*\n(.*)\n?/) || { })[1] || '',
-
-        cursorLocation = this.get2DCursorLocation(selectionProp);
+        textOnSameLineBeforeCursor = this._textLines[cursorLocation.lineIndex].slice(0, cursorLocation.charIndex),
+        textOnSameLineAfterCursor = this._textLines[cursorLocation.lineIndex].slice(cursorLocation.charIndex),
+        textOnNextLine = cursorLocation.lineIndex === this._textLines.length - 1 ? '' :
+          this._textLines[cursorLocation.lineIndex + 1];
 
     // if on last line, down cursor goes to end of line
     if (cursorLocation.lineIndex === this._textLines.length - 1 || e.metaKey || e.keyCode === 34) {
@@ -320,9 +352,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       return selectionProp;
     }
 
-    var textBeforeCursor = this.text.slice(0, selectionProp),
-        textOnSameLineBeforeCursor = textBeforeCursor.slice(textBeforeCursor.lastIndexOf('\n') + 1),
-        textOnPreviousLine = (textBeforeCursor.match(/\n?(.*)\n.*$/) || {})[1] || '',
+    var textOnSameLineBeforeCursor = this._textLines[cursorLocation.lineIndex].slice(0, cursorLocation.charIndex),
+        textOnPreviousLine = cursorLocation.lineIndex === 0 ? '' : this._textLines[cursorLocation.lineIndex - 1],
         _char,
         widthOfSameLineBeforeCursor = this._getLineWidth(this.ctx, cursorLocation.lineIndex),
         lineLeftOffset = this._getLineLeftOffset(widthOfSameLineBeforeCursor),
@@ -627,9 +658,10 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       else {
         var isBeginningOfLine = this.text.slice(this.selectionStart - 1, this.selectionStart) === '\n';
         this.removeStyleObject(isBeginningOfLine);
+
         this.setSelectionStart(this.selectionStart - 1);
-        this.text = this.text.slice(0, this.selectionStart) +
-                    this.text.slice(this.selectionStart + 1);
+        this.set('text', this.text.slice(0, this.selectionStart) +
+                    this.text.slice(this.selectionStart + 1));
       }
     }
   }

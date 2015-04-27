@@ -243,6 +243,11 @@ var filesToInclude = [
   ifSpecifiedInclude('itext', 'src/mixins/itext_click_behavior.mixin.js'),
   ifSpecifiedInclude('itext', 'src/mixins/itext_key_behavior.mixin.js'),
   ifSpecifiedInclude('itext', 'src/mixins/itext.svg_export.js'),
+  
+  ifSpecifiedInclude('textbox', 'src/shapes/textbox.class.js'),
+  ifSpecifiedInclude('textbox', 'src/mixins/textbox_behavior.mixin.js'),
+  ifSpecifiedInclude('textbox', 'src/mixins/textbox_click_behavior.mixin.js'),
+  ifSpecifiedInclude('textbox', 'src/mixins/textbox_key_behavior.mixin.js'),
 
   ifSpecifiedInclude('node', 'src/node.js'),
 

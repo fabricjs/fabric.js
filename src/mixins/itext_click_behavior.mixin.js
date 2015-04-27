@@ -172,7 +172,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
     return this.getLocalPointer(e, rotated);
   },
-
   /**
    * Returns index of a character corresponding to where an object was clicked
    * @param {Event} e Event object
@@ -215,12 +214,12 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         }
 
         return this._getNewSelectionStartFromOffset(
-          mouseOffset, prevWidth, width, charIndex + i, jlen);
+          mouseOffset, prevWidth, width, charIndex, i, jlen);
       }
 
       if (mouseOffset.y < height) {
         return this._getNewSelectionStartFromOffset(
-          mouseOffset, prevWidth, width, charIndex + i, jlen);
+          mouseOffset, prevWidth, width, charIndex, i, jlen);
       }
     }
 
@@ -233,12 +232,12 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   /**
    * @private
    */
-  _getNewSelectionStartFromOffset: function(mouseOffset, prevWidth, width, index, jlen) {
+  _getNewSelectionStartFromOffset: function(mouseOffset, prevWidth, width, index, lineIndex, jlen) {
 
     var distanceBtwLastCharAndCursor = mouseOffset.x - prevWidth,
         distanceBtwNextCharAndCursor = width - mouseOffset.x,
         offset = distanceBtwNextCharAndCursor > distanceBtwLastCharAndCursor ? 0 : 1,
-        newSelectionStart = index + offset;
+        newSelectionStart = index + lineIndex + offset;
 
     // if object is horizontally flipped, mirror cursor location from the end
     if (this.flipX) {

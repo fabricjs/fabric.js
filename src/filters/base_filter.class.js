@@ -19,7 +19,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
    * @default
    */
   type: 'BaseFilter',
-
+  
   /**
    * Constructor
    * @param {Object} [options] Options object

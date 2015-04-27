@@ -67,6 +67,13 @@
     minY: 0,
 
     /**
+     * When false, the stroke will always drawn the same width, regardless of scaleX and scaleY.
+     * @type Boolean
+     * @default
+     */
+    transformStrokeAndFill: true,
+
+    /**
      * Constructor
      * @param {Array|String} path Path data (sequence of coordinates and corresponding "command" tokens)
      * @param {Object} [options] Options object
@@ -139,9 +146,9 @@
 
     /**
      * @private
-     * @param {CanvasRenderingContext2D} ctx context to render path on
+     * @param {CanvasRenderingContext2D} ctx context to create path on
      */
-    _render: function(ctx) {
+    _createPath: function(ctx) {
       var current, // current instruction
           previous = null,
           subpathStartX = 0,
@@ -446,8 +453,56 @@
         }
         previous = current;
       }
+    },
+
+    _renderCurrentPath: function(ctx) {
       this._renderFill(ctx);
       this._renderStroke(ctx);
+    },
+
+    /**
+     * Renders path on a specified context
+     * @param {CanvasRenderingContext2D} ctx context to render path on
+     * @param {Boolean} [noTransform] When true, context is not transformed
+     */
+    render: function(ctx, noTransform) {
+      // do not render if width/height are zeros or object is not visible
+      if (!this.visible) {
+        return;
+      }
+
+      ctx.save();
+
+      !this.transformStrokeAndFill && ctx.save();
+      if (!noTransform) {
+        this.transform(ctx);
+      }
+      if (this.transformMatrix) {
+        ctx.transform.apply(ctx, this.transformMatrix);
+      }
+      this._createPath(ctx, noTransform);
+      !this.transformStrokeAndFill && ctx.restore();
+
+      // Pop contexts to remove scaling applied by the PathGroup
+      if (!this.transformStrokeAndFill && this.group && this.group.type === 'path-group') {
+        ctx.restore();  // ctx.save at the top of this function.
+        ctx.restore();  // ctx.save in PathGroup - we're not distorted now. PathGroup has been hacked to expect this.
+        ctx.save();     // Make a new context so PathGroup has something to restore.
+        ctx.save();     // Emulate ctx.save at the top of this function
+      }
+
+      this._setupCompositeOperation(ctx);
+      this._setStrokeStyles(ctx);
+      this._setFillStyles(ctx);
+      this._setOpacity(ctx);
+      this._setShadow(ctx);
+      this.clipTo && fabric.util.clipContext(this, ctx);
+      this._renderCurrentPath(ctx);
+      this.clipTo && ctx.restore();
+      this._removeShadow(ctx);
+      this._restoreCompositeOperation(ctx);
+
+      ctx.restore();
     },
 
     /**

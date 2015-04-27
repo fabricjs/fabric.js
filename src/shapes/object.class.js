@@ -748,7 +748,7 @@
      * @param {Boolean} fromLeft When true, context is transformed to object's top/left corner. This is used when rendering text on Node
      */
     transform: function(ctx, fromLeft) {
-      if (this.group && this.canvas.preserveObjectStacking && this.group === this.canvas._activeGroup) {
+      if (this.group && this.canvas && this.canvas.preserveObjectStacking && this.group === this.canvas._activeGroup) {
         this.group.transform(ctx);
       }
       var center = fromLeft ? this._getLeftTopCoords() : this.getCenterPoint();
@@ -911,6 +911,16 @@
       this[key] = value;
 
       return this;
+    },
+
+    /**
+     * This callback function is called by the parent group of an object every
+     * time a non-delegated property changes on the group. It is passed the key
+     * and value as parameters. Not adding in this function's signature to avoid
+     * Travis build error about unused variables.
+     */
+    setOnGroup: function() {
+      // implemented by sub-classes, as needed.
     },
 
     /**
