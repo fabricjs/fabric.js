@@ -124,15 +124,21 @@
       else if (hLine) {
         h = strokeWidth;
       }
+
+      var wStrokeMult = this.transformStrokeAndFill ? this.scaleX : 1,
+        hStrokeMult = this.transformStrokeAndFill ? this.scaleY : 1,
+        boxStrokeWidth = 0,
+        boxStrokeHeight = 0;
+
       if (strokeW) {
-        w += (w < 0 ? -strokeWidth : strokeWidth);
+        boxStrokeWidth = (w < 0 ? -strokeWidth : strokeWidth) * wStrokeMult;
       }
       if (strokeH) {
-        h += (h < 0 ? -strokeWidth : strokeWidth);
+        boxStrokeHeight = (h < 0 ? -strokeWidth : strokeWidth) * hStrokeMult;
       }
 
-      w = w * this.scaleX + 2 * this.padding;
-      h = h * this.scaleY + 2 * this.padding;
+      w = w * this.scaleX + boxStrokeWidth + 2 * this.padding;
+      h = h * this.scaleY + boxStrokeHeight + 2 * this.padding;
 
       if (shouldTransform) {
         return fabric.util.transformPoint(new fabric.Point(w, h), vpt, true);
