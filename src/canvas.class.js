@@ -1024,8 +1024,10 @@
      * @chainable
      */
     discardActiveObject: function (e) {
-      this._discardActiveObject();
-      this.renderAll();
+      if (this._activeObject) {
+        this._discardActiveObject();
+        this.renderAll();
+      }
       this.fire('selection:cleared', { e: e });
       return this;
     },
