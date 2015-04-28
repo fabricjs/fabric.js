@@ -9,7 +9,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     this.hiddenTextarea = fabric.document.createElement('textarea');
     this.hiddenTextarea.value = this.text;
 
-    this.hiddenTextarea.style.cssText = 'position: absolute; overflow: hidden; resize: none; margin: 0; padding: 0; border: 0; box-shadow: none;';
+    this.hiddenTextarea.style.cssText = 'position: absolute; overflow: hidden; resize: none; margin: 0; padding: 0; border: 0; box-shadow: none; border-radius: 0;';
     //If at all possible, show the textarea within the canvas wrapper where it can exist
     //at the same height as the iText display. This prevents iOS from scrolling to whatever
     //height the textarea is at when you type.
@@ -55,40 +55,31 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       var top = this.top * yScale;
       var left = this.left * xScale;
       var width = this.getWidth() * xScale;
-      var height = this.getHeight() * yScale;
+      var heightFudgeFactor = this.fontSize * xScale;
+      var height = (this._measuredHeight || this.getHeight()) * yScale + heightFudgeFactor;
 
+      this.hiddenTextarea.style.width = width + 'px';
+      this.hiddenTextarea.style.height = height + 'px';
+
+      // Compensate for rotation of the text's topleft
       if (this.angle >= 45 && this.angle < 135) {
-        // Swap width and height
-        this.hiddenTextarea.style.width = height + 'px';
-        this.hiddenTextarea.style.height = width + 'px';
-
-        // Compensate for rotation of the text's topleft
         this.hiddenTextarea.style.top = top + 'px';
         this.hiddenTextarea.style.left = left - height + 'px';
       } else if (this.angle >= 135 && this.angle < 225) {
-        this.hiddenTextarea.style.width = width + 'px';
-        this.hiddenTextarea.style.height = height + 'px';
-
-        // Compensate for rotation of the text's topleft
         this.hiddenTextarea.style.top = top - height + 'px';
         this.hiddenTextarea.style.left = left - width + 'px';
       } else if (this.angle >= 225 && this.angle < 315) {
-        // Swap width and height
-        this.hiddenTextarea.style.width = height + 'px';
-        this.hiddenTextarea.style.height = width + 'px';
-
-        // Compensate for rotation of the text's topleft
         this.hiddenTextarea.style.top = top - width + 'px';
         this.hiddenTextarea.style.left = left + 'px';
       } else { // angle >= 315 && angle < 45
         this.hiddenTextarea.style.top = top + 'px';
         this.hiddenTextarea.style.left = left + 'px';
-        this.hiddenTextarea.style.width = width + 'px';
-        this.hiddenTextarea.style.height = height + 'px';
       }
 
       this.hiddenTextarea.style.fontSize = this.fontSize * xScale + 'px';
       this.hiddenTextarea.style.color = this.fill;
+      this.hiddenTextarea.style.textAlign = this.textAlign;
+      this.hiddenTextarea.style.lineHeight = this.lineHeight;
     }
   },
 
