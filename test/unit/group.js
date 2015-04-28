@@ -201,7 +201,6 @@ test('toObject without default values', function() {
     'top':                100,
     'width':              80,
     'height':             60,
-    'strokeWidth':        0,
     'objects':            clone.objects
   };
 
