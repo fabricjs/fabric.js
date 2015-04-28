@@ -426,10 +426,6 @@
       if (!this.hiddenTextarea) {
         return;
       }
-
-      this.hiddenTextarea.value = this.text;
-      this.hiddenTextarea.selectionStart = this.selectionStart;
-      this.hiddenTextarea.selectionEnd = this.selectionEnd;
     },
 
     /**
