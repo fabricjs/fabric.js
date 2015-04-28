@@ -342,7 +342,8 @@
      */
     _onMouseDownInDrawingMode: function(e) {
       this._isCurrentlyDrawing = true;
-      this.discardActiveObject(e).renderAll();
+      //Discard active object does a renderAll()
+      this.discardActiveObject(e);
       if (this.clipTo) {
         fabric.util.clipContext(this, this.contextTop);
       }

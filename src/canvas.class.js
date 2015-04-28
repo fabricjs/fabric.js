@@ -829,6 +829,13 @@
       if (!upperCanvasEl) {
         upperCanvasEl = this.upperCanvasEl;
       }
+
+      if (ignoreZoom && e.__fabricPointer_noZoom) {
+        return e.__fabricPointer_noZoom;
+      } else if (!ignoreZoom && e.__fabricPointer) {
+        return e.__fabricPointer;
+      }
+
       var pointer = getPointer(e, upperCanvasEl),
           bounds = upperCanvasEl.getBoundingClientRect(),
           boundsWidth = bounds.width || 0,
@@ -866,10 +873,16 @@
         };
       }
 
-      return {
+      var pointerResult = {
         x: pointer.x * cssScale.width,
         y: pointer.y * cssScale.height
       };
+      if (ignoreZoom) {
+        e.__fabricPointer_noZoom = pointerResult;
+      } else {
+        e.__fabricPointer = pointerResult;
+      }
+      return pointerResult;
     },
 
     /**
@@ -1011,8 +1024,10 @@
      * @chainable
      */
     discardActiveObject: function (e) {
-      this._discardActiveObject();
-      this.renderAll();
+      if (this._activeObject) {
+        this._discardActiveObject();
+        this.renderAll();
+      }
       this.fire('selection:cleared', { e: e });
       return this;
     },
