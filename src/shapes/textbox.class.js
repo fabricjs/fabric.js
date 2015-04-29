@@ -72,6 +72,7 @@
         this._textLines = this._splitTextIntoLines();
         this._clearCache();
         this.height = this._getTextHeight(ctx);
+        this._updateHiddenTextareaPosition();
       },
        /**
         * Wraps text using the 'width' property of Textbox. First this function
