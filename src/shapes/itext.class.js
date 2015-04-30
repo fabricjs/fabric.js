@@ -307,43 +307,19 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
-      this.callSuper('_render', ctx);
-      this.ctx = ctx;
-      this.isEditing && this.renderCursorOrSelection();
+      // We are now using a native text area to edit text, which will have a transparent background,
+      // so we don't want to render anything to the canvas when we're in edit mode.
+      if (!this.isEditing) {
+        this.callSuper('_render', ctx);
+        this.ctx = ctx;
+      }
     },
 
     /**
      * Renders cursor or selection (depending on what exists)
      */
     renderCursorOrSelection: function() {
-      if (!this.active) {
-        return;
-      }
-
-      var chars = this.text.split(''),
-          boundaries, ctx;
-
-      if (this.canvas.contextTop) {
-        ctx = this.canvas.contextTop;
-        ctx.save();
-        ctx.transform.apply(ctx, this.canvas.viewportTransform);
-        this.transform(ctx);
-      }
-      else {
-        ctx = this.ctx;
-        ctx.save();
-      }
-
-      if (this.selectionStart === this.selectionEnd) {
-        boundaries = this._getCursorBoundaries(chars, 'cursor');
-        this.renderCursor(boundaries, ctx);
-      }
-      else {
-        boundaries = this._getCursorBoundaries(chars, 'selection');
-        this.renderSelection(chars, boundaries, ctx);
-      }
-
-      ctx.restore();
+      // No, don't do that. We have a real textarea for editing.
     },
 
     /**

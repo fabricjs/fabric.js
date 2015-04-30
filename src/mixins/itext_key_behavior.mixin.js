@@ -9,7 +9,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     this.hiddenTextarea = fabric.document.createElement('textarea');
     this.hiddenTextarea.value = this.text;
 
-    this.hiddenTextarea.style.cssText = 'position: absolute; overflow: hidden; resize: none; margin: 0; padding: 0; border: 0; box-shadow: none; border-radius: 0;';
+    this.hiddenTextarea.style.cssText = 'position: absolute; overflow: hidden; resize: none; margin: 0; padding: 0; border: 0; box-shadow: none; border-radius: 0; background-color: transparent;';
     //If at all possible, show the textarea within the canvas wrapper where it can exist
     //at the same height as the iText display. This prevents iOS from scrolling to whatever
     //height the textarea is at when you type.
@@ -79,7 +79,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this.hiddenTextarea.style.fontSize = this.fontSize * xScale + 'px';
       this.hiddenTextarea.style.color = this.fill;
       this.hiddenTextarea.style.textAlign = this.textAlign;
-      this.hiddenTextarea.style.lineHeight = this.lineHeight;
+      this.hiddenTextarea.style.lineHeight = this.lineHeight * this._fontSizeMult;
+
     }
   },
 
