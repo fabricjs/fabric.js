@@ -52,29 +52,18 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       var xScale = canvasRect.width / this.canvas.width * zoom;
       var yScale = canvasRect.height / this.canvas.height * zoom;
 
-      var top = this.top * yScale;
-      var left = this.left * xScale;
+      //Use getCenterPoint() instead of this.left/top to calculate the appropriate top/left for
+      //the textbox so that if the shape is rotated, we still draw ourselves within the rotated shape
+      var top = (this.getCenterPoint().y - 0.5 * this.height) * yScale;
+      var left = (this.getCenterPoint().x - 0.5 * this.width) * xScale;
       var width = this.getWidth() * xScale;
       var heightFudgeFactor = this.fontSize * xScale;
       var height = (this._measuredHeight || this.getHeight()) * yScale + heightFudgeFactor;
 
       this.hiddenTextarea.style.width = width + 'px';
       this.hiddenTextarea.style.height = height + 'px';
-
-      // Compensate for rotation of the text's topleft
-      if (this.angle >= 45 && this.angle < 135) {
-        this.hiddenTextarea.style.top = top + 'px';
-        this.hiddenTextarea.style.left = left - height + 'px';
-      } else if (this.angle >= 135 && this.angle < 225) {
-        this.hiddenTextarea.style.top = top - height + 'px';
-        this.hiddenTextarea.style.left = left - width + 'px';
-      } else if (this.angle >= 225 && this.angle < 315) {
-        this.hiddenTextarea.style.top = top - width + 'px';
-        this.hiddenTextarea.style.left = left + 'px';
-      } else { // angle >= 315 && angle < 45
-        this.hiddenTextarea.style.top = top + 'px';
-        this.hiddenTextarea.style.left = left + 'px';
-      }
+      this.hiddenTextarea.style.top = top + 'px';
+      this.hiddenTextarea.style.left = left + 'px';
 
       this.hiddenTextarea.style.fontSize = this.fontSize * xScale + 'px';
       this.hiddenTextarea.style.color = this.fill;
