@@ -32,7 +32,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
     fabric.util.addListener(this.hiddenTextarea, 'keydown', this.onKeyDown.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'input', this.onInput.bind(this));
-    fabric.util.addListener(this.hiddenTextarea, 'textInput', this.onTextAreaInput.bind(this));
 
     if (!this._clickHandlerInitialized && this.canvas) {
       fabric.util.addListener(this.canvas.upperCanvasEl, 'click', this.onClick.bind(this));
@@ -112,11 +111,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     this.hiddenTextarea && this.hiddenTextarea.focus();
   },
 
-  onTextAreaInput: function() {
-    // Broadcast hiddenTextArea input events as 'changed' event on this itext instance
-    this.fire('changed');
-  },
-
   /**
    * Handles keyup event
    * @param {Event} e Event object
@@ -140,7 +134,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   },
 
   /**
-   * Handles keypress event
+   * Handles input event
    * @param {Event} e Event object
    */
   onInput: function(e) {
@@ -148,5 +142,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       return;
     }
     this.set('text', this.hiddenTextarea.value);
+
+    // Broadcast hiddenTextArea input events as 'changed' event on this itext instance
+    this.fire('changed');
   }
 });
