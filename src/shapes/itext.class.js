@@ -307,9 +307,12 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
-      this.callSuper('_render', ctx);
-      this.ctx = ctx;
-      this.isEditing && this.renderCursorOrSelection();
+      // We are now using a native text area to edit text, which will have a transparent background,
+      // so we don't want to render anything to the canvas when we're in edit mode.
+      if (!this.isEditing) {
+        this.callSuper('_render', ctx);
+        this.ctx = ctx;
+      }
     },
 
     /**
