@@ -126,6 +126,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this[this._ctrlKeysMap[e.keyCode]](e);
     }
     else {
+      // Prevent other keydown handlers from calling preventDefault() on events the textarea needs to receive, like arrows and backspace.
+      e.stopPropagation();
       return;
     }
     e.stopImmediatePropagation();
