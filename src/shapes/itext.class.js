@@ -319,34 +319,7 @@
      * Renders cursor or selection (depending on what exists)
      */
     renderCursorOrSelection: function() {
-      if (!this.active) {
-        return;
-      }
-
-      var chars = this.text.split(''),
-          boundaries, ctx;
-
-      if (this.canvas.contextTop) {
-        ctx = this.canvas.contextTop;
-        ctx.save();
-        ctx.transform.apply(ctx, this.canvas.viewportTransform);
-        this.transform(ctx);
-      }
-      else {
-        ctx = this.ctx;
-        ctx.save();
-      }
-
-      if (this.selectionStart === this.selectionEnd) {
-        boundaries = this._getCursorBoundaries(chars, 'cursor');
-        this.renderCursor(boundaries, ctx);
-      }
-      else {
-        boundaries = this._getCursorBoundaries(chars, 'selection');
-        this.renderSelection(chars, boundaries, ctx);
-      }
-
-      ctx.restore();
+      // No, don't do that. We have a real textarea for editing.
     },
 
     /**
