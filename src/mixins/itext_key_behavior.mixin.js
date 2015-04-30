@@ -137,7 +137,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   },
 
   /**
-   * Handles keypress event
+   * Handles input event
    * @param {Event} e Event object
    */
   onInput: function(e) {
@@ -145,5 +145,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       return;
     }
     this.set('text', this.hiddenTextarea.value);
+
+    // Broadcast hiddenTextArea input events as 'changed' event on this itext instance
+    this.fire('changed');
   }
 });
