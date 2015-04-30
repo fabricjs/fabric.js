@@ -65,6 +65,18 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this.hiddenTextarea.style.top = top + 'px';
       this.hiddenTextarea.style.left = left + 'px';
 
+      // Calculate clipping rect for textarea so it doesn't overflow the canvas.
+      //
+      // Setting overflow: hidden doesn't work very well because browsers will still scroll to
+      // keep the cursor on the screen, so this seems to be the best option.
+      var widthOverflow = Math.max(left + width - canvasRect.width, 0);
+      var heightOverflow = Math.max(top + height - canvasRect.height, 0);
+      var clipWidth = 'auto';
+      var clipHeight = 'auto';
+      if (widthOverflow > 0) clipWidth = width - widthOverflow + 'px';
+      if (heightOverflow > 0) clipHeight = height - heightOverflow + 'px';
+      this.hiddenTextarea.style.clip = 'rect(auto,' + clipWidth + ',' + clipHeight + ',auto)';
+
       this.hiddenTextarea.style.fontSize = this.fontSize * xScale + 'px';
       this.hiddenTextarea.style.color = this.fill;
       this.hiddenTextarea.style.textAlign = this.textAlign;
