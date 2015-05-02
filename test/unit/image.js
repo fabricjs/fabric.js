@@ -155,8 +155,6 @@
     createImageObject(function(image) {
       equal(image.crossOrigin, '', 'initial crossOrigin value should be set');
 
-      start();
-
       var elImage = _createImageElement();
       elImage.crossOrigin = 'anonymous';
       image = new fabric.Image(elImage);

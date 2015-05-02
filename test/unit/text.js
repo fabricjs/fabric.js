@@ -46,7 +46,7 @@
     'globalCompositeOperation': 'source-over'
   };
 
-  var TEXT_SVG = '\t<g transform="translate(10 26.22)">\n\t\t<text font-family="Times New Roman" font-size="40" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" ><tspan x="-10" y="8.984" fill="rgb(0,0,0)">x</tspan></text>\n\t</g>\n';
+  var TEXT_SVG = '\t<g transform="translate(10 26.22)">\n\t\t<text font-family="Times New Roman" font-size="40" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" ><tspan x="-10" y="8.98" fill="rgb(0,0,0)">x</tspan></text>\n\t</g>\n';
 
   test('constructor', function() {
     ok(fabric.Text);
