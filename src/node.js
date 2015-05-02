@@ -125,13 +125,15 @@
       var oImg = new fabric.Image(img);
 
       oImg._initConfig(object);
-      oImg._initFilters(object, function(filters) {
+      oImg._initFilters(object.filters, function(filters) {
         oImg.filters = filters || [ ];
-        callback && callback(oImg);
+        oImg._initFilters(object.resizeFilters, function(resizeFilters) {
+          oImg.resizeFilters = resizeFilters || [ ];
+          callback && callback(oImg);
+        });
       });
     });
   };
-
   /**
    * Only available when running fabric on node.js
    * @param {Number} width Canvas width
