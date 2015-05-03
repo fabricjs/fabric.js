@@ -6,4 +6,3 @@ dist/fabric.min.js
 dist/fabric.min.js.gz
 .DS_Store
 HEADER.js
-build.js
