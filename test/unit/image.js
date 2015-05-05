@@ -115,6 +115,27 @@
     });
   });
 
+  asyncTest('toObject with resize filter', function() {
+    createImageObject(function(image) {
+      ok(typeof image.toObject == 'function');
+      var filter = new fabric.Image.filters.Resize({resizeType: 'bilinear', scaleX: 0.3, scaleY: 0.3});
+      image.resizeFilters.push(filter);
+      ok(image.resizeFilters[0] instanceof fabric.Image.filters.Resize, 'should inherit from fabric.Image.filters.Resize');
+      
+      var toObject = image.toObject();
+      deepEqual(toObject.resizeFilters[0], filter.toObject());
+      fabric.Image.fromObject(toObject, function(imageFromObject) {
+        var filterFromObj = imageFromObject.resizeFilters[0];
+        deepEqual(filterFromObj, filter);
+        ok(filterFromObj instanceof fabric.Image.filters.Resize, 'should inherit from fabric.Image.filters.Resize');
+        equal(filterFromObj.scaleX, 0.3);
+        equal(filterFromObj.scaleY, 0.3);
+        equal(filterFromObj.resizeType, 'bilinear');
+      });
+      start();
+    });
+  });
+
   asyncTest('toString', function() {
     createImageObject(function(image) {
       ok(typeof image.toString == 'function');
