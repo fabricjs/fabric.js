@@ -320,7 +320,6 @@
         ||
         (target &&
           activeGroup &&
-          !activeGroup.contains(target) &&
           activeGroup !== target &&
           !e.shiftKey)
         ||
