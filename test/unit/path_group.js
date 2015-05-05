@@ -243,13 +243,14 @@
     ok(fabric.PathGroup);
     getPathGroupObject(function(pathGroup) {
       ok(typeof pathGroup.toSVG == 'function');
+      pathGroup.strokeWidth = 0;
       pathGroup.originX = 'center';
       pathGroup.originY = 'center';
       pathGroup.width = 700;
       pathGroup.height = 600;
       pathGroup.left = 350;
       pathGroup.top = 300;
-      equal(pathGroup.toSVG(), REFERENCE_PATH_GROUP_SVG);
+      equal(pathGroup.toSVG(), REFERENCE_PATH_GROUP_SVG.replace('stroke-width: 1', 'stroke-width: 0'));
       start();
     });
   });

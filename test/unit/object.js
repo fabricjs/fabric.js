@@ -368,29 +368,29 @@ test('getBoundingRectWithStroke', function() {
 
     cObj.setCoords();
     boundingRect = cObj.getBoundingRect();
-    equal(boundingRect.left.toFixed(2), -0.5);
-    equal(boundingRect.top.toFixed(2), -0.5);
+    equal(boundingRect.left.toFixed(2), 0);
+    equal(boundingRect.top.toFixed(2), 0);
     equal(boundingRect.width.toFixed(2), 1);
     equal(boundingRect.height.toFixed(2), 1);
 
     cObj.set('width', 123).setCoords();
     boundingRect = cObj.getBoundingRect();
-    equal(boundingRect.left.toFixed(2), -0.5);
-    equal(boundingRect.top.toFixed(2), -0.5);
+    equal(boundingRect.left.toFixed(2), 0);
+    equal(boundingRect.top.toFixed(2), 0);
     equal(boundingRect.width.toFixed(2), 124);
     equal(boundingRect.height.toFixed(2), 1);
 
     cObj.set('height', 167).setCoords();
     boundingRect = cObj.getBoundingRect();
-    equal(boundingRect.left.toFixed(2), -0.5);
-    equal(boundingRect.top.toFixed(2), -0.5);
+    equal(boundingRect.left.toFixed(2), 0);
+    equal(boundingRect.top.toFixed(2), 0);
     equal(boundingRect.width.toFixed(2), 124);
     equal(boundingRect.height.toFixed(2), 168);
 
     cObj.scale(2).setCoords();
     boundingRect = cObj.getBoundingRect();
-    equal(boundingRect.left.toFixed(2), -1);
-    equal(boundingRect.top.toFixed(2), -1);
+    equal(boundingRect.left.toFixed(2), 0);
+    equal(boundingRect.top.toFixed(2), 0);
     equal(boundingRect.width.toFixed(2), 248);
     equal(boundingRect.height.toFixed(2), 336);
   });
@@ -951,7 +951,7 @@ test('toDataURL & reference to canvas', function() {
 
   test('center', function() {
     var object = new fabric.Object();
-
+    object.strokeWidth = 0;
     ok(typeof object.center == 'function');
 
     canvas.add(object);
@@ -963,7 +963,7 @@ test('toDataURL & reference to canvas', function() {
 
   test('centerH', function() {
     var object = new fabric.Object();
-
+    object.strokeWidth = 0;
     ok(typeof object.centerH == 'function');
 
     canvas.add(object);
@@ -974,7 +974,7 @@ test('toDataURL & reference to canvas', function() {
 
   test('centerV', function() {
     var object = new fabric.Object();
-
+    object.strokeWidth = 0;
     ok(typeof object.centerV == 'function');
 
     canvas.add(object);
