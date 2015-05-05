@@ -479,19 +479,6 @@ test('toObject without default values', function() {
     equal(group.insertAt(rect1, 2), group, 'should be chainable');
   });
 
-  test('test group transformMatrix', function() {
-    var rect1 = new fabric.Rect({ top: 100, left: 100, width: 10, height: 10, strokeWidth: 0 }),
-        rect2 = new fabric.Rect({ top: 120, left: 120, width: 10, height: 10, strokeWidth: 0 }),
-        group = new fabric.Group([ rect1, rect2 ]),
-        ctx = canvas.getContext("2D"), isTransparent = fabric.util.isTransparent;
-        canvas.add(group);
-        equal(isTransparent(ctx, 99, 99, 0), true);
-        equal(isTransparent(ctx, 101, 101, 0), false);
-        group.transformMatrix = [1.2, 0, 0, 1.2, 1, 1];
-        canvas.renderAll();
-        equal(isTransparent(ctx, 101, 101, 0), true);
-        equal(isTransparent(ctx, 131, 131, 0), false);
-  });
   // asyncTest('cloning group with image', function() {
   //   var rect = new fabric.Rect({ top: 100, left: 100, width: 30, height: 10 }),
   //       img = new fabric.Image(_createImageElement()),
