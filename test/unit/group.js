@@ -479,6 +479,14 @@ test('toObject without default values', function() {
     equal(group.insertAt(rect1, 2), group, 'should be chainable');
   });
 
+  test('test group transformMatrix', function() {
+    var rect1 = new fabric.Rect({ top: 100, left: 100, width: 10, height: 10, strokeWidth: 0 }),
+        rect2 = new fabric.Rect({ top: 120, left: 120, width: 10, height: 10, strokeWidth: 0 }),
+        group = new fabric.Group([ rect1, rect2 ]);
+        // test pixel transparent
+        group.transformMatrix = [2, 0, 0, 2, 1, 1];
+        // test pixel not transparent
+  });
   // asyncTest('cloning group with image', function() {
   //   var rect = new fabric.Rect({ top: 100, left: 100, width: 30, height: 10 }),
   //       img = new fabric.Image(_createImageElement()),
