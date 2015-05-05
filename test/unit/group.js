@@ -1,6 +1,9 @@
 (function() {
 
-  var canvas = this.canvas = new fabric.Canvas();
+  var el = fabric.document.createElement('canvas');
+  el.width = 600; el.height = 600;
+
+  var canvas = this.canvas = fabric.isLikelyNode ? fabric.createCanvasForNode() : new fabric.Canvas(el);
 
   // function _createImageElement() {
   //   return fabric.isLikelyNode ? new (require('canvas').Image)() : fabric.document.createElement('img');
@@ -497,6 +500,20 @@ test('toObject without default values', function() {
     equal(g1._objects[3].canvas, canvas);
     equal(rect2.canvas, canvas);
     equal(rect1.canvas, canvas);
+  });
+
+  test('test group transformMatrix', function() {
+    var rect1 = new fabric.Rect({ top: 100, left: 100, width: 10, height: 10, strokeWidth: 0 }),
+        rect2 = new fabric.Rect({ top: 120, left: 120, width: 10, height: 10, strokeWidth: 0 }),
+        group = new fabric.Group([ rect1, rect2 ]),
+        ctx = canvas.contextContainer, isTransparent = fabric.util.isTransparent;
+    canvas.add(group);
+    equal(isTransparent(ctx, 80, 80, 0), true);
+    equal(isTransparent(ctx, 101, 101, 0), false);
+    group.transformMatrix = [1.2, 0, 0, 1.2, 1, 1];
+    canvas.renderAll();
+    equal(isTransparent(ctx, 101, 101, 0), true);
+    equal(isTransparent(ctx, 131, 131, 0), false);
   });
   // asyncTest('cloning group with image', function() {
   //   var rect = new fabric.Rect({ top: 100, left: 100, width: 30, height: 10 }),
