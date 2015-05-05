@@ -486,10 +486,10 @@ test('toObject without default values', function() {
         ctx = canvas.getContext("2D"), isTransparent = fabric.util.isTransparent;
         canvas.add(group);
         equal(isTransparent(ctx, 99, 99, 0), true);
-        equal(isTransparent(ctx, 131, 131, 0), true);
-        group.transformMatrix = [2, 0, 0, 2, 1, 1];
+        equal(isTransparent(ctx, 101, 101, 0), false);
+        group.transformMatrix = [1.2, 0, 0, 1.2, 1, 1];
         canvas.renderAll();
-        equal(isTransparent(ctx, 99, 99, 0), false);
+        equal(isTransparent(ctx, 101, 101, 0), true);
         equal(isTransparent(ctx, 131, 131, 0), false);
   });
   // asyncTest('cloning group with image', function() {
