@@ -166,7 +166,7 @@
     equal(oCircle.get('strokeLineJoin'), strokeLineJoin);
     equal(oCircle.get('strokeMiterLimit'), strokeMiterLimit);
 
-    elFaultyCircle = fabric.document.createElement('circle');
+    var elFaultyCircle = fabric.document.createElement('circle');
     elFaultyCircle.setAttribute('r', '-10');
 
     var error;

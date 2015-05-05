@@ -17,7 +17,7 @@
       IMG_HEIGHT  = 110;
 
   function _createImageElement() {
-    return fabric.isLikelyNode ? new (require('canvas').Image) : fabric.document.createElement('img');
+    return fabric.isLikelyNode ? new (require('canvas').Image)() : fabric.document.createElement('img');
   }
 
   function createImageObject(callback) {
@@ -575,7 +575,6 @@ test('getBoundingRectWithStroke', function() {
     }
     else {
       var image;
-      var _this = this;
 
       setTimeout(function() {
         ok(image);
@@ -590,15 +589,15 @@ test('getBoundingRectWithStroke', function() {
   });
 
   test('toDataURL', function() {
-    var data =
-      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQA'+
-      'AABkCAYAAABw4pVUAAAA+UlEQVR4nO3RoRHAQBDEsOu/6YR+B2s'+
-      'gIO4Z3919pMwDMCRtHoAhafMADEmbB2BI2jwAQ9LmARiSNg/AkLR5AI'+
-      'akzQMwJG0egCFp8wAMSZsHYEjaPABD0uYBGJI2D8CQtHkAhqTNAzAkbR'+
-      '6AIWnzAAxJmwdgSNo8AEPS5gEYkjYPwJC0eQCGpM0DMCRtHoAhafMADEm'+
-      'bB2BI2jwAQ9LmARiSNg/AkLR5AIakzQMwJG0egCFp8wAMSZsHYEjaPABD0'+
-      'uYBGJI2D8CQtHkAhqTNAzAkbR6AIWnzAAxJmwdgSNo8AEPS5gEYkjYPw'+
-      'JC0eQCGpM0DMCRtHsDjB5K06yueJFXJAAAAAElFTkSuQmCC';
+    // var data =
+    //   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQA'+
+    //   'AABkCAYAAABw4pVUAAAA+UlEQVR4nO3RoRHAQBDEsOu/6YR+B2s'+
+    //   'gIO4Z3919pMwDMCRtHoAhafMADEmbB2BI2jwAQ9LmARiSNg/AkLR5AI'+
+    //   'akzQMwJG0egCFp8wAMSZsHYEjaPABD0uYBGJI2D8CQtHkAhqTNAzAkbR'+
+    //   '6AIWnzAAxJmwdgSNo8AEPS5gEYkjYPwJC0eQCGpM0DMCRtHoAhafMADEm'+
+    //   'bB2BI2jwAQ9LmARiSNg/AkLR5AIakzQMwJG0egCFp8wAMSZsHYEjaPABD0'+
+    //   'uYBGJI2D8CQtHkAhqTNAzAkbR6AIWnzAAxJmwdgSNo8AEPS5gEYkjYPw'+
+    //   'JC0eQCGpM0DMCRtHsDjB5K06yueJFXJAAAAAElFTkSuQmCC';
 
     var cObj = new fabric.Rect({
       width: 100, height: 100, fill: 'red'
@@ -607,7 +606,7 @@ test('getBoundingRectWithStroke', function() {
     ok(typeof cObj.toDataURL == 'function');
 
     if (!fabric.Canvas.supports('toDataURL')) {
-      alert('toDataURL is not supported by this environment. Some of the tests can not be run.');
+      window.alert('toDataURL is not supported by this environment. Some of the tests can not be run.');
     }
     else {
       var dataURL = cObj.toDataURL();
@@ -615,7 +614,7 @@ test('getBoundingRectWithStroke', function() {
       equal(dataURL.substring(0, 21), 'data:image/png;base64');
 
       try {
-        var dataURL = cObj.toDataURL({ format: 'jpeg' });
+        dataURL = cObj.toDataURL({ format: 'jpeg' });
         equal(dataURL.substring(0, 22), 'data:image/jpeg;base64');
       }
       catch(err) {
@@ -625,15 +624,15 @@ test('getBoundingRectWithStroke', function() {
   });
 
 test('toDataURL & reference to canvas', function() {
-  var data =
-    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQA'+
-    'AABkCAYAAABw4pVUAAAA+UlEQVR4nO3RoRHAQBDEsOu/6YR+B2s'+
-    'gIO4Z3919pMwDMCRtHoAhafMADEmbB2BI2jwAQ9LmARiSNg/AkLR5AI'+
-    'akzQMwJG0egCFp8wAMSZsHYEjaPABD0uYBGJI2D8CQtHkAhqTNAzAkbR'+
-    '6AIWnzAAxJmwdgSNo8AEPS5gEYkjYPwJC0eQCGpM0DMCRtHoAhafMADEm'+
-    'bB2BI2jwAQ9LmARiSNg/AkLR5AIakzQMwJG0egCFp8wAMSZsHYEjaPABD0'+
-    'uYBGJI2D8CQtHkAhqTNAzAkbR6AIWnzAAxJmwdgSNo8AEPS5gEYkjYPw'+
-    'JC0eQCGpM0DMCRtHsDjB5K06yueJFXJAAAAAElFTkSuQmCC';
+  // var data =
+  //   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQA'+
+  //   'AABkCAYAAABw4pVUAAAA+UlEQVR4nO3RoRHAQBDEsOu/6YR+B2s'+
+  //   'gIO4Z3919pMwDMCRtHoAhafMADEmbB2BI2jwAQ9LmARiSNg/AkLR5AI'+
+  //   'akzQMwJG0egCFp8wAMSZsHYEjaPABD0uYBGJI2D8CQtHkAhqTNAzAkbR'+
+  //   '6AIWnzAAxJmwdgSNo8AEPS5gEYkjYPwJC0eQCGpM0DMCRtHoAhafMADEm'+
+  //   'bB2BI2jwAQ9LmARiSNg/AkLR5AIakzQMwJG0egCFp8wAMSZsHYEjaPABD0'+
+  //   'uYBGJI2D8CQtHkAhqTNAzAkbR6AIWnzAAxJmwdgSNo8AEPS5gEYkjYPw'+
+  //   'JC0eQCGpM0DMCRtHsDjB5K06yueJFXJAAAAAElFTkSuQmCC';
 
   var cObj = new fabric.Rect({
     width: 100, height: 100, fill: 'red'
@@ -641,7 +640,7 @@ test('toDataURL & reference to canvas', function() {
   canvas.add(cObj);
 
   if (!fabric.Canvas.supports('toDataURL')) {
-    alert('toDataURL is not supported by this environment. Some of the tests can not be run.');
+    window.alert('toDataURL is not supported by this environment. Some of the tests can not be run.');
   }
   else {
     var objCanvas = cObj.canvas;
@@ -1113,11 +1112,11 @@ test('toDataURL & reference to canvas', function() {
     equal(object.shadow.blur, 10);
     equal(object.shadow.offsetX, 5);
     equal(object.shadow.offsetY, 15);
-    
+
     equal(object.setShadow(null), object, 'should be chainable');
     ok(!(object.shadow instanceof fabric.Shadow));
     equal(object.shadow, null);
-    
+
   });
 
   test('set shadow', function() {

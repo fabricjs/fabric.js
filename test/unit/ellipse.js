@@ -82,7 +82,7 @@
 
     ellipse._render = function(){
       wasRenderCalled = true;
-    }
+    };
     ellipse.render({});
 
     equal(wasRenderCalled, false, 'should not render when rx/ry are 0');

@@ -1,0 +1,31 @@
+{
+  "globals": {
+    "fabric":   true,
+    "G_vmlCanvasManager": true
+  },
+  "browser":    true,
+  // TODO: change to true
+  "eqeqeq":     false,
+  "eqnull":     true,
+  "evil":       true,
+  "expr":       true,
+  "forin":      false,
+  "immed":      true,
+  "lastsemic":  true,
+  "laxbreak":   true,
+  "loopfunc":   true,
+  "multistr":   true,
+  "newcap":     true,
+  "noarg":      true,
+  "node":       true,
+  "noempty":    false,
+  "nomen":      false,
+  "nonew":      false,
+  "onevar":     false,
+  "plusplus":   false,
+  "strict":     false,
+  "sub":        true,
+  "undef":      true,
+  "unused":     true,
+  "qunit":      true
+}

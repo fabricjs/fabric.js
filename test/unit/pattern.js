@@ -2,7 +2,9 @@
   var IMG_SRC = fabric.isLikelyNode ? (__dirname + '/../fixtures/greyfloral.png') : '../fixtures/greyfloral.png';
 
   function createImageElement() {
-    return fabric.isLikelyNode ? new (require('canvas').Image) : fabric.document.createElement('img');
+    return fabric.isLikelyNode
+            ? new (require('canvas').Image)()
+            : fabric.document.createElement('img');
   }
   function setSrc(img, src, callback) {
     if (fabric.isLikelyNode) {
@@ -61,7 +63,6 @@
     equal(object.offsetX, 0);
     equal(object.offsetY, 0);
 
-    var sourceExecuted;
     var patternWithGetSource = new fabric.Pattern({
       source: function() {return fabric.document.createElement("canvas")}
     });
@@ -78,6 +79,8 @@
   });
 
   test('pattern serialization / deserialization (function)', function() {
+    var patternSourceCanvas, padding;
+
     var pattern = new fabric.Pattern({
       source: function() {
         patternSourceCanvas.setDimensions({
