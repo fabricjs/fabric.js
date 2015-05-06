@@ -131,8 +131,18 @@
         h += (h < 0 ? -strokeWidth : strokeWidth);
       }
 
-      w = w * this.scaleX + 2 * this.padding;
-      h = h * this.scaleY + 2 * this.padding;
+      if ((this.type == 'rect' || this.type == 'triangle' || this.type == 'text' || this.type == 'line') && 
+      (this.transformMatrix[1] != 0 || this.transformMatrix[2] != 0)){
+      //TODO better _calculateCurrentDimensions if strokeWidth != 0 
+        var currentWidth = (w * this.scaleX + Math.abs(h*this.transformMatrix[2])*this.scaleX + 2 * this.padding);
+        var currentHeight = (h * this.scaleY + Math.abs(w*this.transformMatrix[1])*this.scaleY + 2 * this.padding);
+        }
+      else {
+        var currentWidth = w * this.scaleX + 2 * this.padding;
+        var currentHeight = h * this.scaleY + 2 * this.padding;
+        }
+      w = currentWidth;
+      h = currentHeight;
 
       if (shouldTransform) {
         return fabric.util.transformPoint(new fabric.Point(w, h), vpt, true);

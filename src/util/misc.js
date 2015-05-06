@@ -526,7 +526,228 @@
       imageData = null;
 
       return _isTransparent;
+    },
+    
+  /*Take a visible object and skewing this one.
+  * inclination = [skewX, skewY].
+  */
+  skewObject: function(inclination, object) {
+  //TODO function that change the originX and originY of the generic object in 'left' and 'top' rispectively.
+    var canvas = object.canvas;
+    object.transformMatrix = [1,inclination[1],inclination[0],1,0,0];
+    if (object.type == 'path') {
+      var newPath = new fabric.Path(fabric.util.pathToNewPath(object.path, inclination[0], inclination[1]));
+      object.width = newPath.width;
+      object.height = newPath.height;
+      canvas.renderAll();
+      object.setCoords();
+      }
+    else if (object.type == 'circle') {
+      var newDimension = fabric.util.skewCircleWidthHeight(object, inclination);
+      object.width = newDimension.width;
+      object.height = newDimension.height;
+      canvas.renderAll();
+      object.setCoords();
+      }
+    else if (object.type == 'ellipse') {
+      var newDimension = fabric.util.skewEllipseWidthHeight(object, inclination);
+      object.width = newDimension.width;
+      object.height = newDimension.height;
+      canvas.renderAll();
+      object.setCoords();
+      }
+    else if (object.type == 'rect' || object.type == 'triangle' || object.type == 'text' || object.type == 'line') {
+      canvas.renderAll();
+      object.setCoords();
+      }
+    else if (object.type == 'polygon' || object.type == 'polyline') {
+      object.transformMatrix = [1,0,0,1,0,0];
+      var getAbsoluteCoords = fabric.util.getAbsoluteCoords;
+      var skewPolygonPoints = fabric.util.skewPolygonPoints;
+      var changePolygonProp = fabric.util.changePolygonProp;
+      var active = object.active;
+      if (!object.notSkewed){
+        object.notSkewed = new fabric.Polygon(getAbsoluteCoords(object, skewPolygonPoints(object.points, [0,0])));
+        canvas.add(object.notSkewed);      //Set the the not skewed polygon's absolute coords,
+        canvas.remove(object.notSkewed);   //maybe(of course) there is a better way!
+        }
+      else {
+        object.notSkewed.top = object.top;
+        object.notSkewed.left = object.left;
+        changePolygonProp(object, object.notSkewed);
+        }
+      var newPol = new fabric.Polygon(getAbsoluteCoords(object, skewPolygonPoints(object.points, inclination)));
+      changePolygonProp(object, newPol);
+      canvas.remove(object);
+      canvas.add(object);
+      if (active) {
+        canvas.setActiveObject(object);
+        }
     }
+  },
+     
+     /*
+     * Private
+     */
+     pathToNewPath: function(path, skewX, skewY){
+       var newPath = '';
+       var lastX;
+       var lastY;
+       for (var i in path){
+         if (path[i][0] == 'M'){
+           newPath += 'M ';
+           var newX = lastX = path[i][1] + path[i][2]*skewX;
+           var newY = lastY = path[i][2] + path[i][1]*skewY;
+           newPath += newX.toString() + ' ' + newY.toString() + ' ';
+           }
+         if (path[i][0] == 'L'){
+           newPath += 'L ';
+           var newX = lastX = path[i][1] + path[i][2]*skewX;
+           var newY = lastY = path[i][2] + path[i][1]*skewY;
+           newPath += newX.toString() + ' ' + newY.toString() + ' ';
+           }
+         if (path[i][0] == 'H'){
+           newPath += 'H '
+           var newX = lastX = path[i][1] + lastY*skewX;
+           newPath += newX.toString() + ' ';
+           }
+         if (path[i][0] == 'V'){
+           newPath += 'V ';
+           var newY = lastY = path[i][1] + lastX*skewY;
+           newPath += newY.toString() + ' ';
+           }
+         if (path[i][0] == 'C'){
+           newPath += 'C ';
+           newControlX1 = path[i][1] + path[i][2]*skewX;
+           newControlY1 = path[i][2] + path[i][1]*skewY;
+           newControlX2 = path[i][3] + path[i][4]*skewX;
+           newControlY2 = path[i][4] + path[i][3]*skewY;
+           newX = lastX = path[i][5] + path[i][6]*skewX;
+           newY = lastY = path[i][6] + path[i][5]*skewY;
+           newPath += newControlX1.toString() + ' ' + newControlY1.toString() + ' ' +
+             newControlX2.toString() + ' ' + newControlY2.toString() + ' ' +
+             newX.toString() + ' ' + newY.toString() + ' ';
+           }
+         if (path[i][0] == 'S'){
+           newPath += 'S ';
+           newControlX1 = path[i][1] + path[i][2]*skewX;
+           newControlY1 = path[i][2] + path[i][1]*skewY;
+           newX = lastX = path[i][3] + path[i][4]*skewX;
+           newY = lastY = path[i][4] + path[i][3]*skewY;
+           newPath += newControlX1.toString() + ' ' + newControlY1.toString() + ' ' +
+             newX.toString() + ' ' + newY.toString() + ' ';
+           }
+         if (path[i][0] == 'Q'){
+           newPath += 'Q ';
+           newControlX1 = path[i][1] + path[i][2]*skewX;
+           newControlY1 = path[i][2] + path[i][1]*skewY;
+           newX = lastX = path[i][3] + path[i][4]*skewX;
+           newY = lastY = path[i][4] + path[i][3]*skewY;
+           newPath += newControlX1.toString() + ' ' + newControlY1.toString() + ' ' +
+             newX.toString() + ' ' + newY.toString() + ' ';
+           }
+         if (path[i][0] == 'T'){
+           newPath += 'T ';
+           var newX = lastX = path[i][1] + path[i][2]*skewX;
+           var newY = lastY = path[i][2] + path[i][1]*skewY;
+           newPath += newX.toString() + ' ' + newY.toString() + ' ';
+           }
+         if (path[i][0] == 'A'){
+         //TODO arc
+           }
+         if (path[i][0] == 'Z'){
+           newPath += 'Z ';
+           }
+         }
+    return newPath;
+    },
+    
+    /*
+    * Private
+    */
+    skewCircleWidthHeight: function(object, inclination) {
+      var centerX = object.getCenterPoint().x;
+      var centerY = object.getCenterPoint().y;
+      var radius = object.radius + object.strokeWidth/2;
+      var skewX = inclination[0];
+      var skewY = inclination[1];
+      var tx1 = Math.atan(inclination[0]);
+      var tx2 = tx1 + Math.PI;
+      var ty1 = 1.5707963267948966 - Math.atan(inclination[1]); // This is equal to arccot(x)
+      var ty2 = ty1 + Math.PI;
+      var coordX1 = centerX + radius*Math.cos(tx1) + (centerY + radius*Math.sin(tx1))*skewX;
+      var coordX2 = centerX + radius*Math.cos(tx2) + (centerY + radius*Math.sin(tx2))*skewX;
+      var coordY1 = centerY + radius*Math.sin(ty1) + (centerX + radius*Math.cos(ty1))*skewY;
+      var coordY2 = centerY + radius*Math.sin(ty2) + (centerX + radius*Math.cos(ty2))*skewY;
+      var newWidth = Math.abs(coordX1 - coordX2);
+      var newHeight = Math.abs(coordY1 - coordY2);
+      return {width: newWidth, height: newHeight};
+    },
+
+    /*
+    * Private
+    */    
+    skewEllipseWidthHeight: function(object, inclination){
+      var a = (object.rx) + object.strokeWidth/2;
+      var b = (object.ry) + object.strokeWidth/2;
+      var skewX = inclination[0];
+      var skewY = inclination[1];
+      var tx1 = Math.atan(b*skewX / a);
+      var tx2 = tx1 + Math.PI;
+      var ty1 = 1.5707963267948966 - Math.atan(b / a*skewY); // This is equal to arccot(x)
+      var ty2 = ty1 + Math.PI;
+      var coordX1 = a*Math.cos(tx1) + b*Math.sin(tx1)*skewX;
+      var coordX2 = a*Math.cos(tx2) + b*Math.sin(tx2)*skewX;
+      var coordY1 = b*Math.sin(ty1) + a*Math.cos(ty1)*skewY;
+      var coordY2 = b*Math.sin(ty2) + a*Math.cos(ty2)*skewY;
+      var newWidth = Math.abs(coordX1 - coordX2);
+      var newHeight = Math.abs(coordY1 - coordY2);
+      return {width: newWidth, height: newHeight};
+    },
+    
+    /*
+    * Private
+    */    
+    getAbsoluteCoords: function(object, points) {
+      var center = object.getCenterPoint();
+      var newPoints = [];
+      for (var index in points) {
+        var thisPoint = points[index];
+        var newX = thisPoint.x + center.x;
+        var newY = thisPoint.y + center.y;
+        newPoints.push({x: newX, y: newY});
+        }
+      return newPoints;
+    },
+    
+    /*
+    * Private
+    */    
+    skewPolygonPoints: function(points, inclination) {
+      var skewX = inclination[0];
+      var skewY = inclination[1];
+      var newPoints = [];
+      for (var index in points) {
+        var point = points[index];
+        var newX = point.x + point.y*skewX;
+        var newY = point.y + point.x*skewY;
+        newPoints.push({x: newX, y: newY});
+        }
+      return newPoints;
+    },
+    
+    /*
+    * Private
+    */    
+    changePolygonProp: function(object1, object2, options){
+      if (!options){
+        var options = ['_applyPointOffset', '_prevGlobalCompositeOperation',
+          'width', 'height', 'minX', 'minY', 'points'];
+        }
+      for (var index in options){
+        object1[options[index]] = object2[options[index]];
+        }
+    },
   };
 
 })(typeof exports !== 'undefined' ? exports : this);

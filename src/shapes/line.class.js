@@ -1,5 +1,5 @@
 (function(global) {
-
+//TODO private getHeight(): and getWidth(): for support skew
   'use strict';
 
   var fabric = global.fabric || (global.fabric = { }),
@@ -55,6 +55,7 @@
      */
     y2: 0,
 
+    transformMatrix: [1,0,0,1,0,0],
     /**
      * Constructor
      * @param {Array} [points] Array of points

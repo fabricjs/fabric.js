@@ -1,5 +1,5 @@
 (function(global) {
-
+//TODO private getHeight(): and getWidth(): for support skew
   'use strict';
 
   var fabric = global.fabric || (global.fabric = { }),
@@ -289,6 +289,8 @@
      * @default
      */
     shadow:               null,
+    
+    transformMatrix:     [1,0,0,1,0,0],
 
     /**
      * @private
