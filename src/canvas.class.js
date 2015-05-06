@@ -268,7 +268,7 @@
           isObjectInGroup = (
             activeGroup &&
             object.type !== 'group' &&
-            activeGroup.contains(object)),
+            object.group === activeGroup),
           lt;
 
       if (isObjectInGroup) {
