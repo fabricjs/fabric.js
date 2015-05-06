@@ -20639,6 +20639,10 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      */
     getSelectionStyles: function(startIndex, endIndex) {
 
+      if (! this.getSelectedText().length) {
+        return { };
+      }
+
       if (arguments.length === 2) {
         var styles = [ ];
         for (var i = startIndex; i < endIndex; i++) {
