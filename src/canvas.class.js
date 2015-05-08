@@ -499,10 +499,13 @@
      */
     _setObjectScale: function(localMouse, transform, lockScalingX, lockScalingY, by, lockScalingFlip) {
       var target = transform.target, forbidScalingX = false, forbidScalingY = false,
-          strokeWidth = target.stroke ? target.strokeWidth : 0;
+          vLine = target.type === 'line' && target.width === 0,
+          hLine = target.type === 'line' && target.height === 0,
+          strokeWidthX = hLine ? 0 : target.strokeWidth,
+          strokeWidthY = vLine ? 0 : target.strokeWidth;
 
-      transform.newScaleX = localMouse.x / (target.width + strokeWidth / 2);
-      transform.newScaleY = localMouse.y / (target.height + strokeWidth / 2);
+      transform.newScaleX = localMouse.x / (target.width + strokeWidthX);
+      transform.newScaleY = localMouse.y / (target.height + strokeWidthY);
 
       if (lockScalingFlip && transform.newScaleX <= 0 && transform.newScaleX < target.scaleX) {
         forbidScalingX = true;
@@ -536,9 +539,12 @@
     _scaleObjectEqually: function(localMouse, target, transform) {
 
       var dist = localMouse.y + localMouse.x,
-          strokeWidth = target.stroke ? target.strokeWidth : 0,
-          lastDist = (target.height + (strokeWidth / 2)) * transform.original.scaleY +
-                     (target.width + (strokeWidth / 2)) * transform.original.scaleX;
+          vLine = target.type === 'line' && target.width === 0,
+          hLine = target.type === 'line' && target.height === 0,
+          strokeWidthX = hLine ? 0 : target.strokeWidth,
+          strokeWidthY = vLine ? 0 : target.strokeWidth,
+          lastDist = (target.height + strokeWidthY) * transform.original.scaleY +
+                     (target.width + strokeWidthX) * transform.original.scaleX;
 
       // We use transform.scaleX/Y instead of target.scaleX/Y
       // because the object may have a min scale and we'll loose the proportions
