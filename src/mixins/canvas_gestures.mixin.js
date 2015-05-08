@@ -127,10 +127,13 @@
       target._scaling = true;
 
       var constraintPosition = target.translateToOriginPoint(target.getCenterPoint(), t.originX, t.originY),
-        halfStrokeWidth = target.stroke ? target.strokeWidth / 2 : 0;
+        vLine = target.type === 'line' && target.width === 0,
+        hLine = target.type === 'line' && target.height === 0,
+        strokeWidthX = hLine ? 0 : target.strokeWidth,
+        strokeWidthY = vLine ? 0 : target.strokeWidth;
 
-      this._setObjectScale(new fabric.Point((t.scaleX * s * (target.width + halfStrokeWidth)),
-        (t.scaleY * s * (target.height + halfStrokeWidth))),
+      this._setObjectScale(new fabric.Point((t.scaleX * s * (target.width + strokeWidthX)),
+        (t.scaleY * s * (target.height + strokeWidthY))),
         t, lockScalingX, lockScalingY, null, target.get('lockScalingFlip'));
 
       target.setPositionByOrigin(constraintPosition, t.originX, t.originY);
