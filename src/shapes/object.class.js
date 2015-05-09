@@ -1111,7 +1111,7 @@
         return;
       }
 
-      if (!this.shadow.affectStroke) {
+      if (this.shadow && !this.shadow.affectStroke) {
         this._removeShadow(ctx);
       }
 
