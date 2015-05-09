@@ -1,8 +1,8 @@
+/* _TO_SVG_START_ */
 (function() {
   var toFixed = fabric.util.toFixed,
       NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
 
-  /* _TO_SVG_START_ */
   fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.prototype */ {
 
     /**
@@ -115,5 +115,5 @@
       ].join('');
     }
   });
-  /* _TO_SVG_END_ */
 })();
+/* _TO_SVG_END_ */
