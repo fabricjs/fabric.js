@@ -699,6 +699,9 @@
       if (options.fill && options.fill.colorStops && !(options.fill instanceof fabric.Gradient)) {
         this.set('fill', new fabric.Gradient(options.fill));
       }
+      if (options.stroke && options.stroke.colorStops && !(options.stroke instanceof fabric.Gradient)) {
+        this.set('stroke', new fabric.Gradient(options.stroke));
+      }
     },
 
     /**
@@ -1111,7 +1114,7 @@
         return;
       }
 
-      if (!this.shadow.affectStroke) {
+      if (this.shadow && !this.shadow.affectStroke) {
         this._removeShadow(ctx);
       }
 
