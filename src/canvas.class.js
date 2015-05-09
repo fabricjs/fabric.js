@@ -790,6 +790,7 @@
      */
     _checkTarget: function(e, obj, pointer) {
       if (obj &&
+          obj.selectable &&
           obj.visible &&
           obj.evented &&
           this.containsPoint(e, obj)){
