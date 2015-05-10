@@ -446,7 +446,7 @@
       }
       console.log(ctx.strokeStyle);
       ctx[method](chars, left, top);
-      (offsetX || offsetY) && ctx.restore();
+      this[shortM].toLive && ctx.restore();
     },
 
     /**
