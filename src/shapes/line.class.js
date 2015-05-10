@@ -202,7 +202,12 @@
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
-      return extend(this.callSuper('toObject', propertiesToInclude), this.calcLinePoints());
+      return extend(this.callSuper('toObject', propertiesToInclude), {
+        x1: this.x1,
+        x2: this.x2,
+        y1: this.y1,
+        y2: this.y2
+      });
     },
 
     /**
