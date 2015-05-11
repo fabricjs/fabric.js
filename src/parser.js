@@ -367,19 +367,36 @@
     return selector.length === 0;
   }
 
+  function elementById(doc, id, elementsById) {
+    var el = doc.getElementById(id);
+    if (el) {
+      return el;
+    }
+    if (elementsById[id]) {
+      return elementsById[id];
+    }
+    var node, i, idAttr, nodelist = doc.getElementsByTagName('*');
+    for (i = 0; i < nodelist.length; i++) {
+      node = nodelist[i];
+      idAttr = node.getAttribute('id');
+      elementsById[idAttr] = node;
+    }
+    return elementsById[idAttr];
+  }
+
   /**
    * @private
    */
   function parseUseDirectives(doc) {
-    var nodelist = doc.getElementsByTagName('use');
-    while (nodelist.length) {
-      var el = nodelist[0],
+    var nodelist = doc.getElementsByTagName('use'), elementsById = { }, i = 0;
+    while (nodelist.length && i < nodelist.length) {
+      var el = nodelist[i],
           xlink = el.getAttribute('xlink:href').substr(1),
           x = el.getAttribute('x') || 0,
           y = el.getAttribute('y') || 0,
-          el2 = doc.getElementById(xlink).cloneNode(true),
+          el2 = elementById(doc, xlink, elementsById).cloneNode(true),
           currentTrans = (el2.getAttribute('transform') || '') + ' translate(' + x + ', ' + y + ')',
-          parentNode;
+          parentNode, oldLength = nodelist.length;
 
       for (var j = 0, attrs = el.attributes, l = attrs.length; j < l; j++) {
         var attr = attrs.item(j);
@@ -400,6 +417,10 @@
       el2.removeAttribute('id');
       parentNode = el.parentNode;
       parentNode.replaceChild(el2, el);
+      // some browsers do not shorten nodelist after replaceChild
+      if (nodelist.length === oldLength) {
+        i++;
+      }
     }
   }
 
