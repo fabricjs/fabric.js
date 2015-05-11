@@ -512,7 +512,10 @@
       }
 
       if (by === 'equally' && !lockScalingX && !lockScalingY) {
-        forbidScalingX || forbidScalingY || this._scaleObjectEqually(localMouse, target, transform);
+        // JP: trust `_scaleObjectEqually` to respect `lockScalingFlip` rather than implementing it here;
+        // if we suppress the call to _scaleObjectEqually on account of `forbidScalingX || forbidScalingY`,
+        // then scaling will be prematurely forbidden when the mouse moves into negative local x _OR_ y.
+        this._scaleObjectEqually(localMouse, target, transform, lockScalingFlip);
       }
       else if (!by) {
         forbidScalingX || lockScalingX || target.set('scaleX', transform.newScaleX);
@@ -532,12 +535,17 @@
     /**
      * @private
      */
-    _scaleObjectEqually: function(localMouse, target, transform) {
+    _scaleObjectEqually: function(localMouse, target, transform, lockScalingFlip) {
 
       var dist = localMouse.y + localMouse.x,
           strokeWidth = target.stroke ? target.strokeWidth : 0,
           lastDist = (target.height + (strokeWidth / 2)) * transform.original.scaleY +
                      (target.width + (strokeWidth / 2)) * transform.original.scaleX;
+
+      // JP: respect `lockScalingFlip`; `_setObjectScale` trusts us to implement it here now.
+      if (lockScalingFlip && dist < 0) {
+        return;
+      }
 
       // We use transform.scaleX/Y instead of target.scaleX/Y
       // because the object may have a min scale and we'll loose the proportions
