@@ -560,8 +560,8 @@
       var currentCharStyle = { },
           newLineStyles = { };
 
-      if(this.styles[lineIndex] && this.styles[lineIndex][charIndex - 1]) {
-          currentCharStyle = this.styles[lineIndex][charIndex - 1];
+      if (this.styles[lineIndex] && this.styles[lineIndex][charIndex - 1]) {
+        currentCharStyle = this.styles[lineIndex][charIndex - 1];
       }
 
       // if there's nothing after cursor,
