@@ -557,12 +557,8 @@
         this.styles[lineIndex + 1] = { };
       }
 
-      var currentCharStyle = { },
+      var currentCharStyle = this.styles[lineIndex][charIndex - 1],
           newLineStyles = { };
-
-      if(this.styles[lineIndex] && this.styles[lineIndex][charIndex - 1]) {
-          currentCharStyle = this.styles[lineIndex][charIndex - 1];
-      }
 
       // if there's nothing after cursor,
       // we clone current char style onto the next (otherwise empty) line
