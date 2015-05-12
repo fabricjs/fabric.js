@@ -668,7 +668,7 @@
         var numericLine = parseInt(line, 10);
         if (numericLine > lineIndex) {
           this.styles[numericLine + offset] = clonedStyles[numericLine];
-          if(!clonedStyles[numericLine - offset]) {
+          if (!clonedStyles[numericLine - offset]) {
             delete this.styles[numericLine];
           }
         }
