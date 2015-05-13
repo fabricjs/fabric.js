@@ -274,6 +274,15 @@
     equal(iText.text, 't\nt');
   });
 
+  test('insertNewlineStyleObject', function() {
+    var iText = new fabric.IText('test\n');
+
+    equal(typeof iText.insertNewlineStyleObject, 'function');
+
+    iText.insertNewlineStyleObject(0, 4, true);
+    deepEqual(iText.styles, { '1': { '0': { } } });
+  });
+
   test('selectWord', function() {
     var iText = new fabric.IText('test foo bar-baz\nqux');
 
