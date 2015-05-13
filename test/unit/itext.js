@@ -283,6 +283,42 @@
     deepEqual(iText.styles, { '1': { '0': { } } });
   });
 
+  test('shiftLineStyles', function() {
+    var iText = new fabric.IText('test\ntest\ntest', {
+      styles: {
+        '1': {
+          '0': { 'fill': 'red' },
+          '1': { 'fill': 'red' },
+          '2': { 'fill': 'red' },
+          '3': { 'fill': 'red' }
+        }
+      }
+    });
+
+    equal(typeof iText.shiftLineStyles, 'function');
+
+    iText.shiftLineStyles(0, +1);
+    deepEqual(iText.styles, {
+      '2': {
+        '0': { 'fill': 'red' },
+        '1': { 'fill': 'red' },
+        '2': { 'fill': 'red' },
+        '3': { 'fill': 'red' }
+      }
+    });
+
+    iText.shiftLineStyles(0, -1);
+    deepEqual(iText.styles, {
+      '1': {
+        '0': { 'fill': 'red' },
+        '1': { 'fill': 'red' },
+        '2': { 'fill': 'red' },
+        '3': { 'fill': 'red' }
+      }
+    });
+
+  });
+
   test('selectWord', function() {
     var iText = new fabric.IText('test foo bar-baz\nqux');
 
