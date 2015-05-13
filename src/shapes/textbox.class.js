@@ -108,22 +108,37 @@
            lines.push(text);
          }
          else {
-           while (words.length > 0) {
+          /*
+           * If the textbox's width is less than the widest letter.
+           * TODO: Performance improvement - cache the width of W whenever
+           * fontSize changes.
+           */
+          //KJ: This check guards against running an exponential-time algorithm
+          //to determine that every letter (or almost every letter) should be on its own line
+          //but, I have also fixed the loop to always eventually terminate.
+          var widestCommonLetterWidth = Math.max(
+              ctx.measureText('W').width,
+              ctx.measureText('m').width,
+              ctx.measureText('M').width,
+              ctx.measureText('w').width
+          );
+          if (maxWidth <= Math.ceil(widestCommonLetterWidth)) {
+            return text.split('');
+          }
 
-             /*
-              * If the textbox's width is less than the widest letter.
-              * TODO: Performance improvement - cache the width of W whenever
-              * fontSize changes.
-              */
-             if (maxWidth <= ctx.measureText('W').width) {
-               return text.split('');
-             }
+
+           while (words.length > 0) {
 
              /*
               * This handles a word that is longer than the width of the
               * text area.
               */
              while (Math.ceil(ctx.measureText(words[0]).width) >= maxWidth) {
+               if (words[0].length === 1) {
+                 //We failed to wrap this word; it's down to a single letter &
+                 //it still doesn't fit. Just give up this procedure & make it the line
+                 break;
+               }
                var tmp = words[0];
                words[0] = tmp.slice(0, -1);
                if (words.length > 1) {
@@ -136,8 +151,10 @@
 
              if (Math.ceil(ctx.measureText(line + words[0]).width) < maxWidth) {
                line += words.shift() + ' ';
-             }
-             else {
+             } else if (line === '' && words[0].length === 1) {
+               lines.push(words.shift());
+               line = '';
+             } else {
                lines.push(line);
                line = '';
              }
