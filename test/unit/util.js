@@ -24,6 +24,8 @@
     ? require("path").join(__dirname, '../fixtures/', 'very_large_image.jpg')
     : getAbsolutePath('../fixtures/very_large_image.jpg');
 
+  var IMG_URL_NON_EXISTING = 'http://www.google.com/non-existing';
+
   test('fabric.util.toFixed', function(){
     ok(typeof fabric.util.toFixed == 'function');
 
@@ -455,6 +457,23 @@
 
     setTimeout(function() {
       ok(callbackInvoked, 'callback should be invoked');
+      start();
+    }, 1000);
+  });
+
+
+  asyncTest('fabric.util.loadImage with url for a non exsiting image', function() {
+    var callbackInvoked = false;
+    var hadError = false;
+
+    fabric.util.loadImage(IMG_URL_NON_EXISTING, function(img, error) {
+      callbackInvoked = true;
+      hadError = error;
+    });
+
+    setTimeout(function() {
+      ok(callbackInvoked, 'callback should be invoked');
+      equal(hadError, true, 'callback should be invoked with error set to true');
       start();
     }, 1000);
   });
