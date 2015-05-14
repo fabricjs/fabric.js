@@ -182,6 +182,16 @@
     skipTargetFind:         false,
 
     /**
+     * When true, mouse events on canvas (mousedown/mousemove/mouseup) result in free drawing.
+     * After mousedown, mousemove creates a shape,
+     * and then mouseup finalizes it and adds an instance of `fabric.Path` onto canvas.
+     * @tutorial {@link http://fabricjs.com/fabric-intro-part-4/#free_drawing}
+     * @type Boolean
+     * @default
+     */
+    isDrawingMode:          false,
+
+    /**
      * @private
      */
     _initInteractive: function() {
