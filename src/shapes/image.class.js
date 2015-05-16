@@ -362,6 +362,7 @@
       }
       return canvasEl;
     },
+
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
@@ -395,6 +396,7 @@
            
       this._renderStroke(ctx);
     },
+
     /**
      * @private, needed to check if image needs resize
      */

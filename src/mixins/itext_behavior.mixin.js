@@ -648,7 +648,7 @@
         this.insertNewlineStyleObject(lineIndex, charIndex, isEndOfLine);
       }
       else {
-        if (useCopiedStyle) {
+        if (useCopiedStyle && typeof this.copiedStyles !== 'undefined') {
           this._insertStyles(this.copiedStyles);
         }
         else {
