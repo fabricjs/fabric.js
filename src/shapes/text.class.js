@@ -57,6 +57,13 @@
      * @private
      */
     _reNewline: /\r?\n/,
+    
+    /**
+     * Use this regular expression to filter for whitespace that is not a new line.
+     * Mostly used when text is 'justify' aligned.
+     * @private
+     */
+    _reSpacesAndTabs: /[ \t\r]+/g,
 
     /**
      * Retrieves object's fontSize
@@ -457,14 +464,14 @@
         return;
       }
 
-      var lineWidth = this._getLineWidth(ctx, lineIndex),
+      var lineWidth = Math.floor(this._getLineWidth(ctx, lineIndex)),
           totalWidth = this.width;
       if (totalWidth >= lineWidth) {
         // stretch the line
-        var words = line.split(/\s+/),
+        var words = line.split(this._reSpacesAndTabs),
             wordsWidth = this._getWidthOfWords(ctx, line, lineIndex),
             widthDiff = totalWidth - wordsWidth,
-            numSpaces = words.length - 2,
+            numSpaces = line.length - line.replace(this._reSpacesAndTabs, '').length,
             spaceWidth = widthDiff / numSpaces,
             leftOffset = 0;
 
@@ -477,7 +484,7 @@
         this._renderChars(method, ctx, line, left, top, lineIndex);
       }
     },
-
+    
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on

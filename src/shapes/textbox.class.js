@@ -55,7 +55,7 @@
        },
        /**
         * Unlike superclass's version of this function, Textbox does not update
-        * its width here.
+        * its width.
         * @param {CanvasRenderingContext2D} ctx Context to use for measurements
         * @private
         * @override
@@ -66,7 +66,7 @@
         }
         
         if (!ctx) {
-          ctx = this.ctx;
+          ctx = fabric.util.createCanvasElement().getContext('2d');
           this._setTextStyles(ctx);
         }
         this._textLines = this._splitTextIntoLines();
@@ -86,7 +86,7 @@
          var lines = text.split(this._reNewline), wrapped = [], i;
 
          for (i = 0; i < lines.length; i++) {
-           wrapped = wrapped.concat(this._wrapLine(ctx, lines[i] + '\n'));
+           wrapped = wrapped.concat(this._wrapLine(ctx, lines[i]));
          }
 
          return wrapped;
@@ -190,7 +190,6 @@
         * @returns {Object} This object has 'lineIndex' and 'charIndex' properties set to Numbers.
         */
        get2DCursorLocation: function(selectionStart) {
-
          if (typeof selectionStart === 'undefined') {
            selectionStart = this.selectionStart;
          }
@@ -251,7 +250,7 @@
                  lineLeftOffset = this._getCachedLineOffset(cursorLocation.lineIndex);
 
          for (var i = 0; i < cursorLocation.charIndex; i++) {
-           leftOffset += this._getWidthOfChar(this.ctx, lineChars[i], cursorLocation.lineIndex, i);
+            leftOffset += this._getWidthOfChar(this.ctx, lineChars[i], cursorLocation.lineIndex, i);
          }
 
          for (i = 0; i < cursorLocation.lineIndex; i++) {
