@@ -15,18 +15,21 @@
       var cx = point.x,
           cy = point.y;
 
+      if (originX !== 'center' || originY !== 'center') {
+        dim = this._getTransformedDimensions();
+      }
       if (originX === 'left') {
-        cx = point.x + (this.getWidth() + this.strokeWidth * this.scaleX) / 2;
+        cx = point.x + dim.x / 2;
       }
       else if (originX === 'right') {
-        cx = point.x - (this.getWidth() + this.strokeWidth * this.scaleX) / 2;
+        cx = point.x - dim.x / 2;
       }
 
       if (originY === 'top') {
-        cy = point.y + (this.getHeight() + this.strokeWidth * this.scaleY) / 2;
+        cy = point.y + dim.y / 2;
       }
       else if (originY === 'bottom') {
-        cy = point.y - (this.getHeight() + this.strokeWidth * this.scaleY) / 2;
+        cy = point.y - dim.y / 2;
       }
 
       // Apply the reverse rotation to the point (it's already scaled properly)
@@ -44,18 +47,21 @@
       var x = center.x,
           y = center.y;
 
+      if (originX !== 'center' || originY !== 'center') {
+        dim = this._getTransformedDimensions();
+      }
       // Get the point coordinates
       if (originX === 'left') {
-        x = center.x - (this.getWidth() + this.strokeWidth * this.scaleX) / 2;
+        x = center.x - dim.x / 2;
       }
       else if (originX === 'right') {
-        x = center.x + (this.getWidth() + this.strokeWidth * this.scaleX) / 2;
+        x = center.x + dim.x / 2;
       }
       if (originY === 'top') {
-        y = center.y - (this.getHeight() + this.strokeWidth * this.scaleY) / 2;
+        y = center.y - dim.y / 2;
       }
       else if (originY === 'bottom') {
-        y = center.y + (this.getHeight() + this.strokeWidth * this.scaleY) / 2;
+        y = center.y + dim.y / 2;
       }
 
       // Apply the rotation to the point (it's already scaled properly)
@@ -103,21 +109,24 @@
           x, y;
 
       if (originX && originY) {
+        if (originX !== 'center' || originY !== 'center') {
+          dim = this._getTransformedDimensions();
+        }
         if (originX === 'left') {
-          x = center.x - (this.getWidth() + this.strokeWidth * this.scaleX) / 2;
+          x = center.x - dim.x / 2;
         }
         else if (originX === 'right') {
-          x = center.x + (this.getWidth() + this.strokeWidth * this.scaleX) / 2;
+          x = center.x + dim.x / 2;
         }
         else {
           x = center.x;
         }
 
         if (originY === 'top') {
-          y = center.y - (this.getHeight() + this.strokeWidth * this.scaleY) / 2;
+          y = center.y - dim.y / 2;
         }
         else if (originY === 'bottom') {
-          y = center.y + (this.getHeight() + this.strokeWidth * this.scaleY) / 2;
+          y = center.y + dim.y / 2;
         }
         else {
           y = center.y;
