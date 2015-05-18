@@ -371,6 +371,11 @@
       this._setCornerCoords && this._setCornerCoords();
 
       return this;
+    },
+
+    _calcDimensionsTransformMatrix: function() {
+      // introduce skew matrix here later
+      return [this.scaleX, 0, 0, this.scaleY, 0, 0];
     }
   });
 })();
