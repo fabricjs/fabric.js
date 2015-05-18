@@ -30,14 +30,14 @@
     'paths':                    getPathObjects()
   };
 
-  var REFERENCE_PATH_GROUP_SVG = '<g style="stroke: none; stroke-width: 1; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: none; fill-rule: nonzero; opacity: 1;" transform="translate(0 0)" >\n' +
-    '<path d="M 100 100 L 300 100 L 200 300 z" style="stroke: blue; stroke-width: 3; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;" transform="" stroke-linecap="round" />\n' +
-    '<path d="M 200 200 L 100 200 L 400 50 z" style="stroke: blue; stroke-width: 3; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;" transform="" stroke-linecap="round" />\n' +
+  var REFERENCE_PATH_GROUP_SVG = '<g style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: none; fill-rule: nonzero; opacity: 1;" transform="translate(0 0)" >\n' +
+    '<path d="M 100 100 L 300 100 L 200 300 z" style="stroke: blue; stroke-width: 3; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;" transform="" stroke-linecap="round" />\n' +
+    '<path d="M 200 200 L 100 200 L 400 50 z" style="stroke: blue; stroke-width: 3; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;" transform="" stroke-linecap="round" />\n' +
     '</g>\n';
 
-  var REFERENCE_PATH_GROUP_SVG_WITH_MATRIX = '<g style="stroke: none; stroke-width: 1; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: none; fill-rule: nonzero; opacity: 1;" transform=" matrix(1 2 3 4 5 6) translate(0 0)" >\n' +
-    '<path d="M 100 100 L 300 100 L 200 300 z" style="stroke: blue; stroke-width: 3; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;" transform="" stroke-linecap="round" />\n' +
-    '<path d="M 200 200 L 100 200 L 400 50 z" style="stroke: blue; stroke-width: 3; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;" transform="" stroke-linecap="round" />\n' +
+  var REFERENCE_PATH_GROUP_SVG_WITH_MATRIX = '<g style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: none; fill-rule: nonzero; opacity: 1;" transform=" matrix(1 2 3 4 5 6) translate(0 0)" >\n' +
+    '<path d="M 100 100 L 300 100 L 200 300 z" style="stroke: blue; stroke-width: 3; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;" transform="" stroke-linecap="round" />\n' +
+    '<path d="M 200 200 L 100 200 L 400 50 z" style="stroke: blue; stroke-width: 3; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;" transform="" stroke-linecap="round" />\n' +
     '</g>\n';
 
   function getPathElement(path) {
