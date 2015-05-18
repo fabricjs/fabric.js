@@ -582,7 +582,7 @@
         }
         this.styles[lineIndex + 1] = newLineStyles;
       }
-      this._clearCache();
+      this._forceClearCache = true;
     },
 
     /**
@@ -612,7 +612,7 @@
 
       this.styles[lineIndex][charIndex] =
         style || clone(currentLineStyles[charIndex - 1]);
-      this._clearCache();
+      this._forceClearCache = true;
     },
 
     /**
