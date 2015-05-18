@@ -57,7 +57,7 @@
 
     // node-canvas doesn't give <img> "src"
     if (img.src) {
-      equal(object.source, '../fixtures/greyfloral.png');
+      ok(object.source.indexOf('fixtures/greyfloral.png') > -1);
     }
     equal(object.repeat, 'repeat');
     equal(object.offsetX, 0);
