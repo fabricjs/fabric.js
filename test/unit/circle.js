@@ -49,7 +49,7 @@
     equal(circle.getWidth(), 20);
     equal(circle.getHeight(), 20);
 
-    circle.setRadius(20);
+    equal(circle, circle.setRadius(20));
 
     equal(circle.getRadiusX(), 20);
     equal(circle.getRadiusY(), 20);

@@ -106,9 +106,12 @@
       }
     },
 
-    _calculateCurrentDimensions: function(shouldTransform)  {
-      var vpt = this.getViewportTransform(),
-          strokeWidth = this.strokeWidth,
+    /*
+     * Calculate object dimensions from its properties
+     * @private
+     */
+    _getNonTransformedDimensions: function() {
+      var strokeWidth = this.strokeWidth,
           w = this.width,
           h = this.height,
           capped = this.strokeLineCap === 'round' || this.strokeLineCap === 'square',
@@ -130,9 +133,30 @@
       if (strokeH) {
         h += (h < 0 ? -strokeWidth : strokeWidth);
       }
+      return { x: w, y: h };
+    },
 
-      w = w * this.scaleX + 2 * this.padding;
-      h = h * this.scaleY + 2 * this.padding;
+    /*
+     * @private
+     */
+    _getTransformedDimensions: function(dimensions) {
+      if (!dimensions) {
+        dimensions = this._getNonTransformedDimensions();
+      }
+      var transformMatrix = this._calcDimensionsTransformMatrix();
+      return fabric.util.transformPoint(dimensions, transformMatrix, true);
+    },
+
+    /*
+     * private
+     */
+    _calculateCurrentDimensions: function(shouldTransform)  {
+      var vpt = this.getViewportTransform(),
+          dim = this._getTransformedDimensions(),
+          w = dim.x, h = dim.y;
+
+      w += 2 * this.padding;
+      h += 2 * this.padding;
 
       if (shouldTransform) {
         return fabric.util.transformPoint(new fabric.Point(w, h), vpt, true);

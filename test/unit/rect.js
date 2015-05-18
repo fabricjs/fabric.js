@@ -64,6 +64,13 @@
     var rect = fabric.Rect.fromObject(REFERENCE_RECT);
     ok(rect instanceof fabric.Rect);
     deepEqual(rect.toObject(), REFERENCE_RECT);
+
+    var expectedObject = fabric.util.object.extend({ }, REFERENCE_RECT);
+    expectedObject.fill = {"type":"linear","coords":{"x1":0,"y1":0,"x2":200,"y2":0},"colorStops":[{"offset":"0","color":"rgb(255,0,0)","opacity":1},{"offset":"1","color":"rgb(0,0,255)","opacity":1}],"offsetX":0,"offsetY":0};
+    expectedObject.stroke = {"type":"linear","coords":{"x1":0,"y1":0,"x2":200,"y2":0},"colorStops":[{"offset":"0","color":"rgb(255,0,0)","opacity":1},{"offset":"1","color":"rgb(0,0,255)","opacity":1}],"offsetX":0,"offsetY":0};
+    rect = fabric.Rect.fromObject(expectedObject);
+    ok(rect.fill instanceof fabric.Gradient);
+    ok(rect.stroke instanceof fabric.Gradient);
   });
 
   test('fabric.Rect.fromElement', function() {
@@ -134,7 +141,7 @@
     var rect = new fabric.Rect({ width: 100, height: 100, rx: 20, ry: 30, strokeWidth: 0 });
     var svg = rect.toSVG();
 
-    equal(svg, '<rect x="-50" y="-50" rx="20" ry="30" width="100" height="100" style="stroke: none; stroke-width: 0; stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" transform="translate(50 50)"/>\n');
+    equal(svg, '<rect x="-50" y="-50" rx="20" ry="30" width="100" height="100" style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" transform="translate(50 50)"/>\n');
   });
 
   test('toObject without default values', function() {

@@ -65,6 +65,7 @@
       this.renderAll();
       t.action = 'drag';
     },
+
     /**
      * Method that defines actions when an Event.js drag is detected.
      *
@@ -76,6 +77,7 @@
         e: e, self: self
       });
     },
+
     /**
      * Method that defines actions when an Event.js orientation event is detected.
      *
@@ -87,6 +89,7 @@
         e: e, self: self
       });
     },
+
     /**
      * Method that defines actions when an Event.js shake event is detected.
      *
@@ -98,6 +101,7 @@
         e: e, self: self
       });
     },
+
     /**
      * Method that defines actions when an Event.js longpress event is detected.
      *
@@ -109,6 +113,7 @@
         e: e, self: self
       });
     },
+
     /**
      * Scales an object by a factor
      * @param {Number} s The scale factor to apply to the current scale level
@@ -127,19 +132,16 @@
       target._scaling = true;
 
       var constraintPosition = target.translateToOriginPoint(target.getCenterPoint(), t.originX, t.originY),
-        vLine = target.type === 'line' && target.width === 0,
-        hLine = target.type === 'line' && target.height === 0,
-        strokeWidthX = hLine ? 0 : target.strokeWidth,
-        strokeWidthY = vLine ? 0 : target.strokeWidth;
+        dim = target._getNonTransformedDimensions();
 
-      this._setObjectScale(new fabric.Point((t.scaleX * s * (target.width + strokeWidthX)),
-        (t.scaleY * s * (target.height + strokeWidthY))),
+      this._setObjectScale(new fabric.Point(t.scaleX * s * dim.x, t.scaleY * s * dim.y),
         t, lockScalingX, lockScalingY, null, target.get('lockScalingFlip'));
 
       target.setPositionByOrigin(constraintPosition, t.originX, t.originY);
 
       this._fire('scaling', target, e);
     },
+
     /**
      * Rotates object by an angle
      * @param {Number} curAngle The angle of rotation in degrees
