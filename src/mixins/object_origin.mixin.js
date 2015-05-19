@@ -13,23 +13,29 @@
      */
     translateToCenterPoint: function(point, originX, originY) {
       var cx = point.x,
-          cy = point.y;
+          cy = point.y,
+          ox = 0,
+          oy = 0;
 
       if (originX !== 'center' || originY !== 'center') {
         dim = this._getTransformedDimensions();
       }
+      if (this.transformMatrix) {
+        ox = this.transformMatrix[4] * this.scaleX;
+        oy = this.transformMatrix[5] * this.scaleY;
+      }
       if (originX === 'left') {
-        cx = point.x + dim.x / 2;
+        cx = point.x + dim.x / 2 + ox;
       }
       else if (originX === 'right') {
-        cx = point.x - dim.x / 2;
+        cx = point.x - dim.x / 2 - ox;
       }
 
       if (originY === 'top') {
-        cy = point.y + dim.y / 2;
+        cy = point.y + dim.y / 2 + oy;
       }
       else if (originY === 'bottom') {
-        cy = point.y - dim.y / 2;
+        cy = point.y - dim.y / 2 - oy;
       }
 
       // Apply the reverse rotation to the point (it's already scaled properly)
@@ -45,23 +51,29 @@
      */
     translateToOriginPoint: function(center, originX, originY) {
       var x = center.x,
-          y = center.y;
+          y = center.y,
+          ox = 0,
+          oy = 0;
 
       if (originX !== 'center' || originY !== 'center') {
         dim = this._getTransformedDimensions();
       }
+      if (this.transformMatrix) {
+        ox = this.transformMatrix[4] * this.scaleX;
+        oy = this.transformMatrix[5] * this.scaleY;
+      }      
       // Get the point coordinates
       if (originX === 'left') {
-        x = center.x - dim.x / 2;
+        x = center.x - dim.x / 2 - ox;
       }
       else if (originX === 'right') {
-        x = center.x + dim.x / 2;
+        x = center.x + dim.x / 2 + ox;
       }
       if (originY === 'top') {
-        y = center.y - dim.y / 2;
+        y = center.y - dim.y / 2 - oy;
       }
       else if (originY === 'bottom') {
-        y = center.y + dim.y / 2;
+        y = center.y + dim.y / 2 + oy;
       }
 
       // Apply the rotation to the point (it's already scaled properly)
@@ -169,13 +181,15 @@
      * @param {String} to One of 'left', 'center', 'right'
      */
     adjustPosition: function(to) {
-      var angle = degreesToRadians(this.angle),
-          hypotHalf = this.getWidth() / 2,
-          xHalf = Math.cos(angle) * hypotHalf,
-          yHalf = Math.sin(angle) * hypotHalf,
-          hypotFull = this.getWidth(),
-          xFull = Math.cos(angle) * hypotFull,
-          yFull = Math.sin(angle) * hypotFull;
+      var theta = degreesToRadians(this.angle),
+          hypotFull = this._getTransformedDimensions().x
+          hypotHalf = hypotFull / 2,
+          cosTh = Math.cos(theta),
+          sinTh = Math.sin(theta),
+          xHalf = cosTh * hypotHalf,
+          yHalf = sinTh * hypotHalf,
+          xFull = cosTh * hypotFull,
+          yFull = sinTh * hypotFull;
 
       if (this.originX === 'center' && to === 'left' ||
           this.originX === 'right' && to === 'center') {

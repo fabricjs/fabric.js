@@ -303,22 +303,24 @@
      * @chainable
      */
     setCoords: function() {
-      var p = this._getNonTransformedDimensions(),
-          m = this._calcTotalTransformMatrix(),
+      var p = this._calculateCurrentDimensions(),
+          m = this._calcBBoxTransformMatrix(),
           f = fabric.util.transformPoint,
-          theta = fabric.util.degreesToRadians(this.angle),
+          theta = fabric.util.degreesToRadians(this.angle), 
           sinTh = Math.sin(theta),
           cosTh = Math.cos(theta),
-          tl = f({x: -p.x/2, y: -p.y/2}, m), tr = f({x: p.x/2, y: -p.y/2}, m),
-          bl = f({x: -p.x/2, y: p.y/2}, m), br = f({x: p.x/2, y: p.y/2}, m),
-          ml  = new fabric.Point((tl.x + bl.x)/2, (tl.y + bl.y)/2),
-          mt  = new fabric.Point((tr.x + tl.x)/2, (tr.y + tl.y)/2),
-          mr  = new fabric.Point((br.x + tr.x)/2, (br.y + tr.y)/2),
-          mb  = new fabric.Point((br.x + bl.x)/2, (br.y + bl.y)/2),
+          tl = f({x: -p.x/2, y: -p.y/2}, m),
+          tr = f({x: p.x/2, y: -p.y/2}, m),
+          bl = f({x: -p.x/2, y: p.y/2}, m),
+          br = f({x: p.x/2, y: p.y/2}, m),
+          ml = new fabric.Point((tl.x + bl.x)/2, (tl.y + bl.y)/2),
+          mt = new fabric.Point((tr.x + tl.x)/2, (tr.y + tl.y)/2),
+          mr = new fabric.Point((br.x + tr.x)/2, (br.y + tr.y)/2),
+          mb = new fabric.Point((br.x + bl.x)/2, (br.y + bl.y)/2),
           mtr = new fabric.Point(mt.x + sinTh * this.rotatingPointOffset, mt.y - cosTh * this.rotatingPointOffset);
       // debugging
 
-      /* setTimeout(function() {
+       setTimeout(function() {
          canvas.contextTop.fillStyle = 'green';
          canvas.contextTop.fillRect(mb.x, mb.y, 3, 3);
          canvas.contextTop.fillRect(bl.x, bl.y, 3, 3);
@@ -326,12 +328,12 @@
          canvas.contextTop.fillStyle = 'blue';
          canvas.contextTop.fillRect(tl.x, tl.y, 3, 3);
          canvas.contextTop.fillRect(tr.x, tr.y, 3, 3);
-         canvas.contextTop.fillRect(mtr.x, mtr.y, 3, 3);
          canvas.contextTop.fillRect(mt.x, mt.y, 3, 3);
-         canvas.contextTop.fillStyle = 'red';
+         canvas.contextTop.fillRect(mtr.x, mtr.y, 3, 3);
+         canvas.contextTop.fillStyle = 'purple';
          canvas.contextTop.fillRect(ml.x, ml.y, 3, 3);
          canvas.contextTop.fillRect(mr.x, mr.y, 3, 3);
-       }, 50); */
+       }, 50);
 
       this.oCoords = {
         // corners
@@ -347,26 +349,33 @@
       return this;
     },
 
-    _calcTotalTransformMatrix: function() {
+    _calcBBoxTransformMatrix: function() {
       
       var p = this.getCenterPoint(),
-          firstM = this.group ? this.group._calcTotalTransformMatrix() : this.getViewportTransform(),
+          firstM = this.getViewportTransform(),
           translateMatrix = [1, 0, 0, 1, p.x, p.y],
-          dimMatrix = this._calcDimensionsTransformMatrix(),
           m = fabric.util.multiplyTransformMatrices(firstM, translateMatrix);
       if (this.angle) {
-        var theta = fabric.util.degreesToRadians(this.angle),
-            rotateMatrix = [Math.cos(theta), Math.sin(theta), -Math.sin(theta), Math.cos(theta), 0, 0];
-        m = fabric.util.multiplyTransformMatrices(m, rotateMatrix);
+        m = fabric.util.multiplyTransformMatrices(m, this._calcRotateMatrix());
       }
-      m = fabric.util.multiplyTransformMatrices(m, dimMatrix);
       return m;
+    },
+
+    _calcRotateMatrix: function() {
+      // introduce skew matrix here later
+      if (this.angle) {
+        var theta = fabric.util.degreesToRadians(this.angle), 
+            sinTh = Math.sin(theta),
+            cosTh = Math.cos(theta);
+        return [cosTh, sinTh, -sinTh, cosTh, 0, 0];
+      }
+      return [1, 0, 0, 1, 0, 0];
     },
 
     _calcDimensionsTransformMatrix: function() {
       // introduce skew matrix here later
       if (this.transformMatrix) {
-        return fabric.util.multiplyTransformMatrices([this.scaleX, 0, 0, this.scaleY, 0, 0], this.transformMatrix);
+        return fabric.util.multiplyTransformMatrices([this.scaleX, 0, 0, this.scaleY, 0, 0], this.transformMatrix, true);
       }
       return [this.scaleX, 0, 0, this.scaleY, 0, 0];
     }
