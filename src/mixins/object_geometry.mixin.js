@@ -323,12 +323,14 @@
          canvas.contextTop.fillRect(mb.x, mb.y, 3, 3);
          canvas.contextTop.fillRect(bl.x, bl.y, 3, 3);
          canvas.contextTop.fillRect(br.x, br.y, 3, 3);
+         canvas.contextTop.fillStyle = 'blue';
          canvas.contextTop.fillRect(tl.x, tl.y, 3, 3);
          canvas.contextTop.fillRect(tr.x, tr.y, 3, 3);
+         canvas.contextTop.fillRect(mtr.x, mtr.y, 3, 3);
+         canvas.contextTop.fillRect(mt.x, mt.y, 3, 3);
+         canvas.contextTop.fillStyle = 'red';
          canvas.contextTop.fillRect(ml.x, ml.y, 3, 3);
          canvas.contextTop.fillRect(mr.x, mr.y, 3, 3);
-         canvas.contextTop.fillRect(mt.x, mt.y, 3, 3);
-         canvas.contextTop.fillRect(mtr.x, mtr.y, 3, 3);
        }, 50); */
 
       this.oCoords = {
