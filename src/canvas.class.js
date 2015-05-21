@@ -493,13 +493,18 @@
 
       // Get the constraint point
       var constraintPosition = target.translateToOriginPoint(target.getCenterPoint(), t.originX, t.originY),
-          localMouse = target.toLocalPoint(new fabric.Point(x, y), t.originX, t.originY);
+          localMouse = target.toLocalPoint(new fabric.Point(x, y), t.originX, t.originY),
+          dim = target._getTransformedDimensions(), newDim;
 
       this._setLocalMouse(localMouse, t);
 
       // Actually scale the object
-      this._setObjectScale(localMouse, t, lockScalingX, lockScalingY, by, lockScalingFlip);
-
+      this._setObjectScale(localMouse, t, lockScalingX, lockScalingY, by, lockScalingFlip, dim);
+      newDim = target._getTransformedDimensions();
+      if (target.transformMatrix) {
+        constraintPosition.x -= target.scaleX * target.transformMatrix[4] * (newDim.x - dim.x) / newDim.x;
+        constraintPosition.y -= target.scaleY * target.transformMatrix[5] * (newDim.y - dim.y) / newDim.y;
+      }
       // Make sure the constraints apply
       target.setPositionByOrigin(constraintPosition, t.originX, t.originY);
     },
@@ -507,12 +512,11 @@
     /**
      * @private
      */
-    _setObjectScale: function(localMouse, transform, lockScalingX, lockScalingY, by, lockScalingFlip) {
-      var target = transform.target, forbidScalingX = false, forbidScalingY = false,
-          dim = target._getNonTransformedDimensions();
+    _setObjectScale: function(localMouse, transform, lockScalingX, lockScalingY, by, lockScalingFlip, dim) {
+      var target = transform.target, forbidScalingX = false, forbidScalingY = false;
 
-      transform.newScaleX = localMouse.x / dim.x;
-      transform.newScaleY = localMouse.y / dim.y;
+      transform.newScaleX = localMouse.x / (dim.x / target.scaleX);
+      transform.newScaleY = localMouse.y / (dim.y / target.scaleY);
 
       if (lockScalingFlip && transform.newScaleX <= 0 && transform.newScaleX < target.scaleX) {
         forbidScalingX = true;
@@ -523,7 +527,7 @@
       }
 
       if (by === 'equally' && !lockScalingX && !lockScalingY) {
-        forbidScalingX || forbidScalingY || this._scaleObjectEqually(localMouse, target, transform);
+        forbidScalingX || forbidScalingY || this._scaleObjectEqually(localMouse, target, transform, dim);
       }
       else if (!by) {
         forbidScalingX || lockScalingX || target.set('scaleX', transform.newScaleX);
@@ -543,12 +547,11 @@
     /**
      * @private
      */
-    _scaleObjectEqually: function(localMouse, target, transform) {
+    _scaleObjectEqually: function(localMouse, target, transform, dim) {
 
       var dist = localMouse.y + localMouse.x,
-          dim = target._getNonTransformedDimensions(),
-          lastDist = dim.y * transform.original.scaleY +
-                     dim.x * transform.original.scaleX;
+          lastDist = (dim.y / target.scaleY) * transform.original.scaleY +
+                     (dim.x / target.scaleX) * transform.original.scaleX;
 
       // We use transform.scaleX/Y instead of target.scaleX/Y
       // because the object may have a min scale and we'll loose the proportions

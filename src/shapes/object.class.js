@@ -761,6 +761,10 @@
         this.scaleX * (this.flipX ? -1 : 1),
         this.scaleY * (this.flipY ? -1 : 1)
       );
+      if (this.transformMatrix) {
+        var m = this.transformMatrix;
+        ctx.transform(m[0], m[1], m[2], m[3], 0, 0);
+      }
     },
 
     /**
@@ -972,11 +976,11 @@
       if (!noTransform) {
         this.transform(ctx);
       }
+      else {
+        this.transformMatrix && ctx.transform.apply(ctx, this.transformMatrix);
+      }
       this._setStrokeStyles(ctx);
       this._setFillStyles(ctx);
-      if (this.transformMatrix) {
-        ctx.transform.apply(ctx, this.transformMatrix);
-      }
       this._setOpacity(ctx);
       this._setShadow(ctx);
       this.clipTo && fabric.util.clipContext(this, ctx);

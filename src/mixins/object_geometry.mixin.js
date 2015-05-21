@@ -303,60 +303,37 @@
      * @chainable
      */
     setCoords: function() {
-      var theta = degreesToRadians(this.angle),
-          vpt = this.getViewportTransform(),
-          f = function (p) {
-            return fabric.util.transformPoint(p, vpt);
-          },
-          p = this._calculateCurrentDimensions(false),
-          currentWidth = p.x, currentHeight = p.y;
-
-      // If width is negative, make postive. Fixes path selection issue
-      if (currentWidth < 0) {
-        currentWidth = Math.abs(currentWidth);
-      }
-
-      var _hypotenuse = Math.sqrt(
-            Math.pow(currentWidth / 2, 2) +
-            Math.pow(currentHeight / 2, 2)),
-
-          _angle = Math.atan(
-            isFinite(currentHeight / currentWidth)
-              ? currentHeight / currentWidth
-              : 0),
-
-          // offset added for rotate and scale actions
-          offsetX = Math.cos(_angle + theta) * _hypotenuse,
-          offsetY = Math.sin(_angle + theta) * _hypotenuse,
+      var p = this._calculateCurrentDimensions(),
+          m = this._calcBBoxTransformMatrix(),
+          f = fabric.util.transformPoint,
+          theta = fabric.util.degreesToRadians(this.angle), 
           sinTh = Math.sin(theta),
           cosTh = Math.cos(theta),
-          coords = this.getCenterPoint(),
-          wh = new fabric.Point(currentWidth, currentHeight),
-          _tl =   new fabric.Point(coords.x - offsetX, coords.y - offsetY),
-          _tr =   new fabric.Point(_tl.x + (wh.x * cosTh),   _tl.y + (wh.x * sinTh)),
-          bl =  f(new fabric.Point(_tl.x - (wh.y * sinTh),   _tl.y + (wh.y * cosTh))),
-          br  = f(new fabric.Point(_tr.x - (wh.y * sinTh),   _tr.y + (wh.y * cosTh))),
-          tl  = f(_tl),
-          tr  = f(_tr),
-          ml  = new fabric.Point((tl.x + bl.x)/2, (tl.y + bl.y)/2),
-          mt  = new fabric.Point((tr.x + tl.x)/2, (tr.y + tl.y)/2),
-          mr  = new fabric.Point((br.x + tr.x)/2, (br.y + tr.y)/2),
-          mb  = new fabric.Point((br.x + bl.x)/2, (br.y + bl.y)/2),
+          tl = f({x: -p.x/2, y: -p.y/2}, m),
+          tr = f({x: p.x/2, y: -p.y/2}, m),
+          bl = f({x: -p.x/2, y: p.y/2}, m),
+          br = f({x: p.x/2, y: p.y/2}, m),
+          ml = new fabric.Point((tl.x + bl.x)/2, (tl.y + bl.y)/2),
+          mt = new fabric.Point((tr.x + tl.x)/2, (tr.y + tl.y)/2),
+          mr = new fabric.Point((br.x + tr.x)/2, (br.y + tr.y)/2),
+          mb = new fabric.Point((br.x + bl.x)/2, (br.y + bl.y)/2),
           mtr = new fabric.Point(mt.x + sinTh * this.rotatingPointOffset, mt.y - cosTh * this.rotatingPointOffset);
       // debugging
 
-      /* setTimeout(function() {
+       setTimeout(function() {
          canvas.contextTop.fillStyle = 'green';
          canvas.contextTop.fillRect(mb.x, mb.y, 3, 3);
          canvas.contextTop.fillRect(bl.x, bl.y, 3, 3);
          canvas.contextTop.fillRect(br.x, br.y, 3, 3);
+         canvas.contextTop.fillStyle = 'blue';
          canvas.contextTop.fillRect(tl.x, tl.y, 3, 3);
          canvas.contextTop.fillRect(tr.x, tr.y, 3, 3);
-         canvas.contextTop.fillRect(ml.x, ml.y, 3, 3);
-         canvas.contextTop.fillRect(mr.x, mr.y, 3, 3);
          canvas.contextTop.fillRect(mt.x, mt.y, 3, 3);
          canvas.contextTop.fillRect(mtr.x, mtr.y, 3, 3);
-       }, 50); */
+         canvas.contextTop.fillStyle = 'purple';
+         canvas.contextTop.fillRect(ml.x, ml.y, 3, 3);
+         canvas.contextTop.fillRect(mr.x, mr.y, 3, 3);
+       }, 50);
 
       this.oCoords = {
         // corners
@@ -366,15 +343,40 @@
         // rotating point
         mtr: mtr
       };
-
       // set coordinates of the draggable boxes in the corners used to scale/rotate the image
       this._setCornerCoords && this._setCornerCoords();
 
       return this;
     },
 
+    _calcBBoxTransformMatrix: function() {
+      
+      var p = this.getCenterPoint(),
+          firstM = this.getViewportTransform(),
+          translateMatrix = [1, 0, 0, 1, p.x, p.y],
+          m = fabric.util.multiplyTransformMatrices(firstM, translateMatrix);
+      if (this.angle) {
+        m = fabric.util.multiplyTransformMatrices(m, this._calcRotateMatrix());
+      }
+      return m;
+    },
+
+    _calcRotateMatrix: function() {
+      // introduce skew matrix here later
+      if (this.angle) {
+        var theta = fabric.util.degreesToRadians(this.angle), 
+            sinTh = Math.sin(theta),
+            cosTh = Math.cos(theta);
+        return [cosTh, sinTh, -sinTh, cosTh, 0, 0];
+      }
+      return [1, 0, 0, 1, 0, 0];
+    },
+
     _calcDimensionsTransformMatrix: function() {
       // introduce skew matrix here later
+      if (this.transformMatrix) {
+        return fabric.util.multiplyTransformMatrices([this.scaleX, 0, 0, this.scaleY, 0, 0], this.transformMatrix, true);
+      }
       return [this.scaleX, 0, 0, this.scaleY, 0, 0];
     }
   });
