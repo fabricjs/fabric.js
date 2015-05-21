@@ -81,6 +81,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    */
   forwardDelete: function(e) {
     if (this.selectionStart === this.selectionEnd) {
+      if (this.selectionStart === this.text.length) {
+        return;
+      }
       this.moveCursorRight(e);
     }
     this.removeChars(e);
