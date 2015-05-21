@@ -13,7 +13,8 @@
      */
     translateToCenterPoint: function(point, originX, originY) {
       var cx = point.x,
-          cy = point.y;
+          cy = point.y,
+          dim;
 
       if (originX !== 'center' || originY !== 'center') {
         dim = this._getTransformedDimensions();
@@ -45,7 +46,8 @@
      */
     translateToOriginPoint: function(center, originX, originY) {
       var x = center.x,
-          y = center.y;
+          y = center.y,
+          dim;
 
       if (originX !== 'center' || originY !== 'center') {
         dim = this._getTransformedDimensions();
@@ -106,7 +108,7 @@
      */
     toLocalPoint: function(point, originX, originY) {
       var center = this.getCenterPoint(),
-          x, y;
+          x, y, dim;
 
       if (originX && originY) {
         if (originX !== 'center' || originY !== 'center') {
