@@ -114,25 +114,22 @@
       var strokeWidth = this.strokeWidth,
           w = this.width,
           h = this.height,
-          capped = this.strokeLineCap === 'round' || this.strokeLineCap === 'square',
-          vLine = this.type === 'line' && this.width === 0,
-          hLine = this.type === 'line' && this.height === 0,
-          sLine = vLine || hLine,
-          strokeW = (capped && hLine) || !sLine,
-          strokeH = (capped && vLine) || !sLine;
+          addStrokeToW = true,
+          addStrokeToH = true;
 
-      if (vLine) {
-        w = strokeWidth;
+      if (this.type === 'line' && this.strokeLineCap === 'butt') {
+        addStrokeToH = w;
+        addStrokeToW = h;
       }
-      else if (hLine) {
-        h = strokeWidth;
+
+      if (addStrokeToH) {
+        h += h < 0 ? -strokeWidth : strokeWidth;
       }
-      if (strokeW) {
-        w += (w < 0 ? -strokeWidth : strokeWidth);
+
+      if (addStrokeToW) {
+        w += w < 0 ? -strokeWidth : strokeWidth;
       }
-      if (strokeH) {
-        h += (h < 0 ? -strokeWidth : strokeWidth);
-      }
+
       return { x: w, y: h };
     },
 
