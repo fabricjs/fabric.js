@@ -349,14 +349,14 @@
     cObj.set('height', 167).setCoords();
     boundingRect = cObj.getBoundingRect();
     equal(boundingRect.left, 0);
-    equal(boundingRect.top, 0);
+    equal(Math.abs(boundingRect.top).toFixed(13), 0);
     equal(boundingRect.width, 123);
     equal(boundingRect.height, 167);
 
     cObj.scale(2).setCoords();
     boundingRect = cObj.getBoundingRect();
     equal(boundingRect.left, 0);
-    equal(boundingRect.top, 0);
+    equal(Math.abs(boundingRect.top).toFixed(13), 0);
     equal(boundingRect.width, 246);
     equal(boundingRect.height, 334);
   });
