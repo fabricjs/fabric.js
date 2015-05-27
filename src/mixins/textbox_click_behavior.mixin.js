@@ -1,4 +1,4 @@
-(function() {
+(function () {
     var getNewSelectionStartFromOffsetOverriden = fabric.IText.prototype._getNewSelectionStartFromOffset;
     /**
      * Overrides the IText implementation and always sends lineIndex as 0 for Textboxes.
@@ -10,8 +10,8 @@
      * @param {Number} jlen
      * @returns {Number}
      */
-    fabric.IText.prototype._getNewSelectionStartFromOffset = function(mouseOffset,
-                                                                      prevWidth, width, index, lineIndex, jlen) {
+    fabric.IText.prototype._getNewSelectionStartFromOffset = function (mouseOffset,
+                                                                       prevWidth, width, index, lineIndex, jlen) {
         if (this instanceof fabric.Textbox) {
             lineIndex = 0;
         }

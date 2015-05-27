@@ -6,7 +6,7 @@ fabric.util.object.extend(fabric.Textbox.prototype, /** @lends fabric.Textbox.pr
      * @param {Boolean} isRight
      * @returns {Number}
      */
-    getDownCursorOffset: function(e, isRight) {
+    getDownCursorOffset: function (e, isRight) {
         return fabric.IText.prototype.getDownCursorOffset.apply(this, [e, isRight]) - 1;
     },
     /**
@@ -16,7 +16,7 @@ fabric.util.object.extend(fabric.Textbox.prototype, /** @lends fabric.Textbox.pr
      * @param {Boolean} isRight
      * @returns {Number}
      */
-    getUpCursorOffset: function(e, isRight) {
+    getUpCursorOffset: function (e, isRight) {
         return fabric.IText.prototype.getUpCursorOffset.apply(this, [e, isRight]) - 1;
     }
 });
