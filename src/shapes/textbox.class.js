@@ -186,55 +186,58 @@
     /**
      * Returns 2d representation (lineIndex and charIndex) of cursor (or selection start).
      * Overrides the superclass function to take into account text wrapping.
-     * @param {Number} selectionStart Optional index. When not given, current selectionStart is used.
-     * @returns {Object} This object has 'lineIndex' and 'charIndex' properties set to Numbers.
+     *
+     * @param {Number} [selectionStart] Optional index. When not given, current selectionStart is used.
      */
     get2DCursorLocation: function (selectionStart) {
       if (typeof selectionStart === 'undefined') {
         selectionStart = this.selectionStart;
       }
 
-      /*
-       * We use `temp` to populate linesBeforeCursor instead of simply splitting
-       * textBeforeCursor with newlines to handle the case of the
-       * selectionStart value being on a word that, because of its length,
-       * needs to be wrapped to the next line.
-       */
-      var lineIndex = 0,
-        linesBeforeCursor = [],
-        allLines = this._textLines, temp = selectionStart;
+      var numLines = this._textLines.length;
+      var removed = 0;
+      var lineLength;
 
-      while (temp >= 0) {
-        if (lineIndex > allLines.length - 1) {
-          break;
-        }
-        temp -= allLines[lineIndex].length;
-        if (temp < 0) {
-          linesBeforeCursor[linesBeforeCursor.length] = allLines[lineIndex].slice(0,
-            temp + allLines[lineIndex].length);
-        }
-        else {
-          linesBeforeCursor[linesBeforeCursor.length] = allLines[lineIndex];
-        }
-        lineIndex++;
-      }
-      lineIndex--;
-
-      var lastLine = linesBeforeCursor[linesBeforeCursor.length - 1],
-        charIndex = lastLine.length;
-
-      if (linesBeforeCursor[lineIndex] === allLines[lineIndex]) {
-        if (lineIndex + 1 < allLines.length - 1) {
-          lineIndex++;
-          charIndex = 0;
-        }
+      //  case: we are at the end of input
+      if (selectionStart >= this.text.length) {
+        return {
+          lineIndex: numLines - 1,
+          charIndex: this._textLines[numLines - 1].length
+        };
       }
 
+      for (var i = 0; i < numLines; i++) {
+        lineLength = this._textLines[i].length;
+
+        // case: we are in the current line
+        if (selectionStart < lineLength + (this.text[removed + lineLength] == "\n" ? 1 : 0)) {
+          return {
+            lineIndex: i,
+            charIndex: selectionStart
+          };
+        }
+
+        // adjust selection start
+        selectionStart -= lineLength;
+
+        // keep track of removed characters
+        removed += lineLength;
+
+        // if there was a newline, we need to account for the newline character
+        if (this.text[removed] == "\n") {
+          removed++;
+          selectionStart--;
+        }
+      }
+
+      // the only way it reaches here is if the user is currently typing, in which case, return last character
+      // this happens because text has changed, but selectionStart or _textLines has not.
       return {
-        lineIndex: lineIndex,
-        charIndex: charIndex
+        lineIndex: numLines - 1,
+        charIndex: this._textLines[numLines - 1].length
       };
     },
+
     /**
      * Overrides superclass function and uses text wrapping data to get cursor
      * boundary offsets instead of the array of chars.
