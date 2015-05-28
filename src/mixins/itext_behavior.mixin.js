@@ -517,7 +517,7 @@
       this.text = this.text.slice(0, index - 1) +
                   this.text.slice(index);
 
-      this._textLines = this.text.split(this._reNewline);
+      this._textLines = this._splitTextIntoLines();
     },
 
     /**
