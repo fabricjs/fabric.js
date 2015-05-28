@@ -105,8 +105,7 @@
 
       if (ctx.measureText(text).width < maxWidth) {
         lines.push(text);
-      }
-      else {
+      } else {
         while (words.length > 0) {
 
           /*
@@ -125,21 +124,21 @@
           while (Math.ceil(ctx.measureText(words[0]).width) >= maxWidth) {
             var tmp = words[0];
             words[0] = tmp.slice(0, -1);
+
             if (words.length > 1) {
               words[1] = tmp.slice(-1) + words[1];
-            }
-            else {
+            } else {
               words.push(tmp.slice(-1));
             }
           }
 
           if (Math.ceil(ctx.measureText(line + words[0]).width) < maxWidth) {
             line += words.shift() + ' ';
-          }
-          else {
+          } else {
             lines.push(line);
             line = '';
           }
+
           if (words.length === 0) {
             lines.push(line.substring(0, line.length - 1));
           }
@@ -194,9 +193,7 @@
         selectionStart = this.selectionStart;
       }
 
-      var numLines = this._textLines.length;
-      var removed = 0;
-      var lineLength;
+      var numLines = this._textLines.length, removed = 0, lineLength;
 
       //  case: we are at the end of input
       if (selectionStart >= this.text.length) {
@@ -210,7 +207,7 @@
         lineLength = this._textLines[i].length;
 
         // case: we are in the current line
-        if (selectionStart < lineLength + (this.text[removed + lineLength] == "\n" ? 1 : 0)) {
+        if (selectionStart < lineLength + (this.text[removed + lineLength] == '\n' ? 1 : 0)) {
           return {
             lineIndex: i,
             charIndex: selectionStart
@@ -224,7 +221,7 @@
         removed += lineLength;
 
         // if there was a newline, we need to account for the newline character
-        if (this.text[removed] == "\n") {
+        if (this.text[removed] == '\n') {
           removed++;
           selectionStart--;
         }
