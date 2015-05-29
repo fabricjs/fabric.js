@@ -177,7 +177,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   /**
    * Handles input event
    */
-  onInput: function(){
+  onInput: function() {
     var newVal = this.hiddenTextarea.value,
         oldVal = this.text,
         oLen = oldVal.length,
@@ -192,19 +192,23 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       //daed keys will produce unpredictable results
       //need to scan the whole contents from both begin and end to
       //extract the changes
-      if(newVal.replace(/\ /g, '') === oldVal.replace(/\ /g, '')) {
+      if (newVal.replace(/\ /g, '') === oldVal.replace(/\ /g, '')) {
         return;
       }
 
       //start
       for (i = 0; i < oLen; i++) {
-        if (newVal[i] !== oldVal[i]) break;
+        if (newVal[i] !== oldVal[i]) {
+          break;
+        }
       }
       head = i;
 
       //end
       for (i = 1; i <= nLen; i++) {
-        if (newVal[nLen - i] !== oldVal[oLen - i]) break;
+        if (newVal[nLen - i] !== oldVal[oLen - i]) {
+          break;
+        }
       }
       tail = i - 1;
 
@@ -213,7 +217,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this.insertChars(newVal.slice(head, nLen - tail), false, true);
     }
   },
-
 
   /**
    * Gets start offset of a selection
