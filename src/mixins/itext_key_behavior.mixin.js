@@ -13,6 +13,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
     fabric.util.addListener(this.hiddenTextarea, 'keydown', this.onKeyDown.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'keypress', this.onKeyPress.bind(this));
+    fabric.util.addListener(this.hiddenTextarea, 'input', this.onInput.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'copy', this.copy.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'paste', this.paste.bind(this));
 
@@ -49,6 +50,13 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     88: 'cut'
   },
 
+  /**
+   * @private
+   */
+  _deadKeys: [
+    229
+  ],
+
   onClick: function() {
     // No need to trigger click event here, focus is enough to have the keyboard appear on Android
     this.hiddenTextarea && this.hiddenTextarea.focus();
@@ -69,6 +77,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this[this._ctrlKeysMap[e.keyCode]](e);
     }
     else {
+      this.latestKeyCode = e.which;
       return;
     }
     e.stopImmediatePropagation();
@@ -164,6 +173,47 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     }
     e.stopPropagation();
   },
+
+  /**
+   * Handles input event
+   */
+  onInput: function(){
+    var newVal = this.hiddenTextarea.value,
+        oldVal = this.text,
+        oLen = oldVal.length,
+        nLen = newVal.length,
+        head,
+        tail,
+        i;
+
+    //dead key is hit
+    if (this._deadKeys.indexOf(this.latestKeyCode) !== -1) {
+
+      //daed keys will produce unpredictable results
+      //need to scan the whole contents from both begin and end to
+      //extract the changes
+      if(newVal.replace(/\ /g, '') === oldVal.replace(/\ /g, '')) {
+        return;
+      }
+
+      //start
+      for (i = 0; i < oLen; i++) {
+        if (newVal[i] !== oldVal[i]) break;
+      }
+      head = i;
+
+      //end
+      for (i = 1; i <= nLen; i++) {
+        if (newVal[nLen - i] !== oldVal[oLen - i]) break;
+      }
+      tail = i - 1;
+
+      this.setSelectionStart(head, true);
+      this.setSelectionEnd(oLen - tail, true);
+      this.insertChars(newVal.slice(head, nLen - tail), false, true);
+    }
+  },
+
 
   /**
    * Gets start offset of a selection

@@ -478,6 +478,8 @@
       this.hiddenTextarea && this.canvas && this.hiddenTextarea.parentNode.removeChild(this.hiddenTextarea);
       this.hiddenTextarea = null;
 
+      this.latestKeyCode = null;
+
       this.abortCursorAnimation();
       this._restoreEditingProps();
       this._currentCursorOpacity = 0;
@@ -502,12 +504,12 @@
     /**
      * @private
      */
-    _removeCharsFromTo: function(start, end) {
+    _removeCharsFromTo: function(start, end, noTextareaUpdate) {
       while (end !== start) {
         this._removeSingleCharAndStyle(start + 1);
         end--;
       }
-      this.setSelectionStart(start);
+      this.setSelectionStart(start, noTextareaUpdate);
     },
 
     _removeSingleCharAndStyle: function(index) {
@@ -523,18 +525,20 @@
     /**
      * Inserts a character where cursor is (replacing selection if one exists)
      * @param {String} _chars Characters to insert
+     * @param {Boolean} useCopiedStyle Use copied style or not
+     * @param {Boolean} noTextareaUpdate True if no need to update textarea
      */
-    insertChars: function(_chars, useCopiedStyle) {
+    insertChars: function(_chars, useCopiedStyle, noTextareaUpdate) {
       if (this.selectionEnd - this.selectionStart > 1) {
-        this._removeCharsFromTo(this.selectionStart, this.selectionEnd);
-        this.setSelectionEnd(this.selectionStart);
+        this._removeCharsFromTo(this.selectionStart, this.selectionEnd, noTextareaUpdate);
+        this.setSelectionEnd(this.selectionStart, noTextareaUpdate);
       }
       var isEndOfLine = this.text[this.selectionStart] === '\n';
       this.text = this.text.slice(0, this.selectionStart) +
                   _chars + this.text.slice(this.selectionEnd);
       this.insertStyleObjects(_chars, isEndOfLine, useCopiedStyle);
-      this.setSelectionStart(this.selectionStart + _chars.length);
-      this.setSelectionEnd(this.selectionStart);
+      this.setSelectionStart(this.selectionStart + _chars.length, noTextareaUpdate);
+      this.setSelectionEnd(this.selectionStart, noTextareaUpdate);
 
       this.canvas && this.canvas.renderAll();
 

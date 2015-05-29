@@ -219,28 +219,28 @@
      * Sets selection start (left boundary of a selection)
      * @param {Number} index Index to set selection start to
      */
-    setSelectionStart: function(index) {
+    setSelectionStart: function(index, noTextareaUpdate) {
       index = Math.max(index, 0);
       if (this.selectionStart !== index) {
         this.fire('selection:changed');
         this.canvas && this.canvas.fire('text:selection:changed', { target: this });
         this.selectionStart = index;
       }
-      this._updateTextarea();
+      !noTextareaUpdate && this._updateTextarea();
     },
 
     /**
      * Sets selection end (right boundary of a selection)
      * @param {Number} index Index to set selection end to
      */
-    setSelectionEnd: function(index) {
+    setSelectionEnd: function(index, noTextareaUpdate) {
       index = Math.min(index, this.text.length);
       if (this.selectionEnd !== index) {
         this.fire('selection:changed');
         this.canvas && this.canvas.fire('text:selection:changed', { target: this });
         this.selectionEnd = index;
       }
-      this._updateTextarea();
+      !noTextareaUpdate && this._updateTextarea();
     },
 
     /**
