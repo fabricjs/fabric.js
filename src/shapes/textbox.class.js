@@ -105,7 +105,8 @@
 
       if (ctx.measureText(text).width < maxWidth) {
         lines.push(text);
-      } else {
+      }
+      else {
         while (words.length > 0) {
 
           /*
@@ -127,14 +128,16 @@
 
             if (words.length > 1) {
               words[1] = tmp.slice(-1) + words[1];
-            } else {
+            }
+            else {
               words.push(tmp.slice(-1));
             }
           }
 
           if (Math.ceil(ctx.measureText(line + words[0]).width) < maxWidth) {
             line += words.shift() + ' ';
-          } else {
+          }
+          else {
             lines.push(line);
             line = '';
           }
