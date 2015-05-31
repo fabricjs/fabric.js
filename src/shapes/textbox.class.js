@@ -178,7 +178,7 @@
      */
     setOnGroup: function (key, value) {
       if (key === 'scaleX') {
-        this.set(key, Math.abs(1 / value));
+        this.set('scaleX', Math.abs(1 / value));
         this.set('width', (this.get('width') * value) /
           (typeof this.__oldScaleX === 'undefined' ? 1 : this.__oldScaleX));
         this.__oldScaleX = value;
@@ -210,7 +210,7 @@
         lineLength = this._textLines[i].length;
 
         // case: we are in the current line
-        if (selectionStart < lineLength + (this.text[removed + lineLength] == '\n' ? 1 : 0)) {
+        if (selectionStart < lineLength + (this.text[removed + lineLength] === '\n' ? 1 : 0)) {
           return {
             lineIndex: i,
             charIndex: selectionStart
@@ -224,7 +224,7 @@
         removed += lineLength;
 
         // if there was a newline, we need to account for the newline character
-        if (this.text[removed] == '\n') {
+        if (this.text[removed] === '\n') {
           removed++;
           selectionStart--;
         }
@@ -314,7 +314,7 @@
   /**
    * Contains all fabric.Textbox objects that have been created
    * @static
-   * @memberof fabric.Textbox
+   * @memberOf fabric.Textbox
    * @type Array
    */
   fabric.Textbox.instances = [];
