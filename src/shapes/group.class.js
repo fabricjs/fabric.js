@@ -203,12 +203,19 @@
      * @private
      */
     _set: function(key, value) {
-      if (key in this.delegatedProperties || key === 'canvas') {
-        var i = this._objects.length;
+      var i = this._objects.length;
+
+      if (this.delegatedProperties[key] || key === 'canvas') {
         while (i--) {
           this._objects[i].set(key, value);
         }
       }
+      else {
+        while (i--) {
+          this._objects[i].setOnGroup(key, value);
+        }
+      }
+
       this.callSuper('_set', key, value);
     },
 
