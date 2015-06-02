@@ -5,7 +5,12 @@
     "eventjs":            true,
     "exports":            true,
     "fabric":             true,
-    "G_vmlCanvasManager": true
+    "G_vmlCanvasManager": true,
+
+    // node.js
+    "require":            true,
+    "Buffer":             true,
+    "process":            true
   },
 
   "browser":    true,
@@ -21,7 +26,7 @@
   "multistr":   true,
   "newcap":     true,
   "noarg":      true,
-  "node":       true,
+  // "node":       true, // we're not using node to catch `console.log` statements
   "noempty":    false,
   "nomen":      false,
   "nonew":      false,
