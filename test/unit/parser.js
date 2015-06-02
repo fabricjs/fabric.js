@@ -146,6 +146,17 @@
     deepEqual(fabric.parseStyleAttribute(element), expectedObject);
   });
 
+  test('parseStyleAttribute with trailing spaces', function() {
+    var element = fabric.document.createElement('path');
+    element.setAttribute('style', 'left:10px;  top:5px;  ');
+
+    var expectedObject = {
+      'left': 10,
+      'top': 5
+    };
+    deepEqual(fabric.parseStyleAttribute(element), expectedObject);
+  });
+
   test('parseStyleAttribute with value normalization', function() {
     var element = fabric.document.createElement('path');
     element.setAttribute('style', 'fill:none;  stroke-dasharray: 2 0.4;');
