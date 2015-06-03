@@ -83,14 +83,44 @@
      * @returns {Array} Array of lines
      */
     _wrapText: function (ctx, text) {
-      var lines = text.split(this._reNewline), wrapped = [], i;
+      var lines = text.split(this._reNewline), wrapped = [], lineIndex = 0, newLines, i;
 
       for (i = 0; i < lines.length; i++) {
-        wrapped = wrapped.concat(this._wrapLine(ctx, lines[i]));
+        newLines = this._wrapLine(ctx, lines[i], lineIndex);
+        lineIndex += newLines.length;
+        wrapped = wrapped.concat(newLines);
       }
 
       return wrapped;
     },
+
+    /**
+     * Helper function to measure a string of text, given its lineIndex and charIndex offset
+     *
+     * @param {CanvasRenderingContext2D} ctx
+     * @param {String} text
+     * @param {number} lineIndex
+     * @param {number} charOffset
+     * @returns {number}
+     * @private
+     */
+    _measureText: function(ctx, text, lineIndex, charOffset) {
+      var width = 0, decl;
+      charOffset = charOffset || 0;
+
+      for(var i = charOffset; i < charOffset + text.length; i++) {
+        if (this.styles && this.styles[lineIndex] && (decl = this.styles[lineIndex][i])) {
+          ctx.save();
+          width += this._applyCharStylesGetWidth(ctx, text[i], lineIndex, i, decl);
+          ctx.restore();
+        } else {
+          width += this._applyCharStylesGetWidth(ctx, text[i], lineIndex, i);
+        }
+      }
+
+      return width;
+    },
+
     /**
      * Wraps a line of text using the width of the Textbox and a context.
      * @param {CanvasRenderingContext2D} ctx Context to use for measurements
@@ -98,12 +128,12 @@
      * @returns {Array} Array of line(s) into which the given text is wrapped
      * to.
      */
-    _wrapLine: function (ctx, text) {
+    _wrapLine: function (ctx, text, lineIndex) {
       var maxWidth = this.width, words = text.split(' '),
         lines = [],
         line = '';
 
-      if (ctx.measureText(text).width < maxWidth) {
+      if (this._measureText(ctx, text, lineIndex) < maxWidth) {
         lines.push(text);
       }
       else {
@@ -122,7 +152,7 @@
            * This handles a word that is longer than the width of the
            * text area.
            */
-          while (Math.ceil(ctx.measureText(words[0]).width) >= maxWidth) {
+          while (Math.ceil(this._measureText(ctx, words[0], lineIndex)) >= maxWidth) {
             var tmp = words[0];
             words[0] = tmp.slice(0, -1);
 
@@ -134,10 +164,11 @@
             }
           }
 
-          if (Math.ceil(ctx.measureText(line + words[0]).width) < maxWidth) {
+          if (Math.ceil(this._measureText(ctx, line + words[0], lineIndex)) < maxWidth) {
             line += words.shift() + ' ';
           }
           else {
+            lineIndex++;
             lines.push(line);
             line = '';
           }
@@ -160,7 +191,7 @@
       this.ctx.save();
       this._setTextStyles(this.ctx);
 
-      lines = this._wrapText(this.ctx, this.text);
+      var lines = this._wrapText(this.ctx, this.text);
 
       this.ctx.restore();
       return lines;
@@ -196,42 +227,36 @@
         selectionStart = this.selectionStart;
       }
 
-      var numLines = this._textLines.length, removed = 0, lineLength;
-
-      //  case: we are at the end of input
-      if (selectionStart >= this.text.length) {
-        return {
-          lineIndex: numLines - 1,
-          charIndex: this._textLines[numLines - 1].length
-        };
-      }
+      var numLines = this._textLines.length,
+        removed = 0,
+        textHasChanged = this.__text !== this.text;
 
       for (var i = 0; i < numLines; i++) {
-        lineLength = this._textLines[i].length;
+        var line = this._textLines[i],
+          lineLen = line.length;
 
-        // case: we are in the current line
-        if (selectionStart < lineLength + (this.text[removed + lineLength] === '\n' ? 1 : 0)) {
+        if(selectionStart <= removed + lineLen) {
+          // edge case:
+          //   If we are at the end of a line that is wrapping, force cursor on to next line
+          //   However, doing that for inserting styles breaks things, so don't when text has changed
+          if(!textHasChanged && i !== numLines - 1 && selectionStart === removed + lineLen && this.text[removed + lineLen] !== '\n') {
+            i++;
+            selectionStart = removed;
+          }
+
           return {
             lineIndex: i,
-            charIndex: selectionStart
+            charIndex: selectionStart - removed
           };
         }
 
-        // adjust selection start
-        selectionStart -= lineLength;
+        removed += lineLen;
 
-        // keep track of removed characters
-        removed += lineLength;
-
-        // if there was a newline, we need to account for the newline character
         if (this.text[removed] === '\n') {
           removed++;
-          selectionStart--;
         }
       }
 
-      // the only way it reaches here is if the user is currently typing, in which case, return last character
-      // this happens because text has changed, but selectionStart or _textLines has not.
       return {
         lineIndex: numLines - 1,
         charIndex: this._textLines[numLines - 1].length
