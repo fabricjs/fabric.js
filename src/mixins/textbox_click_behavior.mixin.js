@@ -21,7 +21,7 @@
 
     // were we at an end of a line that is wrapping?
     var line = this._textLines[cursor.lineIndex];
-    if(cursor.charIndex === line.length - 1 && index !== this.text.length - 1 && this.text[index + 1] !== '\n') {
+    if (cursor.charIndex === line.length - 1 && index !== this.text.length - 1 && this.text[index + 1] !== '\n') {
       index--;
     }
 

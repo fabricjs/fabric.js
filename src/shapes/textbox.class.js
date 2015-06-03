@@ -104,11 +104,11 @@
      * @returns {number}
      * @private
      */
-    _measureText: function(ctx, text, lineIndex, charOffset) {
+    _measureText: function (ctx, text, lineIndex, charOffset) {
       var width = 0, decl;
       charOffset = charOffset || 0;
 
-      for(var i = charOffset; i < charOffset + text.length; i++) {
+      for (var i = charOffset; i < charOffset + text.length; i++) {
         if (this.styles && this.styles[lineIndex] && (decl = this.styles[lineIndex][i])) {
           ctx.save();
           width += this._applyCharStylesGetWidth(ctx, text[i], lineIndex, i, decl);
@@ -235,11 +235,12 @@
         var line = this._textLines[i],
           lineLen = line.length;
 
-        if(selectionStart <= removed + lineLen) {
+        if (selectionStart <= removed + lineLen) {
           // edge case:
           //   If we are at the end of a line that is wrapping, force cursor on to next line
           //   However, doing that for inserting styles breaks things, so don't when text has changed
-          if(!textHasChanged && i !== numLines - 1 && selectionStart === removed + lineLen && this.text[removed + lineLen] !== '\n') {
+          if (!textHasChanged &&
+            i !== numLines - 1 && selectionStart === removed + lineLen && this.text[removed + lineLen] !== '\n') {
             i++;
             selectionStart = removed;
           }
