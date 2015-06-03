@@ -485,6 +485,29 @@
     },
 
     /**
+     * Returns coordinates of points's bounding rectangle (left, top, width, height)
+     * @param {Array} points, 4 points array
+     * @return {Object} Object with left, top, width, height properties
+     */
+    makeBoundingBoxFromPoints(points) {
+      var xPoints = [points[0].x, points[1].x, points[2].x, points[3].x],
+          minX = fabric.util.array.min(xPoints),
+          maxX = fabric.util.array.max(xPoints),
+          width = Math.abs(minX - maxX),
+          yPoints = [points[0].y, points[1].y, points[2].y, points[3].y],
+          minY = fabric.util.array.min(yPoints),
+          maxY = fabric.util.array.max(yPoints),
+          height = Math.abs(minY - maxY);
+          
+      return {
+        left: minX,
+        top: minY,
+        width: width,
+        height: height
+      };      
+    },
+
+    /**
      * Returns true if context has transparent pixel
      * at specified location (taking tolerance into account)
      * @param {CanvasRenderingContext2D} ctx context
