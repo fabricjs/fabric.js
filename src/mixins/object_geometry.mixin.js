@@ -288,8 +288,8 @@
      */
     setCoords: function() {
       
-      var p = this._calculateCurrentDimensions(),
-          m = this._calcBBoxTransformMatrix(),
+      var p = this._getNonTransformedDimensions(),
+          m = this._calcTotalTransformMatrix(),
           f = fabric.util.transformPoint,
           theta = fabric.util.degreesToRadians(this.angle), 
           sinTh = Math.sin(theta),
@@ -332,6 +332,18 @@
       this._setCornerCoords && this._setCornerCoords();
 
       return this;
+    },
+
+    _calcTotalTransformMatrix: function() {
+      var activeGroup = this.canvas && this.canvas.getActiveGroup(),
+          firstM = this.group && this.group !== activeGroup ? this.group._calcTotalTransformMatrix() : this.getViewportTransform(),
+          p = this.getCenterPoint(), translateMatrix = [1, 0, 0, 1, p.x, p.y],
+          m = fabric.util.multiplyTransformMatrices(firstM, translateMatrix);
+      if (this.angle) {
+        m = fabric.util.multiplyTransformMatrices(m, this._calcRotateMatrix());
+      }
+      m = fabric.util.multiplyTransformMatrices(m, this._calcDimensionsTransformMatrix());
+      return m;
     },
 
     _calcBBoxTransformMatrix: function() {
