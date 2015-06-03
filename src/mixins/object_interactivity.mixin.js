@@ -140,8 +140,30 @@
       if (!dimensions) {
         dimensions = this._getNonTransformedDimensions();
       }
-      var transformMatrix = this._calcDimensionsTransformMatrix();
-      return fabric.util.transformPoint(dimensions, transformMatrix, true);
+      var points = [
+          {
+            x: -dimensions.x/2,
+            y: -dimensions.y/2
+          },
+          {
+            x: dimensions.x/2,
+            y: -dimensions.y/2
+          },
+          {
+            x: -dimensions.x/2,
+            y: dimensions.y/2
+          },
+          {
+            x: dimensions.x/2,
+            y: dimensions.y/2
+          }],
+          i, transformMatrix = this._calcDimensionsTransformMatrix(),
+          bbox;
+      for (i = 0; i < points.length; i++) {
+        points[i] = fabric.util.transformPoint(points[i], transformMatrix);
+      }
+      bbox = fabric.util.makeBoundingBoxFromPoints(points);
+      return { x: bbox.width, y: bbox.height };
     },
 
     /*

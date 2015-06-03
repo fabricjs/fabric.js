@@ -198,23 +198,7 @@
      */
     getBoundingRect: function() {
       this.oCoords || this.setCoords();
-
-      var xCoords = [this.oCoords.tl.x, this.oCoords.tr.x, this.oCoords.br.x, this.oCoords.bl.x],
-          minX = fabric.util.array.min(xCoords),
-          maxX = fabric.util.array.max(xCoords),
-          width = Math.abs(minX - maxX),
-
-          yCoords = [this.oCoords.tl.y, this.oCoords.tr.y, this.oCoords.br.y, this.oCoords.bl.y],
-          minY = fabric.util.array.min(yCoords),
-          maxY = fabric.util.array.max(yCoords),
-          height = Math.abs(minY - maxY);
-
-      return {
-        left: minX,
-        top: minY,
-        width: width,
-        height: height
-      };
+      return fabric.util.makeBoundingBoxFromPoints([this.oCoords.tl, this.oCoords.tr, this.oCoords.br, this.oCoords.bl]);
     },
 
     /**
@@ -303,6 +287,7 @@
      * @chainable
      */
     setCoords: function() {
+      
       var p = this._calculateCurrentDimensions(),
           m = this._calcBBoxTransformMatrix(),
           f = fabric.util.transformPoint,
