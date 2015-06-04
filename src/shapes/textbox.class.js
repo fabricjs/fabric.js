@@ -113,7 +113,8 @@
           ctx.save();
           width += this._applyCharStylesGetWidth(ctx, text[i], lineIndex, i, decl);
           ctx.restore();
-        } else {
+        }
+        else {
           width += this._applyCharStylesGetWidth(ctx, text[i], lineIndex, i);
         }
       }
