@@ -78,7 +78,11 @@
       this.setOptions(options);
 
       if (!path) {
-        throw new Error('`path` argument is required');
+        /*
+         * If there is no path make a blank one otherwise Fabric won't render anything
+         */
+        fabric.warn('`path` argument is required');
+        path = 'M0';
       }
 
       var fromArray = _toString.call(path) === '[object Array]';
