@@ -105,6 +105,24 @@
     renderOnAddRemove: true,
 
     /**
+     * Indicates whether {@link fabric.StaticCanvas#moveTo}, {@link fabric.StaticCanvas#sendToBack}, {@link fabric.StaticCanvas#sendBackwards}, {@link fabric.StaticCanvas#bringForward}, and {@link fabric.StaticCanvas#bringToFront} should also re-render canvas.
+     * Disabling this option could give a great performance boost when moving a lot of objects in the stack of drawn objects at once
+     * (followed by a manual rendering after addition/deletion)
+     * @type Boolean
+     * @default
+     */
+    renderOnStackMove: true,
+
+    /**
+     * Indicates whether {@link fabric.StaticCanvas#centerObject}, {@link fabric.StaticCanvas#centerObjectH} and {@link fabric.StaticCanvas#centerObjectV} should also re-render canvas.
+     * Disabling this option could give a great performance boost when centering a lot of objects on the canvas at once
+     * (followed by a manual rendering after addition/deletion)
+     * @type Boolean
+     * @default
+     */
+    renderOnObjectCenter: true,
+
+    /**
      * Function that determines clipping of entire canvas area
      * Being passed context as first argument. See clipping canvas area in {@link https://github.com/kangax/fabric.js/wiki/FAQ}
      * @type Function
@@ -999,7 +1017,7 @@
      */
     centerObjectH: function (object) {
       this._centerObject(object, new fabric.Point(this.getCenter().left, object.getCenterPoint().y));
-      this.renderAll();
+      this.renderOnObjectCenter && this.renderAll();
       return this;
     },
 
@@ -1012,7 +1030,7 @@
      */
     centerObjectV: function (object) {
       this._centerObject(object, new fabric.Point(object.getCenterPoint().x, this.getCenter().top));
-      this.renderAll();
+      this.renderOnObjectCenter && this.renderAll();
       return this;
     },
 
@@ -1027,7 +1045,7 @@
       var center = this.getCenter();
 
       this._centerObject(object, new fabric.Point(center.left, center.top));
-      this.renderAll();
+      this.renderOnObjectCenter && this.renderAll();
       return this;
     },
 
@@ -1368,7 +1386,7 @@
     sendToBack: function (object) {
       removeFromArray(this._objects, object);
       this._objects.unshift(object);
-      return this.renderAll && this.renderAll();
+      return this.renderOnStackMove && this.renderAll && this.renderAll();
     },
 
     /**
@@ -1380,7 +1398,7 @@
     bringToFront: function (object) {
       removeFromArray(this._objects, object);
       this._objects.push(object);
-      return this.renderAll && this.renderAll();
+      return this.renderOnStackMove && this.renderAll && this.renderAll();
     },
 
     /**
@@ -1399,7 +1417,7 @@
 
         removeFromArray(this._objects, object);
         this._objects.splice(newIdx, 0, object);
-        this.renderAll && this.renderAll();
+        this.renderOnStackMove && this.renderAll && this.renderAll();
       }
       return this;
     },
@@ -1449,7 +1467,7 @@
 
         removeFromArray(this._objects, object);
         this._objects.splice(newIdx, 0, object);
-        this.renderAll && this.renderAll();
+        this.renderOnStackMove && this.renderAll && this.renderAll();
       }
       return this;
     },
@@ -1493,7 +1511,7 @@
     moveTo: function (object, index) {
       removeFromArray(this._objects, object);
       this._objects.splice(index, 0, object);
-      return this.renderAll && this.renderAll();
+      return this.renderOnStackMove && this.renderAll && this.renderAll();
     },
 
     /**
