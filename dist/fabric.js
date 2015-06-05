@@ -15209,10 +15209,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       this.setOptions(options);
 
       if (!path) {
-        /*
-         * If there is no path make a blank one otherwise Fabric won't render anything
-         */
-        //fabric.warn('`path` argument is required');
+        // If there is no path make a blank one otherwise Fabric won't render anything
         path = 'M0';
       }
 
