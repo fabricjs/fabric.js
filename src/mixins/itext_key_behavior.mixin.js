@@ -69,7 +69,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this[this._ctrlKeysMap[e.keyCode]](e);
     }
     else {
-      this.latestKeyCode = e.which;
       return;
     }
     e.stopImmediatePropagation();
@@ -162,19 +161,17 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         oldVal = this.text,
         oLen = oldVal.length,
         nLen = newVal.length,
+        selectionStart = this.hiddenTextarea.selectionStart,
         head,
         tail,
         i;
 
     //scan the whole contents from both begin and end to
     //extract the changes
-    if (newVal.replace(/\ /g, '') === oldVal.replace(/\ /g, '')) {
-      return;
-    }
 
     //find 'start', which indicates the **length** of the changed part before
     //the changes
-    for (i = 0; i < oLen; i++) {
+    for (i = 0; i < selectionStart - 1; i++) {
       if (newVal[i] !== oldVal[i]) {
         break;
       }
@@ -190,9 +187,12 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     }
     tail = i - 1;
 
-    this.setSelectionStart(head, true);
-    this.setSelectionEnd(oLen - tail, true);
-    this.insertChars(newVal.slice(head, nLen - tail), false, true);
+    this.insertChars(newVal.slice(head, nLen - tail), false, true, {
+      start: head,
+      end: oLen - tail
+    });
+    this.setSelectionStart(this.hiddenTextarea.selectionStart, true);
+    this.setSelectionEnd(this.hiddenTextarea.selectionEnd, true);
   },
 
   /**
