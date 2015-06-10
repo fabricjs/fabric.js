@@ -128,7 +128,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (copiedText) {
       this.insertChars(copiedText, true);
     }
-    e.stopPropagation();
+    e.stopImmediatePropagation();
+    e.preventDefault();
   },
 
   /**
