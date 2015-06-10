@@ -1464,10 +1464,15 @@
      */
     getLocalPointer: function(e, pointer) {
       pointer = pointer || this.canvas.getPointer(e);
-      var objectLeftTop = this.translateToOriginPoint(this.getCenterPoint(), 'left', 'top');
+      var pClicked = new fabric.Point(pointer.x, pointer.y),
+          objectLeftTop = this._getLeftTopCoords();
+      if (this.angle) {
+        pClicked = fabric.util.rotatePoint(
+          pClicked, objectLeftTop, fabric.util.degreesToRadians(-this.angle));
+      }
       return {
-        x: pointer.x - objectLeftTop.x,
-        y: pointer.y - objectLeftTop.y
+        x: pClicked.x - objectLeftTop.x,
+        y: pClicked.y - objectLeftTop.y
       };
     },
 
