@@ -1,6 +1,7 @@
 (function() {
 
   var degreesToRadians = fabric.util.degreesToRadians,
+      radiansToDegrees = fabric.util.radiansToDegrees,
       //jscs:disable requireCamelCaseOrUpperCaseIdentifiers
       isVML = function() { return typeof G_vmlCanvasManager !== 'undefined'; };
   //jscs:enable requireCamelCaseOrUpperCaseIdentifiers
@@ -76,13 +77,26 @@
      */
     _setCornerCoords: function() {
       var coords = this.oCoords,
-          newTheta = degreesToRadians(45 - this.angle),
-          cornerHypotenuse = Math.sqrt(2 * Math.pow(this.cornerSize, 2)) / 2,
-          cosHalfOffset = cornerHypotenuse * Math.cos(newTheta),
-          sinHalfOffset = cornerHypotenuse * Math.sin(newTheta),
+          newTheta = 0, cornerHypotenuse = 0,
+          size = this.cornerSizeOverrides, all = this.cornerSize,
           x, y;
 
+      if (!size) {
+        newTheta = degreesToRadians(45 - this.angle),
+        cornerHypotenuse = Math.sqrt(2 * Math.pow(all, 2)) / 2;
+      }
+
       for (var point in coords) {
+        if (size) {
+          var width = size[point + 'Width'] || all,
+              height = size[point + 'Height'] || all;
+          newTheta = degreesToRadians((90 - radiansToDegrees(Math.asin((height / 2) / (width / 2))) / 2) - this.angle);
+          cornerHypotenuse = Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2)) / 2;
+        }
+
+        var cosHalfOffset = cornerHypotenuse * Math.cos(newTheta),
+            sinHalfOffset = cornerHypotenuse * Math.sin(newTheta);
+
         x = coords[point].x;
         y = coords[point].y;
         coords[point].corner = {
@@ -91,12 +105,12 @@
             y: y - cosHalfOffset
           },
           tr: {
-            x: x + cosHalfOffset,
-            y: y - sinHalfOffset
+            x: x + sinHalfOffset,
+            y: y - cosHalfOffset
           },
           bl: {
-            x: x - cosHalfOffset,
-            y: y + sinHalfOffset
+            x: x - sinHalfOffset,
+            y: y + cosHalfOffset
           },
           br: {
             x: x + sinHalfOffset,
@@ -303,9 +317,18 @@
       if (!this.isControlVisible(control)) {
         return;
       }
-      var size = this.cornerSize;
-      isVML() || this.transparentCorners || ctx.clearRect(left, top, size, size);
-      ctx[methodName](left, top, size, size);
+
+      var size = this.cornerSize,
+          override = this.cornerSizeOverrides,
+          width = override ? override[control + 'Width'] || size : size,
+          height = override ? override[control + 'Height'] || size : size;
+
+      left = left - (width / 2) + (size / 2);
+      top = top - (height / 2) + (size / 2);
+
+      isVML() || this.transparentCorners || ctx.clearRect(left, top, width, height);
+
+      ctx[methodName](left, top, width, height);
     },
 
     /**
