@@ -76,19 +76,19 @@
     },
 
     _generateStyleMap: function() {
-      var realLineCount = 0;
-      var realLineCharCount = 0;
-      var charCount = 0;
-      var map = {};
+      var realLineCount = 0,
+          realLineCharCount = 0,
+          charCount = 0,
+          map = {};
 
-      for(var i = 0; i < this._textLines.length; i++) {
-        if(this.text[charCount] === '\n') {
+      for (var i = 0; i < this._textLines.length; i++) {
+        if (this.text[charCount] === '\n') {
           realLineCharCount = 0;
           charCount++;
           realLineCount++;
         }
 
-        map[i] = {line: realLineCount, offset: realLineCharCount};
+        map[i] = { line: realLineCount, offset: realLineCharCount };
 
         charCount += this._textLines[i].length;
         realLineCharCount += this._textLines[i].length;

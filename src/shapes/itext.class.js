@@ -259,8 +259,9 @@
         return styles;
       }
 
-      var loc = this.get2DCursorLocation(startIndex);
-      var style = this._getStyleDeclaration(loc.lineIndex, loc.charIndex);
+      var loc = this.get2DCursorLocation(startIndex),
+          style = this._getStyleDeclaration(loc.lineIndex, loc.charIndex);
+
       return style || {};
     },
 
@@ -917,7 +918,7 @@
      * @private
      */
     _getStyleDeclaration: function(lineIndex, charIndex, returnCloneOrEmpty) {
-      if(returnCloneOrEmpty) {
+      if (returnCloneOrEmpty) {
         return (this.styles[lineIndex] && this.styles[lineIndex][charIndex])
           ? clone(this.styles[lineIndex][charIndex])
           : { };
