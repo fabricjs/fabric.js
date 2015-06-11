@@ -604,9 +604,14 @@
       // 0,1,2,3 -> (charIndex=2) -> 0,1,3,4 -> (insert 2) -> 0,1,2,3,4
       for (var index in currentLineStylesCloned) {
         var numericIndex = parseInt(index, 10);
+
         if (numericIndex >= charIndex) {
           currentLineStyles[numericIndex + 1] = currentLineStylesCloned[numericIndex];
-          //delete currentLineStyles[index];
+
+          // only delete the style if there was nothing moved there
+          if(!currentLineStylesCloned[numericIndex - 1]) {
+            delete currentLineStyles[numericIndex];
+          }
         }
       }
 
