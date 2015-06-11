@@ -5,6 +5,7 @@
    * a Textbox doesn't scale text, it only changes width and makes text wrap automatically.
    */
   var setObjectScaleOverridden = fabric.Canvas.prototype._setObjectScale;
+
   fabric.Canvas.prototype._setObjectScale = function (localMouse, transform,
                                                       lockScalingX, lockScalingY, by, lockScalingFlip) {
 
@@ -38,4 +39,145 @@
     }
   };
 
+  var clone = fabric.util.object.clone;
+
+  fabric.util.object.extend(fabric.Textbox.prototype, /** @lends fabric.IText.prototype */ {
+    /**
+     * @private
+     */
+    _removeExtraneousStyles: function() {
+      //for (var prop in this._styleMap) {
+      //  if (!this._textLines[prop]) {
+      //    delete this.styles[this._styleMap[prop].line];
+      //  }
+      //}
+    },
+
+    /**
+     * Inserts style object for a given line/char index
+     * @param {Number} lineIndex Index of a line
+     * @param {Number} charIndex Index of a char
+     * @param {Object} [style] Style object to insert, if given
+     */
+    insertCharStyleObject: function(lineIndex, charIndex, style) {
+      // adjust lineIndex and charIndex
+      var map = this._styleMap[lineIndex];
+      lineIndex = map.line;
+      charIndex = map.offset + charIndex;
+
+      this.callSuper('insertCharStyleObject', lineIndex, charIndex, style);
+    },
+
+    /**
+     * Inserts new style object
+     * @param {Number} lineIndex Index of a line
+     * @param {Number} charIndex Index of a char
+     * @param {Boolean} isEndOfLine True if it's end of line
+     */
+    insertNewlineStyleObject: function(lineIndex, charIndex, isEndOfLine) {
+      // adjust lineIndex and charIndex
+      var map = this._styleMap[lineIndex];
+      lineIndex = map.line;
+      charIndex = map.offset + charIndex;
+
+      this.callSuper('insertNewlineStyleObject', lineIndex, charIndex, isEndOfLine);
+    },
+
+    /**
+     * Shifts line styles up or down. This function is slightly different than the one in
+     * itext_behaviour as it takes into account the styleMap.
+     *
+     * @param {Number} lineIndex Index of a line
+     * @param {Number} offset Can be -1 or +1
+     */
+    shiftLineStyles: function(lineIndex, offset) {
+      // shift all line styles by 1 upward
+      var clonedStyles = clone(this.styles);
+
+      // adjust line index
+      var map = this._styleMap[lineIndex];
+      lineIndex = map.line;
+
+      for (var line in this.styles) {
+        var numericLine = parseInt(line, 10);
+
+        if (numericLine > lineIndex) {
+          this.styles[numericLine + offset] = clonedStyles[numericLine];
+
+          if (!clonedStyles[numericLine - offset]) {
+            delete this.styles[numericLine];
+          }
+        }
+      }
+      //TODO: evaluate if delete old style lines with offset -1
+    },
+
+    /**
+     * Figure out programatically the text on previous actual line (actual = separated by \n);
+     *
+     * @param {Number} lineIndex
+     * @returns {String}
+     * @private
+     */
+    _getTextOnPreviousLine: function(lineIndex) {
+      var textOnPreviousLine = this._textLines[lineIndex - 1];
+
+      while(this._styleMap[lineIndex - 2] && this._styleMap[lineIndex - 2].line === this._styleMap[lineIndex - 1].line) {
+        textOnPreviousLine = this._textLines[lineIndex - 2] + textOnPreviousLine;
+
+        lineIndex--;
+      }
+
+      return textOnPreviousLine;
+    },
+
+    /**
+     * Removes style object
+     * @param {Boolean} isBeginningOfLine True if cursor is at the beginning of line
+     * @param {Number} [index] Optional index. When not given, current selectionStart is used.
+     */
+    removeStyleObject: function(isBeginningOfLine, index) {
+
+      var cursorLocation = this.get2DCursorLocation(index),
+        map = this._styleMap[cursorLocation.lineIndex],
+        lineIndex = map.line,
+        charIndex = map.offset + cursorLocation.charIndex;
+
+      if (isBeginningOfLine) {
+        var textOnPreviousLine = this._getTextOnPreviousLine(cursorLocation.lineIndex),
+          newCharIndexOnPrevLine = textOnPreviousLine ? textOnPreviousLine.length : 0;
+
+        if (!this.styles[lineIndex - 1]) {
+          this.styles[lineIndex - 1] = { };
+        }
+
+        for (charIndex in this.styles[lineIndex]) {
+          this.styles[lineIndex - 1][parseInt(charIndex, 10) + newCharIndexOnPrevLine]
+            = this.styles[lineIndex][charIndex];
+        }
+
+        this.shiftLineStyles(cursorLocation.lineIndex, -1);
+
+      }
+      else {
+        var currentLineStyles = this.styles[lineIndex];
+
+        if (currentLineStyles) {
+          delete currentLineStyles[charIndex];
+          //console.log('deleting', lineIndex, charIndex + offset);
+        }
+
+        var currentLineStylesCloned = clone(currentLineStyles);
+
+        // shift all styles by 1 backwards
+        for (var i in currentLineStylesCloned) {
+          var numericIndex = parseInt(i, 10);
+          if (numericIndex >= charIndex && numericIndex !== 0) {
+            currentLineStyles[numericIndex - 1] = currentLineStylesCloned[numericIndex];
+            delete currentLineStyles[numericIndex];
+          }
+        }
+      }
+    }
+  });
 })();

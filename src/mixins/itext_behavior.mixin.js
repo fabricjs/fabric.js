@@ -628,8 +628,8 @@
           lineIndex = cursorLocation.lineIndex,
           charIndex = cursorLocation.charIndex;
 
-      if (!this.styles[lineIndex]) {
-        this.styles[lineIndex] = { };
+      if (!this._getLineStyle(lineIndex)) {
+        this._setLineStyle(lineIndex, {});
       }
 
       if (_chars === '\n') {

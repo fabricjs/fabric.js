@@ -70,9 +70,110 @@
         this._setTextStyles(ctx);
       }
       this._textLines = this._splitTextIntoLines();
+      this._styleMap = this._generateStyleMap();
       this._clearCache();
       this.height = this._getTextHeight(ctx);
     },
+
+    _generateStyleMap: function() {
+      var realLineCount = 0;
+      var realLineCharCount = 0;
+      var charCount = 0;
+      var map = {};
+
+      for(var i = 0; i < this._textLines.length; i++) {
+        if(this.text[charCount] === '\n') {
+          realLineCharCount = 0;
+          charCount++;
+          realLineCount++;
+        }
+
+        map[i] = {line: realLineCount, offset: realLineCharCount};
+
+        charCount += this._textLines[i].length;
+        realLineCharCount += this._textLines[i].length;
+      }
+
+      return map;
+    },
+
+    /**
+     * @param {Number} lineIndex
+     * @param {Number} charIndex
+     * @param {Boolean} [returnCloneOrEmpty=false]
+     * @private
+     */
+    _getStyleDeclaration: function(lineIndex, charIndex, returnCloneOrEmpty) {
+      if(this._styleMap) {
+        var map = this._styleMap[lineIndex];
+        lineIndex = map.line;
+        charIndex = map.offset + charIndex;
+      }
+
+      if(returnCloneOrEmpty) {
+        return (this.styles[lineIndex] && this.styles[lineIndex][charIndex])
+          ? clone(this.styles[lineIndex][charIndex])
+          : { };
+      }
+
+      return this.styles[lineIndex] && this.styles[lineIndex][charIndex] ? this.styles[lineIndex][charIndex] : null;
+    },
+
+    /**
+     * @param {Number} lineIndex
+     * @param {Number} charIndex
+     * @param {Object} style
+     * @private
+     */
+    _setStyleDeclaration: function(lineIndex, charIndex, style) {
+      var map = this._styleMap[lineIndex];
+      lineIndex = map.line;
+      charIndex = map.offset + charIndex;
+
+      this.styles[lineIndex][charIndex] = style;
+    },
+
+    /**
+     * @param {Number} lineIndex
+     * @param {Number} charIndex
+     * @private
+     */
+    _deleteStyleDeclaration: function(lineIndex, charIndex) {
+      var map = this._styleMap[lineIndex];
+      lineIndex = map.line;
+      charIndex = map.offset + charIndex;
+
+      delete this.styles[lineIndex][charIndex];
+    },
+
+    /**
+     * @param {Number} lineIndex
+     * @private
+     */
+    _getLineStyle: function(lineIndex) {
+      var map = this._styleMap[lineIndex];
+      return this.styles[map.line];
+    },
+
+    /**
+     * @param {Number} lineIndex
+     * @param {Object} style
+     * @private
+     */
+    _setLineStyle: function(lineIndex, style) {
+      var map = this._styleMap[lineIndex];
+      this.styles[map.line] = style;
+    },
+
+    /**
+     * @param {Number} lineIndex
+     * @private
+     */
+    _deleteLineStyle: function(lineIndex) {
+      var map = this._styleMap[lineIndex];
+      delete this.styles[map.line];
+    },
+
     /**
      * Wraps text using the 'width' property of Textbox. First this function
      * splits text on newlines, so we preserve newlines entered by the user.
@@ -83,12 +184,10 @@
      * @returns {Array} Array of lines
      */
     _wrapText: function (ctx, text) {
-      var lines = text.split(this._reNewline), wrapped = [], lineIndex = 0, newLines, i;
+      var lines = text.split(this._reNewline), wrapped = [], i;
 
       for (i = 0; i < lines.length; i++) {
-        newLines = this._wrapLine(ctx, lines[i], lineIndex);
-        lineIndex += newLines.length;
-        wrapped = wrapped.concat(newLines);
+        wrapped = wrapped.concat(this._wrapLine(ctx, lines[i], i));
       }
 
       return wrapped;
@@ -108,8 +207,10 @@
       var width = 0, decl;
       charOffset = charOffset || 0;
 
-      for (var i = charOffset; i < charOffset + text.length; i++) {
-        if (this.styles && this.styles[lineIndex] && (decl = this.styles[lineIndex][i])) {
+      for (var i = 0; i < text.length; i++) {
+        decl = this._getStyleDeclaration(lineIndex, i + charOffset);
+
+        if (decl) {
           ctx.save();
           width += this._applyCharStylesGetWidth(ctx, text[i], lineIndex, i, decl);
           ctx.restore();
@@ -126,6 +227,7 @@
      * Wraps a line of text using the width of the Textbox and a context.
      * @param {CanvasRenderingContext2D} ctx Context to use for measurements
      * @param {String} text The string of text to split into lines
+     * @param {Number} lineIndex
      * @returns {Array} Array of line(s) into which the given text is wrapped
      * to.
      */
@@ -134,7 +236,9 @@
         lines = [],
         line = '';
 
-      if (this._measureText(ctx, text, lineIndex) < maxWidth) {
+      var offset = 0;
+
+      if (this._measureText(ctx, text, lineIndex, offset) < maxWidth) {
         lines.push(text);
       }
       else {
@@ -153,7 +257,7 @@
            * This handles a word that is longer than the width of the
            * text area.
            */
-          while (Math.ceil(this._measureText(ctx, words[0], lineIndex)) >= maxWidth) {
+          while (Math.ceil(this._measureText(ctx, words[0], lineIndex, offset)) >= maxWidth) {
             var tmp = words[0];
             words[0] = tmp.slice(0, -1);
 
@@ -165,11 +269,11 @@
             }
           }
 
-          if (Math.ceil(this._measureText(ctx, line + words[0], lineIndex)) < maxWidth) {
+          if (Math.ceil(this._measureText(ctx, line + words[0], lineIndex, offset)) < maxWidth) {
             line += words.shift() + ' ';
           }
           else {
-            lineIndex++;
+            offset += line.length;
             lines.push(line);
             line = '';
           }

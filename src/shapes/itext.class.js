@@ -260,11 +260,8 @@
       }
 
       var loc = this.get2DCursorLocation(startIndex);
-      if (this.styles[loc.lineIndex]) {
-        return this.styles[loc.lineIndex][loc.charIndex] || { };
-      }
-
-      return { };
+      var style = this._getStyleDeclaration(loc.lineIndex, loc.charIndex);
+      return style || {};
     },
 
     /**
@@ -293,13 +290,15 @@
     _extendStyles: function(index, styles) {
       var loc = this.get2DCursorLocation(index);
 
-      if (!this.styles[loc.lineIndex]) {
-        this.styles[loc.lineIndex] = { };
+      if (!this._getLineStyle(loc.lineIndex)) {
+        this._setLineStyle(loc.lineIndex, {})
       }
-      if (!this.styles[loc.lineIndex][loc.charIndex]) {
-        this.styles[loc.lineIndex][loc.charIndex] = { };
+
+      if (!this._getStyleDeclaration(loc.lineIndex, loc.charIndex)) {
+        this._setStyleDeclaration(loc.lineIndex, loc.charIndex, {});
       }
-      fabric.util.object.extend(this.styles[loc.lineIndex][loc.charIndex], styles);
+
+      fabric.util.object.extend(this._getStyleDeclaration(loc.lineIndex, loc.charIndex), styles);
     },
 
     /**
@@ -378,7 +377,7 @@
      * @return {Object} Character style
      */
     getCurrentCharStyle: function(lineIndex, charIndex) {
-      var style = this.styles[lineIndex] && this.styles[lineIndex][charIndex === 0 ? 0 : (charIndex - 1)];
+      var style = this._getStyleDeclaration(lineIndex, charIndex === 0 ? 0 : charIndex - 1);
 
       return {
         fontSize: style && style.fontSize || this.fontSize,
@@ -400,10 +399,8 @@
      * @return {Number} Character font size
      */
     getCurrentCharFontSize: function(lineIndex, charIndex) {
-      return (
-        this.styles[lineIndex] &&
-        this.styles[lineIndex][charIndex === 0 ? 0 : (charIndex - 1)] &&
-        this.styles[lineIndex][charIndex === 0 ? 0 : (charIndex - 1)].fontSize) || this.fontSize;
+      var style = this._getStyleDeclaration(lineIndex, charIndex === 0 ? 0 : charIndex - 1);
+      return style && style.fontSize ? style.fontSize : this.fontSize;
     },
 
     /**
@@ -413,10 +410,8 @@
      * @return {String} Character color (fill)
      */
     getCurrentCharColor: function(lineIndex, charIndex) {
-      return (
-        this.styles[lineIndex] &&
-        this.styles[lineIndex][charIndex === 0 ? 0 : (charIndex - 1)] &&
-        this.styles[lineIndex][charIndex === 0 ? 0 : (charIndex - 1)].fill) || this.cursorColor;
+      var style = this._getStyleDeclaration(lineIndex, charIndex === 0 ? 0 : charIndex - 1);
+      return style && style.fill ? style.fill : this.cursorColor;
     },
 
     /**
@@ -644,11 +639,11 @@
      * @param {Number} lineHeight Height of the line
      */
     _renderChar: function(method, ctx, lineIndex, i, _char, left, top, lineHeight) {
-      var decl, charWidth, charHeight,
+      var charWidth, charHeight,
+          decl = this._getStyleDeclaration(lineIndex, i),
           offset = this._fontSizeFraction * lineHeight / this.lineHeight;
 
-      if (this.styles && this.styles[lineIndex] && (decl = this.styles[lineIndex][i])) {
-
+      if (decl) {
         var shouldStroke = decl.stroke || this.stroke,
             shouldFill = decl.fill || this.fill;
 
@@ -803,13 +798,14 @@
             heightOfLine / this.lineHeight
           );
         }
-        if (this.styles[i]) {
+        if (this._getLineStyle(i)) {
           for (var j = 0, jlen = this._textLines[i].length; j < jlen; j++) {
-            if (this.styles[i] && this.styles[i][j] && this.styles[i][j].textBackgroundColor) {
+            var style = this._getStyleDeclaration(i, j);
+            if (style && style.textBackgroundColor) {
 
               var _char = this._textLines[i][j];
 
-              ctx.fillStyle = this.styles[i][j].textBackgroundColor;
+              ctx.fillStyle = style.textBackgroundColor;
 
               ctx.fillRect(
                 this._getLeftOffset() + lineLeftOffset + this._getWidthOfCharsAt(ctx, i, j),
@@ -846,9 +842,7 @@
      * @param {Object} [decl]
      */
     _applyCharStylesGetWidth: function(ctx, _char, lineIndex, charIndex, decl) {
-      var styleDeclaration = decl ||
-                            (this.styles[lineIndex] &&
-                             this.styles[lineIndex][charIndex]);
+      var styleDeclaration = decl || this._getStyleDeclaration(lineIndex, charIndex);
 
       if (styleDeclaration) {
         // cloning so that original style object is not polluted with following font declarations
@@ -917,14 +911,64 @@
     },
 
     /**
-     * @private
      * @param {Number} lineIndex
      * @param {Number} charIndex
+     * @param {Boolean} [returnCloneOrEmpty=false]
+     * @private
      */
-    _getStyleDeclaration: function(lineIndex, charIndex) {
-      return (this.styles[lineIndex] && this.styles[lineIndex][charIndex])
-        ? clone(this.styles[lineIndex][charIndex])
-        : { };
+    _getStyleDeclaration: function(lineIndex, charIndex, returnCloneOrEmpty) {
+      if(returnCloneOrEmpty) {
+        return (this.styles[lineIndex] && this.styles[lineIndex][charIndex])
+          ? clone(this.styles[lineIndex][charIndex])
+          : { };
+      }
+
+      return this.styles[lineIndex] && this.styles[lineIndex][charIndex] ? this.styles[lineIndex][charIndex] : null;
+    },
+
+    /**
+     * @param {Number} lineIndex
+     * @param {Number} charIndex
+     * @param {Object} style
+     * @private
+     */
+    _setStyleDeclaration: function(lineIndex, charIndex, style) {
+      this.styles[lineIndex][charIndex] = style;
+    },
+
+    /**
+     *
+     * @param {Number} lineIndex
+     * @param {Number} charIndex
+     * @private
+     */
+    _deleteStyleDeclaration: function(lineIndex, charIndex) {
+      delete this.styles[lineIndex][charIndex];
+    },
+
+    /**
+     * @param {Number} lineIndex
+     * @private
+     */
+    _getLineStyle: function(lineIndex) {
+      return this.styles[lineIndex];
+    },
+
+    /**
+     * @param {Number} lineIndex
+     * @param {Object} syle
+     * @private
+     */
+    _setLineStyle: function(lineIndex, syle) {
+      this.styles[lineIndex] = style;
+    },
+
+    /**
+     * @param {Number} lineIndex
+     * @private
+     */
+    _deleteLineStyle: function(lineIndex) {
+      delete this.styles[lineIndex];
     },
 
     /**
@@ -936,7 +980,7 @@
         return this._getWidthOfSpace(ctx, lineIndex);
       }
 
-      var styleDeclaration = this._getStyleDeclaration(lineIndex, charIndex);
+      var styleDeclaration = this._getStyleDeclaration(lineIndex, charIndex, true);
       this._applyFontStyles(styleDeclaration);
       var cacheProp = this._getCacheProp(_char, styleDeclaration);
 
@@ -956,10 +1000,8 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _getHeightOfChar: function(ctx, _char, lineIndex, charIndex) {
-      if (this.styles[lineIndex] && this.styles[lineIndex][charIndex]) {
-        return this.styles[lineIndex][charIndex].fontSize || this.fontSize;
-      }
-      return this.fontSize;
+      var style = this._getStyleDeclaration(lineIndex, charIndex);
+      return style && style.fontSize ? style.fontSize : this.fontSize;
     },
 
     /**
