@@ -121,13 +121,7 @@
         firstFixedAncestor = element;
       }
 
-      if (element.nodeType === 1 &&
-          origElement !== upperCanvasEl &&
-          fabric.util.getElementStyle(element, 'position') === 'absolute') {
-        left = 0;
-        top = 0;
-      }
-      else if (element === fabric.document) {
+      if (element === fabric.document) {
         left = body.scrollLeft || docElement.scrollLeft || 0;
         top = body.scrollTop ||  docElement.scrollTop || 0;
       }
