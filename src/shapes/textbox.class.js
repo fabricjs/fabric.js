@@ -208,9 +208,7 @@
       charOffset = charOffset || 0;
 
       for (var i = 0; i < text.length; i++) {
-        decl = this._getStyleDeclaration(lineIndex, i + charOffset);
-
-        if (decl) {
+        if (this.styles && this.styles[lineIndex] && (decl = this.styles[lineIndex][i + charOffset])) {
           ctx.save();
           width += this._applyCharStylesGetWidth(ctx, text[i], lineIndex, i, decl);
           ctx.restore();

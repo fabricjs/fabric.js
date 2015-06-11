@@ -292,7 +292,7 @@
       var loc = this.get2DCursorLocation(index);
 
       if (!this._getLineStyle(loc.lineIndex)) {
-        this._setLineStyle(loc.lineIndex, {})
+        this._setLineStyle(loc.lineIndex, {});
       }
 
       if (!this._getStyleDeclaration(loc.lineIndex, loc.charIndex)) {
