@@ -105,7 +105,7 @@
      */
     toLocalPoint: function(point, originX, originY) {
       var center = this.getCenterPoint(),
-          p, dim, p2;
+          p, p2;
 
       if (originX && originY) {
         p = this.translateToGivenOrigin(center, 'center', 'center', originX, originY);
