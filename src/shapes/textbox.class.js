@@ -278,7 +278,7 @@
           wordWidth = this._measureText(ctx, words[0], lineIndex, line.length + offset);
           lineWidth = line === '' ? wordWidth : this._measureText(ctx, line + words[0], lineIndex, offset);
 
-          if (Math.ceil(lineWidth) < maxWidth || Math.ceil(wordWidth) >= maxWidth) {
+          if (Math.ceil(lineWidth) < maxWidth || (line === '' && Math.ceil(wordWidth) >= maxWidth)) {
             line += words.shift() + ' ';
           }
           else {
