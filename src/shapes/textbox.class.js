@@ -26,6 +26,12 @@
      */
     minWidth: 20,
     /**
+     * Minimum calculated width of a textbox, in pixels.
+     * @type Number
+     * @default
+     */
+    dynamicMinWidth: 0,
+    /**
      * Cached array of text wrapping.
      * @type Array
      */
@@ -53,6 +59,7 @@
       // add width to this list of props that effect line wrapping.
       this._dimensionAffectingProps.width = true;
     },
+
     /**
      * Unlike superclass's version of this function, Textbox does not update
      * its width.
@@ -69,17 +76,32 @@
         ctx = fabric.util.createCanvasElement().getContext('2d');
         this._setTextStyles(ctx);
       }
+
+      // clear dynamicMinWidth as it will be different after we re-wrap line
+      this.dynamicMinWidth = 0;
+
+      // wrap lines
       this._textLines = this._splitTextIntoLines();
+
+      // if after wrapping, the width is smaller than dynamicMinWidth, change the width and re-wrap
+      if(this.dynamicMinWidth > this.width) {
+        this._set('width', this.dynamicMinWidth);
+      }
+
+      // calculate a styleMap that lets us know where styles as, as _textLines is separated by \n and wraps,
+      // but the style object line indices is by \n.
       this._styleMap = this._generateStyleMap();
+
+      // clear cache and re-calculate height
       this._clearCache();
       this.height = this._getTextHeight(ctx);
     },
 
-    _generateStyleMap: function() {
-      var realLineCount = 0,
+    _generateStyleMap: function () {
+      var realLineCount     = 0,
           realLineCharCount = 0,
-          charCount = 0,
-          map = {};
+          charCount         = 0,
+          map               = {};
 
       for (var i = 0; i < this._textLines.length; i++) {
         if (this.text[charCount] === '\n') {
@@ -88,7 +110,7 @@
           realLineCount++;
         }
 
-        map[i] = { line: realLineCount, offset: realLineCharCount };
+        map[i] = {line: realLineCount, offset: realLineCharCount};
 
         charCount += this._textLines[i].length;
         realLineCharCount += this._textLines[i].length;
@@ -103,17 +125,17 @@
      * @param {Boolean} [returnCloneOrEmpty=false]
      * @private
      */
-    _getStyleDeclaration: function(lineIndex, charIndex, returnCloneOrEmpty) {
-      if(this._styleMap) {
+    _getStyleDeclaration: function (lineIndex, charIndex, returnCloneOrEmpty) {
+      if (this._styleMap) {
         var map = this._styleMap[lineIndex];
         lineIndex = map.line;
         charIndex = map.offset + charIndex;
       }
 
-      if(returnCloneOrEmpty) {
+      if (returnCloneOrEmpty) {
         return (this.styles[lineIndex] && this.styles[lineIndex][charIndex])
           ? clone(this.styles[lineIndex][charIndex])
-          : { };
+          : {};
       }
 
       return this.styles[lineIndex] && this.styles[lineIndex][charIndex] ? this.styles[lineIndex][charIndex] : null;
@@ -125,7 +147,7 @@
      * @param {Object} style
      * @private
      */
-    _setStyleDeclaration: function(lineIndex, charIndex, style) {
+    _setStyleDeclaration: function (lineIndex, charIndex, style) {
       var map = this._styleMap[lineIndex];
       lineIndex = map.line;
       charIndex = map.offset + charIndex;
@@ -138,7 +160,7 @@
      * @param {Number} charIndex
      * @private
      */
-    _deleteStyleDeclaration: function(lineIndex, charIndex) {
+    _deleteStyleDeclaration: function (lineIndex, charIndex) {
       var map = this._styleMap[lineIndex];
       lineIndex = map.line;
       charIndex = map.offset + charIndex;
@@ -150,7 +172,7 @@
      * @param {Number} lineIndex
      * @private
      */
-    _getLineStyle: function(lineIndex) {
+    _getLineStyle: function (lineIndex) {
       var map = this._styleMap[lineIndex];
       return this.styles[map.line];
     },
@@ -160,7 +182,7 @@
      * @param {Object} style
      * @private
      */
-    _setLineStyle: function(lineIndex, style) {
+    _setLineStyle: function (lineIndex, style) {
       var map = this._styleMap[lineIndex];
       this.styles[map.line] = style;
     },
@@ -169,7 +191,7 @@
      * @param {Number} lineIndex
      * @private
      */
-    _deleteLineStyle: function(lineIndex) {
+    _deleteLineStyle: function (lineIndex) {
       var map = this._styleMap[lineIndex];
       delete this.styles[map.line];
     },
@@ -214,7 +236,9 @@
           ctx.restore();
         }
         else {
-          width += this._applyCharStylesGetWidth(ctx, text[i], lineIndex, i);
+          // @note: we intentionally pass in an empty style declaration, because if we pass in nothing, it will
+          // retry fetching style declaration
+          width += this._applyCharStylesGetWidth(ctx, text[i], lineIndex, i, {});
         }
       }
 
@@ -230,44 +254,31 @@
      * to.
      */
     _wrapLine: function (ctx, text, lineIndex) {
-      var maxWidth = this.width, words = text.split(' '),
-        lines = [],
-        line = '';
+      var maxWidth  = this.width,
+          words     = text.split(' '),
+          lines     = [],
+          line      = '',
+          offset    = 0,
+          lineWidth = this._measureText(ctx, text, lineIndex, offset);
 
-      var offset = 0;
+      // if the current line fits, do nothing
+      if (lineWidth < maxWidth) {
+        // if the current line is only one word, we need to keep track of it if it's a large word
+        if (text.indexOf(' ') === -1 && lineWidth > this.dynamicMinWidth) {
+          this.dynamicMinWidth = lineWidth;
+        }
 
-      if (this._measureText(ctx, text, lineIndex, offset) < maxWidth) {
         lines.push(text);
       }
       else {
+        var largestWordWidth = 0,
+            wordWidth        = 0;
+
         while (words.length > 0) {
+          wordWidth = this._measureText(ctx, words[0], lineIndex, line.length + offset);
+          lineWidth = line === '' ? wordWidth : this._measureText(ctx, line + words[0], lineIndex, offset);
 
-          /*
-           * If the textbox's width is less than the widest letter.
-           * TODO: Performance improvement - cache the width of W whenever
-           * fontSize changes.
-           */
-          if (maxWidth <= ctx.measureText('W').width) {
-            return text.split('');
-          }
-
-          /*
-           * This handles a word that is longer than the width of the
-           * text area.
-           */
-          while (Math.ceil(this._measureText(ctx, words[0], lineIndex, offset)) >= maxWidth) {
-            var tmp = words[0];
-            words[0] = tmp.slice(0, -1);
-
-            if (words.length > 1) {
-              words[1] = tmp.slice(-1) + words[1];
-            }
-            else {
-              words.push(tmp.slice(-1));
-            }
-          }
-
-          if (Math.ceil(this._measureText(ctx, line + words[0], lineIndex, offset)) < maxWidth) {
+          if (Math.ceil(lineWidth) < maxWidth || Math.ceil(wordWidth) >= maxWidth) {
             line += words.shift() + ' ';
           }
           else {
@@ -279,6 +290,15 @@
           if (words.length === 0) {
             lines.push(line.substring(0, line.length - 1));
           }
+
+          // keep track of largest word
+          if (wordWidth > largestWordWidth) {
+            largestWordWidth = wordWidth;
+          }
+        }
+
+        if (largestWordWidth > this.dynamicMinWidth) {
+          this.dynamicMinWidth = largestWordWidth;
         }
       }
 
@@ -330,13 +350,13 @@
         selectionStart = this.selectionStart;
       }
 
-      var numLines = this._textLines.length,
-        removed = 0,
-        textHasChanged = this.__text !== this.text;
+      var numLines       = this._textLines.length,
+          removed        = 0,
+          textHasChanged = this.__text !== this.text;
 
       for (var i = 0; i < numLines; i++) {
-        var line = this._textLines[i],
-          lineLen = line.length;
+        var line    = this._textLines[i],
+            lineLen = line.length;
 
         if (selectionStart <= removed + lineLen) {
           // edge case:
@@ -375,11 +395,11 @@
      * @returns {Object} Object with 'top', 'left', and 'lineLeft' properties set.
      */
     _getCursorBoundariesOffsets: function (chars, typeOfBoundaries) {
-      var topOffset = 0,
-        leftOffset = 0,
-        cursorLocation = this.get2DCursorLocation(),
-        lineChars = this._textLines[cursorLocation.lineIndex].split(''),
-        lineLeftOffset = this._getCachedLineOffset(cursorLocation.lineIndex);
+      var topOffset      = 0,
+          leftOffset     = 0,
+          cursorLocation = this.get2DCursorLocation(),
+          lineChars      = this._textLines[cursorLocation.lineIndex].split(''),
+          lineLeftOffset = this._getCachedLineOffset(cursorLocation.lineIndex);
 
       for (var i = 0; i < cursorLocation.charIndex; i++) {
         leftOffset += this._getWidthOfChar(this.ctx, lineChars[i], cursorLocation.lineIndex, i);
@@ -401,6 +421,11 @@
         lineLeft: lineLeftOffset
       };
     },
+
+    getMinWidth: function () {
+      return Math.max(this.minWidth, this.dynamicMinWidth);
+    },
+
     /**
      * Returns object representation of an instance
      * @method toObject

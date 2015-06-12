@@ -12,7 +12,7 @@
     var t = transform.target;
     if (t instanceof fabric.Textbox) {
       var w = t.width * ((localMouse.x / transform.scaleX) / (t.width + t.strokeWidth));
-      if (w >= t.minWidth) {
+      if (w >= t.getMinWidth()) {
         t.set('width', w);
       }
     }
@@ -46,11 +46,11 @@
      * @private
      */
     _removeExtraneousStyles: function () {
-      //for (var prop in this._styleMap) {
-      //  if (!this._textLines[prop]) {
-      //    delete this.styles[this._styleMap[prop].line];
-      //  }
-      //}
+      for (var prop in this._styleMap) {
+        if (!this._textLines[prop]) {
+          delete this.styles[this._styleMap[prop].line];
+        }
+      }
     },
 
     /**
@@ -139,13 +139,13 @@
     removeStyleObject: function (isBeginningOfLine, index) {
 
       var cursorLocation = this.get2DCursorLocation(index),
-        map = this._styleMap[cursorLocation.lineIndex],
-        lineIndex = map.line,
-        charIndex = map.offset + cursorLocation.charIndex;
+          map            = this._styleMap[cursorLocation.lineIndex],
+          lineIndex      = map.line,
+          charIndex      = map.offset + cursorLocation.charIndex;
 
       if (isBeginningOfLine) {
-        var textOnPreviousLine = this._getTextOnPreviousLine(cursorLocation.lineIndex),
-          newCharIndexOnPrevLine = textOnPreviousLine ? textOnPreviousLine.length : 0;
+        var textOnPreviousLine     = this._getTextOnPreviousLine(cursorLocation.lineIndex),
+            newCharIndexOnPrevLine = textOnPreviousLine ? textOnPreviousLine.length : 0;
 
         if (!this.styles[lineIndex - 1]) {
           this.styles[lineIndex - 1] = {};
