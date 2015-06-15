@@ -352,43 +352,33 @@
      */
     get2DCursorLocation: function (selectionStart) {
       if (typeof selectionStart === 'undefined') {
-        selectionStart = this.selectionStart;
+          selectionStart = this.selectionStart;
       }
-
+  
       var numLines       = this._textLines.length,
-          removed        = 0,
-          textHasChanged = this.__text !== this.text;
-
+          removed        = 0;
+  
       for (var i = 0; i < numLines; i++) {
-        var line    = this._textLines[i],
-            lineLen = line.length;
-
-        if (selectionStart <= removed + lineLen) {
-          // edge case:
-          //   If we are at the end of a line that is wrapping, force cursor on to next line
-          //   However, doing that for inserting styles breaks things, so don't when text has changed
-          if (!textHasChanged &&
-            i !== numLines - 1 && selectionStart === removed + lineLen && this.text[removed + lineLen] !== '\n') {
-            i++;
-            selectionStart = removed;
+          var line    = this._textLines[i],
+              lineLen = line.length;
+  
+          if (selectionStart <= removed + lineLen) {
+              return {
+                  lineIndex: i,
+                  charIndex: selectionStart - removed
+              };
           }
-
-          return {
-            lineIndex: i,
-            charIndex: selectionStart - removed
-          };
-        }
-
-        removed += lineLen;
-
-        if (this.text[removed] === '\n') {
-          removed++;
-        }
+  
+          removed += lineLen;
+  
+          if (this.text[removed] === '\n' || this.text[removed] === ' ') {
+              removed++;
+          }
       }
-
+  
       return {
-        lineIndex: numLines - 1,
-        charIndex: this._textLines[numLines - 1].length
+          lineIndex: numLines - 1,
+          charIndex: this._textLines[numLines - 1].length
       };
     },
 
