@@ -65,7 +65,7 @@
       lineIndex = map.line;
       charIndex = map.offset + charIndex;
 
-      this.callSuper('insertCharStyleObject', lineIndex, charIndex, style);
+      fabric.IText.prototype.insertCharStyleObject.apply(this, [lineIndex, charIndex, style]);
     },
 
     /**
@@ -80,7 +80,7 @@
       lineIndex = map.line;
       charIndex = map.offset + charIndex;
 
-      this.callSuper('insertNewlineStyleObject', lineIndex, charIndex, isEndOfLine);
+      fabric.IText.prototype.insertNewlineStyleObject.apply(this, [lineIndex, charIndex, isEndOfLine]);
     },
 
     /**
