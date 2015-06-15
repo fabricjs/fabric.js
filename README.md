@@ -44,15 +44,16 @@ Using Fabric.js, you can create and populate objects on canvas; objects like sim
 - Encapsulated in one object
 - No browser sniffing for critical functionality
 - Runs under ES5 strict mode
-- Runs on a server under [Node.js](http://nodejs.org/) (0.6, 0.8, 0.10) (see [Node.js limitations](https://github.com/kangax/fabric.js/wiki/Fabric-limitations-in-node.js))
+- Runs on a server under [Node.js](http://nodejs.org/) (0.8, 0.10, 0.11, 0.12) (see [Node.js limitations](https://github.com/kangax/fabric.js/wiki/Fabric-limitations-in-node.js))
+- Follows [Semantic Versioning](http://semver.org/)
 
 ### Supported browsers
 
 - Firefox 2+
 - Safari 3+
 - Opera 9.64+
-- Chrome (all versions should work)
-- IE9, IE10, IE11
+- Chrome (all versions)
+- IE9, IE10, IE11, Edge
 
 #### With help of [Explorer Canvas](http://code.google.com/p/explorercanvas/)
 
@@ -251,11 +252,11 @@ Get help in Fabric's IRC channel — irc://irc.freenode.net/#fabric.js
 
 ### Credits
 
-- Ernest Delgado for the original idea of [manipulating images on canvas](http://www.ernestdelgado.com/archive/canvas/).
-- [Maxim "hakunin" Chernyak](http://twitter.com/hakunin) for ideas, and help with various parts of the library throughout its life.
-- [Sergey Nisnevich](http://nisnya.com) for help with geometry logic.
+- Ernest Delgado for the original idea of [manipulating images on canvas](http://www.ernestdelgado.com/archive/canvas/)
+- [Maxim "hakunin" Chernyak](http://twitter.com/hakunin) for ideas, and help with various parts of the library throughout its life
+- [Sergey Nisnevich](http://nisnya.com) for help with geometry logic
 - [Stefan Kienzle](https://twitter.com/kienzle_s) for help with bugs, features, documentation, github issues
-- Github contributors: @Kingsquare, @cleercode, @jarek-itmore, @sunrei, @khronnuz, @ollym, @garg, @sjpemberton09, @willmcneilly, @davidjrice, @coulix, and [more](https://github.com/kangax/fabric.js/graphs/contributors)
+- [And all the other GitHub contributors](https://github.com/kangax/fabric.js/graphs/contributors)
 
 ### MIT License
 

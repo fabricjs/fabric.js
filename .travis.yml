@@ -1,7 +1,7 @@
 language: node_js
 node_js:
   - "0.10"
-script: 'npm run-script build && npm test && jscs src'
+script: 'npm run-script build && npm test && jshint src && jscs src'
 before_install:
  - sudo apt-get update -qq
  - sudo apt-get install -qq libgif-dev libpng-dev libjpeg8-dev libpango1.0-dev libcairo2-dev

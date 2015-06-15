@@ -105,7 +105,7 @@
      */
     toLocalPoint: function(point, originX, originY) {
       var center = this.getCenterPoint(),
-          p, dim, p2;
+          p, p2;
 
       if (originX && originY) {
         p = this.translateToGivenOrigin(center, 'center', 'center', originX, originY);
@@ -150,9 +150,6 @@
      */
     adjustPosition: function(to) {
       var angle = degreesToRadians(this.angle),
-          hypotHalf = this.getWidth() / 2,
-          xHalf = Math.cos(angle) * hypotHalf,
-          yHalf = Math.sin(angle) * hypotHalf,
           hypotFull = this.getWidth(),
           xFull = Math.cos(angle) * hypotFull,
           yFull = Math.sin(angle) * hypotFull;
