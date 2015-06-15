@@ -112,6 +112,7 @@
         else if (this.text[charCount] === ' ') {
             // this case deals with space's that are removed from end of lines when wrapping
             realLineCharCount++;
+            charCount++;
         }
 
         map[i] = {line: realLineCount, offset: realLineCharCount};
