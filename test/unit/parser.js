@@ -82,6 +82,23 @@
     deepEqual(fabric.parseAttributes(element, 'x y fill'.split(' ')),
       { fill: 'red', left: 100, top: 200 });
   });
+  
+   test('parseAttributesWithGrandParentSvg', function() {
+    var element = fabric.document.createElement('path');
+    var parent = fabric.document.createElement('g');
+    var grandParent = fabric.document.createElement('svg');
+
+    parent.appendChild(element);
+    grandParent.appendChild(parent);
+
+    element.setAttribute('x', '100');
+    parent.setAttribute('y', '200');
+    grandParent.setAttribute('width', '600');
+	grandParent.setAttribute('height', '600');
+
+    notDeepEqual(fabric.parseAttributes(element, 'x y width height'.split(' ')),
+      { left: 100, top: 200, width: 600, height: 600 });
+  });
 
   asyncTest('parseElements', function() {
     ok(fabric.parseElements);
