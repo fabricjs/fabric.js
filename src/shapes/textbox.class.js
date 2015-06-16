@@ -284,7 +284,7 @@
           lineWidth = line === '' ? wordWidth : this._measureText(ctx, line + words[0], lineIndex, offset);
 
           if (Math.ceil(lineWidth) < maxWidth || (line === '' && Math.ceil(wordWidth) >= maxWidth)) {
-            line += words.shift() + ' ';
+            line += (line === '' ? '' : ' ') + words.shift();
           }
           else {
             offset += line.length;
@@ -293,7 +293,7 @@
           }
 
           if (words.length === 0) {
-            lines.push(line.substring(0, line.length - 1));
+            lines.push(line);
           }
 
           // keep track of largest word
