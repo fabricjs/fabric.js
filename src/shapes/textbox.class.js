@@ -1,5 +1,9 @@
-(function () {
-  var clone = fabric.util.object.clone;
+(function (global) {
+
+  'use strict';
+
+  var fabric = global.fabric || (global.fabric = {}),
+      clone  = fabric.util.object.clone;
 
   /**
    * Textbox class, based on IText, allows the user to resize the text rectangle
@@ -115,7 +119,7 @@
           charCount++;
         }
 
-        map[i] = {line: realLineCount, offset: realLineCharCount};
+        map[i] = { line: realLineCount, offset: realLineCharCount };
 
         charCount += this._textLines[i].length;
         realLineCharCount += this._textLines[i].length;
@@ -470,4 +474,4 @@
    * @type Array
    */
   fabric.Textbox.instances = [];
-})();
+})(typeof exports !== 'undefined' ? exports : this);

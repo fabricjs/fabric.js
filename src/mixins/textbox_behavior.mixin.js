@@ -92,10 +92,10 @@
      */
     shiftLineStyles: function (lineIndex, offset) {
       // shift all line styles by 1 upward
-      var clonedStyles = clone(this.styles);
+      var clonedStyles = clone(this.styles),
+          map          = this._styleMap[lineIndex];
 
       // adjust line index
-      var map = this._styleMap[lineIndex];
       lineIndex = map.line;
 
       for (var line in this.styles) {
@@ -115,17 +115,17 @@
     /**
      * Figure out programatically the text on previous actual line (actual = separated by \n);
      *
-     * @param {Number} lineIndex
+     * @param {Number} lIndex
      * @returns {String}
      * @private
      */
-    _getTextOnPreviousLine: function (lineIndex) {
-      var textOnPreviousLine = this._textLines[lineIndex - 1];
+    _getTextOnPreviousLine: function (lIndex) {
+      var textOnPreviousLine = this._textLines[lIndex - 1];
 
-      while (this._styleMap[lineIndex - 2] && this._styleMap[lineIndex - 2].line === this._styleMap[lineIndex - 1].line) {
-        textOnPreviousLine = this._textLines[lineIndex - 2] + textOnPreviousLine;
+      while (this._styleMap[lIndex - 2] && this._styleMap[lIndex - 2].line === this._styleMap[lIndex - 1].line) {
+        textOnPreviousLine = this._textLines[lIndex - 2] + textOnPreviousLine;
 
-        lineIndex--;
+        lIndex--;
       }
 
       return textOnPreviousLine;

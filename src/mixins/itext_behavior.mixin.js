@@ -1,4 +1,4 @@
-(function() {
+(function () {
 
   var clone = fabric.util.object.clone;
 
@@ -7,7 +7,7 @@
     /**
      * Initializes all the interactive behavior of IText
      */
-    initBehavior: function() {
+    initBehavior: function () {
       this.initAddedHandler();
       this.initRemovedHandler();
       this.initCursorSelectionHandlers();
@@ -17,11 +17,11 @@
     /**
      * Initializes "selected" event handler
      */
-    initSelectedHandler: function() {
-      this.on('selected', function() {
+    initSelectedHandler: function () {
+      this.on('selected', function () {
 
         var _this = this;
-        setTimeout(function() {
+        setTimeout(function () {
           _this.selected = true;
         }, 100);
       });
@@ -30,9 +30,9 @@
     /**
      * Initializes "added" event handler
      */
-    initAddedHandler: function() {
+    initAddedHandler: function () {
       var _this = this;
-      this.on('added', function() {
+      this.on('added', function () {
         if (this.canvas && !this.canvas._hasITextHandlers) {
           this.canvas._hasITextHandlers = true;
           this._initCanvasHandlers();
@@ -49,9 +49,9 @@
       });
     },
 
-    initRemovedHandler: function() {
+    initRemovedHandler: function () {
       var _this = this;
-      this.on('removed', function() {
+      this.on('removed', function () {
         // (Might be removed from a collection, but not on a canvas.)
         if (_this.canvas) {
           _this.canvas._iTextInstances = _this.canvas._iTextInstances || [];
@@ -63,22 +63,22 @@
     /**
      * @private
      */
-    _initCanvasHandlers: function() {
+    _initCanvasHandlers: function () {
       var _this = this;
 
-      this.canvas.on('selection:cleared', function() {
+      this.canvas.on('selection:cleared', function () {
         fabric.IText.prototype.exitEditingOnOthers(_this.canvas);
       });
 
-      this.canvas.on('mouse:up', function() {
+      this.canvas.on('mouse:up', function () {
         if (_this.canvas._iTextInstances) {
-          _this.canvas._iTextInstances.forEach(function(obj) {
+          _this.canvas._iTextInstances.forEach(function (obj) {
             obj.__isMousedown = false;
           });
         }
       });
 
-      this.canvas.on('object:selected', function() {
+      this.canvas.on('object:selected', function () {
         fabric.IText.prototype.exitEditingOnOthers(_this.canvas);
       });
     },
@@ -86,38 +86,38 @@
     /**
      * @private
      */
-    _tick: function() {
+    _tick: function () {
       this._currentTickState = this._animateCursor(this, 1, this.cursorDuration, '_onTickComplete');
     },
 
     /**
      * @private
      */
-    _animateCursor: function(obj, targetOpacity, duration, completeMethod) {
+    _animateCursor: function (obj, targetOpacity, duration, completeMethod) {
 
       var tickState;
 
       tickState = {
         isAborted: false,
-        abort: function() {
+        abort: function () {
           this.isAborted = true;
         },
       };
 
       obj.animate('_currentCursorOpacity', targetOpacity, {
         duration: duration,
-        onComplete: function() {
+        onComplete: function () {
           if (!tickState.isAborted) {
             obj[completeMethod]();
           }
         },
-        onChange: function() {
+        onChange: function () {
           if (obj.canvas) {
             obj.canvas.clearContext(obj.canvas.contextTop || obj.ctx);
             obj.renderCursorOrSelection();
           }
         },
-        abort: function() {
+        abort: function () {
           return tickState.isAborted;
         }
       });
@@ -127,14 +127,14 @@
     /**
      * @private
      */
-    _onTickComplete: function() {
+    _onTickComplete: function () {
 
       var _this = this;
 
       if (this._cursorTimeout1) {
         clearTimeout(this._cursorTimeout1);
       }
-      this._cursorTimeout1 = setTimeout(function() {
+      this._cursorTimeout1 = setTimeout(function () {
         _this._currentTickCompleteState = _this._animateCursor(_this, 0, this.cursorDuration / 2, '_tick');
       }, 100);
     },
@@ -142,7 +142,7 @@
     /**
      * Initializes delayed cursor
      */
-    initDelayedCursor: function(restart) {
+    initDelayedCursor: function (restart) {
       var _this = this,
           delay = restart ? 0 : this.cursorDelay;
 
@@ -157,7 +157,7 @@
       if (this._cursorTimeout2) {
         clearTimeout(this._cursorTimeout2);
       }
-      this._cursorTimeout2 = setTimeout(function() {
+      this._cursorTimeout2 = setTimeout(function () {
         _this._tick();
       }, delay);
     },
@@ -165,7 +165,7 @@
     /**
      * Aborts cursor animation and clears all timeouts
      */
-    abortCursorAnimation: function() {
+    abortCursorAnimation: function () {
       this._currentTickState && this._currentTickState.abort();
       this._currentTickCompleteState && this._currentTickCompleteState.abort();
 
@@ -179,7 +179,7 @@
     /**
      * Selects entire text
      */
-    selectAll: function() {
+    selectAll: function () {
       this.setSelectionStart(0);
       this.setSelectionEnd(this.text.length);
     },
@@ -188,7 +188,7 @@
      * Returns selected text
      * @return {String}
      */
-    getSelectedText: function() {
+    getSelectedText: function () {
       return this.text.slice(this.selectionStart, this.selectionEnd);
     },
 
@@ -197,7 +197,7 @@
      * @param {Number} startFrom Surrent selection index
      * @return {Number} New selection index
      */
-    findWordBoundaryLeft: function(startFrom) {
+    findWordBoundaryLeft: function (startFrom) {
       var offset = 0, index = startFrom - 1;
 
       // remove space before cursor first
@@ -220,7 +220,7 @@
      * @param {Number} startFrom Current selection index
      * @return {Number} New selection index
      */
-    findWordBoundaryRight: function(startFrom) {
+    findWordBoundaryRight: function (startFrom) {
       var offset = 0, index = startFrom;
 
       // remove space after cursor first
@@ -243,7 +243,7 @@
      * @param {Number} startFrom Current selection index
      * @return {Number} New selection index
      */
-    findLineBoundaryLeft: function(startFrom) {
+    findLineBoundaryLeft: function (startFrom) {
       var offset = 0, index = startFrom - 1;
 
       while (!/\n/.test(this.text.charAt(index)) && index > -1) {
@@ -259,7 +259,7 @@
      * @param {Number} startFrom Current selection index
      * @return {Number} New selection index
      */
-    findLineBoundaryRight: function(startFrom) {
+    findLineBoundaryRight: function (startFrom) {
       var offset = 0, index = startFrom;
 
       while (!/\n/.test(this.text.charAt(index)) && index < this.text.length) {
@@ -274,9 +274,9 @@
      * Returns number of newlines in selected text
      * @return {Number} Number of newlines in selected text
      */
-    getNumNewLinesInSelectedText: function() {
+    getNumNewLinesInSelectedText: function () {
       var selectedText = this.getSelectedText(),
-          numNewLines = 0;
+          numNewLines  = 0;
 
       for (var i = 0, len = selectedText.length; i < len; i++) {
         if (selectedText[i] === '\n') {
@@ -292,9 +292,9 @@
      * @param {Number} direction: 1 or -1
      * @return {Number} Index of the beginning or end of a word
      */
-    searchWordBoundary: function(selectionStart, direction) {
-      var index = this._reSpace.test(this.text.charAt(selectionStart)) ? selectionStart - 1 : selectionStart,
-          _char = this.text.charAt(index),
+    searchWordBoundary: function (selectionStart, direction) {
+      var index     = this._reSpace.test(this.text.charAt(selectionStart)) ? selectionStart - 1 : selectionStart,
+          _char     = this.text.charAt(index),
           reNonWord = /[ \n\.,;!\?\-]/;
 
       while (!reNonWord.test(_char) && index > 0 && index < this.text.length) {
@@ -311,9 +311,10 @@
      * Selects a word based on the index
      * @param {Number} selectionStart Index of a character
      */
-    selectWord: function(selectionStart) {
+    selectWord: function (selectionStart) {
       var newSelectionStart = this.searchWordBoundary(selectionStart, -1), /* search backwards */
-          newSelectionEnd = this.searchWordBoundary(selectionStart, 1); /* search forward */
+          newSelectionEnd   = this.searchWordBoundary(selectionStart, 1);
+      /* search forward */
 
       this.setSelectionStart(newSelectionStart);
       this.setSelectionEnd(newSelectionEnd);
@@ -323,9 +324,9 @@
      * Selects a line based on the index
      * @param {Number} selectionStart Index of a character
      */
-    selectLine: function(selectionStart) {
+    selectLine: function (selectionStart) {
       var newSelectionStart = this.findLineBoundaryLeft(selectionStart),
-          newSelectionEnd = this.findLineBoundaryRight(selectionStart);
+          newSelectionEnd   = this.findLineBoundaryRight(selectionStart);
 
       this.setSelectionStart(newSelectionStart);
       this.setSelectionEnd(newSelectionEnd);
@@ -336,7 +337,7 @@
      * @return {fabric.IText} thisArg
      * @chainable
      */
-    enterEditing: function() {
+    enterEditing: function () {
       if (this.isEditing || !this.editable) {
         return;
       }
@@ -366,9 +367,9 @@
       return this;
     },
 
-    exitEditingOnOthers: function(canvas) {
+    exitEditingOnOthers: function (canvas) {
       if (canvas._iTextInstances) {
-        canvas._iTextInstances.forEach(function(obj) {
+        canvas._iTextInstances.forEach(function (obj) {
           obj.selected = false;
           if (obj.isEditing) {
             obj.exitEditing();
@@ -380,9 +381,9 @@
     /**
      * Initializes "mousemove" event handler
      */
-    initMouseMoveHandler: function() {
+    initMouseMoveHandler: function () {
       var _this = this;
-      this.canvas.on('mouse:move',  function(options) {
+      this.canvas.on('mouse:move', function (options) {
         if (!_this.__isMousedown || !_this.isEditing) {
           return;
         }
@@ -402,7 +403,7 @@
     /**
      * @private
      */
-    _setEditingProps: function() {
+    _setEditingProps: function () {
       this.hoverCursor = 'text';
 
       if (this.canvas) {
@@ -418,7 +419,7 @@
     /**
      * @private
      */
-    _updateTextarea: function() {
+    _updateTextarea: function () {
       if (!this.hiddenTextarea) {
         return;
       }
@@ -431,7 +432,7 @@
     /**
      * @private
      */
-    _saveEditingProps: function() {
+    _saveEditingProps: function () {
       this._savedProps = {
         hasControls: this.hasControls,
         borderColor: this.borderColor,
@@ -446,7 +447,7 @@
     /**
      * @private
      */
-    _restoreEditingProps: function() {
+    _restoreEditingProps: function () {
       if (!this._savedProps) {
         return;
       }
@@ -468,7 +469,7 @@
      * @return {fabric.IText} thisArg
      * @chainable
      */
-    exitEditing: function() {
+    exitEditing: function () {
 
       this.selected = false;
       this.isEditing = false;
@@ -491,7 +492,7 @@
     /**
      * @private
      */
-    _removeExtraneousStyles: function() {
+    _removeExtraneousStyles: function () {
       for (var prop in this.styles) {
         if (!this._textLines[prop]) {
           delete this.styles[prop];
@@ -502,7 +503,7 @@
     /**
      * @private
      */
-    _removeCharsFromTo: function(start, end) {
+    _removeCharsFromTo: function (start, end) {
       while (end !== start) {
         this._removeSingleCharAndStyle(start + 1);
         end--;
@@ -510,12 +511,12 @@
       this.setSelectionStart(start);
     },
 
-    _removeSingleCharAndStyle: function(index) {
+    _removeSingleCharAndStyle: function (index) {
       var isBeginningOfLine = this.text[index - 1] === '\n',
-          indexStyle = isBeginningOfLine ? index : index - 1;
+          indexStyle        = isBeginningOfLine ? index : index - 1;
       this.removeStyleObject(isBeginningOfLine, indexStyle);
       this.text = this.text.slice(0, index - 1) +
-                  this.text.slice(index);
+        this.text.slice(index);
 
       this._textLines = this._splitTextIntoLines();
     },
@@ -524,14 +525,14 @@
      * Inserts a character where cursor is (replacing selection if one exists)
      * @param {String} _chars Characters to insert
      */
-    insertChars: function(_chars, useCopiedStyle) {
+    insertChars: function (_chars, useCopiedStyle) {
       if (this.selectionEnd - this.selectionStart > 1) {
         this._removeCharsFromTo(this.selectionStart, this.selectionEnd);
         this.setSelectionEnd(this.selectionStart);
       }
       var isEndOfLine = this.text[this.selectionStart] === '\n';
       this.text = this.text.slice(0, this.selectionStart) +
-                  _chars + this.text.slice(this.selectionEnd);
+        _chars + this.text.slice(this.selectionEnd);
       this.insertStyleObjects(_chars, isEndOfLine, useCopiedStyle);
       this.setSelectionStart(this.selectionStart + _chars.length);
       this.setSelectionEnd(this.selectionStart);
@@ -549,16 +550,16 @@
      * @param {Number} charIndex Index of a char
      * @param {Boolean} isEndOfLine True if it's end of line
      */
-    insertNewlineStyleObject: function(lineIndex, charIndex, isEndOfLine) {
+    insertNewlineStyleObject: function (lineIndex, charIndex, isEndOfLine) {
 
       this.shiftLineStyles(lineIndex, +1);
 
       if (!this.styles[lineIndex + 1]) {
-        this.styles[lineIndex + 1] = { };
+        this.styles[lineIndex + 1] = {};
       }
 
-      var currentCharStyle = { },
-          newLineStyles = { };
+      var currentCharStyle = {},
+          newLineStyles    = {};
 
       if (this.styles[lineIndex] && this.styles[lineIndex][charIndex - 1]) {
         currentCharStyle = this.styles[lineIndex][charIndex - 1];
@@ -591,9 +592,9 @@
      * @param {Number} charIndex Index of a char
      * @param {Object} [style] Style object to insert, if given
      */
-    insertCharStyleObject: function(lineIndex, charIndex, style) {
+    insertCharStyleObject: function (lineIndex, charIndex, style) {
 
-      var currentLineStyles = this.styles[lineIndex],
+      var currentLineStyles       = this.styles[lineIndex],
           currentLineStylesCloned = clone(currentLineStyles);
 
       if (charIndex === 0 && !style) {
@@ -609,7 +610,7 @@
           currentLineStyles[numericIndex + 1] = currentLineStylesCloned[numericIndex];
 
           // only delete the style if there was nothing moved there
-          if(!currentLineStylesCloned[numericIndex - 1]) {
+          if (!currentLineStylesCloned[numericIndex - 1]) {
             delete currentLineStyles[numericIndex];
           }
         }
@@ -626,12 +627,12 @@
      * @param {Boolean} isEndOfLine True if it's end of line
      * @param {Boolean} [useCopiedStyle] Style to insert
      */
-    insertStyleObjects: function(_chars, isEndOfLine, useCopiedStyle) {
+    insertStyleObjects: function (_chars, isEndOfLine, useCopiedStyle) {
       // removed shortcircuit over isEmptyStyles
 
       var cursorLocation = this.get2DCursorLocation(),
-          lineIndex = cursorLocation.lineIndex,
-          charIndex = cursorLocation.charIndex;
+          lineIndex      = cursorLocation.lineIndex,
+          charIndex      = cursorLocation.charIndex;
 
       if (!this._getLineStyle(lineIndex)) {
         this._setLineStyle(lineIndex, {});
@@ -654,12 +655,12 @@
     /**
      * @private
      */
-    _insertStyles: function(styles) {
+    _insertStyles: function (styles) {
       for (var i = 0, len = styles.length; i < len; i++) {
 
         var cursorLocation = this.get2DCursorLocation(this.selectionStart + i),
-            lineIndex = cursorLocation.lineIndex,
-            charIndex = cursorLocation.charIndex;
+            lineIndex      = cursorLocation.lineIndex,
+            charIndex      = cursorLocation.charIndex;
 
         this.insertCharStyleObject(lineIndex, charIndex, styles[i]);
       }
@@ -670,7 +671,7 @@
      * @param {Number} lineIndex Index of a line
      * @param {Number} offset Can be -1 or +1
      */
-    shiftLineStyles: function(lineIndex, offset) {
+    shiftLineStyles: function (lineIndex, offset) {
       // shift all line styles by 1 upward
       var clonedStyles = clone(this.styles);
       for (var line in this.styles) {
@@ -690,21 +691,21 @@
      * @param {Boolean} isBeginningOfLine True if cursor is at the beginning of line
      * @param {Number} [index] Optional index. When not given, current selectionStart is used.
      */
-    removeStyleObject: function(isBeginningOfLine, index) {
+    removeStyleObject: function (isBeginningOfLine, index) {
 
       var cursorLocation = this.get2DCursorLocation(index),
-          lineIndex = cursorLocation.lineIndex,
-          charIndex = cursorLocation.charIndex;
+          lineIndex      = cursorLocation.lineIndex,
+          charIndex      = cursorLocation.charIndex;
 
       if (isBeginningOfLine) {
 
-        var textOnPreviousLine = this._textLines[lineIndex - 1],
+        var textOnPreviousLine     = this._textLines[lineIndex - 1],
             newCharIndexOnPrevLine = textOnPreviousLine
               ? textOnPreviousLine.length
               : 0;
 
         if (!this.styles[lineIndex - 1]) {
-          this.styles[lineIndex - 1] = { };
+          this.styles[lineIndex - 1] = {};
         }
 
         for (charIndex in this.styles[lineIndex]) {
@@ -739,7 +740,7 @@
     /**
      * Inserts new line
      */
-    insertNewline: function() {
+    insertNewline: function () {
       this.insertChars('\n');
     }
   });
