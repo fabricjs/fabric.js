@@ -84,7 +84,7 @@
       this._textLines = this._splitTextIntoLines();
 
       // if after wrapping, the width is smaller than dynamicMinWidth, change the width and re-wrap
-      if(this.dynamicMinWidth > this.width) {
+      if (this.dynamicMinWidth > this.width) {
         this._set('width', this.dynamicMinWidth);
       }
 
@@ -110,9 +110,9 @@
           realLineCount++;
         }
         else if (this.text[charCount] === ' ') {
-            // this case deals with space's that are removed from end of lines when wrapping
-            realLineCharCount++;
-            charCount++;
+          // this case deals with space's that are removed from end of lines when wrapping
+          realLineCharCount++;
+          charCount++;
         }
 
         map[i] = {line: realLineCount, offset: realLineCharCount};
@@ -260,55 +260,58 @@
      */
     _wrapLine: function (ctx, text, lineIndex) {
       var maxWidth  = this.width,
-          words     = text.split(' '),
-          lines     = [],
-          line      = '',
-          offset    = 0,
-          lineWidth = this._measureText(ctx, text, lineIndex, offset);
+          lineWidth = this._measureText(ctx, text, lineIndex, 0);
 
-      // if the current line fits, do nothing
+      // first case: does the whole line fit?
       if (lineWidth < maxWidth) {
         // if the current line is only one word, we need to keep track of it if it's a large word
         if (text.indexOf(' ') === -1 && lineWidth > this.dynamicMinWidth) {
           this.dynamicMinWidth = lineWidth;
         }
 
-        lines.push(text);
+        return [text];
       }
-      else {
-        var largestWordWidth = 0,
-            wordWidth        = 0;
 
-        while (words.length > 0) {
-          wordWidth = this._measureText(ctx, words[0], lineIndex, line.length + offset);
-          lineWidth = line === '' ? wordWidth : this._measureText(ctx, line + words[0], lineIndex, offset);
+      // if the whole line doesn't fit, we break it up into words
+      var lines            = [],
+          line             = '',
+          words            = text.split(' '),
+          offset           = 0,
+          infix            = '',
+          wordWidth        = 0,
+          largestWordWidth = 0;
 
-          if (Math.ceil(lineWidth) < maxWidth || (line === '' && Math.ceil(wordWidth) >= maxWidth)) {
-            line += (line === '' ? '' : ' ') + words.shift();
-          }
-          else {
-            offset += line.length;
-            lines.push(line);
-            line = '';
-          }
+      while (words.length > 0) {
+        infix = line === '' ? '' : ' ';
+        wordWidth = this._measureText(ctx, words[0], lineIndex, line.length + infix.length + offset);
+        lineWidth = line === '' ? wordWidth : this._measureText(ctx, line + infix + words[0], lineIndex, offset);
 
-          if (words.length === 0) {
-            lines.push(line);
-          }
-
-          // keep track of largest word
-          if (wordWidth > largestWordWidth) {
-            largestWordWidth = wordWidth;
-          }
+        if (lineWidth < maxWidth || (line === '' && wordWidth >= maxWidth)) {
+          line += infix + words.shift();
+        }
+        else {
+          offset += line.length + 1; // add 1 because each word is separated by a space
+          lines.push(line);
+          line = '';
         }
 
-        if (largestWordWidth > this.dynamicMinWidth) {
-          this.dynamicMinWidth = largestWordWidth;
+        if (words.length === 0) {
+          lines.push(line);
         }
+
+        // keep track of largest word
+        if (wordWidth > largestWordWidth) {
+          largestWordWidth = wordWidth;
+        }
+      }
+
+      if (largestWordWidth > this.dynamicMinWidth) {
+        this.dynamicMinWidth = largestWordWidth;
       }
 
       return lines;
     },
+
     /**
      * Gets lines of text to render in the Textbox. This function calculates
      * text wrapping on the fly everytime it is called.
@@ -352,33 +355,33 @@
      */
     get2DCursorLocation: function (selectionStart) {
       if (typeof selectionStart === 'undefined') {
-          selectionStart = this.selectionStart;
+        selectionStart = this.selectionStart;
       }
-  
-      var numLines       = this._textLines.length,
-          removed        = 0;
-  
+
+      var numLines = this._textLines.length,
+          removed  = 0;
+
       for (var i = 0; i < numLines; i++) {
-          var line    = this._textLines[i],
-              lineLen = line.length;
-  
-          if (selectionStart <= removed + lineLen) {
-              return {
-                  lineIndex: i,
-                  charIndex: selectionStart - removed
-              };
-          }
-  
-          removed += lineLen;
-  
-          if (this.text[removed] === '\n' || this.text[removed] === ' ') {
-              removed++;
-          }
+        var line    = this._textLines[i],
+            lineLen = line.length;
+
+        if (selectionStart <= removed + lineLen) {
+          return {
+            lineIndex: i,
+            charIndex: selectionStart - removed
+          };
+        }
+
+        removed += lineLen;
+
+        if (this.text[removed] === '\n' || this.text[removed] === ' ') {
+          removed++;
+        }
       }
-  
+
       return {
-          lineIndex: numLines - 1,
-          charIndex: this._textLines[numLines - 1].length
+        lineIndex: numLines - 1,
+        charIndex: this._textLines[numLines - 1].length
       };
     },
 
