@@ -543,10 +543,10 @@
 
         if (!options.cssOnly) {
           this._setBackstoreDimension(prop, dimensions[prop]);
-          cssValue += 'px';
         }
 
         if (!options.backstoreOnly) {
+          cssValue += 'px';
           this._setCssDimension(prop, cssValue);
         }
       }
