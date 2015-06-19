@@ -1078,6 +1078,22 @@
     equal(canvas.getHeight(), 500, 'Should be as the backstore only value');
   });
 
+  test("setDimension css only", function() {
+    canvas.setDimensions({ width: 123 });
+    canvas.setDimensions({ width: 500 }, { cssOnly: true });
+    
+    equal(canvas.lowerCanvasEl.style.width, 500 + 'px', 'Should be as the css only value');
+    equal(canvas.getWidth(), 123, 'Should be as the none css only value');
+  });
+  
+  test("setDimension backstore only", function() {
+    canvas.setDimensions({ width: 123 });
+    canvas.setDimensions({ width: 500 }, { backstoreOnly: true });
+    
+    equal(canvas.lowerCanvasEl.style.width, 123 + 'px', 'Should be as the none backstore only value');
+    equal(canvas.getWidth(), 500, 'Should be as the backstore only value');
+  });
+
   asyncTest('fxRemove', function() {
     ok(typeof canvas.fxRemove == 'function');
 
