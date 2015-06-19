@@ -57,8 +57,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       var top = (this.getCenterPoint().y - 0.5 * this.height) * yScale;
       var left = (this.getCenterPoint().x - 0.5 * this.width) * xScale;
       var width = this.getWidth() * xScale;
-      var heightFudgeFactor = this.fontSize * xScale;
-      var height = (this._measuredHeight || this.getHeight()) * yScale + heightFudgeFactor;
+      var height = this.getHeight() * yScale;
 
       this.hiddenTextarea.style.width = width + 'px';
       this.hiddenTextarea.style.height = height + 'px';
