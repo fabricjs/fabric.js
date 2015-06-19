@@ -113,19 +113,6 @@
            * TODO: Performance improvement - cache the width of W whenever
            * fontSize changes.
            */
-          //KJ: This check guards against running an exponential-time algorithm
-          //to determine that every letter (or almost every letter) should be on its own line
-          //but, I have also fixed the loop to always eventually terminate.
-          var widestCommonLetterWidth = Math.max(
-              ctx.measureText('W').width,
-              ctx.measureText('m').width,
-              ctx.measureText('M').width,
-              ctx.measureText('w').width
-          );
-          if (maxWidth <= Math.ceil(widestCommonLetterWidth)) {
-            return text.split('');
-          }
-
 
            while (words.length > 0) {
 
@@ -133,21 +120,13 @@
               * This handles a word that is longer than the width of the
               * text area.
               */
-             while (Math.ceil(ctx.measureText(words[0]).width) >= maxWidth) {
-               if (words[0].length === 1) {
-                 //We failed to wrap this word; it's down to a single letter &
-                 //it still doesn't fit. Just give up this procedure & make it the line
-                 break;
-               }
-               var tmp = words[0];
-               words[0] = tmp.slice(0, -1);
-               if (words.length > 1) {
-                 words[1] = tmp.slice(-1) + words[1];
-               }
-               else {
-                 words.push(tmp.slice(-1));
-               }
-             }
+
+             // JP: there used to be a bunch of stuff here to (really inefficiently)
+             // break down individual words that couldn't fit on a line of their own.
+             // This was bringing browsers to their knees on account of its really
+             // poor implementation, and is probably not what we actually want, anyway!
+             // Instead, see the block below that just lets an individual word overflow
+             // horizontally on its own line if it can't fit.
 
              if (Math.ceil(ctx.measureText(line + words[0]).width) < maxWidth) {
                line += words.shift() + ' ';
@@ -158,6 +137,16 @@
                lines.push(line);
                line = '';
              }
+
+             // JP: If we've done everything reasonable we can to put the word somewhere
+             // without blowing our horizontal limit, don't try to split it down the
+             // middle--just let it overflow on a line of its own. We should only need
+             // to do anything here if we have an absurdly long word, or an absurdly
+             // narrow text box.
+             if (words.length > 0 && words[0].length > 0) {
+               line += words.shift() + ' ';
+             }
+
              if (words.length === 0) {
                lines.push(line.substring(0, line.length - 1));
              }
