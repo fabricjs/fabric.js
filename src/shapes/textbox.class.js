@@ -1,4 +1,4 @@
-(function (global) {
+(function(global) {
 
   'use strict';
 
@@ -48,7 +48,7 @@
      * @param {Object} [options] Options object
      * @return {fabric.Textbox} thisArg
      */
-    initialize: function (text, options) {
+    initialize: function(text, options) {
       this.ctx = fabric.util.createCanvasElement().getContext('2d');
 
       this.callSuper('initialize', text, options);
@@ -71,7 +71,7 @@
      * @private
      * @override
      */
-    _initDimensions: function (ctx) {
+    _initDimensions: function(ctx) {
       if (this.__skipDimension) {
         return;
       }
@@ -101,7 +101,7 @@
       this.height = this._getTextHeight(ctx);
     },
 
-    _generateStyleMap: function () {
+    _generateStyleMap: function() {
       var realLineCount     = 0,
           realLineCharCount = 0,
           charCount         = 0,
@@ -134,7 +134,7 @@
      * @param {Boolean} [returnCloneOrEmpty=false]
      * @private
      */
-    _getStyleDeclaration: function (lineIndex, charIndex, returnCloneOrEmpty) {
+    _getStyleDeclaration: function(lineIndex, charIndex, returnCloneOrEmpty) {
       if (this._styleMap) {
         var map = this._styleMap[lineIndex];
         lineIndex = map.line;
@@ -156,7 +156,7 @@
      * @param {Object} style
      * @private
      */
-    _setStyleDeclaration: function (lineIndex, charIndex, style) {
+    _setStyleDeclaration: function(lineIndex, charIndex, style) {
       var map = this._styleMap[lineIndex];
       lineIndex = map.line;
       charIndex = map.offset + charIndex;
@@ -169,7 +169,7 @@
      * @param {Number} charIndex
      * @private
      */
-    _deleteStyleDeclaration: function (lineIndex, charIndex) {
+    _deleteStyleDeclaration: function(lineIndex, charIndex) {
       var map = this._styleMap[lineIndex];
       lineIndex = map.line;
       charIndex = map.offset + charIndex;
@@ -181,7 +181,7 @@
      * @param {Number} lineIndex
      * @private
      */
-    _getLineStyle: function (lineIndex) {
+    _getLineStyle: function(lineIndex) {
       var map = this._styleMap[lineIndex];
       return this.styles[map.line];
     },
@@ -191,7 +191,7 @@
      * @param {Object} style
      * @private
      */
-    _setLineStyle: function (lineIndex, style) {
+    _setLineStyle: function(lineIndex, style) {
       var map = this._styleMap[lineIndex];
       this.styles[map.line] = style;
     },
@@ -200,7 +200,7 @@
      * @param {Number} lineIndex
      * @private
      */
-    _deleteLineStyle: function (lineIndex) {
+    _deleteLineStyle: function(lineIndex) {
       var map = this._styleMap[lineIndex];
       delete this.styles[map.line];
     },
@@ -214,7 +214,7 @@
      * @param {String} text The string of text that is split into lines
      * @returns {Array} Array of lines
      */
-    _wrapText: function (ctx, text) {
+    _wrapText: function(ctx, text) {
       var lines = text.split(this._reNewline), wrapped = [], i;
 
       for (i = 0; i < lines.length; i++) {
@@ -234,7 +234,7 @@
      * @returns {number}
      * @private
      */
-    _measureText: function (ctx, text, lineIndex, charOffset) {
+    _measureText: function(ctx, text, lineIndex, charOffset) {
       var width = 0, decl;
       charOffset = charOffset || 0;
 
@@ -262,7 +262,7 @@
      * @returns {Array} Array of line(s) into which the given text is wrapped
      * to.
      */
-    _wrapLine: function (ctx, text, lineIndex) {
+    _wrapLine: function(ctx, text, lineIndex) {
       var maxWidth  = this.width,
           lineWidth = this._measureText(ctx, text, lineIndex, 0);
 
@@ -322,7 +322,7 @@
      * @returns {Array} Array of lines in the Textbox.
      * @override
      */
-    _splitTextIntoLines: function () {
+    _splitTextIntoLines: function() {
       this.ctx.save();
       this._setTextStyles(this.ctx);
 
@@ -342,7 +342,7 @@
      * @param {String} key
      * @param {Any} value
      */
-    setOnGroup: function (key, value) {
+    setOnGroup: function(key, value) {
       if (key === 'scaleX') {
         this.set('scaleX', Math.abs(1 / value));
         this.set('width', (this.get('width') * value) /
@@ -357,7 +357,7 @@
      *
      * @param {Number} [selectionStart] Optional index. When not given, current selectionStart is used.
      */
-    get2DCursorLocation: function (selectionStart) {
+    get2DCursorLocation: function(selectionStart) {
       if (typeof selectionStart === 'undefined') {
         selectionStart = this.selectionStart;
       }
@@ -396,7 +396,7 @@
      * @param {String} typeOfBoundaries Can be 'cursor' or 'selection'
      * @returns {Object} Object with 'top', 'left', and 'lineLeft' properties set.
      */
-    _getCursorBoundariesOffsets: function (chars, typeOfBoundaries) {
+    _getCursorBoundariesOffsets: function(chars, typeOfBoundaries) {
       var topOffset      = 0,
           leftOffset     = 0,
           cursorLocation = this.get2DCursorLocation(),
@@ -424,7 +424,7 @@
       };
     },
 
-    getMinWidth: function () {
+    getMinWidth: function() {
       return Math.max(this.minWidth, this.dynamicMinWidth);
     },
 
@@ -434,7 +434,7 @@
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} object representation of an instance
      */
-    toObject: function (propertiesToInclude) {
+    toObject: function(propertiesToInclude) {
       return fabric.util.object.extend(this.callSuper('toObject', propertiesToInclude), {
         minWidth: this.minWidth
       });
@@ -447,14 +447,14 @@
    * @param {Object} object Object to create an instance from
    * @return {fabric.Textbox} instance of fabric.Textbox
    */
-  fabric.Textbox.fromObject = function (object) {
+  fabric.Textbox.fromObject = function(object) {
     return new fabric.Textbox(object.text, clone(object));
   };
   /**
    * Returns the default controls visibility required for Textboxes.
    * @returns {Object}
    */
-  fabric.Textbox.getTextboxControlVisibility = function () {
+  fabric.Textbox.getTextboxControlVisibility = function() {
     return {
       tl: false,
       tr: false,

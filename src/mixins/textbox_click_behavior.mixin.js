@@ -1,4 +1,4 @@
-(function () {
+(function() {
   var override = fabric.IText.prototype._getNewSelectionStartFromOffset;
   /**
    * Overrides the IText implementation and adjusts character index as there is not always a linebreak
@@ -10,7 +10,7 @@
    * @param {Number} jlen
    * @returns {Number}
    */
-  fabric.IText.prototype._getNewSelectionStartFromOffset = function (mouseOffset, prevWidth, width, index, jlen) {
+  fabric.IText.prototype._getNewSelectionStartFromOffset = function(mouseOffset, prevWidth, width, index, jlen) {
     index = override.call(this, mouseOffset, prevWidth, width, index, jlen);
 
     // the index passed into the function is padded by the amount of lines from _textLines (to account for \n)

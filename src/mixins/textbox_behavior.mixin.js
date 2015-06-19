@@ -1,4 +1,4 @@
-(function () {
+(function() {
 
   /**
    * Override _setObjectScale and add Textbox specific resizing behavior. Resizing
@@ -6,8 +6,8 @@
    */
   var setObjectScaleOverridden = fabric.Canvas.prototype._setObjectScale;
 
-  fabric.Canvas.prototype._setObjectScale = function (localMouse, transform,
-                                                      lockScalingX, lockScalingY, by, lockScalingFlip) {
+  fabric.Canvas.prototype._setObjectScale = function(localMouse, transform,
+                                                     lockScalingX, lockScalingY, by, lockScalingFlip) {
 
     var t = transform.target;
     if (t instanceof fabric.Textbox) {
@@ -27,7 +27,7 @@
    * one is present in the group. Deletes _controlsVisibility otherwise, so that
    * it gets initialized to default value at runtime.
    */
-  fabric.Group.prototype._refreshControlsVisibility = function () {
+  fabric.Group.prototype._refreshControlsVisibility = function() {
     if (typeof fabric.Textbox === 'undefined') {
       return;
     }
@@ -45,7 +45,7 @@
     /**
      * @private
      */
-    _removeExtraneousStyles: function () {
+    _removeExtraneousStyles: function() {
       for (var prop in this._styleMap) {
         if (!this._textLines[prop]) {
           delete this.styles[this._styleMap[prop].line];
@@ -59,7 +59,7 @@
      * @param {Number} charIndex Index of a char
      * @param {Object} [style] Style object to insert, if given
      */
-    insertCharStyleObject: function (lineIndex, charIndex, style) {
+    insertCharStyleObject: function(lineIndex, charIndex, style) {
       // adjust lineIndex and charIndex
       var map = this._styleMap[lineIndex];
       lineIndex = map.line;
@@ -74,7 +74,7 @@
      * @param {Number} charIndex Index of a char
      * @param {Boolean} isEndOfLine True if it's end of line
      */
-    insertNewlineStyleObject: function (lineIndex, charIndex, isEndOfLine) {
+    insertNewlineStyleObject: function(lineIndex, charIndex, isEndOfLine) {
       // adjust lineIndex and charIndex
       var map = this._styleMap[lineIndex];
       lineIndex = map.line;
@@ -90,7 +90,7 @@
      * @param {Number} lineIndex Index of a line
      * @param {Number} offset Can be -1 or +1
      */
-    shiftLineStyles: function (lineIndex, offset) {
+    shiftLineStyles: function(lineIndex, offset) {
       // shift all line styles by 1 upward
       var clonedStyles = clone(this.styles),
           map          = this._styleMap[lineIndex];
@@ -119,7 +119,7 @@
      * @returns {String}
      * @private
      */
-    _getTextOnPreviousLine: function (lIndex) {
+    _getTextOnPreviousLine: function(lIndex) {
       var textOnPreviousLine = this._textLines[lIndex - 1];
 
       while (this._styleMap[lIndex - 2] && this._styleMap[lIndex - 2].line === this._styleMap[lIndex - 1].line) {
@@ -136,7 +136,7 @@
      * @param {Boolean} isBeginningOfLine True if cursor is at the beginning of line
      * @param {Number} [index] Optional index. When not given, current selectionStart is used.
      */
-    removeStyleObject: function (isBeginningOfLine, index) {
+    removeStyleObject: function(isBeginningOfLine, index) {
 
       var cursorLocation = this.get2DCursorLocation(index),
           map            = this._styleMap[cursorLocation.lineIndex],
