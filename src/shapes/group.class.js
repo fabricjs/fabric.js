@@ -247,9 +247,8 @@
      */
     _renderControls: function(ctx, noTransform) {
       this.callSuper('_renderControls', ctx, noTransform);
-      for (var i = 0, len = this._objects.length; i < len; i++) {
-        this._objects[i]._renderControls(ctx);
-      }
+      //AS: we are removing the call to draw controls on the children of the group
+      //as we always draw controls on any active object now.
     },
     /**
      * @private

@@ -47,6 +47,9 @@
       }
     },
 
+    _maybeAddToGroup: function() {
+      return true;
+    },
     /**
      * @private
      */
@@ -67,7 +70,7 @@
           return;
         }
       }
-      else {
+      else if (this._maybeAddToGroup(target)) {
         activeGroup.addWithUpdate(target);
         this._resetObjectTransform(activeGroup);
       }
@@ -80,7 +83,7 @@
      */
     _createActiveGroup: function(target, e) {
 
-      if (this._activeObject && target !== this._activeObject) {
+      if (this._activeObject && target !== this._activeObject && this._maybeAddToGroup(target)) {
 
         var group = this._createGroup(target);
         group.addWithUpdate();

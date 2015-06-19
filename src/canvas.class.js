@@ -1131,20 +1131,21 @@
      * @param {CanvasRenderingContext2D} ctx Context to render controls on
      */
     drawControls: function(ctx) {
-      var activeGroup = this.getActiveGroup();
-      if (activeGroup) {
-        this._drawGroupControls(ctx, activeGroup);
-      }
-      else {
-        this._drawObjectsControls(ctx);
-      }
+      
+      //AS: we are now always running both of these during render
+      //in case we want to make locked objects look selected
+      this._drawGroupControls(ctx);
+      this._drawObjectsControls(ctx);
     },
 
     /**
      * @private
      */
-    _drawGroupControls: function(ctx, activeGroup) {
-      activeGroup._renderControls(ctx);
+    _drawGroupControls: function(ctx) {
+      var activeGroup = this.getActiveGroup();
+      if (activeGroup) {
+        activeGroup._renderControls(ctx);
+      }
     },
 
     /**
