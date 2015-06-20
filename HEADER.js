@@ -42,6 +42,7 @@ fabric.isLikelyNode = typeof Buffer !== 'undefined' &&
  * @type array
  */
 fabric.SHARED_ATTRIBUTES = [
+  "id",
   "display",
   "transform",
   "fill", "fill-opacity", "fill-rule",
