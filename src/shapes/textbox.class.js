@@ -130,23 +130,17 @@
 
              if (Math.ceil(ctx.measureText(line + words[0]).width) < maxWidth) {
                line += words.shift() + ' ';
-             } else if (line === '' && words[0].length === 1) {
+             } else if (line === '') {
+               // Word doesn't fit even on its own line; just push it directly,
+               // and accept that it's going to overflow horizontally.
                lines.push(words.shift());
-               line = '';
              } else {
+               // Flush the line.
                lines.push(line);
                line = '';
              }
 
-             // JP: If we've done everything reasonable we can to put the word somewhere
-             // without blowing our horizontal limit, don't try to split it down the
-             // middle--just let it overflow on a line of its own. We should only need
-             // to do anything here if we have an absurdly long word, or an absurdly
-             // narrow text box.
-             if (words.length > 0 && words[0].length > 0) {
-               line += words.shift() + ' ';
-             }
-
+             // Flush if we're out of words.
              if (words.length === 0) {
                lines.push(line.substring(0, line.length - 1));
              }
