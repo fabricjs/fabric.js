@@ -1154,11 +1154,11 @@
 
         ctx.save();
         if (this.group && this.group.shouldDescaleStroke) {
-            if (!isNaN(1/this.group.strokeScaledX) && !isNaN(1/this.group.strokeScaledY)) {
+            if (isFinite(1/this.group.strokeScaledX) && isFinite(1/this.group.strokeScaledY)) {
                 ctx.scale(1/this.group.strokeScaledX, 1/this.group.strokeScaledY);
             }
         } else if (this.shouldDescaleStroke) {
-            if (!isNaN(1/this.strokeScaledX) && !isNaN(1/this.strokeScaledY)) {
+            if (isFinite(1/this.strokeScaledX) && isFinite(1/this.strokeScaledY)) {
                 ctx.scale(1/this.strokeScaledX, 1/this.strokeScaledY);
             }
         }
