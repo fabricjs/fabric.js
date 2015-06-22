@@ -354,6 +354,11 @@
      */
     scaleY:                   1,
 
+    // Hack to be able to know how much to invert stroke transforms.
+    strokeScaledX: 1,
+    strokeScaledY: 1,
+    shouldDescaleStroke: false,
+
     /**
      * When true, an object is rendered as flipped horizontally
      * @type Boolean
@@ -1146,7 +1151,21 @@
           var g = this.stroke.gradientTransform;
           ctx.transform.apply(ctx, g);
         }
+
+        ctx.save();
+        if (this.group && this.group.shouldDescaleStroke) {
+            if (isFinite(1/this.group.strokeScaledX) && isFinite(1/this.group.strokeScaledY)) {
+                ctx.scale(1/this.group.strokeScaledX, 1/this.group.strokeScaledY);
+            }
+        } else if (this.shouldDescaleStroke) {
+            if (isFinite(1/this.strokeScaledX) && isFinite(1/this.strokeScaledY)) {
+                ctx.scale(1/this.strokeScaledX, 1/this.strokeScaledY);
+            }
+        }
+
         this._stroke ? this._stroke(ctx) : ctx.stroke();
+
+        ctx.restore();
       }
       this._removeShadow(ctx);
       ctx.restore();

@@ -35,6 +35,9 @@
      */
     fill: '',
 
+    // Apply the stroke width normalisation to stuff in here
+    shouldDescaleStroke: true,
+
     /**
      * Constructor
      * @param {Array} paths
@@ -101,19 +104,22 @@
         return;
       }
 
-      for (var i = 0, l = this.paths.length; i < l; ++i) {
-        ctx.save();
+      ctx.save();
 
-        if (this.transformMatrix) {
-          ctx.transform.apply(ctx, this.transformMatrix);
-        }
-        this.transform(ctx);
-        ctx.translate(-this.width/2, -this.height/2);
-
-        this.paths[i].render(ctx, true);
-
-        ctx.restore();
+      if (this.transformMatrix) {
+        ctx.transform.apply(ctx, this.transformMatrix);
       }
+      this.transform(ctx);
+
+      this._setShadow(ctx);
+      this.clipTo && fabric.util.clipContext(this, ctx);
+      ctx.translate(-this.width/2, -this.height/2);
+      for (var i = 0, l = this.paths.length; i < l; ++i) {
+        this.paths[i].render(ctx, true);
+      }
+      this.clipTo && ctx.restore();
+      this._removeShadow(ctx);
+      ctx.restore();
     },
 
     /**

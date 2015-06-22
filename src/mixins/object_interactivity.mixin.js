@@ -125,10 +125,17 @@
         h = strokeWidth;
       }
 
-      var wStrokeMult = this.transformStrokeAndFill ? this.scaleX : 1,
-        hStrokeMult = this.transformStrokeAndFill ? this.scaleY : 1,
+      var wStrokeMult = this.scaleX / this.strokeScaledX,
+        hStrokeMult = this.scaleY / this.strokeScaledY,
         boxStrokeWidth = 0,
         boxStrokeHeight = 0;
+
+      if (!isFinite(wStrokeMult)) {
+        wStrokeMult = 0;
+      }
+      if (!isFinite(hStrokeMult)) {
+        hStrokeMult = 0;
+      }
 
       if (strokeW) {
         boxStrokeWidth = (w < 0 ? -strokeWidth : strokeWidth) * wStrokeMult;

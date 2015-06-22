@@ -15,8 +15,15 @@
       var cx = point.x,
           cy = point.y,
           strokeWidth = this.stroke ? this.strokeWidth : 0,
-          strokeScaleFactorX = this.transformStrokeAndFill ? this.scaleX : 1,
-          strokeScaleFactorY = this.transformStrokeAndFill ? this.scaleY : 1;
+          strokeScaleFactorX = this.scaleX / this.strokeScaledX,
+          strokeScaleFactorY = this.scaleY / this.strokeScaledY;
+
+      if (!isFinite(strokeScaleFactorX)) {
+        strokeScaleFactorX = 0;
+      }
+      if (!isFinite(strokeScaleFactorY)) {
+        strokeScaleFactorY = 0;
+      }
 
       if (originX === 'left') {
         cx = point.x + (this.getWidth() + strokeWidth * strokeScaleFactorX) / 2;
@@ -47,8 +54,15 @@
       var x = center.x,
           y = center.y,
           strokeWidth = this.stroke ? this.strokeWidth : 0,
-          strokeScaleFactorX = this.transformStrokeAndFill ? this.scaleX : 1,
-          strokeScaleFactorY = this.transformStrokeAndFill ? this.scaleY : 1;
+          strokeScaleFactorX = this.scaleX / this.strokeScaledX,
+          strokeScaleFactorY = this.scaleY / this.strokeScaledY;
+
+      if (!isFinite(strokeScaleFactorX)) {
+        strokeScaleFactorX = 0;
+      }
+      if (!isFinite(strokeScaleFactorY)) {
+        strokeScaleFactorY = 0;
+      }
 
       // Get the point coordinates
       if (originX === 'left') {
@@ -108,8 +122,15 @@
       var center = this.getCenterPoint(),
           strokeWidth = this.stroke ? this.strokeWidth : 0,
           x, y,
-          strokeScaleFactorX = this.transformStrokeAndFill ? this.scaleX : 1,
-          strokeScaleFactorY = this.transformStrokeAndFill ? this.scaleY : 1;
+          strokeScaleFactorX = this.scaleX / this.strokeScaledX,
+          strokeScaleFactorY = this.scaleY / this.strokeScaledY;
+
+      if (!isFinite(strokeScaleFactorX)) {
+        strokeScaleFactorX = 0;
+      }
+      if (!isFinite(strokeScaleFactorY)) {
+        strokeScaleFactorY = 0;
+      }
 
       if (originX && originY) {
         if (originX === 'left') {
