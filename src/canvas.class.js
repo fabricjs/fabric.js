@@ -503,6 +503,11 @@
       transform.newScaleX = localMouse.x / (target.width + strokeWidth / 2);
       transform.newScaleY = localMouse.y / (target.height + strokeWidth / 2);
 
+      // If what we're scaling is a path group, update the amount by which stroke needs
+      // to be de-scaled on render
+      transform.strokeScaledX = localMouse.x / (target.width + strokeWidth / 2);
+      transform.strokeScaledY = localMouse.y / (target.height + strokeWidth / 2);
+
       if (lockScalingFlip && transform.newScaleX <= 0 && transform.newScaleX < target.scaleX) {
         forbidScalingX = true;
       }
@@ -518,14 +523,34 @@
         this._scaleObjectEqually(localMouse, target, transform, lockScalingFlip);
       }
       else if (!by) {
-        forbidScalingX || lockScalingX || target.set('scaleX', transform.newScaleX);
-        forbidScalingY || lockScalingY || target.set('scaleY', transform.newScaleY);
+        if (!forbidScalingX && !lockScalingX) {
+          target.set('scaleX', transform.newScaleX);
+          if (target.shouldDescaleStroke) {
+            target.set('strokeScaledX', transform.strokeScaledX);
+          }
+        }
+        if (!forbidScalingY && !lockScalingY) {
+          target.set('scaleY', transform.newScaleY);
+          if (target.shouldDescaleStroke) {
+            target.set('strokeScaledY', transform.strokeScaledY);
+          }
+        }
       }
       else if (by === 'x' && !target.get('lockUniScaling')) {
-        forbidScalingX || lockScalingX || target.set('scaleX', transform.newScaleX);
+        if (!forbidScalingX && !lockScalingX) {
+          target.set('scaleX', transform.newScaleX);
+          if (target.shouldDescaleStroke) {
+            target.set('strokeScaledX', transform.strokeScaledX);
+          }
+        }
       }
       else if (by === 'y' && !target.get('lockUniScaling')) {
-        forbidScalingY || lockScalingY || target.set('scaleY', transform.newScaleY);
+        if (!forbidScalingY && !lockScalingY) {
+          target.set('scaleY', transform.newScaleY);
+          if (target.shouldDescaleStroke) {
+            target.set('strokeScaledY', transform.strokeScaledY);
+          }
+        }
       }
 
       forbidScalingX || forbidScalingY || this._flipObject(transform, by);
@@ -552,8 +577,18 @@
       transform.newScaleX = transform.original.scaleX * dist / lastDist;
       transform.newScaleY = transform.original.scaleY * dist / lastDist;
 
+      var lastStrokeScaledDist = (target.height + (strokeWidth / 2)) * target.strokeScaledY +
+                     (target.width + (strokeWidth / 2)) * target.strokeScaledX;
+
+      transform.strokeScaledX = target.strokeScaledX * dist / lastStrokeScaledDist;
+      transform.strokeScaledY = target.strokeScaledY * dist / lastStrokeScaledDist;
+
       target.set('scaleX', transform.newScaleX);
       target.set('scaleY', transform.newScaleY);
+      if (target.shouldDescaleStroke) {
+        target.set('strokeScaledX', transform.strokeScaledX);
+        target.set('strokeScaledY', transform.strokeScaledY);
+      }
     },
 
     /**

@@ -35,6 +35,9 @@
      */
     fill: '',
 
+    // Apply the stroke width normalisation to stuff in here
+    shouldDescaleStroke: true,
+
     /**
      * Constructor
      * @param {Array} paths

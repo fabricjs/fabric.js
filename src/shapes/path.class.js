@@ -66,6 +66,9 @@
      */
     minY: 0,
 
+    // Apply path width normalisation to the stroke width
+    shouldDescaleStroke: true,
+
     /**
      * Constructor
      * @param {Array|String} path Path data (sequence of coordinates and corresponding "command" tokens)
