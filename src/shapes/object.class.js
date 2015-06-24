@@ -1153,13 +1153,21 @@
         }
 
         ctx.save();
+
+        // Find out if we should be applying a cancelling transform to our stroke
+        var strokeDescaleObject = null;
         if (this.group && this.group.shouldDescaleStroke) {
-            if (isFinite(1/this.group.strokeScaledX) && isFinite(1/this.group.strokeScaledY)) {
-                ctx.scale(1/this.group.strokeScaledX, 1/this.group.strokeScaledY);
-            }
+            strokeDescaleObject = this.group;
         } else if (this.shouldDescaleStroke) {
-            if (isFinite(1/this.strokeScaledX) && isFinite(1/this.strokeScaledY)) {
-                ctx.scale(1/this.strokeScaledX, 1/this.strokeScaledY);
+            strokeDescaleObject = this;
+        }
+
+        if (strokeDescaleObject) {
+            // Don't bother descaling the stroke where the factor is large
+            // You wind up with all sorts of totally busted states because of
+            // floating point precision.
+            if (isFinite(1/strokeDescaleObject.strokeScaledX) && isFinite(1/strokeDescaleObject.strokeScaledY)) {
+                ctx.scale(1/strokeDescaleObject.strokeScaledX, 1/strokeDescaleObject.strokeScaledY);
             }
         }
 
