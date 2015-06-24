@@ -250,16 +250,17 @@
      * @return {Boolean} true if point is contained within an area of given object
      */
     containsPoint: function (e, target) {
+      //TODO delete this!
       var pointer = this.getPointer(e, true),
           xy = this._normalizePointer(target, pointer);
-
       // http://www.geog.ubc.ca/courses/klink/gis.notes/ncgia/u32.html
       // http://idav.ucdavis.edu/~okreylos/TAship/Spring2000/PointInPolygon.html
       return (target.containsPoint(xy) || target._findTargetCorner(pointer));
     },
 
     /**
-     * @private
+     * //TODO delete this!
+     * @private This method is used only inside containsPoint
      */
     _normalizePointer: function (object, pointer) {
       var activeGroup = this.getActiveGroup(),
@@ -769,7 +770,7 @@
         this.controlsAboveOverlay &&
         this.lastRenderedObjectWithControlsAboveOverlay &&
         this.lastRenderedObjectWithControlsAboveOverlay.visible &&
-        this.containsPoint(e, this.lastRenderedObjectWithControlsAboveOverlay) &&
+        this.containsPoint(e, this.lastRenderedObjectWithControlsAboveOverlay, false) &&
         this.lastRenderedObjectWithControlsAboveOverlay._findTargetCorner(this.getPointer(e, true)));
     },
 
@@ -783,18 +784,28 @@
         return;
       }
 
-      if (this._isLastRenderedObject(e)) {
+      //an optimization for making mouse move events over an active group 
+      //or object have a fast path
+      if (!skipGroup && this._isLastRenderedObject(e)) {
         return this.lastRenderedObjectWithControlsAboveOverlay;
       }
 
       // first check current group (if one exists)
       var activeGroup = this.getActiveGroup();
-      if (activeGroup && !skipGroup && this.containsPoint(e, activeGroup)) {
+      if (!skipGroup && activeGroup && this.containsPoint(e, activeGroup, false)) {
         return activeGroup;
       }
 
-      var target = this._searchPossibleTargets(e);
-      this._fireOverOutEvents(target, e);
+      var target;
+      if(!skipGroup) {
+        target = this._searchPossibleTargets(e);
+        this._fireOverOutEvents(target, e);
+      }
+      else if(activeGroup) {
+        //we have clicked a group, we are now looking explicitly looking inside the group
+        target = this._searchPossibleTargets(e, activeGroup);
+        this._fireOverOutEvents(target, e);
+      }
 
       return target;
     },
@@ -822,7 +833,7 @@
     },
 
     /**
-     * @private
+     * @private //TODO delete this!
      */
     _checkTarget: function(e, obj, pointer) {
       if (obj &&
@@ -842,10 +853,9 @@
     },
 
     /**
-     * @private
+     * @private //TODO delete this!
      */
     _searchPossibleTargets: function(e) {
-
       // Cache all targets where their bounding box contains point.
       var target,
           pointer = this.getPointer(e, true),
