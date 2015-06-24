@@ -9,7 +9,21 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     this.hiddenTextarea = fabric.document.createElement('textarea');
     this.hiddenTextarea.value = this.text;
 
-    this.hiddenTextarea.style.cssText = 'position: absolute; overflow: hidden; resize: none; margin: 0; padding: 0; border: 0; box-shadow: none; border-radius: 0; background-color: transparent;';
+    var ua = navigator.userAgent.toLowerCase();
+    var isSafariOnOSX = ua.indexOf('applewebkit') >= 0 && ua.indexOf('safari') >= 0 && ua.indexOf('chrome') === -1 && ua.indexOf('os x') >= 0;
+
+    var cssText = 'position: absolute; overflow: hidden; resize: none; margin: 0;' +
+      'padding: 0; border: 0; box-shadow: none; border-radius: 0;';
+    if (isSafariOnOSX) {
+      // Safari on OSX does not show the cursor in an empty textarea that is transparent (#93615228)
+      // Instead make it nearly transparent.
+      // After some experimentation, this is the lowest alpha value you can have and still have the cursor.
+      cssText += 'background-color: rgba(255, 255, 255, 0.004);';
+    } else {
+      // Don't do the above hack on other browsers to avoid pointless alpha blending.
+      cssText += 'background-color: transparent;';
+    }
+    this.hiddenTextarea.style.cssText = cssText;
     //If at all possible, show the textarea within the canvas wrapper where it can exist
     //at the same height as the iText display. This prevents iOS from scrolling to whatever
     //height the textarea is at when you type.
