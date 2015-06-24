@@ -499,16 +499,27 @@
      * @private
      */
     _setObjectScale: function(localMouse, transform, lockScalingX, lockScalingY, by, lockScalingFlip) {
+      var epsilonClampDiv = function(numerator, denominator){
+        return isFinite(numerator / denominator) ? numerator / denominator : 0;
+      };
+
       var target = transform.target, forbidScalingX = false, forbidScalingY = false,
-          strokeWidth = target.stroke ? target.strokeWidth : 0;
+          strokeWidth = target.stroke ? target.strokeWidth : 0,
+          // Calculate scaling in the same way as fabric did in _scaleObjectEqually
+          // Calculate the actual width of objects including stroke scaling, and then
+          // calculate newScaleX/Y based on this & mouse coordinates.
+          strokeWidthX = epsilonClampDiv(strokeWidth, transform.original.strokeScaledX),
+          strokeWidthY = epsilonClampDiv(strokeWidth, transform.original.strokeScaledY),
+          lastDistX = (target.width + strokeWidthX / 2) * transform.original.scaleX,
+          lastDistY = (target.height + strokeWidthY / 2) * transform.original.scaleY;
 
-      transform.newScaleX = localMouse.x / (target.width + strokeWidth / 2);
-      transform.newScaleY = localMouse.y / (target.height + strokeWidth / 2);
+      transform.newScaleX = transform.original.scaleX * localMouse.x / lastDistX;
+      transform.newScaleY = transform.original.scaleY * localMouse.y / lastDistY;
 
-      // If what we're scaling is a path group, update the amount by which stroke needs
+      // If what we're scaling should antiscale stroke, update the amount by which stroke needs
       // to be de-scaled on render
-      transform.strokeScaledX = localMouse.x / (target.width + strokeWidth / 2);
-      transform.strokeScaledY = localMouse.y / (target.height + strokeWidth / 2);
+      transform.strokeScaledX = transform.original.strokeScaledX * localMouse.x / lastDistX;
+      transform.strokeScaledY = transform.original.strokeScaledY * localMouse.y / lastDistY;
 
       if (lockScalingFlip && transform.newScaleX <= 0 && transform.newScaleX < target.scaleX) {
         forbidScalingX = true;
