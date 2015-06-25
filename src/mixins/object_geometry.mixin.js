@@ -240,14 +240,12 @@
      * @return {Number}
      */
     _constrainScale: function(value) {
-      if (Math.abs(value) < this.minScaleLimit) {
-        if (value < 0) {
-          return -this.minScaleLimit;
-        }
-        else {
-          return this.minScaleLimit;
-        }
-      }
+      // This function has been removed.
+      // There is now no such thing as a minimum object size.
+      // Users must fight this footgun with the undo button.
+      // This feature was causing real badness when objects were made small;
+      // the stroke was growing obsenely and painting the entire screen
+      // the colour of the stroke.
       return value;
     },
 

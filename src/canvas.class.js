@@ -438,7 +438,9 @@
         scaleX: target.scaleX,
         scaleY: target.scaleY,
         originX: origin.x,
-        originY: origin.y
+        originY: origin.y,
+        strokeScaledX: target.strokeScaledX,
+        strokeScaledY: target.strokeScaledY,
       };
 
       this._resetCurrentTransform(e);
@@ -497,16 +499,27 @@
      * @private
      */
     _setObjectScale: function(localMouse, transform, lockScalingX, lockScalingY, by, lockScalingFlip) {
+      var epsilonClampDiv = function(numerator, denominator){
+        return isFinite(numerator / denominator) ? numerator / denominator : 0;
+      };
+
       var target = transform.target, forbidScalingX = false, forbidScalingY = false,
-          strokeWidth = target.stroke ? target.strokeWidth : 0;
+          strokeWidth = target.stroke ? target.strokeWidth : 0,
+          // Calculate scaling in the same way as fabric did in _scaleObjectEqually
+          // Calculate the actual width of objects including stroke scaling, and then
+          // calculate newScaleX/Y based on this & mouse coordinates.
+          strokeWidthX = epsilonClampDiv(strokeWidth, transform.original.strokeScaledX),
+          strokeWidthY = epsilonClampDiv(strokeWidth, transform.original.strokeScaledY),
+          lastDistX = (target.width + strokeWidthX / 2) * transform.original.scaleX,
+          lastDistY = (target.height + strokeWidthY / 2) * transform.original.scaleY;
 
-      transform.newScaleX = localMouse.x / (target.width + strokeWidth / 2);
-      transform.newScaleY = localMouse.y / (target.height + strokeWidth / 2);
+      transform.newScaleX = transform.original.scaleX * localMouse.x / lastDistX;
+      transform.newScaleY = transform.original.scaleY * localMouse.y / lastDistY;
 
-      // If what we're scaling is a path group, update the amount by which stroke needs
+      // If what we're scaling should antiscale stroke, update the amount by which stroke needs
       // to be de-scaled on render
-      transform.strokeScaledX = localMouse.x / (target.width + strokeWidth / 2);
-      transform.strokeScaledY = localMouse.y / (target.height + strokeWidth / 2);
+      transform.strokeScaledX = transform.original.strokeScaledX * localMouse.x / lastDistX;
+      transform.strokeScaledY = transform.original.strokeScaledY * localMouse.y / lastDistY;
 
       if (lockScalingFlip && transform.newScaleX <= 0 && transform.newScaleX < target.scaleX) {
         forbidScalingX = true;
@@ -562,10 +575,18 @@
      */
     _scaleObjectEqually: function(localMouse, target, transform, lockScalingFlip) {
 
+      var epsilonClampDiv = function(numerator, denominator){
+        return isFinite(numerator / denominator) ? numerator / denominator : 0;
+      };
+
       var dist = localMouse.y + localMouse.x,
           strokeWidth = target.stroke ? target.strokeWidth : 0,
-          lastDist = (target.height + (strokeWidth / 2)) * transform.original.scaleY +
-                     (target.width + (strokeWidth / 2)) * transform.original.scaleX;
+
+          // Take the stroke scaling into acount when determining the size of the object
+          strokeWidthX = epsilonClampDiv(strokeWidth, transform.original.strokeScaledX),
+          strokeWidthY = epsilonClampDiv(strokeWidth, transform.original.strokeScaledY),
+          lastDist = (target.height + (strokeWidthY / 2)) * transform.original.scaleY +
+                     (target.width + (strokeWidthX / 2)) * transform.original.scaleX;
 
       // JP: respect `lockScalingFlip`; `_setObjectScale` trusts us to implement it here now.
       if (lockScalingFlip && dist < 0) {
@@ -577,11 +598,9 @@
       transform.newScaleX = transform.original.scaleX * dist / lastDist;
       transform.newScaleY = transform.original.scaleY * dist / lastDist;
 
-      var lastStrokeScaledDist = (target.height + (strokeWidth / 2)) * target.strokeScaledY +
-                     (target.width + (strokeWidth / 2)) * target.strokeScaledX;
-
-      transform.strokeScaledX = target.strokeScaledX * dist / lastStrokeScaledDist;
-      transform.strokeScaledY = target.strokeScaledY * dist / lastStrokeScaledDist;
+      // Calculate the amount of stroke antiscaling to apply in precicely the same way as actual scale.
+      transform.strokeScaledX = transform.original.strokeScaledX * dist / lastDist;
+      transform.strokeScaledY = transform.original.strokeScaledY * dist / lastDist;
 
       target.set('scaleX', transform.newScaleX);
       target.set('scaleY', transform.newScaleY);
