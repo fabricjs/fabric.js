@@ -707,15 +707,6 @@
     /**
      * @private
      */
-    _resetObjectTransform: function (target) {
-      target.scaleX = 1;
-      target.scaleY = 1;
-      target.setAngle(0);
-    },
-
-    /**
-     * @private
-     */
     _drawSelection: function () {
       var ctx = this.contextTop,
           groupSelector = this._groupSelector,
