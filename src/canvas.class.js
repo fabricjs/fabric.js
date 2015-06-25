@@ -249,35 +249,45 @@
      * @param {fabric.Object} target Object to test against
      * @return {Boolean} true if point is contained within an area of given object
      */
-    containsPoint: function (e, target) {
-      var pointer = this.getPointer(e, true),
-          xy = this._normalizePointer(target, pointer);
+    // This is run by various mouse handlers to choose the mouse cursor,
+    // decide whether to select or deselect object or whether a border
+    // control has been clicked.
+    containsPoint: function(e, target, lookInsideGroup) {
+        //when comparing with oCoords, we don't need to consider zoom
+        var pointer = this.getPointer(e, true);
+        var clickXY = {x: pointer.x, y: pointer.y};
 
-      // http://www.geog.ubc.ca/courses/klink/gis.notes/ncgia/u32.html
-      // http://idav.ucdavis.edu/~okreylos/TAship/Spring2000/PointInPolygon.html
-      return (target.containsPoint(xy) || target._findTargetCorner(pointer));
-    },
+        var group = this.getActiveGroup();
+        var wasClicked;
 
-    /**
-     * @private
-     */
-    _normalizePointer: function (object, pointer) {
-      var activeGroup = this.getActiveGroup(),
-          x = pointer.x,
-          y = pointer.y,
-          isObjectInGroup = (
-            activeGroup &&
-            object.type !== 'group' &&
-            object.group === activeGroup),
-          lt;
+        if(lookInsideGroup && group && target.group && target.type != 'group') {
+            //If the object is part of the current selection group, it should
+            //be transformed appropriately
+            //i.e. it should be serialised as it would appear if the selection group
+            //were to be destroyed.
+            var originalProperties = target.canvas._realizeGroupTransformOnObject(target);
 
-      if (isObjectInGroup) {
-        lt = new fabric.Point(activeGroup.left, activeGroup.top);
-        lt = fabric.util.transformPoint(lt, this.viewportTransform, true);
-        x -= lt.x;
-        y -= lt.y;
-      }
-      return { x: x, y: y };
+            //TODO cache this rather than doing it again immediately.
+            target.setCoords();
+            wasClicked = target.containsPoint(clickXY);
+            //Undo the damage we did by changing all of its properties
+            target.canvas._unwindGroupTransformOnObject(target, originalProperties);
+            target.setCoords();
+        } else if( group && !target.group && target.type != 'group') {
+            //when there is a group selection the oCoords of other objects
+            //do NOT consider zoom.
+
+            //Ignore the group itself here, otherwise we
+            // break the corner grab handles
+            wasClicked = target.containsPoint(clickXY);
+        } else {
+
+            //when there is no group, or considering clicks on the group itself,
+            //we should skip zoom. Also consider corner controls for active objects
+            wasClicked = target.containsPoint(clickXY) || (target._findTargetCorner(pointer)) ;
+        }
+
+        return wasClicked;
     },
 
     /**
@@ -725,15 +735,6 @@
     /**
      * @private
      */
-    _resetObjectTransform: function (target) {
-      target.scaleX = 1;
-      target.scaleY = 1;
-      target.setAngle(0);
-    },
-
-    /**
-     * @private
-     */
     _drawSelection: function () {
       var ctx = this.contextTop,
           groupSelector = this._groupSelector,
@@ -788,7 +789,7 @@
         this.controlsAboveOverlay &&
         this.lastRenderedObjectWithControlsAboveOverlay &&
         this.lastRenderedObjectWithControlsAboveOverlay.visible &&
-        this.containsPoint(e, this.lastRenderedObjectWithControlsAboveOverlay) &&
+        this.containsPoint(e, this.lastRenderedObjectWithControlsAboveOverlay, false) &&
         this.lastRenderedObjectWithControlsAboveOverlay._findTargetCorner(this.getPointer(e, true)));
     },
 
@@ -802,18 +803,31 @@
         return;
       }
 
-      if (this._isLastRenderedObject(e)) {
+      //an optimization for making mouse move events over an active group 
+      //or object have a fast path
+      if (!skipGroup && this._isLastRenderedObject(e)) {
         return this.lastRenderedObjectWithControlsAboveOverlay;
       }
 
       // first check current group (if one exists)
       var activeGroup = this.getActiveGroup();
-      if (activeGroup && !skipGroup && this.containsPoint(e, activeGroup)) {
+      if (!skipGroup && activeGroup && this.containsPoint(e, activeGroup, false)) {
         return activeGroup;
       }
 
-      var target = this._searchPossibleTargets(e);
-      this._fireOverOutEvents(target, e);
+      var target;
+      if(!skipGroup) {
+        target = this._searchPossibleTargets(e);
+        this._fireOverOutEvents(target, e);
+      } else if(activeGroup) {
+        //we have clicked a group, we are now looking explicitly looking inside the group
+        target = this._searchPossibleTargets(e, activeGroup);
+        if(!target) {
+          //there was nothing in the group clicked, let's try objects overlapping the group
+          target = this._searchPossibleTargets(e);
+        }
+        this._fireOverOutEvents(target, e);
+      }
 
       return target;
     },
@@ -841,7 +855,7 @@
     },
 
     /**
-     * @private
+     * @private //TODO delete this!
      */
     _checkTarget: function(e, obj, pointer) {
       if (obj &&
@@ -861,10 +875,9 @@
     },
 
     /**
-     * @private
+     * @private //TODO delete this!
      */
     _searchPossibleTargets: function(e) {
-
       // Cache all targets where their bounding box contains point.
       var target,
           pointer = this.getPointer(e, true),

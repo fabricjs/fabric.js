@@ -129,6 +129,9 @@
       }
       // since _restoreObjectsState set objects inactive
       this.forEachObject(this._setObjectActive, this);
+
+      //reset the scale/angle before updating objectCoords
+      this._resetTransform();
       this._calcBounds();
       this._updateObjectsCoords();
       return this;
@@ -150,15 +153,27 @@
       this._moveFlippedObject(object);
       this._restoreObjectsState();
 
+      this.remove(object);
+
       // since _restoreObjectsState set objects inactive
       this.forEachObject(this._setObjectActive, this);
-
-      this.remove(object);
+      //reset the scale/angle before updating objectCoords
+      this._resetTransform();
       this._calcBounds();
       this._updateObjectsCoords();
 
       return this;
     },
+
+    /**
+     * @private
+     */
+    _resetTransform: function () {
+      this.scaleX = 1;
+      this.scaleY = 1;
+      this.setAngle(0);
+    },
+
     /**
      * @private
      */
@@ -342,7 +357,6 @@
     _restoreObjectState: function(object) {
       this._setObjectPosition(object);
 
-      object.setCoords();
       object.hasControls = object.__origHasControls;
       delete object.__origHasControls;
       object.set('active', false);

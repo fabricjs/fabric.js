@@ -421,7 +421,8 @@
         return;
       }
 
-      var target = this.findTarget(e),
+      //initially look for objects or groups
+      var target = this.findTarget(e, false),
           pointer = this.getPointer(e, true);
 
       // save pointer for check in __onMouseUp event
