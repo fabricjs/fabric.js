@@ -791,10 +791,13 @@
       if(!skipGroup) {
         target = this._searchPossibleTargets(e);
         this._fireOverOutEvents(target, e);
-      }
-      else if(activeGroup) {
+      } else if(activeGroup) {
         //we have clicked a group, we are now looking explicitly looking inside the group
         target = this._searchPossibleTargets(e, activeGroup);
+        if(!target) {
+          //there was nothing in the group clicked, let's try objects overlapping the group
+          target = this._searchPossibleTargets(e);
+        }
         this._fireOverOutEvents(target, e);
       }
 
