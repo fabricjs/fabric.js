@@ -338,6 +338,12 @@
      * @chainable
      */
     enterEditing: function() {
+      // We don't want to allow users to edit text that is mostly offscreen, because the textarea
+      // will end up causing the browser's scroll position to jump around wildly.
+      if (this._isMostlyOffscreen()) {
+        return;
+      }
+
       if (this.isEditing || !this.editable) {
         if(this.hiddenTextarea) {
           this.hiddenTextarea.focus();
@@ -401,6 +407,28 @@
           _this.setSelectionEnd(_this.__selectionStartOnMouseDown);
         }
       });
+    },
+
+    _isMostlyOffscreen: function () {
+      var OFFSCREEN_THRESHOLD = 0.2;
+
+      var artboard = this.canvas.sketchpad._artboard;
+      var thisRight = this.left + this.width - artboard.width;
+      var thisBottom = this.top + this.height - artboard.height;
+
+      return (
+        // Left side
+        (this.left < 0 && -this.left / this.width > OFFSCREEN_THRESHOLD) ||
+
+        // Right side
+        (thisRight < 0 && -thisRight / this.width > OFFSCREEN_THRESHOLD) ||
+
+        // Top
+        (this.top < 0 && -this.top / this.height > OFFSCREEN_THRESHOLD) ||
+
+        // Bottom
+        (thisBottom < 0 && -thisBottom / this.height > OFFSCREEN_THRESHOLD)
+      );
     },
 
     /**
