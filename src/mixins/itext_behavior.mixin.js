@@ -413,8 +413,8 @@
       var OFFSCREEN_THRESHOLD = 0.2;
 
       var artboard = this.canvas.sketchpad._artboard;
-      var thisRight = this.left + this.width - artboard.width;
-      var thisBottom = this.top + this.height - artboard.height;
+      var thisRight = artboard.width - (this.left + this.width);
+      var thisBottom = artboard.height - (this.top + this.height);
 
       return (
         // Left side
