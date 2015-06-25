@@ -249,36 +249,45 @@
      * @param {fabric.Object} target Object to test against
      * @return {Boolean} true if point is contained within an area of given object
      */
-    containsPoint: function (e, target) {
-      //TODO delete this!
-      var pointer = this.getPointer(e, true),
-          xy = this._normalizePointer(target, pointer);
-      // http://www.geog.ubc.ca/courses/klink/gis.notes/ncgia/u32.html
-      // http://idav.ucdavis.edu/~okreylos/TAship/Spring2000/PointInPolygon.html
-      return (target.containsPoint(xy) || target._findTargetCorner(pointer));
-    },
+    // This is run by various mouse handlers to choose the mouse cursor,
+    // decide whether to select or deselect object or whether a border
+    // control has been clicked.
+    containsPoint: function(e, target, lookInsideGroup) {
+        //when comparing with oCoords, we don't need to consider zoom
+        var pointer = this.getPointer(e, true);
+        var clickXY = {x: pointer.x, y: pointer.y};
 
-    /**
-     * //TODO delete this!
-     * @private This method is used only inside containsPoint
-     */
-    _normalizePointer: function (object, pointer) {
-      var activeGroup = this.getActiveGroup(),
-          x = pointer.x,
-          y = pointer.y,
-          isObjectInGroup = (
-            activeGroup &&
-            object.type !== 'group' &&
-            object.group === activeGroup),
-          lt;
+        var group = this.getActiveGroup();
+        var wasClicked;
 
-      if (isObjectInGroup) {
-        lt = new fabric.Point(activeGroup.left, activeGroup.top);
-        lt = fabric.util.transformPoint(lt, this.viewportTransform, true);
-        x -= lt.x;
-        y -= lt.y;
-      }
-      return { x: x, y: y };
+        if(lookInsideGroup && group && target.group && target.type != 'group') {
+            //If the object is part of the current selection group, it should
+            //be transformed appropriately
+            //i.e. it should be serialised as it would appear if the selection group
+            //were to be destroyed.
+            var originalProperties = target.canvas._realizeGroupTransformOnObject(target);
+
+            //TODO cache this rather than doing it again immediately.
+            target.setCoords();
+            wasClicked = target.containsPoint(clickXY);
+            //Undo the damage we did by changing all of its properties
+            target.canvas._unwindGroupTransformOnObject(target, originalProperties);
+            target.setCoords();
+        } else if( group && !target.group && target.type != 'group') {
+            //when there is a group selection the oCoords of other objects
+            //do NOT consider zoom.
+
+            //Ignore the group itself here, otherwise we
+            // break the corner grab handles
+            wasClicked = target.containsPoint(clickXY);
+        } else {
+
+            //when there is no group, or considering clicks on the group itself,
+            //we should skip zoom. Also consider corner controls for active objects
+            wasClicked = target.containsPoint(clickXY) || (target._findTargetCorner(pointer)) ;
+        }
+
+        return wasClicked;
     },
 
     /**
