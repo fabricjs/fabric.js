@@ -70,14 +70,11 @@
      * @return {fabric.Point} The new rotated point
      */
     rotatePoint: function(point, origin, radians) {
-      var sin = Math.sin(radians),
-          cos = Math.cos(radians);
-
       point.subtractEquals(origin);
-
-      var rx = point.x * cos - point.y * sin,
+      var sin = Math.sin(radians),
+          cos = Math.cos(radians),
+          rx = point.x * cos - point.y * sin,
           ry = point.x * sin + point.y * cos;
-
       return new fabric.Point(rx, ry).addEquals(origin);
     },
 
@@ -111,10 +108,9 @@
      * @return {Array} The inverted transform
      */
     invertTransform: function(t) {
-      var r = t.slice(),
-          a = 1 / (t[0] * t[3] - t[1] * t[2]);
-      r = [a * t[3], -a * t[1], -a * t[2], a * t[0], 0, 0];
-      var o = fabric.util.transformPoint({ x: t[4], y: t[5] }, r);
+      var a = 1 / (t[0] * t[3] - t[1] * t[2]),
+          r = [a * t[3], -a * t[1], -a * t[2], a * t[0]],
+          o = fabric.util.transformPoint({ x: t[4], y: t[5] }, r, true);
       r[4] = -o.x;
       r[5] = -o.y;
       return r;

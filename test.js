@@ -33,6 +33,7 @@ testrunner.run({
       './test/unit/pattern.js',
       './test/unit/shadow.js',
       './test/unit/object_interactivity.js',
+      './test/unit/object_origin.js',      
       './test/unit/itext.js'
     ]
 }, function(err, report) {

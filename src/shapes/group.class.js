@@ -469,12 +469,14 @@
       var aX = [],
           aY = [],
           o, prop,
-          props = ['tr', 'br', 'bl', 'tl'];
+          props = ['tr', 'br', 'bl', 'tl'],
+          i = 0, iLen = this._objects.length,
+          j, jLen = props.length;
 
-      for (var i = 0, len = this._objects.length; i < len; ++i) {
+      for ( ; i < iLen; ++i) {
         o = this._objects[i];
         o.setCoords();
-        for (var j = 0; j < props.length; j++) {
+        for (j = 0; j < jLen; j++) {
           prop = props[j];
           aX.push(o.oCoords[prop].x);
           aY.push(o.oCoords[prop].y);
