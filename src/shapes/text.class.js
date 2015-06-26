@@ -352,13 +352,15 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
-
       this.clipTo && fabric.util.clipContext(this, ctx);
-
+      ctx.save();
+      this._setOpacity(ctx);
+      this._setShadow(ctx);
+      this._setupCompositeOperation(ctx);
       this._renderTextBackground(ctx);
       this._renderText(ctx);
-
       this._renderTextDecoration(ctx);
+      ctx.restore();
       this.clipTo && ctx.restore();
     },
 
@@ -367,14 +369,11 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _renderText: function(ctx) {
-      ctx.save();
+
       this._translateForTextAlign(ctx);
-      this._setOpacity(ctx);
-      this._setShadow(ctx);
-      this._setupCompositeOperation(ctx);
       this._renderTextFill(ctx);
       this._renderTextStroke(ctx);
-      ctx.restore();
+
     },
 
     /**
