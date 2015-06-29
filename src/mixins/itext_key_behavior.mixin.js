@@ -73,6 +73,35 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       var width = this.getWidth() * xScale;
       var height = this.getHeight() * yScale;
 
+      // Move the textarea to the left, top, bottom, or right as needed in order
+      // to keep the textarea roughly on the canvas.
+      // This has the effect of possibly making the textarea not in the same spot as
+      // the rendered text.
+      // Who cares. It's better than having the browser try and keep the cursor on
+      // the screen, which it does even if clipped away.
+      // Fixes #93604260
+
+      // I'm leaving all of the pointless 0's in the code below to illustrate an important point:
+      // The left/top of the canvasRect in its own coordinate space is 0,0
+      // Therefore, you could consider canvasRect.left === canvasRect.top === 0
+      var topOverflow = Math.max(0 - top, 0);
+      var leftOverflow = Math.max(0 - left, 0);
+      var bottomOverflow = Math.max((top + height) - (0 + canvasRect.height), 0);
+      var rightOverflow = Math.max((left + width) - (0 + canvasRect.width), 0);
+
+      if (topOverflow > 0) {
+        top += topOverflow;
+      }
+      if (bottomOverflow > 0) {
+        top -= bottomOverflow;
+      }
+      if (leftOverflow > 0) {
+        left += leftOverflow;
+      }
+      if (rightOverflow > 0) {
+        left -= rightOverflow;
+      }
+
       this.hiddenTextarea.style.width = width + 'px';
       this.hiddenTextarea.style.height = height + 'px';
       this.hiddenTextarea.style.top = top + 'px';
