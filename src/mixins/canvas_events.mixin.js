@@ -646,7 +646,12 @@
       // and if it is not a group we are transforming
       if ((e.shiftKey || this.uniScaleTransform) && !transform.target.get('lockUniScaling')) {
         transform.currentAction = 'scale';
-        this._scaleObject(x, y);
+        var target = transform.target;
+        if(e.shiftKey &&  target.get('stileSnappedScaling')) {
+          this._scaleObject(x, y, "snapped");
+        } else {
+          this._scaleObject(x, y);
+        }
       }
       else {
         // Switch from a normal resize to proportional

@@ -452,6 +452,14 @@
         strokeScaledX: target.strokeScaledX,
         strokeScaledY: target.strokeScaledY,
       };
+      //when we start scaling lines we need to know if the line was drawn
+      //with reversed endpoints when scaling it.
+      if(target.x2 && target.x1) {
+        if(target.x2 < target.x1) {
+          this._currentTransform.originalLineFlipped = true;
+        }
+      }
+
 
       this._resetCurrentTransform(e);
     },
