@@ -157,6 +157,7 @@ var filesToInclude = [
   'src/util/dom_style.js',
   'src/util/dom_misc.js',
   'src/util/dom_request.js',
+  'src/util/lineGeometry.js',
 
   'src/log.js',
 

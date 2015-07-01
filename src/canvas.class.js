@@ -489,28 +489,111 @@
      * @param {String} by Either 'x' or 'y' - specifies dimension constraint by which to scale an object.
      *                    When not provided, an object is scaled by both dimensions equally
      */
+    //This method is copy-pasted, with stile hacks as annotated.
     _scaleObject: function (x, y, by) {
-      var t = this._currentTransform,
-          target = t.target,
-          lockScalingX = target.get('lockScalingX'),
-          lockScalingY = target.get('lockScalingY'),
-          lockScalingFlip = target.get('lockScalingFlip');
+        var t = this._currentTransform,
+            target = t.target,
+            lockScalingX = target.get('lockScalingX'),
+            lockScalingY = target.get('lockScalingY'),
+            lockScalingFlip = target.get('lockScalingFlip');
 
-      if (lockScalingX && lockScalingY) {
-        return;
-      }
+        if (lockScalingX && lockScalingY) {
+            return;
+        }
 
-      // Get the constraint point
-      var constraintPosition = target.translateToOriginPoint(target.getCenterPoint(), t.originX, t.originY),
-          localMouse = target.toLocalPoint(new fabric.Point(x, y), t.originX, t.originY);
+        if (target.get('stileSnappedScaling')) {
+            var strokeWidth = target.strokeWidth;
+            var padding = target.padding;
+            target.strokeWidth = 0;
+            target.padding = 0;
 
-      this._setLocalMouse(localMouse, t);
+            var endpoints = fabric.util.lineGeometry.getRealEndpointsForLine(target, true);
 
-      // Actually scale the object
-      this._setObjectScale(localMouse, t, lockScalingX, lockScalingY, by, lockScalingFlip);
+            target.strokeWidth = strokeWidth;
+            target.padding = padding;
 
-      // Make sure the constraints apply
-      target.setPositionByOrigin(constraintPosition, t.originX, t.originY);
+            var constrainedPoint;
+            var moveTailEnd;
+
+            //determine which endpoint was resized, as this will
+            // be the one that we want to modify
+            if (t.originX === 'right') {
+                moveTailEnd = true;
+            } else {
+                moveTailEnd = false;
+            }
+
+            //reverse all of this if the line was originally flipped
+            if(t.originalLineFlipped) {
+                moveTailEnd = !moveTailEnd;
+            }
+
+            if(moveTailEnd) {
+                constrainedPoint = {x: endpoints.x2, y: endpoints.y2};
+            } else {
+                constrainedPoint = {x: endpoints.x1, y: endpoints.y1};
+            }
+
+            var xdiff = x - constrainedPoint.x;
+            var ydiff = y - constrainedPoint.y;
+
+            if(by === "snapped") {
+                var area = fabric.util.lineGeometry.getSnappedArea(xdiff, ydiff);
+                xdiff = area.width;
+                ydiff = area.height;
+            }
+
+            if(moveTailEnd) {
+                target.set("x2", constrainedPoint.x);
+                target.set("y2", constrainedPoint.y);
+                target.set('x1', constrainedPoint.x + xdiff);
+                target.set('y1', constrainedPoint.y + ydiff);
+            } else {
+                target.set("x1", constrainedPoint.x);
+                target.set("y1", constrainedPoint.y);
+                target.set('x2', constrainedPoint.x + xdiff);
+                target.set('y2', constrainedPoint.y + ydiff);
+            }
+        } else {
+            // Get the constraint point
+            var constraintPosition = target.translateToOriginPoint(target.getCenterPoint(), t.originX, t.originY),
+                localMouse = target.toLocalPoint(new fabric.Point(x, y), t.originX, t.originY);
+
+            this._setLocalMouse(localMouse, t);
+
+            //STILE HACKS: Save these positions
+            var originalOriginX = t.originX;
+            var originalOriginY = t.originY;
+
+            // Actually scale the object
+            this._setObjectScale(localMouse, t, lockScalingX, lockScalingY, by, lockScalingFlip);
+
+            //STILE HACKS: If we are flipping into another quadrant,
+            //_flipObject will have been called to modify the origin of the transform.
+            //If this is the case, slightly adjust the constraint position to avoid
+            //janking the object as you move it.
+            //TODO: How can we get this merged upstream?
+            if (target.stileScalingSupressed) {
+                var targetAngle = fabric.util.degreesToRadians(target.angle);
+                if (t.originX === 'right' && originalOriginX === 'left') {
+                    constraintPosition.x += (target.strokeWidth) * Math.cos(targetAngle);
+                    constraintPosition.y += (target.strokeWidth) * Math.sin(targetAngle);
+                } else if (t.originX === 'left' && originalOriginX === 'right') {
+                    constraintPosition.x -= (target.strokeWidth) * Math.cos(targetAngle);
+                    constraintPosition.y -= (target.strokeWidth) * Math.sin(targetAngle);
+                }
+                if (t.originY === 'bottom' && originalOriginY === 'top') {
+                    constraintPosition.x += (target.strokeWidth) * Math.cos(Math.PI/2 + targetAngle);
+                    constraintPosition.y += (target.strokeWidth) * Math.sin(Math.PI/2 + targetAngle);
+                } else if (t.originY === 'top' && originalOriginY === 'bottom') {
+                    constraintPosition.x -= (target.strokeWidth) * Math.cos(Math.PI/2 + targetAngle);
+                    constraintPosition.y -= (target.strokeWidth) * Math.sin(Math.PI/2 + targetAngle);
+                }
+            }
+
+            // Make sure the constraints apply
+            target.setPositionByOrigin(constraintPosition, t.originX, t.originY);
+        }
     },
 
     /**
