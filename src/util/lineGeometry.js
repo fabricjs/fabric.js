@@ -67,21 +67,22 @@
         //round to 45 degree increments
         var roundedAngle = (Math.round((lineAngle*4) / Math.PI)/4)*180;
 
-        var distance = (Math.abs(xdiff) + Math.abs(ydiff))/2;
+        //keep hypontenuse the same length even after changing angle
+        var distance = Math.sqrt((xdiff) * (xdiff) + (ydiff) * (ydiff));
 
-        area.width = distance;
-        area.height = distance;
+        area.width = distance * 1 / (Math.sqrt(2));
+        area.height = distance * 1 / (Math.sqrt(2));
 
         //handle vertical cases
         if(Math.abs(roundedAngle) === 90) {
             area.width = 0;
-            area.height = distance*2;
+            area.height = distance;
         }
 
         //handle horizontal cases
         if(Math.abs(roundedAngle) === 180 || roundedAngle === 0) {
             area.height = 0;
-            area.width = distance*2;
+            area.width = distance;
         }
 
         if(xdiff < 0) {

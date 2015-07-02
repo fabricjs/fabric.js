@@ -543,6 +543,7 @@
                 ydiff = area.height;
             }
 
+            //setting these directly will also reset the angle of the line
             if(moveTailEnd) {
                 target.set("x2", constrainedPoint.x);
                 target.set("y2", constrainedPoint.y);
