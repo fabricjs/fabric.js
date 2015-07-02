@@ -67,7 +67,7 @@
         //round to 45 degree increments
         var roundedAngle = (Math.round((lineAngle*4) / Math.PI)/4)*180;
 
-        //keep hypontenuse the same length event after changing angle
+        //keep hypontenuse the same length even after changing angle
         var distance = Math.sqrt((xdiff) * (xdiff) + (ydiff) * (ydiff));
 
         area.width = distance * 1 / (Math.sqrt(2));
