@@ -502,12 +502,12 @@
     /**
      * @private
      */
-    _removeCharsFromTo: function(start, end) {
+    _removeCharsFromTo: function(start, end, noTextareaUpdate) {
       while (end !== start) {
         this._removeSingleCharAndStyle(start + 1);
         end--;
       }
-      this.setSelectionStart(start);
+      this.setSelectionStart(start, noTextareaUpdate);
     },
 
     _removeSingleCharAndStyle: function(index) {
@@ -523,18 +523,30 @@
     /**
      * Inserts a character where cursor is (replacing selection if one exists)
      * @param {String} _chars Characters to insert
+     * @param {Boolean} useCopiedStyle Use copied style or not
+     * @param {Boolean} noTextareaUpdate True if no need to update textarea
+     * @param {Object} range Range discriptor {start: {Number}, end: {Number}}
      */
-    insertChars: function(_chars, useCopiedStyle) {
-      if (this.selectionEnd - this.selectionStart > 1) {
-        this._removeCharsFromTo(this.selectionStart, this.selectionEnd);
-        this.setSelectionEnd(this.selectionStart);
+    insertChars: function(_chars, useCopiedStyle, noTextareaUpdate, range) {
+      var rangeStart,
+          rangeEnd;
+      //use range instead of selection if given
+      rangeStart = range ? range.start : this.selectionStart;
+      rangeEnd = range ? range.end : this.selectionEnd;
+
+      if (rangeStart - rangeEnd > 1) {
+        this._removeCharsFromTo(rangeStart, rangeEnd, noTextareaUpdate);
       }
-      var isEndOfLine = this.text[this.selectionStart] === '\n';
-      this.text = this.text.slice(0, this.selectionStart) +
-                  _chars + this.text.slice(this.selectionEnd);
+      var isEndOfLine = this.text[rangeStart] === '\n';
+      this.text = this.text.slice(0, rangeStart) +
+                  _chars + this.text.slice(rangeEnd);
       this.insertStyleObjects(_chars, isEndOfLine, useCopiedStyle);
-      this.setSelectionStart(this.selectionStart + _chars.length);
-      this.setSelectionEnd(this.selectionStart);
+
+      //when using range, no need to touch selection
+      if (!range) {
+        this.setSelectionEnd(rangeStart + _chars.length, noTextareaUpdate);
+        this.setSelectionStart(rangeStart + _chars.length, noTextareaUpdate);
+      }
 
       this.canvas && this.canvas.renderAll();
 

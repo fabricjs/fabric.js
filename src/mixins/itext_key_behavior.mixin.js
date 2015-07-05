@@ -8,11 +8,11 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
     this.hiddenTextarea.setAttribute('autocapitalize', 'off');
     this.hiddenTextarea.style.cssText = 'position: fixed; bottom: 20px; left: 0px; opacity: 0;'
-                                        + ' width: 0px; height: 0px; z-index: -999;';
+                                        + ' width: 0; height: 0; z-index: -999;';
     fabric.document.body.appendChild(this.hiddenTextarea);
 
     fabric.util.addListener(this.hiddenTextarea, 'keydown', this.onKeyDown.bind(this));
-    fabric.util.addListener(this.hiddenTextarea, 'keypress', this.onKeyPress.bind(this));
+    fabric.util.addListener(this.hiddenTextarea, 'input', this.onInput.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'copy', this.copy.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'paste', this.paste.bind(this));
 
@@ -127,6 +127,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (copiedText) {
       this.insertChars(copiedText, true);
     }
+    e.stopImmediatePropagation();
+    e.preventDefault();
   },
 
   /**
@@ -152,17 +154,45 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   },
 
   /**
-   * Handles keypress event
-   * @param {Event} e Event object
+   * Handles input event
    */
-  onKeyPress: function(e) {
-    if (!this.isEditing || e.metaKey || e.ctrlKey) {
-      return;
+  onInput: function() {
+    var newVal = this.hiddenTextarea.value,
+        oldVal = this.text,
+        oLen = oldVal.length,
+        nLen = newVal.length,
+        selectionStart = this.hiddenTextarea.selectionStart,
+        head,
+        tail,
+        i;
+
+    //scan the whole contents from both begin and end to
+    //extract the changes
+
+    //find 'start', which indicates the **length** of the changed part before
+    //the changes
+    for (i = 0; i < selectionStart - 1; i++) {
+      if (newVal[i] !== oldVal[i]) {
+        break;
+      }
     }
-    if (e.which !== 0) {
-      this.insertChars(String.fromCharCode(e.which));
+    head = i;
+
+    //find 'tail', which indicates the **length** of the changed part after
+    //the changes
+    for (i = 1; i <= Math.min(nLen - head, oLen - head); i++) {
+      if (newVal[nLen - i] !== oldVal[oLen - i]) {
+        break;
+      }
     }
-    e.stopPropagation();
+    tail = i - 1;
+
+    this.insertChars(newVal.slice(head, nLen - tail), false, true, {
+      start: head,
+      end: oLen - tail
+    });
+    this.setSelectionStart(this.hiddenTextarea.selectionStart, true);
+    this.setSelectionEnd(this.hiddenTextarea.selectionEnd, true);
   },
 
   /**
