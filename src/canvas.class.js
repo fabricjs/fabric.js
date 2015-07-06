@@ -615,13 +615,22 @@
           lastDistX = (target.width + strokeWidthX / 2) * transform.original.scaleX,
           lastDistY = (target.height + strokeWidthY / 2) * transform.original.scaleY;
 
-      transform.newScaleX = transform.original.scaleX * localMouse.x / lastDistX;
-      transform.newScaleY = transform.original.scaleY * localMouse.y / lastDistY;
+      transform.newScaleX = epsilonClampDiv(transform.original.scaleX * localMouse.x, lastDistX);
+      transform.newScaleY = epsilonClampDiv(transform.original.scaleY * localMouse.y, lastDistY);
 
       // If what we're scaling should antiscale stroke, update the amount by which stroke needs
       // to be de-scaled on render
-      transform.strokeScaledX = transform.original.strokeScaledX * localMouse.x / lastDistX;
-      transform.strokeScaledY = transform.original.strokeScaledY * localMouse.y / lastDistY;
+      transform.strokeScaledX = epsilonClampDiv(transform.original.strokeScaledX * localMouse.x, lastDistX);
+      transform.strokeScaledY = epsilonClampDiv(transform.original.strokeScaledY * localMouse.y, lastDistY);
+
+      //guard against sizes that will blow up descaler and ruin ratio between strokeScaled and newScale.
+      //This means that the minimum size is the stroke width and we have janking around the centre when
+      //the cursor goes over the active object (and it stops reporting coords apparently)
+      //Otherwise, we will need to consider some way not to set transform.original.strokeScaledX to 0
+      // since that makes it impossible to scale the object again.
+      if(target.shouldDescaleStroke && (!transform.strokeScaledX || !transform.strokeScaledY)) {
+        return;
+      }
 
       if (lockScalingFlip && transform.newScaleX <= 0 && transform.newScaleX < target.scaleX) {
         forbidScalingX = true;
