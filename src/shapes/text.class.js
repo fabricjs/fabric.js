@@ -1054,9 +1054,9 @@
       textContent = element.textContent;
     }
 
-    textContent = element.textContent.replace(/^\s+|\s+$|\n+/g, '').replace(/\s+/g, ' ');
+    textContent = textContent.replace(/^\s+|\s+$|\n+/g, '').replace(/\s+/g, ' ');
     
-    var text = new fabric.Text(textContent, options);
+    var text = new fabric.Text(textContent, options),
         /*
           Adjust positioning:
             x/y attributes in SVG correspond to the bottom-left corner of text bounding box
