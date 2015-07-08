@@ -1,5 +1,7 @@
 ### Fabric
 
+Stile is released from the branch [stile_release_cut](https://github.com/StileEducation/fabric.js/tree/stile_release_cut) not master.
+
 <!-- chat, support -->
 
 [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/kangax/fabric.js?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
