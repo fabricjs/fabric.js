@@ -328,6 +328,15 @@
       return (
         !target
         ||
+        //clear if the object is locked and not being
+        //added or removed directly
+        ( target && target.get('stileLocked') && !e.shiftKey)
+        ||
+        //clear if the object is the active object and the shift key is used
+        ( target && target === activeObject && e.shiftKey)
+        ||
+        //clear if the target is not in the group
+        // and the shift key is not being used
         (target &&
           activeGroup &&
           activeGroup !== target &&

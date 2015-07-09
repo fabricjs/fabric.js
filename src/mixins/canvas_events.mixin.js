@@ -421,6 +421,7 @@
         this._clearSelection(e, target, pointer);
       }
       else if (shouldGroup) {
+      //if the object is being added to a group selection
         this._handleGrouping(e, target);
         target = this.getActiveGroup();
       }
@@ -430,8 +431,15 @@
         this._setupCurrentTransform(e, target);
         // activate object after transform setup to make sure that corners detection is valid
         if (target !== this.getActiveGroup() && target !== this.getActiveObject()) {
-          this.deactivateAll();
-          this.setActiveObject(target, e);
+          //select locked objects on mouse up
+          if(target.get("stileLocked") && !target.get('active') &&
+            //but not if we are removing them from the selection with a shift click
+            !e.shiftKey) {
+            this._groupSelector.initialTarget = target;
+          } else {
+            this.deactivateAll();
+            this.setActiveObject(target, e);
+          }
         }
       }
       // we must renderAll so that active image is placed on the top canvas
@@ -457,9 +465,14 @@
      * @private
      */
     _clearSelection: function(e, target, pointer) {
+      var currentActiveObject = this.getActiveObject();
       this.deactivateAllWithDispatch(e);
 
-      if (target && target.selectable) {
+
+      if (target && target.selectable && !target.get("stileLocked")
+        //don't reactivate an object that was deactivated for some reason
+        //(e.g., shift clicked )
+        && currentActiveObject != target) {
         this.setActiveObject(target, e);
       }
       else if (this.selection) {

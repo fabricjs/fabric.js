@@ -47,33 +47,102 @@
       }
     },
 
-    _maybeAddToGroup: function() {
-      return true;
-    },
     /**
      * @private
      */
     _updateActiveGroup: function(target, e) {
-      var activeGroup = this.getActiveGroup();
+        var activeGroup = this.getActiveGroup();
 
-      if (activeGroup.contains(target)) {
+        var isOnlyLocked = this._activeGroupContainsOnlyLockedObjects();
+        var targetIsLocked = target.get('stileLocked');
+
+        if (activeGroup.contains(target)) {
+            this._removeObjectFromActiveGroup(target, e);
+        }
+        else {
+            //adding to the group
+
+            //unless it's stileSimulatedActive in which case just
+            //toggle the simulatedActive  property
+            if(target.get('stileSimulatedActive')) {
+                target.set('stileSimulatedActive', false);
+                target.set('active', false);
+                //adding to the group
+            } else if (targetIsLocked && isOnlyLocked) {
+                activeGroup.addWithUpdate(target);
+
+            } else if(targetIsLocked && !isOnlyLocked) {
+                //make it fake selected
+                target.set('stileSimulatedActive', true);
+                target.set('active', true);
+
+            } else if(!targetIsLocked) {
+
+                //if we are adding an unlocked object to a bunch of locked objects,
+                //remove the locked objects from the selection.
+                if(isOnlyLocked) {
+                    // Fabric provides a convenient "fast" forEachObject that doesn't
+                    // make copies of references in the group so it's not safe to use here.
+                    _.each(activeGroup.getObjects().concat(), function(groupedObject) {
+                        if(groupedObject.get('stileLocked')) {
+                            groupedObject.set('stileSimulatedActive', true);
+                            activeGroup.removeWithUpdate(groupedObject);
+                            groupedObject.set('active', true);
+                        }
+                    });
+
+                    this._discardActiveGroup();
+                    // activate last remaining object
+                    this.setActiveObject(target);
+                } else {
+                    activeGroup.addWithUpdate(target);
+                }
+            }
+        }
+
+        this.fire('selection:created', { target: activeGroup, e: e });
+        activeGroup.set('active', true);
+
+    },
+    //remove objectt from the active group, with checks to
+    //ensure that the group is destroyed when appropriate
+    _removeObjectFromActiveGroup: function(target, e) {
+        var activeGroup = this.getActiveGroup();
+        target.set('stileSimulatedActive', false);
+        target.set('active', false);
+        if(!activeGroup) {
+            return;
+        }
 
         activeGroup.removeWithUpdate(target);
-        target.set('active', false);
-
+        //TODO check if that was the last real thing in the selection,
+        //make the simulated active objects really the active group 
+        //(so they can be unlocked)
         if (activeGroup.size() === 1) {
-          // remove group alltogether if after removal it only contains 1 object
-          this.discardActiveGroup(e);
-          // activate last remaining object
-          this.setActiveObject(activeGroup.item(0));
-          return;
+            // remove group alltogether if after removal it only contains 1 object
+            this.discardActiveGroup(e);
+            // activate last remaining object
+            this.setActiveObject(activeGroup.item(0));
+            return;
         }
-      }
-      else if (this._maybeAddToGroup(target)) {
-        activeGroup.addWithUpdate(target);
-      }
-      this.fire('selection:created', { target: activeGroup, e: e });
-      activeGroup.set('active', true);
+
+    },
+
+    _activeGroupContainsOnlyLockedObjects: function() {
+        var activeGroup = this.getActiveGroup();
+
+        var groupObjects = activeGroup.getObjects().concat();
+
+         //also skip over stileZlockedObjects
+        var unlockedObjects = _.find(groupObjects, function(object) {
+            return !object.get('stileLocked') && !object.get('stileZLocked');
+        });
+        var lockedObjects = _.find(groupObjects, function(object) {
+            return object.get('stileLocked') && !object.get('stileZLocked');
+        });
+
+        var onlyLocked = _.first(lockedObjects) && !_.first(unlockedObjects);
+        return onlyLocked;
     },
 
     /**
