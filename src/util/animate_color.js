@@ -36,8 +36,8 @@
       endValue: endColor,
       byValue: endColor,
       easing: function (currentTime, startValue, byValue, duration) {
-        var posValue = options['colorEasing']
-              ? options['colorEasing'](currentTime, duration)
+        var posValue = options.colorEasing
+              ? options.colorEasing(currentTime, duration)
               : 1 - Math.cos(currentTime / duration * (Math.PI / 2));
         return calculateColor(startValue, byValue, posValue);
       }
