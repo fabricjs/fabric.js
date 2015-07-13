@@ -201,6 +201,8 @@
       this._createUpperCanvas();
       this._initEventListeners();
 
+      this._initRetinaScaling();
+
       this.freeDrawingBrush = fabric.PencilBrush && new fabric.PencilBrush(this);
 
       this.calcOffset();

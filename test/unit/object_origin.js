@@ -235,8 +235,7 @@
 
   test('adjustPosition', function(){
     var rect = new fabric.Rect(rectOptions),
-        p,
-        point = new fabric.Point(15, 20);
+        p;
 
     rect.originX = 'left';
     rect.originY = 'top';
@@ -292,8 +291,8 @@
 
   test('adjustPositionRotated', function(){
     var rect = new fabric.Rect(rectOptions),
-        p,
-        point = new fabric.Point(15, 20);
+        p;
+        
     rect.angle = 35;
 
     rect.originX = 'left';
