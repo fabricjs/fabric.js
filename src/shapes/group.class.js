@@ -123,12 +123,9 @@
           center = this.getCenterPoint();
 
       object.set({
-        originalLeft: objectLeft,
-        originalTop: objectTop,
         left: objectLeft - center.x,
         top: objectTop - center.y
       });
-      object.setCoords();
     },
 
     /**
@@ -383,7 +380,6 @@
       object.hasControls = object.__origHasControls;
       delete object.__origHasControls;
       object.set('active', false);
-      object.setCoords();
       delete object.group;
 
       return this;
@@ -475,7 +471,7 @@
 
       for ( ; i < iLen; ++i) {
         o = this._objects[i];
-        o.setCoords();
+        o.oCoords || o.setCoords();
         for (j = 0; j < jLen; j++) {
           prop = props[j];
           aX.push(o.oCoords[prop].x);
