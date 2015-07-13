@@ -276,7 +276,7 @@
      */
     getNumNewLinesInSelectedText: function() {
       var selectedText = this.getSelectedText(),
-          numNewLines = 0;
+          numNewLines  = 0;
 
       for (var i = 0, len = selectedText.length; i < len; i++) {
         if (selectedText[i] === '\n') {
@@ -293,8 +293,8 @@
      * @return {Number} Index of the beginning or end of a word
      */
     searchWordBoundary: function(selectionStart, direction) {
-      var index = this._reSpace.test(this.text.charAt(selectionStart)) ? selectionStart - 1 : selectionStart,
-          _char = this.text.charAt(index),
+      var index     = this._reSpace.test(this.text.charAt(selectionStart)) ? selectionStart - 1 : selectionStart,
+          _char     = this.text.charAt(index),
           reNonWord = /[ \n\.,;!\?\-]/;
 
       while (!reNonWord.test(_char) && index > 0 && index < this.text.length) {
@@ -313,7 +313,8 @@
      */
     selectWord: function(selectionStart) {
       var newSelectionStart = this.searchWordBoundary(selectionStart, -1), /* search backwards */
-          newSelectionEnd = this.searchWordBoundary(selectionStart, 1); /* search forward */
+          newSelectionEnd   = this.searchWordBoundary(selectionStart, 1);
+      /* search forward */
 
       this.setSelectionStart(newSelectionStart);
       this.setSelectionEnd(newSelectionEnd);
@@ -325,7 +326,7 @@
      */
     selectLine: function(selectionStart) {
       var newSelectionStart = this.findLineBoundaryLeft(selectionStart),
-          newSelectionEnd = this.findLineBoundaryRight(selectionStart);
+          newSelectionEnd   = this.findLineBoundaryRight(selectionStart);
 
       this.setSelectionStart(newSelectionStart);
       this.setSelectionEnd(newSelectionEnd);
@@ -382,7 +383,7 @@
      */
     initMouseMoveHandler: function() {
       var _this = this;
-      this.canvas.on('mouse:move',  function(options) {
+      this.canvas.on('mouse:move', function(options) {
         if (!_this.__isMousedown || !_this.isEditing) {
           return;
         }
@@ -512,12 +513,12 @@
 
     _removeSingleCharAndStyle: function(index) {
       var isBeginningOfLine = this.text[index - 1] === '\n',
-          indexStyle = isBeginningOfLine ? index : index - 1;
+          indexStyle        = isBeginningOfLine ? index : index - 1;
       this.removeStyleObject(isBeginningOfLine, indexStyle);
       this.text = this.text.slice(0, index - 1) +
-                  this.text.slice(index);
+        this.text.slice(index);
 
-      this._textLines = this.text.split(this._reNewline);
+      this._textLines = this._splitTextIntoLines();
     },
 
     /**
@@ -531,7 +532,7 @@
       }
       var isEndOfLine = this.text[this.selectionStart] === '\n';
       this.text = this.text.slice(0, this.selectionStart) +
-                  _chars + this.text.slice(this.selectionEnd);
+        _chars + this.text.slice(this.selectionEnd);
       this.insertStyleObjects(_chars, isEndOfLine, useCopiedStyle);
       this.setSelectionStart(this.selectionStart + _chars.length);
       this.setSelectionEnd(this.selectionStart);
@@ -554,11 +555,11 @@
       this.shiftLineStyles(lineIndex, +1);
 
       if (!this.styles[lineIndex + 1]) {
-        this.styles[lineIndex + 1] = { };
+        this.styles[lineIndex + 1] = {};
       }
 
-      var currentCharStyle = { },
-          newLineStyles = { };
+      var currentCharStyle = {},
+          newLineStyles    = {};
 
       if (this.styles[lineIndex] && this.styles[lineIndex][charIndex - 1]) {
         currentCharStyle = this.styles[lineIndex][charIndex - 1];
@@ -593,7 +594,7 @@
      */
     insertCharStyleObject: function(lineIndex, charIndex, style) {
 
-      var currentLineStyles = this.styles[lineIndex],
+      var currentLineStyles       = this.styles[lineIndex],
           currentLineStylesCloned = clone(currentLineStyles);
 
       if (charIndex === 0 && !style) {
@@ -604,9 +605,14 @@
       // 0,1,2,3 -> (charIndex=2) -> 0,1,3,4 -> (insert 2) -> 0,1,2,3,4
       for (var index in currentLineStylesCloned) {
         var numericIndex = parseInt(index, 10);
+
         if (numericIndex >= charIndex) {
           currentLineStyles[numericIndex + 1] = currentLineStylesCloned[numericIndex];
-          //delete currentLineStyles[index];
+
+          // only delete the style if there was nothing moved there
+          if (!currentLineStylesCloned[numericIndex - 1]) {
+            delete currentLineStyles[numericIndex];
+          }
         }
       }
 
@@ -625,11 +631,11 @@
       // removed shortcircuit over isEmptyStyles
 
       var cursorLocation = this.get2DCursorLocation(),
-          lineIndex = cursorLocation.lineIndex,
-          charIndex = cursorLocation.charIndex;
+          lineIndex      = cursorLocation.lineIndex,
+          charIndex      = cursorLocation.charIndex;
 
-      if (!this.styles[lineIndex]) {
-        this.styles[lineIndex] = { };
+      if (!this._getLineStyle(lineIndex)) {
+        this._setLineStyle(lineIndex, {});
       }
 
       if (_chars === '\n') {
@@ -653,8 +659,8 @@
       for (var i = 0, len = styles.length; i < len; i++) {
 
         var cursorLocation = this.get2DCursorLocation(this.selectionStart + i),
-            lineIndex = cursorLocation.lineIndex,
-            charIndex = cursorLocation.charIndex;
+            lineIndex      = cursorLocation.lineIndex,
+            charIndex      = cursorLocation.charIndex;
 
         this.insertCharStyleObject(lineIndex, charIndex, styles[i]);
       }
@@ -688,18 +694,18 @@
     removeStyleObject: function(isBeginningOfLine, index) {
 
       var cursorLocation = this.get2DCursorLocation(index),
-          lineIndex = cursorLocation.lineIndex,
-          charIndex = cursorLocation.charIndex;
+          lineIndex      = cursorLocation.lineIndex,
+          charIndex      = cursorLocation.charIndex;
 
       if (isBeginningOfLine) {
 
-        var textOnPreviousLine = this._textLines[lineIndex - 1],
+        var textOnPreviousLine     = this._textLines[lineIndex - 1],
             newCharIndexOnPrevLine = textOnPreviousLine
               ? textOnPreviousLine.length
               : 0;
 
         if (!this.styles[lineIndex - 1]) {
-          this.styles[lineIndex - 1] = { };
+          this.styles[lineIndex - 1] = {};
         }
 
         for (charIndex in this.styles[lineIndex]) {
