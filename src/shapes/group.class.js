@@ -471,7 +471,7 @@
 
       for ( ; i < iLen; ++i) {
         o = this._objects[i];
-        o.oCoords || o.setCoords();
+        o.setCoords();
         for (j = 0; j < jLen; j++) {
           prop = props[j];
           aX.push(o.oCoords[prop].x);
