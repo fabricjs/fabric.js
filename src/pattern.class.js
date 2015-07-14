@@ -85,6 +85,10 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
     else if (typeof this.source.src === 'string') {
       source = this.source.src;
     }
+    // <canvas> element
+    else if (typeof this.source === 'object' && this.source.toDataURL) {
+      source = this.source.toDataURL();
+    }
 
     return {
       source: source,
