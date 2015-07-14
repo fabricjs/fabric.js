@@ -461,7 +461,7 @@
     }, reviver);
   });
 
-  asyncTest('loadFromJSON with no objects', function() {
+  test('loadFromJSON with no objects', function() {
     var c1 = new fabric.Canvas('c1', { backgroundColor: 'green', overlayColor: 'yellow' }),
         c2 = new fabric.Canvas('c2', { backgroundColor: 'red', overlayColor: 'orange' });
 
@@ -473,11 +473,11 @@
       ok(fired, 'Callback should be fired even if no objects');
       equal(c2.backgroundColor, 'green', 'Color should be set properly');
       equal(c2.overlayColor, 'yellow', 'Color should be set properly');
-      start();
+      
     });
   });
 
-  asyncTest('loadFromJSON without "objects" property', function() {
+  test('loadFromJSON without "objects" property', function() {
     var c1 = new fabric.Canvas('c1', { backgroundColor: 'green', overlayColor: 'yellow' }),
         c2 = new fabric.Canvas('c2', { backgroundColor: 'red', overlayColor: 'orange' });
 
@@ -492,11 +492,11 @@
       ok(fired, 'Callback should be fired even if no "objects" property exists');
       equal(c2.backgroundColor, 'green', 'Color should be set properly');
       equal(c2.overlayColor, 'yellow', 'Color should be set properly');
-      start();
+      
     });
   });
 
-  asyncTest('loadFromJSON with empty fabric.Group', function() {
+  test('loadFromJSON with empty fabric.Group', function() {
     var c1 = new fabric.Canvas('c1'),
         c2 = new fabric.Canvas('c2'),
         group = new fabric.Group();
@@ -510,7 +510,6 @@
       fired = true;
 
       ok(fired, 'Callback should be fired even if empty fabric.Group exists');
-      start();
     });
   });
 
