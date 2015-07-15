@@ -522,23 +522,44 @@
     },
 
     /**
-     * Inserts a character where cursor is (replacing selection if one exists)
+     * Inserts characters where cursor is (replacing selection if one exists)
      * @param {String} _chars Characters to insert
+     * @param {Boolean} useCopiedStyle use fabric.copiedTextStyle
      */
     insertChars: function(_chars, useCopiedStyle) {
+      var style;
+
       if (this.selectionEnd - this.selectionStart > 1) {
         this._removeCharsFromTo(this.selectionStart, this.selectionEnd);
         this.setSelectionEnd(this.selectionStart);
       }
+
+      for (var i = 0, len = _chars.length; i < len; i++) {
+        if (useCopiedStyle) {
+          style = fabric.copiedTextStyle[i];
+        }
+        this.insertChar(_chars[i], i < len - 1, style);
+      }
+    },
+
+    /**
+     * Inserts a character where cursor is
+     * @param {String} _char Characters to insert
+     * @param {Boolean} skipUpdate trigger rendering and updates at the end of text insert
+     * @param {Object} styleObject Style to be inserted for the new char
+     */
+    insertChar: function(_char, skipUpdate, styleObject) {
       var isEndOfLine = this.text[this.selectionStart] === '\n';
       this.text = this.text.slice(0, this.selectionStart) +
-        _chars + this.text.slice(this.selectionEnd);
-      this.insertStyleObjects(_chars, isEndOfLine, useCopiedStyle);
-      this.setSelectionStart(this.selectionStart + _chars.length);
+        _char + this.text.slice(this.selectionEnd);
+      this._textLines = this._splitTextIntoLines();
+      this.insertStyleObjects(_char, isEndOfLine, styleObject);
+      this.setSelectionStart(this.selectionStart + 1);
       this.setSelectionEnd(this.selectionStart);
-
+      if (skipUpdate) {
+        return;
+      }
       this.canvas && this.canvas.renderAll();
-
       this.setCoords();
       this.fire('changed');
       this.canvas && this.canvas.fire('text:changed', { target: this });
@@ -625,9 +646,9 @@
      * Inserts style object(s)
      * @param {String} _chars Characters at the location where style is inserted
      * @param {Boolean} isEndOfLine True if it's end of line
-     * @param {Boolean} [useCopiedStyle] Style to insert
+     * @param {Object} [styleObject] Style to insert
      */
-    insertStyleObjects: function(_chars, isEndOfLine, useCopiedStyle) {
+    insertStyleObjects: function(_chars, isEndOfLine, styleObject) {
       // removed shortcircuit over isEmptyStyles
 
       var cursorLocation = this.get2DCursorLocation(),
@@ -642,27 +663,7 @@
         this.insertNewlineStyleObject(lineIndex, charIndex, isEndOfLine);
       }
       else {
-        if (useCopiedStyle) {
-          this._insertStyles(this.copiedStyles);
-        }
-        else {
-          // TODO: support multiple style insertion if _chars.length > 1
-          this.insertCharStyleObject(lineIndex, charIndex);
-        }
-      }
-    },
-
-    /**
-     * @private
-     */
-    _insertStyles: function(styles) {
-      for (var i = 0, len = styles.length; i < len; i++) {
-
-        var cursorLocation = this.get2DCursorLocation(this.selectionStart + i),
-            lineIndex      = cursorLocation.lineIndex,
-            charIndex      = cursorLocation.charIndex;
-
-        this.insertCharStyleObject(lineIndex, charIndex, styles[i]);
+        this.insertCharStyleObject(lineIndex, charIndex, styleObject);
       }
     },
 
