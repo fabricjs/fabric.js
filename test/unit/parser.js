@@ -96,7 +96,7 @@
     grandParent.setAttribute('width', '600');
   	grandParent.setAttribute('height', '600');
 
-    notDeepEqual(fabric.parseAttributes(element, 'x y width height'.split(' ')),
+    deepEqual(fabric.parseAttributes(element, 'x y width height'.split(' ')),
       { left: 100, top: 200, width: 600, height: 600 });
  });
 
