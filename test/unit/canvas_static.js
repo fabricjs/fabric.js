@@ -81,12 +81,8 @@
     'backgroundColor':          '',
     'clipTo':                   null,
     'filters':                  [],
-    'crossOrigin':              '',
     'fillRule':                 'nonzero',
-    'globalCompositeOperation': 'source-over',
-    'alignX':                   'none',
-    'alignY':                   'none',
-    'meetOrSlice':              'meet'
+    'globalCompositeOperation': 'source-over'
   };
 
   function _createImageElement() {
