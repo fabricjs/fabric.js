@@ -67,7 +67,7 @@
      */
     parseDimensionsFromPaths: function(options) {
       var points, p, xC = [ ], yC = [ ], path, height, width,
-          m = this.transformMatrix;
+          m;
       for (var j = this.paths.length; j--;) {
         path = this.paths[j];
         height = path.height + path.strokeWidth;
@@ -78,6 +78,7 @@
           { x: path.left, y: path.top + height },
           { x: path.left + width, y: path.top + height }
         ];
+        m = this.paths[j].transformMatrix;
         for (var i = 0; i < points.length; i++) {
           p = points[i];
           if (m) {
