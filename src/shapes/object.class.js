@@ -797,7 +797,8 @@
             clipTo:                   this.clipTo && String(this.clipTo),
             backgroundColor:          this.backgroundColor,
             fillRule:                 this.fillRule,
-            globalCompositeOperation: this.globalCompositeOperation
+            globalCompositeOperation: this.globalCompositeOperation,
+            transformMatrix:          this.transformMatrix
           };
 
       if (!this.includeDefaultValues) {
