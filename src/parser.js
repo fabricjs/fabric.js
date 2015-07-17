@@ -481,7 +481,7 @@
     if (toBeParsed) {
       return parsedDim;
     }
-    
+
     if (missingViewBox) {
       parsedDim.width = parseUnit(widthAttr);
       parsedDim.height = parseUnit(heightAttr);
@@ -502,7 +502,7 @@
     else {
       parsedDim.width = viewBoxWidth;
       parsedDim.height = viewBoxHeight;
-	  }
+    }
 
     // default is to preserve aspect ratio
     // preserveAspectRatio attribute to be implemented
