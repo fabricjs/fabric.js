@@ -243,16 +243,20 @@
   test('toSVG', function() {
     var text = new fabric.Text('x');
 
+    function removeTranslate(str) {
+      return str.replace(/translate\(.*?\)/, '');
+    }
+
     // temp workaround for text objects not obtaining width under node
     text.width = CHAR_WIDTH;
 
-    equal(text.toSVG(), TEXT_SVG);
+    equal(removeTranslate(text.toSVG()), removeTranslate(TEXT_SVG));
 
     text.setFontFamily('"Arial Black", Arial');
     // temp workaround for text objects not obtaining width under node
     text.width = CHAR_WIDTH;
 
-    equal(text.toSVG(), TEXT_SVG.replace('font-family="Times New Roman"', 'font-family="\'Arial Black\', Arial"'));
+    equal(removeTranslate(text.toSVG()), removeTranslate(TEXT_SVG.replace('font-family="Times New Roman"', 'font-family="\'Arial Black\', Arial"')));
   });
 
 })();

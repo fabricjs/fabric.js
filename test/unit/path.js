@@ -70,7 +70,7 @@
         error = err;
       }
 
-      ok(error, 'should throw error');
+      ok(typeof error === 'undefined', 'should not throw error on empty path');
       start();
     });
   });

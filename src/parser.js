@@ -15,6 +15,11 @@
       parseUnit = fabric.util.parseUnit,
       multiplyTransformMatrices = fabric.util.multiplyTransformMatrices,
 
+      reAllowedSVGTagNames = /^(path|circle|polygon|polyline|ellipse|rect|line|image|text)$/i,
+      reViewBoxTagNames = /^(symbol|image|marker|pattern|view|svg)$/i,
+      reNotAllowedAncestors = /^(?:pattern|defs|symbol|metadata)$/i,
+      reAllowedParents = /^(symbol|g|a|svg)$/i,
+
       attributesMap = {
         cx:                   'left',
         x:                    'left',
@@ -398,10 +403,23 @@
           y = el.getAttribute('y') || 0,
           el2 = elementById(doc, xlink).cloneNode(true),
           currentTrans = (el2.getAttribute('transform') || '') + ' translate(' + x + ', ' + y + ')',
-          parentNode, oldLength = nodelist.length;
+          parentNode, oldLength = nodelist.length, attr, j, attrs, l;
 
-      for (var j = 0, attrs = el.attributes, l = attrs.length; j < l; j++) {
-        var attr = attrs.item(j);
+      applyViewboxTransform(el2);
+      if (/^svg$/i.test(el2.nodeName)) {
+        var el3 = el2.ownerDocument.createElement('g');
+        for (j = 0, attrs = el2.attributes, l = attrs.length; j < l; j++) {
+          attr = attrs.item(j);
+          el3.setAttribute(attr.nodeName, attr.nodeValue);
+        }
+        while (el2.firstChild != null) {
+          el3.appendChild(el2.firstChild);
+        }
+        el2 = el3;
+      }
+
+      for (j = 0, attrs = el.attributes, l = attrs.length; j < l; j++) {
+        attr = attrs.item(j);
         if (attr.nodeName === 'x' || attr.nodeName === 'y' || attr.nodeName === 'xlink:href') {
           continue;
         }
@@ -440,38 +458,60 @@
   /**
    * Add a <g> element that envelop all child elements and makes the viewbox transformMatrix descend on all elements
    */
-  function addVBTransform(element, widthAttr, heightAttr) {
+  function applyViewboxTransform(element) {
 
     var viewBoxAttr = element.getAttribute('viewBox'),
         scaleX = 1,
         scaleY = 1,
         minX = 0,
         minY = 0,
-        viewBoxWidth, viewBoxHeight, matrix, el;
+        viewBoxWidth, viewBoxHeight, matrix, el,
+        widthAttr = element.getAttribute('width'),
+        heightAttr = element.getAttribute('height'),
+        missingViewBox = (!viewBoxAttr || !reViewBoxTagNames.test(element.tagName)
+                           || !(viewBoxAttr = viewBoxAttr.match(reViewBoxAttrValue))),
+        missingDimAttr = (!widthAttr || !heightAttr || widthAttr === '100%' || heightAttr === '100%'),
+        toBeParsed = missingViewBox && missingDimAttr,
+        parsedDim = { };
 
-    if (viewBoxAttr && (viewBoxAttr = viewBoxAttr.match(reViewBoxAttrValue))) {
-      minX = -parseFloat(viewBoxAttr[1]),
-      minY = -parseFloat(viewBoxAttr[2]),
-      viewBoxWidth = parseFloat(viewBoxAttr[3]),
-      viewBoxHeight = parseFloat(viewBoxAttr[4]);
+    parsedDim.width = 0;
+    parsedDim.height = 0;
+    parsedDim.toBeParsed = toBeParsed;
+
+    if (toBeParsed) {
+      return parsedDim;
+    }
+
+    if (missingViewBox) {
+      parsedDim.width = parseUnit(widthAttr);
+      parsedDim.height = parseUnit(heightAttr);
+      return parsedDim;
+    }
+
+    minX = -parseFloat(viewBoxAttr[1]),
+    minY = -parseFloat(viewBoxAttr[2]),
+    viewBoxWidth = parseFloat(viewBoxAttr[3]),
+    viewBoxHeight = parseFloat(viewBoxAttr[4]);
+
+    if (!missingDimAttr) {
+      parsedDim.width = parseUnit(widthAttr);
+      parsedDim.height = parseUnit(heightAttr);
+      scaleX = parsedDim.width / viewBoxWidth;
+      scaleY = parsedDim.height / viewBoxHeight;
     }
     else {
-      return;
-    }
-    if (widthAttr && widthAttr !== viewBoxWidth) {
-      scaleX = widthAttr / viewBoxWidth;
-    }
-    if (heightAttr && heightAttr !== viewBoxHeight) {
-      scaleY = heightAttr / viewBoxHeight;
+      parsedDim.width = viewBoxWidth;
+      parsedDim.height = viewBoxHeight;
     }
 
     // default is to preserve aspect ratio
     // preserveAspectRatio attribute to be implemented
     scaleY = scaleX = (scaleX > scaleY ? scaleY : scaleX);
 
-    if (!(scaleX !== 1 || scaleY !== 1 || minX !== 0 || minY !== 0)) {
-      return;
+    if (scaleX === 1 && scaleY === 1 && minX === 0 && minY === 0) {
+      return parsedDim;
     }
+
     matrix = ' matrix(' + scaleX +
                   ' 0' +
                   ' 0 ' +
@@ -492,6 +532,7 @@
     }
 
     el.setAttribute('transform', matrix);
+    return parsedDim;
   }
 
   /**
@@ -504,9 +545,6 @@
    * @param {Function} [reviver] Method for further parsing of SVG elements, called after each fabric object created.
    */
   fabric.parseSVGDocument = (function() {
-
-    var reAllowedSVGTagNames = /^(path|circle|polygon|polyline|ellipse|rect|line|image|text)$/,
-        reViewBoxTagNames = /^(symbol|image|marker|pattern|view)$/;
 
     function hasAncestorWithNodeName(element, nodeName) {
       while (element && (element = element.parentNode)) {
@@ -526,29 +564,10 @@
 
       var startTime = new Date(),
           svgUid =  fabric.Object.__uid++,
-          widthAttr, heightAttr, toBeParsed = false;
+          options = applyViewboxTransform(doc),
+          descendants = fabric.util.toArray(doc.getElementsByTagName('*'));
 
-      if (doc.getAttribute('width') && doc.getAttribute('width') !== '100%') {
-        widthAttr = parseUnit(doc.getAttribute('width'));
-      }
-      if (doc.getAttribute('height') && doc.getAttribute('height') !== '100%') {
-        heightAttr = parseUnit(doc.getAttribute('height'));
-      }
-
-      if (!widthAttr || !heightAttr) {
-        var viewBoxAttr = doc.getAttribute('viewBox');
-        if (viewBoxAttr && (viewBoxAttr = viewBoxAttr.match(reViewBoxAttrValue))) {
-          widthAttr = parseFloat(viewBoxAttr[3]),
-          heightAttr = parseFloat(viewBoxAttr[4]);
-        }
-        else {
-          toBeParsed = true;
-        }
-      }
-
-      addVBTransform(doc, widthAttr, heightAttr);
-
-      var descendants = fabric.util.toArray(doc.getElementsByTagName('*'));
+      options.svgUid = svgUid;
 
       if (descendants.length === 0 && fabric.isLikelyNode) {
         // we're likely in node, where "o3-xml" library fails to gEBTN("*")
@@ -562,22 +581,15 @@
       }
 
       var elements = descendants.filter(function(el) {
-        reViewBoxTagNames.test(el.tagName) && addVBTransform(el, 0, 0);
+        applyViewboxTransform(el);
         return reAllowedSVGTagNames.test(el.tagName) &&
-              !hasAncestorWithNodeName(el, /^(?:pattern|defs|symbol|metadata)$/); // http://www.w3.org/TR/SVG/struct.html#DefsElement
+              !hasAncestorWithNodeName(el, reNotAllowedAncestors); // http://www.w3.org/TR/SVG/struct.html#DefsElement
       });
 
       if (!elements || (elements && !elements.length)) {
         callback && callback([], {});
         return;
       }
-
-      var options = {
-        width: widthAttr,
-        height: heightAttr,
-        svgUid: svgUid,
-        toBeParsed: toBeParsed
-      };
 
       fabric.gradientDefs[svgUid] = fabric.getGradientDefs(doc);
       fabric.cssRules[svgUid] = fabric.getCSSRules(doc);
@@ -761,7 +773,7 @@
         svgUid = element.getAttribute('svgUid');
       }
       // if there's a parent container (`g` or `a` or `symbol` node), parse its attributes recursively upwards
-      if (element.parentNode && /^(symbol|g|a)$/i.test(element.parentNode.nodeName)) {
+      if (element.parentNode && reAllowedParents.test(element.parentNode.nodeName)) {
         parentAttributes = fabric.parseAttributes(element.parentNode, attributes, svgUid);
       }
       fontSize = (parentAttributes && parentAttributes.fontSize ) ||
