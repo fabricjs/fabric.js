@@ -27,6 +27,7 @@
     'clipTo':                   null,
     'fillRule':                 'nonzero',
     'globalCompositeOperation': 'source-over',
+    'transformMatrix':          null,
     'rx':                       0,
     'ry':                       0,
   };

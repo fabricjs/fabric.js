@@ -34,7 +34,8 @@
     'backgroundColor':          '',
     'clipTo':                   null,
     'fillRule':                 'nonzero',
-    'globalCompositeOperation': 'source-over'
+    'globalCompositeOperation': 'source-over',
+    'transformMatrix':          null
   };
 
   var REFERENCE_EMPTY_OBJECT = {
@@ -133,7 +134,8 @@
       'opacity': 0.34,
       'points': expectedPoints,
       'left': 10,
-      'top': 10
+      'top': 10,
+      'transformMatrix' : [ 2, 0, 0, 2, -10, -20 ]
     }));
 
     deepEqual(polylineWithAttrs.get('transformMatrix'), [ 2, 0, 0, 2, -10, -20 ]);

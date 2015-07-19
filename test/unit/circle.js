@@ -107,7 +107,8 @@
       'globalCompositeOperation': 'source-over',
       'radius':                   0,
       'startAngle':               0,
-      'endAngle':                 2 * Math.PI
+      'endAngle':                 2 * Math.PI,
+      'transformMatrix':          null
     };
     ok(typeof circle.toObject == 'function');
     deepEqual(circle.toObject(), defaultProperties);

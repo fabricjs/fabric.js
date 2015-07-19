@@ -27,6 +27,7 @@
     'backgroundColor':          '',
     'fillRule':                 'nonzero',
     'globalCompositeOperation': 'source-over',
+    'transformMatrix':          null,
     'paths':                    getPathObjects()
   };
 

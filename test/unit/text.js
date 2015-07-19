@@ -42,8 +42,9 @@
     'textDecoration':            '',
     'textAlign':                 'left',
     'textBackgroundColor':       '',
-    'fillRule':                 'nonzero',
-    'globalCompositeOperation': 'source-over'
+    'fillRule':                  'nonzero',
+    'globalCompositeOperation':  'source-over',
+    'transformMatrix':           null  
   };
 
   var TEXT_SVG = '\t<g transform="translate(10.5 26.72)">\n\t\t<text font-family="Times New Roman" font-size="40" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" ><tspan x="-10" y="8.98" fill="rgb(0,0,0)">x</tspan></text>\n\t</g>\n';
