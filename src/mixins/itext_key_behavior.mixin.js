@@ -12,7 +12,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     fabric.document.body.appendChild(this.hiddenTextarea);
 
     fabric.util.addListener(this.hiddenTextarea, 'keydown', this.onKeyDown.bind(this));
-    fabric.util.addListener(this.hiddenTextarea, 'keypress', this.onKeyPress.bind(this));
+    fabric.util.addListener(this.hiddenTextarea, 'input', this.onInput.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'copy', this.copy.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'paste', this.paste.bind(this));
 
@@ -77,6 +77,24 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   },
 
   /**
+   * Handles onInput event
+   * @param {Event} e Event object
+   */
+  onInput: function(e) {
+    if (!this.isEditing || this._cancelOnInput) {
+      this._cancelOnInput = false;
+      return;
+    }
+    var cp = this.selectionStart || 0,
+        textLength = this.text.length,
+        newTextLength = this.hiddenTextarea.value.length,
+        diff = newTextLength - textLength,
+        insChar = this.hiddenTextarea.value.slice(cp, cp + diff);
+    this.insertChars(insChar);
+    e.stopPropagation();
+  },
+
+  /**
    * Forward delete
    */
   forwardDelete: function(e) {
@@ -131,6 +149,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (copiedText) {
       this.insertChars(copiedText, useCopiedStyle);
     }
+    this._cancelOnInput = true;
   },
 
   /**
@@ -153,20 +172,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    */
   _getClipboardData: function(e) {
     return e && (e.clipboardData || fabric.window.clipboardData);
-  },
-
-  /**
-   * Handles keypress event
-   * @param {Event} e Event object
-   */
-  onKeyPress: function(e) {
-    if (!this.isEditing || e.metaKey || e.ctrlKey) {
-      return;
-    }
-    if (e.which !== 0) {
-      this.insertChars(String.fromCharCode(e.which));
-    }
-    e.stopPropagation();
   },
 
   /**
