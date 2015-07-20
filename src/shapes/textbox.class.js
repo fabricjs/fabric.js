@@ -110,8 +110,10 @@
     },
 
     /**
-     * Calculate a styleMap that lets us know where styles as, as _textLines is separated by \n and wraps,
-     * but the style object line indices is by \n.
+     * Generate an object that translates the style object so that it is
+     * broken up by visual lines (new lines and automatic wrapping).
+     * The original text styles object is broken up by actual lines (new lines only),
+     * which is only sufficient for Text / IText
      * @private
      */
     _generateStyleMap: function() {
