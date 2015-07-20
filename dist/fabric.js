@@ -11358,7 +11358,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
             clipTo:                   this.clipTo && String(this.clipTo),
             backgroundColor:          this.backgroundColor,
             fillRule:                 this.fillRule,
-            globalCompositeOperation: this.globalCompositeOperation
+            globalCompositeOperation: this.globalCompositeOperation,
+            transformMatrix:          this.transformMatrix
           };
 
       if (!this.includeDefaultValues) {
@@ -11390,6 +11391,13 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
       stateProperties.forEach(function(prop) {
         if (object[prop] === prototype[prop]) {
+          delete object[prop];
+        }
+        var isArray = Object.prototype.toString.call(object[prop]) === '[object Array]' &&
+                      Object.prototype.toString.call(prototype[prop]) === '[object Array]';
+
+        // basically a check for [] === []
+        if (isArray && object[prop].length === 0 && prototype[prop].length === 0) {
           delete object[prop];
         }
       });
@@ -17189,7 +17197,11 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       });
       var object = extend(this.callSuper('toObject', propertiesToInclude), {
         src: this._originalElement.src || this._originalElement._src,
-        filters: filters
+        filters: filters,
+        crossOrigin: this.crossOrigin,
+        alignX: this.alignX,
+        alignY: this.alignY,
+        meetOrSlice: this.meetOrSlice
       });
 
       if (this.resizeFilters.length > 0) {
@@ -23327,7 +23339,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
      */
     _setSVGTextLineText: function(lineIndex, textSpans, height, textLeftOffset, textTopOffset, textBgRects) {
       if (!this.styles[lineIndex]) {
-        this.callSuper('_setSVGTextLineText',
+        fabric.Text.prototype._setSVGTextLineText.call(this,
           lineIndex, textSpans, height, textLeftOffset, textTopOffset);
       }
       else {
@@ -23530,15 +23542,30 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         this._set('width', this.dynamicMinWidth);
       }
 
-      // calculate a styleMap that lets us know where styles as, as _textLines is separated by \n and wraps,
-      // but the style object line indices is by \n.
-      this._styleMap = this._generateStyleMap();
-
       // clear cache and re-calculate height
       this._clearCache();
       this.height = this._getTextHeight(ctx);
+      this._setLineWidths();
     },
 
+    /**
+     * set the __lineWidths cache array to support
+     * functions that expect it to be filled
+     * @private
+     */
+    _setLineWidths: function() {
+      for (var i = 0, len = this._textLines.length; i < len; i++) {
+        this.__lineWidths[i] = this.width;
+      }
+    },
+
+    /**
+     * Generate an object that translates the style object so that it is
+     * broken up by visual lines (new lines and automatic wrapping).
+     * The original text styles object is broken up by actual lines (new lines only),
+     * which is only sufficient for Text / IText
+     * @private
+     */
     _generateStyleMap: function() {
       var realLineCount     = 0,
           realLineCharCount = 0,
@@ -23767,6 +23794,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       var lines = this._wrapText(this.ctx, this.text);
 
       this.ctx.restore();
+      this._textLines = lines;
+      this._styleMap = this._generateStyleMap();
       return lines;
     },
 

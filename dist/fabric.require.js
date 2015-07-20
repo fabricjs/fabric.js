@@ -5481,7 +5481,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
                 clipTo: this.clipTo && String(this.clipTo),
                 backgroundColor: this.backgroundColor,
                 fillRule: this.fillRule,
-                globalCompositeOperation: this.globalCompositeOperation
+                globalCompositeOperation: this.globalCompositeOperation,
+                transformMatrix: this.transformMatrix
             };
             if (!this.includeDefaultValues) {
                 object = this._removeDefaultValues(object);
@@ -5496,6 +5497,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
             var prototype = fabric.util.getKlass(object.type).prototype, stateProperties = prototype.stateProperties;
             stateProperties.forEach(function(prop) {
                 if (object[prop] === prototype[prop]) {
+                    delete object[prop];
+                }
+                var isArray = Object.prototype.toString.call(object[prop]) === "[object Array]" && Object.prototype.toString.call(prototype[prop]) === "[object Array]";
+                if (isArray && object[prop].length === 0 && prototype[prop].length === 0) {
                     delete object[prop];
                 }
             });
@@ -8179,7 +8184,11 @@ fabric.util.object.extend(fabric.Object.prototype, {
             });
             var object = extend(this.callSuper("toObject", propertiesToInclude), {
                 src: this._originalElement.src || this._originalElement._src,
-                filters: filters
+                filters: filters,
+                crossOrigin: this.crossOrigin,
+                alignX: this.alignX,
+                alignY: this.alignY,
+                meetOrSlice: this.meetOrSlice
             });
             if (this.resizeFilters.length > 0) {
                 object.resizeFilters = this.resizeFilters.map(function(filterObj) {
@@ -11069,7 +11078,7 @@ fabric.util.object.extend(fabric.IText.prototype, {
     fabric.util.object.extend(fabric.IText.prototype, {
         _setSVGTextLineText: function(lineIndex, textSpans, height, textLeftOffset, textTopOffset, textBgRects) {
             if (!this.styles[lineIndex]) {
-                this.callSuper("_setSVGTextLineText", lineIndex, textSpans, height, textLeftOffset, textTopOffset);
+                fabric.Text.prototype._setSVGTextLineText.call(this, lineIndex, textSpans, height, textLeftOffset, textTopOffset);
             } else {
                 this._setSVGTextLineChars(lineIndex, textSpans, height, textLeftOffset, textBgRects);
             }
@@ -11148,9 +11157,14 @@ fabric.util.object.extend(fabric.IText.prototype, {
             if (this.dynamicMinWidth > this.width) {
                 this._set("width", this.dynamicMinWidth);
             }
-            this._styleMap = this._generateStyleMap();
             this._clearCache();
             this.height = this._getTextHeight(ctx);
+            this._setLineWidths();
+        },
+        _setLineWidths: function() {
+            for (var i = 0, len = this._textLines.length; i < len; i++) {
+                this.__lineWidths[i] = this.width;
+            }
         },
         _generateStyleMap: function() {
             var realLineCount = 0, realLineCharCount = 0, charCount = 0, map = {};
@@ -11265,6 +11279,8 @@ fabric.util.object.extend(fabric.IText.prototype, {
             this._setTextStyles(this.ctx);
             var lines = this._wrapText(this.ctx, this.text);
             this.ctx.restore();
+            this._textLines = lines;
+            this._styleMap = this._generateStyleMap();
             return lines;
         },
         setOnGroup: function(key, value) {
