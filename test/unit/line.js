@@ -30,7 +30,8 @@
     'clipTo':                   null,
     'backgroundColor':          '',
     'fillRule':                 'nonzero',
-    'globalCompositeOperation': 'source-over'
+    'globalCompositeOperation': 'source-over',
+    'transformMatrix':          null
   };
 
   QUnit.module('fabric.Line');

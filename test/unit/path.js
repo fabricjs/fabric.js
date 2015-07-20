@@ -28,7 +28,8 @@
     'backgroundColor':          '',
     'clipTo':                   null,
     'fillRule':                 'nonzero',
-    'globalCompositeOperation': 'source-over'
+    'globalCompositeOperation': 'source-over',
+    'transformMatrix':          null
   };
 
   function getPathElement(path) {

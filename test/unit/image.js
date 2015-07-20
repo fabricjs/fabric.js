@@ -43,6 +43,7 @@
     'filters':                  [],
     'fillRule':                 'nonzero',
     'globalCompositeOperation': 'source-over',
+    'transformMatrix':          null
   };
 
   function _createImageElement() {
