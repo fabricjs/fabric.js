@@ -190,6 +190,7 @@
       'opacity':                  1,
       'fillRule':                 'nonzero',
       'globalCompositeOperation': 'source-over',
+      'transformMatrix':          null,
       'objects':                  clone.objects
     };
 

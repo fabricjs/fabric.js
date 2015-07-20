@@ -42,8 +42,9 @@
     'textDecoration':            '',
     'textAlign':                 'left',
     'textBackgroundColor':       '',
-    'fillRule':                 'nonzero',
-    'globalCompositeOperation': 'source-over'
+    'fillRule':                  'nonzero',
+    'globalCompositeOperation':  'source-over',
+    'transformMatrix':           null  
   };
 
   var TEXT_SVG = '\t<g transform="translate(10.5 26.72)">\n\t\t<text font-family="Times New Roman" font-size="40" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" ><tspan x="-10" y="8.98" fill="rgb(0,0,0)">x</tspan></text>\n\t</g>\n';
@@ -243,16 +244,20 @@
   test('toSVG', function() {
     var text = new fabric.Text('x');
 
+    function removeTranslate(str) {
+      return str.replace(/translate\(.*?\)/, '');
+    }
+
     // temp workaround for text objects not obtaining width under node
     text.width = CHAR_WIDTH;
 
-    equal(text.toSVG(), TEXT_SVG);
+    equal(removeTranslate(text.toSVG()), removeTranslate(TEXT_SVG));
 
     text.setFontFamily('"Arial Black", Arial');
     // temp workaround for text objects not obtaining width under node
     text.width = CHAR_WIDTH;
 
-    equal(text.toSVG(), TEXT_SVG.replace('font-family="Times New Roman"', 'font-family="\'Arial Black\', Arial"'));
+    equal(removeTranslate(text.toSVG()), removeTranslate(TEXT_SVG.replace('font-family="Times New Roman"', 'font-family="\'Arial Black\', Arial"')));
   });
 
 })();

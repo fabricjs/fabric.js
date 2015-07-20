@@ -27,6 +27,7 @@
     'backgroundColor':          '',
     'fillRule':                 'nonzero',
     'globalCompositeOperation': 'source-over',
+    'transformMatrix':          null,
     'paths':                    getPathObjects()
   };
 
@@ -75,9 +76,10 @@
     });
   }
 
-  function getPathGroupObject(callback) {
+  function getPathGroupObject(callback, options) {
+    options = options || { };
     getPathObjects(function(objects) {
-      callback(new fabric.PathGroup(objects));
+      callback(new fabric.PathGroup(objects, options));
     });
   }
 
@@ -94,6 +96,28 @@
       equal(pathGroup.get('type'), 'path-group');
       start();
     });
+  });
+
+  asyncTest('parsingDmensions', function() {
+
+    getPathGroupObject(function(pathGroup) {
+
+      ok(pathGroup instanceof fabric.PathGroup);
+      ok(pathGroup instanceof fabric.Object);
+      //this.assertHasMixin(Enumerable, pathGroup);
+      equal(pathGroup.get('type'), 'path-group');
+      equal(pathGroup.width, 403);
+      equal(pathGroup.height, 303);
+      start();
+    }, {toBeParsed: true});
+  });
+
+  test('parsingDmensionsWithTransformMatrix', function() {
+      var pathA = new fabric.Path("M 100 100 L 300 100 L 200 300 z", {transformMatrix: [2, 0, 0, 2, 0, 0]}),
+          pathB = new fabric.Path("M 200 200 L 100 200 L 400 50 z", {transformMatrix: [3, 0, 0, 3, 0, 0]}),
+          pg = new fabric.PathGroup([pathA, pathB], {toBeParsed: true});
+      equal(pg.width, 1203);
+      equal(pg.height, 603);
   });
 
   asyncTest('getObjects', function() {

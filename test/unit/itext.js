@@ -43,6 +43,7 @@
     'textBackgroundColor':      '',
     'fillRule':                 'nonzero',
     'globalCompositeOperation': 'source-over',
+    'transformMatrix':          null,
     styles:                     { }
   };
 

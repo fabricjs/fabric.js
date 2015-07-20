@@ -28,7 +28,8 @@
     'backgroundColor':          '',
     'clipTo':                   null,
     'fillRule':                 'nonzero',
-    'globalCompositeOperation': 'source-over'
+    'globalCompositeOperation': 'source-over',
+    'transformMatrix':          null
   };
 
   function getPathElement(path) {
@@ -70,7 +71,7 @@
         error = err;
       }
 
-      ok(error, 'should throw error');
+      ok(typeof error === 'undefined', 'should not throw error on empty path');
       start();
     });
   });

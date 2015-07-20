@@ -192,21 +192,31 @@
      * @return {Object} Object representation of an instance
      */
     toObject: function(propertiesToInclude) {
+      var filters = [ ];
+      this.filters.forEach(function(filterObj) {
+        if (filterObj) {
+          filters.push(filterObj.toObject());
+        }
+      });
       var object = extend(this.callSuper('toObject', propertiesToInclude), {
         src: this._originalElement.src || this._originalElement._src,
-        filters: this.filters.map(function(filterObj) {
-          return filterObj && filterObj.toObject();
-        }),
+        filters: filters,
         crossOrigin: this.crossOrigin,
         alignX: this.alignX,
         alignY: this.alignY,
         meetOrSlice: this.meetOrSlice
       });
+
       if (this.resizeFilters.length > 0) {
         object.resizeFilters = this.resizeFilters.map(function(filterObj) {
           return filterObj && filterObj.toObject();
         });
       }
+
+      if (!this.includeDefaultValues) {
+        this._removeDefaultValues(object);
+      }
+
       return object;
     },
 

@@ -49,7 +49,8 @@
       'backgroundColor':          '',
       'fillRule':                 'nonzero',
       'globalCompositeOperation': 'source-over',
-      'clipTo':                   null
+      'clipTo':                   null,
+      'transformMatrix':          null
     };
     ok(typeof ellipse.toObject == 'function');
     deepEqual(ellipse.toObject(), defaultProperties);

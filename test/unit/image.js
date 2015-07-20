@@ -41,9 +41,10 @@
     'backgroundColor':          '',
     'clipTo':                   null,
     'filters':                  [],
-    'crossOrigin':              '',
     'fillRule':                 'nonzero',
     'globalCompositeOperation': 'source-over',
+    'transformMatrix':          null,
+    'crossOrigin':              '',
     'alignX':                   'none',
     'alignY':                   'none',
     'meetOrSlice':              'meet'
@@ -121,7 +122,7 @@
       var filter = new fabric.Image.filters.Resize({resizeType: 'bilinear', scaleX: 0.3, scaleY: 0.3});
       image.resizeFilters.push(filter);
       ok(image.resizeFilters[0] instanceof fabric.Image.filters.Resize, 'should inherit from fabric.Image.filters.Resize');
-      
+
       var toObject = image.toObject();
       deepEqual(toObject.resizeFilters[0], filter.toObject());
       fabric.Image.fromObject(toObject, function(imageFromObject) {
@@ -135,6 +136,30 @@
       start();
     });
   });
+
+  // asyncTest('toObject without default values', function() {
+  //   createImageObject(function(image) {
+
+  //     image.includeDefaultValues = false;
+
+  //     var object = image.toObject();
+
+  //     // workaround for node-canvas sometimes producing images with width/height and sometimes not
+  //     if (object.width === 0) {
+  //       object.width = IMG_WIDTH;
+  //     }
+  //     if (object.height === 0) {
+  //       object.height = IMG_HEIGHT;
+  //     }
+  //     deepEqual(object, {
+  //       type: 'image',
+  //       // why the hell deepEqual fail [] == [] check?!
+  //       filters: [],
+  //       crossOrigin: ''
+  //     });
+  //     start();
+  //   });
+  // });
 
   asyncTest('toString', function() {
     createImageObject(function(image) {

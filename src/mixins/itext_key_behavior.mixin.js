@@ -102,8 +102,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       clipboardData.setData('text', selectedText);
     }
 
-    this.copiedText = selectedText;
-    this.copiedStyles = this.getSelectionStyles(
+    fabric.copiedText = selectedText;
+    fabric.copiedTextStyle = this.getSelectionStyles(
                           this.selectionStart,
                           this.selectionEnd);
   },
@@ -115,19 +115,21 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   paste: function(e) {
     var copiedText = null,
         clipboardData = this._getClipboardData(e),
-        usedCopiedStyle;
+        useCopiedStyle = true;
 
     // Check for backward compatibility with old browsers
     if (clipboardData) {
       copiedText = clipboardData.getData('text').replace(/\r/g, '');
+      if (!fabric.copiedTextStyle || fabric.copiedText !== copiedText) {
+        useCopiedStyle = false;
+      }
     }
     else {
-      copiedText = this.copiedText;
-      usedCopiedStyle = true;
+      copiedText = fabric.copiedText;
     }
 
     if (copiedText) {
-      this.insertChars(copiedText, usedCopiedStyle);
+      this.insertChars(copiedText, useCopiedStyle);
     }
   },
 

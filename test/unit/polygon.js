@@ -34,7 +34,8 @@
     'backgroundColor':          '',
     'clipTo':                   null,
     'fillRule':                 'nonzero',
-    'globalCompositeOperation': 'source-over'
+    'globalCompositeOperation': 'source-over',
+    'transformMatrix':          null
   };
 
   var REFERENCE_EMPTY_OBJECT = {
@@ -145,7 +146,8 @@
       'opacity':          0.34,
       'points':           expectedPoints,
       'top':              10,
-      'left':             10
+      'left':             10,
+      'transformMatrix':  [ 2, 0, 0, 2, -10, -20 ]
     }));
 
     deepEqual(polygonWithAttrs.get('transformMatrix'), [ 2, 0, 0, 2, -10, -20 ]);

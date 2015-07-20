@@ -92,15 +92,30 @@
         this._set('width', this.dynamicMinWidth);
       }
 
-      // calculate a styleMap that lets us know where styles as, as _textLines is separated by \n and wraps,
-      // but the style object line indices is by \n.
-      this._styleMap = this._generateStyleMap();
-
       // clear cache and re-calculate height
       this._clearCache();
       this.height = this._getTextHeight(ctx);
+      this._setLineWidths();
     },
 
+    /**
+     * set the __lineWidths cache array to support
+     * functions that expect it to be filled
+     * @private
+     */
+    _setLineWidths: function() {
+      for (var i = 0, len = this._textLines.length; i < len; i++) {
+        this.__lineWidths[i] = this.width;
+      }
+    },
+
+    /**
+     * Generate an object that translates the style object so that it is
+     * broken up by visual lines (new lines and automatic wrapping).
+     * The original text styles object is broken up by actual lines (new lines only),
+     * which is only sufficient for Text / IText
+     * @private
+     */
     _generateStyleMap: function() {
       var realLineCount     = 0,
           realLineCharCount = 0,
@@ -329,6 +344,8 @@
       var lines = this._wrapText(this.ctx, this.text);
 
       this.ctx.restore();
+      this._textLines = lines;
+      this._styleMap = this._generateStyleMap();
       return lines;
     },
 
