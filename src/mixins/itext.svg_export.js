@@ -10,7 +10,7 @@
      */
     _setSVGTextLineText: function(lineIndex, textSpans, height, textLeftOffset, textTopOffset, textBgRects) {
       if (!this.styles[lineIndex]) {
-        this.callSuper('_setSVGTextLineText',
+        fabric.Text.prototype._setSVGTextLineText.call(this,
           lineIndex, textSpans, height, textLeftOffset, textTopOffset);
       }
       else {
