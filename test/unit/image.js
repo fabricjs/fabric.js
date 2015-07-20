@@ -43,7 +43,11 @@
     'filters':                  [],
     'fillRule':                 'nonzero',
     'globalCompositeOperation': 'source-over',
-    'transformMatrix':          null
+    'transformMatrix':          null,
+    'crossOrigin':              '',
+    'alignX':                   'none',
+    'alignY':                   'none',
+    'meetOrSlice':              'meet'
   };
 
   function _createImageElement() {
@@ -132,6 +136,30 @@
       start();
     });
   });
+
+  // asyncTest('toObject without default values', function() {
+  //   createImageObject(function(image) {
+
+  //     image.includeDefaultValues = false;
+
+  //     var object = image.toObject();
+
+  //     // workaround for node-canvas sometimes producing images with width/height and sometimes not
+  //     if (object.width === 0) {
+  //       object.width = IMG_WIDTH;
+  //     }
+  //     if (object.height === 0) {
+  //       object.height = IMG_HEIGHT;
+  //     }
+  //     deepEqual(object, {
+  //       type: 'image',
+  //       // why the hell deepEqual fail [] == [] check?!
+  //       filters: [],
+  //       crossOrigin: ''
+  //     });
+  //     start();
+  //   });
+  // });
 
   asyncTest('toString', function() {
     createImageObject(function(image) {

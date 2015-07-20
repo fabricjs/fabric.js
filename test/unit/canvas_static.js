@@ -83,7 +83,11 @@
     'filters':                  [],
     'fillRule':                 'nonzero',
     'globalCompositeOperation': 'source-over',
-    'transformMatrix':          null
+    'transformMatrix':          null,
+    'crossOrigin':              '',
+    'alignX':                   'none',
+    'alignY':                   'none',
+    'meetOrSlice':              'meet'
   };
 
   function _createImageElement() {
