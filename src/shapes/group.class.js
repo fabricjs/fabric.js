@@ -126,6 +126,7 @@
         left: objectLeft - center.x,
         top: objectTop - center.y
       });
+      object.setCoords();
     },
 
     /**
