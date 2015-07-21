@@ -85,12 +85,12 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this._cancelOnInput = false;
       return;
     }
-    var cp = this.selectionStart || 0,
+    var offset = this.selectionStart || 0,
         textLength = this.text.length,
         newTextLength = this.hiddenTextarea.value.length,
         diff = newTextLength - textLength,
-        insChar = this.hiddenTextarea.value.slice(cp, cp + diff);
-    this.insertChars(insChar);
+        charsToInsert = this.hiddenTextarea.value.slice(offset, offset + diff);
+    this.insertChars(charsToInsert);
     e.stopPropagation();
   },
 
