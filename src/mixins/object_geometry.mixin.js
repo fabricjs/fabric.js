@@ -305,9 +305,8 @@
     setCoords: function() {
       var theta = degreesToRadians(this.angle),
           vpt = this.getViewportTransform(),
-          f = fabric.util.transformPoint,
-          p = this._calculateCurrentDimensions(true),
-          currentWidth = p.x, currentHeight = p.y;
+          dim = this._calculateCurrentDimensions(true),
+          currentWidth = dim.x, currentHeight = dim.y;
 
       // If width is negative, make postive. Fixes path selection issue
       if (currentWidth < 0) {
@@ -322,7 +321,7 @@
           offsetY = Math.sin(_angle + theta) * _hypotenuse,
 
           // offset added for rotate and scale actions
-          coords = f(this.getCenterPoint(), vpt),
+          coords = fabric.util.transformPoint(this.getCenterPoint(), vpt),
           tl  = new fabric.Point(coords.x - offsetX, coords.y - offsetY),
           tr  = new fabric.Point(tl.x + (currentWidth * cosTh), tl.y + (currentWidth * sinTh)),
           bl  = new fabric.Point(tl.x - (currentHeight * sinTh), tl.y + (currentHeight * cosTh)),
