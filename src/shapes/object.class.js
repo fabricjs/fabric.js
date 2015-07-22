@@ -390,6 +390,13 @@
     cornerSize:               12,
 
     /**
+     * Override the size of object's controlling corners (property for each controls width and height)
+     * @type Object
+     * @default
+     */
+    cornerSizeOverrides:      null,
+
+    /**
      * When true, object's controlling corners are rendered as transparent inside (i.e. stroke instead of fill)
      * @type Boolean
      * @default
