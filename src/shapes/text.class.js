@@ -338,7 +338,9 @@
       }
       this._textLines = this._splitTextIntoLines();
       this._clearCache();
-      this._calculateWidth = false;
+      //if textAlign is 'justify' i have to disable caching
+      //when calculating width of text and widths of line.
+      this._cacheLinesWidth = (this.textAlign !== 'justify');
       this.width = this._getTextWidth(ctx);
       this._cacheLinesWidth = true;
       this.height = this._getTextHeight(ctx);
