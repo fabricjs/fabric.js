@@ -116,25 +116,22 @@
       var strokeWidth = this.strokeWidth,
           w = this.width,
           h = this.height,
-          capped = this.strokeLineCap === 'round' || this.strokeLineCap === 'square',
-          vLine = this.type === 'line' && this.width === 0,
-          hLine = this.type === 'line' && this.height === 0,
-          sLine = vLine || hLine,
-          strokeW = (capped && hLine) || !sLine,
-          strokeH = (capped && vLine) || !sLine;
+          addStrokeToW = true,
+          addStrokeToH = true;
 
-      if (vLine) {
-        w = strokeWidth;
+      if (this.type === 'line' && this.strokeLineCap === 'butt') {
+        addStrokeToH = w;
+        addStrokeToW = h;
       }
-      else if (hLine) {
-        h = strokeWidth;
+
+      if (addStrokeToH) {
+        h += h < 0 ? -strokeWidth : strokeWidth;
       }
-      if (strokeW) {
-        w += (w < 0 ? -strokeWidth : strokeWidth);
+
+      if (addStrokeToW) {
+        w += w < 0 ? -strokeWidth : strokeWidth;
       }
-      if (strokeH) {
-        h += (h < 0 ? -strokeWidth : strokeWidth);
-      }
+
       return { x: w, y: h };
     },
 
@@ -152,7 +149,7 @@
     /*
      * private
      */
-    _calculateCurrentDimensions: function(shouldTransform)  {
+    _calculateCurrentDimensions: function()  {
       var vpt = this.getViewportTransform(),
           dim = this._getTransformedDimensions(),
           w = dim.x, h = dim.y;
@@ -160,10 +157,7 @@
       w += 2 * this.padding;
       h += 2 * this.padding;
 
-      if (shouldTransform) {
-        return fabric.util.transformPoint(new fabric.Point(w, h), vpt, true);
-      }
-      return { x: w, y: h };
+      return fabric.util.transformPoint(new fabric.Point(w, h), vpt, true);
     },
 
     /**
@@ -185,7 +179,7 @@
       ctx.strokeStyle = this.borderColor;
       ctx.lineWidth = 1 / this.borderScaleFactor;
 
-      var wh = this._calculateCurrentDimensions(true),
+      var wh = this._calculateCurrentDimensions(),
           width = wh.x,
           height = wh.y;
       if (this.group) {
@@ -228,12 +222,12 @@
         return this;
       }
 
-      var wh = this._calculateCurrentDimensions(true),
+      var wh = this._calculateCurrentDimensions(),
           width = wh.x,
           height = wh.y,
-          left = -(width / 2),
-          top = -(height / 2),
           scaleOffset = this.cornerSize / 2,
+          left = -(width / 2) - scaleOffset,
+          top = -(height / 2) - scaleOffset,
           methodName = this.transparentCorners ? 'strokeRect' : 'fillRect';
 
       ctx.save();
@@ -245,52 +239,52 @@
 
       // top-left
       this._drawControl('tl', ctx, methodName,
-        left - scaleOffset,
-        top - scaleOffset);
+        left,
+        top);
 
       // top-right
       this._drawControl('tr', ctx, methodName,
-        left + width - scaleOffset,
-        top - scaleOffset);
+        left + width,
+        top);
 
       // bottom-left
       this._drawControl('bl', ctx, methodName,
-        left - scaleOffset,
-        top + height - scaleOffset);
+        left,
+        top + height);
 
       // bottom-right
       this._drawControl('br', ctx, methodName,
-        left + width - scaleOffset,
-        top + height - scaleOffset);
+        left + width,
+        top + height);
 
       if (!this.get('lockUniScaling')) {
 
         // middle-top
         this._drawControl('mt', ctx, methodName,
-          left + width/2 - scaleOffset,
-          top - scaleOffset);
+          left + width/2,
+          top);
 
         // middle-bottom
         this._drawControl('mb', ctx, methodName,
-          left + width/2 - scaleOffset,
-          top + height - scaleOffset);
+          left + width/2,
+          top + height);
 
         // middle-right
         this._drawControl('mr', ctx, methodName,
-          left + width - scaleOffset,
-          top + height/2 - scaleOffset);
+          left + width,
+          top + height/2);
 
         // middle-left
         this._drawControl('ml', ctx, methodName,
-          left - scaleOffset,
-          top + height/2 - scaleOffset);
+          left,
+          top + height/2);
       }
 
       // middle-top-rotate
       if (this.hasRotatingPoint) {
         this._drawControl('mtr', ctx, methodName,
-          left + width/2 - scaleOffset,
-          top - this.rotatingPointOffset - scaleOffset);
+          left + width/2 ,
+          top - this.rotatingPointOffset);
       }
 
       ctx.restore();
