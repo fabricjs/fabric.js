@@ -123,8 +123,6 @@
           center = this.getCenterPoint();
 
       object.set({
-        originalLeft: objectLeft,
-        originalTop: objectTop,
         left: objectLeft - center.x,
         top: objectTop - center.y
       });
@@ -390,7 +388,6 @@
       object.hasControls = object.__origHasControls;
       delete object.__origHasControls;
       object.set('active', false);
-      object.setCoords();
       delete object.group;
 
       return this;

@@ -302,7 +302,7 @@
      * @return {fabric.Object} thisArg
      * @chainable
      */
-    setCoords: function() {
+    setCoords: function(global) {
       var theta = degreesToRadians(this.angle),
           vpt = this.getViewportTransform(),
           dim = this._calculateCurrentDimensions(true),
@@ -359,6 +359,39 @@
       this._setCornerCoords && this._setCornerCoords();
 
       return this;
+    },
+
+    _calcTotalTransformMatrix: function() {
+      var firstM = this.group ? this.group._calcTotalTransformMatrix() : this.getViewportTransform(),
+          p = this.getCenterPoint(), translateMatrix = [1, 0, 0, 1, p.x, p.y],
+          m = fabric.util.multiplyTransformMatrices(firstM, translateMatrix);
+      if (this.angle) {
+        m = fabric.util.multiplyTransformMatrices(m, this._calcRotateMatrix());
+      }
+      m = fabric.util.multiplyTransformMatrices(m, this._calcDimensionsTransformMatrix());
+      return m;
+    },
+
+    _calcBBoxTransformMatrix: function() {
+      var p = this.getCenterPoint(),
+          firstM = this.getViewportTransform(),
+          translateMatrix = [1, 0, 0, 1, p.x, p.y],
+          m = fabric.util.multiplyTransformMatrices(firstM, translateMatrix);
+      if (this.angle) {
+        m = fabric.util.multiplyTransformMatrices(m, this._calcRotateMatrix());
+      }
+      return m;
+    },
+
+    _calcRotateMatrix: function() {
+      // introduce skew matrix here later
+      if (this.angle) {
+        var theta = fabric.util.degreesToRadians(this.angle), 
+            sinTh = Math.sin(theta),
+            cosTh = Math.cos(theta);
+        return [cosTh, sinTh, -sinTh, cosTh, 0, 0];
+      }
+      return [1, 0, 0, 1, 0, 0];
     },
 
     _calcDimensionsTransformMatrix: function() {
