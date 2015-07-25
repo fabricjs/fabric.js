@@ -28,6 +28,8 @@
     'fillRule':                 'nonzero',
     'globalCompositeOperation': 'source-over',
     'transformMatrix':          null,
+    'skewX':                    0,
+    'skewY':                    0,
     'paths':                    getPathObjects()
   };
 

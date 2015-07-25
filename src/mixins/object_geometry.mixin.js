@@ -1,5 +1,14 @@
 (function() {
 
+  function getCoords(oCoords) {
+    return [
+      new fabric.Point(oCoords.tl.x, oCoords.tl.y),
+      new fabric.Point(oCoords.tr.x, oCoords.tr.y),
+      new fabric.Point(oCoords.br.x, oCoords.br.y),
+      new fabric.Point(oCoords.bl.x, oCoords.bl.y)
+    ];
+  }
+
   var degreesToRadians = fabric.util.degreesToRadians;
 
   fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
@@ -18,13 +27,9 @@
      * @return {Boolean} true if object intersects with an area formed by 2 points
      */
     intersectsWithRect: function(pointTL, pointBR) {
-      var oCoords = this.oCoords,
-          tl = new fabric.Point(oCoords.tl.x, oCoords.tl.y),
-          tr = new fabric.Point(oCoords.tr.x, oCoords.tr.y),
-          bl = new fabric.Point(oCoords.bl.x, oCoords.bl.y),
-          br = new fabric.Point(oCoords.br.x, oCoords.br.y),
+      var oCoords = getCoords(this.oCoords),
           intersection = fabric.Intersection.intersectPolygonRectangle(
-            [tl, tr, br, bl],
+            oCoords,
             pointTL,
             pointBR
           );
@@ -37,20 +42,9 @@
      * @return {Boolean} true if object intersects with another object
      */
     intersectsWithObject: function(other) {
-      // extracts coords
-      function getCoords(oCoords) {
-        return {
-          tl: new fabric.Point(oCoords.tl.x, oCoords.tl.y),
-          tr: new fabric.Point(oCoords.tr.x, oCoords.tr.y),
-          bl: new fabric.Point(oCoords.bl.x, oCoords.bl.y),
-          br: new fabric.Point(oCoords.br.x, oCoords.br.y)
-        };
-      }
-      var thisCoords = getCoords(this.oCoords),
-          otherCoords = getCoords(other.oCoords),
-          intersection = fabric.Intersection.intersectPolygonPolygon(
-            [thisCoords.tl, thisCoords.tr, thisCoords.br, thisCoords.bl],
-            [otherCoords.tl, otherCoords.tr, otherCoords.br, otherCoords.bl]
+      var intersection = fabric.Intersection.intersectPolygonPolygon(
+            getCoords(this.oCoords),
+            getCoords(other.oCoords)
           );
 
       return intersection.status === 'Intersection';
@@ -198,23 +192,12 @@
      */
     getBoundingRect: function() {
       this.oCoords || this.setCoords();
-
-      var xCoords = [this.oCoords.tl.x, this.oCoords.tr.x, this.oCoords.br.x, this.oCoords.bl.x],
-          minX = fabric.util.array.min(xCoords),
-          maxX = fabric.util.array.max(xCoords),
-          width = Math.abs(minX - maxX),
-
-          yCoords = [this.oCoords.tl.y, this.oCoords.tr.y, this.oCoords.br.y, this.oCoords.bl.y],
-          minY = fabric.util.array.min(yCoords),
-          maxY = fabric.util.array.max(yCoords),
-          height = Math.abs(minY - maxY);
-
-      return {
-        left: minX,
-        top: minY,
-        width: width,
-        height: height
-      };
+      return fabric.util.makeBoundingBoxFromPoints([
+        this.oCoords.tl,
+        this.oCoords.tr,
+        this.oCoords.br,
+        this.oCoords.bl
+      ]);
     },
 
     /**
@@ -222,7 +205,7 @@
      * @return {Number} width value
      */
     getWidth: function() {
-      return this.width * this.scaleX;
+      return this._getTransformedDimensions().x;
     },
 
     /**
@@ -230,7 +213,7 @@
      * @return {Number} height value
      */
     getHeight: function() {
-      return this.height * this.scaleY;
+      return this._getTransformedDimensions().y;
     },
 
     /**
@@ -280,7 +263,7 @@
      */
     scaleToWidth: function(value) {
       // adjust to bounding rect factor so that rotated shapes would fit as well
-      var boundingRectFactor = this.getBoundingRectWidth() / this.getWidth();
+      var boundingRectFactor = this.getBoundingRect().width / this.getWidth();
       return this.scale(value / this.width / boundingRectFactor);
     },
 
@@ -292,7 +275,7 @@
      */
     scaleToHeight: function(value) {
       // adjust to bounding rect factor so that rotated shapes would fit as well
-      var boundingRectFactor = this.getBoundingRectHeight() / this.getHeight();
+      var boundingRectFactor = this.getBoundingRect().height / this.getHeight();
       return this.scale(value / this.height / boundingRectFactor);
     },
 
@@ -305,7 +288,7 @@
     setCoords: function() {
       var theta = degreesToRadians(this.angle),
           vpt = this.getViewportTransform(),
-          dim = this._calculateCurrentDimensions(true),
+          dim = this._calculateCurrentDimensions(),
           currentWidth = dim.x, currentHeight = dim.y;
 
       // If width is negative, make postive. Fixes path selection issue
@@ -362,8 +345,11 @@
     },
 
     _calcDimensionsTransformMatrix: function() {
-      // introduce skew matrix here later
-      return [this.scaleX, 0, 0, this.scaleY, 0, 0];
+      var skewMatrixX = [1, 0, Math.tan(degreesToRadians(this.skewX)), 1, 0, 0],
+          skewMatrixY = [1, Math.tan(degreesToRadians(this.skewY)), 0, 1, 0, 0],
+          scaleMatrix = [this.scaleX, 0, 0, this.scaleY, 0, 0],
+          m = fabric.util.multiplyTransformMatrices(scaleMatrix, skewMatrixX, true);
+      return = fabric.util.multiplyTransformMatrices(m, skewMatrixY, true);
     }
   });
 })();

@@ -7,7 +7,7 @@
   var setObjectScaleOverridden = fabric.Canvas.prototype._setObjectScale;
 
   fabric.Canvas.prototype._setObjectScale = function(localMouse, transform,
-                                                     lockScalingX, lockScalingY, by, lockScalingFlip) {
+                                                     lockScalingX, lockScalingY, by, lockScalingFlip, dim) {
 
     var t = transform.target;
     if (t instanceof fabric.Textbox) {
@@ -18,7 +18,7 @@
     }
     else {
       setObjectScaleOverridden.call(fabric.Canvas.prototype, localMouse, transform,
-        lockScalingX, lockScalingY, by, lockScalingFlip);
+        lockScalingX, lockScalingY, by, lockScalingFlip, dim);
     }
   };
 

@@ -465,7 +465,7 @@
           charIndex++;
         }
 
-        lineLeftOffset = this._getCachedLineOffset(lineIndex);
+        lineLeftOffset = this._getLineLeftOffset(this._getLineWidth(this.ctx, lineIndex));
       }
       if (typeOfBoundaries === 'cursor') {
         topOffset += (1 - this._fontSizeFraction) * this._getHeightOfLine(this.ctx, lineIndex) / this.lineHeight
@@ -480,16 +480,6 @@
     },
 
     /**
-     * @private
-     */
-    _getCachedLineOffset: function(lineIndex) {
-      var widthOfLine = this._getLineWidth(this.ctx, lineIndex);
-
-      return this.__lineOffsets[lineIndex] ||
-        (this.__lineOffsets[lineIndex] = this._getLineLeftOffset(widthOfLine));
-    },
-
-    /**
      * Renders cursor
      * @param {Object} boundaries
      * @param {CanvasRenderingContext2D} ctx transformed context to draw on
@@ -501,7 +491,7 @@
           charIndex = cursorLocation.charIndex,
           charHeight = this.getCurrentCharFontSize(lineIndex, charIndex),
           leftOffset = (lineIndex === 0 && charIndex === 0)
-                    ? this._getCachedLineOffset(lineIndex)
+                    ? this._getLineLeftOffset(this._getLineWidth(ctx, lineIndex))
                     : boundaries.leftOffset;
 
       ctx.fillStyle = this.getCurrentCharColor(lineIndex, charIndex);
@@ -531,7 +521,7 @@
           endLine = end.lineIndex;
 
       for (var i = startLine; i <= endLine; i++) {
-        var lineOffset = this._getCachedLineOffset(i) || 0,
+        var lineOffset = this._getLineLeftOffset(this._getLineWidth(ctx, i)) || 0,
             lineHeight = this._getHeightOfLine(this.ctx, i),
             boxWidth = 0, line = this._textLines[i];
 
@@ -569,12 +559,13 @@
      * @param {String} method
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    _renderChars: function(method, ctx, line, left, top, lineIndex) {
+    _renderChars: function(method, ctx, line, left, top, lineIndex, charOffset) {
 
       if (this.isEmptyStyles()) {
         return this._renderCharsFast(method, ctx, line, left, top);
       }
 
+      charOffset = charOffset || 0;
       this.skipTextAlign = true;
 
       // set proper box offset
@@ -586,26 +577,26 @@
 
       // set proper line offset
       var lineHeight = this._getHeightOfLine(ctx, lineIndex),
-          lineLeftOffset = this._getCachedLineOffset(lineIndex),
+          lineLeftOffset = this._getLineLeftOffset(this._getLineWidth(ctx, lineIndex)),
           prevStyle,
+          thisStyle,
           charsToRender = '';
 
       left += lineLeftOffset || 0;
 
       ctx.save();
       top -= lineHeight / this.lineHeight * this._fontSizeFraction;
-      for (var i = 0, len = line.length; i <= len; i++) {
+      for (var i = charOffset, len = line.length + charOffset; i <= len; i++) {
         prevStyle = prevStyle || this.getCurrentCharStyle(lineIndex, i);
-        var thisStyle = this.getCurrentCharStyle(lineIndex, i + 1);
+        thisStyle = this.getCurrentCharStyle(lineIndex, i + 1);
 
         if (this._hasStyleChanged(prevStyle, thisStyle) || i === len) {
           this._renderChar(method, ctx, lineIndex, i - 1, charsToRender, left, top, lineHeight);
           charsToRender = '';
           prevStyle = thisStyle;
         }
-        charsToRender += line[i];
+        charsToRender += line[i - charOffset];
       }
-
       ctx.restore();
     },
 
@@ -661,8 +652,6 @@
 
         this._renderCharDecoration(ctx, decl, left, top, offset, charWidth, charHeight);
         ctx.restore();
-
-        ctx.translate(charWidth, 0);
       }
       else {
         if (method === 'strokeText' && this.stroke) {
@@ -673,9 +662,8 @@
         }
         charWidth = this._applyCharStylesGetWidth(ctx, _char, lineIndex, i);
         this._renderCharDecoration(ctx, null, left, top, offset, charWidth, this.fontSize);
-
-        ctx.translate(ctx.measureText(_char).width, 0);
       }
+      ctx.translate(charWidth, 0);
     },
 
     /**
@@ -787,7 +775,7 @@
         }
 
         var lineWidth = this._getLineWidth(ctx, i),
-            lineLeftOffset = this._getCachedLineOffset(i);
+            lineLeftOffset = this._getLineLeftOffset(lineWidth);
 
         if (this.textBackgroundColor) {
           ctx.fillStyle = this.textBackgroundColor;
@@ -843,15 +831,7 @@
      * @param {Object} [decl]
      */
     _applyCharStylesGetWidth: function(ctx, _char, lineIndex, charIndex, decl) {
-      var styleDeclaration = decl || this._getStyleDeclaration(lineIndex, charIndex);
-
-      if (styleDeclaration) {
-        // cloning so that original style object is not polluted with following font declarations
-        styleDeclaration = clone(styleDeclaration);
-      }
-      else {
-        styleDeclaration = { };
-      }
+      var styleDeclaration = decl || this._getStyleDeclaration(lineIndex, charIndex, true);
 
       this._applyFontStyles(styleDeclaration);
 

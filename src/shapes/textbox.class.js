@@ -95,18 +95,6 @@
       // clear cache and re-calculate height
       this._clearCache();
       this.height = this._getTextHeight(ctx);
-      this._setLineWidths();
-    },
-
-    /**
-     * set the __lineWidths cache array to support
-     * functions that expect it to be filled
-     * @private
-     */
-    _setLineWidths: function() {
-      for (var i = 0, len = this._textLines.length; i < len; i++) {
-        this.__lineWidths[i] = this.width;
-      }
     },
 
     /**
@@ -155,14 +143,7 @@
         lineIndex = map.line;
         charIndex = map.offset + charIndex;
       }
-
-      if (returnCloneOrEmpty) {
-        return (this.styles[lineIndex] && this.styles[lineIndex][charIndex])
-          ? clone(this.styles[lineIndex][charIndex])
-          : {};
-      }
-
-      return this.styles[lineIndex] && this.styles[lineIndex][charIndex] ? this.styles[lineIndex][charIndex] : null;
+      return this.callSuper('_getStyleDeclaration', lineIndex, charIndex, returnCloneOrEmpty);
     },
 
     /**
@@ -418,7 +399,7 @@
           leftOffset     = 0,
           cursorLocation = this.get2DCursorLocation(),
           lineChars      = this._textLines[cursorLocation.lineIndex].split(''),
-          lineLeftOffset = this._getCachedLineOffset(cursorLocation.lineIndex);
+          lineLeftOffset = this._getLineLeftOffset(this._getLineWidth(this.ctx, cursorLocation.lineIndex));
 
       for (var i = 0; i < cursorLocation.charIndex; i++) {
         leftOffset += this._getWidthOfChar(this.ctx, lineChars[i], cursorLocation.lineIndex, i);

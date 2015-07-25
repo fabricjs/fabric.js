@@ -68,6 +68,15 @@
     centeredScaling:        false,
 
     /**
+     * When true, objects use center point as the origin of skew transformation.
+     * <b>Backwards incompatibility note:</b> This property replaces "centerTransform" (Boolean).
+     * @since 1.6.0
+     * @type Boolean
+     * @default
+     */
+    centeredSkewing:        false,
+
+    /**
      * When true, objects use center point as the origin of rotate transformation.
      * <b>Backwards incompatibility note:</b> This property replaces "centerTransform" (Boolean).
      * @since 1.3.4
@@ -211,19 +220,20 @@
     /**
      * Resets the current transform to its original values and chooses the type of resizing based on the event
      * @private
-     * @param {Event} e Event object fired on mousemove
      */
-    _resetCurrentTransform: function(e) {
+    _resetCurrentTransform: function() {
       var t = this._currentTransform;
 
       t.target.set({
         scaleX: t.original.scaleX,
         scaleY: t.original.scaleY,
+        skewX: t.original.skewX,
+        skewY: t.original.skewY,
         left: t.original.left,
         top: t.original.top
       });
 
-      if (this._shouldCenterTransform(e, t.target)) {
+      if (this._shouldCenterTransform(t.target)) {
         if (t.action === 'rotate') {
           this._setOriginToCenter(t.target);
         }
@@ -348,10 +358,9 @@
 
     /**
      * @private
-     * @param {Event} e Event object
      * @param {fabric.Object} target
      */
-    _shouldCenterTransform: function (e, target) {
+    _shouldCenterTransform: function (target) {
       if (!target) {
         return;
       }
@@ -362,11 +371,14 @@
       if (t.action === 'scale' || t.action === 'scaleX' || t.action === 'scaleY') {
         centerTransform = this.centeredScaling || target.centeredScaling;
       }
+      else if (t.action === 'skewX' || t.action === 'skewY') {
+        centerTransform = this.centeredSkewing || target.centeredSkewing;
+      }
       else if (t.action === 'rotate') {
         centerTransform = this.centeredRotation || target.centeredRotation;
       }
 
-      return centerTransform ? !e.altKey : e.altKey;
+      return centerTransform ? !t.altKey : t.altKey;
     },
 
     /**
@@ -398,18 +410,24 @@
     /**
      * @private
      */
-    _getActionFromCorner: function(target, corner) {
-      var action = 'drag';
-      if (corner) {
-        action = (corner === 'ml' || corner === 'mr')
-          ? 'scaleX'
-          : (corner === 'mt' || corner === 'mb')
-            ? 'scaleY'
-            : corner === 'mtr'
-              ? 'rotate'
-              : 'scale';
+    _getActionFromCorner: function(target, corner, e) {
+
+      if (!corner) {
+        return 'drag';
       }
-      return action;
+
+      switch (corner) {
+        case 'mtr':
+          return 'rotate';
+        case 'ml':
+        case 'mr':
+          return e.shiftKey ? 'skewX' : 'scaleX';
+        case 'mt':
+        case 'mb':
+          return e.shiftKey ? 'skewY' : 'scaleY';
+        default:
+          return 'scale';
+      }
     },
 
     /**
@@ -424,14 +442,17 @@
 
       var pointer = this.getPointer(e),
           corner = target._findTargetCorner(this.getPointer(e, true)),
-          action = this._getActionFromCorner(target, corner),
+          action = this._getActionFromCorner(target, corner, e),
           origin = this._getOriginFromCorner(target, corner);
 
       this._currentTransform = {
         target: target,
         action: action,
+        corner: corner,
         scaleX: target.scaleX,
         scaleY: target.scaleY,
+        skewX: target.skewX,
+        skewY: target.skewY,
         offsetX: pointer.x - target.left,
         offsetY: pointer.y - target.top,
         originX: origin.x,
@@ -441,9 +462,10 @@
         left: target.left,
         top: target.top,
         theta: degreesToRadians(target.angle),
-        width: target.width * target.scaleX,
         mouseXSign: 1,
-        mouseYSign: 1
+        mouseYSign: 1,
+        shiftKey: e.shiftKey,
+        altKey: e.altKey
       };
 
       this._currentTransform.original = {
@@ -451,11 +473,13 @@
         top: target.top,
         scaleX: target.scaleX,
         scaleY: target.scaleY,
+        skewX: target.skewX,
+        skewY: target.skewY,
         originX: origin.x,
         originY: origin.y
       };
 
-      this._resetCurrentTransform(e);
+      this._resetCurrentTransform();
     },
 
     /**
@@ -472,6 +496,118 @@
       }
       if (!target.get('lockMovementY')) {
         target.set('top', y - this._currentTransform.offsetY);
+      }
+    },
+
+    /**
+     * Check if we are increasing a positive skew or lower it,
+     * checking mouse direction and pressed corner.
+     * @private
+     */
+    _changeSkewTransformOrigin: function(localMouseByCenter, t, by) {
+      t.sign = 1, corner = t.corner,
+      skew, originA, originB, mouseSign, skewSign;
+
+      if (by === 'x') {
+        skew = t.target.skewX;
+        originA = 'left';
+        originB = 'right';
+      }
+      if (by === 'y') {
+        skew = t.target.skewY;
+        originA = 'top';
+        originB = 'bottom';
+      }
+
+      skewSign = skew > 0 ? 1 : skew < 0 ? -1 : 0;
+      mouseSign = localMouseByCenter[by] > 0 ? 1 : -1;
+
+      if (this._shouldCenterTransform(t.target)) {
+        originA = 'center';
+        originB = 'center';
+        mouseSign *= 2;
+      }
+
+      if (skewSign > 0) {
+        if (corner === 'mt') {
+          t.originX = originB;
+          t.originY = originB;
+          t.sign = -1 * mouseSign;
+        }
+        else if (corner === 'mb') {
+          t.originX = originA;
+          t.originY = originA;
+          t.sign = mouseSign;
+        }
+      }
+      else if (skewSign > 0) {
+        if (corner === 'mt') {
+          t.originX = originA;
+          t.originY = originA;
+          t.sign = mouseSign;
+        }
+        else if (corner === 'mb') {
+          t.originX = originB;
+          t.originY = originB;
+          t.sign = -1 * mouseSign;
+        }
+      }
+      else {
+        //skewSign === 0, i always enlarge
+        t.originX = mouseSign > 0 ? originA : originB;
+        t.originY = mouseSign > 0 ? originA : originB;
+      }
+    },
+
+    /**
+     * Skew object by mouse events
+     * @private
+     * @param {Number} x pointer's x coordinate
+     * @param {Number} y pointer's y coordinate
+     * @param {String} by Either 'x' or 'y'
+     */
+    _skewObject: function (x, y, by) {
+      var t = this._currentTransform,
+          target = t.target,
+          lockSkewingX = target.get('lockSkewingX'),
+          lockSkewingY = target.get('lockSkewingY');
+
+      if ((lockSkewingX && by === 'x') || (lockSkewingY && by === 'y')) {
+        return;
+      }
+
+      // Get the constraint point
+      var center = target.getCenterPoint(),
+          constraintPosition, localMouse,
+          localMouseByCenter = target.toLocalPoint(new fabric.Point(x, y), 'center', 'center'),
+          dim = target._getTransformedDimensions();
+
+      this._changeSkewTransformOrigin(localMouseByCenter, t, by);
+      constraintPosition = target.translateToOriginPoint(center, t.originX, t.originY);
+      localMouse = target.toLocalPoint(new fabric.Point(x, y), t.originX, t.originY);
+
+      // Actually scale the object
+      this._setObjectSkew(localMouse, t, by, dim);
+
+      // Make sure the constraints apply
+      target.setPositionByOrigin(constraintPosition, t.originX, t.originY);
+    },
+
+    /**
+     * @private
+     */
+    _setObjectSkew: function(localMouse, transform, by, _dim) {
+      var target = transform.target, radians;
+
+      if (by === 'x') {
+        radians = Math.atan((localMouse.x / target.scaleX - _dim.x) / _dim.y);
+        transform.newSkewX = fabric.util.radiansToDegrees(radians);
+        target.set('skewX', transform.newSkewX);
+      }
+      else if (by === 'y') {
+        radians = Math.atan((localMouse.y / target.scaleY - _dim.y) / _dim.x);
+        transform.newSkewY = fabric.util.radiansToDegrees(radians);
+        lockSkewingX || target.set('skewY', transform.newSkewY);
       }
     },
 
@@ -496,12 +632,13 @@
 
       // Get the constraint point
       var constraintPosition = target.translateToOriginPoint(target.getCenterPoint(), t.originX, t.originY),
-          localMouse = target.toLocalPoint(new fabric.Point(x, y), t.originX, t.originY);
+          localMouse = target.toLocalPoint(new fabric.Point(x, y), t.originX, t.originY),
+          dim = target._getTransformedDimensions();
 
-      this._setLocalMouse(localMouse, t);
+      this._setLocalMouseScale(localMouse, t);
 
       // Actually scale the object
-      this._setObjectScale(localMouse, t, lockScalingX, lockScalingY, by, lockScalingFlip);
+      this._setObjectScale(localMouse, t, lockScalingX, lockScalingY, by, lockScalingFlip, dim);
 
       // Make sure the constraints apply
       target.setPositionByOrigin(constraintPosition, t.originX, t.originY);
@@ -510,12 +647,11 @@
     /**
      * @private
      */
-    _setObjectScale: function(localMouse, transform, lockScalingX, lockScalingY, by, lockScalingFlip) {
-      var target = transform.target, forbidScalingX = false, forbidScalingY = false,
-          dim = target._getNonTransformedDimensions();
+    _setObjectScale: function(localMouse, transform, lockScalingX, lockScalingY, by, lockScalingFlip, _dim) {
+      var target = transform.target, forbidScalingX = false, forbidScalingY = false;
 
-      transform.newScaleX = localMouse.x / dim.x;
-      transform.newScaleY = localMouse.y / dim.y;
+      transform.newScaleX = localMouse.x * target.scaleX / _dim.x;
+      transform.newScaleY = localMouse.y * target.scaleY / _dim.y;
 
       if (lockScalingFlip && transform.newScaleX <= 0 && transform.newScaleX < target.scaleX) {
         forbidScalingX = true;
@@ -526,7 +662,7 @@
       }
 
       if (by === 'equally' && !lockScalingX && !lockScalingY) {
-        forbidScalingX || forbidScalingY || this._scaleObjectEqually(localMouse, target, transform);
+        forbidScalingX || forbidScalingY || this._scaleObjectEqually(localMouse, target, transform, _dim);
       }
       else if (!by) {
         forbidScalingX || lockScalingX || target.set('scaleX', transform.newScaleX);
@@ -546,12 +682,11 @@
     /**
      * @private
      */
-    _scaleObjectEqually: function(localMouse, target, transform) {
+    _scaleObjectEqually: function(localMouse, target, transform, _dim) {
 
       var dist = localMouse.y + localMouse.x,
-          dim = target._getNonTransformedDimensions(),
-          lastDist = dim.y * transform.original.scaleY +
-                     dim.x * transform.original.scaleX;
+          lastDist = _dim.y * transform.original.scaleY / target.scaleY +
+                     _dim.x * transform.original.scaleX / target.scaleX;
 
       // We use transform.scaleX/Y instead of target.scaleX/Y
       // because the object may have a min scale and we'll loose the proportions
@@ -588,7 +723,7 @@
     /**
      * @private
      */
-    _setLocalMouse: function(localMouse, t) {
+    _setLocalMouseScale: function(localMouse, t) {
       var target = t.target;
 
       if (t.originX === 'right') {

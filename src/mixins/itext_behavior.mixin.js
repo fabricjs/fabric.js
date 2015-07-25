@@ -289,7 +289,7 @@
     /**
      * Finds index corresponding to beginning or end of a word
      * @param {Number} selectionStart Index of a character
-     * @param {Number} direction: 1 or -1
+     * @param {Number} direction 1 or -1
      * @return {Number} Index of the beginning or end of a word
      */
     searchWordBoundary: function(selectionStart, direction) {

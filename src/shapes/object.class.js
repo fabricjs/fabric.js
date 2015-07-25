@@ -26,6 +26,7 @@
    * @fires modified
    * @fires rotating
    * @fires scaling
+   * @fires skewing
    * @fires moving
    *
    * @fires mousedown
@@ -383,6 +384,20 @@
     angle:                    0,
 
     /**
+     * Angle of skew on x axes of an object (in degrees)
+     * @type Number
+     * @default
+     */
+    skewX:                    0,
+
+    /**
+     * Angle of skew on y axes of an object (in degrees)
+     * @type Number
+     * @default
+     */
+    skewY:                    0,
+
+    /**
      * Size of object's controlling corners (in pixels)
      * @type Number
      * @default
@@ -433,6 +448,16 @@
      * @default
      */
     centeredScaling:          false,
+
+    /**
+     * When true, this object will use center point as the origin of transformation
+     * when being scaled via the controls.
+     * <b>Backwards incompatibility note:</b> This property replaces "centerTransform" (Boolean).
+     * @since 1.6.0
+     * @type Boolean
+     * @default
+     */
+    centeredSkewing:          false,
 
     /**
      * When true, this object will use center point as the origin of transformation
@@ -663,6 +688,20 @@
     lockUniScaling:           false,
 
     /**
+     * When `true`, object horizontal skewing is locked
+     * @type Boolean
+     * @default
+     */
+    lockSkewingX:             false,
+
+    /**
+     * When `true`, object vertical skewing is locked
+     * @type Boolean
+     * @default
+     */
+    lockSkewingY:             false,
+
+    /**
      * When `true`, object cannot be flipped by scaling into negative values
      * @type Boolean
      * @default
@@ -679,7 +718,7 @@
       'top left width height scaleX scaleY flipX flipY originX originY transformMatrix ' +
       'stroke strokeWidth strokeDashArray strokeLineCap strokeLineJoin strokeMiterLimit ' +
       'angle opacity fill fillRule globalCompositeOperation shadow clipTo visible backgroundColor ' +
-      'alignX alignY meetOrSlice'
+      'alignX alignY meetOrSlice skewX skewY'
     ).split(' '),
 
     /**
@@ -762,6 +801,8 @@
         this.scaleX * (this.flipX ? -1 : 1),
         this.scaleY * (this.flipY ? -1 : 1)
       );
+      ctx.transform(1, 0, Math.tan(degreesToRadians(this.skewX)), 1, 0, 0);
+      ctx.transform(1, Math.tan(degreesToRadians(this.skewY)), 0, 1, 0, 0);
     },
 
     /**
@@ -799,7 +840,9 @@
             backgroundColor:          this.backgroundColor,
             fillRule:                 this.fillRule,
             globalCompositeOperation: this.globalCompositeOperation,
-            transformMatrix:          this.transformMatrix
+            transformMatrix:          this.transformMatrix,
+            skewX:                    toFixed(this.skewX, NUM_FRACTION_DIGITS),
+            skewY:                    toFixed(this.skewY, NUM_FRACTION_DIGITS)
           };
 
       if (!this.includeDefaultValues) {
