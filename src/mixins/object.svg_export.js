@@ -23,7 +23,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         opacity = typeof this.opacity !== 'undefined' ? this.opacity : '1',
 
         visibility = this.visible ? '' : ' visibility: hidden;',
-        filter = this.shadow ? 'filter: url(#SVGID_' + this.shadow.id + ');' : '';
+        filter = this.getSvgFilter();
 
     return [
       'stroke: ', stroke, '; ',
@@ -38,6 +38,14 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       filter,
       visibility
     ].join('');
+  },
+
+  /**
+   * Returns filter for svg shadow
+   * @return {String}
+   */
+  getSvgFilter: function() {
+    return this.shadow ? 'filter: url(#SVGID_' + this.shadow.id + ');' : '';
   },
 
   /**

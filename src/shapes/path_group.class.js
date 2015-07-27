@@ -175,17 +175,16 @@
       var objects = this.getObjects(),
           p = this.getPointByOrigin('left', 'top'),
           translatePart = 'translate(' + p.x + ' ' + p.y + ')',
-          markup = [
-            //jscs:disable validateIndentation
-            '<g ',
-              'style="', this.getSvgStyles(), '" ',
-              'transform="', this.getSvgTransformMatrix(), translatePart, this.getSvgTransform(), '" ',
-            '>\n'
-            //jscs:enable validateIndentation
-          ];
+          markup = this._createBaseSVGMarkup();
+      markup.push(
+        '<g ',
+        'style="', this.getSvgStyles(), '" ',
+        'transform="', this.getSvgTransformMatrix(), translatePart, this.getSvgTransform(), '" ',
+        '>\n'
+      );
 
       for (var i = 0, len = objects.length; i < len; i++) {
-        markup.push(objects[i].toSVG(reviver));
+        markup.push('\t', objects[i].toSVG(reviver));
       }
       markup.push('</g>\n');
 
@@ -207,9 +206,14 @@
      * @return {Boolean} true if all paths are of the same color (`fill`)
      */
     isSameColor: function() {
-      var firstPathFill = (this.getObjects()[0].get('fill') || '').toLowerCase();
+      var firstPathFill = this.getObjects()[0].get('fill') || '';
+      if (typeof firstPathFill !== 'string') {
+        return false;
+      }
+      firstPathFill = firstPathFill.toLowerCase();
       return this.getObjects().every(function(path) {
-        return (path.get('fill') || '').toLowerCase() === firstPathFill;
+        var pathFill = path.get('fill') || '';
+        return typeof pathFill === 'string' && (pathFill).toLowerCase() === firstPathFill;
       });
     },
 

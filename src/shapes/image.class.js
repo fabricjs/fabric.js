@@ -227,7 +227,7 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var markup = [], x = -this.width / 2, y = -this.height / 2,
+      var markup = this._createBaseSVGMarkup(), x = -this.width / 2, y = -this.height / 2,
           preserveAspectRatio = 'none';
       if (this.group && this.group.type === 'path-group') {
         x = this.left;
