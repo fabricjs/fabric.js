@@ -143,14 +143,7 @@
         lineIndex = map.line;
         charIndex = map.offset + charIndex;
       }
-
-      if (returnCloneOrEmpty) {
-        return (this.styles[lineIndex] && this.styles[lineIndex][charIndex])
-          ? clone(this.styles[lineIndex][charIndex])
-          : {};
-      }
-
-      return this.styles[lineIndex] && this.styles[lineIndex][charIndex] ? this.styles[lineIndex][charIndex] : null;
+      return this.callSuper('_getStyleDeclaration', lineIndex, charIndex, returnCloneOrEmpty);
     },
 
     /**
