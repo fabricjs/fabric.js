@@ -559,12 +559,13 @@
      * @param {String} method
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    _renderChars: function(method, ctx, line, left, top, lineIndex) {
+    _renderChars: function(method, ctx, line, left, top, lineIndex, charOffset) {
 
       if (this.isEmptyStyles()) {
         return this._renderCharsFast(method, ctx, line, left, top);
       }
 
+      charOffset = charOffset || 0;
       this.skipTextAlign = true;
 
       // set proper box offset
@@ -578,24 +579,24 @@
       var lineHeight = this._getHeightOfLine(ctx, lineIndex),
           lineLeftOffset = this._getLineLeftOffset(this._getLineWidth(ctx, lineIndex)),
           prevStyle,
+          thisStyle,
           charsToRender = '';
 
       left += lineLeftOffset || 0;
 
       ctx.save();
       top -= lineHeight / this.lineHeight * this._fontSizeFraction;
-      for (var i = 0, len = line.length; i <= len; i++) {
+      for (var i = charOffset, len = line.length + charOffset; i <= len; i++) {
         prevStyle = prevStyle || this.getCurrentCharStyle(lineIndex, i);
-        var thisStyle = this.getCurrentCharStyle(lineIndex, i + 1);
+        thisStyle = this.getCurrentCharStyle(lineIndex, i + 1);
 
         if (this._hasStyleChanged(prevStyle, thisStyle) || i === len) {
           this._renderChar(method, ctx, lineIndex, i - 1, charsToRender, left, top, lineHeight);
           charsToRender = '';
           prevStyle = thisStyle;
         }
-        charsToRender += line[i];
+        charsToRender += line[i - charOffset];
       }
-
       ctx.restore();
     },
 
@@ -833,15 +834,7 @@
      * @param {Object} [decl]
      */
     _applyCharStylesGetWidth: function(ctx, _char, lineIndex, charIndex, decl) {
-      var styleDeclaration = decl || this._getStyleDeclaration(lineIndex, charIndex);
-
-      if (styleDeclaration) {
-        // cloning so that original style object is not polluted with following font declarations
-        styleDeclaration = clone(styleDeclaration);
-      }
-      else {
-        styleDeclaration = { };
-      }
+      var styleDeclaration = decl || this._getStyleDeclaration(lineIndex, charIndex, true);
 
       this._applyFontStyles(styleDeclaration);
 

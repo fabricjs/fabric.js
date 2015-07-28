@@ -471,29 +471,28 @@
       top -= this.fontSize * this._fontSizeFraction;
 
       // short-circuit
-      if (this.textAlign !== 'justify') {
+      var lineWidth = this._getLineWidth(ctx, lineIndex);
+      if (this.textAlign !== 'justify' || this.width < lineWidth) {
         this._renderChars(method, ctx, line, left, top, lineIndex);
         return;
       }
 
-      var lineWidth = this._getLineWidth(ctx, lineIndex),
-          totalWidth = this.width;
-      if (totalWidth >= lineWidth) {
-        // stretch the line
-        var words = line.split(/\s+/),
-            wordsWidth = this._getWidthOfWords(ctx, line, lineIndex),
-            widthDiff = totalWidth - wordsWidth,
-            numSpaces = words.length - 1,
-            spaceWidth = widthDiff / numSpaces,
-            leftOffset = 0;
+      // stretch the line
+      var words = line.split(/\s+/),
+          wordsWidth = this._getWidthOfWords(ctx, line, lineIndex),
+          widthDiff = this.width - wordsWidth,
+          numSpaces = words.length - 1,
+          spaceWidth = numSpaces > 0 ? widthDiff / numSpaces : 0,
+          leftOffset = 0, charOffset = 0, word;
 
-        for (var i = 0, len = words.length; i < len; i++) {
-          this._renderChars(method, ctx, words[i], left + leftOffset, top, lineIndex);
-          leftOffset += ctx.measureText(words[i]).width + spaceWidth;
+      for (var i = 0, len = words.length; i < len; i++) {
+        while (line[charOffset] === ' ' && charOffset < line.length) {
+          charOffset++;
         }
-      }
-      else {
-        this._renderChars(method, ctx, line, left, top, lineIndex);
+        word = words[i];
+        this._renderChars(method, ctx, word, left + leftOffset, top, lineIndex, charOffset);
+        leftOffset += ctx.measureText(word).width + spaceWidth;
+        charOffset += word.length;
       }
     },
 
