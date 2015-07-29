@@ -26,7 +26,7 @@
 
       var chars = this._textLines[lineIndex],
           charOffset = 0,
-          lineLeftOffset = this._getSVGLineLeftOffset(lineIndex) - this.width / 2,
+          lineLeftOffset = this._getLineLeftOffset(this._getLineWidth(this.ctx, lineIndex)) - this.width / 2,
           lineOffset = this._getSVGLineTopOffset(lineIndex),
           heightOfLine = this._getHeightOfLine(this.ctx, lineIndex);
 
@@ -47,13 +47,6 @@
 
         charOffset += charWidth;
       }
-    },
-
-    /**
-     * @private
-     */
-    _getSVGLineLeftOffset: function(lineIndex) {
-      return fabric.util.toFixed(this._getLineLeftOffset(this.__lineWidths[lineIndex]), 2);
     },
 
     /**
@@ -101,8 +94,8 @@
 
       return [
         //jscs:disable validateIndentation
-        '<tspan x="', lineLeftOffset + charOffset, '" y="',
-          lineTopOffset - this.height/2, '" ',
+        '<tspan x="', toFixed(lineLeftOffset + charOffset, NUM_FRACTION_DIGITS), '" y="',
+          toFixed(lineTopOffset - this.height/2, NUM_FRACTION_DIGITS), '" ',
           (styleDecl.fontFamily ? 'font-family="' + styleDecl.fontFamily.replace(/"/g, '\'') + '" ': ''),
           (styleDecl.fontSize ? 'font-size="' + styleDecl.fontSize + '" ': ''),
           (styleDecl.fontStyle ? 'font-style="' + styleDecl.fontStyle + '" ': ''),
