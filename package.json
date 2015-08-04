@@ -46,8 +46,8 @@
     "execSync": "1.0.x",
     "uglify-js": "2.4.x",
     "jscs": "1.12.x",
-    "jshint": "2.7.x",
-    "qunit": "0.7.2",
+    "jshint": "2.8.x",
+    "qunit": "0.7.2", // furher versions for some reason break
     "istanbul": "0.3.x"
   },
   "engines": {
