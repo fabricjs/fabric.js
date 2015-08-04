@@ -36,7 +36,7 @@
 
     "safeContextKeyword": "_this",
 
-    "validateJSDoc": {
+    "jsDoc": {
       "checkParamNames": true,
       "requireParamTypes": true
     },
