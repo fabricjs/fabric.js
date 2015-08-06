@@ -652,8 +652,6 @@
 
         this._renderCharDecoration(ctx, decl, left, top, offset, charWidth, charHeight);
         ctx.restore();
-
-        ctx.translate(charWidth, 0);
       }
       else {
         if (method === 'strokeText' && this.stroke) {
@@ -664,9 +662,8 @@
         }
         charWidth = this._applyCharStylesGetWidth(ctx, _char, lineIndex, i);
         this._renderCharDecoration(ctx, null, left, top, offset, charWidth, this.fontSize);
-
-        ctx.translate(ctx.measureText(_char).width, 0);
       }
+      ctx.translate(charWidth, 0);
     },
 
     /**
