@@ -44,6 +44,7 @@ fabric.ElementsParser.prototype._createObject = function(klass, el, index) {
     klass.fromElement(el, this.createCallback(index, el), this.options);
   }
   else {
+    this.resolveParentOffset(el)
     var obj = klass.fromElement(el, this.options);
     this.resolveGradient(obj, 'fill');
     this.resolveGradient(obj, 'stroke');
@@ -51,6 +52,27 @@ fabric.ElementsParser.prototype._createObject = function(klass, el, index) {
     this.instances[index] = obj;
     this.checkIfDone();
   }
+};
+
+fabric.ElementsParser.prototype.resolveParentOffset = function(el) {
+  if(!el) {
+    return;
+  }
+
+  var offsetX = 0, offsetY = 0;
+  var node = el.parentNode
+
+  while (node != null) {
+      if (node.tagName.toLowerCase() == 'svg') {
+        offsetX += parseInt(node.getAttribute('x')) || 0;
+        offsetY += parseInt(node.getAttribute('y')) || 0;
+      }
+      node = node.parentNode;
+  }
+
+  this.options.offsetX = offsetX;
+  this.options.offsetY = offsetY;
+
 };
 
 fabric.ElementsParser.prototype.createCallback = function(index, el) {

@@ -741,6 +741,11 @@
       for (var prop in options) {
         this.set(prop, options[prop]);
       }
+
+      // Add the SVG parrent offset 
+      this.left += parseInt(options.offsetX) || 0;
+      this.top += parseInt(options.offsetY) || 0;
+
       this._initGradient(options);
       this._initPattern(options);
       this._initClipping(options);
