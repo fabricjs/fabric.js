@@ -126,7 +126,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         return;
       }
 
-      if (this.__lastSelected) {
+      if (this.__lastSelected && !this.__corner) {
         this.enterEditing();
         this.initDelayedCursor(true);
       }
