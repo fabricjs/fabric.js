@@ -28,7 +28,7 @@
           ey = pointer.y,
           xPoints,
           lines;
-
+      this.__corner = 0;
       for (var i in this.oCoords) {
 
         if (!this.isControlVisible(i)) {
