@@ -70,6 +70,7 @@ fabric.ElementsParser.prototype.resolveParentOffset = function(el) {
     }
     node = node.parentNode;
   }
+
   this.options.offsetX = offsetX;
   this.options.offsetY = offsetY;
 };

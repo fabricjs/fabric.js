@@ -744,8 +744,10 @@
       }
 
       // Add SVG parrent offset
-      this.left += parseInt(options.offsetX) || 0;
-      this.top += parseInt(options.offsetY) || 0;
+      if (this.left !== 'undefined' && this.top !== 'undefined') {
+        this.left += parseInt(options.offsetX) || 0;
+        this.top += parseInt(options.offsetY) || 0;
+      }
 
       this._initGradient(options);
       this._initPattern(options);

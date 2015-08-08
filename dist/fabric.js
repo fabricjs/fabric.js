@@ -1509,7 +1509,7 @@ fabric.Collection = {
      * Cross-browser approximation of ES5 Function.prototype.bind (not fully spec conforming)
      * @see <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function/bind">Function#bind on MDN</a>
      * @param {Object} thisArg Object to bind function to
-     * @param {Any[]} [...] Values to pass to a bound function
+     * @param {Any[]} Values to pass to a bound function
      * @return {Function}
      */
     Function.prototype.bind = function(thisArg) {
@@ -3864,7 +3864,7 @@ if (typeof console !== 'undefined') {
 fabric.ElementsParser = function(elements, callback, options, reviver) {
   this.elements = elements;
   this.callback = callback;
-  this.options = options;
+  this.options = options || {};
   this.reviver = reviver;
   this.svgUid = (options && options.svgUid) || 0;
 };
@@ -3907,6 +3907,7 @@ fabric.ElementsParser.prototype._createObject = function(klass, el, index) {
     klass.fromElement(el, this.createCallback(index, el), this.options);
   }
   else {
+    this.resolveParentOffset(el);
     var obj = klass.fromElement(el, this.options);
     this.resolveGradient(obj, 'fill');
     this.resolveGradient(obj, 'stroke');
@@ -3914,6 +3915,27 @@ fabric.ElementsParser.prototype._createObject = function(klass, el, index) {
     this.instances[index] = obj;
     this.checkIfDone();
   }
+};
+
+fabric.ElementsParser.prototype.resolveParentOffset = function(el) {
+  if (!el) {
+    return;
+  }
+
+  var offsetX = 0,
+      offsetY = 0,
+      node = el.parentNode;
+
+  while (node != null) {
+    if ('tagName' in node && node.tagName.toLowerCase() === 'svg') {
+      offsetX += parseInt(node.getAttribute('x')) || 0;
+      offsetY += parseInt(node.getAttribute('y')) || 0;
+    }
+    node = node.parentNode;
+  }
+
+  this.options.offsetX = offsetX;
+  this.options.offsetY = offsetY;
 };
 
 fabric.ElementsParser.prototype.createCallback = function(index, el) {
@@ -11247,6 +11269,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @param {Object} [options] Options object
      */
     initialize: function(options) {
+      options = options || {};
       if (options) {
         this.setOptions(options);
       }
@@ -11301,6 +11324,13 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       for (var prop in options) {
         this.set(prop, options[prop]);
       }
+
+      // Add SVG parrent offset
+      if (this.left !== 'undefined' && this.top !== 'undefined') {
+        this.left += parseInt(options.offsetX) || 0;
+        this.top += parseInt(options.offsetY) || 0;
+      }
+
       this._initGradient(options);
       this._initPattern(options);
       this._initClipping(options);
@@ -15260,6 +15290,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
             : 0);
       }
 
+      this.parentOffset = {x: options.offsetX, y: options.offsetY};
+
       this.pathOffset = this.pathOffset || {
         x: this.minX + this.width / 2,
         y: this.minY + this.height / 2
@@ -15281,12 +15313,12 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           controlY = 0, // current control point y
           tempX,
           tempY,
-          l = -this.pathOffset.x,
-          t = -this.pathOffset.y;
+          l = -this.pathOffset.x + this.parentOffset.x,
+          t = -this.pathOffset.y + this.parentOffset.y;
 
       if (this.group && this.group.type === 'path-group') {
-        l = 0;
-        t = 0;
+        l = this.parentOffset.x;
+        t = this.parentOffset.y;
       }
 
       ctx.beginPath();
@@ -21195,8 +21227,6 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 
         this._renderCharDecoration(ctx, decl, left, top, offset, charWidth, charHeight);
         ctx.restore();
-
-        ctx.translate(charWidth, 0);
       }
       else {
         if (method === 'strokeText' && this.stroke) {
@@ -21207,9 +21237,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
         }
         charWidth = this._applyCharStylesGetWidth(ctx, _char, lineIndex, i);
         this._renderCharDecoration(ctx, null, left, top, offset, charWidth, this.fontSize);
-
-        ctx.translate(ctx.measureText(_char).width, 0);
       }
+      ctx.translate(charWidth, 0);
     },
 
     /**
@@ -21977,7 +22006,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     /**
      * Finds index corresponding to beginning or end of a word
      * @param {Number} selectionStart Index of a character
-     * @param {Number} direction: 1 or -1
+     * @param {Number} direction 1 or -1
      * @return {Number} Index of the beginning or end of a word
      */
     searchWordBoundary: function(selectionStart, direction) {

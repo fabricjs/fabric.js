@@ -2109,7 +2109,7 @@ if (typeof console !== "undefined") {
 fabric.ElementsParser = function(elements, callback, options, reviver) {
     this.elements = elements;
     this.callback = callback;
-    this.options = options;
+    this.options = options || {};
     this.reviver = reviver;
     this.svgUid = options && options.svgUid || 0;
 };
@@ -2148,6 +2148,7 @@ fabric.ElementsParser.prototype._createObject = function(klass, el, index) {
     if (klass.async) {
         klass.fromElement(el, this.createCallback(index, el), this.options);
     } else {
+        this.resolveParentOffset(el);
         var obj = klass.fromElement(el, this.options);
         this.resolveGradient(obj, "fill");
         this.resolveGradient(obj, "stroke");
@@ -2155,6 +2156,22 @@ fabric.ElementsParser.prototype._createObject = function(klass, el, index) {
         this.instances[index] = obj;
         this.checkIfDone();
     }
+};
+
+fabric.ElementsParser.prototype.resolveParentOffset = function(el) {
+    if (!el) {
+        return;
+    }
+    var offsetX = 0, offsetY = 0, node = el.parentNode;
+    while (node != null) {
+        if ("tagName" in node && node.tagName.toLowerCase() === "svg") {
+            offsetX += parseInt(node.getAttribute("x")) || 0;
+            offsetY += parseInt(node.getAttribute("y")) || 0;
+        }
+        node = node.parentNode;
+    }
+    this.options.offsetX = offsetX;
+    this.options.offsetY = offsetY;
 };
 
 fabric.ElementsParser.prototype.createCallback = function(index, el) {
@@ -5408,6 +5425,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         lockScalingFlip: false,
         stateProperties: ("top left width height scaleX scaleY flipX flipY originX originY transformMatrix " + "stroke strokeWidth strokeDashArray strokeLineCap strokeLineJoin strokeMiterLimit " + "angle opacity fill fillRule globalCompositeOperation shadow clipTo visible backgroundColor " + "alignX alignY meetOrSlice").split(" "),
         initialize: function(options) {
+            options = options || {};
             if (options) {
                 this.setOptions(options);
             }
@@ -5440,6 +5458,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         setOptions: function(options) {
             for (var prop in options) {
                 this.set(prop, options[prop]);
+            }
+            if (this.left !== "undefined" && this.top !== "undefined") {
+                this.left += parseInt(options.offsetX) || 0;
+                this.top += parseInt(options.offsetY) || 0;
             }
             this._initGradient(options);
             this._initPattern(options);
@@ -7162,16 +7184,20 @@ fabric.util.object.extend(fabric.Object.prototype, {
             if (typeof options.top === "undefined") {
                 this.top = calcDim.top + (this.originY === "center" ? this.height / 2 : this.originY === "bottom" ? this.height : 0);
             }
+            this.parentOffset = {
+                x: options.offsetX,
+                y: options.offsetY
+            };
             this.pathOffset = this.pathOffset || {
                 x: this.minX + this.width / 2,
                 y: this.minY + this.height / 2
             };
         },
         _render: function(ctx) {
-            var current, previous = null, subpathStartX = 0, subpathStartY = 0, x = 0, y = 0, controlX = 0, controlY = 0, tempX, tempY, l = -this.pathOffset.x, t = -this.pathOffset.y;
+            var current, previous = null, subpathStartX = 0, subpathStartY = 0, x = 0, y = 0, controlX = 0, controlY = 0, tempX, tempY, l = -this.pathOffset.x + this.parentOffset.x, t = -this.pathOffset.y + this.parentOffset.y;
             if (this.group && this.group.type === "path-group") {
-                l = 0;
-                t = 0;
+                l = this.parentOffset.x;
+                t = this.parentOffset.y;
             }
             ctx.beginPath();
             for (var i = 0, len = this.path.length; i < len; ++i) {
@@ -9890,7 +9916,6 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
                 }
                 this._renderCharDecoration(ctx, decl, left, top, offset, charWidth, charHeight);
                 ctx.restore();
-                ctx.translate(charWidth, 0);
             } else {
                 if (method === "strokeText" && this.stroke) {
                     ctx[method](_char, left, top);
@@ -9900,8 +9925,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
                 }
                 charWidth = this._applyCharStylesGetWidth(ctx, _char, lineIndex, i);
                 this._renderCharDecoration(ctx, null, left, top, offset, charWidth, this.fontSize);
-                ctx.translate(ctx.measureText(_char).width, 0);
             }
+            ctx.translate(charWidth, 0);
         },
         _hasStyleChanged: function(prevStyle, thisStyle) {
             return prevStyle.fill !== thisStyle.fill || prevStyle.fontSize !== thisStyle.fontSize || prevStyle.textBackgroundColor !== thisStyle.textBackgroundColor || prevStyle.textDecoration !== thisStyle.textDecoration || prevStyle.fontFamily !== thisStyle.fontFamily || prevStyle.fontWeight !== thisStyle.fontWeight || prevStyle.fontStyle !== thisStyle.fontStyle || prevStyle.stroke !== thisStyle.stroke || prevStyle.strokeWidth !== thisStyle.strokeWidth;
