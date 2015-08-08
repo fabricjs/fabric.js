@@ -40,11 +40,11 @@ fabric.ElementsParser.prototype.createObject = function(el, index) {
 };
 
 fabric.ElementsParser.prototype._createObject = function(klass, el, index) {
+  this.resolveParentOffset(el);
   if (klass.async) {
     klass.fromElement(el, this.createCallback(index, el), this.options);
   }
   else {
-    this.resolveParentOffset(el);
     var obj = klass.fromElement(el, this.options);
     this.resolveGradient(obj, 'fill');
     this.resolveGradient(obj, 'stroke');
