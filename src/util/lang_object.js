@@ -10,7 +10,16 @@
   function extend(destination, source) {
     // JScript DontEnum bug is not taken care of
     for (var property in source) {
-      destination[property] = source[property];
+      var _source = source[property];
+      if (Object.prototype.toString.call(_source) === '[object Array]' ) {
+        destination[property] = extend([ ], _source);
+      }
+      else if (_source && typeof _source === 'object'){
+        destination[property] = extend({ }, _source);
+      }
+      else {
+        destination[property] = _source;
+      }
     }
     return destination;
   }

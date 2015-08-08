@@ -199,7 +199,9 @@
 
     equal(_clone.x, 1);
     notEqual(obj, _clone);
-    equal(_clone.y, obj.y);
+    notEqual(_clone.y, obj.y);
+    deepEqual(_clone.y, obj.y);
+    deepEqual(obj, _clone);
   });
 
   test('Function.prototype.bind', function() {
