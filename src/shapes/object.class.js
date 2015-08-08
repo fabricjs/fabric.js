@@ -687,6 +687,7 @@
      * @param {Object} [options] Options object
      */
     initialize: function(options) {
+      options = options || {};
       if (options) {
         this.setOptions(options);
       }
@@ -742,7 +743,7 @@
         this.set(prop, options[prop]);
       }
 
-      // Add the SVG parrent offset 
+      // Add SVG parrent offset
       this.left += parseInt(options.offsetX) || 0;
       this.top += parseInt(options.offsetY) || 0;
 
