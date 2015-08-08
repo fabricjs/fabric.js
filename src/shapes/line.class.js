@@ -70,10 +70,10 @@
 
       this.callSuper('initialize', options);
 
-      this.set('x1', points[0]);
-      this.set('y1', points[1]);
-      this.set('x2', points[2]);
-      this.set('y2', points[3]);
+      this.set('x1', points[0] + options.offsetX);
+      this.set('y1', points[1] + options.offsetY);
+      this.set('x2', points[2] + options.offsetX);
+      this.set('y2', points[3] + options.offsetY);
 
       this._setWidthHeight(options);
     },

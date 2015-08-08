@@ -131,7 +131,7 @@
             : 0);
       }
 
-      this.parentOffset = {x: options.offsetX, y: options.offsetY};
+      this.parentOffset = { x: options.offsetX, y: options.offsetY };
 
       this.pathOffset = this.pathOffset || {
         x: this.minX + this.width / 2,
