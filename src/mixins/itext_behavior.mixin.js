@@ -554,11 +554,12 @@
         _char + this.text.slice(this.selectionEnd);
       this._textLines = this._splitTextIntoLines();
       this.insertStyleObjects(_char, isEndOfLine, styleObject);
-      this.setSelectionStart(this.selectionStart + 1);
-      this.setSelectionEnd(this.selectionStart);
+      this.selectionStart += 1;
+      this.selectionEnd = this.selectionStart;
       if (skipUpdate) {
         return;
       }
+      this._updateTextarea();
       this.canvas && this.canvas.renderAll();
       this.setCoords();
       this.fire('changed');
