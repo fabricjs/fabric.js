@@ -647,15 +647,15 @@
   function _createSVGPattern(markup, canvas, property) {
     if (canvas[property] && canvas[property].toSVG) {
       markup.push(
-        '<pattern x="0" y="0" id="', property, 'Pattern" ',
+        '\t<pattern x="0" y="0" id="', property, 'Pattern" ',
           'width="', canvas[property].source.width,
           '" height="', canvas[property].source.height,
-          '" patternUnits="userSpaceOnUse">',
-        '<image x="0" y="0" ',
+          '" patternUnits="userSpaceOnUse">\n',
+        '\t\t<image x="0" y="0" ',
         'width="', canvas[property].source.width,
         '" height="', canvas[property].source.height,
         '" xlink:href="', canvas[property].source.src,
-        '"></image></pattern>'
+        '"></image>\n\t</pattern>\n'
       );
     }
   }
@@ -1018,7 +1018,7 @@
           '@font-face {',
             'font-family: ', objects[i].fontFamily, '; ',
             'src: url(\'', objects[i].path, '\')',
-          '}'
+          '}\n'
           //jscs:enable validateIndentation
         ].join('');
       }
@@ -1026,11 +1026,11 @@
       if (markup) {
         markup = [
           //jscs:disable validateIndentation
-          '<style type="text/css">',
+          '\t<style type="text/css">',
             '<![CDATA[',
               markup,
             ']]>',
-          '</style>'
+          '</style>\n'
           //jscs:enable validateIndentation
         ].join('');
       }

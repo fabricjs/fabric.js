@@ -266,6 +266,7 @@
         ctx.transform.apply(ctx, this.transformMatrix);
       }
       this.transform(ctx);
+      this._setShadow(ctx);
       this.clipTo && fabric.util.clipContext(this, ctx);
       // the array is now sorted in order of highest first, so start from end
       for (var i = 0, len = this._objects.length; i < len; i++) {
@@ -531,16 +532,19 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var markup = [
-        //jscs:disable validateIndentation
-        '<g ',
-          'transform="', this.getSvgTransform(),
+      var markup = this._createBaseSVGMarkup();
+      markup.push(
+        '<g transform="',
+        /* avoiding styles intentionally */
+        this.getSvgTransform(),
+        this.getSvgTransformMatrix(),
+        '" style="',
+        this.getSvgFilter(),
         '">\n'
-        //jscs:enable validateIndentation
-      ];
+      );
 
       for (var i = 0, len = this._objects.length; i < len; i++) {
-        markup.push(this._objects[i].toSVG(reviver));
+        markup.push('\t', this._objects[i].toSVG(reviver));
       }
 
       markup.push('</g>\n');
