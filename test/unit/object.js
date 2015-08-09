@@ -1067,44 +1067,6 @@ test('toDataURL & reference to canvas', function() {
     equal(fill.colorStops[1].color, 'rgb(0,128,0)');
   });
 
-  test('setGradient with gradientTransform', function() {
-    var object = new fabric.Object();
-
-    ok(typeof object.setGradient == 'function');
-
-    equal(object.setGradient('fill', {
-      x1: 0,
-      y1: 0,
-      x2: 100,
-      y2: 100,
-      gradientTransform: [1, 0, 0, 4, 5, 5],
-      colorStops: {
-        '0': 'rgb(255,0,0)',
-        '1': 'rgb(0,128,0)'
-      }
-    }), object, 'should be chainable');
-
-    ok(typeof object.toObject().fill == 'object');
-    ok(object.fill instanceof fabric.Gradient);
-
-    var fill = object.fill;
-
-    equal(fill.type, 'linear');
-
-    equal(fill.coords.x1, 0);
-    equal(fill.coords.y1, 0);
-
-    equal(fill.coords.x2, 100);
-    equal(fill.coords.y2, 100);
-
-    deepEqual(fill.gradientTransform, [1, 0, 0, 4, 5, 5]);
-
-    equal(fill.colorStops[0].offset, 0);
-    equal(fill.colorStops[1].offset, 1);
-    equal(fill.colorStops[0].color, 'rgb(255,0,0)');
-    equal(fill.colorStops[1].color, 'rgb(0,128,0)');
-  });
-
   asyncTest('setPatternFill', function() {
     var object = new fabric.Object();
 
