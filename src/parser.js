@@ -468,11 +468,14 @@
         viewBoxWidth, viewBoxHeight, matrix, el,
         widthAttr = element.getAttribute('width'),
         heightAttr = element.getAttribute('height'),
+        x = element.getAttribute('x') || 0,
+        y = element.getAttribute('y') || 0,
+        preserveAspectRatio = element.getAttribute('preserveAspectRatio') || '',
         missingViewBox = (!viewBoxAttr || !reViewBoxTagNames.test(element.tagName)
                            || !(viewBoxAttr = viewBoxAttr.match(reViewBoxAttrValue))),
         missingDimAttr = (!widthAttr || !heightAttr || widthAttr === '100%' || heightAttr === '100%'),
         toBeParsed = missingViewBox && missingDimAttr,
-        parsedDim = { };
+        parsedDim = { }, translateMatrix = '';
 
     parsedDim.width = 0;
     parsedDim.height = 0;
@@ -505,14 +508,21 @@
     }
 
     // default is to preserve aspect ratio
-    // preserveAspectRatio attribute to be implemented
-    scaleY = scaleX = (scaleX > scaleY ? scaleY : scaleX);
+    preserveAspectRatio = fabric.util.parsePreserveAspectRatioAttribute(preserveAspectRatio);
+    if (preserveAspectRatio.alignX !== 'none') {
+      //translate all container for the effect of Mid, Min, Max
+      scaleY = scaleX = (scaleX > scaleY ? scaleY : scaleX);
+    }
 
-    if (scaleX === 1 && scaleY === 1 && minX === 0 && minY === 0) {
+    if (scaleX === 1 && scaleY === 1 && minX === 0 && minY === 0 && x === 0 && y === 0) {
       return parsedDim;
     }
 
-    matrix = ' matrix(' + scaleX +
+    if (x || y) {
+      translateMatrix = ' translate(' + parseUnit(x) + ' ' + parseUnit(y) + ') ';
+    }
+
+    matrix = translateMatrix + ' matrix(' + scaleX +
                   ' 0' +
                   ' 0 ' +
                   scaleY + ' ' +
