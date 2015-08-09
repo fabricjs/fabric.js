@@ -522,6 +522,35 @@
       imageData = null;
 
       return _isTransparent;
+    },
+
+    /**
+     * Parse preserveAspectRatio attribute from element
+     * @param {string} attribute to be parsed
+     * @return {Object} an object containing align and meetOrSlice attribute
+     */
+    parsePreserveAspectRatioAttribute: function(attribute) {
+      var meetOrSlice = 'meet', alignX = 'Mid', alignY = 'Mid',
+          aspectRatioAttrs = attribute.split(' '), align;
+
+      if (aspectRatioAttrs && aspectRatioAttrs.length) {
+        meetOrSlice = aspectRatioAttrs.pop();
+        if (meetOrSlice !== 'meet' && meetOrSlice !== 'slice') {
+          align = meetOrSlice;
+          meetOrSlice = 'meet';
+        }
+        else if (aspectRatioAttrs.length) {
+          align = aspectRatioAttrs.pop();
+        }
+      }
+      //divide align in alignX and alignY
+      alignX = align !== 'none' ? align.slice(1, 4) : 'none';
+      alignY = align !== 'none' ? align.slice(5, 8) : 'none';
+      return {
+        meetOrSlice: meetOrSlice,
+        alignX: alignX,
+        alignY: alignY
+      };
     }
   };
 
