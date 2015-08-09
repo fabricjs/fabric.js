@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=json,gestures minifier=uglifyjs` */
 /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: "1.5.0" };
+var fabric = fabric || { version: "1.6.0-rc.1" };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -65,9 +65,9 @@ fabric.reNum = '(?:[-+]?(?:\\d+|\\d*\\.\\d+)(?:e[-+]?\\d+)?)';
  * Device Pixel Ratio
  * @see https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/HTML-canvas-guide/SettingUptheCanvas/SettingUptheCanvas.html
  */
-fabric.devicePixelRatio = fabric.window.devicePixelRatio || 
-                          fabric.window.webkitDevicePixelRatio || 
-                          fabric.window.mozDevicePixelRatio || 
+fabric.devicePixelRatio = fabric.window.devicePixelRatio ||
+                          fabric.window.webkitDevicePixelRatio ||
+                          fabric.window.mozDevicePixelRatio ||
                           1;
 
 
@@ -12315,6 +12315,15 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
 (function() {
 
+  function getCoords(oCoords) {
+    return [
+      new fabric.Point(oCoords.tl.x, oCoords.tl.y),
+      new fabric.Point(oCoords.tr.x, oCoords.tr.y),
+      new fabric.Point(oCoords.br.x, oCoords.br.y),
+      new fabric.Point(oCoords.bl.x, oCoords.bl.y)
+    ];
+  }
+
   var degreesToRadians = fabric.util.degreesToRadians;
 
   fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
@@ -12333,13 +12342,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @return {Boolean} true if object intersects with an area formed by 2 points
      */
     intersectsWithRect: function(pointTL, pointBR) {
-      var oCoords = this.oCoords,
-          tl = new fabric.Point(oCoords.tl.x, oCoords.tl.y),
-          tr = new fabric.Point(oCoords.tr.x, oCoords.tr.y),
-          bl = new fabric.Point(oCoords.bl.x, oCoords.bl.y),
-          br = new fabric.Point(oCoords.br.x, oCoords.br.y),
+      var oCoords = getCoords(this.oCoords),
           intersection = fabric.Intersection.intersectPolygonRectangle(
-            [tl, tr, br, bl],
+            oCoords,
             pointTL,
             pointBR
           );
@@ -12352,20 +12357,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @return {Boolean} true if object intersects with another object
      */
     intersectsWithObject: function(other) {
-      // extracts coords
-      function getCoords(oCoords) {
-        return {
-          tl: new fabric.Point(oCoords.tl.x, oCoords.tl.y),
-          tr: new fabric.Point(oCoords.tr.x, oCoords.tr.y),
-          bl: new fabric.Point(oCoords.bl.x, oCoords.bl.y),
-          br: new fabric.Point(oCoords.br.x, oCoords.br.y)
-        };
-      }
-      var thisCoords = getCoords(this.oCoords),
-          otherCoords = getCoords(other.oCoords),
-          intersection = fabric.Intersection.intersectPolygonPolygon(
-            [thisCoords.tl, thisCoords.tr, thisCoords.br, thisCoords.bl],
-            [otherCoords.tl, otherCoords.tr, otherCoords.br, otherCoords.bl]
+      var intersection = fabric.Intersection.intersectPolygonPolygon(
+            getCoords(this.oCoords),
+            getCoords(other.oCoords)
           );
 
       return intersection.status === 'Intersection';
@@ -12537,6 +12531,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @return {Number} width value
      */
     getWidth: function() {
+      //needs to be changed
       return this.width * this.scaleX;
     },
 
@@ -12545,6 +12540,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @return {Number} height value
      */
     getHeight: function() {
+      //needs to be changed
       return this.height * this.scaleY;
     },
 
@@ -12595,7 +12591,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      */
     scaleToWidth: function(value) {
       // adjust to bounding rect factor so that rotated shapes would fit as well
-      var boundingRectFactor = this.getBoundingRectWidth() / this.getWidth();
+      var boundingRectFactor = this.getBoundingRect().width / this.getWidth();
       return this.scale(value / this.width / boundingRectFactor);
     },
 
@@ -12607,7 +12603,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      */
     scaleToHeight: function(value) {
       // adjust to bounding rect factor so that rotated shapes would fit as well
-      var boundingRectFactor = this.getBoundingRectHeight() / this.getHeight();
+      var boundingRectFactor = this.getBoundingRect().height / this.getHeight();
       return this.scale(value / this.height / boundingRectFactor);
     },
 
@@ -12620,39 +12616,27 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     setCoords: function() {
       var theta = degreesToRadians(this.angle),
           vpt = this.getViewportTransform(),
-          f = function (p) {
-            return fabric.util.transformPoint(p, vpt);
-          },
-          p = this._calculateCurrentDimensions(false),
-          currentWidth = p.x, currentHeight = p.y;
+          dim = this._calculateCurrentDimensions(),
+          currentWidth = dim.x, currentHeight = dim.y;
 
       // If width is negative, make postive. Fixes path selection issue
       if (currentWidth < 0) {
         currentWidth = Math.abs(currentWidth);
       }
 
-      var _hypotenuse = Math.sqrt(
-            Math.pow(currentWidth / 2, 2) +
-            Math.pow(currentHeight / 2, 2)),
-
-          _angle = Math.atan(
-            isFinite(currentHeight / currentWidth)
-              ? currentHeight / currentWidth
-              : 0),
-
-          // offset added for rotate and scale actions
+      var sinTh = Math.sin(theta),
+          cosTh = Math.cos(theta),
+          _angle = currentWidth > 0 ? Math.atan(currentHeight / currentWidth) : 0,
+          _hypotenuse = (currentWidth / Math.cos(_angle)) / 2,
           offsetX = Math.cos(_angle + theta) * _hypotenuse,
           offsetY = Math.sin(_angle + theta) * _hypotenuse,
-          sinTh = Math.sin(theta),
-          cosTh = Math.cos(theta),
-          coords = this.getCenterPoint(),
-          wh = new fabric.Point(currentWidth, currentHeight),
-          _tl =   new fabric.Point(coords.x - offsetX, coords.y - offsetY),
-          _tr =   new fabric.Point(_tl.x + (wh.x * cosTh),   _tl.y + (wh.x * sinTh)),
-          bl =  f(new fabric.Point(_tl.x - (wh.y * sinTh),   _tl.y + (wh.y * cosTh))),
-          br  = f(new fabric.Point(_tr.x - (wh.y * sinTh),   _tr.y + (wh.y * cosTh))),
-          tl  = f(_tl),
-          tr  = f(_tr),
+
+          // offset added for rotate and scale actions
+          coords = fabric.util.transformPoint(this.getCenterPoint(), vpt),
+          tl  = new fabric.Point(coords.x - offsetX, coords.y - offsetY),
+          tr  = new fabric.Point(tl.x + (currentWidth * cosTh), tl.y + (currentWidth * sinTh)),
+          bl  = new fabric.Point(tl.x - (currentHeight * sinTh), tl.y + (currentHeight * cosTh)),
+          br  = new fabric.Point(coords.x + offsetX, coords.y + offsetY),
           ml  = new fabric.Point((tl.x + bl.x)/2, (tl.y + bl.y)/2),
           mt  = new fabric.Point((tr.x + tl.x)/2, (tr.y + tl.y)/2),
           mr  = new fabric.Point((br.x + tr.x)/2, (br.y + tr.y)/2),
@@ -13021,7 +13005,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     _setCornerCoords: function() {
       var coords = this.oCoords,
           newTheta = degreesToRadians(45 - this.angle),
-          cornerHypotenuse = Math.sqrt(2 * Math.pow(this.cornerSize, 2)) / 2,
+          /* Math.sqrt(2 * Math.pow(this.cornerSize, 2)) / 2, */
+          /* 0.707106 stands for sqrt(2)/2 */
+          cornerHypotenuse = this.cornerSize * 0.707106,
           cosHalfOffset = cornerHypotenuse * Math.cos(newTheta),
           sinHalfOffset = cornerHypotenuse * Math.sin(newTheta),
           x, y;
@@ -13058,25 +13044,22 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       var strokeWidth = this.strokeWidth,
           w = this.width,
           h = this.height,
-          capped = this.strokeLineCap === 'round' || this.strokeLineCap === 'square',
-          vLine = this.type === 'line' && this.width === 0,
-          hLine = this.type === 'line' && this.height === 0,
-          sLine = vLine || hLine,
-          strokeW = (capped && hLine) || !sLine,
-          strokeH = (capped && vLine) || !sLine;
+          addStrokeToW = true,
+          addStrokeToH = true;
 
-      if (vLine) {
-        w = strokeWidth;
+      if (this.type === 'line' && this.strokeLineCap === 'butt') {
+        addStrokeToH = w;
+        addStrokeToW = h;
       }
-      else if (hLine) {
-        h = strokeWidth;
+
+      if (addStrokeToH) {
+        h += h < 0 ? -strokeWidth : strokeWidth;
       }
-      if (strokeW) {
-        w += (w < 0 ? -strokeWidth : strokeWidth);
+
+      if (addStrokeToW) {
+        w += w < 0 ? -strokeWidth : strokeWidth;
       }
-      if (strokeH) {
-        h += (h < 0 ? -strokeWidth : strokeWidth);
-      }
+
       return { x: w, y: h };
     },
 
@@ -13094,7 +13077,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     /*
      * private
      */
-    _calculateCurrentDimensions: function(shouldTransform)  {
+    _calculateCurrentDimensions: function()  {
       var vpt = this.getViewportTransform(),
           dim = this._getTransformedDimensions(),
           w = dim.x, h = dim.y;
@@ -13102,10 +13085,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       w += 2 * this.padding;
       h += 2 * this.padding;
 
-      if (shouldTransform) {
-        return fabric.util.transformPoint(new fabric.Point(w, h), vpt, true);
-      }
-      return { x: w, y: h };
+      return fabric.util.transformPoint(new fabric.Point(w, h), vpt, true);
     },
 
     /**
@@ -13127,7 +13107,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       ctx.strokeStyle = this.borderColor;
       ctx.lineWidth = 1 / this.borderScaleFactor;
 
-      var wh = this._calculateCurrentDimensions(true),
+      var wh = this._calculateCurrentDimensions(),
           width = wh.x,
           height = wh.y;
       if (this.group) {
@@ -13170,12 +13150,12 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         return this;
       }
 
-      var wh = this._calculateCurrentDimensions(true),
+      var wh = this._calculateCurrentDimensions(),
           width = wh.x,
           height = wh.y,
-          left = -(width / 2),
-          top = -(height / 2),
           scaleOffset = this.cornerSize / 2,
+          left = -(width / 2) - scaleOffset,
+          top = -(height / 2) - scaleOffset,
           methodName = this.transparentCorners ? 'strokeRect' : 'fillRect';
 
       ctx.save();
@@ -13187,52 +13167,52 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
       // top-left
       this._drawControl('tl', ctx, methodName,
-        left - scaleOffset,
-        top - scaleOffset);
+        left,
+        top);
 
       // top-right
       this._drawControl('tr', ctx, methodName,
-        left + width - scaleOffset,
-        top - scaleOffset);
+        left + width,
+        top);
 
       // bottom-left
       this._drawControl('bl', ctx, methodName,
-        left - scaleOffset,
-        top + height - scaleOffset);
+        left,
+        top + height);
 
       // bottom-right
       this._drawControl('br', ctx, methodName,
-        left + width - scaleOffset,
-        top + height - scaleOffset);
+        left + width,
+        top + height);
 
       if (!this.get('lockUniScaling')) {
 
         // middle-top
         this._drawControl('mt', ctx, methodName,
-          left + width/2 - scaleOffset,
-          top - scaleOffset);
+          left + width/2,
+          top);
 
         // middle-bottom
         this._drawControl('mb', ctx, methodName,
-          left + width/2 - scaleOffset,
-          top + height - scaleOffset);
+          left + width/2,
+          top + height);
 
         // middle-right
         this._drawControl('mr', ctx, methodName,
-          left + width - scaleOffset,
-          top + height/2 - scaleOffset);
+          left + width,
+          top + height/2);
 
         // middle-left
         this._drawControl('ml', ctx, methodName,
-          left - scaleOffset,
-          top + height/2 - scaleOffset);
+          left,
+          top + height/2);
       }
 
       // middle-top-rotate
       if (this.hasRotatingPoint) {
         this._drawControl('mtr', ctx, methodName,
-          left + width/2 - scaleOffset,
-          top - this.rotatingPointOffset - scaleOffset);
+          left + width/2 ,
+          top - this.rotatingPointOffset);
       }
 
       ctx.restore();
@@ -19796,10 +19776,11 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       }
       this._textLines = this._splitTextIntoLines();
       this._clearCache();
-      var currentTextAlign = this.textAlign;
-      this.textAlign = 'left';
+      //if textAlign is 'justify' i have to disable caching
+      //when calculating width of text and widths of line.
+      this._cacheLinesWidth = (this.textAlign !== 'justify');
       this.width = this._getTextWidth(ctx);
-      this.textAlign = currentTextAlign;
+      this._cacheLinesWidth = true;
       this.height = this._getTextHeight(ctx);
     },
 
@@ -19818,14 +19799,14 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      */
     _render: function(ctx) {
       this.clipTo && fabric.util.clipContext(this, ctx);
-      ctx.save();
       this._setOpacity(ctx);
       this._setShadow(ctx);
       this._setupCompositeOperation(ctx);
       this._renderTextBackground(ctx);
+      this._setStrokeStyles(ctx);
+      this._setFillStyles(ctx);
       this._renderText(ctx);
       this._renderTextDecoration(ctx);
-      ctx.restore();
       this.clipTo && ctx.restore();
     },
 
@@ -19838,16 +19819,18 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       this._translateForTextAlign(ctx);
       this._renderTextFill(ctx);
       this._renderTextStroke(ctx);
-
+      this._translateForTextAlign(ctx, true);
     },
 
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Boolean} back Indicates if translate back or forward
      */
-    _translateForTextAlign: function(ctx) {
+    _translateForTextAlign: function(ctx, back) {
       if (this.textAlign !== 'left' && this.textAlign !== 'justify') {
-        ctx.translate(this.textAlign === 'center' ? (this.width / 2) : this.width, 0);
+        var sign = back ? -1 : 1;
+        ctx.translate(this.textAlign === 'center' ? (sign * this.width / 2) : sign * this.width, 0);
       }
     },
 
@@ -19926,29 +19909,28 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       top -= this.fontSize * this._fontSizeFraction;
 
       // short-circuit
-      if (this.textAlign !== 'justify') {
+      var lineWidth = this._getLineWidth(ctx, lineIndex);
+      if (this.textAlign !== 'justify' || this.width < lineWidth) {
         this._renderChars(method, ctx, line, left, top, lineIndex);
         return;
       }
 
-      var lineWidth = this._getLineWidth(ctx, lineIndex),
-          totalWidth = this.width;
-      if (totalWidth >= lineWidth) {
-        // stretch the line
-        var words = line.split(/\s+/),
-            wordsWidth = this._getWidthOfWords(ctx, line, lineIndex),
-            widthDiff = totalWidth - wordsWidth,
-            numSpaces = words.length - 1,
-            spaceWidth = widthDiff / numSpaces,
-            leftOffset = 0;
+      // stretch the line
+      var words = line.split(/\s+/),
+          wordsWidth = this._getWidthOfWords(ctx, line, lineIndex),
+          widthDiff = this.width - wordsWidth,
+          numSpaces = words.length - 1,
+          spaceWidth = numSpaces > 0 ? widthDiff / numSpaces : 0,
+          leftOffset = 0, charOffset = 0, word;
 
-        for (var i = 0, len = words.length; i < len; i++) {
-          this._renderChars(method, ctx, words[i], left + leftOffset, top, lineIndex);
-          leftOffset += ctx.measureText(words[i]).width + spaceWidth;
+      for (var i = 0, len = words.length; i < len; i++) {
+        while (line[charOffset] === ' ' && charOffset < line.length) {
+          charOffset++;
         }
-      }
-      else {
-        this._renderChars(method, ctx, line, left, top, lineIndex);
+        word = words[i];
+        this._renderChars(method, ctx, word, left + leftOffset, top, lineIndex, charOffset);
+        leftOffset += ctx.measureText(word).width + spaceWidth;
+        charOffset += word.length;
       }
     },
 
@@ -20071,7 +20053,6 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
         return;
       }
 
-      ctx.save();
       ctx.fillStyle = this.backgroundColor;
 
       ctx.fillRect(
@@ -20081,7 +20062,6 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
         this.height
       );
 
-      ctx.restore();
     },
 
     /**
@@ -20089,21 +20069,17 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _renderTextLinesBackground: function(ctx) {
-      var lineTopOffset = 0, heightOfLine = this._getHeightOfLine();
       if (!this.textBackgroundColor) {
         return;
       }
+      var lineTopOffset = 0, heightOfLine = this._getHeightOfLine(),
+          lineWidth, lineLeftOffset;
 
-      ctx.save();
       ctx.fillStyle = this.textBackgroundColor;
-
       for (var i = 0, len = this._textLines.length; i < len; i++) {
-
         if (this._textLines[i] !== '') {
-
-          var lineWidth = this._getLineWidth(ctx, i),
-              lineLeftOffset = this._getLineLeftOffset(lineWidth);
-
+          lineWidth = this._getLineWidth(ctx, i);
+          lineLeftOffset = this._getLineLeftOffset(lineWidth);
           ctx.fillRect(
             this._getLeftOffset() + lineLeftOffset,
             this._getTopOffset() + lineTopOffset,
@@ -20113,7 +20089,6 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
         }
         lineTopOffset += heightOfLine;
       }
-      ctx.restore();
     },
 
     /**
@@ -20137,7 +20112,6 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     _clearCache: function() {
       this.__lineWidths = [ ];
       this.__lineHeights = [ ];
-      this.__lineOffsets = [ ];
     },
 
     /**
@@ -20161,14 +20135,32 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Number} lineIndex line number
      * @return {Number} Line width
      */
     _getLineWidth: function(ctx, lineIndex) {
       if (this.__lineWidths[lineIndex]) {
         return this.__lineWidths[lineIndex];
       }
-      this.__lineWidths[lineIndex] = ctx.measureText(this._textLines[lineIndex]).width;
-      return this.__lineWidths[lineIndex];
+      var width, wordCount, line = this._textLines[lineIndex];
+      if (line === '') {
+        width = 0;
+      }
+      else if (this.textAlign === 'justify' && this._cacheLinesWidth) {
+        wordCount = line.split(' ');
+        //consider not justify last line, not for now.
+        if (wordCount.length > 1) {
+          width = this.width;
+        }
+        else {
+          width = ctx.measureText(line).width;
+        }
+      }
+      else {
+        width = ctx.measureText(line).width;
+      }
+      this._cacheLinesWidth && (this.__lineWidths[lineIndex] = width);
+      return width;
     },
 
     /**
@@ -20185,12 +20177,14 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 
       /** @ignore */
       function renderLinesAtOffset(offsets) {
-        var i, lineHeight = 0, len, j, oLen;
+        var i, lineHeight = 0, len, j, oLen, lineWidth,
+            lineLeftOffset, heightOfLine;
+
         for (i = 0, len = _this._textLines.length; i < len; i++) {
 
-          var lineWidth = _this._getLineWidth(ctx, i),
-              lineLeftOffset = _this._getLineLeftOffset(lineWidth),
-              heightOfLine = _this._getHeightOfLine(ctx, i);
+          lineWidth = _this._getLineWidth(ctx, i),
+          lineLeftOffset = _this._getLineLeftOffset(lineWidth),
+          heightOfLine = _this._getHeightOfLine(ctx, i);
 
           for (j = 0, oLen = offsets.length; j < oLen; j++) {
             ctx.fillRect(
@@ -20212,7 +20206,6 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       if (this.textDecoration.indexOf('overline') > -1) {
         offsets.push(-0.12);
       }
-
       if (offsets.length > 0) {
         renderLinesAtOffset(offsets);
       }
@@ -20250,8 +20243,6 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       if (!noTransform) {
         this.transform(ctx);
       }
-      this._setStrokeStyles(ctx);
-      this._setFillStyles(ctx);
       if (this.transformMatrix) {
         ctx.transform.apply(ctx, this.transformMatrix);
       }
@@ -20376,7 +20367,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
         - textTopOffset + height - this.height / 2;
       textSpans.push(
         '<tspan x="',
-          toFixed(textLeftOffset + this._getLineLeftOffset(this.__lineWidths[i]), NUM_FRACTION_DIGITS), '" ',
+          toFixed(textLeftOffset + this._getLineLeftOffset(this._getLineWidth(this.ctx, i)), NUM_FRACTION_DIGITS), '" ',
           'y="',
           toFixed(yPos, NUM_FRACTION_DIGITS),
           '" ',
@@ -20393,11 +20384,11 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
         '\t\t<rect ',
           this._getFillAttributes(this.textBackgroundColor),
           ' x="',
-          toFixed(textLeftOffset + this._getLineLeftOffset(this.__lineWidths[i]), NUM_FRACTION_DIGITS),
+          toFixed(textLeftOffset + this._getLineLeftOffset(this._getLineWidth(this.ctx, i)), NUM_FRACTION_DIGITS),
           '" y="',
           toFixed(height - this.height / 2, NUM_FRACTION_DIGITS),
           '" width="',
-          toFixed(this.__lineWidths[i], NUM_FRACTION_DIGITS),
+          toFixed(this._getLineWidth(this.ctx, i), NUM_FRACTION_DIGITS),
           '" height="',
           toFixed(this._getHeightOfLine(this.ctx, i) / this.lineHeight, NUM_FRACTION_DIGITS),
         '"></rect>\n');
@@ -21017,7 +21008,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
           charIndex++;
         }
 
-        lineLeftOffset = this._getCachedLineOffset(lineIndex);
+        lineLeftOffset = this._getLineLeftOffset(this._getLineWidth(this.ctx, lineIndex));
       }
       if (typeOfBoundaries === 'cursor') {
         topOffset += (1 - this._fontSizeFraction) * this._getHeightOfLine(this.ctx, lineIndex) / this.lineHeight
@@ -21032,16 +21023,6 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     },
 
     /**
-     * @private
-     */
-    _getCachedLineOffset: function(lineIndex) {
-      var widthOfLine = this._getLineWidth(this.ctx, lineIndex);
-
-      return this.__lineOffsets[lineIndex] ||
-        (this.__lineOffsets[lineIndex] = this._getLineLeftOffset(widthOfLine));
-    },
-
-    /**
      * Renders cursor
      * @param {Object} boundaries
      * @param {CanvasRenderingContext2D} ctx transformed context to draw on
@@ -21053,7 +21034,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
           charIndex = cursorLocation.charIndex,
           charHeight = this.getCurrentCharFontSize(lineIndex, charIndex),
           leftOffset = (lineIndex === 0 && charIndex === 0)
-                    ? this._getCachedLineOffset(lineIndex)
+                    ? this._getLineLeftOffset(this._getLineWidth(ctx, lineIndex))
                     : boundaries.leftOffset;
 
       ctx.fillStyle = this.getCurrentCharColor(lineIndex, charIndex);
@@ -21083,7 +21064,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
           endLine = end.lineIndex;
 
       for (var i = startLine; i <= endLine; i++) {
-        var lineOffset = this._getCachedLineOffset(i) || 0,
+        var lineOffset = this._getLineLeftOffset(this._getLineWidth(ctx, i)) || 0,
             lineHeight = this._getHeightOfLine(this.ctx, i),
             boxWidth = 0, line = this._textLines[i];
 
@@ -21121,12 +21102,13 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @param {String} method
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    _renderChars: function(method, ctx, line, left, top, lineIndex) {
+    _renderChars: function(method, ctx, line, left, top, lineIndex, charOffset) {
 
       if (this.isEmptyStyles()) {
         return this._renderCharsFast(method, ctx, line, left, top);
       }
 
+      charOffset = charOffset || 0;
       this.skipTextAlign = true;
 
       // set proper box offset
@@ -21138,26 +21120,26 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 
       // set proper line offset
       var lineHeight = this._getHeightOfLine(ctx, lineIndex),
-          lineLeftOffset = this._getCachedLineOffset(lineIndex),
+          lineLeftOffset = this._getLineLeftOffset(this._getLineWidth(ctx, lineIndex)),
           prevStyle,
+          thisStyle,
           charsToRender = '';
 
       left += lineLeftOffset || 0;
 
       ctx.save();
       top -= lineHeight / this.lineHeight * this._fontSizeFraction;
-      for (var i = 0, len = line.length; i <= len; i++) {
+      for (var i = charOffset, len = line.length + charOffset; i <= len; i++) {
         prevStyle = prevStyle || this.getCurrentCharStyle(lineIndex, i);
-        var thisStyle = this.getCurrentCharStyle(lineIndex, i + 1);
+        thisStyle = this.getCurrentCharStyle(lineIndex, i + 1);
 
         if (this._hasStyleChanged(prevStyle, thisStyle) || i === len) {
           this._renderChar(method, ctx, lineIndex, i - 1, charsToRender, left, top, lineHeight);
           charsToRender = '';
           prevStyle = thisStyle;
         }
-        charsToRender += line[i];
+        charsToRender += line[i - charOffset];
       }
-
       ctx.restore();
     },
 
@@ -21339,7 +21321,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
         }
 
         var lineWidth = this._getLineWidth(ctx, i),
-            lineLeftOffset = this._getCachedLineOffset(i);
+            lineLeftOffset = this._getLineLeftOffset(lineWidth);
 
         if (this.textBackgroundColor) {
           ctx.fillStyle = this.textBackgroundColor;
@@ -21395,15 +21377,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @param {Object} [decl]
      */
     _applyCharStylesGetWidth: function(ctx, _char, lineIndex, charIndex, decl) {
-      var styleDeclaration = decl || this._getStyleDeclaration(lineIndex, charIndex);
-
-      if (styleDeclaration) {
-        // cloning so that original style object is not polluted with following font declarations
-        styleDeclaration = clone(styleDeclaration);
-      }
-      else {
-        styleDeclaration = { };
-      }
+      var styleDeclaration = decl || this._getStyleDeclaration(lineIndex, charIndex, true);
 
       this._applyFontStyles(styleDeclaration);
 
@@ -22716,7 +22690,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     fabric.document.body.appendChild(this.hiddenTextarea);
 
     fabric.util.addListener(this.hiddenTextarea, 'keydown', this.onKeyDown.bind(this));
-    fabric.util.addListener(this.hiddenTextarea, 'keypress', this.onKeyPress.bind(this));
+    fabric.util.addListener(this.hiddenTextarea, 'input', this.onInput.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'copy', this.copy.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'paste', this.paste.bind(this));
 
@@ -22781,6 +22755,24 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   },
 
   /**
+   * Handles onInput event
+   * @param {Event} e Event object
+   */
+  onInput: function(e) {
+    if (!this.isEditing || this._cancelOnInput) {
+      this._cancelOnInput = false;
+      return;
+    }
+    var offset = this.selectionStart || 0,
+        textLength = this.text.length,
+        newTextLength = this.hiddenTextarea.value.length,
+        diff = newTextLength - textLength,
+        charsToInsert = this.hiddenTextarea.value.slice(offset, offset + diff);
+    this.insertChars(charsToInsert);
+    e.stopPropagation();
+  },
+
+  /**
    * Forward delete
    */
   forwardDelete: function(e) {
@@ -22835,6 +22827,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (copiedText) {
       this.insertChars(copiedText, useCopiedStyle);
     }
+    this._cancelOnInput = true;
   },
 
   /**
@@ -22857,20 +22850,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    */
   _getClipboardData: function(e) {
     return e && (e.clipboardData || fabric.window.clipboardData);
-  },
-
-  /**
-   * Handles keypress event
-   * @param {Event} e Event object
-   */
-  onKeyPress: function(e) {
-    if (!this.isEditing || e.metaKey || e.ctrlKey) {
-      return;
-    }
-    if (e.which !== 0) {
-      this.insertChars(String.fromCharCode(e.which));
-    }
-    e.stopPropagation();
   },
 
   /**
@@ -23355,7 +23334,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
       var chars = this._textLines[lineIndex],
           charOffset = 0,
-          lineLeftOffset = this._getSVGLineLeftOffset(lineIndex) - this.width / 2,
+          lineLeftOffset = this._getLineLeftOffset(this._getLineWidth(this.ctx, lineIndex)) - this.width / 2,
           lineOffset = this._getSVGLineTopOffset(lineIndex),
           heightOfLine = this._getHeightOfLine(this.ctx, lineIndex);
 
@@ -23376,13 +23355,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
         charOffset += charWidth;
       }
-    },
-
-    /**
-     * @private
-     */
-    _getSVGLineLeftOffset: function(lineIndex) {
-      return fabric.util.toFixed(this._getLineLeftOffset(this.__lineWidths[lineIndex]), 2);
     },
 
     /**
@@ -23430,8 +23402,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
       return [
         //jscs:disable validateIndentation
-        '<tspan x="', lineLeftOffset + charOffset, '" y="',
-          lineTopOffset - this.height/2, '" ',
+        '<tspan x="', toFixed(lineLeftOffset + charOffset, NUM_FRACTION_DIGITS), '" y="',
+          toFixed(lineTopOffset - this.height/2, NUM_FRACTION_DIGITS), '" ',
           (styleDecl.fontFamily ? 'font-family="' + styleDecl.fontFamily.replace(/"/g, '\'') + '" ': ''),
           (styleDecl.fontSize ? 'font-size="' + styleDecl.fontSize + '" ': ''),
           (styleDecl.fontStyle ? 'font-style="' + styleDecl.fontStyle + '" ': ''),
@@ -23545,18 +23517,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       // clear cache and re-calculate height
       this._clearCache();
       this.height = this._getTextHeight(ctx);
-      this._setLineWidths();
-    },
-
-    /**
-     * set the __lineWidths cache array to support
-     * functions that expect it to be filled
-     * @private
-     */
-    _setLineWidths: function() {
-      for (var i = 0, len = this._textLines.length; i < len; i++) {
-        this.__lineWidths[i] = this.width;
-      }
     },
 
     /**
@@ -23605,14 +23565,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         lineIndex = map.line;
         charIndex = map.offset + charIndex;
       }
-
-      if (returnCloneOrEmpty) {
-        return (this.styles[lineIndex] && this.styles[lineIndex][charIndex])
-          ? clone(this.styles[lineIndex][charIndex])
-          : {};
-      }
-
-      return this.styles[lineIndex] && this.styles[lineIndex][charIndex] ? this.styles[lineIndex][charIndex] : null;
+      return this.callSuper('_getStyleDeclaration', lineIndex, charIndex, returnCloneOrEmpty);
     },
 
     /**
@@ -23868,7 +23821,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
           leftOffset     = 0,
           cursorLocation = this.get2DCursorLocation(),
           lineChars      = this._textLines[cursorLocation.lineIndex].split(''),
-          lineLeftOffset = this._getCachedLineOffset(cursorLocation.lineIndex);
+          lineLeftOffset = this._getLineLeftOffset(this._getLineWidth(this.ctx, cursorLocation.lineIndex));
 
       for (var i = 0; i < cursorLocation.charIndex; i++) {
         leftOffset += this._getWidthOfChar(this.ctx, lineChars[i], cursorLocation.lineIndex, i);
