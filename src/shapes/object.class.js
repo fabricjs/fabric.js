@@ -1339,7 +1339,7 @@
         gradient.coords.r2 = options.r2;
       }
 
-      options.gradientTransform && gradient.gradientTransform = options.gradientTransform;
+      options.gradientTransform && (gradient.gradientTransform = options.gradientTransform);
 
       for (var position in options.colorStops) {
         var color = new fabric.Color(options.colorStops[position]);
