@@ -749,36 +749,6 @@
     },
 
     /**
-     * Given a context, renders an object on that context
-     * @param {CanvasRenderingContext2D} ctx Context to render object on
-     * @param {fabric.Object} object Object to render
-     * @private
-     */
-    _draw: function (ctx, object) {
-      if (!object) {
-        return;
-      }
-
-      ctx.save();
-      var v = this.viewportTransform;
-      ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
-      if (this._shouldRenderObject(object)) {
-        object.render(ctx);
-      }
-      ctx.restore();
-      if (!this.controlsAboveOverlay) {
-        object._renderControls(ctx);
-      }
-    },
-
-    _shouldRenderObject: function(object) {
-      if (!object) {
-        return false;
-      }
-      return (object !== this.getActiveGroup() || !this.preserveObjectStacking);
-    },
-
-    /**
      * @private
      * @param {fabric.Object} obj Object that was added
      */
@@ -855,7 +825,7 @@
      */
     renderAll: function (allOnTop) {
       var canvasToDrawOn = this[(allOnTop === true && this.interactive) ? 'contextTop' : 'contextContainer'],
-          activeGroup = this.getActiveGroup();
+          activeGroup = this.getActiveGroup(), objsToRender = [ ], object, activeGroupObjects = [ ];
 
       if (this.contextTop && this.selection && !this._groupSelector) {
         this.clearContext(this.contextTop);
@@ -871,16 +841,34 @@
         fabric.util.clipContext(this, canvasToDrawOn);
       }
 
-      this._renderBackground(canvasToDrawOn);
-      this._renderObjects(canvasToDrawOn, activeGroup);
-      this._renderActiveGroup(canvasToDrawOn, activeGroup);
+      if (activeGroup && !this.preserveObjectStacking) {
+        for (var i = 0, length = this._objects.length; i < length; i++) {
+          object = this._objects[i];
+          if (!activeGroup.contains(object)) {
+            objsToRender.push(object);
+          }
+          else {
+            activeGroupObjects.push(object);
+          }
+        }
+        activeGroup._set('_objects', activeGroupObjects);
+      }
+      else {
+        objsToRender = this._objects;
+      }
 
+      //apply viewport transform once for all rendering process
+      canvasToDrawOn.setTransform.apply(canvasToDrawOn, this.viewportTransform);
+      this._renderBackground(canvasToDrawOn);
+      this._renderObjects(canvasToDrawOn, objsToRender);
+      !this.preserveObjectStacking && this._renderObjects(canvasToDrawOn, [activeGroup]);
+      if (!this.controlsAboveOverlay && this.interactive) {
+        this.drawControls(canvasToDrawOn);
+      }
       if (this.clipTo) {
         canvasToDrawOn.restore();
       }
-
       this._renderOverlay(canvasToDrawOn);
-
       if (this.controlsAboveOverlay && this.interactive) {
         this.drawControls(canvasToDrawOn);
       }
@@ -893,46 +881,32 @@
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {fabric.Group} activeGroup
+     * @param {Array} objects to render
      */
-    _renderObjects: function(ctx, activeGroup) {
-      var i, length;
-
-      // fast path
-      if (!activeGroup || this.preserveObjectStacking) {
-        for (i = 0, length = this._objects.length; i < length; ++i) {
-          this._draw(ctx, this._objects[i]);
-        }
-      }
-      else {
-        for (i = 0, length = this._objects.length; i < length; ++i) {
-          if (this._objects[i] && !activeGroup.contains(this._objects[i])) {
-            this._draw(ctx, this._objects[i]);
-          }
-        }
+    _renderObjects: function(ctx, objects) {
+      for (var i = 0, length = objects.length; i < length; ++i) {
+        objects[i] && objects[i].render(ctx);
       }
     },
 
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {fabric.Group} activeGroup
      */
-    _renderActiveGroup: function(ctx, activeGroup) {
+    _renderBackgroundOrOverlay: function(ctx, property) {
+      if (this[property + 'Color']) {
+        ctx.fillStyle = this[property + 'Color'].toLive
+          ? this[property + 'Color'].toLive(ctx)
+          : this[property + 'Color'];
 
-      // delegate rendering to group selection (if one exists)
-      if (activeGroup) {
-
-        //Store objects in group preserving order, then replace
-        var sortedObjects = [];
-        this.forEachObject(function (object) {
-          if (activeGroup.contains(object)) {
-            sortedObjects.push(object);
-          }
-        });
-        // forEachObject reverses the object, so we reverse again
-        activeGroup._set('_objects', sortedObjects.reverse());
-        this._draw(ctx, activeGroup);
+        ctx.fillRect(
+          this[property + 'Color'].offsetX || 0,
+          this[property + 'Color'].offsetY || 0,
+          this.width,
+          this.height);
+      }
+      if (this[property + 'Image']) {
+        this[property + 'Image'].render(ctx);
       }
     },
 
@@ -941,20 +915,7 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _renderBackground: function(ctx) {
-      if (this.backgroundColor) {
-        ctx.fillStyle = this.backgroundColor.toLive
-          ? this.backgroundColor.toLive(ctx)
-          : this.backgroundColor;
-
-        ctx.fillRect(
-          this.backgroundColor.offsetX || 0,
-          this.backgroundColor.offsetY || 0,
-          this.width,
-          this.height);
-      }
-      if (this.backgroundImage) {
-        this._draw(ctx, this.backgroundImage);
-      }
+      this._renderBackgroundOrOverlay(ctx, 'background');
     },
 
     /**
@@ -962,20 +923,7 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _renderOverlay: function(ctx) {
-      if (this.overlayColor) {
-        ctx.fillStyle = this.overlayColor.toLive
-          ? this.overlayColor.toLive(ctx)
-          : this.overlayColor;
-
-        ctx.fillRect(
-          this.overlayColor.offsetX || 0,
-          this.overlayColor.offsetY || 0,
-          this.width,
-          this.height);
-      }
-      if (this.overlayImage) {
-        this._draw(ctx, this.overlayImage);
-      }
+      this._renderBackgroundOrOverlay(ctx, 'overlay');
     },
 
     /**
