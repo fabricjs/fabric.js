@@ -131,6 +131,8 @@
             : 0);
       }
 
+      this.parentOffset = { x: options.offsetX, y: options.offsetY };
+
       this.pathOffset = this.pathOffset || {
         x: this.minX + this.width / 2,
         y: this.minY + this.height / 2
@@ -152,12 +154,12 @@
           controlY = 0, // current control point y
           tempX,
           tempY,
-          l = -this.pathOffset.x,
-          t = -this.pathOffset.y;
+          l = -this.pathOffset.x + this.parentOffset.x,
+          t = -this.pathOffset.y + this.parentOffset.y;
 
       if (this.group && this.group.type === 'path-group') {
-        l = 0;
-        t = 0;
+        l = this.parentOffset.x;
+        t = this.parentOffset.y;
       }
 
       ctx.beginPath();

@@ -60,6 +60,14 @@
       this.points = points || [ ];
       this.callSuper('initialize', options);
       this._calcDimensions();
+
+      if ('offsetX' in options && 'offsetY' in options) {
+        this.points.forEach(function(p) {
+          p.x += options.offsetX;
+          p.y += options.offsetY;
+        });
+      }
+
       if (!('top' in options)) {
         this.top = this.minY;
       }

@@ -1,7 +1,7 @@
 fabric.ElementsParser = function(elements, callback, options, reviver) {
   this.elements = elements;
   this.callback = callback;
-  this.options = options;
+  this.options = options || {};
   this.reviver = reviver;
   this.svgUid = (options && options.svgUid) || 0;
 };
@@ -40,6 +40,7 @@ fabric.ElementsParser.prototype.createObject = function(el, index) {
 };
 
 fabric.ElementsParser.prototype._createObject = function(klass, el, index) {
+  this.resolveParentOffset(el);
   if (klass.async) {
     klass.fromElement(el, this.createCallback(index, el), this.options);
   }
@@ -51,6 +52,27 @@ fabric.ElementsParser.prototype._createObject = function(klass, el, index) {
     this.instances[index] = obj;
     this.checkIfDone();
   }
+};
+
+fabric.ElementsParser.prototype.resolveParentOffset = function(el) {
+  if (!el) {
+    return;
+  }
+
+  var offsetX = 0,
+      offsetY = 0,
+      node = el.parentNode;
+
+  while (node != null) {
+    if ('tagName' in node && node.tagName.toLowerCase() === 'svg') {
+      offsetX += parseInt(node.getAttribute('x')) || 0;
+      offsetY += parseInt(node.getAttribute('y')) || 0;
+    }
+    node = node.parentNode;
+  }
+
+  this.options.offsetX = offsetX;
+  this.options.offsetY = offsetY;
 };
 
 fabric.ElementsParser.prototype.createCallback = function(index, el) {
