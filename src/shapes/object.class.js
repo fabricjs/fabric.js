@@ -1286,6 +1286,7 @@
      * @param {Number} [options.r1=0] Radius of start point (only for radial gradients)
      * @param {Number} [options.r2=0] Radius of end point (only for radial gradients)
      * @param {Object} [options.colorStops] Color stops object eg. {0: 'ff0000', 1: '000000'}
+     * @param {Object} [options.gradientTransform] transforMatrix for gradient
      * @return {fabric.Object} thisArg
      * @chainable
      * @see {@link http://jsfiddle.net/fabricjs/58y8b/|jsFiddle demo}
@@ -1337,6 +1338,8 @@
         gradient.coords.r1 = options.r1;
         gradient.coords.r2 = options.r2;
       }
+
+      options.gradientTransform && (gradient.gradientTransform = options.gradientTransform);
 
       for (var position in options.colorStops) {
         var color = new fabric.Color(options.colorStops[position]);

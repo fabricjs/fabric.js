@@ -589,28 +589,13 @@
    */
   fabric.Image.fromElement = function(element, callback, options) {
     var parsedAttributes = fabric.parseAttributes(element, fabric.Image.ATTRIBUTE_NAMES),
-        align = 'xMidYMid', meetOrSlice = 'meet', alignX, alignY, aspectRatioAttrs;
+        preserveAR;
 
     if (parsedAttributes.preserveAspectRatio) {
-      aspectRatioAttrs = parsedAttributes.preserveAspectRatio.split(' ');
+      preserveAR = fabric.util.parsePreserveAspectRatioAttribute(parsedAttributes.preserveAspectRatio);
+      extend(parsedAttributes, preserveAR);
     }
 
-    if (aspectRatioAttrs && aspectRatioAttrs.length) {
-      meetOrSlice = aspectRatioAttrs.pop();
-      if (meetOrSlice !== 'meet' && meetOrSlice !== 'slice') {
-        align = meetOrSlice;
-        meetOrSlice = 'meet';
-      }
-      else if (aspectRatioAttrs.length) {
-        align = aspectRatioAttrs.pop();
-      }
-    }
-    //divide align in alignX and alignY
-    alignX = align !== 'none' ? align.slice(1, 4) : 'none';
-    alignY = align !== 'none' ? align.slice(5, 8) : 'none';
-    parsedAttributes.alignX = alignX;
-    parsedAttributes.alignY = alignY;
-    parsedAttributes.meetOrSlice = meetOrSlice;
     fabric.Image.fromURL(parsedAttributes['xlink:href'], callback,
       extend((options ? fabric.util.object.clone(options) : { }), parsedAttributes));
   };
