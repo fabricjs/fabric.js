@@ -313,14 +313,14 @@
     originY:                  'top',
 
     /**
-     * Top position of an object. Note that by default it's relative to object center. You can change this by setting originY={top/center/bottom}
+     * Top position of an object. Note that by default it's relative to object top. You can change this by setting originY={top/center/bottom}
      * @type Number
      * @default
      */
     top:                      0,
 
     /**
-     * Left position of an object. Note that by default it's relative to object center. You can change this by setting originX={left/center/right}
+     * Left position of an object. Note that by default it's relative to object left. You can change this by setting originX={left/center/right}
      * @type Number
      * @default
      */
