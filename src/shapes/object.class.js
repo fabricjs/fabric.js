@@ -783,7 +783,7 @@
             fill:                     (this.fill && this.fill.toObject) ? this.fill.toObject() : this.fill,
             stroke:                   (this.stroke && this.stroke.toObject) ? this.stroke.toObject() : this.stroke,
             strokeWidth:              toFixed(this.strokeWidth, NUM_FRACTION_DIGITS),
-            strokeDashArray:          this.strokeDashArray,
+            strokeDashArray:          this.strokeDashArray ? extend([ ], this.strokeDashArray) : this.strokeDashArray,
             strokeLineCap:            this.strokeLineCap,
             strokeLineJoin:           this.strokeLineJoin,
             strokeMiterLimit:         toFixed(this.strokeMiterLimit, NUM_FRACTION_DIGITS),
@@ -799,7 +799,7 @@
             backgroundColor:          this.backgroundColor,
             fillRule:                 this.fillRule,
             globalCompositeOperation: this.globalCompositeOperation,
-            transformMatrix:          this.transformMatrix
+            transformMatrix:          this.transformMatrix ? extend([ ], this.transformMatrix) : this.transformMatrix
           };
 
       if (!this.includeDefaultValues) {

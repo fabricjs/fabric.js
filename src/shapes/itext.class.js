@@ -1121,8 +1121,16 @@
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
+      var newStyle = { }, i, j, row;
+      for (i in this.styles) {
+        row = this.styles[i];
+        newStyle[i] = { };
+        for (j in row) {
+          newStyle[i][j] = clone(row[j]);
+        }
+      }
       return fabric.util.object.extend(this.callSuper('toObject', propertiesToInclude), {
-        styles: clone(this.styles)
+        styles: newStyle
       });
     }
   });
