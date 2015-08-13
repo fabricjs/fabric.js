@@ -505,15 +505,10 @@
      * @private
      */
     _changeSkewTransformOrigin: function(localMouseByCenter, t, by) {
-      t.sign = 1, corner = t.corner, property = '',
-      skew, originA, originB, mouseSign, skewSign;
+      var t.sign = 1, property = 'originX', origins = { },
+          skew = t.target.skewX, originA = 'left', originB = 'right',
+          corner = t.corner === 'mt' || t.corner === 'ml' ? 1 : -1;
 
-      if (by === 'x') {
-        skew = t.target.skewX;
-        originA = 'left';
-        originB = 'right';
-        property = 'originX';
-      }
       if (by === 'y') {
         skew = t.target.skewY;
         originA = 'top';
@@ -521,38 +516,21 @@
         property = 'originY';
       }
 
-      skewSign = skew > 0 ? 1 : skew < 0 ? -1 : 0;
-      mouseSign = localMouseByCenter[by] > 0 ? 1 : -1;
+      origins[-1] = originA;
+      origins[0] = 'center';
+      origins[1] = originB;
+
+      skew = skew > 0 ? 1 : skew < 0 ? -1 : 0;
+      t.sign = localMouseByCenter[by] > 0 ? 1 : -1;
+      t[property] = t.sign > 0 ? originA : originB;
 
       if (this._shouldCenterTransform(t.target)) {
-        originA = 'center';
-        originB = 'center';
-        mouseSign *= 2;
+        t.sign *= 2;
       }
 
-      if (skewSign > 0) {
-        if (corner === 'mt') {
-          t[property] = originB;
-          t.sign = -1 * mouseSign;
-        }
-        else if (corner === 'mb') {
-          t[property] = originA;
-          t.sign = mouseSign;
-        }
-      }
-      else if (skewSign > 0) {
-        if (corner === 'mt') {
-          t[property] = originA;
-          t.sign = mouseSign;
-        }
-        else if (corner === 'mb') {
-          t[property] = originB;
-          t.sign = -1 * mouseSign;
-        }
-      }
-      else {
-        //skewSign === 0, i always enlarge
-        t[property] = mouseSign > 0 ? originA : originB;
+      t[property] = origins[skew * corner];
+      if (skew === corner) {
+        t.sign *= -1;
       }
     },
 
