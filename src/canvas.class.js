@@ -505,7 +505,7 @@
      * @private
      */
     _changeSkewTransformOrigin: function(localMouseByCenter, t, by) {
-      var t.sign = 1, property = 'originX', origins = {0: 'center'},
+      var property = 'originX', origins = {0: 'center'},
           skew = t.target.skewX, originA = 'left', originB = 'right',
           corner = t.corner === 'mt' || t.corner === 'ml' ? 1 : -1;
 
@@ -515,7 +515,7 @@
         originB = 'bottom';
         property = 'originY';
       }
-
+      t.sign = 1;
       origins[-1] = originA;
       origins[1] = originB;
 
@@ -552,16 +552,14 @@
 
       // Get the constraint point
       var center = target.getCenterPoint(),
-          constraintPosition, localMouse,
-          localMouseByCenter = target.toLocalPoint(new fabric.Point(x, y), 'center', 'center'),
-          dim = target._getTransformedDimensions();
+          constraintPosition, dim = target._getTransformedDimensions(),
+          localMouseByCenter = target.toLocalPoint(new fabric.Point(x, y), 'center', 'center');
 
       this._changeSkewTransformOrigin(localMouseByCenter, t, by);
       constraintPosition = target.translateToOriginPoint(center, t.originX, t.originY);
-      localMouse = target.toLocalPoint(new fabric.Point(x, y), t.originX, t.originY);
 
       // Actually scale the object
-      this._setObjectSkew(localMouse, t, by, dim);
+      this._setObjectSkew(localMouseByCenter, t, by, dim);
 
       // Make sure the constraints apply
       target.setPositionByOrigin(constraintPosition, t.originX, t.originY);
