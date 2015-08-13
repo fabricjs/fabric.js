@@ -421,10 +421,10 @@
           return 'rotate';
         case 'ml':
         case 'mr':
-          return e.shiftKey ? 'skewX' : 'scaleX';
+          return e.shiftKey ? 'skewY' : 'scaleX';
         case 'mt':
         case 'mb':
-          return e.shiftKey ? 'skewY' : 'scaleY';
+          return e.shiftKey ? 'skewX' : 'scaleY';
         default:
           return 'scale';
       }
