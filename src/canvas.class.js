@@ -505,18 +505,20 @@
      * @private
      */
     _changeSkewTransformOrigin: function(localMouseByCenter, t, by) {
-      t.sign = 1, corner = t.corner,
+      t.sign = 1, corner = t.corner, property = '',
       skew, originA, originB, mouseSign, skewSign;
 
       if (by === 'x') {
         skew = t.target.skewX;
         originA = 'left';
         originB = 'right';
+        property = 'originX';
       }
       if (by === 'y') {
         skew = t.target.skewY;
         originA = 'top';
         originB = 'bottom';
+        property = 'originY';
       }
 
       skewSign = skew > 0 ? 1 : skew < 0 ? -1 : 0;
@@ -530,32 +532,27 @@
 
       if (skewSign > 0) {
         if (corner === 'mt') {
-          t.originX = originB;
-          t.originY = originB;
+          t[property] = originB;
           t.sign = -1 * mouseSign;
         }
         else if (corner === 'mb') {
-          t.originX = originA;
-          t.originY = originA;
+          t[property] = originA;
           t.sign = mouseSign;
         }
       }
       else if (skewSign > 0) {
         if (corner === 'mt') {
-          t.originX = originA;
-          t.originY = originA;
+          t[property] = originA;
           t.sign = mouseSign;
         }
         else if (corner === 'mb') {
-          t.originX = originB;
-          t.originY = originB;
+          t[property] = originB;
           t.sign = -1 * mouseSign;
         }
       }
       else {
         //skewSign === 0, i always enlarge
-        t.originX = mouseSign > 0 ? originA : originB;
-        t.originY = mouseSign > 0 ? originA : originB;
+        t[property] = mouseSign > 0 ? originA : originB;
       }
     },
 
