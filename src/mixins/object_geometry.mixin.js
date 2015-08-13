@@ -349,7 +349,7 @@
           skewMatrixY = [1, Math.tan(degreesToRadians(this.skewY)), 0, 1, 0, 0],
           scaleMatrix = [this.scaleX, 0, 0, this.scaleY, 0, 0],
           m = fabric.util.multiplyTransformMatrices(scaleMatrix, skewMatrixX, true);
-      return = fabric.util.multiplyTransformMatrices(m, skewMatrixY, true);
+      return fabric.util.multiplyTransformMatrices(m, skewMatrixY, true);
     }
   });
 })();
