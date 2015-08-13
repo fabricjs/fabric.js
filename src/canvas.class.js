@@ -579,7 +579,7 @@
       else if (by === 'y') {
         radians = Math.atan((localMouse.y / target.scaleY - _dim.y) / _dim.x);
         transform.newSkewY = fabric.util.radiansToDegrees(radians);
-        lockSkewingX || target.set('skewY', transform.newSkewY);
+        target.set('skewY', transform.newSkewY);
       }
     },
 
