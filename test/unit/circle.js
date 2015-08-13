@@ -39,7 +39,7 @@
   });
 
   test('setRadius', function() {
-    var circle = new fabric.Circle({ radius: 10 });
+    var circle = new fabric.Circle({ radius: 10, strokeWidth: 0});
 
     ok(typeof circle.setRadius == 'function');
 
@@ -59,7 +59,7 @@
   });
 
   test('set radius', function() {
-    var circle = new fabric.Circle();
+    var circle = new fabric.Circle({strokeWidth: 0});
 
     circle.set('radius', 20);
 
@@ -108,6 +108,8 @@
       'radius':                   0,
       'startAngle':               0,
       'endAngle':                 2 * Math.PI,
+      'skewX':                    0,
+      'skewY':                    0,
       'transformMatrix':          null
     };
     ok(typeof circle.toObject == 'function');
@@ -218,7 +220,7 @@
   });
 
   test('cloning and radius, width, height', function() {
-    var circle = new fabric.Circle({ radius: 10 });
+    var circle = new fabric.Circle({ radius: 10, strokeWidth: 0 });
     circle.scale(2);
 
     var clone = circle.clone();

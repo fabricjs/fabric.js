@@ -154,13 +154,13 @@
                           '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,'+
                           '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,'+
                           '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over",'+
-                          '"transformMatrix":null}';
+                          '"transformMatrix":null,"skewX":0,"skewY":0}';
 
     var augmentedJSON = '{"type":"object","originX":"left","originY":"top","left":0,"top":0,"width":122,"height":0,"fill":"rgb(0,0,0)",'+
                         '"stroke":null,"strokeWidth":1,"strokeDashArray":[5,2],"strokeLineCap":"round","strokeLineJoin":"bevil","strokeMiterLimit":5,'+
                         '"scaleX":1.3,"scaleY":1,"angle":0,"flipX":false,"flipY":true,"opacity":0.88,'+
                         '"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over",'+
-                        '"transformMatrix":null}';
+                        '"transformMatrix":null,"skewX":0,"skewY":0}';
 
     var cObj = new fabric.Object();
     ok(typeof cObj.toJSON == 'function');
@@ -206,6 +206,8 @@
       'clipTo':                   null,
       'fillRule':                 'nonzero',
       'globalCompositeOperation': 'source-over',
+      'skewX':                    0,
+      'skewY':                    0,
       'transformMatrix':          null
     };
 
@@ -236,7 +238,9 @@
       'clipTo':                   null,
       'fillRule':                 'nonzero',
       'globalCompositeOperation': 'source-over',
-      'transformMatrix':          null
+      'transformMatrix':          null,
+      'skewX':                    0,
+      'skewY':                    0
     };
 
     var cObj = new fabric.Object();
@@ -412,11 +416,11 @@ test('getBoundingRectWithStroke', function() {
   test('getHeight', function() {
     var cObj = new fabric.Object();
     ok(typeof cObj.getHeight == 'function');
-    equal(cObj.getHeight(), 0);
+    equal(cObj.getHeight(), 0 + cObj.strokeWidth);
     cObj.set('height', 123);
-    equal(cObj.getHeight(), 123);
+    equal(cObj.getHeight(), 123 + cObj.strokeWidth);
     cObj.set('scaleY', 2);
-    equal(cObj.getHeight(), 246);
+    equal(cObj.getHeight(), 246 + cObj.strokeWidth * 2);
   });
 
   test('rotate', function() {

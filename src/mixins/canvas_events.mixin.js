@@ -617,6 +617,14 @@
         this._scaleObject(x, y, 'y');
         this._fire('scaling', target, e);
       }
+      else if (action === 'skewX') {
+        this._skewObject(x, y, 'x');
+        this._fire('skewing', target, e);
+      }
+      else if (action === 'skewY') {
+        this._skewObject(x, y, 'y');
+        this._fire('skewing', target, e);
+      }
       else {
         this._translateObject(x, y);
         this._fire('moving', target, e);
@@ -637,14 +645,14 @@
      */
     _beforeScaleTransform: function(e, transform) {
       if (transform.action === 'scale' || transform.action === 'scaleX' || transform.action === 'scaleY') {
-        var centerTransform = this._shouldCenterTransform(e, transform.target);
+        var centerTransform = this._shouldCenterTransform(transform.target);
 
         // Switch from a normal resize to center-based
         if ((centerTransform && (transform.originX !== 'center' || transform.originY !== 'center')) ||
            // Switch from center-based resize to normal one
            (!centerTransform && transform.originX === 'center' && transform.originY === 'center')
         ) {
-          this._resetCurrentTransform(e);
+          this._resetCurrentTransform();
           transform.reset = true;
         }
       }
@@ -663,7 +671,7 @@
       else {
         // Switch from a normal resize to proportional
         if (!transform.reset && transform.currentAction === 'scale') {
-          this._resetCurrentTransform(e, transform.target);
+          this._resetCurrentTransform();
         }
 
         transform.currentAction = 'scaleEqually';
