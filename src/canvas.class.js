@@ -505,7 +505,7 @@
      * @private
      */
     _changeSkewTransformOrigin: function(localMouseByCenter, t, by) {
-      var t.sign = 1, property = 'originX', origins = { },
+      var t.sign = 1, property = 'originX', origins = {0: 'center'},
           skew = t.target.skewX, originA = 'left', originB = 'right',
           corner = t.corner === 'mt' || t.corner === 'ml' ? 1 : -1;
 
@@ -517,11 +517,10 @@
       }
 
       origins[-1] = originA;
-      origins[0] = 'center';
       origins[1] = originB;
 
       skew = skew > 0 ? 1 : skew < 0 ? -1 : 0;
-      t.sign = localMouseByCenter[by] > 0 ? 1 : -1;
+      t.sign = skew === 0 ? 1 : localMouseByCenter[by] > 0 ? 1 : -1;
       t[property] = t.sign > 0 ? originA : originB;
 
       if (this._shouldCenterTransform(t.target)) {
