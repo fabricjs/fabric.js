@@ -710,9 +710,9 @@
     /**
      * @private
      */
-    _setCornerCursor: function(corner, target) {
+    _setCornerCursor: function(corner, target, e) {
       if (corner in cursorOffset) {
-        this.setCursor(this._getRotatedCornerCursor(corner, target));
+        this.setCursor(this._getRotatedCornerCursor(corner, target, e));
       }
       else if (corner === 'mtr' && target.hasRotatingPoint) {
         this.setCursor(this.rotationCursor);
@@ -726,7 +726,7 @@
     /**
      * @private
      */
-    _getRotatedCornerCursor: function(corner, target) {
+    _getRotatedCornerCursor: function(corner, target, e) {
       var n = Math.round((target.getAngle() % 360) / 45);
 
       if (n < 0) {
@@ -735,7 +735,11 @@
       n += cursorOffset[corner];
       // normalize n to be from 0 to 7
       n %= 8;
-
+      if (e.shiftKey && !(corner % 2)) {
+        //if we are holding shift and we are on a mx corner...
+        n += 2;
+        n %= 8;
+      }
       return this.cursorMap[n];
     }
   });
