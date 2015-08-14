@@ -504,7 +504,7 @@
      * checking mouse direction and pressed corner.
      * @private
      */
-    _changeSkewTransformOrigin: function(localMouseByCenter, t, by) {
+   /* _changeSkewTransformOrigin: function(localMouseByCenter, t, by) {
       var property = 'originX', origins = {0: 'center'},
           skew = t.target.skewX, originA = 'left', originB = 'right',
           corner = t.corner === 'mt' || t.corner === 'ml' ? 1 : -1;
@@ -531,6 +531,80 @@
       if (skew === corner) {
         t.sign *= -1;
       }
+    },*/
+
+    _changeSkewTransformOrigin: function(localMouseByCenter, t, by) {
+      var property = 'originX', origins = {0: 'center'},
+          skew = t.target.skewX, originA = 'left', originB = 'right',
+          corner = t.corner === 'mt' || t.corner === 'ml' ? 1 : -1,
+          mousemove = localMouseByCenter[by];
+          
+      if (by === 'y') {
+        skew = t.target.skewY;
+        originA = 'top';
+        originB = 'bottom';
+        property = 'originY';
+      }
+
+      if (mousemove > 0) {
+        t.sign = 1;
+        if (skew > 0) {
+          if (corner === 1) {
+            t[property] = originB;
+            t.sign = -1;
+          }
+          else {
+            t[property] = originA;
+            t.sign = 1;
+          }
+        } else if (skew < 0) {
+          if (corner === 1) {
+            t[property] = originA;
+            t.sign = 1
+          }
+          else {
+            t[property] = originB;
+            t.sign = -1
+          }
+        }
+      }
+      if (mousemove < 0) {
+        if (skew > 0) {
+          if (corner === 1) {
+            t[property] = originB;
+            t.sign = -1;
+          }
+          else {
+            t[property] = originA;
+            t.sign = 1;
+          }
+        } else if (skew < 0) {
+          if (corner === 1) {
+            t[property] = originA;
+            t.sign = 1;
+          }
+          else {
+            t[property] = originB;
+            t.sign = -1;
+          }
+        }
+      }
+      
+      if (skew === 0) {
+        t.sign = mousemove > 0 ? 1 : -1;
+        if (corner === 1) {
+          t[property] = mousemove > 0 ? originA : originB;
+        }
+        else {
+          t[property] = mousemove < 0 ? originB : originA;
+        }
+      }
+      
+      if (this._shouldCenterTransform(t.target)) {
+        t.sign *= 2;
+      }
+      console.log(t[property], mousemove, t.sign, skew);
+      return true;
     },
 
     /**
