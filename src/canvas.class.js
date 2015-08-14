@@ -545,10 +545,10 @@
         originB = 'bottom';
         property = 'originY';
       }
-
       if (mousemove > 0) {
         t.sign = 1;
         if (skew > 0) {
+          t.skewSign = 1;
           if (corner === 1) {
             t[property] = originB;
             t.sign = -1;
@@ -558,6 +558,7 @@
             t.sign = 1;
           }
         } else if (skew < 0) {
+          t.skewSign = -1;
           if (corner === 1) {
             t[property] = originA;
             t.sign = 1
@@ -570,6 +571,7 @@
       }
       if (mousemove < 0) {
         if (skew > 0) {
+          t.skewSign = 1;
           if (corner === 1) {
             t[property] = originB;
             t.sign = -1;
@@ -579,6 +581,7 @@
             t.sign = 1;
           }
         } else if (skew < 0) {
+          t.skewSign = -1;
           if (corner === 1) {
             t[property] = originA;
             t.sign = 1;
@@ -593,17 +596,26 @@
       if (skew === 0) {
         t.sign = mousemove > 0 ? 1 : -1;
         if (corner === 1) {
-          t[property] = mousemove > 0 ? originA : originB;
+          if (mousemove > 0) {
+            t[property] = originA;
+            t.skewSign = -1;
+          }
+          else {
+            t[property] = originB;
+            t.skewSign = 1;
+          }
         }
         else {
-          t[property] = mousemove < 0 ? originB : originA;
+          if (mousemove > 0) {
+            t[property] = originA;
+            t.skewSign = 1;
+          }
+          else {
+            t[property] = originB;
+            t.skewSign = -1;
+          }
         }
       }
-      
-      if (this._shouldCenterTransform(t.target)) {
-        t.sign *= 2;
-      }
-      console.log(t[property], mousemove, t.sign, skew);
       return true;
     },
 
