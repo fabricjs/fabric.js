@@ -616,6 +616,9 @@
           }
         }
       }
+
+      //console.log(t[property], mousemove, t.sign, skew, t.skewSign);
+
       return true;
     },
 
@@ -654,7 +657,7 @@
     /**
      * @private
      */
-    _setObjectSkew: function(localMouse, transform, by, _dim) {
+    /*_setObjectSkew: function(localMouse, transform, by, _dim) {
       var target = transform.target, radians;
 
       if (by === 'x') {
@@ -667,6 +670,38 @@
         transform.newSkewY = fabric.util.radiansToDegrees(radians);
         target.set('skewY', transform.newSkewY);
       }
+    },*/
+
+    _setObjectSkew: function(localMouse, transform, by, _dim) {
+      var target = transform.target, radians, sign = transform.sign,
+          skewSign = transform.skewSign, newDim, dimNoSkew, newDim,
+          newDimMouse;
+      console.log('skewX:', target.skewX, 'skewY:', target.skewY, 'scaleX:', target.scaleX, 'scaleY:', target.scaleY);
+      if (by === 'x') {
+        newDimMouse = sign * localMouse.x + _dim.x;
+        dimNoSkew = target._getTransformedDimensions(0, target.skewY).x;
+        radians = skewSign * Math.atan(((newDimMouse - dimNoSkew) / target.scaleX) / (_dim.y / target.scaleY));
+        transform.newSkewX = fabric.util.radiansToDegrees(radians);
+        target.set('skewX', transform.newSkewX);
+        if (target.skewY !== 0) {
+          newDim = target._getTransformedDimensions();
+          transform.newScaleY = (_dim.y / newDim.y) * target.scaleY;
+          target.set('scaleY', transform.newScaleY);
+        }
+      }
+      else if (by === 'y') {
+        newDimMouse = sign * localMouse.y + _dim.y;
+        dimNoSkew = target._getTransformedDimensions(target.skewX, 0).y;
+        radians = skewSign * Math.atan(((newDimMouse - dimNoSkew) / target.scaleY) / (_dim.x / target.scaleX));
+        transform.newSkewY = fabric.util.radiansToDegrees(radians);
+        target.set('skewY', transform.newSkewY);
+        if (target.skewX !== 0) {
+          newDim = target._getTransformedDimensions();
+          transform.newScaleX = (_dim.x / newDim.x) * target.scaleX;
+          target.set('scaleX', transform.newScaleX);
+        }
+      }
+      console.log('skewX:', target.skewX, 'skewY:', target.skewY, 'scaleX:', target.scaleX, 'scaleY:', target.scaleY);
     },
 
     /**
