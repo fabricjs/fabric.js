@@ -58,8 +58,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     }
     var toFixed = fabric.util.toFixed,
         angle = this.getAngle() % 360,
-        skewX = this.getSkewX() % 360 * (this.flipX ? -1 : 1),
-        skewY = this.getSkewY() % 360 * (this.flipY ? -1 : 1),
+        skewX = (this.getSkewX() % 360) * (this.flipX ? -1 : 1),
+        skewY = (this.getSkewY() % 360) * (this.flipY ? -1 : 1),
         vpt = !this.canvas || this.canvas.svgViewportTransformation ? this.getViewportTransform() : [1, 0, 0, 1, 0, 0],
         center = fabric.util.transformPoint(this.getCenterPoint(), vpt),
 
