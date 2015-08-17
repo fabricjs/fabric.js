@@ -869,6 +869,35 @@ fabric.Collection = {
       imageData = null;
 
       return _isTransparent;
+    },
+
+    /**
+     * Parse preserveAspectRatio attribute from element
+     * @param {string} attribute to be parsed
+     * @return {Object} an object containing align and meetOrSlice attribute
+     */
+    parsePreserveAspectRatioAttribute: function(attribute) {
+      var meetOrSlice = 'meet', alignX = 'Mid', alignY = 'Mid',
+          aspectRatioAttrs = attribute.split(' '), align;
+
+      if (aspectRatioAttrs && aspectRatioAttrs.length) {
+        meetOrSlice = aspectRatioAttrs.pop();
+        if (meetOrSlice !== 'meet' && meetOrSlice !== 'slice') {
+          align = meetOrSlice;
+          meetOrSlice = 'meet';
+        }
+        else if (aspectRatioAttrs.length) {
+          align = aspectRatioAttrs.pop();
+        }
+      }
+      //divide align in alignX and alignY
+      alignX = align !== 'none' ? align.slice(1, 4) : 'none';
+      alignY = align !== 'none' ? align.slice(5, 8) : 'none';
+      return {
+        meetOrSlice: meetOrSlice,
+        alignX: alignX,
+        alignY: alignY
+      };
     }
   };
 
@@ -1509,7 +1538,7 @@ fabric.Collection = {
      * Cross-browser approximation of ES5 Function.prototype.bind (not fully spec conforming)
      * @see <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function/bind">Function#bind on MDN</a>
      * @param {Object} thisArg Object to bind function to
-     * @param {Any[]} [...] Values to pass to a bound function
+     * @param {Any[]} Values to pass to a bound function
      * @return {Function}
      */
     Function.prototype.bind = function(thisArg) {
@@ -3273,11 +3302,14 @@ if (typeof console !== 'undefined') {
         viewBoxWidth, viewBoxHeight, matrix, el,
         widthAttr = element.getAttribute('width'),
         heightAttr = element.getAttribute('height'),
+        x = element.getAttribute('x') || 0,
+        y = element.getAttribute('y') || 0,
+        preserveAspectRatio = element.getAttribute('preserveAspectRatio') || '',
         missingViewBox = (!viewBoxAttr || !reViewBoxTagNames.test(element.tagName)
                            || !(viewBoxAttr = viewBoxAttr.match(reViewBoxAttrValue))),
         missingDimAttr = (!widthAttr || !heightAttr || widthAttr === '100%' || heightAttr === '100%'),
         toBeParsed = missingViewBox && missingDimAttr,
-        parsedDim = { };
+        parsedDim = { }, translateMatrix = '';
 
     parsedDim.width = 0;
     parsedDim.height = 0;
@@ -3310,14 +3342,21 @@ if (typeof console !== 'undefined') {
     }
 
     // default is to preserve aspect ratio
-    // preserveAspectRatio attribute to be implemented
-    scaleY = scaleX = (scaleX > scaleY ? scaleY : scaleX);
+    preserveAspectRatio = fabric.util.parsePreserveAspectRatioAttribute(preserveAspectRatio);
+    if (preserveAspectRatio.alignX !== 'none') {
+      //translate all container for the effect of Mid, Min, Max
+      scaleY = scaleX = (scaleX > scaleY ? scaleY : scaleX);
+    }
 
-    if (scaleX === 1 && scaleY === 1 && minX === 0 && minY === 0) {
+    if (scaleX === 1 && scaleY === 1 && minX === 0 && minY === 0 && x === 0 && y === 0) {
       return parsedDim;
     }
 
-    matrix = ' matrix(' + scaleX +
+    if (x || y) {
+      translateMatrix = ' translate(' + parseUnit(x) + ' ' + parseUnit(y) + ') ';
+    }
+
+    matrix = translateMatrix + ' matrix(' + scaleX +
                   ' 0' +
                   ' 0 ' +
                   scaleY + ' ' +
@@ -3452,15 +3491,15 @@ if (typeof console !== 'undefined') {
   function _createSVGPattern(markup, canvas, property) {
     if (canvas[property] && canvas[property].toSVG) {
       markup.push(
-        '<pattern x="0" y="0" id="', property, 'Pattern" ',
+        '\t<pattern x="0" y="0" id="', property, 'Pattern" ',
           'width="', canvas[property].source.width,
           '" height="', canvas[property].source.height,
-          '" patternUnits="userSpaceOnUse">',
-        '<image x="0" y="0" ',
+          '" patternUnits="userSpaceOnUse">\n',
+        '\t\t<image x="0" y="0" ',
         'width="', canvas[property].source.width,
         '" height="', canvas[property].source.height,
         '" xlink:href="', canvas[property].source.src,
-        '"></image></pattern>'
+        '"></image>\n\t</pattern>\n'
       );
     }
   }
@@ -3823,7 +3862,7 @@ if (typeof console !== 'undefined') {
           '@font-face {',
             'font-family: ', objects[i].fontFamily, '; ',
             'src: url(\'', objects[i].path, '\')',
-          '}'
+          '}\n'
           //jscs:enable validateIndentation
         ].join('');
       }
@@ -3831,11 +3870,11 @@ if (typeof console !== 'undefined') {
       if (markup) {
         markup = [
           //jscs:disable validateIndentation
-          '<style type="text/css">',
+          '\t<style type="text/css">',
             '<![CDATA[',
               markup,
             ']]>',
-          '</style>'
+          '</style>\n'
           //jscs:enable validateIndentation
         ].join('');
       }
@@ -4894,7 +4933,7 @@ fabric.ElementsParser.prototype.checkIfDone = function() {
   /* _FROM_SVG_START_ */
   function getColorStop(el) {
     var style = el.getAttribute('style'),
-        offset = el.getAttribute('offset'),
+        offset = el.getAttribute('offset') || 0,
         color, colorAlpha, opacity;
 
     // convert percents to absolute values
@@ -6942,7 +6981,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
     _setSVGPreamble: function(markup, options) {
       if (!options.suppressPreamble) {
         markup.push(
-          '<?xml version="1.0" encoding="', (options.encoding || 'UTF-8'), '" standalone="no" ?>',
+          '<?xml version="1.0" encoding="', (options.encoding || 'UTF-8'), '" standalone="no" ?>\n',
             '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" ',
               '"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n'
         );
@@ -6986,12 +7025,12 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
                 options.viewBox.width + ' ' +
                 options.viewBox.height + '" '
               : null),
-          'xml:space="preserve">',
-        '<desc>Created with Fabric.js ', fabric.version, '</desc>',
+          'xml:space="preserve">\n',
+        '<desc>Created with Fabric.js ', fabric.version, '</desc>\n',
         '<defs>',
           fabric.createSVGFontFacesMarkup(this.getObjects()),
           fabric.createSVGRefElementsMarkup(this),
-        '</defs>'
+        '</defs>\n'
       );
     },
 
@@ -7034,7 +7073,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
                 ? this[property].source.height
                 : this.height),
             '" fill="url(#' + property + 'Pattern)"',
-          '></rect>'
+          '></rect>\n'
         );
       }
       else if (this[property] && property === 'overlayColor') {
@@ -7043,7 +7082,7 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
             'width="', this.width,
             '" height="', this.height,
             '" fill="', this[property], '"',
-          '></rect>'
+          '></rect>\n'
         );
       }
     },
@@ -10873,14 +10912,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     originY:                  'top',
 
     /**
-     * Top position of an object. Note that by default it's relative to object center. You can change this by setting originY={top/center/bottom}
+     * Top position of an object. Note that by default it's relative to object top. You can change this by setting originY={top/center/bottom}
      * @type Number
      * @default
      */
     top:                      0,
 
     /**
-     * Left position of an object. Note that by default it's relative to object center. You can change this by setting originX={left/center/right}
+     * Left position of an object. Note that by default it's relative to object left. You can change this by setting originX={left/center/right}
      * @type Number
      * @default
      */
@@ -11343,7 +11382,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
             fill:                     (this.fill && this.fill.toObject) ? this.fill.toObject() : this.fill,
             stroke:                   (this.stroke && this.stroke.toObject) ? this.stroke.toObject() : this.stroke,
             strokeWidth:              toFixed(this.strokeWidth, NUM_FRACTION_DIGITS),
-            strokeDashArray:          this.strokeDashArray,
+            strokeDashArray:          this.strokeDashArray ? this.strokeDashArray.concat() : this.strokeDashArray,
             strokeLineCap:            this.strokeLineCap,
             strokeLineJoin:           this.strokeLineJoin,
             strokeMiterLimit:         toFixed(this.strokeMiterLimit, NUM_FRACTION_DIGITS),
@@ -11359,7 +11398,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
             backgroundColor:          this.backgroundColor,
             fillRule:                 this.fillRule,
             globalCompositeOperation: this.globalCompositeOperation,
-            transformMatrix:          this.transformMatrix
+            transformMatrix:          this.transformMatrix ? this.transformMatrix.concat() : this.transformMatrix
           };
 
       if (!this.includeDefaultValues) {
@@ -11846,6 +11885,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @param {Number} [options.r1=0] Radius of start point (only for radial gradients)
      * @param {Number} [options.r2=0] Radius of end point (only for radial gradients)
      * @param {Object} [options.colorStops] Color stops object eg. {0: 'ff0000', 1: '000000'}
+     * @param {Object} [options.gradientTransform] transforMatrix for gradient
      * @return {fabric.Object} thisArg
      * @chainable
      * @see {@link http://jsfiddle.net/fabricjs/58y8b/|jsFiddle demo}
@@ -11897,6 +11937,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         gradient.coords.r1 = options.r1;
         gradient.coords.r2 = options.r2;
       }
+
+      options.gradientTransform && (gradient.gradientTransform = options.gradientTransform);
 
       for (var position in options.colorStops) {
         var color = new fabric.Color(options.colorStops[position]);
@@ -12787,7 +12829,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         opacity = typeof this.opacity !== 'undefined' ? this.opacity : '1',
 
         visibility = this.visible ? '' : ' visibility: hidden;',
-        filter = this.shadow ? 'filter: url(#SVGID_' + this.shadow.id + ');' : '';
+        filter = this.getSvgFilter();
 
     return [
       'stroke: ', stroke, '; ',
@@ -12802,6 +12844,14 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       filter,
       visibility
     ].join('');
+  },
+
+  /**
+   * Returns filter for svg shadow
+   * @return {String}
+   */
+  getSvgFilter: function() {
+    return this.shadow ? 'filter: url(#SVGID_' + this.shadow.id + ');' : '';
   },
 
   /**
@@ -12956,7 +13006,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           ey = pointer.y,
           xPoints,
           lines;
-
+      this.__corner = 0;
       for (var i in this.oCoords) {
 
         if (!this.isControlVisible(i)) {
@@ -16273,17 +16323,16 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       var objects = this.getObjects(),
           p = this.getPointByOrigin('left', 'top'),
           translatePart = 'translate(' + p.x + ' ' + p.y + ')',
-          markup = [
-            //jscs:disable validateIndentation
-            '<g ',
-              'style="', this.getSvgStyles(), '" ',
-              'transform="', this.getSvgTransformMatrix(), translatePart, this.getSvgTransform(), '" ',
-            '>\n'
-            //jscs:enable validateIndentation
-          ];
+          markup = this._createBaseSVGMarkup();
+      markup.push(
+        '<g ',
+        'style="', this.getSvgStyles(), '" ',
+        'transform="', this.getSvgTransformMatrix(), translatePart, this.getSvgTransform(), '" ',
+        '>\n'
+      );
 
       for (var i = 0, len = objects.length; i < len; i++) {
-        markup.push(objects[i].toSVG(reviver));
+        markup.push('\t', objects[i].toSVG(reviver));
       }
       markup.push('</g>\n');
 
@@ -16305,9 +16354,14 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @return {Boolean} true if all paths are of the same color (`fill`)
      */
     isSameColor: function() {
-      var firstPathFill = (this.getObjects()[0].get('fill') || '').toLowerCase();
+      var firstPathFill = this.getObjects()[0].get('fill') || '';
+      if (typeof firstPathFill !== 'string') {
+        return false;
+      }
+      firstPathFill = firstPathFill.toLowerCase();
       return this.getObjects().every(function(path) {
-        return (path.get('fill') || '').toLowerCase() === firstPathFill;
+        var pathFill = path.get('fill') || '';
+        return typeof pathFill === 'string' && (pathFill).toLowerCase() === firstPathFill;
       });
     },
 
@@ -16637,6 +16691,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         ctx.transform.apply(ctx, this.transformMatrix);
       }
       this.transform(ctx);
+      this._setShadow(ctx);
       this.clipTo && fabric.util.clipContext(this, ctx);
       // the array is now sorted in order of highest first, so start from end
       for (var i = 0, len = this._objects.length; i < len; i++) {
@@ -16902,16 +16957,19 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var markup = [
-        //jscs:disable validateIndentation
-        '<g ',
-          'transform="', this.getSvgTransform(),
+      var markup = this._createBaseSVGMarkup();
+      markup.push(
+        '<g transform="',
+        /* avoiding styles intentionally */
+        this.getSvgTransform(),
+        this.getSvgTransformMatrix(),
+        '" style="',
+        this.getSvgFilter(),
         '">\n'
-        //jscs:enable validateIndentation
-      ];
+      );
 
       for (var i = 0, len = this._objects.length; i < len; i++) {
-        markup.push(this._objects[i].toSVG(reviver));
+        markup.push('\t', this._objects[i].toSVG(reviver));
       }
 
       markup.push('</g>\n');
@@ -17204,7 +17262,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      var markup = [], x = -this.width / 2, y = -this.height / 2,
+      var markup = this._createBaseSVGMarkup(), x = -this.width / 2, y = -this.height / 2,
           preserveAspectRatio = 'none';
       if (this.group && this.group.type === 'path-group') {
         x = this.left;
@@ -17566,28 +17624,13 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    */
   fabric.Image.fromElement = function(element, callback, options) {
     var parsedAttributes = fabric.parseAttributes(element, fabric.Image.ATTRIBUTE_NAMES),
-        align = 'xMidYMid', meetOrSlice = 'meet', alignX, alignY, aspectRatioAttrs;
+        preserveAR;
 
     if (parsedAttributes.preserveAspectRatio) {
-      aspectRatioAttrs = parsedAttributes.preserveAspectRatio.split(' ');
+      preserveAR = fabric.util.parsePreserveAspectRatioAttribute(parsedAttributes.preserveAspectRatio);
+      extend(parsedAttributes, preserveAR);
     }
 
-    if (aspectRatioAttrs && aspectRatioAttrs.length) {
-      meetOrSlice = aspectRatioAttrs.pop();
-      if (meetOrSlice !== 'meet' && meetOrSlice !== 'slice') {
-        align = meetOrSlice;
-        meetOrSlice = 'meet';
-      }
-      else if (aspectRatioAttrs.length) {
-        align = aspectRatioAttrs.pop();
-      }
-    }
-    //divide align in alignX and alignY
-    alignX = align !== 'none' ? align.slice(1, 4) : 'none';
-    alignY = align !== 'none' ? align.slice(5, 8) : 'none';
-    parsedAttributes.alignX = alignX;
-    parsedAttributes.alignY = alignY;
-    parsedAttributes.meetOrSlice = meetOrSlice;
     fabric.Image.fromURL(parsedAttributes['xlink:href'], callback,
       extend((options ? fabric.util.object.clone(options) : { }), parsedAttributes));
   };
@@ -21195,8 +21238,6 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 
         this._renderCharDecoration(ctx, decl, left, top, offset, charWidth, charHeight);
         ctx.restore();
-
-        ctx.translate(charWidth, 0);
       }
       else {
         if (method === 'strokeText' && this.stroke) {
@@ -21207,9 +21248,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
         }
         charWidth = this._applyCharStylesGetWidth(ctx, _char, lineIndex, i);
         this._renderCharDecoration(ctx, null, left, top, offset, charWidth, this.fontSize);
-
-        ctx.translate(ctx.measureText(_char).width, 0);
       }
+      ctx.translate(charWidth, 0);
     },
 
     /**
@@ -21667,8 +21707,16 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
+      var clonedStyles = { }, i, j, row;
+      for (i in this.styles) {
+        row = this.styles[i];
+        clonedStyles[i] = { };
+        for (j in row) {
+          clonedStyles[i][j] = clone(row[j]);
+        }
+      }
       return fabric.util.object.extend(this.callSuper('toObject', propertiesToInclude), {
-        styles: clone(this.styles)
+        styles: clonedStyles
       });
     }
   });
@@ -21977,7 +22025,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
     /**
      * Finds index corresponding to beginning or end of a word
      * @param {Number} selectionStart Index of a character
-     * @param {Number} direction: 1 or -1
+     * @param {Number} direction 1 or -1
      * @return {Number} Index of the beginning or end of a word
      */
     searchWordBoundary: function(selectionStart, direction) {
@@ -22242,11 +22290,12 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
         _char + this.text.slice(this.selectionEnd);
       this._textLines = this._splitTextIntoLines();
       this.insertStyleObjects(_char, isEndOfLine, styleObject);
-      this.setSelectionStart(this.selectionStart + 1);
-      this.setSelectionEnd(this.selectionStart);
+      this.selectionStart += 1;
+      this.selectionEnd = this.selectionStart;
       if (skipUpdate) {
         return;
       }
+      this._updateTextarea();
       this.canvas && this.canvas.renderAll();
       this.setCoords();
       this.fire('changed');
@@ -22564,7 +22613,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         return;
       }
 
-      if (this.__lastSelected) {
+      if (this.__lastSelected && !this.__corner) {
         this.enterEditing();
         this.initDelayedCursor(true);
       }
