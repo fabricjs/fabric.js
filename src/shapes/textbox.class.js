@@ -231,20 +231,11 @@
      * @private
      */
     _measureText: function(ctx, text, lineIndex, charOffset) {
-      var width = 0, decl;
+      var width = 0;
       charOffset = charOffset || 0;
 
-      for (var i = 0; i < text.length; i++) {
-        if (this.styles && this.styles[lineIndex] && (decl = this.styles[lineIndex][i + charOffset])) {
-          ctx.save();
-          width += this._applyCharStylesGetWidth(ctx, text[i], lineIndex, i, decl);
-          ctx.restore();
-        }
-        else {
-          // @note: we intentionally pass in an empty style declaration, because if we pass in nothing, it will
-          // retry fetching style declaration
-          width += this._applyCharStylesGetWidth(ctx, text[i], lineIndex, i, {});
-        }
+      for (var i = 0, len = text.length; i < len; i++) {
+        width += this._getWidthOfChar(ctx, text[i], lineIndex, i + charOffset);
       }
 
       return width;

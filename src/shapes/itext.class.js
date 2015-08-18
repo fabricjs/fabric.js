@@ -645,16 +645,18 @@
         charHeight = this.fontSize;
       }
 
-      shouldStroke = (shouldStroke || this.stroke) && method === 'strokeText';
-      shouldFill = (shouldFill || this.fill) && method === 'fillText';
+      shouldStroke = shouldStroke || method === 'strokeText';
+      shouldFill = shouldFill || method === 'fillText';
 
       decl && ctx.save();
 
       charWidth = this._applyCharStylesGetWidth(ctx, _char, lineIndex, i, decl || {});
       textDecoration = textDecoration || this.textDecoration;
 
-      if (shouldFill || shouldStroke) {
-        ctx[method](_char, left, top);
+      shouldFill && ctx.fillText(_char, left, top);
+      shouldStroke && ctx.strokeText(_char, left, top);
+
+      if (textDecoration || textDecoration !== '') {
         offset = this._fontSizeFraction * lineHeight / this.lineHeight;
         this._renderCharDecoration(ctx, textDecoration, left, top, offset, charWidth, charHeight);
       }
@@ -814,14 +816,16 @@
      * @param {Object} [decl]
      */
     _applyCharStylesGetWidth: function(ctx, _char, lineIndex, charIndex, decl) {
-      var styleDeclaration = decl || this._getStyleDeclaration(lineIndex, charIndex, true);
+      var charDecl = this._getStyleDeclaration(lineIndex, charIndex),
+          styleDeclaration = decl || clone(charDecl), width;
 
       this._applyFontStyles(styleDeclaration);
 
       var cacheProp = this._getCacheProp(_char, styleDeclaration);
 
-      // short-circuit if no styles
-      if (this.isEmptyStyles() && this._charWidthsCache[cacheProp] && this.caching) {
+      // short-circuit if no styles for this char
+      // global style from object is always applyed and handled by save and restore
+      if (!charDecl && this._charWidthsCache[cacheProp] && this.caching) {
         return this._charWidthsCache[cacheProp];
       }
 
@@ -844,12 +848,9 @@
       ctx.font = this._getFontDeclaration.call(styleDeclaration);
       this._setShadow.call(styleDeclaration, ctx);
 
-      if (!this.caching) {
-        return ctx.measureText(_char).width;
-      }
-
-      if (!this._charWidthsCache[cacheProp]) {
-        this._charWidthsCache[cacheProp] = ctx.measureText(_char).width;
+      if (!this.caching || !this._charWidthsCache[cacheProp]) {
+        width = ctx.measureText(_char).width;
+        this.caching && (this._charWidthsCache[cacheProp] = width);
       }
 
       return this._charWidthsCache[cacheProp];
