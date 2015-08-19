@@ -623,7 +623,7 @@
           localMouse = target.toLocalPoint(new fabric.Point(x, y), t.originX, t.originY),
           dim = target._getTransformedDimensions();
 
-      this._setLocalMouseScale(localMouse, t);
+      this._setLocalMouse(localMouse, t);
 
       // Actually scale the object
       this._setObjectScale(localMouse, t, lockScalingX, lockScalingY, by, lockScalingFlip, dim);
@@ -711,7 +711,7 @@
     /**
      * @private
      */
-    _setLocalMouseScale: function(localMouse, t) {
+    _setLocalMouse: function(localMouse, t) {
       var target = t.target;
 
       if (t.originX === 'right') {
