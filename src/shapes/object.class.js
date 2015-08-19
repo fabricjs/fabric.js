@@ -451,16 +451,6 @@
 
     /**
      * When true, this object will use center point as the origin of transformation
-     * when being scaled via the controls.
-     * <b>Backwards incompatibility note:</b> This property replaces "centerTransform" (Boolean).
-     * @since 1.6.0
-     * @type Boolean
-     * @default
-     */
-    centeredSkewing:          false,
-
-    /**
-     * When true, this object will use center point as the origin of transformation
      * when being rotated via the controls.
      * <b>Backwards incompatibility note:</b> This property replaces "centerTransform" (Boolean).
      * @since 1.3.4
