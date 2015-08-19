@@ -447,6 +447,8 @@
         originY: origin.y,
         ex: pointer.x,
         ey: pointer.y,
+        lastX: pointer.x,
+        lastY: pointer.y,
         left: target.left,
         top: target.top,
         theta: degreesToRadians(target.angle),
@@ -492,40 +494,12 @@
      * checking mouse direction and pressed corner.
      * @private
      */
-   /* _changeSkewTransformOrigin: function(localMouseByCenter, t, by) {
-      var property = 'originX', origins = {0: 'center'},
-          skew = t.target.skewX, originA = 'left', originB = 'right',
-          corner = t.corner === 'mt' || t.corner === 'ml' ? 1 : -1;
-
-      if (by === 'y') {
-        skew = t.target.skewY;
-        originA = 'top';
-        originB = 'bottom';
-        property = 'originY';
-      }
-      t.sign = 1;
-      origins[-1] = originA;
-      origins[1] = originB;
-
-      skew = skew > 0 ? 1 : skew < 0 ? -1 : 0;
-      t.sign = skew === 0 ? 1 : localMouseByCenter[by] > 0 ? 1 : -1;
-      t[property] = t.sign > 0 ? originA : originB;
-
-      if (this._shouldCenterTransform(t.target)) {
-        t.sign *= 2;
-      }
-
-      t[property] = origins[skew * corner];
-      if (skew === corner) {
-        t.sign *= -1;
-      }
-    },*/
-
-    _changeSkewTransformOrigin: function(localMouseByCenter, t, by) {
+    _changeSkewTransformOrigin: function(actualMouseByCenter, lastMouseByCenter, t, by) {
       var property = 'originX', origins = {0: 'center'},
           skew = t.target.skewX, originA = 'left', originB = 'right',
           corner = t.corner === 'mt' || t.corner === 'ml' ? 1 : -1,
-          mousemove = localMouseByCenter[by];
+          mouseMove = (actualMouseByCenter - lastMouseByCenter) > 0 ? 1 : -1,
+          origins = { };
           
       if (by === 'y') {
         skew = t.target.skewY;
@@ -533,78 +507,24 @@
         originB = 'bottom';
         property = 'originY';
       }
-      if (mousemove > 0) {
-        t.sign = 1;
-        if (skew > 0) {
-          t.skewSign = 1;
-          if (corner === 1) {
-            t[property] = originB;
-            t.sign = -1;
-          }
-          else {
-            t[property] = originA;
-            t.sign = 1;
-          }
-        } else if (skew < 0) {
-          t.skewSign = -1;
-          if (corner === 1) {
-            t[property] = originA;
-            t.sign = 1
-          }
-          else {
-            t[property] = originB;
-            t.sign = -1
-          }
-        }
-      }
-      if (mousemove < 0) {
-        if (skew > 0) {
-          t.skewSign = 1;
-          if (corner === 1) {
-            t[property] = originB;
-            t.sign = -1;
-          }
-          else {
-            t[property] = originA;
-            t.sign = 1;
-          }
-        } else if (skew < 0) {
-          t.skewSign = -1;
-          if (corner === 1) {
-            t[property] = originA;
-            t.sign = 1;
-          }
-          else {
-            t[property] = originB;
-            t.sign = -1;
-          }
-        }
-      }
-      
+      origins[-1] = originA;
+      origins[1] = originB;
+
       if (skew === 0) {
-        t.sign = mousemove > 0 ? 1 : -1;
+        t.skewSign = -corner * mouseMove;
         if (corner === 1) {
-          if (mousemove > 0) {
-            t[property] = originA;
-            t.skewSign = -1;
-          }
-          else {
-            t[property] = originB;
-            t.skewSign = 1;
-          }
+          t[property] = -corner * mouseMove;
         }
         else {
-          if (mousemove > 0) {
-            t[property] = originA;
-            t.skewSign = 1;
-          }
-          else {
-            t[property] = originB;
-            t.skewSign = -1;
-          }
+          t[property] = corner * mouseMove;
         }
       }
-
+      else {
+        skew = skew > 0 ? 1 : -1
+        t.skewSign = skew;
+        t[property] = origins[skew * corner];
+      }
+    },
       //console.log(t[property], mousemove, t.sign, skew, t.skewSign);
 
       return true;
@@ -629,67 +549,58 @@
 
       // Get the constraint point
       var center = target.getCenterPoint(),
-          constraintPosition, dim = target._getTransformedDimensions(),
-          localMouseByCenter = target.toLocalPoint(new fabric.Point(x, y), 'center', 'center');
+          actualMouseByCenter = target.toLocalPoint(new fabric.Point(x, y), 'center', 'center')[by],
+          lastMouseByCenter = target.toLocalPoint(new fabric.Point(t.lastX, t.lastY), 'center', 'center')[by],
+          actualMouseByOrigin, constraintPosition, dim = target._getTransformedDimensions();
 
-      this._changeSkewTransformOrigin(localMouseByCenter, t, by);
+      this._changeSkewTransformOrigin(actualMouseByCenter, lastMouseByCenter, t, by);
+      actualMouseByOrigin = target.toLocalPoint(new fabric.Point(x, y), t.originX, t.originY)[by],
+
       constraintPosition = target.translateToOriginPoint(center, t.originX, t.originY);
-
-      // Actually scale the object
-      this._setObjectSkew(localMouseByCenter, t, by, dim);
-
+      // Actually skew the object
+      this._setObjectSkew(actualMouseByOrigin, t, by, dim);
+      t.lastX = x;
+      t.lastY = y;
       // Make sure the constraints apply
       target.setPositionByOrigin(constraintPosition, t.originX, t.originY);
     },
 
-    /**
-     * @private
-     */
-    /*_setObjectSkew: function(localMouse, transform, by, _dim) {
-      var target = transform.target, radians;
-
-      if (by === 'x') {
-        radians = Math.atan((localMouse.x / target.scaleX - _dim.x) / _dim.y);
-        transform.newSkewX = fabric.util.radiansToDegrees(radians);
-        target.set('skewX', transform.newSkewX);
-      }
-      else if (by === 'y') {
-        radians = Math.atan((localMouse.y / target.scaleY - _dim.y) / _dim.x);
-        transform.newSkewY = fabric.util.radiansToDegrees(radians);
-        target.set('skewY', transform.newSkewY);
-      }
-    },*/
 
     _setObjectSkew: function(localMouse, transform, by, _dim) {
-      var target = transform.target, radians, sign = transform.sign,
-          skewSign = transform.skewSign, newDim, dimNoSkew, newDim,
-          newDimMouse;
-      console.log('skewX:', target.skewX, 'skewY:', target.skewY, 'scaleX:', target.scaleX, 'scaleY:', target.scaleY);
+      var target = transform.target, newValue,
+          skewSign = transform.skewSign, newDim, dimNoSkew,
+          otherBy, _otherBy, _by, newDimMouse, skewX, skewY;
+
       if (by === 'x') {
-        newDimMouse = sign * localMouse.x + _dim.x;
-        dimNoSkew = target._getTransformedDimensions(0, target.skewY).x;
-        radians = skewSign * Math.atan(((newDimMouse - dimNoSkew) / target.scaleX) / (_dim.y / target.scaleY));
-        transform.newSkewX = fabric.util.radiansToDegrees(radians);
-        target.set('skewX', transform.newSkewX);
-        if (target.skewY !== 0) {
-          newDim = target._getTransformedDimensions();
-          transform.newScaleY = (_dim.y / newDim.y) * target.scaleY;
-          target.set('scaleY', transform.newScaleY);
-        }
+        otherBy = 'y';
+        _otherBy = 'Y';
+        _by = 'X';
+        skewX = 0;
+        skewY = target.skewY;
       }
-      else if (by === 'y') {
-        newDimMouse = sign * localMouse.y + _dim.y;
-        dimNoSkew = target._getTransformedDimensions(target.skewX, 0).y;
-        radians = skewSign * Math.atan(((newDimMouse - dimNoSkew) / target.scaleY) / (_dim.x / target.scaleX));
-        transform.newSkewY = fabric.util.radiansToDegrees(radians);
-        target.set('skewY', transform.newSkewY);
-        if (target.skewX !== 0) {
-          newDim = target._getTransformedDimensions();
-          transform.newScaleX = (_dim.x / newDim.x) * target.scaleX;
-          target.set('scaleX', transform.newScaleX);
-        }
+      else {
+        otherBy = 'x';
+        _otherBy = 'X';
+        _by = 'Y';
+        skewX = target.skewX;
+        skewY = 0;
       }
-      console.log('skewX:', target.skewX, 'skewY:', target.skewY, 'scaleX:', target.scaleX, 'scaleY:', target.scaleY);
+
+      dimNoSkew = target._getTransformedDimensions(skewX, skewY);
+      newDimMouse = 2 * Math.abs(localMouse) - dimNoSkew[by];
+      if (newDimMouse <= 2) {
+        newValue = 0;
+      }
+      else {
+        newValue = skewSign * Math.atan((newDimMouse / target['scale' + _by]) / (dimNoSkew[otherBy] / target['scale' + _otherBy]));
+        newValue = fabric.util.radiansToDegrees(newValue);
+      }
+      target.set('skew' + _by, newValue);
+      if (target['skew' + _otherBy] !== 0) {
+        newDim = target._getTransformedDimensions();
+        newValue = (_dim[otherBy] / newDim[otherBy]) * target['scale' + _otherBy];
+        target.set('scale' + _otherBy, newValue);
+      }
     },
 
     /**
