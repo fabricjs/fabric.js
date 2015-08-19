@@ -68,15 +68,6 @@
     centeredScaling:        false,
 
     /**
-     * When true, objects use center point as the origin of skew transformation.
-     * <b>Backwards incompatibility note:</b> This property replaces "centerTransform" (Boolean).
-     * @since 1.6.0
-     * @type Boolean
-     * @default
-     */
-    centeredSkewing:        false,
-
-    /**
      * When true, objects use center point as the origin of rotate transformation.
      * <b>Backwards incompatibility note:</b> This property replaces "centerTransform" (Boolean).
      * @since 1.3.4
@@ -370,9 +361,6 @@
 
       if (t.action === 'scale' || t.action === 'scaleX' || t.action === 'scaleY') {
         centerTransform = this.centeredScaling || target.centeredScaling;
-      }
-      else if (t.action === 'skewX' || t.action === 'skewY') {
-        centerTransform = this.centeredSkewing || target.centeredSkewing;
       }
       else if (t.action === 'rotate') {
         centerTransform = this.centeredRotation || target.centeredRotation;
