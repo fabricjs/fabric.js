@@ -525,10 +525,6 @@
         t[property] = origins[skew * corner];
       }
     },
-      //console.log(t[property], mousemove, t.sign, skew, t.skewSign);
-
-      return true;
-    },
 
     /**
      * Skew object by mouse events
