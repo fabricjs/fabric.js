@@ -89,7 +89,8 @@
         visible: true,
         fill: this.fill,
         stroke: this.stroke,
-        type: 'text'
+        type: 'text',
+        getSvgFilter: this.getSvgFilter
       }, styleDecl));
 
       return [
