@@ -274,7 +274,7 @@
           lineWidth = wordWidth;
         }
 
-        if (line !== '' || word === '') {
+        if (line !== '' || i === 1) {
           line += infix;
         }
         line += word;
