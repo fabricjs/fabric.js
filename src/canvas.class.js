@@ -499,7 +499,7 @@
           skew = t.target.skewX, originA = 'left', originB = 'right',
           corner = t.corner === 'mt' || t.corner === 'ml' ? 1 : -1,
           mouseMove = (actualMouseByCenter - lastMouseByCenter) > 0 ? 1 : -1,
-          origins = { };
+          origins = { }, flipSign = 1;
           
       if (by === 'y') {
         skew = t.target.skewY;
@@ -510,14 +510,17 @@
       origins[-1] = originA;
       origins[1] = originB;
 
+      t.target['flipX'] && (flipSign *= -1);
+      t.target['flipY'] && (flipSign *= -1);
+
       if (skew === 0) {
-        t.skewSign = -corner * mouseMove;
+        t.skewSign = -corner * mouseMove * flipSign;
         t[property] = origins[-mouseMove];
       }
       else {
         skew = skew > 0 ? 1 : -1
         t.skewSign = skew;
-        t[property] = origins[skew * corner];
+        t[property] = origins[skew * corner * flipSign];
       }
     },
 
