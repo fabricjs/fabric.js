@@ -701,7 +701,7 @@
           this.setCursor(target.hoverCursor || this.hoverCursor);
         }
         else {
-          this._setCornerCursor(corner, target);
+          this._setCornerCursor(corner, target, e);
         }
       }
       return true;
