@@ -2,6 +2,8 @@
 
   var sqrt = Math.sqrt,
       atan2 = Math.atan2,
+      atan = Math.atan,
+      pow = Math.pow,
       PiBy180 = Math.PI / 180;
 
   /**
@@ -493,6 +495,28 @@
         is2x2 ? 0 : a[0] * b[4] + a[2] * b[5] + a[4],
         is2x2 ? 0 : a[1] * b[4] + a[3] * b[5] + a[5]
       ];
+    },
+
+    /**
+     * Decompone standard 2x2 matrix into transform componentes
+     * @static
+     * @memberOf fabric.util
+     * @param  {Array} a transformMatrix
+     * @return {Object} Components of transform
+     */
+    qrDecompone: function(a) {
+      // Matrix multiply a * b
+      var angle = atan(a[0] / a[1]),
+          denom = pow(a[0]) + pow(a[1]),
+          scaleX = sqrt(denom),
+          scaleY = (a[0] * a[3] - a[2] * a [1]) / scaleX,
+          skewX = atan((a[0] * a[2] + a[1] * a [3]) / denom);
+      return {
+        angle: angle / PiBy180,
+        scaleX: scaleX,
+        scaleY: scaleY,
+        skewX: skewX / PiBy180
+      };
     },
 
     /**
