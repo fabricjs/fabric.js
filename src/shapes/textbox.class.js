@@ -307,11 +307,12 @@
      * @override
      */
     _splitTextIntoLines: function() {
+      var originalAlign = this.textAlign;
       this.ctx.save();
       this._setTextStyles(this.ctx);
-
+      this.textAlign = 'left';
       var lines = this._wrapText(this.ctx, this.text);
-
+      this.textAlign = originalAlign;
       this.ctx.restore();
       this._textLines = lines;
       this._styleMap = this._generateStyleMap();
