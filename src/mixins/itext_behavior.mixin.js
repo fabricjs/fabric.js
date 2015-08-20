@@ -558,7 +558,7 @@
         _char + this.text.slice(this.selectionEnd);
       this._textLines = this._splitTextIntoLines();
       this.insertStyleObjects(_char, isEndOfLine, styleObject);
-      this.selectionStart += 1;
+      this.selectionStart += _char.length;
       this.selectionEnd = this.selectionStart;
       if (skipUpdate) {
         return;
