@@ -515,7 +515,8 @@
         angle: angle / PiBy180,
         scaleX: scaleX,
         scaleY: scaleY,
-        skewX: skewX / PiBy180
+        skewX: skewX / PiBy180,
+        skewY: 0
       };
     },
 
