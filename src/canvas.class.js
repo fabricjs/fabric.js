@@ -512,12 +512,7 @@
 
       if (skew === 0) {
         t.skewSign = -corner * mouseMove;
-        if (corner === 1) {
-          t[property] = -corner * mouseMove;
-        }
-        else {
-          t[property] = corner * mouseMove;
-        }
+        t[property] = origins[-mouseMove];
       }
       else {
         skew = skew > 0 ? 1 : -1
