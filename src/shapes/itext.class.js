@@ -175,6 +175,11 @@
     _charWidthsCache: { },
 
     /**
+     * @private
+     */
+    __widthOfSpace: [ ],
+
+    /**
      * Constructor
      * @param {String} text Text string
      * @param {Object} [options] Options object
@@ -191,7 +196,6 @@
      */
     _clearCache: function() {
       this.callSuper('_clearCache');
-      this.__maxFontHeights = [ ];
       this.__widthOfSpace = [ ];
     },
 
@@ -1050,7 +1054,6 @@
           maxHeight = currentCharHeight;
         }
       }
-      this.__maxFontHeights[lineIndex] = maxHeight;
       this.__lineHeights[lineIndex] = maxHeight * this.lineHeight * this._fontSizeMult;
       return this.__lineHeights[lineIndex];
     },
