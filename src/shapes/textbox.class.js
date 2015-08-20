@@ -140,6 +140,9 @@
     _getStyleDeclaration: function(lineIndex, charIndex, returnCloneOrEmpty) {
       if (this._styleMap) {
         var map = this._styleMap[lineIndex];
+        if (!map) {
+          return returnCloneOrEmpty ? { } : null;
+        }
         lineIndex = map.line;
         charIndex = map.offset + charIndex;
       }
