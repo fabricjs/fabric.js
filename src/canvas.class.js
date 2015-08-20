@@ -494,11 +494,11 @@
      * checking mouse direction and pressed corner.
      * @private
      */
-    _changeSkewTransformOrigin: function(actualMouseByCenter, lastMouseByCenter, t, by) {
+    _changeSkewTransformOrigin: function(mouseMove, t, by) {
       var property = 'originX', origins = {0: 'center'},
           skew = t.target.skewX, originA = 'left', originB = 'right',
           corner = t.corner === 'mt' || t.corner === 'ml' ? 1 : -1,
-          mouseMove = (actualMouseByCenter - lastMouseByCenter) > 0 ? 1 : -1,
+          mouseMove = mouseMove > 0 ? 1 : -1,
           origins = { }, flipSign = 1;
           
       if (by === 'y') {
@@ -547,7 +547,7 @@
           lastMouseByCenter = target.toLocalPoint(new fabric.Point(t.lastX, t.lastY), 'center', 'center')[by],
           actualMouseByOrigin, constraintPosition, dim = target._getTransformedDimensions();
 
-      this._changeSkewTransformOrigin(actualMouseByCenter, lastMouseByCenter, t, by);
+      this._changeSkewTransformOrigin(actualMouseByCenter - lastMouseByCenter, t, by);
       actualMouseByOrigin = target.toLocalPoint(new fabric.Point(x, y), t.originX, t.originY)[by],
 
       constraintPosition = target.translateToOriginPoint(center, t.originX, t.originY);
