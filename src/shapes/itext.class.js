@@ -641,16 +641,16 @@
 
       if (decl) {
         charHeight = this._getHeightOfChar(ctx, _char, lineIndex, i);
-        shouldStroke = decl.stroke || this.stroke;
-        shouldFill = decl.fill || this.fill;
+        shouldStroke = decl.stroke;
+        shouldFill = decl.fill;
         textDecoration = decl.textDecoration;
       }
       else {
         charHeight = this.fontSize;
       }
 
-      shouldStroke = shouldStroke && method === 'strokeText';
-      shouldFill = shouldFill && method === 'fillText';
+      shouldStroke = (shouldStroke || this.stroke) && method === 'strokeText';
+      shouldFill = (shouldFill || this.fill) && method === 'fillText';
 
       decl && ctx.save();
 
