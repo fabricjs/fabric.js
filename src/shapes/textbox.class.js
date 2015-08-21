@@ -265,7 +265,7 @@
           largestWordWidth = 0;
 
       for (var i = 0; i < words.length; i++) {
-        word = words[0];
+        word = words[i];
         wordWidth = this._measureText(ctx, word, lineIndex, offset);
         offset += word.length;
 

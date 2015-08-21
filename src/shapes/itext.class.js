@@ -649,8 +649,8 @@
         charHeight = this.fontSize;
       }
 
-      shouldStroke = shouldStroke || method === 'strokeText';
-      shouldFill = shouldFill || method === 'fillText';
+      shouldStroke = (shouldStroke || this.stroke) && method === 'strokeText';
+      shouldFill = (shouldFill || this.fill) && method === 'fillText';
 
       decl && ctx.save();
 
