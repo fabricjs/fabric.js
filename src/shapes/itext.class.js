@@ -699,9 +699,9 @@
 
       var decorationWeight = charHeight / 15,
           positions = {
-            'underline': top + charHeight / 10,
+            underline: top + charHeight / 10,
             'line-through': top - charHeight * (this._fontSizeFraction + this._fontSizeMult - 1) + decorationWeight,
-            'overline': top - (this._fontSizeMult - this._fontSizeFraction) * charHeight
+            overline: top - (this._fontSizeMult - this._fontSizeFraction) * charHeight
           },
           decorations = ['underline', 'line-through', 'overline'], i, decoration;
 

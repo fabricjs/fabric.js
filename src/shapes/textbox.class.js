@@ -17,29 +17,41 @@
    * @see {@link fabric.Textbox#initialize} for constructor definition
    */
   fabric.Textbox = fabric.util.createClass(fabric.IText, fabric.Observable, {
+
     /**
      * Type of an object
      * @type String
      * @default
      */
     type: 'textbox',
+
     /**
      * Minimum width of textbox, in pixels.
      * @type Number
      * @default
      */
     minWidth: 20,
+
     /**
      * Minimum calculated width of a textbox, in pixels.
      * @type Number
      * @default
      */
     dynamicMinWidth: 0,
+
+    /**
+     * Textbox will break words to split text into lines
+     * @type Number
+     * @default
+     */
+    breakWords: false,
+
     /**
      * Cached array of text wrapping.
      * @type Array
      */
     __cachedLines: null,
+
     /**
      * Constructor. Some scaling related property values are forced. Visibility
      * of controls is also fixed; only the rotation and width controls are
@@ -262,14 +274,30 @@
           infix            = ' ',
           wordWidth        = 0,
           infixWidth       = 0,
+          letterWidth      = 0,
           largestWordWidth = 0;
 
       for (var i = 0; i < words.length; i++) {
         word = words[i];
-        wordWidth = this._measureText(ctx, word, lineIndex, offset);
-        offset += word.length;
-
-        lineWidth += infixWidth + wordWidth;
+        lineWidth += infixWidth;
+        if (this.breakWords) {
+          word = word.split('');
+          while (word.length) {
+            letterWidth = this._getWidthOfChar(ctx, word[0], lineIndex, offset);
+            if (lineWidth + letterWidth > this.width) {
+              lines.push(line);
+              line = '';
+              lineWidth = 0;
+            }
+            line += word.shift();
+            offset++;
+            lineWidth += letterWidth;
+          }
+        }
+        else {
+          wordWidth = this._measureText(ctx, word, lineIndex, offset);
+          lineWidth += wordWidth;
+        }
 
         if (lineWidth >= this.width && line !== '') {
           lines.push(line);
@@ -277,16 +305,18 @@
           lineWidth = wordWidth;
         }
 
-        if (line !== '' || i === 1) {
+        // need help to handle double spaces.
+        // currently not handled good
+        if (line !== '' || (i === 1 && word === '')) {
           line += infix;
         }
         line += word;
-
+        offset += word.length;
         infixWidth = this._measureText(ctx, infix, lineIndex, offset);
         offset++;
 
         // keep track of largest word
-        if (wordWidth > largestWordWidth) {
+        if (wordWidth > largestWordWidth && !this.breakWords) {
           largestWordWidth = wordWidth;
         }
       }
