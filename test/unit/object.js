@@ -292,10 +292,12 @@
       strokeLineJoin: 'bevil',
       strokeMiterLimit: 5,
       flipX: true,
-      opacity: 0.13
+      opacity: 0.13,
+      transformMatrix: [3, 0, 3, 1, 0, 0]
     };
 
-    var cObj = new fabric.Object();
+    var cObj = new fabric.Object(),
+        toObjectObj;
     cObj.includeDefaultValues = false;
     deepEqual(emptyObjectRepr, cObj.toObject());
 
@@ -308,9 +310,15 @@
         .set('strokeDashArray', [5, 2])
         .set('strokeLineCap', 'round')
         .set('strokeLineJoin', 'bevil')
-        .set('strokeMiterLimit', 5);
-
-    deepEqual(augmentedObjectRepr, cObj.toObject());
+        .set('strokeMiterLimit', 5)
+        .set('transformMatrix', [3, 0, 3, 1, 0, 0]);
+    toObjectObj = cObj.toObject();
+    deepEqual(augmentedObjectRepr, toObjectObj);
+    notEqual(augmentedObjectRepr.transformMatrix, toObjectObj.transformMatrix);
+    deepEqual(augmentedObjectRepr.transformMatrix, toObjectObj.transformMatrix);
+    notEqual(augmentedObjectRepr.strokeDashArray, toObjectObj.strokeDashArray);
+    deepEqual(augmentedObjectRepr.strokeDashArray, toObjectObj.strokeDashArray);
+    
   });
 
   test('toDatalessObject', function() {

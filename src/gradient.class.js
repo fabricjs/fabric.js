@@ -3,7 +3,7 @@
   /* _FROM_SVG_START_ */
   function getColorStop(el) {
     var style = el.getAttribute('style'),
-        offset = el.getAttribute('offset'),
+        offset = el.getAttribute('offset') || 0,
         color, colorAlpha, opacity;
 
     // convert percents to absolute values

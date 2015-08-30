@@ -382,10 +382,10 @@
     if (el) {
       return el;
     }
-    var node, i, idAttr, nodelist = doc.getElementsByTagName('*');
+    var node, i, nodelist = doc.getElementsByTagName('*');
     for (i = 0; i < nodelist.length; i++) {
       node = nodelist[i];
-      if (idAttr === node.getAttribute('id')) {
+      if (id === node.getAttribute('id')) {
         return node;
       }
     }
