@@ -175,6 +175,11 @@
     _charWidthsCache: { },
 
     /**
+     * @private
+     */
+    __widthOfSpace: [ ],
+
+    /**
      * Constructor
      * @param {String} text Text string
      * @param {Object} [options] Options object
@@ -191,7 +196,6 @@
      */
     _clearCache: function() {
       this.callSuper('_clearCache');
-      this.__maxFontHeights = [ ];
       this.__widthOfSpace = [ ];
     },
 
@@ -631,38 +635,37 @@
      * @param {Number} lineHeight Height of the line
      */
     _renderChar: function(method, ctx, lineIndex, i, _char, left, top, lineHeight) {
-      var charWidth, charHeight,
+      var charWidth, charHeight, shouldFill, shouldStroke,
           decl = this._getStyleDeclaration(lineIndex, i),
-          offset = this._fontSizeFraction * lineHeight / this.lineHeight;
+          offset, textDecoration;
 
       if (decl) {
-        var shouldStroke = decl.stroke || this.stroke,
-            shouldFill = decl.fill || this.fill;
-
-        ctx.save();
-        charWidth = this._applyCharStylesGetWidth(ctx, _char, lineIndex, i, decl);
         charHeight = this._getHeightOfChar(ctx, _char, lineIndex, i);
-
-        if (shouldFill) {
-          ctx.fillText(_char, left, top);
-        }
-        if (shouldStroke) {
-          ctx.strokeText(_char, left, top);
-        }
-
-        this._renderCharDecoration(ctx, decl, left, top, offset, charWidth, charHeight);
-        ctx.restore();
+        shouldStroke = decl.stroke;
+        shouldFill = decl.fill;
+        textDecoration = decl.textDecoration;
       }
       else {
-        if (method === 'strokeText' && this.stroke) {
-          ctx[method](_char, left, top);
-        }
-        if (method === 'fillText' && this.fill) {
-          ctx[method](_char, left, top);
-        }
-        charWidth = this._applyCharStylesGetWidth(ctx, _char, lineIndex, i);
-        this._renderCharDecoration(ctx, null, left, top, offset, charWidth, this.fontSize);
+        charHeight = this.fontSize;
       }
+
+      shouldStroke = (shouldStroke || this.stroke) && method === 'strokeText';
+      shouldFill = (shouldFill || this.fill) && method === 'fillText';
+
+      decl && ctx.save();
+
+      charWidth = this._applyCharStylesGetWidth(ctx, _char, lineIndex, i, decl || {});
+      textDecoration = textDecoration || this.textDecoration;
+
+      shouldFill && ctx.fillText(_char, left, top);
+      shouldStroke && ctx.strokeText(_char, left, top);
+
+      if (textDecoration || textDecoration !== '') {
+        offset = this._fontSizeFraction * lineHeight / this.lineHeight;
+        this._renderCharDecoration(ctx, textDecoration, left, top, offset, charWidth, charHeight);
+      }
+
+      decl && ctx.restore();
       ctx.translate(charWidth, 0);
     },
 
@@ -688,39 +691,25 @@
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    _renderCharDecoration: function(ctx, styleDeclaration, left, top, offset, charWidth, charHeight) {
-
-      var textDecoration = styleDeclaration
-            ? (styleDeclaration.textDecoration || this.textDecoration)
-            : this.textDecoration;
+    _renderCharDecoration: function(ctx, textDecoration, left, top, offset, charWidth, charHeight) {
 
       if (!textDecoration) {
         return;
       }
 
-      if (textDecoration.indexOf('underline') > -1) {
-        ctx.fillRect(
-          left,
-          top + charHeight / 10,
-          charWidth ,
-          charHeight / 15
-        );
-      }
-      if (textDecoration.indexOf('line-through') > -1) {
-        ctx.fillRect(
-          left,
-          top - charHeight * (this._fontSizeFraction + this._fontSizeMult - 1) + charHeight / 15,
-          charWidth,
-          charHeight / 15
-        );
-      }
-      if (textDecoration.indexOf('overline') > -1) {
-        ctx.fillRect(
-          left,
-          top - (this._fontSizeMult - this._fontSizeFraction) * charHeight,
-          charWidth,
-          charHeight / 15
-        );
+      var decorationWeight = charHeight / 15,
+          positions = {
+            'underline': top + charHeight / 10,
+            'line-through': top - charHeight * (this._fontSizeFraction + this._fontSizeMult - 1) + decorationWeight,
+            'overline': top - (this._fontSizeMult - this._fontSizeFraction) * charHeight
+          },
+          decorations = ['underline', 'line-through', 'overline'], i, decoration;
+
+      for (i = 0; i < decorations.length; i++) {
+        decoration = decorations[i];
+        if (textDecoration.indexOf(decoration) > -1) {
+          ctx.fillRect(left, positions[decoration], charWidth , decorationWeight);
+        }
       }
     },
 
@@ -831,14 +820,16 @@
      * @param {Object} [decl]
      */
     _applyCharStylesGetWidth: function(ctx, _char, lineIndex, charIndex, decl) {
-      var styleDeclaration = decl || this._getStyleDeclaration(lineIndex, charIndex, true);
+      var charDecl = this._getStyleDeclaration(lineIndex, charIndex),
+          styleDeclaration = decl || clone(charDecl), width;
 
       this._applyFontStyles(styleDeclaration);
 
       var cacheProp = this._getCacheProp(_char, styleDeclaration);
 
-      // short-circuit if no styles
-      if (this.isEmptyStyles() && this._charWidthsCache[cacheProp] && this.caching) {
+      // short-circuit if no styles for this char
+      // global style from object is always applyed and handled by save and restore
+      if (!charDecl && this._charWidthsCache[cacheProp] && this.caching) {
         return this._charWidthsCache[cacheProp];
       }
 
@@ -861,12 +852,9 @@
       ctx.font = this._getFontDeclaration.call(styleDeclaration);
       this._setShadow.call(styleDeclaration, ctx);
 
-      if (!this.caching) {
-        return ctx.measureText(_char).width;
-      }
-
-      if (!this._charWidthsCache[cacheProp]) {
-        this._charWidthsCache[cacheProp] = ctx.measureText(_char).width;
+      if (!this.caching || !this._charWidthsCache[cacheProp]) {
+        width = ctx.measureText(_char).width;
+        this.caching && (this._charWidthsCache[cacheProp] = width);
       }
 
       return this._charWidthsCache[cacheProp];
@@ -980,18 +968,9 @@
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    _getHeightOfChar: function(ctx, _char, lineIndex, charIndex) {
+    _getHeightOfChar: function(ctx, lineIndex, charIndex) {
       var style = this._getStyleDeclaration(lineIndex, charIndex);
       return style && style.fontSize ? style.fontSize : this.fontSize;
-    },
-
-    /**
-     * @private
-     * @param {CanvasRenderingContext2D} ctx Context to render on
-     */
-    _getHeightOfCharAt: function(ctx, lineIndex, charIndex) {
-      var _char = this._textLines[lineIndex][charIndex];
-      return this._getHeightOfChar(ctx, _char, lineIndex, charIndex);
     },
 
     /**
@@ -1067,15 +1046,14 @@
       }
 
       var line = this._textLines[lineIndex],
-          maxHeight = this._getHeightOfChar(ctx, line[0], lineIndex, 0);
+          maxHeight = this._getHeightOfChar(ctx, lineIndex, 0);
 
       for (var i = 1, len = line.length; i < len; i++) {
-        var currentCharHeight = this._getHeightOfChar(ctx, line[i], lineIndex, i);
+        var currentCharHeight = this._getHeightOfChar(ctx, lineIndex, i);
         if (currentCharHeight > maxHeight) {
           maxHeight = currentCharHeight;
         }
       }
-      this.__maxFontHeights[lineIndex] = maxHeight;
       this.__lineHeights[lineIndex] = maxHeight * this.lineHeight * this._fontSizeMult;
       return this.__lineHeights[lineIndex];
     },
@@ -1121,8 +1099,16 @@
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
+      var clonedStyles = { }, i, j, row;
+      for (i in this.styles) {
+        row = this.styles[i];
+        clonedStyles[i] = { };
+        for (j in row) {
+          clonedStyles[i][j] = clone(row[j]);
+        }
+      }
       return fabric.util.object.extend(this.callSuper('toObject', propertiesToInclude), {
-        styles: clone(this.styles)
+        styles: clonedStyles
       });
     }
   });
