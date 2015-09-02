@@ -28,10 +28,10 @@
     'fillRule':                 'nonzero',
     'globalCompositeOperation': 'source-over',
     'transformMatrix':          null,
-    'skewX':                    0,
-    'skewY':                    0,
     'rx':                       0,
     'ry':                       0,
+    'skewX':                    0,
+    'skewY':                    0,
   };
 
   QUnit.module('fabric.Rect');
@@ -104,7 +104,6 @@
     elRectWithAttrs.setAttribute('stroke-linecap', 'round');
     elRectWithAttrs.setAttribute('stroke-linejoin', 'bevil');
     elRectWithAttrs.setAttribute('stroke-miterlimit', 5);
-    elRectWithAttrs.setAttribute('skewX', 30);
     //elRectWithAttrs.setAttribute('transform', 'translate(-10,-20) scale(2) rotate(45) translate(5,10)');
 
     var rectWithAttrs = fabric.Rect.fromElement(elRectWithAttrs);
@@ -123,7 +122,6 @@
       strokeLineCap:    'round',
       strokeLineJoin:   'bevil',
       strokeMiterLimit: 5,
-      skewX:            30,
       rx:               11,
       ry:               12
     });
