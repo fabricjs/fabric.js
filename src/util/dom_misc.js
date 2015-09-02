@@ -107,9 +107,9 @@
           scrollLeft: 0, scrollTop: 0
         };
 
-    while (element && element.parentNode) {
+    while (element && (element.parentNode || element.host)) {
 
-      element = element.parentNode;
+      element = element.parentNode || element.host;
 
       if (element === fabric.document) {
         left = body.scrollLeft || docElement.scrollLeft || 0;
