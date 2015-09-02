@@ -733,13 +733,12 @@
         n += 8; // full circle ahead
       }
       n += cursorOffset[corner];
-      // normalize n to be from 0 to 7
-      n %= 8;
-      if (e.shiftKey && !(corner % 2)) {
+      if (e.shiftKey && !(cursorOffset[corner] % 2)) {
         //if we are holding shift and we are on a mx corner...
         n += 2;
-        n %= 8;
       }
+      // normalize n to be from 0 to 7
+      n %= 8;
       return this.cursorMap[n];
     }
   });
