@@ -110,6 +110,10 @@
 
     var obj = iText.toObject();
     deepEqual(obj.styles, styles);
+    notEqual(obj.styles[0], styles[0]);
+    notEqual(obj.styles[0][1], styles[0][1]);
+    deepEqual(obj.styles[0], styles[0]);
+    deepEqual(obj.styles[0][1], styles[0][1]);
   });
 
   test('setSelectionStart', function() {

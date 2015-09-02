@@ -140,6 +140,9 @@
     _getStyleDeclaration: function(lineIndex, charIndex, returnCloneOrEmpty) {
       if (this._styleMap) {
         var map = this._styleMap[lineIndex];
+        if (!map) {
+          return returnCloneOrEmpty ? { } : null;
+        }
         lineIndex = map.line;
         charIndex = map.offset + charIndex;
       }
@@ -231,20 +234,11 @@
      * @private
      */
     _measureText: function(ctx, text, lineIndex, charOffset) {
-      var width = 0, decl;
+      var width = 0;
       charOffset = charOffset || 0;
 
-      for (var i = 0; i < text.length; i++) {
-        if (this.styles && this.styles[lineIndex] && (decl = this.styles[lineIndex][i + charOffset])) {
-          ctx.save();
-          width += this._applyCharStylesGetWidth(ctx, text[i], lineIndex, i, decl);
-          ctx.restore();
-        }
-        else {
-          // @note: we intentionally pass in an empty style declaration, because if we pass in nothing, it will
-          // retry fetching style declaration
-          width += this._applyCharStylesGetWidth(ctx, text[i], lineIndex, i, {});
-        }
+      for (var i = 0, len = text.length; i < len; i++) {
+        width += this._getWidthOfChar(ctx, text[i], lineIndex, i + charOffset);
       }
 
       return width;
@@ -259,51 +253,45 @@
      * to.
      */
     _wrapLine: function(ctx, text, lineIndex) {
-      var maxWidth  = this.width,
-          lineWidth = this._measureText(ctx, text, lineIndex, 0);
-
-      // first case: does the whole line fit?
-      if (lineWidth < maxWidth) {
-        // if the current line is only one word, we need to keep track of it if it's a large word
-        if (text.indexOf(' ') === -1 && lineWidth > this.dynamicMinWidth) {
-          this.dynamicMinWidth = lineWidth;
-        }
-
-        return [text];
-      }
-
-      // if the whole line doesn't fit, we break it up into words
-      var lines            = [],
+      var lineWidth        = 0,
+          lines            = [],
           line             = '',
           words            = text.split(' '),
+          word             = '',
           offset           = 0,
-          infix            = '',
+          infix            = ' ',
           wordWidth        = 0,
+          infixWidth       = 0,
           largestWordWidth = 0;
 
-      while (words.length > 0) {
-        infix = line === '' ? '' : ' ';
-        wordWidth = this._measureText(ctx, words[0], lineIndex, line.length + infix.length + offset);
-        lineWidth = line === '' ? wordWidth : this._measureText(ctx, line + infix + words[0], lineIndex, offset);
+      for (var i = 0; i < words.length; i++) {
+        word = words[i];
+        wordWidth = this._measureText(ctx, word, lineIndex, offset);
+        offset += word.length;
 
-        if (lineWidth < maxWidth || (line === '' && wordWidth >= maxWidth)) {
-          line += infix + words.shift();
-        }
-        else {
-          offset += line.length + 1; // add 1 because each word is separated by a space
+        lineWidth += infixWidth + wordWidth;
+
+        if (lineWidth >= this.width && line !== '') {
           lines.push(line);
           line = '';
+          lineWidth = wordWidth;
         }
 
-        if (words.length === 0) {
-          lines.push(line);
+        if (line !== '' || i === 1) {
+          line += infix;
         }
+        line += word;
+
+        infixWidth = this._measureText(ctx, infix, lineIndex, offset);
+        offset++;
 
         // keep track of largest word
         if (wordWidth > largestWordWidth) {
           largestWordWidth = wordWidth;
         }
       }
+
+      i && lines.push(line);
 
       if (largestWordWidth > this.dynamicMinWidth) {
         this.dynamicMinWidth = largestWordWidth;
@@ -319,11 +307,12 @@
      * @override
      */
     _splitTextIntoLines: function() {
+      var originalAlign = this.textAlign;
       this.ctx.save();
       this._setTextStyles(this.ctx);
-
+      this.textAlign = 'left';
       var lines = this._wrapText(this.ctx, this.text);
-
+      this.textAlign = originalAlign;
       this.ctx.restore();
       this._textLines = lines;
       this._styleMap = this._generateStyleMap();

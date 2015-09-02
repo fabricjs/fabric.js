@@ -533,7 +533,11 @@
         this._removeCharsFromTo(this.selectionStart, this.selectionEnd);
         this.setSelectionEnd(this.selectionStart);
       }
-
+      //short circuit for block paste
+      if (!useCopiedStyle && this.isEmptyStyles()) {
+        this.insertChar(_chars, false);
+        return;
+      }
       for (var i = 0, len = _chars.length; i < len; i++) {
         if (useCopiedStyle) {
           style = fabric.copiedTextStyle[i];
@@ -554,7 +558,7 @@
         _char + this.text.slice(this.selectionEnd);
       this._textLines = this._splitTextIntoLines();
       this.insertStyleObjects(_char, isEndOfLine, styleObject);
-      this.selectionStart += 1;
+      this.selectionStart += _char.length;
       this.selectionEnd = this.selectionStart;
       if (skipUpdate) {
         return;
