@@ -437,7 +437,7 @@
         target = this.getActiveGroup();
       }
 
-      if (target && target.selectable && !shouldGroup) {
+      if (target && target.selectable && (target.__corner || !shouldGroup)) {
         this._beforeTransform(e, target);
         this._setupCurrentTransform(e, target);
       }
