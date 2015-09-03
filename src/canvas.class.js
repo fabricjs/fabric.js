@@ -799,6 +799,7 @@
       if (obj &&
           obj.visible &&
           obj.evented &&
+          obj.selectable &&
           this.containsPoint(e, obj)){
         if ((this.perPixelTargetFind || obj.perPixelTargetFind) && !obj.isEditing) {
           var isTransparent = this.isTargetTransparent(obj, pointer.x, pointer.y);
