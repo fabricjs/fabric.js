@@ -62,6 +62,8 @@
         this._rotateObjectByAngle(self.rotation, e);
       }
 
+      this._setCenterToOrigin(t.target);
+
       this.renderAll();
       t.action = 'drag';
     },
