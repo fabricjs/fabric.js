@@ -107,8 +107,13 @@
           scrollLeft: 0, scrollTop: 0
         };
 
+    // While loop checks (and then sets element to) .parentNode OR .host
+    //  to account for ShadowDOM. We still want to traverse up out of ShadowDOM,
+    //  but the .parentNode of a root ShadowDOM node will always be null, instead
+    //  it should be accessed through .host. See http://stackoverflow.com/a/24765528/4383938
     while (element && (element.parentNode || element.host)) {
 
+      // Set element to element parent, or 'host' in case of ShadowDOM
       element = element.parentNode || element.host;
 
       if (element === fabric.document) {
