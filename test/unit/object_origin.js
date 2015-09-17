@@ -237,6 +237,7 @@
     var rect = new fabric.Rect(rectOptions),
         p;
 
+    rect.strokeWidth = 0;
     rect.originX = 'left';
     rect.originY = 'top';
     p = rect.adjustPosition('left');
@@ -294,7 +295,7 @@
         p;
         
     rect.angle = 35;
-
+    rect.strokeWidth = 0;
     rect.originX = 'left';
     rect.originY = 'top';
     p = rect.adjustPosition('left');

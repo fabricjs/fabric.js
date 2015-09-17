@@ -43,6 +43,8 @@
     'filters':                  [],
     'fillRule':                 'nonzero',
     'globalCompositeOperation': 'source-over',
+    'skewX':                    0,
+    'skewY':                    0,
     'transformMatrix':          null,
     'crossOrigin':              '',
     'alignX':                   'none',

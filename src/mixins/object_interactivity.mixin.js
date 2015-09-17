@@ -138,12 +138,39 @@
     /*
      * @private
      */
-    _getTransformedDimensions: function(dimensions) {
-      if (!dimensions) {
-        dimensions = this._getNonTransformedDimensions();
+    _getTransformedDimensions: function(skewX, skewY) {
+      if (typeof skewX === 'undefined') {
+        skewX = this.skewX;
       }
-      var transformMatrix = this._calcDimensionsTransformMatrix();
-      return fabric.util.transformPoint(dimensions, transformMatrix, true);
+      if (typeof skewY === 'undefined') {
+        skewY = this.skewY;
+      }
+      var dimensions = this._getNonTransformedDimensions(),
+          dimX = dimensions.x /2, dimY = dimensions.y / 2,
+          points = [
+          {
+            x: -dimX,
+            y: -dimY
+          },
+          {
+            x: dimX,
+            y: -dimY
+          },
+          {
+            x: -dimX,
+            y: dimY
+          },
+          {
+            x: dimX,
+            y: dimY
+          }],
+          i, transformMatrix = this._calcDimensionsTransformMatrix(skewX, skewY),
+          bbox;
+      for (i = 0; i < points.length; i++) {
+        points[i] = fabric.util.transformPoint(points[i], transformMatrix);
+      }
+      bbox = fabric.util.makeBoundingBoxFromPoints(points);
+      return { x: bbox.width, y: bbox.height };
     },
 
     /*
