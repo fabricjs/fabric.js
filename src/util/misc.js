@@ -498,13 +498,13 @@
     },
 
     /**
-     * Decompone standard 2x2 matrix into transform componentes
+     * Decomposes standard 2x2 matrix into transform componentes
      * @static
      * @memberOf fabric.util
      * @param  {Array} a transformMatrix
      * @return {Object} Components of transform
      */
-    qrDecompone: function(a) {
+    qrDecompose: function(a) {
       var angle = atan(a[0] / a[1]),
           denom = pow(a[0]) + pow(a[1]),
           scaleX = sqrt(denom),
