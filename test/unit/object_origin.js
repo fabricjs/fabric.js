@@ -8,7 +8,7 @@
     'width':                    20,
     'height':                   40,
     'fill':                     'rgb(0,0,0)',
-    'strokeWidth':              2,
+    'strokeWidth':              0,
     'angle':                    0,
     'scaleX':                   2,
     'scaleY':                   2,
