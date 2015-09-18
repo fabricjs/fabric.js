@@ -192,23 +192,12 @@
      */
     getBoundingRect: function() {
       this.oCoords || this.setCoords();
-
-      var xCoords = [this.oCoords.tl.x, this.oCoords.tr.x, this.oCoords.br.x, this.oCoords.bl.x],
-          minX = fabric.util.array.min(xCoords),
-          maxX = fabric.util.array.max(xCoords),
-          width = Math.abs(minX - maxX),
-
-          yCoords = [this.oCoords.tl.y, this.oCoords.tr.y, this.oCoords.br.y, this.oCoords.bl.y],
-          minY = fabric.util.array.min(yCoords),
-          maxY = fabric.util.array.max(yCoords),
-          height = Math.abs(minY - maxY);
-
-      return {
-        left: minX,
-        top: minY,
-        width: width,
-        height: height
-      };
+      return fabric.util.makeBoundingBoxFromPoints([
+        this.oCoords.tl,
+        this.oCoords.tr,
+        this.oCoords.br,
+        this.oCoords.bl
+      ]);
     },
 
     /**
@@ -217,7 +206,7 @@
      */
     getWidth: function() {
       //needs to be changed
-      return this.width * this.scaleX;
+      return this._getTransformedDimensions().x;
     },
 
     /**
@@ -226,7 +215,7 @@
      */
     getHeight: function() {
       //needs to be changed
-      return this.height * this.scaleY;
+      return this._getTransformedDimensions().y;
     },
 
     /**
@@ -357,9 +346,12 @@
       return this;
     },
 
-    _calcDimensionsTransformMatrix: function() {
-      // introduce skew matrix here later
-      return [this.scaleX, 0, 0, this.scaleY, 0, 0];
+    _calcDimensionsTransformMatrix: function(skewX, skewY) {
+      var skewMatrixX = [1, 0, Math.tan(degreesToRadians(skewX)), 1, 0, 0],
+          skewMatrixY = [1, Math.tan(degreesToRadians(skewY)), 0, 1, 0, 0],
+          scaleMatrix = [this.scaleX, 0, 0, this.scaleY, 0, 0],
+          m = fabric.util.multiplyTransformMatrices(scaleMatrix, skewMatrixX, true);
+      return fabric.util.multiplyTransformMatrices(m, skewMatrixY, true);
     }
   });
 })();

@@ -437,7 +437,7 @@
         target = this.getActiveGroup();
       }
 
-      if (target && target.selectable && !shouldGroup) {
+      if (target && target.selectable && (target.__corner || !shouldGroup)) {
         this._beforeTransform(e, target);
         this._setupCurrentTransform(e, target);
       }
@@ -617,6 +617,14 @@
         this._scaleObject(x, y, 'y');
         this._fire('scaling', target, e);
       }
+      else if (action === 'skewX') {
+        this._skewObject(x, y, 'x');
+        this._fire('skewing', target, e);
+      }
+      else if (action === 'skewY') {
+        this._skewObject(x, y, 'y');
+        this._fire('skewing', target, e);
+      }
       else {
         this._translateObject(x, y);
         this._fire('moving', target, e);
@@ -637,14 +645,14 @@
      */
     _beforeScaleTransform: function(e, transform) {
       if (transform.action === 'scale' || transform.action === 'scaleX' || transform.action === 'scaleY') {
-        var centerTransform = this._shouldCenterTransform(e, transform.target);
+        var centerTransform = this._shouldCenterTransform(transform.target);
 
         // Switch from a normal resize to center-based
         if ((centerTransform && (transform.originX !== 'center' || transform.originY !== 'center')) ||
            // Switch from center-based resize to normal one
            (!centerTransform && transform.originX === 'center' && transform.originY === 'center')
         ) {
-          this._resetCurrentTransform(e);
+          this._resetCurrentTransform();
           transform.reset = true;
         }
       }
@@ -663,7 +671,7 @@
       else {
         // Switch from a normal resize to proportional
         if (!transform.reset && transform.currentAction === 'scale') {
-          this._resetCurrentTransform(e, transform.target);
+          this._resetCurrentTransform();
         }
 
         transform.currentAction = 'scaleEqually';
@@ -693,7 +701,7 @@
           this.setCursor(target.hoverCursor || this.hoverCursor);
         }
         else {
-          this._setCornerCursor(corner, target);
+          this._setCornerCursor(corner, target, e);
         }
       }
       return true;
@@ -702,9 +710,9 @@
     /**
      * @private
      */
-    _setCornerCursor: function(corner, target) {
+    _setCornerCursor: function(corner, target, e) {
       if (corner in cursorOffset) {
-        this.setCursor(this._getRotatedCornerCursor(corner, target));
+        this.setCursor(this._getRotatedCornerCursor(corner, target, e));
       }
       else if (corner === 'mtr' && target.hasRotatingPoint) {
         this.setCursor(this.rotationCursor);
@@ -718,13 +726,17 @@
     /**
      * @private
      */
-    _getRotatedCornerCursor: function(corner, target) {
+    _getRotatedCornerCursor: function(corner, target, e) {
       var n = Math.round((target.getAngle() % 360) / 45);
 
       if (n < 0) {
         n += 8; // full circle ahead
       }
       n += cursorOffset[corner];
+      if (e.shiftKey && cursorOffset[corner] % 2 === 0) {
+        //if we are holding shift and we are on a mx corner...
+        n += 2;
+      }
       // normalize n to be from 0 to 7
       n %= 8;
 

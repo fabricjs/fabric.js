@@ -246,7 +246,7 @@
     textDecoration:       '',
 
     /**
-     * Text alignment. Possible values: "left", "center", or "right".
+     * Text alignment. Possible values: "left", "center", "right" or "justify".
      * @type String
      * @default
      */

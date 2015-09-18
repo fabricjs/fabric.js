@@ -993,15 +993,6 @@
         this._drawSelection();
       }
 
-      // delegate rendering to group selection if one exists
-      // used for drawing selection borders/controls
-      var activeGroup = this.getActiveGroup();
-      if (activeGroup) {
-        activeGroup.render(ctx);
-      }
-
-      this._renderOverlay(ctx);
-
       this.fire('after:render');
 
       return this;

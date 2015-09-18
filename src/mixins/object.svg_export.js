@@ -58,6 +58,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     }
     var toFixed = fabric.util.toFixed,
         angle = this.getAngle(),
+        skewX = (this.getSkewX() % 360),
+        skewY = (this.getSkewY() % 360),
         vpt = !this.canvas || this.canvas.svgViewportTransformation ? this.getViewportTransform() : [1, 0, 0, 1, 0, 0],
         center = fabric.util.transformPoint(this.getCenterPoint(), vpt),
 
@@ -81,6 +83,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
             toFixed(this.scaleY * vpt[3], NUM_FRACTION_DIGITS) +
           ')'),
 
+        skewXPart = skewX !== 0 ? ' skewX(' + toFixed(skewX, NUM_FRACTION_DIGITS) + ')' : '',
+
+        skewYPart = skewY !== 0 ? ' skewY(' + toFixed(skewY, NUM_FRACTION_DIGITS) + ')' : '',
+
         addTranslateX = this.type === 'path-group' ? this.width * vpt[0] : 0,
 
         flipXPart = this.flipX ? ' matrix(-1 0 0 1 ' + addTranslateX + ' 0) ' : '',
@@ -90,7 +96,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         flipYPart = this.flipY ? ' matrix(1 0 0 -1 0 ' + addTranslateY + ')' : '';
 
     return [
-      translatePart, anglePart, scalePart, flipXPart, flipYPart
+      translatePart, anglePart, scalePart, flipXPart, flipYPart, skewXPart, skewYPart
     ].join('');
   },
 

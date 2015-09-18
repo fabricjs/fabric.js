@@ -42,6 +42,8 @@
       'flipX':                    false,
       'flipY':                    false,
       'opacity':                  1,
+      'skewX':                    0,
+      'skewY':                    0,
       'rx':                       0,
       'ry':                       0,
       'shadow':                   null,

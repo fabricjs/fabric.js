@@ -2,6 +2,8 @@
 
   var sqrt = Math.sqrt,
       atan2 = Math.atan2,
+      atan = Math.atan,
+      pow = Math.pow,
       PiBy180 = Math.PI / 180;
 
   /**
@@ -98,6 +100,29 @@
         t[0] * p.x + t[2] * p.y + t[4],
         t[1] * p.x + t[3] * p.y + t[5]
       );
+    },
+
+    /**
+     * Returns coordinates of points's bounding rectangle (left, top, width, height)
+     * @param {Array} points 4 points array
+     * @return {Object} Object with left, top, width, height properties
+     */
+    makeBoundingBoxFromPoints: function(points) {
+      var xPoints = [points[0].x, points[1].x, points[2].x, points[3].x],
+          minX = fabric.util.array.min(xPoints),
+          maxX = fabric.util.array.max(xPoints),
+          width = Math.abs(minX - maxX),
+          yPoints = [points[0].y, points[1].y, points[2].y, points[3].y],
+          minY = fabric.util.array.min(yPoints),
+          maxY = fabric.util.array.max(yPoints),
+          height = Math.abs(minY - maxY);
+
+      return {
+        left: minX,
+        top: minY,
+        width: width,
+        height: height
+      };
     },
 
     /**
@@ -457,18 +482,41 @@
      * @memberOf fabric.util
      * @param  {Array} a First transformMatrix
      * @param  {Array} b Second transformMatrix
+     * @param  {Boolean} is2x2 flag to multiply matrices as 2x2 matrices
      * @return {Array} The product of the two transform matrices
      */
-    multiplyTransformMatrices: function(a, b) {
+    multiplyTransformMatrices: function(a, b, is2x2) {
       // Matrix multiply a * b
       return [
         a[0] * b[0] + a[2] * b[1],
         a[1] * b[0] + a[3] * b[1],
         a[0] * b[2] + a[2] * b[3],
         a[1] * b[2] + a[3] * b[3],
-        a[0] * b[4] + a[2] * b[5] + a[4],
-        a[1] * b[4] + a[3] * b[5] + a[5]
+        is2x2 ? 0 : a[0] * b[4] + a[2] * b[5] + a[4],
+        is2x2 ? 0 : a[1] * b[4] + a[3] * b[5] + a[5]
       ];
+    },
+
+    /**
+     * Decomposes standard 2x2 matrix into transform componentes
+     * @static
+     * @memberOf fabric.util
+     * @param  {Array} a transformMatrix
+     * @return {Object} Components of transform
+     */
+    qrDecompose: function(a) {
+      var angle = atan(a[0] / a[1]),
+          denom = pow(a[0]) + pow(a[1]),
+          scaleX = sqrt(denom),
+          scaleY = (a[0] * a[3] - a[2] * a [1]) / scaleX,
+          skewX = atan((a[0] * a[2] + a[1] * a [3]) / denom);
+      return {
+        angle: angle / PiBy180,
+        scaleX: scaleX,
+        scaleY: scaleY,
+        skewX: skewX / PiBy180,
+        skewY: 0
+      };
     },
 
     /**
