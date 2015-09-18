@@ -204,24 +204,6 @@
     });
   });
 
-  asyncTest('isSameColor', function() {
-    getPathGroupObject(function(pathGroup) {
-
-      ok(typeof pathGroup.isSameColor == 'function');
-      equal(pathGroup.isSameColor(), true);
-
-      pathGroup.getObjects()[0].set('fill', 'black');
-      equal(pathGroup.isSameColor(), false);
-
-      // case
-      pathGroup.getObjects()[0].set('fill', '#ff5555');
-      pathGroup.getObjects()[1].set('fill', '#FF5555');
-      equal(pathGroup.isSameColor(), true);
-
-      start();
-    });
-  });
-
   asyncTest('set', function() {
     var fillValue = 'rgb(100,200,100)';
     getPathGroupObject(function(pathGroup) {
@@ -231,19 +213,14 @@
 
       ok(typeof pathGroup.set == 'function');
       equal(pathGroup.set('fill', fillValue), pathGroup, 'should be chainable');
-
-      pathGroup.getObjects().forEach(function(path) {
-        equal(path.get('fill'), fillValue);
-      }, this);
-
       equal(pathGroup.get('fill'), fillValue);
 
       // set different color to one of the paths
       pathGroup.getObjects()[1].set('fill', 'black');
       pathGroup.set('fill', 'rgb(255,255,255)');
 
-      equal(pathGroup.getObjects()[0].get('fill'), 'rgb(100,200,100)',
-        'when paths are of different fill, setting fill of a group should not change them');
+      equal(pathGroup.getObjects()[1].get('fill'), 'black',
+        'Changing fill to pathgroup does not influence paths');
 
       pathGroup.getObjects()[1].set('fill', 'red');
 

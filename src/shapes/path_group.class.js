@@ -120,24 +120,6 @@
     },
 
     /**
-     * Sets certain property to a certain value
-     * @param {String} prop
-     * @param {Any} value
-     * @return {fabric.PathGroup} thisArg
-     */
-    _set: function(prop, value) {
-
-      if (prop === 'fill' && value && this.isSameColor()) {
-        var i = this.paths.length;
-        while (i--) {
-          this.paths[i]._set(prop, value);
-        }
-      }
-
-      return this.callSuper('_set', prop, value);
-    },
-
-    /**
      * Returns object representation of this path group
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} object representation of an instance
@@ -199,22 +181,6 @@
     toString: function() {
       return '#<fabric.PathGroup (' + this.complexity() +
         '): { top: ' + this.top + ', left: ' + this.left + ' }>';
-    },
-
-    /**
-     * Returns true if all paths in this group are of same color
-     * @return {Boolean} true if all paths are of the same color (`fill`)
-     */
-    isSameColor: function() {
-      var firstPathFill = this.getObjects()[0].get('fill') || '';
-      if (typeof firstPathFill !== 'string') {
-        return false;
-      }
-      firstPathFill = firstPathFill.toLowerCase();
-      return this.getObjects().every(function(path) {
-        var pathFill = path.get('fill') || '';
-        return typeof pathFill === 'string' && (pathFill).toLowerCase() === firstPathFill;
-      });
     },
 
     /**
