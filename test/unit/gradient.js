@@ -92,7 +92,7 @@
 
   test('toObject linearGradient', function() {
     var gradient = createLinearGradient();
-
+    gradient.gradientTransform = [1, 0, 0, 1, 50, 50];
     ok(typeof gradient.toObject == 'function');
 
     var object = gradient.toObject();
@@ -103,7 +103,7 @@
     equal(object.coords.y2, gradient.coords.y2);
 
     equal(object.type, gradient.type);
-
+    deepEqual(object.gradientTransform, gradient.gradientTransform);
     equal(object.colorStops, gradient.colorStops);
   });
 
