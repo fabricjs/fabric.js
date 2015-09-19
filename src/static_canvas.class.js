@@ -853,17 +853,15 @@
      * @return {fabric.Canvas} instance
      * @chainable
      */
-    renderAll: function (allOnTop) {
-      var canvasToDrawOn = this[(allOnTop === true && this.interactive) ? 'contextTop' : 'contextContainer'],
+    renderAll: function () {
+      var canvasToDrawOn = this.contextContainer,
           activeGroup = this.getActiveGroup();
 
       if (this.contextTop && this.selection && !this._groupSelector) {
         this.clearContext(this.contextTop);
       }
 
-      if (!allOnTop) {
-        this.clearContext(canvasToDrawOn);
-      }
+      this.clearContext(canvasToDrawOn);
 
       this.fire('before:render');
 
