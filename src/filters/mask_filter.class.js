@@ -57,9 +57,9 @@
       maskCanvasEl.width = maskEl.width;
       maskCanvasEl.height = maskEl.height;
 
-      maskCanvasEl.getContext('2d').drawImage(maskEl, 0, 0, maskEl.width, maskEl.height);
+      maskCanvasEl.getContext('2d').drawImage(maskEl, 0, 0, canvasEl.width, canvasEl.height);
 
-      var maskImageData = maskCanvasEl.getContext('2d').getImageData(0, 0, maskEl.width, maskEl.height),
+      var maskImageData = maskCanvasEl.getContext('2d').getImageData(0, 0, canvasEl.width, canvasEl.height),
           maskData = maskImageData.data;
 
       for (i = 0; i < iLen; i += 4) {
