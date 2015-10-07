@@ -4,11 +4,15 @@
   //         http://www.bitstorm.org/jquery/color-animation/jquery.animate-colors.js
   function calculateColor(begin, end, pos) {
     var color = 'rgba('
-        + parseInt((begin[0] + pos * (end[0] - begin[0])), 10) + ','
-        + parseInt((begin[1] + pos * (end[1] - begin[1])), 10) + ','
-        + parseInt((begin[2] + pos * (end[2] - begin[2])), 10);
+        + Math.round((begin[0] + pos * (end[0] - begin[0]))) + ','
+        + Math.round((begin[1] + pos * (end[1] - begin[1]))) + ','
+        + Math.round((begin[2] + pos * (end[2] - begin[2])));
 
-    color += ',' + (begin && end ? parseFloat(begin[3] + pos * (end[3] - begin[3])) : 1);
+    // Rounding to thousandth place via `toFixed` to avoid scientific notation (e.g. A very small
+    // number like 1.16259e-16 will render the same as the number 1 because scientific notation isn't
+    // universally supported for rgba values)
+    color += ',' + (begin && end ? parseFloat(begin[3] + pos * (end[3] - begin[3])).toFixed(3) : 1);
+
     color += ')';
     return color;
   }
