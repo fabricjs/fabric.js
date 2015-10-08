@@ -54,8 +54,8 @@
           i,
           iLen = imageData.width * imageData.height * 4;
 
-      maskCanvasEl.width = maskEl.width;
-      maskCanvasEl.height = maskEl.height;
+      maskCanvasEl.width = canvasEl.width;
+      maskCanvasEl.height = canvasEl.height;
 
       maskCanvasEl.getContext('2d').drawImage(maskEl, 0, 0, canvasEl.width, canvasEl.height);
 
