@@ -308,7 +308,8 @@
 
       target.hasBorders = target.transparentCorners = false;
 
-      this._draw(this.contextCache, target);
+      target.render(this.contextCache);
+      target._renderControls(this.contextCache);
 
       target.hasBorders = hasBorders;
       target.transparentCorners = transparentCorners;
@@ -1247,20 +1248,16 @@
      * @param {CanvasRenderingContext2D} ctx Context to render controls on
      */
     drawControls: function(ctx) {
+      ctx.save();
+      ctx.setTransform.apply(ctx, [1, 0, 0, 1, 0, 0]);
       var activeGroup = this.getActiveGroup();
       if (activeGroup) {
-        this._drawGroupControls(ctx, activeGroup);
+        activeGroup._renderControls(ctx);
       }
       else {
         this._drawObjectsControls(ctx);
       }
-    },
-
-    /**
-     * @private
-     */
-    _drawGroupControls: function(ctx, activeGroup) {
-      activeGroup._renderControls(ctx);
+      ctx.restore();
     },
 
     /**
