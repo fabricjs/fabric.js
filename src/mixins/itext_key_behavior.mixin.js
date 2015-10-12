@@ -81,14 +81,14 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @param {Event} e Event object
    */
   onInput: function(e) {
-    if (!this.isEditing || this._cancelOnInput) {
-      this._cancelOnInput = false;
+    if (!this.isEditing) {
       return;
     }
     var offset = this.selectionStart || 0,
+        offsetEnd = this.selectionEnd || 0,
         textLength = this.text.length,
         newTextLength = this.hiddenTextarea.value.length,
-        diff = newTextLength - textLength,
+        diff = newTextLength - textLength + offsetEnd - offset,
         charsToInsert = this.hiddenTextarea.value.slice(offset, offset + diff);
     this.insertChars(charsToInsert);
     e.stopPropagation();
@@ -149,7 +149,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (copiedText) {
       this.insertChars(copiedText, useCopiedStyle);
     }
-    this._cancelOnInput = true;
+    e.stopImmediatePropagation();
+    e.preventDefault();
   },
 
   /**

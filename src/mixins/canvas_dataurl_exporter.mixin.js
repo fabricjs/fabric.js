@@ -57,9 +57,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    */
   __toDataURL: function(format, quality, cropping) {
 
-    this.renderAll(true);
+    this.renderAll();
 
-    var canvasEl = this.upperCanvasEl || this.lowerCanvasEl,
+    var canvasEl = this.lowerCanvasEl,
         croppedCanvasEl = this.__getCroppedCanvas(canvasEl, cropping);
 
     // to avoid common confusion https://github.com/kangax/fabric.js/issues/806
@@ -70,9 +70,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     var data = (fabric.StaticCanvas.supports('toDataURLWithQuality'))
               ? (croppedCanvasEl || canvasEl).toDataURL('image/' + format, quality)
               : (croppedCanvasEl || canvasEl).toDataURL('image/' + format);
-
-    this.contextTop && this.clearContext(this.contextTop);
-    this.renderAll();
 
     if (croppedCanvasEl) {
       croppedCanvasEl = null;
@@ -119,7 +116,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         activeObject = this.getActiveObject(),
         activeGroup = this.getActiveGroup(),
 
-        ctx = this.contextTop || this.contextContainer;
+        ctx = this.contextContainer;
 
     if (multiplier > 1) {
       this.setWidth(scaledWidth).setHeight(scaledHeight);
@@ -152,8 +149,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     else if (activeObject && this.deactivateAll) {
       this.deactivateAll();
     }
-
-    this.renderAll(true);
 
     var data = this.__toDataURL(format, quality, cropping);
 

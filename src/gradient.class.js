@@ -153,7 +153,8 @@
         coords: this.coords,
         colorStops: this.colorStops,
         offsetX: this.offsetX,
-        offsetY: this.offsetY
+        offsetY: this.offsetY,
+        gradientTransform: this.gradientTransform ? this.gradientTransform.concat() : this.gradientTransform
       };
     },
 
