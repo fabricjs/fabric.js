@@ -85,20 +85,21 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
     var croppedCanvasEl,
         croppedCtx,
+        croppedNodeCanvasEl,
         shouldCrop = 'left' in cropping ||
                      'top' in cropping ||
                      'width' in cropping ||
                      'height' in cropping;
 
     if (shouldCrop) {
-
       croppedCanvasEl = fabric.util.createCanvasElement();
+      croppedNodeCanvasEl = fabric.isLikelyNode ? canvasEl._nodeCanvas : canvasEl;
       croppedCtx = croppedCanvasEl.getContext('2d');
 
       croppedCanvasEl.width = cropping.width || this.width;
       croppedCanvasEl.height = cropping.height || this.height;
 
-      croppedCtx.drawImage(canvasEl, -cropping.left || 0, -cropping.top || 0);
+      croppedCtx.drawImage(croppedNodeCanvasEl, -cropping.left || 0, -cropping.top || 0);
     }
 
     return croppedCanvasEl;
