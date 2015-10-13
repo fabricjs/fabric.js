@@ -6,6 +6,8 @@ node_js:
   - "0.10"
 addons:
   apt:
+    sources:
+      - ubuntu-toolchain-r-test
     packages:
       - g++-4.8
 script: 'npm run build && npm run test && npm run lint && npm run lint_tests'
