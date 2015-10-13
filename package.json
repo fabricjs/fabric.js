@@ -39,7 +39,7 @@
   },
   "dependencies": {
     "canvas": "1.2.x",
-    "jsdom": "1.1.x",
+    "jsdom": "6.5.x",
     "xmldom": "0.1.x"
   },
   "devDependencies": {
