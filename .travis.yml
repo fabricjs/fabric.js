@@ -11,3 +11,4 @@ addons:
 script: 'npm run build && npm run test && npm run lint && npm run lint_tests'
 before_install:
   - sudo apt-get install -qq libgif-dev libpng-dev libjpeg8-dev libpango1.0-dev libcairo2-dev
+  - if [[ $TRAVIS_OS_NAME == "linux" ]]; then export CXX=g++-4.8; fi
