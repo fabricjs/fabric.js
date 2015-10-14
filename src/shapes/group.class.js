@@ -174,7 +174,7 @@
      * @chainable
      */
     removeWithUpdate: function(object) {
-      this._moveFlippedObject(object);
+      //this._moveFlippedObject(object);
       this._restoreObjectsState();
 
       // since _restoreObjectsState set objects inactive
@@ -325,57 +325,9 @@
      * @return {fabric.Object} transformedObject
      */
     realizeTransform: function(object) {
-      this._moveFlippedObject(object);
+      //this._moveFlippedObject(object);
       this._setObjectPosition(object);
       return object;
-    },
-
-    /**
-     * Moves a flipped object to the position where it's displayed
-     * @private
-     * @param {fabric.Object} object
-     * @return {fabric.Group} thisArg
-     */
-    _moveFlippedObject: function(object) {
-      var oldOriginX = object.get('originX'),
-          oldOriginY = object.get('originY'),
-          center = object.getCenterPoint();
-
-      object.set({
-        originX: 'center',
-        originY: 'center',
-        left: center.x,
-        top: center.y
-      });
-
-      this._toggleFlipping(object);
-
-      var newOrigin = object.getPointByOrigin(oldOriginX, oldOriginY);
-
-      object.set({
-        originX: oldOriginX,
-        originY: oldOriginY,
-        left: newOrigin.x,
-        top: newOrigin.y
-      });
-
-      return this;
-    },
-
-    /**
-     * @private
-     */
-    _toggleFlipping: function(object) {
-      if (this.flipX) {
-        object.toggle('flipX');
-        object.set('left', -object.get('left'));
-        object.setAngle(-object.getAngle());
-      }
-      if (this.flipY) {
-        object.toggle('flipY');
-        object.set('top', -object.get('top'));
-        object.setAngle(-object.getAngle());
-      }
     },
 
     /**
@@ -385,13 +337,12 @@
      * @return {fabric.Group} thisArg
      */
     _restoreObjectState: function(object) {
-      this._setObjectPosition(object);
 
+      this._setObjectPosition(object);
       object.setCoords();
       object.hasControls = object.__origHasControls;
       delete object.__origHasControls;
       object.set('active', false);
-      object.setCoords();
       delete object.group;
 
       return this;
@@ -401,30 +352,14 @@
      * @private
      */
     _setObjectPosition: function(object) {
-      var center = this.getCenterPoint(),
-          rotated = this._getRotatedLeftTop(object);
-
-      object.set({
-        angle: object.getAngle() + this.getAngle(),
-        left: center.x + rotated.left,
-        top: center.y + rotated.top,
-        scaleX: object.get('scaleX') * this.get('scaleX'),
-        scaleY: object.get('scaleY') * this.get('scaleY')
-      });
-    },
-
-    /**
-     * @private
-     */
-    _getRotatedLeftTop: function(object) {
-      var groupAngle = this.getAngle() * (Math.PI / 180);
-      return {
-        left: (-Math.sin(groupAngle) * object.getTop() * this.get('scaleY') +
-                Math.cos(groupAngle) * object.getLeft() * this.get('scaleX')),
-
-        top:  (Math.cos(groupAngle) * object.getTop() * this.get('scaleY') +
-               Math.sin(groupAngle) * object.getLeft() * this.get('scaleX'))
-      };
+      var matrix = object.calcTransformMatrix(),
+          options = fabric.util.qrDecompose(matrix),
+          center = new fabric.Point(options.translateX, options.translateY);
+          console.log(matrix, options);
+      delete options.translateX;
+      delete options.translateY;
+      object.set(options);
+      object.setPositionByOrigin(center, 'center', 'center');
     },
 
     /**
@@ -433,7 +368,7 @@
      * @chainable
      */
     destroy: function() {
-      this._objects.forEach(this._moveFlippedObject, this);
+      //this._objects.forEach(this._moveFlippedObject, this);
       return this._restoreObjectsState();
     },
 
