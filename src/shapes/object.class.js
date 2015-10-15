@@ -1200,13 +1200,20 @@
      * Clones an instance
      * @param {Function} callback Callback is invoked with a clone as a first argument
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-     * @return {fabric.Object} clone of an instance
+     * @return {Promise} Promise with clone of an instance passed to `then` method
      */
-    clone: function(callback, propertiesToInclude) {
-      if (this.constructor.fromObject) {
-        return this.constructor.fromObject(this.toObject(propertiesToInclude), callback);
-      }
-      return new fabric.Object(this.toObject(propertiesToInclude));
+    clone: function(propertiesToInclude) {
+      var _this = this;
+      return new Promise(function(resolve, reject) {
+        if (_this.constructor.fromObject) {
+          _this.constructor.fromObject(_this.toObject(propertiesToInclude))
+            .then(resolve)
+            .catch(reject);
+        }
+        else {
+          resolve(fabric.Object(_this.toObject(propertiesToInclude)));
+        }
+      });
     },
 
     /**
