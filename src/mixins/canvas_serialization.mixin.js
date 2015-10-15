@@ -152,37 +152,49 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
   /**
    * @private
    * @param {String} format
-   * @param {Function} callback
+   * @return {Promise} Promise with url passed to `then` method
    */
-  _toDataURL: function (format, callback) {
-    this.clone(function (clone) {
-      callback(clone.toDataURL(format));
-    });
+  _toDataURL: function (format) {
+    var _this = this;
+    return new Promise(function(resolve, reject) {
+      _this.clone().then(function (clone) {
+        resolve(clone.toDataURL(format));
+      });
+    })
   },
 
   /**
    * @private
    * @param {String} format
    * @param {Number} multiplier
-   * @param {Function} callback
+   * @return {Promise} Promise with url passed to `then` method
    */
-  _toDataURLWithMultiplier: function (format, multiplier, callback) {
-    this.clone(function (clone) {
-      callback(clone.toDataURLWithMultiplier(format, multiplier));
+  _toDataURLWithMultiplier: function (format, multiplier) {
+    var _this = this;
+    return new Promise(function(resolve, reject) {
+      _this.clone().then(function (clone) {
+        resolve(clone.toDataURLWithMultiplier(format, multiplier));
+      });
     });
   },
 
   /**
    * Clones canvas instance
-   * @param {Object} [callback] Receives cloned instance as a first argument
    * @param {Array} [properties] Array of properties to include in the cloned canvas and children
+   * @return {Promise} Promise with clone of an instance passed to `then` method
    */
-  clone: function (callback, properties) {
-    var data = JSON.stringify(this.toJSON(properties));
-    this.cloneWithoutData(function(clone) {
-      clone.loadFromJSON(data, function() {
-        callback && callback(clone);
-      });
+  clone: function (properties) {
+    var data = JSON.stringify(this.toJSON(properties)),
+        _this = this;
+
+    return new Promise(function(resolve, reject) {
+      _this.cloneWithoutData()
+        .then(function(clone) {
+          clone.loadFromJSON(data, function() {
+            resolve(clone);
+          });
+        })
+        .catch(reject)
     });
   },
 
@@ -190,26 +202,30 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * Clones canvas instance without cloning existing data.
    * This essentially copies canvas dimensions, clipping properties, etc.
    * but leaves data empty (so that you can populate it with your own)
-   * @param {Object} [callback] Receives cloned instance as a first argument
+   * @return {Promise} Promise with clone of an instance passed to `then` method
    */
-  cloneWithoutData: function(callback) {
-    var el = fabric.document.createElement('canvas');
+  cloneWithoutData: function() {
+    var el = fabric.document.createElement('canvas'),
+        _this = this;
 
     el.width = this.getWidth();
     el.height = this.getHeight();
 
     var clone = new fabric.Canvas(el);
     clone.clipTo = this.clipTo;
-    if (this.backgroundImage) {
-      clone.setBackgroundImage(this.backgroundImage.src, function() {
-        clone.renderAll();
-        callback && callback(clone);
-      });
-      clone.backgroundImageOpacity = this.backgroundImageOpacity;
-      clone.backgroundImageStretch = this.backgroundImageStretch;
-    }
-    else {
-      callback && callback(clone);
-    }
+
+    return new Promise(function(resolve, reject) {
+      if (_this.backgroundImage) {
+        clone.setBackgroundImage(_this.backgroundImage.src, function() {
+          clone.renderAll();
+          resolve(clone);
+        });
+        clone.backgroundImageOpacity = _this.backgroundImageOpacity;
+        clone.backgroundImageStretch = _this.backgroundImageStretch;
+      }
+      else {
+        resolve(clone);
+      }
+    });
   }
 });
