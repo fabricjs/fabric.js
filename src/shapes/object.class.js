@@ -1216,11 +1216,12 @@
      */
     cloneAsImage: function(callback) {
       var dataUrl = this.toDataURL();
-      fabric.util.loadImage(dataUrl, function(img) {
-        if (callback) {
-          callback(new fabric.Image(img));
-        }
-      });
+      fabric.util.loadImage(dataUrl)
+        .then(function(img) {
+          if (callback) {
+            callback(new fabric.Image(img));
+          }
+        });
       return this;
     },
 

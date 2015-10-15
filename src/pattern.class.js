@@ -48,9 +48,10 @@ fabric.Pattern = fabric.util.createClass(/** @lends fabric.Pattern.prototype */ 
           // img src string
           var _this = this;
           this.source = fabric.util.createImage();
-          fabric.util.loadImage(options.source, function(img) {
-            _this.source = img;
-          });
+          fabric.util.loadImage(options.source)
+            .then(function(img) {
+              _this.source = img;
+            });
         }
       }
       else {

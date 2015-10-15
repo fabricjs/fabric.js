@@ -395,10 +395,11 @@
      */
     __setBgOverlayImage: function(property, image, callback, options) {
       if (typeof image === 'string') {
-        fabric.util.loadImage(image, function(img) {
-          this[property] = new fabric.Image(img, options);
-          callback && callback();
-        }, this, options && options.crossOrigin);
+        fabric.util.loadImage(image, options && options.crossOrigin)
+          .then((function(img) {
+            this[property] = new fabric.Image(img, options);
+            callback && callback();
+          }).bind(this));
       }
       else {
         options && image.setOptions(options);
@@ -419,15 +420,16 @@
     __setBgOverlayColor: function(property, color, callback) {
       if (color && color.source) {
         var _this = this;
-        fabric.util.loadImage(color.source, function(img) {
-          _this[property] = new fabric.Pattern({
-            source: img,
-            repeat: color.repeat,
-            offsetX: color.offsetX,
-            offsetY: color.offsetY
+        fabric.util.loadImage(color.source)
+          .then(function(img) {
+            _this[property] = new fabric.Pattern({
+              source: img,
+              repeat: color.repeat,
+              offsetX: color.offsetX,
+              offsetY: color.offsetY
+            });
+            callback && callback();
           });
-          callback && callback();
-        });
       }
       else {
         this[property] = color;

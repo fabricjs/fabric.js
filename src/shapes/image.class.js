@@ -288,9 +288,10 @@
      * @chainable
      */
     setSrc: function(src, callback, options) {
-      fabric.util.loadImage(src, function(img) {
-        return this.setElement(img, callback, options);
-      }, this, options && options.crossOrigin);
+      fabric.util.loadImage(src, options && options.crossOrigin)
+        .then((function(img) {
+          return this.setElement(img, callback, options);
+        }).bind(this));
     },
 
     /**
