@@ -70,33 +70,35 @@
     });
   }
 
-  fabric.util.loadImage = function(url, callback, context) {
-    function createImageAndCallBack(data) {
-      if (data) {
-        img.src = new Buffer(data, 'binary');
-        // preserving original url, which seems to be lost in node-canvas
-        img._src = url;
-        callback && callback.call(context, img);
+  fabric.util.loadImage = function(url) {
+    return new Promise(function(resolve, reject) {
+      var img = new Image();
+      function createImageAndCallBack(data) {
+        if (data) {
+          img.src = new Buffer(data, 'binary');
+          // preserving original url, which seems to be lost in node-canvas
+          img._src = url;
+          resolve(img);
+        }
+        else {
+          img = null;
+          reject();
+        }
+      }
+      if (url && (url instanceof Buffer || url.indexOf('data') === 0)) {
+        img.src = img._src = url;
+        resolve(img);
+      }
+      else if (url && url.indexOf('http') !== 0) {
+        requestFs(url, createImageAndCallBack);
+      }
+      else if (url) {
+        request(url, 'binary', createImageAndCallBack);
       }
       else {
-        img = null;
-        callback && callback.call(context, null, true);
+        reject(url);
       }
-    }
-    var img = new Image();
-    if (url && (url instanceof Buffer || url.indexOf('data') === 0)) {
-      img.src = img._src = url;
-      callback && callback.call(context, img);
-    }
-    else if (url && url.indexOf('http') !== 0) {
-      requestFs(url, createImageAndCallBack);
-    }
-    else if (url) {
-      request(url, 'binary', createImageAndCallBack);
-    }
-    else {
-      callback && callback.call(context, url);
-    }
+    });
   };
 
   fabric.loadSVGFromURL = function(url, reviver) {
